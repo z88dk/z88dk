@@ -10,16 +10,19 @@
 		SECTION CODE
 		SECTION code_crt_init
 crt0_init_bss:
-	; TODO: Clear bss area
+        EXTERN  __BSS_head
+        EXTERN  __BSS_END_tail
+        ld      hl,__BSS_head
+        ld      de,__BSS_head + 1
+        ld      bc,__BSS_END_tail - __BSS_head - 1
         xor     a               ;Reset atexit() count
+	ld	(hl),a
+        ldir
+
+	; a = 0 - reset exitcount
         ld      (exitcount),a
 IF !DEFINED_nostreams
 	; Setup std* streams
-        ld      hl,__sgoioblk
-        ld      de,__sgoioblk+1
-        ld      bc,#(__sgoioblk_end - __sgoioblk) - 1
-        ld      (hl),0
-        ldir
         ld      hl,__sgoioblk+2
         ld      (hl),19 ;stdin
         ld      hl,__sgoioblk+8

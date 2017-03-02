@@ -96,7 +96,7 @@ int acmatch(char lit)
 
 int CheckTypDef(void)
 {
-    char sname[NAMEMAX];
+    char sname[NAMESIZE];
     char* ptr;
     SYMBOL* sym;
     int i = 0;
@@ -104,7 +104,7 @@ int CheckTypDef(void)
     blanks(); /* Skip white space */
     ptr = line + lptr; /* Where label starts */
 
-    while (an(*ptr) && i < NAMEMAX)
+    while (an(*ptr) && i < (NAMESIZE -1))
         sname[i++] = *ptr++;
     sname[i] = 0;
     sym = findglb(sname);

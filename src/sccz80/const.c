@@ -22,6 +22,8 @@
 
 #include <math.h>
 
+static int get_member_size(TAG_SYMBOL *ptr);;
+static int32_t search_litq_for_doublestr(unsigned char *num);;
 static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias);
 
 /*
@@ -39,11 +41,11 @@ char conssign;
 int constant(LVALUE* lval)
 {
     constype = CINT;
-    conssign = dosigned;
+    conssign = c_default_unsigned;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(&lval->const_val)) {
         lval->val_type = DOUBLE;
-        if (doublestrings) {
+        if (c_double_strings) {
             immedlit(litlab);
             outdec(lval->const_val);
             nl();
@@ -56,7 +58,7 @@ int constant(LVALUE* lval)
             callrts("dload");
         }
         lval->is_const = 0; /*  floating point not constant */
-        lval->flags = 0;
+        lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(&lval->const_val) || pstr(&lval->const_val)) {
         /* Insert int32_t stuff/int32_t pointer here? */
@@ -64,7 +66,7 @@ int constant(LVALUE* lval)
             constype = LONG;
 
         lval->val_type = constype;
-        lval->flags = (lval->flags & MKSIGN) | conssign;
+        lval->flags = (lval->flags & (~UNSIGNED)) | conssign;
         if (constype == LONG)
             vlongconst(lval->const_val);
         else
@@ -74,7 +76,7 @@ int constant(LVALUE* lval)
         lval->is_const = 0; /* string address not constant */
         lval->ptr_type = CCHAR; /* djm 9/3/99 */
         lval->val_type = CINT;
-        lval->flags = 0;
+        lval->flags = FLAGS_NONE;
         immedlit(litlab);
     } else {
         lval->is_const = 0;
@@ -92,7 +94,6 @@ int fnumber(int32_t* val)
     char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
     char* s; /* points into source code */
-    char* dp1; /* First number after dp */
     char* end;
     double dval;
 
@@ -122,7 +123,6 @@ int fnumber(int32_t* val)
         s++;
         return 0;
     }
-    dp1 = ++s;
     while (numeric(*s))
         ++s;
     lptr = (s--) - line; /* save ending point */
@@ -130,18 +130,18 @@ int fnumber(int32_t* val)
     dval = strtod(start, &end);
     if (end == start)
         return 0;
-    dofloat(dval, sum, mathz88 ? 4 : 5, mathz88 ? 127 : 128);
+    dofloat(dval, sum, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
 
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
 
     /* get location for result & bump litptr */
-    if (doublestrings) {
+    if (c_double_strings) {
         *val = stash_double_str(start, lptr + line);
         return (1);
     } else {
-        *val = searchdub(sum);
+        *val = search_litq_for_doublestr(sum);
     }
     return (1); /* report success */
 }
@@ -167,7 +167,7 @@ int stash_double_str(char* start, char* end)
     strncpy(buf, start, len);
     *(buf + len) = 0;
     storeq(len + 1, (unsigned char*)buf, &val);
-    free(buf);
+    FREENULL(buf);
     return (val);
 }
 
@@ -175,7 +175,7 @@ int stash_double_str(char* start, char* end)
  * number - saves space etc etc
  */
 
-int32_t searchdub(unsigned char* num)
+static int32_t search_litq_for_doublestr(unsigned char* num)
 {
     unsigned char* tempdub;
     int dubleft, k, match;
@@ -299,7 +299,7 @@ int pstr(int32_t* val)
     int k;
 
     constype = CINT;
-    conssign = dosigned;
+    conssign = c_default_unsigned;
     if (cmatch('\'')) {
         k = 0;
         while (ch() && ch() != '\'')
@@ -317,9 +317,8 @@ int pstr(int32_t* val)
 
 int tstr(int32_t* val)
 {
-    int k, j;
+    int k = 0;
 
-    j = k = 0;
     if (cmatch('"') == 0)
         return (0);
     do {
@@ -428,7 +427,7 @@ unsigned char litchar()
         return 9;
     case 'r': /* LF */
         gch();
-        return standard_escapes ? 13 : 10;
+        return c_standard_escapecodes ? 13 : 10;
     case 'v': /* VT */
         gch();
         return 11;
@@ -437,7 +436,7 @@ unsigned char litchar()
         return 12;
     case 'n': /* CR */
         gch();
-        return standard_escapes ? 10 : 13;
+        return c_standard_escapecodes ? 10 : 13;
     case '\"': /* " */
         gch();
         return 34;
@@ -495,7 +494,7 @@ void size_of(LVALUE* lval)
     TAG_SYMBOL* otag;
     SYMBOL* ptr;
     struct varid var;
-    char ident;
+    enum ident_type ident;
 
     needchar('(');
     otag = GetVarID(&var, NO);
@@ -524,7 +523,7 @@ void size_of(LVALUE* lval)
                 lval->const_val = 6;
                 break;
             case STRUCT:
-                lval->const_val = GetMembSize(otag);
+                lval->const_val = get_member_size(otag);
                 if (lval->const_val == 0)
                     lval->const_val = otag->size;
             }
@@ -543,7 +542,7 @@ void size_of(LVALUE* lval)
                 if (ptr->type != STRUCT) {
                     lval->const_val = ptr->size;
                 } else {
-                    lval->const_val = GetMembSize(tagtab + ptr->tag_idx);
+                    lval->const_val = get_member_size(tagtab + ptr->tag_idx);
                     if (lval->const_val == 0)
                         lval->const_val = ptr->size;
                 }
@@ -569,9 +568,9 @@ void size_of(LVALUE* lval)
     vconst(lval->const_val);
 }
 
-int GetMembSize(TAG_SYMBOL* ptr)
+static int get_member_size(TAG_SYMBOL* ptr)
 {
-    char sname[NAMEMAX];
+    char sname[NAMESIZE];
     SYMBOL* ptr2;
     if (cmatch('.') == NO && match("->") == NO)
         return (0);

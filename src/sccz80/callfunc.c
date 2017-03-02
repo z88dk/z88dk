@@ -14,12 +14,7 @@
 
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
-
-/*
- *      External variables used
- */
-
-extern int smartprintf;
+static int ForceArgs(char dest, char src, int expr, char functab);
 
 
 /*
@@ -56,7 +51,7 @@ void callfunction(SYMBOL* ptr)
         return;
     }
 
-    if (ptr && smartprintf)
+    if (ptr )
         watcharg = SetWatch(ptr->name, &isscanf);
 
     while (ch() != ')') {
@@ -79,7 +74,7 @@ void callfunction(SYMBOL* ptr)
     }
     needchar(')'); 
 
-    if ( use_r2l_calling_convention == YES || ( ptr && (ptr->flags & SMALLC) == 0) ) {
+    if ( c_use_r2l_calling_convention == YES && ( ptr == NULL || (ptr && (ptr->flags & SMALLC) == 0) ) ) {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];
@@ -90,7 +85,7 @@ void callfunction(SYMBOL* ptr)
 
     /* Don't rewrite expressions whilst we are evaluating */
     save_fps_num = buffer_fps_num;
-    save_fps = mymalloc(buffer_fps_num * sizeof(buffer_fps[0]));
+    save_fps = MALLOC(buffer_fps_num * sizeof(buffer_fps[0]));
     memcpy(save_fps, buffer_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = 0;
     while ( tmpfiles[argnumber+1] ) {
@@ -98,18 +93,27 @@ void callfunction(SYMBOL* ptr)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
         if (ptr) {
+
             /* ordinary call */
             expr = expression(&vconst, &val);
             if (expr == CARRY) {
                 zcarryconv();
                 expr = CINT;
             }
+
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
-                protoarg = ptr->args[ptr->prototyped - argnumber + 1];
+                int proto_argnumber;
+                if ( c_use_r2l_calling_convention == NO || ( (ptr->flags & SMALLC) == SMALLC) ) {
+                    proto_argnumber = ptr->prototyped - argnumber + 1;
+                } else {
+                    proto_argnumber = argnumber;
+                }
+
+                protoarg = ptr->args[proto_argnumber];
                 if ((protoarg != PELLIPSES) && ((protoarg != fnargvalue) || ((protoarg & 7) == STRUCT)))
-                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[ptr->prototyped - argnumber + 1]);
+                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[proto_argnumber]);
             }
-            if ((ptr->flags & REGCALL) && ptr->prototyped == 1) {
+            if ((ptr->flags & FASTCALL) && ptr->prototyped == 1) {
                 /* fastcall of single expression */
 
             } else {
@@ -163,7 +167,7 @@ void callfunction(SYMBOL* ptr)
     }
     memcpy(buffer_fps, save_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = save_fps_num ;
-    free(save_fps);
+    FREENULL(save_fps);
 
     if (ptr)
         debug(DBG_ARG2, "arg %d proto %d", argnumber, ptr->args[1]);
@@ -194,15 +198,11 @@ void callfunction(SYMBOL* ptr)
                 zcallop();
             if (isscanf) {
                 scanf_format_option |= format_option;
-                if (minifunc > scanf_level)
-                    scanf_level = minifunc;
             } else {
                 printf_format_option |= format_option;
-                if (minifunc > printflevel)
-                    printflevel = minifunc;
             }
             outname(ptr->name, dopref(ptr));
-            if ((ptr->flags & SHARED) && useshare)
+            if ((ptr->flags & SHARED) && c_useshared)
                 outstr("_sl");
             else if (ptr->flags & SHAREDC)
                 outstr("_rst");
@@ -217,16 +217,16 @@ void callfunction(SYMBOL* ptr)
      *
      *	We should modify stack if:
      *	- __CALLEE__ isn't set
-     *	- Function is __LIB__ even if compactcode is set
-     *	- compactcode isn't set and __CALLEE__ isn't set
+     *	- Function is __LIB__ even if c_compact_code is set
+     *	- c_compact_code isn't set and __CALLEE__ isn't set
      */
 
-    if ((ptr && ptr->flags & CALLEE) || (compactcode && ptr == NULL) || (compactcode && ((ptr->flags & LIBRARY) == 0))) {
+    if ((ptr && ptr->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((ptr->flags & LIBRARY) == 0))) {
         Zsp += nargs;
     } else {
         /* If we have a frame pointer then ix holds it */
 #ifdef USEFRAME
-        if (useframe) {
+        if (c_useframepointer) {
             if (nargs)
                 RestoreSP(preserve);
             Zsp += nargs;
@@ -277,7 +277,7 @@ static int SetWatch(char* sym, int* type)
  *      djm routine to force arguments to switch type
  */
 
-int ForceArgs(char dest, char src, int expr, char functab)
+static int ForceArgs(char dest, char src, int expr, char functab)
 {
     char did, dtype, disfar, dissign;
     char sid, stype, sisfar, sissign;

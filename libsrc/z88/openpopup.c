@@ -7,9 +7,9 @@
 
 #include <z88.h>
 
-static char  winbot[] = "\x012-S\x012Y"; /* Move to window bottom string */
-static char  winlin[] = "\x012*I\x013N"; /* Bottom line string */
-static char  wincrn[] = "\0x5\0x1\2*L";   /* br corner string */
+static const char  winbot[] = "\x01" "2-S\x01" "2Y"; /* Move to window bottom string */
+static const char  winlin[] = "\x01" "2*I\x01" "3N"; /* Bottom line string */
+static const char  wincrn[] = "\0x5\0x1\2*L";   /* br corner string */
 
 #if 0
 #asm

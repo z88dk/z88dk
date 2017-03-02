@@ -20,7 +20,7 @@
  */
 int initials(char* sname,
     int type, int ident, int dim, int more,
-    TAG_SYMBOL* tag, char zfar)
+    TAG_SYMBOL* tag, char zfar, char isconst)
 {
     int size, desize = 0;
     int olddim = dim;
@@ -44,7 +44,11 @@ int initials(char* sname,
             size = 2;
         }
 
-        output_section("data_compiler"); // output_section("text");
+        if ( isconst ) {
+            output_section("rodata_compiler");
+        } else {
+            output_section("data_compiler"); // output_section("text");
+        }
         prefix();
         outname(sname, YES);
         col();
@@ -222,31 +226,10 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
-#if 0
-        if (ident == VARIABLE || (size != 1 && more != CCHAR))
-            error(E_ASSIGN);
-#endif
-#ifdef INIT_TEST
-        outstr("ident=");
-        outdec(ident);
-        outstr("size=");
-        outdec(size);
-        outstr("more=");
-        outdec(more);
-        outstr("dim=");
-        outdec(*dim);
-        outstr("sz=");
-        outdec(sz);
-        nl();
-#endif
         if (ident == ARRAY && more == 0) {
-            /*
- * Dump the literals where they are, padding out as appropriate
- */
+            /* Dump the literals where they are, padding out as appropriate */
             if (*dim != -1 && sz > *dim) {
-                /*
- * Ooops, initialised to long a string!
- */
+                /* Ooops, initialised to long a string! */
                 warning(W_INIT2LONG);
                 sz = *dim;
                 gltptr = sz;
@@ -258,9 +241,7 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
             dumpzero(size, *dim);
             return;
         } else {
-            /*
- * Store the literals in the queue!
- */
+            /* Store the literals in the queue! */
             storeq(sz, glbq, &value);
             gltptr = 0;
             defword();
@@ -271,13 +252,10 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
             --*dim;
             return;
         }
-    }
-    /*
- * djm, catch label names in structures (for (*name)() initialisation
- */
-    else {
-        char sname[NAMEMAX + 1];
-        SYMBOL* ptr;
+    } else {
+        /* djm, catch label names in structures (for (*name)() initialisation */
+        char sname[NAMESIZE];
+        SYMBOL *ptr;
         if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
                 /* Actually found sommat..very good! */

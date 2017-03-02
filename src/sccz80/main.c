@@ -13,40 +13,74 @@
 extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. */
 #endif
 
-/* 
- *      Data used in this file only
- */
+static char   *c_output_extension = ".asm";
+
+
+static int      gargc; /* global copies of command line args */
+static char   **gargv;
+static SYMBOL  *savecurr;    /* copy of currfn for #include */
+static int      saveline;    /* copy of lineno  "    " */
+static int      saveinfn;    /* copy of infunc  "    " */
+static int      savestart;   /* copy of fnstart "    " */
+
 
 char Filenorig[FILENAME_LEN + 1];
-unsigned int zorg; /* Origin for applications */
 
-int smartprintf; /* Map printf -> miniprintf */
-int makeshare; /* Do we want to make a shared library? */
-int useshare; /* Use shared lib routines? */
-int sharedfile; /* File contains routines which are to be
+int c_makeshare; /* Do we want to make a shared library? */
+int c_useshared; /* Use shared lib routines? */
+int c_shared_file; /* File contains routines which are to be
           * called via lib package - basically jimmy
           * the stack but that's it..
           */
 
-int noaltreg; /* No alternate registers */
-int standard_escapes = 0; /* \n = 10, \r = 13 */
+int c_notaltreg; /* No alternate registers */
+int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 
 /*
  * Some external data
  */
 
-extern int gotocnt; /* No of gotos */
-extern GOTO_TAB* gotoq; /* Pointer for gotoq */
-
-void DispVersion(char*);
-void SetMPM(char*);
-void SetSmart(char*);
-void UnSetSmart(char*);
-void SetMakeShared(char*);
-void SetUseShared(char*);
-void SetAssembler(char* arg);
-void SetOutExt(char* arg);
+static void dumpfns(void);
+static void dumpvars(void);
+static void DispVersion(char*);
+static void SetMakeShared(char*);
+static void SetUseShared(char*);
+static void SetAssembler(char* arg);
+static void SetOutExt(char* arg);
+static void parse(void);
+static void errsummary(void);
+static char *nextarg(int n, char *s, int size);
+static void setup_sym(void);
+static void info(void);
+static void openout(void);
+static void SetNoWarn(char *arg);
+static void SetMathZ88(char *arg);
+static void SetUnsigned(char *arg);
+static void SetDoInline(char *arg);
+static void SetStopError(char *arg);
+static void SetCompactCode(char *arg);
+static void SetCCode(char *arg);
+static void SetDefine(char *arg);
+static void SetUndefine(char *arg);
+static void DispInfo(char *arg);
+static void SetVerbose(char *arg);
+static void UnSetWarning(char *arg);
+static void SetWarning(char *arg);
+static void SetAllWarn(char *arg);
+static void SetShareOffset(char *);
+static void SetDoubleStrings(char *);
+static void SetNoAltReg(char *);
+static void SetSharedFile(char *);
+static void SetDebug(char *);
+static void SetASXX(char *);
+#ifdef USE_FRAME
+static void SetFrameIX(char *);
+static void SetFrameIY(char *);
+static void SetNoFrame(char *);
+#endif
+static void SetStandardEscape(char *);
 static void set_default_r2l(char *arg);
+static void atexit_deallocate(void);
 
 /*
  *
@@ -64,32 +98,23 @@ int main(int argc, char** argv)
     gargv = argv;
 
     /* allocate space for arrays */
-    litq = mymalloc(FNLITQ); /* literals, these 2 dumped end */
-    dubq = mymalloc(FNLITQ); /* Doubles */
-    tempq = mymalloc(LITABSZ); /* Temp strings... */
-    glbq = mymalloc(LITABSZ); /* Used for glb lits, dumped now */
-    symtab = SYM_CAST mymalloc(NUMGLBS * sizeof(SYMBOL));
-    loctab = SYM_CAST mymalloc(NUMLOC * sizeof(SYMBOL));
-    wqueue = WQ_CAST mymalloc(NUMWHILE * sizeof(WHILE_TAB));
-    gotoq = (GOTO_TAB*)calloc(NUMGOTO, sizeof(GOTO_TAB));
-    if (gotoq == NULL)
-        OutOfMem();
+    litq = MALLOC(FNLITQ); /* literals, these 2 dumped end */
+    dubq = MALLOC(FNLITQ); /* Doubles */
+    tempq = MALLOC(LITABSZ); /* Temp strings... */
+    glbq = MALLOC(LITABSZ); /* Used for glb lits, dumped now */
+    symtab = NULL;
+    loctab = MALLOC(NUMLOC * sizeof(SYMBOL));
+    wqueue = MALLOC(NUMWHILE * sizeof(WHILE_TAB));
+    gotoq = MALLOC(NUMGOTO * sizeof(GOTO_TAB));
+    tagptr = tagtab =  MALLOC(NUMTAG * sizeof(TAG_SYMBOL));
+    membptr = membtab =  MALLOC(NUMMEMB * sizeof(SYMBOL));
 
-    tagptr = tagtab = TAG_CAST mymalloc(NUMTAG * sizeof(TAG_SYMBOL));
-    membptr = membtab = SYM_CAST mymalloc(NUMMEMB * sizeof(SYMBOL));
-
-    swnext = SW_CAST mymalloc(NUMCASE * sizeof(SW_TAB));
+    swnext = MALLOC(NUMCASE * sizeof(SW_TAB));
     swend = swnext + (NUMCASE - 1);
 
-    stage = mymalloc(STAGESIZE);
+    stage = MALLOC(STAGESIZE);
     stagelast = stage + STAGELIMIT;
 
-    /* empty symbol table */
-    glbptr = STARTGLB;
-    while (glbptr < ENDGLB) {
-        glbptr->name[0] = 0;
-        ++glbptr;
-    }
 
     glbcnt = 0; /* clear global symbols */
     locptr = STARTLOC; /* clear local symbols */
@@ -100,7 +125,7 @@ int main(int argc, char** argv)
 
     Zsp = /* stack ptr (relative) */
         errcnt = /* no errors */
-        errstop = /* keep going after an error */
+        c_errstop = /* keep going after an error */
         eof = /* not eof yet */
         swactive = /* not in switch */
         skiplevel = /* #if not encountered */
@@ -112,40 +137,34 @@ int main(int argc, char** argv)
         infunc = /* not in function now */
         0; /*  ...all set to zero.... */
 
-    stagenext = NULL_CHAR; /* direct output mode */
+    stagenext = NULL; /* direct output mode */
 
     input = /* no input file */
         inpt2 = /* or include file */
         saveout = /* no diverted output */
-        output = NULL_FD; /* no open units */
+        output = NULL; /* no open units */
 
-    currfn = NULL_SYM; /* no function yet */
+    currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = doinline = mathz88 = incfloat = compactcode = 0;
-    cppcom = 0;
-    dosigned = NO;
-    useshare = makeshare = sharedfile = NO;
-    smartprintf = YES;
-    nxtlab = /* start numbers at lowest possible */
-        ctext = /* don't include the C text as comments */
-        errstop = /* don't stop after errors */
-        verbose = 0;
-    gotocnt = 0;
-    defdenums = 0;
-    doublestrings = 0;
-    noaltreg = NO;
-    shareoffset = SHAREOFFSET; /* Offset for shared libs */
+    ncomp = c_doinline = c_mathz88 = need_floatpack = c_compact_code = 0;
+    c_default_unsigned = NO;
+    c_useshared = c_makeshare = c_shared_file = NO;
+    nxtlab = 0;/* start numbers at lowest possible */
+    c_intermix_ccode = 0; /* don't include the C text as comments */
+    c_errstop =0;  /* don't stop after errors */
+    c_verbose = 0;
+    c_double_strings = 0;
+    c_notaltreg = NO;
+    c_share_offset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
-    assemtype = ASM_Z80ASM;
-    outext = NULL;
-    printflevel = 0;
-    indexix = YES;
-    useframe = NO;
-    use_r2l_calling_convention = NO;
+    c_assembler_type = ASM_Z80ASM;
+    c_framepointer_is_ix = YES;
+    c_useframepointer = NO;
+    c_use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
     /* Parse the command line options */
-    atexit(MemCleanup); /* To free everything */
+    atexit(atexit_deallocate); /* To free everything */
     clear();
     filenum = 0;
     for (n = 1; n < argc; n++) {
@@ -187,9 +206,9 @@ int main(int argc, char** argv)
  */
 void ccabort()
 {
-    if (inpt2 != NULL_FD)
+    if (inpt2 != NULL)
         endinclude();
-    if (input != NULL_FD)
+    if (input != NULL)
         fclose(input);
     closeout();
     fprintf(stderr, "Compilation aborted\n");
@@ -207,12 +226,12 @@ void parse()
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
-            dodeclare(EXTERNAL, NULL_TAG, 0);
+            dodeclare(EXTERNAL, NULL, 0);
         } else if (amatch("static")) {
-            dodeclare(LSTATIC, NULL_TAG, 0);
+            dodeclare(LSTATIC, NULL, 0);
         } else if (amatch("typedef")) {
-            dodeclare(TYPDEF, NULL_TAG, 0);
-        } else if (dodeclare(STATIK, NULL_TAG, 0)) {
+            dodeclare(TYPDEF, NULL, 0);
+        } else if (dodeclare(STATIK, NULL, 0)) {
             ;
         } else if (ch() == '#') {
             if (match("#asm")) {
@@ -235,19 +254,14 @@ void parse()
 /*
  *      Report errors for user
  */
-
-#ifndef SMALL_C
-void
-#endif
-
-errsummary()
+void errsummary()
 {
     /* see if anything left hanging... */
     if (ncmp) {
         error(E_BRACKET);
         nl();
     }
-    if (verbose) {
+    if (c_verbose) {
         printf("Symbol table usage: %d\n", glbcnt);
         printf("Structures defined: %ld\n", (long)(tagptr - tagtab));
         printf("Members defined:    %ld\n", (long)(membptr - membtab));
@@ -268,13 +282,13 @@ char *nextarg(int n, char* s, int size)
     int i;
 
     if (n < 1 || n >= gargc)
-        return NULL_CHAR;
+        return NULL;
     i = 0;
     str = str2 = gargv[n];
     while (++i < size && (*s++ = *str++))
         ;
     if (*str2 == '\0')
-        return NULL_CHAR;
+        return NULL;
     return s;
 }
 
@@ -290,11 +304,17 @@ void setup_sym()
     /* note that the symbol names are not valid C variables */
     dummy_sym[0] = 0;
     dummy_sym[CCHAR] = addglb("0ch", POINTER, CCHAR, 0, STATIK, 0, 0);
+    dummy_sym[CCHAR]->isassigned = YES;
     dummy_sym[CINT] = addglb("0int", POINTER, CINT, 0, STATIK, 0, 0);
+    dummy_sym[CINT]->isassigned = YES;
     dummy_sym[DOUBLE] = addglb("0dbl", POINTER, DOUBLE, 0, STATIK, 0, 0);
+    dummy_sym[DOUBLE]->isassigned = YES;
     dummy_sym[LONG] = addglb("0lng", POINTER, LONG, 0, STATIK, 0, 0);
+    dummy_sym[LONG]->isassigned = YES;
     dummy_sym[CPTR] = addglb("0cpt", POINTER, CPTR, 0, STATIK, 0, 0);
+    dummy_sym[CPTR]->isassigned = YES;
     dummy_sym[VOID] = addglb("0vd", POINTER, VOID, 0, STATIK, 0, 0);
+    dummy_sym[VOID]->isassigned = YES;
 }
 
 void info()
@@ -316,7 +336,7 @@ void info()
  ***********************************************************************
  */
 
-void dumpfns()
+static void dumpfns()
 {
     int ident, type, storage;
     SYMBOL* ptr;
@@ -327,11 +347,7 @@ void dumpfns()
     if (!glbcnt)
         return;
 
-    /* Start at the start! */
-    glbptr = STARTGLB;
-
-    ptr = STARTGLB;
-    while (ptr < ENDGLB) {
+    for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->name[0] != 0 && ptr->name[0] != '0') {
             ident = ptr->ident;
             if (ident == FUNCTIONP)
@@ -345,7 +361,7 @@ void dumpfns()
                     if (storage == EXTERNAL) {
                         if (ptr->flags & LIBRARY) {
                             GlobalPrefix(LIB);
-                            if ((ptr->flags & SHARED) && useshare) {
+                            if ((ptr->flags & SHARED) && c_useshared) {
                                 outstr(ptr->name);
                                 outstr("_sl\n");
                                 GlobalPrefix(LIB);
@@ -384,21 +400,20 @@ void dumpfns()
                 }
             }
         }
-        ++ptr;
     }
 
     if ((fp = fopen("zcc_opt.def", "a")) == NULL) {
         error(E_ZCCOPT);
     }
 
-    if (incfloat) {
+    if (need_floatpack) {
         fprintf(fp, "\nIF !NEED_floatpack\n");
         fprintf(fp, "\tDEFINE\tNEED_floatpack\n");
         fprintf(fp, "ENDIF\n\n");
     }
-    if (mathz88) {
-        fprintf(fp, "\nIF !NEED_mathz88\n");
-        fprintf(fp, "\tDEFINE\tNEED_mathz88\n");
+    if (c_mathz88) {
+        fprintf(fp, "\nIF !NEED_c_mathz88\n");
+        fprintf(fp, "\tDEFINE\tNEED_c_mathz88\n");
         fprintf(fp, "ENDIF\n\n");
     }
     /*
@@ -446,17 +461,6 @@ void dumpfns()
     }
     fclose(fp);
 
-    switch (printflevel) {
-    case 1:
-        WriteDefined("ministdio", 0);
-        break;
-    case 2:
-        WriteDefined("complexstdio", 0);
-        break;
-    case 3:
-        WriteDefined("floatstdio", 0);
-        break;
-    }
 
     outstr("\n\n; --- End of Scope Defns ---\n\n");
 }
@@ -493,14 +497,12 @@ void dumpvars()
         return;
 
     /* Start at the start! */
-    glbptr = STARTGLB;
     outstr("; --- Start of Static Variables ---\n\n");
 
     output_section("bss_compiler"); // output_section("bss");
 
-    ptr = STARTGLB;
-    while (ptr < ENDGLB) {
-        if (ptr->name[0] != 0 && ptr->name[0] != '0') {
+    for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
+        if (ptr->name[0] != '0') {
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;
@@ -513,7 +515,6 @@ void dumpvars()
                 nl();
             }
         }
-        ++ptr;
     }
 
     /* Switch back to standard section */
@@ -621,7 +622,7 @@ void openout()
     FILE* fp;
     clear(); /* erase line */
     output = 0; /* start with none */
-    if (nextarg(filenum, filen2, FILENAME_LEN) == NULL_CHAR)
+    if (nextarg(filenum, filen2, FILENAME_LEN) == NULL)
         return;
     if ((fp = fopen(filen2, "r")) == NULL) {
         fprintf(stderr, "Cannot open source file: %s\n", filen2);
@@ -632,7 +633,7 @@ void openout()
     /* copy file name to string */
     strcpy(Filename, filen2);
     strcpy(Filenorig, filen2);
-    changesuffix(filen2, (outext == NULL) ? ".asm" : outext); /* Change appendix to .asm */
+    changesuffix(filen2, c_output_extension); /* Change appendix to .asm */
     if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
         fprintf(stderr, "Cannot open output file: %s\n", line);
         exit(1);
@@ -660,7 +661,7 @@ void openin()
             fprintf(stderr, "Can't open: %s\n", Filename);
             exit(1);
         } else {
-            if (verbose)
+            if (c_verbose)
                 fprintf(stderr, "Compiling: %s\n", Filename);
             ncomp++;
             newfile();
@@ -688,7 +689,7 @@ void doinclude()
     char name[FILENAME_LEN + 1], *cp;
 
     blanks(); /* skip over to name */
-    if (verbose) {
+    if (c_verbose) {
         toconsole();
         outstr(line);
         nl();
@@ -727,7 +728,7 @@ void doinclude()
  */
 void endinclude()
 {
-    if (verbose) {
+    if (c_verbose) {
         toconsole();
         outstr("#end include\n");
         tofile();
@@ -763,7 +764,6 @@ struct args {
 struct args myargs[] = {
     { "math-z88", NO, SetMathZ88, "Enable machine native maths mode" },
     { "unsigned", NO, SetUnsigned, "Make all types unsigned" },
-    { "//", NO, SetCppComm, "Accept C++ style // comments" },
     { "do-inline", NO, SetDoInline, "Inline certain common functions" },
     { "stop-error", NO, SetStopError, "Stop when an error is received" },
     { "make-shared", NO, SetMakeShared, "This Library file is shared" },
@@ -780,11 +780,8 @@ struct args myargs[] = {
     { "Wall", NO, SetAllWarn, "Enable all warnings" },
     { "Wn", YES, UnSetWarning, "Unset a warning" },
     { "W", YES, SetWarning, "Set a warning" },
-    { "shareoffset=", YES, SetShareOffset, "Define the shared offset (use with -make-shared" },
+    { "c_share_offset=", YES, SetShareOffset, "Define the shared offset (use with -make-shared" },
     { "version", NO, DispVersion, "Display the version of sccz80" },
-    { "smartpf", NO, SetSmart, "Enable smart printf format handling" },
-    { "no-smartpf", NO, UnSetSmart, "Disable smart printf format handling" },
-    { "pflevel", YES, SetPfLevel, "Set the manual printf level" },
     { "debug=", YES, SetDebug, "Enable some extra logging" },
     { "asm=", YES, SetAssembler, "Set the assembler mode to use" },
     { "ext=", YES, SetOutExt, "Use this file extension for generated output" },
@@ -806,41 +803,41 @@ struct args myargs[] = {
 #ifdef USEFRAME
 void SetNoFrame(char* arg)
 {
-    useframe = NO;
-    indexix = NO;
+    c_useframepointer = NO;
+    c_framepointer_is_ix = NO;
 }
 
 void SetFrameIX(char* arg)
 {
-    useframe = YES;
-    indexix = YES;
+    c_useframepointer = YES;
+    c_framepointer_is_ix = YES;
 }
 
 void SetFrameIY(char* arg)
 {
-    useframe = YES;
-    indexix = NO;
+    c_useframepointer = YES;
+    c_framepointer_is_ix = NO;
 }
 #endif
 
 void SetStandardEscape(char* arg)
 {
-    standard_escapes = YES;
+    c_standard_escapecodes = YES;
 }
 
 void SetDoubleStrings(char* arg)
 {
-    doublestrings = YES;
+    c_double_strings = YES;
 }
 
 void SetNoAltReg(char* arg)
 {
-    noaltreg = YES;
+    c_notaltreg = YES;
 }
 
 void SetASXX(char* arg)
 {
-    assemtype = ASM_ASXX;
+    c_assembler_type = ASM_ASXX;
 }
 
 /* debug= */
@@ -854,7 +851,7 @@ void SetDebug(char* arg)
         debuglevel = num;
 }
 
-/* shareoffset= */
+/* c_share_offset= */
 
 void SetShareOffset(char* arg)
 {
@@ -862,31 +859,9 @@ void SetShareOffset(char* arg)
     num = 0;
     sscanf(arg + 12, "%d", &num);
     if (num != 0)
-        shareoffset = num;
+        c_share_offset = num;
 }
 
-/* Flag whether we want to do "smart" mapping of printf -> miniprintf */
-
-void UnSetSmart(char* arg)
-{
-    smartprintf = NO;
-    printflevel = 2; /* Complex */
-}
-
-void SetSmart(char* arg)
-{
-    smartprintf = YES;
-}
-
-/* pflevel= */
-void SetPfLevel(char* arg)
-{
-    int num;
-    num = 0;
-    sscanf(arg + 8, "%d", &num);
-    if (num >= 1 && num <= 3)
-        printflevel = num;
-}
 
 void UnSetWarning(char* arg)
 {
@@ -908,12 +883,12 @@ void SetWarning(char* arg)
 
 void SetMathZ88(char* arg)
 {
-    mathz88 = YES;
+    c_mathz88 = YES;
 }
 
 void SetUnsigned(char* arg)
 {
-    dosigned = YES;
+    c_default_unsigned = YES;
 }
 
 void SetNoWarn(char* arg)
@@ -930,44 +905,40 @@ void SetAllWarn(char* arg)
         mywarn[i].suppress = 0;
 }
 
-void SetCppComm(char* arg)
-{
-    cppcom = YES;
-}
 
 void SetDoInline(char* arg)
 {
-    doinline = YES;
+    c_doinline = YES;
 }
 
 void SetStopError(char* arg)
 {
-    errstop = YES;
+    c_errstop = YES;
 }
 
 void SetUseShared(char* arg)
 {
-    useshare = YES;
+    c_useshared = YES;
 }
 
 void SetSharedFile(char* arg)
 {
-    sharedfile = YES;
+    c_shared_file = YES;
 }
 
 void SetMakeShared(char* arg)
 {
-    makeshare = YES;
+    c_makeshare = YES;
 }
 
 void SetCompactCode(char* arg)
 {
-    compactcode = YES;
+    c_compact_code = YES;
 }
 
 void SetCCode(char* arg)
 {
-    ctext = 1;
+    c_intermix_ccode = 1;
 }
 
 void SetDefine(char* arg)
@@ -987,13 +958,13 @@ void SetAssembler(char* arg)
 
     if (1 == sscanf(arg + 4, "%s", assembler)) {
         if (strcmp(assembler, "z80asm") == 0 || strcmp(assembler, "mpm") == 0) {
-            assemtype = ASM_Z80ASM;
+            c_assembler_type = ASM_Z80ASM;
         } else if (strcmp(assembler, "asxx") == 0) {
-            assemtype = ASM_ASXX;
+            c_assembler_type = ASM_ASXX;
         } else if (strcmp(assembler, "vasm") == 0) {
-            assemtype = ASM_VASM;
+            c_assembler_type = ASM_VASM;
         } else if (strcmp(assembler, "gnu") == 0) {
-            assemtype = ASM_GNU;
+            c_assembler_type = ASM_GNU;
         }
     }
 }
@@ -1005,7 +976,7 @@ void SetOutExt(char* arg)
     temp[0] = '.';
     strncpy(temp + 1, arg + 4, sizeof(temp) - 2);
     temp[sizeof(temp) - 1] = '\0';
-    outext = strdup(temp);
+    c_output_extension = strdup(temp);
 }
 
 void DispInfo(char* arg)
@@ -1032,7 +1003,7 @@ void DispVersion(char* arg)
 
 void SetVerbose(char* arg)
 {
-    verbose = YES;
+    c_verbose = YES;
 }
 
 void ShowNotFunc(char* arg)
@@ -1043,7 +1014,7 @@ void ShowNotFunc(char* arg)
 
 static void set_default_r2l(char *arg)
 {
-    use_r2l_calling_convention = YES;
+    c_use_r2l_calling_convention = YES;
 }
 
 void ParseArgs(char* arg)
@@ -1080,63 +1051,20 @@ void ParseArgs(char* arg)
  *      This routine called via atexit to clean up memory
  */
 
-void MemCleanup()
+void atexit_deallocate()
 {
-    if (litq) {
-        free(litq);
-        litq = 0;
-    }
-    if (dubq) {
-        free(dubq);
-        dubq = 0;
-    }
-    if (tempq) {
-        free(tempq);
-        tempq = 0;
-    }
-    if (glbq) {
-        free(glbq);
-        glbq = 0;
-    }
-    if (symtab) {
-        free(symtab);
-        symtab = 0;
-    }
-    if (loctab) {
-        free(loctab);
-        loctab = 0;
-    }
-    if (wqueue) {
-        free(wqueue);
-        wqueue = 0;
-    }
-    if (tagtab) {
-        free(tagtab);
-        tagtab = 0;
-    }
-    if (membtab) {
-        free(membtab);
-        membtab = 0;
-    }
-    if (swnext) {
-        free(swnext);
-        swnext = 0;
-    }
-    if (stage) {
-        free(stage);
-        stage = 0;
-    }
-    if (gotoq) {
-        free(gotoq);
-        gotoq = 0;
-    }
+    FREENULL(litq);
+    FREENULL(dubq);
+    FREENULL(tempq);
+    FREENULL(glbq);
+    FREENULL(loctab);
+    FREENULL(wqueue);
+    FREENULL(tagtab);
+    FREENULL(membtab);
+    FREENULL(swnext);
+    FREENULL(stage);
+    FREENULL(gotoq);
 }
-
-/*
- *   Routine to keep DOG happy and avoid nastiness
- *   should really do this any case..so I'll let it
- *   pass!
- */
 
 void* mymalloc(size_t size)
 {
@@ -1144,13 +1072,9 @@ void* mymalloc(size_t size)
 
     if ((ptr = calloc(size, 1)) != NULL)
         return ptr;
-    else
-        OutOfMem();
+    else {
+        fprintf(stderr, "Out of memory...\n");
+        exit(1);
+    }
     return 0; /* Sigh */
-}
-
-void OutOfMem()
-{
-    fprintf(stderr, "Out of memory...\n");
-    exit(1);
 }

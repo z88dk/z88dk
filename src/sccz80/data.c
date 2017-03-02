@@ -20,10 +20,10 @@ char Banner[] = "* * * * *  Small-C/Plus z88dk * * * * *";
 char Version[] = "  Version: " Z88DK_VERSION;
 
 SYMBOL *symtab, *loctab; /* global and local symbol tables */
-SYMBOL *glbptr, *locptr; /* ptrs to next entries */
+SYMBOL *locptr; /* ptrs to next entries */
 int glbcnt; /* number of globals used */
 
-SYMBOL* dummy_sym[NTYPE + NUMTAG + 1];
+SYMBOL *dummy_sym[NTYPE + NUMTAG + 1];
 
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */
@@ -38,11 +38,11 @@ int gltptr, litptr, dubptr; /* index of next entry */
 char macq[MACQSIZE]; /* macro string buffer */
 int macptr; /* and its index */
 
-TAG_SYMBOL* tagtab; /* start of structure tag table */
-TAG_SYMBOL* tagptr; /* ptr to next entry */
+TAG_SYMBOL *tagtab; /* start of structure tag table */
+TAG_SYMBOL *tagptr; /* ptr to next entry */
 
-SYMBOL* membtab; /* structure member table */
-SYMBOL* membptr; /* ptr to next member */
+SYMBOL *membtab; /* structure member table */
+SYMBOL *membptr; /* ptr to next member */
 
 char* stage; /* staging buffer */
 char* stagenext; /* next address in stage */
@@ -60,13 +60,13 @@ char Filename[FILENAME_LEN + 1]; /* output file name */
 
 /* My stuff for LIB of long common functions */
 
-int incfloat, cppcom, doinline, ncomp;
+int need_floatpack, c_doinline, ncomp;
 
 int stackargs;
 
-int defstatic, appz88, filenum; /* next argument to be used */
+int defstatic, filenum; /* next argument to be used */
 
-char dosigned, makelib, fnflags, mathz88, compactcode;
+char c_default_unsigned, fnflags, c_mathz88, c_compact_code;
 
 int nxtlab, /* next avail label # */
     dublab, /* label # relative to double pool */
@@ -77,9 +77,9 @@ int nxtlab, /* next avail label # */
     undeclared, /* # function arguments not yet declared */
     ncmp, /* # open compound statements */
     errcnt, /* # errors in compilation */
-    errstop, /* stop on error */
+    c_errstop, /* stop on error */
     eof, /* set non-zero on final input eof */
-    ctext, /* non-zero to intermix c-source */
+    c_intermix_ccode, /* non-zero to intermix c-source */
     cmode, /* non-zero while parsing c-code */
     /* zero when passing assembly code */
     declared, /* number of local bytes declared, else -1 when done */
@@ -89,52 +89,33 @@ int nxtlab, /* next avail label # */
     fnstart, /* line# of start of current fn. */
     lineno, /* line# in current file */
     infunc, /* "inside function" flag */
-    savestart, /* copy of fnstart "    " */
-    saveline, /* copy of lineno  "    " */
-    saveinfn, /* copy of infunc  "    " */
     swactive, /* true inside a switch */
     swdefault, /* default label number, else 0 */
-    verbose, /* Verbose to screen */
-    caller, /* stack offset for caller links...
-                                        local[caller] points to name of current fct
-                                        local[caller-1] points to link for calling fct,
-                                        where local[0] is 1st word on stack after ret addr  */
-    fname; /* label for name of current fct  */
+    c_verbose; /* Verbose to screen */
 
-FILE *input, /* iob # for input file */
-    *output, /* iob # for output file (if any) */
-    *inpt2, /* iob # for "include" file */
-    *saveout; /* holds output ptr when diverted to console */
+FILE    *input; /* iob # for input file */
+FILE    *output; /* iob # for output file (if any) */
+FILE    *inpt2; /* iob # for "include" file */
+FILE    *saveout; /* holds output ptr when diverted to console */
 
-#ifdef SMALL_C
-int minavail = 32000; /* minimum memory available */
-#endif
 
-SYMBOL *currfn, /* ptr to symtab entry for current fn. */
-    *savecurr; /* copy of currfn for #include */
 
-int gargc; /* global copies of command line args */
-char** gargv;
+SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
+
+
 
 char endasm;
 
 char margtag; /* Struct tag number for arg value */
 char fnargvalue; /* Type of argument value (as per proto) */
 int ltype; /* Long? */
-int opertype; /* Saves a lot of code! Reference in cc6 to grab
-                           long type operations! */
 
-/*
- * A couple of variables for dealing with local statics
- */
-
-int lstdecl, lstlab;
 
 /*
  * Variable for the offset to a shared library routine
  */
 
-int shareoffset;
+int c_share_offset;
 
 /*
  * Doms debug variable
@@ -146,48 +127,26 @@ int debuglevel;
  * Assembler type
  */
 
-int assemtype;
+int c_assembler_type;
 
-/*
- * Output file extension
- *
- */
 
-char* outext;
 
-/*
- * Enums defined
- */
 
-int defdenums;
-
-/*
- * Size of far heap in bytes/units/twiddle
- */
-
-int farheapsz;
-
-/*
- * Max level for printf (i.e. what routine do we want?)
- */
-
-int printflevel;
 
 /* Doubles stored as strings? */
 
-int doublestrings;
+int c_double_strings;
 
 /*
  *	Framepointer stuff - tis broken!
  */
-int useframe;
-int indexix;
+int c_useframepointer;
+int c_framepointer_is_ix;
 
 
-int use_r2l_calling_convention;
+int c_use_r2l_calling_convention;
 
 /* scanf format requirements */
-int scanf_level;
 uint32_t scanf_format_option;
 uint32_t printf_format_option;
 

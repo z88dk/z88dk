@@ -4,8 +4,9 @@
 ;
 ;       6/9/98  djm
 
-                SECTION   code_crt0_sccz80
+SECTION   code_crt0_sccz80
 PUBLIC    l_le
+EXTERN    l_compare_result
 
 ;
 ; DE <= HL [signed]
@@ -21,11 +22,11 @@ PUBLIC    l_le
 
    cp b
    ccf
-   ret nz
+   jp nz, l_compare_result
    ld a,l
    cp e
    ccf
-   ret
+   jp l_compare_result
 
 ;        call    l_cmp
 ;        ret     c

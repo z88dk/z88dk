@@ -42,71 +42,71 @@ clean :
 	$(RM) -rf Debug Release
 
 # Dependencies (gcc -MM)
-callfunc.o: callfunc.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+callfunc.o: callfunc.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h  \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-codegen.o: codegen.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+codegen.o: codegen.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-const.o: const.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+const.o: const.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-data.o: data.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+data.o: data.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-declfunc.o: declfunc.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+declfunc.o: declfunc.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-declinit.o: declinit.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+declinit.o: declinit.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-declvar.o: declvar.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+declvar.o: declvar.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-error.o: error.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+error.o: error.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-expr.o: expr.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+expr.o: expr.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-goto.o: goto.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+goto.o: goto.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-io.o: io.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h data.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+io.o: io.c ccdefs.h define.h codegen.h const.h data.h \
   declvar.h declfunc.h declinit.h error.h expr.h io.h lex.h \
-  main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-lex.o: lex.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+lex.o: lex.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-main.o: main.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+main.o: main.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-misc.o: misc.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+misc.o: misc.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-plunge.o: plunge.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+plunge.o: plunge.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-preproc.o: preproc.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+preproc.o: preproc.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-primary.o: primary.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \
+primary.o: primary.c ccdefs.h define.h codegen.h \
   const.h data.h declvar.h declfunc.h declinit.h error.h expr.h   \
-  io.h lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h \
+  io.h lex.h main.h misc.h preproc.h primary.h stmt.h sym.h \
   while.h
-stmt.o: stmt.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+stmt.o: stmt.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-sym.o: sym.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+sym.o: sym.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
-while.o: while.c ccdefs.h define.h lvalue.h callfunc.h codegen.h const.h \
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h
+while.o: while.c ccdefs.h define.h codegen.h const.h \
   data.h declvar.h declfunc.h declinit.h error.h expr.h io.h \
-  lex.h main.h misc.h plunge.h preproc.h primary.h stmt.h sym.h while.h
+  lex.h main.h misc.h preproc.h primary.h stmt.h sym.h while.h

@@ -7,7 +7,6 @@
 
 #include "ccdefs.h"
 
-extern void CleanGoto(void);
 
 /** \brief Given an argument train, add in signature information to currfn
  *
@@ -61,11 +60,11 @@ void StoreFunctionSignature(SYMBOL* ptr)
 int AddNewFunc(
     char* sname,
     int type,
-    int storage,
+    enum storage_type storage,
     char zfar,
     char sign,
     TAG_SYMBOL* otag,
-    int ident,
+    enum ident_type ident,
     int32_t* addr)
 {
     SYMBOL* ptr;
@@ -144,7 +143,7 @@ void newfunc()
         return;
     }
     warning(W_RETINT);
-    AddFuncCode(n, CINT, FUNCTION, dosigned, 0, STATIK, 0, 1, NO, 0, &addr);
+    AddFuncCode(n, CINT, FUNCTION, c_default_unsigned, 0, STATIK, 0, 1, NO, 0, &addr);
 }
 
 /*
@@ -152,12 +151,7 @@ void newfunc()
  *      and also from AddNewFunc(), returns 0 if added a real
  *      function (code etc)
  */
-
-#ifndef SMALL_C
-SYMBOL*
-#endif
-
-AddFuncCode(char* n, char type, char ident, char sign, char zfar, int storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
+SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, enum storage_type storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
 {
     unsigned char tvalue; /* Used to hold protot value */
     char typ; /* Temporary type */
@@ -271,7 +265,7 @@ void DoFnKR(
         /* any legal name bumps arg count */
         if (symname(n)) {
             /* add link to argument chain */
-            if ((cptr = addloc(n, 0, CINT, 0, 0)))
+            if ((cptr = addloc(n, NO_IDENT, CINT, 0, 0)))
                 cptr->offset.p = prevarg;
             prevarg = cptr;
             ++undeclared;
@@ -307,7 +301,7 @@ void DoFnKR(
         } else if (var.type || regit) {
             if (regit && var.type == NO)
                 var.type = CINT;
-            getarg(var.type, NULL_TAG, NO, 0, var.sign, var.zfar, NO);
+            getarg(var.type, NULL, NO, 0, var.sign, var.zfar, NO);
         } else {
             error(E_BADARG);
             break;
@@ -315,6 +309,59 @@ void DoFnKR(
     }
     /* Have finished K&R parsing */
     setlocvar(prevarg, currfn);
+}
+
+
+static int setup_function_parameter(SYMBOL *argument, int argnumber)
+{
+    char buffer2[120];
+    int lgh;
+
+    lgh = 2; /* Default length */
+    /* This is strange, previously double check for ->type */
+    if (argument->type == VOID && argument->ident != POINTER)
+        lgh = 0;
+    if (argument->type == LONG && argument->ident != POINTER)
+        lgh = 4;
+    if (argument->type == DOUBLE && argument->ident != POINTER)
+        lgh = 6;
+    /* Far pointers */
+    if ((argument->flags & FARPTR) == FARPTR && argument->ident == POINTER)
+        lgh = 4;
+    argument->size = lgh;
+    argument->isassigned = YES;
+    /*
+        * Check the definition against prototypes here...
+        */
+    if (argnumber) {
+        uint32_t tester = CalcArgValue(argument->type, argument->ident, argument->flags);
+        if (currfn->args[argnumber] != tester) {
+            if (currfn->args[argnumber] != PELLIPSES) {
+                if (currfn->args[argnumber] == 0) {
+                    warning(W_2MADECL);
+                } else {
+                    if ((currfn->args[argnumber] & PMASKSIGN) == (tester & PMASKSIGN)) {
+                        warning(W_SIGNARG);
+                    } else {
+                        error(E_ARGMIS1, currfn->name, currfn->prototyped - argnumber + 1, ExpandArgValue(tester, buffer2, argument->tag_idx));
+                        error(E_ARGMIS2, ExpandArgValue(currfn->args[argnumber], buffer2, currfn->tagarg[argnumber]));
+                    }
+                }
+            }
+        }
+    }
+    return lgh;
+}
+
+static void setup_r2l_parameters(SYMBOL *argument, int argnumber, int *where)
+{
+    int lgh;
+    if ( argument->offset.p != NULL ) {
+        setup_r2l_parameters(argument->offset.p, argnumber + 1, where);
+    }
+    lgh = setup_function_parameter(argument, argnumber);
+    argument->offset.i = *where;
+    *where = (*where) + lgh;
 }
 
 /** \brief Set the argument offsets for a function, then kick off compiling
@@ -327,10 +374,8 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
 {
     int lgh, where;
     int* iptr;
-    SYMBOL* copyarg;
+    SYMBOL* last_argument;
     int argnumber;
-    char buffer2[120];
-    unsigned char tester;
 
     lgh = 0; /* Initialise it */
     if (prevarg != NULL && currfn->prototyped == 0) {
@@ -349,7 +394,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     /*
      *      Dump some info about defining the function etc
      */
-    if (verbose) {
+    if (c_verbose) {
         toconsole();
         outstr("Defining function: ");
         outstr(currfn->name);
@@ -368,65 +413,42 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         prefix();
         outname(currfn->name, YES);
         col();
-        ; /* print function name */
     }
     nl();
 
     infunc = 1; /* In a function for sure! */
-    copyarg = prevarg;
+    last_argument = prevarg;
 
-    if (((currfn->flags & SHARED) && makeshare) || sharedfile) {
+    if (((currfn->flags & SHARED) && c_makeshare) || c_shared_file) {
         /* Shared library definition, offset the stack */
-        where = 2 + shareoffset;
+        where = 2 + c_share_offset;
     } else
         where = 2;
     /* If we use frame pointer we preserve previous framepointer on entry
      * to each function
      */
-    if (useframe || (currfn->flags & SAVEFRAME))
+    if (c_useframepointer || (currfn->flags & SAVEFRAME))
         where += 2;
-    while (prevarg) {
-        lgh = 2; /* Default length */
-        /* This is strange, previously double check for ->type */
-        if (prevarg->type == VOID && prevarg->ident != POINTER)
-            lgh = 0;
-        if (prevarg->type == LONG && prevarg->ident != POINTER)
-            lgh = 4;
-        if (prevarg->type == DOUBLE && prevarg->ident != POINTER)
-            lgh = 6;
-        /* Far pointers */
-        if ((prevarg->flags & FARPTR) == FARPTR && prevarg->ident == POINTER)
-            lgh = 4;
-        prevarg->size = lgh;
-        /*
-         * Check the definition against prototypes here...
-         */
-        if (argnumber) {
-            tester = CalcArgValue(prevarg->type, prevarg->ident, prevarg->flags);
-            if (currfn->args[argnumber] != tester) {
-                if (currfn->args[argnumber] != PELLIPSES) {
-                    if (currfn->args[argnumber] == 0) {
-                        warning(W_2MADECL);
-                    } else {
-                        if ((currfn->args[argnumber] & PMASKSIGN) == (tester & PMASKSIGN)) {
-                            warning(W_SIGNARG);
-                        } else {
-                            error(E_ARGMIS1, currfn->name, currfn->prototyped - argnumber + 1, ExpandArgValue(tester, buffer2, prevarg->tag_idx));
-                            error(E_ARGMIS2, ExpandArgValue(currfn->args[argnumber], buffer2, currfn->tagarg[argnumber]));
-                        }
-                    }
-                }
+
+    /* For SMALLC we need to start counting from the last argument */
+    if ( currfn->flags & SMALLC || c_use_r2l_calling_convention == NO ) {
+        while (prevarg) {
+            lgh = setup_function_parameter(prevarg, argnumber);
+            if ( argnumber ) {
+                argnumber++;
             }
-            argnumber++;
+            iptr = &prevarg->offset.i;
+            prevarg = prevarg->offset.p; /* follow ptr to prev. arg */
+            *iptr = where; /* insert offset */
+            where += lgh; /* calculate next offset */
         }
-        iptr = &prevarg->offset.i;
-        prevarg = prevarg->offset.p; /* follow ptr to prev. arg */
-        *iptr = where; /* insert offset */
-        where += lgh; /* calculate next offset */
+    } else if ( prevarg != NULL ) {
+        setup_r2l_parameters(prevarg, argnumber, &where);
     }
+
+
     pushframe();
-    currfn->handled = YES;
-    if (currfn->prototyped == 1 && (currfn->flags & REGCALL)) {
+    if (currfn->prototyped == 1 && (currfn->flags & FASTCALL)) {
         /*
          * Fast call routine..
          */
@@ -437,21 +459,17 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         else if (lgh == 6)
             dpush();
         /* erk, if not matched, dodgy type! */
-        copyarg->offset.i = -lgh;
+        last_argument->offset.i = -lgh;
         where = 2;
     }
 
     stackargs = where;
-    lstdecl = 0; /* Set number of local statics to zero */
     if (statement() != STRETURN) {
-        if (lstdecl)
-            postlabel(lstlab);
-        lstdecl = 0;
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
         leave(NO, NO);
     }
-    CleanGoto();
+    goto_cleanup();
     function_appendix(currfn);
 
 #ifdef INBUILT_OPTIMIZER
@@ -461,10 +479,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
 }
 
 /* djm Declare a function in the ansi style! */
-#ifndef SMALL_C
-SYMBOL*
-#endif
-dofnansi(SYMBOL* currfn, int32_t* addr)
+SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
 {
     SYMBOL* prevarg; /* ptr to symbol table entry of most recent argument */
     SYMBOL* argptr; /* Temporary holder.. */
@@ -491,7 +506,7 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
             if (proto == 1)
                 warning(W_ELLIP);
             needchar(')');
-            argptr = addloc("ellp", 0, ELLIPSES, 0, 0);
+            argptr = addloc("ellp", NO_IDENT, ELLIPSES, 0, 0);
             argptr->offset.p = prevarg;
             prevarg = argptr;
             break;
@@ -501,7 +516,7 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
         if (var.type == STRUCT) {
             prevarg = getarg(STRUCT, otag, YES, prevarg, 0, var.zfar, proto);
         } else if (var.type) {
-            prevarg = getarg(var.type, NULL_TAG, YES, prevarg, var.sign, var.zfar, proto);
+            prevarg = getarg(var.type, NULL, YES, prevarg, var.sign, var.zfar, proto);
 
         } else {
             warning(W_EXPARG);
@@ -527,7 +542,7 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
 
     while (1) {
         if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
-            currfn->flags |= REGCALL;
+            currfn->flags |= FASTCALL;
             continue;
         }
         if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
@@ -536,7 +551,6 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
         }
         if (amatch("__smallc")) {
             currfn->flags |= SMALLC;
-            /* Just swallow */
             continue;
         }
         if (amatch("__preserves_regs")) {
@@ -556,7 +570,7 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
         }
         break;
     }
-    if ( use_r2l_calling_convention == NO ) {
+    if ( c_use_r2l_calling_convention == NO ) {
         currfn->flags |= SMALLC;
     }
 
@@ -585,10 +599,7 @@ int CheckANSI()
  * called from "newfunc" this routine adds an entry in the
  *      local symbol table for each named argument
  */
-#ifndef SMALL_C
-SYMBOL*
-#endif
-getarg(
+SYMBOL *getarg(
     int typ, /* typ = CCHAR, CINT, DOUBLE or STRUCT */
     TAG_SYMBOL* otag, /* structure tag for STRUCT type objects */
     int deftype, /* YES=ANSI -> addloc NO=K&R -> findloc */
@@ -604,11 +615,11 @@ getarg(
     /*
  * This is of dubious need since prototyping came about, we could
  * inadvertently include fp packages if the user includes <math.h> but
- * didn't actually use them, we'll save the incfloat business for
+ * didn't actually use them, we'll save the need_floatpack business for
  * static doubles and definitions of local doubles
  *
  *      if (typ == DOUBLE)
- *              incfloat=1;
+ *              need_floatpack=1;
  */
     argptr = NULL;
 
@@ -653,7 +664,7 @@ getarg(
  * temporary
  */
             if (deftype) {
-                argptr = addloc(n, 0, CINT, 0, 0);
+                argptr = addloc(n, NO_IDENT, CINT, 0, 0);
                 argptr->offset.p = prevarg;
             }
             /*

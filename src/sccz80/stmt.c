@@ -16,8 +16,8 @@
 
 extern void dogoto(void);
 extern int dolabel(void);
-int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
-int lastline = 0;
+static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
+static int lastline = 0;
 
 /*
  *      Statement parser
@@ -59,20 +59,17 @@ int statement()
         otag = GetVarID(&var, STATIK);
 
         if (var.type == STRUCT) {
-            declloc(STRUCT, otag, var.sign, locstatic, var.zfar);
+            declloc(STRUCT, otag, locstatic, &var);
             return (lastst);
         } else if (var.type || regit) {
             if (regit && var.type == NO)
                 var.type = CINT;
-            declloc(var.type, NULL_TAG, var.sign, locstatic, var.zfar);
+            declloc(var.type, NULL, locstatic, &var);
             return (lastst);
         }
 
         /* not a definition */
         if (declared >= 0) {
-            if (lstdecl)
-                postlabel(lstlab);
-            lstdecl = 0;
             Zsp = modstk(Zsp - declared, NO, NO);
             declared = -1;
         }
@@ -489,11 +486,11 @@ void doreturn(char type)
     if (endst() == 0) {
         if (currfn->more) {
             /* return pointer to value */
-            force(CINT, doexpr(), YES, dosigned, 0);
+            force(CINT, doexpr(), YES, c_default_unsigned, 0);
             leave(CINT, type);
         } else {
             /* return actual value */
-            force(currfn->type, doexpr(), currfn->flags & UNSIGNED, dosigned, 0);
+            force(currfn->type, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
             leave(currfn->type, type);
         }
     } else
@@ -514,7 +511,7 @@ void leave(int vartype, char type)
     else if (vartype == DOUBLE)
         vartype = NO;
 
-    if (noaltreg) {
+    if (c_notaltreg) {
         if (vartype == LONG)
             savehl();
         modstk(0, 0, NO);
@@ -522,7 +519,7 @@ void leave(int vartype, char type)
         modstk(0, vartype, NO);
     }
 
-    if ((compactcode || currfn->flags & CALLEE) && (stackargs > 2)) {
+    if ((c_compact_code || currfn->flags & CALLEE) && (stackargs > 2)) {
         /* 
          * We're exiting a function and we want to clean up after ourselves
          * (so calling function doesn't have to do this) (first of all we
@@ -530,7 +527,7 @@ void leave(int vartype, char type)
          */
         savesp = Zsp;
 
-        if (noaltreg) {
+        if (c_notaltreg) {
             if (vartype == LONG) /* If long, then dump de somewhere */
                 savede();
         } else if (vartype == LONG) {
@@ -540,7 +537,7 @@ void leave(int vartype, char type)
         Zsp -= stackargs;
         modstk(0, NO, NO);
         zpushde(); /* return address back on stack */
-        if (noaltreg) {
+        if (c_notaltreg) {
             if (vartype == LONG)
                 restorede();
         } else if (vartype == LONG) {
@@ -549,7 +546,7 @@ void leave(int vartype, char type)
         Zsp = savesp;
     }
     popframe(); /* Restore previous frame pointer */
-    if (noaltreg && vartype == LONG)
+    if (c_notaltreg && vartype == LONG)
         restorehl();
     if (type)
         setcond(type);
@@ -637,7 +634,7 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    char label[NAMEMAX];
+    char label[NAMESIZE];
     int k;
     char lab = 0; /* Got an good asm label */
     SYMBOL* myptr;

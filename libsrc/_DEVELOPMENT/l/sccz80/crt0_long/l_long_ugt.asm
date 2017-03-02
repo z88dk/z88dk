@@ -6,11 +6,11 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_long_gt
+PUBLIC l_long_ugt
 
 EXTERN l_long_ucmp
 
-l_long_gt:
+l_long_ugt:
 
    ; PRIMARY > SECONDARY, carry set if true
    ; HL set to 0 (false) or 1 (true)

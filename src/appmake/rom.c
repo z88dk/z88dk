@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.13 2016-07-08 02:43:24 aralbrec Exp $
+ *      $Id: rom.c,v 1.13 2016/07/08 02:43:24 aralbrec Exp $
  */
 
 
@@ -16,7 +16,9 @@ static char             *romname      = NULL;
 static int               romsize      = 0;
 static int               rombase      = 0;
 static int               romfill      = 255;
+static int               chipsize     = 0;
 static char              ihex         = 0;
+
 
 /* Options that are available for this module */
 option_t rom_options[] = {
@@ -28,6 +30,7 @@ option_t rom_options[] = {
     { 's', "romsize",   "Size of output rom",               OPT_INT,   &romsize },
     {  0,  "rombase",   "Base address of output rom",       OPT_INT,   &rombase },
     { 'f', "filler",    "Filler byte (default: 0xFF)",      OPT_INT,   &romfill },
+    {  0,  "chipsize",  "Single chip size in a ROM set",    OPT_INT,   &chipsize },
     {  0,  "ihex",      "Generate an iHEX file",            OPT_BOOL,  &ihex    },
     {  0,  NULL,        NULL,                               OPT_NONE,  NULL     }
 };
@@ -41,13 +44,16 @@ int rom_exec(char *target)
 {
     FILE *fpin, *fpout;
     char outname[FILENAME_MAX+1];
+	char chipname[FILENAME_MAX+1];
+	char file_ext[5];
     int crt_model;
     int pre_size, post_size, in_size;
-    int c;
+    int c, pos, cnt, chipcount;
+	int check;
 
     if (help) return -1;
     if ((binname == NULL) && (romsize == 0)) return -1;
-
+	
     crt_model = (crtfile == NULL) ? (-1) : parameter_search(crtfile, ".sym", "__crt_model");
 
     if ((binorg == -1) && ((crtfile == NULL) || ((binorg = get_org_addr(crtfile)) == -1)))
@@ -91,6 +97,17 @@ int rom_exec(char *target)
         rewind(fpin);
     }
 
+	chipcount=0;
+    if (chipsize>0) {
+		if (romsize==0)
+			exit_log(1, "ROM size must be specified as a multiple of [chipsize = %d]\n", chipsize);
+		if (romsize%chipsize != 0)
+			exit_log(1, "ROM size is %d, it can't be split for [chipsize = %d]\n", romsize, chipsize);
+		chipcount=romsize/chipsize;
+	}
+	if (chipcount>16)
+			exit_log(1, "Too many ROM chips to be created, check [chipsize].\n");
+	
     if ((post_size = (romsize == 0) ? 0 : (romsize - in_size - binorg + rombase)) < 0)
         exit_log(1, "Embedded binary address range [%d,%d] exceeds ROM address range [%d,%d]\n", binorg, binorg+in_size-1, rombase, rombase+romsize-1);
 
@@ -112,9 +129,16 @@ int rom_exec(char *target)
 
     if (fpin != NULL) fclose(fpin);
     fclose(fpout);
+	
+	
 
     if (ihex)
     {
+		if (chipcount>1) {
+            fclose(fpin);
+            exit_log(1, "Hex mode is not supported in multiple chip mode.\n");
+		}
+		
         if ((fpin = fopen(outname, "rb")) == NULL)
             exit_log(1, "Can't open %s for hex conversion\n", outname);
 
@@ -130,7 +154,37 @@ int rom_exec(char *target)
 
         fclose(fpin);
         fclose(fpout);
-    }
+		
+    } else {
+		
+		/* Split into binary blocks */
+		if (chipcount>1) {
+			if ((fpin = fopen(outname, "rb")) == NULL)
+				exit_log(1, "Can't open %s to split into ROM chips\n", outname);
+			
+			for (cnt=1; cnt <= chipcount; cnt++) {
+				sprintf(file_ext, ".0%c", cnt+'a'-1);
+				strcpy(chipname,outname);
+				suffix_change(chipname, file_ext);
+				if ((fpout = fopen(chipname, "wb")) == NULL)
+				{
+					fclose(fpin);
+					exit_log(1, "Can't create %s romchip file\n", chipname);
+				}
+				check=0;
+				for (pos=0; pos<chipsize; pos++) {
+					c = fgetc(fpin);
+					if (c != romfill) check++;
+					fputc(c, fpout);
+				}
+				fclose(fpout);
+				if (!check)
+					fprintf(stderr,"WARNING: ROM chip file '%s' is empty, it can probably be omitted.\n", chipname);
+			}
+			
+			fclose(fpin);	
+		}
+	}
 
     return 0;
 }

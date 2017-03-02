@@ -14,7 +14,7 @@ SECTION code_string
 
 PUBLIC asm_strerror
 
-EXTERN ASMHEAD_rodata_error_strings, __str_locate_nul
+EXTERN __rodata_error_strings_head, __str_locate_nul
 
 asm_strerror:
 
@@ -33,7 +33,7 @@ asm_strerror:
    jr z, use_ok
    
    ld e,l
-   ld hl,ASMHEAD_rodata_error_strings
+   ld hl,__rodata_error_strings_head
    
    ld a,(hl)
    

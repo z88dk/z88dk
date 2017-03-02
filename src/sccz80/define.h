@@ -3,19 +3,22 @@
  * $Id: define.h,v 1.18 2016-09-19 09:17:50 dom Exp $
  */
 
+
+ #ifndef DEFINE_H
+ #define DEFINE_H
+
+ #include "lib/uthash.h"
+
+
+#define MALLOC(x)   mymalloc(x)
+#define CALLOC(x,y) mymalloc(x * y)
+#define FREENULL(x) do { if  (x != NULL ) { free(x); x = NULL; } } while (0)
+
 /*      Stand-alone definitions                 */
 
 #define NO              0
 #define YES             1
-#ifndef NULL
-#define NULL            0
-#endif
-#define NULL_FD 0
 
-#define NULL_FN 0
-#define NULL_CHAR 0
-
-#define alloc malloc
 
 /* Offset to stack params for shared lib funcs */
 
@@ -25,22 +28,17 @@
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
  #define NAMESIZE 33
- #define NAMEMAX  32 
 #else
  #define NAMESIZE 127
- #define NAMEMAX 126
 #endif
 
-#define MAXARGS 10
+#define MAXARGS 20
 
 /*      Define the symbol table parameters      */
 
 /* Stefano  - doubled the global symbol table size */
 /* Aralbrec - doubled the global symbol table size again! */
-#define NUMGLBS         2048
-#define MASKGLBS        2047
-#define STARTGLB        symtab
-#define ENDGLB          (STARTGLB+NUMGLBS)
+
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 #define NUMLOC          33
@@ -50,16 +48,65 @@
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
+enum ident_type {
+    NO_IDENT = 0,
+    VARIABLE = 1,
+    ARRAY,
+    POINTER,
+    FUNCTION,
+    MACRO,
+    FUNCTIONP,
+    GOTOLABEL,
+    /* Only used is processing, not in symbol table */
+    PTR_TO_FN,
+    PTR_TO_PTR,
+    PTR_TO_FNP
+};
+
+enum storage_type {
+    UNKNOWN = 0,
+    STATIK = 1,
+    STKLOC = 2,
+    EXTERNAL = 3,
+    EXTERNP = 4,
+    DECLEXTN = 5,
+    LSTATIC = 6,
+    FAR = 7 ,
+    LSTKEXT = 8,
+    TYPDEF = 9,
+    PORT8 = 10,
+    PORT16 = 11,
+};
+
+
+/* Symbol flags, | against each other */
+enum symbol_flags {
+        FLAGS_NONE = 0,
+        UNSIGNED = 1,
+        FARPTR = 2,
+        FARACC = 4,
+        FASTCALL = 8,     /* for certain lib calls only */
+        SHARED = 16,     /* Call via shared library method (append _s) */
+        SHAREDC = 32,     /* Call via rst (library is C code) */
+        CALLEE = 64,      /* Called function pops regs */
+        LIBRARY = 128,    /* Lib routine */
+        SAVEFRAME = 256,  /* Save framepointer */
+        SMALLC = 512      /* L->R calling order */
+};
+
+
+
 /*      Define symbol table entry format        */
 
-#define SYMBOL struct symb
-#define TAG_SYMBOL struct tag_symbol
+typedef struct tagsymbol_s TAG_SYMBOL;
+typedef struct symbol_s SYMBOL;
 
-SYMBOL {
+
+struct symbol_s {
         char name[NAMESIZE] ;
-        char ident ;         /*VARIABLE, ARRAY, POINTER, FUNCTION, MACRO */
+        enum ident_type ident;
         char type ;          /* DOUBLE, CINT, CCHAR, STRUCT */
-        char storage ;       /* STATIK, STKLOC, EXTERNAL */
+        enum storage_type storage ;       /* STATIK, STKLOC, EXTERNAL */
         union xx  {          /* offset has a number of interpretations: */
                 int i ;      /* local symbol:  offset into stack */
                              /* struct member: offset into struct */
@@ -70,40 +117,23 @@ SYMBOL {
         int  more ;          /* index of linked entry in dummy_sym */
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */
-        char handled;        /* djm, whether we've written the type or not */
         char prototyped;
-        unsigned char args[MAXARGS];       /* arguments */
+        char isconst;        /* Set if const, affects the section the data goes into */
+        char isassigned;     /* Set if we have assigned to it once */
+        uint32_t  args[MAXARGS];       /* arguments */
         unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
-        int flags ;         /* djm, various flags:
+        enum symbol_flags flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer
                                 bit 2 = access via far methods
                               */
+        UT_hash_handle  hh;
 
-} ;
+};
 
-#ifdef SMALL_C
-#define NULL_SYM 0
-#else
-#define NULL_SYM (SYMBOL *)0
-#endif
-
-/*      Define possible entries for "ident"     */
-
-#define VARIABLE        1
-#define ARRAY           2
-#define POINTER         3
-#define FUNCTION        4
-#define MACRO           5
-/* function returning pointer */
-#define FUNCTIONP       6
-#define GOTOLABEL       9
-/* the following only used in processing, not in symbol table */
-#define PTR_TO_FN       7
-#define PTR_TO_PTR      8
-#define PTR_TO_FNP     10
 
 /*      Define possible entries for "type"      */
+
 
 #define DOUBLE  1
 #define CINT    2
@@ -141,39 +171,7 @@ SYMBOL {
 
 #define NTYPE   15
 
-/*      Define possible entries for "storage"   */
 
-#define STATIK  1
-#define STKLOC  2
-#define EXTERNAL 3
-#define EXTERNP  4
-#define DECLEXTN 5
-#define LSTATIC 6
-#define FAR     7
-#define LSTKEXT 8
-#define TYPDEF  9
-
-
-/*      Flags */
-
-#define UNSIGNED  1
-#define FARPTR  2
-#define FARACC  4
-#define REGCALL 8       /* for certain lib calls only */
-#define SHARED  16      /* Call via shared library method (append _s) */
-#define SHAREDC 32	/* Call via rst (library is C code) */
-#define CALLEE  64	/* Called function pops regs */
-#define LIBRARY 128	/* Lib routine */
-#define SAVEFRAME 256     /* Save framepointer */
-#define SMALLC   512    /* L->R calling order */
-
-/*
- * MKDEF is for masking unsigned and far
- */
-#define MKDEF   3
-#define MKSIGN 254
-#define MKFARP 253
-#define MKFARA 251
 
 /*      Define the structure tag table parameters */
 
@@ -181,7 +179,7 @@ SYMBOL {
 #define STARTTAG        tagtab
 #define ENDTAG          tagtab+NUMTAG
 
-struct tag_symbol {
+struct tagsymbol_s {
         char name[NAMESIZE] ;     /* structure tag name */
         int size ;                /* size of struct in bytes */
 	char weak; 		  /* Not fully defined */
@@ -190,12 +188,6 @@ struct tag_symbol {
 } ;
 
 
-
-#ifdef SMALL_C
-#define NULL_TAG 0
-#else
-#define NULL_TAG (TAG_SYMBOL *)0
-#endif
 
 /*      Define the structure member table parameters */
 
@@ -207,29 +199,31 @@ struct tag_symbol {
 
 #define NUMCASE 256
 
-struct sw_tab {
+typedef struct switchtab_s SW_TAB;
+
+struct switchtab_s {
         int label ;             /* label for start of case */
         int32_t value ;             /* value associated with case */
 } ;
 
-#define SW_TAB struct sw_tab
 
 /*      Define the "while" statement queue      */
 
-#define NUMWHILE        20
+#define NUMWHILE        100
 #define WQMAX           wqueue+(NUMWHILE-1)
-#define WHILE_TAB struct while_tab
+typedef struct whiletab_s WHILE_TAB;
 
-struct while_tab {
+struct whiletab_s {
         int sp ;                /* stack pointer */
         int loop ;              /* label for top of loop */
         int exit ;              /* label at end of loop */
 } ;
 
 #define NUMGOTO         100
-#define GOTO_TAB        struct goto_tab
 
-GOTO_TAB {
+typedef struct gototab_s GOTO_TAB;
+
+struct gototab_s {
         int     sp;             /* Stack pointer to correct to */
         SYMBOL *sym;            /* Pointer to goto label       */
         int     lineno;         /* line where goto was         */
@@ -298,34 +292,18 @@ GOTO_TAB {
 #define MAX_LEVELS 100
 
 
-#ifdef SMALL_C
-#define SYM_CAST
-#define TAG_CAST
-#define WQ_CAST
-#define SW_CAST
-#else
-#define SYM_CAST (SYMBOL *)
-#define TAG_CAST (TAG_SYMBOL *)
-#define WQ_CAST (WHILE_TAB *)
-#define SW_CAST (SW_TAB *)
-#endif
-
-
 
 /*
  * djm, function for variable definitions now
  */
-
-#define APPFUNC 1
-#define LIBFUNC 2
 
 struct varid {
         unsigned char type;
         unsigned char zfar;
         unsigned char sign;
         unsigned char sflag;
-        unsigned char defstatus; /* APPFUNC, LIBFUNC etc */
-        unsigned char ident;
+        unsigned char isconst;
+        enum ident_type ident;
         int     more;
 };
 
@@ -358,7 +336,7 @@ struct varid {
 #define ASM_VASM    2
 #define ASM_GNU     3
 
-#define ISASM(x) ( assemtype == (x) )
+#define ISASM(x) ( c_assembler_type == (x) )
 
 struct parser_stack;
 
@@ -370,3 +348,36 @@ struct parser_stack {
     int  slineno;
     struct parser_stack *next;
 };
+
+
+
+typedef struct lvalue_s LVALUE;
+
+struct lvalue_s {
+        SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
+        int indirect ;                  /* type of indirect object, 0 for static object */
+        int ptr_type ;                  /* type of pointer or array, 0 for other idents */
+        int is_const ;                  /* true if constant expression */
+        int32_t const_val ;                        /* value of constant expression (& other uses) */
+        TAG_SYMBOL *tagsym ;    /* tag symbol address, 0 if not struct */
+        void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
+        char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
+        int val_type ;                  /* type of value calculated */
+	int oldval_type;		/* What the valtype was */
+        enum symbol_flags flags;        /* As per symbol */
+        char oflags;                    /* Needed for deref of far str*/
+        int type;                       /* type (from symbol table) */
+        enum ident_type ident;          /* ident (from symbol table) */
+        enum storage_type storage;	/* storage (from sym tab) */
+        char c_id;                      /* ident of cast        */
+        char c_vtype;                   /* type of value calc if cast */
+        char c_flags;                   /* flags for casting */
+	int  level;		/* Parenth level (cast) */
+	int  castlevel;
+	int  offset;
+        TAG_SYMBOL *c_tag;               
+} ;
+
+
+
+#endif
