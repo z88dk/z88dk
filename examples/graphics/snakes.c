@@ -21,8 +21,7 @@
 	zcc +zx81 -create-app -clib=wrx -subtype=wrx -DJOYSTICK_DIALOG -DTEXTSWAP -DSPEED=200 snakes.c
 	zcc +zx81 -create-app -clib=arx -subtype=arx -DJOYSTICK_DIALOG -DTEXTSWAP -DSPEED=100 snakes.c
 	zcc +zx81 -create-app -clib=udg  -DJOYSTICK_DIALOG -DSPEED=300 snakes.c
-	(SLOW 4 to be added in the BASIC portion):
-	zcc +zx81 -create-app -clib=g007ansi -O3 -DJOYSTICK_DIALOG -DSPEED=200 snakes.c
+	zcc +zx81 -create-app -clib=g007ansi -O3 -DJOYSTICK_DIALOG -DSPEED=200 snakes.c   (SLOW 4 to be added in the BASIC portion)
 	
 	
 */
