@@ -17,23 +17,11 @@
 
 #include "dhry.h"
 
-#ifndef NOREG
-        Boolean Regb = true;
-        #undef REG
-        #define REG register
+#ifndef REG
+   Boolean Regb = false;
+	#define REG
 #else
-        Boolean Regb = false;
-        #ifndef NOSTAT
-           #define REG static
-        #else
-           #define REG
-        #endif
-        /* REG becomes blank */
-#endif
-
-#ifndef NOTIMER
-   extern long time_start(void);
-   extern long time_end(void);
+   Boolean Regb = true;
 #endif
 
 /* Global Variables: */
@@ -69,20 +57,15 @@ void main (void)
   /* main program, corresponds to procedures        */
   /* Main and Proc_0 in the Ada version             */
 {
-             One_Fifty       Int_1_Loc;
+        One_Fifty       Int_1_Loc;
   REG   One_Fifty       Int_2_Loc;
-             One_Fifty       Int_3_Loc;
+        One_Fifty       Int_3_Loc;
   REG   char            Ch_Index;
-             Enumeration     Enum_Loc;
-             Str_30          Str_1_Loc;
-             Str_30          Str_2_Loc;
+        Enumeration     Enum_Loc;
+        Str_30          Str_1_Loc;
+        Str_30          Str_2_Loc;
   REG   int             Run_Index;
-
-#ifndef NOSTAT
-  static int             Number_Of_Runs;
-#else
-         int             Number_Of_Runs;
-#endif
+        int             Number_Of_Runs;
 
   /* Initializations */
 
@@ -103,7 +86,7 @@ void main (void)
         /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
         /* overflow may occur for this array element.                   */
 
-#ifndef NOPRINTF
+#ifdef PRINTF
   printf ("\n");
   printf ("Dhrystone Benchmark, Version 2.1 (Language: C)\n");
   printf ("\n");
@@ -131,13 +114,11 @@ void main (void)
   /* Start timer */
   /***************/
 
-#ifndef NOTIMER
-  Begin_Time = time_start();
+#ifdef TIMEFUNC
+  Begin_Time = native_timer_start();
 #endif
 
-#asm
-ticks_begin:
-#endasm
+TIMER_START();
 
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
   {
@@ -189,15 +170,13 @@ ticks_begin:
   /* Stop timer */
   /**************/
 
-#asm
-ticks_end:
-#endasm
+TIMER_STOP();
 
-#ifndef NOTIMER
-  End_Time = time_end();
+#ifdef TIMEFUNC
+  End_Time = native_timer_stop();
 #endif
 
-#ifndef NOPRINTF
+#ifdef PRINTF
   printf ("Execution ends\n");
   printf ("\n");
   printf ("Final values of the variables used in the benchmark:\n");
@@ -251,6 +230,7 @@ ticks_end:
   printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
   printf ("\n");
 
+#ifdef TIMEFUNC
   User_Time = End_Time - Begin_Time;
 
   if (User_Time < Too_Small_Time)
@@ -261,11 +241,10 @@ ticks_end:
   }
   else
   {
-#ifndef NOTIMER
     Microseconds = (double_t) User_Time * 1e6 
                         / (double_t) Number_Of_Runs;
     Dhrystones_Per_Second = (double_t) Number_Of_Runs / (double_t) User_Time;
-#endif
+
     printf ("Microseconds for one run through Dhrystone: ");
     printf ("%6.1f \n", Microseconds);
     printf ("Dhrystones per Second:                      ");
@@ -273,26 +252,17 @@ ticks_end:
     printf ("\n");
   }
 #endif
+#endif
 }
 
 
-#ifndef NOREG
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
-#else
-void Proc_1 (Rec_Pointer Ptr_Val_Par)
-#endif
-
 /******************/
 
     /* executed once */
 {
-#ifndef NOSTAT
-  REG Rec_Pointer Next_Record;
-  Next_Record = Ptr_Val_Par->Ptr_Comp;
-#else
   REG Rec_Pointer Next_Record = Ptr_Val_Par->Ptr_Comp;  
                                         /* == Ptr_Glob_Next */
-#endif
   /* Local variable, initialized with Ptr_Val_Par->Ptr_Comp,    */
   /* corresponds to "rename" in Ada, "with" in Pascal           */
   

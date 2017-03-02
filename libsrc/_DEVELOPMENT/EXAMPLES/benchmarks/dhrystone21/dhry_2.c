@@ -17,16 +17,8 @@
 
 #include "dhry.h"
 
-#ifndef NOREG
-        #undef REG
-        #define REG register
-#else
-        #ifndef NOSTAT
-           #define REG static
-        #else
-           #define REG
-        #endif
-        /* REG becomes blank */
+#ifdef REG
+#define REG
 #endif
 
 extern  int     Int_Glob;

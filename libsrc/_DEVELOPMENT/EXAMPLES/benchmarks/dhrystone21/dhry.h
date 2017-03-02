@@ -144,7 +144,7 @@
  *              -DNOSTRUCTASSIGN        (default: Not defined)
  *                      Define if the C compiler does not support
  *                      assignment of structures.
- *              -DNOENUMS               (default: Not defined)
+ *              -DNOENUM                (default: Not defined)
  *                      Define if the C compiler does not support
  *                      enumeration types.
  *              -DTIMES                 (default)
@@ -345,41 +345,28 @@
  ***************************************************************************
  */
 
-/**********************************************************************
- ** Z88DK NOTES *******************************************************
- **********************************************************************
-
- Simple compile notes until a readme.txt is available.
-  
- (sccz80) Unable to compile at the moment because of 2D array.
- (sdcc  ) zcc +cpm -vn -SO3 -DNOTIMER -DNOSTRUCTASSIGN -DNOREG -DNOSTAT -clib=sdcc_iy --max-allocs-per-node200000 dhry_1.c dhry_2.c -o dhry
- 
- Classic C library:
- 
- (sccz80) Unable to compile at the moment because of 2D array.
-
- **********************************************************************
-
- -DNOPRINTF
- Messages are not printed.
-
- -DNOTIMER
- Timer functions are not available.
-
- -DNOSTRUCTASSIGN
- Define if the compiler does not support struct assignments.
-
- -DNOENUM
- Define if the compiler does not support enum.
-
- -DNOREG
- Define if the compiler does not support the 'register' keyword.
-
- -DNOSTAT
- Define if unsupported register keyword should not be changed to static.
-
- **********************************************************************
-*/
+/*
+ * COMMAND LINE DEFINES
+ * 
+ * -DREG=
+ * Set REG=register.
+ *
+ * -DNOSTRUCTASSIGN
+ * Use memcpy instead of struct assignment.
+ *
+ * -DNOENUM
+ * Use defines instead of enumeration.
+ *
+ * -DTIMER
+ * Insert asm labels into source code at timing points (Z88DK).
+ *
+ * -DTIMEFUNC
+ * Platform timer functions are available (must supply timer functions).
+ *
+ * -DPRINTF
+ * Enable text output (Nunber_Of_Runs = 20000 if not enabled).
+ *
+ */
 
 /* Compiler and system dependent definitions: */
 
@@ -400,15 +387,40 @@
   typedef       enum    {Ident_1, Ident_2, Ident_3, Ident_4, Ident_5}
                 Enumeration;
 #endif
-        /* for boolean and enumeration types in Ada, Pascal */
+/* for boolean and enumeration types in Ada, Pascal */
+
+#ifdef TIMER
+   #define TIMER_START()       intrinsic_label(TIMER_START)
+   #define TIMER_STOP()        intrinsic_label(TIMER_STOP)
+#else
+   #define TIMER_START()
+   #define TIMER_STOP()
+#endif
+
+#ifdef TIMEFUNC
+   // These functions return a long whose difference
+   // indicates time passage in seconds.
+   extern long native_timer_start(void);
+   extern long native_timer_stop(void);
+#endif
+
 
 /* General definitions: */
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
+#ifdef __Z88DK
+   #include <intrinsic.h>
+   #ifdef PRINTF
+      #pragma output CLIB_OPT_PRINTF = 0x04000201
+		#pragma output CLIB_OPT_SCANF  = 0x01
+   #endif
+#endif
+
 #define Null NULL 
-                /* Value of a Null pointer */
+/* Value of a Null pointer */
+
 #define true  1
 #define false 0
 
