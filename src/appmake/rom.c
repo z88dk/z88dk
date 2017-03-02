@@ -49,6 +49,7 @@ int rom_exec(char *target)
     int crt_model;
     int pre_size, post_size, in_size;
     int c, pos, cnt, chipcount;
+	int check;
 
     if (help) return -1;
     if ((binname == NULL) && (romsize == 0)) return -1;
@@ -170,11 +171,15 @@ int rom_exec(char *target)
 					fclose(fpin);
 					exit_log(1, "Can't create %s romchip file\n", chipname);
 				}
+				check=0;
 				for (pos=0; pos<chipsize; pos++) {
 					c = fgetc(fpin);
+					if (c != romfill) check++;
 					fputc(c, fpout);
 				}
 				fclose(fpout);
+				if (!check)
+					fprintf(stderr,"WARNING: ROM chip file '%s' is empty, it can probably be omitted.\n", chipname);
 			}
 			
 			fclose(fpin);	
