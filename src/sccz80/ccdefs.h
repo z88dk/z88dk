@@ -42,7 +42,7 @@
  *      Prototypes
  */
 
-extern void     callfunction(SYMBOL *ptr);
+extern void     callfunction(SYMBOL *ptr, SYMBOL *fnptr);
 
 #include "codegen.h"
 #include "const.h"

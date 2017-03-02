@@ -717,16 +717,16 @@ int heirb(LVALUE* lval)
                 k = 1;
             } else if (cmatch('(')) {
                 if (ptr == NULL) {
-                    callfunction(NULL);
+                    callfunction(NULL,NULL);
                     /* Bugger knows what ya doing..stop SEGV */
                     ptr = dummy_sym[VOID];
                     warning(W_INTERNAL);
                 } else if (ptr->ident != FUNCTION) {
                     if (k && lval->const_val == 0)
                         rvalue(lval);
-                    callfunction(NULL);
+                    callfunction(NULL,ptr);
                 } else
-                    callfunction(ptr);
+                    callfunction(ptr,NULL);
                 k = lval->is_const = lval->const_val = 0;
                 if (ptr && ptr->more == 0) {
                     /* function returning variable */

@@ -25,7 +25,7 @@ static int ForceArgs(char dest, char src, int expr, char functab);
  *      zero, will call the contents of HL
  */
 
-void callfunction(SYMBOL* ptr)
+void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 {
     int isscanf = 0;
     uint32_t format_option;
@@ -38,7 +38,8 @@ void callfunction(SYMBOL* ptr)
     FILE *save_fps;
     int   i;
     int   save_fps_num;
-   
+    int   function_pointer_call = ptr == NULL ? YES : NO;
+       
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
     argnumber = 0;
@@ -53,6 +54,7 @@ void callfunction(SYMBOL* ptr)
 
     if (ptr )
         watcharg = SetWatch(ptr->name, &isscanf);
+    
 
     while (ch() != ')') {
         char *before, *start;
@@ -74,7 +76,9 @@ void callfunction(SYMBOL* ptr)
     }
     needchar(')'); 
 
-    if ( c_use_r2l_calling_convention == YES && ( ptr == NULL || (ptr && (ptr->flags & SMALLC) == 0) ) ) {
+    if ( ptr == NULL ) ptr = fnptr;
+
+    if ( ( ptr == NULL && c_use_r2l_calling_convention == YES ) || (ptr && (ptr->flags & SMALLC) == 0) ) {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];
@@ -92,7 +96,7 @@ void callfunction(SYMBOL* ptr)
         argnumber++;
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
-        if (ptr) {
+        if (function_pointer_call == NO ) {
 
             /* ordinary call */
             expr = expression(&vconst, &val);
@@ -103,7 +107,7 @@ void callfunction(SYMBOL* ptr)
 
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
                 int proto_argnumber;
-                if ( c_use_r2l_calling_convention == NO || ( (ptr->flags & SMALLC) == SMALLC) ) {
+                if ( (ptr->flags & SMALLC) == SMALLC)  {
                     proto_argnumber = ptr->prototyped - argnumber + 1;
                 } else {
                     proto_argnumber = argnumber;
@@ -180,17 +184,17 @@ void callfunction(SYMBOL* ptr)
         }
     }
 
-    if (ptr) {
+    if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
         if ((ptr->prototyped) && ptr->args[1] == PELLIPSES) {
-            if ( ptr && (ptr->flags & SMALLC) == SMALLC ) {
+            if ( (ptr->flags & SMALLC) == SMALLC ) {
                 loadargc(nargs);
             }
         }
         if ( strcmp(ptr->name,"__builtin_strcmp") == 0) {
             gen_builtin_strcmp();
-        } else if (watcharg || (ptr->flags & SHARED) || (ptr->flags & SHAREDC)) {
-            if ((ptr->flags & SHARED) || (ptr->flags & SHAREDC))
+        } else if (watcharg || (ptr->flags & (SHARED|SHAREDC)) ) {
+            if ((ptr->flags & (SHARED|SHAREDC) ) )
                 preserve = YES;
             if (ptr->flags & SHAREDC)
                 zclibcallop();

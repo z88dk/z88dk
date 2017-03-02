@@ -8,6 +8,7 @@
 #include "ccdefs.h"
 
 
+
 /** \brief Given an argument train, add in signature information to currfn
  *
  *  \param ptr - Last argument
@@ -431,7 +432,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         where += 2;
 
     /* For SMALLC we need to start counting from the last argument */
-    if ( currfn->flags & SMALLC || c_use_r2l_calling_convention == NO ) {
+    if ( (currfn->flags & SMALLC) == SMALLC ) {
         while (prevarg) {
             lgh = setup_function_parameter(prevarg, argnumber);
             if ( argnumber ) {
@@ -476,6 +477,48 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     generate();
 #endif
     infunc = 0; /* not in fn. any more */
+}
+
+void check_trailing_modifiers(SYMBOL *currfn)
+{
+    if ( c_use_r2l_calling_convention == NO ) {
+        currfn->flags |= SMALLC;
+    }
+
+    while (1) {
+        if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
+            currfn->flags |= FASTCALL;
+            continue;
+        }
+        if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
+            currfn->flags |= CALLEE;
+            continue;
+        }
+        if (amatch("__smallc")) {
+            currfn->flags |= SMALLC;
+            continue;
+        }
+        if (amatch("__stdc")) {
+            currfn->flags &= ~SMALLC;
+            continue;
+        }
+        if (amatch("__preserves_regs")) {
+            int c;
+            needchar('(');
+            /* Consume what's inside, isalpha, comma, white space */
+            while ((c = ch())) {
+                if (isalpha(c) || isspace(c) || c == ',') {
+                    gch();
+                    continue;
+                }
+                break;
+            }
+
+            needchar(')');
+            continue;
+        }
+        break;
+    }
 }
 
 /* djm Declare a function in the ansi style! */
@@ -540,39 +583,11 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
 
     blanks();
 
-    while (1) {
-        if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
-            currfn->flags |= FASTCALL;
-            continue;
-        }
-        if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
-            currfn->flags |= CALLEE;
-            continue;
-        }
-        if (amatch("__smallc")) {
-            currfn->flags |= SMALLC;
-            continue;
-        }
-        if (amatch("__preserves_regs")) {
-            int c;
-            needchar('(');
-            /* Consume what's inside, isalpha, comma, white space */
-            while ((c = ch())) {
-                if (isalpha(c) || isspace(c) || c == ',') {
-                    gch();
-                    continue;
-                }
-                break;
-            }
 
-            needchar(')');
-            continue;
-        }
-        break;
-    }
-    if ( c_use_r2l_calling_convention == NO ) {
-        currfn->flags |= SMALLC;
-    }
+    check_trailing_modifiers(currfn);
+
+
+
 
     if (cmatch(';'))
         return (prevarg);
@@ -612,15 +627,7 @@ SYMBOL *getarg(
     SYMBOL* argptr;
     int legalname, ident, more;
     int brkflag; /* Needed to correctly break out for K&R*/
-    /*
- * This is of dubious need since prototyping came about, we could
- * inadvertently include fp packages if the user includes <math.h> but
- * didn't actually use them, we'll save the need_floatpack business for
- * static doubles and definitions of local doubles
- *
- *      if (typ == DOUBLE)
- *              need_floatpack=1;
- */
+
     argptr = NULL;
 
     /* Only need while loop if K&R defs */
@@ -659,28 +666,22 @@ SYMBOL *getarg(
             ident = (ident == POINTER) ? PTR_TO_PTR : POINTER;
         }
         if (legalname) {
-            /*
- * For ANSI we need to add symbol name to local table - this CINT is  
- * temporary
- */
+            /* For ANSI we need to add symbol name to local table - this CINT is temporary */
             if (deftype) {
                 argptr = addloc(n, NO_IDENT, CINT, 0, 0);
                 argptr->offset.p = prevarg;
             }
             /*
- * If prototyping, then we can't find the name, but if we're prototyping
- * we have been defined as ANSI, therefore argptr already holds
- * the correct pointer - kinda neat!
- */
+             * If prototyping, then we can't find the name, but if we're prototyping
+             * we have been defined as ANSI, therefore argptr already holds
+             * the correct pointer - kinda neat!
+             */
             if (proto || (argptr = findloc(n))) {
                 argptr->flags = (zfar & FARPTR) | (issigned & UNSIGNED);
                 /* add in details of the type of the name */
                 if (ident == PTR_TO_PTR) {
-                    /* djm mods will be here for long pointer */
-                    //   argptr->flags = UNSIGNED |FARPTR ; /*unsigned*/
                     argptr->ident = POINTER;
                     argptr->type = typ;
-                    //  argptr->type = ( (zfar&FARPTR) ? CPTR : CINT );
                     argptr->more = dummy_idx(typ, otag);
                 } else {
                     argptr->more = more;

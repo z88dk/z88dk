@@ -92,7 +92,7 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*doper)())
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval))
 {
     char *before, *start;
 

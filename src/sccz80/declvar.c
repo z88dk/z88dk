@@ -379,7 +379,7 @@ void declglb(
             itag = otag - tagtab;
         }
         /* add symbol */
-        if (mtag == 0) {
+        if (mtag == NULL) {
             /* this is a real variable, not a structure member */
             if (typ == VOID && ident != FUNCTION && ident != FUNCTIONP && ident != POINTER && ident != ARRAY) {
                 warning(W_BADDECL);
@@ -473,6 +473,10 @@ void declglb(
             if (mtag->size < size)
                 mtag->size = size;
         }
+        if ( ptrtofn ) {
+            check_trailing_modifiers(myptr);
+            printf("%s %x\n",myptr->name,myptr->flags);
+        }
     } while (cmatch(','));
     ns();
 }
@@ -494,6 +498,7 @@ void declloc(
     char sname2[3 * NAMESIZE]; /* More than enuff overhead! */
     SYMBOL* cptr;
     int dsize, size, ident, more, itag, type, decltype;
+    int ptrtofn;
 
     /*       if ( swactive ) error(E_DECLSW) ; */
     if (declared < 0)
@@ -501,7 +506,7 @@ void declloc(
     do {
         if (endst())
             break;
-
+        ptrtofn = NO;
         type = decltype = typ;
         more = /* assume dummy symbol not required */
             itag = 0;
@@ -517,11 +522,14 @@ void declloc(
             more = dummy_idx(typ, otag);
             type = (var->zfar ? CPTR : CINT);
             dsize = size = (var->zfar ? 3 : 2);
+            ptrtofn = YES;
+
         }
 
         if (ident == PTR_TO_FN) {
             needtoken(")()");
             ident = POINTER;
+            ptrtofn = YES;
         }
 
         if (cmatch('[')) {
@@ -607,6 +615,9 @@ void declloc(
                     StoreTOS(decltype);
                 }
             }
+        }
+        if ( ptrtofn ) {
+            check_trailing_modifiers(cptr);
         }
     } while (cmatch(','));
     ns();
