@@ -92,7 +92,7 @@ void vinline()
             }
         }
         if (lptr) {
-            if (ctext && cmode) {
+            if (c_intermix_ccode && cmode) {
                 comment();
                 outstr(line);
                 nl();

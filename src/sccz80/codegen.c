@@ -770,8 +770,9 @@ void zcallop(void)
 
 char dopref(SYMBOL* sym)
 {
-    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP))
+    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) {
         return (0);
+    }
     return (1);
 }
 
@@ -2040,7 +2041,7 @@ void GlobalPrefix(char type)
 
 void EmitLine(int line)
 {
-    if (ISASM(ASM_Z80ASM) && ctext) {
+    if (ISASM(ASM_Z80ASM) && c_intermix_ccode) {
         ot("LINE\t");
         outdec(line);
         nl();

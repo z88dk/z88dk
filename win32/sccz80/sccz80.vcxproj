@@ -182,7 +182,6 @@
     <ClCompile Include="..\..\src\sccz80\while.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\sccz80\callfunc.h" />
     <ClInclude Include="..\..\src\sccz80\ccdefs.h" />
     <ClInclude Include="..\..\src\sccz80\codegen.h" />
     <ClInclude Include="..\..\src\sccz80\const.h" />
@@ -198,7 +197,6 @@
     <ClInclude Include="..\..\src\sccz80\lvalue.h" />
     <ClInclude Include="..\..\src\sccz80\main.h" />
     <ClInclude Include="..\..\src\sccz80\misc.h" />
-    <ClInclude Include="..\..\src\sccz80\plunge.h" />
     <ClInclude Include="..\..\src\sccz80\preproc.h" />
     <ClInclude Include="..\..\src\sccz80\primary.h" />
     <ClInclude Include="..\..\src\sccz80\stmt.h" />

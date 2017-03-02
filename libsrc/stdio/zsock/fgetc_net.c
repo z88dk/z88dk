@@ -14,7 +14,7 @@
 int fgetc_net(SOCKET *s)
 {
 	char	pad;
-	unsigned char	c;
+	unsigned char	c = 0;
 	int	num=0;
 
 	while (1) {

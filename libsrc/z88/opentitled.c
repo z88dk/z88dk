@@ -12,8 +12,8 @@
 ._winapl	defm	1,"3@  ",1,"2A",0	; apply effects string
 #endasm
 #else
-static char winban[] = "\x014+TUR\x012JC";
-static char winapl[] = "\x013@  \x012A";
+static const char winban[] = "\x01" "4+TUR\x01" "2JC";
+static const char winapl[] = "\x01" "3@  \x01" "2A";
 #endif
 
 void opentitled(int wid,int tlx,int tly,int width,int height,char *name)

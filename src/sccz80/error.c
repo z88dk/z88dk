@@ -86,7 +86,8 @@ struct warnings mywarn[] = {
     { "Unreachable code follows", 0 },
     { "Unknown escape sequence \\%c", 0 },
     { "Internal thingummyjob please report!!! Please!", 0 },
-    { "Hex escape sequence out of range ", 0 }
+    { "Hex escape sequence out of range ", 0 },
+    { "Variable '%s' may be used before initialisation ", 0}
 };
 
 struct errors {
@@ -257,7 +258,7 @@ void error(int num, ...)
     if (myerrors[num].fatal != 0)
         ccabort();
     ++errcnt;
-    if (errstop) {
+    if (c_errstop) {
         fprintf(stderr, "Continue (Y\\N) ?\n");
         if ((toupper(getchar()) == 'N'))
             ccabort();

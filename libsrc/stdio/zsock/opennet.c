@@ -14,7 +14,7 @@
 #include <net/socket.h>
 
 
-int opennet(FILE *fp,char *name,char *explicit, size_t max)
+int opennet(FILE *fp,char *name)
 {
 	char	host[50];
 	int	proto;
@@ -33,7 +33,6 @@ int opennet(FILE *fp,char *name,char *explicit, size_t max)
 	host[len]=0;
 	len=open_net1(host,atoi(++next2),proto);
 	if ( len ) {
-			strncpy(explicit,name,max);
 			fp->desc.ptr=(char *)len;
 			fp->flags=_IONETWORK|_IOUSE;
 			fp->ungetc=0;

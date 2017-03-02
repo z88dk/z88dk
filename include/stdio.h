@@ -98,6 +98,15 @@ struct filestr {
         intptr_t extra;
 };
 
+/* funopen functions, placed in extra */
+struct filestr_operations {
+        int     (*readfn)();    /* (void *, char *, int) */
+        int     (*writefn)();   /* (void *, char *, int) */
+        fpos_t  (*seekfn)();    /* (void *, fpos_t, int) */
+        int     (*closefn)();   /* (void *) */
+};
+
+
 /* For asm routines kinda handy to have a nice DEFVARS of the structure*/
 #ifdef STDIO_ASM
 #asm
@@ -110,8 +119,7 @@ DEFVARS 0 {
 #endasm
 #endif
 
-
-#define FILE struct filestr 
+typedef struct filestr FILE;
 
 /* System is used for initial std* streams 
  * Network streams do not set IOREAD/IOWRITE, it is assumed that
@@ -235,12 +243,12 @@ extern int __LIB__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __sm
 extern char __LIB__ *gets(char *s);
 #endif
 
-extern int __LIB__ printf(const char *fmt,...);
-extern int __LIB__ fprintf(FILE *f,const char *fmt,...);
-extern int __LIB__ sprintf(char *s,const char *fmt,...);
-extern int __LIB__ snprintf(char *s,size_t n,const char *fmt,...);
-extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap);
-extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap);
+extern int __LIB__ printf(const char *fmt,...) __vasmallc;
+extern int __LIB__ fprintf(FILE *f,const char *fmt,...) __vasmallc;
+extern int __LIB__ sprintf(char *s,const char *fmt,...) __vasmallc;
+extern int __LIB__ snprintf(char *s,size_t n,const char *fmt,...) __vasmallc;
+extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap) __smallc;
+extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap) __smallc;
 
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
 #define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
@@ -253,11 +261,11 @@ extern void __LIB__ printn(int number, int radix,FILE *file) __smallc;
  * Scanf family 
  */
 
-extern int __LIB__ scanf(const char *fmt,...);
-extern int __LIB__ fscanf(FILE *,const char *fmt,...);
-extern int __LIB__ sscanf(char *,const char *fmt,...);
-extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap);
-extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap);
+extern int __LIB__ scanf(const char *fmt,...) __vasmallc;
+extern int __LIB__ fscanf(FILE *,const char *fmt,...) __vasmallc;
+extern int __LIB__ sscanf(char *,const char *fmt,...) __vasmallc;
+extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap) __smallc;
+extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap) __smallc;
 #define vscanf(ctl,arg) vfscanf(stdin,ctl,arg)
 
 

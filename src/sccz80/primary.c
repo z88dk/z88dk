@@ -138,7 +138,7 @@ int primary(LVALUE* lval)
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
             ptr->args[0] = CalcArgValue(CINT, FUNCTION, 0);
-            ptr->flags |= use_r2l_calling_convention == YES ? 0 : SMALLC;
+            ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
         lval->indirect = 0;
@@ -263,7 +263,7 @@ void force(int t1, int t2, char sign1, char sign2, int lconst)
 
     if (t1 == DOUBLE) {
         if (t2 != DOUBLE) {
-            DoDoubConv(t2, sign2);
+            convert_int_to_double(t2, sign2);
         }
     } else {
         if (t2 == DOUBLE) {
@@ -318,14 +318,14 @@ int widen(LVALUE* lval, LVALUE* lval2)
             mainpop();
             if (lval->val_type == LONG)
                 zpop();
-            DoDoubConv(lval->val_type, lval->flags & UNSIGNED);
+            convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
             DoubSwap();
             lval->val_type = DOUBLE; /* type of result */
         }
         return (1);
     } else {
         if (lval->val_type == DOUBLE) {
-            DoDoubConv(lval2->val_type, lval2->flags & UNSIGNED);
+            convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
             lval2->val_type = DOUBLE;
             return (1);
         } else
@@ -523,9 +523,9 @@ void store(LVALUE* lval)
     if ( lval->symbol && lval->symbol->isconst ) {
         if ( lval->symbol->isassigned ) 
             error(E_CHANGING_CONST, lval->symbol);
-        else
-            lval->symbol->isassigned = YES;
     }
+    if ( lval->symbol ) 
+        lval->symbol->isassigned = YES;
     if (lval->indirect == 0)
         putmem(lval->symbol);
     else
@@ -598,20 +598,28 @@ void smartstore(LVALUE* lval)
 
 void rvaluest(LVALUE* lval)
 {
+    if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
+        warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
+    }
     if (lval->symbol && strncmp(lval->symbol->name, "0dptr", 5) == 0)
         lval->symbol = lval->symbol->offset.p;
-    if (lval->symbol && lval->indirect == 0)
+    if (lval->symbol && lval->indirect == 0) {
+       
         getmem(lval->symbol);
-    else {
+    } else {
         indirect(lval);
     }
 }
 
 void rvalue(LVALUE* lval)
 {
-    if (lval->symbol && lval->indirect == 0)
+    if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
+        warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
+    }
+    if (lval->symbol && lval->indirect == 0) { 
         getmem(lval->symbol);
-    else {
+    } else {
+            
         indirect(lval);
     }
     if (lval->c_vtype) {
@@ -731,7 +739,6 @@ void cscale(
         *val *= 6;
         break;
     case STRUCT:
-
         *val *= tag->size;
         break;
     }
@@ -747,7 +754,7 @@ void cscale(
 void addconst(int val, int opr, char zfar)
 {
     LVALUE lval;
-    /*        if (!opr) lval->val_type=ltype; */
+
     if ((ltype == LONG && (!opr)) || (ltype == CPTR && (!opr))) {
         lval.val_type = LONG;
         lpush();
@@ -765,7 +772,6 @@ void addconst(int val, int opr, char zfar)
             dec(&lval);
         case 0:
             break;
-
         case 3:
             inc(&lval);
         case 2:
@@ -797,9 +803,7 @@ int docast(LVALUE* lval, char df)
         return 0;
 
     if (lval->c_id == VARIABLE) {
-        /*
- * Straight forward variable conversion now..
- */
+        /* Straight forward variable conversion now.. */
         if (df)
             force(lval->c_vtype, lval->val_type, lval->c_flags & UNSIGNED, lval->flags & UNSIGNED, 0);
         lval->val_type = lval->c_vtype;
@@ -816,9 +820,7 @@ int docast(LVALUE* lval, char df)
     if (lval->c_id == POINTER || lval->c_id == PTR_TO_FN) {
         switch (lval->c_vtype) {
         case STRUCT:
-            /*
- * Casting a structure - has to be a pointer...
- */
+            /* Casting a structure - has to be a pointer... */
             lval->tagsym = lval->c_tag; /* Copy tag symbol over */
             lval->ptr_type = STRUCT;
             temp_type = ((lval->c_flags & FARPTR) ? CPTR : CINT);
@@ -925,7 +927,7 @@ int WasComp(LVALUE* lval)
 }
 
 /* Generate Code to Turn integer type of signed to double, Generic now does longs */
-void DoDoubConv(char type, char zunsign)
+void convert_int_to_double(char type, char zunsign)
 {
     if (type == CINT || type == CCHAR) {
         if (zunsign)

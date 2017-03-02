@@ -16,12 +16,6 @@ static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
 static int ForceArgs(char dest, char src, int expr, char functab);
 
-/*
- *      External variables used
- */
-
-extern int smartprintf;
-
 
 /*
  *      Perform a function call
@@ -57,7 +51,7 @@ void callfunction(SYMBOL* ptr)
         return;
     }
 
-    if (ptr && smartprintf)
+    if (ptr )
         watcharg = SetWatch(ptr->name, &isscanf);
 
     while (ch() != ')') {
@@ -80,7 +74,7 @@ void callfunction(SYMBOL* ptr)
     }
     needchar(')'); 
 
-    if ( use_r2l_calling_convention == YES || ( ptr && (ptr->flags & SMALLC) == 0) ) {
+    if ( c_use_r2l_calling_convention == YES && ( ptr == NULL || (ptr && (ptr->flags & SMALLC) == 0) ) ) {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];
@@ -99,18 +93,27 @@ void callfunction(SYMBOL* ptr)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
         if (ptr) {
+
             /* ordinary call */
             expr = expression(&vconst, &val);
             if (expr == CARRY) {
                 zcarryconv();
                 expr = CINT;
             }
+
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
-                protoarg = ptr->args[ptr->prototyped - argnumber + 1];
+                int proto_argnumber;
+                if ( c_use_r2l_calling_convention == NO || ( (ptr->flags & SMALLC) == SMALLC) ) {
+                    proto_argnumber = ptr->prototyped - argnumber + 1;
+                } else {
+                    proto_argnumber = argnumber;
+                }
+
+                protoarg = ptr->args[proto_argnumber];
                 if ((protoarg != PELLIPSES) && ((protoarg != fnargvalue) || ((protoarg & 7) == STRUCT)))
-                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[ptr->prototyped - argnumber + 1]);
+                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[proto_argnumber]);
             }
-            if ((ptr->flags & REGCALL) && ptr->prototyped == 1) {
+            if ((ptr->flags & FASTCALL) && ptr->prototyped == 1) {
                 /* fastcall of single expression */
 
             } else {
@@ -195,12 +198,8 @@ void callfunction(SYMBOL* ptr)
                 zcallop();
             if (isscanf) {
                 scanf_format_option |= format_option;
-                if (minifunc > scanf_level)
-                    scanf_level = minifunc;
             } else {
                 printf_format_option |= format_option;
-                if (minifunc > printflevel)
-                    printflevel = minifunc;
             }
             outname(ptr->name, dopref(ptr));
             if ((ptr->flags & SHARED) && c_useshared)
