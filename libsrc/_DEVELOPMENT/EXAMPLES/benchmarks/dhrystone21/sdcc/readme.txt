@@ -40,30 +40,30 @@ hex2bin dhry.ihx
 
 TIMER_START = 0x278
    0x06e (TIMER_START in dhry_1.sym) -
-	0x000 (_main in dhry_1.sym) +
-	0x20a (_main in dhry.map)
+   0x000 (_main in dhry_1.sym) +
+   0x20a (_main in dhry.map)
 
 TIMER_STOP = 0x3f3
    0x1e9 (TIMER_STOP in dhry_1.sym) -
-	0x000 (_main in dhry_1.sym) +
-	0x20a (_main in dhry.map)
+   0x000 (_main in dhry_1.sym) +
+   0x20a (_main in dhry.map)
 
 SIZE = 7073 bytes
    0x071c (_CODE in dhry.map) +
-	0x0003 (_HEADER0 in dhry.map) +
-	0x0002 (_HEADER1 in dhry.map) +
-	0x0002 (_HEADER2 in dhry.map) +
-	0x0002 (_HEADER3 in dhry.map) +
-	0x0002 (_HEADER4 in dhry.map) +
-	0x0002 (_HEADER5 in dhry.map) +
-	0x0002 (_HEADER6 in dhry.map) +
-	0x0002 (_HEADER7 in dhry.map) +
-	0x000c (_HEADER8 in dhry.map) +
+   0x0003 (_HEADER0 in dhry.map) +
+   0x0002 (_HEADER1 in dhry.map) +
+   0x0002 (_HEADER2 in dhry.map) +
+   0x0002 (_HEADER3 in dhry.map) +
+   0x0002 (_HEADER4 in dhry.map) +
+   0x0002 (_HEADER5 in dhry.map) +
+   0x0002 (_HEADER6 in dhry.map) +
+   0x0002 (_HEADER7 in dhry.map) +
+   0x000c (_HEADER8 in dhry.map) +
    0x0002 (_INITIALIZER in dhry.map) +
-	0x000f (_GSINIT in dhry.map) +
-	0x0001 (_GSFINAL in dhry.map) +
-	0x1454 (_DATA in dhry.map) +
-	0x0002 (_INITIALIZED in dhry.map)
+   0x000f (_GSINIT in dhry.map) +
+   0x0001 (_GSFINAL in dhry.map) +
+   0x1454 (_DATA in dhry.map) +
+   0x0002 (_INITIALIZED in dhry.map)
 
 The invocation of TICKS looked like this:
 
@@ -85,4 +85,4 @@ SDCC 3.6.5 #9842 (MINGW64)
 cycle count  = 292880320
 time @ 4MHz  = 292880320 / 4x10^6 = 73.22008  seconds
 dhrystones/s = 20000 / 73.2208 = 273.1464
-DMIPS        = 321.5913 / 1757 = 0.15546
+DMIPS        = 273.1464 / 1757 = 0.15546
