@@ -1,4 +1,7 @@
-No changes to source code.
+CHANGES TO SOURCE CODE
+======================
+
+None.
 
 The classic lib can use sccz80/genmath, sccz80/mzx, or zsdcc/math48.
 The new c lib can use sccz80/math48 or zsdcc/math48.
@@ -7,7 +10,7 @@ VERIFY CORRECT RESULT
 =====================
 
 To verify correct results, we compiled for the zx spectrum target
-using all combinations of compiler and math library:
+using all combinations of compiler and math libraries:
 
 ;classic not currently working
 
@@ -59,17 +62,17 @@ loading the whetstone program from tape.
 ;zcc +zx -vn -O2 -compiler=sdcc -SO3 --max-allocs-per-node200000 --reserve-regs-iy -DSTATIC -DTIMER whetstone.c -o whetstone -lm -lndos -m -create-app
 
 new/sccz80/math48 : 40 bit mantissa
-zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -create-app
+zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
 
 new/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
-zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -create-app
+zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
 
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks whetstone.bin -start 0944 -end 122d -counter 9999999999
+ticks whetstone.bin -start 08bc -end 13be -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -85,7 +88,8 @@ Z88DK March 2, 2017
 ZSDCC #9833
 
 new/sccz80/math48
-40 bit mantissa
+5483 bytes less page zero
+40 bit mantissa + 8 bit exponent
 
 cycle count  = 970198993
 time @ 4MHz  = 970198993 / 4x10^6 = 242.5497  seconds
@@ -93,7 +97,8 @@ KWIPS        = 100*10*1 / 242.5497 = 4.1229
 MWIPS        = 4.1229 / 1000 = 0.0041229
 
 new/zsdcc/math48
-40 bit mantissa internal, 24 bit presented by compiler
+6370 bytes less page zero
+40 bit mantissa + 8 bit exponent internal, 24 bit mantissa + 8 bit exponent exposed by compiler
 
 cycle count  = 916537242
 time @ 4MHz  = 916537242 / 4x10^6 = 229.1343 seconds
