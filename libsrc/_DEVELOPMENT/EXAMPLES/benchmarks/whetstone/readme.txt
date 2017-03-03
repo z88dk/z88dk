@@ -14,7 +14,7 @@ http://www.roylongbottom.org.uk/whetstone.htm#anchorIndex
 The base source code used for benchmarking is in this directory.
 
 This is modified as little as possible to be compilable by the
-compilers under test and that modified source code is present in
+compilers under test and any modified source code is present in
 subdirectories.
 
 Floating point performance is measured in KWIPS (kilo-whetstones
@@ -28,11 +28,11 @@ In these timing tests, LOOPS will default to 10 and ITERATIONS
 will default to 1.
 
 As can be expected, the implementation's floating point precision
-will greatly impact in comparative accuracy and performance so
+will greatly impact on comparative accuracy and performance so
 the floating point format must be reported along with KWIPS rating
-to allow for suitable comparison of results.
+to allow for suitable insight into results.
 
-When compile whetstone 1.2, several defines are possible:
+When compiling whetstone 1.2, several defines are possible:
 
 /*
  * COMMAND LINE DEFINES
@@ -53,9 +53,9 @@ When compile whetstone 1.2, several defines are possible:
  * Enable command line processing (LOOP=10, II=1 if disabled).
  *
  */
- 
- STATIC can be defined freely for best compiler performance.
- 
+
+STATIC can be defined freely for best compiler performance.
+
 All compiles are first checked for correctness by running the program
 with PRINTOUT defined.  After correctness is verified, time should be
 measured with PRINTOUT undefined so that execution time of printf is not
