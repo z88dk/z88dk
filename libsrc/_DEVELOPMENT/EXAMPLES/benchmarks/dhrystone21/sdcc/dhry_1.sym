@@ -1,0 +1,62 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+  0 TIMER_START                                                    006E R
+  0 TIMER_STOP                                                     01E9 R
+  1 _Arr_1_Glob                                                    000A GR
+  1 _Arr_2_Glob                                                    006E GR
+  1 _Begin_Time                                                    13F6 GR
+  1 _Bool_Glob                                                     0006 GR
+  1 _Ch_1_Glob                                                     0008 GR
+  1 _Ch_2_Glob                                                     0009 GR
+  1 _Dhrystones_Per_Second                                         1406 GR
+  1 _End_Time                                                      13FA GR
+    _Func_1                                                        **** GX
+    _Func_2                                                        **** GX
+  1 _Int_Glob                                                      0004 GR
+  1 _Microseconds                                                  1402 GR
+  1 _Next_Ptr_Glob                                                 0002 GR
+  0 _Proc_1                                                        026A GR
+  0 _Proc_2                                                        0323 GR
+  0 _Proc_3                                                        036D GR
+  0 _Proc_4                                                        03AD GR
+  0 _Proc_5                                                        03D4 GR
+    _Proc_6                                                        **** GX
+    _Proc_7                                                        **** GX
+    _Proc_8                                                        **** GX
+  1 _Ptr_Glob                                                      0000 GR
+  2 _Regb                                                          0000 GR
+  1 _User_Time                                                     13FE GR
+  0 ___str_0                                                       01EE R
+  0 ___str_1                                                       020D R
+  0 ___str_2                                                       022C R
+  0 ___str_3                                                       024B R
+    __divsint                                                      **** GX
+    __mulint                                                       **** GX
+  7 __xinit__Regb                                                  0000 R
+  0 _main                                                          0000 GR
+  1 _malloc_1                                                      140A GR
+  1 _malloc_2                                                      142F GR
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  3E0   flags    0
+   1 _DATA                                      size 1454   flags    0
+   2 _INITIALIZED                               size    2   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size    2   flags    0
+   8 _CABS                                      size    0   flags    8
+
