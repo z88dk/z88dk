@@ -52,7 +52,7 @@
 
 int main()
 {
-   STATIC uint16_t r[2800 + 1];
+   static uint16_t r[2800 + 1];
 
    STATIC uint16_t i, k;
    STATIC uint16_t b;
