@@ -61,3 +61,30 @@ The output of TICKS is a cycle count.  To convert to time in seconds:
 
 Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
+
+
+RESULTS
+=======
+
+1.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library
+8312 bytes less page zero
+
+cycle count  = 3663646
+time @ 4MHZ  = 3663646 / 4*10^6 = 0.9159 sec
+
+2.
+SDCC 3.6.5 #9842 (MINGW64)
+8263 bytes less page zero
+
+cycle count  = 4701570
+time @ 4MHz  = 4701570 / 4*10^6 = 1.1754 sec
+
+3.
+Z88DK March 2, 2017
+sccz80 / new c library
+8414 bytes less page zero
+
+cycle count  = 5894225
+time @ 4MHz  = 5894225 / 4*10^6 = 1.4736 sec

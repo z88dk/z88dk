@@ -129,3 +129,39 @@ where FCPU = clock frequency of Z80 in Hz.
 
 This time can be plugged into the whetstone formulas above to compute
 exact KWIPS performance.
+
+
+RESULTS
+=======
+
+1.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library / math48 float package
+24 bit mantissa + 8 bit exponent (internally 40+8)
+6153 bytes less page zero
+
+cycle count  = 916537242
+time @ 4MHz  = 916537242 / 4x10^6 = 229.1343 seconds
+KWIPS        = 100*10*1 / 229.1343 = 4.3643
+MWIPS        = 4.3643 / 1000 = 0.0043643
+
+2.
+Z88DK March 2, 2017
+sccz80 / new c library / math48 float package
+40 bit mantissa + 8 bit exponent
+5843 bytes less page zero
+
+cycle count  = 970198993
+time @ 4MHz  = 970198993 / 4x10^6 = 242.5497  seconds
+KWIPS        = 100*10*1 / 242.5497 = 4.1229
+MWIPS        = 4.1229 / 1000 = 0.0041229
+
+3.
+SDCC 3.6.5 #9842 (MINGW64)
+24 bit mantissa + 8 bit exponent
+14379 bytes less page zero
+
+cycle count  = 2184812093
+time @ 4MHz  = 2184812093 / 4x10^6 = 546.2030  seconds
+KWIPS        = 100*10*1 / 546.2030 = 1.8308
+MWIPS        = 1.8308 / 1000 = 0.0018308

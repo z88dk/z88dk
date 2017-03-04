@@ -84,3 +84,26 @@ This time can be plugged into the dhrystone formulas above to compute
 exact dhrystone performance.
 
 (Number_Of_Runs = 20000 when PRINTF is disabled).
+
+
+RESULTS
+=======
+
+1.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library
+7126 bytes less page zero
+
+cycle count  = 248762927
+time @ 4MHz  = 248762927 / 4x10^6 = 62.1907  seconds
+dhrystones/s = 20000 / 62.1907 = 321.5913
+DMIPS        = 321.5913 / 1757 = 0.18303
+
+2.
+SDCC 3.6.5 #9842 (MINGW64)
+7013 bytes less page zero
+
+cycle count  = 292880320
+time @ 4MHz  = 292880320 / 4x10^6 = 73.22008  seconds
+dhrystones/s = 20000 / 73.2208 = 273.1464
+DMIPS        = 273.1464 / 1757 = 0.15546

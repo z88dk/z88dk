@@ -54,3 +54,83 @@ The output of TICKS is a cycle count.  To convert to time in seconds:
 
 Execution_Time = CYCLE_COUNT / FCPU
 where FCPU = clock frequency of Z80 in Hz.
+
+
+RESULTS - PI.C (NO LDIV)
+========================
+
+1.
+Z88DK March 2, 2017
+sccz80 / new c library / fast int math
+9018 bytes less page zero
+
+cycle count  = 1708903088
+time @ 4MHz  = 1708903088 / 4*10^6 = 7 min 07 sec
+
+2.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library / fast int math
+8997 bytes less page zero
+
+cycle count  = 1739403552
+time @ 4MHz  = 1739403552 / 4*10^6 = 7 min 15 sec
+
+3.
+Z88DK March 2, 2017
+sccz80 / new c library / small int math
+6269 bytes less page zero
+
+cycle count  = 5246791210
+time @ 4MHz  = 5246791210 / 4*10^6 = 21 min 52 sec
+
+4.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library / small int math
+6246 bytes less page zero
+
+cycle count  = 5278798872
+time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
+
+5.
+SDCC 3.6.5 #9842 (MINGW64)
+6844 bytes less page zero
+
+cycle count  = 8700157418
+time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
+
+
+RESULTS - PI_LDIV.C (LDIV USED)
+===============================
+
+
+1.
+Z88DK March 2, 2017
+sccz80 / new c library / fast int math
+9131 bytes less page zero
+
+cycle count  = 1313857712
+time @ 4MHz  = 1313857712 / 4*10^6 = 5 min 28 sec
+
+2.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library / fast int math
+9097 bytes less page zero
+
+cycle count  = 1328865976
+time @ 4MHz  = 1328865976 / 4*10^6 = 5 min 32 sec
+
+3.
+Z88DK March 2, 2017
+sccz80 / new c library / small int math
+6382 bytes less page zero
+
+cycle count  = 3810732458
+time @ 4MHz  = 3810732458 / 4*10^6 = 15 min 53 sec
+
+4.
+Z88DK March 2, 2017
+zsdcc #9833 / new c library / small int math
+6348 bytes less page zero
+
+cycle count  = 3827247920
+time @ 4MHz  = 3827247920 / 4*10^6 = 15 min 57 sec
