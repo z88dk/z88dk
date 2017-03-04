@@ -97,7 +97,7 @@ KWIPS        = 100*10*1 / 242.5497 = 4.1229
 MWIPS        = 4.1229 / 1000 = 0.0041229
 
 new/zsdcc/math48
-6370 bytes less page zero
+6153 bytes less page zero
 40 bit mantissa + 8 bit exponent internal, 24 bit mantissa + 8 bit exponent exposed by compiler
 
 cycle count  = 916537242
