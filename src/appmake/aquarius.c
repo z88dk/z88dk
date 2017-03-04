@@ -55,7 +55,7 @@ int aquarius_exec(char *target)
     }
 
 	if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
-		printf("Can't open input file\n");
+		printf("Can't open input file %s\n",binname);
 		exit(1);
 	}
 
