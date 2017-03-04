@@ -72,6 +72,8 @@ int rom_exec(char *target)
             // choose bin suffix if new c lib compile and ram model chosen or romsize is set to zero
             // not safe to use bin suffix in classic compile since the linker's output filename ends in .bin
             suffix_change(outname, ((crt_model == 0) || ((crt_model != -1) && (romsize == 0))) ? ".bin" : ".rom");
+			if (!strcmp(outname,binname))
+				suffix_change(outname,".rom");
         }
     }
     else
@@ -130,8 +132,6 @@ int rom_exec(char *target)
     if (fpin != NULL) fclose(fpin);
     fclose(fpout);
 	
-	
-
     if (ihex)
     {
 		if (chipcount>1) {
