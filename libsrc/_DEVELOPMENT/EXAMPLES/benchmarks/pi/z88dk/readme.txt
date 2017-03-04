@@ -140,22 +140,22 @@ ZSDCC #9833
 
 PI.C
 
-new/sccz80/small (7374 bytes less page zero)
+new/sccz80/small (6269 bytes less page zero)
 
 cycle count  = 5246791210
 time @ 4MHz  = 5246791210 / 4*10^6 = 21 min 52 sec
 
-new/zsdcc/small (7352 bytes less page zero)
+new/zsdcc/small (6246 bytes less page zero)
 
 cycle count  = 5278798872
 time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
 
-new/sccz80/fast (10055 bytes less page zero)
+new/sccz80/fast (9018 bytes less page zero)
 
 cycle count  = 1708903088
 time @ 4MHz  = 1708903088 / 4*10^6 = 7 min 07 sec
 
-new/zsdcc/fast (10033 bytes less page zero)
+new/zsdcc/fast (8997 bytes less page zero)
 
 cycle count  = 1739403552
 time @ 4MHz  = 1739403552 / 4*10^6 = 7 min 15 sec
@@ -163,22 +163,22 @@ time @ 4MHz  = 1739403552 / 4*10^6 = 7 min 15 sec
 
 PI_LDIV.C
 
-new/sccz80/small (7487 bytes less page zero)
+new/sccz80/small (6382 bytes less page zero)
 
 cycle count  = 3810732458
 time @ 4MHz  = 3810732458 / 4*10^6 = 15 min 53 sec
 
-new/zsdcc/small (7452 bytes less page zero)
+new/zsdcc/small (6348 bytes less page zero)
 
 cycle count  = 3827247920
 time @ 4MHz  = 3827247920 / 4*10^6 = 15 min 57 sec
 
-new/sccz80/fast (10168 bytes less page zero)
+new/sccz80/fast (9131 bytes less page zero)
 
 cycle count  = 1313857712
 time @ 4MHz  = 1313857712 / 4*10^6 = 5 min 28 sec
 
-new/zsdcc/fast (10133 bytes less page zero)
+new/zsdcc/fast (9097 bytes less page zero)
 
 cycle count  = 1328865976
 time @ 4MHz  = 1328865976 / 4*10^6 = 5 min 32 sec
