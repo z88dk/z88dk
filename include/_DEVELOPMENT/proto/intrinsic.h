@@ -40,7 +40,7 @@ include(__link__.m4)
 
 #ifdef __SCCZ80
 
-#define intrinsic_label(name)  asm("name:");
+#define intrinsic_label(name)  asm(#name":")
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
 

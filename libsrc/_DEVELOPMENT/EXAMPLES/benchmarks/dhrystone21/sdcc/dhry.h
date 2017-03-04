@@ -394,8 +394,8 @@
 /* for boolean and enumeration types in Ada, Pascal */
 
 #ifdef TIMER
-   #define TIMER_START()       intrinsic_label(TIMER_START)
-   #define TIMER_STOP()        intrinsic_label(TIMER_STOP)
+   #define TIMER_START()       __asm__("TIMER_START:")
+   #define TIMER_STOP()        __asm__("TIMER_STOP:")
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -413,6 +413,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+typedef float double_t;
+typedef float float_t;
 
 #ifdef __Z88DK
    #include <intrinsic.h>

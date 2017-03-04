@@ -1,8 +1,12 @@
 
 /*
  printf %d %s %f %e %g used 
- zcc +cpm -vn -SO3 -DNOSIGNAL -D__STDC__ -clib=sdcc_iy --max-allocs-per-node200000 msgs.c part1.c part2.c part3.c part4.c part5.c part6.c part7.c part8.c subs.c -o par -lm
+ zcc +cpm -vn -SO3 -DNOSIGNAL -D__STDC__ -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size @zproject.lst -o par -lm -create-app
 */
+
+#ifdef __Z88DK
+#pragma output CLIB_OPT_PRINTF = 0x15000201
+#endif
 
 #include <stdio.h>
 #ifndef NOSIGNAL
