@@ -46,7 +46,7 @@ SYMBOL* retrstk(char* flags)
 {
     SYMBOL* ptr;
     if (!stkcount)
-        return (laststk = 0);
+        return (laststk = NULL);
     ptr = laststk = stkptr[--stkcount];
     *flags = flgstk[stkcount];
     return (ptr);

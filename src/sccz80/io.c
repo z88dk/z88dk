@@ -319,7 +319,7 @@ void outdec(long number)
 {
     if (number < 0) {
         number = -number;
-        /*	number= (int)( 65536UL-(long)number); */
+        /*        number= (int)( 65536UL-(long)number); */
         outbyte('-');
     }
     outd2(number);

@@ -261,8 +261,8 @@ void declglb(
             ptrtofn = YES;
 #if 0
         } else if ( cmatch('@') ) {
-			storage = EXTERNP;
-			constexpr(&addr,1);
+                        storage = EXTERNP;
+                        constexpr(&addr,1);
 #endif
         } else if (cmatch('(')) {
             /*
@@ -285,14 +285,14 @@ void declglb(
              *      against a K&R style function definition () so carry on
              *      as normal!
              *
-             *	__SHARED__ indicates in a library so preserve carry flag
-             * 	(so we can test with iferror)
+             *        __SHARED__ indicates in a library so preserve carry flag
+             *         (so we can test with iferror)
              *
-             *	__CALLEE__ indicates that the function called cleans up
-             *	the stack
+             *        __CALLEE__ indicates that the function called cleans up
+             *        the stack
              *
-             *	__SHAREDC__ is indicates call by rst 8 but is unused..
-             *	(old idea unused, but may yet be useful)
+             *        __SHAREDC__ is indicates call by rst 8 but is unused..
+             *        (old idea unused, but may yet be useful)
              */
             if (currfn) {
                 if (libdef) {
@@ -469,8 +469,8 @@ void declglb(
                 mtag->size = size;
         }
         if ( ptrtofn ) {
+            myptr->flags |= FLOATINGDECL;
             check_trailing_modifiers(myptr);
-            printf("%s %x\n",myptr->name,myptr->flags);
         }
     } while (cmatch(','));
     ns();
@@ -618,6 +618,7 @@ void declloc(
             }
         }
         if ( ptrtofn ) {
+            cptr->flags |= FLOATINGDECL;
             check_trailing_modifiers(cptr);
         }
     } while (cmatch(','));
@@ -640,7 +641,7 @@ uint32_t CalcArgValue(char type, char ident, enum symbol_flags flags)
 }
 
 /*
- *	Expand the type into something nice
+ *        Expand the type into something nice
  */
 
 char* ExpandType(int type, char** dosign, char tagidx)

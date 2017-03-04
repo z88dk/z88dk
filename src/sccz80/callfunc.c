@@ -217,12 +217,12 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         callstk(nargs);
     }
     /*
-     *	Modify the stack after a function call
+     *        Modify the stack after a function call
      *
-     *	We should modify stack if:
-     *	- __CALLEE__ isn't set
-     *	- Function is __LIB__ even if c_compact_code is set
-     *	- c_compact_code isn't set and __CALLEE__ isn't set
+     *        We should modify stack if:
+     *        - __CALLEE__ isn't set
+     *        - Function is __LIB__ even if c_compact_code is set
+     *        - c_compact_code isn't set and __CALLEE__ isn't set
      */
 
     if ((ptr && ptr->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((ptr->flags & LIBRARY) == 0))) {

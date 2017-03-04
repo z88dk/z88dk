@@ -488,18 +488,21 @@ void check_trailing_modifiers(SYMBOL *currfn)
     while (1) {
         if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
             currfn->flags |= FASTCALL;
+            currfn->flags &= ~FLOATINGDECL;
             continue;
         }
         if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
             currfn->flags |= CALLEE;
+            currfn->flags &= ~FLOATINGDECL;
             continue;
         }
         if (amatch("__smallc")) {
             currfn->flags |= SMALLC;
+            currfn->flags &= ~FLOATINGDECL;
             continue;
         }
         if (amatch("__stdc")) {
-            currfn->flags &= ~SMALLC;
+            currfn->flags &= ~(SMALLC|FLOATINGDECL);
             continue;
         }
         if (amatch("__preserves_regs")) {
@@ -698,6 +701,7 @@ SYMBOL *getarg(
                 argptr->type = STRUCT;
             }
             if ( ptrtofn && argptr ) {
+                argptr->flags |= FLOATINGDECL;
                 check_trailing_modifiers(argptr);
             }
         }

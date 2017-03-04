@@ -6,7 +6,7 @@
  *      char arrays in structs now initialised correctly, strings
  *      truncated if too long, all seems to be fine - hurrah!
  *
- *	2/2/02 djm - This file needs to rewritten to be more flexible
+ *        2/2/02 djm - This file needs to rewritten to be more flexible
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *

@@ -105,10 +105,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (lval->const_val == 0)
             lval->stage_add = stagenext;
 
-        /* Fixed 4/5/2000 If LHS was long const then we would
-		   generate bad code cos constant was only in de and
-		   rhs was ot on the stack -> crash (also in plnge2b)
-        */
         if (lval->val_type == LONG) {
             widenlong(lval, lval2);
             lval2->val_type = LONG; /* Kludge */
