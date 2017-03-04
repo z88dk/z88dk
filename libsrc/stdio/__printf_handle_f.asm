@@ -75,10 +75,10 @@ set_prec:
 call_fp_converter:
         call    l_jphl
         pop     bc              ;the buffer
-        pop     bc
-        pop     bc
-        pop     bc
-        pop     bc
+        pop     bc		;prec
+        pop     bc		;flt
+        pop     bc		;flt
+        pop     bc		;flt
         pop     ix              ;get ix back
         call    __printf_get_buffer_address
         call    strlen          ;get the length of it

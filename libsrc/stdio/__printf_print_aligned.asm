@@ -5,15 +5,19 @@
 	EXTERN	__printf_doprint
 	EXTERN	l_ge
 
+; Entry: bc = buffer to print
+;        de = length of the buffer
 __printf_print_aligned:
         ld      l,(ix-6)        ;width
         ld      h,(ix-5)
         ld      a,h
         or      l
         jr      z,width_done
+        push    hl
         push    bc
-        call    l_ge
+        call    l_ge             ;disturbs hl
         pop     bc
+        pop     hl
         jr      nc,adjust_width
         ld      hl,0
         jr      width_done
