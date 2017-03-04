@@ -15,6 +15,13 @@
  *
  */
 
+#ifdef __Z88DK
+   #include <intrinsic.h>
+   #ifdef PRINTF
+      #pragma output CLIB_OPT_PRINTF = 0x01
+   #endif
+#endif
+
 #ifdef STATIC
    #undef  STATIC
    #define STATIC              static
@@ -48,13 +55,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#ifdef __Z88DK
-   #include <intrinsic.h>
-   #ifdef PRINTF
-      #pragma output CLIB_OPT_PRINTF = 0x01
-   #endif
-#endif
 
 int main()
 {
