@@ -92,6 +92,13 @@ cycle count  = 5278798872
 time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
 
 5.
+HITECH C CPM V309
+6793 bytes less cpm overhead
+
+cycle count  = 5531933581
+time @ 4MHz  = 5531933581 / 4*10^6 = 23 min 03 sec
+
+6.
 SDCC 3.6.5 #9842 (MINGW64)
 6844 bytes less page zero
 
@@ -101,7 +108,6 @@ time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
-
 
 1.
 Z88DK March 2, 2017
