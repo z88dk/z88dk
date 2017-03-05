@@ -107,3 +107,12 @@ cycle count  = 292880320
 time @ 4MHz  = 292880320 / 4x10^6 = 73.22008  seconds
 dhrystones/s = 20000 / 73.2208 = 273.1464
 DMIPS        = 273.1464 / 1757 = 0.15546
+
+3.
+HITECH C CPM V309
+7471 bytes less cpm overhead
+
+cycle count  = 354120220
+time @ 4MHz  = 354120220 / 4*10^6 = 88.53 sec
+dhrystones/s = 20000 / 88.53 = 225.9120
+DMIPS        = 225.9120 / 1757 = 0.12858
