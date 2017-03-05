@@ -135,6 +135,17 @@ RESULTS
 =======
 
 1.
+HITECH C CPM V309
+** INCORRECT RESULTS
+24 bit mantissa + 8 bit exponent
+7605 bytes less cpm overhead
+
+cycle count  = 639413871
+time @ 4MHz  = 639413871 / 4*10^6 = 159.8535 sec
+KWIPS        = 100*10*1 / 159.8535 = 6.2557
+MWIPS        = 6.2557 / 1000 = 0.0062557
+
+2.
 Z88DK March 2, 2017
 zsdcc #9833 / new c library / math48 float package
 24 bit mantissa + 8 bit exponent (internally 40+8)
@@ -145,7 +156,7 @@ time @ 4MHz  = 916537242 / 4x10^6 = 229.1343 seconds
 KWIPS        = 100*10*1 / 229.1343 = 4.3643
 MWIPS        = 4.3643 / 1000 = 0.0043643
 
-2.
+3.
 Z88DK March 2, 2017
 sccz80 / new c library / math48 float package
 40 bit mantissa + 8 bit exponent
@@ -156,7 +167,7 @@ time @ 4MHz  = 970198993 / 4x10^6 = 242.5497  seconds
 KWIPS        = 100*10*1 / 242.5497 = 4.1229
 MWIPS        = 4.1229 / 1000 = 0.0041229
 
-3.
+4.
 SDCC 3.6.5 #9842 (MINGW64)
 24 bit mantissa + 8 bit exponent
 14379 bytes less page zero
