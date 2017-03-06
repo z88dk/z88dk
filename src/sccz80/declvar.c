@@ -195,7 +195,7 @@ void declglb(
     char sname[NAMESIZE];
     int size, ident, more, itag, type, size_st;
     int32_t addr = -1;
-    char flagdef, match, ptrtofn;
+    char match, ptrtofn;
     char fastcall, callee;
     unsigned int libdef;
     SYMBOL* myptr;
@@ -208,14 +208,13 @@ void declglb(
         size = 1; /* assume 1 element */
         more = /* assume dummy symbol not required */
             itag = 0; /* just for tidiness */
-        flagdef = libdef = fastcall = callee = NO;
+        libdef = fastcall = callee = NO;
         libdef = 0;
 
         match = ptrtofn = NO;
 
         while (blanks(), rcmatch('_')) {
             match = NO;
-            //            if (amatch("__APPFUNC__") ) { match=YES; flagdef=1; }
             if (amatch("__LIB__") /* && libdef==0 */) {
                 match = YES;
                 libdef |= LIBRARY;
@@ -262,8 +261,8 @@ void declglb(
             ptrtofn = YES;
 #if 0
         } else if ( cmatch('@') ) {
-			storage = EXTERNP;
-			constexpr(&addr,1);
+                        storage = EXTERNP;
+                        constexpr(&addr,1);
 #endif
         } else if (cmatch('(')) {
             /*
@@ -286,28 +285,17 @@ void declglb(
              *      against a K&R style function definition () so carry on
              *      as normal!
              *
-             *      If we had our function prefixed with __APPFUNC__ then we want
-             *      to write it out to the zcc_opt.def file (this bloody thing
-             *      is becoming invaluable for messaging!
+             *        __SHARED__ indicates in a library so preserve carry flag
+             *         (so we can test with iferror)
              *
-             *	__SHARED__ indicates in a library so preserve carry flag
-             * 	(so we can test with iferror)
+             *        __CALLEE__ indicates that the function called cleans up
+             *        the stack
              *
-             *	__CALLEE__ indicates that the function called cleans up
-             *	the stack
-             *
-             *	__SHAREDC__ is indicates call by rst 8 but is unused..
-             *	(old idea unused, but may yet be useful)
+             *        __SHAREDC__ is indicates call by rst 8 but is unused..
+             *        (old idea unused, but may yet be useful)
              */
-            if (flagdef)
-                WriteDefined(sname, 0);
             if (currfn) {
-                /* djm 1/2/03 - since we can override lib functions don't reset the library
-                   flag
-                   currfn->flags&=(~LIBRARY);
-                */
                 if (libdef) {
-                    //		currfn->flags|=LIBRARY;
                     currfn->flags |= libdef;
                 }
                 if (callee && (libdef & SHARED) != SHARED && (libdef & SHAREDC) != SHAREDC)
@@ -353,10 +341,17 @@ void declglb(
             if (size == 0 && ident == POINTER)
                 size = 0;
             ident = ARRAY;
-            if (ptrtofn)
-                needtoken(")()");
+            if (ptrtofn) {
+                needchar(')');
+                needchar('(');
+                // TODO: Arguments
+                needchar(')');
+            }
         } else if (ptrtofn) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: arguments
+            needchar(')');
         } else if (ident == PTR_TO_PTR) {
             ident = POINTER;
             more = dummy_idx(typ, otag);
@@ -379,7 +374,7 @@ void declglb(
             itag = otag - tagtab;
         }
         /* add symbol */
-        if (mtag == 0) {
+        if (mtag == NULL) {
             /* this is a real variable, not a structure member */
             if (typ == VOID && ident != FUNCTION && ident != FUNCTIONP && ident != POINTER && ident != ARRAY) {
                 warning(W_BADDECL);
@@ -473,6 +468,10 @@ void declglb(
             if (mtag->size < size)
                 mtag->size = size;
         }
+        if ( ptrtofn ) {
+            myptr->flags |= FLOATINGDECL;
+            check_trailing_modifiers(myptr);
+        }
     } while (cmatch(','));
     ns();
 }
@@ -494,6 +493,7 @@ void declloc(
     char sname2[3 * NAMESIZE]; /* More than enuff overhead! */
     SYMBOL* cptr;
     int dsize, size, ident, more, itag, type, decltype;
+    int ptrtofn;
 
     /*       if ( swactive ) error(E_DECLSW) ; */
     if (declared < 0)
@@ -501,7 +501,7 @@ void declloc(
     do {
         if (endst())
             break;
-
+        ptrtofn = NO;
         type = decltype = typ;
         more = /* assume dummy symbol not required */
             itag = 0;
@@ -512,16 +512,25 @@ void declloc(
             illname(sname);
 
         if (ident == FUNCTIONP) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: Arguments
+            needchar(')');
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
             type = (var->zfar ? CPTR : CINT);
             dsize = size = (var->zfar ? 3 : 2);
+            ptrtofn = YES;
+
         }
 
         if (ident == PTR_TO_FN) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: Arguments
+            needchar(')');
             ident = POINTER;
+            ptrtofn = YES;
         }
 
         if (cmatch('[')) {
@@ -608,6 +617,10 @@ void declloc(
                 }
             }
         }
+        if ( ptrtofn ) {
+            cptr->flags |= FLOATINGDECL;
+            check_trailing_modifiers(cptr);
+        }
     } while (cmatch(','));
     ns();
 }
@@ -628,7 +641,7 @@ uint32_t CalcArgValue(char type, char ident, enum symbol_flags flags)
 }
 
 /*
- *	Expand the type into something nice
+ *        Expand the type into something nice
  */
 
 char* ExpandType(int type, char** dosign, char tagidx)

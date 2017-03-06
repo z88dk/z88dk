@@ -73,7 +73,7 @@ static void SetNoAltReg(char *);
 static void SetSharedFile(char *);
 static void SetDebug(char *);
 static void SetASXX(char *);
-#ifdef USE_FRAME
+#ifdef USEFRAME
 static void SetFrameIX(char *);
 static void SetFrameIY(char *);
 static void SetNoFrame(char *);
@@ -789,9 +789,9 @@ struct args myargs[] = {
     { "doublestr", NO, SetDoubleStrings, "Convert fp strings to values at runtime" },
     { "noaltreg", NO, SetNoAltReg, "Don't use alternate registers" },
 #ifdef USEFRAME
-    { "frameix", NO, SetFrameIX },
-    { "frameiy", NO, SetFrameIY },
-    { "noframe", NO, SetNoFrame },
+    { "frameix", NO, SetFrameIX, "Use ix as the framepointer" },
+    { "frameiy", NO, SetFrameIY, "Use iy as the framepointer" },
+    { "noframe", NO, SetNoFrame, "Don't use a framepointer (default)" },
 #endif
     { "standard-escape-chars", NO, SetStandardEscape, "Use standard mappings for escape codes" },
     { "set-r2l-by-default", NO, set_default_r2l, "Use r2l calling by default"},
@@ -801,19 +801,19 @@ struct args myargs[] = {
 };
 
 #ifdef USEFRAME
-void SetNoFrame(char* arg)
+static void SetNoFrame(char* arg)
 {
     c_useframepointer = NO;
     c_framepointer_is_ix = NO;
 }
 
-void SetFrameIX(char* arg)
+static void SetFrameIX(char* arg)
 {
     c_useframepointer = YES;
     c_framepointer_is_ix = YES;
 }
 
-void SetFrameIY(char* arg)
+static void SetFrameIY(char* arg)
 {
     c_useframepointer = YES;
     c_framepointer_is_ix = NO;

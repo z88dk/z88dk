@@ -91,7 +91,8 @@ enum symbol_flags {
         CALLEE = 64,      /* Called function pops regs */
         LIBRARY = 128,    /* Lib routine */
         SAVEFRAME = 256,  /* Save framepointer */
-        SMALLC = 512      /* L->R calling order */
+        SMALLC = 512,      /* L->R calling order */
+        FLOATINGDECL = 1024 /* For a function pointer, the calling convention is floating */
 };
 
 

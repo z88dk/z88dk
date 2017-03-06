@@ -68,7 +68,7 @@ int cmatch(char lit)
     if (line[lptr] == lit) {
         for ( i = 0; i < buffer_fps_num; i++ ) {
              fprintf(buffer_fps[i],"%c",line[lptr]);
-	}
+        }
         ++lptr;
         return 1;
     }

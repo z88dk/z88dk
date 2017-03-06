@@ -2149,15 +2149,13 @@ int CheckOffset(int val)
 
 void OutIndex(int val)
 {
-    if (ISASM(ASM_ASXX)))
-        {
-            outdec(val);
-            if (c_framepointer_is_ix)
-                outstr("(ix)");
-            else
-                outstr("(iy)");
-        }
-    else {
+    if (ISASM(ASM_ASXX)) {
+        outdec(val);
+        if (c_framepointer_is_ix)
+            outstr("(ix)");
+        else
+            outstr("(iy)");
+    } else {
         outstr("(");
         if (c_framepointer_is_ix)
             outstr("ix ");

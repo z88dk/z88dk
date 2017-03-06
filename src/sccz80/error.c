@@ -87,7 +87,8 @@ struct warnings mywarn[] = {
     { "Unknown escape sequence \\%c", 0 },
     { "Internal thingummyjob please report!!! Please!", 0 },
     { "Hex escape sequence out of range ", 0 },
-    { "Variable '%s' may be used before initialisation ", 0}
+    { "Variable '%s' may be used before initialisation ", 0},
+    { "Function pointer '%s'' doesn't have the same %s status as the value it's being given", 0}
 };
 
 struct errors {

@@ -637,7 +637,7 @@ void test(int label, int parens)
 {
     char *before, *start;
     LVALUE lval;
-    void (*oper)();
+    void (*oper)(LVALUE *lva);
 
     ClearCast(&lval);
 
@@ -901,7 +901,7 @@ int utype(LVALUE* lval)
 
 int DoTestJump(LVALUE* lval)
 {
-    void (*fn)();
+    void (*fn)(LVALUE *lval);
     fn = lval->binop;
 
     if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt || fn == zle || fn == lneg || fn == dummy)
@@ -916,7 +916,7 @@ int DoTestJump(LVALUE* lval)
 
 int WasComp(LVALUE* lval)
 {
-    void (*fn)();
+    void (*fn)(LVALUE *lval);
     fn = lval->binop;
 
     if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt || fn == zle) {
