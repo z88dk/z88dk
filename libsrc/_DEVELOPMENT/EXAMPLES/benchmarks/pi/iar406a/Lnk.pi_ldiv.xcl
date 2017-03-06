@@ -1,0 +1,10 @@
+-cZ80                                                             // target processor architecture
+-Z(CODE)RCODE,CODE,CDATA0,CONST,CSTR,CCSTR=0000-7FFE              // memory segments with code and constants should match ORG
+-Z(DATA)INTVEC=7FFF-8000                                          // interrupt table segment (for im2)
+-Z(DATA)DATA0,IDATA0,UDATA0,ECSTR,ALIGN8|8,CSTACK+200=8001-FFFF   // segments for stack, variables, etc
+cstartup                                                          // link out startup
+-C ../z80/lib/clz80                                               // link IAR's library
+-Fraw-binary                                                      // create plain binary
+-l list/pi_ldiv.html
+-o pi-ldiv.bin                                                    // binary filename
+-xehinms                                                          // switch everything on

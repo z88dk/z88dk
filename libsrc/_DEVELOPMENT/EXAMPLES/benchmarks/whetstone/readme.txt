@@ -146,6 +146,16 @@ KWIPS        = 100*10*1 / 159.8535 = 6.2557
 MWIPS        = 6.2557 / 1000 = 0.0062557
 
 2.
+IAR Z80 V4.06A
+24 bit mantissa + 8 bit exponent
+6524 bytes less small amount
+
+cycle count  = 732360277
+time @ 4MHz  = 732360277 / 4*10^6 = 183.0901 seconds
+KWIPS        = 100*10*1 / 183.0901 = 5.4618
+MWIPS        = 5.4618 / 1000 = 0.0054618
+
+3.
 Z88DK March 2, 2017
 zsdcc #9833 / new c library / math48 float package
 24 bit mantissa + 8 bit exponent (internally 40+8)
@@ -156,7 +166,7 @@ time @ 4MHz  = 916537242 / 4x10^6 = 229.1343 seconds
 KWIPS        = 100*10*1 / 229.1343 = 4.3643
 MWIPS        = 4.3643 / 1000 = 0.0043643
 
-3.
+4.
 Z88DK March 2, 2017
 sccz80 / new c library / math48 float package
 40 bit mantissa + 8 bit exponent
@@ -167,7 +177,7 @@ time @ 4MHz  = 970198993 / 4x10^6 = 242.5497  seconds
 KWIPS        = 100*10*1 / 242.5497 = 4.1229
 MWIPS        = 4.1229 / 1000 = 0.0041229
 
-4.
+5.
 SDCC 3.6.5 #9842 (MINGW64)
 24 bit mantissa + 8 bit exponent
 14379 bytes less page zero

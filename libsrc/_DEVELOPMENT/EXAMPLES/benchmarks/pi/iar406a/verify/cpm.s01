@@ -1,0 +1,100 @@
+PUBLIC putchar
+PUBLIC getchar
+RSEG CODE
+
+putchar:
+
+   push de
+	
+   ; no idea if any registers must be preserved
+	; so save them all
+
+	push af
+	push bc
+	push de
+	push hl
+	push ix
+	push iy
+	
+	exx
+	ex af,af'
+	
+	push af
+	push bc
+	push de
+	push hl
+	
+	exx
+	
+	; E = char
+	
+	ld c,2
+	call 0x0005
+	
+	pop hl
+	pop de
+	pop bc
+	pop af
+	
+	ex af,af'
+	exx
+	
+	pop iy
+	pop ix
+	pop hl
+	pop de
+	pop bc
+	pop af
+	
+	pop hl
+   ret
+	
+getchar:
+
+   ; no idea if any registers must be preserved
+	; so save them all
+
+	exx
+	ex af,af'
+	
+	push af
+	push bc
+	push de
+	push hl
+	
+	exx
+	ex af,af'
+	
+	push af
+	push bc
+	push de
+	;;push hl
+	push ix
+	push iy
+	
+	ld c,1
+	call 0x0005
+	
+	ld l,a
+	ld h,0
+	
+	pop iy
+	pop ix
+	pop de
+	pop bc
+	pop af
+	
+	ex af,af'
+	exx
+	
+	pop hl
+	pop de
+	pop bc
+	pop af
+	
+	exx
+	ex af,af'
+	
+	ret
+
+	END

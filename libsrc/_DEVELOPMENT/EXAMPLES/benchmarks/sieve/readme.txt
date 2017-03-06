@@ -75,20 +75,27 @@ cycle count  = 3663646
 time @ 4MHZ  = 3663646 / 4*10^6 = 0.9159 sec
 
 2.
+IAR Z80 V4.06A
+8772 bytes less small amount
+
+cycle count  = 3714152
+time @ 4MHz  = 3714152 / 4*10^6 = 0.9285 sec
+
+3.
 HITECH C CPM V309
 8725 bytes less cpm overhead
 
 cycle count  = 4547538
 time @ 4MHz  = 4547538 / 4*10^6 = 1.1369 sec
 
-3.
+4.
 SDCC 3.6.5 #9842 (MINGW64)
 8263 bytes less page zero
 
 cycle count  = 4701570
 time @ 4MHz  = 4701570 / 4*10^6 = 1.1754 sec
 
-4.
+5.
 Z88DK March 2, 2017
 sccz80 / new c library
 8414 bytes less page zero

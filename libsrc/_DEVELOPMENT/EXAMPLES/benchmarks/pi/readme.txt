@@ -105,6 +105,13 @@ SDCC 3.6.5 #9842 (MINGW64)
 cycle count  = 8700157418
 time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
 
+7.
+IAR Z80 V4.06A
+6789 bytes less small amount
+
+cycle count  = 8762223085
+time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
+
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
@@ -140,3 +147,12 @@ zsdcc #9833 / new c library / small int math
 
 cycle count  = 3827247920
 time @ 4MHz  = 3827247920 / 4*10^6 = 15 min 57 sec
+
+5.
+IAR Z80 V4.06A
+7006 bytes less small amount
+
+cycle count  = 8799503282
+time @ 4MHz  = 8799503282 / 4*10^6 = 36 min 40 sec
+
+It appears that IAR implements ldiv() as two separate divisions.
