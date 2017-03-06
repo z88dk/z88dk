@@ -109,6 +109,15 @@ dhrystones/s = 20000 / 73.2208 = 273.1464
 DMIPS        = 273.1464 / 1757 = 0.15546
 
 3.
+IAR Z80 V4.06A
+7371 bytes less small amount
+
+cycle count  = 306860580
+time @ 4MHz  = 306860580 / 4x10^6 = 76.7151  seconds
+dhrystones/s = 20000 / 76.7151 = 260.7047
+DMIPS        = 260.7047 / 1757 = 0.14838
+
+4.
 HITECH C CPM V309
 7471 bytes less cpm overhead
 
