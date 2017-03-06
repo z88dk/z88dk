@@ -20,8 +20,6 @@
 int open(char *name, int flags, mode_t mode)
 {
 #asm
-        INCLUDE "fileio.def"
-        
 	push	ix
         ld      ix,2
         add     ix,sp

@@ -20,8 +20,6 @@
 size_t write(int fd, void *ptr, size_t len)
 {
 #asm
-        INCLUDE         "fileio.def"
-
 	push	ix
         ld      ix,4
         add     ix,sp

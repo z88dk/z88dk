@@ -21,7 +21,6 @@
 long lseek(int fd, long posn, int whence)
 {
 #asm
-        INCLUDE "fileio.def"
        	push	ix 
         ld      ix,2    
         add     ix,sp
