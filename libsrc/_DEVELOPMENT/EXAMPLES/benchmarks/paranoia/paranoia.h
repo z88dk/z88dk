@@ -1,8 +1,10 @@
 
 /*
+ __STDC__ must be defined but zsdcc does that already
  printf %d %s %f %e %g used 
- zcc +cpm -vn -SO3 -DNOSIGNAL -D__STDC__ -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size @zproject.lst -o par -lm -create-app
-*/
+ 
+ zcc +cpm -vn -SO3 -DNOSIGNAL -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size @zproject.lst -o par -lm -create-app
+ */
 
 #ifdef __Z88DK
 #pragma output CLIB_OPT_PRINTF = 0x15000201
