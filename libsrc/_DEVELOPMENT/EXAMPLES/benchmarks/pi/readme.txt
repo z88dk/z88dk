@@ -92,25 +92,36 @@ cycle count  = 5278798872
 time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
 
 5.
+HITECH C MSDOS V750
+6337 bytes exact
+
+cycle count  = 5520768427
+time @ 4MHz  = 5520768427 / 4x10^6 = 23 min 00 sec
+
+6.
 HITECH C CPM V309
 6793 bytes less cpm overhead
 
 cycle count  = 5531933581
 time @ 4MHz  = 5531933581 / 4*10^6 = 23 min 03 sec
 
-6.
+7.
 SDCC 3.6.5 #9842 (MINGW64)
 6844 bytes less page zero
 
 cycle count  = 8700157418
 time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
 
-7.
+SDCC implements its 32-bit math in C.
+
+8.
 IAR Z80 V4.06A
 6789 bytes less small amount
 
 cycle count  = 8762223085
 time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
+
+It looks like IAR implements its 32-bit math in C.
 
 
 RESULTS - PI_LDIV.C (LDIV USED)
@@ -149,10 +160,20 @@ cycle count  = 3827247920
 time @ 4MHz  = 3827247920 / 4*10^6 = 15 min 57 sec
 
 5.
+HITECH C MSDOS V750
+6486 bytes exact
+
+cycle count  = 5884356227
+time @ 4MHz  = 5884356227 / 4x10^6 = 24 min 31 sec
+
+It looks like HTC implements ldiv() as two separate divisions.
+
+6.
 IAR Z80 V4.06A
 7006 bytes less small amount
 
 cycle count  = 8799503282
 time @ 4MHz  = 8799503282 / 4*10^6 = 36 min 40 sec
 
-It appears that IAR implements ldiv() as two separate divisions.
+It looks like IAR implements ldiv() as two separate divisions.
+It looks like IAR implements its 32-bit math in C.

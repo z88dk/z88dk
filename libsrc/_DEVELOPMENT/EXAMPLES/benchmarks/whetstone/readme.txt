@@ -136,7 +136,7 @@ RESULTS
 
 1.
 HITECH C CPM V309
-** INCORRECT RESULTS
+** MOSTLY INCORRECT RESULTS
 24 bit mantissa + 8 bit exponent
 7605 bytes less cpm overhead
 
@@ -186,3 +186,11 @@ cycle count  = 2184812093
 time @ 4MHz  = 2184812093 / 4x10^6 = 546.2030  seconds
 KWIPS        = 100*10*1 / 546.2030 = 1.8308
 MWIPS        = 1.8308 / 1000 = 0.0018308
+
+SDCC implements its float library in C.
+
+6.
+HITECH C MSDOS V750
+** COMPLETELY INCORRECT RESULTS
+24 bit mantissa + 8 bit exponent
+7002 bytes exact

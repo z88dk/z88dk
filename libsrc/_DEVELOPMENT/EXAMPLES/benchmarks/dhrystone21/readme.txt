@@ -100,6 +100,15 @@ dhrystones/s = 20000 / 62.1907 = 321.5913
 DMIPS        = 321.5913 / 1757 = 0.18303
 
 2.
+HITECH C MSDOS V750
+7002 bytes exact
+
+cycle count  = 288200126
+time @ 4MHz  = 288200126 / 4x10^6 = 72.0500 seconds
+dhrystones/s = 20000 / 72.0500 = 277.5849
+DMIPS        = 277.5849 / 1757 = 0.15799
+
+3.
 SDCC 3.6.5 #9842 (MINGW64)
 7013 bytes less page zero
 
@@ -108,7 +117,7 @@ time @ 4MHz  = 292880320 / 4x10^6 = 73.22008  seconds
 dhrystones/s = 20000 / 73.2208 = 273.1464
 DMIPS        = 273.1464 / 1757 = 0.15546
 
-3.
+4.
 IAR Z80 V4.06A
 7371 bytes less small amount
 
@@ -117,7 +126,7 @@ time @ 4MHz  = 306860580 / 4x10^6 = 76.7151  seconds
 dhrystones/s = 20000 / 76.7151 = 260.7047
 DMIPS        = 260.7047 / 1757 = 0.14838
 
-4.
+5.
 HITECH C CPM V309
 7471 bytes less cpm overhead
 
