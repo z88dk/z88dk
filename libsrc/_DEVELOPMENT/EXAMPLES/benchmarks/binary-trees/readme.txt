@@ -69,10 +69,8 @@ RESULTS
 
 1.
 Z88DK March 2, 2017
-ZSDCC #9833
-
-new/zsdcc
-2674 bytes less page zero
+zsdcc #9833 / new c library
+2674 bytes less page zero not including heap
 
 cycle count  = 132383340000
 time @ 4MHz  = 132383340000 / 4*10^6 = 9 hrs 11 min 36 sec
