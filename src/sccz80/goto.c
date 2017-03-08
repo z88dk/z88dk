@@ -23,8 +23,8 @@
  *         end
  *      5. Literal labels are used for goto labels i.e. getlabel()
  *      6. All gotos are kept in global variable space
- *	7. We endeavour to wipe all trace of goto labels from
- *	   global symbol table on exit
+ *      7. We endeavour to wipe all trace of goto labels from
+ *         global symbol table on exit
  *
  *      All relevent structures and #define are in define.h
  */
@@ -63,7 +63,7 @@ int dolabel()
             if ((ptr = findgoto(sname)) && ptr->ident == GOTOLABEL) {
                 /* Label already goto'd, find some others with
                                  * same stack
-				 */
+                                 */
                 ptr->type = GOTOLABEL;
                 debug(DBG_GOTO, "Starting chase %s\n", sname);
                 ChaseGoto(ptr);

@@ -99,7 +99,7 @@ int newbrain_exec()
             fprintf(fpout,"10 IF TOP>%i THEN RESERVE TOP-%i\n",pos-1,pos-1);
             fprintf(fpout,"20 FOR i=0TO%i:READa:POKE%i+i,a:NEXT i\n",len-1,pos);
             fprintf(fpout,"30 CALL%i\n",pos);
-            fprintf(fpout,"40 END");
+            fprintf(fpout,"40 END\n");
             lnum=100;
             /* ... M/C ...*/
             for (i=0; i<len;i++) {

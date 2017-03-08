@@ -72,10 +72,9 @@ int heir1(LVALUE* lval)
     if (lval->is_const) {
         if (lval->val_type == LONG) {
             vlongconst(lval->const_val);
-
-            /*                      lval->flags=lval->flags|UNSIGNED; */
-        } else
+        } else {
             vconst(lval->const_val);
+        }
     }
     doper = 0;
     if (cmatch('=')) {
@@ -88,26 +87,43 @@ int heir1(LVALUE* lval)
         if (heir1(&lval2))
             rvalue(&lval2);
         /* Now our type checking so we can give off lots of warnings about
-	 * type mismatches etc..
-	 */
+         * type mismatches etc..
+         */
         if (lval2.val_type == VOID && lval2.ptr_type == 0)
             warning(W_VOID);
         /* First operand is a pointer */
         if (lval->ptr_type) {
             if (lval2.ptr_type && lval->ptr_type != lval2.ptr_type && (lval2.ptr_type != VOID && lval->ptr_type != VOID)) {
-/*
- * Here we have a pointer mismatch, however we don't take account of
- * ptr2ptr, so anything involvind them will barf badly, I'm leaving
- * this for now, since the code is fine, but commenting out the warning
- * which is a bit of shame, but there you go...
- */
 #if 0
-		warning(W_PTRTYP);
+                /*
+                * Here we have a pointer mismatch, however we don't take account of
+                * ptr2ptr, so anything involvind them will barf badly, I'm leaving
+                * this for now, since the code is fine, but commenting out the warning
+                * which is a bit of shame, but there you go...
+                */
+                warning(W_PTRTYP);
 #endif
             } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
                 warning(W_INTPTR);
         } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const)))
             warning(W_PTRINT);
+
+        // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
+        if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
+            if ( lval->symbol->flags & FLOATINGDECL) {
+                /* The function pointer was undecorated, it should take on whatever is on the RHS */
+                lval->symbol->flags &= ~(CALLEE|SMALLC);
+                lval->symbol->flags |= ( lval2.flags & (CALLEE|SMALLC));
+            } else {
+                if ( (lval->symbol->flags & CALLEE) != (lval2.flags & CALLEE)) {
+                    warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "_z88dk_callee");
+                }
+                if ( (lval->symbol->flags & SMALLC) != (lval2.flags & SMALLC)) {
+                    warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "__smallc/__stdc");
+                }
+            }
+        }
+
 
 #ifdef SILLYWARNING
         if (((lval->flags & UNSIGNED) != (lval2.flags & UNSIGNED)) && (!(lval2.is_const) && !(lval->ptr_type) && !(lval2.ptr_type)))
@@ -691,8 +707,8 @@ int heirb(LVALUE* lval)
                     } else {
                         /* add constant offset to address in primary */
                         clearstage(before, 0);
-                        //	if (lval->symbol->more)
-                        //		cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
+                        //        if (lval->symbol->more)
+                        //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
                         addconst(val, 1, 0);
                     }
                 } else {
@@ -703,7 +719,7 @@ int heirb(LVALUE* lval)
                         scale(ptr->type, tagtab + ptr->tag_idx);
                     }
                     /* If near, then pop other side back, otherwise
-		       load high reg with de and do an add  */
+                       load high reg with de and do an add  */
                     if (lval->flags & FARPTR) {
                         const2(0);
                     } else {
@@ -717,16 +733,16 @@ int heirb(LVALUE* lval)
                 k = 1;
             } else if (cmatch('(')) {
                 if (ptr == NULL) {
-                    callfunction(NULL);
+                    callfunction(NULL,NULL);
                     /* Bugger knows what ya doing..stop SEGV */
                     ptr = dummy_sym[VOID];
                     warning(W_INTERNAL);
                 } else if (ptr->ident != FUNCTION) {
                     if (k && lval->const_val == 0)
                         rvalue(lval);
-                    callfunction(NULL);
+                    callfunction(NULL,ptr);
                 } else
-                    callfunction(ptr);
+                    callfunction(ptr,NULL);
                 k = lval->is_const = lval->const_val = 0;
                 if (ptr && ptr->more == 0) {
                     /* function returning variable */
@@ -752,10 +768,10 @@ int heirb(LVALUE* lval)
 
             }
             /* Handle structures... come in here with lval holding tehe previous
-	     * pointer to the struct thing..*/
+             * pointer to the struct thing..*/
             else if ((direct = cmatch('.')) || match("->")) {
                 /* Check to see if we have a cast in operation, if so then change type
-		 * internally, but don't generate any code */
+                 * internally, but don't generate any code */
                 if (lval->tagsym == 0) {
                     error(E_MEMBER);
                     junk();
@@ -767,10 +783,9 @@ int heirb(LVALUE* lval)
                     return 0;
                 }
                 /*
-		 * Here, we're trying to chase our member up, we have to be careful
-		 * not to access via far methods near data..
-		 */
-
+                 * Here, we're trying to chase our member up, we have to be careful
+                 * not to access via far methods near data..
+                 */
                 if (k && direct == 0)
                     rvaluest(lval);
 
@@ -779,10 +794,7 @@ int heirb(LVALUE* lval)
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = ptr->flags;
                 if (direct == 0) {
-                    /*
-		     * So, we're accessing via a pointer if we get here
-		     */
-
+                    /* So, we're accessing via a pointer if we get here */
                     flags = ptr->flags;
                     if (lval->oflags & FARACC || (lval->flags & FARPTR))
                         flags |= FARACC;
@@ -828,7 +840,9 @@ int heirb(LVALUE* lval)
         }
     if (ptr && ptr->ident == FUNCTION) {
         address(ptr);
-        lval->symbol = 0;
+        lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
+        lval->flags = ptr->flags;
+        lval->ident = FUNCTION;
         return 0;
     }
     return k;

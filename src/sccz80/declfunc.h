@@ -8,3 +8,4 @@ extern void setlocvar(SYMBOL *prevarg, SYMBOL *currfn);
 extern SYMBOL *dofnansi(SYMBOL *currfn, int32_t *addr);
 extern int CheckANSI(void);
 extern SYMBOL *getarg(int typ, TAG_SYMBOL *otag, int deftype, SYMBOL *prevarg, char issigned, char zfar, char proto);
+extern void check_trailing_modifiers(SYMBOL *currfn);
