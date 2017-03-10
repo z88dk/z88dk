@@ -115,7 +115,7 @@ void DoLibHeader(void)
     if (1) {
         char* ptr = filen;
         if (!isalpha(*ptr) && *ptr != '_') {
-            memmove(ptr + 1, ptr, strlen(ptr));
+            memmove(ptr + 1, ptr, strlen(ptr) + 1);
             *ptr = 'X';
         }
         while (*ptr) {
