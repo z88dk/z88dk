@@ -39,6 +39,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     int   i;
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
+    int   savesp;
        
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
@@ -55,7 +56,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     if (ptr )
         watcharg = SetWatch(ptr->name, &isscanf);
     
-
+    savesp = Zsp;
     while (ch() != ')') {
         char *before, *start;
         if (endst()) {
@@ -75,6 +76,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             break;
     }
     needchar(')'); 
+    Zsp = savesp;
 
     if ( ptr == NULL ) ptr = fnptr;
 

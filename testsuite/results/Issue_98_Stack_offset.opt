@@ -1,0 +1,123 @@
+
+
+
+	MODULE	Issue_98_Stack_offset
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._BottomUpTree
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,h
+	or	l
+	jp	z,i_3
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	ld	de,2
+	exx
+	pop	hl
+	call	l_int2long_s
+	push	de
+	push	hl
+	exx
+	call	l_long_mult
+	call	l_declong
+	push	de
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	dec	hl
+	push	hl
+	call	_BottomUpTree
+	pop	bc
+	pop	bc
+	pop	bc
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	ld	de,2
+	exx
+	pop	hl
+	call	l_int2long_s
+	push	de
+	push	hl
+	exx
+	call	l_long_mult
+	push	de
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	dec	hl
+	push	hl
+	call	_BottomUpTree
+	pop	bc
+	pop	bc
+	pop	bc
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	call	_NewTreeNode
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	push	bc
+	push	bc
+	ret
+
+
+.i_3
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	call	_NewTreeNode
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	push	bc
+	push	bc
+	ret
+
+
+.i_4
+	push	bc
+	push	bc
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	EXTERN	_NewTreeNode
+	PUBLIC	_BottomUpTree
+
+
+
+

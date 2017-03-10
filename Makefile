@@ -17,7 +17,7 @@ DEFAULT = z88
 
 # --> End of Configurable Options
 
-all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg config
+all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg config testsuite
 
 setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
@@ -122,6 +122,10 @@ clean-bins:
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C test clean
+	$(MAKE) -C testsuite clean
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
-.PHONY: test
+testsuite:
+	$(MAKE) -C testsuite
+
+.PHONY: test testsuite

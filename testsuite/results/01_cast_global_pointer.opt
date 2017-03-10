@@ -1,7 +1,7 @@
 
 
 
-	MODULE	X01_cast_global_pointerc
+	MODULE	X01_cast_global_pointerc_
 
 
 	INCLUDE "z80_crt0.hdr"
