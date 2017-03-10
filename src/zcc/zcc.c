@@ -946,7 +946,7 @@ int main(int argc, char **argv)
     if ((ptr = last_path_char(c_crt0)) != NULL) {
         char *p;
         p = mustmalloc((ptr - c_crt0 + 7) * sizeof(char));
-        sprintf(p, "-I \"%.*s\"", ptr - c_crt0, c_crt0);
+        sprintf(p, "-I \"%.*s\"",(int)( ptr - c_crt0), c_crt0);
         BuildOptions(&m4arg, p);
         free(p);
     }
@@ -1178,14 +1178,14 @@ int main(int argc, char **argv)
                     if (p)
                     {
                         len = strlen(tmp);
-                        snprintf(tmp + len, sizeof(tmp) - len - 1, "/%.*s", p - filelist[i], filelist[i]);
+                        snprintf(tmp + len, sizeof(tmp) - len - 1, "/%.*s", (int)(p - filelist[i]), filelist[i]);
                     }
 
                     if (*tmp == '\0')
                         strcpy(tmp, ".");
                 }
                 else if (p)
-                    snprintf(tmp, sizeof(tmp) - 1, "%.*s", p - filelist[i], filelist[i]);
+                    snprintf(tmp, sizeof(tmp) - 1, "%.*s", (int)(p - filelist[i]), filelist[i]);
                 else
                     strcpy(tmp, ".");
 
@@ -1211,7 +1211,7 @@ int main(int argc, char **argv)
                     exit(1);
                 }
 
-                if (q = last_path_char(original_filenames[i]))
+                if ((q = last_path_char(original_filenames[i])) != NULL )
                     q++;
                 else
                     q = original_filenames[i];
@@ -1330,7 +1330,7 @@ int main(int argc, char **argv)
 			int status = 0;
 
 			strcpy(filenamebuf, outputfile);
-			if (oldptr = find_file_ext(filenamebuf))
+			if ((oldptr = find_file_ext(filenamebuf)) != NULL )
 				*oldptr = 0;
 
 			if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
@@ -1387,7 +1387,8 @@ int copy_defc_file(char *name1, char *ext1, char *name2, char *ext2)
     char *line, *ptr;
     GFILTER *filter;
     regmatch_t pmatch[3];
-    int nfilter, errcode, lineno, len;
+    int nfilter, errcode, lineno;
+    unsigned int len;
 
     // the first regular expression is used to parse a z80asm generated defc line
     filter  = mustmalloc(sizeof(*filter));
@@ -1424,7 +1425,7 @@ int copy_defc_file(char *name1, char *ext1, char *name2, char *ext2)
             filter[nfilter].accept = !(*ptr == '-');
             if ((*ptr == '+') || (*ptr == '-')) ++ptr;
             while (isspace(*ptr)) ++ptr;
-            if (errcode = regcomp(&filter[nfilter].preg, ptr, REG_EXTENDED))
+            if ( (errcode = regcomp(&filter[nfilter].preg, ptr, REG_EXTENDED)) )
             {
                 regerror(errcode, &filter[nfilter].preg, buffer, sizeof(buffer));
                 fprintf(stderr, "Ignoring %s line %u: %s", globaldefrefile, lineno, buffer);
@@ -1468,7 +1469,7 @@ int copy_defc_file(char *name1, char *ext1, char *name2, char *ext2)
             fclose(out);
             return 1;
         }
-        snprintf(buffer, sizeof(buffer) - 1, "%.*s", pmatch[2].rm_eo - pmatch[2].rm_so, &line[pmatch[2].rm_so]);
+        snprintf(buffer, sizeof(buffer) - 1, "%.*s",(int)(pmatch[2].rm_eo - pmatch[2].rm_so), &line[pmatch[2].rm_so]);
 
         // accept or reject
         if (globaldefrefile)
@@ -1521,7 +1522,7 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
     if ((out = fopen(buffer, "w")) == NULL)
         return 1;
 
-    fprintf(out, prepend);
+    fprintf(out, "%s", prepend);
     fclose(out);
 
 #ifdef WIN32
