@@ -28,6 +28,8 @@ sscanf:
 	dec	hl
 	dec	hl		;&fmt+1
 	ex	de,hl		;de=&fmy+1
+	ld	hl,65535	;infinite length
+	push	hl
 	ld	hl,1+2+128	;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
 	push	hl		;
 	push	bc		;buf
@@ -46,6 +48,7 @@ sscanf:
 	dec	hl
 	push	hl		;&ap
 	call	asm_scanf
+        pop     bc
 	pop	bc
 	pop	bc
 	pop	bc
