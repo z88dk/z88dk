@@ -78,7 +78,7 @@
  *
  *  MSX, Spectravideo SVI
  *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS wall.c
- *     BLOAD ìCAS:î,R
+ *     BLOAD ‚ÄúCAS:‚Äù,R
  *
  *  SEGA SC-3000
  *     zcc +sc3000 -create-app -Dspritesize=8 -DBANNERS wall.c
@@ -102,7 +102,7 @@
  *     zcc +kc -create-app -DBANNERS -Dspritesize=10 -Dspritesizeh=8 wall.c
  *
  *  Commodore 128
- *     zcc +c128 -lgfx128hr -create-app -zorg=13000 -DSOUND -DBANNERS  -Dspritesize=16 -Dspritesizeh=8 wall.c
+ *     zcc +c128 -lgfx128hr -create-app -DSOUND -DBANNERS  -Dspritesize=16 -DJOYSTICK -Dspritesizeh=8 wall.c
  *
  *  Timex TS2068
  *     zcc +ts2068 -create-app -DSOUND -DBANNERS -DJOYSTICK -Dspritesize=16 -Dspritesizeh=8 wall.c
