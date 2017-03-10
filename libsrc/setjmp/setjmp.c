@@ -16,6 +16,12 @@ int setjmp(jmp_buf env)
 #pragma asm
 	pop	bc	;return address
 	pop	hl	;&env
+	push	iy
+	pop	de	;de=iy, hl=&env
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	inc	hl
 	push	ix
 	pop	de	;de=ix, hl=&env
 	ld	(hl),e

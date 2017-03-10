@@ -25,6 +25,12 @@ void longjmp(jmp_buf env, int val)
 	ld	d,(hl)
 	inc	hl
 	push	de
+	pop	iy
+	ld	e,(hl)	;ix
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	push	de
 	pop	ix
 	ld	e,(hl)	;sp
 	inc	hl

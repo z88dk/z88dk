@@ -18,6 +18,7 @@
  */
 
 typedef struct {
+	int	iy;
 	int	ix;
 	int	sp;
 	int	pc;
