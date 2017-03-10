@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = machine suites
+SUBDIRS = suites
 
 all: subdirs-all
 
