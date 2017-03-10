@@ -382,7 +382,7 @@ void declglb(
             }
             myptr = addglb(sname, ident, type, 0, storage, more, itag);
             /* What happens if we have an array which will be initialised? */
-
+            myptr->isassigned = YES;
             myptr->flags = (var->sign | var->zfar | fastcall);
             myptr->isconst = var->isconst;
 
@@ -404,13 +404,9 @@ void declglb(
                 else
                     myptr->size = size_st;
                 if (defstatic) {
-                    myptr->isassigned = YES;
                     myptr->storage = DECLEXTN;
                 }
             }
-
-            if ( storage == EXTERNAL)
-                myptr->isassigned = YES;
 
             /*
              *      Set the return type of the function
