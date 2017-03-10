@@ -11,7 +11,7 @@ static void cmd_printchar(void)
     } else {
         fputc(l,stdout);
     }
-    SET_ERROR(R,Z88DK_ENONE);
+    SET_ERROR(Z88DK_ENONE);
     fflush(stdout);
 }
 
@@ -24,7 +24,7 @@ static void cmd_readkey(void)
     l = val % 256;
     h = val / 256;
 
-    SET_ERROR(R, Z88DK_ENONE);
+    SET_ERROR(Z88DK_ENONE);
 }
 
 void hook_console_init(hook_command *cmds)
