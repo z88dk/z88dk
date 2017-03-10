@@ -51,6 +51,8 @@ math/float/math48/c/sdcc_iy/cm48_sdcciyp_uchar2ds
 math/float/math48/c/sdcc_iy/cm48_sdcciyp_uchar2ds_callee
 math/float/math48/c/sdcc_iy/cm48_sdcciyp_uint2ds
 math/float/math48/c/sdcc_iy/cm48_sdcciyp_uint2ds_callee
+math/float/math48/c/sdcc_iy/cm48_sdcciyp_ulong2ds
+math/float/math48/c/sdcc_iy/cm48_sdcciyp_ulong2ds_callee
 math/float/math48/c/sdcc_iy/cm48_sdcciyp_ulonglong2ds
 math/float/math48/c/sdcc_iy/cm48_sdcciyp_ulonglong2ds_callee
 math/float/math48/c/sdcc_iy/cm48_sdcciy_acos
