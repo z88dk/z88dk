@@ -165,7 +165,6 @@
 	ld	hl,1	;const
 	ld	de,0
 	call	float
-	ld	hl,0	;const
 	call	dswap
 	call	dsub
 	pop	hl
@@ -379,7 +378,6 @@
 	ld	hl,1	;const
 	ld	de,0
 	call	float
-	ld	hl,0	;const
 	call	dswap
 	call	ddiv
 	pop	hl

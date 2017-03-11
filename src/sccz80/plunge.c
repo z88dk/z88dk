@@ -118,7 +118,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->val_type = DOUBLE;
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zdiv || oper == zmod ) {
-                vconst(0);
                 callrts("dswap");
             }
         } else if (lval->val_type == LONG) {
@@ -278,7 +277,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->val_type = DOUBLE;
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zsub ) {
-                vconst(0);
                 callrts("dswap");
             }
         } else if (lval->val_type == LONG) {
