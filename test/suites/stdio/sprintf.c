@@ -1,6 +1,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include "test.h"
 
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
