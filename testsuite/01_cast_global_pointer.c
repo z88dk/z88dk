@@ -3,7 +3,7 @@ char *a;
 
 main()
 {
-   static char *c;
+   static char *c = 0;
    int *b;
    
    b = (int *)(a);

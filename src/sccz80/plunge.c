@@ -111,7 +111,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lpush();
             vlongconst(lval->const_val);
         } else {
-            const2(lval->const_val);
+            if ( lval2->val_type == LONG ) {
+                vlongconst_noalt(lval->const_val); 
+                lval->val_type = LONG;             
+            } else {
+                const2(lval->const_val);
+            }
         }
         dcerror(lval2);
     } else {
@@ -247,16 +252,16 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if (lval->val_type == LONG) {
             widenlong(lval, lval2);
-            if (c_notaltreg) {
-                vlongconst_noalt(val);
-            } else {
-                doexx();
-                vlongconst(val);
-                lpush();
-                doexx();
-            }
+            lval2->val_type = LONG; /* Kludge */
+            lpush();
+            vlongconst(lval->const_val);
         } else {
-            const2(val);
+            if ( lval2->val_type == LONG ) {
+                vlongconst_noalt(lval->const_val); 
+                lval->val_type = LONG;             
+            } else {
+                const2(lval->const_val);
+            }
         }
         dcerror(lval2);
     } else {

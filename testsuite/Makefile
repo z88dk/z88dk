@@ -8,8 +8,8 @@ OUTPUT = $(SOURCES:.c=.opt)
 all: $(OUTPUT)
 
 %.opt:	%.c
-	zcc +test -a $^ -o $@
-	cat $@ | grep -v '^;' > tmp.opt
+	zcc +test -vn -a $^ -o $@
+	@cat $@ | grep -v '^;' > tmp.opt
 	diff -w tmp.opt results/$@
 	
 

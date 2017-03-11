@@ -1,0 +1,218 @@
+
+
+
+	MODULE	Issue_98_underlying
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._mul
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
+	call	l_long_mult
+	ret
+
+
+
+._muli
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
+	call	l_long_mult
+	ret
+
+
+
+._mul2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,2	;const
+	ld	de,0
+	call	l_long_mult
+	ret
+
+
+
+._div
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
+	call	l_long_div
+	ret
+
+
+
+._div2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,2	;const
+	ld	de,0
+	call	l_long_div
+	ret
+
+
+
+._div3
+	ld	hl,(_g)
+	ld	de,(_g+2)
+	push	de
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_long_div
+	ret
+
+
+
+._add
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
+	call	l_long_add
+	ret
+
+
+
+._add2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	l_inclong
+	call	l_inclong
+	ret
+
+
+
+._sub
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
+	call	l_long_sub
+	ret
+
+
+
+._sub_1
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_long_mult
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
+	call	l_long_sub
+	ret
+
+
+
+._sub2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,65534	;const
+	ld	de,65535
+	call	l_long_add
+	ret
+
+
+
+._sub2_1
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_long_mult
+	push	de
+	push	hl
+	ld	hl,65534	;const
+	ld	de,65535
+	call	l_long_add
+	ret
+
+
+
+._sub3
+	ld	hl,(_g)
+	ld	de,(_g+2)
+	push	de
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_long_sub
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+
+._g	defs	4
+	SECTION	code_compiler
+
+
+
+
+	PUBLIC	_g
+	PUBLIC	_mul
+	PUBLIC	_muli
+	PUBLIC	_mul2
+	PUBLIC	_div
+	PUBLIC	_div2
+	PUBLIC	_div3
+	PUBLIC	_add
+	PUBLIC	_add2
+	PUBLIC	_sub
+	PUBLIC	_sub_1
+	PUBLIC	_sub2
+	PUBLIC	_sub2_1
+	PUBLIC	_sub3
+
+
+
+

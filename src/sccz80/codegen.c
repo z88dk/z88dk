@@ -1943,10 +1943,11 @@ void vlongconst(uint32_t val)
 
 void vlongconst_noalt(uint32_t val)
 {
-    constbc(val % 65536);
-    ol("push\tbc");
     constbc(val / 65536);
     ol("push\tbc");
+    constbc(val % 65536);
+    ol("push\tbc");
+    Zsp -= 4;
 }
 
 /*

@@ -21,18 +21,15 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong
-	ld	de,2
-	exx
-	pop	hl
-	call	l_int2long_s
-	push	de
-	push	hl
-	exx
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
 	call	l_long_mult
 	call	l_declong
 	push	de
 	push	hl
-	ld	hl,4	;const
+	ld	hl,6	;const
 	add	hl,sp
 	call	l_gint	;
 	dec	hl
@@ -42,20 +39,17 @@
 	pop	bc
 	pop	bc
 	push	hl
-	ld	hl,4	;const
+	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	ld	de,2
-	exx
-	pop	hl
-	call	l_int2long_s
-	push	de
-	push	hl
-	exx
+	ld	bc,0
+	push	bc
+	ld	bc,2
+	push	bc
 	call	l_long_mult
 	push	de
 	push	hl
-	ld	hl,4	;const
+	ld	hl,8	;const
 	add	hl,sp
 	call	l_gint	;
 	dec	hl
@@ -65,7 +59,7 @@
 	pop	bc
 	pop	bc
 	push	hl
-	ld	hl,4	;const
+	ld	hl,8	;const
 	add	hl,sp
 	call	l_glong
 	push	de
@@ -75,8 +69,6 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	push	bc
-	push	bc
 	ret
 
 
@@ -84,7 +76,7 @@
 	ld	hl,0	;const
 	push	hl
 	push	hl
-	ld	hl,4	;const
+	ld	hl,8	;const
 	add	hl,sp
 	call	l_glong
 	push	de
@@ -94,14 +86,10 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	push	bc
-	push	bc
 	ret
 
 
 .i_4
-	push	bc
-	push	bc
 	ret
 
 
