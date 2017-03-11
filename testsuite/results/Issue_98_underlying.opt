@@ -24,6 +24,34 @@
 
 
 ._muli
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,2
+	call	l_mult
+	ret
+
+
+
+._muli2
+	ld	hl,(_k)
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	exx
+	pop	hl
+	call	l_int2long_s
+	push	de
+	push	hl
+	exx
+	call	l_long_mult
+	ret
+
+
+
+._mul_assign_to_int
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
@@ -193,14 +221,18 @@
 	SECTION	bss_compiler
 
 ._g	defs	4
+._k	defs	2
 	SECTION	code_compiler
 
 
 
 
 	PUBLIC	_g
+	PUBLIC	_k
 	PUBLIC	_mul
 	PUBLIC	_muli
+	PUBLIC	_muli2
+	PUBLIC	_mul_assign_to_int
 	PUBLIC	_mul2
 	PUBLIC	_div
 	PUBLIC	_div2

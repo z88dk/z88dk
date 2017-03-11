@@ -1,10 +1,19 @@
 long g;
+int k;
 
 long mul(long l)
 {
    return 2 * l;
 }
-int muli(long l)
+int muli(int l)
+{
+   return 2 * l;
+}
+long muli2(long l)
+{
+   return k * l;
+}
+int mul_assign_to_int(long l)
 {
    int v = 2 * l;
    return v;
