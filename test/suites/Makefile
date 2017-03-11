@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = string ctype stdio stdlib math
+SUBDIRS = string ctype stdio stdlib math regex
 
 all: subdirs-all
 
