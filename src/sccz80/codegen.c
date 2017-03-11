@@ -1439,6 +1439,14 @@ void com(LVALUE* lval)
 void inc(LVALUE* lval)
 {
     switch (lval->val_type) {
+    case DOUBLE:
+        // FA = value to be incremented
+        dpush();
+        vlongconst(1);
+        convSlong2doub();
+        callrts("dadd");
+        Zsp += 6;
+        break;
     case LONG:
     case CPTR:
         callrts("l_inclong");
@@ -1455,6 +1463,14 @@ void inc(LVALUE* lval)
 void dec(LVALUE* lval)
 {
     switch (lval->val_type) {
+    case DOUBLE:
+        // FA = value to be incremented
+        dpush();
+        vlongconst(-1);
+        convSlong2doub();
+        callrts("dadd");
+        Zsp += 6;
+        break;
     case LONG:
     case CPTR:
         callrts("l_declong");

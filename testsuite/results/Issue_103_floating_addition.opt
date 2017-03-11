@@ -1,0 +1,757 @@
+
+
+
+	MODULE	Issue_103_floating_addition
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._add_int
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,2	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._add_int_longform
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,2	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._add_int_longform2
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,2	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._add_double
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,i_2+6
+	call	dload
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._sub_int
+	ld	hl,i_2+6
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dsub
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._sub_int_longform
+	ld	hl,i_2+6
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dsub
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._sub_int_longform2
+	ld	hl,i_2+6
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	ld	hl,0	;const
+	call	dswap
+	call	dsub
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._sub_double
+	ld	hl,i_2+6
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,i_2+0
+	call	dload
+	call	dsub
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._mult_int
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,2	;const
+	call	l_int2long_s
+	call	float
+	call	dmul
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._mult_double
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,i_2+6
+	call	dload
+	call	dmul
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._mult_double_longform
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,2	;const
+	call	l_int2long_s
+	call	float
+	call	dmul
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._mult_double_longform2
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,2	;const
+	ld	de,0
+	call	float
+	call	dmul
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._div_int
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,2	;const
+	call	l_int2long_s
+	call	float
+	call	ddiv
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._div_double
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,i_2+6
+	call	dload
+	call	ddiv
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._div_double_longform
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,2	;const
+	call	l_int2long_s
+	call	float
+	call	ddiv
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._div_double_longform2
+	ld	hl,i_2+6
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	ld	hl,0	;const
+	call	dswap
+	call	ddiv
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._main
+	ld	hl,i_1+0
+	push	hl
+	call	_add_int
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+12
+	push	hl
+	call	_add_int_longform
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+33
+	push	hl
+	call	_add_int_longform2
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+55
+	push	hl
+	call	_add_double
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+70
+	push	hl
+	call	_sub_int
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+82
+	push	hl
+	call	_sub_int_longform
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+103
+	push	hl
+	call	_sub_double
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+118
+	push	hl
+	call	_sub_int_longform2
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+140
+	push	hl
+	call	_mult_int
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+153
+	push	hl
+	call	_mult_double
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+169
+	push	hl
+	call	_mult_double_longform
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+194
+	push	hl
+	call	_mult_double_longform2
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+220
+	push	hl
+	call	_div_int
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+232
+	push	hl
+	call	_div_double
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+247
+	push	hl
+	call	_div_double_longform
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,i_1+271
+	push	hl
+	call	_div_double_longform2
+	call	dpush
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+	SECTION	rodata_compiler
+
+.i_1
+	defm	"add_int %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"add_int_longform %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"add_int_longform2 %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"add_double %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"sub_int %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"sub_int_longform %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"sub_double %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"sub_int_longform2 %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"mult_int %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"mult_double %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"mult_double_longform %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"mult_double_longform2 %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"div_int %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"div_double %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"div_double_longform %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+	defm	"div_double_longform2 %f"
+	defb	13
+
+	defm	""
+	defb	0
+
+
+.i_2
+	defb	0,0,0,0,0,129,0,0,0,0
+	defb	0,130
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	EXTERN	open
+	EXTERN	creat
+	EXTERN	close
+	EXTERN	read
+	EXTERN	write
+	EXTERN	lseek
+	EXTERN	readbyte
+	EXTERN	writebyte
+	EXTERN	getcwd
+	EXTERN	rmdir
+	EXTERN	getwd
+	EXTERN	_RND_BLOCKSIZE
+	EXTERN	rnd_loadblock
+	EXTERN	rnd_saveblock
+	EXTERN	rnd_erase
+	EXTERN	__FOPEN_MAX
+	EXTERN	__sgoioblk
+	EXTERN	__sgoioblk_end
+	EXTERN	fopen
+	EXTERN	freopen
+	EXTERN	fdopen
+	EXTERN	fmemopen
+	EXTERN	fclose
+	EXTERN	closeall
+	EXTERN	fgets
+	EXTERN	fputs
+	EXTERN	fputc
+	EXTERN	fputs_callee
+	EXTERN	fputc_callee
+	EXTERN	fgetc
+	EXTERN	ungetc
+	EXTERN	feof
+	EXTERN	puts
+	EXTERN	ftell
+	EXTERN	fgetpos
+	EXTERN	fseek
+	EXTERN	fread
+	EXTERN	fwrite
+	EXTERN	gets
+	EXTERN	printf
+	EXTERN	fprintf
+	EXTERN	sprintf
+	EXTERN	snprintf
+	EXTERN	vfprintf
+	EXTERN	vsnprintf
+	EXTERN	printn
+	EXTERN	scanf
+	EXTERN	fscanf
+	EXTERN	sscanf
+	EXTERN	vfscanf
+	EXTERN	vsscanf
+	EXTERN	getarg
+	EXTERN	fchkstd
+	EXTERN	fgetc_cons
+	EXTERN	fputc_cons
+	EXTERN	fgets_cons
+	EXTERN	fabandon
+	EXTERN	fdtell
+	EXTERN	fdgetpos
+	EXTERN	rename
+	EXTERN	remove
+	EXTERN	getk
+	EXTERN	puts_cons
+	EXTERN	printk
+	PUBLIC	_add_int
+	PUBLIC	_add_int_longform
+	PUBLIC	_add_int_longform2
+	PUBLIC	_add_double
+	PUBLIC	_sub_int
+	PUBLIC	_sub_int_longform
+	PUBLIC	_sub_int_longform2
+	PUBLIC	_sub_double
+	PUBLIC	_mult_int
+	PUBLIC	_mult_double
+	PUBLIC	_mult_double_longform
+	PUBLIC	_mult_double_longform2
+	PUBLIC	_div_int
+	PUBLIC	_div_double
+	PUBLIC	_div_double_longform
+	PUBLIC	_div_double_longform2
+	PUBLIC	_main
+
+
+
+

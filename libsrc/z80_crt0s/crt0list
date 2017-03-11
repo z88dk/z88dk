@@ -108,5 +108,6 @@ crt0_fp/extra
 crt0_fp/fa
 crt0_fp/fasign
 crt0_fp/fp_seed
+crt0_fp/dswap
 crt0_fp/__convert_sdccf2reg
 ../_DEVELOPMENT/l/z80/l_ret
