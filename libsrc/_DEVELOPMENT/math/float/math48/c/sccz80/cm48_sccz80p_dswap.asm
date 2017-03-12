@@ -25,4 +25,16 @@ cm48_sccz80p_dswap:
    ; AC'= y
    ; AC = x
    
-   jp cm48_sccz80p_dpush_0
+   ; jp cm48_sccz80p_dpush_0 - would add extra 'exx'
+
+   pop ix
+
+   ld a,l
+   push af
+   inc sp
+   push bc
+   push de
+   push hl
+   inc sp
+
+	jp (ix)

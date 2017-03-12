@@ -6,6 +6,7 @@
 	EXTERN	__printf_print_aligned
 	EXTERN	get_16bit_ap_parameter
 	EXTERN	strlen
+        EXTERN  l_uge
 
 __printf_handle_s:
         push    hl              ;save format string
@@ -19,6 +20,14 @@ printstr:
         push    hl              ;save string
         call    strlen          ;exits hl=length
         ex      de,hl           ;de=length
+	ld	l,(ix-8)	;precision
+	ld	h,(ix-7)
+	push	hl
+	call    l_uge		;disturbs hl, bc
+	pop	hl
+	jr	nc,use_strlen	;precision > strlen, use strlen
+	ex	de,hl 		;de = precision
+use_strlen:
         pop     bc              ;get string back
         call    __printf_print_aligned
 printstr_end:

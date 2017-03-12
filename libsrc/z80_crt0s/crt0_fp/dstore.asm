@@ -6,11 +6,11 @@
 
 
 ;--------------
-; Copy FA to de
+; Copy FA to hl
 ;--------------
 dstore: ld      de,fa
         ld      bc,6
         ex      de,hl
         ldir
-        ex      de,hl
+        ex      de,hl	; returns de=fa+6, hl=hl+6
         ret

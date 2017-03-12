@@ -11,6 +11,12 @@
 
 
 ._main
+	SECTION	data_compiler
+
+._st_main_c
+	defw	0
+	SECTION	code_compiler
+
 	ld	hl,(_a)
 	push	hl
 	ld	hl,(_st_main_c)
@@ -35,7 +41,6 @@
 	SECTION	bss_compiler
 
 ._a	defs	2
-._st_main_c	defs	2
 	SECTION	code_compiler
 
 

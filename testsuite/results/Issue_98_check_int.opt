@@ -1,0 +1,203 @@
+
+
+
+	MODULE	Issue_98_check_int
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._mul
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,2
+	call	l_mult
+	ret
+
+
+
+._mul2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	add	hl,hl
+	ret
+
+
+
+._mul3
+	ld	de,(_g)
+	ld	hl,4-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_mult
+	ret
+
+
+
+._mul3_2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ex	de,hl
+	ld	hl,(_g)
+	call	l_mult
+	ret
+
+
+
+._div
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,2
+	call	l_div
+	ret
+
+
+
+._div2
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,2	;const
+	pop	de
+	call	l_div
+	ret
+
+
+
+._div3
+	ld	de,(_g)
+	ld	hl,4-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_div
+	ret
+
+
+
+._add
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,2
+	add	hl,de
+	ret
+
+
+
+._add2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	inc	hl
+	inc	hl
+	ret
+
+
+
+._sub
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,2
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._sub_1
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	call	l_mult
+	ld	de,2
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._sub2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	dec	hl
+	dec	hl
+	ret
+
+
+
+._sub2_1
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	call	l_mult
+	dec	hl
+	dec	hl
+	ret
+
+
+
+._sub3
+	ld	de,(_g)
+	ld	hl,4-2	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+
+._g	defs	2
+	SECTION	code_compiler
+
+
+
+
+	PUBLIC	_g
+	PUBLIC	_mul
+	PUBLIC	_mul2
+	PUBLIC	_mul3
+	PUBLIC	_mul3_2
+	PUBLIC	_div
+	PUBLIC	_div2
+	PUBLIC	_div3
+	PUBLIC	_add
+	PUBLIC	_add2
+	PUBLIC	_sub
+	PUBLIC	_sub_1
+	PUBLIC	_sub2
+	PUBLIC	_sub2_1
+	PUBLIC	_sub3
+
+
+
+

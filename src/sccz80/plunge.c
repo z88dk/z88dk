@@ -95,7 +95,9 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval))
 {
     char *before, *start;
+    int   savesp;
 
+    savesp = Zsp;
     setstage(&before, &start);
     lval->stage_add = 0; /* flag as not "..oper 0" syntax */
     if (lval->is_const) {
@@ -104,16 +106,33 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             rvalue(lval2);
         if (lval->const_val == 0)
             lval->stage_add = stagenext;
-
-        if (lval->val_type == LONG) {
+        if ( lval2->val_type == DOUBLE ) { 
+            /* On stack we've got the double, load the constant as a double */
+            dpush();
+            vlongconst(lval->const_val);
+            if ( lval->flags & UNSIGNED ) {
+                convUlong2doub();
+            } else {
+                convSlong2doub();
+            }
+            lval->val_type = DOUBLE;
+            /* Subtraction isn't commutative so we need to swap over' */
+            if ( oper == zdiv || oper == zmod ) {
+                callrts("dswap");
+            }
+        } else if (lval->val_type == LONG) {
             widenlong(lval, lval2);
             lval2->val_type = LONG; /* Kludge */
             lpush();
             vlongconst(lval->const_val);
         } else {
-            const2(lval->const_val);
+            if ( lval2->val_type == LONG ) {
+                vlongconst_noalt(lval->const_val); 
+                lval->val_type = LONG;             
+            } else {
+                const2(lval->const_val);
+            }
         }
-        dcerror(lval2);
     } else {
         /* non-constant on left */
         if (lval->val_type == DOUBLE) {
@@ -141,9 +160,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval2->val_type = LONG;
             } else
                 vconst(lval2->const_val);
-            dcerror(lval);
             if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
                 clearstage(start, 0);
+                Zsp = savesp;
                 if (lval->val_type == LONG) {
                     Zsp += 4;
                     vlongconst(0);
@@ -161,14 +180,14 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     }
     lval->is_const &= lval2->is_const;
     /* ensure that operation is valid for double */
-    if (doper == 0)
-        intcheck(lval, lval2);
-    if (widen(lval, lval2)) {
-        (*doper)(lval);
-        /* result of comparison is int */
-        if (doper != mult && doper != zdiv)
-            lval->val_type = CINT;
-        return;
+    if (  doper != NULL || intcheck(lval,lval2) == 0 ) {
+        if (widen(lval, lval2)) {
+            (*doper)(lval);
+            /* result of comparison is int */
+            if (doper != mult && doper != zdiv)
+                lval->val_type = CINT;
+            return;
+        }
     }
     /* Attempt to compensate width, so that we are doing double oprs if
  * one of the expressions is a double
@@ -245,20 +264,34 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             /* are adding lval to pointer, adjust size */
             cscale(lval2->ptr_type, lval2->tagsym, &val);
         }
-        if (lval->val_type == LONG) {
-            widenlong(lval, lval2);
-            if (c_notaltreg) {
-                vlongconst_noalt(val);
+        if ( lval2->val_type == DOUBLE ) { 
+            /* FA holds the right hand side */
+            dpush();
+            /* On stack we've got the double, load the constant as a double */
+            vlongconst(val);
+            if ( lval->flags & UNSIGNED ) {
+                convUlong2doub();
             } else {
-                doexx();
-                vlongconst(val);
-                lpush();
-                doexx();
+                convSlong2doub();
             }
+            lval->val_type = DOUBLE;
+            /* Subtraction isn't commutative so we need to swap over' */
+            if ( oper == zsub ) {
+                callrts("dswap");
+            }
+        } else if (lval->val_type == LONG) {
+            widenlong(lval, lval2);
+            lval2->val_type = LONG; /* Kludge */
+            lpush();
+            vlongconst(lval->const_val);
         } else {
-            const2(val);
+            if ( lval2->val_type == LONG ) {
+                vlongconst_noalt(lval->const_val); 
+                lval->val_type = LONG;             
+            } else {
+                const2(lval->const_val);
+            }
         }
-        dcerror(lval2);
     } else {
         /* non-constant on left */
         setstage(&before1, &start1);
@@ -279,23 +312,33 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (lval2->is_const) {
             /* constant on right */
             val = lval2->const_val;
-            if (dbltest(lval, lval2)) {
-                /* are adding lval2 to pointer, adjust size */
-                cscale(lval->ptr_type, lval->tagsym, &val);
-            }
-            if (oper == zsub) {
-                /* addition on Z80 is cheaper than subtraction */
-                val = (-val);
-                /* skip later diff scaling - constant can't be pointer */
-                oper = zadd;
-            }
-            /* remove zpush and add int constant to int */
-            clearstage(before1, 0);
-            Zsp += 2;
-            if (lval->val_type == LONG || lval->val_type == CPTR)
+            if ( lval->val_type == DOUBLE ) { 
+                /* On stack we've got the double, load the constant as a double */
+                vlongconst(val);
+                if ( lval2->flags & UNSIGNED ) {
+                    convUlong2doub();
+                } else {
+                    convSlong2doub();
+                }
+                (*oper)(lval);
+            } else {
+                if (dbltest(lval, lval2)) {
+                    /* are adding lval2 to pointer, adjust size */
+                    cscale(lval->ptr_type, lval->tagsym, &val);
+                }
+                if (oper == zsub) {
+                    /* addition on Z80 is cheaper than subtraction */
+                    val = (-val);
+                    /* skip later diff scaling - constant can't be pointer */
+                    oper = zadd;
+                }
+                /* remove zpush and add int constant to int */
+                clearstage(before1, 0);
                 Zsp += 2;
-            addconst(val, 0, 0);
-            dcerror(lval);
+                if (lval->val_type == LONG || lval->val_type == CPTR)
+                    Zsp += 2;
+                addconst(val, 0, 0);
+            }
         } else {
             /* non-constant on both sides or double +/- int const */
             if (dbltest(lval, lval2))

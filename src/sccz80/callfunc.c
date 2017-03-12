@@ -193,8 +193,8 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 loadargc(nargs);
             }
         }
-        if ( strcmp(ptr->name,"__builtin_strcmp") == 0) {
-            gen_builtin_strcmp();
+        if ( strcmp(ptr->name,"__builtin_strcpy") == 0) {
+            gen_builtin_strcpy();
         } else if (watcharg || (ptr->flags & (SHARED|SHAREDC)) ) {
             if ((ptr->flags & (SHARED|SHAREDC) ) )
                 preserve = YES;

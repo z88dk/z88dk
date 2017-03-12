@@ -1,0 +1,273 @@
+
+
+
+	MODULE	Issue_103_double_prepost
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._double_post_increment
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	call	dpush
+	ld	hl,65535	;const
+	ld	de,65535
+	call	float
+	call	dadd
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._double_post_increment_assign
+	ld	hl,i_2+0
+	call	dldpsh
+	push	bc
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	call	dpush
+	ld	hl,65535	;const
+	ld	de,65535
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+._double_pre_increment
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._double_pre_increment_assign
+	ld	hl,i_2+0
+	call	dldpsh
+	push	bc
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	pop	hl
+	call	dstore
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+._double_post_decrement
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,65535	;const
+	ld	de,65535
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	call	dpush
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dadd
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._double_post_decrement_assign
+	ld	hl,i_2+0
+	call	dldpsh
+	push	bc
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,65535	;const
+	ld	de,65535
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	call	dpush
+	ld	hl,1	;const
+	ld	de,0
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+._double_pre_decrement
+	ld	hl,i_2+0
+	call	dldpsh
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,65535	;const
+	ld	de,65535
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	ld	hl,0	;const
+	add	hl,sp
+	call	dload
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._double_pre_decrement_assign
+	ld	hl,i_2+0
+	call	dldpsh
+	push	bc
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	push	hl
+	call	dldpsh
+	ld	hl,65535	;const
+	ld	de,65535
+	call	float
+	call	dadd
+	pop	hl
+	call	dstore
+	pop	hl
+	call	dstore
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	ld	hl,12	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+	SECTION	rodata_compiler
+
+.i_2
+	defb	0,0,0,0,64,130
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	PUBLIC	_double_post_increment
+	PUBLIC	_double_post_increment_assign
+	PUBLIC	_double_pre_increment
+	PUBLIC	_double_pre_increment_assign
+	PUBLIC	_double_post_decrement
+	PUBLIC	_double_post_decrement_assign
+	PUBLIC	_double_pre_decrement
+	PUBLIC	_double_pre_decrement_assign
+
+
+
+

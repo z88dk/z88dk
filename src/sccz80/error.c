@@ -23,7 +23,7 @@ struct warnings mywarn[] = {
     { "Too many arguments in function call", 0 },
     { "Too many arguments in declaration", 0 },
     { "Function returns different type to prototype", 0 },
-    { "Prototype is %s", 0 },
+    { "Prototype is %s", 0 }, /* 5 */
     { "Function is %s", 0 },
     /* Very annoying warning! */
     { "Return type defaults to int", 1 },
@@ -32,7 +32,7 @@ struct warnings mywarn[] = {
  */
     { "Converting integer to pointer without cast", 0 },
     { "Converting pointer to integer without cast", 0 },
-    { "Equating of different signedness", 1 },
+    { "Equating of different signedness", 1 }, /* 10 */
     { "Operation on different signedness!", 1 },
     { "Converting far ptr to near ptr", 0 },
     { "Pointer/pointer type mismatch", 0 },
@@ -40,7 +40,7 @@ struct warnings mywarn[] = {
  * Well, who can't type then?
  */
     { "Expected ','", 0 },
-    { "Expected '\"'", 0 },
+    { "Expected '\"'", 0 }, /* 15 */
     { "Expected '\''", 0 },
     { "Expected ';'", 0 },
     { "Unterminated assembler code", 0 },
@@ -48,7 +48,7 @@ struct warnings mywarn[] = {
     /*
  * Warnings that can pop up during declarations
  */
-    { "Far only applicable to pointers", 0 },
+    { "Far only applicable to pointers", 0 }, /* 20 */
     { "Initialisation too long, truncating!", 0 },
     { "Bad variable declaration (void)", 0 },
     { "Static incompatible with register/auto", 0 },
@@ -56,15 +56,15 @@ struct warnings mywarn[] = {
     /*
  * Blatantly daft expression things
  */
-    { "Illegal sizeof operation (on function)", 0 },
+    { "Illegal sizeof operation (on function)", 0 },  /* 25 */
     { "Expected argument", 0 },
-    { "Int constant in double expression", 0 },
+    { "Int constant in double expression", 0 },  /* UNUSED */
     { "Getting value from void function", 1 },
     /*
  * I shall write the compiler better, well one day at least!
  */
     { "Compiler bug - code may not work properly", 1 },
-    { "Fix soon hopefully! Next warning may be dubious!", 1 },
+    { "Fix soon hopefully! Next warning may be dubious!", 1 }, /* 30 */
     { "Bitfields not supported by compiler", 0 },
     /*
  * Some more just added on to the end..
@@ -72,22 +72,22 @@ struct warnings mywarn[] = {
     { "Division by zero, result set to be zero", 0 },
     { "Call to function without prototype", 1 },
     { "Func expects: %s", 0 },
-    { "Func gets: %s", 0 },
+    { "Func gets: %s", 0 }, /* 35 */
     { "In function: %s() line %d", 0 },
     { "Typedef doesn't support pointer types (sorry!)", 0 },
     { "Converting long to double in generic math mode", 0 },
     { "Const type not supported by compiler", 0 },
-    { "Volatile type not supported by compiler", 0 },
+    { "Volatile type not supported by compiler", 0 }, /* 40 */
     { "... must be preceded by named argument", 0 },
     { "Floating point not supported by printf yet!", 1 },
     { "Function arguments have sign mismatch", 0 },
     { "Auto by default in function definition", 0 },
-    { "%s%s*[] type uninitialised has no storage", 0 },
+    { "%s%s*[] type uninitialised has no storage", 0 }, /* 45 */
     { "Unreachable code follows", 0 },
     { "Unknown escape sequence \\%c", 0 },
     { "Internal thingummyjob please report!!! Please!", 0 },
     { "Hex escape sequence out of range ", 0 },
-    { "Variable '%s' may be used before initialisation ", 0},
+    { "Variable '%s' may be used before initialisation ", 0}, /* 50 */
     { "Function pointer '%s'' doesn't have the same %s status as the value it's being given", 0}
 };
 
@@ -103,7 +103,7 @@ struct errors {
     { "Can't open zcc_opt.def file", 1 },
     { "Can't nest include files", 1 },
     { "Can't open include file", 1 },
-    { "Input line too long", 1 },
+    { "Input line too long", 1 }, /* 5*/
     { "Output file error", 1 },
 
     /*
@@ -112,7 +112,7 @@ struct errors {
     { "Double literal space exhausted", 1 },
     { "Literal Queue Overflow", 1 },
     { "Staging buffer overflow", 1 },
-    { "Macro table full", 1 },
+    { "Macro table full", 1 }, /* 10 */
     { "Global symbol table overflow", 1 },
     { "Local symbol table overflow", 1 },
     { "Structure member table overflow", 1 },
@@ -120,12 +120,12 @@ struct errors {
     /*
  * Hey boy, don't make yer program too complex
  */
-    { "Indirection too deep", 1 },
+    { "Indirection too deep", 1 }, /* 15 */
     { "Negative Size Illegal", 0 },
     { "Not in switch", 0 },
     { "Too many cases", 0 },
     { "Multiple defaults", 0 },
-    { "Too many active whiles", 1 },
+    { "Too many active whiles", 1 }, /* 20 */
     { "Out of context", 0 },
     { "Must assign to char pointer or array", 0 },
     { "Dodgy declaration (not pointer)", 0 },
