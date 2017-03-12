@@ -40,7 +40,8 @@ STATIC can be optionally defined to improve performance.
 All compiles are first checked for correctness by running the program
 with PRINTF defined.  After correctness is verified, time should be
 measured with PRINTF undefined so that execution time of printf is not
-measured.
+measured.  The original benchmark calls for running with N=10 but since
+that takes a lot of time, timed runs will be done with N=8.
 
 =====================================
 
@@ -53,12 +54,20 @@ stretch tree of depth 11	 check: -1
 32	 trees of depth 10	 check: -32
 long lived tree of depth 10	 check: -1
 
+N = 8
+
+stretch tree of depth 9	 check: -1
+512	 trees of depth 4	 check: -512
+128	 trees of depth 6	 check: -128
+32	 trees of depth 8	 check: -32
+long lived tree of depth 8	 check: -1
+
 =====================================
 
 TIMER is defined for Z88DK compiles so that assembly labels are inserted
 into the code at time begin and time stop points.
 
-When COMMAND is not defined, N=10.
+When COMMAND is not defined, N=8.
 
 MALLOC and FREE can be defined to replace the standard malloc/free with
 another memory allocation implementation.

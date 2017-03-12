@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
 #ifdef COMMAND
     N = atol(argv[1]);
 #else
-    N = 10;
+    N = 8;
 #endif
 
 TIMER_START();

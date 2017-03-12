@@ -10,10 +10,10 @@ To verify the correct result, we compiled using all combinations
 of compiler and c library for the zx target:
 
 new/sccz80
-zcc +zx -vn -DSTATIC -DPRINTF -startup=5 -O2 -clib=new binary-trees.c -o bt -lm -create-app
+zcc +zx -vn -DPRINTF -startup=4 -O2 -clib=new fasta.c -o fasta -lm -create-app
 
 new/zsdcc
-zcc +zx -vn -DSTATIC -DPRINTF -startup=5 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 binary-trees.c -o bt -lm -create-app
+zcc +zx -vn -DPRINTF -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 fasta.c -o fasta -lm -create-app
 
 TIMING
 ======
@@ -24,17 +24,17 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 new/sccz80
-zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new binary-trees.c -o bt -lm -m -pragma-include:zpragma.inc -create-app
+zcc +z80 -vn -DTIMER -startup=0 -O2 -clib=new fasta.c -o fasta -lm -m -pragma-include:zpragma.inc -create-app
 
 new/zsdcc
-zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 binary-trees.c -o bt -lm -m -pragma-include:zpragma.inc -create-app
+zcc +z80 -vn -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 fasta.c -o fasta -lm -m -pragma-include:zpragma.inc -create-app
 
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks bt.bin -start 08dc -end 0a40 -counter 999999999999
+ticks fasta.bin -start 09ba -end 0a22 -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -51,14 +51,8 @@ ZSDCC #9833
 
 
 new/zsdcc
-2674 bytes less page zero
+3079 bytes less page zero
 
-cycle count  = 6574755592
-time @ 4MHz  = 6574755592 / 4*10^6 = 27 min 24 sec
+cycle count  = 252249726
+time @ 4MHz  = 252249726 / 4*10^6 = 63.06 sec
 
-
-new/sccz80
-2816 bytes less page zero
-
-cycle count  = MAY BE HANGING
-time @ 4MHz  = NEED TO INVESTIGATE
