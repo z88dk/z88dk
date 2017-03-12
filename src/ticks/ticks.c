@@ -4,7 +4,6 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #define strcasecmp(a,b) stricmp(a,b)
-#define alarm(a)
 #endif
 
 
@@ -508,7 +507,7 @@ int main (int argc, char **argv){
     printf("  -end X         X in hexadecimal is the PC condition to exit\n"),
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
-    printf("  -w X           Maximum amount of running time\n"),
+    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
@@ -518,7 +517,7 @@ int main (int argc, char **argv){
       switch (argc--, argv++[1][1]){
         case 'w':
           alarmtime = strtol(argv[1], NULL, 10);
-          counter = -1;
+          counter = 400000000LL * alarmtime;
           break;
         case 'p':
           pc= strtol(argv[1], NULL, 16);
@@ -686,9 +685,6 @@ int main (int argc, char **argv){
   fclose(fh);
   if( !size )
     printf("File not specified or zero length\n");
-  if ( alarmtime != 0 ) {
-    alarm(alarmtime);  /* Abort a test run if it's been too long */
-  }
   stint= intr;
   do{
     if( pc==start )
@@ -2939,7 +2935,11 @@ int main (int argc, char **argv){
         }
         ih=1;//break;
     }
-  } while ( pc != end && (st < counter || counter == -1) );
+  } while ( pc != end && st < counter  );
+  if ( alarmtime != -1 ) {
+      /* We running as a test, we should never reach the end, so exit with error */
+      exit(1);
+  }
   if( tap && st>sttap )
     sttap= st+( tap= tapcycles() );
   if ( counter != -1 )
