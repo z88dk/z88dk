@@ -1,10 +1,28 @@
 lstoff
+; See also src/ticks/cmds.h
 
+	defc    argv_length = 65280
+        defc    argv_start = 65281
 
 	defc	CMD_EXIT = 0
 	defc	CMD_PRINTCHAR = 1
 	defc	CMD_READKEY = 2
 
+        defc    CMD_OPENF = 3
+        defc    CMD_CLOSEF = 4
+        defc    CMD_WRITEBYTE = 5
+        defc    CMD_READBYTE = 6
+        defc    CMD_WRITEBLOCK = 7
+        defc    CMD_READBLOCK = 8
+        defc    CMD_SEEK = 0
+        defc    CMD_STAT = 10
+
+
+        defc    CMD_REMOVE = 20
+        defc    CMD_RENAME = 21
+
         defc    CMD_GETTIME = 30
 
+        defc    CMD_MKDIR = 40
+        defc    CMD_RMDIR = 41
 lston
