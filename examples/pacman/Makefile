@@ -1,4 +1,4 @@
-CC=zcc
+CC=zcc 
 MV=mv
 MAME=/c/mame/mame
 
@@ -8,7 +8,9 @@ OBJECT_FILES=$(C_FILES:%.c=%.o)
 MAME_DIR=puckmod
 MAME_FILES=namcopac.6e  namcopac.6f namcopac.6h  npacmod.6j
 
-test: $(MAME_FILES:%=$(MAME_DIR)/%)
+all: $(MAME_FILES:%=$(MAME_DIR)/%)
+
+test: all
 	$(MAME) $(MAME_DIR)
 
 clean:
@@ -26,10 +28,10 @@ $(MAME_DIR)/npacmod.6j: rom.bin
 	$(MV)  rom.0d $@
 
 rom.bin: $(OBJECT_FILES)
-	$(CC) +pacman -lm $(OBJECT_FILES) -o $@
+	$(CC) +pacman -vn -lm $(OBJECT_FILES) -o $@
 
-src/%.o: %.asm
-	$(CC) +pacman -c $<
+%.o: %.asm
+	$(CC) +pacman -vn -c $<
 
-src/%.o: %.c
-	$(CC) +pacman -c $<
+%.o: %.c
+	$(CC) +pacman -vn -c $<
