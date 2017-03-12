@@ -7,16 +7,16 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test_genmath.bin 
+all:	test_genmath.bin  test_math48.bin
 
 
 
 test_genmath.bin: $(SOURCES)
-	zcc +test -vn -DMATH_LIBRARY="\"\\\"Genmath\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lm
+	zcc +test -vn -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lm
 	$(MACHINE) $@
 
 test_math48.bin: $(SOURCES)
-	zcc +test -vn -DMATH_LIBRARY="\"\\\"Math48\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lmath48
+	zcc +test -vn -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lmath48
 	$(MACHINE) $@
 
 

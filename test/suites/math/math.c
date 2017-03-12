@@ -3,6 +3,7 @@
 
 #include "test.h"
 #include <stdio.h>
+#include <math.h>
 
 void test_comparison()
 {
@@ -85,6 +86,14 @@ void test_post_incdecrement()
      Assert( a == 2, "--: a == 2");
 }
 
+static int approx_equal(double a, double b)
+{
+   if ( fabs(b-a) < 0.00000001 ) {
+       return 1;
+   }
+   return 0;
+}
+
 void test_pre_incdecrement()
 {
      double a = 2;
@@ -95,7 +104,32 @@ void test_pre_incdecrement()
      Assert( a == 2, "--: a == 2");
 }
 
+static void run_sqrt(double x, double e)
+{
+    static char   buf[100];
+    double r = sqrt(x);
+    snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",x,e,r);
+    Assert( approx_equal(e,r), buf);
+}
 
+void test_sqrt()
+{
+    run_sqrt(4.0, 2.0);
+    run_sqrt(9.0, 3.0);
+    run_sqrt(1.0, 1.0);
+    run_sqrt(1000000, 1000.0);
+    run_sqrt(0.5, 0.70710678);
+
+}
+
+void test_approx_equal()
+{
+    Assert( approx_equal(1.0,2.0) == 0, " 1 != 2");
+    Assert( approx_equal(1.0,1.0) == 1, " 1 == 1");
+    //                   0.00000001
+    Assert( approx_equal(1.23456789,1.23456789) == 1, " 1.23456789 == 1.23456789");
+    Assert( approx_equal(1.23456789,1.23456788) == 0, " 1.23456789 != 1.23456788");
+}
 
 int suite_genmath()
 {
@@ -108,6 +142,10 @@ int suite_genmath()
     suite_add_test(test_integer_constant_longform_lhs);
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
+    suite_add_test(test_approx_equal);
+#ifndef MATH48
+    suite_add_test(test_sqrt);
+#endif
 
     return suite_run();
 }
