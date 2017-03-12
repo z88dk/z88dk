@@ -2235,7 +2235,7 @@ void popframe(void)
     }
 }
 
-void gen_builtin_strcmp()
+void gen_builtin_strcpy()
 {
     int label;
     ol("pop\tde");
