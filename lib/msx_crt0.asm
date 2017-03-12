@@ -118,13 +118,8 @@ IF (startup=2)
         add     hl,bc   ;now points to the end of the command line
 	INCLUDE	"crt0_command_line.asm"
 
-IF DEFINED_Z88DK_USES_SDCC
         push    hl      ;argv
         push    bc      ;argc
-ELSE
-        push    bc      ;argc
-        push    hl      ;argv
-ENDIF
         call    _main		;Call user code
 	pop	bc	;kill argv
 	pop	bc	;kill argc

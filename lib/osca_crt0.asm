@@ -186,13 +186,8 @@ find_end:
 
 	INCLUDE "crt0_command_line.asm"
 
-IF DEFINED_Z88DK_USES_SDCC
         push    hl      ;argv
         push    bc      ;argc
-ELSE
-        push    bc      ;argc
-        push    hl      ;argv
-ENDIF
 
 	call    _main		;Call user code
 

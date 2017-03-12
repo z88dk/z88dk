@@ -101,13 +101,8 @@ argv_none:
 	ld	hl,0
 	add	hl,sp		; address of argv
 	ld	b,0
-IF DEFINED_Z88DK_USES_SDCC
         push    hl      ;argv
         push    bc      ;argc
-ELSE
-        push    bc      ;argc
-        push    hl      ;argv
-ENDIF
 	ld	hl,(shell_cmdlen)
 	ld	(shell_cmdptr),hl
 	call_oz(gn_nln)		; Start a new line...
