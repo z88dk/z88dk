@@ -160,15 +160,6 @@ int primary(LVALUE* lval)
     }
 }
 
-/*
- * flag error if integer constant is found in double expression
- */
-
-void dcerror(LVALUE* lval)
-{
-    if (lval->val_type == DOUBLE)
-        warning(W_INTDOUB);
-}
 
 /*
  * calculate constant expression (signed values)
@@ -247,10 +238,13 @@ int CalcStand(
 }
 
 /* Complains if an operand isn't int */
-void intcheck(LVALUE* lval, LVALUE* lval2)
+int intcheck(LVALUE* lval, LVALUE* lval2)
 {
-    if (lval->val_type == DOUBLE || lval2->val_type == DOUBLE)
+    if (lval->val_type == DOUBLE || lval2->val_type == DOUBLE) {
         error(E_INTOPER);
+        return -1;
+    }
+    return 0;
 }
 
 /* Forces result, having type t2, to have type t1 */
@@ -430,7 +424,7 @@ void prestep(
                 zpush();
         }
         rvalue(lval);
-        intcheck(lval, lval);
+        //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case DOUBLE:
             addconst(n * 6, 1, lval->symbol->flags & FARPTR);
@@ -473,7 +467,6 @@ void poststep(
                 zpush();
         }
         rvalue(lval);
-        intcheck(lval, lval);
         switch (lval->ptr_type) {
         case DOUBLE:
             nstep(lval, n * 6, unstep);

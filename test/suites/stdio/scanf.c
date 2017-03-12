@@ -1,6 +1,7 @@
 
 
-#include "stdio_tests.h"
+#include <stdio.h>
+#include "test.h"
 
 /** \test Test %d handling of scanf() Test takes about 40 seconds to run
  */
@@ -32,4 +33,13 @@ int test_scanf()
     suite_add_test(test_scanf_d);
 
     return suite_run();
+}
+
+int main(int argc, char *argv[])
+{
+    int  res = 0;
+
+    res += test_scanf();
+
+    return res;
 }

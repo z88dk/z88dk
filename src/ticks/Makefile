@@ -1,5 +1,5 @@
 
-OBJS = ticks.o
+OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o
 
 CFLAGS += -g
 
@@ -14,10 +14,7 @@ install:
 	$(INSTALL) ticks$(EXESUFFIX) $(PREFIX)/bin/
 
 clean:
-	$(RM) ticks$(EXESUFFIX) ticks.o core
+	$(RM) ticks$(EXESUFFIX) $(OBJS) core
 	$(RM) -rf Debug Release
 
 
-#Dependencies
-
-ticks.o: ticks.c 

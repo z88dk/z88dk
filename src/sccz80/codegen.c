@@ -1439,6 +1439,14 @@ void com(LVALUE* lval)
 void inc(LVALUE* lval)
 {
     switch (lval->val_type) {
+    case DOUBLE:
+        // FA = value to be incremented
+        dpush();
+        vlongconst(1);
+        convSlong2doub();
+        callrts("dadd");
+        Zsp += 6;
+        break;
     case LONG:
     case CPTR:
         callrts("l_inclong");
@@ -1455,6 +1463,14 @@ void inc(LVALUE* lval)
 void dec(LVALUE* lval)
 {
     switch (lval->val_type) {
+    case DOUBLE:
+        // FA = value to be incremented
+        dpush();
+        vlongconst(-1);
+        convSlong2doub();
+        callrts("dadd");
+        Zsp += 6;
+        break;
     case LONG:
     case CPTR:
         callrts("l_declong");
@@ -1943,10 +1959,11 @@ void vlongconst(uint32_t val)
 
 void vlongconst_noalt(uint32_t val)
 {
-    constbc(val % 65536);
-    ol("push\tbc");
     constbc(val / 65536);
     ol("push\tbc");
+    constbc(val % 65536);
+    ol("push\tbc");
+    Zsp -= 4;
 }
 
 /*
@@ -2218,7 +2235,7 @@ void popframe(void)
     }
 }
 
-void gen_builtin_strcmp()
+void gen_builtin_strcpy()
 {
     int label;
     ol("pop\tde");
