@@ -505,49 +505,56 @@ void doreturn(char type)
 void leave(int vartype, char type)
 {
     int savesp;
+    int save = vartype;
+    int callee_cleanup = (c_compact_code || currfn->flags & CALLEE) && (stackargs > 2);
+    int hlsaved;
 
     if (vartype == CPTR) /* they are the same in any case! */
         vartype = LONG;
-    else if (vartype == DOUBLE)
+    else if ( vartype == DOUBLE ) {
         vartype = NO;
-
-    if (c_notaltreg) {
-        if (vartype == LONG)
-            savehl();
-        modstk(0, 0, NO);
-    } else {
-        modstk(0, vartype, NO);
+        save = NO;
     }
 
-    if ((c_compact_code || currfn->flags & CALLEE) && (stackargs > 2)) {
-        /* 
-         * We're exiting a function and we want to clean up after ourselves
-         * (so calling function doesn't have to do this) (first of all we
-         * have to grab the return address - easy just to exchange
-         */
-        savesp = Zsp;
+    if ( c_notaltreg && abs(Zsp) >= 12 ) {
+        hlsaved = YES;
+        savehl();
+        save=NO;
+    }
+    modstk(0, save, NO);
+    if ( c_notaltreg && abs(Zsp) >= 12 && callee_cleanup == 0 ) {
+        restorehl();
+    }
 
-        if (c_notaltreg) {
-            if (vartype == LONG) /* If long, then dump de somewhere */
-                savede();
-        } else if (vartype == LONG) {
-            doexx();
+    if (callee_cleanup) {
+        int save = vartype;
+        if ( vartype  ) {
+            save = NO;
+            if ( c_notaltreg ) {
+                if ( vartype == LONG )
+                    savede();
+                if ( hlsaved == NO ) savehl();
+            } else {
+                doexx();
+            }
         }
+        savesp = Zsp;
         zpop(); /* Return address in de */
-        Zsp -= stackargs;
-        modstk(0, NO, NO);
+        Zsp = -(stackargs - 2);
+        modstk(0, save, NO);
         zpushde(); /* return address back on stack */
-        if (c_notaltreg) {
-            if (vartype == LONG)
-                restorede();
-        } else if (vartype == LONG) {
-            doexx();
-        }
         Zsp = savesp;
+        if ( vartype ) {
+            if ( c_notaltreg ) {
+                if ( vartype == LONG )
+                    restorede();
+                restorehl();
+            } else {
+                doexx();
+            }
+        }
     }
     popframe(); /* Restore previous frame pointer */
-    if (c_notaltreg && vartype == LONG)
-        restorehl();
     if (type)
         setcond(type);
     zret(); /* and exit function */
