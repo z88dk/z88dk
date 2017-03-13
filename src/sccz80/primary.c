@@ -700,11 +700,13 @@ int constexpr(int32_t* val, int flag)
 {
     char *before, *start;
     int con, valtemp;
+    int savesp = Zsp;
 
     setstage(&before, &start);
     expression(&con, &valtemp);
     *val = (long)valtemp;
     clearstage(before, 0); /* scratch generated code */
+    Zsp = savesp;
     if (flag && con == 0)
         error(E_CONSTANT);
     return con;

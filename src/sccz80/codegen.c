@@ -996,9 +996,12 @@ void point(void)
         ol("defw\tASMPC+2");
 }
 
-/* Modify the stack pointer to the new value indicated */
+/* Modify the stack pointer to the new value indicated 
+ * \param newsp - Where we need to be 
+ * \param save - NO or the variable type that we need to preserve
+ * \param saveaf - Whether we should save af
+ */
 int modstk(int newsp, int save, int saveaf)
-/*  newsp - if true save hl;  save - preserve contents of af */
 {
     int k, flag = NO;
 
@@ -1074,13 +1077,17 @@ modstkcht:
             doexx();
     }
 #else
-    if (save)
-        doexx();
+    if (save) {
+        if (c_notaltreg) savehl();
+        else doexx();
+    }
     vconst(k);
     ol("add\thl,sp");
     ol("ld\tsp,hl");
-    if (save)
-        doexx();
+    if (save) {
+        if (c_notaltreg) restorehl();
+        else doexx();
+    }
 #endif
     if (saveaf) {
         if (c_notaltreg) {
