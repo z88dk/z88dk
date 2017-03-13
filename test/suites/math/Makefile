@@ -4,7 +4,7 @@ include ../make.config
 
 SOURCES += $(wildcard *.c) 
 OBJECTS := $(SOURCES:.c=.o)
-CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
+CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED 
 
 
 all:	test_genmath.bin  test_math48.bin
@@ -12,12 +12,12 @@ all:	test_genmath.bin  test_math48.bin
 
 
 test_genmath.bin: $(SOURCES)
-	zcc +test -vn -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lm
-	$(MACHINE) $@
+	$(call compile, -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"", -lm)
+	$(runtest)
 
 test_math48.bin: $(SOURCES)
-	zcc +test -vn -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lmath48
-	$(MACHINE) $@
+	$(call compile, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lmath48)
+	$(runtest) 
 
 
 clean:

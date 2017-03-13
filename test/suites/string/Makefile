@@ -7,15 +7,14 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test.bin run
+all:	test.bin 
 
 
 
 test.bin: $(SOURCES)
-	zcc +test -vn $(CFLAGS) $(SOURCES) -o $@ -lndos
+	$(compile)
+	$(runtest)
 
-run: test.bin
-	$(MACHINE) test.bin
 
 
 clean:
