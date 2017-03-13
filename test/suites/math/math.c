@@ -143,9 +143,7 @@ int suite_genmath()
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
-#ifndef MATH48
     suite_add_test(test_sqrt);
-#endif
 
     return suite_run();
 }
