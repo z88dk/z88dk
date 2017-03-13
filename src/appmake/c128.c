@@ -1,6 +1,5 @@
 /*
- *      Short program to create a C128 header to load the files on a disk image or
- *      to create a T64 tape file container, to be used with the "LOAD", "LOAD", "RUN" sequence
+ *      Short program to create a C128 header
  *
  *      This tool adds the location of the program at the beginning of the binary block
  *      and creates a BASIC loader; the two files must be put in a disk image
@@ -61,7 +60,7 @@ int c128_exec(char *target)
     if ( binname == NULL ) {
         return -1;
     }
-
+	
     if ( outfile == NULL ) {
         strcpy(filename,binname);
     } else {
@@ -143,8 +142,8 @@ int c128_exec(char *target)
 		/* 1st directory entry: compiled program block */
 		writebyte(1,fpout);		/* normal file type */
 		writebyte(2,fpout);		/* 1541 file type */
-		writeword(0x3000,fpout);		/* start address */
-		writeword(0x3000+len,fpout);	/* end address */
+		writeword(pos,fpout);		/* start address */
+		writeword(pos+len,fpout);	/* end address */
 		writeword(0,fpout);		/* not used */
 		writeword(0x80,fpout);	/* position in the TAP file (from the beginning) */
 		writeword(0,fpout);		/* MSW for the position above */
@@ -162,7 +161,7 @@ int c128_exec(char *target)
 		writebyte(1,fpout);		/* normal file type */
 		writebyte(0x82,fpout);	/* 1541 file type = PRG */
 		writeword(0x1C01,fpout);     /* start address of the BASIC program */
-		writeword(0x1C09+37+22+16,fpout);  /* end address of the BASIC program (line 20 omitted) */
+		writeword(0x1C09+16,fpout);  /* end address of the BASIC program (line 20 omitted) */
 		writeword(0,fpout);		/* not used */
 		writeword(0x80+len,fpout);	/* position in the TAP file (from the beginning) */
 		writeword(0,fpout);		/* MSW for the position above */
@@ -234,85 +233,14 @@ int c128_exec(char *target)
 		namelen=0;
 	}
 	
-    /* start address of the next line of the BASIC program */
-    writeword(0x1C09+diskgap+37+namelen,fpout);
-    /* 30 */
-    writebyte(30,fpout);
-    writebyte(0,fpout);
-    /* ..Z80 instructions for "JP $3000" */
-    writebyte(0x97,fpout);    /* POKE */
-    writebyte('6',fpout);
-    writebyte('5',fpout);
-    writebyte('5',fpout);
-    writebyte('1',fpout);
-    writebyte('8',fpout);
-    writebyte(',',fpout);
-    writebyte('1',fpout);
-    writebyte('9',fpout);
-    writebyte('5',fpout);
-    writebyte(':',fpout);
-    writebyte(0x97,fpout);    /* POKE */
-    writebyte('6',fpout);
-    writebyte('5',fpout);
-    writebyte('5',fpout);
-    writebyte('1',fpout);
-    writebyte('9',fpout);
-    writebyte(',',fpout);
-    sprintf(mybuf,"%03i",(int)pos%256);
-    for (i=0;i<3;i++)
-        writebyte(mybuf[i],fpout);
-    writebyte(':',fpout);
-    writebyte(0x97,fpout);    /* POKE */
-    writebyte('6',fpout);
-    writebyte('5',fpout);
-    writebyte('5',fpout);
-    writebyte('2',fpout);
-    writebyte('0',fpout);
-    writebyte(',',fpout);
-    sprintf(mybuf,"%03i",(int)pos/256);
-    for (i=0;i<3;i++)
-        writebyte(mybuf[i],fpout);
-    /* end of line */
-    writebyte(0,fpout);
-
-    /* start address of the next line of the BASIC program */
-    writeword(0x1C09+diskgap+37+22+namelen,fpout);
-    /* 40 */
-    writebyte(40,fpout);
-    writebyte(0,fpout);
-    /* ..6502 instructions for "CLI/RTS" */
-    writebyte(0x97,fpout);    /* POKE */
-    writebyte('4',fpout);
-    writebyte('3',fpout);
-    writebyte('5',fpout);
-    writebyte('2',fpout);
-    writebyte(',',fpout);
-    writebyte('8',fpout);
-    writebyte('8',fpout);
-    writebyte(':',fpout);
-    writebyte(0x97,fpout);    /* POKE */
-    writebyte('4',fpout);
-    writebyte('3',fpout);
-    writebyte('5',fpout);
-    writebyte('3',fpout);
-    writebyte(',',fpout);
-    writebyte('9',fpout);
-    writebyte('6',fpout);
-    /* end of line */
-    writebyte(0,fpout);
-
     /* address of the current line of the BASIC program */
     /* (it means we are in the last line)               */
-    writeword(0x1C09+diskgap+37+22+namelen,fpout);
+    writeword(0x1C09+diskgap+namelen,fpout);
     /* 50 */
     writebyte(50,fpout);
     writebyte(0,fpout);
     writebyte(0x9e,fpout);    /* SYS */
-    writebyte('6',fpout);
-    writebyte('5',fpout);
-    writebyte('4',fpout);
-    writebyte('8',fpout);
-    writebyte('8',fpout);
+    fprintf(fpout,"%05i",(int)pos);      /* Location for SYS */
     writebyte(':',fpout);
     writebyte(0x80,fpout);    /* END */
     writebyte(0,fpout);
@@ -325,4 +253,6 @@ int c128_exec(char *target)
 
     return 0;
 }
+
+
 
