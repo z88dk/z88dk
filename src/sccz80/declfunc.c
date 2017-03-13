@@ -232,6 +232,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
     locptr = STARTLOC; /* "clear" local symbol table */
     undeclared = 0; /* init arg count */
 
+
     /* Check to see if we are doing ANSI fn defs - must be a better way of
      * doing this! (Have an array and check by that?)           
      */
@@ -431,6 +432,12 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     if (c_useframepointer || (currfn->flags & SAVEFRAME))
         where += 2;
 
+    /* main is always __stdc */
+    if ( strcmp(currfn->name,"main") == 0 ) {
+        currfn->flags &= ~SMALLC;
+    }
+
+
     /* For SMALLC we need to start counting from the last argument */
     if ( (currfn->flags & SMALLC) == SMALLC ) {
         while (prevarg) {
@@ -586,6 +593,10 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
 
     blanks();
     check_trailing_modifiers(currfn);
+    /* main is always __stdc */
+    if ( strcmp(currfn->name,"main") == 0 ) {
+        currfn->flags &= ~SMALLC;
+    }
 
     if (cmatch(';'))
         return (prevarg);
