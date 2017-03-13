@@ -90,14 +90,27 @@ restart30:
 	ret
 
 program:
-	ld	sp,65535
+	ld	sp,65280
 	ld	hl,-64
 	add	hl,sp
 	ld	sp,hl
 	call    crt0_init_bss
 	ld	(exitsp),sp
     	ei
+	ld	a,(argv_length)
+	and	a
+	jr	z,argv_done
+	ld	c,a
+	ld	b,0
+	ld	hl,argv_start
+	add	hl,bc	; now points to end of the command line
+	defc DEFINED_noredir = 1
+	INCLUDE "crt0_command_line.asm"
+	push	hl	;argv
+	push	bc	;argc
 	call	_main
+	pop	bc
+	pop	bc
 cleanup:
 	ld	a,CMD_EXIT	;exit
 	rst	8
@@ -105,7 +118,11 @@ cleanup:
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
+
+
 	INCLUDE "crt0_runtime_selection.asm" 
 	
 	INCLUDE	"crt0_section.asm"
 
+	SECTION rodata_clib
+end:            defb    0               ; null file name

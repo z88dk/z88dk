@@ -446,6 +446,9 @@ unsigned char
 
 unsigned char * mem;
 
+char   cmd_arguments[255];
+int    cmd_arguments_len = 0;
+
 long tapcycles(void){
   mues= 1;
   wavpos!=0x20000 && (ear^= 64);
@@ -565,6 +568,16 @@ int main (int argc, char **argv){
             printf("\nInvalid header size\n"),
             exit(-1);
           wavpos= 44;
+          break;
+        case '-':
+          while ( argc > 1 ) {
+            // I think windows is now comformant with snprintf? Either way, we can't grow the arugment buffer...
+            cmd_arguments_len += snprintf(cmd_arguments + cmd_arguments_len, sizeof(cmd_arguments) - cmd_arguments_len, "%s%s",cmd_arguments_len > 0 ? " " : "", argv[1]);
+            argc--;
+            argv++;
+          }
+          mem[65280] = cmd_arguments_len % 256;
+          memcpy(&mem[65281], cmd_arguments, cmd_arguments_len % 256);
           break;
         default:
           printf("\nWrong Argument: %s\n", argv[0]);
@@ -686,6 +699,8 @@ int main (int argc, char **argv){
   if( !size )
     printf("File not specified or zero length\n");
   stint= intr;
+
+
   do{
     if( pc==start )
       st= 0,
