@@ -122,6 +122,21 @@ void test_sqrt()
 
 }
 
+static void run_pow(double x, double y, double e)
+{
+    static char   buf[100];
+    double r = pow(x,y);
+    snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",x,y,e,r);
+    Assert( approx_equal(e,r), buf);
+}
+
+void test_pow()
+{
+    run_pow(2.0, 2.0, 4.0);
+    run_pow(0.5, 2.0, 0.25);
+    run_pow(2, 0.5, 1.41421356);
+}
+
 void test_approx_equal()
 {
     Assert( approx_equal(1.0,2.0) == 0, " 1 != 2");
@@ -143,9 +158,8 @@ int suite_genmath()
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
-#ifndef MATH48
     suite_add_test(test_sqrt);
-#endif
+    suite_add_test(test_pow);
 
     return suite_run();
 }
