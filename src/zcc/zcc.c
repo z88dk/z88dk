@@ -199,6 +199,7 @@ static int             mz180 = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
+static char            c_sccz80_r2l_calling;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 static char            tmpnambuf[] = "zccXXXX";
@@ -457,6 +458,7 @@ static arg_t     myargs[] = {
 	{ "-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files" },
 	{ "o", AF_MORE, SetString, &outputfile, NULL, "Set the output files" },
 	{ "nt", 0, AddAppmake, NULL, NULL, "Set notruncate on the appmake options" },
+	{ "set-r2l-by-default", AF_BOOL_TRUE, SetBoolean, &c_sccz80_r2l_calling, NULL, "(sccz80) Use r2l calling convention by default"},
 	{ "+", NO, AddPreProc, NULL, NULL, NULL },    /* Strips // comments in vcpp */
 	{ "-fsigned-char", AF_BOOL_TRUE, SetBoolean, &sdcc_signed_char, NULL, NULL },    /* capture sdcc signed char flag */
 	{ "M", AF_BOOL_TRUE, SetBoolean, &swallow_M, NULL, NULL },    /* swallow unsupported -M flag that configs are still generating (causes prob with sdcc) */
@@ -921,6 +923,7 @@ int main(int argc, char **argv)
 	if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
 	BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
 	BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
+
 
 	/* Peephole optimization level for sdcc */
 	if (compiler_type == CC_SDCC)
@@ -2071,7 +2074,7 @@ void print_help_text()
 	printf("\nOptions:\n\n");
 
 	while (cur->help) {
-		printf("-%-15s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
+		printf("-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
 		cur++;
 	}
 
@@ -2278,6 +2281,11 @@ static void configure_compiler()
 		}
 		if (c_code_in_asm) {
 			add_option_to_compiler("-cc");
+		}
+		if (c_sccz80_r2l_calling) {
+			add_option_to_compiler("-set-r2l-by-default");
+			preprocarg = " -DZ88DK_R2L_CALLING_CONVENTION";
+			BuildOptions(&cpparg, preprocarg);
 		}
 		c_compiler = c_sccz80_exe;
 		compiler_style = outimplied;

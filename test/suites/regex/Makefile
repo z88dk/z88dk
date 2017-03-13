@@ -12,8 +12,8 @@ all:	test.bin
 
 
 test.bin: $(SOURCES)
-	zcc +test -vn -DMATH_LIBRARY="\"\\\"Genmath\\\"\"" $(CFLAGS) $(SOURCES) -o $@ -lndos -lmalloc
-	$(MACHINE) $@
+	$(call compile, -lmalloc)
+	$(runtest)
 
 clean:
 	rm -f *.bin $(OBJECTS) zcc_opt.def *~
