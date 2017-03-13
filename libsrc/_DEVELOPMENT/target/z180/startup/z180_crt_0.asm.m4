@@ -107,19 +107,10 @@ __Restart:
 __Restart_2:
 
    IF __crt_enable_commandline >= 1
-      
-      IF __SDCC | __SDCC_IX | __SDCC_IY
 
-         push hl               ; argv
-         push bc               ; argc
-      
-      ELSE
-      
-         push bc               ; argc
-         push hl               ; argv
+      push hl                  ; argv
+      push bc                  ; argc
 
-      ENDIF
-   
    ENDIF
 
    ; initialize data section
