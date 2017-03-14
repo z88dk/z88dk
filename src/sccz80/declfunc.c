@@ -643,7 +643,7 @@ SYMBOL *getarg(
 
     while (undeclared) {
         ptrtofn = NO;
-        ident = get_ident();
+        ident = get_ident(VARIABLE); // TODO
         more = 0;
         if ((legalname = symname(n)) == 0) {
             if (!proto) {

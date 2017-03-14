@@ -530,7 +530,7 @@ int heira(LVALUE* lval)
         otag = GetVarID(&var, NO);
         var.sflag = ((var.sign & UNSIGNED) | (var.zfar & FARPTR));
         if (var.type != NO) {
-            ident = get_ident();
+            ident = get_ident(var.ident);
             if (ident == PTR_TO_FN || ident == FUNCTIONP)
                 needtoken(")()");
             /*

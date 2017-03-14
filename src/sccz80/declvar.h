@@ -1,6 +1,6 @@
 /* decl.c */
 extern int dodeclare(enum storage_type storage, TAG_SYMBOL *mtag, int is_struct);
-extern int get_ident(void);
+extern int get_ident(enum ident_type existing);
 extern int dummy_idx(int typ, TAG_SYMBOL *otag);
 extern void declglb(int typ, enum storage_type storage, TAG_SYMBOL *mtag, TAG_SYMBOL *otag, int is_struct, struct varid *var);
 extern void declloc(int typ, TAG_SYMBOL *otag, char locstatic, struct varid *var);
