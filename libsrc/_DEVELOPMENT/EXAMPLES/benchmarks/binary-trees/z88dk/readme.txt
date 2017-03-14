@@ -9,6 +9,12 @@ VERIFY CORRECT RESULT
 To verify the correct result, we compiled using all combinations
 of compiler and c library for the zx target:
 
+classic/sccz80
+zcc +zx -vn -DSTATIC -DPRINTF -O2 binary-trees.c -o bt -lm -lndos -lmalloc -create-app -pragma-define:USING_amalloc
+
+classic/sdcc (fail)
+zcc +zx -vn -DSTATIC -DPRINTF -compiler=sdcc -SO3 --max-allocs-per-node200000 binary-trees.c -o bt -lmath48 -lndos -lmalloc -create-app -pragma-define:USING_amalloc
+
 new/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -startup=5 -O2 -clib=new binary-trees.c -o bt -lm -create-app
 
@@ -22,6 +28,14 @@ To time, the program was compiled for the generic z80 target so that
 a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
+
+classic/sccz80
+zcc +cpm -vn -DSTATIC -DTIMER -O2 binary-trees.c -o bt -lm -lndos -lmalloc -m -create-app -pragma-define:USING_amalloc
+appmake +rom -s 32768 -f 0 -o bt0.bin
+appmake +inject -b bt0.bin -i BT.COM -s 256 -o bt.bin
+
+classic/sdcc (fail)
+zcc +embedded -vn -DSTATIC -DTIMER -compiler=sdcc -SO3 --max-allocs-per-node200000 binary-trees.c -o bt -lmath48 -lndos -lmalloc -m -create-app -pragma-define:USING_amalloc
 
 new/sccz80
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new binary-trees.c -o bt -lm -m -pragma-include:zpragma.inc -create-app
@@ -50,15 +64,22 @@ Z88DK March 2, 2017
 ZSDCC #9833
 
 
-new/zsdcc
-2674 bytes less page zero
+classic/sccz80
+3886 bytes less cpm overhead
 
-cycle count  = 6574755592
-time @ 4MHz  = 6574755592 / 4*10^6 = 27 min 24 sec
+cycle count  = 
+time @ 4MHz  = 
+
+
+new/zsdcc
+2699 bytes less page zero
+
+cycle count  = 6576187954
+time @ 4MHz  = 6576187954 / 4*10^6 = 27 min 24 sec
 
 
 new/sccz80
-2816 bytes less page zero
+2807 bytes less page zero
 
-cycle count  = MAY BE HANGING
-time @ 4MHz  = NEED TO INVESTIGATE
+cycle count  = 6769295803
+time @ 4MHz  = 6769295803 / 4*10^6 = 28 min 12 sec

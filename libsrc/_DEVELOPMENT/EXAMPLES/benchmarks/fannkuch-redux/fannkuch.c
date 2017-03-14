@@ -9,31 +9,51 @@
 /*
  * COMMAND LINE DEFINES
  *
+ * -DSTATIC
+ * Make locals static.
+ *
  * -DPRINTF
  * Enable printing of results.
  *
  * -DTIMER
  * Insert asm labels into source code at timing points (Z88DK).
  *
+ * -DINLINE
+ * Compiler supports inline functions.
+ *
  * -DCOMMAND
  * Enable reading of N from the command line.
  *
  */
+
+#ifdef STATIC
+   #undef  STATIC
+   #define STATIC            static
+#else
+   #define STATIC
+#endif
 
 #ifdef PRINTF
    #define PRINTF2(a,b)      printf(a,b)
    #define PRINTF3(a,b,c)    printf(a,b,c)
 #else
    #define PRINTF2(a,b)
-   #define PRINTF3(a,b,c)
+   #define PRINTF3(a,b,c)    c
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()       intrinsic_label(TIMER_START)
-   #define TIMER_STOP()        intrinsic_label(TIMER_STOP)
+   #define TIMER_START()     intrinsic_label(TIMER_START)
+   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
    #define TIMER_START()
    #define TIMER_STOP()
+#endif
+
+#ifdef INLINE
+   #undef  INLINE
+   #define INLINE            inline
+#else
+   #define INLINE
 #endif
 
 #ifdef __Z88DK
@@ -54,19 +74,21 @@ int perm [N_MAX];
 int perm1[N_MAX];
 int count[N_MAX];
 
-inline static int max(int a, int b)
+INLINE static int max(int a, int b)
 {
     return a > b ? a : b;
 }
 
 int fannkuchredux(int n)
 {
-    int maxFlipsCount = 0;
-    int permCount = 0;
-    int checksum = 0;
+    STATIC int maxFlipsCount = 0;
+    STATIC int permCount = 0;
+    STATIC int checksum = 0;
 
-    int i;
-    int r = n;
+    STATIC int i;
+    STATIC int r;
+
+    r = n;
 
     for (i=0; i<n; i+=1)
         perm1[i] = i;
