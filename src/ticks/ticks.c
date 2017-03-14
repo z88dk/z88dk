@@ -2951,7 +2951,7 @@ int main (int argc, char **argv){
         ih=1;//break;
     }
   } while ( pc != end && st < counter  );
-  if ( alarmtime != -1 ) {
+  if ( alarmtime != 0 ) {
       /* We running as a test, we should never reach the end, so exit with error */
       exit(1);
   }
