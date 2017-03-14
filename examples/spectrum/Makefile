@@ -1,6 +1,6 @@
 
 
-all: adv_a ansitest enigma fib mm rpn tic sorter snakes dstar dstar_native microman othello othello_udg wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading globe chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
+all: adv_a ansitest enigma fib mm rpn tic sorter dstar dstar_native microman othello othello_udg wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading globe chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
 
 
 adv_a:
