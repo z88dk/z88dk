@@ -48,7 +48,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks bt.bin -start 08dc -end 0a40 -counter 999999999999
+ticks bt.bin -start 08dc -end 0a50 -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -72,10 +72,13 @@ time @ 4MHz  =
 
 
 new/zsdcc
-2699 bytes less page zero
+2690 bytes less page zero
 
-cycle count  = 6576187954
-time @ 4MHz  = 6576187954 / 4*10^6 = 27 min 24 sec
+cycle count  = 6574818298
+time @ 4MHz  = 6574818298 / 4*10^6 = 27 min 24 sec
+
+
+
 
 
 new/sccz80
