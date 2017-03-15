@@ -70,11 +70,9 @@ ELSE
 ENDIF
 	jr		getloop
 .nobs
-IF STANDARDESCAPECHARS
 	cp		10
-ELSE
+	jr		z,getend
 	cp		13
-ENDIF
 	jr		z,getend
 	cp		6
 	jr		nz,nocapslock
