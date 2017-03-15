@@ -157,7 +157,7 @@ int main(int argc, char ** argv)
 #ifdef COMMAND
   int n = atoi(argv[1]);
 #else
-  int n = 3;
+  int n = 1000;
 #endif
   int i;
 

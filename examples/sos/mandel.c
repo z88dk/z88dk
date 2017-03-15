@@ -49,7 +49,7 @@ l110:	     k++;
 		n=l*l; o=m*m;
 
 		if ((n+o)<e) goto l110;
-		color=k&3
+		color=k&3;
 		setcursorpos(y,x);
 		switch (color) {
 			case 1:

@@ -27,8 +27,8 @@ tic:
 sorter:
 	zcc +zx -vn -lndos -create-app ../console/sorter.c -osorter.bin
 
-snakes:
-	zcc +zx -vn  -lndos ../snakes.c -I.. -DJOYSTICK_DIALOG -DSPEED=1500 -create-app -osnakes.bin
+#snakes:
+#	zcc +zx -vn  -lndos ../snakes.c -I.. -DJOYSTICK_DIALOG -DSPEED=1500 -create-app -osnakes.bin
 
 dstar:
 	zcc +zx -vn  -lndos ../dstar.c -I.. -Dspritesize=16 -DSOUND -create-app -odstar.bin

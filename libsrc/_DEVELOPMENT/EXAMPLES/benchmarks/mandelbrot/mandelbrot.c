@@ -13,6 +13,9 @@
 /*
  * COMMAND LINE DEFINES
  *
+ * -DSTATIC
+ * Use statics instead of locals.
+ *
  * -DPRINTF
  * Enable printing of results.
  *
@@ -24,17 +27,24 @@
  *
  */
 
+#ifdef STATIC
+   #undef  STATIC
+   #define STATIC            static
+#else
+   #define STATIC
+#endif
+
 #ifdef PRINTF
    #define PRINTF3(a,b,c)    printf(a,b,c)
    #define PUTC(a,b)         putc(a,b)
 #else
    #define PRINTF3(a,b,c)
-   #define PUTC(a,b)
+   #define PUTC(a,b)         (*output++ = a)
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()       intrinsic_label(TIMER_START)
-   #define TIMER_STOP()        intrinsic_label(TIMER_STOP)
+   #define TIMER_START()     intrinsic_label(TIMER_START)
+   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -51,13 +61,17 @@
 
 #include<stdio.h>
 
+unsigned char *output = (unsigned char *)0xc000;
+
 int main (int argc, char **argv)
 {
-    int w, h, bit_num = 0;
-    char byte_acc = 0;
-    int i, iter = 50;
-    double x, y, limit = 2.0;
-    double Zr, Zi, Cr, Ci, Tr, Ti;
+    STATIC int w, h, bit_num;
+    STATIC unsigned char byte_acc;
+    STATIC int i;
+	 STATIC int iter = 50;
+    STATIC double x, y;
+	 STATIC double limit = 2.0;
+    STATIC double Zr, Zi, Cr, Ci, Tr, Ti;
 
 #ifdef COMMAND
     w = argc > 1 ? atoi(argv[1]) : 60;

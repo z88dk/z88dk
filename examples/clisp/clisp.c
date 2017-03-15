@@ -3,7 +3,7 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.8 2015-07-08 05:57:53 stefano Exp $  */
+/*  $Id: clisp.c,v 1.8 2015/07/08 05:57:53 stefano Exp $  */
 
 /*
 z88dk build hints
@@ -679,7 +679,7 @@ l_eval(long s)
   case TAG_CONS:       /* cons ... function call */
     f = l_car(s);   /* function name or lambda exp */
     a = l_cdr(s);   /* actual argument list */
-#ifndef minimalistic
+#ifndef MINIMALISTIC
     if ((D_GET_TAG(f) == TAG_CONS) && (D_GET_TAG(l_car(f)) == TAG_SYMB) 
         && ((D_GET_DATA(l_car(f)) == KW_LAMBDA))){   /* lambda exp */
       if (eval_args(f, a, av, FTYPE_ANY_ARGS) < 0)
@@ -767,7 +767,7 @@ special(long f, long a)
         return -1;
     }
     break;
-
+#ifndef MINIMALISTIC
   case KW_WHILE:
     if (D_GET_TAG(a) != TAG_CONS)
       return err_msg(errmsg_ill_syntax, 1, f);
@@ -781,6 +781,7 @@ special(long f, long a)
       v = l_eval(l_car(a));
     }
     break;
+#endif
 
 #ifndef MINIMALISTIC
   case KW_AND:

@@ -43,8 +43,8 @@
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()     intrinsic_label(TIMER_START)
-   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+   #define TIMER_START()       __asm__("TIMER_START:")
+   #define TIMER_STOP()        __asm__("TIMER_STOP:")
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -62,7 +62,7 @@
    #include <intrinsic.h>
    #ifdef PRINTF
       // enable printf %u, %ld
-	   #pragma output CLIB_OPT_PRINTF = 0x1002
+      #pragma output CLIB_OPT_PRINTF = 0x1002
    #endif
 #endif
 
@@ -70,6 +70,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define pow(a,b)  powf(a,b)
 
 
 typedef struct tn {

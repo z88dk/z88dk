@@ -22,14 +22,14 @@
  * -DCOMMAND
  * Enable reading of N from the command line.
  *
- * MALLC and FREE
+ * MALLOC and FREE
  * Can be defined to replace malloc() and free().
  *
  */
 
 #ifdef STATIC
    #undef  STATIC
-   #define STATIC static
+   #define STATIC            static
 #else
    #define STATIC
 #endif
@@ -38,13 +38,13 @@
    #define PRINTF3(a,b,c)    printf(a,b,c)
    #define PRINTF4(a,b,c,d)  printf(a,b,c,d)
 #else
-   #define PRINTF3(a,b,c)
+   #define PRINTF3(a,b,c)    c
    #define PRINTF4(a,b,c,d)
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()       intrinsic_label(TIMER_START)
-   #define TIMER_STOP()        intrinsic_label(TIMER_STOP)
+   #define TIMER_START()     intrinsic_label(TIMER_START)
+   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -61,13 +61,12 @@
 #ifdef __Z88DK
    #include <intrinsic.h>
    #ifdef PRINTF
-      // enable printf %u, %li
-	   #pragma output CLIB_OPT_PRINTF = 0x40002
+      // enable printf %u, %ld
+	   #pragma output CLIB_OPT_PRINTF = 0x1002
    #endif
 #endif
 
 
-#include <malloc.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +90,7 @@ treeNode* NewTreeNode(treeNode* left, treeNode* right, long item)
     {
        printf
        (
-          "Out of Memory, item %li\n",
+          "Out of Memory, item %ld\n",
           item
        );
        exit(1);
@@ -145,6 +144,7 @@ int main(int argc, char* argv[])
 {
     STATIC unsigned   N, depth, minDepth, maxDepth, stretchDepth;
     STATIC treeNode   *stretchTree, *longLivedTree, *tempTree;
+    STATIC long       i, iterations, check;
 
 #ifdef COMMAND
     N = atol(argv[1]);
@@ -166,7 +166,7 @@ TIMER_START();
     stretchTree = BottomUpTree(0, stretchDepth);
     PRINTF3
     (
-        "stretch tree of depth %u\t check: %li\n",
+        "stretch tree of depth %u\t check: %ld\n",
         stretchDepth,
         ItemCheck(stretchTree)
     );
@@ -177,8 +177,6 @@ TIMER_START();
 
     for (depth = minDepth; depth <= maxDepth; depth += 2)
     {
-        STATIC long    i, iterations, check;
-
         iterations = pow(2, maxDepth - depth + minDepth);
 
         check = 0;
@@ -196,7 +194,7 @@ TIMER_START();
 
         PRINTF4
         (
-            "%li\t trees of depth %u\t check: %li\n",
+            "%ld\t trees of depth %u\t check: %ld\n",
             iterations * 2,
             depth,
             check
@@ -205,7 +203,7 @@ TIMER_START();
 
     PRINTF3
     (
-        "long lived tree of depth %u\t check: %li\n",
+        "long lived tree of depth %u\t check: %ld\n",
         maxDepth,
         ItemCheck(longLivedTree)
     );
