@@ -1126,18 +1126,81 @@ void scale(int type, TAG_SYMBOL* tag)
 
 void quikmult(int type, int size, char preserve)
 {
-
     if ( type == LONG ) {
+        /* Normal long multiplication is:
+           push, push, ld hl, ld de, call l_long_mult = 11 bytes
+        */
         switch ( size ) {
             case 0:
                 vlongconst(0);
                 break;
             case 1:
-                break;
-            case 2:
+                break;  
+            case 256:  /* 5 bytes */
+                ol("ld\td,e");
+                ol("ld\te,h");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;      
+            case 8: /* 15 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");  
+                /* Fall through */              
+            case 4: /* 10 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");  
+                /* Fall through */            
+            case 2: /* 5 bytes */
                 ol("add\thl,hl");;
                 ol("rl\te");
                 ol("rl\td");   
+                break;
+            case 3: /* 13 bytes */
+                ol("push\tde");
+                ol("push\thl");
+                ol("add\thl,hl");
+                ol("rl\te");
+                ol("rl\td");   
+                ol("pop\tbc");
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ex\tde,hl");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
+                break;
+            case 6:  /* 19 bytes */
+                ol("push\tde");
+                ol("push\thl");
+                ol("add\thl,hl");
+                ol("rl\te");
+                ol("rl\td");   
+                ol("pop\tbc");
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ex\tde,hl");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
+                ol("add\thl,hl");
+                ol("rl\te");
+                ol("rl\td");  
+                break;
+            case 5: /* 19 bytes */
+                ol("push\tde");
+                ol("push\thl");
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");  
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td"); 
+                ol("pop\tbc"); 
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ex\tde,hl");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
                 break;
             default:
                 lpush();       
@@ -1152,6 +1215,10 @@ void quikmult(int type, int size, char preserve)
     switch (size) {
     case 0:
         vconst(0);
+        break;
+    case 256:
+        ol("ld\th,l");
+        ol("ld\tl,0");
         break;
     case 1:
         break;
