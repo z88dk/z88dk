@@ -1301,6 +1301,7 @@ test_clib.lib:
 	$(MAKE) -C stdlib TARGET=test
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
+	$(MAKE) -C time
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 

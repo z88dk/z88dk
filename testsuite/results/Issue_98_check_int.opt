@@ -15,8 +15,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	ld	de,2
-	call	l_mult
+	add	hl,hl
 	ret
 
 

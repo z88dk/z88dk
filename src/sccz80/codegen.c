@@ -1120,13 +1120,41 @@ void scale(int type, TAG_SYMBOL* tag)
         break;
     case STRUCT:
         /* try to avoid multiplying if possible */
-        quikmult(tag->size, YES);
+        quikmult(CINT, tag->size, YES);
     }
 }
 
-void quikmult(int size, char preserve)
+void quikmult(int type, int size, char preserve)
 {
+
+    if ( type == LONG ) {
+        switch ( size ) {
+            case 0:
+                vlongconst(0);
+                break;
+            case 1:
+                break;
+            case 2:
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");   
+                break;
+            default:
+                lpush();       
+                vlongconst(size);
+                callrts("l_long_mult");
+                Zsp += 4;
+        }
+        return;
+    }
+
+
     switch (size) {
+    case 0:
+        vconst(0);
+        break;
+    case 1:
+        break;
     case 16:
         ol("add\thl,hl");;
     case 8:

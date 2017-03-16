@@ -50,7 +50,7 @@ extern void defmesg(void);
 extern void point(void);
 extern int modstk(int newsp, int save,int saveaf);
 extern void scale(int type, TAG_SYMBOL *tag);
-extern void quikmult(int size, char preserve);
+extern void quikmult(int type, int size, char preserve);
 extern void zadd(LVALUE *);
 extern void zsub(LVALUE *);
 extern void mult(LVALUE *);

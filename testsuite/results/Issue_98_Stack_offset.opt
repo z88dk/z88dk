@@ -25,7 +25,7 @@
 	push	bc
 	ld	bc,2
 	push	bc
-	call	l_long_mult
+	call	l_long_div
 	call	l_declong
 	push	de
 	push	hl
@@ -42,11 +42,9 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	ld	bc,0
-	push	bc
-	ld	bc,2
-	push	bc
-	call	l_long_mult
+	add	hl,hl
+	rl	e
+	rl	d
 	push	de
 	push	hl
 	ld	hl,8	;const
