@@ -27,6 +27,7 @@ EXTERN     rcmx_cpdr
 .asmentry
    ld a,e
    add hl,bc
+   dec hl
    cpdr
    inc hl
    ret z

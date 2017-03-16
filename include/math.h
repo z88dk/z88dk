@@ -18,7 +18,7 @@ extern double_t __LIB__ exp(double_t);   /* exponential */
 extern double_t __LIB__ log(double_t);   /* natural logarithm */
 extern double_t __LIB__ log10(double_t); /* log base 10 */
 extern double_t __LIB__ pi();          /* greek pi */
-extern double_t __LIB__ pow(double_t,double_t);   /* pow(x,y) = x**y */
+extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
 extern double_t __LIB__ sin(double_t);   /* sine */
 extern double_t __LIB__ sinh(double_t);  /* hyperbolic sine */
 extern double_t __LIB__ sqrt(double_t);  /* square root */

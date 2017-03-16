@@ -475,6 +475,9 @@ void declglb(
             myptr->flags |= FLOATINGDECL;
             check_trailing_modifiers(myptr);
         }
+        if ( myptr->ident == POINTER ) {
+            myptr->isconst = 0;
+        }
     } while (cmatch(','));
     ns();
 }
@@ -623,6 +626,9 @@ void declloc(
         if ( ptrtofn ) {
             cptr->flags |= FLOATINGDECL;
             check_trailing_modifiers(cptr);
+        }
+        if ( cptr->ident == POINTER ) {
+            cptr->isconst = 0;
         }
     } while (cmatch(','));
     ns();
