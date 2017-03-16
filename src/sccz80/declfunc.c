@@ -299,11 +299,11 @@ void DoFnKR(
         otag = GetVarID(&var, STATIK);
 
         if (var.type == STRUCT) {
-            getarg(STRUCT, otag, NO, 0, 0, var.zfar, NO);
+            getarg(STRUCT, var.ident, otag, NO, 0, 0, var.zfar, NO);
         } else if (var.type || regit) {
             if (regit && var.type == NO)
                 var.type = CINT;
-            getarg(var.type, NULL, NO, 0, var.sign, var.zfar, NO);
+            getarg(var.type, var.ident, NULL, NO, 0, var.sign, var.zfar, NO);
         } else {
             error(E_BADARG);
             break;
@@ -567,9 +567,9 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
         otag = GetVarID(&var, STATIK);
 
         if (var.type == STRUCT) {
-            prevarg = getarg(STRUCT, otag, YES, prevarg, 0, var.zfar, proto);
+            prevarg = getarg(STRUCT, var.ident, otag, YES, prevarg, 0, var.zfar, proto);
         } else if (var.type) {
-            prevarg = getarg(var.type, NULL, YES, prevarg, var.sign, var.zfar, proto);
+            prevarg = getarg(var.type, var.ident, NULL, YES, prevarg, var.sign, var.zfar, proto);
 
         } else {
             warning(W_EXPARG);
@@ -625,6 +625,7 @@ int CheckANSI()
  */
 SYMBOL *getarg(
     int typ, /* typ = CCHAR, CINT, DOUBLE or STRUCT */
+    enum ident_type ident_type,
     TAG_SYMBOL* otag, /* structure tag for STRUCT type objects */
     int deftype, /* YES=ANSI -> addloc NO=K&R -> findloc */
     SYMBOL* prevarg, /* ptr to previous argument, only of use to ANSI */
@@ -643,7 +644,7 @@ SYMBOL *getarg(
 
     while (undeclared) {
         ptrtofn = NO;
-        ident = get_ident(VARIABLE); // TODO
+        ident = get_ident(ident_type); // TODO
         more = 0;
         if ((legalname = symname(n)) == 0) {
             if (!proto) {
