@@ -5,6 +5,36 @@
  * slightly sped up by Petr Prokhorenkov
  */
 
+#ifdef STATIC
+   #undef  STATIC
+   #define STATIC            static
+#else
+   #define STATIC
+#endif
+
+#ifdef PRINTF
+   #define PRINTF2(a,b)      printf(a,b)
+#else
+   #define PRINTF2(a,b)
+#endif
+
+#ifdef TIMER
+   #define TIMER_START()     intrinsic_label(TIMER_START)
+   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+#else
+   #define TIMER_START()
+   #define TIMER_STOP()
+#endif
+
+#ifdef __Z88DK
+   #include <intrinsic.h>
+   #ifdef PRINTF
+      // enable printf %f
+      #pragma output CLIB_OPT_PRINTF = 0x04000000
+   #endif
+#endif
+
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,17 +56,20 @@ struct planet {
  */
 void advance(int nbodies, struct planet * bodies)
 {
-  int i, j;
+  STATIC int i, j;
+  STATIC struct planet *b, *b2;
+  STATIC double dx, dy, dz;
+  STATIC double inv_distance, mag;
 
   for (i = 0; i < nbodies; i++) {
-    struct planet * b = &(bodies[i]);
+    b = &(bodies[i]);
     for (j = i + 1; j < nbodies; j++) {
-      struct planet * b2 = &(bodies[j]);
-      double dx = b->x - b2->x;
-      double dy = b->y - b2->y;
-      double dz = b->z - b2->z;
-      double inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
-      double mag = inv_distance * inv_distance * inv_distance;
+      b2 = &(bodies[j]);
+      dx = b->x - b2->x;
+      dy = b->y - b2->y;
+      dz = b->z - b2->z;
+      inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
+      mag = inv_distance * inv_distance * inv_distance;
       b->vx -= dx * b2->mass * mag;
       b->vy -= dy * b2->mass * mag;
       b->vz -= dz * b2->mass * mag;
@@ -46,7 +79,7 @@ void advance(int nbodies, struct planet * bodies)
     }
   }
   for (i = 0; i < nbodies; i++) {
-    struct planet * b = &(bodies[i]);
+    b = &(bodies[i]);
     b->x += b->vx;
     b->y += b->vy;
     b->z += b->vz;
@@ -55,19 +88,22 @@ void advance(int nbodies, struct planet * bodies)
 
 double energy(int nbodies, struct planet * bodies)
 {
-  double e;
-  int i, j;
+  STATIC double e;
+  STATIC int i, j;
+  STATIC struct planet *b, *b2;
+  STATIC double dx, dy, dz;
+  STATIC double distance;
 
   e = 0.0;
   for (i = 0; i < nbodies; i++) {
-    struct planet * b = &(bodies[i]);
+    b = &(bodies[i]);
     e += 0.5 * b->mass * (b->vx * b->vx + b->vy * b->vy + b->vz * b->vz);
     for (j = i + 1; j < nbodies; j++) {
-      struct planet * b2 = &(bodies[j]);
-      double dx = b->x - b2->x;
-      double dy = b->y - b2->y;
-      double dz = b->z - b2->z;
-      double distance = sqrt(dx * dx + dy * dy + dz * dz);
+      b2 = &(bodies[j]);
+      dx = b->x - b2->x;
+      dy = b->y - b2->y;
+      dz = b->z - b2->z;
+      distance = sqrt(dx * dx + dy * dy + dz * dz);
       e -= (b->mass * b2->mass) / distance;
     }
   }
@@ -76,8 +112,10 @@ double energy(int nbodies, struct planet * bodies)
 
 void offset_momentum(int nbodies, struct planet * bodies)
 {
-  double px = 0.0, py = 0.0, pz = 0.0;
-  int i;
+  STATIC double px, py, pz;
+  STATIC int i;
+  
+  px = py = pz = 0.0;
   for (i = 0; i < nbodies; i++) {
     px += bodies[i].vx * bodies[i].mass;
     py += bodies[i].vy * bodies[i].mass;
@@ -141,7 +179,7 @@ struct planet bodies[NBODIES] = {
  * When all advances done, rescale bodies back to obtain correct energy.
  */
 void scale_bodies(int nbodies, struct planet * bodies, double scale) {
-    int i;
+    STATIC int i;
 
     for (i = 0; i < nbodies; i++) {
         bodies[i].mass *= scale*scale;
@@ -153,16 +191,25 @@ void scale_bodies(int nbodies, struct planet * bodies, double scale) {
 
 int main(int argc, char ** argv)
 {
-  int n = atoi(argv[1]);
   int i;
+  int n = 1000;
+  
+#ifdef COMMAND
+  n = atoi(argv[1]);
+#endif
+
+TIMER_START();
 
   offset_momentum(NBODIES, bodies);
-  printf ("%.9f\n", energy(NBODIES, bodies));
+  PRINTF2("%.9f\n", energy(NBODIES, bodies));
   scale_bodies(NBODIES, bodies, DT);
   for (i = 1; i <= n; i++)  {
     advance(NBODIES, bodies);
   }
   scale_bodies(NBODIES, bodies, RECIP_DT);
-  printf ("%.9f\n", energy(NBODIES, bodies));
+  PRINTF2("%.9f\n", energy(NBODIES, bodies));
+
+TIMER_STOP();
+
   return 0;
 }

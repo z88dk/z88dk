@@ -78,7 +78,6 @@ typedef struct tn {
     long          item;
 } treeNode;
 
-
 treeNode* NewTreeNode(treeNode* left, treeNode* right, long item)
 {
     treeNode*    new;
@@ -178,7 +177,6 @@ TIMER_START();
     for (depth = minDepth; depth <= maxDepth; depth += 2)
     {
         iterations = pow(2, maxDepth - depth + minDepth);
-
         check = 0;
 
         for (i = 1; i <= iterations; i++)
@@ -210,5 +208,4 @@ TIMER_START();
 
 TIMER_STOP();
 
-    return 0;
 } /* main() */

@@ -33,7 +33,7 @@ TIMING
 ======
 
 sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 binary-trees.c -o binary-trees.ihx
-hex2bin binary-trees.ihx
+.\hex2bin binary-trees.ihx
 
 TIMER_START = 0x39a
    0x190 (TIMER_START in binary-trees.sym) -

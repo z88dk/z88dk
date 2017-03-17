@@ -30,7 +30,8 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80
-zcc +cpm -vn -DSTATIC -DTIMER -O2 binary-trees.c -o bt -lm -lndos -lmalloc -m -create-app -pragma-define:USING_amalloc
+zcc +test -vn -DSTATIC -DTIMER -O2 binary-trees.c -o bt -lm -lndos -lmalloc -m -create-app -pragma-define:USING_amalloc
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt -lm -lndos -lmalloc -m -pragma-define:USING_amalloc
 appmake +rom -s 32768 -f 0 -o bt0.bin
 appmake +inject -b bt0.bin -i BT.COM -s 256 -o bt.bin
 
@@ -65,10 +66,10 @@ ZSDCC #9833
 
 
 classic/sccz80
-3886 bytes less cpm overhead
+2919 bytes less page zero
 
-cycle count  = 
-time @ 4MHz  = 
+cycle count  = 323388338
+time @ 4MHz  = 323388338 / 4*10^6 = 80.85 sec
 
 
 new/zsdcc
