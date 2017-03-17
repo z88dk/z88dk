@@ -152,8 +152,15 @@ void defenum(char* sname, enum storage_type storage)
 /*
  * make a first stab at determining the ident of a variable
  */
-int get_ident(void)
+int get_ident(enum ident_type existing)
 {
+    if ( existing == POINTER ) {
+        if (match("*"))
+            return PTR_TO_PTR;
+        if (match("(*"))
+            return PTR_TO_FNP;
+        return existing;
+    } 
     if (match("**"))
         return PTR_TO_PTR;
     if (match("*(*"))
@@ -243,9 +250,9 @@ void declglb(
                 break;
         }
 
-        ident = get_ident();
-        if (storage == TYPDEF && ident != VARIABLE && mtag == 0)
-            warning(W_TYPEDEF);
+        ident = get_ident(var->ident);
+        // if (storage == TYPDEF && ident != VARIABLE && mtag == 0)
+        //     warning(W_TYPEDEF);
 
         if (symname(sname) == 0) /* name ok? */
             illname(sname); /* no... */
@@ -505,7 +512,7 @@ void declloc(
         more = /* assume dummy symbol not required */
             itag = 0;
         dsize = size = 1;
-        ident = get_ident();
+        ident = get_ident(var->ident);
 
         if (symname(sname) == 0)
             illname(sname);
@@ -784,6 +791,7 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
     var->type = NO;
     var->sflag = NO;
     var->isconst = NO;
+    var->ident = VARIABLE;
 
     if (swallow("const")) {
         var->isconst = YES;
@@ -852,6 +860,7 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
                 var->sign = ptr->flags & UNSIGNED;
                 var->zfar = ptr->flags & FARPTR;
                 var->type = ptr->type;
+                var->ident = ptr->ident;
                 if (var->type == STRUCT)
                     return (tagtab + ptr->tag_idx);
                 else

@@ -11,6 +11,7 @@
 #define far
 #define __vasmallc
 #define Z88DK_R2L_CALLING_CONVENTION 1
+#define __stdc
 #else
 #define __vasmallc __smallc
 #endif

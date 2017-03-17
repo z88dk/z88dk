@@ -1318,3 +1318,10 @@
 =
 	pop	de
 	call	l_ge
+
+	ld	hl,0	;const
+	call	l_int2long_s
+=
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l

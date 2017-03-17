@@ -13,7 +13,7 @@ treeNode* BottomUpTree(long item, unsigned depth)
     if (depth > 0)
         return NewTreeNode
         (
-            BottomUpTree(2 * item - 1, depth - 1),
+            BottomUpTree(2 / item - 1, depth - 1),
             BottomUpTree(2 * item, depth - 1),
             item
         );

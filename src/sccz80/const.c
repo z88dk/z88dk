@@ -499,11 +499,15 @@ void size_of(LVALUE* lval)
     needchar('(');
     otag = GetVarID(&var, NO);
     if (var.type != NO) {
-        if (match("**") || cmatch('*'))
-            ident = POINTER;
-        else
-            ident = VARIABLE;
+        ident = var.ident;
+        if ( ident == POINTER && cmatch('*') ) {
 
+        } else {
+            if (match("**") || cmatch('*'))
+                ident = POINTER;
+            else
+                ident = VARIABLE;
+        }
         if (otag && ident == VARIABLE)
             lval->const_val = otag->size;
         if (ident == POINTER) {

@@ -95,17 +95,28 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval))
 {
     char *before, *start;
+    char *before_constlval, *start_constlval;
     int   savesp;
+    int   lval1_wasconst = 0;
 
     savesp = Zsp;
     setstage(&before, &start);
-    lval->stage_add = 0; /* flag as not "..oper 0" syntax */
+    lval->stage_add = NULL; /* flag as not "..oper 0" syntax */
     if (lval->is_const) {
         /* constant on left not loaded yet */
+        lval1_wasconst = 1;
+
+        /* Get RHS */
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        setstage(&before_constlval, &start_constlval);
+
+
         if (lval->const_val == 0)
             lval->stage_add = stagenext;
+
+
+
         if ( lval2->val_type == DOUBLE ) { 
             /* On stack we've got the double, load the constant as a double */
             dpush();
@@ -151,24 +162,26 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
         if (lval2->is_const) {
-            /* constant on right, load primary */
+            /* constant on right, primary loaded */
             if (lval2->const_val == 0)
                 lval->stage_add = start;
+
             /* djm, load double reg for long operators */
             if (lval->val_type == LONG || lval2->val_type == LONG) {
                 vlongconst(lval2->const_val);
                 lval2->val_type = LONG;
-            } else
+            } else {
                 vconst(lval2->const_val);
+            }
+            // TODO: We can do some quickdiv as well surely
             if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
-                clearstage(start, 0);
+                /* Note, a redundant load of lval has been done, this can be taken out by the optimiser */
+                clearstage(before, 0);
                 Zsp = savesp;
                 if (lval->val_type == LONG) {
-                    Zsp += 4;
                     vlongconst(0);
                 } else {
                     vconst(0);
-                    Zsp += 2;
                 }
                 warning(W_DIVZERO);
                 return;
@@ -216,9 +229,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         else
             lval->const_val = calc(lval->const_val, oper, lval2->const_val);
         clearstage(before, 0);
-        /* For long constants we push on stack, have to undo this... */
-        if (lval->val_type == LONG)
-            Zsp += 4;
+        Zsp = savesp;
     } else {
         /* one or both operands not constant */
 
@@ -235,11 +246,26 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             warning(W_OPSG);
 
         /* Special case for multiplication by constant... */
+        if (oper == mult ) {
+            int doquikmult = 0;
+            int32_t const_val;
 
-        if (oper == mult && (lval2->is_const) && (lval->val_type == CINT || lval->val_type == CCHAR)) {
-            clearstage(before, 0);
-            quikmult(lval2->const_val, NO);
-            return;
+            if ( lval2->is_const && (lval->val_type == CINT || lval->val_type == CCHAR || lval->val_type == LONG) ) {
+                doquikmult = 1;
+                const_val = lval2->const_val;
+                clearstage(before, 0);
+            }
+            /* Handle the case that the constant was on the left */
+            if ( lval1_wasconst && (lval2->val_type == CINT || lval2->val_type == CCHAR || lval2->val_type == LONG) ) {
+                doquikmult = 1;
+                const_val = lval->const_val;
+                clearstage(before_constlval, 0);
+            }
+            if ( doquikmult ) {
+                Zsp = savesp;
+                quikmult(lval->val_type, const_val, NO);
+                return;
+            }
         }
         (*oper)(lval);
         lval->binop = oper;

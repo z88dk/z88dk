@@ -774,3 +774,22 @@
 	ld	de,%1
 	call	%2
 	pop	de
+
+	call	l_declong
+.%1
+	ld	hl,%2
+=
+.%1
+	ld	hl,%2
+
+	ld	hl,%1
+	exx
+	ld	hl,%2
+	add	hl,sp
+	ld	sp,hl
+	exx
+=
+	ld	hl,%2
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%1

@@ -1120,13 +1120,108 @@ void scale(int type, TAG_SYMBOL* tag)
         break;
     case STRUCT:
         /* try to avoid multiplying if possible */
-        quikmult(tag->size, YES);
+        quikmult(CINT, tag->size, YES);
     }
 }
 
-void quikmult(int size, char preserve)
+void quikmult(int type, int size, char preserve)
 {
+    if ( type == LONG ) {
+        /* Normal long multiplication is:
+           push, push, ld hl, ld de, call l_long_mult = 11 bytes
+        */
+        switch ( size ) {
+            case 0:
+                vlongconst(0);
+                break;
+            case 1:
+                break;  
+            case 256:  /* 5 bytes */
+                ol("ld\td,e");
+                ol("ld\te,h");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;      
+            case 8: /* 15 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");  
+                /* Fall through */              
+            case 4: /* 10 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");  
+                /* Fall through */            
+            case 2: /* 5 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");   
+                break;
+            case 3: /* 13 bytes */
+                ol("push\tde");
+                ol("push\thl");
+                ol("add\thl,hl");
+                ol("rl\te");
+                ol("rl\td");   
+                ol("pop\tbc");
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ex\tde,hl");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
+                break;
+            case 6:  /* 19 bytes */
+                ol("push\tde");
+                ol("push\thl");
+                ol("add\thl,hl");
+                ol("rl\te");
+                ol("rl\td");   
+                ol("pop\tbc");
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ex\tde,hl");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
+                ol("add\thl,hl");
+                ol("rl\te");
+                ol("rl\td");  
+                break;
+            case 5: /* 19 bytes */
+                ol("push\tde");
+                ol("push\thl");
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");  
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td"); 
+                ol("pop\tbc"); 
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ex\tde,hl");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
+                break;
+            default:
+                lpush();       
+                vlongconst(size);
+                callrts("l_long_mult");
+                Zsp += 4;
+        }
+        return;
+    }
+
+
     switch (size) {
+    case 0:
+        vconst(0);
+        break;
+    case 256:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        break;
+    case 1:
+        break;
     case 16:
         ol("add\thl,hl");;
     case 8:

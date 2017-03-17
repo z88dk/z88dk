@@ -28,19 +28,14 @@
 #ifdef Z88DK_R2L_CALLING_CONVENTION
 
 /* sdcc/sccz80 in r2l mode is a lot more standard */
-
-#ifdef Z88DK_USES_SDCC
 typedef unsigned char * va_list;
-#else
-#define va_list unsigned char *
-#endif
 #define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
 #define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
 #define va_copy(dest, src)      { dest = src; }
 #define va_end(marker)          { marker = (va_list) 0; };
 #else
 
-/* sccz80 variant*/
+/* sccz80 (l2r) variant*/
 #ifndef DEF_GETARG
 #define DEF_GETARG
 extern int __LIB__ getarg(void);
