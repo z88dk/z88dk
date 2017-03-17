@@ -4,7 +4,7 @@
 ;
 ;	int psg_init();
 ;
-;	Set up the PSG
+;	Set up the PSG - most of the existing interfaces are supported
 ;
 ;
 ;	$Id: psg_init.asm,v 1.3 2016-06-10 21:13:58 dom Exp $
@@ -13,26 +13,26 @@
 	SECTION code_clib
 	PUBLIC	psg_init
 	PUBLIC	_psg_init
-	EXTERN		zx_fullerstick
+	EXTERN		zx_soundchip
 
 
 psg_init:
 _psg_init:
-	call	zx_fullerstick
+	call	zx_soundchip
 	ld	a,l
 	and	a
-	ld	hl,$fffd		; select + read
-	ld	bc,$bffd		; write
-	jr	z,nofuller
-	; fuller
 	ld	hl,$ff3f		; select + read
 	ld	bc,$ff5f		; write
-nofuller:
+	jr	z,fullermode
+	
+	ld	hl,$fffd		; select + read
+	ld	bc,$bffd		; write
+fullermode:
+
 	ld	(__psg_select_and_read_port),hl
-	ld	(__psg_write_port),de
+	ld	(__psg_write_port),bc
 
-
-
+do_init:
 	ld	e,@01010101
 	xor a 	; R0: Channel A frequency low bits
 	call outpsg
@@ -42,8 +42,8 @@ nofuller:
 	ld d,12
 psg_iniloop:
 	inc a	; R1-13: set all to 0 but 7 and 11
-	;cp 7
-	;jr z,skip
+	cp 7
+	jr z,skip
 	;cp 11
 	;jr z,skip
 	call outpsg
@@ -63,11 +63,23 @@ outpsg:
 	OUT	(C),a
 	ld	bc,(__psg_write_port)
 	OUT	(C),e
-	ret
+	; ZON-X
+	ld l,a
+	out ($ff),a
+	ld a,e
+	out ($7f),a
+	; ZXM and "William Stuart"
+	ld a,l
+	out ($9f),a
+	ld a,e
+	out ($df),a
 
+	ret
+	
+	
 	SECTION	bss_clib
 	PUBLIC	__psg_select_and_read_port
 	PUBLIC	__psg_write_port
 
-__psg_select_and_read_port:	defw	0
-__psg_write_port:	defw	0	
+__psg_select_and_read_port:   defw	0
+__psg_write_port:            defw	0

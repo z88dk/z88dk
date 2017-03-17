@@ -33,6 +33,16 @@ _set_psg_callee:
     	out	(c),l
 	ld	bc,(__psg_write_port)
 	out	(c),e
+	; ZON-X
+	ld a,l
+	out ($ff),a
+	ld a,e
+	out ($7f),a
+	; ZXM and "William Stuart"
+	ld a,l
+	out ($9f),a
+	ld a,e
+	out ($df),a
 	ret
 
 DEFC ASMDISP_SET_PSG_CALLEE = # asmentry - set_psg_callee

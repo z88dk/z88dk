@@ -1,7 +1,10 @@
 
 
-all: adv_a ansitest enigma fib mm rpn tic sorter dstar dstar_native microman othello othello_udg wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading globe chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
+all: clisp adv_a ansitest enigma fib mm rpn tic sorter snakes dstar dstar_native microman othello othello_udg wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading globe chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
 
+
+clisp:
+	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=1200 -oclisp.bin
 
 adv_a:
 	zcc +zx -vn -lndos ../console/adv_a.c -I../console -create-app -DTAPE -DPICS -DCOMPUTE_SCORE -O3 -zorg=27000 -oadv_a.bin
@@ -27,8 +30,8 @@ tic:
 sorter:
 	zcc +zx -vn -lndos -create-app ../console/sorter.c -osorter.bin
 
-#snakes:
-#	zcc +zx -vn  -lndos ../snakes.c -I.. -DJOYSTICK_DIALOG -DSPEED=1500 -create-app -osnakes.bin
+snakes:
+	zcc +zx -vn  -lndos ../graphics/snakes.c -I.. -DPSG -lm -DJOYSTICK_DIALOG -DSPEED=1500 -create-app -osnakes.bin
 
 dstar:
 	zcc +zx -vn  -lndos ../dstar.c -I.. -Dspritesize=16 -DSOUND -create-app -odstar.bin
