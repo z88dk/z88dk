@@ -43,8 +43,8 @@
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()       __asm__("TIMER_START:")
-   #define TIMER_STOP()        __asm__("TIMER_STOP:")
+   #define TIMER_START()     intrinsic_label(TIMER_START)
+   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
    #define TIMER_START()
    #define TIMER_STOP()
@@ -62,7 +62,7 @@
    #include <intrinsic.h>
    #ifdef PRINTF
       // enable printf %u, %ld
-      #pragma output CLIB_OPT_PRINTF = 0x1002
+	   #pragma output CLIB_OPT_PRINTF = 0x1002
    #endif
 #endif
 
@@ -71,15 +71,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define pow(a,b)  powf(a,b)
-
 
 typedef struct tn {
     struct tn*    left;
     struct tn*    right;
     long          item;
 } treeNode;
-
 
 treeNode* NewTreeNode(treeNode* left, treeNode* right, long item)
 {
@@ -95,7 +92,7 @@ treeNode* NewTreeNode(treeNode* left, treeNode* right, long item)
           "Out of Memory, item %ld\n",
           item
        );
-//       exit(1);
+       exit(1);
     }
 #endif
 
@@ -179,8 +176,7 @@ TIMER_START();
 
     for (depth = minDepth; depth <= maxDepth; depth += 2)
     {
-        iterations = pow(2, maxDepth - depth + minDepth) + 0.5;
-
+        iterations = pow(2, maxDepth - depth + minDepth);
         check = 0;
 
         for (i = 1; i <= iterations; i++)
@@ -212,5 +208,4 @@ TIMER_START();
 
 TIMER_STOP();
 
-    return 0;
 } /* main() */

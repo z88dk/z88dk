@@ -69,20 +69,78 @@ into the code at time begin and time stop points.
 
 When COMMAND is not defined, N=8.
 
-MALLOC and FREE can be defined to replace the standard malloc/free with
-another memory allocation implementation.
-
 
 RESULTS
 =======
 
-1.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library
-2674 bytes less page zero not including heap
 
-cycle count  = 132383340000
-time @ 4MHz  = 132383340000 / 4*10^6 = 9 hrs 11 min 36 sec
+1.
+Z88DK March 18, 2017
+classic / zsdcc #9852
+2910 bytes less page zero
+
+cycle count  = 151251680
+time @ 4MHz  = 151251680 / 4*10^6 = 37.81 sec
+
+2.
+Z88DK March 18, 2017
+classic / sccz80
+2852 bytes less page zero
+
+cycle count  = 159135288
+time @ 4MHz  = 159135288 / 4*10^6 = 39.78 sec
+
+3.
+SDCC 3.6.5 #9852 (MINGW64)
+8626 bytes less page zero
+
+cycle count  = 203788182
+time @ 4MHz  = 203788182 / 4*10^6 = 50.95 sec
+
+Large size caused by float package implemented in C.
+
+4.
+HITECH C MSDOS V750
+4121 bytes exact
+
+cycle count  = 243708728
+time @ 4MHz  = 243708728 / 4x10^6 = 60.93 seconds
+
+5.
+Z88DK March 18, 2017
+new/zsdcc #9852
+2683 bytes less page zero
+
+cycle count  = 6574398908
+time @ 4MHz  = 6574398908 / 4*10^6 = 27 min 24 sec
+
+Issue #113: https://github.com/z88dk/z88dk/issues/113
+
+6.
+Z88DK March 18, 2017
+new / sccz80
+2733 bytes less page zero
+
+cycle count  = 6588490067
+time @ 4MHz  = 6588490067 / 4*10^6 = 27 min 27 sec
+
+Issue #113: https://github.com/z88dk/z88dk/issues/113
+
+7.
+IAR Z80 V4.06A
+4525 bytes less small amount
+
+cycle count  = 7358336547
+time @ 4MHz  = 7358336547 / 4x10^6 = 30 min 40 sec
+
+IAR is likely implementing a heap similar to z88dk's new c library
+where an emphasis is placed on the speed of realloc().
+
+DQ.
+HITECH C CPM V309
+4165 bytes less cpm overhead
+
+Disqualified for incorrect results.
 
 
 BENCHMARKS GAME COMMENTS

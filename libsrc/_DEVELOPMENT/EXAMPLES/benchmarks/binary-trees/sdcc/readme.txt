@@ -19,34 +19,38 @@ After "include <math.h>" add:
 
 #define pow(a,b)  powf(a,b)
 
-Edit sdcc-code/sdcc/device/lib/z80/heap.s to create a stack of 30000 bytes.
-Change this back to 1k after completing this benchmark.
+Add file "heap.s" to create a 20k heap.
 
+Change "iterations = pow(2, maxDepth - depth + minDepth);"
+to: "iterations = pow(2, maxDepth - depth + minDepth) + 0.5;"
 
 VERIFY CORRECT RESULT
 =====================
 
-SDCC does not have any character i/o built into its libraries.
-We'll just trust that correct output is generated.
+Verification is done by targeting CPM.  A very simple putchar + getchar
+calling into BDOS is provided in cpm.s.
+
+Change to the "verify" directory and compile by running "Winmake.bat".
+The resulting "bt.com" file can be run in a cpm emulator to verify results.
 
 TIMING
 ======
 
-sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 binary-trees.c -o binary-trees.ihx
-.\hex2bin binary-trees.ihx
+Change back to the main directory.
+Run Winmake.bat or execute the shell commands listed there.
 
 TIMER_START = 0x39a
    0x190 (TIMER_START in binary-trees.sym) -
    0x188 (_main in binary-trees.sym) +
    0x392 (_main in binary-trees.map)
 
-TIMER_STOP = 0x54a
-   0x340 (TIMER_STOP in binary-trees.sym) -
+TIMER_STOP = 0x55d
+   0x353 (TIMER_STOP in binary-trees.sym) -
    0x188 (_main in binary-trees.sym) +
    0x392 (_main in binary-trees.map)
 
-SIZE = 8607 bytes
-   0x11ce (_CODE in binary-trees.map) +
+SIZE = 8626 bytes
+   0x11e1 (_CODE in binary-trees.map) +
    0x0003 (_HEADER0 in binary-trees.map) +
    0x0002 (_HEADER1 in binary-trees.map) +
    0x0002 (_HEADER2 in binary-trees.map) +
@@ -63,7 +67,7 @@ SIZE = 8607 bytes
 
 The invocation of TICKS looked like this:
 
-ticks binary-trees.bin -start 039a -end 054a -counter 9999999999
+ticks bt.bin -start 039a -end 055d -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -76,7 +80,7 @@ RESULT
 ======
 
 SDCC 3.6.5 #9852 (MINGW64)
-8607 bytes less page zero
+8626 bytes less page zero
 
-cycle count  = 70507108
-time @ 4MHz  = 70507108 / 4*10^6 = 17.63 sec
+cycle count  = 203788182
+time @ 4MHz  = 203788182 / 4*10^6 = 50.95 sec

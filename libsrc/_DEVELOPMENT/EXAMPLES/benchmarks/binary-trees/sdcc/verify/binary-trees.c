@@ -179,7 +179,7 @@ TIMER_START();
 
     for (depth = minDepth; depth <= maxDepth; depth += 2)
     {
-        iterations = pow(2, maxDepth - depth + minDepth);
+        iterations = pow(2, maxDepth - depth + minDepth) + 0.5;
 
         check = 0;
 
