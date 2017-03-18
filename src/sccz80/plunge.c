@@ -97,6 +97,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     char *before, *start;
     char *before_constlval, *start_constlval;
     int   savesp;
+    int   lhs_val_type = lval->val_type;
+    int   rhs_val_type;
     int   lval1_wasconst = 0;
 
     savesp = Zsp;
@@ -109,13 +111,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         /* Get RHS */
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         setstage(&before_constlval, &start_constlval);
 
 
         if (lval->const_val == 0)
             lval->stage_add = stagenext;
-
-
 
         if ( lval2->val_type == DOUBLE ) { 
             /* On stack we've got the double, load the constant as a double */
@@ -161,6 +162,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right, primary loaded */
             if (lval2->const_val == 0)
@@ -205,8 +207,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     /* Attempt to compensate width, so that we are doing double oprs if
  * one of the expressions is a double
  */
-    if (!lval->is_const)
+    if (!lval->is_const) {
         widenlong(lval, lval2);
+    }
     if (lval->ptr_type || lval2->ptr_type) {
         (*oper)(lval);
         //                if (lval->val_type == CPTR) zpop(); /* rest top bits */
@@ -245,8 +248,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);
 
-        /* Special case by constant... */
-        if ( constoper != NULL ) {
+        /* Special case handling for operation by constant */
+        if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || lval2->is_const) ) {
             int doconstoper = 0;
             int32_t const_val;
 
@@ -254,15 +257,17 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 doconstoper = 1;
                 const_val = lval2->const_val;
                 clearstage(before, 0);
+                force(rhs_val_type, lhs_val_type, lval->flags & UNSIGNED ? YES : NO, lval->flags & UNSIGNED ? YES : NO, NO);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == CINT || lval2->val_type == CCHAR || lval2->val_type == LONG) ) {
                 doconstoper = 1;
                 const_val = lval->const_val;
                 clearstage(before_constlval, 0);
+                force(lhs_val_type, rhs_val_type, lval2->flags & UNSIGNED ? YES : NO, lval2->flags & UNSIGNED ? YES : NO, NO);
             }
             if ( doconstoper ) {
-                Zsp = savesp;
+                Zsp = savesp;                
                 constoper(lval, const_val);
                 return;
             }
