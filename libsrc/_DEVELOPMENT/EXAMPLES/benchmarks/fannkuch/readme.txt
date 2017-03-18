@@ -1,6 +1,120 @@
 fannkuch-redux description
 --------------------------
 
+http://benchmarksgame.alioth.debian.org/u64q/program.php?test=fannkuchredux&lang=gcc&id=1
+
+The base source code used for benchmarking is in this directory.
+
+This is modified as little as possible to be compilable by the
+compilers under test and any modified source code is present in
+subdirectories.
+
+When compiling fannkuch, several defines are possible:
+
+/*
+ * COMMAND LINE DEFINES
+ *
+ * -DSTATIC
+ * Make locals static.
+ *
+ * -DPRINTF
+ * Enable printing of results.
+ *
+ * -DTIMER
+ * Insert asm labels into source code at timing points (Z88DK).
+ *
+ * -DINLINE
+ * Compiler supports inline functions.
+ *
+ * -DCOMMAND
+ * Enable reading of N from the command line.
+ *
+ */
+
+STATIC can be optionally defined to improve performance.
+
+All compiles are first checked for correctness by running the program
+with PRINTF defined.  After correctness is verified, time should be
+measured with PRINTF undefined so that execution time of printf is not
+measured.
+
+=====================================
+
+228
+Pfannkuchen(7) = 16
+
+=====================================
+
+TIMER is defined for Z88DK compiles so that assembly labels are inserted
+into the code at time begin and time stop points.
+
+When COMMAND is not defined, the benchmark runs with N=7.
+
+
+RESULTS
+=======
+
+1.
+HITECH C MSDOS V750
+716 bytes exact
+
+cycle count  = 49858382
+time @ 4MHz  = 49858382 / 4x10^6 = 12.46 sec
+
+2.
+Z88DK March 18, 2017
+new / zsdcc #9852
+1082 bytes less page zero
+
+cycle count  = 53329244
+time @ 4MHz  = 53329244 / 4*10^6 = 13.33 sec
+
+3.
+HITECH C CPM V309
+1218 bytes less cpm overhead
+
+cycle count  = 56667034
+time @ 4MHz  = 56667034 / 4*10^6 = 14.17 sec
+
+4.
+IAR Z80 V4.06A
+1347 bytes less small amount
+
+cycle count  = 56708022
+time @ 4MHz  = 56708022 / 4x10^6 = 14.18 sec
+
+5.
+Z88DK March 18, 2017
+classic / zsdcc #9852
+1386 bytes less page zero
+
+cycle count  = 63620883
+time @ 4MHz  = 63620883 / 4*10^6 = 15.91 sec
+
+6.
+SDCC 3.6.5 #9852 (MINGW64)
+1196 bytes less page zero
+
+cycle count  = 67174167
+time @ 4MHz  = 67174167 / 4*10^6 = 16.79 sec
+
+7.
+Z88DK March 18, 2017
+new / sccz80
+1173 bytes less page zero
+
+cycle count  = 89043877
+time @ 4MHz  = 89043877 / 4*10^6 = 22.26 sec
+
+8.
+Z88DK March 18, 2017
+classic / sccz80
+1236 bytes less page zero
+
+cycle count  = 90501905
+time @ 4MHz  = 90501905 / 4*10^6 = 22.63 sec
+
+
 
 Background
 ----------
