@@ -110,8 +110,7 @@ void main (void)
     printf ("\n");
   }
   printf ("Please give the number of runs through the benchmark: ");
-  //scanf ("%d", &Number_Of_Runs);
-  Number_Of_Runs = 1;
+  scanf ("%d", &Number_Of_Runs);
 
   printf ("\n");
 
