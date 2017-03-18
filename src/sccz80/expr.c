@@ -152,9 +152,10 @@ int heir1(LVALUE* lval)
     } else if (match("/=")) {
         oper = doper = zdiv;
         constoper = zdiv_const;
-    } else if (match("%="))
+    } else if (match("%=")) {
         oper = zmod;
-    else if (match(">>=")) {
+        constoper = zmod_const;
+    } else if (match(">>=")) {
         oper = asr;
         constoper = asr_const;
     } else if (match("<<=")) {
@@ -466,7 +467,7 @@ int heir9(LVALUE* lval)
         } else if (cmatch('/')) {
             plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const);
         } else if (cmatch('%')) {
-            plnge2a(heira, lval, &lval2, zmod, zmod, NULL);
+            plnge2a(heira, lval, &lval2, zmod, zmod, zmod_const);
         } else
             return 0;
     }

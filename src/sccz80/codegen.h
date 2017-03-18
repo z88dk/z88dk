@@ -57,6 +57,7 @@ extern void mult_const(LVALUE *lval, int32_t value);
 extern void zdiv(LVALUE *);
 extern void zdiv_const(LVALUE *lval, int32_t value);
 extern void zmod(LVALUE *);
+extern void zmod_const(LVALUE *lval, int32_t value);
 extern void zor(LVALUE *);
 extern void zor_const(LVALUE *lval, int32_t value);
 extern void zxor(LVALUE *);

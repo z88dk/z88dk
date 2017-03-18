@@ -1396,6 +1396,27 @@ void zdiv(LVALUE* lval)
 
 void zdiv_const(LVALUE *lval, int32_t value)
 {
+    if ( lval->val_type == LONG ) {
+        if ( value == 256 ) {
+            ol("ld\tl,h");
+            ol("ld\th,e");
+            ol("ld\te,d");
+            ol("ld\td,0");
+            return;
+        } else if ( value == 65536 ) {
+            swap();
+            const2(0);
+            return;
+        }
+    } else {
+        if ( value == 256 ) {
+            ol("ld\tl,h");
+            ol("ld\th,0");
+            return;
+        }
+    }
+
+
     switch ( value ) {
         case 1:
             break;
@@ -1433,6 +1454,30 @@ void zmod(LVALUE* lval)
             doexx();
         else
             swap();
+    }
+}
+
+void zmod_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG ) {
+        if ( value == 256 ) {
+            ol("ld\th,0");
+            const2(0);
+            return;
+        } else if ( value == 65536 ) {
+            const2(0);
+            return;
+        }
+        lpush();
+        vlongconst(value);
+        zmod(lval);
+    } else {
+        if ( value == 256 ) {
+            ol("ld\th,0");
+            return;
+        }
+        const2(value);
+        zmod(lval);
     }
 }
 
@@ -1538,13 +1583,41 @@ int zor_handle_pow2(int32_t value)
 void zor_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == LONG || lval->val_type == CPTR) {
-        if ( zor_handle_pow2(value) == 0 ) {
+        if ( zor_handle_pow2(value) ) {
+            return;
+        } else if ( (value & 0xFFFFFF00) == 0 ) {
+            ol("ld\ta,l");
+            ot("or\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");
+        } else if ( ( value & 0xFFFF00FF) == 0 ) {
+            ol("ld\ta,h");
+            ot("or\t"); outdec((value % 65536)/256); nl();
+            ol("ld\th,a");            
+       } else if ( ( value & 0xFF00FFFF) == 0 ) {
+            ol("ld\ta,e");
+            ot("or\t"); outdec((value / 65536)%256); nl();
+            ol("ld\te,a");            
+       } else if ( ( value & 0x00FFFFFF) == 0 ) {
+            ol("ld\ta,d");
+            ot("or\t"); outdec((value / 65536)/256); nl();
+            ol("ld\td,a");            
+        } else {
             lpush();
             vlongconst(value);
             zor(lval);
         }
     } else {
-        if ( zor_handle_pow2(value % 65536) == 0 ) {
+        if ( zor_handle_pow2(value % 65536) ) {
+            return;
+        } else if ( ((value % 65536) & 0xff00) == 0 ) {
+            ol("ld\ta,l");
+            ot("or\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");    
+        } else if ( ((value % 65536) & 0x00ff) == 0 ) {
+            ol("ld\ta,h");
+            ot("or\t"); outdec((value % 65536) / 256); nl();
+            ol("ld\th,a");    
+        } else {
             vconst(value);
             zor(lval);
         }        
