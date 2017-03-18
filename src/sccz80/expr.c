@@ -61,7 +61,9 @@ int heir1(LVALUE* lval)
 {
     char *before, *start;
     LVALUE lval2, lval3;
-    void (*oper)(LVALUE *lval), (*doper)(LVALUE *lval);
+    void (*oper)(LVALUE *lval) = NULL;
+    void  (*doper)(LVALUE *lval) = NULL;
+    void (*constoper)(LVALUE *lval, int32_t constvalue) = NULL;
     int k;
 
     ClearCast(&lval2);
@@ -132,27 +134,32 @@ int heir1(LVALUE* lval)
         force(lval->val_type, lval2.val_type, lval->flags & UNSIGNED, lval2.flags & UNSIGNED, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
-    } else if (match("|="))
+    } else if (match("|=")) {
         oper = zor;
-    else if (match("^="))
+        constoper = zor_const;
+    } else if (match("^="))
         oper = zxor;
-    else if (match("&="))
+    else if (match("&=")) {
         oper = zand;
-    else if (match("+="))
+        constoper = zand_const;
+    } else if (match("+="))
         oper = doper = zadd;
     else if (match("-="))
         oper = doper = zsub;
-    else if (match("*="))
+    else if (match("*=")) {
         oper = doper = mult;
-    else if (match("/="))
+        constoper = mult_const;
+    } else if (match("/=")) {
         oper = doper = zdiv;
-    else if (match("%="))
+        constoper = zdiv_const;
+    } else if (match("%="))
         oper = zmod;
-    else if (match(">>="))
+    else if (match(">>=")) {
         oper = asr;
-    else if (match("<<="))
+        constoper = asr_const;
+    } else if (match("<<=")) {
         oper = asl;
-    else
+    } else 
         return k;
 
     /* if we get here we have an oper= */
@@ -173,7 +180,7 @@ int heir1(LVALUE* lval)
     if (oper == zadd || oper == zsub)
         plnge2b(heir1, lval, &lval2, oper);
     else
-        plnge2a(heir1, lval, &lval2, oper, doper);
+        plnge2a(heir1, lval, &lval2, oper, doper, constoper);
 
     /*
      * djm 23/2/99 Major flaw in the plan here Ron, we don't check the
@@ -285,7 +292,7 @@ int heir2b(LVALUE* lval)
     return skim("&&", testjump, jumpnc, 0, 1, heir2, lval);
 }
 
-int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval))
+int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value))
 {
     LVALUE lval2;
     int k;
@@ -301,7 +308,7 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVA
     while (1) {
         if ((ch() == opch) && (nch() != '=') && (nch() != opch)) {
             inbyte();
-            plnge2a(heir, lval, &lval2, oper, 0);
+            plnge2a(heir, lval, &lval2, oper, NULL, constoper);
         } else
             return 0;
     }
@@ -309,17 +316,17 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVA
 
 int heir2(LVALUE* lval)
 {
-    return heir234(lval, heir3, '|', zor);
+    return heir234(lval, heir3, '|', zor, zor_const);
 }
 
 int heir3(LVALUE* lval)
 {
-    return heir234(lval, heir4, '^', zxor);
+    return heir234(lval, heir4, '^', zxor, NULL);
 }
 
 int heir4(LVALUE* lval)
 {
-    return heir234(lval, heir5, '&', zand);
+    return heir234(lval, heir5, '&', zand, zand_const);
 }
 
 int heir5(LVALUE* lval)
@@ -338,9 +345,9 @@ int heir5(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("==")) {
-            plnge2a(heir6, lval, &lval2, zeq, zeq);
+            plnge2a(heir6, lval, &lval2, zeq, zeq, NULL);
         } else if (match("!=")) {
-            plnge2a(heir6, lval, &lval2, zne, zne);
+            plnge2a(heir6, lval, &lval2, zne, zne, NULL);
         } else
             return 0;
     }
@@ -366,15 +373,15 @@ int heir6(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("<=")) {
-            plnge2a(heir7, lval, &lval2, zle, zle);
+            plnge2a(heir7, lval, &lval2, zle, zle, NULL);
         } else if (match(">=")) {
-            plnge2a(heir7, lval, &lval2, zge, zge);
+            plnge2a(heir7, lval, &lval2, zge, zge, NULL);
         } else if (ch() == '<' && nch() != '<') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zlt, zlt);
+            plnge2a(heir7, lval, &lval2, zlt, zlt, NULL);
         } else if (ch() == '>' && nch() != '>') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zgt, zgt);
+            plnge2a(heir7, lval, &lval2, zgt, zgt, NULL);
         } else
             return 0;
     }
@@ -402,11 +409,11 @@ int heir7(LVALUE* lval)
         if ((streq(line + lptr, ">>") == 2) && (streq(line + lptr, ">>=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asr, 0);
+            plnge2a(heir8, lval, &lval2, asr, NULL, asr_const);
         } else if ((streq(line + lptr, "<<") == 2) && (streq(line + lptr, "<<=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asl, 0);
+            plnge2a(heir8, lval, &lval2, asl, NULL, NULL);
         } else
             return 0;
     }
@@ -455,11 +462,11 @@ int heir9(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (cmatch('*')) {
-            plnge2a(heira, lval, &lval2, mult, mult);
+            plnge2a(heira, lval, &lval2, mult, mult, mult_const);
         } else if (cmatch('/')) {
-            plnge2a(heira, lval, &lval2, zdiv, zdiv);
+            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const);
         } else if (cmatch('%')) {
-            plnge2a(heira, lval, &lval2, zmod, zmod);
+            plnge2a(heira, lval, &lval2, zmod, zmod, NULL);
         } else
             return 0;
     }

@@ -92,7 +92,7 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval))
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval))
 {
     char *before, *start;
     char *before_constlval, *start_constlval;
@@ -245,25 +245,25 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);
 
-        /* Special case for multiplication by constant... */
-        if (oper == mult ) {
-            int doquikmult = 0;
+        /* Special case by constant... */
+        if ( constoper != NULL ) {
+            int doconstoper = 0;
             int32_t const_val;
 
             if ( lval2->is_const && (lval->val_type == CINT || lval->val_type == CCHAR || lval->val_type == LONG) ) {
-                doquikmult = 1;
+                doconstoper = 1;
                 const_val = lval2->const_val;
                 clearstage(before, 0);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == CINT || lval2->val_type == CCHAR || lval2->val_type == LONG) ) {
-                doquikmult = 1;
+                doconstoper = 1;
                 const_val = lval->const_val;
                 clearstage(before_constlval, 0);
             }
-            if ( doquikmult ) {
+            if ( doconstoper ) {
                 Zsp = savesp;
-                quikmult(lval->val_type, const_val, NO);
+                constoper(lval, const_val);
                 return;
             }
         }
@@ -414,50 +414,15 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             ltype = CINT; /* dodgy maybe 24/4/99 */
         }
         if (lval->ptr_type == CINT && lval2->ptr_type == CINT) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(1);
-            } else {
-                swap();
-                vconst(1);
-            }
-            asr(lval); /*  div by 2  */
+            zdiv_const(lval,2);  /* Divide by two */
         } else if (lval->ptr_type == CPTR && lval2->ptr_type == CPTR) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(3);
-            } else {
-                swap();
-                vconst(3);
-            }
-            zdiv(lval);
+            zdiv_const(lval,3);
         } else if (lval->ptr_type == LONG && lval2->ptr_type == LONG) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(2);
-            } else {
-                swap();
-                vconst(2);
-            }
-            asr(lval); /* div by 4 */
+            zdiv_const(lval,4); /* div by 4 */
         } else if (lval->ptr_type == DOUBLE && lval2->ptr_type == DOUBLE) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(6);
-            } else {
-                swap();
-                vconst(6);
-            }
-            zdiv(lval); /* div by 6 */
+            zdiv_const(lval,6); /* div by 6 */
         } else if (lval->ptr_type == STRUCT && lval2->ptr_type == STRUCT) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(lval->tagsym->size);
-            } else {
-                swap();
-                vconst(lval->tagsym->size);
-            }
-            zdiv(lval);
+            zdiv_const(lval, lval->tagsym->size);
         }
     }
     result(lval, lval2);

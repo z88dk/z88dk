@@ -2234,3 +2234,31 @@
 	ld	hl,%1
 =
 	ld	hl,%1
+
+	push	hl
+	call	l_gint	;%1
+	ld	a,h
+	and	%2
+	ld	h,a
+	ld	l,0
+	pop	de
+	call	l_pint
+=
+	inc	hl
+	ld	a,(hl)
+	and	%2
+	ld	(hl),a
+	dec	hl
+	ld	(hl),0
+	ld	h,a
+	ld	l,0
+
+	set	%1,d
+	pop	de
+=
+	pop	de
+
+	set	%1,e
+	pop	de
+=
+	pop	de
