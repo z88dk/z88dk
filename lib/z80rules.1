@@ -2262,3 +2262,71 @@
 	pop	de
 =
 	pop	de
+
+	ld	de,0	;const
+	ex	de,hl
+	call	l_eq
+	ccf
+	jp	nc,%1
+	pop	hl
+=
+	ld	a,h
+	or	l
+	jp	z,%1
+	pop	hl
+
+	ld	hl,0	;const
+	call	l_eq
+	jp	nc,%1
+	ld	hl,%2
+=
+	ld	a,d
+	or	e
+	jr	nz,%1
+	ld	hl,%2
+
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ld	de,%1
+	ld	hl,%2
+	add	hl,hl
+	add	hl,de
+
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	%3c	hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ld	de,%1
+	ld	hl,%2
+	%3c	hl
+	add	hl,hl
+	add	hl,de
+
+	ld	e,a
+	ld	d,0
+	ld	a,d
+	or	e
+	jr	%1
+=
+	ld	e,a
+	ld	d,0
+	and	a
+	jr	%1
+
+	call	l_gint	;%2
+	ld	de,%1
+	ex	de,hl
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1

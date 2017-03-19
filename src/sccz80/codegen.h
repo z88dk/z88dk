@@ -66,6 +66,7 @@ extern void zand_const(LVALUE *lval, int32_t value);
 extern void asr(LVALUE *);
 extern void asr_const(LVALUE *lval, int32_t value);
 extern void asl(LVALUE *);
+extern void asl_const(LVALUE *lval, int32_t value);
 extern void lneg(LVALUE *);
 extern void neg(LVALUE *);
 extern void com(LVALUE *);

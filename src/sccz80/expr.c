@@ -160,6 +160,7 @@ int heir1(LVALUE* lval)
         constoper = asr_const;
     } else if (match("<<=")) {
         oper = asl;
+        constoper = asl_const;
     } else 
         return k;
 
@@ -414,7 +415,7 @@ int heir7(LVALUE* lval)
         } else if ((streq(line + lptr, "<<") == 2) && (streq(line + lptr, "<<=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asl, NULL, NULL);
+            plnge2a(heir8, lval, &lval2, asl, NULL, asl_const);
         } else
             return 0;
     }

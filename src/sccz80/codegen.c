@@ -1396,7 +1396,7 @@ void zdiv(LVALUE* lval)
 
 void zdiv_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG ) {
+    if ( lval->val_type == LONG && utype(lval) ) {
         if ( value == 256 ) {
             ol("ld\tl,h");
             ol("ld\th,e");
@@ -1408,7 +1408,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
             const2(0);
             return;
         }
-    } else {
+    } else if ( utype(lval) ) {
         if ( value == 256 ) {
             ol("ld\tl,h");
             ol("ld\th,0");
@@ -1435,6 +1435,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
                 vlongconst(value);
             } else {
                 const2(value);
+                swap();
             }
             zdiv(lval);
     }
@@ -1472,12 +1473,39 @@ void zmod_const(LVALUE *lval, int32_t value)
         vlongconst(value);
         zmod(lval);
     } else {
-        if ( value == 256 ) {
-            ol("ld\th,0");
-            return;
+        switch ( value ) {
+            case 256:
+                ol("ld\th,0");
+                break;
+            case 1:
+                vconst(0);
+                break;
+            case 2:
+                zand_const(lval,1);
+                break;
+            case 4:
+                zand_const(lval, 3);
+                break;
+            case 8:
+                zand_const(lval,7);
+                break;
+            case 16:
+                zand_const(lval,15);
+                break;
+            case 32:
+                zand_const(lval, 31);
+                break;
+            case 64:
+                zand_const(lval,63);
+                break;
+            case 128:
+                zand_const(lval,127);
+                break;
+            default:
+                const2(value);
+                swap();
+                zmod(lval);
         }
-        const2(value);
-        zmod(lval);
     }
 }
 
@@ -1748,6 +1776,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\tl");
         } else {
             const2(value);
+            swap();
             asr(lval);
         }
     }
@@ -1766,6 +1795,82 @@ void asl(LVALUE* lval)
         break;
     default:
         callrts("l_asl");
+    }
+}
+
+void asl_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG  ) { 
+        switch ( value ) {
+            case 0: 
+                return;
+            case 24: // 6 bytes
+                ol("ld\td,l");
+                ol("ld\te,0");
+                vconst(0);
+                break;
+            case 17: // 5 bytes
+                ol("add\thl,hl");
+                // Fall through
+            case 16: // 4 bytes
+                swap();
+                vconst(0);
+                break;
+            case 8: // 5 bytes
+                ol("ld\td,e");
+                ol("ld\te,h");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;         
+            case 1: /* 5 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");   
+                break;
+            default: //  5 bytes
+                loadargc( value % 32 );
+                callrts("l_long_aslo");
+                break;
+        }
+
+    } else {
+        switch ( value ) {
+            case 10:  // 7 bytes
+                ol("sla\tl");
+                ol("sla\tl");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;
+            case 9: // 6 bytes
+                ol("sla\tl");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;
+            case 8: // 3 bytes
+                ol("ld\th,l");
+                ol("ld\tl,0");
+            case 7:
+                ol("add\thl,hl");
+            case 6:
+                ol("add\thl,hl");
+                // Fall through
+            case 5:
+                 ol("add\thl,hl");
+            case 4:
+                ol("add\thl,hl");
+            case 3:
+                ol("add\thl,hl");
+            case 2:
+                ol("add\thl,hl");
+            case 1:
+                ol("add\thl,hl");
+                break;
+            default: // 7 bytes
+                const2(value);
+                swap();
+                asl(lval);
+                break;
+        }
     }
 }
 
