@@ -9,10 +9,13 @@ This is modified as little as possible to be compilable by the
 compilers under test and any modified source code is present in
 subdirectories.
 
-When compiling binary-trees, several defines are possible:
+When compiling fasta, several defines are possible:
 
 /*
  * COMMAND LINE DEFINES
+ *
+ * -DSTATIC
+ * Make locals static.
  *
  * -DPRINTF
  * Enable printing of results.
@@ -43,12 +46,20 @@ RESULTS
 =======
 
 1.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library
-2674 bytes less page zero not including heap
+Z88DK March 18, 2017
+zsdcc #9852 / new
+3144 bytes less page zero
 
-cycle count  = 132383340000
-time @ 4MHz  = 132383340000 / 4*10^6 = 9 hrs 11 min 36 sec
+cycle count  = 251825519
+time @ 4MHz  = 251825519 / 4*10^6 = 62.96 sec
+
+2.
+Z88DK March 18, 2017
+zsdcc #9852 / classic
+3519 bytes less page zero
+
+cycle count  = 256212331
+time @ 4MHz  = 256212331 / 4*10^6 = 64.05 sec
 
 
 BENCHMARKS GAME COMMENTS
