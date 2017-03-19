@@ -1427,7 +1427,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
             asr_const(lval,2);
             break;
         case 8:
-            asr_const(lval,2);
+            asr_const(lval,3);
             break;
         default:
             if ( lval->val_type == LONG || lval->val_type == CPTR ) {
@@ -1629,7 +1629,7 @@ void zor_const(LVALUE *lval, int32_t value)
             ol("ld\ta,d");
             ot("or\t"); outdec((value / 65536)/256); nl();
             ol("ld\td,a");            
-        } else {
+        } else if ( value != 0 ) {
             lpush();
             vlongconst(value);
             zor(lval);
@@ -1645,7 +1645,7 @@ void zor_const(LVALUE *lval, int32_t value)
             ol("ld\ta,h");
             ot("or\t"); outdec((value % 65536) / 256); nl();
             ol("ld\th,a");    
-        } else {
+        } else if ( value != 0 ) {
             vconst(value);
             zor(lval);
         }        
@@ -1761,7 +1761,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\te");
             ol("rr\th");
             ol("rr\tl");
-        } else {
+        } else if ( value != 0 ) {
             lpush();
             vlongconst(value);
             asr(lval);
@@ -1774,7 +1774,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sra\th");
             }
             ol("rr\tl");
-        } else {
+        } else if ( value != 0 ) {
             const2(value);
             swap();
             asr(lval);
@@ -1835,6 +1835,8 @@ void asl_const(LVALUE *lval, int32_t value)
 
     } else {
         switch ( value ) {
+            case 0:
+                return;
             case 10:  // 7 bytes
                 ol("sla\tl");
                 ol("sla\tl");
