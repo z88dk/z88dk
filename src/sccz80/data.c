@@ -69,7 +69,6 @@ int defstatic, filenum; /* next argument to be used */
 char c_default_unsigned, fnflags, c_mathz88, c_compact_code;
 
 int nxtlab, /* next avail label # */
-    dublab, /* label # relative to double pool */
     glblab, /* For initializing global literals */
 
     litlab, /* label # assigned to literal pool */

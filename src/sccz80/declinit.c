@@ -301,6 +301,7 @@ constdecl:
                     if ( c_double_strings ) {
                         error(E_STATIC_DOUBLE_STRING);
                     } else {
+                        // TODO: This should be a real double
                         dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         defbyte();
                         for ( i = 0; i < 6; i++ ) {
@@ -340,6 +341,7 @@ constdecl:
                       if ( c_double_strings ) {
                         error(E_STATIC_DOUBLE_STRING);
                     } else {
+                        // TODO: Do it properly - make it a real double
                         dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         for ( i = 0; i < 6; i++ ) {
                             stowlit(fa[i], 1);

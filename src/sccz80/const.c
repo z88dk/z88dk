@@ -21,12 +21,22 @@
 #include "ccdefs.h"
 
 #include <math.h>
+#include "lib/utlist.h"
 
 static int get_member_size(TAG_SYMBOL *ptr);;
-static int32_t search_litq_for_doublestr(unsigned char* num);
 
 
 
+typedef struct elem_s {
+    struct elem_s *next;
+    int            refcount;
+    int            litlab;
+    unsigned char  fa[6];      /* The parsed representation */
+    char           str[60];    /* A raw string version */
+} elem_t;
+
+
+static elem_t    *double_queue = NULL;
 
 
 /* Modified slightly to sort have two pools - one for strings and one
@@ -43,21 +53,6 @@ int constant(LVALUE* lval)
     if (fnumber(lval)) {
         load_double_into_fa(lval);
         lval->val_type = DOUBLE;
-        #if 0
-        if (c_double_strings) {
-            immedlit(litlab);
-            outdec(lval->const_val);
-            nl();
-            callrts("__atof2");
-            WriteDefined("math_atof", 1);
-        } else {
-            immedlit(dublab);
-            outdec(lval->const_val);
-            nl();
-            callrts("dload");
-        }
-        lval->is_const = 0; /*  floating point not constant */
-        #endif
         lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(lval) || pstr(lval)) {
@@ -83,7 +78,6 @@ int constant(LVALUE* lval)
 
 int fnumber(LVALUE *lval)
 {
-    unsigned char sum[6];
     int i,k; /* flag and mask */
     char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
@@ -131,78 +125,9 @@ int fnumber(LVALUE *lval)
 
     lval->const_val = dval;
 
-#if 0
-    dofloat(dval, sum, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
-    /* get location for result & bump litptr */
-    if (c_double_strings) {
-        *val = stash_double_str(start, lptr + line);
-        return (1);
-    } else {
-        *val = search_litq_for_doublestr(sum);
-    }
-#endif
     return (1); /* report success */
 }
 
-/* stash a double string in the literal pool */
-
-int stash_double_str(char* start, char* end)
-{
-    int len;
-    int32_t val;
-    char* buf;
-
-    len = end - start;
-
-    if (*(start + len - 1) == ' ')
-        len--;
-
-    buf = malloc(len + 1);
-
-    if (buf == NULL) {
-        error(E_LITQOV); /* As good as any really.. */
-    }
-    strncpy(buf, start, len);
-    *(buf + len) = 0;
-    storeq(len + 1, (unsigned char*)buf, &val);
-    FREENULL(buf);
-    return (val);
-}
-
-/* Search through the literal queue searching for a match with our
- * number - saves space etc etc
- */
-
-static int32_t search_litq_for_doublestr(unsigned char* num)
-{
-    unsigned char* tempdub;
-    int dubleft, k, match;
-
-    dubleft = dubptr;
-    tempdub = dubq;
-    while (dubleft) {
-        /* Search through.... */
-        match = 0;
-        for (k = 0; k < 6; k++) {
-            if (*tempdub++ == num[k])
-                match++;
-        }
-        if (match == 6)
-            return (dubptr - dubleft);
-        dubleft -= 6;
-    }
-    /* Put it in the double queue now.. */
-    if (dubptr + 6 >= FNMAX) {
-        error(E_DBOV);
-        return (0);
-    }
-
-    for (k = 0; k < 6; k++) {
-        *tempdub++ = num[k];
-    }
-    dubptr += 6;
-    return (dubptr - 6);
-}
 
 int number(LVALUE *lval)
 {
@@ -636,27 +561,103 @@ void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 }
 
 
+elem_t *get_elem_for_fa(unsigned char fa[6]) 
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( memcmp(elem->fa, fa, 6) == 0 ) {
+            return elem;
+        }
+    }
+    elem = MALLOC(sizeof(*elem));
+    elem->refcount = 0;
+    elem->litlab = getlabel();
+    memcpy(elem->fa, fa, 6);
+    LL_APPEND(double_queue, elem);
+    return elem;
+}
+
+elem_t *get_elem_for_buf(char *str) 
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( strcmp(elem->str, str) == 0 ) {
+            return elem;
+        }
+    }
+    elem = MALLOC(sizeof(*elem));
+    elem->litlab = getlabel();
+    elem->refcount = 0;
+    strcpy(elem->str,str);
+    LL_APPEND(double_queue, elem);
+    return elem;
+}
+
+
+
+void write_double_queue(void)
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( elem->refcount ) {
+            output_section("rodata_compiler"); // output_section("text");
+            prefix();
+            queuelabel(elem->litlab);
+            col();
+            nl();
+            if ( c_double_strings ) {
+                defmesg(); outstr(elem->str); outstr("\"\n");
+                defbyte(); outdec(0); nl();
+            } else {
+                outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
+            }
+        }
+    }
+    nl();
+}
+
+
+void decrement_double_ref(LVALUE *lval)
+{   
+    unsigned char    fa[6];
+    elem_t          *elem;
+    if ( c_double_strings ) {
+        char  buf[40];
+        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        elem = get_elem_for_buf(buf);
+        elem->refcount--;
+    } else {
+        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+        elem = get_elem_for_fa(fa);
+        elem->refcount--;
+    }
+}
+
 void load_double_into_fa(LVALUE *lval)
 {            
     unsigned char    fa[6];
-    int32_t          val;
+    elem_t          *elem;
 
     if ( c_double_strings ) {
         char  buf[40];
-
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        storeq(strlen(buf) + 1, (unsigned char*)buf, &val);
-        immedlit(litlab);
-        outdec(val);
+        elem = get_elem_for_buf(buf);
+        elem->refcount++;
+        immedlit(elem->litlab);
+        outdec(0);
         nl();
         callrts("__atof2");
         WriteDefined("math_atof", 1);
     } else {
         dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
 
-        val = search_litq_for_doublestr(fa);
-        immedlit(dublab);
-        outdec(val);
+        elem = get_elem_for_fa(fa);
+        elem->refcount++;
+        immedlit(elem->litlab);
+        outdec(0);
         nl();
         callrts("dload");
     }

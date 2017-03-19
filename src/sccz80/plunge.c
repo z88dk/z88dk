@@ -231,6 +231,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         /* both operands constant taking respect of sign now,
          * unsigned takes precedence.. 
          */
+         printf("Lval1 %d lval2 %d\n",lval->val_type, lval2->val_type);
+        if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
+        if ( lval2->val_type == DOUBLE ) decrement_double_ref(lval2);
         if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
             lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
         else
@@ -302,18 +305,23 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( lval2->val_type == DOUBLE ) { 
             /* FA holds the right hand side */
             dpush();
-            /* On stack we've got the double, load the constant as a double */
-            vlongconst(val);
-            if ( lval->flags & UNSIGNED ) {
-                convUlong2doub();
+            if ( lval->val_type == DOUBLE ) {
+                load_double_into_fa(lval);
             } else {
-                convSlong2doub();
+                /* On stack we've got the double, load the constant as a double */
+                vlongconst(val);
+                if ( lval->flags & UNSIGNED ) {
+                    convUlong2doub();
+                } else {
+                    convSlong2doub();
+                }
+                lval->val_type = DOUBLE;
             }
-            lval->val_type = DOUBLE;
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zsub ) {
                 callrts("dswap");
             }
+            
         } else if (lval->val_type == LONG) {
             widenlong(lval, lval2);
             lval2->val_type = LONG; /* Kludge */
@@ -349,11 +357,15 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             val = lval2->const_val;
             if ( lval->val_type == DOUBLE ) { 
                 /* On stack we've got the double, load the constant as a double */
-                vlongconst(val);
-                if ( lval2->flags & UNSIGNED ) {
-                    convUlong2doub();
+                if ( lval2->val_type == DOUBLE ) {
+                    load_double_into_fa(lval2);
                 } else {
-                    convSlong2doub();
+                    vlongconst(val);
+                    if ( lval2->flags & UNSIGNED ) {
+                        convUlong2doub();
+                    } else {
+                        convSlong2doub();
+                    }
                 }
                 (*oper)(lval);
             } else {
@@ -399,8 +411,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
     }
     if (lval->is_const &= lval2->is_const) {
+        if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
+        if ( lval2->val_type == DOUBLE ) decrement_double_ref(lval2);
         /* both operands constant */
-        if (oper == zadd)
+        if (oper == zadd) 
             lval->const_val += lval2->const_val;
         else if (oper == zsub)
             lval->const_val -= lval2->const_val;
