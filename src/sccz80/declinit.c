@@ -298,11 +298,15 @@ constdecl:
                     unsigned char  fa[6];
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
-                    dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
-                    defbyte();
-                    for ( i = 0; i < 6; i++ ) {
-                        if ( i ) outbyte(',');
-                        outdec(fa[i]);
+                    if ( c_double_strings ) {
+                        error(E_STATIC_DOUBLE_STRING);
+                    } else {
+                        dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                        defbyte();
+                        for ( i = 0; i < 6; i++ ) {
+                            if ( i ) outbyte(',');
+                            outdec(fa[i]);
+                        }
                     }
                 } else  if (size == 4) {
                     /* there appears to be a bug in z80asm regarding defq */
@@ -331,10 +335,15 @@ constdecl:
                 if ( size == 6 ) {
                     unsigned char  fa[6];
                     int            i;
+
                     /* It was a float, lets parse the float and then dump it */
-                    dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
-                    for ( i = 0; i < 6; i++ ) {
-                        stowlit(fa[i], 1);
+                      if ( c_double_strings ) {
+                        error(E_STATIC_DOUBLE_STRING);
+                    } else {
+                        dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                        for ( i = 0; i < 6; i++ ) {
+                            stowlit(fa[i], 1);
+                        }
                     }
                 } else {
                     stowlit(value, size);

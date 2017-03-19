@@ -74,6 +74,8 @@ int heir1(LVALUE* lval)
     if (lval->is_const) {
         if (lval->val_type == LONG) {
             vlongconst(lval->const_val);
+        } else if (lval->val_type == DOUBLE ) {
+            load_double_into_fa(lval);
         } else {
             vconst(lval->const_val);
         }
@@ -573,7 +575,7 @@ int heira(LVALUE* lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
-        lval->const_val = ~lval->const_val;
+        lval->const_val = ~(int32_t)lval->const_val;
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {

@@ -179,7 +179,7 @@ struct errors {
     { "Cannot assign to compound auto variable \'%s\'", 1 },
 
     { "Attempt to modify const lvalue \'%s\''", 1},
-
+    { "Cannot statically initialise doubles when -doublestr is used", 1},
 };
 
 /*

@@ -23,15 +23,11 @@
 #include <math.h>
 
 static int get_member_size(TAG_SYMBOL *ptr);;
-static int32_t search_litq_for_doublestr(unsigned char *num);;
+static int32_t search_litq_for_doublestr(unsigned char* num);
 
-/*
- * These two variables used whilst loading constants, makes things
- * a little easier to handle - type specifiers..
- */
 
-char constype;
-char conssign;
+
+
 
 /* Modified slightly to sort have two pools - one for strings and one
  * for doubles..
@@ -39,11 +35,15 @@ char conssign;
 
 int constant(LVALUE* lval)
 {
-    constype = CINT;
-    conssign = c_default_unsigned;
+    int32_t val;
+    lval->val_type = CINT;
+    lval->flags &= ~UNSIGNED;
+    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     lval->is_const = 1; /* assume constant will be found */
-    if (fnumber(&lval->const_val)) {
+    if (fnumber(lval)) {
+        load_double_into_fa(lval);
         lval->val_type = DOUBLE;
+        #if 0
         if (c_double_strings) {
             immedlit(litlab);
             outdec(lval->const_val);
@@ -57,36 +57,31 @@ int constant(LVALUE* lval)
             callrts("dload");
         }
         lval->is_const = 0; /*  floating point not constant */
+        #endif
         lval->flags = FLAGS_NONE;
         return (1);
-    } else if (number(&lval->const_val) || pstr(&lval->const_val)) {
-        /* Insert int32_t stuff/int32_t pointer here? */
-        if ((uint32_t)lval->const_val >= 65536LU)
-            constype = LONG;
-
-        lval->val_type = constype;
-        lval->flags = (lval->flags & (~UNSIGNED)) | conssign;
-        if (constype == LONG)
+    } else if (number(lval) || pstr(lval)) {
+        if (lval->val_type == LONG)
             vlongconst(lval->const_val);
         else
             vconst(lval->const_val);
         return (1);
-    } else if (tstr(&lval->const_val)) {
+    } else if (tstr(&val)) {
+        lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
         lval->ptr_type = CCHAR; /* djm 9/3/99 */
         lval->val_type = CINT;
         lval->flags = FLAGS_NONE;
         immedlit(litlab);
-    } else {
-        lval->is_const = 0;
-        return (0);
-    }
-    outdec(lval->const_val);
-    nl();
-    return (1);
+        outdec(lval->const_val);
+        nl();
+        return (1);
+    } 
+    lval->is_const = 0;
+    return (0);
 }
 
-int fnumber(int32_t* val)
+int fnumber(LVALUE *lval)
 {
     unsigned char sum[6];
     int i,k; /* flag and mask */
@@ -129,12 +124,15 @@ int fnumber(int32_t* val)
     dval = strtod(start, &end);
     if (end == start)
         return 0;
-    dofloat(dval, sum, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
 
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
 
+    lval->const_val = dval;
+
+#if 0
+    dofloat(dval, sum, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
     /* get location for result & bump litptr */
     if (c_double_strings) {
         *val = stash_double_str(start, lptr + line);
@@ -142,6 +140,7 @@ int fnumber(int32_t* val)
     } else {
         *val = search_litq_for_doublestr(sum);
     }
+#endif
     return (1); /* report success */
 }
 
@@ -205,14 +204,12 @@ static int32_t search_litq_for_doublestr(unsigned char* num)
     return (dubptr - 6);
 }
 
-int number(int32_t* val)
+int number(LVALUE *lval)
 {
     char c;
     int minus;
     int32_t k;
-    /*
- * djm, set the type specifiers to normal
- */
+
     k = minus = 1;
     while (k) {
         k = 0;
@@ -235,7 +232,7 @@ int number(int32_t* val)
             else
                 k = (k << 4) + ((c & 95) - '7');
         }
-        *val = k;
+        lval->const_val = k;
         goto typecheck;
     }
     if (ch() == '0') {
@@ -245,7 +242,7 @@ int number(int32_t* val)
             if (c < '8')
                 k = k * 8 + (c - '0');
         }
-        *val = k;
+        lval->const_val = k;
         goto typecheck;
     }
     if (numeric(ch()) == 0)
@@ -256,15 +253,19 @@ int number(int32_t* val)
     }
     if (minus < 0)
         k = (-k);
-    *val = k;
+    lval->const_val = k;
 typecheck:
+    lval->val_type = CINT;
+    if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
+        lval->val_type = LONG;
+    }
     while (rcmatch('L') || rcmatch('U') || rcmatch('S')) {
         if (cmatch('L'))
-            constype = LONG;
+            lval->val_type = LONG;
         if (cmatch('U'))
-            conssign = YES; /* unsigned */
+            lval->flags |= UNSIGNED;
         if (cmatch('S'))
-            conssign = NO;
+            lval->flags &= ~UNSIGNED;
     }
     return (1);
 }
@@ -293,18 +294,19 @@ void address(SYMBOL* ptr)
     }
 }
 
-int pstr(int32_t* val)
+int pstr(LVALUE *lval)
 {
     int k;
 
-    constype = CINT;
-    conssign = c_default_unsigned;
+    lval->val_type = CINT;
+    lval->flags &= ~UNSIGNED;
+    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     if (cmatch('\'')) {
         k = 0;
         while (ch() && ch() != '\'')
             k = (k & 255) * 256 + litchar();
         gch();
-        *val = k;
+        lval->const_val = k;
         return (1);
     }
     return (0);
@@ -630,5 +632,32 @@ void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
             fa[4 - i / 2] |= (bit & 0x0f);
         }
         norm = mult - res;
+    }
+}
+
+
+void load_double_into_fa(LVALUE *lval)
+{            
+    unsigned char    fa[6];
+    int32_t          val;
+
+    if ( c_double_strings ) {
+        char  buf[40];
+
+        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        storeq(strlen(buf) + 1, (unsigned char*)buf, &val);
+        immedlit(litlab);
+        outdec(val);
+        nl();
+        callrts("__atof2");
+        WriteDefined("math_atof", 1);
+    } else {
+        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+
+        val = search_litq_for_doublestr(fa);
+        immedlit(dublab);
+        outdec(val);
+        nl();
+        callrts("dload");
     }
 }

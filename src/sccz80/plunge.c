@@ -59,7 +59,9 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
     else if (lval->is_const) {
         if (lval->val_type == LONG)
             vlongconst(lval->const_val);
-        else
+        else if (lval->val_type == DOUBLE ) {
+            load_double_into_fa(lval);
+        } else 
             vconst(lval->const_val);
     }
     if (DoTestJump(lval) || lval->binop == dummy) {
@@ -172,6 +174,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if (lval->val_type == LONG || lval2->val_type == LONG) {
                 vlongconst(lval2->const_val);
                 lval2->val_type = LONG;
+            } else if ( lval2->val_type == DOUBLE ) {
+                load_double_into_fa(lval2);
             } else {
                 vconst(lval2->const_val);
             }
