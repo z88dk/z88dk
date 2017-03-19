@@ -19,12 +19,11 @@
  * initialise global object
  */
 int initials(char* sname,
-    int type, int ident, int dim, int more,
+    int type, enum ident_type ident, int dim, int more,
     TAG_SYMBOL* tag, char zfar, char isconst)
 {
     int size, desize = 0;
     int olddim = dim;
-
     if (cmatch('=')) {
         /* initialiser present */
         defstatic = 1; /* So no 2nd redefine djm */
@@ -33,6 +32,9 @@ int initials(char* sname,
         if (dim == 0)
             dim = -1;
         switch (type) {
+        case DOUBLE:
+            size = 6;
+            break;
         case CCHAR:
             size = 1;
             break;
@@ -92,7 +94,7 @@ int initials(char* sname,
                     desize = dumpzero(size, dim);
                 dim = dim < 0 ? abs(dim + 1) : olddim;
                 cscale(type, tag, &dim);
-                desize = dim;
+                desize = dim;            
             }
         }
         output_section("code_compiler"); // output_section("code");
@@ -187,7 +189,7 @@ int str_init(TAG_SYMBOL* tag)
 /*
  * initialise aggregate
  */
-void agg_init(int size, int type, int ident, int* dim, int more, TAG_SYMBOL* tag)
+void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG_SYMBOL* tag)
 {
     while (*dim) {
         if (ident == ARRAY && type == STRUCT) {
@@ -214,7 +216,7 @@ void agg_init(int size, int type, int ident, int* dim, int more, TAG_SYMBOL* tag
  * this is used for structures and arrays of pointers to char, so that the
  * struct or array is built immediately and the char strings are dumped later
  */
-void init(int size, int ident, int* dim, int more, int dump, int is_struct)
+void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_struct)
 {
     int32_t value;
     int sz; /* number of chars in queue */
@@ -277,7 +279,7 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
             dumpzero(size,*dim);
 #endif
         } else if (constexpr(&value, 1)) {
-        constdecl:
+constdecl:
             if (ident == POINTER) {
 /* 24/1/03 dom - We want to be able to assign values to
                    pointers or they're a bit useless..
@@ -292,7 +294,17 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
             }
             if (dump) {
                 /* struct member or array of pointer to char */
-                if (size == 4) {
+                if ( size == 6 ) {
+                    unsigned char  fa[6];
+                    int      i;
+                    /* It was a float, lets parse the float and then dump it */
+                    dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                    defbyte();
+                    for ( i = 0; i < 6; i++ ) {
+                        if ( i ) outbyte(',');
+                        outdec(fa[i]);
+                    }
+                } else  if (size == 4) {
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
                     outdec(((uint32_t)value % 65536UL) % 256);
@@ -315,8 +327,19 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
                     dumpzero(size, (*dim) - 1);
                 }
 
-            } else
-                stowlit(value, size);
+            } else {
+                if ( size == 6 ) {
+                    unsigned char  fa[6];
+                    int            i;
+                    /* It was a float, lets parse the float and then dump it */
+                    dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                    for ( i = 0; i < 6; i++ ) {
+                        stowlit(fa[i], 1);
+                    }
+                } else {
+                    stowlit(value, size);
+                }
+            }
             --*dim;
         }
     }

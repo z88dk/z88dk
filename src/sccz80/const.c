@@ -24,7 +24,6 @@
 
 static int get_member_size(TAG_SYMBOL *ptr);;
 static int32_t search_litq_for_doublestr(unsigned char *num);;
-static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias);
 
 /*
  * These two variables used whilst loading constants, makes things
@@ -585,7 +584,7 @@ static int get_member_size(TAG_SYMBOL* ptr)
     return (0);
 }
 
-static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
+void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 {
     double norm;
     double x = fabs(raw);

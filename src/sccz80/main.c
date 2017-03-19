@@ -555,6 +555,10 @@ void dumplits(
             else if (size == 0) {
                 defmesg();
                 j = 30;
+            } else if ( size == 6 ) {
+                defbyte();
+                j = 6;
+                size = 1;
             } else
                 defword();
             while (j--) {
