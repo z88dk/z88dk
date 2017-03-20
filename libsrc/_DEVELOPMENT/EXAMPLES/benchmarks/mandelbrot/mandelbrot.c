@@ -70,8 +70,8 @@ int main (int argc, char **argv)
     STATIC int i;
 	 STATIC int iter = 50;
     STATIC double x, y;
-	 STATIC double limit = 2.0;
     STATIC double Zr, Zi, Cr, Ci, Tr, Ti;
+    STATIC double limit = 2.0;
 
 #ifdef COMMAND
     w = argc > 1 ? atoi(argv[1]) : 60;
