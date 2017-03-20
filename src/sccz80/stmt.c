@@ -287,7 +287,8 @@ void doif()
 int doexpr()
 {
     char *before, *start;
-    int type, vconst, val;
+    double val;
+    int type, vconst;
 
     while (1) {
         setstage(&before, &start);
@@ -454,6 +455,8 @@ void doswitch()
  */
 void docase()
 {
+    double value;
+    int    valtype;
     if (swactive == 0)
         error(E_SWITCH);
     if (swnext > swend) {
@@ -461,7 +464,10 @@ void docase()
         return;
     }
     postlabel(swnext->label = getlabel());
-    constexpr(&swnext->value, 1);
+    constexpr(&value,&valtype, 1);
+    if ( valtype == DOUBLE ) 
+        warning(W_DOUBLE_UNEXPECTED);
+    swnext->value = value;
     needchar(':');
     ++swnext;
 }

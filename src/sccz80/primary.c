@@ -696,16 +696,25 @@ void test(int label, int parens)
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(int32_t* val, int flag)
+int constexpr(double *val, int *type, int flag)
 {
     char *before, *start;
-    int con, valtemp;
+    double valtemp;
+    int con;
     int savesp = Zsp;
+    int valtype;
 
     setstage(&before, &start);
-    expression(&con, &valtemp);
-    *val = (long)valtemp;
+    valtype = expression(&con, &valtemp);
+    *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
+    if ( valtype == DOUBLE && con ) {
+        /* Remove double reference since we're scrapping code */
+        LVALUE lval;
+        lval.const_val = valtemp;
+        decrement_double_ref(&lval);
+    }
+    *type = valtype;
     Zsp = savesp;
     if (flag && con == 0)
         error(E_CONSTANT);

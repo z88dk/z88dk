@@ -29,7 +29,8 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 {
     int isscanf = 0;
     uint32_t format_option;
-    int nargs, vconst, val, expr, argnumber;
+    int nargs, vconst, expr, argnumber;
+    double val;
     int watcharg; /* For watching printf etc */
     int minifunc = 0; /* Call cut down version */
     unsigned char protoarg;
@@ -125,8 +126,8 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             } else {
                 if (argnumber == watcharg) {
                     if (ptr)
-                        debug(DBG_ARG1, "Caughtarg!! %s", litq + val + 1);
-                    minifunc = SetMiniFunc(litq + val + 1, &format_option);
+                        debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
+                    minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
                 }
                 if (expr == DOUBLE) {
                     dpush();

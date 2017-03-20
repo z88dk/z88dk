@@ -591,7 +591,12 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
  *      in anycase!!
  */
     if (cmatch('@')) {
-        constexpr(addr, 1);
+        double val;
+        int    valtype;
+        constexpr(&val,&valtype, 1);
+        if ( valtype == DOUBLE ) 
+            warning(W_DOUBLE_UNEXPECTED);
+        *addr = val;
     }
 
     blanks();

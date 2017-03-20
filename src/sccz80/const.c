@@ -31,6 +31,7 @@ typedef struct elem_s {
     struct elem_s *next;
     int            refcount;
     int            litlab;
+    double         value;
     unsigned char  fa[6];      /* The parsed representation */
     char           str[60];    /* A raw string version */
 } elem_t;
@@ -299,14 +300,14 @@ int storeq(int length, unsigned char* queue, int32_t* val)
     return (k);
 }
 
-int qstr(int32_t* val)
+int qstr(double *val)
 {
     int cnt = 0;
 
     if (cmatch('"') == 0)
         return (-1);
 
-    *val = (int32_t)gltptr;
+    *val = gltptr;
     do {
         while (ch() != '"') {
             if (ch() == 0)
@@ -478,9 +479,10 @@ void size_of(LVALUE* lval)
                 }
                 /* Check for index operator on array */
                 if (ptr->ident == ARRAY && rcmatch('[')) {
-                    int val;
+                    double val;
+                    int valtype;
                     needchar('[');
-                    constexpr(&val, 1);
+                    constexpr(&val, &valtype,  1);
                     needchar(']');
                     lval->const_val = get_type_size(ptr->type, tagtab + ptr->tag_idx);
                 }
@@ -561,7 +563,7 @@ void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 }
 
 
-elem_t *get_elem_for_fa(unsigned char fa[6]) 
+elem_t *get_elem_for_fa(unsigned char fa[6], double value) 
 {
     elem_t  *elem;
 
@@ -573,12 +575,13 @@ elem_t *get_elem_for_fa(unsigned char fa[6])
     elem = MALLOC(sizeof(*elem));
     elem->refcount = 0;
     elem->litlab = getlabel();
+    elem->value = value;
     memcpy(elem->fa, fa, 6);
     LL_APPEND(double_queue, elem);
     return elem;
 }
 
-elem_t *get_elem_for_buf(char *str) 
+elem_t *get_elem_for_buf(char *str, double value) 
 {
     elem_t  *elem;
 
@@ -590,6 +593,7 @@ elem_t *get_elem_for_buf(char *str)
     elem = MALLOC(sizeof(*elem));
     elem->litlab = getlabel();
     elem->refcount = 0;
+    elem->value = value;
     strcpy(elem->str,str);
     LL_APPEND(double_queue, elem);
     return elem;
@@ -612,6 +616,7 @@ void write_double_queue(void)
                 defmesg(); outstr(elem->str); outstr("\"\n");
                 defbyte(); outdec(0); nl();
             } else {
+                outfmt("\t;%lf\n",elem->value);
                 outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
             }
         }
@@ -627,11 +632,11 @@ void decrement_double_ref(LVALUE *lval)
     if ( c_double_strings ) {
         char  buf[40];
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        elem = get_elem_for_buf(buf);
+        elem = get_elem_for_buf(buf,lval->const_val);
         elem->refcount--;
     } else {
         dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
-        elem = get_elem_for_fa(fa);
+        elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount--;
     }
 }
@@ -644,7 +649,7 @@ void load_double_into_fa(LVALUE *lval)
     if ( c_double_strings ) {
         char  buf[40];
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        elem = get_elem_for_buf(buf);
+        elem = get_elem_for_buf(buf, lval->const_val);
         elem->refcount++;
         immedlit(elem->litlab);
         outdec(0);
@@ -654,7 +659,7 @@ void load_double_into_fa(LVALUE *lval)
     } else {
         dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
 
-        elem = get_elem_for_fa(fa);
+        elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount++;
         immedlit(elem->litlab);
         outdec(0);

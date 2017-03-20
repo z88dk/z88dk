@@ -249,6 +249,7 @@
 	SECTION	rodata_compiler
 
 .i_2
+	;3.000000
 	defb	0,0,0,0,64,130
 
 

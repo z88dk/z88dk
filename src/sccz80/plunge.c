@@ -60,6 +60,7 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
         if (lval->val_type == LONG)
             vlongconst(lval->const_val);
         else if (lval->val_type == DOUBLE ) {
+            printf("Dropout %lf\n",lval->const_val);
             load_double_into_fa(lval);
         } else 
             vconst(lval->const_val);
@@ -120,7 +121,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (lval->const_val == 0)
             lval->stage_add = stagenext;
 
-        if ( lval2->val_type == DOUBLE ) { 
+        if ( lval2->val_type == DOUBLE && lval2->is_const == 0 ) { 
             /* On stack we've got the double, load the constant as a double */
             dpush();
             vlongconst(lval->const_val);
@@ -290,7 +291,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
     char *before, *start, *before1, *start1;
-    int val, oldsp = Zsp;
+    int oldsp = Zsp;
+    double val;
 
     setstage(&before, &start);
     if (lval->is_const) {
@@ -299,13 +301,16 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             rvalue(lval2);
         val = lval->const_val;
         if (dbltest(lval2, lval)) {
+            int ival = val;
             /* are adding lval to pointer, adjust size */
-            cscale(lval2->ptr_type, lval2->tagsym, &val);
+            cscale(lval2->ptr_type, lval2->tagsym, &ival);
+            val = ival;
         }
-        if ( lval2->val_type == DOUBLE ) { 
+        if ( lval2->val_type == DOUBLE && lval2->is_const == 0 ) { 
             /* FA holds the right hand side */
             dpush();
             if ( lval->val_type == DOUBLE ) {
+                     printf("plnge2b %lf\n",lval->const_val);
                 load_double_into_fa(lval);
             } else {
                 /* On stack we've got the double, load the constant as a double */
@@ -358,6 +363,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval->val_type == DOUBLE ) { 
                 /* On stack we've got the double, load the constant as a double */
                 if ( lval2->val_type == DOUBLE ) {
+                        printf("plnge2b-2 %lf\n",lval2->const_val);
                     load_double_into_fa(lval2);
                 } else {
                     vlongconst(val);
@@ -370,8 +376,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 (*oper)(lval);
             } else {
                 if (dbltest(lval, lval2)) {
+                    int ival = val;
                     /* are adding lval2 to pointer, adjust size */
-                    cscale(lval->ptr_type, lval->tagsym, &val);
+                    cscale(lval->ptr_type, lval->tagsym, &ival);
+                    val = ival;
                 }
                 if (oper == zsub) {
                     /* addition on Z80 is cheaper than subtraction */

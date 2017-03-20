@@ -32,7 +32,7 @@ void ClearCast(LVALUE* lval)
     lval->castlevel = 0;
 }
 
-int expression(int* con, int* val)
+int expression(int  *con, double *val)
 {
     LVALUE lval;
     char type;
@@ -673,7 +673,8 @@ int heirb(LVALUE* lval)
     char *before, *start;
     char *before1, *start1;
     char sname[NAMESIZE];
-    int con, val, direct, k;
+    double dval;
+    int val, con, direct, k, valtype;
     char flags;
     SYMBOL* ptr;
 
@@ -700,7 +701,9 @@ int heirb(LVALUE* lval)
                     zpushde();
                 lval->ident = VARIABLE;
                 zpush();
-                expression(&con, &val);
+                valtype = expression(&con, &dval);
+                // TODO: Check valtype
+                val = dval;
                 needchar(']');
                 if (con) {
                     Zsp += 2; /* undo push */

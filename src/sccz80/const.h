@@ -7,7 +7,7 @@ extern void address(SYMBOL *ptr);
 extern int pstr(LVALUE *lval);
 extern int tstr(int32_t *val);
 extern int storeq(int length, unsigned char *queue,int32_t *val);
-extern int qstr(int32_t *val);
+extern int qstr(double *val);
 extern void stowlit(int value, int size);
 extern unsigned char litchar(void);
 extern void size_of(LVALUE *lval);

@@ -218,13 +218,9 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
  */
 void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_struct)
 {
-    int32_t value;
+    double value;
+    int    valtype;
     int sz; /* number of chars in queue */
-    /*
- * djm 14/3/99 We have to rewrite this bit (ugh!) so that we store
- * our literal in a temporary queue, then if needed, we then dump
- * it out..
- */
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
@@ -243,13 +239,14 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
             dumpzero(size, *dim);
             return;
         } else {
+            int32_t ivalue = value;
             /* Store the literals in the queue! */
-            storeq(sz, glbq, &value);
+            storeq(sz, glbq, &ivalue);
             gltptr = 0;
             defword();
             printlabel(litlab);
             outbyte('+');
-            outdec(value);
+            outdec(ivalue);
             nl();
             --*dim;
             return;
@@ -278,7 +275,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
 #if 0
             dumpzero(size,*dim);
 #endif
-        } else if (constexpr(&value, 1)) {
+        } else if (constexpr(&value, &valtype, 1)) {
 constdecl:
             if (ident == POINTER) {
 /* 24/1/03 dom - We want to be able to assign values to
@@ -298,11 +295,12 @@ constdecl:
                     unsigned char  fa[6];
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
-                    if ( c_double_strings ) {
+                    if ( c_double_strings ) { 
                         error(E_STATIC_DOUBLE_STRING);
                     } else {
                         // TODO: This should be a real double
-                        dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                        printf("Value is %f\n",value);
+                        dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         defbyte();
                         for ( i = 0; i < 6; i++ ) {
                             if ( i ) outbyte(',');
@@ -341,8 +339,9 @@ constdecl:
                       if ( c_double_strings ) {
                         error(E_STATIC_DOUBLE_STRING);
                     } else {
+                        printf("dump2 %lf\n",value);
                         // TODO: Do it properly - make it a real double
-                        dofloat((double)value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                        dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         for ( i = 0; i < 6; i++ ) {
                             stowlit(fa[i], 1);
                         }
