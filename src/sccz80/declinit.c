@@ -298,8 +298,6 @@ constdecl:
                     if ( c_double_strings ) { 
                         error(E_STATIC_DOUBLE_STRING);
                     } else {
-                        // TODO: This should be a real double
-                        printf("Value is %f\n",value);
                         dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         defbyte();
                         for ( i = 0; i < 6; i++ ) {
@@ -339,8 +337,6 @@ constdecl:
                       if ( c_double_strings ) {
                         error(E_STATIC_DOUBLE_STRING);
                     } else {
-                        printf("dump2 %lf\n",value);
-                        // TODO: Do it properly - make it a real double
                         dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         for ( i = 0; i < 6; i++ ) {
                             stowlit(fa[i], 1);

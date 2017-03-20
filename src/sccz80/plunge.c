@@ -60,7 +60,6 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
         if (lval->val_type == LONG)
             vlongconst(lval->const_val);
         else if (lval->val_type == DOUBLE ) {
-            printf("Dropout %lf\n",lval->const_val);
             load_double_into_fa(lval);
         } else 
             vconst(lval->const_val);
@@ -232,7 +231,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         /* both operands constant taking respect of sign now,
          * unsigned takes precedence.. 
          */
-         printf("Lval1 %d lval2 %d\n",lval->val_type, lval2->val_type);
         if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
         if ( lval2->val_type == DOUBLE ) decrement_double_ref(lval2);
         if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
@@ -310,7 +308,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             /* FA holds the right hand side */
             dpush();
             if ( lval->val_type == DOUBLE ) {
-                     printf("plnge2b %lf\n",lval->const_val);
                 load_double_into_fa(lval);
             } else {
                 /* On stack we've got the double, load the constant as a double */
@@ -363,7 +360,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval->val_type == DOUBLE ) { 
                 /* On stack we've got the double, load the constant as a double */
                 if ( lval2->val_type == DOUBLE ) {
-                        printf("plnge2b-2 %lf\n",lval2->const_val);
                     load_double_into_fa(lval2);
                 } else {
                     vlongconst(val);
