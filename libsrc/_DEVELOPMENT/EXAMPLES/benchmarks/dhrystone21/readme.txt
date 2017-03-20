@@ -91,7 +91,7 @@ RESULTS
 
 1.
 Z88DK March 18, 2017
-classic / zsdcc #9852
+zsdcc #9852 / classic c library
 7265 bytes less page zero
 
 cycle count  = 247720320
@@ -101,7 +101,7 @@ DMIPS        = 322.9448 / 1757 = 0.18380
 
 2.
 Z88DK March 18, 2017
-new / zsdcc #9852
+zsdcc #9852 / new c library
 7124 bytes less page zero
 
 cycle count  = 248842927

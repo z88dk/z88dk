@@ -22,41 +22,30 @@
  */
 
 #ifdef STATIC
-   #undef  STATIC
-   #define STATIC            static
+#undef  STATIC
+#define STATIC            static
 #else
-   #define STATIC
+#define STATIC
 #endif
 
 #ifdef PRINTF
-   #define PRINTF2(a,b)      printf(a,b)
-   #define PRINTF3(a,b,c)    printf(a,b,c)
-   #define PUTS(a)           puts(a)
+#define PRINTF2(a,b)      printf(a,b)
+#define PRINTF3(a,b,c)    printf(a,b,c)
+#define PUTS(a)           puts(a)
 #else
-   #define PRINTF2(a,b)
-   #define PRINTF3(a,b,c)
-   #define PUTS(a)
+#define PRINTF2(a,b)
+#define PRINTF3(a,b,c)
+#define PUTS(a)
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()     intrinsic_label(TIMER_START)
-   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+#define TIMER_START()     intrinsic_label(TIMER_START)
+#define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
-   #define TIMER_START()
-   #define TIMER_STOP()
+#define TIMER_START()
+#define TIMER_STOP()
 #endif
 
-#ifdef __Z88DK
-   #include <intrinsic.h>
-   #ifdef PRINTF
-      // enable printf %s
-      #pragma output CLIB_OPT_PRINTF = 0x200
-   #endif
-   #ifdef COMMAND
-      // enable scanf %d
-      #pragma output CLIB_OPT_SCANF = 0x01
-   #endif
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,7 +82,7 @@ void makeCumulative (struct aminoacids * genelist, int count) {
     }
 }
 
-char selectRandom (const struct aminoacids * genelist, int count) {
+char selectRandom (struct aminoacids * genelist, int count) {
     STATIC int i, lo, hi;
 #ifdef STATIC
     static double r;
@@ -118,7 +107,7 @@ char selectRandom (const struct aminoacids * genelist, int count) {
 
 #define LINE_LENGTH (60)
 
-void makeRandomFasta (const char * id, const char * desc, const struct aminoacids * genelist, int count, int n) {
+void makeRandomFasta (char * id, char * desc, struct aminoacids * genelist, int count, int n) {
    STATIC int i, m;
 #ifdef STATIC
    static int todo;
@@ -132,7 +121,6 @@ void makeRandomFasta (const char * id, const char * desc, const struct aminoacid
    PRINTF3(">%s %s\n", id, desc);
 
    for (; todo > 0; todo -= LINE_LENGTH) {
-//       char pick[LINE_LENGTH+1];
        if (todo < LINE_LENGTH) m = todo; else m = LINE_LENGTH;
        for (i=0; i < m; i++) pick[i] = selectRandom(genelist, count);
        pick[m] = '\0';
@@ -140,7 +128,7 @@ void makeRandomFasta (const char * id, const char * desc, const struct aminoacid
    }
 }
 
-void makeRepeatFasta (const char * id, const char * desc, const char *s, int n) {
+void makeRepeatFasta (char * id, char * desc, char *s, int n) {
    STATIC char * ss;
    STATIC int m;
 #ifdef STATIC
@@ -210,12 +198,12 @@ struct aminoacids homosapiens[] = {
 #define HOMOSAPIENS_LEN (sizeof (homosapiens) / sizeof (struct aminoacids))
 
 char *alu =
-   "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG" \
-   "GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA" \
-   "CCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAAT" \
-   "ACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCA" \
-   "GCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGG" \
-   "AGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCC" \
+   "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG"
+   "GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA"
+   "CCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAAT"
+   "ACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCA"
+   "GCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGG"
+   "AGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCC"
    "AGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA";
 
 int main (int argc, char * argv[]) {

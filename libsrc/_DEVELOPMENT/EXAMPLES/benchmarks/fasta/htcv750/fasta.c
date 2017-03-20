@@ -209,7 +209,7 @@ struct aminoacids homosapiens[] = {
 
 #define HOMOSAPIENS_LEN (sizeof (homosapiens) / sizeof (struct aminoacids))
 
-char *alu =
+char alu[] =
    "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG" \
    "GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA" \
    "CCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAAT" \

@@ -9,10 +9,13 @@ This is modified as little as possible to be compilable by the
 compilers under test and any modified source code is present in
 subdirectories.
 
-When compiling binary-trees, several defines are possible:
+When compiling fasta, several defines are possible:
 
 /*
  * COMMAND LINE DEFINES
+ *
+ * -DSTATIC
+ * Make locals static.
  *
  * -DPRINTF
  * Enable printing of results.
@@ -43,12 +46,60 @@ RESULTS
 =======
 
 1.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library
-2674 bytes less page zero not including heap
+HITECH C CPM V309
+4056 bytes less cpm overhead
 
-cycle count  = 132383340000
-time @ 4MHz  = 132383340000 / 4*10^6 = 9 hrs 11 min 36 sec
+cycle count  = 188751954
+time @ 4MHz  = 188751954 / 4*10^6 = 47.19 sec
+
+Surprising result maybe from very fast float library.
+Quite often the float library generates incorrect results
+but not in this program.
+
+2.
+IAR Z80 V4.06A
+6041 bytes less small amount
+
+cycle count  = 223805149
+time @ 4MHz  = 223805149 / 4x10^6 = 55.95 sec
+
+3.
+Z88DK March 18, 2017
+zsdcc #9852 / new c library
+3144 bytes less page zero
+
+cycle count  = 251825519
+time @ 4MHz  = 251825519 / 4*10^6 = 62.96 sec
+
+Internal 48-bit float implementation causes some relative slowdown.
+
+4.
+Z88DK March 18, 2017
+zsdcc #9852 / classic c library
+3519 bytes less page zero
+
+cycle count  = 256212331
+time @ 4MHz  = 256212331 / 4*10^6 = 64.05 sec
+
+Internal 48-bit float implementation causes some relative slowdown.
+
+5.
+SDCC 3.6.5 #9852 (MINGW64)
+6947 bytes less page zero
+
+cycle count  = 488970702
+time @ 4MHz  = 488970702 / 4*10^6 = 122.24 sec
+
+Large size & slow speed largely due to float implementation in C.
+Bugged -DSTATIC prevents potentially faster version from compiling.
+
+DQ.
+HITECH C MSDOS V750
+4121 bytes exact
+
+Disqualified due to incorrect results.
+HTC has problems in its float library and it's likely this is why
+the results are incorrect.
 
 
 BENCHMARKS GAME COMMENTS

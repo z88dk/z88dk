@@ -63,7 +63,7 @@ time @ 4MHz  = 49858382 / 4x10^6 = 12.46 sec
 
 2.
 Z88DK March 18, 2017
-new / zsdcc #9852
+zsdcc #9852 / new c library
 1082 bytes less page zero
 
 cycle count  = 53329244
@@ -85,7 +85,7 @@ time @ 4MHz  = 56708022 / 4x10^6 = 14.18 sec
 
 5.
 Z88DK March 18, 2017
-classic / zsdcc #9852
+zsdcc #9852 / classic c library
 1386 bytes less page zero
 
 cycle count  = 63620883
@@ -100,7 +100,7 @@ time @ 4MHz  = 67174167 / 4*10^6 = 16.79 sec
 
 7.
 Z88DK March 18, 2017
-new / sccz80
+sccz80 / new c library
 1173 bytes less page zero
 
 cycle count  = 89043877
@@ -108,7 +108,7 @@ time @ 4MHz  = 89043877 / 4*10^6 = 22.26 sec
 
 8.
 Z88DK March 18, 2017
-classic / sccz80
+sccz80 / classic c library
 1236 bytes less page zero
 
 cycle count  = 90501905
