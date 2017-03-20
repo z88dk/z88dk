@@ -1,0 +1,210 @@
+;
+;	$Id: Cstartup.s01 1.24 2001/01/04 12:19:06 IPEO Exp $
+;
+
+;----------------------------------------------------------;
+;						      	   ;
+;		    CSTARTUP.S01		      	   ;
+;						      	   ;
+; This file contains the Z80/HD64180 C startup routine     ;
+; and must usually be tailored to suit customer's hardware.;
+;						      	   ;
+; Version:  4.00 [ 28/Apr/94 IJAR]                         ;
+;----------------------------------------------------------;
+
+#define proc64180 ((__TID__&0x010)==0x010)
+
+	NAME	CSTARTUP
+
+	EXTERN	main			; where to begin execution
+	EXTERN	?C_EXIT			; where to go when program is done
+
+#ifdef banking
+#if proc64180
+
+CBAR_addr EQU	3AH	       ; define I/O ports to MMU registers
+CBR_addr  EQU	38H	       ; (See also defines in debug.s01 and l08.s01)
+
+	EXTERN  CBAR_value
+	EXTERN  CBR_value
+#endif
+
+	EXTERN	?BANK_CALL_DIRECT_L08
+#endif
+
+;---------------------------------------------------------------;
+;  CSTACK - The C stack segment					;
+;  								;
+;  Please, see in the link file lnk*.xcl how to increment	;
+;  the stack size without having to reassemble cstartup.s01 !	;
+;---------------------------------------------------------------;
+
+	RSEG	CSTACK
+	DEFS	0			; a bare minimum !
+
+;---------------------------------------------------------------;
+;  Forward declarations of segment used during initialization	;
+;---------------------------------------------------------------;
+	RSEG	UDATA0
+	RSEG	IDATA0
+	RSEG	ECSTR
+	RSEG	TEMP
+	RSEG	DATA0
+	RSEG	WCSTR
+
+	RSEG	CDATA0
+	RSEG	CCSTR
+	RSEG	CONST
+	RSEG	CSTR
+
+	ASEG
+	ORG	0
+init_A
+	JP	init_C
+
+;---------------------------------------------------------------;
+;  RCODE - where the execution actually begins			;
+;---------------------------------------------------------------;
+	RSEG	RCODE
+init_C
+   DI           ;;;;;;;; DISABLE INTERRUPTS
+	LD	SP,.SFE.(CSTACK-1)	; from high to low address
+
+;---------------------------------------------------------------;
+; If hardware must be initiated from assembly or if interrupts	;
+; should be on when reaching main, this is the place to insert	;
+; such code.							;
+;---------------------------------------------------------------;
+
+#ifdef banking
+#if proc64180
+
+;---------------------------------------------------------------;
+; Setting of MMU registers - see chapter "Linking" of manual.	;
+;---------------------------------------------------------------;
+
+	LD	A,CBAR_value			; set CBAR value
+	OUT0	(CBAR_addr),A
+
+	LD	A,CBR_value			; set CBR value
+	OUT0	(CBR_addr),A
+
+#endif
+#endif
+
+;---------------------------------------------------------------;
+; If it is not a requirement that static/global data is set	;
+; to zero or to some explicit value at startup, the following	;
+; line refering to seg_init can be deleted, or commented.	;
+;---------------------------------------------------------------;
+
+	CALL	seg_init
+
+#ifdef banking
+
+	LD	HL,LWRD(main)		; banked call to main()
+	LD	A,BYTE3(main)
+	CALL	?BANK_CALL_DIRECT_L08
+#else
+	CALL	main			; non-banked call to main()
+#endif
+
+;---------------------------------------------------------------;
+; Now when we are ready with our C program we must perform a    ;
+; system-dependent action.  In this case we just stop.		;
+;---------------------------------------------------------------;
+; DO NOT CHANGE THE NEXT LINE OF CSTARTUP IF YOU WANT TO RUN    ;
+; YOUR SOFTWARE WITH THE HELP OF THE C-SPY HLL DEBUGGER.        ;
+;---------------------------------------------------------------;
+
+	JP	?C_EXIT	
+
+;---------------------------------------------------------------;
+; Copy initialized PROMmed code to shadow RAM and clear		;
+; uninitialized variables.					;
+;---------------------------------------------------------------;
+
+seg_init
+
+;---------------------------------------;
+; Zero out UDATA0			;
+;---------------------------------------;
+	LD	HL,.SFE.(UDATA0)
+	LD	DE,.SFB.(UDATA0)
+	CALL	zero_mem
+
+;---------------------------------------;
+; Copy CDATA0 into IDATA0		;
+;---------------------------------------;
+	LD	DE,.SFB.(IDATA0)		;destination address
+	LD	HL,.SFE.(CDATA0)
+	LD	BC,.SFB.(CDATA0)
+	CALL	copy_mem
+
+;---------------------------------------;
+; Copy CCSTR into ECSTR			;
+;---------------------------------------;
+	LD	DE,.SFB.(ECSTR)			;destination address
+	LD	HL,.SFE.(CCSTR)
+	LD	BC,.SFB.(CCSTR)
+
+	; Just fall in to the copy_mem function
+
+;---------------------------------------;
+; Copy memory				;
+;---------------------------------------;
+copy_mem
+	XOR	A
+	SBC	HL,BC
+	PUSH	BC
+	LD	C,L
+	LD	B,H				; BC - that many bytes
+	POP	HL				; source address
+	RET	Z				; If block size = 0 return now
+	LDIR
+	RET
+
+;---------------------------------------;
+; Clear memory				;
+;---------------------------------------;
+zero_mem
+	XOR	A
+again	PUSH	HL
+	SBC	HL,DE
+	POP	HL
+	RET	Z
+	LD	(DE),A
+	INC	DE
+	JR	again
+
+;---------------------------------------------------------------;
+; Interrupt vectors must be inserted here by the user.		;
+;---------------------------------------------------------------;
+
+	COMMON	INTVEC
+
+	ENDMOD	init_A
+
+;---------------------------------------------------------------;
+; Function/module: exit (int code)				;
+;								;
+; When C-SPY is used this code will automatically be replaced   ;
+; by a 'debug' version of exit().				;
+;---------------------------------------------------------------;
+	MODULE	exit
+
+	PUBLIC	exit
+	PUBLIC	?C_EXIT
+
+	RSEG	RCODE
+
+?C_EXIT
+exit	EQU	?C_EXIT
+
+;--------------------------------------------------------------;
+; The next line can be replaced by user defined code.          ;
+;--------------------------------------------------------------;
+        NOP
+	jr $
+
+	END

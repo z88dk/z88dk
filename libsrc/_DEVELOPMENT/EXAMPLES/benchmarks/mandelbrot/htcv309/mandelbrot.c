@@ -28,34 +28,26 @@
  */
 
 #ifdef STATIC
-   #undef  STATIC
-   #define STATIC            static
+#undef  STATIC
+#define STATIC            static
 #else
-   #define STATIC
+#define STATIC
 #endif
 
 #ifdef PRINTF
-   #define PRINTF3(a,b,c)    printf(a,b,c)
-   #define PUTC(a,b)         putc(a,b)
+#define PRINTF3(a,b,c)    printf(a,b,c)
+#define PUTC(a,b)         putc(a,b)
 #else
-   #define PRINTF3(a,b,c)
-   #define PUTC(a,b)         (*output++ = a)
+#define PRINTF3(a,b,c)
+#define PUTC(a,b)         (*output++ = a)
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()     intrinsic_label(TIMER_START)
-   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+#define TIMER_START()     intrinsic_label(TIMER_START)
+#define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
-   #define TIMER_START()
-   #define TIMER_STOP()
-#endif
-
-#ifdef __Z88DK
-   #include <intrinsic.h>
-   #ifdef PRINTF
-      // enable printf %d
-	   #pragma output CLIB_OPT_PRINTF = 0x01
-   #endif
+#define TIMER_START()
+#define TIMER_STOP()
 #endif
 
 
