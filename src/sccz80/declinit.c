@@ -191,17 +191,22 @@ int str_init(TAG_SYMBOL* tag)
  */
 void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG_SYMBOL* tag)
 {
+    int done = 0;
     while (*dim) {
         if (ident == ARRAY && type == STRUCT) {
             /* array of struct */
-            needchar('{');
+            if  ( done == 0 ) {
+                needchar('{');
+            } else if ( cmatch('{') == 0 ) {
+                break;
+            }
             str_init(tag);
             --*dim;
             needchar('}');
         } else {
             init(size, ident, dim, more, (ident == ARRAY && more == CCHAR), 0);
         }
-
+        done++;
         if (cmatch(',') == 0)
             break;
         blanks();
