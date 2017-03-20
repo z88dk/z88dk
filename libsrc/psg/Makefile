@@ -14,13 +14,24 @@ AFILES = \
 	psg_noise_channels.c \
 	psg_tone.c \
 	psg_tone_channels.c \
-	psg_volume.c
+	psg_volume.c \
+	psg_play.c
+
+SIDFILES = \
+	c128/psg_init.c \
+	c128/psg_channels.c \
+	c128/psg_envelope.c \
+	c128/psg_noise.c \
+	c128/psg_tone.c \
+	c128/psg_volume.c
 
 AOBJECTS = $(AFILES:.c=.o)
+SIDOBJECTS = $(SIDFILES:.c=.o)
 
 
 all:    $(AOBJECTS)
 
+c128: $(AOBJECTS) $(SIDOBJECTS)
 
 generic_iy:
 	zcc +test $(CFLAGS) -Ca--IXIY psg_channels.c
@@ -31,12 +42,16 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca--IXIY psg_tone_channels.c
 	zcc +test $(CFLAGS) -Ca--IXIY psg_volume.c
 
+	
+sid_psg:
+
 
 .c.o:
 	zcc +test $(CFLAGS) $*.c
 
 clean:
 	$(RM) -f aquarius/*.o
+	$(RM) -f c128/*.o
 	$(RM) -f cpc/*.o
 	$(RM) -f mc1000/*.o
 	$(RM) -f msx/*.o
