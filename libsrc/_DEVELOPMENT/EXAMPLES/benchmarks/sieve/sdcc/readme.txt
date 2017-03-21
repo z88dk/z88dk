@@ -20,8 +20,11 @@ the labels are instructions.  These can be safely ignored.
 VERIFY CORRECT RESULT
 =====================
 
-SDCC does not have any character i/o built into its libraries.
-We'll just trust that correct output is generated.
+Verification is done by targeting CPM.  A very simple putchar + getchar
+calling into BDOS is provided in cpm.s.
+
+Change to the "verify" directory and compile by running "Winmake.bat".
+The resulting "sieve.com" file can be run in a cpm emulator to verify results.
 
 TIMING
 ======

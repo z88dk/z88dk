@@ -89,23 +89,39 @@ cycle count  = 3714152
 time @ 4MHz  = 3714152 / 4*10^6 = 0.9285 sec
 
 4.
+Z88DK March 18, 2017
+zsdcc #9852 / classic c library
+8521 bytes less page zero
+
+cycle count  = 4513446
+time @ 4MHZ  = 4513446 / 4*10^6 = 1.1284 sec
+
+5.
 HITECH C CPM V309
 8725 bytes less cpm overhead
 
 cycle count  = 4547538
 time @ 4MHz  = 4547538 / 4*10^6 = 1.1369 sec
 
-5.
+6.
 SDCC 3.6.5 #9842 (MINGW64)
 8263 bytes less page zero
 
 cycle count  = 4701570
 time @ 4MHz  = 4701570 / 4*10^6 = 1.1754 sec
 
-6.
+7.
 Z88DK March 2, 2017
 sccz80 / new c library
 8414 bytes less page zero
+
+cycle count  = 5894225
+time @ 4MHz  = 5894225 / 4*10^6 = 1.4736 sec
+
+7.
+Z88DK March 18, 2017
+sccz80 / classic c library
+8566 bytes less page zero
 
 cycle count  = 5894225
 time @ 4MHz  = 5894225 / 4*10^6 = 1.4736 sec

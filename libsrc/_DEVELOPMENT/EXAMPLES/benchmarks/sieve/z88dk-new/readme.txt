@@ -6,12 +6,8 @@ None.
 VERIFY CORRECT RESULT
 =====================
 
-To verify correct results, we compiled for the zx spectrum target
-using all combinations of compilers and libraries:
-
-classic/sccz80
-
-classic/zsdcc
+To verify correct results, compile for the zx spectrum target
+and run in an emulator:
 
 new/sccz80
 zcc +zx -vn -startup=4 -clib=new -O2 -DSTATIC -DTIMER -DPRINTF sieve.c -o sieve -create-app
@@ -30,10 +26,6 @@ To time, the program was compiled for the generic z80 target where
 possible so that a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
-
-classic/sccz80
-
-classic/zsdcc
 
 new/sccz80
 zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER sieve.c -o sieve -m -pragma-include:zpragma.inc -create-app
