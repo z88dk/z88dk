@@ -27,6 +27,12 @@
 #define psgT(hz)		((int)(111861.0 / (hz)))
 #endif
 
+// 1 Mhz clock but the SID is different  
+#ifdef __C128__
+#include <c128/sid.h>
+#define psgT(hz)		((int) (hz/0.0596))
+#endif
+
 #ifdef __MSX__
 #include <msx.h>
 // src clock: 17897725.5 divided internally by 16
@@ -45,7 +51,10 @@
 
 #ifdef __SPECTRUM__
 // src clock: 1773400 divided internally by 16
+// ..but clock differs on other interfaces, so let's permit programmers to override
+#ifndef psgT
 #define psgT(hz)		((int)(110837.5 / (hz)))
+#endif
 #endif
 
 #ifdef __SPRINTER__
@@ -73,17 +82,19 @@
 
 #ifdef __ZX81__
 // ZON-X81 clock: 1625000  divided internally by 16
+#ifndef psgT
 #define psgT(hz)		((int)(101562.0 / (hz)))
+#endif
 #endif
 
 
-// Keep CP/M on at the end of the models list, so it can be overriden
+// Keep CP/M at the end of the models list, so it can be overriden
 
 #ifdef __CPM__
 // This one is tricky.
-// Clock varies, so let's use a generic value which che programmer can override
+// Clock varies, so let's use a generic value which the programmer can override
 #ifndef psgT
-#define psgT(hz)		((int)(85000.0 / (hz)))
+#define psgT(hz)		((int)(100000.0 / (hz)))
 #endif
 #endif
 
