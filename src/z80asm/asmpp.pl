@@ -300,7 +300,8 @@ sub read_lines_it {
 		remove_comments_it(
 		convert_ucase_it(
 		parse_include_it( 
-		read_file_it($file)))))))))));
+		add_label_suffix(
+		read_file_it($file))))))))))));
 }
 
 # read lines from file { text, file, line_nr }, text is chompped
@@ -312,6 +313,20 @@ sub read_file_it {
 	    ienumerate 
 		imap { s/\s+$//; $_ }
 		iter( IO::File->new($path) );
+}
+
+# add ':' after label names
+sub add_label_suffix {
+	my($in) = @_;
+	return 
+		imap {
+			for ($_->{text}) {
+				s/^(\w+)\s+(\w+)/$1: $2/;
+				s/^(\w+)\s*$/$1:/;
+			}
+			$_;
+		}
+		$in;
 }
 
 # parse INCLUDE
@@ -336,14 +351,17 @@ sub remove_comments_it {
 		imap {
 			for ($_->{text}) {
 				s/^\s*;.*//;
-				s/ (?:  (?<qstr>	$QSTR_RE	)
+				s/^\s*\#.*//;
+				s/ (?:  (?<af1>		af\'		)
+				   |	(?<qstr>	$QSTR_RE	)
 				   |	(?<comment>	\s* ; .*	)
 				   |    (?<any>		.	    	)
 				   )
-				 / defined($+{qstr}) 			? $+{qstr} 
+				 / defined($+{af1}) 			? $+{af1} 
+				 : defined($+{qstr}) 			? $+{qstr} 
 				 : defined($+{any})				? $+{any} 
 				 : ""
-				 /egsx;
+				 /egsxi;
 				s/\s+$//;
 			}
 			$_;
