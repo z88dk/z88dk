@@ -646,6 +646,8 @@ void load_double_into_fa(LVALUE *lval)
     unsigned char    fa[6];
     elem_t          *elem;
 
+    fa[0] = fa[1] = fa[2] = fa[3] = fa[4] = fa[5] = 0;
+
     if ( c_double_strings ) {
         char  buf[40];
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
