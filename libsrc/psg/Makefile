@@ -15,7 +15,6 @@ AFILES = \
 	psg_tone.c \
 	psg_tone_channels.c \
 	psg_volume.c \
-	psg_play.c
 
 SIDFILES = \
 	c128/psg_init.c \
