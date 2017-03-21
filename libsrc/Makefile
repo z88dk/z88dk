@@ -1139,11 +1139,12 @@ c128ansi_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C c128 
+	$(MAKE) -C c128
+	$(MAKE) -C psg c128
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lc128
-	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
+	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
 # C128 Base text mode graphics lib - Stefano
 gfx128.lib:

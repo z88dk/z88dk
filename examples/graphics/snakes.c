@@ -7,14 +7,14 @@
 	Build options:
 	-DJOYSTICK_DIALOG	- let the players choose their controllers
 	-DTEXTSWAP			- ZX81 Graphics <> Text mode swap
-	-DPSG				- PSG sound support (e.g. ZON-X on the ZX81, maths library is required)
+	-DPSG -lm			- PSG sound support (e.g. ZON-X on the ZX81, maths library is required)
 	
 	
 	SPEED must be adjusted according to the CPU speed (e.g. must be around 500 on a ZX81):
 	
 	Commodore 128:
 	zcc +c128 -create-app -lgfx128hr -DJOYSTICK_DIALOG -DSPEED=300 snakes.c
-	zcc +c128 -create-app -lgfx128 -DJOYSTICK_DIALOG -DSPEED=500 snakes.c
+	zcc +c128 -create-app -lgfx128 -DJOYSTICK_DIALOG -DSPEED=500 -DPSG -lm snakes.c
 
 	ZX81:
 	zcc +zx81 -create-app -DJOYSTICK_DIALOG -DSPEED=300 snakes.c
@@ -22,6 +22,9 @@
 	zcc +zx81 -create-app -clib=arx -subtype=arx -DJOYSTICK_DIALOG -DTEXTSWAP -DSPEED=100 snakes.c
 	zcc +zx81 -create-app -clib=udg  -DJOYSTICK_DIALOG -DSPEED=300 snakes.c
 	zcc +zx81 -create-app -clib=g007ansi -O3 -DJOYSTICK_DIALOG -DSPEED=200 snakes.c   (SLOW 4 to be added in the BASIC portion)
+	
+	ZX Spectrum:
+	zcc +zx -create-app -lndos -DJOYSTICK_DIALOG -DSPEED=1500 -DPSG -lm snakes.c
 	
 	
 */
