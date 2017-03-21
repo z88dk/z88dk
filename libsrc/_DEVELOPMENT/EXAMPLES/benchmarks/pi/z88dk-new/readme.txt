@@ -7,19 +7,7 @@ The new c library supports a fast integer implementation and a
 small integer implementation.  Both zsdcc and sccz80 can be
 used in combination with the new c library.
 
-The classic c library supports both zsdcc and sccz80.
-
-So these combinations of compilers and integer math implementations
-are under test in z88dk:
-
-classic/sccz80
-classic/zsdcc
-new/sccz80/small
-new/zsdcc/small
-new/sccz80/fast
-new/zsdcc/fast
-
-The default library build is with the small math implementation.
+The default library is built with the small math implementation.
 
 
 VERIFY CORRECT RESULT
@@ -28,14 +16,7 @@ VERIFY CORRECT RESULT
 To verify correct result, we compiled for the zx spectrum target
 all combinations above:
 
-
-1. CLASSIC LIBRARY
-
-classic/sccz80
-
-classic/zsdcc
-
-2. NEW LIBRARY WITH SMALL INTEGER MATH
+1. NEW LIBRARY WITH SMALL INTEGER MATH
 
 new/sccz80/small
 zcc +zx -vn -clib=new -O2 -DSTATIC -DTIMER -DPRINTF pi.c -o pi -create-app
@@ -45,7 +26,7 @@ new/zsdcc/small
 zcc +zx -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTF pi.c -o pi -create-app
 zcc +zx -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTF pi_ldiv.c -o pi_ldiv -create-app
 
-3. NEW LIBRARY WITH FAST INTEGER MATH
+2. NEW LIBRARY WITH FAST INTEGER MATH
 
 Configure the zx library by editing:
 z88dk/libsrc/_DEVELOPMENT/target/zx/config_clib.m4
@@ -78,14 +59,7 @@ a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
 
-
-1. CLASSIC LIBRARY
-
-classic/sccz80
-
-classic/zsdcc
-
-2. NEW LIBRARY WITH SMALL INTEGER MATH
+1. NEW LIBRARY WITH SMALL INTEGER MATH
 
 new/sccz80/small
 zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER pi.c -o pi -m -pragma-include:zpragma.inc -create-app
@@ -95,7 +69,7 @@ new/zsdcc/small
 zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER pi.c -o pi -m -pragma-include:zpragma.inc -create-app
 zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER pi_ldiv.c -o pi_ldiv -m -pragma-include:zpragma.inc -create-app
 
-3. NEW LIBRARY WITH FAST INTEGER MATH
+2. NEW LIBRARY WITH FAST INTEGER MATH
 
 Configure the z80 library by editing:
 z88dk/libsrc/_DEVELOPMENT/target/z80/config_clib.m4

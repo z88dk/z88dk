@@ -92,20 +92,36 @@ cycle count  = 5278798872
 time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
 
 5.
+Z88DK March 18, 2017
+zsdcc #9852 / classic c library
+6484 bytes less page zero
+
+cycle count  = 5377063339
+time @ 4MHz  = 5377063339 / 4*10^6 = 22 min 24 sec
+
+6.
+Z88DK March 18, 2017
+sccz80 / classic c library
+6387 bytes less page zero
+
+cycle count  = 5391508326
+time @ 4MHz  = 5391508326 / 4*10^6 = 22 min 29 sec
+
+7.
 HITECH C MSDOS V750
 6337 bytes exact
 
 cycle count  = 5520768427
 time @ 4MHz  = 5520768427 / 4x10^6 = 23 min 00 sec
 
-6.
+8.
 HITECH C CPM V309
 6793 bytes less cpm overhead
 
 cycle count  = 5531933581
 time @ 4MHz  = 5531933581 / 4*10^6 = 23 min 03 sec
 
-7.
+9.
 SDCC 3.6.5 #9842 (MINGW64)
 6844 bytes less page zero
 
@@ -114,7 +130,7 @@ time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
 
 SDCC implements its 32-bit math in C.
 
-8.
+10.
 IAR Z80 V4.06A
 6789 bytes less small amount
 
