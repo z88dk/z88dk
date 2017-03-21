@@ -682,9 +682,13 @@ void dpush(void)
 /* Push the primary floating point register, preserving
         the top value  */
 
-void dpush2(void)
+void dpush_under(int val_type)
 {
-    callrts("dpush2");
+    if ( val_type == LONG ) {
+        callrts("dpush3");
+    } else {
+        callrts("dpush2");
+    }
     Zsp -= 6;
 }
 

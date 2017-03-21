@@ -22,7 +22,7 @@ extern void lpush2(void);
 extern void zpushde(void);
 extern void zpush(void);
 extern void dpush(void);
-extern void dpush2(void);
+extern void dpush_under(int val_type);
 extern void mainpop(void);
 extern void zpop(void);
 extern void zpopbc(void);

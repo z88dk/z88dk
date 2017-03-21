@@ -158,7 +158,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 zpushde(); /* LSW -> stack, addr = hl */
                 nargs += 4;
             } else if (expr == DOUBLE) {
-                dpush2();
+                dpush_under(CINT);
                 nargs += 6;
                 mainpop();
             } else {

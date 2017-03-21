@@ -308,7 +308,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
 {
     if (lval2->val_type == DOUBLE) {
         if (lval->val_type != DOUBLE) {
-            dpush2(); /* push 2nd operand UNDER 1st */
+            dpush_under(lval->val_type); /* push 2nd operand UNDER 1st */
             mainpop();
             if (lval->val_type == LONG)
                 zpop();
