@@ -314,12 +314,15 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     char *before, *start, *before1, *start1;
     int oldsp = Zsp;
     double val;
+    int lhs_val_type, rhs_val_type;
 
+    lhs_val_type = lval->val_type;
     setstage(&before, &start);
     if (lval->is_const) {
         /* constant on left not yet loaded */
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         val = lval->const_val;
         if (dbltest(lval2, lval)) {
             int ival = val;
@@ -386,6 +389,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right */
             val = lval2->const_val;
@@ -458,9 +462,9 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         }
     }
-    if (lval->is_const &= lval2->is_const) {
-        if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
-        if ( lval2->val_type == DOUBLE ) decrement_double_ref(lval2);
+    if (lval->is_const && lval2->is_const) {
+        if ( lhs_val_type == DOUBLE ) decrement_double_ref(lval);
+        if ( rhs_val_type == DOUBLE ) decrement_double_ref(lval2);
         /* both operands constant */
         if (oper == zadd) 
             lval->const_val += lval2->const_val;
@@ -468,6 +472,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->const_val -= lval2->const_val;
         else
             lval->const_val = 0;
+        // Fake load to get the refcount right
+        load_double_into_fa(lval);
         clearstage(before, 0);
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {
