@@ -15,6 +15,8 @@ void psg_init()
 {
 	clearsid();
 	volumesid(15,0);
-
+	envelopesid(sidVoice1,0,0,15,0);
+	envelopesid(sidVoice2,0,0,15,0);
+	envelopesid(sidVoice3,0,0,15,0);
 }
 
