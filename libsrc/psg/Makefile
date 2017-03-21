@@ -1,7 +1,7 @@
 #
-# Build the MSX target libraries
+# Build the PSG lib componente
 #
-# $Id: Makefile,v 1.11 2016-07-14 13:30:11 pauloscustodio Exp $
+# $Id: Makefile,v 1.11 2016-07-14 13:30:11 pauloscustodio Exp  /  Stefano, 03/2017 $
 #
 
 include ../Make.config
