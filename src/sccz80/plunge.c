@@ -478,6 +478,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {
         /* right operand not constant */
+        lval->is_const = 0;
         (*oper)(lval);
     }
     if (oper == zsub && lval->ptr_type) {
