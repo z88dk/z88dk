@@ -216,9 +216,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lhs_val_type == DOUBLE ) decrement_double_ref(lval);
             if ( rhs_val_type == DOUBLE ) decrement_double_ref(lval2);
             lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
-            lval->val_type = DOUBLE;
-            // Load this constant so we can sort out the refcount for folding
-            load_double_into_fa(lval);
+
+            // Promote as necessary
+            if ( lhs_val_type == DOUBLE || rhs_val_type == DOUBLE ) {
+                lval->val_type = DOUBLE;
+                // Load this constant so we can sort out the refcount for folding
+                load_double_into_fa(lval);
+            }
             clearstage(before, 0);
             Zsp = savesp;
             return;
