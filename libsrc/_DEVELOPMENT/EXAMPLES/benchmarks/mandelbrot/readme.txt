@@ -72,9 +72,7 @@ HITECH C CPM V309
 cycle count  = 1852698998
 time @ 4MHz  = 1852698998 / 4*10^6 = 7 min 43 sec
 
-Surprising result maybe from very fast float library.
-Quite often the float library generates incorrect results
-but not in this program.
+Very fast float library but only accurate for */+-
 
 2.
 IAR Z80 V4.06A
@@ -91,7 +89,7 @@ zsdcc #9852 / new c library
 cycle count  = 3734872448
 time @ 4MHz  = 3734872448 / 4*10^6 = 15 min 34 sec
 
-Internal 48-bit float implementation causes some relative slowdown.
+Internal 48-bit float implementation causes relative slowdown.
 
 4.
 Z88DK March 18, 2017
@@ -101,7 +99,7 @@ zsdcc #9852 / classic c library
 cycle count  = 3781297645
 time @ 4MHz  = 3781297645 / 4*10^6 = 15 min 45 sec
 
-Internal 48-bit float implementation causes some relative slowdown.
+Internal 48-bit float implementation causes relative slowdown.
 
 5.
 Z88DK March 18, 2017
@@ -111,7 +109,7 @@ sccz80 / new c library
 cycle count  = 3853108866
 time @ 4MHz  = 3853108866 / 4*10^6 = 16 min 03 sec
 
-48-bit float implementation causes some relative slowdown.
+48-bit float implementation causes relative slowdown.
 
 6.
 Z88DK March 18, 2017
@@ -121,7 +119,7 @@ sccz80 / classic c library
 cycle count  = 4409687319
 time @ 4MHz  = 4409687319 / 4*10^6 = 18 min 22 sec
 
-48-bit float implementation causes some relative slowdown.
+48-bit float implementation causes relative slowdown.
 
 7.
 SDCC 3.6.5 #9852 (MINGW64)

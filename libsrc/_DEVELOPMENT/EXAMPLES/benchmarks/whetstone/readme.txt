@@ -136,7 +136,7 @@ RESULTS
 
 1.
 HITECH C CPM V309
-** MOSTLY INCORRECT RESULTS
+** Several results with large error (maybe should be DQ)
 24 bit mantissa + 8 bit exponent
 7605 bytes less cpm overhead
 
@@ -189,8 +189,10 @@ MWIPS        = 1.8308 / 1000 = 0.0018308
 
 SDCC implements its float library in C.
 
-6.
+DQ.
 HITECH C MSDOS V750
-** COMPLETELY INCORRECT RESULTS
 24 bit mantissa + 8 bit exponent
 7002 bytes exact
+
+Incorrect results.
+HTC V750 does not have a functioning float library.

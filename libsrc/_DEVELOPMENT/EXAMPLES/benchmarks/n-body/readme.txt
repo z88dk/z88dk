@@ -62,7 +62,7 @@ second number error: 1 * 10^(-4)
 cycle count  = 2244963926
 time @ 4MHz  = 2244963926 / 4*10^6 = 9 min 21 sec
 
-Internal 48-bit float implementation causes some relative slowdown.
+Internal 48-bit float implementation causes relative slowdown.
 
 2.
 Z88DK March 18, 2017
@@ -75,7 +75,7 @@ second number error: 1 * 10^(-4)
 cycle count  = 2254312065
 time @ 4MHz  = 2254312065 / 4*10^6 = 9 min 24 sec
 
-Internal 48-bit float implementation causes some relative slowdown.
+Internal 48-bit float implementation causes relative slowdown.
 
 3.
 IAR Z80 V4.06A
