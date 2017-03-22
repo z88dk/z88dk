@@ -709,10 +709,7 @@ int constexpr(double *val, int *type, int flag)
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     if ( valtype == DOUBLE && con ) {
-        /* Remove double reference since we're scrapping code */
-        LVALUE lval;
-        lval.const_val = valtemp;
-        decrement_double_ref(&lval);
+        decrement_double_ref_direct(valtemp);
     }
     *type = valtype;
     Zsp = savesp;

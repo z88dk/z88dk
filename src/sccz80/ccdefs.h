@@ -68,6 +68,7 @@ extern void     dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void 
 extern int      plnge1(int (*heir)(LVALUE* lval), LVALUE *lval);
 extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval));
 extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
+extern void     load_constant(LVALUE *lval);
 
 #include "preproc.h"
 #include "primary.h"

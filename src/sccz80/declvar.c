@@ -623,10 +623,23 @@ void declloc(
                     declared = 0;
                     setstage(&before, &start);
                     expr = expression(&vconst, &val);
-                    clearstage(before, start);
+
+                    if ( vconst && expr != cptr->type ) {
+                        // It's a constant that doesn't match the right type
+                        LVALUE  lval;
+                        clearstage(before, 0);
+                        if ( expr == DOUBLE ) {
+                            decrement_double_ref_direct(val);
+                        }
+                        lval.val_type = cptr->type;
+                        lval.const_val = val;
+                        load_constant(&lval);
+                    } else {
+                        clearstage(before, start);
+                        //conv type
+                        force(decltype, expr, 0, 0, 0);
+                    }
                     cptr->isassigned = YES;
-                    //conv type
-                    force(decltype, expr, 0, 0, 0);
                     StoreTOS(decltype);
                 }
             }

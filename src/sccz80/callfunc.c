@@ -70,6 +70,9 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         setstage(&before, &start);
         expr = expression(&vconst, &val);
         clearstage(before, start);  // Wipe out everything we did
+        if ( vconst && expr == DOUBLE ) {
+            decrement_double_ref_direct(val);
+        }
         fprintf(tmpfiles[argnumber],";\n");
         pop_buffer_fp();
 

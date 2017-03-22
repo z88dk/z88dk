@@ -49,6 +49,17 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
     }
 }
 
+void load_constant(LVALUE *lval)
+{
+    if (lval->val_type == LONG) {
+        vlongconst(lval->const_val);
+    } else if (lval->val_type == DOUBLE ) {
+        load_double_into_fa(lval);
+    } else {
+        vconst(lval->const_val);
+    }
+}
+
 /*
  * test for early dropout from || or && evaluations
  */
@@ -57,12 +68,9 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
     if (k)
         rvalue(lval);
     else if (lval->is_const) {
-        if (lval->val_type == LONG)
-            vlongconst(lval->const_val);
-        else if (lval->val_type == DOUBLE ) {
-            load_double_into_fa(lval);
-        } else 
-            vconst(lval->const_val);
+        load_constant(lval);
+
+       
     }
     if (DoTestJump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
@@ -87,6 +95,9 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
     if (lval->is_const) {
         /* constant, load it later */
         clearstage(before, 0);
+        if ( lval->val_type == DOUBLE ) {
+       //     decrement_double_ref(lval);
+        }
     }
     return (k);
 }
@@ -180,8 +191,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval->stage_add = start;
 
             /* djm, load double reg for long operators */
-            if ( lval2->val_type == DOUBLE ) {
+            if ( lval2->val_type == DOUBLE || lval->val_type == DOUBLE ) {
                  load_double_into_fa(lval2);
+                 lval2->val_type = DOUBLE;
             } else if (lval->val_type == LONG || lval2->val_type == LONG) {
                 vlongconst(lval2->const_val);
                 lval2->val_type = LONG;
@@ -193,6 +205,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
                 /* Note, a redundant load of lval has been done, this can be taken out by the optimiser */
                 clearstage(before, 0);
+                if ( lval2->val_type == DOUBLE ) {
+                    decrement_double_ref(lval2);
+                }
                 Zsp = savesp;
                 if (lval->val_type == LONG) {
                     vlongconst(0);
@@ -476,8 +491,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->const_val -= lval2->const_val;
         else
             lval->const_val = 0;
-        // Fake load to get the refcount right
-        load_double_into_fa(lval);
+        // Promote as necessary
+        if ( lhs_val_type == DOUBLE || rhs_val_type == DOUBLE ) {
+            lval->val_type = DOUBLE;
+            load_double_into_fa(lval);
+        }
         clearstage(before, 0);
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {

@@ -14,3 +14,4 @@ extern void size_of(LVALUE *lval);
 extern void load_double_into_fa(LVALUE *lval);
 extern void write_double_queue(void);
 extern void decrement_double_ref(LVALUE *lval);
+extern void decrement_double_ref_direct(double value);

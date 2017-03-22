@@ -72,24 +72,34 @@ int heir1(LVALUE* lval)
     setstage(&before, &start);
     k = plnge1(heir1a, lval);
     if (lval->is_const) {
-        if (lval->val_type == LONG) {
-            vlongconst(lval->const_val);
-        } else if (lval->val_type == DOUBLE ) {
-            load_double_into_fa(lval);
-        } else {
-            vconst(lval->const_val);
-        }
+        load_constant(lval);
     }
-    doper = 0;
+    doper = NULL;
     if (cmatch('=')) {
+        char *start1, *before1;
         if (k == 0) {
             needlval();
             return 0;
         }
         if (lval->indirect)
             smartpush(lval, before);
+        setstage(&before1, &start1);
         if (heir1(&lval2))
             rvalue(&lval2);
+            
+        /* If it's a const, then load it with the right type */
+        if ( lval2.is_const ) {
+            /* This leaves the double with a count of 2 */
+            if ( lval2.val_type == DOUBLE ) {
+                decrement_double_ref(&lval2);
+                decrement_double_ref(&lval2);
+            }
+            clearstage(before1, 0);
+            lval2.val_type = lval->val_type;
+            load_constant(&lval2);
+        }
+
+
         /* Now our type checking so we can give off lots of warnings about
          * type mismatches etc..
          */

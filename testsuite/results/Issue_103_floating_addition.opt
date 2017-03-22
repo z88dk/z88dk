@@ -208,9 +208,8 @@
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,2	;const
-	call	l_int2long_s
-	call	float
+	ld	hl,i_3+0
+	call	dload
 	call	dmul
 	pop	hl
 	call	dstore
@@ -255,9 +254,8 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,2	;const
-	call	l_int2long_s
-	call	float
+	ld	hl,i_3+0
+	call	dload
 	call	dmul
 	pop	hl
 	call	dstore
@@ -303,9 +301,8 @@
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,2	;const
-	call	l_int2long_s
-	call	float
+	ld	hl,i_3+0
+	call	dload
 	call	ddiv
 	pop	hl
 	call	dstore
@@ -350,9 +347,8 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,2	;const
-	call	l_int2long_s
-	call	float
+	ld	hl,i_3+0
+	call	dload
 	call	ddiv
 	pop	hl
 	call	dstore

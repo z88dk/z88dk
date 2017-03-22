@@ -616,7 +616,8 @@ void write_double_queue(void)
                 defmesg(); outstr(elem->str); outstr("\"\n");
                 defbyte(); outdec(0); nl();
             } else {
-                outfmt("\t;%lf\n",elem->value);
+                //outfmt("\t;%lf ref: %d\n",elem->value,elem->refcount);
+                outfmt("\t;%lf\n",elem->value,elem->refcount);
                 outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
             }
         }
@@ -624,6 +625,14 @@ void write_double_queue(void)
     nl();
 }
 
+void decrement_double_ref_direct(double value)
+{
+    LVALUE lval;
+
+    lval.const_val = value;
+
+    decrement_double_ref(&lval);
+}
 
 void decrement_double_ref(LVALUE *lval)
 {   
