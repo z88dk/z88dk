@@ -115,6 +115,8 @@ cycle count  = 6574398908
 time @ 4MHz  = 6574398908 / 4*10^6 = 27 min 24 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
+Library optimization for fast realloc causes slow free block search
+when a thousand blocks are allocated in this benchmark.
 
 6.
 Z88DK March 18, 2017
@@ -125,6 +127,8 @@ cycle count  = 6588490067
 time @ 4MHz  = 6588490067 / 4*10^6 = 27 min 27 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
+Library optimization for fast realloc causes slow free block search
+when a thousand blocks are allocated in this benchmark.
 
 7.
 IAR Z80 V4.06A
