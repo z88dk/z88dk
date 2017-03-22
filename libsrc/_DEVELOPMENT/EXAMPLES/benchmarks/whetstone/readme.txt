@@ -167,6 +167,17 @@ KWIPS        = 100*10*1 / 229.1343 = 4.3643
 MWIPS        = 4.3643 / 1000 = 0.0043643
 
 4.
+Z88DK March 18, 2017
+zsdcc #9852 / classic c library / math48 float package
+7049 bytes less page zero
+24 bit mantissa + 8 bit exponent (internally 40+8)
+
+cycle count  = 920888959
+time @ 4MHz  = 920888959 / 4x10^6 = 230.2222 seconds
+KWIPS        = 100*10*1 / 230.2222 = 4.3436
+MWIPS        = 4.3436 / 1000 = 0.0043436
+
+5.
 Z88DK March 2, 2017
 sccz80 / new c library / math48 float package
 40 bit mantissa + 8 bit exponent
@@ -177,7 +188,18 @@ time @ 4MHz  = 970198993 / 4x10^6 = 242.5497  seconds
 KWIPS        = 100*10*1 / 242.5497 = 4.1229
 MWIPS        = 4.1229 / 1000 = 0.0041229
 
-5.
+6.
+Z88DK March 18, 2017
+sccz80 / classic c library / genmath float package
+5715 bytes less page zero
+40 bit mantissa + 8 bit exponent
+
+cycle count  = 1288407230
+time @ 4MHz  = 1288407230 / 4x10^6 = 322.1018  seconds
+KWIPS        = 100*10*1 / 322.1018 = 3.1046
+MWIPS        = 3.1046 / 1000 = 0.0031046
+
+7.
 SDCC 3.6.5 #9842 (MINGW64)
 24 bit mantissa + 8 bit exponent
 14379 bytes less page zero

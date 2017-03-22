@@ -3,25 +3,11 @@ CHANGES TO SOURCE CODE
 
 None.
 
-The classic lib can use sccz80/genmath, sccz80/mzx, or zsdcc/math48.
-The new c lib can use sccz80/math48 or zsdcc/math48.
-
 VERIFY CORRECT RESULT
 =====================
 
-To verify correct results, we compiled for the zx spectrum target
-using all combinations of compiler and math libraries:
-
-;classic not currently working
-
-;classic/sccz80/genmath : 40 bit mantissa
-;zcc +zx -vn -O2 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone -lm -lndos -m -create-app
-
-;classic/sccz80/zx spectrum rom : 32 bit mantissa
-;zcc +zx -vn -O2 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone -lmz -lndos -m -create-app
-
-;classic/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
-;zcc +zx -vn -O2 -compiler=sdcc -SO3 --max-allocs-per-node200000 --reserve-regs-iy -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone -lm -lndos -m -create-app
+To verify correct results, compile for the zx spectrum target and
+run in a spectrum emulator.
 
 new/sccz80/math48 : 40 bit mantissa
 zcc +zx -vn -startup=4 -clib=new -O2 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone -lm -m -create-app
@@ -31,10 +17,7 @@ zcc +zx -vn -startup=4 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -
 
 (These compile settings were found to give the best results).
 
-The output was run in a spectrum emulator and results were verified.
-
-Compiles with >= 32 bit mantissa matched expected results exactly.
-Compiles with 24 bit mantissa had small errors in the last decimal digit.
+Compiles matched expected results exactly.
 
 TIMING
 ======
@@ -43,23 +26,6 @@ To time, the program was compiled for the generic z80 target where
 possible so that a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
-
-The only exception was the zx spectrum rom float implementation
-which must be run on a zx spectrum target.  For TICKS to run
-this, it must be given a memory image that includes the spectrum
-rom.  This was produced by dumping memory from an emulator after
-loading the whetstone program from tape.
-
-;classic not currently working
-
-;classic/sccz80/genmath : 40 bit mantissa
-;zcc +embedded -vn -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -lndos -m -create-app
-
-;classic/sccz80/zx spectrum rom : 32 bit mantissa
-;zcc +zx -vn -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lmz -lndos -m -create-app
-
-;classic/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
-;zcc +zx -vn -O2 -compiler=sdcc -SO3 --max-allocs-per-node200000 --reserve-regs-iy -DSTATIC -DTIMER whetstone.c -o whetstone -lm -lndos -m -create-app
 
 new/sccz80/math48 : 40 bit mantissa
 zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
