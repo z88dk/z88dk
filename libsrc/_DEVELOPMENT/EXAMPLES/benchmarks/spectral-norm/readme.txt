@@ -113,6 +113,17 @@ time @ 4MHz  = 15385384430 / 4*10^6 = 64 min 06 sec
 
 48-bit float implementation causes relative slowdown.
 
+7.
+SDCC 3.6.5 #9852 (MINGW64)
+7495 bytes less page zero
+
+error: 5 * 10^(-6)
+
+cycle count  = 20543308237
+time @ 4MHz  = 20543308237 / 4*10^6 = 85 min 36 sec
+
+Slow speed & large size due to float implementation in C.
+
 DQ.
 HITECH C MSDOS V750
 ? bytes exact
