@@ -132,7 +132,7 @@ void write_bytes(char *line, int flag)
 }	
 
 
-void write_defined(char *sname, int value, int export)
+void write_defined(char *sname, int32_t value, int export)
 {
     FILE *fp;
 
@@ -145,7 +145,7 @@ void write_defined(char *sname, int value, int export)
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
 	if (export) fprintf(fp, "\tPUBLIC\t%s\n", sname);
-    fprintf(fp,"\tdefc %s = %d\n",sname,value);
+    fprintf(fp,"\tdefc %s = %0#x\n",sname,value);
     fprintf(fp,"\tIFNDEF %s\n\tENDIF\n",sname);
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
@@ -185,7 +185,81 @@ void write_redirect(char *sname, char *value)
     fclose(fp);
 }
 
+struct printf_format_s {
+    char fmt;
+    char complex;
+    uint32_t val;
+    uint32_t lval;
+} printf_formats[] = {
+    { 'd', 1, 0x01, 0x1000 },
+    { 'u', 1, 0x02, 0x2000 },
+    { 'x', 2, 0x04, 0x4000 },
+    { 'X', 2, 0x08, 0x8000 },
+    { 'o', 2, 0x10, 0x10000 },
+    { 'n', 2, 0x20, 0x20000 },
+    { 'i', 2, 0x40, 0x40000 },
+    { 'p', 2, 0x80, 0x80000 },
+    { 'B', 2, 0x100, 0x100000 },
+    { 's', 1, 0x200, 0x0 },
+    { 'c', 1, 0x400, 0x0 },
+    { 'a', 0, 0x400000, 0x0 },
+    { 'A', 0, 0x800000, 0x0 },
+    { 'e', 3, 0x1000000, 0x1000000 },
+    { 'E', 3, 0x2000000, 0x2000000 },
+    { 'f', 3, 0x4000000, 0x4000000 },
+    { 'F', 3, 0x8000000, 0x8000000 },
+    { 'g', 3, 0x10000000, 0x10000000 },
+    { 'G', 3, 0x20000000, 0x20000000 },
+    { 0, 0, 0, 0 }
+};
 
+static int32_t parse_format_string(char *arg)
+{
+    char c;
+    int complex, islong;
+    int32_t format_option = 0;
+    struct printf_format_s* fmt;
+
+    complex = 1; /* mini printf */
+    while ((c = *arg++)) {
+        if (c != '%')
+            continue;
+
+        if (*arg == '-' || *arg == '0' || *arg == '+' || *arg == ' ' || *arg == '*' || *arg == '.') {
+            if (complex < 2)
+                complex = 2; /* Switch to standard */
+            format_option |= 0x40000000;
+            while (!isalpha(*arg))
+                arg++;
+        } else if (isdigit(*arg)) {
+            if (complex < 2)
+                complex = 2; /* Switch to standard */
+            format_option |= 0x40000000;
+            while (isdigit(*arg) || *arg == '.') {
+                arg++;
+            }
+        }
+
+        islong = 0;
+        if (*arg == 'l') {
+            if (complex < 2)
+                complex = 2;
+            arg++;
+            islong = 1;
+        }
+        fmt = &printf_formats[0];
+        while (fmt->fmt) {
+            if (fmt->fmt == *arg) {
+                if (complex < fmt->complex)
+                    complex = fmt->complex;
+                format_option |= islong ? fmt->lval : fmt->val;
+                break;
+            }
+            fmt++;
+        }
+    }
+    return format_option;
+}
 
 int main(int argc, char **argv)
 {
@@ -224,6 +298,12 @@ int main(int argc, char **argv)
                     *offs = 0;
                 }
                 write_redirect(ptr,value);
+            } else if ( strncmp(ptr,"printf", 6) == 0 ) {
+                int32_t value = parse_format_string(ptr + 6);
+                write_defined("CLIB_OPT_PRINTF", value, 0);
+            } else if ( strncmp(ptr,"scanf", 5) == 0 ) {
+                int32_t value = parse_format_string(ptr + 5);
+                write_defined("CLIB_OPT_SCANF", value, 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
             } else if ( strncmp(ptr, "data", 4) == 0 ) {
