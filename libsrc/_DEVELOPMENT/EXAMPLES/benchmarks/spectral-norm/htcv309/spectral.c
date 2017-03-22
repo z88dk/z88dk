@@ -5,32 +5,24 @@
  */
 
 #ifdef STATIC
-   #undef  STATIC
-   #define STATIC            static
+#undef  STATIC
+#define STATIC            static
 #else
-   #define STATIC
+#define STATIC
 #endif
 
 #ifdef PRINTF
-   #define PRINTF2(a,b)      printf(a,b)
+#define PRINTF2(a,b)      printf(a,b)
 #else
-   #define PRINTF2(a,b)      b
+#define PRINTF2(a,b)      b
 #endif
 
 #ifdef TIMER
-   #define TIMER_START()     intrinsic_label(TIMER_START)
-   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+#define TIMER_START()     intrinsic_label(TIMER_START)
+#define TIMER_STOP()      intrinsic_label(TIMER_STOP)
 #else
-   #define TIMER_START()
-   #define TIMER_STOP()
-#endif
-
-#ifdef __Z88DK
-   #include <intrinsic.h>
-   #ifdef PRINTF
-      // enable printf %f
-      #pragma output CLIB_OPT_PRINTF = 0x04000000
-   #endif
+#define TIMER_START()
+#define TIMER_STOP()
 #endif
 
 
@@ -45,7 +37,7 @@ double eval_A(int i, int j)
 	return 1.0/((i+j)*(i+j+1)/2+i+1);
 }
 
-void eval_A_times_u(const double u[], double Au[])
+void eval_A_times_u(double u[], double Au[])
 {
   STATIC int i,j;
   for(i=0;i<NUM;i++)
@@ -55,7 +47,7 @@ void eval_A_times_u(const double u[], double Au[])
     }
 }
 
-void eval_At_times_u(const double u[], double Au[])
+void eval_At_times_u(double u[], double Au[])
 {
   STATIC int i,j;
   for(i=0;i<NUM;i++)
@@ -65,7 +57,7 @@ void eval_At_times_u(const double u[], double Au[])
     }
 }
 
-void eval_AtA_times_u(const double u[], double AtAu[])
+void eval_AtA_times_u(double u[], double AtAu[])
 {
 	static double v[NUM];
 	

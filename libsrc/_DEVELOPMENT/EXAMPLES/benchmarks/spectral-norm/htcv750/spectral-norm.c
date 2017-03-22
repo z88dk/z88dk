@@ -4,11 +4,41 @@
  * Contributed by Sebastien Loisel
  */
 
+#ifdef STATIC
+   #undef  STATIC
+   #define STATIC            static
+#else
+   #define STATIC
+#endif
+
+#ifdef PRINTF
+   #define PRINTF2(a,b)      printf(a,b)
+#else
+   #define PRINTF2(a,b)      b
+#endif
+
+#ifdef TIMER
+   #define TIMER_START()     intrinsic_label(TIMER_START)
+   #define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+#else
+   #define TIMER_START()
+   #define TIMER_STOP()
+#endif
+
+#ifdef __Z88DK
+   #include <intrinsic.h>
+   #ifdef PRINTF
+      // enable printf %f
+      #pragma output CLIB_OPT_PRINTF = 0x04000000
+   #endif
+#endif
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#define NUM 2000
+#define NUM 100
 
 double eval_A(int i, int j)
 {
@@ -47,7 +77,9 @@ int main(void)
 {
   STATIC int i;
   STATIC double u[NUM],v[NUM],vBv,vv;
-  
+
+TIMER_START();
+
   for(i=0;i<NUM;i++) u[i]=1;
   for(i=0;i<10;i++)
     {
@@ -56,6 +88,9 @@ int main(void)
     }
   vBv=vv=0;
   for(i=0;i<NUM;i++) { vBv+=u[i]*v[i]; vv+=v[i]*v[i]; }
-  printf("%0.9f\n",sqrt(vBv/vv));
+  PRINTF2("%0.9f\n",sqrt(vBv/vv));
+
+TIMER_STOP();
+
   return 0;
 }

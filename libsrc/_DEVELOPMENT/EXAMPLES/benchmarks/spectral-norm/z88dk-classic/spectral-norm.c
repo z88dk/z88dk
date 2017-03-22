@@ -27,10 +27,6 @@
 
 #ifdef __Z88DK
    #include <intrinsic.h>
-   #ifdef PRINTF
-      // enable printf %f
-      #pragma output CLIB_OPT_PRINTF = 0x04000000
-   #endif
 #endif
 
 
