@@ -1,6 +1,6 @@
 
 
-all: clisp adv_a ansitest enigma fib mm rpn tic sorter snakes dstar dstar_native microman othello othello_udg wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading globe chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
+all: clisp adv_a ansitest enigma fib mm rpn tic sorter snakes dstar dstar_native microman othello othello_udg wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading globe chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample psgtest ex10b ex12 clicktest fx sndtest synthdemo
 
 
 clisp:
@@ -138,6 +138,9 @@ xample:
 clicktest:
 	zcc +zx -vn ../sound/clicktest.c -lndos -create-app -oclicktest.bin
 
+psgtest:
+	zcc +zx -vn ../sound/psgtest.c -lndos -lm -create-app -DBEEPER -opsgtest.bin
+	
 ex12:
 	zcc +zx -vn ../sound/ex12.c -lndos -lm -create-app -oex12.bin
 
