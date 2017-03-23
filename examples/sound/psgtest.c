@@ -1,6 +1,6 @@
 /*
 ;
-;  Emulating bit_play with the PSG (no poliphony!)
+;  Emulating bit_play with the PSG (no real poliphony!)
 ;  play a melody (integer approx to optimize speed and size)
 ;
 ;  by Stefano Bodrato - 2017
@@ -11,6 +11,8 @@
 
 #include <psg.h>
 #include <sound.h>
+#include <time.h>
+#include <stdlib.h>
 
 void psg_play(unsigned char melody[])
 {
@@ -98,9 +100,14 @@ while ( *melody != 0 )
 	}
 	if (*melody>'0' && *melody<='9') duration=(*melody++)-48;
 	if ((*melody >= 'A' && *melody <= 'H') || *melody==0) {
-		psg_tone(chan1, psgT(sound));
-		for (x=0.0; x< BEEP_TSTATES/28000.0*duration; x++) {}
-		psg_tone(chan1, 0);
+		psg_tone(0, psgT(sound));
+		psg_tone(1, psgT(sound/2));
+		psg_tone(2, psgT(sound*2));
+		delay (120*duration);
+		//for (x=0.0; x<BEEP_TSTATES/40000.0*duration; x++) { }
+		psg_tone(0, 0);
+		psg_tone(1, 0);
+		psg_tone(2, 0);
 	}
    }
 }
@@ -109,6 +116,9 @@ while ( *melody != 0 )
 int main () {
 	psg_init();
 	psg_channels(chanAll, chanNone); // set all channels to tone generation
+		psg_volume(0,10);
+		psg_volume(1,10);
+		psg_volume(2,10);
 
 // Fra Martino
 	psg_play("C4DECCDECEFG8E4FG8G2AGFE4CG2AGFE4CDG-CCDG-CC");
