@@ -9,15 +9,32 @@
 
 #include <stdlib.h>
 #include <time.h>
+
 #ifdef __ZX80__
 #include <zx81.h>
+#endif
+
+#ifdef __C128__
+#include <c128/cia.h>
 #endif
 
 
 void  csleep(unsigned int centiseconds)
 {
+#ifdef __C128__
+long x;
+
+  setintctrlcia(cia2,ciaClearIcr); /* disable all cia 2 interrupts */
+  settimerbcia(cia2,timervalcia(1000),ciaCountA);  /* timer b counts timer a underflows */
+  settimeracia(cia2,timervalcia(1000),ciaCPUCont); /* set timer a 1/1000 sec */
+  for (x=0; x<centiseconds; x+=10)
+	while ((inp(cia2+ciaIntCtrl) & 0x02) == 0) {}      /* wait for count down */
+
+#else
+
 	long start = clock();  
 	long per   = ((long) centiseconds * (long) CLOCKS_PER_SEC) / 100L;
+	
 #ifdef __ZX80__
 	gen_tv_field_init(0);
 #endif
@@ -30,5 +47,7 @@ void  csleep(unsigned int centiseconds)
 	    ;
 #endif
 	}
+
+#endif
 }
 
