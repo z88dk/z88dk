@@ -1,16 +1,24 @@
 /*
 ;
-;  Emulating bit_play with the PSG (no real poliphony!)
+;  Emulating bit_play with the PSG (no poliphony!)
 ;  play a melody (integer approx to optimize speed and size)
 ;
 ;  by Stefano Bodrato - 2017
 ;
 ;  Syntax: "TONE(#/b)(+/-)(duration)"
 ;
+
+The "-DBEEPER" option could require extra tuning on the ZX Spectrum if run on a different interface than the "Spectrum 128 sound"
+Please specify the correct clock of the YM Chip, e.g. for the Zon-X :
+#define psgT(hz)		((int)(101562.0 / (hz)))
+
+If the target system lacks the lib support for timers, then try with "-DNODELAY".
+
 */
 
 #include <psg.h>
 #include <sound.h>
+#include <games.h>
 #include <time.h>
 #include <stdlib.h>
 
@@ -103,8 +111,18 @@ while ( *melody != 0 )
 		psg_tone(0, psgT(sound));
 		psg_tone(1, psgT(sound/2));
 		psg_tone(2, psgT(sound*2));
+		
+		/* Feel free to experiment ! */
+#ifdef BEEPER
+		bit_beep ( (double)(sound*duration)/12., (BEEP_TSTATES/(double)sound)-30. );
+#else
+#ifndef NODELAY
 		delay (120*duration);
-		//for (x=0.0; x<BEEP_TSTATES/40000.0*duration; x++) { }
+#else
+		for (x=0.0; x<BEEP_TSTATES/40000.0*duration; x++) { }
+#endif
+#endif
+		
 		psg_tone(0, 0);
 		psg_tone(1, 0);
 		psg_tone(2, 0);
