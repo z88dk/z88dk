@@ -87,11 +87,10 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	push	de
-	push	hl
-	ld	hl,2	;const
-	ld	de,0
-	call	l_long_div
+	sra	d
+	rr	e
+	rr	h
+	rr	l
 	ret
 
 

@@ -69,6 +69,7 @@ int AddNewFunc(
     int32_t* addr)
 {
     SYMBOL* ptr;
+    LVALUE  lval = {0};
     int more;
     char simple; /* Simple def () */
     more = 0;
@@ -78,8 +79,10 @@ int AddNewFunc(
      *      external pointer type
      */
 
-    if (number(addr))
+    if (number(&lval)) {
+        *addr = lval.const_val;
         return (EXTERNP);
+    }
 
     /*
      *      Now, check for simple prototyping, we can drop that
@@ -588,7 +591,12 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
  *      in anycase!!
  */
     if (cmatch('@')) {
-        constexpr(addr, 1);
+        double val;
+        int    valtype;
+        constexpr(&val,&valtype, 1);
+        if ( valtype == DOUBLE ) 
+            warning(W_DOUBLE_UNEXPECTED);
+        *addr = val;
     }
 
     blanks();

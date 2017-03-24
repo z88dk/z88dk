@@ -1,11 +1,11 @@
 /* expr.c */
 extern void ClearCast(LVALUE *lval);
-extern int expression(int *con, int *val);
+extern int expression(int *con, double *val);
 extern int heir1(LVALUE *lval);
 extern int heir1a(LVALUE *lval);
 extern int heir2a(LVALUE *lval);
 extern int heir2b(LVALUE *lval);
-extern int heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval));
+extern int heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value));
 extern int heir2(LVALUE *lval);
 extern int heir3(LVALUE *lval);
 extern int heir4(LVALUE *lval);

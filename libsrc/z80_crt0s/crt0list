@@ -103,6 +103,7 @@ crt0_fp/__atof2
 crt0_fp/dldpsh
 crt0_fp/dload
 crt0_fp/dpush2
+crt0_fp/dpush3
 crt0_fp/dstore
 crt0_fp/extra
 crt0_fp/fa

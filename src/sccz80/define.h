@@ -359,7 +359,7 @@ struct lvalue_s {
         int indirect ;                  /* type of indirect object, 0 for static object */
         int ptr_type ;                  /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
-        int32_t const_val ;                        /* value of constant expression (& other uses) */
+        double const_val ;                        /* value of constant expression (& other uses) */
         TAG_SYMBOL *tagsym ;    /* tag symbol address, 0 if not struct */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */

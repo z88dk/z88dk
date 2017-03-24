@@ -64,11 +64,12 @@
 
 
 ._div2
-	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,2	;const
-	pop	de
-	call	l_div
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	sra	h
+	rr	l
 	ret
 
 

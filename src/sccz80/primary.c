@@ -308,7 +308,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
 {
     if (lval2->val_type == DOUBLE) {
         if (lval->val_type != DOUBLE) {
-            dpush2(); /* push 2nd operand UNDER 1st */
+            dpush_under(lval->val_type); /* push 2nd operand UNDER 1st */
             mainpop();
             if (lval->val_type == LONG)
                 zpop();
@@ -349,16 +349,16 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
 
     if (lval->val_type == LONG) {
         if (lval2->val_type != LONG && lval2->val_type != CPTR) {
-            /*
- * FIXED!! 23/4/99 djm, if any of them is unsigned then we extend out
- * to an unsigned long.
- *
- * This is sort of in accordance with A6.5 except for the fact that
- * we don't convert the signed integer to postive if it negative
- *
- * If neither are unsigned, then we extend the sign, let me know if this
- * causes lots of problems!
- */
+           /*
+            * FIXED!! 23/4/99 djm, if any of them is unsigned then we extend out
+            * to an unsigned long.
+            *
+            * This is sort of in accordance with A6.5 except for the fact that
+            * we don't convert the signed integer to postive if it negative
+            *
+            * If neither are unsigned, then we extend the sign, let me know if this
+            * causes lots of problems!
+            */
             if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
                 convUint2long();
             else
@@ -696,16 +696,22 @@ void test(int label, int parens)
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(int32_t* val, int flag)
+int constexpr(double *val, int *type, int flag)
 {
     char *before, *start;
-    int con, valtemp;
+    double valtemp;
+    int con;
     int savesp = Zsp;
+    int valtype;
 
     setstage(&before, &start);
-    expression(&con, &valtemp);
-    *val = (long)valtemp;
+    valtype = expression(&con, &valtemp);
+    *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
+    if ( valtype == DOUBLE && con ) {
+        decrement_double_ref_direct(valtemp);
+    }
+    *type = valtype;
     Zsp = savesp;
     if (flag && con == 0)
         error(E_CONSTANT);

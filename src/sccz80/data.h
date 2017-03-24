@@ -45,7 +45,6 @@ extern char fnflags;
 extern char c_mathz88;
 extern char c_compact_code;
 extern int nxtlab;
-extern int dublab;
 extern int glblab;
 extern int litlab;
 extern int Zsp;

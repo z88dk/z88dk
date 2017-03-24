@@ -88,7 +88,8 @@ struct warnings mywarn[] = {
     { "Internal thingummyjob please report!!! Please!", 0 },
     { "Hex escape sequence out of range ", 0 },
     { "Variable '%s' may be used before initialisation ", 0}, /* 50 */
-    { "Function pointer '%s'' doesn't have the same %s status as the value it's being given", 0}
+    { "Function pointer '%s'' doesn't have the same %s status as the value it's being given", 0},
+    { "Unexpected floating point encountered, taking int value", 0}
 };
 
 struct errors {
@@ -179,7 +180,7 @@ struct errors {
     { "Cannot assign to compound auto variable \'%s\'", 1 },
 
     { "Attempt to modify const lvalue \'%s\''", 1},
-
+    { "Cannot statically initialise doubles when -doublestr is used", 1},
 };
 
 /*

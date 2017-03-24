@@ -33,7 +33,7 @@ extern int WasComp(LVALUE* lval);
 
 extern char Filenorig[];
 
-
+static void quikmult(int type, int32_t size, char preserve);
 static void threereg(void);
 static void fivereg(void);
 static void sixreg(void);
@@ -682,9 +682,13 @@ void dpush(void)
 /* Push the primary floating point register, preserving
         the top value  */
 
-void dpush2(void)
+void dpush_under(int val_type)
 {
-    callrts("dpush2");
+    if ( val_type == LONG ) {
+        callrts("dpush3");
+    } else {
+        callrts("dpush2");
+    }
     Zsp -= 6;
 }
 
@@ -1124,7 +1128,10 @@ void scale(int type, TAG_SYMBOL* tag)
     }
 }
 
-void quikmult(int type, int size, char preserve)
+
+
+
+void quikmult(int type, int32_t size, char preserve)
 {
     if ( type == LONG ) {
         /* Normal long multiplication is:
@@ -1359,6 +1366,13 @@ void mult(LVALUE* lval)
     }
 }
 
+void mult_const(LVALUE *lval, int32_t value)
+{
+    quikmult(lval->val_type, value, NO);
+}
+
+
+
 /* Divide the secondary register by the primary */
 /*      (quotient in primary, remainder in secondary) */
 void zdiv(LVALUE* lval)
@@ -1384,6 +1398,53 @@ void zdiv(LVALUE* lval)
     }
 }
 
+void zdiv_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG && utype(lval) ) {
+        if ( value == 256 ) {
+            ol("ld\tl,h");
+            ol("ld\th,e");
+            ol("ld\te,d");
+            ol("ld\td,0");
+            return;
+        } else if ( value == 65536 ) {
+            swap();
+            const2(0);
+            return;
+        }
+    } else if ( utype(lval) ) {
+        if ( value == 256 ) {
+            ol("ld\tl,h");
+            ol("ld\th,0");
+            return;
+        }
+    }
+
+
+    switch ( value ) {
+        case 1:
+            break;
+        case 2:
+            asr_const(lval,1);
+            break;
+        case 4:
+            asr_const(lval,2);
+            break;
+        case 8:
+            asr_const(lval,3);
+            break;
+        default:
+            if ( lval->val_type == LONG || lval->val_type == CPTR ) {
+                lpush();
+                vlongconst(value);
+            } else {
+                const2(value);
+                swap();
+            }
+            zdiv(lval);
+    }
+}
+
 /* Compute remainder (mod) of secondary register divided
  *      by the primary
  *      (remainder in primary, quotient in secondary)
@@ -1401,9 +1462,60 @@ void zmod(LVALUE* lval)
     }
 }
 
+void zmod_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG ) {
+        if ( value == 256 ) {
+            ol("ld\th,0");
+            const2(0);
+            return;
+        } else if ( value == 65536 ) {
+            const2(0);
+            return;
+        }
+        lpush();
+        vlongconst(value);
+        zmod(lval);
+    } else {
+        switch ( value ) {
+            case 256:
+                ol("ld\th,0");
+                break;
+            case 1:
+                vconst(0);
+                break;
+            case 2:
+                zand_const(lval,1);
+                break;
+            case 4:
+                zand_const(lval, 3);
+                break;
+            case 8:
+                zand_const(lval,7);
+                break;
+            case 16:
+                zand_const(lval,15);
+                break;
+            case 32:
+                zand_const(lval, 31);
+                break;
+            case 64:
+                zand_const(lval,63);
+                break;
+            case 128:
+                zand_const(lval,127);
+                break;
+            default:
+                const2(value);
+                swap();
+                zmod(lval);
+        }
+    }
+}
+
 /* Inclusive 'or' the primary and secondary */
 /*      (results in primary) */
-void zor(LVALUE* lval)
+void zor(LVALUE* lval )
 {
     switch (lval->val_type) {
     case LONG:
@@ -1413,6 +1525,134 @@ void zor(LVALUE* lval)
         break;
     default:
         callrts("l_or");
+    }
+}
+
+
+int zor_handle_pow2(int32_t value) 
+{
+    int c = 0;
+    switch ( value ) {
+        case 0:
+            return 1;
+        case 0x80:
+            c++;
+        case 0x40:
+            c++;
+        case 0x20:
+            c++;
+        case 0x10:
+            c++;
+        case 0x08:
+            c++;
+        case 0x04:
+            c++;
+        case 0x02:
+            c++;
+        case 0x01:
+            c++;
+            outfmt("\tset\t%d,l\n",c-1);
+            break;
+        case 0x8000:
+            c++;
+        case 0x4000:
+            c++;
+        case 0x2000:
+            c++;
+        case 0x1000:
+            c++;
+        case 0x800:
+            c++;
+        case 0x400:
+            c++;
+        case 0x200:
+            c++;
+        case 0x100:
+            c++;
+            outfmt("\tset\t%d,h\n",c-1);
+            break;
+        case 0x800000:
+            c++;
+        case 0x400000:
+            c++;
+        case 0x200000:
+            c++;
+        case 0x100000:
+            c++;
+        case 0x80000:
+            c++;
+        case 0x40000:
+            c++;
+        case 0x20000:
+            c++;
+        case 0x10000:
+            c++;
+            outfmt("\tset\t%d,e\n",c-1);
+            break;
+        case 0x80000000:
+            c++;
+        case 0x40000000:
+            c++;
+        case 0x20000000:
+            c++;
+        case 0x10000000:
+            c++;
+        case 0x8000000:
+            c++;
+        case 0x4000000:
+            c++;
+        case 0x2000000:
+            c++;
+        case 0x1000000:
+            c++;
+            outfmt("\tset\t%d,d\n",c-1);
+            break;           
+    }
+    return c;
+}
+
+
+void zor_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG || lval->val_type == CPTR) {
+        if ( zor_handle_pow2(value) ) {
+            return;
+        } else if ( (value & 0xFFFFFF00) == 0 ) {
+            ol("ld\ta,l");
+            ot("or\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");
+        } else if ( ( value & 0xFFFF00FF) == 0 ) {
+            ol("ld\ta,h");
+            ot("or\t"); outdec((value % 65536)/256); nl();
+            ol("ld\th,a");            
+       } else if ( ( value & 0xFF00FFFF) == 0 ) {
+            ol("ld\ta,e");
+            ot("or\t"); outdec((value / 65536)%256); nl();
+            ol("ld\te,a");            
+       } else if ( ( value & 0x00FFFFFF) == 0 ) {
+            ol("ld\ta,d");
+            ot("or\t"); outdec((value / 65536)/256); nl();
+            ol("ld\td,a");            
+        } else if ( value != 0 ) {
+            lpush();
+            vlongconst(value);
+            zor(lval);
+        }
+    } else {
+        if ( zor_handle_pow2(value % 65536) ) {
+            return;
+        } else if ( ((value % 65536) & 0xff00) == 0 ) {
+            ol("ld\ta,l");
+            ot("or\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");    
+        } else if ( ((value % 65536) & 0x00ff) == 0 ) {
+            ol("ld\ta,h");
+            ot("or\t"); outdec((value % 65536) / 256); nl();
+            ol("ld\th,a");    
+        } else if ( value != 0 ) {
+            vconst(value);
+            zor(lval);
+        }        
     }
 }
 
@@ -1446,6 +1686,52 @@ void zand(LVALUE* lval)
     }
 }
 
+void zand_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG || lval->val_type == CPTR) {
+        if ( value == 0 ) {
+            vlongconst(0);
+        } else if ( value == 0xff ) {  // 5
+            ol("ld\th,0");
+            const2(0);
+        } else if ( value >= 0 && value < 256 ) { // 9 bytes
+            ol("ld\ta,l");
+            ot("and\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");
+            ol("ld\th,0");
+            const2(0);
+        } else if ( value == 0xffff ) { // 3 bytes
+            const2(0);
+        } else if ( value == 0xffffff ) { // 2 bytes
+            ol("ld\td,0");
+        } else { // 13 bytes
+            lpush(); // 4
+            vlongconst(value); // 6
+            zand(lval); // 3
+        }
+    } else {
+        if ( value == 0 ) {
+            vconst(0);
+        } else if ( value == 0xff ) {
+            ol("ld\th,0");
+        } else if ( value >= 0 && value < 256 ) {
+            // 6 bytes, library call is 6 bytes, this is faster
+            ol("ld\ta,l");
+            ot("and\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");
+            ol("ld\th,0");
+        } else if ( value % 256 == 0 ) {
+            ol("ld\ta,h");
+            ot("and\t"); outdec(value / 256); nl();
+            ol("ld\th,a");
+            ol("ld\tl,0");            
+        } else {
+            vconst(value);
+            zand(lval);
+        }
+    }
+}
+
 /* Arithmetic shift right the secondary register number of */
 /*      times in primary (results in primary) */
 void asr(LVALUE* lval)
@@ -1467,6 +1753,40 @@ void asr(LVALUE* lval)
     }
 }
 
+void asr_const(LVALUE *lval, int32_t value)
+{
+    if  (lval->val_type == LONG || lval->val_type == CPTR ) {
+        if ( value == 1 ) {
+            if ( utype(lval) ) {
+                ol("srl\td");
+            } else {
+                ol("sra\td");
+            }
+            ol("rr\te");
+            ol("rr\th");
+            ol("rr\tl");
+        } else if ( value != 0 ) {
+            lpush();
+            vlongconst(value);
+            asr(lval);
+        }
+    } else {
+        if ( value == 1 ) {
+            if ( utype(lval) ) {
+                ol("srl\th");
+            } else {
+                ol("sra\th");
+            }
+            ol("rr\tl");
+        } else if ( value != 0 ) {
+            const2(value);
+            swap();
+            asr(lval);
+        }
+    }
+}
+
+
 /* Arithmetic left shift the secondary register number of */
 /*      times in primary (results in primary) */
 void asl(LVALUE* lval)
@@ -1479,6 +1799,84 @@ void asl(LVALUE* lval)
         break;
     default:
         callrts("l_asl");
+    }
+}
+
+void asl_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG  ) { 
+        switch ( value ) {
+            case 0: 
+                return;
+            case 24: // 6 bytes
+                ol("ld\td,l");
+                ol("ld\te,0");
+                vconst(0);
+                break;
+            case 17: // 5 bytes
+                ol("add\thl,hl");
+                // Fall through
+            case 16: // 4 bytes
+                swap();
+                vconst(0);
+                break;
+            case 8: // 5 bytes
+                ol("ld\td,e");
+                ol("ld\te,h");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;         
+            case 1: /* 5 bytes */
+                ol("add\thl,hl");;
+                ol("rl\te");
+                ol("rl\td");   
+                break;
+            default: //  5 bytes
+                loadargc( value % 32 );
+                callrts("l_long_aslo");
+                break;
+        }
+
+    } else {
+        switch ( value ) {
+            case 0:
+                return;
+            case 10:  // 7 bytes
+                ol("sla\tl");
+                ol("sla\tl");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;
+            case 9: // 6 bytes
+                ol("sla\tl");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                break;
+            case 8: // 3 bytes
+                ol("ld\th,l");
+                ol("ld\tl,0");
+            case 7:
+                ol("add\thl,hl");
+            case 6:
+                ol("add\thl,hl");
+                // Fall through
+            case 5:
+                 ol("add\thl,hl");
+            case 4:
+                ol("add\thl,hl");
+            case 3:
+                ol("add\thl,hl");
+            case 2:
+                ol("add\thl,hl");
+            case 1:
+                ol("add\thl,hl");
+                break;
+            default: // 7 bytes
+                const2(value);
+                swap();
+                asl(lval);
+                break;
+        }
     }
 }
 

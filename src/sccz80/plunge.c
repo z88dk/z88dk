@@ -49,6 +49,17 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
     }
 }
 
+void load_constant(LVALUE *lval)
+{
+    if (lval->val_type == LONG) {
+        vlongconst(lval->const_val);
+    } else if (lval->val_type == DOUBLE ) {
+        load_double_into_fa(lval);
+    } else {
+        vconst(lval->const_val);
+    }
+}
+
 /*
  * test for early dropout from || or && evaluations
  */
@@ -57,10 +68,9 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
     if (k)
         rvalue(lval);
     else if (lval->is_const) {
-        if (lval->val_type == LONG)
-            vlongconst(lval->const_val);
-        else
-            vconst(lval->const_val);
+        load_constant(lval);
+
+       
     }
     if (DoTestJump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
@@ -85,6 +95,9 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
     if (lval->is_const) {
         /* constant, load it later */
         clearstage(before, 0);
+        if ( lval->val_type == DOUBLE ) {
+       //     decrement_double_ref(lval);
+        }
     }
     return (k);
 }
@@ -92,11 +105,13 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval))
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval))
 {
     char *before, *start;
     char *before_constlval, *start_constlval;
     int   savesp;
+    int   lhs_val_type = lval->val_type;
+    int   rhs_val_type;
     int   lval1_wasconst = 0;
 
     savesp = Zsp;
@@ -109,15 +124,24 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         /* Get RHS */
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         setstage(&before_constlval, &start_constlval);
 
 
         if (lval->const_val == 0)
             lval->stage_add = stagenext;
 
-
-
-        if ( lval2->val_type == DOUBLE ) { 
+        if ( lval->val_type == DOUBLE && lval2->is_const == 0 ) {
+            if ( lval2->val_type != DOUBLE ) {
+                convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
+                lval2->val_type = DOUBLE;
+            }
+            dpush();
+            load_double_into_fa(lval);
+            if ( oper == zdiv || oper == zmod ) {
+                callrts("dswap");
+            }
+        } else if ( lval2->val_type == DOUBLE && lval2->is_const == 0 ) { 
             /* On stack we've got the double, load the constant as a double */
             dpush();
             vlongconst(lval->const_val);
@@ -127,7 +151,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 convSlong2doub();
             }
             lval->val_type = DOUBLE;
-            /* Subtraction isn't commutative so we need to swap over' */
+            /* division isn't commutative so we need to swap over' */
             if ( oper == zdiv || oper == zmod ) {
                 callrts("dswap");
             }
@@ -153,30 +177,37 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             setstage(&before, &start);
             lval->val_type = CINT;
             zpush();
+        } else if (lval->val_type == LONG || lval->val_type == CPTR) {
+             lpush();
         } else {
-            if (lval->val_type == LONG || lval->val_type == CPTR) {
-                lpush();
-            } else
-                zpush();
+             zpush();
         }
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right, primary loaded */
             if (lval2->const_val == 0)
                 lval->stage_add = start;
 
             /* djm, load double reg for long operators */
-            if (lval->val_type == LONG || lval2->val_type == LONG) {
+            if ( lval2->val_type == DOUBLE || lval->val_type == DOUBLE ) {
+                 load_double_into_fa(lval2);
+                 lval2->val_type = DOUBLE;
+            } else if (lval->val_type == LONG || lval2->val_type == LONG) {
                 vlongconst(lval2->const_val);
                 lval2->val_type = LONG;
             } else {
                 vconst(lval2->const_val);
             }
+
             // TODO: We can do some quickdiv as well surely
             if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
                 /* Note, a redundant load of lval has been done, this can be taken out by the optimiser */
                 clearstage(before, 0);
+                if ( lval2->val_type == DOUBLE ) {
+                    decrement_double_ref(lval2);
+                }
                 Zsp = savesp;
                 if (lval->val_type == LONG) {
                     vlongconst(0);
@@ -187,13 +218,30 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 return;
             }
         }
-        if (lval->val_type != DOUBLE && lval2->val_type != DOUBLE && lval->val_type != LONG && lval2->val_type != LONG && lval->val_type != CPTR && lval2->val_type != CPTR)
+        if (lval->val_type != DOUBLE && lval2->val_type != DOUBLE && 
+            lval->val_type != LONG && lval2->val_type != LONG && lval->val_type != CPTR && lval2->val_type != CPTR)
             /* Dodgy? */
             zpop();
     }
     lval->is_const &= lval2->is_const;
+
     /* ensure that operation is valid for double */
     if (  doper != NULL || intcheck(lval,lval2) == 0 ) {
+        if ( lval->is_const && lval2->is_const ) {
+            if ( lhs_val_type == DOUBLE ) decrement_double_ref(lval);
+            if ( rhs_val_type == DOUBLE ) decrement_double_ref(lval2);
+            lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
+
+            // Promote as necessary
+            if ( lhs_val_type == DOUBLE || rhs_val_type == DOUBLE ) {
+                lval->val_type = DOUBLE;
+                // Load this constant so we can sort out the refcount for folding
+                load_double_into_fa(lval);
+            }
+            clearstage(before, 0);
+            Zsp = savesp;
+            return;
+        }
         if (widen(lval, lval2)) {
             (*doper)(lval);
             /* result of comparison is int */
@@ -205,8 +253,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     /* Attempt to compensate width, so that we are doing double oprs if
  * one of the expressions is a double
  */
-    if (!lval->is_const)
+    if (!lval->is_const) {
         widenlong(lval, lval2);
+    }
     if (lval->ptr_type || lval2->ptr_type) {
         (*oper)(lval);
         //                if (lval->val_type == CPTR) zpop(); /* rest top bits */
@@ -224,6 +273,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         /* both operands constant taking respect of sign now,
          * unsigned takes precedence.. 
          */
+        if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
+        if ( lval2->val_type == DOUBLE ) decrement_double_ref(lval2);
         if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
             lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
         else
@@ -245,25 +296,27 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);
 
-        /* Special case for multiplication by constant... */
-        if (oper == mult ) {
-            int doquikmult = 0;
+        /* Special case handling for operation by constant */
+        if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || lval2->is_const) ) {
+            int doconstoper = 0;
             int32_t const_val;
 
             if ( lval2->is_const && (lval->val_type == CINT || lval->val_type == CCHAR || lval->val_type == LONG) ) {
-                doquikmult = 1;
+                doconstoper = 1;
                 const_val = lval2->const_val;
                 clearstage(before, 0);
+                force(rhs_val_type, lhs_val_type, lval->flags & UNSIGNED ? YES : NO, lval->flags & UNSIGNED ? YES : NO, NO);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == CINT || lval2->val_type == CCHAR || lval2->val_type == LONG) ) {
-                doquikmult = 1;
+                doconstoper = 1;
                 const_val = lval->const_val;
                 clearstage(before_constlval, 0);
+                force(lhs_val_type, rhs_val_type, lval2->flags & UNSIGNED ? YES : NO, lval2->flags & UNSIGNED ? YES : NO, NO);
             }
-            if ( doquikmult ) {
-                Zsp = savesp;
-                quikmult(lval->val_type, const_val, NO);
+            if ( doconstoper ) {
+                Zsp = savesp;                
+                constoper(lval, const_val);
                 return;
             }
         }
@@ -278,33 +331,52 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
     char *before, *start, *before1, *start1;
-    int val, oldsp = Zsp;
+    int oldsp = Zsp;
+    double val;
+    int lhs_val_type, rhs_val_type;
 
+    lhs_val_type = lval->val_type;
     setstage(&before, &start);
     if (lval->is_const) {
         /* constant on left not yet loaded */
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         val = lval->const_val;
         if (dbltest(lval2, lval)) {
+            int ival = val;
             /* are adding lval to pointer, adjust size */
-            cscale(lval2->ptr_type, lval2->tagsym, &val);
+            cscale(lval2->ptr_type, lval2->tagsym, &ival);
+            val = ival;
         }
-        if ( lval2->val_type == DOUBLE ) { 
+
+        if ( lval->val_type == DOUBLE && lval2->is_const == 0 ) {
+            if ( lval2->val_type != DOUBLE ) {
+                convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
+                lval2->val_type = DOUBLE;
+            }
+            dpush();
+            load_double_into_fa(lval);
+        } else if ( lval2->val_type == DOUBLE && lval2->is_const == 0 ) { 
             /* FA holds the right hand side */
             dpush();
-            /* On stack we've got the double, load the constant as a double */
-            vlongconst(val);
-            if ( lval->flags & UNSIGNED ) {
-                convUlong2doub();
+            if ( lval->val_type == DOUBLE ) {
+                load_double_into_fa(lval);
             } else {
-                convSlong2doub();
+                /* On stack we've got the double, load the constant as a double */
+                vlongconst(val);
+                if ( lval->flags & UNSIGNED ) {
+                    convUlong2doub();
+                } else {
+                    convSlong2doub();
+                }
+                lval->val_type = DOUBLE;
             }
-            lval->val_type = DOUBLE;
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zsub ) {
                 callrts("dswap");
             }
+            
         } else if (lval->val_type == LONG) {
             widenlong(lval, lval2);
             lval2->val_type = LONG; /* Kludge */
@@ -320,13 +392,14 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
     } else {
         /* non-constant on left */
+        int savesp1 = Zsp;
+
         setstage(&before1, &start1);
-        if (lval->val_type == DOUBLE)
+        if (lval->val_type == DOUBLE) {
             dpush();
-        else if (lval->val_type == LONG || lval->val_type == CPTR)
+        } else if (lval->val_type == LONG || lval->val_type == CPTR) {
             lpush();
-        /* Long ptrs? */
-        else {
+        } else {
             if (lval->val_type == CARRY) {
                 zcarryconv();
                 lval->val_type = CINT;
@@ -335,22 +408,43 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if (plnge1(heir, lval2))
             rvalue(lval2);
+        rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right */
             val = lval2->const_val;
+
+
+            if ( lval2->val_type == DOUBLE ) { 
+                clearstage(before1, 0);
+                Zsp = savesp1;
+                force(DOUBLE, lval->val_type, NO, lval->flags & UNSIGNED, NO);
+                lval->val_type = DOUBLE;
+                dpush();
+                load_double_into_fa(lval2);
+                (*oper)(lval);
+                return;
+            }
+
+
             if ( lval->val_type == DOUBLE ) { 
                 /* On stack we've got the double, load the constant as a double */
-                vlongconst(val);
-                if ( lval2->flags & UNSIGNED ) {
-                    convUlong2doub();
+                if ( lval2->val_type == DOUBLE ) {
+                    load_double_into_fa(lval2);
                 } else {
-                    convSlong2doub();
+                    vlongconst(val);
+                    if ( lval2->flags & UNSIGNED ) {
+                        convUlong2doub();
+                    } else {
+                        convSlong2doub();
+                    }
                 }
                 (*oper)(lval);
             } else {
                 if (dbltest(lval, lval2)) {
+                    int ival = val;
                     /* are adding lval2 to pointer, adjust size */
-                    cscale(lval->ptr_type, lval->tagsym, &val);
+                    cscale(lval->ptr_type, lval->tagsym, &ival);
+                    val = ival;
                 }
                 if (oper == zsub) {
                     /* addition on Z80 is cheaper than subtraction */
@@ -360,13 +454,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 }
                 /* remove zpush and add int constant to int */
                 clearstage(before1, 0);
-                Zsp += 2;
-                if (lval->val_type == LONG || lval->val_type == CPTR)
-                    Zsp += 2;
+                Zsp = savesp1;
                 addconst(val, 0, 0);
             }
         } else {
-            /* non-constant on both sides or double +/- int const */
+            /* non-constant on both sides  */
             if (dbltest(lval, lval2))
                 scale(lval->ptr_type, lval->tagsym);
             if (widen(lval, lval2)) {
@@ -389,18 +481,26 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         }
     }
-    if (lval->is_const &= lval2->is_const) {
+    if (lval->is_const && lval2->is_const) {
+        if ( lhs_val_type == DOUBLE ) decrement_double_ref(lval);
+        if ( rhs_val_type == DOUBLE ) decrement_double_ref(lval2);
         /* both operands constant */
-        if (oper == zadd)
+        if (oper == zadd) 
             lval->const_val += lval2->const_val;
         else if (oper == zsub)
             lval->const_val -= lval2->const_val;
         else
             lval->const_val = 0;
+        // Promote as necessary
+        if ( lhs_val_type == DOUBLE || rhs_val_type == DOUBLE ) {
+            lval->val_type = DOUBLE;
+            load_double_into_fa(lval);
+        }
         clearstage(before, 0);
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {
         /* right operand not constant */
+        lval->is_const = 0;
         (*oper)(lval);
     }
     if (oper == zsub && lval->ptr_type) {
@@ -414,50 +514,15 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             ltype = CINT; /* dodgy maybe 24/4/99 */
         }
         if (lval->ptr_type == CINT && lval2->ptr_type == CINT) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(1);
-            } else {
-                swap();
-                vconst(1);
-            }
-            asr(lval); /*  div by 2  */
+            zdiv_const(lval,2);  /* Divide by two */
         } else if (lval->ptr_type == CPTR && lval2->ptr_type == CPTR) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(3);
-            } else {
-                swap();
-                vconst(3);
-            }
-            zdiv(lval);
+            zdiv_const(lval,3);
         } else if (lval->ptr_type == LONG && lval2->ptr_type == LONG) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(2);
-            } else {
-                swap();
-                vconst(2);
-            }
-            asr(lval); /* div by 4 */
+            zdiv_const(lval,4); /* div by 4 */
         } else if (lval->ptr_type == DOUBLE && lval2->ptr_type == DOUBLE) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(6);
-            } else {
-                swap();
-                vconst(6);
-            }
-            zdiv(lval); /* div by 6 */
+            zdiv_const(lval,6); /* div by 6 */
         } else if (lval->ptr_type == STRUCT && lval2->ptr_type == STRUCT) {
-            if (lval->val_type == CPTR) {
-                lpush();
-                vlongconst(lval->tagsym->size);
-            } else {
-                swap();
-                vconst(lval->tagsym->size);
-            }
-            zdiv(lval);
+            zdiv_const(lval, lval->tagsym->size);
         }
     }
     result(lval, lval2);

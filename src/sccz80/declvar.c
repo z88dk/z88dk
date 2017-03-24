@@ -139,8 +139,15 @@ void defenum(char* sname, enum storage_type storage)
     do {
         if (symname(name) == 0)
             illname(name);
-        if (cmatch('='))
-            constexpr(&value, 1);
+        if (cmatch('=')) {
+            double dval;
+            int    valtype;
+
+            constexpr(&dval, &valtype, 1);
+            if ( valtype == DOUBLE ) 
+                warning(W_DOUBLE_UNEXPECTED);
+            value = dval;
+        }
         ptr = addglb(name, VARIABLE, ENUM, 0, STATIK, 0, 0);
         ptr->size = value;
         value++;
@@ -266,11 +273,6 @@ void declglb(
         } else if (ident == PTR_TO_FN) {
             ident = POINTER;
             ptrtofn = YES;
-#if 0
-        } else if ( cmatch('@') ) {
-                        storage = EXTERNP;
-                        constexpr(&addr,1);
-#endif
         } else if (cmatch('(')) {
             /*
              * Here we check for functions, but we can never have a pointer to
@@ -366,8 +368,13 @@ void declglb(
         }
 
         if (cmatch('@')) {
+            double val;
+            int    valtype;
+            constexpr(&val,&valtype, 1);
+            if ( valtype == DOUBLE ) 
+                warning(W_DOUBLE_UNEXPECTED);
+            addr = val;
             storage = EXTERNP;
-            constexpr(&addr, 1);
         }
         /* Check to see if far has been defined when we haven't got a pointer */
 
@@ -607,7 +614,8 @@ void declloc(
                 cptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
                 cptr->isconst = var->isconst;
                 if (cmatch('=')) {
-                    int vconst, val, expr;
+                    int vconst,expr;
+                    double val;
                     char *before, *start;
                     if ((typ == STRUCT && ident != POINTER) || ident == ARRAY)
                         error(E_AUTOASSIGN, sname);
@@ -615,10 +623,23 @@ void declloc(
                     declared = 0;
                     setstage(&before, &start);
                     expr = expression(&vconst, &val);
-                    clearstage(before, start);
+
+                    if ( vconst && expr != cptr->type ) {
+                        // It's a constant that doesn't match the right type
+                        LVALUE  lval;
+                        clearstage(before, 0);
+                        if ( expr == DOUBLE ) {
+                            decrement_double_ref_direct(val);
+                        }
+                        lval.val_type = cptr->type;
+                        lval.const_val = val;
+                        load_constant(&lval);
+                    } else {
+                        clearstage(before, start);
+                        //conv type
+                        force(decltype, expr, 0, 0, 0);
+                    }
                     cptr->isassigned = YES;
-                    //conv type
-                    force(decltype, expr, 0, 0, 0);
                     StoreTOS(decltype);
                 }
             }
@@ -753,20 +774,23 @@ void ptrerror(int ident)
  *      this routine makes subscript the absolute
  *      size of the array.
  */
-static int needsub(void)
+static int32_t needsub(void)
 {
-    int32_t num;
+    double  val;
+    int     valtype;
 
     if (cmatch(']'))
         return (0); /* null size */
-    if (constexpr(&num, 1) == 0) {
-        num = 1;
-    } else if (num < 0) {
+    if (constexpr(&val,&valtype, 1) == 0) {
+        val = 1;
+    } else if (val < 0) {
         error(E_NEGATIVE);
-        num = (-num);
+        val = (-val);
     }
+    if (valtype == DOUBLE)
+        warning(W_DOUBLE_UNEXPECTED);
     needchar(']'); /* force single dimension */
-    return ((int)num); /* and return size */
+    return (val); /* and return size */
 }
 
 /*
@@ -876,9 +900,10 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
 
 static void swallow_bitfield(void)
 {
-    int32_t val;
+    double val;
+    int valtype;
     if (cmatch(':')) {
-        constexpr(&val, 1);
+        constexpr(&val, &valtype, 1);
         warning(W_BITFIELD);
     }
 }

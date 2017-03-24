@@ -21,18 +21,24 @@
 #include "ccdefs.h"
 
 #include <math.h>
+#include "lib/utlist.h"
 
 static int get_member_size(TAG_SYMBOL *ptr);;
-static int32_t search_litq_for_doublestr(unsigned char *num);;
-static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias);
 
-/*
- * These two variables used whilst loading constants, makes things
- * a little easier to handle - type specifiers..
- */
 
-char constype;
-char conssign;
+
+typedef struct elem_s {
+    struct elem_s *next;
+    int            refcount;
+    int            litlab;
+    double         value;
+    unsigned char  fa[6];      /* The parsed representation */
+    char           str[60];    /* A raw string version */
+} elem_t;
+
+
+static elem_t    *double_queue = NULL;
+
 
 /* Modified slightly to sort have two pools - one for strings and one
  * for doubles..
@@ -40,56 +46,39 @@ char conssign;
 
 int constant(LVALUE* lval)
 {
-    constype = CINT;
-    conssign = c_default_unsigned;
+    int32_t val;
+    lval->val_type = CINT;
+    lval->flags &= ~UNSIGNED;
+    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     lval->is_const = 1; /* assume constant will be found */
-    if (fnumber(&lval->const_val)) {
+    if (fnumber(lval)) {
+        load_double_into_fa(lval);
         lval->val_type = DOUBLE;
-        if (c_double_strings) {
-            immedlit(litlab);
-            outdec(lval->const_val);
-            nl();
-            callrts("__atof2");
-            WriteDefined("math_atof", 1);
-        } else {
-            immedlit(dublab);
-            outdec(lval->const_val);
-            nl();
-            callrts("dload");
-        }
-        lval->is_const = 0; /*  floating point not constant */
         lval->flags = FLAGS_NONE;
         return (1);
-    } else if (number(&lval->const_val) || pstr(&lval->const_val)) {
-        /* Insert int32_t stuff/int32_t pointer here? */
-        if ((uint32_t)lval->const_val >= 65536LU)
-            constype = LONG;
-
-        lval->val_type = constype;
-        lval->flags = (lval->flags & (~UNSIGNED)) | conssign;
-        if (constype == LONG)
+    } else if (number(lval) || pstr(lval)) {
+        if (lval->val_type == LONG)
             vlongconst(lval->const_val);
         else
             vconst(lval->const_val);
         return (1);
-    } else if (tstr(&lval->const_val)) {
+    } else if (tstr(&val)) {
+        lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
         lval->ptr_type = CCHAR; /* djm 9/3/99 */
         lval->val_type = CINT;
         lval->flags = FLAGS_NONE;
         immedlit(litlab);
-    } else {
-        lval->is_const = 0;
-        return (0);
-    }
-    outdec(lval->const_val);
-    nl();
-    return (1);
+        outdec(lval->const_val);
+        nl();
+        return (1);
+    } 
+    lval->is_const = 0;
+    return (0);
 }
 
-int fnumber(int32_t* val)
+int fnumber(LVALUE *lval)
 {
-    unsigned char sum[6];
     int i,k; /* flag and mask */
     char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
@@ -130,90 +119,23 @@ int fnumber(int32_t* val)
     dval = strtod(start, &end);
     if (end == start)
         return 0;
-    dofloat(dval, sum, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
 
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
 
-    /* get location for result & bump litptr */
-    if (c_double_strings) {
-        *val = stash_double_str(start, lptr + line);
-        return (1);
-    } else {
-        *val = search_litq_for_doublestr(sum);
-    }
+    lval->const_val = dval;
+
     return (1); /* report success */
 }
 
-/* stash a double string in the literal pool */
 
-int stash_double_str(char* start, char* end)
-{
-    int len;
-    int32_t val;
-    char* buf;
-
-    len = end - start;
-
-    if (*(start + len - 1) == ' ')
-        len--;
-
-    buf = malloc(len + 1);
-
-    if (buf == NULL) {
-        error(E_LITQOV); /* As good as any really.. */
-    }
-    strncpy(buf, start, len);
-    *(buf + len) = 0;
-    storeq(len + 1, (unsigned char*)buf, &val);
-    FREENULL(buf);
-    return (val);
-}
-
-/* Search through the literal queue searching for a match with our
- * number - saves space etc etc
- */
-
-static int32_t search_litq_for_doublestr(unsigned char* num)
-{
-    unsigned char* tempdub;
-    int dubleft, k, match;
-
-    dubleft = dubptr;
-    tempdub = dubq;
-    while (dubleft) {
-        /* Search through.... */
-        match = 0;
-        for (k = 0; k < 6; k++) {
-            if (*tempdub++ == num[k])
-                match++;
-        }
-        if (match == 6)
-            return (dubptr - dubleft);
-        dubleft -= 6;
-    }
-    /* Put it in the double queue now.. */
-    if (dubptr + 6 >= FNMAX) {
-        error(E_DBOV);
-        return (0);
-    }
-
-    for (k = 0; k < 6; k++) {
-        *tempdub++ = num[k];
-    }
-    dubptr += 6;
-    return (dubptr - 6);
-}
-
-int number(int32_t* val)
+int number(LVALUE *lval)
 {
     char c;
     int minus;
     int32_t k;
-    /*
- * djm, set the type specifiers to normal
- */
+
     k = minus = 1;
     while (k) {
         k = 0;
@@ -236,7 +158,7 @@ int number(int32_t* val)
             else
                 k = (k << 4) + ((c & 95) - '7');
         }
-        *val = k;
+        lval->const_val = k;
         goto typecheck;
     }
     if (ch() == '0') {
@@ -246,7 +168,7 @@ int number(int32_t* val)
             if (c < '8')
                 k = k * 8 + (c - '0');
         }
-        *val = k;
+        lval->const_val = k;
         goto typecheck;
     }
     if (numeric(ch()) == 0)
@@ -257,15 +179,19 @@ int number(int32_t* val)
     }
     if (minus < 0)
         k = (-k);
-    *val = k;
+    lval->const_val = k;
 typecheck:
+    lval->val_type = CINT;
+    if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
+        lval->val_type = LONG;
+    }
     while (rcmatch('L') || rcmatch('U') || rcmatch('S')) {
         if (cmatch('L'))
-            constype = LONG;
+            lval->val_type = LONG;
         if (cmatch('U'))
-            conssign = YES; /* unsigned */
+            lval->flags |= UNSIGNED;
         if (cmatch('S'))
-            conssign = NO;
+            lval->flags &= ~UNSIGNED;
     }
     return (1);
 }
@@ -294,18 +220,19 @@ void address(SYMBOL* ptr)
     }
 }
 
-int pstr(int32_t* val)
+int pstr(LVALUE *lval)
 {
     int k;
 
-    constype = CINT;
-    conssign = c_default_unsigned;
+    lval->val_type = CINT;
+    lval->flags &= ~UNSIGNED;
+    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     if (cmatch('\'')) {
         k = 0;
         while (ch() && ch() != '\'')
             k = (k & 255) * 256 + litchar();
         gch();
-        *val = k;
+        lval->const_val = k;
         return (1);
     }
     return (0);
@@ -373,14 +300,14 @@ int storeq(int length, unsigned char* queue, int32_t* val)
     return (k);
 }
 
-int qstr(int32_t* val)
+int qstr(double *val)
 {
     int cnt = 0;
 
     if (cmatch('"') == 0)
         return (-1);
 
-    *val = (int32_t)gltptr;
+    *val = gltptr;
     do {
         while (ch() != '"') {
             if (ch() == 0)
@@ -552,9 +479,10 @@ void size_of(LVALUE* lval)
                 }
                 /* Check for index operator on array */
                 if (ptr->ident == ARRAY && rcmatch('[')) {
-                    int val;
+                    double val;
+                    int valtype;
                     needchar('[');
-                    constexpr(&val, 1);
+                    constexpr(&val, &valtype,  1);
                     needchar(']');
                     lval->const_val = get_type_size(ptr->type, tagtab + ptr->tag_idx);
                 }
@@ -585,7 +513,7 @@ static int get_member_size(TAG_SYMBOL* ptr)
     return (0);
 }
 
-static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
+void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 {
     double norm;
     double x = fabs(raw);
@@ -631,5 +559,122 @@ static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bia
             fa[4 - i / 2] |= (bit & 0x0f);
         }
         norm = mult - res;
+    }
+}
+
+
+elem_t *get_elem_for_fa(unsigned char fa[6], double value) 
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( memcmp(elem->fa, fa, 6) == 0 ) {
+            return elem;
+        }
+    }
+    elem = MALLOC(sizeof(*elem));
+    elem->refcount = 0;
+    elem->litlab = getlabel();
+    elem->value = value;
+    memcpy(elem->fa, fa, 6);
+    LL_APPEND(double_queue, elem);
+    return elem;
+}
+
+elem_t *get_elem_for_buf(char *str, double value) 
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( strcmp(elem->str, str) == 0 ) {
+            return elem;
+        }
+    }
+    elem = MALLOC(sizeof(*elem));
+    elem->litlab = getlabel();
+    elem->refcount = 0;
+    elem->value = value;
+    strcpy(elem->str,str);
+    LL_APPEND(double_queue, elem);
+    return elem;
+}
+
+
+
+void write_double_queue(void)
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( elem->refcount ) {
+            output_section("rodata_compiler"); // output_section("text");
+            prefix();
+            queuelabel(elem->litlab);
+            col();
+            nl();
+            if ( c_double_strings ) {
+                defmesg(); outstr(elem->str); outstr("\"\n");
+                defbyte(); outdec(0); nl();
+            } else {
+                //outfmt("\t;%lf ref: %d\n",elem->value,elem->refcount);
+                outfmt("\t;%lf\n",elem->value,elem->refcount);
+                outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
+            }
+        }
+    }
+    nl();
+}
+
+void decrement_double_ref_direct(double value)
+{
+    LVALUE lval;
+
+    lval.const_val = value;
+
+    decrement_double_ref(&lval);
+}
+
+void decrement_double_ref(LVALUE *lval)
+{   
+    unsigned char    fa[6];
+    elem_t          *elem;
+    if ( c_double_strings ) {
+        char  buf[40];
+        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        elem = get_elem_for_buf(buf,lval->const_val);
+        elem->refcount--;
+    } else {
+        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+        elem = get_elem_for_fa(fa,lval->const_val);
+        elem->refcount--;
+    }
+}
+
+void load_double_into_fa(LVALUE *lval)
+{            
+    unsigned char    fa[6];
+    elem_t          *elem;
+
+    fa[0] = fa[1] = fa[2] = fa[3] = fa[4] = fa[5] = 0;
+
+    if ( c_double_strings ) {
+        char  buf[40];
+        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        elem = get_elem_for_buf(buf, lval->const_val);
+        elem->refcount++;
+        immedlit(elem->litlab);
+        outdec(0);
+        nl();
+        callrts("__atof2");
+        WriteDefined("math_atof", 1);
+    } else {
+        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+
+        elem = get_elem_for_fa(fa,lval->const_val);
+        elem->refcount++;
+        immedlit(elem->litlab);
+        outdec(0);
+        nl();
+        callrts("dload");
     }
 }

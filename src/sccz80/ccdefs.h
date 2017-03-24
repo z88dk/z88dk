@@ -46,6 +46,7 @@ extern void     callfunction(SYMBOL *ptr, SYMBOL *fnptr);
 
 #include "codegen.h"
 #include "const.h"
+extern void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias);
 #include "data.h"
 #include "declvar.h"
 #include "declfunc.h"
@@ -65,8 +66,9 @@ extern void     goto_cleanup(void);
 extern int      skim(char *opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE *lval);
 extern void     dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int exit1, LVALUE *lval);
 extern int      plnge1(int (*heir)(LVALUE* lval), LVALUE *lval);
-extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval));
+extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval));
 extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
+extern void     load_constant(LVALUE *lval);
 
 #include "preproc.h"
 #include "primary.h"
