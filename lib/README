@@ -1,16 +1,5 @@
-Includes for the Ti-83 and the TI-83 Plus (main.h ti83.h ti83p.h)
------------------------------------------
+This folder includes the key elements to make z88dk work in "classic mode" and discriminate between "classic" and "new" modes.
 
-Just a quick readme to explain things. The files included
-have been changed to compile with z80asm, a linux z80 compiler
-included with the project z88dk which can be found at sourceforge.
-The main.h file assumes that your .asm files are in src/ and the includes in 
-lib/ also, you'll have to define Plus either with the line:
-Define		Plus
-or the option -DPlus on the command line.
-Thats all, if you need to convert anything else, either learn how to use
-regexps (man 7 regex) or contact me
-
---
-Solignac Julien
-<x1cygnus@xcalc.org>
+{z88dk}/lib/config   -> target configuration and build options
+{z88dk}/lib/clib     -> classic lib binary storage
+{z88dk}/lib/         -> target specific startup code and constant definitions for z80asm
