@@ -111,6 +111,8 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             if (expr == CARRY) {
                 zcarryconv();
                 expr = CINT;
+                packedArgumentType &= 0xFFFFFF00;
+                packedArgumentType |= expr;
             }
 
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
@@ -125,12 +127,14 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 if ((protoarg != PELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == STRUCT)))
                     expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
 
+#if 0
                 if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
                     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__smallc/__stdc");
                 }
                 if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
                     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__z88dk_callee");
                 }
+#endif
             }
             if ((ptr->flags & FASTCALL) && ptr->prototyped == 1) {
                 /* fastcall of single expression */
