@@ -25,8 +25,10 @@ stdlib/ltoa
 stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
-stdlib/qsort
-stdlib/qsort_callee
+stdlib/qsort_sccz80
+stdlib/qsort_sccz80_callee
+stdlib/qsort_sdcc
+stdlib/qsort_sdcc_callee
 stdlib/rand
 stdlib/randomize
 stdlib/strtol

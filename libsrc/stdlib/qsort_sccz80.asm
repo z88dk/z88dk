@@ -4,13 +4,13 @@
 ;
 
 
-PUBLIC qsort
-PUBLIC _qsort
-EXTERN qsort_callee
-EXTERN ASMDISP_QSORT_CALLEE
+PUBLIC qsort_sccz80
+PUBLIC _qsort_sccz80
 
-.qsort
-._qsort
+EXTERN qsort_sccz80_enter
+
+.qsort_sccz80
+._qsort_sccz80
 	pop	af
 	pop	ix	; *compar
 	pop	hl	; width
@@ -24,4 +24,4 @@ EXTERN ASMDISP_QSORT_CALLEE
 	push ix
 	push af
 
-	jp qsort_callee + ASMDISP_QSORT_CALLEE
+	jp qsort_sccz80_enter

@@ -118,16 +118,30 @@ extern   int optreset;
 //
 // void *cmp == char (*cmp)(void *key, void *datum);
 
-extern void __LIB__            *l_bsearch(void *key, void *base, unsigned int n, void *cmp) __smallc;
+extern void __LIB__  *l_bsearch(void *key, void *base, unsigned int n, void *cmp) __smallc;
 extern void __LIB__  *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp) __smallc __z88dk_callee;
-extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp) __smallc;
+extern void __LIB__  l_qsort(void *base, unsigned int size, void *cmp) __smallc;
 extern void __LIB__  l_qsort_callee(void *base, unsigned int size, void *cmp) __smallc __z88dk_callee;
 
-extern void __LIB__            qsort(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
-extern void __LIB__  qsort_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
-
 #define l_bsearch(a,b,c,d) l_bsearch_callee(a,b,c,d)
-#define qsort(a,b,c,d) qsort_callee(a,b,c,d)
+
+extern void __LIB__  qsort_sccz80(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
+extern void __LIB__  qsort_sccz80_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
+
+extern void __LIB__  qsort_sdcc(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
+extern void __LIB__  qsort_sdcc_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
+
+#ifdef Z88DK_USES_SDCC
+
+#define qsort                  qsort_sdcc
+#define qsort_sdcc(a,b,c,d)    qsort_sdcc_callee(a,b,c,d)
+
+#else
+
+#define qsort                  qsort_sccz80
+#define qsort_sccz80(a,b,c,d)  qsort_sccz80_callee(a,b,c,d)
+
+#endif
 
 #ifdef __ZX81__
 #define l_qsort(a,b,c) qsort(a,b,2,c)
