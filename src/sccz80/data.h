@@ -73,7 +73,6 @@ extern FILE *saveout;
 extern SYMBOL *currfn;
 
 extern char endasm;
-extern char fnargvalue;
 extern int ltype;
 extern char margtag;
 extern int c_share_offset;

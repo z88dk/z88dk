@@ -157,13 +157,13 @@ struct symbol_s {
  *      Mask of sign in prototype
  */
 
-#define PMASKSIGN 191
+#define PMASKSIGN (UNSIGNED << 16)
 
 /*
  *      What void comes out to in a prototype
  */
 
-#define PVOID 15
+#define PVOID 0x107
 
 /* number of types to which pointers to pointers can be defined */
 /* 15 is more than enough! we need some dummy symbols so casting of **

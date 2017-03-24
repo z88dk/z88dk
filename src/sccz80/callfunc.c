@@ -14,7 +14,7 @@
 
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
-static int ForceArgs(char dest, char src, int expr, char functab);
+static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab);
 
 
 /*
@@ -33,7 +33,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     double val;
     int watcharg; /* For watching printf etc */
     int minifunc = 0; /* Call cut down version */
-    unsigned char protoarg;
+    uint32_t protoarg;
     char preserve = NO; /* Preserve af when cleaningup */
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
     FILE *save_fps;
@@ -60,6 +60,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     savesp = Zsp;
     while (ch() != ')') {
         char *before, *start;
+        uint32_t packedType;
         if (endst()) {
             break;
         }
@@ -68,7 +69,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
-        expr = expression(&vconst, &val);
+        expr = expression(&vconst, &val, &packedType);
         clearstage(before, start);  // Wipe out everything we did
         if ( vconst && expr == DOUBLE ) {
             decrement_double_ref_direct(val);
@@ -103,9 +104,10 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
         if (function_pointer_call == NO ) {
+            uint32_t    packedArgumentType;
 
             /* ordinary call */
-            expr = expression(&vconst, &val);
+            expr = expression(&vconst, &val, &packedArgumentType);
             if (expr == CARRY) {
                 zcarryconv();
                 expr = CINT;
@@ -120,8 +122,15 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 }
 
                 protoarg = ptr->args[proto_argnumber];
-                if ((protoarg != PELLIPSES) && ((protoarg != fnargvalue) || ((protoarg & 7) == STRUCT)))
-                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[proto_argnumber]);
+                if ((protoarg != PELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == STRUCT)))
+                    expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
+
+                if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
+                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__smallc/__stdc");
+                }
+                if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
+                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__z88dk_callee");
+                }
             }
             if ((ptr->flags & FASTCALL) && ptr->prototyped == 1) {
                 /* fastcall of single expression */
@@ -149,8 +158,10 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 }
             }
         } else { /* call to address in HL */
+            uint32_t packedType;
+
             zpush(); /* Push address */
-            expr = expression(&vconst, &val);
+            expr = expression(&vconst, &val, &packedType);
             if (expr == CARRY) {
                 zcarryconv();
                 expr = CINT;
@@ -287,31 +298,31 @@ static int SetWatch(char* sym, int* type)
  *      djm routine to force arguments to switch type
  */
 
-static int ForceArgs(char dest, char src, int expr, char functab)
+static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
 {
-    char did, dtype, disfar, dissign;
-    char sid, stype, sisfar, sissign;
+    int  dtype, stype;
+    enum ident_type dident, sident;
+    enum symbol_flags dflags, sflags;
     char buffer[80];
 
-    dtype = dest & 7; /* Lower 3 bits */
-    did = (dest & 56) / 8; /* Middle 3 bits */
-    disfar = (dest & 128);
-    dissign = (dest & 64);
+    dtype = dest &  0xff; /* Lower 3 bits */
+    dident = (dest & 0xff00) >> 8; /* Middle 3 bits */
+    dflags = (dest & 0xffff0000) >> 16;
 
-    stype = src & 7; /* Lower 3 bits */
-    sid = (src & 56) / 8; /* Middle 3 bits */
-    sisfar = (src & 128);
-    sissign = (src & 64);
+    stype = src &  0xff; /* Lower 3 bits */
+    sident = (src & 0xff00) >> 8; /* Middle 3 bits */
+    sflags = (src & 0xffff0000) >> 16;
 
 
-    if (did == VARIABLE) {
-        if (sid == VARIABLE) {
-            force(dtype, stype, dissign, sissign, 0);
+
+    if (dident == VARIABLE) {
+        if (sident == VARIABLE) {
+            force(dtype, stype, dflags & UNSIGNED, sflags & UNSIGNED, 0);
         } else {
             /* Converting pointer to integer/long */
             warning(W_PTRINT);
             /* Pointer is always unsigned */
-            force(dtype, ((sisfar) ? CPTR : CINT), dissign, 0, 0);
+            force(dtype, ((sflags & FARPTR) ? CPTR : CINT), dflags & UNSIGNED, 0, 0);
         }
         if (dtype == CCHAR)
             expr = CINT;
@@ -328,20 +339,20 @@ static int ForceArgs(char dest, char src, int expr, char functab)
             warning(W_PTRTYP1, buffer);
             ExpandArgValue(src, buffer, margtag);
             warning(W_PTRTYP2, buffer);
-        } else if (dtype == stype && did != sid) {
+        } else if (dtype == stype && dident != sident) {
             warning(W_INTPTR);
             expr = CINT;
         }
 
-        if (disfar) {
-            if (disfar != sisfar) {
+        if (dflags & FARPTR) {
+            if ((dflags & FARPTR) != (sflags & FARPTR)) {
                 /* Widening a pointer - next line unneeded - done elsewhere*/
                 /*                                const2(0); */
                 expr = CPTR;
             }
         } else {
             /* destintation is near pointer */
-            if (disfar != sisfar) {
+            if ((dflags & FARPTR) != (sflags & FARPTR)) {
                 warning(W_PRELIM, currfn->name, lineno - fnstart);
                 warning(W_FARNR);
                 expr = CINT;

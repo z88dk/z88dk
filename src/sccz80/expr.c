@@ -32,7 +32,7 @@ void ClearCast(LVALUE* lval)
     lval->castlevel = 0;
 }
 
-int expression(int  *con, double *val)
+int expression(int  *con, double *val, uint32_t *packedArgumentType)
 {
     LVALUE lval;
     char type;
@@ -46,9 +46,10 @@ int expression(int  *con, double *val)
     if (lval.ptr_type) {
         type = lval.ptr_type;
         lval.ident = POINTER;
-    } else
+    } else {
         type = lval.val_type;
-    fnargvalue = CalcArgValue(type, lval.ident, lval.flags);
+    }
+    *packedArgumentType = CalcArgValue(type, lval.ident, lval.flags);
     margtag = 0;
     if (lval.tagsym)
         margtag = (lval.tagsym - tagtab);
@@ -695,6 +696,8 @@ int heirb(LVALUE* lval)
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
             if (cmatch('[')) {
+                uint32_t packedType;
+
                 if (ptr == 0) {
                     error(E_SUBSCRIPT);
                     junk();
@@ -711,7 +714,7 @@ int heirb(LVALUE* lval)
                     zpushde();
                 lval->ident = VARIABLE;
                 zpush();
-                valtype = expression(&con, &dval);
+                valtype = expression(&con, &dval, &packedType);
                 // TODO: Check valtype
                 val = dval;
                 needchar(']');
@@ -773,10 +776,10 @@ int heirb(LVALUE* lval)
                     lval->ptr_type = 0;
                     lval->val_type = ptr->type;
                     lval->ident = VARIABLE;
-                    ptr = lval->symbol = 0;
+                    ptr = lval->symbol = NULL;
                 } else {
                     /* function returning pointer */
-                    lval->flags = ptr->flags; /* djm */
+                    lval->flags = ptr->flags &= ~(CALLEE|SMALLC); /* djm */
                     ptr = lval->symbol = dummy_sym[(int)ptr->more];
                     lval->ident = POINTER;
                     lval->indirect = lval->ptr_type = ptr->type;

@@ -617,12 +617,14 @@ void declloc(
                     int vconst,expr;
                     double val;
                     char *before, *start;
+                    uint32_t packedType;
+
                     if ((typ == STRUCT && ident != POINTER) || ident == ARRAY)
                         error(E_AUTOASSIGN, sname);
                     Zsp = modstk(Zsp - (declared - size), NO, NO);
                     declared = 0;
                     setstage(&before, &start);
-                    expr = expression(&vconst, &val);
+                    expr = expression(&vconst, &val, &packedType);
 
                     if ( vconst && expr != cptr->type ) {
                         // It's a constant that doesn't match the right type
@@ -658,16 +660,18 @@ void declloc(
 /*
  *      Calculate a value for the arguments, this is kludgey but
  *      kinda nice at the same time
- *      bits 0-2 = type ; 3-5 = ident, 7-8=flags (signed & zfar)
+ *      bit 0-7 = type
+ *      bits 8-15 = ident
+ *      bits 16-31 = flags
  */
 
-uint32_t CalcArgValue(char type, char ident, enum symbol_flags flags)
+uint32_t CalcArgValue(int type, enum ident_type ident, enum symbol_flags flags)
 {
     if (type == ELLIPSES)
         return PELLIPSES;
     if (type == VOID)
         flags &= ~UNSIGNED; /* remove sign from void */
-    return (type + (ident * 8) + ((flags & (UNSIGNED|FARPTR)) * 64));
+    return type + (ident << 8) + ( flags << 16);
 }
 
 /*
@@ -717,20 +721,23 @@ char* ExpandType(int type, char** dosign, char tagidx)
 
 char *ExpandArgValue(uint32_t value, char* buffer, char tagidx)
 {
-    char ident, type, isfar, issigned;
+    enum ident_type ident;
+    int  type;
+    enum symbol_flags flags;
     char *id, *typ, *dofar, *dosign;
 
-    type = value & 7; /* Lower 3 bits */
-    ident = (value & 56) / 8; /* Middle 3 bits */
-    isfar = (value & 128);
-    issigned = (value & 64);
+    type = value &  0xff; /* Lower 3 bits */
+    ident = (value & 0xff00) >> 8; /* Middle 3 bits */
+    flags = (value & 0xffff0000) >> 16;
 
-    if (issigned)
+
+
+    if (flags & UNSIGNED)
         dosign = "unsigned ";
     else
         dosign = "signed ";
 
-    if (isfar)
+    if (flags & FARPTR)
         dofar = "far ";
     else
         dofar = "";

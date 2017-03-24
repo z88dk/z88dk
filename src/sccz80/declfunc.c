@@ -157,7 +157,7 @@ void newfunc()
  */
 SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, enum storage_type storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
 {
-    unsigned char tvalue; /* Used to hold protot value */
+    uint32_t tvalue; /* Used to hold protot value */
     char typ; /* Temporary type */
     int itag;
 
@@ -211,7 +211,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
         currfn = addglb(n, FUNCTION, typ, FUNCTION, storage, more, 0);
         currfn->size = 0;
         currfn->prototyped = 0;
-        currfn->flags = (sign & UNSIGNED) | (zfar & FARPTR);
+        currfn->flags = (sign ? UNSIGNED : 0) | (zfar ? FARPTR : 0);
         if (type == STRUCT)
             currfn->tagarg[0] = itag;
         /*
@@ -220,7 +220,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
          */
         currfn->args[0] = CalcArgValue(type, ident, currfn->flags);
     }
-    tvalue = CalcArgValue(type, ident, ((sign & UNSIGNED) | (zfar & FARPTR)));
+    tvalue = CalcArgValue(type, ident, (sign ? UNSIGNED : 0) | (zfar ? FARPTR :0));    
     if (currfn->args[0] != tvalue || (type == STRUCT && currfn->tagarg[0] != itag)) {
         char buffer[120];
         warning(W_DIFFTYPE);
@@ -345,7 +345,7 @@ static int setup_function_parameter(SYMBOL *argument, int argnumber)
                 if (currfn->args[argnumber] == 0) {
                     warning(W_2MADECL);
                 } else {
-                    if ((currfn->args[argnumber] & PMASKSIGN) == (tester & PMASKSIGN)) {
+                    if ((currfn->args[argnumber] & PMASKSIGN) != (tester & PMASKSIGN)) {
                         warning(W_SIGNARG);
                     } else {
                         error(E_ARGMIS1, currfn->name, currfn->prototyped - argnumber + 1, ExpandArgValue(tester, buffer2, argument->tag_idx));

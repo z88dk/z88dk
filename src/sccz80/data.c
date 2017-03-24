@@ -106,7 +106,6 @@ SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
 char endasm;
 
 char margtag; /* Struct tag number for arg value */
-char fnargvalue; /* Type of argument value (as per proto) */
 int ltype; /* Long? */
 
 

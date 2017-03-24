@@ -703,9 +703,10 @@ int constexpr(double *val, int *type, int flag)
     int con;
     int savesp = Zsp;
     int valtype;
+    uint32_t packedType;
 
     setstage(&before, &start);
-    valtype = expression(&con, &valtemp);
+    valtype = expression(&con, &valtemp, &packedType);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     if ( valtype == DOUBLE && con ) {

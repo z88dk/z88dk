@@ -289,10 +289,11 @@ int doexpr()
     char *before, *start;
     double val;
     int type, vconst;
+    uint32_t packedType;
 
     while (1) {
         setstage(&before, &start);
-        type = expression(&vconst, &val);
+        type = expression(&vconst, &val, &packedType);
         clearstage(before, start);
         if (ch() != ',')
             return type;
