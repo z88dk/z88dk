@@ -35,4 +35,5 @@ graphics/draw_profile_nostencil
 graphics/swapgfxbk_foo
 games/joystick
 abc80/abc_inv
+abc80/abc_cursor
 @z80.lst
