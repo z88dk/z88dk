@@ -68,6 +68,10 @@ TIMER_STOP();
 
 int main(void)
 {
+#ifdef __Z88DK
+   intrinsic_di();
+#endif
+
    PRINTF1("\nFilling the array with numbers.\n\n");
    
    /* FILL ARRAY WITH NUMBERS */

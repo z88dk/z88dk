@@ -1,7 +1,7 @@
-SORT
-====
+SORTING
+=======
 
-This benchmark test the performance of the compiler library's qsort function.
+This benchmark tests the performance of the compiler library's qsort function.
 
 Some of the C compilers under test do not supply a qsort() function so for those
 a common & small implementation has been sourced from the internet.  Unfortunately
@@ -27,8 +27,8 @@ implementation can be further customized to determine pivot selection (middle or
 whether insertion sort is used for small partitions, and if equal items are dispersed
 approximately equally between partitions.  The new c library also has a heapsort
 implementation through the priority_queue data type but that cannot be connected to
-the qsort function.  For Z88DK testing then, only a few combinations are chosen to
-keep the number of variations under control.
+the qsort function so it is not tested.  For Z88DK testing then, only a few combinations
+are chosen to keep the number of variations under control.
 
 RESULTS - 20 ITEMS
 ==================
