@@ -127,8 +127,13 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 if ((protoarg != PELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == STRUCT)))
                     expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
 
-#if 0
+#if 1
                 if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
+                    char   buf[256], buf2[256];
+                    ExpandArgValue(protoarg, buf, 0);
+                    ExpandArgValue(packedArgumentType, buf2, 0);
+                    
+			printf("Protoarg %08x (%s) packed %08x (%s)\n",protoarg, buf, packedArgumentType, buf2);
                     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__smallc/__stdc");
                 }
                 if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
@@ -343,7 +348,8 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
             warning(W_PTRTYP1, buffer);
             ExpandArgValue(src, buffer, margtag);
             warning(W_PTRTYP2, buffer);
-        } else if (dtype == stype && dident != sident) {
+        } else if (dtype == stype && dident != sident && sident != FUNCTION) {
+            printf("%d %d\n",dident,sident);
             warning(W_INTPTR);
             expr = CINT;
         }

@@ -142,8 +142,8 @@ int primary(LVALUE* lval)
         }
         lval->symbol = ptr;
         lval->indirect = 0;
-        lval->val_type = CINT; /* Null function, always int */
-        lval->flags = FLAGS_NONE; /* Assume signed, no far */
+        lval->val_type = ptr->type ; /* Null function, always int */
+        lval->flags = ptr->flags;
         lval->ident = FUNCTION;
         return (0);
     }

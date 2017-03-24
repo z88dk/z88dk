@@ -34,7 +34,7 @@ void ClearCast(LVALUE* lval)
 
 int expression(int  *con, double *val, uint32_t *packedArgumentType)
 {
-    LVALUE lval;
+    LVALUE lval={0};
     char type;
 
     ClearCast(&lval);
@@ -770,6 +770,7 @@ int heirb(LVALUE* lval)
                     callfunction(NULL,ptr);
                 } else
                     callfunction(ptr,NULL);
+                lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
                 if (ptr && ptr->more == 0) {
                     /* function returning variable */
@@ -779,7 +780,7 @@ int heirb(LVALUE* lval)
                     ptr = lval->symbol = NULL;
                 } else {
                     /* function returning pointer */
-                    lval->flags = ptr->flags; //  &= ~(CALLEE|SMALLC); /* djm */
+                    lval->flags = ptr->flags & ~(CALLEE|SMALLC|FASTCALL); /* djm */
                     ptr = lval->symbol = dummy_sym[(int)ptr->more];
                     lval->ident = POINTER;
                     lval->indirect = lval->ptr_type = ptr->type;

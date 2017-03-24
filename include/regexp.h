@@ -21,7 +21,7 @@ typedef struct regexp {
 
 extern regexp __LIB__ __SAVEFRAME__ *regcomp(char *);
 extern int __LIB__ __SAVEFRAME__ regexec(regexp *__prog, char *__string) __smallc;
-extern void __LIB__ __SAVEFRAME__ regsub(regexp *__prog, char *__source, char *__dest);
+extern void __LIB__ __SAVEFRAME__ regsub(regexp *__prog, char *__source, char *__dest) __smallc;
 extern void __LIB__ __SAVEFRAME__ regerror(const char *);
 
 #endif
