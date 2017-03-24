@@ -47,7 +47,6 @@
         PUBLIC	ansi_del_line
         PUBLIC	ansi_SCROLLUP
 
-        PUBLIC	FRAMES
 
 
         IF      !DEFINED_CRT_ORG_CODE
@@ -348,10 +347,6 @@ irq_hndl:
 		ex	(sp),hl
 		ret
 
-FRAMES:
-		defw	0
-		defw	0
-
 
 IF !DEFINED_nogfx
 
@@ -530,12 +525,27 @@ ENDIF
 
         defm  "Small C+ MC1000"
         defb   0
-        INCLUDE "crt0_runtime_selection.asm"
 
+		
+; If we were given an address for the BSS then use it
+IF DEFINED_CRT_ORG_BSS
+	defc	__crt_org_bss = CRT_ORG_BSS
+ENDIF
+
+
+	INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE	"crt0_section.asm"
 
+	
 	SECTION	bss_crt
+	
         PUBLIC	pixelbyte	; Temp store for non-buffered mode
-pixelbyte:      defw    0       
+        PUBLIC	FRAMES
+		
+pixelbyte:
+		defw    0       
 
+FRAMES:
+		defw	0
+		defw	0
 
