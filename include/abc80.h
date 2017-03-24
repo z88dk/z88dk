@@ -18,5 +18,7 @@
 // Invert graphics display
 extern void  __LIB__ abc_inv ();
 
+// Set cursor shape
+extern void  __LIB__ abc_cursor (int shape) __z88dk_fastcall;
 
 #endif
