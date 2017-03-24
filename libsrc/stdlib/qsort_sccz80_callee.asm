@@ -123,6 +123,8 @@ qsort_sccz80_enter:
    ; for ..; j>0; ..
    jp m,i_6
    
+   push ix
+   
    ; 1st arg:  base+j
    ld de,(_base)
    ;ld   hl,(_j)
@@ -142,6 +144,8 @@ qsort_sccz80_enter:
 
    pop bc      ; we're keeping the same args for the next call !
    pop de
+   
+   pop ix
 
    ; if ((*compar)(base+j, jd+j) <=0) break;
    dec hl

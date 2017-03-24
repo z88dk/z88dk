@@ -40,23 +40,23 @@ EXTERN memswap_callee
 
    pop af
    pop bc
-	exx
-	pop hl
-	pop de
-	pop bc
-	exx
-	push af
-	
+   exx
+   pop hl
+   pop de
+   pop bc
+   exx
+   push af
+   
 qsort_sdcc_enter:
 
-	push bc
-	exx
-	ex (sp),ix
-	
-	call asm_qsort
-	
-	pop ix
-	ret
+   push bc
+   exx
+   ex (sp),ix
+   
+   call asm_qsort
+   
+   pop ix
+   ret
 
 asm_qsort:
 
@@ -135,16 +135,18 @@ asm_qsort:
    ; for ..; j>0; ..
    jp m,i_6
 
-	; 1st arg: jd+j
-	push hl
-	ld de,(_jd)
-	add hl,de
-	ex (sp),hl
-	
-	; 2nd arg: base+j
-	ld de,(_base)
-	add hl,de
-	push hl
+   push ix
+   
+   ; 1st arg: jd+j
+   push hl
+   ld de,(_jd)
+   add hl,de
+   ex (sp),hl
+   
+   ; 2nd arg: base+j
+   ld de,(_base)
+   add hl,de
+   push hl
 
    ld bc,ret_addr
    push bc
@@ -154,6 +156,8 @@ asm_qsort:
    pop de      ; we're keeping the same args for the next call !
    pop bc
 
+   pop ix
+   
    ; if ((*compar)(base+j, jd+j) <=0) break;
    dec hl
    bit 7,h
