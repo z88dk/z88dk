@@ -779,7 +779,7 @@ int heirb(LVALUE* lval)
                     ptr = lval->symbol = NULL;
                 } else {
                     /* function returning pointer */
-                    lval->flags = ptr->flags &= ~(CALLEE|SMALLC); /* djm */
+                    lval->flags = ptr->flags; //  &= ~(CALLEE|SMALLC); /* djm */
                     ptr = lval->symbol = dummy_sym[(int)ptr->more];
                     lval->ident = POINTER;
                     lval->indirect = lval->ptr_type = ptr->type;
