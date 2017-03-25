@@ -91,6 +91,7 @@ struct warnings mywarn[] = {
     { "Function pointer '%s'' doesn't have the same %s status as the value it's being given", 0},
     { "Unexpected floating point encountered, taking int value", 0},
     { "Function pointer passed to function '%s' argument %d doesn't have the same %s status as the prototype", 0},
+    { "Left shifting by more than the size of the object", 0},
 };
 
 struct errors {

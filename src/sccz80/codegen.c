@@ -1837,6 +1837,7 @@ void asl_const(LVALUE *lval, int32_t value)
                 ol("rl\td");   
                 break;
             default: //  5 bytes
+                if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
                 loada( value );
                 callrts("l_long_aslo");
                 break;
@@ -1860,6 +1861,7 @@ void asl_const(LVALUE *lval, int32_t value)
             case 8: // 3 bytes
                 ol("ld\th,l");
                 ol("ld\tl,0");
+	        break;
             case 7:
                 ol("add\thl,hl");
             case 6:
@@ -1878,6 +1880,7 @@ void asl_const(LVALUE *lval, int32_t value)
                 break;
             default: // 7 bytes
                 if ( value >= 16 ) {
+                    warning(W_LEFTSHIFT_TOO_BIG);
                     vconst(0);
                 } else {
                     const2(value);
