@@ -37,7 +37,7 @@ static void quikmult(int type, int32_t size, char preserve);
 static void threereg(void);
 static void fivereg(void);
 static void sixreg(void);
-
+static void loada(int n);
 
 /*
  * Data for this module
@@ -508,6 +508,11 @@ void put2tos(void)
 void loadargc(int n)
 {
     n >>= 1;
+    loada(n);
+}
+
+static void loada(int n)
+{
     if (n) {
         ot("ld\ta,");
         outdec(n);
@@ -1832,8 +1837,12 @@ void asl_const(LVALUE *lval, int32_t value)
                 ol("rl\td");   
                 break;
             default: //  5 bytes
-                loadargc( value % 32 );
-                callrts("l_long_aslo");
+                if ( value >= 32 ) {
+                    vlongconst(0);
+                } else {
+                    loada( value );
+                    callrts("l_long_aslo");
+                }
                 break;
         }
 
@@ -1872,9 +1881,13 @@ void asl_const(LVALUE *lval, int32_t value)
                 ol("add\thl,hl");
                 break;
             default: // 7 bytes
-                const2(value);
-                swap();
-                asl(lval);
+                if ( value >= 16 ) {
+                    vconst(0);
+                } else {
+                    const2(value);
+                    swap();
+                    asl(lval);
+                }
                 break;
         }
     }
