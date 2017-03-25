@@ -77,7 +77,7 @@ int suite_run()
             extra = "";
             switch ( stage ) {
             case 0:
-                extra = "(in setup)";
+                extra = "(in setup) ";
                 /* Fall through */
             case 1:
                 /* Protect ourselves against teardown failing */
