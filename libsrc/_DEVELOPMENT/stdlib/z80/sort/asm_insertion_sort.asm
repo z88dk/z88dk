@@ -13,6 +13,7 @@ SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_insertion_sort
+PUBLIC asm0_insertion_sort
 
 EXTERN error_znc
 EXTERN __sort_parameters, l_compare_de_hl, asm0_memswap

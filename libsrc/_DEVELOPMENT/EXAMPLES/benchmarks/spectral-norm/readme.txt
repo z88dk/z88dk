@@ -112,6 +112,7 @@ cycle count  = 15385384430
 time @ 4MHz  = 15385384430 / 4*10^6 = 64 min 06 sec
 
 48-bit float implementation causes relative slowdown.
+[Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.
 
 7.
 SDCC 3.6.5 #9852 (MINGW64)
