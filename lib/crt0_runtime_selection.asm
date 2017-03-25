@@ -154,7 +154,7 @@ ENDIF
 
 
 IF DEFINED_CLIB_OPT_PRINTF
-	; User has specified the configuration level - force scanf to be included
+	; User has specified the configuration level - force printf to be included
 	UNDEFINE NEED_printf
 	DEFINE NEED_printf
 ELSE
@@ -174,6 +174,12 @@ ELSE
         ENDIF
 ENDIF
 
+IF DEFINED_CLIB_OPT_PRINTF2
+	; User has specified the configuration level - force printf to be included
+	UNDEFINE NEED_printf
+	DEFINE NEED_printf
+ENDIF
+
 IF NEED_printf
 	PUBLIC	__printf_format_table
 	EXTERN	__printf_handle_d
@@ -188,6 +194,13 @@ IF NEED_printf
 	EXTERN	__printf_handle_c
 	EXTERN	__printf_handle_n
 	EXTERN	__printf_handle_B
+	EXTERN	__printf_handle_ll
+	EXTERN	__printf_handle_lld
+	EXTERN	__printf_handle_llu
+	EXTERN	__printf_handle_llo
+	EXTERN	__printf_handle_llx
+	EXTERN	__printf_handle_llX
+	EXTERN	__printf_handle_llB
 
 __printf_format_table:
 
@@ -254,7 +267,46 @@ IF CLIB_OPT_PRINTF & $10000000
 	defb	'g'
 	defw	__printf_handle_f
 ENDIF
+IF CLIB_OPT_PRINTF2
+	defb	'l'
+	defw	__printf_handle_ll
+ENDIF
 	defb	0	;end marker
+
+IF CLIB_OPT_PRINTF2
+__printf_format_table64:
+
+IF CLIB_OPT_PRINTF2 & $02
+	defb	'u'
+	defw	__printf_handle_llu
+ENDIF
+
+IF CLIB_OPT_PRINTF2 & $01
+	defb	'd'
+	defw	__printf_handle_lld
+ENDIF
+
+IF CLIB_OPT_PRINTF2 & $04
+	defb	'x'
+	defw	__printf_handle_llx
+ENDIF
+
+IF CLIB_OPT_PRINTF2 & $08
+	defb	'X'
+	defw	__printf_handle_llX
+ENDIF
+IF CLIB_OPT_PRINTF2  & $10
+	defb	'o'
+	defw	__printf_handle_llo
+ENDIF
+IF CLIB_OPT_PRINTF & $100
+	defb	'B'
+	defw	__printf_handle_llB
+ENDIF
+	defb	0	;endmarker
+ENDIF
+
+
 
 IF CLIB_OPT_PRINTF & $40000000
 	EXTERN	__printf_get_flags_impl

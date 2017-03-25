@@ -16,7 +16,9 @@
 	EXTERN	__printf_handle_o
 	EXTERN	__printf_handle_p
 	EXTERN	__printf_handle_X
+	EXTERN	__printf_handle_B
 	EXTERN	__printf_handle_n
+	EXTERN	__printf_handle_ll
 
 	defc __printf_get_flags = __printf_get_flags_impl
 
@@ -39,4 +41,8 @@ __printf_format_table:
 	defw	__printf_handle_X
 	defb	'n'
 	defw	__printf_handle_n
+	defb	'B'
+	defw	__printf_handle_B
+	defb	'l'
+	defw	__printf_handle_ll
 	defb	0

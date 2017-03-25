@@ -69,6 +69,7 @@ ENDIF
 		SECTION code_fp_math48
 		SECTION code_math
 		SECTION code_error
+		SECTION code_stdlib
 		SECTION code_user
 		SECTION rodata_fp
 		SECTION rodata_compiler
