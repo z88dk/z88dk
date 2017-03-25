@@ -129,8 +129,6 @@
 ../_DEVELOPMENT/math/integer/l_divu_32_32x16.asm
 ../_DEVELOPMENT/math/integer/l_divu_32_32x32.asm
 ../_DEVELOPMENT/math/integer/l_divu_32_32x8.asm
-../_DEVELOPMENT/math/integer/small/l_small_divu_64_64x8
-../_DEVELOPMENT/math/integer/small/l_small_divu_64_64x64
 ../_DEVELOPMENT/math/integer/l_mulu_16_16x16.asm
 ../_DEVELOPMENT/math/integer/l_mulu_16_16x8.asm
 ../_DEVELOPMENT/math/integer/l_mulu_16_8x8.asm
@@ -153,6 +151,7 @@
 ../_DEVELOPMENT/math/integer/small/l_small_mul_64_32x32.asm
 ../_DEVELOPMENT/math/integer/small/l_small_mul_64_64x64
 ../_DEVELOPMENT/math/integer/small/l_small_mul_72_64x8
+../_DEVELOPMENT/math/integer/l_divu_64_64x8
 ../_DEVELOPMENT/error/z80/_errno.asm
 ../_DEVELOPMENT/error/z80/errno_mc.asm
 ../_DEVELOPMENT/error/z80/errno_zc.asm
@@ -187,6 +186,8 @@
 ../_DEVELOPMENT/error/z80/error_erange_zc.asm
 ../_DEVELOPMENT/error/z80/error_estat_zc.asm
 ../_DEVELOPMENT/error/z80/error_ewouldblock_zc.asm
+../_DEVELOPMENT/error/z80/error_lmc.asm
+../_DEVELOPMENT/error/z80/error_llmc.asm
 ../_DEVELOPMENT/error/z80/error_lzc.asm
 ../_DEVELOPMENT/error/z80/error_lznc.asm
 ../_DEVELOPMENT/error/z80/error_mc.asm

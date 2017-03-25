@@ -4,6 +4,7 @@
 	PUBLIC	asm_printf
 	PUBLIC	__printf_loop
 	PUBLIC	__printf_get_flags_noop
+	PUBLIC	__printf_format_search_loop
 
 	EXTERN	__printf_get_flags
 	EXTERN	__printf_doprint
@@ -32,8 +33,8 @@ asm_printf:
 	; -9 = base for number conversion
 	; -10 = length of buffer
 	;
-	; -50->-11 = buffer (39 bytes)
-	ld	hl,-50
+	; -80->-11 = buffer (69 bytes)
+	ld	hl,-80
 	add	hl,sp
 	ld	sp,hl
 	ld	e,(ix+2)	;arg pointer
@@ -59,7 +60,7 @@ asm_printf:
 	inc	hl
 	and	a
 	jr	nz,cont
-	ld	hl,48		;adjust the stack
+	ld	hl,78		;adjust the stack
 	add	hl,sp
 	ld	sp,hl
 	pop	hl		;grab the number of bytes written
@@ -90,7 +91,7 @@ no_long_qualifier:
 ; Loop the loop
 	ld	hl,__printf_format_table
 	ld	c,a
-formatloop:
+__printf_format_search_loop:
 	ld	a,(hl)
 	and	a
 	jr	z,no_format_found
@@ -107,7 +108,7 @@ no_format_match:
 	inc	hl
 	inc	hl
 	inc	hl
-	jr	formatloop
+	jr	__printf_format_search_loop
 no_format_found:
 	; No matching format character, just print it out
 	pop	hl

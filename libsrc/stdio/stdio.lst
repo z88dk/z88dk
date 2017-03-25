@@ -68,6 +68,7 @@ stdio/obj/vfscanf
 stdio/obj/vsscanf
 stdio/obj/__printf_doprint
 stdio/obj/__printf_format_table
+stdio/obj/__printf_format_table64
 stdio/obj/__printf_get_buffer_address
 stdio/obj/__printf_get_flags_impl
 stdio/obj/__printf_handle_XX
@@ -86,3 +87,11 @@ stdio/obj/__printf_print_the_buffer
 stdio/obj/asm_printf
 stdio/obj/get_16bit_ap_parameter
 stdio/obj/__printf_print_to_buf
+stdio/obj/__printf_number64
+stdio/obj/__printf_handle_ll
+stdio/obj/__printf_handle_llB
+stdio/obj/__printf_handle_llXX
+stdio/obj/__printf_handle_lld
+stdio/obj/__printf_handle_llo
+stdio/obj/__printf_handle_llu
+stdio/obj/__printf_handle_llx

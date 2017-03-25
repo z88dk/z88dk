@@ -50,6 +50,33 @@ extern unsigned long __LIB__               strtoul(const char *s, char **endp, i
 #define strtol(a,b,c)  strtol_callee(a,b,c)
 #define strtoul(a,b,c) strtol_callee(a,b,c)
 
+#ifdef Z88DK_USES_SDCC
+/* 64 bit is only available with sdcc */
+extern long long atoll(char *buf) __stdc;
+extern long long atoll_callee(char *buf) __z88dk_callee __stdc;
+#define atoll(a) atoll_callee(a)
+
+
+extern char *lltoa(long long num,char *buf,int radix) __stdc;
+extern char *lltoa_callee(long long num,char *buf,int radix) __z88dk_callee __stdc;
+#define lltoa(a,b,c) lltoa_callee(a,b,c)
+
+
+extern long long strtoll(char *nptr,char **endptr,int base) __stdc;
+extern long long strtoll_callee(char *nptr,char **endptr,int base) __z88dk_callee __stdc;
+#define strtoll(a,b,c) strtoll_callee(a,b,c)
+
+
+extern unsigned long long strtoull(char *nptr,char **endptr,int base) __stdc;
+extern unsigned long long strtoull_callee(char *nptr,char **endptr,int base) __z88dk_callee __stdc;
+#define strtoull(a,b,c) strtoull_callee(a,b,c)
+
+
+extern char *ulltoa(unsigned long long num,char *buf,int radix) __stdc;
+extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_callee __stdc;
+#define ulltoa(a,b,c) ulltoa_callee(a,b,c)
+#endif
+
 ///////////////////
 //// Random Numbers
 ///////////////////
