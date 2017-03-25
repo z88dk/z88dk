@@ -24,8 +24,8 @@ PUBLIC l_long_asl
    ld a,l         ; counter
    pop hl
    pop de
-   
-   or a
+ 
+   and 31 
    jr z, done
    
    ld b,a

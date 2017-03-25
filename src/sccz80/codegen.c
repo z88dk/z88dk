@@ -1837,12 +1837,8 @@ void asl_const(LVALUE *lval, int32_t value)
                 ol("rl\td");   
                 break;
             default: //  5 bytes
-                if ( value >= 32 ) {
-                    vlongconst(0);
-                } else {
-                    loada( value );
-                    callrts("l_long_aslo");
-                }
+                loada( value );
+                callrts("l_long_aslo");
                 break;
         }
 
