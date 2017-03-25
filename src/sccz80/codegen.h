@@ -128,4 +128,5 @@ extern void restorede(void);
 extern void output_section(char *section_name);
 extern void function_appendix(SYMBOL *func);
 extern void gen_builtin_strcpy(); 
+extern void gen_builtin_strchr(); 
 

@@ -2758,11 +2758,36 @@ void gen_builtin_strcpy()
     ol("ld\ta,(hl)");
     ol("ldi");
     ol("or\ta");
-    outstr("\tjp\tnz,");
+    outstr("\tjr\tnz,");
     printlabel(label);
     nl();
     ol("pop\thl");
 }
+
+
+void gen_builtin_strchr()
+{
+    int startlabel, endlabel;
+    ol("pop\tde");
+    ol("pop\thl");
+    startlabel = getlabel();
+    endlabel = getlabel();
+    postlabel(startlabel);
+    ol("ld\ta,(hl)");
+    ol("cp\te");
+    outstr("\tjr\tz,");
+    printlabel(endlabel); nl();
+    ol("and\ta");
+    ol("inc\thl");
+    outstr("\tjr\tnz,");
+    printlabel(startlabel); nl();
+    ol("ld\th,a");
+    ol("ld\th,l");
+    postlabel(endlabel);
+}
+
+
+
 
 /*
  * Local Variables:

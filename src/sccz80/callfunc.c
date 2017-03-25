@@ -214,6 +214,12 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         }
         if ( strcmp(ptr->name,"__builtin_strcpy") == 0) {
             gen_builtin_strcpy();
+            nargs = 0;
+            Zsp += 4;
+        } else if ( strcmp(ptr->name,"__builtin_strchr") == 0) {
+            gen_builtin_strchr();
+            nargs = 0;
+            Zsp += 4;
         } else if (watcharg || (ptr->flags & (SHARED|SHAREDC)) ) {
             if ((ptr->flags & (SHARED|SHAREDC) ) )
                 preserve = YES;
