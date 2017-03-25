@@ -23,8 +23,7 @@ PUBLIC l_long_aslo
 ; counter in a
 
 .l_long_aslo
-
-   or a
+   and 31
    ret z
    
    ld b,a
