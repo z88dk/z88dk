@@ -40,7 +40,8 @@ void Assert_real(int result, char *file, int line, char *message)
 
 int suite_run()
 {
-    int      i,stage ;
+    static int stage;
+    int      i;
     const char *extra;
     void    (*func)();
 
