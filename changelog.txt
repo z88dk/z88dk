@@ -13,6 +13,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +test target now supports amalloc and command line arguments
 - [classiclib] printf format %s now supports a precision field
 - [classiclib] printf format %x, %p, %X, %B now disable the + flag
+- [classiclib] printf now supports 64 bit values when used with sdcc
 - [classiclib] +c128 improvements
 - [classiclib] [math48] #108: Single parameter library math functions now work correctly
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
