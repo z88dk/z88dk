@@ -48,7 +48,14 @@ zcc +test -vn -DTIMER -DSTYLE=2 -DNUM=5000 -D__Z88DK -O2 sort.c -o sort-rev-5000
 zcc +test -vn -DTIMER -DSTYLE=3 -DNUM=5000 -D__Z88DK -O2 sort.c -o sort-equ-5000.bin -lndos -m
 
 classic/zsdcc
-zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 binary-trees.c -o bt.bin -lmath48 -lndos -lmalloc -m -pragma-define:USING_amalloc
+zcc +test -vn -DTIMER -DSTYLE=0 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ran-20.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=1 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ord-20.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=2 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-rev-20.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=3 -DNUM=20 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-equ-20.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=0 -DNUM=5000 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ran-5000.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=1 -DNUM=5000 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-ord-5000.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=2 -DNUM=5000 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-rev-5000.bin -lndos -m
+zcc +test -vn -DTIMER -DSTYLE=3 -DNUM=5000 -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 sort.c -o sort-equ-5000.bin -lndos -m
 
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 On purpose these labels were placed so that their values would not vary
@@ -57,7 +64,7 @@ measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks sort-ran-20.bin -start 016b -end 017e -counter 999999999999
+ticks sort-ran-20.bin -start 0161 -end 0174 -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -72,25 +79,35 @@ All programs are very close in size.
 RESULT
 ======
 
-Z88DK March 18, 2017
-classic/sccz80
-1030 bytes less page zero
+Z88DK March 25, 2017
+classic / sccz80
+1029 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          80850     0.0202 sec
-sort-ord-20          52146     0.0130 sec
-sort-rev-20          73152     0.0183 sec
-sort-equ-20          52146     0.0130 sec
+sort-ran-20          81544     0.0204 sec
+sort-ord-20          53944     0.0135 sec
+sort-rev-20          75472     0.0189 sec
+sort-equ-20          53944     0.0135 sec
 
-sort-ran-5000     89601719    22.4004 sec
-sort-ord-5000     39786785     9.9467 sec
-sort-rev-5000     60783056    15.1958 sec
-sort-equ-5000     39786785     9.9467 sec
+sort-ran-5000     80957310    20.2393 sec
+sort-ord-5000     41381930    10.3455 sec
+sort-rev-5000     63068198    15.7670 sec
+sort-equ-5000     41381930    10.3455 sec
 
 
-Z88DK March 18, 2017
+Z88DK March 25, 2017
 classic / zsdcc #9852
-2910 bytes less page zero
+995 bytes less page zero
 
+               cycle count    time @ 4MHz
 
+sort-ran-20          77922     0.0195 sec
+sort-ord-20          50242     0.0126 sec
+sort-rev-20          70672     0.0177 sec
+sort-equ-20          50242     0.0126 sec
+
+sort-ran-5000     85903658    21.4759 sec
+sort-ord-5000     38026708     9.5067 sec
+sort-rev-5000     58261603    14.5654 sec
+sort-equ-5000     38026708     9.5067 sec
