@@ -9,8 +9,8 @@
 #include <stdio.h>
 
 typedef struct {
-    char     *name;
-    char     *testnames[MAX_TESTS];
+    const char     *name;
+    const char     *testnames[MAX_TESTS];
     void     *tests[MAX_TESTS];
     int       num_tests;
     void    (*setup)();
@@ -40,8 +40,8 @@ void Assert_real(int result, char *file, int line, char *message)
 
 int suite_run()
 {
-    int      i, stage;
-    char     *extra;
+    int      i,stage ;
+    const char *extra;
     void    (*func)();
 
     passed = failed = 0;
@@ -49,19 +49,19 @@ int suite_run()
     printf("Starting suite %s (%d tests)\n",suite.name, suite.num_tests);
 
     for ( i = 0; i < suite.num_tests; i++ ) {
+        stage = 0;
         if ( setjmp(&jmpbuf) == 0 ) {
 #ifndef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
 #endif
             failed_message = NULL;
-            stage = 0;
             if ( suite.setup ) {
                 suite.setup();
             }
+            ++stage;
             func = suite.tests[i];
-            stage++;
             func();
-            stage++;
+            ++stage;
             if ( suite.teardown ) {
                 suite.teardown();
             }

@@ -9,6 +9,8 @@
 #endif
 
 #define Assert(r,m) Assert_real((r), __FILE__, __LINE__, (m))
+#define assertEqual(a,b) Assert_real((a) == (b),  __FILE__, __LINE__, #a  "== "  #b)
+#define assertNotEqual(a,b) Assert_real((a) != (b),  __FILE__, __LINE__, #a  "!= "  #b)
 extern void         Assert_real(int result, char *file, int line,  char *message);
 
 
