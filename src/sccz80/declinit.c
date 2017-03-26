@@ -15,6 +15,8 @@
 
 #include "ccdefs.h"
 
+static void output_double_string_load(double value);
+
 /*
  * initialise global object
  */
@@ -46,7 +48,8 @@ int initials(char* sname,
             size = 2;
         }
 
-        if ( isconst ) {
+        // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
+        if ( isconst && !c_double_strings )  {
             output_section("rodata_compiler");
         } else {
             output_section("data_compiler"); // output_section("text");
@@ -301,7 +304,7 @@ constdecl:
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
                     if ( c_double_strings ) { 
-                        error(E_STATIC_DOUBLE_STRING);
+                        output_double_string_load(value);
                     } else {
                         dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         defbyte();
@@ -340,7 +343,7 @@ constdecl:
 
                     /* It was a float, lets parse the float and then dump it */
                       if ( c_double_strings ) {
-                        error(E_STATIC_DOUBLE_STRING);
+                        output_double_string_load(value);
                     } else {
                         dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
                         for ( i = 0; i < 6; i++ ) {
@@ -387,4 +390,20 @@ int getstsize(SYMBOL* ptr, char real)
     default:
         return (1);
     }
+}
+
+static void output_double_string_load(double value)
+{
+    int   dumplocation = getlabel();
+    LVALUE lval;
+
+    postlabel(dumplocation);
+    defstorage(); outdec(6); nl();
+    
+    output_section("code_crt_init");
+    lval.const_val = value;
+    load_double_into_fa(&lval);
+    immedlit(dumplocation); outdec(0); nl();
+    callrts("dstore");
+    output_section("data_compiler");
 }
