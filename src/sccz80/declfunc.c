@@ -287,6 +287,8 @@ void DoFnKR(
             break;
     }
 
+    check_trailing_modifiers(currfn);
+
     Zsp = 0; /* preset stack ptr */
 
     while (undeclared) {
@@ -605,7 +607,6 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
     if ( strcmp(currfn->name,"main") == 0 ) {
         currfn->flags &= ~SMALLC;
     }
-
     if (cmatch(';'))
         return (prevarg);
     setlocvar(prevarg, currfn);

@@ -15,22 +15,27 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] printf format %x, %p, %X, %B now disable the + flag
 - [classiclib] printf now supports 64 bit values when used with sdcc
 - [classiclib] +c128 improvements
-- [sccz80] Defining an extern variable with @ no longer exports symbol
-- [sccz80] The sdcc directives __z88dk_fastcall and __z88dk_callee are now
+- [classiclib] [math48] #108: Single parameter library math functions now work correctly
+- [sccz80] #36: Defining an extern variable with @ no longer exports symbol
+- [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
-- [sccz80] Now supports const qualifier for assigning read-only data to ROM
-- [sccz80] Right to left parameter passing is now supported with __stdc directive
-- [sccz80] Typedef pointers are now supported
+- [sccz80] #81: Now supports const qualifier for assigning read-only data to ROM
+- [sccz80] #94: Right to left parameter passing is now supported with __stdc directive
+- [sccz80] #112: Typedef pointers are now supported
 - [sccz80] Optimisations for long multiplication
-- [sccz80] Callee functions now cleanup correctly without corrupting return values
+- [sccz80] #109: Callee functions now cleanup correctly without corrupting return values
 - [sccz80] #103: Bug fixes around double + int/long operands
 - [sccz80] #98: Bug fix for handling expressions with a const on lefthand side
 - [sccz80] Function pointers now inherit the callee/smallc state of the function
   they are given the value of
 - [sccz80] #90: Bug fix for result of comparison
-- [ticks] [classiclib] Now supports the +test target
+- [sccz80] #118: static doubles can now be initialised
+- [sccz80] #116: Improvements for operations with constants
+- [sccz80] Constant floating point expressions are now folded
+- [sccz80] [math48] #104: Non commutative FP operations with constant on left now work
+- [ticks] [classiclib] #101,#106: Now supports the +test target
 - [zcc] Spaces in filenames (and paths) are now supported.
-- [all] main() always takes its parameters in r->l format regardless of compiler
+- [all] #105: main() always takes its parameters in r->l format regardless of compiler
 
 z88dk v1.99B - 10.01.2017
 
