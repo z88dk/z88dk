@@ -17,7 +17,7 @@ l_small_lsl_dehl:
    ;
    ; uses  : af, b, de, hl
 
-   or a
+   and 31
    ret z
    
    cp 32
