@@ -40,11 +40,7 @@ void Assert_real(int result, char *file, int line, char *message)
 
 int suite_run()
 {
-#ifdef SCCZ80
-    int stage;
-#else
     volatile int stage;
-#endif
     int      i;
     const char *extra;
     void    (*func)();

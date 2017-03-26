@@ -74,10 +74,10 @@ struct warnings mywarn[] = {
     { "Func expects: %s", 0 },
     { "Func gets: %s", 0 }, /* 35 */
     { "In function: %s() line %d", 0 },
-    { "Typedef doesn't support pointer types (sorry!)", 0 },
+    { "Typedef doesn't support pointer types (sorry!)", 1 },
     { "Converting long to double in generic math mode", 0 },
     { "Const type not supported by compiler", 0 },
-    { "Volatile type not supported by compiler", 0 }, /* 40 */
+    { "Volatile type not supported by compiler", 1 }, /* 40 */
     { "... must be preceded by named argument", 0 },
     { "Floating point not supported by printf yet!", 1 },
     { "Function arguments have sign mismatch", 0 },
