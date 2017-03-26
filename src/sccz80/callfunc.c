@@ -350,7 +350,6 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
             ExpandArgValue(src, buffer, margtag);
             warning(W_PTRTYP2, buffer);
         } else if (dtype == stype && dident != sident && sident != FUNCTION) {
-            printf("%d %d\n",dident,sident);
             warning(W_INTPTR);
             expr = CINT;
         }
