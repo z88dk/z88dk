@@ -2782,7 +2782,7 @@ void gen_builtin_strchr()
     outstr("\tjr\tnz,");
     printlabel(startlabel); nl();
     ol("ld\th,a");
-    ol("ld\th,l");
+    ol("ld\tl,h");
     postlabel(endlabel);
 }
 
