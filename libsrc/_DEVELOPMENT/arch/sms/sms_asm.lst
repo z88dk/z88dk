@@ -9,3 +9,7 @@ arch/sms/z80/asm_sms_ldir_vram_to_vram_unsafe
 arch/sms/z80/asm_sms_outi
 arch/sms/z80/asm_sms_set_vram_read_hl
 arch/sms/z80/asm_sms_set_vram_write_de
+arch/sms/z80/mm_frame0_control_register
+arch/sms/z80/mm_frame1_control_register
+arch/sms/z80/mm_frame2_control_register
+arch/sms/z80/mm_frame2_ram_control_register
