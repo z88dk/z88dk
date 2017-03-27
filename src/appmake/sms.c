@@ -200,7 +200,7 @@ int sms_exec(char *target)
         {
             c -= i - 8;
             if (c <= 0x2000)
-                fprintf(stderr, "Notice: Available RAM space is %d bytes ignoring required stack space\n", 0x2000 - c);
+                fprintf(stderr, "Notice: Available RAM space is %d bytes ignoring the stack\n", 0x2000 - c);
             else
                 fprintf(stderr, "Warning: Exceeded 8k RAM by %d bytes.\n", c - 0x2000);
         }
@@ -208,7 +208,7 @@ int sms_exec(char *target)
 
     // look for and append memory banks
 
-    fprintf(stderr, "Adding main banks 00,01%s (%d bytes free)\n", (len > 0x8000) ? ",02" : "", ((len > 0x8000) ? 0xc000 : 0x8000)-len-16*(sega_present+sdsc_present));
+    fprintf(stderr, "Adding main banks 0x00,0x01%s (%d bytes free)\n", (len > 0x8000) ? ",0x02" : "", ((len > 0x8000) ? 0xc000 : 0x8000)-len-16*(sega_present+sdsc_present));
 
     count = 0;
     for (i = 0x02 + (len > 0x8000); i <= 0x1f; ++i)
