@@ -235,6 +235,8 @@ l_setmem_hl:
 
 PUBLIC error_lznc
 
+   EXTERN error_znc
+
    pop hl
 
 error_lznc:
