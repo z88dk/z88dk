@@ -21,7 +21,7 @@ define(`__IO_VDP_COMMAND',           0xbf)
 define(`__IO_VDP_STATUS',            0xbf)
 define(`__IO_JOYSTICK_READ_DC',      0xdc)
 define(`__IO_JOYSTICK_READ_DD',      0xdd)
- 
+
 # Memory Control Registers
 
 define(`__MM_FRAME_2_CONTROL',        0xffff)
