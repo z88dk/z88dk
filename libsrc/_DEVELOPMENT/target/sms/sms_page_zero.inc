@@ -183,8 +183,11 @@ IF (__crt_enable_rst & $80)
 
 ELSE
 
+   push af
+   in a,(0xbf)
+   pop af
    ei
-   reti
+   ret
 
 ENDIF
 
@@ -230,23 +233,14 @@ l_setmem_hl:
 
    ret
 
-   PUBLIC l_inc_hl
+PUBLIC error_lznc
 
-   inc hl
-   inc hl
+   pop hl
 
-   inc hl
-   inc hl
+error_lznc:
    
-   inc hl
-   inc hl
-   
-   inc hl
-   inc hl
-
-l_inc_hl:
-
-   ret
+   ld de,0
+   jp error_znc
 
 ; address = 0x0066
 
