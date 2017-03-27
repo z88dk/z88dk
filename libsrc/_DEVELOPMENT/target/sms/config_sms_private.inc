@@ -34,6 +34,23 @@ defc __Z88DK = 1992
 
 defc __SMS = 1
 
+defc __IO_MEMORY_ENABLES        = 0x3e
+defc __IO_JOYSTICK_PORT_CONTROL = 0x3f
+defc __IO_GUN_SPOT_VERTICAL     = 0x7e
+defc __IO_GUN_SPOT_HORIZONTAL   = 0x7f
+defc __IO_PSG                   = 0x7f
+defc __IO_VDP_DATA              = 0xbe
+defc __IO_VDP_COMMAND           = 0xbf
+defc __IO_VDP_STATUS            = 0xbf
+defc __IO_JOYSTICK_READ_DC      = 0xdc
+defc __IO_JOYSTICK_READ_DD      = 0xdd
+
+defc __MM_FRAME_2_CONTROL     = 0xffff
+defc __MM_FRAME_1_CONTROL     = 0xfffe
+defc __MM_FRAME_0_CONTROL     = 0xfffd
+defc __MM_FRAME_2_RAM_CONTROL = 0xfffc
+
+
 
 
 
