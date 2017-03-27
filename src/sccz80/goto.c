@@ -185,7 +185,7 @@ void ChaseGoto(SYMBOL* ptr)
         if (gptr->sym == ptr && gptr->sp == Zsp) {
             debug(DBG_GOTO, "Matched #%d \n", i);
             postlabel(gptr->label);
-            gptr->sym = 0; /* invalidate */
+            gptr->sym = NULL;
         }
         gptr++;
     }
@@ -218,11 +218,6 @@ void goto_cleanup(void)
         gptr++;
     }
     /* Wipe out reference to our goto labels in symbol table */
-    gptr = gotoq;
-    for (i = 0; i <= gotocnt; i++) {
-        if (gptr->sym)
-            gptr->sym->name[0] = 0;
-    }
     gotocnt = 0;
 }
 
