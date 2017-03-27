@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
     int   alarmtime = 30;
     word  breakaddr = 65535;
     char *progname = argv[0];
+    char *filename;
 
     while ( ( ch = getopt(argc, argv, "w:b:")) != -1 ) {
         switch ( ch ) {
@@ -112,16 +113,38 @@ int main(int argc, char *argv[])
     argc -= optind;
     argv += optind;
 
+
     if ( argc < 1 ) {
         printf("Usage: %s [program to run]\n", progname);
         printf("Options: -w timeout - timeout time\n");
         printf("         -b break address - disables timeout\n");
+        printf("         -- Everything afterwards passed to machine\n");
         exit(1);
+    }
+
+    memset(RAM,0,sizeof(RAM));
+
+    filename = argv[0];
+
+    if ( argc >= 2 && strcmp(argv[1], "--") == 0 ) {
+        char cmd_arguments[256];
+        size_t cmd_arguments_len = 0;
+
+        argc--;
+        argv++;
+
+        while ( argc > 1 ) {
+            // I think windows is now comformant with snprintf? Either way, we can't grow the arugment buffer...
+            cmd_arguments_len += snprintf(cmd_arguments + cmd_arguments_len, sizeof(cmd_arguments) - cmd_arguments_len, "%s%s",cmd_arguments_len > 0 ? " " : "", argv[1]);
+            argc--;
+            argv++;
+          }
+          RAM[65280] = cmd_arguments_len % 256;
+          memcpy(&RAM[65281], cmd_arguments, cmd_arguments_len % 256);
     }
 
 
     /* Clear memory */
-    memset(RAM,0,sizeof(RAM));
     for ( i = 0; i < sizeof(hooks) / sizeof(hooks[0]); i++ ) {
         hooks[i] = NULL;
     }
@@ -142,7 +165,7 @@ int main(int argc, char *argv[])
 
     /* Reset the machine */
     ResetZ80(&z80);
-    load_file(argv[0]);
+    load_file(filename);
 
     RunZ80(&z80);
 
