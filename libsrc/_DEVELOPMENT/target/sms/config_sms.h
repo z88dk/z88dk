@@ -39,6 +39,22 @@
 #undef  __SMS
 #define __SMS  1
 
+#define __IO_MEMORY_ENABLES         0x3e
+#define __IO_JOYSTICK_PORT_CONTROL  0x3f
+#define __IO_GUN_SPOT_VERTICAL      0x7e
+#define __IO_GUN_SPOT_HORIZONTAL    0x7f
+#define __IO_PSG                    0x7f
+#define __IO_VDP_DATA               0xbe
+#define __IO_VDP_COMMAND            0xbf
+#define __IO_VDP_STATUS             0xbf
+#define __IO_JOYSTICK_READ_DC       0xdc
+#define __IO_JOYSTICK_READ_DD       0xdd
+
+#define __MM_FRAME_2_CONTROL      0xffff
+#define __MM_FRAME_1_CONTROL      0xfffe
+#define __MM_FRAME_0_CONTROL      0xfffd
+#define __MM_FRAME_2_RAM_CONTROL  0xfffc
+
 
 
 
