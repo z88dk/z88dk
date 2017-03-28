@@ -17,8 +17,8 @@ include(__link__.m4)
 #define IO_VDP_DATA               __IO_VDP_DATA
 #define IO_VDP_COMMAND            __IO_VDP_COMMAND
 #define IO_VDP_STATUS             __IO_VDP_STATUS
-#define IO_JOYSTICK_READ_DC       __IO_JOYSTICK_READ_DC
-#define IO_JOYSTICK_READ_DD       __IO_JOYSTICK_READ_DD
+#define IO_JOYSTICK_READ_L        __IO_JOYSTICK_READ_L
+#define IO_JOYSTICK_READ_H        __IO_JOYSTICK_READ_H
 
 #define IO_3E  0x3e
 #define IO_3F  0x3f
@@ -41,8 +41,8 @@ __sfr __at __IO_PSG                    IO_PSG;
 __sfr __at __IO_VDP_DATA               IO_VDP_DATA;
 __sfr __at __IO_VDP_COMMAND            IO_VDP_COMMAND;
 __sfr __at __IO_VDP_STATUS             IO_VDP_STATUS;
-__sfr __at __IO_JOYSTICK_READ_DC       IO_JOYSTICK_READ_DC;
-__sfr __at __IO_JOYSTICK_READ_DD       IO_JOYSTICK_READ_DD;
+__sfr __at __IO_JOYSTICK_READ_L        IO_JOYSTICK_READ_L;
+__sfr __at __IO_JOYSTICK_READ_H        IO_JOYSTICK_READ_H;
 
 __sfr __at 0x3e IO_3E;
 __sfr __at 0x3f IO_3F;
@@ -65,8 +65,8 @@ extern unsigned char IO_PSG;
 extern unsigned char IO_VDP_DATA;
 extern unsigned char IO_VDP_COMMAND;
 extern unsigned char IO_VDP_STATUS;
-extern unsigned char IO_JOYSTICK_READ_DC;
-extern unsigned char IO_JOYSTICK_READ_DD;
+extern unsigned char IO_JOYSTICK_READ_L;
+extern unsigned char IO_JOYSTICK_READ_H;
 
 extern unsigned char IO_3E;
 extern unsigned char IO_3F;

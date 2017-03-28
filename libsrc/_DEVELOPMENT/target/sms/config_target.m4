@@ -19,8 +19,8 @@ define(`__IO_PSG',                   0x7f)
 define(`__IO_VDP_DATA',              0xbe)
 define(`__IO_VDP_COMMAND',           0xbf)
 define(`__IO_VDP_STATUS',            0xbf)
-define(`__IO_JOYSTICK_READ_DC',      0xdc)
-define(`__IO_JOYSTICK_READ_DD',      0xdd)
+define(`__IO_JOYSTICK_READ_L',       0xdc)
+define(`__IO_JOYSTICK_READ_H',       0xdd)
 
 # Memory Control Registers
 
@@ -51,8 +51,8 @@ PUBLIC `__IO_PSG'
 PUBLIC `__IO_VDP_DATA'
 PUBLIC `__IO_VDP_COMMAND'
 PUBLIC `__IO_VDP_STATUS'
-PUBLIC `__IO_JOYSTICK_READ_DC'
-PUBLIC `__IO_JOYSTICK_READ_DD'
+PUBLIC `__IO_JOYSTICK_READ_L'
+PUBLIC `__IO_JOYSTICK_READ_H'
 
 PUBLIC `__MM_FRAME_2_CONTROL'
 PUBLIC `__MM_FRAME_1_CONTROL'
@@ -76,8 +76,8 @@ defc `__IO_PSG'                   = __IO_PSG
 defc `__IO_VDP_DATA'              = __IO_VDP_DATA
 defc `__IO_VDP_COMMAND'           = __IO_VDP_COMMAND
 defc `__IO_VDP_STATUS'            = __IO_VDP_STATUS
-defc `__IO_JOYSTICK_READ_DC'      = __IO_JOYSTICK_READ_DC
-defc `__IO_JOYSTICK_READ_DD'      = __IO_JOYSTICK_READ_DD
+defc `__IO_JOYSTICK_READ_L'       = __IO_JOYSTICK_READ_L
+defc `__IO_JOYSTICK_READ_H'       = __IO_JOYSTICK_READ_H
 
 defc `__MM_FRAME_2_CONTROL'     = __MM_FRAME_2_CONTROL
 defc `__MM_FRAME_1_CONTROL'     = __MM_FRAME_1_CONTROL
@@ -103,8 +103,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_VDP_DATA'               __IO_VDP_DATA
 `#define' `__IO_VDP_COMMAND'            __IO_VDP_COMMAND
 `#define' `__IO_VDP_STATUS'             __IO_VDP_STATUS
-`#define' `__IO_JOYSTICK_READ_DC'       __IO_JOYSTICK_READ_DC
-`#define' `__IO_JOYSTICK_READ_DD'       __IO_JOYSTICK_READ_DD
+`#define' `__IO_JOYSTICK_READ_L'        __IO_JOYSTICK_READ_L
+`#define' `__IO_JOYSTICK_READ_H'        __IO_JOYSTICK_READ_H
 
 `#define' `__MM_FRAME_2_CONTROL'      __MM_FRAME_2_CONTROL
 `#define' `__MM_FRAME_1_CONTROL'      __MM_FRAME_1_CONTROL
