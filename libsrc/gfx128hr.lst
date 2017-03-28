@@ -13,3 +13,4 @@ graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/c128/w_putsprite
 graphics/c128/w_pointxy
+graphics/c128/w_stencil_render
