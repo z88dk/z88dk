@@ -266,9 +266,47 @@ rloop6:
 
 .bitmaskr		ld	a,0
 			call	mask_pattern
-			ld	(hl),a
+			;ld	(hl),a
 
-			jp	yloop
+		push de
+		ex	af,af
+		ld	d,18
+        ld      bc,0d600h
+        out     (c),d
+loop4:
+        in      a,(c)
+        rla
+        jp      nc,loop4
+        inc	c
+        out     (c),h
+
+        dec	c
+        inc	d
+        out     (c),d
+loop5:
+        in      a,(c)
+        rla
+        jp      nc,loop5
+        inc	c
+        out     (c),l
+
+        dec	c
+        ld	a,31
+        out     (c),a
+loop6:
+        in      a,(c)
+        rla
+        jp      nc,loop6
+        inc	c
+        ex	af,af
+;-------
+        out	(c),a
+;-------
+
+		pop de
+		
+		jp	yloop
+
 
 
 .onebyte
@@ -280,7 +318,6 @@ rloop6:
 		; Prepare an edge byte, basing on the byte mask in A
 		; and on the pattern being set in (pattern1+1)
 .mask_pattern
-		push hl
 		push bc
 		push de
 		ex	af,af
@@ -313,9 +350,6 @@ loop3:
         jp      nc,loop3
         inc	c
 		
-		push bc
-		push de
-		
 		ex	af,af
 ;-------
         in	e,(c)
@@ -331,46 +365,6 @@ loop3:
 		
 		pop de
 		pop bc
-
-;        cpl
- ;       and	e	; mask data on screen
-        ex	af,af
-        
-        dec	c
-        dec	d
-        out     (c),d
-loop4:
-        in      a,(c)
-        rla
-        jp      nc,loop4
-        inc	c
-        out     (c),h
-
-        dec	c
-        inc	d
-        out     (c),d
-loop5:
-        in      a,(c)
-        rla
-        jp      nc,loop5
-        inc	c
-        out     (c),l
-
-        dec	c
-        ld	a,31
-        out     (c),a
-loop6:
-        in      a,(c)
-        rla
-        jp      nc,loop6
-        inc	c
-        ex	af,af
-;-------
-        out	(c),a
-;-------
-		pop de
-		pop bc
-		pop hl
 		
 		ret
 		
