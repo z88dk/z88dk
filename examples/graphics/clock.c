@@ -9,7 +9,7 @@
  *  zcc +zx -oclock -lndos -create-app -lm -llib3d -DDETAILED clock.c
  *  zcc +zx81ansi -oclock -startup=3 -lgfx81hr192 -lndos -create-app -llib3d -DDETAILED clock.c
  *  zcc +zx81 -oclock -startup=2 -lgfx81 -lndos -create-app -llib3d clock.c
- * 
+ *  zcc +ts2068 -create-app -lm -lgfx2068hr -lm -llib3d -DDETAILED -Dhires clock.c
 
  $Id: clock.c,v 1.1 2012-11-07 15:10:06 stefano Exp $
 */
@@ -20,6 +20,12 @@
 #include <lib3d.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef hires
+#define XDIV 128
+#else
+#define XDIV 256
+#endif
 
 #ifdef DETAILED
 // 16 bytes every sprite with the exception of #8 which is 23 bytes long
@@ -87,13 +93,23 @@ main()
 	
 	clg();
 
+#ifdef hires
+	circle(cx,cy,cy*2,1);
+#else
 	circle(cx,cy,cy,1);
+#endif
+	
 #ifdef DETAILED
+#ifdef hires
+	circle(cx,cy,cy*2-4,1);
+	circle(cx,cy,7,1);
+#else
 	circle(cx,cy,cy-3,1);
 	circle(cx,cy,3,1);
 #endif
+#endif
 	for (i=0;i<60;i++) {
-		x=icos(i*6)*sz/256;
+		x=icos(i*6)*sz/XDIV;
 		y=isin(i*6)*sz/256;
 		
 		plot (cx+x,cy+y);
@@ -102,7 +118,7 @@ main()
 
 #ifdef DETAILED
 	for (i=0;i<12;i++) {
-		x=isin(i*30)*(sz-8)/256;
+		x=isin(i*30)*(sz-8)/XDIV;
 		y=icos(i*30)*(sz-8)/256;
 		putsprite(spr_or, cx+x-5, cy-y-3, roman_nums + i*16 + 7*(i>8));
 	}
@@ -144,13 +160,14 @@ main()
 			//sec
 			undraw(cx,cy,cx+x,cy+y);
 		}
-		x=icos(i*6)*long_sz/256;
+		
+		x=icos(i*6)*long_sz/XDIV;
 		y=isin(i*6)*long_sz/256;
 
-		x_min=icos(j*6)*long_sz/256;
+		x_min=icos(j*6)*long_sz/XDIV;
 		y_min=isin(j*6)*long_sz/256;
 
-		x_hr=icos(k*6)*short_sz/256;
+		x_hr=icos(k*6)*short_sz/XDIV;
 		y_hr=isin(k*6)*short_sz/256;
 
 		// sec
@@ -174,6 +191,7 @@ main()
 		circle(cx,cy,5,1);
 #endif
 
+		//sleep (1);
 		while ((clock() < (tm+CLOCKS_PER_SEC))&&(clock() > CLOCKS_PER_SEC)) {}
 		tm=clock();
 	
