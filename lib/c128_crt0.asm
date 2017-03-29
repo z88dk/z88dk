@@ -95,8 +95,10 @@ z80start:
 	inc	c
 	out	(c),a	;& background
 
-        ld      hl,0
-        add     hl,sp
+	ld hl,$FBFF
+	ld sp,$FBFF
+;        ld      hl,0
+;        add     hl,sp
         ld      (start1+1),hl
         ld      hl,-64
         add     hl,sp

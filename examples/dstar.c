@@ -93,6 +93,9 @@
  *      zcc +z9001 -Dspritesize=20 -DSOUND -lgfx9001krt -create-app dstar.c
  *      zcc +kc -Dspritesize=20 -create-app dstar.c
  *
+ *      Commodore 128:
+ *      zcc +c128 -lgfx128hr -create-app -lm -Dspritesize=21 dstar.c
+ *
  *      ZX81, various HRG flavours (see also the specific target version):
  *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
  *      zcc +zx81 -O3 -clib=g007  -create-app -Dspritesize=16 dstar.c 
