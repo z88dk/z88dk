@@ -1,0 +1,16 @@
+arch/sms/PSGlib/z80/__PSGlib_variables
+arch/sms/PSGlib/z80/asm_PSGlib_CancelLoop
+arch/sms/PSGlib/z80/asm_PSGlib_Frame
+arch/sms/PSGlib/z80/asm_PSGlib_GetStatus
+arch/sms/PSGlib/z80/asm_PSGlib_Play
+arch/sms/PSGlib/z80/asm_PSGlib_PlayNoRepeat
+arch/sms/PSGlib/z80/asm_PSGlib_RestoreVolumes
+arch/sms/PSGlib/z80/asm_PSGlib_SetMusicVolumeAttenuation
+arch/sms/PSGlib/z80/asm_PSGlib_SFXCancelLoop
+arch/sms/PSGlib/z80/asm_PSGlib_SFXFrame
+arch/sms/PSGlib/z80/asm_PSGlib_SFXGetStatus
+arch/sms/PSGlib/z80/asm_PSGlib_SFXPlay
+arch/sms/PSGlib/z80/asm_PSGlib_SFXPlayLoop
+arch/sms/PSGlib/z80/asm_PSGlib_SFXStop
+arch/sms/PSGlib/z80/asm_PSGlib_SilenceChannels
+arch/sms/PSGlib/z80/asm_PSGlib_Stop

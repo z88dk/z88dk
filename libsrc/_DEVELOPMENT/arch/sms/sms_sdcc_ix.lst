@@ -1,3 +1,3 @@
-@arch/sms/sms_asm.lst
-arch/sms/c/sdcc_ix/sms_aplib_depack_vram
-arch/sms/c/sdcc_ix/sms_aplib_depack_vram_callee
+@arch/sms/PSGlib/PSGlib_asm.lst
+@arch/sms/registers/registers_asm.lst
+@arch/sms/vram/vram_asm.lst

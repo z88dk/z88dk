@@ -1,0 +1,8 @@
+arch/sms/registers/z80/mm_fffc
+arch/sms/registers/z80/mm_fffd
+arch/sms/registers/z80/mm_fffe
+arch/sms/registers/z80/mm_ffff
+arch/sms/registers/z80/mm_frame0_control_register
+arch/sms/registers/z80/mm_frame1_control_register
+arch/sms/registers/z80/mm_frame2_control_register
+arch/sms/registers/z80/mm_frame2_ram_control_register

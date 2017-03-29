@@ -47,8 +47,8 @@
 #define __IO_VDP_DATA               0xbe
 #define __IO_VDP_COMMAND            0xbf
 #define __IO_VDP_STATUS             0xbf
-#define __IO_JOYSTICK_READ_DC       0xdc
-#define __IO_JOYSTICK_READ_DD       0xdd
+#define __IO_JOYSTICK_READ_L        0xdc
+#define __IO_JOYSTICK_READ_H        0xdd
 
 #define __MM_FRAME_2_CONTROL      0xffff
 #define __MM_FRAME_1_CONTROL      0xfffe

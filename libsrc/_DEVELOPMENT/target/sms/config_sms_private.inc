@@ -42,8 +42,8 @@ defc __IO_PSG                   = 0x7f
 defc __IO_VDP_DATA              = 0xbe
 defc __IO_VDP_COMMAND           = 0xbf
 defc __IO_VDP_STATUS            = 0xbf
-defc __IO_JOYSTICK_READ_DC      = 0xdc
-defc __IO_JOYSTICK_READ_DD      = 0xdd
+defc __IO_JOYSTICK_READ_L       = 0xdc
+defc __IO_JOYSTICK_READ_H       = 0xdd
 
 defc __MM_FRAME_2_CONTROL     = 0xffff
 defc __MM_FRAME_1_CONTROL     = 0xfffe
