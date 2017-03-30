@@ -22,7 +22,7 @@ asm_PSGlib_SetMusicVolumeAttenuation:
    ;
 	; enter : l = volume attenuation (0-15)
 	;
-   ; uses  : af, hl
+   ; uses  : af
 
    ld a,l
 	ld (_PSGMusicVolumeAttenuation),a

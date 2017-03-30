@@ -1,0 +1,10 @@
+; void PSGSetMusicVolumeAttenuation(unsigned char attenuation)
+
+SECTION code_clib
+SECTION code_PSGlib
+
+PUBLIC PSGSetMusicVolumeAttenuation
+
+EXTERN asm_PSGlib_SetMusicVolumeAttenuation
+
+defc PSGSetMusicVolumeAttenuation = asm_PSGlib_SetMusicVolumeAttenuation

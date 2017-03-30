@@ -18,53 +18,53 @@
 #define SFX_CHANNEL3        0x02
 #define SFX_CHANNELS2AND3   SFX_CHANNEL2|SFX_CHANNEL3
 
-extern void PSGPlay(void *song);
-extern void PSGPlay_fastcall(void *song) __z88dk_fastcall;
+extern void PSGPlay(void *song) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void PSGPlay_fastcall(void *song) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define PSGPlay(a) PSGPlay_fastcall(a)
 
 
-extern void PSGCancelLoop(void);
+extern void PSGCancelLoop(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
-extern void PSGPlayNoRepeat(void *song);
-extern void PSGPlayNoRepeat_fastcall(void *song) __z88dk_fastcall;
+extern void PSGPlayNoRepeat(void *song) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void PSGPlayNoRepeat_fastcall(void *song) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define PSGPlayNoRepeat(a) PSGPlayNoRepeat_fastcall(a)
 
 
-extern void PSGStop(void);
+extern void PSGStop(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
-extern unsigned char PSGGetStatus(void);
+extern unsigned char PSGGetStatus(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
-extern void PSGSetMusicVolumeAttenuation(unsigned char attenuation);
-extern void PSGSetMusicVolumeAttenuation_fastcall(unsigned char attenuation) __z88dk_fastcall;
+extern void PSGSetMusicVolumeAttenuation(unsigned char attenuation) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void PSGSetMusicVolumeAttenuation_fastcall(unsigned char attenuation) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define PSGSetMusicVolumeAttenuation(a) PSGSetMusicVolumeAttenuation_fastcall(a)
 
 
 
-extern void PSGSFXPlay(void *sfx,unsigned char channels);
-extern void PSGSFXPlay_callee(void *sfx,unsigned char channels) __z88dk_callee;
+extern void PSGSFXPlay(void *sfx,unsigned char channels) __preserves_regs(iyl,iyh);
+extern void PSGSFXPlay_callee(void *sfx,unsigned char channels) __preserves_regs(b,iyl,iyh) __z88dk_callee;
 #define PSGSFXPlay(a,b) PSGSFXPlay_callee(a,b)
 
 
-extern void PSGSFXPlayLoop(void *sfx,unsigned char channels);
-extern void PSGSFXPlayLoop_callee(void *sfx,unsigned char channels) __z88dk_callee;
+extern void PSGSFXPlayLoop(void *sfx,unsigned char channels) __preserves_regs(iyl,iyh);
+extern void PSGSFXPlayLoop_callee(void *sfx,unsigned char channels) __preserves_regs(b,iyl,iyh) __z88dk_callee;
 #define PSGSFXPlayLoop(a,b) PSGSFXPlayLoop_callee(a,b)
 
 
-extern void PSGSFXCancelLoop(void);
+extern void PSGSFXCancelLoop(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
-extern void PSGSFXStop(void);
+extern void PSGSFXStop(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
-extern unsigned char PSGSFXGetStatus(void);
-
-
-extern void PSGSilenceChannels(void);
-
-extern void PSGRestoreVolumes(void);
+extern unsigned char PSGSFXGetStatus(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
 
-extern void PSGFrame(void);
+extern void PSGSilenceChannels(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
-extern void PSGSFXFrame(void);
+extern void PSGRestoreVolumes(void) __preserves_regs(b,c,d,e,iyl,iyh);
+
+
+extern void PSGFrame(void) __preserves_regs(d,e);
+
+extern void PSGSFXFrame(void) __preserves_regs(d,e);
 
 
 #endif

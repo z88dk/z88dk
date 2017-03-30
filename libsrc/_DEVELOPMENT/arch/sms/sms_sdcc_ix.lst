@@ -1,3 +1,3 @@
-@arch/sms/PSGlib/PSGlib_asm.lst
+@arch/sms/PSGlib/PSGlib_sdcc.lst
 @arch/sms/registers/registers_asm.lst
 @arch/sms/vram/vram_asm.lst
