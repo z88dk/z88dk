@@ -1,0 +1,26 @@
+PSG simplistic approach (log of writes to SN76489 port)
+
+- No header
+- %1cct xxxx = Latch/Data byte for SN76489 channel c, type t, data xxxx (4 bits)
+- %01xx xxxx = Data byte for SN76489 latched channel and type, data xxxxxx (6 bits)
+- %00xx xxxx = escape/control byte (values 0x00-0x3f), see following table #1
+
+Table #1
+
+  %0000 0000 - end of data [value 0x00] (compulsory, at the end of file)
+
+  %0000 0001 - loop begin marker [value 0x01] (optional, songs with no loop won't have this)
+
+  %0000 0nnn - RESERVED for future expansions [values 0x02-0x07]
+               * PLANNED: GameGear stereo - the following byte sets the stereo configuration
+               * PLANNED: event callback - the following byte will be passed to the callback function
+               * PLANNED: longer waits (8-255) - the following byte gives the additional frames
+               * PLANNED: compression for longer substrings (52-255) - followed by a byte that gives the length
+                                                                       and a word that gives the offset
+  %0000 1xxx &
+  %0001 xxxx &
+  %0010 xxxx &
+  %0011 0xxx - COMPRESSION: repeat block of len 4-51 [values 0x08-0x37]
+               This is followed by a little-endian word which is the offset (from begin of data) of the repeating block
+
+  %0011 1nnn - end of frame, wait nnn additional frames (0-7) [values 0x38-0x3f]
