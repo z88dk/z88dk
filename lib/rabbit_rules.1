@@ -1,0 +1,107 @@
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	ld	hl,(sp + %1)
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+=
+	ld	hl,(sp + %1)
+	push	hl
+
+%check 0 <= %1 <= 251
+	ld	hl,%1	;const
+	add	hl,so
+	call	l_glong
+=
+	ld	hl,(sp + %1)
+	ex	de,hl
+	ld	hl,(sp + %1 + 2)
+
+	call	l_neg
+=
+	neg	hl
+
+	call	l_or
+=
+	or	hl,de
+
+	call	l_and
+=
+	and	hl,de
+
+	pop	bc
+	push	hl
+=
+	ld	(sp + 0),hl
+
+	ld	hl,(sp + %1)
+=
+	defb	0xc4, %1	; ld hl,(sp + %1)
+
+	ld	ix,(sp + %1)
+=
+	defb	0xdd, 0xc4, %1	; ld ix,(sp + %1)
+
+	ld	iy,(sp + %1)
+=
+	defb	0xfd, 0xc4, %1	; ld iy,(sp + %1)
+
+	ld	(sp + %1),hl
+=
+	defb	0xd4, %1	; ld (sp + %1),hl
+
+	ld	(sp + %1),ix
+=
+	defb	0xdd, 0xd4, %1	; ld (sp + %1),ix
+
+	ld	(sp + %1),iy
+=
+	defb	0xfd, 0xd4, %1	; ld (sp + %1),iy
+
+	neg	hl
+=
+	defb	0x4d	; neg hl
+
+	or	hl,de
+=
+	defb	0xec	; or hl,de
+
+	and	hl,de
+=
+	defb	0xdc	; and hl,de
+
+	mul
+=
+	defb	0xf7	; mul
+
+	mulu
+=
+	defb	0xa7	; mulu
+
+	rr	de
+=
+	defb	0xfb	; rr de
+
+	rr	hl
+=
+	defb	0xfc	; rr hl
+
+	rr	ix
+=
+	defb	0xdd, 0xfc	; rr ix
+
+	rr	iy
+=
+	defb	0xfd, 0xfc	; rr iy
+
+	push	hl
+	defb	0xc4, %2
+	pop	de
+=
+	ex	de,hl
+	defc	0xc4, %2
+
