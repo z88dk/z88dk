@@ -60,3 +60,27 @@ ifelse(__STARTUP, 0,
 
    include(`startup/sms_crt_0.asm.m4')
 ')
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; devkitSMS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 8,
+`
+   ; sms standard model
+   ; no files, no fds
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 0
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/sms_crt_8.asm.m4')
+')
