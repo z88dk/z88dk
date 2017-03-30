@@ -62,9 +62,9 @@ extern void PSGSilenceChannels(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 extern void PSGRestoreVolumes(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
 
-extern void PSGFrame(void) __preserves_regs(d,e);
+extern void PSGFrame(void) __preserves_regs(d,e,iyl,iyh);
 
-extern void PSGSFXFrame(void) __preserves_regs(d,e);
+extern void PSGSFXFrame(void) __preserves_regs(d,e,iyl,iyh);
 
 
 #endif

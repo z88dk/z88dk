@@ -32,7 +32,7 @@ __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,PSGSFXGetStatus,void
 __OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,PSGSilenceChannels,void)
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,PSGRestoreVolumes,void)
 
-__OPROTO(`d,e',`d,e',void,,PSGFrame,void)
-__OPROTO(`d,e',`d,e',void,,PSGSFXFrame,void)
+__OPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,PSGFrame,void)
+__OPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,PSGSFXFrame,void)
 
 #endif
