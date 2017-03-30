@@ -186,79 +186,133 @@ void write_redirect(char *sname, char *value)
     fclose(fp);
 }
 
-struct printf_format_s {
+typedef struct convspec_s {
     char fmt;
     char complex;
     uint32_t val;
     uint32_t lval;
-} printf_formats[] = {
-    { 'd', 1, 0x01, 0x1000 },
-    { 'u', 1, 0x02, 0x2000 },
-    { 'x', 2, 0x04, 0x4000 },
-    { 'X', 2, 0x08, 0x8000 },
-    { 'o', 2, 0x10, 0x10000 },
-    { 'n', 2, 0x20, 0x20000 },
-    { 'i', 2, 0x40, 0x40000 },
-    { 'p', 2, 0x80, 0x80000 },
-    { 'B', 2, 0x100, 0x100000 },
-    { 's', 1, 0x200, 0x0 },
-    { 'c', 1, 0x400, 0x0 },
-    { 'a', 0, 0x400000, 0x0 },
-    { 'A', 0, 0x800000, 0x0 },
-    { 'e', 3, 0x1000000, 0x1000000 },
-    { 'E', 3, 0x2000000, 0x2000000 },
-    { 'f', 3, 0x4000000, 0x4000000 },
-    { 'F', 3, 0x8000000, 0x8000000 },
-    { 'g', 3, 0x10000000, 0x10000000 },
-    { 'G', 3, 0x20000000, 0x20000000 },
+    uint32_t llval;
+} CONVSPEC;
+
+CONVSPEC printf_formats[] = {
+    { 'd', 1, 0x01, 0x1000, 0x01 },
+    { 'u', 1, 0x02, 0x2000, 0x02 },
+    { 'x', 2, 0x04, 0x4000, 0x04 },
+    { 'X', 2, 0x08, 0x8000, 0x08 },
+    { 'o', 2, 0x10, 0x10000, 0x10 },
+    { 'n', 2, 0x20, 0x20000, 0 },
+    { 'i', 2, 0x40, 0x40000, 0x40 },
+    { 'p', 2, 0x80, 0x80000, 0 },
+    { 'B', 2, 0x100, 0x100000, 0 },
+    { 's', 1, 0x200, 0, 0 },
+    { 'c', 1, 0x400, 0, 0 },
+    { 'I', 0, 0x800, 0, 0 },
+    { 'a', 0, 0x400000, 0x400000, 0 },
+    { 'A', 0, 0x800000, 0x800000, 0 },
+    { 'e', 3, 0x1000000, 0x1000000, 0 },
+    { 'E', 3, 0x2000000, 0x2000000, 0 },
+    { 'f', 3, 0x4000000, 0x4000000, 0 },
+    { 'F', 3, 0x8000000, 0x8000000, 0 },
+    { 'g', 3, 0x10000000, 0x10000000, 0 },
+    { 'G', 3, 0x20000000, 0x20000000, 0 },
     { 0, 0, 0, 0 }
 };
 
-static int32_t parse_format_string(char *arg)
+CONVSPEC scanf_formats[] = {
+    { 'd', 1, 0x01, 0x1000, 0x01 },
+    { 'u', 1, 0x02, 0x2000, 0x02 },
+    { 'x', 2, 0x04, 0x4000, 0x04 },
+    { 'X', 2, 0x08, 0x8000, 0x08 },
+    { 'o', 2, 0x10, 0x10000, 0x10 },
+    { 'n', 2, 0x20, 0x20000, 0 },
+    { 'i', 2, 0x40, 0x40000, 0x40 },
+    { 'p', 2, 0x80, 0x80000, 0 },
+    { 'B', 2, 0x100, 0x100000, 0 },
+    { 's', 1, 0x200, 0, 0 },
+    { 'c', 1, 0x400, 0, 0 },
+    { 'I', 0, 0x800, 0, 0 },
+    { '[', 0, 0x200000, 0x200000, 0},
+    { 'a', 0, 0x400000, 0x400000, 0 },
+    { 'A', 0, 0x800000, 0x800000, 0 },
+    { 'e', 3, 0x1000000, 0x1000000, 0 },
+    { 'E', 3, 0x2000000, 0x2000000, 0 },
+    { 'f', 3, 0x4000000, 0x4000000, 0 },
+    { 'F', 3, 0x8000000, 0x8000000, 0 },
+    { 'g', 3, 0x10000000, 0x10000000, 0 },
+    { 'G', 3, 0x20000000, 0x20000000, 0 },
+    { 0, 0, 0, 0 }
+};
+
+static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
 {
     char c;
     int complex, islong;
-    int32_t format_option = 0;
-    struct printf_format_s* fmt;
+    uint64_t format_option = 0;
+    CONVSPEC *fmt;
 
-    complex = 1; /* mini printf */
-    while ((c = *arg++)) {
-        if (c != '%')
+    for (complex = 1; c = *arg; ++arg)
+    {
+        if ((c == '%') || isspace(c) || (c == '"') || (c == '='))
             continue;
 
-        if (*arg == '-' || *arg == '0' || *arg == '+' || *arg == ' ' || *arg == '*' || *arg == '.') {
+        if (*arg == '-' || *arg == '0' || *arg == '+' || *arg == ' ' || *arg == '*' || *arg == '.')
+        {
             if (complex < 2)
                 complex = 2; /* Switch to standard */
             format_option |= 0x40000000;
             while (!isalpha(*arg))
                 arg++;
-        } else if (isdigit(*arg)) {
+        }
+        else if (isdigit(*arg))
+        {
             if (complex < 2)
                 complex = 2; /* Switch to standard */
             format_option |= 0x40000000;
-            while (isdigit(*arg) || *arg == '.') {
+            while (isdigit(*arg) || *arg == '.')
                 arg++;
-            }
         }
 
         islong = 0;
-        if (*arg == 'l') {
+        if (*arg == 'l')
+        {
             if (complex < 2)
                 complex = 2;
             arg++;
             islong = 1;
+            if (*arg == 'l')
+            {
+                arg++;
+                islong = 2;
+            }
         }
-        fmt = &printf_formats[0];
-        while (fmt->fmt) {
-            if (fmt->fmt == *arg) {
+
+        fmt = specifiers;
+        while (fmt->fmt)
+        {
+            if (fmt->fmt == *arg)
+            {
                 if (complex < fmt->complex)
                     complex = fmt->complex;
-                format_option |= islong ? fmt->lval : fmt->val;
+                switch (islong)
+                {
+                case 0:
+                    format_option |= fmt->val;
+                    break;
+                case 1:
+                    format_option |= fmt->lval;
+                    break;
+                default:
+                    format_option |= (uint64_t)(fmt->llval) << 32;
+                    break;
+                }
                 break;
             }
             fmt++;
         }
+        if (fmt->fmt == 0)
+            fprintf(stderr, "Ignoring unrecognized %s format specifier %%%c\n", (specifiers == printf_formats) ? "printf" : "scanf", *arg);
     }
+
     return format_option;
 }
 
@@ -300,11 +354,13 @@ int main(int argc, char **argv)
                 }
                 write_redirect(ptr,value);
             } else if ( strncmp(ptr,"printf", 6) == 0 ) {
-                int32_t value = parse_format_string(ptr + 6);
-                write_defined("CLIB_OPT_PRINTF", value, 0);
+                uint64_t value = parse_format_string(ptr + 6, printf_formats);
+                write_defined("CLIB_OPT_PRINTF", (int32_t)(value & 0xffffffff), 0);
+                write_defined("CLIB_OPT_PRINTF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"scanf", 5) == 0 ) {
-                int32_t value = parse_format_string(ptr + 5);
-                write_defined("CLIB_OPT_SCANF", value, 0);
+                uint64_t value = parse_format_string(ptr + 5, scanf_formats);
+                write_defined("CLIB_OPT_SCANF", (int32_t)(value & 0xffffffff), 0);
+                write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
             } else if ( strncmp(ptr, "data", 4) == 0 ) {
@@ -319,17 +375,17 @@ int main(int argc, char **argv)
                 ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
                 /* It's an option, this may tweak something */
-                write_defined("CRT_ORG_CODE", atoi(ptr+6), 0);
+                write_defined("CRT_ORG_CODE", strtol(ptr+6, NULL, 0), 0);
             } else if ( strncmp(ptr, "-reqpag=", 8) == 0 ) {
-                write_defined("CRT_Z88_BADPAGES", atoi(ptr+8), 0);
+                write_defined("CRT_Z88_BADPAGES", strtol(ptr+8, NULL, 0), 0);
             } else if ( strncmp(ptr, "-defvars=", 8) == 0 ) {
-                write_defined("defvarsaddr", atoi(ptr+8), 0);
+                write_defined("defvarsaddr", strtol(ptr+8, NULL, 0), 0);
             } else if ( strncmp(ptr, "-safedata=", 10) == 0 ) {
-                write_defined("CRT_Z88_SAFEDATA", atoi(ptr+9), 0);
+                write_defined("CRT_Z88_SAFEDATA", strtol(ptr+9, NULL, 0), 0);
             } else if ( strncmp(ptr, "-startup=", 9) == 0 ) {
-                write_defined("startup", atoi(ptr+9), 0);
+                write_defined("startup", strtol(ptr+9, NULL, 0), 0);
             } else if ( strncmp(ptr, "-farheap=", 9) == 0 ) {
-                write_defined("farheapsz", atoi(ptr+9), 0);
+                write_defined("farheapsz", strtol(ptr+9, NULL, 0), 0);
             } else if ( strncmp(ptr, "-expandz88", 9) == 0 ) {
                 write_defined("CRT_Z88_EXPANDED", 1, 0);
             } else if ( strncmp(ptr, "-no-expandz88", 9) == 0 ) {
