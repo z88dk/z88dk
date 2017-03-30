@@ -36,10 +36,7 @@ asm_PSGlib_SFXStop:
    ld a,(_PSGChannel2SFX)
    or a
    jr z, skipchan2
-   
-   ld a,(_PSGMusicStatus)
-   or a
-   
+
    inc h
    dec h
    jr z, silchan2
