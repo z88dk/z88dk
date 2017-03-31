@@ -20,7 +20,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
 	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
-	pc6001_clib.lib pps_clib.lib px4.lib \
+	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
@@ -442,6 +442,14 @@ px4.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/px4.lst
+
+# Epson PX8 lib - Stefano	
+px8.lib:
+	@echo ''
+	@echo '--- Building PX-8/Geneva Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/px8.lst
 
 # VZ200/300 lib - Stefano
 vz_clib.lib:
@@ -1511,5 +1519,4 @@ clean:
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
-
 
