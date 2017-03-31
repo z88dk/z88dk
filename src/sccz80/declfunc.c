@@ -461,7 +461,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
 
 
     pushframe();
-    if (currfn->prototyped == 1 && (currfn->flags & FASTCALL)) {
+    if (currfn->prototyped == 1 && (currfn->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         /*
          * Fast call routine..
          */
@@ -508,6 +508,10 @@ void check_trailing_modifiers(SYMBOL *currfn)
             currfn->flags &= ~FLOATINGDECL;
             continue;
         }
+        if (amatch("__z88dk_saveframe") || amatch("__SAVEFRAME__")) {
+            currfn->flags |= SAVEFRAME;
+            continue;
+        }
         if (amatch("__smallc")) {
             currfn->flags |= SMALLC;
             currfn->flags &= ~FLOATINGDECL;
@@ -515,6 +519,10 @@ void check_trailing_modifiers(SYMBOL *currfn)
         }
         if (amatch("__stdc")) {
             currfn->flags &= ~(SMALLC|FLOATINGDECL);
+            continue;
+        }
+        if (amatch("__naked")) {
+            currfn->flags |= NAKED;
             continue;
         }
         if (amatch("__preserves_regs")) {

@@ -516,6 +516,10 @@ void leave(int vartype, char type)
     int callee_cleanup = (c_compact_code || currfn->flags & CALLEE) && (stackargs > 2);
     int hlsaved;
 
+    if ( currfn->flags & NAKED ) {
+        return;
+    }
+
     if (vartype == CPTR) /* they are the same in any case! */
         vartype = LONG;
     else if ( vartype == DOUBLE ) {

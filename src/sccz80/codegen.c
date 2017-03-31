@@ -2731,7 +2731,7 @@ void FrameP(void)
 
 void pushframe(void)
 {
-    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("push\t");
         FrameP();
         nl();
@@ -2740,7 +2740,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("pop\t");
         FrameP();
         nl();
