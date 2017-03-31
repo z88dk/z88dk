@@ -161,22 +161,22 @@ void defenum(char* sname, enum storage_type storage)
  */
 int get_ident(enum ident_type existing)
 {
+    int ret = existing;
     if ( existing == POINTER ) {
         if (match("*"))
-            return PTR_TO_PTR;
-        if (match("(*"))
-            return PTR_TO_FNP;
-        return existing;
-    } 
-    if (match("**"))
-        return PTR_TO_PTR;
-    if (match("*(*"))
-        return PTR_TO_FNP;
-    if (cmatch('*'))
-        return POINTER;
-    if (match("(*"))
-        return PTR_TO_FN;
-    return VARIABLE;
+            ret = PTR_TO_PTR;
+        else if (match("(*"))
+            ret = PTR_TO_FNP;
+    } else if (match("**"))
+        ret =  PTR_TO_PTR;
+    else if (match("*(*"))
+        ret = PTR_TO_FNP;
+    else if (cmatch('*'))
+        ret = POINTER;
+    else if (match("(*"))
+        ret = PTR_TO_FN;
+    swallow("const"); // Just swallow it to get stuff to comple
+    return ret;
 }
 
 /*
