@@ -21,11 +21,11 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib \
-	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
+	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
-	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
+	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
@@ -1204,8 +1204,7 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
-	@echo '--- WARNING: RCM2/3000 is temporarily disabled - no library will be produced ---'
-	@echo ''
+	$(MAKE) -C strings clean
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) stdldeps
@@ -1214,6 +1213,7 @@ rcmx000_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	z80asm --RCMX000 -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	$(MAKE) -C strings clean
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
