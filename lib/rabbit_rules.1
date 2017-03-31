@@ -83,6 +83,24 @@
 	and	a
 	rr	de
 
+%check -128 <= %1 <= 126
+	inc	hl
+	ld	hl,(hl + %1)
+=
+	ld	hl,(hl + %1 + 1)
+
+	inc	hl
+	call	l_gint	;
+=
+	ld	hl,(hl + 1)
+
+%check -128 <= %1 <= 127
+	ld	bc,%1
+	add	hl,bc
+	call	l_gint	;
+=
+	ld	hl,(hl+%1)
+
 	call	l_gint	;
 =
 	ld	hl,(hl+0)
