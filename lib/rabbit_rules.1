@@ -31,6 +31,24 @@
 	ex	de,hl
 	ld	hl,(sp + %1 + 2)
 
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+=
+	add	sp,%1
+	ret
+
+%check 65408 <= %1 <= 65535
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%2
+=
+	add	sp,#(%1 - 65536)
+	ld	hl,%2
+
 	call	l_neg
 =
 	neg	hl
@@ -171,6 +189,10 @@
 	bool	iy
 =
 	defb	0xfd, 0xcc	; bool iy
+
+	add	sp,%1
+=
+	defb	0x27, %1	;add sp,%1
 
 	halt
 =
