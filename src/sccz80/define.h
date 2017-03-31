@@ -92,7 +92,8 @@ enum symbol_flags {
         LIBRARY = 128,    /* Lib routine */
         SAVEFRAME = 256,  /* Save framepointer */
         SMALLC = 512,      /* L->R calling order */
-        FLOATINGDECL = 1024 /* For a function pointer, the calling convention is floating */
+        FLOATINGDECL = 1024, /* For a function pointer, the calling convention is floating */
+        NAKED = 2048      /* Function is naked - don't generate any code */
 };
 
 
