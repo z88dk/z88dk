@@ -1,9 +1,19 @@
+	ld	a,h
+	or	l
+	j%1	%2
+	ld	hl,%3
+=
+	bool	hl
+	j%1	%2
+	ld	hl,%3
+
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
 =
 	ld	hl,(sp + %1)
+
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
@@ -14,7 +24,7 @@
 
 %check 0 <= %1 <= 251
 	ld	hl,%1	;const
-	add	hl,so
+	add	hl,sp
 	call	l_glong
 =
 	ld	hl,(sp + %1)
@@ -37,6 +47,27 @@
 	push	hl
 =
 	ld	(sp + 0),hl
+
+	srl	h
+	rr	l
+=
+	and	a
+	rr	hl
+
+	rr	h
+	rr	l
+=
+	rr	hl
+
+	srl	d
+	rr	e
+=
+	and	a
+	rr	de
+
+	call	l_gint	;
+=
+	ld	hl,(hl+0)
 
 	ld	hl,(sp + %1)
 =
@@ -78,10 +109,6 @@
 =
 	defb	0xf7	; mul
 
-	mulu
-=
-	defb	0xa7	; mulu
-
 	rr	de
 =
 	defb	0xfb	; rr de
@@ -104,4 +131,56 @@
 =
 	ex	de,hl
 	defc	0xc4, %2
+
+	ld	hl,(hl%1)
+=
+	defb	0xdd, 0xe4, %1	;ld hl,(hl%1)
+
+	ld	hl,(iy%1)
+=
+	defb	0xfd, 0xe4, %1	;ld hl,(iy%1)
+
+	ld	hl,(ix%1)
+=
+	defb	0xe4, %1	;ld hl,(ix%1)
+
+	ld	(hl%1),hl
+=
+	defb	0xdd, 0xf4, %1	;ld (hl%1),hl
+
+	ld	(ix%1),hl
+=
+	defb	0xf4, %1	;ld (ix%1),hl
+
+	ld	(iy%1),hl
+=
+	defb	0xfd, 0xf4, %1	;ld (iy%1),hl
+
+	altd
+=
+	defb	0x76
+
+	bool	hl
+=
+	defb	0xcc	; bool hl
+
+	bool	ix
+=
+	defb	0xdd, 0xcc	; bool ix
+
+	bool	iy
+=
+	defb	0xfd, 0xcc	; bool iy
+
+	halt
+=
+	Halt is not supported on RCM
+
+	di
+=
+	di is not supported on RCM
+
+	ei
+=
+	ei is not supported on RCM
 
