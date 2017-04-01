@@ -1035,7 +1035,7 @@ nascom_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(LIBLINKER) -DFORnascom -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
+	$(LIBLINKER) -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
 	
 # Robotron Z1013 library - Stefano
 z1013_clib.lib:
