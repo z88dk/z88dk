@@ -21,7 +21,11 @@
 	jr  nz,nocls
 	ld  a,$1a
 .nocls
+IF STANDARDESCAPECHARS
+	cp  10
+ELSE
 	cp  13
+ENDIF
 	jr nz,nocr
 	ld  b,13
 	call $800C

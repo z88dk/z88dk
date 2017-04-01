@@ -828,7 +828,7 @@ bee_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lbee
-	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
+	$(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
 
 microbee.lib:
 	@echo ''
@@ -837,7 +837,7 @@ microbee.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lbee
-	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
+	$(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
 	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/beegfx.lst
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(LISTFILE_DIRECTORY)/beegfxhr.lst
