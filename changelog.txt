@@ -16,6 +16,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] printf now supports 64 bit values when used with sdcc
 - [classiclib] +c128 improvements
 - [classiclib] [math48] #108: Single parameter library math functions now work correctly
+- [classiclib] +rcmx000 support has been restored and optimisations applied
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -33,6 +34,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #116: Improvements for operations with constants
 - [sccz80] Constant floating point expressions are now folded
 - [sccz80] [math48] #104: Non commutative FP operations with constant on left now work
+- [sccz80] #138: Aggregate (arrays, structs) auto variables can now be initialised
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [all] #105: main() always takes its parameters in r->l format regardless of compiler

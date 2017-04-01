@@ -613,36 +613,55 @@ void declloc(
                 cptr->offset.i = Zsp - declared;
                 cptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
                 cptr->isconst = var->isconst;
-                if (cmatch('=')) {
+                if (rcmatch('=')) {
                     int vconst,expr;
                     double val;
                     char *before, *start;
                     uint32_t packedType;
 
-                    if ((typ == STRUCT && ident != POINTER) || ident == ARRAY)
-                        error(E_AUTOASSIGN, sname);
-                    Zsp = modstk(Zsp - (declared - size), NO, NO);
-                    declared = 0;
-                    setstage(&before, &start);
-                    expr = expression(&vconst, &val, &packedType);
+                    if ((typ == STRUCT && ident != POINTER) || ident == ARRAY) {
+                        char newname[NAMESIZE + 20];
 
-                    if ( vconst && expr != cptr->type ) {
-                        // It's a constant that doesn't match the right type
-                        LVALUE  lval;
-                        clearstage(before, 0);
-                        if ( expr == DOUBLE ) {
-                            decrement_double_ref_direct(val);
+                        declared -= size;
+
+                        snprintf(newname, sizeof(newname),"auto_%s_%s",currfn->name, cptr->name);
+                        // TODO: Fixup name
+                        int alloc_size = initials(newname, cptr->type, cptr->ident, dsize, more, otag, var->zfar, var->isconst);
+
+                        
+                        if ( ident == ARRAY ) {
+                            cptr->offset.i -= (alloc_size - size);
+                            cptr->size += (alloc_size - size);
                         }
-                        lval.val_type = cptr->type;
-                        lval.const_val = val;
-                        load_constant(&lval);
+                        Zsp = modstk(Zsp - (alloc_size - declared), NO, NO);
+                        copy_to_stack(newname, 0, alloc_size);
+                        cptr->isassigned = YES;
+
                     } else {
-                        clearstage(before, start);
-                        //conv type
-                        force(decltype, expr, 0, 0, 0);
+                        cmatch('=');
+                        Zsp = modstk(Zsp - (declared - size), NO, NO);
+                        declared = 0;
+                        setstage(&before, &start);
+                        expr = expression(&vconst, &val, &packedType);
+
+                        if ( vconst && expr != cptr->type ) {
+                            // It's a constant that doesn't match the right type
+                            LVALUE  lval;
+                            clearstage(before, 0);
+                            if ( expr == DOUBLE ) {
+                                decrement_double_ref_direct(val);
+                            }
+                            lval.val_type = cptr->type;
+                            lval.const_val = val;
+                            load_constant(&lval);
+                        } else {
+                            clearstage(before, start);
+                            //conv type
+                            force(decltype, expr, 0, 0, 0);
+                        }
+                        cptr->isassigned = YES;
+                        StoreTOS(decltype);
                     }
-                    cptr->isassigned = YES;
-                    StoreTOS(decltype);
                 }
             }
         }

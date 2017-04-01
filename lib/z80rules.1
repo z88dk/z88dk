@@ -2348,3 +2348,9 @@
 =
 	ld	e,(hl)
 	ld	d,0
+
+	ld	sp,hl
+	ld	hl,0	;const
+	add	hl,sp
+=
+	ld	sp,hl

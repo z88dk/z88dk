@@ -279,6 +279,7 @@ static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
 static char  *c_coptrules9 = NULL;
+static char  *c_coptrules_cpu = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -364,6 +365,7 @@ static arg_t  config[] = {
 	{ "COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "\"DESTDIR/lib/z80rules.2\"" },
 	{ "COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "\"DESTDIR/lib/z80rules.0\"" },
 	{ "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
+	{ "COPTRULESCPU", 0, SetStringConfig, &c_coptrules_cpu, NULL, "An extra copt file for CPU optimisation", NULL },
 	{ "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
 	{ "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
 	{ "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
@@ -1086,17 +1088,26 @@ int main(int argc, char **argv)
 			}
 			else
 			{
+				char *before_cpuext = ".asm";
+
+				if ( c_coptrules_cpu ) {
+					before_cpuext = ".opc";
+				}
 				/* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
 				switch (peepholeopt)
 				{
 				case 0:
-					if (process(".opt", ".asm", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+					if (process(".opt", before_cpuext, c_copt_exe, c_coptrules9, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
 						exit(1);
 					break;
 				case 1:
 					if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
 						exit(1);
-					if (process(".op1", ".asm", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+					if (process(".op1", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
 						exit(1);
 					break;
 				case 2:
@@ -1105,7 +1116,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
 						exit(1);
-					if (process(".op2", ".asm", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+					if (process(".op2", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
 						exit(1);
 					break;
 				default:
@@ -1119,7 +1132,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op2", ".op3", c_copt_exe, c_coptrules1, filter, i, YES, NO))
 						exit(1);
-					if (process(".op3", ".asm", c_copt_exe, c_coptrules3, filter, i, YES, NO))
+					if (process(".op3", before_cpuext, c_copt_exe, c_coptrules3, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
 						exit(1);
 					break;
 				}
@@ -2487,6 +2502,7 @@ void remove_temporary_files(void)
 			remove_file_with_extension(temporary_filenames[j], ".op1");
 			remove_file_with_extension(temporary_filenames[j], ".op2");
 			remove_file_with_extension(temporary_filenames[j], ".op3");
+			remove_file_with_extension(temporary_filenames[j], ".opc");
 			remove_file_with_extension(temporary_filenames[j], ".opt");
 			remove_file_with_extension(temporary_filenames[j], ".o");
             remove_file_with_extension(temporary_filenames[j], ".map");

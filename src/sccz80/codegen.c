@@ -2787,6 +2787,15 @@ void gen_builtin_strchr()
 }
 
 
+void copy_to_stack(char *label, int stack_offset,  int size)
+{
+    vconst(stack_offset);
+    ol("add\thl,sp");  
+    ol("ex\tde,hl");
+    outstr("\tld\thl,"); outname(label, dopref(label)); nl();
+    outfmt("\tld\tbc,%d\n",size);
+    ol("ldir");
+}
 
 
 /*
