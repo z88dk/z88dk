@@ -443,6 +443,14 @@ px4.lib:
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/px4.lst
 
+# Epson PX8 lib - Stefano	
+px8.lib:
+	@echo ''
+	@echo '--- Building PX-8/Geneva Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/px8.lst
+
 # VZ200/300 lib - Stefano
 vz_clib.lib:
 	@echo ''
@@ -1511,5 +1519,4 @@ clean:
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
-
 

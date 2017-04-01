@@ -336,6 +336,12 @@ IF FORpx4
 	defc maxy	= 64
 ENDIF
 
+IF FORpx8
+	DEFINE gotgfx
+	defc maxx	= 480
+	defc maxy	= 64
+ENDIF
+
 IF FORvg5k
 	DEFINE gotgfx
 	defc maxx	= 80

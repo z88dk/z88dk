@@ -1,0 +1,117 @@
+lstoff
+
+; PX8 Slave CPU definitions
+;
+; $Id:  px8_subcpu.def, stefano, 3/2017 $
+;
+
+
+defc SLVFLG = 0xF358
+
+
+; SUB-CPU commands
+
+defc SCPU_RAM_READ			= 0x00
+defc SCPU_RAM_WRITE			= 0x01
+defc SCPU_RAM_EXECUTE		= 0x02
+
+defc SCPU_LCD_MODE			= 0x10
+defc SCPU_LCD_ONOFF			= 0x11
+defc SCPU_LCD_SELECT		= 0x12
+defc SCPU_LCD_GETPTR		= 0x13
+defc SCPU_LCD_SETPTR		= 0x14
+defc SCPU_LCD_LINES			= 0x15
+defc SCPU_LCD_CURS_MODE		= 0x16
+defc SCPU_LCD_GET_CURPOS	= 0x17
+defc SCPU_LCD_SET_CURPOS	= 0x18
+defc SCPU_LCD_FLASH_ONOFF	= 0x19
+defc SCPU_LCD_CLS			= 0x1A
+defc SCPU_LCD_READ_FONT		= 0x1B
+
+defc SCPU_LCD_SET_UDG		= 0x20
+defc SCPU_LCD_GRAPH_FLASH	= 0x21
+defc SCPU_LCD_DRAW_FONT		= 0x22
+defc SCPU_LCD_DRAW_UDG		= 0x23
+defc SCPU_LCD_READ			= 0x24
+defc SCPU_LCD_WRITE			= 0x25
+defc SCPU_LCD_GRAPH_MOVE	= 0x26
+defc SCPU_LCD_SET_POINT		= 0x27
+defc SCPU_LCD_GET_POINT		= 0x28
+defc SCPU_LCD_DRAW_LINE		= 0x29
+
+defc SCPU_LCD_DEF_UDG		= 0x30
+defc SCPU_LCD_TEXT_FLASH	= 0x31
+defc SCPU_LCD_GET_WINPTR	= 0x32
+defc SCPU_LCD_SET_WINPTR	= 0x33
+defc SCPU_LCD_TEXT_READ		= 0x34
+defc SCPU_LCD_TEXT_WRITE	= 0x35
+defc SCPU_LCD_TEXT_MOVE		= 0x36
+
+defc SCPU_MCT_STATUS		= 0x40
+defc SCPU_MCT_HEAD_ON		= 0x41
+defc SCPU_MCT_HEAD_OFF		= 0x42
+defc SCPU_MCT_REW_COUNT		= 0x43
+defc SCPU_MCT_FF_COUNT		= 0x44
+defc SCPU_MCT_REW			= 0x45
+defc SCPU_MCT_FF			= 0x46
+defc SCPU_MCT_SLOW_REW		= 0x47
+defc SCPU_MCT_PLAY			= 0x48
+defc SCPU_MCT_REC			= 0x49
+defc SCPU_MCT_STOP			= 0x4A
+defc SCPU_MCT_CK_WPROT		= 0x4B
+defc SCPU_MCT_GET_COUNT		= 0x4C
+defc SCPU_MCT_SET_COUNT		= 0x4D
+
+defc SCPU_MCT_WR_CONT		= 0x51
+defc SCPU_MCT_WR_STOP		= 0x52
+defc SCPU_MCT_RD_CONT		= 0x53
+defc SCPU_MCT_RD_STOP		= 0x54
+defc SCPU_MCT_SET_WPROT		= 0x55
+defc SCPU_MCT_GET_WPROT		= 0x56
+
+defc SCPU_ESPS_STATUS		= 0x60
+defc SCPU_ESPS_SPEED		= 0x61
+defc SCPU_ESPS_IN			= 0x62
+defc SCPU_ESPS_OUT			= 0x63
+defc SCPU_ESPS_SEND			= 0x64
+defc SCPU_ESPS_RECV			= 0x65
+
+defc SCPU_PROM_ONOFF		= 0x70
+defc SCPU_PROM_READ			= 0x71
+
+defc SCPU_BEEP_ONOFF		= 0x72
+defc SCPU_BEEP_FREQ			= 0x73
+defc SCPU_BEEP_MELODY		= 0x74
+
+
+
+; SUB-CPU return codes (SYS)
+defc RCD00 = 0x00	; Ok, terminated normally
+defc RCD01 = 0x01	; Break acknowledged
+defc RCD02 = 0x02	; Command error
+defc RCD03 = 0x03	; Communications error, command was issued while receiving or sending data
+
+; SUB-CPU return codes (LCD)
+defc RCD04 = 0x11	; Invalid size specification / out of screen
+defc RCD05 = 0x12	; Undefined graphics in user defined character
+defc RCD06 = 0x13	; Invalid user defined character
+
+; SUB-CPU return codes (MCT)
+defc RCD07 = 0x41	; Head error
+defc RCD08 = 0x42	; Tape stopped during processing
+defc RCD09 = 0x43	; Write protect error
+defc RCD10 = 0x44	; Data error
+defc RCD11 = 0x45	; CRC error
+defc RCD11_1 = 0x46	; Block mode error (invalid block identifier)
+
+; SUB-CPU return codes (ESPS)
+defc RCD12 = 0x61	; Link unsuccessful
+defc RCD13 = 0x62	; Communication error
+defc RCD14 = 0x63	; Timeout
+
+; SUB-CPU return codes (BEEP)
+defc RCD15 = 0x71	; BEEP or MELODY command issue before previous command termination
+
+
+
+lston

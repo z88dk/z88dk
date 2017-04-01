@@ -5,7 +5,7 @@ include ../make.config
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test_mult.bin test_callee.bin test_lshift.bin
+all:	test_mult.bin test_callee.bin test_lshift.bin test_autoinit.bin
 
 
 
@@ -19,6 +19,10 @@ test_mult.bin: $(SOURCES) mult.c
 
 test_lshift.bin: $(SOURCES) lshift.c
 	$(compile)
+	$(runtest)
+
+test_autoinit.bin: $(SOURCES) autoinit.c
+	$(call compile, -DGENMATH -DMATH_LIBRARY="\"\\\"Genmath\\\"\"", -lm)
 	$(runtest)
 
 

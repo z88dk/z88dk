@@ -2731,7 +2731,7 @@ void FrameP(void)
 
 void pushframe(void)
 {
-    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("push\t");
         FrameP();
         nl();
@@ -2740,7 +2740,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("pop\t");
         FrameP();
         nl();
@@ -2787,6 +2787,15 @@ void gen_builtin_strchr()
 }
 
 
+void copy_to_stack(char *label, int stack_offset,  int size)
+{
+    vconst(stack_offset);
+    ol("add\thl,sp");  
+    ol("ex\tde,hl");
+    outstr("\tld\thl,"); outname(label, dopref(label)); nl();
+    outfmt("\tld\tbc,%d\n",size);
+    ol("ldir");
+}
 
 
 /*
