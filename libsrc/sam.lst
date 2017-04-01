@@ -1,4 +1,4 @@
-@stdio/stdio.lst
+@stdio/stdio_stdesc.lst
 @input/spectrum.lst
 stdio/sam/fgetc_cons
 stdio/sam/fputc_cons

@@ -382,7 +382,7 @@ pacman_clib.lib:
 	$(MAKE) -C stdio
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(LIBLINKER) -DFORpacman -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
+	$(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
 
 # Philips P2000 lib - Stefano
 p2000_clib.lib:
@@ -887,7 +887,7 @@ sam_clib.lib:
 	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lzx
-	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
+	$(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano
 svi_clib.lib:
