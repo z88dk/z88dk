@@ -1,0 +1,226 @@
+	ld	a,h
+	or	l
+	j%1	%2
+	ld	hl,%3
+=
+	bool	hl
+	j%1	%2
+	ld	hl,%3
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	ld	hl,(sp + %1)
+
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+=
+	ld	hl,(sp + %1)
+	push	hl
+
+%check 0 <= %1 <= 251
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong
+=
+	ld	hl,(sp + %1)
+	ex	de,hl
+	ld	hl,(sp + %1 + 2)
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+=
+	add	sp,%1
+	ret
+
+%check 65408 <= %1 <= 65535
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%2
+=
+	add	sp,#(%1 - 65536)
+	ld	hl,%2
+
+	call	l_neg
+=
+	neg	hl
+
+	call	l_or
+=
+	or	hl,de
+
+	call	l_and
+=
+	and	hl,de
+
+	pop	bc
+	push	hl
+=
+	ld	(sp + 0),hl
+
+	srl	h
+	rr	l
+=
+	and	a
+	rr	hl
+
+	rr	h
+	rr	l
+=
+	rr	hl
+
+	srl	d
+	rr	e
+=
+	and	a
+	rr	de
+
+%check -128 <= %1 <= 126
+	inc	hl
+	ld	hl,(hl + %1)
+=
+	ld	hl,(hl + %1 + 1)
+
+	inc	hl
+	call	l_gint	;
+=
+	ld	hl,(hl + 1)
+
+%check -128 <= %1 <= 127
+	ld	bc,%1
+	add	hl,bc
+	call	l_gint	;
+=
+	ld	hl,(hl+%1)
+
+	call	l_gint	;
+=
+	ld	hl,(hl+0)
+
+	ld	hl,(sp + %1)
+=
+	defb	0xc4, %1	; ld hl,(sp + %1)
+
+	ld	ix,(sp + %1)
+=
+	defb	0xdd, 0xc4, %1	; ld ix,(sp + %1)
+
+	ld	iy,(sp + %1)
+=
+	defb	0xfd, 0xc4, %1	; ld iy,(sp + %1)
+
+	ld	(sp + %1),hl
+=
+	defb	0xd4, %1	; ld (sp + %1),hl
+
+	ld	(sp + %1),ix
+=
+	defb	0xdd, 0xd4, %1	; ld (sp + %1),ix
+
+	ld	(sp + %1),iy
+=
+	defb	0xfd, 0xd4, %1	; ld (sp + %1),iy
+
+	neg	hl
+=
+	defb	0x4d	; neg hl
+
+	or	hl,de
+=
+	defb	0xec	; or hl,de
+
+	and	hl,de
+=
+	defb	0xdc	; and hl,de
+
+	mul
+=
+	defb	0xf7	; mul
+
+	rr	de
+=
+	defb	0xfb	; rr de
+
+	rr	hl
+=
+	defb	0xfc	; rr hl
+
+	rr	ix
+=
+	defb	0xdd, 0xfc	; rr ix
+
+	rr	iy
+=
+	defb	0xfd, 0xfc	; rr iy
+
+	push	hl
+	defb	0xc4, %2
+	pop	de
+=
+	ex	de,hl
+	defc	0xc4, %2
+
+	ld	hl,(hl%1)
+=
+	defb	0xdd, 0xe4, %1	;ld hl,(hl%1)
+
+	ld	hl,(iy%1)
+=
+	defb	0xfd, 0xe4, %1	;ld hl,(iy%1)
+
+	ld	hl,(ix%1)
+=
+	defb	0xe4, %1	;ld hl,(ix%1)
+
+	ld	(hl%1),hl
+=
+	defb	0xdd, 0xf4, %1	;ld (hl%1),hl
+
+	ld	(ix%1),hl
+=
+	defb	0xf4, %1	;ld (ix%1),hl
+
+	ld	(iy%1),hl
+=
+	defb	0xfd, 0xf4, %1	;ld (iy%1),hl
+
+	altd
+=
+	defb	0x76
+
+	bool	hl
+=
+	defb	0xcc	; bool hl
+
+	bool	ix
+=
+	defb	0xdd, 0xcc	; bool ix
+
+	bool	iy
+=
+	defb	0xfd, 0xcc	; bool iy
+
+	add	sp,%1
+=
+	defb	0x27, %1	;add sp,%1
+
+	halt
+=
+	Halt is not supported on RCM
+
+	di
+=
+	di is not supported on RCM
+
+	ei
+=
+	ei is not supported on RCM
+
