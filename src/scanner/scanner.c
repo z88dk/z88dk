@@ -252,6 +252,9 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
 
     for (complex = 1; c = *arg; ++arg)
     {
+        if (c == '/')
+            break;
+
         if ((c == '%') || isspace(c) || (c == '"') || (c == '='))
             continue;
 
