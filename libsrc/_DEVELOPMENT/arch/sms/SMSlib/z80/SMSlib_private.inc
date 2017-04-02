@@ -8,11 +8,11 @@ EXTERN __IO_JOYSTICK_READ_H
 EXTERN __IO_JOYSTICK_PORT_CONTROL
 
 defc VDPControlPort  = __IO_VDP_COMMAND
- defc VDPStatusPort   = __IO_VDP_STATUS
+defc VDPStatusPort   = __IO_VDP_STATUS
 defc VDPDataPort     = __IO_VDP_DATA
 
- defc VDPVCounterPort = __IO_GUN_SPOT_VERTICAL
- defc VDPHCounterPort = __IO_GUN_SPOT_HORIZONTAL
+defc VDPVCounterPort = __IO_GUN_SPOT_VERTICAL
+defc VDPHCounterPort = __IO_GUN_SPOT_HORIZONTAL
  
 defc IOPortL         = __IO_JOYSTICK_READ_L
 defc IOPortH         = __IO_JOYSTICK_READ_H
@@ -25,10 +25,10 @@ EXTERN _SMS_crt0_RST08
 EXTERN _SMS_crt0_RST18
 
 defc SMS_crt0_RST08 = _SMS_crt0_RST08
- defc SMS_crt0_RST18 = _SMS_crt0_RST18
+defc SMS_crt0_RST18 = _SMS_crt0_RST18
 
 defc SMS_PNTAddress  = 0x7800
- defc SMS_SATAddress  = 0x7f00
+defc SMS_SATAddress  = 0x7f00
 defc SMS_CRAMAddress = 0xc000
 
 
