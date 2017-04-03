@@ -41,6 +41,7 @@ include(`target/sms/config_target.m4')
 include(`target/sms/config_cpu.m4')
 include(`target/sms/config_clib.m4')
 include(`target/sms/config_clib_const.m4')
+include(`target/sms/config_devkitSMS.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

@@ -11,8 +11,8 @@ SECTION code_PSGlib
 PUBLIC asm_PSGlib_Play
 
 EXTERN asm_PSGlib_Stop
-EXTERN _PSGLoopFlag, _PSGMusicStart, _PSGMusicPointer, _PSGMusicLoopPoint
-EXTERN _PSGMusicSkipFrames, _PSGMusicSubstringLen, _PSGMusicLastLatch, _PSGMusicStatus
+EXTERN __PSGlib_LoopFlag, __PSGlib_MusicStart, __PSGlib_MusicPointer, __PSGlib_MusicLoopPoint
+EXTERN __PSGlib_MusicSkipFrames, __PSGlib_MusicSubstringLen, __PSGlib_MusicLastLatch, __PSGlib_MusicStatus
 
 asm_PSGlib_Play:
 
@@ -26,20 +26,20 @@ asm_PSGlib_Play:
    call asm_PSGlib_Stop
    
    ld a,1
-   ld (_PSGLoopFlag),a
+   ld (__PSGlib_LoopFlag),a
    
-   ld (_PSGMusicStart),hl          ; // store the begin point of music
-   ld (_PSGMusicPointer),hl        ; // set music pointer to begin of music
-   ld (_PSGMusicLoopPoint),hl      ; // looppointer points to begin too
+   ld (__PSGlib_MusicStart),hl          ; // store the begin point of music
+   ld (__PSGlib_MusicPointer),hl        ; // set music pointer to begin of music
+   ld (__PSGlib_MusicLoopPoint),hl      ; // looppointer points to begin too
    
    xor a
-   ld (_PSGMusicSkipFrames),a      ; // reset the skip frames
-   ld (_PSGMusicSubstringLen),a    ; // reset the substring len (for compression)
+   ld (__PSGlib_MusicSkipFrames),a      ; // reset the skip frames
+   ld (__PSGlib_MusicSubstringLen),a    ; // reset the substring len (for compression)
    
    ld a,PSGLatch|PSGChannel0|PSGVolumeData|0x0f    ; // latch channel 0, volume=0xF (silent)
-   ld (_PSGMusicLastLatch),a
+   ld (__PSGlib_MusicLastLatch),a
    
    ld a,PSG_PLAYING
-   ld (_PSGMusicStatus),a
+   ld (__PSGlib_MusicStatus),a
    
    ret

@@ -9,7 +9,7 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_SFXPlayLoop
 
-EXTERN asm_PSGlib_SFXPlay, _PSGSFXLoopFlag
+EXTERN asm_PSGlib_SFXPlay, __PSGlib_SFXLoopFlag
 
 asm_PSGlib_SFXPlayLoop:
 
@@ -25,6 +25,6 @@ asm_PSGlib_SFXPlayLoop:
 	call asm_PSGlib_SFXPlay
 	
 	ld a,1
-	ld (_PSGSFXLoopFlag),a
+	ld (__PSGlib_SFXLoopFlag),a
 	
 	ret

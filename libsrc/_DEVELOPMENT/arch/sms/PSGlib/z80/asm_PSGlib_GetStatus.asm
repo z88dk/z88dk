@@ -10,7 +10,7 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_GetStatus
 
-EXTERN _PSGMusicStatus
+EXTERN __PSGlib_MusicStatus
 
 asm_PSGlib_GetStatus:
 
@@ -21,5 +21,5 @@ asm_PSGlib_GetStatus:
    ;
    ; uses  : hl
 
-   ld hl,(_PSGMusicStatus)
+   ld hl,(__PSGlib_MusicStatus)
    ret

@@ -10,7 +10,7 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_CancelLoop
 
-EXTERN _PSGLoopFlag
+EXTERN __PSGlib_LoopFlag
 
 asm_PSGlib_CancelLoop:
 
@@ -20,6 +20,6 @@ asm_PSGlib_CancelLoop:
    ; uses  : af
 
    xor a
-   ld (_PSGLoopFlag),a
+   ld (__PSGlib_LoopFlag),a
    
    ret

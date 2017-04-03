@@ -181,16 +181,20 @@ l_setmem_hl:
 
    ret
 
-PUBLIC error_lznc
-
-   EXTERN error_znc
+PUBLIC error_mc
 
    pop hl
+   pop hl
+   pop hl
 
-error_lznc:
+error_mc:
+
+   ; set hl = -1
+   ; set carry flag
    
-   ld de,0
-   jp error_znc
+   ld hl,-1
+   scf
+   ret
 
 ; address = 0x0066
 
