@@ -12,9 +12,9 @@ PUBLIC asm_PSGlib_SFXPlay
 
 EXTERN asm_PSGlib_SFXStop
 
-EXTERN _PSGSFXLoopFlag, _PSGSFXSkipFrames, _PSGSFXSubstringLen
-EXTERN _PSGSFXStart, _PSGSFXPointer, _PSGSFXLoopPoint
-EXTERN _PSGSFXStatus, _PSGChannel2SFX, _PSGChannel3SFX
+EXTERN __PSGlib_SFXLoopFlag, __PSGlib_SFXSkipFrames, __PSGlib_SFXSubstringLen
+EXTERN __PSGlib_SFXStart, __PSGlib_SFXPointer, __PSGlib_SFXLoopPoint
+EXTERN __PSGlib_SFXStatus, __PSGlib_Channel2SFX, __PSGlib_Channel3SFX
 
 asm_PSGlib_SFXPlay:
 
@@ -30,14 +30,14 @@ asm_PSGlib_SFXPlay:
 	call asm_PSGlib_SFXStop
 	
 	xor a
-	ld (_PSGSFXLoopFlag),a
-	ld (_PSGSFXSkipFrames),a
-	ld (_PSGSFXSubstringLen),a
+	ld (__PSGlib_SFXLoopFlag),a
+	ld (__PSGlib_SFXSkipFrames),a
+	ld (__PSGlib_SFXSubstringLen),a
 	
 	ex de,hl
-	ld (_PSGSFXStart),hl
-	ld (_PSGSFXPointer),hl
-	ld (_PSGSFXLoopPoint),hl
+	ld (__PSGlib_SFXStart),hl
+	ld (__PSGlib_SFXPointer),hl
+	ld (__PSGlib_SFXLoopPoint),hl
 	
 	ld a,c
 	and SFX_CHANNEL2
@@ -48,7 +48,7 @@ asm_PSGlib_SFXPlay:
 
 setchan2:
 
-   ld (_PSGChannel2SFX),a
+   ld (__PSGlib_Channel2SFX),a
 
    ld a,c
    and SFX_CHANNEL3
@@ -59,9 +59,9 @@ setchan2:
 
 setchan3:
 
-   ld (_PSGChannel3SFX),a
+   ld (__PSGlib_Channel3SFX),a
 
    ld a,PSG_PLAYING
-   ld (_PSGSFXStatus),a
+   ld (__PSGlib_SFXStatus),a
 
    ret
