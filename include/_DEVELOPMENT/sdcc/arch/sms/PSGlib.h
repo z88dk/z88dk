@@ -5,18 +5,20 @@
 #ifndef _SMS_PSGLIB_H
 #define _SMS_PSGLIB_H
 
+#include <arch.h>
+
 /* **************************************************
    PSGlib - C programming library for the SEGA PSG
    ( part of devkitSMS - github.com/sverx/devkitSMS )
    Synchronized March 29, 2017
    ************************************************** */
 
-#define PSG_STOPPED         0
-#define PSG_PLAYING         1
+#define PSG_STOPPED         __PSGLIB_PSG_STOPPED
+#define PSG_PLAYING         __PSGLIB_PSG_PLAYING
 
-#define SFX_CHANNEL2        0x01
-#define SFX_CHANNEL3        0x02
-#define SFX_CHANNELS2AND3   SFX_CHANNEL2|SFX_CHANNEL3
+#define SFX_CHANNEL2        __PSGLIB_SFX_CHANNEL2
+#define SFX_CHANNEL3        __PSGLIB_SFX_CHANNEL3
+#define SFX_CHANNELS2AND3   __PSGLIB_SFX_CHANNELS2AND3
 
 extern void PSGPlay(void *song) __preserves_regs(b,c,d,e,iyl,iyh);
 extern void PSGPlay_fastcall(void *song) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
