@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_VDPType
 
-EXTERN _VDPType
+EXTERN __SMSlib_VDPType
 
 asm_SMSlib_VDPType:
 
@@ -20,5 +20,5 @@ asm_SMSlib_VDPType:
 	;
 	; uses : hl
 	
-	ld hl,(_VDPType)
+	ld hl,(__SMSlib_VDPType)
 	ret

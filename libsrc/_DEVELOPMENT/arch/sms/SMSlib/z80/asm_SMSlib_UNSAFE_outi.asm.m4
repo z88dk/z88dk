@@ -10,33 +10,33 @@ INCLUDE "SMSlib_private.inc"
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _outi_block
+PUBLIC asm_SMSlib_outi_block
 
-PUBLIC _outi32
-PUBLIC _outi64
-PUBLIC _outi128
+PUBLIC asm_SMSlib_outi32
+PUBLIC asm_SMSlib_outi64
+PUBLIC asm_SMSlib_outi128
 
-_outi128:
+asm_SMSlib_outi128:
 
 Z88DK_FOR(`LOOP', 1, 64,
 `
    outi
 ')
 
-_outi64:
+asm_SMSlib_outi64:
 
 Z88DK_FOR(`LOOP', 1, 32,
 `
    outi
 ')
 
-_out32:
+asm_SMSlib_outi32:
 
 Z88DK_FOR(`LOOP', 1, 32,
 `
    outi
 ')
 
-_outi_block:
+asm_SMSlib_outi_block:
 
    ret

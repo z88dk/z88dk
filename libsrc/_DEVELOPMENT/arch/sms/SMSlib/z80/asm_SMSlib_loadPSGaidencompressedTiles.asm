@@ -8,7 +8,7 @@ INCLUDE "SMSlib_private.inc"
 SECTION bss_clib
 SECTION bss_SMSlib
 
-__PSGaidenDecompBufferAddr:
+__SMSlib_PSGaidenDecompBufferAddr:
    defw 0
 
 SECTION code_clib
@@ -35,13 +35,14 @@ asm_SMSlib_loadPSGaidencompressedTiles:
    add hl,hl
    
    set 6,h
+   INCLUDE "SMS_CRT0_RST08.inc"
    
-   rst SMS_crt0_RST08
+   ld hl,-32
+   add hl,sp
+   ld sp,hl
    
-	ld hl,-32
-	add hl,sp
-	ld (__PSGaidenDecompBufferAddr),hl
-	
+   ld (__SMSlib_PSGaidenDecompBufferAddr),hl
+   
    ex de,hl
    
    ld c,(hl)                ; bc = number of tiles
@@ -55,7 +56,7 @@ asm_SMSlib_loadPSGaidencompressedTiles:
 _DecompressTile:
    push bc                  ; save number of tiles
      ld b,4                 ; count 4 bitplanes
-     ld de,(__PSGaidenDecompBufferAddr)   ; write to de
+     ld de,(__SMSlib_PSGaidenDecompBufferAddr)   ; write to de
      ld c,(ix)              ; c = encoding information for 4 bitplanes
      inc ix
 
@@ -78,7 +79,7 @@ _Compressed:
      ld e,a
      ld a,d       ; get method byte back
      ld d,0x00
-     ld iy,(__PSGaidenDecompBufferAddr)
+     ld iy,(__SMSlib_PSGaidenDecompBufferAddr)
      add iy,de    ; now iy points to the referred to bitplane
      ex de,hl
 
@@ -177,7 +178,7 @@ _BitplaneDone:
 _OutputTileToVRAM:
      ld de,8               ; we are interleaving every 8th byte
      ld c,e                ; counter for the interleaving run
-     ld hl,(__PSGaidenDecompBufferAddr)  ; point at data to write
+     ld hl,(__SMSlib_PSGaidenDecompBufferAddr)  ; point at data to write
 
 _outLoop:
      ld b,4                ; there are 4 bytes to interleave
@@ -198,8 +199,8 @@ _inLoop:
    or c
    jp nz,_DecompressTile
    
-	ld hl,32
-	add hl,sp
-	ld sp,hl
-	
+   ld hl,32
+   add hl,sp
+   ld sp,hl
+   
    ret

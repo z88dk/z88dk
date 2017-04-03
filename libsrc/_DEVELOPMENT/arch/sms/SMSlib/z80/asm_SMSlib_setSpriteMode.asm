@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_setSpriteMode
 
-EXTERN _spritesHeight, _spritesWidth
+EXTERN __SMSlib_spritesHeight, __SMSlib_spritesWidth
 EXTERN asm_SMS_VDPturnOnFeature, asm_SMS_VDPturnOffFeature
 
 asm_SMSlib_setSpriteMode:
@@ -45,7 +45,7 @@ spritemode_tall_off:
 
 spritemode_set_height:
 
-   ld (_spritesHeight),a
+   ld (__SMSlib_spritesHeight),a
 
 test_zoomed:
 
@@ -59,9 +59,9 @@ spritezoom_on:
 
    call asm_SMS_VDPturnOnFeature
    
-   ld a,(_spritesHeight)
+   ld a,(__SMSlib_spritesHeight)
    add a,a
-   ld (_spritesHeight),a
+   ld (__SMSlib_spritesHeight),a
    
    ld a,16
    jr spritezoom_set_width
@@ -73,5 +73,5 @@ spritezoom_off:
 
 spritezoom_set_width:
 
-   ld (_spritesWidth),a
+   ld (__SMSlib_spritesWidth),a
    ret

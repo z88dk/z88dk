@@ -10,7 +10,8 @@ SECTION code_SMSlib
 
 PUBLIC asm_UNSAFE_SMSlib_copySpritestoSAT
 
-EXTERN _SpriteTableY, _SpriteTableXN, _outi_block
+EXTERN asm_SMSlib_outi_block
+EXTERN __SMSlib_SpriteTableY, __SMSlib_SpriteTableXN
 
 asm_UNSAFE_SMSlib_copySpritestoSAT:
 
@@ -19,21 +20,21 @@ asm_UNSAFE_SMSlib_copySpritestoSAT:
    ; uses  : f, bc, hl
    
    ld hl,SMS_SATAddress
-   rst SMS_crt0_RST08
+   INCLUDE "SMS_CRT0_RST08.inc"
    
    ld c,VDPDataPort
-   ld hl,_SpriteTableY
+   ld hl,__SMSlib_SpriteTableY
 
 IF MAXSPRITES=64
-   call _outi_block - (MAXSPRITES*2)
+   call asm_SMSlib_outi_block - (MAXSPRITES*2)
 ELSE
-   call _outi_block - ((MAXSPRITES+1)*2)
+   call asm_SMSlib_outi_block - ((MAXSPRITES+1)*2)
 ENDIF
 
    ld hl,SMS_SATAddress+128
-   rst SMS_crt0_RST08
+   INCLUDE "SMS_crt0_RST08.inc"
    
    ld c,VDPDataPort
-   ld hl,_SpriteTableXN
+   ld hl,__SMSlib_SpriteTableXN
 
-   jp _outi_block - (MAXSPRITES*4)
+   jp asm_SMSlib_outi_block - (MAXSPRITES*4)

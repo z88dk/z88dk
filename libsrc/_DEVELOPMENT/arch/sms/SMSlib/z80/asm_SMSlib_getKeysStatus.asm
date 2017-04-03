@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_getKeysStatus
 
-EXTERN _KeysStatus
+EXTERN __SMSlib_KeysStatus
 
 asm_SMSlib_getKeysStatus:
 
@@ -20,5 +20,5 @@ asm_SMSlib_getKeysStatus:
    ;
    ; uses : hl
 
-   ld hl,(_KeysStatus)
+   ld hl,(__SMSlib_KeysStatus)
    ret

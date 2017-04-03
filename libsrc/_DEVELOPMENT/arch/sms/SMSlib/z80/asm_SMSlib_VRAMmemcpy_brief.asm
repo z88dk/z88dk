@@ -21,7 +21,7 @@ asm_SMSlib_VRAMmemcpy_brief:
    ; uses  : af, bc, de, hl
    
    set 6,h
-   rst SMS_crt0_RST08
+   INCLUDE "SMS_CRT0_RST08.inc"
 
    ex de,hl
    

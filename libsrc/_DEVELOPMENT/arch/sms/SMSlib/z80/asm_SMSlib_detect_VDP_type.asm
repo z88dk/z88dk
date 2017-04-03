@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_detect_VDP_type
 
-EXTERN _VDPType
+EXTERN __SMSlib_VDPType
 
 asm_SMSlib_detect_VDP_type:
 
@@ -50,5 +50,5 @@ loop02:
 
 detected:
    
-   ld (_VDPType),a
+   ld (__SMSlib_VDPType),a
    ret

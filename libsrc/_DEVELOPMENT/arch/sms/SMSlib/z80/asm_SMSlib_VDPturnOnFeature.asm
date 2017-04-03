@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_VDPturnOnFeature
 
-EXTERN _VDPReg
+EXTERN __SMSlib_VDPReg
 
 asm_SMSlib_VDPturnOnFeature:
 
@@ -22,7 +22,7 @@ asm_SMSlib_VDPturnOnFeature:
    
    ex de,hl
    
-   ld hl,_VDPReg
+   ld hl,__SMSlib_VDPReg
    
    inc d
    dec d

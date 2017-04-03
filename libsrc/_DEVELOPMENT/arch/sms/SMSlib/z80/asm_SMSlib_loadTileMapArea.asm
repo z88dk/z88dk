@@ -52,7 +52,7 @@ loop_y:
    ;  c = remaining height
 
 	push bc
-   rst SMS_crt0_RST08          ; SMS_crt0_RST08(hl)
+   INCLUDE "SMS_CRT0_RST08.inc"
    
    ;; SMS_byte_brief_array_to_VDP_data(src,width*2)
    ;; src=(unsigned char*)src+width*2

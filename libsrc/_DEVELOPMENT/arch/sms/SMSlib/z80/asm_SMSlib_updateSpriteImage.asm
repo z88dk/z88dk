@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_updateSpriteImage
 
-EXTERN _SpriteTableXN
+EXTERN __SMSlib_SpriteTableXN
 
 asm_SMSlib_updateSpriteImage:
 
@@ -23,7 +23,7 @@ asm_SMSlib_updateSpriteImage:
 
    ld d,0
    
-   ld hl,_SpriteTableXN
+   ld hl,__SMSlib_SpriteTableXN
    add hl,de
    add hl,de
    

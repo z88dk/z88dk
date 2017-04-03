@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_waitForVBlank
 
-EXTERN _VDPBlank
+EXTERN __SMSlib_VDPBlank
 
 asm_SMSlib_waitForVBlank:
 
@@ -18,7 +18,7 @@ asm_SMSlib_waitForVBlank:
    ;
    ; uses : af, hl
    
-   ld hl,_VDPBlank
+   ld hl,__SMSlib_VDPBlank
    ld (hl),0
    
 loop:

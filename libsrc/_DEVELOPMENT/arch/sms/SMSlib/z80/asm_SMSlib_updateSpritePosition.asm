@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_updateSpritePosition
 
-EXTERN _SpriteTableY, _SpriteTableXN
+EXTERN __SMSlib_SpriteTableY, __SMSlib_SpriteTableXN
 
 asm_SMSlib_updateSpritePosition:
 
@@ -24,7 +24,7 @@ asm_SMSlib_updateSpritePosition:
 
    ld d,0
    
-   ld hl,_SpriteTableY
+   ld hl,__SMSlib_SpriteTableY
    add hl,de
    
    cp 0xd1
@@ -33,7 +33,7 @@ asm_SMSlib_updateSpritePosition:
    dec a
    ld (hl),a
    
-   ld hl,_SpriteTableXN
+   ld hl,__SMSlib_SpriteTableXN
    add hl,de
    add hl,de
    

@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_getKeysReleased
 
-EXTERN _KeysStatus, _PreviousKeysStatus
+EXTERN __SMSlib_KeysStatus, __SMSlib_PreviousKeysStatus
 
 asm_SMSlib_getKeysReleased:
 
@@ -20,14 +20,14 @@ asm_SMSlib_getKeysReleased:
    ;
    ; uses : af, hl
 
-   ld hl,(_PreviousKeysStatus)
+   ld hl,(__SMSlib_PreviousKeysStatus)
    
-   ld a,(_KeysStatus)
+   ld a,(__SMSlib_KeysStatus)
    cpl
    and l
    ld l,a
    
-   ld a,(_KeysStatus+1)
+   ld a,(__SMSlib_KeysStatus+1)
    cpl
    and h
    ld h,a

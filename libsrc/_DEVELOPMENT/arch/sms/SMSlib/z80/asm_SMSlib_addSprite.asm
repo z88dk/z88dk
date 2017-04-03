@@ -12,7 +12,7 @@ PUBLIC asm_SMSlib_addSprite
 PUBLIC asm_SMSlib_addSprite_0
 
 EXTERN error_mc
-EXTERN _SpriteNextFree, _Sprite_TableY, _SpriteTableXN
+EXTERN __SMSlib_SpriteNextFree, __SMSlib_SpriteTableY, __SMSlib_SpriteTableXN
 
 asm_SMSlib_addSprite:
 
@@ -34,14 +34,14 @@ asm_SMSlib_addSprite:
    ;
    ; uses  : af, de, hl
    
-   ld a,(_SpriteNextFree)
+   ld a,(__SMSlib_SpriteNextFree)
    
    cp MAXSPRITES
    jp nc, error_mc
    
    ld e,a
    
-asm_SMS_addSprite_0:
+asm_SMSlib_addSprite_0:
    
    ld a,d                      ; a = unsigned char y
    
@@ -50,13 +50,13 @@ asm_SMS_addSprite_0:
    
    ld d,0                      ; de = _SpriteNextFree
    
-   ld hl,_SpriteTableY
+   ld hl,__SMSlib_SpriteTableY
    add hl,de
    
    dec a
    ld (hl),a                   ; SpriteTableY[SpriteNextFree]=(unsigned char)(y-1)
    
-   ld hl,_SpriteTableXN
+   ld hl,__SMSlib_SpriteTableXN
    add hl,de
    add hl,de
    
@@ -66,7 +66,7 @@ asm_SMS_addSprite_0:
    
    ld a,e
    inc a
-   ld (_SpriteNextFree),a
+   ld (__SMSlib_SpriteNextFree),a
    
    ex de,hl
    ret

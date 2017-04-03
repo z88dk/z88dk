@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_init
 
-EXTERN _VDPReg_init
+EXTERN __SMSlib_VDPReg_init
 
 EXTERN asm_SMSlib_resetPauseRequest, asm_SMSlib_detect_VDP_type, asm_SMSlib_setSpritePaletteColor
 EXTERN asm_SMSlib_initSprites, asm_SMSlib_finalizeSprites, asm_SMSlib_copySpritestoSAT
@@ -25,7 +25,7 @@ asm_SMSlib_init:
    di
    
    ld b,11
-   ld hl,_VDPReg_init
+   ld hl,__SMSlib_VDPReg_init
    
 loop:
 

@@ -11,7 +11,7 @@ SECTION code_SMSlib
 PUBLIC asm_SMSlib_reserveSprite
 
 EXTERN error_mc
-EXTERN _SpriteNextFree, _SpriteTableY
+EXTERN __SMSlib_SpriteNextFree, __SMSlib_SpriteTableY
 
 asm_SMSlib_reserveSprite:
 
@@ -29,7 +29,7 @@ asm_SMSlib_reserveSprite:
    ;
    ; uses : af, de, hl
    
-   ld a,(_SpriteNextFree)
+   ld a,(__SMSlib_SpriteNextFree)
    
    cp MAXSPRITES
    jp nc, error_mc
@@ -37,13 +37,13 @@ asm_SMSlib_reserveSprite:
    ld e,a
    ld d,0
    
-   ld hl,_SpriteTableY
+   ld hl,__SMSlib_SpriteTableY
    add hl,de
    
    ld (hl),0xe0
    
    inc a
-   ld (_SpriteNextFree),a
+   ld (__SMSlib_SpriteNextFree),a
    
    ex de,hl
    ret

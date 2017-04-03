@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_finalizeSprites
 
-EXTERN _SpriteNextFree, _SpriteTableY
+EXTERN __SMSlib_SpriteNextFree, __SMSlib_SpriteTableY
 
 asm_SMSlib_finalizeSprites:
 
@@ -18,7 +18,7 @@ asm_SMSlib_finalizeSprites:
    ;
    ; uses : af, hl
    
-   ld a,(_SpriteNextFree)
+   ld a,(__SMSlib_SpriteNextFree)
    
 IF MAXSPRITES = 64
    
@@ -27,10 +27,10 @@ IF MAXSPRITES = 64
    
 ENDIF
 
-   add a,_SpriteTableY&0xff
+   add a,__SMSlib_SpriteTableY&0xff
    ld l,a
    ld a,0
-   adc a,_SpriteTableY/256
+   adc a,__SMSlib_SpriteTableY/256
    ld h,a
    
    ld (hl),0xd0

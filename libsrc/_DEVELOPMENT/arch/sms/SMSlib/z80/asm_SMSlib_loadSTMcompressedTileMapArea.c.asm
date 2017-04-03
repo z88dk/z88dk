@@ -56,7 +56,7 @@ asm_SMSlib_loadSTMcompressedTileMapArea:
 	ld	(ix-11),0x00
 	ld	l, e
 	ld	h, d
-	rst	SMS_crt0_RST08
+	INCLUDE "SMS_CRT0_RST08.inc"
 l_SMS_loadSTMcompressedTileMapArea_00134:
 	ld	c,(ix+6)
 	ld	b,(ix+7)
@@ -111,7 +111,7 @@ l_SMS_loadSTMcompressedTileMapArea_00105:
 	jp	Z,l_SMS_loadSTMcompressedTileMapArea_00156
 	ld	l, c
 	ld	h, b
-	rst	SMS_crt0_RST18
+	INCLUDE "SMS_CRT0_RST18.inc"
 	dec	(ix-13)
 	ld	a,(ix-13)
 	or	a, a
@@ -122,7 +122,7 @@ l_SMS_loadSTMcompressedTileMapArea_00105:
 	push	bc
 	ld	l, e
 	ld	h, d
-	rst	SMS_crt0_RST08
+	INCLUDE "SMS_CRT0_RST08.inc"
 	pop	bc
 	ld	a,(ix-7)
 	ld	(ix-13),a
@@ -146,7 +146,7 @@ l_SMS_loadSTMcompressedTileMapArea_00110:
 	jp	Z,l_SMS_loadSTMcompressedTileMapArea_00157
 	ld	l,(ix-10)
 	ld	h,(ix-9)
-	rst	SMS_crt0_RST18
+	INCLUDE "SMS_CRT0_RST18.inc"
 	dec	(ix-13)
 	ld	a,(ix-13)
 	or	a, a
@@ -155,7 +155,7 @@ l_SMS_loadSTMcompressedTileMapArea_00110:
 	add	hl,de
 	ld	e,l
 	ld	d,h
-	rst	SMS_crt0_RST08
+	INCLUDE "SMS_CRT0_RST08.inc"
 	ld	a,(ix-7)
 	ld	(ix-13),a
 l_SMS_loadSTMcompressedTileMapArea_00109:
@@ -213,7 +213,7 @@ l_SMS_loadSTMcompressedTileMapArea_00122:
 	push	bc
 	ld	l, e
 	ld	h, d
-	rst	SMS_crt0_RST08
+	INCLUDE "SMS_CRT0_RST08.inc"
 	pop	bc
 	ld	a,(ix-7)
 	ld	(ix-13),a

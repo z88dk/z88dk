@@ -10,9 +10,11 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_isr
 
-EXTERN _SMS_VDPFlags, _VDPBlank
-EXTERN _PreviousKeysStatus, _KeysStatus
-EXTERN _SMS_theLineInterruptHandler, l_jphl
+EXTERN l_jphl
+
+EXTERN __SMSlib_VDPFlags, __SMSlib_VDPBlank
+EXTERN __SMSlib_PreviousKeysStatus, __SMSlib_KeysStatus
+EXTERN __SMSlib_theLineInterruptHandler
 
 asm_SMSlib_isr:
    
@@ -20,26 +22,26 @@ asm_SMSlib_isr:
    push hl
 
    in a,(VDPStatusPort)        ; acknowledge VDP interrupt
-   ld (_SMS_VDPFlags),a
+   ld (__SMSlib_VDPFlags),a
 
    rlca
    jr nc, line_interrupt
 
 frame_interrupt:
 
-   ld hl,_VDPBlank
+   ld hl,__SMSlib_VDPBlank
    ld (hl),1
    
-   ld hl,(_KeysStatus)
-   ld (_PreviousKeysStatus),hl
+   ld hl,(__SMSlib_KeysStatus)
+   ld (__SMSlib_PreviousKeysStatus),hl
    
    in a,(IOPortL)
    cpl
-   ld (_KeysStatus),a
+   ld (__SMSlib_KeysStatus),a
    
    in a,(IOPortH)
    cpl
-   ld (_KeysStatus + 1),a
+   ld (__SMSlib_KeysStatus + 1),a
    
    jr exit
 
@@ -50,7 +52,7 @@ line_interrupt:
    push ix
    push iy
    
-   ld hl,(_SMS_theLineInterruptHandler)
+   ld hl,(__SMSlib_theLineInterruptHandler)
    call l_jphl
    
    pop iy

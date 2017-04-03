@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_setLineInterruptHandler
 
-EXTERN _SMS_theLineInterruptHandler
+EXTERN __SMSlib_theLineInterruptHandler
 
 asm_SMSlib_setLineInterruptHandler:
 
@@ -20,5 +20,5 @@ asm_SMSlib_setLineInterruptHandler:
    ;
    ; uses  : none
 
-   ld (_SMS_theLineInterruptHandler),hl
+   ld (__SMSlib_theLineInterruptHandler),hl
    ret

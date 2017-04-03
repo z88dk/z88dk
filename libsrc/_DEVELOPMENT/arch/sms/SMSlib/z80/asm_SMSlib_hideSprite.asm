@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_hideSprite
 
-EXTERN _SpriteTableY
+EXTERN __SMSlib_SpriteTableY
 
 asm_SMSlib_hideSprite:
 
@@ -22,7 +22,7 @@ asm_SMSlib_hideSprite:
 
    ld h,0
    
-   ld de,_SpriteTableY
+   ld de,__SMSlib_SpriteTableY
    add hl,de
    
    ld (hl),0xe0

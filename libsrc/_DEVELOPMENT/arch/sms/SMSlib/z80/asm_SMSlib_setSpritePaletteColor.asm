@@ -23,7 +23,7 @@ asm_SMSlib_setSpritePaletteColor:
    ld bc,0xc010
    add hl,bc
    
-   rst SMS_crt0_RST08          ; SMS_crt0_RST08(hl)
+   INCLUDE "SMS_CRT0_RST08.inc"
 
    out (VDPDataPort),a
    ret

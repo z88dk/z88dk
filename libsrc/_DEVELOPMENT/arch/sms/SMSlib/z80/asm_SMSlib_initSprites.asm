@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_initSprites
 
-EXTERN _SpriteNextFree
+EXTERN __SMSlib_SpriteNextFree
 
 asm_SMSlib_initSprites:
 
@@ -19,6 +19,6 @@ asm_SMSlib_initSprites:
    ; uses  : af
    
    xor a
-   ld (_SpriteNextFree),a
+   ld (__SMSlib_SpriteNextFree),a
    
    ret

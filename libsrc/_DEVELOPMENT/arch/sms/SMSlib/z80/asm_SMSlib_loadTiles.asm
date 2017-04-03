@@ -30,7 +30,7 @@ asm_SMSlib_loadTiles:
    set 6,h
    
 	ld a,c
-   rst SMS_crt0_RST08          ; SMS_crt0_RST08(hl)
+   INCLUDE "SMS_CRT0_RST08.inc"
 	ld c,a
    
    ex de,hl

@@ -10,9 +10,12 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_isr_mdpad
 
-EXTERN _SMS_VDPFlags, _VDPBlank
-EXTERN _SMS_theLineInterruptHandler, l_jphl
-EXTERN _PreviousKeysStatus, _KeysStatus, _PreviousMDKeysStatus, _MDKeysStatus
+EXTERN l_jphl
+
+EXTERN __SMSlib_VDPFlags, __SMSlib_VDPBlank
+EXTERN __SMSlib_theLineInterruptHandler
+EXTERN __SMSlib_PreviousKeysStatus, __SMSlib_KeysStatus
+EXTERN __SMSlib_PreviousMDKeysStatus, __SMSlib_MDKeysStatus
 
 asm_SMSlib_isr_mdpad:
    
@@ -20,21 +23,21 @@ asm_SMSlib_isr_mdpad:
    push hl
    
    in a,(VDPStatusPort)        ; acknowledge VDP interrupt
-   ld (_SMS_VDPFlags),a
+   ld (__SMSlib_VDPFlags),a
    
    rlca
    jr nc, line_interrupt
    
 frame_interrupt:
 
-   ld hl,_VDPBlank
+   ld hl,__SMSlib_VDPBlank
    ld (hl),1
    
-   ld hl,(_KeysStatus)
-   ld (_PreviousKeysStatus),hl
+   ld hl,(__SMSlib_KeysStatus)
+   ld (__SMSlib_PreviousKeysStatus),hl
    
-   ld hl,(_MDKeysStatus)
-   ld (_PreviousMDKeysStatus),hl
+   ld hl,(__SMSlib_MDKeysStatus)
+   ld (__SMSlib_PreviousMDKeysStatus),hl
    
    ld a,TH_HI
    out (IOPortCtrl),a
@@ -47,7 +50,7 @@ frame_interrupt:
    cpl
    ld h,a
    
-   ld (_KeysStatus),hl
+   ld (__SMSlib_KeysStatus),hl
    
    ld a,TH_LO
    out (IOPortCtrl),a
@@ -97,7 +100,7 @@ read:
 
 set_MDKeysStatus:
 
-   ld (_MDKeysStatus),hl
+   ld (__SMSlib_MDKeysStatus),hl
    jr exit
 
 line_interrupt:
@@ -107,7 +110,7 @@ line_interrupt:
    push ix
    push iy
    
-   ld hl,(_SMS_theLineInterruptHandler)
+   ld hl,(__SMSlib_theLineInterruptHandler)
    call l_jphl
    
    pop iy

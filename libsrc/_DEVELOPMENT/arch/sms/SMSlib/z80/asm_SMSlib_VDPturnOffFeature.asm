@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_VDPturnOffFeature
 
-EXTERN _VDPReg
+EXTERN __SMSlib_VDPReg
 
 asm_SMSlib_VDPturnOffFeature:
 
@@ -22,7 +22,7 @@ asm_SMSlib_VDPturnOffFeature:
    
    ex de,hl
    
-   ld hl,_VDPReg
+   ld hl,__SMSlib_VDPReg
    
    inc d
    dec d

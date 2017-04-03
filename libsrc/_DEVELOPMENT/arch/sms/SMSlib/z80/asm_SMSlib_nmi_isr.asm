@@ -10,13 +10,13 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_nmi_isr
 
-EXTERN _PauseRequested
+EXTERN __SMSlib_PauseRequested
 
 asm_SMSlib_nmi_isr:
 
    push hl
    
-   ld hl,_PauseRequested
+   ld hl,__SMSlib_PauseRequested
    ld (hl),1
    
    pop hl

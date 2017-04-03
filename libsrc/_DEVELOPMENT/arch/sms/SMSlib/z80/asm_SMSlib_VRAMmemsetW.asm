@@ -23,7 +23,7 @@ asm_SMSlib_VRAMmemsetW:
    ld a,c
    
    set 6,h
-   rst SMS_crt0_RST08
+   INCLUDE "SMS_CRT0_RST08.inc"
 
    srl b
    rra

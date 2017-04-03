@@ -3,22 +3,16 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-INCLUDE "SMSlib_private.inc"
-
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC asm_SMSlib_resetPauseRequest
+PUBLIC _SMS_crt0_RST08
 
-EXTERN __SMSlib_PauseRequested
+_SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
 
-asm_SMSlib_resetPauseRequest:
-
-   ; void SMS_resetPauseRequest (void)
-   ;
-   ; uses : af
-   
-   xor a
-	ld (__SMSlib_PauseRequested),a
-	
+   ld c,0xbf                   ; set VDP Control Port
+   di                          ; make it interrupt SAFE
+   out (c),l
+   out (c),h
+   ei
    ret

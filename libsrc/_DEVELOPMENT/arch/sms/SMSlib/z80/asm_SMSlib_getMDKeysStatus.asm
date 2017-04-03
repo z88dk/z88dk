@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_getMDKeysStatus
 
-EXTERN _MDKeysStatus
+EXTERN __SMSlib_MDKeysStatus
 
 asm_SMSlib_getMDKeysStatus:
 
@@ -20,5 +20,5 @@ asm_SMSlib_getMDKeysStatus:
    ;
    ; uses : hl
 
-   ld hl,(_MDKeysStatus)
+   ld hl,(__SMSlib_MDKeysStatus)
    ret

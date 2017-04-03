@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_copySpritestoSAT
 
-EXTERN _SpriteTableY, _SpriteTableXN
+EXTERN __SMSlib_SpriteTableY, __SMSlib_SpriteTableXN
 
 asm_SMSlib_copySpritestoSAT:
 
@@ -19,7 +19,7 @@ asm_SMSlib_copySpritestoSAT:
    ; uses : af, b, hl
    
    ld hl,SMS_SATAddress
-   rst SMS_crt0_RST08          ; SMS_crt0_RST08(hl)
+   INCLUDE "SMS_CRT0_RST08.inc"
    
 IF MAXSPRITES = 64
 
@@ -31,7 +31,7 @@ ELSE
    
 ENDIF
 
-   ld hl,_SpriteTableY
+   ld hl,__SMSlib_SpriteTableY
 
 loop00:
  
@@ -43,12 +43,12 @@ loop00:
    djnz loop00
    
    ld hl,SMS_SATAddress + 128
-   rst SMS_crt0_RST08          ; SMS_crt0_RST08(hl)
+   INCLUDE "SMS_CRT0_RST08.inc"
    
    ld b,MAXSPRITES
    sla b
    
-   ld hl,_SpriteTableXN
+   ld hl,__SMSlib_SpriteTableXN
 
 loop01:
 

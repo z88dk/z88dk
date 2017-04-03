@@ -13,9 +13,9 @@ PUBLIC asm_SMSlib_addSpriteClipping
 EXTERN asm_SMSlib_addSprite_0
 EXTERN error_mc, error_zc
 
-EXTERN _clipWin_x0, _clipWin_x1, _clipWin_y0, _clipWin_y1
-EXTERN _SpriteNextFree, _spritesWidth, _spritesHeight
-EXTERN _SpriteTableY, _SpriteTableXN
+EXTERN __SMSlib_clipWin_x0, __SMSlib_clipWin_x1, __SMSlib_clipWin_y0, __SMSlib_clipWin_y1
+EXTERN __SMSlib_SpriteNextFree, __SMSlib_spritesWidth, __SMSlib_spritesHeight
+EXTERN __SMSlib_SpriteTableY, __SMSlib_SpriteTableXN
 
 asm_SMSlib_addSpriteClipping:
 
@@ -37,7 +37,7 @@ asm_SMSlib_addSpriteClipping:
    ;
    ; uses  : af, de, hl
    
-   ld a,(_SpriteNextFree)
+   ld a,(__SMSlib_SpriteNextFree)
    
    cp MAXSPRITES
    jp nc, error_mc
@@ -62,14 +62,14 @@ first_part_x:
 	dec b
 	jp nz, error_mc - 1
 	
-	ld a,(_clipWin_x1)
+	ld a,(__SMSlib_clipWin_x1)
 	cp c
 	jp c, error_mc - 1
 
 second_part_x:
 
-	ld a,(_clipWin_x0)
-	ld hl,(_spritesWidth)
+	ld a,(__SMSlib_clipWin_x0)
+	ld hl,(__SMSlib_spritesWidth)
 	
 	sub l
 	ld l,a
@@ -104,14 +104,14 @@ first_part_y:
 	dec d
 	jp nz, error_mc - 1
 	
-	ld a,(_clipWin_y1)
+	ld a,(__SMSlib_clipWin_y1)
 	cp e
 	jp c, error_mc - 1
 
 second_part_y:
 	
-	ld a,(_clipWin_y0)
-	ld hl,(_spritesHeight)
+	ld a,(__SMSlib_clipWin_y0)
+	ld hl,(__SMSlib_spritesHeight)
 	
 	sub l
 	ld l,a
@@ -142,4 +142,4 @@ decision_y:
 	ld h,e
 	
 	ex de,hl
-	jp asm_SMS_addSprite_0
+	jp asm_SMSlib_addSprite_0

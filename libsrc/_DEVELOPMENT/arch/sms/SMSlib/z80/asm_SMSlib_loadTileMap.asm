@@ -40,7 +40,7 @@ asm_SMSlib_loadTileMap:
    add hl,de                   ; hl = SMS_PNTAddress+(y*32+x)*2
    
 	ld a,c
-   rst SMS_crt0_RST08          ; SMS_crt0_RST08(hl)
+   INCLUDE "SMS_CRT0_RST08.inc"
 	ld c,a
 	
    pop hl

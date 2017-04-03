@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_UNSAFE_VRAMmemcpy128
 
-EXTERN _outi128
+EXTERN asm_SMSlib_outi128
 
 asm_SMSlib_UNSAFE_VRAMmemcpy128:
 
@@ -22,9 +22,9 @@ asm_SMSlib_UNSAFE_VRAMmemcpy128:
    ; uses  : f, bc, de, hl
    
    set 6,h
-   rst SMS_crt0_RST08
+   INCLUDE "SMS_CRT0_RST08.inc"
    
    ld c,VDPDataPort
    ex de,hl
 
-   jp _outi128
+   jp asm_SMSlib_outi128

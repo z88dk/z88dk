@@ -10,7 +10,7 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_setClippingWindow
 
-EXTERN _clipWin_x0, _clipWin_x1
+EXTERN __SMSlib_clipWin_x0, __SMSlib_clipWin_x1
 
 asm_SMSlib_setClippingWindow:
 
@@ -23,6 +23,6 @@ asm_SMSlib_setClippingWindow:
    ;
    ; uses  : none
    
-   ld (_clipWin_x0),de
-   ld (_clipWin_x1),hl
+   ld (__SMSlib_clipWin_x0),de
+   ld (__SMSlib_clipWin_x1),hl
    ret

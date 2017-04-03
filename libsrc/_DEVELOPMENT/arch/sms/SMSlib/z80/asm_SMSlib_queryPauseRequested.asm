@@ -10,17 +10,15 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_queryPauseRequested
 
-EXTERN _PauseRequested
+EXTERN __SMSlib_PauseRequested
 
 asm_SMSlib_queryPauseRequested:
 
-   ; unsigned int SMS_queryPauseRequested (void)
+   ; unsigned char SMS_queryPauseRequested (void)
    ;
-   ; exit : hl = 1 if paused else 0
+   ; exit : l = 1 if paused else 0
    ;
    ; uses : hl
    
-   ld hl,(_PauseRequested)
-	ld h,0
-   
+   ld hl,(__SMSlib_PauseRequested)
    ret
