@@ -32,7 +32,7 @@ ELSE
 ENDIF
 
    ld hl,SMS_SATAddress+128
-   INCLUDE "SMS_crt0_RST08.inc"
+   INCLUDE "SMS_CRT0_RST08.inc"
    
    ld c,VDPDataPort
    ld hl,__SMSlib_SpriteTableXN
