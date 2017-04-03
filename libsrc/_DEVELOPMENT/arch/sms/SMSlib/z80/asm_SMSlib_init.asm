@@ -3,6 +3,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
+defc NONEED = 1
 INCLUDE "SMSlib_private.inc"
 
 SECTION code_clib
@@ -49,3 +50,9 @@ loop:
    call asm_SMSlib_resetPauseRequest
 
    jp asm_SMSlib_detect_VDP_type
+
+
+; add library initialization to crt
+
+SECTION code_crt_init
+call    asm_SMSlib_init
