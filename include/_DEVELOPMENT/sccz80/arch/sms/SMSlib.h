@@ -134,8 +134,6 @@ extern void __LIB__ __CALLEE__ SMS_loadTileMap_callee(unsigned char x,unsigned c
 
 
 extern void __LIB__ SMS_loadSTMcompressedTileMapArea(unsigned char x,unsigned char y,void *src,unsigned char width) __smallc;
-extern void __LIB__ __CALLEE__ SMS_loadSTMcompressedTileMapArea_callee(unsigned char x,unsigned char y,void *src,unsigned char width) __smallc;
-#define SMS_loadSTMcompressedTileMapArea(a,b,c,d) SMS_loadSTMcompressedTileMapArea_callee(a,b,c,d)
 
 
 extern void __LIB__ SMS_loadTileMapArea(unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height) __smallc;
@@ -149,20 +147,25 @@ extern void __LIB__ __CALLEE__ SMS_loadTileMapArea_callee(unsigned char x,unsign
 
 #define SMS_loadSTMcompressedTileMap(x,y,src) SMS_loadSTMcompressedTileMapArea(x,y,src,32)
 
-/** RESTARTS */
+/** RESTARTS - FASTCALL ONLY */
 
-extern void __LIB__ __FASTCALL__ SMS_crt0_RST08(unsigned int addr);
+#ifdef __CLANG
 
+extern void SMS_crt0_RST08(unsigned int addr);
+extern void SMS_crt0_RST08_call(unsigned int addr);
 
-extern void __LIB__ __FASTCALL__ SMS_crt0_RST08_call(unsigned int addr);
+extern void SMS_crt0_RST18(unsigned int addr);
+extern void SMS_crt0_RST18_call(unsigned int addr);
 
+#else
 
-extern void __LIB__ __FASTCALL__ SMS_crt0_RST18(unsigned int tile);
+extern void SMS_crt0_RST08(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST08_call(unsigned int addr) __z88dk_fastcall;
 
+extern void SMS_crt0_RST18(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
 
-extern void __LIB__ __FASTCALL__ SMS_crt0_RST18_call(unsigned int tile);
-
-
+#endif
 
 #if __SMSLIB_ISRST_SMSCRT0RST08 == 0
    #define SMS_crt0_RST08  SMS_crt0_RST08_call

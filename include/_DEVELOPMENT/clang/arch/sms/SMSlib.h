@@ -139,20 +139,25 @@ extern void SMS_loadTileMapArea(unsigned char x,unsigned char y,void *src,unsign
 
 #define SMS_loadSTMcompressedTileMap(x,y,src) SMS_loadSTMcompressedTileMapArea(x,y,src,32)
 
-/** RESTARTS */
+/** RESTARTS - FASTCALL ONLY */
+
+#ifdef __CLANG
 
 extern void SMS_crt0_RST08(unsigned int addr);
-
-
 extern void SMS_crt0_RST08_call(unsigned int addr);
 
+extern void SMS_crt0_RST18(unsigned int addr);
+extern void SMS_crt0_RST18_call(unsigned int addr);
 
-extern void SMS_crt0_RST18(unsigned int tile);
+#else
 
+extern void SMS_crt0_RST08(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST08_call(unsigned int addr) __z88dk_fastcall;
 
-extern void SMS_crt0_RST18_call(unsigned int tile);
+extern void SMS_crt0_RST18(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
 
-
+#endif
 
 #if __SMSLIB_ISRST_SMSCRT0RST08 == 0
    #define SMS_crt0_RST08  SMS_crt0_RST08_call

@@ -101,7 +101,7 @@ __DPROTO(,,void,,SMS_loadPSGaidencompressedTiles,void *src,unsigned int tilefrom
 /** FUNCTIONS FOR THE TILEMAP */
 
 __DPROTO(,,void,,SMS_loadTileMap,unsigned char x,unsigned char y,void *src,unsigned int size)
-__DPROTO(,,void,,SMS_loadSTMcompressedTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width)
+__OPROTO(,,void,,SMS_loadSTMcompressedTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width)
 __DPROTO(,,void,,SMS_loadTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height)
 
 // turning SMS_loadSTMcompressedTileMap into a define
@@ -109,12 +109,25 @@ __DPROTO(,,void,,SMS_loadTileMapArea,unsigned char x,unsigned char y,void *src,u
 
 #define SMS_loadSTMcompressedTileMap(x,y,src) SMS_loadSTMcompressedTileMapArea(x,y,src,32)
 
-/** RESTARTS */
+/** RESTARTS - FASTCALL ONLY */
 
-__DPROTO(,,void,,SMS_crt0_RST08,unsigned int addr)
-__DPROTO(,,void,,SMS_crt0_RST08_call,unsigned int addr)
-__DPROTO(,,void,,SMS_crt0_RST18,unsigned int tile)
-__DPROTO(,,void,,SMS_crt0_RST18_call,unsigned int tile)
+#ifdef __CLANG
+
+extern void SMS_crt0_RST08(unsigned int addr);
+extern void SMS_crt0_RST08_call(unsigned int addr);
+
+extern void SMS_crt0_RST18(unsigned int addr);
+extern void SMS_crt0_RST18_call(unsigned int addr);
+
+#else
+
+extern void SMS_crt0_RST08(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST08_call(unsigned int addr) __z88dk_fastcall;
+
+extern void SMS_crt0_RST18(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
+
+#endif
 
 #if __SMSLIB_ISRST_SMSCRT0RST08 == 0
    #define SMS_crt0_RST08  SMS_crt0_RST08_call

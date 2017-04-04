@@ -146,9 +146,6 @@ extern void SMS_loadTileMap_callee(unsigned char x,unsigned char y,void *src,uns
 
 
 extern void SMS_loadSTMcompressedTileMapArea(unsigned char x,unsigned char y,void *src,unsigned char width);
-extern void SMS_loadSTMcompressedTileMapArea_callee(unsigned char x,unsigned char y,void *src,unsigned char width) __z88dk_callee;
-#define SMS_loadSTMcompressedTileMapArea(a,b,c,d) SMS_loadSTMcompressedTileMapArea_callee(a,b,c,d)
-
 
 extern void SMS_loadTileMapArea(unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height);
 extern void SMS_loadTileMapArea_callee(unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height) __z88dk_callee;
@@ -161,28 +158,25 @@ extern void SMS_loadTileMapArea_callee(unsigned char x,unsigned char y,void *src
 
 #define SMS_loadSTMcompressedTileMap(x,y,src) SMS_loadSTMcompressedTileMapArea(x,y,src,32)
 
-/** RESTARTS */
+/** RESTARTS - FASTCALL ONLY */
+
+#ifdef __CLANG
 
 extern void SMS_crt0_RST08(unsigned int addr);
-extern void SMS_crt0_RST08_fastcall(unsigned int addr) __z88dk_fastcall;
-#define SMS_crt0_RST08(a) SMS_crt0_RST08_fastcall(a)
-
-
 extern void SMS_crt0_RST08_call(unsigned int addr);
-extern void SMS_crt0_RST08_call_fastcall(unsigned int addr) __z88dk_fastcall;
-#define SMS_crt0_RST08_call(a) SMS_crt0_RST08_call_fastcall(a)
 
+extern void SMS_crt0_RST18(unsigned int addr);
+extern void SMS_crt0_RST18_call(unsigned int addr);
 
-extern void SMS_crt0_RST18(unsigned int tile);
-extern void SMS_crt0_RST18_fastcall(unsigned int tile) __z88dk_fastcall;
-#define SMS_crt0_RST18(a) SMS_crt0_RST18_fastcall(a)
+#else
 
+extern void SMS_crt0_RST08(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST08_call(unsigned int addr) __z88dk_fastcall;
 
-extern void SMS_crt0_RST18_call(unsigned int tile);
-extern void SMS_crt0_RST18_call_fastcall(unsigned int tile) __z88dk_fastcall;
-#define SMS_crt0_RST18_call(a) SMS_crt0_RST18_call_fastcall(a)
+extern void SMS_crt0_RST18(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
 
-
+#endif
 
 #if __SMSLIB_ISRST_SMSCRT0RST08 == 0
    #define SMS_crt0_RST08  SMS_crt0_RST08_call
