@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_addSpriteClipping
+PUBLIC SMS_addSpriteClipping
 
 EXTERN asm_SMSlib_addSpriteClipping
 
-_SMS_addSpriteClipping:
+SMS_addSpriteClipping:
 
    pop af
    pop hl

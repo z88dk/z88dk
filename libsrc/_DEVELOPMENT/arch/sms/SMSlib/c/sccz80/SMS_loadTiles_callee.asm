@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_loadTiles_callee
+PUBLIC SMS_loadTiles_callee
 
 EXTERN asm_SMSlib_loadTiles
 
-_SMS_loadTiles_callee:
+SMS_loadTiles_callee:
 
    pop af
    pop bc

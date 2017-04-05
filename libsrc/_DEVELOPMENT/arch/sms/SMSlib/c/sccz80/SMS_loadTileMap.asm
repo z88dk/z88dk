@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_loadTileMap
+PUBLIC SMS_loadTileMap
 
 EXTERN asm_SMSlib_loadTileMap
 
-_SMS_loadTileMap:
+SMS_loadTileMap:
 
    pop af
    pop bc

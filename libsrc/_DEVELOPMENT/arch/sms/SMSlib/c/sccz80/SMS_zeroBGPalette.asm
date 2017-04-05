@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_zeroBGPalette
+PUBLIC SMS_zeroBGPalette
 
 EXTERN asm_SMSlib_zeroBGPalette
 
-defc _SMS_zeroBGPalette = asm_SMSlib_zeroBGPalette
+defc SMS_zeroBGPalette = asm_SMSlib_zeroBGPalette

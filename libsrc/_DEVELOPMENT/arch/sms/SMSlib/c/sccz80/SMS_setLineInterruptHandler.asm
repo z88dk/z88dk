@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_setLineInterruptHandler
+PUBLIC SMS_setLineInterruptHandler
 
 EXTERN asm_SMSlib_setLineInterruptHandler
 
-defc _SMS_setLineInterruptHandler = asm_SMSlib_setLineInterruptHandler
+defc SMS_setLineInterruptHandler = asm_SMSlib_setLineInterruptHandler

@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_VRAMmemsetW_callee
+PUBLIC SMS_VRAMmemsetW_callee
 
 EXTERN asm_SMSlib_VRAMmemsetW
 
-_SMS_VRAMmemsetW_callee:
+SMS_VRAMmemsetW_callee:
 
    pop hl
    pop bc

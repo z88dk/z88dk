@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_loadSTMcompressedTileMapArea
+PUBLIC SMS_loadSTMcompressedTileMapArea
 
 EXTERN asm_SMSlib_loadSTMcompressedTileMapArea
 
-_SMS_loadSTMcompressedTileMapArea:
+SMS_loadSTMcompressedTileMapArea:
 
    ; this is rather painful
    ; we must reverse parameter order on the stack and change char params to single byte

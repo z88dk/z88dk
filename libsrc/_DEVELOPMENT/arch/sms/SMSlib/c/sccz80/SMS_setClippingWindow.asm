@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_setClippingWindow
+PUBLIC SMS_setClippingWindow
 
 EXTERN asm_SMSlib_setClippingWindow
 
-_SMS_setClippingWindow:
+SMS_setClippingWindow:
 
    pop af
    pop bc

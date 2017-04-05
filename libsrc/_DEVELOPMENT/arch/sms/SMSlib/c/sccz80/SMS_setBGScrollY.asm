@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_setBGScrollY
+PUBLIC SMS_setBGScrollY
 
 EXTERN asm_SMSlib_setBGScrollY
 
-defc _SMS_setBGScrollY = asm_SMSlib_setBGScrollY
+defc SMS_setBGScrollY = asm_SMSlib_setBGScrollY

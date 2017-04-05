@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_initSprites
+PUBLIC SMS_initSprites
 
 EXTERN asm_SMSlib_initSprites
 
-defc _SMS_initSprites = asm_SMSlib_initSprites
+defc SMS_initSprites = asm_SMSlib_initSprites

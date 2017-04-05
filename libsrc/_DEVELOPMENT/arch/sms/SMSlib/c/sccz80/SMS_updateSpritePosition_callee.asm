@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_updateSpritePosition_callee
+PUBLIC SMS_updateSpritePosition_callee
 
 EXTERN asm_SMSlib_updateSpritePosition
 
-_SMS_updateSpritePosition_callee:
+SMS_updateSpritePosition_callee:
 
    pop hl
    pop bc

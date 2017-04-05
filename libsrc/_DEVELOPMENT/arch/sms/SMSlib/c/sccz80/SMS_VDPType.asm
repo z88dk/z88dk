@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_VDPType
+PUBLIC SMS_VDPType
 
 EXTERN asm_SMSlib_VDPType
 
-defc _SMS_VDPType = asm_SMSlib_VDPType
+defc SMS_VDPType = asm_SMSlib_VDPType

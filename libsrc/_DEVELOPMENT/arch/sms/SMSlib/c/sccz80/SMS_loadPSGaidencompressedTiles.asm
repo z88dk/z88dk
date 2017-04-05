@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_loadPSGaidencompressedTiles
+PUBLIC SMS_loadPSGaidencompressedTiles
 
-EXTERN _SMS_loadPSGaidencompressedTiles_callee_0
+EXTERN SMS_loadPSGaidencompressedTiles_callee_0
 
-_SMS_loadPSGaidencompressedTiles:
+SMS_loadPSGaidencompressedTiles:
 
    pop af
 	pop hl
@@ -17,4 +17,4 @@ _SMS_loadPSGaidencompressedTiles:
 	push hl
 	push af
 
-   jp _SMS_loadPSGaidencompressedTiles_callee_0
+   jp SMS_loadPSGaidencompressedTiles_callee_0

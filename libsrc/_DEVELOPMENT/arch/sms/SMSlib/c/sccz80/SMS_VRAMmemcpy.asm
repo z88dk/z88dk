@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_VRAMmemcpy
+PUBLIC SMS_VRAMmemcpy
 
 EXTERN asm_SMSlib_VRAMmemcpy
 
-_SMS_VRAMmemcpy:
+SMS_VRAMmemcpy:
 
    pop af
    pop bc

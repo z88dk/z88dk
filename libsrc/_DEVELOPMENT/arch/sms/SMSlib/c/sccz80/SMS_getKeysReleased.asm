@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_getKeysReleased
+PUBLIC SMS_getKeysReleased
 
 EXTERN asm_SMSlib_getKeysReleased
 
-defc _SMS_getKeysReleased = asm_SMSlib_getKeysReleased
+defc SMS_getKeysReleased = asm_SMSlib_getKeysReleased

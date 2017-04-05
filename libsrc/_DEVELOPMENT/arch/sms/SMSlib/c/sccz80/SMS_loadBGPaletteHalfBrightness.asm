@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_loadBGPaletteHalfBrightness
+PUBLIC SMS_loadBGPaletteHalfBrightness
 
 EXTERN asm_SMSlib_loadBGPaletteHalfBrightness
 
-defc _SMS_loadBGPaletteHalfBrightness = asm_SMSlib_loadBGPaletteHalfBrightness
+defc SMS_loadBGPaletteHalfBrightness = asm_SMSlib_loadBGPaletteHalfBrightness

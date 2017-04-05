@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_useFirstHalfTilesforSprites
+PUBLIC SMS_useFirstHalfTilesforSprites
 
 EXTERN asm_SMSlib_useFirstHalfTilesforSprites
 
-defc _SMS_useFirstHalfTilesforSprites = asm_SMSlib_useFirstHalfTilesforSprites
+defc SMS_useFirstHalfTilesforSprites = asm_SMSlib_useFirstHalfTilesforSprites

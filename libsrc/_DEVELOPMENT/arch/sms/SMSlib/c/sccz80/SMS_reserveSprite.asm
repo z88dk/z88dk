@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_reserveSprite
+PUBLIC SMS_reserveSprite
 
 EXTERN asm_SMSlib_reserveSprite
 
-defc _SMS_reserveSprite = asm_SMSlib_reserveSprite
+defc SMS_reserveSprite = asm_SMSlib_reserveSprite

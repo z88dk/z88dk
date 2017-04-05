@@ -3,19 +3,19 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_loadPSGaidencompressedTiles_callee
-PUBLIC _SMS_loadPSGaidencompressedTiles_callee_0
+PUBLIC SMS_loadPSGaidencompressedTiles_callee
+PUBLIC SMS_loadPSGaidencompressedTiles_callee_0
 
 EXTERN asm_SMSlib_loadPSGaidencompressedTiles
 
-_SMS_loadPSGaidencompressedTiles_callee:
+SMS_loadPSGaidencompressedTiles_callee:
 
    pop af
    pop hl
    pop de
    push af
 
-_SMS_loadPSGaidencompressedTiles_callee_0:
+SMS_loadPSGaidencompressedTiles_callee_0:
 
    push ix
    push iy

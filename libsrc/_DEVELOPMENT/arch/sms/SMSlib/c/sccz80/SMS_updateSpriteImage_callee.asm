@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_updateSpriteImage_callee
+PUBLIC SMS_updateSpriteImage_callee
 
 EXTERN asm_SMSlib_updateSpriteImage
 
-_SMS_updateSpriteImage_callee:
+SMS_updateSpriteImage_callee:
 
    pop af
    pop bc

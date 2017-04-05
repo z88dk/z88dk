@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_setBGPaletteColor
+PUBLIC SMS_setBGPaletteColor
 
 EXTERN asm_SMSlib_setBGPaletteColor
 
-_SMS_setBGPaletteColor:
+SMS_setBGPaletteColor:
 
    pop af
    pop bc

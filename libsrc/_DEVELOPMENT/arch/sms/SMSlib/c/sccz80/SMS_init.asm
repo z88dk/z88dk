@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_init
+PUBLIC SMS_init
 
 EXTERN asm_SMSlib_init
 
-defc _SMS_init = asm_SMSlib_init
+defc SMS_init = asm_SMSlib_init

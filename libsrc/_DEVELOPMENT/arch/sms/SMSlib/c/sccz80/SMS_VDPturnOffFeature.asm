@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_SMSlib
 
-PUBLIC _SMS_VDPturnOffFeature
+PUBLIC SMS_VDPturnOffFeature
 
 EXTERN asm_SMSlib_VDPturnOffFeature
 
-defc _SMS_VDPturnOffFeature = asm_SMSlib_VDPturnOffFeature
+defc SMS_VDPturnOffFeature = asm_SMSlib_VDPturnOffFeature
