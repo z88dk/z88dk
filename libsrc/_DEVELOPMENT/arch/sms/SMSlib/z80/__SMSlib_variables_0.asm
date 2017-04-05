@@ -47,7 +47,7 @@ __SMSlib_spritesWidth:
 
    defb 8
 
-__SMSlib_SMS_theLineInterruptHandler:
+__SMSlib_theLineInterruptHandler:
 
    defw l_ret                  ; /* 'empty' line interrupt handler */
 
@@ -69,7 +69,7 @@ __SMSlib_VDPBlank:
 
    defb 0                      ; /* used by INTerrupt */
 
-__SMSlib_SMS_VDPFlags:
+__SMSlib_VDPFlags:
 
    defb 0                      ; /* holds the sprite overflow and sprite collision flags */
 
