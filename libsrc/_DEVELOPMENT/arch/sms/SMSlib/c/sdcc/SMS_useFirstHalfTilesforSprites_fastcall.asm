@@ -7,4 +7,4 @@ PUBLIC _SMS_useFirstHalfTilesforSprites_fastcall
 
 EXTERN asm_SMSlib_useFirstHalfTilesforSprites
 
-defc_SMS_useFirstHalfTilesforSprites_fastcall = asm_SMSlib_useFirstHalfTilesforSprites
+defc _SMS_useFirstHalfTilesforSprites_fastcall = asm_SMSlib_useFirstHalfTilesforSprites

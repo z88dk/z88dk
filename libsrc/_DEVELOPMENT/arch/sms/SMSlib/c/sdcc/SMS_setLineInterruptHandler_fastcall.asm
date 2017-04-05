@@ -1,0 +1,10 @@
+; void SMS_setLineInterruptHandler(void *theHandlerFunction)
+
+SECTION code_clib
+SECTION code_SMSlib
+
+PUBLIC _SMS_setLineInterruptHandler_fastcall
+
+EXTERN asm_SMSlib_setLineInterruptHandler
+
+defc _SMS_setLineInterruptHandler_fastcall = asm_SMSlib_setLineInterruptHandler
