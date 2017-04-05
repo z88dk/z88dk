@@ -76,7 +76,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
-	
+   
    include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
 
@@ -86,11 +86,16 @@ __Restart:
    
    ; initialize mappers
    
-   ld hl,0x0000
-   ld (0xfffc),hl              ; (0xfffc) = $00
-   ld hl,0x0201
-   ld (0xfffe),hl              ; (0xfffd) = $00, (0xfffe) = $01, (0xffff) = $02
-   
+   ld de,0x0000
+   ld (0xfffc),de              ; (0xfffc) = $00
+   ld de,0x0201
+   ld (0xfffe),de              ; (0xfffd) = $00, (0xfffe) = $01, (0xffff) = $02
+
+   ; silence psg
+
+   EXTERN asm_sms_psg_silence
+   call   asm_sms_psg_silence
+
    ; command line
    
    IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
