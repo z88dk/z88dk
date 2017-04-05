@@ -13,6 +13,8 @@
    Synchronized March 29, 2017
    ************************************************** */
 
+#define SMS_MAXSPRITES  __SMSLIB_MAXSPRITES
+	
 // there is no penalty for enabling MD_PAD_SUPPORT
 
 #ifndef MD_PAD_SUPPORT
@@ -152,27 +154,27 @@ extern void __LIB__ __CALLEE__ SMS_loadTileMapArea_callee(unsigned char x,unsign
 #ifdef __CLANG
 
 extern void SMS_crt0_RST08(unsigned int addr);
-extern void SMS_crt0_RST08_call(unsigned int addr);
+extern void _RST08_SMS_crt0_RST08(unsigned int addr);
 
 extern void SMS_crt0_RST18(unsigned int addr);
-extern void SMS_crt0_RST18_call(unsigned int addr);
+extern void _RST18_SMS_crt0_RST18(unsigned int addr);
 
 #else
 
 extern void SMS_crt0_RST08(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
-extern void SMS_crt0_RST08_call(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+extern void _RST08_SMS_crt0_RST08(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 
 extern void SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
-extern void SMS_crt0_RST18_call(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+extern void _RST18_SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 
 #endif
 
-#if __SMSLIB_ISRST_SMSCRT0RST08 == 0
-   #define SMS_crt0_RST08  SMS_crt0_RST08_call
+#if __SMSLIB_ISRST_SMSCRT0RST08
+   #define SMS_crt0_RST08  _RST08_SMS_crt0_RST08
 #endif
 
-#if __SMSLIB_ISRST_SMSCRT0RST18 == 0
-   #define SMS_crt0_RST18  SMS_crt0_RST18_call
+#if __SMSLIB_ISRST_SMSCRT0RST18
+   #define SMS_crt0_RST18  _RST18_SMS_crt0_RST18
 #endif
 
 // functions for setting tiles / moving 'cursor'

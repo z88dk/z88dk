@@ -13,7 +13,6 @@
    PUBLIC _SMS_crt0_RST08_call
 
 _SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
-_SMS_crt0_RST08_call:
 
    ld c,0xbf                   ; set VDP Control Port
    di                          ; make it interrupt SAFE
@@ -32,7 +31,6 @@ _SMS_crt0_RST08_call:
    PUBLIC _SMS_crt0_RST18_call
 
 _SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
-_SMS_crt0_RST18_call:
 
    ld a,l                      ; (respecting VRAM time costraints)
    out (0xbe),a                ; 11
