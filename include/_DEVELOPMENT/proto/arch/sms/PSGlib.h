@@ -31,7 +31,7 @@ __OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,PSGSFXCancelLoop,void
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,PSGSFXStop,void)
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,PSGSFXGetStatus,void)
 
-__OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,PSGSilenceChannels,void)
+__OPROTO(`a,d,e,iyl,iyh',`a,d,e,iyl,iyh',void,,PSGSilenceChannels,void)
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,PSGRestoreVolumes,void)
 
 __OPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,PSGFrame,void)

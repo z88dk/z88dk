@@ -59,7 +59,7 @@ extern void PSGSFXStop(void) __preserves_regs(b,c,d,e,iyl,iyh);
 extern unsigned char PSGSFXGetStatus(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
 
-extern void PSGSilenceChannels(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void PSGSilenceChannels(void) __preserves_regs(a,d,e,iyl,iyh);
 
 extern void PSGRestoreVolumes(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
