@@ -10,9 +10,10 @@
    defs 0x0008 - ASMPC
 
    PUBLIC _SMS_crt0_RST08
-   PUBLIC _SMS_crt0_RST08_call
+   PUBLIC __RST08_SMS_crt0_RST08
 
 _SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
+__RST08_SMS_crt0_RST08:
 
    ld c,0xbf                   ; set VDP Control Port
    di                          ; make it interrupt SAFE
@@ -28,9 +29,10 @@ _SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
    defs 0x0018 - ASMPC
 
    PUBLIC _SMS_crt0_RST18
-   PUBLIC _SMS_crt0_RST18_call
+   PUBLIC __RST18_SMS_crt0_RST18
 
 _SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
+__RST18_SMS_crt0_RST18:
 
    ld a,l                      ; (respecting VRAM time costraints)
    out (0xbe),a                ; 11
