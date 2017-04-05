@@ -1,3 +1,7 @@
+graphics/px8/draw
+graphics/px8/undraw
+graphics/px8/xordraw
+graphics/draw_profile_nostencil
 @gfxbasew.lst
 graphics/px8/clg
 graphics/w_drawb
