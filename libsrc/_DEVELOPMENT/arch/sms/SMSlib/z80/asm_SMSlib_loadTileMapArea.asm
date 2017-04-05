@@ -12,7 +12,7 @@ PUBLIC asm_SMSlib_loadTileMapArea
 
 asm_SMSlib_loadTileMapArea:
 
-   ; void SMS_loadTileMap(SMS_loadTileMapArea (unsigned char x, unsigned char y,  void *src, unsigned char width, unsigned char height)
+   ; void SMS_loadTileMapArea (unsigned char x, unsigned char y,  void *src, unsigned char width, unsigned char height)
    ;
    ; enter :  b = unsigned char width
    ;          c = unsigned char height
