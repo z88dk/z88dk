@@ -14,12 +14,7 @@
    ************************************************** */
 
 #define SMS_MAXSPRITES  __SMSLIB_MAXSPRITES
-	
-// there is no penalty for enabling MD_PAD_SUPPORT
-
-#ifndef MD_PAD_SUPPORT
-#define MD_PAD_SUPPORT  1
-#endif
+#define MD_PAD_SUPPORT  __SMSLIB_ENABLE_MDPAD
 
 /** LIBRARY INITIALIZATION */
 /** no need to call - this is inserted automatically into all crts */
@@ -97,7 +92,7 @@ extern void SMS_setSpriteMode_fastcall(unsigned char mode) __preserves_regs(b,iy
 // modes for SMS_setSpriteMode
 
 #define SPRITEMODE_NORMAL         __SMSLIB_SPRITEMODE_NORMAL
-#define SPRITEMODE_TALL           __SMSLIB_SPRITEMODE_TALL',
+#define SPRITEMODE_TALL           __SMSLIB_SPRITEMODE_TALL
 #define SPRITEMODE_ZOOMED         __SMSLIB_SPRITEMODE_ZOOMED
 #define SPRITEMODE_TALL_ZOOMED    __SMSLIB_SPRITEMODE_TALL_ZOOMED
 

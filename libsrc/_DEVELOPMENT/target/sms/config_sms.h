@@ -451,6 +451,7 @@
 
 
 #define __SMSLIB_MAXSPRITES   64
+#define __SMSLIB_ENABLE_MDPAD  0
 
 #define __SMSLIB_PNTADDRESS   0x7800
 #define __SMSLIB_SATADDRESS   0x7f00
