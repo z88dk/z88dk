@@ -15,7 +15,7 @@ asm_SMSlib_VRAMmemsetW:
    ; void SMS_VRAMmemsetW (unsigned int dst, unsigned int value, unsigned int size)
    ;
    ; enter : hl = unsigned int dst
-   ;         de = unsigned char value
+   ;         de = unsigned int value
    ;         bc = unsigned int size
    ;
    ; uses  : af, bc, h
