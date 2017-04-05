@@ -159,11 +159,11 @@ extern void SMS_crt0_RST18_call(unsigned int addr);
 
 #else
 
-extern void SMS_crt0_RST08(unsigned int addr) __z88dk_fastcall;
-extern void SMS_crt0_RST08_call(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST08(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+extern void SMS_crt0_RST08_call(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 
-extern void SMS_crt0_RST18(unsigned int addr) __z88dk_fastcall;
-extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+extern void SMS_crt0_RST18_call(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 
 #endif
 

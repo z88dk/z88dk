@@ -20,12 +20,12 @@ include(__link__.m4)
 /** LIBRARY INITIALIZATION */
 /** no need to call - this is inserted automatically into all crts */
 
-__OPROTO(,,void,,SMS_init,void)
+__OPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_init,void)
 
 /** VDP OPERATIVE MODE HANDLING FUNCTIONS */
 
-__DPROTO(,,void,,SMS_VDPturnOnFeature,unsigned int feature)
-__DPROTO(,,void,,SMS_VDPturnOffFeature, unsigned int feature)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',void,,SMS_VDPturnOnFeature,unsigned int feature)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',void,,SMS_VDPturnOffFeature, unsigned int feature)
 
 // feature can be one of the following:
 
@@ -55,11 +55,11 @@ __DPROTO(,,void,,SMS_VDPturnOffFeature, unsigned int feature)
 
 /** */
 
-__DPROTO(,,void,,SMS_setBGScrollX,unsigned char scrollX)
-__DPROTO(,,void,,SMS_setBGScrollY,unsigned char scrollY)
-__DPROTO(,,void,,SMS_setBackdropColor,unsigned char entry)
-__DPROTO(,,void,,SMS_useFirstHalfTilesforSprites,unsigned char usefirsthalf)
-__DPROTO(,,void,,SMS_setSpriteMode,unsigned char mode)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_setBGScrollX,unsigned char scrollX)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_setBGScrollY,unsigned char scrollY)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_setBackdropColor,unsigned char entry)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_useFirstHalfTilesforSprites,unsigned char usefirsthalf)
+__DPROTO(`b,iyl,iyh',`b,iyl,iyh',void,,SMS_setSpriteMode,unsigned char mode)
 
 // modes for SMS_setSpriteMode
 
@@ -91,18 +91,18 @@ extern unsigned char _SMSlib_SRAM[];
 
 /** WAIT UNTIL NEXT VBLANK STARTS */
 
-__OPROTO(,,void,,SMS_waitForVBlank,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_waitForVBlank,void)
 
 /** FUNCTIONS TO LOAD TILES INTO VRAM */
 
-__DPROTO(,,void,,SMS_loadTiles,void *src,unsigned int tileFrom, unsigned int size)
-__DPROTO(,,void,,SMS_loadPSGaidencompressedTiles,void *src,unsigned int tilefrom)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_loadTiles,void *src,unsigned int tileFrom, unsigned int size)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_loadPSGaidencompressedTiles,void *src,unsigned int tilefrom)
 
 /** FUNCTIONS FOR THE TILEMAP */
 
-__DPROTO(,,void,,SMS_loadTileMap,unsigned char x,unsigned char y,void *src,unsigned int size)
-__OPROTO(,,void,,SMS_loadSTMcompressedTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width)
-__DPROTO(,,void,,SMS_loadTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_loadTileMap,unsigned char x,unsigned char y,void *src,unsigned int size)
+__OPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_loadSTMcompressedTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_loadTileMapArea,unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height)
 
 // turning SMS_loadSTMcompressedTileMap into a define
 // void SMS_loadSTMcompressedTileMap (unsigned char x, unsigned char y, unsigned char *src);
@@ -121,11 +121,11 @@ extern void SMS_crt0_RST18_call(unsigned int addr);
 
 #else
 
-extern void SMS_crt0_RST08(unsigned int addr) __z88dk_fastcall;
-extern void SMS_crt0_RST08_call(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST08(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+extern void SMS_crt0_RST08_call(unsigned int addr) __preserves_regs(a,b,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 
-extern void SMS_crt0_RST18(unsigned int addr) __z88dk_fastcall;
-extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
+extern void SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+extern void SMS_crt0_RST18_call(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 
 #endif
 
@@ -163,18 +163,18 @@ extern void SMS_crt0_RST18_call(unsigned int addr) __z88dk_fastcall;
 
 /** FUNCTIONS FOR SPRITE HANDLING */
 
-__OPROTO(,,void,,SMS_initSprites,void)
+__OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,SMS_initSprites,void)
 // returns -1 if no more sprites are available
-__DPROTO(,,signed char,,SMS_addSprite,unsigned char x,unsigned char y,unsigned char tile)
-__OPROTO(,,signed char,,SMS_reserveSprite,void)
-__DPROTO(,,void,,SMS_updateSpritePosition,unsigned char sprite,unsigned char x,unsigned char y)
-__DPROTO(,,void,,SMS_updateSpriteImage,unsigned char sprite,unsigned char image)
-__DPROTO(,,void,,SMS_hideSprite,unsigned char sprite)
-__DPROTO(,,void,,SMS_setClippingWindow,unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1)
+__DPROTO(`iyl,iyh',`iyl,iyh',signed char,,SMS_addSprite,unsigned char x,unsigned char y,unsigned char tile)
+__OPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',signed char,,SMS_reserveSprite,void)
+__DPROTO(`b,iyl,iyh',`b,iyl,iyh',void,,SMS_updateSpritePosition,unsigned char sprite,unsigned char x,unsigned char y)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',void,,SMS_updateSpriteImage,unsigned char sprite,unsigned char image)
+__DPROTO(`a,b,c,iyl,iyh',`b,c,iyl,iyh',void,,SMS_hideSprite,unsigned char sprite)
+__DPROTO(`a,b,c,iyl,iyh',`b,c,iyl,iyh',void,,SMS_setClippingWindow,unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1)
 // returns -1 if no more sprites are available or sprite clipped
-__DPROTO(,,signed char,,SMS_addSpriteClipping,int x,int y, unsigned char tile)
-__OPROTO(,,void,,SMS_finalizeSprites,void)
-__OPROTO(,,void,,SMS_copySpritestoSAT,void)
+__DPROTO(`iyl,iyh',`iyl,iyh',signed char,,SMS_addSpriteClipping,int x,int y, unsigned char tile)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_finalizeSprites,void)
+__OPROTO(`c,d,e,iyl,iyh',`c,d,e,iyl,iyh',void,,SMS_copySpritestoSAT,void)
 
 /** COLORS / PALETTE HANDLING */
 
@@ -184,15 +184,15 @@ __OPROTO(,,void,,SMS_copySpritestoSAT,void)
 
 // SMS functions to set a color / load palette
 
-__DPROTO(,,void,,SMS_setBGPaletteColor,unsigned char entry,unsigned char color)
-__DPROTO(,,void,,SMS_setSpritePaletteColor,unsigned char entry,unsigned char color)
-__DPROTO(,,void,,SMS_loadBGPalette,void *palette)
-__DPROTO(,,void,,SMS_loadSpritePalette,void *palette)
+__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,SMS_setBGPaletteColor,unsigned char entry,unsigned char color)
+__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,SMS_setSpritePaletteColor,unsigned char entry,unsigned char color)
+__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,SMS_loadBGPalette,void *palette)
+__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,SMS_loadSpritePalette,void *palette)
 
 #define SMS_setNextBGColoratIndex(i)       SMS_setAddr(SMS_CRAMAddress|(i))
 #define SMS_setNextSpriteColoratIndex(i)   SMS_setAddr(SMS_CRAMAddress|0x10|(i))
 
-__DPROTO(,,void,,SMS_setColor,unsigned char color)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_setColor,unsigned char color)
 
 // SMS macros for colors
 
@@ -200,17 +200,17 @@ __DPROTO(,,void,,SMS_setColor,unsigned char color)
 #define RGB8(r,g,b)       (((r)>>6)|(((g)>>6)<<2)|(((b)>>6)<<4))
 #define RGBHTML(RGB24bit) (((RGB24bit)>>22)|((((RGB24bit)&0xFFFF)>>14)<<2)|((((RGB24bit)&0xFF)>>6)<<4))
 
-__DPROTO(,,void,,SMS_loadBGPaletteHalfBrightness,void *palette)
-__DPROTO(,,void,,SMS_loadSpritePaletteHalfBrightness,void *palette)
-__OPROTO(,,void,,SMS_zeroBGPalette,void)
-__OPROTO(,,void,,SMS_zeroSpritePalette,void)
+__DPROTO(`c,d,e,iyl,iyh',`c,d,e,iyl,iyh',void,,SMS_loadBGPaletteHalfBrightness,void *palette)
+__DPROTO(`c,d,e,iyl,iyh',`c,d,e,iyl,iyh',void,,SMS_loadSpritePaletteHalfBrightness,void *palette)
+__OPROTO(`c,d,e,h,l,iyl,iyh',`c,d,e,h,l,iyl,iyh',void,,SMS_zeroBGPalette,void)
+__OPROTO(`c,d,e,h,l,iyl,iyh',`c,d,e,h,l,iyl,iyh',void,,SMS_zeroSpritePalette,void)
 
 /** FUNCTIONS TO READ JOYSTICKS */
 
-__OPROTO(,,unsigned int,,SMS_getKeysStatus,void)
-__OPROTO(,,unsigned int,,SMS_getKeysPressed,void)
-__OPROTO(,,unsigned int,,SMS_getKeysHeld,void)
-__OPROTO(,,unsigned int,,SMS_getKeysReleased,void)
+__OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',unsigned int,,SMS_getKeysStatus,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getKeysPressed,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getKeysHeld,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getKeysReleased,void)
 
 // handy defines for joypad handling
 
@@ -242,10 +242,10 @@ __OPROTO(,,unsigned int,,SMS_getKeysReleased,void)
 
 // functions to read additional MD buttons
 
-__OPROTO(,,unsigned int,,SMS_getMDKeysStatus,void)
-__OPROTO(,,unsigned int,,SMS_getMDKeysPressed,void)
-__OPROTO(,,unsigned int,,SMS_getMDKeysHeld,void)
-__OPROTO(,,unsigned int,,SMS_getMDKeysReleased,void)
+__OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',unsigned int,,SMS_getMDKeysStatus,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getMDKeysPressed,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getMDKeysHeld,void)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getMDKeysReleased,void)
 
 // handy defines for additional MD joypad handling
 
@@ -260,12 +260,12 @@ __OPROTO(,,unsigned int,,SMS_getMDKeysReleased,void)
 
 /** SMS - PAUSE HANDLING */
 
-__OPROTO(,,unsigned char,,SMS_queryPauseRequested,void)
-__OPROTO(,,void,,SMS_resetPauseRequest,void)
+__OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',unsigned char,,SMS_queryPauseRequested,void)
+__OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,SMS_resetPauseRequest,void)
 
 /** SMS - VDPType HANDLING */
 
-__OPROTO(,,void,,SMS_VDPType,void)
+__OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',void,,SMS_VDPType,void)
 
 // WARNING: these constants may change value later, please use defines
 
@@ -282,30 +282,30 @@ extern unsigned char _SMSlib_VDPFlags;
 
 /** LINE INTERRUPT */
 
-__DPROTO(,,void,,SMS_setLineInterruptHandler,void *theHandlerFunction)
-__DPROTO(,,void,,SMS_setLineCounter,unsigned char count)
+__DPROTO(`a,b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_setLineInterruptHandler,void *theHandlerFunction)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_setLineCounter,unsigned char count)
 
 #define SMS_enableLineInterrupt()   SMS_VDPturnOnFeature(0x0010)   // turns on line IRQ
 #define SMS_disableLineInterrupt()  SMS_VDPturnOffFeature(0x0010)  // turns off line IRQ
 
 /** VCOUNT / HCOUNT */
 
-__OPROTO(,,unsigned char,,SMS_getVCount,void)
-__OPROTO(,,unsigned char,,SMS_getHCount,void)
+__OPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,h,iyl,iyh',unsigned char,,SMS_getVCount,void)
+__OPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,h,iyl,iyh',unsigned char,,SMS_getHCount,void)
 
 /** LOW LEVEL FUNCTIONS */
 
-__DPROTO(,,void,,SMS_VRAMmemcpy,unsigned int dst,void *src,unsigned int size)
-__DPROTO(,,void,,SMS_VRAMmemcpy_brief,unsigned int dst,void *src,unsigned char size)
-__DPROTO(,,void,,SMS_VRAMmemset,unsigned int dst,unsigned char value,unsigned int size)
-__DPROTO(,,void,,SMS_VRAMmemsetW,unsigned int dst,unsigned int value,unsigned int size)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_VRAMmemcpy,unsigned int dst,void *src,unsigned int size)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_VRAMmemcpy_brief,unsigned int dst,void *src,unsigned char size)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_VRAMmemset,unsigned int dst,unsigned char value,unsigned int size)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_VRAMmemsetW,unsigned int dst,unsigned int value,unsigned int size)
 
 /** VRAM UNSAFE FUNCTIONS. FAST BUT DANGEROUS! */
 
-__OPROTO(,,void,,UNSAFE_SMS_copySpritestoSAT,void)
-__DPROTO(,,void,,UNSAFE_SMS_VRAMmemcpy32,unsigned int dst,void *src)
-__DPROTO(,,void,,UNSAFE_SMS_VRAMmemcpy64,unsigned int dst,void *src)
-__DPROTO(,,void,,UNSAFE_SMS_VRAMmemcpy128,unsigned int dst,void *src)
+__OPROTO(`a,d,e,iyl,iyh',`a,d,e,iyl,iyh',void,,UNSAFE_SMS_copySpritestoSAT,void)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,UNSAFE_SMS_VRAMmemcpy32,unsigned int dst,void *src)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,UNSAFE_SMS_VRAMmemcpy64,unsigned int dst,void *src)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,UNSAFE_SMS_VRAMmemcpy128,unsigned int dst,void *src)
 
 // handy functions for UNSAFE_SMS_VRAMmemcpy
 
@@ -328,8 +328,8 @@ __DPROTO(,,void,,UNSAFE_SMS_VRAMmemcpy128,unsigned int dst,void *src)
 
 /** INTERRUPT SERVICE ROUTINES */
 
-__OPROTO(,,void,,SMS_isr,void)
-__OPROTO(,,void,,SMS_nmi_isr,void)
+__OPROTO(`a,b,c,d,e,h,l,iyl,iyh',`a,b,c,d,e,h,l,iyl,iyh',void,,SMS_isr,void)
+__OPROTO(`a,b,c,d,e,h,l,iyl,iyh',`a,b,c,d,e,h,l,iyl,iyh',void,,SMS_nmi_isr,void)
 
 /** STILL MISSING
 
