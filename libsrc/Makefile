@@ -247,7 +247,7 @@ z88_clib.lib: gfxdeps
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz88 
 	$(MAKE) -C z88 
-	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # Network stdio - dom
 z88net_clib.lib: gfxdeps
@@ -265,7 +265,7 @@ z88net_clib.lib: gfxdeps
 	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz88 
-	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
 
 # ZX Spectrum fcntl - dom/stefano
 zxfcntl:

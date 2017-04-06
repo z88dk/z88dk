@@ -22,13 +22,13 @@ obj/ixiy/%.o: %.c
 	zcc +test $(CFLAGS) -Ca--IXIY -c -o $@ $^
 
 obj/net/%.o: %.asm
-	zcc +z88 $(CFLAGS) -DNET_STDIO -Ca-I../ -c -o $@ $^
+	zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -DNET_STDIO -Ca-I../ -c -o $@ $^
 
 obj/net/%.o: %.c
-	zcc +z88 $(CFLAGS) -DNET_STDIO -c -o $@ $^
+	zcc +z88 $(CFLAGS) -Cc-standard-escape-chars -DNET_STDIO -c -o $@ $^
 
 obj/cpm/%.o: %.asm
-	zcc +cpm $(CFLAGS) -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/cpm/%.o: %.c
 	zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
