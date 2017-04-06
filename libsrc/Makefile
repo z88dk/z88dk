@@ -802,7 +802,7 @@ aquarius_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C psg
 	$(MAKE) -C games laquarius 
-	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:
