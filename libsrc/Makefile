@@ -433,7 +433,7 @@ pps_clib.lib:
 	$(MAKE) -C spectrum 
 	$(MAKE) -C psg
 	$(MAKE) -C games lzx
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
+	$(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
 # Epson PX4 lib - Stefano	
 px4.lib:
