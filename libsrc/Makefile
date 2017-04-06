@@ -904,7 +904,7 @@ svi_clib.lib:
 	$(MAKE) -C games lmsx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
 msx_clib.lib:
