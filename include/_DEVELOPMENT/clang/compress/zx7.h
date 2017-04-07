@@ -87,4 +87,10 @@ extern unsigned char *dzx7_agile_rcs_back(void *src,void *dst);
 
 
 
+#ifdef __SMS
+extern unsigned int sms_dzx7_standard_vram(void *src,unsigned int dst);
+
+
+#endif
+
 #endif

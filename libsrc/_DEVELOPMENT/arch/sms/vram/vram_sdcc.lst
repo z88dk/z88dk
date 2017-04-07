@@ -1,0 +1,3 @@
+@arch/sms/vram/vram_asm.lst
+compress/zx7/c/sdcc_iy/sms_dzx7_standard_vram
+compress/zx7/c/sdcc_iy/sms_dzx7_standard_vram_callee

@@ -1,3 +1,5 @@
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_crt_common
 
@@ -10,9 +12,9 @@ asm_sms_set_vram_write_de:
    ; uses  : af
 
    ld a,e
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
    ld a,d
    or $40
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
    
    ret
