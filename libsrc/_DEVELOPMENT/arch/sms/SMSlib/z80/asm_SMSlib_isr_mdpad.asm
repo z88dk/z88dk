@@ -57,8 +57,8 @@ frame_interrupt:
    
    in a,(IOPortL)
    
-   ld l,a
    ld h,0
+   ld l,a
 
    ; hl = MDKeysStatus
    
@@ -70,7 +70,6 @@ frame_interrupt:
 
 read:
    
-   dec h
    ld a,l
    cpl
    and 0x30
@@ -109,10 +108,22 @@ line_interrupt:
    push de
    push ix
    push iy
+   exx
+   ex af,af'
+   push af
+   push bc
+   push de
+   push hl
    
    ld hl,(__SMSlib_theLineInterruptHandler)
    call l_jphl
-   
+
+   pop hl
+   pop de
+   pop bc
+   pop af
+   ex af,af'
+   exx
    pop iy
    pop ix
    pop de
@@ -124,4 +135,4 @@ exit:
    pop af
    
    ei
-   ret
+   reti

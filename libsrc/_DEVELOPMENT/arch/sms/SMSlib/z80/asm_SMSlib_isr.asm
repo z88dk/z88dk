@@ -51,10 +51,22 @@ line_interrupt:
    push de
    push ix
    push iy
+   exx
+   ex af,af'
+   push af
+   push bc
+   push de
+   push hl
    
    ld hl,(__SMSlib_theLineInterruptHandler)
    call l_jphl
    
+   pop hl
+   pop de
+   pop bc
+   pop af
+   ex af,af'
+   exx
    pop iy
    pop ix
    pop de
@@ -66,4 +78,4 @@ exit:
    pop af
    
    ei
-   ret
+   reti
