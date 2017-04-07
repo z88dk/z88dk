@@ -340,6 +340,14 @@ struct varid {
 
 #define ISASM(x) ( c_assembler_type == (x) )
 
+
+#define CPU_Z80      1
+#define CPU_Z180     2
+#define CPU_R2K      4
+#define CPU_R3K      8
+
+#define CPU_RABBIT (CPU_R2K|CPU_R3K)
+
 struct parser_stack;
 
 struct parser_stack {

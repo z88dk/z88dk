@@ -2300,7 +2300,9 @@ static void configure_compiler()
 		preprocarg = " -DSCCZ80 -DSMALL_C";
 		BuildOptions(&cpparg, preprocarg);
 		/* Indicate to sccz80 what assembler we want */
-		snprintf(buf, sizeof(buf), "-asm=%s -ext=opt", c_assembler_type);
+		snprintf(buf, sizeof(buf), "-asm=%s -ext=opt %s", c_assembler_type,
+		            (mz180 ? "-mz180" : ( mr2k ? "-mr2k" : "-mz80")));
+
 		add_option_to_compiler(buf);
 		if (sccz80arg) {
 			add_option_to_compiler(sccz80arg);

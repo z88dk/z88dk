@@ -144,6 +144,8 @@ int c_framepointer_is_ix;
 
 int c_use_r2l_calling_convention;
 
+int c_cpu = CPU_Z80;
+
 /* scanf format requirements */
 uint32_t scanf_format_option;
 uint32_t printf_format_option;

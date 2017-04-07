@@ -53,6 +53,7 @@ static char *nextarg(int n, char *s, int size);
 static void setup_sym(void);
 static void info(void);
 static void openout(void);
+static void set_cpu(char *arg);
 static void SetNoWarn(char *arg);
 static void SetMathZ88(char *arg);
 static void SetUnsigned(char *arg);
@@ -798,6 +799,7 @@ struct args myargs[] = {
 #endif
     { "standard-escape-chars", NO, SetStandardEscape, "Use standard mappings for escape codes" },
     { "set-r2l-by-default", NO, set_default_r2l, "Use r2l calling by default"},
+    { "m", YES, set_cpu, "Set the target CPU (z80, z180, r2k, r3k)"},
     /* Compatibility Modes.. */
     { "f", NO, SetUnsigned, NULL },
     { "", 0, NULL, NULL }
@@ -822,6 +824,19 @@ static void SetFrameIY(char* arg)
     c_framepointer_is_ix = NO;
 }
 #endif
+
+static void set_cpu(char *arg)
+{
+    if ( strcmp(arg,"mz80") == 0) {
+        c_cpu = CPU_Z80;
+    } else if ( strcmp(arg, "mz180") == 0 ) {
+        c_cpu = CPU_Z180;
+    } else if ( strcmp(arg, "mr2k") == 0 ) {
+        c_cpu = CPU_R2K;
+    } else if ( strcmp(arg, "mr3k") == 0 ) {
+        c_cpu = CPU_R3K;
+    }
+}
 
 void SetStandardEscape(char* arg)
 {
