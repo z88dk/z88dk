@@ -4,15 +4,16 @@
 ; modified by Stefano Bodrato - Jan 2001
 ;
 ; Sept 2003 - Stefano: Fixed bug for sprites wider than 8.
+; Apr 2017  - Stefano: Fixed bug for sprite pos coordinates wider than 255.
 ;
 ; Much More Generic version
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: w_putsprite2.asm,v 1.4 2017-01-02 21:51:24 aralbrec Exp $
+; $Id: w_putsprite2.asm,v 2017 Stefano Exp $
 ;
 
-
+	SECTION code_clib
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 
@@ -36,18 +37,18 @@
 
         inc     hl
         ld      e,(hl)
- 	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y __gfx_coords
-
-	inc	hl
+        ld      d,(hl)
+        inc     hl
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)  ; x and y __gfx_coords
+		ld		(oldx),bc
 
         inc     hl
         ld      a,(hl)  ; and/or/xor mode
 
-	ld	h,d
-	ld	l,e
-	
+
 	cp	166	; and(hl) opcode
 	jr	z,doand
 
@@ -57,35 +58,29 @@
 	; 182 - or
 	; 174 - xor
 
+;--------------------------------------
 .doxor
 	ld	a,(ix+0)	; Width
 	ld	b,(ix+1)	; Height
-.oloopx	push	bc		;Save # of rows
+.oloopx
+	push	bc		;Save # of rows
 	push	af
+
+	ld		hl,(oldx)	;;
 
 	;ld	b,a		;Load width
 	ld	b,0		; Better, start from zero !!
 
 	ld	c,(ix+2)	;Load one line of image
 
-.iloopx	sla	c		;Test leftmost pixel
+.iloopx
+	sla	c		;Test leftmost pixel
 	jr	nc,noplotx	;See if a plot is needed
-
-	pop	af
-	push	af
 
 	push	hl
 	push	bc
 	push	de
-	ld	a,h
-	add	a,b
-	ld	h,a
-
-	ld	e,l
-	ld	d,0
-	ld	l,h
-	ld	h,d
-	call	w_xorpixel
+	call	w_xorpixel	
 	pop	de
 	pop	bc
 	pop	hl
@@ -93,6 +88,7 @@
 .noplotx
 
 	inc	b	; witdh counter
+	inc hl ;;
 	
 	pop	af
 	push	af
@@ -109,7 +105,6 @@
 .noblkx
 	
 	ld	a,b	; next byte in row ?
-	;dec	a
 	and	a
 	jr	z,iloopx
 	and	7
@@ -123,7 +118,9 @@
 
 .noblockx
 
-	inc	l
+	;pop hl
+	;inc	l
+	inc de
 
 	pop	af
 	pop	bc		;Restore data
@@ -132,34 +129,28 @@
 
 
 
+;--------------------------------------
 .doand
 	ld	a,(ix+0)	; Width
 	ld	b,(ix+1)	; Height
-.oloopa	push	bc		;Save # of rows
+.oloopa
+	push	bc		;Save # of rows
 	push	af
+
+	ld		hl,(oldx)	;;
 
 	;ld	b,a		;Load width
 	ld	b,0		; Better, start from zero !!
 
 	ld	c,(ix+2)	;Load one line of image
 
-.iloopa	sla	c		;Test leftmost pixel
+.iloopa
+	sla	c		;Test leftmost pixel
 	jr	nc,noplota	;See if a plot is needed
-
-	pop	af
-	push	af
 
 	push	hl
 	push	bc
 	push	de
-	ld	a,h
-	add	a,b
-	ld	h,a
-
-	ld	e,l
-	ld	d,0
-	ld	l,h
-	ld	h,d
 	call	w_respixel
 	pop	de
 	pop	bc
@@ -168,6 +159,7 @@
 .noplota
 
 	inc	b	; witdh counter
+	inc hl ;;
 	
 	pop	af
 	push	af
@@ -198,43 +190,39 @@
 
 .noblocka
 
-	inc	l
+	;pop hl
+	;inc	l
+	inc de
+
 	pop	af
-        pop	bc		;Restore data
-        djnz    oloopa
-        ret
+	pop	bc		;Restore data
+	djnz	oloopa
+	ret
 
 
 
-
+;--------------------------------------
 .door
 	ld	a,(ix+0)	; Width
 	ld	b,(ix+1)	; Height
-.oloopo	push	bc		;Save # of rows
+.oloopo
+	push	bc		;Save # of rows
 	push	af
+
+	ld		hl,(oldx)	;;
 
 	;ld	b,a		;Load width
 	ld	b,0		; Better, start from zero !!
 
 	ld	c,(ix+2)	;Load one line of image
 
-.iloopo	sla	c		;Test leftmost pixel
+.iloopo
+	sla	c		;Test leftmost pixel
 	jr	nc,noploto	;See if a plot is needed
-
-	pop	af
-	push	af
 
 	push	hl
 	push	bc
 	push	de
-	ld	a,h
-	add	a,b
-	ld	h,a
-
-	ld	e,l
-	ld	d,0
-	ld	l,h
-	ld	h,d
 	call	w_plotpixel
 	pop	de
 	pop	bc
@@ -243,6 +231,7 @@
 .noploto
 
 	inc	b	; witdh counter
+	inc hl ;;
 	
 	pop	af
 	push	af
@@ -273,10 +262,17 @@
 
 .noblocko
 
-	;djnz	iloopo
-	inc	l
+	;pop hl
+	;inc	l
+	inc de
+	
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopo
 	ret
+
+
+	SECTION  bss_clib
+.oldx
+         defw   0
 
