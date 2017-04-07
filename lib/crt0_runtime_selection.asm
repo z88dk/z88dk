@@ -167,9 +167,7 @@ ELSE
 	    IF DEFINED_complexstdio
                 defc CLIB_OPT_PRINTF = 0x851BF7BF
             ELSE
-                IF DEFINED_complexstdio
-		    defc CLIB_OPT_PRINTF = 0x801BF7BF
-                ENDIF
+	        defc CLIB_OPT_PRINTF = 0x801BF7BF
             ENDIF
         ENDIF
 ENDIF
@@ -182,6 +180,7 @@ ENDIF
 
 IF NEED_printf
 	PUBLIC	__printf_format_table
+	PUBLIC  __printf_format_table64
 	EXTERN	__printf_handle_d
 	EXTERN	__printf_handle_u
 	EXTERN	__printf_handle_o
@@ -273,7 +272,6 @@ IF CLIB_OPT_PRINTF2
 ENDIF
 	defb	0	;end marker
 
-IF CLIB_OPT_PRINTF2
 __printf_format_table64:
 
 IF CLIB_OPT_PRINTF2 & $02
@@ -304,7 +302,6 @@ IF CLIB_OPT_PRINTF & $100
 	defw	__printf_handle_llB
 ENDIF
 	defb	0	;endmarker
-ENDIF
 
 
 
