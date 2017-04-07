@@ -52,6 +52,7 @@ section code_nirvanam
 section code_nirvanap
 section code_PSGlib
 section code_setjmp
+section code_SMSlib
 section code_sound_bit
 section code_stdio
 section code_stdlib

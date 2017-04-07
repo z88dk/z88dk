@@ -35,11 +35,11 @@ IF __CRTCFG = 0
    defc TAR__crt_enable_streams        = 0
    
    defc TAR__crt_enable_commandline    = 0
-   defc TAR__crt_enable_restart        = 1
+   defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
    
    defc TAR__crt_enable_eidi           = 0x12
-   defc TAR__crt_on_exit               = 0x10001
+   defc TAR__crt_on_exit               = 0x0000
    
    defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0

@@ -1,0 +1,10 @@
+IF __SMSLIB_ISRST_SMSCRT0RST18 = 0
+
+   EXTERN _SMS_crt0_RST18
+   call   _SMS_crt0_RST18
+
+ELSE
+
+   rst 0x18
+
+ENDIF

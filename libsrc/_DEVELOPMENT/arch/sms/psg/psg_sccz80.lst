@@ -1,0 +1,2 @@
+@arch/sms/psg/psg_asm.lst
+arch/sms/psg/c/sccz80/sms_psg_silence

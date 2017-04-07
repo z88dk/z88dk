@@ -10,7 +10,7 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_PlayNoRepeat
 
-EXTERN asm_PSGlib_Play, _PSGLoopFlag
+EXTERN asm_PSGlib_Play, __PSGlib_LoopFlag
 
 asm_PSGlib_PlayNoRepeat:
 
@@ -24,6 +24,6 @@ asm_PSGlib_PlayNoRepeat:
    call asm_PSGlib_Play
 
    xor a
-   ld (_PSGLoopFlag),a
+   ld (__PSGlib_LoopFlag),a
    
    ret

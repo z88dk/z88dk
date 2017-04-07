@@ -62,5 +62,5 @@
 						call px8_conout	; x (msb)
 						pop hl
 						ld c,l
-						call px8_conout	; x (lsb)
+						jp px8_conout	; x (lsb)
 

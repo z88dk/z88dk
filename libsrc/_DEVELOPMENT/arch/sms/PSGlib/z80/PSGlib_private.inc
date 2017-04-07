@@ -1,4 +1,4 @@
-EXTERN __IO_PSG
+INCLUDE "config_private.inc"
 
 defc PSGPort       = __IO_PSG
 defc PSGDataPort   = __IO_PSG
@@ -17,11 +17,9 @@ defc PSGSubString  = 0x08
 defc PSGLoop       = 0x01
 defc PSGEnd        = 0x00
 
-; keep consistent with c header
+defc PSG_STOPPED   = __PSGLIB_PSG_STOPPED
+defc PSG_PLAYING   = __PSGLIB_PSG_PLAYING
 
-defc PSG_STOPPED   = 0
-defc PSG_PLAYING   = 1
-
-defc SFX_CHANNEL2     = 0x01
-defc SFX_CHANNEL3     = 0x02
-defc SFX_CHANNEL2AND3 = 0x03
+defc SFX_CHANNEL2     = __PSGLIB_SFX_CHANNEL2
+defc SFX_CHANNEL3     = __PSGLIB_SFX_CHANNEL3
+defc SFX_CHANNEL2AND3 = __PSGLIB_SFX_CHANNELS2AND3

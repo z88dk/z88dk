@@ -9,7 +9,7 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_SFXGetStatus
 
-EXTERN _PSGSFXStatus
+EXTERN __PSGlib_SFXStatus
 
 asm_PSGlib_SFXGetStatus:
 
@@ -20,5 +20,5 @@ asm_PSGlib_SFXGetStatus:
    ;
    ; uses  : hl
 
-   ld hl,(_PSGSFXStatus)
+   ld hl,(__PSGlib_SFXStatus)
    ret

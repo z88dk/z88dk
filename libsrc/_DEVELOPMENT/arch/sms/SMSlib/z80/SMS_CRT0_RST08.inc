@@ -1,0 +1,10 @@
+IF __SMSLIB_ISRST_SMSCRT0RST08 = 0
+
+   EXTERN _SMS_crt0_RST08
+   call   _SMS_crt0_RST08
+
+ELSE
+
+   rst 0x08
+
+ENDIF

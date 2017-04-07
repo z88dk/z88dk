@@ -1,0 +1,10 @@
+; void SMS_loadBGPaletteHalfBrightness(void *palette)
+
+SECTION code_clib
+SECTION code_SMSlib
+
+PUBLIC _SMS_loadBGPaletteHalfBrightness_fastcall
+
+EXTERN asm_SMSlib_loadBGPaletteHalfBrightness
+
+defc _SMS_loadBGPaletteHalfBrightness_fastcall = asm_SMSlib_loadBGPaletteHalfBrightness

@@ -3,10 +3,7 @@
         SECTION code_clib
         PUBLIC    w_xorpixel
 
-        EXTERN     l_cmp
-
-        EXTERN    __gfx_coords
-        EXTERN    px8_conout
+        EXTERN     w_plotpixel
 
 ;
 ;       $Id: w_xorpixl.asm, Stefano - 2017 $
@@ -29,38 +26,4 @@
 ;  afbcdehl/.... different
 ;
 .w_xorpixel
-                        push    hl
-                        ld      hl,maxy
-                        call    l_cmp
-                        pop     hl
-                        ret     nc               ; Return if Y overflows
-
-                        push    de
-                        ld      de,maxx
-                        call    l_cmp
-                        pop     de
-                        ret     c               ; Return if X overflows
-                        
-                        ld      (__gfx_coords),hl     ; store X
-                        ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
-                        push	hl
-						push	de
-						
-						ld	c,27		; ESCape
-						call px8_conout
-						
-						ld	c,0xc7		; PSET/PRESET
-						call px8_conout
-						ld	c,0		; XOR not available  :(
-						call px8_conout
-						pop de
-						ld c,e
-						call px8_conout	; y
-						pop hl
-						push hl
-						ld c,h
-						call px8_conout	; x (msb)
-						pop hl
-						ld c,l
-						call px8_conout	; x (lsb)
-
+					jp w_plotpixel

@@ -1,0 +1,10 @@
+; void SMS_useFirstHalfTilesforSprites(_Bool usefirsthalf)
+
+SECTION code_clib
+SECTION code_SMSlib
+
+PUBLIC _SMS_useFirstHalfTilesforSprites_fastcall
+
+EXTERN asm_SMSlib_useFirstHalfTilesforSprites
+
+defc _SMS_useFirstHalfTilesforSprites_fastcall = asm_SMSlib_useFirstHalfTilesforSprites

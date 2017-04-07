@@ -10,12 +10,12 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_RestoreVolumes
 
-EXTERN _PSGMusicStatus, _PSGChannel2SFX, _PSGChannel3SFX
+EXTERN __PSGlib_MusicStatus, __PSGlib_Channel2SFX, __PSGlib_Channel3SFX
 
-EXTERN _PSGMusicVolumeAttenuation
-EXTERN _PSGChan0Volume, _PSGChan1Volume, _PSGChan2Volume, _PSGChan3Volume
+EXTERN __PSGlib_MusicVolumeAttenuation
+EXTERN __PSGlib_Chan0Volume, __PSGlib_Chan1Volume, __PSGlib_Chan2Volume, __PSGlib_Chan3Volume
 
-EXTERN _PSGSFXChan2Volume, _PSGSFXChan3Volume
+EXTERN __PSGlib_SFXChan2Volume, __PSGlib_SFXChan3Volume
 
 asm_PSGlib_RestoreVolumes:
 
@@ -24,18 +24,18 @@ asm_PSGlib_RestoreVolumes:
    ;
    ; uses  : af, hl
 
-   ld a,(_PSGMusicStatus)
+   ld a,(__PSGlib_MusicStatus)
 	
-	ld hl,(_PSGMusicVolumeAttenuation)
+	ld hl,(__PSGlib_MusicVolumeAttenuation)
 	ld h,a
 	
-	; h = _PSGMusicStatus
-	; l = _PSGMusicVolumeAttenuation
+	; h = __PSGlib_MusicStatus
+	; l = __PSGlib_MusicVolumeAttenuation
 	
 	or a
 	jr z, skipchan01
 
-   ld a,(_PSGChan0Volume)
+   ld a,(__PSGlib_Chan0Volume)
 
    add a,l
    cp 16
@@ -48,7 +48,7 @@ outchan0:
    or PSGLatch|PSGChannel0|PSGVolumeData
    out (PSGPort),a
 	
-	ld a,(_PSGChan1Volume)
+	ld a,(__PSGlib_Chan1Volume)
    
    add a,l
    cp 16
@@ -63,17 +63,17 @@ outchan1:
 
 skipchan01:
 
-   ld a,(_PSGChannel2SFX)
+   ld a,(__PSGlib_Channel2SFX)
    or a
 	
-	ld a,(_PSGSFXChan2Volume)
+	ld a,(__PSGlib_SFXChan2Volume)
 	jr nz, outchan2
 	
 	inc h
 	dec h
 	jr z, skipchan2
 	
-	ld a,(_PSGChan2Volume)
+	ld a,(__PSGlib_Chan2Volume)
    
    add a,l
    cp 16
@@ -88,17 +88,17 @@ outchan2:
 
 skipchan2:
 
-   ld a,(_PSGChannel3SFX)
+   ld a,(__PSGlib_Channel3SFX)
    or a
    
-   ld a,(_PSGSFXChan3Volume)
+   ld a,(__PSGlib_SFXChan3Volume)
    jr nz, outchan3
    
 	inc h
 	dec h
 	ret z
 	
-   ld a,(_PSGChan3Volume)
+   ld a,(__PSGlib_Chan3Volume)
    
    add a,l
    cp 16

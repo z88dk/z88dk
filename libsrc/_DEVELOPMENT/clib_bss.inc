@@ -9,6 +9,7 @@ section bss_error
 section bss_fcntl
 section bss_input
 section bss_PSGlib
+section bss_SMSlib
 section bss_sound_bit
 section bss_stdio
 section bss_stdlib

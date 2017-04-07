@@ -10,8 +10,10 @@
    defs 0x0008 - ASMPC
 
    PUBLIC _SMS_crt0_RST08
+   PUBLIC __RST08_SMS_crt0_RST08
 
 _SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
+__RST08_SMS_crt0_RST08:
 
    ld c,0xbf                   ; set VDP Control Port
    di                          ; make it interrupt SAFE
@@ -27,8 +29,10 @@ _SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
    defs 0x0018 - ASMPC
 
    PUBLIC _SMS_crt0_RST18
+   PUBLIC __RST18_SMS_crt0_RST18
 
 _SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
+__RST18_SMS_crt0_RST18:
 
    ld a,l                      ; (respecting VRAM time costraints)
    out (0xbe),a                ; 11
@@ -133,10 +137,17 @@ IF (__crt_enable_rst & $80)
    jp _z80_rst_38h
 
 ELSE
+IF (__SMSLIB_ENABLE_MDPAD = 0)
 
-   EXTERN _SMS_isr
-   jp _SMS_isr
+   EXTERN asm_SMSlib_isr
+   jp     asm_SMSlib_isr
 
+ELSE
+
+   EXTERN asm_SMSlib_isr_mdpad
+   jp     asm_SMSlib_isr_mdpad
+
+ENDIF
 ENDIF
 
    PUBLIC l_setmem_hl
@@ -181,16 +192,20 @@ l_setmem_hl:
 
    ret
 
-PUBLIC error_lznc
-
-   EXTERN error_znc
+PUBLIC error_mc
 
    pop hl
+   pop hl
+   pop hl
 
-error_lznc:
+error_mc:
+
+   ; set hl = -1
+   ; set carry flag
    
-   ld de,0
-   jp error_znc
+   ld hl,-1
+   scf
+   ret
 
 ; address = 0x0066
 
@@ -203,7 +218,7 @@ IF __crt_enable_nmi
 
 ELSE
 
-   EXTERN _SMS_nmi_isr
-   jp _SMS_nmi_isr
+   EXTERN asm_SMSlib_nmi_isr
+   jp     asm_SMSlib_nmi_isr
 
 ENDIF

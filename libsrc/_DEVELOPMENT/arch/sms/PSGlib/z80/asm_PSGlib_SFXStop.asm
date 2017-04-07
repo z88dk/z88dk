@@ -10,10 +10,10 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_SFXStop
 
-EXTERN _PSGSFXStatus, _PSGChannel2SFX, _PSGChannel3SFX
+EXTERN __PSGlib_SFXStatus, __PSGlib_Channel2SFX, __PSGlib_Channel3SFX
 
-EXTERN _PSGMusicStatus, _PSGMusicVolumeAttenuation, _PSGChan2Volume, _PSGChan3Volume
-EXTERN _PSGChan2LowTone, _PSGChan2HighTone, _PSGChan3LowTone
+EXTERN __PSGlib_MusicStatus, __PSGlib_MusicVolumeAttenuation, __PSGlib_Chan2Volume, __PSGlib_Chan3Volume
+EXTERN __PSGlib_Chan2LowTone, __PSGlib_Chan2HighTone, __PSGlib_Chan3LowTone
 
 asm_PSGlib_SFXStop:
 
@@ -22,18 +22,18 @@ asm_PSGlib_SFXStop:
    ;
    ; uses : af, hl
    
-   ld a,(_PSGSFXStatus)
+   ld a,(__PSGlib_SFXStatus)
    or a
    ret z
    
-   ld hl,(_PSGMusicVolumeAttenuation)
-   ld a,(_PSGMusicStatus)
+   ld hl,(__PSGlib_MusicVolumeAttenuation)
+   ld a,(__PSGlib_MusicStatus)
    ld h,a
    
-   ; l = _PSGMusicVolumeAttenuation
-   ; h = _PSGMusicStatus
+   ; l = __PSGlib_MusicVolumeAttenuation
+   ; h = __PSGlib_MusicStatus
    
-   ld a,(_PSGChannel2SFX)
+   ld a,(__PSGlib_Channel2SFX)
    or a
    jr z, skipchan2
 
@@ -41,16 +41,16 @@ asm_PSGlib_SFXStop:
    dec h
    jr z, silchan2
    
-   ld a,(_PSGChan2LowTone)
+   ld a,(__PSGlib_Chan2LowTone)
    and 0x0f
    or PSGLatch|PSGChannel2
    out (PSGPort),a
    
-   ld a,(_PSGChan2HighTone)
+   ld a,(__PSGlib_Chan2HighTone)
    and 0x3f
    out (PSGPort),a
    
-   ld a,(_PSGChan2Volume)
+   ld a,(__PSGlib_Chan2Volume)
    
    add a,l
    cp 16
@@ -67,11 +67,11 @@ outchan2:
    out (PSGPort),a
 
    ld a,PSG_STOPPED
-   ld (_PSGChannel2SFX),a
+   ld (__PSGlib_Channel2SFX),a
    
 skipchan2:
 
-   ld a,(_PSGChannel3SFX)
+   ld a,(__PSGlib_Channel3SFX)
    or a
    jr z, skipchan3
 
@@ -79,12 +79,12 @@ skipchan2:
    dec h
    jr z, silchan3
 
-   ld a,(_PSGChan3LowTone)
+   ld a,(__PSGlib_Chan3LowTone)
    and 0x0f
    or PSGLatch|PSGChannel3
    out (PSGPort),a
    
-   ld a,(_PSGChan3Volume)
+   ld a,(__PSGlib_Chan3Volume)
    
    add a,l
    cp 16
@@ -101,11 +101,11 @@ outchan3:
    out (PSGPort),a
 
    ld a,PSG_STOPPED
-   ld (_PSGChannel3SFX),a
+   ld (__PSGlib_Channel3SFX),a
    
 skipchan3:
 
    ld a,PSG_STOPPED
-   ld (_PSGSFXStatus),a
+   ld (__PSGlib_SFXStatus),a
    
    ret

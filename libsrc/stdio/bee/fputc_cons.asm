@@ -27,9 +27,21 @@ ELSE
 	cp  13
 ENDIF
 	jr nz,nocr
-	ld  b,13
-	call $800C
-	ld  a,10
 .nocr
+
+
+IF STANDARDESCAPECHARS
+        cp      10      ; LF ?
+        jr      nz,nocrlf
+		ld  b,a
+		call nocrlf
+        ld      a,13
+ELSE
+		cp      13      ; CR ?
+		jr      nz,nocrlf
+		call nocrlf
+		ld  a,10
+ENDIF
+.nocrlf
 	ld  b,a
 	jp	$800C

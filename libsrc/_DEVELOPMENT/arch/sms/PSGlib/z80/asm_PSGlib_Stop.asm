@@ -10,7 +10,7 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_Stop
 
-EXTERN _PSGMusicStatus, _PSGChannel2SFX, _PSGChannel3SFX
+EXTERN __PSGlib_MusicStatus, __PSGlib_Channel2SFX, __PSGlib_Channel3SFX
 
 asm_PSGlib_Stop:
 
@@ -19,7 +19,7 @@ asm_PSGlib_Stop:
    ;
    ; uses  : af
    
-   ld a,(_PSGMusicStatus)
+   ld a,(__PSGlib_MusicStatus)
    or a
    ret z
    
@@ -29,7 +29,7 @@ asm_PSGlib_Stop:
    ld a,PSGLatch|PSGChannel1|PSGVolumeData|0x0f    ; // latch channel 1, volume=0xF (silent)
    out (PSGPort),a
 
-   ld a,(_PSGChannel2SFX)
+   ld a,(__PSGlib_Channel2SFX)
    
    or a
    jr z, skip00
@@ -39,7 +39,7 @@ asm_PSGlib_Stop:
 
 skip00:
 
-   ld a,(_PSGChannel3SFX)
+   ld a,(__PSGlib_Channel3SFX)
    
    or a
    jr z, skip01
@@ -50,6 +50,6 @@ skip00:
 skip01:
 
    ld a,PSG_STOPPED
-   ld (_PSGMusicStatus),a
+   ld (__PSGlib_MusicStatus),a
    
    ret

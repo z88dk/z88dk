@@ -20,7 +20,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
 	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
-	pc6001_clib.lib pps_clib.lib px4.lib \
+	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
@@ -754,7 +754,7 @@ abc80_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
+	$(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
 
 # ABC800 library - Stefano
 abc800_clib.lib:
@@ -785,7 +785,7 @@ ace_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C ace 
 	$(MAKE) -C games lace
-	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	$(LIBLINKER) -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
@@ -802,7 +802,7 @@ aquarius_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C psg
 	$(MAKE) -C games laquarius 
-	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	$(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:
