@@ -5,7 +5,7 @@
 ; modified for sms vram by aralbrec
 ; ===============================================================
 ; 
-; void *dzx7_standard_vram(void *src, void *dst)
+; unsigned int sms_dzx7_standard_vram(void *src, unsigned int dst)
 ;
 ; Decompress the compressed block at address src to address dst.
 ; VRAM addresses are assumed to be stable.
@@ -24,15 +24,15 @@ EXTERN asm_sms_set_vram_write_de, asm_sms_ldir_vram_to_vram, l_ret
 asm_dzx7_standard_vram:
 
    ; enter : hl = void *src
-   ;         de = void *dst in vram
+   ;         de = unsigned int dst in vram
    ;
-   ; exit  : hl = & following uncompressed block
+   ; exit  : hl = & following uncompressed block in vram
    ;
    ; uses  : af, bc, de, hl, af'
 
         call asm_sms_set_vram_write_de
         
-        ld c,$be
+        ld c,__IO_VDP_DATA
         ld a,$80
         
 dzx7s_copy_byte_loop:
@@ -76,7 +76,7 @@ dzx7s_len_value_loop:
         ld      e, (hl)                 ; load offset flag (1 bit) + offset value (7 bits)
         inc     hl
 
-IF __z80_cpu_info & $02
+IF __CPU_INFO & $01
 
         defb $cb, $33                   ; opcode for undocumented instruction "SLL E" aka "SLS E"
 
@@ -114,7 +114,7 @@ dzx7s_offset_end:
 ;;dzx7s_exit:
 
         call asm_sms_set_vram_write_de
-        ld c,$be
+        ld c,__IO_VDP_DATA
 
         pop     hl                      ; restore source address (compressed data)
         jr      dzx7s_main_loop

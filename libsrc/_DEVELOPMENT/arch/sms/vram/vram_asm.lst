@@ -1,5 +1,4 @@
 arch/sms/vram/z80/asm_sms_aplib_depack_vram
-arch/sms/vram/z80/asm_sms_dzx7_standard_vram
 arch/sms/vram/z80/asm_sms_ldir_mem_to_vram
 arch/sms/vram/z80/asm_sms_ldir_mem_to_vram_unsafe
 arch/sms/vram/z80/asm_sms_ldir_vram_to_mem
@@ -8,3 +7,4 @@ arch/sms/vram/z80/asm_sms_ldir_vram_to_vram
 arch/sms/vram/z80/asm_sms_ldir_vram_to_vram_unsafe
 arch/sms/vram/z80/asm_sms_set_vram_read_hl
 arch/sms/vram/z80/asm_sms_set_vram_write_de
+compress/zx7/z80/asm_sms_dzx7_standard_vram

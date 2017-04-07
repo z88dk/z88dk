@@ -2,4 +2,4 @@
 @arch/sms/PSGlib/PSGlib_sdcc.lst
 @arch/sms/registers/registers_asm.lst
 @arch/sms/SMSlib/SMSlib_sdcc.lst
-@arch/sms/vram/vram_asm.lst
+@arch/sms/vram/vram_sdcc.lst
