@@ -1,4 +1,7 @@
 l/z80/l_bitset_locate
+l/z80/l_call_hl
+l/z80/l_call_ix
+l/z80/l_call_iy
 l/z80/l_command_line_parse
 l/z80/l_command_line_parse_in_place
 l/z80/l_compare_de_hl
