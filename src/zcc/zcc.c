@@ -196,6 +196,7 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_nostdlib = 0;
 static int             mz180 = 0;
+static int             mr2k = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
@@ -406,6 +407,7 @@ static arg_t     myargs[] = {
 	{ "asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)" },
 	{ "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
+	{ "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2/3000 cpu" },
 	{ "crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
 	{ "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
 	{ "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
@@ -1062,6 +1064,11 @@ int main(int argc, char **argv)
 			if (m4only || clangonly || llvmonly || preprocessonly) continue;
 			if (compiler_type == CC_SDCC)
 			{
+				char *before_cpuext = ".asm";
+
+				if ( c_coptrules_cpu ) {
+					before_cpuext = ".opc";
+				}
 				/* sdcc_opt.9 implements bugfixes and code size reduction and should be applied to every sdcc compile */
 				switch (peepholeopt)
 				{
@@ -1073,7 +1080,9 @@ int main(int argc, char **argv)
 				case 1:
 					if (process(".opt", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
 						exit(1);
-					if (process(".op1", ".asm", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
+					if (process(".op1", before_cpuext, c_copt_exe, c_sdccopt9, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
 						exit(1);
 					break;
 				default:
@@ -1081,7 +1090,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op1", ".op2", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
 						exit(1);
-					if (process(".op2", ".asm", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+					if (process(".op2", before_cpuext, c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
 						exit(1);
 					break;
 				}
@@ -2267,7 +2278,7 @@ static void configure_compiler()
 	if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
 		compiler_type = CC_SDCC;
 		snprintf(buf, sizeof(buf), "%s --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
-            (mz180 ? "-mz180 -portmode=z180" : "-mz80"), \
+            (mz180 ? "-mz180 -portmode=z180" : ( mr2k ? "-mr2k" : "-mz80")), \
             (sdcc_signed_char ? "--fsigned-char" : ""), \
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
             (opt_code_size ? "--opt-code-size" : ""));
