@@ -1,0 +1,5 @@
+main.c
+assets_sms/common.c
+@game/game.lst
+@s8/s8.lst
+@screens/screens.lst

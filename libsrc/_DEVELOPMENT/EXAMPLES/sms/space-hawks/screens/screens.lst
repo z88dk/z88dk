@@ -1,0 +1,10 @@
+_screen_basic.c
+screen_game.c
+screen_gameover.c
+screen_hiscore.c
+screen_name.c
+screen_select.c
+screen_spritesmind.c
+screen_title.c
+screen_win.c
+screenManager.c
