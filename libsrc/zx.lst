@@ -1,5 +1,5 @@
 @input/spectrum.lst
-@stdio/stdio.lst
+@stdio/stdio_stdesc.lst
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fputc_cons
 stdio/spectrum/getk

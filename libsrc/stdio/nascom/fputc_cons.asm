@@ -36,9 +36,11 @@ ENDIF
 .nassys
 ; NASSYS monitor
 	pop	af
-	cp	12
-	jr	nz,nocls
-	ld	a,0ch
-.nocls
+IF STANDARDESCAPECHARS
+	cp	10
+	jr	nz,prt_nassys
+	ld	a,13
+ENDIF
+.prt_nassys
 	defb	0f7h
 	ret
