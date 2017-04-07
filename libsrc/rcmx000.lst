@@ -21,7 +21,7 @@ stdio_new/general/stdio_basechar
 stdio_new/general/stdio_atou
 stdio_new/general/stdio_ultoa_any
 stdio_new/general/stdio_utoa_any
-@regex/regex.lst
+@regex/regex_r2k.lst
 stdio/ansi/ansifont_f3
 stdio/ansi/ansifont_f4
 stdio/ansi/ansifont_f4pack
