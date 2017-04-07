@@ -785,7 +785,7 @@ ace_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C ace 
 	$(MAKE) -C games lace
-	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	$(LIBLINKER) -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
@@ -802,7 +802,7 @@ aquarius_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C psg
 	$(MAKE) -C games laquarius 
-	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	$(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:
