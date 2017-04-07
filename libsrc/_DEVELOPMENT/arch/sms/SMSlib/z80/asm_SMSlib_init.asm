@@ -3,7 +3,7 @@
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
 
-defc NONEED = 1
+defc __NONEED = 1
 INCLUDE "SMSlib_private.inc"
 
 SECTION code_clib

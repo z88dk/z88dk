@@ -85,14 +85,14 @@ extern void __LIB__ __FASTCALL__ SMS_setSpriteMode(unsigned char mode);
 
 /** MACRO FOR ROM BANKSWITCHING */
 
-extern unsigned char MM_FFFF;
+extern volatile unsigned char MM_FFFF;
 
 #define ROM_bank_to_be_mapped_on_slot2   MM_FFFF
 #define SMS_mapROMBank(n)                (MM_FFFF=(n))
 
 /** MACRO FOR SRAM ACCESS */
 
-extern unsigned char MM_FFFC;
+extern volatile unsigned char MM_FFFC;
 
 #define SRAM_bank_to_be_mapped_on_slot2  MM_FFFC
 #define SMS_enableSRAM()                 (MM_FFFC=0x08)
@@ -335,6 +335,8 @@ extern unsigned int __LIB__ SMS_getKeysReleased(void) __smallc;
 
 #endif
 
+#if MD_PAD_SUPPORT
+
 // functions to read additional MD buttons
 
 extern unsigned int __LIB__ SMS_getMDKeysStatus(void) __smallc;
@@ -361,6 +363,8 @@ extern unsigned int __LIB__ SMS_getMDKeysReleased(void) __smallc;
 
 // port B is still missing
 
+#endif
+
 /** SMS - PAUSE HANDLING */
 
 extern unsigned char __LIB__ SMS_queryPauseRequested(void) __smallc;
@@ -372,7 +376,7 @@ extern void __LIB__ SMS_resetPauseRequest(void) __smallc;
 
 /** SMS - VDPType HANDLING */
 
-extern void __LIB__ SMS_VDPType(void) __smallc;
+extern unsigned char __LIB__ SMS_VDPType(void) __smallc;
 
 
 
@@ -383,7 +387,7 @@ extern void __LIB__ SMS_VDPType(void) __smallc;
 
 /** VDP FLAGS*/
 
-extern unsigned char _SMSlib_VDPFlags;
+extern volatile unsigned char _SMSlib_VDPFlags;
 #define SMS_VDPFlags _SMSlib_VDPFlags
 
 #define VDPFLAG_SPRITEOVERFLOW  __SMSLIB_VDPFLAG_SPRITEOVERFLOW

@@ -67,14 +67,14 @@ __DPROTO(`b,iyl,iyh',`b,iyl,iyh',void,,SMS_setSpriteMode,unsigned char mode)
 
 /** MACRO FOR ROM BANKSWITCHING */
 
-extern unsigned char MM_FFFF;
+extern volatile unsigned char MM_FFFF;
 
 #define ROM_bank_to_be_mapped_on_slot2   MM_FFFF
 #define SMS_mapROMBank(n)                (MM_FFFF=(n))
 
 /** MACRO FOR SRAM ACCESS */
 
-extern unsigned char MM_FFFC;
+extern volatile unsigned char MM_FFFC;
 
 #define SRAM_bank_to_be_mapped_on_slot2  MM_FFFC
 #define SMS_enableSRAM()                 (MM_FFFC=0x08)
@@ -171,7 +171,7 @@ __DPROTO(`a,b,c,iyl,iyh',`b,c,iyl,iyh',void,,SMS_setClippingWindow,unsigned char
 // returns -1 if no more sprites are available or sprite clipped
 __DPROTO(`iyl,iyh',`iyl,iyh',signed char,,SMS_addSpriteClipping,int x,int y, unsigned char tile)
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,SMS_finalizeSprites,void)
-__OPROTO(`c,d,e,iyl,iyh',`c,d,e,iyl,iyh',void,,SMS_copySpritestoSAT,void)
+__OPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,SMS_copySpritestoSAT,void)
 
 /** COLORS / PALETTE HANDLING */
 
@@ -237,6 +237,8 @@ __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getKeysReleased,v
 
 #endif
 
+#if MD_PAD_SUPPORT
+
 // functions to read additional MD buttons
 
 __OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',unsigned int,,SMS_getMDKeysStatus,void)
@@ -255,6 +257,8 @@ __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,SMS_getMDKeysReleased
 
 // port B is still missing
 
+#endif
+
 /** SMS - PAUSE HANDLING */
 
 __OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',unsigned char,,SMS_queryPauseRequested,void)
@@ -262,7 +266,7 @@ __OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,SMS_resetPauseRequest
 
 /** SMS - VDPType HANDLING */
 
-__OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',void,,SMS_VDPType,void)
+__OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',unsigned char,,SMS_VDPType,void)
 
 // WARNING: these constants may change value later, please use defines
 
@@ -271,7 +275,7 @@ __OPROTO(`a,b,c,d,e,iyl,iyh',`a,b,c,d,e,iyl,iyh',void,,SMS_VDPType,void)
 
 /** VDP FLAGS*/
 
-extern unsigned char _SMSlib_VDPFlags;
+extern volatile unsigned char _SMSlib_VDPFlags;
 #define SMS_VDPFlags _SMSlib_VDPFlags
 
 #define VDPFLAG_SPRITEOVERFLOW  __SMSLIB_VDPFLAG_SPRITEOVERFLOW

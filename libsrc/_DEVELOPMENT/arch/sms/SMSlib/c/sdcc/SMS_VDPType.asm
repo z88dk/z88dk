@@ -1,4 +1,4 @@
-; void SMS_VDPType(void)
+; unsigned char SMS_VDPType(void)
 
 SECTION code_clib
 SECTION code_SMSlib

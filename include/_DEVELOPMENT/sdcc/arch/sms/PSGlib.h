@@ -34,7 +34,7 @@ extern void PSGPlayNoRepeat_fastcall(void *song) __preserves_regs(b,c,d,e,h,l,iy
 
 extern void PSGStop(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
-extern unsigned char PSGGetStatus(void) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char PSGGetStatus(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
 
 extern void PSGSetMusicVolumeAttenuation(unsigned char attenuation) __preserves_regs(b,c,d,e,iyl,iyh);
 extern void PSGSetMusicVolumeAttenuation_fastcall(unsigned char attenuation) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
@@ -56,7 +56,7 @@ extern void PSGSFXCancelLoop(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
 extern void PSGSFXStop(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
-extern unsigned char PSGSFXGetStatus(void) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char PSGSFXGetStatus(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
 
 
 extern void PSGSilenceChannels(void) __preserves_regs(a,d,e,iyl,iyh);

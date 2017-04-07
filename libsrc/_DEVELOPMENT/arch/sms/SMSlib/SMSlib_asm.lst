@@ -35,7 +35,7 @@ arch/sms/SMSlib/z80/asm_SMSlib_loadTiles
 arch/sms/SMSlib/z80/asm_SMSlib_nmi_isr
 arch/sms/SMSlib/z80/asm_SMSlib_queryPauseRequested
 arch/sms/SMSlib/z80/asm_SMSlib_reserveSprite
-arch/sms/SMSlib/z80/asm_SMSlib_resetPauseRequested
+arch/sms/SMSlib/z80/asm_SMSlib_resetPauseRequest
 arch/sms/SMSlib/z80/asm_SMSlib_setBackdropColor
 arch/sms/SMSlib/z80/asm_SMSlib_setBGPaletteColor
 arch/sms/SMSlib/z80/asm_SMSlib_setBGScrollX
