@@ -1,4 +1,4 @@
-@stdio/stdio.lst
+@stdio/stdio_stdesc.lst
 stdio/nascom/fgetc_cons
 stdio/nascom/getk
 stdio/nascom/fputc_cons

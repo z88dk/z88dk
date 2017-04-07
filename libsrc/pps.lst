@@ -1,5 +1,5 @@
 stdio/sprinter/puts_cons
-@stdio/stdio.lst
+@stdio/stdio_stdesc.lst
 stdio/sprinter/fgetc_cons
 stdio/sprinter/fputc_cons
 stdio/sprinter/getk

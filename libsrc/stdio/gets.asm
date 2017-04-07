@@ -104,7 +104,11 @@ IF EMULATECURSOR
 ENDIF
 	xor	a
 	ld	(hl),a
+IF STANDARDESCAPECHARS
+	ld	a,10	; end with CR
+ELSE
 	ld	a,13	; end with CR
+ENDIF
 	call conout
 	ld h,d	; set ptr to string
 	ld l,e
