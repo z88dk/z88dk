@@ -22,3 +22,4 @@ obj/r2k/%.o: %.c
 clean:
 	$(RM) *.err *.sym *.map zcc_opt.def *.i $(AFILES)
 	$(RM) $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS))
+	$(RM) -fr obj
