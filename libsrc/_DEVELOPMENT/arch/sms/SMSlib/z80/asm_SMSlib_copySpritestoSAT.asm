@@ -16,7 +16,7 @@ asm_SMSlib_copySpritestoSAT:
 
    ; void SMS_copySpritestoSAT (void)
    ;
-   ; uses : af, b, hl
+   ; uses : af, bc, hl
    
    ld hl,SMS_SATAddress
    INCLUDE "SMS_CRT0_RST08.inc"

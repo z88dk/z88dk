@@ -35,7 +35,7 @@ asm_SMSlib_addSpriteClipping:
    ;            hl = -1 (too many sprites), 0 (clipped)
    ;            carry set
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, b, de, hl
    
    ld a,(__SMSlib_SpriteNextFree)
    

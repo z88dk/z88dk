@@ -18,7 +18,7 @@ asm_SMSlib_hideSprite:
    ;
    ; enter : l = signed char sprite
    ;
-   ; uses : de, hl
+   ; uses : f, de, hl
 
    ld h,0
    

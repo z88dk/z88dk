@@ -98,14 +98,14 @@ extern void SMS_setSpriteMode_fastcall(unsigned char mode) __preserves_regs(b,iy
 
 /** MACRO FOR ROM BANKSWITCHING */
 
-extern unsigned char MM_FFFF;
+extern volatile unsigned char MM_FFFF;
 
 #define ROM_bank_to_be_mapped_on_slot2   MM_FFFF
 #define SMS_mapROMBank(n)                (MM_FFFF=(n))
 
 /** MACRO FOR SRAM ACCESS */
 
-extern unsigned char MM_FFFC;
+extern volatile unsigned char MM_FFFC;
 
 #define SRAM_bank_to_be_mapped_on_slot2  MM_FFFC
 #define SMS_enableSRAM()                 (MM_FFFC=0x08)
@@ -247,7 +247,7 @@ extern signed char SMS_addSpriteClipping_callee(int x,int y,unsigned char tile) 
 
 extern void SMS_finalizeSprites(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
-extern void SMS_copySpritestoSAT(void) __preserves_regs(c,d,e,iyl,iyh);
+extern void SMS_copySpritestoSAT(void) __preserves_regs(d,e,iyl,iyh);
 
 
 /** COLORS / PALETTE HANDLING */
@@ -348,6 +348,8 @@ extern unsigned int SMS_getKeysReleased(void) __preserves_regs(b,c,d,e,iyl,iyh);
 
 #endif
 
+#if MD_PAD_SUPPORT
+
 // functions to read additional MD buttons
 
 extern unsigned int SMS_getMDKeysStatus(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
@@ -370,6 +372,8 @@ extern unsigned int SMS_getMDKeysReleased(void) __preserves_regs(b,c,d,e,iyl,iyh
 
 // port B is still missing
 
+#endif
+
 /** SMS - PAUSE HANDLING */
 
 extern unsigned char SMS_queryPauseRequested(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
@@ -379,7 +383,7 @@ extern void SMS_resetPauseRequest(void) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
 
 /** SMS - VDPType HANDLING */
 
-extern void SMS_VDPType(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
+extern unsigned char SMS_VDPType(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
 
 
 // WARNING: these constants may change value later, please use defines
@@ -389,7 +393,7 @@ extern void SMS_VDPType(void) __preserves_regs(a,b,c,d,e,iyl,iyh);
 
 /** VDP FLAGS*/
 
-extern unsigned char _SMSlib_VDPFlags;
+extern volatile unsigned char _SMSlib_VDPFlags;
 #define SMS_VDPFlags _SMSlib_VDPFlags
 
 #define VDPFLAG_SPRITEOVERFLOW  __SMSLIB_VDPFLAG_SPRITEOVERFLOW
