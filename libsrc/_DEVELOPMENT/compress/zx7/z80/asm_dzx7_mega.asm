@@ -106,7 +106,7 @@ dzx7m_offset_start_od:
         ld      e, (hl)                 ; load offset flag (1 bit) + offset value (7 bits)
         inc     hl
         
-IF __z80_cpu_info & $02
+IF __CPU_INFO & $01
 
         defb $cb, $33                   ; opcode for undocumented instruction "SLL E" aka "SLS E"
 
@@ -232,7 +232,7 @@ dzx7m_offset_start_ev:
         ld      e, (hl)                 ; load offset flag (1 bit) + offset value (7 bits)
         inc     hl
         
-IF __z80_cpu_info & $02
+IF __CPU_INFO & $01
 
         defb $cb, $33                   ; opcode for undocumented instruction "SLL E" aka "SLS E"
 

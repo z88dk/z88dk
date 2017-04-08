@@ -1,0 +1,7 @@
+@arch/sms/compress/compress_asm.lst
+compress/aplib/c/sccz80/sms_aplib_depack_vram
+compress/aplib/c/sccz80/sms_aplib_depack_vram_callee
+compress/zx7/c/sccz80/sms_dzx7_standard_vram
+compress/zx7/c/sccz80/sms_dzx7_standard_vram_callee
+compress/zx7/c/sccz80/sms_dzx7_standard_vram_unsafe
+compress/zx7/c/sccz80/sms_dzx7_standard_vram_unsafe_callee

@@ -6,6 +6,10 @@
 ;
 ; ========================================================================
 
+; a faster method that copies more than one byte at a time should be sought
+
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_crt_common
 
@@ -27,21 +31,21 @@ asm_sms_ldir_vram_to_vram:
 loop:
 
    ld a,l
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
    ld a,h
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
     
-   in a,($be)
+   in a,(__IO_VDP_DATA)
    ex af,af'
     
    ld a,e
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
    ld a,d
    or $40
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
     
    ex af,af'
-   out ($be),a
+   out (__IO_VDP_DATA),a
     
    inc de
     

@@ -156,7 +156,7 @@ dzx7a_copy_bytes:
 
         pop     hl                      ; restore source address (compressed data)
 ;;        jr      dzx7a_main_loop1
-        jr      dzx7a_main_loop1+1
+        jp      dzx7a_main_loop1+1
 
 dzx7a_load_bits:
 

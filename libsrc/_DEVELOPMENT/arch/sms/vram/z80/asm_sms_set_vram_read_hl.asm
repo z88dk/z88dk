@@ -1,3 +1,5 @@
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_crt_common
 
@@ -10,8 +12,8 @@ asm_sms_set_vram_read_hl:
    ; uses  : af
 
    ld a,l
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
    ld a,h
-   out ($bf),a
+   out (__IO_VDP_COMMAND),a
    
    ret

@@ -15,6 +15,7 @@ include(__link__.m4)
 #define IO_GUN_SPOT_HORIZONTAL    __IO_GUN_SPOT_HORIZONTAL
 #define IO_PSG                    __IO_PSG
 #define IO_VDP_DATA               __IO_VDP_DATA
+#define IO_VDP_CONTROL            __IO_VDP_COMMAND
 #define IO_VDP_COMMAND            __IO_VDP_COMMAND
 #define IO_VDP_STATUS             __IO_VDP_STATUS
 #define IO_JOYSTICK_READ_L        __IO_JOYSTICK_READ_L
@@ -39,8 +40,9 @@ __sfr __at __IO_GUN_SPOT_VERTICAL      IO_GUN_SPOT_VERTICAL;
 __sfr __at __IO_GUN_SPOT_HORIZONTAL    IO_GUN_SPOT_HORIZONTAL;
 __sfr __at __IO_PSG                    IO_PSG;
 __sfr __at __IO_VDP_DATA               IO_VDP_DATA;
-__sfr __at __IO_VDP_COMMAND            IO_VDP_COMMAND;
-__sfr __at __IO_VDP_STATUS             IO_VDP_STATUS;
+__sfr __at __IO_VDP_COMMAND            IO_VDP_CONTROL;  // same port
+__sfr __at __IO_VDP_COMMAND            IO_VDP_COMMAND;  // same port
+__sfr __at __IO_VDP_STATUS             IO_VDP_STATUS;   // same port
 __sfr __at __IO_JOYSTICK_READ_L        IO_JOYSTICK_READ_L;
 __sfr __at __IO_JOYSTICK_READ_H        IO_JOYSTICK_READ_H;
 
@@ -81,14 +83,25 @@ extern unsigned char IO_DD;
 
 // MEMORY MAPPED REGISTERS
 
-extern unsigned char MM_FRAME2_CONTROL_REGISTER;
-extern unsigned char MM_FRAME1_CONTROL_REGISTER;
-extern unsigned char MM_FRAME0_CONTROL_REGISTER;
-extern unsigned char MM_FRAME2_RAM_CONTROL_REGISTER;
+extern volatile unsigned char MM_FRAME2_CONTROL_REGISTER;
+extern volatile unsigned char MM_FRAME1_CONTROL_REGISTER;
+extern volatile unsigned char MM_FRAME0_CONTROL_REGISTER;
+extern volatile unsigned char MM_FRAME2_RAM_CONTROL_REGISTER;
 
-extern unsigned char MM_FFFF;
-extern unsigned char MM_FFFE;
-extern unsigned char MM_FFFD;
-extern unsigned char MM_FFFC;
+extern volatile unsigned char MM_FFFF;
+extern volatile unsigned char MM_FFFE;
+extern volatile unsigned char MM_FFFD;
+extern volatile unsigned char MM_FFFC;
+
+// VRAM <-> MEMORY COPY OPERATIONS
+
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_mem_to_vram,unsigned int dst,void *src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_mem_to_vram_unsafe,unsigned int dst,void *src,unsigned int n)
+
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_mem,void *dst,unsigned int src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_mem_unsafe,void *dst,unsigned int src,unsigned int n)
+
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_vram,unsigned int dst,unsigned int src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_vram_unsafe,unsigned int dst,unsigned int src,unsigned int n)
 
 #endif

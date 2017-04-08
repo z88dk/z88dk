@@ -238,13 +238,13 @@ transfstr: defm "This is the transfer 2 ram function",0
 
 _s_ostr: defw 0
 	; Send pointer to null terminated string in hl
-_outstr:
+_OUTSTR:
 	ld a,(hl)
 	cp 0
 	ret z	
 	call __sendchar
 	inc hl
-	jr _outstr
+	jr _OUTSTR
 
 	include "rcmx000_flutil.asm"
 start_user_prog:

@@ -16,3 +16,16 @@ z80_crt0s/z80_emu/rcmx_cpi
 z80_crt0s/z80_emu/rcmx_cpir
 z80_crt0s/z80_emu/rcmx_rld
 z80_crt0s/z80_emu/rcmx_rrd
+stdio_new/error/stdio_error_zc
+stdio_new/general/stdio_basechar
+stdio_new/general/stdio_atou
+stdio_new/general/stdio_ultoa_any
+stdio_new/general/stdio_utoa_any
+@regex/regex_r2k.lst
+stdio/ansi/ansifont_f3
+stdio/ansi/ansifont_f4
+stdio/ansi/ansifont_f4pack
+stdio/ansi/ansifont_f5
+stdio/ansi/ansifont_f6
+stdio/ansi/ansifont_f8
+@compress/zx7/zx7.lst

@@ -81,7 +81,7 @@ dzx7a_len_value_start_b:
         ld      e, (hl)                 ; load offset flag (1 bit) + offset value (7 bits)
         dec     hl
 
-IF __z80_cpu_info & $02
+IF __CPU_INFO & $01
 
         defb $cb, $33                   ; opcode for undocumented instruction "SLL E" aka "SLS E"
 

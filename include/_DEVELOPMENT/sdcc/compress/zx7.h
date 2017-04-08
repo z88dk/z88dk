@@ -107,4 +107,17 @@ extern unsigned char *dzx7_agile_rcs_back_callee(void *src,void *dst) __z88dk_ca
 
 
 
+#ifdef __SMS
+extern unsigned int sms_dzx7_standard_vram(void *src,unsigned int dst);
+extern unsigned int sms_dzx7_standard_vram_callee(void *src,unsigned int dst) __z88dk_callee;
+#define sms_dzx7_standard_vram(a,b) sms_dzx7_standard_vram_callee(a,b)
+
+
+extern unsigned int sms_dzx7_standard_vram_unsafe(void *src,unsigned int dst);
+extern unsigned int sms_dzx7_standard_vram_unsafe_callee(void *src,unsigned int dst) __z88dk_callee;
+#define sms_dzx7_standard_vram_unsafe(a,b) sms_dzx7_standard_vram_unsafe_callee(a,b)
+
+
+#endif
+
 #endif

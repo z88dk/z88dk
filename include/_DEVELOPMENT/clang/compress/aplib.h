@@ -18,7 +18,7 @@
 // http://www.ibsensoftware.com/products_aPLib.html             //
 //                                                              //
 // Further information:                                         //
-// http://z88dk.cvs.sourceforge.net/viewvc/z88dk/z88dk/libsrc/_DEVELOPMENT/compress/aplib/readme.txt
+// https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/compress/aplib/readme.txt
 //                                                              //
 //////////////////////////////////////////////////////////////////
 
@@ -27,9 +27,7 @@ extern void aplib_depack(void *dst,void *src);
 
 
 #ifdef __SMS
-
-extern void sms_aplib_depack_vram(void *dst,void *src);
-
+extern void sms_aplib_depack_vram(unsigned int dst,void *src);
 
 
 #endif

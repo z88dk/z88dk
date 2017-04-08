@@ -61,6 +61,12 @@ IF FORvz
 	defc maxy	= 64
 ENDIF
 
+IF FORabc80
+	DEFINE gotgfx
+	defc maxx	= 70
+	defc maxy	= 72
+ENDIF
+
 IF FORbee
 	DEFINE gotgfx
 	defc maxx	= 160

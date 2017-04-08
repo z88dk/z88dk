@@ -1018,6 +1018,11 @@ int modstk(int newsp, int save, int saveaf)
 
     if (k == 0)
         return newsp;
+    if ( (c_cpu & CPU_RABBIT) && abs(k) > 1 && abs(k) <= 127 ) {
+        outstr("\tadd\tsp,"); outdec(k); nl();
+        return newsp;
+    }
+
 #ifdef USEFRAME
     if (c_useframepointer)
         goto modstkcht;
@@ -2792,7 +2797,7 @@ void copy_to_stack(char *label, int stack_offset,  int size)
     vconst(stack_offset);
     ol("add\thl,sp");  
     ol("ex\tde,hl");
-    outstr("\tld\thl,"); outname(label, dopref(label)); nl();
+    outstr("\tld\thl,"); outname(label, 1); nl();
     outfmt("\tld\tbc,%d\n",size);
     ol("ldir");
 }

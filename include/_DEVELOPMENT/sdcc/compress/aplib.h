@@ -18,22 +18,20 @@
 // http://www.ibsensoftware.com/products_aPLib.html             //
 //                                                              //
 // Further information:                                         //
-// http://z88dk.cvs.sourceforge.net/viewvc/z88dk/z88dk/libsrc/_DEVELOPMENT/compress/aplib/readme.txt
+// https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/compress/aplib/readme.txt
 //                                                              //
 //////////////////////////////////////////////////////////////////
 
-extern void aplib_depack(void *dst,void *src);
-extern void aplib_depack_callee(void *dst,void *src) __z88dk_callee;
+extern void aplib_depack(void *dst,void *src) __preserves_regs(iyl,iyh);
+extern void aplib_depack_callee(void *dst,void *src) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define aplib_depack(a,b) aplib_depack_callee(a,b)
 
 
 
 #ifdef __SMS
-
-extern void sms_aplib_depack_vram(void *dst,void *src);
-extern void sms_aplib_depack_vram_callee(void *dst,void *src) __z88dk_callee;
+extern void sms_aplib_depack_vram(unsigned int dst,void *src) __preserves_regs(iyl,iyh);
+extern void sms_aplib_depack_vram_callee(unsigned int dst,void *src) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define sms_aplib_depack_vram(a,b) sms_aplib_depack_vram_callee(a,b)
-
 
 
 #endif
