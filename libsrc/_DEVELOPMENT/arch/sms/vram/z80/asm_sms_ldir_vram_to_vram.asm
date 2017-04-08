@@ -6,6 +6,8 @@
 ;
 ; ========================================================================
 
+; a faster method that copies more than one byte at a time should be sought
+
 INCLUDE "config_private.inc"
 
 SECTION code_clib

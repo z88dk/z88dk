@@ -113,6 +113,11 @@ extern unsigned int __LIB__ __CALLEE__ sms_dzx7_standard_vram_callee(void *src,u
 #define sms_dzx7_standard_vram(a,b) sms_dzx7_standard_vram_callee(a,b)
 
 
+extern unsigned int __LIB__ sms_dzx7_standard_vram_unsafe(void *src,unsigned int dst) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_dzx7_standard_vram_unsafe_callee(void *src,unsigned int dst) __smallc;
+#define sms_dzx7_standard_vram_unsafe(a,b) sms_dzx7_standard_vram_unsafe_callee(a,b)
+
+
 #endif
 
 #endif

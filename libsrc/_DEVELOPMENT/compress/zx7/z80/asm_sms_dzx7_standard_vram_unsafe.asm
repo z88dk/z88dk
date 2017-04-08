@@ -10,6 +10,10 @@
 ; Decompress the compressed block at memory address src to vram
 ; address dst.  VRAM addresses are assumed to be stable.
 ;
+; This decompression is unsafe because it does not satisfy
+; minimum VDP timing.  Decompression can only be done if the
+; video display is disabled.
+;
 ; ===============================================================
 
 INCLUDE "config_private.inc"
@@ -17,11 +21,11 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_compress_zx7
 
-PUBLIC asm_dzx7_standard_vram
+PUBLIC asm_dzx7_standard_vram_unsafe
 
-EXTERN asm_sms_set_vram_write_de, asm_sms_ldir_vram_to_vram, l_ret
+EXTERN asm_sms_set_vram_write_de, asm_sms_ldir_vram_to_vram_unsafe, l_ret
 
-asm_dzx7_standard_vram:
+asm_dzx7_standard_vram_unsafe:
 
    ; enter : hl = void *src
    ;         de = unsigned int dst in vram
@@ -109,7 +113,7 @@ dzx7s_offset_end:
         sbc     hl, de                  ; HL = destination - offset - 1
         pop     de                      ; DE = destination
         ;;ldir
-        call asm_sms_ldir_vram_to_vram
+        call asm_sms_ldir_vram_to_vram_unsafe
         
 ;;dzx7s_exit:
 

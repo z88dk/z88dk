@@ -67,6 +67,7 @@ __DPROTO(,,unsigned char,*,dzx7_agile_rcs_back,void *src,void *dst)
 
 #ifdef __SMS
 __DPROTO(,,unsigned int,,sms_dzx7_standard_vram,void *src,unsigned int dst)
+__DPROTO(,,unsigned int,,sms_dzx7_standard_vram_unsafe,void *src,unsigned int dst)
 #endif
 
 #endif

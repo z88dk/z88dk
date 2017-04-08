@@ -42,9 +42,9 @@ __sfr __at __IO_GUN_SPOT_VERTICAL      IO_GUN_SPOT_VERTICAL;
 __sfr __at __IO_GUN_SPOT_HORIZONTAL    IO_GUN_SPOT_HORIZONTAL;
 __sfr __at __IO_PSG                    IO_PSG;
 __sfr __at __IO_VDP_DATA               IO_VDP_DATA;
-__sfr __at __IO_VDP_COMMAND            IO_VDP_CONTROL;
-__sfr __at __IO_VDP_COMMAND            IO_VDP_COMMAND;
-__sfr __at __IO_VDP_STATUS             IO_VDP_STATUS;
+__sfr __at __IO_VDP_COMMAND            IO_VDP_CONTROL;  // same port
+__sfr __at __IO_VDP_COMMAND            IO_VDP_COMMAND;  // same port
+__sfr __at __IO_VDP_STATUS             IO_VDP_STATUS;   // same port
 __sfr __at __IO_JOYSTICK_READ_L        IO_JOYSTICK_READ_L;
 __sfr __at __IO_JOYSTICK_READ_H        IO_JOYSTICK_READ_H;
 
@@ -94,5 +94,40 @@ extern volatile unsigned char MM_FFFF;
 extern volatile unsigned char MM_FFFE;
 extern volatile unsigned char MM_FFFD;
 extern volatile unsigned char MM_FFFC;
+
+// VRAM <-> MEMORY COPY OPERATIONS
+
+extern unsigned int __LIB__ sms_ldir_mem_to_vram(unsigned int dst,void *src,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_ldir_mem_to_vram_callee(unsigned int dst,void *src,unsigned int n) __smallc;
+#define sms_ldir_mem_to_vram(a,b,c) sms_ldir_mem_to_vram_callee(a,b,c)
+
+
+extern unsigned int __LIB__ sms_ldir_mem_to_vram_unsafe(unsigned int dst,void *src,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_ldir_mem_to_vram_unsafe_callee(unsigned int dst,void *src,unsigned int n) __smallc;
+#define sms_ldir_mem_to_vram_unsafe(a,b,c) sms_ldir_mem_to_vram_unsafe_callee(a,b,c)
+
+
+
+extern unsigned int __LIB__ sms_ldir_vram_to_mem(void *dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_ldir_vram_to_mem_callee(void *dst,unsigned int src,unsigned int n) __smallc;
+#define sms_ldir_vram_to_mem(a,b,c) sms_ldir_vram_to_mem_callee(a,b,c)
+
+
+extern unsigned int __LIB__ sms_ldir_vram_to_mem_unsafe(void *dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_ldir_vram_to_mem_unsafe_callee(void *dst,unsigned int src,unsigned int n) __smallc;
+#define sms_ldir_vram_to_mem_unsafe(a,b,c) sms_ldir_vram_to_mem_unsafe_callee(a,b,c)
+
+
+
+extern unsigned int __LIB__ sms_ldir_vram_to_vram(unsigned int dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_ldir_vram_to_vram_callee(unsigned int dst,unsigned int src,unsigned int n) __smallc;
+#define sms_ldir_vram_to_vram(a,b,c) sms_ldir_vram_to_vram_callee(a,b,c)
+
+
+extern unsigned int __LIB__ sms_ldir_vram_to_vram_unsafe(unsigned int dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_ldir_vram_to_vram_unsafe_callee(unsigned int dst,unsigned int src,unsigned int n) __smallc;
+#define sms_ldir_vram_to_vram_unsafe(a,b,c) sms_ldir_vram_to_vram_unsafe_callee(a,b,c)
+
+
 
 #endif

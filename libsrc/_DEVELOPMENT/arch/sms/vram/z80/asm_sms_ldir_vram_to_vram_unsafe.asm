@@ -7,8 +7,7 @@
 ; ========================================================================
 
 ; unsafe version has not been written yet
-; the idea is to read a bunch of bytes onto the
-; stack and then write them quickly to dst
+; the idea is to read a bunch of bytes into the stack and then write them quickly to dst
 
 INCLUDE "config_private.inc"
 

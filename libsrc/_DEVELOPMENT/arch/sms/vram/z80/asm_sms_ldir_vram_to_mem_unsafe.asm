@@ -6,6 +6,8 @@
 ;
 ; ========================================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_crt_common
 
@@ -22,8 +24,8 @@ asm_sms_ldir_vram_to_mem_unsafe:
    ;         de = void *dst in memory
    ;         bc = unsigned int n > 0
    ;
-   ; exit  : hl = void *src, &byte after last read
-   ;         de = void *dst, &byte after last written
+   ; exit  : hl = void *src, &byte after last read from vram
+   ;         de = void *dst, &byte after last written to memory
    ;
    ; uses  : af, bc, de, hl
 
@@ -48,14 +50,14 @@ asm_sms_ldir_vram_to_mem_unsafe_continue:
    
 no_adjust:
    
-   ld c,$be
+   ld c,__IO_VDP_DATA
    
 loop:
 
    inir
    
    dec a
-   jp nz, loop
+   jr nz, loop
    
    ex de,hl
    ret
