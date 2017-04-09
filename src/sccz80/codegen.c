@@ -2813,8 +2813,12 @@ void intrinsic_in(SYMBOL *sym)
         return;
     }
     if (sym->type == PORT8 ) {
-        outstr("\tin\ta,("); outname(sym->name, 1); outstr(")"); nl();
-        ol("ld\tl,a");
+        if ( c_cpu == CPU_Z180 ) {
+            outstr("\tin0\tl,("); outname(sym->name, 1); outstr(")"); nl();
+        } else {
+            outstr("\tin\ta,("); outname(sym->name, 1); outstr(")"); nl();
+            ol("ld\tl,a");
+        }
         ol("ld\th,0");
     } else {
         outstr("\tld\ta,");  outname(sym->name, 1); outstr(" / 256"); nl();
@@ -2836,8 +2840,12 @@ void intrinsic_out(SYMBOL *sym)
         return;
     }
     if (sym->type == PORT8 ) {
-        ol("ld\ta,l");
-        outstr("\tout\t("); outname(sym->name, 1); outstr("),a"); nl();
+        if ( c_cpu == CPU_Z180 ) {
+            outstr("\tout0\t("); outname(sym->name, 1); outstr("),l"); nl();
+        } else {
+            ol("ld\ta,l");
+            outstr("\tout\t("); outname(sym->name, 1); outstr("),a"); nl();
+        }
     } else {
         ol("ld\ta,l");
         outstr("\tld\tbc,"); outname(sym->name, 1);  nl();
