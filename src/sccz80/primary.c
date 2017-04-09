@@ -519,7 +519,7 @@ void store(LVALUE* lval)
     }
     if ( lval->symbol ) 
         lval->symbol->isassigned = YES;
-    if (lval->symbol->type == PORT8 || lval->symbol->type == PORT16 ) {
+    if (lval->symbol && (lval->symbol->type == PORT8 || lval->symbol->type == PORT16) ) {
         intrinsic_out(lval->symbol);
     } else if (lval->indirect == 0)
         putmem(lval->symbol);
