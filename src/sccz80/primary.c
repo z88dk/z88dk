@@ -519,7 +519,9 @@ void store(LVALUE* lval)
     }
     if ( lval->symbol ) 
         lval->symbol->isassigned = YES;
-    if (lval->indirect == 0)
+    if (lval->symbol->type == PORT8 || lval->symbol->type == PORT16 ) {
+        intrinsic_out(lval->symbol);
+    } else if (lval->indirect == 0)
         putmem(lval->symbol);
     else
         putstk(lval->indirect);
@@ -596,7 +598,10 @@ void rvaluest(LVALUE* lval)
     }
     if (lval->symbol && strncmp(lval->symbol->name, "0dptr", 5) == 0)
         lval->symbol = lval->symbol->offset.p;
-    if (lval->symbol && lval->indirect == 0) {
+
+    if (lval->symbol && (lval->symbol->type == PORT8  || lval->symbol->type == PORT16) ) {
+        intrinsic_in(lval->symbol);
+    } else if (lval->symbol && lval->indirect == 0) {
        
         getmem(lval->symbol);
     } else {
@@ -609,7 +614,9 @@ void rvalue(LVALUE* lval)
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
         warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
     }
-    if (lval->symbol && lval->indirect == 0) { 
+    if (lval->symbol && (lval->symbol->type == PORT8  || lval->symbol->type == PORT16) ) {
+        intrinsic_in(lval->symbol);
+    } else if (lval->symbol && lval->indirect == 0) { 
         getmem(lval->symbol);
     } else {
             

@@ -73,9 +73,7 @@ enum storage_type {
     LSTATIC = 6,
     FAR = 7 ,
     LSTKEXT = 8,
-    TYPDEF = 9,
-    PORT8 = 10,
-    PORT16 = 11,
+    TYPDEF = 9
 };
 
 
@@ -147,6 +145,8 @@ struct symbol_s {
 #define ELLIPSES 8      /* Used for ANSI defs */
 #define ENUM    9       /* ONly used in symbol table */
 #define CARRY   10      /* Carry stuff */
+#define PORT8   11
+#define PORT16  12
 
 /*
  *      Value of ellipses in prototypes

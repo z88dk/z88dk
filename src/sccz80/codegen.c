@@ -208,7 +208,6 @@ void outname(char* sname, char pref)
  */
 void getmem(SYMBOL* sym)
 {
-
     if (sym->ident != POINTER && sym->type == CCHAR) {
         if (!(sym->flags & UNSIGNED)) {
 #ifdef PREAPR00
@@ -2800,6 +2799,33 @@ void copy_to_stack(char *label, int stack_offset,  int size)
     outstr("\tld\thl,"); outname(label, 1); nl();
     outfmt("\tld\tbc,%d\n",size);
     ol("ldir");
+}
+
+
+void intrinsic_in(SYMBOL *sym)
+{
+    if (sym->type == PORT8 ) {
+        outstr("\tin\ta,("); outname(sym->name, 1); outstr(")"); nl();
+        ol("ld\tl,a");
+        ol("ld\th,0");
+    } else {
+        outstr("\tld\ta,");  outname(sym->name, 1); outstr(" / 256"); nl();
+        outstr("\tin\ta,("); outname(sym->name, 1); outstr(" % 256)"); nl();
+        ol("ld\tl,a");
+        ol("ld\th,0");
+    }
+}
+
+void intrinsic_out(SYMBOL *sym)
+{
+    if (sym->type == PORT8 ) {
+        ol("ld\ta,l");
+        outstr("\tout\t("); outname(sym->name, 1); outstr("),a"); nl();
+    } else {
+        ol("ld\ta,l");
+        outstr("\tld\tbc,"); outname(sym->name, 1);  nl();
+        ol("out\t(c),a");
+    }
 }
 
 

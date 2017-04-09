@@ -261,8 +261,23 @@ void declglb(
         // if (storage == TYPDEF && ident != VARIABLE && mtag == 0)
         //     warning(W_TYPEDEF);
 
+        if ( var->type == PORT8 || var->type == PORT16 )  {
+            double dval;
+            int    valtype;
+
+            constexpr(&dval, &valtype, 1);
+            if (dval < 0) {
+                error(E_NEGATIVE);
+                dval = (-dval);
+            }
+            if ( valtype == DOUBLE ) 
+                warning(W_DOUBLE_UNEXPECTED);
+            size = dval;
+        }
+        
         if (symname(sname) == 0) /* name ok? */
             illname(sname); /* no... */
+
 
         if (ident == PTR_TO_FNP) {
             /* function returning pointer needs dummy symbol */
@@ -411,7 +426,10 @@ void declglb(
                 if (typ == STRUCT)
                     myptr->tagarg[0] = itag;
             }
-            if (storage != EXTERNAL && ident != FUNCTION) {
+
+            if ( var->type == PORT8 || var->type == PORT16 ) {
+                myptr->size = size;
+            } else if (storage != EXTERNAL && ident != FUNCTION) {
                 size_st = initials(sname, type, ident, size, more, otag, var->zfar, var->isconst);
                 if (storage == EXTERNP)
                     myptr->size = addr;
@@ -848,6 +866,18 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
         //        warning(W_CONST);
     } else if (swallow("volatile"))
         warning(W_VOLATILE);
+
+    // Try and match sdcc way of doing things
+    if (amatch("__sfr")) {
+        blanks();
+        var->type = PORT8;
+        
+        if ( amatch("__banked")) {
+            var->type = PORT16;
+        } 
+        match("__at");
+        return NULL;
+    }
 
     if (amatch("far"))
         var->zfar = FARPTR;
