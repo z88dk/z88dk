@@ -2804,6 +2804,14 @@ void copy_to_stack(char *label, int stack_offset,  int size)
 
 void intrinsic_in(SYMBOL *sym)
 {
+    if ( c_cpu & CPU_RABBIT ) {
+        ol("ioi");
+        outstr("\tld\thl,("); outname(sym->name, 1); outstr(")"); nl();
+        if ( c_cpu == CPU_R2K ) {
+            ol("nop"); // Rabbit bug workaround
+        }
+        return;
+    }
     if (sym->type == PORT8 ) {
         outstr("\tin\ta,("); outname(sym->name, 1); outstr(")"); nl();
         ol("ld\tl,a");
@@ -2818,6 +2826,15 @@ void intrinsic_in(SYMBOL *sym)
 
 void intrinsic_out(SYMBOL *sym)
 {
+    if ( c_cpu & CPU_RABBIT ) {
+        ol("ld\ta,l");
+        ol("ioi");
+        outstr("\tld\t("); outname(sym->name, 1); outstr("),a"); nl();
+        if ( c_cpu == CPU_R2K ) {
+            ol("nop"); // Rabbit bug workaround
+        }
+        return;
+    }
     if (sym->type == PORT8 ) {
         ol("ld\ta,l");
         outstr("\tout\t("); outname(sym->name, 1); outstr("),a"); nl();
