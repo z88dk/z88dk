@@ -15,7 +15,7 @@
         INCLUDE "zcc_opt.def"
 
 ; Only the ANSI terminal is available
-	defc NEED_ansiterminal = 1
+;	defc NEED_ansiterminal = 1  <-- specified elsewhere
 
 ;--------
 ; Some scope definitions

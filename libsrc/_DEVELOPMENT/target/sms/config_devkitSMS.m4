@@ -10,8 +10,8 @@ divert(-1)
 define(`__SMSLIB_MAXSPRITES',  64)
 define(`__SMSLIB_ENABLE_MDPAD', 0)            # determines whether md isr is used
 
-define(`__SMSLIB_PNTADDRESS',  0x7800)
-define(`__SMSLIB_SATADDRESS',  0x7f00)
+define(`__SMSLIB_PNTADDRESS',  0x`'eval(__SMS_VRAM_SCREEN_MAP_ADDRESS + 0x4000,16))
+define(`__SMSLIB_SATADDRESS',  0x`'eval(__SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS + 0x4000,16))
 define(`__SMSLIB_CRAMADDRESS', 0xc000)
 
 define(`__SMSLIB_ISRST_SMSCRT0RST08', 0x08)   # make zero to turn into call
