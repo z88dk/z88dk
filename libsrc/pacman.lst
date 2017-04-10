@@ -1,4 +1,4 @@
-@stdio/stdio_stdesc.lst
+@stdio/stdio.lst
 stdio/pacman/fgetc_cons
 stdio/pacman/fputc_cons
 stdio/pacman/getk
