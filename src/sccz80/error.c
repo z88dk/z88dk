@@ -183,6 +183,7 @@ struct errors {
 
     { "Attempt to modify const lvalue \'%s\''", 1},
     { "Cannot statically initialise doubles when -doublestr is used", 1},
+    { "Cannot dereference the port definition: \'%s\'", 1}
 };
 
 /*
