@@ -31,12 +31,18 @@ z88dk vX.XX  - XX.XX.XXXX
   they are given the value of
 - [sccz80] #90: Bug fix for result of comparison
 - [sccz80] #118: static doubles can now be initialised
-- [sccz80] #116: Improvements for operations with constants
+- [sccz80] #116: Optimisations for operations with constants
 - [sccz80] Constant floating point expressions are now folded
 - [sccz80] [math48] #104: Non commutative FP operations with constant on left now work
 - [sccz80] #138: Aggregate (arrays, structs) auto variables can now be initialised
+- [sccz80] #139: Added support for __naked directive to prevent generation of any code
+  for marked functions
+- [sccz80 #78: __sfr (__banked__) __at [address] [name] syntax is now supported for
+  IO ports. Specific code is generated for Z80, Z180, Rabbit compilations.
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [zcc] Spaces in filenames (and paths) are now supported.
+- [zpragma] Support for #pragma printf and #pragma scanf which take a format string
+  argument and configure the appropriate printf converters.
 - [all] #105: main() always takes its parameters in r->l format regardless of compiler
 
 z88dk v1.99B - 10.01.2017
