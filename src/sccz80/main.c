@@ -354,8 +354,10 @@ static void dumpfns()
                 ident = FUNCTION;
             type = ptr->type;
             storage = ptr->storage;
-            if (ident == FUNCTION && ptr->size != 0) {
-                outfmt("\tdefc\t_%s=\t%d\n", ptr->name, ptr->size);
+            if (type == PORT8 || type == PORT16 ) {
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
+            } else if (ident == FUNCTION && ptr->size != 0) {
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
             } else {
                 if (ident == FUNCTION && storage != LSTATIC) {
                     if (storage == EXTERNAL) {
@@ -506,7 +508,9 @@ void dumpvars()
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;
-            if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF) {
+            if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && 
+                storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
+                type != PORT8 && type != PORT16) {
                 prefix();
                 outname(ptr->name, 1);
                 col();

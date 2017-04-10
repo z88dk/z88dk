@@ -1,4 +1,4 @@
-@stdio/stdio_stdesc.lst
+@stdio/stdio.lst
 stdio/aquarius/fgetc_cons
 stdio/aquarius/getk
 stdio/aquarius/fputc_cons

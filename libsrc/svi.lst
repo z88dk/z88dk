@@ -1,4 +1,4 @@
-@stdio/stdio_stdesc.lst
+@stdio/stdio.lst
 stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
