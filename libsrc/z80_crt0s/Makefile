@@ -4,23 +4,25 @@
 
 include ../Make.config
 
-all: crt0s crtz80s183 crt0iy
+all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib
 
 
-crt0s:
-	@$(RM) crt0_long/l_long_case.o
-	$(LIBLINKER) -I. -x$(OUTPUT_DIRECTORY)/z80_crt0 @crt0list
-	$(LIBLINKER) -I. -x$(OUTPUT_DIRECTORY)/rcmx000_crt0 @rcm.lst
+$(OUTPUT_DIRECTORY)/z80_crt0.lib:
+	$(MAKE) clean
+	$(LIBLINKER) -I. -x$@ @crt0list
+
+$(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
+	$(MAKE) clean
+	$(LIBLINKER) -I. --RCMX000 -x$@ @rcm.lst
 
 # this one uses iy in place of ix
-crt0iy:
+$(OUTPUT_DIRECTORY)/z80iy_crt0.lib:
 	$(MAKE) clean
-	@$(RM) crt0_long/l_long_case.o
-	$(LIBLINKER) -I. --IXIY -DZ80S183 -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @crt0list
+	$(LIBLINKER) -I. --IXIY -DZ80S183 -x$@ @crt0list
 	$(MAKE) clean
 
-crtz80s183:
-	@$(RM) crt0_long/l_long_case.o
+$(OUTPUT_DIRECTORY)/z80s183_crt0.lib:
+	$(MAKE) clean
 	$(LIBLINKER) -I. -DZ80S183 -x$(OUTPUT_DIRECTORY)/z80s183_crt0 @crt0list
 
 

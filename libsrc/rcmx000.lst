@@ -4,18 +4,12 @@ stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
 stdio/rcmx000/getk
 stdio/rcmx000/fputc_cons
-@stdlib/stdlib.lst
-@strings/string.lst
+@stdlib/stdlib_r2k.lst
+@strings/string_r2k.lst
 setjmp/longjmp
 setjmp/setjmp
 assert/assert
 time/rcmx000/clock
-z80_crt0s/z80_emu/rcmx_cpd
-z80_crt0s/z80_emu/rcmx_cpdr
-z80_crt0s/z80_emu/rcmx_cpi
-z80_crt0s/z80_emu/rcmx_cpir
-z80_crt0s/z80_emu/rcmx_rld
-z80_crt0s/z80_emu/rcmx_rrd
 stdio_new/error/stdio_error_zc
 stdio_new/general/stdio_basechar
 stdio_new/general/stdio_atou
@@ -28,4 +22,4 @@ stdio/ansi/ansifont_f4pack
 stdio/ansi/ansifont_f5
 stdio/ansi/ansifont_f6
 stdio/ansi/ansifont_f8
-@compress/zx7/zx7.lst
+@compress/zx7/zx7_r2k.lst

@@ -8,16 +8,31 @@ include ../Make.config
 TARGET ?= test
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 CUSTOBJECTS = sleep.o csleep.o delay.o
+ASMFILES = $(wildcard *.asm)
+
+OBJECTS = $(GENOBJECTS) $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
 .PHONY: deps
 
-all: deps $(GENOBJECTS) $(CUSTOBJECTS)
+all: dirs deps $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS))
 
-%.o: %.c
+obj/z80/%.o: %.c
 	zcc +$(TARGET) $(CFLAGS) -o $@  $^
 
+obj/z80/%.o: %.asm
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.c
+	zcc +rcmx000 $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.asm
+	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
+
+dirs:
+	mkdir -p obj/z80 obj/r2k
+
 deps:
-	$(RM) $(CUSTOBJECTS)
+	$(RM)  $(addprefix obj/z80/, $(CUSTOBJECTS))
 
 clean:
-	$(RM) *.o* *.sym *.map zcc_opt.def *.i 
+	$(RM) -fr obj
