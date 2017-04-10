@@ -409,7 +409,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         tofile();
     }
 
-    output_section("code_compiler"); // output_section("code");
+    output_section(c_code_section); // output_section("code");
 
     nl();
     prefix();
