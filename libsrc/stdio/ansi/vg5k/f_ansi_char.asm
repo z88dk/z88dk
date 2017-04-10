@@ -30,6 +30,7 @@
 
 
 .ansi_CHAR
+	ld	ix,$47FA
 
 	ld    d,a
 	
