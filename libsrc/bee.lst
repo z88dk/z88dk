@@ -1,4 +1,4 @@
-@stdio/stdio_stdesc.lst
+@stdio/stdio.lst
 stdio/bee/fgetc_cons
 stdio/bee/getk
 stdio/bee/fputc_cons
