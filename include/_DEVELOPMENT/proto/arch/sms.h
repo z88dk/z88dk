@@ -93,6 +93,12 @@ extern volatile unsigned char MM_FFFE;
 extern volatile unsigned char MM_FFFD;
 extern volatile unsigned char MM_FFFC;
 
+// VRAM ADDRESS ASSIGNMENT
+
+#define SMS_VRAM_SCREEN_MAP_ADDRESS              __SMS_VRAM_SCREEN_MAP_ADDRESS
+#define SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS  __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS
+#define SMS_VRAM_CHARACTER_PATTERN_BASE_ADDRESS  __SMS_VRAM_CHARACTER_PATTERN_BASE_ADDRESS
+
 // VRAM <-> MEMORY COPY OPERATIONS
 
 __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_mem_to_vram,unsigned int dst,void *src,unsigned int n)
