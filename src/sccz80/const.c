@@ -607,7 +607,7 @@ void write_double_queue(void)
 
     LL_FOREACH(double_queue, elem ) {
         if ( elem->refcount ) {
-            output_section("rodata_compiler"); // output_section("text");
+            output_section(c_rodata_section); // output_section("text");
             prefix();
             queuelabel(elem->litlab);
             col();
