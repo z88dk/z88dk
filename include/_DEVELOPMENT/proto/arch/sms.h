@@ -101,13 +101,16 @@ extern volatile unsigned char MM_FFFC;
 
 // VRAM <-> MEMORY COPY OPERATIONS
 
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_mem_to_vram,unsigned int dst,void *src,unsigned int n)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_mem_to_vram_unsafe,unsigned int dst,void *src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_mem_to_vram,unsigned int dst,void *src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_mem_to_vram_unsafe,unsigned int dst,void *src,unsigned int n)
 
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_mem,void *dst,unsigned int src,unsigned int n)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_mem_unsafe,void *dst,unsigned int src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_vram_to_mem,void *dst,unsigned int src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_vram_to_mem_unsafe,void *dst,unsigned int src,unsigned int n)
 
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_vram,unsigned int dst,unsigned int src,unsigned int n)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_ldir_vram_to_vram_unsafe,unsigned int dst,unsigned int src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_vram_to_vram,unsigned int dst,unsigned int src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_vram_to_vram_unsafe,unsigned int dst,unsigned int src,unsigned int n)
+
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memset_vram,unsigned int dst,unsigned char c,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memset_vram_unsafe,unsigned int dst,unsigned char c,unsigned int n)
 
 #endif
