@@ -88,6 +88,13 @@ Define rules for a ragel-based parser.
 			fbreak;
 		}
 	}
+
+	action assert_RABBIT { 
+		if ( (opts.cpu & CPU_RABBIT) == 0 ) { 
+			error_illegal_ident(); 
+			fbreak;
+		}
+	}
 	
 	/*---------------------------------------------------------------------
 	*   Expression 
@@ -860,20 +867,31 @@ Define rules for a ragel-based parser.
 				 RET, RETN, RETI, \
 				 OTDR, OTIR, OUTD, OUTI, \
 				 SLP, \
-				 OTIM, OTIMR, OTDM, OTDMR
+				 OTIM, OTIMR, OTDM, OTDMR, \
+				 ALTD, IOI, IOE, IPRES
 		| label? _TK_<OP> _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP> ); }
-#endfor  <OP>		
+#endfor  <OP>	
+
 
 		/*---------------------------------------------------------------------
 		*   opcodes constant argument
 		*--------------------------------------------------------------------*/
-#foreach <OP> in IM, RST
+#foreach <OP> in IM, RST, IPSET
 		| label? _TK_<OP> const_expr _TK_NEWLINE
 		  @{ if (!expr_error)
 				DO_stmt( Z80_<OP>( expr_value ) );
 		  }
 #endfor  <OP>
+
+		/*---------------------------------------------------------------------
+		*   Rabbit Opcodes
+		*--------------------------------------------------------------------*/
+		/* bool hl|ix|iy */
+#foreach <DD> in HL, IX, IY
+		| label? _TK_BOOL _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( P_<DD> + Z80_BOOL); }
+#endfor  <DD>
 
 		; /* end of main */
 		

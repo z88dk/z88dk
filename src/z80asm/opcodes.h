@@ -111,6 +111,9 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define _CHOOSE3_(n, i1, o1, i2, o2, i3, o3)	\
 			((n) == (i1) ? (o1) : \
 			 _CHOOSE2_((n), (i2), (o2), (i3), (o3)))
+#define _CHOOSE4_(n, i1, o1, i2, o2, i3, o3, i4, o4)	\
+			((n) == (i1) ? (o1) : \
+			 _CHOOSE3_((n), (i2), (o2), (i3), (o3), (i4), (o4)))
 
 /* choose RST opcode */
 #define _RST_ARG(n)			((n) < 0 || (n) > 0x38 || (((n) & 7) != 0) ? \
@@ -251,3 +254,11 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_TSTIO			_Z180_ONLY(0xED74)
 #define Z80_TST(r)			_Z180_ONLY(0xED04 + ((r) << 3))
 #define Z80_TST_n			_Z180_ONLY(0xED64)
+
+/* Rabbit opcodes */
+#define Z80_IOI				_RABBIT_ONLY(0xD3)
+#define Z80_IOE				_RABBIT_ONLY(0xDB)
+#define Z80_ALTD			_RABBIT_ONLY(0x76)
+#define Z80_IPRES			_RABBIT_ONLY(0xED5D)
+#define Z80_IPSET(n)		_RABBIT_ONLY(_CHOOSE4_((n), 0, 0xED46, 1, 0xED56, 2, 0xED4E, 3, 0xED5E))
+#define Z80_BOOL			_RABBIT_ONLY(0xCC)
