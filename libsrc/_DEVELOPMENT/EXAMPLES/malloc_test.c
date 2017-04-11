@@ -1,11 +1,36 @@
-// zcc +zx -vn -DPRINTF -startup=4 -O3 -clib=new malloc_test.c -o malloc_test -create-app
-// zcc +zx -vn -DPRINTF -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 malloc_test.c -o malloc_test -create-app
+// zcc +zx -vn -DPRINTF -DWALK -startup=4 -O3 -clib=new malloc_test.c -o malloc_test -create-app
+// zcc +zx -vn -DPRINTF -DWALK -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 malloc_test.c -o malloc_test -create-app
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stropts.h>
 #include <intrinsic.h>
+#include <malloc.h>
+
+#ifdef WALK
+
+void visit_heap_block(heap_info_t *hi)
+{
+   switch (hi->type)
+   {
+      case 0:
+         printf("HEADER    ");
+         break;
+      case 1:
+         printf("ALLOCATED ");
+         break;
+      default:
+         printf("FREE      ");
+         break;
+   }
+   
+   printf("@ %05u size %04u bytes\n", (unsigned int)(hi->address), hi->size);
+}
+
+#pragma output CLIB_OPT_PRINTF = 0x202
+
+#endif
 
 #ifdef PRINTF
    #define PRINTF1(a)         printf(a)
@@ -39,7 +64,7 @@ void main(void)
    
 intrinsic_label(TIMER_START);
 
-   for (i=0; i<N*1000; ++i)
+   for (i=0; i<5000; ++i)
    {
       vic = (unsigned char)((unsigned long)rand() * N / ((unsigned int)RAND_MAX + 1));
       
@@ -73,4 +98,12 @@ intrinsic_label(TIMER_START);
 intrinsic_label(TIMER_STOP);
 
    PRINTF4("\n\n%s (%u errors, %u unables)\n\n\n\n", errors ? "FAIL" : "PASS", errors, unables);
+   
+#ifdef WALK
+
+   printf("Let's walk the heap.\n\n");
+   heap_info(_malloc_heap, visit_heap_block);
+   printf("\nEnd of heap.\n\n\n\n");
+
+#endif
 }
