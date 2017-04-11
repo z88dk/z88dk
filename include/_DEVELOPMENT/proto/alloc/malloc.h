@@ -16,6 +16,9 @@ typedef struct heap_info_s
 
 } heap_info_t;
 
+// expose pointer to malloc heap
+extern unsigned char *_malloc_heap;
+
 __DPROTO(,,void,*,_falloc_,void *p,size_t size)
 __DPROTO(,,void,*,heap_alloc,void *heap,size_t size)
 __DPROTO(,,void,*,heap_alloc_aligned,void *heap,size_t alignment,size_t size)

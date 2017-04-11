@@ -18,6 +18,9 @@ typedef struct heap_info_s
 
 } heap_info_t;
 
+// expose pointer to malloc heap
+extern unsigned char *_malloc_heap;
+
 extern void *_falloc_(void *p,size_t size);
 extern void *_falloc__callee(void *p,size_t size) __z88dk_callee;
 #define _falloc_(a,b) _falloc__callee(a,b)
