@@ -51,12 +51,6 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 gamesdeps:
 	$(RM) -f games/*.o
 
-#  short script to sort out stdlib dependencies
-stdldeps:
-	$(RM) -f stdlib/sleep.o
-	$(RM) -f stdlib/csleep.o
-	$(RM) -f stdlib/delay.o
-
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -95,8 +89,6 @@ msxdeps:
 zx81deps:
 	$(RM) -f assert/*.o
 	$(RM) -f setjmp/*.o
-	$(RM) -f strings/*.o
-	$(RM) -f stdlib/*.o
 	$(RM) -f stdio/zx81/*.o
 	$(RM) -f stdio_new/stream-general/*.o
 	$(RM) -f stdio_new/stream-out/stdio_basechar.o
@@ -231,10 +223,11 @@ net.lib:
 	$(MAKE) -C net 
 
 # z88 library - dom
-z88_clib.lib: gfxdeps
+z88_clib.lib: 
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) -C fcntl/z88
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -251,10 +244,11 @@ z88_clib.lib: gfxdeps
 	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # Network stdio - dom
-z88net_clib.lib: gfxdeps
+z88net_clib.lib: 
 	@echo ''
 	@echo '--- Building Z88 Network Aware Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) -C fcntl/z88
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -287,7 +281,6 @@ zx_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -314,7 +307,6 @@ ts2068_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -381,7 +373,6 @@ pacman_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=pacman
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -484,7 +475,6 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx80
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -504,7 +494,6 @@ zx81_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -980,7 +969,6 @@ enterprise_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=enterprise
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1046,7 +1034,6 @@ mc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=mc1000
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1229,7 +1216,6 @@ newbrain_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=newbrain
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1254,17 +1240,14 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
-	$(MAKE) -C strings clean
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=rcmx000
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	z80asm --RCMX000 -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
-	$(MAKE) -C strings clean
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
@@ -1458,7 +1441,6 @@ osca_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=osca
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 

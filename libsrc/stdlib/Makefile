@@ -1,7 +1,3 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
 
 include ../Make.config
 
@@ -10,17 +6,23 @@ GENOBJECTS = unbcd.o wcmatch.o getopt.o
 CUSTOBJECTS = sleep.o csleep.o delay.o
 ASMFILES = $(wildcard *.asm)
 
-OBJECTS = $(GENOBJECTS) $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
 
-.PHONY: deps
+.PHONY: copyit
 
-all: dirs deps $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS))
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS)) copyit
 
 obj/z80/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
 
 obj/z80/%.o: %.asm
-	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.c
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.asm
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
 
 obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $@  $^
@@ -28,11 +30,23 @@ obj/r2k/%.o: %.c
 obj/r2k/%.o: %.asm
 	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
 
-dirs:
-	mkdir -p obj/z80 obj/r2k
+obj/$(TARGET)/%.o: %.c
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
 
-deps:
-	$(RM)  $(addprefix obj/z80/, $(CUSTOBJECTS))
+obj/$(TARGET)/%.o: %.asm
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+# This is bad, but changing 56 list files will kill me so silently copy the
+# machine targets into the right place
+# This can go away should #159 (variables in list files) be accepted
+copyit:
+	@cp -f obj/$(TARGET)/*.o obj/z80/
+	@cp -f obj/$(TARGET)/*.o obj/ixiy/
+	@cp -f obj/$(TARGET)/*.o obj/r2k/
+
+
+dirs:
+	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/$(TARGET)
 
 clean:
 	$(RM) -fr obj

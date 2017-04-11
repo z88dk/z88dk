@@ -1,4 +1,4 @@
-@stdio/stdio.lst
+@stdio/stdio_r2k.lst
 @ctype/ctype.lst
 stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
