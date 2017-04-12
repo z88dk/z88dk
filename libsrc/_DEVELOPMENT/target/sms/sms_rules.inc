@@ -141,4 +141,20 @@
       defc CRT_OTERM_BACKGROUND_CHAR = 0
    ENDIF
 
+   IFNDEF CRT_OTERM_WINDOW_X
+      defc CRT_OTERM_WINDOW_X = 0
+   ENDIF
+   
+   IFNDEF CRT_OTERM_WINDOW_WIDTH
+      defc CRT_OTERM_WINDOW_WIDTH = 32
+   ENDIF
+   
+   IFNDEF CRT_OTERM_WINDOW_Y
+      defc CRT_OTERM_WINDOW_Y = 0
+   ENDIF
+   
+   IFNDEF CRT_OTERM_WINDOW_HEIGHT
+      defc CRT_OTERM_WINDOW_HEIGHT = 24
+   ENDIF
+
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
