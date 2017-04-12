@@ -502,7 +502,7 @@ zx81_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lzx81
 	$(MAKE) -C psg generic_iy
-	$(LIBLINKER) --IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
+	$(LIBLINKER) --IXIY -DSTANDARDESCAPECHARS -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
 
 # Lambda 8300 lib - Stefano
@@ -520,7 +520,7 @@ lambda_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lzx81
 	$(MAKE) -C psg generic_iy
-	$(LIBLINKER) --IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(LISTFILE_DIRECTORY)/zx81.lst
+	$(LIBLINKER) --IXIY -DSTANDARDESCAPECHARS -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
 
 # ZX81 std graphics lib - Stefano
