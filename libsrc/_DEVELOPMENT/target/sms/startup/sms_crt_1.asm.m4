@@ -52,6 +52,16 @@ dnl## INSTANTIATE DRIVERS #####################################
 dnl############################################################
 
 include(`../clib_instantiate_begin.m4')
+
+include(`../m4_file_absent.m4')dnl
+m4_file_absent
+
+include(`driver/terminal/sms_01_output_terminal.m4')dnl
+m4_sms_01_output_terminal(_stdout, 0x2370, 0, 0, 0, 32, 0, 24, 0, CRT_OTERM_SCREEN_MAP_ADDRESS, CRT_OTERM_CHAR_PATTERN_OFFSET, CRT_OTERM_PRINT_FLAG, CRT_OTERM_BACKGROUND_CHAR)
+
+include(`../m4_file_dup.m4')dnl
+m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+
 include(`../clib_instantiate_end.m4')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
