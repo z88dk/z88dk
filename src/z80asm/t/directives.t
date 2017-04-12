@@ -91,6 +91,34 @@ z80asm(
 ASM
 );
 
+# test -I using environment variables
+unlink "test.inc";
+make_path("test_dir");
+	write_file("test_dir/test.inc", 'ld a,10');
+	
+	z80asm(
+		asm		=> 'include "test.inc"	;; error: cannot read file \'test.inc\'',
+	);
+	
+	z80asm(
+		asm		=> 'include "test.inc"		;; 3E 0A',
+		options	=> "-b -Itest_dir",
+	);
+
+	$ENV{TEST_ENV} = 'test';
+	z80asm(
+		asm		=> 'include "test.inc"		;; 3E 0A',
+		options	=> '-b -I${TEST_ENV}_dir',
+	);
+
+	delete $ENV{TEST_ENV};
+	z80asm(
+		asm		=> 'include "test.inc"		;; 3E 0A',
+		options	=> '-b -Itest${TEST_ENV}_dir',
+	);
+
+remove_tree("test_dir");
+
 #------------------------------------------------------------------------------
 # DEFGROUP - simple use tested in opcodes.t
 # test error messages here
