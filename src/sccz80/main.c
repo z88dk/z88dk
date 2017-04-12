@@ -36,6 +36,11 @@ int c_shared_file; /* File contains routines which are to be
 int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 
+char *c_rodata_section = "rodata_compiler";
+char *c_data_section = "data_compiler";
+char *c_bss_section = "bss_compiler";
+char *c_code_section = "code_compiler";
+
 /*
  * Some external data
  */
@@ -82,6 +87,11 @@ static void SetNoFrame(char *);
 static void SetStandardEscape(char *);
 static void set_default_r2l(char *arg);
 static void atexit_deallocate(void);
+static void set_rodata_section(char *arg);
+static void set_data_section(char *arg);
+static void set_code_section(char *arg);
+static void set_bss_section(char *arg);
+
 
 /*
  *
@@ -354,8 +364,10 @@ static void dumpfns()
                 ident = FUNCTION;
             type = ptr->type;
             storage = ptr->storage;
-            if (ident == FUNCTION && ptr->size != 0) {
-                outfmt("\tdefc\t_%s=\t%d\n", ptr->name, ptr->size);
+            if (type == PORT8 || type == PORT16 ) {
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
+            } else if (ident == FUNCTION && ptr->size != 0) {
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
             } else {
                 if (ident == FUNCTION && storage != LSTATIC) {
                     if (storage == EXTERNAL) {
@@ -499,14 +511,16 @@ void dumpvars()
     /* Start at the start! */
     outstr("; --- Start of Static Variables ---\n\n");
 
-    output_section("bss_compiler"); // output_section("bss");
+    output_section(c_bss_section); // output_section("bss");
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->name[0] != '0' && ptr->ident != GOTOLABEL) {
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;
-            if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF) {
+            if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && 
+                storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
+                type != PORT8 && type != PORT16) {
                 prefix();
                 outname(ptr->name, 1);
                 col();
@@ -518,7 +532,7 @@ void dumpvars()
     }
 
     /* Switch back to standard section */
-    output_section("code_compiler"); // output_section("code");
+    output_section(c_code_section); // output_section("code");
 }
 
 /*
@@ -535,7 +549,7 @@ void dumplits(
 
     if (queueptr) {
         if (pr_label) {
-            output_section("rodata_compiler"); // output_section("text");
+            output_section(c_rodata_section); // output_section("text");
             prefix();
             queuelabel(queuelab);
             col();
@@ -591,7 +605,7 @@ void dumplits(
                 }
             }
         }
-        //output_section("code_compiler"); // output_section("code");
+        //output_section(c_code_section); // output_section("code");
     }
     nl();
 }
@@ -800,10 +814,40 @@ struct args myargs[] = {
     { "standard-escape-chars", NO, SetStandardEscape, "Use standard mappings for escape codes" },
     { "set-r2l-by-default", NO, set_default_r2l, "Use r2l calling by default"},
     { "m", YES, set_cpu, "Set the target CPU (z80, z180, r2k, r3k)"},
+    { "-constseg=",YES, set_rodata_section, "Set the const section name"},
+    { "-codeseg=",YES, set_code_section, "Set the code section name"},
+    { "-bssseg=",YES, set_bss_section, "Set the BSS section name"},
+    { "-dataseg=",YES, set_data_section, "Set the data section name"},
+    
     /* Compatibility Modes.. */
     { "f", NO, SetUnsigned, NULL },
     { "", 0, NULL, NULL }
 };
+
+
+static void set_rodata_section(char *arg)
+{
+    char *ptr = strchr(arg,'=');
+    c_rodata_section = strdup(ptr + 1);
+}
+
+static void set_data_section(char *arg)
+{
+    char *ptr = strchr(arg,'=');
+    c_data_section = strdup(ptr + 1);
+}
+static void set_code_section(char *arg)
+{
+    char *ptr = strchr(arg,'=');
+    c_code_section = strdup(ptr + 1);
+}
+static void set_bss_section(char *arg)
+{
+    char *ptr = strchr(arg,'=');
+    c_bss_section = strdup(ptr + 1);
+}
+
+
 
 #ifdef USEFRAME
 static void SetNoFrame(char* arg)

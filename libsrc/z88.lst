@@ -1,6 +1,6 @@
 stdio/z88/puts_cons
 stdio/z88/fgets_cons
-@stdio/stdio_stdesc.lst
+@stdio/stdio.lst
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

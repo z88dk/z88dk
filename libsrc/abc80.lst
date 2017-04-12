@@ -1,4 +1,4 @@
-@stdio/stdio_stdesc.lst
+@stdio/stdio.lst
 stdio/abc80/fgetc_cons
 stdio/abc80/fputc_cons
 stdio/abc80/getk

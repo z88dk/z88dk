@@ -27,11 +27,11 @@ _heap_info_callee:
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC _heap_info
+PUBLIC _heap_info_callee
 
-EXTERN _heap_info_unlocked
+EXTERN _heap_info_unlocked_callee
 
-defc _heap_info = _heap_info_unlocked
+defc _heap_info_callee = _heap_info_unlocked_callee
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

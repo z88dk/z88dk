@@ -54,30 +54,6 @@
 =
 	halt
 
-	call	_intrinsic_in8_port_%1
-=
-	in	a,(%1)
-	ld	l,a
-
-	call	_intrinsic_out8_port_%1
-	call	_intrinsic_out8_value_%2
-=
-	ld	a,%2
-	out	(%1),a
-	ld	l,a
-
-	call	_intrinsic_in16_port_%1
-=
-	ld	bc,%1
-	in	l,(c)
-
-	call	_intrinsic_out16_port_%1
-	call	_intrinsic_out16_value_%2
-=
-	ld	l,%2
-	ld	bc,%1
-	out	(c),l
-
 	call	_intrinsic_load16_%1
 =
 	ld	hl,(%1)
@@ -111,54 +87,6 @@
 	call	intrinsic_nop
 =
 	nop
-
-	call	intrinsic_push_af
-=
-	push af
-
-	call	intrinsic_push_bc
-=
-	push bc
-
-	call	intrinsic_push_de
-=
-	push de
-
-	call	intrinsic_push_hl
-=
-	push hl
-
-	call	intrinsic_push_ix
-=
-	push ix
-
-	call	intrinsic_push_iy
-=
-	push iy
-
-	call	intrinsic_pop_af
-=
-	pop af
-
-	call	intrinsic_pop_bc
-=
-	pop bc
-
-	call	intrinsic_pop_de
-=
-	pop de
-
-	call	intrinsic_pop_hl
-=
-	pop hl
-
-	call	intrinsic_pop_ix
-=
-	pop ix
-
-	call	intrinsic_pop_iy
-=
-	pop iy
 
 	call	intrinsic_exx
 =

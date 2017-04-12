@@ -16,11 +16,6 @@
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
 
-#define intrinsic_in8(port)  ((unsigned char)intrinsic_in8_port_##port())
-#define intrinsic_out8(port,value)  ((unsigned char)(intrinsic_out8_port_##port(),intrinsic_out8_value_##value()))
-#define intrinsic_in16(port)  ((unsigned char)intrinsic_in16_port_##port())
-#define intrinsic_out16(port,value)  ((unsigned char)(intrinsic_out16_port_##port(),intrinsic_out16_value_##value()))
-
 extern void intrinsic_stub(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
@@ -32,18 +27,6 @@ extern void intrinsic_im_0(void) __preserves_regs(a,b,c,d,e,h,l);
 extern void intrinsic_im_1(void) __preserves_regs(a,b,c,d,e,h,l);
 extern void intrinsic_im_2(void) __preserves_regs(a,b,c,d,e,h,l);
 extern void intrinsic_nop(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_push_af(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_push_bc(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_push_de(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_push_hl(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_push_ix(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_push_iy(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_pop_af(void) __preserves_regs(b,c,d,e,h,l);
-extern void intrinsic_pop_bc(void) __preserves_regs(a,d,e,h,l);
-extern void intrinsic_pop_de(void) __preserves_regs(a,b,c,h,l);
-extern void intrinsic_pop_hl(void) __preserves_regs(a,b,c,d,e);
-extern void intrinsic_pop_ix(void) __preserves_regs(a,b,c,d,e,h,l);
-extern void intrinsic_pop_iy(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void intrinsic_ex_de_hl(void) __preserves_regs(a,b,c);
 extern void intrinsic_exx(void) __preserves_regs(a);
@@ -71,11 +54,6 @@ extern unsigned long intrinsic_swap_word_32_fastcall(unsigned long n) __preserve
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
 
-#define intrinsic_in8(port)  ((unsigned char)intrinsic_in8_port_##port())
-#define intrinsic_out8(port,value)  ((unsigned char)(intrinsic_out8_port_##port(),intrinsic_out8_value_##value()))
-#define intrinsic_in16(port)  ((unsigned char)intrinsic_in16_port_##port())
-#define intrinsic_out16(port,value)  ((unsigned char)(intrinsic_out16_port_##port(),intrinsic_out16_value_##value()))
-
 extern void __LIB__ intrinsic_stub(void) __smallc;
 
 extern void __LIB__ intrinsic_di(void) __smallc;
@@ -87,18 +65,6 @@ extern void __LIB__ intrinsic_im_0(void) __smallc;
 extern void __LIB__ intrinsic_im_1(void) __smallc;
 extern void __LIB__ intrinsic_im_2(void) __smallc;
 extern void __LIB__ intrinsic_nop(void) __smallc;
-extern void __LIB__ intrinsic_push_af(void) __smallc;
-extern void __LIB__ intrinsic_push_bc(void) __smallc;
-extern void __LIB__ intrinsic_push_de(void) __smallc;
-extern void __LIB__ intrinsic_push_hl(void) __smallc;
-extern void __LIB__ intrinsic_push_ix(void) __smallc;
-extern void __LIB__ intrinsic_push_iy(void) __smallc;
-extern void __LIB__ intrinsic_pop_af(void) __smallc;
-extern void __LIB__ intrinsic_pop_bc(void) __smallc;
-extern void __LIB__ intrinsic_pop_de(void) __smallc;
-extern void __LIB__ intrinsic_pop_hl(void) __smallc;
-extern void __LIB__ intrinsic_pop_ix(void) __smallc;
-extern void __LIB__ intrinsic_pop_iy(void) __smallc;
 
 extern void __LIB__ intrinsic_ex_de_hl(void) __smallc;
 extern void __LIB__ intrinsic_exx(void) __smallc;

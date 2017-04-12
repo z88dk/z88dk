@@ -507,6 +507,9 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
         else
             flags &= ~FARACC;
     }
+    if ( lval->symbol->type == PORT8 || lval->symbol->type == PORT16 ) {
+        error(E_PORT_DEREF, lval->symbol->name);
+    }
     /* NB it has already been determind that lval->symbol is non-zero */
     if (lval->symbol->more == 0) {
         /* array of/pointer to variable */
@@ -629,7 +632,7 @@ int heira(LVALUE* lval)
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
             /* OK to take address of struct */
-            if (lval->tagsym == 0 || lval->ptr_type != STRUCT || (lval->symbol && lval->symbol->ident == ARRAY)) {
+            if (lval->tagsym == 0 || lval->ptr_type != STRUCT || (lval->symbol && lval->symbol->ident == ARRAY ) ) {
                 error(E_ADDRESS);
             }
             return 0;

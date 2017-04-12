@@ -13,7 +13,7 @@ include(__link__.m4)
 
 #else
 
-   // Z80S180 / Z80L180 CLASS
+   // Z8S180 / Z8L180 CLASS
 
 #endif
 
@@ -22,128 +22,6 @@ include(__link__.m4)
 #if (__Z180 & __Z180_Z80180)
 
    // Z80180 CLASS
-
-   #ifdef __SCCZ80
-
-   #define CNTLA0  __IO_CNTLA0
-   #define CNTLA1  __IO_CNTLA1
-   #define CNTLB0  __IO_CNTLB0
-   #define CNTLB1  __IO_CNTLB1
-   #define STAT0  __IO_STAT0
-   #define STAT1  __IO_STAT1
-   #define TDR0  __IO_TDR0
-   #define TDR1  __IO_TDR1
-   #define RDR0  __IO_RDR0
-   #define RDR1  __IO_RDR1
-
-   #define CNTR  __IO_CNTR
-   #define TRD  __IO_TRD
-
-   #define TMDR0L  __IO_TMDR0L
-   #define TMDR0H  __IO_TMDR0H
-   #define RLDR0L  __IO_RLDR0L
-   #define RLDR0H  __IO_RLDR0H
-   #define TCR  __IO_TCR
-   #define TMDR1L  __IO_TMDR1L
-   #define TMDR1H  __IO_TMDR1H
-   #define RLDR1L  __IO_RLDR1L
-   #define RLDR1H  __IO_RLDR1H
-
-   #define FRC  __IO_FRC
-
-   #define SAR0L  __IO_SAR0L
-   #define SAR0H  __IO_SAR0H
-   #define SAR0B  __IO_SAR0B
-   #define DAR0L  __IO_DAR0L
-   #define DAR0H  __IO_DAR0H
-   #define DAR0B  __IO_DAR0B
-   #define BCR0L  __IO_BCR0L
-   #define BCR0H  __IO_BCR0H
-   #define MAR1L  __IO_MAR1L
-   #define MAR1H  __IO_MAR1H
-   #define MAR1B  __IO_MAR1B
-   #define IAR1L  __IO_IAR1L
-   #define IAR1H  __IO_IAR1H
-   #define BCR1L  __IO_BCR1L
-   #define BCR1H  __IO_BCR1H
-   #define DSTAT  __IO_DSTAT
-   #define DMODE  __IO_DMODE
-   #define DCNTL  __IO_DCNTL
-
-   #define IL  __IO_IL
-   #define ITC  __IO_ITC
-
-   #define RCR  __IO_RCR
-
-   #define CBR  __IO_CBR
-   #define BBR  __IO_BBR
-   #define CBAR  __IO_CBAR
-
-   #define OMCR  __IO_OMCR
-   #define ICR  __IO_ICR
-
-   #endif
-
-   #ifdef __SDCC
-
-   __sfr __at __IO_CNTLA0 CNTLA0;
-   __sfr __at __IO_CNTLA1 CNTLA1;
-   __sfr __at __IO_CNTLB0 CNTLB0;
-   __sfr __at __IO_CNTLB1 CNTLB1;
-   __sfr __at __IO_STAT0 STAT0;
-   __sfr __at __IO_STAT1 STAT1;
-   __sfr __at __IO_TDR0 TDR0;
-   __sfr __at __IO_TDR1 TDR1;
-   __sfr __at __IO_RDR0 RDR0;
-   __sfr __at __IO_RDR1 RDR1;
-
-   __sfr __at __IO_CNTR CNTR;
-   __sfr __at __IO_TRD TRD;
-
-   __sfr __at __IO_TMDR0L TMDR0L;
-   __sfr __at __IO_TMDR0H TMDR0H;
-   __sfr __at __IO_RLDR0L RLDR0L;
-   __sfr __at __IO_RLDR0H RLDR0H;
-   __sfr __at __IO_TCR TCR;
-   __sfr __at __IO_TMDR1L TMDR1L;
-   __sfr __at __IO_TMDR1H TMDR1H;
-   __sfr __at __IO_RLDR1L RLDR1L;
-   __sfr __at __IO_RLDR1H RLDR1H;
-
-   __sfr __at __IO_FRC FRC;
-
-   __sfr __at __IO_SAR0L SAR0L;
-   __sfr __at __IO_SAR0H SAR0H;
-   __sfr __at __IO_SAR0B SAR0B;
-   __sfr __at __IO_DAR0L DAR0L;
-   __sfr __at __IO_DAR0H DAR0H;
-   __sfr __at __IO_DAR0B DAR0B;
-   __sfr __at __IO_BCR0L BCR0L;
-   __sfr __at __IO_BCR0H BCR0H;
-   __sfr __at __IO_MAR1L MAR1L;
-   __sfr __at __IO_MAR1H MAR1H;
-   __sfr __at __IO_MAR1B MAR1B;
-   __sfr __at __IO_IAR1L IAR1L;
-   __sfr __at __IO_IAR1H IAR1H;
-   __sfr __at __IO_BCR1L BCR1L;
-   __sfr __at __IO_BCR1H BCR1H;
-   __sfr __at __IO_DSTAT DSTAT;
-   __sfr __at __IO_DMODE DMODE;
-   __sfr __at __IO_DCNTL DCNTL;
-
-   __sfr __at __IO_IL IL;
-   __sfr __at __IO_ITC ITC;
-
-   __sfr __at __IO_RCR RCR;
-
-   __sfr __at __IO_CBR CBR;
-   __sfr __at __IO_BBR BBR;
-   __sfr __at __IO_CBAR CBAR;
-
-   __sfr __at __IO_OMCR OMCR;
-   __sfr __at __IO_ICR ICR;
-
-   #endif
 
    #ifdef __CLANG
 
@@ -204,83 +82,7 @@ include(__link__.m4)
    extern unsigned char OMCR;
    extern unsigned char ICR;
 
-   #endif
-
-#else
-	
-   // Z80S180 / Z80L180 CLASS
-
-   #ifdef __SCCZ80
-
-   #define CNTLA0  __IO_CNTLA0
-   #define CNTLA1  __IO_CNTLA1
-   #define CNTLB0  __IO_CNTLB0
-   #define CNTLB1  __IO_CNTLB1
-   #define STAT0  __IO_STAT0
-   #define STAT1  __IO_STAT1
-   #define TDR0  __IO_TDR0
-   #define TDR1  __IO_TDR1
-   #define RDR0  __IO_RDR0
-   #define RDR1  __IO_RDR1
-   #define ASEXT0  __IO_ASEXT0
-   #define ASEXT1  __IO_ASEXT1
-   #define ASTC0L  __IO_ASTC0L
-   #define ASTC0H  __IO_ASTC0H
-   #define ASTC1L  __IO_ASTC1L
-   #define ASTC1H  __IO_ASTC1H
-
-   #define CNTR  __IO_CNTR
-   #define TRD  __IO_TRD
-
-   #define TMDR0L  __IO_TMDR0L
-   #define TMDR0H  __IO_TMDR0H
-   #define RLDR0L  __IO_RLDR0L
-   #define RLDR0H  __IO_RLDR0H
-   #define TCR  __IO_TCR
-   #define TMDR1L  __IO_TMDR1L
-   #define TMDR1H  __IO_TMDR1H
-   #define RLDR1L  __IO_RLDR1L
-   #define RLDR1H  __IO_RLDR1H
-
-   #define FRC  __IO_FRC
-   #define CMR  __IO_CMR
-   #define CCR  __IO_CCR
-
-   #define SAR0L  __IO_SAR0L
-   #define SAR0H  __IO_SAR0H
-   #define SAR0B  __IO_SAR0B
-   #define DAR0L  __IO_DAR0L
-   #define DAR0H  __IO_DAR0H
-   #define DAR0B  __IO_DAR0B
-   #define BCR0L  __IO_BCR0L
-   #define BCR0H  __IO_BCR0H
-   #define MAR1L  __IO_MAR1L
-   #define MAR1H  __IO_MAR1H
-   #define MAR1B  __IO_MAR1B
-   #define IAR1L  __IO_IAR1L
-   #define IAR1H  __IO_IAR1H
-   #define IAR1B  __IO_IAR1B
-   #define BCR1L  __IO_BCR1L
-   #define BCR1H  __IO_BCR1H
-   #define DSTAT  __IO_DSTAT
-   #define DMODE  __IO_DMODE
-   #define DCNTL  __IO_DCNTL
-
-   #define IL  __IO_IL
-   #define ITC  __IO_ITC
-
-   #define RCR  __IO_RCR
-
-   #define CBR  __IO_CBR
-   #define BBR  __IO_BBR
-   #define CBAR  __IO_CBAR
-
-   #define OMCR  __IO_OMCR
-   #define ICR  __IO_ICR
-
-   #endif
-
-   #ifdef __SDCC
+   #else
 
    __sfr __at __IO_CNTLA0 CNTLA0;
    __sfr __at __IO_CNTLA1 CNTLA1;
@@ -292,12 +94,6 @@ include(__link__.m4)
    __sfr __at __IO_TDR1 TDR1;
    __sfr __at __IO_RDR0 RDR0;
    __sfr __at __IO_RDR1 RDR1;
-   __sfr __at __IO_ASEXT0 ASEXT0;
-   __sfr __at __IO_ASEXT1 ASEXT1;
-   __sfr __at __IO_ASTC0L ASTC0L;
-   __sfr __at __IO_ASTC0H ASTC0H;
-   __sfr __at __IO_ASTC1L ASTC1L;
-   __sfr __at __IO_ASTC1H ASTC1H;
 
    __sfr __at __IO_CNTR CNTR;
    __sfr __at __IO_TRD TRD;
@@ -313,8 +109,6 @@ include(__link__.m4)
    __sfr __at __IO_RLDR1H RLDR1H;
 
    __sfr __at __IO_FRC FRC;
-   __sfr __at __IO_CMR CMR;
-   __sfr __at __IO_CCR CCR;
 
    __sfr __at __IO_SAR0L SAR0L;
    __sfr __at __IO_SAR0H SAR0H;
@@ -329,7 +123,6 @@ include(__link__.m4)
    __sfr __at __IO_MAR1B MAR1B;
    __sfr __at __IO_IAR1L IAR1L;
    __sfr __at __IO_IAR1H IAR1H;
-   __sfr __at __IO_IAR1B IAR1B;
    __sfr __at __IO_BCR1L BCR1L;
    __sfr __at __IO_BCR1H BCR1H;
    __sfr __at __IO_DSTAT DSTAT;
@@ -349,6 +142,10 @@ include(__link__.m4)
    __sfr __at __IO_ICR ICR;
 
    #endif
+
+#else
+	
+   // Z8S180 / Z8L180 CLASS
 
    #ifdef __CLANG
 
@@ -417,6 +214,74 @@ include(__link__.m4)
 
    extern unsigned char OMCR;
    extern unsigned char ICR;
+
+   #else
+
+   __sfr __at __IO_CNTLA0 CNTLA0;
+   __sfr __at __IO_CNTLA1 CNTLA1;
+   __sfr __at __IO_CNTLB0 CNTLB0;
+   __sfr __at __IO_CNTLB1 CNTLB1;
+   __sfr __at __IO_STAT0 STAT0;
+   __sfr __at __IO_STAT1 STAT1;
+   __sfr __at __IO_TDR0 TDR0;
+   __sfr __at __IO_TDR1 TDR1;
+   __sfr __at __IO_RDR0 RDR0;
+   __sfr __at __IO_RDR1 RDR1;
+   __sfr __at __IO_ASEXT0 ASEXT0;
+   __sfr __at __IO_ASEXT1 ASEXT1;
+   __sfr __at __IO_ASTC0L ASTC0L;
+   __sfr __at __IO_ASTC0H ASTC0H;
+   __sfr __at __IO_ASTC1L ASTC1L;
+   __sfr __at __IO_ASTC1H ASTC1H;
+
+   __sfr __at __IO_CNTR CNTR;
+   __sfr __at __IO_TRD TRD;
+
+   __sfr __at __IO_TMDR0L TMDR0L;
+   __sfr __at __IO_TMDR0H TMDR0H;
+   __sfr __at __IO_RLDR0L RLDR0L;
+   __sfr __at __IO_RLDR0H RLDR0H;
+   __sfr __at __IO_TCR TCR;
+   __sfr __at __IO_TMDR1L TMDR1L;
+   __sfr __at __IO_TMDR1H TMDR1H;
+   __sfr __at __IO_RLDR1L RLDR1L;
+   __sfr __at __IO_RLDR1H RLDR1H;
+
+   __sfr __at __IO_FRC FRC;
+   __sfr __at __IO_CMR CMR;
+   __sfr __at __IO_CCR CCR;
+
+   __sfr __at __IO_SAR0L SAR0L;
+   __sfr __at __IO_SAR0H SAR0H;
+   __sfr __at __IO_SAR0B SAR0B;
+   __sfr __at __IO_DAR0L DAR0L;
+   __sfr __at __IO_DAR0H DAR0H;
+   __sfr __at __IO_DAR0B DAR0B;
+   __sfr __at __IO_BCR0L BCR0L;
+   __sfr __at __IO_BCR0H BCR0H;
+   __sfr __at __IO_MAR1L MAR1L;
+   __sfr __at __IO_MAR1H MAR1H;
+   __sfr __at __IO_MAR1B MAR1B;
+   __sfr __at __IO_IAR1L IAR1L;
+   __sfr __at __IO_IAR1H IAR1H;
+   __sfr __at __IO_IAR1B IAR1B;
+   __sfr __at __IO_BCR1L BCR1L;
+   __sfr __at __IO_BCR1H BCR1H;
+   __sfr __at __IO_DSTAT DSTAT;
+   __sfr __at __IO_DMODE DMODE;
+   __sfr __at __IO_DCNTL DCNTL;
+
+   __sfr __at __IO_IL IL;
+   __sfr __at __IO_ITC ITC;
+
+   __sfr __at __IO_RCR RCR;
+
+   __sfr __at __IO_CBR CBR;
+   __sfr __at __IO_BBR BBR;
+   __sfr __at __IO_CBAR CBAR;
+
+   __sfr __at __IO_OMCR OMCR;
+   __sfr __at __IO_ICR ICR;
 
    #endif
 
