@@ -32,29 +32,73 @@ t_z80asm_capture("", 		$copyrightmsg, 	"", 0);
 # list of files
 #------------------------------------------------------------------------------
 unlink_testfiles();
-write_file(asm1_file(), "defb 1");
-write_file(asm2_file(), "defb 2");
-write_file(asm3_file(), "defb 3");
-write_file(asm4_file(), "defb 4");
-t_z80asm_capture(join(" ", "", "-b", asm1_file(), asm2_file(), asm3_file(), asm4_file()),
-				 "", "", 0);
-t_binary(read_binfile(bin1_file()), "\1\2\3\4");
-ok unlink bin1_file();
+write_file("test1.asm", "defb 1");
+write_file("test2.asm", "defb 2");
+write_file("test3.asm", "defb 3");
+write_file("test4.asm", "defb 4");
 
-write_binfile(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
-write_binfile(asmlst2_file(), "\r\r\n\n  ".asm3_file()."  \r\r\n\n    ".asm4_file()."\n");
-t_z80asm_capture(join(" ", "", "-b", asm1_file(), '@'.asmlst1_file()),
-				 "", "", 0);
-t_binary(read_binfile(bin1_file()), "\1\2\3\4");
-ok unlink bin1_file();
+t_z80asm_capture('-b test1.asm test2.asm test3.asm test4.asm', "", "", 0);
+t_binary(read_binfile("test1.bin"), "\1\2\3\4");
+ok unlink "test1.bin";
 
-write_binfile(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
-write_binfile(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst1_file());
-t_z80asm_capture(join(" ", "", "-b", asm1_file(), '@'.asmlst1_file()),
-				 "", <<'ERR', 1);
-Error at file 'test2.asmlst' line 7: cannot include file 'test1.asmlst' recursively
+# list file with blank lines and comments
+write_binfile("test1.lst", <<'END');
+; comment followed by blank line
+
+# comment
+   test2.asm  
+@  test2.lst  
+END
+
+# list file with different EOL chars
+write_binfile("test2.lst", "\r\r\n\n  "."test3.asm"."  \r\r\n\n    "."test4.asm"."\n");
+t_z80asm_capture('-b test1.asm @test1.lst', "", "", 0);
+t_binary(read_binfile("test1.bin"), "\1\2\3\4");
+ok unlink "test1.bin";
+
+# recursive includes
+write_binfile("test1.lst", "\r\r\n\n  "."test2.asm"."  \r\r\n\n  \@ "."test2.lst");
+write_binfile("test2.lst", "\r\r\n\n  "."test2.asm"."  \r\r\n\n  \@ "."test1.lst");
+t_z80asm_capture('-b test1.asm @test1.lst', "", <<'ERR', 1);
+Error at file 'test2.lst' line 7: cannot include file 'test1.lst' recursively
 1 errors occurred during assembly
 ERR
+
+# expand environment variables in source and list files
+$ENV{TEST_ENV} = 'test';
+
+t_z80asm_capture('-b ${TEST_ENV}1.asm ${TEST_ENV}2.asm ${TEST_ENV}3.asm ${TEST_ENV}4.asm', "", "", 0);
+t_binary(read_binfile("test1.bin"), "\1\2\3\4");
+ok unlink "test1.bin";
+
+write_binfile("test1.lst", <<'END');
+${TEST_ENV}1.asm
+${TEST_ENV}2.asm
+${TEST_ENV}3.asm
+${TEST_ENV}4.asm
+END
+
+t_z80asm_capture('-b @test1.lst', "", "", 0);
+t_binary(read_binfile("test1.bin"), "\1\2\3\4");
+ok unlink "test1.bin";
+
+# non-existent environment variable is empty
+delete $ENV{TEST_ENV};
+
+t_z80asm_capture('-b test${TEST_ENV}1.asm test${TEST_ENV}2.asm test${TEST_ENV}3.asm test${TEST_ENV}4.asm', "", "", 0);
+t_binary(read_binfile("test1.bin"), "\1\2\3\4");
+ok unlink "test1.bin";
+
+write_binfile("test1.lst", <<'END');
+test${TEST_ENV}1.asm
+test${TEST_ENV}2.asm
+test${TEST_ENV}3.asm
+test${TEST_ENV}4.asm
+END
+
+t_z80asm_capture('-b @test1.lst', "", "", 0);
+t_binary(read_binfile("test1.bin"), "\1\2\3\4");
+ok unlink "test1.bin";
 
 #------------------------------------------------------------------------------
 # --help, -h
@@ -490,6 +534,23 @@ for my $options ("-o$bin", "-o=$bin", "--output$bin", "--output=$bin") {
 	t_binary(read_file($bin, binmode => ':raw'), "\0");
 }
 
+# test -o with environment variables
+$ENV{TEST_ENV} = '2.bin';
+unlink_testfiles($bin);
+write_file(asm_file(), "nop");
+t_z80asm_capture('-b -otest${TEST_ENV} '.asm_file(), "", "", 0);
+ok ! -f bin_file();
+ok -f $bin;
+t_binary(read_file($bin, binmode => ':raw'), "\0");
+
+delete $ENV{TEST_ENV};
+unlink_testfiles($bin);
+write_file(asm_file(), "nop");
+t_z80asm_capture('-b -otest${TEST_ENV}2.bin '.asm_file(), "", "", 0);
+ok ! -f bin_file();
+ok -f $bin;
+t_binary(read_file($bin, binmode => ':raw'), "\0");
+
 unlink_testfiles($bin);
 
 #------------------------------------------------------------------------------
@@ -635,6 +696,13 @@ for my $options ('-L', '-L=', '--lib-path', '--lib-path=') {
 	t_z80asm_ok(0, $asm, $bin, $options.$lib_dir." -i".$lib_base);
 }
 
+# use environment variable in -L
+$ENV{TEST_ENV} = 'data';
+t_z80asm_ok(0, $asm, $bin, '-Lt/${TEST_ENV} -i'.$lib_base);
+
+delete $ENV{TEST_ENV};
+t_z80asm_ok(0, $asm, $bin, '-Lt/da${TEST_ENV}ta -i'.$lib_base);
+
 unlink_testfiles($lib);
 
 #------------------------------------------------------------------------------
@@ -658,6 +726,13 @@ for my $options ('-D23', '-Da*') {
 for my $options ('-D', '-D=', '--define', '--define=') {
 	t_z80asm_ok(0, $asm, "\x3E\x01", $options."_value23");
 }
+
+# -D with environment variables
+$ENV{TEST_ENV} = 'value';
+t_z80asm_ok(0, $asm, "\x3E\x01", '-D=_${TEST_ENV}23');
+
+delete $ENV{TEST_ENV};
+t_z80asm_ok(0, $asm, "\x3E\x01", '-D=_value${TEST_ENV}23');
 
 #------------------------------------------------------------------------------
 # -i, --use-lib, -x, --make-lib
