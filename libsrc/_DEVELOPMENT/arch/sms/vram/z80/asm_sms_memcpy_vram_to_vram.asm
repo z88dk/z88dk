@@ -30,20 +30,26 @@ asm_sms_memcpy_vram_to_vram:
    
 loop:
 
+   ; must yield opportunities for an interrupt to occur
+
+   di
+
    ld a,l
    out (__IO_VDP_COMMAND),a
    ld a,h
    out (__IO_VDP_COMMAND),a
-    
+
    in a,(__IO_VDP_DATA)
    ex af,af'
-    
+
    ld a,e
    out (__IO_VDP_COMMAND),a
    ld a,d
    or $40
    out (__IO_VDP_COMMAND),a
-    
+
+   ei
+
    ex af,af'
    out (__IO_VDP_DATA),a
     
