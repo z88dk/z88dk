@@ -483,7 +483,7 @@ zx80_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lzx
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
 
 # ZX81 lib - Stefano
