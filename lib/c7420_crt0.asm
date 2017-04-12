@@ -1,3 +1,4 @@
+;
 ;       CRT0 for the Philips Videopac C7420 module
 ;
 ;       Stefano Bodrato 2015
@@ -7,6 +8,7 @@
 
 
         MODULE  c7420_crt0
+
 
 ;--------
 ; Include zcc_opt.def to find out some info
@@ -36,10 +38,15 @@
 
 start:
         ld      (start1+1),sp	;Save entry stack
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
-	call	crt0_init_bss
+        IF !STACKPTR
+        ;ld      hl,-64
+        ;add     hl,sp
+        ;ld      sp,hl
+		ELSE
+        ld      sp,STACKPTR-64
+		ENDIF
+
+		call    crt0_init_bss
         ld      (exitsp),sp
 		
 ; Optional definition for auto MALLOC init
@@ -49,33 +56,33 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-
-        call    _main
-	push	hl
+		call    _main
 cleanup:
+		push	hl
 ;
 ;       Deallocate memory which has been allocated here!
 ;
 
 IF !DEFINED_nostreams
-	EXTERN	closeall
-	call	closeall
+		EXTERN	closeall
+		call	closeall
 ENDIF
 
-	pop	hl
+		pop	hl
 start1:
-        ld      sp,0
-	ld	a,l
-        jp	$19f9	; $1994 for french version ??
-			; perhaps we should first spot the right location,
-						; looking around for the 47h, AFh sequence
+		ld  sp,0
+		ld	a,l
+		jp	$19f9	; $1994 for french version ??
+				; perhaps we should first spot the right location,
+				; looking around for the 47h, AFh sequence
 
 
-l_dcal:	jp	(hl)		;Used for function pointer calls
+l_dcal:
+		jp	(hl)	; Used for function pointer calls
 
 
 
-        INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE	"crt0_section.asm"
 
 
