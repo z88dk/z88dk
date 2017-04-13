@@ -619,7 +619,7 @@ ti82_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lticalc
-	$(LIBLINKER) -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
+	$(LIBLINKER) -DFORti82 -DSTANDARDESCAPECHARS -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti83_clib.lib:
 	@echo ''
@@ -634,7 +634,7 @@ ti83_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lticalc
-	$(LIBLINKER) -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
+	$(LIBLINKER) -DFORti83 -DSTANDARDESCAPECHARS -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti83p_clib.lib:
 	@echo ''
@@ -649,7 +649,7 @@ ti83p_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lticalc
-	$(LIBLINKER) -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
+	$(LIBLINKER) -DFORti83p -DSTANDARDESCAPECHARS -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti85_clib.lib:
 	@echo ''
@@ -664,7 +664,7 @@ ti85_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lticalc
-	$(LIBLINKER) -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
+	$(LIBLINKER) -DFORti85 -DSTANDARDESCAPECHARS -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti86_clib.lib:
 	@echo ''
@@ -679,7 +679,7 @@ ti86_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lticalc
-	$(LIBLINKER) -DFORti86 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
+	$(LIBLINKER) -DFORti86 -DSTANDARDESCAPECHARS -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 # vt100 C lib for the Sharp OZ family - stefano
 # use -DPACKEDFONT for tiny 50->80 column modes
