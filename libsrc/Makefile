@@ -321,7 +321,7 @@ ts2068_clib.lib:
 	$(MAKE) -C spectrum
 	$(MAKE) -C psg
 	$(MAKE) -C games lzx
-	$(LIBLINKER) -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
+	$(LIBLINKER) -DFORzx -DFORts2068 -DSTANDARDESCAPECHARS -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano
 gfx2068hr.lib:
