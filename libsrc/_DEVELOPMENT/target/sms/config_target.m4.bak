@@ -31,8 +31,8 @@ define(`__MM_FRAME_2_RAM_CONTROL',    0xfffc)
 
 # VRAM Address Settings (VRAM size is 16k)
 
-define(`__SMS_VRAM_SCREEN_MAP_ADDRESS',  0x3800)              # multiples of 0x0800 - affects devkitSMS
-define(`__SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS', 0x3f00)   # multiples of 0x0100 - affects devkitSMS
+define(`__SMS_VRAM_SCREEN_MAP_ADDRESS',  0x3800)              # multiples of 0x0800
+define(`__SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS', 0x3f00)   # multiples of 0x0100
 define(`__SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS', 0x2000)      # 0x0000 or 0x2000
 
 #
