@@ -15,7 +15,11 @@
 	ld	a,(hl)
 	
 	ld  c,a
+IF STANDARDESCAPECHARS
+	cp  10
+ELSE
 	cp  13
+ENDIF
 	jr  nz,nocr
 	call $f00c		; conout
 	ld  c,10
