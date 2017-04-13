@@ -35,14 +35,21 @@
 	ld	a,(hl)
 	
 IF STANDARDESCAPECHARS
-	cp  13
-	ret z
 	cp  10
 	jr  nz,notCR
 	ld	a,13
 .notCR
 ENDIF
 
+
+	; Some undercase text?  Transform in UPPER !
+	cp	97
+	jr	c,nounder
+	sub	32
+	jr	setout
+.nounder
+	; Some more char remapping can stay here...
+.setout
 
         push    ix
 	ld	(savesp),sp
