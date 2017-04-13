@@ -33,10 +33,17 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	cp	12	; Clear screen ?
-	jr	nz,nocls
-	;ld	a,$16
-.nocls
+	
+IF STANDARDESCAPECHARS
+	cp  13
+	ret z
+	cp  10
+	jr  nz,notCR
+	ld	a,13
+.notCR
+ENDIF
+
+
         push    ix
 	ld	(savesp),sp
 
