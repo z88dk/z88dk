@@ -1,0 +1,6 @@
+input/sms/z80/asm_in_pause
+input/sms/z80/asm_in_stick_1
+input/sms/z80/asm_in_stick_2
+input/sms/z80/asm_in_test_key
+input/sms/z80/asm_in_wait_key
+input/sms/z80/asm_in_wait_nokey

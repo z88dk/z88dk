@@ -1,0 +1,7 @@
+@input/sms/input_asm.lst
+input/sms/c/sccz80/in_pause
+input/sms/c/sccz80/in_stick_1
+input/sms/c/sccz80/in_stick_2
+input/sms/c/sccz80/in_test_key
+input/sms/c/sccz80/in_wait_key
+input/sms/c/sccz80/in_wait_nokey
