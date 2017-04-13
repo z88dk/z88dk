@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr 2001
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:46 dom Exp $
+;	$Id: fputc_cons.asm - 04/2017, Stefano $
 ;
 
 	SECTION code_clib
@@ -48,10 +48,17 @@ ENDIF
 ;  Linefeed or Carriage return ?
 
 .nocls
+IF STANDARDESCAPECHARS
+	cp	10		;CR
+	jr	z,docrlf
+	cp	13
+	jr	nz,nocrlf
+ELSE
 	cp	13		;CR
 	jr	z,docrlf
 	cp	10
 	jr	nz,nocrlf
+ENDIF
 .docrlf
 
 IF FORti82
