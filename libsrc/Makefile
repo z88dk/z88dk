@@ -1049,7 +1049,7 @@ z1013_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(LIBLINKER) -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
+	$(LIBLINKER) -DFORz1013 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
 z9001_clib.lib:
@@ -1065,7 +1065,7 @@ z9001_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz9001
-	$(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
+	$(LIBLINKER) -DFORz9001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
 	@echo ''
 	@echo '--- Building Z9001 Standard Graphics Libraires ---'
 	@echo ''
@@ -1089,7 +1089,7 @@ kc_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(LIBLINKER) -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
+	$(LIBLINKER) -DFORkc -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
