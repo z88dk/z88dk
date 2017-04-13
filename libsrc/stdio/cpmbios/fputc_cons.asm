@@ -22,6 +22,10 @@ ELSE
 ENDIF
 	jr  nz,nocr
 	call $f00c		; conout
+IF STANDARDESCAPECHARS
+	ld  c,13
+ELSE
 	ld  c,10
+ENDIF
 .nocr
 	jp  $f00c		; conout
