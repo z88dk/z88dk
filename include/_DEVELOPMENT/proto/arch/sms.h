@@ -80,6 +80,9 @@ extern volatile unsigned char MM_FFFC;
 
 // VRAM <-> MEMORY COPY OPERATIONS
 
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_mem_to_cram,unsigned int cdst,void *src,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_mem_to_cram_unsafe,unsigned int cdst,void *src,unsigned int n)
+
 __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_mem_to_vram,unsigned int dst,void *src,unsigned int n)
 __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_mem_to_vram_unsafe,unsigned int dst,void *src,unsigned int n)
 

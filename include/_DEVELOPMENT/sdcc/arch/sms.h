@@ -82,6 +82,17 @@ extern volatile unsigned char MM_FFFC;
 
 // VRAM <-> MEMORY COPY OPERATIONS
 
+extern unsigned int sms_memcpy_mem_to_cram(unsigned int cdst,void *src,unsigned int n) __preserves_regs(iyl,iyh);
+extern unsigned int sms_memcpy_mem_to_cram_callee(unsigned int cdst,void *src,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_memcpy_mem_to_cram(a,b,c) sms_memcpy_mem_to_cram_callee(a,b,c)
+
+
+extern unsigned int sms_memcpy_mem_to_cram_unsafe(unsigned int cdst,void *src,unsigned int n) __preserves_regs(iyl,iyh);
+extern unsigned int sms_memcpy_mem_to_cram_unsafe_callee(unsigned int cdst,void *src,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_memcpy_mem_to_cram_unsafe(a,b,c) sms_memcpy_mem_to_cram_unsafe_callee(a,b,c)
+
+
+
 extern unsigned int sms_memcpy_mem_to_vram(unsigned int dst,void *src,unsigned int n) __preserves_regs(iyl,iyh);
 extern unsigned int sms_memcpy_mem_to_vram_callee(unsigned int dst,void *src,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define sms_memcpy_mem_to_vram(a,b,c) sms_memcpy_mem_to_vram_callee(a,b,c)

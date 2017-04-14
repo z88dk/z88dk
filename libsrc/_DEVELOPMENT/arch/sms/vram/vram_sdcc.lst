@@ -1,4 +1,8 @@
 @arch/sms/vram/vram_asm.lst
+arch/sms/vram/c/sdcc/sms_memcpy_mem_to_cram
+arch/sms/vram/c/sdcc/sms_memcpy_mem_to_cram_callee
+arch/sms/vram/c/sdcc/sms_memcpy_mem_to_cram_unsafe
+arch/sms/vram/c/sdcc/sms_memcpy_mem_to_cram_unsafe_callee
 arch/sms/vram/c/sdcc/sms_memcpy_mem_to_vram
 arch/sms/vram/c/sdcc/sms_memcpy_mem_to_vram_callee
 arch/sms/vram/c/sdcc/sms_memcpy_mem_to_vram_unsafe

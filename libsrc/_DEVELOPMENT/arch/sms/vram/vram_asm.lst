@@ -1,3 +1,5 @@
+arch/sms/vram/z80/asm_sms_memcpy_mem_to_cram
+arch/sms/vram/z80/asm_sms_memcpy_mem_to_cram_unsafe
 arch/sms/vram/z80/asm_sms_memcpy_mem_to_vram
 arch/sms/vram/z80/asm_sms_memcpy_mem_to_vram_unsafe
 arch/sms/vram/z80/asm_sms_memcpy_vram_to_mem
