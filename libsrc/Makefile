@@ -465,7 +465,7 @@ vz_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lvz
-	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
+	$(LIBLINKER) -DFORvz -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
 
 # ZX80 lib - Stefano
 zx80_clib.lib:
@@ -1328,7 +1328,7 @@ trs80_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C games ltrs80
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
+	$(LIBLINKER) -DFORtrs80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
 	@echo ''
 	@echo '--- Building TRS 80 GFX libraires ---'
