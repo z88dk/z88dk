@@ -20,12 +20,12 @@ dnl## $13 = background character (absolute 16-bit character) ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_m4_sms_01_output_terminal',dnl
+define(`m4_sms_01_output_terminal',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: m4_sms_01_output_terminal
+   ; driver: sms_01_output_terminal
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : write only
    ; type  : 002 = output terminal
@@ -152,8 +152,8 @@ define(`m4_m4_sms_01_output_terminal',dnl
       ; print flags
       ; background character
       
-      defw $10
-      defw $11
+      defw $10 & 0x3800
+      defw $11 & 0x01ff
       defb $12
       defw $13
 

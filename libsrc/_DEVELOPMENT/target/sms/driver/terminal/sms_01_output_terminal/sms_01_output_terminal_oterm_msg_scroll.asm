@@ -17,8 +17,7 @@ sms_01_output_terminal_oterm_msg_scroll:
    
    push hl
    
-   ld e,c
-   ld d,0                      ; de = number of rows to scroll upward
+   ld e,c                      ; e = number of rows to scroll upward
 
    ld l,(ix+26)
    ld h,(ix+27)                ; hl = background character
