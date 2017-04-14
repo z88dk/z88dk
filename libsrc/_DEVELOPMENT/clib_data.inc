@@ -3,6 +3,7 @@
 
 section data_alloc_balloc
 section data_alloc_malloc
+section data_arch
 section data_fcntl
 section data_fcntl_stdio_heap_head
 section data_fcntl_stdio_heap_body
