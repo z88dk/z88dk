@@ -157,4 +157,8 @@
       defc CRT_OTERM_WINDOW_HEIGHT = 24
    ENDIF
 
+   IFNDEF CRT_OTERM_TERMINAL_FLAGS
+      defc CRT_OTERM_TERMINAL_FLAGS = 0x2370
+   ENDIF
+   
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
