@@ -7,7 +7,7 @@
 
 // SDSC Header - not generated if no SDSC pragmas are present
 
-#pragma output   SDSC_HDR_VERSION     = 1046
+#pragma output   SDSC_HDR_VERSION     = 199
 #pragma output   SDSC_HDR_DATE        = 20170414         // if omitted current date is used
 #pragma redirect SDSC_HDR_AUTHOR      = _author          // character string in program
 #pragma redirect SDSC_HDR_NAME        = _name            // character string in program
@@ -20,3 +20,5 @@
 // Output Terminal Options
 
 #pragma output CRT_OTERM_CHAR_PATTERN_OFFSET = -32       // ascii code 32 of the font will be mapped to character 0
+#pragma output CRT_OTERM_WINDOW_WIDTH = 32
+#pragma output CRT_OTERM_WINDOW_HEIGHT = 12
