@@ -27,5 +27,6 @@ defc asm_sms_memsetw_vram_unsafe = asm_sms_memsetw_vram
    ;
    ; exit  : hl = void *dst, &byte after last written in vram
    ;         de = unsigned int c
+   ;         bc = 0
    ;
    ; uses  : af, bc, de, hl

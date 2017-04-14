@@ -25,6 +25,7 @@ asm_sms_memcpy_mem_to_cram_unsafe:
    ;
    ; exit  : de = void *src, &byte after last read from memory
    ;         hl = void *dst, &byte after last written to cram
+   ;         bc = 0
    ;
    ; uses  : af, bc, de, hl
 

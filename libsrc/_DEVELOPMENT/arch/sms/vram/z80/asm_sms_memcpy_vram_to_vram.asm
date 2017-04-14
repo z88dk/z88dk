@@ -25,6 +25,7 @@ asm_sms_memcpy_vram_to_vram:
    ;
    ; exit  : hl = void *src, &byte after last read
    ;         de = void *dst, &byte after last written
+   ;         bc = 0
    ;
    ; uses  : af, bc, de, hl, af'
    
