@@ -27,7 +27,7 @@
 void ClearCast(LVALUE* lval)
 {
     lval->c_vtype = lval->c_id = lval->c_flags = 0;
-    lval->c_tag = (TAG_SYMBOL*)0;
+    lval->c_tag = NULL;
     lval->level = 0;
     lval->castlevel = 0;
 }
@@ -120,8 +120,9 @@ int heir1(LVALUE* lval)
 #endif
             } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
                 warning(W_INTPTR);
-        } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const)))
+        } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const))) {
             warning(W_PTRINT);
+        }
 
         // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
         if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
@@ -197,12 +198,6 @@ int heir1(LVALUE* lval)
     else
         plnge2a(heir1, lval, &lval2, oper, doper, constoper);
 
-    /*
-     * djm 23/2/99 Major flaw in the plan here Ron, we don't check the
-     * types properly before storing, this one left open for years!!!
-     * So we we do int+=double we don't get the right value (slaps head
-     * and runs round the room!)
-     */
     force(lval3.val_type, lval->val_type, lval3.flags & UNSIGNED, lval->flags & UNSIGNED, lval->is_const);
     smartstore(&lval3);
     return 0;
@@ -227,9 +222,7 @@ int heir1a(LVALUE* lval)
             rvalue(lval);
         /* test condition, jump to false expression evaluation if necessary */
         if (DoTestJump(lval)) {
-            /*
- * Always evaluated as an integer, so fake it temporarily
- */
+            // Always evaluated as an integer, so fake it temporarily
             force(CINT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
             temptype = lval->val_type;
             lval->val_type = CINT; /* Force to integer */
@@ -631,16 +624,12 @@ int heira(LVALUE* lval)
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
-            /* OK to take address of struct */
-            if (lval->tagsym == 0 || lval->ptr_type != STRUCT || (lval->symbol && lval->symbol->ident == ARRAY ) ) {
-                error(E_ADDRESS);
-            }
+            // There probably needs to be some checks in here, to be defined later
+            if (lval->c_vtype)
+                docast(lval, NO);
             return 0;
         }
-        /*
- * Do the cast in here and convert the type, but don't generate any
- * code..
- */
+        // Do the cast in here and convert the type, but don't generate any code.
         if (lval->c_vtype)
             docast(lval, NO);
 
@@ -664,10 +653,6 @@ int heira(LVALUE* lval)
 
         k = heirb(lval);
 
-        /*
- * djm 2/3/99 Removed if (k) because heirb returns 0 for a function
- * hopefully this will work, also inserted the check for VOID
- */
         if (k)
             ltype = lval->val_type; /* djm 28/11/98 */
         if (match("++")) {
