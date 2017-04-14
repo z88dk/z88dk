@@ -56,7 +56,7 @@ asm_sms_scroll_wc_up:
    ex de,hl                    ; de = copy to screen map address
    
    ld a,(ix+2)                 ; a = rect.y
-   add a,c
+   add a,l                     ; add number of rows to scroll
    ld h,a                      ; h = y coord of copy up area
    ld l,(ix+0)                 ; l = x coord of copy up area
    
