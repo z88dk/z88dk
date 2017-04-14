@@ -22,7 +22,7 @@ EXTERN __aplib_var_bits, __aplib_var_byte
 EXTERN __aplib_var_LWM, __aplib_var_R0
 
 EXTERN __aplib_getbit, __aplib_getbitbc, __aplib_getgamma
-EXTERN asm_sms_ldir_vram_to_vram, asm_sms_set_vram_write_de, asm_sms_set_vram_read_hl
+EXTERN asm_sms_memcpy_vram_to_vram, asm_sms_set_vram_write_de, asm_sms_set_vram_read_hl
 
 ap_VRAMToDE_write:
 
@@ -56,7 +56,7 @@ ap_VRAM_ldir_dest_to_dest:
   ; if it uses overlapping source/dest then a buffer will break it
 
    push af
-   call asm_sms_ldir_vram_to_vram
+   call asm_sms_memcpy_vram_to_vram
    pop af
    ret
    

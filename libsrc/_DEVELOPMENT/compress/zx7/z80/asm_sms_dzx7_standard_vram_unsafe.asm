@@ -21,11 +21,11 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_compress_zx7
 
-PUBLIC asm_dzx7_standard_vram_unsafe
+PUBLIC asm_sms_dzx7_standard_vram_unsafe
 
-EXTERN asm_sms_set_vram_write_de, asm_sms_ldir_vram_to_vram_unsafe, l_ret
+EXTERN asm_sms_set_vram_write_de, asm_sms_memcpy_vram_to_vram_unsafe, l_ret
 
-asm_dzx7_standard_vram_unsafe:
+asm_sms_dzx7_standard_vram_unsafe:
 
    ; enter : hl = void *src
    ;         de = unsigned int dst in vram
@@ -113,7 +113,7 @@ dzx7s_offset_end:
         sbc     hl, de                  ; HL = destination - offset - 1
         pop     de                      ; DE = destination
         ;;ldir
-        call asm_sms_ldir_vram_to_vram_unsafe
+        call asm_sms_memcpy_vram_to_vram_unsafe
         
 ;;dzx7s_exit:
 
