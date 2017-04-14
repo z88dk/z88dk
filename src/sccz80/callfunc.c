@@ -257,7 +257,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     } else {
         /* If we have a frame pointer then ix holds it */
 #ifdef USEFRAME
-        if (c_useframepointer) {
+        if (c_framepointer_is_ix != -1) {
             if (nargs)
                 RestoreSP(preserve);
             Zsp += nargs;

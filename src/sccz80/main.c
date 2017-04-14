@@ -13,7 +13,7 @@
 extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. */
 #endif
 
-static char   *c_output_extension = ".asm";
+static char   *c_output_extension = "asm";
 
 
 static int      gargc; /* global copies of command line args */
@@ -41,56 +41,104 @@ char *c_data_section = "data_compiler";
 char *c_bss_section = "bss_compiler";
 char *c_code_section = "code_compiler";
 
-/*
- * Some external data
- */
+
+#define OPT_BOOL         1
+#define OPT_BOOL_FALSE   2
+#define OPT_INT          4
+#define OPT_STRING       8
+#define OPT_ASSIGN       16
+#define OPT_MORE         32
+#define OPT_FUNCTION     64
+#define OPT_HEADER       128
+
+
+typedef struct {
+    const char     short_name;
+    const char    *long_name;
+    int            type;
+    const char    *description;
+    void          *value;
+    intptr_t       data;
+} option;
+
 
 static void dumpfns(void);
 static void dumpvars(void);
-static void DispVersion(char*);
-static void SetMakeShared(char*);
-static void SetUseShared(char*);
-static void SetAssembler(char* arg);
-static void SetOutExt(char* arg);
 static void parse(void);
 static void errsummary(void);
 static char *nextarg(int n, char *s, int size);
 static void setup_sym(void);
 static void info(void);
 static void openout(void);
-static void set_cpu(char *arg);
-static void SetNoWarn(char *arg);
-static void SetMathZ88(char *arg);
-static void SetUnsigned(char *arg);
-static void SetDoInline(char *arg);
-static void SetStopError(char *arg);
-static void SetCompactCode(char *arg);
-static void SetCCode(char *arg);
-static void SetDefine(char *arg);
-static void SetUndefine(char *arg);
-static void DispInfo(char *arg);
-static void SetVerbose(char *arg);
-static void UnSetWarning(char *arg);
-static void SetWarning(char *arg);
-static void SetAllWarn(char *arg);
-static void SetShareOffset(char *);
-static void SetDoubleStrings(char *);
-static void SetNoAltReg(char *);
-static void SetSharedFile(char *);
-static void SetDebug(char *);
-static void SetASXX(char *);
-#ifdef USEFRAME
-static void SetFrameIX(char *);
-static void SetFrameIY(char *);
-static void SetNoFrame(char *);
-#endif
-static void SetStandardEscape(char *);
-static void set_default_r2l(char *arg);
+
+static int parse_arguments(option *args, int argc, char **argv);
+static void SetAssembler(option *arg, char* val);
+static void SetDefine(option *arg, char *val);
+static void SetUndefine(option *arg, char *val);
+static void UnSetWarning(option *arg, char *val);
+static void SetWarning(option *arg, char *val);
+static void SetNoWarn(option *arg, char* val);
+static void SetAllWarn(option *arg, char *val);
+static void DispInfo(option *arg, char *val);
+
+
 static void atexit_deallocate(void);
-static void set_rodata_section(char *arg);
-static void set_data_section(char *arg);
-static void set_code_section(char *arg);
-static void set_bss_section(char *arg);
+
+
+
+static option  sccz80_opts[] = {
+    { 'v', "verbose", OPT_BOOL, "Be verbose", &c_verbose, 0 },
+    { 'h', "help", OPT_FUNCTION, "Show this help page", DispInfo, 0 },
+    { 0, "", OPT_HEADER, "CPU Targetting:", NULL, 0 },
+    { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, CPU_Z80 },
+    { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, CPU_Z180 },
+    { 0, "mr2k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, CPU_R2K },
+    { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, CPU_R3K },
+    { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
+    { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
+    { 0, "do-inline", OPT_BOOL, "Inlne some common functions", &c_doinline, 0 },
+    { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
+    { 0, "math-z88", OPT_BOOL, "Make FP constants match z88", &c_mathz88, 0 },
+    { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, 0 },
+    { 0, "compact", OPT_BOOL, "Make all functions callee", &c_compact_code, 0},
+    { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, 0},
+    { 0, "set-r2l-by-default", OPT_BOOL, "Use r->l calling convention by default", &c_use_r2l_calling_convention, 0 },
+    { 0, "asm", OPT_FUNCTION, "=<name> Set the assembler output (z80asm,vasm,asxx,gnu)", SetAssembler, 0 },
+    { 0, "constseg", OPT_STRING, "=<name> Set the const section name", &c_rodata_section, 0 },
+    { 0, "codeseg", OPT_STRING, "=<name> Set the code section name", &c_code_section, 0 },
+    { 0, "bssseg", OPT_STRING, "=<name> Set the bss section name", &c_bss_section, 0 },
+    { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, 0 },
+#ifdef USEFRAME
+    { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, 0 },
+    { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},
+    { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, 0},
+#endif
+    { 0, "", OPT_HEADER, "Shared code generation:", NULL, 0 },
+    { 0, "make-shared", OPT_BOOL, "This Library file is shared", &c_makeshare, 0 },
+    { 0, "shared-file", OPT_BOOL, "All functions with this file are shared", &c_shared_file, 0 },
+    { 0, "use-shared", OPT_BOOL, "Use shared library functions", &c_useshared, 0 },
+    { 0, "share-offset", OPT_INT, "=<val> Define the shared offset (use with -make-shared)", &c_share_offset, 0 },
+
+
+    { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },
+    { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, 0 },
+    { 0, "Wnone", OPT_FUNCTION|OPT_BOOL, "Disable all warnings", SetNoWarn, 0 },
+    { 0, "Wall", OPT_FUNCTION|OPT_BOOL, "Enable all warnings", SetAllWarn, 0 },
+    { 0, "Wn", OPT_FUNCTION|OPT_MORE, "<num> Disable a warning", UnSetWarning, 0},
+    { 0, "W", OPT_FUNCTION|OPT_MORE, "<num> Enable a warning",  SetWarning, 0 },
+    
+    { 0, "", OPT_HEADER, "Debugging options", NULL, 0 },
+    { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, 0 },
+    { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, 0 },
+    { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, 0 },
+    { 0, "D", OPT_FUNCTION|OPT_MORE, "Define a preprocessor directive", SetDefine, 0 },
+    { 0, "U", OPT_FUNCTION|OPT_MORE, "Undefine a preprocessor directive" , SetUndefine, 0 },
+    { 0, "", OPT_HEADER, "All options can be prefixed with either a single or double -", NULL, 0},
+    { 0, "", OPT_HEADER, "Assignments can either be = or as next argument", NULL, 0},
+    { 0 }
+};
+
+
 
 
 /*
@@ -104,7 +152,6 @@ static void set_bss_section(char *arg);
  */
 int main(int argc, char** argv)
 {
-    int n; /* Loop counter */
     gargc = argc;
     gargv = argv;
 
@@ -169,8 +216,7 @@ int main(int argc, char** argv)
     c_share_offset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
     c_assembler_type = ASM_Z80ASM;
-    c_framepointer_is_ix = YES;
-    c_useframepointer = NO;
+    c_framepointer_is_ix = -1;
     c_use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
@@ -178,17 +224,10 @@ int main(int argc, char** argv)
     atexit(atexit_deallocate); /* To free everything */
     clear();
     filenum = 0;
-    for (n = 1; n < argc; n++) {
-        if (argv[n][0] == '-')
-            ParseArgs(1 + argv[n]);
-        else {
-            filenum = n;
-            break;
-        }
-    }
+    gargc = parse_arguments(sccz80_opts, argc, argv);
     clear();
 
-    if (filenum == 0) {
+    if (gargc == 0) {
         info();
         exit(1);
     }
@@ -291,7 +330,7 @@ char *nextarg(int n, char* s, int size)
     char* str2;
     int i;
 
-    if (n < 1 || n >= gargc)
+    if (n < 0 || n >= gargc)
         return NULL;
     i = 0;
     str = str2 = gargv[n];
@@ -772,195 +811,132 @@ void closeout()
     output = 0; /* mark as closed */
 }
 
-struct args {
-    char* name;
-    char more;
-    void (*setfunc)(char*);
-    char* help;
-};
-
-struct args myargs[] = {
-    { "math-z88", NO, SetMathZ88, "Enable machine native maths mode" },
-    { "unsigned", NO, SetUnsigned, "Make all types unsigned" },
-    { "do-inline", NO, SetDoInline, "Inline certain common functions" },
-    { "stop-error", NO, SetStopError, "Stop when an error is received" },
-    { "make-shared", NO, SetMakeShared, "This Library file is shared" },
-    { "shared-file", NO, SetSharedFile, "All functions within this file are shared" },
-    { "use-shared", NO, SetUseShared, "Used shared library functions" },
-    { "Wnone", NO, SetNoWarn, "Disable all warnings" },
-    { "compact", NO, SetCompactCode, "Enable caller cleanup for all functions" },
-    { "cc", NO, SetCCode, "Intersperse the assembler output with the source c code" },
-    { "verbose", NO, SetVerbose, "Be more verbose" },
-    { "D", YES, SetDefine, "Define a preprocessor directive" },
-    { "U", YES, SetUndefine, "Undefine a preprocessor directive" },
-    { "h", NO, DispInfo, "Displays this text" },
-    { "v", NO, SetVerbose, "Be more verbose" },
-    { "Wall", NO, SetAllWarn, "Enable all warnings" },
-    { "Wn", YES, UnSetWarning, "Unset a warning" },
-    { "W", YES, SetWarning, "Set a warning" },
-    { "c_share_offset=", YES, SetShareOffset, "Define the shared offset (use with -make-shared" },
-    { "version", NO, DispVersion, "Display the version of sccz80" },
-    { "debug=", YES, SetDebug, "Enable some extra logging" },
-    { "asm=", YES, SetAssembler, "Set the assembler mode to use" },
-    { "ext=", YES, SetOutExt, "Use this file extension for generated output" },
-    { "asxx", NO, SetASXX, "Use asxx as the output format" },
-    { "doublestr", NO, SetDoubleStrings, "Convert fp strings to values at runtime" },
-    { "noaltreg", NO, SetNoAltReg, "Don't use alternate registers" },
-#ifdef USEFRAME
-    { "frameix", NO, SetFrameIX, "Use ix as the framepointer" },
-    { "frameiy", NO, SetFrameIY, "Use iy as the framepointer" },
-    { "noframe", NO, SetNoFrame, "Don't use a framepointer (default)" },
-#endif
-    { "standard-escape-chars", NO, SetStandardEscape, "Use standard mappings for escape codes" },
-    { "set-r2l-by-default", NO, set_default_r2l, "Use r2l calling by default"},
-    { "m", YES, set_cpu, "Set the target CPU (z80, z180, r2k, r3k)"},
-    { "-constseg=",YES, set_rodata_section, "Set the const section name"},
-    { "-codeseg=",YES, set_code_section, "Set the code section name"},
-    { "-bssseg=",YES, set_bss_section, "Set the BSS section name"},
-    { "-dataseg=",YES, set_data_section, "Set the data section name"},
-    
-    /* Compatibility Modes.. */
-    { "f", NO, SetUnsigned, NULL },
-    { "", 0, NULL, NULL }
-};
 
 
-static void set_rodata_section(char *arg)
-{
-    char *ptr = strchr(arg,'=');
-    c_rodata_section = strdup(ptr + 1);
-}
 
-static void set_data_section(char *arg)
+static void set_option(option *arg, char *value)
 {
-    char *ptr = strchr(arg,'=');
-    c_data_section = strdup(ptr + 1);
-}
-static void set_code_section(char *arg)
-{
-    char *ptr = strchr(arg,'=');
-    c_code_section = strdup(ptr + 1);
-}
-static void set_bss_section(char *arg)
-{
-    char *ptr = strchr(arg,'=');
-    c_bss_section = strdup(ptr + 1);
+    if ( arg->type & OPT_ASSIGN ) {
+        if ( arg->type & (OPT_BOOL|OPT_INT) ) {
+            *(int *)arg->value = arg->data;
+        } else if ( arg->type & OPT_STRING ) {
+            *(char *)arg->value = arg->data;
+        }
+    } else if ( arg->type & OPT_FUNCTION ) {
+        void (*func)(option *arg, char *type) = arg->value;
+        func(arg,value);
+    } else if ( arg->type & OPT_BOOL ) {
+        int  val = 1;
+        if ( value != NULL ) {
+            if ( toupper(*value) == 'N' || toupper(*value) == 'F' || *value == '0') {
+                val = 0;
+            }
+        }
+        *(int *)arg->value = val;
+    } else if ( arg->type & OPT_BOOL_FALSE) {
+        *(int *)arg->value = 0;
+    } else if ( arg->type & OPT_INT ) {
+        *(int *)arg->value = atoi(value);
+    } else if ( arg->type & OPT_STRING ) {
+        *(char **)arg->value = value;
+    } 
 }
 
 
-
-#ifdef USEFRAME
-static void SetNoFrame(char* arg)
+int parse_arguments(option *args, int argc, char **argv)
 {
-    c_useframepointer = NO;
-    c_framepointer_is_ix = NO;
-}
+    int    i;
+    int    outargc = 0;
 
-static void SetFrameIX(char* arg)
-{
-    c_useframepointer = YES;
-    c_framepointer_is_ix = YES;
-}
+    for ( i = 1; i < argc; i++ ) {
+        option *myarg;
+        if ( argv[i][0] == '-') {
+            char   *argstart = argv[i] + 1;
 
-static void SetFrameIY(char* arg)
-{
-    c_useframepointer = YES;
-    c_framepointer_is_ix = NO;
-}
-#endif
-
-static void set_cpu(char *arg)
-{
-    if ( strcmp(arg,"mz80") == 0) {
-        c_cpu = CPU_Z80;
-    } else if ( strcmp(arg, "mz180") == 0 ) {
-        c_cpu = CPU_Z180;
-    } else if ( strcmp(arg, "mr2k") == 0 ) {
-        c_cpu = CPU_R2K;
-    } else if ( strcmp(arg, "mr3k") == 0 ) {
-        c_cpu = CPU_R3K;
+            /* Swallow the second - option */
+            if  ( *argstart == '-' ) {
+                argstart++;
+            }
+            for ( myarg = args ; myarg->description != NULL; myarg++ ) {
+                if ( myarg->type & OPT_HEADER ) {
+                    continue;
+                }
+                if ( strlen(argstart) == 1 && *argstart == myarg->short_name ) {
+                    char *val = NULL;
+                    if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN)) == 0 ) {
+                        if ( ++i < argc ) {
+                            val = argv[i];
+                        } else {
+                            fprintf(stderr, "Insufficient number of arguments supplied\n");
+                            break;                       
+                         }
+                    }
+                    set_option(myarg, val);
+                    break;
+                } else if ( myarg->long_name && strncmp(argstart, myarg->long_name, strlen(myarg->long_name)) == 0 ) {
+                    char  *val = NULL;
+                    if ( argstart[strlen(myarg->long_name)] == '=' ) {
+                        val = argstart + strlen(myarg->long_name) + 1;
+                    } else if ( myarg->type & OPT_MORE ) {
+                        val = argstart + strlen(myarg->long_name);
+                    } else {
+                        if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN)) == 0 ) {
+                            if ( ++i < argc ) {
+                                val = argv[i];
+                            } else {
+                                fprintf(stderr, "Insufficient number of arguments supplied\n");
+                                break;
+                            }
+                        }
+                    }
+                    set_option(myarg, val);
+                    break;
+                }
+            }
+            if ( myarg->description == NULL ) {
+                fprintf(stderr, "Unknown option %s\n",argv[i]);
+            }
+        } else {
+            /* Copy unswallowed options */
+            argv[outargc++] = argv[i];
+        }
     }
+    return outargc;
 }
 
-void SetStandardEscape(char* arg)
-{
-    c_standard_escapecodes = YES;
-}
 
-void SetDoubleStrings(char* arg)
-{
-    c_double_strings = YES;
-}
 
-void SetNoAltReg(char* arg)
-{
-    c_notaltreg = YES;
-}
 
-void SetASXX(char* arg)
-{
-    c_assembler_type = ASM_ASXX;
-}
 
-/* debug= */
 
-void SetDebug(char* arg)
+void UnSetWarning(option *arg, char* val)
 {
     int num;
     num = 0;
-    sscanf(arg + 6, "%d", &num);
-    if (num != 0)
-        debuglevel = num;
-}
-
-/* c_share_offset= */
-
-void SetShareOffset(char* arg)
-{
-    int num;
-    num = 0;
-    sscanf(arg + 12, "%d", &num);
-    if (num != 0)
-        c_share_offset = num;
-}
-
-
-void UnSetWarning(char* arg)
-{
-    int num;
-    num = 0;
-    sscanf(arg + 2, "%d", &num);
+    sscanf(val, "%d", &num);
     if (num < W_MAXIMUM)
         mywarn[num].suppress = 1;
 }
 
-void SetWarning(char* arg)
+void SetWarning(option *arg, char* val)
 {
     int num;
     num = 0;
-    sscanf(arg + 1, "%d", &num);
+    sscanf(val, "%d", &num);
     if (num < W_MAXIMUM)
         mywarn[num].suppress = 0;
 }
 
-void SetMathZ88(char* arg)
-{
-    c_mathz88 = YES;
-}
 
-void SetUnsigned(char* arg)
-{
-    c_default_unsigned = YES;
-}
 
-void SetNoWarn(char* arg)
+void SetNoWarn(option *arg, char* val)
 {
     int i;
     for (i = 1; i < W_MAXIMUM; i++)
         mywarn[i].suppress = 1;
 }
 
-void SetAllWarn(char* arg)
+void SetAllWarn(option *arg, char* val)
 {
     int i;
     for (i = 1; i < W_MAXIMUM; i++)
@@ -968,89 +944,55 @@ void SetAllWarn(char* arg)
 }
 
 
-void SetDoInline(char* arg)
+
+
+void SetDefine(option *arg, char* val)
 {
-    c_doinline = YES;
+    defmac(val);
 }
 
-void SetStopError(char* arg)
+void SetUndefine(option *arg, char* val)
 {
-    c_errstop = YES;
-}
-
-void SetUseShared(char* arg)
-{
-    c_useshared = YES;
-}
-
-void SetSharedFile(char* arg)
-{
-    c_shared_file = YES;
-}
-
-void SetMakeShared(char* arg)
-{
-    c_makeshare = YES;
-}
-
-void SetCompactCode(char* arg)
-{
-    c_compact_code = YES;
-}
-
-void SetCCode(char* arg)
-{
-    c_intermix_ccode = 1;
-}
-
-void SetDefine(char* arg)
-{
-    defmac(arg + 1);
-}
-
-void SetUndefine(char* arg)
-{
-    strcpy(line, arg + 1);
+    strcpy(line, val);
     delmac();
 }
 
-void SetAssembler(char* arg)
+void SetAssembler(option *arg, char *assembler)
 {
-    char assembler[128];
 
-    if (1 == sscanf(arg + 4, "%s", assembler)) {
-        if (strcmp(assembler, "z80asm") == 0 || strcmp(assembler, "mpm") == 0) {
-            c_assembler_type = ASM_Z80ASM;
-        } else if (strcmp(assembler, "asxx") == 0) {
-            c_assembler_type = ASM_ASXX;
-        } else if (strcmp(assembler, "vasm") == 0) {
-            c_assembler_type = ASM_VASM;
-        } else if (strcmp(assembler, "gnu") == 0) {
-            c_assembler_type = ASM_GNU;
-        }
+    if (strcmp(assembler, "z80asm") == 0 || strcmp(assembler, "mpm") == 0) {
+        c_assembler_type = ASM_Z80ASM;
+    } else if (strcmp(assembler, "asxx") == 0) {
+        c_assembler_type = ASM_ASXX;
+    } else if (strcmp(assembler, "vasm") == 0) {
+        c_assembler_type = ASM_VASM;
+    } else if (strcmp(assembler, "gnu") == 0) {
+        c_assembler_type = ASM_GNU;
     }
 }
 
-void SetOutExt(char* arg)
-{
-    char temp[10];
 
-    temp[0] = '.';
-    strncpy(temp + 1, arg + 4, sizeof(temp) - 2);
-    temp[sizeof(temp) - 1] = '\0';
-    c_output_extension = strdup(temp);
-}
-
-void DispInfo(char* arg)
+void DispInfo(option *arg, char *val)
 {
-    struct args* cur = &myargs[0];
+    option *cur = &sccz80_opts[0];
     info();
 
     printf("\nOptions:\n\n");
 
-    while (cur->setfunc) {
-        if (cur->help) {
-            fprintf(stderr, "-%-25s %s\n", cur->name, cur->help);
+    while (cur->description) {
+        if ( cur->type & OPT_HEADER ) {
+            fprintf(stderr,"\n%s\n",cur->description);
+        } else {
+            char    shortopt[6];
+            char    longopt[26];
+            shortopt[0] = longopt[0] = 0;;
+            if ( cur->short_name ) {
+                snprintf(shortopt, sizeof(shortopt),"-%c", cur->short_name);
+            }
+            if ( cur->long_name ) {
+                snprintf(longopt, sizeof(longopt),"-%s", cur->long_name);
+            }
+            fprintf(stderr,"%5s %-25s %s\n",shortopt,longopt,cur->description);
         }
         cur++;
     }
@@ -1063,51 +1005,8 @@ void DispVersion(char* arg)
     exit(1);
 }
 
-void SetVerbose(char* arg)
-{
-    c_verbose = YES;
-}
-
-void ShowNotFunc(char* arg)
-{
-    fprintf(stderr, "Flag -%s is currently non-functional\n", arg);
-}
 
 
-static void set_default_r2l(char *arg)
-{
-    c_use_r2l_calling_convention = YES;
-}
-
-void ParseArgs(char* arg)
-{
-    struct args* pargs;
-    int flag;
-    pargs = myargs;
-    flag = 0;
-    while (pargs->setfunc) {
-        switch (pargs->more) {
-
-        /* More info follows the initial thing.. */
-        case YES:
-            if (strncmp(arg, pargs->name, strlen(pargs->name)) == 0) {
-                (*pargs->setfunc)(arg);
-                flag = 1;
-            }
-            break;
-        case NO:
-
-            if (strcmp(arg, pargs->name) == 0) {
-                (*pargs->setfunc)(arg);
-                flag = 1;
-            }
-        }
-        if (flag)
-            return;
-        pargs++;
-    }
-    printf("Unrecognised argument: %s\n", arg);
-}
 
 /*
  *      This routine called via atexit to clean up memory

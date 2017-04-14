@@ -79,7 +79,6 @@ extern int c_share_offset;
 extern int debuglevel;
 extern int c_assembler_type;
 extern int c_framepointer_is_ix;
-extern int c_useframepointer;
 extern int c_double_strings;
 extern int usempm;
 extern int z80asm_sections;
