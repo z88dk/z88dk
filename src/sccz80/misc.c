@@ -20,7 +20,6 @@ void changesuffix(char* name, char* suffix)
     if (j) {
         name[j - 1] = '\0';
     }
-    strcat(name, ".");
     strcat(name, suffix);
 }
 

@@ -676,6 +676,9 @@ int dumpzero(int size, int count)
 void openout()
 {
     char filen2[FILENAME_LEN + 1];
+    char extension[FILENAME_LEN+1];
+
+    snprintf(extension,sizeof(extension),".%s",c_output_extension);
     FILE* fp;
     clear(); /* erase line */
     output = 0; /* start with none */
@@ -690,7 +693,7 @@ void openout()
     /* copy file name to string */
     strcpy(Filename, filen2);
     strcpy(Filenorig, filen2);
-    changesuffix(filen2, c_output_extension); /* Change appendix to .asm */
+    changesuffix(filen2, extension); /* Change appendix to .asm */
     if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
         fprintf(stderr, "Cannot open output file: %s\n", line);
         exit(1);
