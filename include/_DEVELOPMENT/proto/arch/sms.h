@@ -5,6 +5,12 @@ include(__link__.m4)
 
 #include <arch.h>
 
+// GLOBAL VARIABLES
+
+extern unsigned int GLOBAL_SMS_VRAM_SCREEN_MAP_ADDRESS;
+extern unsigned int GLOBAL_SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS;
+extern unsigned int GLOBAL_SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS;
+
 // IO MAPPED REGISTERS
 
 #ifdef __CLANG
@@ -85,5 +91,8 @@ __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memcpy_vram_to_vram_unsafe,unsign
 
 __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memset_vram,unsigned int dst,unsigned char c,unsigned int n)
 __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memset_vram_unsafe,unsigned int dst,unsigned char c,unsigned int n)
+
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memsetw_vram,unsigned int dst,unsigned int c,unsigned int n)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,sms_memsetw_vram_unsafe,unsigned int dst,unsigned int c,unsigned int n)
 
 #endif

@@ -15,3 +15,7 @@ arch/sms/vram/c/sdcc/sms_memset_vram
 arch/sms/vram/c/sdcc/sms_memset_vram_callee
 arch/sms/vram/c/sdcc/sms_memset_vram_unsafe
 arch/sms/vram/c/sdcc/sms_memset_vram_unsafe_callee
+arch/sms/vram/c/sdcc/sms_memsetw_vram
+arch/sms/vram/c/sdcc/sms_memsetw_vram_callee
+arch/sms/vram/c/sdcc/sms_memsetw_vram_unsafe
+arch/sms/vram/c/sdcc/sms_memsetw_vram_unsafe_callee

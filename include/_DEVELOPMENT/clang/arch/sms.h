@@ -7,6 +7,12 @@
 
 #include <arch.h>
 
+// GLOBAL VARIABLES
+
+extern unsigned int GLOBAL_SMS_VRAM_SCREEN_MAP_ADDRESS;
+extern unsigned int GLOBAL_SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS;
+extern unsigned int GLOBAL_SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS;
+
 // IO MAPPED REGISTERS
 
 #ifdef __CLANG
@@ -101,6 +107,13 @@ extern unsigned int sms_memset_vram(unsigned int dst,unsigned char c,unsigned in
 
 
 extern unsigned int sms_memset_vram_unsafe(unsigned int dst,unsigned char c,unsigned int n);
+
+
+
+extern unsigned int sms_memsetw_vram(unsigned int dst,unsigned int c,unsigned int n);
+
+
+extern unsigned int sms_memsetw_vram_unsafe(unsigned int dst,unsigned int c,unsigned int n);
 
 
 

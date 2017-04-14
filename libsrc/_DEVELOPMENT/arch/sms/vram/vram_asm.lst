@@ -6,5 +6,7 @@ arch/sms/vram/z80/asm_sms_memcpy_vram_to_vram
 arch/sms/vram/z80/asm_sms_memcpy_vram_to_vram_unsafe
 arch/sms/vram/z80/asm_sms_memset_vram
 arch/sms/vram/z80/asm_sms_memset_vram_unsafe
+arch/sms/vram/z80/asm_sms_memsetw_vram
+arch/sms/vram/z80/asm_sms_memsetw_vram_unsafe
 arch/sms/vram/z80/asm_sms_set_vram_read_hl
 arch/sms/vram/z80/asm_sms_set_vram_write_de

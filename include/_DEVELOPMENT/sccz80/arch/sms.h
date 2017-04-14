@@ -7,6 +7,12 @@
 
 #include <arch.h>
 
+// GLOBAL VARIABLES
+
+extern unsigned int GLOBAL_SMS_VRAM_SCREEN_MAP_ADDRESS;
+extern unsigned int GLOBAL_SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS;
+extern unsigned int GLOBAL_SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS;
+
 // IO MAPPED REGISTERS
 
 #ifdef __CLANG
@@ -117,6 +123,17 @@ extern unsigned int __LIB__ __CALLEE__ sms_memset_vram_callee(unsigned int dst,u
 extern unsigned int __LIB__ sms_memset_vram_unsafe(unsigned int dst,unsigned char c,unsigned int n) __smallc;
 extern unsigned int __LIB__ __CALLEE__ sms_memset_vram_unsafe_callee(unsigned int dst,unsigned char c,unsigned int n) __smallc;
 #define sms_memset_vram_unsafe(a,b,c) sms_memset_vram_unsafe_callee(a,b,c)
+
+
+
+extern unsigned int __LIB__ sms_memsetw_vram(unsigned int dst,unsigned int c,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc;
+#define sms_memsetw_vram(a,b,c) sms_memsetw_vram_callee(a,b,c)
+
+
+extern unsigned int __LIB__ sms_memsetw_vram_unsafe(unsigned int dst,unsigned int c,unsigned int n) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_unsafe_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc;
+#define sms_memsetw_vram_unsafe(a,b,c) sms_memsetw_vram_unsafe_callee(a,b,c)
 
 
 
