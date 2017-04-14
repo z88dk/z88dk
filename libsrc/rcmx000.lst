@@ -4,8 +4,8 @@ stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
 stdio/rcmx000/getk
 stdio/rcmx000/fputc_cons
-@stdlib/stdlib_r2k.lst
-@strings/string_r2k.lst
+@stdlib/stdlib.lst
+@strings/string.lst
 setjmp/longjmp
 setjmp/setjmp
 assert/assert
@@ -15,11 +15,11 @@ stdio_new/general/stdio_basechar
 stdio_new/general/stdio_atou
 stdio_new/general/stdio_ultoa_any
 stdio_new/general/stdio_utoa_any
-@regex/regex_r2k.lst
+@regex/regex.lst
 stdio/ansi/ansifont_f3
 stdio/ansi/ansifont_f4
 stdio/ansi/ansifont_f4pack
 stdio/ansi/ansifont_f5
 stdio/ansi/ansifont_f6
 stdio/ansi/ansifont_f8
-@compress/zx7/zx7_r2k.lst
+@compress/zx7/zx7.lst

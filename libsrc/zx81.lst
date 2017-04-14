@@ -11,7 +11,7 @@ stdio/ansi/fputc_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/zx81/f_ansi_attr
 stdio/ansi/zx81/f_ansi_bel
-@stdlib/stdlib_ixiy.lst
+@stdlib/stdlib.lst
 time/zx81/clock
 games/zx81snd/joystick
 games/zx81snd/bit_open
