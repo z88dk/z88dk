@@ -16,11 +16,24 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
+IF STANDARDESCAPECHARS
+	cp  10
+ELSE
 	cp  13
+ENDIF
 	jr  nz,nocr
 	call PV1
 	defb FNCRT
-	ld  a,10
+IF STANDARDESCAPECHARS
+	ld  c,13
+	call PV1
+	defb FNCRT
+	ld  c,10
+ELSE
+	call PV1
+	defb FNCRT
+	ld  c,10
+ENDIF
 .nocr
 	call PV1
 	defb FNCRT

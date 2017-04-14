@@ -11,10 +11,13 @@ asm_sms_set_vram_write_de:
    ;
    ; uses  : af
 
+   di
+
    ld a,e
    out (__IO_VDP_COMMAND),a
    ld a,d
    or $40
    out (__IO_VDP_COMMAND),a
-   
+
+   ei   
    ret

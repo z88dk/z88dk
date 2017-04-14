@@ -9,6 +9,7 @@
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_iy.lst
+@input/sms/input_sdcc.lst
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
 @l/sdcc.lst
@@ -20,5 +21,6 @@
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
+@target/sms/driver/driver.lst
 @threads/threads_sdcc_iy.lst
 @z80/z80_sdcc_iy.lst

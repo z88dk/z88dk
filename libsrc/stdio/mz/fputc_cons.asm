@@ -33,10 +33,24 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	cp	12	; Clear screen ?
-	jr	nz,nocls
-	;ld	a,$16
-.nocls
+	
+IF STANDARDESCAPECHARS
+	cp  10
+	jr  nz,notCR
+	ld	a,13
+.notCR
+ENDIF
+
+
+	; Some undercase text?  Transform in UPPER !
+	cp	97
+	jr	c,nounder
+	sub	32
+	jr	setout
+.nounder
+	; Some more char remapping can stay here...
+.setout
+
         push    ix
 	ld	(savesp),sp
 

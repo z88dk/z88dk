@@ -186,6 +186,12 @@ IF FORmsx
 	defc fcolor	= 1
 ENDIF
 
+IF FORmz
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 50
+ENDIF
+
 IF FORsvi
 	DEFINE gotgfx
 	defc maxx	= 256

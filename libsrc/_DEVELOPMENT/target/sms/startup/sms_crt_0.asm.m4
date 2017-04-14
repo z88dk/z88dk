@@ -30,12 +30,26 @@ include "config_sms_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; The embedded target has no device drivers so it cannot
-; instantiate FILEs.
-
-; It can use sprint/sscanf + family and it can create
-; memstreams in the default configuration.
+dnl
+dnl############################################################
+dnl## LIST OF AVAILABLE DRIVERS WITH STATIC INSTANTIATORS #####
+dnl############################################################
+dnl
+dnl## output terminals
+dnl
+dnl#include(`driver/terminal/sms_01_output_terminal.m4')dnl
+dnl
+dnl## file dup
+dnl
+dnl#include(`../m4_file_dup.m4')dnl
+dnl
+dnl## empty fd slot
+dnl
+dnl#include(`../m4_file_absent.m4')dnl
+dnl
+dnl############################################################
+dnl## INSTANTIATE DRIVERS #####################################
+dnl############################################################
 
 include(`../clib_instantiate_begin.m4')
 include(`../clib_instantiate_end.m4')

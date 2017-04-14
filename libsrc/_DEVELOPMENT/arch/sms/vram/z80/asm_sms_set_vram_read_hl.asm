@@ -11,9 +11,12 @@ asm_sms_set_vram_read_hl:
    ;
    ; uses  : af
 
+   di
+
    ld a,l
    out (__IO_VDP_COMMAND),a
    ld a,h
    out (__IO_VDP_COMMAND),a
-   
+
+   ei   
    ret

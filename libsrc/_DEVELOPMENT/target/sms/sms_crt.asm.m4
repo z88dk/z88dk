@@ -61,13 +61,36 @@ ifelse(__STARTUP, 0,
    include(`startup/sms_crt_0.asm.m4')
 ')
 
+ifelse(__STARTUP, 1,
+`
+   ; sms standard model
+	;
+   ; stdin  = unconnected
+	; stdout = sms_01_output_terminal
+	; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 0
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/sms_crt_1.asm.m4')
+')
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; devkitSMS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(__STARTUP, 8,
+ifelse(__STARTUP, 16,
 `
-   ; sms standard model
+   ; sms standard model with devkitSMS page zero
    ; no files, no fds
 
    IFNDEF __CRTCFG
@@ -82,5 +105,28 @@ ifelse(__STARTUP, 8,
    
    ENDIF
 
-   include(`startup/sms_crt_8.asm.m4')
+   include(`startup/sms_crt_16.asm.m4')
+')
+
+ifelse(__STARTUP, 17,
+`
+   ; sms standard model with devkitSMS page zero
+	;
+   ; stdin  = unconnected
+	; stdout = sms_01_output_terminal
+	; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 0
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/sms_crt_17.asm.m4')
 ')

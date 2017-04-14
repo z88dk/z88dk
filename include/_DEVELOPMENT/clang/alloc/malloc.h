@@ -18,6 +18,9 @@ typedef struct heap_info_s
 
 } heap_info_t;
 
+// expose pointer to malloc heap
+extern unsigned char *_malloc_heap;
+
 extern void *_falloc_(void *p,size_t size);
 
 

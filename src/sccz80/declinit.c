@@ -50,9 +50,9 @@ int initials(char* sname,
 
         // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
         if ( isconst && !c_double_strings )  {
-            output_section("rodata_compiler");
+            output_section(c_rodata_section);
         } else {
-            output_section("data_compiler"); // output_section("text");
+            output_section(c_data_section); // output_section("text");
         }
         prefix();
         outname(sname, YES);
@@ -100,7 +100,7 @@ int initials(char* sname,
                 desize = dim;            
             }
         }
-        output_section("code_compiler"); // output_section("code");
+        output_section(c_code_section); // output_section("code");
     } else {
         char *dosign, *typ;
         dosign = "";
@@ -406,5 +406,5 @@ static void output_double_string_load(double value)
     load_double_into_fa(&lval);
     immedlit(dumplocation); outdec(0); nl();
     callrts("dstore");
-    output_section("data_compiler");
+    output_section(c_data_section);
 }
