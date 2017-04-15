@@ -29,6 +29,8 @@ asm_sms_memcpy_vram_to_vram:
    ;
    ; uses  : af, bc, de, hl, af'
    
+   set 6,d
+   
 loop:
 
    ; must yield opportunities for an interrupt to occur
@@ -46,7 +48,6 @@ loop:
    ld a,e
    out (__IO_VDP_COMMAND),a
    ld a,d
-   or $40
    out (__IO_VDP_COMMAND),a
 
    ei
@@ -58,5 +59,6 @@ loop:
     
    cpi
    jp pe, loop
-    
+
+   res 6,d
    ret
