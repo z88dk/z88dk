@@ -138,7 +138,6 @@ int c_double_strings;
 /*
  *        Framepointer stuff - tis broken!
  */
-int c_useframepointer;
 int c_framepointer_is_ix;
 
 

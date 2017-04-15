@@ -466,7 +466,7 @@ void putstk(char typeobj)
 void puttos(void)
 {
 #ifdef USEFRAME
-    if (c_useframepointer) {
+    if (c_framepointer_is_ix != -1) {
         ot("ld\t");
         OutIndex(0);
         outstr(",l\n");
@@ -484,7 +484,7 @@ void puttos(void)
 void put2tos(void)
 {
 #ifdef USEFRAME
-    if (c_useframepointer) {
+    if (c_framepointer_is_ix != -1) {
         ot("ld\t");
         OutIndex(2);
         outstr(",l\n");
@@ -588,7 +588,7 @@ void indirect(LVALUE* lval)
         } else {
             ot("call\tl_gint\t;");
 #ifdef USEFRAME
-            if (c_useframepointer && CheckOffset(lval->offset)) {
+            if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
                 OutIndex(lval->offset);
             }
 #endif
@@ -1023,7 +1023,7 @@ int modstk(int newsp, int save, int saveaf)
     }
 
 #ifdef USEFRAME
-    if (c_useframepointer)
+    if (c_framepointer_is_ix != -1)
         goto modstkcht;
 #endif
     if (k > 0) {
@@ -1070,7 +1070,7 @@ modstkcht:
         }
     }
 #ifdef USEFRAME
-    if (c_useframepointer) {
+    if (c_framepointer_is_ix != -1) {
         ot("ld\t");
         FrameP();
         outstr(",");
@@ -2723,7 +2723,7 @@ void RestoreSP(char saveaf)
 void setframe(void)
 {
 #ifdef USEFRAME
-    if (!c_useframepointer)
+    if (c_framepointer_is_ix == -1)
         return;
     ot("ld\t");
     FrameP();
@@ -2743,7 +2743,7 @@ void FrameP(void)
 
 void pushframe(void)
 {
-    if (c_useframepointer || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("push\t");
         FrameP();
         nl();
@@ -2752,7 +2752,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (c_useframepointer || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("pop\t");
         FrameP();
         nl();

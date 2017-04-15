@@ -434,7 +434,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     /* If we use frame pointer we preserve previous framepointer on entry
      * to each function
      */
-    if (c_useframepointer || (currfn->flags & SAVEFRAME))
+    if (c_framepointer_is_ix != -1 || (currfn->flags & SAVEFRAME))
         where += 2;
 
     /* main is always __stdc */
