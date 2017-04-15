@@ -9,7 +9,6 @@
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_ix.lst
-@font/sms/fonts.lst
 @input/sms/input_sdcc.lst
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
