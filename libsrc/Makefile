@@ -232,7 +232,7 @@ z88_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C time
-	$(MAKE) -C rs232 lz88
+	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
@@ -253,7 +253,7 @@ z88net_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C time
-	$(MAKE) -C rs232 lz88
+	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
@@ -292,7 +292,7 @@ zx_clib.lib:
 
 # ZX Spectrum RS232 libraries - stefano
 zx232:
-	$(MAKE) -C rs232 lzx
+	$(MAKE) -C rs232 
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
@@ -1142,7 +1142,7 @@ cpc_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C rs232 lcpc
+	$(MAKE) -C rs232 
 	$(MAKE) -C psg
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
@@ -1441,7 +1441,7 @@ osca_clib.lib:
 	$(MAKE) -C stdlib TARGET=osca
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
-	$(MAKE) -C rs232 losca
+	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean

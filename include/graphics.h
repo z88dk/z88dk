@@ -17,6 +17,7 @@
 #define __GFX_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 
 #ifdef __TIKI100__
 #include <tiki100.h>

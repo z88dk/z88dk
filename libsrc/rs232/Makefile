@@ -1,19 +1,20 @@
 # $Id: Makefile,v 1.6 2012-06-26 06:09:52 stefano Exp $
 
-lcpc:
-	cd cpc ; $(MAKE) ; cd ..
+SUBDIRS = osca	z88 cpc	spectrum
 
-losca:
-	cd osca ; $(MAKE) ; cd ..
+all: subdirs-all
 
-lzx:
-	cd spectrum ; $(MAKE) ; cd ..
+subdirs-all:	$(SUBDIRS)
 
-lz88:
-	cd z88 ; $(MAKE) ; cd ..
+
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 clean:
-	cd cpc ; $(MAKE) clean ; cd ..
-	cd z88 ; $(MAKE) clean ; cd ..
-	cd spectrum ; $(MAKE) clean ; cd ..
-	cd osca ; $(MAKE) clean ; cd ..
+	@for s in $(SUBDIRS); \
+	do \
+		$(MAKE) -C $$s clean; \
+	done
+
+.PHONY: $(SUBDIRS) subdirs-all
+
