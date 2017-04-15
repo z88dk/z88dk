@@ -70,7 +70,7 @@ ticks:
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
 config:
-	./config.sh `pwd`/ $(DEFAULT)
+	cp -f lib/config/$(DEFAULT).cfg lib/config/zcc.cfg
 
 libs:
 	cd libsrc ; $(MAKE)
@@ -95,7 +95,6 @@ install:
 	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	./config.sh $(prefix_share)/z88dk/ $(DEFAULT)
 	cp -R -p include $(DESTDIR)/$(prefix_share)/z88dk
 	cp -R -p lib $(DESTDIR)/$(prefix_share)/z88dk
 	find $(DESTDIR)/$(prefix_share)/z88dk -type f -exec chmod 644 {} \;
