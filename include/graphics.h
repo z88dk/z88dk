@@ -30,13 +30,13 @@
  */
 
 struct window {
-        char    number;
-        char    x;
-        char    y;
-        char    width;
-        char    depth;
-        char    type;
-        char    graph;
+        uint8_t number;
+        uint8_t x;
+        uint8_t y;
+        uint8_t width;
+        uint8_t depth;
+        uint8_t type;
+        uint8_t graph;
 } ;
 
 
