@@ -80,10 +80,9 @@ static void SetWarning(option *arg, char *val);
 static void SetNoWarn(option *arg, char* val);
 static void SetAllWarn(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
-
+static void set_math_z88_parameters(option *opt, char *arg);
 
 static void atexit_deallocate(void);
-
 
 
 static option  sccz80_opts[] = {
@@ -98,7 +97,10 @@ static option  sccz80_opts[] = {
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
     { 0, "do-inline", OPT_BOOL, "Inlne some common functions", &c_doinline, 0 },
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
-    { 0, "math-z88", OPT_BOOL, "Make FP constants match z88", &c_mathz88, 0 },
+    { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
+    { 0, "fp-exponent-bias", OPT_INT, "=<num> FP exponent bias (default: 128)", &c_fp_exponent_bias, 0 },
+    { 0, "fp-mantissa-size", OPT_INT, "=<num> FP mantissa size (default: 5 bytes)", &c_fp_mantissa_bytes, 0 },
+    
     { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, 0 },
     { 0, "compact", OPT_BOOL, "Make all functions callee", &c_compact_code, 0},
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, 0},
@@ -910,6 +912,11 @@ int parse_arguments(option *args, int argc, char **argv)
 
 
 
+static void set_math_z88_parameters(option *opt, char *arg)
+{
+    c_fp_exponent_bias = 127;
+    c_fp_mantissa_bytes = 4;
+}
 
 
 void UnSetWarning(option *arg, char* val)

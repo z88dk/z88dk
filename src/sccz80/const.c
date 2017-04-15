@@ -32,7 +32,7 @@ typedef struct elem_s {
     int            refcount;
     int            litlab;
     double         value;
-    unsigned char  fa[6];      /* The parsed representation */
+    unsigned char  fa[MAX_MANTISSA_SIZE+1];      /* The parsed representation */
     char           str[60];    /* A raw string version */
 } elem_t;
 
@@ -513,15 +513,22 @@ static int get_member_size(TAG_SYMBOL* ptr)
     return (0);
 }
 
-void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
+void dofloat(double raw, unsigned char fa[])
 {
     double norm;
     double x = fabs(raw);
     double exp = log(x) / log(2);
     int i;
+    int mant_bytes = c_fp_mantissa_bytes;
+    int exp_bias = c_fp_exponent_bias;
+
+    if (mant_bytes > MAX_MANTISSA_SIZE ) {
+        mant_bytes = MAX_MANTISSA_SIZE;
+    }
+
 
     if (x == 0.0) {
-        fa[0] = fa[1] = fa[2] = fa[3] = fa[4] = fa[5] = 0;
+        memset(fa, 0, MAX_MANTISSA_SIZE + 1);
         return;
     }
 
@@ -563,12 +570,12 @@ void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 }
 
 
-elem_t *get_elem_for_fa(unsigned char fa[6], double value) 
+elem_t *get_elem_for_fa(unsigned char fa[], double value) 
 {
     elem_t  *elem;
 
     LL_FOREACH(double_queue, elem ) {
-        if ( memcmp(elem->fa, fa, 6) == 0 ) {
+        if ( memcmp(elem->fa, fa, c_fp_mantissa_bytes + 1) == 0 ) {
             return elem;
         }
     }
@@ -636,7 +643,7 @@ void decrement_double_ref_direct(double value)
 
 void decrement_double_ref(LVALUE *lval)
 {   
-    unsigned char    fa[6];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1];
     elem_t          *elem;
     if ( c_double_strings ) {
         char  buf[40];
@@ -644,19 +651,20 @@ void decrement_double_ref(LVALUE *lval)
         elem = get_elem_for_buf(buf,lval->const_val);
         elem->refcount--;
     } else {
-        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+        dofloat(lval->const_val, fa);
         elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount--;
     }
 }
 
+
 void load_double_into_fa(LVALUE *lval)
 {            
-    unsigned char    fa[6];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1];
     elem_t          *elem;
 
-    fa[0] = fa[1] = fa[2] = fa[3] = fa[4] = fa[5] = 0;
-
+    memset(fa, 0, sizeof(fa));
+    
     if ( c_double_strings ) {
         char  buf[40];
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
@@ -668,8 +676,8 @@ void load_double_into_fa(LVALUE *lval)
         callrts("__atof2");
         WriteDefined("math_atof", 1);
     } else {
-        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
-
+        dofloat(lval->const_val, fa);
+        
         elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount++;
         immedlit(elem->litlab);

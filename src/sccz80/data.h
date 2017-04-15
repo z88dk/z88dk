@@ -94,3 +94,5 @@ extern char *c_code_section;
 extern char *c_bss_section;
 extern char *c_data_section;
 extern char *c_rodata_section;
+extern int c_fp_mantissa_bytes;
+extern int c_fp_exponent_bias;

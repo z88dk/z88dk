@@ -19,6 +19,8 @@
 #define NO              0
 #define YES             1
 
+/* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
+#define MAX_MANTISSA_SIZE  5    
 
 /* Offset to stack params for shared lib funcs */
 
