@@ -8,5 +8,5 @@
 
 main()
 {
-	printf("Hello world!\n");
+	printf("Hello world! %d\n",12);
 }
