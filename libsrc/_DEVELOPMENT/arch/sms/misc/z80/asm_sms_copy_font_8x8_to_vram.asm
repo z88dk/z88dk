@@ -24,6 +24,8 @@ asm_sms_copy_font_8x8_to_vram:
    ;
    ;         VDP DESTINATION ADDRESS ALREADY SET!
    ;
+   ; exit  : hl = void *font, one byte past last char read
+   ;
    ; uses  : af, bc, de, hl
 
 char_loop:
