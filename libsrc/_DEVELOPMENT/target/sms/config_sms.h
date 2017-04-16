@@ -55,6 +55,9 @@
 #define __MM_FRAME_0_CONTROL      0xfffd
 #define __MM_FRAME_2_RAM_CONTROL  0xfffc
 
+#define __SMS_VDP_R0  0x04
+#define __SMS_VDP_R1  0x20
+
 #define __SMS_VRAM_SCREEN_MAP_ADDRESS              0x3800
 #define __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS  0x3f00
 #define __SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS     0x2000

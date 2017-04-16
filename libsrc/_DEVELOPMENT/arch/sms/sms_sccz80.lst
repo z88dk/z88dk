@@ -1,6 +1,6 @@
 @arch/sms/compress/compress_sccz80.lst
 @arch/sms/globals/globals_asm.lst
-@arch/sms/misc/misc_asm.lst
+@arch/sms/misc/misc_sccz80.lst
 @arch/sms/psg/psg_sccz80.lst
 @arch/sms/PSGlib/PSGlib_sccz80.lst
 @arch/sms/registers/registers_asm.lst

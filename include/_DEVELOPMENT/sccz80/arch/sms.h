@@ -6,8 +6,12 @@
 #define _ARCH_SMS_H
 
 #include <arch.h>
+#include <rect.h>
 
 // GLOBAL VARIABLES
+
+extern unsigned char GLOBAL_SMS_VDP_R0;
+extern unsigned char GLOBAL_SMS_VDP_R1;
 
 extern unsigned int GLOBAL_SMS_VRAM_SCREEN_MAP_ADDRESS;
 extern unsigned int GLOBAL_SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS;
@@ -82,6 +86,50 @@ extern volatile unsigned char MM_FFFC;
 
 // VRAM <-> MEMORY COPY OPERATIONS
 
+extern void __LIB__ sms_copy_mem_to_vram(void *src,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_copy_mem_to_vram_callee(void *src,unsigned int n) __smallc;
+#define sms_copy_mem_to_vram(a,b) sms_copy_mem_to_vram_callee(a,b)
+
+
+extern void __LIB__ sms_copy_mem_to_vram_unsafe(void *src,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_copy_mem_to_vram_unsafe_callee(void *src,unsigned int n) __smallc;
+#define sms_copy_mem_to_vram_unsafe(a,b) sms_copy_mem_to_vram_unsafe_callee(a,b)
+
+
+
+extern void __LIB__ sms_copy_vram_to_mem(void *dst,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_copy_vram_to_mem_callee(void *dst,unsigned int n) __smallc;
+#define sms_copy_vram_to_mem(a,b) sms_copy_vram_to_mem_callee(a,b)
+
+
+extern void __LIB__ sms_copy_vram_to_mem_unsafe(void *dst,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_copy_vram_to_mem_unsafe_callee(void *dst,unsigned int n) __smallc;
+#define sms_copy_vram_to_mem_unsafe(a,b) sms_copy_vram_to_mem_unsafe_callee(a,b)
+
+
+
+extern void __LIB__ sms_set_vram(unsigned char c,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_set_vram_callee(unsigned char c,unsigned int n) __smallc;
+#define sms_set_vram(a,b) sms_set_vram_callee(a,b)
+
+
+extern void __LIB__ sms_set_vram_unsafe(unsigned char c,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_set_vram_unsafe_callee(unsigned char c,unsigned int n) __smallc;
+#define sms_set_vram_unsafe(a,b) sms_set_vram_unsafe_callee(a,b)
+
+
+
+extern void __LIB__ sms_setw_vram(unsigned int c,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_setw_vram_callee(unsigned int c,unsigned int n) __smallc;
+#define sms_setw_vram(a,b) sms_setw_vram_callee(a,b)
+
+
+extern void __LIB__ sms_setw_vram_unsafe(unsigned int c,unsigned int n) __smallc;
+extern void __LIB__ __CALLEE__ sms_setw_vram_unsafe_callee(unsigned int c,unsigned int n) __smallc;
+#define sms_setw_vram_unsafe(a,b) sms_setw_vram_unsafe_callee(a,b)
+
+
+
 extern unsigned int __LIB__ sms_memcpy_mem_to_cram(unsigned int cdst,void *src,unsigned int n) __smallc;
 extern unsigned int __LIB__ __CALLEE__ sms_memcpy_mem_to_cram_callee(unsigned int cdst,void *src,unsigned int n) __smallc;
 #define sms_memcpy_mem_to_cram(a,b,c) sms_memcpy_mem_to_cram_callee(a,b,c)
@@ -145,6 +193,34 @@ extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_callee(unsigned int dst,
 extern unsigned int __LIB__ sms_memsetw_vram_unsafe(unsigned int dst,unsigned int c,unsigned int n) __smallc;
 extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_unsafe_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc;
 #define sms_memsetw_vram_unsafe(a,b,c) sms_memsetw_vram_unsafe_callee(a,b,c)
+
+
+
+// MISCELLANEOUS
+
+extern void __LIB__ __FASTCALL__ sms_border(unsigned char color);
+
+
+extern unsigned int __LIB__ sms_cxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc;
+#define sms_cxy2saddr(a,b) sms_cxy2saddr_callee(a,b)
+
+
+
+extern void __LIB__ *sms_copy_font_8x8_to_vram(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
+extern void __LIB__ __CALLEE__ *sms_copy_font_8x8_to_vram_callee(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
+#define sms_copy_font_8x8_to_vram(a,b,c,d) sms_copy_font_8x8_to_vram_callee(a,b,c,d)
+
+
+
+extern void __LIB__ sms_cls_wc(struct r_Rect8 *r,unsigned int background_char) __smallc;
+extern void __LIB__ __CALLEE__ sms_cls_wc_callee(struct r_Rect8 *r,unsigned int background_char) __smallc;
+#define sms_cls_wc(a,b) sms_cls_wc_callee(a,b)
+
+
+extern void __LIB__ sms_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
+extern void __LIB__ __CALLEE__ sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
+#define sms_scroll_wc_up(a,b,c) sms_scroll_wc_up_callee(a,b,c)
 
 
 
