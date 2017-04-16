@@ -50,13 +50,26 @@ extern void add_Z88_FPP(int argument);
 extern void add_Z88_INVOKE(int argument);
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		((opts.cpu & CPU_RABBIT) ? \
+#define _Z80_ONLY(x)		(!(opts.cpu & CPU_Z80) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RABBIT_ONLY(x)		(!(opts.cpu & CPU_RABBIT) ? \
+#define _EXCEPT_Z80(x)		((opts.cpu & CPU_Z80) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 #define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
+#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_RCM2000) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
+#define _RCM3000_ONLY(x)	(!(opts.cpu & CPU_RCM3000) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
+
+#define _ZILOG_ONLY(x)		(!(opts.cpu & CPU_ZILOG) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
+#define _RABBIT_ONLY(x)		(!(opts.cpu & CPU_RABBIT) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 
@@ -146,27 +159,27 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_CPIR			0xEDB1
 #define Z80_CPL				0x2F
 #define Z80_CP_n			_Z80_ALU_n(ALU_CP)
-#define Z80_DAA				_Z80_ONLY(0x27)
+#define Z80_DAA				_ZILOG_ONLY(0x27)
 #define Z80_DEC(reg)		(0x05 + ((reg) << 3))
 #define Z80_DEC16(reg)		(0x0B + ((reg) << 4))
-#define Z80_DI				_Z80_ONLY(0xF3)
+#define Z80_DI				_ZILOG_ONLY(0xF3)
 #define Z80_DJNZ			0x10
-#define Z80_EI				_Z80_ONLY(0xFB)
+#define Z80_EI				_ZILOG_ONLY(0xFB)
 #define Z80_EXX				0xD9
 #define Z80_EX_AF_AF		0x08
 #define Z80_EX_DE_HL		0xEB
 #define Z80_EX_IND_SP_HL	((opts.cpu & CPU_RABBIT) ? 0xED54 : 0xE3)
 #define Z80_EX_IND_SP_idx	0xE3	/* (IX) or (IY) */
-#define Z80_HALT			_Z80_ONLY(0x76)
-#define Z80_IM(n)			_Z80_ONLY(_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E))
+#define Z80_HALT			_ZILOG_ONLY(0x76)
+#define Z80_IM(n)			_ZILOG_ONLY(_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E))
 #define Z80_INC(reg)		(0x04 + ((reg) << 3))
 #define Z80_INC16(reg)		(0x03 + ((reg) << 4))
-#define Z80_IND				_Z80_ONLY(0xEDAA)
-#define Z80_INDR			_Z80_ONLY(0xEDBA)
-#define Z80_INI				_Z80_ONLY(0xEDA2)
-#define Z80_INIR			_Z80_ONLY(0xEDB2)
-#define Z80_IN_A_n			_Z80_ONLY(0xDB)
-#define Z80_IN_REG_C(reg)	_Z80_ONLY((0xED40 + ((reg) << 3)))
+#define Z80_IND				_ZILOG_ONLY(0xEDAA)
+#define Z80_INDR			_ZILOG_ONLY(0xEDBA)
+#define Z80_INI				_ZILOG_ONLY(0xEDA2)
+#define Z80_INIR			_ZILOG_ONLY(0xEDB2)
+#define Z80_IN_A_n			_ZILOG_ONLY(0xDB)
+#define Z80_IN_REG_C(reg)	_ZILOG_ONLY((0xED40 + ((reg) << 3)))
 #define Z80_JP				0xC3
 #define Z80_JP_FLAG(flag)	(0xC2 + ((flag) << 3))
 #define Z80_JP_idx			0xE9	/* (HL) or (IX) or (IY) */
@@ -192,18 +205,18 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_NOP				0x00
 #define Z80_OR(reg)			_Z80_ALU(ALU_OR, (reg))
 #define Z80_OR_n			_Z80_ALU_n(ALU_OR)
-#define Z80_OTDR			_Z80_ONLY(0xEDBB)
-#define Z80_OTIR			_Z80_ONLY(0xEDB3)
-#define Z80_OUTD			_Z80_ONLY(0xEDAB)
-#define Z80_OUTI			_Z80_ONLY(0xEDA3)
-#define Z80_OUT_C_REG(reg)	_Z80_ONLY((0xED41 + ((reg) << 3)))
-#define Z80_OUT_n_A			_Z80_ONLY(0xD3)
+#define Z80_OTDR			_ZILOG_ONLY(0xEDBB)
+#define Z80_OTIR			_ZILOG_ONLY(0xEDB3)
+#define Z80_OUTD			_ZILOG_ONLY(0xEDAB)
+#define Z80_OUTI			_ZILOG_ONLY(0xEDA3)
+#define Z80_OUT_C_REG(reg)	_ZILOG_ONLY((0xED41 + ((reg) << 3)))
+#define Z80_OUT_n_A			_ZILOG_ONLY(0xD3)
 #define Z80_POP(reg)		(0xC1 + ((reg) << 4))
 #define Z80_PUSH(reg)		(0xC5 + ((reg) << 4))
 #define Z80_RES(bit,reg)	_Z80_BRS(BRS_RES, (bit), (reg))
 #define Z80_RET				0xC9
 #define Z80_RETI			0xED4D
-#define Z80_RETN			_Z80_ONLY(0xED45)
+#define Z80_RETN			_ZILOG_ONLY(0xED45)
 #define Z80_RET_FLAG(flag)	(0xC0 + ((flag) << 3))
 #define Z80_RL(reg)			_Z80_RS(RS_RL,  (reg))
 #define Z80_RLA				0x17
@@ -222,7 +235,7 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_SCF				0x37
 #define Z80_SET(bit,reg)	_Z80_BRS(BRS_SET, (bit), (reg))
 #define Z80_SLA(reg)		_Z80_RS(RS_SLA, (reg))
-#define Z80_SLL(reg)		_Z80_ONLY(_Z80_RS(RS_SLL, (reg)))
+#define Z80_SLL(reg)		_ZILOG_ONLY(_Z80_RS(RS_SLL, (reg)))
 #define Z80_SRA(reg)		_Z80_RS(RS_SRA, (reg))
 #define Z80_SRL(reg)		_Z80_RS(RS_SRL, (reg))
 #define Z80_SUB(reg)		_Z80_ALU(ALU_SUB, (reg))
@@ -230,21 +243,25 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_XOR(reg)		_Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			_Z80_ALU_n(ALU_XOR)
 
-#define Z80_LD_R_A			   _Z80_ONLY(0xED4F)
+#define Z80_LD_R_A			 _ZILOG_ONLY(0xED4F)
 #define Z80_LD_EIR_A		_RABBIT_ONLY(0xED4F)
 
-#define Z80_LD_A_R			   _Z80_ONLY(0xED5F)
+#define Z80_LD_A_R			 _ZILOG_ONLY(0xED5F)
 #define Z80_LD_A_EIR		_RABBIT_ONLY(0xED5F)
 
-#define Z80_LD_A_I			   _Z80_ONLY(0xED57)
+#define Z80_LD_A_I			 _ZILOG_ONLY(0xED57)
 #define Z80_LD_A_IIR		_RABBIT_ONLY(0xED57)
 
-#define Z80_LD_I_A			   _Z80_ONLY(0xED47)
+#define Z80_LD_I_A			 _ZILOG_ONLY(0xED47)
 #define Z80_LD_IIR_A		_RABBIT_ONLY(0xED47)
 
 /* Z180 opcodes */
 #define Z80_SLP				_Z180_ONLY(0xED76)
-#define Z80_MLT(dd)			_Z180_ONLY(0xED4C + ((dd) << 4))
+#define Z80_MLT(dd)			((opts.cpu & CPU_Z80) ? \
+								(error_illegal_ident(), 0) : \
+								(opts.cpu & CPU_RABBIT) && (dd) == REG_SP ? \
+									(error_illegal_ident(), 0) : \
+									0xED4C + ((dd) << 4))
 #define Z80_IN0(r)			_Z180_ONLY(0xED00 + ((r) << 3))
 #define Z80_OUT0(r)			_Z180_ONLY(0xED01 + ((r) << 3))
 #define Z80_OTIM			_Z180_ONLY(0xED83)
@@ -252,8 +269,8 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_OTDM			_Z180_ONLY(0xED8B)
 #define Z80_OTDMR			_Z180_ONLY(0xED9B)
 #define Z80_TSTIO			_Z180_ONLY(0xED74)
-#define Z80_TST(r)			_Z180_ONLY(0xED04 + ((r) << 3))
-#define Z80_TST_n			_Z180_ONLY(0xED64)
+#define Z80_TST(r)			_EXCEPT_Z80(0xED04 + ((r) << 3))
+#define Z80_TST_n			_EXCEPT_Z80(0xED64)
 
 /* Rabbit opcodes */
 #define Z80_IOI				_RABBIT_ONLY(0xD3)

@@ -332,3 +332,11 @@ tokens:
   - name	: CALL_PKG
   - name	: FPP
   - name	: INVOKE
+  
+  # Rabbit 2000/3000 specific opcodes
+  - name	: IOI
+  - name	: IOE
+  - name	: ALTD
+  - name	: IPSET
+  - name	: IPRES
+  - name	: BOOL

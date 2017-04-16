@@ -193,13 +193,12 @@
 #define _TK_CALL_PKG	188
 #define _TK_FPP	189
 #define _TK_INVOKE	190
-
-#define _TK_IOI 191
-#define _TK_IOE 192
-#define _TK_ALTD 193
-#define _TK_IPSET 194
-#define _TK_IPRES 195
-#define _TK_BOOL 196
+#define _TK_IOI	191
+#define _TK_IOE	192
+#define _TK_ALTD	193
+#define _TK_IPSET	194
+#define _TK_IPRES	195
+#define _TK_BOOL	196
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -395,11 +394,11 @@ typedef enum tokid_t
 	TK_CALL_PKG	= 188,
 	TK_FPP	= 189,
 	TK_INVOKE	= 190,
-	TK_IOI = 191,
-	TK_IOE = 192,
-	TK_ALTD = 193,
-	TK_IPSET = 194,
-	TK_IPRES = 195,
-	TK_BOOL = 196
+	TK_IOI	= 191,
+	TK_IOE	= 192,
+	TK_ALTD	= 193,
+	TK_IPSET	= 194,
+	TK_IPRES	= 195,
+	TK_BOOL	= 196,
 } tokid_t;
 #endif

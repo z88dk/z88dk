@@ -80,23 +80,6 @@ Define rules for a ragel-based parser.
 	string = _TK_STRING @{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); };
 	
 	/*---------------------------------------------------------------------
-	*   assert we are on a Z80
-	*--------------------------------------------------------------------*/
-	action assert_Z80 { 
-		if ( opts.cpu & CPU_RABBIT ) { 
-			error_illegal_ident(); 
-			fbreak;
-		}
-	}
-
-	action assert_RABBIT { 
-		if ( (opts.cpu & CPU_RABBIT) == 0 ) { 
-			error_illegal_ident(); 
-			fbreak;
-		}
-	}
-	
-	/*---------------------------------------------------------------------
 	*   Expression 
 	*--------------------------------------------------------------------*/
 	action parens_open { 
@@ -459,14 +442,12 @@ Define rules for a ragel-based parser.
 #ifndef _LD_<R1>_<R2>_DEFINED
 #define _LD_<R1>_<R2>_DEFINED
 		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_<R2> _TK_NEWLINE \
-			@assert_Z80
 			@{ DO_stmt( P_<X> + Z80_LD_r_r( REG_<R1>, REG_<R2> ) ); }
 #endif
 
 #ifndef _LD_<R2>_<R1>_DEFINED
 #define _LD_<R2>_<R1>_DEFINED
 		|	label? _TK_LD _TK_<R2> _TK_COMMA _TK_<R1> _TK_NEWLINE \
-			@assert_Z80
 			@{ DO_stmt( P_<X> + Z80_LD_r_r( REG_<R2>, REG_<R1> ) ); }
 #endif
 
@@ -623,8 +604,7 @@ Define rules for a ragel-based parser.
 	#foreach <X> in IX, IY
 		#foreach <R> in L, H
 		| label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_<X><R> _TK_NEWLINE
-		  @assert_Z80
-		  @{ DO_stmt( P_<X> + Z80_<OP>( REG_<R> ) ); }
+		  @{ DO_stmt( P_<X> + Z80_<OP>( REG_<X><R> ) ); }
 		#endfor  <R>
 		
 		/* (x) */
@@ -697,8 +677,7 @@ Define rules for a ragel-based parser.
 	#foreach <X> in IX, IY
 		#foreach <R> in L, H
 		| label? _TK_<OP> _TK_<X><R> _TK_NEWLINE
-		  @assert_Z80
-		  @{ DO_stmt( P_<X> + Z80_<OP>( REG_<R> ) ); }
+		  @{ DO_stmt( P_<X> + Z80_<OP>( REG_<X><R> ) ); }
 		#endfor  <R>
 		
 		/* (x) */
