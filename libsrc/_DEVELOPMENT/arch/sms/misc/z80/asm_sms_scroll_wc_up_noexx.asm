@@ -16,9 +16,6 @@ asm_sms_scroll_wc_up_noexx:
    ;
    ; uses  : af, bc, de, hl
    
-   ex af,af'
-   push af
-   
    exx
    push bc
    exx
@@ -28,8 +25,5 @@ asm_sms_scroll_wc_up_noexx:
    exx
    pop bc
    exx
-   
-   pop af
-   ex af,af'
-   
+
    ret
