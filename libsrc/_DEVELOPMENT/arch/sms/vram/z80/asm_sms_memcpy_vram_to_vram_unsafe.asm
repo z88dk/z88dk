@@ -9,8 +9,6 @@
 ; unsafe version has not been written yet
 ; the idea is to read a bunch of bytes into the stack and then write them quickly to dst
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_crt_common
 
@@ -32,4 +30,4 @@ defc asm_sms_memcpy_vram_to_vram_unsafe = asm_sms_memcpy_vram_to_vram
 ;;    ;         de = void *dst, &byte after last written
 ;;    ;         bc = 0
 ;;    ;
-;;    ; uses  : af, bc, de, hl, af'
+;;    ; uses  : af, bc, de, hl

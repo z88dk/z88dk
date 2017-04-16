@@ -1,6 +1,6 @@
 ; ========================================================================
 ; 
-; void *sms_memsetw_vram_unsafe(void *dst, unsigned int c, unsigned int n)
+; void *sms_setw_vram_unsafe(void *dst, unsigned int c, unsigned int n)
 ;
 ; memset VRAM word at a time unsafe; VRAM addresses are assumed to be stable.
 ;
@@ -11,20 +11,20 @@
 SECTION code_clib
 SECTION code_crt_common
 
-PUBLIC asm_sms_memsetw_vram_unsafe
+PUBLIC asm_sms_setw_vram_unsafe
 
-EXTERN asm_sms_memsetw_vram
+EXTERN asm_sms_setw_vram
 
-defc asm_sms_memsetw_vram_unsafe = asm_sms_memsetw_vram
+defc asm_sms_setw_vram_unsafe = asm_sms_setw_vram
 
    ; memset vram by word
    ;
-   ; enter : de = void *dst in vram
-   ;         hl = unsigned int c
+   ; enter : de = unsigned int c
    ;         bc = unsigned int n > 0
    ;
-   ; exit  : hl = void *dst, &byte after last written in vram
-   ;         de = unsigned int c
+   ;         VRAM DESTINATION ADDRESS ALREADY SET!
+   ;
+   ; exit  : de = unsigned int c
    ;         bc = 0
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, hl

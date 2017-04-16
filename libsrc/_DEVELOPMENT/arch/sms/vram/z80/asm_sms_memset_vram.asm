@@ -6,14 +6,13 @@
 ;
 ; ========================================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_crt_common
 
 PUBLIC asm_sms_memset_vram
 
-EXTERN asm_sms_set_vram_write_de
+EXTERN asm_sms_vram_write_de
+EXTERN asm_sms_set_vram
 
 asm_sms_memset_vram:
 
@@ -24,20 +23,13 @@ asm_sms_memset_vram:
    ;         bc = unsigned int n > 0
    ;
    ; exit  : hl = void *dst, &byte after last written in vram
+   ;         bc = 0
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : f, bc, de, hl
 
    ld l,a
-   call asm_sms_set_vram_write_de
+   call asm_sms_vram_write_de
    ld a,l
    
    ex de,hl
-   
-loop:
-
-   out (__IO_VDP_DATA),a
-   
-   cpi                         ; hl++, bc--
-   jp pe, loop
-   
-   ret
+   jp asm_sms_set_vram

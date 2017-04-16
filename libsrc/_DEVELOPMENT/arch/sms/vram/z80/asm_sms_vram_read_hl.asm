@@ -3,9 +3,9 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_crt_common
 
-PUBLIC asm_sms_set_vram_read_hl
+PUBLIC asm_sms_vram_read_hl
 
-asm_sms_set_vram_read_hl:
+asm_sms_vram_read_hl:
 
    ; enter : hl = vram address
    ;

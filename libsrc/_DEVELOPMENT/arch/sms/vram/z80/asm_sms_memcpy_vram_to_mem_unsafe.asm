@@ -6,15 +6,13 @@
 ;
 ; ========================================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_crt_common
 
 PUBLIC asm_sms_memcpy_vram_to_mem_unsafe
-PUBLIC asm_sms_memcpy_vram_to_mem_unsafe_continue
 
-EXTERN asm_sms_set_vram_read_hl
+EXTERN asm_sms_vram_read_hl
+EXTERN asm_sms_copy_vram_to_mem_unsafe
 
 asm_sms_memcpy_vram_to_mem_unsafe:
 
@@ -26,39 +24,17 @@ asm_sms_memcpy_vram_to_mem_unsafe:
    ;
    ; exit  : hl = void *src, &byte after last read from vram
    ;         de = void *dst, &byte after last written to memory
+   ;         bc = 0
    ;
    ; uses  : af, bc, de, hl
 
-   call asm_sms_set_vram_read_hl
+   call asm_sms_vram_read_hl
    
    add hl,bc
    ex de,hl
 
-asm_sms_memcpy_vram_to_mem_unsafe_continue:
-
    ; hl = void *dst in memory
    ; bc = unsigned int n > 0
    ; VRAM has src address set
-   
-   ld a,b
-   inc a
-   ld b,c
-   
-   inc b
-   djnz no_adjust
-   dec a
-   
-no_adjust:
-   
-   ld c,__IO_VDP_DATA
-   
-loop:
 
-   inir
-   
-   dec a
-   jr nz, loop
-   
-   ex de,hl
-   ret
- 
+   jp asm_sms_copy_vram_to_mem_unsafe
