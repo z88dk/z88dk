@@ -50,7 +50,7 @@ IF FORz88
         defc sndbit_mask   = 64
 ENDIF
 
-IF FORjupiter
+IF FORace
         defc sndbit_port   = 254
         defc sndbit_bit    = 3
         defc sndbit_mask   = 8         ; (2^sndbit_bit)
@@ -86,7 +86,8 @@ IF FORti83
         defc sndbit_mask   = 3
 ENDIF
 
-IF FORti83p
+; Confusing name
+IF FORti8x
         defc sndbit_port   = 0
         defc sndbit_bit    = 0
         defc sndbit_mask   = 3
@@ -165,3 +166,37 @@ IF FORaussie
         defc sndbit_bit    = 7
         defc sndbit_mask   = 128	; bit 6 should stay 'on'
 ENDIF
+
+
+; Compatibily ones only, the following ports don't have a beeper
+IF FOReinstein
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
+IF FORmtx
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
+IF FORoz
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
+IF FORpps
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
+IF FORlynx
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
+

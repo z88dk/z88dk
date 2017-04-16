@@ -35,16 +35,5 @@ games/vg5k/bit_open
 games/vg5k/bit_open_di
 games/vg5k/bit_close
 games/vg5k/bit_close_ei
-games/bit_click
-games/bit_play
-games/bit_fx
-games/bit_fx2
-games/bit_fx3
-games/bit_fx4
-games/bit_synth
-games/bit_frequency
-games/bit_beep
-games/beeper
-games/__bit_irqstatus
-games/__snd_tick
+@games/games.lst
 @z80.lst

@@ -33,7 +33,7 @@ obj/r2k/%.o: %.asm
 	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
 
 dirs:
-	mkdir -p obj/z80 obj/r2k obj/ixiy
+	@mkdir -p obj/z80 obj/r2k obj/ixiy
 
 
 clean:
