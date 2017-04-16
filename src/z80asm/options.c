@@ -55,7 +55,8 @@ static void option_define( char *symbol );
 static void option_make_lib( char *library );
 static void option_use_lib( char *library );
 static void option_cpu_z180( void );
-static void option_cpu_RCM2000( void );
+static void option_cpu_r2k(void);
+static void option_cpu_r3k(void);
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -524,9 +525,14 @@ static void option_cpu_z180(void)
 	opts.cpu = CPU_Z180;
 }
 
-static void option_cpu_RCM2000( void )
+static void option_cpu_r2k(void)
 {
-    opts.cpu = CPU_RCM2000;
+	opts.cpu = CPU_RCM2000;
+}
+
+static void option_cpu_r3k(void)
+{
+	opts.cpu = CPU_RCM3000;
 }
 
 /*-----------------------------------------------------------------------------

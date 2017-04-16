@@ -68,7 +68,7 @@ for my $rabbit (0, 1) {
 		if (@asm) {
 			push @OUTPUT, "z80asm(\n";
 			push @OUTPUT, "    options => \"-l -b".
-						  ($rabbit ? " -DRABBIT --RCMX000 -i\".z80emu()" : "\"").",\n";
+						  ($rabbit ? " -DRABBIT --cpu=r2k -i\".z80emu()" : "\"").",\n";
 			unless ($error) {
 				push @OUTPUT, "    asm1 => <<'END_ASM',\n";
 				push @OUTPUT, $asm1;

@@ -18,9 +18,9 @@ Parse command line options
 *   CPU type
 *----------------------------------------------------------------------------*/
 #define CPU_Z80     1
-#define CPU_RCM2000 2
-#define CPU_RCM3000 4
-#define CPU_Z180    8
+#define CPU_Z180    2
+#define CPU_RCM2000 4
+#define CPU_RCM3000 8
 
 #define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
 #define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
