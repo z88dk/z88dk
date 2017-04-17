@@ -84,6 +84,67 @@ extern volatile unsigned char MM_FFFC;
 #define SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS  __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS
 #define SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS     __SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS
 
+// MISCELLANEOUS
+
+extern void __LIB__ __FASTCALL__ sms_border(unsigned char color);
+
+
+extern unsigned int __LIB__ sms_cxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned int __LIB__ __CALLEE__ sms_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc;
+#define sms_cxy2saddr(a,b) sms_cxy2saddr_callee(a,b)
+
+
+
+extern void __LIB__ *sms_copy_font_8x8_to_vram(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
+extern void __LIB__ __CALLEE__ *sms_copy_font_8x8_to_vram_callee(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
+#define sms_copy_font_8x8_to_vram(a,b,c,d) sms_copy_font_8x8_to_vram_callee(a,b,c,d)
+
+
+
+extern void __LIB__ sms_cls_wc(struct r_Rect8 *r,unsigned int background_char) __smallc;
+extern void __LIB__ __CALLEE__ sms_cls_wc_callee(struct r_Rect8 *r,unsigned int background_char) __smallc;
+#define sms_cls_wc(a,b) sms_cls_wc_callee(a,b)
+
+
+extern void __LIB__ sms_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
+extern void __LIB__ __CALLEE__ sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
+#define sms_scroll_wc_up(a,b,c) sms_scroll_wc_up_callee(a,b,c)
+
+
+
+// VDP
+
+#define VDP_FEATURE_SHIFT_SPRITES      __VDP_FEATURE_SHIFT_SPRITES
+#define VDP_FEATURE_LINE_INTERRUPT     __VDP_FEATURE_LINE_INTERRUPT
+#define VDP_FEATURE_LEFT_COLUMN_BLANK  __VDP_FEATURE_LEFT_COLUMN_BLANK
+#define VDP_FEATURE_HSCROLL_INHIBIT    __VDP_FEATURE_HSCROLL_INHIBIT
+#define VDP_FEATURE_VSCROLL_INHIBIT    __VDP_FEATURE_VSCROLL_INHIBIT
+
+#define VDP_FEATURE_WIDE_SPRITES       __VDP_FEATURE_WIDE_SPRITES
+#define VDP_FEATURE_VBLANK_INTERRUPT   __VDP_FEATURE_VBLANK_INTERRUPT
+#define VDP_FEATURE_SHOW_DISPLAY       __VDP_FEATURE_SHOW_DISPLAY
+
+#define sms_display_off()  sms_vdp_feature_disable(__VDP_FEATURE_SHOW_DISPLAY)
+#define sms_display_on()   sms_vdp_feature_enable(__VDP_FEATURE_SHOW_DISPLAY)
+
+extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_disable(unsigned int features);
+
+
+extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_enable(unsigned int features);
+
+
+
+extern void __LIB__ __FASTCALL__ sms_vdp_init(void *vdp_reg_array);
+
+
+
+extern void __LIB__ __FASTCALL__ sms_vdp_set_read_address(unsigned int addr);
+
+
+extern void __LIB__ __FASTCALL__ sms_vdp_set_write_address(unsigned int addr);
+
+
+
 // VRAM <-> MEMORY COPY OPERATIONS
 
 extern void __LIB__ sms_copy_mem_to_vram(void *src,unsigned int n) __smallc;
@@ -193,34 +254,6 @@ extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_callee(unsigned int dst,
 extern unsigned int __LIB__ sms_memsetw_vram_unsafe(unsigned int dst,unsigned int c,unsigned int n) __smallc;
 extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_unsafe_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc;
 #define sms_memsetw_vram_unsafe(a,b,c) sms_memsetw_vram_unsafe_callee(a,b,c)
-
-
-
-// MISCELLANEOUS
-
-extern void __LIB__ __FASTCALL__ sms_border(unsigned char color);
-
-
-extern unsigned int __LIB__ sms_cxy2saddr(unsigned char x,unsigned char y) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc;
-#define sms_cxy2saddr(a,b) sms_cxy2saddr_callee(a,b)
-
-
-
-extern void __LIB__ *sms_copy_font_8x8_to_vram(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
-extern void __LIB__ __CALLEE__ *sms_copy_font_8x8_to_vram_callee(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
-#define sms_copy_font_8x8_to_vram(a,b,c,d) sms_copy_font_8x8_to_vram_callee(a,b,c,d)
-
-
-
-extern void __LIB__ sms_cls_wc(struct r_Rect8 *r,unsigned int background_char) __smallc;
-extern void __LIB__ __CALLEE__ sms_cls_wc_callee(struct r_Rect8 *r,unsigned int background_char) __smallc;
-#define sms_cls_wc(a,b) sms_cls_wc_callee(a,b)
-
-
-extern void __LIB__ sms_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
-extern void __LIB__ __CALLEE__ sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
-#define sms_scroll_wc_up(a,b,c) sms_scroll_wc_up_callee(a,b,c)
 
 
 

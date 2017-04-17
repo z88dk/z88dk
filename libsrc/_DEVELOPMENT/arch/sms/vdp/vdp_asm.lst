@@ -1,0 +1,8 @@
+arch/sms/vdp/z80/__sms_vdp_reg_array
+arch/sms/vdp/z80/asm_sms_display_off
+arch/sms/vdp/z80/asm_sms_display_on
+arch/sms/vdp/z80/asm_sms_vdp_feature_disable
+arch/sms/vdp/z80/asm_sms_vdp_feature_enable
+arch/sms/vdp/z80/asm_sms_vdp_init
+arch/sms/vdp/z80/asm_sms_vdp_set_read_address
+arch/sms/vdp/z80/asm_sms_vdp_set_write_address

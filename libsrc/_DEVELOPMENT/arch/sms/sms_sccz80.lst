@@ -5,4 +5,5 @@
 @arch/sms/PSGlib/PSGlib_sccz80.lst
 @arch/sms/registers/registers_asm.lst
 @arch/sms/SMSlib/SMSlib_sccz80.lst
+@arch/sms/vdp/vdp_sccz80.lst
 @arch/sms/vram/vram_sccz80.lst
