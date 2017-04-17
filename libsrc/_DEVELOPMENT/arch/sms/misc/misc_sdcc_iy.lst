@@ -9,3 +9,9 @@ arch/sms/misc/c/sdcc_iy/sms_cxy2saddr
 arch/sms/misc/c/sdcc_iy/sms_cxy2saddr_callee
 arch/sms/misc/c/sdcc_iy/sms_scroll_wc_up
 arch/sms/misc/c/sdcc_iy/sms_scroll_wc_up_callee
+arch/sms/misc/c/sdcc_iy/sms_tiles_clear_area
+arch/sms/misc/c/sdcc_iy/sms_tiles_clear_area_callee
+arch/sms/misc/c/sdcc_iy/sms_tiles_get_area
+arch/sms/misc/c/sdcc_iy/sms_tiles_get_area_callee
+arch/sms/misc/c/sdcc_iy/sms_tiles_put_area
+arch/sms/misc/c/sdcc_iy/sms_tiles_put_area_callee

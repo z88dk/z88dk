@@ -104,6 +104,16 @@ extern void sms_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned int b
 
 
 
+extern void sms_tiles_clear_area(struct r_Rect8 *r,unsigned int background_char);
+
+
+extern void sms_tiles_get_area(struct r_Rect8 *r,void *dst);
+
+
+extern void sms_tiles_put_area(struct r_Rect8 *r,void *src);
+
+
+
 // VDP
 
 #define VDP_FEATURE_SHIFT_SPRITES      __VDP_FEATURE_SHIFT_SPRITES
