@@ -627,11 +627,13 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IND_C, "(\t C \t)");
 	T_END();
 					 
-	SetTemporaryLine("bc de hl af af' sp ix iy "
-					 "BC DE HL AF AF' SP IX IY ");
+	SetTemporaryLine("bc de de' hl hl' af af' sp ix iy "
+					 "BC DE DE' HL HL' AF AF' SP IX IY ");
 	T_GET(TK_BC,  "bc");  
 	T_GET(TK_DE,  "de");  
+	T_GET(TK_DE1, "de'");  
 	T_GET(TK_HL,  "hl");  
+	T_GET(TK_HL1, "hl'");  
 	T_GET(TK_AF,  "af");  
 	T_GET(TK_AF1, "af'"); 
 	T_GET(TK_SP,  "sp");  
@@ -640,7 +642,9 @@ t_compile_module($init, <<'END', $objs);
 	
 	T_GET(TK_BC,  "BC");  
 	T_GET(TK_DE,  "DE");  
+	T_GET(TK_DE1, "DE'");  
 	T_GET(TK_HL,  "HL");  
+	T_GET(TK_HL1, "HL'");  
 	T_GET(TK_AF,  "AF");  
 	T_GET(TK_AF1, "AF'"); 
 	T_GET(TK_SP,  "SP");  

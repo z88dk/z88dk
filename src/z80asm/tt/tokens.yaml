@@ -204,6 +204,12 @@ tokens:
   - name	: AF1
     regexp	: "\"AF'\"i"
   
+  - name	: DE1
+    regexp	: "\"DE'\"i"
+  
+  - name	: HL1
+    regexp	: "\"HL'\"i"
+  
   # Assembly directives
   - name	: BINARY
   - name	: DEFB
@@ -327,16 +333,18 @@ tokens:
   - name	: TST
   - name	: TSTIO
 
+  # Rabbit 2000/3000 specific opcodes
+  - name	: ALTD
+  - name	: BOOL
+  - name	: IOE
+  - name	: IOI
+  - name	: IPRES
+  - name	: IPSET
+  - name    : IDET
+  
   # Z88DK specific opcodes
   - name	: CALL_OZ
   - name	: CALL_PKG
   - name	: FPP
   - name	: INVOKE
   
-  # Rabbit 2000/3000 specific opcodes
-  - name	: IOI
-  - name	: IOE
-  - name	: ALTD
-  - name	: IPSET
-  - name	: IPRES
-  - name	: BOOL

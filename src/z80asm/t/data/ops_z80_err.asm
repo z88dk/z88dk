@@ -83,3 +83,19 @@
  TSTIO 170              ;; 0BA6:  ED 74 AA
  TSTIO 255              ;; 0BA6:  ED 74 FF
  SLP                    ;; 0BA6:  ED 76
+ ADD SP, -128           ;; 0BA6:  27 80
+ ADD SP, 0              ;; 0BA6:  27 00
+ ADD SP, 127            ;; 0BA6:  27 7F
+ ALTD                   ;; 0BA6:  76
+ AND HL, DE             ;; 0BA6:  DC
+ AND IX, DE             ;; 0BA6:  DD DC
+ AND IY, DE             ;; 0BA6:  FD DC
+ BOOL HL                ;; 0BA6:  CC
+ BOOL IX                ;; 0BA6:  DD CC
+ BOOL IY                ;; 0BA6:  FD CC
+ EX DE', HL             ;; 0BA6:  E3
+ EX DE, HL'             ;; 0BA6:  76 EB
+ EX DE', HL'            ;; 0BA6:  76 E3
+ IOE                    ;; 0BA6:  DB
+ IOI                    ;; 0BA6:  D3
+ IDET                   ;; 0BA6:  5B

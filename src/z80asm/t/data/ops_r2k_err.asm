@@ -237,3 +237,4 @@
  TSTIO 170              ;; 0A42:  ED 74 AA
  TSTIO 255              ;; 0A42:  ED 74 FF
  SLP                    ;; 0A42:  ED 76
+ IDET                   ;; 0A5A:  5B

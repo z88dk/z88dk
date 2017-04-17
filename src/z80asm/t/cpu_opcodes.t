@@ -236,6 +236,26 @@ for (@CPU) {
 
 	emit("TSTIO n",			0xED, 0x74, "n");
 	emit("SLP",				0xED, 0x76);
+
+	# Rabbit RCM2000
+	emit("ADD SP, d",		0x27, "d");
+	emit("ALTD",			0x76);			# TODO: add all ALTD combinations
+	
+	emit("AND HL, DE",		0xDC);
+	emit("AND x, DE",		"x", 0xDC);
+	
+	emit("BOOL HL",			0xCC);
+	emit("BOOL x",			"x", 0xCC);
+	
+	emit("EX DE', HL",		0xE3);
+	emit("EX DE, HL'",		0x76, 0xEB);
+	emit("EX DE', HL'",		0x76, 0xE3);
+
+	emit("IOE",				0xDB);
+	emit("IOI",				0xD3);
+	
+	# Rabbit 3000
+	emit("IDET",			0x5B);
 	
 	close $asmf;
 	close $binf;
@@ -311,7 +331,12 @@ sub emit {
 	}
 	
 	if (($asm_line =~ /\b ( I[XY][HL] ) \b/x && $cpu ne 'z80') ||
-	    ($asm_line =~ /\b ( EIR | IIR ) \b/x && $cpu =~ /^z/) ||
+	    ($asm_line =~ /\b ( EIR | IIR |
+							ADD \s+ SP | AND \s+ (HL|IX|IY) | 
+							ALTD |
+							BOOL |
+							IOE | IOI ) \b |
+						\b ( DE\' | HL\' ) /x && $cpu =~ /^z/) ||
 	    ($asm_line =~ /\b ( MLT | TST | 
 							IN0 | OUT0 | 
 							OTDM | OTDMR | 
@@ -329,7 +354,8 @@ sub emit {
 							CPI | CPIR | CPD | CPDR |
 							RST \s+ 0 | RST \s+ 8 | RST \s+ 48 |
 							CALL \s+ (NZ|Z|NC|C|PO|PE|P|M) \b |
-							SLL ) \b/x && $cpu =~ /^r/)
+							SLL ) \b/x && $cpu =~ /^r/) ||
+		($asm_line =~ /\b ( IDET ) \b/x && $cpu ne 'r3k')
 	) {
 		say $errf $asm_line;
 	}

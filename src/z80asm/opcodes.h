@@ -24,8 +24,11 @@ extern void add_opcode(int opcode);
 /* add opcode followed by jump relative offset expression */
 extern void add_opcode_jr(int opcode, struct Expr *expr);
 
-/* add opcode followed by 8-bit expression */
+/* add opcode followed by 8-bit unsigned expression */
 extern void add_opcode_n(int opcode, struct Expr *expr);
+
+/* add opcode followed by 8-bit signed expression */
+extern void add_opcode_d(int opcode, struct Expr *expr);
 
 /* add opcode followed by 16-bit expression */
 extern void add_opcode_nn(int opcode, struct Expr *expr);
@@ -279,3 +282,10 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_IPRES			_RABBIT_ONLY(0xED5D)
 #define Z80_IPSET(n)		_RABBIT_ONLY(_CHOOSE4_((n), 0, 0xED46, 1, 0xED56, 2, 0xED4E, 3, 0xED5E))
 #define Z80_BOOL			_RABBIT_ONLY(0xCC)
+#define Z80_ADD_SP_d		_RABBIT_ONLY(0x27)
+#define Z80_AND_HL_DE		_RABBIT_ONLY(0xDC)
+#define Z80_BOOL			_RABBIT_ONLY(0xCC)
+#define Z80_EX_DE1_HL		_RABBIT_ONLY(0xE3)
+#define Z80_EX_DE_HL1		_RABBIT_ONLY(0x76EB)
+#define Z80_EX_DE1_HL1		_RABBIT_ONLY(0x76E3)
+#define Z80_IDET			_RCM3000_ONLY(0x5B)

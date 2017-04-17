@@ -1040,3 +1040,19 @@
  TST 170                ;; 0A3A:  ED 64 AA
  TST 255                ;; 0A3D:  ED 64 FF
  TST (HL)               ;; 0A40:  ED 34
+ ADD SP, -128           ;; 0A42:  27 80
+ ADD SP, 0              ;; 0A44:  27 00
+ ADD SP, 127            ;; 0A46:  27 7F
+ ALTD                   ;; 0A48:  76
+ AND HL, DE             ;; 0A49:  DC
+ AND IX, DE             ;; 0A4A:  DD DC
+ AND IY, DE             ;; 0A4C:  FD DC
+ BOOL HL                ;; 0A4E:  CC
+ BOOL IX                ;; 0A4F:  DD CC
+ BOOL IY                ;; 0A51:  FD CC
+ EX DE', HL             ;; 0A53:  E3
+ EX DE, HL'             ;; 0A54:  76 EB
+ EX DE', HL'            ;; 0A56:  76 E3
+ IOE                    ;; 0A58:  DB
+ IOI                    ;; 0A59:  D3
+ IDET                   ;; 0A5A:  5B

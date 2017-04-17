@@ -37,11 +37,18 @@ void add_opcode_jr(int opcode, Expr *expr)
 	Pass2infoExpr(RANGE_JR_OFFSET, expr);
 }
 
-/* add opcode followed by 8-bit expression */
+/* add opcode followed by 8-bit unsigned expression */
 void add_opcode_n(int opcode, Expr *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
+}
+
+/* add opcode followed by 8-bit signed expression */
+void add_opcode_d(int opcode, Expr *expr)
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
 }
 
 /* add opcode followed by 16-bit expression */

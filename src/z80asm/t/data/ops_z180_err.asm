@@ -78,3 +78,19 @@
  XOR IYL                ;; 036C:  FD AD
  OR IYL                 ;; 036C:  FD B5
  CP IYL                 ;; 036C:  FD BD
+ ADD SP, -128           ;; 0BE0:  27 80
+ ADD SP, 0              ;; 0BE0:  27 00
+ ADD SP, 127            ;; 0BE0:  27 7F
+ ALTD                   ;; 0BE0:  76
+ AND HL, DE             ;; 0BE0:  DC
+ AND IX, DE             ;; 0BE0:  DD DC
+ AND IY, DE             ;; 0BE0:  FD DC
+ BOOL HL                ;; 0BE0:  CC
+ BOOL IX                ;; 0BE0:  DD CC
+ BOOL IY                ;; 0BE0:  FD CC
+ EX DE', HL             ;; 0BE0:  E3
+ EX DE, HL'             ;; 0BE0:  76 EB
+ EX DE', HL'            ;; 0BE0:  76 E3
+ IOE                    ;; 0BE0:  DB
+ IOI                    ;; 0BE0:  D3
+ IDET                   ;; 0BE0:  5B

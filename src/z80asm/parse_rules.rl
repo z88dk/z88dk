@@ -38,6 +38,7 @@ Define rules for a ragel-based parser.
 
 #define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
 #define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
+#define DO_stmt_d(  opcode)	_DO_stmt_(d,   opcode)
 #define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
 #define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
 
@@ -573,9 +574,6 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( Z80_EX_AF_AF ); }
 #endfor  <DD>
 
-		| label? _TK_EX _TK_DE _TK_COMMA _TK_HL _TK_NEWLINE
-		  @{ DO_stmt( Z80_EX_DE_HL ); }
-
 		| label? _TK_EX _TK_IND_SP _TK_COMMA _TK_HL _TK_NEWLINE
 		  @{ DO_stmt( Z80_EX_IND_SP_HL ); }
 
@@ -584,6 +582,13 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( P_<DD> + Z80_EX_IND_SP_idx ); }
 #endfor  <DD>
 
+#foreach <R1> in DE, DE1
+  #foreach <R2> in HL, HL1
+		| label? _TK_EX _TK_<R1> _TK_COMMA _TK_<R2> _TK_NEWLINE
+		  @{ DO_stmt( Z80_EX_<R1>_<R2> ); }
+  #endfor <R2>
+#endfor <R1>
+		
 		/*---------------------------------------------------------------------
 		*   Emulated opcodes
 		*--------------------------------------------------------------------*/
@@ -664,6 +669,15 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( Z80_MLT( REG_<DD> ) ); }
 #endfor  <DD>
 
+		/* ADD SP, d */
+		| label? _TK_ADD _TK_SP _TK_COMMA expr _TK_NEWLINE
+		  @{ DO_stmt_d( Z80_ADD_SP_d ); }
+
+		/* AND idx, DE */
+#foreach <DD> in HL, IX, IY
+		| label? _TK_AND _TK_<DD> _TK_COMMA _TK_DE _TK_NEWLINE
+		  @{ DO_stmt( P_<DD> + Z80_AND_HL_DE ); }
+#endfor  <DD>
 
 		/*---------------------------------------------------------------------
 		*   INC / DEC
@@ -847,11 +861,11 @@ Define rules for a ragel-based parser.
 				 OTDR, OTIR, OUTD, OUTI, \
 				 SLP, \
 				 OTIM, OTIMR, OTDM, OTDMR, \
-				 ALTD, IOI, IOE, IPRES
+				 ALTD, IOI, IOE, IPRES, \
+				 BOOL, IDET
 		| label? _TK_<OP> _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP> ); }
 #endfor  <OP>	
-
 
 		/*---------------------------------------------------------------------
 		*   opcodes constant argument
