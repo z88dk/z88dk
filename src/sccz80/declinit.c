@@ -306,7 +306,7 @@ constdecl:
                     if ( c_double_strings ) { 
                         output_double_string_load(value);
                     } else {
-                        dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                        dofloat(value, fa);
                         defbyte();
                         for ( i = 0; i < 6; i++ ) {
                             if ( i ) outbyte(',');
@@ -346,7 +346,7 @@ constdecl:
                       if ( c_double_strings ) {
                         output_double_string_load(value);
                     } else {
-                        dofloat(value, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+                        dofloat(value, fa);
                         for ( i = 0; i < 6; i++ ) {
                             stowlit(fa[i], 1);
                         }

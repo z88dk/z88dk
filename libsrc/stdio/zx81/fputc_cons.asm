@@ -53,10 +53,17 @@ ENDIF
 
 
 .doput
+IF STANDARDESCAPECHARS
+	cp  10		; CR?
+	jr  z,isLF
+	cp  13      ; LF?
+	jr  nz,NoLF
+ELSE
 	cp  13		; CR?
 	jr  z,isLF
 	cp  10      ; LF?
 	jr  nz,NoLF
+ENDIF
 .isLF
 	xor a
 	ld (COLUMN),a   ; automatic CR

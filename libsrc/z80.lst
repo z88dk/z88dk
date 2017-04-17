@@ -1,4 +1,4 @@
-assert/assert
+@assert/assert.lst
 @ctype/ctype.lst
 setjmp/longjmp
 setjmp/setjmp

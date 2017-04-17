@@ -70,7 +70,7 @@ ticks:
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
 config:
-	./config.sh `pwd`/ $(DEFAULT)
+	cp -f lib/config/$(DEFAULT).cfg lib/config/zcc.cfg
 
 libs:
 	cd libsrc ; $(MAKE)

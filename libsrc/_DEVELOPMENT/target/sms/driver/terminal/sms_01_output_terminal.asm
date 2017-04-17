@@ -114,9 +114,13 @@
 ;
 ;   * IOCTL_OTERM_SCROLL
 ;
-;   * IOCTL_OTERM_PATTERN_OFFSET
+;   * IOCTL_OTERM_SCREEN_MAP_ADDRESS
+;
+;   * IOCTL_OTERM_CHARACTER_PATTERN_OFFSET
 ;
 ;   * IOCTL_OTERM_PRINT_FLAGS
+;
+;   * IOCTL_OTERM_BACKGROUND_CHARACTER
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
@@ -132,8 +136,10 @@
 ;   18                      window.y
 ;   19                      window.height
 ;   20                      scroll_limit
-;  21/22                    character pattern offset (in characters)
-;   23                      flags: HFLIP (bit 1), VLFIP (bit 2), COLORHALF (bit 3), OVERSPRITES (bit 4)
+;  21/22                    screen map base address
+;  23/24                    character pattern offset (in characters)
+;   25                      flags: H-FLIP (bit 1), V-FLIP (bit 2), COLORHALF (bit 3), OVERSPRITES (bit 4)
+;  26/27                    background character (clear screen character, absolute)
 
 SECTION code_driver
 SECTION code_driver_terminal_output

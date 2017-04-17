@@ -7,6 +7,12 @@ dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "config_sms_public.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -22,20 +28,28 @@ include "sms_rules.inc"
 include "crt_memory_map.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-include "config_sms_public.inc"
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; The embedded target has no device drivers so it cannot
-; instantiate FILEs.
-
-; It can use sprint/sscanf + family and it can create
-; memstreams in the default configuration.
+dnl
+dnl############################################################
+dnl## LIST OF AVAILABLE DRIVERS WITH STATIC INSTANTIATORS #####
+dnl############################################################
+dnl
+dnl## output terminals
+dnl
+dnl#include(`driver/terminal/sms_01_output_terminal.m4')dnl
+dnl
+dnl## file dup
+dnl
+dnl#include(`../m4_file_dup.m4')dnl
+dnl
+dnl## empty fd slot
+dnl
+dnl#include(`../m4_file_absent.m4')dnl
+dnl
+dnl############################################################
+dnl## INSTANTIATE DRIVERS #####################################
+dnl############################################################
 
 include(`../clib_instantiate_begin.m4')
 include(`../clib_instantiate_end.m4')
@@ -87,14 +101,9 @@ __Restart:
    ; initialize mappers
    
    ld de,0x0000
-   ld (0xfffc),de              ; (0xfffc) = $00
+   ld (0xfffc),de              ; (0xfffc) = $00, (0xfffd) = $00
    ld de,0x0201
-   ld (0xfffe),de              ; (0xfffd) = $00, (0xfffe) = $01, (0xffff) = $02
-
-   ; silence psg
-
-   EXTERN asm_sms_psg_silence
-   call   asm_sms_psg_silence
+   ld (0xfffe),de              ; (0xfffe) = $01, (0xffff) = $02
 
    ; command line
    
@@ -112,6 +121,18 @@ __Restart_2:
       push bc                  ; argc
 
    ENDIF
+
+   ; silence psg
+
+   EXTERN asm_sms_psg_silence
+   call   asm_sms_psg_silence
+
+   ; vdp initialization
+
+   EXTERN asm_sms_vdp_init, __sms_vdp_reg_array
+
+	ld hl, __sms_vdp_reg_array
+   call   asm_sms_vdp_init
 
    ; initialize data section
 

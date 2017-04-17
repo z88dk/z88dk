@@ -138,13 +138,16 @@ int c_double_strings;
 /*
  *        Framepointer stuff - tis broken!
  */
-int c_useframepointer;
 int c_framepointer_is_ix;
 
 
 int c_use_r2l_calling_convention;
 
 int c_cpu = CPU_Z80;
+
+/* Settings for genmath + math48 */
+int c_fp_mantissa_bytes = 5;
+int c_fp_exponent_bias = 128;
 
 /* scanf format requirements */
 uint32_t scanf_format_option;

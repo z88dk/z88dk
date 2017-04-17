@@ -1,22 +1,35 @@
 ;
 ;	ROM Console routine for the Philips Videopac C7420
 ;	By Stefano Bodrato - 2015
+;	Apr, 2107:   fixes and improvements
 ;
-;	$Id: fputc_cons.asm,v 1.3 2016-06-12 17:00:21 dom Exp $
+;	$Id:fputc_cons.asm,  2017, Stefano $
 ;
-
 
 	SECTION	code_clib
 	PUBLIC	fputc_cons_native
 
 .fputc_cons_native
-	ld	hl,2
-	add	hl,sp
-	ld	a,(hl)
+
+; ODDLY THIS DOESN'T WORK !   (O2EM emulator problem ?)
+;        ld      hl,2
+;        add     hl,sp
+;        ld      a,(hl)
+		
+	pop bc
+	pop hl
+	ld a,l
+	push hl
+	push bc
+
 IF STANDARDESCAPECHARS
-	cp	13
-ELSE
+	cp  13
+	ret z
 	cp	10
+ELSE
+	cp  10
+	ret z
+	cp	13
 ENDIF
 	jr	nz,nocr
 	ld	a,131		; ENTER
@@ -31,9 +44,32 @@ ENDIF
 	jr	nz,nocls
 	;ld	a,159		; VIDINI (slower)
 	ld	a,157		; CLEARA
-	rst	$30
+	call outchar
 	ld	a,140		; HOME
 .nocls
 
+
+	cp '$'
+	jr	nz,nodollar
+	ld	a,4
+.nodollar
+
+	cp '#'
+	jr	nz,nohash
+	ld	a,6
+.nohash
+
+	cp '^'
+	jr	nz,nopow
+	ld	a,13
+.nopow
+
+
+.outchar
+
+	
+	push af
+	pop af
 	rst	$30
+	
 	ret

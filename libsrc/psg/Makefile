@@ -27,26 +27,22 @@ SIDFILES = \
 AOBJECTS = $(AFILES:.c=.o)
 SIDOBJECTS = $(SIDFILES:.c=.o)
 
+.PHONY:	dirs
 
-all:    $(AOBJECTS)
+all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECTS)) $(addprefix obj/, $(SIDOBJECTS))
 
-c128: $(AOBJECTS) $(SIDOBJECTS)
+obj/z80/%.o: %.c
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
 
-generic_iy:
-	zcc +test $(CFLAGS) -Ca--IXIY psg_channels.c
-	zcc +test $(CFLAGS) -Ca--IXIY psg_envelope.c
-	zcc +test $(CFLAGS) -Ca--IXIY psg_noise.c
-	zcc +test $(CFLAGS) -Ca--IXIY psg_noise_channels.c
-	zcc +test $(CFLAGS) -Ca--IXIY psg_tone.c
-	zcc +test $(CFLAGS) -Ca--IXIY psg_tone_channels.c
-	zcc +test $(CFLAGS) -Ca--IXIY psg_volume.c
+obj/c128/%.o: c128/%.c
+	zcc +c128 -mz80 $(CFLAGS) -o $@  $^
 
-	
-sid_psg:
+obj/ixiy/%.o: %.c
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
 
 
-.c.o:
-	zcc +test $(CFLAGS) $*.c
+dirs:
+	@mkdir -p obj/z80 obj/ixiy obj/c128
 
 clean:
 	$(RM) -f aquarius/*.o
@@ -61,4 +57,4 @@ clean:
 	$(RM) -f trs80/*.o
 	$(RM) -f x1/*.o
 	$(RM) -f zx81/*.o
-	$(RM) *.o* *.sym *.map zcc_opt.def *.i
+	$(RM) -fr obj
