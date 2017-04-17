@@ -1,5 +1,3 @@
-// zcc +sms -v -startup=1 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 hello.c -o hello -pragma-include:zpragma.inc -create-app
-
 #include <stdio.h>
 #include <stropts.h>
 #include <arch/sms.h>
@@ -21,16 +19,12 @@ void main(void)
 {
 	sms_memcpy_mem_to_cram(0, palette, 16);
 	sms_memcpy_mem_to_cram(16, palette, 16);
-	
-	IO_VDP_COMMAND = 0x00;
-	IO_VDP_COMMAND = 0x40;
-	
+
+	sms_vdp_set_write_address(0x0000);
 	sms_copy_font_8x8_to_vram(font_8x8_clairsys, 127, 0, 1);
 	
-	// must turn on the display!
-	
-	IO_VDP_COMMAND = 0xc0;
-	IO_VDP_COMMAND = 0x81;
+	sms_display_on();
+	sms_border(4);
 	
 	// clear entire screen with # character
 	
@@ -44,8 +38,8 @@ void main(void)
 	while (1)
 	{
 		printf("SMS says Hello World!\n");
-		z80_delay_ms(500);
+		z80_delay_ms(250);
 		printf("Something else...\n");
-		z80_delay_ms(500);
+		z80_delay_ms(250);
 	}
 }
