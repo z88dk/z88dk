@@ -1220,7 +1220,7 @@ rcmx000_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	z80asm --RCMX000 -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	z80asm --cpu=r2k -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 	$(MAKE) -C strings clean
 
 # embedded target - contributed by Daniel Wallner
