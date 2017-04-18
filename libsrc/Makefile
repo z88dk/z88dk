@@ -1380,7 +1380,7 @@ x07_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=x07 TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
+	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
 x1ansi_clib.lib:
