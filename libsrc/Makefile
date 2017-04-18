@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.265 2016/11/25 14:45:01 stefano Exp $
+# $Id: Makefile,v 1.265+ ...now on GIT $
 
 
 include Make.config
@@ -967,14 +967,14 @@ enterprise_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=enterprise
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
+	$(MAKE) -C stdio
+	$(MAKE) -C compress/zx7
 	$(MAKE) -C setjmp
-	$(MAKE) -C time 
+	$(MAKE) -C time
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lenterprise
-	$(MAKE) -C enterprise 
+	$(MAKE) -C enterprise
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
@@ -1004,7 +1004,7 @@ einstein.lib:
 	$(MAKE) -C games lmsx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
+	$(LIBLINKER) -DFOReinstein -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
