@@ -11,4 +11,13 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	jp	$C1BE
+IF STANDARDESCAPECHARS
+	cp  13
+	ret z
+	cp  10
+	jr  nz,notCR
+	ld	a,13
+.notCR
+ENDIF
+	jp	$009F
+
