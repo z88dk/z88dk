@@ -38,6 +38,7 @@ dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/terminal/sms_01_output_terminal.m4')dnl
+dnl#include(`driver/terminal/sms_01_output_terminal_tty_z88dk.m4')dnl
 dnl
 dnl## file dup
 dnl

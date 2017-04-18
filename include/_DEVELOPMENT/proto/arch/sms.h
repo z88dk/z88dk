@@ -92,6 +92,10 @@ __DPROTO(`iyl,iyh',`iyl,iyh',void,*,sms_copy_font_8x8_to_vram,void *font,unsigne
 __DPROTO(,,void,,sms_cls_wc,struct r_Rect8 *r,unsigned int background_char)
 __DPROTO(,,void,,sms_scroll_wc_up,struct r_Rect8 *r,unsigned char rows,unsigned int background_char)
 
+__DPROTO(,,void,,sms_tiles_clear_area,struct r_Rect8 *r,unsigned int background_char)
+__DPROTO(,,void,,sms_tiles_get_area,struct r_Rect8 *r,void *dst)
+__DPROTO(,,void,,sms_tiles_put_area,struct r_Rect8 *r,void *src)
+
 // VDP
 
 #define VDP_FEATURE_SHIFT_SPRITES      __VDP_FEATURE_SHIFT_SPRITES

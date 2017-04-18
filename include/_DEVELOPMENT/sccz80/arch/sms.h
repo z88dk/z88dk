@@ -112,6 +112,22 @@ extern void __LIB__ __CALLEE__ sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigne
 
 
 
+extern void __LIB__ sms_tiles_clear_area(struct r_Rect8 *r,unsigned int background_char) __smallc;
+extern void __LIB__ __CALLEE__ sms_tiles_clear_area_callee(struct r_Rect8 *r,unsigned int background_char) __smallc;
+#define sms_tiles_clear_area(a,b) sms_tiles_clear_area_callee(a,b)
+
+
+extern void __LIB__ sms_tiles_get_area(struct r_Rect8 *r,void *dst) __smallc;
+extern void __LIB__ __CALLEE__ sms_tiles_get_area_callee(struct r_Rect8 *r,void *dst) __smallc;
+#define sms_tiles_get_area(a,b) sms_tiles_get_area_callee(a,b)
+
+
+extern void __LIB__ sms_tiles_put_area(struct r_Rect8 *r,void *src) __smallc;
+extern void __LIB__ __CALLEE__ sms_tiles_put_area_callee(struct r_Rect8 *r,void *src) __smallc;
+#define sms_tiles_put_area(a,b) sms_tiles_put_area_callee(a,b)
+
+
+
 // VDP
 
 #define VDP_FEATURE_SHIFT_SPRITES      __VDP_FEATURE_SHIFT_SPRITES
