@@ -86,7 +86,14 @@ extern void add_Z88_INVOKE(int argument);
 #define P_IY	(opts.swap_ix_iy ? 0xDD00 : 0xFD00)
 
 /* Flags constants */
-enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
+enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO_LZ, FLAG_PE_LO, FLAG_P, FLAG_M };
+
+#define FLAG_PO		_ZILOG_ONLY(FLAG_PO_LZ)
+#define FLAG_PE		_ZILOG_ONLY(FLAG_PE_LO)
+
+#define FLAG_LZ		_RABBIT_ONLY(FLAG_PO_LZ)
+#define FLAG_LO		_RABBIT_ONLY(FLAG_PE_LO)
+
 #define NOT_FLAG(flag)	((flag) ^ 1)
 
 /* 8-bit registers */

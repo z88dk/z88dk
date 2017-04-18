@@ -13,19 +13,24 @@ my @CPU = (qw( z80 z180 r2k r3k ));
 my @R   = ([B => 0], [C => 1], [D => 2], [E => 3],   [H => 4],   [L => 5], [A => 7]);
 my @DD  = ([BC => 0], [DE => 1], [HL => 2], [SP => 3]);
 my @DD1 = ([BC => 0], [DE => 1],            [SP => 3]);
+my @DD2 = ([BC => 0], [DE => 1], [HL => 2]           );
 my @QQ  = ([BC => 0], [DE => 1], [HL => 2], [AF => 3]);
 my @X   = ([IX => 0xDD], [IY => 0xFD]);
 my @X8  = ([IXH => 0xDD04], [IXL => 0xDD05], [IYH => 0xFD04], [IYL => 0xFD05]);
-my @CC  = ([NZ => 0], [Z => 1], [NC => 2], [C => 3], [PO => 4], [PE => 5], [P => 6], [M => 7]);
+my @CC  = ([NZ => 0], [Z => 1], [NC => 2], [C => 3],                       [P => 6], [M => 7]);
+my @CCZ = (                                          [PO => 4], [PE => 5]                    );
+my @CCR = (                                          [LZ => 4], [LO => 5]                    );
 my @CC1 = ([NZ => 0], [Z => 1], [NC => 2], [C => 3]);
 my @ALU = (["ADD A," => 0], ["ADC A," => 1], [SUB => 2], ["SBC A," => 3], [AND => 4], [XOR => 5], [OR => 6], [CP => 7]);
-my @ROT = ([RLC => 0], [RRC => 1], [RL => 2], [RR => 3], [SLA => 4], [SRA => 5], [SLL => 6], [SRL => 7]);
+my @ROT = ([RLC => 0], [RRC => 1], [RL => 2], [RR => 3], [SLA => 4], [SRA => 5],             [SRL => 7]);
+my @ROTZ= (                                                                      [SLL => 6]            );
 my @BIT = ([BIT => 0x40], [RES => 0x80], [SET => 0xC0]);
 my @N   = ([0 => 0], [85 => 0x55], [170 => 0xAA], [255 => 0xFF]);
 my @M   = ([0 => 0], [4660 => 0x1234], [52719 => 0xCDEF], [65535 => 0xFFFF]);
 my @D   = ([-128 => 0x80], [0 => 0], [127 => 0x7F]);
 my @B   = (map {[$_ => $_]} 0..7);
-my @RST = (map {[$_*8 => $_]} 0..7);
+my @RST  = (                          [0x10 => 2], [0x18 => 3], [0x20 => 4], [0x28 => 5],              [0x38 => 7]);
+my @RSTZ = ([0x00 => 0], [0x08 => 1],                                                     [0x30 => 6]             );
 
 #------------------------------------------------------------------------------
 # globals
@@ -51,211 +56,276 @@ for (@CPU) {
 	open ($errf, ">", 	 $filebase."_err.asm");
 	open ($binf, ">:raw", $filebase.".bmk");
 	
-	# common
-	emit("LD r, r1", 		"0x40 + r * 8 + r1");
-	emit("LD r, x8", 		"x8 >> 8", "0x40 + r * 8 + (x8 & 255)");
+	# cpu flags
+	my $ALL		= 1;
+	my $Z80 	= $cpu eq 'z80';
+	my $Z180 	= $cpu eq 'z180';
+	my $R2K		= $cpu eq 'r2k';
+	my $R3K		= $cpu eq 'r3k';
+	my $NOT_Z80	= ! $Z80;
+	my $ZILOG	= $Z80 || $Z180;
+	my $RABBIT	= $R2K || $R3K;
 	
-	emit("LD r, n", 		"0x06+r*8", "n");
-	emit("LD x8, n", 		"x8 >> 8", "0x06 + (x8 & 255) * 8", "n");
+	# 8-bit load group
+	emit($ALL,		"LD r, r1", 		"0x40 + r * 8 + r1");
+	emit($Z80,		"LD r, x8", 		"x8 >> 8", "0x40 + r * 8 + (x8 & 255)");
 	
-	emit("LD r, (HL)", 		"0x46 + r * 8");
-	emit("LD r, (x + d)", 	"x", "0x46 + r * 8", "d");
-
-	emit("LD (HL), r", 		"0x70 + r");
-	emit("LD (x + d), r", 	"x", "0x70 + r", "d");
-
-	emit("LD (HL), n", 		0x36, "n");
-	emit("LD (x + d), n",	"x", 0x36, "d", "n");
-
-	emit("LD A, (BC)", 		0x0A);
-	emit("LD A, (DE)", 		0x1A);
-	emit("LD A, (m)", 		0x3A, "m & 255", "m >> 8");
-
-	emit("LD (BC), A", 		0x02);
-	emit("LD (DE), A", 		0x12);
-	emit("LD (m), A", 		0x32, "m & 255", "m >> 8");
-
-	emit("LD I, A", 		0xED, 0x47);
-	emit("LD A, I", 		0xED, 0x57);
-	emit("LD R, A", 		0xED, 0x4F);
-	emit("LD A, R", 		0xED, 0x5F);
-
-	emit("LD IIR, A", 		0xED, 0x47);
-	emit("LD A, IIR", 		0xED, 0x57);
-	emit("LD EIR, A", 		0xED, 0x4F);
-	emit("LD A, EIR", 		0xED, 0x5F);
-
-	emit("LD dd, m", 		"0x01 + dd * 16", "m & 255", "m >> 8");
-	emit("LD x, m", 		"x", "0x01 + 2 * 16", "m & 255", "m >> 8");
-
-	emit("LD HL, (m)", 		0x2A, "m & 255", "m >> 8");
-	emit("LD x, (m)", 		"x", 0x2A, "m & 255", "m >> 8");
-
-	emit("LD dd1, (m)", 	0xED, "0x4B + dd1 * 16", "m & 255", "m >> 8");
-
-	emit("LD (m), HL", 		0x22, "m & 255", "m >> 8");
-	emit("LD (m), x", 		"x", 0x22, "m & 255", "m >> 8");
-
-	emit("LD (m), dd1", 	0xED, "0x43 + dd1 * 16", "m & 255", "m >> 8");
-
-	emit("LD SP, HL",		0xF9);
-	emit("LD SP, x",		"x", 0xF9);
+	emit($ALL,		"LD r, n", 			"0x06+r*8", "n");
+	emit($Z80,		"LD x8, n", 		"x8 >> 8", "0x06 + (x8 & 255) * 8", "n");
 	
-	emit("PUSH qq",			"0xC5 + qq * 16");
-	emit("PUSH x",			"x", "0xC5 + 2 * 16");
-	emit("POP qq",			"0xC1 + qq * 16");
-	emit("POP x",			"x", "0xC1 + 2 * 16");
+	emit($ALL,		"LD r, (HL)", 		"0x46 + r * 8");
+	emit($ALL,		"LD r, (x + d)", 	"x", "0x46 + r * 8", "d");
+
+	emit($ALL,		"LD (HL), r", 		"0x70 + r");
+	emit($ALL,		"LD (x + d), r", 	"x", "0x70 + r", "d");
+
+	emit($ALL,		"LD (HL), n", 		0x36, "n");
+	emit($ALL,		"LD (x + d), n",	"x", 0x36, "d", "n");
+
+	emit($ALL,		"LD A, (BC)", 		0x0A);
+	emit($ALL,		"LD A, (DE)", 		0x1A);
+	emit($ALL,		"LD A, (m)", 		0x3A, "m & 255", "m >> 8");
+
+	emit($ALL,		"LD (BC), A", 		0x02);
+	emit($ALL,		"LD (DE), A", 		0x12);
+	emit($ALL,		"LD (m), A", 		0x32, "m & 255", "m >> 8");
+
 	
-	emit("EX DE, HL",		0xEB);
-	emit("EX AF, AF'",		0x08);
-	emit("EXX",				0xD9);
+	# 16-bit load group
+	emit($ALL,		"LD dd, m", 		"0x01 + dd * 16", "m & 255", "m >> 8");
+	emit($ALL,		"LD x, m", 			"x", "0x01 + 2 * 16", "m & 255", "m >> 8");
 	
-	if ($cpu =~ /^z/) {
-		emit("EX (SP), HL",	0xE3);
+	emit($ALL,		"LD HL, (m)", 		0x2A, "m & 255", "m >> 8");
+	emit($ALL,		"LD x, (m)", 		"x", 0x2A, "m & 255", "m >> 8");
+
+	emit($ALL,		"LD dd1, (m)", 		0xED, "0x4B + dd1 * 16", "m & 255", "m >> 8");
+
+	emit($ALL,		"LD (m), HL", 		0x22, "m & 255", "m >> 8");
+	emit($ALL,		"LD (m), x", 		"x", 0x22, "m & 255", "m >> 8");
+
+	emit($ALL,		"LD (m), dd1", 		0xED, "0x43 + dd1 * 16", "m & 255", "m >> 8");
+
+	emit($ALL,		"LD SP, HL",		0xF9);
+	emit($ALL,		"LD SP, x",			"x", 0xF9);
+	
+	emit($ALL,		"PUSH qq",			"0xC5 + qq * 16");
+	emit($ALL,		"PUSH x",			"x", "0xC5 + 2 * 16");
+	emit($ALL,		"POP qq",			"0xC1 + qq * 16");
+	emit($ALL,		"POP x",			"x", "0xC1 + 2 * 16");
+	
+	
+	# Exchange Group
+	emit($ALL,		"EX DE, HL",		0xEB);
+	emit($ALL,		"EX AF, AF'",		0x08);
+	emit($ALL,		"EXX",				0xD9);
+	
+	if ($ZILOG) {
+		emit($ALL,	"EX (SP), HL",		0xE3);
 	}
 	else {
-		emit("EX (SP), HL",	0xED, 0x54);
+		emit($ALL,	"EX (SP), HL",		0xED, 0x54);
 	}
-	emit("EX (SP), x",		"x", 0xE3);
-	
-	emit("LDI",				0xED, 0xA0);
-	emit("LDIR",			0xED, 0xB0);
-	emit("LDD",				0xED, 0xA8);
-	emit("LDDR",			0xED, 0xB8);
-	
-	emit("CPI",				0xED, 0xA1);
-	emit("CPIR",			0xED, 0xB1);
-	emit("CPD",				0xED, 0xA9);
-	emit("CPDR",			0xED, 0xB9);
-	
-	emit("alu r",			"0x80 + alu * 8 + r");
-	emit("alu x8",	 		"x8 >> 8", "0x80 + alu * 8 + (x8 & 255)");
 
-	emit("alu n",			"0xC6 + alu * 8", "n");
-	emit("alu (HL)",		"0x86 + alu * 8");
-	emit("alu (x + d)",		"x", "0x86 + alu * 8", "d");
+	emit($ALL,		"EX (SP), x",		"x", 0xE3);
 	
-	emit("INC r",			"0x04 + r * 8");
-	emit("INC (HL)",		0x34);
-	emit("INC (x + d)",		"x", 0x34, "d");
-	
-	emit("DEC r",			"0x05 + r * 8");
-	emit("DEC (HL)",		0x35);
-	emit("DEC (x + d)",		"x", 0x35, "d");
-	
-	emit("DAA",				0x27);
-	emit("CPL",				0x2F);
-	emit("NEG",				0xED, 0x44);
-	emit("CCF",				0x3F);
-	emit("SCF",				0x37);
-	emit("NOP",				0x00);
-	emit("HALT",			0x76);
-	emit("DI",				0xF3);
-	emit("EI",				0xFB);
-	emit("IM 0",			0xED, 0x46);
-	emit("IM 1",			0xED, 0x56);
-	emit("IM 2",			0xED, 0x5E);
-	
-	emit("ADD HL, dd",		"0x09 + dd * 16");
-	emit("ADD x, dd",		"x", "0x09 + dd * 16");
-	emit("ADC HL, dd",		0xED, "0x4A + dd * 16");
-	emit("SBC HL, dd",		0xED, "0x42 + dd * 16");
-	
-	emit("INC dd",			"0x03 + dd * 16");
-	emit("INC x",			"x", 0x23);
-	emit("DEC dd",			"0x0B + dd * 16");
-	emit("DEC x",			"x", 0x2B);
-	
-	emit("RLCA",			0x07);
-	emit("RRCA",			0x0F);
-	emit("RLA",				0x17);
-	emit("RRA",				0x1F);
-	
-	emit("rot r",			0xCB, "0x00 + rot * 8 + r");
-	emit("rot (HL)",		0xCB, "0x00 + rot * 8 + 6");
-	emit("rot (x + d)",		"x", 0xCB, "d", "0x00 + rot * 8 + 6");
+	emit($RABBIT,	"EX DE', HL",		0xE3);
+	emit($RABBIT,	"EX DE, HL'",		0x76, 0xEB);
+	emit($RABBIT,	"EX DE', HL'",		0x76, 0xE3);
 
-	emit("RLD",				0xED, 0x6F);
-	emit("RRD",				0xED, 0x67);
 	
-	emit("bit b, r",		0xCB, "bit + b * 8 + r");
-	emit("bit b, (HL)",		0xCB, "bit + b * 8 + 6");
-	emit("bit b, (x + d)",	"x", 0xCB, "d", "bit + b * 8 + 6");
+	# Block Transfer Group
+	emit($ALL,		"LDI",				0xED, 0xA0);
+	emit($ALL,		"LDIR",				0xED, 0xB0);
+	emit($ALL,		"LDD",				0xED, 0xA8);
+	emit($ALL,		"LDDR",				0xED, 0xB8);
 	
-	emit("JP m",			0xC3, "m & 255", "m >> 8");
-	emit("JP cc, m",		"0xC2 + cc * 8", "m & 255", "m >> 8");
-	
-	emit("JR ASMPC+2",		0x18, 0x00);
-	emit("JR cc1, ASMPC+2",	"0x20 + cc1 * 8", 0x00);
-	
-	emit("JP (HL)",			0xE9);
-	emit("JP (x)",			"x", 0xE9);
-	
-	emit("DJNZ ASMPC+2",	0x10, 0x00);
-	
-	emit("CALL m",			0xCD, "m & 255", "m >> 8");
-	emit("CALL cc, m",		"0xC4 + cc * 8", "m & 255", "m >> 8");
-	
-	emit("RET",				0xC9);
-	emit("RET cc",			"0xC0 + cc * 8");
-	emit("RETI",			0xED, 0x4D);
-	emit("RETN",			0xED, 0x45);
-	
-	emit("RST rst",			"0xC7 + rst * 8");
-	
-	emit("IN A, (n)",		0xDB, "n");
-	emit("IN r, (C)",		0xED, "0x40 + r * 8");
-	
-	emit("INI",				0xED, 0xA2);
-	emit("INIR",			0xED, 0xB2);
-	emit("IND",				0xED, 0xAA);
-	emit("INDR",			0xED, 0xBA);
 
-	emit("OUT (n), A",		0xD3, "n");
-	emit("OUT (C), r",		0xED, "0x41 + r * 8");
+	# Search Group
+	emit($ZILOG,	"CPI",				0xED, 0xA1);
+	emit($ZILOG,	"CPIR",				0xED, 0xB1);
+	emit($ZILOG,	"CPD",				0xED, 0xA9);
+	emit($ZILOG,	"CPDR",				0xED, 0xB9);
 	
-	emit("OUTI",			0xED, 0xA3);
-	emit("OTIR",			0xED, 0xB3);
-	emit("OUTD",			0xED, 0xAB);
-	emit("OTDR",			0xED, 0xBB);
+	
+	# 8-Bit Arithmetic Group
+	emit($ALL,		"alu r",			"0x80 + alu * 8 + r");
+	emit($Z80,		"alu x8",	 		"x8 >> 8", "0x80 + alu * 8 + (x8 & 255)");
+	
+	emit($ALL,		"alu n",			"0xC6 + alu * 8", "n");
+	emit($ALL,		"alu (HL)",			"0x86 + alu * 8");
+	emit($ALL,		"alu (x + d)",		"x", "0x86 + alu * 8", "d");
+	
+	emit($ALL,		"INC r",			"0x04 + r * 8");
+	emit($ALL,		"INC (HL)",			0x34);
+	emit($ALL,		"INC (x + d)",		"x", 0x34, "d");
+	
+	emit($ALL,		"DEC r",			"0x05 + r * 8");
+	emit($ALL,		"DEC (HL)",			0x35);
+	emit($ALL,		"DEC (x + d)",		"x", 0x35, "d");
+	
+	emit($NOT_Z80,	"TST r",			0xED, "0x04 + r * 8");
+	emit($NOT_Z80,	"TST n",			0xED, 0x64, "n");
+	emit($NOT_Z80,	"TST (HL)",			0xED, 0x34);
+	
+	
+	# General-Purpose Arithmetic Group
+	emit($ZILOG,	"DAA",				0x27);
+	emit($ZILOG,	"RLD",				0xED, 0x6F);
+	emit($ZILOG,	"RRD",				0xED, 0x67);
+	
+	emit($ALL,		"CPL",				0x2F);
+	emit($ALL,		"NEG",				0xED, 0x44);
+	emit($ALL,		"CCF",				0x3F);
+	emit($ALL,		"SCF",				0x37);
 
-	# Z180
-	emit("MLT dd",			0xED, "0x4C + dd * 16");
 
-	emit("TST r",			0xED, "0x04 + r * 8");
-	emit("TST n",			0xED, 0x64, "n");
-	emit("TST (HL)",		0xED, 0x34);
+	# CPU Control Group
+	emit($ALL,		"NOP",				0x00);
+	emit($ZILOG,	"HALT",				0x76);
+	emit($Z180,		"SLP",				0xED, 0x76);
 	
-	emit("IN0 r, (n)",		0xED, "0x00 + r * 8", "n");
-	emit("OUT0 (n), r",		0xED, "0x01 + r * 8", "n");
-	
-	emit("OTDM",			0xED, 0x8B);
-	emit("OTDMR",			0xED, 0x9B);
-	emit("OTIM",			0xED, 0x83);
-	emit("OTIMR",			0xED, 0x93);
+	emit($RABBIT,	"ALTD",				0x76);			# TODO: add all ALTD combinations
 
-	emit("TSTIO n",			0xED, 0x74, "n");
-	emit("SLP",				0xED, 0x76);
 
-	# Rabbit RCM2000
-	emit("ADD SP, d",		0x27, "d");
-	emit("ALTD",			0x76);			# TODO: add all ALTD combinations
-	
-	emit("AND HL, DE",		0xDC);
-	emit("AND x, DE",		"x", 0xDC);
-	
-	emit("BOOL HL",			0xCC);
-	emit("BOOL x",			"x", 0xCC);
-	
-	emit("EX DE', HL",		0xE3);
-	emit("EX DE, HL'",		0x76, 0xEB);
-	emit("EX DE', HL'",		0x76, 0xE3);
+	# 16-Bit Arithmetic Group
+	emit($ALL,		"ADD HL, dd",		"0x09 + dd * 16");
+	emit($ALL,		"ADD x, dd",		"x", "0x09 + dd * 16");
 
-	emit("IOE",				0xDB);
-	emit("IOI",				0xD3);
+	emit($RABBIT,	"ADD SP, d",		0x27, "d");
+
+	emit($ALL,		"ADC HL, dd",		0xED, "0x4A + dd * 16");
+
+	emit($ALL,		"SBC HL, dd",		0xED, "0x42 + dd * 16");
 	
-	# Rabbit 3000
-	emit("IDET",			0x5B);
+	emit($RABBIT,	"AND HL, DE",		0xDC);
+	emit($RABBIT,	"AND x, DE",		"x", 0xDC);
+	
+	emit($RABBIT,	"BOOL HL",			0xCC);
+	emit($RABBIT,	"BOOL x",			"x", 0xCC);
+	
+	emit($ALL,		"INC dd",			"0x03 + dd * 16");
+	emit($ALL,		"INC x",			"x", 0x23);
+	emit($ALL,		"DEC dd",			"0x0B + dd * 16");
+	emit($ALL,		"DEC x",			"x", 0x2B);
+
+	emit($NOT_Z80,	"MLT dd2",			0xED, "0x4C + dd2 * 16");
+	emit($Z180,		"MLT SP",			0xED, "0x4C + 3   * 16");
+
+	
+	# Rotate and Shift Group
+	emit($ALL,		"RLCA",				0x07);
+	emit($ALL,		"RRCA",				0x0F);
+	emit($ALL,		"RLA",				0x17);
+	emit($ALL,		"RRA",				0x1F);
+	
+	emit($ALL,		"rot r",			0xCB, "0x00 + rot  * 8 + r");
+	emit($ZILOG,	"rotz r",			0xCB, "0x00 + rotz * 8 + r");
+	
+	emit($ALL,		"rot (HL)",			0xCB, "0x00 + rot  * 8 + 6");
+	emit($ZILOG,	"rotz (HL)",		0xCB, "0x00 + rotz * 8 + 6");
+	
+	emit($ALL,		"rot (x + d)",		"x", 0xCB, "d", "0x00 + rot  * 8 + 6");
+	emit($ZILOG,	"rotz (x + d)",		"x", 0xCB, "d", "0x00 + rotz * 8 + 6");
+
+	
+	# Bit Set, Reset, and Test Group
+	emit($ALL,		"bit b, r",			0xCB, "bit + b * 8 + r");
+	emit($ALL,		"bit b, (HL)",		0xCB, "bit + b * 8 + 6");
+	emit($ALL,		"bit b, (x + d)",	"x", 0xCB, "d", "bit + b * 8 + 6");
+
+	
+	# Jump Group
+	emit($ALL,		"JP m",				0xC3, "m & 255", "m >> 8");
+
+	emit($ALL,		"JP cc, m",			"0xC2 + cc  * 8", "m & 255", "m >> 8");
+	emit($ZILOG,	"JP ccz, m",		"0xC2 + ccz * 8", "m & 255", "m >> 8");
+	emit($RABBIT,	"JP ccr, m",		"0xC2 + ccr * 8", "m & 255", "m >> 8");
+	
+	emit($ALL,		"JR ASMPC+2",		0x18, 0x00);
+	emit($ALL,		"JR cc1, ASMPC+2",	"0x20 + cc1 * 8", 0x00);
+	
+	emit($ALL,		"JP (HL)",			0xE9);
+	emit($ALL,		"JP (x)",			"x", 0xE9);
+	
+	emit($ALL,		"DJNZ ASMPC+2",		0x10, 0x00);
+
+	
+	# Call and Return Group
+	emit($ALL,		"CALL m",			0xCD, "m & 255", "m >> 8");
+	emit($ZILOG,	"CALL cc, m",		"0xC4 + cc * 8", "m & 255", "m >> 8");
+	
+	emit($ALL,		"RET",				0xC9);
+	
+	emit($ALL,		"RET cc",			"0xC0 + cc  * 8");
+	emit($ZILOG,	"RET ccz",			"0xC0 + ccz * 8");
+	emit($RABBIT,	"RET ccr",			"0xC0 + ccr * 8");
+
+	emit($ALL,		"RST rst",			"0xC7 + rst  * 8");
+	emit($ZILOG,	"RST rstz",			"0xC7 + rstz * 8");
+
+	# TODO: support LCALL - need 3-byte values in the object file
+	
+	
+	# Input and Output Group
+	emit($ZILOG,	"IN A, (n)",		0xDB, "n");
+	emit($ZILOG,	"IN r, (C)",		0xED, "0x40 + r * 8");
+	
+	emit($ZILOG,	"INI",				0xED, 0xA2);
+	emit($ZILOG,	"INIR",				0xED, 0xB2);
+	emit($ZILOG,	"IND",				0xED, 0xAA);
+	emit($ZILOG,	"INDR",				0xED, 0xBA);
+
+	emit($ZILOG,	"OUT (n), A",		0xD3, "n");
+	emit($ZILOG,	"OUT (C), r",		0xED, "0x41 + r * 8");
+	
+	emit($ZILOG,	"OUTI",				0xED, 0xA3);
+	emit($ZILOG,	"OTIR",				0xED, 0xB3);
+	emit($ZILOG,	"OUTD",				0xED, 0xAB);
+	emit($ZILOG,	"OTDR",				0xED, 0xBB);
+
+	emit($Z180,		"IN0 r, (n)",		0xED, "0x00 + r * 8", "n");
+	emit($Z180,		"OUT0 (n), r",		0xED, "0x01 + r * 8", "n");
+	
+	emit($Z180,		"OTDM",				0xED, 0x8B);
+	emit($Z180,		"OTDMR",			0xED, 0x9B);
+	emit($Z180,		"OTIM",				0xED, 0x83);
+	emit($Z180,		"OTIMR",			0xED, 0x93);
+
+	emit($Z180,		"TSTIO n",			0xED, 0x74, "n");
+
+	emit($RABBIT,	"IOE",				0xDB);
+	emit($RABBIT,	"IOI",				0xD3);
+
+	
+	# Interrupt control group
+	emit($ZILOG,	"DI",				0xF3);
+	emit($ZILOG,	"EI",				0xFB);
+	emit($ZILOG,	"IM 0",				0xED, 0x46);
+	emit($ZILOG,	"IM 1",				0xED, 0x56);
+	emit($ZILOG,	"IM 2",				0xED, 0x5E);
+	
+	emit($RABBIT,	"IPSET 0",			0xED, 0x46);
+	emit($RABBIT,	"IPSET 1",			0xED, 0x56);
+	emit($RABBIT,	"IPSET 2",			0xED, 0x4E);
+	emit($RABBIT,	"IPSET 3",			0xED, 0x5E);
+
+	emit($RABBIT,	"IPRES",			0xED, 0x5D);
+
+	emit($ZILOG,	"LD I, A", 			0xED, 0x47);
+	emit($ZILOG,	"LD A, I", 			0xED, 0x57);
+	emit($ZILOG,	"LD R, A", 			0xED, 0x4F);
+	emit($ZILOG,	"LD A, R", 			0xED, 0x5F);
+
+	emit($RABBIT,	"LD IIR, A", 		0xED, 0x47);
+	emit($RABBIT,	"LD A, IIR", 		0xED, 0x57);
+	emit($RABBIT,	"LD EIR, A", 		0xED, 0x4F);
+	emit($RABBIT,	"LD A, EIR", 		0xED, 0x5F);
+
+	emit($ALL,		"RETI",				0xED, 0x4D);
+	emit($ZILOG,	"RETN",				0xED, 0x45);
+
+	emit($R3K,		"IDET",				0x5B);
+
 	
 	close $asmf;
 	close $binf;
@@ -267,56 +337,71 @@ for (@CPU) {
 done_testing;
 
 sub emit {
-	my($opcode, @bytes) = @_;
+	my($exists, $opcode, @bytes) = @_;
 
 	# expand opcodes
 	if ($opcode =~ /\b(r\d*)\b/) {
-		return expand_emit($1, \@R, $opcode, @bytes);
+		return expand_emit($exists, $1, \@R, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(dd)\b/) {
-		return expand_emit($1, \@DD, $opcode, @bytes);
+		return expand_emit($exists, $1, \@DD, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(dd1)\b/) {
-		return expand_emit($1, \@DD1, $opcode, @bytes);
+		return expand_emit($exists, $1, \@DD1, $opcode, @bytes);
+	}
+	elsif ($opcode =~ /\b(dd2)\b/) {
+		return expand_emit($exists, $1, \@DD2, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(qq)\b/) {
-		return expand_emit($1, \@QQ, $opcode, @bytes);
+		return expand_emit($exists, $1, \@QQ, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(x)\b/) {
-		return expand_emit($1, \@X, $opcode, @bytes);
+		return expand_emit($exists, $1, \@X, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(x8)\b/) {
-		return expand_emit($1, \@X8, $opcode, @bytes);
+		return expand_emit($exists, $1, \@X8, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(cc)\b/) {
-		return expand_emit($1, \@CC, $opcode, @bytes);
+		return expand_emit($exists, $1, \@CC, $opcode, @bytes);
+	}
+	elsif ($opcode =~ /\b(ccz)\b/) {
+		return expand_emit($exists, $1, \@CCZ, $opcode, @bytes);
+	}
+	elsif ($opcode =~ /\b(ccr)\b/) {
+		return expand_emit($exists, $1, \@CCR, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(cc1)\b/) {
-		return expand_emit($1, \@CC1, $opcode, @bytes);
+		return expand_emit($exists, $1, \@CC1, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(alu)\b/) {
-		return expand_emit($1, \@ALU, $opcode, @bytes);
+		return expand_emit($exists, $1, \@ALU, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(rot)\b/) {
-		return expand_emit($1, \@ROT, $opcode, @bytes);
+		return expand_emit($exists, $1, \@ROT, $opcode, @bytes);
+	}
+	elsif ($opcode =~ /\b(rotz)\b/) {
+		return expand_emit($exists, $1, \@ROTZ, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(bit)\b/) {
-		return expand_emit($1, \@BIT, $opcode, @bytes);
+		return expand_emit($exists, $1, \@BIT, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(n)\b/) {
-		return expand_emit($1, \@N, $opcode, @bytes);
+		return expand_emit($exists, $1, \@N, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(m)\b/) {
-		return expand_emit($1, \@M, $opcode, @bytes);
+		return expand_emit($exists, $1, \@M, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(d)\b/) {
-		return expand_emit($1, \@D, $opcode, @bytes);
+		return expand_emit($exists, $1, \@D, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(b)\b/) {
-		return expand_emit($1, \@B, $opcode, @bytes);
+		return expand_emit($exists, $1, \@B, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(rst)\b/) {
-		return expand_emit($1, \@RST, $opcode, @bytes);
+		return expand_emit($exists, $1, \@RST, $opcode, @bytes);
+	}
+	elsif ($opcode =~ /\b(rstz)\b/) {
+		return expand_emit($exists, $1, \@RSTZ, $opcode, @bytes);
 	}
 	
 	$opcode = replace_index($opcode);
@@ -330,33 +415,7 @@ sub emit {
 		$bin_line .= chr($byte);
 	}
 	
-	if (($asm_line =~ /\b ( I[XY][HL] ) \b/x && $cpu ne 'z80') ||
-	    ($asm_line =~ /\b ( EIR | IIR |
-							ADD \s+ SP | AND \s+ (HL|IX|IY) | 
-							ALTD |
-							BOOL |
-							IOE | IOI ) \b |
-						\b ( DE\' | HL\' ) /x && $cpu =~ /^z/) ||
-	    ($asm_line =~ /\b ( MLT | TST | 
-							IN0 | OUT0 | 
-							OTDM | OTDMR | 
-							TSTIO | 
-							OTIM | OTIMR | 
-							SLP ) \b/x && $cpu eq 'z80') ||
-	    ($asm_line =~ /\b ( I | R | 
-							DAA | MLT \s+ SP | RRD | RLD | 
-							HALT | DI | EI | IM \s+ 0 | IM \s+ 1 | IM \s+ 2 | RETN |
-							OUT | IN | OUT0 | IN0 | SLP | 
-							INI | IND | INIR | INDR | 
-							OUTI | OUTD | OTIR | OTDR | 
-							OTDM | OTDMR | OTIM | OTIMR |
-							TSTIO |
-							CPI | CPIR | CPD | CPDR |
-							RST \s+ 0 | RST \s+ 8 | RST \s+ 48 |
-							CALL \s+ (NZ|Z|NC|C|PO|PE|P|M) \b |
-							SLL ) \b/x && $cpu =~ /^r/) ||
-		($asm_line =~ /\b ( IDET ) \b/x && $cpu ne 'r3k')
-	) {
+	if (!$exists) {
 		say $errf $asm_line;
 	}
 	else {
@@ -376,7 +435,7 @@ sub replace_index {
 }
 
 sub expand_emit {
-	my($replace, $list, $opcode, @bytes) = @_;
+	my($exists, $replace, $list, $opcode, @bytes) = @_;
 	
 	for (@$list) {
 		my($text, $id) = @$_;
@@ -387,7 +446,7 @@ sub expand_emit {
 			s/\b$replace\b/$id/g;
 		}
 		
-		emit($opcode_inst, @bytes_inst);
+		emit($exists, $opcode_inst, @bytes_inst);
 	}
 }
 

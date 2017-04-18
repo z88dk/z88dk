@@ -174,6 +174,8 @@ tokens:
   - name	: PE
   - name	: P
   - name	: M
+  - name	: LZ
+  - name	: LO
   
   # 8-bit registers
   - name	: B

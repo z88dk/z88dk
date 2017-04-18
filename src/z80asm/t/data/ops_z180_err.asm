@@ -42,55 +42,70 @@
  LD IYL, 85             ;; 0069:  FD 2E 55
  LD IYL, 170            ;; 0069:  FD 2E AA
  LD IYL, 255            ;; 0069:  FD 2E FF
- LD IIR, A              ;; 01FF:  ED 47
- LD A, IIR              ;; 01FF:  ED 57
- LD EIR, A              ;; 01FF:  ED 4F
- LD A, EIR              ;; 01FF:  ED 5F
- ADD A, IXH             ;; 036C:  DD 84
- ADC A, IXH             ;; 036C:  DD 8C
- SUB IXH                ;; 036C:  DD 94
- SBC A, IXH             ;; 036C:  DD 9C
- AND IXH                ;; 036C:  DD A4
- XOR IXH                ;; 036C:  DD AC
- OR IXH                 ;; 036C:  DD B4
- CP IXH                 ;; 036C:  DD BC
- ADD A, IXL             ;; 036C:  DD 85
- ADC A, IXL             ;; 036C:  DD 8D
- SUB IXL                ;; 036C:  DD 95
- SBC A, IXL             ;; 036C:  DD 9D
- AND IXL                ;; 036C:  DD A5
- XOR IXL                ;; 036C:  DD AD
- OR IXL                 ;; 036C:  DD B5
- CP IXL                 ;; 036C:  DD BD
- ADD A, IYH             ;; 036C:  FD 84
- ADC A, IYH             ;; 036C:  FD 8C
- SUB IYH                ;; 036C:  FD 94
- SBC A, IYH             ;; 036C:  FD 9C
- AND IYH                ;; 036C:  FD A4
- XOR IYH                ;; 036C:  FD AC
- OR IYH                 ;; 036C:  FD B4
- CP IYH                 ;; 036C:  FD BC
- ADD A, IYL             ;; 036C:  FD 85
- ADC A, IYL             ;; 036C:  FD 8D
- SUB IYL                ;; 036C:  FD 95
- SBC A, IYL             ;; 036C:  FD 9D
- AND IYL                ;; 036C:  FD A5
- XOR IYL                ;; 036C:  FD AD
- OR IYL                 ;; 036C:  FD B5
- CP IYL                 ;; 036C:  FD BD
- ADD SP, -128           ;; 0BE0:  27 80
- ADD SP, 0              ;; 0BE0:  27 00
- ADD SP, 127            ;; 0BE0:  27 7F
- ALTD                   ;; 0BE0:  76
- AND HL, DE             ;; 0BE0:  DC
- AND IX, DE             ;; 0BE0:  DD DC
- AND IY, DE             ;; 0BE0:  FD DC
- BOOL HL                ;; 0BE0:  CC
- BOOL IX                ;; 0BE0:  DD CC
- BOOL IY                ;; 0BE0:  FD CC
- EX DE', HL             ;; 0BE0:  E3
- EX DE, HL'             ;; 0BE0:  76 EB
- EX DE', HL'            ;; 0BE0:  76 E3
- IOE                    ;; 0BE0:  DB
- IOI                    ;; 0BE0:  D3
- IDET                   ;; 0BE0:  5B
+ EX DE', HL             ;; 031C:  E3
+ EX DE, HL'             ;; 031C:  76 EB
+ EX DE', HL'            ;; 031C:  76 E3
+ ADD A, IXH             ;; 0364:  DD 84
+ ADC A, IXH             ;; 0364:  DD 8C
+ SUB IXH                ;; 0364:  DD 94
+ SBC A, IXH             ;; 0364:  DD 9C
+ AND IXH                ;; 0364:  DD A4
+ XOR IXH                ;; 0364:  DD AC
+ OR IXH                 ;; 0364:  DD B4
+ CP IXH                 ;; 0364:  DD BC
+ ADD A, IXL             ;; 0364:  DD 85
+ ADC A, IXL             ;; 0364:  DD 8D
+ SUB IXL                ;; 0364:  DD 95
+ SBC A, IXL             ;; 0364:  DD 9D
+ AND IXL                ;; 0364:  DD A5
+ XOR IXL                ;; 0364:  DD AD
+ OR IXL                 ;; 0364:  DD B5
+ CP IXL                 ;; 0364:  DD BD
+ ADD A, IYH             ;; 0364:  FD 84
+ ADC A, IYH             ;; 0364:  FD 8C
+ SUB IYH                ;; 0364:  FD 94
+ SBC A, IYH             ;; 0364:  FD 9C
+ AND IYH                ;; 0364:  FD A4
+ XOR IYH                ;; 0364:  FD AC
+ OR IYH                 ;; 0364:  FD B4
+ CP IYH                 ;; 0364:  FD BC
+ ADD A, IYL             ;; 0364:  FD 85
+ ADC A, IYL             ;; 0364:  FD 8D
+ SUB IYL                ;; 0364:  FD 95
+ SBC A, IYL             ;; 0364:  FD 9D
+ AND IYL                ;; 0364:  FD A5
+ XOR IYL                ;; 0364:  FD AD
+ OR IYL                 ;; 0364:  FD B5
+ CP IYL                 ;; 0364:  FD BD
+ ALTD                   ;; 049A:  76
+ ADD SP, -128           ;; 04AE:  27 80
+ ADD SP, 0              ;; 04AE:  27 00
+ ADD SP, 127            ;; 04AE:  27 7F
+ AND HL, DE             ;; 04BE:  DC
+ AND IX, DE             ;; 04BE:  DD DC
+ AND IY, DE             ;; 04BE:  FD DC
+ BOOL HL                ;; 04BE:  CC
+ BOOL IX                ;; 04BE:  DD CC
+ BOOL IY                ;; 04BE:  FD CC
+ JP LZ, 0               ;; 0A46:  E2 00 00
+ JP LZ, 4660            ;; 0A46:  E2 34 12
+ JP LZ, 52719           ;; 0A46:  E2 EF CD
+ JP LZ, 65535           ;; 0A46:  E2 FF FF
+ JP LO, 0               ;; 0A46:  EA 00 00
+ JP LO, 4660            ;; 0A46:  EA 34 12
+ JP LO, 52719           ;; 0A46:  EA EF CD
+ JP LO, 65535           ;; 0A46:  EA FF FF
+ RET LZ                 ;; 0AB4:  E0
+ RET LO                 ;; 0AB4:  E8
+ IOE                    ;; 0BB4:  DB
+ IOI                    ;; 0BB4:  D3
+ IPSET 0                ;; 0BBC:  ED 46
+ IPSET 1                ;; 0BBC:  ED 56
+ IPSET 2                ;; 0BBC:  ED 4E
+ IPSET 3                ;; 0BBC:  ED 5E
+ IPRES                  ;; 0BBC:  ED 5D
+ LD IIR, A              ;; 0BC4:  ED 47
+ LD A, IIR              ;; 0BC4:  ED 57
+ LD EIR, A              ;; 0BC4:  ED 4F
+ LD A, EIR              ;; 0BC4:  ED 5F
+ IDET                   ;; 0BC8:  5B

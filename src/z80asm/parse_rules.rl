@@ -802,7 +802,7 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt_jr( Z80_JR_FLAG( FLAG_<FLAG> ) ); }
 #endfor  <FLAG>
 
-#foreach <FLAG> in NZ, Z, NC, C, PO, PE, P, M
+#foreach <FLAG> in NZ, Z, NC, C, PO, PE, P, M, LZ, LO
 		| label? _TK_JP _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
 		  @{ DO_stmt_nn( Z80_JP_FLAG( FLAG_<FLAG> ) ); }
 
