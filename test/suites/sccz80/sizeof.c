@@ -116,8 +116,6 @@ void test_sizeof_struct()
     assertEqual(6, sizeof(val.d));
 
     /* Now pointers */
-    printf("Val cp %d\n",sizeof(val.cp));
-    printf("Val lp %d\n",sizeof(val.lp));
     assertEqual(2, sizeof(val.cp));
     assertEqual(2, sizeof(val.ip));
     assertEqual(2, sizeof(val.lp));
@@ -134,8 +132,22 @@ void test_sizeof_struct()
 
     assertEqual(13, sizeof(val.nested1));
     assertEqual(2, sizeof(val.nestedp));
-    assertEqual(13, sizeof(*val.nestedp));
-    
+    assertEqual(13, sizeof(*val.nestedp));   
+}
+
+void test_sizeof_nested_struct()
+{
+    struct st   val;
+
+    assertEqual(1, sizeof(val.nested1.c));
+    assertEqual(2, sizeof(val.nested1.i));
+    assertEqual(4, sizeof(val.nested1.l));
+    assertEqual(6, sizeof(val.nested1.d));
+
+    assertEqual(1, sizeof(val.nestedp->c));
+    assertEqual(2, sizeof(val.nestedp->i));
+    assertEqual(4, sizeof(val.nestedp->l));
+    assertEqual(6, sizeof(val.nestedp->d));
 }
 
 int suite_sizeof()
@@ -147,6 +159,7 @@ int suite_sizeof()
     suite_add_test(test_sizeof_ptrarrays);
     suite_add_test(test_sizeof_misc);
     suite_add_test(test_sizeof_struct);
+    suite_add_test(test_sizeof_nested_struct);
 
     return suite_run();
 }
