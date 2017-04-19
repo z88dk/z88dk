@@ -1075,22 +1075,22 @@
  JP C, 4660             ;; 0A8F:  DA 34 12
  JP C, 52719            ;; 0A92:  DA EF CD
  JP C, 65535            ;; 0A95:  DA FF FF
- JP P, 0                ;; 0A98:  F2 00 00
- JP P, 4660             ;; 0A9B:  F2 34 12
- JP P, 52719            ;; 0A9E:  F2 EF CD
- JP P, 65535            ;; 0AA1:  F2 FF FF
- JP M, 0                ;; 0AA4:  FA 00 00
- JP M, 4660             ;; 0AA7:  FA 34 12
- JP M, 52719            ;; 0AAA:  FA EF CD
- JP M, 65535            ;; 0AAD:  FA FF FF
- JP PO, 0               ;; 0AB0:  E2 00 00
- JP PO, 4660            ;; 0AB3:  E2 34 12
- JP PO, 52719           ;; 0AB6:  E2 EF CD
- JP PO, 65535           ;; 0AB9:  E2 FF FF
- JP PE, 0               ;; 0ABC:  EA 00 00
- JP PE, 4660            ;; 0ABF:  EA 34 12
- JP PE, 52719           ;; 0AC2:  EA EF CD
- JP PE, 65535           ;; 0AC5:  EA FF FF
+ JP PO, 0               ;; 0A98:  E2 00 00
+ JP PO, 4660            ;; 0A9B:  E2 34 12
+ JP PO, 52719           ;; 0A9E:  E2 EF CD
+ JP PO, 65535           ;; 0AA1:  E2 FF FF
+ JP PE, 0               ;; 0AA4:  EA 00 00
+ JP PE, 4660            ;; 0AA7:  EA 34 12
+ JP PE, 52719           ;; 0AAA:  EA EF CD
+ JP PE, 65535           ;; 0AAD:  EA FF FF
+ JP P, 0                ;; 0AB0:  F2 00 00
+ JP P, 4660             ;; 0AB3:  F2 34 12
+ JP P, 52719            ;; 0AB6:  F2 EF CD
+ JP P, 65535            ;; 0AB9:  F2 FF FF
+ JP M, 0                ;; 0ABC:  FA 00 00
+ JP M, 4660             ;; 0ABF:  FA 34 12
+ JP M, 52719            ;; 0AC2:  FA EF CD
+ JP M, 65535            ;; 0AC5:  FA FF FF
  JR ASMPC+2             ;; 0AC8:  18 00
  JR NZ, ASMPC+2         ;; 0ACA:  20 00
  JR Z, ASMPC+2          ;; 0ACC:  28 00
@@ -1120,69 +1120,77 @@
  CALL C, 4660           ;; 0B0C:  DC 34 12
  CALL C, 52719          ;; 0B0F:  DC EF CD
  CALL C, 65535          ;; 0B12:  DC FF FF
- CALL P, 0              ;; 0B15:  F4 00 00
- CALL P, 4660           ;; 0B18:  F4 34 12
- CALL P, 52719          ;; 0B1B:  F4 EF CD
- CALL P, 65535          ;; 0B1E:  F4 FF FF
- CALL M, 0              ;; 0B21:  FC 00 00
- CALL M, 4660           ;; 0B24:  FC 34 12
- CALL M, 52719          ;; 0B27:  FC EF CD
- CALL M, 65535          ;; 0B2A:  FC FF FF
- RET                    ;; 0B2D:  C9
- RET NZ                 ;; 0B2E:  C0
- RET Z                  ;; 0B2F:  C8
- RET NC                 ;; 0B30:  D0
- RET C                  ;; 0B31:  D8
- RET P                  ;; 0B32:  F0
- RET M                  ;; 0B33:  F8
- RET PO                 ;; 0B34:  E0
- RET PE                 ;; 0B35:  E8
- RST 16                 ;; 0B36:  D7
- RST 24                 ;; 0B37:  DF
- RST 32                 ;; 0B38:  E7
- RST 40                 ;; 0B39:  EF
- RST 56                 ;; 0B3A:  FF
- RST 0                  ;; 0B3B:  C7
- RST 8                  ;; 0B3C:  CF
- RST 48                 ;; 0B3D:  F7
- IN A, (0)              ;; 0B3E:  DB 00
- IN A, (85)             ;; 0B40:  DB 55
- IN A, (170)            ;; 0B42:  DB AA
- IN A, (255)            ;; 0B44:  DB FF
- IN B, (C)              ;; 0B46:  ED 40
- IN C, (C)              ;; 0B48:  ED 48
- IN D, (C)              ;; 0B4A:  ED 50
- IN E, (C)              ;; 0B4C:  ED 58
- IN H, (C)              ;; 0B4E:  ED 60
- IN L, (C)              ;; 0B50:  ED 68
- IN A, (C)              ;; 0B52:  ED 78
- INI                    ;; 0B54:  ED A2
- INIR                   ;; 0B56:  ED B2
- IND                    ;; 0B58:  ED AA
- INDR                   ;; 0B5A:  ED BA
- OUT (0), A             ;; 0B5C:  D3 00
- OUT (85), A            ;; 0B5E:  D3 55
- OUT (170), A           ;; 0B60:  D3 AA
- OUT (255), A           ;; 0B62:  D3 FF
- OUT (C), B             ;; 0B64:  ED 41
- OUT (C), C             ;; 0B66:  ED 49
- OUT (C), D             ;; 0B68:  ED 51
- OUT (C), E             ;; 0B6A:  ED 59
- OUT (C), H             ;; 0B6C:  ED 61
- OUT (C), L             ;; 0B6E:  ED 69
- OUT (C), A             ;; 0B70:  ED 79
- OUTI                   ;; 0B72:  ED A3
- OTIR                   ;; 0B74:  ED B3
- OUTD                   ;; 0B76:  ED AB
- OTDR                   ;; 0B78:  ED BB
- DI                     ;; 0B7A:  F3
- EI                     ;; 0B7B:  FB
- IM 0                   ;; 0B7C:  ED 46
- IM 1                   ;; 0B7E:  ED 56
- IM 2                   ;; 0B80:  ED 5E
- LD I, A                ;; 0B82:  ED 47
- LD A, I                ;; 0B84:  ED 57
- LD R, A                ;; 0B86:  ED 4F
- LD A, R                ;; 0B88:  ED 5F
- RETI                   ;; 0B8A:  ED 4D
- RETN                   ;; 0B8C:  ED 45
+ CALL PO, 0             ;; 0B15:  E4 00 00
+ CALL PO, 4660          ;; 0B18:  E4 34 12
+ CALL PO, 52719         ;; 0B1B:  E4 EF CD
+ CALL PO, 65535         ;; 0B1E:  E4 FF FF
+ CALL PE, 0             ;; 0B21:  EC 00 00
+ CALL PE, 4660          ;; 0B24:  EC 34 12
+ CALL PE, 52719         ;; 0B27:  EC EF CD
+ CALL PE, 65535         ;; 0B2A:  EC FF FF
+ CALL P, 0              ;; 0B2D:  F4 00 00
+ CALL P, 4660           ;; 0B30:  F4 34 12
+ CALL P, 52719          ;; 0B33:  F4 EF CD
+ CALL P, 65535          ;; 0B36:  F4 FF FF
+ CALL M, 0              ;; 0B39:  FC 00 00
+ CALL M, 4660           ;; 0B3C:  FC 34 12
+ CALL M, 52719          ;; 0B3F:  FC EF CD
+ CALL M, 65535          ;; 0B42:  FC FF FF
+ RET                    ;; 0B45:  C9
+ RET NZ                 ;; 0B46:  C0
+ RET Z                  ;; 0B47:  C8
+ RET NC                 ;; 0B48:  D0
+ RET C                  ;; 0B49:  D8
+ RET PO                 ;; 0B4A:  E0
+ RET PE                 ;; 0B4B:  E8
+ RET P                  ;; 0B4C:  F0
+ RET M                  ;; 0B4D:  F8
+ RST 16                 ;; 0B4E:  D7
+ RST 24                 ;; 0B4F:  DF
+ RST 32                 ;; 0B50:  E7
+ RST 40                 ;; 0B51:  EF
+ RST 56                 ;; 0B52:  FF
+ RST 0                  ;; 0B53:  C7
+ RST 8                  ;; 0B54:  CF
+ RST 48                 ;; 0B55:  F7
+ IN A, (0)              ;; 0B56:  DB 00
+ IN A, (85)             ;; 0B58:  DB 55
+ IN A, (170)            ;; 0B5A:  DB AA
+ IN A, (255)            ;; 0B5C:  DB FF
+ IN B, (C)              ;; 0B5E:  ED 40
+ IN C, (C)              ;; 0B60:  ED 48
+ IN D, (C)              ;; 0B62:  ED 50
+ IN E, (C)              ;; 0B64:  ED 58
+ IN H, (C)              ;; 0B66:  ED 60
+ IN L, (C)              ;; 0B68:  ED 68
+ IN A, (C)              ;; 0B6A:  ED 78
+ INI                    ;; 0B6C:  ED A2
+ INIR                   ;; 0B6E:  ED B2
+ IND                    ;; 0B70:  ED AA
+ INDR                   ;; 0B72:  ED BA
+ OUT (0), A             ;; 0B74:  D3 00
+ OUT (85), A            ;; 0B76:  D3 55
+ OUT (170), A           ;; 0B78:  D3 AA
+ OUT (255), A           ;; 0B7A:  D3 FF
+ OUT (C), B             ;; 0B7C:  ED 41
+ OUT (C), C             ;; 0B7E:  ED 49
+ OUT (C), D             ;; 0B80:  ED 51
+ OUT (C), E             ;; 0B82:  ED 59
+ OUT (C), H             ;; 0B84:  ED 61
+ OUT (C), L             ;; 0B86:  ED 69
+ OUT (C), A             ;; 0B88:  ED 79
+ OUTI                   ;; 0B8A:  ED A3
+ OTIR                   ;; 0B8C:  ED B3
+ OUTD                   ;; 0B8E:  ED AB
+ OTDR                   ;; 0B90:  ED BB
+ DI                     ;; 0B92:  F3
+ EI                     ;; 0B93:  FB
+ IM 0                   ;; 0B94:  ED 46
+ IM 1                   ;; 0B96:  ED 56
+ IM 2                   ;; 0B98:  ED 5E
+ LD I, A                ;; 0B9A:  ED 47
+ LD A, I                ;; 0B9C:  ED 57
+ LD R, A                ;; 0B9E:  ED 4F
+ LD A, R                ;; 0BA0:  ED 5F
+ RETI                   ;; 0BA2:  ED 4D
+ RETN                   ;; 0BA4:  ED 45

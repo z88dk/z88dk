@@ -17,8 +17,7 @@ my @DD2 = ([BC => 0], [DE => 1], [HL => 2]           );
 my @QQ  = ([BC => 0], [DE => 1], [HL => 2], [AF => 3]);
 my @X   = ([IX => 0xDD], [IY => 0xFD]);
 my @X8  = ([IXH => 0xDD04], [IXL => 0xDD05], [IYH => 0xFD04], [IYL => 0xFD05]);
-my @CC  = ([NZ => 0], [Z => 1], [NC => 2], [C => 3],                       [P => 6], [M => 7]);
-my @CCZ = (                                          [PO => 4], [PE => 5]                    );
+my @CC  = ([NZ => 0], [Z => 1], [NC => 2], [C => 3], [PO => 4], [PE => 5], [P => 6], [M => 7]);
 my @CCR = (                                          [LZ => 4], [LO => 5]                    );
 my @CC1 = ([NZ => 0], [Z => 1], [NC => 2], [C => 3]);
 my @ALU = (["ADD A," => 0], ["ADC A," => 1], [SUB => 2], ["SBC A," => 3], [AND => 4], [XOR => 5], [OR => 6], [CP => 7]);
@@ -238,7 +237,6 @@ for (@CPU) {
 	emit($ALL,		"JP m",				0xC3, "m & 255", "m >> 8");
 
 	emit($ALL,		"JP cc, m",			"0xC2 + cc  * 8", "m & 255", "m >> 8");
-	emit($ZILOG,	"JP ccz, m",		"0xC2 + ccz * 8", "m & 255", "m >> 8");
 	emit($RABBIT,	"JP ccr, m",		"0xC2 + ccr * 8", "m & 255", "m >> 8");
 	
 	emit($ALL,		"JR ASMPC+2",		0x18, 0x00);
@@ -257,7 +255,6 @@ for (@CPU) {
 	emit($ALL,		"RET",				0xC9);
 	
 	emit($ALL,		"RET cc",			"0xC0 + cc  * 8");
-	emit($ZILOG,	"RET ccz",			"0xC0 + ccz * 8");
 	emit($RABBIT,	"RET ccr",			"0xC0 + ccr * 8");
 
 	emit($ALL,		"RST rst",			"0xC7 + rst  * 8");
@@ -363,9 +360,6 @@ sub emit {
 	}
 	elsif ($opcode =~ /\b(cc)\b/) {
 		return expand_emit($exists, $1, \@CC, $opcode, @bytes);
-	}
-	elsif ($opcode =~ /\b(ccz)\b/) {
-		return expand_emit($exists, $1, \@CCZ, $opcode, @bytes);
 	}
 	elsif ($opcode =~ /\b(ccr)\b/) {
 		return expand_emit($exists, $1, \@CCR, $opcode, @bytes);

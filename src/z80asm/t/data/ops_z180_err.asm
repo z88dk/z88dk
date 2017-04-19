@@ -95,17 +95,17 @@
  JP LO, 4660            ;; 0A46:  EA 34 12
  JP LO, 52719           ;; 0A46:  EA EF CD
  JP LO, 65535           ;; 0A46:  EA FF FF
- RET LZ                 ;; 0AB4:  E0
- RET LO                 ;; 0AB4:  E8
- IOE                    ;; 0BB4:  DB
- IOI                    ;; 0BB4:  D3
- IPSET 0                ;; 0BBC:  ED 46
- IPSET 1                ;; 0BBC:  ED 56
- IPSET 2                ;; 0BBC:  ED 4E
- IPSET 3                ;; 0BBC:  ED 5E
- IPRES                  ;; 0BBC:  ED 5D
- LD IIR, A              ;; 0BC4:  ED 47
- LD A, IIR              ;; 0BC4:  ED 57
- LD EIR, A              ;; 0BC4:  ED 4F
- LD A, EIR              ;; 0BC4:  ED 5F
- IDET                   ;; 0BC8:  5B
+ RET LZ                 ;; 0ACC:  E0
+ RET LO                 ;; 0ACC:  E8
+ IOE                    ;; 0BCC:  DB
+ IOI                    ;; 0BCC:  D3
+ IPSET 0                ;; 0BD4:  ED 46
+ IPSET 1                ;; 0BD4:  ED 56
+ IPSET 2                ;; 0BD4:  ED 4E
+ IPSET 3                ;; 0BD4:  ED 5E
+ IPRES                  ;; 0BD4:  ED 5D
+ LD IIR, A              ;; 0BDC:  ED 47
+ LD A, IIR              ;; 0BDC:  ED 57
+ LD EIR, A              ;; 0BDC:  ED 4F
+ LD A, EIR              ;; 0BDC:  ED 5F
+ IDET                   ;; 0BE0:  5B

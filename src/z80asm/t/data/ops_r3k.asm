@@ -1005,59 +1005,69 @@
  JP C, 4660             ;; 09EA:  DA 34 12
  JP C, 52719            ;; 09ED:  DA EF CD
  JP C, 65535            ;; 09F0:  DA FF FF
- JP P, 0                ;; 09F3:  F2 00 00
- JP P, 4660             ;; 09F6:  F2 34 12
- JP P, 52719            ;; 09F9:  F2 EF CD
- JP P, 65535            ;; 09FC:  F2 FF FF
- JP M, 0                ;; 09FF:  FA 00 00
- JP M, 4660             ;; 0A02:  FA 34 12
- JP M, 52719            ;; 0A05:  FA EF CD
- JP M, 65535            ;; 0A08:  FA FF FF
- JP LZ, 0               ;; 0A0B:  E2 00 00
- JP LZ, 4660            ;; 0A0E:  E2 34 12
- JP LZ, 52719           ;; 0A11:  E2 EF CD
- JP LZ, 65535           ;; 0A14:  E2 FF FF
- JP LO, 0               ;; 0A17:  EA 00 00
- JP LO, 4660            ;; 0A1A:  EA 34 12
- JP LO, 52719           ;; 0A1D:  EA EF CD
- JP LO, 65535           ;; 0A20:  EA FF FF
- JR ASMPC+2             ;; 0A23:  18 00
- JR NZ, ASMPC+2         ;; 0A25:  20 00
- JR Z, ASMPC+2          ;; 0A27:  28 00
- JR NC, ASMPC+2         ;; 0A29:  30 00
- JR C, ASMPC+2          ;; 0A2B:  38 00
- JP (HL)                ;; 0A2D:  E9
- JP (IX)                ;; 0A2E:  DD E9
- JP (IY)                ;; 0A30:  FD E9
- DJNZ ASMPC+2           ;; 0A32:  10 00
- CALL 0                 ;; 0A34:  CD 00 00
- CALL 4660              ;; 0A37:  CD 34 12
- CALL 52719             ;; 0A3A:  CD EF CD
- CALL 65535             ;; 0A3D:  CD FF FF
- RET                    ;; 0A40:  C9
- RET NZ                 ;; 0A41:  C0
- RET Z                  ;; 0A42:  C8
- RET NC                 ;; 0A43:  D0
- RET C                  ;; 0A44:  D8
- RET P                  ;; 0A45:  F0
- RET M                  ;; 0A46:  F8
- RET LZ                 ;; 0A47:  E0
- RET LO                 ;; 0A48:  E8
- RST 16                 ;; 0A49:  D7
- RST 24                 ;; 0A4A:  DF
- RST 32                 ;; 0A4B:  E7
- RST 40                 ;; 0A4C:  EF
- RST 56                 ;; 0A4D:  FF
- IOE                    ;; 0A4E:  DB
- IOI                    ;; 0A4F:  D3
- IPSET 0                ;; 0A50:  ED 46
- IPSET 1                ;; 0A52:  ED 56
- IPSET 2                ;; 0A54:  ED 4E
- IPSET 3                ;; 0A56:  ED 5E
- IPRES                  ;; 0A58:  ED 5D
- LD IIR, A              ;; 0A5A:  ED 47
- LD A, IIR              ;; 0A5C:  ED 57
- LD EIR, A              ;; 0A5E:  ED 4F
- LD A, EIR              ;; 0A60:  ED 5F
- RETI                   ;; 0A62:  ED 4D
- IDET                   ;; 0A64:  5B
+ JP PO, 0               ;; 09F3:  E2 00 00
+ JP PO, 4660            ;; 09F6:  E2 34 12
+ JP PO, 52719           ;; 09F9:  E2 EF CD
+ JP PO, 65535           ;; 09FC:  E2 FF FF
+ JP PE, 0               ;; 09FF:  EA 00 00
+ JP PE, 4660            ;; 0A02:  EA 34 12
+ JP PE, 52719           ;; 0A05:  EA EF CD
+ JP PE, 65535           ;; 0A08:  EA FF FF
+ JP P, 0                ;; 0A0B:  F2 00 00
+ JP P, 4660             ;; 0A0E:  F2 34 12
+ JP P, 52719            ;; 0A11:  F2 EF CD
+ JP P, 65535            ;; 0A14:  F2 FF FF
+ JP M, 0                ;; 0A17:  FA 00 00
+ JP M, 4660             ;; 0A1A:  FA 34 12
+ JP M, 52719            ;; 0A1D:  FA EF CD
+ JP M, 65535            ;; 0A20:  FA FF FF
+ JP LZ, 0               ;; 0A23:  E2 00 00
+ JP LZ, 4660            ;; 0A26:  E2 34 12
+ JP LZ, 52719           ;; 0A29:  E2 EF CD
+ JP LZ, 65535           ;; 0A2C:  E2 FF FF
+ JP LO, 0               ;; 0A2F:  EA 00 00
+ JP LO, 4660            ;; 0A32:  EA 34 12
+ JP LO, 52719           ;; 0A35:  EA EF CD
+ JP LO, 65535           ;; 0A38:  EA FF FF
+ JR ASMPC+2             ;; 0A3B:  18 00
+ JR NZ, ASMPC+2         ;; 0A3D:  20 00
+ JR Z, ASMPC+2          ;; 0A3F:  28 00
+ JR NC, ASMPC+2         ;; 0A41:  30 00
+ JR C, ASMPC+2          ;; 0A43:  38 00
+ JP (HL)                ;; 0A45:  E9
+ JP (IX)                ;; 0A46:  DD E9
+ JP (IY)                ;; 0A48:  FD E9
+ DJNZ ASMPC+2           ;; 0A4A:  10 00
+ CALL 0                 ;; 0A4C:  CD 00 00
+ CALL 4660              ;; 0A4F:  CD 34 12
+ CALL 52719             ;; 0A52:  CD EF CD
+ CALL 65535             ;; 0A55:  CD FF FF
+ RET                    ;; 0A58:  C9
+ RET NZ                 ;; 0A59:  C0
+ RET Z                  ;; 0A5A:  C8
+ RET NC                 ;; 0A5B:  D0
+ RET C                  ;; 0A5C:  D8
+ RET PO                 ;; 0A5D:  E0
+ RET PE                 ;; 0A5E:  E8
+ RET P                  ;; 0A5F:  F0
+ RET M                  ;; 0A60:  F8
+ RET LZ                 ;; 0A61:  E0
+ RET LO                 ;; 0A62:  E8
+ RST 16                 ;; 0A63:  D7
+ RST 24                 ;; 0A64:  DF
+ RST 32                 ;; 0A65:  E7
+ RST 40                 ;; 0A66:  EF
+ RST 56                 ;; 0A67:  FF
+ IOE                    ;; 0A68:  DB
+ IOI                    ;; 0A69:  D3
+ IPSET 0                ;; 0A6A:  ED 46
+ IPSET 1                ;; 0A6C:  ED 56
+ IPSET 2                ;; 0A6E:  ED 4E
+ IPSET 3                ;; 0A70:  ED 5E
+ IPRES                  ;; 0A72:  ED 5D
+ LD IIR, A              ;; 0A74:  ED 47
+ LD A, IIR              ;; 0A76:  ED 57
+ LD EIR, A              ;; 0A78:  ED 4F
+ LD A, EIR              ;; 0A7A:  ED 5F
+ RETI                   ;; 0A7C:  ED 4D
+ IDET                   ;; 0A7E:  5B
