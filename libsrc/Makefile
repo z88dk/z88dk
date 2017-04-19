@@ -1446,7 +1446,7 @@ osca_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C fcntl/osca
-	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
+	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 
 # Preempt multitasking library - dom
 preempt.lib:
