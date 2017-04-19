@@ -482,22 +482,25 @@ void size_of(LVALUE* lval)
                 } else {
                     SYMBOL *mptr;
                     /* We're a member of a structure */
-                    if ( (mptr = get_member(tagtab + ptr->tag_idx) ) != NULL ) {
-                        ptr = mptr;
-                        ptrtype = 0;
-                        ptrotag = NULL;
-                        if ( ptr->ident == POINTER && deref ) {
-                            ptrtype = ptr->type;
-                            if  (ptr->type == STRUCT)
-                                ptrotag = tagtab + ptr->tag_idx;
-                            // TODO: Nested structs
+                    do {
+                        if ( (mptr = get_member(tagtab + ptr->tag_idx) ) != NULL ) {
+                            ptr = mptr;
+                            ptrtype = 0;
+                            ptrotag = NULL;
+                            if ( ptr->ident == POINTER && deref ) {
+                                ptrtype = ptr->type;
+                                if  (ptr->type == STRUCT) {
+                                    ptrotag = tagtab + ptr->tag_idx;
+                                }
+                                // TODO: Nested structs
+                            } else {
+                                // tag_sym->size = numner of elements
+                                lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+                            }
                         } else {
-                            // tag_sym->size = numner of elements
-                            lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+                            lval->const_val = ptr->size;
                         }
-                    } else {
-                        lval->const_val = ptr->size;
-                    }
+                    } while ( ptr->type == STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
                 if (ptr->ident == ARRAY && rcmatch('[')) {
@@ -539,8 +542,9 @@ static SYMBOL *get_member(TAG_SYMBOL* ptr)
 {
     char sname[NAMESIZE];
     SYMBOL* ptr2;
+
     if (cmatch('.') == NO && match("->") == NO)
-        return (0);
+        return NULL;
 
     if (symname(sname) && (ptr2 = findmemb(ptr, sname))) {
         return ptr2;

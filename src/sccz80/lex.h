@@ -5,6 +5,7 @@ extern int match(char *lit);
 extern int cmatch(char lit);
 extern int acmatch(char lit);
 extern int rmatch(char *lit);
+extern int rmatch2(char* lit);
 extern int rcmatch(char lit);
 extern int amatch(char *lit);
 extern int swallow(char *lit);

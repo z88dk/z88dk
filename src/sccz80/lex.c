@@ -126,6 +126,15 @@ int rmatch(char* lit)
     return 0;
 }
 
+int rmatch2(char* lit)
+{
+    int k;
+    blanks();
+    if ((k = streq(line + lptr, lit)))
+        return 1;
+    return 0;
+}
+
 /*
  * djm, reversible character match, used to scan for local statics
  */
