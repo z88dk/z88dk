@@ -1429,7 +1429,7 @@ sos_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C sos 
-	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
+	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:
