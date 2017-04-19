@@ -23,7 +23,7 @@
 #include <math.h>
 #include "lib/utlist.h"
 
-static int get_member_size(TAG_SYMBOL *ptr);;
+static SYMBOL *get_member(TAG_SYMBOL *ptr);;
 
 
 
@@ -413,17 +413,20 @@ unsigned char litchar()
 }
 
 /* Perform a sizeof (works on variables as well */
-/* FIXME: Should also dereference pointers... */
 void size_of(LVALUE* lval)
 {
     char sname[NAMESIZE];
     int length;
     TAG_SYMBOL* otag;
-    SYMBOL* ptr;
+    SYMBOL *ptr;
     struct varid var;
     enum ident_type ident;
+    int          deref = 0;
 
     needchar('(');
+    while ( cmatch('*') ) {
+        deref++;
+    }
     otag = GetVarID(&var, NO);
     if (var.type != NO) {
         ident = var.ident;
@@ -435,29 +438,23 @@ void size_of(LVALUE* lval)
             else
                 ident = VARIABLE;
         }
+
+        if ( deref && ident !=  POINTER  ) {
+            uint32_t   argvalue = CalcArgValue(var.type, var.ident,((var.sign & UNSIGNED) | (var.zfar & FARPTR)));
+            char       got[256];
+
+            ExpandArgValue(argvalue, got, 0);
+            printf("What\n");
+            error(E_SIZEOF,got);
+            lval->const_val = 2;
+            return;
+        }
         if (otag && ident == VARIABLE)
             lval->const_val = otag->size;
         if (ident == POINTER) {
             lval->const_val = (var.zfar ? 3 : 2);
         } else {
-            switch (var.type) {
-            case CCHAR:
-                lval->const_val = 1;
-                break;
-            case CINT:
-                lval->const_val = 2;
-                break;
-            case LONG:
-                lval->const_val = 4;
-                break;
-            case DOUBLE:
-                lval->const_val = 6;
-                break;
-            case STRUCT:
-                lval->const_val = get_member_size(otag);
-                if (lval->const_val == 0)
-                    lval->const_val = otag->size;
-            }
+            lval->const_val = get_type_size(var.type, var.ident, (var.zfar & FARPTR), otag);
         }
     } else if (cmatch('"')) { /* Check size of string */
         length = 1; /* Always at least one */
@@ -466,16 +463,41 @@ void size_of(LVALUE* lval)
             litchar();
         };
         lval->const_val = length;
+        if ( deref ) 
+            lval->const_val = 1;
     } else if (symname(sname)) { /* Size of an object */
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
-            /* Actually found sommat..very good! */
+            int ptrtype = -1;  /* Type of the pointer */
+            TAG_SYMBOL *ptrotag = NULL;
+
             if (ptr->ident != FUNCTION && ptr->ident != MACRO) {
                 if (ptr->type != STRUCT) {
-                    lval->const_val = ptr->size;
-                } else {
-                    lval->const_val = get_member_size(tagtab + ptr->tag_idx);
-                    if (lval->const_val == 0)
+                    if ( ptr->ident == POINTER && deref ) {
+                        ptrtype = ptr->type;
+                        if ( ptr->type == STRUCT ) 
+                            ptrotag = tagtab + ptr->tag_idx;
+                    } else {
                         lval->const_val = ptr->size;
+                    }
+                } else {
+                    SYMBOL *mptr;
+                    /* We're a member of a structure */
+                    if ( (mptr = get_member(tagtab + ptr->tag_idx) ) != NULL ) {
+                        ptr = mptr;
+                        ptrtype = 0;
+                        ptrotag = NULL;
+                        if ( ptr->ident == POINTER && deref ) {
+                            ptrtype = ptr->type;
+                            if  (ptr->type == STRUCT)
+                                ptrotag = tagtab + ptr->tag_idx;
+                            // TODO: Nested structs
+                        } else {
+                            // tag_sym->size = numner of elements
+                            lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+                        }
+                    } else {
+                        lval->const_val = ptr->size;
+                    }
                 }
                 /* Check for index operator on array */
                 if (ptr->ident == ARRAY && rcmatch('[')) {
@@ -484,11 +506,24 @@ void size_of(LVALUE* lval)
                     needchar('[');
                     constexpr(&val, &valtype,  1);
                     needchar(']');
-                    lval->const_val = get_type_size(ptr->type, tagtab + ptr->tag_idx);
+                    lval->const_val = get_type_size(ptr->type, VARIABLE, 0, tagtab + ptr->tag_idx);
+                    if ( deref && ptr->more ) {
+                        ptrtype = ptr->more;
+                        ptrotag = tagtab + ptr->tag_idx;
+                    }
+                }
+                if ( deref ) {
+                    if ( ptrtype != -1 ) {
+                        lval->const_val = get_type_size(ptrtype, VARIABLE, 0, ptrotag);
+                    } else {
+                        uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
+                        char       got[256];
+
+                        ExpandArgValue(argvalue, got, ptr->tag_idx);
+                        error(E_SIZEOF,got);
+                    }
                 }
             } else {
-                warning(W_SIZEOF);
-                /* good enough default? */
                 lval->const_val = 2;
             }
         }
@@ -500,17 +535,18 @@ void size_of(LVALUE* lval)
     vconst(lval->const_val);
 }
 
-static int get_member_size(TAG_SYMBOL* ptr)
+static SYMBOL *get_member(TAG_SYMBOL* ptr)
 {
     char sname[NAMESIZE];
     SYMBOL* ptr2;
     if (cmatch('.') == NO && match("->") == NO)
         return (0);
 
-    if (symname(sname) && (ptr2 = findmemb(ptr, sname)))
-        return ptr2->size;
+    if (symname(sname) && (ptr2 = findmemb(ptr, sname))) {
+        return ptr2;
+    }
     error(E_UNMEMB, sname);
-    return (0);
+    return NULL;
 }
 
 void dofloat(double raw, unsigned char fa[])
