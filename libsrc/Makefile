@@ -1292,7 +1292,7 @@ lynx_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lgal
-	TARGET=lynx TYPE=z80 $(LIBLINKER) -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
+	TARGET=lynx TYPE=z80 $(LIBLINKER) -DFORlynx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
 sms_clib.lib:
