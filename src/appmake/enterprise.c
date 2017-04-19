@@ -13,6 +13,7 @@
 
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
+static char             *extfile      = ".app";
 static char              help         = 0;
 
 
@@ -21,6 +22,7 @@ option_t enterprise_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    { 'e', "ext",      "Extension of output file",   OPT_STR,   &extfile },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -48,7 +50,7 @@ int enterprise_exec(char *target)
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
-        suffix_change(filename,".app");
+        suffix_change(filename, extfile);
     } else {
         strcpy(filename,outfile);
     }
@@ -92,6 +94,5 @@ int enterprise_exec(char *target)
 
     return 0;
 }
-
 
 

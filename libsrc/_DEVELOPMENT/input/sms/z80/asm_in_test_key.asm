@@ -25,11 +25,13 @@ asm_in_test_key:
 	push bc
 	
 	in a,(__IO_JOYSTICK_READ_L)
-	
+   cpl
+
 	and $30
 	ld c,a
 	
 	in a,(__IO_JOYSTICK_READ_H)
+   cpl
 	
 	and $0c
 	or c

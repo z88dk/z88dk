@@ -8,17 +8,21 @@
 // SDSC Header - not generated if no SDSC pragmas are present
 
 #pragma output   SDSC_HDR_VERSION     = 199
-#pragma output   SDSC_HDR_DATE        = 20170414         // if omitted current date is used
+#pragma output   SDSC_HDR_DATE        = 20170416         // if omitted current date is used
 #pragma redirect SDSC_HDR_AUTHOR      = _author          // character string in program
 #pragma redirect SDSC_HDR_NAME        = _name            // character string in program
 #pragma redirect SDSC_HDR_DESCRIPTION = _description     // character string in program
 
 // Eliminate Unused Printf Converters
 
-#pragma printf = ""         // generates a reference to printf so only employ if using printf()
+#pragma printf = ""    // generates a reference to the printf core so only employ if actually using the printf() family
 
 // Output Terminal Options
 
 #pragma output CRT_OTERM_CHAR_PATTERN_OFFSET = -32       // ascii code 32 of the font will be mapped to character 0
-#pragma output CRT_OTERM_WINDOW_WIDTH = 32
-#pragma output CRT_OTERM_WINDOW_HEIGHT = 12
+#pragma output CRT_OTERM_BACKGROUND_CHAR     = 0         // background char is an absolute character 0-511, choose space
+
+#pragma output CRT_OTERM_WINDOW_X      = 4
+#pragma output CRT_OTERM_WINDOW_WIDTH  = 24
+#pragma output CRT_OTERM_WINDOW_Y      = 4
+#pragma output CRT_OTERM_WINDOW_HEIGHT = 16

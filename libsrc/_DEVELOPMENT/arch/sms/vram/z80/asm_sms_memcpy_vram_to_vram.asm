@@ -27,38 +27,53 @@ asm_sms_memcpy_vram_to_vram:
    ;         de = void *dst, &byte after last written
    ;         bc = 0
    ;
-   ; uses  : af, bc, de, hl, af'
-   
+   ; uses  : af, bc, de, hl
+
    set 6,d
    
-loop:
+   ld a,c
+   inc b
+   
+   or a
+   jr nz, no_adjust
+   dec b
 
+no_adjust:
+   
+   ld c,__IO_VDP_COMMAND
+   
+outer_loop:
+
+   push bc
+   ld b,a
+
+inner_loop:
+   
    ; must yield opportunities for an interrupt to occur
-
+   
    di
-
-   ld a,l
-   out (__IO_VDP_COMMAND),a
-   ld a,h
-   out (__IO_VDP_COMMAND),a
-
+   
+   out (c),l
+   out (c),h
    in a,(__IO_VDP_DATA)
-   ex af,af'
-
-   ld a,e
-   out (__IO_VDP_COMMAND),a
-   ld a,d
-   out (__IO_VDP_COMMAND),a
-
-   ei
-
-   ex af,af'
+   
+   out (c),e
+   out (c),d
    out (__IO_VDP_DATA),a
-    
+   
+   ei
+   
+   inc hl
    inc de
-    
-   cpi
-   jp pe, loop
+   
+   djnz inner_loop
 
+   ld a,b
+   pop bc
+   
+   djnz outer_loop
+
+   ld c,b
    res 6,d
+   
    ret

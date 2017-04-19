@@ -6,8 +6,12 @@
 #define _ARCH_SMS_H
 
 #include <arch.h>
+#include <rect.h>
 
 // GLOBAL VARIABLES
+
+extern unsigned char GLOBAL_SMS_VDP_R0;
+extern unsigned char GLOBAL_SMS_VDP_R1;
 
 extern unsigned int GLOBAL_SMS_VRAM_SCREEN_MAP_ADDRESS;
 extern unsigned int GLOBAL_SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS;
@@ -80,7 +84,140 @@ extern volatile unsigned char MM_FFFC;
 #define SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS  __SMS_VRAM_SPRITE_ATTRIBUTE_TABLE_ADDRESS
 #define SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS     __SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS
 
+// MISCELLANEOUS
+
+extern void sms_border(unsigned char color) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void sms_border_fastcall(unsigned char color) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+#define sms_border(a) sms_border_fastcall(a)
+
+
+extern unsigned int sms_cxy2saddr(unsigned char x,unsigned char y) __preserves_regs(d,e,iyl,iyh);
+extern unsigned int sms_cxy2saddr_callee(unsigned char x,unsigned char y) __preserves_regs(d,e,iyl,iyh) __z88dk_callee;
+#define sms_cxy2saddr(a,b) sms_cxy2saddr_callee(a,b)
+
+
+
+extern void *sms_copy_font_8x8_to_vram(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __preserves_regs(iyl,iyh);
+extern void *sms_copy_font_8x8_to_vram_callee(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_copy_font_8x8_to_vram(a,b,c,d) sms_copy_font_8x8_to_vram_callee(a,b,c,d)
+
+
+
+extern void sms_cls_wc(struct r_Rect8 *r,unsigned int background_char);
+extern void sms_cls_wc_callee(struct r_Rect8 *r,unsigned int background_char) __z88dk_callee;
+#define sms_cls_wc(a,b) sms_cls_wc_callee(a,b)
+
+
+extern void sms_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned int background_char);
+extern void sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __z88dk_callee;
+#define sms_scroll_wc_up(a,b,c) sms_scroll_wc_up_callee(a,b,c)
+
+
+
+extern void sms_tiles_clear_area(struct r_Rect8 *r,unsigned int background_char);
+extern void sms_tiles_clear_area_callee(struct r_Rect8 *r,unsigned int background_char) __z88dk_callee;
+#define sms_tiles_clear_area(a,b) sms_tiles_clear_area_callee(a,b)
+
+
+extern void sms_tiles_get_area(struct r_Rect8 *r,void *dst);
+extern void sms_tiles_get_area_callee(struct r_Rect8 *r,void *dst) __z88dk_callee;
+#define sms_tiles_get_area(a,b) sms_tiles_get_area_callee(a,b)
+
+
+extern void sms_tiles_put_area(struct r_Rect8 *r,void *src);
+extern void sms_tiles_put_area_callee(struct r_Rect8 *r,void *src) __z88dk_callee;
+#define sms_tiles_put_area(a,b) sms_tiles_put_area_callee(a,b)
+
+
+
+// VDP
+
+#define VDP_FEATURE_SHIFT_SPRITES      __VDP_FEATURE_SHIFT_SPRITES
+#define VDP_FEATURE_LINE_INTERRUPT     __VDP_FEATURE_LINE_INTERRUPT
+#define VDP_FEATURE_LEFT_COLUMN_BLANK  __VDP_FEATURE_LEFT_COLUMN_BLANK
+#define VDP_FEATURE_HSCROLL_INHIBIT    __VDP_FEATURE_HSCROLL_INHIBIT
+#define VDP_FEATURE_VSCROLL_INHIBIT    __VDP_FEATURE_VSCROLL_INHIBIT
+
+#define VDP_FEATURE_WIDE_SPRITES       __VDP_FEATURE_WIDE_SPRITES
+#define VDP_FEATURE_VBLANK_INTERRUPT   __VDP_FEATURE_VBLANK_INTERRUPT
+#define VDP_FEATURE_SHOW_DISPLAY       __VDP_FEATURE_SHOW_DISPLAY
+
+#define sms_display_off()  sms_vdp_feature_disable(__VDP_FEATURE_SHOW_DISPLAY)
+#define sms_display_on()   sms_vdp_feature_enable(__VDP_FEATURE_SHOW_DISPLAY)
+
+extern unsigned int sms_vdp_feature_disable(unsigned int features) __preserves_regs(b,c,iyl,iyh);
+extern unsigned int sms_vdp_feature_disable_fastcall(unsigned int features) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;
+#define sms_vdp_feature_disable(a) sms_vdp_feature_disable_fastcall(a)
+
+
+extern unsigned int sms_vdp_feature_enable(unsigned int features) __preserves_regs(b,c,iyl,iyh);
+extern unsigned int sms_vdp_feature_enable_fastcall(unsigned int features) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;
+#define sms_vdp_feature_enable(a) sms_vdp_feature_enable_fastcall(a)
+
+
+
+extern void sms_vdp_init(void *vdp_reg_array) __preserves_regs(c,d,e,iyl,iyh);
+extern void sms_vdp_init_fastcall(void *vdp_reg_array) __preserves_regs(c,d,e,iyl,iyh) __z88dk_fastcall;
+#define sms_vdp_init(a) sms_vdp_init_fastcall(a)
+
+
+
+extern void sms_vdp_set_read_address(unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void sms_vdp_set_read_address_fastcall(unsigned int addr) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+#define sms_vdp_set_read_address(a) sms_vdp_set_read_address_fastcall(a)
+
+
+extern void sms_vdp_set_write_address(unsigned int addr) __preserves_regs(b,c,iyl,iyh);
+extern void sms_vdp_set_write_address_fastcall(unsigned int addr) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;
+#define sms_vdp_set_write_address(a) sms_vdp_set_write_address_fastcall(a)
+
+
+
 // VRAM <-> MEMORY COPY OPERATIONS
+
+extern void sms_copy_mem_to_vram(void *src,unsigned int n) __preserves_regs(iyl,iyh);
+extern void sms_copy_mem_to_vram_callee(void *src,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_copy_mem_to_vram(a,b) sms_copy_mem_to_vram_callee(a,b)
+
+
+extern void sms_copy_mem_to_vram_unsafe(void *src,unsigned int n) __preserves_regs(iyl,iyh);
+extern void sms_copy_mem_to_vram_unsafe_callee(void *src,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_copy_mem_to_vram_unsafe(a,b) sms_copy_mem_to_vram_unsafe_callee(a,b)
+
+
+
+extern void sms_copy_vram_to_mem(void *dst,unsigned int n) __preserves_regs(iyl,iyh);
+extern void sms_copy_vram_to_mem_callee(void *dst,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_copy_vram_to_mem(a,b) sms_copy_vram_to_mem_callee(a,b)
+
+
+extern void sms_copy_vram_to_mem_unsafe(void *dst,unsigned int n) __preserves_regs(iyl,iyh);
+extern void sms_copy_vram_to_mem_unsafe_callee(void *dst,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_copy_vram_to_mem_unsafe(a,b) sms_copy_vram_to_mem_unsafe_callee(a,b)
+
+
+
+extern void sms_set_vram(unsigned char c,unsigned int n) __preserves_regs(d,e,iyl,iyh);
+extern void sms_set_vram_callee(unsigned char c,unsigned int n) __preserves_regs(d,e,iyl,iyh) __z88dk_callee;
+#define sms_set_vram(a,b) sms_set_vram_callee(a,b)
+
+
+extern void sms_set_vram_unsafe(unsigned char c,unsigned int n) __preserves_regs(d,e,iyl,iyh);
+extern void sms_set_vram_unsafe_callee(unsigned char c,unsigned int n) __preserves_regs(d,e,iyl,iyh) __z88dk_callee;
+#define sms_set_vram_unsafe(a,b) sms_set_vram_unsafe_callee(a,b)
+
+
+
+extern void sms_setw_vram(unsigned int c,unsigned int n) __preserves_regs(iyl,iyh);
+extern void sms_setw_vram_callee(unsigned int c,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_setw_vram(a,b) sms_setw_vram_callee(a,b)
+
+
+extern void sms_setw_vram_unsafe(unsigned int c,unsigned int n) __preserves_regs(iyl,iyh);
+extern void sms_setw_vram_unsafe_callee(unsigned int c,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define sms_setw_vram_unsafe(a,b) sms_setw_vram_unsafe_callee(a,b)
+
+
 
 extern unsigned int sms_memcpy_mem_to_cram(unsigned int cdst,void *src,unsigned int n) __preserves_regs(iyl,iyh);
 extern unsigned int sms_memcpy_mem_to_cram_callee(unsigned int cdst,void *src,unsigned int n) __preserves_regs(iyl,iyh) __z88dk_callee;

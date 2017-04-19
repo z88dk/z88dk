@@ -5,26 +5,6 @@
 
 INCLUDE "SMSlib_private.inc"
 
-SECTION rodata_clib
-SECTION rodata_SMSlib
-
-PUBLIC __SMSlib_VDPReg_init
-
-__SMSlib_VDPReg_init:
-
-   defb 0x04                   ; /* reg0: Mode 4 */
-   defb 0x20                   ; /* reg1: display OFF - frame int (vblank) ON */
-   defb ((__SMSLIB_PNTADDRESS & 0x3800) >> 10) + 0xf1                     ; /* reg2: PNT at 0x3800 */
-   defb 0xFF                   ; /* reg3: no effect (when in mode 4) */
-   defb 0xFF                   ; /* reg4: no effect (when in mode 4) */
-   defb ((__SMSLIB_SATADDRESS & 0x3f00) >> 7) + 0x81                      ; /* reg5: SAT at 0x3F00 */
-   defb ((__SMS_VRAM_SPRITE_PATTERN_BASE_ADDRESS & 0x2000) >> 11) + 0xfb  ; /* reg6: Sprite tiles at 0x2000 */
-   defb 0x00                   ; /* reg7: backdrop color (zero) */
-   defb 0x00                   ; /* reg8: scroll X (zero) */
-   defb 0x00                   ; /* reg9: scroll Y (zero) */
-   defb 0xFF                   ; /* regA: line interrupt count (offscreen) */
-
-
 SECTION data_clib
 SECTION data_SMSlib
 
@@ -33,11 +13,9 @@ PUBLIC __SMSlib_spritesHeight
 PUBLIC __SMSlib_spritesWidth
 PUBLIC __SMSlib_theLineInterruptHandler
 
-EXTERN l_ret
+EXTERN l_ret, _GLOBAL_SMS_VDP_R0R1
 
-__SMSlib_VDPReg:
-
-   defb 0x04, 0x20             ; /* the VDP registers #0 and #1 'shadow' (initialized RAM) */
+defc __SMSlib_VDPReg = _GLOBAL_SMS_VDP_R0R1  ; /* the VDP registers #0 and #1 'shadow' (initialized RAM) */
 
 __SMSlib_spritesHeight:
 

@@ -38,6 +38,7 @@ dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/terminal/sms_01_output_terminal.m4')dnl
+dnl#include(`driver/terminal/sms_01_output_terminal_tty_z88dk.m4')dnl
 dnl
 dnl## file dup
 dnl
@@ -101,15 +102,10 @@ __Restart:
    ; initialize mappers
    
    ld de,0x0000
-   ld (0xfffc),de              ; (0xfffc) = $00
+   ld (0xfffc),de              ; (0xfffc) = $00, (0xfffd) = $00
    ld de,0x0201
-   ld (0xfffe),de              ; (0xfffd) = $00, (0xfffe) = $01, (0xffff) = $02
+   ld (0xfffe),de              ; (0xfffe) = $01, (0xffff) = $02
 
-   ; silence psg
-
-   EXTERN asm_sms_psg_silence
-   call   asm_sms_psg_silence
-   
    ; command line
    
    IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
@@ -126,6 +122,18 @@ __Restart_2:
       push bc                  ; argc
 
    ENDIF
+
+   ; silence psg
+
+   EXTERN asm_sms_psg_silence
+   call   asm_sms_psg_silence
+
+   ; vdp initialization
+
+   EXTERN asm_sms_vdp_init, __sms_vdp_reg_array
+
+	ld hl, __sms_vdp_reg_array
+   call   asm_sms_vdp_init
 
    ; initialize data section
 

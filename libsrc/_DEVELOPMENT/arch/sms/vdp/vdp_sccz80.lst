@@ -1,0 +1,6 @@
+@arch/sms/vdp/vdp_asm.lst
+arch/sms/vdp/c/sccz80/sms_vdp_feature_disable
+arch/sms/vdp/c/sccz80/sms_vdp_feature_enable
+arch/sms/vdp/c/sccz80/sms_vdp_init
+arch/sms/vdp/c/sccz80/sms_vdp_set_read_address
+arch/sms/vdp/c/sccz80/sms_vdp_set_write_address

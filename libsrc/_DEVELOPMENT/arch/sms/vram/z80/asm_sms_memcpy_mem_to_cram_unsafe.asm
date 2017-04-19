@@ -6,8 +6,6 @@
 ;
 ; ========================================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_crt_common
 

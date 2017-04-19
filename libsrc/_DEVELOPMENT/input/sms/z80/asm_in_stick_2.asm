@@ -25,9 +25,11 @@ asm_in_stick_2:
    ; uses : af, hl
    
    in a,(__IO_JOYSTICK_READ_L)
+   cpl
    ld h,a
    
    in a,(__IO_JOYSTICK_READ_H)
+   cpl
    
    rl h
    rla

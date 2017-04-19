@@ -38,6 +38,7 @@
 ; Execution starts here
 ;----------------------
 start:
+	;di
 
 	ld      (start1+1),sp	;Save entry stack
 	ld      hl,-64
@@ -46,6 +47,7 @@ start:
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
+
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
@@ -53,12 +55,11 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-
-	ld a,65
-	call $C1BE
+	;ld a,65	; (Debugging:  print 'A' char)
+	;call $009F
         call    _main		;Call user code
-	ld a,65
-	call $C1BE
+	;ld a,65	; (Debugging:  print 'A' char)
+	;call $009F
 
 cleanup:
 ;	push	hl		;Save return value
@@ -79,11 +80,6 @@ end:	defb	0		; null file name
 
         INCLUDE "crt0_runtime_selection.asm"
 
-
 	INCLUDE	"crt0_section.asm"
 
-	SECTION	bss_crt
-defltdsk:       defb    0	;Default disc
-	PUBLIC	pixelbyte	; VDP gfx driver, byte temp storage
-pixelbyte:	defb	0	; temp byte storage for VDP driver
 

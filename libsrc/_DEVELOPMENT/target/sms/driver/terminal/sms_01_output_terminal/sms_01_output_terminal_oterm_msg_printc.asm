@@ -4,7 +4,7 @@ SECTION code_driver_terminal_output
 PUBLIC sms_01_output_terminal_oterm_msg_printc
 
 EXTERN __IO_VDP_DATA
-EXTERN asm_sms_set_vram_write_de
+EXTERN asm_sms_vram_write_de
 
 sms_01_output_terminal_oterm_msg_printc:
 
@@ -35,7 +35,7 @@ sms_01_output_terminal_oterm_msg_printc:
    add hl,de
    ex de,hl                    ; de = address of character in screen map
    
-   call asm_sms_set_vram_write_de
+   call asm_sms_vram_write_de
    
    ld a,c                      ; ascii code
    add a,(ix+23)               ; add character offset low byte

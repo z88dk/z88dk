@@ -23,7 +23,7 @@ asm_sms_scroll_wc_up:
    ;         hl = background character
    ;         ix = rect *
    ;
-   ; uses  : af, bc, de, hl, af', bc'
+   ; uses  : af, bc, de, hl, bc'
 
    inc e
    dec e
@@ -109,6 +109,7 @@ clear_blank:
    ld b,c
    
    exx
+   ex de,hl                    ; hl = copy to address becomes next row to clear
    pop de                      ; de = background character
    exx
 

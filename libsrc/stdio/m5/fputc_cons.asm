@@ -3,7 +3,7 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.6 2016-05-15 20:15:45 dom Exp $
+;	$Id: fputc_cons.asm,v 1.6+ (GIT imported) $
 ;
 
 	SECTION code_clib
@@ -16,6 +16,12 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
+IF STANDARDESCAPECHARS
+	cp  10
+	jr	nz,nocr
+	ld	a,13
+.nocr
+ENDIF
 
 	ld	ix,DSPCH
 	jp	msxbios

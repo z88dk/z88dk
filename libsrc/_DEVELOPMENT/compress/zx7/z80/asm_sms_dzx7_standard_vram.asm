@@ -19,7 +19,7 @@ SECTION code_compress_zx7
 
 PUBLIC asm_sms_dzx7_standard_vram
 
-EXTERN asm_sms_set_vram_write_de, asm_sms_memcpy_vram_to_vram, l_ret
+EXTERN asm_sms_vram_write_de, asm_sms_memcpy_vram_to_vram, l_ret
 
 asm_sms_dzx7_standard_vram:
 
@@ -28,9 +28,9 @@ asm_sms_dzx7_standard_vram:
    ;
    ; exit  : hl = & following uncompressed block in vram
    ;
-   ; uses  : af, bc, de, hl, af'
+   ; uses  : af, bc, de, hl
 
-        call asm_sms_set_vram_write_de
+        call asm_sms_vram_write_de
         
         ld c,__IO_VDP_DATA
         ld a,$80
@@ -96,7 +96,7 @@ dzx7s_rld_next_bit:
         rl      d                       ; insert next bit into D
         jr      nc, dzx7s_rld_next_bit  ; repeat 4 times, until bit marker is out
         inc     d                       ; add 128 to DE
-        srl	    d                       ; retrieve fourth bit from D
+        srl     d                       ; retrieve fourth bit from D
         
 dzx7s_offset_end:
 
@@ -109,15 +109,17 @@ dzx7s_offset_end:
         sbc     hl, de                  ; HL = destination - offset - 1
         pop     de                      ; DE = destination
         ;;ldir
-        call asm_sms_memcpy_vram_to_vram
+
+        push    af
+        call    asm_sms_memcpy_vram_to_vram
+        pop     af
         
 ;;dzx7s_exit:
 
-        call asm_sms_set_vram_write_de
         ld c,__IO_VDP_DATA
 
         pop     hl                      ; restore source address (compressed data)
-        jr      dzx7s_main_loop
+        jr      nc, dzx7s_main_loop
         
 dzx7s_next_bit:
 

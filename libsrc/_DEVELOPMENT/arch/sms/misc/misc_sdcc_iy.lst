@@ -1,0 +1,17 @@
+@arch/sms/misc/misc_asm.lst
+arch/sms/misc/c/sdcc_iy/sms_border
+arch/sms/misc/c/sdcc_iy/sms_border_fastcall
+arch/sms/misc/c/sdcc_iy/sms_cls_wc
+arch/sms/misc/c/sdcc_iy/sms_cls_wc_callee
+arch/sms/misc/c/sdcc_iy/sms_copy_font_8x8_to_vram
+arch/sms/misc/c/sdcc_iy/sms_copy_font_8x8_to_vram_callee
+arch/sms/misc/c/sdcc_iy/sms_cxy2saddr
+arch/sms/misc/c/sdcc_iy/sms_cxy2saddr_callee
+arch/sms/misc/c/sdcc_iy/sms_scroll_wc_up
+arch/sms/misc/c/sdcc_iy/sms_scroll_wc_up_callee
+arch/sms/misc/c/sdcc_iy/sms_tiles_clear_area
+arch/sms/misc/c/sdcc_iy/sms_tiles_clear_area_callee
+arch/sms/misc/c/sdcc_iy/sms_tiles_get_area
+arch/sms/misc/c/sdcc_iy/sms_tiles_get_area_callee
+arch/sms/misc/c/sdcc_iy/sms_tiles_put_area
+arch/sms/misc/c/sdcc_iy/sms_tiles_put_area_callee

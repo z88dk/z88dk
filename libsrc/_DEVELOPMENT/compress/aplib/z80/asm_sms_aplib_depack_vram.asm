@@ -13,6 +13,8 @@
 ;
 ; ===================================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_compress_aplib
 
@@ -22,19 +24,19 @@ EXTERN __aplib_var_bits, __aplib_var_byte
 EXTERN __aplib_var_LWM, __aplib_var_R0
 
 EXTERN __aplib_getbit, __aplib_getbitbc, __aplib_getgamma
-EXTERN asm_sms_memcpy_vram_to_vram, asm_sms_set_vram_write_de, asm_sms_set_vram_read_hl
+EXTERN asm_sms_memcpy_vram_to_vram, asm_sms_vram_write_de, asm_sms_vram_read_hl
 
 ap_VRAMToDE_write:
 
    push af
-   call asm_sms_set_vram_write_de
+   call asm_sms_vram_write_de
    pop af
    ret
    
 ap_VRAMToHL_read:
 
    push af
-   call asm_sms_set_vram_read_hl
+   call asm_sms_vram_read_hl
    pop af
    ret
       
@@ -42,7 +44,7 @@ ap_VRAM_ldi_src_to_dest:
 
    call ap_VRAMToDE_write
    push bc
-      ld c,$be
+      ld c,__IO_VDP_DATA
       outi
    pop bc
    dec bc
@@ -201,7 +203,7 @@ _vram_aploop:
 _WriteAToVRAMAndLoop:
 
    call ap_VRAMToDE_write
-   out ($be),a
+   out (__IO_VDP_DATA),a
    inc de
    jr _vram_aploop
    
@@ -211,7 +213,7 @@ _vram_apbranch4:
    push hl
       sbc hl,bc
       call ap_VRAMToHL_read
-      in a,($be)
+      in a,(__IO_VDP_DATA)
    pop hl
    ex de,hl
    jr _WriteAToVRAMAndLoop
