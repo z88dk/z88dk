@@ -1021,7 +1021,7 @@ m5_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
+	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
 mc1000_clib.lib:
