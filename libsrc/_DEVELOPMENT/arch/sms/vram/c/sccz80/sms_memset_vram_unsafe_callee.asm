@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC _sms_memset_vram_unsafe_callee
+PUBLIC sms_memset_vram_unsafe_callee
 
 EXTERN asm_sms_memset_vram_unsafe
 
-_sms_memset_vram_unsafe_callee:
+sms_memset_vram_unsafe_callee:
 
    pop af
    pop bc

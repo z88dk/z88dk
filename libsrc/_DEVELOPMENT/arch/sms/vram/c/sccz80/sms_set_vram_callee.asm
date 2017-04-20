@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_crt_common
 
-PUBLIC _sms_set_vram_callee
+PUBLIC sms_set_vram_callee
 
 EXTERN asm_sms_set_vram
 
-_sms_set_vram_callee:
+sms_set_vram_callee:
 
    pop hl
    pop bc

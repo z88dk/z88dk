@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC _sms_memsetw_vram_callee
+PUBLIC sms_memsetw_vram_callee
 
 EXTERN asm_sms_memsetw_vram
 
-_sms_memsetw_vram_callee:
+sms_memsetw_vram_callee:
 
    pop af
    pop bc
