@@ -968,11 +968,13 @@ static void swallow_bitfield(void)
 int get_type_size(int type, enum ident_type ident, enum symbol_flags flags, TAG_SYMBOL* otag)
 {
     int size;
-
     if ( ident == VARIABLE ) {
         switch (type) {
         case CCHAR:
             size = 1;
+            break;
+        case CPTR:
+            size = 3;
             break;
         case LONG:
             size = 4;

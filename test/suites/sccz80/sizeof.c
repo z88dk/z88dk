@@ -14,6 +14,18 @@ void test_sizeof_types()
     assertEqual(2, sizeof(double *));
 }
 
+void test_sizeof_far_pointers()
+{
+    far char *ptrs[2];
+
+    assertEqual(3, sizeof(far char *));
+    assertEqual(6, sizeof(ptrs));
+    assertEqual(3, sizeof(*ptrs));
+    assertEqual(3, sizeof(ptrs[0]));
+    assertEqual(1, sizeof(*ptrs[0]));
+    assertEqual(1, sizeof(**ptrs));
+}
+
 void test_sizeof_primitives()
 {
     char    c;
@@ -173,10 +185,27 @@ void test_sizeof_nested_struct()
     assertEqual(6, sizeof(val.nestedp->d));
 }
 
+void test_sizeof_array_struct()
+{
+    struct   st vals[10];
+    struct   st *pvals[10];
+
+    assertEqual(560, sizeof(vals));
+    assertEqual(56, sizeof(vals[0]));
+    //assertEqual(1, sizeof(vals[0].c)); // Doesn't parse'
+    assertEqual(20, sizeof(pvals));
+    //printf("%d %d\n",sizeof(*pvals),sizeof(**pvals));
+    assertEqual(2, sizeof(*pvals)); // Matches sdcc behaviour
+    assertEqual(2, sizeof(**pvals));  // Reports 2 should be 56
+
+}
+
+
 int suite_sizeof()
 {
     suite_setup("Sizeof Tests");
     suite_add_test(test_sizeof_types);
+    suite_add_test(test_sizeof_far_pointers);
     suite_add_test(test_sizeof_primitives);
     suite_add_test(test_sizeof_arrays);
     suite_add_test(test_sizeof_arrays2);
@@ -184,6 +213,7 @@ int suite_sizeof()
     suite_add_test(test_sizeof_misc);
     suite_add_test(test_sizeof_struct);
     suite_add_test(test_sizeof_nested_struct);
+    suite_add_test(test_sizeof_array_struct);
 
     return suite_run();
 }
