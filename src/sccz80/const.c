@@ -503,19 +503,26 @@ void size_of(LVALUE* lval)
                     } while ( ptr->type == STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
-                if (ptr->ident == ARRAY && rcmatch('[')) {
-                    double val;
-                    int valtype;
-                    needchar('[');
-                    constexpr(&val, &valtype,  1);
-                    needchar(']');
-                    lval->const_val = get_type_size(ptr->type, VARIABLE, 0, tagtab + ptr->tag_idx);
-                    if ( deref && ptr->more ) {
-                        ptrtype = ptr->more;
+                if (ptr->ident == ARRAY ) {
+                    if (rcmatch('[')) {
+                        double val;
+                        int valtype;
+                        needchar('[');
+                        constexpr(&val, &valtype,  1);
+                        needchar(']');
+                        deref++;
+                        lval->const_val = get_type_size(ptr->type, VARIABLE, 0, tagtab + ptr->tag_idx);
+                    }
+                    if ( deref ) {
+                        if ( deref == 1 ) {
+                            ptrtype = ptr->type;
+                        } else {
+                            ptrtype = ptr->more;
+                        }
                         ptrotag = tagtab + ptr->tag_idx;
                     }
                 }
-                if ( deref ) {
+                if ( deref > 0 ) {
                     if ( ptrtype != -1 ) {
                         lval->const_val = get_type_size(ptrtype, VARIABLE, 0, ptrotag);
                     } else {
@@ -529,6 +536,8 @@ void size_of(LVALUE* lval)
             } else {
                 lval->const_val = 2;
             }
+        } else {
+            error(E_UNSYMB, sname);
         }
     }
     needchar(')');

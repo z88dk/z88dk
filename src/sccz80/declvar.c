@@ -613,7 +613,8 @@ void declloc(
                 cptr->isconst = var->isconst;
             }
             if (rcmatch('=')) {
-                initials(sname2, type, ident, dsize, more, otag, var->zfar, var->isconst);
+                int size_st = initials(sname2, type, ident, dsize, more, otag, var->zfar, var->isconst);
+                cptr->size = size_st;
                 cptr->isassigned = YES;
                 ns();
                 cptr->storage = LSTKEXT;

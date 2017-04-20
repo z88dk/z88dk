@@ -69,10 +69,33 @@ void test_sizeof_ptrarrays()
     assertEqual(20, sizeof(i));
     assertEqual(20, sizeof(l));
     assertEqual(20, sizeof(d));
+    assertEqual(2, sizeof(c[0]));
+    assertEqual(2, sizeof(i[0]));
+    assertEqual(2, sizeof(l[0]));
+    assertEqual(2, sizeof(d[0]));
     assertEqual(1, sizeof(*c[0]));
     assertEqual(2, sizeof(*i[0]));
     assertEqual(4, sizeof(*l[0]));
     assertEqual(6, sizeof(*d[0]));
+}
+
+static unsigned char *gquotes[] = {
+    "Hello",
+    "World",
+};
+
+void test_sizeof_arrays2()
+{
+    static unsigned char *lquotes[] = {
+	    "Hello",
+	    "World",
+    };
+    assertEqual(4, sizeof(gquotes));
+    assertEqual(2, sizeof(*gquotes));
+    assertEqual(1, sizeof(**gquotes));
+    assertEqual(4, sizeof(lquotes));
+    assertEqual(2, sizeof(*lquotes));
+    assertEqual(1, sizeof(**lquotes));
 }
 
 void test_sizeof_misc()
@@ -156,6 +179,7 @@ int suite_sizeof()
     suite_add_test(test_sizeof_types);
     suite_add_test(test_sizeof_primitives);
     suite_add_test(test_sizeof_arrays);
+    suite_add_test(test_sizeof_arrays2);
     suite_add_test(test_sizeof_ptrarrays);
     suite_add_test(test_sizeof_misc);
     suite_add_test(test_sizeof_struct);
