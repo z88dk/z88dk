@@ -15,7 +15,8 @@
 #else
 
    #define __assert_s(s)       #s
-   #define assert(exp)         if (!(exp))  { fputs(__FILE__ " line " __assert_s(__LINE__) ": assert(" __assert_s(exp) ") failed\n", stderr); abort(); }
+   #define __assert_i(s)       __assert_s(s)
+   #define assert(exp)         if (!(exp))  { fputs(__FILE__ " line " __assert_i(__LINE__) ": assert(" __assert_s(exp) ") failed\n", stderr); abort(); }
 
 #endif
 

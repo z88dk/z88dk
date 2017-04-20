@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC _sms_tiles_get_area_callee
+PUBLIC sms_tiles_get_area_callee
 
 EXTERN asm_sms_tiles_get_area
 
-_sms_tiles_get_area_callee:
+sms_tiles_get_area_callee:
 
    pop af
    pop de

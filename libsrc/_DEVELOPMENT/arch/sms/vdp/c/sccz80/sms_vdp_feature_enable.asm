@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC sms_vdp_feature_enable_fastcall
+PUBLIC sms_vdp_feature_enable
 
 EXTERN asm_sms_vdp_feature_enable
 
-defc sms_vdp_feature_enable_fastcall = asm_sms_vdp_feature_enable
+defc sms_vdp_feature_enable = asm_sms_vdp_feature_enable

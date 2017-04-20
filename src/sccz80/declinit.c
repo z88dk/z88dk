@@ -100,7 +100,7 @@ int initials(char* sname,
                 desize = dim;            
             }
         }
-        output_section(c_code_section); // output_section("code");
+        output_section(c_code_section); 
     } else {
         char *dosign, *typ;
         dosign = "";

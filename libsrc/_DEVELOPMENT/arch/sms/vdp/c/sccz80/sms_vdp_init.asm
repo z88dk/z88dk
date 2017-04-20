@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC sms_vdp_init_fastcall
+PUBLIC sms_vdp_init
 
 EXTERN asm_sms_vdp_init
 
-sms_vdp_init_fastcall:
+sms_vdp_init:
 
    di
    

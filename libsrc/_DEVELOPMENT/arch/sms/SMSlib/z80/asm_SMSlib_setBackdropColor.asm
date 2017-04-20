@@ -1,4 +1,4 @@
-;; **************************************************
+; **************************************************
 ; SMSlib - C programming library for the SMS/GG
 ; ( part of devkitSMS - github.com/sverx/devkitSMS )
 ; **************************************************
@@ -10,21 +10,12 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_setBackdropColor
 
-asm_SMSlib_setBackdropColor:
+EXTERN asm_sms_border
+
+defc asm_SMSlib_setBackdropColor = asm_sms_border
 
    ; void SMS_setBackdropColor (unsigned char entry)
    ;
    ; enter :  l = unsigned char entry
    ;
    ; uses  : af
-   
-   di
-   
-   ld a,l
-   out (VDPControlPort),a
-   
-   ld a,0x87
-   out (VDPControlPort),a
-   
-   ei
-   ret

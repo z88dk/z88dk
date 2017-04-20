@@ -47,10 +47,6 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  short script to sort out games dependencies
-gamesdeps:
-	$(RM) -f games/*.o
-
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -94,7 +90,7 @@ zx81deps:
 	$(RM) -f stdio/ansi/zx81/*.o
 	$(RM) -f input/spectrum/*.o
 	$(RM) -f input/zx81/*.o
-	$(RM) -f games/*.o
+	$(RM) -f games/zx81/*.o
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/zx81/*.o
 	$(RM) -f graphics/zx81/hr/*.o
@@ -235,8 +231,7 @@ z88_clib.lib:
 	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lz88 
+	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C z88 
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
@@ -256,8 +251,7 @@ z88net_clib.lib:
 	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lz88 
+	$(MAKE) -C games TARGET=z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
 
 # ZX Spectrum fcntl - dom/stefano
@@ -283,10 +277,9 @@ zx_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum
 	$(MAKE) -C psg
-	$(MAKE) -C games lzx
+	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/zxcpm.lst
 
@@ -310,10 +303,9 @@ ts2068_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C time 
-	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum
 	$(MAKE) -C psg
-	$(MAKE) -C games lzx
+	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano
@@ -337,7 +329,6 @@ zxrom.lib:
 	@echo ''
 	@echo '--- Building ZXROM Library ---'
 	@echo ''
-	$(MAKE) gamesdeps
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
 
 # ZXVGS - yarek
@@ -390,8 +381,7 @@ p2000_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lp2000
+	$(MAKE) -C games TARGET=p2000
 	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
 # PC6001 lib - Stefano
@@ -425,10 +415,9 @@ pps_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C time 
-	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum 
 	$(MAKE) -C psg
-	$(MAKE) -C games lzx
+	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
 # Epson PX4 lib - Stefano	
@@ -460,8 +449,7 @@ vz_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lvz
+	$(MAKE) -C games TARGET=vz
 	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
 
 # ZX80 lib - Stefano
@@ -477,8 +465,7 @@ zx80_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lzx
+	$(MAKE) -C games TARGET=zx80
 	$(MAKE) -C psg
 	TARGET=zx80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
@@ -496,8 +483,7 @@ zx81_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp 
 	$(MAKE) -C assert 
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lzx81
+	$(MAKE) -C games TARGET=zx81
 	$(MAKE) -C psg 
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS --IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
@@ -515,8 +501,7 @@ lambda_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp 
 	$(MAKE) -C assert 
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lzx81
+	$(MAKE) -C games TARGET=zx81
 	$(MAKE) -C psg 
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS --IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
@@ -616,8 +601,8 @@ ti82_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lticalc
+	$(RM) games/ticalc/*.o
+	$(MAKE) -C games TARGET=ti82
 	TARGET=ti82 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti83_clib.lib:
@@ -632,8 +617,8 @@ ti83_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lticalc
+	$(RM) -f games/ticalc/*.o
+	$(MAKE) -C games TARGET=ti83
 	TARGET=ti83 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti83p_clib.lib:
@@ -648,8 +633,8 @@ ti83p_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lticalc
+	$(RM) -f games/ticalc/*.o
+	$(MAKE) -C games TARGET=ti8x
 	TARGET=ti8x TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti85_clib.lib:
@@ -664,8 +649,8 @@ ti85_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lticalc
+	$(RM) -f games/ticalc/*.o
+	$(MAKE) -C games TARGET=ti85
 	TARGET=ti85 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 ti86_clib.lib:
@@ -680,8 +665,8 @@ ti86_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lticalc
+	$(RM) -f games/ticalc/*.o
+	$(MAKE) -C games TARGET=ti86
 	TARGET=ti86 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti86 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 # vt100 C lib for the Sharp OZ family - stefano
@@ -700,8 +685,7 @@ ozansi_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C oz 
-	$(MAKE) gamesdeps
-	$(MAKE) -C games loz
+	$(MAKE) -C games TARGET=oz
 	TARGET=oz TYPE=z80 $(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
 # CPM lib - Stefano/dom
@@ -762,6 +746,7 @@ abc80_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
+	$(MAKE) -C games TARGET=abc80 SUBSET=joystick.asm
 	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
 
 # ABC800 library - Stefano
@@ -777,6 +762,7 @@ abc800_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
+	$(MAKE) -C games TARGET=abc800 SUBSET=joystick.asm
 	TARGET=abc800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
 
 # Jupiter ACE library - Stefano
@@ -792,10 +778,9 @@ ace_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
 	$(MAKE) -C ace 
-	$(MAKE) -C games lace
-	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	$(MAKE) -C games TARGET=ace
+	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
@@ -810,9 +795,8 @@ aquarius_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
 	$(MAKE) -C psg
-	$(MAKE) -C games laquarius 
+	$(MAKE) -C games TARGET=aquarius 
 	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 	
 # Aussie Byte library - Stefano
@@ -821,9 +805,8 @@ aussie.lib:
 	@echo '--- Building Aussie Byte Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) gamesdeps
-	$(MAKE) -C games laussie
-	$(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/aussie.lst
+	$(MAKE) -C games TARGET=cpm SUBTYPE=aussie
+	TARGET=aussie TYPE=z80 $(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/aussie.lst
 
 # Applied Technology MicroBee library - Stefano
 bee_clib.lib:
@@ -838,8 +821,7 @@ bee_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lbee
+	$(MAKE) -C games TARGET=bee
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
 
 microbee.lib:
@@ -847,9 +829,8 @@ microbee.lib:
 	@echo '--- Building MicroBee Library (CP/M & graphics) ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lbee
-	$(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
+	$(MAKE) -C games TARGET=bee
+	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
 	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/beegfx.lst
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(LISTFILE_DIRECTORY)/beegfxhr.lst
@@ -899,8 +880,7 @@ sam_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C time 
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lzx
+	$(MAKE) -C games TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano
@@ -916,7 +896,8 @@ svi_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C games lmsx
+	$(RM) games/msx/*.o
+	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C msx
 	$(MAKE) -C psg
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
@@ -935,7 +916,8 @@ msx_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C games lmsx
+	$(RM) games/msx/*.o
+	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
 	TARGET=msx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
@@ -953,7 +935,7 @@ mtx_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C games lmsx
+	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
@@ -972,10 +954,9 @@ enterprise_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C time
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lenterprise
-	$(MAKE) -C enterprise
-	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
+	$(MAKE) -C games TARGET=enterprise
+	$(MAKE) -C enterprise 
+	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
 gfxep.lib:
@@ -1001,10 +982,10 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C games lmsx
+	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFOReinstein -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
+	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -1036,8 +1017,7 @@ mc1000_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lmc1000
+	$(MAKE) -C games TARGET=mc1000
 	$(MAKE) -C psg
 	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
 
@@ -1084,8 +1064,7 @@ z9001_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lz9001
+	$(MAKE) -C games TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
 	@echo ''
 	@echo '--- Building Z9001 Standard Graphics Libraires ---'
@@ -1174,8 +1153,7 @@ c128ansi_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C c128
 	$(MAKE) -C psg c128
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lc128
+	$(MAKE) -C games TARGET=c128
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
@@ -1220,7 +1198,7 @@ newbrain_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C time 
 	$(MAKE) -C assert
-	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
 # TIKI-100 library - Stefano
@@ -1273,8 +1251,7 @@ gal_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lgal
+	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 
 # Camputers Lynx - Stefano Bodrato
@@ -1290,9 +1267,8 @@ lynx_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lgal
-	TARGET=lynx TYPE=z80 $(LIBLINKER) -DFORlynx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
+	$(MAKE) -C games TARGET=lynx
+	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
 sms_clib.lib:
@@ -1355,8 +1331,7 @@ trs80_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games ltrs80
+	$(MAKE) -C games TARGET=trs80
 	$(MAKE) -C psg
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
@@ -1412,8 +1387,7 @@ vg5k_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) gamesdeps
-	$(MAKE) -C games lvg5k
+	$(MAKE) -C games TARGET=vg5k
 	TARGET=vg5k TYPE=z80 $(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
 
 # S-OS (The Sentinel) - Stefano

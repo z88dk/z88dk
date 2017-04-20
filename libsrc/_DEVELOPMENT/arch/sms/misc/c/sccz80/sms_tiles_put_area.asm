@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC _sms_tiles_put_area
+PUBLIC sms_tiles_put_area
 
 EXTERN asm_sms_tiles_put_area
 
-_sms_tiles_put_area:
+sms_tiles_put_area:
 
    pop af
    pop de

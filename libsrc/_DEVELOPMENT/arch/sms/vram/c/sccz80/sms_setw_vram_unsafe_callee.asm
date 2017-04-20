@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_crt_common
 
-PUBLIC _sms_setw_vram_unsafe_callee
+PUBLIC sms_setw_vram_unsafe_callee
 
 EXTERN asm_sms_setw_vram_unsafe
 
-_sms_setw_vram_unsafe_callee:
+sms_setw_vram_unsafe_callee:
 
    pop af
    pop bc

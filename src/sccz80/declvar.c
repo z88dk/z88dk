@@ -465,8 +465,8 @@ void declglb(
             /* are adding structure member, mtag->size is offset */
             myptr = addmemb(sname, ident, type, mtag->size, storage, more, itag);
             myptr--; /* addmemb returns myptr+1 */
-            myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->size = size;
+            myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->isassigned = YES;  // Pretend that it is
 
             /* store (correctly scaled) size of member in tag table entry */
@@ -580,7 +580,7 @@ void declloc(
             type = (var->zfar ? CPTR : CINT);
             dsize = size = (var->zfar ? 3 : 2);
         } else {
-            size = get_type_size(type, otag);
+            size = get_type_size(type, VARIABLE, 0, otag);
         }
         /* Check to see if far has been defined when we haven't got a pointer */
         if (var->zfar && !(ident == POINTER || (ident == ARRAY && more))) {
@@ -613,7 +613,8 @@ void declloc(
                 cptr->isconst = var->isconst;
             }
             if (rcmatch('=')) {
-                initials(sname2, type, ident, dsize, more, otag, var->zfar, var->isconst);
+                int size_st = initials(sname2, type, ident, dsize, more, otag, var->zfar, var->isconst);
+                cptr->size = size_st;
                 cptr->isassigned = YES;
                 ns();
                 cptr->storage = LSTKEXT;
@@ -964,25 +965,31 @@ static void swallow_bitfield(void)
     }
 }
 
-int get_type_size(int type, TAG_SYMBOL* otag)
+int get_type_size(int type, enum ident_type ident, enum symbol_flags flags, TAG_SYMBOL* otag)
 {
     int size;
-
-    switch (type) {
-    case CCHAR:
-        size = 1;
-        break;
-    case LONG:
-        size = 4;
-        break;
-    case DOUBLE:
-        size = 6;
-        break;
-    case STRUCT:
-        size = otag->size;
-        break;
-    default:
-        size = 2;
+    if ( ident == VARIABLE ) {
+        switch (type) {
+        case CCHAR:
+            size = 1;
+            break;
+        case CPTR:
+            size = 3;
+            break;
+        case LONG:
+            size = 4;
+            break;
+        case DOUBLE:
+            size = 6;
+            break;
+        case STRUCT:
+            size = otag->size;
+            break;
+        default:
+            size = 2;
+        }
+        return size;
+    } else {
+        return flags & FARPTR ? 3 : 2;
     }
-    return size;
 }
