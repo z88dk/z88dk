@@ -1,11 +1,5 @@
 #include "main.h"
 
-// Header information.
-
-const unsigned char ckd_name[] = "Candy Kid Demo";
-const unsigned char ckd_author[] = "StevePro Studios";
-const unsigned char ckd_description[] = "Simple Sega Master System demo to run on real hardware!";
-
 // Global variables.
 bool global_pause;
 unsigned char hacker_debug, hacker_splash;
@@ -183,3 +177,12 @@ void custom_screen_manager_update(unsigned char *screen_type, const unsigned int
 		engine_font_manager_draw_data(prev_joypad1, 31, 13);
 	}
 }
+
+// Z88DK SPECIFIES HEADER INFO VIA PRAGMAS
+
+extern const unsigned char ckd_author[] = "StevePro Studios";
+extern const unsigned char ckd_name[] = "Candy Kid Demo";
+extern const unsigned char ckd_description[] = "Simple Sega Master System demo to run on real hardware!";
+
+// SMS_EMBED_SEGA_ROM_HEADER(9999, 0);
+// SMS_EMBED_SDSC_HEADER(1, 0, 2017, 3, 17, "StevePro Studios", "Candy Kid Demo", "Simple Sega Master System demo to run on real hardware!");
