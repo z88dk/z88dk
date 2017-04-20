@@ -176,7 +176,7 @@ void main(void)
          buffer = buffer_space;
       }
    
-      // pause for five seconds (press a button to skip)
+      // pause for fifteen seconds (press a button to skip)
       
       in_wait_nokey();
       in_pause(15000);
