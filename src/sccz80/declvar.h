@@ -9,4 +9,4 @@ extern char *ExpandArgValue(uint32_t, char *buffer, char tagidx);
 extern void ptrerror(int ident);
 extern TAG_SYMBOL *GetVarID(struct varid *var,enum storage_type storage);
 extern char *ExpandType(int type, char **sign, char tagidx);
-extern int get_type_size(int type, TAG_SYMBOL *otag);
+extern int get_type_size(int type, enum ident_type ident, enum symbol_flags flags, TAG_SYMBOL *otag);

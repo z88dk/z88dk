@@ -56,7 +56,7 @@ struct warnings mywarn[] = {
     /*
  * Blatantly daft expression things
  */
-    { "Illegal sizeof operation (on function)", 0 },  /* 25 */
+    { "", 1 },  /* 25 */
     { "Expected argument", 0 },
     { "Int constant in double expression", 0 },  /* UNUSED */
     { "Getting value from void function", 1 },
@@ -183,7 +183,8 @@ struct errors {
 
     { "Attempt to modify const lvalue \'%s\''", 1},
     { "Cannot statically initialise doubles when -doublestr is used", 1},
-    { "Cannot dereference the port definition: \'%s\'", 1}
+    { "Cannot dereference the port definition: \'%s\'", 1},
+    { "sizeof expects a pointer but got %s",1}
 };
 
 /*
