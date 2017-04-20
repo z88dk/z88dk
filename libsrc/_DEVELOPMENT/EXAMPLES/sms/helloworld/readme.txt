@@ -11,7 +11,7 @@ Compile with sccz80:
 
 zcc +sms -vn -startup=1 -clib=new -O3 hello.c -o hello -pragma-include:zpragma.inc -create-app
 
-Z88DK can compile a program using a selection of CRTs provided by the library.  The particular one a compile uses is specified by the "-startup" parameter.  Here is a list of what is available for the sms target:
+Z88DK can compile a program using a selection of CRTs provided by the library.  The particular one a compile uses is specified by the "-startup" parameter.  Here is a list of what is available for the sms target at the time of writing:
 
 -startup=0 (the default)
 Plain CRT with a standard set of pragmas that customize the page zero code.
@@ -23,7 +23,7 @@ A CRT with one text terminal instantiated on stdout and stderr.  The text termin
 As startup=1 but the text terminal also understands a number of control codes that can be embedded in the ascii stream.
 
 -startup=16
-A plain devkitSMS CRT.  This is similar to startup=0 except a few restart locations are occupied by devkitSMS restart code.
+A plain devkitSMS CRT.  This is similar to startup=0 except a few restart locations are occupied by devkitSMS restart code and the devkitSMS interrupt routines are installed by default.
 
 -startup=17
 A devkitSMS CRT combined with the terminal from startup=1 (16+1=17).
@@ -39,7 +39,7 @@ This file contains pragmas that show how to set optional SMS and SDSC header inf
 
 #pragma printf = "c s d u lx lld"
 
-This pragma allows us to tell the library what printf converters should be included.  Without specifying this, the compiler will link a rather large set of converters that excludes floating point.  Being able to specify which are needed can reduce program size.
+This pragma tells the library what printf converters should be enabled.  Without specifying this, the compiler will link a rather large set of converters that excludes floating point.  Being able to specify which are actually needed can reduce program size.
 
 #pragma output CRT_OTERM_CHAR_PATTERN_OFFSET = -32
 #pragma output CRT_OTERM_BACKGROUND_CHAR     = 0
@@ -53,7 +53,7 @@ The latter four dimension the output terminal's initial position and size.
 
 CRT_OTERM_BACKGROUND_CHAR records the terminal's erase character.  This character is absolute and ranges from 0-511.
 
-CRT_OTERM_CHAR_PATTERN_OFFSET gives the character offset the terminal should add to ascii characters before printing them.  In this program the font is loaded to vram at character position 0.  The font starts with a space, ascii 32, so by setting this pragma to -32, a space will be printed using tile 32-32 = 0.  Likewise an 'A' will be printed using tile 'A'-32.  All the terminal properties can be changed at runtime but this on in particular is useful since it allows changing of fonts.
+CRT_OTERM_CHAR_PATTERN_OFFSET gives the character offset the terminal should add to ascii characters before printing them.  In this program the font is loaded to vram at character position 0.  The font starts with a space, ascii 32, so by setting this pragma to -32, a space will be printed using tile 32-32 = 0.  Likewise an 'A' will be printed using tile 'A'-32.  All the terminal properties can be changed at runtime but this one in particular is useful since it allows changing of fonts.
 
 The source code itself should be self-explanatory given the function names are verbose.  Keep in mind areas on screen are defined by a rectangle structure that defines x,width,y,height.
 
