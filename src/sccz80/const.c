@@ -444,7 +444,6 @@ void size_of(LVALUE* lval)
             char       got[256];
 
             ExpandArgValue(argvalue, got, 0);
-            printf("What\n");
             error(E_SIZEOF,got);
             lval->const_val = 2;
             return;
@@ -495,7 +494,6 @@ void size_of(LVALUE* lval)
                                 if  (ptr->type == STRUCT) {
                                     ptrotag = tagtab + ptr->tag_idx;
                                 }
-                                // TODO: Nested structs
                             } else {
                                 // tag_sym->size = numner of elements
                                 lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
@@ -519,10 +517,11 @@ void size_of(LVALUE* lval)
                     if ( deref ) {
                         if ( deref == 1 ) {
                             ptrtype = ptr->type;
+                            ptrotag = tagtab + ptr->tag_idx;
                         } else {
-                            ptrtype = ptr->more;
+                            ptrtype = dummy_sym[(int)ptr->more]->type;
+                            ptrotag = tagtab + dummy_sym[(int)ptr->more]->tag_idx;
                         }
-                        ptrotag = tagtab + ptr->tag_idx;
                         ptrflags = ptr->flags;
                     }
                 }

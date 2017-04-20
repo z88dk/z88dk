@@ -194,10 +194,8 @@ void test_sizeof_array_struct()
     assertEqual(56, sizeof(vals[0]));
     //assertEqual(1, sizeof(vals[0].c)); // Doesn't parse'
     assertEqual(20, sizeof(pvals));
-    //printf("%d %d\n",sizeof(*pvals),sizeof(**pvals));
-    assertEqual(2, sizeof(*pvals)); // Matches sdcc behaviour
-    assertEqual(2, sizeof(**pvals));  // Reports 2 should be 56
-
+    assertEqual(2, sizeof(*pvals)); 
+    assertEqual(56, sizeof(**pvals)); 
 }
 
 
