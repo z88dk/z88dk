@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.265 2016/11/25 14:45:01 stefano Exp $
+# $Id: Makefile,v 1.265+ ...now on GIT $
 
 
 include Make.config
@@ -392,7 +392,7 @@ p2000_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lp2000
-	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
+	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
 # PC6001 lib - Stefano
 pc6001_clib.lib:
@@ -408,7 +408,7 @@ pc6001_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C psg
-	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
+	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
@@ -956,7 +956,7 @@ mtx_clib.lib:
 	$(MAKE) -C games lmsx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=mtx TYPE=z80 $(LIBLINKER) -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
+	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
 enterprise_clib.lib:
@@ -967,14 +967,14 @@ enterprise_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=enterprise
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
+	$(MAKE) -C stdio
+	$(MAKE) -C compress/zx7
 	$(MAKE) -C setjmp
-	$(MAKE) -C time 
+	$(MAKE) -C time
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lenterprise
-	$(MAKE) -C enterprise 
+	$(MAKE) -C enterprise
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
@@ -1004,7 +1004,7 @@ einstein.lib:
 	$(MAKE) -C games lmsx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
+	$(LIBLINKER) -DFOReinstein -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -1021,7 +1021,7 @@ m5_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
+	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
 mc1000_clib.lib:
@@ -1039,7 +1039,7 @@ mc1000_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lmc1000
 	$(MAKE) -C psg
-	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
+	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
 
 # NASCOM library - Stefano
 nascom_clib.lib:
@@ -1275,7 +1275,7 @@ gal_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lgal
-	TARGET=gal TYPE=z80 $(LIBLINKER) -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
+	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 
 # Camputers Lynx - Stefano Bodrato
 lynx_clib.lib:
@@ -1292,7 +1292,7 @@ lynx_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lgal
-	TARGET=lynx TYPE=z80 $(LIBLINKER) -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
+	TARGET=lynx TYPE=z80 $(LIBLINKER) -DFORlynx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
 sms_clib.lib:
@@ -1380,7 +1380,7 @@ x07_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=x07 TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
+	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
 x1ansi_clib.lib:
@@ -1429,7 +1429,7 @@ sos_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C sos 
-	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
+	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:
@@ -1446,7 +1446,7 @@ osca_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C fcntl/osca
-	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
+	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 
 # Preempt multitasking library - dom
 preempt.lib:

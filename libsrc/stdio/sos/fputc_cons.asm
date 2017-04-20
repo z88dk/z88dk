@@ -26,4 +26,12 @@
 	jr	nz,nobs
 	ld	a,$1d
 .nobs
+
+IF STANDARDESCAPECHARS
+	cp	10
+	jr	nz,nocr
+	ld	a,13
+.nocr
+ENDIF
+
 	jp	1FF4h 

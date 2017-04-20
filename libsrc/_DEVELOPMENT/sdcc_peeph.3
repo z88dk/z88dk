@@ -14565,22 +14565,6 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	set	%1,%2
-	ld	(hl),%2
-} by {
-	set	%1,(hl)
-	; peephole z88dk-396d
-} if notUsed(%2)
-
-replace restart {
-	res	%1,%2
-	ld	(hl),%2
-} by {
-	res	%1,(hl)
-	; peephole z88dk-396e
-} if notUsed(%2)
-
-replace restart {
 	ld	l, c
 	ld	h, b
 	push	bc
@@ -22467,6 +22451,532 @@ replace restart {
 	; peephole z88dk-484c2
 }
 // notVolatile
+
+replace restart {
+	ld	a,#<(%1)
+	ld	hl,#%2
+	add	a,(hl)
+	ld	c,a
+	ld	a,#>(%1)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%2)
+	ld	h,%3
+	ld	bc,#%1
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	ld	hl,#%2
+	; peephole z88dk-485a1
+} if operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,#<(%1 + %7)
+	ld	hl,#%2
+	add	a,(hl)
+	ld	c,a
+	ld	a,#>(%1 + %7)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%2)
+	ld	h,%3
+	ld	bc,#%1+%7
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	ld	hl,#%2
+	; peephole z88dk-485a2
+} if operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,#<(%1)
+	ld	hl,#%2 + %8
+	add	a,(hl)
+	ld	c,a
+	ld	a,#>(%1)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%2+%8)
+	ld	h,%3
+	ld	bc,#%1
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	ld	hl,#%2+%8
+	; peephole z88dk-485a3
+} if operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,#<(%1 + %7)
+	ld	hl,#%2 + %8
+	add	a,(hl)
+	ld	c,a
+	ld	a,#>(%1 + %7)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%2+%8)
+	ld	h,%3
+	ld	bc,#%1+%7
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	ld	hl,#%2+%8
+	; peephole z88dk-485a4
+} if operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,(#%1)
+	add	a,#<(%2)
+	ld	c,a
+	ld	a,#>(%2)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%1)
+	ld	h,%3
+	ld	bc,#%2
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485b1
+} if notUsed('hl'), operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,(#%1)
+	add	a,#<(%2 + %7)
+	ld	c,a
+	ld	a,#>(%2 + %7)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%1)
+	ld	h,%3
+	ld	bc,#%2+%7
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485b2
+} if notUsed('hl'), operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,(#%1 + %8)
+	add	a,#<(%2)
+	ld	c,a
+	ld	a,#>(%2)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%1+%8)
+	ld	h,%3
+	ld	bc,#%2
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485b3
+} if notUsed('hl'), operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	a,(#%1 + %8)
+	add	a,#<(%2 + %7)
+	ld	c,a
+	ld	a,#>(%2 + %7)
+	adc	a,%3
+	ld	b,a
+} by {
+	ld	hl,(#%1+%8)
+	ld	h,%3
+	ld	bc,#%2+%7
+	add	hl,bc
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485b4
+} if notUsed('hl'), operandsNotRelated(%3 'a'), operandsNotRelated(%3 'c'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	%1	%2,%3
+} by {
+	%1	%2,%3
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485c1
+} if same(%1 'set' 'res' 'bit'), operandsNotRelated(%3 'bc')
+
+replace restart {
+	ld	hl,#%5
+	%1	%2,%3
+} by {
+	%1	%2,%3
+	ld	hl,#%5
+	; peephole z88dk-485c2
+} if same(%1 'set' 'res' 'bit'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	hl,#%5
+	ld	(bc),a
+} by {
+	ld	(bc),a
+	ld	hl,#%5
+	; peephole z88dk-485c3
+}
+
+replace restart {
+	ex	de,hl
+	%1	%2,%3
+} by {
+	%1	%2,%3
+	ex	de,hl
+	; peephole z88dk-485c4
+} if same(%1 'set' 'res' 'bit'), operandsNotRelated(%3 'de'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	bc,#%1
+	ld	a,%2
+	ld	(bc),a
+} by {
+	ld	hl,#%1
+	ld	a,%2
+	ld	(hl),a
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485d1
+} if notUsed('hl'), operandsNotRelated(%2 'bc'), operandsNotRelated(%2 'hl')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	%1,%2
+} by {
+	ld	%1,%2
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485d2
+} if operandsNotRelated(%1 'bc'), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'bc')
+
+replace restart {
+	ld	%1,a
+	inc	%1
+	inc	%1
+} by {
+	add	a,#0x02
+	ld	%1,a
+	; peephole z88dk-485e1
+} if notUsed('a')
+
+replace restart {
+	add	a,#%2
+	ld	%1,a
+	inc	%1
+} by {
+	add	a,#%2+1
+	ld	%1,a
+	; peephole z88dk-485e2
+} if notUsed('a')
+
+replace restart {
+	ld	%1,a
+	dec	%1
+	dec	%1
+} by {
+	add	a,#-0x02
+	ld	%1,a
+	; peephole z88dk-485e3
+} if notUsed('a')
+
+replace restart {
+	add	a,#%2
+	ld	%1,a
+	dec	%1
+} by {
+	add	a,#%2-1
+	ld	%1,a
+	; peephole z88dk-485e4
+} if notUsed('a')
+
+replace restart {
+	add	a,#%1
+	add	a,#%2
+} by {
+	add	a,#%1+%2
+	; peephole z88dk-485e5
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	h,(hl)
+} by {
+	ld	hl,(#%1-1)
+	; peephole z88dk-485e6
+} if notUsed('l')
+
+replace restart {
+	inc	a
+	inc	a
+} by {
+	add	a,#0x02
+	; peephole z88dk-485e7
+}
+
+replace restart {
+	add	a,#%1
+	inc	a
+} by {
+	add	a,#%1+1
+	; peephole z88dk-485e8
+}
+
+replace restart {
+	dec	a
+	dec	a
+} by {
+	add	a,#-0x02
+	; peephole z88dk-485e9
+}
+
+replace restart {
+	add	a,#%1
+	dec	a
+} by {
+	add	a,#%1-1
+	; peephole z88dk-485e10
+}
+
+replace restart {
+	ld	%1,%2 (%3)
+	ld	%4,%5
+	sla	%1
+	rl	%4
+} by {
+	ld	l,%2 (%3)
+	ld	h,%5
+	add	hl,hl
+	ld	%1,l
+	ld	%4,h
+	; peephole z88dk-485e11
+} if notUsed('hl'), operandsNotRelated(%1 'hl'), operandsNotRelated(%4 'hl'), notSame(%5 'l')
+
+replace restart {
+	ld	a,e
+	ld	hl,#%1
+	add	a,(hl)
+	ld	c,a
+	ld	a,d
+	adc	a,%2
+	ld	b,a
+} by {
+	ld	hl,(#%1)
+	ld	h,%2
+	add	hl,de
+	ld	a,h
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485e12
+} if notUsed('hl'), notSame(%2 'a' 'c'), operandsNotRelated(%2 'hl')
+
+replace restart {
+	ld	a,e
+	ld	hl,#%1
+	add	a,(hl)
+	ld	e,a
+	ld	a,d
+	adc	a,%2
+	ld	d,a
+} by {
+	ld	hl,(#%1)
+	ld	h,%2
+	add	hl,de
+	ld	a,h
+	ld	e,l
+	ld	d,h
+	; peephole z88dk-485e13
+} if notUsed('hl'), notSame(%2 'a' 'e'), operandsNotRelated(%2 'hl')
+
+replace restart {
+	ld	a,c
+	ld	hl,#%1
+	add	a,(hl)
+	ld	e,a
+	ld	a,b
+	adc	a,%2
+	ld	d,a
+} by {
+	ld	hl,(#%1)
+	ld	h,%2
+	add	hl,bc
+	ld	a,h
+	ld	e,l
+	ld	d,h
+	; peephole z88dk-485e14
+} if notUsed('hl'), notSame(%2 'a' 'e'), operandsNotRelated(%2 'hl')
+
+replace restart {
+	ld	a,(#%1)
+	ld	c,a
+	ld	b,%2
+	ld	hl,#%3
+	add	hl,bc
+} by {
+	ld	hl,(#%1)
+	ld	h,%2
+	ld	bc,#%3
+	add	hl,bc
+	; peephole z88dk-486a
+} if notSame(%2 'a'), notSame(%2 'c'), operandsNotRelated(%2 'hl'), notUsed('bc'), notUsed('a')
+
+replace restart {
+	%5	%1,(hl)
+	%2	%3,(hl)
+} by {
+	ld	a,(hl)
+	%5	%1,a
+	ld	(hl),a
+	%2	%3,(hl)
+	; peephole z88dk-486b1
+} if same(%2 'set' 'res' 'bit'), same(%5 'set' 'res' 'bit'), notUsed('a')
+
+replace restart {
+	ld	(hl),a
+	%5	%2,(hl)
+} by {
+	%5	%2,a
+	ld	(hl),a
+	; peephole z88dk-486b2
+} if same(%5 'set' 'res'), notUsed('a')
+
+replace restart {
+	ld	(hl),%3
+	bit	%2,(hl)
+} by {
+	bit	%2,%3
+	ld	(hl),%3
+	; peephole z88dk-486b3
+} if same(%3 'a' 'b' 'c' 'd' 'e' 'h' 'l')
+// if notVolatile
+
+replace restart {
+	res	0,a
+} by {
+	and	a,#0xfe
+	; peephole z88dk-487a0
+}
+
+replace restart {
+	res	1,a
+} by {
+	and	a,#0xfd
+	; peephole z88dk-487a1
+}
+
+replace restart {
+	res	2,a
+} by {
+	and	a,#0xfb
+	; peephole z88dk-487a2
+}
+
+replace restart {
+	res	3,a
+} by {
+	and	a,#0xf7
+	; peephole z88dk-487a3
+}
+
+replace restart {
+	res	4,a
+} by {
+	and	a,#0xef
+	; peephole z88dk-487a4
+}
+
+replace restart {
+	res	5,a
+} by {
+	and	a,#0xdf
+	; peephole z88dk-487a5
+}
+
+replace restart {
+	res	6,a
+} by {
+	and	a,#0xbf
+	; peephole z88dk-487a6
+}
+
+replace restart {
+	res	7,a
+} by {
+	and	a,#0x7f
+	; peephole z88dk-487a7
+}
+
+replace restart {
+	set	0,a
+} by {
+	or	a,#0x01
+	; peephole z88dk-487b0
+}
+
+replace restart {
+	set	1,a
+} by {
+	or	a,#0x02
+	; peephole z88dk-487b1
+}
+
+replace restart {
+	set	2,a
+} by {
+	or	a,#0x04
+	; peephole z88dk-487b2
+}
+
+replace restart {
+	set	3,a
+} by {
+	or	a,#0x08
+	; peephole z88dk-487b3
+}
+
+replace restart {
+	set	4,a
+} by {
+	or	a,#0x10
+	; peephole z88dk-487b4
+}
+
+replace restart {
+	set	5,a
+} by {
+	or	a,#0x20
+	; peephole z88dk-487b5
+}
+
+replace restart {
+	set	6,a
+} by {
+	or	a,#0x40
+	; peephole z88dk-487b6
+}
+
+replace restart {
+	set	7,a
+} by {
+	or	a,#0x80
+	; peephole z88dk-487b7
+}
 
 
 

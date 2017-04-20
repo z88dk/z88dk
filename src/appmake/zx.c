@@ -53,6 +53,7 @@ static char             *blockname    = NULL;
 static char             *merge        = NULL;
 static int               origin       = -1;
 static int               patchpos     = -1;
+static int               clear_address = -1;
 static char             *patchdata    = NULL;
 static char             *screen       = NULL;
 static char              help         = 0;
@@ -95,6 +96,7 @@ option_t zx_options[] = {
     {  0 , "merge",    "Merge a custom loader from external TAP file",  OPT_STR,   &merge },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
+    {  0,  "clearaddr", "Address to CLEAR at",       OPT_INT,   &clear_address},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -487,7 +489,10 @@ int zx_exec(char *target)
                         writeword_p(26+32,fpout,&parity);         /* BASIC line length */
                     writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
                     writebyte_p(0xb0,fpout,&parity);       /* VAL */
-                    sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
+                    if ( clear_address == -1 ) {
+                        clear_address = pos - 1;
+                    }
+                    sprintf(mybuf,"\"%i\":",clear_address);        /* location for CLEAR */
                     writestring_p(mybuf,fpout,&parity);
                     if (turbo) {
                         /* 36 bytes, which means 32 extra bytes */

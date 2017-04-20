@@ -1714,8 +1714,8 @@ void GlobalDefc(arg_t *argument, char *arg)
         if (*ptr == 'f')
         {
             // filename containing regular expressions
-            if (*++ptr == '=') ++ptr;
-            while (isspace(*ptr)) ++ptr;
+            ++ptr;
+            while (isspace(*ptr) || ispunct(*ptr)) ++ptr;
 
             if (*ptr != 0)
                 *(char **)argument->data = muststrdup(ptr);

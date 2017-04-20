@@ -47,8 +47,7 @@ char *c_code_section = "code_compiler";
 #define OPT_INT          4
 #define OPT_STRING       8
 #define OPT_ASSIGN       16
-#define OPT_MORE         32
-#define OPT_FUNCTION     64
+#define OPT_FUNCTION     32
 #define OPT_HEADER       128
 
 
@@ -126,15 +125,15 @@ static option  sccz80_opts[] = {
     { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, 0 },
     { 0, "Wnone", OPT_FUNCTION|OPT_BOOL, "Disable all warnings", SetNoWarn, 0 },
     { 0, "Wall", OPT_FUNCTION|OPT_BOOL, "Enable all warnings", SetAllWarn, 0 },
-    { 0, "Wn", OPT_FUNCTION|OPT_MORE, "<num> Disable a warning", UnSetWarning, 0},
-    { 0, "W", OPT_FUNCTION|OPT_MORE, "<num> Enable a warning",  SetWarning, 0 },
+    { 0, "Wn", OPT_FUNCTION, "<num> Disable a warning", UnSetWarning, 0},
+    { 0, "W", OPT_FUNCTION, "<num> Enable a warning",  SetWarning, 0 },
     
     { 0, "", OPT_HEADER, "Debugging options", NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, 0 },
     { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, 0 },
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, 0 },
-    { 0, "D", OPT_FUNCTION|OPT_MORE, "Define a preprocessor directive", SetDefine, 0 },
-    { 0, "U", OPT_FUNCTION|OPT_MORE, "Undefine a preprocessor directive" , SetUndefine, 0 },
+    { 0, "D", OPT_FUNCTION, "Define a preprocessor directive", SetDefine, 0 },
+    { 0, "U", OPT_FUNCTION, "Undefine a preprocessor directive" , SetUndefine, 0 },
     { 0, "", OPT_HEADER, "All options can be prefixed with either a single or double -", NULL, 0},
     { 0, "", OPT_HEADER, "Assignments can either be = or as next argument", NULL, 0},
     { 0 }
@@ -882,10 +881,12 @@ int parse_arguments(option *args, int argc, char **argv)
                     char  *val = NULL;
                     if ( argstart[strlen(myarg->long_name)] == '=' ) {
                         val = argstart + strlen(myarg->long_name) + 1;
-                    } else if ( myarg->type & OPT_MORE ) {
-                        val = argstart + strlen(myarg->long_name);
                     } else {
-                        if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN)) == 0 ) {
+                        if ( strlen(argstart) > strlen(myarg->long_name) )  {
+                             /* Try and take the value after the option (without the = sign) */
+                             val = argstart + strlen(myarg->long_name);
+                        } else if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN)) == 0 ) {
+                            /* Otherwise it's the next argument */
                             if ( ++i < argc ) {
                                 val = argv[i];
                             } else {

@@ -20,12 +20,12 @@
 IF STANDARDESCAPECHARS
 	cp	10
 ELSE
-	cp	13		; CRLP
+	cp	13		; CRLF
 ENDIF
 	jr	nz,nocr
-	ld	a,10
-	call setout
 	ld	a,13
+	call setout
+	ld	a,10
 	jp setout
 ;	jr	z,$ca79
 .nocr
