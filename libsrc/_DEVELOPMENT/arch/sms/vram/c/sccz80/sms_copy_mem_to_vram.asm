@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_crt_common
 
-PUBLIC _sms_copy_mem_to_vram
+PUBLIC sms_copy_mem_to_vram
 
 EXTERN asm_sms_copy_mem_to_vram
 
-_sms_copy_mem_to_vram:
+sms_copy_mem_to_vram:
 
    pop af
    pop bc
