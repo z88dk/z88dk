@@ -12,7 +12,7 @@ Compile with sccz80:
 
 zcc +sms -vn -startup=1 -clib=new -O3 speech.c quotes.c font_8x8_bubble.asm -o speech -pragma-include:zpragma.inc -create-app
 
-ZCC can make a binary out of any number of .c, .asm, .s, .o, .m4 files on the compile line.  If listing all source files is tedious, they can be listed in a .lst file from which ZCC can read them.  In this example, two .c files and a single .asm file make up the program.
+ZCC can make a binary out of any number of .c, .asm, .s, .o, .m4 files on the compile line.  If listing all source files is tedious, they can be listed in a separate .lst file from which ZCC can read them.  In this example, two .c files and a single .asm file make up the program.
 
 speech.c
 The main program.

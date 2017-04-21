@@ -78,14 +78,16 @@ int main(void)
       exit(1);
    }
 
+   sms_memset_vram(0x3000, 0xff, RAWBIN_SIZE);
+
 intrinsic_label(APLIB_TIMER_START);
 
-	sms_aplib_depack_vram(0x1000, rawbin_ap);
+	sms_aplib_depack_vram(0x3000, rawbin_ap);
 
 intrinsic_label(APLIB_TIMER_STOP);
 
    memset(buffer, 0xff, sizeof(buffer));
-   sms_memcpy_vram_to_mem(buffer, 0x1000, RAWBIN_SIZE);
+   sms_memcpy_vram_to_mem(buffer, 0x3000, RAWBIN_SIZE);
    if (verify() == FALSE)
    {
       perror("aplib_depack");
@@ -104,14 +106,16 @@ intrinsic_label(APLIB_TIMER_STOP);
       exit(1);
    }
 
+   sms_memset_vram(0x3000, 0xff, RAWBIN_SIZE);
+
 intrinsic_label(ZX7_TIMER_START);
 
-   sms_dzx7_standard_vram(rawbin_zx7, 0x1000);
+   sms_dzx7_standard_vram(rawbin_zx7, 0x3000);
 
 intrinsic_label(ZX7_TIMER_STOP);
 
    memset(buffer, 0xff, sizeof(buffer));
-   sms_memcpy_vram_to_mem(buffer, 0x1000, RAWBIN_SIZE);
+   sms_memcpy_vram_to_mem(buffer, 0x3000, RAWBIN_SIZE);
    if (verify() == FALSE)
    {
       perror("dzx7_standard_vram");
