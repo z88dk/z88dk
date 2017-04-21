@@ -5,7 +5,7 @@ SECTION code_SMSlib
 
 PUBLIC UNSAFE_SMS_VRAMmemcpy64_callee
 
-EXTERN asm_SMSlib_VRAMmemcpy64
+EXTERN asm_SMSlib_UNSAFE_VRAMmemcpy64
 
 UNSAFE_SMS_VRAMmemcpy64_callee:
 
@@ -13,4 +13,4 @@ UNSAFE_SMS_VRAMmemcpy64_callee:
 	pop de
 	ex (sp),hl
 
-   jp asm_SMSlib_VRAMmemcpy64
+   jp asm_SMSlib_UNSAFE_VRAMmemcpy64
