@@ -3,7 +3,7 @@ http://www.smspower.org/Homebrew/SpaceHawks-SMS
 https://bitbucket.org/SpritesMind/spacehawks_sms/downloads/?tab=branches
 
 sccz80 compile:
-// unable to compile due to multidimensional array
+// unable to compile due to unusual pointer to array declaration #180
 // zcc +sms -v -startup=16 -clib=new -O3 @zproject-sms.lst -o spacehawks -create-app -pragma-include:zpragma.inc
 
 zsdcc compile:
