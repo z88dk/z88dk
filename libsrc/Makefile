@@ -1302,7 +1302,7 @@ sc3000_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
+	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
 test_clib.lib:
