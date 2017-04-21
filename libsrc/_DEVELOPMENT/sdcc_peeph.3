@@ -22612,8 +22612,19 @@ replace restart {
 	%1	%2,%3
 	ld	c,l
 	ld	b,h
-	; peephole z88dk-485c1
-} if same(%1 'set' 'res' 'bit'), operandsNotRelated(%3 'bc')
+	; peephole z88dk-485c1a
+} if same(%1 'set' 'res'), operandsNotRelated(%3 'bc'), operandsNotRelated(%3 'hl')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	bit	%2,%3
+} by {
+	bit	%2,%3
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-485c1b
+} if operandsNotRelated(%3 'bc')
 
 replace restart {
 	ld	hl,#%5
