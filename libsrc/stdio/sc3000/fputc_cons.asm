@@ -3,7 +3,7 @@
 ;
 ;	Print character to the screen
 ;
-;	$Id: fputc_cons.asm,v 1.3 2016-05-15 20:15:46 dom Exp $
+;	$Id: fputc_cons.asm,v 1.3+  (GIT) $
 ;
 
 	  SECTION code_clib
@@ -24,11 +24,8 @@ ELSE
 	cp	13
 ENDIF
 	jr	nz,nocr
-	call	$2400
-IF STANDARDESCAPECHARS
 	ld	a,13
-ELSE
+	call	$2400
 	ld	a,10
-ENDIF
 .nocr
 	jp	$2400
