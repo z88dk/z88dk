@@ -1105,7 +1105,7 @@ nc_clib.lib:
 	$(MAKE) -C fcntl/nc100
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=nc TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
+	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
 
 # Amstrad CPC library - Stefano
 cpc_clib.lib:
