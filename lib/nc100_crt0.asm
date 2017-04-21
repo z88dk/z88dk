@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.17 2016-10-13 07:47:20 stefano Exp $
+;       $Id: nc100_crt0.asm,v 1.17+ (now on GIT) $
 ;
 
 
@@ -36,12 +36,14 @@
 
 IF (startup=2)
 
-		org     $8C00
+		defc    CRT_ORG_CODE  = $8C00
+		org     CRT_ORG_CODE
 		jp	start
 
 ELSE
 
-		org     $C000
+		defc    CRT_ORG_CODE  = $C000
+		org     CRT_ORG_CODE
 		jp	start
 
 IF DEFINED_USING_amalloc
@@ -69,7 +71,8 @@ ENDIF
 ENDIF
 
 
-start:				;Entry point at $c2220
+start:
+		;Entry point at $c2220
         ld      (start1+1),sp   ;Save entry stack
         ld      hl,-64		;Create the atexit stack
         add     hl,sp
@@ -100,8 +103,8 @@ start:				;Entry point at $c2220
 		call	sbrk_callee
 	ENDIF
 
-
         call    _main		;Call user code
+
 cleanup:
 	push	hl
 IF !DEFINED_nostreams
