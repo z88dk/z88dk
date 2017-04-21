@@ -686,7 +686,7 @@ void write_double_queue(void)
 
 void decrement_double_ref_direct(double value)
 {
-    LVALUE lval;
+    LVALUE lval={0};
 
     lval.const_val = value;
 

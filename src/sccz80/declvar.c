@@ -665,7 +665,7 @@ void declloc(
 
                         if ( vconst && expr != cptr->type ) {
                             // It's a constant that doesn't match the right type
-                            LVALUE  lval;
+                            LVALUE  lval={0};
                             clearstage(before, 0);
                             if ( expr == DOUBLE ) {
                                 decrement_double_ref_direct(val);

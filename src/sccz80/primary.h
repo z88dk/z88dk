@@ -22,7 +22,7 @@ extern void test(int label, int parens);
 extern int constexpr(double *val, int *valtype, int flag);
 extern void cscale(int type, TAG_SYMBOL *tag, int *val);
 extern void addconst(int val, int opr, char zfar);
-extern int docast(LVALUE *lval,char df);
+extern int  docast(LVALUE *lval,LVALUE *dest_lval);
 extern void convert_int_to_double(char type, char zunsign);
 extern int   utype(LVALUE *lval);
 extern int DoTestJump(LVALUE *lval);
