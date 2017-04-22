@@ -1285,7 +1285,7 @@ sms_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
+	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
 sc3000_clib.lib:
