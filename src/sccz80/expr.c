@@ -672,7 +672,7 @@ int heirb(LVALUE* lval)
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                        zadd_const(lval, 1);
+                        zadd_const(lval, val);
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
