@@ -40,6 +40,7 @@ char *c_rodata_section = "rodata_compiler";
 char *c_data_section = "data_compiler";
 char *c_bss_section = "bss_compiler";
 char *c_code_section = "code_compiler";
+char *c_init_section = "code_crt_init";
 
 
 #define OPT_BOOL         1
@@ -109,6 +110,7 @@ static option  sccz80_opts[] = {
     { 0, "codeseg", OPT_STRING, "=<name> Set the code section name", &c_code_section, 0 },
     { 0, "bssseg", OPT_STRING, "=<name> Set the bss section name", &c_bss_section, 0 },
     { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, 0 },
+    { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, 0 },
 #ifdef USEFRAME
     { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},

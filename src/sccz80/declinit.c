@@ -401,7 +401,7 @@ static void output_double_string_load(double value)
     postlabel(dumplocation);
     defstorage(); outdec(6); nl();
     
-    output_section("code_crt_init");
+    output_section(c_init_section);
     lval.const_val = value;
     load_double_into_fa(&lval);
     immedlit(dumplocation); outdec(0); nl();

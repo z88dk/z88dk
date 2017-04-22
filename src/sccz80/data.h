@@ -90,6 +90,7 @@ extern int buffer_fps_num;
 extern struct parser_stack *pstack;
 extern int c_use_r2l_calling_convention;
 extern int c_cpu;
+extern char *c_init_section;
 extern char *c_code_section;
 extern char *c_bss_section;
 extern char *c_data_section;
