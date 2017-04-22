@@ -390,11 +390,11 @@ Define rules for a ragel-based parser.
   #endfor  <R2>
 	
 		/* LD r,(hl) */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_IND_HL _TK_NEWLINE \
+		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE \
 			@{ DO_stmt( Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
 
 		/* LD (hl),r */
-		|	label? _TK_LD _TK_IND_HL _TK_COMMA _TK_<R1> _TK_NEWLINE \
+		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA _TK_<R1> _TK_NEWLINE \
 			@{ DO_stmt( Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
 
   #foreach <X> in IX, IY
@@ -462,7 +462,7 @@ Define rules for a ragel-based parser.
 #endfor  <X>
 
 		/* LD (hl),N */
-		|	label? _TK_LD _TK_IND_HL _TK_COMMA expr _TK_NEWLINE
+		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA expr _TK_NEWLINE
 			@{ DO_stmt_n( Z80_LD_r_n( REG_idx ) ); }
 
 #foreach <X> in IX, IY
@@ -497,7 +497,7 @@ Define rules for a ragel-based parser.
 			}
 
 		/* load I, R */
-#foreach <IR> in I, IIR, R, EIR
+#foreach <IR> in I, IIR, R, EIR, XPC
 		|	label? _TK_LD _TK_<IR> _TK_COMMA _TK_A _TK_NEWLINE \
 			@{ DO_stmt( Z80_LD_<IR>_A ); }
 		|	label? _TK_LD _TK_A _TK_COMMA _TK_<IR> _TK_NEWLINE \
@@ -547,11 +547,27 @@ Define rules for a ragel-based parser.
 			}
 #endfor  <DD>
 
-		/* ld sp,hl|ix|iy */
 #foreach <DD> in HL, IX, IY
+		/* ld sp,hl|ix|iy */
 		| label? _TK_LD _TK_SP _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{ DO_stmt( P_<DD> + Z80_LD_SP_idx ); }
+
+		/* ld (hl|ix|iy+d),hl */
+		|	label? _TK_LD _TK_IND_<DD> expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE \
+			@{ DO_stmt_d( Z80_LD_IND_<DD>_d_HL ); }
+
+		/* ld (sp+d), hl|ix|iy */
+		|	label? _TK_LD _TK_IND_SP expr _TK_RPAREN _TK_COMMA _TK_<DD> _TK_NEWLINE \
+			@{ DO_stmt_n( P_<DD> + Z80_LD_IND_SP_n_HL ); }
 #endfor  <DD>
+
+#foreach <D1> in BC, DE, HL
+  #foreach <D2> in BC, DE
+		/* ld dd', bc|de */
+		| label? _TK_LD _TK_<D1>1 _TK_COMMA _TK_<D2> _TK_NEWLINE
+		  @{ DO_stmt( Z80_LD_dd1_<D2>(REG_<D1>) ); }
+  #endfor <D2>
+#endfor <D1>
 
 		/*---------------------------------------------------------------------
 		*   PUSH / POP
@@ -574,11 +590,11 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( Z80_EX_AF_AF ); }
 #endfor  <DD>
 
-		| label? _TK_EX _TK_IND_SP _TK_COMMA _TK_HL _TK_NEWLINE
+		| label? _TK_EX _TK_IND_SP _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE
 		  @{ DO_stmt( Z80_EX_IND_SP_HL ); }
 
 #foreach <DD> in IX, IY
-		| label? _TK_EX _TK_IND_SP _TK_COMMA _TK_<DD> _TK_NEWLINE
+		| label? _TK_EX _TK_IND_SP _TK_RPAREN _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{ DO_stmt( P_<DD> + Z80_EX_IND_SP_idx ); }
 #endfor  <DD>
 
@@ -624,7 +640,7 @@ Define rules for a ragel-based parser.
 	#endfor  <X>
 	
 		/* (hl) */
-		| label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
+		| label? _TK_<OP> (_TK_A _TK_COMMA)? _TK_IND_HL _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
 
 		/* N */
@@ -638,7 +654,7 @@ Define rules for a ragel-based parser.
 #endfor  <R>
 
 		/* (hl) */
-		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
+		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_IND_HL _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt( Z80_TST( REG_idx ) ); }
 
 		/* N */
@@ -706,7 +722,7 @@ Define rules for a ragel-based parser.
 	#endfor  <X>
 	
 		/* (hl) */
-		| label? _TK_<OP> _TK_IND_HL _TK_NEWLINE
+		| label? _TK_<OP> _TK_IND_HL _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
 
   #foreach <DD> in BC, DE, HL, SP, IX, IY
@@ -741,7 +757,7 @@ Define rules for a ragel-based parser.
 	#endfor  <X>
 	
 		/* (hl) */
-		| label? _TK_<OP> _TK_IND_HL _TK_NEWLINE
+		| label? _TK_<OP> _TK_IND_HL _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
 #endfor  <OP>
 		
@@ -778,7 +794,7 @@ Define rules for a ragel-based parser.
 	
 		/* (hl) */
 		| label? _TK_<OP>  const_expr _TK_COMMA
-					_TK_IND_HL _TK_NEWLINE
+					_TK_IND_HL _TK_RPAREN _TK_NEWLINE
 		  @{ if (!expr_error)
 				DO_stmt( Z80_<OP>( expr_value, REG_idx ) ); 
 		  }
@@ -813,7 +829,7 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( Z80_RET_FLAG( FLAG_<FLAG> ) ); }
 #endfor  <FLAG>
 
-		| label? _TK_JP _TK_IND_HL _TK_NEWLINE
+		| label? _TK_JP _TK_IND_HL _TK_RPAREN _TK_NEWLINE
 		  @{ DO_stmt( Z80_JP_idx ); }
 		
 #foreach <X> in IX, IY

@@ -189,6 +189,7 @@ tokens:
   - name	: R
   - name	: IIR
   - name	: EIR
+  - name	: XPC
   - name	: IXH
   - name	: IYH
   - name	: IXL
@@ -203,14 +204,17 @@ tokens:
   - name	: AF
   - name	: SP
   
-  - name	: AF1
-    regexp	: "\"AF'\"i"
+  - name	: BC1
+    regexp	: "\"BC'\"i"
   
   - name	: DE1
     regexp	: "\"DE'\"i"
   
   - name	: HL1
     regexp	: "\"HL'\"i"
+  
+  - name	: AF1
+    regexp	: "\"AF'\"i"
   
   # Assembly directives
   - name	: BINARY

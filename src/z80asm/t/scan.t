@@ -627,9 +627,10 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IND_C, "(\t C \t)");
 	T_END();
 					 
-	SetTemporaryLine("bc de de' hl hl' af af' sp ix iy "
-					 "BC DE DE' HL HL' AF AF' SP IX IY ");
+	SetTemporaryLine("bc bc' de de' hl hl' af af' sp ix iy "
+					 "BC BC' DE DE' HL HL' AF AF' SP IX IY ");
 	T_GET(TK_BC,  "bc");  
+	T_GET(TK_BC1, "bc'");  
 	T_GET(TK_DE,  "de");  
 	T_GET(TK_DE1, "de'");  
 	T_GET(TK_HL,  "hl");  
@@ -641,6 +642,7 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IY,  "iy");  
 	
 	T_GET(TK_BC,  "BC");  
+	T_GET(TK_BC1, "BC'");  
 	T_GET(TK_DE,  "DE");  
 	T_GET(TK_DE1, "DE'");  
 	T_GET(TK_HL,  "HL");  
@@ -656,23 +658,23 @@ t_compile_module($init, <<'END', $objs);
 					 "(BC) (DE) (HL) (SP) (\t BC \t) (\t DE \t) (\t HL \t) (\t SP \t) ");
 	T_GET(TK_IND_BC, "(bc)"); 
 	T_GET(TK_IND_DE, "(de)"); 
-	T_GET(TK_IND_HL, "(hl)"); 
-	T_GET(TK_IND_SP, "(sp)"); 
+	T_GET(TK_IND_HL, "(hl"); T_RPAREN();
+	T_GET(TK_IND_SP, "(sp"); T_RPAREN();
 
 	T_GET(TK_IND_BC, "(\t bc \t)"); 
 	T_GET(TK_IND_DE, "(\t de \t)"); 
-	T_GET(TK_IND_HL, "(\t hl \t)"); 
-	T_GET(TK_IND_SP, "(\t sp \t)"); 
+	T_GET(TK_IND_HL, "(\t hl \t"); T_RPAREN();
+	T_GET(TK_IND_SP, "(\t sp \t"); T_RPAREN();
 	
 	T_GET(TK_IND_BC, "(BC)"); 
 	T_GET(TK_IND_DE, "(DE)"); 
-	T_GET(TK_IND_HL, "(HL)"); 
-	T_GET(TK_IND_SP, "(SP)"); 
+	T_GET(TK_IND_HL, "(HL"); T_RPAREN();
+	T_GET(TK_IND_SP, "(SP"); T_RPAREN();
 	
 	T_GET(TK_IND_BC, "(\t BC \t)");
 	T_GET(TK_IND_DE, "(\t DE \t)");
-	T_GET(TK_IND_HL, "(\t HL \t)");
-	T_GET(TK_IND_SP, "(\t SP \t)");
+	T_GET(TK_IND_HL, "(\t HL \t"); T_RPAREN();
+	T_GET(TK_IND_SP, "(\t SP \t"); T_RPAREN();
 	T_END();
 	
 	SetTemporaryLine("(ix) (iy) (\t ix \t) (\t iy \t) "
@@ -761,7 +763,7 @@ t_compile_module($init, <<'END', $objs);
 
 	
 	/* assembly operands */
-	SetTemporaryLine("i r I R iir eir IIR EIR ");
+	SetTemporaryLine("i r I R iir eir IIR EIR xpc XPC");
 	scan_expect_operands();
 	T_GET(TK_I,    "i");
 	T_GET(TK_R,    "r");
@@ -771,6 +773,8 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_EIR,   "eir");
 	T_GET(TK_IIR,   "IIR");
 	T_GET(TK_EIR,   "EIR");
+	T_GET(TK_XPC,   "xpc");
+	T_GET(TK_XPC,   "XPC");
 	T_END();
 
 	

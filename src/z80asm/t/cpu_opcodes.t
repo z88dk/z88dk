@@ -65,31 +65,6 @@ for (@CPU) {
 	my $ZILOG	= $Z80 || $Z180;
 	my $RABBIT	= $R2K || $R3K;
 	
-	# 8-bit load group
-	emit($ALL,		"LD r, r1", 		"0x40 + r * 8 + r1");
-	emit($Z80,		"LD r, x8", 		"x8 >> 8", "0x40 + r * 8 + (x8 & 255)");
-	
-	emit($ALL,		"LD r, n", 			"0x06+r*8", "n");
-	emit($Z80,		"LD x8, n", 		"x8 >> 8", "0x06 + (x8 & 255) * 8", "n");
-	
-	emit($ALL,		"LD r, (HL)", 		"0x46 + r * 8");
-	emit($ALL,		"LD r, (x + d)", 	"x", "0x46 + r * 8", "d");
-
-	emit($ALL,		"LD (HL), r", 		"0x70 + r");
-	emit($ALL,		"LD (x + d), r", 	"x", "0x70 + r", "d");
-
-	emit($ALL,		"LD (HL), n", 		0x36, "n");
-	emit($ALL,		"LD (x + d), n",	"x", 0x36, "d", "n");
-
-	emit($ALL,		"LD A, (BC)", 		0x0A);
-	emit($ALL,		"LD A, (DE)", 		0x1A);
-	emit($ALL,		"LD A, (m)", 		0x3A, "m & 255", "m >> 8");
-
-	emit($ALL,		"LD (BC), A", 		0x02);
-	emit($ALL,		"LD (DE), A", 		0x12);
-	emit($ALL,		"LD (m), A", 		0x32, "m & 255", "m >> 8");
-
-	
 	# 16-bit load group
 	emit($ALL,		"LD dd, m", 		"0x01 + dd * 16", "m & 255", "m >> 8");
 	emit($ALL,		"LD x, m", 			"x", "0x01 + 2 * 16", "m & 255", "m >> 8");
@@ -112,6 +87,12 @@ for (@CPU) {
 	emit($ALL,		"POP qq",			"0xC1 + qq * 16");
 	emit($ALL,		"POP x",			"x", "0xC1 + 2 * 16");
 	
+	emit($RABBIT,	"LD (HL + d), HL",	0xDD, 0xF4, "d");
+	emit($RABBIT,	"LD (ix + d), HL",	      0xF4, "d");		# Note: lower case ix, iy to avoid replacement in replace_index()
+	emit($RABBIT,	"LD (iy + d), HL",	0xFD, 0xF4, "d");
+	
+	emit($RABBIT, 	"LD (SP + n), HL",	0xD4, "n");
+	emit($RABBIT, 	"LD (SP + n), x",	"x", 0xD4, "n");
 	
 	# Exchange Group
 	emit($ALL,		"EX DE, HL",		0xEB);
@@ -185,6 +166,9 @@ for (@CPU) {
 	
 	emit($RABBIT,	"ALTD",				0x76);			# TODO: add all ALTD combinations
 
+	emit($RABBIT,	"LD A, XPC",		0xED, 0x77);
+	emit($RABBIT,	"LD XPC, A",		0xED, 0x67);
+	
 
 	# 16-Bit Arithmetic Group
 	emit($ALL,		"ADD HL, dd",		"0x09 + dd * 16");
@@ -260,7 +244,7 @@ for (@CPU) {
 	emit($ALL,		"RST rst",			"0xC7 + rst  * 8");
 	emit($ZILOG,	"RST rstz",			"0xC7 + rstz * 8");
 
-	# TODO: support LCALL - need 3-byte values in the object file
+	# TODO: support LCALL - convert label to XPC:ADDR, where 0xE000 <= ADDR <= 0xFFFF
 	
 	
 	# Input and Output Group
@@ -323,6 +307,8 @@ for (@CPU) {
 
 	emit($R3K,		"IDET",				0x5B);
 
+	my $in_file = $0; $in_file =~ s/\.t$/.in/i or die;
+	parse($cpu, path($in_file)->lines);
 	
 	close $asmf;
 	close $binf;
@@ -416,6 +402,116 @@ sub emit {
 		say $asmf $asm_line;
 		print $binf $bin_line;
 		$addr += length($bin_line);
+	}
+}
+
+sub parse {
+	my($cpu, @lines) = @_;
+	
+	# read each line
+	for (@lines) {
+		for (split(/\n/, $_)) {
+			next if /^\s*\#/;
+			next if /^\s*\;/;
+			next if /^\s*$/;
+			s/^\s+//;
+			s/\s+$//;
+			s/\s+/ /g;
+			
+			# check if cpu has this opcode
+			my $exists = 1;
+			if (/^\[(.*?)\]\s*/) {
+				my($cpus, $rest) = ($1, $');
+				$_ = $rest;
+				$exists = check_cpus($cpu, split(' ', $cpus));
+			}
+			
+			# get opcode and bytes
+			my($opcode, $bytes) = split(/\s*=>\s*/, $_);
+			emit_line($exists, $opcode, $bytes);
+		}
+	}
+}
+
+sub check_cpus {
+	my($cpu, @cpus) = @_;
+	for (@cpus) {
+		return 1 if /$cpu/i;
+		return 1 if /zilog/i && $cpu =~ /^z/;
+		return 1 if /rabbit/i && $cpu =~ /^r/;
+		return 1 if /not_z80/i && $cpu !~ /z80/i;
+	}
+	return 0;
+}
+
+sub emit_line {
+	my($exists, $opcode, $bytes, $var) = @_;
+	$var ||= 1;		# start with $1
+	
+	# expand $var
+	if ($opcode =~ /\{(.*?)\}/) {
+		my($before, $list, $after) = ($`, $1, $');
+		my @list = split(' ', $list);
+		for (0 .. $#list) {
+			my($id, $text) = ($_, $list[$_]);
+			next if $text eq '.';				# use a DOT to skip items
+			
+			my $opcode_copy = $before . $text . $after;
+			my $bytes_copy = $bytes; $bytes_copy =~ s/\$$var/ sprintf("%X", $id) /ge;
+			
+			emit_line($exists, $opcode_copy, $bytes_copy, $var+1);
+		}
+		return;
+	}
+	
+	# expand N, MN, D
+	if ($opcode =~ /\b(MN)\b/) { 
+		return expand_values($exists, $opcode, $bytes, $1, 0, 0x0123, 0x4567, 0x89AB, 0xCDEF, 0xFFFF);
+	} 
+	elsif ($opcode =~ /\b(N)\b/) { 
+		return expand_values($exists, $opcode, $bytes, $1, 0, 0x55, 0xAA, 0xFF);
+	} 
+	elsif ($opcode =~ /\b(D)\b/) { 
+		return expand_values($exists, $opcode, $bytes, $1, -128, 0, 127);
+	} 
+	else { 
+	} 
+
+	# compute bytes
+	$bytes =~ s/([0-9A-F]+)/0x$1/g;		# all numbers in hex
+	my @bytes = split(/\s*,\s*/, $bytes);
+	
+	# emit
+	my $asm_line = sprintf(" %-23s;; %04X: ", $opcode, $addr);
+	my $bin_line = '';
+	for (@bytes) {
+		my $byte = eval($_); $@ and die $@;
+		$asm_line .= sprintf(" %02X", $byte);
+		$bin_line .= chr($byte);
+	}
+	
+	if (!$exists) {
+		say $errf $asm_line;
+	}
+	else {
+		say $asmf $asm_line;
+		print $binf $bin_line;
+		$addr += length($bin_line);
+	}
+}
+
+sub expand_values {
+	my($exists, $opcode, $bytes, $var, @values) = @_;
+	for (@values) {
+		my $opcode_copy = $opcode; $opcode_copy =~ s/\b$var\b/$_/g;
+		my $bytes_copy = $bytes; 
+		$bytes_copy =~ s/\b$var\b/ sprintf("%X", $_ & 255) /ge;
+		if ($var eq 'MN') {
+			$bytes_copy =~ s/\bM\b/ sprintf("%X", ($_ >>  8) & 255) /ge;
+			$bytes_copy =~ s/\bN\b/ sprintf("%X",         $_ & 255) /ge;
+		}
+
+		emit_line($exists, $opcode_copy, $bytes_copy);
 	}
 }
 
