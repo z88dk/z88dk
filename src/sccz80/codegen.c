@@ -757,13 +757,7 @@ void zclibcallop()
     defword();
 }
 
-/* Call the specified subroutine name */
-void zcall(SYMBOL* sname)
-{
-    zcallop();
-    outname(sname->name, dopref(sname));
-    nl();
-}
+
 
 /* Output the call op code */
 
@@ -2825,6 +2819,54 @@ void gen_builtin_strchr()
     ol("ld\th,a");
     ol("ld\tl,h");
     postlabel(endlabel);
+}
+
+void gen_builtin_memset(int32_t c, int32_t s)
+{
+    if ( c == -1 ) {
+        /* Value is on the stack */
+        ol("pop\tde");  /* c */
+        ol("pop\thl");  /* buffer */
+        Zsp += 4;
+    } else {
+        /* hl is buffer - data load happens a bit later*/
+    }
+
+    /* Now decide what to do about the count */
+    if ( s < 4 ) {
+        int i;
+        for ( i = 0; i < s; i++ ) {
+            if ( i  != 0 ) {
+                ol("inc\thl");
+            }
+            if ( c != -1 ) {
+                outstr("\tld\t(hl),"); outdec(c % 256); nl();
+            } else {
+                ol("ld\t(hl),e");
+            }
+        }
+    } else if ( s < 256 ) {
+        int looplabel = getlabel();
+        if ( c != -1 ) {
+            outstr("\tld\te,"); outdec(c % 256); nl();
+        }
+        outstr("\tld\tb,"); outdec(s); nl();
+        postlabel(looplabel);
+        ol("ld\t(hl),e");
+        ol("inc\thl");
+        outstr("\tdjnz\t"); printlabel(looplabel); nl();
+    } else {
+        if ( c != -1 ) {
+            outstr("\tld\t(hl),"); outdec(c % 256); nl();
+        } else {
+            ol("ld\t(hl),e");
+        }
+        ol("ld\td,h");
+        ol("ld\te,l");
+        ol("inc\tde");
+        outstr("\tld\tbc,"); outdec((s % 65536) - 1); nl();
+        ol("ldir");
+    }
 }
 
 

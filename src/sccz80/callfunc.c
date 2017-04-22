@@ -35,12 +35,16 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     int minifunc = 0; /* Call cut down version */
     uint32_t protoarg;
     char preserve = NO; /* Preserve af when cleaningup */
+    int   isconstarg[5];
+    double constargval[5];
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
     FILE *save_fps;
     int   i;
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
     int   savesp;
+    enum symbol_flags builtin_flags = 0;
+    char   *funcname = "(unknown)";
        
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
@@ -54,9 +58,10 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         return;
     }
 
-    if (ptr )
-        watcharg = SetWatch(ptr->name, &isscanf);
-    
+    if (ptr ) {
+        funcname = ptr->name;
+        watcharg = SetWatch(funcname, &isscanf);
+    }
     savesp = Zsp;
     while (ch() != ')') {
         char *before, *start;
@@ -70,6 +75,10 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 
         setstage(&before, &start);
         expr = expression(&vconst, &val, &packedType);
+        if ( argnumber < 5 ) {
+            isconstarg[argnumber] = vconst;
+            constargval[argnumber] = val;
+        }
         clearstage(before, start);  // Wipe out everything we did
         if ( vconst && expr == DOUBLE ) {
             decrement_double_ref_direct(val);
@@ -85,7 +94,28 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 
     if ( ptr == NULL ) ptr = fnptr;
 
-    if ( ( ptr == NULL && c_use_r2l_calling_convention == YES ) || (ptr && (ptr->flags & SMALLC) == 0) ) {
+    if ( ptr != NULL ) {
+        /* Check for some builtins */
+        if ( strcmp(funcname, "__builtin_memset") == 0 ) {
+            if ( argnumber == 3 && isconstarg[3] && constargval[3] > 0  ) {
+                /* We want at least the size to be constant */
+                fclose(tmpfiles[3]);
+                tmpfiles[3] = NULL;
+                argnumber--;
+                builtin_flags = SMALLC;
+                if ( isconstarg[2] ) {
+                    fclose(tmpfiles[2]);
+                    tmpfiles[2] = NULL;
+                    argnumber--;
+                    builtin_flags |= FASTCALL;
+                }
+            } else {
+                funcname = "memset";
+            }
+        }
+    }
+
+    if ( ( (ptr == NULL && c_use_r2l_calling_convention == YES ) || (ptr && (ptr->flags & SMALLC) == 0) ) && (builtin_flags & SMALLC) == 0)  {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];
@@ -129,14 +159,14 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 
 #if 1
                 if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
-                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__smallc/__stdc");
+                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
                 }
                 if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
-                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, ptr->name, argnumber, "__z88dk_callee");
+                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
                 }
 #endif
             }
-            if ((ptr->flags & FASTCALL) && ptr->prototyped == 1) {
+            if ( ((ptr->flags & FASTCALL) && ptr->prototyped == 1) || (builtin_flags & FASTCALL) == FASTCALL ) {
                 /* fastcall of single expression */
 
             } else {
@@ -204,7 +234,6 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             warning(W_2MAFUNC);
         }
     }
-
     if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
         if ((ptr->prototyped) && ptr->args[1] == PELLIPSES) {
@@ -212,14 +241,17 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 loadargc(nargs);
             }
         }
-        if ( strcmp(ptr->name,"__builtin_strcpy") == 0) {
+        if ( strcmp(funcname,"__builtin_strcpy") == 0) {
             gen_builtin_strcpy();
             nargs = 0;
             Zsp += 4;
-        } else if ( strcmp(ptr->name,"__builtin_strchr") == 0) {
+        } else if ( strcmp(funcname,"__builtin_strchr") == 0) {
             gen_builtin_strchr();
             nargs = 0;
             Zsp += 4;
+        } else if ( strcmp(funcname, "__builtin_memset") == 0 ) {
+            gen_builtin_memset(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
+            nargs = 0;
         } else if (watcharg || (ptr->flags & (SHARED|SHAREDC)) ) {
             if ((ptr->flags & (SHARED|SHAREDC) ) )
                 preserve = YES;
@@ -232,14 +264,16 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             } else {
                 printf_format_option |= format_option;
             }
-            outname(ptr->name, dopref(ptr));
+            outname(funcname, dopref(ptr));
             if ((ptr->flags & SHARED) && c_useshared)
                 outstr("_sl");
             else if (ptr->flags & SHAREDC)
                 outstr("_rst");
             nl();
-        } else
-            zcall(ptr);
+        } else {
+            zcallop();
+            outname(funcname, dopref(ptr)); nl();
+        }
     } else {
         callstk(nargs);
     }
