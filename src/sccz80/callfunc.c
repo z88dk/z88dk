@@ -117,6 +117,17 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             } else {
                 funcname = "strcpy";
             }
+        } else if ( strcmp(funcname, "__builtin_strchr") == 0 ) {
+            if ( argnumber == 2 ) {
+                builtin_flags = SMALLC|FASTCALL;
+                if ( isconstarg[2] && constargval[2] ) {
+                    fclose(tmpfiles[2]);
+                    tmpfiles[2] = NULL;
+                    argnumber--;
+                }
+            } else {
+                funcname = "strchr";
+            }
 
         }
     }
@@ -253,9 +264,8 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             nargs = 0;
             Zsp += 2;
         } else if ( strcmp(funcname,"__builtin_strchr") == 0) {
-            gen_builtin_strchr();
+            gen_builtin_strchr(isconstarg[2] ? constargval[2] : -1);
             nargs = 0;
-            Zsp += 4;
         } else if ( strcmp(funcname, "__builtin_memset") == 0 ) {
             gen_builtin_memset(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;

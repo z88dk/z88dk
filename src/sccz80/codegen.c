@@ -2800,11 +2800,18 @@ void gen_builtin_strcpy()
 }
 
 
-void gen_builtin_strchr()
+void gen_builtin_strchr(int32_t c)
 {
     int startlabel, endlabel;
-    ol("pop\tde");
-    ol("pop\thl");
+    if ( c == -1 ) {
+        /* hl = c, stack = buffer */
+        ol("ex\tde,hl");
+        ol("pop\thl");
+        Zsp += 2;
+    } else {
+        /* hl = buffer */
+        outstr("\tld\te,"); outdec(c % 256); nl();
+    }
     startlabel = getlabel();
     endlabel = getlabel();
     postlabel(startlabel);
