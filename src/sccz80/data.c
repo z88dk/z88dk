@@ -54,7 +54,7 @@ SW_TAB* swend; /* address of last entry in switch table */
 char line[LINESIZE]; /* parsing buffer */
 char mline[LINESIZE]; /* temp macro buffer */
 int lptr, mptr; /* indexes into buffers */
-char Filename[FILENAME_LEN + 1]; /* output file name */
+char Filename[FILENAME_LEN + 1]; /* original file name */
 
 /*      Misc storage    */
 

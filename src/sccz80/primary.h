@@ -24,5 +24,5 @@ extern void cscale(int type, TAG_SYMBOL *tag, int *val);
 extern int  docast(LVALUE *lval,LVALUE *dest_lval);
 extern void convert_int_to_double(char type, char zunsign);
 extern int   utype(LVALUE *lval);
-extern int DoTestJump(LVALUE *lval);
+extern int check_lastop_was_testjump(LVALUE *lval);
 

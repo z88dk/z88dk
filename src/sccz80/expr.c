@@ -672,7 +672,7 @@ int heirb(LVALUE* lval)
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                        addconst(lval, 1);
+                        zadd_const(lval, 1);
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
@@ -761,7 +761,7 @@ int heirb(LVALUE* lval)
                 }
                 lval->flags = flags;
 
-                addconst(lval, ptr->offset.i);
+                zadd_const(lval, ptr->offset.i);
                 lval->symbol = ptr;
                 lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;

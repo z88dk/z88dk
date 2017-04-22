@@ -400,10 +400,10 @@ void prestep(
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case DOUBLE:
-            addconst(lval, (n * 6));
+            zadd_const(lval, (n * 6));
             break;
         case STRUCT:
-            addconst(lval, n * lval->tagsym->size);
+            zadd_const(lval, n * lval->tagsym->size);
             break;
         case LONG:
             (*step)(lval);
@@ -478,10 +478,10 @@ void nstep(
     int n,
     void (*unstep)(LVALUE *lval))
 {
-    addconst(lval, n);
+    zadd_const(lval, n);
     store(lval);
     if (unstep)
-        addconst(lval, -n);
+        zadd_const(lval, -n);
 }
 
 void store(LVALUE* lval)
@@ -657,7 +657,7 @@ void test(int label, int parens)
         else
             testjump(&lval, label);
     } else {
-        if (lval.binop == dummy || DoTestJump(&lval)) {
+        if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
             if (lval.binop == dummy)
                 lval.val_type = CINT; /* logical always int */
             testjump(&lval, label);
@@ -827,7 +827,7 @@ int utype(LVALUE* lval)
  * Returns 1 if we should testjump i.e. ld a,h or l jp z, or 0 for carry conds
  */
 
-int DoTestJump(LVALUE* lval)
+int check_lastop_was_testjump(LVALUE* lval)
 {
     void (*fn)(LVALUE *lval);
     fn = lval->binop;
@@ -842,7 +842,7 @@ int DoTestJump(LVALUE* lval)
  * At the same time set the result to be of type CINT
  */
 
-int WasComp(LVALUE* lval)
+int check_lastop_was_comparison(LVALUE* lval)
 {
     void (*fn)(LVALUE *lval);
     fn = lval->binop;

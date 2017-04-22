@@ -72,7 +72,7 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
 
        
     }
-    if (DoTestJump(lval) || lval->binop == dummy) {
+    if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
             lval->val_type = CINT;
         }
@@ -458,7 +458,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 /* remove zpush and add int constant to int */
                 clearstage(before1, 0);
                 Zsp = savesp1;
-                addconst(lval, val);
+                zadd_const(lval, val);
             }
         } else {
             /* non-constant on both sides  */

@@ -28,7 +28,7 @@
 #include "ccdefs.h"
 #include <time.h>
 
-extern int WasComp(LVALUE* lval);
+extern int check_lastop_was_comparison(LVALUE* lval);
 
 
 extern char Filenorig[];
@@ -895,11 +895,11 @@ void testjump(LVALUE* lval, int label)
     if (lval->binop == NULL)
         type = lval->val_type;
 
-    if (type == LONG && WasComp(lval)) {
+    if (type == LONG && check_lastop_was_comparison(lval)) {
         ol("or\td");
         ol("or\te");
     }
-    if (type == CPTR && WasComp(lval)) {
+    if (type == CPTR && check_lastop_was_comparison(lval)) {
         ol("or\te");
     }
     opjump("z,", label);
@@ -1338,7 +1338,7 @@ void zadd(LVALUE* lval)
 }
 
 
-void addconst(LVALUE *lval, int value)
+void zadd_const(LVALUE *lval, int32_t value)
 {
     switch (value) {
     case -3:
@@ -1458,7 +1458,6 @@ void zdiv_const(LVALUE *lval, int32_t value)
             return;
         }
     }
-
 
     switch ( value ) {
         case 1:
@@ -2039,7 +2038,7 @@ void dummy(LVALUE *lval)
 /* test for equal to zero */
 void eq0(LVALUE* lval, int label)
 {
-    WasComp(lval);
+    check_lastop_was_comparison(lval);
     switch (lval->oldval_type) {
 #ifdef CHARCOMP0
     case CCHAR:
