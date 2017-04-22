@@ -102,16 +102,22 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 fclose(tmpfiles[3]);
                 tmpfiles[3] = NULL;
                 argnumber--;
-                builtin_flags = SMALLC;
+                builtin_flags = SMALLC|FASTCALL;
                 if ( isconstarg[2] ) {
                     fclose(tmpfiles[2]);
                     tmpfiles[2] = NULL;
                     argnumber--;
-                    builtin_flags |= FASTCALL;
                 }
             } else {
                 funcname = "memset";
             }
+        } else if ( strcmp(funcname, "__builtin_strcpy") == 0 ) {
+            if ( argnumber == 2 ) {
+                builtin_flags = FASTCALL|SMALLC;
+            } else {
+                funcname = "strcpy";
+            }
+
         }
     }
 
@@ -166,8 +172,9 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 }
 #endif
             }
-            if ( ((ptr->flags & FASTCALL) && ptr->prototyped == 1) || (builtin_flags & FASTCALL) == FASTCALL ) {
-                /* fastcall of single expression */
+            if ( ((ptr->flags & FASTCALL) && ptr->prototyped == 1) || 
+                (tmpfiles[argnumber+1] == NULL && (builtin_flags & FASTCALL) == FASTCALL ) ) {
+                /* fastcall of single expression OR the last argument of a builtin */
 
             } else {
                 if (argnumber == watcharg) {
@@ -244,7 +251,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         if ( strcmp(funcname,"__builtin_strcpy") == 0) {
             gen_builtin_strcpy();
             nargs = 0;
-            Zsp += 4;
+            Zsp += 2;
         } else if ( strcmp(funcname,"__builtin_strchr") == 0) {
             gen_builtin_strchr();
             nargs = 0;

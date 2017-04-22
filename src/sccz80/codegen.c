@@ -2785,8 +2785,8 @@ void popframe(void)
 void gen_builtin_strcpy()
 {
     int label;
+    // hl holds src on entry, on stack= dest
     ol("pop\tde");
-    ol("pop\thl");
     ol("push\tde");
     label = getlabel();
     postlabel(label);
@@ -2824,10 +2824,10 @@ void gen_builtin_strchr()
 void gen_builtin_memset(int32_t c, int32_t s)
 {
     if ( c == -1 ) {
-        /* Value is on the stack */
-        ol("pop\tde");  /* c */
+        /* Entry hl = c, on stack = buffer */
+        ol("ex\tde,hl");  /* c */
         ol("pop\thl");  /* buffer */
-        Zsp += 4;
+        Zsp += 2;
     } else {
         /* hl is buffer - data load happens a bit later*/
     }
