@@ -1317,7 +1317,7 @@ test_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C time
 	$(MAKE) -C assert
-	TARGET=test TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
+	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 
 # TRS 80 - stefano
 trs80_clib.lib:
