@@ -6,20 +6,6 @@
  *
  */
 
-/* 9/9/98 djm - Modified plnge2a to use unsigned functions for unsigned
- *              variables, seems to be fine..
- *
- * Have added parameter to addconst, so to not do long add for stack ops
- *
- */
-
-/* 14/9/98 Some conditional long pointer stuff inserted
- *
- * 5/10/98 Some simple prototyping 
- *
- *13/11/98 Radically changed handling of longs - now they are pushed onto
- *         the stack instead of being held in alternate register set
- */
 
 #include "ccdefs.h"
 
@@ -206,7 +192,7 @@ int heir1a(LVALUE* lval)
         if (k)
             rvalue(lval);
         /* test condition, jump to false expression evaluation if necessary */
-        if (DoTestJump(lval)) {
+        if (check_lastop_was_testjump(lval)) {
             // Always evaluated as an integer, so fake it temporarily
             force(CINT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
             temptype = lval->val_type;
@@ -619,8 +605,6 @@ int heira(LVALUE *lval)
 
     k = heirb(lval);
 
-    if (k) // Kill this setting of ltype
-        ltype = lval->val_type; /* djm 28/11/98 */
     if (match("++")) {
         poststep(k, lval, 1, inc, dec);
         return 0;
@@ -688,7 +672,7 @@ int heirb(LVALUE* lval)
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                        addconst(val, 1, 0);
+                        addconst(lval, 1);
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
@@ -777,7 +761,7 @@ int heirb(LVALUE* lval)
                 }
                 lval->flags = flags;
 
-                addconst(ptr->offset.i, 1, ptr->flags & FARPTR);
+                addconst(lval, ptr->offset.i);
                 lval->symbol = ptr;
                 lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;

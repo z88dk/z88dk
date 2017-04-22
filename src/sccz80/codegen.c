@@ -1337,6 +1337,36 @@ void zadd(LVALUE* lval)
     }
 }
 
+
+void addconst(LVALUE *lval, int value)
+{
+    switch (value) {
+    case -3:
+        dec(lval);
+    case -2:
+        dec(lval);
+    case -1:
+        dec(lval);
+    case 0:
+        break;
+    case 3:
+        inc(lval);
+    case 2:
+        inc(lval);
+    case 1:
+        inc(lval);
+        break;
+    default:
+        if ( lval->val_type == LONG || lval->val_type == CPTR ) {
+            lpush();
+            vlongconst(value);
+            zadd(lval);
+        } else {
+            addbchl(value);
+        }
+    }
+}
+
 /* Subtract the primary register from the secondary */
 /*      (results in primary) */
 void zsub(LVALUE* lval)

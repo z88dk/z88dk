@@ -38,14 +38,12 @@ int primary(LVALUE* lval)
             lval->ident = ptr->ident;
             lval->storage = ptr->storage;
             lval->ptr_type = 0;
-            ltype = ptr->type;
             if (ptr->type == STRUCT)
                 lval->tagsym = tagtab + ptr->tag_idx;
             if (ptr->ident == POINTER) {
                 lval->ptr_type = ptr->type;
                 /* djm long pointers */
                 lval->indirect = lval->val_type = (ptr->flags & FARPTR ? CPTR : CINT);
-                ltype = lval->indirect;
             }
             if (ptr->ident == ARRAY || (ptr->ident == VARIABLE && ptr->type == STRUCT)) {
                 /* djm pointer? */
@@ -79,14 +77,12 @@ int primary(LVALUE* lval)
                 lval->ident = ptr->ident;
                 lval->ptr_type = 0;
                 lval->storage = ptr->storage;
-                ltype = ptr->type;
                 if (ptr->type == STRUCT)
                     lval->tagsym = tagtab + ptr->tag_idx;
                 if (ptr->ident != ARRAY && (ptr->ident != VARIABLE || ptr->type != STRUCT)) {
                     if (ptr->ident == POINTER) {
                         lval->ptr_type = ptr->type;
                         lval->val_type = (ptr->flags & FARPTR ? CPTR : CINT);
-                        ltype = lval->val_type;
                     }
                     return (1);
                 }
@@ -404,10 +400,10 @@ void prestep(
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case DOUBLE:
-            addconst(n * 6, 1, lval->symbol->flags & FARPTR);
+            addconst(lval, (n * 6));
             break;
         case STRUCT:
-            addconst(n * lval->tagsym->size, 1, lval->symbol->flags & FARPTR);
+            addconst(lval, n * lval->tagsym->size);
             break;
         case LONG:
             (*step)(lval);
@@ -482,10 +478,10 @@ void nstep(
     int n,
     void (*unstep)(LVALUE *lval))
 {
-    addconst(n, 1, lval->symbol->flags & FARPTR);
+    addconst(lval, n);
     store(lval);
     if (unstep)
-        addconst(-n, 1, lval->symbol->flags & FARPTR);
+        addconst(lval, -n);
 }
 
 void store(LVALUE* lval)
@@ -726,52 +722,6 @@ void cscale(
     }
 }
 
-/*
- * add constant to primary register
- *
- * changed quite a bit...using bc to get offset to add to, was
- * going to take account of far and then push/pop, but maybe this
- * will work just as well?
- */
-void addconst(int val, int opr, char zfar)
-{
-    LVALUE lval={0};
-
-    if ((ltype == LONG && (!opr)) || (ltype == CPTR && (!opr))) {
-        lval.val_type = LONG;
-        lpush();
-        vlongconst(val);
-        zadd(&lval);
-    } else {
-        lval.val_type = CINT;
-        switch (val) {
-
-        case -3:
-            dec(&lval);
-        case -2:
-            dec(&lval);
-        case -1:
-            dec(&lval);
-        case 0:
-            break;
-        case 3:
-            inc(&lval);
-        case 2:
-            inc(&lval);
-        case 1:
-            inc(&lval);
-            break;
-
-        default:
-            addbchl(val);
-        }
-    }
-}
-
-/*
- *      Routine to do casting
- *      djm 24/3/99
- */
 
 /**
  * \param lval - The lval that holds the cast informatino
