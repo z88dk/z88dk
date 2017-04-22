@@ -14,40 +14,17 @@ int primary(LVALUE* lval)
 {
     char sname[NAMESIZE];
     SYMBOL* ptr;
-    int k, level;
-    char cid, vtype, cflags, clevel;
-    TAG_SYMBOL* cotag;
-
+    int k;
+    
     if (cmatch('(')) {
-        lval->level++;
-        do
+        do {
             k = heir1(lval);
-        while (cmatch(','));
+        } while (cmatch(','));
         needchar(')');
-        /* Not sure about doing this here..but here goes nowt!*/
-        if (lval->c_vtype) {
-            docast(lval, YES);
-        }
-        lval->level--;
-        if (lval->c_vtype) {
-            docast(lval, YES);
-        }
         return k;
     }
-    /* clear lval array - djm second arg was lval.. now cast, clears lval */
-    cid = lval->c_id;
-    vtype = lval->c_vtype;
-    cflags = lval->c_flags;
-    cotag = lval->c_tag;
-    level = lval->level;
-    clevel = lval->castlevel;
+
     memset(lval, 0, sizeof(LVALUE));
-    lval->c_id = cid;
-    lval->c_vtype = vtype;
-    lval->c_flags = cflags;
-    lval->c_tag = cotag;
-    lval->level = level;
-    lval->castlevel = clevel;
 
     if (symname(sname)) {
         if (strcmp(sname, "sizeof") == 0) {
@@ -607,6 +584,7 @@ void rvaluest(LVALUE* lval)
     } else {
         indirect(lval);
     }
+    if (lval->c_vtype ) docast(lval, lval);
 }
 
 void rvalue(LVALUE* lval)
@@ -618,13 +596,10 @@ void rvalue(LVALUE* lval)
         intrinsic_in(lval->symbol);
     } else if (lval->symbol && lval->indirect == 0) { 
         getmem(lval->symbol);
-    } else {
-            
+    } else {           
         indirect(lval);
     }
-    if (lval->c_vtype) {
-        docast(lval, YES);
-    }
+    if (lval->c_vtype ) docast(lval, lval);
 #if DEBUG_SIGN
     if (lval->flags & UNSIGNED)
         ol("; unsigned");
@@ -636,10 +611,8 @@ void rvalue(LVALUE* lval)
 void test(int label, int parens)
 {
     char *before, *start;
-    LVALUE lval;
+    LVALUE lval={0};
     void (*oper)(LVALUE *lva);
-
-    ClearCast(&lval);
 
     if (parens)
         needchar('(');
@@ -762,7 +735,7 @@ void cscale(
  */
 void addconst(int val, int opr, char zfar)
 {
-    LVALUE lval;
+    LVALUE lval={0};
 
     if ((ltype == LONG && (!opr)) || (ltype == CPTR && (!opr))) {
         lval.val_type = LONG;
@@ -800,29 +773,29 @@ void addconst(int val, int opr, char zfar)
  *      djm 24/3/99
  */
 
-int docast(LVALUE* lval, char df)
+/**
+ * \param lval - The lval that holds the cast informatino
+ * \param dest_lval - The lvalue that will be changed
+ */
+int docast(LVALUE* lval, LVALUE *dest_lval)
 {
     SYMBOL* ptr;
     char temp_type;
     int itag;
     char nam[20];
 
-    debug(DBG_CAST1, "Level=%d Castlevel=%d df=%d %p", lval->level, lval->castlevel, df, lval);
-    if (lval->level != lval->castlevel)
-        return 0;
-
     if (lval->c_id == VARIABLE) {
         /* Straight forward variable conversion now.. */
-        if (df)
-            force(lval->c_vtype, lval->val_type, lval->c_flags & UNSIGNED, lval->flags & UNSIGNED, 0);
-        lval->val_type = lval->c_vtype;
-        lval->ptr_type = 0;
-        lval->ident = VARIABLE;
-        lval->flags = ((lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
-        lval->c_id = 0;
-        lval->c_vtype = 0;
-        lval->c_flags = 0;
-        lval->is_const = 0;
+        if ( dest_lval->const_val == 0 ) {
+            force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
+        }
+        dest_lval->val_type = lval->c_vtype;
+        dest_lval->ptr_type = 0;
+        dest_lval->ident = VARIABLE;
+        dest_lval->flags = ((dest_lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
+        dest_lval->c_id = 0;
+        dest_lval->c_vtype = 0;
+        dest_lval->c_flags = 0;
         return (0);
     }
 
@@ -830,38 +803,35 @@ int docast(LVALUE* lval, char df)
         switch (lval->c_vtype) {
         case STRUCT:
             /* Casting a structure - has to be a pointer... */
-            lval->tagsym = lval->c_tag; /* Copy tag symbol over */
-            lval->ptr_type = STRUCT;
+            dest_lval->tagsym = lval->c_tag; /* Copy tag symbol over */
+            dest_lval->ptr_type = STRUCT;
             temp_type = ((lval->c_flags & FARPTR) ? CPTR : CINT);
-            if (df)
-                force(temp_type, lval->val_type, 0, 0, 0);
-            lval->val_type = temp_type;
-            lval->flags = ((lval->flags & FARACC) | lval->c_flags);
-            if (df) {
-                lval->c_id = 0;
-                lval->c_vtype = 0;
-                lval->c_flags = 0;
+            if ( dest_lval->const_val == 0 ) {
+                force(temp_type, dest_lval->val_type, 0, 0, 0);
             }
+            dest_lval->val_type = temp_type;
+            dest_lval->flags = ((lval->flags & FARACC) | lval->c_flags);
+            dest_lval->c_id = 0;
+            dest_lval->c_vtype = 0;
+            dest_lval->c_flags = 0;
             return (1);
 
         /* All other simple pointers.. */
         default:
-            debug(DBG_CAST2, "Converting %d to %d", lval->ptr_type, lval->c_vtype);
-            lval->ptr_type = lval->c_vtype;
-            // make an exception for "*(double *)var" recasting in vfprintf_fp (c_vtype == 1)
-            if ((lval->symbol == NULL) || (lval->c_vtype == 1))
-                lval->symbol = dummy_sym[(int)lval->c_vtype];
+            debug(DBG_CAST2, "Converting %d to %d", dest_lval->ptr_type, lval->c_vtype);
+            dest_lval->indirect = dest_lval->ptr_type = lval->c_vtype;
+            // Set the destination symbol type
+            dest_lval->symbol = dummy_sym[(int)lval->c_vtype];
             temp_type = ((lval->c_flags & FARPTR) ? CPTR : CINT);
-            if (df)
-                force(temp_type, lval->val_type, 0, 0, 0);
-            lval->val_type = temp_type;
-            lval->flags = ((lval->flags & FARACC) | lval->c_flags);
-            lval->ident = POINTER;
-            if (df) {
-                lval->c_id = 0;
-                lval->c_vtype = 0;
-                lval->c_flags = 0;
+            if ( dest_lval->const_val == 0 ) {
+                force(temp_type, dest_lval->val_type, 0, 0, 0);
             }
+            dest_lval->val_type = temp_type;
+            dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
+            dest_lval->ident = POINTER;
+            dest_lval->c_id = 0;
+            dest_lval->c_vtype = 0;
+            dest_lval->c_flags = 0;
             return (1);
         }
     }
@@ -875,17 +845,16 @@ int docast(LVALUE* lval, char df)
     if (lval->c_tag)
         itag = lval->c_tag - tagtab;
     ptr = lval->symbol;
-    lval->symbol = addloc(nam, POINTER, temp_type, dummy_idx(lval->c_vtype, lval->c_tag), itag);
-    lval->symbol->offset.p = ptr;
-    if (df)
-        force(temp_type, lval->val_type, 0, 0, 0);
-    lval->val_type = temp_type;
-    lval->flags = ((lval->flags & FARACC) | lval->c_flags);
-    if (df) {
-        lval->c_id = 0;
-        lval->c_vtype = 0;
-        lval->c_flags = 0;
+    dest_lval->symbol = addloc(nam, POINTER, temp_type, dummy_idx(lval->c_vtype, lval->c_tag), itag);
+    dest_lval->symbol->offset.p = ptr;
+    if ( dest_lval->const_val == 0 ) {
+        force(temp_type, dest_lval->val_type, 0, 0, 0);
     }
+    dest_lval->val_type = temp_type;
+    dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
+    dest_lval->c_id = 0;
+    dest_lval->c_vtype = 0;
+    dest_lval->c_flags = 0;
     return (1);
 }
 

@@ -1,5 +1,4 @@
 /* expr.c */
-extern void ClearCast(LVALUE *lval);
 extern int expression(int *con, double *val, uint32_t *packedArgumentType);
 extern int heir1(LVALUE *lval);
 extern int heir1a(LVALUE *lval);
