@@ -1222,7 +1222,7 @@ rcmx000_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) --RCMX000 -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) --RCMX000 -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
@@ -1236,7 +1236,7 @@ embedded_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=embedded TYPE=z80 $(LIBLINKER) -DFORembedded -x$(OUTPUT_DIRECTORY)/embedded_clib @$(LISTFILE_DIRECTORY)/embedded.lst
+	TARGET=embedded TYPE=z80 $(LIBLINKER) -DFORembedded -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/embedded_clib @$(LISTFILE_DIRECTORY)/embedded.lst
 
 # Galaksija - Stefano Bodrato
 gal_clib.lib:
