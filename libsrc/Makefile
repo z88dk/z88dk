@@ -864,7 +864,7 @@ rex_clib.lib:
 	$(MAKE) -C stdlib TARGET=rex
 	$(MAKE) -C setjmp
 	$(MAKE) -C rex
-	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
+	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
 sam_clib.lib:
