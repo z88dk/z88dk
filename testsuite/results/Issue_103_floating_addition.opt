@@ -556,97 +556,97 @@
 
 .i_1
 	defm	"add_int %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"add_int_longform %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"add_int_longform2 %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"add_double %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"sub_int %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"sub_int_longform %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"sub_double %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"sub_int_longform2 %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"mult_int %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"mult_double %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"mult_double_longform %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"mult_double_longform2 %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"div_int %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"div_double %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"div_double_longform %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
 
 	defm	"div_double_longform2 %f"
-	defb	13
+	defb	10
 
 	defm	""
 	defb	0
