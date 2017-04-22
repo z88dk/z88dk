@@ -37,8 +37,11 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #138: Aggregate (arrays, structs) auto variables can now be initialised
 - [sccz80] #139: Added support for __naked directive to prevent generation of any code
   for marked functions
-- [sccz80 #78: __sfr (__banked__) __at [address] [name] syntax is now supported for
+- [sccz80] #78: __sfr (__banked__) __at [address] [name] syntax is now supported for
   IO ports. Specific code is generated for Z80, Z180, Rabbit compilations.
+- [sccz80] #26: A whole bunch of casting issues have been resolved
+- [sccz80] #176: sizeof() now works on a wider range of lvalues
+- [sccz80] #155: The section names used by sccz80 can now be configured
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [zpragma] Support for #pragma printf and #pragma scanf which take a format string
