@@ -2838,6 +2838,7 @@ void gen_builtin_memset(int32_t c, int32_t s)
     } else {
         /* hl is buffer - data load happens a bit later*/
     }
+    ol("push\thl");
 
     /* Now decide what to do about the count */
     if ( s < 4 ) {
@@ -2874,6 +2875,7 @@ void gen_builtin_memset(int32_t c, int32_t s)
         outstr("\tld\tbc,"); outdec((s % 65536) - 1); nl();
         ol("ldir");
     }
+    ol("pop\thl");
 }
 
 
