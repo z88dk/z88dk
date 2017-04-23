@@ -1044,9 +1044,9 @@ int main(int argc, char **argv)
     // This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.
 
 	// Parse through the files, handling each one in turn
-	for (i = 1; i <= nfiles; i++)
+	for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0))  // HACK 1 OF 2
     {
-        if (i == nfiles) i = 0;  // HACK 1 OF 3
+        if (i == nfiles) i = 0;                            // HACK 2 OF 2
 		if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
 	SWITCH_REPEAT:
 		switch (get_filetype_by_suffix(filelist[i]))
@@ -1332,8 +1332,7 @@ int main(int argc, char **argv)
             {
                 c_crt_incpath = ptr;
                 if (verbose) printf("WILL ACT AS CRT\n");
-                // continue;
-                break;  // HACK 2 OF 3
+                continue;
             }
 
 			if (process(".asm", c_extension, c_assembler, ptr, assembler_style, i, YES, NO))
@@ -1349,8 +1348,6 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Filetype of %s (%s) unrecognized\n", filelist[i], original_filenames[i]);
 			exit(1);
 		}
-
-        if (i == 0) break;  // HACK 3 OF 3
 	}
 
 	if (verbose) printf("\nGENERATING OUTPUT\n");
