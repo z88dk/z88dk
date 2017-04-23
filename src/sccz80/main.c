@@ -35,6 +35,7 @@ int c_shared_file; /* File contains routines which are to be
 
 int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
+int c_disable_builtins = 0;
 
 char *c_rodata_section = "rodata_compiler";
 char *c_data_section = "data_compiler";
@@ -96,6 +97,7 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
     { 0, "do-inline", OPT_BOOL, "Inlne some common functions", &c_doinline, 0 },
+    { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
     { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
     { 0, "fp-exponent-bias", OPT_INT, "=<num> FP exponent bias (default: 128)", &c_fp_exponent_bias, 0 },

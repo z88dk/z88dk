@@ -97,7 +97,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     if ( ptr != NULL ) {
         /* Check for some builtins */
         if ( strcmp(funcname, "__builtin_memset") == 0 ) {
-            if ( argnumber == 3 && isconstarg[3] && constargval[3] > 0  ) {
+            if ( argnumber == 3 && isconstarg[3] && constargval[3] > 0 && c_disable_builtins == 0  ) {
                 /* We want at least the size to be constant */
                 fclose(tmpfiles[3]);
                 tmpfiles[3] = NULL;
@@ -112,7 +112,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 funcname = "memset";
             }
         } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
-            if ( argnumber == 3 && isconstarg[3] && constargval[3] > 0  ) {
+            if ( argnumber == 3 && isconstarg[3] && constargval[3] > 0  && c_disable_builtins == 0) {
                 /* We want at least the size to be constant */
                 fclose(tmpfiles[3]);
                 tmpfiles[3] = NULL;
@@ -126,14 +126,14 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             } else {
                 funcname = "memcpy";
             }  
-        } else if ( strcmp(funcname, "__builtin_strcpy") == 0 ) {
-            if ( argnumber == 2 ) {
+        } else if ( strcmp(funcname, "__builtin_strcpy") == 0) {
+            if ( argnumber == 2  && c_disable_builtins == 0 ) {
                 builtin_flags = FASTCALL|SMALLC;
             } else {
                 funcname = "strcpy";
             }
-        } else if ( strcmp(funcname, "__builtin_strchr") == 0 ) {
-            if ( argnumber == 2 ) {
+        } else if ( strcmp(funcname, "__builtin_strchr") == 0) {
+            if ( argnumber == 2  && c_disable_builtins == 0) {
                 builtin_flags = SMALLC|FASTCALL;
                 if ( isconstarg[2] && constargval[2] ) {
                     fclose(tmpfiles[2]);
