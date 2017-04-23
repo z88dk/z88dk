@@ -986,7 +986,7 @@ int main(int argc, char **argv)
         if ((fp = fopen(DEFFILE, "r")) != NULL)
         {
             unsigned char buffer[LINEMAX + 1];
-            char *p;
+            unsigned char *p;
             long val;
 
             while (fgets(buffer, LINEMAX, fp) != NULL)
@@ -2215,7 +2215,6 @@ static void configure_misc_options()
 	// the new c lib uses startup=-1 to mean user supplies the crt
 	// current working dir will be different than when using -crt0
 	if (c_startup >= -1) {
-        char tmp[64];
 		write_zcc_defined("startup", c_startup, 0);
 	}
 
