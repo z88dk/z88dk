@@ -13,9 +13,8 @@ define(`__Z80_NMOS', 0x01)
 define(`__Z80_CMOS', 0x02)
 
 # Clock frequency in Hz
-# decided against basing on selected model
 
-define(`__CPU_CLOCK', 3500000)
+define(`__CPU_CLOCK', `ifelse(eval((__SPECTRUM&(__SPECTRUM_128|__SPECTRUM_128_P2)) == 0), 1, 3500000, 3546900)')
 
 # CPU info
 
