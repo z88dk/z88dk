@@ -101,12 +101,10 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 /* We want at least the size to be constant */
                 fclose(tmpfiles[3]);
                 tmpfiles[3] = NULL;
-                argnumber--;
                 builtin_flags = SMALLC|FASTCALL;
                 if ( isconstarg[2] ) {
                     fclose(tmpfiles[2]);
                     tmpfiles[2] = NULL;
-                    argnumber--;
                 }
             } else {
                 funcname = "memset";
@@ -116,12 +114,10 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 /* We want at least the size to be constant */
                 fclose(tmpfiles[3]);
                 tmpfiles[3] = NULL;
-                argnumber--;
-                builtin_flags = SMALLC|FASTCALL;
+                builtin_flags = SMALLC|FASTCALL;    
                 if ( isconstarg[2] ) {
                     fclose(tmpfiles[2]);
                     tmpfiles[2] = NULL;
-                    argnumber--;
                 }
             } else {
                 funcname = "memcpy";
@@ -138,7 +134,6 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 if ( isconstarg[2] && constargval[2] ) {
                     fclose(tmpfiles[2]);
                     tmpfiles[2] = NULL;
-                    argnumber--;
                 }
             } else {
                 funcname = "strchr";
@@ -258,9 +253,9 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     FREENULL(save_fps);
 
     if (ptr)
-        debug(DBG_ARG2, "arg %d proto %d", argnumber, ptr->args[1]);
+        debug(DBG_ARG2, "arg %d %d proto %d", argnumber, ptr->prototyped, ptr->args[1]);
 
-    if (ptr && (ptr->prototyped != 0)) {
+    if (ptr && (ptr->prototyped != 0) && builtin_flags == 0 ) {
         if ((ptr->prototyped > argnumber) && (ptr->args[1] != PVOID) && (ptr->args[1] != PELLIPSES)) {
             warning(W_2FAFUNC);
         } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PELLIPSES)) {

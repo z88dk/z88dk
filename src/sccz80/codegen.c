@@ -2788,11 +2788,11 @@ void gen_builtin_strcpy()
     // hl holds src on entry, on stack= dest
     ol("pop\tde");
     ol("push\tde");
+    ol("xor\ta");
     label = getlabel();
     postlabel(label);
-    ol("ld\ta,(hl)");
+    ol("cp\t(hl)");
     ol("ldi");
-    ol("or\ta");
     outstr("\tjr\tnz,");
     printlabel(label);
     nl();

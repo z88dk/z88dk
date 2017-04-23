@@ -2354,3 +2354,17 @@
 	add	hl,sp
 =
 	ld	sp,hl
+
+	call	memset
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	memset_callee
+
+	call	memcpy
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	memcpy_callee
