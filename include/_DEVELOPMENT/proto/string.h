@@ -84,6 +84,29 @@ __DPROTO(,,size_t,,strxfrm,char *dst,const char *src,size_t n)
    
 #endif
 
+#ifdef __SCCZ80
+
+   #ifndef __SCCZ80_DISABLE_BUILTIN
+
+	extern void __LIB__    *__builtin_memset(void *dst, int c, size_t n) __smallc;
+   extern void __LIB__    *__builtin_memcpy(void *dst, void *src,size_t n) __smallc;
+   extern char __LIB__    *__builtin_strcpy(char *dst, const char *src) __smallc;
+   extern char __LIB__    *__builtin_strchr(const char *haystack, int needle) __smallc;
+
+   #undef memset
+   #undef memcpy
+   #undef strcpy
+   #undef strchr
+
+   #define strcpy(a,b)     __builtin_strcpy(a,b)
+   #define strchr(a,b)     __builtin_strchr(a,b)
+   #define memset(a,b,c)   __builtin_memset(a,b,c)
+   #define memcpy(a,b,c)   __builtin_memcpy(a,b,c)
+
+	#endif
+
+#endif
+
 #ifdef __SDCC
 
    extern int ffsll(long long i) __preserves_regs(b,c);
