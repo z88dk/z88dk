@@ -179,10 +179,10 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
         /* already in symbol table ? */
         if (currfn->ident != FUNCTION && currfn->ident != FUNCTIONP) {
             /* already variable by that name */
-            multidef();
+            multidef(n);
         } else if (currfn->offset.i == FUNCTION && !currfn->prototyped) {
             /* already function by that name */
-            multidef();
+            multidef(n);
         } else {
             /* we have what was earlier assumed to be a function */
 

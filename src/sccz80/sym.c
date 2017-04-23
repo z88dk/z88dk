@@ -127,7 +127,7 @@ SYMBOL* addglb(
             return (ptr);
         }
 
-        multidef();
+        multidef(sname);
         return (ptr);
     }
     ptr = CALLOC(1, sizeof(*ptr));
@@ -148,7 +148,7 @@ SYMBOL* addloc(
     SYMBOL* cptr;
 
     if ((cptr = findloc(sname))) {
-        multidef();
+        multidef(sname);
         return cptr;
     }
     if (locptr >= ENDLOC) {

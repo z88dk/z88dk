@@ -85,7 +85,7 @@ defstruct(char* sname, enum storage_type storage, int is_struct)
     if (sname && (tag = findtag(sname))) {
         if (tag->weak == 0) {
             if (rcmatch('{'))
-                multidef();
+                multidef(sname);
             else
                 return tag;
         }

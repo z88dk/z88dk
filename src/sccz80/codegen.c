@@ -757,13 +757,7 @@ void zclibcallop()
     defword();
 }
 
-/* Call the specified subroutine name */
-void zcall(SYMBOL* sname)
-{
-    zcallop();
-    outname(sname->name, dopref(sname));
-    nl();
-}
+
 
 /* Output the call op code */
 
@@ -2791,14 +2785,14 @@ void popframe(void)
 void gen_builtin_strcpy()
 {
     int label;
+    // hl holds src on entry, on stack= dest
     ol("pop\tde");
-    ol("pop\thl");
     ol("push\tde");
+    ol("xor\ta");
     label = getlabel();
     postlabel(label);
-    ol("ld\ta,(hl)");
+    ol("cp\t(hl)");
     ol("ldi");
-    ol("or\ta");
     outstr("\tjr\tnz,");
     printlabel(label);
     nl();
@@ -2806,11 +2800,18 @@ void gen_builtin_strcpy()
 }
 
 
-void gen_builtin_strchr()
+void gen_builtin_strchr(int32_t c)
 {
     int startlabel, endlabel;
-    ol("pop\tde");
-    ol("pop\thl");
+    if ( c == -1 ) {
+        /* hl = c, stack = buffer */
+        ol("ex\tde,hl");
+        ol("pop\thl");
+        Zsp += 2;
+    } else {
+        /* hl = buffer */
+        outstr("\tld\te,"); outdec(c % 256); nl();
+    }
     startlabel = getlabel();
     endlabel = getlabel();
     postlabel(startlabel);
@@ -2827,6 +2828,75 @@ void gen_builtin_strchr()
     postlabel(endlabel);
 }
 
+void gen_builtin_memset(int32_t c, int32_t s)
+{
+    if ( c == -1 ) {
+        /* Entry hl = c, on stack = buffer */
+        ol("ex\tde,hl");  /* c */
+        ol("pop\thl");  /* buffer */
+        Zsp += 2;
+    } else {
+        /* hl is buffer - data load happens a bit later*/
+    }
+    ol("push\thl");
+
+    /* Now decide what to do about the count */
+    if ( s < 4 ) {
+        int i;
+        for ( i = 0; i < s; i++ ) {
+            if ( i  != 0 ) {
+                ol("inc\thl");
+            }
+            if ( c != -1 ) {
+                outstr("\tld\t(hl),"); outdec(c % 256); nl();
+            } else {
+                ol("ld\t(hl),e");
+            }
+        }
+    } else if ( s < 256 ) {
+        int looplabel = getlabel();
+        if ( c != -1 ) {
+            outstr("\tld\te,"); outdec(c % 256); nl();
+        }
+        outstr("\tld\tb,"); outdec(s); nl();
+        postlabel(looplabel);
+        ol("ld\t(hl),e");
+        ol("inc\thl");
+        outstr("\tdjnz\t"); printlabel(looplabel); nl();
+    } else {
+        if ( c != -1 ) {
+            outstr("\tld\t(hl),"); outdec(c % 256); nl();
+        } else {
+            ol("ld\t(hl),e");
+        }
+        ol("ld\td,h");
+        ol("ld\te,l");
+        ol("inc\tde");
+        outstr("\tld\tbc,"); outdec((s % 65536) - 1); nl();
+        ol("ldir");
+    }
+    ol("pop\thl");
+}
+
+void gen_builtin_memcpy(int32_t src, int32_t n)
+{
+    if ( src == -1 ) {
+        /* Entry hl = src, on stack = dst */
+        ol("pop\tde");  /* dst */
+        ol("push\tde");
+        Zsp += 2;
+        outstr("\tld\tbc,"); outdec(n % 65536); nl();
+        ol("ldir");
+    } else {
+        /* hl is dst */
+        ol("push\thl");
+        ol("ex\tde,hl");
+        outstr("\tld\thl,"); outdec(src % 65536); nl();
+        outstr("\tld\tbc,"); outdec(n % 65536); nl();
+        ol("ldir");
+    }
+    ol("pop\thl");
+}
 
 void copy_to_stack(char *label, int stack_offset,  int size)
 {
