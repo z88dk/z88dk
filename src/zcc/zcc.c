@@ -481,7 +481,7 @@ typedef struct pragma_m4_s pragma_m4_t;
 
 pragma_m4_t important_pragmas[] = {
     { 0, "startup", "__STARTUP" },
-    { 0, "CRT_INCLUDE_DEVICE_INSTANTIATION", "M4__CRT_INCLUDE_DEVICE_INSTANTIATION" },
+    { 0, "CRT_INCLUDE_DRIVER_INSTANTIATION", "M4__CRT_INCLUDE_DRIVER_INSTANTIATION" },
     { 0, "CRT_ITERM_EDIT_BUFFER_SIZE", "M4__CRT_ITERM_EDIT_BUFFER_SIZE" },
     { 0, "CRT_OTERM_FZX_DRAW_MODE", "M4__CRT_OTERM_FZX_DRAW_MODE" },
 };
@@ -991,14 +991,14 @@ int main(int argc, char **argv)
 
             while (fgets(buffer, LINEMAX, fp) != NULL)
             {
-                for (i = 0; i != sizeof(important_pragmas)/sizeof(*important_pragmas); ++i)
+                for (i = 0; i < sizeof(important_pragmas)/sizeof(*important_pragmas); ++i)
                 {
                     if ((!important_pragmas[i].seen) && (p = strstr(buffer, important_pragmas[i].pragma)) && isspace(buffer[p - buffer + strlen(important_pragmas[i].pragma)]) && isspace(*(p-1)))
                     {
                         if (sscanf(buffer, " defc %*s = %ld", &val))
                         {
                             important_pragmas[i].seen = 1;
-                            sprintf(buffer, "--define=%s=%ld", important_pragmas[i].m4_name, val);
+                            snprintf(buffer, sizeof(buffer), "--define=%s=%ld", important_pragmas[i].m4_name, val);
                             buffer[sizeof(buffer) - 1] = 0;
                             BuildOptions(&m4arg, buffer);
                         }
