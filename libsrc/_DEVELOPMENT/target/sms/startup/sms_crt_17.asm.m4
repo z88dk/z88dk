@@ -54,14 +54,20 @@ dnl############################################################
 
 include(`../clib_instantiate_begin.m4')
 
-include(`../m4_file_absent.m4')dnl
-m4_file_absent
+ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
+`
+   include(`../m4_file_absent.m4')dnl
+   m4_file_absent
 
-include(`driver/terminal/sms_01_output_terminal.m4')dnl
-m4_sms_01_output_terminal(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, CRT_OTERM_SCREEN_MAP_ADDRESS, CRT_OTERM_CHAR_PATTERN_OFFSET, CRT_OTERM_PRINT_FLAG, CRT_OTERM_BACKGROUND_CHAR)
+   include(`driver/terminal/sms_01_output_terminal.m4')dnl
+   m4_sms_01_output_terminal(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, CRT_OTERM_SCREEN_MAP_ADDRESS, CRT_OTERM_CHAR_PATTERN_OFFSET, CRT_OTERM_PRINT_FLAG, CRT_OTERM_BACKGROUND_CHAR)
 
-include(`../m4_file_dup.m4')dnl
-m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+   include(`../m4_file_dup.m4')dnl
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+',
+`
+   include(`crt_driver_instantiation.asm.m4')
+')
 
 include(`../clib_instantiate_end.m4')
 

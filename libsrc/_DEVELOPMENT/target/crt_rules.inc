@@ -527,10 +527,10 @@
 
    ;; rules that must be processed by m4
    
-   ifdef(`M4__CRT_INCLUDE_DEVICE_INSTANTIATION',,`define(`M4__CRT_INCLUDE_DEVICE_INSTANTIATION', 0)')
+   ifdef(`M4__CRT_INCLUDE_DRIVER_INSTANTIATION',,`define(`M4__CRT_INCLUDE_DRIVER_INSTANTIATION', 0)')
 
-   IFNDEF __crt_include_device_instantiation
-      defc __crt_include_device_instantiation = M4__CRT_INCLUDE_DEVICE_INSTANTIATION
+   IFNDEF __crt_include_driver_instantiation
+      defc __crt_include_driver_instantiation = M4__CRT_INCLUDE_DRIVER_INSTANTIATION
    ENDIF
 
    ;; public definitions
