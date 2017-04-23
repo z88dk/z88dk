@@ -2878,6 +2878,25 @@ void gen_builtin_memset(int32_t c, int32_t s)
     ol("pop\thl");
 }
 
+void gen_builtin_memcpy(int32_t src, int32_t n)
+{
+    if ( src == -1 ) {
+        /* Entry hl = src, on stack = dst */
+        ol("pop\tde");  /* dst */
+        ol("push\tde");
+        Zsp += 2;
+        outstr("\tld\tbc,"); outdec(n % 65536); nl();
+        ol("ldir");
+    } else {
+        /* hl is dst */
+        ol("push\thl");
+        ol("ex\tde,hl");
+        outstr("\tld\thl,"); outdec(src % 65536); nl();
+        outstr("\tld\tbc,"); outdec(n % 65536); nl();
+        ol("ldir");
+    }
+    ol("pop\thl");
+}
 
 void copy_to_stack(char *label, int stack_offset,  int size)
 {

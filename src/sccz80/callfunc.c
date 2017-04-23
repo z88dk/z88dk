@@ -111,6 +111,21 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             } else {
                 funcname = "memset";
             }
+        } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
+            if ( argnumber == 3 && isconstarg[3] && constargval[3] > 0  ) {
+                /* We want at least the size to be constant */
+                fclose(tmpfiles[3]);
+                tmpfiles[3] = NULL;
+                argnumber--;
+                builtin_flags = SMALLC|FASTCALL;
+                if ( isconstarg[2] ) {
+                    fclose(tmpfiles[2]);
+                    tmpfiles[2] = NULL;
+                    argnumber--;
+                }
+            } else {
+                funcname = "memcpy";
+            }  
         } else if ( strcmp(funcname, "__builtin_strcpy") == 0 ) {
             if ( argnumber == 2 ) {
                 builtin_flags = FASTCALL|SMALLC;
@@ -268,6 +283,9 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             nargs = 0;
         } else if ( strcmp(funcname, "__builtin_memset") == 0 ) {
             gen_builtin_memset(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
+            nargs = 0;
+        } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
+            gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
         } else if (watcharg || (ptr->flags & (SHARED|SHAREDC)) ) {
             if ((ptr->flags & (SHARED|SHAREDC) ) )
