@@ -50,8 +50,8 @@ zcc:
 	$(MAKE) -C src/zcc PREFIX=`pwd` install
 
 zpragma:
-	$(MAKE) -C src/scanner
-	$(MAKE) -C src/scanner PREFIX=`pwd` install
+	$(MAKE) -C src/zpragma
+	$(MAKE) -C src/zpragma PREFIX=`pwd` install
 
 zx7:
 	$(MAKE) -C src/zx7
@@ -118,7 +118,7 @@ clean-bins:
 	$(MAKE) -C src/z80asm clean
 	$(MAKE) -C src/z80nm clean
 	$(MAKE) -C src/zcc clean
-	$(MAKE) -C src/scanner clean
+	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C test clean

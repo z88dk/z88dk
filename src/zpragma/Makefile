@@ -1,7 +1,7 @@
 
 INSTALL ?= install
 
-OBJS = scanner.o
+OBJS = zpragma.o
 
 
 all: zpragma$(EXESUFFIX)
@@ -13,10 +13,10 @@ install:
 	$(INSTALL) zpragma$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
-	$(RM) zpragma$(EXESUFFIX) scanner.o core$(EXESUFFIX)
+	$(RM) zpragma$(EXESUFFIX) zpragma.o core$(EXESUFFIX)
 	$(RM) -rf Debug Release
 
 
 #Dependencies
 
-scanner.o: scanner.c 
+zpragma.o: zpragma.c 
