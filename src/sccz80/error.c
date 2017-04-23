@@ -144,7 +144,7 @@ struct errors {
     { "Incorrect number of arguments", 0 },
     { "Expected arguments", 0 },
     { "Out of data for struct initialisation", 1 },
-    { "Already defined", 1 },
+    { "Symbol %s is already defined", 1 },
     { "Must be lvalue", 1 },
     { "Illegal address", 0 },
     { "Can't subscript", 0 },
@@ -203,9 +203,9 @@ void illname(char* sname)
     junk();
 }
 
-void multidef(void)
+void multidef(const char *sname)
 {
-    error(E_DEFINED);
+    error(E_DEFINED,sname);
 }
 
 void needtoken(char* str)
