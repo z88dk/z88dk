@@ -17,6 +17,8 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +c128 improvements
 - [classiclib] [math48] #108: Single parameter library math functions now work correctly
 - [classiclib] +rcmx000 support has been restored and optimisations applied
+- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable with
+  -D__SDCC_DISABLE_BUILTIN or -D__SCCZ80_DISABLE_BUILTIN as appropriate
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -42,6 +44,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #26: A whole bunch of casting issues have been resolved
 - [sccz80] #176: sizeof() now works on a wider range of lvalues
 - [sccz80] #155: The section names used by sccz80 can now be configured
+- [sccz80] #188: sccz80 now provides builtin functions for memcpy, memset, strcpy, strchr
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [zpragma] Support for #pragma printf and #pragma scanf which take a format string
