@@ -3,7 +3,7 @@
 ; SELECT CRT0 FROM -STARTUP=N COMMANDLINE OPTION ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-INCLUDE "zcc_opt.def"
+include(`zcc_opt.def')
 
 ifdef(`__STARTUP',,`define(`__STARTUP', 2)')
 
@@ -11,7 +11,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
    
-   defc startup = 2
+   defc startup = __STARTUP
 
 ENDIF
 

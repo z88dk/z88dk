@@ -27,9 +27,9 @@ define(`m4_zx_01_input_kbd_inkey',dnl
    ;
    ; ioctl_flags   : $3
    ; buffer size   : $4 bytes
-   ; debounce      : `ifelse($5,,0,$5)' ms
-   ; repeat_start  : `ifelse($6,,500,$6)' ms
-   ; repeat_period : `ifelse($7,,15,$7)' ms
+   ; debounce      : $5 ms
+   ; repeat_start  : $6 ms
+   ; repeat_period : $7 ms
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    `ifelse($1,0,,dnl
@@ -153,9 +153,9 @@ define(`m4_zx_01_input_kbd_inkey',dnl
       
       defb 0
       defb 0
-      defb `ifelse($5,,0,$5)'
-      defw `ifelse($6,,500,$6)'
-      defw `ifelse($7,,15,$7)'
+      defb $5
+      defw $6
+      defw $7
       
       `ifelse($4,0,,dnl
       

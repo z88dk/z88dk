@@ -32,7 +32,7 @@ define(`m4_zx_01_output_char_64',dnl
    ;
    ; ioctl_flags   : $2
    ; cursor coord  : `($3,$4)'
-   ; window        : `(eval($5 & 254),eval($6 & 254),$7,$8)'
+   ; window        : `($5,$6,$7,$8)'
    ; scroll limit  : $9
    ; font address  : $10
    ; text colour   : $11
@@ -144,7 +144,7 @@ define(`m4_zx_01_output_char_64',dnl
       ; scroll limit
 
       defb `$3, $4'
-      defb `eval($5 & 254), eval($6 & 254), $7, $8'
+      defb `$5, $6, $7, $8'
       defb $9
       
       ; font address

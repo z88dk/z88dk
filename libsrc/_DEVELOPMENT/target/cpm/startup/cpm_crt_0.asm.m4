@@ -19,7 +19,8 @@ include "config_cpm_public.inc"
 
 include "../crt_defaults.inc"
 include "crt_config.inc"
-include "../crt_rules.inc"
+include(`../crt_rules.inc')
+include(`cpm_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -64,7 +65,7 @@ dnl
 include(`../clib_instantiate_begin.m4')
 
 include(`driver/terminal/cpm_00_input_cons.m4')
-m4_cpm_00_input_cons(_stdin, 0x0100, 64)
+m4_cpm_00_input_cons(_stdin, 0x0100, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
 include(`driver/terminal/cpm_00_output_cons.m4')
 m4_cpm_00_output_cons(_stdout, 0x0010)

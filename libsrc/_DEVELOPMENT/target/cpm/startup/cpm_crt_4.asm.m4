@@ -19,7 +19,8 @@ include "config_cpm_public.inc"
 
 include "../crt_defaults.inc"
 include "crt_config.inc"
-include "../crt_rules.inc"
+include(`../crt_rules.inc')
+include(`cpm_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -64,10 +65,10 @@ dnl
 include(`../clib_instantiate_begin.m4')
 
 include(`driver/terminal/cpm_01_input_kbd_dcio.m4')
-m4_cpm_01_input_kbd_dcio(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64)
+m4_cpm_01_input_kbd_dcio(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
 include(`driver/terminal/cpm_01_output_dcio.m4')
-m4_cpm_01_output_dcio(_stdout, 0x2370)
+m4_cpm_01_output_dcio(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
 include(`../m4_file_dup.m4')dnl
 m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
