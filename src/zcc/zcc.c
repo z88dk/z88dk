@@ -1034,11 +1034,23 @@ int main(int argc, char **argv)
     /* crt file is now the first file in filelist */
     c_crt0 = temporary_filenames[0];
 
+    // PLOT TWIST
+    // The crt must be processed last because the new c library now processes zcc_opt.def with m4.
+    // With the crt first, the other .c files have not been processed yet and zcc_opt.def may not be complete.
+    //
+    // To solve let's do something awkward.  Process the files starting at index one but go one larger than
+    // the number of files.  When the one larger number is hit, set the index to zero to do the crt.
+    //
+    // This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.
+
 	// Parse through the files, handling each one in turn
-	for (i = 0; i < nfiles; i++) {
+	for (i = 1; i <= nfiles; i++)
+    {
+        if (i == nfiles) i = 0;  // HACK 1 OF 3
 		if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
 	SWITCH_REPEAT:
-		switch (get_filetype_by_suffix(filelist[i])) {
+		switch (get_filetype_by_suffix(filelist[i]))
+        {
 		case M4FILE:
 			if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
 				exit(1);
@@ -1320,7 +1332,8 @@ int main(int argc, char **argv)
             {
                 c_crt_incpath = ptr;
                 if (verbose) printf("WILL ACT AS CRT\n");
-                continue;
+                // continue;
+                break;  // HACK 2 OF 3
             }
 
 			if (process(".asm", c_extension, c_assembler, ptr, assembler_style, i, YES, NO))
@@ -1336,6 +1349,8 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Filetype of %s (%s) unrecognized\n", filelist[i], original_filenames[i]);
 			exit(1);
 		}
+
+        if (i == 0) break;  // HACK 3 OF 3
 	}
 
 	if (verbose) printf("\nGENERATING OUTPUT\n");
