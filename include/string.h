@@ -209,7 +209,7 @@ extern void __LIB__   *rawmemchr(const void *, uint c) __smallc;
 
 // Builtin handling
 
-#ifdef SCCZ80
+#ifdef __SCCZ80
 #ifndef __SCCZ80_DISABLE_BUILTIN
 extern void __LIB__    *__builtin_memset(void *dst, int c, size_t n) __smallc;
 extern void __LIB__    *__builtin_memcpy(void *dst, void *src,size_t n) __smallc;
@@ -226,7 +226,7 @@ extern char __LIB__    *__builtin_strchr(const char *haystack, int needle) __sma
 #endif
 #endif
 
-#ifdef Z88DK_USES_SDCC
+#ifdef __SDCC
 #ifndef __SDCC_DISABLE_BUILTIN
 #undef memcpy
 #undef strcpy
