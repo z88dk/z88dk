@@ -2346,7 +2346,7 @@ static void configure_compiler()
 		if (sdccarg) {
 			add_option_to_compiler(sdccarg);
 		}
-		preprocarg = " -DZ88DK_USES_SDCC=1";
+		preprocarg = " -DZ88DK_USES_SDCC=1 -D__SDCC";
 		BuildOptions(&cpparg, preprocarg);
 		//if ( assembler_type == ASM_Z80ASM ) {
 		//    parse_cmdline_arg("-Ca-sdcc");
@@ -2357,7 +2357,7 @@ static void configure_compiler()
 		write_zcc_defined("Z88DK_USES_SDCC", 1, 0);
 	}
 	else {
-		preprocarg = " -DSCCZ80 -DSMALL_C";
+		preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
 		BuildOptions(&cpparg, preprocarg);
 		/* Indicate to sccz80 what assembler we want */
 		snprintf(buf, sizeof(buf), "-asm=%s -ext=opt %s", c_assembler_type,
