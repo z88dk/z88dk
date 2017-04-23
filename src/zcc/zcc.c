@@ -412,6 +412,7 @@ static arg_t     myargs[] = {
 	{ "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
 	{ "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
 	{ "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
+    { "pragma-output",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def (same as above)" },
 	{ "pragma-export",AF_MORE,PragmaExport,NULL, NULL, "Define the option in zcc_opt.def and export as public" },
 	{ "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
 	{ "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
@@ -469,6 +470,21 @@ static arg_t     myargs[] = {
 	{ "", 0, NULL, NULL }
 };
 
+
+struct pragma_m4_s {
+    int         seen;
+    const char *pragma;
+    const char *m4_name;
+};
+
+typedef struct pragma_m4_s pragma_m4_t;
+
+pragma_m4_t important_pragmas[] = {
+    { 0, "startup", "__STARTUP" },
+    { 0, "CRT_INCLUDE_DEVICE_INSTANTIATION", "M4__CRT_INCLUDE_DEVICE_INSTANTIATION" },
+    { 0, "CRT_ITERM_EDIT_BUFFER_SIZE", "M4__CRT_ITERM_EDIT_BUFFER_SIZE" },
+    { 0, "CRT_OTERM_FZX_DRAW_MODE", "M4__CRT_OTERM_FZX_DRAW_MODE" },
+};
 
 
 static void *mustmalloc(size_t n)
@@ -889,7 +905,6 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-
 	/* Mangle math lib name but only for classic compiles */
 	if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
 		if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   // -lm appears here
@@ -962,6 +977,43 @@ int main(int argc, char **argv)
     BuildOptions(&m4arg, c_m4opts);
 
     build_bin = !m4only && !clangonly && !llvmonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
+
+    /* Create M4 defines out of some pragmas for the CRT */
+    /* Some pragma values need to be known at m4 time in the new c lib CRTs */
+
+    if (build_bin)
+    {
+        if ((fp = fopen(DEFFILE, "r")) != NULL)
+        {
+            unsigned char buffer[LINEMAX + 1];
+            char *p;
+            long val;
+
+            while (fgets(buffer, LINEMAX, fp) != NULL)
+            {
+                for (i = 0; i != sizeof(important_pragmas)/sizeof(*important_pragmas); ++i)
+                {
+                    if ((!important_pragmas[i].seen) && (p = strstr(buffer, important_pragmas[i].pragma)) && isspace(buffer[p - buffer + strlen(important_pragmas[i].pragma)]) && isspace(*(p-1)))
+                    {
+                        if (sscanf(buffer, " defc %*s = %ld", &val))
+                        {
+                            important_pragmas[i].seen = 1;
+                            sprintf(buffer, "--define=%s=%ld", important_pragmas[i].m4_name, val);
+                            buffer[sizeof(buffer) - 1] = 0;
+                            BuildOptions(&m4arg, buffer);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Could not open %s: File in use?\n", DEFFILE);
+            exit(1);
+        }
+
+        fclose(fp);
+    }
 
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
@@ -1715,7 +1767,7 @@ void GlobalDefc(arg_t *argument, char *arg)
         {
             // filename containing regular expressions
             ++ptr;
-            while (isspace(*ptr) || ispunct(*ptr)) ++ptr;
+            while (isspace(*ptr) || (*ptr == '=') || (*ptr == ':')) ++ptr;
 
             if (*ptr != 0)
                 *(char **)argument->data = muststrdup(ptr);
@@ -2165,9 +2217,6 @@ static void configure_misc_options()
 	if (c_startup >= -1) {
         char tmp[64];
 		write_zcc_defined("startup", c_startup, 0);
-        snprintf(tmp, sizeof(tmp), "--define=__STARTUP=%d", c_startup);
-        tmp[sizeof(tmp) - 1] = 0;
-        BuildOptions(&m4arg, tmp);
 	}
 
 	if (linkargs == NULL) {
@@ -2325,7 +2374,7 @@ void PragmaInclude(arg_t *arg, char *val)
 {
 	char *ptr = strip_outer_quotes(val + strlen(arg->name) + 1);
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if (*ptr != '\0') {
 		free(pragincname);
@@ -2339,7 +2388,7 @@ void PragmaRedirect(arg_t *arg, char *val)
 	char *ptr = val + strlen(arg->name) + 1;
 	char *value = "";
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if ((eql = strchr(ptr, '=')) != NULL) {
 		*eql = 0;
@@ -2361,7 +2410,7 @@ void PragmaDefine(arg_t *arg, char *val)
 	int   value = 0;
 	char *eql;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if ((eql = strchr(ptr, '=')) != NULL) {
 		*eql = 0;
@@ -2376,7 +2425,7 @@ void PragmaExport(arg_t *arg, char *val)
 	int   value = 0;
 	char *eql;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if ((eql = strchr(ptr, '=')) != NULL) {
 		*eql = 0;
@@ -2399,7 +2448,7 @@ void PragmaNeed(arg_t *arg, char *val)
 {
 	char *ptr = val + strlen(arg->name) + 1;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	add_zccopt("\nIF !NEED_%s\n", ptr);
 	add_zccopt("\tDEFINE\tNEED_%s\n", ptr);
@@ -2412,7 +2461,7 @@ void PragmaBytes(arg_t *arg, char *val)
 	char *ptr = val + strlen(arg->name) + 1;
 	char *value;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr ==':')) ++ptr;
 
 	if ((value = strchr(ptr, '=')) != NULL) {
 		*value++ = 0;
