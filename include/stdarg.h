@@ -25,7 +25,7 @@
 
 
 
-#ifdef Z88DK_R2L_CALLING_CONVENTION
+#ifdef __Z88DK_R2L_CALLING_CONVENTION
 
 /* sdcc/sccz80 in r2l mode is a lot more standard */
 typedef unsigned char * va_list;

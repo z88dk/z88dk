@@ -11,7 +11,7 @@
 
 #ifndef _FLOAT_T
 #define _FLOAT_T
-#ifdef Z88DK_USES_SDCC
+#ifdef __SDCC
 typedef float float_t;
 #else
 typedef double float_t;
@@ -20,7 +20,7 @@ typedef double float_t;
 
 #ifndef _DOUBLE_T
 #define _DOUBLE_T
-#ifdef Z88DK_USES_SDCC
+#ifdef __SDCC
 typedef float double_t;
 #else
 typedef double double_t;
