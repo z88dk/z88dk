@@ -1,140 +1,140 @@
- LD (HL + -128), HL     ;; 011D:  DD F4 80
- LD (HL + 0), HL        ;; 011D:  DD F4 00
- LD (HL + 127), HL      ;; 011D:  DD F4 7F
- LD (ix + -128), HL     ;; 011D:  F4 80
- LD (ix + 0), HL        ;; 011D:  F4 00
- LD (ix + 127), HL      ;; 011D:  F4 7F
- LD (iy + -128), HL     ;; 011D:  FD F4 80
- LD (iy + 0), HL        ;; 011D:  FD F4 00
- LD (iy + 127), HL      ;; 011D:  FD F4 7F
- LD (SP + 0), HL        ;; 011D:  D4 00
- LD (SP + 85), HL       ;; 011D:  D4 55
- LD (SP + 170), HL      ;; 011D:  D4 AA
- LD (SP + 255), HL      ;; 011D:  D4 FF
- LD (SP + 0), IX        ;; 011D:  DD D4 00
- LD (SP + 85), IX       ;; 011D:  DD D4 55
- LD (SP + 170), IX      ;; 011D:  DD D4 AA
- LD (SP + 255), IX      ;; 011D:  DD D4 FF
- LD (SP + 0), IY        ;; 011D:  FD D4 00
- LD (SP + 85), IY       ;; 011D:  FD D4 55
- LD (SP + 170), IY      ;; 011D:  FD D4 AA
- LD (SP + 255), IY      ;; 011D:  FD D4 FF
- EX DE', HL             ;; 0125:  E3
- EX DE, HL'             ;; 0125:  76 EB
- EX DE', HL'            ;; 0125:  76 E3
- ADD A, IXH             ;; 016D:  DD 84
- ADC A, IXH             ;; 016D:  DD 8C
- SUB IXH                ;; 016D:  DD 94
- SBC A, IXH             ;; 016D:  DD 9C
- AND IXH                ;; 016D:  DD A4
- XOR IXH                ;; 016D:  DD AC
- OR IXH                 ;; 016D:  DD B4
- CP IXH                 ;; 016D:  DD BC
- ADD A, IXL             ;; 016D:  DD 85
- ADC A, IXL             ;; 016D:  DD 8D
- SUB IXL                ;; 016D:  DD 95
- SBC A, IXL             ;; 016D:  DD 9D
- AND IXL                ;; 016D:  DD A5
- XOR IXL                ;; 016D:  DD AD
- OR IXL                 ;; 016D:  DD B5
- CP IXL                 ;; 016D:  DD BD
- ADD A, IYH             ;; 016D:  FD 84
- ADC A, IYH             ;; 016D:  FD 8C
- SUB IYH                ;; 016D:  FD 94
- SBC A, IYH             ;; 016D:  FD 9C
- AND IYH                ;; 016D:  FD A4
- XOR IYH                ;; 016D:  FD AC
- OR IYH                 ;; 016D:  FD B4
- CP IYH                 ;; 016D:  FD BC
- ADD A, IYL             ;; 016D:  FD 85
- ADC A, IYL             ;; 016D:  FD 8D
- SUB IYL                ;; 016D:  FD 95
- SBC A, IYL             ;; 016D:  FD 9D
- AND IYL                ;; 016D:  FD A5
- XOR IYL                ;; 016D:  FD AD
- OR IYL                 ;; 016D:  FD B5
- CP IYL                 ;; 016D:  FD BD
- ALTD                   ;; 02A3:  76
- LD A, XPC              ;; 02A3:  ED 77
- LD XPC, A              ;; 02A3:  ED 67
- ADD SP, -128           ;; 02B7:  27 80
- ADD SP, 0              ;; 02B7:  27 00
- ADD SP, 127            ;; 02B7:  27 7F
- AND HL, DE             ;; 02C7:  DC
- AND IX, DE             ;; 02C7:  DD DC
- AND IY, DE             ;; 02C7:  FD DC
- BOOL HL                ;; 02C7:  CC
- BOOL IX                ;; 02C7:  DD CC
- BOOL IY                ;; 02C7:  FD CC
- JP LZ, 0               ;; 084F:  E2 00 00
- JP LZ, 4660            ;; 084F:  E2 34 12
- JP LZ, 52719           ;; 084F:  E2 EF CD
- JP LZ, 65535           ;; 084F:  E2 FF FF
- JP LO, 0               ;; 084F:  EA 00 00
- JP LO, 4660            ;; 084F:  EA 34 12
- JP LO, 52719           ;; 084F:  EA EF CD
- JP LO, 65535           ;; 084F:  EA FF FF
- RET LZ                 ;; 08D5:  E0
- RET LO                 ;; 08D5:  E8
- IOE                    ;; 09D5:  DB
- IOI                    ;; 09D5:  D3
- IPSET 0                ;; 09DD:  ED 46
- IPSET 1                ;; 09DD:  ED 56
- IPSET 2                ;; 09DD:  ED 4E
- IPSET 3                ;; 09DD:  ED 5E
- IPRES                  ;; 09DD:  ED 5D
- LD IIR, A              ;; 09E5:  ED 47
- LD A, IIR              ;; 09E5:  ED 57
- LD EIR, A              ;; 09E5:  ED 4F
- LD A, EIR              ;; 09E5:  ED 5F
- IDET                   ;; 09E9:  5B
- ld b, ixh              ;; 0A1A:  DD 44
- ld b, ixl              ;; 0A1A:  DD 45
- ld c, ixh              ;; 0A1A:  DD 4C
- ld c, ixl              ;; 0A1A:  DD 4D
- ld d, ixh              ;; 0A1A:  DD 54
- ld d, ixl              ;; 0A1A:  DD 55
- ld e, ixh              ;; 0A1A:  DD 5C
- ld e, ixl              ;; 0A1A:  DD 5D
- ld ixh, ixh            ;; 0A1A:  DD 64
- ld ixh, ixl            ;; 0A1A:  DD 65
- ld ixl, ixh            ;; 0A1A:  DD 6C
- ld ixl, ixl            ;; 0A1A:  DD 6D
- ld a, ixh              ;; 0A1A:  DD 7C
- ld a, ixl              ;; 0A1A:  DD 7D
- ld b, iyh              ;; 0A1A:  FD 44
- ld b, iyl              ;; 0A1A:  FD 45
- ld c, iyh              ;; 0A1A:  FD 4C
- ld c, iyl              ;; 0A1A:  FD 4D
- ld d, iyh              ;; 0A1A:  FD 54
- ld d, iyl              ;; 0A1A:  FD 55
- ld e, iyh              ;; 0A1A:  FD 5C
- ld e, iyl              ;; 0A1A:  FD 5D
- ld iyh, iyh            ;; 0A1A:  FD 64
- ld iyh, iyl            ;; 0A1A:  FD 65
- ld iyl, iyh            ;; 0A1A:  FD 6C
- ld iyl, iyl            ;; 0A1A:  FD 6D
- ld a, iyh              ;; 0A1A:  FD 7C
- ld a, iyl              ;; 0A1A:  FD 7D
- ld ixh, 0              ;; 0A52:  DD 26 00
- ld ixh, 85             ;; 0A52:  DD 26 55
- ld ixh, 170            ;; 0A52:  DD 26 AA
- ld ixh, 255            ;; 0A52:  DD 26 FF
- ld ixl, 0              ;; 0A52:  DD 2E 00
- ld ixl, 85             ;; 0A52:  DD 2E 55
- ld ixl, 170            ;; 0A52:  DD 2E AA
- ld ixl, 255            ;; 0A52:  DD 2E FF
- ld iyh, 0              ;; 0A52:  FD 26 00
- ld iyh, 85             ;; 0A52:  FD 26 55
- ld iyh, 170            ;; 0A52:  FD 26 AA
- ld iyh, 255            ;; 0A52:  FD 26 FF
- ld iyl, 0              ;; 0A52:  FD 2E 00
- ld iyl, 85             ;; 0A52:  FD 2E 55
- ld iyl, 170            ;; 0A52:  FD 2E AA
- ld iyl, 255            ;; 0A52:  FD 2E FF
- ld bc', bc             ;; 0BEC:  ED 49
- ld bc', de             ;; 0BEC:  ED 41
- ld de', bc             ;; 0BEC:  ED 59
- ld de', de             ;; 0BEC:  ED 51
- ld hl', bc             ;; 0BEC:  ED 69
- ld hl', de             ;; 0BEC:  ED 61
+ ADD A, IXH             ;; 0040:  DD 84
+ ADC A, IXH             ;; 0040:  DD 8C
+ SUB IXH                ;; 0040:  DD 94
+ SBC A, IXH             ;; 0040:  DD 9C
+ AND IXH                ;; 0040:  DD A4
+ XOR IXH                ;; 0040:  DD AC
+ OR IXH                 ;; 0040:  DD B4
+ CP IXH                 ;; 0040:  DD BC
+ ADD A, IXL             ;; 0040:  DD 85
+ ADC A, IXL             ;; 0040:  DD 8D
+ SUB IXL                ;; 0040:  DD 95
+ SBC A, IXL             ;; 0040:  DD 9D
+ AND IXL                ;; 0040:  DD A5
+ XOR IXL                ;; 0040:  DD AD
+ OR IXL                 ;; 0040:  DD B5
+ CP IXL                 ;; 0040:  DD BD
+ ADD A, IYH             ;; 0040:  FD 84
+ ADC A, IYH             ;; 0040:  FD 8C
+ SUB IYH                ;; 0040:  FD 94
+ SBC A, IYH             ;; 0040:  FD 9C
+ AND IYH                ;; 0040:  FD A4
+ XOR IYH                ;; 0040:  FD AC
+ OR IYH                 ;; 0040:  FD B4
+ CP IYH                 ;; 0040:  FD BC
+ ADD A, IYL             ;; 0040:  FD 85
+ ADC A, IYL             ;; 0040:  FD 8D
+ SUB IYL                ;; 0040:  FD 95
+ SBC A, IYL             ;; 0040:  FD 9D
+ AND IYL                ;; 0040:  FD A5
+ XOR IYL                ;; 0040:  FD AD
+ OR IYL                 ;; 0040:  FD B5
+ CP IYL                 ;; 0040:  FD BD
+ ALTD                   ;; 0176:  76
+ LD A, XPC              ;; 0176:  ED 77
+ LD XPC, A              ;; 0176:  ED 67
+ ADD SP, -128           ;; 018A:  27 80
+ ADD SP, 0              ;; 018A:  27 00
+ ADD SP, 127            ;; 018A:  27 7F
+ AND HL, DE             ;; 019A:  DC
+ AND IX, DE             ;; 019A:  DD DC
+ AND IY, DE             ;; 019A:  FD DC
+ BOOL HL                ;; 019A:  CC
+ BOOL IX                ;; 019A:  DD CC
+ BOOL IY                ;; 019A:  FD CC
+ JP LZ, 0               ;; 0722:  E2 00 00
+ JP LZ, 4660            ;; 0722:  E2 34 12
+ JP LZ, 52719           ;; 0722:  E2 EF CD
+ JP LZ, 65535           ;; 0722:  E2 FF FF
+ JP LO, 0               ;; 0722:  EA 00 00
+ JP LO, 4660            ;; 0722:  EA 34 12
+ JP LO, 52719           ;; 0722:  EA EF CD
+ JP LO, 65535           ;; 0722:  EA FF FF
+ RET LZ                 ;; 07A8:  E0
+ RET LO                 ;; 07A8:  E8
+ IOE                    ;; 08A8:  DB
+ IOI                    ;; 08A8:  D3
+ IPSET 0                ;; 08B0:  ED 46
+ IPSET 1                ;; 08B0:  ED 56
+ IPSET 2                ;; 08B0:  ED 4E
+ IPSET 3                ;; 08B0:  ED 5E
+ IPRES                  ;; 08B0:  ED 5D
+ LD IIR, A              ;; 08B8:  ED 47
+ LD A, IIR              ;; 08B8:  ED 57
+ LD EIR, A              ;; 08B8:  ED 4F
+ LD A, EIR              ;; 08B8:  ED 5F
+ IDET                   ;; 08BC:  5B
+ ld b, ixh              ;; 08ED:  DD 44
+ ld b, ixl              ;; 08ED:  DD 45
+ ld c, ixh              ;; 08ED:  DD 4C
+ ld c, ixl              ;; 08ED:  DD 4D
+ ld d, ixh              ;; 08ED:  DD 54
+ ld d, ixl              ;; 08ED:  DD 55
+ ld e, ixh              ;; 08ED:  DD 5C
+ ld e, ixl              ;; 08ED:  DD 5D
+ ld ixh, ixh            ;; 08ED:  DD 64
+ ld ixh, ixl            ;; 08ED:  DD 65
+ ld ixl, ixh            ;; 08ED:  DD 6C
+ ld ixl, ixl            ;; 08ED:  DD 6D
+ ld a, ixh              ;; 08ED:  DD 7C
+ ld a, ixl              ;; 08ED:  DD 7D
+ ld b, iyh              ;; 08ED:  FD 44
+ ld b, iyl              ;; 08ED:  FD 45
+ ld c, iyh              ;; 08ED:  FD 4C
+ ld c, iyl              ;; 08ED:  FD 4D
+ ld d, iyh              ;; 08ED:  FD 54
+ ld d, iyl              ;; 08ED:  FD 55
+ ld e, iyh              ;; 08ED:  FD 5C
+ ld e, iyl              ;; 08ED:  FD 5D
+ ld iyh, iyh            ;; 08ED:  FD 64
+ ld iyh, iyl            ;; 08ED:  FD 65
+ ld iyl, iyh            ;; 08ED:  FD 6C
+ ld iyl, iyl            ;; 08ED:  FD 6D
+ ld a, iyh              ;; 08ED:  FD 7C
+ ld a, iyl              ;; 08ED:  FD 7D
+ ld ixh, 0              ;; 0925:  DD 26 00
+ ld ixh, 85             ;; 0925:  DD 26 55
+ ld ixh, 170            ;; 0925:  DD 26 AA
+ ld ixh, 255            ;; 0925:  DD 26 FF
+ ld ixl, 0              ;; 0925:  DD 2E 00
+ ld ixl, 85             ;; 0925:  DD 2E 55
+ ld ixl, 170            ;; 0925:  DD 2E AA
+ ld ixl, 255            ;; 0925:  DD 2E FF
+ ld iyh, 0              ;; 0925:  FD 26 00
+ ld iyh, 85             ;; 0925:  FD 26 55
+ ld iyh, 170            ;; 0925:  FD 26 AA
+ ld iyh, 255            ;; 0925:  FD 26 FF
+ ld iyl, 0              ;; 0925:  FD 2E 00
+ ld iyl, 85             ;; 0925:  FD 2E 55
+ ld iyl, 170            ;; 0925:  FD 2E AA
+ ld iyl, 255            ;; 0925:  FD 2E FF
+ ld (hl + -128), hl     ;; 0C60:  DD F4 80
+ ld (hl + 0), hl        ;; 0C60:  DD F4 00
+ ld (hl + 127), hl      ;; 0C60:  DD F4 7F
+ ld (ix + -128), hl     ;; 0C60:  F4 80
+ ld (ix + 0), hl        ;; 0C60:  F4 00
+ ld (ix + 127), hl      ;; 0C60:  F4 7F
+ ld (iy + -128), hl     ;; 0C60:  FD F4 80
+ ld (iy + 0), hl        ;; 0C60:  FD F4 00
+ ld (iy + 127), hl      ;; 0C60:  FD F4 7F
+ ld (sp + 0), hl        ;; 0C60:  D4 00
+ ld (sp + 85), hl       ;; 0C60:  D4 55
+ ld (sp + 170), hl      ;; 0C60:  D4 AA
+ ld (sp + 255), hl      ;; 0C60:  D4 FF
+ ld (sp + 0), ix        ;; 0C60:  DD D4 00
+ ld (sp + 85), ix       ;; 0C60:  DD D4 55
+ ld (sp + 170), ix      ;; 0C60:  DD D4 AA
+ ld (sp + 255), ix      ;; 0C60:  DD D4 FF
+ ld (sp + 0), iy        ;; 0C60:  FD D4 00
+ ld (sp + 85), iy       ;; 0C60:  FD D4 55
+ ld (sp + 170), iy      ;; 0C60:  FD D4 AA
+ ld (sp + 255), iy      ;; 0C60:  FD D4 FF
+ ld bc', bc             ;; 0C60:  ED 49
+ ld bc', de             ;; 0C60:  ED 41
+ ld de', bc             ;; 0C60:  ED 59
+ ld de', de             ;; 0C60:  ED 51
+ ld hl', bc             ;; 0C60:  ED 69
+ ld hl', de             ;; 0C60:  ED 61
+ ex de', hl             ;; 0C69:  E3
+ ex de, hl'             ;; 0C69:  76 EB
+ ex de', hl'            ;; 0C69:  76 E3

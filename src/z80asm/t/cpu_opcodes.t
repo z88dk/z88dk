@@ -65,67 +65,6 @@ for (@CPU) {
 	my $ZILOG	= $Z80 || $Z180;
 	my $RABBIT	= $R2K || $R3K;
 	
-	# 16-bit load group
-	emit($ALL,		"LD dd, m", 		"0x01 + dd * 16", "m & 255", "m >> 8");
-	emit($ALL,		"LD x, m", 			"x", "0x01 + 2 * 16", "m & 255", "m >> 8");
-	
-	emit($ALL,		"LD HL, (m)", 		0x2A, "m & 255", "m >> 8");
-	emit($ALL,		"LD x, (m)", 		"x", 0x2A, "m & 255", "m >> 8");
-
-	emit($ALL,		"LD dd1, (m)", 		0xED, "0x4B + dd1 * 16", "m & 255", "m >> 8");
-
-	emit($ALL,		"LD (m), HL", 		0x22, "m & 255", "m >> 8");
-	emit($ALL,		"LD (m), x", 		"x", 0x22, "m & 255", "m >> 8");
-
-	emit($ALL,		"LD (m), dd1", 		0xED, "0x43 + dd1 * 16", "m & 255", "m >> 8");
-
-	emit($ALL,		"LD SP, HL",		0xF9);
-	emit($ALL,		"LD SP, x",			"x", 0xF9);
-	
-	emit($ALL,		"PUSH qq",			"0xC5 + qq * 16");
-	emit($ALL,		"PUSH x",			"x", "0xC5 + 2 * 16");
-	emit($ALL,		"POP qq",			"0xC1 + qq * 16");
-	emit($ALL,		"POP x",			"x", "0xC1 + 2 * 16");
-	
-	emit($RABBIT,	"LD (HL + d), HL",	0xDD, 0xF4, "d");
-	emit($RABBIT,	"LD (ix + d), HL",	      0xF4, "d");		# Note: lower case ix, iy to avoid replacement in replace_index()
-	emit($RABBIT,	"LD (iy + d), HL",	0xFD, 0xF4, "d");
-	
-	emit($RABBIT, 	"LD (SP + n), HL",	0xD4, "n");
-	emit($RABBIT, 	"LD (SP + n), x",	"x", 0xD4, "n");
-	
-	# Exchange Group
-	emit($ALL,		"EX DE, HL",		0xEB);
-	emit($ALL,		"EX AF, AF'",		0x08);
-	emit($ALL,		"EXX",				0xD9);
-	
-	if ($ZILOG) {
-		emit($ALL,	"EX (SP), HL",		0xE3);
-	}
-	else {
-		emit($ALL,	"EX (SP), HL",		0xED, 0x54);
-	}
-
-	emit($ALL,		"EX (SP), x",		"x", 0xE3);
-	
-	emit($RABBIT,	"EX DE', HL",		0xE3);
-	emit($RABBIT,	"EX DE, HL'",		0x76, 0xEB);
-	emit($RABBIT,	"EX DE', HL'",		0x76, 0xE3);
-
-	
-	# Block Transfer Group
-	emit($ALL,		"LDI",				0xED, 0xA0);
-	emit($ALL,		"LDIR",				0xED, 0xB0);
-	emit($ALL,		"LDD",				0xED, 0xA8);
-	emit($ALL,		"LDDR",				0xED, 0xB8);
-	
-
-	# Search Group
-	emit($ZILOG,	"CPI",				0xED, 0xA1);
-	emit($ZILOG,	"CPIR",				0xED, 0xB1);
-	emit($ZILOG,	"CPD",				0xED, 0xA9);
-	emit($ZILOG,	"CPDR",				0xED, 0xB9);
-	
 	
 	# 8-Bit Arithmetic Group
 	emit($ALL,		"alu r",			"0x80 + alu * 8 + r");
@@ -428,6 +367,9 @@ sub parse {
 			
 			# get opcode and bytes
 			my($opcode, $bytes) = split(/\s*=>\s*/, $_);
+			
+			# handle cpus in bytes
+			$bytes =~ s/\[(.*?)\]/ check_cpus($cpu, split(' ', $1)) /ge;
 			emit_line($exists, $opcode, $bytes);
 		}
 	}
@@ -479,15 +421,17 @@ sub emit_line {
 
 	# compute bytes
 	$bytes =~ s/([0-9A-F]+)/0x$1/g;		# all numbers in hex
-	my @bytes = split(/\s*,\s*/, $bytes);
+	my @bytes = split_exprs($bytes);
 	
 	# emit
 	my $asm_line = sprintf(" %-23s;; %04X: ", $opcode, $addr);
 	my $bin_line = '';
 	for (@bytes) {
-		my $byte = eval($_); $@ and die $@;
-		$asm_line .= sprintf(" %02X", $byte);
-		$bin_line .= chr($byte);
+		my @subbytes = eval($_); $@ and die $@;
+		for my $byte (@subbytes) {
+			$asm_line .= sprintf(" %02X", $byte);
+			$bin_line .= chr($byte);
+		}
 	}
 	
 	if (!$exists) {
@@ -513,6 +457,39 @@ sub expand_values {
 
 		emit_line($exists, $opcode_copy, $bytes_copy);
 	}
+}
+
+sub split_exprs {
+	local($_) = @_;
+	my @exprs = ('');
+	my $paren = 0;
+	while (! /\G\Z/gc) {
+		if (/\G\(/gc) {
+			$paren++;
+			$exprs[-1] .= $&;
+		}
+		elsif (/\G\)/gc) {
+			$paren--;
+			die "syntax error: $_" if $paren < 0;
+			$exprs[-1] .= $&;
+		}
+		elsif (/\G,/gc) {
+			if ($paren == 0) {
+				push @exprs, '';
+			}
+			else {
+				$exprs[-1] .= $&;
+			}
+		}
+		elsif (/\G[^(),]+/gc) {
+			$exprs[-1] .= $&;
+		}
+		else {
+			die "syntax error: $_";
+		}
+	}
+	
+	return @exprs;
 }
 
 sub replace_index {

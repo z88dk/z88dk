@@ -30,7 +30,74 @@
 			
 			ld a, (MN)										=> 	   3A, N, M
 			ld (MN), a										=> 	   32, N, M
+
 ;------------------------------------------------------------------------------
 ; 16-bit load group
 ;------------------------------------------------------------------------------
+			ld {bc de hl sp}, MN		=>     01 + $1*10, N, M
+			ld {.  .  ix . }, MN		=> DD, 01 + $1*10, N, M
+			ld {.  .  iy . }, MN		=> FD, 01 + $1*10, N, M
+
+			ld hl, (MN)					=>     2A, N, M
+			ld ix, (MN)					=> DD, 2A, N, M
+			ld iy, (MN)					=> FD, 2A, N, M
+
+			ld (MN), hl					=>     22, N, M
+			ld (MN), ix					=> DD, 22, N, M
+			ld (MN), iy					=> FD, 22, N, M
+
+			LD {bc de . sp}, (MN)		=> ED, 4B + $1*10, N, M
+			LD (MN), {bc de . sp}		=> ED, 43 + $1*10, N, M
+
+			ld sp, hl					=>     F9
+			ld sp, ix					=> DD, F9
+			ld sp, iy					=> FD, F9
+
+			push {bc de hl af}			=>     C5 + $1*10
+			push {.  .  ix . }			=> DD, C5 + $1*10
+			push {.  .  iy . }			=> FD, C5 + $1*10
+
+			pop {bc de hl af}			=>     C1 + $1*10
+			pop {.  .  ix . }			=> DD, C1 + $1*10
+			pop {.  .  iy . }			=> FD, C1 + $1*10
+
+[rabbit]	ld (hl + D), hl				=> DD, F4, D
+[rabbit]	ld (ix + D), hl				=>     F4, D
+[rabbit]	ld (iy + D), hl				=> FD, F4, D
+
+[rabbit]	ld (sp + N), hl				=>     D4, N
+[rabbit]	ld (sp + N), ix				=> DD, D4, N
+[rabbit]	ld (sp + N), iy				=> FD, D4, N
+	
 [rabbit]	ld {bc de hl}', {bc de}		=> ED, 49 + $1*10 - $2*8
+
+;------------------------------------------------------------------------------
+; Exchange Group
+;------------------------------------------------------------------------------
+			ex af, {af af'}				=>     08
+			exx							=>     D9
+
+			ex (sp), hl					=> [zilog] ? (E3) : (ED, 54)
+			ex (sp), ix					=> DD, E3
+			ex (sp), iy					=> FD, E3
+
+			ex de, hl					=>     EB
+[rabbit]	ex de', hl 					=>     E3
+[rabbit]	ex de,  hl'					=> 76, EB
+[rabbit]	ex de', hl'					=> 76, E3
+
+;------------------------------------------------------------------------------
+; Block Transfer Group
+;------------------------------------------------------------------------------
+			ldi 						=> ED, A0
+			ldir						=> ED, B0
+			ldd 						=> ED, A8
+			lddr						=> ED, B8
+
+;------------------------------------------------------------------------------
+; Search Group
+;------------------------------------------------------------------------------
+[zilog]		cpi 						=> ED, A1
+[zilog]		cpir						=> ED, B1
+[zilog]		cpd 						=> ED, A9
+[zilog]		cpdr						=> ED, B9
