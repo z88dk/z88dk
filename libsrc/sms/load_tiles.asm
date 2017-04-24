@@ -9,7 +9,8 @@
 ;==============================================================
 .load_tiles
 ._load_tiles
-	ld	hl, 2
+	push	ix	; save callers ix
+	ld	hl, 4
 	add	hl, sp
 	ld	a, (hl) ; bits per pixel
 	inc	hl
@@ -27,7 +28,6 @@
 	inc	hl
 	ld	d, (hl)
 	inc	hl
-	push	ix	; save callers ix
 	push	de
 	pop	ix	; tile data
 	pop	hl	; initial index
