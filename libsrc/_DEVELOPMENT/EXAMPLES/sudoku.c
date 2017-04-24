@@ -9,7 +9,7 @@
 
 // use -DVERBOSE to print list of steps taken
 
-#pragma output CLIB_OPT_PRINTF       = 0x00000102    // printf has %uB enabled only
+#pragma printf = "%u %B"
 
 #ifdef __SPECTRUM
 #pragma output REGISTER_SP           = -1            // do not change stack pointer

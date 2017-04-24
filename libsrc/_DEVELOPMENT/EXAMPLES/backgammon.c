@@ -5,8 +5,8 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size backgammon.c -o backg -create-app
 // zcc +zx -vn -SO3 -startup=4 -clib-sdcc_iy --max-allocs-per-node200000 --opt-code-size backgammon.c -o backg -create-app
 
-#pragma output CLIB_OPT_PRINTF         = 0x00000401  // printf has %cd enabled only
-#pragma output CLIB_OPT_SCANF          = 0x00000001  // scanf has %d enabled only
+#pragma printf = "%c %d"
+#pragma scanf  = "%d"
 
 #ifdef __SPECTRUM
 

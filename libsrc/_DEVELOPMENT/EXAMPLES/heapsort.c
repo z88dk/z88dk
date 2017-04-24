@@ -27,8 +27,9 @@
 #include <adt/wa_priority_queue.h>
 #include <intrinsic.h>
 
-#pragma output CLIB_OPT_PRINTF       = 0x202   // enable %u%s only
-#pragma output CLIB_OPT_SCANF        = 0x2     // enable %u only
+#pragma printf = "%u %s"
+#pragma scanf  = "%u"
+
 #pragma output CLIB_MALLOC_HEAP_SIZE = 5000    // specify a 5k heap
 
 wa_priority_queue_t queue;
