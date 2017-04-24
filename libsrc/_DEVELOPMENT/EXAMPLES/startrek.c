@@ -30,7 +30,7 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 // zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 
-#pragma output CLIB_OPT_PRINTF         = 0x04000201   // printf has %sdf enabled only
+#pragma printf = "%s %d %f"
 
 #pragma output CLIB_MALLOC_HEAP_SIZE   = 0            // do not create malloc heap
 #pragma output CLIB_STDIO_HEAP_SIZE    = 0            // do not create stdio heap (cannot open files)

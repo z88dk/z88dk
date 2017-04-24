@@ -13,12 +13,12 @@ include Make.config
 # LIBRARIES not built by the global list below:
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
-all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
+all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	abc80_clib.lib abc800_clib.lib \
 	ace_clib.lib aquarius_clib.lib aussie.lib bee_clib.lib microbee.lib c7420_clib.lib\
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
-	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
+	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
@@ -31,6 +31,8 @@ genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib nd
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
+
+nclibs: nc_clib.lib gfxnc100.lib gfxnc200.lib
 
 eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
@@ -50,6 +52,7 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
+	$(RM) -f graphics/nc/*.o
 	$(RM) -f graphics/c128/*.o
 	$(RM) -f graphics/ticalc/*.o
 	$(RM) -f graphics/gray/*.o
@@ -1105,7 +1108,23 @@ nc_clib.lib:
 	$(MAKE) -C fcntl/nc100
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
+	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
+	
+# NC-100 graphics lib - Stefano
+gfxnc100.lib:
+	@echo ''
+	@echo '--- Building NC-100 Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(LISTFILE_DIRECTORY)/gfxnc.lst
+
+# NC-200 graphics lib - Stefano
+gfxnc200.lib:
+	@echo ''
+	@echo '--- Building NC-200 Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORnc200 -x$(OUTPUT_DIRECTORY)/gfxnc200 @$(LISTFILE_DIRECTORY)/gfxnc.lst
 
 # Amstrad CPC library - Stefano
 cpc_clib.lib:

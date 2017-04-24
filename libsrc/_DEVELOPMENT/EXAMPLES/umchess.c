@@ -19,12 +19,7 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm --fsigned-char -create-app
 // zcc +zx -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm --fsigned-char -create-app
 
-#pragma output CLIB_OPT_PRINTF = 0x00000400   // printf has %c enabled only
-
-#ifdef __SPECTRUM
-#pragma output CRT_ENABLE_EIDI = 0x01         // disable interrupts at start
-#endif
-
+#pragma printf = "%c"
 
 #include <stdio.h>
 

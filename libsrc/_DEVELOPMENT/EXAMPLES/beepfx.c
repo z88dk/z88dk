@@ -6,9 +6,12 @@
 
 #include <stdio.h>
 #include <sound.h>
-#include <arch/spectrum.h>
+#include <arch/zx.h>
 #include <stropts.h>
 #include <z80.h>
+
+#pragma printf = "%u %s"
+#pragma scanf  = "%u %n"
 
 // list of all beepfx sound effects
 
