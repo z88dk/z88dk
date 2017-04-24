@@ -19,6 +19,11 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +rcmx000 support has been restored and optimisations applied
 - [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable with
   -D__SDCC_DISABLE_BUILTIN or -D__SCCZ80_DISABLE_BUILTIN as appropriate
+- [classiclib] +sms fixed an issue with tile corruption due to sdcc compatiblity
+  code being inserted in the wrong place
+- [classiclib] +nc100 graphics support has been added
+- [classiclib] +msx fixed an initialisation error that prevented ROMs from
+  working correctly
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -49,6 +54,8 @@ z88dk vX.XX  - XX.XX.XXXX
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [zpragma] Support for #pragma printf and #pragma scanf which take a format string
   argument and configure the appropriate printf converters.
+- [zpragma] has now been completely renamed, scanner is no more
+- [newlib] +sms devKit SMS has been incorporated
 - [all] #105: main() always takes its parameters in r->l format regardless of compiler
 
 z88dk v1.99B - 10.01.2017
