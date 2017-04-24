@@ -281,6 +281,7 @@ static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
 static char  *c_coptrules9 = NULL;
 static char  *c_coptrules_cpu = NULL;
+static char  *c_coptrules_user = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -456,6 +457,7 @@ static arg_t     myargs[] = {
 	{ "x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files" },
 	{ "-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files" },
 	{ "-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)" },
+	{ "custom-copt-rules", AF_MORE, SetString, &c_coptrules_user, NULL, "Custom user copy rules" },
 	{ "zopt", AF_BOOL_TRUE, SetBoolean, &zopt, NULL, "Enable llvm-optimizer (clang only)" },
 	{ "m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable" },
 	{ "g", AF_MORE, GlobalDefc, &globaldefrefile, &globaldefon, "Generate a global defc file of the final executable (-g, -gp, -gpf filename)" },
@@ -1164,9 +1166,16 @@ int main(int argc, char **argv)
 			else
 			{
 				char *before_cpuext = ".asm";
+				char *before_user = ".asm";
 
 				if ( c_coptrules_cpu ) {
 					before_cpuext = ".opc";
+					if ( c_coptrules_user ) {
+						before_user = ".opu";
+					}
+				} else if ( c_coptrules_user ) {
+					before_user = ".opu";
+					before_cpuext = ".opu";
 				}
 				/* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
 				switch (peepholeopt)
@@ -1174,7 +1183,9 @@ int main(int argc, char **argv)
 				case 0:
 					if (process(".opt", before_cpuext, c_copt_exe, c_coptrules9, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				case 1:
@@ -1182,7 +1193,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op1", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				case 2:
@@ -1193,7 +1206,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op2", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				default:
@@ -1209,7 +1224,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op3", before_cpuext, c_copt_exe, c_coptrules3, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				}
