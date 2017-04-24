@@ -1,1142 +1,1322 @@
- ADD A, B               ;; 0000:  80
- ADC A, B               ;; 0001:  88
- SUB B                  ;; 0002:  90
- SBC A, B               ;; 0003:  98
- AND B                  ;; 0004:  A0
- XOR B                  ;; 0005:  A8
- OR B                   ;; 0006:  B0
- CP B                   ;; 0007:  B8
- ADD A, C               ;; 0008:  81
- ADC A, C               ;; 0009:  89
- SUB C                  ;; 000A:  91
- SBC A, C               ;; 000B:  99
- AND C                  ;; 000C:  A1
- XOR C                  ;; 000D:  A9
- OR C                   ;; 000E:  B1
- CP C                   ;; 000F:  B9
- ADD A, D               ;; 0010:  82
- ADC A, D               ;; 0011:  8A
- SUB D                  ;; 0012:  92
- SBC A, D               ;; 0013:  9A
- AND D                  ;; 0014:  A2
- XOR D                  ;; 0015:  AA
- OR D                   ;; 0016:  B2
- CP D                   ;; 0017:  BA
- ADD A, E               ;; 0018:  83
- ADC A, E               ;; 0019:  8B
- SUB E                  ;; 001A:  93
- SBC A, E               ;; 001B:  9B
- AND E                  ;; 001C:  A3
- XOR E                  ;; 001D:  AB
- OR E                   ;; 001E:  B3
- CP E                   ;; 001F:  BB
- ADD A, H               ;; 0020:  84
- ADC A, H               ;; 0021:  8C
- SUB H                  ;; 0022:  94
- SBC A, H               ;; 0023:  9C
- AND H                  ;; 0024:  A4
- XOR H                  ;; 0025:  AC
- OR H                   ;; 0026:  B4
- CP H                   ;; 0027:  BC
- ADD A, L               ;; 0028:  85
- ADC A, L               ;; 0029:  8D
- SUB L                  ;; 002A:  95
- SBC A, L               ;; 002B:  9D
- AND L                  ;; 002C:  A5
- XOR L                  ;; 002D:  AD
- OR L                   ;; 002E:  B5
- CP L                   ;; 002F:  BD
- ADD A, A               ;; 0030:  87
- ADC A, A               ;; 0031:  8F
- SUB A                  ;; 0032:  97
- SBC A, A               ;; 0033:  9F
- AND A                  ;; 0034:  A7
- XOR A                  ;; 0035:  AF
- OR A                   ;; 0036:  B7
- CP A                   ;; 0037:  BF
- ADD A, 0               ;; 0038:  C6 00
- ADD A, 85              ;; 003A:  C6 55
- ADD A, 170             ;; 003C:  C6 AA
- ADD A, 255             ;; 003E:  C6 FF
- ADC A, 0               ;; 0040:  CE 00
- ADC A, 85              ;; 0042:  CE 55
- ADC A, 170             ;; 0044:  CE AA
- ADC A, 255             ;; 0046:  CE FF
- SUB 0                  ;; 0048:  D6 00
- SUB 85                 ;; 004A:  D6 55
- SUB 170                ;; 004C:  D6 AA
- SUB 255                ;; 004E:  D6 FF
- SBC A, 0               ;; 0050:  DE 00
- SBC A, 85              ;; 0052:  DE 55
- SBC A, 170             ;; 0054:  DE AA
- SBC A, 255             ;; 0056:  DE FF
- AND 0                  ;; 0058:  E6 00
- AND 85                 ;; 005A:  E6 55
- AND 170                ;; 005C:  E6 AA
- AND 255                ;; 005E:  E6 FF
- XOR 0                  ;; 0060:  EE 00
- XOR 85                 ;; 0062:  EE 55
- XOR 170                ;; 0064:  EE AA
- XOR 255                ;; 0066:  EE FF
- OR 0                   ;; 0068:  F6 00
- OR 85                  ;; 006A:  F6 55
- OR 170                 ;; 006C:  F6 AA
- OR 255                 ;; 006E:  F6 FF
- CP 0                   ;; 0070:  FE 00
- CP 85                  ;; 0072:  FE 55
- CP 170                 ;; 0074:  FE AA
- CP 255                 ;; 0076:  FE FF
- ADD A, (HL)            ;; 0078:  86
- ADC A, (HL)            ;; 0079:  8E
- SUB (HL)               ;; 007A:  96
- SBC A, (HL)            ;; 007B:  9E
- AND (HL)               ;; 007C:  A6
- XOR (HL)               ;; 007D:  AE
- OR (HL)                ;; 007E:  B6
- CP (HL)                ;; 007F:  BE
- ADD A, (IX + -128)     ;; 0080:  DD 86 80
- ADD A, (IX + 0)        ;; 0083:  DD 86 00
- ADD A, (IX + 127)      ;; 0086:  DD 86 7F
- ADC A, (IX + -128)     ;; 0089:  DD 8E 80
- ADC A, (IX + 0)        ;; 008C:  DD 8E 00
- ADC A, (IX + 127)      ;; 008F:  DD 8E 7F
- SUB (IX + -128)        ;; 0092:  DD 96 80
- SUB (IX + 0)           ;; 0095:  DD 96 00
- SUB (IX + 127)         ;; 0098:  DD 96 7F
- SBC A, (IX + -128)     ;; 009B:  DD 9E 80
- SBC A, (IX + 0)        ;; 009E:  DD 9E 00
- SBC A, (IX + 127)      ;; 00A1:  DD 9E 7F
- AND (IX + -128)        ;; 00A4:  DD A6 80
- AND (IX + 0)           ;; 00A7:  DD A6 00
- AND (IX + 127)         ;; 00AA:  DD A6 7F
- XOR (IX + -128)        ;; 00AD:  DD AE 80
- XOR (IX + 0)           ;; 00B0:  DD AE 00
- XOR (IX + 127)         ;; 00B3:  DD AE 7F
- OR (IX + -128)         ;; 00B6:  DD B6 80
- OR (IX + 0)            ;; 00B9:  DD B6 00
- OR (IX + 127)          ;; 00BC:  DD B6 7F
- CP (IX + -128)         ;; 00BF:  DD BE 80
- CP (IX + 0)            ;; 00C2:  DD BE 00
- CP (IX + 127)          ;; 00C5:  DD BE 7F
- ADD A, (IY + -128)     ;; 00C8:  FD 86 80
- ADD A, (IY + 0)        ;; 00CB:  FD 86 00
- ADD A, (IY + 127)      ;; 00CE:  FD 86 7F
- ADC A, (IY + -128)     ;; 00D1:  FD 8E 80
- ADC A, (IY + 0)        ;; 00D4:  FD 8E 00
- ADC A, (IY + 127)      ;; 00D7:  FD 8E 7F
- SUB (IY + -128)        ;; 00DA:  FD 96 80
- SUB (IY + 0)           ;; 00DD:  FD 96 00
- SUB (IY + 127)         ;; 00E0:  FD 96 7F
- SBC A, (IY + -128)     ;; 00E3:  FD 9E 80
- SBC A, (IY + 0)        ;; 00E6:  FD 9E 00
- SBC A, (IY + 127)      ;; 00E9:  FD 9E 7F
- AND (IY + -128)        ;; 00EC:  FD A6 80
- AND (IY + 0)           ;; 00EF:  FD A6 00
- AND (IY + 127)         ;; 00F2:  FD A6 7F
- XOR (IY + -128)        ;; 00F5:  FD AE 80
- XOR (IY + 0)           ;; 00F8:  FD AE 00
- XOR (IY + 127)         ;; 00FB:  FD AE 7F
- OR (IY + -128)         ;; 00FE:  FD B6 80
- OR (IY + 0)            ;; 0101:  FD B6 00
- OR (IY + 127)          ;; 0104:  FD B6 7F
- CP (IY + -128)         ;; 0107:  FD BE 80
- CP (IY + 0)            ;; 010A:  FD BE 00
- CP (IY + 127)          ;; 010D:  FD BE 7F
- INC B                  ;; 0110:  04
- INC C                  ;; 0111:  0C
- INC D                  ;; 0112:  14
- INC E                  ;; 0113:  1C
- INC H                  ;; 0114:  24
- INC L                  ;; 0115:  2C
- INC A                  ;; 0116:  3C
- INC (HL)               ;; 0117:  34
- INC (IX + -128)        ;; 0118:  DD 34 80
- INC (IX + 0)           ;; 011B:  DD 34 00
- INC (IX + 127)         ;; 011E:  DD 34 7F
- INC (IY + -128)        ;; 0121:  FD 34 80
- INC (IY + 0)           ;; 0124:  FD 34 00
- INC (IY + 127)         ;; 0127:  FD 34 7F
- DEC B                  ;; 012A:  05
- DEC C                  ;; 012B:  0D
- DEC D                  ;; 012C:  15
- DEC E                  ;; 012D:  1D
- DEC H                  ;; 012E:  25
- DEC L                  ;; 012F:  2D
- DEC A                  ;; 0130:  3D
- DEC (HL)               ;; 0131:  35
- DEC (IX + -128)        ;; 0132:  DD 35 80
- DEC (IX + 0)           ;; 0135:  DD 35 00
- DEC (IX + 127)         ;; 0138:  DD 35 7F
- DEC (IY + -128)        ;; 013B:  FD 35 80
- DEC (IY + 0)           ;; 013E:  FD 35 00
- DEC (IY + 127)         ;; 0141:  FD 35 7F
- TST B                  ;; 0144:  ED 04
- TST C                  ;; 0146:  ED 0C
- TST D                  ;; 0148:  ED 14
- TST E                  ;; 014A:  ED 1C
- TST H                  ;; 014C:  ED 24
- TST L                  ;; 014E:  ED 2C
- TST A                  ;; 0150:  ED 3C
- TST 0                  ;; 0152:  ED 64 00
- TST 85                 ;; 0155:  ED 64 55
- TST 170                ;; 0158:  ED 64 AA
- TST 255                ;; 015B:  ED 64 FF
- TST (HL)               ;; 015E:  ED 34
- CPL                    ;; 0160:  2F
- NEG                    ;; 0161:  ED 44
- CCF                    ;; 0163:  3F
- SCF                    ;; 0164:  37
- NOP                    ;; 0165:  00
- ALTD                   ;; 0166:  76
- LD A, XPC              ;; 0167:  ED 77
- LD XPC, A              ;; 0169:  ED 67
- ADD HL, BC             ;; 016B:  09
- ADD HL, DE             ;; 016C:  19
- ADD HL, HL             ;; 016D:  29
- ADD HL, SP             ;; 016E:  39
- ADD IX, BC             ;; 016F:  DD 09
- ADD IY, BC             ;; 0171:  FD 09
- ADD IX, DE             ;; 0173:  DD 19
- ADD IY, DE             ;; 0175:  FD 19
- ADD IX, IX             ;; 0177:  DD 29
- ADD IY, IY             ;; 0179:  FD 29
- ADD IX, SP             ;; 017B:  DD 39
- ADD IY, SP             ;; 017D:  FD 39
- ADD SP, -128           ;; 017F:  27 80
- ADD SP, 0              ;; 0181:  27 00
- ADD SP, 127            ;; 0183:  27 7F
- ADC HL, BC             ;; 0185:  ED 4A
- ADC HL, DE             ;; 0187:  ED 5A
- ADC HL, HL             ;; 0189:  ED 6A
- ADC HL, SP             ;; 018B:  ED 7A
- SBC HL, BC             ;; 018D:  ED 42
- SBC HL, DE             ;; 018F:  ED 52
- SBC HL, HL             ;; 0191:  ED 62
- SBC HL, SP             ;; 0193:  ED 72
- AND HL, DE             ;; 0195:  DC
- AND IX, DE             ;; 0196:  DD DC
- AND IY, DE             ;; 0198:  FD DC
- BOOL HL                ;; 019A:  CC
- BOOL IX                ;; 019B:  DD CC
- BOOL IY                ;; 019D:  FD CC
- INC BC                 ;; 019F:  03
- INC DE                 ;; 01A0:  13
- INC HL                 ;; 01A1:  23
- INC SP                 ;; 01A2:  33
- INC IX                 ;; 01A3:  DD 23
- INC IY                 ;; 01A5:  FD 23
- DEC BC                 ;; 01A7:  0B
- DEC DE                 ;; 01A8:  1B
- DEC HL                 ;; 01A9:  2B
- DEC SP                 ;; 01AA:  3B
- DEC IX                 ;; 01AB:  DD 2B
- DEC IY                 ;; 01AD:  FD 2B
- MLT BC                 ;; 01AF:  ED 4C
- MLT DE                 ;; 01B1:  ED 5C
- MLT HL                 ;; 01B3:  ED 6C
- RLCA                   ;; 01B5:  07
- RRCA                   ;; 01B6:  0F
- RLA                    ;; 01B7:  17
- RRA                    ;; 01B8:  1F
- RLC B                  ;; 01B9:  CB 00
- RRC B                  ;; 01BB:  CB 08
- RL B                   ;; 01BD:  CB 10
- RR B                   ;; 01BF:  CB 18
- SLA B                  ;; 01C1:  CB 20
- SRA B                  ;; 01C3:  CB 28
- SRL B                  ;; 01C5:  CB 38
- RLC C                  ;; 01C7:  CB 01
- RRC C                  ;; 01C9:  CB 09
- RL C                   ;; 01CB:  CB 11
- RR C                   ;; 01CD:  CB 19
- SLA C                  ;; 01CF:  CB 21
- SRA C                  ;; 01D1:  CB 29
- SRL C                  ;; 01D3:  CB 39
- RLC D                  ;; 01D5:  CB 02
- RRC D                  ;; 01D7:  CB 0A
- RL D                   ;; 01D9:  CB 12
- RR D                   ;; 01DB:  CB 1A
- SLA D                  ;; 01DD:  CB 22
- SRA D                  ;; 01DF:  CB 2A
- SRL D                  ;; 01E1:  CB 3A
- RLC E                  ;; 01E3:  CB 03
- RRC E                  ;; 01E5:  CB 0B
- RL E                   ;; 01E7:  CB 13
- RR E                   ;; 01E9:  CB 1B
- SLA E                  ;; 01EB:  CB 23
- SRA E                  ;; 01ED:  CB 2B
- SRL E                  ;; 01EF:  CB 3B
- RLC H                  ;; 01F1:  CB 04
- RRC H                  ;; 01F3:  CB 0C
- RL H                   ;; 01F5:  CB 14
- RR H                   ;; 01F7:  CB 1C
- SLA H                  ;; 01F9:  CB 24
- SRA H                  ;; 01FB:  CB 2C
- SRL H                  ;; 01FD:  CB 3C
- RLC L                  ;; 01FF:  CB 05
- RRC L                  ;; 0201:  CB 0D
- RL L                   ;; 0203:  CB 15
- RR L                   ;; 0205:  CB 1D
- SLA L                  ;; 0207:  CB 25
- SRA L                  ;; 0209:  CB 2D
- SRL L                  ;; 020B:  CB 3D
- RLC A                  ;; 020D:  CB 07
- RRC A                  ;; 020F:  CB 0F
- RL A                   ;; 0211:  CB 17
- RR A                   ;; 0213:  CB 1F
- SLA A                  ;; 0215:  CB 27
- SRA A                  ;; 0217:  CB 2F
- SRL A                  ;; 0219:  CB 3F
- RLC (HL)               ;; 021B:  CB 06
- RRC (HL)               ;; 021D:  CB 0E
- RL (HL)                ;; 021F:  CB 16
- RR (HL)                ;; 0221:  CB 1E
- SLA (HL)               ;; 0223:  CB 26
- SRA (HL)               ;; 0225:  CB 2E
- SRL (HL)               ;; 0227:  CB 3E
- RLC (IX + -128)        ;; 0229:  DD CB 80 06
- RLC (IX + 0)           ;; 022D:  DD CB 00 06
- RLC (IX + 127)         ;; 0231:  DD CB 7F 06
- RRC (IX + -128)        ;; 0235:  DD CB 80 0E
- RRC (IX + 0)           ;; 0239:  DD CB 00 0E
- RRC (IX + 127)         ;; 023D:  DD CB 7F 0E
- RL (IX + -128)         ;; 0241:  DD CB 80 16
- RL (IX + 0)            ;; 0245:  DD CB 00 16
- RL (IX + 127)          ;; 0249:  DD CB 7F 16
- RR (IX + -128)         ;; 024D:  DD CB 80 1E
- RR (IX + 0)            ;; 0251:  DD CB 00 1E
- RR (IX + 127)          ;; 0255:  DD CB 7F 1E
- SLA (IX + -128)        ;; 0259:  DD CB 80 26
- SLA (IX + 0)           ;; 025D:  DD CB 00 26
- SLA (IX + 127)         ;; 0261:  DD CB 7F 26
- SRA (IX + -128)        ;; 0265:  DD CB 80 2E
- SRA (IX + 0)           ;; 0269:  DD CB 00 2E
- SRA (IX + 127)         ;; 026D:  DD CB 7F 2E
- SRL (IX + -128)        ;; 0271:  DD CB 80 3E
- SRL (IX + 0)           ;; 0275:  DD CB 00 3E
- SRL (IX + 127)         ;; 0279:  DD CB 7F 3E
- RLC (IY + -128)        ;; 027D:  FD CB 80 06
- RLC (IY + 0)           ;; 0281:  FD CB 00 06
- RLC (IY + 127)         ;; 0285:  FD CB 7F 06
- RRC (IY + -128)        ;; 0289:  FD CB 80 0E
- RRC (IY + 0)           ;; 028D:  FD CB 00 0E
- RRC (IY + 127)         ;; 0291:  FD CB 7F 0E
- RL (IY + -128)         ;; 0295:  FD CB 80 16
- RL (IY + 0)            ;; 0299:  FD CB 00 16
- RL (IY + 127)          ;; 029D:  FD CB 7F 16
- RR (IY + -128)         ;; 02A1:  FD CB 80 1E
- RR (IY + 0)            ;; 02A5:  FD CB 00 1E
- RR (IY + 127)          ;; 02A9:  FD CB 7F 1E
- SLA (IY + -128)        ;; 02AD:  FD CB 80 26
- SLA (IY + 0)           ;; 02B1:  FD CB 00 26
- SLA (IY + 127)         ;; 02B5:  FD CB 7F 26
- SRA (IY + -128)        ;; 02B9:  FD CB 80 2E
- SRA (IY + 0)           ;; 02BD:  FD CB 00 2E
- SRA (IY + 127)         ;; 02C1:  FD CB 7F 2E
- SRL (IY + -128)        ;; 02C5:  FD CB 80 3E
- SRL (IY + 0)           ;; 02C9:  FD CB 00 3E
- SRL (IY + 127)         ;; 02CD:  FD CB 7F 3E
- BIT 0, B               ;; 02D1:  CB 40
- BIT 1, B               ;; 02D3:  CB 48
- BIT 2, B               ;; 02D5:  CB 50
- BIT 3, B               ;; 02D7:  CB 58
- BIT 4, B               ;; 02D9:  CB 60
- BIT 5, B               ;; 02DB:  CB 68
- BIT 6, B               ;; 02DD:  CB 70
- BIT 7, B               ;; 02DF:  CB 78
- RES 0, B               ;; 02E1:  CB 80
- RES 1, B               ;; 02E3:  CB 88
- RES 2, B               ;; 02E5:  CB 90
- RES 3, B               ;; 02E7:  CB 98
- RES 4, B               ;; 02E9:  CB A0
- RES 5, B               ;; 02EB:  CB A8
- RES 6, B               ;; 02ED:  CB B0
- RES 7, B               ;; 02EF:  CB B8
- SET 0, B               ;; 02F1:  CB C0
- SET 1, B               ;; 02F3:  CB C8
- SET 2, B               ;; 02F5:  CB D0
- SET 3, B               ;; 02F7:  CB D8
- SET 4, B               ;; 02F9:  CB E0
- SET 5, B               ;; 02FB:  CB E8
- SET 6, B               ;; 02FD:  CB F0
- SET 7, B               ;; 02FF:  CB F8
- BIT 0, C               ;; 0301:  CB 41
- BIT 1, C               ;; 0303:  CB 49
- BIT 2, C               ;; 0305:  CB 51
- BIT 3, C               ;; 0307:  CB 59
- BIT 4, C               ;; 0309:  CB 61
- BIT 5, C               ;; 030B:  CB 69
- BIT 6, C               ;; 030D:  CB 71
- BIT 7, C               ;; 030F:  CB 79
- RES 0, C               ;; 0311:  CB 81
- RES 1, C               ;; 0313:  CB 89
- RES 2, C               ;; 0315:  CB 91
- RES 3, C               ;; 0317:  CB 99
- RES 4, C               ;; 0319:  CB A1
- RES 5, C               ;; 031B:  CB A9
- RES 6, C               ;; 031D:  CB B1
- RES 7, C               ;; 031F:  CB B9
- SET 0, C               ;; 0321:  CB C1
- SET 1, C               ;; 0323:  CB C9
- SET 2, C               ;; 0325:  CB D1
- SET 3, C               ;; 0327:  CB D9
- SET 4, C               ;; 0329:  CB E1
- SET 5, C               ;; 032B:  CB E9
- SET 6, C               ;; 032D:  CB F1
- SET 7, C               ;; 032F:  CB F9
- BIT 0, D               ;; 0331:  CB 42
- BIT 1, D               ;; 0333:  CB 4A
- BIT 2, D               ;; 0335:  CB 52
- BIT 3, D               ;; 0337:  CB 5A
- BIT 4, D               ;; 0339:  CB 62
- BIT 5, D               ;; 033B:  CB 6A
- BIT 6, D               ;; 033D:  CB 72
- BIT 7, D               ;; 033F:  CB 7A
- RES 0, D               ;; 0341:  CB 82
- RES 1, D               ;; 0343:  CB 8A
- RES 2, D               ;; 0345:  CB 92
- RES 3, D               ;; 0347:  CB 9A
- RES 4, D               ;; 0349:  CB A2
- RES 5, D               ;; 034B:  CB AA
- RES 6, D               ;; 034D:  CB B2
- RES 7, D               ;; 034F:  CB BA
- SET 0, D               ;; 0351:  CB C2
- SET 1, D               ;; 0353:  CB CA
- SET 2, D               ;; 0355:  CB D2
- SET 3, D               ;; 0357:  CB DA
- SET 4, D               ;; 0359:  CB E2
- SET 5, D               ;; 035B:  CB EA
- SET 6, D               ;; 035D:  CB F2
- SET 7, D               ;; 035F:  CB FA
- BIT 0, E               ;; 0361:  CB 43
- BIT 1, E               ;; 0363:  CB 4B
- BIT 2, E               ;; 0365:  CB 53
- BIT 3, E               ;; 0367:  CB 5B
- BIT 4, E               ;; 0369:  CB 63
- BIT 5, E               ;; 036B:  CB 6B
- BIT 6, E               ;; 036D:  CB 73
- BIT 7, E               ;; 036F:  CB 7B
- RES 0, E               ;; 0371:  CB 83
- RES 1, E               ;; 0373:  CB 8B
- RES 2, E               ;; 0375:  CB 93
- RES 3, E               ;; 0377:  CB 9B
- RES 4, E               ;; 0379:  CB A3
- RES 5, E               ;; 037B:  CB AB
- RES 6, E               ;; 037D:  CB B3
- RES 7, E               ;; 037F:  CB BB
- SET 0, E               ;; 0381:  CB C3
- SET 1, E               ;; 0383:  CB CB
- SET 2, E               ;; 0385:  CB D3
- SET 3, E               ;; 0387:  CB DB
- SET 4, E               ;; 0389:  CB E3
- SET 5, E               ;; 038B:  CB EB
- SET 6, E               ;; 038D:  CB F3
- SET 7, E               ;; 038F:  CB FB
- BIT 0, H               ;; 0391:  CB 44
- BIT 1, H               ;; 0393:  CB 4C
- BIT 2, H               ;; 0395:  CB 54
- BIT 3, H               ;; 0397:  CB 5C
- BIT 4, H               ;; 0399:  CB 64
- BIT 5, H               ;; 039B:  CB 6C
- BIT 6, H               ;; 039D:  CB 74
- BIT 7, H               ;; 039F:  CB 7C
- RES 0, H               ;; 03A1:  CB 84
- RES 1, H               ;; 03A3:  CB 8C
- RES 2, H               ;; 03A5:  CB 94
- RES 3, H               ;; 03A7:  CB 9C
- RES 4, H               ;; 03A9:  CB A4
- RES 5, H               ;; 03AB:  CB AC
- RES 6, H               ;; 03AD:  CB B4
- RES 7, H               ;; 03AF:  CB BC
- SET 0, H               ;; 03B1:  CB C4
- SET 1, H               ;; 03B3:  CB CC
- SET 2, H               ;; 03B5:  CB D4
- SET 3, H               ;; 03B7:  CB DC
- SET 4, H               ;; 03B9:  CB E4
- SET 5, H               ;; 03BB:  CB EC
- SET 6, H               ;; 03BD:  CB F4
- SET 7, H               ;; 03BF:  CB FC
- BIT 0, L               ;; 03C1:  CB 45
- BIT 1, L               ;; 03C3:  CB 4D
- BIT 2, L               ;; 03C5:  CB 55
- BIT 3, L               ;; 03C7:  CB 5D
- BIT 4, L               ;; 03C9:  CB 65
- BIT 5, L               ;; 03CB:  CB 6D
- BIT 6, L               ;; 03CD:  CB 75
- BIT 7, L               ;; 03CF:  CB 7D
- RES 0, L               ;; 03D1:  CB 85
- RES 1, L               ;; 03D3:  CB 8D
- RES 2, L               ;; 03D5:  CB 95
- RES 3, L               ;; 03D7:  CB 9D
- RES 4, L               ;; 03D9:  CB A5
- RES 5, L               ;; 03DB:  CB AD
- RES 6, L               ;; 03DD:  CB B5
- RES 7, L               ;; 03DF:  CB BD
- SET 0, L               ;; 03E1:  CB C5
- SET 1, L               ;; 03E3:  CB CD
- SET 2, L               ;; 03E5:  CB D5
- SET 3, L               ;; 03E7:  CB DD
- SET 4, L               ;; 03E9:  CB E5
- SET 5, L               ;; 03EB:  CB ED
- SET 6, L               ;; 03ED:  CB F5
- SET 7, L               ;; 03EF:  CB FD
- BIT 0, A               ;; 03F1:  CB 47
- BIT 1, A               ;; 03F3:  CB 4F
- BIT 2, A               ;; 03F5:  CB 57
- BIT 3, A               ;; 03F7:  CB 5F
- BIT 4, A               ;; 03F9:  CB 67
- BIT 5, A               ;; 03FB:  CB 6F
- BIT 6, A               ;; 03FD:  CB 77
- BIT 7, A               ;; 03FF:  CB 7F
- RES 0, A               ;; 0401:  CB 87
- RES 1, A               ;; 0403:  CB 8F
- RES 2, A               ;; 0405:  CB 97
- RES 3, A               ;; 0407:  CB 9F
- RES 4, A               ;; 0409:  CB A7
- RES 5, A               ;; 040B:  CB AF
- RES 6, A               ;; 040D:  CB B7
- RES 7, A               ;; 040F:  CB BF
- SET 0, A               ;; 0411:  CB C7
- SET 1, A               ;; 0413:  CB CF
- SET 2, A               ;; 0415:  CB D7
- SET 3, A               ;; 0417:  CB DF
- SET 4, A               ;; 0419:  CB E7
- SET 5, A               ;; 041B:  CB EF
- SET 6, A               ;; 041D:  CB F7
- SET 7, A               ;; 041F:  CB FF
- BIT 0, (HL)            ;; 0421:  CB 46
- BIT 1, (HL)            ;; 0423:  CB 4E
- BIT 2, (HL)            ;; 0425:  CB 56
- BIT 3, (HL)            ;; 0427:  CB 5E
- BIT 4, (HL)            ;; 0429:  CB 66
- BIT 5, (HL)            ;; 042B:  CB 6E
- BIT 6, (HL)            ;; 042D:  CB 76
- BIT 7, (HL)            ;; 042F:  CB 7E
- RES 0, (HL)            ;; 0431:  CB 86
- RES 1, (HL)            ;; 0433:  CB 8E
- RES 2, (HL)            ;; 0435:  CB 96
- RES 3, (HL)            ;; 0437:  CB 9E
- RES 4, (HL)            ;; 0439:  CB A6
- RES 5, (HL)            ;; 043B:  CB AE
- RES 6, (HL)            ;; 043D:  CB B6
- RES 7, (HL)            ;; 043F:  CB BE
- SET 0, (HL)            ;; 0441:  CB C6
- SET 1, (HL)            ;; 0443:  CB CE
- SET 2, (HL)            ;; 0445:  CB D6
- SET 3, (HL)            ;; 0447:  CB DE
- SET 4, (HL)            ;; 0449:  CB E6
- SET 5, (HL)            ;; 044B:  CB EE
- SET 6, (HL)            ;; 044D:  CB F6
- SET 7, (HL)            ;; 044F:  CB FE
- BIT 0, (IX + -128)     ;; 0451:  DD CB 80 46
- BIT 1, (IX + -128)     ;; 0455:  DD CB 80 4E
- BIT 2, (IX + -128)     ;; 0459:  DD CB 80 56
- BIT 3, (IX + -128)     ;; 045D:  DD CB 80 5E
- BIT 4, (IX + -128)     ;; 0461:  DD CB 80 66
- BIT 5, (IX + -128)     ;; 0465:  DD CB 80 6E
- BIT 6, (IX + -128)     ;; 0469:  DD CB 80 76
- BIT 7, (IX + -128)     ;; 046D:  DD CB 80 7E
- BIT 0, (IX + 0)        ;; 0471:  DD CB 00 46
- BIT 1, (IX + 0)        ;; 0475:  DD CB 00 4E
- BIT 2, (IX + 0)        ;; 0479:  DD CB 00 56
- BIT 3, (IX + 0)        ;; 047D:  DD CB 00 5E
- BIT 4, (IX + 0)        ;; 0481:  DD CB 00 66
- BIT 5, (IX + 0)        ;; 0485:  DD CB 00 6E
- BIT 6, (IX + 0)        ;; 0489:  DD CB 00 76
- BIT 7, (IX + 0)        ;; 048D:  DD CB 00 7E
- BIT 0, (IX + 127)      ;; 0491:  DD CB 7F 46
- BIT 1, (IX + 127)      ;; 0495:  DD CB 7F 4E
- BIT 2, (IX + 127)      ;; 0499:  DD CB 7F 56
- BIT 3, (IX + 127)      ;; 049D:  DD CB 7F 5E
- BIT 4, (IX + 127)      ;; 04A1:  DD CB 7F 66
- BIT 5, (IX + 127)      ;; 04A5:  DD CB 7F 6E
- BIT 6, (IX + 127)      ;; 04A9:  DD CB 7F 76
- BIT 7, (IX + 127)      ;; 04AD:  DD CB 7F 7E
- RES 0, (IX + -128)     ;; 04B1:  DD CB 80 86
- RES 1, (IX + -128)     ;; 04B5:  DD CB 80 8E
- RES 2, (IX + -128)     ;; 04B9:  DD CB 80 96
- RES 3, (IX + -128)     ;; 04BD:  DD CB 80 9E
- RES 4, (IX + -128)     ;; 04C1:  DD CB 80 A6
- RES 5, (IX + -128)     ;; 04C5:  DD CB 80 AE
- RES 6, (IX + -128)     ;; 04C9:  DD CB 80 B6
- RES 7, (IX + -128)     ;; 04CD:  DD CB 80 BE
- RES 0, (IX + 0)        ;; 04D1:  DD CB 00 86
- RES 1, (IX + 0)        ;; 04D5:  DD CB 00 8E
- RES 2, (IX + 0)        ;; 04D9:  DD CB 00 96
- RES 3, (IX + 0)        ;; 04DD:  DD CB 00 9E
- RES 4, (IX + 0)        ;; 04E1:  DD CB 00 A6
- RES 5, (IX + 0)        ;; 04E5:  DD CB 00 AE
- RES 6, (IX + 0)        ;; 04E9:  DD CB 00 B6
- RES 7, (IX + 0)        ;; 04ED:  DD CB 00 BE
- RES 0, (IX + 127)      ;; 04F1:  DD CB 7F 86
- RES 1, (IX + 127)      ;; 04F5:  DD CB 7F 8E
- RES 2, (IX + 127)      ;; 04F9:  DD CB 7F 96
- RES 3, (IX + 127)      ;; 04FD:  DD CB 7F 9E
- RES 4, (IX + 127)      ;; 0501:  DD CB 7F A6
- RES 5, (IX + 127)      ;; 0505:  DD CB 7F AE
- RES 6, (IX + 127)      ;; 0509:  DD CB 7F B6
- RES 7, (IX + 127)      ;; 050D:  DD CB 7F BE
- SET 0, (IX + -128)     ;; 0511:  DD CB 80 C6
- SET 1, (IX + -128)     ;; 0515:  DD CB 80 CE
- SET 2, (IX + -128)     ;; 0519:  DD CB 80 D6
- SET 3, (IX + -128)     ;; 051D:  DD CB 80 DE
- SET 4, (IX + -128)     ;; 0521:  DD CB 80 E6
- SET 5, (IX + -128)     ;; 0525:  DD CB 80 EE
- SET 6, (IX + -128)     ;; 0529:  DD CB 80 F6
- SET 7, (IX + -128)     ;; 052D:  DD CB 80 FE
- SET 0, (IX + 0)        ;; 0531:  DD CB 00 C6
- SET 1, (IX + 0)        ;; 0535:  DD CB 00 CE
- SET 2, (IX + 0)        ;; 0539:  DD CB 00 D6
- SET 3, (IX + 0)        ;; 053D:  DD CB 00 DE
- SET 4, (IX + 0)        ;; 0541:  DD CB 00 E6
- SET 5, (IX + 0)        ;; 0545:  DD CB 00 EE
- SET 6, (IX + 0)        ;; 0549:  DD CB 00 F6
- SET 7, (IX + 0)        ;; 054D:  DD CB 00 FE
- SET 0, (IX + 127)      ;; 0551:  DD CB 7F C6
- SET 1, (IX + 127)      ;; 0555:  DD CB 7F CE
- SET 2, (IX + 127)      ;; 0559:  DD CB 7F D6
- SET 3, (IX + 127)      ;; 055D:  DD CB 7F DE
- SET 4, (IX + 127)      ;; 0561:  DD CB 7F E6
- SET 5, (IX + 127)      ;; 0565:  DD CB 7F EE
- SET 6, (IX + 127)      ;; 0569:  DD CB 7F F6
- SET 7, (IX + 127)      ;; 056D:  DD CB 7F FE
- BIT 0, (IY + -128)     ;; 0571:  FD CB 80 46
- BIT 1, (IY + -128)     ;; 0575:  FD CB 80 4E
- BIT 2, (IY + -128)     ;; 0579:  FD CB 80 56
- BIT 3, (IY + -128)     ;; 057D:  FD CB 80 5E
- BIT 4, (IY + -128)     ;; 0581:  FD CB 80 66
- BIT 5, (IY + -128)     ;; 0585:  FD CB 80 6E
- BIT 6, (IY + -128)     ;; 0589:  FD CB 80 76
- BIT 7, (IY + -128)     ;; 058D:  FD CB 80 7E
- BIT 0, (IY + 0)        ;; 0591:  FD CB 00 46
- BIT 1, (IY + 0)        ;; 0595:  FD CB 00 4E
- BIT 2, (IY + 0)        ;; 0599:  FD CB 00 56
- BIT 3, (IY + 0)        ;; 059D:  FD CB 00 5E
- BIT 4, (IY + 0)        ;; 05A1:  FD CB 00 66
- BIT 5, (IY + 0)        ;; 05A5:  FD CB 00 6E
- BIT 6, (IY + 0)        ;; 05A9:  FD CB 00 76
- BIT 7, (IY + 0)        ;; 05AD:  FD CB 00 7E
- BIT 0, (IY + 127)      ;; 05B1:  FD CB 7F 46
- BIT 1, (IY + 127)      ;; 05B5:  FD CB 7F 4E
- BIT 2, (IY + 127)      ;; 05B9:  FD CB 7F 56
- BIT 3, (IY + 127)      ;; 05BD:  FD CB 7F 5E
- BIT 4, (IY + 127)      ;; 05C1:  FD CB 7F 66
- BIT 5, (IY + 127)      ;; 05C5:  FD CB 7F 6E
- BIT 6, (IY + 127)      ;; 05C9:  FD CB 7F 76
- BIT 7, (IY + 127)      ;; 05CD:  FD CB 7F 7E
- RES 0, (IY + -128)     ;; 05D1:  FD CB 80 86
- RES 1, (IY + -128)     ;; 05D5:  FD CB 80 8E
- RES 2, (IY + -128)     ;; 05D9:  FD CB 80 96
- RES 3, (IY + -128)     ;; 05DD:  FD CB 80 9E
- RES 4, (IY + -128)     ;; 05E1:  FD CB 80 A6
- RES 5, (IY + -128)     ;; 05E5:  FD CB 80 AE
- RES 6, (IY + -128)     ;; 05E9:  FD CB 80 B6
- RES 7, (IY + -128)     ;; 05ED:  FD CB 80 BE
- RES 0, (IY + 0)        ;; 05F1:  FD CB 00 86
- RES 1, (IY + 0)        ;; 05F5:  FD CB 00 8E
- RES 2, (IY + 0)        ;; 05F9:  FD CB 00 96
- RES 3, (IY + 0)        ;; 05FD:  FD CB 00 9E
- RES 4, (IY + 0)        ;; 0601:  FD CB 00 A6
- RES 5, (IY + 0)        ;; 0605:  FD CB 00 AE
- RES 6, (IY + 0)        ;; 0609:  FD CB 00 B6
- RES 7, (IY + 0)        ;; 060D:  FD CB 00 BE
- RES 0, (IY + 127)      ;; 0611:  FD CB 7F 86
- RES 1, (IY + 127)      ;; 0615:  FD CB 7F 8E
- RES 2, (IY + 127)      ;; 0619:  FD CB 7F 96
- RES 3, (IY + 127)      ;; 061D:  FD CB 7F 9E
- RES 4, (IY + 127)      ;; 0621:  FD CB 7F A6
- RES 5, (IY + 127)      ;; 0625:  FD CB 7F AE
- RES 6, (IY + 127)      ;; 0629:  FD CB 7F B6
- RES 7, (IY + 127)      ;; 062D:  FD CB 7F BE
- SET 0, (IY + -128)     ;; 0631:  FD CB 80 C6
- SET 1, (IY + -128)     ;; 0635:  FD CB 80 CE
- SET 2, (IY + -128)     ;; 0639:  FD CB 80 D6
- SET 3, (IY + -128)     ;; 063D:  FD CB 80 DE
- SET 4, (IY + -128)     ;; 0641:  FD CB 80 E6
- SET 5, (IY + -128)     ;; 0645:  FD CB 80 EE
- SET 6, (IY + -128)     ;; 0649:  FD CB 80 F6
- SET 7, (IY + -128)     ;; 064D:  FD CB 80 FE
- SET 0, (IY + 0)        ;; 0651:  FD CB 00 C6
- SET 1, (IY + 0)        ;; 0655:  FD CB 00 CE
- SET 2, (IY + 0)        ;; 0659:  FD CB 00 D6
- SET 3, (IY + 0)        ;; 065D:  FD CB 00 DE
- SET 4, (IY + 0)        ;; 0661:  FD CB 00 E6
- SET 5, (IY + 0)        ;; 0665:  FD CB 00 EE
- SET 6, (IY + 0)        ;; 0669:  FD CB 00 F6
- SET 7, (IY + 0)        ;; 066D:  FD CB 00 FE
- SET 0, (IY + 127)      ;; 0671:  FD CB 7F C6
- SET 1, (IY + 127)      ;; 0675:  FD CB 7F CE
- SET 2, (IY + 127)      ;; 0679:  FD CB 7F D6
- SET 3, (IY + 127)      ;; 067D:  FD CB 7F DE
- SET 4, (IY + 127)      ;; 0681:  FD CB 7F E6
- SET 5, (IY + 127)      ;; 0685:  FD CB 7F EE
- SET 6, (IY + 127)      ;; 0689:  FD CB 7F F6
- SET 7, (IY + 127)      ;; 068D:  FD CB 7F FE
- JP 0                   ;; 0691:  C3 00 00
- JP 4660                ;; 0694:  C3 34 12
- JP 52719               ;; 0697:  C3 EF CD
- JP 65535               ;; 069A:  C3 FF FF
- JP NZ, 0               ;; 069D:  C2 00 00
- JP NZ, 4660            ;; 06A0:  C2 34 12
- JP NZ, 52719           ;; 06A3:  C2 EF CD
- JP NZ, 65535           ;; 06A6:  C2 FF FF
- JP Z, 0                ;; 06A9:  CA 00 00
- JP Z, 4660             ;; 06AC:  CA 34 12
- JP Z, 52719            ;; 06AF:  CA EF CD
- JP Z, 65535            ;; 06B2:  CA FF FF
- JP NC, 0               ;; 06B5:  D2 00 00
- JP NC, 4660            ;; 06B8:  D2 34 12
- JP NC, 52719           ;; 06BB:  D2 EF CD
- JP NC, 65535           ;; 06BE:  D2 FF FF
- JP C, 0                ;; 06C1:  DA 00 00
- JP C, 4660             ;; 06C4:  DA 34 12
- JP C, 52719            ;; 06C7:  DA EF CD
- JP C, 65535            ;; 06CA:  DA FF FF
- JP PO, 0               ;; 06CD:  E2 00 00
- JP PO, 4660            ;; 06D0:  E2 34 12
- JP PO, 52719           ;; 06D3:  E2 EF CD
- JP PO, 65535           ;; 06D6:  E2 FF FF
- JP PE, 0               ;; 06D9:  EA 00 00
- JP PE, 4660            ;; 06DC:  EA 34 12
- JP PE, 52719           ;; 06DF:  EA EF CD
- JP PE, 65535           ;; 06E2:  EA FF FF
- JP P, 0                ;; 06E5:  F2 00 00
- JP P, 4660             ;; 06E8:  F2 34 12
- JP P, 52719            ;; 06EB:  F2 EF CD
- JP P, 65535            ;; 06EE:  F2 FF FF
- JP M, 0                ;; 06F1:  FA 00 00
- JP M, 4660             ;; 06F4:  FA 34 12
- JP M, 52719            ;; 06F7:  FA EF CD
- JP M, 65535            ;; 06FA:  FA FF FF
- JP LZ, 0               ;; 06FD:  E2 00 00
- JP LZ, 4660            ;; 0700:  E2 34 12
- JP LZ, 52719           ;; 0703:  E2 EF CD
- JP LZ, 65535           ;; 0706:  E2 FF FF
- JP LO, 0               ;; 0709:  EA 00 00
- JP LO, 4660            ;; 070C:  EA 34 12
- JP LO, 52719           ;; 070F:  EA EF CD
- JP LO, 65535           ;; 0712:  EA FF FF
- JR ASMPC+2             ;; 0715:  18 00
- JR NZ, ASMPC+2         ;; 0717:  20 00
- JR Z, ASMPC+2          ;; 0719:  28 00
- JR NC, ASMPC+2         ;; 071B:  30 00
- JR C, ASMPC+2          ;; 071D:  38 00
- JP (HL)                ;; 071F:  E9
- JP (IX)                ;; 0720:  DD E9
- JP (IY)                ;; 0722:  FD E9
- DJNZ ASMPC+2           ;; 0724:  10 00
- CALL 0                 ;; 0726:  CD 00 00
- CALL 4660              ;; 0729:  CD 34 12
- CALL 52719             ;; 072C:  CD EF CD
- CALL 65535             ;; 072F:  CD FF FF
- RET                    ;; 0732:  C9
- RET NZ                 ;; 0733:  C0
- RET Z                  ;; 0734:  C8
- RET NC                 ;; 0735:  D0
- RET C                  ;; 0736:  D8
- RET PO                 ;; 0737:  E0
- RET PE                 ;; 0738:  E8
- RET P                  ;; 0739:  F0
- RET M                  ;; 073A:  F8
- RET LZ                 ;; 073B:  E0
- RET LO                 ;; 073C:  E8
- RST 16                 ;; 073D:  D7
- RST 24                 ;; 073E:  DF
- RST 32                 ;; 073F:  E7
- RST 40                 ;; 0740:  EF
- RST 56                 ;; 0741:  FF
- IOE                    ;; 0742:  DB
- IOI                    ;; 0743:  D3
- IPSET 0                ;; 0744:  ED 46
- IPSET 1                ;; 0746:  ED 56
- IPSET 2                ;; 0748:  ED 4E
- IPSET 3                ;; 074A:  ED 5E
- IPRES                  ;; 074C:  ED 5D
- LD IIR, A              ;; 074E:  ED 47
- LD A, IIR              ;; 0750:  ED 57
- LD EIR, A              ;; 0752:  ED 4F
- LD A, EIR              ;; 0754:  ED 5F
- RETI                   ;; 0756:  ED 4D
- ld b, b                ;; 0758:  40
- ld b, c                ;; 0759:  41
- ld b, d                ;; 075A:  42
- ld b, e                ;; 075B:  43
- ld b, h                ;; 075C:  44
- ld b, l                ;; 075D:  45
- ld b, a                ;; 075E:  47
- ld c, b                ;; 075F:  48
- ld c, c                ;; 0760:  49
- ld c, d                ;; 0761:  4A
- ld c, e                ;; 0762:  4B
- ld c, h                ;; 0763:  4C
- ld c, l                ;; 0764:  4D
- ld c, a                ;; 0765:  4F
- ld d, b                ;; 0766:  50
- ld d, c                ;; 0767:  51
- ld d, d                ;; 0768:  52
- ld d, e                ;; 0769:  53
- ld d, h                ;; 076A:  54
- ld d, l                ;; 076B:  55
- ld d, a                ;; 076C:  57
- ld e, b                ;; 076D:  58
- ld e, c                ;; 076E:  59
- ld e, d                ;; 076F:  5A
- ld e, e                ;; 0770:  5B
- ld e, h                ;; 0771:  5C
- ld e, l                ;; 0772:  5D
- ld e, a                ;; 0773:  5F
- ld h, b                ;; 0774:  60
- ld h, c                ;; 0775:  61
- ld h, d                ;; 0776:  62
- ld h, e                ;; 0777:  63
- ld h, h                ;; 0778:  64
- ld h, l                ;; 0779:  65
- ld h, a                ;; 077A:  67
- ld l, b                ;; 077B:  68
- ld l, c                ;; 077C:  69
- ld l, d                ;; 077D:  6A
- ld l, e                ;; 077E:  6B
- ld l, h                ;; 077F:  6C
- ld l, l                ;; 0780:  6D
- ld l, a                ;; 0781:  6F
- ld a, b                ;; 0782:  78
- ld a, c                ;; 0783:  79
- ld a, d                ;; 0784:  7A
- ld a, e                ;; 0785:  7B
- ld a, h                ;; 0786:  7C
- ld a, l                ;; 0787:  7D
- ld a, a                ;; 0788:  7F
- ld b, 0                ;; 0789:  06 00
- ld b, 85               ;; 078B:  06 55
- ld b, 170              ;; 078D:  06 AA
- ld b, 255              ;; 078F:  06 FF
- ld c, 0                ;; 0791:  0E 00
- ld c, 85               ;; 0793:  0E 55
- ld c, 170              ;; 0795:  0E AA
- ld c, 255              ;; 0797:  0E FF
- ld d, 0                ;; 0799:  16 00
- ld d, 85               ;; 079B:  16 55
- ld d, 170              ;; 079D:  16 AA
- ld d, 255              ;; 079F:  16 FF
- ld e, 0                ;; 07A1:  1E 00
- ld e, 85               ;; 07A3:  1E 55
- ld e, 170              ;; 07A5:  1E AA
- ld e, 255              ;; 07A7:  1E FF
- ld h, 0                ;; 07A9:  26 00
- ld h, 85               ;; 07AB:  26 55
- ld h, 170              ;; 07AD:  26 AA
- ld h, 255              ;; 07AF:  26 FF
- ld l, 0                ;; 07B1:  2E 00
- ld l, 85               ;; 07B3:  2E 55
- ld l, 170              ;; 07B5:  2E AA
- ld l, 255              ;; 07B7:  2E FF
- ld a, 0                ;; 07B9:  3E 00
- ld a, 85               ;; 07BB:  3E 55
- ld a, 170              ;; 07BD:  3E AA
- ld a, 255              ;; 07BF:  3E FF
- ld b, (hl)             ;; 07C1:  46
- ld c, (hl)             ;; 07C2:  4E
- ld d, (hl)             ;; 07C3:  56
- ld e, (hl)             ;; 07C4:  5E
- ld h, (hl)             ;; 07C5:  66
- ld l, (hl)             ;; 07C6:  6E
- ld a, (hl)             ;; 07C7:  7E
- ld b, (ix + -128)      ;; 07C8:  DD 46 80
- ld b, (ix + 0)         ;; 07CB:  DD 46 00
- ld b, (ix + 127)       ;; 07CE:  DD 46 7F
- ld c, (ix + -128)      ;; 07D1:  DD 4E 80
- ld c, (ix + 0)         ;; 07D4:  DD 4E 00
- ld c, (ix + 127)       ;; 07D7:  DD 4E 7F
- ld d, (ix + -128)      ;; 07DA:  DD 56 80
- ld d, (ix + 0)         ;; 07DD:  DD 56 00
- ld d, (ix + 127)       ;; 07E0:  DD 56 7F
- ld e, (ix + -128)      ;; 07E3:  DD 5E 80
- ld e, (ix + 0)         ;; 07E6:  DD 5E 00
- ld e, (ix + 127)       ;; 07E9:  DD 5E 7F
- ld h, (ix + -128)      ;; 07EC:  DD 66 80
- ld h, (ix + 0)         ;; 07EF:  DD 66 00
- ld h, (ix + 127)       ;; 07F2:  DD 66 7F
- ld l, (ix + -128)      ;; 07F5:  DD 6E 80
- ld l, (ix + 0)         ;; 07F8:  DD 6E 00
- ld l, (ix + 127)       ;; 07FB:  DD 6E 7F
- ld a, (ix + -128)      ;; 07FE:  DD 7E 80
- ld a, (ix + 0)         ;; 0801:  DD 7E 00
- ld a, (ix + 127)       ;; 0804:  DD 7E 7F
- ld b, (iy + -128)      ;; 0807:  FD 46 80
- ld b, (iy + 0)         ;; 080A:  FD 46 00
- ld b, (iy + 127)       ;; 080D:  FD 46 7F
- ld c, (iy + -128)      ;; 0810:  FD 4E 80
- ld c, (iy + 0)         ;; 0813:  FD 4E 00
- ld c, (iy + 127)       ;; 0816:  FD 4E 7F
- ld d, (iy + -128)      ;; 0819:  FD 56 80
- ld d, (iy + 0)         ;; 081C:  FD 56 00
- ld d, (iy + 127)       ;; 081F:  FD 56 7F
- ld e, (iy + -128)      ;; 0822:  FD 5E 80
- ld e, (iy + 0)         ;; 0825:  FD 5E 00
- ld e, (iy + 127)       ;; 0828:  FD 5E 7F
- ld h, (iy + -128)      ;; 082B:  FD 66 80
- ld h, (iy + 0)         ;; 082E:  FD 66 00
- ld h, (iy + 127)       ;; 0831:  FD 66 7F
- ld l, (iy + -128)      ;; 0834:  FD 6E 80
- ld l, (iy + 0)         ;; 0837:  FD 6E 00
- ld l, (iy + 127)       ;; 083A:  FD 6E 7F
- ld a, (iy + -128)      ;; 083D:  FD 7E 80
- ld a, (iy + 0)         ;; 0840:  FD 7E 00
- ld a, (iy + 127)       ;; 0843:  FD 7E 7F
- ld (hl), b             ;; 0846:  70
- ld (hl), c             ;; 0847:  71
- ld (hl), d             ;; 0848:  72
- ld (hl), e             ;; 0849:  73
- ld (hl), h             ;; 084A:  74
- ld (hl), l             ;; 084B:  75
- ld (hl), a             ;; 084C:  77
- ld (ix + -128), b      ;; 084D:  DD 70 80
- ld (ix + 0), b         ;; 0850:  DD 70 00
- ld (ix + 127), b       ;; 0853:  DD 70 7F
- ld (ix + -128), c      ;; 0856:  DD 71 80
- ld (ix + 0), c         ;; 0859:  DD 71 00
- ld (ix + 127), c       ;; 085C:  DD 71 7F
- ld (ix + -128), d      ;; 085F:  DD 72 80
- ld (ix + 0), d         ;; 0862:  DD 72 00
- ld (ix + 127), d       ;; 0865:  DD 72 7F
- ld (ix + -128), e      ;; 0868:  DD 73 80
- ld (ix + 0), e         ;; 086B:  DD 73 00
- ld (ix + 127), e       ;; 086E:  DD 73 7F
- ld (ix + -128), h      ;; 0871:  DD 74 80
- ld (ix + 0), h         ;; 0874:  DD 74 00
- ld (ix + 127), h       ;; 0877:  DD 74 7F
- ld (ix + -128), l      ;; 087A:  DD 75 80
- ld (ix + 0), l         ;; 087D:  DD 75 00
- ld (ix + 127), l       ;; 0880:  DD 75 7F
- ld (ix + -128), a      ;; 0883:  DD 77 80
- ld (ix + 0), a         ;; 0886:  DD 77 00
- ld (ix + 127), a       ;; 0889:  DD 77 7F
- ld (iy + -128), b      ;; 088C:  FD 70 80
- ld (iy + 0), b         ;; 088F:  FD 70 00
- ld (iy + 127), b       ;; 0892:  FD 70 7F
- ld (iy + -128), c      ;; 0895:  FD 71 80
- ld (iy + 0), c         ;; 0898:  FD 71 00
- ld (iy + 127), c       ;; 089B:  FD 71 7F
- ld (iy + -128), d      ;; 089E:  FD 72 80
- ld (iy + 0), d         ;; 08A1:  FD 72 00
- ld (iy + 127), d       ;; 08A4:  FD 72 7F
- ld (iy + -128), e      ;; 08A7:  FD 73 80
- ld (iy + 0), e         ;; 08AA:  FD 73 00
- ld (iy + 127), e       ;; 08AD:  FD 73 7F
- ld (iy + -128), h      ;; 08B0:  FD 74 80
- ld (iy + 0), h         ;; 08B3:  FD 74 00
- ld (iy + 127), h       ;; 08B6:  FD 74 7F
- ld (iy + -128), l      ;; 08B9:  FD 75 80
- ld (iy + 0), l         ;; 08BC:  FD 75 00
- ld (iy + 127), l       ;; 08BF:  FD 75 7F
- ld (iy + -128), a      ;; 08C2:  FD 77 80
- ld (iy + 0), a         ;; 08C5:  FD 77 00
- ld (iy + 127), a       ;; 08C8:  FD 77 7F
- ld (hl), 0             ;; 08CB:  36 00
- ld (hl), 85            ;; 08CD:  36 55
- ld (hl), 170           ;; 08CF:  36 AA
- ld (hl), 255           ;; 08D1:  36 FF
- ld (ix + -128), 0      ;; 08D3:  DD 36 80 00
- ld (ix + 0), 0         ;; 08D7:  DD 36 00 00
- ld (ix + 127), 0       ;; 08DB:  DD 36 7F 00
- ld (ix + -128), 85     ;; 08DF:  DD 36 80 55
- ld (ix + 0), 85        ;; 08E3:  DD 36 00 55
- ld (ix + 127), 85      ;; 08E7:  DD 36 7F 55
- ld (ix + -128), 170    ;; 08EB:  DD 36 80 AA
- ld (ix + 0), 170       ;; 08EF:  DD 36 00 AA
- ld (ix + 127), 170     ;; 08F3:  DD 36 7F AA
- ld (ix + -128), 255    ;; 08F7:  DD 36 80 FF
- ld (ix + 0), 255       ;; 08FB:  DD 36 00 FF
- ld (ix + 127), 255     ;; 08FF:  DD 36 7F FF
- ld (iy + -128), 0      ;; 0903:  FD 36 80 00
- ld (iy + 0), 0         ;; 0907:  FD 36 00 00
- ld (iy + 127), 0       ;; 090B:  FD 36 7F 00
- ld (iy + -128), 85     ;; 090F:  FD 36 80 55
- ld (iy + 0), 85        ;; 0913:  FD 36 00 55
- ld (iy + 127), 85      ;; 0917:  FD 36 7F 55
- ld (iy + -128), 170    ;; 091B:  FD 36 80 AA
- ld (iy + 0), 170       ;; 091F:  FD 36 00 AA
- ld (iy + 127), 170     ;; 0923:  FD 36 7F AA
- ld (iy + -128), 255    ;; 0927:  FD 36 80 FF
- ld (iy + 0), 255       ;; 092B:  FD 36 00 FF
- ld (iy + 127), 255     ;; 092F:  FD 36 7F FF
- ld a, (bc)             ;; 0933:  0A
- ld a, (de)             ;; 0934:  1A
- ld (bc), a             ;; 0935:  02
- ld (de), a             ;; 0936:  12
- ld a, (0)              ;; 0937:  3A 00 00
- ld a, (291)            ;; 093A:  3A 23 01
- ld a, (17767)          ;; 093D:  3A 67 45
- ld a, (35243)          ;; 0940:  3A AB 89
- ld a, (52719)          ;; 0943:  3A EF CD
- ld a, (65535)          ;; 0946:  3A FF FF
- ld (0), a              ;; 0949:  32 00 00
- ld (291), a            ;; 094C:  32 23 01
- ld (17767), a          ;; 094F:  32 67 45
- ld (35243), a          ;; 0952:  32 AB 89
- ld (52719), a          ;; 0955:  32 EF CD
- ld (65535), a          ;; 0958:  32 FF FF
- ld bc, 0               ;; 095B:  01 00 00
- ld bc, 291             ;; 095E:  01 23 01
- ld bc, 17767           ;; 0961:  01 67 45
- ld bc, 35243           ;; 0964:  01 AB 89
- ld bc, 52719           ;; 0967:  01 EF CD
- ld bc, 65535           ;; 096A:  01 FF FF
- ld de, 0               ;; 096D:  11 00 00
- ld de, 291             ;; 0970:  11 23 01
- ld de, 17767           ;; 0973:  11 67 45
- ld de, 35243           ;; 0976:  11 AB 89
- ld de, 52719           ;; 0979:  11 EF CD
- ld de, 65535           ;; 097C:  11 FF FF
- ld hl, 0               ;; 097F:  21 00 00
- ld hl, 291             ;; 0982:  21 23 01
- ld hl, 17767           ;; 0985:  21 67 45
- ld hl, 35243           ;; 0988:  21 AB 89
- ld hl, 52719           ;; 098B:  21 EF CD
- ld hl, 65535           ;; 098E:  21 FF FF
- ld sp, 0               ;; 0991:  31 00 00
- ld sp, 291             ;; 0994:  31 23 01
- ld sp, 17767           ;; 0997:  31 67 45
- ld sp, 35243           ;; 099A:  31 AB 89
- ld sp, 52719           ;; 099D:  31 EF CD
- ld sp, 65535           ;; 09A0:  31 FF FF
- ld ix, 0               ;; 09A3:  DD 21 00 00
- ld ix, 291             ;; 09A7:  DD 21 23 01
- ld ix, 17767           ;; 09AB:  DD 21 67 45
- ld ix, 35243           ;; 09AF:  DD 21 AB 89
- ld ix, 52719           ;; 09B3:  DD 21 EF CD
- ld ix, 65535           ;; 09B7:  DD 21 FF FF
- ld iy, 0               ;; 09BB:  FD 21 00 00
- ld iy, 291             ;; 09BF:  FD 21 23 01
- ld iy, 17767           ;; 09C3:  FD 21 67 45
- ld iy, 35243           ;; 09C7:  FD 21 AB 89
- ld iy, 52719           ;; 09CB:  FD 21 EF CD
- ld iy, 65535           ;; 09CF:  FD 21 FF FF
- ld hl, (0)             ;; 09D3:  2A 00 00
- ld hl, (291)           ;; 09D6:  2A 23 01
- ld hl, (17767)         ;; 09D9:  2A 67 45
- ld hl, (35243)         ;; 09DC:  2A AB 89
- ld hl, (52719)         ;; 09DF:  2A EF CD
- ld hl, (65535)         ;; 09E2:  2A FF FF
- ld ix, (0)             ;; 09E5:  DD 2A 00 00
- ld ix, (291)           ;; 09E9:  DD 2A 23 01
- ld ix, (17767)         ;; 09ED:  DD 2A 67 45
- ld ix, (35243)         ;; 09F1:  DD 2A AB 89
- ld ix, (52719)         ;; 09F5:  DD 2A EF CD
- ld ix, (65535)         ;; 09F9:  DD 2A FF FF
- ld iy, (0)             ;; 09FD:  FD 2A 00 00
- ld iy, (291)           ;; 0A01:  FD 2A 23 01
- ld iy, (17767)         ;; 0A05:  FD 2A 67 45
- ld iy, (35243)         ;; 0A09:  FD 2A AB 89
- ld iy, (52719)         ;; 0A0D:  FD 2A EF CD
- ld iy, (65535)         ;; 0A11:  FD 2A FF FF
- ld (0), hl             ;; 0A15:  22 00 00
- ld (291), hl           ;; 0A18:  22 23 01
- ld (17767), hl         ;; 0A1B:  22 67 45
- ld (35243), hl         ;; 0A1E:  22 AB 89
- ld (52719), hl         ;; 0A21:  22 EF CD
- ld (65535), hl         ;; 0A24:  22 FF FF
- ld (0), ix             ;; 0A27:  DD 22 00 00
- ld (291), ix           ;; 0A2B:  DD 22 23 01
- ld (17767), ix         ;; 0A2F:  DD 22 67 45
- ld (35243), ix         ;; 0A33:  DD 22 AB 89
- ld (52719), ix         ;; 0A37:  DD 22 EF CD
- ld (65535), ix         ;; 0A3B:  DD 22 FF FF
- ld (0), iy             ;; 0A3F:  FD 22 00 00
- ld (291), iy           ;; 0A43:  FD 22 23 01
- ld (17767), iy         ;; 0A47:  FD 22 67 45
- ld (35243), iy         ;; 0A4B:  FD 22 AB 89
- ld (52719), iy         ;; 0A4F:  FD 22 EF CD
- ld (65535), iy         ;; 0A53:  FD 22 FF FF
- LD bc, (0)             ;; 0A57:  ED 4B 00 00
- LD bc, (291)           ;; 0A5B:  ED 4B 23 01
- LD bc, (17767)         ;; 0A5F:  ED 4B 67 45
- LD bc, (35243)         ;; 0A63:  ED 4B AB 89
- LD bc, (52719)         ;; 0A67:  ED 4B EF CD
- LD bc, (65535)         ;; 0A6B:  ED 4B FF FF
- LD de, (0)             ;; 0A6F:  ED 5B 00 00
- LD de, (291)           ;; 0A73:  ED 5B 23 01
- LD de, (17767)         ;; 0A77:  ED 5B 67 45
- LD de, (35243)         ;; 0A7B:  ED 5B AB 89
- LD de, (52719)         ;; 0A7F:  ED 5B EF CD
- LD de, (65535)         ;; 0A83:  ED 5B FF FF
- LD sp, (0)             ;; 0A87:  ED 7B 00 00
- LD sp, (291)           ;; 0A8B:  ED 7B 23 01
- LD sp, (17767)         ;; 0A8F:  ED 7B 67 45
- LD sp, (35243)         ;; 0A93:  ED 7B AB 89
- LD sp, (52719)         ;; 0A97:  ED 7B EF CD
- LD sp, (65535)         ;; 0A9B:  ED 7B FF FF
- LD (0), bc             ;; 0A9F:  ED 43 00 00
- LD (291), bc           ;; 0AA3:  ED 43 23 01
- LD (17767), bc         ;; 0AA7:  ED 43 67 45
- LD (35243), bc         ;; 0AAB:  ED 43 AB 89
- LD (52719), bc         ;; 0AAF:  ED 43 EF CD
- LD (65535), bc         ;; 0AB3:  ED 43 FF FF
- LD (0), de             ;; 0AB7:  ED 53 00 00
- LD (291), de           ;; 0ABB:  ED 53 23 01
- LD (17767), de         ;; 0ABF:  ED 53 67 45
- LD (35243), de         ;; 0AC3:  ED 53 AB 89
- LD (52719), de         ;; 0AC7:  ED 53 EF CD
- LD (65535), de         ;; 0ACB:  ED 53 FF FF
- LD (0), sp             ;; 0ACF:  ED 73 00 00
- LD (291), sp           ;; 0AD3:  ED 73 23 01
- LD (17767), sp         ;; 0AD7:  ED 73 67 45
- LD (35243), sp         ;; 0ADB:  ED 73 AB 89
- LD (52719), sp         ;; 0ADF:  ED 73 EF CD
- LD (65535), sp         ;; 0AE3:  ED 73 FF FF
- ld sp, hl              ;; 0AE7:  F9
- ld sp, ix              ;; 0AE8:  DD F9
- ld sp, iy              ;; 0AEA:  FD F9
- push bc                ;; 0AEC:  C5
- push de                ;; 0AED:  D5
- push hl                ;; 0AEE:  E5
- push af                ;; 0AEF:  F5
- push ix                ;; 0AF0:  DD E5
- push iy                ;; 0AF2:  FD E5
- pop bc                 ;; 0AF4:  C1
- pop de                 ;; 0AF5:  D1
- pop hl                 ;; 0AF6:  E1
- pop af                 ;; 0AF7:  F1
- pop ix                 ;; 0AF8:  DD E1
- pop iy                 ;; 0AFA:  FD E1
- ld (hl + -128), hl     ;; 0AFC:  DD F4 80
- ld (hl + 0), hl        ;; 0AFF:  DD F4 00
- ld (hl + 127), hl      ;; 0B02:  DD F4 7F
- ld (ix + -128), hl     ;; 0B05:  F4 80
- ld (ix + 0), hl        ;; 0B07:  F4 00
- ld (ix + 127), hl      ;; 0B09:  F4 7F
- ld (iy + -128), hl     ;; 0B0B:  FD F4 80
- ld (iy + 0), hl        ;; 0B0E:  FD F4 00
- ld (iy + 127), hl      ;; 0B11:  FD F4 7F
- ld (sp + 0), hl        ;; 0B14:  D4 00
- ld (sp + 85), hl       ;; 0B16:  D4 55
- ld (sp + 170), hl      ;; 0B18:  D4 AA
- ld (sp + 255), hl      ;; 0B1A:  D4 FF
- ld (sp + 0), ix        ;; 0B1C:  DD D4 00
- ld (sp + 85), ix       ;; 0B1F:  DD D4 55
- ld (sp + 170), ix      ;; 0B22:  DD D4 AA
- ld (sp + 255), ix      ;; 0B25:  DD D4 FF
- ld (sp + 0), iy        ;; 0B28:  FD D4 00
- ld (sp + 85), iy       ;; 0B2B:  FD D4 55
- ld (sp + 170), iy      ;; 0B2E:  FD D4 AA
- ld (sp + 255), iy      ;; 0B31:  FD D4 FF
- ld bc', bc             ;; 0B34:  ED 49
- ld bc', de             ;; 0B36:  ED 41
- ld de', bc             ;; 0B38:  ED 59
- ld de', de             ;; 0B3A:  ED 51
- ld hl', bc             ;; 0B3C:  ED 69
- ld hl', de             ;; 0B3E:  ED 61
- ex af, af              ;; 0B40:  08
- ex af, af'             ;; 0B41:  08
- exx                    ;; 0B42:  D9
- ex (sp), hl            ;; 0B43:  ED 54
- ex (sp), ix            ;; 0B45:  DD E3
- ex (sp), iy            ;; 0B47:  FD E3
- ex de, hl              ;; 0B49:  EB
- ex de', hl             ;; 0B4A:  E3
- ex de, hl'             ;; 0B4B:  76 EB
- ex de', hl'            ;; 0B4D:  76 E3
- ldi                    ;; 0B4F:  ED A0
- ldir                   ;; 0B51:  ED B0
- ldd                    ;; 0B53:  ED A8
- lddr                   ;; 0B55:  ED B8
+ ld b, b                ;; 0000:  40
+ ld b, c                ;; 0001:  41
+ ld b, d                ;; 0002:  42
+ ld b, e                ;; 0003:  43
+ ld b, h                ;; 0004:  44
+ ld b, l                ;; 0005:  45
+ ld b, a                ;; 0006:  47
+ ld c, b                ;; 0007:  48
+ ld c, c                ;; 0008:  49
+ ld c, d                ;; 0009:  4A
+ ld c, e                ;; 000A:  4B
+ ld c, h                ;; 000B:  4C
+ ld c, l                ;; 000C:  4D
+ ld c, a                ;; 000D:  4F
+ ld d, b                ;; 000E:  50
+ ld d, c                ;; 000F:  51
+ ld d, d                ;; 0010:  52
+ ld d, e                ;; 0011:  53
+ ld d, h                ;; 0012:  54
+ ld d, l                ;; 0013:  55
+ ld d, a                ;; 0014:  57
+ ld e, b                ;; 0015:  58
+ ld e, c                ;; 0016:  59
+ ld e, d                ;; 0017:  5A
+ ld e, e                ;; 0018:  5B
+ ld e, h                ;; 0019:  5C
+ ld e, l                ;; 001A:  5D
+ ld e, a                ;; 001B:  5F
+ ld h, b                ;; 001C:  60
+ ld h, c                ;; 001D:  61
+ ld h, d                ;; 001E:  62
+ ld h, e                ;; 001F:  63
+ ld h, h                ;; 0020:  64
+ ld h, l                ;; 0021:  65
+ ld h, a                ;; 0022:  67
+ ld l, b                ;; 0023:  68
+ ld l, c                ;; 0024:  69
+ ld l, d                ;; 0025:  6A
+ ld l, e                ;; 0026:  6B
+ ld l, h                ;; 0027:  6C
+ ld l, l                ;; 0028:  6D
+ ld l, a                ;; 0029:  6F
+ ld a, b                ;; 002A:  78
+ ld a, c                ;; 002B:  79
+ ld a, d                ;; 002C:  7A
+ ld a, e                ;; 002D:  7B
+ ld a, h                ;; 002E:  7C
+ ld a, l                ;; 002F:  7D
+ ld a, a                ;; 0030:  7F
+ ld b, 0                ;; 0031:  06 00
+ ld b, 85               ;; 0033:  06 55
+ ld b, 170              ;; 0035:  06 AA
+ ld b, 255              ;; 0037:  06 FF
+ ld c, 0                ;; 0039:  0E 00
+ ld c, 85               ;; 003B:  0E 55
+ ld c, 170              ;; 003D:  0E AA
+ ld c, 255              ;; 003F:  0E FF
+ ld d, 0                ;; 0041:  16 00
+ ld d, 85               ;; 0043:  16 55
+ ld d, 170              ;; 0045:  16 AA
+ ld d, 255              ;; 0047:  16 FF
+ ld e, 0                ;; 0049:  1E 00
+ ld e, 85               ;; 004B:  1E 55
+ ld e, 170              ;; 004D:  1E AA
+ ld e, 255              ;; 004F:  1E FF
+ ld h, 0                ;; 0051:  26 00
+ ld h, 85               ;; 0053:  26 55
+ ld h, 170              ;; 0055:  26 AA
+ ld h, 255              ;; 0057:  26 FF
+ ld l, 0                ;; 0059:  2E 00
+ ld l, 85               ;; 005B:  2E 55
+ ld l, 170              ;; 005D:  2E AA
+ ld l, 255              ;; 005F:  2E FF
+ ld a, 0                ;; 0061:  3E 00
+ ld a, 85               ;; 0063:  3E 55
+ ld a, 170              ;; 0065:  3E AA
+ ld a, 255              ;; 0067:  3E FF
+ ld b, (hl)             ;; 0069:  46
+ ld c, (hl)             ;; 006A:  4E
+ ld d, (hl)             ;; 006B:  56
+ ld e, (hl)             ;; 006C:  5E
+ ld h, (hl)             ;; 006D:  66
+ ld l, (hl)             ;; 006E:  6E
+ ld a, (hl)             ;; 006F:  7E
+ ld b, (ix + -128)      ;; 0070:  DD 46 80
+ ld b, (ix + 0)         ;; 0073:  DD 46 00
+ ld b, (ix + 127)       ;; 0076:  DD 46 7F
+ ld c, (ix + -128)      ;; 0079:  DD 4E 80
+ ld c, (ix + 0)         ;; 007C:  DD 4E 00
+ ld c, (ix + 127)       ;; 007F:  DD 4E 7F
+ ld d, (ix + -128)      ;; 0082:  DD 56 80
+ ld d, (ix + 0)         ;; 0085:  DD 56 00
+ ld d, (ix + 127)       ;; 0088:  DD 56 7F
+ ld e, (ix + -128)      ;; 008B:  DD 5E 80
+ ld e, (ix + 0)         ;; 008E:  DD 5E 00
+ ld e, (ix + 127)       ;; 0091:  DD 5E 7F
+ ld h, (ix + -128)      ;; 0094:  DD 66 80
+ ld h, (ix + 0)         ;; 0097:  DD 66 00
+ ld h, (ix + 127)       ;; 009A:  DD 66 7F
+ ld l, (ix + -128)      ;; 009D:  DD 6E 80
+ ld l, (ix + 0)         ;; 00A0:  DD 6E 00
+ ld l, (ix + 127)       ;; 00A3:  DD 6E 7F
+ ld a, (ix + -128)      ;; 00A6:  DD 7E 80
+ ld a, (ix + 0)         ;; 00A9:  DD 7E 00
+ ld a, (ix + 127)       ;; 00AC:  DD 7E 7F
+ ld b, (iy + -128)      ;; 00AF:  FD 46 80
+ ld b, (iy + 0)         ;; 00B2:  FD 46 00
+ ld b, (iy + 127)       ;; 00B5:  FD 46 7F
+ ld c, (iy + -128)      ;; 00B8:  FD 4E 80
+ ld c, (iy + 0)         ;; 00BB:  FD 4E 00
+ ld c, (iy + 127)       ;; 00BE:  FD 4E 7F
+ ld d, (iy + -128)      ;; 00C1:  FD 56 80
+ ld d, (iy + 0)         ;; 00C4:  FD 56 00
+ ld d, (iy + 127)       ;; 00C7:  FD 56 7F
+ ld e, (iy + -128)      ;; 00CA:  FD 5E 80
+ ld e, (iy + 0)         ;; 00CD:  FD 5E 00
+ ld e, (iy + 127)       ;; 00D0:  FD 5E 7F
+ ld h, (iy + -128)      ;; 00D3:  FD 66 80
+ ld h, (iy + 0)         ;; 00D6:  FD 66 00
+ ld h, (iy + 127)       ;; 00D9:  FD 66 7F
+ ld l, (iy + -128)      ;; 00DC:  FD 6E 80
+ ld l, (iy + 0)         ;; 00DF:  FD 6E 00
+ ld l, (iy + 127)       ;; 00E2:  FD 6E 7F
+ ld a, (iy + -128)      ;; 00E5:  FD 7E 80
+ ld a, (iy + 0)         ;; 00E8:  FD 7E 00
+ ld a, (iy + 127)       ;; 00EB:  FD 7E 7F
+ ld (hl), b             ;; 00EE:  70
+ ld (hl), c             ;; 00EF:  71
+ ld (hl), d             ;; 00F0:  72
+ ld (hl), e             ;; 00F1:  73
+ ld (hl), h             ;; 00F2:  74
+ ld (hl), l             ;; 00F3:  75
+ ld (hl), a             ;; 00F4:  77
+ ld (ix + -128), b      ;; 00F5:  DD 70 80
+ ld (ix + 0), b         ;; 00F8:  DD 70 00
+ ld (ix + 127), b       ;; 00FB:  DD 70 7F
+ ld (ix + -128), c      ;; 00FE:  DD 71 80
+ ld (ix + 0), c         ;; 0101:  DD 71 00
+ ld (ix + 127), c       ;; 0104:  DD 71 7F
+ ld (ix + -128), d      ;; 0107:  DD 72 80
+ ld (ix + 0), d         ;; 010A:  DD 72 00
+ ld (ix + 127), d       ;; 010D:  DD 72 7F
+ ld (ix + -128), e      ;; 0110:  DD 73 80
+ ld (ix + 0), e         ;; 0113:  DD 73 00
+ ld (ix + 127), e       ;; 0116:  DD 73 7F
+ ld (ix + -128), h      ;; 0119:  DD 74 80
+ ld (ix + 0), h         ;; 011C:  DD 74 00
+ ld (ix + 127), h       ;; 011F:  DD 74 7F
+ ld (ix + -128), l      ;; 0122:  DD 75 80
+ ld (ix + 0), l         ;; 0125:  DD 75 00
+ ld (ix + 127), l       ;; 0128:  DD 75 7F
+ ld (ix + -128), a      ;; 012B:  DD 77 80
+ ld (ix + 0), a         ;; 012E:  DD 77 00
+ ld (ix + 127), a       ;; 0131:  DD 77 7F
+ ld (iy + -128), b      ;; 0134:  FD 70 80
+ ld (iy + 0), b         ;; 0137:  FD 70 00
+ ld (iy + 127), b       ;; 013A:  FD 70 7F
+ ld (iy + -128), c      ;; 013D:  FD 71 80
+ ld (iy + 0), c         ;; 0140:  FD 71 00
+ ld (iy + 127), c       ;; 0143:  FD 71 7F
+ ld (iy + -128), d      ;; 0146:  FD 72 80
+ ld (iy + 0), d         ;; 0149:  FD 72 00
+ ld (iy + 127), d       ;; 014C:  FD 72 7F
+ ld (iy + -128), e      ;; 014F:  FD 73 80
+ ld (iy + 0), e         ;; 0152:  FD 73 00
+ ld (iy + 127), e       ;; 0155:  FD 73 7F
+ ld (iy + -128), h      ;; 0158:  FD 74 80
+ ld (iy + 0), h         ;; 015B:  FD 74 00
+ ld (iy + 127), h       ;; 015E:  FD 74 7F
+ ld (iy + -128), l      ;; 0161:  FD 75 80
+ ld (iy + 0), l         ;; 0164:  FD 75 00
+ ld (iy + 127), l       ;; 0167:  FD 75 7F
+ ld (iy + -128), a      ;; 016A:  FD 77 80
+ ld (iy + 0), a         ;; 016D:  FD 77 00
+ ld (iy + 127), a       ;; 0170:  FD 77 7F
+ ld (hl), 0             ;; 0173:  36 00
+ ld (hl), 85            ;; 0175:  36 55
+ ld (hl), 170           ;; 0177:  36 AA
+ ld (hl), 255           ;; 0179:  36 FF
+ ld (ix + -128), 0      ;; 017B:  DD 36 80 00
+ ld (ix + 0), 0         ;; 017F:  DD 36 00 00
+ ld (ix + 127), 0       ;; 0183:  DD 36 7F 00
+ ld (ix + -128), 85     ;; 0187:  DD 36 80 55
+ ld (ix + 0), 85        ;; 018B:  DD 36 00 55
+ ld (ix + 127), 85      ;; 018F:  DD 36 7F 55
+ ld (ix + -128), 170    ;; 0193:  DD 36 80 AA
+ ld (ix + 0), 170       ;; 0197:  DD 36 00 AA
+ ld (ix + 127), 170     ;; 019B:  DD 36 7F AA
+ ld (ix + -128), 255    ;; 019F:  DD 36 80 FF
+ ld (ix + 0), 255       ;; 01A3:  DD 36 00 FF
+ ld (ix + 127), 255     ;; 01A7:  DD 36 7F FF
+ ld (iy + -128), 0      ;; 01AB:  FD 36 80 00
+ ld (iy + 0), 0         ;; 01AF:  FD 36 00 00
+ ld (iy + 127), 0       ;; 01B3:  FD 36 7F 00
+ ld (iy + -128), 85     ;; 01B7:  FD 36 80 55
+ ld (iy + 0), 85        ;; 01BB:  FD 36 00 55
+ ld (iy + 127), 85      ;; 01BF:  FD 36 7F 55
+ ld (iy + -128), 170    ;; 01C3:  FD 36 80 AA
+ ld (iy + 0), 170       ;; 01C7:  FD 36 00 AA
+ ld (iy + 127), 170     ;; 01CB:  FD 36 7F AA
+ ld (iy + -128), 255    ;; 01CF:  FD 36 80 FF
+ ld (iy + 0), 255       ;; 01D3:  FD 36 00 FF
+ ld (iy + 127), 255     ;; 01D7:  FD 36 7F FF
+ ld a, (bc)             ;; 01DB:  0A
+ ld a, (de)             ;; 01DC:  1A
+ ld (bc), a             ;; 01DD:  02
+ ld (de), a             ;; 01DE:  12
+ ld a, (0)              ;; 01DF:  3A 00 00
+ ld a, (291)            ;; 01E2:  3A 23 01
+ ld a, (17767)          ;; 01E5:  3A 67 45
+ ld a, (35243)          ;; 01E8:  3A AB 89
+ ld a, (52719)          ;; 01EB:  3A EF CD
+ ld a, (65535)          ;; 01EE:  3A FF FF
+ ld (0), a              ;; 01F1:  32 00 00
+ ld (291), a            ;; 01F4:  32 23 01
+ ld (17767), a          ;; 01F7:  32 67 45
+ ld (35243), a          ;; 01FA:  32 AB 89
+ ld (52719), a          ;; 01FD:  32 EF CD
+ ld (65535), a          ;; 0200:  32 FF FF
+ add a, b               ;; 0203:  80
+ add a, c               ;; 0204:  81
+ add a, d               ;; 0205:  82
+ add a, e               ;; 0206:  83
+ add a, h               ;; 0207:  84
+ add a, l               ;; 0208:  85
+ add a, (hl)            ;; 0209:  86
+ add a, a               ;; 020A:  87
+ adc a, b               ;; 020B:  88
+ adc a, c               ;; 020C:  89
+ adc a, d               ;; 020D:  8A
+ adc a, e               ;; 020E:  8B
+ adc a, h               ;; 020F:  8C
+ adc a, l               ;; 0210:  8D
+ adc a, (hl)            ;; 0211:  8E
+ adc a, a               ;; 0212:  8F
+ sub a, b               ;; 0213:  90
+ sub a, c               ;; 0214:  91
+ sub a, d               ;; 0215:  92
+ sub a, e               ;; 0216:  93
+ sub a, h               ;; 0217:  94
+ sub a, l               ;; 0218:  95
+ sub a, (hl)            ;; 0219:  96
+ sub a, a               ;; 021A:  97
+ sbc a, b               ;; 021B:  98
+ sbc a, c               ;; 021C:  99
+ sbc a, d               ;; 021D:  9A
+ sbc a, e               ;; 021E:  9B
+ sbc a, h               ;; 021F:  9C
+ sbc a, l               ;; 0220:  9D
+ sbc a, (hl)            ;; 0221:  9E
+ sbc a, a               ;; 0222:  9F
+ and a, b               ;; 0223:  A0
+ and a, c               ;; 0224:  A1
+ and a, d               ;; 0225:  A2
+ and a, e               ;; 0226:  A3
+ and a, h               ;; 0227:  A4
+ and a, l               ;; 0228:  A5
+ and a, (hl)            ;; 0229:  A6
+ and a, a               ;; 022A:  A7
+ xor a, b               ;; 022B:  A8
+ xor a, c               ;; 022C:  A9
+ xor a, d               ;; 022D:  AA
+ xor a, e               ;; 022E:  AB
+ xor a, h               ;; 022F:  AC
+ xor a, l               ;; 0230:  AD
+ xor a, (hl)            ;; 0231:  AE
+ xor a, a               ;; 0232:  AF
+ or a, b                ;; 0233:  B0
+ or a, c                ;; 0234:  B1
+ or a, d                ;; 0235:  B2
+ or a, e                ;; 0236:  B3
+ or a, h                ;; 0237:  B4
+ or a, l                ;; 0238:  B5
+ or a, (hl)             ;; 0239:  B6
+ or a, a                ;; 023A:  B7
+ cp a, b                ;; 023B:  B8
+ cp a, c                ;; 023C:  B9
+ cp a, d                ;; 023D:  BA
+ cp a, e                ;; 023E:  BB
+ cp a, h                ;; 023F:  BC
+ cp a, l                ;; 0240:  BD
+ cp a, (hl)             ;; 0241:  BE
+ cp a, a                ;; 0242:  BF
+ add b                  ;; 0243:  80
+ add c                  ;; 0244:  81
+ add d                  ;; 0245:  82
+ add e                  ;; 0246:  83
+ add h                  ;; 0247:  84
+ add l                  ;; 0248:  85
+ add (hl)               ;; 0249:  86
+ add a                  ;; 024A:  87
+ adc b                  ;; 024B:  88
+ adc c                  ;; 024C:  89
+ adc d                  ;; 024D:  8A
+ adc e                  ;; 024E:  8B
+ adc h                  ;; 024F:  8C
+ adc l                  ;; 0250:  8D
+ adc (hl)               ;; 0251:  8E
+ adc a                  ;; 0252:  8F
+ sub b                  ;; 0253:  90
+ sub c                  ;; 0254:  91
+ sub d                  ;; 0255:  92
+ sub e                  ;; 0256:  93
+ sub h                  ;; 0257:  94
+ sub l                  ;; 0258:  95
+ sub (hl)               ;; 0259:  96
+ sub a                  ;; 025A:  97
+ sbc b                  ;; 025B:  98
+ sbc c                  ;; 025C:  99
+ sbc d                  ;; 025D:  9A
+ sbc e                  ;; 025E:  9B
+ sbc h                  ;; 025F:  9C
+ sbc l                  ;; 0260:  9D
+ sbc (hl)               ;; 0261:  9E
+ sbc a                  ;; 0262:  9F
+ and b                  ;; 0263:  A0
+ and c                  ;; 0264:  A1
+ and d                  ;; 0265:  A2
+ and e                  ;; 0266:  A3
+ and h                  ;; 0267:  A4
+ and l                  ;; 0268:  A5
+ and (hl)               ;; 0269:  A6
+ and a                  ;; 026A:  A7
+ xor b                  ;; 026B:  A8
+ xor c                  ;; 026C:  A9
+ xor d                  ;; 026D:  AA
+ xor e                  ;; 026E:  AB
+ xor h                  ;; 026F:  AC
+ xor l                  ;; 0270:  AD
+ xor (hl)               ;; 0271:  AE
+ xor a                  ;; 0272:  AF
+ or b                   ;; 0273:  B0
+ or c                   ;; 0274:  B1
+ or d                   ;; 0275:  B2
+ or e                   ;; 0276:  B3
+ or h                   ;; 0277:  B4
+ or l                   ;; 0278:  B5
+ or (hl)                ;; 0279:  B6
+ or a                   ;; 027A:  B7
+ cp b                   ;; 027B:  B8
+ cp c                   ;; 027C:  B9
+ cp d                   ;; 027D:  BA
+ cp e                   ;; 027E:  BB
+ cp h                   ;; 027F:  BC
+ cp l                   ;; 0280:  BD
+ cp (hl)                ;; 0281:  BE
+ cp a                   ;; 0282:  BF
+ add a, (ix+-128)       ;; 0283:  DD 86 80
+ add a, (ix+0)          ;; 0286:  DD 86 00
+ add a, (ix+127)        ;; 0289:  DD 86 7F
+ adc a, (ix+-128)       ;; 028C:  DD 8E 80
+ adc a, (ix+0)          ;; 028F:  DD 8E 00
+ adc a, (ix+127)        ;; 0292:  DD 8E 7F
+ sub a, (ix+-128)       ;; 0295:  DD 96 80
+ sub a, (ix+0)          ;; 0298:  DD 96 00
+ sub a, (ix+127)        ;; 029B:  DD 96 7F
+ sbc a, (ix+-128)       ;; 029E:  DD 9E 80
+ sbc a, (ix+0)          ;; 02A1:  DD 9E 00
+ sbc a, (ix+127)        ;; 02A4:  DD 9E 7F
+ and a, (ix+-128)       ;; 02A7:  DD A6 80
+ and a, (ix+0)          ;; 02AA:  DD A6 00
+ and a, (ix+127)        ;; 02AD:  DD A6 7F
+ xor a, (ix+-128)       ;; 02B0:  DD AE 80
+ xor a, (ix+0)          ;; 02B3:  DD AE 00
+ xor a, (ix+127)        ;; 02B6:  DD AE 7F
+ or a, (ix+-128)        ;; 02B9:  DD B6 80
+ or a, (ix+0)           ;; 02BC:  DD B6 00
+ or a, (ix+127)         ;; 02BF:  DD B6 7F
+ cp a, (ix+-128)        ;; 02C2:  DD BE 80
+ cp a, (ix+0)           ;; 02C5:  DD BE 00
+ cp a, (ix+127)         ;; 02C8:  DD BE 7F
+ add (ix+-128)          ;; 02CB:  DD 86 80
+ add (ix+0)             ;; 02CE:  DD 86 00
+ add (ix+127)           ;; 02D1:  DD 86 7F
+ adc (ix+-128)          ;; 02D4:  DD 8E 80
+ adc (ix+0)             ;; 02D7:  DD 8E 00
+ adc (ix+127)           ;; 02DA:  DD 8E 7F
+ sub (ix+-128)          ;; 02DD:  DD 96 80
+ sub (ix+0)             ;; 02E0:  DD 96 00
+ sub (ix+127)           ;; 02E3:  DD 96 7F
+ sbc (ix+-128)          ;; 02E6:  DD 9E 80
+ sbc (ix+0)             ;; 02E9:  DD 9E 00
+ sbc (ix+127)           ;; 02EC:  DD 9E 7F
+ and (ix+-128)          ;; 02EF:  DD A6 80
+ and (ix+0)             ;; 02F2:  DD A6 00
+ and (ix+127)           ;; 02F5:  DD A6 7F
+ xor (ix+-128)          ;; 02F8:  DD AE 80
+ xor (ix+0)             ;; 02FB:  DD AE 00
+ xor (ix+127)           ;; 02FE:  DD AE 7F
+ or (ix+-128)           ;; 0301:  DD B6 80
+ or (ix+0)              ;; 0304:  DD B6 00
+ or (ix+127)            ;; 0307:  DD B6 7F
+ cp (ix+-128)           ;; 030A:  DD BE 80
+ cp (ix+0)              ;; 030D:  DD BE 00
+ cp (ix+127)            ;; 0310:  DD BE 7F
+ add a, (iy+-128)       ;; 0313:  FD 86 80
+ add a, (iy+0)          ;; 0316:  FD 86 00
+ add a, (iy+127)        ;; 0319:  FD 86 7F
+ adc a, (iy+-128)       ;; 031C:  FD 8E 80
+ adc a, (iy+0)          ;; 031F:  FD 8E 00
+ adc a, (iy+127)        ;; 0322:  FD 8E 7F
+ sub a, (iy+-128)       ;; 0325:  FD 96 80
+ sub a, (iy+0)          ;; 0328:  FD 96 00
+ sub a, (iy+127)        ;; 032B:  FD 96 7F
+ sbc a, (iy+-128)       ;; 032E:  FD 9E 80
+ sbc a, (iy+0)          ;; 0331:  FD 9E 00
+ sbc a, (iy+127)        ;; 0334:  FD 9E 7F
+ and a, (iy+-128)       ;; 0337:  FD A6 80
+ and a, (iy+0)          ;; 033A:  FD A6 00
+ and a, (iy+127)        ;; 033D:  FD A6 7F
+ xor a, (iy+-128)       ;; 0340:  FD AE 80
+ xor a, (iy+0)          ;; 0343:  FD AE 00
+ xor a, (iy+127)        ;; 0346:  FD AE 7F
+ or a, (iy+-128)        ;; 0349:  FD B6 80
+ or a, (iy+0)           ;; 034C:  FD B6 00
+ or a, (iy+127)         ;; 034F:  FD B6 7F
+ cp a, (iy+-128)        ;; 0352:  FD BE 80
+ cp a, (iy+0)           ;; 0355:  FD BE 00
+ cp a, (iy+127)         ;; 0358:  FD BE 7F
+ add (iy+-128)          ;; 035B:  FD 86 80
+ add (iy+0)             ;; 035E:  FD 86 00
+ add (iy+127)           ;; 0361:  FD 86 7F
+ adc (iy+-128)          ;; 0364:  FD 8E 80
+ adc (iy+0)             ;; 0367:  FD 8E 00
+ adc (iy+127)           ;; 036A:  FD 8E 7F
+ sub (iy+-128)          ;; 036D:  FD 96 80
+ sub (iy+0)             ;; 0370:  FD 96 00
+ sub (iy+127)           ;; 0373:  FD 96 7F
+ sbc (iy+-128)          ;; 0376:  FD 9E 80
+ sbc (iy+0)             ;; 0379:  FD 9E 00
+ sbc (iy+127)           ;; 037C:  FD 9E 7F
+ and (iy+-128)          ;; 037F:  FD A6 80
+ and (iy+0)             ;; 0382:  FD A6 00
+ and (iy+127)           ;; 0385:  FD A6 7F
+ xor (iy+-128)          ;; 0388:  FD AE 80
+ xor (iy+0)             ;; 038B:  FD AE 00
+ xor (iy+127)           ;; 038E:  FD AE 7F
+ or (iy+-128)           ;; 0391:  FD B6 80
+ or (iy+0)              ;; 0394:  FD B6 00
+ or (iy+127)            ;; 0397:  FD B6 7F
+ cp (iy+-128)           ;; 039A:  FD BE 80
+ cp (iy+0)              ;; 039D:  FD BE 00
+ cp (iy+127)            ;; 03A0:  FD BE 7F
+ add a, 0               ;; 03A3:  C6 00
+ add a, 85              ;; 03A5:  C6 55
+ add a, 170             ;; 03A7:  C6 AA
+ add a, 255             ;; 03A9:  C6 FF
+ adc a, 0               ;; 03AB:  CE 00
+ adc a, 85              ;; 03AD:  CE 55
+ adc a, 170             ;; 03AF:  CE AA
+ adc a, 255             ;; 03B1:  CE FF
+ sub a, 0               ;; 03B3:  D6 00
+ sub a, 85              ;; 03B5:  D6 55
+ sub a, 170             ;; 03B7:  D6 AA
+ sub a, 255             ;; 03B9:  D6 FF
+ sbc a, 0               ;; 03BB:  DE 00
+ sbc a, 85              ;; 03BD:  DE 55
+ sbc a, 170             ;; 03BF:  DE AA
+ sbc a, 255             ;; 03C1:  DE FF
+ and a, 0               ;; 03C3:  E6 00
+ and a, 85              ;; 03C5:  E6 55
+ and a, 170             ;; 03C7:  E6 AA
+ and a, 255             ;; 03C9:  E6 FF
+ xor a, 0               ;; 03CB:  EE 00
+ xor a, 85              ;; 03CD:  EE 55
+ xor a, 170             ;; 03CF:  EE AA
+ xor a, 255             ;; 03D1:  EE FF
+ or a, 0                ;; 03D3:  F6 00
+ or a, 85               ;; 03D5:  F6 55
+ or a, 170              ;; 03D7:  F6 AA
+ or a, 255              ;; 03D9:  F6 FF
+ cp a, 0                ;; 03DB:  FE 00
+ cp a, 85               ;; 03DD:  FE 55
+ cp a, 170              ;; 03DF:  FE AA
+ cp a, 255              ;; 03E1:  FE FF
+ add 0                  ;; 03E3:  C6 00
+ add 85                 ;; 03E5:  C6 55
+ add 170                ;; 03E7:  C6 AA
+ add 255                ;; 03E9:  C6 FF
+ adc 0                  ;; 03EB:  CE 00
+ adc 85                 ;; 03ED:  CE 55
+ adc 170                ;; 03EF:  CE AA
+ adc 255                ;; 03F1:  CE FF
+ sub 0                  ;; 03F3:  D6 00
+ sub 85                 ;; 03F5:  D6 55
+ sub 170                ;; 03F7:  D6 AA
+ sub 255                ;; 03F9:  D6 FF
+ sbc 0                  ;; 03FB:  DE 00
+ sbc 85                 ;; 03FD:  DE 55
+ sbc 170                ;; 03FF:  DE AA
+ sbc 255                ;; 0401:  DE FF
+ and 0                  ;; 0403:  E6 00
+ and 85                 ;; 0405:  E6 55
+ and 170                ;; 0407:  E6 AA
+ and 255                ;; 0409:  E6 FF
+ xor 0                  ;; 040B:  EE 00
+ xor 85                 ;; 040D:  EE 55
+ xor 170                ;; 040F:  EE AA
+ xor 255                ;; 0411:  EE FF
+ or 0                   ;; 0413:  F6 00
+ or 85                  ;; 0415:  F6 55
+ or 170                 ;; 0417:  F6 AA
+ or 255                 ;; 0419:  F6 FF
+ cp 0                   ;; 041B:  FE 00
+ cp 85                  ;; 041D:  FE 55
+ cp 170                 ;; 041F:  FE AA
+ cp 255                 ;; 0421:  FE FF
+ inc b                  ;; 0423:  04
+ inc c                  ;; 0424:  0C
+ inc d                  ;; 0425:  14
+ inc e                  ;; 0426:  1C
+ inc h                  ;; 0427:  24
+ inc l                  ;; 0428:  2C
+ inc a                  ;; 0429:  3C
+ dec b                  ;; 042A:  05
+ dec c                  ;; 042B:  0D
+ dec d                  ;; 042C:  15
+ dec e                  ;; 042D:  1D
+ dec h                  ;; 042E:  25
+ dec l                  ;; 042F:  2D
+ dec a                  ;; 0430:  3D
+ inc (hl)               ;; 0431:  34
+ dec (hl)               ;; 0432:  35
+ inc (ix + -128)        ;; 0433:  DD 34 80
+ inc (ix + 0)           ;; 0436:  DD 34 00
+ inc (ix + 127)         ;; 0439:  DD 34 7F
+ dec (ix + -128)        ;; 043C:  DD 35 80
+ dec (ix + 0)           ;; 043F:  DD 35 00
+ dec (ix + 127)         ;; 0442:  DD 35 7F
+ inc (iy + -128)        ;; 0445:  FD 34 80
+ inc (iy + 0)           ;; 0448:  FD 34 00
+ inc (iy + 127)         ;; 044B:  FD 34 7F
+ dec (iy + -128)        ;; 044E:  FD 35 80
+ dec (iy + 0)           ;; 0451:  FD 35 00
+ dec (iy + 127)         ;; 0454:  FD 35 7F
+ tst a, b               ;; 0457:  ED 04
+ tst a, c               ;; 0459:  ED 0C
+ tst a, d               ;; 045B:  ED 14
+ tst a, e               ;; 045D:  ED 1C
+ tst a, h               ;; 045F:  ED 24
+ tst a, l               ;; 0461:  ED 2C
+ tst a, a               ;; 0463:  ED 3C
+ tst b                  ;; 0465:  ED 04
+ tst c                  ;; 0467:  ED 0C
+ tst d                  ;; 0469:  ED 14
+ tst e                  ;; 046B:  ED 1C
+ tst h                  ;; 046D:  ED 24
+ tst l                  ;; 046F:  ED 2C
+ tst a                  ;; 0471:  ED 3C
+ tst a, 0               ;; 0473:  ED 64 00
+ tst a, 85              ;; 0476:  ED 64 55
+ tst a, 170             ;; 0479:  ED 64 AA
+ tst a, 255             ;; 047C:  ED 64 FF
+ tst 0                  ;; 047F:  ED 64 00
+ tst 85                 ;; 0482:  ED 64 55
+ tst 170                ;; 0485:  ED 64 AA
+ tst 255                ;; 0488:  ED 64 FF
+ tst a, (hl)            ;; 048B:  ED 34
+ tst (hl)               ;; 048D:  ED 34
+ cpl                    ;; 048F:  2F
+ neg                    ;; 0490:  ED 44
+ ccf                    ;; 0492:  3F
+ scf                    ;; 0493:  37
+ ld bc, 0               ;; 0494:  01 00 00
+ ld bc, 291             ;; 0497:  01 23 01
+ ld bc, 17767           ;; 049A:  01 67 45
+ ld bc, 35243           ;; 049D:  01 AB 89
+ ld bc, 52719           ;; 04A0:  01 EF CD
+ ld bc, 65535           ;; 04A3:  01 FF FF
+ ld de, 0               ;; 04A6:  11 00 00
+ ld de, 291             ;; 04A9:  11 23 01
+ ld de, 17767           ;; 04AC:  11 67 45
+ ld de, 35243           ;; 04AF:  11 AB 89
+ ld de, 52719           ;; 04B2:  11 EF CD
+ ld de, 65535           ;; 04B5:  11 FF FF
+ ld hl, 0               ;; 04B8:  21 00 00
+ ld hl, 291             ;; 04BB:  21 23 01
+ ld hl, 17767           ;; 04BE:  21 67 45
+ ld hl, 35243           ;; 04C1:  21 AB 89
+ ld hl, 52719           ;; 04C4:  21 EF CD
+ ld hl, 65535           ;; 04C7:  21 FF FF
+ ld sp, 0               ;; 04CA:  31 00 00
+ ld sp, 291             ;; 04CD:  31 23 01
+ ld sp, 17767           ;; 04D0:  31 67 45
+ ld sp, 35243           ;; 04D3:  31 AB 89
+ ld sp, 52719           ;; 04D6:  31 EF CD
+ ld sp, 65535           ;; 04D9:  31 FF FF
+ ld ix, 0               ;; 04DC:  DD 21 00 00
+ ld ix, 291             ;; 04E0:  DD 21 23 01
+ ld ix, 17767           ;; 04E4:  DD 21 67 45
+ ld ix, 35243           ;; 04E8:  DD 21 AB 89
+ ld ix, 52719           ;; 04EC:  DD 21 EF CD
+ ld ix, 65535           ;; 04F0:  DD 21 FF FF
+ ld iy, 0               ;; 04F4:  FD 21 00 00
+ ld iy, 291             ;; 04F8:  FD 21 23 01
+ ld iy, 17767           ;; 04FC:  FD 21 67 45
+ ld iy, 35243           ;; 0500:  FD 21 AB 89
+ ld iy, 52719           ;; 0504:  FD 21 EF CD
+ ld iy, 65535           ;; 0508:  FD 21 FF FF
+ ld hl, (0)             ;; 050C:  2A 00 00
+ ld hl, (291)           ;; 050F:  2A 23 01
+ ld hl, (17767)         ;; 0512:  2A 67 45
+ ld hl, (35243)         ;; 0515:  2A AB 89
+ ld hl, (52719)         ;; 0518:  2A EF CD
+ ld hl, (65535)         ;; 051B:  2A FF FF
+ ld ix, (0)             ;; 051E:  DD 2A 00 00
+ ld ix, (291)           ;; 0522:  DD 2A 23 01
+ ld ix, (17767)         ;; 0526:  DD 2A 67 45
+ ld ix, (35243)         ;; 052A:  DD 2A AB 89
+ ld ix, (52719)         ;; 052E:  DD 2A EF CD
+ ld ix, (65535)         ;; 0532:  DD 2A FF FF
+ ld iy, (0)             ;; 0536:  FD 2A 00 00
+ ld iy, (291)           ;; 053A:  FD 2A 23 01
+ ld iy, (17767)         ;; 053E:  FD 2A 67 45
+ ld iy, (35243)         ;; 0542:  FD 2A AB 89
+ ld iy, (52719)         ;; 0546:  FD 2A EF CD
+ ld iy, (65535)         ;; 054A:  FD 2A FF FF
+ ld (0), hl             ;; 054E:  22 00 00
+ ld (291), hl           ;; 0551:  22 23 01
+ ld (17767), hl         ;; 0554:  22 67 45
+ ld (35243), hl         ;; 0557:  22 AB 89
+ ld (52719), hl         ;; 055A:  22 EF CD
+ ld (65535), hl         ;; 055D:  22 FF FF
+ ld (0), ix             ;; 0560:  DD 22 00 00
+ ld (291), ix           ;; 0564:  DD 22 23 01
+ ld (17767), ix         ;; 0568:  DD 22 67 45
+ ld (35243), ix         ;; 056C:  DD 22 AB 89
+ ld (52719), ix         ;; 0570:  DD 22 EF CD
+ ld (65535), ix         ;; 0574:  DD 22 FF FF
+ ld (0), iy             ;; 0578:  FD 22 00 00
+ ld (291), iy           ;; 057C:  FD 22 23 01
+ ld (17767), iy         ;; 0580:  FD 22 67 45
+ ld (35243), iy         ;; 0584:  FD 22 AB 89
+ ld (52719), iy         ;; 0588:  FD 22 EF CD
+ ld (65535), iy         ;; 058C:  FD 22 FF FF
+ LD bc, (0)             ;; 0590:  ED 4B 00 00
+ LD bc, (291)           ;; 0594:  ED 4B 23 01
+ LD bc, (17767)         ;; 0598:  ED 4B 67 45
+ LD bc, (35243)         ;; 059C:  ED 4B AB 89
+ LD bc, (52719)         ;; 05A0:  ED 4B EF CD
+ LD bc, (65535)         ;; 05A4:  ED 4B FF FF
+ LD de, (0)             ;; 05A8:  ED 5B 00 00
+ LD de, (291)           ;; 05AC:  ED 5B 23 01
+ LD de, (17767)         ;; 05B0:  ED 5B 67 45
+ LD de, (35243)         ;; 05B4:  ED 5B AB 89
+ LD de, (52719)         ;; 05B8:  ED 5B EF CD
+ LD de, (65535)         ;; 05BC:  ED 5B FF FF
+ LD sp, (0)             ;; 05C0:  ED 7B 00 00
+ LD sp, (291)           ;; 05C4:  ED 7B 23 01
+ LD sp, (17767)         ;; 05C8:  ED 7B 67 45
+ LD sp, (35243)         ;; 05CC:  ED 7B AB 89
+ LD sp, (52719)         ;; 05D0:  ED 7B EF CD
+ LD sp, (65535)         ;; 05D4:  ED 7B FF FF
+ LD (0), bc             ;; 05D8:  ED 43 00 00
+ LD (291), bc           ;; 05DC:  ED 43 23 01
+ LD (17767), bc         ;; 05E0:  ED 43 67 45
+ LD (35243), bc         ;; 05E4:  ED 43 AB 89
+ LD (52719), bc         ;; 05E8:  ED 43 EF CD
+ LD (65535), bc         ;; 05EC:  ED 43 FF FF
+ LD (0), de             ;; 05F0:  ED 53 00 00
+ LD (291), de           ;; 05F4:  ED 53 23 01
+ LD (17767), de         ;; 05F8:  ED 53 67 45
+ LD (35243), de         ;; 05FC:  ED 53 AB 89
+ LD (52719), de         ;; 0600:  ED 53 EF CD
+ LD (65535), de         ;; 0604:  ED 53 FF FF
+ LD (0), sp             ;; 0608:  ED 73 00 00
+ LD (291), sp           ;; 060C:  ED 73 23 01
+ LD (17767), sp         ;; 0610:  ED 73 67 45
+ LD (35243), sp         ;; 0614:  ED 73 AB 89
+ LD (52719), sp         ;; 0618:  ED 73 EF CD
+ LD (65535), sp         ;; 061C:  ED 73 FF FF
+ ld sp, hl              ;; 0620:  F9
+ ld sp, ix              ;; 0621:  DD F9
+ ld sp, iy              ;; 0623:  FD F9
+ push bc                ;; 0625:  C5
+ push de                ;; 0626:  D5
+ push hl                ;; 0627:  E5
+ push af                ;; 0628:  F5
+ push ix                ;; 0629:  DD E5
+ push iy                ;; 062B:  FD E5
+ pop bc                 ;; 062D:  C1
+ pop de                 ;; 062E:  D1
+ pop hl                 ;; 062F:  E1
+ pop af                 ;; 0630:  F1
+ pop ix                 ;; 0631:  DD E1
+ pop iy                 ;; 0633:  FD E1
+ ld (hl + -128), hl     ;; 0635:  DD F4 80
+ ld (hl + 0), hl        ;; 0638:  DD F4 00
+ ld (hl + 127), hl      ;; 063B:  DD F4 7F
+ ld (ix + -128), hl     ;; 063E:  F4 80
+ ld (ix + 0), hl        ;; 0640:  F4 00
+ ld (ix + 127), hl      ;; 0642:  F4 7F
+ ld (iy + -128), hl     ;; 0644:  FD F4 80
+ ld (iy + 0), hl        ;; 0647:  FD F4 00
+ ld (iy + 127), hl      ;; 064A:  FD F4 7F
+ ld (sp + 0), hl        ;; 064D:  D4 00
+ ld (sp + 85), hl       ;; 064F:  D4 55
+ ld (sp + 170), hl      ;; 0651:  D4 AA
+ ld (sp + 255), hl      ;; 0653:  D4 FF
+ ld (sp + 0), ix        ;; 0655:  DD D4 00
+ ld (sp + 85), ix       ;; 0658:  DD D4 55
+ ld (sp + 170), ix      ;; 065B:  DD D4 AA
+ ld (sp + 255), ix      ;; 065E:  DD D4 FF
+ ld (sp + 0), iy        ;; 0661:  FD D4 00
+ ld (sp + 85), iy       ;; 0664:  FD D4 55
+ ld (sp + 170), iy      ;; 0667:  FD D4 AA
+ ld (sp + 255), iy      ;; 066A:  FD D4 FF
+ ld bc', bc             ;; 066D:  ED 49
+ ld bc', de             ;; 066F:  ED 41
+ ld de', bc             ;; 0671:  ED 59
+ ld de', de             ;; 0673:  ED 51
+ ld hl', bc             ;; 0675:  ED 69
+ ld hl', de             ;; 0677:  ED 61
+ add hl, bc             ;; 0679:  09
+ add hl, de             ;; 067A:  19
+ add hl, hl             ;; 067B:  29
+ add hl, sp             ;; 067C:  39
+ add ix, bc             ;; 067D:  DD 09
+ add ix, de             ;; 067F:  DD 19
+ add ix, ix             ;; 0681:  DD 29
+ add ix, sp             ;; 0683:  DD 39
+ add iy, bc             ;; 0685:  FD 09
+ add iy, de             ;; 0687:  FD 19
+ add iy, iy             ;; 0689:  FD 29
+ add iy, sp             ;; 068B:  FD 39
+ sbc hl, bc             ;; 068D:  ED 42
+ sbc hl, de             ;; 068F:  ED 52
+ sbc hl, hl             ;; 0691:  ED 62
+ sbc hl, sp             ;; 0693:  ED 72
+ adc hl, bc             ;; 0695:  ED 4A
+ adc hl, de             ;; 0697:  ED 5A
+ adc hl, hl             ;; 0699:  ED 6A
+ adc hl, sp             ;; 069B:  ED 7A
+ inc bc                 ;; 069D:  03
+ inc de                 ;; 069E:  13
+ inc hl                 ;; 069F:  23
+ inc sp                 ;; 06A0:  33
+ dec bc                 ;; 06A1:  0B
+ dec de                 ;; 06A2:  1B
+ dec hl                 ;; 06A3:  2B
+ dec sp                 ;; 06A4:  3B
+ inc ix                 ;; 06A5:  DD 23
+ dec ix                 ;; 06A7:  DD 2B
+ inc iy                 ;; 06A9:  FD 23
+ dec iy                 ;; 06AB:  FD 2B
+ add sp, -128           ;; 06AD:  27 80
+ add sp, 0              ;; 06AF:  27 00
+ add sp, 127            ;; 06B1:  27 7F
+ and hl, de             ;; 06B3:  DC
+ and ix, de             ;; 06B4:  DD DC
+ and iy, de             ;; 06B6:  FD DC
+ bool hl                ;; 06B8:  CC
+ bool ix                ;; 06B9:  DD CC
+ bool iy                ;; 06BB:  FD CC
+ mlt bc                 ;; 06BD:  ED 4C
+ mlt de                 ;; 06BF:  ED 5C
+ mlt hl                 ;; 06C1:  ED 6C
+ ex af, af              ;; 06C3:  08
+ ex af, af'             ;; 06C4:  08
+ exx                    ;; 06C5:  D9
+ ex (sp), hl            ;; 06C6:  ED 54
+ ex (sp), ix            ;; 06C8:  DD E3
+ ex (sp), iy            ;; 06CA:  FD E3
+ ex de, hl              ;; 06CC:  EB
+ ex de', hl             ;; 06CD:  E3
+ ex de, hl'             ;; 06CE:  76 EB
+ ex de', hl'            ;; 06D0:  76 E3
+ rlca                   ;; 06D2:  07
+ rrca                   ;; 06D3:  0F
+ rla                    ;; 06D4:  17
+ rra                    ;; 06D5:  1F
+ rlc b                  ;; 06D6:  CB 00
+ rlc c                  ;; 06D8:  CB 01
+ rlc d                  ;; 06DA:  CB 02
+ rlc e                  ;; 06DC:  CB 03
+ rlc h                  ;; 06DE:  CB 04
+ rlc l                  ;; 06E0:  CB 05
+ rlc (hl)               ;; 06E2:  CB 06
+ rlc a                  ;; 06E4:  CB 07
+ rrc b                  ;; 06E6:  CB 08
+ rrc c                  ;; 06E8:  CB 09
+ rrc d                  ;; 06EA:  CB 0A
+ rrc e                  ;; 06EC:  CB 0B
+ rrc h                  ;; 06EE:  CB 0C
+ rrc l                  ;; 06F0:  CB 0D
+ rrc (hl)               ;; 06F2:  CB 0E
+ rrc a                  ;; 06F4:  CB 0F
+ rl b                   ;; 06F6:  CB 10
+ rl c                   ;; 06F8:  CB 11
+ rl d                   ;; 06FA:  CB 12
+ rl e                   ;; 06FC:  CB 13
+ rl h                   ;; 06FE:  CB 14
+ rl l                   ;; 0700:  CB 15
+ rl (hl)                ;; 0702:  CB 16
+ rl a                   ;; 0704:  CB 17
+ rr b                   ;; 0706:  CB 18
+ rr c                   ;; 0708:  CB 19
+ rr d                   ;; 070A:  CB 1A
+ rr e                   ;; 070C:  CB 1B
+ rr h                   ;; 070E:  CB 1C
+ rr l                   ;; 0710:  CB 1D
+ rr (hl)                ;; 0712:  CB 1E
+ rr a                   ;; 0714:  CB 1F
+ sla b                  ;; 0716:  CB 20
+ sla c                  ;; 0718:  CB 21
+ sla d                  ;; 071A:  CB 22
+ sla e                  ;; 071C:  CB 23
+ sla h                  ;; 071E:  CB 24
+ sla l                  ;; 0720:  CB 25
+ sla (hl)               ;; 0722:  CB 26
+ sla a                  ;; 0724:  CB 27
+ sra b                  ;; 0726:  CB 28
+ sra c                  ;; 0728:  CB 29
+ sra d                  ;; 072A:  CB 2A
+ sra e                  ;; 072C:  CB 2B
+ sra h                  ;; 072E:  CB 2C
+ sra l                  ;; 0730:  CB 2D
+ sra (hl)               ;; 0732:  CB 2E
+ sra a                  ;; 0734:  CB 2F
+ srl b                  ;; 0736:  CB 38
+ srl c                  ;; 0738:  CB 39
+ srl d                  ;; 073A:  CB 3A
+ srl e                  ;; 073C:  CB 3B
+ srl h                  ;; 073E:  CB 3C
+ srl l                  ;; 0740:  CB 3D
+ srl (hl)               ;; 0742:  CB 3E
+ srl a                  ;; 0744:  CB 3F
+ rlc (ix+-128)          ;; 0746:  DD CB 80 06
+ rlc (ix+0)             ;; 074A:  DD CB 00 06
+ rlc (ix+127)           ;; 074E:  DD CB 7F 06
+ rrc (ix+-128)          ;; 0752:  DD CB 80 0E
+ rrc (ix+0)             ;; 0756:  DD CB 00 0E
+ rrc (ix+127)           ;; 075A:  DD CB 7F 0E
+ rl (ix+-128)           ;; 075E:  DD CB 80 16
+ rl (ix+0)              ;; 0762:  DD CB 00 16
+ rl (ix+127)            ;; 0766:  DD CB 7F 16
+ rr (ix+-128)           ;; 076A:  DD CB 80 1E
+ rr (ix+0)              ;; 076E:  DD CB 00 1E
+ rr (ix+127)            ;; 0772:  DD CB 7F 1E
+ sla (ix+-128)          ;; 0776:  DD CB 80 26
+ sla (ix+0)             ;; 077A:  DD CB 00 26
+ sla (ix+127)           ;; 077E:  DD CB 7F 26
+ sra (ix+-128)          ;; 0782:  DD CB 80 2E
+ sra (ix+0)             ;; 0786:  DD CB 00 2E
+ sra (ix+127)           ;; 078A:  DD CB 7F 2E
+ srl (ix+-128)          ;; 078E:  DD CB 80 3E
+ srl (ix+0)             ;; 0792:  DD CB 00 3E
+ srl (ix+127)           ;; 0796:  DD CB 7F 3E
+ rlc (iy+-128)          ;; 079A:  FD CB 80 06
+ rlc (iy+0)             ;; 079E:  FD CB 00 06
+ rlc (iy+127)           ;; 07A2:  FD CB 7F 06
+ rrc (iy+-128)          ;; 07A6:  FD CB 80 0E
+ rrc (iy+0)             ;; 07AA:  FD CB 00 0E
+ rrc (iy+127)           ;; 07AE:  FD CB 7F 0E
+ rl (iy+-128)           ;; 07B2:  FD CB 80 16
+ rl (iy+0)              ;; 07B6:  FD CB 00 16
+ rl (iy+127)            ;; 07BA:  FD CB 7F 16
+ rr (iy+-128)           ;; 07BE:  FD CB 80 1E
+ rr (iy+0)              ;; 07C2:  FD CB 00 1E
+ rr (iy+127)            ;; 07C6:  FD CB 7F 1E
+ sla (iy+-128)          ;; 07CA:  FD CB 80 26
+ sla (iy+0)             ;; 07CE:  FD CB 00 26
+ sla (iy+127)           ;; 07D2:  FD CB 7F 26
+ sra (iy+-128)          ;; 07D6:  FD CB 80 2E
+ sra (iy+0)             ;; 07DA:  FD CB 00 2E
+ sra (iy+127)           ;; 07DE:  FD CB 7F 2E
+ srl (iy+-128)          ;; 07E2:  FD CB 80 3E
+ srl (iy+0)             ;; 07E6:  FD CB 00 3E
+ srl (iy+127)           ;; 07EA:  FD CB 7F 3E
+ bit 0, b               ;; 07EE:  CB 40
+ bit 0, c               ;; 07F0:  CB 41
+ bit 0, d               ;; 07F2:  CB 42
+ bit 0, e               ;; 07F4:  CB 43
+ bit 0, h               ;; 07F6:  CB 44
+ bit 0, l               ;; 07F8:  CB 45
+ bit 0, (hl)            ;; 07FA:  CB 46
+ bit 0, a               ;; 07FC:  CB 47
+ bit 1, b               ;; 07FE:  CB 48
+ bit 1, c               ;; 0800:  CB 49
+ bit 1, d               ;; 0802:  CB 4A
+ bit 1, e               ;; 0804:  CB 4B
+ bit 1, h               ;; 0806:  CB 4C
+ bit 1, l               ;; 0808:  CB 4D
+ bit 1, (hl)            ;; 080A:  CB 4E
+ bit 1, a               ;; 080C:  CB 4F
+ bit 2, b               ;; 080E:  CB 50
+ bit 2, c               ;; 0810:  CB 51
+ bit 2, d               ;; 0812:  CB 52
+ bit 2, e               ;; 0814:  CB 53
+ bit 2, h               ;; 0816:  CB 54
+ bit 2, l               ;; 0818:  CB 55
+ bit 2, (hl)            ;; 081A:  CB 56
+ bit 2, a               ;; 081C:  CB 57
+ bit 3, b               ;; 081E:  CB 58
+ bit 3, c               ;; 0820:  CB 59
+ bit 3, d               ;; 0822:  CB 5A
+ bit 3, e               ;; 0824:  CB 5B
+ bit 3, h               ;; 0826:  CB 5C
+ bit 3, l               ;; 0828:  CB 5D
+ bit 3, (hl)            ;; 082A:  CB 5E
+ bit 3, a               ;; 082C:  CB 5F
+ bit 4, b               ;; 082E:  CB 60
+ bit 4, c               ;; 0830:  CB 61
+ bit 4, d               ;; 0832:  CB 62
+ bit 4, e               ;; 0834:  CB 63
+ bit 4, h               ;; 0836:  CB 64
+ bit 4, l               ;; 0838:  CB 65
+ bit 4, (hl)            ;; 083A:  CB 66
+ bit 4, a               ;; 083C:  CB 67
+ bit 5, b               ;; 083E:  CB 68
+ bit 5, c               ;; 0840:  CB 69
+ bit 5, d               ;; 0842:  CB 6A
+ bit 5, e               ;; 0844:  CB 6B
+ bit 5, h               ;; 0846:  CB 6C
+ bit 5, l               ;; 0848:  CB 6D
+ bit 5, (hl)            ;; 084A:  CB 6E
+ bit 5, a               ;; 084C:  CB 6F
+ bit 6, b               ;; 084E:  CB 70
+ bit 6, c               ;; 0850:  CB 71
+ bit 6, d               ;; 0852:  CB 72
+ bit 6, e               ;; 0854:  CB 73
+ bit 6, h               ;; 0856:  CB 74
+ bit 6, l               ;; 0858:  CB 75
+ bit 6, (hl)            ;; 085A:  CB 76
+ bit 6, a               ;; 085C:  CB 77
+ bit 7, b               ;; 085E:  CB 78
+ bit 7, c               ;; 0860:  CB 79
+ bit 7, d               ;; 0862:  CB 7A
+ bit 7, e               ;; 0864:  CB 7B
+ bit 7, h               ;; 0866:  CB 7C
+ bit 7, l               ;; 0868:  CB 7D
+ bit 7, (hl)            ;; 086A:  CB 7E
+ bit 7, a               ;; 086C:  CB 7F
+ res 0, b               ;; 086E:  CB 80
+ res 0, c               ;; 0870:  CB 81
+ res 0, d               ;; 0872:  CB 82
+ res 0, e               ;; 0874:  CB 83
+ res 0, h               ;; 0876:  CB 84
+ res 0, l               ;; 0878:  CB 85
+ res 0, (hl)            ;; 087A:  CB 86
+ res 0, a               ;; 087C:  CB 87
+ res 1, b               ;; 087E:  CB 88
+ res 1, c               ;; 0880:  CB 89
+ res 1, d               ;; 0882:  CB 8A
+ res 1, e               ;; 0884:  CB 8B
+ res 1, h               ;; 0886:  CB 8C
+ res 1, l               ;; 0888:  CB 8D
+ res 1, (hl)            ;; 088A:  CB 8E
+ res 1, a               ;; 088C:  CB 8F
+ res 2, b               ;; 088E:  CB 90
+ res 2, c               ;; 0890:  CB 91
+ res 2, d               ;; 0892:  CB 92
+ res 2, e               ;; 0894:  CB 93
+ res 2, h               ;; 0896:  CB 94
+ res 2, l               ;; 0898:  CB 95
+ res 2, (hl)            ;; 089A:  CB 96
+ res 2, a               ;; 089C:  CB 97
+ res 3, b               ;; 089E:  CB 98
+ res 3, c               ;; 08A0:  CB 99
+ res 3, d               ;; 08A2:  CB 9A
+ res 3, e               ;; 08A4:  CB 9B
+ res 3, h               ;; 08A6:  CB 9C
+ res 3, l               ;; 08A8:  CB 9D
+ res 3, (hl)            ;; 08AA:  CB 9E
+ res 3, a               ;; 08AC:  CB 9F
+ res 4, b               ;; 08AE:  CB A0
+ res 4, c               ;; 08B0:  CB A1
+ res 4, d               ;; 08B2:  CB A2
+ res 4, e               ;; 08B4:  CB A3
+ res 4, h               ;; 08B6:  CB A4
+ res 4, l               ;; 08B8:  CB A5
+ res 4, (hl)            ;; 08BA:  CB A6
+ res 4, a               ;; 08BC:  CB A7
+ res 5, b               ;; 08BE:  CB A8
+ res 5, c               ;; 08C0:  CB A9
+ res 5, d               ;; 08C2:  CB AA
+ res 5, e               ;; 08C4:  CB AB
+ res 5, h               ;; 08C6:  CB AC
+ res 5, l               ;; 08C8:  CB AD
+ res 5, (hl)            ;; 08CA:  CB AE
+ res 5, a               ;; 08CC:  CB AF
+ res 6, b               ;; 08CE:  CB B0
+ res 6, c               ;; 08D0:  CB B1
+ res 6, d               ;; 08D2:  CB B2
+ res 6, e               ;; 08D4:  CB B3
+ res 6, h               ;; 08D6:  CB B4
+ res 6, l               ;; 08D8:  CB B5
+ res 6, (hl)            ;; 08DA:  CB B6
+ res 6, a               ;; 08DC:  CB B7
+ res 7, b               ;; 08DE:  CB B8
+ res 7, c               ;; 08E0:  CB B9
+ res 7, d               ;; 08E2:  CB BA
+ res 7, e               ;; 08E4:  CB BB
+ res 7, h               ;; 08E6:  CB BC
+ res 7, l               ;; 08E8:  CB BD
+ res 7, (hl)            ;; 08EA:  CB BE
+ res 7, a               ;; 08EC:  CB BF
+ set 0, b               ;; 08EE:  CB C0
+ set 0, c               ;; 08F0:  CB C1
+ set 0, d               ;; 08F2:  CB C2
+ set 0, e               ;; 08F4:  CB C3
+ set 0, h               ;; 08F6:  CB C4
+ set 0, l               ;; 08F8:  CB C5
+ set 0, (hl)            ;; 08FA:  CB C6
+ set 0, a               ;; 08FC:  CB C7
+ set 1, b               ;; 08FE:  CB C8
+ set 1, c               ;; 0900:  CB C9
+ set 1, d               ;; 0902:  CB CA
+ set 1, e               ;; 0904:  CB CB
+ set 1, h               ;; 0906:  CB CC
+ set 1, l               ;; 0908:  CB CD
+ set 1, (hl)            ;; 090A:  CB CE
+ set 1, a               ;; 090C:  CB CF
+ set 2, b               ;; 090E:  CB D0
+ set 2, c               ;; 0910:  CB D1
+ set 2, d               ;; 0912:  CB D2
+ set 2, e               ;; 0914:  CB D3
+ set 2, h               ;; 0916:  CB D4
+ set 2, l               ;; 0918:  CB D5
+ set 2, (hl)            ;; 091A:  CB D6
+ set 2, a               ;; 091C:  CB D7
+ set 3, b               ;; 091E:  CB D8
+ set 3, c               ;; 0920:  CB D9
+ set 3, d               ;; 0922:  CB DA
+ set 3, e               ;; 0924:  CB DB
+ set 3, h               ;; 0926:  CB DC
+ set 3, l               ;; 0928:  CB DD
+ set 3, (hl)            ;; 092A:  CB DE
+ set 3, a               ;; 092C:  CB DF
+ set 4, b               ;; 092E:  CB E0
+ set 4, c               ;; 0930:  CB E1
+ set 4, d               ;; 0932:  CB E2
+ set 4, e               ;; 0934:  CB E3
+ set 4, h               ;; 0936:  CB E4
+ set 4, l               ;; 0938:  CB E5
+ set 4, (hl)            ;; 093A:  CB E6
+ set 4, a               ;; 093C:  CB E7
+ set 5, b               ;; 093E:  CB E8
+ set 5, c               ;; 0940:  CB E9
+ set 5, d               ;; 0942:  CB EA
+ set 5, e               ;; 0944:  CB EB
+ set 5, h               ;; 0946:  CB EC
+ set 5, l               ;; 0948:  CB ED
+ set 5, (hl)            ;; 094A:  CB EE
+ set 5, a               ;; 094C:  CB EF
+ set 6, b               ;; 094E:  CB F0
+ set 6, c               ;; 0950:  CB F1
+ set 6, d               ;; 0952:  CB F2
+ set 6, e               ;; 0954:  CB F3
+ set 6, h               ;; 0956:  CB F4
+ set 6, l               ;; 0958:  CB F5
+ set 6, (hl)            ;; 095A:  CB F6
+ set 6, a               ;; 095C:  CB F7
+ set 7, b               ;; 095E:  CB F8
+ set 7, c               ;; 0960:  CB F9
+ set 7, d               ;; 0962:  CB FA
+ set 7, e               ;; 0964:  CB FB
+ set 7, h               ;; 0966:  CB FC
+ set 7, l               ;; 0968:  CB FD
+ set 7, (hl)            ;; 096A:  CB FE
+ set 7, a               ;; 096C:  CB FF
+ bit 0, (ix+-128)       ;; 096E:  DD CB 80 46
+ bit 0, (ix+0)          ;; 0972:  DD CB 00 46
+ bit 0, (ix+127)        ;; 0976:  DD CB 7F 46
+ bit 1, (ix+-128)       ;; 097A:  DD CB 80 4E
+ bit 1, (ix+0)          ;; 097E:  DD CB 00 4E
+ bit 1, (ix+127)        ;; 0982:  DD CB 7F 4E
+ bit 2, (ix+-128)       ;; 0986:  DD CB 80 56
+ bit 2, (ix+0)          ;; 098A:  DD CB 00 56
+ bit 2, (ix+127)        ;; 098E:  DD CB 7F 56
+ bit 3, (ix+-128)       ;; 0992:  DD CB 80 5E
+ bit 3, (ix+0)          ;; 0996:  DD CB 00 5E
+ bit 3, (ix+127)        ;; 099A:  DD CB 7F 5E
+ bit 4, (ix+-128)       ;; 099E:  DD CB 80 66
+ bit 4, (ix+0)          ;; 09A2:  DD CB 00 66
+ bit 4, (ix+127)        ;; 09A6:  DD CB 7F 66
+ bit 5, (ix+-128)       ;; 09AA:  DD CB 80 6E
+ bit 5, (ix+0)          ;; 09AE:  DD CB 00 6E
+ bit 5, (ix+127)        ;; 09B2:  DD CB 7F 6E
+ bit 6, (ix+-128)       ;; 09B6:  DD CB 80 76
+ bit 6, (ix+0)          ;; 09BA:  DD CB 00 76
+ bit 6, (ix+127)        ;; 09BE:  DD CB 7F 76
+ bit 7, (ix+-128)       ;; 09C2:  DD CB 80 7E
+ bit 7, (ix+0)          ;; 09C6:  DD CB 00 7E
+ bit 7, (ix+127)        ;; 09CA:  DD CB 7F 7E
+ res 0, (ix+-128)       ;; 09CE:  DD CB 80 86
+ res 0, (ix+0)          ;; 09D2:  DD CB 00 86
+ res 0, (ix+127)        ;; 09D6:  DD CB 7F 86
+ res 1, (ix+-128)       ;; 09DA:  DD CB 80 8E
+ res 1, (ix+0)          ;; 09DE:  DD CB 00 8E
+ res 1, (ix+127)        ;; 09E2:  DD CB 7F 8E
+ res 2, (ix+-128)       ;; 09E6:  DD CB 80 96
+ res 2, (ix+0)          ;; 09EA:  DD CB 00 96
+ res 2, (ix+127)        ;; 09EE:  DD CB 7F 96
+ res 3, (ix+-128)       ;; 09F2:  DD CB 80 9E
+ res 3, (ix+0)          ;; 09F6:  DD CB 00 9E
+ res 3, (ix+127)        ;; 09FA:  DD CB 7F 9E
+ res 4, (ix+-128)       ;; 09FE:  DD CB 80 A6
+ res 4, (ix+0)          ;; 0A02:  DD CB 00 A6
+ res 4, (ix+127)        ;; 0A06:  DD CB 7F A6
+ res 5, (ix+-128)       ;; 0A0A:  DD CB 80 AE
+ res 5, (ix+0)          ;; 0A0E:  DD CB 00 AE
+ res 5, (ix+127)        ;; 0A12:  DD CB 7F AE
+ res 6, (ix+-128)       ;; 0A16:  DD CB 80 B6
+ res 6, (ix+0)          ;; 0A1A:  DD CB 00 B6
+ res 6, (ix+127)        ;; 0A1E:  DD CB 7F B6
+ res 7, (ix+-128)       ;; 0A22:  DD CB 80 BE
+ res 7, (ix+0)          ;; 0A26:  DD CB 00 BE
+ res 7, (ix+127)        ;; 0A2A:  DD CB 7F BE
+ set 0, (ix+-128)       ;; 0A2E:  DD CB 80 C6
+ set 0, (ix+0)          ;; 0A32:  DD CB 00 C6
+ set 0, (ix+127)        ;; 0A36:  DD CB 7F C6
+ set 1, (ix+-128)       ;; 0A3A:  DD CB 80 CE
+ set 1, (ix+0)          ;; 0A3E:  DD CB 00 CE
+ set 1, (ix+127)        ;; 0A42:  DD CB 7F CE
+ set 2, (ix+-128)       ;; 0A46:  DD CB 80 D6
+ set 2, (ix+0)          ;; 0A4A:  DD CB 00 D6
+ set 2, (ix+127)        ;; 0A4E:  DD CB 7F D6
+ set 3, (ix+-128)       ;; 0A52:  DD CB 80 DE
+ set 3, (ix+0)          ;; 0A56:  DD CB 00 DE
+ set 3, (ix+127)        ;; 0A5A:  DD CB 7F DE
+ set 4, (ix+-128)       ;; 0A5E:  DD CB 80 E6
+ set 4, (ix+0)          ;; 0A62:  DD CB 00 E6
+ set 4, (ix+127)        ;; 0A66:  DD CB 7F E6
+ set 5, (ix+-128)       ;; 0A6A:  DD CB 80 EE
+ set 5, (ix+0)          ;; 0A6E:  DD CB 00 EE
+ set 5, (ix+127)        ;; 0A72:  DD CB 7F EE
+ set 6, (ix+-128)       ;; 0A76:  DD CB 80 F6
+ set 6, (ix+0)          ;; 0A7A:  DD CB 00 F6
+ set 6, (ix+127)        ;; 0A7E:  DD CB 7F F6
+ set 7, (ix+-128)       ;; 0A82:  DD CB 80 FE
+ set 7, (ix+0)          ;; 0A86:  DD CB 00 FE
+ set 7, (ix+127)        ;; 0A8A:  DD CB 7F FE
+ bit 0, (iy+-128)       ;; 0A8E:  FD CB 80 46
+ bit 0, (iy+0)          ;; 0A92:  FD CB 00 46
+ bit 0, (iy+127)        ;; 0A96:  FD CB 7F 46
+ bit 1, (iy+-128)       ;; 0A9A:  FD CB 80 4E
+ bit 1, (iy+0)          ;; 0A9E:  FD CB 00 4E
+ bit 1, (iy+127)        ;; 0AA2:  FD CB 7F 4E
+ bit 2, (iy+-128)       ;; 0AA6:  FD CB 80 56
+ bit 2, (iy+0)          ;; 0AAA:  FD CB 00 56
+ bit 2, (iy+127)        ;; 0AAE:  FD CB 7F 56
+ bit 3, (iy+-128)       ;; 0AB2:  FD CB 80 5E
+ bit 3, (iy+0)          ;; 0AB6:  FD CB 00 5E
+ bit 3, (iy+127)        ;; 0ABA:  FD CB 7F 5E
+ bit 4, (iy+-128)       ;; 0ABE:  FD CB 80 66
+ bit 4, (iy+0)          ;; 0AC2:  FD CB 00 66
+ bit 4, (iy+127)        ;; 0AC6:  FD CB 7F 66
+ bit 5, (iy+-128)       ;; 0ACA:  FD CB 80 6E
+ bit 5, (iy+0)          ;; 0ACE:  FD CB 00 6E
+ bit 5, (iy+127)        ;; 0AD2:  FD CB 7F 6E
+ bit 6, (iy+-128)       ;; 0AD6:  FD CB 80 76
+ bit 6, (iy+0)          ;; 0ADA:  FD CB 00 76
+ bit 6, (iy+127)        ;; 0ADE:  FD CB 7F 76
+ bit 7, (iy+-128)       ;; 0AE2:  FD CB 80 7E
+ bit 7, (iy+0)          ;; 0AE6:  FD CB 00 7E
+ bit 7, (iy+127)        ;; 0AEA:  FD CB 7F 7E
+ res 0, (iy+-128)       ;; 0AEE:  FD CB 80 86
+ res 0, (iy+0)          ;; 0AF2:  FD CB 00 86
+ res 0, (iy+127)        ;; 0AF6:  FD CB 7F 86
+ res 1, (iy+-128)       ;; 0AFA:  FD CB 80 8E
+ res 1, (iy+0)          ;; 0AFE:  FD CB 00 8E
+ res 1, (iy+127)        ;; 0B02:  FD CB 7F 8E
+ res 2, (iy+-128)       ;; 0B06:  FD CB 80 96
+ res 2, (iy+0)          ;; 0B0A:  FD CB 00 96
+ res 2, (iy+127)        ;; 0B0E:  FD CB 7F 96
+ res 3, (iy+-128)       ;; 0B12:  FD CB 80 9E
+ res 3, (iy+0)          ;; 0B16:  FD CB 00 9E
+ res 3, (iy+127)        ;; 0B1A:  FD CB 7F 9E
+ res 4, (iy+-128)       ;; 0B1E:  FD CB 80 A6
+ res 4, (iy+0)          ;; 0B22:  FD CB 00 A6
+ res 4, (iy+127)        ;; 0B26:  FD CB 7F A6
+ res 5, (iy+-128)       ;; 0B2A:  FD CB 80 AE
+ res 5, (iy+0)          ;; 0B2E:  FD CB 00 AE
+ res 5, (iy+127)        ;; 0B32:  FD CB 7F AE
+ res 6, (iy+-128)       ;; 0B36:  FD CB 80 B6
+ res 6, (iy+0)          ;; 0B3A:  FD CB 00 B6
+ res 6, (iy+127)        ;; 0B3E:  FD CB 7F B6
+ res 7, (iy+-128)       ;; 0B42:  FD CB 80 BE
+ res 7, (iy+0)          ;; 0B46:  FD CB 00 BE
+ res 7, (iy+127)        ;; 0B4A:  FD CB 7F BE
+ set 0, (iy+-128)       ;; 0B4E:  FD CB 80 C6
+ set 0, (iy+0)          ;; 0B52:  FD CB 00 C6
+ set 0, (iy+127)        ;; 0B56:  FD CB 7F C6
+ set 1, (iy+-128)       ;; 0B5A:  FD CB 80 CE
+ set 1, (iy+0)          ;; 0B5E:  FD CB 00 CE
+ set 1, (iy+127)        ;; 0B62:  FD CB 7F CE
+ set 2, (iy+-128)       ;; 0B66:  FD CB 80 D6
+ set 2, (iy+0)          ;; 0B6A:  FD CB 00 D6
+ set 2, (iy+127)        ;; 0B6E:  FD CB 7F D6
+ set 3, (iy+-128)       ;; 0B72:  FD CB 80 DE
+ set 3, (iy+0)          ;; 0B76:  FD CB 00 DE
+ set 3, (iy+127)        ;; 0B7A:  FD CB 7F DE
+ set 4, (iy+-128)       ;; 0B7E:  FD CB 80 E6
+ set 4, (iy+0)          ;; 0B82:  FD CB 00 E6
+ set 4, (iy+127)        ;; 0B86:  FD CB 7F E6
+ set 5, (iy+-128)       ;; 0B8A:  FD CB 80 EE
+ set 5, (iy+0)          ;; 0B8E:  FD CB 00 EE
+ set 5, (iy+127)        ;; 0B92:  FD CB 7F EE
+ set 6, (iy+-128)       ;; 0B96:  FD CB 80 F6
+ set 6, (iy+0)          ;; 0B9A:  FD CB 00 F6
+ set 6, (iy+127)        ;; 0B9E:  FD CB 7F F6
+ set 7, (iy+-128)       ;; 0BA2:  FD CB 80 FE
+ set 7, (iy+0)          ;; 0BA6:  FD CB 00 FE
+ set 7, (iy+127)        ;; 0BAA:  FD CB 7F FE
+ ldi                    ;; 0BAE:  ED A0
+ ldir                   ;; 0BB0:  ED B0
+ ldd                    ;; 0BB2:  ED A8
+ lddr                   ;; 0BB4:  ED B8
+ nop                    ;; 0BB6:  00
+ altd                   ;; 0BB7:  76
+ ld a, xpc              ;; 0BB8:  ED 77
+ ld xpc, a              ;; 0BBA:  ED 67
+ jp 0                   ;; 0BBC:  C3 00 00
+ jp 291                 ;; 0BBF:  C3 23 01
+ jp 17767               ;; 0BC2:  C3 67 45
+ jp 35243               ;; 0BC5:  C3 AB 89
+ jp 52719               ;; 0BC8:  C3 EF CD
+ jp 65535               ;; 0BCB:  C3 FF FF
+ jp nz, 0               ;; 0BCE:  C2 00 00
+ jp nz, 291             ;; 0BD1:  C2 23 01
+ jp nz, 17767           ;; 0BD4:  C2 67 45
+ jp nz, 35243           ;; 0BD7:  C2 AB 89
+ jp nz, 52719           ;; 0BDA:  C2 EF CD
+ jp nz, 65535           ;; 0BDD:  C2 FF FF
+ jp z, 0                ;; 0BE0:  CA 00 00
+ jp z, 291              ;; 0BE3:  CA 23 01
+ jp z, 17767            ;; 0BE6:  CA 67 45
+ jp z, 35243            ;; 0BE9:  CA AB 89
+ jp z, 52719            ;; 0BEC:  CA EF CD
+ jp z, 65535            ;; 0BEF:  CA FF FF
+ jp nc, 0               ;; 0BF2:  D2 00 00
+ jp nc, 291             ;; 0BF5:  D2 23 01
+ jp nc, 17767           ;; 0BF8:  D2 67 45
+ jp nc, 35243           ;; 0BFB:  D2 AB 89
+ jp nc, 52719           ;; 0BFE:  D2 EF CD
+ jp nc, 65535           ;; 0C01:  D2 FF FF
+ jp c, 0                ;; 0C04:  DA 00 00
+ jp c, 291              ;; 0C07:  DA 23 01
+ jp c, 17767            ;; 0C0A:  DA 67 45
+ jp c, 35243            ;; 0C0D:  DA AB 89
+ jp c, 52719            ;; 0C10:  DA EF CD
+ jp c, 65535            ;; 0C13:  DA FF FF
+ jp po, 0               ;; 0C16:  E2 00 00
+ jp po, 291             ;; 0C19:  E2 23 01
+ jp po, 17767           ;; 0C1C:  E2 67 45
+ jp po, 35243           ;; 0C1F:  E2 AB 89
+ jp po, 52719           ;; 0C22:  E2 EF CD
+ jp po, 65535           ;; 0C25:  E2 FF FF
+ jp pe, 0               ;; 0C28:  EA 00 00
+ jp pe, 291             ;; 0C2B:  EA 23 01
+ jp pe, 17767           ;; 0C2E:  EA 67 45
+ jp pe, 35243           ;; 0C31:  EA AB 89
+ jp pe, 52719           ;; 0C34:  EA EF CD
+ jp pe, 65535           ;; 0C37:  EA FF FF
+ jp p, 0                ;; 0C3A:  F2 00 00
+ jp p, 291              ;; 0C3D:  F2 23 01
+ jp p, 17767            ;; 0C40:  F2 67 45
+ jp p, 35243            ;; 0C43:  F2 AB 89
+ jp p, 52719            ;; 0C46:  F2 EF CD
+ jp p, 65535            ;; 0C49:  F2 FF FF
+ jp m, 0                ;; 0C4C:  FA 00 00
+ jp m, 291              ;; 0C4F:  FA 23 01
+ jp m, 17767            ;; 0C52:  FA 67 45
+ jp m, 35243            ;; 0C55:  FA AB 89
+ jp m, 52719            ;; 0C58:  FA EF CD
+ jp m, 65535            ;; 0C5B:  FA FF FF
+ jp lz, 0               ;; 0C5E:  E2 00 00
+ jp lz, 291             ;; 0C61:  E2 23 01
+ jp lz, 17767           ;; 0C64:  E2 67 45
+ jp lz, 35243           ;; 0C67:  E2 AB 89
+ jp lz, 52719           ;; 0C6A:  E2 EF CD
+ jp lz, 65535           ;; 0C6D:  E2 FF FF
+ jp lo, 0               ;; 0C70:  EA 00 00
+ jp lo, 291             ;; 0C73:  EA 23 01
+ jp lo, 17767           ;; 0C76:  EA 67 45
+ jp lo, 35243           ;; 0C79:  EA AB 89
+ jp lo, 52719           ;; 0C7C:  EA EF CD
+ jp lo, 65535           ;; 0C7F:  EA FF FF
+ jp (hl)                ;; 0C82:  E9
+ jp (ix)                ;; 0C83:  DD E9
+ jp (iy)                ;; 0C85:  FD E9
+ djnz ASMPC             ;; 0C87:  10 FE
+ jr ASMPC               ;; 0C89:  18 FE
+ jr nz, ASMPC           ;; 0C8B:  20 FE
+ jr z, ASMPC            ;; 0C8D:  28 FE
+ jr nc, ASMPC           ;; 0C8F:  30 FE
+ jr c, ASMPC            ;; 0C91:  38 FE
+ call 0                 ;; 0C93:  CD 00 00
+ call 291               ;; 0C96:  CD 23 01
+ call 17767             ;; 0C99:  CD 67 45
+ call 35243             ;; 0C9C:  CD AB 89
+ call 52719             ;; 0C9F:  CD EF CD
+ call 65535             ;; 0CA2:  CD FF FF
+ ret                    ;; 0CA5:  C9
+ ret nz                 ;; 0CA6:  C0
+ ret z                  ;; 0CA7:  C8
+ ret nc                 ;; 0CA8:  D0
+ ret c                  ;; 0CA9:  D8
+ ret po                 ;; 0CAA:  E0
+ ret pe                 ;; 0CAB:  E8
+ ret p                  ;; 0CAC:  F0
+ ret m                  ;; 0CAD:  F8
+ ret lz                 ;; 0CAE:  E0
+ ret lo                 ;; 0CAF:  E8
+ rst 16                 ;; 0CB0:  D7
+ rst 24                 ;; 0CB1:  DF
+ rst 32                 ;; 0CB2:  E7
+ rst 40                 ;; 0CB3:  EF
+ rst 56                 ;; 0CB4:  FF
+ ioe                    ;; 0CB5:  DB
+ ioi                    ;; 0CB6:  D3
+ ipset 0                ;; 0CB7:  ED 46
+ ipset 1                ;; 0CB9:  ED 56
+ ipset 2                ;; 0CBB:  ED 4E
+ ipset 3                ;; 0CBD:  ED 5E
+ ipres                  ;; 0CBF:  ED 5D
+ ld iir, a              ;; 0CC1:  ED 47
+ ld a, iir              ;; 0CC3:  ED 57
+ ld eir, a              ;; 0CC5:  ED 4F
+ ld a, eir              ;; 0CC7:  ED 5F
+ reti                   ;; 0CC9:  ED 4D

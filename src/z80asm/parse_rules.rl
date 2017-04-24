@@ -841,14 +841,23 @@ Define rules for a ragel-based parser.
 		*   IN, OUT
 		*--------------------------------------------------------------------*/
 #foreach <R> in B, C, D, E, H, L, A
-		| label? _TK_IN _TK_<R> _TK_COMMA _TK_IND_C _TK_NEWLINE
-		  @{ DO_stmt( Z80_IN_REG_C( REG_<R> ) ); }
-		
 		| label? _TK_OUT _TK_IND_C _TK_COMMA _TK_<R> _TK_NEWLINE 
 		  @{ DO_stmt( Z80_OUT_C_REG( REG_<R> ) ); }
 #endfor  <R>
 
+		| label? _TK_OUT _TK_IND_C _TK_COMMA const_expr _TK_NEWLINE 
+		  @{ if (!expr_error) {
+			   if (expr_value != 0) 
+			     error_int_range(expr_value);
+			   else 
+			     DO_stmt( Z80_OUT_C_REG( REG_idx ) ); 
+			 }
+		  }
+
 #foreach <R> in B, C, D, E, H, L, F, A
+		| label? _TK_IN _TK_<R> _TK_COMMA _TK_IND_C _TK_NEWLINE
+		  @{ DO_stmt( Z80_IN_REG_C( REG_<R> ) ); }
+		
 		| label? _TK_IN0 _TK_<R> _TK_COMMA paren_expr _TK_NEWLINE
 		  @{ DO_stmt_n( Z80_IN0( REG_<R> ) ); }		
 

@@ -9,27 +9,74 @@
 [z80]		ld {b c d e ixh ixl . a}, {. . . . ixh ixl . .}	=> DD, 40 + $1*8 + $2
 [z80]		ld {b c d e iyh iyl . a}, {. . . . iyh iyl . .}	=> FD, 40 + $1*8 + $2
 
-			ld {b c d e   h   l . a}, N						=>     06 + $1*8, N
-[z80]		ld {. . . . ixh ixl . .}, N						=> DD, 06 + $1*8, N
-[z80]		ld {. . . . iyh iyl . .}, N						=> FD, 06 + $1*8, N
+			ld {b c d e   h   l . a}, N			=>     06 + $1*8, N
+[z80]		ld {. . . . ixh ixl . .}, N			=> DD, 06 + $1*8, N
+[z80]		ld {. . . . iyh iyl . .}, N			=> FD, 06 + $1*8, N
 
-			ld {b c d e   h   l . a}, (hl)					=>     46 + $1*8
-			ld {b c d e   h   l . a}, (ix + D)				=> DD, 46 + $1*8, D
-			ld {b c d e   h   l . a}, (iy + D)				=> FD, 46 + $1*8, D
+			ld {b c d e   h   l . a}, (hl)		=>     46 + $1*8
+			ld {b c d e   h   l . a}, (ix + D)	=> DD, 46 + $1*8, D
+			ld {b c d e   h   l . a}, (iy + D)	=> FD, 46 + $1*8, D
 
-			ld (hl),     {b c d e   h   l . a}				=>     70 + $1
-			ld (ix + D), {b c d e   h   l . a}				=> DD, 70 + $1, D
-			ld (iy + D), {b c d e   h   l . a}				=> FD, 70 + $1, D
+			ld (hl),     {b c d e   h   l . a}	=>     70 + $1
+			ld (ix + D), {b c d e   h   l . a}	=> DD, 70 + $1, D
+			ld (iy + D), {b c d e   h   l . a}	=> FD, 70 + $1, D
 
-			ld (hl),     N									=>     36,    N
-			ld (ix + D), N									=> DD, 36, D, N
-			ld (iy + D), N									=> FD, 36, D, N
+			ld (hl),     N		=>     36,    N
+			ld (ix + D), N		=> DD, 36, D, N
+			ld (iy + D), N		=> FD, 36, D, N
 
-			ld a, ({bc de})									=> 	   0A + $1*10
-			ld ({bc de}), a									=> 	   02 + $1*10
+			ld a, ({bc de})		=> 	   0A + $1*10
+			ld ({bc de}), a		=> 	   02 + $1*10
 			
-			ld a, (MN)										=> 	   3A, N, M
-			ld (MN), a										=> 	   32, N, M
+			ld a, (MN)			=> 	   3A, N, M
+			ld (MN), a			=> 	   32, N, M
+
+;------------------------------------------------------------------------------
+; 8-bit arithmetic group
+;------------------------------------------------------------------------------
+			{add adc sub sbc and xor or cp} a, {b c d e   h   l (hl)   a}	=>     80 + $1*8 + $2
+			{add adc sub sbc and xor or cp}    {b c d e   h   l (hl)   a}	=>     80 + $1*8 + $2
+			
+			{add adc sub sbc and xor or cp} a, {. . . .   .   . (ix+D) .}	=> DD, 80 + $1*8 + $2, D
+			{add adc sub sbc and xor or cp}    {. . . .   .   . (ix+D) .}	=> DD, 80 + $1*8 + $2, D
+			
+			{add adc sub sbc and xor or cp} a, {. . . .   .   . (iy+D) .}	=> FD, 80 + $1*8 + $2, D
+			{add adc sub sbc and xor or cp}    {. . . .   .   . (iy+D) .}	=> FD, 80 + $1*8 + $2, D
+			
+[z80]		{add adc sub sbc and xor or cp} a, {. . . . ixh ixl .    .}	=> DD, 80 + $1*8 + $2
+[z80]		{add adc sub sbc and xor or cp}    {. . . . ixh ixl .    .}	=> DD, 80 + $1*8 + $2
+[z80]		{add adc sub sbc and xor or cp} a, {. . . . iyh iyl .    .}	=> FD, 80 + $1*8 + $2
+[z80]		{add adc sub sbc and xor or cp}    {. . . . iyh iyl .    .}	=> FD, 80 + $1*8 + $2
+
+			{add adc sub sbc and xor or cp} a, N			=>     C6 + $1*8, N
+			{add adc sub sbc and xor or cp}    N			=>     C6 + $1*8, N
+
+			{inc dec} {b c d e   h   l . a}	=>     04 + $1 + $2*8
+[z80]		{inc dec} {. . . . ixh ixl . .}	=> DD, 04 + $1 + $2*8
+[z80]		{inc dec} {. . . . iyh iyl . .}	=> FD, 04 + $1 + $2*8
+
+			{inc dec} (hl)					=>     34 + $1
+			{inc dec} (ix + D)				=> DD, 34 + $1, D
+			{inc dec} (iy + D)				=> FD, 34 + $1, D
+
+[not_z80]	tst a, {b c d e   h   l . a}	=> ED, 04 + $1*8
+[not_z80]	tst    {b c d e   h   l . a}	=> ED, 04 + $1*8
+[not_z80]	tst a, N						=> ED, 64, N
+[not_z80]	tst    N						=> ED, 64, N
+[not_z80]	tst a, (hl)						=> ED, 34
+[not_z80]	tst    (hl)						=> ED, 34
+
+;------------------------------------------------------------------------------
+; General-Purpose Arithmetic Group
+;------------------------------------------------------------------------------
+[zilog]		daa					=>     27
+[zilog]		rld					=> ED, 6F
+[zilog]		rrd					=> ED, 67
+
+			cpl					=>     2F
+			neg					=> ED, 44
+			ccf					=>     3F
+			scf					=>     37
 
 ;------------------------------------------------------------------------------
 ; 16-bit load group
@@ -72,32 +119,183 @@
 [rabbit]	ld {bc de hl}', {bc de}		=> ED, 49 + $1*10 - $2*8
 
 ;------------------------------------------------------------------------------
+; 16-Bit Arithmetic Group
+;------------------------------------------------------------------------------
+			add hl, {bc de hl sp}		=>     09 + $1*10
+			add ix, {bc de ix sp}		=> DD, 09 + $1*10
+			add iy, {bc de iy sp}		=> FD, 09 + $1*10
+
+			{sbc adc} hl, {bc de hl sp}	=> ED, 42 + $1*8 + $2*10
+
+			{inc dec} {bc de hl sp}		=>     03 + $1*8 + $2*10
+			{inc dec} {.  .  ix . }		=> DD, 03 + $1*8 + $2*10
+			{inc dec} {.  .  iy . }		=> FD, 03 + $1*8 + $2*10
+			
+[rabbit]	add sp, D					=>     27, D
+
+[rabbit]	and hl, de					=>     DC
+[rabbit]	and ix, de					=> DD, DC
+[rabbit]	and iy, de					=> FD, DC
+
+[rabbit]	bool hl						=>     CC
+[rabbit]	bool ix						=> DD, CC
+[rabbit]	bool iy						=> FD, CC
+
+[not_z80]	mlt {bc de hl . }			=> ED, 4C + $1*10
+[z180]		mlt {.  .  .  sp}			=> ED, 4C + $1*10
+
+;------------------------------------------------------------------------------
 ; Exchange Group
 ;------------------------------------------------------------------------------
-			ex af, {af af'}				=>     08
-			exx							=>     D9
+			ex af, {af af'}		=>     08
+			exx					=>     D9
+	
+			ex (sp), hl			=> [zilog] ? (E3) : (ED, 54)
+			ex (sp), ix			=> DD, E3
+			ex (sp), iy			=> FD, E3
+	
+			ex de, hl			=>     EB
+[rabbit]	ex de', hl 			=>     E3
+[rabbit]	ex de,  hl'			=> 76, EB
+[rabbit]	ex de', hl'			=> 76, E3
 
-			ex (sp), hl					=> [zilog] ? (E3) : (ED, 54)
-			ex (sp), ix					=> DD, E3
-			ex (sp), iy					=> FD, E3
+;------------------------------------------------------------------------------
+; Rotate and Shift Group
+;------------------------------------------------------------------------------
+			{rlca rrca rla rra}											=>     07 + $1*8
+	
+			{rlc rrc rl rr sla sra .   srl} {b c d e h l (hl)   a}		=>     CB,    $1*8 + $2
+[zilog]		{.   .   .  .  .   .   sll .  } {b c d e h l (hl)   a}		=>     CB,    $1*8 + $2
+	
+			{rlc rrc rl rr sla sra .   srl} {. . . . . . (ix+D) .}		=> DD, CB, D, $1*8 + $2
+[zilog]		{.   .   .  .  .   .   sll .  } {. . . . . . (ix+D) .}		=> DD, CB, D, $1*8 + $2
+	
+			{rlc rrc rl rr sla sra .   srl} {. . . . . . (iy+D) .}		=> FD, CB, D, $1*8 + $2
+[zilog]		{.   .   .  .  .   .   sll .  } {. . . . . . (iy+D) .}		=> FD, CB, D, $1*8 + $2
 
-			ex de, hl					=>     EB
-[rabbit]	ex de', hl 					=>     E3
-[rabbit]	ex de,  hl'					=> 76, EB
-[rabbit]	ex de', hl'					=> 76, E3
-
+;------------------------------------------------------------------------------
+; Bit Set, Reset, and Test Group
+;------------------------------------------------------------------------------
+			{. bit res set} {0 1 2 3 4 5 6 7}, {b c d e h l (hl)   a}	=>     CB,    $1*40 + $2*8 + $3
+			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (ix+D) .}	=> DD, CB, D, $1*40 + $2*8 + $3
+			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (iy+D) .}	=> FD, CB, D, $1*40 + $2*8 + $3
+			
 ;------------------------------------------------------------------------------
 ; Block Transfer Group
 ;------------------------------------------------------------------------------
-			ldi 						=> ED, A0
-			ldir						=> ED, B0
-			ldd 						=> ED, A8
-			lddr						=> ED, B8
+			ldi 				=> ED, A0
+			ldir				=> ED, B0
+			ldd 				=> ED, A8
+			lddr				=> ED, B8
 
 ;------------------------------------------------------------------------------
 ; Search Group
 ;------------------------------------------------------------------------------
-[zilog]		cpi 						=> ED, A1
-[zilog]		cpir						=> ED, B1
-[zilog]		cpd 						=> ED, A9
-[zilog]		cpdr						=> ED, B9
+[zilog]		cpi 				=> ED, A1
+[zilog]		cpir				=> ED, B1
+[zilog]		cpd 				=> ED, A9
+[zilog]		cpdr				=> ED, B9
+
+;------------------------------------------------------------------------------
+; CPU Control Group
+;------------------------------------------------------------------------------
+			nop					=>     00
+[zilog]		halt				=>     76
+[z180]		slp					=> ED, 76
+	
+; TODO: add all ALTD combinations
+[rabbit]	altd				=>     76
+[rabbit]	ld a, xpc			=> ED, 77
+[rabbit]	ld xpc, a			=> ED, 67
+
+;------------------------------------------------------------------------------
+; Jump Group
+;------------------------------------------------------------------------------
+			jp MN							=> C3, N, M
+			jp {nz z nc c po pe p m}, MN	=> C2 + $1*8, N, M
+[rabbit]	jp {.  . .  . lz lo . .}, MN	=> C2 + $1*8, N, M
+
+			jp (hl)							=>     E9
+			jp (ix)							=> DD, E9
+			jp (iy)							=> FD, E9
+			
+			djnz ASMPC						=> 10, FE
+			jr ASMPC						=> 18, FE
+			jr {nz z nc c}, ASMPC			=> 20 + $1*8, FE
+
+;------------------------------------------------------------------------------
+; Call and Return Group
+;------------------------------------------------------------------------------
+			call MN							=> CD, N, M
+[zilog]		call {nz z nc c po pe p m}, MN	=> C4 + $1*8, N, M
+
+; TODO: LCALL not supported
+
+			ret								=> C9
+			ret {nz z nc c po pe p m}		=> C0 + $1*8
+[rabbit]	ret {.  . .  . lz lo . .}		=> C0 + $1*8
+
+			rst {. . 16 24 32 40 .  56}		=> C7 + $1*8
+[zilog]		rst {0 8 .  .  .  .  48 . }		=> C7 + $1*8
+
+;------------------------------------------------------------------------------
+; Input and Output Group
+;------------------------------------------------------------------------------
+[zilog]		in  a, (N)						=>     DB, N
+[zilog]		in  {b c d e h l f a}, (c)		=> ED, 40 + $1*8
+[z180]		in0 {b c d e h l f a}, (N)		=> ED, 00 + $1*8, N
+
+[zilog]		out  (N), a						=>     D3, N
+[zilog]		out  (c), {b c d e h l 0 a}		=> ED, 41 + $1*8
+[z180]		out0 (N), {b c d e h l . a}		=> ED, 01 + $1*8, N
+
+[z180]		tstio N			=> ED, 74, N
+
+[rabbit]	ioe				=>     DB
+[rabbit]	ioi				=>     D3
+
+[zilog]		ini				=> ED, A2
+[zilog]		inir			=> ED, B2
+[zilog]		ind				=> ED, AA
+[zilog]		indr			=> ED, BA
+	
+[zilog]		outi			=> ED, A3
+[zilog]		otir			=> ED, B3
+[zilog]		outd			=> ED, AB
+[zilog]		otdr			=> ED, BB
+
+[z180]		otdm			=> ED, 8B
+[z180]		otdmr			=> ED, 9B
+[z180]		otim			=> ED, 83
+[z180]		otimr			=> ED, 93
+
+;------------------------------------------------------------------------------
+; Interrupt control group
+;------------------------------------------------------------------------------
+[zilog]		di				=>     F3
+[zilog]		ei				=>     FB
+[zilog]		im 0			=> ED, 46
+[zilog]		im 1			=> ED, 56
+[zilog]		im 2			=> ED, 5E
+
+[rabbit]	ipset 0			=> ED, 46
+[rabbit]	ipset 1			=> ED, 56
+[rabbit]	ipset 2			=> ED, 4E
+[rabbit]	ipset 3			=> ED, 5E
+
+[rabbit]	ipres			=> ED, 5D
+
+[zilog]		ld i, a			=> ED, 47
+[zilog]		ld a, i			=> ED, 57
+[zilog]		ld r, a			=> ED, 4F
+[zilog]		ld a, r			=> ED, 5F
+
+[rabbit]	ld iir, a		=> ED, 47
+[rabbit]	ld a, iir		=> ED, 57
+[rabbit]	ld eir, a		=> ED, 4F
+[rabbit]	ld a, eir		=> ED, 5F
+
+			reti			=> ED, 4D
+[zilog]		retn			=> ED, 45
+                               
+[r3k]		idet			=>     5B
