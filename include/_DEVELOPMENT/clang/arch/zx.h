@@ -33,6 +33,29 @@
 #define BRIGHT                      0x40
 #define FLASH                       0x80
 
+// GLOBAL VARIABLES
+
+extern unsigned char GLOBAL_ZX_PORT_FE;
+extern unsigned char GLOBAL_ZX_PORT_1FFD;
+extern unsigned char GLOBAL_ZX_PORT_7FFD;
+
+// IO MAPPED REGISTERS
+
+#ifdef __CLANG
+
+extern unsigned char IO_FE;
+extern unsigned char IO_1FFD;
+extern unsigned char IO_7FFD;
+
+#else
+
+__sfr __at 0xfe IO_FE;
+
+__sfr __banked __at 0x1ffd IO_1FFD;
+__sfr __banked __at 0x7ffd IO_7FFD;
+
+#endif
+
 // misc
 
 extern void zx_border(uint16_t colour);
