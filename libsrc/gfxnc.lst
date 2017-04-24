@@ -1,6 +1,5 @@
 @gfxbasew.lst
 graphics/nc/clg
-graphics/nc/fill
 graphics/w_stencil_render
 graphics/nc/w_pixladdr
 graphics/clrarea
