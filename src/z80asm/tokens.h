@@ -202,10 +202,26 @@
 #define _TK_IPRES	197
 #define _TK_IPSET	198
 #define _TK_IDET	199
-#define _TK_CALL_OZ	200
-#define _TK_CALL_PKG	201
-#define _TK_FPP	202
-#define _TK_INVOKE	203
+#define _TK_LDDSR	200
+#define _TK_LDISR	201
+#define _TK_LDP	202
+#define _TK_LSDR	203
+#define _TK_LSIR	204
+#define _TK_LSDDR	205
+#define _TK_LSIDR	206
+#define _TK_MUL	207
+#define _TK_IP	208
+#define _TK_SU	209
+#define _TK_RDMODE	210
+#define _TK_SETUSR	211
+#define _TK_SURES	212
+#define _TK_SYSCALL	213
+#define _TK_UMA	214
+#define _TK_UMS	215
+#define _TK_CALL_OZ	216
+#define _TK_CALL_PKG	217
+#define _TK_FPP	218
+#define _TK_INVOKE	219
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -410,9 +426,25 @@ typedef enum tokid_t
 	TK_IPRES	= 197,
 	TK_IPSET	= 198,
 	TK_IDET	= 199,
-	TK_CALL_OZ	= 200,
-	TK_CALL_PKG	= 201,
-	TK_FPP	= 202,
-	TK_INVOKE	= 203,
+	TK_LDDSR	= 200,
+	TK_LDISR	= 201,
+	TK_LDP	= 202,
+	TK_LSDR	= 203,
+	TK_LSIR	= 204,
+	TK_LSDDR	= 205,
+	TK_LSIDR	= 206,
+	TK_MUL	= 207,
+	TK_IP	= 208,
+	TK_SU	= 209,
+	TK_RDMODE	= 210,
+	TK_SETUSR	= 211,
+	TK_SURES	= 212,
+	TK_SYSCALL	= 213,
+	TK_UMA	= 214,
+	TK_UMS	= 215,
+	TK_CALL_OZ	= 216,
+	TK_CALL_PKG	= 217,
+	TK_FPP	= 218,
+	TK_INVOKE	= 219,
 } tokid_t;
 #endif

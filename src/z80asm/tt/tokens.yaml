@@ -347,6 +347,22 @@ tokens:
   - name	: IPRES
   - name	: IPSET
   - name    : IDET
+  - name    : LDDSR
+  - name    : LDISR
+  - name    : LDP
+  - name    : LSDR
+  - name    : LSIR
+  - name    : LSDDR
+  - name    : LSIDR
+  - name	: MUL
+  - name	: IP
+  - name	: SU
+  - name	: RDMODE
+  - name	: SETUSR
+  - name	: SURES
+  - name	: SYSCALL
+  - name	: UMA
+  - name	: UMS
   
   # Z88DK specific opcodes
   - name	: CALL_OZ

@@ -114,6 +114,23 @@
  inc iyl                ;; 0431:  FD 2C
  dec iyh                ;; 0431:  FD 25
  dec iyl                ;; 0431:  FD 2D
+ push ip                ;; 0632:  ED 76
+ push su                ;; 0632:  ED 66
+ pop ip                 ;; 063A:  ED 7E
+ pop su                 ;; 063A:  ED 6E
+ ld hl, ix              ;; 063A:  DD 7C
+ ld hl, iy              ;; 063A:  FD 7C
+ ld ix, hl              ;; 063A:  DD 7D
+ ld iy, hl              ;; 063A:  FD 7D
+ ld hl, (hl + -128)     ;; 063A:  DD E4 80
+ ld hl, (hl + 0)        ;; 063A:  DD E4 00
+ ld hl, (hl + 127)      ;; 063A:  DD E4 7F
+ ld hl, (ix + -128)     ;; 063A:  E4 80
+ ld hl, (ix + 0)        ;; 063A:  E4 00
+ ld hl, (ix + 127)      ;; 063A:  E4 7F
+ ld hl, (iy + -128)     ;; 063A:  FD E4 80
+ ld hl, (iy + 0)        ;; 063A:  FD E4 00
+ ld hl, (iy + 127)      ;; 063A:  FD E4 7F
  ld (hl + -128), hl     ;; 063A:  DD F4 80
  ld (hl + 0), hl        ;; 063A:  DD F4 00
  ld (hl + 127), hl      ;; 063A:  DD F4 7F
@@ -123,6 +140,48 @@
  ld (iy + -128), hl     ;; 063A:  FD F4 80
  ld (iy + 0), hl        ;; 063A:  FD F4 00
  ld (iy + 127), hl      ;; 063A:  FD F4 7F
+ ldp (0), hl            ;; 063A:  ED 65 00 00
+ ldp (291), hl          ;; 063A:  ED 65 23 01
+ ldp (17767), hl        ;; 063A:  ED 65 67 45
+ ldp (35243), hl        ;; 063A:  ED 65 AB 89
+ ldp (52719), hl        ;; 063A:  ED 65 EF CD
+ ldp (65535), hl        ;; 063A:  ED 65 FF FF
+ ldp (0), ix            ;; 063A:  DD 65 00 00
+ ldp (291), ix          ;; 063A:  DD 65 23 01
+ ldp (17767), ix        ;; 063A:  DD 65 67 45
+ ldp (35243), ix        ;; 063A:  DD 65 AB 89
+ ldp (52719), ix        ;; 063A:  DD 65 EF CD
+ ldp (65535), ix        ;; 063A:  DD 65 FF FF
+ ldp (0), iy            ;; 063A:  FD 65 00 00
+ ldp (291), iy          ;; 063A:  FD 65 23 01
+ ldp (17767), iy        ;; 063A:  FD 65 67 45
+ ldp (35243), iy        ;; 063A:  FD 65 AB 89
+ ldp (52719), iy        ;; 063A:  FD 65 EF CD
+ ldp (65535), iy        ;; 063A:  FD 65 FF FF
+ ldp hl, (0)            ;; 063A:  ED 6D 00 00
+ ldp hl, (291)          ;; 063A:  ED 6D 23 01
+ ldp hl, (17767)        ;; 063A:  ED 6D 67 45
+ ldp hl, (35243)        ;; 063A:  ED 6D AB 89
+ ldp hl, (52719)        ;; 063A:  ED 6D EF CD
+ ldp hl, (65535)        ;; 063A:  ED 6D FF FF
+ ldp ix, (0)            ;; 063A:  DD 6D 00 00
+ ldp ix, (291)          ;; 063A:  DD 6D 23 01
+ ldp ix, (17767)        ;; 063A:  DD 6D 67 45
+ ldp ix, (35243)        ;; 063A:  DD 6D AB 89
+ ldp ix, (52719)        ;; 063A:  DD 6D EF CD
+ ldp ix, (65535)        ;; 063A:  DD 6D FF FF
+ ldp iy, (0)            ;; 063A:  FD 6D 00 00
+ ldp iy, (291)          ;; 063A:  FD 6D 23 01
+ ldp iy, (17767)        ;; 063A:  FD 6D 67 45
+ ldp iy, (35243)        ;; 063A:  FD 6D AB 89
+ ldp iy, (52719)        ;; 063A:  FD 6D EF CD
+ ldp iy, (65535)        ;; 063A:  FD 6D FF FF
+ ldp (hl), hl           ;; 063A:  ED 64
+ ldp (ix), hl           ;; 063A:  DD 64
+ ldp (iy), hl           ;; 063A:  FD 64
+ ldp hl, (hl)           ;; 063A:  ED 6C
+ ldp hl, (ix)           ;; 063A:  DD 6C
+ ldp hl, (iy)           ;; 063A:  FD 6C
  ld (sp + 0), hl        ;; 063A:  D4 00
  ld (sp + 85), hl       ;; 063A:  D4 55
  ld (sp + 170), hl      ;; 063A:  D4 AA
@@ -135,6 +194,18 @@
  ld (sp + 85), iy       ;; 063A:  FD D4 55
  ld (sp + 170), iy      ;; 063A:  FD D4 AA
  ld (sp + 255), iy      ;; 063A:  FD D4 FF
+ ld hl, (sp + 0)        ;; 063A:  C4 00
+ ld hl, (sp + 85)       ;; 063A:  C4 55
+ ld hl, (sp + 170)      ;; 063A:  C4 AA
+ ld hl, (sp + 255)      ;; 063A:  C4 FF
+ ld ix, (sp + 0)        ;; 063A:  DD C4 00
+ ld ix, (sp + 85)       ;; 063A:  DD C4 55
+ ld ix, (sp + 170)      ;; 063A:  DD C4 AA
+ ld ix, (sp + 255)      ;; 063A:  DD C4 FF
+ ld iy, (sp + 0)        ;; 063A:  FD C4 00
+ ld iy, (sp + 85)       ;; 063A:  FD C4 55
+ ld iy, (sp + 170)      ;; 063A:  FD C4 AA
+ ld iy, (sp + 255)      ;; 063A:  FD C4 FF
  ld bc', bc             ;; 063A:  ED 49
  ld bc', de             ;; 063A:  ED 41
  ld de', bc             ;; 063A:  ED 59
@@ -145,17 +216,38 @@
  add sp, 0              ;; 066E:  27 00
  add sp, 127            ;; 066E:  27 7F
  and hl, de             ;; 066E:  DC
+ or hl, de              ;; 066E:  EC
  and ix, de             ;; 066E:  DD DC
+ or ix, de              ;; 066E:  DD EC
  and iy, de             ;; 066E:  FD DC
+ or iy, de              ;; 066E:  FD EC
  bool hl                ;; 066E:  CC
  bool ix                ;; 066E:  DD CC
  bool iy                ;; 066E:  FD CC
+ mul                    ;; 0676:  F7
+ uma                    ;; 0676:  ED C0
+ ums                    ;; 0676:  ED C8
  ex de', hl             ;; 067F:  E3
  ex de, hl'             ;; 067F:  76 EB
  ex de', hl'            ;; 067F:  76 E3
+ rl de                  ;; 07C3:  F3
+ rr de                  ;; 07C3:  FB
+ rr hl                  ;; 07C3:  FC
+ rr ix                  ;; 07C3:  DD FC
+ rr iy                  ;; 07C3:  FD FC
+ ldisr                  ;; 0B8B:  ED 90
+ lddsr                  ;; 0B8B:  ED 98
+ lsdr                   ;; 0B8B:  ED F8
+ lsir                   ;; 0B8B:  ED F0
+ lsddr                  ;; 0B8B:  ED D8
+ lsidr                  ;; 0B8B:  ED D0
  altd                   ;; 0B97:  76
  ld a, xpc              ;; 0B97:  ED 77
  ld xpc, a              ;; 0B97:  ED 67
+ rdmode                 ;; 0B97:  ED 7F
+ setusr                 ;; 0B97:  ED 6F
+ sures                  ;; 0B97:  ED 7D
+ syscall                ;; 0B97:  ED 75
  jp lz, 0               ;; 0C39:  E2 00 00
  jp lz, 291             ;; 0C39:  E2 23 01
  jp lz, 17767           ;; 0C39:  E2 67 45
@@ -177,8 +269,8 @@
  ipset 2                ;; 0E0D:  ED 4E
  ipset 3                ;; 0E0D:  ED 5E
  ipres                  ;; 0E0D:  ED 5D
- ld iir, a              ;; 0E15:  ED 47
- ld a, iir              ;; 0E15:  ED 57
- ld eir, a              ;; 0E15:  ED 4F
- ld a, eir              ;; 0E15:  ED 5F
+ ld iir, a              ;; 0E15:  ED 4F
+ ld a, iir              ;; 0E15:  ED 5F
+ ld eir, a              ;; 0E15:  ED 47
+ ld a, eir              ;; 0E15:  ED 57
  idet                   ;; 0E19:  5B
