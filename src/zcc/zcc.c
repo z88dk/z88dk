@@ -105,7 +105,7 @@ static void            configure_compiler();
 static void            configure_misc_options();
 static void            configure_maths_library(char **libstring);
 
-
+static void            apply_copt_rules(int filenumber, int num, char **rules);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static void            ShowErrors(char *, char *);
@@ -1128,108 +1128,63 @@ int main(int argc, char **argv)
 				exit(1);
 		case OPTFILE:
 			if (m4only || clangonly || llvmonly || preprocessonly) continue;
-			if (compiler_type == CC_SDCC)
-			{
-				char *before_cpuext = ".asm";
+			if (compiler_type == CC_SDCC) {
+				char  *rules[MAX_COPT_RULE_FILES];
+				int    num_rules = 0;
 
-				if ( c_coptrules_cpu ) {
-					before_cpuext = ".opc";
-				}
 				/* sdcc_opt.9 implements bugfixes and code size reduction and should be applied to every sdcc compile */
-				switch (peepholeopt)
-				{
-				case 0:
-					// the output will be in asz80 syntax which is stored in a .s file
-					if (process(".opt", ".s", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
-						exit(1);
-					break;
-				case 1:
-					if (process(".opt", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-						exit(1);
-					if (process(".op1", before_cpuext, c_copt_exe, c_sdccopt9, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
-						exit(1);
-					break;
-				default:
-					if (process(".opt", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-						exit(1);
-					if (process(".op1", ".op2", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
-						exit(1);
-					if (process(".op2", before_cpuext, c_copt_exe, c_sdccopt2, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
-						exit(1);
-					break;
-				}
-			}
-			else
-			{
-				char *before_cpuext = ".asm";
-				char *before_user = ".asm";
+				rules[num_rules++] = c_sdccopt9;
 
-				if ( c_coptrules_cpu ) {
-					before_cpuext = ".opc";
-					if ( c_coptrules_user ) {
-						before_user = ".opu";
-					}
-				} else if ( c_coptrules_user ) {
-					before_user = ".opu";
-					before_cpuext = ".opu";
-				}
-				/* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
 				switch (peepholeopt)
 				{
 				case 0:
-					if (process(".opt", before_cpuext, c_copt_exe, c_coptrules9, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
-						exit(1);
+					rules[num_rules++] = c_sdccopt9;
 					break;
 				case 1:
-					if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
-						exit(1);
-					if (process(".op1", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
-						exit(1);
-					break;
-				case 2:
-					/* Double optimization! */
-					if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
-						exit(1);
-					if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
-						exit(1);
-					if (process(".op2", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
-						exit(1);
+					rules[num_rules++] = c_sdccopt1;
+					rules[num_rules++] = c_sdccopt9;
 					break;
 				default:
-					/*
-					* Triple opt (last level adds routines but
-					* can save space..)
-					*/
-					if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
-						exit(1);
-					if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
-						exit(1);
-					if (process(".op2", ".op3", c_copt_exe, c_coptrules1, filter, i, YES, NO))
-						exit(1);
-					if (process(".op3", before_cpuext, c_copt_exe, c_coptrules3, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
-						exit(1);
-					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
-						exit(1);
+					rules[num_rules++] = c_sdccopt1;
+					rules[num_rules++] = c_sdccopt9;
+					rules[num_rules++] = c_sdccopt2;
 					break;
 				}
+				if ( c_coptrules_cpu ) {
+					rules[num_rules++] = c_coptrules_cpu;
+				}
+				if ( c_coptrules_user ) {
+					rules[num_rules++] = c_coptrules_user;
+				}
+				apply_copt_rules(i, num_rules, rules);
+			} else {
+				char  *rules[MAX_COPT_RULE_FILES];
+				int    num_rules = 0;
+				
+				/* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
+				rules[num_rules++] = c_coptrules9;
+
+				switch (peepholeopt) {
+					case 1:
+						rules[num_rules++] = c_coptrules1;
+						break;
+					case 2:
+						rules[num_rules++] = c_coptrules2;
+						rules[num_rules++] = c_coptrules1;
+						break;
+					default:
+						rules[num_rules++] = c_coptrules2;
+						rules[num_rules++] = c_coptrules1;
+						rules[num_rules++] = c_coptrules3;
+						break;
+				}
+				if ( c_coptrules_cpu ) {
+					rules[num_rules++] = c_coptrules_cpu;
+				}
+				if ( c_coptrules_user ) {
+					rules[num_rules++] = c_coptrules_user;
+				}
+				apply_copt_rules(i, num_rules, rules);
 			}
 			// continue processing if this is not a .s file
 			if ((compiler_type != CC_SDCC) || (peepholeopt != 0))
@@ -1469,6 +1424,30 @@ int main(int argc, char **argv)
 
 	exit(0);
 }
+
+
+static void apply_copt_rules(int filenumber, int num, char **rules)
+{
+	char  *input_ext = ".opt";
+	char  *output_ext = ".op1";
+	int    i;
+
+	for ( i = 0; i < num ; i++ ) {
+		if ( i == (num-1) ) {
+			output_ext = ".asm";
+		}
+		if (process(input_ext, output_ext, c_copt_exe, rules[i], filter, filenumber, YES, NO))
+			exit(1);
+		if ( i % 2 == 0 ) {
+			input_ext = ".op1";
+			output_ext = ".opt";
+		} else {
+			input_ext = ".opt";
+			output_ext = ".op1";
+		}
+	}
+}
+
 
 
 /* Filter global defc file as it is written to the destination directory.
@@ -2589,9 +2568,6 @@ void remove_temporary_files(void)
 			remove_file_with_extension(temporary_filenames[j], ".asm");
 			remove_file_with_extension(temporary_filenames[j], ".err");
 			remove_file_with_extension(temporary_filenames[j], ".op1");
-			remove_file_with_extension(temporary_filenames[j], ".op2");
-			remove_file_with_extension(temporary_filenames[j], ".op3");
-			remove_file_with_extension(temporary_filenames[j], ".opc");
 			remove_file_with_extension(temporary_filenames[j], ".opt");
 			remove_file_with_extension(temporary_filenames[j], ".o");
             remove_file_with_extension(temporary_filenames[j], ".map");
