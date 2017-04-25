@@ -23,16 +23,25 @@
 ._fgetc_cons
 	call	$B9B3	;kmreadchar
 	jr	nc,fgetc_cons	;no key available...try again
+IF STANDARDESCAPECHARS
+	ld	a,c
+	cp	13
+	jr	nz,nocr
+	ld	c,10
+.nocr
+ENDIF
 	ld	l,c
 	ld	h,b
 	ld	a,b
+	cp  3
+	jr	z,fgetc_cons	; timeout or unwanted chars ?
 	and	a
 	ret	z		;no token
 	sub	2
 	ret	nz		;not b=2
 	ld	a,c
 	cp	$FC
-	ret	nz		
+	ret	nz
 ; We've got here so we have just received escape so check yellow
 	push	hl		;keep this in case 
 	call	$B8d2	;kmgetyellow
