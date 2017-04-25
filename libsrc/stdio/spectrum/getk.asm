@@ -18,6 +18,12 @@
 	ld	h,0
 	ld	a,(23560)
 	ld	l,a
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
 	and	a
 	ret	z
 	xor	a
