@@ -16,6 +16,14 @@
 .getk
 ._getk
 	call	$79
+	
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
 	ld	h,0
 	ld	l,a
 	ret
