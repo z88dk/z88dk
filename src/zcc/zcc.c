@@ -160,6 +160,7 @@ static int             crtcopied = 0;    /* Copied the crt0 code over? */
 static int             swallow_M = 0;
 static int             c_print_specs = 0;
 static int             c_zorg = -1;
+static int             c_sccz80_inline_ints = 0;
 static int             max_argc;
 static int             gargc;
 static char          **gargv;
@@ -282,6 +283,7 @@ static char  *c_coptrules3 = NULL;
 static char  *c_coptrules9 = NULL;
 static char  *c_coptrules_cpu = NULL;
 static char  *c_coptrules_user = NULL;
+static char  *c_coptrules_sccz80 = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -368,6 +370,7 @@ static arg_t  config[] = {
 	{ "COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "\"DESTDIR/lib/z80rules.0\"" },
 	{ "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
 	{ "COPTRULESCPU", 0, SetStringConfig, &c_coptrules_cpu, NULL, "An extra copt file for CPU optimisation", NULL },
+	{ "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
 	{ "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
 	{ "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
 	{ "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
@@ -458,6 +461,7 @@ static arg_t     myargs[] = {
 	{ "-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files" },
 	{ "-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)" },
 	{ "custom-copt-rules", AF_MORE, SetString, &c_coptrules_user, NULL, "Custom user copy rules" },
+	{ "sccz80-inline-ints", AF_BOOL_TRUE, SetBoolean, &c_sccz80_inline_ints, NULL, "Inline int gets/puts for sccz80" },
 	{ "zopt", AF_BOOL_TRUE, SetBoolean, &zopt, NULL, "Enable llvm-optimizer (clang only)" },
 	{ "m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable" },
 	{ "g", AF_MORE, GlobalDefc, &globaldefrefile, &globaldefon, "Generate a global defc file of the final executable (-g, -gp, -gpf filename)" },
@@ -838,6 +842,10 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	if (c_sccz80_inline_ints == 0 ) {
+		c_coptrules_sccz80 = NULL;
+	}
+
 	configure_assembler();
 	configure_compiler();
 	configure_misc_options();
@@ -1180,6 +1188,9 @@ int main(int argc, char **argv)
 				}
 				if ( c_coptrules_cpu ) {
 					rules[num_rules++] = c_coptrules_cpu;
+				}
+				if ( c_coptrules_sccz80 ) {
+					rules[num_rules++] = c_coptrules_sccz80;
 				}
 				if ( c_coptrules_user ) {
 					rules[num_rules++] = c_coptrules_user;
