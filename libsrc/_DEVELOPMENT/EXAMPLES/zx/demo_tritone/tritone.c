@@ -8,8 +8,8 @@
 #include <arch/zx.h>
 #include <z80.h>
 
-#pragma output CLIB_OPT_PRINTF       = 0x00000202   // enable %us for printf only
-#pragma output CLIB_OPT_SCANF        = 0x00000022   // enable %un for scanf only
+#pragma printf = "%u %s"
+#pragma scanf  = "%u %n"
 
 #pragma output CRT_ORG_CODE          = 40000
 #pragma output REGISTER_SP           = 0
