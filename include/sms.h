@@ -100,6 +100,7 @@ typedef union _fixed {
   UWORD w;
 } fixed;
 
+extern void __LIB__ clear_vram();
 extern void __LIB__ load_palette(unsigned char *data, int index, int count) __smallc;
 extern void __LIB__ load_tiles(unsigned char *data, int index, int count, int bpp) __smallc;
 extern void __LIB__ set_bkg_map(unsigned int *data, int x, int y, int w, int h) __smallc;

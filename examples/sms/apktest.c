@@ -14,10 +14,13 @@ void main() {
 
 	aplib_depack(testtxt_apk, buf);
 
+        clear_vram();
 	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN);
 	load_tiles(standard_font, 0, 255, 1);
 	load_palette(pal1, 0, 16);
 	load_palette(pal2, 16, 16);
+
+        set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN);
 
 	printf(buf);
 

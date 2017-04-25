@@ -10,10 +10,11 @@ unsigned char pal2[] = {0x00, 0x03, 0x08, 0x28, 0x02, 0x22, 0x0A, 0x2A,
 void main() {
 	int y = 0;
 
-	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN);
+        clear_vram();
 	load_tiles(standard_font, 0, 255, 1);
 	load_palette(pal1, 0, 16);
 	load_palette(pal2, 16, 16);
+        set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN);
 
 	printf("Hello, stdio!\nIs it working?\nI hope so.");
 	gotoxy(5, 5);

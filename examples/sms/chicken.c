@@ -33,53 +33,54 @@ int rand_speed() {
 	return (rand() & 0x3F) + 0x0A;
 }
 
-void main() {
-	int x = 0;
-	int y = 0;
-	int	 i, j;
-	int ply_x = 120;
-	int ply_y = 92;
-	int ply_tile = 'H';
-	int ply2_x = 120;
-	int ply2_y = 100;
-	int ply2_tile = 'H';
-	int raster[10], speeds[10], *p, *p2;
-	char *c;
+void main() { 
+    int x = 0; 
+    int y = 0; 
+    int  i, j; 
+    int ply_x = 120; 
+    int ply_y = 92; 
+    int ply_tile = 'H'; 
+    int ply2_x = 120; 
+    int ply2_y = 100; 
+    int ply2_tile = 'H'; 
+    int raster[10], speeds[10], *p, *p2; 
+    char *c; 
 
+    clear_vram(); 
 
-	for (y = 2; y < 22; y += 2) {
-		for (x = 0; x != 32; x += 2) {
-			set_bkg_map(road_pattern, x, y, 2, 2);
-		}
-		for (x = 0; x != 32; x += 4) {
-			if (y < 12) {
-				set_bkg_map(car1_map_r, x, y+1, 2, 1);
-			} else {
-				set_bkg_map(car1_map_l, x, y+1, 2, 1);
-			}
-		}
-	}
+    for (y = 2; y < 22; y += 2) { 
+        for (x = 0; x != 32; x += 2) { 
+            set_bkg_map(road_pattern, x, y, 2, 2); 
+        } 
+        for (x = 0; x != 32; x += 4) { 
+            if (y < 12) { 
+                set_bkg_map(car1_map_r, x, y+1, 2, 1); 
+            } else { 
+                set_bkg_map(car1_map_l, x, y+1, 2, 1); 
+            } 
+        } 
+    } 
 
-	for (x = 0; x != 32; x ++) {
-		set_bkg_map(top_sidewalk_pattern, x, 0, 1, 3);
-		set_bkg_map(bottom_sidewalk_pattern, x, 22, 1, 3);
-		set_bkg_map(central_strip_pattern, x, 12, 1, 1);
-	}
+    for (x = 0; x != 32; x ++) { 
+        set_bkg_map(top_sidewalk_pattern, x, 0, 1, 3); 
+        set_bkg_map(bottom_sidewalk_pattern, x, 22, 1, 3); 
+        set_bkg_map(central_strip_pattern, x, 12, 1, 1); 
+    } 
 
-	for (i = 0, p2 = speeds; i != 5; i++, p2++) {
-		(*p2) = rand_speed();
-	}
-	for (i = 0; i != 5; i++, p2++) {
-		(*p2) = -rand_speed();
-	}
+    for (i = 0, p2 = speeds; i != 5; i++, p2++) { 
+        (*p2) = rand_speed(); 
+    } 
+    for (i = 0; i != 5; i++, p2++) { 
+        (*p2) = -rand_speed(); 
+    } 
 
-	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN);
+    load_tiles(chicken_graphics, 0, 255, 4); 
+    load_palette(pal1, 0, 16); 
+    load_palette(pal2, 16, 16); 
 
-	load_tiles(chicken_graphics, 0, 255, 4);
-	load_palette(pal1, 0, 16);
-	load_palette(pal2, 16, 16);
+    set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN); 
 
-//	add_pause_int(pause_handler);
+//  add_pause_int(pause_handler); 
 
 	for (;;) {
 		p = raster;
