@@ -29,11 +29,7 @@
 .notbs
 	cp	1fh
 	jr	nz,notcr
-IF STANDARDESCAPECHARS
-	ld	a,10
-ELSE
 	ld	a,13
-ENDIF
 .notcr
 	jr	fgetcc_exit
 
@@ -42,6 +38,13 @@ ENDIF
 	rst	8
 	
 .fgetcc_exit
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
 	ld	l,a
 	ld	h,0
 	ret
