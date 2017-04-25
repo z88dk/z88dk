@@ -16,7 +16,11 @@ defb	9
 defb	$03	;Up
 defb	11
 defb	$05	;ENTER
+IF STANDARDESCAPECHARS
+defb	10
+ELSE
 defb	13
+ENDIF
 
 defb	$7	;DEL
 defb	8
@@ -61,7 +65,12 @@ defb	9
 defb	$03	;Up
 defb	11
 defb	$05	;ENTER
+IF STANDARDESCAPECHARS
+defb	10
+ELSE
 defb	13
+ENDIF
+
 
 defb	$7	;DEL
 defb	8
