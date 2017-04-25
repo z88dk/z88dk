@@ -27,10 +27,9 @@
 	add	hl,sp
 	call	l_glong
 =
-	ld	hl,(sp + %1)
-	ex	de,hl
 	ld	hl,(sp + %1 + 2)
 	ex	de,hl
+	ld	hl,(sp + %1)
 
 %check 0 <= %1 <= 127
 	ld	hl,%1	;const
