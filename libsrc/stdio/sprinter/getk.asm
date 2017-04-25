@@ -20,5 +20,13 @@
 	pop	ix
 	ld	hl,0
 	ret	nz	;no key pressed
+	
+IF STANDARDESCAPECHARS
+	ld	a,13
+	cp	e
+	jr	nz,not_return
+	ld	e,10
+.not_return
+ENDIF
 	ld	l,e
 	ret
