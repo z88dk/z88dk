@@ -16,6 +16,8 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
+	cp 12
+	jp	z,$B824	;TXTCLEARWINDOW (cls)
 IF STANDARDESCAPECHARS
 	cp	10
 ELSE
