@@ -756,8 +756,6 @@ void dopragma()
         doasm();
     else if (amatch("endasm"))
         endasm = 1;
-    else if (rcmatch('-'))
-        ParseArgs(line + lptr + 1);
     else {
         warning(W_PRAGMA);
         clear();

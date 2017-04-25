@@ -169,7 +169,8 @@ int z88_exec(char *target)
               exit_log(1, "reqpag isn't defined and can't find the end of the BSS segment\n");
          }
          reqpag = 0;
-         if ( asmtail > 0x2000 ) {
+         /* If we've only got one byte then we don't need to set reqpag */
+         if ( asmtail > 0x2001 ) {
              reqpag = ((asmtail - 0x2000) / 256) + 1;
          }
          

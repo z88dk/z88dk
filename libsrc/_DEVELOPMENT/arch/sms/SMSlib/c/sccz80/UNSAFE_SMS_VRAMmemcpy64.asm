@@ -5,7 +5,7 @@ SECTION code_SMSlib
 
 PUBLIC UNSAFE_SMS_VRAMmemcpy64
 
-EXTERN asm_SMSlib_VRAMmemcpy64
+EXTERN asm_SMSlib_UNSAFE_VRAMmemcpy64
 
 UNSAFE_SMS_VRAMmemcpy64:
 
@@ -17,4 +17,4 @@ UNSAFE_SMS_VRAMmemcpy64:
    push de
    push af
 
-   jp asm_SMSlib_VRAMmemcpy64
+   jp asm_SMSlib_UNSAFE_VRAMmemcpy64

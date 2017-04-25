@@ -136,6 +136,7 @@
 /* #define spritesize 6   -->  TI mode, 96x54  */
 /* #define spritesize 7   -->  TI85/86, VZ200  */
 /* #define spritesize 8   -->  128x72 pixels   */
+/* #define spritesize 14  -->  Medium screen mode 224x126  */
 /* #define spritesize 16  -->  Big screen mode 256x144  */
 /* #define spritesize 20  -->  Wide screen mode 320x160 */
 /* #define spritesize 21  -->  Wide screen mode 512x192 */
@@ -146,6 +147,9 @@
 #endif
 
 /* Single sprite memory usage, including bytes for its size */
+#if (spritesize == 14)
+  #define spritemem 30
+#endif
 #if (spritesize == 15)|(spritesize == 16))
   #define spritemem 34
 #endif

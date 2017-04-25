@@ -72,7 +72,7 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
 
        
     }
-    if (DoTestJump(lval) || lval->binop == dummy) {
+    if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
             lval->val_type = CINT;
         }
@@ -296,6 +296,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);
 
+        // Remove any function type decorators
+        lval->flags &= (UNSIGNED|FAR);
+
         /* Special case handling for operation by constant */
         if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || lval2->is_const) ) {
             int doconstoper = 0;
@@ -455,7 +458,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 /* remove zpush and add int constant to int */
                 clearstage(before1, 0);
                 Zsp = savesp1;
-                addconst(val, 0, 0);
+                zadd_const(lval, val);
             }
         } else {
             /* non-constant on both sides  */
@@ -504,15 +507,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         (*oper)(lval);
     }
     if (oper == zsub && lval->ptr_type) {
-        /* scale difference between pointers */
-        /* djm...preserve our pointer high 8 bits? */
-        if (lval->val_type == CPTR) {
-            lval->val_type = CPTR;
-            ltype = LONG;
-        } else {
-            lval->val_type = CINT; /* operate on pointers as ints */
-            ltype = CINT; /* dodgy maybe 24/4/99 */
-        }
         if (lval->ptr_type == CINT && lval2->ptr_type == CINT) {
             zdiv_const(lval,2);  /* Divide by two */
         } else if (lval->ptr_type == CPTR && lval2->ptr_type == CPTR) {

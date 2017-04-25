@@ -1,0 +1,294 @@
+
+
+
+	MODULE	Issue_188_builtins
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._strchr1
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	de,hl
+	pop	hl
+.i_2
+	ld	a,(hl)
+	cp	e
+	jr	z,i_3
+	and	a
+	inc	hl
+	jr	nz,i_2
+	ld	h,a
+	ld	l,h
+.i_3
+	ret
+
+
+
+._strchr2
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	e,97
+.i_4
+	ld	a,(hl)
+	cp	e
+	jr	z,i_5
+	and	a
+	inc	hl
+	jr	nz,i_4
+	ld	h,a
+	ld	l,h
+.i_5
+	ret
+
+
+
+._memset1
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	ld	e,0
+	ld	b,13
+.i_6
+	ld	(hl),e
+	inc	hl
+	djnz	i_6
+	pop	hl
+	ret
+
+
+
+._memset2
+	ld	hl,6	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	de,hl
+	pop	hl
+	push	hl
+	ld	b,13
+.i_7
+	ld	(hl),e
+	inc	hl
+	djnz	i_7
+	pop	hl
+	ret
+
+
+
+._memset3
+	ld	hl,6	;const
+	call	l_g2intspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	memset_callee
+	ret
+
+
+
+._strcpy1
+	ld	hl,4	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,i_1+0
+	push	de
+	xor	a
+.i_8
+	cp	(hl)
+	ldi
+	jr	nz,i_8
+	pop	hl
+	ret
+
+
+
+._strcpy2
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	push	de
+	xor	a
+.i_9
+	cp	(hl)
+	ldi
+	jr	nz,i_9
+	pop	hl
+	ret
+
+
+
+._memcpy1
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	ex	de,hl
+	ld	hl,1000
+	ld	bc,10
+	ldir
+	pop	hl
+	ret
+
+
+
+._memcpy2
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	push	de
+	ld	bc,10
+	ldir
+	pop	hl
+	ret
+
+
+
+._memcpy3
+	ld	hl,6	;const
+	call	l_g2intspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	memcpy_callee
+	ret
+
+
+	SECTION	rodata_compiler
+
+.i_1
+	defm	"hello"
+	defb	0
+
+
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	EXTERN	strlen
+	EXTERN	strcat
+	EXTERN	strcmp
+	EXTERN	strcpy
+	EXTERN	strncat
+	EXTERN	strncmp
+	EXTERN	strncpy
+	EXTERN	strrev
+	EXTERN	strchr
+	EXTERN	strchrnul
+	EXTERN	strrchr
+	EXTERN	strrstrip
+	EXTERN	strstrip
+	EXTERN	strstr
+	EXTERN	strrstr
+	EXTERN	strtok
+	EXTERN	strtok_r
+	EXTERN	strtok_s
+	EXTERN	strsep
+	EXTERN	strpbrk
+	EXTERN	strpos
+	EXTERN	strcspn
+	EXTERN	strspn
+	EXTERN	stricmp
+	EXTERN	strcasecmp
+	EXTERN	strnicmp
+	EXTERN	strncasecmp
+	EXTERN	strlwr
+	EXTERN	strupr
+	EXTERN	strlcat
+	EXTERN	strlcpy
+	EXTERN	memset
+	EXTERN	memcpy
+	EXTERN	memmove
+	EXTERN	memchr
+	EXTERN	memrchr
+	EXTERN	memcmp
+	EXTERN	memswap
+	EXTERN	memopi
+	EXTERN	memopd
+	EXTERN	strdup
+	EXTERN	strcat_callee
+	EXTERN	strcmp_callee
+	EXTERN	strcpy_callee
+	EXTERN	strncat_callee
+	EXTERN	strncmp_callee
+	EXTERN	strncpy_callee
+	EXTERN	strchr_callee
+	EXTERN	strchrnul_callee
+	EXTERN	strrchr_callee
+	EXTERN	strrstrip_callee
+	EXTERN	strstrip_callee
+	EXTERN	strstr_callee
+	EXTERN	strrstr_callee
+	EXTERN	strtok_callee
+	EXTERN	strtok_r_callee
+	EXTERN	strsep_callee
+	EXTERN	strpbrk_callee
+	EXTERN	strpos_callee
+	EXTERN	strcspn_callee
+	EXTERN	strspn_callee
+	EXTERN	stricmp_callee
+	EXTERN	strnicmp_callee
+	EXTERN	strlcat_callee
+	EXTERN	strlcpy_callee
+	EXTERN	memset_callee
+	EXTERN	memcpy_callee
+	EXTERN	memmove_callee
+	EXTERN	memchr_callee
+	EXTERN	memrchr_callee
+	EXTERN	memcmp_callee
+	EXTERN	memswap_callee
+	EXTERN	memopi_callee
+	EXTERN	memopd_callee
+	EXTERN	bzero
+	EXTERN	bcmp
+	EXTERN	bcopy
+	EXTERN	index
+	EXTERN	rindex
+	EXTERN	strset
+	EXTERN	strnset
+	EXTERN	strcmpi
+	EXTERN	strncmpi
+	EXTERN	rawmemchr
+	EXTERN	__builtin_memset
+	EXTERN	__builtin_memcpy
+	EXTERN	__builtin_strcpy
+	EXTERN	__builtin_strchr
+	PUBLIC	_strchr1
+	PUBLIC	_strchr2
+	PUBLIC	_memset1
+	PUBLIC	_memset2
+	PUBLIC	_memset3
+	PUBLIC	_strcpy1
+	PUBLIC	_strcpy2
+	PUBLIC	_memcpy1
+	PUBLIC	_memcpy2
+	PUBLIC	_memcpy3
+
+
+
+

@@ -3,6 +3,10 @@
 ;; crt rules for sms ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; Define Memory Banks
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    IFNDEF CRT_ORG_BANK_02
       defc CRT_ORG_BANK_02 = 0x8000
    ENDIF
@@ -123,4 +127,54 @@
       defc CRT_ORG_BANK_1F = 0x8000
    ENDIF
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; Output Terminal Settings
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IFNDEF CRT_OTERM_SCREEN_MAP_ADDRESS
+      defc CRT_OTERM_SCREEN_MAP_ADDRESS = __SMS_VRAM_SCREEN_MAP_ADDRESS
+   ENDIF
+
+   ; Offset added to ASCII code to generate the tile number for display  0-511
+   ; (this default assumes the font is stored beginning at tile 0)
+
+   IFNDEF CRT_OTERM_CHAR_PATTERN_OFFSET
+      defc CRT_OTERM_CHAR_PATTERN_OFFSET = -32
+   ENDIF
+
+   ; Character modifiers added to printed tile
+   ; H-FLIP (bit 1), V-FLIP (bit 2), COLORHALF (bit 3), OVERSPRITES (bit 4)
+
+   IFNDEF CRT_OTERM_PRINT_FLAG
+      defc CRT_OTERM_PRINT_FLAG = 0
+   ENDIF
+
+   ; Absolute background tile used as blank in window 0-511
+
+   IFNDEF CRT_OTERM_BACKGROUND_CHAR
+      defc CRT_OTERM_BACKGROUND_CHAR = 0
+   ENDIF
+
+   ; Terminal window dimensions in characters
+
+   IFNDEF CRT_OTERM_WINDOW_X
+      defc CRT_OTERM_WINDOW_X = 0
+   ENDIF
+   
+   IFNDEF CRT_OTERM_WINDOW_WIDTH
+      defc CRT_OTERM_WINDOW_WIDTH = 32
+   ENDIF
+   
+   IFNDEF CRT_OTERM_WINDOW_Y
+      defc CRT_OTERM_WINDOW_Y = 0
+   ENDIF
+   
+   IFNDEF CRT_OTERM_WINDOW_HEIGHT
+      defc CRT_OTERM_WINDOW_HEIGHT = 24
+   ENDIF
+
+   IFNDEF CRT_OTERM_TERMINAL_FLAGS
+      defc CRT_OTERM_TERMINAL_FLAGS = 0x2370
+   ENDIF
+   
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

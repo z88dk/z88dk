@@ -47,7 +47,7 @@ extern void     callfunction(SYMBOL *ptr, SYMBOL *fnptr);
 #include "codegen.h"
 extern void copy_to_stack(char *label, int stack_offset,  int size);
 #include "const.h"
-extern void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias);
+extern void dofloat(double raw, unsigned char fa[]);
 #include "data.h"
 #include "declvar.h"
 #include "declfunc.h"

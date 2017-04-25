@@ -1,0 +1,4 @@
+target/sms/driver/terminal/sms_01_output_terminal_base
+@target/sms/driver/terminal/sms_01_output_terminal.lst
+@target/sms/driver/terminal/sms_01_output_terminal_tty_z88dk.lst
+@target/sms/driver/terminal/sms_tty.lst

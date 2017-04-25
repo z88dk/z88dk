@@ -5,7 +5,7 @@ SECTION code_SMSlib
 
 PUBLIC _UNSAFE_SMS_VRAMmemcpy128
 
-EXTERN asm_SMSlib_VRAMmemcpy128
+EXTERN asm_SMSlib_UNSAFE_VRAMmemcpy128
 
 _UNSAFE_SMS_VRAMmemcpy128:
 
@@ -17,4 +17,4 @@ _UNSAFE_SMS_VRAMmemcpy128:
    push hl
    push af
 
-   jp asm_SMSlib_VRAMmemcpy128
+   jp asm_SMSlib_UNSAFE_VRAMmemcpy128

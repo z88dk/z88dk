@@ -17,6 +17,7 @@
 #define __GFX_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 
 #ifdef __TIKI100__
 #include <tiki100.h>
@@ -30,13 +31,13 @@
  */
 
 struct window {
-        char    number;
-        char    x;
-        char    y;
-        char    width;
-        char    depth;
-        char    type;
-        char    graph;
+        uint8_t number;
+        uint8_t x;
+        uint8_t y;
+        uint8_t width;
+        uint8_t depth;
+        uint8_t type;
+        uint8_t graph;
 } ;
 
 

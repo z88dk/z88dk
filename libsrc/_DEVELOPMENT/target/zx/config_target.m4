@@ -16,8 +16,6 @@ define(`__SPECTRUM_128_P2A', 8)
 define(`__SPECTRUM_128_P3', 16)
 define(`__SPECTRUM_PENTAGON', 32)
 
-define(`__SPECTRUM_128_MASK', 62)
-
 #
 # END OF USER CONFIGURATION
 ###############################################################
@@ -38,8 +36,6 @@ PUBLIC `__SPECTRUM_128_P2'
 PUBLIC `__SPECTRUM_128_P2A'
 PUBLIC `__SPECTRUM_128_P3'
 PUBLIC `__SPECTRUM_PENTAGON'
-
-PUBLIC `__SPECTRUM_128_MASK'
 ')
 
 dnl#
@@ -56,8 +52,6 @@ defc `__SPECTRUM_128_P2'   = __SPECTRUM_128_P2
 defc `__SPECTRUM_128_P2A'  = __SPECTRUM_128_P2A
 defc `__SPECTRUM_128_P3'   = __SPECTRUM_128_P3
 defc `__SPECTRUM_PENTAGON' = __SPECTRUM_PENTAGON
-
-defc `__SPECTRUM_128_MASK' = __SPECTRUM_128_MASK
 ')
 
 dnl#
@@ -75,6 +69,4 @@ ifdef(`CFG_C_DEF',
 `#define' `__SPECTRUM_128_P2A'   __SPECTRUM_128_P2A
 `#define' `__SPECTRUM_128_P3'    __SPECTRUM_128_P3
 `#define' `__SPECTRUM_PENTAGON'  __SPECTRUM_PENTAGON
-
-`#define' `__SPECTRUM_128_MASK'  __SPECTRUM_128_MASK
 ')

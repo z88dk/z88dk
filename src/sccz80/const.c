@@ -23,7 +23,7 @@
 #include <math.h>
 #include "lib/utlist.h"
 
-static int get_member_size(TAG_SYMBOL *ptr);;
+static SYMBOL *get_member(TAG_SYMBOL *ptr);;
 
 
 
@@ -32,7 +32,7 @@ typedef struct elem_s {
     int            refcount;
     int            litlab;
     double         value;
-    unsigned char  fa[6];      /* The parsed representation */
+    unsigned char  fa[MAX_MANTISSA_SIZE+1];      /* The parsed representation */
     char           str[60];    /* A raw string version */
 } elem_t;
 
@@ -413,17 +413,20 @@ unsigned char litchar()
 }
 
 /* Perform a sizeof (works on variables as well */
-/* FIXME: Should also dereference pointers... */
 void size_of(LVALUE* lval)
 {
     char sname[NAMESIZE];
     int length;
     TAG_SYMBOL* otag;
-    SYMBOL* ptr;
+    SYMBOL *ptr;
     struct varid var;
     enum ident_type ident;
+    int          deref = 0;
 
     needchar('(');
+    while ( cmatch('*') ) {
+        deref++;
+    }
     otag = GetVarID(&var, NO);
     if (var.type != NO) {
         ident = var.ident;
@@ -435,29 +438,22 @@ void size_of(LVALUE* lval)
             else
                 ident = VARIABLE;
         }
+
+        if ( deref && ident !=  POINTER  ) {
+            uint32_t   argvalue = CalcArgValue(var.type, var.ident,((var.sign & UNSIGNED) | (var.zfar & FARPTR)));
+            char       got[256];
+
+            ExpandArgValue(argvalue, got, 0);
+            error(E_SIZEOF,got);
+            lval->const_val = 2;
+            return;
+        }
         if (otag && ident == VARIABLE)
             lval->const_val = otag->size;
         if (ident == POINTER) {
             lval->const_val = (var.zfar ? 3 : 2);
         } else {
-            switch (var.type) {
-            case CCHAR:
-                lval->const_val = 1;
-                break;
-            case CINT:
-                lval->const_val = 2;
-                break;
-            case LONG:
-                lval->const_val = 4;
-                break;
-            case DOUBLE:
-                lval->const_val = 6;
-                break;
-            case STRUCT:
-                lval->const_val = get_member_size(otag);
-                if (lval->const_val == 0)
-                    lval->const_val = otag->size;
-            }
+            lval->const_val = get_type_size(var.type, var.ident, (var.zfar & FARPTR), otag);
         }
     } else if (cmatch('"')) { /* Check size of string */
         length = 1; /* Always at least one */
@@ -466,31 +462,85 @@ void size_of(LVALUE* lval)
             litchar();
         };
         lval->const_val = length;
+        if ( deref ) 
+            lval->const_val = 1;
     } else if (symname(sname)) { /* Size of an object */
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
-            /* Actually found sommat..very good! */
+            int ptrtype = -1;  /* Type of the pointer */
+            enum symbol_flags ptrflags;
+            TAG_SYMBOL *ptrotag = NULL;
+
             if (ptr->ident != FUNCTION && ptr->ident != MACRO) {
                 if (ptr->type != STRUCT) {
-                    lval->const_val = ptr->size;
-                } else {
-                    lval->const_val = get_member_size(tagtab + ptr->tag_idx);
-                    if (lval->const_val == 0)
+                    if ( ptr->ident == POINTER && deref ) {
+                        ptrtype = ptr->type;
+                        ptrflags = ptr->flags;
+                        if ( ptr->type == STRUCT ) 
+                            ptrotag = tagtab + ptr->tag_idx;
+                    } else {
                         lval->const_val = ptr->size;
+                    }
+                } else {
+                    SYMBOL *mptr;
+                    /* We're a member of a structure */
+                    do {
+                        if ( (mptr = get_member(tagtab + ptr->tag_idx) ) != NULL ) {
+                            ptr = mptr;
+                            ptrtype = 0;
+                            ptrotag = NULL;
+                            if ( ptr->ident == POINTER && deref ) {
+                                ptrtype = ptr->type;
+                                ptrflags = ptr->flags;
+                                if  (ptr->type == STRUCT) {
+                                    ptrotag = tagtab + ptr->tag_idx;
+                                }
+                            } else {
+                                // tag_sym->size = numner of elements
+                                lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+                            }
+                        } else {
+                            lval->const_val = ptr->size;
+                        }
+                    } while ( ptr->type == STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
-                if (ptr->ident == ARRAY && rcmatch('[')) {
-                    double val;
-                    int valtype;
-                    needchar('[');
-                    constexpr(&val, &valtype,  1);
-                    needchar(']');
-                    lval->const_val = get_type_size(ptr->type, tagtab + ptr->tag_idx);
+                if (ptr->ident == ARRAY ) {
+                    if (rcmatch('[')) {
+                        double val;
+                        int valtype;
+                        needchar('[');
+                        constexpr(&val, &valtype,  1);
+                        needchar(']');
+                        deref++;
+                        lval->const_val = get_type_size(ptr->type, VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
+                    }
+                    if ( deref ) {
+                        if ( deref == 1 ) {
+                            ptrtype = ptr->type;
+                            ptrotag = tagtab + ptr->tag_idx;
+                        } else {
+                            ptrtype = dummy_sym[(int)ptr->more]->type;
+                            ptrotag = tagtab + dummy_sym[(int)ptr->more]->tag_idx;
+                        }
+                        ptrflags = ptr->flags;
+                    }
+                }
+                if ( deref > 0 ) {
+                    if ( ptrtype != -1 ) {
+                        lval->const_val = get_type_size(ptrtype, VARIABLE, ptrflags, ptrotag);
+                    } else {
+                        uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
+                        char       got[256];
+
+                        ExpandArgValue(argvalue, got, ptr->tag_idx);
+                        error(E_SIZEOF,got);
+                    }
                 }
             } else {
-                warning(W_SIZEOF);
-                /* good enough default? */
                 lval->const_val = 2;
             }
+        } else {
+            error(E_UNSYMB, sname);
         }
     }
     needchar(')');
@@ -500,28 +550,37 @@ void size_of(LVALUE* lval)
     vconst(lval->const_val);
 }
 
-static int get_member_size(TAG_SYMBOL* ptr)
+static SYMBOL *get_member(TAG_SYMBOL* ptr)
 {
     char sname[NAMESIZE];
     SYMBOL* ptr2;
-    if (cmatch('.') == NO && match("->") == NO)
-        return (0);
 
-    if (symname(sname) && (ptr2 = findmemb(ptr, sname)))
-        return ptr2->size;
+    if (cmatch('.') == NO && match("->") == NO)
+        return NULL;
+
+    if (symname(sname) && (ptr2 = findmemb(ptr, sname))) {
+        return ptr2;
+    }
     error(E_UNMEMB, sname);
-    return (0);
+    return NULL;
 }
 
-void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
+void dofloat(double raw, unsigned char fa[])
 {
     double norm;
     double x = fabs(raw);
     double exp = log(x) / log(2);
     int i;
+    int mant_bytes = c_fp_mantissa_bytes;
+    int exp_bias = c_fp_exponent_bias;
+
+    if (mant_bytes > MAX_MANTISSA_SIZE ) {
+        mant_bytes = MAX_MANTISSA_SIZE;
+    }
+
 
     if (x == 0.0) {
-        fa[0] = fa[1] = fa[2] = fa[3] = fa[4] = fa[5] = 0;
+        memset(fa, 0, MAX_MANTISSA_SIZE + 1);
         return;
     }
 
@@ -563,12 +622,12 @@ void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 }
 
 
-elem_t *get_elem_for_fa(unsigned char fa[6], double value) 
+elem_t *get_elem_for_fa(unsigned char fa[], double value) 
 {
     elem_t  *elem;
 
     LL_FOREACH(double_queue, elem ) {
-        if ( memcmp(elem->fa, fa, 6) == 0 ) {
+        if ( memcmp(elem->fa, fa, c_fp_mantissa_bytes + 1) == 0 ) {
             return elem;
         }
     }
@@ -627,7 +686,7 @@ void write_double_queue(void)
 
 void decrement_double_ref_direct(double value)
 {
-    LVALUE lval;
+    LVALUE lval={0};
 
     lval.const_val = value;
 
@@ -636,7 +695,7 @@ void decrement_double_ref_direct(double value)
 
 void decrement_double_ref(LVALUE *lval)
 {   
-    unsigned char    fa[6];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1];
     elem_t          *elem;
     if ( c_double_strings ) {
         char  buf[40];
@@ -644,19 +703,20 @@ void decrement_double_ref(LVALUE *lval)
         elem = get_elem_for_buf(buf,lval->const_val);
         elem->refcount--;
     } else {
-        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
+        dofloat(lval->const_val, fa);
         elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount--;
     }
 }
 
+
 void load_double_into_fa(LVALUE *lval)
 {            
-    unsigned char    fa[6];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1];
     elem_t          *elem;
 
-    fa[0] = fa[1] = fa[2] = fa[3] = fa[4] = fa[5] = 0;
-
+    memset(fa, 0, sizeof(fa));
+    
     if ( c_double_strings ) {
         char  buf[40];
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
@@ -668,8 +728,8 @@ void load_double_into_fa(LVALUE *lval)
         callrts("__atof2");
         WriteDefined("math_atof", 1);
     } else {
-        dofloat(lval->const_val, fa, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
-
+        dofloat(lval->const_val, fa);
+        
         elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount++;
         immedlit(elem->litlab);

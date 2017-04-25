@@ -4,7 +4,7 @@
 #ifndef _INTRINSIC_H
 #define _INTRINSIC_H
 
-#ifdef Z88DK_USES_SDCC
+#ifdef __SDCC
 
 // SDCC COMPILES
 // disable warnings connected to intrinsics

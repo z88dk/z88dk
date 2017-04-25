@@ -29,13 +29,21 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
+	
 	cp	12
 	jr	nz,nocls
-
 	ld	a,0
 	ld	(6800h),a	; force TEXT mode
 	jp	457
 .nocls
+
+IF STANDARDESCAPECHARS
+	cp  10
+	jr  nz,notCR
+	ld	a,13
+	jr setout
+.notCR
+ENDIF
 
 	; Some undercase text?  Transform in UPPER !
 	cp	97
@@ -45,12 +53,11 @@
 .nounder
 	; Transform the UPPER to INVERSE TEXT
 	; Naah! That was orrible!
-	;cp	65
-	;jr	c,noupper
-	;add	a,128
+	cp	65
+	jr	c,noupper
+	add	a,128
 .noupper
 	; Some more char remapping can stay here...
 .setout
-	call	826
-	ret
+	jp	826
 

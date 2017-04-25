@@ -201,9 +201,8 @@ start:
 	ld sp, ($FC4A)
 	ei
 
-	call	crt0_init_bss
-
 ; port fixing; required for ROMs
+; port fixing = set the memory configuration, must be first!
 
 	in a,($A8)
 	and a, $CF
@@ -215,6 +214,7 @@ start:
 	or d
 	out ($A8),a
 
+	call	crt0_init_bss
         
 IF (HEAPSIZE > 4)
         

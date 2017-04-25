@@ -9,10 +9,6 @@
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
 
-#ifdef __RCMX000__
-#define SIMPLIFIED_STDIO
-#endif
-
 #ifdef __SPECTRUM__
 #include <spectrum.h>
 #endif

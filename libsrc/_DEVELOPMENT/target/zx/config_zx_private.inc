@@ -41,8 +41,6 @@ defc __SPECTRUM_128_P2A  = 8
 defc __SPECTRUM_128_P3   = 16
 defc __SPECTRUM_PENTAGON = 32
 
-defc __SPECTRUM_128_MASK = 62
-
 
 
 

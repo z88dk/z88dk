@@ -10,24 +10,25 @@ dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "config_zx_public.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
 include "crt_config.inc"
-include "../crt_rules.inc"
+include(`../crt_rules.inc')
+include(`zx_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "crt_memory_map.inc"
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-include "config_zx_public.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -63,24 +64,30 @@ dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
 dnl############################################################
 
-ifndef CRT_FONT
+ifndef CRT_OTERM_FONT_8X8
 
-   PUBLIC CRT_FONT
+   PUBLIC CRT_OTERM_FONT_8X8
    EXTERN _font_8x8_rom
-   defc CRT_FONT = _font_8x8_rom
+   defc CRT_OTERM_FONT_8X8 = _font_8x8_rom
 
 endif
 
 include(`../clib_instantiate_begin.m4')
 
-include(`driver/terminal/zx_01_input_kbd_inkey.m4')dnl
-m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64, 1, 500, 15)dnl
+ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
+`
+   include(`driver/terminal/zx_01_input_kbd_inkey.m4')dnl
+   m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE, CRT_ITERM_INKEY_DEBOUNCE, CRT_ITERM_INKEY_REPEAT_START, CRT_ITERM_INKEY_REPEAT_RATE)dnl
 
-include(`driver/terminal/zx_01_output_char_32.m4')dnl
-m4_zx_01_output_char_32(_stdout, 0x2370, 0, 0, 0, 32, 0, 24, 0, CRT_FONT, 56, 0, 56)dnl
+   include(`driver/terminal/zx_01_output_char_32.m4')dnl
+   m4_zx_01_output_char_32(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, CRT_OTERM_FONT_8X8, CRT_OTERM_TEXT_COLOR, CRT_OTERM_TEXT_COLOR_MASK, CRT_OTERM_BACKGROUND_COLOR)dnl
 
-include(`../m4_file_dup.m4')dnl
-m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+   include(`../m4_file_dup.m4')dnl
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+',
+`
+   include(`crt_driver_instantiation.asm.m4')
+')
 
 include(`../clib_instantiate_end.m4')
 

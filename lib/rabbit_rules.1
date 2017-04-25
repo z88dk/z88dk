@@ -30,6 +30,7 @@
 	ld	hl,(sp + %1)
 	ex	de,hl
 	ld	hl,(sp + %1 + 2)
+	ex	de,hl
 
 %check 0 <= %1 <= 127
 	ld	hl,%1	;const
@@ -105,6 +106,76 @@
 =
 	ld	hl,(hl+0)
 
+	ld	hl,0	;const
+=
+	bool	hl
+	rr	hl
+
+	pop	hl
+	push	hl
+=
+	ld	hl,(sp + 0)
+
+	pop	bc
+	defb	0xc4, 0	; ld hl,(sp + 0)
+	push	bc
+=
+	ld	hl,(sp + 2)
+
+; bool clears the carry flag
+=
+
+
+	call	l_lneg
+	jp	c,%1
+=
+	bool	hl
+	dec	hl
+	bool	hl
+	jp	nz,%1
+
+	call	l_lneg
+	jp	nc,%1
+=
+	bool	hl
+	dec	hl
+	bool	hl
+	jp	z,%1
+
+	call	l_lneg
+	call	c,%1
+=
+	bool	hl
+	dec	hl
+	bool	hl
+	call	nz,%1
+
+	call	l_lneg
+	call	nc,%1
+=
+	bool	hl
+	dec	hl
+	bool	hl
+	call	z,%1
+
+	call	l_lneg
+	ccf
+	call	c,%1
+=
+	bool	hl
+	dec	hl
+	bool	hl
+	call	nz,%1
+
+	call	l_lneg
+	ccf
+	call	nc,%1
+=
+	bool	hl
+	dec	hl
+	bool	hl
+	call	z,%1
+
 	ld	hl,(sp + %1)
 =
 	defb	0xc4, %1	; ld hl,(sp + %1)
@@ -170,7 +241,7 @@
 	pop	de
 =
 	ex	de,hl
-	defc	0xc4, %2
+	defb	0xc4, %2
 
 	ld	hl,(hl%1)
 =

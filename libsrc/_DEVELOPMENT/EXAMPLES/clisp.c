@@ -16,7 +16,7 @@
 
 // more information including examples in z88dk/examples/clisp
 
-#pragma output CLIB_OPT_PRINTF         = 0x00001200   // printf has %(ld)s enabled only
+#pragma printf = "%ld %s"
 
 #ifdef __SPECTRUM
 

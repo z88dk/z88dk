@@ -1,20 +1,40 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-
 
 include ../Make.config
 
+TARGET ?= test
+GENOBJECTS = assert.o
+ASMFILES = $(wildcard *.asm)
 
-all: assert.o
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
 
-generic_iy:
-	zcc +test $(CFLAGS) -Ca--IXIY assert.c
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) 
 
-.c.o:
-	zcc +test $(CFLAGS) $*.c
+obj/z80/%.o: %.c
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
 
+obj/z80/%.o: %.asm
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.c
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.asm
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.c
+	zcc +rcmx000 $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.asm
+	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
+
+obj/$(TARGET)/%.o: %.c
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+obj/$(TARGET)/%.o: %.asm
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+dirs:
+	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/$(TARGET)
 
 clean:
-	$(RM) *.o* *.sym *.map *~ *.err  zcc_opt.def
-	$(RM) assert.asm *.i
+	$(RM) -fr obj

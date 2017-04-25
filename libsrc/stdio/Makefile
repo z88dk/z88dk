@@ -13,7 +13,7 @@ AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
-all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES))
+all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
 
 obj/ixiy/%.o: %.asm
 	zcc +test $(CFLAGS) -Ca--IXIY -Ca-I../ -c -o $@ $^
@@ -45,11 +45,18 @@ obj/stdesc/%.o: %.asm
 obj/stdesc/%.o: %.c
 	zcc +test $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
 
+obj/r2k/%.o: %.asm
+	zcc +rcmx000 -Ca-DFORrcmx000 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Ca-I../ -Cc-standard-escape-chars -c -o $@ $^
+
+obj/r2k/%.o: %.c
+	zcc +rcmx000 $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
+
+
 
 
 .PHONY: dirs
 dirs:
-	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/cpm obj/stdesc
+	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/cpm obj/stdesc obj/r2k
 
 
 

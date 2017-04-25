@@ -19,8 +19,8 @@
  *
  */
 
-#pragma output CLIB_OPT_PRINTF       = 0x04000201  // %sdf enabled
-#pragma output CLIB_OPT_SCANF        = 0x00200201  // %sd[ enabled
+#pragma printf = "%s %d %f"
+#pragma scanf  = "%s %d %["
 
 #pragma output CLIB_EXIT_STACK_SIZE  = 0
 #pragma output CLIB_MALLOC_HEAP_SIZE = 128

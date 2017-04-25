@@ -6,38 +6,14 @@
  *
  */
 
-/* 9/9/98 djm - Modified plnge2a to use unsigned functions for unsigned
- *              variables, seems to be fine..
- *
- * Have added parameter to addconst, so to not do long add for stack ops
- *
- */
-
-/* 14/9/98 Some conditional long pointer stuff inserted
- *
- * 5/10/98 Some simple prototyping 
- *
- *13/11/98 Radically changed handling of longs - now they are pushed onto
- *         the stack instead of being held in alternate register set
- */
 
 #include "ccdefs.h"
 
-/* Clear the casting markers */
-void ClearCast(LVALUE* lval)
-{
-    lval->c_vtype = lval->c_id = lval->c_flags = 0;
-    lval->c_tag = (TAG_SYMBOL*)0;
-    lval->level = 0;
-    lval->castlevel = 0;
-}
 
 int expression(int  *con, double *val, uint32_t *packedArgumentType)
 {
     LVALUE lval={0};
     char type;
-
-    ClearCast(&lval);
 
     if (heir1(&lval)) {
         rvalue(&lval);
@@ -61,15 +37,12 @@ int expression(int  *con, double *val, uint32_t *packedArgumentType)
 int heir1(LVALUE* lval)
 {
     char *before, *start;
-    LVALUE lval2, lval3;
+    LVALUE lval2={0}, lval3={0};
     void (*oper)(LVALUE *lval) = NULL;
     void  (*doper)(LVALUE *lval) = NULL;
     void (*constoper)(LVALUE *lval, int32_t constvalue) = NULL;
     int k;
 
-    ClearCast(&lval2);
-    ClearCast(&lval3);
-    lval2.level = lval3.level = lval->level;
     setstage(&before, &start);
     k = plnge1(heir1a, lval);
     if (lval->is_const) {
@@ -120,8 +93,9 @@ int heir1(LVALUE* lval)
 #endif
             } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
                 warning(W_INTPTR);
-        } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const)))
+        } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const))) {
             warning(W_PTRINT);
+        }
 
         // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
         if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
@@ -197,12 +171,6 @@ int heir1(LVALUE* lval)
     else
         plnge2a(heir1, lval, &lval2, oper, doper, constoper);
 
-    /*
-     * djm 23/2/99 Major flaw in the plan here Ron, we don't check the
-     * types properly before storing, this one left open for years!!!
-     * So we we do int+=double we don't get the right value (slaps head
-     * and runs round the room!)
-     */
     force(lval3.val_type, lval->val_type, lval3.flags & UNSIGNED, lval->flags & UNSIGNED, lval->is_const);
     smartstore(&lval3);
     return 0;
@@ -214,22 +182,18 @@ int heir1(LVALUE* lval)
 int heir1a(LVALUE* lval)
 {
     int falselab, endlab, skiplab;
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
     int temptype;
-    ClearCast(&lval2);
 
-    lval2.level = lval->level;
     k = heir2a(lval);
     if (cmatch('?')) {
         /* evaluate condition expression */
         if (k)
             rvalue(lval);
         /* test condition, jump to false expression evaluation if necessary */
-        if (DoTestJump(lval)) {
-            /*
- * Always evaluated as an integer, so fake it temporarily
- */
+        if (check_lastop_was_testjump(lval)) {
+            // Always evaluated as an integer, so fake it temporarily
             force(CINT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
             temptype = lval->val_type;
             lval->val_type = CINT; /* Force to integer */
@@ -309,11 +273,9 @@ int heir2b(LVALUE* lval)
 
 int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value))
 {
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
 
-    ClearCast(&lval2);
-    lval2.level = lval->level;
     k = plnge1(heir, lval);
     blanks();
     if ((ch() != opch) || (nch() == '=') || (nch() == opch))
@@ -346,11 +308,8 @@ int heir4(LVALUE* lval)
 
 int heir5(LVALUE* lval)
 {
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
-
-    ClearCast(&lval2);
-    lval2.level = lval->level;
 
     k = plnge1(heir6, lval);
     blanks();
@@ -370,11 +329,8 @@ int heir5(LVALUE* lval)
 
 int heir6(LVALUE* lval)
 {
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
-
-    ClearCast(&lval2);
-    lval2.level = lval->level;
 
     k = plnge1(heir7, lval);
     blanks();
@@ -404,11 +360,8 @@ int heir6(LVALUE* lval)
 
 int heir7(LVALUE* lval)
 {
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
-
-    ClearCast(&lval2);
-    lval2.level = lval->level;
 
     k = plnge1(heir8, lval);
     blanks();
@@ -436,11 +389,9 @@ int heir7(LVALUE* lval)
 
 int heir8(LVALUE* lval)
 {
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
 
-    ClearCast(&lval2);
-    lval2.level = lval->level;
 
     k = plnge1(heir9, lval);
     blanks();
@@ -462,10 +413,8 @@ int heir8(LVALUE* lval)
 
 int heir9(LVALUE* lval)
 {
-    LVALUE lval2;
+    LVALUE lval2={0};
     int k;
-    ClearCast(&lval2);
-    lval2.level = lval->level;
 
     k = plnge1(heira, lval);
     blanks();
@@ -537,9 +486,10 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     return lval->symbol;
 }
 
-int heira(LVALUE* lval)
+int heira(LVALUE *lval)
 {
     int k, j;
+    LVALUE  cast_lval={0};
     TAG_SYMBOL* otag;
     struct varid var;
     char ident;
@@ -561,17 +511,25 @@ int heira(LVALUE* lval)
             /*
  * Scrunch everything together, replace c_ptype with c_id
  */
-            lval->c_vtype = var.type;
-            lval->c_id = ident;
-            lval->c_tag = otag;
-            lval->c_flags = var.sflag;
-            lval->castlevel = lval->level;
+            cast_lval.c_vtype = var.type;
+            cast_lval.c_id = ident;
+            cast_lval.c_tag = otag;
+            cast_lval.c_flags = var.sflag;
             needchar(')');
             for ( j = 0; j < save_fps_num; j++ ) {
                  fprintf(buffer_fps[j],"%.*s",lptr-klptr,line+klptr);
             }
             buffer_fps_num = save_fps_num;
-            return (heira(lval));
+            k = heira(lval);
+            if ( k == 1 ) { // If we need to fetch then we should cast what we get 
+                lval->c_vtype = cast_lval.c_vtype;
+                lval->c_id = cast_lval.c_id;
+                lval->c_tag = cast_lval.c_tag;
+                lval->c_flags = cast_lval.c_flags;
+            } else {
+                if (cast_lval.c_vtype ) docast(&cast_lval, lval);
+            }
+            return k;
         } else {
             lptr = klptr;
         }
@@ -611,13 +569,6 @@ int heira(LVALUE* lval)
     } else if (cmatch('*')) { /* unary * */
         if (heira(lval))
             rvalue(lval);
-        /* Cast the symbol before derefencing.. */
-        if (lval->c_id /* != VARIABLE */) {
-            j = docast(lval, 1);
-            if (j)
-                lval->indirect = lval->c_vtype;
-        }
-
         if (lval->symbol == 0) {
             error(E_DEREF);
             junk();
@@ -631,18 +582,8 @@ int heira(LVALUE* lval)
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
-            /* OK to take address of struct */
-            if (lval->tagsym == 0 || lval->ptr_type != STRUCT || (lval->symbol && lval->symbol->ident == ARRAY ) ) {
-                error(E_ADDRESS);
-            }
             return 0;
         }
-        /*
- * Do the cast in here and convert the type, but don't generate any
- * code..
- */
-        if (lval->c_vtype)
-            docast(lval, NO);
 
         if (lval->symbol) {
             lval->ptr_type = lval->symbol->type;
@@ -660,26 +601,18 @@ int heira(LVALUE* lval)
         address(lval->symbol);
         lval->indirect = lval->symbol->type;
         return 0;
-    } else {
-
-        k = heirb(lval);
-
-        /*
- * djm 2/3/99 Removed if (k) because heirb returns 0 for a function
- * hopefully this will work, also inserted the check for VOID
- */
-        if (k)
-            ltype = lval->val_type; /* djm 28/11/98 */
-        if (match("++")) {
-            poststep(k, lval, 1, inc, dec);
-            return 0;
-        } else if (match("--")) {
-            poststep(k, lval, -1, dec, inc);
-
-            return 0;
-        } else
-            return k;
     }
+
+    k = heirb(lval);
+
+    if (match("++")) {
+        poststep(k, lval, 1, inc, dec);
+        return 0;
+    } else if (match("--")) {
+        poststep(k, lval, -1, dec, inc);
+        return 0;
+    } 
+    return k;
 }
 
 int heirb(LVALUE* lval)
@@ -739,7 +672,7 @@ int heirb(LVALUE* lval)
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                        addconst(val, 1, 0);
+                        zadd_const(lval, val);
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
@@ -793,10 +726,6 @@ int heirb(LVALUE* lval)
                         lval->tagsym = tagtab + ptr->tag_idx;
                     }
                 }
-                /* Perform the cast here */
-                if (lval->c_vtype)
-                    docast(lval, YES);
-
             }
             /* Handle structures... come in here with lval holding tehe previous
              * pointer to the struct thing..*/
@@ -820,8 +749,6 @@ int heirb(LVALUE* lval)
                 if (k && direct == 0)
                     rvaluest(lval);
 
-                if (lval->c_tag)
-                    docast(lval, NO);
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = ptr->flags;
                 if (direct == 0) {
@@ -834,7 +761,7 @@ int heirb(LVALUE* lval)
                 }
                 lval->flags = flags;
 
-                addconst(ptr->offset.i, 1, ptr->flags & FARPTR);
+                zadd_const(lval, ptr->offset.i);
                 lval->symbol = ptr;
                 lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;

@@ -34,7 +34,7 @@ typedef unsigned int           uint_fast8_t;
 typedef unsigned int           uint_fast16_t;
 typedef unsigned long          uint_fast32_t;
 
-#ifdef Z88DK_USES_SDCC
+#ifdef __SDCC
 
 typedef long long              int64_t;
 typedef unsigned long long     uint64_t;

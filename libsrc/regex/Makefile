@@ -6,12 +6,14 @@ CFILES = regexp.c regsub.c regerror.c
 AFILES  = $(CFILES:.c=.opt)
 OBJECTS = $(CFILES:.c=.o)
 
-all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS))
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))
 
 
 dirs:
-	@mkdir -p obj/z80 obj/r2k
+	@mkdir -p obj/z80 obj/r2k obj/ixiy
 
+obj/ixiy/%.o: %.c
+	zcc +test -Ca--IXIY $(CFLAGS) -o $@ -c $^
 
 obj/z80/%.o: %.c
 	zcc +test $(CFLAGS) -o $@ -c $^

@@ -50,7 +50,7 @@ extern unsigned long __LIB__               strtoul(const char *s, char **endp, i
 #define strtol(a,b,c)  strtol_callee(a,b,c)
 #define strtoul(a,b,c) strtol_callee(a,b,c)
 
-#ifdef Z88DK_USES_SDCC
+#ifdef __SDCC
 /* 64 bit is only available with sdcc */
 extern long long atoll(char *buf) __stdc;
 extern long long atoll_callee(char *buf) __z88dk_callee __stdc;
@@ -158,7 +158,7 @@ extern void __LIB__  qsort_sccz80_callee(void *base, unsigned int nel, unsigned 
 extern void __LIB__  qsort_sdcc(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
 extern void __LIB__  qsort_sdcc_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
 
-#ifdef Z88DK_USES_SDCC
+#ifdef __Z88DK_R2L_CALLING_CONVENTION
 
 #define qsort                  qsort_sdcc
 #define qsort_sdcc(a,b,c,d)    qsort_sdcc_callee(a,b,c,d)

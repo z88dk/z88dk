@@ -38,6 +38,7 @@ typedef struct udk_s
 #define IN_STICK_FIRE    0x80
 #define IN_STICK_FIRE_1  0x80
 #define IN_STICK_FIRE_2  0x40
+#define IN_STICK_FIRE_3  0x20
 
 #define IN_STICK_UP      0x01
 #define IN_STICK_DOWN    0x02
@@ -65,6 +66,10 @@ typedef struct udk_s
 
 #ifdef __CPM
 #include <input/input_cpm.h>
+#endif
+
+#ifdef __SMS
+#include <input/input_sms.h>
 #endif
 
 #ifdef __SPECTRUM

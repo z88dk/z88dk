@@ -1,0 +1,145 @@
+
+
+
+	MODULE	Issue_26_casting
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._far_pointer_cast
+	ld	hl,0	;const
+	push	hl
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	de,0
+	call	lp_glong
+	pop	bc
+	call	l_plong
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._far_pointer_cast2
+	ld	hl,0	;const
+	push	hl
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	de,0
+	call	lp_gint
+	call	l_int2long_s
+	pop	bc
+	call	l_plong
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._far_pointer_cast3
+	ld	hl,0	;const
+	dec	sp
+	ld	a,e
+	pop	de
+	ld	e,a
+	push	de
+	push	hl
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_getptr
+	call	l_glong
+	pop	bc
+	call	l_plong
+	inc	sp
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._struct_cast
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	push	hl
+	push	bc
+	pop	hl
+	pop	bc
+	ret
+
+
+
+._writetext
+	ld	hl,2	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	a,h
+	or	120
+	ld	h,a
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	pop	de
+	call	l_or
+	push	hl
+	call	_SMS_setAddr
+	pop	bc
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	PUBLIC	_far_pointer_cast
+	PUBLIC	_far_pointer_cast2
+	PUBLIC	_far_pointer_cast3
+	PUBLIC	_struct_cast
+	EXTERN	_SMS_setTile
+	PUBLIC	_writetext
+	EXTERN	_SMS_setAddr
+
+
+
+

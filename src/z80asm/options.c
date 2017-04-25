@@ -185,16 +185,20 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 break;
 
             case OptCallArg:
-                if ( *opt_arg_ptr )
-                    ( ( void ( * )( char * ) )( opts_lu[j].arg ) )( opt_arg_ptr );
+				if (*opt_arg_ptr) {
+					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+					((void(*)(char *))(opts_lu[j].arg))(opt_arg_ptr);
+				}
                 else
                     error_illegal_option( argv[II] );
 
                 break;
 
             case OptString:
-                if ( *opt_arg_ptr )
+				if (*opt_arg_ptr) {
+					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
                     *( ( char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
+				}
                 else
                     error_illegal_option( argv[II] );
 
@@ -204,6 +208,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 				if (*opt_arg_ptr)
 				{
 					UT_array **p_path = (UT_array **)opts_lu[j].arg;
+					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
 					utarray_push_back(*p_path, &opt_arg_ptr);
 				}
                 else
@@ -287,6 +292,7 @@ static char *expand_environment_variables(char *arg)
 	char  *rep, *start;
 	char  *value = strdup(arg);
 	char   varname[300];
+	char  *ret;
 
 	start = value;
 	while ((ptr = strchr(start, '$')) != NULL) 
@@ -316,8 +322,9 @@ static char *expand_environment_variables(char *arg)
 		}
 	}
 
+	ret = strpool_add(value);		// free memory, return pooled string
 	free(value);
-	return nval ? nval : arg;
+	return ret;
 }
 
 /* From: http://creativeandcritical.net/str-replace-c/ */

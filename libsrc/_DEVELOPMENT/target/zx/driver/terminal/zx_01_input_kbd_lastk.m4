@@ -25,7 +25,7 @@ define(`m4_zx_01_input_kbd_lastk',dnl
    ;
    ; ioctl_flags   : $3
    ; buffer size   : $4 bytes
-   ; LASTK address : `ifelse($5,0,`(none)',$5)'
+   ; LASTK address : $5
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    `ifelse($1,0,,dnl   

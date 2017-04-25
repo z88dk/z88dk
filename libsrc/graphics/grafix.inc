@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,  (v 1.58 2016/11/28) - 2017-> stefano Exp $
+;	$Id: grafix.inc,  (v 1.58+..   GIT imported) $
 ;
 
 
@@ -186,6 +186,12 @@ IF FORmsx
 	defc fcolor	= 1
 ENDIF
 
+IF FORmz
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 50
+ENDIF
+
 IF FORsvi
 	DEFINE gotgfx
 	defc maxx	= 256
@@ -346,6 +352,18 @@ IF FORpx8
 	DEFINE gotgfx
 	defc maxx	= 480
 	defc maxy	= 64
+ENDIF
+
+IF FORnc100
+	DEFINE gotgfx
+	defc maxx	= 480
+	defc maxy	= 64
+ENDIF
+
+IF FORnc200
+	DEFINE gotgfx
+	defc maxx	= 480
+	defc maxy	= 128
 ENDIF
 
 IF FORvg5k

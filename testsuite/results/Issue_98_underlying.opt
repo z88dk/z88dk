@@ -167,11 +167,8 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	push	de
-	push	hl
-	ld	hl,65534	;const
-	ld	de,65535
-	call	l_long_add
+	call	l_declong
+	call	l_declong
 	ret
 
 
@@ -186,11 +183,8 @@
 	add	hl,sp
 	call	l_glong
 	call	l_long_mult
-	push	de
-	push	hl
-	ld	hl,65534	;const
-	ld	de,65535
-	call	l_long_add
+	call	l_declong
+	call	l_declong
 	ret
 
 

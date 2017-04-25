@@ -3,11 +3,11 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC _sms_memset_vram
+PUBLIC sms_memset_vram
 
 EXTERN asm_sms_memset_vram
 
-_sms_memset_vram:
+sms_memset_vram:
 
    pop af
    pop bc

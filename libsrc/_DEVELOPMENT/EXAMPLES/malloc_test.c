@@ -10,6 +10,8 @@
 
 #ifdef WALK
 
+#pragma printf = "%s %u"
+
 void visit_heap_block(heap_info_t *hi)
 {
    switch (hi->type)
@@ -28,8 +30,6 @@ void visit_heap_block(heap_info_t *hi)
    printf("@ %05u size %04u bytes\n", (unsigned int)(hi->address), hi->size);
 }
 
-#pragma output CLIB_OPT_PRINTF = 0x202
-
 #endif
 
 #ifdef PRINTF
@@ -38,7 +38,7 @@ void visit_heap_block(heap_info_t *hi)
    #define PRINTF3(a,b,c)     printf(a,b,c)
    #define PRINTF4(a,b,c,d)   printf(a,b,c,d)
    #define IOCTL(a,b,c)       ioctl(a,b,c)
-   #pragma output CLIB_OPT_PRINTF = 0x202
+	#pragma printf = "%s %u"
 #else
    #define PRINTF1(a)
    #define PRINTF2(a,b)

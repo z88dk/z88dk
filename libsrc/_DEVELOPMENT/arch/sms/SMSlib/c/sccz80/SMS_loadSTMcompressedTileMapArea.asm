@@ -20,14 +20,16 @@ SMS_loadSTMcompressedTileMapArea:
    inc sp
    ex (sp),hl
 
+   ld h,a
+
    ; bc = width
    ; de = src
-   ;  a = y
+   ;  h = y
    ;  l = x
-   
-   ld h,a
-   
+   ; stack = ret
+
    pop af
+   push bc                     ; extra item for sccz80 return
    push bc
    push de
    push hl

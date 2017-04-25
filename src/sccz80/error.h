@@ -1,7 +1,7 @@
 /* error.c */
 extern int endst(void);
 extern void illname(char *sname);
-extern void multidef(void);
+extern void multidef(const char *sname);
 extern void needtoken(char *str);
 extern void needchar(char c);
 extern void needlval(void);
@@ -32,7 +32,7 @@ enum warnct {
         
         W_FAR, W_INIT2LONG, W_BADDECL, W_BADSTC, W_ASSPTR,
 
-        W_SIZEOF, W_EXPARG, W_INTDOUB, W_VOID,
+        W_unused, W_EXPARG, W_INTDOUB, W_VOID,
 
         W_BUG1, W_BUG2, W_BITFIELD,
 
@@ -71,6 +71,8 @@ enum errorct {
         E_MISSIF, E_MAXLEVELS, E_MAXGOTO, E_UNGOTO, E_AUTOASSIGN,
 
         E_CHANGING_CONST, E_STATIC_DOUBLE_STRING, E_PORT_DEREF,
+
+        E_SIZEOF,
 
         E_MAXIMUM
 };

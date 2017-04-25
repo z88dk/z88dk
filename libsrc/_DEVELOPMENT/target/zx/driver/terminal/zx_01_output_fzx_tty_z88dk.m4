@@ -47,7 +47,7 @@ define(`m4_zx_01_output_fzx_tty_z88dk',dnl
    ; font          : $10
    ; fzx draw mode : `ifelse($18,0,OR,$18,1,XOR,CLEAR)'
    ; left margin   : $20
-   ; line spacing  : `ifelse($19,0,single,$19,1,one and half,double)'
+   ; line spacing  : $19
    ; space expand  : $21
    ;
    ; text colour   : $11
@@ -177,8 +177,6 @@ define(`m4_zx_01_output_fzx_tty_z88dk',dnl
 
       ; font
       ; cursor (x,y)
-
-      EXTERN $10
 
       defw $10
       defw `$3, $4'

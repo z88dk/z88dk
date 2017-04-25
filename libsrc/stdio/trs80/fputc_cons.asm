@@ -17,10 +17,15 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-;	cp	12
-;	jr	nz,nocls
-;
-;.nocls
+	
+IF STANDARDESCAPECHARS
+	cp  13
+	ret z
+	cp  10
+	jr  nz,notCR
+	ld	a,13
+.notCR
+ENDIF
 
 	; Some undercase text?  Transform in UPPER !
 	cp	97

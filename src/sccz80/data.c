@@ -54,7 +54,7 @@ SW_TAB* swend; /* address of last entry in switch table */
 char line[LINESIZE]; /* parsing buffer */
 char mline[LINESIZE]; /* temp macro buffer */
 int lptr, mptr; /* indexes into buffers */
-char Filename[FILENAME_LEN + 1]; /* output file name */
+char Filename[FILENAME_LEN + 1]; /* original file name */
 
 /*      Misc storage    */
 
@@ -106,7 +106,6 @@ SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
 char endasm;
 
 char margtag; /* Struct tag number for arg value */
-int ltype; /* Long? */
 
 
 /*
@@ -138,13 +137,16 @@ int c_double_strings;
 /*
  *        Framepointer stuff - tis broken!
  */
-int c_useframepointer;
 int c_framepointer_is_ix;
 
 
 int c_use_r2l_calling_convention;
 
 int c_cpu = CPU_Z80;
+
+/* Settings for genmath + math48 */
+int c_fp_mantissa_bytes = 5;
+int c_fp_exponent_bias = 128;
 
 /* scanf format requirements */
 uint32_t scanf_format_option;

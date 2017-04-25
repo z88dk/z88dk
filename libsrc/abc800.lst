@@ -19,7 +19,7 @@ graphics/putsprite_smc
 graphics/liner
 graphics/stencil_render
 graphics/swapgfxbk_foo
-games/joystick
+games/obj/${TARGET}/joystick
 abc800/abc_cursor
 abc800/abc_vdu
 @z80.lst

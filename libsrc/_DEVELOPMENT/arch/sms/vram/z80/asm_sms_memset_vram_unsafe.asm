@@ -8,8 +8,6 @@
 
 ; unsafe version has not been written yet
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_crt_common
 
@@ -26,5 +24,6 @@ defc asm_sms_memset_vram_unsafe = asm_sms_memset_vram
    ;         bc = unsigned int n > 0
    ;
    ; exit  : hl = void *dst, &byte after last written in vram
+   ;         bc = 0
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : f, bc, de, hl

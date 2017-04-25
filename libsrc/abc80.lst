@@ -33,7 +33,7 @@ graphics/putsprite3
 graphics/liner
 graphics/draw_profile_nostencil
 graphics/swapgfxbk_foo
-games/joystick
+games/obj/${TARGET}/joystick
 abc80/abc_inv
 abc80/abc_cursor
 @z80.lst

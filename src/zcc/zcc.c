@@ -281,6 +281,7 @@ static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
 static char  *c_coptrules9 = NULL;
 static char  *c_coptrules_cpu = NULL;
+static char  *c_coptrules_user = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -412,6 +413,7 @@ static arg_t     myargs[] = {
 	{ "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
 	{ "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
 	{ "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
+    { "pragma-output",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def (same as above)" },
 	{ "pragma-export",AF_MORE,PragmaExport,NULL, NULL, "Define the option in zcc_opt.def and export as public" },
 	{ "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
 	{ "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
@@ -455,6 +457,7 @@ static arg_t     myargs[] = {
 	{ "x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files" },
 	{ "-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files" },
 	{ "-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)" },
+	{ "custom-copt-rules", AF_MORE, SetString, &c_coptrules_user, NULL, "Custom user copy rules" },
 	{ "zopt", AF_BOOL_TRUE, SetBoolean, &zopt, NULL, "Enable llvm-optimizer (clang only)" },
 	{ "m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable" },
 	{ "g", AF_MORE, GlobalDefc, &globaldefrefile, &globaldefon, "Generate a global defc file of the final executable (-g, -gp, -gpf filename)" },
@@ -469,6 +472,21 @@ static arg_t     myargs[] = {
 	{ "", 0, NULL, NULL }
 };
 
+
+struct pragma_m4_s {
+    int         seen;
+    const char *pragma;
+    const char *m4_name;
+};
+
+typedef struct pragma_m4_s pragma_m4_t;
+
+pragma_m4_t important_pragmas[] = {
+    { 0, "startup", "__STARTUP" },
+    { 0, "CRT_INCLUDE_DRIVER_INSTANTIATION", "M4__CRT_INCLUDE_DRIVER_INSTANTIATION" },
+    { 0, "CRT_ITERM_EDIT_BUFFER_SIZE", "M4__CRT_ITERM_EDIT_BUFFER_SIZE" },
+    { 0, "CRT_OTERM_FZX_DRAW_MODE", "M4__CRT_OTERM_FZX_DRAW_MODE" },
+};
 
 
 static void *mustmalloc(size_t n)
@@ -889,7 +907,6 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-
 	/* Mangle math lib name but only for classic compiles */
 	if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
 		if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   // -lm appears here
@@ -963,6 +980,43 @@ int main(int argc, char **argv)
 
     build_bin = !m4only && !clangonly && !llvmonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
 
+    /* Create M4 defines out of some pragmas for the CRT */
+    /* Some pragma values need to be known at m4 time in the new c lib CRTs */
+
+    if (build_bin)
+    {
+        if ((fp = fopen(DEFFILE, "r")) != NULL)
+        {
+            unsigned char buffer[LINEMAX + 1];
+            unsigned char *p;
+            long val;
+
+            while (fgets(buffer, LINEMAX, fp) != NULL)
+            {
+                for (i = 0; i < sizeof(important_pragmas)/sizeof(*important_pragmas); ++i)
+                {
+                    if ((!important_pragmas[i].seen) && (p = strstr(buffer, important_pragmas[i].pragma)) && isspace(buffer[p - buffer + strlen(important_pragmas[i].pragma)]) && isspace(*(p-1)))
+                    {
+                        if (sscanf(buffer, " defc %*s = %ld", &val))
+                        {
+                            important_pragmas[i].seen = 1;
+                            snprintf(buffer, sizeof(buffer), "--define=%s=%ld", important_pragmas[i].m4_name, val);
+                            buffer[sizeof(buffer) - 1] = 0;
+                            BuildOptions(&m4arg, buffer);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Could not open %s: File in use?\n", DEFFILE);
+            exit(1);
+        }
+
+        fclose(fp);
+    }
+
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
         // append target crt to end of filelist
@@ -982,11 +1036,23 @@ int main(int argc, char **argv)
     /* crt file is now the first file in filelist */
     c_crt0 = temporary_filenames[0];
 
+    // PLOT TWIST
+    // The crt must be processed last because the new c library now processes zcc_opt.def with m4.
+    // With the crt first, the other .c files have not been processed yet and zcc_opt.def may not be complete.
+    //
+    // To solve let's do something awkward.  Process the files starting at index one but go one larger than
+    // the number of files.  When the one larger number is hit, set the index to zero to do the crt.
+    //
+    // This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.
+
 	// Parse through the files, handling each one in turn
-	for (i = 0; i < nfiles; i++) {
+	for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0))  // HACK 1 OF 2
+    {
+        if (i == nfiles) i = 0;                            // HACK 2 OF 2
 		if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
 	SWITCH_REPEAT:
-		switch (get_filetype_by_suffix(filelist[i])) {
+		switch (get_filetype_by_suffix(filelist[i]))
+        {
 		case M4FILE:
 			if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
 				exit(1);
@@ -1100,9 +1166,16 @@ int main(int argc, char **argv)
 			else
 			{
 				char *before_cpuext = ".asm";
+				char *before_user = ".asm";
 
 				if ( c_coptrules_cpu ) {
 					before_cpuext = ".opc";
+					if ( c_coptrules_user ) {
+						before_user = ".opu";
+					}
+				} else if ( c_coptrules_user ) {
+					before_user = ".opu";
+					before_cpuext = ".opu";
 				}
 				/* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
 				switch (peepholeopt)
@@ -1110,7 +1183,9 @@ int main(int argc, char **argv)
 				case 0:
 					if (process(".opt", before_cpuext, c_copt_exe, c_coptrules9, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				case 1:
@@ -1118,7 +1193,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op1", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				case 2:
@@ -1129,7 +1206,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op2", before_cpuext, c_copt_exe, c_coptrules1, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				default:
@@ -1145,7 +1224,9 @@ int main(int argc, char **argv)
 						exit(1);
 					if (process(".op3", before_cpuext, c_copt_exe, c_coptrules3, filter, i, YES, NO))
 						exit(1);
-					if ( c_coptrules_cpu && process(before_cpuext, ".asm", c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+					if ( c_coptrules_cpu && process(before_cpuext, before_user, c_copt_exe, c_coptrules_cpu, filter, i, YES, NO))
+						exit(1);
+					if ( c_coptrules_user && process(before_user, ".asm", c_copt_exe, c_coptrules_user, filter, i, YES, NO))
 						exit(1);
 					break;
 				}
@@ -1714,8 +1795,8 @@ void GlobalDefc(arg_t *argument, char *arg)
         if (*ptr == 'f')
         {
             // filename containing regular expressions
-            if (*++ptr == '=') ++ptr;
-            while (isspace(*ptr)) ++ptr;
+            ++ptr;
+            while (isspace(*ptr) || (*ptr == '=') || (*ptr == ':')) ++ptr;
 
             if (*ptr != 0)
                 *(char **)argument->data = muststrdup(ptr);
@@ -2163,11 +2244,7 @@ static void configure_misc_options()
 	// the new c lib uses startup=-1 to mean user supplies the crt
 	// current working dir will be different than when using -crt0
 	if (c_startup >= -1) {
-        char tmp[64];
 		write_zcc_defined("startup", c_startup, 0);
-        snprintf(tmp, sizeof(tmp), "--define=__STARTUP=%d", c_startup);
-        tmp[sizeof(tmp) - 1] = 0;
-        BuildOptions(&m4arg, tmp);
 	}
 
 	if (linkargs == NULL) {
@@ -2286,7 +2363,7 @@ static void configure_compiler()
 		if (sdccarg) {
 			add_option_to_compiler(sdccarg);
 		}
-		preprocarg = " -DZ88DK_USES_SDCC=1";
+		preprocarg = " -D__SDCC";
 		BuildOptions(&cpparg, preprocarg);
 		//if ( assembler_type == ASM_Z80ASM ) {
 		//    parse_cmdline_arg("-Ca-sdcc");
@@ -2294,10 +2371,9 @@ static void configure_compiler()
 		c_compiler = c_sdcc_exe;
 		c_cpp_exe = c_sdcc_preproc_exe;
 		compiler_style = filter_outspecified_flag;
-		write_zcc_defined("Z88DK_USES_SDCC", 1, 0);
 	}
 	else {
-		preprocarg = " -DSCCZ80 -DSMALL_C";
+		preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
 		BuildOptions(&cpparg, preprocarg);
 		/* Indicate to sccz80 what assembler we want */
 		snprintf(buf, sizeof(buf), "-asm=%s -ext=opt %s", c_assembler_type,
@@ -2325,7 +2401,7 @@ void PragmaInclude(arg_t *arg, char *val)
 {
 	char *ptr = strip_outer_quotes(val + strlen(arg->name) + 1);
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if (*ptr != '\0') {
 		free(pragincname);
@@ -2339,7 +2415,7 @@ void PragmaRedirect(arg_t *arg, char *val)
 	char *ptr = val + strlen(arg->name) + 1;
 	char *value = "";
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if ((eql = strchr(ptr, '=')) != NULL) {
 		*eql = 0;
@@ -2361,7 +2437,7 @@ void PragmaDefine(arg_t *arg, char *val)
 	int   value = 0;
 	char *eql;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if ((eql = strchr(ptr, '=')) != NULL) {
 		*eql = 0;
@@ -2376,7 +2452,7 @@ void PragmaExport(arg_t *arg, char *val)
 	int   value = 0;
 	char *eql;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	if ((eql = strchr(ptr, '=')) != NULL) {
 		*eql = 0;
@@ -2399,7 +2475,7 @@ void PragmaNeed(arg_t *arg, char *val)
 {
 	char *ptr = val + strlen(arg->name) + 1;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
 	add_zccopt("\nIF !NEED_%s\n", ptr);
 	add_zccopt("\tDEFINE\tNEED_%s\n", ptr);
@@ -2412,7 +2488,7 @@ void PragmaBytes(arg_t *arg, char *val)
 	char *ptr = val + strlen(arg->name) + 1;
 	char *value;
 
-	while (ispunct(*ptr)) ++ptr;
+	while ((*ptr == '=') || (*ptr ==':')) ++ptr;
 
 	if ((value = strchr(ptr, '=')) != NULL) {
 		*value++ = 0;

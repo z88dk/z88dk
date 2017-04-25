@@ -9,24 +9,25 @@ dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "config_rc2014_public.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
 include "crt_config.inc"
-include "../crt_rules.inc"
+include(`../crt_rules.inc')
+include(`rc2014_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "crt_memory_map.inc"
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-include "config_rc2014_public.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,14 +60,20 @@ dnl
 
 include(`../clib_instantiate_begin.m4')
 
-include(`driver/character/rc_00_input_acia.m4')
-m4_rc_00_input_acia(_stdin, 0x0100)
+ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
+`
+   include(`driver/character/rc_00_input_acia.m4')
+   m4_rc_00_input_acia(_stdin, 0x0100)
 
-include(`driver/character/rc_00_output_acia.m4')
-m4_rc_00_output_acia(_stdout, 0x0100)
+   include(`driver/character/rc_00_output_acia.m4')
+   m4_rc_00_output_acia(_stdout, 0x0100)
 
-include(`../m4_file_dup.m4')
-m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+   include(`../m4_file_dup.m4')
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+',
+`
+   include(`crt_driver_instantiation.asm.m4')
+')
 
 include(`../clib_instantiate_end.m4')
 

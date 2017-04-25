@@ -46,8 +46,6 @@
 #define __SPECTRUM_128_P3    16
 #define __SPECTRUM_PENTAGON  32
 
-#define __SPECTRUM_128_MASK  62
-
 
 
 

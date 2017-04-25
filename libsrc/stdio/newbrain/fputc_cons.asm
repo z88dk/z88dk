@@ -5,7 +5,7 @@
 ;	(HL)=char to display
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:45 dom Exp $
+;	$Id: fputc_cons.asm,v 1.5+ (now on GIT) $
 ;
 	SECTION code_clib
 	PUBLIC	fputc_cons_native
@@ -28,6 +28,17 @@
 ;	call	doprint
 ;	ld	a,$1c		; cursor home left (13 wasn't good in 80 columns mode)
 ;.nocrlf
+
+IF STANDARDESCAPECHARS
+	cp	10
+ELSE
+	cp	13
+ENDIF
+	jr	nz,nocrlf
+	ld	a,13
+	call doprint
+	ld	a,10
+.nocrlf
 
 .doprint
 	ld	e,0

@@ -11,8 +11,6 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_init
 
-EXTERN __SMSlib_VDPReg_init
-
 EXTERN asm_SMSlib_resetPauseRequest, asm_SMSlib_detect_VDP_type, asm_SMSlib_setSpritePaletteColor
 EXTERN asm_SMSlib_initSprites, asm_SMSlib_finalizeSprites, asm_SMSlib_copySpritestoSAT
 
@@ -23,26 +21,7 @@ asm_SMSlib_init:
 
    call asm_SMSlib_setSpritePaletteColor
 
-   di
-   
-   ld b,11
-   ld hl,__SMSlib_VDPReg_init
-   
-loop:
-
-   ld a,(hl)
-   inc hl
-   
-   out (VDPControlPort),a
-   
-   ld a,11+0x80
-   sub b
-   
-   out (VDPControlPort),a
-   
-   djnz loop
-   
-   ei
+   ; vdp register initialization moved to crt
    
    call asm_SMSlib_initSprites
    call asm_SMSlib_finalizeSprites

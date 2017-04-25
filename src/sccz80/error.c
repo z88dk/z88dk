@@ -56,7 +56,7 @@ struct warnings mywarn[] = {
     /*
  * Blatantly daft expression things
  */
-    { "Illegal sizeof operation (on function)", 0 },  /* 25 */
+    { "", 1 },  /* 25 */
     { "Expected argument", 0 },
     { "Int constant in double expression", 0 },  /* UNUSED */
     { "Getting value from void function", 1 },
@@ -144,17 +144,17 @@ struct errors {
     { "Incorrect number of arguments", 0 },
     { "Expected arguments", 0 },
     { "Out of data for struct initialisation", 1 },
-    { "Already defined", 1 },
+    { "Symbol %s is already defined", 1 },
     { "Must be lvalue", 1 },
     { "Illegal address", 0 },
     { "Can't subscript", 0 },
     { "Can't take member", 1 },
     { "Unknown member: %s", 1 },
     { "Unknown struct", 1 },
-    { "Illegal symbol name: %s", 0 },
+    { "Illegal symbol name: %s", 1 },
     { "Missing closing bracket", 0 },
     { "Missing token: %s", 0 },
-    { "Unknown symbol: %s", 0 },
+    { "Unknown symbol: %s", 1 },
     { "Argument mismatch %s() Arg #%d: %s", 0 },
     { "Doesn't match original decl type: %s", 0 },
     { "Missing token, expecting %c got %c", 0 },
@@ -183,7 +183,8 @@ struct errors {
 
     { "Attempt to modify const lvalue \'%s\''", 1},
     { "Cannot statically initialise doubles when -doublestr is used", 1},
-    { "Cannot dereference the port definition: \'%s\'", 1}
+    { "Cannot dereference the port definition: \'%s\'", 1},
+    { "sizeof expects a pointer but got %s",1}
 };
 
 /*
@@ -202,9 +203,9 @@ void illname(char* sname)
     junk();
 }
 
-void multidef(void)
+void multidef(const char *sname)
 {
-    error(E_DEFINED);
+    error(E_DEFINED,sname);
 }
 
 void needtoken(char* str)

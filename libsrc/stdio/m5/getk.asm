@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 18/5/2001
 ;
 ;
-;	$Id: getk.asm,v 1.8 2016-06-12 17:07:44 dom Exp $
+;	$Id: getk.asm,v 1.8+ (GIT imported) $
 ;
 
         SECTION code_clib
@@ -18,7 +18,7 @@
 
 .getk
 ._getk
-	ld	ix,0ACECH
+	ld	ix,ACECH0
 	call	msxbios
 	ld	h,0
 	ld	l,a
