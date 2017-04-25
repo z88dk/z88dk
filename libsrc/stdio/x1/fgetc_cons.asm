@@ -22,7 +22,15 @@ _fgetc_cons:
         and a
         jp z, fgetc_cons
         ld (hl), 0
-        ld h, 0
-        ld l, a
+
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
+        ld h,0
+        ld l,a
         ret
 
