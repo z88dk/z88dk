@@ -25,5 +25,11 @@
 		ld	l,h
 		ret
 .gotkey
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
 		ld	l,a
 		ret
