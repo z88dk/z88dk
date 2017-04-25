@@ -10,6 +10,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-02-09 Fix #54 overflow errors in calculated constants at linking stage
 - 2017-02-12 Fix #65 separate BSS section not generated from object file if BSS org was -1 at assembly time
 - 2017-04-12 Fix #159 allow environment variables ${VAR} in the command line options and arguments and list files (contribution from dom@suborbital.org.uk)
+- 2017-04-25 Fix #194 wrong assembly of DDCB with no index
 
 2016
 ----

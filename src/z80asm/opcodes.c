@@ -21,12 +21,23 @@ Define CPU opcodes
 *  bytes in big-endian format, e.g. 0xCB00 */
 void add_opcode(int opcode)
 {
-	if ( opcode & 0xFF000000 )
+	Bool out = FALSE;
+	
+	if (opcode & 0xFF000000) {
+		out = TRUE;
 		append_byte( (opcode >> 24) & 0xFF );
-	if ( opcode & 0xFF0000 )
+	}
+
+	if (out || (opcode & 0xFF0000)) {
+		out = TRUE;
 		append_byte( (opcode >> 16) & 0xFF );
-	if ( opcode & 0xFF00 )
-		append_byte( (opcode >> 8) & 0xFF );
+	}
+
+	if (out || (opcode & 0xFF00)) {
+		out = TRUE;
+		append_byte((opcode >> 8) & 0xFF);
+	}
+
 	append_byte( opcode & 0xFF );
 }
 
