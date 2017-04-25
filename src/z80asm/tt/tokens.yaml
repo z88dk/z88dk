@@ -204,6 +204,27 @@ tokens:
   - name	: AF
   - name	: SP
   
+  - name	: B1
+    regexp	: "\"B'\"i"
+  
+  - name	: C1
+    regexp	: "\"C'\"i"
+  
+  - name	: D1
+    regexp	: "\"D'\"i"
+  
+  - name	: E1
+    regexp	: "\"E'\"i"
+  
+  - name	: H1
+    regexp	: "\"H'\"i"
+  
+  - name	: L1
+    regexp	: "\"L'\"i"
+  
+  - name	: A1
+    regexp	: "\"A'\"i"
+  
   - name	: BC1
     regexp	: "\"BC'\"i"
   

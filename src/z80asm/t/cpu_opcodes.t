@@ -150,7 +150,10 @@ sub emit_line {
 sub expand_values {
 	my($exists, $opcode, $bytes, $var, @values) = @_;
 	for (@values) {
-		my $opcode_copy = $opcode; $opcode_copy =~ s/\b$var\b/$_/g;
+		my $opcode_copy = $opcode; 
+		$opcode_copy =~ s/\b$var\b/$_/g;
+		#$opcode_copy =~ s/\((\w+)\s*\+\s*0\s*\)/($1)/g;
+		
 		my $bytes_copy = $bytes; 
 		$bytes_copy =~ s/\b$var\b/ sprintf("%X", $_ & 255) /ge;
 		if ($var eq 'MN') {

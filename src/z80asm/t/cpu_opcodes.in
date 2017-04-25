@@ -5,7 +5,9 @@
 ;------------------------------------------------------------------------------
 ; 8-bit load group
 ;------------------------------------------------------------------------------
-			ld {b c d e   h   l . a}, {b c d e   h   l . a}	=>     40 + $1*8 + $2
+			ld {b c d e   h   l . a},  {b c d e   h   l . a}=>     40 + $1*8 + $2
+[rabbit]	ld {b c d e   h   l . a}', {b c d e   h   l . a}=> 76, 40 + $1*8 + $2
+
 [z80]		ld {b c d e ixh ixl . a}, {. . . . ixh ixl . .}	=> DD, 40 + $1*8 + $2
 [z80]		ld {b c d e iyh iyl . a}, {. . . . iyh iyl . .}	=> FD, 40 + $1*8 + $2
 
@@ -13,9 +15,14 @@
 [z80]		ld {. . . . ixh ixl . .}, N			=> DD, 06 + $1*8, N
 [z80]		ld {. . . . iyh iyl . .}, N			=> FD, 06 + $1*8, N
 
-			ld {b c d e   h   l . a}, (hl)		=>     46 + $1*8
-			ld {b c d e   h   l . a}, (ix + D)	=> DD, 46 + $1*8, D
-			ld {b c d e   h   l . a}, (iy + D)	=> FD, 46 + $1*8, D
+			ld {b c d e   h   l . a},  (hl)		=>         46 + $1*8
+[rabbit]	ld {b c d e   h   l . a}', (hl)		=> 76,     46 + $1*8
+
+			ld {b c d e   h   l . a},  (ix + D)	=>     DD, 46 + $1*8, D
+[rabbit]	ld {b c d e   h   l . a}', (ix + D)	=> 76, DD, 46 + $1*8, D
+
+			ld {b c d e   h   l . a},  (iy + D)	=>     FD, 46 + $1*8, D
+[rabbit]	ld {b c d e   h   l . a}', (iy + D)	=> 76, FD, 46 + $1*8, D
 
 			ld (hl),     {b c d e   h   l . a}	=>     70 + $1
 			ld (ix + D), {b c d e   h   l . a}	=> DD, 70 + $1, D
@@ -25,10 +32,14 @@
 			ld (ix + D), N		=> DD, 36, D, N
 			ld (iy + D), N		=> FD, 36, D, N
 
-			ld a, ({bc de})		=> 	   0A + $1*10
+			ld a,  ({bc de})	=> 	   0A + $1*10
+[rabbit]	ld a', ({bc de})	=> 76, 0A + $1*10
+
 			ld ({bc de}), a		=> 	   02 + $1*10
 			
-			ld a, (MN)			=> 	   3A, N, M
+			ld a,  (MN)			=> 	   3A, N, M
+[rabbit]	ld a', (MN)			=> 76, 3A, N, M
+			
 			ld (MN), a			=> 	   32, N, M
 
 ;------------------------------------------------------------------------------
@@ -51,7 +62,12 @@
 			{add adc sub sbc and xor or cp} a, N			=>     C6 + $1*8, N
 			{add adc sub sbc and xor or cp}    N			=>     C6 + $1*8, N
 
+[rabbit]	{add adc sub sbc and xor or . } a', {b c d e   h   l (hl)   a}	=> 76,     80 + $1*8 + $2
+[rabbit]	{add adc sub sbc and xor or . } a', {. . . .   .   . (ix+D) .}	=> 76, DD, 80 + $1*8 + $2, D
+[rabbit]	{add adc sub sbc and xor or . } a', N							=> 76,     C6 + $1*8, N
+
 			{inc dec} {b c d e   h   l . a}	=>     04 + $1 + $2*8
+[rabbit]	{inc dec} {b c d e   h   l . a}'=> 76, 04 + $1 + $2*8
 [z80]		{inc dec} {. . . . ixh ixl . .}	=> DD, 04 + $1 + $2*8
 [z80]		{inc dec} {. . . . iyh iyl . .}	=> FD, 04 + $1 + $2*8
 
@@ -74,6 +90,9 @@
 [zilog]		rrd					=> ED, 67
 
 			cpl					=>     2F
+			cpl a				=>     2F
+[rabbit]	cpl	a'				=> 76, 2F
+
 			neg					=> ED, 44
 			ccf					=>     3F
 			scf					=>     37
@@ -81,11 +100,15 @@
 ;------------------------------------------------------------------------------
 ; 16-bit load group
 ;------------------------------------------------------------------------------
-			ld {bc de hl sp}, MN		=>     01 + $1*10, N, M
+			ld {bc de hl sp},  MN		=>     01 + $1*10, N, M
+[rabbit]	ld {bc de hl . }', MN		=> 76, 01 + $1*10, N, M
+
 			ld {.  .  ix . }, MN		=> DD, 01 + $1*10, N, M
 			ld {.  .  iy . }, MN		=> FD, 01 + $1*10, N, M
 
-			ld hl, (MN)					=>     2A, N, M
+			ld hl,  (MN)				=>     2A, N, M
+[rabbit]	ld hl', (MN)				=> 76, 2A, N, M
+			
 			ld ix, (MN)					=> DD, 2A, N, M
 			ld iy, (MN)					=> FD, 2A, N, M
 
@@ -93,7 +116,9 @@
 			ld (MN), ix					=> DD, 22, N, M
 			ld (MN), iy					=> FD, 22, N, M
 
-			ld {bc de . sp}, (MN)		=> ED, 4B + $1*10, N, M
+			ld {bc de . sp},  (MN)		=>     ED, 4B + $1*10, N, M
+[rabbit]	ld {bc de . . }', (MN)		=> 76, ED, 4B + $1*10, N, M
+
 			ld (MN), {bc de . sp}		=> ED, 43 + $1*10, N, M
 
 			ld sp, hl					=>     F9
@@ -112,15 +137,22 @@
 [rabbit]	pop ip						=> ED, 7E
 [r3k]		pop su						=> ED, 6E
 
-[rabbit]	ld hl, ix					=> DD, 7C
-[rabbit]	ld hl, iy					=> FD, 7C
+[rabbit]	ld hl,  ix					=>     DD, 7C
+[rabbit]	ld hl', ix					=> 76, DD, 7C
+[rabbit]	ld hl,  iy					=>     FD, 7C
+[rabbit]	ld hl', iy					=> 76, FD, 7C
 
 [rabbit]	ld ix, hl					=> DD, 7D
 [rabbit]	ld iy, hl					=> FD, 7D
 
-[rabbit]	ld hl, (hl + D)				=> DD, E4, D
-[rabbit]	ld hl, (ix + D)				=>     E4, D
-[rabbit]	ld hl, (iy + D)				=> FD, E4, D
+[rabbit]	ld hl,  (hl + D)			=>     DD, E4, D
+[rabbit]	ld hl', (hl + D)			=> 76, DD, E4, D
+
+[rabbit]	ld hl,  (ix + D)			=>         E4, D
+[rabbit]	ld hl', (ix + D)			=> 76,     E4, D
+
+[rabbit]	ld hl,  (iy + D)			=>     FD, E4, D
+[rabbit]	ld hl', (iy + D)			=> 76, FD, E4, D
 
 [rabbit]	ld (hl + D), hl				=> DD, F4, D
 [rabbit]	ld (ix + D), hl				=>     F4, D
@@ -146,32 +178,39 @@
 [rabbit]	ld (sp + N), ix				=> DD, D4, N
 [rabbit]	ld (sp + N), iy				=> FD, D4, N
 
-[rabbit]	ld hl, (sp + N)				=>     C4, N
-[rabbit]	ld ix, (sp + N)				=> DD, C4, N
-[rabbit]	ld iy, (sp + N)				=> FD, C4, N
+[rabbit]	ld hl,  (sp + N)				=>     C4, N
+[rabbit]	ld hl', (sp + N)				=> 76, C4, N
+[rabbit]	ld ix,  (sp + N)				=> DD, C4, N
+[rabbit]	ld iy,  (sp + N)				=> FD, C4, N
 	
 [rabbit]	ld {bc de hl}', {bc de}		=> ED, 49 + $1*10 - $2*8
 
 ;------------------------------------------------------------------------------
 ; 16-Bit Arithmetic Group
 ;------------------------------------------------------------------------------
-			add hl, {bc de hl sp}		=>     09 + $1*10
+			add hl,  {bc de hl sp}		=>     09 + $1*10
+[rabbit]	add hl', {bc de hl sp}		=> 76, 09 + $1*10
+
 			add ix, {bc de ix sp}		=> DD, 09 + $1*10
 			add iy, {bc de iy sp}		=> FD, 09 + $1*10
 
-			{sbc adc} hl, {bc de hl sp}	=> ED, 42 + $1*8 + $2*10
+			{sbc adc} hl,  {bc de hl sp}=>     ED, 42 + $1*8 + $2*10
+[rabbit]	{sbc adc} hl', {bc de hl sp}=> 76, ED, 42 + $1*8 + $2*10
 
 			{inc dec} {bc de hl sp}		=>     03 + $1*8 + $2*10
+[rabbit]	{inc dec} {bc de hl . }'	=> 76, 03 + $1*8 + $2*10
 			{inc dec} {.  .  ix . }		=> DD, 03 + $1*8 + $2*10
 			{inc dec} {.  .  iy . }		=> FD, 03 + $1*8 + $2*10
 			
 [rabbit]	add sp, D					=>     27, D
 
-[rabbit]	{and or} hl, de				=>     DC + $1*10
-[rabbit]	{and or} ix, de				=> DD, DC + $1*10
-[rabbit]	{and or} iy, de				=> FD, DC + $1*10
+[rabbit]	{and or} hl,  de			=>     DC + $1*10
+[rabbit]	{and or} hl', de			=> 76, DC + $1*10
+[rabbit]	{and or} ix,  de			=> DD, DC + $1*10
+[rabbit]	{and or} iy,  de			=> FD, DC + $1*10
 
 [rabbit]	bool hl						=>     CC
+[rabbit]	bool hl'					=> 76, CC
 [rabbit]	bool ix						=> DD, CC
 [rabbit]	bool iy						=> FD, CC
 
@@ -189,6 +228,8 @@
 			exx					=>     D9
 	
 			ex (sp), hl			=> [zilog] ? (E3) : (ED, 54)
+[rabbit]	ex (sp), hl'		=> 76, ED, 54
+
 			ex (sp), ix			=> DD, E3
 			ex (sp), iy			=> FD, E3
 	
@@ -257,8 +298,9 @@
 	
 ; TODO: add all ALTD combinations
 [rabbit]	altd				=>     76
-[rabbit]	ld a, xpc			=> ED, 77
-[rabbit]	ld xpc, a			=> ED, 67
+[rabbit]	ld a,  xpc			=>     ED, 77
+[rabbit]	ld a', xpc			=> 76, ED, 77
+[rabbit]	ld xpc, a			=>     ED, 67
 
 [r3k]		rdmode				=> ED, 7F
 [r3k]		setusr				=> ED, 6F
@@ -278,7 +320,12 @@
 			jp (ix)							=> DD, E9
 			jp (iy)							=> FD, E9
 			
-			djnz ASMPC						=> 10, FE
+			djnz ASMPC						=>     10, FE
+			djnz b,  ASMPC					=>     10, FE
+[rabbit]	djnz b', ASMPC					=> 76, 10, FE
+
+; TODO: check that address is corretly computed in DJNZ B', LABEL
+
 			jr ASMPC						=> 18, FE
 			jr {nz z nc c}, ASMPC			=> 20 + $1*8, FE
 
@@ -351,10 +398,12 @@
 [zilog]		ld r, a			=> ED, 4F
 [zilog]		ld a, r			=> ED, 5F
 
-[rabbit]	ld iir, a		=> ED, 4F
-[rabbit]	ld a, iir		=> ED, 5F
-[rabbit]	ld eir, a		=> ED, 47
-[rabbit]	ld a, eir		=> ED, 57
+[rabbit]	ld iir, a		=>     ED, 4F
+[rabbit]	ld a,  iir		=>     ED, 5F
+[rabbit]	ld a', iir		=> 76, ED, 5F
+[rabbit]	ld eir, a		=>     ED, 47
+[rabbit]	ld a,  eir		=>     ED, 57
+[rabbit]	ld a', eir		=> 76, ED, 57
 
 			reti			=> ED, 4D
 [zilog]		retn			=> ED, 45
