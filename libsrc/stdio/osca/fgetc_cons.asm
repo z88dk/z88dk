@@ -5,7 +5,7 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.6 2016-06-12 17:32:01 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.6+ (now on GIT) $
 ;
 
 
@@ -21,6 +21,8 @@
 
 .kwait
 
+IF STANDARDESCAPECHARS
+ELSE
 	ld	a,(buf)
 	and a
 	jr	z,nobuf
@@ -29,6 +31,7 @@
 	ld	(buf),a
 	jr	dokey
 .nobuf
+ENDIF
 	call kjt_get_key
 	or a
 	jr z,kwait
@@ -51,9 +54,13 @@
 .noctrl
 	cp	$5a
 	jr	nz,noent
+IF STANDARDESCAPECHARS
+	ld	b,10
+ELSE
 	ld	b,13
 	ld	a,10
 	ld  (buf),a
+ENDIF
 .noent
 	cp	$6b
 	jr	nz,noleft
@@ -84,5 +91,8 @@
 
 	ret
 
+IF STANDARDESCAPECHARS
+ELSE
         SECTION bss_clib
 .buf defb 0
+ENDIF
