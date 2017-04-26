@@ -1005,7 +1005,7 @@ int main(int argc, char **argv)
                 {
                     if ((!important_pragmas[i].seen) && (p = strstr(buffer, important_pragmas[i].pragma)) && isspace(buffer[p - buffer + strlen(important_pragmas[i].pragma)]) && isspace(*(p-1)))
                     {
-                        if (sscanf(buffer, " defc %*s = %ld", &val))
+                        if (sscanf(buffer, " defc %*s = %li", &val))
                         {
                             important_pragmas[i].seen = 1;
                             snprintf(buffer, sizeof(buffer), "--define=%s=%ld", important_pragmas[i].m4_name, val);
