@@ -15,6 +15,14 @@ getk:
 _getk:
         ld hl, _x1_keyboard_io
         ld a, (hl)
+
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
         ld h, 0
         ld l, a
 	ret

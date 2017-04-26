@@ -1,3 +1,5 @@
+	
+	SECTION rodata_compiler
 	PUBLIC _pong_graphics
 
 ._pong_graphics

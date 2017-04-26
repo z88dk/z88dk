@@ -14,6 +14,13 @@
 
 .getk
 	call	2
+	
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
 
 	ld	l,a
 	ld	h,0

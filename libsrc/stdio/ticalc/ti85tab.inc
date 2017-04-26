@@ -17,7 +17,11 @@ defb	9
 defb	$04	;Up
 defb	11
 defb	$09	;ENTER
+IF STANDARDESCAPECHARS
+defb	10
+ELSE
 defb	13
+ENDIF
 
 defb	$0A
 defb	'+'
@@ -75,7 +79,11 @@ defb	0
 .TiKeyTab2
 
 defb	$09	;ENTER
+IF STANDARDESCAPECHARS
+defb	10
+ELSE
 defb	13
+ENDIF
 
 defb	$0A
 defb	'X'

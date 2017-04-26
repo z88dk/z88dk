@@ -1,5 +1,7 @@
-FZX v1.0 - a bitmap font format
-Copyright (c) 2013 Andrew Owen
+# FZX Proportional Fonts
+
+FZX v1.0 - a bitmap font format  
+Copyright (c) 2013 Andrew Owen  
 
 FZX is a royalty-free compact font file format designed primarily for storing
 bitmap fonts for 8 bit computers, primarily the Sinclair ZX Spectrum, although
@@ -15,16 +17,13 @@ FZX has the following features:
 The formal format specification is provided below. For a practical example look
 at the sample source file "Sinclair.fzx.asm".
 
-
-=============
-SPECIFICATION
-=============
+## Specification
 
 The format consists of a three byte header followed by a variable-length table
 and a variable-length set of character definitions.
 
 The header format is:
-
+```
 height   - vertical gap between baselines in pixels
            This is the number of pixels to move down after a carriage return.
 
@@ -36,13 +35,15 @@ tracking - horizontal gap between characters in pixels
 lastchar - the ASCII code of the last definition in the font
            All characters up to and including this character must have an
            entry in the list of definitions although the entry can be blank.
-
+```
 The table consists of a three byte entry for each character from ASCII 32 to the
 last character defined (lastchar), followed by a final word containing the
 offset to the byte after the last byte of the last definition).
 
-The table entry format is:
+![FZX Font Definition](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/font/fzx/FZX.png)
 
+The table entry format is:
+```
 offset   - word containing the offset to the character definition
            This is calculated from the start of the table and stored as an
            offset rather than an absolute address to make the font relocatable.
@@ -61,26 +62,23 @@ shift    - nibble containing the amount of leading for the character (0-15)
 width    - nibble containing the width of the character (1-16)
            The width of the character definition in pixels. The value stores is
            one less than the required value.
-
+```
 The word (2 bytes) containing the offset and shift can be calculated as follows:
 
-   offset+16384*kern
+`   offset+16384*kern`
 
 The byte containing the leading and width can be calculated as follows:
 
-   16*shift+width-1
+`   16*shift+width-1`
 
 The character definitions consist of a byte or pair of bytes for each row of the
 character, depending on whether the character is 1 to 8 pixels wide (byte), or
 9 to 16 pixels wide (pair of bytes).
 
-
-=======
-EXAMPLE
-=======
+## Example
 
 The first few bytes of Sinclair.fzx are as follows:
-
+```
 ADDRESS CONTENT COMMENT
 0000    09      ; this font has height = 9
 0001    02      ; this font has tracking = 2
@@ -122,7 +120,7 @@ ADDRESS CONTENT COMMENT
 02dc    88 80
 02de    88 80
 02e0    F0      ; char 110 image starts here...
-
+```
 Notice that offsets are not relative to the beginning of the FZX, but relative
 to the current position. These offsets determine both image location and size
 for each char.
@@ -137,10 +135,7 @@ the remaining bytes since they are all blank anyway.
 
 And so on...
 
-
-=====
-LEGAL
-=====
+## Legal
 
 The FZX font format is an open standard. You can freely use it to design and
 distribute new fonts, or use it inside any programs (even commercial releases).

@@ -17,7 +17,7 @@
 ._fgetc_cons
 	call	$79
 	jr	z,fgetc_cons
-
+  
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return

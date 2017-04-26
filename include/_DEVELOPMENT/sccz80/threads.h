@@ -31,7 +31,7 @@ extern void __LIB__ __CALLEE__ call_once_callee(once_flag *flag,void *func) __sm
 #define call_once(a,b) call_once_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ mtx_destroy(mtx_t *m);
+extern void __LIB__ __FASTCALL__ mtx_destroy(mtx_t *m) __smallc;
 
 
 extern int __LIB__ mtx_init(mtx_t *m,int type) __smallc;
@@ -39,7 +39,7 @@ extern int __LIB__ __CALLEE__ mtx_init_callee(mtx_t *m,int type) __smallc;
 #define mtx_init(a,b) mtx_init_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ mtx_lock(mtx_t *m);
+extern int __LIB__ __FASTCALL__ mtx_lock(mtx_t *m) __smallc;
 
 
 extern int __LIB__ mtx_timedlock(mtx_t *m,struct timespec *ts) __smallc;
@@ -47,19 +47,19 @@ extern int __LIB__ __CALLEE__ mtx_timedlock_callee(mtx_t *m,struct timespec *ts)
 #define mtx_timedlock(a,b) mtx_timedlock_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ mtx_trylock(mtx_t *m);
+extern int __LIB__ __FASTCALL__ mtx_trylock(mtx_t *m) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ mtx_unlock(mtx_t *m);
+extern int __LIB__ __FASTCALL__ mtx_unlock(mtx_t *m) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ spinlock_acquire(char *spinlock);
+extern void __LIB__ __FASTCALL__ spinlock_acquire(char *spinlock) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ spinlock_release(char *spinlock);
+extern void __LIB__ __FASTCALL__ spinlock_release(char *spinlock) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ spinlock_tryacquire(char *spinlock);
+extern int __LIB__ __FASTCALL__ spinlock_tryacquire(char *spinlock) __smallc;
 
 
 

@@ -61,7 +61,7 @@ extern intmax_t imaxabs_callee(intmax_t j) __z88dk_callee;
 
 #ifdef __SCCZ80
 
-extern intmax_t __LIB__ __FASTCALL__ imaxabs(intmax_t j);
+extern intmax_t __LIB__ __FASTCALL__ imaxabs(intmax_t j) __smallc;
 
 
 

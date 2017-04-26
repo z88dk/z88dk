@@ -413,7 +413,7 @@ void setup_paddles(paddle_rec *paddles, playfield_rec *playfield) {
 		if (playfield->left_player == 1) {
 			controlled_by++;
 		} else {
-			controlled_by = (controlled_by + 2) 0x03;
+			controlled_by = (controlled_by + 2) & 0x03;
 		}
 	}
 
@@ -440,7 +440,7 @@ void setup_paddles(paddle_rec *paddles, playfield_rec *playfield) {
 
 		x -= xinc;
 		if (playfield->left_player == 0) {
-			controlled_by = (controlled_by + 2) 0x03;
+			controlled_by = (controlled_by + 2) & 0x03;
 		}
 	}
 }
@@ -517,36 +517,37 @@ void select_options(paddle_rec *paddles, playfield_rec *playfield) {
 	set_sprite(63, 0, -16, 1);
 }
 
-void main() {
-	int joy1, joy2;
-	int i;
-	playfield_rec playfield;
-	paddle_rec paddles[8], *paddle;
-	ball_rec ball;
+void main() { 
+    int joy1, joy2; 
+    int i; 
+    playfield_rec playfield; 
+    paddle_rec paddles[8], *paddle; 
+    ball_rec ball; 
 
-	playfield.top = 16 << 4;
-	playfield.bottom = 184 << 4;
-	playfield.left = 0 << 4;
-	playfield.right = 255 << 4;
-	playfield.score0 = 0;
-	playfield.score1 = 0;
-	playfield.left_player = 0;
-	playfield.right_player = 2;
-	playfield.paddle_mode = 0;
-	playfield.actual_paddle_count = 1;
-	playfield.spin_on = 1;
+    playfield.top = 16 << 4; 
+    playfield.bottom = 184 << 4; 
+    playfield.left = 0 << 4; 
+    playfield.right = 255 << 4; 
+    playfield.score0 = 0; 
+    playfield.score1 = 0; 
+    playfield.left_player = 0; 
+    playfield.right_player = 2; 
+    playfield.paddle_mode = 0; 
+    playfield.actual_paddle_count = 1; 
+    playfield.spin_on = 1; 
 
-	setup_paddles(paddles, &playfield);
+    setup_paddles(paddles, &playfield); 
 
-	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN);
-	load_tiles(pong_graphics, 1, 64, 4);
-	load_palette(pal1, 0, 16);
-	load_palette(pal2, 16, 16);
+    clear_vram(); 
+    load_tiles(pong_graphics, 1, 64, 4); 
+    load_palette(pal1, 0, 16); 
+    load_palette(pal2, 16, 16); 
 
-	for (i = 0; i != 64; i++) {
-		set_sprite(i, 0, -16, 0);
-	}
+    for (i = 0; i != 64; i++) { 
+        set_sprite(i, 0, -16, 0); 
+    } 
 
+    set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN); 
 	while (1) {
 		draw_bkg();
 		draw_score(&playfield);

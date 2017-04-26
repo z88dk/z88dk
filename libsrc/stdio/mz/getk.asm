@@ -19,7 +19,11 @@
 		call	$1B   ;get key
 		cp	$66   ;was it ENTER ?
 		jr	nz,noenter
+IF STANDARDESCAPECHARS
+		ld	a,10
+ELSE
 		ld	a,13
+ENDIF
 .noenter
  		ld	l,a
 		ld	h,0

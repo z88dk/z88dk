@@ -2368,3 +2368,12 @@
 	pop	bc
 =
 	call	memcpy_callee
+
+	push	hl
+	pop	de
+	ld	a,%1
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	(hl),%1
+	ld	hl,%2

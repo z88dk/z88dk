@@ -86,7 +86,7 @@ extern volatile unsigned char MM_FFFC;
 
 // MISCELLANEOUS
 
-extern void __LIB__ __FASTCALL__ sms_border(unsigned char color);
+extern void __LIB__ __FASTCALL__ sms_border(unsigned char color) __smallc;
 
 
 extern unsigned int __LIB__ sms_cxy2saddr(unsigned char x,unsigned char y) __smallc;
@@ -143,21 +143,21 @@ extern void __LIB__ __CALLEE__ sms_tiles_put_area_callee(struct r_Rect8 *r,void 
 #define sms_display_off()  sms_vdp_feature_disable(__VDP_FEATURE_SHOW_DISPLAY)
 #define sms_display_on()   sms_vdp_feature_enable(__VDP_FEATURE_SHOW_DISPLAY)
 
-extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_disable(unsigned int features);
+extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_disable(unsigned int features) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_enable(unsigned int features);
-
-
-
-extern void __LIB__ __FASTCALL__ sms_vdp_init(void *vdp_reg_array);
+extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_enable(unsigned int features) __smallc;
 
 
 
-extern void __LIB__ __FASTCALL__ sms_vdp_set_read_address(unsigned int addr);
+extern void __LIB__ __FASTCALL__ sms_vdp_init(void *vdp_reg_array) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ sms_vdp_set_write_address(unsigned int addr);
+
+extern void __LIB__ __FASTCALL__ sms_vdp_set_read_address(unsigned int addr) __smallc;
+
+
+extern void __LIB__ __FASTCALL__ sms_vdp_set_write_address(unsigned int addr) __smallc;
 
 
 

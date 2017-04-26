@@ -1,6 +1,6 @@
 # ZX SPECTRUM NIRVANA- DEMO
-[Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)
-[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/nirvanam)
+[Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)  
+[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/nirvanam)  
 [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/nirvana-.h)
 
 Before using Nirvana-, it should be configured.

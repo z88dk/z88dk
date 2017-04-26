@@ -38,22 +38,22 @@ extern int __LIB__ __CALLEE__ b_array_at_callee(b_array_t *a,size_t idx) __small
 #define b_array_at(a,b) b_array_at_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ b_array_back(b_array_t *a);
+extern int __LIB__ __FASTCALL__ b_array_back(b_array_t *a) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ b_array_capacity(b_array_t *a);
+extern size_t __LIB__ __FASTCALL__ b_array_capacity(b_array_t *a) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ b_array_clear(b_array_t *a);
+extern void __LIB__ __FASTCALL__ b_array_clear(b_array_t *a) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *b_array_data(b_array_t *a);
+extern void __LIB__ __FASTCALL__ *b_array_data(b_array_t *a) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ b_array_destroy(b_array_t *a);
+extern void __LIB__ __FASTCALL__ b_array_destroy(b_array_t *a) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ b_array_empty(b_array_t *a);
+extern int __LIB__ __FASTCALL__ b_array_empty(b_array_t *a) __smallc;
 
 
 extern size_t __LIB__ b_array_erase(b_array_t *a,size_t idx) __smallc;
@@ -71,7 +71,7 @@ extern size_t __LIB__ __CALLEE__ b_array_erase_range_callee(b_array_t *a,size_t 
 #define b_array_erase_range(a,b,c) b_array_erase_range_callee(a,b,c)
 
 
-extern int __LIB__ __FASTCALL__ b_array_front(b_array_t *a);
+extern int __LIB__ __FASTCALL__ b_array_front(b_array_t *a) __smallc;
 
 
 extern b_array_t __LIB__ *b_array_init(void *p,void *data,size_t capacity) __smallc;
@@ -94,7 +94,7 @@ extern size_t __LIB__ __CALLEE__ b_array_insert_n_callee(b_array_t *a,size_t idx
 #define b_array_insert_n(a,b,c,d) b_array_insert_n_callee(a,b,c,d)
 
 
-extern int __LIB__ __FASTCALL__ b_array_pop_back(b_array_t *a);
+extern int __LIB__ __FASTCALL__ b_array_pop_back(b_array_t *a) __smallc;
 
 
 extern size_t __LIB__ b_array_push_back(b_array_t *a,int c) __smallc;
@@ -112,7 +112,7 @@ extern int __LIB__ __CALLEE__ b_array_resize_callee(b_array_t *a,size_t n) __sma
 #define b_array_resize(a,b) b_array_resize_callee(a,b)
 
 
-extern size_t __LIB__ __FASTCALL__ b_array_size(b_array_t *a);
+extern size_t __LIB__ __FASTCALL__ b_array_size(b_array_t *a) __smallc;
 
 
 extern size_t __LIB__ b_array_write_block(void *src,size_t n,b_array_t *a,size_t idx) __smallc;

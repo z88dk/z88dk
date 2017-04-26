@@ -33,22 +33,22 @@ extern void __LIB__ __CALLEE__ *w_array_at_callee(w_array_t *a,size_t idx) __sma
 #define w_array_at(a,b) w_array_at_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ *w_array_back(w_array_t *a);
+extern void __LIB__ __FASTCALL__ *w_array_back(w_array_t *a) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ w_array_capacity(w_array_t *a);
+extern size_t __LIB__ __FASTCALL__ w_array_capacity(w_array_t *a) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ w_array_clear(w_array_t *a);
+extern void __LIB__ __FASTCALL__ w_array_clear(w_array_t *a) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *w_array_data(w_array_t *a);
+extern void __LIB__ __FASTCALL__ *w_array_data(w_array_t *a) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ w_array_destroy(w_array_t *a);
+extern void __LIB__ __FASTCALL__ w_array_destroy(w_array_t *a) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ w_array_empty(w_array_t *a);
+extern int __LIB__ __FASTCALL__ w_array_empty(w_array_t *a) __smallc;
 
 
 extern size_t __LIB__ w_array_erase(w_array_t *a,size_t idx) __smallc;
@@ -61,7 +61,7 @@ extern size_t __LIB__ __CALLEE__ w_array_erase_range_callee(w_array_t *a,size_t 
 #define w_array_erase_range(a,b,c) w_array_erase_range_callee(a,b,c)
 
 
-extern void __LIB__ __FASTCALL__ *w_array_front(w_array_t *a);
+extern void __LIB__ __FASTCALL__ *w_array_front(w_array_t *a) __smallc;
 
 
 extern w_array_t __LIB__ *w_array_init(void *p,void *data,size_t capacity) __smallc;
@@ -79,7 +79,7 @@ extern size_t __LIB__ __CALLEE__ w_array_insert_n_callee(w_array_t *a,size_t idx
 #define w_array_insert_n(a,b,c,d) w_array_insert_n_callee(a,b,c,d)
 
 
-extern void __LIB__ __FASTCALL__ *w_array_pop_back(w_array_t *a);
+extern void __LIB__ __FASTCALL__ *w_array_pop_back(w_array_t *a) __smallc;
 
 
 extern size_t __LIB__ w_array_push_back(w_array_t *a,void *item) __smallc;
@@ -92,7 +92,7 @@ extern int __LIB__ __CALLEE__ w_array_resize_callee(w_array_t *a,size_t n) __sma
 #define w_array_resize(a,b) w_array_resize_callee(a,b)
 
 
-extern size_t __LIB__ __FASTCALL__ w_array_size(w_array_t *a);
+extern size_t __LIB__ __FASTCALL__ w_array_size(w_array_t *a) __smallc;
 
 
 

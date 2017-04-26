@@ -34,22 +34,22 @@ extern void __LIB__ __CALLEE__ w_vector_at_callee(w_vector_t *v,size_t idx) __sm
 #define w_vector_at(a,b) w_vector_at_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ *w_vector_back(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ *w_vector_back(w_vector_t *v) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ w_vector_capacity(w_vector_t *v);
+extern size_t __LIB__ __FASTCALL__ w_vector_capacity(w_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ w_vector_clear(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ w_vector_clear(w_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *w_vector_data(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ *w_vector_data(w_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ w_vector_destroy(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ w_vector_destroy(w_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ w_vector_empty(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ w_vector_empty(w_vector_t *v) __smallc;
 
 
 extern size_t __LIB__ w_vector_erase(w_vector_t *v,size_t idx) __smallc;
@@ -62,7 +62,7 @@ extern size_t __LIB__ __CALLEE__ w_vector_erase_range_callee(w_vector_t *v,size_
 #define w_vector_erase_range(a,b,c) w_vector_erase_range_callee(a,b,c)
 
 
-extern void __LIB__ __FASTCALL__ *w_vector_front(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ *w_vector_front(w_vector_t *v) __smallc;
 
 
 extern w_vector_t __LIB__ *w_vector_init(void *p,size_t capacity,size_t max_size) __smallc;
@@ -80,10 +80,10 @@ extern size_t __LIB__ __CALLEE__ w_vector_insert_n_callee(w_vector_t *v,size_t i
 #define w_vector_insert_n(a,b,c,d) w_vector_insert_n_callee(a,b,c,d)
 
 
-extern void __LIB__ __FASTCALL__ *w_vector_max_size(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ *w_vector_max_size(w_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *w_vector_pop_back(w_vector_t *v);
+extern void __LIB__ __FASTCALL__ *w_vector_pop_back(w_vector_t *v) __smallc;
 
 
 extern size_t __LIB__ w_vector_push_back(w_vector_t *v,void *item) __smallc;
@@ -101,10 +101,10 @@ extern int __LIB__ __CALLEE__ w_vector_resize_callee(w_vector_t *v,size_t n) __s
 #define w_vector_resize(a,b) w_vector_resize_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ w_vector_shrink_to_fit(w_vector_t *v);
+extern int __LIB__ __FASTCALL__ w_vector_shrink_to_fit(w_vector_t *v) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ w_vector_size(w_vector_t *v);
+extern size_t __LIB__ __FASTCALL__ w_vector_size(w_vector_t *v) __smallc;
 
 
 

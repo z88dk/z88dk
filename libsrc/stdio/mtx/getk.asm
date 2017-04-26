@@ -16,7 +16,7 @@
 .getk
 ._getk
 	call	$79
-
+  
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return

@@ -46,7 +46,7 @@ extern void __LIB__ __CALLEE__ *heap_calloc_callee(void *heap,size_t nmemb,size_
 #define heap_calloc(a,b,c) heap_calloc_callee(a,b,c)
 
 
-extern void __LIB__ __FASTCALL__ *heap_destroy(void *heap);
+extern void __LIB__ __FASTCALL__ *heap_destroy(void *heap) __smallc;
 
 
 extern void __LIB__ heap_free(void *heap,void *p) __smallc;
@@ -143,10 +143,10 @@ extern void __LIB__ __CALLEE__ *calloc_callee(size_t nmemb,size_t size) __smallc
 #define calloc(a,b) calloc_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ free(void *p);
+extern void __LIB__ __FASTCALL__ free(void *p) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *malloc(size_t size);
+extern void __LIB__ __FASTCALL__ *malloc(size_t size) __smallc;
 
 
 extern void __LIB__ *realloc(void *p,size_t size) __smallc;
@@ -165,10 +165,10 @@ extern void __LIB__ __CALLEE__ *calloc_unlocked_callee(size_t nmemb,size_t size)
 #define calloc_unlocked(a,b) calloc_unlocked_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ free_unlocked(void *p);
+extern void __LIB__ __FASTCALL__ free_unlocked(void *p) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *malloc_unlocked(size_t size);
+extern void __LIB__ __FASTCALL__ *malloc_unlocked(size_t size) __smallc;
 
 
 extern void __LIB__ *realloc_unlocked(void *p,size_t size) __smallc;

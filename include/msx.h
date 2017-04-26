@@ -147,22 +147,22 @@ extern void __LIB__ msx_noblank();
 // Change the MSX color attributes
 extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
 
-#define TRANSPARENT    0x00
-#define BLACK          0x01
-#define MEDIUM_GREEN   0x02
-#define LIGHT_GREEN    0x03
-#define DARK_BLUE      0x04
-#define LIGHT_BLUE     0x05
-#define DARK_RED       0x06
-#define CYAN           0x07
-#define MEDIUM_RED     0x08
-#define LIGHT_RED      0x09
-#define DARK_YELLOW    0x0A
-#define LIGHT_YELLOW   0x0B
-#define DARK_GREEN     0x0C
-#define MAGENTA        0x0D
-#define GRAY           0x0E
-#define WHITE          0x0F
+#define INK_TRANSPARENT    0x00
+#define INK_BLACK          0x01
+#define INK_MEDIUM_GREEN   0x02
+#define INK_LIGHT_GREEN    0x03
+#define INK_DARK_BLUE      0x04
+#define INK_LIGHT_BLUE     0x05
+#define INK_DARK_RED       0x06
+#define INK_CYAN           0x07
+#define INK_MEDIUM_RED     0x08
+#define INK_LIGHT_RED      0x09
+#define INK_DARK_YELLOW    0x0A
+#define INK_LIGHT_YELLOW   0x0B
+#define INK_DARK_GREEN     0x0C
+#define INK_MAGENTA        0x0D
+#define INK_GRAY           0x0E
+#define INK_WHITE          0x0F
 
 
 /************************************************************************/

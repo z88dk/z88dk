@@ -25,10 +25,10 @@ extern void __LIB__ SMS_init(void) __smallc;
 
 /** VDP OPERATIVE MODE HANDLING FUNCTIONS */
 
-extern void __LIB__ __FASTCALL__ SMS_VDPturnOnFeature(unsigned int feature);
+extern void __LIB__ __FASTCALL__ SMS_VDPturnOnFeature(unsigned int feature) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_VDPturnOffFeature(unsigned int feature);
+extern void __LIB__ __FASTCALL__ SMS_VDPturnOffFeature(unsigned int feature) __smallc;
 
 
 
@@ -60,19 +60,19 @@ extern void __LIB__ __FASTCALL__ SMS_VDPturnOffFeature(unsigned int feature);
 
 /** */
 
-extern void __LIB__ __FASTCALL__ SMS_setBGScrollX(unsigned char scrollX);
+extern void __LIB__ __FASTCALL__ SMS_setBGScrollX(unsigned char scrollX) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setBGScrollY(unsigned char scrollY);
+extern void __LIB__ __FASTCALL__ SMS_setBGScrollY(unsigned char scrollY) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setBackdropColor(unsigned char entry);
+extern void __LIB__ __FASTCALL__ SMS_setBackdropColor(unsigned char entry) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_useFirstHalfTilesforSprites(unsigned char usefirsthalf);
+extern void __LIB__ __FASTCALL__ SMS_useFirstHalfTilesforSprites(unsigned char usefirsthalf) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setSpriteMode(unsigned char mode);
+extern void __LIB__ __FASTCALL__ SMS_setSpriteMode(unsigned char mode) __smallc;
 
 
 
@@ -220,7 +220,7 @@ extern void __LIB__ __CALLEE__ SMS_updateSpriteImage_callee(unsigned char sprite
 #define SMS_updateSpriteImage(a,b) SMS_updateSpriteImage_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ SMS_hideSprite(unsigned char sprite);
+extern void __LIB__ __FASTCALL__ SMS_hideSprite(unsigned char sprite) __smallc;
 
 
 extern void __LIB__ SMS_setClippingWindow(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1) __smallc;
@@ -259,17 +259,17 @@ extern void __LIB__ __CALLEE__ SMS_setSpritePaletteColor_callee(unsigned char en
 #define SMS_setSpritePaletteColor(a,b) SMS_setSpritePaletteColor_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ SMS_loadBGPalette(void *palette);
+extern void __LIB__ __FASTCALL__ SMS_loadBGPalette(void *palette) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_loadSpritePalette(void *palette);
+extern void __LIB__ __FASTCALL__ SMS_loadSpritePalette(void *palette) __smallc;
 
 
 
 #define SMS_setNextBGColoratIndex(i)       SMS_setAddr(SMS_CRAMAddress|(i))
 #define SMS_setNextSpriteColoratIndex(i)   SMS_setAddr(SMS_CRAMAddress|0x10|(i))
 
-extern void __LIB__ __FASTCALL__ SMS_setColor(unsigned char color);
+extern void __LIB__ __FASTCALL__ SMS_setColor(unsigned char color) __smallc;
 
 
 
@@ -279,10 +279,10 @@ extern void __LIB__ __FASTCALL__ SMS_setColor(unsigned char color);
 #define RGB8(r,g,b)       (((r)>>6)|(((g)>>6)<<2)|(((b)>>6)<<4))
 #define RGBHTML(RGB24bit) (((RGB24bit)>>22)|((((RGB24bit)&0xFFFF)>>14)<<2)|((((RGB24bit)&0xFF)>>6)<<4))
 
-extern void __LIB__ __FASTCALL__ SMS_loadBGPaletteHalfBrightness(void *palette);
+extern void __LIB__ __FASTCALL__ SMS_loadBGPaletteHalfBrightness(void *palette) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_loadSpritePaletteHalfBrightness(void *palette);
+extern void __LIB__ __FASTCALL__ SMS_loadSpritePaletteHalfBrightness(void *palette) __smallc;
 
 
 extern void __LIB__ SMS_zeroBGPalette(void) __smallc;
@@ -395,10 +395,10 @@ extern volatile unsigned char _SMSlib_VDPFlags;
 
 /** LINE INTERRUPT */
 
-extern void __LIB__ __FASTCALL__ SMS_setLineInterruptHandler(void *theHandlerFunction);
+extern void __LIB__ __FASTCALL__ SMS_setLineInterruptHandler(void *theHandlerFunction) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setLineCounter(unsigned char count);
+extern void __LIB__ __FASTCALL__ SMS_setLineCounter(unsigned char count) __smallc;
 
 
 

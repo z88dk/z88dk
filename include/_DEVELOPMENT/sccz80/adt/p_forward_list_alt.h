@@ -17,19 +17,19 @@ typedef struct p_forward_list_alt_s
 
 } p_forward_list_alt_t;
 
-extern void __LIB__ __FASTCALL__ *p_forward_list_alt_back(p_forward_list_alt_t *ls);
+extern void __LIB__ __FASTCALL__ *p_forward_list_alt_back(p_forward_list_alt_t *ls) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ p_forward_list_alt_clear(p_forward_list_alt_t *ls);
+extern void __LIB__ __FASTCALL__ p_forward_list_alt_clear(p_forward_list_alt_t *ls) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ p_forward_list_alt_empty(p_forward_list_alt_t *ls);
+extern int __LIB__ __FASTCALL__ p_forward_list_alt_empty(p_forward_list_alt_t *ls) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *p_forward_list_alt_front(p_forward_list_alt_t *ls);
+extern void __LIB__ __FASTCALL__ *p_forward_list_alt_front(p_forward_list_alt_t *ls) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ p_forward_list_alt_init(void *p);
+extern void __LIB__ __FASTCALL__ p_forward_list_alt_init(void *p) __smallc;
 
 
 extern void __LIB__ *p_forward_list_alt_insert_after(p_forward_list_alt_t *ls,void *ls_item,void *item) __smallc;
@@ -37,13 +37,13 @@ extern void __LIB__ __CALLEE__ *p_forward_list_alt_insert_after_callee(p_forward
 #define p_forward_list_alt_insert_after(a,b,c) p_forward_list_alt_insert_after_callee(a,b,c)
 
 
-extern void __LIB__ __FASTCALL__ *p_forward_list_alt_next(void *item);
+extern void __LIB__ __FASTCALL__ *p_forward_list_alt_next(void *item) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *p_forward_list_alt_pop_back(p_forward_list_alt_t *ls);
+extern void __LIB__ __FASTCALL__ *p_forward_list_alt_pop_back(p_forward_list_alt_t *ls) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *p_forward_list_alt_pop_front(p_forward_list_alt_t *ls);
+extern void __LIB__ __FASTCALL__ *p_forward_list_alt_pop_front(p_forward_list_alt_t *ls) __smallc;
 
 
 extern void __LIB__ *p_forward_list_alt_prev(p_forward_list_alt_t *ls,void *next) __smallc;
@@ -71,7 +71,7 @@ extern void __LIB__ __CALLEE__ *p_forward_list_alt_remove_after_callee(p_forward
 #define p_forward_list_alt_remove_after(a,b) p_forward_list_alt_remove_after_callee(a,b)
 
 
-extern size_t __LIB__ __FASTCALL__ p_forward_list_alt_size(p_forward_list_alt_t *ls);
+extern size_t __LIB__ __FASTCALL__ p_forward_list_alt_size(p_forward_list_alt_t *ls) __smallc;
 
 
 

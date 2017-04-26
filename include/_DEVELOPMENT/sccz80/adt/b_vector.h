@@ -39,22 +39,22 @@ extern int __LIB__ __CALLEE__ b_vector_at_callee(b_vector_t *v,size_t idx) __sma
 #define b_vector_at(a,b) b_vector_at_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ b_vector_back(b_vector_t *v);
+extern int __LIB__ __FASTCALL__ b_vector_back(b_vector_t *v) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ b_vector_capacity(b_vector_t *v);
+extern size_t __LIB__ __FASTCALL__ b_vector_capacity(b_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ b_vector_clear(b_vector_t *v);
+extern void __LIB__ __FASTCALL__ b_vector_clear(b_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *b_vector_data(b_vector_t *v);
+extern void __LIB__ __FASTCALL__ *b_vector_data(b_vector_t *v) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ b_vector_destroy(b_vector_t *v);
+extern void __LIB__ __FASTCALL__ b_vector_destroy(b_vector_t *v) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ b_vector_empty(b_vector_t *v);
+extern int __LIB__ __FASTCALL__ b_vector_empty(b_vector_t *v) __smallc;
 
 
 extern size_t __LIB__ b_vector_erase(b_vector_t *v,size_t idx) __smallc;
@@ -72,7 +72,7 @@ extern size_t __LIB__ __CALLEE__ b_vector_erase_range_callee(b_vector_t *v,size_
 #define b_vector_erase_range(a,b,c) b_vector_erase_range_callee(a,b,c)
 
 
-extern int __LIB__ __FASTCALL__ b_vector_front(b_vector_t *v);
+extern int __LIB__ __FASTCALL__ b_vector_front(b_vector_t *v) __smallc;
 
 
 extern b_vector_t __LIB__ *b_vector_init(void *p,size_t capacity,size_t max_size) __smallc;
@@ -95,10 +95,10 @@ extern size_t __LIB__ __CALLEE__ b_vector_insert_n_callee(b_vector_t *v,size_t i
 #define b_vector_insert_n(a,b,c,d) b_vector_insert_n_callee(a,b,c,d)
 
 
-extern size_t __LIB__ __FASTCALL__ b_vector_max_size(b_vector_t *v);
+extern size_t __LIB__ __FASTCALL__ b_vector_max_size(b_vector_t *v) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ b_vector_pop_back(b_vector_t *v);
+extern int __LIB__ __FASTCALL__ b_vector_pop_back(b_vector_t *v) __smallc;
 
 
 extern size_t __LIB__ b_vector_push_back(b_vector_t *v,int c) __smallc;
@@ -121,10 +121,10 @@ extern int __LIB__ __CALLEE__ b_vector_resize_callee(b_vector_t *v,size_t n) __s
 #define b_vector_resize(a,b) b_vector_resize_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ b_vector_shrink_to_fit(b_vector_t *);
+extern int __LIB__ __FASTCALL__ b_vector_shrink_to_fit(b_vector_t *) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ b_vector_size(b_vector_t *v);
+extern size_t __LIB__ __FASTCALL__ b_vector_size(b_vector_t *v) __smallc;
 
 
 extern size_t __LIB__ b_vector_write_block(void *src,size_t n,b_vector_t *v,size_t idx) __smallc;

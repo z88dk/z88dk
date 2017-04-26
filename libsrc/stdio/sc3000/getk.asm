@@ -13,6 +13,12 @@
 .getk
 ._getk
 	call	$42D4
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
 	ld	l,a
 	ld	h,0
 	ret

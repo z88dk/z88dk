@@ -20,13 +20,13 @@
 #define SFX_CHANNEL3        __PSGLIB_SFX_CHANNEL3
 #define SFX_CHANNELS2AND3   __PSGLIB_SFX_CHANNELS2AND3
 
-extern void __LIB__ __FASTCALL__ PSGPlay(void *song);
+extern void __LIB__ __FASTCALL__ PSGPlay(void *song) __smallc;
 
 
 extern void __LIB__ PSGCancelLoop(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ PSGPlayNoRepeat(void *song);
+extern void __LIB__ __FASTCALL__ PSGPlayNoRepeat(void *song) __smallc;
 
 
 extern void __LIB__ PSGStop(void) __smallc;
@@ -35,7 +35,7 @@ extern void __LIB__ PSGStop(void) __smallc;
 extern unsigned char __LIB__ PSGGetStatus(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ PSGSetMusicVolumeAttenuation(unsigned char attenuation);
+extern void __LIB__ __FASTCALL__ PSGSetMusicVolumeAttenuation(unsigned char attenuation) __smallc;
 
 
 

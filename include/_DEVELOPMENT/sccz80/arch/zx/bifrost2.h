@@ -131,7 +131,7 @@ extern unsigned char __LIB__ __CALLEE__ BIFROST2_getTile_callee(unsigned char px
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ __FASTCALL__ BIFROST2_getAnimGroup(unsigned char tile);
+extern unsigned char __LIB__ __FASTCALL__ BIFROST2_getAnimGroup(unsigned char tile) __smallc;
 
 
 

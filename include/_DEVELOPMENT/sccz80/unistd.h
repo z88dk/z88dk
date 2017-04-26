@@ -45,10 +45,10 @@ typedef long                   off_t;
 typedef int                    intptr_t;
 #endif
 
-extern int __LIB__ __FASTCALL__ close(int fd);
+extern int __LIB__ __FASTCALL__ close(int fd) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ dup(int fd);
+extern int __LIB__ __FASTCALL__ dup(int fd) __smallc;
 
 
 extern int __LIB__ dup2(int fd,int fd2) __smallc;
@@ -56,7 +56,7 @@ extern int __LIB__ __CALLEE__ dup2_callee(int fd,int fd2) __smallc;
 #define dup2(a,b) dup2_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ _exit(int status);
+extern void __LIB__ __FASTCALL__ _exit(int status) __smallc;
 
 
 extern off_t __LIB__ lseek(int fd,off_t offset,int whence) __smallc;
