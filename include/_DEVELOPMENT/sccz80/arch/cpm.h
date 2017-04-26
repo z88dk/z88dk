@@ -76,7 +76,7 @@ extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int 
 #define getuid()   cpm_bdos_hl(CPM_SUID, 0xFF)
 #define setuid(u)  cpm_bdos(CPM_SUID, u)
 
-extern unsigned long __LIB__ __FASTCALL__ cpm_get_offset(void *p);
+extern unsigned long __LIB__ __FASTCALL__ cpm_get_offset(void *p) __smallc;
 
 
 extern void __LIB__ cpm_set_offset(void *p,unsigned long offset) __smallc;

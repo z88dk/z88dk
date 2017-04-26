@@ -71,10 +71,10 @@ extern FILE __LIB__ __CALLEE__ *_fmemopen__callee(void **bufp,size_t *sizep,char
 extern int __LIB__ asprintf(char **ptr,char *format,...) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ clearerr(FILE *stream);
+extern void __LIB__ __FASTCALL__ clearerr(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ fclose(FILE *stream);
+extern int __LIB__ __FASTCALL__ fclose(FILE *stream) __smallc;
 
 
 extern FILE __LIB__ *fdopen(int fd,const char *mode) __smallc;
@@ -82,16 +82,16 @@ extern FILE __LIB__ __CALLEE__ *fdopen_callee(int fd,const char *mode) __smallc;
 #define fdopen(a,b) fdopen_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ feof(FILE *stream);
+extern int __LIB__ __FASTCALL__ feof(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ ferror(FILE *stream);
+extern int __LIB__ __FASTCALL__ ferror(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ fflush(FILE *stream);
+extern int __LIB__ __FASTCALL__ fflush(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ fgetc(FILE *stream);
+extern int __LIB__ __FASTCALL__ fgetc(FILE *stream) __smallc;
 
 
 extern int __LIB__ fgetpos(FILE *stream,fpos_t *pos) __smallc;
@@ -104,10 +104,10 @@ extern char __LIB__ __CALLEE__ *fgets_callee(char *s,int n,FILE *stream) __small
 #define fgets(a,b,c) fgets_callee(a,b,c)
 
 
-extern int __LIB__ __FASTCALL__ fileno(FILE *stream);
+extern int __LIB__ __FASTCALL__ fileno(FILE *stream) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ flockfile(FILE *stream);
+extern void __LIB__ __FASTCALL__ flockfile(FILE *stream) __smallc;
 
 
 extern FILE __LIB__ *fmemopen(void *buf,size_t size,char *mode) __smallc;
@@ -156,13 +156,13 @@ extern int __LIB__ __CALLEE__ fsetpos_callee(FILE *stream,fpos_t *pos) __smallc;
 #define fsetpos(a,b) fsetpos_callee(a,b)
 
 
-extern uint32_t __LIB__ __FASTCALL__ ftell(FILE *stream);
+extern uint32_t __LIB__ __FASTCALL__ ftell(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ ftrylockfile(FILE *stream);
+extern int __LIB__ __FASTCALL__ ftrylockfile(FILE *stream) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ funlockfile(FILE *stream);
+extern void __LIB__ __FASTCALL__ funlockfile(FILE *stream) __smallc;
 
 
 extern size_t __LIB__ fwrite(void *ptr,size_t size,size_t nmemb,FILE *stream) __smallc;
@@ -170,7 +170,7 @@ extern size_t __LIB__ __CALLEE__ fwrite_callee(void *ptr,size_t size,size_t nmem
 #define fwrite(a,b,c,d) fwrite_callee(a,b,c,d)
 
 
-extern int __LIB__ __FASTCALL__ getc(FILE *stream);
+extern int __LIB__ __FASTCALL__ getc(FILE *stream) __smallc;
 
 
 extern int __LIB__ getchar(void) __smallc;
@@ -186,7 +186,7 @@ extern int __LIB__ __CALLEE__ getline_callee(char **lineptr,size_t *n,FILE *stre
 #define getline(a,b,c) getline_callee(a,b,c)
 
 
-extern char __LIB__ __FASTCALL__ *gets(char *s);
+extern char __LIB__ __FASTCALL__ *gets(char *s) __smallc;
 
 
 extern int __LIB__ obstack_printf(struct obstack *ob,char *format,...) __smallc;
@@ -202,7 +202,7 @@ extern FILE __LIB__ __CALLEE__ *open_memstream_callee(char **bufp,size_t *sizep)
 #define open_memstream(a,b) open_memstream_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ perror(char *s);
+extern void __LIB__ __FASTCALL__ perror(char *s) __smallc;
 
 
 extern int __LIB__ printf(char *format,...) __smallc;
@@ -213,13 +213,13 @@ extern int __LIB__ __CALLEE__ putc_callee(int c,FILE *stream) __smallc;
 #define putc(a,b) putc_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ putchar(int c);
+extern int __LIB__ __FASTCALL__ putchar(int c) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ puts(char *s);
+extern int __LIB__ __FASTCALL__ puts(char *s) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ rewind(FILE *stream);
+extern void __LIB__ __FASTCALL__ rewind(FILE *stream) __smallc;
 
 
 extern int __LIB__ scanf(char *format,...) __smallc;
@@ -280,22 +280,22 @@ extern int __LIB__ __CALLEE__ vsscanf_callee(char *s,char *format,void *arg) __s
 
 
 
-extern void __LIB__ __FASTCALL__ clearerr_unlocked(FILE *stream);
+extern void __LIB__ __FASTCALL__ clearerr_unlocked(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ fclose_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ fclose_unlocked(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ feof_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ feof_unlocked(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ ferror_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ ferror_unlocked(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ fflush_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ fflush_unlocked(FILE *stream) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ fgetc_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ fgetc_unlocked(FILE *stream) __smallc;
 
 
 extern int __LIB__ fgetpos_unlocked(FILE *stream,fpos_t *pos) __smallc;
@@ -308,7 +308,7 @@ extern char __LIB__ __CALLEE__ *fgets_unlocked_callee(char *s,int n,FILE *stream
 #define fgets_unlocked(a,b,c) fgets_unlocked_callee(a,b,c)
 
 
-extern int __LIB__ __FASTCALL__ fileno_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ fileno_unlocked(FILE *stream) __smallc;
 
 
 extern int __LIB__ fprintf_unlocked(FILE *stream,char *format,...) __smallc;
@@ -347,7 +347,7 @@ extern int __LIB__ __CALLEE__ fsetpos_unlocked_callee(FILE *stream,fpos_t *pos) 
 #define fsetpos_unlocked(a,b) fsetpos_unlocked_callee(a,b)
 
 
-extern uint32_t __LIB__ __FASTCALL__ ftell_unlocked(FILE *stream);
+extern uint32_t __LIB__ __FASTCALL__ ftell_unlocked(FILE *stream) __smallc;
 
 
 extern size_t __LIB__ fwrite_unlocked(void *ptr,size_t size,size_t nmemb,FILE *stream) __smallc;
@@ -355,7 +355,7 @@ extern size_t __LIB__ __CALLEE__ fwrite_unlocked_callee(void *ptr,size_t size,si
 #define fwrite_unlocked(a,b,c,d) fwrite_unlocked_callee(a,b,c,d)
 
 
-extern int __LIB__ __FASTCALL__ getc_unlocked(FILE *stream);
+extern int __LIB__ __FASTCALL__ getc_unlocked(FILE *stream) __smallc;
 
 
 extern int __LIB__ getchar_unlocked(void) __smallc;
@@ -371,7 +371,7 @@ extern int __LIB__ __CALLEE__ getline_unlocked_callee(char **lineptr,size_t *n,F
 #define getline_unlocked(a,b,c) getline_unlocked_callee(a,b,c)
 
 
-extern char __LIB__ __FASTCALL__ *gets_unlocked(char *s);
+extern char __LIB__ __FASTCALL__ *gets_unlocked(char *s) __smallc;
 
 
 extern int __LIB__ printf_unlocked(char *format,...) __smallc;
@@ -382,13 +382,13 @@ extern int __LIB__ __CALLEE__ putc_unlocked_callee(int c,FILE *stream) __smallc;
 #define putc_unlocked(a,b) putc_unlocked_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ putchar_unlocked(int c);
+extern int __LIB__ __FASTCALL__ putchar_unlocked(int c) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ puts_unlocked(char *s);
+extern int __LIB__ __FASTCALL__ puts_unlocked(char *s) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ rewind_unlocked(FILE *stream);
+extern void __LIB__ __FASTCALL__ rewind_unlocked(FILE *stream) __smallc;
 
 
 extern int __LIB__ scanf_unlocked(char *format,...) __smallc;

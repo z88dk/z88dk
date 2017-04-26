@@ -41,7 +41,7 @@ extern void __LIB__ __CALLEE__ *obstack_alloc_callee(struct obstack *ob,size_t s
 #define obstack_alloc(a,b) obstack_alloc_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ *obstack_base(struct obstack *ob);
+extern void __LIB__ __FASTCALL__ *obstack_base(struct obstack *ob) __smallc;
 
 
 extern void __LIB__ *obstack_blank(struct obstack *ob,int size) __smallc;
@@ -64,7 +64,7 @@ extern void __LIB__ __CALLEE__ *obstack_copy0_callee(struct obstack *ob,void *p,
 #define obstack_copy0(a,b,c) obstack_copy0_callee(a,b,c)
 
 
-extern void __LIB__ __FASTCALL__ *obstack_finish(struct obstack *ob);
+extern void __LIB__ __FASTCALL__ *obstack_finish(struct obstack *ob) __smallc;
 
 
 extern void __LIB__ *obstack_free(struct obstack *ob,void *object) __smallc;
@@ -97,13 +97,13 @@ extern void __LIB__ __CALLEE__ *obstack_int_grow_fast_callee(struct obstack *ob,
 #define obstack_int_grow_fast(a,b) obstack_int_grow_fast_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ *obstack_next_free(struct obstack *ob);
+extern void __LIB__ __FASTCALL__ *obstack_next_free(struct obstack *ob) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ obstack_object_size(struct obstack *ob);
+extern size_t __LIB__ __FASTCALL__ obstack_object_size(struct obstack *ob) __smallc;
 
 
-extern size_t __LIB__ __FASTCALL__ obstack_room(struct obstack *ob);
+extern size_t __LIB__ __FASTCALL__ obstack_room(struct obstack *ob) __smallc;
 
 
 

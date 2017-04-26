@@ -72,13 +72,13 @@ extern char __LIB__ __CALLEE__ *_memupr__callee(void *p,size_t n) __smallc;
 #define _memupr_(a,b) _memupr__callee(a,b)
 
 
-extern char __LIB__ __FASTCALL__ *_strrstrip_(char *s);
+extern char __LIB__ __FASTCALL__ *_strrstrip_(char *s) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ ffs(int i);
+extern int __LIB__ __FASTCALL__ ffs(int i) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ ffsl(long i);
+extern int __LIB__ __FASTCALL__ ffsl(long i) __smallc;
 
 
 extern void __LIB__ *memccpy(void *dst,const void *src,int c,size_t n) __smallc;
@@ -176,10 +176,10 @@ extern size_t __LIB__ __CALLEE__ strcspn_callee(const char *s,const char *nspn) 
 #define strcspn(a,b) strcspn_callee(a,b)
 
 
-extern char __LIB__ __FASTCALL__ *strdup(const char *s);
+extern char __LIB__ __FASTCALL__ *strdup(const char *s) __smallc;
 
 
-extern char __LIB__ __FASTCALL__ *strerror(int errnum);
+extern char __LIB__ __FASTCALL__ *strerror(int errnum) __smallc;
 
 
 extern int __LIB__ stricmp(const char *s1,const char *s2) __smallc;
@@ -197,10 +197,10 @@ extern size_t __LIB__ __CALLEE__ strlcpy_callee(char *dst,const char *src,size_t
 #define strlcpy(a,b,c) strlcpy_callee(a,b,c)
 
 
-extern size_t __LIB__ __FASTCALL__ strlen(const char *s);
+extern size_t __LIB__ __FASTCALL__ strlen(const char *s) __smallc;
 
 
-extern char __LIB__ __FASTCALL__ *strlwr(char *s);
+extern char __LIB__ __FASTCALL__ *strlwr(char *s) __smallc;
 
 
 extern int __LIB__ strncasecmp(const char *s1,const char *s2,size_t n) __smallc;
@@ -258,7 +258,7 @@ extern size_t __LIB__ __CALLEE__ strrcspn_callee(const char *s,const char *set) 
 #define strrcspn(a,b) strrcspn_callee(a,b)
 
 
-extern char __LIB__ __FASTCALL__ *strrev(char *s);
+extern char __LIB__ __FASTCALL__ *strrev(char *s) __smallc;
 
 
 extern size_t __LIB__ strrspn(const char *s,const char *set) __smallc;
@@ -266,7 +266,7 @@ extern size_t __LIB__ __CALLEE__ strrspn_callee(const char *s,const char *set) _
 #define strrspn(a,b) strrspn_callee(a,b)
 
 
-extern char __LIB__ __FASTCALL__ *strrstrip(char *s);
+extern char __LIB__ __FASTCALL__ *strrstrip(char *s) __smallc;
 
 
 extern char __LIB__ *strsep(char **s,const char *delim) __smallc;
@@ -284,7 +284,7 @@ extern char __LIB__ __CALLEE__ *strstr_callee(const char *s,const char *subs) __
 #define strstr(a,b) strstr_callee(a,b)
 
 
-extern char __LIB__ __FASTCALL__ *strstrip(char *s);
+extern char __LIB__ __FASTCALL__ *strstrip(char *s) __smallc;
 
 
 extern char __LIB__ *strtok(char *s,const char *delim) __smallc;
@@ -297,7 +297,7 @@ extern char __LIB__ __CALLEE__ *strtok_r_callee(char *s,const char *delim,char *
 #define strtok_r(a,b,c) strtok_r_callee(a,b,c)
 
 
-extern char __LIB__ __FASTCALL__ *strupr(char *s);
+extern char __LIB__ __FASTCALL__ *strupr(char *s) __smallc;
 
 
 extern size_t __LIB__ strxfrm(char *dst,const char *src,size_t n) __smallc;

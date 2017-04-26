@@ -42,7 +42,7 @@ extern `$3' `$4'```$5'''_callee`'(`shift(shift(shift(shift(shift($@)))))') __pre
 dnl
 `ifelse(eval($# == 6),1,dnl
 dnl
-extern `$3' __LIB__ __FASTCALL__ `$4'``$5''`'(`$6');
+extern `$3' __LIB__ __FASTCALL__ `$4'``$5''`'(`$6') __smallc;
 
 ,dnl
 extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __smallc;

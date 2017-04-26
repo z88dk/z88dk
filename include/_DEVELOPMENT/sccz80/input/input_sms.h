@@ -11,7 +11,7 @@
 // keyboard
 ///////////
 
-extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms);
+extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms) __smallc;
 
 
 extern int __LIB__ in_test_key(void) __smallc;

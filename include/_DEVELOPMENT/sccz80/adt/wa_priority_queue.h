@@ -19,19 +19,19 @@ typedef struct wa_priority_queue_s
 
 } wa_priority_queue_t;
 
-extern size_t __LIB__ __FASTCALL__ wa_priority_queue_capacity(wa_priority_queue_t *q);
+extern size_t __LIB__ __FASTCALL__ wa_priority_queue_capacity(wa_priority_queue_t *q) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ wa_priority_queue_clear(wa_priority_queue_t *q);
+extern void __LIB__ __FASTCALL__ wa_priority_queue_clear(wa_priority_queue_t *q) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *wa_priority_queue_data(wa_priority_queue_t *q);
+extern void __LIB__ __FASTCALL__ *wa_priority_queue_data(wa_priority_queue_t *q) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ wa_priority_queue_destroy(wa_priority_queue_t *q);
+extern void __LIB__ __FASTCALL__ wa_priority_queue_destroy(wa_priority_queue_t *q) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ wa_priority_queue_empty(wa_priority_queue_t *q);
+extern int __LIB__ __FASTCALL__ wa_priority_queue_empty(wa_priority_queue_t *q) __smallc;
 
 
 extern wa_priority_queue_t __LIB__ *wa_priority_queue_init(void *p,void *data,size_t capacity,void *compar) __smallc;
@@ -39,7 +39,7 @@ extern wa_priority_queue_t __LIB__ __CALLEE__ *wa_priority_queue_init_callee(voi
 #define wa_priority_queue_init(a,b,c,d) wa_priority_queue_init_callee(a,b,c,d)
 
 
-extern void __LIB__ __FASTCALL__ *wa_priority_queue_pop(wa_priority_queue_t *q);
+extern void __LIB__ __FASTCALL__ *wa_priority_queue_pop(wa_priority_queue_t *q) __smallc;
 
 
 extern int __LIB__ wa_priority_queue_push(wa_priority_queue_t *q,void *item) __smallc;
@@ -52,10 +52,10 @@ extern int __LIB__ __CALLEE__ wa_priority_queue_resize_callee(wa_priority_queue_
 #define wa_priority_queue_resize(a,b) wa_priority_queue_resize_callee(a,b)
 
 
-extern size_t __LIB__ __FASTCALL__ wa_priority_queue_size(wa_priority_queue_t *q);
+extern size_t __LIB__ __FASTCALL__ wa_priority_queue_size(wa_priority_queue_t *q) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *wa_priority_queue_top(wa_priority_queue_t *q);
+extern void __LIB__ __FASTCALL__ *wa_priority_queue_top(wa_priority_queue_t *q) __smallc;
 
 
 

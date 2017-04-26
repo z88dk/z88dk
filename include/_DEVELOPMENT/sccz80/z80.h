@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-extern void __LIB__ __FASTCALL__ im2_init(void *im2_table_address);
+extern void __LIB__ __FASTCALL__ im2_init(void *im2_table_address) __smallc;
 
 
 extern void __LIB__ *im2_install_isr(uint16_t vector,void *isr) __smallc;
@@ -41,20 +41,20 @@ extern int __LIB__ __CALLEE__ im2_remove_generic_callback_callee(uint16_t vector
 
 
 
-extern void __LIB__ __FASTCALL__ z80_delay_ms(uint16_t ms);
+extern void __LIB__ __FASTCALL__ z80_delay_ms(uint16_t ms) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ z80_delay_tstate(uint16_t tstates);
+extern void __LIB__ __FASTCALL__ z80_delay_tstate(uint16_t tstates) __smallc;
 
 
 extern uint16_t __LIB__ z80_get_int_state(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ z80_set_int_state(uint16_t state);
+extern void __LIB__ __FASTCALL__ z80_set_int_state(uint16_t state) __smallc;
 
 
 
-extern uint8_t __LIB__ __FASTCALL__ z80_inp(uint16_t port);
+extern uint8_t __LIB__ __FASTCALL__ z80_inp(uint16_t port) __smallc;
 
 
 extern void __LIB__ *z80_inir(void *dst,uint16_t port) __smallc;

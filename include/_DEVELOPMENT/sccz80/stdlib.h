@@ -190,13 +190,13 @@ extern void __LIB__ __CALLEE__ _shellsort__callee(void *base,size_t nmemb,size_t
 #define _shellsort_(a,b,c,d) _shellsort__callee(a,b,c,d)
 
 
-extern uint16_t __LIB__ __FASTCALL__ _random_uniform_cmwc_8_(void *seed);
+extern uint16_t __LIB__ __FASTCALL__ _random_uniform_cmwc_8_(void *seed) __smallc;
 
 
-extern uint32_t __LIB__ __FASTCALL__ _random_uniform_xor_32_(uint32_t *seed);
+extern uint32_t __LIB__ __FASTCALL__ _random_uniform_xor_32_(uint32_t *seed) __smallc;
 
 
-extern uint16_t __LIB__ __FASTCALL__ _random_uniform_xor_8_(uint32_t *seed);
+extern uint16_t __LIB__ __FASTCALL__ _random_uniform_xor_8_(uint32_t *seed) __smallc;
 
 
 extern int __LIB__ _strtoi_(char *nptr,char **endptr,int base) __smallc;
@@ -212,22 +212,22 @@ extern uint16_t __LIB__ __CALLEE__ _strtou__callee(char *nptr,char **endptr,int 
 extern void __LIB__ abort(void) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ abs(int j);
+extern int __LIB__ __FASTCALL__ abs(int j) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ at_quick_exit(void *func);
+extern int __LIB__ __FASTCALL__ at_quick_exit(void *func) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ atexit(void *func);
+extern int __LIB__ __FASTCALL__ atexit(void *func) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ atof(char *nptr);
+extern double_t __LIB__ __FASTCALL__ atof(char *nptr) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ atoi(char *buf);
+extern int __LIB__ __FASTCALL__ atoi(char *buf) __smallc;
 
 
-extern long __LIB__ __FASTCALL__ atol(char *buf);
+extern long __LIB__ __FASTCALL__ atol(char *buf) __smallc;
 
 
 extern void __LIB__ bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc;
@@ -255,7 +255,7 @@ extern size_t __LIB__ __CALLEE__ dtoh_callee(double_t x,void *buf,uint16_t prec,
 #define dtoh(a,b,c,d) dtoh_callee(a,b,c,d)
 
 
-extern void __LIB__ __FASTCALL__ exit(int status);
+extern void __LIB__ __FASTCALL__ exit(int status) __smallc;
 
 
 extern size_t __LIB__ ftoa(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
@@ -283,7 +283,7 @@ extern char __LIB__ __CALLEE__ *itoa_callee(int num,char *buf,int radix) __small
 #define itoa(a,b,c) itoa_callee(a,b,c)
 
 
-extern long __LIB__ __FASTCALL__ labs(long j);
+extern long __LIB__ __FASTCALL__ labs(long j) __smallc;
 
 
 extern char __LIB__ *ltoa(long num,char *buf,int radix) __smallc;
@@ -296,13 +296,13 @@ extern void __LIB__ __CALLEE__ qsort_callee(void *base,size_t nmemb,size_t size,
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
 
 
-extern void __LIB__ __FASTCALL__ quick_exit(int status);
+extern void __LIB__ __FASTCALL__ quick_exit(int status) __smallc;
 
 
 extern int __LIB__ rand(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ srand(uint16_t seed);
+extern void __LIB__ __FASTCALL__ srand(uint16_t seed) __smallc;
 
 
 extern double_t __LIB__ strtod(char *nptr,char **endptr) __smallc;
@@ -325,7 +325,7 @@ extern uint32_t __LIB__ __CALLEE__ strtoul_callee(char *nptr,char **endptr,int b
 #define strtoul(a,b,c) strtoul_callee(a,b,c)
 
 
-extern int __LIB__ __FASTCALL__ system(char *s);
+extern int __LIB__ __FASTCALL__ system(char *s) __smallc;
 
 
 extern char __LIB__ *ultoa(uint32_t num,char *buf,int radix) __smallc;
@@ -351,10 +351,10 @@ extern void __LIB__ __CALLEE__ *calloc_callee(size_t nmemb,size_t size) __smallc
 #define calloc(a,b) calloc_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ free(void *p);
+extern void __LIB__ __FASTCALL__ free(void *p) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *malloc(size_t size);
+extern void __LIB__ __FASTCALL__ *malloc(size_t size) __smallc;
 
 
 extern void __LIB__ *realloc(void *p,size_t size) __smallc;
@@ -373,10 +373,10 @@ extern void __LIB__ __CALLEE__ *calloc_unlocked_callee(size_t nmemb,size_t size)
 #define calloc_unlocked(a,b) calloc_unlocked_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ free_unlocked(void *p);
+extern void __LIB__ __FASTCALL__ free_unlocked(void *p) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ *malloc_unlocked(size_t size);
+extern void __LIB__ __FASTCALL__ *malloc_unlocked(size_t size) __smallc;
 
 
 extern void __LIB__ *realloc_unlocked(void *p,size_t size) __smallc;
