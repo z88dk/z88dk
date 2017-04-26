@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Aug. 2010
 ;
 ;
-;	$Id: getk.asm,v 1.3 2016-06-12 17:32:01 dom Exp $
+;	$Id: getk.asm,v 1.3+ (now on GIT) $
 ;
 
         SECTION code_clib
@@ -16,7 +16,7 @@
 .getk
 ._getk
 	call	$79
-	
+  
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
