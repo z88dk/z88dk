@@ -39,7 +39,7 @@ ENDIF
 	defb	9
 	defb	'_'
 	defb	12
-	defb	'£'
+	defb	0xA3
 	defb	13
 	defb	'$'
 	defb	14
@@ -121,7 +121,7 @@ ENDIF
 	defb	131
 	defb	'_'
 	defb	12		; spider
-	defb	'£'
+	defb	0xa3
 	defb	13
 	defb	'$'
 	defb	6		; "battemberg"
@@ -203,7 +203,7 @@ ENDIF
 	defb	10
 	defb	'_'
 	defb	12
-	defb	'£'
+	defb	0xA3
 	defb	13
 	defb	'$'
 	defb	14
