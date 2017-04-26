@@ -1,6 +1,6 @@
 # ZX SPECTRUM BIFROST_H DEMO
-[Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)
-[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/bifrost_h)
+[Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)  
+[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/bifrost_h)  
 [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/bifrost_h.h)
 
 Before using Bifrost_H, it should be configured.

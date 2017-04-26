@@ -1,6 +1,6 @@
 # ZX SPECTRUM BIFROST*2 DEMO
-[Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)
-[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/bifrost2)
+[Game Engine Author's Website](https://www.ime.usp.br/~einar/bifrost/)  
+[Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/bifrost2)  
 [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/bifrost2.h)
 
 Before using Bifrost*2, it should be configured.
@@ -40,17 +40,17 @@ This program can be compiled as follows:
 
 1. SCCZ80 + New C Library
 ```
-   zcc +zx -vn -startup=1 -clib=new bifrost2dem.c ctile.asm -o bifrost2dem
-   appmake +zx -b bifrost2dem_BIFROST2.bin -o bifrost2.tap --noloader --org 51625 --blockname BIFROST2
-   appmake +zx -b bifrost2dem_CODE.bin -o bifrost2dem.tap --noloader --org 32768 --blockname bifrost2dm
-   copy /b loader.tap + bifrost2.tap + bifrost2dem.tap demo.tap
+zcc +zx -vn -startup=1 -clib=new bifrost2dem.c ctile.asm -o bifrost2dem
+appmake +zx -b bifrost2dem_BIFROST2.bin -o bifrost2.tap --noloader --org 51625 --blockname BIFROST2
+appmake +zx -b bifrost2dem_CODE.bin -o bifrost2dem.tap --noloader --org 32768 --blockname bifrost2dm
+copy /b loader.tap + bifrost2.tap + bifrost2dem.tap demo.tap
 ```
 2. ZSDCC + New C Library
 ```
-   zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 bifrost2dem.c ctile.asm -o bifrost2dem
-   appmake +zx -b bifrost2dem_BIFROST2.bin -o bifrost2.tap --noloader --org 51625 --blockname BIFROST2
-   appmake +zx -b bifrost2dem_CODE.bin -o bifrost2dem.tap --noloader --org 32768 --blockname bifrost2dm
-   copy /b loader.tap + bifrost2.tap + bifrost2dem.tap demo.tap
+zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 bifrost2dem.c ctile.asm -o bifrost2dem
+appmake +zx -b bifrost2dem_BIFROST2.bin -o bifrost2.tap --noloader --org 51625 --blockname BIFROST2
+appmake +zx -b bifrost2dem_CODE.bin -o bifrost2dem.tap --noloader --org 32768 --blockname bifrost2dm
+copy /b loader.tap + bifrost2.tap + bifrost2dem.tap demo.tap
 ```
 After compiling, the binaries "bifrost2dem_CODE.bin" (containing the program) and "bifrost2dem_BIFROST2.bin" (containing the bifrost*2 engine) are produced.
 

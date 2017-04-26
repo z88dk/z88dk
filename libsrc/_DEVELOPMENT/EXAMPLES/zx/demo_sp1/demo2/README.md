@@ -19,8 +19,9 @@ zcc +zx -vn -SO3 -startup=31 -clib=sdcc_iy --max-allocs-per-node200000 demo.c gr
 
 ## Controls
 
- q = increase number of sprites
- a = decrease number of sprites
- o = exit to basic
- p = change background
+ q = increase number of sprites  
+ a = decrease number of sprites  
+ o = exit to basic  
+ p = change background  
  space = toggle border timer
+ 
