@@ -61,6 +61,7 @@ extern void zmod_const(LVALUE *lval, int32_t value);
 extern void zor(LVALUE *);
 extern void zor_const(LVALUE *lval, int32_t value);
 extern void zxor(LVALUE *);
+extern void zxor_const(LVALUE *lval, int32_t value);
 extern void zand(LVALUE *);
 extern void zand_const(LVALUE *lval, int32_t value);
 extern void asr(LVALUE *);
