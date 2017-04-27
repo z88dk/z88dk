@@ -1,0 +1,15 @@
+#ifndef _GLOBAL_MANAGER_H_
+#define _GLOBAL_MANAGER_H_
+
+#define GLOBAL_LFT_SIDE		1
+#define GLOBAL_TOP_LINE		1
+#define GLOBAL_MID_LINE		10
+#define GLOBAL_TXT_START	4
+#define GLOBAL_TXT_LINE1	16
+#define GLOBAL_TXT_LINE2	19
+#define GLOBAL_TXT_LINE3	20
+
+#define MAX_ENEMIES			3
+#define MAX_BULLETS			3
+
+#endif//_GLOBAL_MANAGER_H_
