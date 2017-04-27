@@ -295,6 +295,10 @@ struct gototab_s {
 
 #define MAX_LEVELS 100
 
+/* Extract from the packed argument value */
+#define GET_PACKED_TYPE(v)  (v & 0xff)
+#define GET_PACKED_IDENT(v) ((v >> 8) & 0xff)
+#define GET_PACKED_FLAGS(v) ((v >> 16) & 0xffff)
 
 
 /*
@@ -349,6 +353,11 @@ struct varid {
 #define CPU_R3K      8
 
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
+
+
+#define INLINE_GINT  1
+#define INLINE_PINT  2
+#define INLINE_ALL   255
 
 struct parser_stack;
 

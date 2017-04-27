@@ -670,7 +670,7 @@ void declloc(
                             if ( expr == DOUBLE ) {
                                 decrement_double_ref_direct(val);
                             }
-                            lval.val_type = cptr->type;
+                            lval.val_type =  decltype;
                             lval.const_val = val;
                             load_constant(&lval);
                         } else {
