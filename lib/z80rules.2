@@ -745,7 +745,6 @@
 =
 	ld	a,(hl)
 	cp	#(%1 % 256)
-	jp	z,%2
 	jp	nc,%2
 	ld	hl,%3
 
@@ -792,9 +791,7 @@
 =
 	ld	a,(hl)
 	cp	#(%1 % 256)
-	jr	z,%2_uge
 	jp	c,%2
-.%2_uge
 	ld	hl,%3
 
 	ld	(%1),hl
