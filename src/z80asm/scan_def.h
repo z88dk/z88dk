@@ -178,6 +178,7 @@ TOKEN(TK_E1, "E'", )
 TOKEN(TK_H1, "H'", )
 TOKEN(TK_L1, "L'", )
 TOKEN(TK_A1, "A'", )
+TOKEN(TK_F1, "F'", )
 
 TOKEN(TK_BC1, "BC'", )
 TOKEN(TK_DE1, "DE'", )

@@ -11,9 +11,10 @@
 [z80]		ld {b c d e ixh ixl . a}, {. . . . ixh ixl . .}	=> DD, 40 + $1*8 + $2
 [z80]		ld {b c d e iyh iyl . a}, {. . . . iyh iyl . .}	=> FD, 40 + $1*8 + $2
 
-			ld {b c d e   h   l . a}, N			=>     06 + $1*8, N
-[z80]		ld {. . . . ixh ixl . .}, N			=> DD, 06 + $1*8, N
-[z80]		ld {. . . . iyh iyl . .}, N			=> FD, 06 + $1*8, N
+			ld {b c d e   h   l . a},  N			=>     06 + $1*8, N
+[rabbit]	ld {b c d e   h   l . a}', N			=> 76, 06 + $1*8, N
+[z80]		ld {. . . . ixh ixl . .},  N			=> DD, 06 + $1*8, N
+[z80]		ld {. . . . iyh iyl . .},  N			=> FD, 06 + $1*8, N
 
 			ld {b c d e   h   l . a},  (hl)		=>         46 + $1*8
 [rabbit]	ld {b c d e   h   l . a}', (hl)		=> 76,     46 + $1*8
@@ -85,17 +86,25 @@
 ;------------------------------------------------------------------------------
 ; General-Purpose Arithmetic Group
 ;------------------------------------------------------------------------------
-[zilog]		daa					=>     27
-[zilog]		rld					=> ED, 6F
-[zilog]		rrd					=> ED, 67
+[zilog]		daa					=>         27
+[zilog]		rld					=>     ED, 6F
+[zilog]		rrd					=>     ED, 67
 
-			cpl					=>     2F
-			cpl a				=>     2F
-[rabbit]	cpl	a'				=> 76, 2F
-
-			neg					=> ED, 44
+			cpl					=>         2F
+			cpl a				=>         2F
+[rabbit]	cpl	a'				=>     76, 2F
+                                       
+			neg					=>     ED, 44
+			neg a				=>     ED, 44
+[rabbit]	neg a'				=> 76, ED, 44
+			
 			ccf					=>     3F
+			ccf	f				=>     3F
+[rabbit]	ccf	f'				=> 76, 3F
+			
 			scf					=>     37
+			scf f				=>     37
+[rabbit]	scf	f'				=> 76, 37
 
 ;------------------------------------------------------------------------------
 ; 16-bit load group
@@ -132,6 +141,7 @@
 [r3k]		push su						=> ED, 66
 
 			pop {bc de hl af}			=>     C1 + $1*10
+[rabbit]	pop {bc de hl af}'			=> 76, C1 + $1*10
 			pop {.  .  ix . }			=> DD, C1 + $1*10
 			pop {.  .  iy . }			=> FD, C1 + $1*10
 [rabbit]	pop ip						=> ED, 7E
@@ -191,9 +201,9 @@
 			add hl,  {bc de hl sp}		=>     09 + $1*10
 [rabbit]	add hl', {bc de hl sp}		=> 76, 09 + $1*10
 
-			add ix, {bc de ix sp}		=> DD, 09 + $1*10
-			add iy, {bc de iy sp}		=> FD, 09 + $1*10
-
+			add ix, {bc de ix sp}		=>     DD, 09 + $1*10
+			add iy, {bc de iy sp}		=>     FD, 09 + $1*10
+                                               
 			{sbc adc} hl,  {bc de hl sp}=>     ED, 42 + $1*8 + $2*10
 [rabbit]	{sbc adc} hl', {bc de hl sp}=> 76, ED, 42 + $1*8 + $2*10
 
@@ -204,10 +214,11 @@
 			
 [rabbit]	add sp, D					=>     27, D
 
-[rabbit]	{and or} hl,  de			=>     DC + $1*10
-[rabbit]	{and or} hl', de			=> 76, DC + $1*10
-[rabbit]	{and or} ix,  de			=> DD, DC + $1*10
-[rabbit]	{and or} iy,  de			=> FD, DC + $1*10
+[rabbit]	{and or} hl,  de			=>         DC + $1*10
+[rabbit]	{and or} hl', de			=> 76,     DC + $1*10
+
+[rabbit]	{and or} ix,  de			=>     DD, DC + $1*10
+[rabbit]	{and or} iy,  de			=>     FD, DC + $1*10
 
 [rabbit]	bool hl						=>     CC
 [rabbit]	bool hl'					=> 76, CC
@@ -255,15 +266,21 @@
 [rabbit]	rl de		=>     F3
 [rabbit]	rr de		=>     FB
 [rabbit]	rr hl		=>     FC
+
+[rabbit]	rl de'		=> 76, F3
+[rabbit]	rr de'		=> 76, FB
+[rabbit]	rr hl'		=> 76, FC
+
 [rabbit]	rr ix		=> DD, FC
 [rabbit]	rr iy		=> FD, FC
 
 ;------------------------------------------------------------------------------
 ; Bit Set, Reset, and Test Group
 ;------------------------------------------------------------------------------
-			{. bit res set} {0 1 2 3 4 5 6 7}, {b c d e h l (hl)   a}	=>     CB,    $1*40 + $2*8 + $3
-			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (ix+D) .}	=> DD, CB, D, $1*40 + $2*8 + $3
-			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (iy+D) .}	=> FD, CB, D, $1*40 + $2*8 + $3
+			{. bit res set} {0 1 2 3 4 5 6 7}, {b c d e h l (hl)   a}		=>     CB,    $1*40 + $2*8 + $3
+[rabbit]	{. .   res set} {0 1 2 3 4 5 6 7}, {b c d e h l .      a}'		=> 76, CB,    $1*40 + $2*8 + $3
+			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (ix+D) .}		=> DD, CB, D, $1*40 + $2*8 + $3
+			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (iy+D) .}		=> FD, CB, D, $1*40 + $2*8 + $3
 			
 ;------------------------------------------------------------------------------
 ; Block Transfer Group

@@ -225,6 +225,9 @@ tokens:
   - name	: A1
     regexp	: "\"A'\"i"
   
+  - name	: F1
+    regexp	: "\"F'\"i"
+  
   - name	: BC1
     regexp	: "\"BC'\"i"
   
