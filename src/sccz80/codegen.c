@@ -1789,7 +1789,7 @@ void zand_const(LVALUE *lval, int32_t value)
     } else {
         if ( value == 0 ) {
             vconst(0);
-        } else if ( value == 0xff ) {
+        } else if ( (value % 65536) == 0xff ) {
             ol("ld\th,0");
         } else if ( value >= 0 && value < 256 ) {
             // 6 bytes, library call is 6 bytes, this is faster
@@ -1799,7 +1799,7 @@ void zand_const(LVALUE *lval, int32_t value)
             ol("ld\th,0");
         } else if ( value % 256 == 0 ) {
             ol("ld\ta,h");
-            ot("and\t"); outdec(value / 256); nl();
+            ot("and\t"); outdec( (value % 65536) / 256); nl();
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else {
