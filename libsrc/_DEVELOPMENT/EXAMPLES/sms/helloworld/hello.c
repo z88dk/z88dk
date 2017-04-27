@@ -2,7 +2,7 @@
 #include <stropts.h>
 #include <arch/sms.h>
 #include <rect.h>
-#include <z80.h>
+#include <input.h>
 
 const unsigned char author[] = "z88dk";
 const unsigned char name[] = "Hello World";
@@ -37,8 +37,8 @@ void main(void)
 	while (1)
 	{
 		printf("SMS says Hello World!\n");
-		z80_delay_ms(250);
+		in_pause(250);
 		printf("Something else...\n");
-		z80_delay_ms(250);
+		in_pause(250);
 	}
 }

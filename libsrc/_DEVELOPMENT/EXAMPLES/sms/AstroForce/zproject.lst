@@ -12,4 +12,4 @@ bank12.o
 bank13.o
 bank14.o
 fixedbank.o
-main.c
+src/main.c

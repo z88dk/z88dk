@@ -1,5 +1,21 @@
-Data Storm
-==========
+# Data Storm v1.00 by haroldoop
+[Original Website](http://www.smspower.org/Homebrew/DataStorm-SMS)
+
+The source code here consists of everything needed to compile the game and does not include raw binary assets that need conversion to sms-friendly formats using other tools as an intermediate step.  To see everything, visit the link above.
+
+## Compiling
+
+zsdcc compile (high optimization means compile times can be long):
+```
+zcc +sms -v -startup=16 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 datastorm.c gfx.c -o datastorm --fsigned-char -create-app -pragma-include:zpragma.inc
+```
+
+---
+---
+
+# Data Storm
+(Original Text)
+
 
 About
 -----

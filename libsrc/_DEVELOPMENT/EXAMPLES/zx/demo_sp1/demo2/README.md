@@ -1,4 +1,4 @@
-# ZX SPECTRUM SP1 DEMO 1
+# ZX SPECTRUM SP1 DEMO 2
 (C) 2012 Timmy
 
 A simple demo program to show how z88dk and sp1 can be used to make a game.

@@ -19,8 +19,8 @@
 
 // Output Terminal Options
 
-#pragma output CRT_OTERM_CHAR_PATTERN_OFFSET = -32       // ascii code 32 of the font will be mapped to character 0
-#pragma output CRT_OTERM_BACKGROUND_CHAR     = 0         // background char is an absolute character 0-511, choose space
+#pragma output CRT_OTERM_CHAR_PATTERN_OFFSET = -32       // ascii code 32 of the font will be mapped to tile 0
+#pragma output CRT_OTERM_BACKGROUND_CHAR     = 0         // background tile is an absolute tile 0-511
 
 #pragma output CRT_OTERM_WINDOW_X      = 4
 #pragma output CRT_OTERM_WINDOW_WIDTH  = 24
