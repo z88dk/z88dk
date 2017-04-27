@@ -1173,6 +1173,8 @@ int main(int argc, char **argv)
 				rules[num_rules++] = c_coptrules9;
 
 				switch (peepholeopt) {
+					case 0:
+						break;
 					case 1:
 						rules[num_rules++] = c_coptrules1;
 						break;
