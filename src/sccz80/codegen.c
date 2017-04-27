@@ -451,7 +451,7 @@ void putstk(char typeobj)
         break;
     default:
         zpop();
-        if (c_doinline) {
+        if (c_doinline & INLINE_PINT) {
             LoadAccum();
             ol("ld\t(de),a");
             ol("inc\tde");
@@ -580,7 +580,7 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (c_doinline) {
+        if (c_doinline & INLINE_GINT) {
             ol("ld\ta,(hl)");
             ol("inc\thl");
             ol("ld\th,(hl)");
