@@ -1,4 +1,24 @@
-# CandyKidDemoSMS
+# CandyKidDemo SMS by SteveProXNA  
+March 27, 2017  
+[Original Source Repository](http://github.com/SteveProXNA/CandyKidDemoSMS)  
+[Page at SMS POWER](http://www.smspower.org/Homebrew/CandyKidDemo-SMS)
+
+The source code here consists of everything needed to compile the game and does not include raw binary assets that need conversion to sms-friendly formats using other tools as an intermediate step.  To see everything, visit the link above.
+
+## Compiling
+
+zsdcc compile (optimization is high so compile time could be long):
+~~~
+zcc +sms -v -startup=16 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 main.c gfx.c psg.c -o ckd -pragma-include:zpragma.inc -create-app
+~~~
+
+---
+---
+
+
+
+# CandyKidDemo SMS by SteveProXNA 
+(Original Description Text)  
 Candy Kid Demo for the Sega Master System 2017 Competition
 
 ###### RELEASE
@@ -64,5 +84,4 @@ Previous Sega-based retro games published include "Candy Kid" available here:
 
 ###### CONTACT
 - Blog:		http://steveproxna.blogspot.com
-- Email:	steven_boland@hotmail.com
 - Twitter:	[@SteveProXNA](http://twitter.com/SteveProXNA)

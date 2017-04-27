@@ -32,7 +32,7 @@ genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib nd
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
-nclibs: nc_clib.lib gfxnc100.lib gfxnc200.lib
+nclibs: nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib
 
 eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
@@ -1117,6 +1117,13 @@ gfxnc100.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(LISTFILE_DIRECTORY)/gfxnc.lst
+	
+gfxzcn.lib:
+	@echo ''
+	@echo '--- Building NC-100 Graphics Library (ZCN)---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORnc100 -DFORzcn -x$(OUTPUT_DIRECTORY)/gfxzcn @$(LISTFILE_DIRECTORY)/gfxnc.lst
 
 # NC-200 graphics lib - Stefano
 gfxnc200.lib:

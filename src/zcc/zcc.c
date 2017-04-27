@@ -1044,7 +1044,7 @@ int main(int argc, char **argv)
     /* crt file is now the first file in filelist */
     c_crt0 = temporary_filenames[0];
 
-    // PLOT TWIST
+    // PLOT TWIST - See #190 on Github
     // The crt must be processed last because the new c library now processes zcc_opt.def with m4.
     // With the crt first, the other .c files have not been processed yet and zcc_opt.def may not be complete.
     //
@@ -1140,8 +1140,8 @@ int main(int argc, char **argv)
 				char  *rules[MAX_COPT_RULE_FILES];
 				int    num_rules = 0;
 
-				/* sdcc_opt.9 implements bugfixes and code size reduction and should be applied to every sdcc compile */
-				rules[num_rules++] = c_sdccopt9;
+				/* sdcc_opt.9 bugfixes critical sections and implements RST substitution */
+				// rules[num_rules++] = c_sdccopt9;
 
 				switch (peepholeopt)
 				{
@@ -1169,7 +1169,7 @@ int main(int argc, char **argv)
 				char  *rules[MAX_COPT_RULE_FILES];
 				int    num_rules = 0;
 				
-				/* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
+				/* z80rules.9 implements intrinsics and RST substitution */
 				rules[num_rules++] = c_coptrules9;
 
 				switch (peepholeopt) {

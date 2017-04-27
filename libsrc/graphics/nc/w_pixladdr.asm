@@ -46,10 +46,14 @@
         rr      e
 
         add     hl,de           ;hl = (y * 64) + (x / 8)
+IF FORzcn
+        ld      de,$C000+$3000		;base_graphics  in ZCN mode
+ELSE
 IF FORnc100
         ld      de,$4000+$3000		;base_graphics  ;)
 ELSE
         ld      de,$4000+$2000		;base_graphics  ;)
+ENDIF
 ENDIF
         add     hl,de
 
