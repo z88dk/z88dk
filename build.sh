@@ -39,13 +39,20 @@ export CC
 export CFLAGS
 export CCOPT
 
-MAKE="make"
-INSTALL="install"
-
-if [ "`uname -s`" = "SunOS" ]; then
-   MAKE="gmake"
-   INSTALL="ginstall"
-fi
+case `uname -s` in
+    SunOS)
+        MAKE="gmake"
+        INSTALL="ginstall"
+        ;;
+    OpenBSD|NetBSD|FreeBSD)
+        MAKE="gmake"
+        INSTALL="install"
+        ;;
+    *)
+        MAKE="make"
+        INSTALL="install"
+        ;;
+esac
 
 export INSTALL
 
