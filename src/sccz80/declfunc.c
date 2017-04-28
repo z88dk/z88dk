@@ -92,8 +92,10 @@ int AddNewFunc(
      */
     simple = NO;
     if (cmatch(')')) {
-        if (rcmatch(';') || rcmatch(','))
+        if (rcmatch(';') || rcmatch(',')) {
+            currfn = NULL;
             return (storage);
+        }
         simple = YES;
     }
 
