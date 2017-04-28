@@ -18,11 +18,11 @@ PUBLIC asm_z80_set_int_state
 
 asm_z80_set_int_state:
 
-   ; enter : hl = ei/di status
+   ; enter : l = ei/di status
    ;
    ; uses  : f
 
-   IF __z80_cpu_info & $01
+   IF __Z80 & __Z80_NMOS
    
       bit 0,l                  ; check carry flag
    

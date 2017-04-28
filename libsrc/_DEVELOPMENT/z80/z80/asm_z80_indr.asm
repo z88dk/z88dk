@@ -3,7 +3,7 @@
 ; Nov 2014
 ; ===============================================================
 ;
-; void *z80_indr(void *dst, uint16_t port)
+; void *z80_indr(void *dst, uint8_t port, uint8_t num)
 ;
 ; Read sequence of bytes from port and store at address dst.
 ;
@@ -17,7 +17,8 @@ PUBLIC asm_z80_indr
 asm_z80_indr:
 
    ; enter : hl = void *dst
-   ;         bc = port
+   ;          c = port
+   ;          b = num
    ;
    ; exit  : hl = void *dst_prev (address prior to last byte written)
    ;

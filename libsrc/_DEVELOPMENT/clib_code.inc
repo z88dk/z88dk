@@ -40,6 +40,7 @@ section code_fcntl
 section code_font_fzx
 section code_fp_genmath
 section code_fp_math48
+section code_im2
 section code_input
 section code_inttypes
 section code_l
@@ -60,6 +61,7 @@ section code_string
 section code_temp_sp1
 section code_threads
 section code_threads_mutex
+section code_z180
 section code_z80
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

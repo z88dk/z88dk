@@ -3,7 +3,7 @@
 ; Nov 2014
 ; ===============================================================
 ;
-; void *z80_otdr(void *src, uint16_t port)
+; void *z80_otdr(void *src, uint8_t port, uint8_t num)
 ;
 ; Write sequence of bytes at address src to port.
 ;
@@ -16,8 +16,9 @@ PUBLIC asm_z80_otdr
 
 asm_z80_otdr:
 
-   ; enter : bc = port
-   ;         hl = void *src
+   ; enter : hl = void *src
+   ;          c = port
+   ;          b = num
    ;
    ; exit  : hl = void *src_prev (address of byte prior to last written)
    ;

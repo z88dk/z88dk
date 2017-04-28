@@ -10,6 +10,7 @@
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_iy.lst
 @font/fzx/zx/zx_sdcc_iy.lst
+@im2/im2_sdcc.lst
 @input/zx/input_sdcc_iy.lst
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
@@ -26,4 +27,4 @@
 @target/zx/driver/driver.lst
 @temp/sp1/zx/sp1_zx_sdcc_iy.lst
 @threads/threads_sdcc_iy.lst
-@z80/z80_sdcc_iy.lst
+@z80/z80_sdcc.lst

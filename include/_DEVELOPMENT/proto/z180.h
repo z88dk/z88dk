@@ -1,9 +1,61 @@
 include(__link__.m4)
 
+#ifdef __Z180
+
 #ifndef _Z180_H
 #define _Z180_H
 
 #include <arch.h>
+#include <stdint.h>
+
+// Runtime IM 2
+
+#include <im2.h>
+
+// Exact T State Delay Busy Loop
+
+__DPROTO(,,void,,z180_delay_ms,uint16_t ms)
+__DPROTO(`d,e',`d,e',void,,z180_delay_tstate,uint16_t tstates)
+__OPROTO(`b,c,d,e',`b,c,d,e',uint8_t,,z180_get_int_state,void)
+__DPROTO(`a,b,c,d,e,h,l',`b,c,d,e',void,,z180_set_int_state,uint8_t state)
+
+// IO By Function
+
+__DPROTO(`d,e',`d,e',uint8_t,,z180_inp,uint16_t port)
+__DPROTO(`d,e',`d,e',void,*,z180_inir,void *dst,uint8_t port,uint8_t num)
+__DPROTO(`d,e',`d,e',void,*,z180_indr,void *dst,uint8_t port,uint8_t num)
+__DPROTO(`d,e',`d,e',void,,z180_outp,uint16_t port,uint8_t data)
+__DPROTO(`d,e',`d,e',void,*,z180_otir,void *src,uint8_t port,uint8_t num)
+__DPROTO(`d,e',`d,e',void,*,z180_otdr,void *src,uint8_t port,uint8_t num)
+
+__DPROTO(`d,e',`d,e',void,*,z180_otim,void *dst,uint8_t port,uint8_t num)
+__DPROTO(`d,e',`d,e',void,*,z180_otimr,void *dst,uint8_t port,uint8_t num)
+__DPROTO(`d,e',`d,e',void,*,z180_otdm,void *src,uint8_t port,uint8_t num)
+__DPROTO(`d,e',`d,e',void,*,z180_otdmr,void *src,uint8_t port,uint8_t num)
+
+// Memory by Address
+
+#define z180_bpoke(a,b)  (*(unsigned char *)(a) = b)
+#define z180_wpoke(a,b)  (*(unsigned int *)(a) = b)
+#define z180_lpoke(a,b)  (*(unsigned long *)(a) = b)
+
+#define z180_bpeek(a)    (*(unsigned char *)(a))
+#define z180_wpeek(a)    (*(unsigned int *)(a))
+#define z180_lpeek(a)    (*(unsigned long *)(a))
+
+#ifdef __CLANG
+
+#define z180_llpoke(a,b) (*(unsigned long long *)(a) = b)
+#define z180_llpeek(a)   (*(unsigned long long *)(a))
+
+#endif
+
+#ifdef __SDCC
+
+#define z180_llpoke(a,b) (*(unsigned long long *)(a) = b)
+#define z180_llpeek(a)   (*(unsigned long long *)(a))
+
+#endif
 
 // INTERNAL INTERRUPT VECTORS
 
@@ -284,6 +336,8 @@ include(__link__.m4)
    __sfr __at __IO_ICR ICR;
 
    #endif
+
+#endif
 
 #endif
 
