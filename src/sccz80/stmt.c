@@ -16,6 +16,7 @@
 
 extern void dogoto(void);
 extern int dolabel(void);
+static void docritical(void);
 static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
 static int lastline = 0;
 
@@ -172,6 +173,11 @@ int statement()
                 st = STASM;
             }
             break;
+        case '_':
+            if (match("__critical")) {
+                docritical();
+                st = STCRITICAL;
+            }
         }
         if (st == -1) {
             /* if nothing else, assume it's an expression */
@@ -494,14 +500,15 @@ void doreturn(char type)
         if (currfn->more) {
             /* return pointer to value */
             force(CINT, doexpr(), YES, c_default_unsigned, 0);
-            leave(CINT, type);
+            leave(CINT, type, incritical);
         } else {
             /* return actual value */
             force(currfn->type, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
-            leave(currfn->type, type);
+            leave(currfn->type, type, incritical);
         }
-    } else
-        leave(NO, type);
+    } else {
+        leave(NO, type, incritical);
+    }
 }
 
 /*
@@ -509,14 +516,14 @@ void doreturn(char type)
  * If vartype is a value then save it
  * type: 1=c, 2=nc, 0=don't bother
  */
-void leave(int vartype, char type)
+void leave(int vartype, char type, int incritical)
 {
     int savesp;
     int save = vartype;
     int callee_cleanup = (c_compact_code || currfn->flags & CALLEE) && (stackargs > 2);
     int hlsaved;
 
-    if ( currfn->flags & NAKED ) {
+    if ( (currfn->flags & NAKED) == NAKED ) {
         return;
     }
 
@@ -566,6 +573,11 @@ void leave(int vartype, char type)
         }
     }
     popframe(); /* Restore previous frame pointer */
+
+    /* Naked has already returned */
+    if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
+        zleavecritical();
+    }
     if (type)
         setcond(type);
     zret(); /* and exit function */
@@ -603,6 +615,20 @@ void docont()
     }
     modstk(ptr->sp, NO, NO); /* else clean up stk ptr */
     jump(ptr->loop); /* jump to loop label */
+}
+
+static void docritical(void)
+{
+    if ( incritical ) {
+        error(E_NESTED_CRITICAL);
+    }
+    incritical = 1;
+    zentercritical();
+    Zsp -= zcriticaloffset();
+    statement();
+    zleavecritical();
+    incritical = 0;
+    Zsp += zcriticaloffset();
 }
 
 /*

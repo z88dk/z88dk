@@ -186,7 +186,9 @@ struct errors {
     { "Attempt to modify const lvalue \'%s\''", 1},
     { "Cannot statically initialise doubles when -doublestr is used", 1},
     { "Cannot dereference the port definition: \'%s\'", 1},
-    { "sizeof expects a pointer but got %s",1}
+    { "sizeof expects a pointer but got %s",1},
+    { "Cannot nest __critical sections", 1},
+    { "Function '%s' is both __naked and __critical, this is not permitted", 1},
 };
 
 /*

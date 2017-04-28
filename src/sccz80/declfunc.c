@@ -447,6 +447,10 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
         where += 2;
 
+    if ( (currfn->flags & (CRITICAL|NAKED)) == CRITICAL ) {
+        where += zcriticaloffset();
+    }
+
     /* main is always __stdc */
     if ( strcmp(currfn->name,"main") == 0 ) {
         currfn->flags &= ~SMALLC;
@@ -469,7 +473,9 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         setup_r2l_parameters(prevarg, argnumber, &where);
     }
 
-
+    if ( (currfn->flags & CRITICAL) == CRITICAL ) {
+        zentercritical();
+    }
     pushframe();
     if (currfn->prototyped == 1 && (currfn->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         /*
@@ -490,7 +496,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     if (statement() != STRETURN) {
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
-        leave(NO, NO);
+        leave(NO, NO, 0);
     }
     goto_cleanup();
     function_appendix(currfn);
@@ -535,6 +541,11 @@ void check_trailing_modifiers(SYMBOL *currfn)
             currfn->flags |= NAKED;
             continue;
         }
+
+        if ( amatch("__critical")) {
+            currfn->flags |= CRITICAL;
+            continue;
+        }
         if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -551,6 +562,9 @@ void check_trailing_modifiers(SYMBOL *currfn)
             continue;
         }
         break;
+    }
+    if ( (currfn->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
+        error(E_NAKED_CRITICAL, currfn->name);
     }
 }
 

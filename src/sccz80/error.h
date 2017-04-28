@@ -74,7 +74,7 @@ enum errorct {
 
         E_CHANGING_CONST, E_STATIC_DOUBLE_STRING, E_PORT_DEREF,
 
-        E_SIZEOF,
+        E_SIZEOF, E_NESTED_CRITICAL, E_NAKED_CRITICAL,
 
         E_MAXIMUM
 };
