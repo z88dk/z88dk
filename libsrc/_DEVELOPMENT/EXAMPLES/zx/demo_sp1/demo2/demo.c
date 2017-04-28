@@ -84,8 +84,8 @@ unsigned char levelb[32*24*3];
 
 void drawmap(void)
 {
-	sp1_PutTiles(&levelbrect, (struct sp1_tp *)(levelb));
-	sp1_Invalidate(&levelbrect);
+   sp1_PutTiles(&levelbrect, (struct sp1_tp *)(levelb));
+   sp1_Invalidate(&levelbrect);
 }
 
 // Fill the background with some arbitrary patterns, and draw it.
@@ -162,11 +162,24 @@ main()
    unsigned char c;
    unsigned char d;
 
+   // Set up IM2 mode
+   // (halt is being used here)
+   
+   // interrupts are already disabled by the CRT
+   
+   im2_init(0xd000);           // place z80 in im2 mode with interrupt vector table located at 0xd000
+   memset(0xd000, 0xd1, 257);  // initialize 257-byte im2 vector table with all 0xd1 bytes
+   
+   z80_bpoke(0xd1d1, 0xfb);    // POKE instructions at address 0xd1d1 (interrupt service routine entry)
+   z80_bpoke(0xd1d2, 0xed);
+   z80_bpoke(0xd1d3, 0x4d);    // instructions for EI; RETI
+   
+   intrinsic_ei();             // enable interrupts without impeding optimizer
+
    // Make the border black.
 
    zx_border(INK_BLACK);
-   
-   
+
    // The next part is very important. The game will not compile if it is removed.
    // Initialise the SP1 library
    
