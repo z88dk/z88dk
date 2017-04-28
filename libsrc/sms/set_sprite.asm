@@ -41,7 +41,13 @@
 
 	ld a, c
 	out ($be), a		; Set X
-	ld a, d
+	nop			;4
+	nop
+	nop
+	nop
+	nop
+	nop
+	ld a, d			;4
 	out ($be), a		; Set Tile
 
 	ret

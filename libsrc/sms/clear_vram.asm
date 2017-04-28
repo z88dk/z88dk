@@ -18,8 +18,12 @@
 	ld 	a, $00       ; Value to write
 .clearVRAM1
 	out 	($be),a      ; Output to VRAM address, which is auto-incremented after each write
-	dec 	h
-	jp 	nz, clearVRAM1
+	nop			;4
+	nop			;4
+	nop			;4
+	nop			;4
+	dec 	h		;4
+	jp 	nz, clearVRAM1	;10
 	dec 	l
 	jp 	nz, clearVRAM1
 	ret
