@@ -46,6 +46,10 @@ extern unsigned long intrinsic_swap_word_32(unsigned long n) __preserves_regs(a,
 extern unsigned long intrinsic_swap_word_32_fastcall(unsigned long n) __preserves_regs(a,b,c) __z88dk_fastcall;
 #define intrinsic_swap_word_32(a) intrinsic_swap_word_32_fastcall(a)
 
+#ifdef __Z180
+extern void intrinsic_slp(void) __preserves_regs(a,b,c,d,e,h,l);
+#endif
+
 #else
 
 // SCCZ80 COMPILES
@@ -75,6 +79,10 @@ extern void __LIB__ *intrinsic_return_de(void) __smallc;
 extern unsigned int __LIB__ __FASTCALL__ intrinsic_swap_endian_16(unsigned long n);
 extern unsigned long __LIB__ __FASTCALL__ intrinsic_swap_endian_32(unsigned long n);
 extern unsigned long __LIB__ __FASTCALL__ intrinsic_swap_word_32(unsigned long n);
+
+#ifdef __Z180
+extern void __LIB__ intrinsic_slp(void) __smallc;
+#endif
 
 #endif
 #endif

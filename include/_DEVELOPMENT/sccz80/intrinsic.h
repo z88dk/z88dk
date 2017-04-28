@@ -94,4 +94,12 @@ extern unsigned long __LIB__ __FASTCALL__ intrinsic_swap_word_32(unsigned long n
 
 
 
+#ifdef __Z180
+
+extern void __LIB__ intrinsic_slp(void) __smallc;
+
+
+
+#endif
+
 #endif
