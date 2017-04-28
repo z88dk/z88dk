@@ -116,6 +116,7 @@ struct symbol_s {
                              /* or offset into macro table, else 0 */
                 SYMBOL *p ;  /* also used to form linked list of fn args */
         } offset ;
+        char  declared_location[1024];  /* Where it was declared, this will truncated with a silly long path */
         int  more ;          /* index of linked entry in dummy_sym */
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */

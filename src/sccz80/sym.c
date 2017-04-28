@@ -202,4 +202,5 @@ static void initialise_sym(
     ptr->more = more;
     ptr->tag_idx = itag;
     ptr->flags = FLAGS_NONE;
+    snprintf(ptr->declared_location, sizeof(ptr->declared_location),"%s:%d", Filename, lineno);
 }
