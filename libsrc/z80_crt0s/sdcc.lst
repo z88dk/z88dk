@@ -50,9 +50,9 @@
 ../_DEVELOPMENT/l/sdcc/____sdcc_store_debc_hlix
 ../_DEVELOPMENT/l/sdcc/____sdcc_store_debc_mhl
 ../_DEVELOPMENT/l/sdcc/____sdcc_store_dehl_bcix
-../_DEVELOPMENT/l/sdcc/____sdcc_z80_pop_ei
-../_DEVELOPMENT/l/sdcc/____sdcc_z80_pop_ei_jp
-../_DEVELOPMENT/l/sdcc/____sdcc_z80_push_di
+../_DEVELOPMENT/l/sdcc/____sdcc_cpu_pop_ei
+../_DEVELOPMENT/l/sdcc/____sdcc_cpu_pop_ei_jp
+../_DEVELOPMENT/l/sdcc/____sdcc_cpu_push_di
 ../_DEVELOPMENT/l/sdcc/___sdcc_call_hl
 ../_DEVELOPMENT/l/sdcc/___sdcc_call_iy
 ../_DEVELOPMENT/l/sdcc/___sdcc_enter_ix

@@ -28,9 +28,7 @@ __DPROTO(`d,e',`d,e',void,,z180_outp,uint16_t port,uint8_t data)
 __DPROTO(`d,e',`d,e',void,*,z180_otir,void *src,uint8_t port,uint8_t num)
 __DPROTO(`d,e',`d,e',void,*,z180_otdr,void *src,uint8_t port,uint8_t num)
 
-__DPROTO(`d,e',`d,e',void,*,z180_otim,void *dst,uint8_t port,uint8_t num)
 __DPROTO(`d,e',`d,e',void,*,z180_otimr,void *dst,uint8_t port,uint8_t num)
-__DPROTO(`d,e',`d,e',void,*,z180_otdm,void *src,uint8_t port,uint8_t num)
 __DPROTO(`d,e',`d,e',void,*,z180_otdmr,void *src,uint8_t port,uint8_t num)
 
 // Memory by Address

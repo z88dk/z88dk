@@ -13,8 +13,10 @@ SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_outp
+PUBLIC asm_cpu_outp
 
 asm_z80_outp:
+asm_cpu_outp:
 
    ; enter : bc = port
    ;          l = data

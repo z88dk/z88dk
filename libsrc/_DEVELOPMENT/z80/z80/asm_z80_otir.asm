@@ -13,8 +13,10 @@ SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_otir
+PUBLIC asm_cpu_otir
 
 asm_z80_otir:
+asm_cpu_otir:
 
    ; enter : hl = void *src
    ;          c = port

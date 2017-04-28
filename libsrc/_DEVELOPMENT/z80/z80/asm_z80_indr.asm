@@ -13,8 +13,10 @@ SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_indr
+PUBLIC asm_cpu_indr
 
 asm_z80_indr:
+asm_cpu_indr:
 
    ; enter : hl = void *dst
    ;          c = port
