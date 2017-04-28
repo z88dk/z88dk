@@ -92,6 +92,7 @@ struct warnings mywarn[] = {
     { "Unexpected floating point encountered, taking int value", 0},
     { "Function pointer passed to function '%s' argument %d doesn't have the same %s status as the prototype", 0},
     { "Left shifting by more than the size of the object", 0},
+    { "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.",0},
 };
 
 struct errors {

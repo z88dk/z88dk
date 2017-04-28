@@ -107,6 +107,7 @@ int primary(LVALUE* lval)
             }
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
+            warning(W_IMPLICIT_DEFINITION, sname);
             ptr = addglb(sname, FUNCTION, CINT, 0, STATIK, 0, 0);
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
