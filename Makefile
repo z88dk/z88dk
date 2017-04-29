@@ -20,7 +20,7 @@ DEFAULT = z88
 all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg config testsuite
 
 setup:
-	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
+	echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h
 	echo '#define UNIX 1' >> src/config.h
 	echo '#define Z88DK_VERSION "${version}-${git_rev}"' >> src/config.h
 	@mkdir -p bin
@@ -77,12 +77,12 @@ libs:
 	cd libsrc ; $(MAKE) install
 
 install-libs:
-	mkdir -p $(prefix)/lib/z88dk/lib/config
-	cp -R lib/config/* $(prefix)/lib/z88dk/lib/config/
-	find $(prefix)/lib/z88dk/lib/config -type f | xargs chmod 644
-	mkdir -p $(prefix)/lib/z88dk/lib/clibs
-	cp -R lib/clibs/* $(prefix)/lib/z88dk/lib/clibs/
-	find $(prefix)/lib/z88dk/lib/clibs -type f | xargs chmod 644
+	mkdir -p $(DESTDIR)/$(prefix_share)/z88dk/lib/config
+	cp -R lib/config/* $(DESTDIR)/$(prefix_share)/z88dk/lib/config/
+	find $(DESTDIR)/$(prefix_share)/z88dk/lib/config -type f | xargs chmod 644
+	mkdir -p $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs
+	cp -R lib/clibs/* $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs/
+	find $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs -type f | xargs chmod 644
 
 install:
 	mkdir -p -m 755 $(DESTDIR)/$(prefix)/bin $(DESTDIR)/$(prefix_share)/z88dk
@@ -95,7 +95,6 @@ install:
 	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	./config.sh $(prefix_share)/z88dk/ $(DEFAULT)
 	cp -R -p include $(DESTDIR)/$(prefix_share)/z88dk
 	cp -R -p lib $(DESTDIR)/$(prefix_share)/z88dk
 	find $(DESTDIR)/$(prefix_share)/z88dk -type f -exec chmod 644 {} \;
