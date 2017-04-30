@@ -9,7 +9,7 @@ all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUT
 
 $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 	$(MAKE) clean
-	$(LIBLINKER) -I. -x$@ @crt0list
+	$(LIBLINKER) -I. -x$@ @crt0.lst
 
 $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
 	$(MAKE) clean
@@ -18,12 +18,12 @@ $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
 # this one uses iy in place of ix
 $(OUTPUT_DIRECTORY)/z80iy_crt0.lib:
 	$(MAKE) clean
-	$(LIBLINKER) -I. --IXIY -DZ80S183 -x$@ @crt0list
+	$(LIBLINKER) -I. --IXIY -DZ80S183 -x$@ @crt0.lst
 	$(MAKE) clean
 
 $(OUTPUT_DIRECTORY)/z80s183_crt0.lib:
 	$(MAKE) clean
-	$(LIBLINKER) -I. -DZ80S183 -x$(OUTPUT_DIRECTORY)/z80s183_crt0 @crt0list
+	$(LIBLINKER) -I. -DZ80S183 -x$(OUTPUT_DIRECTORY)/z80s183_crt0 @crt0.lst
 
 
 clean:
