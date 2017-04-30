@@ -133,7 +133,9 @@ Help Options:
 Code Generation Options:
   --cpu=z80              Assemble for the Z80
   --cpu=z180             Assemble for the Z180
-  --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
+  --cpu=r2k              Assemble for the Rabbit 2000
+  --cpu=r3k              Assemble for the Rabbit 3000
+  --no-emul              Do not call emulation routines for missing opcodes
   --ti83plus             Interpret 'Invoke' as RST 28h
   --IXIY                 Swap IX and IY registers
   -C, --line-mode        Enable LINE directive
@@ -636,11 +638,11 @@ z80asm(
 # -R, --relocatable - tested in reloc.t
 
 #------------------------------------------------------------------------------
-# --RCMX000
+# --cpu=r2k
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "ex (sp),hl", "\xE3");
-t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--RCMX000");
+t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--cpu=r2k");
 
 #------------------------------------------------------------------------------
 # --ti83plus
