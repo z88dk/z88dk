@@ -60,6 +60,7 @@ OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
 OPT_TITLE("Code Generation Options:")
+OPT(OptCall, option_cpu_z80, "", "--cpu=z80", "Assemble for the Z80", "")
 OPT(OptCall, option_cpu_z180, "", "--cpu=z180", "Assemble for the Z180", "")
 OPT(OptCall, option_cpu_r2k, "", "--cpu=r2k", "Assemble for the Rabbit 2000", "")
 OPT(OptCall, option_cpu_r3k, "", "--cpu=r3k", "Assemble for the Rabbit 3000", "")
