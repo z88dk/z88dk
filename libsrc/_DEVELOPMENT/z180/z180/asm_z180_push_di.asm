@@ -16,8 +16,10 @@ SECTION code_clib
 SECTION code_z180
 
 PUBLIC asm_z180_push_di
+PUBLIC asm_cpu_push_di
 
 asm_z180_push_di:
+asm_cpu_push_di:
 
    ; exit  : stack = ei_di_status
    ;

@@ -67,19 +67,9 @@ extern void *z180_otdr_callee(void *src,uint8_t port,uint8_t num) __preserves_re
 
 
 
-extern void *z180_otim(void *dst,uint8_t port,uint8_t num) __preserves_regs(d,e);
-extern void *z180_otim_callee(void *dst,uint8_t port,uint8_t num) __preserves_regs(d,e) __z88dk_callee;
-#define z180_otim(a,b,c) z180_otim_callee(a,b,c)
-
-
 extern void *z180_otimr(void *dst,uint8_t port,uint8_t num) __preserves_regs(d,e);
 extern void *z180_otimr_callee(void *dst,uint8_t port,uint8_t num) __preserves_regs(d,e) __z88dk_callee;
 #define z180_otimr(a,b,c) z180_otimr_callee(a,b,c)
-
-
-extern void *z180_otdm(void *src,uint8_t port,uint8_t num) __preserves_regs(d,e);
-extern void *z180_otdm_callee(void *src,uint8_t port,uint8_t num) __preserves_regs(d,e) __z88dk_callee;
-#define z180_otdm(a,b,c) z180_otdm_callee(a,b,c)
 
 
 extern void *z180_otdmr(void *src,uint8_t port,uint8_t num) __preserves_regs(d,e);

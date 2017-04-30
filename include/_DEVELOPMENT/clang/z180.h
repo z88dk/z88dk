@@ -50,13 +50,7 @@ extern void *z180_otdr(void *src,uint8_t port,uint8_t num);
 
 
 
-extern void *z180_otim(void *dst,uint8_t port,uint8_t num);
-
-
 extern void *z180_otimr(void *dst,uint8_t port,uint8_t num);
-
-
-extern void *z180_otdm(void *src,uint8_t port,uint8_t num);
 
 
 extern void *z180_otdmr(void *src,uint8_t port,uint8_t num);

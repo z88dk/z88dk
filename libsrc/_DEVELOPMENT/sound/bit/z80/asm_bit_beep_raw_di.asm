@@ -15,7 +15,7 @@ SECTION code_sound_bit
 
 PUBLIC asm_bit_beep_raw_di
 
-EXTERN asm_bit_beep_raw, asm_z80_push_di, asm0_z80_pop_ei
+EXTERN asm_bit_beep_raw, asm_cpu_push_di, asm0_cpu_pop_ei
 
 asm_bit_beep_raw_di:
 
@@ -24,6 +24,6 @@ asm_bit_beep_raw_di:
    ;
    ; uses  : af, bc, de, hl, ix
    
-   call asm_z80_push_di
+   call asm_cpu_push_di
    call asm_bit_beep_raw
-   jp asm0_z80_pop_ei
+   jp asm0_cpu_pop_ei

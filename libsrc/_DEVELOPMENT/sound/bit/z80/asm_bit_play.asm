@@ -33,7 +33,7 @@ SECTION code_sound_bit
 
 PUBLIC asm_bit_play
 
-EXTERN asm_isdigit, asm0_bit_beep, asm_z80_delay_ms
+EXTERN asm_isdigit, asm0_bit_beep, asm_cpu_delay_ms
 EXTERN l_mulu_16_16x8, l0_divu_16_16x8, l_mulu_16_8x8
 EXTERN error_znc, error_einval_zc
 
@@ -218,7 +218,7 @@ play_pause:
    ld l,83
    
    call l_mulu_16_8x8          ; hl = l * e = delay in milliseconds
-   call asm_z80_delay_ms
+   call asm_cpu_delay_ms
    
    pop hl
    pop de

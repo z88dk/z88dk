@@ -15,8 +15,10 @@ SECTION code_clib
 SECTION code_z180
 
 PUBLIC asm_z180_set_int_state
+PUBLIC asm_cpu_set_int_state
 
 asm_z180_set_int_state:
+asm_cpu_set_int_state:
 
    ; enter : l = ei/di status
    ;

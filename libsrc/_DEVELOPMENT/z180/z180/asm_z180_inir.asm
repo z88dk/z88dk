@@ -13,8 +13,10 @@ SECTION code_clib
 SECTION code_z180
 
 PUBLIC asm_z180_inir
+PUBLIC asm_cpu_inir
 
 asm_z180_inir:
+asm_cpu_inir:
 
    ; enter : hl = void *dst
    ;          c = port
