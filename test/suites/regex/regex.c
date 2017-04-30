@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <regexp.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 struct regex_test {
     char *pattern;
