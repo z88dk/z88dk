@@ -29,7 +29,10 @@ export PATH
 ZCCCFG=`pwd`/lib/config/
 export ZCCCFG
 
-CFLAGS="-g -O2"	
+
+if [ -z "$CFLAGS" ]; then
+   CFLAGS="-g -O2"	
+fi
 
 export CC
 export CFLAGS
