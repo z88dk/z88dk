@@ -65,6 +65,7 @@ static void            AddAppmake(arg_t *arg, char *);
 static void            AddLinkLibrary(arg_t *arg, char *);
 static void            AddLinkSearchPath(arg_t *arg, char *);
 static void            print_help_config(arg_t *arg, char *);
+static void            usage(const char *program);
 static void            print_help_text(const char *program);
 static void            SetString(arg_t *arg, char *);
 static void            GlobalDefc(arg_t *argument, char *);
@@ -2164,13 +2165,18 @@ void print_help_config(arg_t *arg, char *val)
 	print_help_text(gargv[0]);
 }
 
+void usage(const char *program)
+{
+	printf("zcc - Frontend for the z88dk Cross-C Compiler - %s\n",version);
+	printf("Usage: %s +[target] {options} {files}\n",program);
+}
+
 void print_help_text(const char *program)
 {
 	arg_t      *cur = &myargs[0];
 
-	printf("zcc - Frontend for the z88dk Cross-C Compiler\n");
-	printf("%s", version);
-	printf("%s +[target] {options} {files\n",program);
+	usage(program);
+
 	printf("\nOptions:\n\n");
 
 	while (cur->help) {
@@ -2735,7 +2741,9 @@ int 	find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf,
 		*/
 		return (gc);
 	} 
-	print_help_text(program);
+	// Without a config file, we should just exit
+	usage(program);
+	exit(1);
 }
 
 

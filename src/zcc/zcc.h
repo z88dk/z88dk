@@ -10,7 +10,7 @@
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v " Z88DK_VERSION " (C) 1998-2016 D.J.Morris\n";
+char *version = "v" Z88DK_VERSION "\n";
 
 
 
