@@ -1682,7 +1682,7 @@ void zor_const(LVALUE *lval, int32_t value)
             ot("or\t"); outdec((value % 65536) / 256); nl();
             ol("ld\th,a");    
         } else if ( value != 0 ) {
-            vconst(value);
+            const2(value);
             zor(lval);
         }        
     }
@@ -1741,7 +1741,7 @@ void zxor_const(LVALUE *lval, int32_t value)
         } else if ( ( value & 0xffff) == 0xffff ) {
             com(lval);
         } else if ( value != 0 ) {
-            vconst(value);
+            const2(value);
             zxor(lval);
         }        
     }
@@ -1803,7 +1803,7 @@ void zand_const(LVALUE *lval, int32_t value)
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else {
-            vconst(value);
+            const2(value);
             zand(lval);
         }
     }
