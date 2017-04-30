@@ -48,6 +48,7 @@ include(`target/zx/config_nirvanam.m4')
 include(`target/zx/config_nirvanap.m4')
 include(`target/zx/config_sound_bit.m4')
 include(`target/zx/config_sp1.m4')
+include(`target/zx/config_ulaplus.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

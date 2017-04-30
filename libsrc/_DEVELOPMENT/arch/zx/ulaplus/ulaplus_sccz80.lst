@@ -1,0 +1,14 @@
+@arch/zx/ulaplus/ulaplus_asm.lst
+arch/zx/ulaplus/c/sccz80/ulap_attr_from_pentp_penti
+arch/zx/ulaplus/c/sccz80/ulap_attr_from_pentp_penti_callee
+arch/zx/ulaplus/c/sccz80/ulap_disable
+arch/zx/ulaplus/c/sccz80/ulap_enable
+arch/zx/ulaplus/c/sccz80/ulap_pent_from_attr_ink
+arch/zx/ulaplus/c/sccz80/ulap_pent_from_attr_paper
+arch/zx/ulaplus/c/sccz80/ulap_read_color
+arch/zx/ulaplus/c/sccz80/ulap_read_palette
+arch/zx/ulaplus/c/sccz80/ulap_read_palette_callee
+arch/zx/ulaplus/c/sccz80/ulap_write_color
+arch/zx/ulaplus/c/sccz80/ulap_write_color_callee
+arch/zx/ulaplus/c/sccz80/ulap_write_palette
+arch/zx/ulaplus/c/sccz80/ulap_write_palette_callee
