@@ -131,6 +131,7 @@ Help Options:
   -v, --verbose          Be verbose
 
 Code Generation Options:
+  --cpu=z80              Assemble for the Z80
   --cpu=z180             Assemble for the Z180
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
   --ti83plus             Interpret 'Invoke' as RST 28h

@@ -54,6 +54,7 @@ static void option_origin( char *origin );
 static void option_define( char *symbol );
 static void option_make_lib( char *library );
 static void option_use_lib( char *library );
+static void option_cpu_z80(void);
 static void option_cpu_z180( void );
 static void option_cpu_RCM2000( void );
 
@@ -524,6 +525,11 @@ static void option_make_lib( char *library )
 static void option_use_lib( char *library )
 {
     GetLibfile( library );
+}
+
+static void option_cpu_z80(void)
+{
+	opts.cpu = CPU_Z80;
 }
 
 static void option_cpu_z180(void)
