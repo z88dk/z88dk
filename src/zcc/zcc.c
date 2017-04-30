@@ -996,8 +996,8 @@ int main(int argc, char **argv)
     {
         if ((fp = fopen(DEFFILE, "r")) != NULL)
         {
-            unsigned char buffer[LINEMAX + 1];
-            unsigned char *p;
+            char buffer[LINEMAX + 1];
+            char *p;
             long val;
 
             while (fgets(buffer, LINEMAX, fp) != NULL)
