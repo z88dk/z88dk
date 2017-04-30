@@ -12,7 +12,7 @@ CFLAGS += `$(XML2CONFIG) --cflags`
 all: z80svg$(EXESUFFIX)
 
 z80svg$(EXESUFFIX):	$(OBJS)
-	$(CC) -o z80svg$(EXESUFFIX) $(CFLAGS) $(CCOPT) $(OBJS) $(LIBS)
+	$(CC) -o z80svg$(EXESUFFIX) $(CFLAGS)  $(OBJS) $(LIBS)
 
 install: 
 	$(INSTALL) z80svg$(EXESUFFIX) $(PREFIX)/bin/

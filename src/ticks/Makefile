@@ -8,7 +8,7 @@ INSTALL ?= install
 all: ticks$(EXESUFFIX)
 
 ticks$(EXESUFFIX):	$(OBJS)
-	${CC} -o ticks$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
+	$(CC) -o ticks$(EXESUFFIX) $(CFLAGS)  $(OBJS)
 
 install:
 	$(INSTALL) ticks$(EXESUFFIX) $(PREFIX)/bin/

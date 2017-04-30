@@ -26,18 +26,13 @@ mkdir -p bin
 PATH=`pwd`/bin:$PATH
 export PATH
 
-Z80_OZFILES=`pwd`/lib/
 ZCCCFG=`pwd`/lib/config/
-export Z80_OZFILES
 export ZCCCFG
 
-CC=gcc
-#CFLAGS="-g -O2"	# "make -e" below overrides CFLAGS in the called Makefiles by this one
-					# causing problems building z80asm
-CCOPT=-DUNIX
+CFLAGS="-g -O2"	
+
 export CC
 export CFLAGS
-export CCOPT
 
 case `uname -s` in
     SunOS)
@@ -56,7 +51,8 @@ esac
 
 export INSTALL
 
-$MAKE -e
+$MAKE 
 $MAKE -C `pwd`/libsrc
 $MAKE -C `pwd`/libsrc install
 $MAKE -C `pwd`/libsrc/_DEVELOPMENT
+$MAKE -C test
