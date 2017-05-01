@@ -284,6 +284,7 @@ static char  *c_coptrules9 = NULL;
 static char  *c_coptrules_cpu = NULL;
 static char  *c_coptrules_user = NULL;
 static char  *c_coptrules_sccz80 = NULL;
+static char  *c_coptrules_target = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -371,6 +372,7 @@ static arg_t  config[] = {
 	{ "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
 	{ "COPTRULESCPU", 0, SetStringConfig, &c_coptrules_cpu, NULL, "An extra copt file for CPU optimisation", NULL },
 	{ "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
+	{ "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
 	{ "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
 	{ "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
 	{ "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
@@ -1158,6 +1160,9 @@ int main(int argc, char **argv)
 					rules[num_rules++] = c_sdccopt2;
 					break;
 				}
+				if ( c_coptrules_target ) {
+					rules[num_rules++] = c_coptrules_target;
+				}
 				if ( c_coptrules_cpu ) {
 					rules[num_rules++] = c_coptrules_cpu;
 				}
@@ -1187,6 +1192,9 @@ int main(int argc, char **argv)
 						rules[num_rules++] = c_coptrules1;
 						rules[num_rules++] = c_coptrules3;
 						break;
+				}
+				if ( c_coptrules_target ) {
+					rules[num_rules++] = c_coptrules_target;
 				}
 				if ( c_coptrules_cpu ) {
 					rules[num_rules++] = c_coptrules_cpu;
