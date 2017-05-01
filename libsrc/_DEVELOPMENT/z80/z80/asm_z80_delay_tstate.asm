@@ -15,8 +15,10 @@ SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_delay_tstate
+PUBLIC asm_cpu_delay_tstate
 
 asm_z80_delay_tstate:
+asm_cpu_delay_tstate:
 
    ; enter : hl = tstates >= 141
    ;

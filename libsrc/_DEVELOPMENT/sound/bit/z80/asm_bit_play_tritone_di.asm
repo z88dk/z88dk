@@ -15,7 +15,7 @@ SECTION code_sound_bit
 
 PUBLIC asm_bit_play_tritone_di
 
-EXTERN asm_bit_play_tritone, asm_z80_push_di, asm0_z80_pop_ei
+EXTERN asm_bit_play_tritone, asm_cpu_push_di, asm0_cpu_pop_ei
 
 asm_bit_play_tritone_di:
 
@@ -28,6 +28,6 @@ asm_bit_play_tritone_di:
    ;
    ; uses  : all except af', iy
 
-   call asm_z80_push_di
+   call asm_cpu_push_di
    call asm_bit_play_tritone
-   jp asm0_z80_pop_ei
+   jp asm0_cpu_pop_ei

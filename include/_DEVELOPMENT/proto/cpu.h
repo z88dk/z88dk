@@ -43,9 +43,7 @@ include(__link__.m4)
 #define cpu_otir  z180_otir
 #define cpu_otdr  z180_otdr
 
-#define cpu_otim   z180_otim
 #define cpu_otimr  z180_otimr
-#define cpu_otdm   z180_otdm
 #define cpu_otdmr  z180_otdmr
 
 #endif

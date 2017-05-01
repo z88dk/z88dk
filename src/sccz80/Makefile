@@ -29,7 +29,7 @@ OBJS =	callfunc.o     	\
 
 all: sccz80$(EXESUFFIX)
 
-CFLAGS +=  -Wall -g
+CFLAGS +=  -Wall 
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm

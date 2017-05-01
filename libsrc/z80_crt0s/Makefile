@@ -13,7 +13,7 @@ $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 
 $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
 	$(MAKE) clean
-	$(LIBLINKER) -I. --RCMX000 -x$@ @rcm.lst
+	$(LIBLINKER) -I. --cpu=r2k -x$@ @rcm.lst
 
 # this one uses iy in place of ix
 $(OUTPUT_DIRECTORY)/z80iy_crt0.lib:

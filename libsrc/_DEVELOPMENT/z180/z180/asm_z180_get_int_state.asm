@@ -15,8 +15,10 @@ SECTION code_clib
 SECTION code_z180
 
 PUBLIC asm_z180_get_int_state
+PUBLIC asm_cpu_get_int_state
 
 asm_z180_get_int_state:
+asm_cpu_get_int_state:
 
    ; exit  : l = ei/di status
    ;

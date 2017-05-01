@@ -659,13 +659,6 @@
 	ex	de,hl
 =
 
-	ld	hl,0	;const
-	rl	l
-	ret
-=
-	ld	hl,0	;const
-	ret
-
 	call	l_gint	;
 	ld	b,h
 	ld	c,l

@@ -15,8 +15,10 @@ SECTION code_clib
 SECTION code_z180
 
 PUBLIC asm_z180_delay_tstate
+PUBLIC asm_cpu_delay_tstate
 
 asm_z180_delay_tstate:
+asm_cpu_delay_tstate:
 
    ; enter : hl = tstates >= 141
    ;

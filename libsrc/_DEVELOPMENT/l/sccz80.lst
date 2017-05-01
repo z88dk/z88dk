@@ -44,6 +44,8 @@ l/sccz80/crt0/l_pint_eq
 l/sccz80/crt0/l_pint_ex
 l/sccz80/crt0/l_pint_pop
 l/sccz80/crt0/l_plong
+l/sccz80/crt0/l_pop_ei
+l/sccz80/crt0/l_push_di
 l/sccz80/crt0/l_putptr
 l/sccz80/crt0/l_sub
 l/sccz80/crt0/l_sxt

@@ -12,12 +12,15 @@ prefix_share = $(prefix)/share
 git_rev = $(shell git rev-parse --short HEAD)
 version := $(shell date +%Y%m%d)
 
-# The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
-DEFAULT = z88
+INSTALL ?= install
+CFLAGS ?= -O2
+CC ?= gcc
 
 # --> End of Configurable Options
 
-all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg config testsuite
+export CC INSTALL CFLAGS
+
+all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite
 
 setup:
 	echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h
@@ -69,8 +72,6 @@ ticks:
 	$(MAKE) -C src/ticks
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
-config:
-	cp -f lib/config/$(DEFAULT).cfg lib/config/zcc.cfg
 
 libs:
 	cd libsrc ; $(MAKE)
@@ -85,20 +86,16 @@ install-libs:
 	find $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs -type f | xargs chmod 644
 
 install:
-	mkdir -p -m 755 $(DESTDIR)/$(prefix)/bin $(DESTDIR)/$(prefix_share)/z88dk
-	mkdir -p -m 755 $(DESTDIR)/$(prefix_share)/z88dk/lib
-	mkdir -p -m 755 $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs 
-	mkdir -p -m 755 $(DESTDIR)/$(prefix_share)/z88dk/lib/config
 	cd src/appmake ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/copt ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/cpp ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cp -R -p include $(DESTDIR)/$(prefix_share)/z88dk
-	cp -R -p lib $(DESTDIR)/$(prefix_share)/z88dk
-	find $(DESTDIR)/$(prefix_share)/z88dk -type f -exec chmod 644 {} \;
-	find $(DESTDIR)/$(prefix_share)/z88dk -type d -exec chmod 755 {} \;
+	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{}  \;
+	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{}  \;
+	find lib -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
+	find lib -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
 
 test:
 	$(MAKE) -C test
