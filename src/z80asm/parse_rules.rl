@@ -461,23 +461,6 @@ Define rules for a ragel-based parser.
 
 #foreach <X> in IX, IY
   #foreach <R1> in <X>H, <X>L
-	#foreach <R2> in B, C, D, E, <X>H, <X>L, A
-
-		/* LD r,r */
-#ifndef _LD_<R1>_<R2>_DEFINED
-#define _LD_<R1>_<R2>_DEFINED
-		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_<R2> _TK_NEWLINE \
-			@{ DO_stmt( P_<X> + Z80_LD_r_r( REG_<R1>, REG_<R2> ) ); }
-#endif
-
-#ifndef _LD_<R2>_<R1>_DEFINED
-#define _LD_<R2>_<R1>_DEFINED
-		|	label? _TK_LD _TK_<R2> _TK_COMMA _TK_<R1> _TK_NEWLINE \
-			@{ DO_stmt( P_<X> + Z80_LD_r_r( REG_<R2>, REG_<R1> ) ); }
-#endif
-
-	#endfor  <R2>
-
 		/* LD r,N */
 		|	label? _TK_LD _TK_<R1> _TK_COMMA expr _TK_NEWLINE
 			@{ DO_stmt_n( P_<X> + Z80_LD_r_n( REG_<R1> ) ); }

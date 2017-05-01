@@ -67,7 +67,7 @@ sub add_opcode {
 	my($opcodes, $opcode, $bytes, $cpus, $var) = @_;
 	$var ||= 1;		# start with $1
 	
-	# expand $var
+	# expand $var: {b c d} -> expands into 3 lines for each element and $1 = (0..3)
 	if ($opcode =~ /\{(.*?)\}/) {
 		my($before, $list, $after) = ($`, $1, $');
 		my @list = split(' ', $list);
@@ -83,10 +83,9 @@ sub add_opcode {
 		return;
 	}
 	
-	# expand ['] - generate one line without ', one with ' and one without ' and with ALTD
+	# expand ['] -> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
 	if ($opcode =~ /\[\'\]/) {
 		my($opcode_1, $tick, $opcode_2) = ($`, $1, $');
-		
 		@$cpus == 0 or die;
 		
 		# without '
@@ -97,6 +96,21 @@ sub add_opcode {
 		
 		# without ' and with ALTD
 		add_opcode($opcodes, "altd ".$opcode_1.$opcode_2, "76, ".$bytes, ['rabbit'], $var);
+		
+		return;
+	}
+
+	# expand XH, XL -> expands to 2 lines with (ixh,ixl) and (iyh,iyl), only for [z80]
+	if ($opcode =~ /X[HL]/) {
+		@$cpus == 0 or die;
+
+		# IXH, IXL
+		(my $opcode_copy = $opcode) =~ s/X([HL])/ix\L$1/g;
+		add_opcode($opcodes, $opcode_copy, "DD, ".$bytes, ['z80'], $var);
+		
+		# IYH, IYL
+		($opcode_copy = $opcode) =~ s/X([HL])/iy\L$1/g;
+		add_opcode($opcodes, $opcode_copy, "FD, ".$bytes, ['z80'], $var);
 		
 		return;
 	}
@@ -271,19 +285,7 @@ sub rule {
 	my($tokens, $bytes, $cpus) = @_;
 
 	# build rule based on tokens
-	my $rule = '| label? ';
-	for my $token (@$tokens) {
-		if ($token eq ',') {
-			$rule .= '_TK_COMMA ';
-		}
-		elsif ($token =~ /^([a-z]+)\'$/) {
-			$rule .= '_TK_'.uc($1).'1 ';
-		}
-		else {
-			$rule .= '_TK_'.uc($token).' ';
-		}
-	}
-	$rule .= '_TK_NEWLINE ';
+	my $rule = '| label? '.join(' ', rule_tokens(@$tokens)).' ';
 
 	# build opcode from bytes
 	my $opcode = 0;
@@ -306,6 +308,16 @@ sub rule {
 	return $rule;
 }
 
+sub rule_tokens {
+	my(@tokens) = @_;
+	for (@tokens) {
+		if    ($_ eq ',') 		{ $_ = '_TK_COMMA'; }
+		elsif (/^([a-z]+)\'$/) 	{ $_ = '_TK_'.uc($1).'1'; }
+		else 					{ $_ = '_TK_'.uc($_); }
+	}
+	push @tokens, '_TK_NEWLINE ';
+	return @tokens;
+}
 
 #------------------------------------------------------------------------------
 sub replace_ext {

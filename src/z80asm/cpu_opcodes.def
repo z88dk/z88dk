@@ -1,20 +1,21 @@
 ;------------------------------------------------------------------------------
 ; List of all the CPU opcodes
 ; {b c d}	-> expands into 3 lines for each element and $1 = (0..3)
-; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for rabbit
+; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
+; XH, XL	-> expands to 2 lines with (ixh,ixl) and (iyh,iyl), only for [z80]
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
 ; 8-bit load group
 ;------------------------------------------------------------------------------
-			ld {b c d e h l . a}['], {b c d e h l . a} => 40 + $1*8 + $2
+			ld {b c d e  h  l . a}['], {b c d e  h  l . a}	=> 40 + $1*8 + $2
+			ld {b c d e XH XL . a},    {. . . . XH XL . .}	=> 40 + $1*8 + $2
+			ld {. . . . XH XL . .},    {b c d e XH XL . a}	=> 40 + $1*8 + $2
+
 __END__
-
-
-[z80]		ld {b c d e ixh ixl . a}, {. . . . ixh ixl . .}	=> DD, 40 + $1*8 + $2
-[z80]		ld {b c d e iyh iyl . a}, {. . . . iyh iyl . .}	=> FD, 40 + $1*8 + $2
-
 			ld {b c d e   h   l . a},  N			=>     06 + $1*8, N
+
+
 [rabbit]	ld {b c d e   h   l . a}', N			=> 76, 06 + $1*8, N
 [z80]		ld {. . . . ixh ixl . .},  N			=> DD, 06 + $1*8, N
 [z80]		ld {. . . . iyh iyl . .},  N			=> FD, 06 + $1*8, N

@@ -327,10 +327,10 @@ IF !RABBIT
 	ld	{i r},a
 	ld	a,{i r}
 ELSE
- 	ld	iir,a							;; 	ld	i,a
- 	ld	eir,a							;; 	ld	r,a
- 	ld	a,iir							;; 	ld	a,i
- 	ld	a,eir							;; 	ld	a,r
+ 	ld	iir,a							;; 	ld	r,a
+ 	ld	eir,a							;; 	ld	i,a
+ 	ld	a,iir							;; 	ld	a,r
+ 	ld	a,eir							;; 	ld	a,i
 ENDIF
 
 ;------------------------------------------------------------------------------

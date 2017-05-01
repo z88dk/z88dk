@@ -131,6 +131,7 @@ Help Options:
   -v, --verbose          Be verbose
 
 Code Generation Options:
+  --cpu=z80              Assemble for the Z80
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000
   --cpu=r3k              Assemble for the Rabbit 3000

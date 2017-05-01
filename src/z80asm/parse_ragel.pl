@@ -58,7 +58,7 @@ push @TEMP, "$FILE.h2";
 
 # remove #line .h2 -> .h
 open($in, "<", "$FILE.h2") or die "Input from $FILE.h2 failed: $!\n";
-open($out, ">", "$FILE.h") or die "Output to $FILE.h failed: $!\n";
+open($out, ">:raw", "$FILE.h") or die "Output to $FILE.h failed: $!\n";	# LF only
 while (<$in>) {
 	s/^#.*//; 
 	next unless /\S/;
@@ -66,10 +66,6 @@ while (<$in>) {
 }
 close($out) or die;
 close($in) or die;
-
-# convert to UNIX LF
-$cmd = "dos2unix $FILE.h";
-system($cmd) and die "'$cmd' failed: $!\n";
 
 unlink(@TEMP);
 exit 0;

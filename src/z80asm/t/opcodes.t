@@ -3149,10 +3149,10 @@ IF      !RABBIT
         ld   a,i
         ld   a,r
 ELSE    
-        ld   iir,a                      ;; ED 47
-        ld   eir,a                      ;; ED 4F
-        ld   a,iir                      ;; ED 57
-        ld   a,eir                      ;; ED 5F
+        ld   iir,a                      ;; ED 4F
+        ld   eir,a                      ;; ED 47
+        ld   a,iir                      ;; ED 5F
+        ld   a,eir                      ;; ED 57
 ENDIF   
 
 ;------------------------------------------------------------------------------
