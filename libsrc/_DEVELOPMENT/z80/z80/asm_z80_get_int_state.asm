@@ -3,7 +3,7 @@
 ; aralbrec: accommodate nmos z80 bug
 ; ===============================================================
 ;
-; unsigned int z80_get_int_state(void)
+; unsigned char z80_get_int_state(void)
 ;
 ; Retrieve the current ei/di status.
 ;
@@ -15,14 +15,16 @@ SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_get_int_state
+PUBLIC asm_cpu_get_int_state
 
 asm_z80_get_int_state:
+asm_cpu_get_int_state:
 
-   ; exit  : hl = ei/di status
+   ; exit  : l = ei/di status
    ;
    ; uses  : af, hl
 
-   IF __z80_cpu_info & $01
+   IF __Z80 & __Z80_NMOS
    
       ; nmos z80 bug prevents use of "ld a,i" to gather IFF2 into p/v flag
       ; see http://www.z80.info/zip/ZilogProductSpecsDatabook129-143.pdf

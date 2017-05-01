@@ -57,6 +57,8 @@
 
 ._far_pointer_cast3
 	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
 	dec	sp
 	ld	a,e
 	pop	de
@@ -84,11 +86,9 @@
 
 ._struct_cast
 	ld	hl,0	;const
-	ld	d,h
-	ld	e,l
 	push	hl
-	push	bc
-	pop	hl
+	push	hl
+	pop	bc
 	pop	bc
 	ret
 

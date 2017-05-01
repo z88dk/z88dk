@@ -94,4 +94,12 @@ extern unsigned long intrinsic_swap_word_32(unsigned long n);
 
 
 
+#ifdef __Z180
+
+extern void intrinsic_slp(void);
+
+
+
+#endif
+
 #endif

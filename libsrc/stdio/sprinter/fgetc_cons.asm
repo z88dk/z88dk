@@ -20,6 +20,14 @@
 	ld	c,$35		;K_CLEAR
 	rst	$10
 	pop	ix
+IF STANDARDESCAPECHARS
+	ld	a,13
+	cp	e
+	jr	nz,not_return
+	ld	e,10
+.not_return
+ENDIF
+
 	ld	l,e		;e= = ascii code
 	ld	h,0
 	ret

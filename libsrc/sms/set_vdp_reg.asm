@@ -15,8 +15,9 @@
 	ld	a, (hl)		; Value
 	inc	hl
 	inc	hl
+	di
 	out	($bf),a
-	
 	ld	a, (hl)		; Register #
 	out	($bf),a
+	ei
 	ret

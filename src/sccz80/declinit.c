@@ -16,6 +16,9 @@
 #include "ccdefs.h"
 
 static void output_double_string_load(double value);
+static void init(int size, enum ident_type ident, int *dim, int more, int dump, int is_struct, int zfar);
+static void agg_init(int size, int type, enum ident_type ident, int *dim, int more, TAG_SYMBOL *tag, int zfar);
+
 
 /*
  * initialise global object
@@ -42,6 +45,9 @@ int initials(char* sname,
             break;
         case LONG:
             size = 4;
+            break;
+        case CPTR:
+            size = 3;
             break;
         case CINT:
         default:
@@ -70,12 +76,12 @@ int initials(char* sname,
                 str_init(tag);
             } else {
                 /* aggregate is not struct or struct pointer */
-                agg_init(size, type, ident, &dim, more, tag);
+                agg_init(size, type, ident, &dim, more, tag, zfar);
             }
             needchar('}');
         } else {
             /* single initialiser */
-            init(size, ident, &dim, more, 0, 0);
+            init(size, ident, &dim, more, 0, 0, zfar);
         }
 
         /* dump literal queue and fill tail of array with zeros */
@@ -146,7 +152,7 @@ int str_init(TAG_SYMBOL* tag)
                             needchar('}');
                         }
                     } else {
-                        init(sz, ptr->ident, &dim, 1, 1, 1);
+                        init(sz, ptr->ident, &dim, 1, 1, 1, ptr->flags & FAR);
                     }
 
                     if (cmatch(',') == 0)
@@ -156,7 +162,7 @@ int str_init(TAG_SYMBOL* tag)
                 needchar('}');
                 dumpzero(sz, dim);
             } else {
-                init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+                init(sz, ptr->ident, &dim, ptr->more, 1, 1, ptr->flags & FAR);
             }
             /* Pad out afterwards */
         } else { /* Run out of data for this initialisation, set blank */
@@ -192,7 +198,7 @@ int str_init(TAG_SYMBOL* tag)
 /*
  * initialise aggregate
  */
-void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG_SYMBOL* tag)
+void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG_SYMBOL* tag, int zfar)
 {
     int done = 0;
     while (*dim) {
@@ -207,7 +213,7 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
             --*dim;
             needchar('}');
         } else {
-            init(size, ident, dim, more, (ident == ARRAY && more == CCHAR), 0);
+            init(size, ident, dim, more, (ident == ARRAY && more == CCHAR), 0, zfar);
         }
         done++;
         if (cmatch(',') == 0)
@@ -224,7 +230,7 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
  * this is used for structures and arrays of pointers to char, so that the
  * struct or array is built immediately and the char strings are dumped later
  */
-void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_struct)
+void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_struct, int zfar)
 {
     double value;
     int    valtype;
@@ -270,6 +276,9 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
                     defword();
                     outname(ptr->name, dopref(ptr));
                     nl();
+                    if ( zfar ) {
+                        defbyte(); outdec(0); nl();
+                    }
                     --*dim;
                 } else if (ptr->type == ENUM) {
                     value = ptr->size;
@@ -286,15 +295,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
         } else if (constexpr(&value, &valtype, 1)) {
 constdecl:
             if (ident == POINTER) {
-/* 24/1/03 dom - We want to be able to assign values to
-                   pointers or they're a bit useless..
-                */
-#if 0
-                /* the only constant which can be assigned to a pointer is 0 */
-                if (value != 0)
-                    warning(W_ASSPTR);
-#endif
-                size = 2;
+                size = zfar ? 3 : 2;
                 dump = YES;
             }
             if (dump) {
@@ -323,6 +324,13 @@ constdecl:
                     outdec(((uint32_t)value / 65536UL) % 256);
                     outbyte(',');
                     outdec(((uint32_t)value / 65536UL) / 256);
+                } else if ( size == 3 ) {
+                    defbyte();
+                    outdec(((uint32_t)value % 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)value % 65536UL) / 256);
+                    outbyte(',');
+                    outdec(((uint32_t)value / 65536UL) % 256);
                 } else {
                     if (size == 1)
                         defbyte();

@@ -1,0 +1,8 @@
+enemy_manager.c
+font_manager.c
+gamer_manager.c
+hack_manager.c
+music_manager.asm
+score_manager.c
+sprite_manager.c
+tile_manager.c

@@ -5,7 +5,7 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.8 2016-05-15 20:15:45 dom Exp $
+;	$Id: fputc_cons.asm,v 1.8+ (now on GIT) $
 ;
 
 
@@ -42,10 +42,11 @@ IF STANDARDESCAPECHARS
 	ret	z
 	cp	10
 	jr	nz,nocr
+	ld	(hl),13
 	push	hl
 	call	kjt_print_string
 	pop	hl
-	ld	(hl),13
+	ld	(hl),10
 ELSE
 	cp	10	
 	ret	z

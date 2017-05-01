@@ -451,7 +451,7 @@ void putstk(char typeobj)
         break;
     default:
         zpop();
-        if (c_doinline) {
+        if (c_doinline & INLINE_PINT) {
             LoadAccum();
             ol("ld\t(de),a");
             ol("inc\tde");
@@ -580,7 +580,7 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (c_doinline) {
+        if (c_doinline & INLINE_GINT) {
             ol("ld\ta,(hl)");
             ol("inc\thl");
             ol("ld\th,(hl)");
@@ -1682,7 +1682,7 @@ void zor_const(LVALUE *lval, int32_t value)
             ot("or\t"); outdec((value % 65536) / 256); nl();
             ol("ld\th,a");    
         } else if ( value != 0 ) {
-            vconst(value);
+            const2(value);
             zor(lval);
         }        
     }
@@ -1702,6 +1702,51 @@ void zxor(LVALUE *lval)
         callrts("l_xor");
     }
 }
+
+void zxor_const(LVALUE *lval, int32_t value)
+{
+    if ( lval->val_type == LONG || lval->val_type == CPTR) {
+        if ( (value & 0xFFFFFF00) == 0 ) {
+            ol("ld\ta,l");
+            ot("xor\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");
+        } else if ( ( value & 0xFFFF00FF) == 0 ) {
+            ol("ld\ta,h");
+            ot("xor\t"); outdec((value % 65536)/256); nl();
+            ol("ld\th,a");            
+       } else if ( ( value & 0xFF00FFFF) == 0 ) {
+            ol("ld\ta,e");
+            ot("xor\t"); outdec((value / 65536)%256); nl();
+            ol("ld\te,a");            
+       } else if ( ( value & 0x00FFFFFF) == 0 ) {
+            ol("ld\ta,d");
+            ot("xor\t"); outdec((value / 65536)/256); nl();
+            ol("ld\td,a");  
+        } else if ( ( value & 0xffffffff) == 0xffffffff ) {
+            com(lval);          
+        } else if ( value != 0 ) {
+            lpush();
+            vlongconst(value);
+            zxor(lval);
+        }
+    } else {
+        if ( ((value % 65536) & 0xff00) == 0 ) {
+            ol("ld\ta,l");
+            ot("xor\t"); outdec(value % 256); nl();
+            ol("ld\tl,a");    
+        } else if ( ((value % 65536) & 0x00ff) == 0 ) {
+            ol("ld\ta,h");
+            ot("xor\t"); outdec((value % 65536) / 256); nl();
+            ol("ld\th,a");   
+        } else if ( ( value & 0xffff) == 0xffff ) {
+            com(lval);
+        } else if ( value != 0 ) {
+            const2(value);
+            zxor(lval);
+        }        
+    }
+}
+
 
 /* 'And' the primary and secondary */
 /*      (results in primary) */
@@ -1744,7 +1789,7 @@ void zand_const(LVALUE *lval, int32_t value)
     } else {
         if ( value == 0 ) {
             vconst(0);
-        } else if ( value == 0xff ) {
+        } else if ( (value % 65536) == 0xff ) {
             ol("ld\th,0");
         } else if ( value >= 0 && value < 256 ) {
             // 6 bytes, library call is 6 bytes, this is faster
@@ -1754,11 +1799,11 @@ void zand_const(LVALUE *lval, int32_t value)
             ol("ld\th,0");
         } else if ( value % 256 == 0 ) {
             ol("ld\ta,h");
-            ot("and\t"); outdec(value / 256); nl();
+            ot("and\t"); outdec( (value % 65536) / 256); nl();
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else {
-            vconst(value);
+            const2(value);
             zand(lval);
         }
     }

@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,  (v 1.58+..   GIT imported) $
+;	$Id: grafix.inc,  (v 1.58 2016/11/28) - 2017-> stefano Exp $
 ;
 
 

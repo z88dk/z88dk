@@ -58,4 +58,10 @@ __DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,intrinsic_swap_endian_16,unsigned lon
 __DPROTO(`b,c',`b,c',unsigned long,,intrinsic_swap_endian_32,unsigned long n)
 __DPROTO(`a,b,c',`a,b,c',unsigned long,,intrinsic_swap_word_32,unsigned long n)
 
+#ifdef __Z180
+
+__OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_slp,void)
+
+#endif
+
 #endif

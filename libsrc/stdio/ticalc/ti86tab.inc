@@ -17,7 +17,11 @@ defb	9
 defb	$03	;Up
 defb	11
 defb	$06	;ENTER
+IF STANDARDESCAPECHARS
+defb	10
+ELSE
 defb	13
+ENDIF
 
 defb	$05
 defb	':'

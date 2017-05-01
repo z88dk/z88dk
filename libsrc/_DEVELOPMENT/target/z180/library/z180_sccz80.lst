@@ -8,6 +8,7 @@
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sccz80.lst
+@im2/im2_sccz80.lst
 @inttypes/inttypes_sccz80.lst
 @l/l.lst
 @l/sccz80.lst
@@ -20,4 +21,4 @@
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
 @threads/threads_sccz80.lst
-@z80/z80_sccz80.lst
+@z180/z180_sccz80.lst

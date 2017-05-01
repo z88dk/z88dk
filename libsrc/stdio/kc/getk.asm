@@ -22,6 +22,14 @@
     call PV1
     defb FNKBDS
 ;    jr nc,gkret
+
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
     ld l, a
 ;.gkret
 	ld	h,0

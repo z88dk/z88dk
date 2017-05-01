@@ -1,0 +1,36 @@
+; Optimisation file for inlining some very common sccz80 operations
+; Inlines a couple of common operations
+; l_gint rule saves 27T at the cost of 1 byte
+; l_pint rule saves 27T at cost of 2 bytes
+; l_sxt rule saves 27T at the cost of 1 byte
+; l_sub rule saves 27T at a cost of 1 bytes
+=
+;
+
+	call	l_gint	;
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
+	call	l_pint
+=
+	ex	de,hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+
+	call	l_sxt
+=
+	ld	l,a
+	rlca
+	sbc	a,a
+	ld	h,a
+
+	call	l_sub
+=
+	ex	de,hl
+	and	a
+	sbc	hl,de

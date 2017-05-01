@@ -14,22 +14,12 @@
         EXTERN    swapgfxbk1
 .clg
 ._clg
-		call swapgfxbk
-		xor a
-IF FORnc100
-		ld  hl,$4000+$3000
+IF FORzcn
+	ld	e,1	; ^A
+	ld	c,2
+	jp	5
 ELSE
-		ld  hl,$4000+$2000
+		jp $B824
 ENDIF
-		ld (hl),a
-		ld d,h
-		ld e,l
-		inc de
-IF FORnc100
-		ld bc,4095
-ELSE
-		ld bc,8191
-ENDIF
-		ldir
-		jp swapgfxbk1
+
 

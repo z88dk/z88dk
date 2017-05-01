@@ -19,6 +19,13 @@
 	ld   a,69h ; keyboard channel
 	rst  $30   ; EXOS
 	defb 5     ; output to channel
+IF STANDARDESCAPECHARS
+	ld	a,13
+	cp	b
+	jr	nz,not_return
+	ld	b,10
+.not_return
+ENDIF
 
 	ld   h,0
 	ld   l,b

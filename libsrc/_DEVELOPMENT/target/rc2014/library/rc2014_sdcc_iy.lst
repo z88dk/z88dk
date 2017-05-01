@@ -8,6 +8,7 @@
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_iy.lst
+@im2/im2_sdcc.lst
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
 @l/sdcc.lst
@@ -22,4 +23,4 @@
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver.lst
 @threads/threads_sdcc_iy.lst
-@z80/z80_sdcc_iy.lst
+@z80/z80_sdcc.lst

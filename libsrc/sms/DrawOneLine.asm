@@ -26,8 +26,12 @@
 .loop
 	ld	a, (hl)
 	out	($be), a	; Character number
-	inc	hl
-	ld	a, (hl)
+	inc	hl		;6
+	ld	a, (hl)		;7
+	nop			;4
+	nop			;4
+	nop			;4
+	nop			;4
 	out	($be), a	; Attribute number
 	inc	hl
 

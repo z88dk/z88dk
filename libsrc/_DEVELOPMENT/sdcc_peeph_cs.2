@@ -3214,6 +3214,13 @@ barrier
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_intrinsic_slp
+} by {
+	slp
+	; peephole z88dk-intrinsic-slp
+}
+
+replace restart {
 	call	_intrinsic_stub
 } by {
 	; peephole z88dk-intrinsic-stub
@@ -3441,7 +3448,7 @@ replace restart {
 	di
 	push	af
 } by {
-	call	____sdcc_z80_push_di
+	call	____sdcc_cpu_push_di
 	; peephole z88dk-bugfix-4a-critical-open-1
 }
 
@@ -3451,7 +3458,7 @@ replace restart {
 	ei
 %1:
 } by {
-	call	____sdcc_z80_pop_ei
+	call	____sdcc_cpu_pop_ei
 %1:
 	; peephole z88dk-bugfix-4c-critical-close-1
 }

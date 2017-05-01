@@ -8,7 +8,7 @@
 #include <sound.h>
 #include <arch/zx.h>
 #include <stropts.h>
-#include <z80.h>
+#include <cpu.h>
 
 #pragma printf = "%u %s"
 #pragma scanf  = "%u %n"
@@ -109,7 +109,7 @@ main()
       printf("%2u: %s\n", i, beepfx[i].name);
       
       bit_beepfx_di(beepfx[i].effect);
-      z80_delay_ms(100);
+      cpu_delay_ms(100);
    }
    
    printf("\nENTER A SPACE SEPARATED LIST OF");

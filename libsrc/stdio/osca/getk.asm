@@ -25,7 +25,11 @@
 
 	cp	$5a
 	jr	nz,noent
+IF STANDARDESCAPECHARS
+	ld	b,10
+ELSE
 	ld	b,13
+ENDIF
 .noent
 	cp	$6b
 	jr	nz,noleft

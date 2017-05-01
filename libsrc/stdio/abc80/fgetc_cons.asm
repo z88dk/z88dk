@@ -16,6 +16,12 @@
 	ld	a,(65013)
 	and 127
 	jr	z,fgetc_cons
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
 	ld	l,a
 	xor a
 	ld (65013),a

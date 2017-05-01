@@ -101,13 +101,13 @@
 
 #endif
 
-extern double_t __LIB__ __FASTCALL__ acos(double_t x);
+extern double_t __LIB__ __FASTCALL__ acos(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ asin(double_t x);
+extern double_t __LIB__ __FASTCALL__ asin(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ atan(double_t x);
+extern double_t __LIB__ __FASTCALL__ atan(double_t x) __smallc;
 
 
 extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
@@ -116,43 +116,43 @@ extern double_t __LIB__ __CALLEE__ atan2_callee(double_t y,double_t x) __smallc;
 
 
 
-extern double_t __LIB__ __FASTCALL__ cos(double_t x);
+extern double_t __LIB__ __FASTCALL__ cos(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ sin(double_t x);
+extern double_t __LIB__ __FASTCALL__ sin(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ tan(double_t x);
-
-
-
-extern double_t __LIB__ __FASTCALL__ acosh(double_t x);
-
-
-extern double_t __LIB__ __FASTCALL__ asinh(double_t x);
-
-
-extern double_t __LIB__ __FASTCALL__ atanh(double_t x);
+extern double_t __LIB__ __FASTCALL__ tan(double_t x) __smallc;
 
 
 
-extern double_t __LIB__ __FASTCALL__ cosh(double_t x);
+extern double_t __LIB__ __FASTCALL__ acosh(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ sinh(double_t x);
+extern double_t __LIB__ __FASTCALL__ asinh(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ tanh(double_t x);
+extern double_t __LIB__ __FASTCALL__ atanh(double_t x) __smallc;
 
 
 
-extern double_t __LIB__ __FASTCALL__ exp(double_t x);
+extern double_t __LIB__ __FASTCALL__ cosh(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ exp2(double_t x);
+extern double_t __LIB__ __FASTCALL__ sinh(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ expm1(double_t x);
+extern double_t __LIB__ __FASTCALL__ tanh(double_t x) __smallc;
+
+
+
+extern double_t __LIB__ __FASTCALL__ exp(double_t x) __smallc;
+
+
+extern double_t __LIB__ __FASTCALL__ exp2(double_t x) __smallc;
+
+
+extern double_t __LIB__ __FASTCALL__ expm1(double_t x) __smallc;
 
 
 extern double_t __LIB__ frexp(double_t value,int *exp) __smallc;
@@ -160,7 +160,7 @@ extern double_t __LIB__ __CALLEE__ frexp_callee(double_t value,int *exp) __small
 #define frexp(a,b) frexp_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ ilogb(double_t x);
+extern int __LIB__ __FASTCALL__ ilogb(double_t x) __smallc;
 
 
 extern double_t __LIB__ ldexp(double_t x,int exp) __smallc;
@@ -169,19 +169,19 @@ extern double_t __LIB__ __CALLEE__ ldexp_callee(double_t x,int exp) __smallc;
 
 
 
-extern double_t __LIB__ __FASTCALL__ log(double_t x);
+extern double_t __LIB__ __FASTCALL__ log(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ log10(double_t x);
+extern double_t __LIB__ __FASTCALL__ log10(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ log1p(double_t x);
+extern double_t __LIB__ __FASTCALL__ log1p(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ log2(double_t x);
+extern double_t __LIB__ __FASTCALL__ log2(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ logb(double_t x);
+extern double_t __LIB__ __FASTCALL__ logb(double_t x) __smallc;
 
 
 
@@ -196,7 +196,7 @@ extern double_t __LIB__ __CALLEE__ scalbln_callee(double_t x,int n) __smallc;
 
 
 
-extern double_t __LIB__ __FASTCALL__ fabs(double_t x);
+extern double_t __LIB__ __FASTCALL__ fabs(double_t x) __smallc;
 
 
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
@@ -210,48 +210,48 @@ extern double_t __LIB__ __CALLEE__ pow_callee(double_t x,double_t y) __smallc;
 #define pow(a,b) pow_callee(a,b)
 
 
-extern double_t __LIB__ __FASTCALL__ sqrt(double_t x);
+extern double_t __LIB__ __FASTCALL__ sqrt(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ cbrt(double_t x);
-
-
-
-extern double_t __LIB__ __FASTCALL__ erf(double_t x);
-
-
-extern double_t __LIB__ __FASTCALL__ erfc(double_t x);
-
-
-extern double_t __LIB__ __FASTCALL__ lgamma(double_t x);
-
-
-extern double_t __LIB__ __FASTCALL__ tgamma(double_t x);
+extern double_t __LIB__ __FASTCALL__ cbrt(double_t x) __smallc;
 
 
 
-extern double_t __LIB__ __FASTCALL__ ceil(double_t x);
+extern double_t __LIB__ __FASTCALL__ erf(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ floor(double_t x);
+extern double_t __LIB__ __FASTCALL__ erfc(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ nearbyint(double_t x);
+extern double_t __LIB__ __FASTCALL__ lgamma(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ rint(double_t x);
+extern double_t __LIB__ __FASTCALL__ tgamma(double_t x) __smallc;
 
 
-extern long __LIB__ __FASTCALL__ lrint(double_t x);
+
+extern double_t __LIB__ __FASTCALL__ ceil(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ round(double_t x);
+extern double_t __LIB__ __FASTCALL__ floor(double_t x) __smallc;
 
 
-extern long __LIB__ __FASTCALL__ lround(double_t x);
+extern double_t __LIB__ __FASTCALL__ nearbyint(double_t x) __smallc;
 
 
-extern double_t __LIB__ __FASTCALL__ trunc(double_t x);
+extern double_t __LIB__ __FASTCALL__ rint(double_t x) __smallc;
+
+
+extern long __LIB__ __FASTCALL__ lrint(double_t x) __smallc;
+
+
+extern double_t __LIB__ __FASTCALL__ round(double_t x) __smallc;
+
+
+extern long __LIB__ __FASTCALL__ lround(double_t x) __smallc;
+
+
+extern double_t __LIB__ __FASTCALL__ trunc(double_t x) __smallc;
 
 
 
@@ -281,7 +281,7 @@ extern double_t __LIB__ __CALLEE__ copysign_callee(double_t x,double_t y) __smal
 #define copysign(a,b) copysign_callee(a,b)
 
 
-extern double_t __LIB__ __FASTCALL__ nan(const char *tagp);
+extern double_t __LIB__ __FASTCALL__ nan(const char *tagp) __smallc;
 
 
 

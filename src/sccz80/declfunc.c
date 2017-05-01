@@ -92,8 +92,10 @@ int AddNewFunc(
      */
     simple = NO;
     if (cmatch(')')) {
-        if (rcmatch(';') || rcmatch(','))
+        if (rcmatch(';') || rcmatch(',')) {
+            currfn = NULL;
             return (storage);
+        }
         simple = YES;
     }
 
@@ -159,6 +161,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
 {
     uint32_t tvalue; /* Used to hold protot value */
     char typ; /* Temporary type */
+    int wasdefined = 0;
     int itag;
 
     itag = 0;
@@ -185,11 +188,14 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
             multidef(n);
         } else {
             /* we have what was earlier assumed to be a function */
-
             if (currfn->storage == EXTERNAL && currfn->flags & LIBRARY) {
                 /* Overwriting a library function */
                 currfn->offset.i = FUNCTION;
             } else {
+                /* If we added it without a prototype beforehand, indicate a redefinition possibly happening */
+                if ( currfn->prototyped == 0 ) {
+                    wasdefined = 1;
+                }
                 /*
                  * I'm not sure what *exactly* I was trying to achieve here djm 25/2/00
                  */
@@ -240,6 +246,9 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
      * doing this! (Have an array and check by that?)           
      */
     if (CheckANSI()) {
+        if ( wasdefined ) {
+            warning(W_DECLARATION_POSSIBLY_DIFFERENT, currfn->name,currfn->declared_location);
+        }
         return (dofnansi(currfn, addr)); /* So we can pass back result */
     }
     DoFnKR(currfn, simple);
@@ -351,7 +360,7 @@ static int setup_function_parameter(SYMBOL *argument, int argnumber)
                         warning(W_SIGNARG);
                     } else {
                         error(E_ARGMIS1, currfn->name, currfn->prototyped - argnumber + 1, ExpandArgValue(tester, buffer2, argument->tag_idx));
-                        error(E_ARGMIS2, ExpandArgValue(currfn->args[argnumber], buffer2, currfn->tagarg[argnumber]));
+                        error(E_ARGMIS2, ExpandArgValue(currfn->args[argnumber], buffer2, currfn->tagarg[argnumber]), currfn->declared_location);
                     }
                 }
             }
@@ -394,10 +403,11 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
      *      If we have filled up our number of arguments, then pretend
      *      we don't have any..nasty, nasty
      */
-    if (argnumber == (MAXARGS - 1))
+    if (argnumber == (MAXARGS - 1)) {
         argnumber = 0;
-    else if (argnumber)
+    } else if (argnumber) {
         argnumber = 1;
+    }
     /*
      *      Dump some info about defining the function etc
      */
@@ -434,7 +444,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     /* If we use frame pointer we preserve previous framepointer on entry
      * to each function
      */
-    if (c_framepointer_is_ix != -1 || (currfn->flags & SAVEFRAME))
+    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
         where += 2;
 
     /* main is always __stdc */

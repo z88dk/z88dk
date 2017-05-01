@@ -12,6 +12,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-04-12 Fix #159 allow environment variables ${VAR} in the command line options and arguments and list files (contribution from dom@suborbital.org.uk)
 - 2017-04-25 Fix #194 wrong assembly of DDCB with no index
 - 2017-04-30 Fix #209 add a --cpu=z80 option
+- 2017-04-30 Fix #216 replace --RCMX000 by --cpu=r2k and --cpu=r3k
 
 2016
 ----

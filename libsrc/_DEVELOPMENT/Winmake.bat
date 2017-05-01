@@ -36,8 +36,13 @@ for %%t in (%targets%) do (
 
    if not "!temp!" == "%alltargets%" (
    
+      set cpu=
+      if "%%t" == "z180" (
+         set cpu="--cpu=z180"
+      )
+      
       echo.
-      echo target = %%t
+      echo target = %%t !cpu!
 
       m4 -DCFG_ASM_DEF target/%%t/config.m4 > target/%%t/config_%%t_private.inc
       m4 -DCFG_ASM_PUB target/%%t/config.m4 > target/%%t/config_%%t_public.inc
@@ -59,7 +64,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sccz80.lib
       
-      z80asm -x%%t_sccz80 -D__SCCZ80 @target/%%t/library/%%t_sccz80.lst
+      z80asm !cpu! -x%%t_sccz80 -D__SCCZ80 @target/%%t/library/%%t_sccz80.lst
       move /Y %%t_sccz80.lib lib/sccz80/%%t.lib
 
       del /S *.o > nul 2>&1
@@ -67,7 +72,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_ix.lib
 
-      z80asm -x%%t_sdcc_ix -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
+      z80asm !cpu! -x%%t_sdcc_ix -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
       move /Y %%t_sdcc_ix.lib lib/sdcc_ix/%%t.lib
 
       del /S *.o > nul 2>&1
@@ -75,7 +80,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_iy.lib
 
-      z80asm --IXIY -x%%t_sdcc_iy -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
+      z80asm !cpu! --IXIY -x%%t_sdcc_iy -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
       move /Y %%t_sdcc_iy.lib lib/sdcc_iy/%%t.lib
 
       del /S *.o > nul 2>&1

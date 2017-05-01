@@ -9,7 +9,7 @@
 ;	On an nc100 we have to test for "yellow"
 
 ;
-;	$Id: getk.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
+;	$Id: getk.asm,v 1.4+  (now on GIT) $
 ;
 
 
@@ -24,6 +24,13 @@
 	call	$B9B3	;kmreadchar
 	ld	hl,0
 	ret	nc	;no key pressed
+IF STANDARDESCAPECHARS
+	ld	a,c
+	cp	13
+	jr	nz,nocr
+	ld	c,10
+.nocr
+ENDIF
 	ld	l,c
 	ld	h,b
 	ld	a,b
@@ -33,7 +40,8 @@
 	ret	nz		;not b=2
 	ld	a,c
 	cp	$FC
-	ret	nz		
+	ret	nz
+
 ; We've got here so we have just received escape so check yellow
 	push	hl		;keep this in case 
 	call	$B8d2	;kmgetyellow

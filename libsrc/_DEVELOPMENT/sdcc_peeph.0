@@ -5,6 +5,13 @@
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_intrinsic_slp
+} by {
+	slp
+	; peephole z88dk-intrinsic-slp
+}
+
+replace restart {
 	call	_intrinsic_stub
 } by {
 	; peephole z88dk-intrinsic-stub

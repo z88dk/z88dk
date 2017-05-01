@@ -5,7 +5,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.21 2016-05-15 20:15:46 dom Exp $
+;	$Id: fputc_cons.asm,v 1.21+ (now on GIT) $
 ;
 ;----------------------------------------------------------------
 ;
@@ -55,13 +55,9 @@ ENDIF
 .doput
 IF STANDARDESCAPECHARS
 	cp  10		; CR?
-	jr  z,isLF
-	cp  13      ; LF?
 	jr  nz,NoLF
 ELSE
 	cp  13		; CR?
-	jr  z,isLF
-	cp  10      ; LF?
 	jr  nz,NoLF
 ENDIF
 .isLF

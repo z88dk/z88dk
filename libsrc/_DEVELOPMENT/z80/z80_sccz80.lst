@@ -1,16 +1,3 @@
-z80/c/sccz80/im2_append_generic_callback
-z80/c/sccz80/im2_append_generic_callback_callee
-z80/c/sccz80/im2_create_generic_isr
-z80/c/sccz80/im2_create_generic_isr_callee
-z80/c/sccz80/im2_create_generic_isr_8080
-z80/c/sccz80/im2_create_generic_isr_8080_callee
-z80/c/sccz80/im2_init
-z80/c/sccz80/im2_install_isr
-z80/c/sccz80/im2_install_isr_callee
-z80/c/sccz80/im2_prepend_generic_callback
-z80/c/sccz80/im2_prepend_generic_callback_callee
-z80/c/sccz80/im2_remove_generic_callback
-z80/c/sccz80/im2_remove_generic_callback_callee
 z80/c/sccz80/z80_delay_ms
 z80/c/sccz80/z80_delay_tstate
 z80/c/sccz80/z80_get_int_state

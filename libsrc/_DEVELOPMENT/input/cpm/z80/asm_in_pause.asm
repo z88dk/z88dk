@@ -17,7 +17,7 @@ SECTION code_input
 
 PUBLIC asm_in_pause
 
-EXTERN asm_in_wait_key, asm_in_test_key, asm_z80_delay_tstate
+EXTERN asm_in_wait_key, asm_in_test_key, asm_cpu_delay_tstate
 
 asm_in_pause:
 
@@ -55,7 +55,7 @@ pause_loop:
    ; wait for one millisecond
    
    ld hl,+(__CPU_CLOCK / 1000) - 95 - 500
-   call asm_z80_delay_tstate
+   call asm_cpu_delay_tstate
    
    dec de
    

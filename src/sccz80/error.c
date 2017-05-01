@@ -92,6 +92,8 @@ struct warnings mywarn[] = {
     { "Unexpected floating point encountered, taking int value", 0},
     { "Function pointer passed to function '%s' argument %d doesn't have the same %s status as the prototype", 0},
     { "Left shifting by more than the size of the object", 0},
+    { "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.",0},
+    { "Definition of function '%s' is potentially different to earlier declaration at %s", 0},
 };
 
 struct errors {
@@ -156,7 +158,7 @@ struct errors {
     { "Missing token: %s", 0 },
     { "Unknown symbol: %s", 1 },
     { "Argument mismatch %s() Arg #%d: %s", 0 },
-    { "Doesn't match original decl type: %s", 0 },
+    { "Doesn't match original decl type: %s declared at %s", 0 },
     { "Missing token, expecting %c got %c", 0 },
 
     /*

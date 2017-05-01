@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.10 2016-06-26 20:32:08 dom Exp $
+;	$Id: cnvtab.asm,v 1.10+ (now on GIT) $
 ;
 
 	SECTION rodata_clib
@@ -27,7 +27,11 @@ IF FORzx81
 	defb	119	; Rubout
 	defb	12
 	defb	118	; Newline
+IF STANDARDESCAPECHARS
+	defb	10
+ELSE
 	defb	13
+ENDIF
 	defb    116     ; Graphics
 	defb    6
 	defb	11
@@ -35,7 +39,7 @@ IF FORzx81
 	defb	9
 	defb	'_'
 	defb	12
-	defb	'£'
+	defb	0xA3
 	defb	13
 	defb	'$'
 	defb	14
@@ -105,7 +109,11 @@ IF FORlambda
 	defb	119	; Rubout
 	defb	12
 	defb	118	; Newline
+IF STANDARDESCAPECHARS
+	defb	10
+ELSE
 	defb	13
+ENDIF
 	defb    116     ; Graphics
 	defb    6
 	defb	11
@@ -113,7 +121,7 @@ IF FORlambda
 	defb	131
 	defb	'_'
 	defb	12		; spider
-	defb	'£'
+	defb	0xa3
 	defb	13
 	defb	'$'
 	defb	6		; "battemberg"
@@ -183,7 +191,11 @@ IF FORzx80
 	defb	119	; Rubout
 	defb	12
 	defb	118	; Newline
+IF STANDARDESCAPECHARS
+	defb	10
+ELSE
 	defb	13
+ENDIF
 	defb    116     ; Graphics
 	defb    6
 	defb	11
@@ -191,7 +203,7 @@ IF FORzx80
 	defb	10
 	defb	'_'
 	defb	12
-	defb	'£'
+	defb	0xA3
 	defb	13
 	defb	'$'
 	defb	14

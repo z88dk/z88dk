@@ -36,6 +36,10 @@
 	out 	($bf),a     ; Palette index
 	ld 	a,$c0
 	out 	($bf),a     ; Palette write identifier
-	ld 	c,$be
-	otir                ; Output b bytes starting at hl to port c
+.LoadPalette1
+	ld	a,(hl)		;7
+	out	($be),a
+	inc	hl		;6
+	nop			;4
+	djnz	LoadPalette1	;13
 	ret

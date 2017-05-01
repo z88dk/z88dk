@@ -23,6 +23,14 @@
     call z,$f009        ; conin: Get a key if one is waiting
 
 .gkret
+
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
 	ld	l,a
 	ld	h,0
 	ret

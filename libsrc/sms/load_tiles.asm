@@ -81,11 +81,11 @@ LoadTiles:
 
             _DataLoop:
                 ; Write byte
-                ld a,(ix+0)
+                ld a,(ix+0)	;19
                 out ($be),a
-                dec e
-                inc ix
-                jp nz,_DataLoop
+                dec e		;4
+                inc ix		;10
+                jp nz,_DataLoop ;10
 
             ; Restore counter
             ld e,d

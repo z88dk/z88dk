@@ -30,12 +30,13 @@ struct x {
 };
 
 
-void struct_cast()
+void *struct_cast()
 {
      long *ptr = 0;
      struct x *st;
 
-     st = (struct x *)st;
+     st = (struct x *)ptr;
+     return st;
 }
 
 #define SMS_PNTAddress            0x7800

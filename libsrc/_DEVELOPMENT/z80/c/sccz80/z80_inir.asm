@@ -1,5 +1,5 @@
 
-; void *z80_inir(void *dst, uint16_t port)
+; void *z80_inir(void *dst, uint8_t port, uint8_t num)
 
 SECTION code_clib
 SECTION code_z80
@@ -11,11 +11,14 @@ EXTERN asm_z80_inir
 z80_inir:
 
    pop af
+   pop de
    pop bc
    pop hl
    
    push hl
    push bc
+   push de
    push af
-   
+
+   ld b,e
    jp asm_z80_inir

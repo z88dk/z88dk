@@ -51,13 +51,15 @@ void main() {
 	int ply2_tile = 'H';
 	char *c;
 
-	set_vdp_reg(VDP_REG_HINT_COUNTER, 0xFF);
-	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN/* | VDP_REG_FLAGS1_VINT*/);
+        clear_vram();
 	set_bkg_map(bg1, 0, 0, 4, 4);
 	set_bkg_map(hello, 0, 6, 13, 1);
 	load_tiles(standard_font, 0, 255, 1);
 	load_palette(pal1, 0, 16);
 	load_palette(pal2, 16, 16);
+
+	set_vdp_reg(VDP_REG_HINT_COUNTER, 0xFF);
+        set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN);
 
 //	add_raster_int(vbl_handler);
 	add_pause_int(pause_handler);

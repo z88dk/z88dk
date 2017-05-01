@@ -86,4 +86,11 @@ extern unsigned long intrinsic_swap_word_32_fastcall(unsigned long n) __preserve
 
 
 
+#ifdef __Z180
+
+extern void intrinsic_slp(void) __preserves_regs(a,b,c,d,e,h,l);
+
+
+#endif
+
 #endif

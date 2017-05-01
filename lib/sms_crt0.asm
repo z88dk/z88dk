@@ -66,74 +66,77 @@
 filler1:
 	defs	(INT_Start - filler1)
 
-int_RASTER:
-	push	hl
-	
-	ld	a, ($BF)
-	or	a
-	jp	p, int_not_VBL	; Bit 7 not set
-	jr	int_VBL
+int_RASTER: 
+    push    af 
 
-int_not_VBL:
-	pop	hl
-	reti
-	
-int_VBL:
-	ld	hl, timer
-	ld	a, (hl)
-	inc	a
-	ld	(hl), a
-	inc	hl
-	ld	a, (hl)
-	adc	a, 1
-	ld	(hl), a		;Increments the timer
-	
-	ld	hl, raster_procs
-	jr	int_handler
+    ld  a, ($BF) 
+    or  a 
+    jp  p, int_not_VBL  ; Bit 7 not set 
 
-filler2:
-	defs	(NMI_Start - filler2)
-int_PAUSE:
-	push	hl
-	
-	ld	hl, _pause_flag
-	ld	a, (hl)
-	xor	a, 1
-	ld	(hl), a
-	
-	ld	hl, pause_procs
-	jr	int_handler	
+;int_VBL: 
+    push    hl 
 
-int_handler:
-	push	af
-	push	bc
-	push	de
-int_loop:
-	ld	a, (hl)
-	inc	hl
-	or	(hl)
-	jr	z, int_done
-	push	hl
-	ld	a, (hl)
-	dec	hl
-	ld	l, (hl)
-	ld	h, a
-	call	call_int_handler
-	pop	hl
-	inc	hl
-	jr	int_loop
-int_done:
-	pop	de
-	pop	bc
-	pop	af
-	pop	hl
-	
-	ei
+    ld  hl, timer 
+    ld  a, (hl) 
+    inc a 
+    ld  (hl), a 
+    inc hl 
+    ld  a, (hl) 
+    adc a, 1 
+    ld  (hl), a     ;Increments the timer 
 
-	reti
+    ld  hl, raster_procs 
+    call    int_handler 
 
-call_int_handler:
-	jp	(hl)
+    pop hl 
+
+int_not_VBL: 
+    pop af 
+    ei 
+    ret 
+
+filler2: 
+    defs    (NMI_Start - filler2) 
+int_PAUSE: 
+    push    af 
+    push    hl 
+
+    ld  hl, _pause_flag 
+    ld  a, (hl) 
+    xor a, 1 
+    ld  (hl), a 
+
+    ld  hl, pause_procs 
+    call    int_handler 
+
+    pop hl 
+    pop af 
+    retn 
+
+int_handler: 
+    push    bc 
+    push    de 
+int_loop: 
+    ld  a, (hl) 
+    inc hl 
+    or  (hl) 
+    jr  z, int_done 
+    push    hl 
+    ld  a, (hl) 
+    dec hl 
+    ld  l, (hl) 
+    ld  h, a 
+    call    call_int_handler 
+    pop hl 
+    inc hl 
+    jr  int_loop 
+int_done: 
+    pop de 
+    pop bc 
+    ret 
+
+call_int_handler: 
+    jp  (hl) 
 
 ;-------        
 ; Beginning of the actual code
@@ -196,34 +199,36 @@ DefaultInitialiseVDP:
     DEFC NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
     DEFC SpriteTableAddress = $3f00   ; must be a multiple of $100; usually $3f00; fills $100 bytes
 
-_Data:
-    defb @00000100,$80
-    ;     |||||||`- Disable synch
-    ;     ||||||`-- Enable extra height modes
-    ;     |||||`--- SMS mode instead of SG
-    ;     ||||`---- Shift sprites left 8 pixels
-    ;     |||`----- Enable line interrupts
-    ;     ||`------ Blank leftmost column for scrolling
-    ;     |`------- Fix top 2 rows during horizontal scrolling
-    ;     `-------- Fix right 8 columns during vertical scrolling
-    defb @10000100,$81
-    ;      |||| |`- Zoomed sprites -> 16x16 pixels
-    ;      |||| `-- Doubled sprites -> 2 tiles per sprite, 8x16
-    ;      |||`---- 30 row/240 line mode
-    ;      ||`----- 28 row/224 line mode
-    ;      |`------ Enable VBlank interrupts
-    ;      `------- Enable display
-    defb (NameTableAddress/1024) |@11110001,$82
-    defb (SpriteTableAddress/128)|@10000001,$85
-    defb (SpriteSet/4)           |@11111011,$86
-    defb $f|$f0,$87
-    ;     `-------- Border palette colour (sprite palette)
-    defb $00,$88
-    ;     ``------- Horizontal scroll
-    defb $00,$89
-    ;     ``------- Vertical scroll
-    defb $ff,$8a
-    ;     ``------- Line interrupt spacing ($ff to disable)
+_Data: 
+    defb @00000100,$80 
+    ;     |||||||`- Disable synch 
+    ;     ||||||`-- Enable extra height modes 
+    ;     |||||`--- SMS mode instead of SG 
+    ;     ||||`---- Shift sprites left 8 pixels 
+    ;     |||`----- Enable line interrupts 
+    ;     ||`------ Blank leftmost column for scrolling 
+    ;     |`------- Fix top 2 rows during horizontal scrolling 
+    ;     `-------- Fix right 8 columns during vertical scrolling 
+    defb @10000000,$81 
+    ;      |||| |`- Zoomed sprites -> 16x16 pixels 
+    ;      |||| `-- Doubled sprites -> 2 tiles per sprite, 8x16 
+    ;      |||`---- 30 row/240 line mode 
+    ;      ||`----- 28 row/224 line mode 
+    ;      |`------ Enable VBlank interrupts 
+    ;      `------- Enable display 
+    defb (NameTableAddress/1024) |@11110001,$82 
+    defb $FF,$83 
+    defb $FF,$84 
+    defb (SpriteTableAddress/128)|@10000001,$85 
+    defb (SpriteSet/2^2)         |@11111011,$86 
+    defb $f|$f0,$87 
+    ;     `-------- Border palette colour (sprite palette) 
+    defb $00,$88 
+    ;     ``------- Horizontal scroll 
+    defb $00,$89 
+    ;     ``------- Vertical scroll 
+    defb $ff,$8a 
+    ;     ``------- Line interrupt spacing ($ff to disable) 
 _End:
 	
 
@@ -260,8 +265,215 @@ RG6SAV:			defb	0
 RG7SAV:			defb	0
 
 
+; DEFINE SECTIONS FOR BANKSWITCHING
+; consistent with appmake and new c library
 
+   IFNDEF CRT_ORG_BANK_02
+      defc CRT_ORG_BANK_02 = 0x8000
+   ENDIF
 
+   IFNDEF CRT_ORG_BANK_03
+      defc CRT_ORG_BANK_03 = 0x8000
+   ENDIF
 
+   IFNDEF CRT_ORG_BANK_04
+      defc CRT_ORG_BANK_04 = 0x8000
+   ENDIF
 
+   IFNDEF CRT_ORG_BANK_05
+      defc CRT_ORG_BANK_05 = 0x8000
+   ENDIF
 
+   IFNDEF CRT_ORG_BANK_06
+      defc CRT_ORG_BANK_06 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_07
+      defc CRT_ORG_BANK_07 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_08
+      defc CRT_ORG_BANK_08 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_09
+      defc CRT_ORG_BANK_09 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0A
+      defc CRT_ORG_BANK_0A = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0B
+      defc CRT_ORG_BANK_0B = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0C
+      defc CRT_ORG_BANK_0C = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0D
+      defc CRT_ORG_BANK_0D = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0E
+      defc CRT_ORG_BANK_0E = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0F
+      defc CRT_ORG_BANK_0F = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_10
+      defc CRT_ORG_BANK_10 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_11
+      defc CRT_ORG_BANK_11 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_12
+      defc CRT_ORG_BANK_12 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_13
+      defc CRT_ORG_BANK_13 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_14
+      defc CRT_ORG_BANK_14 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_15
+      defc CRT_ORG_BANK_15 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_16
+      defc CRT_ORG_BANK_16 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_17
+      defc CRT_ORG_BANK_17 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_18
+      defc CRT_ORG_BANK_18 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_19
+      defc CRT_ORG_BANK_19 = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1A
+      defc CRT_ORG_BANK_1A = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1B
+      defc CRT_ORG_BANK_1B = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1C
+      defc CRT_ORG_BANK_1C = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1D
+      defc CRT_ORG_BANK_1D = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1E
+      defc CRT_ORG_BANK_1E = 0x8000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1F
+      defc CRT_ORG_BANK_1F = 0x8000
+   ENDIF
+
+   SECTION BANK_02
+   org CRT_ORG_BANK_02
+   
+   SECTION BANK_03
+   org CRT_ORG_BANK_03
+
+   SECTION BANK_04
+   org CRT_ORG_BANK_04
+   
+   SECTION BANK_05
+   org CRT_ORG_BANK_05
+
+   SECTION BANK_06
+   org CRT_ORG_BANK_06
+   
+   SECTION BANK_07
+   org CRT_ORG_BANK_07
+
+   SECTION BANK_08
+   org CRT_ORG_BANK_08
+   
+   SECTION BANK_09
+   org CRT_ORG_BANK_09
+   
+   SECTION BANK_0A
+   org CRT_ORG_BANK_0A
+   
+   SECTION BANK_0B
+   org CRT_ORG_BANK_0B
+
+   SECTION BANK_0C
+   org CRT_ORG_BANK_0C
+   
+   SECTION BANK_0D
+   org CRT_ORG_BANK_0D
+
+   SECTION BANK_0E
+   org CRT_ORG_BANK_0E
+   
+   SECTION BANK_0F
+   org CRT_ORG_BANK_0F
+
+   SECTION BANK_10
+   org CRT_ORG_BANK_10
+   
+   SECTION BANK_11
+   org CRT_ORG_BANK_11
+
+   SECTION BANK_12
+   org CRT_ORG_BANK_12
+   
+   SECTION BANK_13
+   org CRT_ORG_BANK_13
+
+   SECTION BANK_14
+   org CRT_ORG_BANK_14
+   
+   SECTION BANK_15
+   org CRT_ORG_BANK_15
+
+   SECTION BANK_16
+   org CRT_ORG_BANK_16
+   
+   SECTION BANK_17
+   org CRT_ORG_BANK_17
+
+   SECTION BANK_18
+   org CRT_ORG_BANK_18
+   
+   SECTION BANK_19
+   org CRT_ORG_BANK_19
+   
+   SECTION BANK_1A
+   org CRT_ORG_BANK_1A
+   
+   SECTION BANK_1B
+   org CRT_ORG_BANK_1B
+
+   SECTION BANK_1C
+   org CRT_ORG_BANK_1C
+   
+   SECTION BANK_1D
+   org CRT_ORG_BANK_1D
+
+   SECTION BANK_1E
+   org CRT_ORG_BANK_1E
+   
+   SECTION BANK_1F
+   org CRT_ORG_BANK_1F

@@ -52,7 +52,7 @@ include(`../clib_instantiate_end.m4')
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION COMMON0
+SECTION CODE
 
 PUBLIC __Start, __Exit
 
@@ -65,7 +65,7 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
-   SECTION COMMON0
+   SECTION CODE
 
 ENDIF
 

@@ -17,6 +17,14 @@
 ._fgetc_cons
 	call $803F
 	jr nz,fgetc_cons
+
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
+
 	ld	h,0
 	ld	l,a
 	ret

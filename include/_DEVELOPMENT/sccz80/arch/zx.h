@@ -58,10 +58,10 @@ __sfr __banked __at 0x7ffd IO_7FFD;
 
 // misc
 
-extern void __LIB__ __FASTCALL__ zx_border(uint16_t colour);
+extern void __LIB__ __FASTCALL__ zx_border(uint16_t colour) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ zx_cls(uint16_t attr);
+extern void __LIB__ __FASTCALL__ zx_cls(uint16_t attr) __smallc;
 
 
 extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,uint16_t attr) __smallc;
@@ -110,40 +110,40 @@ extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cx(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cx(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cy(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cy(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2px(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2px(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2py(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2py(void *aaddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *aaddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *aaddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcdown(void *aaddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcdown(void *aaddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcleft(void *aaddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcleft(void *aaddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcright(void *aaddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcright(void *aaddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcup(void *aaddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcup(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_bitmask2px(int bitmask);
+extern unsigned int __LIB__ __FASTCALL__ zx_bitmask2px(int bitmask) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_cy2aaddr(int row);
+extern unsigned char __LIB__ __FASTCALL__ *zx_cy2aaddr(int row) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_cy2saddr(int row);
+extern unsigned char __LIB__ __FASTCALL__ *zx_cy2saddr(int row) __smallc;
 
 
 extern unsigned char __LIB__ *zx_cyx2aaddr(int row,int col) __smallc;
@@ -156,7 +156,7 @@ extern unsigned char __LIB__ __CALLEE__ *zx_cyx2saddr_callee(int row,int col) __
 #define zx_cyx2saddr(a,b) zx_cyx2saddr_callee(a,b)
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_px2bitmask(int x);
+extern unsigned int __LIB__ __FASTCALL__ zx_px2bitmask(int x) __smallc;
 
 
 extern unsigned char __LIB__ *zx_pxy2aaddr(int x,int y) __smallc;
@@ -169,40 +169,40 @@ extern unsigned char __LIB__ __CALLEE__ *zx_pxy2saddr_callee(int x,int y) __smal
 #define zx_pxy2saddr(a,b) zx_pxy2saddr_callee(a,b)
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_py2aaddr(int y);
+extern unsigned char __LIB__ __FASTCALL__ *zx_py2aaddr(int y) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_py2saddr(int y);
+extern unsigned char __LIB__ __FASTCALL__ *zx_py2saddr(int y) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *saddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_saddr2px(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2px(void *saddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_saddr2py(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2py(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcdown(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcdown(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcleft(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcleft(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcright(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcright(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcup(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcup(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddrpdown(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddrpdown(void *saddr) __smallc;
 
 
 extern unsigned char __LIB__ *zx_saddrpleft(void *saddr,int bitmask) __smallc;
@@ -215,7 +215,7 @@ extern unsigned char __LIB__ __CALLEE__ *zx_saddrpright_callee(void *saddr,int b
 #define zx_saddrpright(a,b) zx_saddrpright_callee(a,b)
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_saddrpup(void *saddr);
+extern unsigned char __LIB__ __FASTCALL__ *zx_saddrpup(void *saddr) __smallc;
 
 
 

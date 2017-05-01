@@ -16,8 +16,10 @@ SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_push_di
+PUBLIC asm_cpu_push_di
 
 asm_z80_push_di:
+asm_cpu_push_di:
 
    ; exit  : stack = ei_di_status
    ;
@@ -26,7 +28,7 @@ asm_z80_push_di:
    ex (sp),hl
    push hl
 
-   IF __z80_cpu_info & $01
+   IF __Z80 & __Z80_NMOS
    
       ; nmos z80 bug prevents use of "ld a,i" to gather IFF2 into p/v flag
       ; see http://www.z80.info/zip/ZilogProductSpecsDatabook129-143.pdf

@@ -49,7 +49,8 @@ char *c_init_section = "code_crt_init";
 #define OPT_INT          4
 #define OPT_STRING       8
 #define OPT_ASSIGN       16
-#define OPT_FUNCTION     32
+#define OPT_OR           32
+#define OPT_FUNCTION     64
 #define OPT_HEADER       128
 
 
@@ -96,7 +97,9 @@ static option  sccz80_opts[] = {
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, CPU_R3K },
     { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
-    { 0, "do-inline", OPT_BOOL, "Inlne some common functions", &c_doinline, 0 },
+    { 0, "do-inline", OPT_ASSIGN|OPT_INT, "Inlne some common functions", &c_doinline, ~0 },
+    { 0, "inline-gint", OPT_OR, "Inline the l_gint call", &c_doinline, INLINE_GINT },
+    { 0, "inline-pint", OPT_OR, "Inline the l_pint call", &c_doinline, INLINE_PINT },
     { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
     { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
@@ -830,6 +833,8 @@ static void set_option(option *arg, char *value)
         } else if ( arg->type & OPT_STRING ) {
             *(char *)arg->value = arg->data;
         }
+    } else if (arg->type & OPT_OR ) {
+            *(int *)arg->value |= arg->data;
     } else if ( arg->type & OPT_FUNCTION ) {
         void (*func)(option *arg, char *type) = arg->value;
         func(arg,value);
@@ -871,7 +876,7 @@ int parse_arguments(option *args, int argc, char **argv)
                 }
                 if ( strlen(argstart) == 1 && *argstart == myarg->short_name ) {
                     char *val = NULL;
-                    if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN)) == 0 ) {
+                    if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN|OPT_OR)) == 0 ) {
                         if ( ++i < argc ) {
                             val = argv[i];
                         } else {
@@ -889,7 +894,7 @@ int parse_arguments(option *args, int argc, char **argv)
                         if ( strlen(argstart) > strlen(myarg->long_name) )  {
                              /* Try and take the value after the option (without the = sign) */
                              val = argstart + strlen(myarg->long_name);
-                        } else if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN)) == 0 ) {
+                        } else if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN|OPT_OR)) == 0 ) {
                             /* Otherwise it's the next argument */
                             if ( ++i < argc ) {
                                 val = argv[i];

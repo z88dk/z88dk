@@ -51,7 +51,7 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
 
 void load_constant(LVALUE *lval)
 {
-    if (lval->val_type == LONG) {
+    if (lval->val_type == LONG || lval->val_type == CPTR) {
         vlongconst(lval->const_val);
     } else if (lval->val_type == DOUBLE ) {
         load_double_into_fa(lval);
@@ -300,7 +300,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         lval->flags &= (UNSIGNED|FAR);
 
         /* Special case handling for operation by constant */
-        if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || lval2->is_const) ) {
+        if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || oper == zxor || lval2->is_const) ) {
             int doconstoper = 0;
             int32_t const_val;
 

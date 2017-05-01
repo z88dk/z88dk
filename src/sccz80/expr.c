@@ -124,9 +124,10 @@ int heir1(LVALUE* lval)
     } else if (match("|=")) {
         oper = zor;
         constoper = zor_const;
-    } else if (match("^="))
+    } else if (match("^=")) {
         oper = zxor;
-    else if (match("&=")) {
+        constoper = zxor_const;
+    } else if (match("&=")) {
         oper = zand;
         constoper = zand_const;
     } else if (match("+="))
@@ -298,7 +299,7 @@ int heir2(LVALUE* lval)
 
 int heir3(LVALUE* lval)
 {
-    return heir234(lval, heir4, '^', zxor, NULL);
+    return heir234(lval, heir4, '^', zxor, zxor_const);
 }
 
 int heir4(LVALUE* lval)

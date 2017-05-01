@@ -196,7 +196,7 @@ extern void __LIB__ __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c,void *d
 #define sp1_ChangeSprType(a,b) sp1_ChangeSprType_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ sp1_DeleteSpr(struct sp1_ss *s);
+extern void __LIB__ __FASTCALL__ sp1_DeleteSpr(struct sp1_ss *s) __smallc;
 
 // only call after sprite is removed from screen
 
@@ -259,7 +259,7 @@ extern void __LIB__ __CALLEE__ sp1_InsertCharStruct_callee(struct sp1_update *u,
 #define sp1_InsertCharStruct(a,b) sp1_InsertCharStruct_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ sp1_RemoveCharStruct(struct sp1_cs *cs);
+extern void __LIB__ __FASTCALL__ sp1_RemoveCharStruct(struct sp1_cs *cs) __smallc;
 
 
 
@@ -376,37 +376,37 @@ extern void __LIB__ __CALLEE__ sp1_IterateUpdateRect_callee(struct sp1_Rect *r,v
 
 
 
-extern void __LIB__ __FASTCALL__ sp1_InvUpdateStruct(struct sp1_update *u);
+extern void __LIB__ __FASTCALL__ sp1_InvUpdateStruct(struct sp1_update *u) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ sp1_ValUpdateStruct(struct sp1_update *u);
-
-
-
-extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructIfInv(struct sp1_update *u);
-
-
-extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructIfVal(struct sp1_update *u);
-
-
-extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructIfNotRem(struct sp1_update *u);
-
-
-extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructAlways(struct sp1_update *u);
+extern void __LIB__ __FASTCALL__ sp1_ValUpdateStruct(struct sp1_update *u) __smallc;
 
 
 
-extern void __LIB__ __FASTCALL__ sp1_RemoveUpdateStruct(struct sp1_update *u);
+extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructIfInv(struct sp1_update *u) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ sp1_RestoreUpdateStruct(struct sp1_update *u);
+extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructIfVal(struct sp1_update *u) __smallc;
+
+
+extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructIfNotRem(struct sp1_update *u) __smallc;
+
+
+extern void __LIB__ __FASTCALL__ sp1_DrawUpdateStructAlways(struct sp1_update *u) __smallc;
 
 
 
-extern void __LIB__ __FASTCALL__ sp1_Invalidate(struct sp1_Rect *r);
+extern void __LIB__ __FASTCALL__ sp1_RemoveUpdateStruct(struct sp1_update *u) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ sp1_Validate(struct sp1_Rect *r);
+extern void __LIB__ __FASTCALL__ sp1_RestoreUpdateStruct(struct sp1_update *u) __smallc;
+
+
+
+extern void __LIB__ __FASTCALL__ sp1_Invalidate(struct sp1_Rect *r) __smallc;
+
+
+extern void __LIB__ __FASTCALL__ sp1_Validate(struct sp1_Rect *r) __smallc;
 
 
 

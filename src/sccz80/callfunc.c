@@ -184,7 +184,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 if ((protoarg != PELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == STRUCT)))
                     expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
 
-#if 1
+#if 0
                 if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
                     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
                 }

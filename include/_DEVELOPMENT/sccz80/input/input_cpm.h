@@ -14,14 +14,14 @@
 extern int __LIB__ in_inkey(void) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode);
+extern int __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode) __smallc;
 
 
-extern uint16_t __LIB__ __FASTCALL__ in_key_scancode(int c);
+extern uint16_t __LIB__ __FASTCALL__ in_key_scancode(int c) __smallc;
 
 
 
-extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms);
+extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms) __smallc;
 
 
 extern int __LIB__ in_test_key(void) __smallc;
@@ -38,7 +38,7 @@ extern void __LIB__ in_wait_nokey(void) __smallc;
 // joysticks
 ////////////
 
-extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u);
+extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u) __smallc;
 
 
 

@@ -20,7 +20,13 @@
 .fgetc_cons
 ._fgetc_cons
 		call	$016C
-
+		
+IF STANDARDESCAPECHARS
+	cp	13
+	jr	nz,not_return
+	ld	a,10
+.not_return
+ENDIF
 		ld	h,0
 		ld	l,a
 
