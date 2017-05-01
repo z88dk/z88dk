@@ -13,7 +13,7 @@ OBJS += $(REGEX_OBJS)
 all: zcc$(EXESUFFIX)
 
 zcc$(EXESUFFIX):	$(OBJS)
-	${CC} -o zcc$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
+	$(CC) -o zcc$(EXESUFFIX) $(CFLAGS) $(OBJS)
 
 %.o: %.c
 	$(CC) -c -o $@ $(CFLAGS) $(INCLUDES) $^
