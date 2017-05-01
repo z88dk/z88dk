@@ -2706,7 +2706,7 @@ void tempname(char *filen)
 *
 *    If ZCCCFG doesn't exist then we take the c_install_dir/lib/config/zcc.cfg
 */
-int 	find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, size_t buflen)
+int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, size_t buflen)
 {
 	FILE           *fp;
 	char           *cfgfile;
@@ -2741,7 +2741,7 @@ int 	find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf,
 		*/
 		return (gc);
 	} 
-	// Without a config file, we should just exit
+	// Without a config file, we should just print usage and then exit
 	usage(program);
 	exit(1);
 }
