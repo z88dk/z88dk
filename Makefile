@@ -13,7 +13,7 @@ git_rev = $(shell git rev-parse --short HEAD)
 version := $(shell date +%Y%m%d)
 
 INSTALL ?= install
-CFLAGS ?= -g -O2
+CFLAGS ?= -O2
 CC ?= gcc
 
 # --> End of Configurable Options
