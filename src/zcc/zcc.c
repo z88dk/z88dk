@@ -2167,8 +2167,8 @@ void print_help_config(arg_t *arg, char *val)
 
 void usage(const char *program)
 {
-	printf("zcc - Frontend for the z88dk Cross-C Compiler - %s\n",version);
-	printf("Usage: %s +[target] {options} {files}\n",program);
+	fprintf(stderr,"zcc - Frontend for the z88dk Cross-C Compiler - %s\n",version);
+	fprintf(stderr,"Usage: %s +[target] {options} {files}\n",program);
 }
 
 void print_help_text(const char *program)
@@ -2177,10 +2177,10 @@ void print_help_text(const char *program)
 
 	usage(program);
 
-	printf("\nOptions:\n\n");
+	fprintf(stderr,"\nOptions:\n\n");
 
 	while (cur->help) {
-		printf("-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
+		fprintf(stderr,"-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
 		cur++;
 	}
 
@@ -2742,6 +2742,7 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
 		return (gc);
 	} 
 	// Without a config file, we should just print usage and then exit
+        fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
 	usage(program);
 	exit(1);
 }
