@@ -156,3 +156,6 @@ FILE *buffer_fps[200];
 int   buffer_fps_num = 0 ;
 
 struct parser_stack *pstack; /**< Stack of previous saved parsers */
+
+
+int incritical;
