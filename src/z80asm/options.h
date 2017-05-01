@@ -19,12 +19,12 @@ Parse command line options
 *----------------------------------------------------------------------------*/
 #define CPU_Z80     1
 #define CPU_Z180    2
-#define CPU_RCM2000 4
-#define CPU_RCM3000 8
+#define CPU_R2K		4
+#define CPU_R3K		8
 
-#define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
-#define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
-#define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
+#define CPU_RABBIT (CPU_R2K		|CPU_R3K)
+#define CPU_ZILOG  (CPU_Z80		|CPU_Z180)
+#define CPU_ALL    (CPU_ZILOG	|CPU_RABBIT)
 
 /*-----------------------------------------------------------------------------
 *   singleton opts

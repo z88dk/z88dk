@@ -29,8 +29,12 @@ scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 	
 all : parse_rules.h
 
+cpu_opcodes.h : cpu_opcodes.def cpu_opcodes.pl
+	perl cpu_opcodes.pl
+
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
-				parse_ragel.pl dev/Makefile 
+				parse_ragel.pl dev/Makefile \
+				cpu_opcodes.h
 	perl parse_ragel.pl parse_rules.rl
 #	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)
 	

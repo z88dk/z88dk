@@ -1,10 +1,16 @@
 ;------------------------------------------------------------------------------
 ; List of all the CPU opcodes
+; {b c d}	-> expands into 3 lines for each element and $1 = (0..3)
+; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for rabbit
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
 ; 8-bit load group
 ;------------------------------------------------------------------------------
+			ld {b c d e h l . a}['], {b c d e h l . a} => 40 + $1*8 + $2
+__END__
+
+
 [z80]		ld {b c d e ixh ixl . a}, {. . . . ixh ixl . .}	=> DD, 40 + $1*8 + $2
 [z80]		ld {b c d e iyh iyl . a}, {. . . . iyh iyl . .}	=> FD, 40 + $1*8 + $2
 
@@ -311,6 +317,7 @@
 [z180]		slp					=> ED, 76
 	
 ; TODO: add all ALTD combinations
+[rabbit]	altd				=>     76
 [rabbit]	ld a,  xpc			=>     ED, 77
 [rabbit]	ld a', xpc			=> 76, ED, 77
 [rabbit]	ld xpc, a			=>     ED, 67

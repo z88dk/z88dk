@@ -379,20 +379,12 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 		| label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 
+#include "cpu_opcodes.h"
+
 		/*---------------------------------------------------------------------
 		*   8-bit load group
 		*--------------------------------------------------------------------*/
 #foreach <R1> in   B, C, D, E, H, L, A
-  #foreach <R2> in B, C, D, E, H, L, A
-		/* LD r,r */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_<R2> _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_r_r( REG_<R1>, REG_<R2> ) ); }
-			
-		/* LD r',r */
-		|	label? _TK_LD _TK_<R1>1 _TK_COMMA _TK_<R2> _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt( Z80_LD_r_r( REG_<R1>, REG_<R2> ) ); }
-  #endfor  <R2>
-	
 		/* LD r,(hl) */
 		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE \
 			@{ DO_stmt( Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
@@ -1121,7 +1113,7 @@ Define rules for a ragel-based parser.
 				 OTDR, OTIR, OUTD, OUTI, \
 				 SLP, \
 				 OTIM, OTIMR, OTDM, OTDMR, \
-				 ALTD, IOI, IOE, IPRES, \
+				 IOI, IOE, IPRES, \
 				 IDET, \
 				 LDDSR, LDISR, LSDR, LSIR, LSDDR, LSIDR, \
 				 MUL, RDMODE, SETUSR, SURES, SYSCALL, UMA, UMS

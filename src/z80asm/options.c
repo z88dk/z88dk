@@ -540,12 +540,12 @@ static void option_cpu_z180(void)
 
 static void option_cpu_r2k(void)
 {
-	opts.cpu = CPU_RCM2000;
+	opts.cpu = CPU_R2K;
 }
 
 static void option_cpu_r3k(void)
 {
-	opts.cpu = CPU_RCM3000;
+	opts.cpu = CPU_R3K;
 }
 
 /*-----------------------------------------------------------------------------

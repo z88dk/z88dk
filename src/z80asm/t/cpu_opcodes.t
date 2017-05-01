@@ -14,7 +14,6 @@ my @CPU = (qw( z80 z180 r2k r3k ));
 #------------------------------------------------------------------------------
 # globals
 my $cpu;		# current cpu
-my $filebase;	# current file basename
 my $asmf;		# current asm output file handle
 my $binf;		# current binary output file handle
 my $errf;		# current error output file handle, opcodes that are invalid
@@ -26,14 +25,16 @@ for (@CPU) {
 	$cpu = $_;
 	ok 1, $cpu;
 	
-	$filebase = "t/data/ops_".$cpu;
-	path(path($filebase)->dirname)->mkpath;
+	my $asm_file = "t/data/ops_".$cpu."_ok.asm";
+	my $err_file = "t/data/ops_".$cpu."_err.asm";
+	my $bmk_file = "t/data/ops_".$cpu."_ok.bmk";
 	
 	$addr = 0;
 	
-	open ($asmf, ">", 	 $filebase.".asm");
-	open ($errf, ">", 	 $filebase."_err.asm");
-	open ($binf, ">:raw", $filebase.".bmk");
+	# write asm files in binary mode to have only LF
+	open ($asmf, ">:raw", $asm_file);
+	open ($errf, ">:raw", $err_file);
+	open ($binf, ">:raw", $bmk_file);
 	
 	my $in_file = $0; $in_file =~ s/\.t$/.in/i or die;
 	parse($cpu, path($in_file)->lines);
@@ -42,7 +43,13 @@ for (@CPU) {
 	close $binf;
 	close $errf;
 	
-	test_asm();
+	test_asm($cpu, $asm_file, $err_file, $bmk_file);
+
+	$asm_file = "t/data/opcodes_".$cpu."_ok.asm";
+	$err_file = "t/data/opcodes_".$cpu."_err.asm";
+	$bmk_file = "t/data/opcodes_".$cpu."_ok.bmk";
+	
+	test_asm($cpu, $asm_file, $err_file, $bmk_file);
 }
 
 done_testing;
@@ -199,27 +206,24 @@ sub split_exprs {
 }
 
 sub test_asm {
-	my $opt;
-	if ($cpu eq 'z80') {		$opt = '';	}
-	elsif ($cpu eq 'z180') {	$opt = '--cpu=z180'	}
-	elsif ($cpu eq 'r2k') {		$opt = '--cpu=r2k'	}
-	elsif ($cpu eq 'r3k') {		$opt = '--cpu=r3k'	}
-	else {						die "cpu $cpu unknown\n";	}
+	my($cpu, $asm_file, $err_file, $bmk_file) = @_;
+	for ($asm_file, $err_file, $bmk_file) { $_ = path($_); }
 	
 	# build OK
-	my $cmd = "./z80asm $opt -l -b --no-emul $filebase";
+	my $cmd = "./z80asm --cpu=$cpu -l -b --no-emul $asm_file";
 	ok system($cmd)==0, $cmd;
 	
-	my $bin = path("$filebase.bin")->slurp_raw;
-	my $bmk = path("$filebase.bmk")->slurp_raw;
-	$cmd = "diff $filebase.bin $filebase.bmk";
+	my $bin_file = replace_ext($asm_file, ".bin");
+	my $bin = $bin_file->slurp_raw;
+	my $bmk = $bmk_file->slurp_raw;
+	$cmd = "diff $bin_file $bmk_file";
 	ok $bin eq $bmk, $cmd;
 	
 	if ($bin eq $bmk) {
-		unlink "$filebase.lis";
-		unlink "$filebase.o";
-		unlink "$filebase.bin";
-		unlink "$filebase.err";
+		unlink replace_ext($asm_file, ".lis");
+		unlink replace_ext($asm_file, ".o");
+		unlink replace_ext($asm_file, ".bin");
+		unlink replace_ext($asm_file, ".err");
 	}
 	else {
 		my $bin_dump = HexDump($bin);
@@ -228,9 +232,9 @@ sub test_asm {
 	}
 	
 	# build failure for invalid opcodes
-	my $num_errors = scalar(path($filebase."_err.asm")->lines);
+	my $num_errors = scalar($err_file->lines);
 	if ($num_errors > 0) {
-		$cmd = "./z80asm $opt -l -b --no-emul ".$filebase."_err";
+		$cmd = "./z80asm --cpu=$cpu -l -b --no-emul $err_file";
 
 		my($stdout, $stderr, $exit) = capture {	system($cmd); };
 		is $stdout, "", "output of $cmd";
@@ -258,7 +262,13 @@ sub test_asm {
 		}
 		ok $ok, "errors of $cmd";
 		if ($ok) {
-			unlink $filebase."_err.err"
+			unlink replace_ext($err_file, ".err");
 		}
 	}
+}
+
+sub replace_ext {
+	my($file, $new_ext) = @_;
+	$file =~ s/\.\w+$/$new_ext/;
+	return path($file);
 }

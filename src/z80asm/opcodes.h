@@ -62,10 +62,10 @@ extern void add_Z88_INVOKE(int argument);
 #define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_RCM2000) ? \
+#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_R2K) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM3000_ONLY(x)	(!(opts.cpu & CPU_RCM3000) ? \
+#define _RCM3000_ONLY(x)	(!(opts.cpu & CPU_R3K) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 

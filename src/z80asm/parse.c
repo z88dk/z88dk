@@ -283,6 +283,10 @@ static void read_token(ParseCtx *ctx)
 
 	ctx->expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(ctx->tokens)) + expr_start_index : NULL;
 
+	// if symbol is a prefix, set scanner to get an opcode
+	if (sym.tok == TK_ALTD)
+		scan_expect_opcode();
+
 	GetSym();
 
 	STR_DELETE(buffer);
