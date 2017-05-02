@@ -6,12 +6,14 @@ SECTION code_alloc_balloc
 
 PUBLIC _balloc_addmem
 
-EXTERN l0_balloc_addmem_callee
+EXTERN asm_balloc_addmem
 
 _balloc_addmem:
 
-   pop af
    pop ix
+   dec sp
+   pop af
+   inc sp
    pop bc
    pop hl
    pop de
@@ -19,7 +21,7 @@ _balloc_addmem:
    push de
    push hl
    push bc
-   push hl
    push af
+   push ix
    
-   jp l0_balloc_addmem_callee
+   jp asm_balloc_addmem
