@@ -10,8 +10,9 @@ EXTERN asm_b_vector_insert_n
 
 b_vector_insert_n:
 
-   pop af
    pop ix
+   pop de
+   ld a,e
    pop de
    pop bc
    pop hl
@@ -19,8 +20,7 @@ b_vector_insert_n:
    push hl
    push bc
    push de
+   push de
    push ix
-   push af
-   
-   ld a,ixl   
+
    jp asm_b_vector_insert_n

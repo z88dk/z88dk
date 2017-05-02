@@ -32,13 +32,11 @@ asm_strtoul:
    ;           carry reset
    ;           dehl = unsigned long result
    ;             bc = char *nptr (& next unconsumed char)
-   ;            ixl = base
    ;
    ;         invalid input string or base:
    ;
    ;           carry set
    ;             bc = initial char *nptr
-   ;            ixl = base
    ;           dehl = 0
    ;           errno set to EINVAL
    ;           
@@ -46,7 +44,6 @@ asm_strtoul:
    ;
    ;            carry set
    ;             bc = char *nptr (& next unconsumed char following oversized number)
-   ;            ixl = base
    ;           dehl = $ffffffff (ULONG_MAX)
    ;           errno set to ERANGE
    ;

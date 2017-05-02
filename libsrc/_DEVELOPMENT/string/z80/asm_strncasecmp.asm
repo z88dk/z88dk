@@ -11,6 +11,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_string
 
@@ -41,6 +43,23 @@ loop:
 
    ld a,(hl)
    call asm_tolower
+
+IFDEF __Z180
+
+   push hl
+   
+   ld l,a
+   
+   ld a,(de)
+   call asm_tolower
+   
+   cp l
+   jr nz, different
+   
+   pop hl
+
+ELSE
+
    ld ixl,a                  ; ixl = *s2
    
    ld a,(de)
@@ -48,6 +67,8 @@ loop:
    
    cp ixl                    ; *s1 - *s2
    jr nz, different
+
+ENDIF
 
    inc de
    inc hl
@@ -66,6 +87,16 @@ equal:                       ; both strings ended same time
    
 different:
 
+IFDEF __Z180
+
+   sub l
+   pop hl
+
+ELSE
+
    sub ixl
+
+ENDIF
+
    ld h,a
    ret

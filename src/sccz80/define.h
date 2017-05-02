@@ -93,7 +93,8 @@ enum symbol_flags {
         SAVEFRAME = 256,  /* Save framepointer */
         SMALLC = 512,      /* L->R calling order */
         FLOATINGDECL = 1024, /* For a function pointer, the calling convention is floating */
-        NAKED = 2048      /* Function is naked - don't generate any code */
+        NAKED = 2048,      /* Function is naked - don't generate any code */
+        CRITICAL = 4096    /* Disable interrupts around the function */
 };
 
 
@@ -286,6 +287,7 @@ struct gototab_s {
 #define STCASE          11
 #define STDEF           12
 #define STGOTO          13
+#define STCRITICAL      14
 
 
 /* Maximum number of errors before we barf */

@@ -1,0 +1,13 @@
+; Specific rules for the z88.
+; This is used to transform critical sections into native OZ calls
+=
+
+	call	l_push_di
+=
+	call	$51
+	push	af
+
+	call	l_pop_ei
+=
+	pop	af
+	call	$54

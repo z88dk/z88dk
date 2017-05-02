@@ -6,5 +6,5 @@ z80_emu/rcmx_cpi
 z80_emu/rcmx_cpir
 z80_emu/rcmx_rld
 z80_emu/rcmx_rrd
-@crt0list
+@crt0.lst
 

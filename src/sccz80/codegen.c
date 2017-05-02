@@ -3006,6 +3006,33 @@ void intrinsic_out(SYMBOL *sym)
 }
 
 
+void zentercritical(void)
+{
+    if ( c_cpu & CPU_RABBIT ) {
+        ol("ipset\t3");
+    } else {
+        callrts("l_push_di");
+    }
+}
+
+void zleavecritical(void)
+{
+    if ( c_cpu & CPU_RABBIT ) {
+        ol("ipres");
+    } else {
+        callrts("l_pop_ei");
+    }
+}
+
+int zcriticaloffset(void)
+{
+    if ( c_cpu & CPU_RABBIT ) {
+        return 0;
+    }
+    return 2;
+}
+
+
 /*
  * Local Variables:
  *  indent-tabs-mode:nil

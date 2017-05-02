@@ -11,7 +11,7 @@ endif
 all: z80nm$(EXESUFFIX)
 
 z80nm$(EXESUFFIX):	$(OBJS)
-	${CC} -o z80nm$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
+	$(CC) -o z80nm$(EXESUFFIX) $(CFLAGS) $(OBJS)
 
 install: 
 	$(INSTALL) z80nm$(EXESUFFIX) $(PREFIX)/bin/

@@ -13,8 +13,6 @@
 ;
 ; ===============================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_z180
 
@@ -47,17 +45,8 @@ asm0_cpu_pop_ei:
    ; uses  : af
 
    pop af                      ; af = ei_di_status
-   
-   IF __Z80 & __Z80_NMOS
-   
-      jr nc, di_state
-   
-   ELSE
-   
-      jp po, di_state
+   jp po, di_state
 
-   ENDIF
-   
 ei_state:
 
    ei

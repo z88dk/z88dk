@@ -21,29 +21,40 @@ __strtoul__:
    ;
    ;              a = 0 (number not negated) or 1 (number negated)
    ;           dehl = result
-   ;            ixl = base
    ;             bc = char * (& next unconsumed char in string)
    ;
    ;         carry set indicates error, a holds error code
    ;
    ;              a = 0/-1 for invalid string, -2 for invalid base
    ;           dehl = 0
-   ;            ixl = base
    ;             bc = original char *
    ;
    ;              a = 3 indicates negate on unsigned overflow
-   ;            ixl = base
    ;             bc = char * (& next unconsumed char following number)
    ;
    ;              a = 2 indicates unsigned overflow
-   ;            ixl = base
    ;             bc = char * (& next unconsumed char following number)
    ;
    ;              a = 1 indicates negative underflow
-   ;            ixl = base
    ;             bc = char * (& next unconsumed char following number)
    ;
    ; uses  : af, bc, de, hl, ix
+
+IFDEF __Z180
+
+   dec sp
+   
+   ld ix,0
+   add ix,sp
+
+   call z180_entry
+   
+   inc sp
+   ret
+
+z180_entry:
+
+ENDIF
 
    ld a,d
    or e
@@ -74,7 +85,7 @@ no_endp:
 
    call l_valid_base
    
-   ld ixl,a                    ; ixl = base
+   ld d,a                      ; d = base
    ld c,l
    ld b,h                      ; bc = original char *
  
@@ -85,7 +96,7 @@ valid_base:
 
    ;  bc = original char *
    ;  hl = char *
-   ; ixl = base
+   ;   d = base
 
    call l_eat_ws               ; skip whitespace
    call l_eat_sign             ; carry set if negative
@@ -119,11 +130,11 @@ positive:
 
    ;  bc = original char*
    ;  hl = char *
-   ; ixl = base
+   ;   d = base
 
-   ld a,ixl                    ; a = base
+   ld a,d                      ; a = base
    call l_eat_base_prefix
-   ld ixl,a                    ; ixl = base
+   ld d,a                      ; d = base
    
    ; there must be at least one valid digit
    
@@ -131,13 +142,13 @@ positive:
    call l_char2num
    jr c, invalid_input
    
-   cp ixl
+   cp d
    jr nc, invalid_input
    
    ; there is special code for base 2, 8, 10, 16
 
    ld e,a
-   ld a,ixl
+   ld a,d
 
 IF __CLIB_OPT_TXT2NUM & $40
 
@@ -170,8 +181,18 @@ ENDIF
    ; use generic algorithm
    
    ;  hl = char *
-   ; ixl = base
+   ;   d = base
    ;   e = first numerical digit
+
+IFDEF __Z180
+
+   ld (ix+0),d
+
+ELSE
+
+   ld ixl,d
+
+ENDIF
    
    ld c,l
    ld b,h
@@ -193,9 +214,18 @@ loop:
    ld a,(bc)
    call l_char2num             ; a = digit
    jr c, number_complete
-   
+
+IFDEF __Z180
+
+   cp (ix+0)
+   jr nc, number_complete
+
+ELSE
+
    cp ixl                      ; digit in 0..base-1 ?
    jr nc, number_complete
+
+ENDIF
    
    inc bc                      ; consume the char
    
@@ -203,9 +233,18 @@ loop:
    
    push af                     ; save new digit
    push bc                     ; save char *
-   
+
+IFDEF __Z180
+
+   ld a,(ix+0)
+   call l_mulu_40_32x8
+
+ELSE
+
    ld a,ixl                    ; a = base
    call l_mulu_40_32x8         ; ADEHL = DEHL * A
+
+ENDIF
    
    pop bc                      ; bc = char *
    
@@ -245,7 +284,16 @@ u_oflow:
    
    ld l,c
    ld h,b                      ; hl = char *
+
+IFDEF __Z180
+
+   ld c,(ix+0)
+
+ELSE
+
    ld c,ixl                    ; c = base
+
+ENDIF
    
    call l_eat_digits
 

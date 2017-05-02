@@ -12,7 +12,7 @@ extern void doswitch(void);
 extern void docase(void);
 extern void dodefault(void);
 extern void doreturn(char);
-extern void leave(int save,char type);
+extern void leave(int save,char type, int incritical);
 extern void dobreak(void);
 extern void docont(void);
 extern void doasm(void);

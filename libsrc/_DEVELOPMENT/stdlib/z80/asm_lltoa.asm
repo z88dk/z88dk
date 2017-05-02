@@ -13,6 +13,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_stdlib
 
@@ -38,9 +40,22 @@ asm_lltoa:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
+IFDEF __Z180
+
+   push ix
+   ex (sp),hl
+   ld a,h
+   or l
+   pop hl
+   jp z, error_zc
+
+ELSE
+
    ld a,ixh
    or ixl
    jp z, error_zc              ; if buf == NULL
+
+ENDIF
    
 asm0_lltoa:                    ; bypass NULL check
 

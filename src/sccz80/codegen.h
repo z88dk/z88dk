@@ -134,3 +134,6 @@ extern void gen_builtin_memset(int32_t c, int32_t s);
 extern void gen_builtin_memcpy(int32_t src, int32_t n);
 extern void intrinsic_in(SYMBOL *sym);
 extern void intrinsic_out(SYMBOL *sym);
+extern void zentercritical(void);
+extern void zleavecritical(void);
+extern int zcriticaloffset(void);

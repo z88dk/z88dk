@@ -43,9 +43,22 @@ asm_fflush_unlocked:
    ;
    ; uses  : all except ix
 
+IFDEF __Z180
+
+   push ix
+   pop hl
+
+   ld a,l
+   or h
+   jp z, asm__fflushall_unlocked
+
+ELSE
+
    ld a,ixl
    or ixh
    jp z, asm__fflushall_unlocked
+
+ENDIF
 
 asm0_fflush_unlocked:
 

@@ -6,20 +6,21 @@ SECTION code_string
 
 PUBLIC memccpy
 
-EXTERN l0_memccpy_callee
+EXTERN asm_memccpy
 
 memccpy:
 
-   pop af
-   pop bc
    pop ix
-   pop hl
-   pop de
-   
-   push de
-   push hl
-   push ix
-   push bc
-   push af
+	pop bc
+	pop de
+	ld a,e
+	pop hl
+	pop de
+	
+	push de
+	push hl
+	push de
+	push bc
+	push ix
 
-   jp l0_memccpy_callee
+   jp asm_memccpy

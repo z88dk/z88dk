@@ -6,8 +6,6 @@ SECTION code_string
 
 PUBLIC _strncasecmp
 
-EXTERN asm_strncasecmp
-
 _strncasecmp:
 
    pop af
@@ -19,5 +17,15 @@ _strncasecmp:
    push hl
    push de
    push af
-   
-   jp asm_strncasecmp
+
+IFDEF __Z180
+
+   EXTERN asm_strncasecmp
+   jp     asm_strncasecmp
+
+ELSE
+
+   EXTERN l0_strncasecmp_callee
+   jp     l0_strncasecmp_callee
+
+ENDIF

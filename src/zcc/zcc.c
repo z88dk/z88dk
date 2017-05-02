@@ -65,7 +65,8 @@ static void            AddAppmake(arg_t *arg, char *);
 static void            AddLinkLibrary(arg_t *arg, char *);
 static void            AddLinkSearchPath(arg_t *arg, char *);
 static void            print_help_config(arg_t *arg, char *);
-static void            print_help_text();
+static void            usage(const char *program);
+static void            print_help_text(const char *program);
 static void            SetString(arg_t *arg, char *);
 static void            GlobalDefc(arg_t *argument, char *);
 static void            PragmaDefine(arg_t *arg, char *);
@@ -114,7 +115,7 @@ static int             copy_file(char *src, char *src_extension, char *dest, cha
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_defc_file(char *name1, char *ext1, char *name2, char *ext2);
 static void            tempname(char *);
-static int             find_zcc_config_fileFile(char *arg, int argc, char *buf, size_t buflen);
+static int             find_zcc_config_fileFile(const char *program, char *arg, int argc, char *buf, size_t buflen);
 static void            parse_option(char *option);
 static void            linkargs_mangle(char *linkargs);
 static void            add_zccopt(char *fmt, ...);
@@ -284,6 +285,7 @@ static char  *c_coptrules9 = NULL;
 static char  *c_coptrules_cpu = NULL;
 static char  *c_coptrules_user = NULL;
 static char  *c_coptrules_sccz80 = NULL;
+static char  *c_coptrules_target = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -371,6 +373,7 @@ static arg_t  config[] = {
 	{ "COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "\"DESTDIR/lib/z80rules.9\"" },
 	{ "COPTRULESCPU", 0, SetStringConfig, &c_coptrules_cpu, NULL, "An extra copt file for CPU optimisation", NULL },
 	{ "COPTRULESINLINE", 0, SetStringConfig, &c_coptrules_sccz80, NULL, "Optimisation file for inlining sccz80 ops", "\"DESTDIR/lib/z80rules.8\"" },
+	{ "COPTRULESTARGET", 0, SetStringConfig, &c_coptrules_target, NULL, "Optimisation file for target specific operations",NULL },
 	{ "SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1\"" },
 	{ "SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2\"" },
 	{ "SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "\"DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3\"" },
@@ -774,7 +777,7 @@ int main(int argc, char **argv)
 
 	gc = 1;            /* Set for the first argument to scan for */
 	if (argc == 1) {
-		print_help_text();
+		print_help_text(argv[0]);
 		exit(1);
 	}
 
@@ -790,7 +793,7 @@ int main(int argc, char **argv)
 
 	setup_default_configuration();
 
-	gc = find_zcc_config_fileFile(argv[gc], gc, config_filename, sizeof(config_filename));
+	gc = find_zcc_config_fileFile(argv[0], argv[gc], gc, config_filename, sizeof(config_filename));
 	/* Okay, so now we read in the options file and get some info for us */
 	if ((fp = fopen(config_filename, "r")) == NULL) {
 		fprintf(stderr, "Can't open config file %s\n", config_filename);
@@ -911,7 +914,7 @@ int main(int argc, char **argv)
 
 
 	if (nfiles <= 0) {
-		print_help_text();
+		print_help_text(argv[0]);
 		exit(0);
 	}
 
@@ -995,8 +998,8 @@ int main(int argc, char **argv)
     {
         if ((fp = fopen(DEFFILE, "r")) != NULL)
         {
-            unsigned char buffer[LINEMAX + 1];
-            unsigned char *p;
+            char buffer[LINEMAX + 1];
+            char *p;
             long val;
 
             while (fgets(buffer, LINEMAX, fp) != NULL)
@@ -1158,6 +1161,9 @@ int main(int argc, char **argv)
 					rules[num_rules++] = c_sdccopt2;
 					break;
 				}
+				if ( c_coptrules_target ) {
+					rules[num_rules++] = c_coptrules_target;
+				}
 				if ( c_coptrules_cpu ) {
 					rules[num_rules++] = c_coptrules_cpu;
 				}
@@ -1187,6 +1193,9 @@ int main(int argc, char **argv)
 						rules[num_rules++] = c_coptrules1;
 						rules[num_rules++] = c_coptrules3;
 						break;
+				}
+				if ( c_coptrules_target ) {
+					rules[num_rules++] = c_coptrules_target;
 				}
 				if ( c_coptrules_cpu ) {
 					rules[num_rules++] = c_coptrules_cpu;
@@ -2161,19 +2170,25 @@ void add_file_to_process(char *filename)
 
 void print_help_config(arg_t *arg, char *val)
 {
-	print_help_text();
+	print_help_text(gargv[0]);
 }
 
-void print_help_text()
+void usage(const char *program)
+{
+	fprintf(stderr,"zcc - Frontend for the z88dk Cross-C Compiler - %s\n",version);
+	fprintf(stderr,"Usage: %s +[target] {options} {files}\n",program);
+}
+
+void print_help_text(const char *program)
 {
 	arg_t      *cur = &myargs[0];
 
-	printf("zcc - Frontend for the z88dk Cross-C Compiler\n");
-	printf("%s", version);
-	printf("\nOptions:\n\n");
+	usage(program);
+
+	fprintf(stderr,"\nOptions:\n\n");
 
 	while (cur->help) {
-		printf("-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
+		fprintf(stderr,"-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
 		cur++;
 	}
 
@@ -2699,7 +2714,7 @@ void tempname(char *filen)
 *
 *    If ZCCCFG doesn't exist then we take the c_install_dir/lib/config/zcc.cfg
 */
-int find_zcc_config_fileFile(char *arg, int gc, char *buf, size_t buflen)
+int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, size_t buflen)
 {
 	FILE           *fp;
 	char           *cfgfile;
@@ -2733,34 +2748,11 @@ int find_zcc_config_fileFile(char *arg, int gc, char *buf, size_t buflen)
 		* when
 		*/
 		return (gc);
-	}
-	/* Okay, nowt specified so get the old style entry */
-	cfgfile = getenv("ZCCFILE");
-	if (cfgfile != NULL) {
-		if (strlen(cfgfile) > FILENAME_MAX) {
-			fprintf(stderr, "Possibly corrupt env variable ZCCFILE\n");
-			exit(1);
-		}
-		snprintf(buf, buflen, "%s", cfgfile);
-		return (gc);
-	}
-	/*
-	* Last resort!
-	* New style config take ZCCCFG/zcc.cfg
-	*/
-	cfgfile = getenv("ZCCCFG");
-	if (cfgfile != NULL) {
-		if (strlen(cfgfile) > FILENAME_MAX) {
-			fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
-			exit(1);
-		}
-		snprintf(buf, buflen, "%s/zcc.cfg", cfgfile);
-	}
-	else {
-		// Fall back to a sensible default
-		snprintf(buf, buflen, "%slib/config/zcc.cfg", c_install_dir);
-	}
-	return (gc);
+	} 
+	// Without a config file, we should just print usage and then exit
+        fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+	usage(program);
+	exit(1);
 }
 
 
