@@ -77,34 +77,41 @@ libs:
 	cd libsrc ; $(MAKE)
 	cd libsrc ; $(MAKE) install
 
-install-libs:
-	mkdir -p $(DESTDIR)/$(prefix_share)/z88dk/lib/config
-	cp -R lib/config/* $(DESTDIR)/$(prefix_share)/z88dk/lib/config/
-	find $(DESTDIR)/$(prefix_share)/z88dk/lib/config -type f | xargs chmod 644
-	mkdir -p $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs
-	cp -R lib/clibs/* $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs/
-	find $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs -type f | xargs chmod 644
-
-install:
+install: install-clean
 	cd src/appmake ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/copt ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/cpp ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/zpragma ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/zx7 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/z80nm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/ticks ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd support/graphics; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{}  \;
 	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{}  \;
 	find lib -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
 	find lib -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
+	find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
+	find libsrc -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
 
+
+# Needs libs to have been installed, no dependency yet since rebuilding libsrc
+# still does too many cleans
 test:
 	$(MAKE) -C test
 
+testsuite: 
+	$(MAKE) -C testsuite
+
+install-clean:
+	$(MAKE) -C libsrc install-clean
+
 clean: clean-bins
 	$(MAKE) -C libsrc clean
-#	cd lib/config ; $(RM) *.cfg		# .cfg are now stored in CVS
-#	cd lib/clibs ; $(RM) *.lib		# .lib are now stored in CVS
-#	find . -name "*.o" -type f -exec rm -f {} \;
+	$(RM) lib/clibs/*.lib
+
 
 clean-bins:
 	$(MAKE) -C src/appmake clean
@@ -120,8 +127,5 @@ clean-bins:
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
-
-testsuite:
-	$(MAKE) -C testsuite
 
 .PHONY: test testsuite
