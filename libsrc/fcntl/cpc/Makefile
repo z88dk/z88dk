@@ -23,7 +23,7 @@ $(OUTPUT_DIRECTORY)/cpcfs.lib: $(OBJECTS) $(wildcard *.asm) cpcfs.lst
 	@echo ''
 	@echo '--- Building Amstrad CPC fcntl Library ---'
 	@echo ''
-	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcfs @cpcfs.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcfs @cpcfs.lst
 
 
 .c.o:
