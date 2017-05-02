@@ -15,5 +15,22 @@ _strncasecmp_callee:
    pop hl
    pop bc
    push af
-   
+
+IFDEF __Z180
+
    jp asm_strncasecmp
+
+ELSE
+
+PUBLIC l0_strncasecmp_callee
+
+l0_strncasecmp_callee:
+
+   push ix
+   
+   call asm_strncasecmp
+   
+   pop ix
+   ret
+
+ENDIF

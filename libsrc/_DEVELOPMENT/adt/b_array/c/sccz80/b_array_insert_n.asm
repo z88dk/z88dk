@@ -10,8 +10,9 @@ EXTERN asm_b_array_insert_n
 
 b_array_insert_n:
 
-   pop af
    pop ix
+   pop de
+   ld a,e
    pop de
    pop bc
    pop hl
@@ -19,8 +20,7 @@ b_array_insert_n:
    push hl
    push bc
    push de
-   push hl
-   push af
-   
-   ld a,ixl
+   push de
+   push ix
+
    jp asm_b_array_insert_n

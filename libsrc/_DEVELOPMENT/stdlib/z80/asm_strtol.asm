@@ -32,21 +32,18 @@ asm_strtol:
    ;           carry reset
    ;           dehl = long result
    ;             bc = char *nptr (& next unconsumed char)
-   ;            ixl = base
    ;
    ;         invalid input string or base:
    ;
    ;           carry set
    ;             bc = initial char *nptr
    ;           dehl = 0
-   ;            ixl = base
    ;           errno set to EINVAL
    ;
    ;         overflow:
    ;
    ;           carry set
    ;             bc = char *nptr (& next unconsumed char following oversized number)
-   ;            ixl = base
    ;           dehl = $7fffffff (LONG_MAX) or $80000000 (LONG_MIN)
    ;           errno set to ERANGE
    ;
