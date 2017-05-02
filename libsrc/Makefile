@@ -369,7 +369,7 @@ pacman_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
+	TARGET=pacman TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/pacman/def -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
 
 # Philips P2000 lib - Stefano
 p2000_clib.lib:
@@ -385,7 +385,7 @@ p2000_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=p2000
-	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
+	TARGET=p2000 TYPE=z80 $(LIBLINKER) -II$(DEFFILE_DIR)/p2000/def -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
 # PC6001 lib - Stefano
 pc6001_clib.lib:
@@ -401,7 +401,7 @@ pc6001_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C psg
-	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
+	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/pc6001/def -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
@@ -421,7 +421,7 @@ pps_clib.lib:
 	$(MAKE) -C spectrum 
 	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=pps
-	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
+	TARGET=pps TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/pps/def -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
 # Epson PX4 lib - Stefano	
 px4.lib:
@@ -429,7 +429,7 @@ px4.lib:
 	@echo '--- Building PX-4/HC-40 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/px4.lst
+	TARGET=px4 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/px4/def -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/px4.lst
 
 # Epson PX8 lib - Stefano	
 px8.lib:
@@ -437,7 +437,7 @@ px8.lib:
 	@echo '--- Building PX-8/Geneva Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/px8.lst
+	TARGET=px8 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/px8/def -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/px8.lst
 
 # VZ200/300 lib - Stefano
 vz_clib.lib:
@@ -453,7 +453,7 @@ vz_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=vz
-	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
+	TARGET=vz TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/vz/def -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
 
 # ZX80 lib - Stefano
 zx80_clib.lib:
@@ -689,7 +689,7 @@ ozansi_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C oz 
 	$(MAKE) -C games TARGET=oz
-	TARGET=oz TYPE=z80 $(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
+	TARGET=oz TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/oz/def -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
 # CPM lib - Stefano/dom
 cpm_clib.lib:
@@ -705,7 +705,7 @@ cpm_clib.lib:
 	$(MAKE) -C time 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=cpm TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+	TARGET=cpm TYPE=z80 $(LIBLINKER) -II$(DEFFILE_DIR)/cpm/def -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 
 # Sorcerer Exidy lib - Stefano
 sorcerer_clib.lib:
@@ -719,7 +719,7 @@ sorcerer_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
+	TARGET=srr TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/srr/def -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
 
 # Sharp MZ lib - Stefano
 mz_clib.lib:
@@ -734,7 +734,7 @@ mz_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
+	TARGET=mz TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/mz/def -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
 
 # ABC80 Library - Stefano
 abc80_clib.lib:
@@ -750,7 +750,7 @@ abc80_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=abc80 SUBSET=joystick.asm
-	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
+	TARGET=abc80 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/abc80/def -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
 
 # ABC800 library - Stefano
 abc800_clib.lib:
@@ -766,7 +766,7 @@ abc800_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=abc800 SUBSET=joystick.asm
-	TARGET=abc800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
+	TARGET=abc800 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/abc800/def -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
 
 # Jupiter ACE library - Stefano
 ace_clib.lib:
@@ -783,7 +783,7 @@ ace_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C ace 
 	$(MAKE) -C games TARGET=ace
-	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	TARGET=ace TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/ace/def -DFORace -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
@@ -800,7 +800,7 @@ aquarius_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=aquarius 
-	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	TARGET=aquarius TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/aquarius/def -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:
@@ -809,7 +809,7 @@ aussie.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=aussie
-	TARGET=aussie TYPE=z80 $(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/aussie.lst
+	TARGET=aussie TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/aussie/def -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/aussie.lst
 
 # Applied Technology MicroBee library - Stefano
 bee_clib.lib:
@@ -825,7 +825,7 @@ bee_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=bee
-	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
+	TARGET=bee TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/bee/def -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
 
 microbee.lib:
 	@echo ''
@@ -833,14 +833,14 @@ microbee.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C games TARGET=bee
-	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
-	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/beegfx.lst
+	TARGET=bee TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/bee/def -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/bee/def -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/beegfx.lst
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(LISTFILE_DIRECTORY)/beegfxhr.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/bee/def -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(LISTFILE_DIRECTORY)/beegfxhr.lst
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORbeehr320 -x$(OUTPUT_DIRECTORY)/gfxbee320.lib @$(LISTFILE_DIRECTORY)/beegfxhr320.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/bee/def -DFORbeehr320 -x$(OUTPUT_DIRECTORY)/gfxbee320.lib @$(LISTFILE_DIRECTORY)/beegfxhr320.lst
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(LISTFILE_DIRECTORY)/beegfxhr512.lst
+	$(LIBLINKER) -II$(DEFFILE_DIR)/bee/def -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(LISTFILE_DIRECTORY)/beegfxhr512.lst
 
 # Philips Videopac C7420 library - Stefano
 c7420_clib.lib:
@@ -855,7 +855,7 @@ c7420_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=c7420 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(LISTFILE_DIRECTORY)/c7420.lst
+	TARGET=c7420 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/c7420/def -DSTANDARDESCAPECHARS -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(LISTFILE_DIRECTORY)/c7420.lst
 
 # Xircom REX 6000 library - Dominic
 rex_clib.lib:
@@ -867,7 +867,7 @@ rex_clib.lib:
 	$(MAKE) -C stdlib TARGET=rex
 	$(MAKE) -C setjmp
 	$(MAKE) -C rex
-	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
+	TARGET=rex TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/rex6000/def -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
 sam_clib.lib:
@@ -884,7 +884,7 @@ sam_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C time 
 	$(MAKE) -C games TARGET=sam
-	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
+	TARGET=sam TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/sam/def -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano
 svi_clib.lib:
@@ -903,7 +903,7 @@ svi_clib.lib:
 	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
+	TARGET=svi TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/svi/def -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
 msx_clib.lib:
@@ -923,7 +923,7 @@ msx_clib.lib:
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=msx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
+	TARGET=msx TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/msx/def -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
 mtx_clib.lib:
@@ -941,7 +941,7 @@ mtx_clib.lib:
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
+	TARGET=mtx TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/mtx/def -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
 enterprise_clib.lib:
@@ -959,7 +959,7 @@ enterprise_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=enterprise
 	$(MAKE) -C enterprise 
-	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
+	TARGET=enterprise TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/enterprise/def -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
 gfxep.lib:
@@ -968,7 +968,7 @@ gfxep.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C graphics lenterprise
-	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/gfxep.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/enterprise/def -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/gfxep.lst
 
 # Enterprise HRG graphics lib - Stefano
 gfxephr.lib:
@@ -977,7 +977,7 @@ gfxephr.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C graphics lenterprisehr
-	$(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/gfxephr.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/enterprise/def -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/gfxephr.lst
 
 # Einstein library - Stefano
 einstein.lib:
@@ -988,7 +988,7 @@ einstein.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
+	TARGET=einstein TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/einstein/def -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -1005,7 +1005,7 @@ m5_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
+	TARGET=m5 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/m5/def -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
 mc1000_clib.lib:
@@ -1022,7 +1022,7 @@ mc1000_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=mc1000
 	$(MAKE) -C psg
-	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
+	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/mc1000/def -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
 
 # NASCOM library - Stefano
 nascom_clib.lib:
@@ -1037,7 +1037,7 @@ nascom_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
+	TARGET=nascom TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/nascom/def -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
 	
 # Robotron Z1013 library - Stefano
 z1013_clib.lib:
@@ -1052,7 +1052,7 @@ z1013_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
+	TARGET=z1013 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/z1013/def -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
 z9001_clib.lib:
@@ -1068,17 +1068,17 @@ z9001_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=z9001
-	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
+	TARGET=z9001 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/z9001/def -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
 	@echo ''
 	@echo '--- Building Z9001 Standard Graphics Libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/gfx9001 @$(LISTFILE_DIRECTORY)/gfx9001.lst
+	TARGET=z9001 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/z9001/def -DFORz9001 -x$(OUTPUT_DIRECTORY)/gfx9001 @$(LISTFILE_DIRECTORY)/gfx9001.lst
 	@echo ''
 	@echo '--- Building Z9001 KRT High Resolution libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/gfx9001krt.lst
+	TARGET=z9001 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/z9001/def -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/gfx9001krt.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib:
@@ -1093,7 +1093,7 @@ kc_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
+	TARGET=kc TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/kc/def -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
@@ -1108,7 +1108,7 @@ nc_clib.lib:
 	$(MAKE) -C fcntl/nc100
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
+	TARGET=nc TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/nc100/def -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
 	
 # NC-100 graphics lib - Stefano
 gfxnc100.lib:
@@ -1116,14 +1116,14 @@ gfxnc100.lib:
 	@echo '--- Building NC-100 Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(LISTFILE_DIRECTORY)/gfxnc.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/nc100/def -DFORnc100 -x$(OUTPUT_DIRECTORY)/gfxnc100 @$(LISTFILE_DIRECTORY)/gfxnc.lst
 	
 gfxzcn.lib:
 	@echo ''
 	@echo '--- Building NC-100 Graphics Library (ZCN)---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORnc100 -DFORzcn -x$(OUTPUT_DIRECTORY)/gfxzcn @$(LISTFILE_DIRECTORY)/gfxnc.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/nc100/def -DFORnc100 -DFORzcn -x$(OUTPUT_DIRECTORY)/gfxzcn @$(LISTFILE_DIRECTORY)/gfxnc.lst
 
 # NC-200 graphics lib - Stefano
 gfxnc200.lib:
@@ -1131,7 +1131,7 @@ gfxnc200.lib:
 	@echo '--- Building NC-200 Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORnc200 -x$(OUTPUT_DIRECTORY)/gfxnc200 @$(LISTFILE_DIRECTORY)/gfxnc.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/nc200/def -DFORnc200 -x$(OUTPUT_DIRECTORY)/gfxnc200 @$(LISTFILE_DIRECTORY)/gfxnc.lst
 
 # Amstrad CPC library - Stefano
 cpc_clib.lib:
@@ -1149,8 +1149,8 @@ cpc_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C rs232 
 	$(MAKE) -C psg
-	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
-	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
+	TARGET=cpc TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
+	TARGET=cpc TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
 cpcfs.lib:
 	@echo ''
@@ -1180,8 +1180,8 @@ c128ansi_clib.lib:
 	$(MAKE) -C c128
 	$(MAKE) -C psg c128
 	$(MAKE) -C games TARGET=c128
-	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
-	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
+	TARGET=c128 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/c128/def -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
+	TARGET=c128 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/c128/def -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
 # C128 Base text mode graphics lib - Stefano
 gfx128.lib:
@@ -1189,7 +1189,7 @@ gfx128.lib:
 	@echo '--- Building Commodore 128 Base Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/gfx128.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/c128/def -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/gfx128.lst
 
 # C128 HRG graphics lib - Stefano
 gfx128hr.lib:
@@ -1198,7 +1198,7 @@ gfx128hr.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C graphics lc128
-	$(LIBLINKER) -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(LISTFILE_DIRECTORY)/gfx128hr.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/c128/def -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(LISTFILE_DIRECTORY)/gfx128hr.lst
 
 # C128 640x480 HRG graphics lib - Stefano
 gfx128hr480.lib:
@@ -1207,7 +1207,7 @@ gfx128hr480.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C graphics lc128
-	$(LIBLINKER) -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(LISTFILE_DIRECTORY)/gfx128hr480.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/c128/def -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(LISTFILE_DIRECTORY)/gfx128hr480.lst
 
 # Grundy NewBrain library - Stefano
 newbrain_clib.lib:
@@ -1224,8 +1224,8 @@ newbrain_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C time 
 	$(MAKE) -C assert
-	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
-	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/newbrain/def -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/newbrain/def -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
 # TIKI-100 library - Stefano
 tiki100.lib:
@@ -1234,7 +1234,7 @@ tiki100.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C psg
-	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/tiki100.lst
+	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/tiki100/def -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/tiki100.lst
 	
 # RCM2/3000 lib
 rcmx000_clib.lib:
@@ -1278,7 +1278,7 @@ gal_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=gal
-	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
+	TARGET=gal TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/gal/def -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 
 # Camputers Lynx - Stefano Bodrato
 lynx_clib.lib:
@@ -1294,7 +1294,7 @@ lynx_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=lynx
-	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
+	TARGET=lynx TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/lynx/def -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
 sms_clib.lib:
@@ -1311,7 +1311,7 @@ sms_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
+	TARGET=sms TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/sms/def -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
 sc3000_clib.lib:
@@ -1328,7 +1328,7 @@ sc3000_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
+	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/sc3000/def -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
 test_clib.lib:
@@ -1343,7 +1343,7 @@ test_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C time
 	$(MAKE) -C assert
-	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
+	TARGET=test TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/test/def -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 
 # TRS 80 - stefano
 trs80_clib.lib:
@@ -1359,15 +1359,15 @@ trs80_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=trs80
 	$(MAKE) -C psg
-	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
-	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/trs80/def -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/trs80/def -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
 	@echo ''
 	@echo '--- Building TRS 80 GFX libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/trs80/def -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/trs80/def -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
 
 # Canon X-07 lib - Stefano
 x07_clib.lib:
@@ -1381,7 +1381,7 @@ x07_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
+	TARGET=x07 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/x07/def -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
 x1ansi_clib.lib:
@@ -1398,7 +1398,7 @@ x1ansi_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C psg
 	$(MAKE) -C x1 
-	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/x1/def -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
 vg5k_clib.lib:
@@ -1414,7 +1414,7 @@ vg5k_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=vg5k
-	TARGET=vg5k TYPE=z80 $(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
+	TARGET=vg5k TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/vg5k/def -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
 
 # S-OS (The Sentinel) - Stefano
 sos_clib.lib:
@@ -1429,7 +1429,7 @@ sos_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C sos 
-	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
+	TARGET=sos TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/sos/def -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:
@@ -1446,7 +1446,7 @@ osca_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C fcntl/osca
-	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
+	TARGET=osca TYPE=z80 $(LIBLINKER) -I$(DEFFILE_DIR)/osca/def -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 
 # Preempt multitasking library - dom
 preempt.lib:
