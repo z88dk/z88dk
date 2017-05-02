@@ -4,21 +4,19 @@
 SECTION code_clib
 SECTION code_alloc_balloc
 
-PUBLIC _balloc_addmem_callee, l0_balloc_addmem_callee
+PUBLIC _balloc_addmem_callee
 
 EXTERN asm_balloc_addmem
 
 _balloc_addmem_callee:
 
-   pop af
    pop ix
+   dec sp
+   pop af
+   inc sp
    pop bc
    pop hl
    pop de
-   push af
-
-l0_balloc_addmem_callee:
-
-   ld a,ixl
+   push ix
 
    jp asm_balloc_addmem
