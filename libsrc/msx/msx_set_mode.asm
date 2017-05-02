@@ -17,7 +17,11 @@
 	
 	EXTERN	msxbios
 
+IF FORmsx
         INCLUDE "msxbios.def"
+ELSE
+        INCLUDE "svibios.def"
+ENDIF
 
 
 msx_set_mode:
