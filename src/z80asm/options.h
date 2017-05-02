@@ -27,6 +27,11 @@ Parse command line options
 #define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
 
 /*-----------------------------------------------------------------------------
+*   APPMAKE type
+*----------------------------------------------------------------------------*/
+typedef enum { APPMAKE_NONE, APPMAKE_ZX81, APPMAKE_ZX } appmake_t;
+
+/*-----------------------------------------------------------------------------
 *   singleton opts
 *----------------------------------------------------------------------------*/
 #define OPT_VAR(type, name, default)	type name;
@@ -59,3 +64,20 @@ extern char *get_lib_filename( char *filename );
 extern char *get_sym_filename( char *filename );
 extern char *get_map_filename(char *filename);
 extern char *get_reloc_filename(char *filename);
+
+/*-----------------------------------------------------------------------------
+*   Call appmake if requested in options
+*----------------------------------------------------------------------------*/
+extern void checkrun_appmake(void);
+
+#define ZX_ORIGIN		 23760		/* origin for unexpanded ZX Spectrum */
+#define ZX_ORIGIN_S		"23760"
+#define ZX_ORIGIN_MIN	 23760
+#define ZX_ORIGIN_MAX	 0xFFFF
+#define ZX_APP_EXT		".tap"		/* ZX Spectrum TAP file */
+
+#define ZX81_ORIGIN		 16514		/* origin for ZX 81 */
+#define ZX81_ORIGIN_S	"16514"
+#define ZX81_ORIGIN_MIN	 16514
+#define ZX81_ORIGIN_MAX  16514
+#define ZX81_APP_EXT	".P"		/* ZX81 .P file */

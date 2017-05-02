@@ -357,8 +357,12 @@ int main( int argc, char *argv[] )
 		else if (opts.make_bin) {
 			assert(opts.consol_obj_file == NULL);
 			link_modules();			
+
 			if (!get_num_errors())
 				CreateBinFile();
+
+			if (!get_num_errors())
+				checkrun_appmake();		/* call appmake if requested in the options */
 		}
 		else if (opts.bin_file) {	// -o consolidated obj
 			opts.consol_obj_file = get_obj_filename(opts.bin_file);

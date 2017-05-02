@@ -123,8 +123,8 @@ my $reloc_header = reloc_header(@reloc);
 
 t_z80asm_capture("-b -m --relocatable test.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
-Warning at module 'test': --relocatable ignores ORG at file 'test.o', section 'code'
-Warning at module 'test': --relocatable ignores ORG at file 'test.o', section 'data'
+Warning at module 'test': ORG ignored at file 'test.o', section 'code'
+Warning at module 'test': ORG ignored at file 'test.o', section 'data'
 ERR
 
 t_binary(read_binfile("test.bin"), $reloc_header.CPU::Z80::Assembler::z80asm("org 0\n".$asm));
@@ -242,12 +242,12 @@ $reloc_header = reloc_header(@reloc);
 
 t_z80asm_capture("-b -m --relocatable test.asm test1.asm test2.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
-Warning at module 'test': --relocatable ignores ORG at file 'test.o', section 'code'
-Warning at module 'test': --relocatable ignores ORG at file 'test.o', section 'data'
-Warning at module 'test1': --relocatable ignores ORG at file 'test1.o', section 'code'
-Warning at module 'test1': --relocatable ignores ORG at file 'test1.o', section 'data'
-Warning at module 'test2': --relocatable ignores ORG at file 'test2.o', section 'code'
-Warning at module 'test2': --relocatable ignores ORG at file 'test2.o', section 'data'
+Warning at module 'test': ORG ignored at file 'test.o', section 'code'
+Warning at module 'test': ORG ignored at file 'test.o', section 'data'
+Warning at module 'test1': ORG ignored at file 'test1.o', section 'code'
+Warning at module 'test1': ORG ignored at file 'test1.o', section 'data'
+Warning at module 'test2': ORG ignored at file 'test2.o', section 'code'
+Warning at module 'test2': ORG ignored at file 'test2.o', section 'data'
 ERR
 
 t_binary(read_binfile("test.bin"), $reloc_header.CPU::Z80::Assembler::z80asm("org 0\n".$asm));

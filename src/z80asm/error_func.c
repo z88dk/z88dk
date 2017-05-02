@@ -249,11 +249,20 @@ void error_invalid_org_option(char *org_hex)
 	
 	STR_DELETE(msg);
 }
+void error_invalid_org(int origin)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "invalid ORG value '%d'", origin );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void warn_org_ignored(char *filename, char *section_name)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	str_append_sprintf( msg, "--relocatable ignores ORG at file '%s', section '%s'", filename, section_name );
+	str_append_sprintf( msg, "ORG ignored at file '%s', section '%s'", filename, section_name );
 	do_error( ErrWarn, str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -290,6 +299,15 @@ void error_int_range(long value)
 	STR_DEFINE(msg, STR_SIZE);
 
 	str_append_sprintf( msg, "integer '%ld' out of range", value );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_cmd_failed(char *cmd)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "command '%s' failed", cmd );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);
