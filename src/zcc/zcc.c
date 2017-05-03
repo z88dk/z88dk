@@ -21,6 +21,7 @@
 #include        <ctype.h>
 #include        <stddef.h>
 #include        <stdint.h>
+#include        <inttypes.h>
 #include        <time.h>
 #include        <sys/stat.h>
 #include        "zcc.h"
@@ -999,8 +1000,7 @@ int main(int argc, char **argv)
         if ((fp = fopen(DEFFILE, "r")) != NULL)
         {
             char buffer[LINEMAX + 1];
-            char *p;
-            long val;
+            int32_t val;
 
             while (fgets(buffer, LINEMAX, fp) != NULL)
             {
@@ -1010,11 +1010,11 @@ int main(int argc, char **argv)
                     {
                         char match[LINEMAX + 1];
 
-                        snprintf(match, sizeof(match), " defc %s = %%li", important_pragmas[i].pragma);
+                        snprintf(match, sizeof(match), " defc %s = %%" SCNi32, important_pragmas[i].pragma);
                         if (sscanf(buffer, match, &val) == 1)
                         {
                             important_pragmas[i].seen = 1;
-                            snprintf(buffer, sizeof(buffer), "--define=%s=%ld", important_pragmas[i].m4_name, val);
+                            snprintf(buffer, sizeof(buffer), "--define=%s=%" PRId32, important_pragmas[i].m4_name, val);
                             buffer[sizeof(buffer) - 1] = 0;
                             BuildOptions(&m4arg, buffer);
                         }
