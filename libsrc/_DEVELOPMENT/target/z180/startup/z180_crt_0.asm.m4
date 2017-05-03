@@ -141,6 +141,8 @@ SECTION code_crt_main
    
    call _main                  ; hl = return status
 
+__Leave:
+
    ; run exit stack
 
    IF __clib_exit_stack_size > 0

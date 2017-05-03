@@ -570,29 +570,40 @@ __Test_Trap:
 
    out0 (0x3f),a
 
+   in0 a,(ITC)
+   
+   xor $80
+   jp m, __reset
+   
+   out0 (ITC),a
+
 IF __crt_enable_trap
 
-   in0 a,(ITC)
-   and $80
+   ; user handles trap
 
-   jr z, __Test_Trap_Fail
-   
    pop af
    
    EXTERN _z180_trap
    jp     _z180_trap
 
+ELSE
+
+   ; trap is not handled
+   ; perform a program exit
+
+   jp __Leave
+
 ENDIF
 
-__Test_Trap_Fail:
+__reset:
 
    include "../crt_start_di.inc"
 
-   IF REGISTER_SP = -1
+IF REGISTER_SP = -1
    
    pop af
    
-   ENDIF
+ENDIF
    
    ld a,__IO_VECTOR_BASE
    out0 (IL),a
