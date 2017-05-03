@@ -1004,11 +1004,14 @@ int main(int argc, char **argv)
 
             while (fgets(buffer, LINEMAX, fp) != NULL)
             {
-                for (i = 0; i < sizeof(important_pragmas)/sizeof(*important_pragmas); ++i)
+                for (i = 0; i < sizeof(important_pragmas) / sizeof(*important_pragmas); ++i)
                 {
-                    if ((!important_pragmas[i].seen) && (p = strstr(buffer, important_pragmas[i].pragma)) && isspace(buffer[p - buffer + strlen(important_pragmas[i].pragma)]) && isspace(*(p-1)))
+                    if (important_pragmas[i].seen == 0)
                     {
-                        if (sscanf(buffer, " defc %*s = %li", &val))
+                        char match[LINEMAX + 1];
+
+                        snprintf(match, sizeof(match), " defc %s = %%li", important_pragmas[i].pragma);
+                        if (sscanf(buffer, match, &val) == 1)
                         {
                             important_pragmas[i].seen = 1;
                             snprintf(buffer, sizeof(buffer), "--define=%s=%ld", important_pragmas[i].m4_name, val);
