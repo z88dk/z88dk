@@ -8,6 +8,7 @@
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Test https://github.com/z88dk/z88dk/issues/54
+# z80asm: overflow errors in calculated constants at linking stage
 
 use Modern::Perl;
 use Capture::Tiny::Extended 'capture';

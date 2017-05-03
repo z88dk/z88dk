@@ -7,7 +7,8 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
-# Test https://github.com/z88dk/z88dk/issues/65
+# Test https://github.com/z88dk/z88dk/issues/194
+# z80asm: wrong assembly of DDCB with no index
 
 use Modern::Perl;
 use Capture::Tiny::Extended 'capture';
