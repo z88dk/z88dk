@@ -1,5 +1,0 @@
-This folder includes the key elements to make z88dk work in "classic mode" and discriminate between "classic" and "new" modes.
-
-{z88dk}/lib/config   -> target configuration and build options
-{z88dk}/lib/clib     -> classic lib binary storage
-{z88dk}/lib/         -> target specific startup code and constant definitions for z80asm
