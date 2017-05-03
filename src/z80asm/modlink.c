@@ -737,7 +737,7 @@ void link_modules( void )
 			/* compare header of file */
 			if (strcmp(fheader, Z80objhdr) != 0)
 			{
-				error_not_obj_file(obj_filename);  /* not a object     file */
+				error_not_obj_file(obj_filename);  /* not a object file */
 				myfclose(file);
 				break;
 			}

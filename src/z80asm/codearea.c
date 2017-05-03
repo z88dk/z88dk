@@ -572,22 +572,26 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 					cur_addr != section->addr ||
 					(section != get_first_section(NULL) && section->origin >= 0))
 				{
-					str_set(new_name, path_remove_ext(filename));	/* "test" */
-					str_append_char(new_name, '_');
-					str_append(new_name, section->name);
+					if (opts.appmake)
+						warn_org_ignored(get_obj_filename(filename), section->name);
+					else {
+						str_set(new_name, path_remove_ext(filename));	/* "test" */
+						str_append_char(new_name, '_');
+						str_append(new_name, section->name);
 
-					myfclose(*pbinfile);
-					*pbinfile = myfopen(get_bin_filename(str_data(new_name)), "wb");
-					if (!*pbinfile)
-						break;
+						myfclose(*pbinfile);
+						*pbinfile = myfopen(get_bin_filename(str_data(new_name)), "wb");
+						if (!*pbinfile)
+							break;
 
-					if (*prelocfile) {
-						myfclose(*prelocfile);
-						*prelocfile = myfopen(get_reloc_filename(str_data(new_name)), "wb");
-						cur_section_block_size = 0;
+						if (*prelocfile) {
+							myfclose(*prelocfile);
+							*prelocfile = myfopen(get_reloc_filename(str_data(new_name)), "wb");
+							cur_section_block_size = 0;
+						}
+
+						cur_addr = section->addr;
 					}
-
-					cur_addr = section->addr;
 				}
 			}
 

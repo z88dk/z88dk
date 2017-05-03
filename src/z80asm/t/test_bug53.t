@@ -8,6 +8,7 @@
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Test https://github.com/z88dk/z88dk/issues/53
+# z80asm: public constants not being listed in global .def file
 
 use Modern::Perl;
 use Capture::Tiny::Extended 'capture';

@@ -186,7 +186,9 @@ sub unlink_temp {
 								c |
 								asmlst |
 								prj |
-								i ) $/ix}
+								i |
+								tap | 
+								P ) $/ix}
 		read_dir(".");
 	@temp = uniq(@temp);
 	

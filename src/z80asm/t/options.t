@@ -163,6 +163,12 @@ Output File Options:
   -l, --list             Create listing file.lis
   -m, --map              Create address map file.map
   -g, --globaldef        Create global definition file.def
+
+Appmake Options:
+  +zx81                  Generate ZX81 .P file, origin at 16514
+  +zx                    Generate ZX Spectrum .tap file, origin defaults to
+                         23760 (in a REM), but can be set with -rORG >= 24000
+                         for above RAMTOP
 END
 
 unlink_testfiles();
