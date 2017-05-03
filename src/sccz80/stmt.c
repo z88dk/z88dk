@@ -665,6 +665,7 @@ void doasmfunc(char wantbr)
             if (c == 10 || c == 13)
                 outstr("\n\t");
         }
+        blanks();
     } while (acmatch('"'));
     needchar(')');
     outbyte('\n');

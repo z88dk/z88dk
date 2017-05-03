@@ -58,6 +58,8 @@ static void option_cpu_z80(void);
 static void option_cpu_z180(void);
 static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
+static void option_appmake_zx(void);
+static void option_appmake_zx81(void);
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -235,7 +237,7 @@ static void process_options( int *parg, int argc, char *argv[] )
 {
 #define II (*parg)
 
-    for ( II = 1; II < argc && argv[II][0] == '-'; II++ )
+    for ( II = 1; II < argc && (argv[II][0] == '-' || argv[II][0] == '+'); II++ )
         process_opt( &II, argc, argv );
 
 #undef II
@@ -252,8 +254,9 @@ static void process_file( char *filename )
 
     switch ( filename[0] )
     {
-    case '-':		/* Illegal source file name */
-        error_illegal_src_filename( filename );
+	case '-':		/* Illegal source file name */
+	case '+':
+		error_illegal_src_filename( filename );
         break;
 
     case '\0':		/* no file */
@@ -612,3 +615,59 @@ char *get_obj_filename( char *filename )
     return path_replace_ext( filename, FILEEXT_OBJ);
 }
 
+/*-----------------------------------------------------------------------------
+*   Appmake options
+*	+zx without ORG - sets org at 25760, in a REM statement
+*	+zx with ORG - uses that org
+*----------------------------------------------------------------------------*/
+static void option_appmake_zx(void)
+{
+	opts.appmake = APPMAKE_ZX;
+	opts.appmake_opts = "+zx";
+	opts.appmake_ext = ZX_APP_EXT;
+	opts.appmake_origin_min = ZX_ORIGIN_MIN;
+	opts.appmake_origin_max = ZX_ORIGIN_MAX;
+	set_origin_option(ZX_ORIGIN);
+	opts.make_bin = TRUE;
+}
+
+static void option_appmake_zx81(void)
+{
+	opts.appmake = APPMAKE_ZX81;
+	opts.appmake_opts = "+zx81";
+	opts.appmake_ext = ZX81_APP_EXT;
+	opts.appmake_origin_min = ZX81_ORIGIN_MIN;
+	opts.appmake_origin_max = ZX81_ORIGIN_MAX;
+	set_origin_option(ZX81_ORIGIN);
+	opts.make_bin = TRUE;
+}
+
+void checkrun_appmake(void)
+{
+	STR_DEFINE(cmd, STR_SIZE);
+
+	if (opts.appmake) {
+		Section *first_section = get_first_section(NULL);
+		int origin = first_section->origin;
+		if (origin < opts.appmake_origin_min || origin > opts.appmake_origin_max) {
+			error_invalid_org(origin);
+		}
+		else {
+			char *bin_filename = get_bin_filename(get_first_module(NULL)->filename);
+			char *out_filename = path_replace_ext(bin_filename, opts.appmake_ext);
+
+			str_sprintf(cmd, "appmake %s -b \"%s\" -o \"%s\" --org %d",
+				opts.appmake_opts,
+				bin_filename,
+				out_filename,
+				origin);
+
+			if (opts.verbose)
+				puts(str_data(cmd));
+
+			int rv = system(str_data(cmd));
+			if (rv != 0)
+				error_cmd_failed(str_data(cmd));
+		}
+	}
+}

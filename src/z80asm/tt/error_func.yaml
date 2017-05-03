@@ -151,10 +151,15 @@ errors:
     args	: char *org_hex
     message	: "\"invalid ORG option '%s'\", org_hex"
 	
+  - type	: ErrError
+    func	: error_invalid_org
+    args	: int origin
+    message	: "\"invalid ORG value '%d'\", origin"
+	
   - type	: ErrWarn
     func	: warn_org_ignored
     args	: 'char *filename, char *section_name'
-    message	: "\"--relocatable ignores ORG at file '%s', section '%s'\", filename, section_name"
+    message	: "\"ORG ignored at file '%s', section '%s'\", filename, section_name"
 	
   - type	: ErrError
     func	: error_not_obj_file
@@ -176,3 +181,9 @@ errors:
     func	: error_int_range
     args	: long value
     message	: "\"integer '%ld' out of range\", value"
+
+  # system call errors
+  - type	: ErrError
+    func	: error_cmd_failed
+    args	: char *cmd
+    message	: "\"command '%s' failed\", cmd"

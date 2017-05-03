@@ -24,16 +24,7 @@ asm_cpu_set_int_state:
    ;
    ; uses  : f
 
-   IF __Z80 & __Z80_NMOS
-   
-      bit 0,l                  ; check carry flag
-   
-   ELSE
-   
-      bit 2,l                  ; check p/v flag
-   
-   ENDIF
-   
+   bit 2,l                  ; check p/v flag
    jr z, di_state
    
 ei_state:

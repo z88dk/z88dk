@@ -170,7 +170,7 @@ int zx81_exec(char *target)
 /* ************************************* */
 			// SYSTEM VARS before "VERSN" are not saved (ERR_NR, FLAGS, ERR_SP, RAMTOP, MODE, PPC are preserved)
 			fputc(255,fpout);							// VERSN ($4009) set to 255 when in PC8300 BASIC mode
-			writeword(16509,fpout);						// NXTLIN (Display addr ??)
+			writeword(17302,fpout);						// NXTLIN PC change to autorun; was 16509
 			writeword(17302,fpout);						// PROGRAM
 			writeword(16510,fpout);						// DF-CC (Display addr+1)
 			//writeword(17327,fpout);						// VARS
@@ -243,7 +243,7 @@ int zx81_exec(char *target)
 			fputc(253,fpout);							// 
 			fputc(255,fpout);							// DB_ST
 			fputc(55,fpout);							// MARGIN (55 if 50hz, 31 if 60 hz)
-			writeword(16530+len,fpout);					// NXTLIN
+			writeword(16509, fpout);					// NXTLIN; PC change to autorun; was 16530 + len
 			writeword(0,fpout);							// OLDPPC
 			fputc(0,fpout);								// FLAGX
 			writeword(0,fpout);							// STRLEN

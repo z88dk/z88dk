@@ -25,7 +25,7 @@ my $test	 = "test";
 sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
 my @TEST_EXT = (qw( asm lis inc bin map o lib sym def err 
-					exe c lst prj i reloc ));
+					exe c lst prj i reloc tap P ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 my @IDS = ("", 0 .. 20);

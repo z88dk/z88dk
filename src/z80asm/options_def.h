@@ -33,6 +33,12 @@ OPT_VAR( Bool,      reloc_info, FALSE   )	/* generate .reloc file */
 OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 OPT_VAR( Bool,      no_emul,	FALSE	)	/* do not generate calls to emulation ops if true */
 
+OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
+OPT_VAR(char *, appmake_opts, "")
+OPT_VAR(char *, appmake_ext, "")
+OPT_VAR(int, appmake_origin_min, -1)
+OPT_VAR(int, appmake_origin_max, -1)
+
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
 OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
@@ -92,6 +98,12 @@ OPT(OptSet, &opts.symtable, "-s", "--symtable", "Create symbol table file" FILEE
 OPT(OptSet, &opts.list, "-l", "--list", "Create listing file" FILEEXT_LIST, "")
 OPT(OptSet, &opts.map, "-m", "--map", "Create address map file" FILEEXT_MAP, "")
 OPT(OptSet, &opts.globaldef, "-g", "--globaldef", "Create global definition file" FILEEXT_DEF, "")
+
+OPT_TITLE("Appmake Options:")
+OPT(OptCall, option_appmake_zx81, "", "+zx81", "Generate ZX81 .P file, origin at " ZX81_ORIGIN_S, "")
+OPT(OptCall, option_appmake_zx, "", "+zx", "Generate ZX Spectrum .tap file, origin defaults to\n"
+	"                         " ZX_ORIGIN_S " (in a REM), but can be set with -rORG >= 24000\n"
+	"                         for above RAMTOP", "")
 
 /*-----------------------------------------------------------------------------
 *   clear macros
