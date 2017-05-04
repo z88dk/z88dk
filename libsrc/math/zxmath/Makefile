@@ -9,7 +9,7 @@ all: mzx_tiny m81_tiny mzx m81
 
 mzx_tiny:
 	rm -f *.o* ../../mzx_tiny.lib
-	$(LIBLINKER) -DFORzx -DTINYMODE -x$(OUTPUT_DIRECTORY)/mzx_tiny @zxmlist
+	$(LIBLINKER) -I$(DEFFILE_DIR)/zx/def -DFORzx -DTINYMODE -x$(OUTPUT_DIRECTORY)/mzx_tiny @zxmlist
 
 m81_tiny:
 	rm -f *.o* ../../m81_tiny.lib
@@ -21,7 +21,7 @@ mlambda_tiny:
 
 mzx:
 	rm -f *.o* ../../mzx.lib
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/mzx @zxmlist
+	$(LIBLINKER) -I$(DEFFILE_DIR)/zx/def -DFORzx -x$(OUTPUT_DIRECTORY)/mzx @zxmlist
 
 m81:
 	rm -f *.o* ../../m81.lib
