@@ -9,7 +9,7 @@ all:
 	@echo ''
 	@echo '---> Building OSCA RS232 library <---'
 	@echo ''
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232osca @oscalist
+	$(LIBLINKER) -I$(DEFFILE_DIR)/osca/def -x$(OUTPUT_DIRECTORY)/rs232osca @oscalist
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i

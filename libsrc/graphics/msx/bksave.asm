@@ -11,12 +11,7 @@
 	PUBLIC    _bksave
 	PUBLIC	bkpixeladdress
 
-
-IF FORmsx
-	INCLUDE "msx.def"
-ELSE
-	INCLUDE "svi.def"
-ENDIF
+	INCLUDE "msx/vdp.inc"
 
 	
 .bksave

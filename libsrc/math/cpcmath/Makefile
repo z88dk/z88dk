@@ -40,22 +40,22 @@ lcpc_math: cpc_math
 cpc_math: 
 	$(MAKE) clean
 	$(MAKE) objs
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpc_math @cpclist
+	$(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -x$(OUTPUT_DIRECTORY)/cpc_math @cpclist
 
 464_math: 
 	$(MAKE) clean
 	$(MAKE) objs
-	$(LIBLINKER) -DforCPC464 -x$(OUTPUT_DIRECTORY)/464_math @468list
+	$(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -DforCPC464 -x$(OUTPUT_DIRECTORY)/464_math @468list
 
 664_math: 
 	$(MAKE) clean
 	$(MAKE) objs
-	$(LIBLINKER) -DforCPC664 -x$(OUTPUT_DIRECTORY)/664_math @468list
+	$(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -DforCPC664 -x$(OUTPUT_DIRECTORY)/664_math @468list
 
 6128_math:
 	$(MAKE) clean
 	$(MAKE) objs
-	$(LIBLINKER) -DforCPC6128 -x$(OUTPUT_DIRECTORY)/6128_math @468list
+	$(LIBLINKER) -I$(DEFFILE_DIR)/cpc/def -DforCPC6128 -x$(OUTPUT_DIRECTORY)/6128_math @468list
 
 .c.o:
 	zcc +cpc $(CFLAGS) -D__CPC__ -D__NATIVE_MATH__  $*.c

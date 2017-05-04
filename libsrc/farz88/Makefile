@@ -7,7 +7,7 @@ include ../Make.config
 
 all:
 	cd strings ; $(MAKE) ; cd ..
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/farz88 @farz88.lst
+	$(LIBLINKER) -I$(DEFFILE_DIR)/z88/def -x$(OUTPUT_DIRECTORY)/farz88 @farz88.lst
 
 clean:
 	$(RM) *.o *~

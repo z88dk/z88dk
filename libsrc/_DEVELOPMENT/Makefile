@@ -40,6 +40,10 @@ ${cleans}: clean-%:
 	$(RM) lib/sdcc_ix/$(target).lib
 	$(RM) lib/sdcc_iy/$(target).lib
 
+install-clean:
+	find . -name '*.o' | xargs $(RM)
+	find . -name '*.err' | xargs $(RM)
+
 clean:	${cleans}
 	$(RM) config_private.inc zcc_opt.def
 	find . -name '*.o' | xargs $(RM)
