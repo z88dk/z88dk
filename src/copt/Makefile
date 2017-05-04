@@ -3,7 +3,7 @@ INSTALL ?= install
 
 INCLUDES += -I.
 
-CFLAGS += -DLOCAL_REGEXP
+LOCAL_CFLAGS += -DLOCAL_REGEXP
 OBJS = copt.o
 REGEX_OBJS = regex/regcomp.o  regex/regerror.o regex/regexec.o  regex/regfree.o
 
@@ -15,7 +15,7 @@ copt$(EXESUFFIX):	$(OBJS)
 	$(CC) -o copt$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 %.o: %.c
-	$(CC) -c -o $@ $(CFLAGS) $(INCLUDES) $^
+	$(CC) -c -o $@ $(CFLAGS) $(LOCAL_CFLAGS) $(INCLUDES) $^
 
 install:
 	$(INSTALL) copt$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)copt$(EXESUFFIX)
