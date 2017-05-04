@@ -15,16 +15,18 @@ version := $(shell date +%Y%m%d)
 INSTALL ?= install
 CFLAGS ?= -O2
 CC ?= gcc
+EXEC_PREFIX ?= 
 
 # --> End of Configurable Options
 
-export CC INSTALL CFLAGS
+export CC INSTALL CFLAGS EXEC_PREFIX
 
 all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite
 
 setup:
 	echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h
 	echo '#define UNIX 1' >> src/config.h
+	echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h
 	echo '#define Z88DK_VERSION "${version}-${git_rev}"' >> src/config.h
 	@mkdir -p bin
 

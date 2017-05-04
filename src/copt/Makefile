@@ -18,7 +18,7 @@ copt$(EXESUFFIX):	$(OBJS)
 	$(CC) -c -o $@ $(CFLAGS) $(INCLUDES) $^
 
 install:
-	$(INSTALL) copt$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) copt$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)copt$(EXESUFFIX)
 
 clean:
 	$(RM) copt$(EXESUFFIX) copt.o core$(EXESUFFIX) regex/*.o

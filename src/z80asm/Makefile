@@ -61,7 +61,7 @@ clean::
 # intall
 #------------------------------------------------------------------------------
 install:
-	$(INSTALL) $(TARGET) $(PREFIX)/bin/
+	$(INSTALL) $(TARGET) $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl  $(PREFIX)/bin/
 
 #------------------------------------------------------------------------------
