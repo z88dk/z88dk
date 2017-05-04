@@ -1,5 +1,7 @@
 ;   Graphics library for the Amstrad NC
-;   FIXME:  to be completed !
+;	
+;   fill.asm - Stefano, 05/2017
+;
 
 
 	INCLUDE "graphics/grafix.inc"
@@ -45,7 +47,7 @@
 		rlca
 		djnz loop3
 .cont
-;		ld hl,sline
+		;ld hl,sline
 
         ld      hl,-maxx * 2 * 3    ; create buffer 2 on stack
         add     hl,sp               ; The stack size depends on the display height.
@@ -199,8 +201,8 @@
 		ret nc
 		dec de
 		bit	5,e
-		ret	z		
-		scf 
+		ret	nz
+		ccf
 		ret
 
 ; b mask
@@ -214,6 +216,7 @@
 		cp	60
 		ccf
 		ret
+
 ; enter: de = valid screen address
 ; exit : carry = moved off screen
 ;        de = new screen address one pixel up
@@ -225,6 +228,7 @@
 		ld	d,h
 		ld	e,l
 		pop	hl
+		and a
 		bit	7,d
 		ret	z
 		scf
@@ -241,12 +245,13 @@
 		ld	d,h
 		ld	e,l
 		pop	hl
+		and a
 IF FORnc200
 		bit	5,d
 ELSE
 		bit	4,d
 ENDIF
-		ret	z
+		ret	nz
 		scf
 		ret
 
