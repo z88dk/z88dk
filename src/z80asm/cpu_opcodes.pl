@@ -83,9 +83,33 @@ sub add_opcode {
 		return;
 	}
 	
+	# expand (X) -> expands 5 lines (hl), (ix), (ix+d), (iy), (iy+d)
+	# must be replaced before [']
+	if ($opcode =~ /\(X\)/) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		@$cpus == 0 or die;
+	
+		# hl
+		add_opcode($opcodes, $opcode_1."(hl)".$opcode_2, $bytes, [], $var);
+		
+		# ix
+		add_opcode($opcodes, $opcode_1."(ix)".$opcode_2, "DD, ".$bytes.", 0", [], $var);
+		
+		# ix+D
+		add_opcode($opcodes, $opcode_1."(ix SN)".$opcode_2, "DD, ".$bytes.", SN", [], $var);
+		
+		# iy
+		add_opcode($opcodes, $opcode_1."(iy)".$opcode_2, "FD, ".$bytes.", 0", [], $var);
+		
+		# iy+D
+		add_opcode($opcodes, $opcode_1."(iy SN)".$opcode_2, "FD, ".$bytes.", SN", [], $var);
+		
+		return;
+	}
+	
 	# expand ['] -> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
 	if ($opcode =~ /\[\'\]/) {
-		my($opcode_1, $tick, $opcode_2) = ($`, $1, $');
+		my($opcode_1, $opcode_2) = ($`, $');
 		@$cpus == 0 or die;
 		
 		# without '
@@ -270,6 +294,18 @@ sub add_asm_line {
 		return;		
 	}
 
+	# handle N: ld b,(ix SN)
+	if ($opcode =~ /\bSN\b/) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		my @values = (0, -128, 127);
+		for my $value (@values) {
+			my @bytes_copy = fill_value($value & 0xFF, @$bytes);
+			add_asm_line($opcode_1.($value >= 0 ? "+" : "").$value.$opcode_2, \@bytes_copy, 
+						 $exists, $ok_fh, $bin_fh, $err_fh, $addr);
+		}
+		return;		
+	}
 	
 	my $asm_line = sprintf(" %-23s;; %04X: ", $opcode, $$addr).
 				   join(" ", map {sprintf("%02X", $_)} @$bytes);
@@ -302,8 +338,9 @@ sub fill_value {
 	my($value, @bytes) = @_;
 	
 	for (@bytes) {
-		if    ($_ eq 'N') { $_ = $value & 0xFF; }
-		elsif ($_ eq 'M') { $_ = $value >> 8; }
+		if    ($_ eq 'N')  { $_ = $value & 0xFF; }
+		elsif ($_ eq 'M')  { $_ = $value >> 8; }
+		elsif ($_ eq 'SN') { $_ = $value; }
 		else {
 			$_ = eval($_); $@ and die $@;
 		}
@@ -315,7 +352,10 @@ sub fill_value {
 sub join_tokens {
 	my(@tokens) = @_;
 	my $opcode = join(" ", @tokens);
-	$opcode =~ s/ ([,])/$1/g;
+	for ($opcode) {
+		s/ ([,\)])/$1/g;
+		s/([\(]) /$1/g;
+	}
 	return $opcode;
 }
 
@@ -409,7 +449,8 @@ sub rule_tokens {
 
 sub rule_opcode {
 	my(@bytes) = @_;
-		
+say "@bytes";
+
 	# check for selection on type of expression
 	if (@bytes && $bytes[0] =~ /^ \s* expr_in_parens \s* \? \s* \( (.*?) \) \s* : \s* \( (.*?) \) \s*$/x) {
 		my($paren, $no_paren) = ($1, $2);
@@ -418,19 +459,32 @@ sub rule_opcode {
 		return 'if (expr_in_parens) { '.$paren.' } else { '.$no_paren.' } ';
 	}
 	
+	# check for prefixes
+	my $code = '';
+	while (@bytes && $bytes[0] == 0x76) {
+		$code .= 'DO_stmt(0x76); ';
+		shift @bytes;
+	}
+	
 	# check for MN
 	if (@bytes > 2 && $bytes[-2] eq 'N' && $bytes[-1] eq 'M') {
 		pop @bytes; pop @bytes;
-		return 'DO_stmt_nn('.rule_compute_opcode(@bytes).');';
+		return $code.'DO_stmt_nn('.rule_compute_opcode(@bytes).');';
 	}
 	
 	# check for N
 	if (@bytes > 1 && $bytes[-1] eq 'N') {
 		pop @bytes; 
-		return 'DO_stmt_n('.rule_compute_opcode(@bytes).');';
+		return $code.'DO_stmt_n('.rule_compute_opcode(@bytes).');';
 	}
 	
-	return 'DO_stmt('.rule_compute_opcode(@bytes).');'
+	# check for SN
+	if (@bytes > 1 && $bytes[-1] eq 'SN') {
+		pop @bytes; 
+		return $code.'DO_stmt_idx('.rule_compute_opcode(@bytes).');';
+	}
+	
+	return $code.'DO_stmt('.rule_compute_opcode(@bytes).');'
 }
 
 sub rule_compute_opcode {

@@ -384,43 +384,6 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   8-bit load group
 		*--------------------------------------------------------------------*/
-#foreach <R1> in   B, C, D, E, H, L, A
-		/* LD (hl),r */
-		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA _TK_<R1> _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
-
-  #foreach <X> in IX, IY
-		/* LD r,(ix) */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA 
-					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt( (P_<X> + Z80_LD_r_r( REG_<R1>, REG_idx ) ) << 8 ); }
-			
-		/* LD r',(ix) */
-		|	label? _TK_LD _TK_<R1>1 _TK_COMMA 
-					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt( (P_<X> + Z80_LD_r_r( REG_<R1>, REG_idx ) ) << 8 ); }
-			
-		/* LD r,(ix+d) */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA 
-					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
-			
-		/* LD r',(ix+d) */
-		|	label? _TK_LD _TK_<R1>1 _TK_COMMA 
-					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
-			
-		/* LD (ix),r */
-		|	label? _TK_LD _TK_IND_<X> _TK_RPAREN 
-					_TK_COMMA _TK_<R1> _TK_NEWLINE \
-			@{ DO_stmt( (P_<X> + Z80_LD_r_r( REG_idx, REG_<R1> ) ) << 8 ); }
-			
-		/* LD (ix+d),r */
-		|	label? _TK_LD _TK_IND_<X> expr _TK_RPAREN 
-					_TK_COMMA _TK_<R1> _TK_NEWLINE \
-			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
-  #endfor  <X>
-#endfor  <R1>
 
 		/* LD (hl),N */
 		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA expr _TK_NEWLINE

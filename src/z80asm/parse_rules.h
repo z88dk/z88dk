@@ -1,13 +1,13 @@
 static const int parser_start = 1;
-static const int parser_first_final = 2637;
+static const int parser_first_final = 2777;
 static const int parser_error = 0;
-static const int parser_en_skip = 2594;
-static const int parser_en_defgroup_open = 2606;
-static const int parser_en_defgroup_line = 2608;
-static const int parser_en_defvars_open = 2616;
-static const int parser_en_defvars_line = 2618;
+static const int parser_en_skip = 2734;
+static const int parser_en_defgroup_open = 2746;
+static const int parser_en_defgroup_line = 2748;
+static const int parser_en_defvars_open = 2756;
+static const int parser_en_defvars_line = 2758;
 static const int parser_en_main = 1;
-static const int parser_en_main_directives_assign_asm_DEFC_asm_DEFC_iter_asm_DEFC_next = 2545;
+static const int parser_en_main_directives_assign_asm_DEFC_asm_DEFC_iter_asm_DEFC_next = 2685;
 static const int parser_en_main_directives_DEFx_asm_DEFB_asm_DEFB_iter_asm_DEFB_next = 3;
 static const int parser_en_main_directives_DEFx_asm_DEFW_asm_DEFW_iter_asm_DEFW_next = 20;
 static const int parser_en_main_directives_DEFx_asm_DEFQ_asm_DEFQ_iter_asm_DEFQ_next = 8;
@@ -62,33 +62,33 @@ static Bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 	{
 case 1:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 0: goto st2637;
+		case 0: goto st2777;
 		case 3: goto tr2;
-		case 7: goto st2637;
-		case 93: goto st2543;
-		case 95: goto st2545;
-		case 96: goto st2551;
-		case 97: goto st2553;
+		case 7: goto st2777;
+		case 93: goto st2683;
+		case 95: goto st2685;
+		case 96: goto st2691;
+		case 97: goto st2693;
 		case 98: goto st8;
 		case 100: goto st12;
-		case 101: goto st2555;
+		case 101: goto st2695;
 		case 102: goto st20;
-		case 103: goto st2560;
-		case 104: goto st2561;
-		case 105: goto st2562;
-		case 106: goto st2564;
-		case 107: goto st2566;
-		case 108: goto st2570;
-		case 109: goto st2572;
-		case 110: goto st2574;
-		case 111: goto st2576;
-		case 112: goto st2580;
-		case 113: goto st2581;
-		case 114: goto st2582;
-		case 115: goto st2584;
-		case 116: goto st2588;
-		case 117: goto st2590;
-		case 118: goto st2592;
+		case 103: goto st2700;
+		case 104: goto st2701;
+		case 105: goto st2702;
+		case 106: goto st2704;
+		case 107: goto st2706;
+		case 108: goto st2710;
+		case 109: goto st2712;
+		case 110: goto st2714;
+		case 111: goto st2716;
+		case 112: goto st2720;
+		case 113: goto st2721;
+		case 114: goto st2722;
+		case 115: goto st2724;
+		case 116: goto st2728;
+		case 117: goto st2730;
+		case 118: goto st2732;
 		case 123: goto st24;
 		case 124: goto st109;
 		case 125: goto st211;
@@ -168,30 +168,30 @@ case 1:
 		case 199: goto st2341;
 		case 200: goto st2356;
 		case 201: goto st2360;
-		case 202: goto st2460;
-		case 203: goto st2465;
-		case 204: goto st2466;
-		case 205: goto st2467;
-		case 206: goto st2468;
-		case 207: goto st2472;
-		case 208: goto st2473;
-		case 209: goto st2474;
-		case 210: goto st2475;
-		case 211: goto st2516;
-		case 212: goto st2517;
-		case 213: goto st2518;
-		case 214: goto st2519;
-		case 215: goto st2520;
-		case 218: goto st2521;
-		case 219: goto st2522;
-		case 220: goto st2523;
-		case 221: goto st2524;
-		case 222: goto st2525;
-		case 223: goto st2526;
-		case 224: goto st2527;
-		case 225: goto st2531;
-		case 226: goto st2535;
-		case 227: goto st2539;
+		case 202: goto st2600;
+		case 203: goto st2605;
+		case 204: goto st2606;
+		case 205: goto st2607;
+		case 206: goto st2608;
+		case 207: goto st2612;
+		case 208: goto st2613;
+		case 209: goto st2614;
+		case 210: goto st2615;
+		case 211: goto st2656;
+		case 212: goto st2657;
+		case 213: goto st2658;
+		case 214: goto st2659;
+		case 215: goto st2660;
+		case 218: goto st2661;
+		case 219: goto st2662;
+		case 220: goto st2663;
+		case 221: goto st2664;
+		case 222: goto st2665;
+		case 223: goto st2666;
+		case 224: goto st2667;
+		case 225: goto st2671;
+		case 226: goto st2675;
+		case 227: goto st2679;
 	}
 	if ( 94 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 99 )
 		goto st3;
@@ -201,7 +201,7 @@ st0:
 	goto _out;
 tr131:
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; }
-	goto st2637;
+	goto st2777;
 tr136:
 	{ push_expr(ctx); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
@@ -209,7 +209,7 @@ tr136:
      if ( ctx->p->tok == TK_COMMA )
       {goto st3;}
     }
-	goto st2637;
+	goto st2777;
 tr141:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -218,14 +218,14 @@ tr141:
      if ( ctx->p->tok == TK_COMMA )
       {goto st3;}
     }
-	goto st2637;
+	goto st2777;
 tr144:
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
      asm_DEFB_str(str_data(name), str_len(name));
      if ( ctx->p->tok == TK_COMMA )
       {goto st3;}
     }
-	goto st2637;
+	goto st2777;
 tr148:
 	{ push_expr(ctx); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
@@ -233,7 +233,7 @@ tr148:
      if ( ctx->p->tok == TK_COMMA )
       {goto st8;}
     }
-	goto st2637;
+	goto st2777;
 tr153:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -242,33 +242,33 @@ tr153:
      if ( ctx->p->tok == TK_COMMA )
       {goto st8;}
     }
-	goto st2637;
+	goto st2777;
 tr159:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
        if (! expr_error) asm_DEFS(expr_value, 0); }
-	goto st2637;
+	goto st2777;
 tr168:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
        if (! expr_error) asm_DEFS(value1, expr_value); }
-	goto st2637;
+	goto st2777;
 tr173:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
        if (! expr_error) asm_DEFS(value1, expr_value); }
-	goto st2637;
+	goto st2777;
 tr176:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
        if (! expr_error) asm_DEFS(expr_value, 0); }
-	goto st2637;
+	goto st2777;
 tr183:
 	{ push_expr(ctx); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
@@ -276,7 +276,7 @@ tr183:
      if ( ctx->p->tok == TK_COMMA )
       {goto st20;}
     }
-	goto st2637;
+	goto st2777;
 tr188:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -285,831 +285,831 @@ tr188:
      if ( ctx->p->tok == TK_COMMA )
       {goto st20;}
     }
-	goto st2637;
+	goto st2777;
 tr211:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr216:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr220:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr232:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_ADC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr241:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_ADC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr253:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_ADC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr262:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_ADC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr263:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr264:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr265:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr266:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr267:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr268:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr269:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr272:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADC( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr273:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADC( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr274:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADC( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr275:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADC( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr281:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr282:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr283:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr284:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr299:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr304:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr308:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr320:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_ADC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr329:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_ADC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr341:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_ADC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr350:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_ADC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr351:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr352:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr353:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr354:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr355:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr356:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr357:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr363:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr364:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr365:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr366:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADC16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr390:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADD_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr395:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADD_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr399:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr411:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_ADD( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr420:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_ADD( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr432:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_ADD( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr441:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_ADD( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr442:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr443:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr444:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr445:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr446:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr447:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr448:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr451:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADD( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr452:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADD( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr453:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADD( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr454:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADD( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr460:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_ADD16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr461:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_ADD16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr462:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_ADD16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr463:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_ADD16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr469:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADD16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr470:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADD16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr471:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADD16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr472:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_ADD16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr478:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADD16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr479:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADD16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr480:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADD16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr481:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_ADD16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr486:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_ADD_SP_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr491:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_ADD_SP_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr508:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADD_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr513:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_ADD_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr517:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr529:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_ADD( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr538:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_ADD( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr550:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_ADD( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr559:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_ADD( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr560:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr561:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr562:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr563:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr564:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr565:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr566:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr572:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr573:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr574:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr575:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ADD16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr598:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_AND_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr603:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_AND_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr607:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr619:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_AND( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr628:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_AND( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr640:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_AND( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr649:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr650:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr651:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr652:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr653:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr654:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr655:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr656:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr659:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_AND( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr660:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_AND( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr661:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_AND( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr662:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_AND( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr665:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_AND_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr668:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_AND_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr671:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_AND_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr686:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_AND_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr691:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_AND_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr695:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr707:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_AND( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr716:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_AND( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr728:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_AND( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr737:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr738:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr739:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr740:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr741:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr742:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr743:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr744:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr747:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_AND_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr767:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_idx )); };
     }
-	goto st2637;
+	goto st2777;
 tr779:
 	{ if (!expr_error)
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); }
                                            ;
     }
-	goto st2637;
+	goto st2777;
 tr788:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
-	goto st2637;
+	goto st2777;
 tr800:
 	{ if (!expr_error)
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); }
                                            ;
     }
-	goto st2637;
+	goto st2777;
 tr809:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
-	goto st2637;
+	goto st2777;
 tr810:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_C )); };
     }
-	goto st2637;
+	goto st2777;
 tr811:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_B )); };
     }
-	goto st2637;
+	goto st2777;
 tr812:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_D )); };
     }
-	goto st2637;
+	goto st2777;
 tr813:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_E )); };
     }
-	goto st2637;
+	goto st2777;
 tr814:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_H )); };
     }
-	goto st2637;
+	goto st2777;
 tr815:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_L )); };
     }
-	goto st2637;
+	goto st2777;
 tr816:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BIT( expr_value, REG_A )); };
     }
-	goto st2637;
+	goto st2777;
 tr833:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_CALL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr838:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_CALL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr845:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_NZ, expr); }; }
-	goto st2637;
+	goto st2777;
 tr850:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_NZ, expr); }; }
-	goto st2637;
+	goto st2777;
 tr857:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_Z, expr); }; }
-	goto st2637;
+	goto st2777;
 tr862:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_Z, expr); }; }
-	goto st2637;
+	goto st2777;
 tr869:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_NC, expr); }; }
-	goto st2637;
+	goto st2777;
 tr874:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_NC, expr); }; }
-	goto st2637;
+	goto st2777;
 tr881:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_C, expr); }; }
-	goto st2637;
+	goto st2777;
 tr886:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_C, expr); }; }
-	goto st2637;
+	goto st2777;
 tr893:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_PO, expr); }; }
-	goto st2637;
+	goto st2777;
 tr898:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_PO, expr); }; }
-	goto st2637;
+	goto st2777;
 tr905:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_PE, expr); }; }
-	goto st2637;
+	goto st2777;
 tr910:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_PE, expr); }; }
-	goto st2637;
+	goto st2777;
 tr917:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_P, expr); }; }
-	goto st2637;
+	goto st2777;
 tr922:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_P, expr); }; }
-	goto st2637;
+	goto st2777;
 tr929:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_M, expr); }; }
-	goto st2637;
+	goto st2777;
 tr934:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_M, expr); }; }
-	goto st2637;
+	goto st2777;
 tr941:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_LZ, expr); }; }
-	goto st2637;
+	goto st2777;
 tr946:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_LZ, expr); }; }
-	goto st2637;
+	goto st2777;
 tr953:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_LO, expr); }; }
-	goto st2637;
+	goto st2777;
 tr958:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_call_flag(FLAG_LO, expr); }; }
-	goto st2637;
+	goto st2777;
 tr961:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CCF); }; }
-	goto st2637;
+	goto st2777;
 tr964:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CCF); }; }
-	goto st2637;
+	goto st2777;
 tr965:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CCF); }; }
-	goto st2637;
+	goto st2777;
 tr983:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_CP_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr988:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_CP_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr992:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr1004:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_CP( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1013:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_CP( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1025:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_CP( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1034:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_CP( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1035:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr1036:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr1037:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr1038:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr1039:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr1040:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr1041:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CP( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr1044:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_CP( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr1045:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_CP( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr1046:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_CP( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr1047:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_CP( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr1048:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_CPD), "rcmx_cpd"); }; }
-	goto st2637;
+	goto st2777;
 tr1049:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_CPDR), "rcmx_cpdr"); }; }
-	goto st2637;
+	goto st2777;
 tr1050:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_CPI), "rcmx_cpi"); }; }
-	goto st2637;
+	goto st2777;
 tr1051:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_CPIR), "rcmx_cpir"); }; }
-	goto st2637;
+	goto st2777;
 tr1052:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CPL); }; }
-	goto st2637;
+	goto st2777;
 tr1055:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CPL); }; }
-	goto st2637;
+	goto st2777;
 tr1056:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CPL); }; }
-	goto st2637;
+	goto st2777;
 tr1057:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DAA); }; }
-	goto st2637;
+	goto st2777;
 tr1089:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr1101:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_DEC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1110:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_DEC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1122:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_DEC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1131:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_DEC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1132:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr1133:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr1134:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr1135:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr1136:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr1137:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr1138:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr1139:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_DEC( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr1140:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_DEC( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr1141:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_DEC( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr1142:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_DEC( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr1143:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_BC + Z80_DEC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr1144:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_DE + Z80_DEC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr1145:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_DEC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr1146:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_DEC16( REG_IX )); }; }
-	goto st2637;
+	goto st2777;
 tr1147:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_DEC16( REG_IY )); }; }
-	goto st2637;
+	goto st2777;
 tr1148:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_SP + Z80_DEC16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr1149:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr1150:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr1151:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr1152:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr1153:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr1154:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr1155:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr1156:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr1157:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr1158:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DEC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr1159:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DI); }; }
-	goto st2637;
+	goto st2777;
 tr1165:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_DJNZ), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1170:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_DJNZ), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1177:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_DJNZ), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1182:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_DJNZ), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1189:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_DJNZ), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1194:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_DJNZ), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1197:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EI); }; }
-	goto st2637;
+	goto st2777;
 tr1208:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_IND_SP_HL); }; }
-	goto st2637;
+	goto st2777;
 tr1209:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_EX_IND_SP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr1210:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_EX_IND_SP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr1211:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_IND_SP_HL); }; }
-	goto st2637;
+	goto st2777;
 tr1215:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_DE_HL); }; }
-	goto st2637;
+	goto st2777;
 tr1216:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_DE_HL1); }; }
-	goto st2637;
+	goto st2777;
 tr1220:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_AF_AF); }; }
-	goto st2637;
+	goto st2777;
 tr1221:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_AF_AF); }; }
-	goto st2637;
+	goto st2777;
 tr1225:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_DE1_HL); }; }
-	goto st2637;
+	goto st2777;
 tr1226:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EX_DE1_HL1); }; }
-	goto st2637;
+	goto st2777;
 tr1227:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_EXX); }; }
-	goto st2637;
+	goto st2777;
 tr1228:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_HALT); }; }
-	goto st2637;
+	goto st2777;
 tr1232:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IM( expr_value )); };
     }
-	goto st2637;
+	goto st2777;
 tr1237:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -1117,32 +1117,32 @@ tr1237:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IM( expr_value )); };
     }
-	goto st2637;
+	goto st2777;
 tr1250:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr1253:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr1256:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr1259:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr1262:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr1265:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr1271:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN_A_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1276:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -1150,1046 +1150,1046 @@ tr1276:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN_A_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1279:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr1282:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IN_REG_C( REG_F )); }; }
-	goto st2637;
+	goto st2777;
 tr1314:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr1326:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_INC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1335:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_INC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1347:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_INC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1356:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_INC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1357:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr1358:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr1359:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr1360:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr1361:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr1362:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr1363:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr1364:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_INC( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr1365:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_INC( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr1366:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_INC( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr1367:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_INC( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr1368:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_BC + Z80_INC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr1369:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_DE + Z80_INC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr1370:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_INC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr1371:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_INC16( REG_IX )); }; }
-	goto st2637;
+	goto st2777;
 tr1372:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_INC16( REG_IY )); }; }
-	goto st2637;
+	goto st2777;
 tr1373:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_SP + Z80_INC16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr1374:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr1375:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr1376:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr1377:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr1378:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr1379:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr1380:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr1381:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr1382:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr1383:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr1384:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IND); }; }
-	goto st2637;
+	goto st2777;
 tr1385:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INDR); }; }
-	goto st2637;
+	goto st2777;
 tr1386:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INI); }; }
-	goto st2637;
+	goto st2777;
 tr1387:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_INIR); }; }
-	goto st2637;
+	goto st2777;
 tr1404:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1409:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1413:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_JP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr1415:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_JP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr1417:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_JP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr1422:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1427:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1434:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1439:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1446:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1451:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1458:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1463:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1470:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1475:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1482:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1487:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1494:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1499:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1506:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1511:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1518:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_LZ )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1523:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_LZ )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1530:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_LO )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1535:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_LO )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1545:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1550:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1557:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1562:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1569:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1574:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1581:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1586:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1593:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1598:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1654:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_IND_NN_A), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1655:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_BC )), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1656:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_DE )), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1657:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_HL + Z80_LD_IND_nn_idx), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1658:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_IX + Z80_LD_IND_nn_idx), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1659:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_IY + Z80_LD_IND_nn_idx), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1660:
 	{
     if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_SP )), expr); };
    }
-	goto st2637;
+	goto st2777;
 tr1666:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr1669:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr1683:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_IND_HL_d_HL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1704:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1709:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1712:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_C )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x71); }; }
+	goto st2777;
 tr1713:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_B )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x70); }; }
+	goto st2777;
 tr1714:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_D )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x72); }; }
+	goto st2777;
 tr1715:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_E )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x73); }; }
+	goto st2777;
 tr1716:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_H )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x74); }; }
+	goto st2777;
 tr1717:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_L )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x75); }; }
+	goto st2777;
 tr1718:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_A )); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x77); }; }
+	goto st2777;
 tr1719:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IND_HL_d_HL << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1735:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((P_HL + Z80_LD_IND_SP_n_HL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1736:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((P_IX + Z80_LD_IND_SP_n_HL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1737:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((P_IY + Z80_LD_IND_SP_n_HL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1750:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_HL + Z80_LD_IND_SP_n_HL) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1751:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_IND_SP_n_HL) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1752:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_IND_SP_n_HL) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1776:
 	{ push_expr(ctx); }
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); }; }
-	goto st2637;
+	goto st2777;
 tr1781:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); }; }
-	goto st2637;
+	goto st2777;
 tr1784:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_C )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD71), expr); }; }
+	goto st2777;
 tr1785:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_B )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD70), expr); }; }
+	goto st2777;
 tr1786:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_D )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD72), expr); }; }
+	goto st2777;
 tr1787:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_E )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD73), expr); }; }
+	goto st2777;
 tr1788:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_H )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD74), expr); }; }
+	goto st2777;
 tr1789:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_L )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD75), expr); }; }
+	goto st2777;
 tr1790:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_A )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD77), expr); }; }
+	goto st2777;
 tr1791:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_IND_IX_d_HL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1812:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1817:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1820:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7100); }; }
+	goto st2777;
 tr1821:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7000); }; }
+	goto st2777;
 tr1822:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7200); }; }
+	goto st2777;
 tr1823:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7300); }; }
+	goto st2777;
 tr1824:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7400); }; }
+	goto st2777;
 tr1825:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7500); }; }
+	goto st2777;
 tr1826:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7700); }; }
+	goto st2777;
 tr1827:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IND_IX_d_HL << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1851:
 	{ push_expr(ctx); }
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); }; }
-	goto st2637;
+	goto st2777;
 tr1856:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); }; }
-	goto st2637;
+	goto st2777;
 tr1859:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_C )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD71), expr); }; }
+	goto st2777;
 tr1860:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_B )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD70), expr); }; }
+	goto st2777;
 tr1861:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_D )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD72), expr); }; }
+	goto st2777;
 tr1862:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_E )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD73), expr); }; }
+	goto st2777;
 tr1863:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_H )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD74), expr); }; }
+	goto st2777;
 tr1864:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_L )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD75), expr); }; }
+	goto st2777;
 tr1865:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_A )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD77), expr); }; }
+	goto st2777;
 tr1866:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_IND_IY_d_HL), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1887:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1892:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1895:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7100); }; }
+	goto st2777;
 tr1896:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7000); }; }
+	goto st2777;
 tr1897:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7200); }; }
+	goto st2777;
 tr1898:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7300); }; }
+	goto st2777;
 tr1899:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7400); }; }
+	goto st2777;
 tr1900:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7500); }; }
+	goto st2777;
 tr1901:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7700); }; }
+	goto st2777;
 tr1902:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IND_IY_d_HL << 8); }; }
-	goto st2637;
+	goto st2777;
 tr1921:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x0E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1926:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x0E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr1930:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4E); }; }
-	goto st2637;
+	goto st2777;
 tr1942:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_C, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD4E), expr); }; }
+	goto st2777;
 tr1951:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4E00); }; }
+	goto st2777;
 tr1963:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_C, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD4E), expr); }; }
+	goto st2777;
 tr1972:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4E00); }; }
+	goto st2777;
 tr1973:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x49); }; }
-	goto st2637;
+	goto st2777;
 tr1974:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x48); }; }
-	goto st2637;
+	goto st2777;
 tr1975:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4A); }; }
-	goto st2637;
+	goto st2777;
 tr1976:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4B); }; }
-	goto st2637;
+	goto st2777;
 tr1977:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4C); }; }
-	goto st2637;
+	goto st2777;
 tr1978:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4D); }; }
-	goto st2637;
+	goto st2777;
 tr1979:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4F); }; }
-	goto st2637;
+	goto st2777;
 tr1980:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4C); }; }
-	goto st2637;
+	goto st2777;
 tr1981:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4C); }; }
-	goto st2637;
+	goto st2777;
 tr1982:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4D); }; }
-	goto st2637;
+	goto st2777;
 tr1983:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4D); }; }
-	goto st2637;
+	goto st2777;
 tr2002:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x06), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2007:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x06), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2011:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x46); }; }
-	goto st2637;
+	goto st2777;
 tr2023:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_B, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD46), expr); }; }
+	goto st2777;
 tr2032:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4600); }; }
+	goto st2777;
 tr2044:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_B, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD46), expr); }; }
+	goto st2777;
 tr2053:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4600); }; }
+	goto st2777;
 tr2054:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x41); }; }
-	goto st2637;
+	goto st2777;
 tr2055:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x40); }; }
-	goto st2637;
+	goto st2777;
 tr2056:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x42); }; }
-	goto st2637;
+	goto st2777;
 tr2057:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x43); }; }
-	goto st2637;
+	goto st2777;
 tr2058:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x44); }; }
-	goto st2637;
+	goto st2777;
 tr2059:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x45); }; }
-	goto st2637;
+	goto st2777;
 tr2060:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x47); }; }
-	goto st2637;
+	goto st2777;
 tr2061:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD44); }; }
-	goto st2637;
+	goto st2777;
 tr2062:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD44); }; }
-	goto st2637;
+	goto st2777;
 tr2063:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD45); }; }
-	goto st2637;
+	goto st2777;
 tr2064:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD45); }; }
-	goto st2637;
+	goto st2777;
 tr2083:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x16), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2088:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x16), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2092:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x56); }; }
-	goto st2637;
+	goto st2777;
 tr2104:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_D, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD56), expr); }; }
+	goto st2777;
 tr2113:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5600); }; }
+	goto st2777;
 tr2125:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_D, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD56), expr); }; }
+	goto st2777;
 tr2134:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5600); }; }
+	goto st2777;
 tr2135:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x51); }; }
-	goto st2637;
+	goto st2777;
 tr2136:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x50); }; }
-	goto st2637;
+	goto st2777;
 tr2137:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x52); }; }
-	goto st2637;
+	goto st2777;
 tr2138:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x53); }; }
-	goto st2637;
+	goto st2777;
 tr2139:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x54); }; }
-	goto st2637;
+	goto st2777;
 tr2140:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x55); }; }
-	goto st2637;
+	goto st2777;
 tr2141:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x57); }; }
-	goto st2637;
+	goto st2777;
 tr2142:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD54); }; }
-	goto st2637;
+	goto st2777;
 tr2143:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD54); }; }
-	goto st2637;
+	goto st2777;
 tr2144:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD55); }; }
-	goto st2637;
+	goto st2777;
 tr2145:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD55); }; }
-	goto st2637;
+	goto st2777;
 tr2164:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x1E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2169:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x1E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2173:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5E); }; }
-	goto st2637;
+	goto st2777;
 tr2185:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_E, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD5E), expr); }; }
+	goto st2777;
 tr2194:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5E00); }; }
+	goto st2777;
 tr2206:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_E, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD5E), expr); }; }
+	goto st2777;
 tr2215:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5E00); }; }
+	goto st2777;
 tr2216:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x59); }; }
-	goto st2637;
+	goto st2777;
 tr2217:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x58); }; }
-	goto st2637;
+	goto st2777;
 tr2218:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5A); }; }
-	goto st2637;
+	goto st2777;
 tr2219:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5B); }; }
-	goto st2637;
+	goto st2777;
 tr2220:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5C); }; }
-	goto st2637;
+	goto st2777;
 tr2221:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5D); }; }
-	goto st2637;
+	goto st2777;
 tr2222:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5F); }; }
-	goto st2637;
+	goto st2777;
 tr2223:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5C); }; }
-	goto st2637;
+	goto st2777;
 tr2224:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5C); }; }
-	goto st2637;
+	goto st2777;
 tr2225:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5D); }; }
-	goto st2637;
+	goto st2777;
 tr2226:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5D); }; }
-	goto st2637;
+	goto st2777;
 tr2241:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x26), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2246:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x26), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2250:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x66); }; }
-	goto st2637;
+	goto st2777;
 tr2262:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_H, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD66), expr); }; }
+	goto st2777;
 tr2271:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6600); }; }
+	goto st2777;
 tr2283:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_H, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD66), expr); }; }
+	goto st2777;
 tr2292:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6600); }; }
+	goto st2777;
 tr2293:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x61); }; }
-	goto st2637;
+	goto st2777;
 tr2294:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x60); }; }
-	goto st2637;
+	goto st2777;
 tr2295:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x62); }; }
-	goto st2637;
+	goto st2777;
 tr2296:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x63); }; }
-	goto st2637;
+	goto st2777;
 tr2297:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x64); }; }
-	goto st2637;
+	goto st2777;
 tr2298:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x65); }; }
-	goto st2637;
+	goto st2777;
 tr2299:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x67); }; }
-	goto st2637;
+	goto st2777;
 tr2314:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x2E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2319:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x2E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2323:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6E); }; }
-	goto st2637;
+	goto st2777;
 tr2335:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_L, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD6E), expr); }; }
+	goto st2777;
 tr2344:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6E00); }; }
+	goto st2777;
 tr2356:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_L, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD6E), expr); }; }
+	goto st2777;
 tr2365:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6E00); }; }
+	goto st2777;
 tr2366:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x69); }; }
-	goto st2637;
+	goto st2777;
 tr2367:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x68); }; }
-	goto st2637;
+	goto st2777;
 tr2368:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6A); }; }
-	goto st2637;
+	goto st2777;
 tr2369:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6B); }; }
-	goto st2637;
+	goto st2777;
 tr2370:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6C); }; }
-	goto st2637;
+	goto st2777;
 tr2371:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6D); }; }
-	goto st2637;
+	goto st2777;
 tr2372:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6F); }; }
-	goto st2637;
+	goto st2777;
 tr2398:
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x3A), expr); }; } else { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x3E), expr); }; } }
-	goto st2637;
+	goto st2777;
 tr2403:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (expr_in_parens) { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x3A), expr); }; } else { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x3E), expr); }; } }
-	goto st2637;
+	goto st2777;
 tr2406:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr2407:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr2409:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7E); }; }
-	goto st2637;
+	goto st2777;
 tr2421:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_A, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD7E), expr); }; }
+	goto st2777;
 tr2430:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7E00); }; }
+	goto st2777;
 tr2442:
-	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_A, REG_idx )), expr); }; }
-	goto st2637;
+	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD7E), expr); }; }
+	goto st2777;
 tr2451:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7E00); }; }
+	goto st2777;
 tr2452:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x79); }; }
-	goto st2637;
+	goto st2777;
 tr2453:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x78); }; }
-	goto st2637;
+	goto st2777;
 tr2454:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7A); }; }
-	goto st2637;
+	goto st2777;
 tr2455:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7B); }; }
-	goto st2637;
+	goto st2777;
 tr2456:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7C); }; }
-	goto st2637;
+	goto st2777;
 tr2457:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7D); }; }
-	goto st2637;
+	goto st2777;
 tr2458:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7F); }; }
-	goto st2637;
+	goto st2777;
 tr2459:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_I); }; }
-	goto st2637;
+	goto st2777;
 tr2460:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_R); }; }
-	goto st2637;
+	goto st2777;
 tr2461:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_IIR); }; }
-	goto st2637;
+	goto st2777;
 tr2462:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_EIR); }; }
-	goto st2637;
+	goto st2777;
 tr2463:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_XPC); }; }
-	goto st2637;
+	goto st2777;
 tr2464:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7C); }; }
-	goto st2637;
+	goto st2777;
 tr2465:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7C); }; }
-	goto st2637;
+	goto st2777;
 tr2466:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7D); }; }
-	goto st2637;
+	goto st2777;
 tr2467:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7D); }; }
-	goto st2637;
+	goto st2777;
 tr2470:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_I_A); }; }
-	goto st2637;
+	goto st2777;
 tr2473:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_R_A); }; }
-	goto st2637;
+	goto st2777;
 tr2476:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IIR_A); }; }
-	goto st2637;
+	goto st2777;
 tr2479:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_EIR_A); }; }
-	goto st2637;
+	goto st2777;
 tr2482:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_XPC_A); }; }
-	goto st2637;
+	goto st2777;
 tr2494:
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xDD26), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2499:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xDD26), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2502:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD61); }; }
-	goto st2637;
+	goto st2777;
 tr2503:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD60); }; }
-	goto st2637;
+	goto st2777;
 tr2504:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD62); }; }
-	goto st2637;
+	goto st2777;
 tr2505:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD63); }; }
-	goto st2637;
+	goto st2777;
 tr2506:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD67); }; }
-	goto st2637;
+	goto st2777;
 tr2507:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD64); }; }
-	goto st2637;
+	goto st2777;
 tr2508:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD65); }; }
-	goto st2637;
+	goto st2777;
 tr2520:
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xFD26), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2525:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xFD26), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2528:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD61); }; }
-	goto st2637;
+	goto st2777;
 tr2529:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD60); }; }
-	goto st2637;
+	goto st2777;
 tr2530:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD62); }; }
-	goto st2637;
+	goto st2777;
 tr2531:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD63); }; }
-	goto st2637;
+	goto st2777;
 tr2532:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD67); }; }
-	goto st2637;
+	goto st2777;
 tr2533:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD64); }; }
-	goto st2637;
+	goto st2777;
 tr2534:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD65); }; }
-	goto st2637;
+	goto st2777;
 tr2546:
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xDD2E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2551:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xDD2E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2554:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD69); }; }
-	goto st2637;
+	goto st2777;
 tr2555:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD68); }; }
-	goto st2637;
+	goto st2777;
 tr2556:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6A); }; }
-	goto st2637;
+	goto st2777;
 tr2557:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6B); }; }
-	goto st2637;
+	goto st2777;
 tr2558:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6F); }; }
-	goto st2637;
+	goto st2777;
 tr2559:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6C); }; }
-	goto st2637;
+	goto st2777;
 tr2560:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6D); }; }
-	goto st2637;
+	goto st2777;
 tr2572:
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xFD2E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2577:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0xFD2E), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2580:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD69); }; }
-	goto st2637;
+	goto st2777;
 tr2581:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD68); }; }
-	goto st2637;
+	goto st2777;
 tr2582:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6A); }; }
-	goto st2637;
+	goto st2777;
 tr2583:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6B); }; }
-	goto st2637;
+	goto st2777;
 tr2584:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6F); }; }
-	goto st2637;
+	goto st2777;
 tr2585:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6C); }; }
-	goto st2637;
+	goto st2777;
 tr2586:
 	{ if ( (opts.cpu & (CPU_Z80)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6D); }; }
-	goto st2637;
+	goto st2777;
 tr2591:
 	{ push_expr(ctx); }
 	{
@@ -2205,7 +2205,7 @@ tr2591:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2596:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2222,7 +2222,7 @@ tr2596:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2603:
 	{ push_expr(ctx); }
 	{
@@ -2238,7 +2238,7 @@ tr2603:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2608:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2255,7 +2255,7 @@ tr2608:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2621:
 	{ push_expr(ctx); }
 	{
@@ -2271,7 +2271,7 @@ tr2621:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2626:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2288,37 +2288,37 @@ tr2626:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2640:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_HL_IND_HL_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2649:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_HL_d << 8); }; }
-	goto st2637;
+	goto st2777;
 tr2661:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((P_HL + Z80_LD_HL_IND_SP_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2670:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_HL + Z80_LD_HL_IND_SP_n) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr2682:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_HL_IND_IX_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2691:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_IX_d << 8); }; }
-	goto st2637;
+	goto st2777;
 tr2703:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_HL_IND_IY_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2712:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_IY_d << 8); }; }
-	goto st2637;
+	goto st2777;
 tr2713:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IX); }; }
-	goto st2637;
+	goto st2777;
 tr2714:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IY); }; }
-	goto st2637;
+	goto st2777;
 tr2721:
 	{ push_expr(ctx); }
 	{
@@ -2334,7 +2334,7 @@ tr2721:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2726:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2351,16 +2351,16 @@ tr2726:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2740:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((P_IX + Z80_LD_HL_IND_SP_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2749:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_HL_IND_SP_n) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr2750:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IX_HL); }; }
-	goto st2637;
+	goto st2777;
 tr2757:
 	{ push_expr(ctx); }
 	{
@@ -2376,7 +2376,7 @@ tr2757:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2762:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2393,16 +2393,16 @@ tr2762:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2776:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((P_IY + Z80_LD_HL_IND_SP_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr2785:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_HL_IND_SP_n) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr2786:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_IY_HL); }; }
-	goto st2637;
+	goto st2777;
 tr2794:
 	{ push_expr(ctx); }
 	{
@@ -2418,7 +2418,7 @@ tr2794:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2799:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2435,352 +2435,352 @@ tr2799:
      { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr2802:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_LD_SP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr2803:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_LD_SP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr2804:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_LD_SP_idx); }; }
-	goto st2637;
+	goto st2777;
 tr2819:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7606), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x06), expr); }; }
+	goto st2777;
 tr2824:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7606), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x06), expr); }; }
+	goto st2777;
 tr2828:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7646); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x46); }; }
+	goto st2777;
 tr2840:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_B, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD46), expr); }; }
+	goto st2777;
 tr2849:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4600); }; }
+	goto st2777;
 tr2861:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_B, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD46), expr); }; }
+	goto st2777;
 tr2870:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4600); }; }
+	goto st2777;
 tr2871:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7641); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x41); }; }
+	goto st2777;
 tr2872:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7640); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x40); }; }
+	goto st2777;
 tr2873:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7642); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x42); }; }
+	goto st2777;
 tr2874:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7643); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x43); }; }
+	goto st2777;
 tr2875:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7644); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x44); }; }
+	goto st2777;
 tr2876:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7645); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x45); }; }
+	goto st2777;
 tr2877:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7647); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x47); }; }
+	goto st2777;
 tr2892:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x760E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x0E), expr); }; }
+	goto st2777;
 tr2897:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x760E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x0E), expr); }; }
+	goto st2777;
 tr2901:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764E); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4E); }; }
+	goto st2777;
 tr2913:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_C, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD4E), expr); }; }
+	goto st2777;
 tr2922:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4E00); }; }
+	goto st2777;
 tr2934:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_C, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD4E), expr); }; }
+	goto st2777;
 tr2943:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4E00); }; }
+	goto st2777;
 tr2944:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7649); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x49); }; }
+	goto st2777;
 tr2945:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7648); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x48); }; }
+	goto st2777;
 tr2946:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764A); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4A); }; }
+	goto st2777;
 tr2947:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764B); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4B); }; }
+	goto st2777;
 tr2948:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764C); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4C); }; }
+	goto st2777;
 tr2949:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764D); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4D); }; }
+	goto st2777;
 tr2950:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764F); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4F); }; }
+	goto st2777;
 tr2965:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7616), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x16), expr); }; }
+	goto st2777;
 tr2970:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7616), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x16), expr); }; }
+	goto st2777;
 tr2974:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7656); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x56); }; }
+	goto st2777;
 tr2986:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_D, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD56), expr); }; }
+	goto st2777;
 tr2995:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5600); }; }
+	goto st2777;
 tr3007:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_D, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD56), expr); }; }
+	goto st2777;
 tr3016:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5600); }; }
+	goto st2777;
 tr3017:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7651); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x51); }; }
+	goto st2777;
 tr3018:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7650); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x50); }; }
+	goto st2777;
 tr3019:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7652); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x52); }; }
+	goto st2777;
 tr3020:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7653); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x53); }; }
+	goto st2777;
 tr3021:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7654); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x54); }; }
+	goto st2777;
 tr3022:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7655); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x55); }; }
+	goto st2777;
 tr3023:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7657); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x57); }; }
+	goto st2777;
 tr3038:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x761E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x1E), expr); }; }
+	goto st2777;
 tr3043:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x761E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x1E), expr); }; }
+	goto st2777;
 tr3047:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765E); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5E); }; }
+	goto st2777;
 tr3059:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_E, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD5E), expr); }; }
+	goto st2777;
 tr3068:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5E00); }; }
+	goto st2777;
 tr3080:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_E, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD5E), expr); }; }
+	goto st2777;
 tr3089:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5E00); }; }
+	goto st2777;
 tr3090:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7659); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x59); }; }
+	goto st2777;
 tr3091:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7658); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x58); }; }
+	goto st2777;
 tr3092:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765A); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5A); }; }
+	goto st2777;
 tr3093:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765B); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5B); }; }
+	goto st2777;
 tr3094:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765C); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5C); }; }
+	goto st2777;
 tr3095:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765D); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5D); }; }
+	goto st2777;
 tr3096:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765F); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5F); }; }
+	goto st2777;
 tr3111:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7626), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x26), expr); }; }
+	goto st2777;
 tr3116:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7626), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x26), expr); }; }
+	goto st2777;
 tr3120:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7666); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x66); }; }
+	goto st2777;
 tr3132:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_H, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD66), expr); }; }
+	goto st2777;
 tr3141:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6600); }; }
+	goto st2777;
 tr3153:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_H, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD66), expr); }; }
+	goto st2777;
 tr3162:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6600); }; }
+	goto st2777;
 tr3163:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7661); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x61); }; }
+	goto st2777;
 tr3164:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7660); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x60); }; }
+	goto st2777;
 tr3165:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7662); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x62); }; }
+	goto st2777;
 tr3166:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7663); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x63); }; }
+	goto st2777;
 tr3167:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7664); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x64); }; }
+	goto st2777;
 tr3168:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7665); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x65); }; }
+	goto st2777;
 tr3169:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7667); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x67); }; }
+	goto st2777;
 tr3184:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x762E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x2E), expr); }; }
+	goto st2777;
 tr3189:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x762E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x2E), expr); }; }
+	goto st2777;
 tr3193:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766E); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6E); }; }
+	goto st2777;
 tr3205:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_L, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD6E), expr); }; }
+	goto st2777;
 tr3214:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6E00); }; }
+	goto st2777;
 tr3226:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_L, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD6E), expr); }; }
+	goto st2777;
 tr3235:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6E00); }; }
+	goto st2777;
 tr3236:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7669); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x69); }; }
+	goto st2777;
 tr3237:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7668); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x68); }; }
+	goto st2777;
 tr3238:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766A); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6A); }; }
+	goto st2777;
 tr3239:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766B); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6B); }; }
+	goto st2777;
 tr3240:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766C); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6C); }; }
+	goto st2777;
 tr3241:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766D); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6D); }; }
+	goto st2777;
 tr3242:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766F); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6F); }; }
+	goto st2777;
 tr3264:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x763A), expr); }; } else { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x763E), expr); }; } }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x3A), expr); }; } else { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x3E), expr); }; } }
+	goto st2777;
 tr3269:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x763A), expr); }; } else { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x763E), expr); }; } }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x3A), expr); }; } else { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x3E), expr); }; } }
+	goto st2777;
 tr3272:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr3273:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr3275:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767E); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7E); }; }
+	goto st2777;
 tr3287:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_A, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD7E), expr); }; }
+	goto st2777;
 tr3296:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7E00); }; }
+	goto st2777;
 tr3308:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_A, REG_idx )), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD7E), expr); }; }
+	goto st2777;
 tr3317:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7E00); }; }
+	goto st2777;
 tr3318:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7679); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x79); }; }
+	goto st2777;
 tr3319:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7678); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x78); }; }
+	goto st2777;
 tr3320:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767A); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7A); }; }
+	goto st2777;
 tr3321:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767B); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7B); }; }
+	goto st2777;
 tr3322:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767C); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7C); }; }
+	goto st2777;
 tr3323:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767D); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7D); }; }
+	goto st2777;
 tr3324:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767F); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7F); }; }
+	goto st2777;
 tr3325:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_I); }; }
-	goto st2637;
+	goto st2777;
 tr3326:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_R); }; }
-	goto st2637;
+	goto st2777;
 tr3327:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_IIR); }; }
-	goto st2637;
+	goto st2777;
 tr3328:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_EIR); }; }
-	goto st2637;
+	goto st2777;
 tr3329:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_A_XPC); }; }
-	goto st2637;
+	goto st2777;
 tr3336:
 	{ push_expr(ctx); }
 	{
@@ -2796,7 +2796,7 @@ tr3336:
      { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_dd_nn( REG_BC )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr3341:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2813,13 +2813,13 @@ tr3341:
      { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_dd_nn( REG_BC )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr3344:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_dd1_BC(REG_BC)); }; }
-	goto st2637;
+	goto st2777;
 tr3345:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_dd1_DE(REG_BC)); }; }
-	goto st2637;
+	goto st2777;
 tr3352:
 	{ push_expr(ctx); }
 	{
@@ -2835,7 +2835,7 @@ tr3352:
      { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_dd_nn( REG_DE )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr3357:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2852,13 +2852,13 @@ tr3357:
      { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_dd_nn( REG_DE )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr3360:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_dd1_BC(REG_DE)); }; }
-	goto st2637;
+	goto st2777;
 tr3361:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_dd1_DE(REG_DE)); }; }
-	goto st2637;
+	goto st2777;
 tr3374:
 	{ push_expr(ctx); }
 	{
@@ -2874,7 +2874,7 @@ tr3374:
      { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_dd_nn( REG_HL )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr3379:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -2891,190 +2891,190 @@ tr3379:
      { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LD_dd_nn( REG_HL )), expr); };
     }
    }
-	goto st2637;
+	goto st2777;
 tr3393:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_HL_IND_HL_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3402:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_HL_d << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3414:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_LD_HL_IND_SP_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3423:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_SP_n << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3435:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_HL_IND_IX_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3444:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_IX_d << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3456:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_d((Z80_LD_HL_IND_IY_d), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3465:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IND_IY_d << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3466:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_dd1_BC(REG_HL)); }; }
-	goto st2637;
+	goto st2777;
 tr3467:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_dd1_DE(REG_HL)); }; }
-	goto st2637;
+	goto st2777;
 tr3468:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IX); }; }
-	goto st2637;
+	goto st2777;
 tr3469:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LD_HL_IY); }; }
-	goto st2637;
+	goto st2777;
 tr3470:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDD); }; }
-	goto st2637;
+	goto st2777;
 tr3471:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDDR); }; }
-	goto st2637;
+	goto st2777;
 tr3472:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDI); }; }
-	goto st2637;
+	goto st2777;
 tr3473:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDIR); }; }
-	goto st2637;
+	goto st2777;
 tr3474:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_NEG); }; }
-	goto st2637;
+	goto st2777;
 tr3477:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_NEG); }; }
-	goto st2637;
+	goto st2777;
 tr3478:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_NEG); }; }
-	goto st2637;
+	goto st2777;
 tr3479:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_NOP); }; }
-	goto st2637;
+	goto st2777;
 tr3502:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3507:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3511:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr3523:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_OR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3532:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_OR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3544:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_OR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3553:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_OR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3554:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr3555:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr3556:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr3557:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr3558:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr3559:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr3560:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr3563:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_OR( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr3564:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_OR( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr3565:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_OR( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr3566:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_OR( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr3569:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_OR_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr3572:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_OR_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr3575:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_OR_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr3590:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3595:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3599:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr3611:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_OR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3620:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_OR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3632:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_OR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3641:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_OR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr3642:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr3643:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr3644:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr3645:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr3646:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr3647:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr3648:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr3651:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OR_HL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr3652:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OTDR); }; }
-	goto st2637;
+	goto st2777;
 tr3653:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OTIR); }; }
-	goto st2637;
+	goto st2777;
 tr3664:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT_n_A), expr); }; }
-	goto st2637;
+	goto st2777;
 tr3679:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
@@ -3085,7 +3085,7 @@ tr3679:
         { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_idx )); };
     }
     }
-	goto st2637;
+	goto st2777;
 tr3684:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -3097,455 +3097,455 @@ tr3684:
         { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_idx )); };
     }
     }
-	goto st2637;
+	goto st2777;
 tr3687:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr3688:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr3689:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr3690:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr3691:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr3692:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr3693:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUT_C_REG( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr3694:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUTD); }; }
-	goto st2637;
+	goto st2777;
 tr3695:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OUTI); }; }
-	goto st2637;
+	goto st2777;
 tr3708:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_BC + Z80_POP( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr3709:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_DE + Z80_POP( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr3710:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_POP( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr3711:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_POP( REG_IX )); }; }
-	goto st2637;
+	goto st2777;
 tr3712:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_POP( REG_IY )); }; }
-	goto st2637;
+	goto st2777;
 tr3713:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_AF + Z80_POP( REG_AF )); }; }
-	goto st2637;
+	goto st2777;
 tr3714:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_POP( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr3715:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_POP( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr3716:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_POP( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr3717:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_POP( REG_AF )); }; }
-	goto st2637;
+	goto st2777;
 tr3718:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_POP_IP); }; }
-	goto st2637;
+	goto st2777;
 tr3719:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_POP_SU); }; }
-	goto st2637;
+	goto st2777;
 tr3728:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_BC + Z80_PUSH( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr3729:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_DE + Z80_PUSH( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr3730:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_PUSH( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr3731:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_PUSH( REG_IX )); }; }
-	goto st2637;
+	goto st2777;
 tr3732:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_PUSH( REG_IY )); }; }
-	goto st2637;
+	goto st2777;
 tr3733:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_AF + Z80_PUSH( REG_AF )); }; }
-	goto st2637;
+	goto st2777;
 tr3734:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_PUSH_IP); }; }
-	goto st2637;
+	goto st2777;
 tr3735:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_PUSH_SU); }; }
-	goto st2637;
+	goto st2777;
 tr3762:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_idx )); };
     }
-	goto st2637;
+	goto st2777;
 tr3774:
 	{ if (!expr_error)
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); }
                                            ;
     }
-	goto st2637;
+	goto st2777;
 tr3783:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
-	goto st2637;
+	goto st2777;
 tr3795:
 	{ if (!expr_error)
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); }
                                            ;
     }
-	goto st2637;
+	goto st2777;
 tr3804:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
-	goto st2637;
+	goto st2777;
 tr3805:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_C )); };
     }
-	goto st2637;
+	goto st2777;
 tr3806:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_B )); };
     }
-	goto st2637;
+	goto st2777;
 tr3807:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_D )); };
     }
-	goto st2637;
+	goto st2777;
 tr3808:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_E )); };
     }
-	goto st2637;
+	goto st2777;
 tr3809:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_H )); };
     }
-	goto st2637;
+	goto st2777;
 tr3810:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_L )); };
     }
-	goto st2637;
+	goto st2777;
 tr3811:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_A )); };
     }
-	goto st2637;
+	goto st2777;
 tr3812:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_B )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3813:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_C )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3814:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_D )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3815:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_E )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3816:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_H )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3817:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_L )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3818:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RES( expr_value, REG_A )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr3822:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET); }; }
-	goto st2637;
+	goto st2777;
 tr3833:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NZ )); }; }
-	goto st2637;
+	goto st2777;
 tr3834:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_Z )); }; }
-	goto st2637;
+	goto st2777;
 tr3835:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NC )); }; }
-	goto st2637;
+	goto st2777;
 tr3836:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr3837:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PO )); }; }
-	goto st2637;
+	goto st2777;
 tr3838:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PE )); }; }
-	goto st2637;
+	goto st2777;
 tr3839:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_P )); }; }
-	goto st2637;
+	goto st2777;
 tr3840:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_M )); }; }
-	goto st2637;
+	goto st2777;
 tr3841:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_LZ )); }; }
-	goto st2637;
+	goto st2777;
 tr3842:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RET_FLAG( FLAG_LO )); }; }
-	goto st2637;
+	goto st2777;
 tr3843:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RETI); }; }
-	goto st2637;
+	goto st2777;
 tr3844:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RETN); }; }
-	goto st2637;
+	goto st2777;
 tr3858:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr3870:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); }
                            ; }
-	goto st2637;
+	goto st2777;
 tr3879:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
-	goto st2637;
+	goto st2777;
 tr3891:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); }
                            ; }
-	goto st2637;
+	goto st2777;
 tr3900:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
-	goto st2637;
+	goto st2777;
 tr3901:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr3902:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr3903:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr3904:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr3905:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr3906:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr3907:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr3908:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr3909:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RL_DE); }; }
-	goto st2637;
+	goto st2777;
 tr3910:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLA); }; }
-	goto st2637;
+	goto st2777;
 tr3922:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr3934:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr3943:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr3955:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr3964:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr3965:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr3966:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr3967:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr3968:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr3969:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr3970:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr3971:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr3972:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLCA); }; }
-	goto st2637;
+	goto st2777;
 tr3973:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_RLD), "rcmx_rld"); }; }
-	goto st2637;
+	goto st2777;
 tr3991:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4003:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); }
                            ; }
-	goto st2637;
+	goto st2777;
 tr4012:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
-	goto st2637;
+	goto st2777;
 tr4024:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); }
                            ; }
-	goto st2637;
+	goto st2777;
 tr4033:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
-	goto st2637;
+	goto st2777;
 tr4034:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4035:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4036:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4037:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4038:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4039:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4040:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4041:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR_DE); }; }
-	goto st2637;
+	goto st2777;
 tr4042:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR_HL); }; }
-	goto st2637;
+	goto st2777;
 tr4043:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR_IX); }; }
-	goto st2637;
+	goto st2777;
 tr4044:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR_IY); }; }
-	goto st2637;
+	goto st2777;
 tr4045:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR_DE); }; }
-	goto st2637;
+	goto st2777;
 tr4046:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR_HL); }; }
-	goto st2637;
+	goto st2777;
 tr4047:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRA); }; }
-	goto st2637;
+	goto st2777;
 tr4059:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4071:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4080:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4092:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4101:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4102:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4103:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4104:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4105:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4106:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4107:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4108:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4109:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRCA); }; }
-	goto st2637;
+	goto st2777;
 tr4110:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_RRD), "rcmx_rrd"); }; }
-	goto st2637;
+	goto st2777;
 tr4114:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RST( expr_value )); };
     }
-	goto st2637;
+	goto st2777;
 tr4119:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
@@ -3553,641 +3553,641 @@ tr4119:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RST( expr_value )); };
     }
-	goto st2637;
+	goto st2777;
 tr4142:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SBC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4147:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SBC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4151:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4163:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_SBC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4172:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_SBC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4184:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_SBC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4193:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_SBC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4194:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4195:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4196:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4197:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4198:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4199:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4200:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4203:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_SBC( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr4204:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_SBC( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr4205:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_SBC( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr4206:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_SBC( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr4212:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr4213:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr4214:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr4215:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr4230:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SBC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4235:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SBC_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4239:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4251:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_SBC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4260:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_SBC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4272:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_SBC( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4281:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_SBC( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4282:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4283:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4284:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4285:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4286:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4287:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4288:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4294:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr4295:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr4296:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr4297:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SBC16( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr4298:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SCF); }; }
-	goto st2637;
+	goto st2777;
 tr4301:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SCF); }; }
-	goto st2637;
+	goto st2777;
 tr4302:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SCF); }; }
-	goto st2637;
+	goto st2777;
 tr4329:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_idx )); };
     }
-	goto st2637;
+	goto st2777;
 tr4341:
 	{ if (!expr_error)
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); }
                                            ;
     }
-	goto st2637;
+	goto st2777;
 tr4350:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
-	goto st2637;
+	goto st2777;
 tr4362:
 	{ if (!expr_error)
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); }
                                            ;
     }
-	goto st2637;
+	goto st2777;
 tr4371:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                               ;
      }
-	goto st2637;
+	goto st2777;
 tr4372:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_C )); };
     }
-	goto st2637;
+	goto st2777;
 tr4373:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_B )); };
     }
-	goto st2637;
+	goto st2777;
 tr4374:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_D )); };
     }
-	goto st2637;
+	goto st2777;
 tr4375:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_E )); };
     }
-	goto st2637;
+	goto st2777;
 tr4376:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_H )); };
     }
-	goto st2637;
+	goto st2777;
 tr4377:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_L )); };
     }
-	goto st2637;
+	goto st2777;
 tr4378:
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_A )); };
     }
-	goto st2637;
+	goto st2777;
 tr4379:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_B )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4380:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_C )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4381:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_D )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4382:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_E )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4383:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_H )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4384:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_L )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4385:
 	{ if (!expr_error) {
        { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); };
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SET( expr_value, REG_A )); };
        }
     }
-	goto st2637;
+	goto st2777;
 tr4400:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4412:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4421:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4433:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4442:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4443:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4444:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4445:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4446:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4447:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4448:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4449:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLA( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4461:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4473:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4482:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4494:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4503:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4504:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4505:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4506:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4507:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4508:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4509:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4510:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLL( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4522:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4534:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4543:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4555:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4564:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4565:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4566:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4567:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4568:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4569:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4570:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4571:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRA( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4583:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4595:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4604:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4616:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); }
                             ; }
-	goto st2637;
+	goto st2777;
 tr4625:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
-	goto st2637;
+	goto st2777;
 tr4626:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4627:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4628:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4629:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4630:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4631:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4632:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SRL( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4651:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SUB_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4656:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SUB_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4660:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4672:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_SUB( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4681:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_SUB( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4693:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_SUB( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4702:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_SUB( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4703:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4704:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4705:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4706:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4707:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4708:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4709:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4712:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_SUB( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr4713:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_SUB( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr4714:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_SUB( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr4715:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_SUB( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr4730:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SUB_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4735:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_SUB_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4739:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4751:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_SUB( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4760:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_SUB( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4772:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_SUB( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4781:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_SUB( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4782:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4783:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4784:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4785:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4786:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4787:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4788:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SUB( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4807:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_XOR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4812:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_XOR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4816:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4828:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_XOR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4837:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_XOR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4849:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_XOR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4858:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_XOR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4859:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4860:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4861:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4862:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4863:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4864:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4865:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4868:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_XOR( REG_IXH )); }; }
-	goto st2637;
+	goto st2777;
 tr4869:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_XOR( REG_IYH )); }; }
-	goto st2637;
+	goto st2777;
 tr4870:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_XOR( REG_IXL )); }; }
-	goto st2637;
+	goto st2777;
 tr4871:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_XOR( REG_IYL )); }; }
-	goto st2637;
+	goto st2777;
 tr4886:
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_XOR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4891:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_XOR_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4895:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr4907:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IX + Z80_XOR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4916:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IX + Z80_XOR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4928:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((P_IY + Z80_XOR( REG_idx )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4937:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(( P_IY + Z80_XOR( REG_idx ) ) << 8); }; }
-	goto st2637;
+	goto st2777;
 tr4938:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr4939:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr4940:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr4941:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr4942:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr4943:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr4944:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_XOR( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr4945:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SLP); }; }
-	goto st2637;
+	goto st2777;
 tr4950:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_MLT( REG_BC )); }; }
-	goto st2637;
+	goto st2777;
 tr4951:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_MLT( REG_DE )); }; }
-	goto st2637;
+	goto st2777;
 tr4952:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_MLT( REG_HL )); }; }
-	goto st2637;
+	goto st2777;
 tr4953:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_MLT( REG_SP )); }; }
-	goto st2637;
+	goto st2777;
 tr4966:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4971:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4195,14 +4195,14 @@ tr4971:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4978:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_B )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4983:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4210,14 +4210,14 @@ tr4983:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_B )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4990:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_D )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr4995:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4225,14 +4225,14 @@ tr4995:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_D )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5002:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_E )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5007:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4240,14 +4240,14 @@ tr5007:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_E )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5014:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_H )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5019:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4255,14 +4255,14 @@ tr5019:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_H )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5026:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_L )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5031:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4270,14 +4270,14 @@ tr5031:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_L )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5038:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_A )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5043:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4285,14 +4285,14 @@ tr5043:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_A )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5050:
 	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_F )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5055:
 	{ expr_open_parens--; }
 	{ if (! expr_in_parens)
@@ -4300,467 +4300,551 @@ tr5055:
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_IN0( REG_F )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5074:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_C )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5075:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_B )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5076:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_D )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5077:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_E )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5078:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_H )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5079:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_L )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5080:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_A )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5081:
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_OUT0( REG_F )), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5085:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OTIM); }; }
-	goto st2637;
+	goto st2777;
 tr5086:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OTIMR); }; }
-	goto st2637;
+	goto st2777;
 tr5087:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OTDM); }; }
-	goto st2637;
+	goto st2777;
 tr5088:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_OTDMR); }; }
-	goto st2637;
+	goto st2777;
 tr5100:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_TST_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5105:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_TST_n), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5109:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_idx )); }; }
-	goto st2637;
+	goto st2777;
 tr5110:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_C )); }; }
-	goto st2637;
+	goto st2777;
 tr5111:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_B )); }; }
-	goto st2637;
+	goto st2777;
 tr5112:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_D )); }; }
-	goto st2637;
+	goto st2777;
 tr5113:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_E )); }; }
-	goto st2637;
+	goto st2777;
 tr5114:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_H )); }; }
-	goto st2637;
+	goto st2777;
 tr5115:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_L )); }; }
-	goto st2637;
+	goto st2777;
 tr5116:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_TST( REG_A )); }; }
-	goto st2637;
+	goto st2777;
 tr5122:
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_TSTIO), expr); }; }
-	goto st2637;
+	goto st2777;
 tr5127:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((Z80_TSTIO), expr); }; }
-	goto st2637;
-tr5150:
+	goto st2777;
+tr5152:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x760E), expr); }; }
-	goto st2637;
-tr5155:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x0E), expr); }; }
+	goto st2777;
+tr5157:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x760E), expr); }; }
-	goto st2637;
-tr5159:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764E); }; }
-	goto st2637;
-tr5160:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7649); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x0E), expr); }; }
+	goto st2777;
 tr5161:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7648); }; }
-	goto st2637;
-tr5162:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764A); }; }
-	goto st2637;
-tr5163:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764B); }; }
-	goto st2637;
-tr5164:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764C); }; }
-	goto st2637;
-tr5165:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764D); }; }
-	goto st2637;
-tr5166:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x764F); }; }
-	goto st2637;
-tr5179:
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7606), expr); }; }
-	goto st2637;
-tr5184:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7606), expr); }; }
-	goto st2637;
-tr5188:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7646); }; }
-	goto st2637;
-tr5189:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7641); }; }
-	goto st2637;
-tr5190:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7640); }; }
-	goto st2637;
-tr5191:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7642); }; }
-	goto st2637;
-tr5192:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7643); }; }
-	goto st2637;
-tr5193:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7644); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4E); }; }
+	goto st2777;
+tr5173:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD4E), expr); }; }
+	goto st2777;
+tr5182:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4E00); }; }
+	goto st2777;
 tr5194:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7645); }; }
-	goto st2637;
-tr5195:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7647); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD4E), expr); }; }
+	goto st2777;
+tr5203:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4E00); }; }
+	goto st2777;
+tr5204:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x49); }; }
+	goto st2777;
+tr5205:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x48); }; }
+	goto st2777;
+tr5206:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4A); }; }
+	goto st2777;
+tr5207:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4B); }; }
+	goto st2777;
 tr5208:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4C); }; }
+	goto st2777;
+tr5209:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4D); }; }
+	goto st2777;
+tr5210:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x4F); }; }
+	goto st2777;
+tr5225:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7616), expr); }; }
-	goto st2637;
-tr5213:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x06), expr); }; }
+	goto st2777;
+tr5230:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7616), expr); }; }
-	goto st2637;
-tr5217:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7656); }; }
-	goto st2637;
-tr5218:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7651); }; }
-	goto st2637;
-tr5219:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7650); }; }
-	goto st2637;
-tr5220:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7652); }; }
-	goto st2637;
-tr5221:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7653); }; }
-	goto st2637;
-tr5222:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7654); }; }
-	goto st2637;
-tr5223:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7655); }; }
-	goto st2637;
-tr5224:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7657); }; }
-	goto st2637;
-tr5237:
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x761E), expr); }; }
-	goto st2637;
-tr5242:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x761E), expr); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x06), expr); }; }
+	goto st2777;
+tr5234:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x46); }; }
+	goto st2777;
 tr5246:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765E); }; }
-	goto st2637;
-tr5247:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7659); }; }
-	goto st2637;
-tr5248:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7658); }; }
-	goto st2637;
-tr5249:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765A); }; }
-	goto st2637;
-tr5250:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765B); }; }
-	goto st2637;
-tr5251:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765C); }; }
-	goto st2637;
-tr5252:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765D); }; }
-	goto st2637;
-tr5253:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x765F); }; }
-	goto st2637;
-tr5266:
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7626), expr); }; }
-	goto st2637;
-tr5271:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x7626), expr); }; }
-	goto st2637;
-tr5275:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7666); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD46), expr); }; }
+	goto st2777;
+tr5255:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD4600); }; }
+	goto st2777;
+tr5267:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD46), expr); }; }
+	goto st2777;
 tr5276:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7661); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD4600); }; }
+	goto st2777;
 tr5277:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7660); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x41); }; }
+	goto st2777;
 tr5278:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7662); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x40); }; }
+	goto st2777;
 tr5279:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7663); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x42); }; }
+	goto st2777;
 tr5280:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7664); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x43); }; }
+	goto st2777;
 tr5281:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7665); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x44); }; }
+	goto st2777;
 tr5282:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7667); }; }
-	goto st2637;
-tr5295:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x45); }; }
+	goto st2777;
+tr5283:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x47); }; }
+	goto st2777;
+tr5298:
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x762E), expr); }; }
-	goto st2637;
-tr5300:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x16), expr); }; }
+	goto st2777;
+tr5303:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x762E), expr); }; }
-	goto st2637;
-tr5304:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766E); }; }
-	goto st2637;
-tr5305:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7669); }; }
-	goto st2637;
-tr5306:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7668); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x16), expr); }; }
+	goto st2777;
 tr5307:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766A); }; }
-	goto st2637;
-tr5308:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766B); }; }
-	goto st2637;
-tr5309:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766C); }; }
-	goto st2637;
-tr5310:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766D); }; }
-	goto st2637;
-tr5311:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x766F); }; }
-	goto st2637;
-tr5324:
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x763A), expr); }; } else { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x763E), expr); }; } }
-	goto st2637;
-tr5329:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x763A), expr); }; } else { { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x763E), expr); }; } }
-	goto st2637;
-tr5333:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767E); }; }
-	goto st2637;
-tr5334:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7679); }; }
-	goto st2637;
-tr5335:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7678); }; }
-	goto st2637;
-tr5336:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767A); }; }
-	goto st2637;
-tr5337:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767B); }; }
-	goto st2637;
-tr5338:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767C); }; }
-	goto st2637;
-tr5339:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767D); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x56); }; }
+	goto st2777;
+tr5319:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD56), expr); }; }
+	goto st2777;
+tr5328:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5600); }; }
+	goto st2777;
 tr5340:
-	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x767F); }; }
-	goto st2637;
-tr5345:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_BOOL); }; }
-	goto st2637;
-tr5346:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_BOOL); }; }
-	goto st2637;
-tr5347:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_BOOL); }; }
-	goto st2637;
-tr5348:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BOOL); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD56), expr); }; }
+	goto st2777;
 tr5349:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IOE); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5600); }; }
+	goto st2777;
 tr5350:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IOI); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x51); }; }
+	goto st2777;
 tr5351:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IPRES); }; }
-	goto st2637;
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x50); }; }
+	goto st2777;
+tr5352:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x52); }; }
+	goto st2777;
+tr5353:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x53); }; }
+	goto st2777;
+tr5354:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x54); }; }
+	goto st2777;
 tr5355:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x55); }; }
+	goto st2777;
+tr5356:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x57); }; }
+	goto st2777;
+tr5371:
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x1E), expr); }; }
+	goto st2777;
+tr5376:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x1E), expr); }; }
+	goto st2777;
+tr5380:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5E); }; }
+	goto st2777;
+tr5392:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD5E), expr); }; }
+	goto st2777;
+tr5401:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD5E00); }; }
+	goto st2777;
+tr5413:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD5E), expr); }; }
+	goto st2777;
+tr5422:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD5E00); }; }
+	goto st2777;
+tr5423:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x59); }; }
+	goto st2777;
+tr5424:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x58); }; }
+	goto st2777;
+tr5425:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5A); }; }
+	goto st2777;
+tr5426:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5B); }; }
+	goto st2777;
+tr5427:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5C); }; }
+	goto st2777;
+tr5428:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5D); }; }
+	goto st2777;
+tr5429:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x5F); }; }
+	goto st2777;
+tr5444:
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x26), expr); }; }
+	goto st2777;
+tr5449:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x26), expr); }; }
+	goto st2777;
+tr5453:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x66); }; }
+	goto st2777;
+tr5465:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD66), expr); }; }
+	goto st2777;
+tr5474:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6600); }; }
+	goto st2777;
+tr5486:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD66), expr); }; }
+	goto st2777;
+tr5495:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6600); }; }
+	goto st2777;
+tr5496:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x61); }; }
+	goto st2777;
+tr5497:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x60); }; }
+	goto st2777;
+tr5498:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x62); }; }
+	goto st2777;
+tr5499:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x63); }; }
+	goto st2777;
+tr5500:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x64); }; }
+	goto st2777;
+tr5501:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x65); }; }
+	goto st2777;
+tr5502:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x67); }; }
+	goto st2777;
+tr5517:
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x2E), expr); }; }
+	goto st2777;
+tr5522:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) return FALSE; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x2E), expr); }; }
+	goto st2777;
+tr5526:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6E); }; }
+	goto st2777;
+tr5538:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD6E), expr); }; }
+	goto st2777;
+tr5547:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD6E00); }; }
+	goto st2777;
+tr5559:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD6E), expr); }; }
+	goto st2777;
+tr5568:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD6E00); }; }
+	goto st2777;
+tr5569:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x69); }; }
+	goto st2777;
+tr5570:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x68); }; }
+	goto st2777;
+tr5571:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6A); }; }
+	goto st2777;
+tr5572:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6B); }; }
+	goto st2777;
+tr5573:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6C); }; }
+	goto st2777;
+tr5574:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6D); }; }
+	goto st2777;
+tr5575:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x6F); }; }
+	goto st2777;
+tr5590:
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x3A), expr); }; } else { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x3E), expr); }; } }
+	goto st2777;
+tr5595:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } if (expr_in_parens) { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((0x3A), expr); }; } else { { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_n((0x3E), expr); }; } }
+	goto st2777;
+tr5599:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7E); }; }
+	goto st2777;
+tr5611:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xDD7E), expr); }; }
+	goto st2777;
+tr5620:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xDD7E00); }; }
+	goto st2777;
+tr5632:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_idx((0xFD7E), expr); }; }
+	goto st2777;
+tr5641:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0xFD7E00); }; }
+	goto st2777;
+tr5642:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x79); }; }
+	goto st2777;
+tr5643:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x78); }; }
+	goto st2777;
+tr5644:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7A); }; }
+	goto st2777;
+tr5645:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7B); }; }
+	goto st2777;
+tr5646:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7C); }; }
+	goto st2777;
+tr5647:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7D); }; }
+	goto st2777;
+tr5648:
+	{ if ( (opts.cpu & (CPU_RABBIT)) == 0 ) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x76); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x7F); }; }
+	goto st2777;
+tr5653:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_HL + Z80_BOOL); }; }
+	goto st2777;
+tr5654:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IX + Z80_BOOL); }; }
+	goto st2777;
+tr5655:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(P_IY + Z80_BOOL); }; }
+	goto st2777;
+tr5656:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_BOOL); }; }
+	goto st2777;
+tr5657:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IOE); }; }
+	goto st2777;
+tr5658:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IOI); }; }
+	goto st2777;
+tr5659:
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IPRES); }; }
+	goto st2777;
+tr5663:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IPSET( expr_value )); };
     }
-	goto st2637;
-tr5360:
+	goto st2777;
+tr5668:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error)
     { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IPSET( expr_value )); };
     }
-	goto st2637;
-tr5363:
+	goto st2777;
+tr5671:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_IDET); }; }
-	goto st2637;
-tr5364:
+	goto st2777;
+tr5672:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDDSR); }; }
-	goto st2637;
-tr5365:
+	goto st2777;
+tr5673:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDISR); }; }
-	goto st2637;
-tr5383:
+	goto st2777;
+tr5691:
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IND_mn_HL), expr); }; }
-	goto st2637;
-tr5384:
+	goto st2777;
+tr5692:
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IND_mn_IX), expr); }; }
-	goto st2637;
-tr5385:
+	goto st2777;
+tr5693:
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IND_mn_IY), expr); }; }
-	goto st2637;
-tr5392:
+	goto st2777;
+tr5700:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDP_IND_HL_HL); }; }
-	goto st2637;
-tr5396:
+	goto st2777;
+tr5704:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDP_IND_IX_HL); }; }
-	goto st2637;
-tr5400:
+	goto st2777;
+tr5708:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDP_IND_IY_HL); }; }
-	goto st2637;
-tr5408:
+	goto st2777;
+tr5716:
 	{ push_expr(ctx); }
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_HL_IND_mn), expr); }; }
-	goto st2637;
-tr5413:
+	goto st2777;
+tr5721:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_HL_IND_mn), expr); }; }
-	goto st2637;
-tr5417:
+	goto st2777;
+tr5725:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDP_HL_IND_HL); }; }
-	goto st2637;
-tr5419:
+	goto st2777;
+tr5727:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDP_HL_IND_IX); }; }
-	goto st2637;
-tr5421:
+	goto st2777;
+tr5729:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LDP_HL_IND_IY); }; }
-	goto st2637;
-tr5426:
+	goto st2777;
+tr5734:
 	{ push_expr(ctx); }
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IX_IND_mn), expr); }; }
-	goto st2637;
-tr5431:
+	goto st2777;
+tr5739:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IX_IND_mn), expr); }; }
-	goto st2637;
-tr5438:
+	goto st2777;
+tr5746:
 	{ push_expr(ctx); }
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IY_IND_mn), expr); }; }
-	goto st2637;
-tr5443:
+	goto st2777;
+tr5751:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (! expr_in_parens)
       return FALSE;
     { Expr *expr = pop_expr(ctx); if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_nn((Z80_LDP_IY_IND_mn), expr); }; }
-	goto st2637;
-tr5446:
+	goto st2777;
+tr5754:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LSDR); }; }
-	goto st2637;
-tr5447:
+	goto st2777;
+tr5755:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LSIR); }; }
-	goto st2637;
-tr5448:
+	goto st2777;
+tr5756:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LSDDR); }; }
-	goto st2637;
-tr5449:
+	goto st2777;
+tr5757:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_LSIDR); }; }
-	goto st2637;
-tr5450:
+	goto st2777;
+tr5758:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_MUL); }; }
-	goto st2637;
-tr5451:
+	goto st2777;
+tr5759:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RDMODE); }; }
-	goto st2637;
-tr5452:
+	goto st2777;
+tr5760:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SETUSR); }; }
-	goto st2637;
-tr5453:
+	goto st2777;
+tr5761:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SURES); }; }
-	goto st2637;
-tr5454:
+	goto st2777;
+tr5762:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_SYSCALL); }; }
-	goto st2637;
-tr5455:
+	goto st2777;
+tr5763:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_UMA); }; }
-	goto st2637;
-tr5456:
+	goto st2777;
+tr5764:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_UMS); }; }
-	goto st2637;
-tr5460:
+	goto st2777;
+tr5768:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error) {
@@ -4768,8 +4852,8 @@ tr5460:
      add_Z88_CALL_OZ(expr_value);
     }
    }
-	goto st2637;
-tr5465:
+	goto st2777;
+tr5773:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
@@ -4778,8 +4862,8 @@ tr5465:
      add_Z88_CALL_OZ(expr_value);
     }
    }
-	goto st2637;
-tr5471:
+	goto st2777;
+tr5779:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error) {
@@ -4787,8 +4871,8 @@ tr5471:
      add_Z88_CALL_PKG(expr_value);
     }
    }
-	goto st2637;
-tr5476:
+	goto st2777;
+tr5784:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
@@ -4797,8 +4881,8 @@ tr5476:
      add_Z88_CALL_PKG(expr_value);
     }
    }
-	goto st2637;
-tr5482:
+	goto st2777;
+tr5790:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error) {
@@ -4806,8 +4890,8 @@ tr5482:
      add_Z88_FPP(expr_value);
     }
    }
-	goto st2637;
-tr5487:
+	goto st2777;
+tr5795:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
@@ -4816,8 +4900,8 @@ tr5487:
      add_Z88_FPP(expr_value);
     }
    }
-	goto st2637;
-tr5493:
+	goto st2777;
+tr5801:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error) {
@@ -4825,8 +4909,8 @@ tr5493:
      add_Z88_INVOKE(expr_value);
     }
    }
-	goto st2637;
-tr5498:
+	goto st2777;
+tr5806:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
@@ -4835,48 +4919,48 @@ tr5498:
      add_Z88_INVOKE(expr_value);
     }
    }
-	goto st2637;
-tr5502:
+	goto st2777;
+tr5810:
 	{ asm_BINARY(str_data(name)); }
-	goto st2637;
-tr5508:
+	goto st2777;
+tr5816:
 	{ push_expr(ctx); }
 	{ asm_DEFC(str_data(name), pop_expr(ctx));
      if ( ctx->p->tok == TK_COMMA )
-      {goto st2545;}
+      {goto st2685;}
     }
-	goto st2637;
-tr5513:
+	goto st2777;
+tr5821:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ asm_DEFC(str_data(name), pop_expr(ctx));
      if ( ctx->p->tok == TK_COMMA )
-      {goto st2545;}
+      {goto st2685;}
     }
-	goto st2637;
-tr5516:
+	goto st2777;
+tr5824:
 	{ asm_DEFGROUP_start(0);
        ctx->current_sm = SM_DEFGROUP_OPEN; }
-	goto st2637;
-tr5518:
+	goto st2777;
+tr5826:
 	{ asm_DEFGROUP_start(0);
        ctx->current_sm = SM_DEFGROUP_LINE; }
-	goto st2637;
-tr5523:
+	goto st2777;
+tr5831:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error)
     asm_DEFVARS_start(expr_value);
     ctx->current_sm = SM_DEFVARS_OPEN;
     }
-	goto st2637;
-tr5529:
+	goto st2777;
+tr5837:
 	{ if (! expr_error)
     asm_DEFVARS_start(expr_value);
     ctx->current_sm = SM_DEFVARS_LINE;
     }
-	goto st2637;
-tr5530:
+	goto st2777;
+tr5838:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
@@ -4884,69 +4968,69 @@ tr5530:
     asm_DEFVARS_start(expr_value);
     ctx->current_sm = SM_DEFVARS_OPEN;
     }
-	goto st2637;
-tr5534:
+	goto st2777;
+tr5842:
 	{ asm_ELSE(ctx); }
-	goto st2637;
-tr5535:
+	goto st2777;
+tr5843:
 	{ asm_ENDIF(ctx); }
-	goto st2637;
-tr5541:
+	goto st2777;
+tr5849:
 	{ push_expr(ctx); }
 	{ asm_IF(ctx, pop_expr(ctx) ); }
-	goto st2637;
-tr5546:
+	goto st2777;
+tr5854:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ asm_IF(ctx, pop_expr(ctx) ); }
-	goto st2637;
-tr5550:
+	goto st2777;
+tr5858:
 	{ asm_IFDEF(ctx, str_data(name) ); }
-	goto st2637;
-tr5552:
+	goto st2777;
+tr5860:
 	{ asm_IFNDEF(ctx, str_data(name) ); }
-	goto st2637;
-tr5554:
+	goto st2777;
+tr5862:
 	{ asm_INCLUDE(str_data(name)); }
-	goto st2637;
-tr5558:
+	goto st2777;
+tr5866:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error) asm_LINE(expr_value); }
-	goto st2637;
-tr5563:
+	goto st2777;
+tr5871:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error) asm_LINE(expr_value); }
-	goto st2637;
-tr5566:
+	goto st2777;
+tr5874:
 	{ asm_LSTOFF(); }
-	goto st2637;
-tr5567:
+	goto st2777;
+tr5875:
 	{ asm_LSTON(); }
-	goto st2637;
-tr5569:
+	goto st2777;
+tr5877:
 	{ asm_MODULE(str_data(name)); }
-	goto st2637;
-tr5573:
+	goto st2777;
+tr5881:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error) asm_ORG(expr_value); }
-	goto st2637;
-tr5578:
+	goto st2777;
+tr5886:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (!expr_error) asm_ORG(expr_value); }
-	goto st2637;
-tr5583:
+	goto st2777;
+tr5891:
 	{ asm_SECTION(str_data(name)); }
-	goto st2637;
-st2637:
+	goto st2777;
+st2777:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2637;
-case 2637:
+		goto _test_eof2777;
+case 2777:
 	goto st0;
 tr2:
 	{ str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); }
@@ -5041,30 +5125,30 @@ case 2:
 		case 199: goto st2341;
 		case 200: goto st2356;
 		case 201: goto st2360;
-		case 202: goto st2460;
-		case 203: goto st2465;
-		case 204: goto st2466;
-		case 205: goto st2467;
-		case 206: goto st2468;
-		case 207: goto st2472;
-		case 208: goto st2473;
-		case 209: goto st2474;
-		case 210: goto st2475;
-		case 211: goto st2516;
-		case 212: goto st2517;
-		case 213: goto st2518;
-		case 214: goto st2519;
-		case 215: goto st2520;
-		case 218: goto st2521;
-		case 219: goto st2522;
-		case 220: goto st2523;
-		case 221: goto st2524;
-		case 222: goto st2525;
-		case 223: goto st2526;
-		case 224: goto st2527;
-		case 225: goto st2531;
-		case 226: goto st2535;
-		case 227: goto st2539;
+		case 202: goto st2600;
+		case 203: goto st2605;
+		case 204: goto st2606;
+		case 205: goto st2607;
+		case 206: goto st2608;
+		case 207: goto st2612;
+		case 208: goto st2613;
+		case 209: goto st2614;
+		case 210: goto st2615;
+		case 211: goto st2656;
+		case 212: goto st2657;
+		case 213: goto st2658;
+		case 214: goto st2659;
+		case 215: goto st2660;
+		case 218: goto st2661;
+		case 219: goto st2662;
+		case 220: goto st2663;
+		case 221: goto st2664;
+		case 222: goto st2665;
+		case 223: goto st2666;
+		case 224: goto st2667;
+		case 225: goto st2671;
+		case 226: goto st2675;
+		case 227: goto st2679;
 	}
 	goto st0;
 st3:
@@ -58710,12 +58794,12 @@ st2361:
 case 2361:
 	switch( ( ((int)ctx->p->tok)) ) {
 		case 51: goto st2362;
-		case 58: goto st2376;
-		case 59: goto st2390;
-		case 60: goto st2404;
-		case 61: goto st2418;
-		case 62: goto st2432;
-		case 63: goto st2446;
+		case 58: goto st2396;
+		case 59: goto st2430;
+		case 60: goto st2464;
+		case 61: goto st2498;
+		case 62: goto st2532;
+		case 63: goto st2566;
 	}
 	goto st0;
 st2362:
@@ -58738,14 +58822,16 @@ case 2363:
 		case 31: goto tr5141;
 		case 39: goto tr5140;
 		case 43: goto st2367;
+		case 45: goto st2369;
+		case 46: goto st2379;
 		case 47: goto tr5139;
-		case 51: goto st2369;
-		case 58: goto st2370;
-		case 59: goto st2371;
-		case 60: goto st2372;
-		case 61: goto st2373;
-		case 62: goto st2374;
-		case 63: goto st2375;
+		case 51: goto st2389;
+		case 58: goto st2390;
+		case 59: goto st2391;
+		case 60: goto st2392;
+		case 61: goto st2393;
+		case 62: goto st2394;
+		case 63: goto st2395;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
 		goto tr5140;
@@ -58777,7 +58863,7 @@ case 2364:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5150;
+		case 7: goto tr5152;
 		case 18: goto st2365;
 		case 131086: goto st2366;
 		case 131104: goto st2366;
@@ -58814,10 +58900,10 @@ tr5141:
  }
 	{ expr_open_parens++; }
 	goto st2365;
-tr5154:
+tr5156:
 	{ expr_open_parens++; }
 	goto st2365;
-tr5156:
+tr5158:
 	{ expr_open_parens--; }
 	goto st2365;
 st2365:
@@ -58828,15 +58914,15 @@ case 2365:
 		case 2: goto st2364;
 		case 4: goto st2364;
 		case 8: goto st2365;
-		case 13: goto tr5154;
+		case 13: goto tr5156;
 		case 16: goto st2365;
 		case 18: goto st2365;
-		case 31: goto tr5154;
+		case 31: goto tr5156;
 		case 39: goto st2365;
 		case 47: goto st2364;
 	}
 	goto st0;
-tr5157:
+tr5159:
 	{ expr_open_parens--; }
 	goto st2366;
 st2366:
@@ -58858,25 +58944,25 @@ case 2366:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5155;
-		case 18: goto tr5156;
-		case 131086: goto tr5157;
-		case 131104: goto tr5157;
+		case 7: goto tr5157;
+		case 18: goto tr5158;
+		case 131086: goto tr5159;
+		case 131104: goto tr5159;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5156;
+				goto tr5158;
 		} else if ( _widec >= 10 )
-			goto tr5156;
+			goto tr5158;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5156;
+				goto tr5158;
 		} else if ( _widec >= 33 )
-			goto tr5156;
+			goto tr5158;
 	} else
-		goto tr5156;
+		goto tr5158;
 	goto st0;
 st2367:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -58890,101 +58976,38 @@ st2368:
 		goto _test_eof2368;
 case 2368:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5159;
+		goto tr5161;
 	goto st0;
 st2369:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2369;
 case 2369:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5160;
-	goto st0;
-st2370:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2370;
-case 2370:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5161;
-	goto st0;
-st2371:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2371;
-case 2371:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5162;
-	goto st0;
-st2372:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2372;
-case 2372:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5163;
-	goto st0;
-st2373:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2373;
-case 2373:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5164;
-	goto st0;
-st2374:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2374;
-case 2374:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5165;
-	goto st0;
-st2375:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2375;
-case 2375:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5166;
-	goto st0;
-st2376:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2376;
-case 2376:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2377;
-	goto st0;
-st2377:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2377;
-case 2377:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5168;
-		case 4: goto tr5168;
-		case 13: goto tr5170;
-		case 16: goto tr5169;
-		case 18: goto tr5169;
-		case 31: goto tr5170;
-		case 39: goto tr5169;
-		case 43: goto st2381;
-		case 47: goto tr5168;
-		case 51: goto st2383;
-		case 58: goto st2384;
-		case 59: goto st2385;
-		case 60: goto st2386;
-		case 61: goto st2387;
-		case 62: goto st2388;
-		case 63: goto st2389;
+		case 2: goto tr5162;
+		case 4: goto tr5162;
+		case 13: goto tr5164;
+		case 14: goto st2378;
+		case 16: goto tr5163;
+		case 18: goto tr5163;
+		case 31: goto tr5164;
+		case 39: goto tr5163;
+		case 47: goto tr5162;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5169;
+		goto tr5163;
 	goto st0;
-tr5168:
+tr5162:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2378;
-st2378:
+	goto st2370;
+st2370:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2378;
-case 2378:
+		goto _test_eof2370;
+case 2370:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -59000,67 +59023,300 @@ case 2378:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5179;
-		case 18: goto st2379;
-		case 131086: goto st2380;
-		case 131104: goto st2380;
+		case 18: goto st2371;
+		case 65550: goto tr5167;
+		case 131086: goto tr5168;
+		case 131104: goto st2376;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2379;
+				goto st2371;
 		} else if ( _widec >= 10 )
-			goto st2379;
+			goto st2371;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2379;
+				goto st2371;
 		} else if ( _widec >= 33 )
-			goto st2379;
+			goto st2371;
 	} else
-		goto st2379;
+		goto st2371;
 	goto st0;
-tr5169:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2379;
-tr5170:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5171:
 	{ expr_open_parens++; }
-	goto st2379;
-tr5183:
-	{ expr_open_parens++; }
-	goto st2379;
-tr5185:
+	goto st2371;
+tr5174:
 	{ expr_open_parens--; }
-	goto st2379;
+	goto st2371;
+st2371:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2371;
+case 2371:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2372;
+		case 4: goto st2372;
+		case 8: goto st2371;
+		case 13: goto tr5171;
+		case 16: goto st2371;
+		case 18: goto st2371;
+		case 31: goto tr5171;
+		case 39: goto st2371;
+		case 47: goto st2372;
+	}
+	goto st0;
+st2372:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2372;
+case 2372:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2371;
+		case 65550: goto tr5167;
+		case 131086: goto st2374;
+		case 131104: goto st2374;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2371;
+		} else if ( _widec >= 10 )
+			goto st2371;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2371;
+		} else if ( _widec >= 33 )
+			goto st2371;
+	} else
+		goto st2371;
+	goto st0;
+tr5167:
+	{ push_expr(ctx); }
+	goto st2373;
+tr5175:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2373;
+st2373:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2373;
+case 2373:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5173;
+	goto st0;
+tr5176:
+	{ expr_open_parens--; }
+	goto st2374;
+st2374:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2374;
+case 2374:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5174;
+		case 65550: goto tr5175;
+		case 131086: goto tr5176;
+		case 131104: goto tr5176;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5174;
+		} else if ( _widec >= 10 )
+			goto tr5174;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5174;
+		} else if ( _widec >= 33 )
+			goto tr5174;
+	} else
+		goto tr5174;
+	goto st0;
+tr5168:
+	{ push_expr(ctx); }
+	goto st2375;
+tr5177:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2375;
+st2375:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2375;
+case 2375:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5173;
+		case 18: goto tr5174;
+		case 65550: goto tr5175;
+		case 131086: goto tr5177;
+		case 131104: goto tr5178;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5174;
+		} else if ( _widec >= 10 )
+			goto tr5174;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5174;
+		} else if ( _widec >= 33 )
+			goto tr5174;
+	} else
+		goto tr5174;
+	goto st0;
+tr5178:
+	{ expr_open_parens--; }
+	goto st2376;
+st2376:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2376;
+case 2376:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5174;
+		case 65550: goto tr5175;
+		case 131086: goto tr5177;
+		case 131104: goto tr5178;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5174;
+		} else if ( _widec >= 10 )
+			goto tr5174;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5174;
+		} else if ( _widec >= 33 )
+			goto tr5174;
+	} else
+		goto tr5174;
+	goto st0;
+tr5163:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2377;
+tr5164:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2377;
+tr5181:
+	{ expr_open_parens++; }
+	goto st2377;
+st2377:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2377;
+case 2377:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2370;
+		case 4: goto st2370;
+		case 8: goto st2377;
+		case 13: goto tr5181;
+		case 16: goto st2377;
+		case 18: goto st2377;
+		case 31: goto tr5181;
+		case 39: goto st2377;
+		case 47: goto st2370;
+	}
+	goto st0;
+st2378:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2378;
+case 2378:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5182;
+	goto st0;
 st2379:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2379;
 case 2379:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2378;
-		case 4: goto st2378;
-		case 8: goto st2379;
-		case 13: goto tr5183;
-		case 16: goto st2379;
-		case 18: goto st2379;
-		case 31: goto tr5183;
-		case 39: goto st2379;
-		case 47: goto st2378;
+		case 2: goto tr5183;
+		case 4: goto tr5183;
+		case 13: goto tr5185;
+		case 14: goto st2388;
+		case 16: goto tr5184;
+		case 18: goto tr5184;
+		case 31: goto tr5185;
+		case 39: goto tr5184;
+		case 47: goto tr5183;
 	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5184;
 	goto st0;
-tr5186:
-	{ expr_open_parens--; }
+tr5183:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
 	goto st2380;
 st2380:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -59081,352 +59337,587 @@ case 2380:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5184;
-		case 18: goto tr5185;
-		case 131086: goto tr5186;
-		case 131104: goto tr5186;
+		case 18: goto st2381;
+		case 65550: goto tr5188;
+		case 131086: goto tr5189;
+		case 131104: goto st2386;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5185;
+				goto st2381;
 		} else if ( _widec >= 10 )
-			goto tr5185;
+			goto st2381;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5185;
+				goto st2381;
 		} else if ( _widec >= 33 )
-			goto tr5185;
+			goto st2381;
 	} else
-		goto tr5185;
+		goto st2381;
 	goto st0;
+tr5192:
+	{ expr_open_parens++; }
+	goto st2381;
+tr5195:
+	{ expr_open_parens--; }
+	goto st2381;
 st2381:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2381;
 case 2381:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2382;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2382;
+		case 4: goto st2382;
+		case 8: goto st2381;
+		case 13: goto tr5192;
+		case 16: goto st2381;
+		case 18: goto st2381;
+		case 31: goto tr5192;
+		case 39: goto st2381;
+		case 47: goto st2382;
+	}
 	goto st0;
 st2382:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2382;
 case 2382:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5188;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2381;
+		case 65550: goto tr5188;
+		case 131086: goto st2384;
+		case 131104: goto st2384;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2381;
+		} else if ( _widec >= 10 )
+			goto st2381;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2381;
+		} else if ( _widec >= 33 )
+			goto st2381;
+	} else
+		goto st2381;
 	goto st0;
+tr5188:
+	{ push_expr(ctx); }
+	goto st2383;
+tr5196:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2383;
 st2383:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2383;
 case 2383:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5189;
+		goto tr5194;
 	goto st0;
+tr5197:
+	{ expr_open_parens--; }
+	goto st2384;
 st2384:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2384;
 case 2384:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5190;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5195;
+		case 65550: goto tr5196;
+		case 131086: goto tr5197;
+		case 131104: goto tr5197;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5195;
+		} else if ( _widec >= 10 )
+			goto tr5195;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5195;
+		} else if ( _widec >= 33 )
+			goto tr5195;
+	} else
+		goto tr5195;
 	goto st0;
+tr5189:
+	{ push_expr(ctx); }
+	goto st2385;
+tr5198:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2385;
 st2385:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2385;
 case 2385:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5191;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5194;
+		case 18: goto tr5195;
+		case 65550: goto tr5196;
+		case 131086: goto tr5198;
+		case 131104: goto tr5199;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5195;
+		} else if ( _widec >= 10 )
+			goto tr5195;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5195;
+		} else if ( _widec >= 33 )
+			goto tr5195;
+	} else
+		goto tr5195;
 	goto st0;
+tr5199:
+	{ expr_open_parens--; }
+	goto st2386;
 st2386:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2386;
 case 2386:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5192;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5195;
+		case 65550: goto tr5196;
+		case 131086: goto tr5198;
+		case 131104: goto tr5199;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5195;
+		} else if ( _widec >= 10 )
+			goto tr5195;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5195;
+		} else if ( _widec >= 33 )
+			goto tr5195;
+	} else
+		goto tr5195;
 	goto st0;
+tr5184:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2387;
+tr5185:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2387;
+tr5202:
+	{ expr_open_parens++; }
+	goto st2387;
 st2387:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2387;
 case 2387:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5193;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2380;
+		case 4: goto st2380;
+		case 8: goto st2387;
+		case 13: goto tr5202;
+		case 16: goto st2387;
+		case 18: goto st2387;
+		case 31: goto tr5202;
+		case 39: goto st2387;
+		case 47: goto st2380;
+	}
 	goto st0;
 st2388:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2388;
 case 2388:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5194;
+		goto tr5203;
 	goto st0;
 st2389:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2389;
 case 2389:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5195;
+		goto tr5204;
 	goto st0;
 st2390:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2390;
 case 2390:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2391;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5205;
 	goto st0;
 st2391:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2391;
 case 2391:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5197;
-		case 4: goto tr5197;
-		case 13: goto tr5199;
-		case 16: goto tr5198;
-		case 18: goto tr5198;
-		case 31: goto tr5199;
-		case 39: goto tr5198;
-		case 43: goto st2395;
-		case 47: goto tr5197;
-		case 51: goto st2397;
-		case 58: goto st2398;
-		case 59: goto st2399;
-		case 60: goto st2400;
-		case 61: goto st2401;
-		case 62: goto st2402;
-		case 63: goto st2403;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5198;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5206;
 	goto st0;
-tr5197:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2392;
 st2392:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2392;
 case 2392:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5208;
-		case 18: goto st2393;
-		case 131086: goto st2394;
-		case 131104: goto st2394;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2393;
-		} else if ( _widec >= 10 )
-			goto st2393;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2393;
-		} else if ( _widec >= 33 )
-			goto st2393;
-	} else
-		goto st2393;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5207;
 	goto st0;
-tr5198:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2393;
-tr5199:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2393;
-tr5212:
-	{ expr_open_parens++; }
-	goto st2393;
-tr5214:
-	{ expr_open_parens--; }
-	goto st2393;
 st2393:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2393;
 case 2393:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2392;
-		case 4: goto st2392;
-		case 8: goto st2393;
-		case 13: goto tr5212;
-		case 16: goto st2393;
-		case 18: goto st2393;
-		case 31: goto tr5212;
-		case 39: goto st2393;
-		case 47: goto st2392;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5208;
 	goto st0;
-tr5215:
-	{ expr_open_parens--; }
-	goto st2394;
 st2394:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2394;
 case 2394:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5213;
-		case 18: goto tr5214;
-		case 131086: goto tr5215;
-		case 131104: goto tr5215;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5214;
-		} else if ( _widec >= 10 )
-			goto tr5214;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5214;
-		} else if ( _widec >= 33 )
-			goto tr5214;
-	} else
-		goto tr5214;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5209;
 	goto st0;
 st2395:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2395;
 case 2395:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2396;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5210;
 	goto st0;
 st2396:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2396;
 case 2396:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5217;
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2397;
 	goto st0;
 st2397:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2397;
 case 2397:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5218;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5212;
+		case 4: goto tr5212;
+		case 13: goto tr5214;
+		case 16: goto tr5213;
+		case 18: goto tr5213;
+		case 31: goto tr5214;
+		case 39: goto tr5213;
+		case 43: goto st2401;
+		case 45: goto st2403;
+		case 46: goto st2413;
+		case 47: goto tr5212;
+		case 51: goto st2423;
+		case 58: goto st2424;
+		case 59: goto st2425;
+		case 60: goto st2426;
+		case 61: goto st2427;
+		case 62: goto st2428;
+		case 63: goto st2429;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5213;
 	goto st0;
+tr5212:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2398;
 st2398:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2398;
 case 2398:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5219;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5225;
+		case 18: goto st2399;
+		case 131086: goto st2400;
+		case 131104: goto st2400;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2399;
+		} else if ( _widec >= 10 )
+			goto st2399;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2399;
+		} else if ( _widec >= 33 )
+			goto st2399;
+	} else
+		goto st2399;
 	goto st0;
+tr5213:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2399;
+tr5214:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2399;
+tr5229:
+	{ expr_open_parens++; }
+	goto st2399;
+tr5231:
+	{ expr_open_parens--; }
+	goto st2399;
 st2399:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2399;
 case 2399:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5220;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2398;
+		case 4: goto st2398;
+		case 8: goto st2399;
+		case 13: goto tr5229;
+		case 16: goto st2399;
+		case 18: goto st2399;
+		case 31: goto tr5229;
+		case 39: goto st2399;
+		case 47: goto st2398;
+	}
 	goto st0;
+tr5232:
+	{ expr_open_parens--; }
+	goto st2400;
 st2400:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2400;
 case 2400:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5221;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5230;
+		case 18: goto tr5231;
+		case 131086: goto tr5232;
+		case 131104: goto tr5232;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5231;
+		} else if ( _widec >= 10 )
+			goto tr5231;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5231;
+		} else if ( _widec >= 33 )
+			goto tr5231;
+	} else
+		goto tr5231;
 	goto st0;
 st2401:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2401;
 case 2401:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5222;
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2402;
 	goto st0;
 st2402:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2402;
 case 2402:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5223;
+		goto tr5234;
 	goto st0;
 st2403:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2403;
 case 2403:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5224;
-	goto st0;
-st2404:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2404;
-case 2404:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2405;
-	goto st0;
-st2405:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2405;
-case 2405:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5226;
-		case 4: goto tr5226;
-		case 13: goto tr5228;
-		case 16: goto tr5227;
-		case 18: goto tr5227;
-		case 31: goto tr5228;
-		case 39: goto tr5227;
-		case 43: goto st2409;
-		case 47: goto tr5226;
-		case 51: goto st2411;
-		case 58: goto st2412;
-		case 59: goto st2413;
-		case 60: goto st2414;
-		case 61: goto st2415;
-		case 62: goto st2416;
-		case 63: goto st2417;
+		case 2: goto tr5235;
+		case 4: goto tr5235;
+		case 13: goto tr5237;
+		case 14: goto st2412;
+		case 16: goto tr5236;
+		case 18: goto tr5236;
+		case 31: goto tr5237;
+		case 39: goto tr5236;
+		case 47: goto tr5235;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5227;
+		goto tr5236;
 	goto st0;
-tr5226:
+tr5235:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2406;
+	goto st2404;
+st2404:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2404;
+case 2404:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2405;
+		case 65550: goto tr5240;
+		case 131086: goto tr5241;
+		case 131104: goto st2410;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2405;
+		} else if ( _widec >= 10 )
+			goto st2405;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2405;
+		} else if ( _widec >= 33 )
+			goto st2405;
+	} else
+		goto st2405;
+	goto st0;
+tr5244:
+	{ expr_open_parens++; }
+	goto st2405;
+tr5247:
+	{ expr_open_parens--; }
+	goto st2405;
+st2405:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2405;
+case 2405:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2406;
+		case 4: goto st2406;
+		case 8: goto st2405;
+		case 13: goto tr5244;
+		case 16: goto st2405;
+		case 18: goto st2405;
+		case 31: goto tr5244;
+		case 39: goto st2405;
+		case 47: goto st2406;
+	}
+	goto st0;
 st2406:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2406;
@@ -59446,66 +59937,41 @@ case 2406:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5237;
-		case 18: goto st2407;
+		case 18: goto st2405;
+		case 65550: goto tr5240;
 		case 131086: goto st2408;
 		case 131104: goto st2408;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2407;
+				goto st2405;
 		} else if ( _widec >= 10 )
-			goto st2407;
+			goto st2405;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2407;
+				goto st2405;
 		} else if ( _widec >= 33 )
-			goto st2407;
+			goto st2405;
 	} else
-		goto st2407;
+		goto st2405;
 	goto st0;
-tr5227:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5240:
+	{ push_expr(ctx); }
 	goto st2407;
-tr5228:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2407;
-tr5241:
-	{ expr_open_parens++; }
-	goto st2407;
-tr5243:
+tr5248:
 	{ expr_open_parens--; }
+	{ push_expr(ctx); }
 	goto st2407;
 st2407:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2407;
 case 2407:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2406;
-		case 4: goto st2406;
-		case 8: goto st2407;
-		case 13: goto tr5241;
-		case 16: goto st2407;
-		case 18: goto st2407;
-		case 31: goto tr5241;
-		case 39: goto st2407;
-		case 47: goto st2406;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5246;
 	goto st0;
-tr5244:
+tr5249:
 	{ expr_open_parens--; }
 	goto st2408;
 st2408:
@@ -59527,128 +59993,389 @@ case 2408:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5242;
-		case 18: goto tr5243;
-		case 131086: goto tr5244;
-		case 131104: goto tr5244;
+		case 18: goto tr5247;
+		case 65550: goto tr5248;
+		case 131086: goto tr5249;
+		case 131104: goto tr5249;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5243;
+				goto tr5247;
 		} else if ( _widec >= 10 )
-			goto tr5243;
+			goto tr5247;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5243;
+				goto tr5247;
 		} else if ( _widec >= 33 )
-			goto tr5243;
+			goto tr5247;
 	} else
-		goto tr5243;
+		goto tr5247;
 	goto st0;
+tr5241:
+	{ push_expr(ctx); }
+	goto st2409;
+tr5250:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2409;
 st2409:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2409;
 case 2409:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2410;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5246;
+		case 18: goto tr5247;
+		case 65550: goto tr5248;
+		case 131086: goto tr5250;
+		case 131104: goto tr5251;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5247;
+		} else if ( _widec >= 10 )
+			goto tr5247;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5247;
+		} else if ( _widec >= 33 )
+			goto tr5247;
+	} else
+		goto tr5247;
 	goto st0;
+tr5251:
+	{ expr_open_parens--; }
+	goto st2410;
 st2410:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2410;
 case 2410:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5246;
-	goto st0;
-st2411:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2411;
-case 2411:
-	if ( ( ((int)ctx->p->tok)) == 7 )
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5247;
+		case 65550: goto tr5248;
+		case 131086: goto tr5250;
+		case 131104: goto tr5251;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5247;
+		} else if ( _widec >= 10 )
+			goto tr5247;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5247;
+		} else if ( _widec >= 33 )
+			goto tr5247;
+	} else
 		goto tr5247;
 	goto st0;
-st2412:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2412;
-case 2412:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5248;
-	goto st0;
-st2413:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2413;
-case 2413:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5249;
-	goto st0;
-st2414:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2414;
-case 2414:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5250;
-	goto st0;
-st2415:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2415;
-case 2415:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5251;
-	goto st0;
-st2416:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2416;
-case 2416:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5252;
-	goto st0;
-st2417:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2417;
-case 2417:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5253;
-	goto st0;
-st2418:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2418;
-case 2418:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2419;
-	goto st0;
-st2419:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2419;
-case 2419:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5255;
-		case 4: goto tr5255;
-		case 13: goto tr5257;
-		case 16: goto tr5256;
-		case 18: goto tr5256;
-		case 31: goto tr5257;
-		case 39: goto tr5256;
-		case 43: goto st2423;
-		case 47: goto tr5255;
-		case 51: goto st2425;
-		case 58: goto st2426;
-		case 59: goto st2427;
-		case 60: goto st2428;
-		case 61: goto st2429;
-		case 62: goto st2430;
-		case 63: goto st2431;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5256;
-	goto st0;
-tr5255:
+tr5236:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
+	goto st2411;
+tr5237:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2411;
+tr5254:
+	{ expr_open_parens++; }
+	goto st2411;
+st2411:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2411;
+case 2411:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2404;
+		case 4: goto st2404;
+		case 8: goto st2411;
+		case 13: goto tr5254;
+		case 16: goto st2411;
+		case 18: goto st2411;
+		case 31: goto tr5254;
+		case 39: goto st2411;
+		case 47: goto st2404;
+	}
+	goto st0;
+st2412:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2412;
+case 2412:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5255;
+	goto st0;
+st2413:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2413;
+case 2413:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5256;
+		case 4: goto tr5256;
+		case 13: goto tr5258;
+		case 14: goto st2422;
+		case 16: goto tr5257;
+		case 18: goto tr5257;
+		case 31: goto tr5258;
+		case 39: goto tr5257;
+		case 47: goto tr5256;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5257;
+	goto st0;
+tr5256:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2414;
+st2414:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2414;
+case 2414:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2415;
+		case 65550: goto tr5261;
+		case 131086: goto tr5262;
+		case 131104: goto st2420;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2415;
+		} else if ( _widec >= 10 )
+			goto st2415;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2415;
+		} else if ( _widec >= 33 )
+			goto st2415;
+	} else
+		goto st2415;
+	goto st0;
+tr5265:
+	{ expr_open_parens++; }
+	goto st2415;
+tr5268:
+	{ expr_open_parens--; }
+	goto st2415;
+st2415:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2415;
+case 2415:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2416;
+		case 4: goto st2416;
+		case 8: goto st2415;
+		case 13: goto tr5265;
+		case 16: goto st2415;
+		case 18: goto st2415;
+		case 31: goto tr5265;
+		case 39: goto st2415;
+		case 47: goto st2416;
+	}
+	goto st0;
+st2416:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2416;
+case 2416:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2415;
+		case 65550: goto tr5261;
+		case 131086: goto st2418;
+		case 131104: goto st2418;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2415;
+		} else if ( _widec >= 10 )
+			goto st2415;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2415;
+		} else if ( _widec >= 33 )
+			goto st2415;
+	} else
+		goto st2415;
+	goto st0;
+tr5261:
+	{ push_expr(ctx); }
+	goto st2417;
+tr5269:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2417;
+st2417:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2417;
+case 2417:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5267;
+	goto st0;
+tr5270:
+	{ expr_open_parens--; }
+	goto st2418;
+st2418:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2418;
+case 2418:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5268;
+		case 65550: goto tr5269;
+		case 131086: goto tr5270;
+		case 131104: goto tr5270;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5268;
+		} else if ( _widec >= 10 )
+			goto tr5268;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5268;
+		} else if ( _widec >= 33 )
+			goto tr5268;
+	} else
+		goto tr5268;
+	goto st0;
+tr5262:
+	{ push_expr(ctx); }
+	goto st2419;
+tr5271:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2419;
+st2419:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2419;
+case 2419:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5267;
+		case 18: goto tr5268;
+		case 65550: goto tr5269;
+		case 131086: goto tr5271;
+		case 131104: goto tr5272;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5268;
+		} else if ( _widec >= 10 )
+			goto tr5268;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5268;
+		} else if ( _widec >= 33 )
+			goto tr5268;
+	} else
+		goto tr5268;
+	goto st0;
+tr5272:
+	{ expr_open_parens--; }
 	goto st2420;
 st2420:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -59669,34 +60396,26 @@ case 2420:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5266;
-		case 18: goto st2421;
-		case 131086: goto st2422;
-		case 131104: goto st2422;
+		case 18: goto tr5268;
+		case 65550: goto tr5269;
+		case 131086: goto tr5271;
+		case 131104: goto tr5272;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2421;
+				goto tr5268;
 		} else if ( _widec >= 10 )
-			goto st2421;
+			goto tr5268;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2421;
+				goto tr5268;
 		} else if ( _widec >= 33 )
-			goto st2421;
+			goto tr5268;
 	} else
-		goto st2421;
+		goto tr5268;
 	goto st0;
-tr5256:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2421;
 tr5257:
 	{
   ctx->expr_start = ctx->p;
@@ -59704,37 +60423,137 @@ tr5257:
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
+	goto st2421;
+tr5258:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
 	{ expr_open_parens++; }
 	goto st2421;
-tr5270:
+tr5275:
 	{ expr_open_parens++; }
-	goto st2421;
-tr5272:
-	{ expr_open_parens--; }
 	goto st2421;
 st2421:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2421;
 case 2421:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2420;
-		case 4: goto st2420;
+		case 2: goto st2414;
+		case 4: goto st2414;
 		case 8: goto st2421;
-		case 13: goto tr5270;
+		case 13: goto tr5275;
 		case 16: goto st2421;
 		case 18: goto st2421;
-		case 31: goto tr5270;
+		case 31: goto tr5275;
 		case 39: goto st2421;
-		case 47: goto st2420;
+		case 47: goto st2414;
 	}
 	goto st0;
-tr5273:
-	{ expr_open_parens--; }
-	goto st2422;
 st2422:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2422;
 case 2422:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5276;
+	goto st0;
+st2423:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2423;
+case 2423:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5277;
+	goto st0;
+st2424:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2424;
+case 2424:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5278;
+	goto st0;
+st2425:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2425;
+case 2425:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5279;
+	goto st0;
+st2426:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2426;
+case 2426:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5280;
+	goto st0;
+st2427:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2427;
+case 2427:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5281;
+	goto st0;
+st2428:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2428;
+case 2428:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5282;
+	goto st0;
+st2429:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2429;
+case 2429:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5283;
+	goto st0;
+st2430:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2430;
+case 2430:
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2431;
+	goto st0;
+st2431:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2431;
+case 2431:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5285;
+		case 4: goto tr5285;
+		case 13: goto tr5287;
+		case 16: goto tr5286;
+		case 18: goto tr5286;
+		case 31: goto tr5287;
+		case 39: goto tr5286;
+		case 43: goto st2435;
+		case 45: goto st2437;
+		case 46: goto st2447;
+		case 47: goto tr5285;
+		case 51: goto st2457;
+		case 58: goto st2458;
+		case 59: goto st2459;
+		case 60: goto st2460;
+		case 61: goto st2461;
+		case 62: goto st2462;
+		case 63: goto st2463;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5286;
+	goto st0;
+tr5285:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2432;
+st2432:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2432;
+case 2432:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -59750,128 +60569,67 @@ case 2422:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5271;
-		case 18: goto tr5272;
-		case 131086: goto tr5273;
-		case 131104: goto tr5273;
+		case 7: goto tr5298;
+		case 18: goto st2433;
+		case 131086: goto st2434;
+		case 131104: goto st2434;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5272;
+				goto st2433;
 		} else if ( _widec >= 10 )
-			goto tr5272;
+			goto st2433;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5272;
+				goto st2433;
 		} else if ( _widec >= 33 )
-			goto tr5272;
+			goto st2433;
 	} else
-		goto tr5272;
-	goto st0;
-st2423:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2423;
-case 2423:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2424;
-	goto st0;
-st2424:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2424;
-case 2424:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5275;
-	goto st0;
-st2425:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2425;
-case 2425:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5276;
-	goto st0;
-st2426:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2426;
-case 2426:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5277;
-	goto st0;
-st2427:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2427;
-case 2427:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5278;
-	goto st0;
-st2428:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2428;
-case 2428:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5279;
-	goto st0;
-st2429:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2429;
-case 2429:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5280;
-	goto st0;
-st2430:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2430;
-case 2430:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5281;
-	goto st0;
-st2431:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2431;
-case 2431:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5282;
-	goto st0;
-st2432:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2432;
-case 2432:
-	if ( ( ((int)ctx->p->tok)) == 17 )
 		goto st2433;
 	goto st0;
-st2433:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2433;
-case 2433:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5284;
-		case 4: goto tr5284;
-		case 13: goto tr5286;
-		case 16: goto tr5285;
-		case 18: goto tr5285;
-		case 31: goto tr5286;
-		case 39: goto tr5285;
-		case 43: goto st2437;
-		case 47: goto tr5284;
-		case 51: goto st2439;
-		case 58: goto st2440;
-		case 59: goto st2441;
-		case 60: goto st2442;
-		case 61: goto st2443;
-		case 62: goto st2444;
-		case 63: goto st2445;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5285;
-	goto st0;
-tr5284:
+tr5286:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
+	goto st2433;
+tr5287:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2433;
+tr5302:
+	{ expr_open_parens++; }
+	goto st2433;
+tr5304:
+	{ expr_open_parens--; }
+	goto st2433;
+st2433:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2433;
+case 2433:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2432;
+		case 4: goto st2432;
+		case 8: goto st2433;
+		case 13: goto tr5302;
+		case 16: goto st2433;
+		case 18: goto st2433;
+		case 31: goto tr5302;
+		case 39: goto st2433;
+		case 47: goto st2432;
+	}
+	goto st0;
+tr5305:
+	{ expr_open_parens--; }
 	goto st2434;
 st2434:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -59892,72 +60650,70 @@ case 2434:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5295;
-		case 18: goto st2435;
-		case 131086: goto st2436;
-		case 131104: goto st2436;
+		case 7: goto tr5303;
+		case 18: goto tr5304;
+		case 131086: goto tr5305;
+		case 131104: goto tr5305;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2435;
+				goto tr5304;
 		} else if ( _widec >= 10 )
-			goto st2435;
+			goto tr5304;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2435;
+				goto tr5304;
 		} else if ( _widec >= 33 )
-			goto st2435;
+			goto tr5304;
 	} else
-		goto st2435;
+		goto tr5304;
 	goto st0;
-tr5285:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2435;
-tr5286:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2435;
-tr5299:
-	{ expr_open_parens++; }
-	goto st2435;
-tr5301:
-	{ expr_open_parens--; }
-	goto st2435;
 st2435:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2435;
 case 2435:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2434;
-		case 4: goto st2434;
-		case 8: goto st2435;
-		case 13: goto tr5299;
-		case 16: goto st2435;
-		case 18: goto st2435;
-		case 31: goto tr5299;
-		case 39: goto st2435;
-		case 47: goto st2434;
-	}
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2436;
 	goto st0;
-tr5302:
-	{ expr_open_parens--; }
-	goto st2436;
 st2436:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2436;
 case 2436:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5307;
+	goto st0;
+st2437:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2437;
+case 2437:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5308;
+		case 4: goto tr5308;
+		case 13: goto tr5310;
+		case 14: goto st2446;
+		case 16: goto tr5309;
+		case 18: goto tr5309;
+		case 31: goto tr5310;
+		case 39: goto tr5309;
+		case 47: goto tr5308;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5309;
+	goto st0;
+tr5308:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2438;
+st2438:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2438;
+case 2438:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -59973,122 +60729,294 @@ case 2436:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5300;
-		case 18: goto tr5301;
-		case 131086: goto tr5302;
-		case 131104: goto tr5302;
+		case 18: goto st2439;
+		case 65550: goto tr5313;
+		case 131086: goto tr5314;
+		case 131104: goto st2444;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5301;
+				goto st2439;
 		} else if ( _widec >= 10 )
-			goto tr5301;
+			goto st2439;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5301;
+				goto st2439;
 		} else if ( _widec >= 33 )
-			goto tr5301;
+			goto st2439;
 	} else
-		goto tr5301;
+		goto st2439;
 	goto st0;
-st2437:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2437;
-case 2437:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2438;
-	goto st0;
-st2438:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2438;
-case 2438:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5304;
-	goto st0;
+tr5317:
+	{ expr_open_parens++; }
+	goto st2439;
+tr5320:
+	{ expr_open_parens--; }
+	goto st2439;
 st2439:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2439;
 case 2439:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5305;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2440;
+		case 4: goto st2440;
+		case 8: goto st2439;
+		case 13: goto tr5317;
+		case 16: goto st2439;
+		case 18: goto st2439;
+		case 31: goto tr5317;
+		case 39: goto st2439;
+		case 47: goto st2440;
+	}
 	goto st0;
 st2440:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2440;
 case 2440:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5306;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2439;
+		case 65550: goto tr5313;
+		case 131086: goto st2442;
+		case 131104: goto st2442;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2439;
+		} else if ( _widec >= 10 )
+			goto st2439;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2439;
+		} else if ( _widec >= 33 )
+			goto st2439;
+	} else
+		goto st2439;
 	goto st0;
+tr5313:
+	{ push_expr(ctx); }
+	goto st2441;
+tr5321:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2441;
 st2441:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2441;
 case 2441:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5307;
+		goto tr5319;
 	goto st0;
+tr5322:
+	{ expr_open_parens--; }
+	goto st2442;
 st2442:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2442;
 case 2442:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5308;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5320;
+		case 65550: goto tr5321;
+		case 131086: goto tr5322;
+		case 131104: goto tr5322;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5320;
+		} else if ( _widec >= 10 )
+			goto tr5320;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5320;
+		} else if ( _widec >= 33 )
+			goto tr5320;
+	} else
+		goto tr5320;
 	goto st0;
+tr5314:
+	{ push_expr(ctx); }
+	goto st2443;
+tr5323:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2443;
 st2443:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2443;
 case 2443:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5309;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5319;
+		case 18: goto tr5320;
+		case 65550: goto tr5321;
+		case 131086: goto tr5323;
+		case 131104: goto tr5324;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5320;
+		} else if ( _widec >= 10 )
+			goto tr5320;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5320;
+		} else if ( _widec >= 33 )
+			goto tr5320;
+	} else
+		goto tr5320;
 	goto st0;
+tr5324:
+	{ expr_open_parens--; }
+	goto st2444;
 st2444:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2444;
 case 2444:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5310;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5320;
+		case 65550: goto tr5321;
+		case 131086: goto tr5323;
+		case 131104: goto tr5324;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5320;
+		} else if ( _widec >= 10 )
+			goto tr5320;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5320;
+		} else if ( _widec >= 33 )
+			goto tr5320;
+	} else
+		goto tr5320;
 	goto st0;
+tr5309:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2445;
+tr5310:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2445;
+tr5327:
+	{ expr_open_parens++; }
+	goto st2445;
 st2445:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2445;
 case 2445:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5311;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2438;
+		case 4: goto st2438;
+		case 8: goto st2445;
+		case 13: goto tr5327;
+		case 16: goto st2445;
+		case 18: goto st2445;
+		case 31: goto tr5327;
+		case 39: goto st2445;
+		case 47: goto st2438;
+	}
 	goto st0;
 st2446:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2446;
 case 2446:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2447;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5328;
 	goto st0;
 st2447:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2447;
 case 2447:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5313;
-		case 4: goto tr5313;
-		case 13: goto tr5315;
-		case 16: goto tr5314;
-		case 18: goto tr5314;
-		case 31: goto tr5315;
-		case 39: goto tr5314;
-		case 43: goto st2451;
-		case 47: goto tr5313;
-		case 51: goto st2453;
-		case 58: goto st2454;
-		case 59: goto st2455;
-		case 60: goto st2456;
-		case 61: goto st2457;
-		case 62: goto st2458;
-		case 63: goto st2459;
+		case 2: goto tr5329;
+		case 4: goto tr5329;
+		case 13: goto tr5331;
+		case 14: goto st2456;
+		case 16: goto tr5330;
+		case 18: goto tr5330;
+		case 31: goto tr5331;
+		case 39: goto tr5330;
+		case 47: goto tr5329;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5314;
+		goto tr5330;
 	goto st0;
-tr5313:
+tr5329:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
@@ -60115,10 +61043,10 @@ case 2448:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5324;
 		case 18: goto st2449;
-		case 131086: goto st2450;
-		case 131104: goto st2450;
+		case 65550: goto tr5334;
+		case 131086: goto tr5335;
+		case 131104: goto st2454;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
@@ -60135,27 +61063,10 @@ case 2448:
 	} else
 		goto st2449;
 	goto st0;
-tr5314:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2449;
-tr5315:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5338:
 	{ expr_open_parens++; }
 	goto st2449;
-tr5328:
-	{ expr_open_parens++; }
-	goto st2449;
-tr5330:
+tr5341:
 	{ expr_open_parens--; }
 	goto st2449;
 st2449:
@@ -60163,20 +61074,17 @@ st2449:
 		goto _test_eof2449;
 case 2449:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2448;
-		case 4: goto st2448;
+		case 2: goto st2450;
+		case 4: goto st2450;
 		case 8: goto st2449;
-		case 13: goto tr5328;
+		case 13: goto tr5338;
 		case 16: goto st2449;
 		case 18: goto st2449;
-		case 31: goto tr5328;
+		case 31: goto tr5338;
 		case 39: goto st2449;
-		case 47: goto st2448;
+		case 47: goto st2450;
 	}
 	goto st0;
-tr5331:
-	{ expr_open_parens--; }
-	goto st2450;
 st2450:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2450;
@@ -60196,259 +61104,469 @@ case 2450:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5329;
-		case 18: goto tr5330;
-		case 131086: goto tr5331;
-		case 131104: goto tr5331;
+		case 18: goto st2449;
+		case 65550: goto tr5334;
+		case 131086: goto st2452;
+		case 131104: goto st2452;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5330;
+				goto st2449;
 		} else if ( _widec >= 10 )
-			goto tr5330;
+			goto st2449;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5330;
+				goto st2449;
 		} else if ( _widec >= 33 )
-			goto tr5330;
+			goto st2449;
 	} else
-		goto tr5330;
+		goto st2449;
 	goto st0;
+tr5334:
+	{ push_expr(ctx); }
+	goto st2451;
+tr5342:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2451;
 st2451:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2451;
 case 2451:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2452;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5340;
 	goto st0;
+tr5343:
+	{ expr_open_parens--; }
+	goto st2452;
 st2452:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2452;
 case 2452:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5333;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5341;
+		case 65550: goto tr5342;
+		case 131086: goto tr5343;
+		case 131104: goto tr5343;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5341;
+		} else if ( _widec >= 10 )
+			goto tr5341;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5341;
+		} else if ( _widec >= 33 )
+			goto tr5341;
+	} else
+		goto tr5341;
 	goto st0;
+tr5335:
+	{ push_expr(ctx); }
+	goto st2453;
+tr5344:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2453;
 st2453:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2453;
 case 2453:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5334;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5340;
+		case 18: goto tr5341;
+		case 65550: goto tr5342;
+		case 131086: goto tr5344;
+		case 131104: goto tr5345;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5341;
+		} else if ( _widec >= 10 )
+			goto tr5341;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5341;
+		} else if ( _widec >= 33 )
+			goto tr5341;
+	} else
+		goto tr5341;
 	goto st0;
+tr5345:
+	{ expr_open_parens--; }
+	goto st2454;
 st2454:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2454;
 case 2454:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5335;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5341;
+		case 65550: goto tr5342;
+		case 131086: goto tr5344;
+		case 131104: goto tr5345;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5341;
+		} else if ( _widec >= 10 )
+			goto tr5341;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5341;
+		} else if ( _widec >= 33 )
+			goto tr5341;
+	} else
+		goto tr5341;
 	goto st0;
+tr5330:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2455;
+tr5331:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2455;
+tr5348:
+	{ expr_open_parens++; }
+	goto st2455;
 st2455:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2455;
 case 2455:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5336;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2448;
+		case 4: goto st2448;
+		case 8: goto st2455;
+		case 13: goto tr5348;
+		case 16: goto st2455;
+		case 18: goto st2455;
+		case 31: goto tr5348;
+		case 39: goto st2455;
+		case 47: goto st2448;
+	}
 	goto st0;
 st2456:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2456;
 case 2456:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5337;
+		goto tr5349;
 	goto st0;
 st2457:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2457;
 case 2457:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5338;
+		goto tr5350;
 	goto st0;
 st2458:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2458;
 case 2458:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5339;
+		goto tr5351;
 	goto st0;
 st2459:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2459;
 case 2459:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5340;
+		goto tr5352;
 	goto st0;
 st2460:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2460;
 case 2460:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 76: goto st2461;
-		case 77: goto st2462;
-		case 78: goto st2463;
-		case 91: goto st2464;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5353;
 	goto st0;
 st2461:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2461;
 case 2461:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5345;
+		goto tr5354;
 	goto st0;
 st2462:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2462;
 case 2462:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5346;
+		goto tr5355;
 	goto st0;
 st2463:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2463;
 case 2463:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5347;
+		goto tr5356;
 	goto st0;
 st2464:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2464;
 case 2464:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5348;
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2465;
 	goto st0;
 st2465:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2465;
 case 2465:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5349;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5358;
+		case 4: goto tr5358;
+		case 13: goto tr5360;
+		case 16: goto tr5359;
+		case 18: goto tr5359;
+		case 31: goto tr5360;
+		case 39: goto tr5359;
+		case 43: goto st2469;
+		case 45: goto st2471;
+		case 46: goto st2481;
+		case 47: goto tr5358;
+		case 51: goto st2491;
+		case 58: goto st2492;
+		case 59: goto st2493;
+		case 60: goto st2494;
+		case 61: goto st2495;
+		case 62: goto st2496;
+		case 63: goto st2497;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5359;
 	goto st0;
+tr5358:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2466;
 st2466:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2466;
 case 2466:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5350;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5371;
+		case 18: goto st2467;
+		case 131086: goto st2468;
+		case 131104: goto st2468;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2467;
+		} else if ( _widec >= 10 )
+			goto st2467;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2467;
+		} else if ( _widec >= 33 )
+			goto st2467;
+	} else
+		goto st2467;
 	goto st0;
+tr5359:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2467;
+tr5360:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2467;
+tr5375:
+	{ expr_open_parens++; }
+	goto st2467;
+tr5377:
+	{ expr_open_parens--; }
+	goto st2467;
 st2467:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2467;
 case 2467:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5351;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2466;
+		case 4: goto st2466;
+		case 8: goto st2467;
+		case 13: goto tr5375;
+		case 16: goto st2467;
+		case 18: goto st2467;
+		case 31: goto tr5375;
+		case 39: goto st2467;
+		case 47: goto st2466;
+	}
 	goto st0;
+tr5378:
+	{ expr_open_parens--; }
+	goto st2468;
 st2468:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2468;
 case 2468:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5352;
-		case 4: goto tr5352;
-		case 13: goto tr5354;
-		case 16: goto tr5353;
-		case 18: goto tr5353;
-		case 31: goto tr5354;
-		case 39: goto tr5353;
-		case 47: goto tr5352;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5353;
+	switch( _widec ) {
+		case 7: goto tr5376;
+		case 18: goto tr5377;
+		case 131086: goto tr5378;
+		case 131104: goto tr5378;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5377;
+		} else if ( _widec >= 10 )
+			goto tr5377;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5377;
+		} else if ( _widec >= 33 )
+			goto tr5377;
+	} else
+		goto tr5377;
 	goto st0;
-tr5352:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2469;
 st2469:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2469;
 case 2469:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5355;
-		case 18: goto st2470;
-		case 131086: goto st2471;
-		case 131104: goto st2471;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2470;
-		} else if ( _widec >= 10 )
-			goto st2470;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2470;
-		} else if ( _widec >= 33 )
-			goto st2470;
-	} else
+	if ( ( ((int)ctx->p->tok)) == 14 )
 		goto st2470;
 	goto st0;
-tr5353:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2470;
-tr5354:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2470;
-tr5359:
-	{ expr_open_parens++; }
-	goto st2470;
-tr5361:
-	{ expr_open_parens--; }
-	goto st2470;
 st2470:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2470;
 case 2470:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2469;
-		case 4: goto st2469;
-		case 8: goto st2470;
-		case 13: goto tr5359;
-		case 16: goto st2470;
-		case 18: goto st2470;
-		case 31: goto tr5359;
-		case 39: goto st2470;
-		case 47: goto st2469;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5380;
 	goto st0;
-tr5362:
-	{ expr_open_parens--; }
-	goto st2471;
 st2471:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2471;
 case 2471:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5381;
+		case 4: goto tr5381;
+		case 13: goto tr5383;
+		case 14: goto st2480;
+		case 16: goto tr5382;
+		case 18: goto tr5382;
+		case 31: goto tr5383;
+		case 39: goto tr5382;
+		case 47: goto tr5381;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5382;
+	goto st0;
+tr5381:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2472;
+st2472:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2472;
+case 2472:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -60464,77 +61582,103 @@ case 2471:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5360;
-		case 18: goto tr5361;
-		case 131086: goto tr5362;
-		case 131104: goto tr5362;
+		case 18: goto st2473;
+		case 65550: goto tr5386;
+		case 131086: goto tr5387;
+		case 131104: goto st2478;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5361;
+				goto st2473;
 		} else if ( _widec >= 10 )
-			goto tr5361;
+			goto st2473;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5361;
+				goto st2473;
 		} else if ( _widec >= 33 )
-			goto tr5361;
+			goto st2473;
 	} else
-		goto tr5361;
+		goto st2473;
 	goto st0;
-st2472:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2472;
-case 2472:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5363;
-	goto st0;
+tr5390:
+	{ expr_open_parens++; }
+	goto st2473;
+tr5393:
+	{ expr_open_parens--; }
+	goto st2473;
 st2473:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2473;
 case 2473:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5364;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2474;
+		case 4: goto st2474;
+		case 8: goto st2473;
+		case 13: goto tr5390;
+		case 16: goto st2473;
+		case 18: goto st2473;
+		case 31: goto tr5390;
+		case 39: goto st2473;
+		case 47: goto st2474;
+	}
 	goto st0;
 st2474:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2474;
 case 2474:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5365;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2473;
+		case 65550: goto tr5386;
+		case 131086: goto st2476;
+		case 131104: goto st2476;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2473;
+		} else if ( _widec >= 10 )
+			goto st2473;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2473;
+		} else if ( _widec >= 33 )
+			goto st2473;
+	} else
+		goto st2473;
 	goto st0;
+tr5386:
+	{ push_expr(ctx); }
+	goto st2475;
+tr5394:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2475;
 st2475:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2475;
 case 2475:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5366;
-		case 4: goto tr5366;
-		case 13: goto tr5368;
-		case 16: goto tr5367;
-		case 18: goto tr5367;
-		case 31: goto tr5368;
-		case 39: goto tr5367;
-		case 43: goto st2483;
-		case 45: goto st2487;
-		case 46: goto st2491;
-		case 47: goto tr5366;
-		case 76: goto st2495;
-		case 77: goto st2506;
-		case 78: goto st2511;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5367;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5392;
 	goto st0;
-tr5366:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5395:
+	{ expr_open_parens--; }
 	goto st2476;
 st2476:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -60555,104 +61699,183 @@ case 2476:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 17: goto tr5376;
-		case 131086: goto st2482;
-		case 131104: goto st2482;
+		case 18: goto tr5393;
+		case 65550: goto tr5394;
+		case 131086: goto tr5395;
+		case 131104: goto tr5395;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 18 )
-				goto st2477;
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5393;
 		} else if ( _widec >= 10 )
-			goto st2477;
+			goto tr5393;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2477;
+				goto tr5393;
 		} else if ( _widec >= 33 )
-			goto st2477;
+			goto tr5393;
 	} else
-		goto st2477;
+		goto tr5393;
 	goto st0;
-tr5367:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5387:
+	{ push_expr(ctx); }
 	goto st2477;
-tr5368:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2477;
-tr5379:
-	{ expr_open_parens++; }
-	goto st2477;
-tr5386:
+tr5396:
 	{ expr_open_parens--; }
+	{ push_expr(ctx); }
 	goto st2477;
 st2477:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2477;
 case 2477:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2476;
-		case 4: goto st2476;
-		case 8: goto st2477;
-		case 13: goto tr5379;
-		case 16: goto st2477;
-		case 18: goto st2477;
-		case 31: goto tr5379;
-		case 39: goto st2477;
-		case 47: goto st2476;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
+	switch( _widec ) {
+		case 7: goto tr5392;
+		case 18: goto tr5393;
+		case 65550: goto tr5394;
+		case 131086: goto tr5396;
+		case 131104: goto tr5397;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5393;
+		} else if ( _widec >= 10 )
+			goto tr5393;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5393;
+		} else if ( _widec >= 33 )
+			goto tr5393;
+	} else
+		goto tr5393;
 	goto st0;
-tr5376:
-	{ push_expr(ctx); }
-	goto st2478;
-tr5387:
+tr5397:
 	{ expr_open_parens--; }
-	{ push_expr(ctx); }
 	goto st2478;
 st2478:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2478;
 case 2478:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 76: goto st2479;
-		case 77: goto st2480;
-		case 78: goto st2481;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
+	switch( _widec ) {
+		case 18: goto tr5393;
+		case 65550: goto tr5394;
+		case 131086: goto tr5396;
+		case 131104: goto tr5397;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5393;
+		} else if ( _widec >= 10 )
+			goto tr5393;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5393;
+		} else if ( _widec >= 33 )
+			goto tr5393;
+	} else
+		goto tr5393;
 	goto st0;
+tr5382:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2479;
+tr5383:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2479;
+tr5400:
+	{ expr_open_parens++; }
+	goto st2479;
 st2479:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2479;
 case 2479:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5383;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2472;
+		case 4: goto st2472;
+		case 8: goto st2479;
+		case 13: goto tr5400;
+		case 16: goto st2479;
+		case 18: goto st2479;
+		case 31: goto tr5400;
+		case 39: goto st2479;
+		case 47: goto st2472;
+	}
 	goto st0;
 st2480:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2480;
 case 2480:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5384;
+		goto tr5401;
 	goto st0;
 st2481:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2481;
 case 2481:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5385;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5402;
+		case 4: goto tr5402;
+		case 13: goto tr5404;
+		case 14: goto st2490;
+		case 16: goto tr5403;
+		case 18: goto tr5403;
+		case 31: goto tr5404;
+		case 39: goto tr5403;
+		case 47: goto tr5402;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5403;
 	goto st0;
-tr5388:
-	{ expr_open_parens--; }
+tr5402:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
 	goto st2482;
 st2482:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -60673,148 +61896,52 @@ case 2482:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 17: goto tr5387;
-		case 131086: goto tr5388;
-		case 131104: goto tr5388;
+		case 18: goto st2483;
+		case 65550: goto tr5407;
+		case 131086: goto tr5408;
+		case 131104: goto st2488;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 18 )
-				goto tr5386;
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2483;
 		} else if ( _widec >= 10 )
-			goto tr5386;
+			goto st2483;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5386;
+				goto st2483;
 		} else if ( _widec >= 33 )
-			goto tr5386;
+			goto st2483;
 	} else
-		goto tr5386;
+		goto st2483;
 	goto st0;
+tr5411:
+	{ expr_open_parens++; }
+	goto st2483;
+tr5414:
+	{ expr_open_parens--; }
+	goto st2483;
 st2483:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2483;
 case 2483:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2484;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2484;
+		case 4: goto st2484;
+		case 8: goto st2483;
+		case 13: goto tr5411;
+		case 16: goto st2483;
+		case 18: goto st2483;
+		case 31: goto tr5411;
+		case 39: goto st2483;
+		case 47: goto st2484;
+	}
 	goto st0;
 st2484:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2484;
 case 2484:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2485;
-	goto st0;
-st2485:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2485;
-case 2485:
-	if ( ( ((int)ctx->p->tok)) == 76 )
-		goto st2486;
-	goto st0;
-st2486:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2486;
-case 2486:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5392;
-	goto st0;
-st2487:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2487;
-case 2487:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2488;
-	goto st0;
-st2488:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2488;
-case 2488:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2489;
-	goto st0;
-st2489:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2489;
-case 2489:
-	if ( ( ((int)ctx->p->tok)) == 76 )
-		goto st2490;
-	goto st0;
-st2490:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2490;
-case 2490:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5396;
-	goto st0;
-st2491:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2491;
-case 2491:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2492;
-	goto st0;
-st2492:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2492;
-case 2492:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2493;
-	goto st0;
-st2493:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2493;
-case 2493:
-	if ( ( ((int)ctx->p->tok)) == 76 )
-		goto st2494;
-	goto st0;
-st2494:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2494;
-case 2494:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5400;
-	goto st0;
-st2495:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2495;
-case 2495:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2496;
-	goto st0;
-st2496:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2496;
-case 2496:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5402;
-		case 4: goto tr5402;
-		case 13: goto tr5404;
-		case 16: goto tr5403;
-		case 18: goto tr5403;
-		case 31: goto tr5404;
-		case 39: goto tr5403;
-		case 43: goto st2500;
-		case 45: goto st2502;
-		case 46: goto st2504;
-		case 47: goto tr5402;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5403;
-	goto st0;
-tr5402:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2497;
-st2497:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2497;
-case 2497:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -60830,72 +61957,93 @@ case 2497:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5408;
-		case 18: goto st2498;
-		case 131086: goto st2499;
-		case 131104: goto st2499;
+		case 18: goto st2483;
+		case 65550: goto tr5407;
+		case 131086: goto st2486;
+		case 131104: goto st2486;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2498;
+				goto st2483;
 		} else if ( _widec >= 10 )
-			goto st2498;
+			goto st2483;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2498;
+				goto st2483;
 		} else if ( _widec >= 33 )
-			goto st2498;
+			goto st2483;
 	} else
-		goto st2498;
+		goto st2483;
 	goto st0;
-tr5403:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2498;
-tr5404:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2498;
-tr5412:
-	{ expr_open_parens++; }
-	goto st2498;
-tr5414:
-	{ expr_open_parens--; }
-	goto st2498;
-st2498:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2498;
-case 2498:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2497;
-		case 4: goto st2497;
-		case 8: goto st2498;
-		case 13: goto tr5412;
-		case 16: goto st2498;
-		case 18: goto st2498;
-		case 31: goto tr5412;
-		case 39: goto st2498;
-		case 47: goto st2497;
-	}
-	goto st0;
+tr5407:
+	{ push_expr(ctx); }
+	goto st2485;
 tr5415:
 	{ expr_open_parens--; }
-	goto st2499;
-st2499:
+	{ push_expr(ctx); }
+	goto st2485;
+st2485:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2499;
-case 2499:
+		goto _test_eof2485;
+case 2485:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5413;
+	goto st0;
+tr5416:
+	{ expr_open_parens--; }
+	goto st2486;
+st2486:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2486;
+case 2486:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5414;
+		case 65550: goto tr5415;
+		case 131086: goto tr5416;
+		case 131104: goto tr5416;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5414;
+		} else if ( _widec >= 10 )
+			goto tr5414;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5414;
+		} else if ( _widec >= 33 )
+			goto tr5414;
+	} else
+		goto tr5414;
+	goto st0;
+tr5408:
+	{ push_expr(ctx); }
+	goto st2487;
+tr5417:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2487;
+st2487:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2487;
+case 2487:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -60913,8 +62061,9 @@ case 2499:
 	switch( _widec ) {
 		case 7: goto tr5413;
 		case 18: goto tr5414;
-		case 131086: goto tr5415;
-		case 131104: goto tr5415;
+		case 65550: goto tr5415;
+		case 131086: goto tr5417;
+		case 131104: goto tr5418;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
@@ -60931,80 +62080,403 @@ case 2499:
 	} else
 		goto tr5414;
 	goto st0;
-st2500:
+tr5418:
+	{ expr_open_parens--; }
+	goto st2488;
+st2488:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2500;
-case 2500:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2501;
-	goto st0;
-st2501:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2501;
-case 2501:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5417;
-	goto st0;
-st2502:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2502;
-case 2502:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2503;
-	goto st0;
-st2503:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2503;
-case 2503:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5419;
-	goto st0;
-st2504:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2504;
-case 2504:
-	if ( ( ((int)ctx->p->tok)) == 14 )
-		goto st2505;
-	goto st0;
-st2505:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2505;
-case 2505:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5421;
-	goto st0;
-st2506:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2506;
-case 2506:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2507;
-	goto st0;
-st2507:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2507;
-case 2507:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5423;
-		case 4: goto tr5423;
-		case 13: goto tr5425;
-		case 16: goto tr5424;
-		case 18: goto tr5424;
-		case 31: goto tr5425;
-		case 39: goto tr5424;
-		case 47: goto tr5423;
+		goto _test_eof2488;
+case 2488:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5424;
+	switch( _widec ) {
+		case 18: goto tr5414;
+		case 65550: goto tr5415;
+		case 131086: goto tr5417;
+		case 131104: goto tr5418;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5414;
+		} else if ( _widec >= 10 )
+			goto tr5414;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5414;
+		} else if ( _widec >= 33 )
+			goto tr5414;
+	} else
+		goto tr5414;
 	goto st0;
-tr5423:
+tr5403:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2508;
+	goto st2489;
+tr5404:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2489;
+tr5421:
+	{ expr_open_parens++; }
+	goto st2489;
+st2489:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2489;
+case 2489:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2482;
+		case 4: goto st2482;
+		case 8: goto st2489;
+		case 13: goto tr5421;
+		case 16: goto st2489;
+		case 18: goto st2489;
+		case 31: goto tr5421;
+		case 39: goto st2489;
+		case 47: goto st2482;
+	}
+	goto st0;
+st2490:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2490;
+case 2490:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5422;
+	goto st0;
+st2491:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2491;
+case 2491:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5423;
+	goto st0;
+st2492:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2492;
+case 2492:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5424;
+	goto st0;
+st2493:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2493;
+case 2493:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5425;
+	goto st0;
+st2494:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2494;
+case 2494:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5426;
+	goto st0;
+st2495:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2495;
+case 2495:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5427;
+	goto st0;
+st2496:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2496;
+case 2496:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5428;
+	goto st0;
+st2497:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2497;
+case 2497:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5429;
+	goto st0;
+st2498:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2498;
+case 2498:
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2499;
+	goto st0;
+st2499:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2499;
+case 2499:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5431;
+		case 4: goto tr5431;
+		case 13: goto tr5433;
+		case 16: goto tr5432;
+		case 18: goto tr5432;
+		case 31: goto tr5433;
+		case 39: goto tr5432;
+		case 43: goto st2503;
+		case 45: goto st2505;
+		case 46: goto st2515;
+		case 47: goto tr5431;
+		case 51: goto st2525;
+		case 58: goto st2526;
+		case 59: goto st2527;
+		case 60: goto st2528;
+		case 61: goto st2529;
+		case 62: goto st2530;
+		case 63: goto st2531;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5432;
+	goto st0;
+tr5431:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2500;
+st2500:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2500;
+case 2500:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5444;
+		case 18: goto st2501;
+		case 131086: goto st2502;
+		case 131104: goto st2502;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2501;
+		} else if ( _widec >= 10 )
+			goto st2501;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2501;
+		} else if ( _widec >= 33 )
+			goto st2501;
+	} else
+		goto st2501;
+	goto st0;
+tr5432:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2501;
+tr5433:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2501;
+tr5448:
+	{ expr_open_parens++; }
+	goto st2501;
+tr5450:
+	{ expr_open_parens--; }
+	goto st2501;
+st2501:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2501;
+case 2501:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2500;
+		case 4: goto st2500;
+		case 8: goto st2501;
+		case 13: goto tr5448;
+		case 16: goto st2501;
+		case 18: goto st2501;
+		case 31: goto tr5448;
+		case 39: goto st2501;
+		case 47: goto st2500;
+	}
+	goto st0;
+tr5451:
+	{ expr_open_parens--; }
+	goto st2502;
+st2502:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2502;
+case 2502:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5449;
+		case 18: goto tr5450;
+		case 131086: goto tr5451;
+		case 131104: goto tr5451;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5450;
+		} else if ( _widec >= 10 )
+			goto tr5450;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5450;
+		} else if ( _widec >= 33 )
+			goto tr5450;
+	} else
+		goto tr5450;
+	goto st0;
+st2503:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2503;
+case 2503:
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2504;
+	goto st0;
+st2504:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2504;
+case 2504:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5453;
+	goto st0;
+st2505:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2505;
+case 2505:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5454;
+		case 4: goto tr5454;
+		case 13: goto tr5456;
+		case 14: goto st2514;
+		case 16: goto tr5455;
+		case 18: goto tr5455;
+		case 31: goto tr5456;
+		case 39: goto tr5455;
+		case 47: goto tr5454;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5455;
+	goto st0;
+tr5454:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2506;
+st2506:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2506;
+case 2506:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2507;
+		case 65550: goto tr5459;
+		case 131086: goto tr5460;
+		case 131104: goto st2512;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2507;
+		} else if ( _widec >= 10 )
+			goto st2507;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2507;
+		} else if ( _widec >= 33 )
+			goto st2507;
+	} else
+		goto st2507;
+	goto st0;
+tr5463:
+	{ expr_open_parens++; }
+	goto st2507;
+tr5466:
+	{ expr_open_parens--; }
+	goto st2507;
+st2507:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2507;
+case 2507:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2508;
+		case 4: goto st2508;
+		case 8: goto st2507;
+		case 13: goto tr5463;
+		case 16: goto st2507;
+		case 18: goto st2507;
+		case 31: goto tr5463;
+		case 39: goto st2507;
+		case 47: goto st2508;
+	}
+	goto st0;
 st2508:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2508;
@@ -61024,66 +62496,41 @@ case 2508:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5426;
-		case 18: goto st2509;
+		case 18: goto st2507;
+		case 65550: goto tr5459;
 		case 131086: goto st2510;
 		case 131104: goto st2510;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2509;
+				goto st2507;
 		} else if ( _widec >= 10 )
-			goto st2509;
+			goto st2507;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2509;
+				goto st2507;
 		} else if ( _widec >= 33 )
-			goto st2509;
+			goto st2507;
 	} else
-		goto st2509;
+		goto st2507;
 	goto st0;
-tr5424:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5459:
+	{ push_expr(ctx); }
 	goto st2509;
-tr5425:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2509;
-tr5430:
-	{ expr_open_parens++; }
-	goto st2509;
-tr5432:
+tr5467:
 	{ expr_open_parens--; }
+	{ push_expr(ctx); }
 	goto st2509;
 st2509:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2509;
 case 2509:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2508;
-		case 4: goto st2508;
-		case 8: goto st2509;
-		case 13: goto tr5430;
-		case 16: goto st2509;
-		case 18: goto st2509;
-		case 31: goto tr5430;
-		case 39: goto st2509;
-		case 47: goto st2508;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5465;
 	goto st0;
-tr5433:
+tr5468:
 	{ expr_open_parens--; }
 	goto st2510;
 st2510:
@@ -61105,365 +62552,37 @@ case 2510:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5431;
-		case 18: goto tr5432;
-		case 131086: goto tr5433;
-		case 131104: goto tr5433;
+		case 18: goto tr5466;
+		case 65550: goto tr5467;
+		case 131086: goto tr5468;
+		case 131104: goto tr5468;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5432;
+				goto tr5466;
 		} else if ( _widec >= 10 )
-			goto tr5432;
+			goto tr5466;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5432;
+				goto tr5466;
 		} else if ( _widec >= 33 )
-			goto tr5432;
+			goto tr5466;
 	} else
-		goto tr5432;
+		goto tr5466;
 	goto st0;
+tr5460:
+	{ push_expr(ctx); }
+	goto st2511;
+tr5469:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2511;
 st2511:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2511;
 case 2511:
-	if ( ( ((int)ctx->p->tok)) == 17 )
-		goto st2512;
-	goto st0;
-st2512:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2512;
-case 2512:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5435;
-		case 4: goto tr5435;
-		case 13: goto tr5437;
-		case 16: goto tr5436;
-		case 18: goto tr5436;
-		case 31: goto tr5437;
-		case 39: goto tr5436;
-		case 47: goto tr5435;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5436;
-	goto st0;
-tr5435:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2513;
-st2513:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2513;
-case 2513:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5438;
-		case 18: goto st2514;
-		case 131086: goto st2515;
-		case 131104: goto st2515;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2514;
-		} else if ( _widec >= 10 )
-			goto st2514;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2514;
-		} else if ( _widec >= 33 )
-			goto st2514;
-	} else
-		goto st2514;
-	goto st0;
-tr5436:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2514;
-tr5437:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2514;
-tr5442:
-	{ expr_open_parens++; }
-	goto st2514;
-tr5444:
-	{ expr_open_parens--; }
-	goto st2514;
-st2514:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2514;
-case 2514:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2513;
-		case 4: goto st2513;
-		case 8: goto st2514;
-		case 13: goto tr5442;
-		case 16: goto st2514;
-		case 18: goto st2514;
-		case 31: goto tr5442;
-		case 39: goto st2514;
-		case 47: goto st2513;
-	}
-	goto st0;
-tr5445:
-	{ expr_open_parens--; }
-	goto st2515;
-st2515:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2515;
-case 2515:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5443;
-		case 18: goto tr5444;
-		case 131086: goto tr5445;
-		case 131104: goto tr5445;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5444;
-		} else if ( _widec >= 10 )
-			goto tr5444;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5444;
-		} else if ( _widec >= 33 )
-			goto tr5444;
-	} else
-		goto tr5444;
-	goto st0;
-st2516:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2516;
-case 2516:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5446;
-	goto st0;
-st2517:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2517;
-case 2517:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5447;
-	goto st0;
-st2518:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2518;
-case 2518:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5448;
-	goto st0;
-st2519:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2519;
-case 2519:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5449;
-	goto st0;
-st2520:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2520;
-case 2520:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5450;
-	goto st0;
-st2521:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2521;
-case 2521:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5451;
-	goto st0;
-st2522:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2522;
-case 2522:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5452;
-	goto st0;
-st2523:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2523;
-case 2523:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5453;
-	goto st0;
-st2524:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2524;
-case 2524:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5454;
-	goto st0;
-st2525:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2525;
-case 2525:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5455;
-	goto st0;
-st2526:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2526;
-case 2526:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5456;
-	goto st0;
-st2527:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2527;
-case 2527:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5457;
-		case 4: goto tr5457;
-		case 13: goto tr5459;
-		case 16: goto tr5458;
-		case 18: goto tr5458;
-		case 31: goto tr5459;
-		case 39: goto tr5458;
-		case 47: goto tr5457;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5458;
-	goto st0;
-tr5457:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2528;
-st2528:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2528;
-case 2528:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5460;
-		case 18: goto st2529;
-		case 131086: goto st2530;
-		case 131104: goto st2530;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2529;
-		} else if ( _widec >= 10 )
-			goto st2529;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2529;
-		} else if ( _widec >= 33 )
-			goto st2529;
-	} else
-		goto st2529;
-	goto st0;
-tr5458:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2529;
-tr5459:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2529;
-tr5464:
-	{ expr_open_parens++; }
-	goto st2529;
-tr5466:
-	{ expr_open_parens--; }
-	goto st2529;
-st2529:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2529;
-case 2529:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2528;
-		case 4: goto st2528;
-		case 8: goto st2529;
-		case 13: goto tr5464;
-		case 16: goto st2529;
-		case 18: goto st2529;
-		case 31: goto tr5464;
-		case 39: goto st2529;
-		case 47: goto st2528;
-	}
-	goto st0;
-tr5467:
-	{ expr_open_parens--; }
-	goto st2530;
-st2530:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2530;
-case 2530:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -61481,8 +62600,9 @@ case 2530:
 	switch( _widec ) {
 		case 7: goto tr5465;
 		case 18: goto tr5466;
-		case 131086: goto tr5467;
-		case 131104: goto tr5467;
+		case 65550: goto tr5467;
+		case 131086: goto tr5469;
+		case 131104: goto tr5470;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
@@ -61499,35 +62619,13 @@ case 2530:
 	} else
 		goto tr5466;
 	goto st0;
-st2531:
+tr5470:
+	{ expr_open_parens--; }
+	goto st2512;
+st2512:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2531;
-case 2531:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5468;
-		case 4: goto tr5468;
-		case 13: goto tr5470;
-		case 16: goto tr5469;
-		case 18: goto tr5469;
-		case 31: goto tr5470;
-		case 39: goto tr5469;
-		case 47: goto tr5468;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5469;
-	goto st0;
-tr5468:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2532;
-st2532:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2532;
-case 2532:
+		goto _test_eof2512;
+case 2512:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -61543,67 +62641,473 @@ case 2532:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5471;
-		case 18: goto st2533;
-		case 131086: goto st2534;
-		case 131104: goto st2534;
+		case 18: goto tr5466;
+		case 65550: goto tr5467;
+		case 131086: goto tr5469;
+		case 131104: goto tr5470;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2533;
+				goto tr5466;
 		} else if ( _widec >= 10 )
-			goto st2533;
+			goto tr5466;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2533;
+				goto tr5466;
 		} else if ( _widec >= 33 )
-			goto st2533;
+			goto tr5466;
 	} else
+		goto tr5466;
+	goto st0;
+tr5455:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2513;
+tr5456:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2513;
+tr5473:
+	{ expr_open_parens++; }
+	goto st2513;
+st2513:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2513;
+case 2513:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2506;
+		case 4: goto st2506;
+		case 8: goto st2513;
+		case 13: goto tr5473;
+		case 16: goto st2513;
+		case 18: goto st2513;
+		case 31: goto tr5473;
+		case 39: goto st2513;
+		case 47: goto st2506;
+	}
+	goto st0;
+st2514:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2514;
+case 2514:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5474;
+	goto st0;
+st2515:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2515;
+case 2515:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5475;
+		case 4: goto tr5475;
+		case 13: goto tr5477;
+		case 14: goto st2524;
+		case 16: goto tr5476;
+		case 18: goto tr5476;
+		case 31: goto tr5477;
+		case 39: goto tr5476;
+		case 47: goto tr5475;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5476;
+	goto st0;
+tr5475:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2516;
+st2516:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2516;
+case 2516:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2517;
+		case 65550: goto tr5480;
+		case 131086: goto tr5481;
+		case 131104: goto st2522;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2517;
+		} else if ( _widec >= 10 )
+			goto st2517;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2517;
+		} else if ( _widec >= 33 )
+			goto st2517;
+	} else
+		goto st2517;
+	goto st0;
+tr5484:
+	{ expr_open_parens++; }
+	goto st2517;
+tr5487:
+	{ expr_open_parens--; }
+	goto st2517;
+st2517:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2517;
+case 2517:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2518;
+		case 4: goto st2518;
+		case 8: goto st2517;
+		case 13: goto tr5484;
+		case 16: goto st2517;
+		case 18: goto st2517;
+		case 31: goto tr5484;
+		case 39: goto st2517;
+		case 47: goto st2518;
+	}
+	goto st0;
+st2518:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2518;
+case 2518:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2517;
+		case 65550: goto tr5480;
+		case 131086: goto st2520;
+		case 131104: goto st2520;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2517;
+		} else if ( _widec >= 10 )
+			goto st2517;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2517;
+		} else if ( _widec >= 33 )
+			goto st2517;
+	} else
+		goto st2517;
+	goto st0;
+tr5480:
+	{ push_expr(ctx); }
+	goto st2519;
+tr5488:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2519;
+st2519:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2519;
+case 2519:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5486;
+	goto st0;
+tr5489:
+	{ expr_open_parens--; }
+	goto st2520;
+st2520:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2520;
+case 2520:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5487;
+		case 65550: goto tr5488;
+		case 131086: goto tr5489;
+		case 131104: goto tr5489;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5487;
+		} else if ( _widec >= 10 )
+			goto tr5487;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5487;
+		} else if ( _widec >= 33 )
+			goto tr5487;
+	} else
+		goto tr5487;
+	goto st0;
+tr5481:
+	{ push_expr(ctx); }
+	goto st2521;
+tr5490:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2521;
+st2521:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2521;
+case 2521:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5486;
+		case 18: goto tr5487;
+		case 65550: goto tr5488;
+		case 131086: goto tr5490;
+		case 131104: goto tr5491;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5487;
+		} else if ( _widec >= 10 )
+			goto tr5487;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5487;
+		} else if ( _widec >= 33 )
+			goto tr5487;
+	} else
+		goto tr5487;
+	goto st0;
+tr5491:
+	{ expr_open_parens--; }
+	goto st2522;
+st2522:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2522;
+case 2522:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5487;
+		case 65550: goto tr5488;
+		case 131086: goto tr5490;
+		case 131104: goto tr5491;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5487;
+		} else if ( _widec >= 10 )
+			goto tr5487;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5487;
+		} else if ( _widec >= 33 )
+			goto tr5487;
+	} else
+		goto tr5487;
+	goto st0;
+tr5476:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2523;
+tr5477:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2523;
+tr5494:
+	{ expr_open_parens++; }
+	goto st2523;
+st2523:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2523;
+case 2523:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2516;
+		case 4: goto st2516;
+		case 8: goto st2523;
+		case 13: goto tr5494;
+		case 16: goto st2523;
+		case 18: goto st2523;
+		case 31: goto tr5494;
+		case 39: goto st2523;
+		case 47: goto st2516;
+	}
+	goto st0;
+st2524:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2524;
+case 2524:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5495;
+	goto st0;
+st2525:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2525;
+case 2525:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5496;
+	goto st0;
+st2526:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2526;
+case 2526:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5497;
+	goto st0;
+st2527:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2527;
+case 2527:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5498;
+	goto st0;
+st2528:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2528;
+case 2528:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5499;
+	goto st0;
+st2529:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2529;
+case 2529:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5500;
+	goto st0;
+st2530:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2530;
+case 2530:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5501;
+	goto st0;
+st2531:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2531;
+case 2531:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5502;
+	goto st0;
+st2532:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2532;
+case 2532:
+	if ( ( ((int)ctx->p->tok)) == 17 )
 		goto st2533;
 	goto st0;
-tr5469:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2533;
-tr5470:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2533;
-tr5475:
-	{ expr_open_parens++; }
-	goto st2533;
-tr5477:
-	{ expr_open_parens--; }
-	goto st2533;
 st2533:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2533;
 case 2533:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2532;
-		case 4: goto st2532;
-		case 8: goto st2533;
-		case 13: goto tr5475;
-		case 16: goto st2533;
-		case 18: goto st2533;
-		case 31: goto tr5475;
-		case 39: goto st2533;
-		case 47: goto st2532;
+		case 2: goto tr5504;
+		case 4: goto tr5504;
+		case 13: goto tr5506;
+		case 16: goto tr5505;
+		case 18: goto tr5505;
+		case 31: goto tr5506;
+		case 39: goto tr5505;
+		case 43: goto st2537;
+		case 45: goto st2539;
+		case 46: goto st2549;
+		case 47: goto tr5504;
+		case 51: goto st2559;
+		case 58: goto st2560;
+		case 59: goto st2561;
+		case 60: goto st2562;
+		case 61: goto st2563;
+		case 62: goto st2564;
+		case 63: goto st2565;
 	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5505;
 	goto st0;
-tr5478:
-	{ expr_open_parens--; }
+tr5504:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
 	goto st2534;
 st2534:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -61624,50 +63128,67 @@ case 2534:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5476;
-		case 18: goto tr5477;
-		case 131086: goto tr5478;
-		case 131104: goto tr5478;
+		case 7: goto tr5517;
+		case 18: goto st2535;
+		case 131086: goto st2536;
+		case 131104: goto st2536;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5477;
+				goto st2535;
 		} else if ( _widec >= 10 )
-			goto tr5477;
+			goto st2535;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5477;
+				goto st2535;
 		} else if ( _widec >= 33 )
-			goto tr5477;
+			goto st2535;
 	} else
-		goto tr5477;
+		goto st2535;
 	goto st0;
-st2535:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2535;
-case 2535:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5479;
-		case 4: goto tr5479;
-		case 13: goto tr5481;
-		case 16: goto tr5480;
-		case 18: goto tr5480;
-		case 31: goto tr5481;
-		case 39: goto tr5480;
-		case 47: goto tr5479;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5480;
-	goto st0;
-tr5479:
+tr5505:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
+	goto st2535;
+tr5506:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2535;
+tr5521:
+	{ expr_open_parens++; }
+	goto st2535;
+tr5523:
+	{ expr_open_parens--; }
+	goto st2535;
+st2535:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2535;
+case 2535:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2534;
+		case 4: goto st2534;
+		case 8: goto st2535;
+		case 13: goto tr5521;
+		case 16: goto st2535;
+		case 18: goto st2535;
+		case 31: goto tr5521;
+		case 39: goto st2535;
+		case 47: goto st2534;
+	}
+	goto st0;
+tr5524:
+	{ expr_open_parens--; }
 	goto st2536;
 st2536:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -61688,125 +63209,59 @@ case 2536:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5482;
-		case 18: goto st2537;
-		case 131086: goto st2538;
-		case 131104: goto st2538;
+		case 7: goto tr5522;
+		case 18: goto tr5523;
+		case 131086: goto tr5524;
+		case 131104: goto tr5524;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2537;
+				goto tr5523;
 		} else if ( _widec >= 10 )
-			goto st2537;
+			goto tr5523;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2537;
+				goto tr5523;
 		} else if ( _widec >= 33 )
-			goto st2537;
+			goto tr5523;
 	} else
-		goto st2537;
+		goto tr5523;
 	goto st0;
-tr5480:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2537;
-tr5481:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2537;
-tr5486:
-	{ expr_open_parens++; }
-	goto st2537;
-tr5488:
-	{ expr_open_parens--; }
-	goto st2537;
 st2537:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2537;
 case 2537:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2536;
-		case 4: goto st2536;
-		case 8: goto st2537;
-		case 13: goto tr5486;
-		case 16: goto st2537;
-		case 18: goto st2537;
-		case 31: goto tr5486;
-		case 39: goto st2537;
-		case 47: goto st2536;
-	}
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2538;
 	goto st0;
-tr5489:
-	{ expr_open_parens--; }
-	goto st2538;
 st2538:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2538;
 case 2538:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5487;
-		case 18: goto tr5488;
-		case 131086: goto tr5489;
-		case 131104: goto tr5489;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5488;
-		} else if ( _widec >= 10 )
-			goto tr5488;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5488;
-		} else if ( _widec >= 33 )
-			goto tr5488;
-	} else
-		goto tr5488;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5526;
 	goto st0;
 st2539:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2539;
 case 2539:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5490;
-		case 4: goto tr5490;
-		case 13: goto tr5492;
-		case 16: goto tr5491;
-		case 18: goto tr5491;
-		case 31: goto tr5492;
-		case 39: goto tr5491;
-		case 47: goto tr5490;
+		case 2: goto tr5527;
+		case 4: goto tr5527;
+		case 13: goto tr5529;
+		case 14: goto st2548;
+		case 16: goto tr5528;
+		case 18: goto tr5528;
+		case 31: goto tr5529;
+		case 39: goto tr5528;
+		case 47: goto tr5527;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5491;
+		goto tr5528;
 	goto st0;
-tr5490:
+tr5527:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
@@ -61833,10 +63288,10 @@ case 2540:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5493;
 		case 18: goto st2541;
-		case 131086: goto st2542;
-		case 131104: goto st2542;
+		case 65550: goto tr5532;
+		case 131086: goto tr5533;
+		case 131104: goto st2546;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
@@ -61853,27 +63308,10 @@ case 2540:
 	} else
 		goto st2541;
 	goto st0;
-tr5491:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2541;
-tr5492:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5536:
 	{ expr_open_parens++; }
 	goto st2541;
-tr5497:
-	{ expr_open_parens++; }
-	goto st2541;
-tr5499:
+tr5539:
 	{ expr_open_parens--; }
 	goto st2541;
 st2541:
@@ -61881,20 +63319,17 @@ st2541:
 		goto _test_eof2541;
 case 2541:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2540;
-		case 4: goto st2540;
+		case 2: goto st2542;
+		case 4: goto st2542;
 		case 8: goto st2541;
-		case 13: goto tr5497;
+		case 13: goto tr5536;
 		case 16: goto st2541;
 		case 18: goto st2541;
-		case 31: goto tr5497;
+		case 31: goto tr5536;
 		case 39: goto st2541;
-		case 47: goto st2540;
+		case 47: goto st2542;
 	}
 	goto st0;
-tr5500:
-	{ expr_open_parens--; }
-	goto st2542;
 st2542:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2542;
@@ -61914,89 +63349,47 @@ case 2542:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5498;
-		case 18: goto tr5499;
-		case 131086: goto tr5500;
-		case 131104: goto tr5500;
+		case 18: goto st2541;
+		case 65550: goto tr5532;
+		case 131086: goto st2544;
+		case 131104: goto st2544;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5499;
+				goto st2541;
 		} else if ( _widec >= 10 )
-			goto tr5499;
+			goto st2541;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5499;
+				goto st2541;
 		} else if ( _widec >= 33 )
-			goto tr5499;
+			goto st2541;
 	} else
-		goto tr5499;
+		goto st2541;
 	goto st0;
+tr5532:
+	{ push_expr(ctx); }
+	goto st2543;
+tr5540:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2543;
 st2543:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2543;
 case 2543:
-	if ( ( ((int)ctx->p->tok)) == 5 )
-		goto tr5501;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5538;
 	goto st0;
-tr5501:
-	{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); }
+tr5541:
+	{ expr_open_parens--; }
 	goto st2544;
 st2544:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2544;
 case 2544:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5502;
-	goto st0;
-st2545:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2545;
-case 2545:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5503;
-	goto st0;
-tr5503:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2546;
-st2546:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2546;
-case 2546:
-	if ( ( ((int)ctx->p->tok)) == 26 )
-		goto st2547;
-	goto st0;
-st2547:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2547;
-case 2547:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5505;
-		case 4: goto tr5505;
-		case 13: goto tr5507;
-		case 16: goto tr5506;
-		case 18: goto tr5506;
-		case 31: goto tr5507;
-		case 39: goto tr5506;
-		case 47: goto tr5505;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5506;
-	goto st0;
-tr5505:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2548;
-st2548:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2548;
-case 2548:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -62012,67 +63405,183 @@ case 2548:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5508;
-		case 17: goto tr5508;
-		case 131086: goto st2550;
-		case 131104: goto st2550;
+		case 18: goto tr5539;
+		case 65550: goto tr5540;
+		case 131086: goto tr5541;
+		case 131104: goto tr5541;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 18 )
-				goto st2549;
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5539;
 		} else if ( _widec >= 10 )
-			goto st2549;
+			goto tr5539;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2549;
+				goto tr5539;
 		} else if ( _widec >= 33 )
-			goto st2549;
+			goto tr5539;
 	} else
-		goto st2549;
+		goto tr5539;
 	goto st0;
-tr5506:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2549;
-tr5507:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2549;
-tr5512:
-	{ expr_open_parens++; }
-	goto st2549;
-tr5514:
+tr5533:
+	{ push_expr(ctx); }
+	goto st2545;
+tr5542:
 	{ expr_open_parens--; }
-	goto st2549;
+	{ push_expr(ctx); }
+	goto st2545;
+st2545:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2545;
+case 2545:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5538;
+		case 18: goto tr5539;
+		case 65550: goto tr5540;
+		case 131086: goto tr5542;
+		case 131104: goto tr5543;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5539;
+		} else if ( _widec >= 10 )
+			goto tr5539;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5539;
+		} else if ( _widec >= 33 )
+			goto tr5539;
+	} else
+		goto tr5539;
+	goto st0;
+tr5543:
+	{ expr_open_parens--; }
+	goto st2546;
+st2546:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2546;
+case 2546:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5539;
+		case 65550: goto tr5540;
+		case 131086: goto tr5542;
+		case 131104: goto tr5543;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5539;
+		} else if ( _widec >= 10 )
+			goto tr5539;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5539;
+		} else if ( _widec >= 33 )
+			goto tr5539;
+	} else
+		goto tr5539;
+	goto st0;
+tr5528:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2547;
+tr5529:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2547;
+tr5546:
+	{ expr_open_parens++; }
+	goto st2547;
+st2547:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2547;
+case 2547:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2540;
+		case 4: goto st2540;
+		case 8: goto st2547;
+		case 13: goto tr5546;
+		case 16: goto st2547;
+		case 18: goto st2547;
+		case 31: goto tr5546;
+		case 39: goto st2547;
+		case 47: goto st2540;
+	}
+	goto st0;
+st2548:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2548;
+case 2548:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5547;
+	goto st0;
 st2549:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2549;
 case 2549:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2548;
-		case 4: goto st2548;
-		case 8: goto st2549;
-		case 13: goto tr5512;
-		case 16: goto st2549;
-		case 18: goto st2549;
-		case 31: goto tr5512;
-		case 39: goto st2549;
-		case 47: goto st2548;
+		case 2: goto tr5548;
+		case 4: goto tr5548;
+		case 13: goto tr5550;
+		case 14: goto st2558;
+		case 16: goto tr5549;
+		case 18: goto tr5549;
+		case 31: goto tr5550;
+		case 39: goto tr5549;
+		case 47: goto tr5548;
 	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5549;
 	goto st0;
-tr5515:
-	{ expr_open_parens--; }
+tr5548:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
 	goto st2550;
 st2550:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -62093,86 +63602,192 @@ case 2550:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5513;
-		case 17: goto tr5513;
-		case 131086: goto tr5515;
-		case 131104: goto tr5515;
+		case 18: goto st2551;
+		case 65550: goto tr5553;
+		case 131086: goto tr5554;
+		case 131104: goto st2556;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 18 )
-				goto tr5514;
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2551;
 		} else if ( _widec >= 10 )
-			goto tr5514;
+			goto st2551;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5514;
+				goto st2551;
 		} else if ( _widec >= 33 )
-			goto tr5514;
+			goto st2551;
 	} else
-		goto tr5514;
+		goto st2551;
 	goto st0;
+tr5557:
+	{ expr_open_parens++; }
+	goto st2551;
+tr5560:
+	{ expr_open_parens--; }
+	goto st2551;
 st2551:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2551;
 case 2551:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto tr5516;
-		case 35: goto st2552;
+		case 2: goto st2552;
+		case 4: goto st2552;
+		case 8: goto st2551;
+		case 13: goto tr5557;
+		case 16: goto st2551;
+		case 18: goto st2551;
+		case 31: goto tr5557;
+		case 39: goto st2551;
+		case 47: goto st2552;
 	}
 	goto st0;
 st2552:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2552;
 case 2552:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5518;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2551;
+		case 65550: goto tr5553;
+		case 131086: goto st2554;
+		case 131104: goto st2554;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2551;
+		} else if ( _widec >= 10 )
+			goto st2551;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2551;
+		} else if ( _widec >= 33 )
+			goto st2551;
+	} else
+		goto st2551;
 	goto st0;
+tr5553:
+	{ push_expr(ctx); }
+	goto st2553;
+tr5561:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2553;
 st2553:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2553;
 case 2553:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5519;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5559;
 	goto st0;
-tr5519:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ asm_DEFINE(str_data(name)); }
+tr5562:
+	{ expr_open_parens--; }
 	goto st2554;
 st2554:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2554;
 case 2554:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto st2637;
-		case 17: goto st2553;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
+	switch( _widec ) {
+		case 18: goto tr5560;
+		case 65550: goto tr5561;
+		case 131086: goto tr5562;
+		case 131104: goto tr5562;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5560;
+		} else if ( _widec >= 10 )
+			goto tr5560;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5560;
+		} else if ( _widec >= 33 )
+			goto tr5560;
+	} else
+		goto tr5560;
 	goto st0;
+tr5554:
+	{ push_expr(ctx); }
+	goto st2555;
+tr5563:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2555;
 st2555:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2555;
 case 2555:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5520;
-		case 4: goto tr5520;
-		case 13: goto tr5522;
-		case 16: goto tr5521;
-		case 18: goto tr5521;
-		case 31: goto tr5522;
-		case 39: goto tr5521;
-		case 47: goto tr5520;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5521;
+	switch( _widec ) {
+		case 7: goto tr5559;
+		case 18: goto tr5560;
+		case 65550: goto tr5561;
+		case 131086: goto tr5563;
+		case 131104: goto tr5564;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5560;
+		} else if ( _widec >= 10 )
+			goto tr5560;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5560;
+		} else if ( _widec >= 33 )
+			goto tr5560;
+	} else
+		goto tr5560;
 	goto st0;
-tr5520:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5564:
+	{ expr_open_parens--; }
 	goto st2556;
 st2556:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -62193,25 +63808,27 @@ case 2556:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5523;
-		case 18: goto st2557;
-		case 35: goto tr5525;
-		case 131086: goto st2559;
-		case 131104: goto st2559;
+		case 18: goto tr5560;
+		case 65550: goto tr5561;
+		case 131086: goto tr5563;
+		case 131104: goto tr5564;
 	}
-	if ( _widec < 15 ) {
-		if ( 10 <= _widec && _widec <= 12 )
-			goto st2557;
-	} else if ( _widec > 16 ) {
-		if ( _widec > 30 ) {
-			if ( 33 <= _widec && _widec <= 37 )
-				goto st2557;
-		} else if ( _widec >= 20 )
-			goto st2557;
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5560;
+		} else if ( _widec >= 10 )
+			goto tr5560;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5560;
+		} else if ( _widec >= 33 )
+			goto tr5560;
 	} else
-		goto st2557;
+		goto tr5560;
 	goto st0;
-tr5521:
+tr5549:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
@@ -62219,7 +63836,7 @@ tr5521:
   expr_open_parens = 0;
  }
 	goto st2557;
-tr5522:
+tr5550:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
@@ -62228,167 +63845,127 @@ tr5522:
  }
 	{ expr_open_parens++; }
 	goto st2557;
-tr5528:
+tr5567:
 	{ expr_open_parens++; }
-	goto st2557;
-tr5531:
-	{ expr_open_parens--; }
 	goto st2557;
 st2557:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2557;
 case 2557:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2556;
-		case 4: goto st2556;
+		case 2: goto st2550;
+		case 4: goto st2550;
 		case 8: goto st2557;
-		case 13: goto tr5528;
+		case 13: goto tr5567;
 		case 16: goto st2557;
 		case 18: goto st2557;
-		case 31: goto tr5528;
+		case 31: goto tr5567;
 		case 39: goto st2557;
-		case 47: goto st2556;
+		case 47: goto st2550;
 	}
 	goto st0;
-tr5525:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	goto st2558;
-tr5532:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	goto st2558;
 st2558:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2558;
 case 2558:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5529;
+		goto tr5568;
 	goto st0;
-tr5533:
-	{ expr_open_parens--; }
-	goto st2559;
 st2559:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2559;
 case 2559:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5530;
-		case 18: goto tr5531;
-		case 35: goto tr5532;
-		case 131086: goto tr5533;
-		case 131104: goto tr5533;
-	}
-	if ( _widec < 15 ) {
-		if ( 10 <= _widec && _widec <= 12 )
-			goto tr5531;
-	} else if ( _widec > 16 ) {
-		if ( _widec > 30 ) {
-			if ( 33 <= _widec && _widec <= 37 )
-				goto tr5531;
-		} else if ( _widec >= 20 )
-			goto tr5531;
-	} else
-		goto tr5531;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5569;
 	goto st0;
 st2560:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2560;
 case 2560:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5534;
+		goto tr5570;
 	goto st0;
 st2561:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2561;
 case 2561:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5535;
+		goto tr5571;
 	goto st0;
 st2562:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2562;
 case 2562:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5536;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5572;
 	goto st0;
-tr5536:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ asm_EXTERN(str_data(name)); }
-	goto st2563;
 st2563:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2563;
 case 2563:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto st2637;
-		case 17: goto st2562;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5573;
 	goto st0;
 st2564:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2564;
 case 2564:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5537;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5574;
 	goto st0;
-tr5537:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ asm_GLOBAL(str_data(name)); }
-	goto st2565;
 st2565:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2565;
 case 2565:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto st2637;
-		case 17: goto st2564;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5575;
 	goto st0;
 st2566:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2566;
 case 2566:
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2567;
+	goto st0;
+st2567:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2567;
+case 2567:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5538;
-		case 4: goto tr5538;
-		case 13: goto tr5540;
-		case 16: goto tr5539;
-		case 18: goto tr5539;
-		case 31: goto tr5540;
-		case 39: goto tr5539;
-		case 47: goto tr5538;
+		case 2: goto tr5577;
+		case 4: goto tr5577;
+		case 13: goto tr5579;
+		case 16: goto tr5578;
+		case 18: goto tr5578;
+		case 31: goto tr5579;
+		case 39: goto tr5578;
+		case 43: goto st2571;
+		case 45: goto st2573;
+		case 46: goto st2583;
+		case 47: goto tr5577;
+		case 51: goto st2593;
+		case 58: goto st2594;
+		case 59: goto st2595;
+		case 60: goto st2596;
+		case 61: goto st2597;
+		case 62: goto st2598;
+		case 63: goto st2599;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5539;
+		goto tr5578;
 	goto st0;
-tr5538:
+tr5577:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2567;
-st2567:
+	goto st2568;
+st2568:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2567;
-case 2567:
+		goto _test_eof2568;
+case 2568:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -62404,35 +63981,35 @@ case 2567:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5541;
-		case 18: goto st2568;
-		case 131086: goto st2569;
-		case 131104: goto st2569;
+		case 7: goto tr5590;
+		case 18: goto st2569;
+		case 131086: goto st2570;
+		case 131104: goto st2570;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2568;
+				goto st2569;
 		} else if ( _widec >= 10 )
-			goto st2568;
+			goto st2569;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2568;
+				goto st2569;
 		} else if ( _widec >= 33 )
-			goto st2568;
+			goto st2569;
 	} else
-		goto st2568;
+		goto st2569;
 	goto st0;
-tr5539:
+tr5578:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2568;
-tr5540:
+	goto st2569;
+tr5579:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
@@ -62440,36 +64017,36 @@ tr5540:
   expr_open_parens = 0;
  }
 	{ expr_open_parens++; }
-	goto st2568;
-tr5545:
+	goto st2569;
+tr5594:
 	{ expr_open_parens++; }
-	goto st2568;
-tr5547:
-	{ expr_open_parens--; }
-	goto st2568;
-st2568:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2568;
-case 2568:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2567;
-		case 4: goto st2567;
-		case 8: goto st2568;
-		case 13: goto tr5545;
-		case 16: goto st2568;
-		case 18: goto st2568;
-		case 31: goto tr5545;
-		case 39: goto st2568;
-		case 47: goto st2567;
-	}
-	goto st0;
-tr5548:
+	goto st2569;
+tr5596:
 	{ expr_open_parens--; }
 	goto st2569;
 st2569:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2569;
 case 2569:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2568;
+		case 4: goto st2568;
+		case 8: goto st2569;
+		case 13: goto tr5594;
+		case 16: goto st2569;
+		case 18: goto st2569;
+		case 31: goto tr5594;
+		case 39: goto st2569;
+		case 47: goto st2568;
+	}
+	goto st0;
+tr5597:
+	{ expr_open_parens--; }
+	goto st2570;
+st2570:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2570;
+case 2570:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -62485,106 +64062,70 @@ case 2569:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5546;
-		case 18: goto tr5547;
-		case 131086: goto tr5548;
-		case 131104: goto tr5548;
+		case 7: goto tr5595;
+		case 18: goto tr5596;
+		case 131086: goto tr5597;
+		case 131104: goto tr5597;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5547;
+				goto tr5596;
 		} else if ( _widec >= 10 )
-			goto tr5547;
+			goto tr5596;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5547;
+				goto tr5596;
 		} else if ( _widec >= 33 )
-			goto tr5547;
+			goto tr5596;
 	} else
-		goto tr5547;
+		goto tr5596;
 	goto st0;
-st2570:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2570;
-case 2570:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5549;
-	goto st0;
-tr5549:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2571;
 st2571:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2571;
 case 2571:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5550;
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2572;
 	goto st0;
 st2572:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2572;
 case 2572:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5551;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5599;
 	goto st0;
-tr5551:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2573;
 st2573:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2573;
 case 2573:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5552;
-	goto st0;
-st2574:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2574;
-case 2574:
-	if ( ( ((int)ctx->p->tok)) == 5 )
-		goto tr5553;
-	goto st0;
-tr5553:
-	{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2575;
-st2575:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2575;
-case 2575:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5554;
-	goto st0;
-st2576:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2576;
-case 2576:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5555;
-		case 4: goto tr5555;
-		case 13: goto tr5557;
-		case 16: goto tr5556;
-		case 18: goto tr5556;
-		case 31: goto tr5557;
-		case 39: goto tr5556;
-		case 47: goto tr5555;
+		case 2: goto tr5600;
+		case 4: goto tr5600;
+		case 13: goto tr5602;
+		case 14: goto st2582;
+		case 16: goto tr5601;
+		case 18: goto tr5601;
+		case 31: goto tr5602;
+		case 39: goto tr5601;
+		case 47: goto tr5600;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5556;
+		goto tr5601;
 	goto st0;
-tr5555:
+tr5600:
 	{
   ctx->expr_start = ctx->p;
   expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2577;
-st2577:
+	goto st2574;
+st2574:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2577;
-case 2577:
+		goto _test_eof2574;
+case 2574:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -62600,67 +64141,149 @@ case 2577:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5558;
-		case 18: goto st2578;
-		case 131086: goto st2579;
-		case 131104: goto st2579;
+		case 18: goto st2575;
+		case 65550: goto tr5605;
+		case 131086: goto tr5606;
+		case 131104: goto st2580;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto st2578;
+				goto st2575;
 		} else if ( _widec >= 10 )
-			goto st2578;
+			goto st2575;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2578;
+				goto st2575;
 		} else if ( _widec >= 33 )
-			goto st2578;
+			goto st2575;
 	} else
-		goto st2578;
+		goto st2575;
 	goto st0;
-tr5556:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2578;
-tr5557:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
+tr5609:
 	{ expr_open_parens++; }
-	goto st2578;
-tr5562:
-	{ expr_open_parens++; }
-	goto st2578;
-tr5564:
+	goto st2575;
+tr5612:
+	{ expr_open_parens--; }
+	goto st2575;
+st2575:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2575;
+case 2575:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2576;
+		case 4: goto st2576;
+		case 8: goto st2575;
+		case 13: goto tr5609;
+		case 16: goto st2575;
+		case 18: goto st2575;
+		case 31: goto tr5609;
+		case 39: goto st2575;
+		case 47: goto st2576;
+	}
+	goto st0;
+st2576:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2576;
+case 2576:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2575;
+		case 65550: goto tr5605;
+		case 131086: goto st2578;
+		case 131104: goto st2578;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2575;
+		} else if ( _widec >= 10 )
+			goto st2575;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2575;
+		} else if ( _widec >= 33 )
+			goto st2575;
+	} else
+		goto st2575;
+	goto st0;
+tr5605:
+	{ push_expr(ctx); }
+	goto st2577;
+tr5613:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2577;
+st2577:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2577;
+case 2577:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5611;
+	goto st0;
+tr5614:
 	{ expr_open_parens--; }
 	goto st2578;
 st2578:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2578;
 case 2578:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2577;
-		case 4: goto st2577;
-		case 8: goto st2578;
-		case 13: goto tr5562;
-		case 16: goto st2578;
-		case 18: goto st2578;
-		case 31: goto tr5562;
-		case 39: goto st2578;
-		case 47: goto st2577;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
 	}
+	switch( _widec ) {
+		case 18: goto tr5612;
+		case 65550: goto tr5613;
+		case 131086: goto tr5614;
+		case 131104: goto tr5614;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5612;
+		} else if ( _widec >= 10 )
+			goto tr5612;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5612;
+		} else if ( _widec >= 33 )
+			goto tr5612;
+	} else
+		goto tr5612;
 	goto st0;
-tr5565:
+tr5606:
+	{ push_expr(ctx); }
+	goto st2579;
+tr5615:
 	{ expr_open_parens--; }
+	{ push_expr(ctx); }
 	goto st2579;
 st2579:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -62681,635 +64304,121 @@ case 2579:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5563;
-		case 18: goto tr5564;
-		case 131086: goto tr5565;
-		case 131104: goto tr5565;
+		case 7: goto tr5611;
+		case 18: goto tr5612;
+		case 65550: goto tr5613;
+		case 131086: goto tr5615;
+		case 131104: goto tr5616;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5564;
+				goto tr5612;
 		} else if ( _widec >= 10 )
-			goto tr5564;
+			goto tr5612;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5564;
+				goto tr5612;
 		} else if ( _widec >= 33 )
-			goto tr5564;
+			goto tr5612;
 	} else
-		goto tr5564;
+		goto tr5612;
 	goto st0;
+tr5616:
+	{ expr_open_parens--; }
+	goto st2580;
 st2580:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2580;
 case 2580:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5566;
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5612;
+		case 65550: goto tr5613;
+		case 131086: goto tr5615;
+		case 131104: goto tr5616;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5612;
+		} else if ( _widec >= 10 )
+			goto tr5612;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5612;
+		} else if ( _widec >= 33 )
+			goto tr5612;
+	} else
+		goto tr5612;
 	goto st0;
+tr5601:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2581;
+tr5602:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2581;
+tr5619:
+	{ expr_open_parens++; }
+	goto st2581;
 st2581:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2581;
 case 2581:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5567;
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2574;
+		case 4: goto st2574;
+		case 8: goto st2581;
+		case 13: goto tr5619;
+		case 16: goto st2581;
+		case 18: goto st2581;
+		case 31: goto tr5619;
+		case 39: goto st2581;
+		case 47: goto st2574;
+	}
 	goto st0;
 st2582:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2582;
 case 2582:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5568;
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5620;
 	goto st0;
-tr5568:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2583;
 st2583:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2583;
 case 2583:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5569;
-	goto st0;
-st2584:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2584;
-case 2584:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5570;
-		case 4: goto tr5570;
-		case 13: goto tr5572;
-		case 16: goto tr5571;
-		case 18: goto tr5571;
-		case 31: goto tr5572;
-		case 39: goto tr5571;
-		case 47: goto tr5570;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5571;
-	goto st0;
-tr5570:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2585;
-st2585:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2585;
-case 2585:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5573;
-		case 18: goto st2586;
-		case 131086: goto st2587;
-		case 131104: goto st2587;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2586;
-		} else if ( _widec >= 10 )
-			goto st2586;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2586;
-		} else if ( _widec >= 33 )
-			goto st2586;
-	} else
-		goto st2586;
-	goto st0;
-tr5571:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2586;
-tr5572:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2586;
-tr5577:
-	{ expr_open_parens++; }
-	goto st2586;
-tr5579:
-	{ expr_open_parens--; }
-	goto st2586;
-st2586:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2586;
-case 2586:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2585;
-		case 4: goto st2585;
-		case 8: goto st2586;
-		case 13: goto tr5577;
-		case 16: goto st2586;
-		case 18: goto st2586;
-		case 31: goto tr5577;
-		case 39: goto st2586;
-		case 47: goto st2585;
-	}
-	goto st0;
-tr5580:
-	{ expr_open_parens--; }
-	goto st2587;
-st2587:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2587;
-case 2587:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5578;
-		case 18: goto tr5579;
-		case 131086: goto tr5580;
-		case 131104: goto tr5580;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5579;
-		} else if ( _widec >= 10 )
-			goto tr5579;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5579;
-		} else if ( _widec >= 33 )
-			goto tr5579;
-	} else
-		goto tr5579;
-	goto st0;
-st2588:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2588;
-case 2588:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5581;
-	goto st0;
-tr5581:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ asm_PUBLIC(str_data(name)); }
-	goto st2589;
-st2589:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2589;
-case 2589:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto st2637;
-		case 17: goto st2588;
-	}
-	goto st0;
-st2590:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2590;
-case 2590:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5582;
-	goto st0;
-tr5582:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2591;
-st2591:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2591;
-case 2591:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5583;
-	goto st0;
-st2592:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2592;
-case 2592:
-	if ( ( ((int)ctx->p->tok)) == 2 )
-		goto tr5584;
-	goto st0;
-tr5584:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ asm_UNDEFINE(str_data(name)); }
-	goto st2593;
-st2593:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2593;
-case 2593:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto st2637;
-		case 17: goto st2592;
-	}
-	goto st0;
-case 2594:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 0: goto st2639;
-		case 7: goto st2638;
-		case 103: goto st2596;
-		case 104: goto st2597;
-		case 107: goto st2598;
-		case 108: goto st2602;
-		case 109: goto st2604;
-	}
-	goto st2595;
-st2595:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2595;
-case 2595:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto st2638;
-	goto st2595;
-tr5593:
-	{ asm_ELSE(ctx); }
-	goto st2638;
-tr5594:
-	{ asm_ENDIF(ctx); }
-	goto st2638;
-tr5598:
-	{ push_expr(ctx); }
-	{ asm_IF(ctx, pop_expr(ctx) ); }
-	goto st2638;
-tr5603:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ asm_IF(ctx, pop_expr(ctx) ); }
-	goto st2638;
-tr5607:
-	{ asm_IFDEF(ctx, str_data(name) ); }
-	goto st2638;
-tr5609:
-	{ asm_IFNDEF(ctx, str_data(name) ); }
-	goto st2638;
-st2638:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2638;
-case 2638:
-	goto st0;
-st2639:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2639;
-case 2639:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto st2638;
-	goto st2595;
-st2596:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2596;
-case 2596:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5593;
-	goto st2595;
-st2597:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2597;
-case 2597:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5594;
-	goto st2595;
-st2598:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2598;
-case 2598:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5595;
-		case 4: goto tr5595;
-		case 7: goto st2638;
-		case 13: goto tr5597;
-		case 16: goto tr5596;
-		case 18: goto tr5596;
-		case 31: goto tr5597;
-		case 39: goto tr5596;
-		case 47: goto tr5595;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5596;
-	goto st2595;
-tr5595:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2599;
-st2599:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2599;
-case 2599:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5598;
-		case 13: goto st2595;
-		case 17: goto st2595;
-		case 19: goto st2595;
-		case 31: goto st2595;
-		case 35: goto st2595;
-		case 65550: goto st2595;
-		case 65568: goto st2595;
-		case 131086: goto st2601;
-		case 131104: goto st2601;
-	}
-	if ( _widec < 15 ) {
-		if ( _widec > 9 ) {
-			if ( 10 <= _widec && _widec <= 12 )
-				goto st2600;
-		} else
-			goto st2595;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 37 ) {
-			if ( 38 <= _widec )
-				goto st2595;
-		} else if ( _widec >= 33 )
-			goto st2600;
-	} else
-		goto st2600;
-	goto st0;
-tr5596:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2600;
-tr5597:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2600;
-tr5602:
-	{ expr_open_parens++; }
-	goto st2600;
-tr5604:
-	{ expr_open_parens--; }
-	goto st2600;
-st2600:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2600;
-case 2600:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2599;
-		case 4: goto st2599;
-		case 7: goto st2638;
-		case 8: goto st2600;
-		case 13: goto tr5602;
-		case 16: goto st2600;
-		case 18: goto st2600;
-		case 31: goto tr5602;
-		case 39: goto st2600;
-		case 47: goto st2599;
-	}
-	goto st2595;
-tr5605:
-	{ expr_open_parens--; }
-	goto st2601;
-st2601:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2601;
-case 2601:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5603;
-		case 13: goto st2595;
-		case 17: goto st2595;
-		case 19: goto st2595;
-		case 31: goto st2595;
-		case 35: goto st2595;
-		case 65550: goto st2595;
-		case 65568: goto st2595;
-		case 131086: goto tr5605;
-		case 131104: goto tr5605;
-	}
-	if ( _widec < 15 ) {
-		if ( _widec > 9 ) {
-			if ( 10 <= _widec && _widec <= 12 )
-				goto tr5604;
-		} else
-			goto st2595;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 37 ) {
-			if ( 38 <= _widec )
-				goto st2595;
-		} else if ( _widec >= 33 )
-			goto tr5604;
-	} else
-		goto tr5604;
-	goto st0;
-st2602:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2602;
-case 2602:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5606;
-		case 7: goto st2638;
-	}
-	goto st2595;
-tr5606:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2603;
-st2603:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2603;
-case 2603:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5607;
-	goto st2595;
-st2604:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2604;
-case 2604:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5608;
-		case 7: goto st2638;
-	}
-	goto st2595;
-tr5608:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2605;
-st2605:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2605;
-case 2605:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5609;
-	goto st2595;
-case 2606:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 0: goto tr5610;
-		case 7: goto st2640;
-		case 35: goto st2607;
-	}
-	goto st0;
-tr5610:
-	{ error_missing_block(); }
-	goto st2640;
-tr5613:
-	{ ctx->current_sm = SM_DEFGROUP_LINE; }
-	goto st2640;
-st2640:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2640;
-case 2640:
-	goto st0;
-st2607:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2607;
-case 2607:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5613;
-	goto st0;
-case 2608:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 0: goto tr5614;
-		case 2: goto tr5615;
-		case 7: goto st2641;
-		case 38: goto st2615;
-	}
-	goto st0;
-tr5614:
-	{ error_missing_close_block(); }
-	goto st2641;
-tr5618:
-	{ asm_DEFGROUP_define_const(str_data(name)); }
-	goto st2641;
-tr5624:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFGROUP_start(expr_value);
-    asm_DEFGROUP_define_const(str_data(name));
-    }
-	goto st2641;
-tr5630:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFGROUP_start(expr_value);
-    asm_DEFGROUP_define_const(str_data(name));
-    }
-	goto st2641;
-tr5634:
-	{ ctx->current_sm = SM_MAIN; }
-	goto st2641;
-st2641:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2641;
-case 2641:
-	goto st0;
-tr5615:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2609;
-st2609:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2609;
-case 2609:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto tr5618;
-		case 17: goto tr5619;
-		case 26: goto st2611;
-	}
-	goto st0;
-tr5619:
-	{ asm_DEFGROUP_define_const(str_data(name)); }
-	goto st2610;
-tr5626:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFGROUP_start(expr_value);
-    asm_DEFGROUP_define_const(str_data(name));
-    }
-	goto st2610;
-tr5632:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFGROUP_start(expr_value);
-    asm_DEFGROUP_define_const(str_data(name));
-    }
-	goto st2610;
-st2610:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2610;
-case 2610:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5615;
-		case 7: goto st2641;
-	}
-	goto st0;
-st2611:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2611;
-case 2611:
 	switch( ( ((int)ctx->p->tok)) ) {
 		case 2: goto tr5621;
 		case 4: goto tr5621;
 		case 13: goto tr5623;
+		case 14: goto st2592;
 		case 16: goto tr5622;
 		case 18: goto tr5622;
 		case 31: goto tr5623;
@@ -63326,11 +64435,11 @@ tr5621:
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2612;
-st2612:
+	goto st2584;
+st2584:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2612;
-case 2612:
+		goto _test_eof2584;
+case 2584:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -63346,25 +64455,231 @@ case 2612:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5624;
-		case 17: goto tr5626;
-		case 131086: goto st2614;
-		case 131104: goto st2614;
+		case 18: goto st2585;
+		case 65550: goto tr5626;
+		case 131086: goto tr5627;
+		case 131104: goto st2590;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 18 )
-				goto st2613;
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2585;
 		} else if ( _widec >= 10 )
-			goto st2613;
+			goto st2585;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto st2613;
+				goto st2585;
 		} else if ( _widec >= 33 )
-			goto st2613;
+			goto st2585;
 	} else
-		goto st2613;
+		goto st2585;
+	goto st0;
+tr5630:
+	{ expr_open_parens++; }
+	goto st2585;
+tr5633:
+	{ expr_open_parens--; }
+	goto st2585;
+st2585:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2585;
+case 2585:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2586;
+		case 4: goto st2586;
+		case 8: goto st2585;
+		case 13: goto tr5630;
+		case 16: goto st2585;
+		case 18: goto st2585;
+		case 31: goto tr5630;
+		case 39: goto st2585;
+		case 47: goto st2586;
+	}
+	goto st0;
+st2586:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2586;
+case 2586:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto st2585;
+		case 65550: goto tr5626;
+		case 131086: goto st2588;
+		case 131104: goto st2588;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2585;
+		} else if ( _widec >= 10 )
+			goto st2585;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2585;
+		} else if ( _widec >= 33 )
+			goto st2585;
+	} else
+		goto st2585;
+	goto st0;
+tr5626:
+	{ push_expr(ctx); }
+	goto st2587;
+tr5634:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2587;
+st2587:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2587;
+case 2587:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5632;
+	goto st0;
+tr5635:
+	{ expr_open_parens--; }
+	goto st2588;
+st2588:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2588;
+case 2588:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5633;
+		case 65550: goto tr5634;
+		case 131086: goto tr5635;
+		case 131104: goto tr5635;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5633;
+		} else if ( _widec >= 10 )
+			goto tr5633;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5633;
+		} else if ( _widec >= 33 )
+			goto tr5633;
+	} else
+		goto tr5633;
+	goto st0;
+tr5627:
+	{ push_expr(ctx); }
+	goto st2589;
+tr5636:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2589;
+st2589:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2589;
+case 2589:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5632;
+		case 18: goto tr5633;
+		case 65550: goto tr5634;
+		case 131086: goto tr5636;
+		case 131104: goto tr5637;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5633;
+		} else if ( _widec >= 10 )
+			goto tr5633;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5633;
+		} else if ( _widec >= 33 )
+			goto tr5633;
+	} else
+		goto tr5633;
+	goto st0;
+tr5637:
+	{ expr_open_parens--; }
+	goto st2590;
+st2590:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2590;
+case 2590:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 18: goto tr5633;
+		case 65550: goto tr5634;
+		case 131086: goto tr5636;
+		case 131104: goto tr5637;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5633;
+		} else if ( _widec >= 10 )
+			goto tr5633;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5633;
+		} else if ( _widec >= 33 )
+			goto tr5633;
+	} else
+		goto tr5633;
 	goto st0;
 tr5622:
 	{
@@ -63373,7 +64688,7 @@ tr5622:
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2613;
+	goto st2591;
 tr5623:
 	{
   ctx->expr_start = ctx->p;
@@ -63382,408 +64697,158 @@ tr5623:
   expr_open_parens = 0;
  }
 	{ expr_open_parens++; }
-	goto st2613;
-tr5629:
-	{ expr_open_parens++; }
-	goto st2613;
-tr5631:
-	{ expr_open_parens--; }
-	goto st2613;
-st2613:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2613;
-case 2613:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2612;
-		case 4: goto st2612;
-		case 8: goto st2613;
-		case 13: goto tr5629;
-		case 16: goto st2613;
-		case 18: goto st2613;
-		case 31: goto tr5629;
-		case 39: goto st2613;
-		case 47: goto st2612;
-	}
-	goto st0;
-tr5633:
-	{ expr_open_parens--; }
-	goto st2614;
-st2614:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2614;
-case 2614:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5630;
-		case 17: goto tr5632;
-		case 131086: goto tr5633;
-		case 131104: goto tr5633;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 18 )
-				goto tr5631;
-		} else if ( _widec >= 10 )
-			goto tr5631;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5631;
-		} else if ( _widec >= 33 )
-			goto tr5631;
-	} else
-		goto tr5631;
-	goto st0;
-st2615:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2615;
-case 2615:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5634;
-	goto st0;
-case 2616:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 0: goto tr5635;
-		case 7: goto st2642;
-		case 35: goto st2617;
-	}
-	goto st0;
-tr5635:
-	{ error_missing_block(); }
-	goto st2642;
-tr5638:
-	{ ctx->current_sm = SM_DEFVARS_LINE; }
-	goto st2642;
-st2642:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2642;
-case 2642:
-	goto st0;
-st2617:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2617;
-case 2617:
-	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5638;
-	goto st0;
-case 2618:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 0: goto tr5639;
-		case 2: goto tr5640;
-		case 7: goto st2643;
-		case 38: goto st2636;
-	}
-	goto st0;
-tr5639:
-	{ error_missing_close_block(); }
-	goto st2643;
-tr5643:
-	{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
-	goto st2643;
-tr5651:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_B, expr_value );
-    }
-	goto st2643;
-tr5656:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_B, expr_value );
-    }
-	goto st2643;
-tr5662:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_W, expr_value );
-    }
-	goto st2643;
-tr5667:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_W, expr_value );
-    }
-	goto st2643;
-tr5673:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_P, expr_value );
-    }
-	goto st2643;
-tr5678:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_P, expr_value );
-    }
-	goto st2643;
-tr5684:
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_Q, expr_value );
-    }
-	goto st2643;
-tr5689:
-	{ expr_open_parens--; }
-	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
-	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_Q, expr_value );
-    }
-	goto st2643;
-tr5692:
-	{ ctx->current_sm = SM_MAIN; }
-	goto st2643;
-st2643:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2643;
-case 2643:
-	goto st0;
+	goto st2591;
 tr5640:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	goto st2619;
-st2619:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2619;
-case 2619:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 7: goto tr5643;
-		case 119: goto st2620;
-		case 120: goto st2624;
-		case 121: goto st2628;
-		case 122: goto st2632;
-	}
-	goto st0;
-st2620:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2620;
-case 2620:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5648;
-		case 4: goto tr5648;
-		case 13: goto tr5650;
-		case 16: goto tr5649;
-		case 18: goto tr5649;
-		case 31: goto tr5650;
-		case 39: goto tr5649;
-		case 47: goto tr5648;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5649;
-	goto st0;
-tr5648:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2621;
-st2621:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2621;
-case 2621:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5651;
-		case 18: goto st2622;
-		case 131086: goto st2623;
-		case 131104: goto st2623;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2622;
-		} else if ( _widec >= 10 )
-			goto st2622;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2622;
-		} else if ( _widec >= 33 )
-			goto st2622;
-	} else
-		goto st2622;
-	goto st0;
-tr5649:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2622;
-tr5650:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
 	{ expr_open_parens++; }
-	goto st2622;
-tr5655:
-	{ expr_open_parens++; }
-	goto st2622;
-tr5657:
-	{ expr_open_parens--; }
-	goto st2622;
-st2622:
+	goto st2591;
+st2591:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2622;
-case 2622:
+		goto _test_eof2591;
+case 2591:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2621;
-		case 4: goto st2621;
-		case 8: goto st2622;
-		case 13: goto tr5655;
-		case 16: goto st2622;
-		case 18: goto st2622;
-		case 31: goto tr5655;
-		case 39: goto st2622;
-		case 47: goto st2621;
+		case 2: goto st2584;
+		case 4: goto st2584;
+		case 8: goto st2591;
+		case 13: goto tr5640;
+		case 16: goto st2591;
+		case 18: goto st2591;
+		case 31: goto tr5640;
+		case 39: goto st2591;
+		case 47: goto st2584;
 	}
 	goto st0;
-tr5658:
-	{ expr_open_parens--; }
-	goto st2623;
-st2623:
+st2592:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2623;
-case 2623:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
+		goto _test_eof2592;
+case 2592:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5641;
+	goto st0;
+st2593:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2593;
+case 2593:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5642;
+	goto st0;
+st2594:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2594;
+case 2594:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5643;
+	goto st0;
+st2595:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2595;
+case 2595:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5644;
+	goto st0;
+st2596:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2596;
+case 2596:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5645;
+	goto st0;
+st2597:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2597;
+case 2597:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5646;
+	goto st0;
+st2598:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2598;
+case 2598:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5647;
+	goto st0;
+st2599:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2599;
+case 2599:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5648;
+	goto st0;
+st2600:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2600;
+case 2600:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 76: goto st2601;
+		case 77: goto st2602;
+		case 78: goto st2603;
+		case 91: goto st2604;
 	}
-	switch( _widec ) {
-		case 7: goto tr5656;
-		case 18: goto tr5657;
-		case 131086: goto tr5658;
-		case 131104: goto tr5658;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5657;
-		} else if ( _widec >= 10 )
-			goto tr5657;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5657;
-		} else if ( _widec >= 33 )
-			goto tr5657;
-	} else
+	goto st0;
+st2601:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2601;
+case 2601:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5653;
+	goto st0;
+st2602:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2602;
+case 2602:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5654;
+	goto st0;
+st2603:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2603;
+case 2603:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5655;
+	goto st0;
+st2604:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2604;
+case 2604:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5656;
+	goto st0;
+st2605:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2605;
+case 2605:
+	if ( ( ((int)ctx->p->tok)) == 7 )
 		goto tr5657;
 	goto st0;
-st2624:
+st2606:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2624;
-case 2624:
+		goto _test_eof2606;
+case 2606:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5658;
+	goto st0;
+st2607:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2607;
+case 2607:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5659;
+	goto st0;
+st2608:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2608;
+case 2608:
 	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5659;
-		case 4: goto tr5659;
-		case 13: goto tr5661;
-		case 16: goto tr5660;
-		case 18: goto tr5660;
-		case 31: goto tr5661;
-		case 39: goto tr5660;
-		case 47: goto tr5659;
+		case 2: goto tr5660;
+		case 4: goto tr5660;
+		case 13: goto tr5662;
+		case 16: goto tr5661;
+		case 18: goto tr5661;
+		case 31: goto tr5662;
+		case 39: goto tr5661;
+		case 47: goto tr5660;
 	}
 	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5660;
-	goto st0;
-tr5659:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2625;
-st2625:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2625;
-case 2625:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5662;
-		case 18: goto st2626;
-		case 131086: goto st2627;
-		case 131104: goto st2627;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2626;
-		} else if ( _widec >= 10 )
-			goto st2626;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2626;
-		} else if ( _widec >= 33 )
-			goto st2626;
-	} else
-		goto st2626;
+		goto tr5661;
 	goto st0;
 tr5660:
 	{
@@ -63792,7 +64857,46 @@ tr5660:
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
-	goto st2626;
+	goto st2609;
+st2609:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2609;
+case 2609:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5663;
+		case 18: goto st2610;
+		case 131086: goto st2611;
+		case 131104: goto st2611;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2610;
+		} else if ( _widec >= 10 )
+			goto st2610;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2610;
+		} else if ( _widec >= 33 )
+			goto st2610;
+	} else
+		goto st2610;
+	goto st0;
 tr5661:
 	{
   ctx->expr_start = ctx->p;
@@ -63800,37 +64904,45 @@ tr5661:
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
   expr_open_parens = 0;
  }
+	goto st2610;
+tr5662:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
 	{ expr_open_parens++; }
-	goto st2626;
-tr5666:
+	goto st2610;
+tr5667:
 	{ expr_open_parens++; }
-	goto st2626;
-tr5668:
-	{ expr_open_parens--; }
-	goto st2626;
-st2626:
-	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2626;
-case 2626:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2625;
-		case 4: goto st2625;
-		case 8: goto st2626;
-		case 13: goto tr5666;
-		case 16: goto st2626;
-		case 18: goto st2626;
-		case 31: goto tr5666;
-		case 39: goto st2626;
-		case 47: goto st2625;
-	}
-	goto st0;
+	goto st2610;
 tr5669:
 	{ expr_open_parens--; }
-	goto st2627;
-st2627:
+	goto st2610;
+st2610:
 	if ( ++( ctx->p) == ( ctx->pe) )
-		goto _test_eof2627;
-case 2627:
+		goto _test_eof2610;
+case 2610:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2609;
+		case 4: goto st2609;
+		case 8: goto st2610;
+		case 13: goto tr5667;
+		case 16: goto st2610;
+		case 18: goto st2610;
+		case 31: goto tr5667;
+		case 39: goto st2610;
+		case 47: goto st2609;
+	}
+	goto st0;
+tr5670:
+	{ expr_open_parens--; }
+	goto st2611;
+st2611:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2611;
+case 2611:
 	_widec = ( ((int)ctx->p->tok));
 	if ( ( ((int)ctx->p->tok)) > 14 ) {
 		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
@@ -63846,325 +64958,3707 @@ case 2627:
   ) _widec += 65536;
 	}
 	switch( _widec ) {
-		case 7: goto tr5667;
-		case 18: goto tr5668;
-		case 131086: goto tr5669;
-		case 131104: goto tr5669;
+		case 7: goto tr5668;
+		case 18: goto tr5669;
+		case 131086: goto tr5670;
+		case 131104: goto tr5670;
 	}
 	if ( _widec < 20 ) {
 		if ( _widec > 12 ) {
 			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5668;
+				goto tr5669;
 		} else if ( _widec >= 10 )
-			goto tr5668;
+			goto tr5669;
 	} else if ( _widec > 30 ) {
 		if ( _widec > 34 ) {
 			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5668;
+				goto tr5669;
 		} else if ( _widec >= 33 )
-			goto tr5668;
+			goto tr5669;
 	} else
-		goto tr5668;
+		goto tr5669;
+	goto st0;
+st2612:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2612;
+case 2612:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5671;
+	goto st0;
+st2613:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2613;
+case 2613:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5672;
+	goto st0;
+st2614:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2614;
+case 2614:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5673;
+	goto st0;
+st2615:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2615;
+case 2615:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5674;
+		case 4: goto tr5674;
+		case 13: goto tr5676;
+		case 16: goto tr5675;
+		case 18: goto tr5675;
+		case 31: goto tr5676;
+		case 39: goto tr5675;
+		case 43: goto st2623;
+		case 45: goto st2627;
+		case 46: goto st2631;
+		case 47: goto tr5674;
+		case 76: goto st2635;
+		case 77: goto st2646;
+		case 78: goto st2651;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5675;
+	goto st0;
+tr5674:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2616;
+st2616:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2616;
+case 2616:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 17: goto tr5684;
+		case 131086: goto st2622;
+		case 131104: goto st2622;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 18 )
+				goto st2617;
+		} else if ( _widec >= 10 )
+			goto st2617;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2617;
+		} else if ( _widec >= 33 )
+			goto st2617;
+	} else
+		goto st2617;
+	goto st0;
+tr5675:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2617;
+tr5676:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2617;
+tr5687:
+	{ expr_open_parens++; }
+	goto st2617;
+tr5694:
+	{ expr_open_parens--; }
+	goto st2617;
+st2617:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2617;
+case 2617:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2616;
+		case 4: goto st2616;
+		case 8: goto st2617;
+		case 13: goto tr5687;
+		case 16: goto st2617;
+		case 18: goto st2617;
+		case 31: goto tr5687;
+		case 39: goto st2617;
+		case 47: goto st2616;
+	}
+	goto st0;
+tr5684:
+	{ push_expr(ctx); }
+	goto st2618;
+tr5695:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	goto st2618;
+st2618:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2618;
+case 2618:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 76: goto st2619;
+		case 77: goto st2620;
+		case 78: goto st2621;
+	}
+	goto st0;
+st2619:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2619;
+case 2619:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5691;
+	goto st0;
+st2620:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2620;
+case 2620:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5692;
+	goto st0;
+st2621:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2621;
+case 2621:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5693;
+	goto st0;
+tr5696:
+	{ expr_open_parens--; }
+	goto st2622;
+st2622:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2622;
+case 2622:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 17: goto tr5695;
+		case 131086: goto tr5696;
+		case 131104: goto tr5696;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 18 )
+				goto tr5694;
+		} else if ( _widec >= 10 )
+			goto tr5694;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5694;
+		} else if ( _widec >= 33 )
+			goto tr5694;
+	} else
+		goto tr5694;
+	goto st0;
+st2623:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2623;
+case 2623:
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2624;
+	goto st0;
+st2624:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2624;
+case 2624:
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2625;
+	goto st0;
+st2625:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2625;
+case 2625:
+	if ( ( ((int)ctx->p->tok)) == 76 )
+		goto st2626;
+	goto st0;
+st2626:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2626;
+case 2626:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5700;
+	goto st0;
+st2627:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2627;
+case 2627:
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2628;
 	goto st0;
 st2628:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2628;
 case 2628:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5670;
-		case 4: goto tr5670;
-		case 13: goto tr5672;
-		case 16: goto tr5671;
-		case 18: goto tr5671;
-		case 31: goto tr5672;
-		case 39: goto tr5671;
-		case 47: goto tr5670;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5671;
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2629;
 	goto st0;
-tr5670:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2629;
 st2629:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2629;
 case 2629:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5673;
-		case 18: goto st2630;
-		case 131086: goto st2631;
-		case 131104: goto st2631;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2630;
-		} else if ( _widec >= 10 )
-			goto st2630;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2630;
-		} else if ( _widec >= 33 )
-			goto st2630;
-	} else
+	if ( ( ((int)ctx->p->tok)) == 76 )
 		goto st2630;
 	goto st0;
-tr5671:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2630;
-tr5672:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2630;
-tr5677:
-	{ expr_open_parens++; }
-	goto st2630;
-tr5679:
-	{ expr_open_parens--; }
-	goto st2630;
 st2630:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2630;
 case 2630:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2629;
-		case 4: goto st2629;
-		case 8: goto st2630;
-		case 13: goto tr5677;
-		case 16: goto st2630;
-		case 18: goto st2630;
-		case 31: goto tr5677;
-		case 39: goto st2630;
-		case 47: goto st2629;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5704;
 	goto st0;
-tr5680:
-	{ expr_open_parens--; }
-	goto st2631;
 st2631:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2631;
 case 2631:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5678;
-		case 18: goto tr5679;
-		case 131086: goto tr5680;
-		case 131104: goto tr5680;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5679;
-		} else if ( _widec >= 10 )
-			goto tr5679;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5679;
-		} else if ( _widec >= 33 )
-			goto tr5679;
-	} else
-		goto tr5679;
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2632;
 	goto st0;
 st2632:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2632;
 case 2632:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto tr5681;
-		case 4: goto tr5681;
-		case 13: goto tr5683;
-		case 16: goto tr5682;
-		case 18: goto tr5682;
-		case 31: goto tr5683;
-		case 39: goto tr5682;
-		case 47: goto tr5681;
-	}
-	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
-		goto tr5682;
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2633;
 	goto st0;
-tr5681:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2633;
 st2633:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2633;
 case 2633:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5684;
-		case 18: goto st2634;
-		case 131086: goto st2635;
-		case 131104: goto st2635;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto st2634;
-		} else if ( _widec >= 10 )
-			goto st2634;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto st2634;
-		} else if ( _widec >= 33 )
-			goto st2634;
-	} else
+	if ( ( ((int)ctx->p->tok)) == 76 )
 		goto st2634;
 	goto st0;
-tr5682:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	goto st2634;
-tr5683:
-	{
-  ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  expr_open_parens = 0;
- }
-	{ expr_open_parens++; }
-	goto st2634;
-tr5688:
-	{ expr_open_parens++; }
-	goto st2634;
-tr5690:
-	{ expr_open_parens--; }
-	goto st2634;
 st2634:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2634;
 case 2634:
-	switch( ( ((int)ctx->p->tok)) ) {
-		case 2: goto st2633;
-		case 4: goto st2633;
-		case 8: goto st2634;
-		case 13: goto tr5688;
-		case 16: goto st2634;
-		case 18: goto st2634;
-		case 31: goto tr5688;
-		case 39: goto st2634;
-		case 47: goto st2633;
-	}
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5708;
 	goto st0;
-tr5691:
-	{ expr_open_parens--; }
-	goto st2635;
 st2635:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2635;
 case 2635:
-	_widec = ( ((int)ctx->p->tok));
-	if ( ( ((int)ctx->p->tok)) > 14 ) {
-		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
-			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-			if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-		}
-	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
-		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
-		if ( 
-  expr_open_parens > 0
-  ) _widec += 65536;
-	}
-	switch( _widec ) {
-		case 7: goto tr5689;
-		case 18: goto tr5690;
-		case 131086: goto tr5691;
-		case 131104: goto tr5691;
-	}
-	if ( _widec < 20 ) {
-		if ( _widec > 12 ) {
-			if ( 15 <= _widec && _widec <= 16 )
-				goto tr5690;
-		} else if ( _widec >= 10 )
-			goto tr5690;
-	} else if ( _widec > 30 ) {
-		if ( _widec > 34 ) {
-			if ( 36 <= _widec && _widec <= 37 )
-				goto tr5690;
-		} else if ( _widec >= 33 )
-			goto tr5690;
-	} else
-		goto tr5690;
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2636;
 	goto st0;
 st2636:
 	if ( ++( ctx->p) == ( ctx->pe) )
 		goto _test_eof2636;
 case 2636:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5710;
+		case 4: goto tr5710;
+		case 13: goto tr5712;
+		case 16: goto tr5711;
+		case 18: goto tr5711;
+		case 31: goto tr5712;
+		case 39: goto tr5711;
+		case 43: goto st2640;
+		case 45: goto st2642;
+		case 46: goto st2644;
+		case 47: goto tr5710;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5711;
+	goto st0;
+tr5710:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2637;
+st2637:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2637;
+case 2637:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5716;
+		case 18: goto st2638;
+		case 131086: goto st2639;
+		case 131104: goto st2639;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2638;
+		} else if ( _widec >= 10 )
+			goto st2638;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2638;
+		} else if ( _widec >= 33 )
+			goto st2638;
+	} else
+		goto st2638;
+	goto st0;
+tr5711:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2638;
+tr5712:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2638;
+tr5720:
+	{ expr_open_parens++; }
+	goto st2638;
+tr5722:
+	{ expr_open_parens--; }
+	goto st2638;
+st2638:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2638;
+case 2638:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2637;
+		case 4: goto st2637;
+		case 8: goto st2638;
+		case 13: goto tr5720;
+		case 16: goto st2638;
+		case 18: goto st2638;
+		case 31: goto tr5720;
+		case 39: goto st2638;
+		case 47: goto st2637;
+	}
+	goto st0;
+tr5723:
+	{ expr_open_parens--; }
+	goto st2639;
+st2639:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2639;
+case 2639:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5721;
+		case 18: goto tr5722;
+		case 131086: goto tr5723;
+		case 131104: goto tr5723;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5722;
+		} else if ( _widec >= 10 )
+			goto tr5722;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5722;
+		} else if ( _widec >= 33 )
+			goto tr5722;
+	} else
+		goto tr5722;
+	goto st0;
+st2640:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2640;
+case 2640:
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2641;
+	goto st0;
+st2641:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2641;
+case 2641:
 	if ( ( ((int)ctx->p->tok)) == 7 )
-		goto tr5692;
+		goto tr5725;
+	goto st0;
+st2642:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2642;
+case 2642:
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2643;
+	goto st0;
+st2643:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2643;
+case 2643:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5727;
+	goto st0;
+st2644:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2644;
+case 2644:
+	if ( ( ((int)ctx->p->tok)) == 14 )
+		goto st2645;
+	goto st0;
+st2645:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2645;
+case 2645:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5729;
+	goto st0;
+st2646:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2646;
+case 2646:
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2647;
+	goto st0;
+st2647:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2647;
+case 2647:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5731;
+		case 4: goto tr5731;
+		case 13: goto tr5733;
+		case 16: goto tr5732;
+		case 18: goto tr5732;
+		case 31: goto tr5733;
+		case 39: goto tr5732;
+		case 47: goto tr5731;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5732;
+	goto st0;
+tr5731:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2648;
+st2648:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2648;
+case 2648:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5734;
+		case 18: goto st2649;
+		case 131086: goto st2650;
+		case 131104: goto st2650;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2649;
+		} else if ( _widec >= 10 )
+			goto st2649;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2649;
+		} else if ( _widec >= 33 )
+			goto st2649;
+	} else
+		goto st2649;
+	goto st0;
+tr5732:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2649;
+tr5733:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2649;
+tr5738:
+	{ expr_open_parens++; }
+	goto st2649;
+tr5740:
+	{ expr_open_parens--; }
+	goto st2649;
+st2649:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2649;
+case 2649:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2648;
+		case 4: goto st2648;
+		case 8: goto st2649;
+		case 13: goto tr5738;
+		case 16: goto st2649;
+		case 18: goto st2649;
+		case 31: goto tr5738;
+		case 39: goto st2649;
+		case 47: goto st2648;
+	}
+	goto st0;
+tr5741:
+	{ expr_open_parens--; }
+	goto st2650;
+st2650:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2650;
+case 2650:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5739;
+		case 18: goto tr5740;
+		case 131086: goto tr5741;
+		case 131104: goto tr5741;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5740;
+		} else if ( _widec >= 10 )
+			goto tr5740;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5740;
+		} else if ( _widec >= 33 )
+			goto tr5740;
+	} else
+		goto tr5740;
+	goto st0;
+st2651:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2651;
+case 2651:
+	if ( ( ((int)ctx->p->tok)) == 17 )
+		goto st2652;
+	goto st0;
+st2652:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2652;
+case 2652:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5743;
+		case 4: goto tr5743;
+		case 13: goto tr5745;
+		case 16: goto tr5744;
+		case 18: goto tr5744;
+		case 31: goto tr5745;
+		case 39: goto tr5744;
+		case 47: goto tr5743;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5744;
+	goto st0;
+tr5743:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2653;
+st2653:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2653;
+case 2653:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5746;
+		case 18: goto st2654;
+		case 131086: goto st2655;
+		case 131104: goto st2655;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2654;
+		} else if ( _widec >= 10 )
+			goto st2654;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2654;
+		} else if ( _widec >= 33 )
+			goto st2654;
+	} else
+		goto st2654;
+	goto st0;
+tr5744:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2654;
+tr5745:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2654;
+tr5750:
+	{ expr_open_parens++; }
+	goto st2654;
+tr5752:
+	{ expr_open_parens--; }
+	goto st2654;
+st2654:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2654;
+case 2654:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2653;
+		case 4: goto st2653;
+		case 8: goto st2654;
+		case 13: goto tr5750;
+		case 16: goto st2654;
+		case 18: goto st2654;
+		case 31: goto tr5750;
+		case 39: goto st2654;
+		case 47: goto st2653;
+	}
+	goto st0;
+tr5753:
+	{ expr_open_parens--; }
+	goto st2655;
+st2655:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2655;
+case 2655:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5751;
+		case 18: goto tr5752;
+		case 131086: goto tr5753;
+		case 131104: goto tr5753;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5752;
+		} else if ( _widec >= 10 )
+			goto tr5752;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5752;
+		} else if ( _widec >= 33 )
+			goto tr5752;
+	} else
+		goto tr5752;
+	goto st0;
+st2656:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2656;
+case 2656:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5754;
+	goto st0;
+st2657:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2657;
+case 2657:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5755;
+	goto st0;
+st2658:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2658;
+case 2658:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5756;
+	goto st0;
+st2659:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2659;
+case 2659:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5757;
+	goto st0;
+st2660:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2660;
+case 2660:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5758;
+	goto st0;
+st2661:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2661;
+case 2661:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5759;
+	goto st0;
+st2662:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2662;
+case 2662:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5760;
+	goto st0;
+st2663:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2663;
+case 2663:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5761;
+	goto st0;
+st2664:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2664;
+case 2664:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5762;
+	goto st0;
+st2665:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2665;
+case 2665:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5763;
+	goto st0;
+st2666:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2666;
+case 2666:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5764;
+	goto st0;
+st2667:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2667;
+case 2667:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5765;
+		case 4: goto tr5765;
+		case 13: goto tr5767;
+		case 16: goto tr5766;
+		case 18: goto tr5766;
+		case 31: goto tr5767;
+		case 39: goto tr5766;
+		case 47: goto tr5765;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5766;
+	goto st0;
+tr5765:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2668;
+st2668:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2668;
+case 2668:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5768;
+		case 18: goto st2669;
+		case 131086: goto st2670;
+		case 131104: goto st2670;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2669;
+		} else if ( _widec >= 10 )
+			goto st2669;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2669;
+		} else if ( _widec >= 33 )
+			goto st2669;
+	} else
+		goto st2669;
+	goto st0;
+tr5766:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2669;
+tr5767:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2669;
+tr5772:
+	{ expr_open_parens++; }
+	goto st2669;
+tr5774:
+	{ expr_open_parens--; }
+	goto st2669;
+st2669:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2669;
+case 2669:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2668;
+		case 4: goto st2668;
+		case 8: goto st2669;
+		case 13: goto tr5772;
+		case 16: goto st2669;
+		case 18: goto st2669;
+		case 31: goto tr5772;
+		case 39: goto st2669;
+		case 47: goto st2668;
+	}
+	goto st0;
+tr5775:
+	{ expr_open_parens--; }
+	goto st2670;
+st2670:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2670;
+case 2670:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5773;
+		case 18: goto tr5774;
+		case 131086: goto tr5775;
+		case 131104: goto tr5775;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5774;
+		} else if ( _widec >= 10 )
+			goto tr5774;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5774;
+		} else if ( _widec >= 33 )
+			goto tr5774;
+	} else
+		goto tr5774;
+	goto st0;
+st2671:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2671;
+case 2671:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5776;
+		case 4: goto tr5776;
+		case 13: goto tr5778;
+		case 16: goto tr5777;
+		case 18: goto tr5777;
+		case 31: goto tr5778;
+		case 39: goto tr5777;
+		case 47: goto tr5776;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5777;
+	goto st0;
+tr5776:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2672;
+st2672:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2672;
+case 2672:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5779;
+		case 18: goto st2673;
+		case 131086: goto st2674;
+		case 131104: goto st2674;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2673;
+		} else if ( _widec >= 10 )
+			goto st2673;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2673;
+		} else if ( _widec >= 33 )
+			goto st2673;
+	} else
+		goto st2673;
+	goto st0;
+tr5777:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2673;
+tr5778:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2673;
+tr5783:
+	{ expr_open_parens++; }
+	goto st2673;
+tr5785:
+	{ expr_open_parens--; }
+	goto st2673;
+st2673:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2673;
+case 2673:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2672;
+		case 4: goto st2672;
+		case 8: goto st2673;
+		case 13: goto tr5783;
+		case 16: goto st2673;
+		case 18: goto st2673;
+		case 31: goto tr5783;
+		case 39: goto st2673;
+		case 47: goto st2672;
+	}
+	goto st0;
+tr5786:
+	{ expr_open_parens--; }
+	goto st2674;
+st2674:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2674;
+case 2674:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5784;
+		case 18: goto tr5785;
+		case 131086: goto tr5786;
+		case 131104: goto tr5786;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5785;
+		} else if ( _widec >= 10 )
+			goto tr5785;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5785;
+		} else if ( _widec >= 33 )
+			goto tr5785;
+	} else
+		goto tr5785;
+	goto st0;
+st2675:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2675;
+case 2675:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5787;
+		case 4: goto tr5787;
+		case 13: goto tr5789;
+		case 16: goto tr5788;
+		case 18: goto tr5788;
+		case 31: goto tr5789;
+		case 39: goto tr5788;
+		case 47: goto tr5787;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5788;
+	goto st0;
+tr5787:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2676;
+st2676:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2676;
+case 2676:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5790;
+		case 18: goto st2677;
+		case 131086: goto st2678;
+		case 131104: goto st2678;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2677;
+		} else if ( _widec >= 10 )
+			goto st2677;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2677;
+		} else if ( _widec >= 33 )
+			goto st2677;
+	} else
+		goto st2677;
+	goto st0;
+tr5788:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2677;
+tr5789:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2677;
+tr5794:
+	{ expr_open_parens++; }
+	goto st2677;
+tr5796:
+	{ expr_open_parens--; }
+	goto st2677;
+st2677:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2677;
+case 2677:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2676;
+		case 4: goto st2676;
+		case 8: goto st2677;
+		case 13: goto tr5794;
+		case 16: goto st2677;
+		case 18: goto st2677;
+		case 31: goto tr5794;
+		case 39: goto st2677;
+		case 47: goto st2676;
+	}
+	goto st0;
+tr5797:
+	{ expr_open_parens--; }
+	goto st2678;
+st2678:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2678;
+case 2678:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5795;
+		case 18: goto tr5796;
+		case 131086: goto tr5797;
+		case 131104: goto tr5797;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5796;
+		} else if ( _widec >= 10 )
+			goto tr5796;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5796;
+		} else if ( _widec >= 33 )
+			goto tr5796;
+	} else
+		goto tr5796;
+	goto st0;
+st2679:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2679;
+case 2679:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5798;
+		case 4: goto tr5798;
+		case 13: goto tr5800;
+		case 16: goto tr5799;
+		case 18: goto tr5799;
+		case 31: goto tr5800;
+		case 39: goto tr5799;
+		case 47: goto tr5798;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5799;
+	goto st0;
+tr5798:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2680;
+st2680:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2680;
+case 2680:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5801;
+		case 18: goto st2681;
+		case 131086: goto st2682;
+		case 131104: goto st2682;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2681;
+		} else if ( _widec >= 10 )
+			goto st2681;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2681;
+		} else if ( _widec >= 33 )
+			goto st2681;
+	} else
+		goto st2681;
+	goto st0;
+tr5799:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2681;
+tr5800:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2681;
+tr5805:
+	{ expr_open_parens++; }
+	goto st2681;
+tr5807:
+	{ expr_open_parens--; }
+	goto st2681;
+st2681:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2681;
+case 2681:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2680;
+		case 4: goto st2680;
+		case 8: goto st2681;
+		case 13: goto tr5805;
+		case 16: goto st2681;
+		case 18: goto st2681;
+		case 31: goto tr5805;
+		case 39: goto st2681;
+		case 47: goto st2680;
+	}
+	goto st0;
+tr5808:
+	{ expr_open_parens--; }
+	goto st2682;
+st2682:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2682;
+case 2682:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5806;
+		case 18: goto tr5807;
+		case 131086: goto tr5808;
+		case 131104: goto tr5808;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5807;
+		} else if ( _widec >= 10 )
+			goto tr5807;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5807;
+		} else if ( _widec >= 33 )
+			goto tr5807;
+	} else
+		goto tr5807;
+	goto st0;
+st2683:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2683;
+case 2683:
+	if ( ( ((int)ctx->p->tok)) == 5 )
+		goto tr5809;
+	goto st0;
+tr5809:
+	{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2684;
+st2684:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2684;
+case 2684:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5810;
+	goto st0;
+st2685:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2685;
+case 2685:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5811;
+	goto st0;
+tr5811:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2686;
+st2686:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2686;
+case 2686:
+	if ( ( ((int)ctx->p->tok)) == 26 )
+		goto st2687;
+	goto st0;
+st2687:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2687;
+case 2687:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5813;
+		case 4: goto tr5813;
+		case 13: goto tr5815;
+		case 16: goto tr5814;
+		case 18: goto tr5814;
+		case 31: goto tr5815;
+		case 39: goto tr5814;
+		case 47: goto tr5813;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5814;
+	goto st0;
+tr5813:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2688;
+st2688:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2688;
+case 2688:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5816;
+		case 17: goto tr5816;
+		case 131086: goto st2690;
+		case 131104: goto st2690;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 18 )
+				goto st2689;
+		} else if ( _widec >= 10 )
+			goto st2689;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2689;
+		} else if ( _widec >= 33 )
+			goto st2689;
+	} else
+		goto st2689;
+	goto st0;
+tr5814:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2689;
+tr5815:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2689;
+tr5820:
+	{ expr_open_parens++; }
+	goto st2689;
+tr5822:
+	{ expr_open_parens--; }
+	goto st2689;
+st2689:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2689;
+case 2689:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2688;
+		case 4: goto st2688;
+		case 8: goto st2689;
+		case 13: goto tr5820;
+		case 16: goto st2689;
+		case 18: goto st2689;
+		case 31: goto tr5820;
+		case 39: goto st2689;
+		case 47: goto st2688;
+	}
+	goto st0;
+tr5823:
+	{ expr_open_parens--; }
+	goto st2690;
+st2690:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2690;
+case 2690:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5821;
+		case 17: goto tr5821;
+		case 131086: goto tr5823;
+		case 131104: goto tr5823;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 18 )
+				goto tr5822;
+		} else if ( _widec >= 10 )
+			goto tr5822;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5822;
+		} else if ( _widec >= 33 )
+			goto tr5822;
+	} else
+		goto tr5822;
+	goto st0;
+st2691:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2691;
+case 2691:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto tr5824;
+		case 35: goto st2692;
+	}
+	goto st0;
+st2692:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2692;
+case 2692:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5826;
+	goto st0;
+st2693:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2693;
+case 2693:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5827;
+	goto st0;
+tr5827:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	{ asm_DEFINE(str_data(name)); }
+	goto st2694;
+st2694:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2694;
+case 2694:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto st2777;
+		case 17: goto st2693;
+	}
+	goto st0;
+st2695:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2695;
+case 2695:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5828;
+		case 4: goto tr5828;
+		case 13: goto tr5830;
+		case 16: goto tr5829;
+		case 18: goto tr5829;
+		case 31: goto tr5830;
+		case 39: goto tr5829;
+		case 47: goto tr5828;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5829;
+	goto st0;
+tr5828:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2696;
+st2696:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2696;
+case 2696:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5831;
+		case 18: goto st2697;
+		case 35: goto tr5833;
+		case 131086: goto st2699;
+		case 131104: goto st2699;
+	}
+	if ( _widec < 15 ) {
+		if ( 10 <= _widec && _widec <= 12 )
+			goto st2697;
+	} else if ( _widec > 16 ) {
+		if ( _widec > 30 ) {
+			if ( 33 <= _widec && _widec <= 37 )
+				goto st2697;
+		} else if ( _widec >= 20 )
+			goto st2697;
+	} else
+		goto st2697;
+	goto st0;
+tr5829:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2697;
+tr5830:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2697;
+tr5836:
+	{ expr_open_parens++; }
+	goto st2697;
+tr5839:
+	{ expr_open_parens--; }
+	goto st2697;
+st2697:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2697;
+case 2697:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2696;
+		case 4: goto st2696;
+		case 8: goto st2697;
+		case 13: goto tr5836;
+		case 16: goto st2697;
+		case 18: goto st2697;
+		case 31: goto tr5836;
+		case 39: goto st2697;
+		case 47: goto st2696;
+	}
+	goto st0;
+tr5833:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	goto st2698;
+tr5840:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	goto st2698;
+st2698:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2698;
+case 2698:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5837;
+	goto st0;
+tr5841:
+	{ expr_open_parens--; }
+	goto st2699;
+st2699:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2699;
+case 2699:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5838;
+		case 18: goto tr5839;
+		case 35: goto tr5840;
+		case 131086: goto tr5841;
+		case 131104: goto tr5841;
+	}
+	if ( _widec < 15 ) {
+		if ( 10 <= _widec && _widec <= 12 )
+			goto tr5839;
+	} else if ( _widec > 16 ) {
+		if ( _widec > 30 ) {
+			if ( 33 <= _widec && _widec <= 37 )
+				goto tr5839;
+		} else if ( _widec >= 20 )
+			goto tr5839;
+	} else
+		goto tr5839;
+	goto st0;
+st2700:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2700;
+case 2700:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5842;
+	goto st0;
+st2701:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2701;
+case 2701:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5843;
+	goto st0;
+st2702:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2702;
+case 2702:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5844;
+	goto st0;
+tr5844:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	{ asm_EXTERN(str_data(name)); }
+	goto st2703;
+st2703:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2703;
+case 2703:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto st2777;
+		case 17: goto st2702;
+	}
+	goto st0;
+st2704:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2704;
+case 2704:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5845;
+	goto st0;
+tr5845:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	{ asm_GLOBAL(str_data(name)); }
+	goto st2705;
+st2705:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2705;
+case 2705:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto st2777;
+		case 17: goto st2704;
+	}
+	goto st0;
+st2706:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2706;
+case 2706:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5846;
+		case 4: goto tr5846;
+		case 13: goto tr5848;
+		case 16: goto tr5847;
+		case 18: goto tr5847;
+		case 31: goto tr5848;
+		case 39: goto tr5847;
+		case 47: goto tr5846;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5847;
+	goto st0;
+tr5846:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2707;
+st2707:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2707;
+case 2707:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5849;
+		case 18: goto st2708;
+		case 131086: goto st2709;
+		case 131104: goto st2709;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2708;
+		} else if ( _widec >= 10 )
+			goto st2708;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2708;
+		} else if ( _widec >= 33 )
+			goto st2708;
+	} else
+		goto st2708;
+	goto st0;
+tr5847:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2708;
+tr5848:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2708;
+tr5853:
+	{ expr_open_parens++; }
+	goto st2708;
+tr5855:
+	{ expr_open_parens--; }
+	goto st2708;
+st2708:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2708;
+case 2708:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2707;
+		case 4: goto st2707;
+		case 8: goto st2708;
+		case 13: goto tr5853;
+		case 16: goto st2708;
+		case 18: goto st2708;
+		case 31: goto tr5853;
+		case 39: goto st2708;
+		case 47: goto st2707;
+	}
+	goto st0;
+tr5856:
+	{ expr_open_parens--; }
+	goto st2709;
+st2709:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2709;
+case 2709:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5854;
+		case 18: goto tr5855;
+		case 131086: goto tr5856;
+		case 131104: goto tr5856;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5855;
+		} else if ( _widec >= 10 )
+			goto tr5855;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5855;
+		} else if ( _widec >= 33 )
+			goto tr5855;
+	} else
+		goto tr5855;
+	goto st0;
+st2710:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2710;
+case 2710:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5857;
+	goto st0;
+tr5857:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2711;
+st2711:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2711;
+case 2711:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5858;
+	goto st0;
+st2712:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2712;
+case 2712:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5859;
+	goto st0;
+tr5859:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2713;
+st2713:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2713;
+case 2713:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5860;
+	goto st0;
+st2714:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2714;
+case 2714:
+	if ( ( ((int)ctx->p->tok)) == 5 )
+		goto tr5861;
+	goto st0;
+tr5861:
+	{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2715;
+st2715:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2715;
+case 2715:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5862;
+	goto st0;
+st2716:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2716;
+case 2716:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5863;
+		case 4: goto tr5863;
+		case 13: goto tr5865;
+		case 16: goto tr5864;
+		case 18: goto tr5864;
+		case 31: goto tr5865;
+		case 39: goto tr5864;
+		case 47: goto tr5863;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5864;
+	goto st0;
+tr5863:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2717;
+st2717:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2717;
+case 2717:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5866;
+		case 18: goto st2718;
+		case 131086: goto st2719;
+		case 131104: goto st2719;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2718;
+		} else if ( _widec >= 10 )
+			goto st2718;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2718;
+		} else if ( _widec >= 33 )
+			goto st2718;
+	} else
+		goto st2718;
+	goto st0;
+tr5864:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2718;
+tr5865:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2718;
+tr5870:
+	{ expr_open_parens++; }
+	goto st2718;
+tr5872:
+	{ expr_open_parens--; }
+	goto st2718;
+st2718:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2718;
+case 2718:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2717;
+		case 4: goto st2717;
+		case 8: goto st2718;
+		case 13: goto tr5870;
+		case 16: goto st2718;
+		case 18: goto st2718;
+		case 31: goto tr5870;
+		case 39: goto st2718;
+		case 47: goto st2717;
+	}
+	goto st0;
+tr5873:
+	{ expr_open_parens--; }
+	goto st2719;
+st2719:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2719;
+case 2719:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5871;
+		case 18: goto tr5872;
+		case 131086: goto tr5873;
+		case 131104: goto tr5873;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5872;
+		} else if ( _widec >= 10 )
+			goto tr5872;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5872;
+		} else if ( _widec >= 33 )
+			goto tr5872;
+	} else
+		goto tr5872;
+	goto st0;
+st2720:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2720;
+case 2720:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5874;
+	goto st0;
+st2721:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2721;
+case 2721:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5875;
+	goto st0;
+st2722:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2722;
+case 2722:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5876;
+	goto st0;
+tr5876:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2723;
+st2723:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2723;
+case 2723:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5877;
+	goto st0;
+st2724:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2724;
+case 2724:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5878;
+		case 4: goto tr5878;
+		case 13: goto tr5880;
+		case 16: goto tr5879;
+		case 18: goto tr5879;
+		case 31: goto tr5880;
+		case 39: goto tr5879;
+		case 47: goto tr5878;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5879;
+	goto st0;
+tr5878:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2725;
+st2725:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2725;
+case 2725:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5881;
+		case 18: goto st2726;
+		case 131086: goto st2727;
+		case 131104: goto st2727;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2726;
+		} else if ( _widec >= 10 )
+			goto st2726;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2726;
+		} else if ( _widec >= 33 )
+			goto st2726;
+	} else
+		goto st2726;
+	goto st0;
+tr5879:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2726;
+tr5880:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2726;
+tr5885:
+	{ expr_open_parens++; }
+	goto st2726;
+tr5887:
+	{ expr_open_parens--; }
+	goto st2726;
+st2726:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2726;
+case 2726:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2725;
+		case 4: goto st2725;
+		case 8: goto st2726;
+		case 13: goto tr5885;
+		case 16: goto st2726;
+		case 18: goto st2726;
+		case 31: goto tr5885;
+		case 39: goto st2726;
+		case 47: goto st2725;
+	}
+	goto st0;
+tr5888:
+	{ expr_open_parens--; }
+	goto st2727;
+st2727:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2727;
+case 2727:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5886;
+		case 18: goto tr5887;
+		case 131086: goto tr5888;
+		case 131104: goto tr5888;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5887;
+		} else if ( _widec >= 10 )
+			goto tr5887;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5887;
+		} else if ( _widec >= 33 )
+			goto tr5887;
+	} else
+		goto tr5887;
+	goto st0;
+st2728:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2728;
+case 2728:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5889;
+	goto st0;
+tr5889:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	{ asm_PUBLIC(str_data(name)); }
+	goto st2729;
+st2729:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2729;
+case 2729:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto st2777;
+		case 17: goto st2728;
+	}
+	goto st0;
+st2730:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2730;
+case 2730:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5890;
+	goto st0;
+tr5890:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2731;
+st2731:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2731;
+case 2731:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5891;
+	goto st0;
+st2732:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2732;
+case 2732:
+	if ( ( ((int)ctx->p->tok)) == 2 )
+		goto tr5892;
+	goto st0;
+tr5892:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	{ asm_UNDEFINE(str_data(name)); }
+	goto st2733;
+st2733:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2733;
+case 2733:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto st2777;
+		case 17: goto st2732;
+	}
+	goto st0;
+case 2734:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 0: goto st2779;
+		case 7: goto st2778;
+		case 103: goto st2736;
+		case 104: goto st2737;
+		case 107: goto st2738;
+		case 108: goto st2742;
+		case 109: goto st2744;
+	}
+	goto st2735;
+st2735:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2735;
+case 2735:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto st2778;
+	goto st2735;
+tr5901:
+	{ asm_ELSE(ctx); }
+	goto st2778;
+tr5902:
+	{ asm_ENDIF(ctx); }
+	goto st2778;
+tr5906:
+	{ push_expr(ctx); }
+	{ asm_IF(ctx, pop_expr(ctx) ); }
+	goto st2778;
+tr5911:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ asm_IF(ctx, pop_expr(ctx) ); }
+	goto st2778;
+tr5915:
+	{ asm_IFDEF(ctx, str_data(name) ); }
+	goto st2778;
+tr5917:
+	{ asm_IFNDEF(ctx, str_data(name) ); }
+	goto st2778;
+st2778:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2778;
+case 2778:
+	goto st0;
+st2779:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2779;
+case 2779:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto st2778;
+	goto st2735;
+st2736:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2736;
+case 2736:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5901;
+	goto st2735;
+st2737:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2737;
+case 2737:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5902;
+	goto st2735;
+st2738:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2738;
+case 2738:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5903;
+		case 4: goto tr5903;
+		case 7: goto st2778;
+		case 13: goto tr5905;
+		case 16: goto tr5904;
+		case 18: goto tr5904;
+		case 31: goto tr5905;
+		case 39: goto tr5904;
+		case 47: goto tr5903;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5904;
+	goto st2735;
+tr5903:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2739;
+st2739:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2739;
+case 2739:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5906;
+		case 13: goto st2735;
+		case 17: goto st2735;
+		case 19: goto st2735;
+		case 31: goto st2735;
+		case 35: goto st2735;
+		case 65550: goto st2735;
+		case 65568: goto st2735;
+		case 131086: goto st2741;
+		case 131104: goto st2741;
+	}
+	if ( _widec < 15 ) {
+		if ( _widec > 9 ) {
+			if ( 10 <= _widec && _widec <= 12 )
+				goto st2740;
+		} else
+			goto st2735;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 37 ) {
+			if ( 38 <= _widec )
+				goto st2735;
+		} else if ( _widec >= 33 )
+			goto st2740;
+	} else
+		goto st2740;
+	goto st0;
+tr5904:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2740;
+tr5905:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2740;
+tr5910:
+	{ expr_open_parens++; }
+	goto st2740;
+tr5912:
+	{ expr_open_parens--; }
+	goto st2740;
+st2740:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2740;
+case 2740:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2739;
+		case 4: goto st2739;
+		case 7: goto st2778;
+		case 8: goto st2740;
+		case 13: goto tr5910;
+		case 16: goto st2740;
+		case 18: goto st2740;
+		case 31: goto tr5910;
+		case 39: goto st2740;
+		case 47: goto st2739;
+	}
+	goto st2735;
+tr5913:
+	{ expr_open_parens--; }
+	goto st2741;
+st2741:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2741;
+case 2741:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5911;
+		case 13: goto st2735;
+		case 17: goto st2735;
+		case 19: goto st2735;
+		case 31: goto st2735;
+		case 35: goto st2735;
+		case 65550: goto st2735;
+		case 65568: goto st2735;
+		case 131086: goto tr5913;
+		case 131104: goto tr5913;
+	}
+	if ( _widec < 15 ) {
+		if ( _widec > 9 ) {
+			if ( 10 <= _widec && _widec <= 12 )
+				goto tr5912;
+		} else
+			goto st2735;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 37 ) {
+			if ( 38 <= _widec )
+				goto st2735;
+		} else if ( _widec >= 33 )
+			goto tr5912;
+	} else
+		goto tr5912;
+	goto st0;
+st2742:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2742;
+case 2742:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5914;
+		case 7: goto st2778;
+	}
+	goto st2735;
+tr5914:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2743;
+st2743:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2743;
+case 2743:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5915;
+	goto st2735;
+st2744:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2744;
+case 2744:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5916;
+		case 7: goto st2778;
+	}
+	goto st2735;
+tr5916:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2745;
+st2745:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2745;
+case 2745:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5917;
+	goto st2735;
+case 2746:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 0: goto tr5918;
+		case 7: goto st2780;
+		case 35: goto st2747;
+	}
+	goto st0;
+tr5918:
+	{ error_missing_block(); }
+	goto st2780;
+tr5921:
+	{ ctx->current_sm = SM_DEFGROUP_LINE; }
+	goto st2780;
+st2780:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2780;
+case 2780:
+	goto st0;
+st2747:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2747;
+case 2747:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5921;
+	goto st0;
+case 2748:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 0: goto tr5922;
+		case 2: goto tr5923;
+		case 7: goto st2781;
+		case 38: goto st2755;
+	}
+	goto st0;
+tr5922:
+	{ error_missing_close_block(); }
+	goto st2781;
+tr5926:
+	{ asm_DEFGROUP_define_const(str_data(name)); }
+	goto st2781;
+tr5932:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
+    asm_DEFGROUP_define_const(str_data(name));
+    }
+	goto st2781;
+tr5938:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
+    asm_DEFGROUP_define_const(str_data(name));
+    }
+	goto st2781;
+tr5942:
+	{ ctx->current_sm = SM_MAIN; }
+	goto st2781;
+st2781:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2781;
+case 2781:
+	goto st0;
+tr5923:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2749;
+st2749:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2749;
+case 2749:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto tr5926;
+		case 17: goto tr5927;
+		case 26: goto st2751;
+	}
+	goto st0;
+tr5927:
+	{ asm_DEFGROUP_define_const(str_data(name)); }
+	goto st2750;
+tr5934:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
+    asm_DEFGROUP_define_const(str_data(name));
+    }
+	goto st2750;
+tr5940:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
+    asm_DEFGROUP_define_const(str_data(name));
+    }
+	goto st2750;
+st2750:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2750;
+case 2750:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5923;
+		case 7: goto st2781;
+	}
+	goto st0;
+st2751:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2751;
+case 2751:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5929;
+		case 4: goto tr5929;
+		case 13: goto tr5931;
+		case 16: goto tr5930;
+		case 18: goto tr5930;
+		case 31: goto tr5931;
+		case 39: goto tr5930;
+		case 47: goto tr5929;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5930;
+	goto st0;
+tr5929:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2752;
+st2752:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2752;
+case 2752:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5932;
+		case 17: goto tr5934;
+		case 131086: goto st2754;
+		case 131104: goto st2754;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 18 )
+				goto st2753;
+		} else if ( _widec >= 10 )
+			goto st2753;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2753;
+		} else if ( _widec >= 33 )
+			goto st2753;
+	} else
+		goto st2753;
+	goto st0;
+tr5930:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2753;
+tr5931:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2753;
+tr5937:
+	{ expr_open_parens++; }
+	goto st2753;
+tr5939:
+	{ expr_open_parens--; }
+	goto st2753;
+st2753:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2753;
+case 2753:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2752;
+		case 4: goto st2752;
+		case 8: goto st2753;
+		case 13: goto tr5937;
+		case 16: goto st2753;
+		case 18: goto st2753;
+		case 31: goto tr5937;
+		case 39: goto st2753;
+		case 47: goto st2752;
+	}
+	goto st0;
+tr5941:
+	{ expr_open_parens--; }
+	goto st2754;
+st2754:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2754;
+case 2754:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5938;
+		case 17: goto tr5940;
+		case 131086: goto tr5941;
+		case 131104: goto tr5941;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 18 )
+				goto tr5939;
+		} else if ( _widec >= 10 )
+			goto tr5939;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5939;
+		} else if ( _widec >= 33 )
+			goto tr5939;
+	} else
+		goto tr5939;
+	goto st0;
+st2755:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2755;
+case 2755:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5942;
+	goto st0;
+case 2756:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 0: goto tr5943;
+		case 7: goto st2782;
+		case 35: goto st2757;
+	}
+	goto st0;
+tr5943:
+	{ error_missing_block(); }
+	goto st2782;
+tr5946:
+	{ ctx->current_sm = SM_DEFVARS_LINE; }
+	goto st2782;
+st2782:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2782;
+case 2782:
+	goto st0;
+st2757:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2757;
+case 2757:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr5946;
+	goto st0;
+case 2758:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 0: goto tr5947;
+		case 2: goto tr5948;
+		case 7: goto st2783;
+		case 38: goto st2776;
+	}
+	goto st0;
+tr5947:
+	{ error_missing_close_block(); }
+	goto st2783;
+tr5951:
+	{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
+	goto st2783;
+tr5959:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_B, expr_value );
+    }
+	goto st2783;
+tr5964:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_B, expr_value );
+    }
+	goto st2783;
+tr5970:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_W, expr_value );
+    }
+	goto st2783;
+tr5975:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_W, expr_value );
+    }
+	goto st2783;
+tr5981:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_P, expr_value );
+    }
+	goto st2783;
+tr5986:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_P, expr_value );
+    }
+	goto st2783;
+tr5992:
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_Q, expr_value );
+    }
+	goto st2783;
+tr5997:
+	{ expr_open_parens--; }
+	{ push_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_Q, expr_value );
+    }
+	goto st2783;
+tr6000:
+	{ ctx->current_sm = SM_MAIN; }
+	goto st2783;
+st2783:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2783;
+case 2783:
+	goto st0;
+tr5948:
+	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	goto st2759;
+st2759:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2759;
+case 2759:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 7: goto tr5951;
+		case 119: goto st2760;
+		case 120: goto st2764;
+		case 121: goto st2768;
+		case 122: goto st2772;
+	}
+	goto st0;
+st2760:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2760;
+case 2760:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5956;
+		case 4: goto tr5956;
+		case 13: goto tr5958;
+		case 16: goto tr5957;
+		case 18: goto tr5957;
+		case 31: goto tr5958;
+		case 39: goto tr5957;
+		case 47: goto tr5956;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5957;
+	goto st0;
+tr5956:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2761;
+st2761:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2761;
+case 2761:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5959;
+		case 18: goto st2762;
+		case 131086: goto st2763;
+		case 131104: goto st2763;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2762;
+		} else if ( _widec >= 10 )
+			goto st2762;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2762;
+		} else if ( _widec >= 33 )
+			goto st2762;
+	} else
+		goto st2762;
+	goto st0;
+tr5957:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2762;
+tr5958:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2762;
+tr5963:
+	{ expr_open_parens++; }
+	goto st2762;
+tr5965:
+	{ expr_open_parens--; }
+	goto st2762;
+st2762:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2762;
+case 2762:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2761;
+		case 4: goto st2761;
+		case 8: goto st2762;
+		case 13: goto tr5963;
+		case 16: goto st2762;
+		case 18: goto st2762;
+		case 31: goto tr5963;
+		case 39: goto st2762;
+		case 47: goto st2761;
+	}
+	goto st0;
+tr5966:
+	{ expr_open_parens--; }
+	goto st2763;
+st2763:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2763;
+case 2763:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5964;
+		case 18: goto tr5965;
+		case 131086: goto tr5966;
+		case 131104: goto tr5966;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5965;
+		} else if ( _widec >= 10 )
+			goto tr5965;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5965;
+		} else if ( _widec >= 33 )
+			goto tr5965;
+	} else
+		goto tr5965;
+	goto st0;
+st2764:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2764;
+case 2764:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5967;
+		case 4: goto tr5967;
+		case 13: goto tr5969;
+		case 16: goto tr5968;
+		case 18: goto tr5968;
+		case 31: goto tr5969;
+		case 39: goto tr5968;
+		case 47: goto tr5967;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5968;
+	goto st0;
+tr5967:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2765;
+st2765:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2765;
+case 2765:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5970;
+		case 18: goto st2766;
+		case 131086: goto st2767;
+		case 131104: goto st2767;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2766;
+		} else if ( _widec >= 10 )
+			goto st2766;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2766;
+		} else if ( _widec >= 33 )
+			goto st2766;
+	} else
+		goto st2766;
+	goto st0;
+tr5968:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2766;
+tr5969:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2766;
+tr5974:
+	{ expr_open_parens++; }
+	goto st2766;
+tr5976:
+	{ expr_open_parens--; }
+	goto st2766;
+st2766:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2766;
+case 2766:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2765;
+		case 4: goto st2765;
+		case 8: goto st2766;
+		case 13: goto tr5974;
+		case 16: goto st2766;
+		case 18: goto st2766;
+		case 31: goto tr5974;
+		case 39: goto st2766;
+		case 47: goto st2765;
+	}
+	goto st0;
+tr5977:
+	{ expr_open_parens--; }
+	goto st2767;
+st2767:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2767;
+case 2767:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5975;
+		case 18: goto tr5976;
+		case 131086: goto tr5977;
+		case 131104: goto tr5977;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5976;
+		} else if ( _widec >= 10 )
+			goto tr5976;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5976;
+		} else if ( _widec >= 33 )
+			goto tr5976;
+	} else
+		goto tr5976;
+	goto st0;
+st2768:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2768;
+case 2768:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5978;
+		case 4: goto tr5978;
+		case 13: goto tr5980;
+		case 16: goto tr5979;
+		case 18: goto tr5979;
+		case 31: goto tr5980;
+		case 39: goto tr5979;
+		case 47: goto tr5978;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5979;
+	goto st0;
+tr5978:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2769;
+st2769:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2769;
+case 2769:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5981;
+		case 18: goto st2770;
+		case 131086: goto st2771;
+		case 131104: goto st2771;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2770;
+		} else if ( _widec >= 10 )
+			goto st2770;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2770;
+		} else if ( _widec >= 33 )
+			goto st2770;
+	} else
+		goto st2770;
+	goto st0;
+tr5979:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2770;
+tr5980:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2770;
+tr5985:
+	{ expr_open_parens++; }
+	goto st2770;
+tr5987:
+	{ expr_open_parens--; }
+	goto st2770;
+st2770:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2770;
+case 2770:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2769;
+		case 4: goto st2769;
+		case 8: goto st2770;
+		case 13: goto tr5985;
+		case 16: goto st2770;
+		case 18: goto st2770;
+		case 31: goto tr5985;
+		case 39: goto st2770;
+		case 47: goto st2769;
+	}
+	goto st0;
+tr5988:
+	{ expr_open_parens--; }
+	goto st2771;
+st2771:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2771;
+case 2771:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5986;
+		case 18: goto tr5987;
+		case 131086: goto tr5988;
+		case 131104: goto tr5988;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5987;
+		} else if ( _widec >= 10 )
+			goto tr5987;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5987;
+		} else if ( _widec >= 33 )
+			goto tr5987;
+	} else
+		goto tr5987;
+	goto st0;
+st2772:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2772;
+case 2772:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto tr5989;
+		case 4: goto tr5989;
+		case 13: goto tr5991;
+		case 16: goto tr5990;
+		case 18: goto tr5990;
+		case 31: goto tr5991;
+		case 39: goto tr5990;
+		case 47: goto tr5989;
+	}
+	if ( 8 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 9 )
+		goto tr5990;
+	goto st0;
+tr5989:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2773;
+st2773:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2773;
+case 2773:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5992;
+		case 18: goto st2774;
+		case 131086: goto st2775;
+		case 131104: goto st2775;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto st2774;
+		} else if ( _widec >= 10 )
+			goto st2774;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto st2774;
+		} else if ( _widec >= 33 )
+			goto st2774;
+	} else
+		goto st2774;
+	goto st0;
+tr5990:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	goto st2774;
+tr5991:
+	{
+  ctx->expr_start = ctx->p;
+  expr_in_parens =
+   (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+  expr_open_parens = 0;
+ }
+	{ expr_open_parens++; }
+	goto st2774;
+tr5996:
+	{ expr_open_parens++; }
+	goto st2774;
+tr5998:
+	{ expr_open_parens--; }
+	goto st2774;
+st2774:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2774;
+case 2774:
+	switch( ( ((int)ctx->p->tok)) ) {
+		case 2: goto st2773;
+		case 4: goto st2773;
+		case 8: goto st2774;
+		case 13: goto tr5996;
+		case 16: goto st2774;
+		case 18: goto st2774;
+		case 31: goto tr5996;
+		case 39: goto st2774;
+		case 47: goto st2773;
+	}
+	goto st0;
+tr5999:
+	{ expr_open_parens--; }
+	goto st2775;
+st2775:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2775;
+case 2775:
+	_widec = ( ((int)ctx->p->tok));
+	if ( ( ((int)ctx->p->tok)) > 14 ) {
+		if ( 32 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 32 ) {
+			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+			if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+		}
+	} else if ( ( ((int)ctx->p->tok)) >= 14 ) {
+		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
+		if ( 
+  expr_open_parens > 0
+  ) _widec += 65536;
+	}
+	switch( _widec ) {
+		case 7: goto tr5997;
+		case 18: goto tr5998;
+		case 131086: goto tr5999;
+		case 131104: goto tr5999;
+	}
+	if ( _widec < 20 ) {
+		if ( _widec > 12 ) {
+			if ( 15 <= _widec && _widec <= 16 )
+				goto tr5998;
+		} else if ( _widec >= 10 )
+			goto tr5998;
+	} else if ( _widec > 30 ) {
+		if ( _widec > 34 ) {
+			if ( 36 <= _widec && _widec <= 37 )
+				goto tr5998;
+		} else if ( _widec >= 33 )
+			goto tr5998;
+	} else
+		goto tr5998;
+	goto st0;
+st2776:
+	if ( ++( ctx->p) == ( ctx->pe) )
+		goto _test_eof2776;
+case 2776:
+	if ( ( ((int)ctx->p->tok)) == 7 )
+		goto tr6000;
 	goto st0;
 	}
-	_test_eof2637: ( ctx->cs) = 2637; goto _test_eof; 
+	_test_eof2777: ( ctx->cs) = 2777; goto _test_eof; 
 	_test_eof2: ( ctx->cs) = 2; goto _test_eof; 
 	_test_eof3: ( ctx->cs) = 3; goto _test_eof; 
 	_test_eof4: ( ctx->cs) = 4; goto _test_eof; 
@@ -66757,9 +71251,8 @@ case 2636:
 	_test_eof2591: ( ctx->cs) = 2591; goto _test_eof; 
 	_test_eof2592: ( ctx->cs) = 2592; goto _test_eof; 
 	_test_eof2593: ( ctx->cs) = 2593; goto _test_eof; 
+	_test_eof2594: ( ctx->cs) = 2594; goto _test_eof; 
 	_test_eof2595: ( ctx->cs) = 2595; goto _test_eof; 
-	_test_eof2638: ( ctx->cs) = 2638; goto _test_eof; 
-	_test_eof2639: ( ctx->cs) = 2639; goto _test_eof; 
 	_test_eof2596: ( ctx->cs) = 2596; goto _test_eof; 
 	_test_eof2597: ( ctx->cs) = 2597; goto _test_eof; 
 	_test_eof2598: ( ctx->cs) = 2598; goto _test_eof; 
@@ -66770,9 +71263,9 @@ case 2636:
 	_test_eof2603: ( ctx->cs) = 2603; goto _test_eof; 
 	_test_eof2604: ( ctx->cs) = 2604; goto _test_eof; 
 	_test_eof2605: ( ctx->cs) = 2605; goto _test_eof; 
-	_test_eof2640: ( ctx->cs) = 2640; goto _test_eof; 
+	_test_eof2606: ( ctx->cs) = 2606; goto _test_eof; 
 	_test_eof2607: ( ctx->cs) = 2607; goto _test_eof; 
-	_test_eof2641: ( ctx->cs) = 2641; goto _test_eof; 
+	_test_eof2608: ( ctx->cs) = 2608; goto _test_eof; 
 	_test_eof2609: ( ctx->cs) = 2609; goto _test_eof; 
 	_test_eof2610: ( ctx->cs) = 2610; goto _test_eof; 
 	_test_eof2611: ( ctx->cs) = 2611; goto _test_eof; 
@@ -66780,9 +71273,9 @@ case 2636:
 	_test_eof2613: ( ctx->cs) = 2613; goto _test_eof; 
 	_test_eof2614: ( ctx->cs) = 2614; goto _test_eof; 
 	_test_eof2615: ( ctx->cs) = 2615; goto _test_eof; 
-	_test_eof2642: ( ctx->cs) = 2642; goto _test_eof; 
+	_test_eof2616: ( ctx->cs) = 2616; goto _test_eof; 
 	_test_eof2617: ( ctx->cs) = 2617; goto _test_eof; 
-	_test_eof2643: ( ctx->cs) = 2643; goto _test_eof; 
+	_test_eof2618: ( ctx->cs) = 2618; goto _test_eof; 
 	_test_eof2619: ( ctx->cs) = 2619; goto _test_eof; 
 	_test_eof2620: ( ctx->cs) = 2620; goto _test_eof; 
 	_test_eof2621: ( ctx->cs) = 2621; goto _test_eof; 
@@ -66801,12 +71294,153 @@ case 2636:
 	_test_eof2634: ( ctx->cs) = 2634; goto _test_eof; 
 	_test_eof2635: ( ctx->cs) = 2635; goto _test_eof; 
 	_test_eof2636: ( ctx->cs) = 2636; goto _test_eof; 
+	_test_eof2637: ( ctx->cs) = 2637; goto _test_eof; 
+	_test_eof2638: ( ctx->cs) = 2638; goto _test_eof; 
+	_test_eof2639: ( ctx->cs) = 2639; goto _test_eof; 
+	_test_eof2640: ( ctx->cs) = 2640; goto _test_eof; 
+	_test_eof2641: ( ctx->cs) = 2641; goto _test_eof; 
+	_test_eof2642: ( ctx->cs) = 2642; goto _test_eof; 
+	_test_eof2643: ( ctx->cs) = 2643; goto _test_eof; 
+	_test_eof2644: ( ctx->cs) = 2644; goto _test_eof; 
+	_test_eof2645: ( ctx->cs) = 2645; goto _test_eof; 
+	_test_eof2646: ( ctx->cs) = 2646; goto _test_eof; 
+	_test_eof2647: ( ctx->cs) = 2647; goto _test_eof; 
+	_test_eof2648: ( ctx->cs) = 2648; goto _test_eof; 
+	_test_eof2649: ( ctx->cs) = 2649; goto _test_eof; 
+	_test_eof2650: ( ctx->cs) = 2650; goto _test_eof; 
+	_test_eof2651: ( ctx->cs) = 2651; goto _test_eof; 
+	_test_eof2652: ( ctx->cs) = 2652; goto _test_eof; 
+	_test_eof2653: ( ctx->cs) = 2653; goto _test_eof; 
+	_test_eof2654: ( ctx->cs) = 2654; goto _test_eof; 
+	_test_eof2655: ( ctx->cs) = 2655; goto _test_eof; 
+	_test_eof2656: ( ctx->cs) = 2656; goto _test_eof; 
+	_test_eof2657: ( ctx->cs) = 2657; goto _test_eof; 
+	_test_eof2658: ( ctx->cs) = 2658; goto _test_eof; 
+	_test_eof2659: ( ctx->cs) = 2659; goto _test_eof; 
+	_test_eof2660: ( ctx->cs) = 2660; goto _test_eof; 
+	_test_eof2661: ( ctx->cs) = 2661; goto _test_eof; 
+	_test_eof2662: ( ctx->cs) = 2662; goto _test_eof; 
+	_test_eof2663: ( ctx->cs) = 2663; goto _test_eof; 
+	_test_eof2664: ( ctx->cs) = 2664; goto _test_eof; 
+	_test_eof2665: ( ctx->cs) = 2665; goto _test_eof; 
+	_test_eof2666: ( ctx->cs) = 2666; goto _test_eof; 
+	_test_eof2667: ( ctx->cs) = 2667; goto _test_eof; 
+	_test_eof2668: ( ctx->cs) = 2668; goto _test_eof; 
+	_test_eof2669: ( ctx->cs) = 2669; goto _test_eof; 
+	_test_eof2670: ( ctx->cs) = 2670; goto _test_eof; 
+	_test_eof2671: ( ctx->cs) = 2671; goto _test_eof; 
+	_test_eof2672: ( ctx->cs) = 2672; goto _test_eof; 
+	_test_eof2673: ( ctx->cs) = 2673; goto _test_eof; 
+	_test_eof2674: ( ctx->cs) = 2674; goto _test_eof; 
+	_test_eof2675: ( ctx->cs) = 2675; goto _test_eof; 
+	_test_eof2676: ( ctx->cs) = 2676; goto _test_eof; 
+	_test_eof2677: ( ctx->cs) = 2677; goto _test_eof; 
+	_test_eof2678: ( ctx->cs) = 2678; goto _test_eof; 
+	_test_eof2679: ( ctx->cs) = 2679; goto _test_eof; 
+	_test_eof2680: ( ctx->cs) = 2680; goto _test_eof; 
+	_test_eof2681: ( ctx->cs) = 2681; goto _test_eof; 
+	_test_eof2682: ( ctx->cs) = 2682; goto _test_eof; 
+	_test_eof2683: ( ctx->cs) = 2683; goto _test_eof; 
+	_test_eof2684: ( ctx->cs) = 2684; goto _test_eof; 
+	_test_eof2685: ( ctx->cs) = 2685; goto _test_eof; 
+	_test_eof2686: ( ctx->cs) = 2686; goto _test_eof; 
+	_test_eof2687: ( ctx->cs) = 2687; goto _test_eof; 
+	_test_eof2688: ( ctx->cs) = 2688; goto _test_eof; 
+	_test_eof2689: ( ctx->cs) = 2689; goto _test_eof; 
+	_test_eof2690: ( ctx->cs) = 2690; goto _test_eof; 
+	_test_eof2691: ( ctx->cs) = 2691; goto _test_eof; 
+	_test_eof2692: ( ctx->cs) = 2692; goto _test_eof; 
+	_test_eof2693: ( ctx->cs) = 2693; goto _test_eof; 
+	_test_eof2694: ( ctx->cs) = 2694; goto _test_eof; 
+	_test_eof2695: ( ctx->cs) = 2695; goto _test_eof; 
+	_test_eof2696: ( ctx->cs) = 2696; goto _test_eof; 
+	_test_eof2697: ( ctx->cs) = 2697; goto _test_eof; 
+	_test_eof2698: ( ctx->cs) = 2698; goto _test_eof; 
+	_test_eof2699: ( ctx->cs) = 2699; goto _test_eof; 
+	_test_eof2700: ( ctx->cs) = 2700; goto _test_eof; 
+	_test_eof2701: ( ctx->cs) = 2701; goto _test_eof; 
+	_test_eof2702: ( ctx->cs) = 2702; goto _test_eof; 
+	_test_eof2703: ( ctx->cs) = 2703; goto _test_eof; 
+	_test_eof2704: ( ctx->cs) = 2704; goto _test_eof; 
+	_test_eof2705: ( ctx->cs) = 2705; goto _test_eof; 
+	_test_eof2706: ( ctx->cs) = 2706; goto _test_eof; 
+	_test_eof2707: ( ctx->cs) = 2707; goto _test_eof; 
+	_test_eof2708: ( ctx->cs) = 2708; goto _test_eof; 
+	_test_eof2709: ( ctx->cs) = 2709; goto _test_eof; 
+	_test_eof2710: ( ctx->cs) = 2710; goto _test_eof; 
+	_test_eof2711: ( ctx->cs) = 2711; goto _test_eof; 
+	_test_eof2712: ( ctx->cs) = 2712; goto _test_eof; 
+	_test_eof2713: ( ctx->cs) = 2713; goto _test_eof; 
+	_test_eof2714: ( ctx->cs) = 2714; goto _test_eof; 
+	_test_eof2715: ( ctx->cs) = 2715; goto _test_eof; 
+	_test_eof2716: ( ctx->cs) = 2716; goto _test_eof; 
+	_test_eof2717: ( ctx->cs) = 2717; goto _test_eof; 
+	_test_eof2718: ( ctx->cs) = 2718; goto _test_eof; 
+	_test_eof2719: ( ctx->cs) = 2719; goto _test_eof; 
+	_test_eof2720: ( ctx->cs) = 2720; goto _test_eof; 
+	_test_eof2721: ( ctx->cs) = 2721; goto _test_eof; 
+	_test_eof2722: ( ctx->cs) = 2722; goto _test_eof; 
+	_test_eof2723: ( ctx->cs) = 2723; goto _test_eof; 
+	_test_eof2724: ( ctx->cs) = 2724; goto _test_eof; 
+	_test_eof2725: ( ctx->cs) = 2725; goto _test_eof; 
+	_test_eof2726: ( ctx->cs) = 2726; goto _test_eof; 
+	_test_eof2727: ( ctx->cs) = 2727; goto _test_eof; 
+	_test_eof2728: ( ctx->cs) = 2728; goto _test_eof; 
+	_test_eof2729: ( ctx->cs) = 2729; goto _test_eof; 
+	_test_eof2730: ( ctx->cs) = 2730; goto _test_eof; 
+	_test_eof2731: ( ctx->cs) = 2731; goto _test_eof; 
+	_test_eof2732: ( ctx->cs) = 2732; goto _test_eof; 
+	_test_eof2733: ( ctx->cs) = 2733; goto _test_eof; 
+	_test_eof2735: ( ctx->cs) = 2735; goto _test_eof; 
+	_test_eof2778: ( ctx->cs) = 2778; goto _test_eof; 
+	_test_eof2779: ( ctx->cs) = 2779; goto _test_eof; 
+	_test_eof2736: ( ctx->cs) = 2736; goto _test_eof; 
+	_test_eof2737: ( ctx->cs) = 2737; goto _test_eof; 
+	_test_eof2738: ( ctx->cs) = 2738; goto _test_eof; 
+	_test_eof2739: ( ctx->cs) = 2739; goto _test_eof; 
+	_test_eof2740: ( ctx->cs) = 2740; goto _test_eof; 
+	_test_eof2741: ( ctx->cs) = 2741; goto _test_eof; 
+	_test_eof2742: ( ctx->cs) = 2742; goto _test_eof; 
+	_test_eof2743: ( ctx->cs) = 2743; goto _test_eof; 
+	_test_eof2744: ( ctx->cs) = 2744; goto _test_eof; 
+	_test_eof2745: ( ctx->cs) = 2745; goto _test_eof; 
+	_test_eof2780: ( ctx->cs) = 2780; goto _test_eof; 
+	_test_eof2747: ( ctx->cs) = 2747; goto _test_eof; 
+	_test_eof2781: ( ctx->cs) = 2781; goto _test_eof; 
+	_test_eof2749: ( ctx->cs) = 2749; goto _test_eof; 
+	_test_eof2750: ( ctx->cs) = 2750; goto _test_eof; 
+	_test_eof2751: ( ctx->cs) = 2751; goto _test_eof; 
+	_test_eof2752: ( ctx->cs) = 2752; goto _test_eof; 
+	_test_eof2753: ( ctx->cs) = 2753; goto _test_eof; 
+	_test_eof2754: ( ctx->cs) = 2754; goto _test_eof; 
+	_test_eof2755: ( ctx->cs) = 2755; goto _test_eof; 
+	_test_eof2782: ( ctx->cs) = 2782; goto _test_eof; 
+	_test_eof2757: ( ctx->cs) = 2757; goto _test_eof; 
+	_test_eof2783: ( ctx->cs) = 2783; goto _test_eof; 
+	_test_eof2759: ( ctx->cs) = 2759; goto _test_eof; 
+	_test_eof2760: ( ctx->cs) = 2760; goto _test_eof; 
+	_test_eof2761: ( ctx->cs) = 2761; goto _test_eof; 
+	_test_eof2762: ( ctx->cs) = 2762; goto _test_eof; 
+	_test_eof2763: ( ctx->cs) = 2763; goto _test_eof; 
+	_test_eof2764: ( ctx->cs) = 2764; goto _test_eof; 
+	_test_eof2765: ( ctx->cs) = 2765; goto _test_eof; 
+	_test_eof2766: ( ctx->cs) = 2766; goto _test_eof; 
+	_test_eof2767: ( ctx->cs) = 2767; goto _test_eof; 
+	_test_eof2768: ( ctx->cs) = 2768; goto _test_eof; 
+	_test_eof2769: ( ctx->cs) = 2769; goto _test_eof; 
+	_test_eof2770: ( ctx->cs) = 2770; goto _test_eof; 
+	_test_eof2771: ( ctx->cs) = 2771; goto _test_eof; 
+	_test_eof2772: ( ctx->cs) = 2772; goto _test_eof; 
+	_test_eof2773: ( ctx->cs) = 2773; goto _test_eof; 
+	_test_eof2774: ( ctx->cs) = 2774; goto _test_eof; 
+	_test_eof2775: ( ctx->cs) = 2775; goto _test_eof; 
+	_test_eof2776: ( ctx->cs) = 2776; goto _test_eof; 
 	_test_eof: {}
 	_out: {}
 	}
   if ( ctx->cs == 0 )
    return FALSE;
-  if ( ctx->cs >= 2637 )
+  if ( ctx->cs >= 2777 )
    return TRUE;
   if (get_num_errors() != start_num_errors)
    break;
