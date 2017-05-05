@@ -385,14 +385,6 @@ Define rules for a ragel-based parser.
 		*   8-bit load group
 		*--------------------------------------------------------------------*/
 #foreach <R1> in   B, C, D, E, H, L, A
-		/* LD r,(hl) */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
-
-		/* LD r',(hl) */
-		|	label? _TK_LD _TK_<R1>1 _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt( Z80_LD_r_r( REG_<R1>, REG_idx ) ); }
-
 		/* LD (hl),r */
 		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA _TK_<R1> _TK_NEWLINE \
 			@{ DO_stmt( Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
@@ -428,45 +420,7 @@ Define rules for a ragel-based parser.
 					_TK_COMMA _TK_<R1> _TK_NEWLINE \
 			@{ DO_stmt_idx( P_<X> + Z80_LD_r_r( REG_idx, REG_<R1> ) ); }
   #endfor  <X>
-		
-		/* LD r,N | LD A,(NN) */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA expr _TK_NEWLINE
-			@{ 
-				if ( expr_in_parens ) {
-					if ( REG_<R1> == REG_A ) {
-						DO_stmt_nn( Z80_LD_A_IND_NN );		/* ld a,(NN) */
-					}
-					else
-						return FALSE;			/* syntax error */
-				}
-				else {
-					DO_stmt_n( Z80_LD_r_n( REG_<R1> ) );	/* ld r,N */
-				}
-			}	
-		/* LD r',N | LD A',(NN) */
-		|	label? _TK_LD _TK_<R1>1 _TK_COMMA expr _TK_NEWLINE
-			@{ 
-				if ( expr_in_parens ) {
-					if ( REG_<R1> == REG_A ) {
-						DO_stmt(Z80_ALTD); DO_stmt_nn( Z80_LD_A_IND_NN );		/* ld a',(NN) */
-					}
-					else
-						return FALSE;			/* syntax error */
-				}
-				else {
-					DO_stmt(Z80_ALTD); DO_stmt_n( Z80_LD_r_n( REG_<R1> ) );	/* ld r',N */
-				}
-			}	
 #endfor  <R1>
-
-#foreach <X> in IX, IY
-  #foreach <R1> in <X>H, <X>L
-		/* LD r,N */
-		|	label? _TK_LD _TK_<R1> _TK_COMMA expr _TK_NEWLINE
-			@{ DO_stmt_n( P_<X> + Z80_LD_r_n( REG_<R1> ) ); }
-
-  #endfor  <R1>
-#endfor  <X>
 
 		/* LD (hl),N */
 		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA expr _TK_NEWLINE

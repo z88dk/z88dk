@@ -2,7 +2,10 @@
 ; List of all the CPU opcodes
 ; {b c d}	-> expands into 3 lines for each element and $1 = (0..3)
 ; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
+; X			-> expands 4 lines (ix), (ix+d), (iy), (iy+d)
 ; XH, XL	-> expands to 2 lines with (ixh,ixl) and (iyh,iyl), only for [z80]
+; N_IMN		-> expands to: ld a,(MN) | ld a,N
+; N			-> expands to: ld b,N
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
@@ -12,15 +15,15 @@
 			ld {b c d e XH XL . a},    {. . . . XH XL . .}	=> 40 + $1*8 + $2
 			ld {. . . . XH XL . .},    {b c d e XH XL . a}	=> 40 + $1*8 + $2
 
+			ld {. . . .  .  . . a}['], N_IMN	=> expr_in_parens ? (3A, N, M) : (06 + $1*8, N)
+			ld {b c d e  h  l . .}['], N		=>                                06 + $1*8, N
+			ld {. . . . XH XL . .},    N		=>                                06 + $1*8, N
+			
+			ld {b c d e  h  l . a}['], (hl)		=> 46 + $1*8
 __END__
-			ld {b c d e   h   l . a},  N			=>     06 + $1*8, N
 
 
-[rabbit]	ld {b c d e   h   l . a}', N			=> 76, 06 + $1*8, N
-[z80]		ld {. . . . ixh ixl . .},  N			=> DD, 06 + $1*8, N
-[z80]		ld {. . . . iyh iyl . .},  N			=> FD, 06 + $1*8, N
 
-			ld {b c d e   h   l . a},  (hl)		=>         46 + $1*8
 [rabbit]	ld {b c d e   h   l . a}', (hl)		=> 76,     46 + $1*8
 
 			ld {b c d e   h   l . a},  (ix + D)	=>     DD, 46 + $1*8, D
