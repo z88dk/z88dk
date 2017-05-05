@@ -1,4 +1,7 @@
 @gfxbasew.lst
+graphics/w_drawb
+graphics/w_undrawb
+graphics/w_xorborder
 graphics/nc/clg
 graphics/w_stencil_render
 graphics/nc/w_pixladdr
@@ -11,3 +14,4 @@ graphics/nc/swapgfxbk
 graphics/w_putsprite
 graphics/draw_profile
 graphics/w_pointxy
+graphics/nc/fill
