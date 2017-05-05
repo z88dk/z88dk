@@ -13,7 +13,7 @@ _sp1_ClearRectInv_callee:
    pop hl
    pop bc
    pop de
-   ld d,b
+   ld d,c
    pop bc
    push af
    
@@ -28,4 +28,9 @@ _sp1_ClearRectInv_callee:
    ld c,(hl)
    pop hl
 
-   jp asm_sp1_ClearRectInv
+   push iy
+
+   call asm_sp1_ClearRectInv
+
+   pop iy
+   ret
