@@ -28,7 +28,7 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab);
 void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 {
     int isscanf = 0;
-    uint32_t format_option;
+    uint32_t format_option = 0;
     int nargs, vconst, expr, argnumber;
     double val;
     int watcharg; /* For watching printf etc */
