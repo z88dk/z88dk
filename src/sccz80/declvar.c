@@ -641,18 +641,16 @@ void declloc(
                     if ((typ == STRUCT && ident != POINTER) || ident == ARRAY) {
                         char newname[NAMESIZE + 20];
 
-                        declared -= size;
-
                         snprintf(newname, sizeof(newname),"auto_%s_%s",currfn->name, cptr->name);
-                        // TODO: Fixup name
                         int alloc_size = initials(newname, cptr->type, cptr->ident, dsize, more, otag, var->zfar, var->isconst);
 
-                        
+			declared += (alloc_size - size);
                         if ( ident == ARRAY ) {
                             cptr->offset.i -= (alloc_size - size);
                             cptr->size += (alloc_size - size);
                         }
-                        Zsp = modstk(Zsp - (alloc_size - declared), NO, NO);
+                        Zsp = modstk(Zsp - declared, NO, NO);
+			declared = 0;
                         copy_to_stack(newname, 0, alloc_size);
                         cptr->isassigned = YES;
 
