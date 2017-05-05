@@ -3,10 +3,9 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *balloc_firstfit(unsigned int queue, unsigned char num)
+; void *balloc_firstfit(unsigned char queue, unsigned char num)
 ;
-; Allocate a block from the first queue in [queue, queue+num-1
-
+; Allocate a block from the first queue in [queue, queue+num-1]
 ; that has a block available.
 ;
 ; ===============================================================
@@ -20,8 +19,8 @@ EXTERN __balloc_array, error_zc
 
 asm_balloc_firstfit:
 
-   ; enter : hl = queue
-   ;          a = num
+   ; enter :  l = queue
+   ;          h = num
    ;
    ; exit  : success
    ;
@@ -35,9 +34,12 @@ asm_balloc_firstfit:
    ;
    ; uses  : af, bc, de, hl
 
+   ld a,h
+
    or a
    jp z, error_zc              ; zero queues to search
-   
+
+   ld h,0
    add hl,hl
    ld de,(__balloc_array)
    add hl,de                   ; forward_list *q

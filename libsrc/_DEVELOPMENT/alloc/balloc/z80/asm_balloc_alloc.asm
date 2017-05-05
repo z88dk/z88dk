@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void *balloc_alloc(unsigned int queue)
+; void *balloc_alloc(unsigned char queue)
 ;
 ; Allocate a block of memory from the front of the queue.
 ;
@@ -19,7 +19,7 @@ EXTERN asm_p_forward_list_remove_after
 
 asm_balloc_alloc:
 
-   ; enter : hl = unsigned int queue
+   ; enter : l = unsigned int queue
    ;
    ; exit  : success
    ;
@@ -33,6 +33,7 @@ asm_balloc_alloc:
    ;
    ; uses  : af, de, hl
 
+   ld h,0
    add hl,hl
    ld de,(__balloc_array)
    add hl,de                   ; p_forward_list *q
