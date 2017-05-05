@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include "config.h"
 
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
@@ -292,7 +293,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
         // 2: compressed rom model, complete binary is "*_CODE.bin" + zx7("*_DATA.bin")
 
         get_temporary_filename(tname);
-        snprintf(cmdline, FILENAME_MAX*2 + 127, "zx7 -f %s %s", name, tname);
+        snprintf(cmdline, FILENAME_MAX*2 + 127, "%szx7 -f %s %s", EXEC_PREFIX,name, tname);
 
         if (system(cmdline) != 0)
             exit_log(1, "ERROR: Unable to compress %s\n", name);

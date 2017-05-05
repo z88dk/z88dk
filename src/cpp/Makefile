@@ -14,7 +14,7 @@ zcpp$(EXESUFFIX):$(OBJS)
 	$(CC) $(CFLAGS) -c $<
 
 install:
-	$(INSTALL) zcpp$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) zcpp$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)zcpp$(EXESUFFIX)
 
 clean:
 	$(RM) *.o core *~ zcpp$(EXESUFFIX)

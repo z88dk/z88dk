@@ -13,8 +13,8 @@ dzx7$(EXESUFFIX):	dzx7.c
 	$(CC) -o dzx7$(EXESUFFIX) $(LDFLAGS) dzx7.c
 
 install:
-	$(INSTALL) zx7$(EXESUFFIX) $(PREFIX)/bin
-	$(INSTALL) dzx7$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) zx7$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)zx7$(EXESUFFIX)
+	$(INSTALL) dzx7$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)dzx7$(EXESUFFIX)
 
 clean:
 	$(RM) zx7$(EXESUFFIX) zx7.o core$(EXESUFFIX)

@@ -11,7 +11,7 @@ ticks$(EXESUFFIX):	$(OBJS)
 	$(CC) -o ticks$(EXESUFFIX) $(CFLAGS) $(OBJS)
 
 install:
-	$(INSTALL) ticks$(EXESUFFIX) $(PREFIX)/bin/
+	$(INSTALL) ticks$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)ticks$(EXESUFFIX)
 
 clean:
 	$(RM) ticks$(EXESUFFIX) $(OBJS) core

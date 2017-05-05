@@ -10,7 +10,7 @@ zpragma$(EXESUFFIX):	$(OBJS)
 	$(CC) -o zpragma$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:
-	$(INSTALL) zpragma$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) zpragma$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)zpragma$(EXESUFFIX)
 
 clean:
 	$(RM) zpragma$(EXESUFFIX) zpragma.o core$(EXESUFFIX)

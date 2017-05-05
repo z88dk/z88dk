@@ -215,7 +215,6 @@ static char            tmpnambuf[] = "zccXXXX";
 static char           *c_assembler_type = "z80asm";
 static int             assembler_type = ASM_Z80ASM;
 static enum iostyle    assembler_style = outimplied;
-static char           *sdcc_assemblernames[] = { "z80asm", "asxxxx", "z80asm", "binutils" };
 static int             linker_output_separate_arg = 0;
 
 static enum iostyle    compiler_style = outimplied;
@@ -252,8 +251,8 @@ static char  *c_install_dir = PREFIX "/";
 static char  *c_options = NULL;
 
 
-static char  *c_z80asm_exe = "z80asm";
-static char  *c_mpm_exe = "mpm";
+static char  *c_z80asm_exe = EXEC_PREFIX "z80asm";
+static char  *c_mpm_exe = EXEC_PREFIX "mpm";
 static char  *c_vasm_exe = "vasmz80";
 static char  *c_vlink_exe = "vlink";
 static char  *c_gnuas_exe = "z80-unknown-coff-as";
@@ -263,13 +262,13 @@ static char  *c_aslink_exe = "aslink";
 
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
-static char  *c_sdcc_exe = "zsdcc";
-static char  *c_sccz80_exe = "sccz80";
-static char  *c_cpp_exe = "zcpp";
-static char  *c_sdcc_preproc_exe = "zsdcpp";
-static char  *c_zpragma_exe = "zpragma";
-static char  *c_copt_exe = "copt";
-static char  *c_appmake_exe = "appmake";
+static char  *c_sdcc_exe = EXEC_PREFIX "zsdcc";
+static char  *c_sccz80_exe = EXEC_PREFIX "sccz80";
+static char  *c_cpp_exe = EXEC_PREFIX "zcpp";
+static char  *c_sdcc_preproc_exe = EXEC_PREFIX "zsdcpp";
+static char  *c_zpragma_exe = EXEC_PREFIX "zpragma";
+static char  *c_copt_exe = EXEC_PREFIX "copt";
+static char  *c_appmake_exe = EXEC_PREFIX "appmake";
 #ifndef WIN32
 static char  *c_copycmd = "cat";
 #else

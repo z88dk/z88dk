@@ -4,7 +4,7 @@
 # Build z88dk on unix systems
 #
 
-set -e -u 		# -e: exit on error; -u: exit on undefined variable
+set -e  		# -e: exit on error; -u: exit on undefined variable
 				# -e can be overidden by -k option
 
 do_clean=0
