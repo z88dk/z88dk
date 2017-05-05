@@ -13,7 +13,6 @@ _balloc_addmem_callee:
    pop ix
    dec sp
    pop af
-   inc sp
    pop bc
    pop hl
    pop de
