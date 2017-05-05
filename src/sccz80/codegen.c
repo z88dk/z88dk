@@ -1230,6 +1230,24 @@ void quikmult(int type, int32_t size, char preserve)
     case 0:
         vconst(0);
         break;
+    case 2048:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
+    case 1024:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
+    case 512:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        ol("add\thl,hl");
+        break;
     case 256:
         ol("ld\th,l");
         ol("ld\tl,0");
@@ -1454,7 +1472,12 @@ void zdiv_const(LVALUE *lval, int32_t value)
             return;
         }
     } else if ( utype(lval) ) {
-        if ( value == 256 ) {
+        if ( value == 512 ) {
+            ol("ld\tl,h");
+            ol("ld\th,0");
+            ol("srl\tl");
+            return;
+        } else if ( value == 256 ) {
             ol("ld\tl,h");
             ol("ld\th,0");
             return;
