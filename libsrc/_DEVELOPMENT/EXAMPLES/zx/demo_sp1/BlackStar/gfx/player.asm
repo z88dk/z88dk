@@ -1,4 +1,4 @@
-SECTION CONTENDED
+SECTION rodata_user
 
 PUBLIC _player
 

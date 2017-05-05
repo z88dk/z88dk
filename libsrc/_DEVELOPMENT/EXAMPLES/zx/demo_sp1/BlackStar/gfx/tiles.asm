@@ -6,7 +6,7 @@
 ;; base: 128
 ;;
 
-SECTION CONTENDED
+SECTION rodata_user
 
 PUBLIC _ptiles
 

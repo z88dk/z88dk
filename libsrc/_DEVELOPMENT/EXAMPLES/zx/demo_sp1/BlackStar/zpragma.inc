@@ -1,7 +1,3 @@
-// DEFINE OUR OWN MEMORY MAP
-
-#pragma output __MMAP                 = -1         // memory map is read from file "mmap.inc"
-
 // COMPILE TIME CRT CONFIGURATION
 
 #pragma output CRT_ORG_CODE           = 25124      // org of compile
