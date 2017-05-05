@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-#include "config.h"
+#include "../config.h"
 
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
