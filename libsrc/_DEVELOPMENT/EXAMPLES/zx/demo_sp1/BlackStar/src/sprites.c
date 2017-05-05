@@ -22,25 +22,25 @@ int sp_collect = 0;
 void
 init_sprites(void)
 {
-	unsigned char i;
-	
-	// to be run ONCE
-	
-	sprites[PLAYER].s = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 16, 0);
-	sp1_AddColSpr(sprites[PLAYER].s, SP1_DRAW_MASK2, 0, 64, 0);
-	sp1_AddColSpr(sprites[PLAYER].s, SP1_DRAW_MASK2RB, 0, 0, 0);
+   unsigned char i;
+   
+   // to be run ONCE
+   
+   sprites[PLAYER].s = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 16, 0);
+   sp1_AddColSpr(sprites[PLAYER].s, SP1_DRAW_MASK2, 0, 64, 0);
+   sp1_AddColSpr(sprites[PLAYER].s, SP1_DRAW_MASK2RB, 0, 0, 0);
 
-	sprites[PLAYER].sprite = NULL;
+   sprites[PLAYER].sprite = NULL;
    sprites[PLAYER].alive = 1;
    sprites[PLAYER].n = NULL;
-	sprites[PLAYER].type = ST_PLAYER;
+   sprites[PLAYER].type = ST_PLAYER;
 
    // init our lists
 
    sp_used = sprites;
    sp_free = sprites + 1;
 
-	for (i = 1; i < MAX_SPRITES - 1; ++i)
+   for (i = 1; i < MAX_SPRITES - 1; ++i)
    {
         sprites[i].n = sprites + i + 1;
         sprites[i].alive = 0;
@@ -53,28 +53,28 @@ init_sprites(void)
 unsigned char
 add_sprite(void)
 {
-	struct ssprites *t;
-	
-	if (!sp_free)
-		return 0;
-	
-	// always one is in use: the player!
-	
-	t = sp_used;
-	sp_used = sp_free;
-	sp_free = sp_free->n;
-	sp_used->n = t;
-	sp_used->alive = 1;
-	
-	return 1;
+   struct ssprites *t;
+   
+   if (!sp_free)
+      return 0;
+   
+   // always one is in use: the player!
+   
+   t = sp_used;
+   sp_used = sp_free;
+   sp_free = sp_free->n;
+   sp_used->n = t;
+   sp_used->alive = 1;
+   
+   return 1;
 }
 
 void
 collect_sprites(void)
 {
-	struct ssprites *t, *tp;
-	
-	if (!sp_collect)
+   struct ssprites *t, *tp;
+   
+   if (!sp_collect)
         return;
 
    // current, previous
@@ -116,7 +116,7 @@ destroy_type_sprite(unsigned char type)
       return;
 
    for (t = sp_used; t; t = t->n)
-	{
+   {
       if (t->alive && t->type & type)
       {
          sp1_MoveSprAbs(t->s, &cr, NULL, 0, 34, 0, 0);
@@ -124,40 +124,40 @@ destroy_type_sprite(unsigned char type)
          t->alive = 0;
          sp_collect++;
       }
-	}
+   }
 }
 
 int
 add_explo(int x, int y)
 {
    if (!add_sprite())
-	   return 0;
+      return 0;
 
    sp_used->s = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 16, 2);
-	sp1_AddColSpr(sp_used->s, SP1_DRAW_MASK2, 0, 64, 2);
-	sp1_AddColSpr(sp_used->s, SP1_DRAW_MASK2RB, 0, 0, 2);
+   sp1_AddColSpr(sp_used->s, SP1_DRAW_MASK2, 0, 64, 2);
+   sp1_AddColSpr(sp_used->s, SP1_DRAW_MASK2RB, 0, 0, 2);
    sp_used->type = ST_EXPLO;
-	sp_used->frame = 0;
-	sp_used->delay = 0;
-	sp_used->x = x;
-	sp_used->y = y;
-	sp_used->sprite = NULL; //explosion;
+   sp_used->frame = 0;
+   sp_used->delay = 0;
+   sp_used->x = x;
+   sp_used->y = y;
+   sp_used->sprite = NULL; //explosion;
 
    sp1_MoveSprPix(sp_used->s, &cr, sp_used->sprite, 8 + sp_used->x, 8 + sp_used->y);
-	return 1;
+   return 1;
 }
 
 void
 add_enemy(int x, int y, unsigned char *sprite)
 {
-	// not really a explosion, but saves some bytes as they're the same size
+   // not really a explosion, but saves some bytes as they're the same size
 
    if(!add_explo(x, y))
-	   return;
+      return;
 
    sp_used->type = ST_ENEMY;
-	sp_used->sprite = sprite;
-	sp_used->alive = 1;
+   sp_used->sprite = sprite;
+   sp_used->alive = 1;
    sp_used->delay = rand() % 15;
    sp_used->x = x;
    sp_used->y = y;
@@ -178,13 +178,13 @@ void
 add_bullet(unsigned char type, unsigned char x, unsigned char y)
 {
    if(!add_sprite())
-	   return;
+      return;
 
    sp_used->s = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, 8, 1);
    sp1_AddColSpr(sp_used->s, SP1_DRAW_MASK2RB, 0, 0, 1);
    sp_used->type = type;
-	sp_used->frame = 0;
-	sp_used->delay = 0;
+   sp_used->frame = 0;
+   sp_used->delay = 0;
 
    sp_used->x = x;
    sp_used->y = y;
@@ -202,5 +202,5 @@ add_bullet(unsigned char type, unsigned char x, unsigned char y)
       sp_used->iy = 6;
    }
 
-	sp1_MoveSprPix(sp_used->s, &cr, sp_used->sprite, sp_used->x, sp_used->y);
+   sp1_MoveSprPix(sp_used->s, &cr, sp_used->sprite, sp_used->x, sp_used->y);
 }

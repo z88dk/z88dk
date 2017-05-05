@@ -49,6 +49,12 @@ appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noload
 appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
 copy /b loader.tap + screen.tap + game.tap blackstar.tap
 ~~~
+Some flags you may want to add to the compile line:
+* -m  Creates a map file showing where everything is in memory
+* --list  Shows the C source after it has been translated to asm by the compiler
+* --c-code-in-asm  Will intersperse C code as comments in the list file
+* -vn  Makes `zcc` quiet
+
 ### Notes
 
 * Compile time options are communicated to `zcc` via pragmas which are stored in the file "zpragma.inc".  There are a lot of options; [these ones](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded#crt_configuration) are generic for all targets and then the spectrum has more defined specifically for it.  The main ones of interest here are `CRT_ORG_CODE` which sets the ORG address, `REGISTER_SP` which sets the initial stack location in agreement with suggestions from the [default SP1 memory map](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/config_sp1.m4#L34), and `CLIB_BALLOC_TABLE_SIZE` which tells the crt to create a block memory allocator with one queue.
