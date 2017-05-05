@@ -8,4 +8,6 @@ alloc/balloc/c/sdcc_ix/balloc_firstfit
 alloc/balloc/c/sdcc_ix/balloc_firstfit_callee
 alloc/balloc/c/sdcc_ix/balloc_free
 alloc/balloc/c/sdcc_ix/balloc_free_fastcall
+alloc/balloc/c/sdcc_ix/balloc_reset
+alloc/balloc/c/sdcc_ix/balloc_reset_fastcall
 @alloc/balloc/balloc_asm.lst

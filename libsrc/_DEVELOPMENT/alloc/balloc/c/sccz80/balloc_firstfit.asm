@@ -1,5 +1,5 @@
 
-; void *balloc_firstfit(unsigned int queue, unsigned char num)
+; void *balloc_firstfit(unsigned char queue, unsigned char num)
 
 SECTION code_clib
 SECTION code_alloc_balloc
@@ -11,11 +11,12 @@ EXTERN l0_balloc_firstfit_callee
 balloc_firstfit:
 
    pop af
-   pop bc
+   pop de
    pop hl
    
    push hl
-   push bc
+   push de
    push af
    
+   ld h,e
    jp l0_balloc_firstfit_callee

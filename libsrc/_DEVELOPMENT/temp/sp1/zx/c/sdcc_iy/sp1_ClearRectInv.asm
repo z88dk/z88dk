@@ -44,4 +44,9 @@ _sp1_ClearRectInv:
    ld h,a
    ex af,af'
 
-   jp asm_sp1_ClearRectInv
+   push iy
+
+   call asm_sp1_ClearRectInv
+
+   pop iy
+   ret

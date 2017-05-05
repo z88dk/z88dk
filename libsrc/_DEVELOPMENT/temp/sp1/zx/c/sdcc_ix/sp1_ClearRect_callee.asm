@@ -13,7 +13,7 @@ _sp1_ClearRect_callee:
    pop hl
    pop bc
    pop de
-   ld d,b
+   ld d,c
    pop bc
    push af
    

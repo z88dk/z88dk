@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <stdint.h>
 
 uint8_t   fontbuf[4096];
 

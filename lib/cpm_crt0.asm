@@ -81,6 +81,9 @@ ELSE
 ENDIF
 ENDIF
 
+	nop	 ;   Those extra bytes fix the Amstrad NC's ZCN support !!?!
+	nop
+
         call    crt0_init_bss   ;Initialise any data setup by sdcc
 	ld      (start1+1),sp	;Save entry stack
 IF (startup=3)

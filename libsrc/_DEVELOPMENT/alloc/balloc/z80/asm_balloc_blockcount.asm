@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; size_t balloc_blockcount(unsigned int queue)
+; size_t balloc_blockcount(unsigned char queue)
 ;
 ; Return number of free blocks in the queue.  O(n).
 ;
@@ -25,6 +25,7 @@ asm_balloc_blockcount:
    ;
    ; uses  : af, de, hl
 
+   ld h,0
    add hl,hl
    ld de,(__balloc_array)
    add hl,de                   ; p_forward_list *q

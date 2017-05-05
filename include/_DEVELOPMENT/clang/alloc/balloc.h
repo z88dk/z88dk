@@ -7,19 +7,22 @@
 
 #include <stddef.h>
 
-extern void *balloc_addmem(int q,size_t num,size_t size,void *p);
+extern void *balloc_addmem(unsigned char q,size_t num,size_t size,void *p);
 
 
-extern void *balloc_alloc(int q);
+extern void *balloc_alloc(unsigned char q);
 
 
-extern size_t balloc_blockcount(int q);
+extern size_t balloc_blockcount(unsigned char q);
 
 
-extern void *balloc_firstfit(int q,int numq);
+extern void *balloc_firstfit(unsigned char q,unsigned char numq);
 
 
 extern void balloc_free(void *p);
+
+
+extern void *balloc_reset(unsigned char q);
 
 
 
