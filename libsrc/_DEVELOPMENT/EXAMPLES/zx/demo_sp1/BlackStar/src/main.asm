@@ -5,8 +5,11 @@ defc   _TEMPMEM = 0x5e24
 
 SECTION code_user
 
-; sp1 will call asm_malloc and asm_free as needed to create and delete sprites
-; hijack the library's malloc and free and provide our own that uses the block memory allocator instead
+; Sp1 will call asm_malloc and asm_free as needed to deal with memory when creating and deleting sprites.
+; Hijack the library's malloc and free and provide our own that uses the block memory allocator instead.
+; To do that you must look up the library API for these functions:
+; (malloc) https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/alloc/malloc/z80
+; (balloc) https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/alloc/balloc/z80
 
 PUBLIC asm_malloc
 
@@ -15,7 +18,7 @@ EXTERN asm_balloc_alloc
 asm_malloc:
 
    ; LIBRARY REQUIREMENT:
-	
+   
    ; Allocate memory from the thread's default heap
    ;
    ; enter : hl = size
@@ -37,10 +40,10 @@ asm_malloc:
    ;
    ; uses  : af, bc, de, hl
 
-	; we have only one queue with one size so that's what we use
-	
-	ld hl,0                     ; queue #0
-	jp asm_balloc_alloc         ; agrees with the library's requirements above
+   ; we have only one queue with one size so that's what we use
+   
+   ld hl,0                     ; queue #0
+   jp asm_balloc_alloc         ; agrees with the library's requirements above
 
 
 PUBLIC asm_free
@@ -67,8 +70,8 @@ asm_free:
    ; uses  : af, de, hl
 
    push bc
-	
-	call asm_balloc_free        ; agrees with lib req but the lib does not allow bc to change
-	
-	pop bc
-	ret
+   
+   call asm_balloc_free        ; agrees with lib req but the lib does not allow bc to change
+   
+   pop bc
+   ret

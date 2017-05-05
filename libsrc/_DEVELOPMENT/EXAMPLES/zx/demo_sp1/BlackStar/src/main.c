@@ -103,7 +103,7 @@ run_redefine_keys(void)
       sp1_PrintString(&ps0, redefine_texts[i]);
       sp1_UpdateNow();
 
-		in_wait_key();
+      in_wait_key();
       keys[i] = in_inkey();
       in_wait_nokey();
 
@@ -912,10 +912,10 @@ main(void)
    unsigned char idle = 0;
 
    // the crt has disabled interrupts before main is called
-	
-	// z88dk tracks the border colour so that beeper audio does not change the border colour while playing.
-	// (this project contains a 3rd party ntropic player that does not obey z88dk convention so we set the border to same colour)
-	zx_border(INK_BLACK);
+   
+   // z88dk tracks the border colour so that beeper audio does not change the border colour while playing.
+   // (this project contains a 3rd party ntropic player that does not obey z88dk convention so we set the border to same colour)
+   zx_border(INK_BLACK);
 
    // set up the block memory allocator with one queue
    // max size requested by sp1 will be 24 bytes or block size of 25 (+1 for overhead)

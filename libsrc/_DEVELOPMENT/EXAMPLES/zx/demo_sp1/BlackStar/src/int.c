@@ -12,25 +12,25 @@ unsigned char timer;
 
 IM2_DEFINE_ISR_8080(isr)
 {
-	// update the clock
-	++tick;
+   // update the clock
+   ++tick;
 }
 
 void
 wait(void)
 {
-	while (abs(tick - timer) < WFRAMES)
-		intrinsic_halt();
-	
-	timer = tick;
+   while (abs(tick - timer) < WFRAMES)
+      intrinsic_halt();
+   
+   timer = tick;
 }
 
 void
 setup_int(void)
 {
-	im2_init((void *)0xd000);
-	memset((void *)0xd000, 0xd1, 257);
-	
-	z80_bpoke(0xd1d1, 0xc3);
-	z80_wpoke(0xd1d2, (unsigned int)isr);
+   im2_init((void *)0xd000);
+   memset((void *)0xd000, 0xd1, 257);
+   
+   z80_bpoke(0xd1d1, 0xc3);
+   z80_wpoke(0xd1d2, (unsigned int)isr);
 }
