@@ -5,6 +5,33 @@ This is a game I made in (less than) 48 hours for [BitBitJam 2015](http://bitbit
 
 I targeted the ZX Spectrum 48K and the theme was "Confronted Kingdoms". The result is Black Star, a Space Invaders type of game, that won in the "best platform use" category.
 
+## License
+
+The loading screen is based on Angelo Nero's "rainbow wormhole".
+
+This bundle includes some third party code that has its own license, for
+the rest the following applies.
+
+Copyright (C) 2015 by Juan J. Martinez - www.usebox.net
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
 ## Compiling
 
 `sccz80` compile (change copy to equivalent cat for non-windows)
