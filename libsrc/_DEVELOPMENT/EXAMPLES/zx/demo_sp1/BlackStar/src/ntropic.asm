@@ -24,7 +24,7 @@ PUBLIC _ntropic_play
 
 _ntropic_play:
 
-   ; void ntropic_play(uchar *song_addr, unsigned int loop) __z88dk_callee
+   ; void ntropic_play(unsigned char *song_addr, unsigned int loop) __z88dk_callee
    ; callee linkage means we clear the stack
 
    ; first gather the parameters from the stack

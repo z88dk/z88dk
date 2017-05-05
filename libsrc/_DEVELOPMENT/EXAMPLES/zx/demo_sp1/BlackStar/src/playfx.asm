@@ -28,12 +28,31 @@ _playfx:
    ; beepfx sound effects engine so we'll
    ; just call that.
 
-   ; asm_bit_beepfx_di:
+   ; asm_bit_beepfx:
    ; enter : ix = void *effect
    ; uses  : af, bc, de, hl, bc', de', hl', ix
-   
+
+IFDEF __SDCC_IY
+
+   ; Admittedly this is tricky.
+   ; CLIB=SDCC_IY compiles build the library with IX and IY swapped.
+
+   ; So although the library function documents IX as the input parameter,
+   ; that has been changed to IY during the library build!
+
+   ; Technically we also do not have to save IX around this call since
+   ; instead of using IX it's now using IY which is ok with zsdcc.
+   ; But let's keep things as simple as possible since speed here doesn't matter.
+
+   push hl
+   pop iy
+
+ELSE
+
    push hl
    pop ix
+
+ENDIF
    
    di
    

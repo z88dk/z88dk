@@ -912,6 +912,10 @@ main(void)
    unsigned char idle = 0;
 
    // the crt has disabled interrupts before main is called
+	
+	// z88dk tracks the border colour so that beeper audio does not change the border colour while playing.
+	// (this project contains a 3rd party ntropic player that does not obey z88dk convention so we set the border to same colour)
+	zx_border(INK_BLACK);
 
    // set up the block memory allocator with one queue
    // max size requested by sp1 will be 24 bytes or block size of 25 (+1 for overhead)
@@ -919,6 +923,7 @@ main(void)
    balloc_addmem(0, sizeof(block_of_ram)/25, 24, block_of_ram);  // add free memory from bss section
    balloc_addmem(0, 8, 24, (void *)0xd101);                      // another eight from an unused area
 
+   // interrupt mode 2
    setup_int();
 
    // sp1.lib
@@ -945,7 +950,7 @@ main(void)
 
    draw_menu();
 
-   srand(tick);
+   srand(tick);  // 256 different games are possible
 
    while(1)
    {

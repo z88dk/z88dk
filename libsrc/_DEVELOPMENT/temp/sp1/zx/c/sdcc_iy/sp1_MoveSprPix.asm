@@ -24,6 +24,5 @@ _sp1_MoveSprPix:
    push bc
    push hl
    push af
-   
-   push bc
+
    jp l0_sp1_MoveSprPix_callee
