@@ -684,7 +684,7 @@ sub get_gcc_options {
 	if ( ! %FLAGS ) {
 		open(my $pipe, "make -p|") or die;
 		while (<$pipe>) {
-			if (/^(CFLAGS|LDFLAGS)\s*=\s*(.*)/) {
+			if (/^\w*(CFLAGS|LDFLAGS)\s*=\s*(.*)/) {
 				my($flag, $text) = ($1, $2);
 				$text =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
 				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;
