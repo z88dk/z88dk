@@ -351,7 +351,7 @@ sub remove_comments_it {
 		imap {
 			for ($_->{text}) {
 				s/^\s*;.*//;
-				s/^\s*\#.*//;
+#				s/^\s*\#.*//;
 				s/ (?:  (?<af1>		af\'		)
 				   |	(?<qstr>	$QSTR_RE	)
 				   |	(?<comment>	\s* ; .*	)

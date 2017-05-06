@@ -18,12 +18,12 @@ _sp1_MoveSprPix_callee:
    pop de
    pop bc
    push af
-   
+
+l0_sp1_MoveSprPix_callee:
+
    exx
    push bc
    exx
-
-l0_sp1_MoveSprPix_callee:
 
    ex (sp),iy
    

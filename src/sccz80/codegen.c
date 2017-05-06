@@ -1146,6 +1146,10 @@ void quikmult(int type, int32_t size, char preserve)
                 break;
             case 1:
                 break;  
+            case 65536:
+                ol("ex\tde,hl");
+                vconst(0);
+                break;
             case 256:  /* 5 bytes */
                 ol("ld\td,e");
                 ol("ld\te,h");
@@ -1153,17 +1157,17 @@ void quikmult(int type, int32_t size, char preserve)
                 ol("ld\tl,0");
                 break;      
             case 8: /* 15 bytes */
-                ol("add\thl,hl");;
+                ol("add\thl,hl");
                 ol("rl\te");
                 ol("rl\td");  
                 /* Fall through */              
             case 4: /* 10 bytes */
-                ol("add\thl,hl");;
+                ol("add\thl,hl");
                 ol("rl\te");
                 ol("rl\td");  
                 /* Fall through */            
             case 2: /* 5 bytes */
-                ol("add\thl,hl");;
+                ol("add\thl,hl");
                 ol("rl\te");
                 ol("rl\td");   
                 break;
@@ -1226,23 +1230,45 @@ void quikmult(int type, int32_t size, char preserve)
     case 0:
         vconst(0);
         break;
+    case 2048:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
+    case 1024:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
+    case 512:
+        ol("ld\th,l");
+        ol("ld\tl,0");
+        ol("add\thl,hl");
+        break;
     case 256:
         ol("ld\th,l");
         ol("ld\tl,0");
         break;
     case 1:
         break;
+    case 64:
+        ol("add\thl,hl");
+    case 32:
+        ol("add\thl,hl");
     case 16:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
     case 8:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
     case 4:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
     case 2:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
         break;
     case 12:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
     case 6:
         sixreg();
         break;
@@ -1258,10 +1284,10 @@ void quikmult(int type, int32_t size, char preserve)
         break;
     case 10:
         fivereg();
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
         break;
     case 14:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
     case 7:
         sixreg();
         ol("add\thl,bc");  /* BC contains original value */
@@ -1446,7 +1472,12 @@ void zdiv_const(LVALUE *lval, int32_t value)
             return;
         }
     } else if ( utype(lval) ) {
-        if ( value == 256 ) {
+        if ( value == 512 ) {
+            ol("ld\tl,h");
+            ol("ld\th,0");
+            ol("srl\tl");
+            return;
+        } else if ( value == 256 ) {
             ol("ld\tl,h");
             ol("ld\th,0");
             return;

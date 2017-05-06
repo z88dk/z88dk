@@ -32,7 +32,7 @@ TARGET =		z80asm$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-CFLAGS +=		-MMD -I. -I$(LOCAL_LIB) -It -Wall -std=c99 -D_GNU_SOURCE
+LOCAL_CFLAGS +=		-MMD -I. -I$(LOCAL_LIB) -It -Wall -std=c99 -D_GNU_SOURCE
 
 #------------------------------------------------------------------------------
 # main
@@ -41,7 +41,11 @@ CFLAGS +=		-MMD -I. -I$(LOCAL_LIB) -It -Wall -std=c99 -D_GNU_SOURCE
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
+
+
+%.o: %.c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
@@ -61,7 +65,7 @@ clean::
 # intall
 #------------------------------------------------------------------------------
 install:
-	$(INSTALL) $(TARGET) $(PREFIX)/bin/
+	$(INSTALL) $(TARGET) $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl  $(PREFIX)/bin/
 
 #------------------------------------------------------------------------------

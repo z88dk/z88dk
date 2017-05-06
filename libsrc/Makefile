@@ -1491,7 +1491,9 @@ sp1-clean:
 	$(MAKE) -C sprites/software/sp1 clean
 
 
-clean:
+clean: classic-clean new-clean
+
+classic-clean:
 	$(MAKE) -C ace clean
 	$(MAKE) -C assert clean
 	$(MAKE) -C c128 clean
@@ -1551,6 +1553,14 @@ clean:
 	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
 	$(RM) *.lib
+
+new-clean:
+	$(MAKE) -C _DEVELOPMENT clean
+
+new-install-clean:
+	$(MAKE) -C _DEVELOPMENT install-clean
+
+install-clean: classic-clean new-install-clean
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs

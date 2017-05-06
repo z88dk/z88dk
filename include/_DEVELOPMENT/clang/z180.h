@@ -113,7 +113,7 @@ extern void *z180_otdmr(void *src,uint8_t port,uint8_t num);
    extern unsigned char RDR1;
 
    extern unsigned char CNTR;
-   extern unsigned char TRD;
+   extern unsigned char TRDR;
 
    extern unsigned char TMDR0L;
    extern unsigned char TMDR0H;
@@ -172,7 +172,7 @@ extern void *z180_otdmr(void *src,uint8_t port,uint8_t num);
    __sfr __at __IO_RDR1 RDR1;
 
    __sfr __at __IO_CNTR CNTR;
-   __sfr __at __IO_TRD TRD;
+   __sfr __at __IO_TRDR TRDR;
 
    __sfr __at __IO_TMDR0L TMDR0L;
    __sfr __at __IO_TMDR0H TMDR0H;
@@ -243,7 +243,7 @@ extern void *z180_otdmr(void *src,uint8_t port,uint8_t num);
    extern unsigned char ASTC1H;
 
    extern unsigned char CNTR;
-   extern unsigned char TRD;
+   extern unsigned char TRDR;
 
    extern unsigned char TMDR0L;
    extern unsigned char TMDR0H;
@@ -311,7 +311,7 @@ extern void *z180_otdmr(void *src,uint8_t port,uint8_t num);
    __sfr __at __IO_ASTC1H ASTC1H;
 
    __sfr __at __IO_CNTR CNTR;
-   __sfr __at __IO_TRD TRD;
+   __sfr __at __IO_TRDR TRDR;
 
    __sfr __at __IO_TMDR0L TMDR0L;
    __sfr __at __IO_TMDR0H TMDR0H;

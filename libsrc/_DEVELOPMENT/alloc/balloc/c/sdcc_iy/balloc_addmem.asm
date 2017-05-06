@@ -13,7 +13,6 @@ _balloc_addmem:
    pop ix
    dec sp
    pop af
-   inc sp
    pop bc
    pop hl
    pop de
@@ -22,6 +21,7 @@ _balloc_addmem:
    push hl
    push bc
    push af
+   inc sp
    push ix
    
    jp asm_balloc_addmem

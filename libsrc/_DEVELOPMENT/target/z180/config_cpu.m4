@@ -54,7 +54,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    # CSI/O
 
    define(`__IO_CNTR', eval(__IO_BASE_ADDRESS + 0x0a))
-   define(`__IO_TRD', eval(__IO_BASE_ADDRESS + 0x0b))
+   define(`__IO_TRDR', eval(__IO_BASE_ADDRESS + 0x0b))
 
    # Timer
 
@@ -139,7 +139,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    # CSI/O
 
    define(`__IO_CNTR', eval(__IO_BASE_ADDRESS + 0x0a))
-   define(`__IO_TRD', eval(__IO_BASE_ADDRESS + 0x0b))
+   define(`__IO_TRDR', eval(__IO_BASE_ADDRESS + 0x0b))
 
    # Timer
 
@@ -202,6 +202,109 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    define(`__IO_ICR', eval(__IO_BASE_ADDRESS + 0x3f))
 ')
 
+# I/O REGISTER BIT FIELDS
+
+define(`__IO_CNTLA0_MPE',       0x80)
+define(`__IO_CNTLA0_RE',        0x40)
+define(`__IO_CNTLA0_TE',        0x20)
+define(`__IO_CNTLA0_RTS0',      0x10)
+define(`__IO_CNTLA0_MPBR',      0x08)
+define(`__IO_CNTLA0_EFR',       0x08)
+define(`__IO_CNTLA0_MODE_MASK', 0x07)
+define(`__IO_CNTLA0_MODE_8P2',  0x07)
+define(`__IO_CNTLA0_MODE_8P1',  0x06)
+define(`__IO_CNTLA0_MODE_8N2',  0x05)
+define(`__IO_CNTLA0_MODE_8N1',  0x04)
+define(`__IO_CNTLA0_MODE_7P2',  0x03)
+define(`__IO_CNTLA0_MODE_7P1',  0x02)
+define(`__IO_CNTLA0_MODE_7N2',  0x01)
+define(`__IO_CNTLA0_MODE_7N1',  0x00)
+
+define(`__IO_CNTLA1_MPE',       0x80)
+define(`__IO_CNTLA1_RE',        0x40)
+define(`__IO_CNTLA1_TE',        0x20)
+define(`__IO_CNTLA1_CKA1D',     0x10)
+define(`__IO_CNTLA1_MPBR',      0x08)
+define(`__IO_CNTLA1_EFR',       0x08)
+define(`__IO_CNTLA1_MODE_MASK', 0x07)
+define(`__IO_CNTLA1_MODE_8P2',  0x07)
+define(`__IO_CNTLA1_MODE_8P1',  0x06)
+define(`__IO_CNTLA1_MODE_8N2',  0x05)
+define(`__IO_CNTLA1_MODE_8N1',  0x04)
+define(`__IO_CNTLA1_MODE_7P2',  0x03)
+define(`__IO_CNTLA1_MODE_7P1',  0x02)
+define(`__IO_CNTLA1_MODE_7N2',  0x01)
+define(`__IO_CNTLA1_MODE_7N1',  0x00)
+
+define(`__IO_CNTLB0_MPBT',      0x80)
+define(`__IO_CNTLB0_MP',        0x40)
+define(`__IO_CNTLB0_CTS',       0x20)
+define(`__IO_CNTLB0_PS',        0x20)
+define(`__IO_CNTLB0_PEO',       0x10)
+define(`__IO_CNTLB0_DR',        0x08)
+define(`__IO_CNTLB0_SS_MASK',   0x07)
+define(`__IO_CNTLB0_SS_EXT',    0x07)
+define(`__IO_CNTLB0_SS_DIV_64', 0x06)
+define(`__IO_CNTLB0_SS_DIV_32', 0x05)
+define(`__IO_CNTLB0_SS_DIV_16', 0x04)
+define(`__IO_CNTLB0_SS_DIV_8',  0x03)
+define(`__IO_CNTLB0_SS_DIV_4',  0x02)
+define(`__IO_CNTLB0_SS_DIV_2',  0x01)
+define(`__IO_CNTLB0_SS_DIV_1',  0x00)
+
+define(`__IO_CNTLB0_MPBT',      0x80)
+define(`__IO_CNTLB1_MP',        0x40)
+define(`__IO_CNTLB1_CTS',       0x20)
+define(`__IO_CNTLB1_PS',        0x20)
+define(`__IO_CNTLB1_PEO',       0x10)
+define(`__IO_CNTLB1_DR',        0x08)
+define(`__IO_CNTLB1_SS_MASK',   0x07)
+define(`__IO_CNTLB1_SS_EXT',    0x07)
+define(`__IO_CNTLB1_SS_DIV_64', 0x06)
+define(`__IO_CNTLB1_SS_DIV_32', 0x05)
+define(`__IO_CNTLB1_SS_DIV_16', 0x04)
+define(`__IO_CNTLB1_SS_DIV_8',  0x03)
+define(`__IO_CNTLB1_SS_DIV_4',  0x02)
+define(`__IO_CNTLB1_SS_DIV_2',  0x01)
+define(`__IO_CNTLB1_SS_DIV_1',  0x00)
+
+define(`__IO_STAT0_RDRF',       0x80)
+define(`__IO_STAT0_OVRN',       0x40)
+define(`__IO_STAT0_PE',         0x20)
+define(`__IO_STAT0_FE',         0x10)
+define(`__IO_STAT0_RIE',        0x08)
+define(`__IO_STAT0_DCD0',       0x04)
+define(`__IO_STAT0_TDRE',       0x02)
+define(`__IO_STAT0_TIE',        0x01)
+
+define(`__IO_STAT1_RDRF',       0x80)
+define(`__IO_STAT1_OVRN',       0x40)
+define(`__IO_STAT1_PE',         0x20)
+define(`__IO_STAT1_FE',         0x10)
+define(`__IO_STAT1_RIE',        0x08)
+define(`__IO_STAT1_CTS1E',      0x04)
+define(`__IO_STAT1_TDRE',       0x02)
+define(`__IO_STAT1_TIE',        0x01)
+
+define(`__IO_CNTR_EF',          0x80)
+define(`__IO_CNTR_EIE',         0x40)
+define(`__IO_CNTR_RE',          0x20)
+define(`__IO_CNTR_TE',          0x10)
+define(`__IO_CNTR_SS_MASK',     0x07)
+define(`__IO_CNTR_SS_EXT',      0x07)
+define(`__IO_CNTR_SS_DIV_1280', 0x06)
+define(`__IO_CNTR_SS_DIV_640',  0x05)
+define(`__IO_CNTR_SS_DIV_320',  0x04)
+define(`__IO_CNTR_SS_DIV_160',  0x03)
+define(`__IO_CNTR_SS_DIV_80',   0x02)
+define(`__IO_CNTR_SS_DIV_40',   0x01)
+define(`__IO_CNTR_SS_DIV_20',   0x00)
+
+
+
+
+
+
 #
 # END OF USER CONFIGURATION
 ###############################################################
@@ -246,7 +349,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `RDR1'
 
    PUBLIC `CNTR'
-   PUBLIC `TRD'
+   PUBLIC `TRDR'
 
    PUBLIC `TMDR0L'
    PUBLIC `TMDR0H'
@@ -312,7 +415,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `ASTC1H'
 
    PUBLIC `CNTR'
-   PUBLIC `TRD'
+   PUBLIC `TRDR'
 
    PUBLIC `TMDR0L'
    PUBLIC `TMDR0H'
@@ -400,7 +503,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `RDR1' = __IO_RDR1
 
    defc `CNTR' = __IO_CNTR
-   defc `TRD' = __IO_TRD
+   defc `TRDR' = __IO_TRDR
 
    defc `TMDR0L' = __IO_TMDR0L
    defc `TMDR0H' = __IO_TMDR0H
@@ -466,7 +569,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `ASTC1H' = __IO_ASTC1H
 
    defc `CNTR' = __IO_CNTR
-   defc `TRD' = __IO_TRD
+   defc `TRDR' = __IO_TRDR
 
    defc `TMDR0L' = __IO_TMDR0L
    defc `TMDR0H' = __IO_TMDR0H
@@ -555,7 +658,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `__IO_RDR1'  __IO_RDR1
 
    `#define' `__IO_CNTR'  __IO_CNTR
-   `#define' `__IO_TRD'  __IO_TRD
+   `#define' `__IO_TRDR'  __IO_TRDR
 
    `#define' `__IO_TMDR0L'  __IO_TMDR0L
    `#define' `__IO_TMDR0H'  __IO_TMDR0H
@@ -621,7 +724,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `__IO_ASTC1H'  __IO_ASTC1H
 
    `#define' `__IO_CNTR'  __IO_CNTR
-   `#define' `__IO_TRD'  __IO_TRD
+   `#define' `__IO_TRDR'  __IO_TRDR
 
    `#define' `__IO_TMDR0L'  __IO_TMDR0L
    `#define' `__IO_TMDR0H'  __IO_TMDR0H

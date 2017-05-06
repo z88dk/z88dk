@@ -1,5 +1,5 @@
 
-; void *balloc_alloc_fastcall(unsigned int queue)
+; void *balloc_alloc_fastcall(unsigned char queue)
 
 SECTION code_clib
 SECTION code_alloc_balloc

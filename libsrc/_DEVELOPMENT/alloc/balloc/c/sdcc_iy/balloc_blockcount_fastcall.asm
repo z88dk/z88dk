@@ -1,5 +1,5 @@
 
-; size_t balloc_blockcount_fastcall(unsigned int queue)
+; size_t balloc_blockcount_fastcall(unsigned char queue)
 
 SECTION code_clib
 SECTION code_alloc_balloc

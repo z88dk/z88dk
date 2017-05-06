@@ -34,8 +34,6 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #109: Callee functions now cleanup correctly without corrupting return values
 - [sccz80] #103: Bug fixes around double + int/long operands
 - [sccz80] #98: Bug fix for handling expressions with a const on lefthand side
-- [sccz80] Function pointers now inherit the callee/smallc state of the function
-  they are given the value of
 - [sccz80] #90: Bug fix for result of comparison
 - [sccz80] #118: static doubles can now be initialised
 - [sccz80] #116: Optimisations for operations with constants
@@ -50,8 +48,13 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #176: sizeof() now works on a wider range of lvalues
 - [sccz80] #155: The section names used by sccz80 can now be configured
 - [sccz80] #188: sccz80 now provides builtin functions for memcpy, memset, strcpy, strchr
+- [sccz80] #220: sccz80 now supports __critical blocks and functions
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [zcc] Spaces in filenames (and paths) are now supported.
+- [zcc] Custom optimisation rules can be supplied with -custom-copt-rules=
+- [zcc] A target must now be supplied to zcc
+- [zcc] The option -sccz80-inline-ints will inline any calls generates to l_gint and l_pint.
+  This can improve performance at the cost of a small increase in binary size
 - [zpragma] Support for #pragma printf and #pragma scanf which take a format string
   argument and configure the appropriate printf converters.
 - [zpragma] has now been completely renamed, scanner is no more
