@@ -6,7 +6,7 @@ It is a sophisticated engine that is not completely documented, however if you a
 
 * [Brief Overview of the Engine](https://www.z88dk.org/wiki/doku.php?id=library:sprites:sp1)
 * [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/sp1.h)
-* [Largely Up-to-Date Commentary](https://www.z88dk.org/wiki/doku.php?id=libnew:examples:sp1_ex1)  
+* [Discussion of SP1's Memory Map and Configuration](https://www.z88dk.org/wiki/doku.php?id=libnew:examples:sp1_ex1)  
 SP1 configuration is now done through z88dk/libsrc/_DEVELOPMENT/target/zx/config_sp1.m4
 * [Set of Old Tutorial Programs](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/spectrum/examples) showing how part of the SP1 library works.  
   I am a little hesitant to link these because Z88DK has been simplified since then so these programs will not compile as-is.  Changes concern how SP1 allocates memory (it is now implied to be through malloc/free) and how data is defined in asm (it should be done in a separate .asm file).  The ideas and API calls are the same so seeing these examples and reading the comments in the .c source should be of value to understand how things work.
@@ -15,7 +15,7 @@ SP1 configuration is now done through z88dk/libsrc/_DEVELOPMENT/target/zx/config
 
 SP1 understands two kinds of graphics - background tiles and sprites.
 
-**Tiles** are simply UDGs so the usual graphics tools can be used for that.  An automatic one you may want to check into is [png2c.py](https://github.com/reidrac/png2c-z88dk).  This tool also seems to generate `sp1_PrintString()` strings to draw a complete screen.  `sp1_PrintString()` understands [control codes](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/temp/sp1/zx/tiles/SP1PrintString.asm#L20) in strings like repeat, move relative and so on that can describe a complete background screen in a compact manner.
+**Tiles** are simply UDGs so the usual graphics tools can be used for that.  An automatic one you may want to check into is [png2c.py](https://www.usebox.net/jjm/zxdev/).  This tool also seems to generate `sp1_PrintString()` strings to draw a complete screen.  `sp1_PrintString()` understands [control codes](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/temp/sp1/zx/tiles/SP1PrintString.asm#L20) in strings like repeat, move relative and so on that can describe a complete background screen in a compact manner.
 
 **Sprites**, on the other hand, are defined in an unusual manner.  First of all, the engine is character oriented so all dimensions are measured in characters.  Sprite graphics are arranged in columns of a certain character height.  This is why sprites are built using `sp1_CreateSpr()` to create the first column (and specify the height) and then further columns are added with `sp1_AddColSpr()`.
 
@@ -28,5 +28,5 @@ There are a few tools available that will generate SP1 sprites:
   * ;Data Outputted:  Gfx
   * ;Interleave:      Sprite
   * ;Mask:            Yes, before graphic
-* [png2sprite.py](https://github.com/reidrac/png2sprite)
+* [png2sprite.py](https://www.usebox.net/jjm/zxdev/)
 * [TommyGun](https://worldofspectrum.org/forums/discussion/52390/tommygun-update) also has a SevenuP plug-in for its image editor.
