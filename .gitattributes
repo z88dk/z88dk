@@ -1,6 +1,6 @@
 *.pdf   binary
 *.asm   text eol=lf
-*.bmk   text eol=lf
+*.bmk   binary
 *.c     text eol=lf
 *.def   text eol=lf
 *.h     text eol=lf
