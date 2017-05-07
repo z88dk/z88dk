@@ -50,8 +50,11 @@ char	KFlag,			/* Kibitz flag		*/
 	BFlag;		/* Debug flag		*/
 
 
-main(int argc,char **argv)
-//char **argv;
+static int Check();
+static int rguess(char *prompt, char *where);
+static int match(char *aa, char *bb);
+
+int main(int argc,char **argv)
  {
 	register int i,j;
 	int ngames, ntries;
@@ -134,9 +137,7 @@ Game:
 	goto Game;
  }
 
-int match(aa, bb)
- char *aa;
- char *bb;
+int match(char *aa, char *bb)
  {	register int i, score;
 	char j;
 	int temp[MCOLORS];
