@@ -151,6 +151,91 @@ By using Z88DK for an all-asm or nearly all-asm project, you gain optional acces
 
 If you will be sharing your ASM code/data/music for others to use, Z88DK provides an ideal mechanism through **libraries** which few z80 assemblers support.
 
+## A Quick Note for ASM Code
+
+Z88DK uses `z80asm` as a section-aware linking assembler.  What this means is placement of code and data in memory is controlled by section assignment rather than ORG.  This is an essential feature of a modern development environment.
+
+A [memory map](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/crt_memory_model.inc) is defined by the CRT to inform the linker how sections are placed in memory.  It is also easy for users to define a custom memory map but this can be explained elsewhere.  This memory map is the default one used by the newlib.  It has many tiny sections aggregated into three main ones:  CODE, DATA and BSS.  Some targets may define more sections.  For example, the +sms and +zx targets define additional sections BANK_XX (XX from 00 and up in hex) for bankswitched memory banks.
+
+The CODE section will contain read-only code and data that can be held in ROM.  The DATA section will contain self-modifying code or data that is initially non-zero that must be in RAM.  If the program will be stored in ROM, this DATA section must be constructed in RAM before main() is called.  The BSS section holds initially zero RAM variables.
+
+This separation allows Z88DK to generate programs that can be stored in ROM.  There are three compile models that Z88DK supports that are variations on this:  the ROM model, the compressed ROM model and the RAM model.  These are explained [here](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded#understanding_the_output_files_generated_by_the_compiler).  Compiles for home computers like the zx spectrum are almost always RAM model compiles and Z88DK sets that up by default.  Games consoles like the Sega Master System store programs on ROM cartridge so for them a ROM model compile is set up by default.
+
+`z80asm` can be used as a simpler non-sectioned assembler but as a component of Z88DK, interacting with the libraries and C code, and called through `zcc`, asm code and data needs to be assigned to appropriate sections to be made part of the output binary.
+
+Z88DK defines a number of sections for ASM code that asm programmers can use: **code_user**, **rodata_user**, **smc_user**, **data_user**, **bss_user**.
+
+Example use and explanation can be see below.
+
+~~~
+SECTION code_user
+PUBLIC _main
+
+; code_user is for read-only code
+; called by the crt as entry to program
+_main:
+   ld hl,10
+   ret
+
+SECTION bss_user
+PUBLIC myvar
+
+; bss_user is for zeroed ram variables
+; zeroed by crt when program started
+myvar:
+   defs 100
+
+SECTION data_user
+PUBLIC name
+
+; data_user is for initially non-zero ram variables
+; initialized in ram by crt if the program is in rom
+name: 
+   defm "John Smith"
+   defb 0
+
+SECTION smc_user
+PUBLIC oops
+
+; smc_user is for self-modifying code
+; self modifying code is moved to ram if the program is in rom
+oops:
+   ld hl,0
+   ld (oops),hl
+   ret
+
+SECTION rodata_user
+PUBLIC placedinrom
+
+; rodata_user if for constant data
+; kept in rom if program is in rom
+placedinrom:
+   defb 1,2,3,4
+
+SECTION BANK_06
+PUBLIC aymusic
+
+; assignment to a specific memory bank
+; varies by target
+aymusic:
+   BINARY "rawdata.bin"
+
+SECTION code_crt_init
+EXTERN stufftodo
+
+; wedged before call to main inside crt so initialization
+; can happen before program is started
+
+call stufftodo
+
+; notice NO RET!
+~~~
+
+Assignment to a section is done with the SECTION directive.  The currently active SECTION can be changed at any time within an asm file.  (It should be noted that the C compilers can change active section on a file granularity only see [AstroForce](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/sms/AstroForce) for the +sms).  SECTION use is straightforward but for more examples have a look at the [library code](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT).
+
+ASM code is not confined to the list of sections given above.  ASM code and data can be added to any section defined in the memory map.  One such special section is **code_crt_init** (see above) that can wedge in initialization code before main() is called.  You can also invent your own sections with their own ORG addresses.  Unknown sections will be output as a separate binary by the linker.
+
+
 ## Distributing Code or Data as a Library to Share with Others
 
 If you have subroutines or graphics and sound to share, you can place that in a library.  People using your code or graphics can link against your library on the compile line with "-lname".  Z88DK will automatically pull stuff out of your library as needed but only what is actually used.
