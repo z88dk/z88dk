@@ -385,44 +385,6 @@ Define rules for a ragel-based parser.
 		*   8-bit load group
 		*--------------------------------------------------------------------*/
 
-		/* LD (hl),N */
-		|	label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA expr _TK_NEWLINE
-			@{ DO_stmt_n( Z80_LD_r_n( REG_idx ) ); }
-
-#foreach <X> in IX, IY
-		/* LD (ix),N */
-		|	label? _TK_LD _TK_IND_<X> _TK_RPAREN 
-					_TK_COMMA expr _TK_NEWLINE 
-			@{ DO_stmt_n( (P_<X> + Z80_LD_r_n( REG_idx ) ) << 8 ); }
-			
-		/* LD (ix+d),N */
-		|	label? _TK_LD _TK_IND_<X> expr _TK_RPAREN 
-					_TK_COMMA expr _TK_NEWLINE 
-			@{ DO_stmt_idx_n( P_<X> + Z80_LD_r_n( REG_idx ) ); }
-#endfor  <X>		
-
-#foreach <DD> in BC, DE
-		/* LD a,(bc|de) */
-		|	label? _TK_LD _TK_A _TK_COMMA _TK_IND_<DD> _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_A_IND_dd( REG_IND_<DD> ) ); }
-
-		|	label? _TK_LD _TK_A1 _TK_COMMA _TK_IND_<DD> _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt( Z80_LD_A_IND_dd( REG_IND_<DD> ) ); }
-
-		/* LD (bc|de),a */
-		|	label? _TK_LD _TK_IND_<DD> _TK_COMMA _TK_A _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_IND_dd_A( REG_IND_<DD> ) ); }
-#endfor  <DD>		
-
-		/* ld (NN),A */
-		| label? _TK_LD expr _TK_COMMA _TK_A _TK_NEWLINE
-		  @{
-				if (! expr_in_parens)
-					return FALSE;			/* syntax error */
-					
-				DO_stmt_nn( Z80_LD_IND_NN_A );		/* ld (NN),a */
-			}
-
 		/* load I, R */
 #foreach <IR> in I, IIR, R, EIR, XPC
 		|	label? _TK_LD _TK_<IR> _TK_COMMA _TK_A _TK_NEWLINE \

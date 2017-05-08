@@ -155,9 +155,11 @@ sub add_opcode {
 		return;
 	}
 
-	my $valid_code = check_valid($opcode);
+	# reorder bytes DD|FD, xx, N, SN -> DD|FD, xx, SN, N
+	$bytes =~ s/\b (N) \s* , \s* (SN 0?) \b/ $2, $1 /x;
 	
 	# build test code
+	my $valid_code = check_valid($opcode);
 	for my $cpu (@CPUS) {
 		my $exists = check_arch($cpu, $arch);
 		build_test_code($opcode, $bytes, $cpu, $exists && $valid_code);
@@ -206,12 +208,26 @@ sub build_test_code {
 		return;
 	}
 	
+	# check for /IMN/
+	if ($opcode =~ /\b IMN \b/x) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		# MN
+		(my $bytes_copy = $bytes) =~ s/\b N \s* , \s* M \b/ 34, 12 /x or die;
+		build_test_code($opcode_1.(0x1234).$opcode_2, $bytes_copy, $cpu, 0);
+		
+		# (N)
+		build_test_code($opcode_1.'('.(0x1234).')'.$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		
+		return;
+	}
+	
 	# check for /SN/
 	if ($opcode =~ /\b SN \b/x) {
 		my($opcode_1, $opcode_2) = ($`, $');
 		
-		(my $bytes_copy = $bytes) =~ s/\b SN \b/ 2A /x or die;
-		build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		(my $bytes_copy = $bytes) =~ s/\b SN \b/ 7F /x or die;
+		build_test_code($opcode_1.(0x7F).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
 		
 		return;
 	}
@@ -274,6 +290,10 @@ sub build_ragel_rule {
 		$rule .= 'if (expr_in_parens) return FALSE; ';
 	}
 	
+	if ($opcode =~ /\b IMN \b/x) {
+		$rule .= 'if (!expr_in_parens) return FALSE; ';
+	}
+	
 	$rule .= join(' ', opcode_bytes_rule($bytes)).' ';
 	$rule .= '}';
 	
@@ -300,6 +320,8 @@ sub opcode_tokens_rule {
 		elsif (/ \G ,   		/gcx)	{ push @tokens, '_TK_COMMA'; }
 		elsif (/ \G \)   		/gcx)	{ push @tokens, '_TK_RPAREN'; }
 		elsif (/ \G \( \s* (hl|ix|iy) \s* \+? /gcx)	
+										{ push @tokens, '_TK_IND_'.uc($1); }
+		elsif (/ \G \( \s* (bc|de) \s* \) \+? /gcx)	
 										{ push @tokens, '_TK_IND_'.uc($1); }
 		elsif (/ \G [A-Z_]+ 	/gcx)	{ push @tokens, 'expr'; }
 		elsif (/ \G ([a-z0]+)\' /gcx)	{ push @tokens, '_TK_'.uc($1).'1'; }
@@ -339,15 +361,22 @@ sub opcode_bytes_rule {
 	if ($bytes =~ s/\b N \s* , \s* M \b/ /x) {
 		$func = 'DO_stmt_nn';
 	}
-	elsif ($bytes =~ s/\b N \b/ /x) {
-		$func = 'DO_stmt_n';
+	elsif ($bytes =~ s/\b SN \s* , \s* N \b/ /x) {
+		$func = 'DO_stmt_idx_n';
 	}
 	elsif ($bytes =~ s/\b SN \b/ /x) {
 		$func = 'DO_stmt_idx';
 	}
+	elsif ($bytes =~ s/\b SN0 \s* , \s* N \b/ /x) {
+		$func = 'DO_stmt_n';
+		$post_arg = ' << 8';
+	}
 	elsif ($bytes =~ s/\b SN0 \b/ /x) {
 		$func = 'DO_stmt';
 		$post_arg = ' << 8';
+	}
+	elsif ($bytes =~ s/\b N \b/ /x) {
+		$func = 'DO_stmt_n';
 	}
 	
 	# opcode

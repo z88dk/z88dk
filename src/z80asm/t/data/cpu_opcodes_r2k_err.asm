@@ -60,6 +60,12 @@
  altd ld iyl, iyh
  altd ld iyl, iyl
  altd ld l, (42)
+ ld (hl), (42)
+ ld (ix), (42)
+ ld (ix+127), (42)
+ ld (iy), (42)
+ ld (iy+127), (42)
+ ld 4660, a
  ld a', ixh
  ld a', ixl
  ld a', iyh

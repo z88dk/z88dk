@@ -5,6 +5,7 @@
 ; (X)		-> expands 5 lines (hl), (ix), (ix+d), (iy), (iy+d)
 ; XH, XL	-> expands to 3 lines with (h,l), and (ixh,ixl) and (iyh,iyl) only for [z80]
 ; N_IMN		-> expands to: ld a,(MN) | ld a,N
+; IMN		-> expands to: ld (MN),a
 ; N			-> expands to: ld b,N
 ;------------------------------------------------------------------------------
 
@@ -16,30 +17,16 @@
 		ld {. . . .  .  . . a}['], N_IMN				=> expr_in_parens ? 3A, N, M : 06 + $1*8, N
 		ld {b c d e XH XL . .}['], N					=>                             06 + $1*8, N
 
+		ld (X), N										=> 36, N
 		ld      {b c d e h l . a}['], (X)				=> 46 + $1*8
 		ld (X), {b c d e h l . a}						=> 70 + $1
 
+		ld       ({bc de}), a							=> 02 + $1*10
+		ld a['], ({bc de})								=> 0A + $1*10
+		
+		ld IMN, a										=> 32, N, M
+
 __END__
-			ld (X), N							=>     36,    N
-
-
-
-
-
-
-			ld (hl),     N		=>     36,    N
-			ld (ix + D), N		=> DD, 36, D, N
-			ld (iy + D), N		=> FD, 36, D, N
-
-			ld a,  ({bc de})	=> 	   0A + $1*10
-[rabbit]	ld a', ({bc de})	=> 76, 0A + $1*10
-
-			ld ({bc de}), a		=> 	   02 + $1*10
-			
-			ld a,  (MN)			=> 	   3A, N, M
-[rabbit]	ld a', (MN)			=> 76, 3A, N, M
-			
-			ld (MN), a			=> 	   32, N, M
 
 ;------------------------------------------------------------------------------
 ; 8-bit arithmetic group
