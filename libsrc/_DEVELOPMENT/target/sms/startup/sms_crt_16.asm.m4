@@ -149,10 +149,6 @@ __Restart_2:
 
    include "../clib_init_bss.inc"
 
-   ; enforce code section name
-   
-   include "../crt_enforce_code_section_name.inc"
-
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 

@@ -15,7 +15,7 @@
 _SMS_crt0_RST08:               ; Restart 08h - write HL to VDP Control Port
 __RST08_SMS_crt0_RST08:
 
-   ld c,0xbf                   ; set VDP Control Port
+   ld c,__IO_VDP_COMMAND
    di                          ; make it interrupt SAFE
    out (c),l
    out (c),h
@@ -35,11 +35,11 @@ _SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
 __RST18_SMS_crt0_RST18:
 
    ld a,l                      ; (respecting VRAM time costraints)
-   out (0xbe),a                ; 11
+   out (__IO_VDP_DATA),a       ; 11
    ld a,h                      ; 4
    sub 0                       ; 7
    nop                         ; 4 = 26 (VRAM SAFE)
-   out (0xbe),a
+   out (__IO_VDP_DATA),a
    ret
 
    defm "1.99C"

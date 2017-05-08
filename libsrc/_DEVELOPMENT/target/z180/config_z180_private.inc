@@ -82,7 +82,7 @@ defc __IO_BASE_ADDRESS = 0
    defc ASTC1H = 29
 
    defc CNTR = 10
-   defc TRD = 11
+   defc TRDR = 11
 
    defc TMDR0L = 12
    defc TMDR0H = 13

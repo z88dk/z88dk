@@ -61,11 +61,14 @@ ELSE
 
 ENDIF
 
-IF __crt_enforce_snames & 2
-
-   defb 0
-
-ENDIF
+section data_align_256
+section data_align_128
+section data_align_64
+section data_align_32
+section data_align_16
+section data_align_8
+section data_align_4
+section data_align_2
 
 section smc_driver
 section smc_font
@@ -107,13 +110,14 @@ ELSE
 
 ENDIF
 
-IF __crt_enforce_snames & 1
-
-   defb 0
-
-ENDIF
-
-section BSS_UNINITIALIZED
+section bss_align_256
+section bss_align_128
+section bss_align_64
+section bss_align_32
+section bss_align_16
+section bss_align_8
+section bss_align_4
+section bss_align_2
 
 section bss_driver
 section bss_font
@@ -123,6 +127,7 @@ section bss_lib
 section bss_compiler
 section bss_user
 
+section BSS_UNINITIALIZED
 SECTION BSS_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

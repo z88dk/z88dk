@@ -31,9 +31,7 @@ IF __CRTCFG = 0
    defc TAR__crt_initialize_bss        = 1
    
    defc TAR__crt_include_preamble      = 0
-
-   defc TAR__crt_enable_streams        = 0
-   
+  
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
