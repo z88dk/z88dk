@@ -7,64 +7,82 @@ use Modern::Perl;
 use Path::Tiny;
 use Data::Dump 'dump';
 
-my @CPU = (qw( z80 z180 r2k r3k ));
-my $TEST = "t/data/opcodes_";
+# global data
+my @CPUS = (qw( z80 z180 r2k r3k ));
+my $TEST_FILE = "t/data/cpu_opcodes_";
+my %TEST_ASM;			# %TEST_ASM{cpu}{ok|err} contais test assembly
+my @RAGEL_INC;			# $RAGEL_INC 			 contains Ragel rules
+
+# init data
+for my $cpu (@CPUS) {
+	$TEST_ASM{$cpu} = {ok => [], err => []};
+} 
 
 my $datafile = replace_ext($0, ".def");
-my $opcodes = parse_file($datafile);
+parse_file($datafile);
 
-for my $cpu (@CPU) {
-	make_test_files($opcodes, $cpu,
-		$TEST.$cpu."_ok.asm",
-		$TEST.$cpu."_ok.bmk",
-		$TEST.$cpu."_err.asm");
-}
-
-my $parser_file = replace_ext($0, ".h");
-make_parser_file($opcodes, $parser_file);
-
-#------------------------------------------------------------------------------
-# Parse input file, return data structure
-#------------------------------------------------------------------------------
-sub parse_file {
-	my($file) = @_;
-	my $opcodes = {};
-	parse_lines($opcodes, path($file)->lines);
-	return $opcodes;
-}
-
-sub parse_lines {
-	my($opcodes, @lines) = @_;
-	
-	# read each line
-LINES:
-	for (@lines) {
-		for (split(/\n/, $_)) {
-			next if /^\s*\#/;
-			next if /^\s*\;/;
-			next if /^\s*$/;
-			last LINES if /^__END__/;
-			s/^\s+//;
-			s/\s+$//;
-			s/\s+/ /g;
-			
-			# check if this opcode has a cpu filter
-			my @cpus;
-			if (/^\[(.*?)\]\s*/) {
-				my($cpus, $rest) = ($1, $');
-				$_ = $rest;
-				@cpus = split(' ', $cpus);
-			}
-			
-			# get opcode and bytes and insert in opcodes
-			my($opcode, $bytes) = split(/\s*=>\s*/, $_);
-			add_opcode($opcodes, $opcode, $bytes, \@cpus);
-		}
+# write test files
+for my $cpu (@CPUS) {
+	for my $data (qw( ok err )) {
+		my @lines = sort @{$TEST_ASM{$cpu}{$data}};
+		my $file = $TEST_FILE.$cpu."_".$data.".asm";
+		path($file)->spew_raw(map {"$_\n"} @lines);
 	}
 }
 
+# write parser include
+path("cpu_opcodes.h")->spew_raw(map {"$_\n"} sort @RAGEL_INC);
+
+#------------------------------------------------------------------------------
+sub replace_ext {
+	my($file, $new_ext) = @_;
+	$file =~ s/\.\w+$/$new_ext/;
+	return path($file);
+}
+
+#------------------------------------------------------------------------------
+sub trim {
+	local($_) = @_;
+	s/^\s*\#.*//;
+	s/^\s*\;.*//;
+	s/^\s+//;
+	s/\s+$//;
+	s/\s+/ /g;
+	return $_;
+}
+
+#------------------------------------------------------------------------------
+# Parse input file
+#------------------------------------------------------------------------------
+sub parse_file {
+	my($file) = @_;
+	for (path($file)->lines) {
+		$_ = trim($_);
+		last if /^__END__/;
+		next unless /\S/;
+		parse_line($_);
+	}
+}
+
+#------------------------------------------------------------------------------
+sub parse_line {
+	local($_) = @_;
+	
+	# check if this opcode has a cpu filter
+	my $arch = '';
+	if (/^\[\s*(\w+)\s*\]\s*/) {
+		$arch = $1;
+		my $rest = $';
+	}
+	
+	# get opcode and bytes and insert in opcodes
+	my($opcode, $bytes) = split(/\s*=>\s*/, $_);
+	add_opcode($opcode, $bytes, $arch);
+}
+
+#------------------------------------------------------------------------------
 sub add_opcode {
-	my($opcodes, $opcode, $bytes, $cpus, $var) = @_;
+	my($opcode, $bytes, $arch, $var) = @_;
 	$var ||= 1;		# start with $1
 	
 	# expand $var: {b c d} -> expands into 3 lines for each element and $1 = (0..3)
@@ -74,85 +92,168 @@ sub add_opcode {
 		for (0 .. $#list) {
 			my($id, $text) = ($_, $list[$_]);
 			next if $text eq '.';				# use a DOT to skip items
+			(my $bytes_copy = $bytes) =~ s/\$$var/ sprintf("%X", $id) /ge;
 			
-			my $opcode_copy = $before . $text . $after;
-			my $bytes_copy = $bytes; $bytes_copy =~ s/\$$var/ sprintf("%X", $id) /ge;
-			
-			add_opcode($opcodes, $opcode_copy, $bytes_copy, $cpus, $var+1);
+			add_opcode($before.$text.$after, $bytes_copy, $arch, $var+1);
 		}
 		return;
 	}
-	
+
 	# expand (X) -> expands 5 lines (hl), (ix), (ix+d), (iy), (iy+d)
-	# must be replaced before [']
 	if ($opcode =~ /\(X\)/) {
 		my($opcode_1, $opcode_2) = ($`, $');
-		@$cpus == 0 or die;
 	
 		# hl
-		add_opcode($opcodes, $opcode_1."(hl)".$opcode_2, $bytes, [], $var);
+		add_opcode($opcode_1."(hl)".$opcode_2, $bytes, $arch, $var);
 		
 		# ix
-		add_opcode($opcodes, $opcode_1."(ix)".$opcode_2, "DD, ".$bytes.", 0", [], $var);
+		add_opcode($opcode_1."(ix)".$opcode_2, "DD, ".$bytes.", SN", $arch, $var);
 		
 		# ix+D
-		add_opcode($opcodes, $opcode_1."(ix SN)".$opcode_2, "DD, ".$bytes.", SN", [], $var);
+		add_opcode($opcode_1."(ix+SN)".$opcode_2, "DD, ".$bytes.", SN", $arch, $var);
 		
 		# iy
-		add_opcode($opcodes, $opcode_1."(iy)".$opcode_2, "FD, ".$bytes.", 0", [], $var);
+		add_opcode($opcode_1."(iy)".$opcode_2, "FD, ".$bytes.", SN", $arch, $var);
 		
 		# iy+D
-		add_opcode($opcodes, $opcode_1."(iy SN)".$opcode_2, "FD, ".$bytes.", SN", [], $var);
-		
-		return;
-	}
-	
-	# expand ['] -> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
-	if ($opcode =~ /\[\'\]/) {
-		my($opcode_1, $opcode_2) = ($`, $');
-		@$cpus == 0 or die;
-		
-		# without '
-		add_opcode($opcodes, $opcode_1.$opcode_2, $bytes, [], $var);
-		
-		# with '
-		add_opcode($opcodes, $opcode_1."'".$opcode_2, "76, ".$bytes, ['rabbit'], $var);
-		
-		# without ' and with ALTD
-		add_opcode($opcodes, "altd ".$opcode_1.$opcode_2, "76, ".$bytes, ['rabbit'], $var);
+		add_opcode($opcode_1."(iy+SN)".$opcode_2, "FD, ".$bytes.", SN", $arch, $var);
 		
 		return;
 	}
 
-	# expand XH, XL -> expands to 2 lines with (ixh,ixl) and (iyh,iyl), only for [z80]
+	# expand XH, XL -> expands to 3 lines with (h,l), and (ixh,ixl) and (iyh,iyl) only for [z80]
 	if ($opcode =~ /X[HL]/) {
-		@$cpus == 0 or die;
 
+		# H, L
+		(my $opcode_copy = $opcode) =~ s/X([HL])/\L$1/g;
+		add_opcode($opcode_copy, $bytes, $arch, $var);
+		
 		# IXH, IXL
-		(my $opcode_copy = $opcode) =~ s/X([HL])/ix\L$1/g;
-		add_opcode($opcodes, $opcode_copy, "DD, ".$bytes, ['z80'], $var);
+		($opcode_copy = $opcode) =~ s/X([HL])/ix\L$1/g;
+		add_opcode($opcode_copy, "DD, ".$bytes, 'z80', $var);
 		
 		# IYH, IYL
 		($opcode_copy = $opcode) =~ s/X([HL])/iy\L$1/g;
-		add_opcode($opcodes, $opcode_copy, "FD, ".$bytes, ['z80'], $var);
+		add_opcode($opcode_copy, "FD, ".$bytes, 'z80', $var);
 		
 		return;
 	}
 
+	# expand ['] -> expands 3 lines: no tick for all arch, with tick / with ALTD for [rabbit]
+	if ($opcode =~ /\[\'\]/) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		# without '
+		add_opcode($opcode_1.$opcode_2, $bytes, $arch, $var);
+		
+		# with '
+		add_opcode($opcode_1."'".$opcode_2, "76, ".$bytes, 'rabbit', $var);
+		
+		# without ' and with ALTD
+		add_opcode("altd ".$opcode_1.$opcode_2, "76, ".$bytes, 'rabbit', $var);
+		
+		return;
+	}
+
+	my $valid_code = check_valid($opcode);
+	
+	# build test code
+	for my $cpu (@CPUS) {
+		my $exists = check_arch($cpu, $arch);
+		build_test_code($opcode, $bytes, $cpu, $exists && $valid_code);
+	}
+	
+	# build Ragel rules
+	if ($valid_code) {
+		build_ragel_rule($opcode, $bytes, $arch);
+	}
+}
+
+#------------------------------------------------------------------------------
+sub build_test_code {
+	my($opcode, $bytes, $cpu, $exists_and_valid) = @_;
+	
+	my @bytes = compute_bytes(split(/\s*,\s*/, $bytes));
+	my $asm_line = sprintf(" %-23s;; ", $opcode).
+				   join(" ", map {sprintf("%02X", $_)} @bytes);
+	if ($exists_and_valid) {
+		push @{$TEST_ASM{$cpu}{ok}}, $asm_line;
+	}
+	else {
+		push @{$TEST_ASM{$cpu}{err}}, " ".$opcode;
+	}
+}
+
+#------------------------------------------------------------------------------
+sub compute_bytes {
+	my(@bytes) = @_;
+	
+	for (@bytes) {
+		# all numbers in hex
+		s/ \b( [0-9A-F]+ )\b /0x$1/gx;
+		$_ = eval($_); $@ and die "$_: $@";
+	}
+
+	return @bytes;
+}
+
+#------------------------------------------------------------------------------
+sub check_arch {
+	my($cpu, $arch) = @_;
+	return 1 unless $arch;
+	for ($arch) {
+		/^not_(.*)/ and return ! check_arch($cpu, $1);
+		return 1 if /$cpu/;
+		return 1 if /zilog/ && $cpu =~ /^z/;
+		return 1 if /rabbit/ && $cpu =~ /^r/;
+	}
+	return 0;
+}
+
+#------------------------------------------------------------------------------
+sub build_ragel_rule {
+	my($opcode, $bytes, $arch) = @_;
+}
+
+#------------------------------------------------------------------------------
+# check for invalid code constructs
+sub check_valid {
+	local($_) = @_;
+
+	return 0 if /\bi[xy][hl]\b/ && /\baltd\b|\'/;
+	return 1;
+}
+
+__END__
+
+for my $cpu (@CPU) {
+	make_test_files(, $cpu,
+		$TEST_FILE.$cpu."_ok.asm",
+		$TEST_FILE.$cpu."_ok.bmk",
+		$TEST_FILE.$cpu."_err.asm");
+}
+
+my $parser_file = replace_ext($0, ".h");
+make_parser_file(, $parser_file);
+
+sub add_opcode {
+	my(, $opcode, $bytes, $arch, $var) = @_;
+	$var ||= 1;		# start with $1
+	
 	# scan tokens
 	my @tokens = scan_opcode($opcode);
 	
 	# compute bytes
 	my @bytes = compute_bytes($bytes);
 	
-	# build trie of tokens in $opcodes
-	my $p = $opcodes;
+	# build trie of tokens in 
+	my $p = ;
 	for my $token (@tokens, "") {
 		$p->{$token} ||= {};
 		$p = $p->{$token};
 	}
 	
-	$p->{cpus} = $cpus;
+	$p->{arch} = $arch;
 	$p->{bytes} = \@bytes;
 }
 
@@ -195,7 +296,6 @@ sub compute_bytes {
 	
 	return split_exprs($bytes);
 }
-
 sub split_exprs {
 	local($_) = @_;
 	my @exprs = ('');
@@ -234,7 +334,7 @@ sub split_exprs {
 # Build asm test files for assembly ok and error
 #------------------------------------------------------------------------------
 sub make_test_files {
-	my($opcodes, $cpu, $ok_file, $bin_file, $err_file) = @_;
+	my(, $cpu, $ok_file, $bin_file, $err_file) = @_;
 	
 	# write asm files in binary mode to have only LF
 	open(my $ok_fh,  ">:raw", $ok_file)  or die $!;
@@ -242,7 +342,7 @@ sub make_test_files {
 	open(my $err_fh, ">:raw", $err_file) or die $!;
 	my $addr = 0;
 	
-	add_asm_lines([], $opcodes, $cpu, $ok_fh, $bin_fh, $err_fh, \$addr);
+	add_asm_lines([], , $cpu, $ok_fh, $bin_fh, $err_fh, \$addr);
 }
 
 sub add_asm_lines {
@@ -252,7 +352,7 @@ sub add_asm_lines {
 		if ($token eq "") {		# leaf - output
 			my $opcode = join_tokens(@$tokens);
 			my @bytes = @{$p->{$token}{bytes}};
-			my $exists = check_cpus($cpu, @{$p->{$token}{cpus}});
+			my $exists = check_arch($cpu, @{$p->{$token}{arch}});
 			add_asm_line($opcode, \@bytes, $exists, $ok_fh, $bin_fh, $err_fh, $addr);
 		}
 		else { 					# branch - recurse
@@ -359,27 +459,15 @@ sub join_tokens {
 	return $opcode;
 }
 
-sub check_cpus {
-	my($cpu, @cpus) = @_;
-	return 1 unless @cpus;
-	for (@cpus) {
-		/^not_(.*)/ and return ! check_cpus($cpu, $1);
-		return 1 if /$cpu/;
-		return 1 if /zilog/ && $cpu =~ /^z/;
-		return 1 if /rabbit/ && $cpu =~ /^r/;
-	}
-	return 0;
-}
-
 #------------------------------------------------------------------------------
 # Build parser include file
 #------------------------------------------------------------------------------
 sub make_parser_file {
-	my($opcodes, $parser_file) = @_;
+	my(, $parser_file) = @_;
 	
 	# write files in binary mode to have only LF
 	open(my $fh, ">:raw", $parser_file)  or die $!;
-	add_rules([], $opcodes, $fh);
+	add_rules([], , $fh);
 }
 
 sub add_rules {
@@ -388,8 +476,8 @@ sub add_rules {
 	for my $token (sort keys %$p) {
 		if ($token eq "") {		# leaf - output
 			my $bytes = $p->{$token}{bytes};
-			my $cpus  = $p->{$token}{cpus};
-			my $rule = rule($tokens, $bytes, $cpus);
+			my $arch  = $p->{$token}{arch};
+			my $rule = rule($tokens, $bytes, $arch);
 			say $fh $rule;
 		}
 		else { 					# branch - recurse
@@ -399,15 +487,15 @@ sub add_rules {
 }
 
 sub rule {
-	my($tokens, $bytes, $cpus) = @_;
+	my($tokens, $bytes, $arch) = @_;
 
 	# build rule based on tokens
 	my $rule = '| label? '.join(' ', rule_tokens(@$tokens)).' ';
 
 	# build CPU condition
 	my $cpu_cond = '';
-	if (@$cpus) {
-		my @cond = map {'CPU_'.uc($_)} @$cpus;
+	if (@$arch) {
+		my @cond = map {'CPU_'.uc($_)} @$arch;
 		$cpu_cond = 'if ( (opts.cpu & ('.join('|', @cond).')) == 0 ) { '.
 					'error_illegal_ident(); return FALSE; } ';
 	}
@@ -498,9 +586,3 @@ sub rule_compute_opcode {
 	return sprintf('0x%02X', $opcode);
 }
 
-#------------------------------------------------------------------------------
-sub replace_ext {
-	my($file, $new_ext) = @_;
-	$file =~ s/\.\w+$/$new_ext/;
-	return path($file);
-}

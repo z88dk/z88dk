@@ -1,12 +1,15 @@
+			ld {b c d e XH XL . a}['], {b c d e XH XL . a}	=> 40 + $1*8 + $2
 ;------------------------------------------------------------------------------
 ; List of all the CPU opcodes
 ; {b c d}	-> expands into 3 lines for each element and $1 = (0..3)
 ; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
 ; (X)		-> expands 5 lines (hl), (ix), (ix+d), (iy), (iy+d)
-; XH, XL	-> expands to 2 lines with (ixh,ixl) and (iyh,iyl), only for [z80]
+; XH, XL	-> expands to 3 lines with (h,l), and (ixh,ixl) and (iyh,iyl) only for [z80]
 ; N_IMN		-> expands to: ld a,(MN) | ld a,N
 ; N			-> expands to: ld b,N
 ;------------------------------------------------------------------------------
+
+__END__
 
 ;------------------------------------------------------------------------------
 ; 8-bit load group

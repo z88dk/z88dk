@@ -45,11 +45,31 @@ for (@CPU) {
 	
 	test_asm($cpu, $asm_file, $err_file, $bmk_file);
 
+	# test old opcodes_*
 	$asm_file = "t/data/opcodes_".$cpu."_ok.asm";
 	$err_file = "t/data/opcodes_".$cpu."_err.asm";
 	$bmk_file = "t/data/opcodes_".$cpu."_ok.bmk";
 	
 	test_asm($cpu, $asm_file, $err_file, $bmk_file);
+	
+	# test new cpu_opcodes_*
+	$asm_file = "t/data/cpu_opcodes_".$cpu."_ok.asm";
+	$err_file = "t/data/cpu_opcodes_".$cpu."_err.asm";
+	$bmk_file = "t/data/cpu_opcodes_".$cpu."_ok.bmk";
+
+	# build bmk
+	my $bytes = '';
+	for (path($asm_file)->lines) {
+		s/.*;;\s*//;
+		for (split(' ', $_)) {
+			$bytes .= chr(hex($_));
+		}
+	}
+	path($bmk_file)->spew_raw($bytes);
+	
+	test_asm($cpu, $asm_file, $err_file, $bmk_file);
+
+	unlink($bmk_file);
 }
 
 done_testing;
