@@ -1,17 +1,11 @@
 /*
-	$Id: sprite.c,v 1.16 2015-03-25 11:07:37 stefano Exp $
+	$Id: sprite.c,v 1.16+ (now on GIT) $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
-	slightly improved and ported to Allegro 5 by Stefano Bodrato
+	improved and ported to Allegro 5 by Stefano Bodrato
 
-	Please send Daniel McKinnon your own updates to the code,
-	it can be anything!  Comments, GUI elements, Bug-Fixes,
-	Features, ports, etc.
-
-	Send any updates, fixes, or support requests to:  stikmansoftware@yahoo.com
-	...and signal changes to the z88dk_devel list, too.
-
+	Original author's address:  stikmansoftware _A_T_ yahoo.com
 */
 
 
@@ -20,9 +14,9 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
-#include <zlib.h>
-#include "allegro5/allegro_image.h"
+#include <allegro5/allegro_image.h>
 
+#include <zlib.h>
 
 #include <stdio.h>
 
@@ -34,6 +28,11 @@
 
 #define DEFAULT_SIZE_X			16
 #define DEFAULT_SIZE_Y			16
+
+#ifndef FALSE
+#define FALSE 0
+#define TRUE 1
+#endif
 
 
 int bls;
@@ -637,7 +636,7 @@ void save_code_file( const char *file )
 
 void save_sprite_file( const char *file )
 {
-	gzFile *f = NULL;
+	gzFile f = NULL;
 	int x,y,i;
 
 	//f = al_fopen( file, "wb" );
@@ -661,7 +660,7 @@ void save_sprite_file( const char *file )
 
 void load_sprite_file( const char *file )
 {
-	gzFile *f = NULL;
+	gzFile f = NULL;
 	int x,y,i;
 
 	f = gzopen( file, "rb" );
@@ -690,7 +689,7 @@ void load_sprite_file( const char *file )
 
 void merge_sprite_file( const char *file )
 {
-	gzFile *f = NULL;
+	gzFile f = NULL;
 	int x,y,i;
 
 	f = gzopen( file, "rb" );
