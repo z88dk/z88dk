@@ -224,6 +224,35 @@ FILE *fopen_bin(char *fname, char *crtfile)
 
     if (strlen(fname) == 0) return (NULL);
 
+    // Warn if aligned sections are not aligned
+
+    for (c = 0x80; c >= 0x2; c >>= 1)
+    {
+        int start;
+
+        // data sections
+
+        snprintf(cmdline, sizeof(cmdline), "__data_align_%d_size", c);
+        if (parameter_search(crtfile, ".map", cmdline) > 0)
+        {
+            snprintf(cmdline, sizeof(cmdline), "__data_align_%d_head", c);
+            if (((start = parameter_search(crtfile, ".map", cmdline)) & (c - 1)) != 0)
+                fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", strlen(cmdline) - 5, cmdline, start);
+        }
+
+        // bss sections
+
+        snprintf(cmdline, sizeof(cmdline), "__bss_align_%d_size", c);
+        if (parameter_search(crtfile, ".map", cmdline) > 0)
+        {
+            snprintf(cmdline, sizeof(cmdline), "__bss_align_%d_head", c);
+            if (((start = parameter_search(crtfile, ".map", cmdline)) & (c - 1)) != 0)
+                fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", strlen(cmdline) - 5, cmdline, start);
+        }
+    }
+
+    // Sort out the binary
+
     strcpy(name, fname);
     suffix_change(name, "_CODE.bin");
 
