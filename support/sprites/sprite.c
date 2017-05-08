@@ -3,9 +3,15 @@
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
-	improved and ported to Allegro 5 by Stefano Bodrato
+	slightly improved and ported to Allegro 5 by Stefano Bodrato
 
-	Original author's address:  stikmansoftware _A_T_ yahoo.com
+	Please send Daniel McKinnon your own updates to the code,
+	it can be anything!  Comments, GUI elements, Bug-Fixes,
+	Features, ports, etc.
+
+	Send any updates, fixes, or support requests to:  stikmansoftware@yahoo.com
+	...and signal changes to the z88dk_devel list, too.
+
 */
 
 
@@ -447,6 +453,10 @@ void import_from_bitmap( const char *file )
 	unsigned char r = 0;
 	unsigned char g = 0;
 	unsigned char b = 0;
+	char xsz[10];
+	char ysz[10];
+	char pixel[5];
+
 	
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	temp = al_load_bitmap( file );
@@ -470,6 +480,24 @@ void import_from_bitmap( const char *file )
 		if	(fseek(fpin,0,SEEK_END))
 			return;
 		len=ftell(fpin);
+		fseek(fpin,0L,SEEK_SET);
+		
+		// PBM format
+		if (fgetc(fpin)=='P') if (fgetc(fpin)=='1') if (fgetc(fpin)==10) {
+			fscanf(fpin,"%s %s",xsz,ysz);
+			sprite[ on_sprite ].size_x = atoi(xsz);
+			sprite[ on_sprite ].size_y = atoi(ysz);
+			if ( sprite[ on_sprite ].size_x >= MAX_SIZE_X )
+				sprite[ on_sprite ].size_x = MAX_SIZE_X;
+			if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
+				sprite[ on_sprite ].size_y = MAX_SIZE_Y;
+			for ( y = 1; y <= atoi(ysz); y++ )
+				for ( x = 1; x <= atoi(xsz); x++ ) {
+					fscanf(fpin,"%s ",pixel);
+					sprite[ on_sprite ].p[ x ][ y ] = (pixel[0]=='1') ? 1 : 0;
+				}
+		}
+		
 		fseek(fpin,0L,SEEK_SET);
 
 		// ZX Spectrum Screen dump
@@ -525,6 +553,7 @@ void import_from_bitmap( const char *file )
 	}
 	fit_sprite_on_screen();
 	update_screen();
+	
 }
 
 void import_from_printmaster( const char *file )
@@ -573,6 +602,23 @@ void import_from_printmaster( const char *file )
 
 	fit_sprite_on_screen();
 	update_screen();
+}
+
+void do_import_raw()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_bmp = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_bmp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_bmp, 0));
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog_bmp);
+
+	import_from_bitmap( file );
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_L);
 }
 
 void do_import_bitmap()
