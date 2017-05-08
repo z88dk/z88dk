@@ -36,6 +36,7 @@ for (@CPU) {
 	open ($errf, ">:raw", $err_file);
 	open ($binf, ">:raw", $bmk_file);
 	
+	# parse .in file and build t/data/ops_*
 	my $in_file = $0; $in_file =~ s/\.t$/.in/i or die;
 	parse($cpu, path($in_file)->lines);
 	
@@ -45,14 +46,7 @@ for (@CPU) {
 	
 	test_asm($cpu, $asm_file, $err_file, $bmk_file);
 
-	# test old opcodes_*
-	$asm_file = "t/data/opcodes_".$cpu."_ok.asm";
-	$err_file = "t/data/opcodes_".$cpu."_err.asm";
-	$bmk_file = "t/data/opcodes_".$cpu."_ok.bmk";
-	
-	test_asm($cpu, $asm_file, $err_file, $bmk_file);
-	
-	# test new cpu_opcodes_*
+	# test cpu_opcodes_* built by cpu_opcodes.pl
 	$asm_file = "t/data/cpu_opcodes_".$cpu."_ok.asm";
 	$err_file = "t/data/cpu_opcodes_".$cpu."_err.asm";
 	$bmk_file = "t/data/cpu_opcodes_".$cpu."_ok.bmk";

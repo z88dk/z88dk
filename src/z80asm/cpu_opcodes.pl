@@ -107,13 +107,13 @@ sub add_opcode {
 		add_opcode($opcode_1."(hl)".$opcode_2, $bytes, $arch, $var);
 		
 		# ix
-		add_opcode($opcode_1."(ix)".$opcode_2, "DD, ".$bytes.", SN", $arch, $var);
+		add_opcode($opcode_1."(ix)".$opcode_2, "DD, ".$bytes.", SN0", $arch, $var);
 		
 		# ix+D
 		add_opcode($opcode_1."(ix+SN)".$opcode_2, "DD, ".$bytes.", SN", $arch, $var);
 		
 		# iy
-		add_opcode($opcode_1."(iy)".$opcode_2, "FD, ".$bytes.", SN", $arch, $var);
+		add_opcode($opcode_1."(iy)".$opcode_2, "FD, ".$bytes.", SN0", $arch, $var);
 		
 		# iy+D
 		add_opcode($opcode_1."(iy+SN)".$opcode_2, "FD, ".$bytes.", SN", $arch, $var);
@@ -173,6 +173,52 @@ sub add_opcode {
 sub build_test_code {
 	my($opcode, $bytes, $cpu, $exists_and_valid) = @_;
 	
+	# check for /N_IMN/
+	if ($opcode =~ /\b N_IMN \b/x) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		$bytes =~ /\b expr_in_parens \s* \? \s* (.*?) \s* : \s* (.*) $/x 
+			or die "expected expr_in_parens at ", $bytes;
+		my($bytes_1, $true, $false) = ($`, $1, $2);
+		
+		# N
+		(my $bytes_copy = $bytes_1.$false) =~ s/\b N \b/ 2A /x or die;
+		build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		
+		# (MN)
+		($bytes_copy = $bytes_1.$true) =~ s/\b N \s* , \s* M \b/ 34, 12 /x or die;
+		build_test_code($opcode_1.'('.(0x1234).')'.$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		
+		return;
+	}
+	
+	# check for /N/
+	if ($opcode =~ /\b N \b/x) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		# N
+		(my $bytes_copy = $bytes) =~ s/\b N \b/ 2A /x or die;
+		build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		
+		# (N)
+		build_test_code($opcode_1.'('.(0x2A).')'.$opcode_2, $bytes_copy, $cpu, 0);
+		
+		return;
+	}
+	
+	# check for /SN/
+	if ($opcode =~ /\b SN \b/x) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		(my $bytes_copy = $bytes) =~ s/\b SN \b/ 2A /x or die;
+		build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		
+		return;
+	}
+	
+	# check for /SN0/
+	$bytes =~ s/\b SN0 \b/0/x;
+	
 	my @bytes = compute_bytes(split(/\s*,\s*/, $bytes));
 	my $asm_line = sprintf(" %-23s;; ", $opcode).
 				   join(" ", map {sprintf("%02X", $_)} @bytes);
@@ -188,6 +234,7 @@ sub build_test_code {
 sub compute_bytes {
 	my(@bytes) = @_;
 	
+	@bytes = grep {/\S/} @bytes;
 	for (@bytes) {
 		# all numbers in hex
 		s/ \b( [0-9A-F]+ )\b /0x$1/gx;
@@ -213,6 +260,24 @@ sub check_arch {
 #------------------------------------------------------------------------------
 sub build_ragel_rule {
 	my($opcode, $bytes, $arch) = @_;
+	
+	my $rule = '| label? ';
+	$rule .= join(' ', opcode_tokens_rule($opcode)).' ';
+	$rule .= '@{ ';
+	
+	if ($arch) {
+		$rule .= 'if ( (opts.cpu & (CPU_'.uc($arch).')) == 0 ) { '.
+				 'error_illegal_ident(); return FALSE; } ';
+	}
+	
+	if ($opcode =~ /\b N \b/x) {
+		$rule .= 'if (expr_in_parens) return FALSE; ';
+	}
+	
+	$rule .= join(' ', opcode_bytes_rule($bytes)).' ';
+	$rule .= '}';
+	
+	push @RAGEL_INC, $rule;
 }
 
 #------------------------------------------------------------------------------
@@ -223,6 +288,84 @@ sub check_valid {
 	return 0 if /\bi[xy][hl]\b/ && /\baltd\b|\'/;
 	return 1;
 }
+
+#------------------------------------------------------------------------------
+# scan opcode, return list of tokens
+sub opcode_tokens_rule {
+	local($_) = @_;
+	
+	my @tokens;
+	while (!/ \G \z /gcx) {
+		if    (/ \G \s+ 		/gcx)	{	; }		# ignore blanks
+		elsif (/ \G ,   		/gcx)	{ push @tokens, '_TK_COMMA'; }
+		elsif (/ \G \)   		/gcx)	{ push @tokens, '_TK_RPAREN'; }
+		elsif (/ \G \( \s* (hl|ix|iy) \s* \+? /gcx)	
+										{ push @tokens, '_TK_IND_'.uc($1); }
+		elsif (/ \G [A-Z_]+ 	/gcx)	{ push @tokens, 'expr'; }
+		elsif (/ \G ([a-z0]+)\' /gcx)	{ push @tokens, '_TK_'.uc($1).'1'; }
+		elsif (/ \G ([a-z0]+)   /gcx)	{ push @tokens, '_TK_'.uc($1); }
+		else { die "cannot parse ".substr($_,pos($_)||0); }
+	}
+	push @tokens, '_TK_NEWLINE';
+	return @tokens;
+}
+
+#------------------------------------------------------------------------------
+# return rules to load opcode
+sub opcode_bytes_rule {
+	my($bytes) = @_;
+	my @rules;
+	
+	# ALTD prefix
+	if ($bytes =~ s/^\s*76\s*,\s*//) {
+		push @rules, 'DO_stmt(0x76);';
+	}
+
+	# expr_in_parens
+	if ($bytes =~ /\b expr_in_parens \s* \? \s* (.*?) \s* : \s* (.*) $/x) {
+		my($bytes_1, $true, $false) = ($`, $1, $2);
+		
+		push @rules, 'if (expr_in_parens) {';
+		push @rules, opcode_bytes_rule($bytes_1.$true);
+		push @rules, '} else {';
+		push @rules, opcode_bytes_rule($bytes_1.$false);
+		push @rules, '}';
+		return @rules;
+	}
+
+	# Handle data bytes
+	my $func = 'DO_stmt';
+	my $post_arg = '';
+	if ($bytes =~ s/\b N \s* , \s* M \b/ /x) {
+		$func = 'DO_stmt_nn';
+	}
+	elsif ($bytes =~ s/\b N \b/ /x) {
+		$func = 'DO_stmt_n';
+	}
+	elsif ($bytes =~ s/\b SN \b/ /x) {
+		$func = 'DO_stmt_idx';
+	}
+	elsif ($bytes =~ s/\b SN0 \b/ /x) {
+		$func = 'DO_stmt';
+		$post_arg = ' << 8';
+	}
+	
+	# opcode
+	my @bytes = compute_bytes(split(/\s*,\s*/, $bytes));
+	my $opcode = 0;
+	while (@bytes) {
+		die unless $bytes[0] =~ /^\d+$/;
+		$opcode <<= 8;
+		$opcode |= shift @bytes;
+	}
+	
+	push @rules, $func.'(0x'.sprintf('%02X', $opcode).$post_arg.');';
+	
+	return @rules;
+}
+
+
+
 
 __END__
 
