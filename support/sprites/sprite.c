@@ -453,10 +453,14 @@ void import_from_bitmap( const char *file )
 	unsigned char r = 0;
 	unsigned char g = 0;
 	unsigned char b = 0;
+	char c;
 	char xsz[10];
 	char ysz[10];
-	char pixel[5];
+	int pixel;
+	
+	int spcount = 0;
 
+	//char message[200];
 	
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	temp = al_load_bitmap( file );
@@ -483,19 +487,28 @@ void import_from_bitmap( const char *file )
 		fseek(fpin,0L,SEEK_SET);
 		
 		// PBM format
-		if (fgetc(fpin)=='P') if (fgetc(fpin)=='1') if (fgetc(fpin)==10) {
+		while (!feof(fpin) && fgetc(fpin)=='P' && fgetc(fpin)=='1' && fgetc(fpin)=='\n') {
+			// rip comments
+			while ((c=fgetc(fpin))=='#') 
+				while ((c=fgetc(fpin))!='\n') {}
+			ungetc(c, fpin);
+			// current pic size
 			fscanf(fpin,"%s %s",xsz,ysz);
-			sprite[ on_sprite ].size_x = atoi(xsz);
-			sprite[ on_sprite ].size_y = atoi(ysz);
-			if ( sprite[ on_sprite ].size_x >= MAX_SIZE_X )
-				sprite[ on_sprite ].size_x = MAX_SIZE_X;
-			if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
-				sprite[ on_sprite ].size_y = MAX_SIZE_Y;
+				//sprintf(message, "Load start: %s %s",xsz,ysz);
+				//al_show_native_message_box(display, "MSG", "Message", message, NULL, 0);
+			sprite[ on_sprite + spcount ].size_x = atoi(xsz);
+			sprite[ on_sprite + spcount ].size_y = atoi(ysz);
+			if ( sprite[ on_sprite + spcount ].size_x >= MAX_SIZE_X )
+				sprite[ on_sprite + spcount ].size_x = MAX_SIZE_X;
+			if ( sprite[ on_sprite + spcount ].size_y >= MAX_SIZE_Y )
+				sprite[ on_sprite + spcount ].size_y = MAX_SIZE_Y;
+			
 			for ( y = 1; y <= atoi(ysz); y++ )
 				for ( x = 1; x <= atoi(xsz); x++ ) {
-					fscanf(fpin,"%s ",pixel);
-					sprite[ on_sprite ].p[ x ][ y ] = (pixel[0]=='1') ? 1 : 0;
+					fscanf(fpin,"%1i",&pixel);
+					sprite[ on_sprite + spcount ].p[ x ][ y ] = (pixel==1?1:0);
 				}
+			spcount++;
 		}
 		
 		fseek(fpin,0L,SEEK_SET);
@@ -549,6 +562,7 @@ void import_from_bitmap( const char *file )
 			}
 
 		}
+		
 		fclose(fpin);
 	}
 	fit_sprite_on_screen();
