@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 `sccz80` compile (change copy to equivalent cat for non-windows)
 ~~~
-zcc +zx -v -startup=31 -DWFRAMES=3 -clib=new -O3 --fsigned-char @zproject.lst -o blackstar -pragma-include:zpragma.inc
+zcc +zx -v -startup=31 -DWFRAMES=3 -clib=new -O3 @zproject.lst -o blackstar -pragma-include:zpragma.inc
 appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noloader
 appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
 copy /b loader.tap + screen.tap + game.tap blackstar.tap

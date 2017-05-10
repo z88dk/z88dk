@@ -1,16 +1,15 @@
 /*
-	$Id: sprite.c,v 1.16 2015-03-25 11:07:37 stefano Exp $
+	$Id: sprite.c,v 1.16+ (now on GIT) $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
 	slightly improved and ported to Allegro 5 by Stefano Bodrato
 
-	Please send Daniel McKinnon your own updates to the code,
+	Please send Daniel McKinnon (and the z88dk team) your own updates to the code,
 	it can be anything!  Comments, GUI elements, Bug-Fixes,
 	Features, ports, etc.
 
-	Send any updates, fixes, or support requests to:  stikmansoftware@yahoo.com
-	...and signal changes to the z88dk_devel list, too.
+	Original Author's contact:  stikmansoftware _a_t_ yahoo.com
 
 */
 
@@ -20,9 +19,9 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
-#include <zlib.h>
-#include "allegro5/allegro_image.h"
+#include <allegro5/allegro_image.h>
 
+#include <zlib.h>
 
 #include <stdio.h>
 
@@ -34,6 +33,11 @@
 
 #define DEFAULT_SIZE_X			16
 #define DEFAULT_SIZE_Y			16
+
+#ifndef FALSE
+#define FALSE 0
+#define TRUE 1
+#endif
 
 
 int bls;
@@ -409,14 +413,14 @@ void chop_sprite( int src )
 	int x, y, x_offset, y_offset;
 	int save_x, save_y;
 	
-	//save destination sprites' dims
+	//save destination sprites' sz
 	save_x = sprite[ on_sprite ].size_x;
 	save_y = sprite[ on_sprite ].size_y;
 
 	y_offset = 0;
-	while ( sprite[ src ].size_y > y_offset) {
+	while ((sprite[ src ].size_y > y_offset) && (on_sprite < MAX_SPRITE)) {
 	    x_offset = 0;
-	    while ( sprite[ src ].size_x > x_offset) {	
+	    while ( (sprite[ src ].size_x > x_offset) && (on_sprite < MAX_SPRITE)) {
 		sprite[ on_sprite ].size_x = save_x;
 		sprite[ on_sprite ].size_y = save_y;
 		for ( y = 1; y <= save_y; y++ )
@@ -448,6 +452,17 @@ void import_from_bitmap( const char *file )
 	unsigned char r = 0;
 	unsigned char g = 0;
 	unsigned char b = 0;
+	char c;
+	char xsz[10];
+	char ysz[10];
+	int pixel;
+	char row[1000];
+	char foo[10];
+	int exitflag;
+	
+	int spcount = 0;
+
+	//char message[200];
 	
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	temp = al_load_bitmap( file );
@@ -472,6 +487,97 @@ void import_from_bitmap( const char *file )
 			return;
 		len=ftell(fpin);
 		fseek(fpin,0L,SEEK_SET);
+		
+		
+		// Import as generic 8x8 character dump, this will be overwritten if better solutions are found
+		// remove some byte hoping to cut away headers
+		for (x=0;x<(len%16);x++) getc(fpin); 
+		sprite[ on_sprite ].size_x = 128;
+		sprite[ on_sprite ].size_y = len/16;
+		if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
+			sprite[ on_sprite ].size_y = MAX_SIZE_Y;
+		
+		for ( y = 0; y < len/128; y++ )
+			for ( x = 0; x < 16; x++ )
+				for ( i = 1; i <= 8; i++ ) {
+					b=getc(fpin);
+					for ( j = 1; j <= 8; j++ ) {
+						sprite[ on_sprite ].p[ x*8+j ][ y*8+i ] = ((b&128) != 0);
+						b<<=1;
+					}
+				}
+		
+		fseek(fpin,0L,SEEK_SET);
+
+		// PBM format
+		while (!feof(fpin) && fgetc(fpin)=='P' && fgetc(fpin)=='1' && fgetc(fpin)=='\n') {
+			// rip comments
+			while ((c=fgetc(fpin))=='#') 
+				while ((c=fgetc(fpin))!='\n') {}
+			ungetc(c, fpin);
+			// current pic size
+			fscanf(fpin,"%s %s",xsz,ysz);
+				//sprintf(message, "Load start: %s %s",xsz,ysz);
+				//al_show_native_message_box(display, "MSG", "Message", message, NULL, 0);
+			sprite[ on_sprite + spcount ].size_x = atoi(xsz);
+			sprite[ on_sprite + spcount ].size_y = atoi(ysz);
+			if ( sprite[ on_sprite + spcount ].size_x >= MAX_SIZE_X )
+				sprite[ on_sprite + spcount ].size_x = MAX_SIZE_X;
+			if ( sprite[ on_sprite + spcount ].size_y >= MAX_SIZE_Y )
+				sprite[ on_sprite + spcount ].size_y = MAX_SIZE_Y;
+			
+			for ( y = 1; y <= atoi(ysz); y++ )
+				for ( x = 1; x <= atoi(xsz); x++ ) {
+					fscanf(fpin,"%1i",&pixel);
+					sprite[ on_sprite + spcount ].p[ x ][ y ] = (pixel==1?1:0);
+				}
+			spcount++;
+		}
+		
+		fseek(fpin,0L,SEEK_SET);
+		
+		fscanf(fpin,"%s",row);
+		if ((!strcmp(row,"STARTFONT"))||(!strncmp(row,"COMMENT",8))) {
+			spcount=0;
+			
+			exitflag=0;
+			while (exitflag==0) {
+
+				sprite[ on_sprite + spcount ].size_x=0;
+				sprite[ on_sprite + spcount ].size_y=0;
+				
+				while (((sprite[ on_sprite + spcount ].size_x==0)||(sprite[ on_sprite + spcount ].size_y==0)) && !exitflag) {
+					sprintf (row,"ABC");
+					while (strncmp(row, "BBX",3)&&(!feof(fpin)) && !exitflag) {
+						fgets(row,sizeof(row),fpin);
+						if (!strncmp(row, "ENDFONT",7)) exitflag=1;
+					}
+					sscanf(row,"%s %s %s",foo,xsz,ysz);
+					sprite[ on_sprite + spcount ].size_x = atoi(xsz);
+					sprite[ on_sprite + spcount ].size_y = atoi(ysz);
+				}
+				
+				if (!exitflag) {
+					while (strncmp(row, "BITMAP",3) && (!feof(fpin)))
+						fgets(row,sizeof(row),fpin);
+					
+					for ( y = 1; y <= sprite[ on_sprite ].size_y+4; y++ )
+						for ( x = 1; x <= sprite[ on_sprite ].size_x+1; x+=8 ) {
+							fscanf(fpin,"%2X",&pixel);
+
+							for ( i = 0; i < 8; i++ ) {
+							sprite[ on_sprite + spcount ].p[ x+i ][ y ] = ((pixel&128) != 0);
+							pixel<<=1;
+							}
+						}
+				}
+					
+				spcount++;
+				if (spcount>=MAX_SPRITE) exitflag=1;
+			}
+		}
+		
+		fseek(fpin,0L,SEEK_SET);
 
 		// ZX Spectrum Screen dump
 		if ((len==6144)||(len==6912)) {
@@ -486,6 +592,7 @@ void import_from_bitmap( const char *file )
 					}
 				}
 		}
+		
 		// Import font from ZX Spectrum Snapshot (a 27 bytes header with register values followed by the memory dump)
 		if ((len==49179)||(len==131103)) {
 			fseek(fpin,7249L,SEEK_SET);
@@ -522,10 +629,12 @@ void import_from_bitmap( const char *file )
 			}
 
 		}
+		
 		fclose(fpin);
 	}
 	fit_sprite_on_screen();
 	update_screen();
+	
 }
 
 void import_from_printmaster( const char *file )
@@ -574,6 +683,23 @@ void import_from_printmaster( const char *file )
 
 	fit_sprite_on_screen();
 	update_screen();
+}
+
+void do_import_raw()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_bmp = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_bmp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_bmp, 0));
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog_bmp);
+
+	import_from_bitmap( file );
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_L);
 }
 
 void do_import_bitmap()
@@ -637,7 +763,7 @@ void save_code_file( const char *file )
 
 void save_sprite_file( const char *file )
 {
-	gzFile *f = NULL;
+	gzFile f = NULL;
 	int x,y,i;
 
 	//f = al_fopen( file, "wb" );
@@ -661,7 +787,7 @@ void save_sprite_file( const char *file )
 
 void load_sprite_file( const char *file )
 {
-	gzFile *f = NULL;
+	gzFile f = NULL;
 	int x,y,i;
 
 	f = gzopen( file, "rb" );
@@ -690,7 +816,7 @@ void load_sprite_file( const char *file )
 
 void merge_sprite_file( const char *file )
 {
-	gzFile *f = NULL;
+	gzFile f = NULL;
 	int x,y,i;
 
 	f = gzopen( file, "rb" );
@@ -1026,7 +1152,7 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 325, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 345, ALLEGRO_ALIGN_LEFT, "F3/F6..................Load/Merge sprites (editor format), merge over current pos.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 365, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import picture (BMP,GIF,JPG,LBM,PCX,PNG,SCR,SNA,TGA...)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import BMP, LBM, PCX, TGA, PBM, BDF, SNA, SCR, mem.dump");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
 	al_draw_text(font, al_map_rgb(0,5,10), 190, 445, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");

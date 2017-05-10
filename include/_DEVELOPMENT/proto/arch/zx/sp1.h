@@ -44,9 +44,9 @@ struct sp1_update {                   // "update structs" - 10 bytes - Every til
 
    uint8_t              nload;          // +0 bit 7 = 1 for invalidated, bit 6 = 1 for removed, bits 5:0 = number of occluding sprites present + 1
    uint8_t              colour;         // +1 background tile attribute
-   uint16_t               tile;           // +2 background 16-bit tile code (if MSB != 0 taken as address of graphic, else lookup in tile array)
-   struct sp1_cs     *slist;          // +4 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) points at struct sp1_cs.attr_mask
-   struct sp1_update *ulist;          // +6 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
+   uint16_t             tile;           // +2 background 16-bit tile code (if MSB != 0 taken as address of graphic, else lookup in tile array)
+   struct sp1_cs       *slist;          // +4 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) points at struct sp1_cs.attr_mask
+   struct sp1_update   *ulist;          // +6 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
    uint8_t             *screen;         // +8 address in display file where this tile is drawn
 
 };
@@ -66,7 +66,7 @@ struct sp1_ss {                       // "sprite structs" - 20 bytes - Every spr
    uint8_t              res0;           // +8  "LD A,n" opcode
    uint8_t              e_hrot;         // +9  effective horizontal rotation = MSB of rotation table to use
    uint8_t              res1;           // +10 "LD BC,nn" opcode
-   uint16_t               e_offset;       // +11 effective offset to add to graphic pointers, equals result of vertical rotation + frame addr
+   uint16_t             e_offset;       // +11 effective offset to add to graphic pointers, equals result of vertical rotation + frame addr
    uint8_t              res2;           // +13 "EX DE,HL" opcode
    uint8_t              res3;           // +14 "JP (HL)" opcode
 
@@ -89,7 +89,7 @@ struct sp1_cs {                       // "char structs" - 24 bytes - Every sprit
    uint8_t              attr_mask;      // +6  attribute mask logically ANDed with underlying attribute, default = 0xff for transparent
    uint8_t              attr;           // +7  sprite colour, logically ORed to form final colour, default = 0 for transparent
 
-   void              *ss_draw;        // +8  struct sp1_ss + 8 bytes ; points at code embedded in sprite struct sp1_ss
+   void                *ss_draw;        // +8  struct sp1_ss + 8 bytes ; points at code embedded in sprite struct sp1_ss
 
    uint8_t              res0;           // +10 typically "LD HL,nn" opcode
    uint8_t             *def;            // +11 graphic definition pointer
@@ -97,10 +97,10 @@ struct sp1_cs {                       // "char structs" - 24 bytes - Every sprit
    uint8_t              res2;           // +14
    uint8_t             *l_def;          // +15 graphic definition pointer for sprite character to left of this one
    uint8_t              res3;           // +17 typically "CALL nn" opcode
-   void              *draw;           // +18 & draw function for this sprite char
+   void                *draw;           // +18 & draw function for this sprite char
 
-   struct sp1_cs     *next_in_upd;    // +20 BIG ENDIAN ; & sp1_cs.attr_mask of next sprite occupying the same tile (MSB = 0 if none)
-   struct sp1_cs     *prev_in_upd;    // +22 BIG ENDIAN ; & sp1_cs.next_in_upd of previous sprite occupying the same tile
+   struct sp1_cs       *next_in_upd;    // +20 BIG ENDIAN ; & sp1_cs.attr_mask of next sprite occupying the same tile (MSB = 0 if none)
+   struct sp1_cs       *prev_in_upd;    // +22 BIG ENDIAN ; & sp1_cs.next_in_upd of previous sprite occupying the same tile
 
 };
 
@@ -120,14 +120,14 @@ struct sp1_tp {                       // "tile pairs" - 3 bytes - A struct to ho
 
 struct sp1_pss {                      // "print string struct" - 11 bytes - A struct holding print state information
 
-   struct sp1_Rect   *bounds;         // +0 rectangular boundary within which printing will be allowed
+   struct sp1_Rect     *bounds;         // +0 rectangular boundary within which printing will be allowed
    uint8_t              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=ywrap?
    uint8_t              x;              // +3 current x coordinate of cursor with respect to top left corner of bounds
    uint8_t              y;              // +4 current y coordinate of cursor with respect to top left corner of bounds
    uint8_t              attr_mask;      // +5 current attribute mask
    uint8_t              attr;           // +6 current attribute
-   struct sp1_update *pos;            // +7 RESERVED struct sp1_update associated with current cursor coordinates
-   void              *visit;          // +9 void (*visit)(struct sp1_update *) function, set to 0 for none
+   struct sp1_update   *pos;            // +7 RESERVED struct sp1_update associated with current cursor coordinates
+   void                *visit;          // +9 void (*visit)(struct sp1_update *) function, set to 0 for none
    
 };
 
@@ -143,6 +143,9 @@ struct sp1_pss {                      // "print string struct" - 11 bytes - A st
 #define SP1_TYPE_2BYTE     0x40       // sprite graphic consists of (mask,graph) pairs, valid only in sp1_CreateSpr()
 #define SP1_TYPE_1BYTE     0x00       // sprite graphic consists of graph only, valid only in sp1_CreateSpr()
 
+// sprite attribute masks, logically AND together if necessary
+// zx.h contains defines for INK and PAPER colours
+
 #define SP1_AMASK_TRANS    0xff       // attribute mask for a transparent-colour sprite
 #define SP1_AMASK_INK      0xf8       // attribute mask for an ink-only sprite
 #define SP1_AMASK_PAPER    0xc7       // attribute mask for a paper-only sprite
@@ -150,8 +153,12 @@ struct sp1_pss {                      // "print string struct" - 11 bytes - A st
 #define SP1_AMASK_NOBRIGHT 0xbf       // attribute mask for no-bright
 #define SP1_ATTR_TRANS     0x00       // attribute for a transparent-colour sprite
 
+// prototype struct_sp1_ss and struct_sp1_cs that can be used to initialize empty structures
+
 extern struct sp1_cs  sp1_struct_cs_prototype;
 extern struct sp1_ss  sp1_struct_ss_prototype;
+
+// draw functions for sprites with two-byte graphical definitions, ie (mask,graphic) pairs
 
 extern void    SP1_DRAW_MASK2(void);        // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation will use MASK2_NR if no rotation necessary
 extern void    SP1_DRAW_MASK2NR(void);      // masked sprite 2-byte definition (mask,graph) pairs ; no rotation applied, graphic always drawn at exact tile boundary
@@ -176,8 +183,34 @@ extern void    SP1_DRAW_XOR2RB(void);       // xor sprite 2-byte definition (mas
 extern void    SP1_DRAW_LOAD2LBIM(void);    // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for left boundary of sprite w/ implied mask
 extern void    SP1_DRAW_LOAD2RBIM(void);    // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for right boundary of sprite w/ implied mask
 
+// draw functions for sprites with one-byte graphical definitions, ie no mask just graphics
+
+extern void    SP1_DRAW_LOAD1(void);        // load sprite 1-byte definition graph only no mask; sw rotation will use LOAD1_NR if no rotation necessary
+extern void    SP1_DRAW_LOAD1NR(void);      // load sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
+extern void    SP1_DRAW_LOAD1LB(void);      // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite only
+extern void    SP1_DRAW_LOAD1RB(void);      // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite only
+
+extern void    SP1_DRAW_OR1(void);          // or sprite 1-byte definition graph only no mask; sw rotation will use OR1_NR if no rotation necessary
+extern void    SP1_DRAW_OR1NR(void);        // or sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
+extern void    SP1_DRAW_OR1LB(void);        // or sprite 1-byte definition graph only no mask; sw rotation as OR1 but for left boundary of sprite only
+extern void    SP1_DRAW_OR1RB(void);        // or sprite 1-byte definition graph only no mask; sw rotation as OR1 but for right boundary of sprite only
+
+extern void    SP1_DRAW_XOR1(void);         // xor sprite 1-byte definition graph only no mask; sw rotation will use XOR1_NR if no rotation necessary
+extern void    SP1_DRAW_XOR1NR(void);       // xor sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
+extern void    SP1_DRAW_XOR1LB(void);       // xor sprite 1-byte definition graph only no mask; sw rotation as XOR1 but for left boundary of sprite only
+extern void    SP1_DRAW_XOR1RB(void);       // xor sprite 1-byte definition graph only no mask; sw rotation as XOR1 but for right boundary of sprite only
+
+extern void    SP1_DRAW_LOAD1LBIM(void);    // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite with implied mask
+extern void    SP1_DRAW_LOAD1RBIM(void);    // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite with implied mask
+
+// draw functions for sprites without graphics
+
 extern void    SP1_DRAW_ATTR(void);         // pixels are not drawn, only attributes
 
+// void *hook1  <->  void [ __FASTCALL__ ] (*hook1)(uint count, struct sp1_cs *c)      // if __FASTCALL__ only struct sp1_cs* passed
+// void *hook2  <->  void [ __FASTCALL__ ] (*hook2)(uint count, struct sp1_update *u)  // if __FASTCALL__ only struct sp1_update* passed
+//
+// void *drawf  <->  void (*drawf)(void)     // sprite draw function containing draw code and data for struct_sp1_cs
 
 __DPROTO(,,struct sp1_ss,*,sp1_CreateSpr,void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane)
 __DPROTO(,,uint16_t,,sp1_AddColSpr,struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane)
@@ -196,6 +229,9 @@ __DPROTO(,,void,,sp1_PutSprClr,uint8_t **sprdest,struct sp1_ap *src,uint16_t n)
 __DPROTO(,,void,,sp1_GetSprClr,uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n)
 
 __DPROTO(,,void,*,sp1_PreShiftSpr,uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift)
+
+// some functions for displaying independent struct_sp1_cs not connected with any sprites; useful as foreground elements
+// if not using a no-rotate (NR) type sprite draw function, must manually init the sp1_cs.ldef member after calling sp1_InitCharStruct()
 
 __DPROTO(,,void,,sp1_InitCharStruct,struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane)
 __DPROTO(,,void,,sp1_InsertCharStruct,struct sp1_update *u,struct sp1_cs *cs)
