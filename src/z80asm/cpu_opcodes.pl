@@ -70,9 +70,9 @@ sub parse_line {
 	
 	# check if this opcode has a cpu filter
 	my $arch = '';
-	if (/^\[\s*(\w+)\s*\]\s*/) {
+	if (/^\[\s*([\w_]+)\s*\]\s*/) {
 		$arch = $1;
-		my $rest = $';
+		$_ = $';
 	}
 	
 	# get opcode and bytes and insert in opcodes
@@ -155,6 +155,33 @@ sub add_opcode {
 		return;
 	}
 
+	# expand [a',] -> expands 4 lines: sub b | sub a,b | sub a',b | altd sub b
+	if ($opcode =~ /\[a\',\]/) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		add_opcode(        $opcode_1."     ".$opcode_2,        $bytes, $arch,    $var);
+		add_opcode(        $opcode_1." a,  ".$opcode_2,        $bytes, $arch,    $var);
+		add_opcode(        $opcode_1." a', ".$opcode_2, "76, ".$bytes, "rabbit", $var);
+		add_opcode("altd ".$opcode_1." a,  ".$opcode_2, "76, ".$bytes, "rabbit", $var);
+		
+		return;
+	}
+
+	# expand [a,] -> expands 2 lines: sub b | sub a,b
+	if ($opcode =~ /\[a,\]/) {
+		my($opcode_1, $opcode_2) = ($`, $');
+		
+		add_opcode($opcode_1."    ".$opcode_2, $bytes, $arch, $var);
+		add_opcode($opcode_1." a, ".$opcode_2, $bytes, $arch, $var);
+		
+		return;
+	}
+
+	# remove extra blanks
+	for ($opcode) {
+		s/\s+/ /g; s/^\s+//; s/\s+$//;
+	}
+	
 	# reorder bytes DD|FD, xx, N, SN -> DD|FD, xx, SN, N
 	$bytes =~ s/\b (N) \s* , \s* (SN 0?) \b/ $2, $1 /x;
 	
@@ -282,8 +309,9 @@ sub build_ragel_rule {
 	$rule .= '@{ ';
 	
 	if ($arch) {
-		$rule .= 'if ( (opts.cpu & (CPU_'.uc($arch).')) == 0 ) { '.
-				 'error_illegal_ident(); return FALSE; } ';
+		my $cond = ($arch =~ /not_(.*)/) ? '(opts.cpu & (CPU_'.uc($1).   ')) != 0'
+										 : '(opts.cpu & (CPU_'.uc($arch).')) == 0';
+		$rule .= "if ($cond) { error_illegal_ident(); return FALSE; } ";
 	}
 	
 	if ($opcode =~ /\b N \b/x) {
@@ -305,7 +333,7 @@ sub build_ragel_rule {
 sub check_valid {
 	local($_) = @_;
 
-	return 0 if /\bi[xy][hl]\b/ && /\baltd\b|\'/;
+	return 0 if /\b i[xy][hl] \b/x && /\b altd \b | \' /x;
 	return 1;
 }
 
@@ -326,7 +354,7 @@ sub opcode_tokens_rule {
 		elsif (/ \G [A-Z_]+ 	/gcx)	{ push @tokens, 'expr'; }
 		elsif (/ \G ([a-z0]+)\' /gcx)	{ push @tokens, '_TK_'.uc($1).'1'; }
 		elsif (/ \G ([a-z0]+)   /gcx)	{ push @tokens, '_TK_'.uc($1); }
-		else { die "cannot parse ".substr($_,pos($_)||0); }
+		else { die "cannot parse ".substr($_,pos($_)||0)." in $_"; }
 	}
 	push @tokens, '_TK_NEWLINE';
 	return @tokens;

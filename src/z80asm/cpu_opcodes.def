@@ -2,6 +2,8 @@
 ; List of all the CPU opcodes
 ; {b c d}	-> expands into 3 lines for each element and $1 = (0..3)
 ; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
+; [a,]		-> expands 2 lines: sub b | sub a,b
+; [a',]		-> expands 4 lines: sub b | sub a,b | sub a',b | altd sub b
 ; (X)		-> expands 5 lines (hl), (ix), (ix+d), (iy), (iy+d)
 ; XH, XL	-> expands to 3 lines with (h,l), and (ixh,ixl) and (iyh,iyl) only for [z80]
 ; N_IMN		-> expands to: ld a,(MN) | ld a,N
@@ -26,40 +28,23 @@
 		
 		ld IMN, a										=> 32, N, M
 
-__END__
-
 ;------------------------------------------------------------------------------
 ; 8-bit arithmetic group
 ;------------------------------------------------------------------------------
-			{add adc sub sbc and xor or cp} a, {b c d e   h   l (hl)   a}	=>     80 + $1*8 + $2
-			{add adc sub sbc and xor or cp}    {b c d e   h   l (hl)   a}	=>     80 + $1*8 + $2
-			
-			{add adc sub sbc and xor or cp} a, {. . . .   .   . (ix+D) .}	=> DD, 80 + $1*8 + $2, D
-			{add adc sub sbc and xor or cp}    {. . . .   .   . (ix+D) .}	=> DD, 80 + $1*8 + $2, D
-			
-			{add adc sub sbc and xor or cp} a, {. . . .   .   . (iy+D) .}	=> FD, 80 + $1*8 + $2, D
-			{add adc sub sbc and xor or cp}    {. . . .   .   . (iy+D) .}	=> FD, 80 + $1*8 + $2, D
-			
-[z80]		{add adc sub sbc and xor or cp} a, {. . . . ixh ixl .    .}	=> DD, 80 + $1*8 + $2
-[z80]		{add adc sub sbc and xor or cp}    {. . . . ixh ixl .    .}	=> DD, 80 + $1*8 + $2
-[z80]		{add adc sub sbc and xor or cp} a, {. . . . iyh iyl .    .}	=> FD, 80 + $1*8 + $2
-[z80]		{add adc sub sbc and xor or cp}    {. . . . iyh iyl .    .}	=> FD, 80 + $1*8 + $2
+		{add adc sub sbc and xor or cp} [a',] {b c d e XH XL (X) a}	=> 80 + $1*8 + $2
+		{add adc sub sbc and xor or cp} [a',] N						=> C6 + $1*8, N
+		{inc dec} {b c d e XH XL  .  a}[']							=> 04 + $1 + $2*8
+		{inc dec} {. . . .  .  . (X) .}   							=> 04 + $1 + $2*8
+		
+[not_z80] tst [a,] {b c d e h l (hl) a}								=> ED, 04 + $1*8
+[not_z80] tst [a,] N												=> ED, 64, N
+		
+__END__
 
-			{add adc sub sbc and xor or cp} a, N			=>     C6 + $1*8, N
-			{add adc sub sbc and xor or cp}    N			=>     C6 + $1*8, N
 
-[rabbit]	{add adc sub sbc and xor or . } a', {b c d e   h   l (hl)   a}	=> 76,     80 + $1*8 + $2
-[rabbit]	{add adc sub sbc and xor or . } a', {. . . .   .   . (ix+D) .}	=> 76, DD, 80 + $1*8 + $2, D
-[rabbit]	{add adc sub sbc and xor or . } a', N							=> 76,     C6 + $1*8, N
 
-			{inc dec} {b c d e   h   l . a}	=>     04 + $1 + $2*8
-[rabbit]	{inc dec} {b c d e   h   l . a}'=> 76, 04 + $1 + $2*8
-[z80]		{inc dec} {. . . . ixh ixl . .}	=> DD, 04 + $1 + $2*8
-[z80]		{inc dec} {. . . . iyh iyl . .}	=> FD, 04 + $1 + $2*8
 
-			{inc dec} (hl)					=>     34 + $1
-			{inc dec} (ix + D)				=> DD, 34 + $1, D
-			{inc dec} (iy + D)				=> FD, 34 + $1, D
+
 
 [not_z80]	tst a, {b c d e   h   l . a}	=> ED, 04 + $1*8
 [not_z80]	tst    {b c d e   h   l . a}	=> ED, 04 + $1*8
