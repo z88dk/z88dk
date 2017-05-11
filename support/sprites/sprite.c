@@ -167,7 +167,7 @@ void do_mouse_stuff()
 }
 
 
-void generate_codes( int i )
+void generate_codes( int i, int mode )
 {
 	int bstring[ MAX_SIZE_X * MAX_SIZE_Y ];	//Binary String
 	int hstring[ MAX_SIZE_X * MAX_SIZE_Y ];	//Hex String
@@ -217,7 +217,11 @@ void generate_codes( int i )
 
 	//Make C Code
 	n = 0;
-	sprintf( hexcode, "char sprite%i[] = { %i, %i", i, sprite[ i ].size_x, sprite[ i ].size_y );
+	if (mode)
+		sprintf( hexcode, "char sprite%i[] = { %i, %i", i, sprite[ i ].size_x, sprite[ i ].size_y );
+	else
+		hexcode[0]=0;
+
 	for ( p = 0; p < hex_size; p += 2 )
 	{
 		sprintf( hexcode, "%s, 0x%c%c ", hexcode, hexc[ hstring[ p ] ], hexc[ hstring[ p + 1] ] );
@@ -228,7 +232,10 @@ void generate_codes( int i )
 			n = 0;
 		}
 	}
-	sprintf( hexcode, "%s };\n", hexcode );
+	if (mode)
+		sprintf( hexcode, "%s };\n", hexcode );
+	else
+		sprintf( hexcode, "%s \n", hexcode );
 
 }
 
@@ -737,7 +744,7 @@ void do_import_printmaster()
 }
 
 //Saves a header file with sprites 0-on_sprite for use with z88dk
-void save_code_file( const char *file )
+void save_code_file( const char *file, int mode )
 {
 	ALLEGRO_FILE *f = NULL;
 	int i;
@@ -751,7 +758,7 @@ void save_code_file( const char *file )
 
 	for ( i = 0; i <= on_sprite; i++ )
 	{
-		generate_codes( i );
+		generate_codes( i, mode );
 		al_fputs( f, hexcode );
 	}
 
@@ -890,7 +897,7 @@ void load_sevenup_file( const char *file )
 
 
 //The file selector for saving code files
-void do_save_code()
+void do_save_code(int mode)
 {
 	const char *file = NULL;
 
@@ -902,10 +909,13 @@ void do_save_code()
 	al_destroy_native_file_dialog(file_dialog_sv);
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
-	save_code_file( file );
+	save_code_file( file, mode );
 	al_destroy_path(path);
 
-	wkey_release(ALLEGRO_KEY_F5);
+	if (mode)
+		wkey_release(ALLEGRO_KEY_F5);
+	else
+		wkey_release(ALLEGRO_KEY_F7);
 }
 
 //The file selector for saving sprite files
@@ -1135,8 +1145,8 @@ void do_help_page() {
 	al_clear_to_color (al_map_rgb(240,230,250) );
 	
 	al_draw_text(font, al_map_rgb(20,5,10), 8, 5, ALLEGRO_ALIGN_LEFT, "Image Editing");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 30, ALLEGRO_ALIGN_LEFT, "Up / Down.............Zoom In / Out");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 50, ALLEGRO_ALIGN_LEFT, "SHIFT + arrow keys....Scroll Sprite");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 30, ALLEGRO_ALIGN_LEFT, "Up / Down..............Zoom In / Out");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 50, ALLEGRO_ALIGN_LEFT, "SHIFT + arrow keys.....Scroll Sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 70, ALLEGRO_ALIGN_LEFT, "H/V/D..................Flip sprite horizontally/vertically/diagonally");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 90, ALLEGRO_ALIGN_LEFT, "SHIFT + DEL............Remove sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "INS / DEL..............Insert/Clear a sprite");
@@ -1156,6 +1166,7 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
 	al_draw_text(font, al_map_rgb(0,5,10), 190, 445, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 465, ALLEGRO_ALIGN_LEFT, "F7.....................As above, RAW data only (no size/headers)");
 
 	al_flip_display();
 
@@ -1325,7 +1336,9 @@ void do_keyboard_input(int keycode)
 	else if ( keycode ==  ALLEGRO_KEY_F4 )
 		do_load_sevenup();
 	else if ( keycode ==  ALLEGRO_KEY_F5 )
-		do_save_code();
+		do_save_code(1);
+	else if ( keycode ==  ALLEGRO_KEY_F7 )
+		do_save_code(0);
 	else if ( keycode ==  ALLEGRO_KEY_F6 )
 		do_merge_sprites();
 	else if ( keycode ==  ALLEGRO_KEY_L )
