@@ -562,7 +562,7 @@ void import_from_bitmap( const char *file )
 						fgets(row,sizeof(row),fpin);
 					
 					for ( y = 1; y <= sprite[ on_sprite ].size_y+4; y++ )
-						for ( x = 1; x <= sprite[ on_sprite ].size_x+1; x+=8 ) {
+						for ( x = 1; x <= sprite[ on_sprite ].size_x; x+=8 ) {
 							fscanf(fpin,"%2X",&pixel);
 
 							for ( i = 0; i < 8; i++ ) {
