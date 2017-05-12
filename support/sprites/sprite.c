@@ -497,19 +497,21 @@ void import_from_bitmap( const char *file )
 		
 		
 		// Import as generic 8x8 character dump, this will be overwritten if better solutions are found
+		#define CHAR_H		8
 		// remove some byte hoping to cut away headers
 		for (x=0;x<(len%16);x++) getc(fpin); 
 		sprite[ on_sprite ].size_x = 128;
-		sprite[ on_sprite ].size_y = len/16;
+		sprite[ on_sprite ].size_y = CHAR_H*len/128;
 		if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
 			sprite[ on_sprite ].size_y = MAX_SIZE_Y;
 		
-		for ( y = 0; y < len/128; y++ )
+		for ( y = 0; y < len/(16*CHAR_H); y++ )
 			for ( x = 0; x < 16; x++ )
-				for ( i = 1; i <= 8; i++ ) {
+				for ( i = 1; i <= CHAR_H; i++ ) {
 					b=getc(fpin);
 					for ( j = 1; j <= 8; j++ ) {
-						sprite[ on_sprite ].p[ x*8+j ][ y*8+i ] = ((b&128) != 0);
+						// sprite[ on_sprite ].p[ x*8+9-j ]  <- invert horiz.
+						sprite[ on_sprite ].p[ x*8+j ][ y*CHAR_H+i ] = ((b&128) != 0);
 						b<<=1;
 					}
 				}
