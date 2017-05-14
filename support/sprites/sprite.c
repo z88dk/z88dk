@@ -484,7 +484,7 @@ void import_from_bitmap( const char *file )
 		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
 			for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
 				al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
-				sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
+				sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 500 );
 			}
 	} else {
 		fpin = fopen( file, "rb" );
