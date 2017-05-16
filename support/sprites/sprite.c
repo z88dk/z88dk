@@ -4,6 +4,8 @@
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
 	slightly improved and ported to Allegro 5 by Stefano Bodrato
+	
+	Find the **HACK** markers to change the code at your convenience
 
 	Please send Daniel McKinnon (and the z88dk team) your own updates to the code,
 	it can be anything!  Comments, GUI elements, Bug-Fixes,
@@ -484,7 +486,8 @@ void import_from_bitmap( const char *file )
 		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
 			for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
 				al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
-				sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 500 );
+				/* **HACK**, use 500 for darker pictures, 300 for a reduced sensivity */
+				sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 400 );
 			}
 	} else {
 		fpin = fopen( file, "rb" );
@@ -495,10 +498,13 @@ void import_from_bitmap( const char *file )
 		len=ftell(fpin);
 		fseek(fpin,0L,SEEK_SET);
 		
-		
+
 		// Import as generic 8x8 character dump, this will be overwritten if better solutions are found
+		/* **HACK** - change character height at your convenience for binary capture */
 		#define CHAR_H		8
+		
 		// remove some byte hoping to cut away headers
+		/* **HACK** - remove or adjust the following line to change the loader starting point */
 		for (x=0;x<(len%16);x++) getc(fpin); 
 		sprite[ on_sprite ].size_x = 128;
 		sprite[ on_sprite ].size_y = CHAR_H*len/128;
@@ -1006,6 +1012,35 @@ void reset_sprites()
 		sprite[ i ].size_x = DEFAULT_SIZE_X;
 		sprite[ i ].size_y = DEFAULT_SIZE_Y;
 	}
+	
+	/*
+	// **HACK** Use this loader to recover sprite from binary data (e.g. "thefont[]")
+	
+	int i,x,y,j,b,p,x0,y0;
+	
+	i=0;
+	p=0;
+	x0 = thefont[p];
+	p++;
+	while (x0 != 0) {
+		y0 = thefont[p];
+		p++;
+		sprite[ i ].size_x = x0;
+		sprite[ i ].size_y = y0;
+		for ( y = 0; y < y0; y++ )
+			for ( x = 1; x <= x0; x+=8 ) {
+				b=thefont[p];
+				p++;
+				for ( j = 0; j < 8; j++ ) {
+					sprite[ i ].p[ x+j ][ y+1 ] = ((b&128) != 0);
+					b<<=1;
+				}
+			}
+		x0 = thefont[p];
+		p++;  i++;
+	}
+	*/
+
 }
 
 //Copies sprite[ src ].p[][] to sprite[ dest ].p[][]
