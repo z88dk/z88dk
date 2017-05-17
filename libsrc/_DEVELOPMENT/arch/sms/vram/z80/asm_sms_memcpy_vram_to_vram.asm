@@ -41,7 +41,7 @@ asm_sms_memcpy_vram_to_vram:
 no_adjust:
    
    ld c,__IO_VDP_COMMAND
-   
+
 outer_loop:
 
    push bc
@@ -56,13 +56,13 @@ inner_loop:
    out (c),l
    out (c),h
    in a,(__IO_VDP_DATA)
-   
+
    out (c),e
    out (c),d
    out (__IO_VDP_DATA),a
-   
+
    ei
-   
+
    inc hl
    inc de
    

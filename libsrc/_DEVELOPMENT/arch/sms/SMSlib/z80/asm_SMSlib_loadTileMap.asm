@@ -10,6 +10,8 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_loadTileMap
 
+EXTERN asm_sms_copy_mem_to_vram
+
 asm_SMSlib_loadTileMap:
 
    ; void SMS_loadTileMap(unsigned char x, unsigned char y, void *src, unsigned int size)
@@ -39,10 +41,10 @@ asm_SMSlib_loadTileMap:
    ld de,SMS_PNTAddress
    add hl,de                   ; hl = SMS_PNTAddress+(y*32+x)*2
    
-	ld a,c
+   ld a,c
    INCLUDE "SMS_CRT0_RST08.inc"
-	ld c,a
-	
+   ld c,a
+   
    pop hl
    
    ;; SMS_byte_array_to_VDP_data(src,size)
@@ -50,12 +52,4 @@ asm_SMSlib_loadTileMap:
    ; bc = unsigned int size
    ; hl = void *src
    
-loop:
-   
-   ld a,(hl)
-   out (VDPDataPort),a
-   
-   cpi                         ; hl++, bc--
-   jp pe, loop
-   
-   ret
+   jp asm_sms_copy_mem_to_vram

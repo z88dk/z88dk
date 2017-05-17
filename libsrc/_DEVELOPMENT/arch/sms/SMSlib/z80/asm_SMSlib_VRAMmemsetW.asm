@@ -10,6 +10,8 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_VRAMmemsetW
 
+EXTERN asm_sms_setw_vram
+
 asm_SMSlib_VRAMmemsetW:
 
    ; void SMS_VRAMmemsetW (unsigned int dst, unsigned int value, unsigned int size)
@@ -18,7 +20,7 @@ asm_SMSlib_VRAMmemsetW:
    ;         de = unsigned int value
    ;         bc = unsigned int size
    ;
-   ; uses  : af, bc, h
+   ; uses  : af, bc, hl
    
    ld a,c
    
@@ -28,22 +30,8 @@ asm_SMSlib_VRAMmemsetW:
    srl b
    rra
    ld c,a
-   
-loop:
 
-   ld a,b
-   or c
+   or b
    ret z
 
-   ld a,e
-   out (VDPDataPort),a
-   
-   nop
-   nop
-   nop
-   
-   ld a,d
-   out (VDPDataPort),a
-
-   dec bc
-   jr loop
+   jp asm_sms_setw_vram

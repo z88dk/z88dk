@@ -10,6 +10,8 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_loadTiles
 
+EXTERN asm_sms_copy_mem_to_vram
+
 asm_SMSlib_loadTiles:
 
    ; void SMS_loadTiles (void *src, unsigned int tilefrom, unsigned int size)
@@ -36,13 +38,5 @@ asm_SMSlib_loadTiles:
    ex de,hl
    
    ;; SMS_byte_array_to_VDP_data(src,size)
-   
- loop:
-   
-   ld a,(hl)
-   out (VDPDataPort),a
-   
-   cpi                         ; hl++, bc--
-   jp pe, loop
-   
-   ret
+
+   jp asm_sms_copy_mem_to_vram

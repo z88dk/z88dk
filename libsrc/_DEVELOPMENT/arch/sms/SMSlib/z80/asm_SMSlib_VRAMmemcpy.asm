@@ -10,6 +10,8 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_VRAMmemcpy
 
+EXTERN asm_sms_copy_mem_to_vram
+
 asm_SMSlib_VRAMmemcpy:
 
    ; void SMS_VRAMmemcpy (unsigned int dst, void *src, unsigned int size)
@@ -27,13 +29,5 @@ asm_SMSlib_VRAMmemcpy:
 
    ld c,a
    ex de,hl
-   
-loop:
 
-   ld a,(hl)
-   out (VDPDataPort),a
-   
-   cpi                         ; hl++, bc--
-   jp pe, loop
-   
-   ret
+   jp asm_sms_copy_mem_to_vram

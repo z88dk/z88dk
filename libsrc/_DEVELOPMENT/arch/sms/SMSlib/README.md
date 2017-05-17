@@ -1,5 +1,5 @@
 SMSlib library from [devkitSMS](https://github.com/sverx/devkitSMS)
-synchronized March 29, 2017
+synchronized May 15, 2017
 
 SMSlib
 ======

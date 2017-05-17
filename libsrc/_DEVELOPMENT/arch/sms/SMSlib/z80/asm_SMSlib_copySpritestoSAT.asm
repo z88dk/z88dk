@@ -32,15 +32,12 @@ ELSE
 ENDIF
 
    ld hl,__SMSlib_SpriteTableY
+   ld c,VDPDataPort
 
 loop00:
  
-   ld a,(hl)
-   inc hl
-   
-   out (VDPDataPort),a
-   
-   djnz loop00
+   outi
+   jr nz, loop00
    
    ld hl,SMS_SATAddress + 128
    INCLUDE "SMS_CRT0_RST08.inc"
@@ -49,13 +46,11 @@ loop00:
    sla b
    
    ld hl,__SMSlib_SpriteTableXN
+   ld c,VDPDataPort
 
 loop01:
 
-   ld a,(hl)
-   inc hl
-   
-   out (VDPDataPort),a
-   
-   djnz loop01
+   outi
+   jr nz, loop01
+
    ret

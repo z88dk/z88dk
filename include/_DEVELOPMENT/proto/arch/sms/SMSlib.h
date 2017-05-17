@@ -8,7 +8,7 @@ include(__link__.m4)
 /* **************************************************
    SMSlib - C programming library for the SMS/GG
    ( part of devkitSMS - github.com/sverx/devkitSMS )
-   Synchronized March 29, 2017
+   Synchronized May 15, 2017
    ************************************************** */
 
 #define SMS_MAXSPRITES  __SMSLIB_MAXSPRITES

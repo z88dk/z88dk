@@ -51,12 +51,12 @@ asm_SMSlib_addSpriteClipping:
 
 check_x:
 
-	; if ((x>clipWin_x1) || (x<((int)(clipWin_x0)-(int)(spritesWidth))))
+	; if ((x<0) || (x>clipWin_x1) || (x<((int)(clipWin_x0)-(int)(spritesWidth))))
 
 first_part_x:
 
 	bit 7,b
-	jr nz, second_part_x
+	jp nz, error_mc - 1
 
 	inc b
 	dec b
@@ -132,7 +132,7 @@ second_part_y:
 decision_y:
 
    jp c, error_mc - 1
-	
+
 	; bc = x
 	; de = y
 	; stack = tile | SpriteNextFree
