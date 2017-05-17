@@ -1014,7 +1014,7 @@ void reset_sprites()
 	}
 	
 	/*
-	// **HACK** Use this loader to recover sprite from binary data (e.g. "thefont[]")
+	// **HACK** Use this loader to recover sprites from pre-generated binary data (e.g. "thefont[]")
 	
 	int i,x,y,j,b,p,x0,y0;
 	
@@ -1041,6 +1041,34 @@ void reset_sprites()
 	}
 	*/
 
+/*
+	// **HACK** Use this code to load fonts created for the GLCD format
+	// set FONTX and FONTY properly and include the font data as follows:
+	// char thefont[] ={0x04, 0x00, 0x00...   };
+	
+	int i,x,y,j,b,p;
+	
+	#define FONTX  7
+	#define FONTY  11
+	
+	i=0;
+	p=0;
+	for (i=0; i<=64; i++) {
+		sprite[ i ].size_x = thefont[p]+1;
+		p++;
+		sprite[ i ].size_y = FONTY;
+		for ( x = 0; x < FONTX; x++ ) {
+			for ( y = 0; y <FONTY; y+=8 ) {
+				b=thefont[p];
+				p++;
+				for ( j = 1; j <= 8; j++ ) {
+					sprite[ i ].p[ 1+x ][ y+j ] = ((b&1) != 0);
+					b>>=1;
+				}
+			}
+		}
+	}
+*/
 }
 
 //Copies sprite[ src ].p[][] to sprite[ dest ].p[][]
