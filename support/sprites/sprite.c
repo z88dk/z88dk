@@ -568,27 +568,31 @@ void import_from_bitmap( const char *file )
 						if (!strncmp(row, "ENDFONT",7)) exitflag=1;
 					}
 					sscanf(row,"%s %s %s",foo,xsz,ysz);
-					sprite[ on_sprite + spcount ].size_x = atoi(xsz);
+					sprite[ on_sprite + spcount ].size_x = g = atoi(xsz);
 					sprite[ on_sprite + spcount ].size_y = atoi(ysz);
+					if (g%8) {g=g/8+1;}
+					else g=g/8;
 				}
 				
 				if (!exitflag) {
 					while (strncmp(row, "BITMAP",3) && (!feof(fpin)))
 						fgets(row,sizeof(row),fpin);
 					
-					for ( y = 1; y <= sprite[ on_sprite ].size_y+4; y++ )
-						for ( x = 1; x <= sprite[ on_sprite ].size_x; x+=8 ) {
+					for ( y = 1; y <= sprite[ on_sprite + spcount ].size_y; y++ ) {
+						for ( x = 0; x < g; x++ ) {
 							fscanf(fpin,"%2X",&pixel);
 
-							for ( i = 0; i < 8; i++ ) {
-							sprite[ on_sprite + spcount ].p[ x+i ][ y ] = ((pixel&128) != 0);
+							for ( i = 1; i <= 8; i++ ) {
+							sprite[ on_sprite + spcount ].p[ x*8+i ][ y ] = ((pixel&128) != 0);
 							pixel<<=1;
 							}
 						}
+					}
 				}
-					
+				/* **HACK** (BDF font import), right margin adj. */
+				sprite[ on_sprite + spcount ].size_x++;
 				spcount++;
-				if (spcount>=MAX_SPRITE) exitflag=1;
+				if ((on_sprite + spcount)>=MAX_SPRITE) exitflag=1;
 			}
 		}
 		
