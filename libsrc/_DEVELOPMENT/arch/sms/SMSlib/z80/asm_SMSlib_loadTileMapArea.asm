@@ -68,7 +68,7 @@ loop_y:
 loop:
    
    outi
-   djnz loop
+   jp nz, loop
 
    ex de,hl
 

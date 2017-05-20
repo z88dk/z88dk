@@ -37,7 +37,7 @@ ENDIF
 loop00:
  
    outi
-   jr nz, loop00
+   jp nz, loop00
    
    ld hl,SMS_SATAddress + 128
    INCLUDE "SMS_CRT0_RST08.inc"
@@ -51,6 +51,6 @@ loop00:
 loop01:
 
    outi
-   jr nz, loop01
+   jp nz, loop01
 
    ret

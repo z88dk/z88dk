@@ -25,5 +25,6 @@ asm_SMSlib_setBGPaletteColor:
    
    INCLUDE "SMS_CRT0_RST08.inc"
 
+   nop
    out (VDPDataPort),a
    ret

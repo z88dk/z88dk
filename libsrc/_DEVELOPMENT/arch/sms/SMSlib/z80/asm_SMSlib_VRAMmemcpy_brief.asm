@@ -29,6 +29,6 @@ asm_SMSlib_VRAMmemcpy_brief:
 loop:
 
    outi
-   djnz loop
+   jp nz, loop
 
    ret
