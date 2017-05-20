@@ -57,13 +57,14 @@ inner_loop:
    out (c),h
 
    inc hl
-	xor a
-	ret nz
+   xor a
+   ret nz
 
    in a,(__IO_VDP_DATA)
 
    ei
-   cp 0
+   nop
+   nop
    di
 
    out (c),e
