@@ -164,7 +164,7 @@ void main(void)
             
                if (*buffer_walk == '\n')
                {
-                  buffer_walk--;
+                  buffer_space--;
                   break;
                }
             }
