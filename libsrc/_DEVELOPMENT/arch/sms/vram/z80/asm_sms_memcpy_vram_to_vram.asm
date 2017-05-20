@@ -47,31 +47,38 @@ outer_loop:
    push bc
    ld b,a
 
+   di
+
 inner_loop:
    
    ; must yield opportunities for an interrupt to occur
-   
-   di
-   
+
    out (c),l
    out (c),h
+
+   inc hl
+	xor a
+	ret nz
+
    in a,(__IO_VDP_DATA)
+
+   ei
+   cp 0
+   di
 
    out (c),e
    out (c),d
    out (__IO_VDP_DATA),a
 
-   ei
-
-   inc hl
    inc de
-   
    djnz inner_loop
 
    ld a,b
    pop bc
    
    djnz outer_loop
+
+   ei
 
    ld c,b
    res 6,d
