@@ -426,6 +426,68 @@ void scroll_sprite_down()
 }
 
 
+int check_left_border()
+{
+	int y;
+	
+	for ( y = sprite[ on_sprite ].size_y; y > 0 ; y-- )
+		if (sprite[ on_sprite ].p[ 1 ][ y ] != 0) return 1;
+	return 0;
+}
+
+
+int check_top_border()
+{
+	int x;
+	
+	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
+		if (sprite[ on_sprite ].p[ x ][ 1 ] != 0) return 1;
+	return 0;
+}
+
+
+int check_right_border()
+{
+	int y;
+	
+	for ( y = sprite[ on_sprite ].size_y; y > 0 ; y-- )
+		if (sprite[ on_sprite ].p[ sprite[ on_sprite ].size_x ][ y ] != 0) return 1;
+	return 0;
+}
+
+
+int check_bottom_border()
+{
+	int x;
+	
+	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
+		if (sprite[ on_sprite ].p[ x ][ sprite[ on_sprite ].size_y ] != 0) return 1;
+	return 0;
+}
+
+
+void fit_sprite_borders()
+{
+	int x, y;
+	for ( y = sprite[ on_sprite ].size_y; y > 0 ; y-- )
+		if (!check_top_border()) scroll_sprite_up();
+	
+	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
+		if (!check_left_border()) scroll_sprite_left();
+	
+	for ( y = sprite[ on_sprite ].size_y; y > 0 ; y-- )
+		if (!check_bottom_border()) sprite[ on_sprite ].size_y--;
+	
+	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
+		if (!check_right_border()) sprite[ on_sprite ].size_x--;
+	
+	sprite[ on_sprite ].size_x++;
+	sprite[ on_sprite ].size_y++;
+
+	update_screen();
+}
+
+
 //chop sprite in smaller items
 void chop_sprite( int src )
 {
@@ -1389,7 +1451,7 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "SHIFT + H/V............Double Width/Height");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C/P....................Copy/Paste sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "5......................Reduce sprite size at 50%");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit the zoom settings for the current sprite size");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit: auto zoom or use SHIFT to adjust margins");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 230, ALLEGRO_ALIGN_LEFT, "SHIFP + P.......Split the copied sprite into pieces as big as the current ");
 	al_draw_text(font, al_map_rgb(0,5,10), 140, 250, ALLEGRO_ALIGN_LEFT, "sprite and paste them starting from the current sprite position.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 270, ALLEGRO_ALIGN_LEFT, "M......................Compute mask for copied sprite and paste to current sprite");
@@ -1559,7 +1621,9 @@ void do_keyboard_input(int keycode)
 	if ( keycode ==  ALLEGRO_KEY_M )
 		if (copied != on_sprite) copy_sprite_mask( copied, on_sprite );
 
-	if ( keycode ==  ALLEGRO_KEY_F )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && (keycode ==  ALLEGRO_KEY_F ) ) {
+		fit_sprite_borders();
+	} else if ( keycode ==  ALLEGRO_KEY_F )
 	{
 		fit_sprite_on_screen();
 		update_screen();
