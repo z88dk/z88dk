@@ -29,7 +29,7 @@
 
         inc hl                      ; move the Rx pointer along
         ld a, l                     ; get the low byte of the Rx pointer
-        cp +(aciaRxBuffer + ACIA_RX_SIZE) & $FF
+        cp (aciaRxBuffer + ACIA_RX_SIZE) & $FF
         jr nz, get_no_rx_wrap
         ld hl, aciaRxBuffer         ; we wrapped, so go back to start of buffer
 
