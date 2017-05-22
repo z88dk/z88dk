@@ -579,9 +579,9 @@ void import_from_gif( const char *FileName )
 		sprite[ on_sprite ].size_y = MAX_SIZE_Y;
 	
 	for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
-		GifRow = ScreenBuffer[y];
+		GifRow = ScreenBuffer[y-1];
 		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ ) {
-			ColorMapEntry = &ColorMap->Colors[GifRow[x]];
+			ColorMapEntry = &ColorMap->Colors[GifRow[x-1]];
 			/* **HACK** (GIF) - use 500 for darker pictures, 300 for a reduced sensivity */
 			sprite[ on_sprite ].p[ x ][ y ] = ( (ColorMapEntry->Red+ColorMapEntry->Blue+ColorMapEntry->Green) < 400 );
 		}
