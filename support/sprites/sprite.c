@@ -27,6 +27,12 @@
 
 #include <stdio.h>
 
+/* **HACK** (GIF file support)- add "-DGIF_SUPPORT" and -lgif in the Makefile*/
+#ifdef GIF_SUPPORT
+#include <gif_lib.h>
+#include <malloc.h>
+const char gifPatterns[] = "*.gif";
+#endif
 
 #define MAX_SIZE_X		255
 #define MAX_SIZE_Y		255
@@ -379,9 +385,11 @@ void flip_sprite_d()
 void scroll_sprite_left()
 {
 	int x, y;
-	for ( x = 1; x < sprite[ on_sprite ].size_x; x++ )
-		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
+	for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
+		for ( x = 1; x < sprite[ on_sprite ].size_x; x++ )
 			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x + 1 ][ y ];
+		sprite[ on_sprite ].p[ x ][ y ] = 0;
+	}
 	update_screen();
 }
 
@@ -399,9 +407,11 @@ void scroll_sprite_right()
 void scroll_sprite_up()
 {
 	int x, y;
-	for ( y = 1; y < sprite[ on_sprite ].size_y; y++ )
-		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
+	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ ) {
+		for ( y = 1; y < sprite[ on_sprite ].size_y; y++ )
 			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x ][ y + 1 ];
+		sprite[ on_sprite ].p[ x ][ y ] = 0;
+	}
 	update_screen();
 }
 
@@ -452,6 +462,143 @@ void wkey_release(int keycode)
 }
 
 
+#ifdef GIF_SUPPORT
+void import_from_gif( const char *FileName )
+{
+	int x,y;
+    int	i, j, Size, Row, Col, Width, Height, ExtCode;
+    GifRecordType RecordType;
+    GifByteType *Extension;
+    GifRowType *ScreenBuffer;
+    GifFileType *GifFile;
+    GifRowType GifRow;
+    GifColorType *ColorMapEntry;
+
+    int
+	InterlacedOffset[] = { 0, 4, 2, 1 }, /* The way Interlaced image should. */
+	InterlacedJumps[] = { 8, 8, 4, 2 };    /* be read - offsets and jumps... */
+    int ImageNum = 0;
+    ColorMapObject *ColorMap;
+    int Error;
+
+	if ((GifFile = DGifOpenFileName(FileName, &Error)) == NULL)
+		return;
+
+    if (GifFile->SHeight == 0 || GifFile->SWidth == 0) {
+	fprintf(stderr, "Image of width or height 0\n");
+	exit(EXIT_FAILURE);
+    }
+
+    /* 
+     * Allocate the screen as vector of column of rows. Note this
+     * screen is device independent - it's the screen defined by the
+     * GIF file parameters.
+     */
+    if ((ScreenBuffer = (GifRowType *)
+	malloc(GifFile->SHeight * sizeof(GifRowType))) == NULL)
+		return;
+
+    Size = GifFile->SWidth * sizeof(GifPixelType);/* Size in bytes one row.*/
+    if ((ScreenBuffer[0] = (GifRowType) malloc(Size)) == NULL) /* First row. */
+		return;
+
+    for (i = 0; i < GifFile->SWidth; i++)  /* Set its color to BackGround. */
+	ScreenBuffer[0][i] = GifFile->SBackGroundColor;
+    for (i = 1; i < GifFile->SHeight; i++) {
+	/* Allocate the other rows, and set their color to background too: */
+	if ((ScreenBuffer[i] = (GifRowType) malloc(Size)) == NULL)
+		return;
+
+	memcpy(ScreenBuffer[i], ScreenBuffer[0], Size);
+    }
+
+    /* Scan the content of the GIF file and load the image(s) in: */
+    do {
+	if (DGifGetRecordType(GifFile, &RecordType) == GIF_ERROR) 
+		return;
+	
+	switch (RecordType) {
+	    case IMAGE_DESC_RECORD_TYPE:
+		if (DGifGetImageDesc(GifFile) == GIF_ERROR)
+			return;
+			
+		Row = GifFile->Image.Top; /* Image Position relative to Screen. */
+		Col = GifFile->Image.Left;
+		Width = GifFile->Image.Width;
+		Height = GifFile->Image.Height;
+		if (GifFile->Image.Left + GifFile->Image.Width > GifFile->SWidth ||
+		   GifFile->Image.Top + GifFile->Image.Height > GifFile->SHeight) {
+		    fprintf(stderr, "Image %d is not confined to screen dimension, aborted.\n",ImageNum);
+		    exit(EXIT_FAILURE);
+		}
+		if (GifFile->Image.Interlace) {
+		    /* Need to perform 4 passes on the images: */
+		    for (i = 0; i < 4; i++)
+			for (j = Row + InterlacedOffset[i]; j < Row + Height;
+						 j += InterlacedJumps[i]) {
+			    if (DGifGetLine(GifFile, &ScreenBuffer[j][Col], Width) == GIF_ERROR)
+					return;
+			}
+		}
+		else {
+		    for (i = 0; i < Height; i++)
+				if (DGifGetLine(GifFile, &ScreenBuffer[Row++][Col], Width) == GIF_ERROR)
+					return;
+		}
+		break;
+	    case EXTENSION_RECORD_TYPE:
+		/* Skip any extension blocks in file: */
+		if (DGifGetExtension(GifFile, &ExtCode, &Extension) == GIF_ERROR) {
+			return;
+		}
+		while (Extension != NULL)
+		    if (DGifGetExtensionNext(GifFile, &Extension) == GIF_ERROR)
+				return;
+		break;
+	    case TERMINATE_RECORD_TYPE:
+		break;
+	    default:		    /* Should be trapped by DGifGetRecordType. */
+		break;
+	}
+    } while (RecordType != TERMINATE_RECORD_TYPE);
+
+    /* Lets dump it - set the global variables required and do it: */
+    ColorMap = (GifFile->Image.ColorMap
+		? GifFile->Image.ColorMap
+		: GifFile->SColorMap);
+    if (ColorMap == NULL) {
+        fprintf(stderr, "Gif Image does not have a colormap\n");
+        exit(EXIT_FAILURE);
+    }
+
+	sprite[ on_sprite ].size_x = GifFile->SWidth;
+	sprite[ on_sprite ].size_y = GifFile->SHeight;
+	if ( sprite[ on_sprite ].size_x >= MAX_SIZE_X )
+		sprite[ on_sprite ].size_x = MAX_SIZE_X;
+	if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
+		sprite[ on_sprite ].size_y = MAX_SIZE_Y;
+	
+	for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
+		GifRow = ScreenBuffer[y];
+		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ ) {
+			ColorMapEntry = &ColorMap->Colors[GifRow[x]];
+			/* **HACK** (GIF) - use 500 for darker pictures, 300 for a reduced sensivity */
+			sprite[ on_sprite ].p[ x ][ y ] = ( (ColorMapEntry->Red+ColorMapEntry->Blue+ColorMapEntry->Green) < 400 );
+		}
+	}
+
+
+
+    (void)free(ScreenBuffer);
+
+	fit_sprite_on_screen();
+	update_screen();
+	
+    DGifCloseFile(GifFile, &Error);
+}
+#endif
+
+		
 void import_from_bitmap( const char *file )
 {
 	ALLEGRO_BITMAP *temp = NULL;
@@ -720,6 +867,25 @@ void do_import_raw()
 	
 	wkey_release(ALLEGRO_KEY_L);
 }
+
+#ifdef GIF_SUPPORT
+void do_import_gif()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_bmp = al_create_native_file_dialog("./", "Load GIF picture", gifPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_bmp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_bmp, 0));
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog_bmp);
+
+	import_from_gif( file );
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_G);
+}
+#endif
 
 void do_import_bitmap()
 {
@@ -1231,7 +1397,11 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 325, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 345, ALLEGRO_ALIGN_LEFT, "F3/F6..................Load/Merge sprites (editor format), merge over current pos.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 365, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import BMP, LBM, PCX, TGA, PBM, BDF, SNA, SCR, mem.dump");
+	#ifdef GIF_SUPPORT
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "G/L....................Import GIF / BMP,LBM,PCX,TGA,PNG,PBM,BDF,SNA,SCR,RAWdata");
+	#else
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import BMP,LBM,PCX,TGA,PNG,PBM,BDF,SNA,SCR,RAWdata");
+	#endif
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
 	al_draw_text(font, al_map_rgb(0,5,10), 190, 445, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
@@ -1412,6 +1582,10 @@ void do_keyboard_input(int keycode)
 		do_merge_sprites();
 	else if ( keycode ==  ALLEGRO_KEY_L )
 		do_import_bitmap();
+#ifdef GIF_SUPPORT
+	else if ( keycode ==  ALLEGRO_KEY_G )
+		do_import_gif();
+#endif
 	else if ( keycode ==  ALLEGRO_KEY_N )
 		do_import_printmaster();
 
