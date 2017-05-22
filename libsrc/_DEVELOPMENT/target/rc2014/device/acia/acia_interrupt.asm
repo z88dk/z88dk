@@ -33,7 +33,7 @@
 
         inc hl                      ; move the Rx pointer along
         ld a, l	                    ; move low byte of the Rx pointer
-        cp (aciaRxBuffer + ACIA_RX_SIZE) & $FF
+        cp +(aciaRxBuffer + ACIA_RX_SIZE) & $FF
         jr nz, no_rx_wrap
         ld hl, aciaRxBuffer         ; we wrapped, so go back to start of buffer
 
@@ -62,7 +62,7 @@
 
         inc hl                      ; move the Tx pointer along
         ld a, l                     ; get the low byte of the Tx pointer
-        cp (aciaTxBuffer + ACIA_TX_SIZE) & $FF
+        cp +(aciaTxBuffer + ACIA_TX_SIZE) & $FF
         jr nz, no_tx_wrap
         ld hl, aciaTxBuffer         ; we wrapped, so go back to start of buffer
 

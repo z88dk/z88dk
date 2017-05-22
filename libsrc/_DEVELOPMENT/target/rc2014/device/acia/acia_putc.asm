@@ -45,7 +45,7 @@
         inc hl                      ; move the Tx pointer along
 
         ld a, l                     ; move low byte of the Tx pointer
-        cp (aciaTxBuffer + ACIA_TX_SIZE) & $FF
+        cp +(aciaTxBuffer + ACIA_TX_SIZE) & $FF
         jr nz, put_no_tx_wrap
         ld hl, aciaTxBuffer         ; we wrapped, so go back to start of buffer
 
