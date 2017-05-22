@@ -188,8 +188,17 @@ sub add_opcode {
 	# build test code
 	my $valid_code = check_valid($opcode);
 	for my $cpu (@CPUS) {
-		my $exists = check_arch($cpu, $arch);
-		build_test_code($opcode, $bytes, $cpu, $exists && $valid_code);
+
+		# check for emulation flags
+		if ($bytes =~ /^\s*rabbit_emul\s*:\s*/) {
+			my $bytes_1 = $';
+			my $exists = check_arch($cpu, 'zilog');
+			build_test_code($opcode, $bytes_1, $cpu, $exists && $valid_code);	
+		}
+		else {
+			my $exists = check_arch($cpu, $arch);
+			build_test_code($opcode, $bytes, $cpu, $exists && $valid_code);
+		}
 	}
 	
 	# build Ragel rules
@@ -322,7 +331,7 @@ sub build_ragel_rule {
 		$rule .= 'if (!expr_in_parens) return FALSE; ';
 	}
 	
-	$rule .= join(' ', opcode_bytes_rule($bytes)).' ';
+	$rule .= join(' ', opcode_bytes_rule($bytes, $opcode)).' ';
 	$rule .= '}';
 	
 	push @RAGEL_INC, $rule;
@@ -363,8 +372,14 @@ sub opcode_tokens_rule {
 #------------------------------------------------------------------------------
 # return rules to load opcode
 sub opcode_bytes_rule {
-	my($bytes) = @_;
+	my($bytes, $opcode) = @_;
 	my @rules;
+
+	# rabbit_emul prefix
+	my $rabbit_emul;
+	if ($bytes =~ s/^\s*rabbit_emul\s*:\s*//) {
+		$rabbit_emul = 1;
+	}
 	
 	# ALTD prefix
 	if ($bytes =~ s/^\s*76\s*,\s*//) {
@@ -376,9 +391,9 @@ sub opcode_bytes_rule {
 		my($bytes_1, $true, $false) = ($`, $1, $2);
 		
 		push @rules, 'if (expr_in_parens) {';
-		push @rules, opcode_bytes_rule($bytes_1.$true);
+		push @rules, opcode_bytes_rule($bytes_1.$true, $opcode);
 		push @rules, '} else {';
-		push @rules, opcode_bytes_rule($bytes_1.$false);
+		push @rules, opcode_bytes_rule($bytes_1.$false, $opcode);
 		push @rules, '}';
 		return @rules;
 	}
@@ -386,7 +401,11 @@ sub opcode_bytes_rule {
 	# Handle data bytes
 	my $func = 'DO_stmt';
 	my $post_arg = '';
-	if ($bytes =~ s/\b N \s* , \s* M \b/ /x) {
+	if ($rabbit_emul) {
+		$func = 'DO_stmt_emul';
+		$post_arg = qq(, "rcmx_$opcode");
+	}
+	elsif ($bytes =~ s/\b N \s* , \s* M \b/ /x) {
 		$func = 'DO_stmt_nn';
 	}
 	elsif ($bytes =~ s/\b SN \s* , \s* N \b/ /x) {
@@ -407,16 +426,16 @@ sub opcode_bytes_rule {
 		$func = 'DO_stmt_n';
 	}
 	
-	# opcode
+	# opcode value
 	my @bytes = compute_bytes(split(/\s*,\s*/, $bytes));
-	my $opcode = 0;
+	my $opcode_value = 0;
 	while (@bytes) {
 		die unless $bytes[0] =~ /^\d+$/;
-		$opcode <<= 8;
-		$opcode |= shift @bytes;
+		$opcode_value <<= 8;
+		$opcode_value |= shift @bytes;
 	}
 	
-	push @rules, $func.'(0x'.sprintf('%02X', $opcode).$post_arg.');';
+	push @rules, $func.'(0x'.sprintf('%02X', $opcode_value).$post_arg.');';
 	
 	return @rules;
 }

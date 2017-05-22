@@ -609,7 +609,7 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   Emulated opcodes
 		*--------------------------------------------------------------------*/
-#foreach <OP> in CPI, CPIR, CPD, CPDR, RLD, RRD
+#foreach <OP> in CPI, CPIR, CPD, CPDR
 		| label? _TK_<OP> _TK_NEWLINE \
 		  @{ DO_stmt_emul( Z80_<OP>, #LCASE( rcmx_<OP> ) ); }  
 #endfor  <OP>
@@ -864,7 +864,7 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 #foreach <OP> in RLA, RLCA, RRA, RRCA, \
 				 CPL, NEG, CCF, SCF, NOP, \
-				 DAA, DI, EI, HALT, \
+				 DI, EI, HALT, \
 				 LDI, LDIR, LDD, LDDR, \
 				 INI, INIR, IND, INDR, \
 				 RET, RETN, RETI, \

@@ -102,6 +102,7 @@
  cp e                   ;; BB
  cp h                   ;; BC
  cp l                   ;; BD
+ daa                    ;; 27
  dec (hl)               ;; 35
  dec (ix)               ;; DD 35 00
  dec (ix+127)           ;; DD 35 7F
@@ -289,6 +290,8 @@
  or e                   ;; B3
  or h                   ;; B4
  or l                   ;; B5
+ rld                    ;; ED 6F
+ rrd                    ;; ED 67
  sbc (hl)               ;; 9E
  sbc (ix)               ;; DD 9E 00
  sbc (ix+127)           ;; DD 9E 7F

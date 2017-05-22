@@ -397,6 +397,7 @@
 | label? _TK_CP _TK_IYL _TK_NEWLINE @{ if ((opts.cpu & (CPU_Z80)) == 0) { error_illegal_ident(); return FALSE; } DO_stmt(0xFDBD); }
 | label? _TK_CP _TK_L _TK_NEWLINE @{ DO_stmt(0xBD); }
 | label? _TK_CP expr _TK_NEWLINE @{ if (expr_in_parens) return FALSE; DO_stmt_n(0xFE); }
+| label? _TK_DAA _TK_NEWLINE @{ if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; } DO_stmt(0x27); }
 | label? _TK_DEC _TK_A _TK_NEWLINE @{ DO_stmt(0x3D); }
 | label? _TK_DEC _TK_A1 _TK_NEWLINE @{ if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } DO_stmt(0x76); DO_stmt(0x3D); }
 | label? _TK_DEC _TK_B _TK_NEWLINE @{ DO_stmt(0x05); }
@@ -771,6 +772,8 @@
 | label? _TK_OR _TK_IYL _TK_NEWLINE @{ if ((opts.cpu & (CPU_Z80)) == 0) { error_illegal_ident(); return FALSE; } DO_stmt(0xFDB5); }
 | label? _TK_OR _TK_L _TK_NEWLINE @{ DO_stmt(0xB5); }
 | label? _TK_OR expr _TK_NEWLINE @{ if (expr_in_parens) return FALSE; DO_stmt_n(0xF6); }
+| label? _TK_RLD _TK_NEWLINE @{ DO_stmt_emul(0xED6F, "rcmx_rld"); }
+| label? _TK_RRD _TK_NEWLINE @{ DO_stmt_emul(0xED67, "rcmx_rrd"); }
 | label? _TK_SBC _TK_A _TK_COMMA _TK_A _TK_NEWLINE @{ DO_stmt(0x9F); }
 | label? _TK_SBC _TK_A _TK_COMMA _TK_B _TK_NEWLINE @{ DO_stmt(0x98); }
 | label? _TK_SBC _TK_A _TK_COMMA _TK_C _TK_NEWLINE @{ DO_stmt(0x99); }

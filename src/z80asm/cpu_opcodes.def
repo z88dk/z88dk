@@ -39,27 +39,16 @@
 [not_z80] tst [a,] {b c d e h l (hl) a}								=> ED, 04 + $1*8
 [not_z80] tst [a,] N												=> ED, 64, N
 		
-__END__
-
-
-
-
-
-
-[not_z80]	tst a, {b c d e   h   l . a}	=> ED, 04 + $1*8
-[not_z80]	tst    {b c d e   h   l . a}	=> ED, 04 + $1*8
-[not_z80]	tst a, N						=> ED, 64, N
-[not_z80]	tst    N						=> ED, 64, N
-[not_z80]	tst a, (hl)						=> ED, 34
-[not_z80]	tst    (hl)						=> ED, 34
-
 ;------------------------------------------------------------------------------
 ; General-Purpose Arithmetic Group
 ;------------------------------------------------------------------------------
-[zilog]		daa					=>         27
-[zilog]		rld					=>     ED, 6F
-[zilog]		rrd					=>     ED, 67
 
+[zilog]		daa					=> 27
+
+			rld					=> rabbit_emul : ED, 6F
+			rrd					=> rabbit_emul : ED, 67
+
+__END__
 			cpl					=>         2F
 			cpl a				=>         2F
 [rabbit]	cpl	a'				=>     76, 2F

@@ -1209,7 +1209,7 @@ tr1446:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_ALTD); }; { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_CPL); }; }
 	goto st3400;
 tr1447:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_DAA); }; }
+	{ if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; } { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x27); }; }
 	goto st3400;
 tr1479:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(0x35); }; }
@@ -3756,7 +3756,7 @@ tr4441:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RLCA); }; }
 	goto st3400;
 tr4442:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_RLD), "rcmx_rld"); }; }
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((0xED6F), "\"rcmx_rld\""); }; }
 	goto st3400;
 tr4460:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RR( REG_idx )); }; }
@@ -3863,7 +3863,7 @@ tr4578:
 	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode(Z80_RRCA); }; }
 	goto st3400;
 tr4579:
-	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((Z80_RRD), "rcmx_rrd"); }; }
+	{ { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; }; add_opcode_emul((0xED67), "\"rcmx_rrd\""); }; }
 	goto st3400;
 tr4583:
 	{ push_expr(ctx); }

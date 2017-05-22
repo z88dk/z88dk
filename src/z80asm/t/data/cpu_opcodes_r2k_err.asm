@@ -168,6 +168,7 @@
  cp ixl
  cp iyh
  cp iyl
+ daa
  dec ixh
  dec ixh'
  dec ixl
@@ -329,6 +330,8 @@
  or ixl
  or iyh
  or iyl
+ rld
+ rrd
  sbc (42)
  sbc a', (42)
  sbc a', ixh
