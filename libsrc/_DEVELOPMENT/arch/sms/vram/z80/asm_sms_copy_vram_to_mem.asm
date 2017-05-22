@@ -42,7 +42,7 @@ no_adjust:
 loop:
 
    ini
-   jr nz, loop
+   jp nz, loop
    
    dec a
    jr nz, loop

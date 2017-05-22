@@ -88,7 +88,7 @@
    #define __IO_ASTC1H  29
 
    #define __IO_CNTR  10
-   #define __IO_TRD  11
+   #define __IO_TRDR  11
 
    #define __IO_TMDR0L  12
    #define __IO_TMDR0H  13

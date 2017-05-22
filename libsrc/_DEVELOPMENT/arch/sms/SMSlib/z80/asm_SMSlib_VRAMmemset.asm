@@ -10,15 +10,17 @@ SECTION code_SMSlib
 
 PUBLIC asm_SMSlib_VRAMmemset
 
+EXTERN asm_sms_set_vram
+
 asm_SMSlib_VRAMmemset:
 
    ; void SMS_VRAMmemset (unsigned int dst, unsigned char value, unsigned int size)
    ;
    ; enter : hl = unsigned int dst
    ;          e = unsigned char value
-   ;         bc = unsigned int size
+   ;         bc = unsigned int size > 0
    ;
-   ; uses  : af, bc, h
+   ; uses  : af, bc, hl
    
    ld a,c
    
@@ -26,15 +28,9 @@ asm_SMSlib_VRAMmemset:
    INCLUDE "SMS_CRT0_RST08.inc"
 
    ld c,a
-   
-loop:
 
-   ld a,b
-   or c
+   or b
    ret z
 
    ld a,e
-   out (VDPDataPort),a
-
-   dec bc
-   jr loop
+   jp asm_sms_set_vram
