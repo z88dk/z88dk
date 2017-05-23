@@ -124,6 +124,7 @@
  altd and a, e          ;; 76 A3
  altd and a, h          ;; 76 A4
  altd and a, l          ;; 76 A5
+ altd ccf f             ;; 76 3F
  altd cp a, (42)        ;; 76 FE 2A
  altd cp a, (hl)        ;; 76 BE
  altd cp a, (ix)        ;; 76 DD BE 00
@@ -138,6 +139,7 @@
  altd cp a, e           ;; 76 BB
  altd cp a, h           ;; 76 BC
  altd cp a, l           ;; 76 BD
+ altd cpl a             ;; 76 2F
  altd dec a             ;; 76 3D
  altd dec b             ;; 76 05
  altd dec c             ;; 76 0D
@@ -252,6 +254,7 @@
  altd ld l, e           ;; 76 6B
  altd ld l, h           ;; 76 6C
  altd ld l, l           ;; 76 6D
+ altd neg a             ;; 76 ED 44
  altd or a, (42)        ;; 76 F6 2A
  altd or a, (hl)        ;; 76 B6
  altd or a, (ix)        ;; 76 DD B6 00
@@ -280,6 +283,7 @@
  altd sbc a, e          ;; 76 9B
  altd sbc a, h          ;; 76 9C
  altd sbc a, l          ;; 76 9D
+ altd scf f             ;; 76 37
  altd sub a, (42)       ;; 76 D6 2A
  altd sub a, (hl)       ;; 76 96
  altd sub a, (ix)       ;; 76 DD 96 00
@@ -350,6 +354,9 @@
  and e                  ;; A3
  and h                  ;; A4
  and l                  ;; A5
+ ccf                    ;; 3F
+ ccf f                  ;; 3F
+ ccf f'                 ;; 76 3F
  cp (42)                ;; FE 2A
  cp (hl)                ;; BE
  cp (ix)                ;; DD BE 00
@@ -392,6 +399,9 @@
  cp e                   ;; BB
  cp h                   ;; BC
  cp l                   ;; BD
+ cpl                    ;; 2F
+ cpl a                  ;; 2F
+ cpl a'                 ;; 76 2F
  dec (hl)               ;; 35
  dec (ix)               ;; DD 35 00
  dec (ix+127)           ;; DD 35 7F
@@ -678,6 +688,9 @@
  ld l, e                ;; 6B
  ld l, h                ;; 6C
  ld l, l                ;; 6D
+ neg                    ;; ED 44
+ neg a                  ;; ED 44
+ neg a'                 ;; 76 ED 44
  or (42)                ;; F6 2A
  or (hl)                ;; B6
  or (ix)                ;; DD B6 00
@@ -762,6 +775,9 @@
  sbc e                  ;; 9B
  sbc h                  ;; 9C
  sbc l                  ;; 9D
+ scf                    ;; 37
+ scf f                  ;; 37
+ scf f'                 ;; 76 37
  sub (42)               ;; D6 2A
  sub (hl)               ;; 96
  sub (ix)               ;; DD 96 00

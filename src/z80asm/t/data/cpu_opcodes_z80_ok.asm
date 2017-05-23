@@ -106,6 +106,8 @@
  and iyh                ;; FD A4
  and iyl                ;; FD A5
  and l                  ;; A5
+ ccf                    ;; 3F
+ ccf f                  ;; 3F
  cp (42)                ;; FE 2A
  cp (hl)                ;; BE
  cp (ix)                ;; DD BE 00
@@ -142,6 +144,8 @@
  cp iyh                 ;; FD BC
  cp iyl                 ;; FD BD
  cp l                   ;; BD
+ cpl                    ;; 2F
+ cpl a                  ;; 2F
  daa                    ;; 27
  dec (hl)               ;; 35
  dec (ix)               ;; DD 35 00
@@ -379,6 +383,8 @@
  ld l, e                ;; 6B
  ld l, h                ;; 6C
  ld l, l                ;; 6D
+ neg                    ;; ED 44
+ neg a                  ;; ED 44
  or (42)                ;; F6 2A
  or (hl)                ;; B6
  or (ix)                ;; DD B6 00
@@ -453,6 +459,8 @@
  sbc iyh                ;; FD 9C
  sbc iyl                ;; FD 9D
  sbc l                  ;; 9D
+ scf                    ;; 37
+ scf f                  ;; 37
  sub (42)               ;; D6 2A
  sub (hl)               ;; 96
  sub (ix)               ;; DD 96 00

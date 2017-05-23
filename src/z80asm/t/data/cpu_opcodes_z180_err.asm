@@ -104,6 +104,7 @@
  altd and a, iyh
  altd and a, iyl
  altd and a, l
+ altd ccf f
  altd cp a, (42)
  altd cp a, (hl)
  altd cp a, (ix)
@@ -122,6 +123,7 @@
  altd cp a, iyh
  altd cp a, iyl
  altd cp a, l
+ altd cpl a
  altd dec a
  altd dec b
  altd dec c
@@ -300,6 +302,7 @@
  altd ld l, e
  altd ld l, h
  altd ld l, l
+ altd neg a
  altd or a, (42)
  altd or a, (hl)
  altd or a, (ix)
@@ -336,6 +339,7 @@
  altd sbc a, iyh
  altd sbc a, iyl
  altd sbc a, l
+ altd scf f
  altd sub a, (42)
  altd sub a, (hl)
  altd sub a, (ix)
@@ -398,6 +402,7 @@
  and ixl
  and iyh
  and iyl
+ ccf f'
  cp a', (42)
  cp a', (hl)
  cp a', (ix)
@@ -424,6 +429,7 @@
  cp ixl
  cp iyh
  cp iyl
+ cpl a'
  dec a'
  dec b'
  dec c'
@@ -667,6 +673,7 @@
  ld l', e
  ld l', h
  ld l', l
+ neg a'
  or a', (42)
  or a', (hl)
  or a', (ix)
@@ -719,6 +726,7 @@
  sbc ixl
  sbc iyh
  sbc iyl
+ scf f'
  sub a', (42)
  sub a', (hl)
  sub a', (ix)

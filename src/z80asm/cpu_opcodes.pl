@@ -156,13 +156,13 @@ sub add_opcode {
 	}
 
 	# expand [a',] -> expands 4 lines: sub b | sub a,b | sub a',b | altd sub b
-	if ($opcode =~ /\[a\',\]/) {
-		my($opcode_1, $opcode_2) = ($`, $');
+	if ($opcode =~ / \[ (a|f) \' (,?) \] /x) {
+		my($opcode_1, $reg_af, $comma, $opcode_2) = ($`, $1, $2, $');
 		
-		add_opcode(        $opcode_1."     ".$opcode_2,        $bytes, $arch,    $var);
-		add_opcode(        $opcode_1." a,  ".$opcode_2,        $bytes, $arch,    $var);
-		add_opcode(        $opcode_1." a', ".$opcode_2, "76, ".$bytes, "rabbit", $var);
-		add_opcode("altd ".$opcode_1." a,  ".$opcode_2, "76, ".$bytes, "rabbit", $var);
+		add_opcode("     $opcode_1                  $opcode_2",        $bytes, $arch,    $var);
+		add_opcode("     $opcode_1 $reg_af  $comma  $opcode_2",        $bytes, $arch,    $var);
+		add_opcode("     $opcode_1 $reg_af' $comma  $opcode_2", "76, ".$bytes, "rabbit", $var);
+		add_opcode("altd $opcode_1 $reg_af  $comma  $opcode_2", "76, ".$bytes, "rabbit", $var);
 		
 		return;
 	}
@@ -179,7 +179,7 @@ sub add_opcode {
 
 	# remove extra blanks
 	for ($opcode) {
-		s/\s+/ /g; s/^\s+//; s/\s+$//;
+		s/\s+,/,/g; s/\s+/ /g; s/^\s+//; s/\s+$//;
 	}
 	
 	# reorder bytes DD|FD, xx, N, SN -> DD|FD, xx, SN, N

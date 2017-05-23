@@ -863,7 +863,7 @@ Define rules for a ragel-based parser.
 		*   opcodes without arguments
 		*--------------------------------------------------------------------*/
 #foreach <OP> in RLA, RLCA, RRA, RRCA, \
-				 CPL, NEG, CCF, SCF, NOP, \
+				 NOP, \
 				 DI, EI, HALT, \
 				 LDI, LDIR, LDD, LDDR, \
 				 INI, INIR, IND, INDR, \
@@ -877,26 +877,6 @@ Define rules for a ragel-based parser.
 				 MUL, RDMODE, SETUSR, SURES, SYSCALL, UMA, UMS
 		| label? _TK_<OP> _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP> ); }
-#endfor  <OP>	
-
-#foreach <OP> in CPL, NEG
-		/* cpl|neg a */
-		| label? _TK_<OP> _TK_A _TK_NEWLINE
-		  @{                    DO_stmt( Z80_<OP> ); }
-		  
-		/* cpl|neg a' */
-		| label? _TK_<OP> _TK_A1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP> ); }
-#endfor  <OP>	
-
-#foreach <OP> in SCF, CCF
-		/* scf|ccf f */
-		| label? _TK_<OP> _TK_F _TK_NEWLINE
-		  @{                    DO_stmt( Z80_<OP> ); }
-		  
-		/* scf|ccf f' */
-		| label? _TK_<OP> _TK_F1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP> ); }
 #endfor  <OP>	
 
 		/*---------------------------------------------------------------------

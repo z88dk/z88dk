@@ -48,22 +48,12 @@
 			rld					=> rabbit_emul : ED, 6F
 			rrd					=> rabbit_emul : ED, 67
 
+			cpl [a']			=> 2F
+			neg	[a']			=> ED, 44
+
+			ccf	[f']			=> 3F
+			scf	[f']			=> 37
 __END__
-			cpl					=>         2F
-			cpl a				=>         2F
-[rabbit]	cpl	a'				=>     76, 2F
-                                       
-			neg					=>     ED, 44
-			neg a				=>     ED, 44
-[rabbit]	neg a'				=> 76, ED, 44
-			
-			ccf					=>     3F
-			ccf	f				=>     3F
-[rabbit]	ccf	f'				=> 76, 3F
-			
-			scf					=>     37
-			scf f				=>     37
-[rabbit]	scf	f'				=> 76, 37
 
 ;------------------------------------------------------------------------------
 ; 16-bit load group
