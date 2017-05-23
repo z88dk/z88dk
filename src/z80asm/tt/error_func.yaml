@@ -53,6 +53,11 @@ errors:
     args	: 'char *name, char *used'
     message	: "\"symbol '%s' used as '%s'\", name, used"
 	
+  - type	: ErrWarn
+    func	: warn_expr_in_parens
+    args	: void
+    message	: '"interpreting indirect value as immediate"'
+	
   # Assembly errors
   - type	: ErrError
     func	: error_syntax

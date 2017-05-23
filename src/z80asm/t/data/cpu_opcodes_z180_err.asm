@@ -1,4 +1,3 @@
- adc (42)
  adc a', (42)
  adc a', (hl)
  adc a', (ix)
@@ -17,7 +16,6 @@
  adc a', iyh
  adc a', iyl
  adc a', l
- adc a, (42)
  adc a, ixh
  adc a, ixl
  adc a, iyh
@@ -26,7 +24,6 @@
  adc ixl
  adc iyh
  adc iyl
- add (42)
  add a', (42)
  add a', (hl)
  add a', (ix)
@@ -45,7 +42,6 @@
  add a', iyh
  add a', iyl
  add a', l
- add a, (42)
  add a, ixh
  add a, ixl
  add a, iyh
@@ -376,7 +372,6 @@
  altd xor a, iyh
  altd xor a, iyl
  altd xor a, l
- and (42)
  and a', (42)
  and a', (hl)
  and a', (ix)
@@ -395,7 +390,6 @@
  and a', iyh
  and a', iyl
  and a', l
- and a, (42)
  and a, ixh
  and a, ixl
  and a, iyh
@@ -404,7 +398,6 @@
  and ixl
  and iyh
  and iyl
- cp (42)
  cp a', (42)
  cp a', (hl)
  cp a', (ix)
@@ -423,7 +416,6 @@
  cp a', iyh
  cp a', iyl
  cp a', l
- cp a, (42)
  cp a, ixh
  cp a, ixl
  cp a, iyh
@@ -462,11 +454,6 @@
  inc iyl
  inc iyl'
  inc l'
- ld (hl), (42)
- ld (ix), (42)
- ld (ix+127), (42)
- ld (iy), (42)
- ld (iy+127), (42)
  ld 4660, a
  ld a', (4660)
  ld a', (bc)
@@ -510,7 +497,6 @@
  ld b', iyh
  ld b', iyl
  ld b', l
- ld b, (42)
  ld b, ixh
  ld b, ixl
  ld b, iyh
@@ -533,7 +519,6 @@
  ld c', iyh
  ld c', iyl
  ld c', l
- ld c, (42)
  ld c, ixh
  ld c, ixl
  ld c, iyh
@@ -556,7 +541,6 @@
  ld d', iyh
  ld d', iyl
  ld d', l
- ld d, (42)
  ld d, ixh
  ld d, ixl
  ld d, iyh
@@ -579,7 +563,6 @@
  ld e', iyh
  ld e', iyl
  ld e', l
- ld e, (42)
  ld e, ixh
  ld e, ixl
  ld e, iyh
@@ -598,7 +581,6 @@
  ld h', e
  ld h', h
  ld h', l
- ld h, (42)
  ld ixh', (42)
  ld ixh', 42
  ld ixh', a
@@ -685,8 +667,6 @@
  ld l', e
  ld l', h
  ld l', l
- ld l, (42)
- or (42)
  or a', (42)
  or a', (hl)
  or a', (ix)
@@ -705,7 +685,6 @@
  or a', iyh
  or a', iyl
  or a', l
- or a, (42)
  or a, ixh
  or a, ixl
  or a, iyh
@@ -714,7 +693,6 @@
  or ixl
  or iyh
  or iyl
- sbc (42)
  sbc a', (42)
  sbc a', (hl)
  sbc a', (ix)
@@ -733,7 +711,6 @@
  sbc a', iyh
  sbc a', iyl
  sbc a', l
- sbc a, (42)
  sbc a, ixh
  sbc a, ixl
  sbc a, iyh
@@ -742,7 +719,6 @@
  sbc ixl
  sbc iyh
  sbc iyl
- sub (42)
  sub a', (42)
  sub a', (hl)
  sub a', (ix)
@@ -761,7 +737,6 @@
  sub a', iyh
  sub a', iyl
  sub a', l
- sub a, (42)
  sub a, ixh
  sub a, ixl
  sub a, iyh
@@ -770,9 +745,6 @@
  sub ixl
  sub iyh
  sub iyl
- tst (42)
- tst a, (42)
- xor (42)
  xor a', (42)
  xor a', (hl)
  xor a', (ix)
@@ -791,7 +763,6 @@
  xor a', iyh
  xor a', iyl
  xor a', l
- xor a, (42)
  xor a, ixh
  xor a, ixl
  xor a, iyh

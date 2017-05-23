@@ -10,6 +10,7 @@ extern void error_no_src_file(void);
 extern void error_illegal_option(char *option);
 extern void error_illegal_src_filename(char *filename);
 extern void warn_symbol_different(char *name, char *used);
+extern void warn_expr_in_parens(void);
 extern void error_syntax(void);
 extern void error_syntax_expr(void);
 extern void error_invalid_squoted_string(void);

@@ -239,7 +239,7 @@ sub build_test_code {
 		build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
 		
 		# (N)
-		build_test_code($opcode_1.'('.(0x2A).')'.$opcode_2, $bytes_copy, $cpu, 0);
+		build_test_code($opcode_1.'('.(0x2A).')'.$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
 		
 		return;
 	}
@@ -324,7 +324,7 @@ sub build_ragel_rule {
 	}
 	
 	if ($opcode =~ /\b N \b/x) {
-		$rule .= 'if (expr_in_parens) return FALSE; ';
+		$rule .= 'if (expr_in_parens) warn_expr_in_parens(); ';
 	}
 	
 	if ($opcode =~ /\b IMN \b/x) {
@@ -403,7 +403,7 @@ sub opcode_bytes_rule {
 	my $post_arg = '';
 	if ($rabbit_emul) {
 		$func = 'DO_stmt_emul';
-		$post_arg = qq(, "rcmx_$opcode");
+		$post_arg = ", rcmx_$opcode";
 	}
 	elsif ($bytes =~ s/\b N \s* , \s* M \b/ /x) {
 		$func = 'DO_stmt_nn';

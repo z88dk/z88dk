@@ -78,6 +78,15 @@ void warn_symbol_different(char *name, char *used)
 	
 	STR_DELETE(msg);
 }
+void warn_expr_in_parens(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "interpreting indirect value as immediate" );
+	do_error( ErrWarn, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_syntax(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
