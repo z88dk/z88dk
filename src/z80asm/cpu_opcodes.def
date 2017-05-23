@@ -53,22 +53,21 @@
 
 			ccf	[f']			=> 3F
 			scf	[f']			=> 37
-__END__
-
+			
 ;------------------------------------------------------------------------------
 ; 16-bit load group
 ;------------------------------------------------------------------------------
-			ld {bc de hl sp},  MN		=>     01 + $1*10, N, M
-[rabbit]	ld {bc de hl . }', MN		=> 76, 01 + $1*10, N, M
 
-			ld {.  .  ix . }, MN		=> DD, 01 + $1*10, N, M
-			ld {.  .  iy . }, MN		=> FD, 01 + $1*10, N, M
+			ld {bc de .  . }['],  N_IMN	=> expr_in_parens ? ED, 4B + $1*10, N, M : 01 + $1*10, N, M
+			ld {.  .  .  sp},     N_IMN	=> expr_in_parens ? ED, 4B + $1*10, N, M : 01 + $1*10, N, M
 
-			ld hl,  (MN)				=>     2A, N, M
-[rabbit]	ld hl', (MN)				=> 76, 2A, N, M
-			
-			ld ix, (MN)					=> DD, 2A, N, M
-			ld iy, (MN)					=> FD, 2A, N, M
+			ld {.  .  hl . }['],  N_IMN	=> expr_in_parens ?             2A, N, M :         21, N, M
+			ld {.  .  ix . },     N_IMN	=> expr_in_parens ?         DD, 2A, N, M :     DD, 21, N, M
+			ld {.  .  iy . },     N_IMN	=> expr_in_parens ?         FD, 2A, N, M :     FD, 21, N, M
+
+
+__END__
+
 
 			ld (MN), hl					=>     22, N, M
 			ld (MN), ix					=> DD, 22, N, M

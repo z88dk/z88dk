@@ -265,6 +265,8 @@
  ld b, iyh              ;; FD 44
  ld b, iyl              ;; FD 45
  ld b, l                ;; 45
+ ld bc, (4660)          ;; ED 4B 34 12
+ ld bc, 4660            ;; 01 34 12
  ld c, (42)             ;; 0E 2A
  ld c, (hl)             ;; 4E
  ld c, (ix)             ;; DD 4E 00
@@ -301,6 +303,8 @@
  ld d, iyh              ;; FD 54
  ld d, iyl              ;; FD 55
  ld d, l                ;; 55
+ ld de, (4660)          ;; ED 5B 34 12
+ ld de, 4660            ;; 11 34 12
  ld e, (42)             ;; 1E 2A
  ld e, (hl)             ;; 5E
  ld e, (ix)             ;; DD 5E 00
@@ -333,6 +337,10 @@
  ld h, e                ;; 63
  ld h, h                ;; 64
  ld h, l                ;; 65
+ ld hl, (4660)          ;; 2A 34 12
+ ld hl, 4660            ;; 21 34 12
+ ld ix, (4660)          ;; DD 2A 34 12
+ ld ix, 4660            ;; DD 21 34 12
  ld ixh, (42)           ;; DD 26 2A
  ld ixh, 42             ;; DD 26 2A
  ld ixh, a              ;; DD 67
@@ -351,6 +359,8 @@
  ld ixl, e              ;; DD 6B
  ld ixl, ixh            ;; DD 6C
  ld ixl, ixl            ;; DD 6D
+ ld iy, (4660)          ;; FD 2A 34 12
+ ld iy, 4660            ;; FD 21 34 12
  ld iyh, (42)           ;; FD 26 2A
  ld iyh, 42             ;; FD 26 2A
  ld iyh, a              ;; FD 67
@@ -383,6 +393,8 @@
  ld l, e                ;; 6B
  ld l, h                ;; 6C
  ld l, l                ;; 6D
+ ld sp, (4660)          ;; ED 7B 34 12
+ ld sp, 4660            ;; 31 34 12
  neg                    ;; ED 44
  neg a                  ;; ED 44
  or (42)                ;; F6 2A

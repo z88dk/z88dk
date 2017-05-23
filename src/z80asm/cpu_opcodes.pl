@@ -219,9 +219,17 @@ sub build_test_code {
 			or die "expected expr_in_parens at ", $bytes;
 		my($bytes_1, $true, $false) = ($`, $1, $2);
 		
-		# N
-		(my $bytes_copy = $bytes_1.$false) =~ s/\b N \b/ 2A /x or die;
-		build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		# N | MN
+		my $bytes_copy = $bytes_1.$false;
+		if ($bytes_copy =~ s/\b N \s* , \s* M \b/ 34, 12 /x) {
+			build_test_code($opcode_1.(0x1234).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		}
+		elsif ($bytes_copy =~ s/\b N \b/ 2A /x) {
+			build_test_code($opcode_1.(0x2A).$opcode_2, $bytes_copy, $cpu, $exists_and_valid);
+		}
+		else {
+			die;
+		}
 		
 		# (MN)
 		($bytes_copy = $bytes_1.$true) =~ s/\b N \s* , \s* M \b/ 34, 12 /x or die;
@@ -343,6 +351,7 @@ sub check_valid {
 	local($_) = @_;
 
 	return 0 if /\b i[xy][hl] \b/x && /\b altd \b | \' /x;
+	return 0 if /\b (ix|iy|sp) \' /x;
 	return 1;
 }
 

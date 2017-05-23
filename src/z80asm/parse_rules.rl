@@ -398,41 +398,6 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   16-bit load group
 		*--------------------------------------------------------------------*/
-#foreach <DD> in BC, DE, HL, SP, IX, IY
-		/* ld dd,NN | ld dd,(NN) */
-		| label? _TK_LD _TK_<DD> _TK_COMMA expr _TK_NEWLINE
-		  @{
-				if ( expr_in_parens ) {
-					if ( REG_<DD> == REG_HL ) {		/* ld hl,(NN) */
-						DO_stmt_nn( P_<DD> + Z80_LD_idx_IND_nn );
-					}
-					else {							/* ld dd,(NN) */
-						DO_stmt_nn( Z80_LD_dd_IND_nn( REG_<DD> ) );
-					}
-				}
-				else {								/* ld dd,NN */
-					DO_stmt_nn( P_<DD> + Z80_LD_dd_nn( REG_<DD> ) );
-				}
-			}
-#endfor  <DD>
-
-#foreach <DD> in BC, DE, HL
-		/* ld dd',NN | ld dd',(NN) */
-		| label? _TK_LD _TK_<DD>1 _TK_COMMA expr _TK_NEWLINE
-		  @{
-				if ( expr_in_parens ) {
-					if ( REG_<DD> == REG_HL ) {		/* ld hl,(NN) */
-						DO_stmt(Z80_ALTD); DO_stmt_nn( Z80_LD_idx_IND_nn );
-					}
-					else {							/* ld dd,(NN) */
-						DO_stmt(Z80_ALTD); DO_stmt_nn( Z80_LD_dd_IND_nn( REG_<DD> ) );
-					}
-				}
-				else {								/* ld dd,NN */
-					DO_stmt(Z80_ALTD); DO_stmt_nn( Z80_LD_dd_nn( REG_<DD> ) );
-				}
-			}
-#endfor  <DD>
 
 		/* ld (NN),hl|ix|iy */
 #foreach <DD> in HL, IX, IY

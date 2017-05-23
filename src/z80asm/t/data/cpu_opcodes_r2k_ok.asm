@@ -184,6 +184,8 @@
  altd ld b, e           ;; 76 43
  altd ld b, h           ;; 76 44
  altd ld b, l           ;; 76 45
+ altd ld bc, (4660)     ;; 76 ED 4B 34 12
+ altd ld bc, 4660       ;; 76 01 34 12
  altd ld c, (42)        ;; 76 0E 2A
  altd ld c, (hl)        ;; 76 4E
  altd ld c, (ix)        ;; 76 DD 4E 00
@@ -212,6 +214,8 @@
  altd ld d, e           ;; 76 53
  altd ld d, h           ;; 76 54
  altd ld d, l           ;; 76 55
+ altd ld de, (4660)     ;; 76 ED 5B 34 12
+ altd ld de, 4660       ;; 76 11 34 12
  altd ld e, (42)        ;; 76 1E 2A
  altd ld e, (hl)        ;; 76 5E
  altd ld e, (ix)        ;; 76 DD 5E 00
@@ -240,6 +244,8 @@
  altd ld h, e           ;; 76 63
  altd ld h, h           ;; 76 64
  altd ld h, l           ;; 76 65
+ altd ld hl, (4660)     ;; 76 2A 34 12
+ altd ld hl, 4660       ;; 76 21 34 12
  altd ld l, (42)        ;; 76 2E 2A
  altd ld l, (hl)        ;; 76 6E
  altd ld l, (ix)        ;; 76 DD 6E 00
@@ -548,6 +554,10 @@
  ld b, e                ;; 43
  ld b, h                ;; 44
  ld b, l                ;; 45
+ ld bc', (4660)         ;; 76 ED 4B 34 12
+ ld bc', 4660           ;; 76 01 34 12
+ ld bc, (4660)          ;; ED 4B 34 12
+ ld bc, 4660            ;; 01 34 12
  ld c', (42)            ;; 76 0E 2A
  ld c', (hl)            ;; 76 4E
  ld c', (ix)            ;; 76 DD 4E 00
@@ -604,6 +614,10 @@
  ld d, e                ;; 53
  ld d, h                ;; 54
  ld d, l                ;; 55
+ ld de', (4660)         ;; 76 ED 5B 34 12
+ ld de', 4660           ;; 76 11 34 12
+ ld de, (4660)          ;; ED 5B 34 12
+ ld de, 4660            ;; 11 34 12
  ld e', (42)            ;; 76 1E 2A
  ld e', (hl)            ;; 76 5E
  ld e', (ix)            ;; 76 DD 5E 00
@@ -660,6 +674,14 @@
  ld h, e                ;; 63
  ld h, h                ;; 64
  ld h, l                ;; 65
+ ld hl', (4660)         ;; 76 2A 34 12
+ ld hl', 4660           ;; 76 21 34 12
+ ld hl, (4660)          ;; 2A 34 12
+ ld hl, 4660            ;; 21 34 12
+ ld ix, (4660)          ;; DD 2A 34 12
+ ld ix, 4660            ;; DD 21 34 12
+ ld iy, (4660)          ;; FD 2A 34 12
+ ld iy, 4660            ;; FD 21 34 12
  ld l', (42)            ;; 76 2E 2A
  ld l', (hl)            ;; 76 6E
  ld l', (ix)            ;; 76 DD 6E 00
@@ -688,6 +710,8 @@
  ld l, e                ;; 6B
  ld l, h                ;; 6C
  ld l, l                ;; 6D
+ ld sp, (4660)          ;; ED 7B 34 12
+ ld sp, 4660            ;; 31 34 12
  neg                    ;; ED 44
  neg a                  ;; ED 44
  neg a'                 ;; 76 ED 44
