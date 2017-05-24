@@ -69,6 +69,7 @@ const char sprPatterns[] = "*.sgz";
 const char sprHeader[] =  "*.*;*.h";
 const char bmpPatterns[] = "*.*";
 const char shpPatterns[] = "*.shp";
+const char geosPatterns[] = "*.cvt";
 
 typedef struct spritetype
 {
@@ -546,10 +547,8 @@ void import_from_gif( const char *FileName )
 	if ((GifFile = DGifOpenFileName(FileName, &Error)) == NULL)
 		return;
 
-    if (GifFile->SHeight == 0 || GifFile->SWidth == 0) {
-	fprintf(stderr, "Image of width or height 0\n");
-	exit(EXIT_FAILURE);
-    }
+    if (GifFile->SHeight == 0 || GifFile->SWidth == 0)
+		return;
 
     /* 
      * Allocate the screen as vector of column of rows. Note this
@@ -576,8 +575,7 @@ void import_from_gif( const char *FileName )
 
     /* Scan the content of the GIF file and load the image(s) in: */
     do {
-	if (DGifGetRecordType(GifFile, &RecordType) == GIF_ERROR) 
-		return;
+		DGifGetRecordType(GifFile, &RecordType);
 	
 	switch (RecordType) {
 	    case IMAGE_DESC_RECORD_TYPE:
@@ -589,33 +587,28 @@ void import_from_gif( const char *FileName )
 		Width = GifFile->Image.Width;
 		Height = GifFile->Image.Height;
 		if (GifFile->Image.Left + GifFile->Image.Width > GifFile->SWidth ||
-		   GifFile->Image.Top + GifFile->Image.Height > GifFile->SHeight) {
-		    fprintf(stderr, "Image %d is not confined to screen dimension, aborted.\n",ImageNum);
-		    exit(EXIT_FAILURE);
-		}
+		   GifFile->Image.Top + GifFile->Image.Height > GifFile->SHeight)
+			   return;
 		if (GifFile->Image.Interlace) {
 		    /* Need to perform 4 passes on the images: */
 		    for (i = 0; i < 4; i++)
 			for (j = Row + InterlacedOffset[i]; j < Row + Height;
 						 j += InterlacedJumps[i]) {
-			    if (DGifGetLine(GifFile, &ScreenBuffer[j][Col], Width) == GIF_ERROR)
-					return;
+				DGifGetLine(GifFile, &ScreenBuffer[j][Col], Width);
 			}
 		}
 		else {
 		    for (i = 0; i < Height; i++)
-				if (DGifGetLine(GifFile, &ScreenBuffer[Row++][Col], Width) == GIF_ERROR)
-					return;
+				DGifGetLine(GifFile, &ScreenBuffer[Row++][Col], Width);
 		}
 		break;
 	    case EXTENSION_RECORD_TYPE:
 		/* Skip any extension blocks in file: */
-		if (DGifGetExtension(GifFile, &ExtCode, &Extension) == GIF_ERROR) {
-			return;
-		}
+		DGifGetExtension(GifFile, &ExtCode, &Extension);
+
 		while (Extension != NULL)
-		    if (DGifGetExtensionNext(GifFile, &Extension) == GIF_ERROR)
-				return;
+		    DGifGetExtensionNext(GifFile, &Extension);
+		
 		break;
 	    case TERMINATE_RECORD_TYPE:
 		break;
@@ -628,10 +621,8 @@ void import_from_gif( const char *FileName )
     ColorMap = (GifFile->Image.ColorMap
 		? GifFile->Image.ColorMap
 		: GifFile->SColorMap);
-    if (ColorMap == NULL) {
-        fprintf(stderr, "Gif Image does not have a colormap\n");
-        exit(EXIT_FAILURE);
-    }
+    if (ColorMap == NULL)
+		return;
 
 	sprite[ on_sprite ].size_x = GifFile->SWidth;
 	sprite[ on_sprite ].size_y = GifFile->SHeight;
@@ -660,7 +651,94 @@ void import_from_gif( const char *FileName )
 }
 #endif
 
-		
+
+int getword (FILE *fpin) {
+	int b;
+	b=getc(fpin);
+	return (b+256*getc(fpin));
+}
+
+/* Hint: extract from disk images with DirMaster, or pick some file here:
+   http://cbmfiles.com/genie/GEOSFontsListing.php  */
+
+void import_from_geos( const char *file )
+{
+	FILE *fpin = NULL;
+	int x, y, i;
+	unsigned char b;
+	int rowbytes, y_sz;
+	int spcount, exitflag;
+	int index, pindex;
+	long ipos, bpos;
+	long len;
+	char message[200];
+
+	spcount = exitflag = 0;
+	
+	fpin = fopen( file, "rb" );
+	if (!fpin)
+		return;
+	if	(fseek(fpin,0,SEEK_END))
+		return;
+	len=ftell(fpin);
+	fseek(fpin,0L,SEEK_SET);
+	
+	
+	b=getc(fpin);
+	rowbytes = getword(fpin);
+	y_sz = getc(fpin);
+	len=ftell(fpin);
+	
+	
+	if ((ipos = getword(fpin))==8) {
+	/* 1st bit pos is always 0 */
+	ipos +=2;
+	pindex=0;
+	
+	// Naked VLIR record found, no header block
+	
+		while (!exitflag) {
+			sprite[ on_sprite + spcount ].size_y = y_sz;
+			fseek(fpin,ipos,SEEK_SET);
+			index=getword(fpin);
+
+			sprite[ on_sprite + spcount ].size_x = index-pindex;
+
+			if ( sprite[ on_sprite + spcount ].size_x >= MAX_SIZE_X )
+				sprite[ on_sprite + spcount ].size_x = MAX_SIZE_X;
+			if ( sprite[ on_sprite + spcount ].size_y >= MAX_SIZE_Y )
+				sprite[ on_sprite + spcount ].size_y = MAX_SIZE_Y;
+			
+			
+			for ( y = 0; y < y_sz; y++ ) {
+				i=pindex;
+				for ( x = 0; x < sprite[ on_sprite + spcount ].size_x; x++ ) {
+					fseek(fpin,(long)(0xca+(y*rowbytes)+(i/8)),SEEK_SET);
+					b=getc(fpin);
+
+					b=b>>(7-(i%8));
+					sprite[ on_sprite + spcount ].p[ x+1 ][ y+1 ] = ((b&1) != 0);
+					i++;
+				}
+			}
+			pindex=index;
+			
+			ipos+=2;
+			spcount++;
+			if (spcount >= 96) exitflag++;
+			if ((on_sprite + spcount)>=MAX_SPRITE) exitflag++;
+		}
+			
+	}
+	fseek(fpin,0L,SEEK_SET);
+		 
+	fclose(fpin);
+
+	fit_sprite_on_screen();
+	update_screen();
+}
+
+
 void import_from_bitmap( const char *file )
 {
 	ALLEGRO_BITMAP *temp = NULL;
@@ -928,6 +1006,23 @@ void do_import_raw()
 	al_destroy_path(path);
 	
 	wkey_release(ALLEGRO_KEY_L);
+}
+
+void do_import_geos()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_bmp = al_create_native_file_dialog("./", "Load GEOS font", geosPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_bmp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_bmp, 0));
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog_bmp);
+
+	import_from_geos( file );
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_O);
 }
 
 #ifdef GIF_SUPPORT
@@ -1449,9 +1544,9 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "INS / DEL..............Insert/Clear a sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 130, ALLEGRO_ALIGN_LEFT, "I......................Invert Sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "SHIFT + H/V............Double Width/Height");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C/P....................Copy/Paste sprite");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "5......................Reduce sprite size at 50%");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit: auto zoom or use SHIFT to adjust margins");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "5......................Reduce sprite size at 50%");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "F/SHIFT + F............Fit: auto zoom or use SHIFT to adjust margins");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "C/P....................Copy/Paste sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 230, ALLEGRO_ALIGN_LEFT, "SHIFP + P.......Split the copied sprite into pieces as big as the current ");
 	al_draw_text(font, al_map_rgb(0,5,10), 140, 250, ALLEGRO_ALIGN_LEFT, "sprite and paste them starting from the current sprite position.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 270, ALLEGRO_ALIGN_LEFT, "M......................Compute mask for copied sprite and paste to current sprite");
@@ -1464,10 +1559,11 @@ void do_help_page() {
 	#else
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import BMP,LBM,PCX,TGA,PNG,PBM,BDF,SNA,SCR,RAWdata");
 	#endif
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib.");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
-	al_draw_text(font, al_map_rgb(0,5,10), 190, 445, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 465, ALLEGRO_ALIGN_LEFT, "F7.....................As above, RAW data only (no size/headers)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "O......................Import a GEOS font (.CVT)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 445, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 465, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 485, ALLEGRO_ALIGN_LEFT, "F7.....................As above, RAW data only (no size/headers)");
 
 	al_flip_display();
 
@@ -1650,6 +1746,8 @@ void do_keyboard_input(int keycode)
 	else if ( keycode ==  ALLEGRO_KEY_G )
 		do_import_gif();
 #endif
+	else if ( keycode ==  ALLEGRO_KEY_O )
+		do_import_geos();
 	else if ( keycode ==  ALLEGRO_KEY_N )
 		do_import_printmaster();
 
