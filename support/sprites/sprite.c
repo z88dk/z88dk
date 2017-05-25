@@ -93,7 +93,7 @@ char *hexc = "0123456789ABCDEF";					//For converting integers (0-15) to Hex
 void draw_button( int x, int y, int w, int h, char *text, ALLEGRO_COLOR border_c, ALLEGRO_COLOR fill_c, ALLEGRO_COLOR text_c  )
 {
 	al_draw_filled_rectangle( x+1, y+1, x+w-1, y+h-1, fill_c );
-	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Boder
+	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Border
 	al_draw_text(font, text_c, x+(w/2), y+(h/2) - 4, ALLEGRO_ALIGN_CENTRE, text);
 }
 
@@ -680,8 +680,7 @@ int getword (FILE *fpin) {
 	return (b+256*getc(fpin));
 }
 
-/* Hint: extract from disk images with DirMaster, or pick some file here:
-   http://cbmfiles.com/genie/GEOSFontsListing.php  */
+/* Hint: extract from Commodore disk images with DirMaster */
 
 void import_from_geos( const char *file )
 {
@@ -692,24 +691,17 @@ void import_from_geos( const char *file )
 	int spcount, exitflag, bflag;
 	int index, pindex;
 	long ipos;
-	//long len;
-	//char message[200];
 
 	spcount = exitflag = 0;
 	
 	fpin = fopen( file, "rb" );
 	if (!fpin)
 		return;
-	/*if	(fseek(fpin,0,SEEK_END))
-		return;
-	len=ftell(fpin);
-	fseek(fpin,0L,SEEK_SET);*/
 	
 	
 	b=getc(fpin);
 	rowbytes = getword(fpin);
 	y_sz = getc(fpin);
-	//len=ftell(fpin);
 	
 	
 	if ((ipos = getword(fpin))==8) {
@@ -763,7 +755,7 @@ void import_from_geos( const char *file )
 			ipos+=2;
 			
 			spcount++;
-			if (spcount >= 96) exitflag++;
+			if (spcount >= 95) exitflag++;
 			if ((on_sprite + spcount)>=MAX_SPRITE) exitflag++;
 		}
 			
@@ -1200,6 +1192,7 @@ void load_sprite_file( const char *file )
 			}
 			
 		/* **HACK** - auto-adjust height on open */
+		/*
 		b=0;
 		sprite[ i ].size_y++;
 		while (b == 0) {
@@ -1207,7 +1200,7 @@ void load_sprite_file( const char *file )
 			for ( x = sprite[ i ].size_x; x > 0 ; x-- )
 				if (sprite[ i ].p[ x ][ sprite[ i ].size_y ] != 0) b=1;
 			if (sprite[ i ].size_y <= 1) b=1;
-		}
+		}*/
 
 	}
 
