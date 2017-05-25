@@ -253,9 +253,32 @@ void fit_sprite_on_screen()
 {
 	//Calculate size of best fit
 	if ( (sprite[ on_sprite ].size_x/2) > sprite[ on_sprite ].size_y )
-		bls = (int)(600 / (sprite[ on_sprite ].size_x + 10));
+		bls = (600 / (sprite[ on_sprite ].size_x + 10));
 	else
-		bls = (int)(440 / (sprite[ on_sprite ].size_y + 10));
+		bls = (440 / (sprite[ on_sprite ].size_y + 10));
+}
+
+
+// Resize the sprite set view to best fit on the screen
+void fit_sprite_s_on_screen()
+{
+	int i;
+	int x_sz, y_sz;
+	
+	x_sz=DEFAULT_SIZE_X, y_sz=DEFAULT_SIZE_Y;
+	
+	for (i=0; i<MAX_SPRITE; i++) {
+		if (x_sz < sprite[ i ].size_x)
+			x_sz = sprite[ i ].size_x;
+		if (y_sz < sprite[ i ].size_y)
+			y_sz = sprite[ i ].size_y;
+	}
+	
+	//Calculate size of best fit
+	if ( (x_sz/2) > y_sz )
+		bls = (600 / ++x_sz);
+	else
+		bls = (440 / ++y_sz);
 }
 
 
@@ -482,8 +505,8 @@ void fit_sprite_borders()
 	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
 		if (!check_right_border()) sprite[ on_sprite ].size_x--;
 	
-	sprite[ on_sprite ].size_x++;
-	sprite[ on_sprite ].size_y++;
+	//sprite[ on_sprite ].size_x++;
+	//sprite[ on_sprite ].size_y++;
 
 	update_screen();
 }
@@ -540,7 +563,6 @@ void import_from_gif( const char *FileName )
     int
 	InterlacedOffset[] = { 0, 4, 2, 1 }, /* The way Interlaced image should. */
 	InterlacedJumps[] = { 8, 8, 4, 2 };    /* be read - offsets and jumps... */
-    int ImageNum = 0;
     ColorMapObject *ColorMap;
     int Error;
 
@@ -644,7 +666,7 @@ void import_from_gif( const char *FileName )
 
     (void)free(ScreenBuffer);
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 	
     DGifCloseFile(GifFile, &Error);
@@ -667,27 +689,27 @@ void import_from_geos( const char *file )
 	int x, y, i;
 	unsigned char b;
 	int rowbytes, y_sz;
-	int spcount, exitflag;
+	int spcount, exitflag, bflag;
 	int index, pindex;
-	long ipos, bpos;
-	long len;
-	char message[200];
+	long ipos;
+	//long len;
+	//char message[200];
 
 	spcount = exitflag = 0;
 	
 	fpin = fopen( file, "rb" );
 	if (!fpin)
 		return;
-	if	(fseek(fpin,0,SEEK_END))
+	/*if	(fseek(fpin,0,SEEK_END))
 		return;
 	len=ftell(fpin);
-	fseek(fpin,0L,SEEK_SET);
+	fseek(fpin,0L,SEEK_SET);*/
 	
 	
 	b=getc(fpin);
 	rowbytes = getword(fpin);
 	y_sz = getc(fpin);
-	len=ftell(fpin);
+	//len=ftell(fpin);
 	
 	
 	if ((ipos = getword(fpin))==8) {
@@ -699,6 +721,8 @@ void import_from_geos( const char *file )
 	
 		while (!exitflag) {
 			sprite[ on_sprite + spcount ].size_y = y_sz;
+			/* **HACK** - Estra row on top of GEOS font */
+			//sprite[ on_sprite + spcount ].size_y = y_sz+1;
 			fseek(fpin,ipos,SEEK_SET);
 			index=getword(fpin);
 
@@ -718,12 +742,26 @@ void import_from_geos( const char *file )
 
 					b=b>>(7-(i%8));
 					sprite[ on_sprite + spcount ].p[ x+1 ][ y+1 ] = ((b&1) != 0);
+					/* **HACK** - Estra row on top of GEOS font */
+					//sprite[ on_sprite + spcount ].p[ x+1 ][ y+2 ] = ((b&1) != 0);
 					i++;
 				}
 			}
+			
+			/* Adjust font height */
+			bflag=0;
+			sprite[ on_sprite  + spcount ].size_y++;
+			while (bflag == 0) {
+				sprite[ on_sprite  + spcount ].size_y--;
+				for ( x = sprite[ on_sprite + spcount ].size_x; x > 0 ; x-- )
+					if (sprite[ on_sprite + spcount ].p[ x ][ sprite[ on_sprite + spcount ].size_y ] != 0) bflag=1;
+				if (sprite[ on_sprite + spcount ].size_y <= 1) bflag=1;
+			}
+
 			pindex=index;
 			
 			ipos+=2;
+			
 			spcount++;
 			if (spcount >= 96) exitflag++;
 			if ((on_sprite + spcount)>=MAX_SPRITE) exitflag++;
@@ -734,7 +772,7 @@ void import_from_geos( const char *file )
 		 
 	fclose(fpin);
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
@@ -876,6 +914,19 @@ void import_from_bitmap( const char *file )
 						}
 					}
 				}
+
+				/* **HACK** (BDF font import), remove this code for fixed height font */
+				/* Adjust font height */
+				b=0;
+				sprite[ on_sprite  + spcount ].size_y++;
+				while (b == 0) {
+					sprite[ on_sprite  + spcount ].size_y--;
+					for ( x = sprite[ on_sprite + spcount ].size_x; x > 0 ; x-- )
+						if (sprite[ on_sprite + spcount ].p[ x ][ sprite[ on_sprite + spcount ].size_y ] != 0) b=1;
+					if (sprite[ on_sprite + spcount ].size_y <= 1) b=1;
+				}
+				//sprite[ on_sprite  + spcount ].size_y++;
+
 				/* **HACK** (BDF font import), right margin adj. */
 				sprite[ on_sprite + spcount ].size_x++;
 				spcount++;
@@ -938,7 +989,7 @@ void import_from_bitmap( const char *file )
 		
 		fclose(fpin);
 	}
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 	
 }
@@ -987,7 +1038,7 @@ void import_from_printmaster( const char *file )
 
 	fclose(fpin);
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
@@ -1130,7 +1181,7 @@ void save_sprite_file( const char *file )
 void load_sprite_file( const char *file )
 {
 	gzFile f = NULL;
-	int x,y,i;
+	int x,y,i,b;
 
 	f = gzopen( file, "rb" );
 	if (!f) {
@@ -1147,11 +1198,22 @@ void load_sprite_file( const char *file )
 			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
 				sprite[ i ].p[ x ][ y ] = gzgetc (f);
 			}
+			
+		/* **HACK** - auto-adjust height on open */
+		b=0;
+		sprite[ i ].size_y++;
+		while (b == 0) {
+			sprite[ i ].size_y--;
+			for ( x = sprite[ i ].size_x; x > 0 ; x-- )
+				if (sprite[ i ].p[ x ][ sprite[ i ].size_y ] != 0) b=1;
+			if (sprite[ i ].size_y <= 1) b=1;
+		}
+
 	}
 
 	gzclose( f );
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
@@ -1226,7 +1288,7 @@ void load_sevenup_file( const char *file )
 
 	fclose( f );
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
