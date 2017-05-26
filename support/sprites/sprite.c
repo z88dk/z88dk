@@ -686,7 +686,7 @@ void import_from_geos( const char *file )
 {
 	FILE *fpin = NULL;
 	int x, y, i;
-	unsigned char b;
+	unsigned char b,id;
 	int rowbytes, y_sz;
 	int spcount, exitflag, bflag;
 	int index, pindex;
@@ -699,7 +699,9 @@ void import_from_geos( const char *file )
 		return;
 	
 	
-	b=getc(fpin);
+	id=getc(fpin);
+	/* Shift file pointers if the extracted file includes the C64 header */
+	if (id==0x83) fseek(fpin,0x2fb,SEEK_SET);
 	rowbytes = getword(fpin);
 	y_sz = getc(fpin);
 	
@@ -715,7 +717,11 @@ void import_from_geos( const char *file )
 			sprite[ on_sprite + spcount ].size_y = y_sz;
 			/* **HACK** - Extra row on top of GEOS font */
 			//sprite[ on_sprite + spcount ].size_y = y_sz+1;
-			fseek(fpin,ipos,SEEK_SET);
+			if (id==0x83)
+				fseek(fpin,ipos+0x2fa,SEEK_SET);
+			else
+				fseek(fpin,ipos,SEEK_SET);
+			
 			index=getword(fpin);
 
 			sprite[ on_sprite + spcount ].size_x = index-pindex;
@@ -728,7 +734,10 @@ void import_from_geos( const char *file )
 			for ( y = 0; y < y_sz; y++ ) {
 				i=pindex;
 				for ( x = 0; x < sprite[ on_sprite + spcount ].size_x; x++ ) {
-					fseek(fpin,(long)(0xca+(y*rowbytes)+(i/8)),SEEK_SET);
+					if (id==0x83)
+						fseek(fpin,(long)(0x2fa+0xca+(y*rowbytes)+(i/8)),SEEK_SET);
+					else
+						fseek(fpin,(long)(0xca+(y*rowbytes)+(i/8)),SEEK_SET);
 					b=getc(fpin);
 
 					b=b>>(7-(i%8));
