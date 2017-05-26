@@ -713,7 +713,7 @@ void import_from_geos( const char *file )
 	
 		while (!exitflag) {
 			sprite[ on_sprite + spcount ].size_y = y_sz;
-			/* **HACK** - Estra row on top of GEOS font */
+			/* **HACK** - Extra row on top of GEOS font */
 			//sprite[ on_sprite + spcount ].size_y = y_sz+1;
 			fseek(fpin,ipos,SEEK_SET);
 			index=getword(fpin);
@@ -724,7 +724,6 @@ void import_from_geos( const char *file )
 				sprite[ on_sprite + spcount ].size_x = MAX_SIZE_X;
 			if ( sprite[ on_sprite + spcount ].size_y >= MAX_SIZE_Y )
 				sprite[ on_sprite + spcount ].size_y = MAX_SIZE_Y;
-			
 			
 			for ( y = 0; y < y_sz; y++ ) {
 				i=pindex;
@@ -1588,6 +1587,7 @@ void copy_sprite_mask( int src, int dest )
 	update_screen();
 }
 
+
 void do_help_page() {
 	al_clear_to_color (al_map_rgb(240,230,250) );
 	
@@ -1628,6 +1628,36 @@ void do_help_page() {
 
 }
 
+
+void do_preview_page() {
+	int x,y,spcount, xmargin, ymargin;
+	
+	al_clear_to_color (al_map_rgb(230,240,250) );
+	spcount=0;
+	xmargin=0;
+	ymargin=0;
+	
+	while ((ymargin<520) && ((on_sprite + spcount)<=MAX_SPRITE)) {
+	//Draw Big Sprite Block
+	for ( x = 1; x <= sprite[ on_sprite + spcount ].size_x; x++ )
+		for ( y = 1; y <= sprite[ on_sprite + spcount ].size_y; y++ )
+			if ( sprite[ on_sprite + spcount ].p[ x ][ y ] )
+				if ((xmargin+x+1<720)&&(ymargin+y+1<520))
+					al_draw_filled_rectangle( xmargin+x , ymargin+y , xmargin+x+1 , ymargin+y+1 , al_map_rgb(0, 0, 0) );
+	xmargin+= sprite[ on_sprite + spcount ].size_x;
+	if (xmargin >=720){
+		ymargin+=sprite[ on_sprite + spcount ].size_y;;
+		xmargin=0;
+	}
+	spcount++;
+	}
+	al_flip_display();
+
+	do {
+	al_get_keyboard_state(&pressed_keys);
+	}	while (al_key_down(&pressed_keys, ALLEGRO_KEY_F12 ));
+
+}
 
 void do_gui_buttons()
 {
@@ -1694,6 +1724,11 @@ void do_keyboard_input(int keycode)
 
 	if ( keycode == ALLEGRO_KEY_F1 ) {
 		do_help_page();
+		update_screen();
+	}
+
+	if ( keycode == ALLEGRO_KEY_F12 ) {
+		do_preview_page();
 		update_screen();
 	}
 
@@ -1885,7 +1920,7 @@ int main()
 
 	//------Main Program Loop----------
 	update_screen();
-	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page", NULL, 0);
+	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page, 'F12' for a quick preview.", NULL, 0);
 	al_flush_event_queue(eventQueue);
 	
 	while (!exit_requested) {
