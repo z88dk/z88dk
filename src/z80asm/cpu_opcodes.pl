@@ -121,6 +121,32 @@ sub add_opcode {
 		return;
 	}
 
+	# expand (HL+SN) -> expands 2 lines (hl), (hl+SN)
+	if ($opcode =~ /\( \s* (HL|IX|IY) \s* \+ \s* SN \s* \) /x) {
+		my($opcode_1, $reg, $opcode_2) = ($`, lc($1), $');
+	
+		# (hl)
+		add_opcode($opcode_1."($reg)".$opcode_2, $bytes.", SN0", $arch, $var);
+		
+		# (hl+SN)
+		add_opcode($opcode_1."($reg+SN)".$opcode_2, $bytes.", SN", $arch, $var);
+		
+		return;
+	}
+
+	# expand (SP+N) -> expands 2 lines (sp), (sp+N)
+	if ($opcode =~ /\( \s* (SP) \s* \+ \s* N \s* \) /x) {
+		my($opcode_1, $reg, $opcode_2) = ($`, lc($1), $');
+	
+		# (hl)
+		add_opcode($opcode_1."($reg)".$opcode_2, $bytes.", SN0", $arch, $var);
+		
+		# (hl+SN)
+		add_opcode($opcode_1."($reg+N)".$opcode_2, $bytes.", N", $arch, $var);
+		
+		return;
+	}
+
 	# expand XH, XL -> expands to 3 lines with (h,l), and (ixh,ixl) and (iyh,iyl) only for [z80]
 	if ($opcode =~ /X[HL]/) {
 
@@ -135,6 +161,24 @@ sub add_opcode {
 		# IYH, IYL
 		($opcode_copy = $opcode) =~ s/X([HL])/iy\L$1/g;
 		add_opcode($opcode_copy, "FD, ".$bytes, 'z80', $var);
+		
+		return;
+	}
+
+	# expand X -> expands to 3 lines with hl, ix and iy
+	if ($opcode =~ /\bX\b/) {
+
+		# hl
+		(my $opcode_copy = $opcode) =~ s/\bX\b/hl/g;
+		add_opcode($opcode_copy, $bytes, $arch, $var);
+		
+		# ix
+		($opcode_copy = $opcode) =~ s/\bX\b/ix/g;
+		add_opcode($opcode_copy, "DD, ".$bytes, $arch, $var);
+		
+		# iy
+		($opcode_copy = $opcode) =~ s/\bX\b/iy/g;
+		add_opcode($opcode_copy, "FD, ".$bytes, $arch, $var);
 		
 		return;
 	}
@@ -352,6 +396,7 @@ sub check_valid {
 
 	return 0 if /\b i[xy][hl] \b/x && /\b altd \b | \' /x;
 	return 0 if /\b (ix|iy|sp) \' /x;
+	return 0 if /\b altd \s+ ld \s+ (ix|iy|sp) /x;
 	return 1;
 }
 
@@ -365,7 +410,7 @@ sub opcode_tokens_rule {
 		if    (/ \G \s+ 		/gcx)	{	; }		# ignore blanks
 		elsif (/ \G ,   		/gcx)	{ push @tokens, '_TK_COMMA'; }
 		elsif (/ \G \)   		/gcx)	{ push @tokens, '_TK_RPAREN'; }
-		elsif (/ \G \( \s* (hl|ix|iy) \s* \+? /gcx)	
+		elsif (/ \G \( \s* (hl|ix|iy|sp) \s* \+? /gcx)	
 										{ push @tokens, '_TK_IND_'.uc($1); }
 		elsif (/ \G \( \s* (bc|de) \s* \) \+? /gcx)	
 										{ push @tokens, '_TK_IND_'.uc($1); }

@@ -1,14 +1,5 @@
 ;------------------------------------------------------------------------------
 ; List of all the CPU opcodes
-; {b c d}	-> expands into 3 lines for each element and $1 = (0..3)
-; [']		-> expands 3 lines: no tick for all cpus, with tick / with ALTD for [rabbit]
-; [a,]		-> expands 2 lines: sub b | sub a,b
-; [a',]		-> expands 4 lines: sub b | sub a,b | sub a',b | altd sub b
-; (X)		-> expands 5 lines (hl), (ix), (ix+d), (iy), (iy+d)
-; XH, XL	-> expands to 3 lines with (h,l), and (ixh,ixl) and (iyh,iyl) only for [z80]
-; N_IMN		-> expands to: ld a,(MN) | ld a,N
-; IMN		-> expands to: ld (MN),a
-; N			-> expands to: ld b,N
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
@@ -58,71 +49,44 @@
 ; 16-bit load group
 ;------------------------------------------------------------------------------
 
-			ld {bc de .  . }['],  N_IMN	=> expr_in_parens ? ED, 4B + $1*10, N, M : 01 + $1*10, N, M
-			ld {.  .  .  sp},     N_IMN	=> expr_in_parens ? ED, 4B + $1*10, N, M : 01 + $1*10, N, M
+			ld {.  .  X  . }['],  N_IMN	=> expr_in_parens ?             2A, N, M : 01 + $1*10, N, M
+			ld {bc de .  sp}['],  N_IMN	=> expr_in_parens ? ED, 4B + $1*10, N, M : 01 + $1*10, N, M
 
-			ld {.  .  hl . }['],  N_IMN	=> expr_in_parens ?             2A, N, M :         21, N, M
-			ld {.  .  ix . },     N_IMN	=> expr_in_parens ?         DD, 2A, N, M :     DD, 21, N, M
-			ld {.  .  iy . },     N_IMN	=> expr_in_parens ?         FD, 2A, N, M :     FD, 21, N, M
+			ld IMN, X					=>             22, N, M
+			ld IMN, {bc de . sp}		=> ED, 43 + $1*10, N, M
 
-
-__END__
-
-
-			ld (MN), hl					=>     22, N, M
-			ld (MN), ix					=> DD, 22, N, M
-			ld (MN), iy					=> FD, 22, N, M
-
-			ld {bc de . sp},  (MN)		=>     ED, 4B + $1*10, N, M
-[rabbit]	ld {bc de . . }', (MN)		=> 76, ED, 4B + $1*10, N, M
-
-			ld (MN), {bc de . sp}		=> ED, 43 + $1*10, N, M
-
-			ld sp, hl					=>     F9
-			ld sp, ix					=> DD, F9
-			ld sp, iy					=> FD, F9
-
-			push {bc de hl af}			=>     C5 + $1*10
-			push {.  .  ix . }			=> DD, C5 + $1*10
-			push {.  .  iy . }			=> FD, C5 + $1*10
+			ld sp, X					=> F9
+			
+			push {bc de X  af}			=> C5 + $1*10
+			pop  {bc de X  af}[']		=> C1 + $1*10
+			
 [rabbit]	push ip						=> ED, 76
+[rabbit]	pop  ip						=> ED, 7E
+
 [r3k]		push su						=> ED, 66
+[r3k]		pop  su						=> ED, 6E
 
-			pop {bc de hl af}			=>     C1 + $1*10
-[rabbit]	pop {bc de hl af}'			=> 76, C1 + $1*10
-			pop {.  .  ix . }			=> DD, C1 + $1*10
-			pop {.  .  iy . }			=> FD, C1 + $1*10
-[rabbit]	pop ip						=> ED, 7E
-[r3k]		pop su						=> ED, 6E
-
-[rabbit]	ld hl,  ix					=>     DD, 7C
-[rabbit]	ld hl', ix					=> 76, DD, 7C
-[rabbit]	ld hl,  iy					=>     FD, 7C
-[rabbit]	ld hl', iy					=> 76, FD, 7C
-
+[rabbit]	ld hl['],  ix				=> DD, 7C
+[rabbit]	ld hl['],  iy				=> FD, 7C
+			
 [rabbit]	ld ix, hl					=> DD, 7D
 [rabbit]	ld iy, hl					=> FD, 7D
 
-[rabbit]	ld hl,  (hl + D)			=>     DD, E4, D
-[rabbit]	ld hl', (hl + D)			=> 76, DD, E4, D
+[rabbit]	ld hl['],  (HL+SN)			=> DD, E4
+[rabbit]	ld hl['],  (IX+SN)			=>     E4
+[rabbit]	ld hl['],  (IY+SN)			=> FD, E4
 
-[rabbit]	ld hl,  (ix + D)			=>         E4, D
-[rabbit]	ld hl', (ix + D)			=> 76,     E4, D
+[rabbit]	ld (HL+SN), hl				=> DD, F4
+[rabbit]	ld (IX+SN), hl				=>     F4
+[rabbit]	ld (IY+SN), hl				=> FD, F4
 
-[rabbit]	ld hl,  (iy + D)			=>     FD, E4, D
-[rabbit]	ld hl', (iy + D)			=> 76, FD, E4, D
+[rabbit]	ldp IMN, hl					=> ED, 65, N, M
+[rabbit]	ldp IMN, ix					=> DD, 65, N, M
+[rabbit]	ldp IMN, iy					=> FD, 65, N, M
 
-[rabbit]	ld (hl + D), hl				=> DD, F4, D
-[rabbit]	ld (ix + D), hl				=>     F4, D
-[rabbit]	ld (iy + D), hl				=> FD, F4, D
-
-[rabbit]	ldp (MN), hl				=> ED, 65, N, M
-[rabbit]	ldp (MN), ix				=> DD, 65, N, M
-[rabbit]	ldp (MN), iy				=> FD, 65, N, M
-
-[rabbit]	ldp hl, (MN)				=> ED, 6D, N, M
-[rabbit]	ldp ix, (MN)				=> DD, 6D, N, M
-[rabbit]	ldp iy, (MN)				=> FD, 6D, N, M
+[rabbit]	ldp hl, IMN					=> ED, 6D, N, M
+[rabbit]	ldp ix, IMN					=> DD, 6D, N, M
+[rabbit]	ldp iy, IMN					=> FD, 6D, N, M
 
 [rabbit]	ldp (hl), hl				=> ED, 64
 [rabbit]	ldp (ix), hl				=> DD, 64
@@ -131,6 +95,17 @@ __END__
 [rabbit]	ldp hl, (hl)				=> ED, 6C
 [rabbit]	ldp hl, (ix)				=> DD, 6C
 [rabbit]	ldp hl, (iy)				=> FD, 6C
+
+__END__
+[rabbit]	ld (SP+N), hl				=>     D4
+[rabbit]	ld (SP+N), ix				=> DD, D4
+[rabbit]	ld (SP+N), iy				=> FD, D4
+
+
+
+
+
+
 
 [rabbit]	ld (sp + N), hl				=>     D4, N
 [rabbit]	ld (sp + N), ix				=> DD, D4, N

@@ -241,7 +241,17 @@
  altd ld h, h
  altd ld h, l
  altd ld hl, (4660)
+ altd ld hl, (hl)
+ altd ld hl, (hl+127)
+ altd ld hl, (ix)
+ altd ld hl, (ix+127)
+ altd ld hl, (iy)
+ altd ld hl, (iy+127)
  altd ld hl, 4660
+ altd ld hl, ix
+ altd ld hl, iy
+ altd ld ix, (4660)
+ altd ld ix, 4660
  altd ld ixh, (42)
  altd ld ixh, 42
  altd ld ixh, a
@@ -260,6 +270,8 @@
  altd ld ixl, e
  altd ld ixl, ixh
  altd ld ixl, ixl
+ altd ld iy, (4660)
+ altd ld iy, 4660
  altd ld iyh, (42)
  altd ld iyh, 42
  altd ld iyh, a
@@ -292,6 +304,8 @@
  altd ld l, e
  altd ld l, h
  altd ld l, l
+ altd ld sp, (4660)
+ altd ld sp, 4660
  altd neg a
  altd or a, (42)
  altd or a, (hl)
@@ -311,6 +325,12 @@
  altd or a, iyh
  altd or a, iyl
  altd or a, l
+ altd pop af
+ altd pop bc
+ altd pop de
+ altd pop hl
+ altd pop ix
+ altd pop iy
  altd sbc a, (42)
  altd sbc a, (hl)
  altd sbc a, (ix)
@@ -426,7 +446,19 @@
  inc iyh'
  inc iyl'
  inc l'
+ ld (hl), hl
+ ld (hl+127), hl
+ ld (ix), hl
+ ld (ix+127), hl
+ ld (iy), hl
+ ld (iy+127), hl
  ld 4660, a
+ ld 4660, bc
+ ld 4660, de
+ ld 4660, hl
+ ld 4660, ix
+ ld 4660, iy
+ ld 4660, sp
  ld a', (4660)
  ld a', (bc)
  ld a', (de)
@@ -538,7 +570,26 @@
  ld h', h
  ld h', l
  ld hl', (4660)
+ ld hl', (hl)
+ ld hl', (hl+127)
+ ld hl', (ix)
+ ld hl', (ix+127)
+ ld hl', (iy)
+ ld hl', (iy+127)
  ld hl', 4660
+ ld hl', ix
+ ld hl', iy
+ ld hl, (hl)
+ ld hl, (hl+127)
+ ld hl, (ix)
+ ld hl, (ix+127)
+ ld hl, (iy)
+ ld hl, (iy+127)
+ ld hl, ix
+ ld hl, iy
+ ld ix', (4660)
+ ld ix', 4660
+ ld ix, hl
  ld ixh', (42)
  ld ixh', 42
  ld ixh', a
@@ -557,6 +608,9 @@
  ld ixl', e
  ld ixl', ixh
  ld ixl', ixl
+ ld iy', (4660)
+ ld iy', 4660
+ ld iy, hl
  ld iyh', (42)
  ld iyh', 42
  ld iyh', a
@@ -589,6 +643,26 @@
  ld l', e
  ld l', h
  ld l', l
+ ld sp', (4660)
+ ld sp', 4660
+ ldp (4660), hl
+ ldp (4660), ix
+ ldp (4660), iy
+ ldp (hl), hl
+ ldp (ix), hl
+ ldp (iy), hl
+ ldp 4660, hl
+ ldp 4660, ix
+ ldp 4660, iy
+ ldp hl, (4660)
+ ldp hl, (hl)
+ ldp hl, (ix)
+ ldp hl, (iy)
+ ldp hl, 4660
+ ldp ix, (4660)
+ ldp ix, 4660
+ ldp iy, (4660)
+ ldp iy, 4660
  neg a'
  or a', (42)
  or a', (hl)
@@ -608,6 +682,16 @@
  or a', iyh
  or a', iyl
  or a', l
+ pop af'
+ pop bc'
+ pop de'
+ pop hl'
+ pop ip
+ pop ix'
+ pop iy'
+ pop su
+ push ip
+ push su
  sbc a', (42)
  sbc a', (hl)
  sbc a', (ix)

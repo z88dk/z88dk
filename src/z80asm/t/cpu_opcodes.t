@@ -225,7 +225,12 @@ sub test_asm {
 	
 	# build OK
 	my $cmd = "./z80asm --cpu=$cpu -l -b --no-emul $asm_file";
-	ok system($cmd)==0, $cmd;
+	ok 1, $cmd;
+	my($out, $err, $exit) = capture { system($cmd) };
+	$err =~ s/^Warning .* interpreting indirect value as immediate\s*//gm;
+	is $out, "", "output";
+	is $err, "", "error";
+	is $exit, 0, "exit";
 	
 	my $bin_file = replace_ext($asm_file, ".bin");
 	my $bin = $bin_file->slurp_raw;

@@ -124,14 +124,6 @@ Define rules for a ragel-based parser.
 			  >expr_start_action
 			  %{ push_expr(ctx); };
 	
-	/* expression within parentheses */
-	paren_expr = expr1 
-			  >expr_start_action
-			  %{ if (! expr_in_parens)
-					return FALSE;		/* syntax error */
-				 push_expr(ctx); 
-			   };
-	
 	const_expr = 
 			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };
 	
@@ -399,56 +391,8 @@ Define rules for a ragel-based parser.
 		*   16-bit load group
 		*--------------------------------------------------------------------*/
 
-		/* ld (NN),hl|ix|iy */
 #foreach <DD> in HL, IX, IY
-		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{
-				if (! expr_in_parens)
-					return FALSE;			/* syntax error */
-					
-				DO_stmt_nn( P_<DD> + Z80_LD_IND_nn_idx );
-			}
-#endfor  <DD>
 
-		/* ld (NN),dd */
-#foreach <DD> in BC, DE, SP
-		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{
-				if (! expr_in_parens)
-					return FALSE;			/* syntax error */
-					
-				DO_stmt_nn( Z80_LD_IND_nn_dd( REG_<DD> ) );	/* ld (NN),dd */
-			}
-#endfor  <DD>
-
-#foreach <DD> in HL, IX, IY
-		/* ld sp,hl|ix|iy */
-		| label? _TK_LD _TK_SP _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( P_<DD> + Z80_LD_SP_idx ); }
-
-		/* ld (hl|ix|iy+d),hl */
-		|	label? _TK_LD _TK_IND_<DD> expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE \
-			@{ DO_stmt_d( Z80_LD_IND_<DD>_d_HL ); }
-
-		/* ld (hl|ix|iy),hl */
-		|	label? _TK_LD _TK_IND_<DD> _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_IND_<DD>_d_HL << 8 ); }
-
-		/* ld hl,(hl|ix|iy+d) */
-		|	label? _TK_LD _TK_HL _TK_COMMA _TK_IND_<DD> expr _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt_d( Z80_LD_HL_IND_<DD>_d ); }
-
-		/* ld hl,(hl|ix|iy) */
-		|	label? _TK_LD _TK_HL _TK_COMMA _TK_IND_<DD> _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_HL_IND_<DD>_d << 8 ); }
-
-		/* ld hl',(hl|ix|iy+d) */
-		|	label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_<DD> expr _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt_d( Z80_LD_HL_IND_<DD>_d ); }
-
-		/* ld hl',(hl|ix|iy) */
-		|	label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_<DD> _TK_RPAREN _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt( Z80_LD_HL_IND_<DD>_d << 8 ); }
 
 		/* ld (sp+n), hl|ix|iy */
 		|	label? _TK_LD _TK_IND_SP expr _TK_RPAREN _TK_COMMA _TK_<DD> _TK_NEWLINE \
@@ -482,65 +426,6 @@ Define rules for a ragel-based parser.
   #endfor <D2>
 #endfor <D1>
 
-#foreach <R> in IX, IY
-		/* ld hl,ix|iy */
-		| label? _TK_LD _TK_HL _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ DO_stmt( Z80_LD_HL_<R> ); }
-
-		| label? _TK_LD _TK_HL1 _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_LD_HL_<R> ); }
-
-		/* ld ix|iy,hl */
-		| label? _TK_LD _TK_<R> _TK_COMMA _TK_HL _TK_NEWLINE
-		  @{ DO_stmt( Z80_LD_<R>_HL ); }
-#endfor <R>
-
-#foreach <R> in HL, IX, IY
-		/* ldp (hl|ix|iy),hl */
-		| label? _TK_LDP _TK_IND_<R> _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE
-		  @{ DO_stmt( Z80_LDP_IND_<R>_HL ); }
-
-		/* ldp hl,(hl|ix|iy) */
-		| label? _TK_LDP _TK_HL _TK_COMMA _TK_IND_<R> _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt( Z80_LDP_HL_IND_<R> ); }
-
-		/* ldp (mn), hl|ix|iy */
-		| label? _TK_LDP expr _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ if (! expr_in_parens)
-			   return FALSE;			/* syntax error */
-			 DO_stmt_nn( Z80_LDP_IND_mn_<R> ); }
-
-		/* ldp hl|ix|iy, (mn) */
-		| label? _TK_LDP _TK_<R> _TK_COMMA expr _TK_NEWLINE
-		  @{ if (! expr_in_parens)
-			   return FALSE;			/* syntax error */
-			 DO_stmt_nn( Z80_LDP_<R>_IND_mn ); }
-#endfor <R>
-
-		/*---------------------------------------------------------------------
-		*   PUSH / POP
-		*--------------------------------------------------------------------*/
-#foreach <OP> in PUSH, POP
-  #foreach <DD> in BC, DE, HL, AF, IX, IY
-		| label? _TK_<OP> _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( P_<DD> + Z80_<OP>( REG_<DD> ) ); }
-  #endfor  <DD>
-#endfor  <OP>
-
-#foreach <OP> in POP
-  #foreach <DD> in BC, DE, HL, AF
-		| label? _TK_<OP> _TK_<DD>1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP>( REG_<DD> ) ); }
-  #endfor  <DD>
-#endfor  <OP>
-
-#foreach <OP> in PUSH, POP
-  #foreach <R> in IP, SU
-		/* push|pop ip|su */
-		| label? _TK_<OP> _TK_<R> _TK_NEWLINE
-		  @{ DO_stmt( Z80_<OP>_<R> ); }
-  #endfor <R>
-#endfor  <OP>
 
 		/*---------------------------------------------------------------------
 		*   EX, EXX
@@ -808,18 +693,22 @@ Define rules for a ragel-based parser.
 		| label? _TK_IN _TK_<R> _TK_COMMA _TK_IND_C _TK_NEWLINE
 		  @{ DO_stmt( Z80_IN_REG_C( REG_<R> ) ); }
 		
-		| label? _TK_IN0 _TK_<R> _TK_COMMA paren_expr _TK_NEWLINE
-		  @{ DO_stmt_n( Z80_IN0( REG_<R> ) ); }		
+		| label? _TK_IN0 _TK_<R> _TK_COMMA expr _TK_NEWLINE
+		  @{ if (!expr_in_parens) return FALSE;
+		     DO_stmt_n( Z80_IN0( REG_<R> ) ); }		
 
-	    | label? _TK_OUT0 paren_expr _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ DO_stmt_n( Z80_OUT0( REG_<R> ) ); }		
+	    | label? _TK_OUT0 expr _TK_COMMA _TK_<R> _TK_NEWLINE
+		  @{ if (!expr_in_parens) return FALSE;
+		     DO_stmt_n( Z80_OUT0( REG_<R> ) ); }		
 #endfor  <R>
 
-		| label? _TK_IN _TK_A _TK_COMMA paren_expr _TK_NEWLINE
-		  @{ DO_stmt_n( Z80_IN_A_n ); }
+		| label? _TK_IN _TK_A _TK_COMMA expr _TK_NEWLINE
+		  @{ if (!expr_in_parens) return FALSE;
+		     DO_stmt_n( Z80_IN_A_n ); }
 		
-		| label? _TK_OUT paren_expr _TK_COMMA _TK_A _TK_NEWLINE 
-		  @{ DO_stmt_n( Z80_OUT_n_A ); }
+		| label? _TK_OUT expr _TK_COMMA _TK_A _TK_NEWLINE 
+		  @{ if (!expr_in_parens) return FALSE;
+		     DO_stmt_n( Z80_OUT_n_A ); }
 
 		| label? _TK_TSTIO expr _TK_NEWLINE
 		  @{ DO_stmt_n( Z80_TSTIO ); }
