@@ -80,6 +80,7 @@ IF !__crt_model
         SECTION DATA
         SECTION smc_clib
 		  SECTION smc_user
+      SECTION data_clib
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
@@ -138,6 +139,7 @@ IF __crt_model > 0
 		defb	0		; control name of data binary
 		SECTION smc_clib
 		SECTION smc_user
+        SECTION data_clib
         SECTION data_crt
         SECTION data_compiler
         SECTION data_user
