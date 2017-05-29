@@ -33,6 +33,6 @@ asm_SMSlib_loadSpritePalette:
 loop:
 
    outi
-   jr nz, loop
+   jp nz, loop
    
    ret

@@ -90,7 +90,7 @@ intrinsic_label(APLIB_TIMER_STOP);
    sms_memcpy_vram_to_mem(buffer, 0x3000, RAWBIN_SIZE);
    if (verify() == FALSE)
    {
-      perror("aplib_depack");
+      perror("aplib_depack_vram");
       exit(1);
    }
 

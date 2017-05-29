@@ -61,16 +61,17 @@ loop_y:
    ; hl = tile address
    ;  b = unsigned int width*2
 	; stack = width*2 | remaining height
-   
+
+   ld c,VDPDataPort
+   ex de,hl
+
 loop:
    
-   ld a,(de)
-   inc de
-   
-   out (VDPDataPort),a
+   outi
+   jp nz, loop
 
-   djnz loop
-   
+   ex de,hl
+
    ld c,64
    add hl,bc
    

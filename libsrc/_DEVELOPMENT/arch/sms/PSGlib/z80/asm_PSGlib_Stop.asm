@@ -32,7 +32,7 @@ asm_PSGlib_Stop:
    ld a,(__PSGlib_Channel2SFX)
    
    or a
-   jr z, skip00
+   jr nz, skip00
    
    ld a,PSGLatch|PSGChannel2|PSGVolumeData|0x0f    ; // latch channel 2, volume=0xF (silent)
    out (PSGPort),a
@@ -42,7 +42,7 @@ skip00:
    ld a,(__PSGlib_Channel3SFX)
    
    or a
-   jr z, skip01
+   jr nz, skip01
    
    ld a,PSGLatch|PSGChannel3|PSGVolumeData|0x0f    ; // latch channel 3, volume=0xF (silent)
    out (PSGPort),a

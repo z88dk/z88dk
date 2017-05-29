@@ -1,0 +1,6 @@
+arch/zx/nirvanam/z80/asm_NIRVANAM_drawT_di
+arch/zx/nirvanam/z80/asm_NIRVANAM_drawTW_di
+arch/zx/nirvanam/z80/asm_NIRVANAM_drawW_di
+arch/zx/nirvanam/z80/asm_NIRVANAM_fillT_di
+arch/zx/nirvanam/z80/asm_NIRVANAM_spriteT
+arch/zx/nirvanam/z80/NIRVANAM_ENGINE

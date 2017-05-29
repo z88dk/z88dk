@@ -562,7 +562,7 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 			cur_addr = section->addr;
 
 		/* bytes from this section */
-		if (section_size > 0)
+		if (section_size > 0 || section->origin >= 0)
 		{
 			if (section->name && *section->name)					/* only if section name not empty */
 			{

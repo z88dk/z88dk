@@ -171,10 +171,8 @@ long parameter_search(char *filen, char *ext,char *target)
     long    val=-1;
     FILE    *fp;
 
-    if (filen == NULL) {
-        fprintf(stderr,"Warning: CRT file name not specified (not z88dk compiled?)\n");
+    if (filen == NULL)
         return(-1);
-    }
 
     /* Create the filename very quickly */
     strcpy(name,filen);

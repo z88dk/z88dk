@@ -24,13 +24,11 @@ asm_SMSlib_VRAMmemcpy_brief:
    INCLUDE "SMS_CRT0_RST08.inc"
 
    ex de,hl
+   ld c,VDPDataPort
    
 loop:
 
-   ld a,(hl)
-   inc hl
-   
-   out (VDPDataPort),a
-   
-   djnz loop
+   outi
+   jp nz, loop
+
    ret
