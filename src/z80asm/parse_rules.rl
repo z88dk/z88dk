@@ -372,6 +372,7 @@ Define rules for a ragel-based parser.
 		| label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 
 #include "cpu_opcodes.h"
+#include "cpu_opcodes2.h"
 
 		/*---------------------------------------------------------------------
 		*   8-bit load group

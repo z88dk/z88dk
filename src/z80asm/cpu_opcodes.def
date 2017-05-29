@@ -6,7 +6,7 @@
 ; 8-bit load group
 ;------------------------------------------------------------------------------
 
-		ld {b c d e XH XL . a}['], {b c d e XH XL . a}	=> 40 + $1*8 + $2
+;		ld {b c d e XH XL . a}['], {b c d e XH XL . a}	=> 40 + $1*8 + $2
 		ld {. . . .  .  . . a}['], N_IMN				=> expr_in_parens ? 3A, N, M : 06 + $1*8, N
 		ld {b c d e XH XL . .}['], N					=>                             06 + $1*8, N
 

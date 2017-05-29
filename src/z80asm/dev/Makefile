@@ -32,9 +32,13 @@ all : parse_rules.h
 cpu_opcodes.h : cpu_opcodes.def cpu_opcodes.pl
 	perl cpu_opcodes.pl
 
+cpu_opcodes2.h : cpu_opcodes.py
+	python cpu_opcodes.py
+
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile \
-				cpu_opcodes.h
+				cpu_opcodes.h \
+				cpu_opcodes2.h
 	perl parse_ragel.pl parse_rules.rl
 #	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)
 	

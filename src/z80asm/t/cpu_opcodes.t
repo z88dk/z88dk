@@ -64,6 +64,25 @@ for (@CPU) {
 	test_asm($cpu, $asm_file, $err_file, $bmk_file);
 
 	unlink($bmk_file);
+
+	# test cpu* built by cpu_opcodes2.py
+	$asm_file = "t/data/".$cpu."-ok.asm";
+	$err_file = "t/data/".$cpu."-err.asm";
+	$bmk_file = "t/data/".$cpu."-ok.bmk";
+
+	# build bmk
+	$bytes = '';
+	for (path($asm_file)->lines) {
+		s/.*;\s*//;
+		for (split(' ', $_)) {
+			$bytes .= chr(hex($_));
+		}
+	}
+	path($bmk_file)->spew_raw($bytes);
+	
+	test_asm($cpu, $asm_file, $err_file, $bmk_file);
+
+	unlink($bmk_file);
 }
 
 done_testing;

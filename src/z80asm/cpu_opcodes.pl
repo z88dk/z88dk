@@ -452,12 +452,25 @@ sub opcode_bytes_rule {
 		return @rules;
 	}
 
+	# DD, FD prefixes
+	my $post_arg = '';
+	my $pre_arg = '';
+	if ($bytes =~ s/^\s*DD\s*,\s*//) {
+		$pre_arg = '(';
+		$post_arg = ' + P_IX)';
+	}
+	elsif ($bytes =~ s/^\s*FD\s*,\s*//) {
+		$pre_arg = '(';
+		$post_arg = ' + P_IY)';
+	}
+	else {
+	}
+	
 	# Handle data bytes
 	my $func = 'DO_stmt';
-	my $post_arg = '';
 	if ($rabbit_emul) {
 		$func = 'DO_stmt_emul';
-		$post_arg = ", rcmx_$opcode";
+		$post_arg .= ", rcmx_$opcode";
 	}
 	elsif ($bytes =~ s/\b N \s* , \s* M \b/ /x) {
 		$func = 'DO_stmt_nn';
@@ -470,11 +483,11 @@ sub opcode_bytes_rule {
 	}
 	elsif ($bytes =~ s/\b SN0 \s* , \s* N \b/ /x) {
 		$func = 'DO_stmt_n';
-		$post_arg = ' << 8';
+		$post_arg .= ' << 8';
 	}
 	elsif ($bytes =~ s/\b SN0 \b/ /x) {
 		$func = 'DO_stmt';
-		$post_arg = ' << 8';
+		$post_arg .= ' << 8';
 	}
 	elsif ($bytes =~ s/\b N \b/ /x) {
 		$func = 'DO_stmt_n';
@@ -489,7 +502,7 @@ sub opcode_bytes_rule {
 		$opcode_value |= shift @bytes;
 	}
 	
-	push @rules, $func.'(0x'.sprintf('%02X', $opcode_value).$post_arg.');';
+	push @rules, $func.'('.$pre_arg.'0x'.sprintf('%02X', $opcode_value).$post_arg.');';
 	
 	return @rules;
 }
