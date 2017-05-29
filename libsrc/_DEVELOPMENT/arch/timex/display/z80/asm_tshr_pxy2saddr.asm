@@ -1,9 +1,8 @@
-
 ; ===============================================================
-; Jun 2007
+; May 2017
 ; ===============================================================
 ;
-; void *zx_pxy2saddr(uchar x, uchar y)
+; void *tshr_pxy2saddr(uchar x, uchar y)
 ;
 ; Screen address of byte containing pixel at coordinate x, y.
 ;
@@ -12,29 +11,25 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC asm_zx_pxy2saddr
-PUBLIC asm0_zx_pxy2saddr
+PUBLIC asm_tshr_pxy2saddr
 
-asm_zx_pxy2saddr:
+asm_tshr_pxy2saddr:
 
-   ; enter :  l = x coordinate
-   ;          h = valid y coordinate
+   ; enter :  hl = valid x coordinate
+   ;           c = valid y coordinate
    ;
    ; exit  : hl = screen address of byte containing pixel
-   ;          e = x coordinate
-   ;          d = y coordinate
+   ;         de = x coordinate
+   ;          c = y coordinate
    ;
    ; uses  : af, de, hl
    
-   ld a,h
+   ld a,c
    and $07
    or $40
-
-asm0_zx_pxy2saddr:
-
    ld d,a
    
-   ld a,h
+   ld a,c
    rra
    rra
    rra
@@ -42,20 +37,29 @@ asm0_zx_pxy2saddr:
    or d
    ld d,a
    
+   ld a,h
+   rra
    ld a,l
    rra
    rra
    rra
+   rra
+   
+   jr nc, dfile0
+   set 5,d
+
+dfile0:
+
    and $1f
    ld e,a
    
-   ld a,h
+   ld a,c
    add a,a
    add a,a
    and $e0
-
+   
    or e
    ld e,a
-
+   
    ex de,hl
    ret

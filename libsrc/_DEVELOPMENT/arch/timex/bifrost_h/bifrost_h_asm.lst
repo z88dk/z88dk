@@ -1,0 +1,7 @@
+arch/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH
+arch/zx/bifrost_h/z80/asm_BIFROSTH_getAnimGroup
+arch/zx/bifrost_h/z80/asm_BIFROSTH_getTile
+arch/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim2Frames
+arch/zx/bifrost_h/z80/asm_BIFROSTH_resetAnim4Frames
+arch/zx/bifrost_h/z80/asm_BIFROSTH_setTile
+arch/zx/bifrost_h/z80/BIFROSTH_ENGINE
