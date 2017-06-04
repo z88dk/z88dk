@@ -5,7 +5,7 @@
 ;------------------------------------------------------------------------------
 ; 8-bit arithmetic group
 ;------------------------------------------------------------------------------
-		{add adc sub sbc and xor or cp} [a',] {b c d e XH XL (X) a}	=> 80 + $1*8 + $2
+		; {add adc sub sbc and xor or cp} [a',] {b c d e XH XL (X) a}	=> 80 + $1*8 + $2
 		{add adc sub sbc and xor or cp} [a',] N						=> C6 + $1*8, N
 		{inc dec} {b c d e XH XL  .  a}[']							=> 04 + $1 + $2*8
 		{inc dec} {. . . .  .  . (X) .}   							=> 04 + $1 + $2*8

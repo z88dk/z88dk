@@ -21,7 +21,17 @@ ALTD	= Token(0,	"altd",	"_TK_ALTD",		0x76)
 COMMA	= Token(0,	",",	"_TK_COMMA",	0)
 RPAREN	= Token(0,	")",	"_TK_RPAREN",	0)
 LD		= Token(0,	"ld",	"_TK_LD",		0)
-NL		= Token(0,	"",		"_TK_NEWLINE",	0)
+NEWLINE = Token(0,	"",		"_TK_NEWLINE",	0)
+
+ADD		= Token(0,	"add",	"_TK_ADD",		0)
+ADC		= Token(1,	"adc",	"_TK_ADC",		0)
+SUB		= Token(2,	"sub",	"_TK_SUB",		0)
+SBC		= Token(3,	"sbc",	"_TK_SBC",		0)
+AND		= Token(4,	"and",	"_TK_AND",		0)
+XOR		= Token(5,	"xor",	"_TK_XOR",		0)
+OR		= Token(6,	"or",	"_TK_OR",		0)
+CP		= Token(7,	"cp",	"_TK_CP",		0)
+
 expr	= Token(0,	"",		"expr",			0)
 
 B		= Token(0,	"b",	"_TK_B",		0); B.ix = B; B.iy = B
@@ -130,32 +140,10 @@ def emit_rule(cpus, rule_toks, code_toks):
 	code = sp.join(code_toks)
 	rule_line = sp.join(['| label?',
 						 rule,
-						 NL.tok,
+						 NEWLINE.tok,
 						 '@{', cpu_code[cpus], 
 						 code,
 						 '\n}\n\n'])
-	file_rules.write(rule_line)
-
-
-def emit(cpus, asm_toks, bytes, rule_toks, code_toks):
-	asm  = sp.join([x.asm for x in asm_toks])
-	dump = sp.join(["%02X" % x for x in bytes])
-	rule = sp.join([x.tok for x in rule_toks])
-	code = sp.join(code_toks)
-	
-	asm_line = " %-30s ; %s\n" % (asm, dump)
-	for arch in (Z80, Z180, R2K, R3K):
-		if cpus & arch:
-			file_ok[arch].write(asm_line)
-		else:
-			file_err[arch].write(asm_line)
-	
-	rule_line = sp.join(['| label?', '\n',
-						 rule,
-						 NL.tok,
-						 '@{', '\n', cpu_code[cpus], 
-						 code,
-						 '}\n\n'])
 	file_rules.write(rule_line)
 
 def DO(stmt, opcode, prefix=0, dis0=0):
@@ -412,3 +400,138 @@ emit_rule(ALL, [LD, expr, COMMA, A],
 	['\nif (!expr_in_parens) return FALSE;',
 	 DO_stmt_nn(opcode)])
 
+#------------------------------------------------------------------------------
+# 8-bit arithmetic group
+#------------------------------------------------------------------------------
+
+for op in (ADD, ADC, SUB, SBC, AND, XOR, OR, CP):
+	for r in (B, C, D, E, H, L, A):
+		# add a, r
+		opcode = 0x80 + op.n*8 + r.n
+		emit_asm( ALL, "%s a, %s" % (op.asm, r.asm), [opcode])
+		emit_rule(ALL, [op, A, COMMA, r],
+			[DO_stmt(opcode)])
+			
+		# add r
+		emit_asm( ALL, "%s %s" % (op.asm, r.asm), [opcode])
+		emit_rule(ALL, [op, r],
+			[DO_stmt(opcode)])
+			
+		# altd add a, r
+		emit_asm( RABBIT, "altd %s a, %s" % (op.asm, r.asm), [ALTD.prefix, opcode])
+		emit_rule(RABBIT, [ALTD, op, A, COMMA, r],
+			[DO_ALTD(), DO_stmt(opcode)])
+			
+		# altd add r
+		emit_asm( RABBIT, "altd %s %s" % (op.asm, r.asm), [ALTD.prefix, opcode])
+		emit_rule(RABBIT, [ALTD, op, r],
+			[DO_ALTD(), DO_stmt(opcode)])
+			
+		# add a', r
+		emit_asm( RABBIT, "%s a', %s" % (op.asm, r.asm), [ALTD.prefix, opcode])
+		emit_rule(RABBIT, [op, A1, COMMA, r],
+			[DO_ALTD(), DO_stmt(opcode)])
+			
+		dd, fd = r.ix.prefix, r.iy.prefix
+		if dd or fd:
+			# add a, ixh
+			emit_asm( Z80, "%s a, %s" % (op.asm, r.ix.asm), [dd, opcode])
+			emit_rule(Z80, [op, A, COMMA, r.ix],
+				[DO_stmt(opcode, P_IX)])
+				
+			# add ixh
+			emit_asm( Z80, "%s %s" % (op.asm, r.ix.asm), [dd, opcode])
+			emit_rule(Z80, [op, r.ix],
+				[DO_stmt(opcode, P_IX)])
+				
+			# add a, iyh
+			emit_asm( Z80, "%s a, %s" % (op.asm, r.iy.asm), [fd, opcode])
+			emit_rule(Z80, [op, A, COMMA, r.iy],
+				[DO_stmt(opcode, P_IY)])
+				
+			# add iyh
+			emit_asm( Z80, "%s %s" % (op.asm, r.iy.asm), [fd, opcode])
+			emit_rule(Z80, [op, r.iy],
+				[DO_stmt(opcode, P_IY)])
+
+	# add a, (hl)
+	opcode = 0x86 + op.n*8
+	emit_asm( ALL, "%s a, (hl)" % op.asm, [opcode])
+	emit_rule(ALL, [op, A, COMMA, IND_HL, RPAREN],
+		[DO_stmt(opcode)])
+	
+	# add (hl)
+	emit_asm( ALL, "%s (hl)" % op.asm, [opcode])
+	emit_rule(ALL, [op, IND_HL, RPAREN],
+		[DO_stmt(opcode)])
+	
+	# altd add a, (hl)
+	emit_asm( RABBIT, "altd %s a, (hl)" % op.asm, [ALTD.prefix, opcode])
+	emit_rule(RABBIT, [ALTD, op, A, COMMA, IND_HL, RPAREN],
+		[DO_ALTD(), DO_stmt(opcode)])
+		
+	# altd add (hl)
+	emit_asm( RABBIT, "altd %s (hl)" % op.asm, [ALTD.prefix, opcode])
+	emit_rule(RABBIT, [ALTD, op, IND_HL, RPAREN],
+		[DO_ALTD(), DO_stmt(opcode)])
+		
+	# add a', (hl)
+	emit_asm( RABBIT, "%s a', (hl)" % op.asm, [ALTD.prefix, opcode])
+	emit_rule(RABBIT, [op, A1, COMMA, IND_HL, RPAREN],
+		[DO_ALTD(), DO_stmt(opcode)])
+		
+	for x in (IX, IY):
+		# add a, (ix)
+		emit_asm( ALL, "%s a, (%s)" % (op.asm, x.asm), [x.prefix, opcode, 0])
+		emit_rule(ALL, [op, A, COMMA, x.ind, RPAREN],
+			[DO_stmt(opcode, x.p_ix, 1)])
+		
+		# add a, (ix+d)
+		emit_asm( ALL, "%s a, (%s + 127)" % (op.asm, x.asm), [x.prefix, opcode, 0x7F])
+		emit_asm( ALL, "%s a, (%s - 128)" % (op.asm, x.asm), [x.prefix, opcode, 0x80])
+		emit_rule(ALL, [op, A, COMMA, x.ind, expr, RPAREN],
+			[DO_stmt_idx(opcode, x.p_ix)])
+		
+		# add (ix)
+		emit_asm( ALL, "%s (%s)" % (op.asm, x.asm), [x.prefix, opcode, 0])
+		emit_rule(ALL, [op, x.ind, RPAREN],
+			[DO_stmt(opcode, x.p_ix, 1)])
+		
+		# add (ix+d)
+		emit_asm( ALL, "%s (%s + 127)" % (op.asm, x.asm), [x.prefix, opcode, 0x7F])
+		emit_asm( ALL, "%s (%s - 128)" % (op.asm, x.asm), [x.prefix, opcode, 0x80])
+		emit_rule(ALL, [op, x.ind, expr, RPAREN],
+			[DO_stmt_idx(opcode, x.p_ix)])
+		
+		# altd add a, (ix)
+		emit_asm( RABBIT, "altd %s a, (%s)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0])
+		emit_rule(RABBIT, [ALTD, op, A, COMMA, x.ind, RPAREN],
+			[DO_ALTD(), DO_stmt(opcode, x.p_ix, 1)])
+		
+		# altd add a, (ix+d)
+		emit_asm( RABBIT, "altd %s a, (%s + 127)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x7F])
+		emit_asm( RABBIT, "altd %s a, (%s - 128)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x80])
+		emit_rule(RABBIT, [ALTD, op, A, COMMA, x.ind, expr, RPAREN],
+			[DO_ALTD(), DO_stmt_idx(opcode, x.p_ix)])
+		
+		# altd add (ix)
+		emit_asm( RABBIT, "altd %s (%s)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0])
+		emit_rule(RABBIT, [ALTD, op, x.ind, RPAREN],
+			[DO_ALTD(), DO_stmt(opcode, x.p_ix, 1)])
+		
+		# altd add (ix+d)
+		emit_asm( RABBIT, "altd %s (%s + 127)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x7F])
+		emit_asm( RABBIT, "altd %s (%s - 128)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x80])
+		emit_rule(RABBIT, [ALTD, op, x.ind, expr, RPAREN],
+			[DO_ALTD(), DO_stmt_idx(opcode, x.p_ix)])
+		
+		# add a', (ix)
+		emit_asm( RABBIT, "%s a', (%s)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0])
+		emit_rule(RABBIT, [op, A1, COMMA, x.ind, RPAREN],
+			[DO_ALTD(), DO_stmt(opcode, x.p_ix, 1)])
+		
+		# add a', (ix+d)
+		emit_asm( RABBIT, "%s a', (%s + 127)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x7F])
+		emit_asm( RABBIT, "%s a', (%s - 128)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x80])
+		emit_rule(RABBIT, [op, A1, COMMA, x.ind, expr, RPAREN],
+			[DO_ALTD(), DO_stmt_idx(opcode, x.p_ix)])
