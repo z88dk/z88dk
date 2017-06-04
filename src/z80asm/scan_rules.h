@@ -2157,7 +2157,7 @@ tr3:
 tr12:
 	{te = p+1;{
 	sym.tok = TK_IND_BC;
-	;
+	p--; te--;
 	{p++; cs = 21; goto _out;}
 }}
 	goto st21;
@@ -2171,7 +2171,7 @@ tr13:
 tr15:
 	{te = p+1;{
 	sym.tok = TK_IND_DE;
-	;
+	p--; te--;
 	{p++; cs = 21; goto _out;}
 }}
 	goto st21;
@@ -3491,6 +3491,8 @@ case 5:
 		case 9: goto st5;
 		case 32: goto st5;
 		case 41: goto tr12;
+		case 43: goto tr12;
+		case 45: goto tr12;
 	}
 	goto tr3;
 st6:
@@ -3520,6 +3522,8 @@ case 8:
 		case 9: goto st8;
 		case 32: goto st8;
 		case 41: goto tr15;
+		case 43: goto tr15;
+		case 45: goto tr15;
 	}
 	goto tr3;
 st9:

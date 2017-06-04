@@ -140,20 +140,24 @@ tokens:
     regexp	: '"(" hspace "C"i hspace ")"'
 
   # Indirect 16-bit register
-  - name	: IND_BC
-    regexp	: '"(" hspace "BC"i hspace ")"'
-
-  - name	: IND_DE
-    regexp	: '"(" hspace "DE"i hspace ")"'
-
-  - name	: IND_HL
-    regexp	: '"(" hspace "HL"i hspace ")"'
-
-  - name	: IND_SP
-    regexp	: '"(" hspace "SP"i hspace ")"'
-
   # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
   # can collect expression, will be positive or negative depending on symbol
+  - name	: IND_BC
+    regexp	: '"(" hspace "BC"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
+  - name	: IND_DE
+    regexp	: '"(" hspace "DE"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
+  - name	: IND_HL
+    regexp	: '"(" hspace "HL"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
+  - name	: IND_SP
+    regexp	: '"(" hspace "SP"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
   - name	: IND_IX
     regexp	: '"(" hspace "IX"i index_reg_suffix'
     lexcode	: 'p--; te--;'

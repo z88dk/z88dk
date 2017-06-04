@@ -31,7 +31,7 @@ for my $cpu (@CPUS) {
 }
 
 # write parser include
-path("cpu_opcodes.h")->spew_raw(map {"$_\n"} sort @RAGEL_INC);
+path("cpu_opcodes2.h")->spew_raw(map {"$_\n"} sort @RAGEL_INC);
 
 #------------------------------------------------------------------------------
 sub replace_ext {
@@ -410,9 +410,7 @@ sub opcode_tokens_rule {
 		if    (/ \G \s+ 		/gcx)	{	; }		# ignore blanks
 		elsif (/ \G ,   		/gcx)	{ push @tokens, '_TK_COMMA'; }
 		elsif (/ \G \)   		/gcx)	{ push @tokens, '_TK_RPAREN'; }
-		elsif (/ \G \( \s* (hl|ix|iy|sp) \s* \+? /gcx)	
-										{ push @tokens, '_TK_IND_'.uc($1); }
-		elsif (/ \G \( \s* (bc|de) \s* \) \+? /gcx)	
+		elsif (/ \G \( \s* (hl|ix|iy|sp|bc|de) \s* \+? /gcx)	
 										{ push @tokens, '_TK_IND_'.uc($1); }
 		elsif (/ \G [A-Z_]+ 	/gcx)	{ push @tokens, 'expr'; }
 		elsif (/ \G ([a-z0]+)\' /gcx)	{ push @tokens, '_TK_'.uc($1).'1'; }

@@ -656,23 +656,23 @@ t_compile_module($init, <<'END', $objs);
 	
 	SetTemporaryLine("(bc) (de) (hl) (sp) (\t bc \t) (\t de \t) (\t hl \t) (\t sp \t) "
 					 "(BC) (DE) (HL) (SP) (\t BC \t) (\t DE \t) (\t HL \t) (\t SP \t) ");
-	T_GET(TK_IND_BC, "(bc)"); 
-	T_GET(TK_IND_DE, "(de)"); 
+	T_GET(TK_IND_BC, "(bc"); T_RPAREN();
+	T_GET(TK_IND_DE, "(de"); T_RPAREN();
 	T_GET(TK_IND_HL, "(hl"); T_RPAREN();
 	T_GET(TK_IND_SP, "(sp"); T_RPAREN();
 
-	T_GET(TK_IND_BC, "(\t bc \t)"); 
-	T_GET(TK_IND_DE, "(\t de \t)"); 
+	T_GET(TK_IND_BC, "(\t bc \t"); T_RPAREN();
+	T_GET(TK_IND_DE, "(\t de \t"); T_RPAREN();
 	T_GET(TK_IND_HL, "(\t hl \t"); T_RPAREN();
 	T_GET(TK_IND_SP, "(\t sp \t"); T_RPAREN();
 	
-	T_GET(TK_IND_BC, "(BC)"); 
-	T_GET(TK_IND_DE, "(DE)"); 
+	T_GET(TK_IND_BC, "(BC"); T_RPAREN();
+	T_GET(TK_IND_DE, "(DE"); T_RPAREN();
 	T_GET(TK_IND_HL, "(HL"); T_RPAREN();
 	T_GET(TK_IND_SP, "(SP"); T_RPAREN();
 	
-	T_GET(TK_IND_BC, "(\t BC \t)");
-	T_GET(TK_IND_DE, "(\t DE \t)");
+	T_GET(TK_IND_BC, "(\t BC \t"); T_RPAREN();
+	T_GET(TK_IND_DE, "(\t DE \t"); T_RPAREN();
 	T_GET(TK_IND_HL, "(\t HL \t"); T_RPAREN();
 	T_GET(TK_IND_SP, "(\t SP \t"); T_RPAREN();
 	T_END();

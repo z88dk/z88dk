@@ -29,10 +29,10 @@ scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 	
 all : parse_rules.h
 
-cpu_opcodes.h : cpu_opcodes.def cpu_opcodes.pl
+cpu_opcodes2.h : cpu_opcodes.def cpu_opcodes.pl
 	perl cpu_opcodes.pl
 
-cpu_opcodes2.h : cpu_opcodes.py
+cpu_opcodes.h : cpu_opcodes.py
 	python cpu_opcodes.py
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \

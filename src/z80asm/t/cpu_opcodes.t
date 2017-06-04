@@ -60,32 +60,49 @@ for (@CPU) {
 		}
 	}
 	path($bmk_file)->spew_raw($bytes);
-	
 	test_asm($cpu, $asm_file, $err_file, $bmk_file);
-
 	unlink($bmk_file);
 
-	# test cpu* built by cpu_opcodes2.py
+	# test cpu* built by cpu_opcodes.py
 	$asm_file = "t/data/".$cpu."-ok.asm";
 	$err_file = "t/data/".$cpu."-err.asm";
 	$bmk_file = "t/data/".$cpu."-ok.bmk";
 
 	# build bmk
-	$bytes = '';
-	for (path($asm_file)->lines) {
-		s/.*;\s*//;
-		for (split(' ', $_)) {
-			$bytes .= chr(hex($_));
-		}
-	}
-	path($bmk_file)->spew_raw($bytes);
-	
-	test_asm($cpu, $asm_file, $err_file, $bmk_file);
+	($bytes, my $bytes_ixiy) = get_bytes($asm_file);
 
+	path($bmk_file)->spew_raw($bytes);
+	test_asm($cpu, $asm_file, $err_file, $bmk_file);
+	unlink($bmk_file);
+
+	path($bmk_file)->spew_raw($bytes_ixiy);
+	test_asm($cpu, $asm_file, $err_file, $bmk_file, "--IXIY");
 	unlink($bmk_file);
 }
 
 done_testing;
+
+sub get_bytes {
+	my($asm_file) = @_;
+	my $bytes = '';
+	my $bytes_ixiy = '';
+	for (path($asm_file)->lines) {
+		s/.*;\s*//;
+		
+		my $line_bytes = '';
+		for (split(' ', $_)) {
+			$line_bytes .= chr(hex($_));
+		}
+		
+		$bytes .= $line_bytes;
+		
+		# compute swapped ix/iy
+		$line_bytes =~ s/^(\x76?)([\xDD\xFD])/$1 . ($2 eq chr(0xDD) ? chr(0xFD) : chr(0xDD))/e;
+		$bytes_ixiy .= $line_bytes;
+	}
+	
+	return ($bytes, $bytes_ixiy);
+}
 
 sub parse {
 	my($cpu, @lines) = @_;
@@ -239,11 +256,12 @@ sub split_exprs {
 }
 
 sub test_asm {
-	my($cpu, $asm_file, $err_file, $bmk_file) = @_;
+	my($cpu, $asm_file, $err_file, $bmk_file, $options) = @_;
 	for ($asm_file, $err_file, $bmk_file) { $_ = path($_); }
+	$options //= '';
 	
 	# build OK
-	my $cmd = "./z80asm --cpu=$cpu -l -b --no-emul $asm_file";
+	my $cmd = "./z80asm --cpu=$cpu -l -b --no-emul $options $asm_file";
 	ok 1, $cmd;
 	my($out, $err, $exit) = capture { system($cmd) };
 	$err =~ s/^Warning .* interpreting indirect value as immediate\s*//gm;

@@ -146,54 +146,10 @@
  altd inc iyh
  altd inc iyl
  altd inc l
- altd ld a, (4660)
- altd ld a, (bc)
- altd ld a, (de)
- altd ld a, (hl)
- altd ld a, (ix)
- altd ld a, (ix+127)
- altd ld a, (iy)
- altd ld a, (iy+127)
- altd ld a, 42
- altd ld b, (42)
- altd ld b, (hl)
- altd ld b, (ix)
- altd ld b, (ix+127)
- altd ld b, (iy)
- altd ld b, (iy+127)
- altd ld b, 42
  altd ld bc, (4660)
  altd ld bc, 4660
- altd ld c, (42)
- altd ld c, (hl)
- altd ld c, (ix)
- altd ld c, (ix+127)
- altd ld c, (iy)
- altd ld c, (iy+127)
- altd ld c, 42
- altd ld d, (42)
- altd ld d, (hl)
- altd ld d, (ix)
- altd ld d, (ix+127)
- altd ld d, (iy)
- altd ld d, (iy+127)
- altd ld d, 42
  altd ld de, (4660)
  altd ld de, 4660
- altd ld e, (42)
- altd ld e, (hl)
- altd ld e, (ix)
- altd ld e, (ix+127)
- altd ld e, (iy)
- altd ld e, (iy+127)
- altd ld e, 42
- altd ld h, (42)
- altd ld h, (hl)
- altd ld h, (ix)
- altd ld h, (ix+127)
- altd ld h, (iy)
- altd ld h, (iy+127)
- altd ld h, 42
  altd ld hl, (4660)
  altd ld hl, (hl)
  altd ld hl, (hl+127)
@@ -206,23 +162,8 @@
  altd ld hl, iy
  altd ld ix, (4660)
  altd ld ix, 4660
- altd ld ixh, (42)
- altd ld ixh, 42
- altd ld ixl, (42)
- altd ld ixl, 42
  altd ld iy, (4660)
  altd ld iy, 4660
- altd ld iyh, (42)
- altd ld iyh, 42
- altd ld iyl, (42)
- altd ld iyl, 42
- altd ld l, (42)
- altd ld l, (hl)
- altd ld l, (ix)
- altd ld l, (ix+127)
- altd ld l, (iy)
- altd ld l, (iy+127)
- altd ld l, 42
  altd ld sp, (4660)
  altd ld sp, 4660
  altd neg a
@@ -395,61 +336,16 @@
  ld (ix+127), hl
  ld (iy), hl
  ld (iy+127), hl
- ld 4660, a
  ld 4660, bc
  ld 4660, de
  ld 4660, hl
  ld 4660, ix
  ld 4660, iy
  ld 4660, sp
- ld a', (4660)
- ld a', (bc)
- ld a', (de)
- ld a', (hl)
- ld a', (ix)
- ld a', (ix+127)
- ld a', (iy)
- ld a', (iy+127)
- ld a', 42
- ld b', (42)
- ld b', (hl)
- ld b', (ix)
- ld b', (ix+127)
- ld b', (iy)
- ld b', (iy+127)
- ld b', 42
  ld bc', (4660)
  ld bc', 4660
- ld c', (42)
- ld c', (hl)
- ld c', (ix)
- ld c', (ix+127)
- ld c', (iy)
- ld c', (iy+127)
- ld c', 42
- ld d', (42)
- ld d', (hl)
- ld d', (ix)
- ld d', (ix+127)
- ld d', (iy)
- ld d', (iy+127)
- ld d', 42
  ld de', (4660)
  ld de', 4660
- ld e', (42)
- ld e', (hl)
- ld e', (ix)
- ld e', (ix+127)
- ld e', (iy)
- ld e', (iy+127)
- ld e', 42
- ld h', (42)
- ld h', (hl)
- ld h', (ix)
- ld h', (ix+127)
- ld h', (iy)
- ld h', (iy+127)
- ld h', 42
  ld hl', (4660)
  ld hl', (hl)
  ld hl', (hl+127)
@@ -471,32 +367,9 @@
  ld ix', (4660)
  ld ix', 4660
  ld ix, hl
- ld ixh', (42)
- ld ixh', 42
- ld ixh, (42)
- ld ixh, 42
- ld ixl', (42)
- ld ixl', 42
- ld ixl, (42)
- ld ixl, 42
  ld iy', (4660)
  ld iy', 4660
  ld iy, hl
- ld iyh', (42)
- ld iyh', 42
- ld iyh, (42)
- ld iyh, 42
- ld iyl', (42)
- ld iyl', 42
- ld iyl, (42)
- ld iyl, 42
- ld l', (42)
- ld l', (hl)
- ld l', (ix)
- ld l', (ix+127)
- ld l', (iy)
- ld l', (iy+127)
- ld l', 42
  ld sp', (4660)
  ld sp', 4660
  ldp (4660), hl

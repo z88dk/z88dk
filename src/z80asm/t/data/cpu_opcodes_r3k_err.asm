@@ -48,16 +48,8 @@
  altd inc iyl
  altd ld ix, (4660)
  altd ld ix, 4660
- altd ld ixh, (42)
- altd ld ixh, 42
- altd ld ixl, (42)
- altd ld ixl, 42
  altd ld iy, (4660)
  altd ld iy, 4660
- altd ld iyh, (42)
- altd ld iyh, 42
- altd ld iyl, (42)
- altd ld iyl, 42
  altd ld sp, (4660)
  altd ld sp, 4660
  altd or a, ixh
@@ -117,7 +109,6 @@
  inc iyh'
  inc iyl
  inc iyl'
- ld 4660, a
  ld 4660, bc
  ld 4660, de
  ld 4660, hl
@@ -126,24 +117,8 @@
  ld 4660, sp
  ld ix', (4660)
  ld ix', 4660
- ld ixh', (42)
- ld ixh', 42
- ld ixh, (42)
- ld ixh, 42
- ld ixl', (42)
- ld ixl', 42
- ld ixl, (42)
- ld ixl, 42
  ld iy', (4660)
  ld iy', 4660
- ld iyh', (42)
- ld iyh', 42
- ld iyh, (42)
- ld iyh, 42
- ld iyl', (42)
- ld iyl', 42
- ld iyl, (42)
- ld iyl, 42
  ld sp', (4660)
  ld sp', 4660
  ldp 4660, hl

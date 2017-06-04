@@ -186,11 +186,10 @@ TOKEN(TK_HL1, "HL'", )
 TOKEN(TK_AF1, "AF'", )
 
 /* indirect 16-bit registers */
-TOKEN_RE(TK_IND_BC, "(BC)", "(" hspace "BC"i hspace ")", )
-TOKEN_RE(TK_IND_DE, "(DE)", "(" hspace "DE"i hspace ")", )
-
 /* TK_IND_IX|IY|HL is followed by ')', '+' or '-', but follow char is not matched - 
 *  can collect expression, will be positive or negative depending on symbol */
+TOKEN_RE(TK_IND_BC, "(BC", "(" hspace "BC"i index_reg_suffix, p--; te--)
+TOKEN_RE(TK_IND_DE, "(DE", "(" hspace "DE"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HL, "(HL", "(" hspace "HL"i index_reg_suffix, p--; te--)
