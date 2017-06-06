@@ -1640,6 +1640,9 @@ void do_help_page() {
 
 void do_preview_page() {
 	int x,y,spcount, xmargin, ymargin;
+	char text[100];
+	int cksum;
+	cksum=0;
 	
 	al_clear_to_color (al_map_rgb(230,240,250) );
 	spcount=0;
@@ -1651,8 +1654,10 @@ void do_preview_page() {
 	for ( x = 1; x <= sprite[ on_sprite + spcount ].size_x; x++ )
 		for ( y = 1; y <= sprite[ on_sprite + spcount ].size_y; y++ )
 			if ( sprite[ on_sprite + spcount ].p[ x ][ y ] )
-				if ((xmargin+x+1<720)&&(ymargin+y+1<520))
+				if ((xmargin+x+1<720)&&(ymargin+y+1<520)) {
 					al_draw_filled_rectangle( xmargin+x , ymargin+y , xmargin+x+1 , ymargin+y+1 , al_map_rgb(0, 0, 0) );
+					cksum++;
+				}
 	xmargin+= sprite[ on_sprite + spcount ].size_x;
 	if (xmargin >=720){
 		ymargin+=sprite[ on_sprite + spcount ].size_y;;
@@ -1660,6 +1665,10 @@ void do_preview_page() {
 	}
 	spcount++;
 	}
+
+	sprintf( text, "Cksum: %i", cksum );
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 485, ALLEGRO_ALIGN_LEFT, text);
+
 	al_flip_display();
 
 	do {

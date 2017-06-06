@@ -2,8 +2,11 @@
 *.asm   text eol=lf
 *.bmk   text eol=lf
 *.c     text eol=lf
+*.cpp   text eol=lf
+*.def   text eol=lf
 *.h     text eol=lf
 *.pl    text eol=lf
+*.py    text eol=lf
 *.pm    text eol=lf
 *.rl    text eol=lf
 *.t     text eol=lf
