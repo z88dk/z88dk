@@ -6621,3 +6621,143 @@ if ((opts.cpu & (CPU_Z80)) != 0) { error_illegal_ident(); return FALSE; }
 DO_stmt_n(0xED64); 
 }
 
+/* daa */
+| label? _TK_DAA _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x27); 
+}
+
+/* rrd */
+| label? _TK_RRD _TK_NEWLINE @{  
+DO_stmt_emul(0xED67, rcmx_rrd); 
+}
+
+/* rld */
+| label? _TK_RLD _TK_NEWLINE @{  
+DO_stmt_emul(0xED6F, rcmx_rld); 
+}
+
+/* cpl */
+| label? _TK_CPL _TK_NEWLINE @{  
+DO_stmt(0x2F); 
+}
+
+/* cpl a */
+| label? _TK_CPL _TK_A _TK_NEWLINE @{  
+DO_stmt(0x2F); 
+}
+
+/* altd cpl a */
+| label? _TK_ALTD _TK_CPL _TK_A _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x2F); 
+}
+
+/* altd cpl */
+| label? _TK_ALTD _TK_CPL _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x2F); 
+}
+
+/* cpl a' */
+| label? _TK_CPL _TK_A1 _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x2F); 
+}
+
+/* neg */
+| label? _TK_NEG _TK_NEWLINE @{  
+DO_stmt(0xED44); 
+}
+
+/* neg a */
+| label? _TK_NEG _TK_A _TK_NEWLINE @{  
+DO_stmt(0xED44); 
+}
+
+/* altd neg a */
+| label? _TK_ALTD _TK_NEG _TK_A _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0xED44); 
+}
+
+/* altd neg */
+| label? _TK_ALTD _TK_NEG _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0xED44); 
+}
+
+/* neg a' */
+| label? _TK_NEG _TK_A1 _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0xED44); 
+}
+
+/* ccf */
+| label? _TK_CCF _TK_NEWLINE @{  
+DO_stmt(0x3F); 
+}
+
+/* ccf f */
+| label? _TK_CCF _TK_F _TK_NEWLINE @{  
+DO_stmt(0x3F); 
+}
+
+/* altd ccf f */
+| label? _TK_ALTD _TK_CCF _TK_F _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x3F); 
+}
+
+/* altd ccf */
+| label? _TK_ALTD _TK_CCF _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x3F); 
+}
+
+/* ccf f' */
+| label? _TK_CCF _TK_F1 _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x3F); 
+}
+
+/* scf */
+| label? _TK_SCF _TK_NEWLINE @{  
+DO_stmt(0x37); 
+}
+
+/* scf f */
+| label? _TK_SCF _TK_F _TK_NEWLINE @{  
+DO_stmt(0x37); 
+}
+
+/* altd scf f */
+| label? _TK_ALTD _TK_SCF _TK_F _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x37); 
+}
+
+/* altd scf */
+| label? _TK_ALTD _TK_SCF _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x37); 
+}
+
+/* scf f' */
+| label? _TK_SCF _TK_F1 _TK_NEWLINE @{ 
+if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; } 
+DO_stmt(0x76); 
+DO_stmt(0x37); 
+}
+

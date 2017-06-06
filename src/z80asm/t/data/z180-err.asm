@@ -766,3 +766,15 @@
  dec iyl                        ; FD 2D
  altd dec a                     ; 76 3D
  dec a'                         ; 76 3D
+ altd cpl a                     ; 76 2F
+ altd cpl                       ; 76 2F
+ cpl a'                         ; 76 2F
+ altd neg a                     ; 76 ED 44
+ altd neg                       ; 76 ED 44
+ neg a'                         ; 76 ED 44
+ altd ccf f                     ; 76 3F
+ altd ccf                       ; 76 3F
+ ccf f'                         ; 76 3F
+ altd scf f                     ; 76 37
+ altd scf                       ; 76 37
+ scf f'                         ; 76 37

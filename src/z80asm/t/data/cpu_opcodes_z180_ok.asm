@@ -1,8 +1,3 @@
- ccf                    ;; 3F
- ccf f                  ;; 3F
- cpl                    ;; 2F
- cpl a                  ;; 2F
- daa                    ;; 27
  ld (4660), bc          ;; ED 43 34 12
  ld (4660), de          ;; ED 53 34 12
  ld (4660), hl          ;; 22 34 12
@@ -24,8 +19,6 @@
  ld sp, hl              ;; F9
  ld sp, ix              ;; DD F9
  ld sp, iy              ;; FD F9
- neg                    ;; ED 44
- neg a                  ;; ED 44
  pop af                 ;; F1
  pop bc                 ;; C1
  pop de                 ;; D1
@@ -38,7 +31,3 @@
  push hl                ;; E5
  push ix                ;; DD E5
  push iy                ;; FD E5
- rld                    ;; ED 6F
- rrd                    ;; ED 67
- scf                    ;; 37
- scf f                  ;; 37

@@ -583,3 +583,14 @@
  dec (iy)                       ; FD 35 00
  dec (iy + 127)                 ; FD 35 7F
  dec (iy - 128)                 ; FD 35 80
+ daa                            ; 27
+ rrd                            ; ED 67
+ rld                            ; ED 6F
+ cpl                            ; 2F
+ cpl a                          ; 2F
+ neg                            ; ED 44
+ neg a                          ; ED 44
+ ccf                            ; 3F
+ ccf f                          ; 3F
+ scf                            ; 37
+ scf f                          ; 37

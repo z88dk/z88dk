@@ -126,3 +126,6 @@
  dec iyh                        ; FD 25
  dec ixl                        ; DD 2D
  dec iyl                        ; FD 2D
+ daa                            ; 27
+ rrd                            ; ED 67
+ rld                            ; ED 6F

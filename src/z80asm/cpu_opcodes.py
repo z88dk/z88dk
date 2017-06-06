@@ -17,69 +17,79 @@ class Token:
 		self.tok	= tok
 		self.prefix	= prefix
 
-ALTD	= Token(0,	"altd",	"_TK_ALTD",		0x76)
-COMMA	= Token(0,	",",	"_TK_COMMA",	0)
-RPAREN	= Token(0,	")",	"_TK_RPAREN",	0)
-LD		= Token(0,	"ld",	"_TK_LD",		0)
-NEWLINE = Token(0,	"",		"_TK_NEWLINE",	0)
+ALTD	= Token(0,		"altd",	"_TK_ALTD",		0x76)
+COMMA	= Token(0,		",",	"_TK_COMMA",	0)
+RPAREN	= Token(0,		")",	"_TK_RPAREN",	0)
+LD		= Token(0,		"ld",	"_TK_LD",		0)
+NEWLINE = Token(0,		"",		"_TK_NEWLINE",	0)
+	
+ADD		= Token(0,		"add",	"_TK_ADD",		0)
+ADC		= Token(1,		"adc",	"_TK_ADC",		0)
+SUB		= Token(2,		"sub",	"_TK_SUB",		0)
+SBC		= Token(3,		"sbc",	"_TK_SBC",		0)
+AND		= Token(4,		"and",	"_TK_AND",		0)
+XOR		= Token(5,		"xor",	"_TK_XOR",		0)
+OR		= Token(6,		"or",	"_TK_OR",		0)
+CP		= Token(7,		"cp",	"_TK_CP",		0)
+	
+INC		= Token(0,		"inc",	"_TK_INC",		0)
+DEC		= Token(1,		"dec",	"_TK_DEC",		0)
 
-ADD		= Token(0,	"add",	"_TK_ADD",		0)
-ADC		= Token(1,	"adc",	"_TK_ADC",		0)
-SUB		= Token(2,	"sub",	"_TK_SUB",		0)
-SBC		= Token(3,	"sbc",	"_TK_SBC",		0)
-AND		= Token(4,	"and",	"_TK_AND",		0)
-XOR		= Token(5,	"xor",	"_TK_XOR",		0)
-OR		= Token(6,	"or",	"_TK_OR",		0)
-CP		= Token(7,	"cp",	"_TK_CP",		0)
+TST		= Token(0,		"tst",	"_TK_TST",		0)
 
-INC		= Token(0,	"inc",	"_TK_INC",		0)
-DEC		= Token(1,	"dec",	"_TK_DEC",		0)
-
-TST		= Token(0,	"tst",	"_TK_TST",		0)
-
-expr	= Token(0,	"",		"expr",			0)
-
-B		= Token(0,	"b",	"_TK_B",		0); B.ix = B; B.iy = B
-C		= Token(1,	"c",	"_TK_C",		0); C.ix = C; C.iy = C
-D		= Token(2,	"d",	"_TK_D",		0); D.ix = D; D.iy = D
-E		= Token(3,	"e",	"_TK_E",		0); E.ix = E; E.iy = E
-H		= Token(4,	"h",	"_TK_H",		0); H.ix = H; H.iy = H
-L		= Token(5,	"l",	"_TK_L",		0); L.ix = L; L.iy = L
-A		= Token(7,	"a",	"_TK_A",		0); A.ix = A; A.iy = A
-
-B1		= Token(0,	"b'",	"_TK_B1",		0x76); B.alt = B1
-C1		= Token(1,	"c'",	"_TK_C1",		0x76); C.alt = C1
-D1		= Token(2,	"d'",	"_TK_D1",		0x76); D.alt = D1
-E1		= Token(3,	"e'",	"_TK_E1",		0x76); E.alt = E1
-H1		= Token(4,	"h'",	"_TK_H1",		0x76); H.alt = H1
-L1		= Token(5,	"l'",	"_TK_L1",		0x76); L.alt = L1
-A1		= Token(7,	"a'",	"_TK_A1",		0x76); A.alt = A1
-
-IXH		= Token(4,	"ixh",	"_TK_IXH",		0xDD); H.ix = IXH
-IXL		= Token(5,	"ixl",	"_TK_IXL",		0xDD); L.ix = IXL
-
-IYH		= Token(4,	"iyh",	"_TK_IYH",		0xFD); H.iy = IYH
-IYL		= Token(5,	"iyl",	"_TK_IYL",		0xFD); L.iy = IYL
-
-BC		= Token(0,	"bc",	"_TK_BC",		0)
-DE		= Token(1,	"de",	"_TK_DE",		0)
-HL		= Token(2,	"hl",	"_TK_HL",		0)   ; HL.p_ix = 0
-SP		= Token(3,	"sp",	"_TK_SP",		0)
-AF		= Token(3,	"af",	"_TK_AF",		0)
-IX		= Token(2,	"ix",	"_TK_IX",		0xDD); IX.p_ix = P_IX
-IY		= Token(2,	"iy",	"_TK_IY",		0xFD); IY.p_ix = P_IY
-
-BC1		= Token(0,	"bc'",	"_TK_BC1",		0)   ; BC.alt = BC1
-DE1		= Token(1,	"de'",	"_TK_DE1",		0)   ; DE.alt = DE1
-HL1		= Token(2,	"hl'",	"_TK_HL1",		0)   ; HL.alt = HL1
-AF1		= Token(3,	"af'",	"_TK_AF1",		0)   ; AF.alt = AF1
-
-IND_BC	= Token(0,	"(bc",	"_TK_IND_BC",	0)   ; BC.ind = IND_BC
-IND_DE	= Token(1,	"(de",	"_TK_IND_DE",	0)   ; DE.ind = IND_DE
-IND_HL	= Token(2,	"(hl",	"_TK_IND_HL",	0)   ; HL.ind = IND_HL
-IND_SP	= Token(3,	"(sp",	"_TK_IND_SP",	0)   ; SP.ind = IND_SP
-IND_IX	= Token(2,	"(ix",	"_TK_IND_IX",	0xDD); IX.ind = IND_IX
-IND_IY	= Token(2,	"(iy",	"_TK_IND_IY",	0xFD); IY.ind = IND_IY
+CCF		= Token(0x3F,	"ccf",	"_TK_CCF",		0)
+CPL		= Token(0x2F,	"cpl",	"_TK_CPL",		0)
+DAA		= Token(0x27,	"daa",	"_TK_DAA",		0)
+NEG		= Token(0x44,	"neg",	"_TK_NEG",		0)
+RLD		= Token(0x6F,	"rld",	"_TK_RLD",		0)
+RRD		= Token(0x67,	"rrd",	"_TK_RRD",		0)
+SCF		= Token(0x37,	"scf",	"_TK_SCF",		0)
+	
+expr	= Token(0,		"",		"expr",			0)
+	
+B		= Token(0,		"b",	"_TK_B",		0); B.ix = B; B.iy = B
+C		= Token(1,		"c",	"_TK_C",		0); C.ix = C; C.iy = C
+D		= Token(2,		"d",	"_TK_D",		0); D.ix = D; D.iy = D
+E		= Token(3,		"e",	"_TK_E",		0); E.ix = E; E.iy = E
+H		= Token(4,		"h",	"_TK_H",		0); H.ix = H; H.iy = H
+L		= Token(5,		"l",	"_TK_L",		0); L.ix = L; L.iy = L
+A		= Token(7,		"a",	"_TK_A",		0); A.ix = A; A.iy = A
+F		= Token(0,		"f",	"_TK_F",		0); F.ix = F; F.iy = F
+	
+B1		= Token(0,		"b'",	"_TK_B1",		0x76); B.alt = B1
+C1		= Token(1,		"c'",	"_TK_C1",		0x76); C.alt = C1
+D1		= Token(2,		"d'",	"_TK_D1",		0x76); D.alt = D1
+E1		= Token(3,		"e'",	"_TK_E1",		0x76); E.alt = E1
+H1		= Token(4,		"h'",	"_TK_H1",		0x76); H.alt = H1
+L1		= Token(5,		"l'",	"_TK_L1",		0x76); L.alt = L1
+A1		= Token(7,		"a'",	"_TK_A1",		0x76); A.alt = A1
+F1		= Token(0,		"f'",	"_TK_F1",		0x76); F.alt = F1
+	
+IXH		= Token(4,		"ixh",	"_TK_IXH",		0xDD); H.ix = IXH
+IXL		= Token(5,		"ixl",	"_TK_IXL",		0xDD); L.ix = IXL
+	
+IYH		= Token(4,		"iyh",	"_TK_IYH",		0xFD); H.iy = IYH
+IYL		= Token(5,		"iyl",	"_TK_IYL",		0xFD); L.iy = IYL
+	
+BC		= Token(0,		"bc",	"_TK_BC",		0)
+DE		= Token(1,		"de",	"_TK_DE",		0)
+HL		= Token(2,		"hl",	"_TK_HL",		0)   ; HL.p_ix = 0
+SP		= Token(3,		"sp",	"_TK_SP",		0)
+AF		= Token(3,		"af",	"_TK_AF",		0)
+IX		= Token(2,		"ix",	"_TK_IX",		0xDD); IX.p_ix = P_IX
+IY		= Token(2,		"iy",	"_TK_IY",		0xFD); IY.p_ix = P_IY
+	
+BC1		= Token(0,		"bc'",	"_TK_BC1",		0)   ; BC.alt = BC1
+DE1		= Token(1,		"de'",	"_TK_DE1",		0)   ; DE.alt = DE1
+HL1		= Token(2,		"hl'",	"_TK_HL1",		0)   ; HL.alt = HL1
+AF1		= Token(3,		"af'",	"_TK_AF1",		0)   ; AF.alt = AF1
+	
+IND_BC	= Token(0,		"(bc",	"_TK_IND_BC",	0)   ; BC.ind = IND_BC
+IND_DE	= Token(1,		"(de",	"_TK_IND_DE",	0)   ; DE.ind = IND_DE
+IND_HL	= Token(2,		"(hl",	"_TK_IND_HL",	0)   ; HL.ind = IND_HL
+IND_SP	= Token(3,		"(sp",	"_TK_IND_SP",	0)   ; SP.ind = IND_SP
+IND_IX	= Token(2,		"(ix",	"_TK_IND_IX",	0xDD); IX.ind = IND_IX
+IND_IY	= Token(2,		"(iy",	"_TK_IND_IY",	0xFD); IY.ind = IND_IY
 
 sp = " "
 
@@ -133,7 +143,7 @@ file_rules 		= open("cpu_opcodes.h", "w")
 def emit_asm(cpus, asm, bytes):
 	bytes_dump = sp.join(["%02X" % x for x in bytes])
 	asm_line = " %-30s ; %s\n" % (asm, bytes_dump)
-	for arch in (Z80, Z180, R2K, R3K):
+	for arch in [Z80, Z180, R2K, R3K]:
 		if cpus & arch:
 			file_ok[arch].write(asm_line)
 		else:
@@ -174,6 +184,9 @@ def DO_stmt_idx(opcode, prefix=0, dis0=0):
 def DO_stmt_idx_n(opcode, prefix=0, dis0=0):
 	return DO('DO_stmt_idx_n', opcode, prefix, dis0)
 
+def DO_stmt_emul(opcode, func):
+	return '\nDO_stmt_emul(0x%02X, %s);' % (opcode, func)
+
 def DO_ALTD():
 	return DO_stmt(ALTD.prefix)
 
@@ -181,8 +194,8 @@ def DO_ALTD():
 # 8-bit load group
 #------------------------------------------------------------------------------
 
-for r1 in (B, C, D, E, H, L, A):
-	for r2 in (B, C, D, E, H, L, A):
+for r1 in [B, C, D, E, H, L, A]:
+	for r2 in [B, C, D, E, H, L, A]:
 		opcode = 0x40 + r1.n*8 + r2.n
 		
 		# ld r,r
@@ -303,7 +316,7 @@ for r1 in (B, C, D, E, H, L, A):
 	emit_rule(RABBIT, [LD, r1.alt, COMMA, HL.ind, RPAREN],
 		[DO_ALTD(), DO_stmt(opcode)])
 		 
-	for x in (IX, IY):
+	for x in [IX, IY]:
 		# ld r, (ix)
 		emit_asm( ALL, "ld %s, (%s)" % (r1.asm, x.asm), [x.prefix, opcode, 0])
 		emit_rule(ALL, [LD, r1, COMMA, x.ind, RPAREN],
@@ -343,7 +356,7 @@ for r1 in (B, C, D, E, H, L, A):
 	emit_rule(ALL, [LD, HL.ind, RPAREN, COMMA, r1],
 		[DO_stmt(opcode)])
 	
-	for x in (IX, IY):
+	for x in [IX, IY]:
 		# ld (ix), r
 		emit_asm( ALL, "ld (%s), %s" % (x.asm, r1.asm), [x.prefix, opcode, 0])
 		emit_rule(ALL, [LD, x.ind, RPAREN, COMMA, r1],
@@ -361,7 +374,7 @@ emit_rule(ALL, [LD, HL.ind, RPAREN, COMMA, expr],
 	['\nif (expr_in_parens) warn_expr_in_parens();',
 	 DO_stmt_n(0x36)])
 	 
-for x in (IX, IY):
+for x in [IX, IY]:
 	# ld (ix | iy), N
 	emit_asm( ALL, "ld (%s), 42" % x.asm, [x.prefix, 0x36, 0, 42])
 	emit_rule(ALL, [LD, x.ind, RPAREN, COMMA, expr],
@@ -375,7 +388,7 @@ for x in (IX, IY):
 		['\nif (expr_in_parens) warn_expr_in_parens();',
 		 DO_stmt_idx_n(0x36, x.p_ix)])
 		 
-for x in (BC, DE):
+for x in [BC, DE]:
 	# ld (bc | de), a
 	opcode = 0x02 + x.n*16
 	emit_asm( ALL, "ld (%s), a" % x.asm, [opcode])
@@ -409,8 +422,8 @@ emit_rule(ALL, [LD, expr, COMMA, A],
 # 8-bit arithmetic group
 #------------------------------------------------------------------------------
 
-for op in (ADD, ADC, SUB, SBC, AND, XOR, OR, CP):
-	for r in (B, C, D, E, H, L, A):
+for op in [ADD, ADC, SUB, SBC, AND, XOR, OR, CP]:
+	for r in [B, C, D, E, H, L, A]:
 		# add a, r
 		opcode = 0x80 + op.n*8 + r.n
 		emit_asm( ALL, "%s a, %s" % (op.asm, r.asm), [opcode])
@@ -485,7 +498,7 @@ for op in (ADD, ADC, SUB, SBC, AND, XOR, OR, CP):
 	emit_rule(RABBIT, [op, A1, COMMA, IND_HL, RPAREN],
 		[DO_ALTD(), DO_stmt(opcode)])
 		
-	for x in (IX, IY):
+	for x in [IX, IY]:
 		# add a, (ix)
 		emit_asm( ALL, "%s a, (%s)" % (op.asm, x.asm), [x.prefix, opcode, 0])
 		emit_rule(ALL, [op, A, COMMA, x.ind, RPAREN],
@@ -572,8 +585,8 @@ for op in (ADD, ADC, SUB, SBC, AND, XOR, OR, CP):
 	emit_rule(RABBIT, [op, A1, COMMA, expr],
 		[DO_ALTD(), DO_stmt_n(opcode)])
 		
-for op in (INC, DEC):
-	for r in (B, C, D, E, H, L, A):
+for op in [INC, DEC]:
+	for r in [B, C, D, E, H, L, A]:
 		# inc r
 		opcode = 0x04 + op.n + r.n*8
 		emit_asm( ALL, "%s %s" % (op.asm, r.asm), [opcode])
@@ -608,7 +621,7 @@ for op in (INC, DEC):
 	emit_rule(ALL, [op, IND_HL, RPAREN],
 		[DO_stmt(opcode)])
 	
-	for x in (IX, IY):
+	for x in [IX, IY]:
 		# inc (ix)
 		emit_asm( ALL, "%s (%s)" % (op.asm, x.asm), [x.prefix, opcode, 0])
 		emit_rule(ALL, [op, x.ind, RPAREN],
@@ -620,7 +633,7 @@ for op in (INC, DEC):
 		emit_rule(ALL, [op, x.ind, expr, RPAREN],
 			[DO_stmt_idx(opcode, x.p_ix)])
 
-for r in (B, C, D, E, H, L, A):
+for r in [B, C, D, E, H, L, A]:
 	# tst a, r
 	opcode = 0x04 + r.n*8
 	emit_asm( NOT_Z80, "tst a, %s" % r.asm, [0xED, opcode])
@@ -655,4 +668,99 @@ emit_asm( NOT_Z80, "tst  42 ", [0xED, opcode, 42])
 emit_asm( NOT_Z80, "tst (42)", [0xED, opcode, 42])
 emit_rule(NOT_Z80, [TST, expr],
 	[DO_stmt_n(0xED00 + opcode)])
+		
+
+#------------------------------------------------------------------------------
+# General-Purpose Arithmetic Group
+#------------------------------------------------------------------------------
+
+for op in [DAA]:
+	# daa
+	emit_asm( ZILOG, op.asm, [op.n])
+	emit_rule(ZILOG, [op],
+		[DO_stmt(op.n)])
+		
+for op in [RRD, RLD]:
+	# rrd / rld : only exist in ZILOG, but emulated in RABBIT
+	emit_asm( ZILOG, op.asm, [0xED, op.n])
+	emit_rule(ALL, [op],
+		[DO_stmt_emul(0xED00 + op.n, 'rcmx_' + op.asm)])
+
+for op in [CPL]:
+	# cpl
+	emit_asm( ALL, op.asm, [op.n])
+	emit_rule(ALL, [op],
+		[DO_stmt(op.n)])
+		
+	# cpl a
+	emit_asm( ALL, "%s a" % op.asm, [op.n])
+	emit_rule(ALL, [op, A],
+		[DO_stmt(op.n)])
+		
+	# altd cpl a
+	emit_asm( RABBIT, "altd %s a" % op.asm, [ALTD.prefix, op.n])
+	emit_rule(RABBIT, [ALTD, op, A],
+		[DO_ALTD(), DO_stmt(op.n)])
+		
+	# altd cpl
+	emit_asm( RABBIT, "altd %s" % op.asm, [ALTD.prefix, op.n])
+	emit_rule(RABBIT, [ALTD, op],
+		[DO_ALTD(), DO_stmt(op.n)])
+		
+	# cpl a'
+	emit_asm( RABBIT, "%s a'" % op.asm, [ALTD.prefix, op.n])
+	emit_rule(RABBIT, [op, A1],
+		[DO_ALTD(), DO_stmt(op.n)])
+		
+for op in [NEG]:
+	# neg
+	emit_asm( ALL, op.asm, [0xED, op.n])
+	emit_rule(ALL, [op],
+		[DO_stmt(0xED00 + op.n)])
+		
+	# neg a
+	emit_asm( ALL, "%s a" % op.asm, [0xED, op.n])
+	emit_rule(ALL, [op, A],
+		[DO_stmt(0xED00 + op.n)])
+		
+	# altd neg a
+	emit_asm( RABBIT, "altd %s a" % op.asm, [ALTD.prefix, 0xED, op.n])
+	emit_rule(RABBIT, [ALTD, op, A],
+		[DO_ALTD(), DO_stmt(0xED00 + op.n)])
+		
+	# altd neg
+	emit_asm( RABBIT, "altd %s" % op.asm, [ALTD.prefix, 0xED, op.n])
+	emit_rule(RABBIT, [ALTD, op],
+		[DO_ALTD(), DO_stmt(0xED00 + op.n)])
+		
+	# neg a'
+	emit_asm( RABBIT, "%s a'" % op.asm, [ALTD.prefix, 0xED, op.n])
+	emit_rule(RABBIT, [op, A1],
+		[DO_ALTD(), DO_stmt(0xED00 + op.n)])
+		
+for op in [CCF, SCF]:
+	# ccf
+	emit_asm( ALL, op.asm, [op.n])
+	emit_rule(ALL, [op],
+		[DO_stmt(op.n)])
+		
+	# ccf f
+	emit_asm( ALL, "%s f" % op.asm, [op.n])
+	emit_rule(ALL, [op, F],
+		[DO_stmt(op.n)])
+		
+	# altd ccf f
+	emit_asm( RABBIT, "altd %s f" % op.asm, [ALTD.prefix, op.n])
+	emit_rule(RABBIT, [ALTD, op, F],
+		[DO_ALTD(), DO_stmt(op.n)])
+		
+	# altd ccf
+	emit_asm( RABBIT, "altd %s" % op.asm, [ALTD.prefix, op.n])
+	emit_rule(RABBIT, [ALTD, op],
+		[DO_ALTD(), DO_stmt(op.n)])
+		
+	# ccf f'
+	emit_asm( RABBIT, "%s f'" % op.asm, [ALTD.prefix, op.n])
+	emit_rule(RABBIT, [op, F1],
+		[DO_ALTD(), DO_stmt(op.n)])
 		

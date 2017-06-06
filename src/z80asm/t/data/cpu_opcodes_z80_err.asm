@@ -1,5 +1,3 @@
- altd ccf f
- altd cpl a
  altd ld bc, (4660)
  altd ld bc, 4660
  altd ld de, (4660)
@@ -20,16 +18,12 @@
  altd ld iy, 4660
  altd ld sp, (4660)
  altd ld sp, 4660
- altd neg a
  altd pop af
  altd pop bc
  altd pop de
  altd pop hl
  altd pop ix
  altd pop iy
- altd scf f
- ccf f'
- cpl a'
  ld (hl), hl
  ld (hl+127), hl
  ld (ix), hl
@@ -90,7 +84,6 @@
  ldp ix, 4660
  ldp iy, (4660)
  ldp iy, 4660
- neg a'
  pop af'
  pop bc'
  pop de'
@@ -101,4 +94,3 @@
  pop su
  push ip
  push su
- scf f'

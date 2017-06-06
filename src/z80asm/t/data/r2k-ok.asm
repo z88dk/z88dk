@@ -1115,3 +1115,23 @@
  tst a, (42)                    ; ED 64 2A
  tst  42                        ; ED 64 2A
  tst (42)                       ; ED 64 2A
+ cpl                            ; 2F
+ cpl a                          ; 2F
+ altd cpl a                     ; 76 2F
+ altd cpl                       ; 76 2F
+ cpl a'                         ; 76 2F
+ neg                            ; ED 44
+ neg a                          ; ED 44
+ altd neg a                     ; 76 ED 44
+ altd neg                       ; 76 ED 44
+ neg a'                         ; 76 ED 44
+ ccf                            ; 3F
+ ccf f                          ; 3F
+ altd ccf f                     ; 76 3F
+ altd ccf                       ; 76 3F
+ ccf f'                         ; 76 3F
+ scf                            ; 37
+ scf f                          ; 37
+ altd scf f                     ; 76 37
+ altd scf                       ; 76 37
+ scf f'                         ; 76 37

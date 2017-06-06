@@ -1,5 +1,3 @@
- altd ccf f             ;; 76 3F
- altd cpl a             ;; 76 2F
  altd ld bc, (4660)     ;; 76 ED 4B 34 12
  altd ld bc, 4660       ;; 76 01 34 12
  altd ld de, (4660)     ;; 76 ED 5B 34 12
@@ -14,20 +12,12 @@
  altd ld hl, 4660       ;; 76 21 34 12
  altd ld hl, ix         ;; 76 DD 7C
  altd ld hl, iy         ;; 76 FD 7C
- altd neg a             ;; 76 ED 44
  altd pop af            ;; 76 F1
  altd pop bc            ;; 76 C1
  altd pop de            ;; 76 D1
  altd pop hl            ;; 76 E1
  altd pop ix            ;; 76 DD E1
  altd pop iy            ;; 76 FD E1
- altd scf f             ;; 76 37
- ccf                    ;; 3F
- ccf f                  ;; 3F
- ccf f'                 ;; 76 3F
- cpl                    ;; 2F
- cpl a                  ;; 2F
- cpl a'                 ;; 76 2F
  ld (4660), bc          ;; ED 43 34 12
  ld (4660), de          ;; ED 53 34 12
  ld (4660), hl          ;; 22 34 12
@@ -91,9 +81,6 @@
  ldp hl, (iy)           ;; FD 6C
  ldp ix, (4660)         ;; DD 6D 34 12
  ldp iy, (4660)         ;; FD 6D 34 12
- neg                    ;; ED 44
- neg a                  ;; ED 44
- neg a'                 ;; 76 ED 44
  pop af                 ;; F1
  pop af'                ;; 76 F1
  pop bc                 ;; C1
@@ -112,6 +99,3 @@
  push ip                ;; ED 76
  push ix                ;; DD E5
  push iy                ;; FD E5
- scf                    ;; 37
- scf f                  ;; 37
- scf f'                 ;; 76 37

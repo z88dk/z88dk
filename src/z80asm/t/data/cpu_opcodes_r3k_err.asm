@@ -4,7 +4,6 @@
  altd ld iy, 4660
  altd ld sp, (4660)
  altd ld sp, 4660
- daa
  ld 4660, bc
  ld 4660, de
  ld 4660, hl
@@ -25,5 +24,3 @@
  ldp iy, 4660
  pop ix'
  pop iy'
- rld
- rrd
