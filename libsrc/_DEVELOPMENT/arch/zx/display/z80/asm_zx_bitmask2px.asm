@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_bitmask2px(uchar bitmask)
+; uchar zx_bitmask2px(uchar bitmask)
 ;
 ; Return x coordinate 0-7 corresponding to bitmask.
 ;
@@ -18,12 +18,12 @@ asm_zx_bitmask2px:
 
    ; enter :  l = 8-bit bitmask
    ;
-   ; exit  : hl = x coordinate corresponding to leftmost set bit
+   ; exit  :  l = x coordinate corresponding to leftmost set bit
    ;
-   ; uses  : af, hl
+   ; uses  : af, l
    
    ld a,l
-   ld hl,0
+   ld l,0
    
    or a
    ret z

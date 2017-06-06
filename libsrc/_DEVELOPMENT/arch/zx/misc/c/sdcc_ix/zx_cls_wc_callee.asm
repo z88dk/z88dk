@@ -12,7 +12,9 @@ _zx_cls_wc_callee:
 
    pop hl
    pop bc
+   dec sp
    ex (sp),hl
+   ld l,h
 
 l0_zx_cls_wc_callee:
    

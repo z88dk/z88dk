@@ -1,5 +1,5 @@
 
-; void zx_scroll_wc_up(struct r_Rect8 *r, uchar rows, uchar attr)
+; void zx_scroll_wc_up(struct r_Rect8 *r, uint rows, uchar attr)
 
 SECTION code_clib
 SECTION code_arch

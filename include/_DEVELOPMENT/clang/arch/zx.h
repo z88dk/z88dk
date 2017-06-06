@@ -58,19 +58,19 @@ __sfr __banked __at 0x7ffd IO_7FFD;
 
 // misc
 
-extern void zx_border(uint16_t colour);
+extern void zx_border(unsigned char colour);
 
 
-extern void zx_cls(uint16_t attr);
+extern void zx_cls(unsigned char attr);
 
 
-extern void zx_cls_wc(struct r_Rect8 *r,uint16_t attr);
+extern void zx_cls_wc(struct r_Rect8 *r,unsigned char attr);
 
 
-extern void zx_scroll_up(uint16_t rows,uint16_t attr);
+extern void zx_scroll_up(unsigned int rows,unsigned char attr);
 
 
-extern void zx_scroll_wc_up(struct r_Rect8 *r,uint16_t rows,uint16_t attr);
+extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned int rows,unsigned char attr);
 
 
 
@@ -90,7 +90,7 @@ extern void zx_scroll_wc_up(struct r_Rect8 *r,uint16_t rows,uint16_t attr);
 //
 // cx    = character x coordinate (0..31)
 // cy    = character y coordinate (0..23)
-// cyx   = character (y,x) coordinate - ordering borrowed from Sinclair Basic
+// cxy   = character (x,y) coordinate
 //
 // So for example:
 //
@@ -104,16 +104,16 @@ extern void zx_scroll_wc_up(struct r_Rect8 *r,uint16_t rows,uint16_t attr);
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern unsigned int zx_aaddr2cx(void *aaddr);
+extern unsigned char zx_aaddr2cx(void *aaddr);
 
 
-extern unsigned int zx_aaddr2cy(void *aaddr);
+extern unsigned char zx_aaddr2cy(void *aaddr);
 
 
-extern unsigned int zx_aaddr2px(void *aaddr);
+extern unsigned char zx_aaddr2px(void *aaddr);
 
 
-extern unsigned int zx_aaddr2py(void *aaddr);
+extern unsigned char zx_aaddr2py(void *aaddr);
 
 
 extern unsigned char *zx_aaddr2saddr(void *aaddr);
@@ -131,43 +131,43 @@ extern unsigned char *zx_aaddrcright(void *aaddr);
 extern unsigned char *zx_aaddrcup(void *aaddr);
 
 
-extern unsigned int zx_bitmask2px(int bitmask);
+extern unsigned char zx_bitmask2px(unsigned char bitmask);
 
 
-extern unsigned char *zx_cy2aaddr(int row);
+extern unsigned char *zx_cxy2aaddr(unsigned char x,unsigned char y);
 
 
-extern unsigned char *zx_cy2saddr(int row);
+extern unsigned char *zx_cxy2saddr(unsigned char x,unsigned char y);
 
 
-extern unsigned char *zx_cyx2aaddr(int row,int col);
+extern unsigned char *zx_cy2aaddr(unsigned char y);
 
 
-extern unsigned char *zx_cyx2saddr(int row,int col);
+extern unsigned char *zx_cy2saddr(unsigned char y);
 
 
-extern unsigned int zx_px2bitmask(int x);
+extern unsigned char zx_px2bitmask(unsigned char x);
 
 
-extern unsigned char *zx_pxy2aaddr(int x,int y);
+extern unsigned char *zx_pxy2aaddr(unsigned char x,unsigned char y);
 
 
-extern unsigned char *zx_pxy2saddr(int x,int y);
+extern unsigned char *zx_pxy2saddr(unsigned char x,unsigned char y);
 
 
-extern unsigned char *zx_py2aaddr(int y);
+extern unsigned char *zx_py2aaddr(unsigned char y);
 
 
-extern unsigned char *zx_py2saddr(int y);
+extern unsigned char *zx_py2saddr(unsigned char y);
 
 
 extern unsigned char *zx_saddr2aaddr(void *saddr);
 
 
-extern unsigned int zx_saddr2cx(void *saddr);
+extern unsigned char zx_saddr2cx(void *saddr);
 
 
-extern unsigned int zx_saddr2cy(void *saddr);
+extern unsigned char zx_saddr2cy(void *saddr);
 
 
 extern unsigned int zx_saddr2px(void *saddr);
@@ -191,10 +191,10 @@ extern unsigned char *zx_saddrcup(void *saddr);
 extern unsigned char *zx_saddrpdown(void *saddr);
 
 
-extern unsigned char *zx_saddrpleft(void *saddr,int bitmask);
+extern unsigned char *zx_saddrpleft(void *saddr,unsigned char bitmask);
 
 
-extern unsigned char *zx_saddrpright(void *saddr,int bitmask);
+extern unsigned char *zx_saddrpright(void *saddr,unsigned char bitmask);
 
 
 extern unsigned char *zx_saddrpup(void *saddr);
@@ -203,7 +203,7 @@ extern unsigned char *zx_saddrpup(void *saddr);
 
 // graphics
 
-extern int zx_pattern_fill(int x,int y,void *pattern,unsigned int depth);
+extern int zx_pattern_fill(unsigned char x,unsigned char y,void *pattern,unsigned int depth);
 
 
 

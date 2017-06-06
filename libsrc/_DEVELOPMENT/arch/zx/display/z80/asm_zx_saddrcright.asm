@@ -30,7 +30,9 @@ asm_zx_saddrcright:
    ld a,$08
    add a,h
    ld h,a
-   
-   cp $58
+
+   and $18
+   cp $18
+
    ccf
    ret

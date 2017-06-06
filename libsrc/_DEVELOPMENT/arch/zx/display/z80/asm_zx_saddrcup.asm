@@ -32,5 +32,8 @@ asm_zx_saddrcup:
    sub $08
    ld h,a
    
-   cp $40
+   and $18
+   cp $18
+
+   ccf
    ret

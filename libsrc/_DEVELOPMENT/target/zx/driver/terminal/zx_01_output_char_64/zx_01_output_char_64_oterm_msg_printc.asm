@@ -4,7 +4,7 @@ SECTION code_driver_terminal_output
 
 PUBLIC zx_01_output_char_64_oterm_msg_printc
 
-EXTERN asm_zx_cyx2saddr, asm_zx_saddr2aaddr
+EXTERN asm_zx_cxy2saddr, asm_zx_saddr2aaddr
 
 zx_01_output_char_64_oterm_msg_printc:
 
@@ -33,7 +33,7 @@ code_ok:
 
 __screen_address:
 
-   call asm_zx_cyx2saddr
+   call asm_zx_cxy2saddr
    ex de,hl                    ; de = screen address
    
    ld l,c

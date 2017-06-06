@@ -1,5 +1,5 @@
 
-; uint zx_aaddr2cy(void *attraddr)
+; uchar zx_aaddr2cy(void *attraddr)
 
 SECTION code_clib
 SECTION code_arch

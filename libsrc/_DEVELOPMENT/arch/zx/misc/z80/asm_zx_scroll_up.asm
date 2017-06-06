@@ -3,7 +3,7 @@
 ; 2014
 ; ===============================================================
 ; 
-; void zx_scroll_up(uchar rows, uchar attr)
+; void zx_scroll_up(uint rows, uchar attr)
 ;
 ; Scroll screen upward by rows chars and clear vacated area
 ; using attribute.

@@ -12,6 +12,8 @@ _zx_cls_wc_callee:
 
    pop hl
    pop ix
+   dec sp
    ex (sp),hl
    
+   ld l,h
    jp asm_zx_cls_wc

@@ -1,5 +1,5 @@
 
-; int zx_pattern_fill(uint x, uint y, void *pattern, uint depth)
+; int zx_pattern_fill(uchar x, uchar y, void *pattern, uint depth)
 
 SECTION code_clib
 SECTION code_arch

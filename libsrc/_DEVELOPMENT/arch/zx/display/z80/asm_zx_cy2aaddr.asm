@@ -16,7 +16,7 @@ PUBLIC asm_zx_cy2aaddr
 
 asm_zx_cy2aaddr:
 
-   ; enter : hl = valid character y coordinate
+   ; enter :  l = valid character y coordinate
    ;
    ; exit  : hl = attribute address at row = y, x = 0
    ;

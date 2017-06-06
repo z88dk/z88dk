@@ -1,5 +1,5 @@
 
-; void zx_scroll_up(uchar rows, uchar attr)
+; void zx_scroll_up(uint rows, uchar attr)
 
 SECTION code_clib
 SECTION code_arch

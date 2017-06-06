@@ -32,6 +32,9 @@ asm_zx_saddrcleft:
    ld a,h
    sub $08
    ld h,a
-   
-   cp $40
+
+   and $18
+   cp $18
+
+   ccf
    ret

@@ -1,5 +1,5 @@
 
-; uint zx_px2bitmask(uchar x)
+; uchar zx_px2bitmask(uchar x)
 
 SECTION code_clib
 SECTION code_arch

@@ -3,7 +3,7 @@
 ; 2014
 ; ===============================================================
 ; 
-; void zx_scroll_wc_up(struct r_Rect8 *r, uchar rows, uchar attr)
+; void zx_scroll_wc_up(struct r_Rect8 *r, uint rows, uchar attr)
 ;
 ; Scroll the rectangular area upward by rows characters.
 ; Clear the vacated area.
@@ -15,7 +15,7 @@ SECTION code_arch
 
 PUBLIC asm_zx_scroll_wc_up
 
-EXTERN asm_zx_cls_wc, asm_zx_cyx2saddr, asm_zx_saddr2aaddr
+EXTERN asm_zx_cls_wc, asm_zx_cxy2saddr, asm_zx_saddr2aaddr
 EXTERN asm0_zx_saddrpdown, asm_memset
 
 asm_zx_scroll_wc_up:
@@ -55,7 +55,7 @@ asm_zx_scroll_wc_up:
    ld h,(ix+2)                 ; h = rect.y
    ld l,(ix+0)                 ; l = rect.x
    
-   call asm_zx_cyx2saddr
+   call asm_zx_cxy2saddr
    ex de,hl                    ; de = destination screen address
    
    ld a,(ix+2)                 ; a = rect.y
@@ -63,7 +63,7 @@ asm_zx_scroll_wc_up:
    ld h,a                      ; h = absolute y coord of copy up area
    ld l,(ix+0)                 ; l = absolute x coord of copy up area
    
-   call asm_zx_cyx2saddr       ; hl = source screen address
+   call asm_zx_cxy2saddr       ; hl = source screen address
    
    push hl
    push de

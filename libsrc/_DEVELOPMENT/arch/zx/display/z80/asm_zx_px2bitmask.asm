@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_px2bitmask(uchar x)
+; uchar zx_px2bitmask(uchar x)
 ;
 ; Return bitmask corresponding to pixel x coordinate.
 ;
@@ -18,11 +18,9 @@ asm_zx_px2bitmask:
 
    ; enter :  l = pixel x coordinate
    ;
-   ; exit  : hl = 8-bit bitmask
+   ; exit  :  l = 8-bit bitmask
    ;
-   ; uses  : af, b, hl
-   
-   ld h,0
+   ; uses  : af, b, l
    
    ld a,l
    and $07

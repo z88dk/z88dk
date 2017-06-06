@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_saddr2py(void *saddr)
+; uchar zx_saddr2py(void *saddr)
 ;
 ; Pixel y coordinate corresponding to screen address.
 ;
@@ -18,9 +18,9 @@ asm_zx_saddr2py:
 
    ; enter : hl = screen address
    ;
-   ; exit  : hl = pixel y coordinate
+   ; exit  :  l = pixel y coordinate
    ;
-   ; uses  : af, hl
+   ; uses  : af, l
    
    ld a,l
    rra
@@ -40,6 +40,5 @@ asm_zx_saddr2py:
    and $07
    or l
    ld l,a
-   
-   ld h,0
+
    ret

@@ -1,5 +1,5 @@
 
-; uint zx_saddr2px(void *saddr)
+; uchar zx_saddr2px(void *saddr)
 
 SECTION code_clib
 SECTION code_arch

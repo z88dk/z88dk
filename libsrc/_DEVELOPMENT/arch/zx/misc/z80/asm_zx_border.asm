@@ -20,7 +20,7 @@ asm_zx_border:
 
    ; enter :  l = border colour 0..7
    ;
-   ; uses  : af, hl
+   ; uses  : af, l
    
    ld a,l
    and $07
