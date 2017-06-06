@@ -263,6 +263,10 @@
  add (iy)                       ; FD 86 00
  add (iy + 127)                 ; FD 86 7F
  add (iy - 128)                 ; FD 86 80
+ add a,  42                     ; C6 2A
+ add a, (42)                    ; C6 2A
+ add  42                        ; C6 2A
+ add (42)                       ; C6 2A
  adc a, b                       ; 88
  adc b                          ; 88
  adc a, c                       ; 89
@@ -299,6 +303,10 @@
  adc (iy)                       ; FD 8E 00
  adc (iy + 127)                 ; FD 8E 7F
  adc (iy - 128)                 ; FD 8E 80
+ adc a,  42                     ; CE 2A
+ adc a, (42)                    ; CE 2A
+ adc  42                        ; CE 2A
+ adc (42)                       ; CE 2A
  sub a, b                       ; 90
  sub b                          ; 90
  sub a, c                       ; 91
@@ -335,6 +343,10 @@
  sub (iy)                       ; FD 96 00
  sub (iy + 127)                 ; FD 96 7F
  sub (iy - 128)                 ; FD 96 80
+ sub a,  42                     ; D6 2A
+ sub a, (42)                    ; D6 2A
+ sub  42                        ; D6 2A
+ sub (42)                       ; D6 2A
  sbc a, b                       ; 98
  sbc b                          ; 98
  sbc a, c                       ; 99
@@ -371,6 +383,10 @@
  sbc (iy)                       ; FD 9E 00
  sbc (iy + 127)                 ; FD 9E 7F
  sbc (iy - 128)                 ; FD 9E 80
+ sbc a,  42                     ; DE 2A
+ sbc a, (42)                    ; DE 2A
+ sbc  42                        ; DE 2A
+ sbc (42)                       ; DE 2A
  and a, b                       ; A0
  and b                          ; A0
  and a, c                       ; A1
@@ -407,6 +423,10 @@
  and (iy)                       ; FD A6 00
  and (iy + 127)                 ; FD A6 7F
  and (iy - 128)                 ; FD A6 80
+ and a,  42                     ; E6 2A
+ and a, (42)                    ; E6 2A
+ and  42                        ; E6 2A
+ and (42)                       ; E6 2A
  xor a, b                       ; A8
  xor b                          ; A8
  xor a, c                       ; A9
@@ -443,6 +463,10 @@
  xor (iy)                       ; FD AE 00
  xor (iy + 127)                 ; FD AE 7F
  xor (iy - 128)                 ; FD AE 80
+ xor a,  42                     ; EE 2A
+ xor a, (42)                    ; EE 2A
+ xor  42                        ; EE 2A
+ xor (42)                       ; EE 2A
  or a, b                        ; B0
  or b                           ; B0
  or a, c                        ; B1
@@ -479,6 +503,10 @@
  or (iy)                        ; FD B6 00
  or (iy + 127)                  ; FD B6 7F
  or (iy - 128)                  ; FD B6 80
+ or a,  42                      ; F6 2A
+ or a, (42)                     ; F6 2A
+ or  42                         ; F6 2A
+ or (42)                        ; F6 2A
  cp a, b                        ; B8
  cp b                           ; B8
  cp a, c                        ; B9
@@ -515,3 +543,43 @@
  cp (iy)                        ; FD BE 00
  cp (iy + 127)                  ; FD BE 7F
  cp (iy - 128)                  ; FD BE 80
+ cp a,  42                      ; FE 2A
+ cp a, (42)                     ; FE 2A
+ cp  42                         ; FE 2A
+ cp (42)                        ; FE 2A
+ inc b                          ; 04
+ inc c                          ; 0C
+ inc d                          ; 14
+ inc e                          ; 1C
+ inc h                          ; 24
+ inc ixh                        ; DD 24
+ inc iyh                        ; FD 24
+ inc l                          ; 2C
+ inc ixl                        ; DD 2C
+ inc iyl                        ; FD 2C
+ inc a                          ; 3C
+ inc (hl)                       ; 34
+ inc (ix)                       ; DD 34 00
+ inc (ix + 127)                 ; DD 34 7F
+ inc (ix - 128)                 ; DD 34 80
+ inc (iy)                       ; FD 34 00
+ inc (iy + 127)                 ; FD 34 7F
+ inc (iy - 128)                 ; FD 34 80
+ dec b                          ; 05
+ dec c                          ; 0D
+ dec d                          ; 15
+ dec e                          ; 1D
+ dec h                          ; 25
+ dec ixh                        ; DD 25
+ dec iyh                        ; FD 25
+ dec l                          ; 2D
+ dec ixl                        ; DD 2D
+ dec iyl                        ; FD 2D
+ dec a                          ; 3D
+ dec (hl)                       ; 35
+ dec (ix)                       ; DD 35 00
+ dec (ix + 127)                 ; DD 35 7F
+ dec (ix - 128)                 ; DD 35 80
+ dec (iy)                       ; FD 35 00
+ dec (iy + 127)                 ; FD 35 7F
+ dec (iy - 128)                 ; FD 35 80

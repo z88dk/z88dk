@@ -1,11 +1,3 @@
- altd dec ixh
- altd dec ixl
- altd dec iyh
- altd dec iyl
- altd inc ixh
- altd inc ixl
- altd inc iyh
- altd inc iyl
  altd ld ix, (4660)
  altd ld ix, 4660
  altd ld iy, (4660)
@@ -13,22 +5,6 @@
  altd ld sp, (4660)
  altd ld sp, 4660
  daa
- dec ixh
- dec ixh'
- dec ixl
- dec ixl'
- dec iyh
- dec iyh'
- dec iyl
- dec iyl'
- inc ixh
- inc ixh'
- inc ixl
- inc ixl'
- inc iyh
- inc iyh'
- inc iyl
- inc iyl'
  ld 4660, bc
  ld 4660, de
  ld 4660, hl

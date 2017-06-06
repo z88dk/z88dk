@@ -32,6 +32,11 @@ XOR		= Token(5,	"xor",	"_TK_XOR",		0)
 OR		= Token(6,	"or",	"_TK_OR",		0)
 CP		= Token(7,	"cp",	"_TK_CP",		0)
 
+INC		= Token(0,	"inc",	"_TK_INC",		0)
+DEC		= Token(1,	"dec",	"_TK_DEC",		0)
+
+TST		= Token(0,	"tst",	"_TK_TST",		0)
+
 expr	= Token(0,	"",		"expr",			0)
 
 B		= Token(0,	"b",	"_TK_B",		0); B.ix = B; B.iy = B
@@ -535,3 +540,119 @@ for op in (ADD, ADC, SUB, SBC, AND, XOR, OR, CP):
 		emit_asm( RABBIT, "%s a', (%s - 128)" % (op.asm, x.asm), [ALTD.prefix, x.prefix, opcode, 0x80])
 		emit_rule(RABBIT, [op, A1, COMMA, x.ind, expr, RPAREN],
 			[DO_ALTD(), DO_stmt_idx(opcode, x.p_ix)])
+
+	# add a, N
+	opcode = 0xC6 + op.n*8
+	emit_asm( ALL, "%s a,  42 " % op.asm, [opcode, 42])
+	emit_asm( ALL, "%s a, (42)" % op.asm, [opcode, 42])
+	emit_rule(ALL, [op, A, COMMA, expr],
+		[DO_stmt_n(opcode)])
+		
+	# add N
+	emit_asm( ALL, "%s  42 " % op.asm, [opcode, 42])
+	emit_asm( ALL, "%s (42)" % op.asm, [opcode, 42])
+	emit_rule(ALL, [op, expr],
+		[DO_stmt_n(opcode)])
+		
+	# altd add a, N
+	emit_asm( RABBIT, "altd %s a,  42 " % op.asm, [ALTD.prefix, opcode, 42])
+	emit_asm( RABBIT, "altd %s a, (42)" % op.asm, [ALTD.prefix, opcode, 42])
+	emit_rule(RABBIT, [ALTD, op, A, COMMA, expr],
+		[DO_ALTD(), DO_stmt_n(opcode)])
+		
+	# altd add N
+	emit_asm( RABBIT, "altd %s  42 " % op.asm, [ALTD.prefix, opcode, 42])
+	emit_asm( RABBIT, "altd %s (42)" % op.asm, [ALTD.prefix, opcode, 42])
+	emit_rule(RABBIT, [ALTD, op, expr],
+		[DO_ALTD(), DO_stmt_n(opcode)])
+		
+	# add a', N
+	emit_asm( RABBIT, "%s a',  42 " % op.asm, [ALTD.prefix, opcode, 42])
+	emit_asm( RABBIT, "%s a', (42)" % op.asm, [ALTD.prefix, opcode, 42])
+	emit_rule(RABBIT, [op, A1, COMMA, expr],
+		[DO_ALTD(), DO_stmt_n(opcode)])
+		
+for op in (INC, DEC):
+	for r in (B, C, D, E, H, L, A):
+		# inc r
+		opcode = 0x04 + op.n + r.n*8
+		emit_asm( ALL, "%s %s" % (op.asm, r.asm), [opcode])
+		emit_rule(ALL, [op, r],
+			[DO_stmt(opcode)])
+			
+		# altd inc r
+		emit_asm( RABBIT, "altd %s %s" % (op.asm, r.asm), [ALTD.prefix, opcode])
+		emit_rule(RABBIT, [ALTD, op, r],
+			[DO_ALTD(), DO_stmt(opcode)])
+			
+		# inc r'
+		emit_asm( RABBIT, "%s %s" % (op.asm, r.alt.asm), [ALTD.prefix, opcode])
+		emit_rule(RABBIT, [op, r.alt],
+			[DO_ALTD(), DO_stmt(opcode)])
+			
+		dd, fd = r.ix.prefix, r.iy.prefix
+		if dd or fd:
+			# inc ixh
+			emit_asm( Z80, "%s %s" % (op.asm, r.ix.asm), [dd, opcode])
+			emit_rule(Z80, [op, r.ix],
+				[DO_stmt(opcode, P_IX)])
+				
+			# inc iyh
+			emit_asm( Z80, "%s %s" % (op.asm, r.iy.asm), [fd, opcode])
+			emit_rule(Z80, [op, r.iy],
+				[DO_stmt(opcode, P_IY)])
+
+	# inc (hl)
+	opcode = 0x04 + op.n + 6*8
+	emit_asm( ALL, "%s (hl)" % op.asm, [opcode])
+	emit_rule(ALL, [op, IND_HL, RPAREN],
+		[DO_stmt(opcode)])
+	
+	for x in (IX, IY):
+		# inc (ix)
+		emit_asm( ALL, "%s (%s)" % (op.asm, x.asm), [x.prefix, opcode, 0])
+		emit_rule(ALL, [op, x.ind, RPAREN],
+			[DO_stmt(opcode, x.p_ix, 1)])
+		
+		# inc (ix+d)
+		emit_asm( ALL, "%s (%s + 127)" % (op.asm, x.asm), [x.prefix, opcode, 0x7F])
+		emit_asm( ALL, "%s (%s - 128)" % (op.asm, x.asm), [x.prefix, opcode, 0x80])
+		emit_rule(ALL, [op, x.ind, expr, RPAREN],
+			[DO_stmt_idx(opcode, x.p_ix)])
+
+for r in (B, C, D, E, H, L, A):
+	# tst a, r
+	opcode = 0x04 + r.n*8
+	emit_asm( NOT_Z80, "tst a, %s" % r.asm, [0xED, opcode])
+	emit_rule(NOT_Z80, [TST, A, COMMA, r],
+		[DO_stmt(0xED00 + opcode)])
+			
+	# tst r
+	emit_asm( NOT_Z80, "tst %s" % r.asm, [0xED, opcode])
+	emit_rule(NOT_Z80, [TST, r],
+		[DO_stmt(0xED00 + opcode)])
+			
+# tst a, (hl)
+opcode = 0x04 + 6*8
+emit_asm( NOT_Z80, "tst a, (hl)", [0xED, opcode])
+emit_rule(NOT_Z80, [TST, A, COMMA, IND_HL, RPAREN],
+	[DO_stmt(0xED00 + opcode)])
+		
+# tst (hl)
+emit_asm( NOT_Z80, "tst (hl)", [0xED, opcode])
+emit_rule(NOT_Z80, [TST, IND_HL, RPAREN],
+	[DO_stmt(0xED00 + opcode)])
+		
+# tst a, N
+opcode = 0x64
+emit_asm( NOT_Z80, "tst a,  42 ", [0xED, opcode, 42])
+emit_asm( NOT_Z80, "tst a, (42)", [0xED, opcode, 42])
+emit_rule(NOT_Z80, [TST, A, COMMA, expr],
+	[DO_stmt_n(0xED00 + opcode)])
+		
+# tst N
+emit_asm( NOT_Z80, "tst  42 ", [0xED, opcode, 42])
+emit_asm( NOT_Z80, "tst (42)", [0xED, opcode, 42])
+emit_rule(NOT_Z80, [TST, expr],
+	[DO_stmt_n(0xED00 + opcode)])
+		

@@ -118,3 +118,11 @@
  cp ixl                         ; DD BD
  cp a, iyl                      ; FD BD
  cp iyl                         ; FD BD
+ inc ixh                        ; DD 24
+ inc iyh                        ; FD 24
+ inc ixl                        ; DD 2C
+ inc iyl                        ; FD 2C
+ dec ixh                        ; DD 25
+ dec iyh                        ; FD 25
+ dec ixl                        ; DD 2D
+ dec iyl                        ; FD 2D

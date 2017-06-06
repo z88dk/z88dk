@@ -1,39 +1,5 @@
- adc (42)               ;; CE 2A
- adc 42                 ;; CE 2A
- adc a', (42)           ;; 76 CE 2A
- adc a', 42             ;; 76 CE 2A
- adc a, (42)            ;; CE 2A
- adc a, 42              ;; CE 2A
- add (42)               ;; C6 2A
- add 42                 ;; C6 2A
- add a', (42)           ;; 76 C6 2A
- add a', 42             ;; 76 C6 2A
- add a, (42)            ;; C6 2A
- add a, 42              ;; C6 2A
- altd adc a, (42)       ;; 76 CE 2A
- altd adc a, 42         ;; 76 CE 2A
- altd add a, (42)       ;; 76 C6 2A
- altd add a, 42         ;; 76 C6 2A
- altd and a, (42)       ;; 76 E6 2A
- altd and a, 42         ;; 76 E6 2A
  altd ccf f             ;; 76 3F
- altd cp a, (42)        ;; 76 FE 2A
- altd cp a, 42          ;; 76 FE 2A
  altd cpl a             ;; 76 2F
- altd dec a             ;; 76 3D
- altd dec b             ;; 76 05
- altd dec c             ;; 76 0D
- altd dec d             ;; 76 15
- altd dec e             ;; 76 1D
- altd dec h             ;; 76 25
- altd dec l             ;; 76 2D
- altd inc a             ;; 76 3C
- altd inc b             ;; 76 04
- altd inc c             ;; 76 0C
- altd inc d             ;; 76 14
- altd inc e             ;; 76 1C
- altd inc h             ;; 76 24
- altd inc l             ;; 76 2C
  altd ld bc, (4660)     ;; 76 ED 4B 34 12
  altd ld bc, 4660       ;; 76 01 34 12
  altd ld de, (4660)     ;; 76 ED 5B 34 12
@@ -49,77 +15,19 @@
  altd ld hl, ix         ;; 76 DD 7C
  altd ld hl, iy         ;; 76 FD 7C
  altd neg a             ;; 76 ED 44
- altd or a, (42)        ;; 76 F6 2A
- altd or a, 42          ;; 76 F6 2A
  altd pop af            ;; 76 F1
  altd pop bc            ;; 76 C1
  altd pop de            ;; 76 D1
  altd pop hl            ;; 76 E1
  altd pop ix            ;; 76 DD E1
  altd pop iy            ;; 76 FD E1
- altd sbc a, (42)       ;; 76 DE 2A
- altd sbc a, 42         ;; 76 DE 2A
  altd scf f             ;; 76 37
- altd sub a, (42)       ;; 76 D6 2A
- altd sub a, 42         ;; 76 D6 2A
- altd xor a, (42)       ;; 76 EE 2A
- altd xor a, 42         ;; 76 EE 2A
- and (42)               ;; E6 2A
- and 42                 ;; E6 2A
- and a', (42)           ;; 76 E6 2A
- and a', 42             ;; 76 E6 2A
- and a, (42)            ;; E6 2A
- and a, 42              ;; E6 2A
  ccf                    ;; 3F
  ccf f                  ;; 3F
  ccf f'                 ;; 76 3F
- cp (42)                ;; FE 2A
- cp 42                  ;; FE 2A
- cp a', (42)            ;; 76 FE 2A
- cp a', 42              ;; 76 FE 2A
- cp a, (42)             ;; FE 2A
- cp a, 42               ;; FE 2A
  cpl                    ;; 2F
  cpl a                  ;; 2F
  cpl a'                 ;; 76 2F
- dec (hl)               ;; 35
- dec (ix)               ;; DD 35 00
- dec (ix+127)           ;; DD 35 7F
- dec (iy)               ;; FD 35 00
- dec (iy+127)           ;; FD 35 7F
- dec a                  ;; 3D
- dec a'                 ;; 76 3D
- dec b                  ;; 05
- dec b'                 ;; 76 05
- dec c                  ;; 0D
- dec c'                 ;; 76 0D
- dec d                  ;; 15
- dec d'                 ;; 76 15
- dec e                  ;; 1D
- dec e'                 ;; 76 1D
- dec h                  ;; 25
- dec h'                 ;; 76 25
- dec l                  ;; 2D
- dec l'                 ;; 76 2D
- inc (hl)               ;; 34
- inc (ix)               ;; DD 34 00
- inc (ix+127)           ;; DD 34 7F
- inc (iy)               ;; FD 34 00
- inc (iy+127)           ;; FD 34 7F
- inc a                  ;; 3C
- inc a'                 ;; 76 3C
- inc b                  ;; 04
- inc b'                 ;; 76 04
- inc c                  ;; 0C
- inc c'                 ;; 76 0C
- inc d                  ;; 14
- inc d'                 ;; 76 14
- inc e                  ;; 1C
- inc e'                 ;; 76 1C
- inc h                  ;; 24
- inc h'                 ;; 76 24
- inc l                  ;; 2C
- inc l'                 ;; 76 2C
  ld (4660), bc          ;; ED 43 34 12
  ld (4660), de          ;; ED 53 34 12
  ld (4660), hl          ;; 22 34 12
@@ -186,12 +94,6 @@
  neg                    ;; ED 44
  neg a                  ;; ED 44
  neg a'                 ;; 76 ED 44
- or (42)                ;; F6 2A
- or 42                  ;; F6 2A
- or a', (42)            ;; 76 F6 2A
- or a', 42              ;; 76 F6 2A
- or a, (42)             ;; F6 2A
- or a, 42               ;; F6 2A
  pop af                 ;; F1
  pop af'                ;; 76 F1
  pop bc                 ;; C1
@@ -212,44 +114,6 @@
  push ix                ;; DD E5
  push iy                ;; FD E5
  push su                ;; ED 66
- sbc (42)               ;; DE 2A
- sbc 42                 ;; DE 2A
- sbc a', (42)           ;; 76 DE 2A
- sbc a', 42             ;; 76 DE 2A
- sbc a, (42)            ;; DE 2A
- sbc a, 42              ;; DE 2A
  scf                    ;; 37
  scf f                  ;; 37
  scf f'                 ;; 76 37
- sub (42)               ;; D6 2A
- sub 42                 ;; D6 2A
- sub a', (42)           ;; 76 D6 2A
- sub a', 42             ;; 76 D6 2A
- sub a, (42)            ;; D6 2A
- sub a, 42              ;; D6 2A
- tst (42)               ;; ED 64 2A
- tst (hl)               ;; ED 34
- tst 42                 ;; ED 64 2A
- tst a                  ;; ED 3C
- tst a, (42)            ;; ED 64 2A
- tst a, (hl)            ;; ED 34
- tst a, 42              ;; ED 64 2A
- tst a, a               ;; ED 3C
- tst a, b               ;; ED 04
- tst a, c               ;; ED 0C
- tst a, d               ;; ED 14
- tst a, e               ;; ED 1C
- tst a, h               ;; ED 24
- tst a, l               ;; ED 2C
- tst b                  ;; ED 04
- tst c                  ;; ED 0C
- tst d                  ;; ED 14
- tst e                  ;; ED 1C
- tst h                  ;; ED 24
- tst l                  ;; ED 2C
- xor (42)               ;; EE 2A
- xor 42                 ;; EE 2A
- xor a', (42)           ;; 76 EE 2A
- xor a', 42             ;; 76 EE 2A
- xor a, (42)            ;; EE 2A
- xor a, 42              ;; EE 2A
