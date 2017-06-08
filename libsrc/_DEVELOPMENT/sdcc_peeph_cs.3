@@ -15427,11 +15427,11 @@ replace restart {
 	ld	%4,%5
 	bit	%3,%1
 } by {
+	bit	%3,%2
 	ld	%1,%2
 	ld	%4,%5
-	bit	%3,%2
 	; peephole z88dk-386b
-} if notVolatile(%1), canAssign(%2 '(hl)'), notSame(%4 %2), notSame(%4 %1)
+} if same(%2 'a' 'b' 'c' 'd' 'e' 'h' 'l'), operandsNotRelated(%4 %1), notVolatile(%1)
 
 replace restart {
 	ld	%2,#0
