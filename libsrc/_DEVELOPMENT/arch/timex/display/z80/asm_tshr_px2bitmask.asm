@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshr_px2bitmask(uchar x)
+; uchar tshr_px2bitmask(uchar x)
 ;
 ; Return bitmask corresponding to pixel x coordinate.
 ;

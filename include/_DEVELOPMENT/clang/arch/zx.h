@@ -67,10 +67,10 @@ extern void zx_cls(unsigned char attr);
 extern void zx_cls_wc(struct r_Rect8 *r,unsigned char attr);
 
 
-extern void zx_scroll_up(unsigned int rows,unsigned char attr);
+extern void zx_scroll_up(unsigned char rows,unsigned char attr);
 
 
-extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned int rows,unsigned char attr);
+extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
 
 
 

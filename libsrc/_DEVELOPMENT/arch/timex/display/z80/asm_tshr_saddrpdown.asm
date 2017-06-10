@@ -14,38 +14,8 @@ SECTION code_arch
 PUBLIC asm_tshr_saddrpdown
 PUBLIC asm0_tshr_saddrpdown
 
-asm_tshr_saddrpdown:
+EXTERN asm_zx_saddrpdown
+EXTERN asm0_zx_saddrpdown
 
-   ; enter : hl = screen address
-   ;
-   ; exit  : hl = screen address moved down one pixel
-   ;         carry set of new screen address is off screen
-   ;
-   ; uses  : af, hl
-
-   inc h
-
-asm0_tshr_saddrpdown:
-
-   ld a,h
-   and $07
-   ret nz
-
-   ld a,h
-   sub $08
-   ld h,a
-   
-   ld a,l
-   add a,$20
-   ld l,a
-   ret nc
-   
-   ld a,h
-   add a,$08
-   ld h,a
-   
-   and $18
-   cp $18
- 
-   ccf
-   ret
+defc asm_tshr_saddrpdown = asm_zx_saddrpdown
+defc asm0_tshr_saddrpdown = asm0_zx_saddrpdown

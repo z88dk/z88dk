@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshr_saddr2py(void *saddr)
+; uchar tshr_saddr2py(void *saddr)
 ;
 ; Pixel y coordinate corresponding to screen address.
 ;

@@ -14,22 +14,6 @@ SECTION code_arch
 
 PUBLIC asm_tshc_aaddrcright
 
-asm_tshc_aaddrcright:
+EXTERN asm_zx_saddrcright
 
-   ; enter : hl = screen address
-   ;
-   ; exit  : hl = screen address moved to right one character
-   ;         carry set if new screen address is off screen
-   ;
-   ; uses  : af, hl
-
-   inc l
-   ret nz
-   
-   ld a,$08
-   add a,h
-   ld h,a
-   
-   cp $78
-   ccf
-   ret
+defc asm_tshc_aaddrcright = asm_zx_saddrcright

@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; void *tshc_aaddrpright(void *aaddr, uint bitmask)
+; void *tshc_aaddrpright(void *aaddr, uchar bitmask)
 ;
 ; Modify attribute address and bitmask to move right one pixel.
 ; Indicate error if pixel is at the rightmost edge.

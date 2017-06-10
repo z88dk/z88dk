@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshc_aaddr2cx(void *aaddr)
+; uchar tshc_aaddr2cx(void *aaddr)
 ;
 ; Character x coordinate corresponding to attribute address.
 ;

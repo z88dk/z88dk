@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshc_aaddr2px(void *aaddr)
+; uchar tshc_aaddr2px(void *aaddr)
 ;
 ; Pixel x coordinate corresponding to the leftmost pixel
 ; of the attribute address.

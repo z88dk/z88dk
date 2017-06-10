@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; void *tshr_saddrpright(void *saddr, uint bitmask)
+; void *tshr_saddrpright(void *saddr, uchar bitmask)
 ;
 ; Modify screen address and bitmask to move right one pixel.
 ; Indicate error if pixel is at the rightmost edge.

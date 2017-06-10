@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshc_saddr2px(void *saddr)
+; uchar tshc_saddr2px(void *saddr)
 ;
 ; Pixel x coordinate corresponding to the leftmost pixel at
 ; of the screen address.

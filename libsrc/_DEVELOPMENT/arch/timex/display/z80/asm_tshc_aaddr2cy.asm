@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshc_aaddr2cy(void *aaddr)
+; uchar tshc_aaddr2cy(void *aaddr)
 ;
 ; Character y coordinate corresponding to attribute address.
 ;

@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; void *tshr_pxy2saddr(uchar x, uchar y)
+; void *tshr_pxy2saddr(uint x, uchar y)
 ;
 ; Screen address of byte containing pixel at coordinate x, y.
 ;

@@ -15,7 +15,7 @@ PUBLIC asm_tshc_cy2aaddr
 
 asm_tshc_cy2aaddr:
 
-   ; enter : hl = valid character y coordinate
+   ; enter :  l = valid character y coordinate
    ;
    ; exit  : hl = attribute address of character coordinate row = y, x = 0
    ;

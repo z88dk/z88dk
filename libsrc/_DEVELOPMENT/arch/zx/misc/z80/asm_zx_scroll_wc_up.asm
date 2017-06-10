@@ -3,7 +3,7 @@
 ; 2014
 ; ===============================================================
 ; 
-; void zx_scroll_wc_up(struct r_Rect8 *r, uint rows, uchar attr)
+; void zx_scroll_wc_up(struct r_Rect8 *r, uchar rows, uchar attr)
 ;
 ; Scroll the rectangular area upward by rows characters.
 ; Clear the vacated area.
@@ -14,6 +14,7 @@ SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_scroll_wc_up
+PUBLIC asm0_zx_scroll_wc_up
 
 EXTERN asm_zx_cls_wc, asm_zx_cxy2saddr, asm_zx_saddr2aaddr
 EXTERN asm0_zx_saddrpdown, asm_memset
@@ -29,7 +30,9 @@ asm_zx_scroll_wc_up:
    inc d
    dec d
    jp nz, asm_zx_cls_wc
-   
+
+asm0_zx_scroll_wc_up:
+
    inc e
    dec e
    ret z

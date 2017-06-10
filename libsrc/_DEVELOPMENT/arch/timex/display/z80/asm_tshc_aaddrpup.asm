@@ -13,30 +13,6 @@ SECTION code_arch
 
 PUBLIC asm_tshc_aaddrpup
 
-   ; enter : hl = attibute address
-   ;
-   ; exit  : hl = attribute address moved up one pixel
-   ;         carry set if new attribute address is off screen
-   ;
-   ; uses  : af, hl
+EXTERN asm_zx_saddrpup
 
-   ld a,h
-   dec h
-   and $07
-   ret nz
-   
-   ld a,$08
-   add a,h
-   ld h,a
-   
-   ld a,l
-   sub $20
-   ld l,a
-   ret nc
-   
-   ld a,h
-   sub $08
-   ld h,a
-   
-   cp $60
-   ret
+defc asm_tshc_aaddrpup = asm_zx_saddrpup

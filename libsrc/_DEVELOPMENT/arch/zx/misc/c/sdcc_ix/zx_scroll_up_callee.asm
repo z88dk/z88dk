@@ -1,19 +1,20 @@
 
-; void zx_scroll_up_callee(uint rows, uchar attr)
+; void zx_scroll_up_callee(uchar rows, uchar attr)
 
 SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_scroll_up_callee
 
-EXTERN asm_zx_scroll_up
+EXTERN asm0_zx_scroll_up
 
 _zx_scroll_up_callee:
 
    pop hl
-   pop de
-   dec sp
    ex (sp),hl
+   
+   ld e,l
+   ld d,0
+   ld l,h
 
-	ld l,h
-   jp asm_zx_scroll_up
+   jp asm0_zx_scroll_up

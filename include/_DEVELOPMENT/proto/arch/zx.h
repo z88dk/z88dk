@@ -59,8 +59,8 @@ __sfr __banked __at 0x7ffd IO_7FFD;
 __DPROTO(`b,c,d,e,h',`b,c,d,e',void,,zx_border,unsigned char colour)
 __DPROTO(,,void,,zx_cls,unsigned char attr)
 __DPROTO(,,void,,zx_cls_wc,struct r_Rect8 *r,unsigned char attr)
-__DPROTO(,,void,,zx_scroll_up,unsigned int rows,unsigned char attr)
-__DPROTO(,,void,,zx_scroll_wc_up,struct r_Rect8 *r,unsigned int rows,unsigned char attr)
+__DPROTO(,,void,,zx_scroll_up,unsigned char rows,unsigned char attr)
+__DPROTO(,,void,,zx_scroll_wc_up,struct r_Rect8 *r,unsigned char rows,unsigned char attr)
 
 // display
 

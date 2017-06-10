@@ -14,36 +14,8 @@ SECTION code_arch
 PUBLIC asm_tshc_aaddrpdown
 PUBLIC asm0_tshc_aaddrpdown
 
-asm_tshc_aaddrpdown:
+EXTERN asm_zx_saddrpdown
+EXTERN asm0_zx_saddrpdown
 
-   ; enter : hl = attribute address
-   ;
-   ; exit  : hl = attribute address moved down one pixel
-   ;         carry set of new attribute address is off screen
-   ;
-   ; uses  : af, hl
-
-   inc h
-
-asm0_tshc_aaddrpdown:
-
-   ld a,h
-   and $07
-   ret nz
-
-   ld a,h
-   sub $08
-   ld h,a
-   
-   ld a,l
-   add a,$20
-   ld l,a
-   ret nc
-   
-   ld a,h
-   add a,$08
-   ld h,a
-   
-   cp $78
-   ccf
-   ret
+defc asm_tshc_aaddrpdown = asm_zx_saddrpdown
+defc asm0_tshc_aaddrpdown = asm0_zx_saddrpdown

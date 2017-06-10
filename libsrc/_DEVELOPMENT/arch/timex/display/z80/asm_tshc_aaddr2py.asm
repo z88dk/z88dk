@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshc_aaddr2py(void *aaddr)
+; uchar tshc_aaddr2py(void *aaddr)
 ;
 ; Pixel y coordinate corresponding to attribute address.
 ;

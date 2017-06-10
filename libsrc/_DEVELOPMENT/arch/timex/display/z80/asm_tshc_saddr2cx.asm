@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; uint tshc_saddr2cx(void *saddr)
+; uchar tshc_saddr2cx(void *saddr)
 ;
 ; Character x coordinate corresponding to screen address.
 ;

@@ -73,13 +73,13 @@ extern void zx_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __z88dk_calle
 #define zx_cls_wc(a,b) zx_cls_wc_callee(a,b)
 
 
-extern void zx_scroll_up(unsigned int rows,unsigned char attr);
-extern void zx_scroll_up_callee(unsigned int rows,unsigned char attr) __z88dk_callee;
+extern void zx_scroll_up(unsigned char rows,unsigned char attr);
+extern void zx_scroll_up_callee(unsigned char rows,unsigned char attr) __z88dk_callee;
 #define zx_scroll_up(a,b) zx_scroll_up_callee(a,b)
 
 
-extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned int rows,unsigned char attr);
-extern void zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned int rows,unsigned char attr) __z88dk_callee;
+extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
+extern void zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __z88dk_callee;
 #define zx_scroll_wc_up(a,b,c) zx_scroll_wc_up_callee(a,b,c)
 
 

@@ -2,7 +2,7 @@
 ; May 2017
 ; ===============================================================
 ;
-; void *tshc_aaddr2saddr(void *aaddr)
+; uchar *tshc_aaddr2saddr(void *aaddr)
 ;
 ; Attribute address to screen address.
 ;
