@@ -63,22 +63,22 @@ discussed, but the user is assumed to be able to read a simple C program.
 The first step is to check the necessary tools are in place. Running each of
 these commands should produce something similar to the output given:
 ```
-  \>zcc
+  >zcc
   zcc - Frontend for the z88dk Cross-C Compiler
   <pages and pages of help and options snipped>
 ```
 ```
-  \>zsdcc
+  >zsdcc
   ZSDCC IS A MODIFICATION OF SDCC FOR Z88DK
   Build: 3.6.6 #9921 (Linux) Jun  2 2017
   <pages and pages of help and options snipped>
 ```
 ```
-  \>z80asm
+  >z80asm
   Z80 Module Assembler 2.8.5, (c) InterLogic 1993-2009, Paulo Custodio 2011-2017
 ```
 ```
-  \>appmake 
+  >appmake 
   appmake [+target] [options]
   
   The z88dk application generator
@@ -91,7 +91,7 @@ need solving before going any further.
 
 As a starting point, both for discussion and development processes, we're going
 to get this program to compile and run:
-
+```
   /* C source start */
   
   #include <arch/zx.h>
@@ -103,7 +103,7 @@ to get this program to compile and run:
   }
   
   /* C source end */
-
+```
 Details will follow, but for now it should be pretty obvious what this program
 will do. Copy this text into a file called black_border.c.
 
@@ -113,15 +113,15 @@ The Z88DK front end tool for the zsdcc compiler is zcc. In order to make it
 build code for a Spectrum, as opposed to any of the dozens of other machines
 Z88DK supports, it needs the +zx target as its first argument. So all our
 compilation commands will start with:
-
+```
   >zcc +zx ...
-
+```
 zcc output can be noisy, which is frequently useful but initially confusing. So
 for the time being we're going to turn down the verboseness of the output using
 the -vn flag:
-
+```
   >zcc +zx -vn ...
-
+```
 zcc can utilise either of the C compilers in Z88DK; for the purposes of this
 guide we're only using the newer, more standards compliant one, zsdcc. Which
 compiler is used depends on the compile line switch which sets the library to
@@ -135,9 +135,9 @@ understand that this is the library to use when getting started and using it on
 the command line automatically invokes the new compiler which is what we
 want. The zcc argument to select the library is -clib, so now the command line
 is:
-
+```
   >zcc +zx -vn -clib=sdcc_iy ...
-
+```
 Next we need to specify a C runtime. This is a small piece of code which is
 inserted before the programmer's C code. It sets up memory usage, how the
 program will exit, and various other things to do with how the keyboard is read
@@ -146,22 +146,22 @@ thing is important, but almost none of it is relevant to the ZX
 Spectrum. Therefore the most basic C runtime is the one for us to use. The C
 runtimes are numbered rather than named, and it happens that the one numbered
 '31' is the most minimalistic one. Hence that's the one to use:
-
+```
   >zcc +zx -vn -clib=sdcc_iy -startup=31 ...
-
+```
 Now we specify the input C file. You saved the example code to a file called
 black_border.c, so:
-
+```
   >zcc +zx -vn -clib=sdcc_iy -startup=31 black_border.c ...
-
+```
 Now for the output. zsdcc produces a bunch of output files, none of which are of
 any interest when getting started other than the final runnable. Nevertheless,
 they have to be called something so we must specify the basename for these
 files.  Extensions like ".bin" and ".o" are frequently used, but no extension
 works just as well:
-
+```
   >zcc +zx -vn -clib=sdcc_iy -startup=31 black_border.c -o black_border ...
-
+```
 One more thing to add. The output from the C compiler is Z80 machine code, but
 we need a way to get it into a Spectrum. Spectrums, as we all know, use tapes,
 so we need to bundle up our program into a TAP archive so the Spectrum can LOAD
@@ -170,9 +170,9 @@ it.
 There's a tool to do exactly that called appmake, but we don't need to know the
 details of that because zcc will handle it for us. Adding the appropriate
 argument brings us to our final command line:
-
+```
   >zcc +zx -vn -clib=sdcc_iy -startup=31 black_border.c -o black_border -create-app
-
+```
 Running this command should produce a file called black_border.tap. If it
 doesn't it's easier to ask in the Z88DK support forum than it is to try to work
 out why.
@@ -197,9 +197,9 @@ might be useful to complete the picture of what's happening.
 #### Header Files
 
 The first line of the program is:
-
+```
   #include <arch/zx.h>
-
+```
 but where does this file come from? The Z88DK installation contains hundreds of
 header files and only a small number of them are for use with zsdcc and the
 Spectrum.
@@ -209,13 +209,13 @@ of -vn and looking for the -I argument on the zsdccp command. How this affects
 the compilation is beyond the scope of a getting started guide, but suffice to
 say it shows that when using the zsdcc compiler the header files come from this
 directory:
-
+```
  include/_DEVELOPMENT/sdcc
-
+```
 so the header file being included in this example is:
-
+```
  include/_DEVELOPMENT/sdcc/arch/zx.h
-
+```
 It's sometimes quicker to browse the header files in a web browser. The base
 link is [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/sdcc).
 
@@ -235,18 +235,18 @@ Another peek at the output of zcc with the -v argument shows a -L argument being
 passed into an embedded z80asm command. Again, details are beyond the scope of
 this document, but the value for that argument tells us that the library code is
 coming from:
-
+```
  libsrc/_DEVELOPMENT/lib/sdcc_iy
-
+```
 There are several library files in there which together make up the entire
 sdcc_iy library. Any of those files can supply code for a zsdcc compiled
 program. The important one for Spectrum programmers is zx.lib. That library file
 is full of optimised Z80 machine code routines which provide the sorts of
 features Spectrum programs need. If you're interested you can inspect the
 contents of the library with the z80nm command:
-
->z80nm zx.lib | less
-
+```
+  >z80nm zx.lib | less
+```
 Do a search and you'll find the zx_border() function listed in there.
 
 
