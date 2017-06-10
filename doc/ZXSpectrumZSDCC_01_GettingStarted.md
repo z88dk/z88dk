@@ -1,4 +1,4 @@
-# ZX Spectrum Development with Z88dk - Getting Started
+# ZX Spectrum Development with Z88DK - Getting Started
 
 This document describes how to get started writing ZX Spectrum programs using
 Z88DK. It concerns itself only with the newer, more standards compilant zsdcc C
@@ -62,25 +62,28 @@ discussed, but the user is assumed to be able to read a simple C program.
 
 The first step is to check the necessary tools are in place. Running each of
 these commands should produce something similar to the output given:
-
-  >zcc
+```
+  \>zcc
   zcc - Frontend for the z88dk Cross-C Compiler
   <pages and pages of help and options snipped>
-
-  >zsdcc
+```
+```
+  \>zsdcc
   ZSDCC IS A MODIFICATION OF SDCC FOR Z88DK
   Build: 3.6.6 #9921 (Linux) Jun  2 2017
   <pages and pages of help and options snipped>
-
-  >z80asm
+```
+```
+  \>z80asm
   Z80 Module Assembler 2.8.5, (c) InterLogic 1993-2009, Paulo Custodio 2011-2017
-
-  >appmake 
+```
+```
+  \>appmake 
   appmake [+target] [options]
   
   The z88dk application generator
   <pages and pages of help and options snipped>
-
+```
 If these all work, we're ready to begin. If any of them don't, those problems
 need solving before going any further.
 
