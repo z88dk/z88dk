@@ -16,7 +16,7 @@
 // draw all 9 sprites underneath the 10th moving one.
 /////////////////////////////////////////////////////////////
 
-// zcc +ts2068 -vn ex3a.c -o ex3a.bin -create-app -lsp1 -lmalloc
+// zcc +ts2068 -vn ex3a.c -o ex3a.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

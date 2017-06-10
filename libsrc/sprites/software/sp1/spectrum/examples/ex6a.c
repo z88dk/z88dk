@@ -48,7 +48,7 @@
 // text is printed to see the effect.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex6a.c -o ex6a.bin -create-app -lsp1
+// zcc +zx -vn ex6a.c -o ex6a.bin -create-app -lsp1 -lndos
 
 #include <sprites/sp1.h>
 #include <spectrum.h>

@@ -8,7 +8,7 @@
 // draw function is specified.
 /////////////////////////////////////////////////////////////
 
-// zcc +ts2068 -vn ex2b.c -o ex2b.bin -create-app -lsp1 -lmalloc
+// zcc +ts2068 -vn ex2b.c -o ex2b.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

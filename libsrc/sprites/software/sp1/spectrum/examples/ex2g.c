@@ -8,7 +8,7 @@
 // several different sprite types.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex2g.c -o ex2g.bin -create-app -lsp1 -lmalloc
+// zcc +zx -vn ex2g.c -o ex2g.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

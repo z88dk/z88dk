@@ -35,7 +35,7 @@
 // colour.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex4a.c -o ex4a.bin -create-app -lsp1 -lmalloc
+// zcc +zx -vn ex4a.c -o ex4a.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

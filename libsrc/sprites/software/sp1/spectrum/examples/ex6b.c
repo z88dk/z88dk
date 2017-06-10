@@ -73,7 +73,7 @@
 ///////////////////////////////////////////////////////////////
 //
 // ALL GRAPHICS BY REDBALLOON AT WWW.WORLDOFSPECTRUM.ORG/FORUMS
-// zcc +zx -vn ex6b.c -o ex6b.bin -create-app -lsp1
+// zcc +zx -vn ex6b.c -o ex6b.bin -create-app -lsp1 -lndos
 
 #include <input.h>
 #include <sprites/sp1.h>
