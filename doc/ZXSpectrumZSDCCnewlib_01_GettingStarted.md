@@ -68,10 +68,9 @@ these commands should produce something similar to the output given:
   <pages and pages of help and options snipped>
 ```
 ```
-  >zsdcc
+  >zsdcc -v
   ZSDCC IS A MODIFICATION OF SDCC FOR Z88DK
   Build: 3.6.6 #9921 (Linux) Jun  2 2017
-  <pages and pages of help and options snipped>
 ```
 ```
   >z80asm
