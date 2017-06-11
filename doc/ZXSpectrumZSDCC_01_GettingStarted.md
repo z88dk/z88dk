@@ -142,10 +142,11 @@ Next we need to specify a C runtime. This is a small piece of code which is
 inserted before the programmer's C code. It sets up memory usage, how the
 program will exit, and various other things to do with how the keyboard is read
 and the screen is used. On some of the machines supported by Z88DK this sort of
-thing is important, but almost none of it is relevant to the ZX
-Spectrum. Therefore the most basic C runtime is the one for us to use. The C
-runtimes are numbered rather than named, and it happens that the one numbered
-'31' is the most minimalistic one. Hence that's the one to use:
+thing is important, but it is less so for the ZX Spectrum, especially if the
+intention is to write graphics based programs such as games. Therefore the most
+basic C runtime is the one for us to use. The C runtimes are numbered rather
+than named, and it happens that the one numbered '31' is the most minimalistic
+one. Hence that's the one to use:
 ```
   >zcc +zx -vn -clib=sdcc_iy -startup=31 ...
 ```
