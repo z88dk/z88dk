@@ -229,7 +229,7 @@ system. The relevant ones are those for the zsdcc compiler.
 
 Another question which might be asked of this tiny example is, where does the
 zx_border() code come from? The answer is the sdcc_iy standard library specified
-on the zcc compilation command via the -clib argument.
+in the zcc compilation command via the -clib argument.
 
 Another peek at the output of zcc with the -v argument shows a -L argument being
 passed into an embedded z80asm command. Again, details are beyond the scope of
@@ -238,21 +238,14 @@ coming from:
 ```
  libsrc/_DEVELOPMENT/lib/sdcc_iy
 ```
-There are several library files in there which together make up the entire
-sdcc_iy library. Any of those files can supply code for a zsdcc compiled
-program. The important one for Spectrum programmers is zx.lib. That library file
-is full of optimised Z80 machine code routines which provide the sorts of
-features Spectrum programs need. If you're interested you can inspect the
-contents of the library with the z80nm command:
-```
-  >z80nm zx.lib | less
-```
-Do a search and you'll find the zx_border() function listed in there.
+The contents of this directory are built during the Z88DK build, so you can't
+browse is online.
 
-
-
-
-Another worked example? Using sp1? Better, can I find some stuff in the clib
-which I can build togther?
-
-Read the comments in the thread I started and see what details I can pull out.
+On your local machine you'll find there are several library files in there
+which together make up the entire sdcc_iy library. Any of those files can supply
+code for a zsdcc compiled program. The important one for Spectrum programmers is
+zx.lib. That library file is full of optimised Z80 machine code routines which
+provide the sorts of features Spectrum programs need. If you're interested you
+can inspect the contents of the library with the z80nm command: ``` >z80nm
+zx.lib | less ``` Do a search and you'll find the zx_border() function listed in
+there.
