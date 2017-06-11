@@ -247,6 +247,8 @@ which together make up the entire sdcc_iy library. Any of those files can supply
 code for a zsdcc compiled program. The important one for Spectrum programmers is
 zx.lib. That library file is full of optimised Z80 machine code routines which
 provide the sorts of features Spectrum programs need. If you're interested you
-can inspect the contents of the library with the z80nm command: ``` >z80nm
-zx.lib | less ``` Do a search and you'll find the zx_border() function listed in
-there.
+can inspect the contents of the library with the z80nm command:
+```
+>z80nm zx.lib | less
+```
+Do a search and you'll find the zx_border() function listed in there.
