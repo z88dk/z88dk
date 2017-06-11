@@ -6954,27 +6954,31 @@ replace restart {
 	sla	c
 	rl	b
 } by {
-	ex	de,hl
+	ld	e,l
+	ld	d,h
 	add	hl,hl
 	ld	c,l
 	ld	b,h
-	ex	de,hl
+	ld	l,e
+	ld	h,d
 	; peephole z88dk-206b
 } if notUsed('de')
 
 replace restart {
 	ld	c,l
 	ld	b,h
-	ex	de,hl
+	ld	l,e
+	ld	h,d
 	sla	c
 	rl	b
 } by {
 	add	hl,hl
 	ld	c,l
 	ld	b,h
-	ex	de,hl
+	ld	l,e
+	ld	h,d
 	; peephole z88dk-206c
-} if notUsed('de')
+}
 
 replace restart {
 	ld	c,l
