@@ -14,15 +14,16 @@ include Make.config
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
 all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
-	abc80_clib.lib abc800_clib.lib \
-	ace_clib.lib aquarius_clib.lib aussie.lib bee_clib.lib microbee.lib c7420_clib.lib\
-	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib \
+	abc80_clib.lib abc800_clib.lib ace_clib.lib aquarius_clib.lib \
+	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
+	cpm_clib.lib einstein.lib gal_clib.lib \
+	g800_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
-	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
+	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
@@ -1279,6 +1280,20 @@ gal_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
+
+# Sharp PC-G8xx/E2xx - Stefano Bodrato
+g800_clib.lib:
+	@echo ''
+	@echo '--- Building Sharp PC-G8xx/E2xx Library ---'
+	@echo ''
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdlib TARGET=g800
+	$(MAKE) -C stdio 
+	$(MAKE) -C compress/zx7 
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(LISTFILE_DIRECTORY)/g800.lst
 
 # Camputers Lynx - Stefano Bodrato
 lynx_clib.lib:
