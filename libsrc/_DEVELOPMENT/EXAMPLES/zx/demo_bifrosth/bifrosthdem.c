@@ -17,9 +17,9 @@
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0            // do not create a heap
 #pragma output REGISTER_SP           = -1           // do not change sp
 
-#define printInk(k)          printf("\x10%c", (k))
-#define printPaper(k)        printf("\x11%c", (k))
-#define printAt(row, col)    printf("\x16%c%c", (col), (row))
+#define printInk(k)          printf("\x10%c", '0'+(k))
+#define printPaper(k)        printf("\x11%c", '0'+(k))
+#define printAt(row, col)    printf("\x16%c%c", (col)+1, (row)+1)
 
 extern unsigned char ctiles[];
 

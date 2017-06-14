@@ -13,8 +13,10 @@ zx_01_output_fzx_tty_z88dk_22_at:
    ex de,hl
    
    ld e,(hl)                   ; e = y coord
+   dec e
    inc hl
    ld l,(hl)                   ; l = x coord
+   dec l
 
    xor a
    

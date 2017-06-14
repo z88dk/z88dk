@@ -11,6 +11,7 @@ zx_01_output_fzx_tty_z88dk_23_atr:
    ; de = parameters *
    
    ld a,(de)                   ; a = dy
+   dec a
    inc de
    
    ld c,a
@@ -29,6 +30,7 @@ zx_01_output_fzx_tty_z88dk_23_atr:
    ld (ix+38),h                ; set new y
    
    ld a,(de)                   ; a = dx
+   dec a
    
    ld c,a
    
