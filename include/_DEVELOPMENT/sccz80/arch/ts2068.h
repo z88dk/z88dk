@@ -180,10 +180,10 @@ extern unsigned char __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr) __smallc;
 extern unsigned char __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ zx_saddr2px(void *saddr) __smallc;
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2px(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ zx_saddr2py(void *saddr) __smallc;
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2py(void *saddr) __smallc;
 
 
 extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcdown(void *saddr) __smallc;

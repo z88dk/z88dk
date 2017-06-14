@@ -166,10 +166,10 @@ extern unsigned char zx_saddr2cx(void *saddr);
 extern unsigned char zx_saddr2cy(void *saddr);
 
 
-extern unsigned char zx_saddr2px(void *saddr);
+extern unsigned int zx_saddr2px(void *saddr);
 
 
-extern unsigned char zx_saddr2py(void *saddr);
+extern unsigned int zx_saddr2py(void *saddr);
 
 
 extern unsigned char *zx_saddrcdown(void *saddr);
