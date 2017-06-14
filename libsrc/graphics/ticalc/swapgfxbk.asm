@@ -14,17 +14,13 @@
 ;
 
 
-                PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
+		PUBLIC    swapgfxbk
+		PUBLIC    _swapgfxbk
 		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
+		PUBLIC   _swapgfxbk1
 
 		EXTERN	cpygraph
 
-
-.swapgfxbk
-._swapgfxbk
-		ret
 
 .swapgfxbk1
 ._swapgfxbk1
@@ -38,4 +34,6 @@
 		pop	de
 		pop	hl
 
+.swapgfxbk
+._swapgfxbk
 		ret
