@@ -66,7 +66,6 @@ compile line is therefore:
 
 ```
  zcc +zx -vn -startup=0 -clib=sdcc_iy hello_world.c -o hello_world -create-app
-
 ```
 
 Run that compilation and drag and drop the resultant TAP file onto the Fuse
@@ -114,7 +113,7 @@ few bytes of the Spectrum's ROM:
 
   int main()
   {
-    unsigned char * rom_addr = 0;
+    unsigned char* rom_addr = 0;
     int i, j;
 
     zx_cls(PAPER_WHITE);
@@ -176,7 +175,7 @@ called question.c:
     zx_cls(PAPER_WHITE);
 
     printf("What is your name? ");
-    gets(name);
+    gets(name);  /* Dangerous! See below */
     printf("Hello, %s", name);
 
     return 0;
@@ -230,7 +229,6 @@ and recompile with crt1 using:
 
 ```
 zcc +zx -vn -startup=1 -clib=sdcc_iy hello_world.c -o hello_world -create-app
-
 ```
 
 When you run this program you'll see the word "world" is in magenta ink. Why?
@@ -252,8 +250,8 @@ Try this one:
 
 Code '\x16' (hex, that's 22 decimal) is the 'AT' control which sets the cursor
 position. The next 2 bytes provide the x,y cursor character location (0A,0C hex
-is 10,12 decimal, in this case). Note that stdio code takes the arguments in x,y
-order, which is the opposite way round to Spectrum BASIC's AT operator, and that
+is 10,12 decimal). Note that the stdio code takes the arguments in x,y order,
+which is the opposite way round to Spectrum BASIC's AT operator, and that
 coordinates are 1-based, not 0-based. That is, the top left corner of the screen
 is 1,1, not 0,0.
 
