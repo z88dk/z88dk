@@ -3,7 +3,10 @@
 // zcc +cpm -vn -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 password.c -o password -create-app
 
 // zcc +zx -vn -startup=8 -O3 -clib=new password.c -o password -create-app
-// zcc +zx -vn -startup=8 -clib=sdcc_iy --max-allocs-per-node200000 password.c -o password -create-app
+// zcc +zx -vn -startup=8 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 password.c -o password -create-app
+
+#pragma printf = "%s"
+#pragma scanf  = "%["
 
 #include <stdio.h>
 #include <stropts.h>

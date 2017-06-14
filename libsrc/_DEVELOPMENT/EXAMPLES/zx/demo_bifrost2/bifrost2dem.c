@@ -18,7 +18,7 @@
 
 #define printInk(k)          printf("\x10%c", '0'+k)
 #define printPaper(k)        printf("\x11%c", '0'+k)
-#define printAt(row, col)    printf("\x16%c%c", (col), (row))
+#define printAt(row, col)    printf("\x16%c%c", (col)+1, (row)+1)
 
 extern unsigned char ctiles[];
 

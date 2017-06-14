@@ -4,11 +4,11 @@
 SECTION code_font
 SECTION code_font_fzx
 
-PUBLIC _fzx_at
+PUBLIC _fzx_at_callee
 
 EXTERN asm_fzx_at
 
-_fzx_at:
+_fzx_at_callee:
 
    pop af
    pop ix
