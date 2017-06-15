@@ -579,13 +579,13 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 						str_append_char(new_name, '_');
 						str_append(new_name, section->name);
 
-						myfclose(*pbinfile);
+                        myfclose_remove_if_empty(*pbinfile);
 						*pbinfile = myfopen(get_bin_filename(str_data(new_name)), "wb");
 						if (!*pbinfile)
 							break;
 
 						if (*prelocfile) {
-							myfclose(*prelocfile);
+                            myfclose_remove_if_empty(*prelocfile);
 							*prelocfile = myfopen(get_reloc_filename(str_data(new_name)), "wb");
 							cur_section_block_size = 0;
 						}
