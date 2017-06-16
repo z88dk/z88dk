@@ -2,13 +2,13 @@
 
 This is the second document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
-with the newer, more standards compilant zsdcc C compiler. Neither the older
-sccz80 compiler nor the older "classic" libraries are discussed.
+with the newer, more standards compilant zsdcc C compiler. Neither the original
+sccz80 compiler nor the "classic" library is discussed.
 
 ## Assumptions
 
-It is assumed the reader has worked through the first installment of this
-series.
+It is assumed the reader has worked through the [first installment of this
+series](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
 
 ## Purpose
 
@@ -16,7 +16,7 @@ It might be a reasonable assumption that most people picking up Spectrum
 programming for the first time are looking to write games, and so are interested
 in sprites, joysticks, music, and so on. First things first, however. Simple
 text based programs allow programmers to experiment with library routines, to
-feed them inputs and see the outputs. Runtime debugging is a long way away in
+feed them inputs and see the outputs. Runtime debugging will go a long way away in
 this "getting started" series, so for the time being text IO is going to be
 useful.
 
@@ -28,8 +28,9 @@ input and output is traditionally based around the ROM routines accessed from
 BASIC and hence is extremely simple. stdio, from the world of C, is vastly more
 powerful. It looks a bit strange in 32 columns.
 
-The stdio library talks to a "driver." The driver is the part of the Z88DK code
-which handles the screen, input and output.
+The stdio library talks to a "driver." A driver is some Z88DK code that is
+attached to the end of a byte stream.  These drivers can handle screen output
+and keyboard input like PRINT and INPUT do in basic.
 
 ### Hello World
 
@@ -81,7 +82,7 @@ and you'll notice it contains the declaration of the zx_cls() function. There's
 no documentation for that function beyond the header file, but it's a reasonable
 assumption that it clears the screen. A little experimentation shows that its
 argument changes the colour attribute of the screen. Try changing the
-PAPER_WHITE constant to PAPER_YELLOW to confirm this. The scarceity of
+PAPER_WHITE constant to PAPER_YELLOW to confirm this. The scarcity of
 documentation makes this sort of investigation necessary for Z88DK development
 as things stand.
 
@@ -114,7 +115,7 @@ few bytes of the Spectrum's ROM:
   int main()
   {
     unsigned char* rom_addr = 0;
-    int i, j;
+    unsigned char i, j;
 
     zx_cls(PAPER_WHITE);
 
@@ -190,7 +191,7 @@ We'll go back to 32 column mode for this one (crt0), so the compile command is:
 zcc +zx -vn -startup=0 -clib=sdcc_iy question.c -o question -create-app
 ```
 
-Note that with stdio comes the responsibility usually associated with the
+Note that with stdio comes the same responsibilities usually associated with the
 library on other platforms. This includes avoiding things like buffer
 overflows. The example above uses a buffer of 15 bytes for the entered name. Try
 entering a 20 character string and see how the Spectrum behaves. The use of
@@ -267,7 +268,7 @@ requires. Macros can make them more readable. For example:
   #define FLASH_ON "\x12\x31"
 ```
 
-A subtle caveat to look our for. Consider this:
+A subtle caveat to look out for. Consider this:
 
 ```
   puts("\x16\x0A\x0BCool!");
@@ -298,22 +299,22 @@ So far in this guide we've looked at the following C runtimes. It's always worth
 checking to ensure you're using the right one. If you don't need control codes
 don't use one of the crts which enable them. You'll save memory.
 
-#### -startup0 (crt0)
+#### -startup=0 (crt0)
 
 32x24 mode, no control code support
 
-#### -startup1 (crt1)
+#### -startup=1 (crt1)
 
 32x24 mode, control codes supported
 
-#### -startup4 (crt4)
+#### -startup=4 (crt4)
 
 64x24 mode, no control code support
 
-#### -startup5 (crt5)
+#### -startup=5 (crt5)
 
 64x24 mode, control codes supported
 
-#### -startup31 (crt31)
+#### -startup=31 (crt31)
 
 stdio not supported at all

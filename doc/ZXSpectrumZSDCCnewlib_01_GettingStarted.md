@@ -2,10 +2,10 @@
 
 This document describes how to get started writing ZX Spectrum programs using
 Z88DK. It concerns itself only with the newer, more standards compilant zsdcc C
-compiler. The older sccz80 compiler is not discussed.
+compiler. The original sccz80 compiler is not discussed.
 
 Further, this document only concerns itself with the 48K ZX Spectrum. Topics
-which came with the later machines, like memory bank switching, are not covered
+concerned with the later machines, like memory bank switching, are not covered
 here.
 
 ## Purpose
@@ -19,8 +19,10 @@ tools and libraries found in Z88DK.
 Z88DK covers around 50 Z80 based machines. This document covers exactly one of
 them.
 
-Z88DK has 2 compilers which can build ZX Spectrum programs. This document covers
+Z88DK has two C compilers which can build ZX Spectrum programs. This document covers
 only one of them.
+
+Z88DK has two C libraries containing code that implements the standard and extensions.  This document covers one of them.
 
 ## Assumptions
 
@@ -157,7 +159,7 @@ black_border.c, so:
 Now for the output. zsdcc produces a bunch of output files, none of which are of
 any interest when getting started other than the final runnable. Nevertheless,
 they have to be called something so we must specify the basename for these
-files.  Extensions like ".bin" and ".o" are frequently used, but no extension
+files.  Extensions like ".bin" are frequently used, but no extension
 works just as well:
 ```
   >zcc +zx -vn -clib=sdcc_iy -startup=31 black_border.c -o black_border ...
@@ -201,7 +203,7 @@ The first line of the program is:
   #include <arch/zx.h>
 ```
 but where does this file come from? The Z88DK installation contains hundreds of
-header files and only a small number of them are for use with zsdcc and the
+header files and only a some of them are for use with zsdcc and the
 Spectrum.
 
 The answer can be found by running our compilation command again with -v instead
@@ -239,7 +241,7 @@ coming from:
  libsrc/_DEVELOPMENT/lib/sdcc_iy
 ```
 The contents of this directory are built during the Z88DK build, so you can't
-browse is online.
+browse it online.
 
 On your local machine you'll find there are several library files in there
 which together make up the entire sdcc_iy library. Any of those files can supply
@@ -251,3 +253,5 @@ can inspect the contents of the library with the z80nm command:
 >z80nm zx.lib | less
 ```
 Do a search and you'll find the zx_border() function listed in there.
+
+[... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)
