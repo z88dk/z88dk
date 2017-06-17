@@ -20,20 +20,21 @@ disappointment.
 There's a header file full of graphics routines here:
 
 ```
- [include/graphics.h](https://github.com/z88dk/z88dk/blob/master/include/graphics.h)
+ include/graphics.h
 ```
 
-This what we're after: draw, plot, circle, all sorts of stuff. But there's a
-problem. The header file is in the Z88DK include/ directory, whereas the header
-files for all the new libraries are, as we've seen in the previous installments
-of this series, here:
+[This](https://github.com/z88dk/z88dk/blob/master/include/graphics.h) is what
+we're after: draw, plot, circle, all sorts of stuff. But there's a problem. The
+header file is in the Z88DK include/ directory, whereas the header files for all
+the new libraries are, as we've seen in the previous installments of this
+series, here:
 
 ```
  include/_DEVELOPMENT/sdcc/
 ```
 
 The explanation is that the header files in the include/ directory relate to
-functions in the classic librares. We're using the newer compiler with the new
+functions in the _classic_ librares. We're using the newer compiler with the _new_
 libraries, and you'll notice that there's no graphics.h file in the
 include/_DEVELOPMENT/sdcc directory. As of this writing, June 2017, the graphics
 routines haven't yet been ported to the new library.
