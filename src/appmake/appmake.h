@@ -126,6 +126,9 @@ extern option_t  rex_options;
 extern int       rom_exec(char *target);
 extern option_t  rom_options;
 
+extern int       glue_exec(char *target);
+extern option_t  glue_options;
+
 extern int       residos_exec(char *target);
 extern option_t  residos_options;
 
@@ -288,6 +291,10 @@ struct {
       "Embed a binary inside a rom, padding if necessary",
       NULL,
       rom_exec,    &rom_options },
+    { "gluebin", "glue", "(C) 2017 Alvin Albrecht",
+      "Glue several output binaries into a single binary representing memory",
+       NULL,
+       glue_exec, &glue_options },
     { "dgos",   "srr",       "(C) 2011, 2017 Stefano Bodrato",
       "DGOS, KCS variant for Sorcerer Exidy and Microbee, also WAV format",
       NULL,
@@ -398,7 +405,6 @@ struct {
 extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(char *filen, char *ext,char *target);
 extern FILE         *fopen_bin(char *fname, char *crtfile);
-extern FILE         *fopen_data(char *fname);
 extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);
