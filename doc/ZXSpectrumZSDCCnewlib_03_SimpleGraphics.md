@@ -72,7 +72,7 @@ on screen.  Z88DK calls the memory region that represents pixels the "screen add
 and the memory region that represents colours the "attribute addresses."
 
 The problem of drawing or printing into the display directly is then a problem of 
-apping character and pixel coordinates to memory addresses in the display file area.
+mapping character and pixel coordinates to memory addresses in the display file area.
 This is what the manipulator functions that Z88DK provides does for you.
 
 The display file manipulator functions are defined in
@@ -105,14 +105,15 @@ you would write a byte there that sets exactly one bit corresponding the individ
 you want to plot.  There is another function `zx_px2bitmask()` that will tell you what byte
 to write given an x coordinate and we will see how that is used in the example below.
 
-It should be noted that both the character coordinates and pixel coordinates have (0,0)
+It should be noted that both the character coordinates and the pixel coordinates have (0,0)
 located at the top left of the screen.  BASIC does the same for character coordinates but
 it places the pixel coordinate origin two character lines above the lower left of the
 screen.  So the pixel coordinate system is a little bit different in C.
 
 ### Plotting Points on Screen
 
-To illustrate how this display manipulators can be used, let's write a program that plots points at random on the screen.  Save this to a file called plot.c:
+To illustrate how these display manipulators can be used, let's write a program that plots
+points at random on the screen.  Save this to a file called plot.c:
 
 ```
   /* C source start */
@@ -239,11 +240,12 @@ The compile line is the same as for the last example:
 ### Where To Go From Here
 
 We didn't do anything with colour.  The function `zx_saddr2aaddr()` may be useful
-for turning a screen address into a corresponding attribute address.
+for turning a screen address into a corresponding attribute address which you
+could then use to write an attribute value.
 
 Another simple modification may be to have the line routine draw a patterned line
 instead of a solid black one.
 
 Besides the screen address manipulators, there is one high level graphics function
 in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L280)
-and that is `zx_pattern_fill()` which will fill an area on screen with a pattern.
+and that is `zx_pattern_fill()`.  This can be used to fill an area on screen with a pattern.
