@@ -97,7 +97,8 @@ sub get_bytes {
 		$bytes .= $line_bytes;
 		
 		# compute swapped ix/iy
-		$line_bytes =~ s/^(\x76?)([\xDD\xFD])/$1 . ($2 eq chr(0xDD) ? chr(0xFD) : chr(0xDD))/e;
+		$line_bytes =~ s/^ (\x76?) ([\xDD\xFD]) (?! [\xD4\xE4\xF4] ) /
+						$1 . ($2 eq chr(0xDD) ? chr(0xFD) : chr(0xDD))/xe;
 		$bytes_ixiy .= $line_bytes;
 	}
 	

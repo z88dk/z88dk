@@ -6,29 +6,6 @@
 ; 16-bit load group
 ;------------------------------------------------------------------------------
 
-			ld {.  .  X  . }['],  N_IMN	=> expr_in_parens ?             2A, N, M : 01 + $1*10, N, M
-			ld {bc de .  sp}['],  N_IMN	=> expr_in_parens ? ED, 4B + $1*10, N, M : 01 + $1*10, N, M
-
-			ld IMN, X					=>             22, N, M
-			ld IMN, {bc de . sp}		=> ED, 43 + $1*10, N, M
-
-			ld sp, X					=> F9
-			
-			push {bc de X  af}			=> C5 + $1*10
-			pop  {bc de X  af}[']		=> C1 + $1*10
-			
-[rabbit]	push ip						=> ED, 76
-[rabbit]	pop  ip						=> ED, 7E
-
-[r3k]		push su						=> ED, 66
-[r3k]		pop  su						=> ED, 6E
-
-[rabbit]	ld hl['],  ix				=> DD, 7C
-[rabbit]	ld hl['],  iy				=> FD, 7C
-			
-[rabbit]	ld ix, hl					=> DD, 7D
-[rabbit]	ld iy, hl					=> FD, 7D
-
 [rabbit]	ld hl['],  (HL+SN)			=> DD, E4
 [rabbit]	ld hl['],  (IX+SN)			=>     E4
 [rabbit]	ld hl['],  (IY+SN)			=> FD, E4

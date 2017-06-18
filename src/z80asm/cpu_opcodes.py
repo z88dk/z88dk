@@ -6,6 +6,10 @@
 P_IX = '(opts.swap_ix_iy ? 0xFD00 : 0xDD00)'
 P_IY = '(opts.swap_ix_iy ? 0xDD00 : 0xFD00)'
 
+RABBIT_P_HL = '0xDD00'
+RABBIT_P_IX = '(opts.swap_ix_iy ? 0xFD00 : 0     )'
+RABBIT_P_IY = '(opts.swap_ix_iy ? 0      : 0xFD00)'
+
 #------------------------------------------------------------------------------
 # Tokens
 #------------------------------------------------------------------------------
@@ -44,7 +48,10 @@ NEG		= Token(0x44,	"neg",	"_TK_NEG",		0)
 RLD		= Token(0x6F,	"rld",	"_TK_RLD",		0)
 RRD		= Token(0x67,	"rrd",	"_TK_RRD",		0)
 SCF		= Token(0x37,	"scf",	"_TK_SCF",		0)
-	
+
+PUSH	= Token(0,		"push",	"_TK_PUSH",		0)	
+POP		= Token(0,		"pop",	"_TK_POP",		0)	
+
 expr	= Token(0,		"",		"expr",			0)
 	
 B		= Token(0,		"b",	"_TK_B",		0); B.ix = B; B.iy = B
@@ -90,6 +97,9 @@ IND_HL	= Token(2,		"(hl",	"_TK_IND_HL",	0)   ; HL.ind = IND_HL
 IND_SP	= Token(3,		"(sp",	"_TK_IND_SP",	0)   ; SP.ind = IND_SP
 IND_IX	= Token(2,		"(ix",	"_TK_IND_IX",	0xDD); IX.ind = IND_IX
 IND_IY	= Token(2,		"(iy",	"_TK_IND_IY",	0xFD); IY.ind = IND_IY
+
+IP		= Token(0,		"ip",	"_TK_IP",		0);
+SU		= Token(0,		"su",	"_TK_SU",		0);
 
 sp = " "
 
@@ -764,3 +774,340 @@ for op in [CCF, SCF]:
 	emit_rule(RABBIT, [op, F1],
 		[DO_ALTD(), DO_stmt(op.n)])
 		
+
+#------------------------------------------------------------------------------
+# 16-bit load group
+#------------------------------------------------------------------------------
+
+# ld hl, NN | ld hl, (NN)
+dd = HL
+ind_opcode = 0x2A
+imm_opcode = 0x01 + dd.n*16
+emit_asm( ALL, "ld %s,  256"  % dd.asm, [imm_opcode, 0, 1]);
+emit_asm( ALL, "ld %s, (256)" % dd.asm, [ind_opcode, 0, 1]);
+emit_rule(ALL, [LD, dd, COMMA, expr], 
+	['\nif (expr_in_parens) {',
+	 DO_stmt_nn(ind_opcode),
+	 '\n} else {',
+	 DO_stmt_nn(imm_opcode),
+	 '\n}'])
+
+# altd ld hl, NN | altd ld hl, (NN)
+emit_asm( RABBIT, "altd ld %s,  256"  % dd.asm, [ALTD.prefix, imm_opcode, 0, 1]);
+emit_asm( RABBIT, "altd ld %s, (256)" % dd.asm, [ALTD.prefix, ind_opcode, 0, 1]);
+emit_rule(RABBIT, [ALTD, LD, dd, COMMA, expr], 
+	['\nif (expr_in_parens) {',
+	 DO_ALTD(),
+	 DO_stmt_nn(ind_opcode),
+	 '\n} else {',
+	 DO_ALTD(),
+	 DO_stmt_nn(imm_opcode),
+	 '\n}'])
+
+# ld hl', NN | ld hl', (NN)
+emit_asm( RABBIT, "ld %s,  256"  % dd.alt.asm, [ALTD.prefix, imm_opcode, 0, 1]);
+emit_asm( RABBIT, "ld %s, (256)" % dd.alt.asm, [ALTD.prefix, ind_opcode, 0, 1]);
+emit_rule(RABBIT, [LD, dd.alt, COMMA, expr], 
+	['\nif (expr_in_parens) {',
+	 DO_ALTD(),
+	 DO_stmt_nn(ind_opcode),
+	 '\n} else {',
+	 DO_ALTD(),
+	 DO_stmt_nn(imm_opcode),
+	 '\n}'])
+
+for dd in [IX, IY]:
+	# ld ix, NN | ld ix, (NN)
+	emit_asm( ALL, "ld %s,  256"  % dd.asm, [dd.prefix, imm_opcode, 0, 1]);
+	emit_asm( ALL, "ld %s, (256)" % dd.asm, [dd.prefix, ind_opcode, 0, 1]);
+	emit_rule(ALL, [LD, dd, COMMA, expr], 
+		['\nif (expr_in_parens) {',
+		 DO_stmt_nn(ind_opcode, dd.p_ix),
+		 '\n} else {',
+		 DO_stmt_nn(imm_opcode, dd.p_ix),
+		 '\n}'])
+
+for dd in [BC, DE, SP]:
+	# ld bc, NN | ld bc, (NN)
+	ind_opcode = 0x4B + dd.n*16
+	imm_opcode = 0x01 + dd.n*16
+	emit_asm( ALL, "ld %s,  256"  % dd.asm, [imm_opcode, 0, 1]);
+	emit_asm( ALL, "ld %s, (256)" % dd.asm, [0xED, ind_opcode, 0, 1]);
+	emit_rule(ALL, [LD, dd, COMMA, expr], 
+		['\nif (expr_in_parens) {',
+		 DO_stmt_nn(0xED00 + ind_opcode),
+		 '\n} else {',
+		 DO_stmt_nn(imm_opcode),
+		 '\n}'])
+
+	if dd != SP:
+		# altd ld bc, NN | altd ld bc, (NN)
+		emit_asm( RABBIT, "altd ld %s,  256"  % dd.asm, [ALTD.prefix, imm_opcode, 0, 1]);
+		emit_asm( RABBIT, "altd ld %s, (256)" % dd.asm, [ALTD.prefix, 0xED, ind_opcode, 0, 1]);
+		emit_rule(RABBIT, [ALTD, LD, dd, COMMA, expr], 
+			['\nif (expr_in_parens) {',
+			 DO_ALTD(),
+			 DO_stmt_nn(0xED00 + ind_opcode),
+			 '\n} else {',
+			 DO_ALTD(),
+			 DO_stmt_nn(imm_opcode),
+			 '\n}'])
+
+		# ld bc', NN | ld bc', (NN)
+		emit_asm( RABBIT, "ld %s,  256"  % dd.alt.asm, [ALTD.prefix, imm_opcode, 0, 1]);
+		emit_asm( RABBIT, "ld %s, (256)" % dd.alt.asm, [ALTD.prefix, 0xED, ind_opcode, 0, 1]);
+		emit_rule(RABBIT, [LD, dd.alt, COMMA, expr], 
+			['\nif (expr_in_parens) {',
+			 DO_ALTD(),
+			 DO_stmt_nn(0xED00 + ind_opcode),
+			 '\n} else {',
+			 DO_ALTD(),
+			 DO_stmt_nn(imm_opcode),
+			 '\n}'])
+
+# ld (NN), hl
+dd = HL
+opcode = 0x22
+emit_asm( ALL, "ld (256), %s" % dd.asm, [opcode, 0, 1])
+emit_rule(ALL, [LD, expr, COMMA, dd],
+	['\nif (!expr_in_parens) return FALSE;',
+	 DO_stmt_nn(opcode)])
+
+for dd in [IX, IY]:
+	# ld (NN), ix
+	emit_asm( ALL, "ld (256), %s" % dd.asm, [dd.prefix, opcode, 0, 1])
+	emit_rule(ALL, [LD, expr, COMMA, dd],
+		['\nif (!expr_in_parens) return FALSE;',
+		 DO_stmt_nn(opcode, dd.p_ix)])
+
+for dd in [BC, DE, SP]:
+	# ld (NN), bc
+	opcode = 0x43 + dd.n*16
+	emit_asm( ALL, "ld (256), %s" % dd.asm, [0xED, opcode, 0, 1])
+	emit_rule(ALL, [LD, expr, COMMA, dd],
+		['\nif (!expr_in_parens) return FALSE;',
+		 DO_stmt_nn(0xED00 + opcode)])
+
+# ld sp, hl
+opcode = 0xF9
+dd = HL
+emit_asm( ALL, "ld sp, %s" % dd.asm, [opcode])
+emit_rule(ALL, [LD, SP, COMMA, dd],
+	[DO_stmt(opcode)])
+
+for dd in [IX, IY]:
+	# ld sp, ix
+	emit_asm( ALL, "ld sp, %s" % dd.asm, [dd.prefix, opcode])
+	emit_rule(ALL, [LD, SP, COMMA, dd],
+		[DO_stmt(opcode, dd.p_ix)])
+
+for dd in [BC, DE, HL, AF]:
+	# push bc
+	opcode = 0xC5 + dd.n*16
+	emit_asm( ALL, "push %s" % dd.asm, [opcode])
+	emit_rule(ALL, [PUSH, dd],
+		[DO_stmt(opcode)])
+
+for dd in [IX, IY]:
+	# push ix
+	opcode = 0xC5 + dd.n*16
+	emit_asm( ALL, "push %s" % dd.asm, [dd.prefix, opcode])
+	emit_rule(ALL, [PUSH, dd],
+		[DO_stmt(opcode, dd.p_ix)])
+
+for dd in [BC, DE, HL, AF]:
+	# pop bc
+	opcode = 0xC1 + dd.n*16
+	emit_asm( ALL, "pop %s" % dd.asm, [opcode])
+	emit_rule(ALL, [POP, dd],
+		[DO_stmt(opcode)])
+
+	# altd pop bc
+	emit_asm( RABBIT, "altd pop %s" % dd.asm, [ALTD.prefix, opcode])
+	emit_rule(RABBIT, [ALTD, POP, dd],
+		[DO_ALTD(),
+		 DO_stmt(opcode)])
+
+	# pop bc'
+	emit_asm( RABBIT, "pop %s" % dd.alt.asm, [ALTD.prefix, opcode])
+	emit_rule(RABBIT, [POP, dd.alt],
+		[DO_ALTD(),
+		 DO_stmt(opcode)])
+
+for dd in [IX, IY]:
+	# pop ix
+	opcode = 0xC1 + dd.n*16
+	emit_asm( ALL, "pop %s" % dd.asm, [dd.prefix, opcode])
+	emit_rule(ALL, [POP, dd],
+		[DO_stmt(opcode, dd.p_ix)])
+
+# push ip
+emit_asm( RABBIT, "push %s" % IP.asm, [0xED, 0x76])
+emit_rule(RABBIT, [PUSH, IP], [DO_stmt(0xED76)])
+
+# pop ip
+emit_asm( RABBIT, "pop %s" % IP.asm, [0xED, 0x7E])
+emit_rule(RABBIT, [POP, IP], [DO_stmt(0xED7E)])
+
+# push su
+emit_asm( R3K, "push %s" % SU.asm, [0xED, 0x66])
+emit_rule(R3K, [PUSH, SU], [DO_stmt(0xED66)])
+
+# pop su
+emit_asm( R3K, "pop %s" % SU.asm, [0xED, 0x6E])
+emit_rule(R3K, [POP, SU], [DO_stmt(0xED6E)])
+
+for dd in [IX, IY]:
+	# ld hl, ix
+	opcode = 0x7C
+	emit_asm( RABBIT, "ld %s, %s" % (HL.asm, dd.asm), [dd.prefix, opcode])
+	emit_rule(RABBIT, [LD, HL, COMMA, dd], 
+		[DO_stmt(opcode, dd.p_ix)])
+		
+	# altd ld hl, ix
+	emit_asm( RABBIT, "altd ld %s, %s" % (HL.asm, dd.asm), 
+		[ALTD.prefix, dd.prefix, opcode])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, dd], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, dd.p_ix)])
+		
+	# ld hl', ix
+	emit_asm( RABBIT, "ld %s, %s" % (HL.alt.asm, dd.asm), 
+		[ALTD.prefix, dd.prefix, opcode])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, dd], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, dd.p_ix)])
+		 
+	# ld ix, hl
+	opcode = 0x7D
+	emit_asm( RABBIT, "ld %s, %s" % (dd.asm, HL.asm), [dd.prefix, opcode])
+	emit_rule(RABBIT, [LD, dd, COMMA, HL], 
+		[DO_stmt(opcode, dd.p_ix)])
+
+		
+		
+if 0:
+	# ld hl, (hl+d)
+	opcode = 0xE4
+	emit_asm( RABBIT, "ld hl, (hl + 127)", [0xDD, opcode, 0x7F])
+	emit_asm( RABBIT, "ld hl, (hl - 128)", [0xDD, opcode, 0x80])
+	emit_rule(RABBIT, [LD, HL, COMMA, IND_HL, expr, RPAREN], 
+		[DO_stmt_idx(opcode, RABBIT_P_HL)])
+
+	# ld hl, (hl)
+	emit_asm( RABBIT, "ld hl, (hl)", [0xDD, opcode, 0])
+	emit_rule(RABBIT, [LD, HL, COMMA, IND_HL, RPAREN], 
+		[DO_stmt(opcode, RABBIT_P_HL, 1)])
+
+	# altd ld hl, (hl+d)
+	emit_asm( RABBIT, "altd ld hl, (hl + 127)", [ALTD.prefix, 0xDD, opcode, 0x7F])
+	emit_asm( RABBIT, "altd ld hl, (hl - 128)", [ALTD.prefix, 0xDD, opcode, 0x80])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, IND_HL, expr, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt_idx(opcode, RABBIT_P_HL)])
+
+	# altd ld hl, (hl)
+	emit_asm( RABBIT, "altd ld hl, (hl)", [ALTD.prefix, 0xDD, opcode, 0])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, IND_HL, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, RABBIT_P_HL, 1)])
+
+	# ld hl', (hl+d)
+	emit_asm( RABBIT, "ld hl', (hl + 127)", [ALTD.prefix, 0xDD, opcode, 0x7F])
+	emit_asm( RABBIT, "ld hl', (hl - 128)", [ALTD.prefix, 0xDD, opcode, 0x80])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, IND_HL, expr, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt_idx(opcode, RABBIT_P_HL)])
+
+	# ld hl', (hl)
+	emit_asm( RABBIT, "ld hl', (hl)", [ALTD.prefix, 0xDD, opcode, 0])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, IND_HL, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, RABBIT_P_HL, 1)])
+
+
+		 
+		 
+		 
+		 
+		 
+	# ld hl, (ix+d)
+	emit_asm( RABBIT, "ld hl, (ix + 127)", [opcode, 0x7F])
+	emit_asm( RABBIT, "ld hl, (ix - 128)", [opcode, 0x80])
+	emit_rule(RABBIT, [LD, HL, COMMA, IND_IX, expr, RPAREN], 
+		[DO_stmt_idx(opcode, RABBIT_P_IX)])
+
+	# ld hl, (ix)
+	emit_asm( RABBIT, "ld hl, (ix)", [opcode, 0])
+	emit_rule(RABBIT, [LD, HL, COMMA, IND_IX, RPAREN], 
+		[DO_stmt(opcode, RABBIT_P_IX, 1)])
+
+	# altd ld hl, (ix+d)
+	emit_asm( RABBIT, "altd ld hl, (ix + 127)", [ALTD.prefix, opcode, 0x7F])
+	emit_asm( RABBIT, "altd ld hl, (ix - 128)", [ALTD.prefix, opcode, 0x80])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, IND_IX, expr, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt_idx(opcode, RABBIT_P_IX)])
+
+	# altd ld hl, (ix)
+	emit_asm( RABBIT, "altd ld hl, (ix)", [ALTD.prefix, opcode, 0])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, IND_IX, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, RABBIT_P_IX, 1)])
+
+	# ld hl', (ix+d)
+	emit_asm( RABBIT, "ld hl', (ix + 127)", [ALTD.prefix, opcode, 0x7F])
+	emit_asm( RABBIT, "ld hl', (ix - 128)", [ALTD.prefix, opcode, 0x80])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, IND_IX, expr, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt_idx(opcode, RABBIT_P_IX)])
+
+	# ld hl', (ix)
+	emit_asm( RABBIT, "ld hl', (ix)", [ALTD.prefix, opcode, 0])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, IND_IX, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, RABBIT_P_IX, 1)])
+
+
+		 
+		 
+		 
+		 
+		 
+	# ld hl, (iy+d)
+	emit_asm( RABBIT, "ld hl, (iy + 127)", [opcode, 0x7F])
+	emit_asm( RABBIT, "ld hl, (iy - 128)", [opcode, 0x80])
+	emit_rule(RABBIT, [LD, HL, COMMA, IND_IX, expr, RPAREN], 
+		[DO_stmt_idx(opcode, RABBIT_P_IX)])
+
+	# ld hl, (iy)
+	emit_asm( RABBIT, "ld hl, (iy)", [opcode, 0])
+	emit_rule(RABBIT, [LD, HL, COMMA, IND_IX, RPAREN], 
+		[DO_stmt(opcode, RABBIT_P_IX, 1)])
+
+	# altd ld hl, (iy+d)
+	emit_asm( RABBIT, "altd ld hl, (iy + 127)", [ALTD.prefix, opcode, 0x7F])
+	emit_asm( RABBIT, "altd ld hl, (iy - 128)", [ALTD.prefix, opcode, 0x80])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, IND_IX, expr, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt_idx(opcode, RABBIT_P_IX)])
+
+	# altd ld hl, (iy)
+	emit_asm( RABBIT, "altd ld hl, (iy)", [ALTD.prefix, opcode, 0])
+	emit_rule(RABBIT, [ALTD, LD, HL, COMMA, IND_IX, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, RABBIT_P_IX, 1)])
+
+	# ld hl', (iy+d)
+	emit_asm( RABBIT, "ld hl', (iy + 127)", [ALTD.prefix, opcode, 0x7F])
+	emit_asm( RABBIT, "ld hl', (iy - 128)", [ALTD.prefix, opcode, 0x80])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, IND_IX, expr, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt_idx(opcode, RABBIT_P_IX)])
+
+	# ld hl', (iy)
+	emit_asm( RABBIT, "ld hl', (iy)", [ALTD.prefix, opcode, 0])
+	emit_rule(RABBIT, [LD, HL.alt, COMMA, IND_IX, RPAREN], 
+		[DO_ALTD(),
+		 DO_stmt(opcode, RABBIT_P_IX, 1)])
+
