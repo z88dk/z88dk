@@ -318,3 +318,5 @@ don't use one of the crts which enable them. You'll save memory.
 #### -startup=31 (crt31)
 
 stdio not supported at all
+
+[... continue to Part 3: Simple Graphics](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md)
