@@ -42,6 +42,7 @@ extern void  myfclose( FILE *file );
    delete temp file by myfclose_remove() or atexit if xflcose() not called  */
 extern FILE *myfopen_atomic( char *filename, char *mode );
 extern void  myfclose_remove( FILE *file );
+extern void  myfclose_remove_if_empty(FILE *file);
 
 /* read/write buffers */
 extern void xfwrite( void *buffer, size_t size, size_t count, FILE *file );

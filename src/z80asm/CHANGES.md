@@ -14,6 +14,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-04-30 Fix #209 add a --cpu=z80 option
 - 2017-04-30 Fix #216 replace --RCMX000 by --cpu=r2k and --cpu=r3k
 - 2017-05-21 Fix #233 force the name of the output file to use section names with defined ORG
+- 2017-06-18 Fix #239 z80asm: empty sections with org are causing empty binaries to be produced (thank you @aralbrec)
 
 2016
 ----

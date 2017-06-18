@@ -951,9 +951,9 @@ CreateBinFile( void )
 		}
 
 		fwrite_codearea(filename, &binaryfile, &relocfile);		/* write code as one big chunk */
-		myfclose(binaryfile);
+        myfclose_remove_if_empty(binaryfile);
 		if (relocfile != NULL)
-			myfclose(relocfile);
+            myfclose_remove_if_empty(relocfile);
 	}
 }
 
