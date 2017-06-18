@@ -3,7 +3,7 @@
 This is the second document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
 with the newer, more standards compilant zsdcc C compiler. Neither the original
-sccz80 compiler nor the "classic" library is discussed.
+sccz80 compiler nor the classic library is discussed.
 
 ## Assumptions
 
@@ -72,7 +72,7 @@ compile line is therefore:
 Run that compilation and drag and drop the resultant TAP file onto the Fuse
 window. It does what you'd expect, Spectrum style.
 
-The zx.h header file is found here:
+The [zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h) header file is found here:
 
 ```
  include/_DEVELOPMENT/sdcc/arch/zx.h
@@ -86,7 +86,7 @@ PAPER_WHITE constant to PAPER_YELLOW to confirm this. The scarcity of
 documentation makes this sort of investigation necessary for Z88DK development
 as things stand.
 
-The stdio.h header is found here:
+The [stdio.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/stdio.h) header is found here:
 
 ```
  include/_DEVELOPMENT/sdcc/stdio.h
@@ -285,7 +285,7 @@ concatenation to work around this:
 
 Documentation for control codes, as implemented by the new Z88DK libraries,
 hasn't been completed yet. Reading the source files is the only way to get
-definitive documentation. They're here:
+definitive documentation. They're [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk):
 
 ```
   libsrc/_DEVELOPMENT/target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk
@@ -318,5 +318,15 @@ don't use one of the crts which enable them. You'll save memory.
 #### -startup=31 (crt31)
 
 stdio not supported at all
+
+### And a couple more CRTs we didn't look at:
+
+#### -startup=8 (crt8)
+
+fzx proportional fonts, no control code support
+
+#### -startup=9 (crt9)
+
+fzx proportional fonts, control codes supported
 
 [... continue to Part 3: Simple Graphics](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md)
