@@ -221,7 +221,7 @@ so the header file being included in this example is:
 It's sometimes quicker to browse the header files in a web browser. The base
 link is [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/sdcc).
 
-That arch/zx.h file contains the value for the INK_BLACK macro and a prototype
+That [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h) file contains the value for the INK_BLACK macro and a prototype
 for the zx_border() function.
 
 It's important not to be distracted by all the other header files in the
