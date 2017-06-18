@@ -2,14 +2,14 @@
 
 This is the third document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
-with the newer, more standards compilant zsdcc C compiler. Neither the older
-sccz80 compiler nor the older "classic" libraries are covered.
+with the newer, more standards compliant zsdcc C compiler. Neither the original
+sccz80 compiler nor the classic library is covered.
 
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from
-[installment 2](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md).
+series and is continuing on from [installment 2](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md).
+If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
 
 ## Simple Graphics
 
@@ -25,25 +25,25 @@ There's a header file full of graphics routines here:
 
 [This](https://github.com/z88dk/z88dk/blob/master/include/graphics.h) is what
 we're after: draw, plot, circle, all sorts of stuff. But there's a problem. The
-header file is in the Z88DK include/ directory, whereas the header files for all
-the new libraries are, as we've seen in the previous installments of this
-series, here:
+header file is in the Z88DK include/ directory, whereas the header files for the
+new library is, as we've seen in the previous installments of this
+series, [here](https://github.com/z88dk/z88dk/tree/master/include/_DEVELOPMENT/sdcc):
 
 ```
  include/_DEVELOPMENT/sdcc/
 ```
 
 The explanation is that the header files in the include/ directory relate to
-functions in the _classic_ librares. We're using the newer compiler with the _new_
-libraries, and you'll notice that there's no graphics.h file in the
+functions in the _classic_ library. We're using the newer compiler with the _new_
+library, and you'll notice that there's no graphics.h file in the
 include/_DEVELOPMENT/sdcc directory. As of this writing, June 2017, the graphics
 routines haven't yet been ported to the new library.
 
 Thus, for now at least, we meet a dead end. If your application requires the
-graphics libraries, or any other routines which aren't yet in the new libraries,
-your only option is to switch to the older, sccz80 compiler with the classic
-libraries. Although still well supported by Z88DK, and therefore a practical
-option if needed, this is not the way forward, and not covered by this guide.
+graphics libraries, or any other routines which aren't yet in the new library,
+your only option is to switch to using the classic library. Although still well
+supported by Z88DK, and therefore a practical option, this is outside the scope
+of this guide which concerns itself exclusively with the new library.
 
 This is an important lesson. There are two compilers in Z88DK, two sets of
 libraries and two sets of headers. You need to pay attention to which you're
@@ -51,7 +51,199 @@ using, which headers you're examining, and which are being referred to in the
 documentation, emails and forum posts you're reading. The graphics routines are
 a relatively simple case because they appear in one but are nowhere to be seen
 in the other; it gets more confusing when some classic library code has been
-ported to the new libraries, and has been updated on the way. If you find
+ported to the new library, and has been updated on the way. If you find
 yourself reading the documentation for the older code, while compiling and
 linking in the new code, you're going to get confused. While the Z88DK library
 transition is ongoing, you need to pay attention.
+
+## The Display File Address Manipulators
+
+Although the new library does not contain graphics commands like line, circle,
+and so on, it does contain some lower level functions that can help to implement
+these sorts of commands.  So before leaving this installment, let's have a look at
+how they might be used to implement plot and draw.
+
+The Spectrum's display is memory mapped, which means a block of memory is set aside
+to represent the screen contents and this block is read by the ULA to generate the
+display.  The range of memory addresses from 16384 to 22527 represent the pixels on
+screen.  Each bit represents whether a particular pixel is on or off.  The range of
+addresses from 22528 to 23295 represent the colour applied to each 8x8 group of pixels
+on screen.  Z88DK calls the memory region that represents pixels the "screen addresses"
+and the memory region that represents colours the "attribute addresses."
+
+The problem of drawing or printing into the display directly is then a problem of 
+apping character and pixel coordinates to memory addresses in the display file area.
+This is what the manipulator functions that Z88DK provides does for you.
+
+The display file manipulator functions are defined in
+[arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L87).
+If you scroll down to line 87, you will find a block of functions under the "display"
+heading.  These are the functions that manipulate display file addresses.
+
+To make it clear what each function does, there is a naming convention applied to
+each function name.  In general function names are composed of strings like these:
+
+```
+saddr = screen address
+aaddr = attribute address
+
+px    = pixel x coordinate (0..255)
+py    = pixel y coordinate (0..191)
+pxy   = pixel (x,y) coordinate
+
+cx    = character x coordinate (0..31)
+cy    = character y coordinate (0..23)
+cxy   = character (x,y) coordinate
+```
+
+If you wanted to find a function that converts a pixel x,y coordinate to a screen
+address, you would look for something like `zx_pxy2saddr`.  And there it is on line 197
+of [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L197).
+Because the Spectrum stores the state of eight pixels in each byte, the screen address
+returned by that function holds the state of eight pixels.  To plot an individual point,
+you would write a byte there that sets exactly one bit corresponding the individual pixel
+you want to plot.  There is another function `zx_px2bitmask()` that will tell you what byte
+to write given an x coordinate and we will see how that is used in the example below.
+
+It should be noted that both the character coordinates and pixel coordinates have (0,0)
+located at the top left of the screen.  BASIC does the same for character coordinates but
+it places the pixel coordinate origin two character lines above the lower left of the
+screen.  So the pixel coordinate system is a little bit different in C.
+
+### Plotting Points on Screen
+
+To illustrate how this display manipulators can be used, let's write a program that plots points at random on the screen.  Save this to a file called plot.c:
+
+```
+  /* C source start */
+
+  #include <arch/zx.h>
+  #include <input.h>
+  #include <stdlib.h>
+
+  void plot(unsigned char x, unsigned char y)
+  {
+     *zx_pxy2saddr(x,y) |= zx_px2bitmask(x);
+  }
+
+  int main(void)
+  {
+     zx_cls(PAPER_WHITE);
+   
+     while (1)
+     {
+        plot(rand()%256, rand()%192);
+      
+        if (in_test_key())
+        {
+           zx_cls((rand() % 7) + PAPER_WHITE);
+           in_wait_nokey();
+        }
+     }
+  }
+
+  /* C source end */
+```
+
+Our compile line will use startup=31 because we have no use for stdio in this example:
+
+```
+ zcc +zx -vn -startup=31 -clib=sdcc_iy plot.c -o plot -create-app
+```
+
+We're borrowing a couple of functions from the input library to check for keypresses.
+This is the subject of the next installment of this series.  The functions are fairly
+self-explanatory.  `in_test_key()` returns true if any key is pressed on the keyboard.
+`in_wait_nokey()` blocks until no keys are pressed.  The combination is being used in
+the above program to detect a keypress, clear the screen to a random ink colour, and
+then wait for the key to be released.  Functions like these will be explained more
+fully in part 4.
+
+The `plot()` function is very simple.  `zx_pxy2saddr(x,y)` returns a `char *` that
+represents the screen address that contains the point to be plotted.  To find out which
+bit in the byte there should be set, a call to `zx_px2bitmask(x)` is made.  The result
+of that call is a byte with a single bit set in it.  Then this byte is mixed into the
+display by ORing it in using the C operator "|=".
+
+Notice we haven't done anything with colour.  We're simply plotting pixels here and the
+colour they will appear in depends on the current attribute value on screen which
+is being set by `zx_cls()`.
+
+### Drawing Lines on Screen
+
+Let's go one step further and draw lines on screen.  We'll do that the easy way by borrowing
+some C code from the [internet](https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C)
+that draws lines using the Bresenham algorithm.  The results here will be quick but it's
+not going to be the fastest possible way to draw lines.
+
+Retaining our plot function and borrowing the internet line code, save the following in
+file line.c:
+
+```
+  /* C source start */
+
+  #include <arch/zx.h>
+  #include <input.h>
+  #include <stdlib.h>
+
+  void plot(unsigned char x, unsigned char y)
+  {
+     *zx_pxy2saddr(x,y) |= zx_px2bitmask(x);
+  }
+
+  void line(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1)
+  {
+     unsigned char dx  = abs(x1-x0);
+     unsigned char dy  = abs(y1-y0);
+     signed   char sx  = x0<x1 ? 1 : -1;
+     signed   char sy  = y0<y1 ? 1 : -1;
+     int           err = (dx>dy ? dx : -dy)/2;
+     int           e2;
+
+     while (1)
+     {
+        plot(x0,y0);
+        if (x0==x1 && y0==y1) break;
+      
+        e2 = err;
+        if (e2 >-dx) { err -= dy; x0 += sx; }
+        if (e2 < dy) { err += dx; y0 += sy; }
+     }
+  }
+
+  int main(void)
+  {
+     zx_cls(PAPER_WHITE);
+   
+     while (1)
+     {
+        line(rand()%256, rand()%192, rand()%256, rand()%192);
+      
+        if (in_test_key())
+        {
+           zx_cls((rand() % 7) + PAPER_WHITE);
+           in_wait_nokey();
+        }
+     }
+  }
+
+  /* C source end */
+```
+
+The compile line is the same as for the last example:
+
+```
+ zcc +zx -vn -startup=31 -clib=sdcc_iy line.c -o line -create-app
+```
+
+### Where To Go From Here
+
+We didn't do anything with colour.  The function `zx_saddr2aaddr()` may be useful
+for turning a screen address into a corresponding attribute address.
+
+Another simple modification may be to have the line routine draw a patterned line
+instead of a solid black one.
+
+Besides the screen address manipulators, there is one high level graphics function
+in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L280)
+and that is `zx_pattern_fill()` which will fill an area on screen with a pattern.
