@@ -136,7 +136,7 @@ int glue_exec(char *target)
 
                     bank = 256;
                     if (p = strstr(symbol_name, "BANK_"))
-                        if (sscanf(p, "BANK_%x", &bank) != 1)
+                        if ((sscanf(p, "BANK_%x", &bank) != 1) || (bank > 255))
                             bank = -1;
 
                     if ((bank < 0) || (bank > 256))
