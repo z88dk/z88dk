@@ -829,7 +829,8 @@ static int checksum(const unsigned char *data, int size)
 }
 
 
-
+// if address < 0, do not write EOF record to ihx file
+// if address == -1, taken as zero
 int bin2hex(FILE *input, FILE *output, int address)
 {
     unsigned char outbuf[5 + RECSIZE + 1];
@@ -837,28 +838,38 @@ int bin2hex(FILE *input, FILE *output, int address)
     int byte;
     int size;   
     int i;
+    int noeof;
 
+    noeof = address < 0;
+    address = (address == -1) ? 0 : abs(address);
 
     inbuf = outbuf + 5;
     outbuf[0] = ':';
 
     do {    
         size = 0;
-        while (size < RECSIZE) {
-            byte = fgetc(input);             
-        if ( byte == EOF ) {
-            break;
-        }
+        while (size < RECSIZE)
+        {
+            byte = fgetc(input);
+
+            if ( byte == EOF )
+                break;
 
             inbuf[size++] = byte;
         }
 
+        if (size == 0 && noeof)
+            return 0;
+
         outbuf[1] = size;
-        if (size > 0) {
+        if (size > 0)
+        {
             outbuf[2] = address >> 8;
             outbuf[3] = address & 0xff;
             outbuf[4] = 0;
-        } else {
+        }
+        else
+        {
             outbuf[2] = 0;
             outbuf[3] = 0;
             outbuf[4] = 1;
@@ -874,7 +885,7 @@ int bin2hex(FILE *input, FILE *output, int address)
         address += size;        
     } while (!feof(input) || (size > 0));
 
-    return(0);
+    return 0;
 }
 
 
