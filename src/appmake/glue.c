@@ -112,19 +112,23 @@ int glue_exec(char *target)
             i = strlen(symbol_name);
             if ((i >= 6) && (strncmp(symbol_name, "__", 2) == 0) && ((strcmp(symbol_name + i - 5, "_head") == 0) || (strcmp(symbol_name + i - 5, "_size") == 0)))
             {
-                // section found, extract section name
+                // section found, extract section name and form binary filename
 
                 if (i == 6)
+                {
                     section_name[0] = 0;
+                    sprintf(filename, "%s.bin", binname);
+                    if (stat(filename, &st_file) < 0)
+                        suffix_change(filename, "");
+                }
                 else
                 {
                     strcpy(section_name, &symbol_name[2]);
                     section_name[i - 7] = 0;
+                    sprintf(filename, "%s_%s.bin", binname, section_name);
                 }
 
                 // check if there's a corresponding binary file
-
-                sprintf(filename, "%s_%s.bin", binname, section_name);
 
                 if ((strcmp(symbol_name + i - 4, "head") == 0) && (stat(filename, &st_file) >= 0))
                 {
@@ -308,7 +312,7 @@ int glue_exec(char *target)
                         if (fihx)
                         {
                             rewind(fin);
-                            bin2hex(fin, fihx, (memory_banks[i].array[j].org == 0) ? -1 : -memory_banks[i].array[j].org);
+                            bin2hex(fin, fihx, memory_banks[i].array[j].org, 0);
                         }
 
                         fclose(fin);
