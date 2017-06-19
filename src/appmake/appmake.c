@@ -829,19 +829,15 @@ static int checksum(const unsigned char *data, int size)
 }
 
 
-// if address < 0, do not write EOF record to ihx file
-// if address == -1, taken as zero
-int bin2hex(FILE *input, FILE *output, int address)
+// if address >= LARGE_ADDRESS_OFFSET, do not write EOF record to ihx file
+// if address >= LARGE_ADDRESS_OFFSET, subtract LARGE_ADDRESS_OFFSET (see glue.c)
+int bin2hex(FILE *input, FILE *output, int address, int eofrec)
 {
     unsigned char outbuf[5 + RECSIZE + 1];
     unsigned char *inbuf;
     int byte;
     int size;   
     int i;
-    int noeof;
-
-    noeof = address < 0;
-    address = (address == -1) ? 0 : abs(address);
 
     inbuf = outbuf + 5;
     outbuf[0] = ':';
@@ -858,7 +854,7 @@ int bin2hex(FILE *input, FILE *output, int address)
             inbuf[size++] = byte;
         }
 
-        if (size == 0 && noeof)
+        if (size == 0 && !eofrec)
             return 0;
 
         outbuf[1] = size;

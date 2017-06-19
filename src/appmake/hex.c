@@ -67,7 +67,7 @@ int hex_exec(char *target)
         myexit(NULL,1);
     } 
 
-    bin2hex(input, output, origin); 
+    bin2hex(input, output, origin, 1); 
 
     fclose(input); 
     fclose(output);
