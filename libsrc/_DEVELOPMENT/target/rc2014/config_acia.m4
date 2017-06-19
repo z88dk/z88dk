@@ -43,9 +43,11 @@ define(`ACIA_IRQ', 0x80)            # IRQ (Either Transmitted or Received Byte)
 
 # MC68C50 ACIA driver
 
-define(`ACIA_RX_SIZE', 0x80)        # Size of the Rx Buffer
-define(`ACIA_RX_FULLISH', eval(ACIA_RX_SIZE-4))   # Size of the Rx Buffer, when not_RTS is signalled
-define(`ACIA_TX_SIZE', 0x80)        # Size of the Tx Buffer   
+define(`ACIA_RX_SIZE', 0xFF)        # Size of the Rx Buffer
+define(`ACIA_RX_FULLISH', eval(ACIA_RX_SIZE-8))
+                                    # Size of the Rx Buffer, when not_RTS is signalled
+define(`ACIA_RX_EMPTYSIZE', 0x08)   # Fullness of the Rx Buffer, when RTS is signalled
+define(`ACIA_TX_SIZE', 0x0F)        # Size of the Tx Buffer   
 
 #
 # END OF USER CONFIGURATION
@@ -97,6 +99,7 @@ PUBLIC `ACIA_IRQ'
 
 PUBLIC `ACIA_RX_SIZE'
 PUBLIC `ACIA_RX_FULLISH'
+PUBLIC `ACIA_RX_EMPTYSIZE'
 PUBLIC `ACIA_TX_SIZE'
 ')
 
@@ -144,6 +147,7 @@ defc `ACIA_IRQ'         = ACIA_IRQ
 
 defc `ACIA_RX_SIZE'     = ACIA_RX_SIZE
 defc `ACIA_RX_FULLISH'  = ACIA_RX_FULLISH
+defc `ACIA_RX_EMPTYSIZE' = ACIA_RX_EMPTYSIZE
 defc `ACIA_TX_SIZE'     = ACIA_TX_SIZE
 ')
 
@@ -191,5 +195,6 @@ ifdef(`CFG_C_DEF',
 
 `#define' `ACIA_RX_SIZE'      ACIA_RX_SIZE
 `#define' `ACIA_RX_FULLISH'   ACIA_RX_FULLISH
+`#define' `ACIA_RX_EMPTYSIZE' ACIA_RX_EMPTYSIZE
 `#define' `ACIA_TX_SIZE'      ACIA_TX_SIZE
 ')

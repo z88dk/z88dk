@@ -41,16 +41,12 @@
         jr nc, clean_up_tx          ; buffer full, so drop the Tx byte and clean up
 
         ld hl, (aciaTxIn)           ; get the pointer to where we poke
-        ld (hl), a                  ; write the Tx byte to the aciaTxIn   
-        inc hl                      ; move the Tx pointer along
+        ld (hl), a                  ; write the Tx byte to the aciaTxIn
 
-        ld a, l                     ; move low byte of the Tx pointer
-        cp (aciaTxBuffer + ACIA_TX_SIZE) & $FF
-        jr nz, put_no_tx_wrap
-        ld hl, aciaTxBuffer         ; we wrapped, so go back to start of buffer
-
-    put_no_tx_wrap:
-
+        inc l                       ; move the Tx pointer, just low byte along
+        ld a, ACIA_TX_SIZE          ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        ld l, a                     ; return the low byte to l
         ld (aciaTxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaTxCount

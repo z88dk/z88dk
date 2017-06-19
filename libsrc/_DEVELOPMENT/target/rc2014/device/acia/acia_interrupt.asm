@@ -31,14 +31,7 @@
         ld hl, (aciaRxIn)           ; get the pointer to where we poke
         ld (hl), a                  ; write the Rx byte to the aciaRxIn address
 
-        inc hl                      ; move the Rx pointer along
-        ld a, l	                    ; move low byte of the Rx pointer
-        cp (aciaRxBuffer + ACIA_RX_SIZE) & $FF
-        jr nz, no_rx_wrap
-        ld hl, aciaRxBuffer         ; we wrapped, so go back to start of buffer
-
-    no_rx_wrap:
-
+        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
         ld (aciaRxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaRxCount
@@ -48,26 +41,22 @@
 
     tx_check:
 
-        ld a, (aciaTxCount)         ; get the number of bytes in the Tx buffer
-        or a                        ; check whether it is zero
-        jr z, tei_clear             ; if the count is zero, then disable the Tx Interrupt
-
         in a, (ACIA_STATUS_ADDR)    ; get the status of the ACIA
         and ACIA_TDRE               ; check whether a byte can be transmitted
         jr z, rts_check             ; if not, go check for the receive RTS selection
+
+        ld a, (aciaTxCount)         ; get the number of bytes in the Tx buffer
+        or a                        ; check whether it is zero
+        jr z, tei_clear             ; if the count is zero, then disable the Tx Interrupt
 
         ld hl, (aciaTxOut)          ; get the pointer to place where we pop the Tx byte
         ld a, (hl)                  ; get the Tx byte
         out (ACIA_DATA_ADDR), a     ; output the Tx byte to the ACIA
 
-        inc hl                      ; move the Tx pointer along
-        ld a, l                     ; get the low byte of the Tx pointer
-        cp (aciaTxBuffer + ACIA_TX_SIZE) & $FF
-        jr nz, no_tx_wrap
-        ld hl, aciaTxBuffer         ; we wrapped, so go back to start of buffer
-
-    no_tx_wrap:
-
+        inc l                       ; move the Tx pointer, just low byte, along
+        ld a, ACIA_TX_SIZE          ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        ld l, a                     ; return the low byte to l
         ld (aciaTxOut), hl          ; write where the next byte should be popped
 
         ld hl, aciaTxCount
