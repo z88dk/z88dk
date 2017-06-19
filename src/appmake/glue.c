@@ -142,7 +142,7 @@ int glue_exec(char *target)
                     if ((bank < 0) || (bank > 256))
                     {
                         bank = 256;
-                        fprintf(stderr, "Warning: section %s is being placed in the main bank\n", &symbol_name[2]);
+                        fprintf(stderr, "Warning: section %s is being placed in the main bank\n", section_name);
                     }
 
                     // add binary info to corresponding memory bank list
