@@ -14,4 +14,3 @@ SECTION bss_align_256
 PUBLIC aciaRxBuffer
 
 aciaRxBuffer:   defs ACIA_RX_SIZE       ; Space for the Rx Buffer
-                defs 256 - ASMPC
