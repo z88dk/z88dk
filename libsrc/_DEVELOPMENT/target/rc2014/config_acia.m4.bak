@@ -43,11 +43,11 @@ define(`ACIA_IRQ', 0x80)            # IRQ (Either Transmitted or Received Byte)
 
 # MC68C50 ACIA driver
 
-define(`ACIA_RX_SIZE', 0xFF)        # Size of the Rx Buffer
+define(`ACIA_RX_SIZE', 0x100)       # Size of the Rx Buffer
 define(`ACIA_RX_FULLISH', eval(ACIA_RX_SIZE-8))
                                     # Size of the Rx Buffer, when not_RTS is signalled
 define(`ACIA_RX_EMPTYSIZE', 0x08)   # Fullness of the Rx Buffer, when RTS is signalled
-define(`ACIA_TX_SIZE', 0x0F)        # Size of the Tx Buffer   
+define(`ACIA_TX_SIZE', 0x10)        # Size of the Tx Buffer   
 
 #
 # END OF USER CONFIGURATION
