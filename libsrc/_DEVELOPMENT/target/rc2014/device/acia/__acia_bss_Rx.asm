@@ -14,3 +14,9 @@ SECTION bss_align_256
 PUBLIC aciaRxBuffer
 
 aciaRxBuffer:   defs ACIA_RX_SIZE       ; Space for the Rx Buffer
+
+; pad to next 256 byte boundary
+
+IF (ASMPC & 0xff)
+   defs 256 - (ASMPC & 0xff)
+ENDIF
