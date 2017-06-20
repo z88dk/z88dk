@@ -24,7 +24,7 @@
         ld l, a                     ; Move Rx byte to l
 
         ld a, (aciaRxCount)         ; Get the number of bytes in the Rx buffer
-        cp ACIA_RX_SIZE             ; check whether there is space in the buffer
+        cp ACIA_RX_SIZE - 1         ; check whether there is space in the buffer
         jr nc, tx_check             ; buffer full, check if we can send something
 
         ld a, l                     ; get Rx byte from l
@@ -54,7 +54,7 @@
         out (ACIA_DATA_ADDR), a     ; output the Tx byte to the ACIA
 
         inc l                       ; move the Tx pointer, just low byte, along
-        ld a, ACIA_TX_SIZE          ; load the buffer size, (n^2)-1
+        ld a, ACIA_TX_SIZE - 1      ; load the buffer size, (n^2)-1
         and l                       ; range check
         ld l, a                     ; return the low byte to l
         ld (aciaTxOut), hl          ; write where the next byte should be popped
