@@ -34,7 +34,7 @@
     put_buffer_tx:
 
         ld a, (aciaTxCount)         ; Get the number of bytes in the Tx buffer
-        cp ACIA_TX_SIZE             ; check whether there is space in the buffer
+        cp ACIA_TX_SIZE - 1         ; check whether there is space in the buffer
         ld a,l                      ; Tx byte
 
         ld l,1
@@ -44,7 +44,7 @@
         ld (hl), a                  ; write the Tx byte to the aciaTxIn
 
         inc l                       ; move the Tx pointer, just low byte along
-        ld a, ACIA_TX_SIZE          ; load the buffer size, (n^2)-1
+        ld a, ACIA_TX_SIZE - 1      ; load the buffer size, (n^2)-1
         and l                       ; range check
         ld l, a                     ; return the low byte to l
         ld (aciaTxIn), hl           ; write where the next byte should be poked
