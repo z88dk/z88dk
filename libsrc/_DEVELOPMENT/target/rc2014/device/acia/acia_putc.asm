@@ -43,10 +43,13 @@
         ld hl, (aciaTxIn)           ; get the pointer to where we poke
         ld (hl), a                  ; write the Tx byte to the aciaTxIn
 
-        inc l                       ; move the Tx pointer, just low byte along
-        ld a, ACIA_TX_SIZE - 1      ; load the buffer size, (n^2)-1
-        and l                       ; range check
-        ld l, a                     ; return the low byte to l
+        ld a,l                      ; check if Tx pointer is at the end of its range
+        cp +(aciaTxBuffer + ACIA_TX_SIZE - 1) & 0xff
+        jr z, resetTxBuffer         ; if at end of range, reset Tx pointer to start of Tx buffer
+        inc hl                      ; else advance to next byte in Tx buffer
+
+    tx_buffer_adjusted:
+    
         ld (aciaTxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaTxCount
@@ -67,6 +70,11 @@
         call asm_z80_pop_ei         ; critical section end
 
         ret
+
+    resetTxBuffer:
+    
+        ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
+        jp tx_buffer_adjusted
 
     EXTERN _acia_need
     defc NEED = _acia_need
