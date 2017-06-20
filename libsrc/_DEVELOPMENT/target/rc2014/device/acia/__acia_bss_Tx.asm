@@ -9,8 +9,6 @@ aciaTxIn:       defw aciaTxBuffer       ; non-zero item in bss since it's initia
 aciaTxOut:      defw aciaTxBuffer       ; non-zero item in bss since it's initialized anyway
 aciaTxLock:     defb 0                  ; lock flag for Tx exclusion
 
-SECTION bss_align_16
-
 PUBLIC aciaTxBuffer
 
 aciaTxBuffer:   defs ACIA_TX_SIZE       ; Space for the Tx Buffer
