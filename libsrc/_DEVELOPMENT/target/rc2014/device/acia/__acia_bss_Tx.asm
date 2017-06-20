@@ -14,4 +14,3 @@ SECTION bss_align_16
 PUBLIC aciaTxBuffer
 
 aciaTxBuffer:   defs ACIA_TX_SIZE       ; Space for the Tx Buffer
-                defs 16 - ASMPC
