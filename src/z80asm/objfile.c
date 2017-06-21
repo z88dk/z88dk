@@ -191,15 +191,16 @@ static long write_modname( FILE *fp )
 static long write_code( FILE *fp )
 {
 	long code_ptr;
-	int code_size;
+	int code_size = 0;
+	Bool wrote_data = FALSE;
 	
 	code_ptr  = ftell( fp );
-	code_size = fwrite_module_code( fp );
+	wrote_data = fwrite_module_code(fp, &code_size);
 
 	if (opts.verbose)
 		printf("Module '%s' size: %ld bytes\n", CURRENTMODULE->modname, (long)code_size);
 
-	if ( code_size > 0 )
+	if (wrote_data)
 		return code_ptr;
 	else
 		return -1;

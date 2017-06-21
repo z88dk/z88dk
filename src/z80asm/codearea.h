@@ -150,8 +150,8 @@ extern void append_file_contents( FILE *file,            long num_bytes );
 *   read/write current module to an open file
 *----------------------------------------------------------------------------*/
 
-/* write object code of the current module, return total size written */
-extern int fwrite_module_code( FILE *file );	
+/* write object code of the current module, return TRUE if wrote any data */
+extern Bool fwrite_module_code(FILE *file, int* p_code_size);
 
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file

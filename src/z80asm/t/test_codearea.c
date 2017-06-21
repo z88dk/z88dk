@@ -142,6 +142,7 @@ static void test_sections( void )
 	FILE *file;
 	FILE *reloc = NULL;
 	Byte *p;
+	int code_size;
 
 	T( reset_codearea() );
 	
@@ -286,14 +287,15 @@ static void test_sections( void )
 #define T_MODULE(n,size) \
 	T( set_cur_module_id( n ) ); \
 	assert( (file = fopen("test.bin", "wb")) != NULL ); \
-	assert( size == fwrite_module_code( file ) ); \
+	assert( fwrite_module_code( file, &code_size ) ); \
+	assert( size == code_size ); \
 	fclose( file ); \
 	dump_file("module " #n );
 
-	T_MODULE( 0, 24 );
-	T_MODULE( 1,  8 );
-	T_MODULE( 2, 11 );
-	T_MODULE( 3,  3 );
+	T_MODULE( 0, 24);
+	T_MODULE( 1,  8);
+	T_MODULE( 2, 11);
+	T_MODULE( 3,  3);
 #undef T_MODULE
 
 	/* write whole code area */
@@ -310,7 +312,7 @@ static void test_sections( void )
 	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
 	T( new_section("bss") ); T( append_byte(3) ); T( next_PC() );
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	T( fwrite_module_code( file ) );
+	T( fwrite_module_code( file, &code_size ) );
 	fclose( file );
 	dump_file("code area ");
 
@@ -318,7 +320,7 @@ static void test_sections( void )
 	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
 	T( new_section("data") ); T( append_byte(2) ); T( next_PC() );
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	T( fwrite_module_code( file ) );
+	T( fwrite_module_code( file, &code_size ) );
 	fclose( file );
 	dump_file("code area ");
 
@@ -326,7 +328,7 @@ static void test_sections( void )
 	T( new_section("code") ); T( new_section("data") );	T( new_section("bss") );
 	T( new_section("code") ); T( append_byte(1) ); T( next_PC() );
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	T( fwrite_module_code( file ) );
+	T( fwrite_module_code( file, &code_size ) );
 	fclose( file );
 	dump_file("code area ");
 
