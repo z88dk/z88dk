@@ -159,10 +159,10 @@ defc ACIA_OVRN        = 0x20
 defc ACIA_PE          = 0x40
 defc ACIA_IRQ         = 0x80
 
-defc ACIA_RX_SIZE     = 0xFF
-defc ACIA_RX_FULLISH  = 247
+defc ACIA_RX_SIZE     = 0x100
+defc ACIA_RX_FULLISH  = 248
 defc ACIA_RX_EMPTYSIZE = 0x08
-defc ACIA_TX_SIZE     = 0x0F
+defc ACIA_TX_SIZE     = 0x10
 
 
 

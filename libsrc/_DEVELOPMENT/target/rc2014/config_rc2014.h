@@ -109,10 +109,10 @@
 #define ACIA_PE           0x40
 #define ACIA_IRQ          0x80
 
-#define ACIA_RX_SIZE      0xFF
-#define ACIA_RX_FULLISH   247
+#define ACIA_RX_SIZE      0x100
+#define ACIA_RX_FULLISH   248
 #define ACIA_RX_EMPTYSIZE 0x08
-#define ACIA_TX_SIZE      0x0F
+#define ACIA_TX_SIZE      0x10
 
 
 
