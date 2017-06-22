@@ -85,7 +85,6 @@ int fnumber(LVALUE *lval)
     char* s; /* points into source code */
     char* end;
     double dval;
-
     start = s = line + lptr; /* save starting point */
     k = 1;
     minus = 1;
@@ -578,7 +577,6 @@ void dofloat(double raw, unsigned char fa[])
         mant_bytes = MAX_MANTISSA_SIZE;
     }
 
-
     if (x == 0.0) {
         memset(fa, 0, MAX_MANTISSA_SIZE + 1);
         return;
@@ -618,6 +616,9 @@ void dofloat(double raw, unsigned char fa[])
             fa[4 - i / 2] |= (bit & 0x0f);
         }
         norm = mult - res;
+    }
+    if ( raw < 0 ) {
+       fa[0] |= 0x80;
     }
 }
 
