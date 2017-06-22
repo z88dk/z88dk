@@ -829,36 +829,51 @@ static int checksum(const unsigned char *data, int size)
 }
 
 
-
-int bin2hex(FILE *input, FILE *output, int address)
+// if eofrec == 0 do not write end-of-file record
+int bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec)
 {
-    unsigned char outbuf[5 + RECSIZE + 1];
+    unsigned char *outbuf;
     unsigned char *inbuf;
     int byte;
     int size;   
     int i;
 
+    if (recsize < 1)
+        recsize = 16;
+    else if (recsize > 255)
+        recsize = 255;
+
+    if ((outbuf = malloc((recsize + 6) * sizeof(*outbuf))) == NULL)
+        exit_log(1, "Error bin2hex: out of memory\n");
 
     inbuf = outbuf + 5;
     outbuf[0] = ':';
 
-    do {    
+    do
+    {    
         size = 0;
-        while (size < RECSIZE) {
-            byte = fgetc(input);             
-        if ( byte == EOF ) {
-            break;
-        }
+        while (size < recsize)
+        {
+            byte = fgetc(input);
+
+            if ( byte == EOF )
+                break;
 
             inbuf[size++] = byte;
         }
 
+        if (size == 0 && !eofrec)
+            break;
+
         outbuf[1] = size;
-        if (size > 0) {
+        if (size > 0)
+        {
             outbuf[2] = address >> 8;
             outbuf[3] = address & 0xff;
             outbuf[4] = 0;
-        } else {
+        }
+        else
+        {
             outbuf[2] = 0;
             outbuf[3] = 0;
             outbuf[4] = 1;
@@ -866,15 +881,15 @@ int bin2hex(FILE *input, FILE *output, int address)
         outbuf[5 + size] = checksum(outbuf + 1, size + 4);
         fputc(outbuf[0], output);
 
-        for (i=1; i<(size+6); i++) {
+        for (i=1; i<(size+6); i++)
             fprintf(output, "%02X", outbuf[i]);
-        }
 
         fprintf(output, "\n");
         address += size;        
     } while (!feof(input) || (size > 0));
 
-    return(0);
+    free(outbuf);
+    return 0;
 }
 
 

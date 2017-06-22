@@ -69,7 +69,7 @@ filler1:
 int_RASTER: 
     push    af 
 
-    ld  a, ($BF) 
+    in  a, ($BF) 
     or  a 
     jp  p, int_not_VBL  ; Bit 7 not set 
 

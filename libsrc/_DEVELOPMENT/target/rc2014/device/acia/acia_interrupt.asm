@@ -24,21 +24,14 @@
         ld l, a                     ; Move Rx byte to l
 
         ld a, (aciaRxCount)         ; Get the number of bytes in the Rx buffer
-        cp ACIA_RX_SIZE             ; check whether there is space in the buffer
+        cp ACIA_RX_SIZE - 1         ; check whether there is space in the buffer
         jr nc, tx_check             ; buffer full, check if we can send something
 
         ld a, l                     ; get Rx byte from l
         ld hl, (aciaRxIn)           ; get the pointer to where we poke
         ld (hl), a                  ; write the Rx byte to the aciaRxIn address
 
-        inc hl                      ; move the Rx pointer along
-        ld a, l	                    ; move low byte of the Rx pointer
-        cp (aciaRxBuffer + ACIA_RX_SIZE) & $FF
-        jr nz, no_rx_wrap
-        ld hl, aciaRxBuffer         ; we wrapped, so go back to start of buffer
-
-    no_rx_wrap:
-
+        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
         ld (aciaRxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaRxCount
@@ -48,26 +41,25 @@
 
     tx_check:
 
-        ld a, (aciaTxCount)         ; get the number of bytes in the Tx buffer
-        or a                        ; check whether it is zero
-        jr z, tei_clear             ; if the count is zero, then disable the Tx Interrupt
-
         in a, (ACIA_STATUS_ADDR)    ; get the status of the ACIA
         and ACIA_TDRE               ; check whether a byte can be transmitted
         jr z, rts_check             ; if not, go check for the receive RTS selection
+
+        ld a, (aciaTxCount)         ; get the number of bytes in the Tx buffer
+        or a                        ; check whether it is zero
+        jr z, tei_clear             ; if the count is zero, then disable the Tx Interrupt
 
         ld hl, (aciaTxOut)          ; get the pointer to place where we pop the Tx byte
         ld a, (hl)                  ; get the Tx byte
         out (ACIA_DATA_ADDR), a     ; output the Tx byte to the ACIA
 
-        inc hl                      ; move the Tx pointer along
-        ld a, l                     ; get the low byte of the Tx pointer
-        cp (aciaTxBuffer + ACIA_TX_SIZE) & $FF
-        jr nz, no_tx_wrap
-        ld hl, aciaTxBuffer         ; we wrapped, so go back to start of buffer
+        ld a,l                      ; check if Tx pointer is at the end of its range
+        cp +(aciaTxBuffer + ACIA_TX_SIZE - 1) & 0xff
+        jr z, resetTxBuffer         ; if at end of range, reset Tx pointer to start of Tx buffer
+        inc hl                      ; else advance to next byte in Tx buffer
 
-    no_tx_wrap:
-
+    tx_buffer_adjusted:
+    
         ld (aciaTxOut), hl          ; write where the next byte should be popped
 
         ld hl, aciaTxCount
@@ -101,6 +93,11 @@
         
         ei
         reti
+
+    resetTxBuffer:
+    
+        ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
+        jp tx_buffer_adjusted
 
     EXTERN _acia_need
     defc NEED = _acia_need

@@ -27,14 +27,7 @@
         ld a, (hl)                  ; get the Rx byte
         push af                     ; save the Rx byte on stack
 
-        inc hl                      ; move the Rx pointer along
-        ld a, l                     ; get the low byte of the Rx pointer
-        cp (aciaRxBuffer + ACIA_RX_SIZE) & $FF
-        jr nz, get_no_rx_wrap
-        ld hl, aciaRxBuffer         ; we wrapped, so go back to start of buffer
-
-    get_no_rx_wrap:
-
+        inc l                       ; move the Rx pointer low byte along
         ld (aciaRxOut), hl          ; write where the next byte should be popped
 
         ld hl,aciaRxCount
@@ -49,7 +42,7 @@
         ld a, (aciaControl)         ; get the ACIA control echo byte
         and ~ACIA_TEI_MASK          ; mask out the Tx interrupt bits
         or ACIA_TDI_RTS0            ; set RTS low.
-        ld (aciaControl), a	    ; write the ACIA control echo byte back
+        ld (aciaControl), a	        ; write the ACIA control echo byte back
         out (ACIA_CTRL_ADDR), a     ; set the ACIA CTRL register
         
         call asm_z80_pop_ei         ; critical section end

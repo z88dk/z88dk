@@ -504,6 +504,9 @@ File test2.o at $0000: Z80RMF08
   Expressions:
     E =  (test2.asm:7) $0000 $0000: func1_alias := func1 (section lib)
     E =  (test2.asm:8) $0000 $0000: func2_alias := func2 (section lib)
+  Code: 0 bytes, ORG at $1000
+  Code: 0 bytes (section code)
+  Code: 0 bytes (section lib)
 END
 
 #------------------------------------------------------------------------------
@@ -640,6 +643,7 @@ File test.o at $0000: Z80RMF08
     U         asm_b_array_at
   Expressions:
     E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
+  Code: 0 bytes, ORG at $1000
 
 File test1.o at $0000: Z80RMF08
   Name: test1

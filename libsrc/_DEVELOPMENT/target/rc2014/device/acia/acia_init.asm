@@ -16,18 +16,15 @@
 
         ld a, ACIA_RESET            ; Master Reset the ACIA
         out (ACIA_CTRL_ADDR),a
-		
-        nop
-        nop
 
         ld a, ACIA_REI|ACIA_TDI_RTS0|ACIA_8N1|ACIA_CLK_DIV_64
                                     ; load the default ACIA configuration
                                     ; 8n1 at 115200 baud
                                     ; receive interrupt enabled
                                     ; transmit interrupt disabled
-                                    
         ld (aciaControl), a         ; write the ACIA control byte echo
-        out (ACIA_CTRL_ADDR),a      ; output to the ACIA control byte
+        out (ACIA_CTRL_ADDR), a     ; output to the ACIA control
+
         call _acia_reset            ; reset empties the Tx & Rx buffers
 
         im 1                        ; interrupt mode 1

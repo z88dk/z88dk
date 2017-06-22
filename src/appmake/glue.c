@@ -4,9 +4,9 @@
 *      Section names containing "BANK_XX" where "XX" is a hex number 00-FF
 *      are assumed to be part of memory bank XX.
 *
-*      Section names containing "align_dd" where "dd" is a decimal number
-*      are assumed to be sections aliged to dd.  These sections' org
-*      addresses will be check for proper alignment.
+*      Section names containing "_align_dd" where "dd" is a decimal number
+*      are assumed to be sections aligned to dd.  These sections' org
+*      addresses will be checked for proper alignment.
 *      
 *      aralbrec - June 2017
 */
@@ -18,24 +18,24 @@ static char             *binname = NULL;
 static char             *crtfile = NULL;
 static int               romfill = 255;
 static char              ihex = 0;
+static char              ipad = 0;
+static int               recsize = 16;
 static char              clean = 0;
 
 
 /* Options that are available for this module */
 option_t glue_options[] = {
-    { 'h', "help",      "Display this help",                 OPT_BOOL,  &help },
-    { 'b', "binfile",   "Basename of binary output files (required)",   OPT_STR,   &binname },
-    { 'c', "crt0file",  "crt0 used to link binaries (required)",        OPT_STR,   &crtfile },
-    { 'f', "filler",    "Filler byte (default: 0xFF)",       OPT_INT,   &romfill },
-    {  0,  "ihex",      "Generate an iHEX file",             OPT_BOOL,  &ihex },
-    {  0,  "clean",     "Remove binary files when finished", OPT_BOOL,  &clean },
-    {  0,  NULL,        NULL,                                OPT_NONE,  NULL }
+    { 'h', "help",      "Display this help",                       OPT_BOOL,  &help },
+    { 'b', "binfile",   "Basename of binary output files",         OPT_STR,   &binname },
+    { 'c', "crt0file",  "Basename of map file (default=binfile)",  OPT_STR,   &crtfile },
+    { 'f', "filler",    "Filler byte (default: 0xFF)",             OPT_INT,   &romfill },
+    {  0,  "ihex",      "Generate an iHEX file",                   OPT_BOOL,  &ihex },
+    { 'p', "pad",       "Pad iHEX file",                           OPT_BOOL,  &ipad },
+    { 'r', "recsize",   "Record size for iHEX file (default: 16)", OPT_INT,   &recsize },
+    {  0,  "clean",     "Remove binary files when finished",       OPT_BOOL,  &clean },
+    {  0,  NULL,        NULL,                                      OPT_NONE,  NULL }
 };
 
-
-/*
-* Execution starts here
-*/
 
 
 struct binary_blob {
@@ -72,19 +72,29 @@ int compare_aligned(const struct aligned_blob *a, const struct aligned_blob *b)
     return strcmp(a->section_name, b->section_name);
 }
 
+
+/*
+* Execution starts here
+*/
+
+
 int glue_exec(char *target)
 {
     int i, j, k, bank;
     char *p;
-    FILE *fin, *fout;
+    FILE *fin, *fout, *fihx;
     char buffer[LINEMAX + 1];
     char filename[FILENAME_MAX * 2 + 1];
+    char ihexname[FILENAME_MAX * 2 + 1];
     char symbol_name[LINEMAX];
+    char section_name[LINEMAX];
     long symbol_value;
     struct stat st_file;
 
     if (help) return -1;
-    if ((crtfile == NULL) || (binname == NULL)) return -1;
+
+    if (crtfile == NULL) crtfile = binname;
+    if (binname == NULL) return -1;
 
     strcpy(filename, crtfile);
     suffix_change(filename, ".map");
@@ -104,14 +114,27 @@ int glue_exec(char *target)
         if (sscanf(buffer, "%s = $%lx", symbol_name, &symbol_value) == 2)
         {
             // symbol and value have been read
-
+            
             i = strlen(symbol_name);
-            if ((i > 7) && (strncmp(symbol_name, "__", 2) == 0) && ((strcmp(symbol_name + i - 5, "_head") == 0) || (strcmp(symbol_name + i - 5, "_size") == 0)))
+            if ((i >= 6) && (strncmp(symbol_name, "__", 2) == 0) && ((strcmp(symbol_name + i - 5, "_head") == 0) || (strcmp(symbol_name + i - 5, "_size") == 0)))
             {
-                // section found, check if there's a corresponding binary file
+                // section found, extract section name and form binary filename
 
-                symbol_name[i - 5] = 0;
-                sprintf(filename, "%s_%s.bin", binname, &symbol_name[2]);
+                if (i == 6)
+                {
+                    section_name[0] = 0;
+                    sprintf(filename, "%s.bin", binname);
+                    if (stat(filename, &st_file) < 0)
+                        suffix_change(filename, "");
+                }
+                else
+                {
+                    strcpy(section_name, &symbol_name[2]);
+                    section_name[i - 7] = 0;
+                    sprintf(filename, "%s_%s.bin", binname, section_name);
+                }
+
+                // check if there's a corresponding binary file
 
                 if ((strcmp(symbol_name + i - 4, "head") == 0) && (stat(filename, &st_file) >= 0))
                 {
@@ -119,13 +142,13 @@ int glue_exec(char *target)
 
                     bank = 256;
                     if (p = strstr(symbol_name, "BANK_"))
-                        if (sscanf(p, "BANK_%x", &bank) != 1)
+                        if ((sscanf(p, "BANK_%x", &bank) != 1) || (bank > 255))
                             bank = -1;
 
                     if ((bank < 0) || (bank > 256))
                     {
                         bank = 256;
-                        fprintf(stderr, "Warning: section %s is being placed in the main bank\n", &symbol_name[2]);
+                        fprintf(stderr, "Warning: section %s is being placed in the main bank\n", section_name);
                     }
 
                     // add binary info to corresponding memory bank list
@@ -139,7 +162,7 @@ int glue_exec(char *target)
                     memory_banks[bank].array[j].filename = strdup(filename);
                     memory_banks[bank].array[j].org = symbol_value;
                     memory_banks[bank].array[j].size = st_file.st_size;
-                    memory_banks[bank].array[j].section_name = strdup(&symbol_name[2]);
+                    memory_banks[bank].array[j].section_name = strdup(section_name);
 
                     if ((memory_banks[bank].array[j].filename == NULL) || (memory_banks[bank].array[j].section_name == NULL))
                         exit_log(1, "Error: out of memory\n");
@@ -147,12 +170,12 @@ int glue_exec(char *target)
 
                 // record aligned section
 
-                if ((p = strstr(symbol_name, "align_")) && (sscanf(p, "align_%u", &j) == 1))
+                if ((p = strstr(section_name, "_align_")) && (sscanf(p, "_align_%u", &j) == 1))
                 {
                     // look for existing entry for aligned section
 
                     for (k = 0; k < aligned_sections.num; ++k)
-                        if (strcmp(aligned_sections.array[k].section_name, &symbol_name[2]) == 0)
+                        if (strcmp(aligned_sections.array[k].section_name, section_name) == 0)
                             break;
 
                     // if no existing entry, make a new one
@@ -165,7 +188,7 @@ int glue_exec(char *target)
                         if (aligned_sections.array == NULL)
                             exit_log(1, "Error: out of memory\n");
 
-                        aligned_sections.array[k].section_name = strdup(&symbol_name[2]);
+                        aligned_sections.array[k].section_name = strdup(section_name);
                         aligned_sections.array[k].alignment = j;
                         aligned_sections.array[k].org = -1;
                         aligned_sections.array[k].size = 0;
@@ -245,11 +268,18 @@ int glue_exec(char *target)
         {
             sprintf(filename, (i == 256) ? "%s__.bin" : "%s__%02x.bin", binname, i);
 
+            strcpy(ihexname, filename);
+            suffix_change(ihexname, ".ihx");
+
             if ((fout = fopen(filename, "wb")) == NULL)
                 fprintf(stderr, "Error: cannot create file %s, skipping\n", filename);
             else
             {
-                printf("Creating %s (org 0x%04x)\n", filename, memory_banks[i].array[0].org);
+                fihx = NULL;
+                if (ihex && ((fihx = fopen(ihexname, "wb")) == NULL))
+                    fprintf(stderr, "Error: cannot create file %s, skipping\n", filename);
+
+                printf("Creating %s (org 0x%04x = %d)\n", filename, memory_banks[i].array[0].org, memory_banks[i].array[0].org);
 
                 for (j = 0; j < memory_banks[i].num; ++j)
                 {
@@ -259,6 +289,12 @@ int glue_exec(char *target)
                         fclose(fout);
                         fout = NULL;
                         remove(filename);
+                        if (fihx)
+                        {
+                            fclose(fihx);
+                            fihx = NULL;
+                            remove(ihexname);
+                        }
                         break;
                     }
                     else
@@ -277,35 +313,44 @@ int glue_exec(char *target)
                         while ((k = fgetc(fin)) != EOF)
                             fputc(k, fout);
 
+                        // ihex
+
+                        if (fihx && !ipad)
+                        {
+                            rewind(fin);
+                            bin2hex(fin, fihx, memory_banks[i].array[j].org, recsize, 0);
+                        }
+
                         fclose(fin);
                     }
                 }
 
-                if (fout != NULL)
+                if (fout) fclose(fout);
+                if (fihx)
                 {
-                    fclose(fout);
-
-                    if (ihex)
+                    if (ipad)
                     {
-                        fin = fopen(filename, "rb");
-                        suffix_change(filename, ".ihx");
+                        // request is for a padded ihex file
+                        // nothing has been written to the ihex file yet, use the generate bin file as input source
 
-                        if (fin == NULL)
-                            fprintf(stderr, "Unable to create ihx file %s\n", filename);
+                        if ((fin = fopen(filename, "rb")) == NULL)
+                        {
+                            fprintf(stderr, "Error: cannot read file %s to generate %s, skipping\n", filename, ihexname);
+                            fclose(fihx);
+                            remove(ihexname);
+                        }
                         else
                         {
-                            if ((fout = fopen(filename, "wb")) == NULL)
-                            {
-                                fclose(fin);
-                                fprintf(stderr, "Unable to create ihx file %s\n", filename);
-                            }
-                            else
-                            {
-                                bin2hex(fin, fout, memory_banks[i].array[0].org);
-                                fclose(fin);
-                                fclose(fout);
-                            }
+                            bin2hex(fin, fihx, memory_banks[i].array[0].org, recsize, 1);
+                            fclose(fin);
+                            fclose(fihx);
                         }
+
+                    }
+                    else
+                    {
+                        fprintf(fihx, ":00000001FF\n");
+                        fclose(fihx);
                     }
                 }
             }

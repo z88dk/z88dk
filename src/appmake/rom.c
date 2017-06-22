@@ -18,6 +18,7 @@ static int               rombase      = 0;
 static int               romfill      = 255;
 static int               chipsize     = 0;
 static char              ihex         = 0;
+static int               recsize      = 16;
 
 
 /* Options that are available for this module */
@@ -32,6 +33,7 @@ option_t rom_options[] = {
     { 'f', "filler",    "Filler byte (default: 0xFF)",      OPT_INT,   &romfill },
     {  0,  "chipsize",  "Single chip size in a ROM set",    OPT_INT,   &chipsize },
     {  0,  "ihex",      "Generate an iHEX file",            OPT_BOOL,  &ihex    },
+    { 'r', "recsize",   "Record size for iHEX file (default: 16)", OPT_INT, &recsize },
     {  0,  NULL,        NULL,                               OPT_NONE,  NULL     }
 };
 
@@ -150,7 +152,7 @@ int rom_exec(char *target)
             exit_log(1, "Can't create %s for hex conversion\n", outname);
         }
 
-        bin2hex(fpin, fpout, (romsize == 0) ? binorg : rombase);
+        bin2hex(fpin, fpout, (romsize == 0) ? binorg : rombase, recsize, 1);
 
         fclose(fpin);
         fclose(fpout);
