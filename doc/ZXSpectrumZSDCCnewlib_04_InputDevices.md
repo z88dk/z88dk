@@ -135,15 +135,15 @@ the key to be released using in_wait_nokey() before showing the result.
 
 Experimenting with this program, you'll see that in_inkey() only returns a key
 value when a _single_ key is being pressed. That means it's no use if you want
-to detect multiple keys or spot shift+key type combinations. It might, however,
-be what you want if you're scanning the keyboard in your game loop.
+to detect multiple keys or spot shift+key type combinations.
 
 ## Scancodes
 
 For faster and more accurate information on what's happening on the keyboard we
-need to switch to examining _scancodes_. There are 40 unique scancodes, one for
-each key on the keyboard. Each scancode is a 14 bit, predefined and hardcoded
-number, and some of the common ones are listed in input_zx.h, like this:
+need to switch to examining _scancodes_. A scancode is a single number which
+represents the physical state of the keyboard when a single character is
+entered. Each scancode is a 14 bit, predefined and hardcoded number, and some of
+the common ones are listed in input_zx.h, like this:
 
 ```
 #define IN_KEY_SCANCODE_a      0x01fd
