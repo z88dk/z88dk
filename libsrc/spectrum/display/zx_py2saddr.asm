@@ -10,13 +10,13 @@ PUBLIC _zx_py2saddr
 
    ld a,l
    and $07
-   or $40
    ld h,a
    ld a,l
+   and $c0
    rra
-   rra
-   rra
-   and $18
+   inc a
+   rrca
+   rrca
    or h
    ld h,a
    
