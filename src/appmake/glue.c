@@ -4,7 +4,7 @@
 *      Section names containing "BANK_XX" where "XX" is a hex number 00-FF
 *      are assumed to be part of memory bank XX.
 *
-*      Section names containing "align_dd" where "dd" is a decimal number
+*      Section names containing "_align_dd" where "dd" is a decimal number
 *      are assumed to be sections aligned to dd.  These sections' org
 *      addresses will be checked for proper alignment.
 *      
@@ -18,24 +18,24 @@ static char             *binname = NULL;
 static char             *crtfile = NULL;
 static int               romfill = 255;
 static char              ihex = 0;
+static char              ipad = 0;
+static int               recsize = 16;
 static char              clean = 0;
 
 
 /* Options that are available for this module */
 option_t glue_options[] = {
-    { 'h', "help",      "Display this help",                      OPT_BOOL,  &help },
-    { 'b', "binfile",   "Basename of binary output files",        OPT_STR,   &binname },
-    { 'c', "crt0file",  "Basename of map file (default=binname)", OPT_STR,   &crtfile },
-    { 'f', "filler",    "Filler byte (default: 0xFF)",            OPT_INT,   &romfill },
-    {  0,  "ihex",      "Generate an iHEX file",                  OPT_BOOL,  &ihex },
-    {  0,  "clean",     "Remove binary files when finished",      OPT_BOOL,  &clean },
-    {  0,  NULL,        NULL,                                     OPT_NONE,  NULL }
+    { 'h', "help",      "Display this help",                       OPT_BOOL,  &help },
+    { 'b', "binfile",   "Basename of binary output files",         OPT_STR,   &binname },
+    { 'c', "crt0file",  "Basename of map file (default=binfile)",  OPT_STR,   &crtfile },
+    { 'f', "filler",    "Filler byte (default: 0xFF)",             OPT_INT,   &romfill },
+    {  0,  "ihex",      "Generate an iHEX file",                   OPT_BOOL,  &ihex },
+    { 'p', "pad",       "Pad iHEX file",                           OPT_BOOL,  &ipad },
+    { 'r', "recsize",   "Record size for iHEX file (default: 16)", OPT_INT,   &recsize },
+    {  0,  "clean",     "Remove binary files when finished",       OPT_BOOL,  &clean },
+    {  0,  NULL,        NULL,                                      OPT_NONE,  NULL }
 };
 
-
-/*
-* Execution starts here
-*/
 
 
 struct binary_blob {
@@ -71,6 +71,12 @@ int compare_aligned(const struct aligned_blob *a, const struct aligned_blob *b)
 {
     return strcmp(a->section_name, b->section_name);
 }
+
+
+/*
+* Execution starts here
+*/
+
 
 int glue_exec(char *target)
 {
@@ -309,10 +315,10 @@ int glue_exec(char *target)
 
                         // ihex
 
-                        if (fihx)
+                        if (fihx && !ipad)
                         {
                             rewind(fin);
-                            bin2hex(fin, fihx, memory_banks[i].array[j].org, 0);
+                            bin2hex(fin, fihx, memory_banks[i].array[j].org, recsize, 0);
                         }
 
                         fclose(fin);
@@ -322,8 +328,30 @@ int glue_exec(char *target)
                 if (fout) fclose(fout);
                 if (fihx)
                 {
-                    fprintf(fihx, ":00000001FF\n");
-                    fclose(fihx);
+                    if (ipad)
+                    {
+                        // request is for a padded ihex file
+                        // nothing has been written to the ihex file yet, use the generate bin file as input source
+
+                        if ((fin = fopen(filename, "rb")) == NULL)
+                        {
+                            fprintf(stderr, "Error: cannot read file %s to generate %s, skipping\n", filename, ihexname);
+                            fclose(fihx);
+                            remove(ihexname);
+                        }
+                        else
+                        {
+                            bin2hex(fin, fihx, memory_banks[i].array[0].org, recsize, 1);
+                            fclose(fin);
+                            fclose(fihx);
+                        }
+
+                    }
+                    else
+                    {
+                        fprintf(fihx, ":00000001FF\n");
+                        fclose(fihx);
+                    }
                 }
             }
         }
