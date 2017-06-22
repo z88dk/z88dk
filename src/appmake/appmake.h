@@ -433,8 +433,7 @@ extern void         zx_rawbit(FILE *fpout, int period);
 extern void         zx_rawout (FILE *fpout, unsigned char b, char fast);
 
 /*  record size for bin2hex and other text encoding formats */
-#define RECSIZE 16
-extern int          bin2hex(FILE *input, FILE *output, int address, int eofrec);
+extern int          bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec);
 extern int          hexdigit(char digit);
 extern uint32_t     num2bcd(uint32_t num);
 

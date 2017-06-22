@@ -829,22 +829,30 @@ static int checksum(const unsigned char *data, int size)
 }
 
 
-// if address >= LARGE_ADDRESS_OFFSET, do not write EOF record to ihx file
-// if address >= LARGE_ADDRESS_OFFSET, subtract LARGE_ADDRESS_OFFSET (see glue.c)
-int bin2hex(FILE *input, FILE *output, int address, int eofrec)
+// if eofrec == 0 do not write end-of-file record
+int bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec)
 {
-    unsigned char outbuf[5 + RECSIZE + 1];
+    unsigned char *outbuf;
     unsigned char *inbuf;
     int byte;
     int size;   
     int i;
 
+    if (recsize < 1)
+        recsize = 16;
+    else if (recsize > 255)
+        recsize = 255;
+
+    if ((outbuf = malloc((recsize + 6) * sizeof(*outbuf))) == NULL)
+        exit_log(1, "Error bin2hex: out of memory\n");
+
     inbuf = outbuf + 5;
     outbuf[0] = ':';
 
-    do {    
+    do
+    {    
         size = 0;
-        while (size < RECSIZE)
+        while (size < recsize)
         {
             byte = fgetc(input);
 
@@ -855,7 +863,7 @@ int bin2hex(FILE *input, FILE *output, int address, int eofrec)
         }
 
         if (size == 0 && !eofrec)
-            return 0;
+            break;
 
         outbuf[1] = size;
         if (size > 0)
@@ -873,14 +881,14 @@ int bin2hex(FILE *input, FILE *output, int address, int eofrec)
         outbuf[5 + size] = checksum(outbuf + 1, size + 4);
         fputc(outbuf[0], output);
 
-        for (i=1; i<(size+6); i++) {
+        for (i=1; i<(size+6); i++)
             fprintf(output, "%02X", outbuf[i]);
-        }
 
         fprintf(output, "\n");
         address += size;        
     } while (!feof(input) || (size > 0));
 
+    free(outbuf);
     return 0;
 }
 
