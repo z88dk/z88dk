@@ -20,9 +20,11 @@ SECTION code_z80
 
 PUBLIC asm_z80_pop_ei
 PUBLIC asm0_z80_pop_ei
+PUBLIC asm_z80_pop_ei_jp
 
 PUBLIC asm_cpu_pop_ei
 PUBLIC asm0_cpu_pop_ei
+PUBLIC asm_cpu_pop_ei_jp
 
 asm_z80_pop_ei:
 asm_cpu_pop_ei:
@@ -41,6 +43,8 @@ asm_cpu_pop_ei:
 
 asm0_z80_pop_ei:
 asm0_cpu_pop_ei:
+asm_z80_pop_ei_jp:
+asm_cpu_pop_ei_jp:
 
    ; enter : stack = ret, ei_di_status
    ;
