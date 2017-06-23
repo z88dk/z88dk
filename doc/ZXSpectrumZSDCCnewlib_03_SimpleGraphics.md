@@ -56,32 +56,50 @@ yourself reading the documentation for the older code, while compiling and
 linking in the new code, you're going to get confused. While the Z88DK library
 transition is ongoing, you need to pay attention.
 
-## The Display File Address Manipulators
+## All Is Not Lost
+
+The new library doesn't contain the graphics routines we want, but all is not
+lost if you're prepared to get your programming hands a bit dirty. What follows
+might be a little beyond the scope of a getting started guide, but it
+demonstrates that Z88DK provides what is needed if you'd like a do-it-yourself
+option.
+
+### The Display File Address Manipulators
 
 Although the new library does not contain graphics commands like line, circle,
 and so on, it does contain some lower level functions that can help to implement
 these sorts of commands.  So before leaving this installment, let's have a look at
 how they might be used to implement plot and draw.
 
-The Spectrum's display is memory mapped, which means a block of memory is set aside
-to represent the screen contents and this block is read by the ULA to generate the
-display.  The range of memory addresses from 16384 to 22527 represent the pixels on
-screen.  Each bit represents whether a particular pixel is on or off.  The range of
-addresses from 22528 to 23295 represent the colour applied to each 8x8 group of pixels
-on screen.  Z88DK calls the memory region that represents pixels the "screen addresses"
-and the memory region that represents colours the "attribute addresses."
+The Spectrum's display is memory mapped, which means a block of memory is set
+aside to represent the screen contents. This area of memory is directly used to
+generate the display. The range of memory addresses from 16384 to 22527
+represent the pixels on screen. Each bit represents whether a particular pixel
+is on or off. The range of addresses from 22528 to 23295 represent the colour
+applied to each 8x8 group of pixels on screen. Z88DK calls the memory region
+that represents pixels the "screen addresses" and the memory region that
+represents colours the "attribute addresses."
 
-The problem of drawing or printing into the display directly is then a problem of 
-mapping character and pixel coordinates to memory addresses in the display file area.
-This is what the manipulator functions that Z88DK provides does for you.
+The problem of drawing or printing into the display directly is really a problem
+of working out which bit of which byte in the display memory contains the
+pixel you want to set. Z88DK provides some manipulator functions that do this
+for you.
 
-The display file manipulator functions are defined in
-[arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L87).
-If you scroll down to line 87, you will find a block of functions under the "display"
-heading.  These are the functions that manipulate display file addresses.
+The display address manipulator functions are defined in
+[arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h).
+
+```
+include/_DEVELOPMENT/sdcc/arch/zx.h
+```
+
+Note that this file is in the new library's include path, so it's ready to be
+used with the new libraries.
+
+If you scroll down you will find a block of functions under the "display"
+heading. These are the functions that manipulate display addresses.
 
 To make it clear what each function does, there is a naming convention applied to
-each function name.  In general function names are composed of strings like these:
+each function name. In general function names are composed of strings like these:
 
 ```
 saddr = screen address
@@ -96,30 +114,30 @@ cy    = character y coordinate (0..23)
 cxy   = character (x,y) coordinate
 ```
 
-If you wanted to find a function that converts a pixel x,y coordinate to a screen
-address, you would look for something like `zx_pxy2saddr`.  And there it is on line 197
-of [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L197).
-Because the Spectrum stores the state of eight pixels in each byte, the screen address
-returned by that function holds the state of eight pixels.  To plot an individual point,
-you would write a byte there that sets exactly one bit corresponding the individual pixel
-you want to plot.  There is another function `zx_px2bitmask()` that will tell you what byte
-to write given an x coordinate and we will see how that is used in the example below.
+If you wanted to find a function that converts a pixel x,y coordinate to a
+screen address, you would look for something like `zx_pxy2saddr`. Because the
+Spectrum stores the state of eight pixels in each byte, the screen address
+returned by that function holds the state of eight pixels. To plot an
+individual point, you would write a byte there that sets exactly one bit
+corresponding to the individual pixel you want to plot. There is another function
+zx_px2bitmask() that will tell you what byte to write given an x coordinate
+and we will see how that is used in the example below.
 
-It should be noted that both the character coordinates and the pixel coordinates have (0,0)
-located at the top left of the screen.  BASIC does the same for character coordinates but
-it places the pixel coordinate origin two character lines above the lower left of the
-screen.  So the pixel coordinate system is a little bit different in C.
+It should be noted that both the character coordinates and the pixel coordinates
+have (0,0) located at the top left of the screen.  BASIC does the same for
+character coordinates but it places the pixel coordinate origin two character
+lines above the lower left of the screen.  So the pixel coordinate system is a
+little bit different in C.
 
 ### Plotting Points on Screen
 
-To illustrate how these display manipulators can be used, let's write a program that plots
-points at random on the screen.  Save this to a file called plot.c:
+To illustrate how these display manipulators can be used, let's write a program
+that plots points at random on the screen.  Save this to a file called plot.c:
 
 ```
   /* C source start */
 
   #include <arch/zx.h>
-  #include <input.h>
   #include <stdlib.h>
 
   void plot(unsigned char x, unsigned char y)
@@ -129,18 +147,15 @@ points at random on the screen.  Save this to a file called plot.c:
 
   int main(void)
   {
+     unsigned char i;
+
      zx_cls(PAPER_WHITE);
    
-     while (1)
+     for( i=0; i<15; i++ )
      {
-        plot(rand()%256, rand()%192);
-      
-        if (in_test_key())
-        {
-           zx_cls((rand() % 7) + PAPER_WHITE);
-           in_wait_nokey();
-        }
+        plot(rand()%256, rand()%192);      
      }
+     return 0;
   }
 
   /* C source end */
@@ -152,33 +167,30 @@ Our compile line will use startup=31 because we have no use for stdio in this ex
  zcc +zx -vn -startup=31 -clib=sdcc_iy plot.c -o plot -create-app
 ```
 
-We're borrowing a couple of functions from the input library to check for keypresses.
-This is the subject of the next installment of this series.  The functions are fairly
-self-explanatory.  `in_test_key()` returns true if any key is pressed on the keyboard.
-`in_wait_nokey()` blocks until no keys are pressed.  The combination is being used in
-the above program to detect a keypress, clear the screen to a random ink colour, and
-then wait for the key to be released.  Functions like these will be explained more
-fully in part 4.
+In the plot() function, zx_pxy2saddr(x,y) returns a char* that represents the
+screen address that contains the pixel to be plotted. To find out which bit in
+the byte should be set, a call to zx_px2bitmask(x) is made. The result of that
+call is a byte with a single bit set in it - that's the bit we want to set. Then
+this byte is mixed into the display by ORing it in using the C operator "|=".
 
-The `plot()` function is very simple.  `zx_pxy2saddr(x,y)` returns a `char *` that
-represents the screen address that contains the point to be plotted.  To find out which
-bit in the byte there should be set, a call to `zx_px2bitmask(x)` is made.  The result
-of that call is a byte with a single bit set in it.  Then this byte is mixed into the
-display by ORing it in using the C operator "|=".
-
-Notice we haven't done anything with colour.  We're simply plotting pixels here and the
+Notice we haven't done anything with colour. We're simply plotting pixels here and the
 colour they will appear in depends on the current attribute value on screen which
 is being set by `zx_cls()`.
 
 ### Drawing Lines on Screen
 
-Let's go one step further and draw lines on screen.  We'll do that the easy way by borrowing
+Let's go one step further and draw lines on screen. We'll do that the easy way by borrowing
 some C code from the [internet](https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C)
-that draws lines using the Bresenham algorithm.  The results here will be quick but it's
+that draws lines using the Bresenham algorithm. The results here will be quick but it's
 not going to be the fastest possible way to draw lines.
+
+It really isn't important to understand the Bresenham algorithm. The important
+point here is that Z88DK provides the low level tools which enable such a
+algorithm to be implemented.
 
 Retaining our plot function and borrowing the internet line code, save the following in
 file line.c:
+
 
 ```
   /* C source start */
@@ -214,18 +226,15 @@ file line.c:
 
   int main(void)
   {
-     zx_cls(PAPER_WHITE);
+    unsigned char i;
+
+    zx_cls(PAPER_WHITE);
    
-     while (1)
-     {
-        line(rand()%256, rand()%192, rand()%256, rand()%192);
-      
-        if (in_test_key())
-        {
-           zx_cls((rand() % 7) + PAPER_WHITE);
-           in_wait_nokey();
-        }
-     }
+    for( i=0; i<15; i++ )
+    {
+      line(rand()%256, rand()%192, rand()%256, rand()%192);
+    }
+    return 0;
   }
 
   /* C source end */
@@ -249,3 +258,5 @@ instead of a solid black one.
 Besides the screen address manipulators, there is one high level graphics function
 in [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h#L280)
 and that is `zx_pattern_fill()`.  This can be used to fill an area on screen with a pattern.
+
+[... continue to Part 4: Input Devices](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md)
