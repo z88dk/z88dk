@@ -80,12 +80,6 @@ applied to each 8x8 group of pixels on screen. Z88DK calls the memory region
 that represents pixels the "screen addresses" and the memory region that
 represents colours the "attribute addresses."
 
-
-
-Use a stdio example to indicate the values returned by the translator functions.
-
-
-
 The problem of drawing or printing into the display directly is really a problem
 of working out which bit of which byte in the display file area contains the
 pixel you want to set. Z88DK provides some manipulator functions that do this
