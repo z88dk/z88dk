@@ -4,7 +4,7 @@
 
     PUBLIC _acia_getc
 
-    EXTERN ACIA_RX_SIZE, ACIA_RX_FULLISH
+    EXTERN ACIA_RX_SIZE, ACIA_RX_EMPTYSIZE
     EXTERN ACIA_TEI_MASK, ACIA_TDI_RTS0, ACIA_CTRL_ADDR
 
     EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
@@ -34,7 +34,7 @@
         dec (hl)                    ; atomically decrement Rx count
         ld a,(hl)                   ; get the newly decremented Rx count
 
-        cp ACIA_RX_FULLISH          ; compare the count with the preferred full size
+        cp ACIA_RX_EMPTYSIZE        ; compare the count with the preferred empty size
         jr nc, get_clean_up_rx      ; if the buffer is full, don't change the RTS
 
         call asm_z80_push_di        ; critical section begin
