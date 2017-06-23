@@ -666,7 +666,7 @@ void write_double_queue(void)
     elem_t  *elem;
 
     LL_FOREACH(double_queue, elem ) {
-        if ( elem->refcount ) {
+        if ( 1 || elem->refcount ) {
             output_section(c_rodata_section); // output_section("text");
             prefix();
             queuelabel(elem->litlab);
