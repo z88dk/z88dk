@@ -120,7 +120,7 @@ Spectrum stores the state of eight pixels in each byte, the screen address
 returned by that function holds the state of eight pixels. To plot an
 individual point, you would write a byte there that sets exactly one bit
 corresponding to the individual pixel you want to plot. There is another function
-zx_px2bitmask() that will tell you what bit to write given an x coordinate
+zx_px2bitmask() that will tell you what byte to write given an x coordinate
 and we will see how that is used in the example below.
 
 It should be noted that both the character coordinates and the pixel coordinates
