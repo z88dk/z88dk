@@ -85,7 +85,7 @@ of working out which bit of which byte in the display memory contains the
 pixel you want to set. Z88DK provides some manipulator functions that do this
 for you.
 
-The display file manipulator functions are defined in
+The display address manipulator functions are defined in
 [arch/zx.h](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx.h).
 
 ```
