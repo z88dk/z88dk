@@ -125,8 +125,10 @@ int AddNewFunc(
 
     if (ptr == NULL ) { /* Defined a function */
         /* trap external int blah() { } things */
-     //   if (currfn->storage == EXTERNAL)
-     //       currfn->storage = STATIK;
+        if (currfn && currfn->storage == EXTERNAL) {
+		printf("TRansmuting %p\n",currfn);
+            currfn->storage = STATIK;
+	}
         return (0);
     } else {
         StoreFunctionSignature(ptr);
@@ -265,7 +267,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
  */
 
 int DoFnKR(
-    SYMBOL* currfn,
+    SYMBOL* function,
     char simple)
 {
     char n[NAMESIZE];
@@ -300,10 +302,11 @@ int DoFnKR(
             break;
     }
 
-    check_trailing_modifiers(currfn);
+    check_trailing_modifiers(function);
 
     if ( cmatch(';')) {
-        printf("Storage %d\n",currfn->storage);
+	printf("Doing something %p\n",currfn);
+        currfn = NULL;
         return -1;
     }
 
@@ -333,7 +336,7 @@ int DoFnKR(
         }
     }
     /* Have finished K&R parsing */
-    setlocvar(prevarg, currfn);
+    setlocvar(prevarg, function);
     return(0);
 }
 
