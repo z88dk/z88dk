@@ -1,0 +1,27 @@
+
+
+
+	MODULE	Issue_254_KR_Specifiers
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	EXTERN	_func
+	EXTERN	_func2
+	EXTERN	_func3
+	EXTERN	_func4
+
+
+
+
