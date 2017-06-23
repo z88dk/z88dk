@@ -81,7 +81,7 @@ that represents pixels the "screen addresses" and the memory region that
 represents colours the "attribute addresses."
 
 The problem of drawing or printing into the display directly is really a problem
-of working out which bit of which byte in the display file area contains the
+of working out which bit of which byte in the display memory contains the
 pixel you want to set. Z88DK provides some manipulator functions that do this
 for you.
 
