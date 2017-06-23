@@ -10,6 +10,7 @@ sccz80 compiler nor the older classic libraries are discussed.
 It is assumed the reader has worked through the earlier installments of this
 series and is continuing on from
 [installment 3](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md).
+If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
 
 ## Input Devices
 
