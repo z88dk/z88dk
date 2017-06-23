@@ -125,13 +125,11 @@ int AddNewFunc(
 
     if (ptr == NULL ) { /* Defined a function */
         /* trap external int blah() { } things */
-        if (currfn->storage == EXTERNAL)
-            currfn->storage = STATIK;
+     //   if (currfn->storage == EXTERNAL)
+     //       currfn->storage = STATIK;
         return (0);
     } else {
-        if ( ptr->offset.i != FUNCTION ) {
-            StoreFunctionSignature(ptr);
-        }
+        StoreFunctionSignature(ptr);
         /* function prototypes always have extern linkage by default */
         currfn->storage = EXTERNAL;
     }
@@ -257,9 +255,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
         }
         return (dofnansi(currfn, addr)); /* So we can pass back result */
     }
-    if ( DoFnKR(currfn, simple) == -1 ) {
-        return currfn;
-    }
+    DoFnKR(currfn, simple);
     return NULL ;
 }
 
@@ -307,6 +303,7 @@ int DoFnKR(
     check_trailing_modifiers(currfn);
 
     if ( cmatch(';')) {
+        printf("Storage %d\n",currfn->storage);
         return -1;
     }
 
@@ -407,7 +404,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     int argnumber;
 
     lgh = 0; /* Initialise it */
-    if (prevarg != NULL && currfn->prototyped == 0 && currfn->offset.i != FUNCTION) {
+    if (prevarg != NULL && currfn->prototyped == 0 ) {
         StoreFunctionSignature(prevarg);
     }
 
