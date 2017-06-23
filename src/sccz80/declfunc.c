@@ -126,7 +126,6 @@ int AddNewFunc(
     if (ptr == NULL ) { /* Defined a function */
         /* trap external int blah() { } things */
         if (currfn && currfn->storage == EXTERNAL) {
-		printf("TRansmuting %p\n",currfn);
             currfn->storage = STATIK;
 	}
         return (0);

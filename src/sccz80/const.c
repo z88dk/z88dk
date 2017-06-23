@@ -677,7 +677,7 @@ void write_double_queue(void)
                 defbyte(); outdec(0); nl();
             } else {
                 //outfmt("\t;%lf ref: %d\n",elem->value,elem->refcount);
-                outfmt("\t;%lf\n",elem->value,elem->refcount);
+                outfmt("\t;%lf\n",elem->value);
                 outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
             }
         }
@@ -710,12 +710,29 @@ void decrement_double_ref(LVALUE *lval)
     }
 }
 
+void increment_double_ref(LVALUE *lval)
+{   
+    unsigned char    fa[MAX_MANTISSA_SIZE+1];
+    elem_t          *elem;
+    if ( c_double_strings ) {
+        char  buf[40];
+        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        elem = get_elem_for_buf(buf,lval->const_val);
+        elem->refcount++;
+    } else {
+        dofloat(lval->const_val, fa);
+        elem = get_elem_for_fa(fa,lval->const_val);
+        elem->refcount++;
+    }
+}
+
+
+
 
 void load_double_into_fa(LVALUE *lval)
 {            
     unsigned char    fa[MAX_MANTISSA_SIZE+1];
     elem_t          *elem;
-
     memset(fa, 0, sizeof(fa));
     
     if ( c_double_strings ) {
