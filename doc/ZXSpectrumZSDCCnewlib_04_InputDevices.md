@@ -1,16 +1,15 @@
 # ZX Spectrum Development with Z88DK - Input Devices
 
-This is the forth document in the series which describes how to get started
+This is the fourth document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
-with the newer, more standards compilant zsdcc C compiler. Neither the older
-sccz80 compiler nor the older classic libraries are discussed.
+with the newer, more standards compilant zsdcc C compiler. Neither the original
+sccz80 compiler nor the classic library is discussed.
 
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
 series and is continuing on from
-[installment 3](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md).
-If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
+[installment 3](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md).  If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
 
 ## Input Devices
 
@@ -88,11 +87,11 @@ one which doesn't set up a terminal driver. We don't need it for this example.
 
 This program uses the zx_border() library routine we've seen before to change
 the border colour, then calls the input library function which sits and waits
-for a key to be pressed. Any key will do; the key which is pressed isn't
-returned. When a key is pressed the border is turned blue, then, since we know
-at least one key is currently down, we call the input library function which
-waits for _no_ key to be pressed. When the user releases the key (strictly
-speaking, when they release _all_ keys they might be holding) the no-key
+for a key to be pressed. Any key will do including the shift keys; the key which
+is pressed isn't returned. When a key is pressed the border is turned blue, then,
+since we know at least one key is currently down, we call the input library
+function which waits for _no_ key to be pressed. When the user releases the key
+(strictly speaking, when they release _all_ keys they might be holding) the no-key
 function returns and we go round the loop. Result: the border is white when the
 keyboard is untouched, and turns blue when any key is being held down.
 
@@ -111,11 +110,10 @@ int main()
 
   while( 1 )
   {
-    in_wait_key();
-    c = in_inkey();
-    in_wait_nokey();
+    while ((c = in_inkey()) == 0) ;
 
     printf("Key pressed is %c (0x%02X)\n", c, c);
+    in_wait_nokey();
   }
 }
 
@@ -130,20 +128,21 @@ zcc +zx -vn -startup=0 -clib=sdcc_iy key_value.c -o key_value -create-app
 ```
 
 The in_inkey() function examines the keyboard and immediately returns the ASCII
-code of the key being pressed, if any. So in this case we wait for a key to be
-pressed using in_wait_key(), then read the key using in_inkey(), then wait for
-the key to be released using in_wait_nokey() before showing the result.
+code of the key being pressed or 0 if either no keys are pressed or more than one
+key is pressed.  So in this case we spin in an empty while loop until in_inkey()
+returns an ascii code.  That is printed to screen and then we wait for the key to
+be released using in_wait_nokey().
 
 Experimenting with this program, you'll see that in_inkey() only returns a key
 value when a _single_ key is being pressed. That means it's no use if you want
-to detect multiple keys or spot shift+key type combinations.
+to detect multiple simultaneous key presses.
 
 ## Scancodes
 
 For faster and more accurate information on what's happening on the keyboard we
 need to switch to examining _scancodes_. A scancode is a single number which
 represents the physical state of the keyboard when a single character is
-entered. Each scancode is a 14 bit, predefined and hardcoded number, and some of
+entered. Each scancode is a 16 bit, predefined and hardcoded number, and some of
 the common ones are listed in input_zx.h, like this:
 
 ```
@@ -347,13 +346,18 @@ so, for example, moving it to the up/right position gives the value 0x0009
 (0x0001 for up plus 0x0008 for right). Holding fire adds 0x0080. For Kempston
 the top byte of the uint16_t is not used.
 
-Other joysticks might return different bitmaps, so either experiment or check
-the source code. The assembler files are well commented, and are
+All joysticks return the same format 16-bit value but may differ in the number
+of fire buttons that can be detected.  The assembler files for these other
+joysticks are well commented, and are
 [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/input/zx/z80):
 
 ```
 libsrc/_DEVELOPMENT/input/zx/z80/
 ```
+
+Because the format of the return value from joystick functions are the same,
+it possible to implement a user-defined joystick option using a function pointer
+but this is beyond the scope of this introduction.
 
 Also worth noting is that automatic joystick detection is not supported in
 Z88DK's new libraries because doing so can be unreliable on certain Spectrum
@@ -404,3 +408,7 @@ Compile with:
 ```
 zcc +zx -vn -startup=31 -clib=sdcc_iy joy_border.c -o joy_border -create-app
 ```
+
+If your emulator does not map the kempston joystick to your controller or to
+the keyboard, try using `in_stick_sinclair1()` in place of `in_stick_kempston()`.
+The Sinclair sticks map themselves to the number keys on the keyboard.
