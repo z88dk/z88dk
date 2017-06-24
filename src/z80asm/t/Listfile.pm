@@ -23,11 +23,14 @@ use Object::Tiny::RW qw(
 		LIST_LST	
 		LIST_ON 	
 );
-use t::TestZ80asm; *z80asm = \&::z80asm; # z80asm already imported in another package
 use Test::More;
 use Test::Differences; 
 use File::Slurp;
 use List::AllUtils 'uniq';
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm; *z80asm = \&::z80asm; # z80asm already imported in another package
+};
 
 my $LABEL_RE = qr/\b[A-Z_][A-Z0-9_]*/;
 my $MAX_LINE = 255-2;

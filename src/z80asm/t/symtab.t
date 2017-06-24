@@ -9,7 +9,7 @@
 
 use Modern::Perl;
 use Test::More;
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 # -DVAR
 t_z80asm(

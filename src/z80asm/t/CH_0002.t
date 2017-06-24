@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test::More;
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 t_z80asm_ok(0, "ld a,    3",   "\x3E\x03");
 t_z80asm_ok(0, "ld a,+ + 3",   "\x3E\x03");

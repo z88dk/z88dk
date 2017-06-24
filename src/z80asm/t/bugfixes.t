@@ -13,8 +13,11 @@ use Modern::Perl;
 use File::Path qw(make_path remove_tree);;
 use Path::Tiny;
 use Capture::Tiny::Extended 'capture';
-use t::TestZ80asm;
-use t::Listfile;
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+	use t::Listfile;
+};
 
 #------------------------------------------------------------------------------
 # CH_0001: Assembly error messages should appear on stderr

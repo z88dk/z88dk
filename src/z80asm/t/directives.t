@@ -10,9 +10,12 @@
 # Test assembly directives
 
 use Modern::Perl;
-use t::TestZ80asm;
 use File::Slurp;
 use File::Path qw( make_path remove_tree );
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+};
 
 #------------------------------------------------------------------------------
 # INCLUDE
