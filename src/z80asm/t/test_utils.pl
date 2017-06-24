@@ -691,7 +691,7 @@ sub get_gcc_options {
 			if (/^\w*(CFLAGS|LDFLAGS)\s*=\s*(.*)/) {
 				my($flag, $text) = ($1, $2);
 				
-				$text =~ s/\$\((\w+)\)/ $ENV{$1} /ge; 
+				$text =~ s/\$\((\w+)\)/ $ENV{$1} || "" /ge;
 				defined $ENV{$1} or warn "Environment variable $1 not found";
 				
 				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;

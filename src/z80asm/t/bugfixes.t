@@ -253,7 +253,7 @@ ASM2
 );
 
 #------------------------------------------------------------------------------
-# BUG_0016: RCMX000 emulation routines not assembled when LIST is ON (-l)
+# BUG_0016: RCM2000 and RCM3000 emulation routines not assembled when LIST is ON (-l)
 note "BUG_0016";
 for my $list ("", "-l") {
 z80asm(
@@ -508,7 +508,7 @@ ASM
 );
 
 #------------------------------------------------------------------------------
-# BUG_0047 : Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCMX000
+# BUG_0047 : Expressions including ASMPC not relocated - impacts call po|pe|p|m emulation in RCM2000
 note "BUG_0047";
 z80asm(
 	asm		=> <<'ASM',
