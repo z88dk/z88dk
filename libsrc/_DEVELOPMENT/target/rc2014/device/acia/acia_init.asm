@@ -4,13 +4,14 @@
     PUBLIC _acia_init
 
     EXTERN _acia_reset, aciaControl
+    EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     EXTERN ACIA_RESET, ACIA_CTRL_ADDR
     EXTERN ACIA_REI, ACIA_TDI_RTS0, ACIA_8N1, ACIA_CLK_DIV_64
 
     _acia_init:
     
-        di
+        call asm_z80_push_di        ; di
 
         ; initialise the ACIA
 
@@ -29,5 +30,4 @@
 
         im 1                        ; interrupt mode 1
 
-        ei
-        ret
+        jp asm_z80_pop_ei_jp        ; ei
