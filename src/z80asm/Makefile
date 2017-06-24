@@ -36,8 +36,9 @@ TEST_SRC_LIB:=t/testlib.c
 TARGET =		z80asm$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
+OPT = -O3
 LOCAL_LIB :=	lib
-LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -O3 -std=c99 -D_GNU_SOURCE -DVERSION=$(VERSION)
+LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 -std=c99 -D_GNU_SOURCE -DVERSION=$(VERSION) $(OPT)
 
 #------------------------------------------------------------------------------
 # main
@@ -131,6 +132,7 @@ test_enigma: $(TARGET)
 	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
 	echo 'HREXLSLEOC .' >> enigma.bmk
 	diff -w enigma.bmk enigma.out
+	$(RM) enigma.bin enigma.in enigma.out enigma.bmk
 	
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst enigma.bin enigma.in enigma.out enigma.bmk
