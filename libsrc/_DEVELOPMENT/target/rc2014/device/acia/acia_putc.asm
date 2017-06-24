@@ -8,7 +8,7 @@
     EXTERN ACIA_TDRE, ACIA_TX_SIZE, ACIA_TEI_MASK, ACIA_TEI_RTS0, ACIA_CTRL_ADDR
 
     EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
-    EXTERN asm_z80_push_di, asm_z80_pop_ei
+    EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     _acia_putc:
 
@@ -67,9 +67,7 @@
         ld (aciaControl), a         ; write the ACIA control echo byte back
         out (ACIA_CTRL_ADDR), a     ; set the ACIA CTRL register
         
-        call asm_z80_pop_ei         ; critical section end
-
-        ret
+        jp asm_z80_pop_ei_jp        ; critical section end
 
     resetTxBuffer:
     

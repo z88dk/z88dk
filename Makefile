@@ -10,6 +10,7 @@
 prefix = /usr/local
 prefix_share = $(prefix)/share
 git_rev = $(shell git rev-parse --short HEAD)
+git_count = $(shell git rev-list --count HEAD)
 version := $(shell date +%Y%m%d)
 
 INSTALL ?= install
@@ -27,7 +28,7 @@ setup:
 	echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h
 	echo '#define UNIX 1' >> src/config.h
 	echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h
-	echo '#define Z88DK_VERSION "${version}-${git_rev}"' >> src/config.h
+	echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h
 	@mkdir -p bin
 
 appmake:

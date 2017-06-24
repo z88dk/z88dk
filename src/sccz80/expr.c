@@ -563,12 +563,9 @@ int heira(LVALUE *lval)
         if (heira(lval))
             rvalue(lval);
         neg(lval);
-        if ( lval->is_const ) {
-            if ( lval->val_type == DOUBLE ) {
-                decrement_double_ref(lval);
-            }
-            lval->const_val = -lval->const_val;
-        }
+        if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
+        lval->const_val = -lval->const_val;
+        if ( lval->val_type == DOUBLE ) increment_double_ref(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */
