@@ -735,9 +735,10 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     int itag;
     char nam[20];
 
+
     if (lval->c_id == VARIABLE) {
         /* Straight forward variable conversion now.. */
-        if ( dest_lval->const_val == 0 ) {
+        if ( dest_lval->is_const == 0 ) {
             force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
         }
         dest_lval->val_type = lval->c_vtype;
