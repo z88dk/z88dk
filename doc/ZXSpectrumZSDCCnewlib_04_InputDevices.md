@@ -137,7 +137,7 @@ the key to be released using in_wait_nokey() before showing the result.
 For normal keys the in_inkey() function returns the ASCII code of the key being
 pressed. It returns 0 if either of the shift keys is pressed, or if it's called
 when no keys are pressed. If you manage to press two or more keys
-simulatenously, that makes in_inkey() return 0 as well. These limitations mean
+simultaneously, that makes in_inkey() return 0 as well. These limitations mean
 in_inkey() is only useful in certain situations. For an accurate understanding
 of what's happening on the keyboard we need to turn to _scancodes_.
 
