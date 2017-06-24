@@ -15,6 +15,11 @@ endif
 CC 			?= gcc
 INSTALL 	?= install
 
+VERSION		= $(shell git rev-list --count HEAD)
+ifeq ($(VERSION),)
+  VERSION	= 0
+endif
+
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
@@ -32,7 +37,7 @@ TARGET =		z80asm$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -O3 -std=c99 -D_GNU_SOURCE
+LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -O3 -std=c99 -D_GNU_SOURCE -DVERSION=$(VERSION)
 
 #------------------------------------------------------------------------------
 # main

@@ -9,8 +9,14 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "hist.h"
 
-#define VERSION     "2.8.5"
+#ifndef VERSION
+#define VERSION     0
+#endif
+
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2017"
+
+#define STR1(x)	#x
+#define STR(x)	STR1(x)
 
 #ifdef QDOS
 #include <qdos.h>
@@ -27,7 +33,7 @@ struct WINDOWDEF _condetails =
 #endif
 
 #ifdef AMIGA
-char amiver[] = "$VER: z80asm " VERSION ", (c) " COPYRIGHT;
+char amiver[] = "$VER: z80asm version " STR(VERSION) ", (c) " COPYRIGHT;
 #endif
 
-char copyrightmsg[] = "Z80 Module Assembler " VERSION ", (c) " COPYRIGHT;
+char copyrightmsg[] = "Z80 Module Assembler v" STR(VERSION) ", (c) " COPYRIGHT;
