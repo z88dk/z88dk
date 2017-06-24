@@ -665,10 +665,11 @@ sub normalize {
 # get version and date from hist.c
 sub get_copyright {
 	my $hist = read_file("hist.c");
-	my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x or die;
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
-	my $copyrightmsg = "Z80 Module Assembler ".$version.", (c) ".$copyright;
+
+	chomp(my $version = `git rev-list --count HEAD`);
 	
+	my $copyrightmsg = "Z80 Module Assembler v".$version.", (c) ".$copyright;
 	return $copyrightmsg;
 }
 
