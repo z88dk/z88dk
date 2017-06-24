@@ -14,7 +14,7 @@ use Modern::Perl;
 use Test::More;
 use Path::Tiny;
 use Capture::Tiny::Extended 'capture';
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 unlink_testfiles();
 path("test.asm")->spew(<<END);

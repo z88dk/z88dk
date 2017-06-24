@@ -15,7 +15,7 @@ use CPU::Z80::Assembler (); #$CPU::Z80::Assembler::verbose = 1;
 use Test::Differences; 
 use Test::More;
 use Data::Dump 'dump';
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 # copied from z80asm.c:
 # unsigned char reloc_routine[] =

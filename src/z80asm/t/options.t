@@ -18,7 +18,7 @@ use Time::HiRes 'sleep';
 use Capture::Tiny 'capture_merged';
 use Test::Differences; 
 use Test::More;
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 my $copyrightmsg = get_copyright()."\n";
 

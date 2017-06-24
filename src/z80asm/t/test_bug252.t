@@ -16,7 +16,7 @@ use Path::Tiny;
 use Test::Differences;
 use Data::HexDump;
 use Capture::Tiny::Extended 'capture';
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 path("map.asm")->spew(<<END);
 	section s0

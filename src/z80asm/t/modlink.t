@@ -10,7 +10,10 @@
 # Test linking of modules
 
 use Modern::Perl;
-use t::TestZ80asm;
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+};
 
 #------------------------------------------------------------------------------
 # Test expressions across modules

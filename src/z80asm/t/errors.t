@@ -17,7 +17,7 @@ use File::Path qw(make_path remove_tree);;
 use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
 use Path::Tiny;
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 #------------------------------------------------------------------------------
 # Black box tests

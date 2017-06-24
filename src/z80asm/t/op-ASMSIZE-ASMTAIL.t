@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test::More;
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 my @testfiles = qw( testa.asm testa.lis testa.sym testa.o testa.map testa.bin
 					testb.asm testb.lis testb.sym testb.o
