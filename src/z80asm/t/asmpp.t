@@ -16,7 +16,7 @@ use File::Slurp;
 use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 #------------------------------------------------------------------------------
 # simple code

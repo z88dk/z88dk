@@ -14,7 +14,7 @@ use warnings;
 use Test::More;
 use Test::Differences; 
 use Capture::Tiny::Extended 'capture';
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
