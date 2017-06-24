@@ -110,7 +110,9 @@ int main()
 
   while( 1 )
   {
-    while ((c = in_inkey()) == 0) ;
+    in_wait_key();
+    c = in_inkey();
+    in_wait_nokey();
 
     printf("Key pressed is %c (0x%02X)\n", c, c);
     in_wait_nokey();
@@ -127,15 +129,17 @@ it. crt0 will do nicely:
 zcc +zx -vn -startup=0 -clib=sdcc_iy key_value.c -o key_value -create-app
 ```
 
-The in_inkey() function examines the keyboard and immediately returns the ASCII
-code of the key being pressed or 0 if either no keys are pressed or more than one
-key is pressed.  So in this case we spin in an empty while loop until in_inkey()
-returns an ascii code.  That is printed to screen and then we wait for the key to
-be released using in_wait_nokey().
+The in_inkey() function examines the keyboard and immediately returns a code
+relating to the key being pressed. So in this case we wait for a key to be
+pressed using in_wait_key(), then read the key using in_inkey(), then wait for
+the key to be released using in_wait_nokey() before showing the result.
 
-Experimenting with this program, you'll see that in_inkey() only returns a key
-value when a _single_ key is being pressed. That means it's no use if you want
-to detect multiple simultaneous key presses.
+For normal keys the in_inkey() function returns the ASCII code of the key being
+pressed. It returns 0 if either of the shift keys is pressed, or if it's called
+when no keys are pressed. If you manage to press two or more keys
+simultaneously, that makes in_inkey() return 0 as well. These limitations mean
+in_inkey() is only useful in certain situations. For an accurate understanding
+of what's happening on the keyboard we need to turn to _scancodes_.
 
 ## Scancodes
 
