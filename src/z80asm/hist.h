@@ -9,8 +9,4 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #pragma once
 
-#ifdef QDOS
-extern char _prog_name[], _version[], _copyright[];
-#endif
-
 extern char copyrightmsg[];

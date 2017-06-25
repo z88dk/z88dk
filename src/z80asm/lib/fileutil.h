@@ -16,13 +16,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "utarray.h"
 #include <stdio.h>
 
-/* File name extension separator */
-#ifdef QDOS
-#define FILEEXT_SEPARATOR "_"
-#else
-#define FILEEXT_SEPARATOR "."
-#endif
-
 /*-----------------------------------------------------------------------------
 *   File input/output
 *	Register callbacks to be used on read/write error of a file.

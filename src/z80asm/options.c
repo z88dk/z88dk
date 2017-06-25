@@ -28,16 +28,16 @@ Parse command line options
 #include <string.h>
 
 /* default file name extensions */
-#define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
-#define FILEEXT_LIST    FILEEXT_SEPARATOR "lis"    /* ".lis" / "_lis" */
-#define FILEEXT_OBJ     FILEEXT_SEPARATOR "o"	   /* ".o"   / "_o"   */
-#define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
-#define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
-#define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
-#define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
-#define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
-#define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
-#define FILEEXT_RELOC   FILEEXT_SEPARATOR "reloc"  /* ".reloc" / "_reloc" */
+#define FILEEXT_ASM     ".asm"    
+#define FILEEXT_LIST    ".lis"    
+#define FILEEXT_OBJ     ".o"	  
+#define FILEEXT_DEF     ".def"    
+#define FILEEXT_ERR     ".err"    
+#define FILEEXT_BIN     ".bin"    
+#define FILEEXT_LIB     ".lib"    
+#define FILEEXT_SYM     ".sym"    
+#define FILEEXT_MAP     ".map"    
+#define FILEEXT_RELOC   ".reloc"  
 
 /* types */
 enum OptType
