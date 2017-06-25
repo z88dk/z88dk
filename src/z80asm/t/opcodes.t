@@ -2564,7 +2564,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b -DRABBIT --RCMX000 -i".z80emu(),
+    options => "-l -b -DRABBIT --cpu=r2k -i".z80emu(),
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -4821,7 +4821,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b -DRABBIT --RCMX000 -i".z80emu(),
+    options => "-l -b -DRABBIT --cpu=r2k -i".z80emu(),
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
