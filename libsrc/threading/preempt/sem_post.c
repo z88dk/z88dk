@@ -34,7 +34,7 @@ int sem_post(sem_t *sem)
 	jr	z,sem_out		; No waiters
 	push	ix
 	pop	hl
-	ld	de,#semaphore_waiters
+	ld	de,semaphore_waiters
 	add	hl,de
 	ld	b,(ix+semaphore_waiters_num)
 	ld	(ix+semaphore_waiters_num),0

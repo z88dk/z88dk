@@ -33,7 +33,7 @@
 	PUBLIC __rlulong_rrx_s
 
 __rrulong_rrx_s:
-        ld      hl,#2+4
+        ld      hl,2+4
         add     hl,sp
 
         ld      a,(hl)
@@ -58,7 +58,7 @@ __rrulong_rrx_s:
         ret
 
 __rrslong_rrx_s:
-        ld      hl,#2+4
+        ld      hl,2+4
         add     hl,sp
 
         ld      a,(hl)
@@ -84,7 +84,7 @@ __rrslong_rrx_s:
 
 __rlslong_rrx_s:
 __rlulong_rrx_s:
-        ld      hl,#2+4
+        ld      hl,2+4
         add     hl,sp
 
         ld      a,(hl)

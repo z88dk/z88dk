@@ -46,7 +46,7 @@ __divuint_rrx_s:
         jr      __divu16
 
 __divuchar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         add     hl,sp
 
         ld      e,(hl)
@@ -56,7 +56,7 @@ __divuchar_rrx_s:
         ;; Fall through
 __divuchar_rrx_hds:
 __divu8:
-        ld      h,#0x00
+        ld      h,0x00
         ld      d,h
         ; Fall through to __divu16
 
@@ -80,7 +80,7 @@ __divu16:
         or      d
         ;; Two algorithms: one assumes divisor <2^7, the second
         ;; assumes divisor >=2^7; choose the applicable one.
-        and     #0x80
+        and     0x80
         jr      NZ,morethan7bits
         or      d
         jr      NZ,morethan7bits
@@ -88,7 +88,7 @@ __divu16:
 
         ;; unsigned 16/7-bit division
 .atmost7bits
-        ld      b,#16           ; bits in dividend and possible quotient
+        ld      b,16           ; bits in dividend and possible quotient
         ;; Carry cleared by AND/OR, this "0" bit will pass trough HL.[*]
         adc     hl,hl
 .dvloop7
@@ -115,10 +115,10 @@ __divu16:
         ret
 
 .morethan7bits
-        ld      b,#9            ; at most 9 bits in quotient.
+        ld      b,9            ; at most 9 bits in quotient.
         ld      a,l             ; precompute the first 7 shifts, by
         ld      l,h             ;  doing 8
-        ld      h,#0
+        ld      h,0
         rr      l               ;  undoing 1
 .dvloop
         ;; Shift next bit of quotient into bit 0 of dividend

@@ -36,7 +36,7 @@
 	EXTERN __div16
 
 __modschar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         add     hl,sp
 
         ld      e,(hl)
