@@ -41,9 +41,11 @@ LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 -std=c99 -D_GNU
 .PHONY: all
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): ../config.h $(OBJS)
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
+../config.h:
+	touch $@
 
 %.o: %.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<

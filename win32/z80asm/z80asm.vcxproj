@@ -95,8 +95,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cmd /c type nul &gt;&gt; $(ProjectDir)\..\..\src\config.h</Command>
+      <Message>Create empty z88dk/src/config.h if it does not exist</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
