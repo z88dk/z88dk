@@ -169,21 +169,6 @@ sub pop_include {
 }
 	
 #------------------------------------------------------------------------------
-# get version and date from hist.c
-#------------------------------------------------------------------------------
-sub get_copyright {
-	our $copyrightmsg;
-	unless ($copyrightmsg) {
-		my $hist = read_file("hist.c");
-		my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x or die;
-		my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
-		$copyrightmsg = "Z80 Module Assembler ".$version.", (c) ".$copyright;
-	}
-	
-	return $copyrightmsg;
-}
-
-#------------------------------------------------------------------------------
 # compare result file with list of expected lines
 #------------------------------------------------------------------------------
 sub compare_list_file {

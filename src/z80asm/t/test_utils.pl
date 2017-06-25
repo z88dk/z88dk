@@ -667,9 +667,11 @@ sub get_copyright {
 	my $hist = read_file("hist.c");
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
 
-	chomp(my $version = `git rev-list --count HEAD`);
+	my $config = read_file("../config.h");
+	my($version) = $config =~ /\#define \s+ Z88DK_VERSION \s+ \" (.*?) \" /x or die;
 	
-	my $copyrightmsg = "Z80 Module Assembler v".$version.", (c) ".$copyright;
+	my $copyrightmsg = "Z80 Module Assembler ".$version."\n(c) ".$copyright;
+
 	return $copyrightmsg;
 }
 

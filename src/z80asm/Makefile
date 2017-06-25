@@ -15,11 +15,6 @@ endif
 CC 			?= gcc
 INSTALL 	?= install
 
-VERSION		= $(shell git rev-list --count HEAD)
-ifeq ($(VERSION),)
-  VERSION	= 0
-endif
-
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
@@ -38,7 +33,7 @@ MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 OPT = -O3
 LOCAL_LIB :=	lib
-LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 -std=c99 -D_GNU_SOURCE -DVERSION=$(VERSION) $(OPT)
+LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 -std=c99 -D_GNU_SOURCE $(OPT)
 
 #------------------------------------------------------------------------------
 # main

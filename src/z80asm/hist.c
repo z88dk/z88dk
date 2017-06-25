@@ -8,21 +8,19 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "hist.h"
+#include "../config.h"
 
-#ifndef VERSION
-#define VERSION     0
+#ifndef Z88DK_VERSION
+#define Z88DK_VERSION ""
 #endif
 
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2017"
-
-#define STR1(x)	#x
-#define STR(x)	STR1(x)
 
 #ifdef QDOS
 #include <qdos.h>
 
 char _prog_name[] = "Z80asm";
-char _version[] = VERSION;
+char _version[] = Z88DK_VERSION;
 char _copyright[] = "\x7f " COPYRIGHT;
 
 void consetup_title();
@@ -33,7 +31,7 @@ struct WINDOWDEF _condetails =
 #endif
 
 #ifdef AMIGA
-char amiver[] = "$VER: z80asm version " STR(VERSION) ", (c) " COPYRIGHT;
+char amiver[] = "$VER: z80asm version " Z88DK_VERSION "\n(c) " COPYRIGHT;
 #endif
 
-char copyrightmsg[] = "Z80 Module Assembler v" STR(VERSION) ", (c) " COPYRIGHT;
+char copyrightmsg[] = "Z80 Module Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT;
