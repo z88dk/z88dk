@@ -5,7 +5,7 @@
 
 include(`zcc_opt.def')
 
-ifdef(`__STARTUP',,`define(`__STARTUP', 2)')
+ifdef(`__STARTUP',,`define(`__STARTUP', 16)')
 
 IFNDEF startup
 
@@ -24,7 +24,7 @@ ifelse(__STARTUP, -1,
 `
    IFNDEF __CRTCFG
    
-      defc __CRTCFG = 2
+      defc __CRTCFG = 0
    
    ENDIF
    
@@ -38,13 +38,12 @@ ifelse(__STARTUP, -1,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; acia driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 0,
 `
-   ; generic rc2014 system
-   ; no files, no fds
+   ; acia drivers installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
@@ -62,13 +61,12 @@ ifelse(__STARTUP, 0,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(__STARTUP, 1,
+ifelse(__STARTUP, 16,
 `
-   ; generic rc2014 system
-   ; no files, no fds
+   ; basic drivers installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
@@ -82,17 +80,16 @@ ifelse(__STARTUP, 1,
    
    ENDIF
 
-   include(`startup/rc2014_crt_0.asm.m4')
+   include(`startup/rc2014_crt_16.asm.m4')
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; compressed rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; none ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(__STARTUP, 2,
+ifelse(__STARTUP, 256,
 `
-   ; generic rc2014 system
-   ; no files, no fds
+   ; nothing on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
@@ -106,5 +103,5 @@ ifelse(__STARTUP, 2,
    
    ENDIF
 
-   include(`startup/rc2014_crt_0.asm.m4')
+   include(`startup/rc2014_crt_256.asm.m4')
 ')
