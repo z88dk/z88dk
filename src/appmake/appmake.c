@@ -224,7 +224,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
 
     // Warn if aligned sections are not aligned
 
-    for (c = 0x80; c >= 0x2; c >>= 1)
+    for (c = 0x100; c >= 0x2; c >>= 1)
     {
         int start;
 
