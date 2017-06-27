@@ -37,10 +37,10 @@ dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
 include(`target/z88dk_version.m4')
-include(`target/z80/config_target.m4')
-include(`target/z80/config_cpu.m4')
-include(`target/z80/config_clib.m4')
-include(`target/z80/config_clib_const.m4')
+include(`target/z80/config/config_target.m4')
+include(`target/z80/config/config_cpu.m4')
+include(`target/z80/config/config_clib.m4')
+include(`target/z80/config/config_clib_const.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

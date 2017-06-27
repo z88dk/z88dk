@@ -37,18 +37,18 @@ dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
 include(`target/z88dk_version.m4')
-include(`target/zx/config_target.m4')
-include(`target/zx/config_cpu.m4')
-include(`target/zx/config_clib.m4')
-include(`target/zx/config_clib_const.m4')
-include(`target/zx/config_bifrost_2.m4')
-include(`target/zx/config_bifrost_h.m4')
-include(`target/zx/config_bifrost_l.m4')
-include(`target/zx/config_nirvanam.m4')
-include(`target/zx/config_nirvanap.m4')
-include(`target/zx/config_sound_bit.m4')
-include(`target/zx/config_sp1.m4')
-include(`target/zx/config_ulaplus.m4')
+include(`target/zx/config/config_target.m4')
+include(`target/zx/config/config_cpu.m4')
+include(`target/zx/config/config_clib.m4')
+include(`target/zx/config/config_clib_const.m4')
+include(`target/zx/config/config_bifrost_2.m4')
+include(`target/zx/config/config_bifrost_h.m4')
+include(`target/zx/config/config_bifrost_l.m4')
+include(`target/zx/config/config_nirvanam.m4')
+include(`target/zx/config/config_nirvanap.m4')
+include(`target/zx/config/config_sound_bit.m4')
+include(`target/zx/config/config_sp1.m4')
+include(`target/zx/config/config_ulaplus.m4')
 
 dnl############################################################
 dnl# END IF GUARDS
