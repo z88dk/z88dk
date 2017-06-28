@@ -45,7 +45,10 @@ $(TARGET): ../config.h $(OBJS)
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 ../config.h:
-	touch $@
+	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
+	@echo \#define UNIX 1											>> $@
+	@echo \#define EXEC_PREFIX \"\"									>> $@
+	@echo \#define Z88DK_VERSION \"build-$(shell date +%Y%m%d)\"	>> $@
 
 %.o: %.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
