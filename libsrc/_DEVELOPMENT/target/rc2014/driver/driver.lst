@@ -2,3 +2,5 @@
 @target/rc2014/driver/character/rc_00_output_acia.lst
 @target/rc2014/driver/character/rc_00_input_basic.lst
 @target/rc2014/driver/character/rc_00_output_basic.lst
+@target/rc2014/driver/terminal/rc_01_input_basic_dcio.lst
+@target/rc2014/driver/terminal/rc_01_output_basic_dcio.lst

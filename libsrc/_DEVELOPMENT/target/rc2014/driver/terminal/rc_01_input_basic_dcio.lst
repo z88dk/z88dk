@@ -1,0 +1,4 @@
+target/rc2014/driver/terminal/rc_01_input_basic_dcio
+target/rc2014/driver/terminal/rc_01_input_basic_dcio/rc_01_input_basic_dcio_iterm_msg_getc
+target/rc2014/driver/terminal/rc_01_input_basic_dcio/rc_01_input_basic_dcio_iterm_msg_interrupt
+target/rc2014/driver/terminal/rc_01_input_basic_dcio/rc_01_input_basic_dcio_stdio_msg_flsh
