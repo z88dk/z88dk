@@ -149,12 +149,17 @@ errors:
   - type	: ErrError
     func	: error_invalid_org_option
     args	: char *org_hex
-    message	: "\"invalid ORG option '%s'\", org_hex"
+    message	: "\"invalid --origin option '%s'\", org_hex"
 	
   - type	: ErrError
     func	: error_invalid_org
     args	: int origin
     message	: "\"invalid ORG value '%d'\", origin"
+	
+  - type	: ErrError
+    func	: error_invalid_filler_option
+    args	: char *filler_hex
+    message	: "\"invalid --filler option '%s'\", filler_hex"
 	
   - type	: ErrWarn
     func	: warn_org_ignored

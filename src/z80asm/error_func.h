@@ -30,6 +30,7 @@ extern void error_max_codesize(long size);
 extern void error_org_redefined(void);
 extern void error_invalid_org_option(char *org_hex);
 extern void error_invalid_org(int origin);
+extern void error_invalid_filler_option(char *filler_hex);
 extern void warn_org_ignored(char *filename, char *section_name);
 extern void error_not_obj_file(char *filename);
 extern void error_not_lib_file(char *filename);

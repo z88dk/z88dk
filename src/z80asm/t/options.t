@@ -157,6 +157,7 @@ Binary Output:
   -r, --origin=ADDR      Relocate binary file to given address (decimal or hex)
   -R, --relocatable      Create relocatable code
   --reloc-info           Geneate binary file relocation information
+  --filler=BYTE          Default value to fill in DEFS (decimal or hex)
 
 Output File Options:
   -s, --symtable         Create symbol table file.sym
@@ -637,7 +638,7 @@ for my $origin (-1, 0x10000) {
 z80asm(
 	options	=> "-b -r123Z",
 	asm		=> "start: jp start",
-	error	=> "Error: invalid ORG option '123Z'",
+	error	=> "Error: invalid --origin option '123Z'",
 );
 
 #------------------------------------------------------------------------------

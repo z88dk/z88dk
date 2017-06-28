@@ -60,6 +60,7 @@ static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
+static void option_filler( char *filler_arg );
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -467,14 +468,14 @@ static void exit_copyright( void )
 /*-----------------------------------------------------------------------------
 *   Option functions called from Opts table
 *----------------------------------------------------------------------------*/
-static void option_origin( char *origin )
+int number_arg(char *arg)
 {
 	char *end;
-	char *p = origin;
-	long lorigin;
+	char *p = arg;
+	long lval;
 	int radix;
 	char suffix = '\0';
-
+	
 	if (p[0] == '$') {
 		p++;
 		radix = 16;
@@ -491,11 +492,29 @@ static void option_origin( char *origin )
 		radix = 10;
 	}
 
-	lorigin = strtol(p, &end, radix);
-	if (*end != suffix || errno == ERANGE || lorigin < INT_MIN || lorigin > INT_MAX)
+	lval = strtol(p, &end, radix);
+	if (*end != suffix || errno == ERANGE || lval < 0 || lval > INT_MAX)
+		return -1;
+	else
+		return (int)lval;
+}
+
+static void option_origin( char *origin )
+{
+	int value = number_arg(origin);
+	if (value < 0 || value > 0xFFFF)
 		error_invalid_org_option(origin);
 	else
-		set_origin_option((int)lorigin);
+		set_origin_option(value);
+}
+
+static void option_filler( char *filler_arg )
+{
+	int value = number_arg(filler_arg);
+	if (value < 0 || value > 0xFF)
+		error_invalid_filler_option(filler_arg);
+	else
+		opts.filler = value;
 }
 
 static void option_define( char *symbol )
