@@ -8,12 +8,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "hist.h"
-
-#ifdef _MSC_VER
-#include "../../win32/config.h"
-#else
 #include "../config.h"
-#endif
 
 #ifndef Z88DK_VERSION
 #define Z88DK_VERSION "build " __DATE__
