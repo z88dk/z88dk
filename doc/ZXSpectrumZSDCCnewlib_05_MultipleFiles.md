@@ -37,7 +37,7 @@ As always, we start simple. Here's a source file containing a main() function:
 
 #include <stdio.h>
 
-extern unsigned char* message;
+extern unsigned char message[];
 
 int main()
 {
@@ -55,7 +55,7 @@ text_data.c:
 ```
 /* C source start */
 
-unsigned char* message = "Hello, world!";
+unsigned char message[] = "Hello, world!";
 
 /* C source end */
 ```
@@ -114,3 +114,39 @@ All the data files listed in data/data.lst would be compiled and linked with
 game_code.c as you'd expect.
 
 ## Adding Z80 Assembly Language
+
+This guide isn't the place to introduce Z80 assembly language or how it can be
+used with Z88DK, but we can demonstrate how to bring a Z80 assembly language
+file into our build. In fact, since the zcc front end tool knows how to deal
+with assembly language files it's quite trivial.
+
+Copy this assembly language into a file called text_data.asm:
+
+```
+SECTION rodata_user
+
+PUBLIC _message
+
+_message:
+
+defb 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x41, 0x53, 0x4D, 0x00
+```
+
+Build the application with:
+
+```
+zcc +zx -vn -startup=0 -clib=sdcc_iy text_main.c text_data.asm -o text -create-app
+```
+
+The zcc tool recognises the ASM file and knows it has to be passed to the
+assembler, as opposed to the C compiler. Once assembled, zcc links the assembly
+language into the application and makes its contents available to the C code.
+
+### Where To Go From Here
+
+This has been a brief introduction to the ability of zcc to handle multiple
+files and file types all in one build. We've scratched the surface and
+demonstrated a couple of useful features of zcc. It's a powerful and flexible
+tool which is worth exploring, and is documented
+[here](https://www.z88dk.org/wiki/doku.php?id=zcc)
+
