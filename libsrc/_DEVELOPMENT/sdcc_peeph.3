@@ -22886,6 +22886,21 @@ replace restart {
 } if notUsed('hl'), notSame(%2 'a' 'e'), operandsNotRelated(%2 'hl')
 
 replace restart {
+	ld 	a,e
+	add	a,l
+	ld	e,a
+	ld	a,d
+	adc	a,#0x%1
+	ld	d,a
+} by {
+	ld	h,#0x%1
+	add	hl,de
+	ld	a,h
+	ex	de,hl
+	; peephole z88dk-485e15
+} if notUsed('hl')
+
+replace restart {
 	ld	a,(#%1)
 	ld	c,a
 	ld	b,%2
