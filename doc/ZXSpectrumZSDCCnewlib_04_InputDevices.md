@@ -416,3 +416,7 @@ zcc +zx -vn -startup=31 -clib=sdcc_iy joy_border.c -o joy_border -create-app
 If your emulator does not map the kempston joystick to your controller or to
 the keyboard, try using `in_stick_sinclair1()` in place of `in_stick_kempston()`.
 The Sinclair sticks map themselves to the number keys on the keyboard.
+
+### Where To Go From Here
+
+[... continue to Part 5: Using multiple files](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md)
