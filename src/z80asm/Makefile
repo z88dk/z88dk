@@ -32,8 +32,9 @@ TARGET =		z80asm$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 OPT = -O3
+STD = -std=gnu99
 LOCAL_LIB :=	lib
-LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 -std=gnu11 $(OPT)
+LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 
 #------------------------------------------------------------------------------
 # main
