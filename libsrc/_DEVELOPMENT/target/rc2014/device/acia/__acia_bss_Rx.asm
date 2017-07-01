@@ -9,7 +9,7 @@ aciaRxIn:       defw aciaRxBuffer       ; non-zero item in bss since it's initia
 aciaRxOut:      defw aciaRxBuffer       ; non-zero item in bss since it's initialized anyway
 
 
-SECTION bss_align_256
+SECTION data_align_256
 
 PUBLIC aciaRxBuffer
 

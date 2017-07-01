@@ -33,20 +33,20 @@
 	EXTERN __div16
 
 __modsuchar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         add     hl,sp
 
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        ld      h,#0
+        ld      h,0
 
         call    __div_signexte
 
 	jp	__get_remainder
 
 __moduschar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         ld      d, h
         add     hl,sp
 

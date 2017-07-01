@@ -201,10 +201,34 @@ SECTION code_crt_return
 
    ; terminate
    
-   include "../crt_exit_eidi.inc"
-   include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"      
+   IF (__crt_on_exit = 0x10002)
+   
+      ; returning to basic
+      
+      pop hl
+      
+      IF CRT_ABPASS > 0
+      
+         ld a,h
+         ld b,l
+         call CRT_ABPASS
 
+      ENDIF
+      
+      ld sp,(__sp_or_ret)
+      
+      im 1
+      ei
+      ret
+   
+   ELSE
+   
+      include "../crt_exit_eidi.inc"
+      include "../crt_restore_sp.inc"
+      include "../crt_program_exit.inc"      
+
+   ENDIF
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

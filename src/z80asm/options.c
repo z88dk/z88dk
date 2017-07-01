@@ -28,16 +28,16 @@ Parse command line options
 #include <string.h>
 
 /* default file name extensions */
-#define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
-#define FILEEXT_LIST    FILEEXT_SEPARATOR "lis"    /* ".lis" / "_lis" */
-#define FILEEXT_OBJ     FILEEXT_SEPARATOR "o"	   /* ".o"   / "_o"   */
-#define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
-#define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
-#define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
-#define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
-#define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
-#define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
-#define FILEEXT_RELOC   FILEEXT_SEPARATOR "reloc"  /* ".reloc" / "_reloc" */
+#define FILEEXT_ASM     ".asm"    
+#define FILEEXT_LIST    ".lis"    
+#define FILEEXT_OBJ     ".o"	  
+#define FILEEXT_DEF     ".def"    
+#define FILEEXT_ERR     ".err"    
+#define FILEEXT_BIN     ".bin"    
+#define FILEEXT_LIB     ".lib"    
+#define FILEEXT_SYM     ".sym"    
+#define FILEEXT_MAP     ".map"    
+#define FILEEXT_RELOC   ".reloc"  
 
 /* types */
 enum OptType
@@ -60,6 +60,7 @@ static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
+static void option_filler( char *filler_arg );
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -467,14 +468,14 @@ static void exit_copyright( void )
 /*-----------------------------------------------------------------------------
 *   Option functions called from Opts table
 *----------------------------------------------------------------------------*/
-static void option_origin( char *origin )
+int number_arg(char *arg)
 {
 	char *end;
-	char *p = origin;
-	long lorigin;
+	char *p = arg;
+	long lval;
 	int radix;
 	char suffix = '\0';
-
+	
 	if (p[0] == '$') {
 		p++;
 		radix = 16;
@@ -491,11 +492,29 @@ static void option_origin( char *origin )
 		radix = 10;
 	}
 
-	lorigin = strtol(p, &end, radix);
-	if (*end != suffix || errno == ERANGE || lorigin < INT_MIN || lorigin > INT_MAX)
+	lval = strtol(p, &end, radix);
+	if (*end != suffix || errno == ERANGE || lval < 0 || lval > INT_MAX)
+		return -1;
+	else
+		return (int)lval;
+}
+
+static void option_origin( char *origin )
+{
+	int value = number_arg(origin);
+	if (value < 0 || value > 0xFFFF)
 		error_invalid_org_option(origin);
 	else
-		set_origin_option((int)lorigin);
+		set_origin_option(value);
+}
+
+static void option_filler( char *filler_arg )
+{
+	int value = number_arg(filler_arg);
+	if (value < 0 || value > 0xFF)
+		error_invalid_filler_option(filler_arg);
+	else
+		opts.filler = value;
 }
 
 static void option_define( char *symbol )

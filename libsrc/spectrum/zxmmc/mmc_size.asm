@@ -43,10 +43,10 @@ defc CSD_OFFSET = 18
 		
 		; c_size
         ld      a,(ix+CSD_OFFSET+6)
-        and     #(3 % 256)
+        and     +(3 % 256)
         ld      e,a
         ld      d,0
-        ld      l,#(10 % 256)
+        ld      l,+(10 % 256)
         call    l_asl
         push    hl
         ;ld      hl,2    ;const
@@ -54,7 +54,7 @@ defc CSD_OFFSET = 18
         ;call    l_gint  ;
 		ld      e,(IX+CSD_OFFSET+7)
         ld      d,0
-        ld      l,#(2 % 256)
+        ld      l,+(2 % 256)
         call    l_asl
         pop     de
         add     hl,de
@@ -82,10 +82,10 @@ defc CSD_OFFSET = 18
  
 		; c_size_mult
         ld      a,(ix+CSD_OFFSET+9)
-        and     #(3 % 256)
+        and     +(3 % 256)
         ld      e,a
         ld      d,0
-        ;ld      l,#(1 % 256)
+        ;ld      l,+(1 % 256)
         ;call    l_asl
 		;push    hl
 		sla		e
@@ -107,7 +107,7 @@ defc CSD_OFFSET = 18
 		
 		; block_len		..should be always 512, but you never know !
         ld      a,(ix+CSD_OFFSET+5)
-        and     #(15 % 256)
+        and     +(15 % 256)
         ;ld      l,a
         ;ld      h,0
         ;ld      bc,-8		; value to get size in KiloBytes

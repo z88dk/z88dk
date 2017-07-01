@@ -37,11 +37,11 @@ dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
 include(`target/z88dk_version.m4')
-include(`target/sms/config_target.m4')
-include(`target/sms/config_cpu.m4')
-include(`target/sms/config_clib.m4')
-include(`target/sms/config_clib_const.m4')
-include(`target/sms/config_devkitSMS.m4')
+include(`target/sms/config/config_target.m4')
+include(`target/sms/config/config_cpu.m4')
+include(`target/sms/config/config_clib.m4')
+include(`target/sms/config/config_clib_const.m4')
+include(`target/sms/config/config_devkitSMS.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

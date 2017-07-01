@@ -32,18 +32,18 @@
 	EXTERN __div_signexte
 
 __divsuchar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         add     hl,sp
 
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        ld      h,#0
+        ld      h,0
 
         jp      __div_signexte
 
 __divuschar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         ld      d, h
         add     hl,sp
 

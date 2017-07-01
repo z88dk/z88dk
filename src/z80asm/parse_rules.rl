@@ -243,7 +243,7 @@ Define rules for a ragel-based parser.
 	asm_DEFS = 
 		  label? _TK_DEFS const_expr _TK_NEWLINE 
 		  @{ DO_STMT_LABEL(); 
-		     if (! expr_error) asm_DEFS(expr_value, 0); }
+		     if (! expr_error) asm_DEFS(expr_value, opts.filler); }
 		| label? _TK_DEFS 
 				const_expr _TK_COMMA
 				@{ value1 = expr_error ? 0 : expr_value; }

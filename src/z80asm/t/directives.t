@@ -10,9 +10,12 @@
 # Test assembly directives
 
 use Modern::Perl;
-use t::TestZ80asm;
 use File::Slurp;
 use File::Path qw( make_path remove_tree );
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+};
 
 #------------------------------------------------------------------------------
 # INCLUDE
@@ -208,6 +211,59 @@ z80asm(
 		defb 0
 		defs 65536			;; error: max. code size of 65536 bytes reached
 END
+);
+
+# test filler byte
+z80asm(
+	asm		=> " defb 1 \n defs 3 \n defb 2",
+	bin		=> pack("C*", 1, 0, 0, 0, 2),
+);
+z80asm(
+	asm		=> " defb 1 \n defs 3, 21 \n defb 2",
+	bin		=> pack("C*", 1, 21, 21, 21, 2),
+);
+
+z80asm(
+	asm		=> " defb 1 \n defs 3 \n defb 2",
+	bin		=> pack("C*", 1, 254, 254, 254, 2),
+	options	=> "-b --filler=0xFE"
+);
+z80asm(
+	asm		=> " defb 1 \n defs 3, 21 \n defb 2",
+	bin		=> pack("C*", 1, 21, 21, 21, 2),
+	options	=> "-b --filler=0xFE"
+);
+
+z80asm(
+	asm		=> " defb 1 \n defs 3 \n defb 2",
+	bin		=> pack("C*", 1, 253, 253, 253, 2),
+	options	=> "-b --filler=\$FD"
+);
+z80asm(
+	asm		=> " defb 1 \n defs 3 \n defb 2",
+	bin		=> pack("C*", 1, 252, 252, 252, 2),
+	options	=> "-b --filler=0FCh"
+);
+z80asm(
+	asm		=> " defb 1 \n defs 3 \n defb 2",
+	bin		=> pack("C*", 1, 251, 251, 251, 2),
+	options	=> "-b --filler=251"
+);
+z80asm(
+	asm		=> " defb 1 \n defs 3 \n defb 2",
+	bin		=> pack("C*", 1, 0, 0, 0, 2),
+	options	=> "-b --filler=0"
+);
+
+z80asm(
+	asm		=> " defb 1 ",
+	options	=> "-b --filler=-1",
+	error	=> "Error: invalid --filler option '-1'",
+);
+z80asm(
+	asm		=> " defb 1 ",
+	options	=> "-b --filler=256",
+	error	=> "Error: invalid --filler option '256'",
 );
 
 #------------------------------------------------------------------------------

@@ -244,7 +244,7 @@ void error_invalid_org_option(char *org_hex)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	str_append_sprintf( msg, "invalid ORG option '%s'", org_hex );
+	str_append_sprintf( msg, "invalid --origin option '%s'", org_hex );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -254,6 +254,15 @@ void error_invalid_org(int origin)
 	STR_DEFINE(msg, STR_SIZE);
 
 	str_append_sprintf( msg, "invalid ORG value '%d'", origin );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_invalid_filler_option(char *filler_hex)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "invalid --filler option '%s'", filler_hex );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);

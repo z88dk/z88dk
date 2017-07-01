@@ -40,14 +40,14 @@
 ; Now replaced by a builtin for code generation, but
 ; still called from some asm files in this directory.
 __muluchar_rrx_s:
-        ld      hl, #2+1
+        ld      hl, 2+1
         ld      d, h
         add     hl, sp
         ld      e, (hl)
         dec     hl
         ld      h, (hl)
         ld      l, d
-        ld      b, #8
+        ld      b, 8
 muluchar_rrx_s_loop:
         add     hl, hl
         jr      nc, muluchar_rrx_s_noadd
@@ -59,7 +59,7 @@ muluchar_rrx_s_noadd:
 ; operands have different sign
 
 __mulsuchar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         ld      b, h
         add     hl,sp
 
@@ -69,7 +69,7 @@ __mulsuchar_rrx_s:
         jr      signexte
 
 __muluschar_rrx_s:
-        ld      hl,#2
+        ld      hl,2
         ld      b, h
         add     hl,sp
 
@@ -81,7 +81,7 @@ __muluschar_rrx_s:
 ;; Originally from GBDK by Pascal Felber.
 
 __mulschar_rrx_s:
-        ld      hl,#2+1
+        ld      hl,2+1
         add     hl,sp
 
         ld      e,(hl)

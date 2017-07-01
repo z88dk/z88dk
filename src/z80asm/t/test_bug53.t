@@ -12,8 +12,11 @@
 
 use Modern::Perl;
 use Capture::Tiny::Extended 'capture';
-use t::TestZ80asm;
-use t::Listfile;
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+	use t::Listfile;
+};
 
 unlink "test.sym", "test.map", "test.def";
 z80asm(

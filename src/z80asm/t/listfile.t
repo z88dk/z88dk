@@ -12,8 +12,11 @@ use warnings;
 use File::Slurp;
 use Test::More;
 use Test::Differences; 
-use t::TestZ80asm;
-use t::Listfile;
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+	use t::Listfile;
+};
 
 my $inc_file = "testinclude.inc";
 

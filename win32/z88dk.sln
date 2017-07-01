@@ -4,26 +4,61 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80nm", "z80nm\z80nm.vcxproj", "{E3CAFDD4-FBE2-4E7E-AB20-816C8B257F6B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appmake", "appmake\appmake.vcxproj", "{321F0E77-E3DC-4C14-8113-28FDFAC73F7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "copt", "copt\copt.vcxproj", "{07E658CC-1989-42C6-B8CB-CB64157F6FE9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zx7", "zx7\zx7.vcxproj", "{086E8F49-256B-4400-A2E2-4B76827A7ABA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dzx7", "dzx7\dzx7.vcxproj", "{F33CCA3A-0186-4A3C-9624-137D3221EDD8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sccz80", "sccz80\sccz80.vcxproj", "{111DC904-A160-49BF-8B81-55DAE0158BD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ticks", "ticks\ticks.vcxproj", "{DC84BAC7-DC4A-4C90-9C94-0E4FC77796E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm", "z80asm\z80asm.vcxproj", "{48CCD8D5-4049-4C31-8C9E-80CEACAD7FE6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zcc", "zcc\zcc.vcxproj", "{6AFC6D74-9D1C-40C7-850B-5A8DF2E6F73B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zcpp", "zcpp\zcpp.vcxproj", "{6ED563F1-DC26-4619-A2EA-3BF91B015976}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zpragma", "zpragma\zpragma.vcxproj", "{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "config", "config\config.vcxproj", "{E82ADEEF-219A-44C3-A670-AACFD2D419EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,6 +156,14 @@ Global
 		{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}.Release|Win32.Build.0 = Release|Win32
 		{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}.Release|x64.ActiveCfg = Release|x64
 		{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}.Release|x64.Build.0 = Release|x64
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Debug|Win32.Build.0 = Debug|Win32
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Debug|x64.ActiveCfg = Debug|x64
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Debug|x64.Build.0 = Debug|x64
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|Win32.ActiveCfg = Release|Win32
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|Win32.Build.0 = Release|Win32
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|x64.ActiveCfg = Release|x64
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
