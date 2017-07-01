@@ -91,3 +91,4 @@ win32/zlink_symbol_test/Release/
 win32/zlink_writer_test/Debug/
 win32/zlink_writer_test/Release/
 t/**
+src/config.h
