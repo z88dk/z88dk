@@ -184,8 +184,8 @@ extern unsigned char *zx_cy2saddr_fastcall(unsigned char y) __preserves_regs(b,c
 #define zx_cy2saddr(a) zx_cy2saddr_fastcall(a)
 
 
-extern unsigned char zx_px2bitmask(unsigned char x) __preserves_regs(c,d,e,iyl,iyh);
-extern unsigned char zx_px2bitmask_fastcall(unsigned char x) __preserves_regs(c,d,e,h,iyl,iyh) __z88dk_fastcall;
+extern unsigned char zx_px2bitmask(unsigned char x) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char zx_px2bitmask_fastcall(unsigned char x) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
 #define zx_px2bitmask(a) zx_px2bitmask_fastcall(a)
 
 

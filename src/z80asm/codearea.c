@@ -671,7 +671,7 @@ void read_origin(FILE* file, Section *section) {
 		section->section_split = TRUE;
 	}
 	else {
-		section->section_split = FALSE;
+		// ignore all other values
 	}
 }
 

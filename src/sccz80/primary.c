@@ -138,15 +138,15 @@ int primary(LVALUE* lval)
 /*
  * calculate constant expression (signed values)
  */
-int calc(
-    int left,
+double calc(
+    double left,
     void (*oper)(LVALUE *),
-    int right)
+    double right)
 {
-    if (oper == zdiv)
+    if (oper == zdiv && right != 0.0)
         return (left / right);
     else if (oper == zmod)
-        return (left % right);
+        return ((int)left % (int)right);
     else if (oper == zle)
         return (left <= right);
     else if (oper == zge)
@@ -156,20 +156,20 @@ int calc(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr)
-        return (left >> right);
+        return ((int)left >> (int)right);
     else
         return (CalcStand(left, oper, right));
 }
 
-int calcun(
-    unsigned int left,
+double calcun(
+    double left,
     void (*oper)(LVALUE *),
-    unsigned int right)
+    double right)
 {
     if (oper == zdiv)
         return (left / right);
     else if (oper == zmod)
-        return (left % right);
+        return ((unsigned int)left % (unsigned int)right);
     else if (oper == zle)
         return (left <= right);
     else if (oper == zge)
@@ -179,7 +179,7 @@ int calcun(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr)
-        return (left >> right);
+        return ((unsigned int)left >> (unsigned int)right);
     else
         return (CalcStand(left, oper, right));
 }
@@ -188,21 +188,21 @@ int calcun(
  * Calculations..standard ones - same for U & S 
  */
 
-int CalcStand(
-    int left,
+double CalcStand(
+    double left,
     void (*oper)(LVALUE *),
-    int right)
+    double right)
 {
     if (oper == zor)
-        return (left | right);
+        return ((unsigned int)left | (unsigned int)right);
     else if (oper == zxor)
-        return (left ^ right);
+        return ((unsigned int)left ^ (unsigned int)right);
     else if (oper == zand)
-        return (left & right);
+        return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
-        return (left * right);
+        return ((unsigned int)left * (unsigned int)right);
     else if (oper == asl)
-        return (left << right);
+        return ((unsigned int)left << (unsigned int)right);
     else if (oper == zeq)
         return (left == right);
     else if (oper == zne)

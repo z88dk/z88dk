@@ -1,8 +1,8 @@
 /* primary.c */
 extern int primary(LVALUE *lval);
-extern int calc(int32_t left, void (*oper)(LVALUE *), int32_t right);
-extern int calcun(uint32_t left, void (*oper)(LVALUE *),uint32_t right);
-extern int CalcStand(int32_t left, void (*oper)(LVALUE *), int32_t right);
+extern double calc(double left, void (*oper)(LVALUE *), double right);
+extern double calcun(double left, void (*oper)(LVALUE *),double right);
+extern double CalcStand(double left, void (*oper)(LVALUE *), double right);
 extern int intcheck(LVALUE *lval, LVALUE *lval2);
 extern void force(int t1, int t2, char sign1, char sign2, int lconst);
 extern int widen(LVALUE *lval, LVALUE *lval2);
