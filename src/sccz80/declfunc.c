@@ -18,9 +18,13 @@ void StoreFunctionSignature(SYMBOL* ptr)
     SYMBOL* ptr2;
     int j, k;
 
+
     /* Count the number of arguments that this function had */
     j = 1;
     ptr2 = ptr;
+    if ( ptr2 == NULL ) {
+        return;
+    }
     while ((ptr2 = ptr2->offset.p)) {
         j++;
     }
@@ -121,8 +125,9 @@ int AddNewFunc(
 
     if (ptr == NULL ) { /* Defined a function */
         /* trap external int blah() { } things */
-        if (currfn->storage == EXTERNAL)
+        if (currfn && currfn->storage == EXTERNAL) {
             currfn->storage = STATIK;
+	}
         return (0);
     } else {
         StoreFunctionSignature(ptr);
@@ -252,7 +257,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
         return (dofnansi(currfn, addr)); /* So we can pass back result */
     }
     DoFnKR(currfn, simple);
-    return (0);
+    return NULL ;
 }
 
 /*
@@ -260,8 +265,8 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
  * a separate function and then it makes life a lot easier!!
  */
 
-void DoFnKR(
-    SYMBOL* currfn,
+int DoFnKR(
+    SYMBOL* function,
     char simple)
 {
     char n[NAMESIZE];
@@ -296,7 +301,13 @@ void DoFnKR(
             break;
     }
 
-    check_trailing_modifiers(currfn);
+    check_trailing_modifiers(function);
+
+    if ( cmatch(';')) {
+	printf("Doing something %p\n",currfn);
+        currfn = NULL;
+        return -1;
+    }
 
     Zsp = 0; /* preset stack ptr */
 
@@ -324,7 +335,8 @@ void DoFnKR(
         }
     }
     /* Have finished K&R parsing */
-    setlocvar(prevarg, currfn);
+    setlocvar(prevarg, function);
+    return(0);
 }
 
 
@@ -394,7 +406,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     int argnumber;
 
     lgh = 0; /* Initialise it */
-    if (prevarg != NULL && currfn->prototyped == 0) {
+    if (prevarg != NULL && currfn->prototyped == 0 ) {
         StoreFunctionSignature(prevarg);
     }
 

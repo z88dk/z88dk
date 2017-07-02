@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_saddr2cy(void *saddr)
+; uchar zx_saddr2cy(void *saddr)
 ;
 ; Character y coordinate corresponding to screen address.
 ;
@@ -28,6 +28,4 @@ asm_zx_saddr2cy:
    or l
    
    ld l,a
-   ld h,0
-   
    ret

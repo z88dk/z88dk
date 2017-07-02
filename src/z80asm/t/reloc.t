@@ -15,7 +15,7 @@ use CPU::Z80::Assembler (); #$CPU::Z80::Assembler::verbose = 1;
 use Test::Differences; 
 use Test::More;
 use Data::Dump 'dump';
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 # copied from z80asm.c:
 # unsigned char reloc_routine[] =
@@ -74,9 +74,8 @@ my $asm = "section code\norg $code_addr\n".code_asm("").
 unlink_testfiles();
 write_file("test.asm", $asm);
 t_z80asm_capture("-b -m --reloc-info test.asm", "", "", 0);
-
-t_binary(read_binfile("test.bin"), "");
-t_binary(read_binfile("test.reloc"), "");
+ok ! -f "test.bin";
+ok ! -f "test.reloc";
 
 t_binary(read_binfile("test_code.bin"), 
 		CPU::Z80::Assembler::z80asm("org $code_addr\n".
@@ -90,7 +89,7 @@ t_binary(read_binfile("test_code.reloc"),
 							   
 t_binary(read_binfile("test_data.bin"), 
 		CPU::Z80::Assembler::z80asm(data_asm("").data_asm("1").data_asm("2")));
-t_binary(read_binfile("test_data.reloc"), "");
+ok ! -f "test.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
 __head                          = $0000 ; G 
@@ -176,9 +175,8 @@ write_file("test2.asm",
 		"section data\n".
 		data_asm("2"));
 t_z80asm_capture("-b -m --reloc-info test.asm test1.asm test2.asm", "", "", 0);
-
-t_binary(read_binfile("test.bin"), "");
-t_binary(read_binfile("test.reloc"), "");
+ok ! -f "test.bin";
+ok ! -f "test.reloc";
 
 t_binary(read_binfile("test_code.bin"), 
 		CPU::Z80::Assembler::z80asm("org $code_addr\n".
@@ -299,9 +297,8 @@ write_file("test.asm", <<"...".
 	"section data1\n".data_asm("1").
 	"section data2\n".data_asm("2"));
 t_z80asm_capture("-b -m --reloc-info test.asm", "", "", 0);
-
-t_binary(read_binfile("test.bin"), "");
-t_binary(read_binfile("test.reloc"), "");
+ok ! -f "test.bin";
+ok ! -f "test.reloc";
 
 t_binary(read_binfile("test_code.bin"), 
 		CPU::Z80::Assembler::z80asm("org $code_addr\n".

@@ -1,5 +1,5 @@
 
-; void *zx_saddrpright(void *saddr, uint bitmask)
+; void *zx_saddrpright(void *saddr, uchar bitmask)
 
 SECTION code_clib
 SECTION code_arch

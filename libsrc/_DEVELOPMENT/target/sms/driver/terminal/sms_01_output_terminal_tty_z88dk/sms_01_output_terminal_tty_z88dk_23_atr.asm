@@ -13,8 +13,10 @@ sms_01_output_terminal_tty_z88dk_23_atr:
    ex de,hl
    
    ld d,(hl)                   ; d = dy
+   dec d
    inc hl
    ld e,(hl)                   ; e = dx
+   dec e
    
    ex de,hl
 

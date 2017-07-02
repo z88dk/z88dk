@@ -6,13 +6,16 @@ SECTION code_arch
 
 PUBLIC _zx_scroll_wc_up_callee
 
-EXTERN asm_zx_scroll_wc_up
+EXTERN asm0_zx_scroll_wc_up
 
 _zx_scroll_wc_up_callee:
 
    pop hl
    pop ix
-   pop de
    ex (sp),hl
    
-   jp asm_zx_scroll_wc_up
+   ld e,l
+   ld d,0
+   ld l,h
+
+   jp asm0_zx_scroll_wc_up

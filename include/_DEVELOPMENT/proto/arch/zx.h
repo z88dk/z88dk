@@ -56,11 +56,11 @@ __sfr __banked __at 0x7ffd IO_7FFD;
 
 // misc
 
-__DPROTO(`b,c,d,e',`b,c,d,e',void,,zx_border,uint16_t colour)
-__DPROTO(,,void,,zx_cls,uint16_t attr)
-__DPROTO(,,void,,zx_cls_wc,struct r_Rect8 *r,uint16_t attr)
-__DPROTO(,,void,,zx_scroll_up,uint16_t rows,uint16_t attr)
-__DPROTO(,,void,,zx_scroll_wc_up,struct r_Rect8 *r,uint16_t rows,uint16_t attr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',void,,zx_border,unsigned char colour)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,zx_cls,unsigned char attr)
+__DPROTO(,,void,,zx_cls_wc,struct r_Rect8 *r,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,zx_scroll_up,unsigned char rows,unsigned char attr)
+__DPROTO(,,void,,zx_scroll_wc_up,struct r_Rect8 *r,unsigned char rows,unsigned char attr)
 
 // display
 
@@ -78,7 +78,7 @@ __DPROTO(,,void,,zx_scroll_wc_up,struct r_Rect8 *r,uint16_t rows,uint16_t attr)
 //
 // cx    = character x coordinate (0..31)
 // cy    = character y coordinate (0..23)
-// cyx   = character (y,x) coordinate - ordering borrowed from Sinclair Basic
+// cxy   = character (x,y) coordinate
 //
 // So for example:
 //
@@ -92,41 +92,41 @@ __DPROTO(,,void,,zx_scroll_wc_up,struct r_Rect8 *r,uint16_t rows,uint16_t attr)
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_aaddr2cx,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_aaddr2cy,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_aaddr2px,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_aaddr2py,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_aaddr2saddr,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_aaddrcdown,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_aaddrcleft,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_aaddrcright,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_aaddrcup,void *aaddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_bitmask2px,int bitmask)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_cy2aaddr,int row)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_cy2saddr,int row)
-__DPROTO(`b,c',`b,c',unsigned char,*,zx_cyx2aaddr,int row,int col)
-__DPROTO(`b,c',`b,c',unsigned char,*,zx_cyx2saddr,int row,int col)
-__DPROTO(`c,d,e',`c,d,e',unsigned int,,zx_px2bitmask,int x)
-__DPROTO(`b,c',`b,c',unsigned char,*,zx_pxy2aaddr,int x,int y)
-__DPROTO(`b,c',`b,c',unsigned char,*,zx_pxy2saddr,int x,int y)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_py2aaddr,int y)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_py2saddr,int y)
-__DPROTO(`b,c,d,e,l',`b,c,d,e',unsigned char,*,zx_saddr2aaddr,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_saddr2cx,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_saddr2cy,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_saddr2px,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,zx_saddr2py,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_saddrcdown,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_saddrcleft,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_saddrcright,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_saddrcup,void *saddr)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_saddrpdown,void *saddr)
-__DPROTO(`b,c',`b,c',unsigned char,*,zx_saddrpleft,void *saddr,int bitmask)
-__DPROTO(`b,c',`b,c',unsigned char,*,zx_saddrpright,void *saddr,int bitmask)
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,*,zx_saddrpup,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_aaddr2cx,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_aaddr2cy,void *aaddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_aaddr2px,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_aaddr2py,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_aaddr2saddr,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_aaddrcdown,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_aaddrcleft,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_aaddrcright,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_aaddrcup,void *aaddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_bitmask2px,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_cxy2aaddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_cxy2saddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_cy2aaddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_cy2saddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_px2bitmask,unsigned char x)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_pxy2aaddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_pxy2saddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_py2aaddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_py2saddr,unsigned char y)
+__DPROTO(`b,c,d,e,l,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddr2aaddr,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_saddr2cx,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_saddr2cy,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zx_saddr2px,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zx_saddr2py,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcdown,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcleft,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcright,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcup,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrpdown,void *saddr)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,zx_saddrpleft,void *saddr,unsigned char bitmask)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,zx_saddrpright,void *saddr,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrpup,void *saddr)
 
 // graphics
 
-__DPROTO(,,int,,zx_pattern_fill,int x,int y,void *pattern,unsigned int depth)
+__DPROTO(,,int,,zx_pattern_fill,unsigned char x,unsigned char y,void *pattern,unsigned int depth)
 
 #endif

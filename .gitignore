@@ -31,6 +31,8 @@ win32/z80nm/Release/
 win32/sccz80/Debug/
 win32/appmake/Debug/
 win32/appmake/Release/
+win32/config/Debug/
+win32/config/Release/
 win32/Debug/
 win32/dzx7/Release/
 win32/z80asm/Debug/
@@ -89,3 +91,4 @@ win32/zlink_symbol_test/Release/
 win32/zlink_writer_test/Debug/
 win32/zlink_writer_test/Release/
 t/**
+src/config.h

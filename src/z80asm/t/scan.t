@@ -13,7 +13,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurp;
 use Test::Differences; 
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o expr.o ".

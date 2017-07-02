@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_aaddr2px(void *attraddr)
+; uchar zx_aaddr2px(void *attraddr)
 ;
 ; Attribute address to pixel x coordinate. 
 ;
@@ -18,9 +18,9 @@ asm_zx_aaddr2px:
 
    ; enter : hl = valid attribute address
    ;
-   ; exit  : hl = pixel x coordinate of leftmost pixel in attr square
+   ; exit  :  l = pixel x coordinate of leftmost pixel in attr square
    ;
-   ; uses  : af, hl
+   ; uses  : af, l
 
    ld a,l
    
@@ -30,6 +30,4 @@ asm_zx_aaddr2px:
    and $f8
    
    ld l,a
-   ld h,0
-   
    ret

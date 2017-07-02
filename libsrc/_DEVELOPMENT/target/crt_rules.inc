@@ -123,24 +123,6 @@
       ENDIF
    
    ENDIF
-
-   IFDEF CRT_ENFORCE_SNAMES
-   
-      defc __crt_enforce_snames = CRT_ENFORCE_SNAMES
-   
-   ELSE
-   
-      IFDEF TAR__crt_enforce_snames
-      
-         defc __crt_enforce_snames = TAR__crt_enforce_snames
-      
-      ELSE
-      
-         defc __crt_enforce_snames = DEF__crt_enforce_snames
-      
-      ENDIF
-   
-   ENDIF
    
    IFDEF CRT_INITIALIZE_BSS
    
@@ -210,24 +192,6 @@
       ELSE
       
          defc __crt_interrupt_mode = DEF__crt_interrupt_mode
-      
-      ENDIF
-      
-   ENDIF
-
-   IFDEF CRT_ENABLE_STREAMS
-   
-      defc __crt_enable_streams = CRT_ENABLE_STREAMS
-   
-   ELSE
-   
-      IFDEF TAR__crt_enable_streams
-      
-         defc __crt_enable_streams = TAR__crt_enable_streams
-      
-      ELSE
-      
-         defc __crt_enable_streams = DEF__crt_enable_streams
       
       ENDIF
       

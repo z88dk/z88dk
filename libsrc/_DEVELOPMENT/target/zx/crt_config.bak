@@ -35,8 +35,6 @@ IF __CRTCFG = 0
    defc TAR__crt_org_vector_table      = 0
    defc TAR__crt_interrupt_mode        = -1
    
-   defc TAR__crt_enable_streams        = 0x7
-   
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
@@ -83,8 +81,6 @@ IF __CRTCFG = 1
 
    defc TAR__crt_org_vector_table      = 0
    defc TAR__crt_interrupt_mode        = -1
-   
-   defc TAR__crt_enable_streams        = 0x7
    
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 1

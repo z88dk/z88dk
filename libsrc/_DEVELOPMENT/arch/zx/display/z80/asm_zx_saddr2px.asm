@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_saddr2px(void *saddr)
+; uchar zx_saddr2px(void *saddr)
 ;
 ; Pixel x coordinate corresponding to the leftmost pixel at
 ; of the screen address.
@@ -19,10 +19,10 @@ asm_zx_saddr2px:
 
    ; enter : hl = screen address
    ;
-   ; exit  : hl = pixel x coordinate of leftmost pixel in byte
+   ; exit  :  l = pixel x coordinate of leftmost pixel in byte
    ;              at screen address
    ;
-   ; uses  : af, hl
+   ; uses  : af, l
 
    ld a,l
    add a,a
@@ -30,6 +30,4 @@ asm_zx_saddr2px:
    add a,a
    
    ld l,a
-   ld h,0
-   
    ret

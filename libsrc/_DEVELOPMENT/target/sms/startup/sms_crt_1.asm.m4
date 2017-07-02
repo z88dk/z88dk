@@ -98,7 +98,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "sms_page_zero.inc"
+   include "sms_page_zero_z80.inc"
 
 ENDIF
 
@@ -158,10 +158,6 @@ __Restart_2:
    ; initialize bss section
 
    include "../clib_init_bss.inc"
-
-   ; enforce code section name
-   
-   include "../crt_enforce_code_section_name.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main

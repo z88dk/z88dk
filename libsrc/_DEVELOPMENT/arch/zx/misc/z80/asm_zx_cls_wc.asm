@@ -15,7 +15,7 @@ SECTION code_arch
 PUBLIC asm_zx_cls_wc
 
 EXTERN asm_memset, asm_zx_saddr2aaddr
-EXTERN asm_zx_cyx2saddr, asm0_zx_saddrpdown
+EXTERN asm_zx_cxy2saddr, asm0_zx_saddrpdown
 
 asm_zx_cls_wc:
 
@@ -29,7 +29,7 @@ asm_zx_cls_wc:
    ld l,(ix+0)                 ; l = rect.x
    ld h,(ix+2)                 ; h = rect.y
    
-   call asm_zx_cyx2saddr       ; hl = screen address
+   call asm_zx_cxy2saddr       ; hl = screen address
 
    ; ix = rect *
    ; hl = screen address

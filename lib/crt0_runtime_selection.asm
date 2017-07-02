@@ -339,6 +339,7 @@ IF NEED_ansiterminal
 	defc _puts_cons = puts_cons_ansi
 
         PUBLIC ansicolumns
+        PUBLIC ansirows
         PUBLIC ansicharacter_pixelwidth
         PUBLIC ansifont
         PUBLIC ansifont_is_packed

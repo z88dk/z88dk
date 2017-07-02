@@ -4,10 +4,10 @@
    IF __crt_initialize_bss
 
          EXTERN asm_memset
-         EXTERN __BSS_UNINITIALIZED_tail, __BSS_END_tail
+         EXTERN __BSS_head, __BSS_UNINITIALIZED_head
 
-         ld hl,__BSS_UNINITIALIZED_tail
-         ld bc,__BSS_END_tail - __BSS_UNINITIALIZED_tail
+         ld hl,__BSS_head
+         ld bc,__BSS_UNINITIALIZED_head - __BSS_head
          
          ld e,0
          call asm_memset

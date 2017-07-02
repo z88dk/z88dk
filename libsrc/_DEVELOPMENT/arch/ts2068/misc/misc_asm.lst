@@ -1,0 +1,8 @@
+arch/zx/misc/z80/__sound_bit_state
+arch/zx/misc/z80/asm_zx_border
+arch/zx/misc/z80/asm_zx_cls
+arch/zx/misc/z80/asm_zx_cls_wc
+arch/zx/misc/z80/asm_zx_scroll_up
+arch/zx/misc/z80/asm_zx_scroll_up_noexx
+arch/zx/misc/z80/asm_zx_scroll_wc_up
+arch/zx/misc/z80/asm_zx_scroll_wc_up_noexx

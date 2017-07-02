@@ -21,6 +21,7 @@ static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *crtfile      = NULL;
 static int               origin       = -1;
+static int               recsize      = 16;
 static char              help         = 0;
 
 
@@ -31,6 +32,7 @@ option_t hex_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &outfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    { 'r', "recsize",  "Record size (default: 16)",  OPT_INT,   &recsize },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -67,7 +69,7 @@ int hex_exec(char *target)
         myexit(NULL,1);
     } 
 
-    bin2hex(input, output, origin); 
+    bin2hex(input, output, origin, recsize, 1); 
 
     fclose(input); 
     fclose(output);

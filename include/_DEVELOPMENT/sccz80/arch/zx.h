@@ -58,24 +58,24 @@ __sfr __banked __at 0x7ffd IO_7FFD;
 
 // misc
 
-extern void __LIB__ __FASTCALL__ zx_border(uint16_t colour) __smallc;
+extern void __LIB__ __FASTCALL__ zx_border(unsigned char colour) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ zx_cls(uint16_t attr) __smallc;
+extern void __LIB__ __FASTCALL__ zx_cls(unsigned char attr) __smallc;
 
 
-extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,uint16_t attr) __smallc;
-extern void __LIB__ __CALLEE__ zx_cls_wc_callee(struct r_Rect8 *r,uint16_t attr) __smallc;
+extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ zx_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __smallc;
 #define zx_cls_wc(a,b) zx_cls_wc_callee(a,b)
 
 
-extern void __LIB__ zx_scroll_up(uint16_t rows,uint16_t attr) __smallc;
-extern void __LIB__ __CALLEE__ zx_scroll_up_callee(uint16_t rows,uint16_t attr) __smallc;
+extern void __LIB__ zx_scroll_up(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ zx_scroll_up_callee(unsigned char rows,unsigned char attr) __smallc;
 #define zx_scroll_up(a,b) zx_scroll_up_callee(a,b)
 
 
-extern void __LIB__ zx_scroll_wc_up(struct r_Rect8 *r,uint16_t rows,uint16_t attr) __smallc;
-extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t rows,uint16_t attr) __smallc;
+extern void __LIB__ zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
 #define zx_scroll_wc_up(a,b,c) zx_scroll_wc_up_callee(a,b,c)
 
 
@@ -96,7 +96,7 @@ extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t
 //
 // cx    = character x coordinate (0..31)
 // cy    = character y coordinate (0..23)
-// cyx   = character (y,x) coordinate - ordering borrowed from Sinclair Basic
+// cxy   = character (x,y) coordinate
 //
 // So for example:
 //
@@ -110,16 +110,16 @@ extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cx(void *aaddr) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_aaddr2cx(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cy(void *aaddr) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_aaddr2cy(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2px(void *aaddr) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_aaddr2px(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2py(void *aaddr) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_aaddr2py(void *aaddr) __smallc;
 
 
 extern unsigned char __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *aaddr) __smallc;
@@ -137,51 +137,51 @@ extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcright(void *aaddr) __smallc;
 extern unsigned char __LIB__ __FASTCALL__ *zx_aaddrcup(void *aaddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_bitmask2px(int bitmask) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_bitmask2px(unsigned char bitmask) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_cy2aaddr(int row) __smallc;
+extern unsigned char __LIB__ *zx_cxy2aaddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *zx_cxy2aaddr_callee(unsigned char x,unsigned char y) __smallc;
+#define zx_cxy2aaddr(a,b) zx_cxy2aaddr_callee(a,b)
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_cy2saddr(int row) __smallc;
+extern unsigned char __LIB__ *zx_cxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *zx_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc;
+#define zx_cxy2saddr(a,b) zx_cxy2saddr_callee(a,b)
 
 
-extern unsigned char __LIB__ *zx_cyx2aaddr(int row,int col) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *zx_cyx2aaddr_callee(int row,int col) __smallc;
-#define zx_cyx2aaddr(a,b) zx_cyx2aaddr_callee(a,b)
+extern unsigned char __LIB__ __FASTCALL__ *zx_cy2aaddr(unsigned char y) __smallc;
 
 
-extern unsigned char __LIB__ *zx_cyx2saddr(int row,int col) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *zx_cyx2saddr_callee(int row,int col) __smallc;
-#define zx_cyx2saddr(a,b) zx_cyx2saddr_callee(a,b)
+extern unsigned char __LIB__ __FASTCALL__ *zx_cy2saddr(unsigned char y) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_px2bitmask(int x) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_px2bitmask(unsigned char x) __smallc;
 
 
-extern unsigned char __LIB__ *zx_pxy2aaddr(int x,int y) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *zx_pxy2aaddr_callee(int x,int y) __smallc;
+extern unsigned char __LIB__ *zx_pxy2aaddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *zx_pxy2aaddr_callee(unsigned char x,unsigned char y) __smallc;
 #define zx_pxy2aaddr(a,b) zx_pxy2aaddr_callee(a,b)
 
 
-extern unsigned char __LIB__ *zx_pxy2saddr(int x,int y) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *zx_pxy2saddr_callee(int x,int y) __smallc;
+extern unsigned char __LIB__ *zx_pxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *zx_pxy2saddr_callee(unsigned char x,unsigned char y) __smallc;
 #define zx_pxy2saddr(a,b) zx_pxy2saddr_callee(a,b)
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_py2aaddr(int y) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ *zx_py2aaddr(unsigned char y) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ *zx_py2saddr(int y) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ *zx_py2saddr(unsigned char y) __smallc;
 
 
 extern unsigned char __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *saddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr) __smallc;
 
 
-extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr) __smallc;
+extern unsigned char __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr) __smallc;
 
 
 extern unsigned int __LIB__ __FASTCALL__ zx_saddr2px(void *saddr) __smallc;
@@ -205,13 +205,13 @@ extern unsigned char __LIB__ __FASTCALL__ *zx_saddrcup(void *saddr) __smallc;
 extern unsigned char __LIB__ __FASTCALL__ *zx_saddrpdown(void *saddr) __smallc;
 
 
-extern unsigned char __LIB__ *zx_saddrpleft(void *saddr,int bitmask) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *zx_saddrpleft_callee(void *saddr,int bitmask) __smallc;
+extern unsigned char __LIB__ *zx_saddrpleft(void *saddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *zx_saddrpleft_callee(void *saddr,unsigned char bitmask) __smallc;
 #define zx_saddrpleft(a,b) zx_saddrpleft_callee(a,b)
 
 
-extern unsigned char __LIB__ *zx_saddrpright(void *saddr,int bitmask) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *zx_saddrpright_callee(void *saddr,int bitmask) __smallc;
+extern unsigned char __LIB__ *zx_saddrpright(void *saddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *zx_saddrpright_callee(void *saddr,unsigned char bitmask) __smallc;
 #define zx_saddrpright(a,b) zx_saddrpright_callee(a,b)
 
 
@@ -221,8 +221,8 @@ extern unsigned char __LIB__ __FASTCALL__ *zx_saddrpup(void *saddr) __smallc;
 
 // graphics
 
-extern int __LIB__ zx_pattern_fill(int x,int y,void *pattern,unsigned int depth) __smallc;
-extern int __LIB__ __CALLEE__ zx_pattern_fill_callee(int x,int y,void *pattern,unsigned int depth) __smallc;
+extern int __LIB__ zx_pattern_fill(unsigned char x,unsigned char y,void *pattern,unsigned int depth) __smallc;
+extern int __LIB__ __CALLEE__ zx_pattern_fill_callee(unsigned char x,unsigned char y,void *pattern,unsigned int depth) __smallc;
 #define zx_pattern_fill(a,b,c,d) zx_pattern_fill_callee(a,b,c,d)
 
 

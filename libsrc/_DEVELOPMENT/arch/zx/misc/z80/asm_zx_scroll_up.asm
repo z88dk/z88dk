@@ -16,6 +16,7 @@ SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_scroll_up
+PUBLIC asm0_zx_scroll_up
 
 EXTERN asm_zx_cls
 EXTERN asm_zx_cy2saddr, asm_zx_cy2aaddr, asm0_zx_saddrpdown
@@ -30,7 +31,9 @@ asm_zx_scroll_up:
    inc d
    dec d
    jp nz, asm_zx_cls
-   
+
+asm0_zx_scroll_up:
+
    inc e
    dec e
    ret z

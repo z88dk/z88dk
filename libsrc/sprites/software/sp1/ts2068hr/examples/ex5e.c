@@ -70,7 +70,7 @@
 // similarly but does not invalidate the rectangular area.
 /////////////////////////////////////////////////////////////
 
-// zcc +ts2068 -vn ex5e.c -o ex5e.bin -create-app -lsp1 -lmalloc
+// zcc +ts2068 -vn ex5e.c -o ex5e.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <input.h>
 #include <sprites/sp1.h>

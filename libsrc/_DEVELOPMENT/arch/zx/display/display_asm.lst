@@ -8,10 +8,10 @@ arch/zx/display/z80/asm_zx_aaddrcleft
 arch/zx/display/z80/asm_zx_aaddrcright
 arch/zx/display/z80/asm_zx_aaddrcup
 arch/zx/display/z80/asm_zx_bitmask2px
+arch/zx/display/z80/asm_zx_cxy2aaddr
+arch/zx/display/z80/asm_zx_cxy2saddr
 arch/zx/display/z80/asm_zx_cy2aaddr
 arch/zx/display/z80/asm_zx_cy2saddr
-arch/zx/display/z80/asm_zx_cyx2aaddr
-arch/zx/display/z80/asm_zx_cyx2saddr
 arch/zx/display/z80/asm_zx_px2bitmask
 arch/zx/display/z80/asm_zx_pxy2aaddr
 arch/zx/display/z80/asm_zx_pxy2saddr

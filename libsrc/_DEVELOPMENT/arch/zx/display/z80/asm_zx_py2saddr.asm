@@ -13,6 +13,7 @@ SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_py2saddr
+PUBLIC asm0_zx_py2saddr
 
 asm_zx_py2saddr:
 
@@ -25,6 +26,9 @@ asm_zx_py2saddr:
    ld a,l
    and $07
    or $40
+
+asm0_zx_py2saddr:
+
    ld h,a
    
    ld a,l

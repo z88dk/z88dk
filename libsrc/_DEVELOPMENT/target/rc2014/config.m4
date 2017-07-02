@@ -37,11 +37,11 @@ dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
 include(`target/z88dk_version.m4')
-include(`target/rc2014/config_target.m4')
-include(`target/rc2014/config_cpu.m4')
-include(`target/rc2014/config_acia.m4')
-include(`target/rc2014/config_clib.m4')
-include(`target/rc2014/config_clib_const.m4')
+include(`target/rc2014/config/config_target.m4')
+include(`target/rc2014/config/config_cpu.m4')
+include(`target/rc2014/config/config_acia.m4')
+include(`target/rc2014/config/config_clib.m4')
+include(`target/rc2014/config/config_clib_const.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

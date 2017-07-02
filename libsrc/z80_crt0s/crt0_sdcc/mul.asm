@@ -63,12 +63,12 @@ __mul16:
 	xor	a,a
 	ld	l,a
 	or	a,b
-	ld	b,#16
+	ld	b,16
 
         ;; Optimise for the case when this side has 8 bits of data or
         ;; less.  This is often the case with support address calls.
         jr      NZ,lab2
-        ld      b,#8
+        ld      b,8
         ld      a,c
 .lab1
         ;; Taken from z88dk, which originally borrowed from the

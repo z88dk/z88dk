@@ -15,7 +15,7 @@
 // as the 10th crosses them.
 /////////////////////////////////////////////////////////////
 
-// zcc +ts2068 -vn ex3b.c -o ex3b.bin -create-app -lsp1 -lmalloc
+// zcc +ts2068 -vn ex3b.c -o ex3b.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

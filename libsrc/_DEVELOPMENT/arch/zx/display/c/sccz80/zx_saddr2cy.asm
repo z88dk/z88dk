@@ -1,5 +1,5 @@
 
-; uint zx_saddr2cy(void *saddr)
+; uchar zx_saddr2cy(void *saddr)
 
 SECTION code_clib
 SECTION code_arch

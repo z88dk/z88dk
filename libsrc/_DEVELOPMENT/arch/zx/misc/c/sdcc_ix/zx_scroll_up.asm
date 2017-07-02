@@ -6,16 +6,16 @@ SECTION code_arch
 
 PUBLIC _zx_scroll_up
 
-EXTERN asm_zx_scroll_up
+EXTERN asm0_zx_scroll_up
 
 _zx_scroll_up:
 
    pop af
    pop de
-   pop hl
    
-   push hl
    push de
    push af
    
-   jp asm_zx_scroll_up
+   ld l,d
+   ld d,0
+   jp asm0_zx_scroll_up

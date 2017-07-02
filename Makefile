@@ -10,6 +10,7 @@
 prefix = /usr/local
 prefix_share = $(prefix)/share
 git_rev = $(shell git rev-parse --short HEAD)
+git_count = $(shell git rev-list --count HEAD)
 version := $(shell date +%Y%m%d)
 
 INSTALL ?= install
@@ -24,11 +25,20 @@ export CC INSTALL CFLAGS EXEC_PREFIX
 all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite
 
 setup:
-	echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h
-	echo '#define UNIX 1' >> src/config.h
-	echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h
-	echo '#define Z88DK_VERSION "${version}-${git_rev}"' >> src/config.h
+	$(shell if [ "${git_count}" != "" ]; then \
+	    echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h; \
+	    echo '#define UNIX 1' >> src/config.h; \
+	    echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
+	    echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
+	fi)
+	$(shell if [ ! -f src/config.h ]; then \
+	    echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h; \
+	    echo '#define UNIX 1' >> src/config.h; \
+	    echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
+	    echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
+        fi)
 	@mkdir -p bin
+
 
 appmake:
 	$(MAKE) -C src/appmake

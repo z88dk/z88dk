@@ -501,10 +501,11 @@ void append_file_contents(FILE *file, long num_bytes)
 /*-----------------------------------------------------------------------------
 *   read/write current module to an open file
 *----------------------------------------------------------------------------*/
-int fwrite_module_code(FILE *file)
+Bool fwrite_module_code(FILE *file, int* p_code_size)
 {
 	Section *section;
 	SectionHashElem *iter;
+	Bool wrote_data = FALSE;
 	int code_size = 0;
 	int addr, size;
 
@@ -528,13 +529,17 @@ int fwrite_module_code(FILE *file)
 				xfput_chars(file, (char *)ByteArray_item(section->bytes, addr), size);
 
 			code_size += size;
+			wrote_data = TRUE;
 		}
 	}
 
-	if (code_size > 0)
+	if (wrote_data)
 		xfput_int32(file, -1);		/* end marker */
 
-	return code_size;
+	if (p_code_size)
+		*p_code_size = code_size;
+
+	return wrote_data;
 }
 
 /*-----------------------------------------------------------------------------
@@ -562,7 +567,7 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 			cur_addr = section->addr;
 
 		/* bytes from this section */
-		if (section_size > 0 || section->origin >= 0)
+		if (section_size > 0 || section->origin >= 0 || section->section_split)
 		{
 			if (section->name && *section->name)					/* only if section name not empty */
 			{
@@ -579,13 +584,13 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 						str_append_char(new_name, '_');
 						str_append(new_name, section->name);
 
-						myfclose(*pbinfile);
+                        myfclose_remove_if_empty(*pbinfile);
 						*pbinfile = myfopen(get_bin_filename(str_data(new_name)), "wb");
 						if (!*pbinfile)
 							break;
 
 						if (*prelocfile) {
-							myfclose(*prelocfile);
+                            myfclose_remove_if_empty(*prelocfile);
 							*prelocfile = myfopen(get_reloc_filename(str_data(new_name)), "wb");
 							cur_section_block_size = 0;
 						}
@@ -666,7 +671,7 @@ void read_origin(FILE* file, Section *section) {
 		section->section_split = TRUE;
 	}
 	else {
-		section->section_split = FALSE;
+		// ignore all other values
 	}
 }
 

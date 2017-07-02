@@ -13,7 +13,14 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-04-25 Fix #194 wrong assembly of DDCB with no index
 - 2017-04-30 Fix #209 add a --cpu=z80 option
 - 2017-04-30 Fix #216 replace --RCMX000 by --cpu=r2k and --cpu=r3k
+- 2017-05-03 Fix #222 z80asm: add +zx and +zx81 options to z80asm to generate .tap and .P files
 - 2017-05-21 Fix #233 force the name of the output file to use section names with defined ORG
+- 2017-06-18 Fix #239 z80asm: empty sections with org are causing empty binaries to be produced (thank you @aralbrec)
+- 2017-06-21 Fix #252 z80asm ignores _map file if 0 bytes
+- 2017-06-24 Fix #259 show source code version in z80asm
+- 2017-06-24 Fix #264 Fix test scripts for Perl 5.26
+- 2017-06-29 Fix #248 z80asm - cli setting for DEFS
+- 2017-07-02 Fix #270 ignoring org -1 for sections when data is in object file separate from memory map file
 
 2016
 ----

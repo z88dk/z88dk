@@ -50,6 +50,8 @@ OPT_VAR(UT_array *,	lib_path,	NULL )		/* path for library files */
 
 OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 
+OPT_VAR(int,		filler,		0)			/* filler byte for defs */
+
 /*-----------------------------------------------------------------------------
 *   define options
 *----------------------------------------------------------------------------*/
@@ -92,6 +94,7 @@ OPT(OptSet, &opts.date_stamp, "-d", "--date-stamp", "Assemble only updated files
 OPT(OptCallArg, option_origin, "-r", "--origin", "Relocate binary file to given address (decimal or hex)", "ADDR")
 OPT(OptSet, &opts.relocatable, "-R", "--relocatable", "Create relocatable code", "")
 OPT(OptSet, &opts.reloc_info, "", "--reloc-info", "Geneate binary file relocation information", "")
+OPT(OptCallArg, option_filler, "", "--filler", "Default value to fill in DEFS (decimal or hex)", "BYTE")
 
 OPT_TITLE("Output File Options:")
 OPT(OptSet, &opts.symtable, "-s", "--symtable", "Create symbol table file" FILEEXT_SYM, "")

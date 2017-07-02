@@ -919,8 +919,8 @@ LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *e
 void
 CreateBinFile( void )
 {
-	FILE *binaryfile;
-	FILE *relocfile;
+	FILE *binaryfile, *inital_binaryfile;
+	FILE *relocfile, *initial_relocfile;
 	char *filename;
 	Bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
 
@@ -931,7 +931,11 @@ CreateBinFile( void )
 
     /* binary output to filename.bin */
     binaryfile = myfopen( filename, "wb" );
+	inital_binaryfile = binaryfile;
+
 	relocfile = opts.relocatable ? NULL : opts.reloc_info ? myfopen(get_reloc_filename(filename), "wb") : NULL;
+	initial_relocfile = relocfile;
+
 	if (binaryfile)
 	{
 		if (is_relocatable)
@@ -951,9 +955,19 @@ CreateBinFile( void )
 		}
 
 		fwrite_codearea(filename, &binaryfile, &relocfile);		/* write code as one big chunk */
-		myfclose(binaryfile);
-		if (relocfile != NULL)
-			myfclose(relocfile);
+
+		/* delete output file if empty, except main output file */
+		if (binaryfile == inital_binaryfile)
+			myfclose(binaryfile);
+		else
+			myfclose_remove_if_empty(binaryfile);
+
+		if (relocfile != NULL) {
+			if (relocfile == initial_relocfile)
+				myfclose(relocfile);
+			else
+				myfclose_remove_if_empty(relocfile);
+		}
 	}
 }
 

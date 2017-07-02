@@ -1,0 +1,11 @@
+arch/zx/misc/c/sdcc_ix/zx_border
+arch/zx/misc/c/sdcc_ix/zx_border_fastcall
+arch/zx/misc/c/sdcc_ix/zx_cls
+arch/zx/misc/c/sdcc_ix/zx_cls_fastcall
+arch/zx/misc/c/sdcc_ix/zx_cls_wc
+arch/zx/misc/c/sdcc_ix/zx_cls_wc_callee
+arch/zx/misc/c/sdcc_ix/zx_scroll_up
+arch/zx/misc/c/sdcc_ix/zx_scroll_up_callee
+arch/zx/misc/c/sdcc_ix/zx_scroll_wc_up
+arch/zx/misc/c/sdcc_ix/zx_scroll_wc_up_callee
+@arch/zx/misc/misc_asm.lst

@@ -69,6 +69,7 @@ const char sprPatterns[] = "*.sgz";
 const char sprHeader[] =  "*.*;*.h";
 const char bmpPatterns[] = "*.*";
 const char shpPatterns[] = "*.shp";
+const char geosPatterns[] = "*.cvt";
 
 typedef struct spritetype
 {
@@ -92,7 +93,7 @@ char *hexc = "0123456789ABCDEF";					//For converting integers (0-15) to Hex
 void draw_button( int x, int y, int w, int h, char *text, ALLEGRO_COLOR border_c, ALLEGRO_COLOR fill_c, ALLEGRO_COLOR text_c  )
 {
 	al_draw_filled_rectangle( x+1, y+1, x+w-1, y+h-1, fill_c );
-	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Boder
+	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Border
 	al_draw_text(font, text_c, x+(w/2), y+(h/2) - 4, ALLEGRO_ALIGN_CENTRE, text);
 }
 
@@ -252,9 +253,32 @@ void fit_sprite_on_screen()
 {
 	//Calculate size of best fit
 	if ( (sprite[ on_sprite ].size_x/2) > sprite[ on_sprite ].size_y )
-		bls = (int)(600 / (sprite[ on_sprite ].size_x + 10));
+		bls = (600 / (sprite[ on_sprite ].size_x + 10));
 	else
-		bls = (int)(440 / (sprite[ on_sprite ].size_y + 10));
+		bls = (440 / (sprite[ on_sprite ].size_y + 10));
+}
+
+
+// Resize the sprite set view to best fit on the screen
+void fit_sprite_s_on_screen()
+{
+	int i;
+	int x_sz, y_sz;
+	
+	x_sz=DEFAULT_SIZE_X, y_sz=DEFAULT_SIZE_Y;
+	
+	for (i=0; i<MAX_SPRITE; i++) {
+		if (x_sz < sprite[ i ].size_x)
+			x_sz = sprite[ i ].size_x;
+		if (y_sz < sprite[ i ].size_y)
+			y_sz = sprite[ i ].size_y;
+	}
+	
+	//Calculate size of best fit
+	if ( (x_sz/2) > y_sz )
+		bls = (600 / ++x_sz);
+	else
+		bls = (440 / ++y_sz);
 }
 
 
@@ -481,8 +505,8 @@ void fit_sprite_borders()
 	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
 		if (!check_right_border()) sprite[ on_sprite ].size_x--;
 	
-	sprite[ on_sprite ].size_x++;
-	sprite[ on_sprite ].size_y++;
+	//sprite[ on_sprite ].size_x++;
+	//sprite[ on_sprite ].size_y++;
 
 	update_screen();
 }
@@ -539,17 +563,14 @@ void import_from_gif( const char *FileName )
     int
 	InterlacedOffset[] = { 0, 4, 2, 1 }, /* The way Interlaced image should. */
 	InterlacedJumps[] = { 8, 8, 4, 2 };    /* be read - offsets and jumps... */
-    int ImageNum = 0;
     ColorMapObject *ColorMap;
     int Error;
 
 	if ((GifFile = DGifOpenFileName(FileName, &Error)) == NULL)
 		return;
 
-    if (GifFile->SHeight == 0 || GifFile->SWidth == 0) {
-	fprintf(stderr, "Image of width or height 0\n");
-	exit(EXIT_FAILURE);
-    }
+    if (GifFile->SHeight == 0 || GifFile->SWidth == 0)
+		return;
 
     /* 
      * Allocate the screen as vector of column of rows. Note this
@@ -576,8 +597,7 @@ void import_from_gif( const char *FileName )
 
     /* Scan the content of the GIF file and load the image(s) in: */
     do {
-	if (DGifGetRecordType(GifFile, &RecordType) == GIF_ERROR) 
-		return;
+		DGifGetRecordType(GifFile, &RecordType);
 	
 	switch (RecordType) {
 	    case IMAGE_DESC_RECORD_TYPE:
@@ -589,33 +609,28 @@ void import_from_gif( const char *FileName )
 		Width = GifFile->Image.Width;
 		Height = GifFile->Image.Height;
 		if (GifFile->Image.Left + GifFile->Image.Width > GifFile->SWidth ||
-		   GifFile->Image.Top + GifFile->Image.Height > GifFile->SHeight) {
-		    fprintf(stderr, "Image %d is not confined to screen dimension, aborted.\n",ImageNum);
-		    exit(EXIT_FAILURE);
-		}
+		   GifFile->Image.Top + GifFile->Image.Height > GifFile->SHeight)
+			   return;
 		if (GifFile->Image.Interlace) {
 		    /* Need to perform 4 passes on the images: */
 		    for (i = 0; i < 4; i++)
 			for (j = Row + InterlacedOffset[i]; j < Row + Height;
 						 j += InterlacedJumps[i]) {
-			    if (DGifGetLine(GifFile, &ScreenBuffer[j][Col], Width) == GIF_ERROR)
-					return;
+				DGifGetLine(GifFile, &ScreenBuffer[j][Col], Width);
 			}
 		}
 		else {
 		    for (i = 0; i < Height; i++)
-				if (DGifGetLine(GifFile, &ScreenBuffer[Row++][Col], Width) == GIF_ERROR)
-					return;
+				DGifGetLine(GifFile, &ScreenBuffer[Row++][Col], Width);
 		}
 		break;
 	    case EXTENSION_RECORD_TYPE:
 		/* Skip any extension blocks in file: */
-		if (DGifGetExtension(GifFile, &ExtCode, &Extension) == GIF_ERROR) {
-			return;
-		}
+		DGifGetExtension(GifFile, &ExtCode, &Extension);
+
 		while (Extension != NULL)
-		    if (DGifGetExtensionNext(GifFile, &Extension) == GIF_ERROR)
-				return;
+		    DGifGetExtensionNext(GifFile, &Extension);
+		
 		break;
 	    case TERMINATE_RECORD_TYPE:
 		break;
@@ -628,10 +643,8 @@ void import_from_gif( const char *FileName )
     ColorMap = (GifFile->Image.ColorMap
 		? GifFile->Image.ColorMap
 		: GifFile->SColorMap);
-    if (ColorMap == NULL) {
-        fprintf(stderr, "Gif Image does not have a colormap\n");
-        exit(EXIT_FAILURE);
-    }
+    if (ColorMap == NULL)
+		return;
 
 	sprite[ on_sprite ].size_x = GifFile->SWidth;
 	sprite[ on_sprite ].size_y = GifFile->SHeight;
@@ -653,14 +666,117 @@ void import_from_gif( const char *FileName )
 
     (void)free(ScreenBuffer);
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 	
     DGifCloseFile(GifFile, &Error);
 }
 #endif
 
-		
+
+int getword (FILE *fpin) {
+	int b;
+	b=getc(fpin);
+	return (b+256*getc(fpin));
+}
+
+/* Hint: extract from Commodore disk images with DirMaster */
+
+void import_from_geos( const char *file )
+{
+	FILE *fpin = NULL;
+	int x, y, i;
+	unsigned char b,id;
+	int rowbytes, y_sz;
+	int spcount, exitflag, bflag;
+	int index, pindex;
+	long ipos;
+
+	spcount = exitflag = 0;
+	
+	fpin = fopen( file, "rb" );
+	if (!fpin)
+		return;
+	
+	
+	id=getc(fpin);
+	/* Shift file pointers if the extracted file includes the C64 header */
+	if (id==0x83) fseek(fpin,0x2fb,SEEK_SET);
+	rowbytes = getword(fpin);
+	y_sz = getc(fpin);
+	
+	
+	if ((ipos = getword(fpin))==8) {
+	/* 1st bit pos is always 0 */
+	ipos +=2;
+	pindex=0;
+	
+	// Naked VLIR record found, no header block
+	
+		while (!exitflag) {
+			sprite[ on_sprite + spcount ].size_y = y_sz;
+			/* **HACK** - Extra row on top of GEOS font */
+			//sprite[ on_sprite + spcount ].size_y = y_sz+1;
+			if (id==0x83)
+				fseek(fpin,ipos+0x2fa,SEEK_SET);
+			else
+				fseek(fpin,ipos,SEEK_SET);
+			
+			index=getword(fpin);
+
+			sprite[ on_sprite + spcount ].size_x = index-pindex;
+
+			if ( sprite[ on_sprite + spcount ].size_x >= MAX_SIZE_X )
+				sprite[ on_sprite + spcount ].size_x = MAX_SIZE_X;
+			if ( sprite[ on_sprite + spcount ].size_y >= MAX_SIZE_Y )
+				sprite[ on_sprite + spcount ].size_y = MAX_SIZE_Y;
+			
+			for ( y = 0; y < y_sz; y++ ) {
+				i=pindex;
+				for ( x = 0; x < sprite[ on_sprite + spcount ].size_x; x++ ) {
+					if (id==0x83)
+						fseek(fpin,(long)(0x2fa+0xca+(y*rowbytes)+(i/8)),SEEK_SET);
+					else
+						fseek(fpin,(long)(0xca+(y*rowbytes)+(i/8)),SEEK_SET);
+					b=getc(fpin);
+
+					b=b>>(7-(i%8));
+					sprite[ on_sprite + spcount ].p[ x+1 ][ y+1 ] = ((b&1) != 0);
+					/* **HACK** - Estra row on top of GEOS font */
+					//sprite[ on_sprite + spcount ].p[ x+1 ][ y+2 ] = ((b&1) != 0);
+					i++;
+				}
+			}
+			
+			/* Adjust font height */
+			bflag=0;
+			sprite[ on_sprite  + spcount ].size_y++;
+			while (bflag == 0) {
+				sprite[ on_sprite  + spcount ].size_y--;
+				for ( x = sprite[ on_sprite + spcount ].size_x; x > 0 ; x-- )
+					if (sprite[ on_sprite + spcount ].p[ x ][ sprite[ on_sprite + spcount ].size_y ] != 0) bflag=1;
+				if (sprite[ on_sprite + spcount ].size_y <= 1) bflag=1;
+			}
+
+			pindex=index;
+			
+			ipos+=2;
+			
+			spcount++;
+			if (spcount >= 95) exitflag++;
+			if ((on_sprite + spcount)>=MAX_SPRITE) exitflag++;
+		}
+			
+	}
+	fseek(fpin,0L,SEEK_SET);
+		 
+	fclose(fpin);
+
+	fit_sprite_s_on_screen();
+	update_screen();
+}
+
+
 void import_from_bitmap( const char *file )
 {
 	ALLEGRO_BITMAP *temp = NULL;
@@ -798,6 +914,19 @@ void import_from_bitmap( const char *file )
 						}
 					}
 				}
+
+				/* **HACK** (BDF font import), remove this code for fixed height font */
+				/* Adjust font height */
+				b=0;
+				sprite[ on_sprite  + spcount ].size_y++;
+				while (b == 0) {
+					sprite[ on_sprite  + spcount ].size_y--;
+					for ( x = sprite[ on_sprite + spcount ].size_x; x > 0 ; x-- )
+						if (sprite[ on_sprite + spcount ].p[ x ][ sprite[ on_sprite + spcount ].size_y ] != 0) b=1;
+					if (sprite[ on_sprite + spcount ].size_y <= 1) b=1;
+				}
+				//sprite[ on_sprite  + spcount ].size_y++;
+
 				/* **HACK** (BDF font import), right margin adj. */
 				sprite[ on_sprite + spcount ].size_x++;
 				spcount++;
@@ -860,7 +989,7 @@ void import_from_bitmap( const char *file )
 		
 		fclose(fpin);
 	}
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 	
 }
@@ -909,7 +1038,7 @@ void import_from_printmaster( const char *file )
 
 	fclose(fpin);
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
@@ -928,6 +1057,23 @@ void do_import_raw()
 	al_destroy_path(path);
 	
 	wkey_release(ALLEGRO_KEY_L);
+}
+
+void do_import_geos()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_bmp = al_create_native_file_dialog("./", "Load GEOS font", geosPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_bmp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_bmp, 0));
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog_bmp);
+
+	import_from_geos( file );
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_O);
 }
 
 #ifdef GIF_SUPPORT
@@ -1035,7 +1181,7 @@ void save_sprite_file( const char *file )
 void load_sprite_file( const char *file )
 {
 	gzFile f = NULL;
-	int x,y,i;
+	int x,y,i,b;
 
 	f = gzopen( file, "rb" );
 	if (!f) {
@@ -1052,11 +1198,23 @@ void load_sprite_file( const char *file )
 			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
 				sprite[ i ].p[ x ][ y ] = gzgetc (f);
 			}
+			
+		/* **HACK** - auto-adjust height on open */
+		/*
+		b=0;
+		sprite[ i ].size_y++;
+		while (b == 0) {
+			sprite[ i ].size_y--;
+			for ( x = sprite[ i ].size_x; x > 0 ; x-- )
+				if (sprite[ i ].p[ x ][ sprite[ i ].size_y ] != 0) b=1;
+			if (sprite[ i ].size_y <= 1) b=1;
+		}*/
+
 	}
 
 	gzclose( f );
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
@@ -1131,7 +1289,7 @@ void load_sevenup_file( const char *file )
 
 	fclose( f );
 
-	fit_sprite_on_screen();
+	fit_sprite_s_on_screen();
 	update_screen();
 }
 
@@ -1438,6 +1596,7 @@ void copy_sprite_mask( int src, int dest )
 	update_screen();
 }
 
+
 void do_help_page() {
 	al_clear_to_color (al_map_rgb(240,230,250) );
 	
@@ -1449,9 +1608,9 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "INS / DEL..............Insert/Clear a sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 130, ALLEGRO_ALIGN_LEFT, "I......................Invert Sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "SHIFT + H/V............Double Width/Height");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C/P....................Copy/Paste sprite");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "5......................Reduce sprite size at 50%");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit: auto zoom or use SHIFT to adjust margins");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "5......................Reduce sprite size at 50%");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "F/SHIFT + F............Fit: auto zoom or use SHIFT to adjust margins");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "C/P....................Copy/Paste sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 230, ALLEGRO_ALIGN_LEFT, "SHIFP + P.......Split the copied sprite into pieces as big as the current ");
 	al_draw_text(font, al_map_rgb(0,5,10), 140, 250, ALLEGRO_ALIGN_LEFT, "sprite and paste them starting from the current sprite position.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 270, ALLEGRO_ALIGN_LEFT, "M......................Compute mask for copied sprite and paste to current sprite");
@@ -1464,10 +1623,11 @@ void do_help_page() {
 	#else
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import BMP,LBM,PCX,TGA,PNG,PBM,BDF,SNA,SCR,RAWdata");
 	#endif
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib.");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
-	al_draw_text(font, al_map_rgb(0,5,10), 190, 445, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 465, ALLEGRO_ALIGN_LEFT, "F7.....................As above, RAW data only (no size/headers)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "O......................Import a GEOS font (.CVT)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 445, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 465, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 485, ALLEGRO_ALIGN_LEFT, "F7.....................As above, RAW data only (no size/headers)");
 
 	al_flip_display();
 
@@ -1477,6 +1637,45 @@ void do_help_page() {
 
 }
 
+
+void do_preview_page() {
+	int x,y,spcount, xmargin, ymargin;
+	char text[100];
+	int cksum;
+	cksum=0;
+	
+	al_clear_to_color (al_map_rgb(230,240,250) );
+	spcount=0;
+	xmargin=0;
+	ymargin=0;
+	
+	while ((ymargin<520) && ((on_sprite + spcount)<=MAX_SPRITE)) {
+	//Draw Big Sprite Block
+	for ( x = 1; x <= sprite[ on_sprite + spcount ].size_x; x++ )
+		for ( y = 1; y <= sprite[ on_sprite + spcount ].size_y; y++ )
+			if ( sprite[ on_sprite + spcount ].p[ x ][ y ] )
+				if ((xmargin+x+1<720)&&(ymargin+y+1<520)) {
+					al_draw_filled_rectangle( xmargin+x , ymargin+y , xmargin+x+1 , ymargin+y+1 , al_map_rgb(0, 0, 0) );
+					cksum++;
+				}
+	xmargin+= sprite[ on_sprite + spcount ].size_x;
+	if (xmargin >=720){
+		ymargin+=sprite[ on_sprite + spcount ].size_y;;
+		xmargin=0;
+	}
+	spcount++;
+	}
+
+	sprintf( text, "Cksum: %i", cksum );
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 485, ALLEGRO_ALIGN_LEFT, text);
+
+	al_flip_display();
+
+	do {
+	al_get_keyboard_state(&pressed_keys);
+	}	while (al_key_down(&pressed_keys, ALLEGRO_KEY_F12 ));
+
+}
 
 void do_gui_buttons()
 {
@@ -1543,6 +1742,11 @@ void do_keyboard_input(int keycode)
 
 	if ( keycode == ALLEGRO_KEY_F1 ) {
 		do_help_page();
+		update_screen();
+	}
+
+	if ( keycode == ALLEGRO_KEY_F12 ) {
+		do_preview_page();
 		update_screen();
 	}
 
@@ -1650,6 +1854,8 @@ void do_keyboard_input(int keycode)
 	else if ( keycode ==  ALLEGRO_KEY_G )
 		do_import_gif();
 #endif
+	else if ( keycode ==  ALLEGRO_KEY_O )
+		do_import_geos();
 	else if ( keycode ==  ALLEGRO_KEY_N )
 		do_import_printmaster();
 
@@ -1732,7 +1938,7 @@ int main()
 
 	//------Main Program Loop----------
 	update_screen();
-	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page", NULL, 0);
+	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page, 'F12' for a quick preview.", NULL, 0);
 	al_flush_event_queue(eventQueue);
 	
 	while (!exit_requested) {

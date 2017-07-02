@@ -247,7 +247,7 @@ tr159:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
-       if (! expr_error) asm_DEFS(expr_value, 0); }
+       if (! expr_error) asm_DEFS(expr_value, opts.filler); }
 	goto st3716;
 tr168:
 	{ push_expr(ctx); }
@@ -267,7 +267,7 @@ tr176:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
-       if (! expr_error) asm_DEFS(expr_value, 0); }
+       if (! expr_error) asm_DEFS(expr_value, opts.filler); }
 	goto st3716;
 tr183:
 	{ push_expr(ctx); }

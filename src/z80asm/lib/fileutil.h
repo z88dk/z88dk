@@ -16,13 +16,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "utarray.h"
 #include <stdio.h>
 
-/* File name extension separator */
-#ifdef QDOS
-#define FILEEXT_SEPARATOR "_"
-#else
-#define FILEEXT_SEPARATOR "."
-#endif
-
 /*-----------------------------------------------------------------------------
 *   File input/output
 *	Register callbacks to be used on read/write error of a file.
@@ -42,6 +35,7 @@ extern void  myfclose( FILE *file );
    delete temp file by myfclose_remove() or atexit if xflcose() not called  */
 extern FILE *myfopen_atomic( char *filename, char *mode );
 extern void  myfclose_remove( FILE *file );
+extern void  myfclose_remove_if_empty(FILE *file);
 
 /* read/write buffers */
 extern void xfwrite( void *buffer, size_t size, size_t count, FILE *file );

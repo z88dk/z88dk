@@ -19,7 +19,7 @@ IF __MMAP = 0
    ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "../crt_memory_model.inc"
+   INCLUDE "../crt_memory_model_z80.inc"
 
    SECTION BANK_00
    org CRT_ORG_BANK_00

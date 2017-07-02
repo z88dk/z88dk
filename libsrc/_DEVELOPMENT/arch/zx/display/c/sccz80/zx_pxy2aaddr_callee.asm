@@ -4,7 +4,7 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC zx_pxy2aaddr_callee, l0_zx_pxy2aaddr_callee
+PUBLIC zx_pxy2aaddr_callee
 
 EXTERN asm_zx_pxy2aaddr
 
@@ -14,8 +14,5 @@ zx_pxy2aaddr_callee:
    pop de
    ex (sp),hl
 
-l0_zx_pxy2aaddr_callee:
-
-   ld h,e
-   
+   ld h,e   
    jp asm_zx_pxy2aaddr

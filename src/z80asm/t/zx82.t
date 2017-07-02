@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test::More;
-require 't/test_utils.pl';
+require './t/test_utils.pl';
 
 my $src = 	  "t/data/zx48.asm";
 my $bmk_bin = "t/data/zx48.rom";

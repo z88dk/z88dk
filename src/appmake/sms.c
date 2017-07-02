@@ -55,6 +55,7 @@ int sms_exec(char *target)
 {
     time_t t;
     struct tm *lt;
+    struct stat st_file;
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
     int checksum, len, sdsc_present, sega_present, i, c, count;
@@ -215,7 +216,7 @@ int sms_exec(char *target)
     {
         sprintf(filename, "%s_BANK_%02X.bin", binname, i);
 
-        if ((fpin = fopen(filename, "rb")) == NULL)
+        if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fpin = fopen(filename, "rb")) == NULL))
             count += 0x4000;
         else
         {

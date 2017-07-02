@@ -172,6 +172,7 @@
     <ClCompile Include="..\..\src\appmake\enterprise.c" />
     <ClCompile Include="..\..\src\appmake\extract.c" />
     <ClCompile Include="..\..\src\appmake\galaksija.c" />
+    <ClCompile Include="..\..\src\appmake\glue.c" />
     <ClCompile Include="..\..\src\appmake\hex.c" />
     <ClCompile Include="..\..\src\appmake\inject.c" />
     <ClCompile Include="..\..\src\appmake\kc.c" />

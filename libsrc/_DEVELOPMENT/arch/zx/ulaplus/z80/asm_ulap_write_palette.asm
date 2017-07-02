@@ -24,7 +24,7 @@ loop:
    ld b,__IO_ULAP_REGISTER / 256
    out (c),e
    
-   ld b,__IO_ULAP_DATA / 256
+   ld b,0xff & ((__IO_ULAP_DATA / 256) + 1)
    outi
    inc e
    

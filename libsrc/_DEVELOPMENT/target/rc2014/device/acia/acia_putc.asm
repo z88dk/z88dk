@@ -8,7 +8,7 @@
     EXTERN ACIA_TDRE, ACIA_TX_SIZE, ACIA_TEI_MASK, ACIA_TEI_RTS0, ACIA_CTRL_ADDR
 
     EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
-    EXTERN asm_z80_push_di, asm_z80_pop_ei
+    EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     _acia_putc:
 
@@ -34,23 +34,22 @@
     put_buffer_tx:
 
         ld a, (aciaTxCount)         ; Get the number of bytes in the Tx buffer
-        cp ACIA_TX_SIZE             ; check whether there is space in the buffer
+        cp ACIA_TX_SIZE - 1         ; check whether there is space in the buffer
         ld a,l                      ; Tx byte
 
         ld l,1
         jr nc, clean_up_tx          ; buffer full, so drop the Tx byte and clean up
 
         ld hl, (aciaTxIn)           ; get the pointer to where we poke
-        ld (hl), a                  ; write the Tx byte to the aciaTxIn   
-        inc hl                      ; move the Tx pointer along
+        ld (hl), a                  ; write the Tx byte to the aciaTxIn
 
-        ld a, l                     ; move low byte of the Tx pointer
-        cp (aciaTxBuffer + ACIA_TX_SIZE) & $FF
-        jr nz, put_no_tx_wrap
-        ld hl, aciaTxBuffer         ; we wrapped, so go back to start of buffer
+        ld a,l                      ; check if Tx pointer is at the end of its range
+        cp +(aciaTxBuffer + ACIA_TX_SIZE - 1) & 0xff
+        jr z, resetTxBuffer         ; if at end of range, reset Tx pointer to start of Tx buffer
+        inc hl                      ; else advance to next byte in Tx buffer
 
-    put_no_tx_wrap:
-
+    tx_buffer_adjusted:
+    
         ld (aciaTxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaTxCount
@@ -68,9 +67,12 @@
         ld (aciaControl), a         ; write the ACIA control echo byte back
         out (ACIA_CTRL_ADDR), a     ; set the ACIA CTRL register
         
-        call asm_z80_pop_ei         ; critical section end
+        jp asm_z80_pop_ei_jp        ; critical section end
 
-        ret
+    resetTxBuffer:
+    
+        ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
+        jp tx_buffer_adjusted
 
     EXTERN _acia_need
     defc NEED = _acia_need

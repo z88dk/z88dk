@@ -16,7 +16,7 @@ PUBLIC asm_zx_cy2saddr
 
 asm_zx_cy2saddr:
 
-   ; enter : hl = valid character y coordinate
+   ; enter :  l = valid character y coordinate
    ;
    ; exit  : hl = screen address of character coordinate row = y, x = 0
    ;

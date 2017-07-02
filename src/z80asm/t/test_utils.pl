@@ -665,10 +665,13 @@ sub normalize {
 # get version and date from hist.c
 sub get_copyright {
 	my $hist = read_file("hist.c");
-	my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x or die;
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
-	my $copyrightmsg = "Z80 Module Assembler ".$version.", (c) ".$copyright;
+
+	my $config = read_file("../config.h");
+	my($version) = $config =~ /\#define \s+ Z88DK_VERSION \s+ \" (.*?) \" /x or die;
 	
+	my $copyrightmsg = "Z80 Module Assembler ".$version."\n(c) ".$copyright;
+
 	return $copyrightmsg;
 }
 
@@ -680,13 +683,17 @@ sub get_gcc_options {
 	
 	# hack
 	$ENV{LOCAL_LIB} = "lib";
+	$ENV{OPT} ||= "";
 	
 	if ( ! %FLAGS ) {
 		open(my $pipe, "make -p|") or die;
 		while (<$pipe>) {
 			if (/^\w*(CFLAGS|LDFLAGS)\s*=\s*(.*)/) {
 				my($flag, $text) = ($1, $2);
-				$text =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
+				
+				$text =~ s/\$\((\w+)\)/ $ENV{$1} || "" /ge;
+				defined $ENV{$1} or warn "Environment variable $1 not found";
+				
 				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;
 				$text =~ s/\s+/ /g;
 				

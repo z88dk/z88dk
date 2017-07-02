@@ -3,7 +3,7 @@
 ; Jun 2007
 ; ===============================================================
 ;
-; uint zx_aaddr2cy(void *attraddr)
+; uchar zx_aaddr2cy(void *attraddr)
 ;
 ; Attribute address to character y coordinate. 
 ;
@@ -18,7 +18,7 @@ asm_zx_aaddr2cy:
 
    ; enter : hl = valid attribute address
    ;
-   ; exit  : hl = character y coordinate of attr square
+   ; exit  : l = character y coordinate of attr square
    ;
    ; uses  : af, hl
 
@@ -30,6 +30,4 @@ asm_zx_aaddr2cy:
    and $1f
    
    ld l,a
-   ld h,0
-   
    ret

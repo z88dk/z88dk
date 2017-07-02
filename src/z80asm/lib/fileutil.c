@@ -340,6 +340,12 @@ void myfclose_remove( FILE *file )
 		remove( filename );
 }
 
+void myfclose_remove_if_empty(FILE *file)
+{
+    fseek(file, 0, SEEK_END);
+    return (ftell(file) == 0) ? myfclose_remove(file) : myfclose(file);
+}
+
 /*-----------------------------------------------------------------------------
 *   Buffers
 *----------------------------------------------------------------------------*/
@@ -578,7 +584,7 @@ static void _path_remove_ext( Str *dest, char *filename )
     str_set( dest, filename );		/* make a copy */
 
     /* BUG_0014 : need to ignore dot if before a directory separator */
-    dot_pos   = strrchr( str_data(dest), FILEEXT_SEPARATOR[0] );
+    dot_pos   = strrchr( str_data(dest), '.' );
     dir_pos_1 = strrchr( str_data(dest), '/' );
 
     if ( dir_pos_1 == NULL ) dir_pos_1 = str_data(dest);

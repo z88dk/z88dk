@@ -71,7 +71,7 @@
 // the rectangular area.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex5e.c -o ex5e.bin -create-app -lsp1 -lmalloc
+// zcc +zx -vn ex5e.c -o ex5e.bin -create-app -lsp1 -lmalloc -lndos
 
 #include <sprites/sp1.h>
 #include <input.h>

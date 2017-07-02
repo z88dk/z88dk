@@ -10,7 +10,10 @@
 # Test linking of modules
 
 use Modern::Perl;
-use t::TestZ80asm;
+BEGIN { 
+	use lib '.'; 
+	use t::TestZ80asm;
+};
 
 #------------------------------------------------------------------------------
 # Test expressions across modules
@@ -504,6 +507,9 @@ File test2.o at $0000: Z80RMF08
   Expressions:
     E =  (test2.asm:7) $0000 $0000: func1_alias := func1 (section lib)
     E =  (test2.asm:8) $0000 $0000: func2_alias := func2 (section lib)
+  Code: 0 bytes, ORG at $1000
+  Code: 0 bytes (section code)
+  Code: 0 bytes (section lib)
 END
 
 #------------------------------------------------------------------------------
@@ -640,6 +646,7 @@ File test.o at $0000: Z80RMF08
     U         asm_b_array_at
   Expressions:
     E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
+  Code: 0 bytes, ORG at $1000
 
 File test1.o at $0000: Z80RMF08
   Name: test1
@@ -721,7 +728,7 @@ my($stdout, $stderr, $return) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
-is read_binfile("test.bin"), "", "test.bin";
+ok ! -f "test.bin", "test.bin";
 is read_binfile("test_bank0.bin"), "\xC9\0\0\0\0\0\0\0\xC9\xC9", "test_bank0.bin";
 is read_binfile("test_bank1.bin"), "\xCD\x08\x00\x00\x00\0\0\0\xC9\x00\xC9", "test_bank1.bin";
 is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9", "test_main.bin";

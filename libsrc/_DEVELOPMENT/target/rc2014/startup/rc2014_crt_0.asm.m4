@@ -40,10 +40,12 @@ dnl
 dnl## input terminals
 dnl
 dnl#include(`driver/character/rc_00_input_acia.m4')
+dnl#include(`driver/character/rc_00_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/character/rc_00_output_acia.m4')
+dnl#include(`driver/character/rc_00_output_basic.m4')
 dnl
 dnl## file dup
 dnl
@@ -104,7 +106,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "../crt_page_zero.inc"
+   include "rc2014_page_zero_z80.inc"
 
 ENDIF
 
@@ -156,10 +158,6 @@ __Restart_2:
    ; initialize bss section
 
    include "../clib_init_bss.inc"
-
-   ; enforce code section name
-   
-   include "../crt_enforce_code_section_name.inc"
 
 SECTION code_crt_init          ; user and library initialization
 
