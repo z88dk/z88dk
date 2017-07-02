@@ -20,20 +20,20 @@ asm_zx_px2bitmask:
    ;
    ; exit  :  l = 8-bit bitmask
    ;
-   ; uses  : af, b, l
+   ; uses  : af, hl
    
-   ld a,l
-   and $07
-   ld b,a
-   
-   ld a,$80
-   ld l,a
-   ret z
-   
-loop:
+	ld a,l
+	and $07
+	
+	add a,mask_table & 0xff
+	ld l,a
+	ld a,0
+	adc a,mask_table / 256
+	ld h,a
+	
+	ld l,(hl)
+	ret
 
-   rra
-   djnz loop
-   
-   ld l,a
-   ret
+mask_table:
+
+   defb $80, $40, $20, $10, $08, $04, $02, $01	
