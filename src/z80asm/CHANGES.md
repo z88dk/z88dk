@@ -20,7 +20,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-06-24 Fix #259 show source code version in z80asm
 - 2017-06-24 Fix #264 Fix test scripts for Perl 5.26
 - 2017-06-29 Fix #248 z80asm - cli setting for DEFS
-- 2017-07-01 Fix #270 ignoring org -1 for sections when data is in object file separate from memory map file
+- 2017-07-02 Fix #270 ignoring org -1 for sections when data is in object file separate from memory map file
 
 2016
 ----
