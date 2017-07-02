@@ -230,7 +230,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( lval->is_const && lval2->is_const ) {
             if ( lhs_val_type == DOUBLE ) decrement_double_ref(lval);
             if ( rhs_val_type == DOUBLE ) decrement_double_ref(lval2);
-            lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
+            lval->const_val = calcdouble(lval->const_val, oper, lval2->const_val);
 
             // Promote as necessary
             if ( lhs_val_type == DOUBLE || rhs_val_type == DOUBLE ) {

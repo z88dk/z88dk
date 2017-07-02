@@ -184,6 +184,27 @@ int calcun(
         return (CalcStand(left, oper, right));
 }
 
+int calcdouble(
+    double left,
+    void (*oper)(LVALUE *),
+    double right)
+{
+    if (oper == zdiv && right != 0.0)
+        return (left / right);
+    else if (oper == zle)
+        return (left <= right);
+    else if (oper == zge)
+        return (left >= right);
+    else if (oper == zlt)
+        return (left < right);
+    else if (oper == zgt)
+        return (left > right);
+    else if (oper == zne)
+        return (left != right);
+    else
+        return 0;
+}
+
 /*
  * Calculations..standard ones - same for U & S 
  */
