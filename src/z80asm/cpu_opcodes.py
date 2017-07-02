@@ -569,31 +569,36 @@ for op in [ADD, ADC, SUB, SBC, AND, XOR, OR, CP]:
 	emit_asm( ALL, "%s a,  42 " % op.asm, [opcode, 42])
 	emit_asm( ALL, "%s a, (42)" % op.asm, [opcode, 42])
 	emit_rule(ALL, [op, A, COMMA, expr],
-		[DO_stmt_n(opcode)])
+		['\nif (expr_in_parens) warn_expr_in_parens();', 
+		 DO_stmt_n(opcode)])
 		
 	# add N
 	emit_asm( ALL, "%s  42 " % op.asm, [opcode, 42])
 	emit_asm( ALL, "%s (42)" % op.asm, [opcode, 42])
 	emit_rule(ALL, [op, expr],
-		[DO_stmt_n(opcode)])
+		['\nif (expr_in_parens) warn_expr_in_parens();', 
+		 DO_stmt_n(opcode)])
 		
 	# altd add a, N
 	emit_asm( RABBIT, "altd %s a,  42 " % op.asm, [ALTD.prefix, opcode, 42])
 	emit_asm( RABBIT, "altd %s a, (42)" % op.asm, [ALTD.prefix, opcode, 42])
 	emit_rule(RABBIT, [ALTD, op, A, COMMA, expr],
-		[DO_ALTD(), DO_stmt_n(opcode)])
+		['\nif (expr_in_parens) warn_expr_in_parens();', 
+		 DO_ALTD(), DO_stmt_n(opcode)])
 		
 	# altd add N
 	emit_asm( RABBIT, "altd %s  42 " % op.asm, [ALTD.prefix, opcode, 42])
 	emit_asm( RABBIT, "altd %s (42)" % op.asm, [ALTD.prefix, opcode, 42])
 	emit_rule(RABBIT, [ALTD, op, expr],
-		[DO_ALTD(), DO_stmt_n(opcode)])
+		['\nif (expr_in_parens) warn_expr_in_parens();', 
+		 DO_ALTD(), DO_stmt_n(opcode)])
 		
 	# add a', N
 	emit_asm( RABBIT, "%s a',  42 " % op.asm, [ALTD.prefix, opcode, 42])
 	emit_asm( RABBIT, "%s a', (42)" % op.asm, [ALTD.prefix, opcode, 42])
 	emit_rule(RABBIT, [op, A1, COMMA, expr],
-		[DO_ALTD(), DO_stmt_n(opcode)])
+		['\nif (expr_in_parens) warn_expr_in_parens();', 
+		 DO_ALTD(), DO_stmt_n(opcode)])
 		
 for op in [INC, DEC]:
 	for r in [B, C, D, E, H, L, A]:
