@@ -138,59 +138,15 @@ int primary(LVALUE* lval)
 /*
  * calculate constant expression (signed values)
  */
-int calc(
-    int left,
-    void (*oper)(LVALUE *),
-    int right)
-{
-    if (oper == zdiv)
-        return (left / right);
-    else if (oper == zmod)
-        return (left % right);
-    else if (oper == zle)
-        return (left <= right);
-    else if (oper == zge)
-        return (left >= right);
-    else if (oper == zlt)
-        return (left < right);
-    else if (oper == zgt)
-        return (left > right);
-    else if (oper == asr)
-        return (left >> right);
-    else
-        return (CalcStand(left, oper, right));
-}
-
-int calcun(
-    unsigned int left,
-    void (*oper)(LVALUE *),
-    unsigned int right)
-{
-    if (oper == zdiv)
-        return (left / right);
-    else if (oper == zmod)
-        return (left % right);
-    else if (oper == zle)
-        return (left <= right);
-    else if (oper == zge)
-        return (left >= right);
-    else if (oper == zlt)
-        return (left < right);
-    else if (oper == zgt)
-        return (left > right);
-    else if (oper == asr)
-        return (left >> right);
-    else
-        return (CalcStand(left, oper, right));
-}
-
-int calcdouble(
+double calc(
     double left,
     void (*oper)(LVALUE *),
     double right)
 {
     if (oper == zdiv && right != 0.0)
         return (left / right);
+    else if (oper == zmod)
+        return ((int)left % (int)right);
     else if (oper == zle)
         return (left <= right);
     else if (oper == zge)
@@ -199,31 +155,54 @@ int calcdouble(
         return (left < right);
     else if (oper == zgt)
         return (left > right);
-    else if (oper == zne)
-        return (left != right);
+    else if (oper == asr)
+        return ((int)left >> (int)right);
     else
-        return 0;
+        return (CalcStand(left, oper, right));
+}
+
+double calcun(
+    double left,
+    void (*oper)(LVALUE *),
+    double right)
+{
+    if (oper == zdiv)
+        return (left / right);
+    else if (oper == zmod)
+        return ((unsigned int)left % (unsigned int)right);
+    else if (oper == zle)
+        return (left <= right);
+    else if (oper == zge)
+        return (left >= right);
+    else if (oper == zlt)
+        return (left < right);
+    else if (oper == zgt)
+        return (left > right);
+    else if (oper == asr)
+        return ((unsigned int)left >> (unsigned int)right);
+    else
+        return (CalcStand(left, oper, right));
 }
 
 /*
  * Calculations..standard ones - same for U & S 
  */
 
-int CalcStand(
-    int left,
+double CalcStand(
+    double left,
     void (*oper)(LVALUE *),
-    int right)
+    double right)
 {
     if (oper == zor)
-        return (left | right);
+        return ((unsigned int)left | (unsigned int)right);
     else if (oper == zxor)
-        return (left ^ right);
+        return ((unsigned int)left ^ (unsigned int)right);
     else if (oper == zand)
-        return (left & right);
+        return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
-        return (left * right);
+        return ((unsigned int)left * (unsigned int)right);
     else if (oper == asl)
-        return (left << right);
+        return ((unsigned int)left << (unsigned int)right);
     else if (oper == zeq)
         return (left == right);
     else if (oper == zne)
