@@ -10,3 +10,4 @@ extern int rcmatch(char lit);
 extern int amatch(char *lit);
 extern int swallow(char *lit);
 extern int CheckTypDef(void);
+extern int checkws();
