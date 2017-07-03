@@ -20,8 +20,27 @@ rc_01_input_basic_dcio_iterm_msg_getc:
                                ; if Rx buffer is empty, will block
    ; a = ascii code
 
+   cp 32
+   ret nc
+   
+   cp 10
+   jr z, key_cr
+   
+   cp 13
+   jr z, key_lf
+   
    cp CHAR_CTRL_Z
    jp z, error_mc              ; generate EOF (ctr-z is from cp/m)
    
    or a                        ; reset carry to indicate success
+   ret
+
+key_cr:
+
+   ld a,CHAR_CR
+   ret
+
+key_lf:
+
+   ld a,CHAR_LF
    ret
