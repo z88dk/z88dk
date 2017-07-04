@@ -113,6 +113,11 @@ int CheckTypDef(void)
     return 0;
 }
 
+int checkws()
+{
+    return isspace( *(line+lptr));
+}
+
 /* djm, reversible match thing, used to scan for ascii fn defs.. 
  * this doesn't affect the line permanently! 
  */

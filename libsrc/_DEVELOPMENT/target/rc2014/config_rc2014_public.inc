@@ -438,7 +438,7 @@ defc __CLIB_OPT_STDIO_VALID = 0x01
 
 defc CHAR_CR = 13
 defc CHAR_LF = 10
-defc CHAR_BS = 12
+defc CHAR_BS = 8
 defc CHAR_ESC = 27
 defc CHAR_CAPS = 6
 defc CHAR_BELL = 7

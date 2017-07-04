@@ -242,7 +242,7 @@ define(`__CLIB_OPT_STDIO_VALID', 0x01)
 define(`CHAR_CR', 13)
 define(`CHAR_LF', 10)
 
-define(`CHAR_BS',     12)
+define(`CHAR_BS',      8)
 define(`CHAR_ESC',    27)
 define(`CHAR_CAPS',    6)
 define(`CHAR_BELL',    7)

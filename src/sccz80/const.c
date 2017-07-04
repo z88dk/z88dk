@@ -184,7 +184,8 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = LONG;
     }
-    while (rcmatch('L') || rcmatch('U') || rcmatch('S')) {
+    
+    while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S'))) {
         if (cmatch('L'))
             lval->val_type = LONG;
         if (cmatch('U'))
