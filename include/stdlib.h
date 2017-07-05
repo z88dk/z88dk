@@ -204,8 +204,8 @@ extern uint __LIB__  isqrt(uint n) __z88dk_fastcall;
 // used to inline code if the parameters resolve to constants.
 
 extern unsigned int  __LIB__  inp(unsigned int port) __z88dk_fastcall;
-extern void          __LIB__              outp(unsigned int port, unsigned char byte) __smallc;
-extern void          __LIB__    outp_callee(unsigned int port, unsigned char byte) __smallc __z88dk_callee;
+extern void          __LIB__              outp(unsigned int port, unsigned int byte) __smallc;
+extern void          __LIB__    outp_callee(unsigned int port, unsigned int byte) __smallc __z88dk_callee;
 
 #define outp(a,b) outp_callee(a,b)
 
