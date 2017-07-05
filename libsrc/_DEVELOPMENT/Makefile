@@ -2,7 +2,7 @@
 Z80ASM = $(EXEC_PREFIX)z80asm
 ZX7 = $(EXEC_PREFIX)zx7
 
-TARGET ?= z80 cpm m rc2014 sms z180 zx
+TARGET ?= z80 cpm m rc2014 sms yaz180 z180 zx
 
 jobs := $(foreach target,$(TARGET),job-$(target))
 cleans := $(foreach target,$(TARGET),clean-$(target))
@@ -16,6 +16,9 @@ target = $(firstword $(subst -, ,$*))
 ${jobs}: job-%:
 	$(eval cpu := $(shell \
 		if [ "$(target)" = "z180" ]; then \
+			echo "--cpu=z180"; \
+		elif \
+			[ "$(target)" = "yaz180" ]; then \
 			echo "--cpu=z180"; \
 		else \
 			echo "";  \

@@ -1,0 +1,12 @@
+target/yaz180/device/asci/__asci0_bss_Rx
+target/yaz180/device/asci/__asci0_bss_Tx
+target/yaz180/device/asci/__asci0_need
+target/yaz180/device/asci/asci0_flush_Rx
+target/yaz180/device/asci/asci0_flush_Tx
+target/yaz180/device/asci/asci0_getc
+target/yaz180/device/asci/asci0_init
+target/yaz180/device/asci/asci0_interrupt
+target/yaz180/device/asci/asci0_peekc
+target/yaz180/device/asci/asci0_pollc
+target/yaz180/device/asci/asci0_putc
+target/yaz180/device/asci/asci0_reset
