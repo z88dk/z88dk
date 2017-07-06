@@ -19,13 +19,13 @@ include(__link__.m4)
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_start,void)
+__OPROTO(`b,c,d,e',`b,c,d,e',void,,NIRVANAP_start,void)
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_stop,void)
+__OPROTO(`b,c,d,e',`b,c,d,e',void,,NIRVANAP_stop,void)
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).

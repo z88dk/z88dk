@@ -75,9 +75,9 @@ delay_show:
         djnz    delay_show
         call    show_next_tile
         call    show_next_tile
-		  
+        
 PUBLIC asm_BIFROSTL_showNextTile
-		  
+        
 asm_BIFROSTL_showNextTile:
 show_next_tile:
         ld      de, $0101               ; D = row, E = col (1,3,5..17)
@@ -347,7 +347,7 @@ exit_raster:
         pop     af
 _BIFROSTL_ISR_HOOK:
         ei
-		  reti
+        reti
 
 ; -----------------------------------------------------------------------------
 ; RAND USR 64995 to activate engine
@@ -363,22 +363,28 @@ asm_BIFROSTL_start:
         ld      a, $fe
         ld      i, a
         im      2
+        ld      hl,main_engine
+        ld      ($fdfe),hl
         ei
         ret
 
 ; -----------------------------------------------------------------------------
 ; RAND USR 65012 to deactivate engine
+; replaced
+;
+;PUBLIC asm_BIFROSTL_stop
+;
+;asm_BIFROSTL_stop:
+;
+;        di
+;        ld      a, $3f
+;        ld      i, a
+;        im      1
+;        ei
+;        ret
+;
 
-PUBLIC asm_BIFROSTL_stop
-
-asm_BIFROSTL_stop:
-
-        di
-        ld      a, $3f
-        ld      i, a
-        im      1
-        ei
-        ret
+defs $fdfd - $e501 - ASMPC
 
 ; -----------------------------------------------------------------------------
 ; interrupt address at $fdfd

@@ -496,6 +496,7 @@ delay_last:
 ; -----------------------------------------------------------------------------
 
 PUBLIC _NIRVANAM_ISR_HOOK
+PUBLIC _NIRVANAM_ISR_STOP
 
 main_engine:
 ; preserve all registers
@@ -541,7 +542,7 @@ Z88DK_FOR(`LOOP', `1', `11',
 delay_wide:
 delay_128k:
         ld      b, $05
-		  
+        
 ELSE
 
 ; draw 8 tiles
@@ -650,8 +651,10 @@ _NIRVANAM_ISR_HOOK:
         pop     de
         pop     bc
         pop     af
+
+_NIRVANAM_ISR_STOP:
         ei
-		  reti
+        reti
 
 ; -----------------------------------------------------------------------------
 ; Insert Space Here
@@ -675,24 +678,27 @@ asm_NIRVANAM_start:
         ld      a, $fe
         ld      i, a
         im      2
+        ld      hl,main_engine
+        ld      ($fdfe),hl
         ei
         ret
 
 ; -----------------------------------------------------------------------------
 ; Deactivate NIRVANA engine.
-;
-; Address: 65012
+; replaced
 ; -----------------------------------------------------------------------------
+;
+;PUBLIC asm_NIRVANAM_stop
+;
+;asm_NIRVANAM_stop:
+;        di
+;        ld      a, $3f
+;        ld      i, a
+;        im      1
+;        ei
+;        ret
 
-PUBLIC asm_NIRVANAM_stop
-
-asm_NIRVANAM_stop:
-        di
-        ld      a, $3f
-        ld      i, a
-        im      1
-        ei
-        ret
+defs $fdfd - org_nirvanam - ASMPC
 
 ; -----------------------------------------------------------------------------
 ; interrupt address at $fdfd

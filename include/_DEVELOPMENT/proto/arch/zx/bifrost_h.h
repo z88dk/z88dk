@@ -33,13 +33,13 @@ extern unsigned char BIFROSTH_tilemap[81];
 // Activate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTH_start,void)
+__OPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROSTH_start,void)
 
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTH_stop,void)
+__OPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROSTH_stop,void)
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).
