@@ -77,17 +77,18 @@ int compare_aligned(const struct aligned_blob *a, const struct aligned_blob *b)
 * Execution starts here
 */
 
+#define GLUELINEMAX 512
 
 int glue_exec(char *target)
 {
     int i, j, k, bank;
     char *p;
     FILE *fin, *fout, *fihx;
-    char buffer[LINEMAX + 1];
+    char buffer[GLUELINEMAX + 1];
     char filename[FILENAME_MAX * 2 + 1];
     char ihexname[FILENAME_MAX * 2 + 1];
-    char symbol_name[LINEMAX];
-    char section_name[LINEMAX];
+    char symbol_name[GLUELINEMAX];
+    char section_name[GLUELINEMAX];
     long symbol_value;
     struct stat st_file;
 
@@ -109,7 +110,7 @@ int glue_exec(char *target)
     if ((fin = fopen(filename, "r")) == NULL)
         exit_log(1, "Error: cannot open map file %s\n", filename);
 
-    while (fgets(buffer, LINEMAX, fin) != NULL)
+    while (fgets(buffer, GLUELINEMAX, fin) != NULL)
     {
         if (sscanf(buffer, "%s = $%lx", symbol_name, &symbol_value) == 2)
         {
