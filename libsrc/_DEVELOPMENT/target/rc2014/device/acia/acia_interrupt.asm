@@ -1,7 +1,7 @@
 
     SECTION code_driver
 
-    PUBLIC _acia_interrupt
+    PUBLIC __z80_rst_38h
     
     EXTERN aciaRxCount, aciaRxIn, aciaRxBuffer
     EXTERN aciaTxCount, aciaTxOut, aciaTxBuffer, aciaControl
@@ -9,7 +9,7 @@
     EXTERN ACIA_STATUS_ADDR, ACIA_RDRF, ACIA_DATA_ADDR, ACIA_RX_SIZE, ACIA_RX_FULLISH
     EXTERN ACIA_TDRE, ACIA_TX_SIZE, ACIA_TEI_MASK, ACIA_TDI_RTS0, ACIA_CTRL_ADDR, ACIA_TDI_RTS1
 
-    _acia_interrupt:
+    __z80_rst_38h:
 
         push af
         push hl

@@ -470,7 +470,46 @@
       ENDIF
       
    ENDIF
+
+
+   IFDEF CRT_ENABLE_RST_TABLE
    
+      defc __crt_enable_rst_table = CRT_ENABLE_RST_TABLE
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_rst_table
+      
+         defc __crt_enable_rst_table = TAR__crt_enable_rst_table
+      
+      ELSE
+      
+         defc __crt_enable_rst_table = DEF__crt_enable_rst_table
+      
+      ENDIF
+   
+   ENDIF
+
+
+   IFDEF CRT_ENABLE_NMI_TABLE
+   
+      defc __crt_enable_nmi_table = CRT_ENABLE_NMI_TABLE
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_nmi_table
+      
+         defc __crt_enable_nmi_table = TAR__crt_enable_nmi_table
+      
+      ELSE
+      
+         defc __crt_enable_nmi_table = DEF__crt_enable_nmi_table
+      
+      ENDIF
+      
+   ENDIF
+
+
    IFDEF CRT_ENABLE_TRAP
    
       defc __crt_enable_trap = CRT_ENABLE_TRAP

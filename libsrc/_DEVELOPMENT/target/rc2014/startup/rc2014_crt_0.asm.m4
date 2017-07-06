@@ -106,7 +106,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "rc2014_page_zero_z80.inc"
+   include "../crt_page_zero_z80.inc"
 
 ENDIF
 
@@ -208,6 +208,15 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+IF (__crt_org_vector_table = -2)
+
+SECTION smc_driver
+
+   include "../crt_interrupt_table_z80.inc"
+
+ENDIF
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
