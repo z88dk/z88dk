@@ -258,3 +258,5 @@ ELSE
    retn
 
 ENDIF
+
+defc __page_zero_present = 1

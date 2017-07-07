@@ -222,3 +222,5 @@ ELSE
    jp     asm_SMSlib_nmi_isr
 
 ENDIF
+
+defc __page_zero_present = 1

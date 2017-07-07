@@ -22,5 +22,6 @@
 @string/string_sdcc_iy.lst
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver.lst
+target/rc2014/rc2014_weak_defaults.asm
 @threads/threads_sdcc_iy.lst
 @z80/z80_sdcc.lst

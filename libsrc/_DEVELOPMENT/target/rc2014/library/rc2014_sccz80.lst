@@ -22,5 +22,6 @@
 @string/string_sccz80.lst
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver.lst
+target/rc2014/rc2014_weak_defaults.asm
 @threads/threads_sccz80.lst
 @z80/z80_sccz80.lst
