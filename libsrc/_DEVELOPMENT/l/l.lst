@@ -7,6 +7,7 @@ l/z80/l_command_line_parse_in_place
 l/z80/l_compare_de_hl
 l/z80/l_dec_bc
 l/z80/l_dec_de
+l/z80/l_ei_reti
 l/z80/l_ex_bc_de
 l/z80/l_ex_bc_hl
 l/z80/l_fast_ldir
@@ -20,6 +21,7 @@ l/z80/l_offset_ix_de
 l/z80/l_readword_2_hl
 l/z80/l_readword_hl
 l/z80/l_ret
+l/z80/l_retn
 l/z80/l_setmem_de
 l/z80/l_setmem_hl
 l/z80/l_testword_hl

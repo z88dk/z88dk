@@ -1,3 +1,11 @@
+z80/z80/__z80_nmi
+z80/z80/__z80_rst_08h
+z80/z80/__z80_rst_10h
+z80/z80/__z80_rst_18h
+z80/z80/__z80_rst_20h
+z80/z80/__z80_rst_28h
+z80/z80/__z80_rst_30h
+z80/z80/__z80_rst_38h
 z80/z80/asm_z80_delay_ms
 z80/z80/asm_z80_delay_tstate
 z80/z80/asm_z80_get_int_state
