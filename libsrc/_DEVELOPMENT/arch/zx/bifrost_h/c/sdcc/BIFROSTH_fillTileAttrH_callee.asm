@@ -20,8 +20,8 @@ _BIFROSTH_fillTileAttrH_callee:
 	pop bc
 	dec sp
 	ex (sp),hl
+   ld d,c          ; D = lin
 	ld c,l          ; C = attr
-	ld d,c          ; D = lin
 	ld e,b          ; E = col
 	
 	jp asm_BIFROSTH_fillTileAttrH
