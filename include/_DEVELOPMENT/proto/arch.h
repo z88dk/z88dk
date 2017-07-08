@@ -33,4 +33,8 @@ include(__link__.m4)
 #include <../../../libsrc/_DEVELOPMENT/target/ts2068/config_ts2068.h>
 #endif
 
+#ifdef __YAZ180
+#include <../../../libsrc/_DEVELOPMENT/target/yaz180/config_yaz180.h>
+#endif
+
 #endif

@@ -35,14 +35,14 @@ extern unsigned char BIFROSTL_tilemap[81];
 // Activate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-extern void BIFROSTL_start(void) __preserves_regs(b,c,d,e,h,l);
+extern void BIFROSTL_start(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-extern void BIFROSTL_stop(void) __preserves_regs(b,c,d,e,h,l);
+extern void BIFROSTL_stop(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------

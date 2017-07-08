@@ -21,14 +21,14 @@
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_start(void) __preserves_regs(b,c,d,e,h,l);
+extern void NIRVANAM_start(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e,h,l);
+extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------

@@ -15,6 +15,13 @@ IF (__crt_enable_rst & $02)
    EXTERN _z180_rst_08h
    jp _z180_rst_08h
 
+   IF (__crt_enable_rst & $0202 = $02)
+   
+      PUBLIC _z180_rst_08h_vector
+      defc   _z180_rst_08h_vector = $09
+      
+   ENDIF
+
 ELSE
 
    ret
@@ -32,6 +39,13 @@ IF (__crt_enable_rst & $04)
    EXTERN _z180_rst_10h
    jp _z180_rst_10h
 
+   IF (__crt_enable_rst & $0404 = $04)
+   
+      PUBLIC _z180_rst_10h_vector
+      defc   _z180_rst_10h_vector = $11
+      
+   ENDIF
+
 ELSE
 
    ret
@@ -48,6 +62,13 @@ IF (__crt_enable_rst & $08)
 
    EXTERN _z180_rst_18h
    jp _z180_rst_18h
+
+   IF (__crt_enable_rst & $0808 = $08)
+   
+      PUBLIC _z180_rst_18h_vector
+      defc   _z180_rst_18h_vector = $19
+      
+   ENDIF
 
 ELSE
 
@@ -74,6 +95,13 @@ IF (__crt_enable_rst & $10)
    EXTERN _z180_rst_20h
    jp _z180_rst_20h
 
+   IF (__crt_enable_rst & $1010 = $10)
+   
+      PUBLIC _z180_rst_20h_vector
+      defc   _z180_rst_20h_vector = $21
+      
+   ENDIF
+
 ELSE
 
    ret
@@ -99,6 +127,13 @@ IF (__crt_enable_rst & $20)
    EXTERN _z180_rst_28h
    jp _z180_rst_28h
 
+   IF (__crt_enable_rst & $2020 = $20)
+   
+      PUBLIC _z180_rst_28h_vector
+      defc   _z180_rst_28h_vector = $29
+      
+   ENDIF
+
 ELSE
 
    ret
@@ -123,6 +158,13 @@ IF (__crt_enable_rst & $40)
 
    EXTERN _z180_rst_30h
    jp _z180_rst_30h
+
+   IF (__crt_enable_rst & $4040 = $40)
+   
+      PUBLIC _z180_rst_30h_vector
+      defc   _z180_rst_30h_vector = $31
+      
+   ENDIF
 
 ELSE
 
@@ -181,6 +223,13 @@ IF (__crt_enable_rst & $80)
 
    EXTERN _z180_rst_38h
    jp _z180_rst_38h
+
+   IF (__crt_enable_rst & $8080 = $80)
+   
+      PUBLIC _z180_rst_38h_vector
+      defc   _z180_rst_38h_vector = $39
+      
+   ENDIF
 
 ELSE
 
@@ -257,6 +306,13 @@ IF __crt_enable_nmi
 
    EXTERN _z180_nmi
    jp _z180_nmi
+
+   IF (__crt_enable_nmi = 1)
+   
+      PUBLIC _z180_nmi_vector
+      defc   _z180_nmi_vector = $67
+      
+   ENDIF
 
 ELSE
 
@@ -585,6 +641,13 @@ IF __crt_enable_trap
    
    EXTERN _z180_trap
    jp     _z180_trap
+
+   IF (__crt_enable_trap = 1)
+   
+      PUBLIC _z180_trap_vector
+      defc   _z180_trap_vector = ASMPC - 2
+      
+   ENDIF
 
 ELSE
 

@@ -20,6 +20,7 @@
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
+@target/rc2014/default/default.lst
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver.lst
 @threads/threads_sdcc_iy.lst
