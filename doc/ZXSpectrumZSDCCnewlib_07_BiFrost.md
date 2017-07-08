@@ -67,7 +67,7 @@ Step 1, therefore, is to create a BASIC loader program. Yes, you're going to
 type a bit of Spectrum BASIC. Here it is:
 
 ```
-10 CLEAR 32768
+10 CLEAR 32767
 20 LOAD "" CODE
 30 LOAD "" CODE
 40 RANDOMIZE USR 32768
