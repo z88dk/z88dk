@@ -5,6 +5,12 @@
    ld a,__IO_BASE_ADDRESS
 
    jp __Test_Trap
+
+   PUBLIC l_retn
+
+l_retn:
+
+   retn
    
 ; address = 0x0008
 
@@ -309,7 +315,6 @@ IF __crt_enable_nmi
 
 ELSE
 
-   EXTERN l_retn
    jp     l_retn
 
 ENDIF
