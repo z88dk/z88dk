@@ -2,7 +2,7 @@ IF __page_zero_present
 
 SECTION smc_jump_vectors
 
-IF (__crt_enable_rst & 0x0202)
+IF (__crt_enable_rst & 0x0202 = 0x0202)
 
    PUBLIC _z80_rst_08h
    PUBLIC _z80_rst_08h_vector
@@ -17,7 +17,7 @@ IF (__crt_enable_rst & 0x0202)
 
 ENDIF
 
-IF (__crt_enable_rst & 0x0404)
+IF (__crt_enable_rst & 0x0404 = 0x0404)
 
    PUBLIC _z80_rst_10h
    PUBLIC _z80_rst_10h_vector
@@ -32,7 +32,7 @@ IF (__crt_enable_rst & 0x0404)
 
 ENDIF
 
-IF (__crt_enable_rst & 0x0808)
+IF (__crt_enable_rst & 0x0808 = 0x0808)
 
    PUBLIC _z80_rst_18h
    PUBLIC _z80_rst_18h_vector
@@ -47,7 +47,7 @@ IF (__crt_enable_rst & 0x0808)
 
 ENDIF
 
-IF (__crt_enable_rst & 0x1010)
+IF (__crt_enable_rst & 0x1010 = 0x1010)
 
    PUBLIC _z80_rst_20h
    PUBLIC _z80_rst_20h_vector
@@ -62,7 +62,7 @@ IF (__crt_enable_rst & 0x1010)
 
 ENDIF
 
-IF (__crt_enable_rst & 0x2020)
+IF (__crt_enable_rst & 0x2020 = 0x2020)
 
    PUBLIC _z80_rst_28h
    PUBLIC _z80_rst_28h_vector
@@ -77,7 +77,7 @@ IF (__crt_enable_rst & 0x2020)
 
 ENDIF
 
-IF (__crt_enable_rst & 0x4040)
+IF (__crt_enable_rst & 0x4040 = 0x4040)
 
    PUBLIC _z80_rst_30h
    PUBLIC _z80_rst_30h_vector
@@ -92,7 +92,7 @@ IF (__crt_enable_rst & 0x4040)
 
 ENDIF
 
-IF (__crt_enable_rst & 0x8080)
+IF (__crt_enable_rst & 0x8080 = 0x8080)
 
    PUBLIC _z80_rst_38h
    PUBLIC _z80_rst_38h_vector
