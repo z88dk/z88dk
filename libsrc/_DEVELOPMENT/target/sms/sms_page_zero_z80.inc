@@ -12,12 +12,19 @@
 IF (__crt_enable_rst & $02)
 
    EXTERN _z80_rst_08h
-   jp _z80_rst_08h
+   jp     _z80_rst_08h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $0202) != $0202)
+   
+   PUBLIC _z80_rst_08h_vector
+   defc   _z80_rst_08h_vector = $09
+     
 ENDIF
 
    defm "Z88DK"
@@ -29,12 +36,19 @@ ENDIF
 IF (__crt_enable_rst & $04)
 
    EXTERN _z80_rst_10h
-   jp _z80_rst_10h
+   jp     _z80_rst_10h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $0404) != $0404)
+   
+   PUBLIC _z80_rst_10h_vector
+   defc   _z80_rst_10h_vector = $11
+      
 ENDIF
 
    defm "1.99C"
@@ -46,12 +60,19 @@ ENDIF
 IF (__crt_enable_rst & $08)
 
    EXTERN _z80_rst_18h
-   jp _z80_rst_18h
+   jp     _z80_rst_18h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $0808) != $0808)
+   
+   PUBLIC _z80_rst_18h_vector
+   defc   _z80_rst_18h_vector = $19
+      
 ENDIF
 
    PUBLIC l_dec_de
@@ -71,12 +92,19 @@ l_dec_de:
 IF (__crt_enable_rst & $10)
 
    EXTERN _z80_rst_20h
-   jp _z80_rst_20h
+   jp     _z80_rst_20h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $1010) != $1010)
+   
+   PUBLIC _z80_rst_20h_vector
+   defc   _z80_rst_20h_vector = $21
+      
 ENDIF
 
    PUBLIC l_dec_bc
@@ -96,12 +124,19 @@ l_dec_bc:
 IF (__crt_enable_rst & $20)
 
    EXTERN _z80_rst_28h
-   jp _z80_rst_28h
+   jp     _z80_rst_28h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $2020) != $2020)
+   
+   PUBLIC _z80_rst_28h_vector
+   defc   _z80_rst_28h_vector = $29
+      
 ENDIF
 
    PUBLIC l_ret
@@ -121,12 +156,19 @@ l_ret:
 IF (__crt_enable_rst & $40)
 
    EXTERN _z80_rst_30h
-   jp _z80_rst_30h
+   jp     _z80_rst_30h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $4040) != $4040)
+   
+   PUBLIC _z80_rst_30h_vector
+   defc   _z80_rst_30h_vector = $31
+      
 ENDIF
 
 IF __SDCC_IY
@@ -180,6 +222,13 @@ IF (__crt_enable_rst & $80)
 
    EXTERN _z80_rst_38h
    jp _z80_rst_38h
+
+   IF ((__crt_enable_rst & $8080) = $80)
+   
+      PUBLIC _z80_rst_38h_vector
+      defc   _z80_rst_38h_vector = $39
+      
+   ENDIF
 
 ELSE
 
@@ -251,12 +300,20 @@ error_lznc:
 IF __crt_enable_nmi
 
    EXTERN _z80_nmi
-   jp _z80_nmi
+   jp     _z80_nmi
 
 ELSE
 
-   retn
+   EXTERN l_retn
+   jp     l_retn
 
+ENDIF
+
+IF (__crt_enable_nmi <= 1)
+   
+   PUBLIC _z80_nmi_vector
+   defc   _z80_nmi_vector = $67
+      
 ENDIF
 
 defc __page_zero_present = 1

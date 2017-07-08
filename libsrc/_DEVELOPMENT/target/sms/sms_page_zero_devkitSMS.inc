@@ -34,7 +34,7 @@ __RST08_SMS_crt0_RST08:
 _SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
 __RST18_SMS_crt0_RST18:
 
-   ld a,l                      ; (respecting VRAM time costraints)
+   ld a,l                      ; (respecting VRAM time constraints)
    out (__IO_VDP_DATA),a       ; 11
    ld a,h                      ; 4
    sub 0                       ; 7
@@ -51,12 +51,19 @@ __RST18_SMS_crt0_RST18:
 IF (__crt_enable_rst & $20)
 
    EXTERN _z80_rst_28h
-   jp _z80_rst_28h
+   jp     _z80_rst_28h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $2020) != $2020)
+   
+   PUBLIC _z80_rst_28h_vector
+   defc   _z80_rst_28h_vector = $29
+      
 ENDIF
 
    PUBLIC l_ret
@@ -76,12 +83,19 @@ l_ret:
 IF (__crt_enable_rst & $40)
 
    EXTERN _z80_rst_30h
-   jp _z80_rst_30h
+   jp     _z80_rst_30h
 
 ELSE
 
-   ret
+   jp l_ret
 
+ENDIF
+
+IF ((__crt_enable_rst & $4040) != $4040)
+   
+   PUBLIC _z80_rst_30h_vector
+   defc   _z80_rst_30h_vector = $31
+      
 ENDIF
 
 IF __SDCC_IY
@@ -148,6 +162,13 @@ ELSE
    jp     asm_SMSlib_isr_mdpad
 
 ENDIF
+ENDIF
+
+IF ((__crt_enable_rst & $8080) != $8080)
+   
+   PUBLIC _z80_rst_38h_vector
+   defc   _z80_rst_38h_vector = $39
+      
 ENDIF
 
    PUBLIC l_setmem_hl
@@ -221,6 +242,13 @@ ELSE
    EXTERN asm_SMSlib_nmi_isr
    jp     asm_SMSlib_nmi_isr
 
+ENDIF
+
+IF (__crt_enable_nmi <= 1)
+   
+   PUBLIC _z80_nmi_vector
+   defc   _z80_nmi_vector = $67
+      
 ENDIF
 
 defc __page_zero_present = 1
