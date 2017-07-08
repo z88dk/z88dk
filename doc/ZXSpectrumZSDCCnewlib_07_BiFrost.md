@@ -1,9 +1,15 @@
-# ZX Spectrum Development with Z88DK - Sprite Libraries
+# ZX Spectrum Development with Z88DK - BiFrost
 
 This is the sixth document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
 with the newer, more standards compilant zsdcc C compiler. Neither the original
 sccz80 compiler nor the classic library is discussed.
+
+This document covers the BiFrost library which provides multicolour graphics
+support for Spectrum programs. Although this might be considered a rather niche
+topic, the discussion also covers other aspects of Z88DK which will be referred
+to in future installments. The reader is encouraged to at least skim read the
+document even if they have no particular interest in BiFrost.
 
 ## Assumptions
 
@@ -12,21 +18,15 @@ series and is continuing on from [installment 5](https://github.com/z88dk/z88dk/
 
 If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
 
-## Z88DK's ZX Spectrum Sprite Libraries
+## Z88DK's BiFrost Library
 
-Intro
-
-### SP1
-
-### BiFrost
-
-BiFrost is a multicolour sprite library written by Einar Saukas, which has been
-embedded and interfaced with the Z88DK C development kit. "Multicolour" means
-it's capable of drawing blocks of pixels which are 8 pixels wide by 1 pixel
-high, each with 2 colour attributes. This works much the same way as the
-Spectrum's native 8x8 pixel blocks which have the INK and PAPER attributes, but
-since BiFrost's blocks occupy 1 pixel row instead of 8, the programmer can get a
-much more colourful display.
+BiFrost is a multicolour graphics library written by Einar Saukas, which has
+been embedded into, and interfaced with, the Z88DK C development
+kit. "Multicolour" means it's capable of drawing blocks of pixels which are 8
+pixels wide by 1 pixel high, each with 2 colour attributes. This works much the
+same way as the Spectrum's native 8x8 pixel blocks which have the INK and PAPER
+attributes, but since BiFrost's blocks occupy 1 pixel row instead of 8, the
+programmer can get a much more colourful display.
 
 There are 2 versions of BiFrost, the original and BiFrost2. Somewhat
 confusingly, the original BiFrost also comes in 2 versions, low resolution and
@@ -34,19 +34,25 @@ high resolution. Which of the 3 versions you chose depends on what capabilities
 you require.
 
 Technical limitations mean BiFrost can't use the whole screen. It's restricted
-to 18 character rows by 18 character columns. That's 144x144 pixels. The low
-resolution version of BiFrost can place a 16x16 pixel multicolour sprite at 8
-pixel boundaries. The high resolution version of BiFrost can place a multicolour
-sprite at any pixel, at the expense of more memory consumption are greater CPU
-processing requirement over the low resolution version.
+to 18 character rows by 18 character columns. That's 144x144 pixels, as seen in
+green:
+
+![alt text](images/bifrost_area1.png "BiFrost area")
+
+The low resolution version of BiFrost can place a 16x16 pixel multicolour "tile"
+at 8 pixel boundaries, i.e. aligned to character locations. The high resolution
+version of BiFrost can place a multicolour tile at any vertical pixel, although
+still aligned to 8 pixel horizonal coordinates, at the expense of more memory
+consumption and greater CPU processing requirement over the low resolution
+version.
 
 BiFrost2 is an improvement on the high resolution version of BiFrost. It can
-place a 16x16 pixel multicolour sprite at any pixel, and can do so within a
+place a 16x16 pixel multicolour tile at any pixel, and can do so within a
 20x20 character grid. That's a 160x160 pixel area of the screen.
 
-#### Building a BiFrost Program
+## A BiFrost Program BASIC Loader
 
-BiFrost based programs created with Z88DK load in a slightly different way to
+BiFrost based programs created with Z88DK LOAD in a slightly different way to
 most Spectrum programs. The compliation process generates _two_ blocks of
 machine code. The first is the programmer's code, the compiled C, as usual. The
 second is the BiFrost library itself, which is loaded separately into a
@@ -60,7 +66,8 @@ the loading process the Spectrum will have to go through:
 * the BASIC loader then runs the programmer's code
 
 The programmer's code, created by Z88DK, expects to find the BiFrost library
-loaded and waiting to be run at the correct address. As long as the BASIC loader
+loaded and waiting to be run at the correct address. (BiFrost  has to be loaded
+at an exact memory location otherwise it won't work.) As long as the BASIC loader
 has loaded BiFrost into the correct area of memory this will work as expected.
 
 Step 1, therefore, is to create a BASIC loader program. Yes, you're going to
@@ -84,15 +91,100 @@ SAVE "biloader" LINE 10
 Once that's complete, write out the "virtual tape" to a file called
 bifrost_loader.tap using Media->Tape->Write. That's the loader part completed.
 
-Step 2 is to create a coloured tile, which is the sprite BiFrost will draw onto
-the screen. <COME BACK TO THIS>
+## Create a ctile
+
+A _ctile_ in BiFrost terminology is a 16x16 pixel graphic which can be thought
+of as being divided into 2 columns of 8 bits each, by 16 rows high. Each of
+these 8 pixel wide by 1 pixel high blocks can have two colours - like INK and
+PAPER in traditional Spectrum terms.
+
+The ctile data format is very simple: 32 bytes of bitmap data followed by 32
+bytes of attribute data. Even so, a graphical editor makes life a lot easier
+when designing tiles, and [ZX
+Paintbrush](http://www.zx-modules.de/zxpaintbrush/zxpaintbrush.html) supports
+them natively. Sadly, from a Linux user's perspective, this is a Windows-only
+tool. although it does appear to run under WINE.
+
+This author used a Windows virtual machine to run it, and created the coloured
+ball seen below:
+
+![alt text](images/coloured_ball_editor.png "Coloured ball")
+
+Zx Paintbrush saves ctiles in a 16KB file containing 256 tiles. For this example
+we only needed a single ctile, so the 64 byte file was created using ZX
+Paintbrush's export function, which will create a ctile file of a single ctile.
+
+## Load the ctile into an Assembly File
+
+There are several ways to get the 64 bytes of ctile data into a Z88DK program. A
+C array containing the relevant bytes is probably easiest, but not the most
+flexible since you'd have to change the array each time you update your
+graphic. An alternative, which we use in this example, is to create an assembly
+language file like this:
+
+```
+SECTION rodata_user
+
+PUBLIC _ctiles
+
+_ctiles:
+
+   BINARY "coloured_ball.ctile"
+```
+
+Save that to a file called ctile.asm. It creates a symbol for the ctile data
+called __ctiles_, the leading underscore of which exports it so it's visible to
+the C program, as we'll see in a moment.
+
+The assembler's BINARY command loads the binary data from the named file, which
+is the output from ZX Paintbrush.
+
+### A Simple BiFrost Program - Low Resolution
 
 Step 3 is to create a small program which uses BiFrost. Save this to
 bifrost_01.c:
 
 ```
-???
+#pragma output REGISTER_SP  = -1
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+
+#include <arch/zx.h>
+#include <arch/zx/bifrost_l.h>
+
+extern unsigned char ctiles[];
+
+int main()
+{
+  unsigned char blank_tile_index;
+  unsigned char row, col;
+
+  BIFROSTL_resetTileImages(_ctiles);
+
+  for(blank_tile_index = 0; blank_tile_index < 81; blank_tile_index++) {
+    BIFROSTL_tilemap[blank_tile_index] = BIFROSTL_DISABLED;
+  }
+
+  zx_cls(PAPER_WHITE);
+
+  for(row = 1; row <=17; row++)
+    for(col = 1; col <= 17; col+=2)
+      BIFROSTL_fillTileAttrL(row, col, INK_WHITE+(8*INK_WHITE));
+
+  BIFROSTL_setTile(0, 0, 0+BIFROSTL_STATIC);
+
+  BIFROSTL_start();
+
+  while(1); 
+}
 ```
+
+This C program references the external symbol _ctiles_ which is the array of
+tile data the assembly language file makes available. This data is loaded into
+BiFrost's tile images data area using the BIFROSTL_resetTileImages()
+function. This area has enough space for 256 tiles, although in this example
+only the first tile, tile 0, is used.
+
+
 
 and compile it with this:
 
@@ -200,15 +292,42 @@ bifrost_01.tap: bifrost_01_code.tap
 Clearly this makefile could be made more streamlined, or more generic, but it
 works for this example.
 
-
-and the output file is the .TAP file for the Spectrum
-to load. --noloader tells appmake not to create a BASIC loader (which it does by
-default) since we already have our our, and to ensure the machine code is saved
-such that it loads at address 32768, which is where Z88DK code expect to run
-from by default.
+Once the loader, the C code and the BiFrost library are all loaded from tape the
+Spectrum's memory will look like this:
 
 
-###
+```
++-------------+
+|0xFFFF  65535|
+|             | User Defined Graphics
+|-------------|
+|0xFF58  65368| Z88DK program's stack
+|-------------| Grows downwards, remember!
+|             |
+|             |
+|             | Z88DK heap memory
+|             |
+|             |
+|-------------|
+|             | Z88DK BSS section  (CRT_BSS_DATA)
+|             | Z88DK DATA section (CRT_ORG_DATA)
+|-------------| ^^^
+|             |
+|0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
+|-------------|
+|             | Lower RAM, includes
+|             | sys vars, print buffer, etc.
+|             | Slower, "contended memory"
+|-------------|
+|0x5AFF  23295|
+|             | Display File (i.e. screen memory)
+|0x4000  16384|
+|-------------|
+|0x3FFF  16383|
+|             | ROM
+|0x0000      0|
++-------------+
+```
 
 ### Nirvana
 
