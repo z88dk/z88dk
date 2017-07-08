@@ -366,7 +366,7 @@ section code_crt_start
 
 ENDIF
 
-IF (__crt_org_vector_table = -0x0100) || (__crt_org_vector_table = -1)
+IF (__crt_org_vector_table = -0x0100)
 
 ; place vector table at address 0x0100
 

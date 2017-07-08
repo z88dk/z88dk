@@ -159,6 +159,10 @@ __Restart_2:
 
    include "../clib_init_bss.inc"
 
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 

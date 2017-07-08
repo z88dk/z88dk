@@ -85,18 +85,7 @@ ENDIF
 
 __Start:
 
-   IF __page_zero_present = 0
-   
-      include "../crt_start_di.inc"
-   
-   ENDIF
-
-   EXTERN __code_vector_head
-   
-   ld a,__code_vector_head/256
-   ld i,a
-
-   include "../crt_set_interrupt_mode.inc"
+   include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -127,6 +116,10 @@ __Restart_2:
    ; initialize bss section
 
    include "../clib_init_bss.inc"
+
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
