@@ -20,7 +20,9 @@ If you would like to jump to the beginning, click on [installment 1](https://git
 
 ## Z88DK's BiFrost Library
 
-BiFrost is a multicolour graphics library written by Einar Saukas, which has
+[BiFrost](http://www.worldofspectrum.org/infoseekid.cgi?id=0027405)
+is a multicolour graphics library written by
+[Einar Saukas](https://www.ime.usp.br/~einar/bifrost/), which has
 been embedded into, and interfaced with, the Z88DK C development
 kit. "Multicolour" means it's capable of drawing blocks of pixels which are 8
 pixels wide by 1 pixel high, each with 2 colour attributes. This works much the
@@ -28,10 +30,19 @@ same way as the Spectrum's native 8x8 pixel blocks which have the INK and PAPER
 attributes, but since BiFrost's blocks occupy 1 pixel row instead of 8, the
 programmer can get a much more colourful display.
 
-There are 2 versions of BiFrost, the original and BiFrost2. Somewhat
+There are 2 versions of BiFrost: the original and BiFrost2. Somewhat
 confusingly, the original BiFrost also comes in 2 versions, low resolution and
 high resolution. Which of the 3 versions you chose depends on what capabilities
 you require.
+
+## Understanding BiFrost's Capabilities
+
+BiFrost places coloured _tiles_ within its display area. Although tiles can be
+animated and moved around to some extent, they're not the _sprite_ type of
+graphics which you might think of as floating freely around the screen. BiFrost
+isn't suitable for Space Invaders, but it will help you to write puzzle games,
+board games, strategy and turn playing games, and will do so providing a level
+of colour which the Spectrum shouldn't really be capable of.
 
 Technical limitations mean BiFrost can't use the whole screen. It's restricted
 to 18 character rows by 18 character columns. That's 144x144 pixels, as seen in
@@ -47,8 +58,8 @@ consumption and greater CPU processing requirement over the low resolution
 version.
 
 BiFrost2 is an improvement on the high resolution version of BiFrost. It can
-place a 16x16 pixel multicolour tile at any pixel, and can do so within a
-20x20 character grid. That's a 160x160 pixel area of the screen.
+place a 16x16 pixel multicolour tile at any vertical pixel, and can do so within
+a 20x22 character grid. That's a 160x176 pixel area of the screen.
 
 ## A BiFrost Program BASIC Loader
 
@@ -105,14 +116,16 @@ Paintbrush](http://www.zx-modules.de/zxpaintbrush/zxpaintbrush.html) supports
 them natively. Sadly, from a Linux user's perspective, this is a Windows-only
 tool. although it does appear to run under WINE.
 
-This author used a Windows virtual machine to run it, and created the coloured
-ball seen below:
+This author used a Windows virtual machine to run it, and stretching his
+artistic abilities to the absolute limit, created the coloured ball seen below:
 
 ![alt text](images/coloured_ball_editor.png "Coloured ball")
 
-Zx Paintbrush saves ctiles in a 16KB file containing 256 tiles. For this example
-we only needed a single ctile, so the 64 byte file was created using ZX
-Paintbrush's export function, which will create a ctile file of a single ctile.
+ZX Paintbrush saves ctiles in a 16KB file containing 256 tiles, so all your
+tiles would normally be saved and loaded via a single file. For this example we
+only needed a single ctile, so the 64 byte file was created using ZX
+Paintbrush's export function, which will create a ctile file containing a single
+ctile.
 
 ## Load the ctile into an Assembly File
 
@@ -184,9 +197,37 @@ BiFrost's tile images data area using the BIFROSTL_resetTileImages()
 function. This area has enough space for 256 tiles, although in this example
 only the first tile, tile 0, is used.
 
+The BiFrost tile map is the in-memory representation of what's on the
+screen. Set a value in this array and the BiFrost engine will magically render a
+tile onto the screen. More specifically, the BIFROSTL_tilemap has 81 entries,
+representing the 9x9 tile grid. Each entry hold the index into the tile images
+data area (as set by the BIFROSTL_resetTileImages() call earlier) of the tile to
+render in that screen location. So if you set BIFROSTL_tilemap[0] to 0, the
+first tile in the tile images will appear in the top left corner of the BiFrost
+display. Set that array entry to the value BIFROSTL_DISABLED and the tile will
+disappear again. Thus you control the tiles shown onscreen by changing the
+values in the BIFROSTL_tilemap array.
+
+We start our example by reseting all the BIFROSTL_tilemap entries to
+BIFROSTL_DISABLED which ensures no tiles are rendered to start with, then we set
+the attributes of the display area to all white. (Note the rather unusual
+looking values used in the two loops around the call to BIFROSTL_fillTileAttrL()
+- this is explained in the [function's entry in the header
+file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/bifrost_l.h).
+
+We then place our single tile, the coloured ball (index 0 in our tiles image
+data array), at position 0,0 which is the top left corner. With everything in
+place we then fire up the BiFrost engine and go into an infinite loop. (If we
+return to BASIC BiFrost stops.)
+
+### Memory Map and the Pragmas
 
 
-and compile it with this:
+
+
+### Building the Program
+
+We can compile our little program with this:
 
 ```
 zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_01.c ctile.asm -o bifrost_01
