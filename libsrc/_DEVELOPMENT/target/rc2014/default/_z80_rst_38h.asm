@@ -1,4 +1,4 @@
-;; builds at 0x0000 get acia driver by default
+;; compiles at address 0x0 get acia driver by default
 
 PUBLIC _z80_rst_38h
 EXTERN _acia_interrupt
