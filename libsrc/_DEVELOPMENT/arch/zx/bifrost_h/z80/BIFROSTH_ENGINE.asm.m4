@@ -84,7 +84,7 @@ fill_tile_attr:
         ld      h, attribs/512
         ld      l, d
         add     hl, hl
-        ld      bc, attribs-(attribs/512)*512
+        ld      bc, attribs-((attribs/512)*512)
         add     hl, bc
         ld      sp, hl
         ld      h, deltas/256
