@@ -14,7 +14,7 @@ document even if they have no particular interest in BiFrost.
 ## Assumptions
 
 It is assumed the reader has worked through the earlier installments of this
-series and is continuing on from [installment 5](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md).
+series and is continuing on from [installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md).
 
 If you would like to jump to the beginning, click on [installment 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md).
 
@@ -192,15 +192,16 @@ int main()
 ```
 
 This C program references the external symbol _ctiles_ which is the array of
-tile data the assembly language file makes available. This data is loaded into
-BiFrost's tile images data area using the BIFROSTL_resetTileImages()
+tile data the assembly language file makes available. That is, the ctile data is
+the graphics tile data the program can use and place on the screen. This data is
+loaded into BiFrost's tile images data area using the BIFROSTL_resetTileImages()
 function. This area has enough space for 256 tiles, although in this example
-only the first tile, tile 0, is used.
+only the first tile, tile 0, is used - the coloured ball.
 
 The BiFrost tile map is the in-memory representation of what's on the
 screen. Set a value in this array and the BiFrost engine will magically render a
 tile onto the screen. More specifically, the BIFROSTL_tilemap has 81 entries,
-representing the 9x9 tile grid. Each entry hold the index into the tile images
+representing the 9x9 tile grid. Each entry holds the index into the tile images
 data area (as set by the BIFROSTL_resetTileImages() call earlier) of the tile to
 render in that screen location. So if you set BIFROSTL_tilemap[0] to 0, the
 first tile in the tile images will appear in the top left corner of the BiFrost
@@ -211,19 +212,18 @@ values in the BIFROSTL_tilemap array.
 We start our example by reseting all the BIFROSTL_tilemap entries to
 BIFROSTL_DISABLED which ensures no tiles are rendered to start with, then we set
 the attributes of the display area to all white. (Note the rather unusual
-looking values used in the two loops around the call to BIFROSTL_fillTileAttrL()
-- this is explained in the [function's entry in the header
+looking values used in the two loops around the call to
+BIFROSTL_fillTileAttrL() - this is explained in the [function's entry in the header
 file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/bifrost_l.h).
 
 We then place our single tile, the coloured ball (index 0 in our tiles image
-data array), at position 0,0 which is the top left corner. With everything in
+data array, plus a value which indicates to the engine that this tile shouldn't
+be animated), at position 0,0 which is the top left corner. With everything in
 place we then fire up the BiFrost engine and go into an infinite loop. (If we
 return to BASIC BiFrost stops.)
 
-### Memory Map and the Pragmas
-
-
-
+This example program has 2 pragma instructions at the top. These are important,
+as we'll see in a few moments. First, we need to see how to build this program.
 
 ### Building the Program
 
@@ -255,7 +255,7 @@ zcc's remit we need to do it manually.
 The command to convert a binary machine code file to a .TAP file is _appmake_
 and for our first piece of code we build a command as follows.
 
-Our target machine, as ever, be a ZX Spectrum:
+Our target machine, as ever, will be a ZX Spectrum:
 
 ```
 appmake +zx ...
@@ -332,6 +332,51 @@ bifrost_01.tap: bifrost_01_code.tap
 
 Clearly this makefile could be made more streamlined, or more generic, but it
 works for this example.
+
+### Memory Map and the Pragmas
+
+The example program has 2 pragma instructions to the compiler at the top. The
+use of pragmas was covered in [installment
+6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
+of this series. Of more interest is _why_ they are needed here.
+
+Without the pragmas the memory map of the program, together with the BiFrost
+library, would look like this:
+
+
+```
++-------------+
+|0xFFFF  65535|
+|             | User Defined Graphics
+|-------------|
+|0xFF58  65368| Z88DK program's stack
+|-------------| Grows downwards, remember!
+|             |
+|             |
+|             | Z88DK heap memory
+|             |
+|             |
+|-------------|
+|             | Z88DK BSS section  (CRT_BSS_DATA)
+|             | Z88DK DATA section (CRT_ORG_DATA)
+|-------------| ^^^
+|             |
+|0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
+|-------------|
+|             | Lower RAM, includes
+|             | sys vars, print buffer, etc.
+|             | Slower, "contended memory"
+|-------------|
+|0x5AFF  23295|
+|             | Display File (i.e. screen memory)
+|0x4000  16384|
+|-------------|
+|0x3FFF  16383|
+|             | ROM
+|0x0000      0|
++-------------+
+```
+
 
 Once the loader, the C code and the BiFrost library are all loaded from tape the
 Spectrum's memory will look like this:
