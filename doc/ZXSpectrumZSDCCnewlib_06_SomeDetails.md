@@ -180,3 +180,9 @@ actually need some heap, any other amount which leaves your valuable memory
 areas alone) stops this initialisation of memory. As we'll see in another
 installment, this type of heap control is required to protect the area of memory
 the BiFrost multicolour library uses for itself.
+
+### Where To Go From Here
+
+Now that we've seen how programs are laid out in memory, we can have a better 
+look at the BiFrost library.
+Part 7 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)

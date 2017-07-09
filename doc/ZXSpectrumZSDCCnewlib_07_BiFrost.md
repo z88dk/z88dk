@@ -331,7 +331,9 @@ bifrost_01.tap: bifrost_01_code.tap
 ```
 
 Clearly this makefile could be made more streamlined, or more generic, but it
-works for this example.
+works for this example. Save this to a file called 'makefile' and run 'make'
+(assuming GNU make is installed). The resultant TAP file will place a ball
+towards the top left corner of the screen.
 
 ### Memory Map and the Pragmas
 
@@ -343,15 +345,20 @@ of this series. Of more interest is _why_ they are needed here.
 Without the pragmas the memory map of the program, together with the BiFrost
 library, would look like this:
 
-
 ```
-+-------------+
-|0xFFFF  65535|
-|             | User Defined Graphics
+...
+|             |
 |-------------|
 |0xFF58  65368| Z88DK program's stack
 |-------------| Grows downwards, remember!
-|             |
+|0xFF51  65361|
+|             | BiFrost 81 byte tile map
+|0xFF01  65281|
+|-------------|
+|0xFF00  65280|
+|             | BiFrost Library
+|0xE501  58625|
+|-------------|
 |             |
 |             | Z88DK heap memory
 |             |
@@ -363,33 +370,44 @@ library, would look like this:
 |             |
 |0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
 |-------------|
-|             | Lower RAM, includes
-|             | sys vars, print buffer, etc.
-|             | Slower, "contended memory"
-|-------------|
-|0x5AFF  23295|
-|             | Display File (i.e. screen memory)
-|0x4000  16384|
-|-------------|
-|0x3FFF  16383|
-|             | ROM
-|0x0000      0|
-+-------------+
-```
-
-
-Once the loader, the C code and the BiFrost library are all loaded from tape the
-Spectrum's memory will look like this:
-
-
-```
-+-------------+
-|0xFFFF  65535|
-|             | User Defined Graphics
-|-------------|
-|0xFF58  65368| Z88DK program's stack
-|-------------| Grows downwards, remember!
 |             |
+...
+```
+
+The example program is loaded at address 32768 as is usual for Z88DK
+programs. The BiFrost library is very particular about where it's loaded. It
+occupies the bytes from 58625 to 65280, inclusive. By default, the BiFrost tile
+map, which is the 81 byte map which BiFrost uses to map which tiles are
+onscreen, goes at address 65281. (See the __BIFROSTL_TILE_MAP entry in the
+[default BiFrost low resolution configuration
+file](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/config/config_bifrost_l.m4)).
+Those tiles occupy the 81 bytes from 65281 to 65361 inclusive. But look where
+Z88DK puts the program's stack by default: [address
+65368](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/crt_config.inc#L28). That's
+only 7 bytes above the tile map, which means the stack is bound to overwrite the
+tile map data as it grows downwards.
+
+So the first thing we have to do is move the stack somewhere safer, where it's
+got a bit of room to grow. That's what the REGISTER_SP pragma does, and as we
+saw in [installment
+6]((https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md),
+setting it to -1 leaves the stack pointer where the BASIC loader puts it, which
+in our case is address 32767, safely below our program:
+
+```
+...
+|             |
+|-------------|
+|             |
+|-------------|
+|0xFF51  65361|
+|             | BiFrost 81 byte tile map
+|0xFF01  65281|
+|-------------|
+|0xFF00  65280|
+|             | BiFrost Library
+|0xE501  58625|
+|-------------|
 |             |
 |             | Z88DK heap memory
 |             |
@@ -401,25 +419,36 @@ Spectrum's memory will look like this:
 |             |
 |0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
 |-------------|
-|             | Lower RAM, includes
-|             | sys vars, print buffer, etc.
-|             | Slower, "contended memory"
-|-------------|
-|0x5AFF  23295|
-|             | Display File (i.e. screen memory)
-|0x4000  16384|
-|-------------|
-|0x3FFF  16383|
-|             | ROM
-|0x0000      0|
-+-------------+
+|0x7FFF  32767| Z88DK program's stack
+|             |
+...
 ```
 
-### Nirvana
+The other thing we need to consider with this example is the heap. The heap
+normally fills the area between the top of the program's BSS area and the
+stack. Since we've moved the stack _below_ the BSS area, that would result in a
+heap of negative size. As discussed
+[here](https://www.z88dk.org/wiki/doku.php?id=temp:front#crt_configuration),
+Z88DK doesn't like that and will exit the program immediately if that's how it's
+set up. We get round it in this example by simply setting the heap size to zero
+bytes, which is what the second pragma instruction does. If your program does
+need a heap you'll need to use the pragma to specify it how big it needs to
+be. But don't get greedy - if your program, plus its DATA and BSS sections, plus
+its heap, all reach up beyond address 58625 your heap will wipe out the BiFrost
+library. That will not end well when your program calls it.
 
-Two versions, Nivana and Nivana+. They only differ in the screen size and what
-happens when a sprite is positioned at the edge of the screen.
+### Another BiFrost Program - High Resolution
 
-Speccy has 8x8 pixel blocks with one INK/PAPER attribute used to colour
-them. Nirvana uses what's termed a "bi-colour" pixel block which is 8x2 pixels
-with one INK/PAPER attribute. 
+### BiFrost2
+
+### Where To Go From Here
+
+Given this basic understanding of how Z88DK and BiFrost work together, the Z88DK
+BiFrost examples are the next logical step. They're
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx).
+
+Even if BiFrost isn't your thing, the lessons learned here will be useful going
+forwards. With resources so limited every byte matters in Spectrum
+programs, and it's an unforgiving environment. Get anything wrong and the
+program will crash. The programmer needs to adopt a mindset where he or she sees the
+complete picture.
