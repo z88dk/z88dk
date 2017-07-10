@@ -1,6 +1,6 @@
 # ZX Spectrum Development with Z88DK - BiFrost
 
-This is the sixth document in the series which describes how to get started
+This is the seventh document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
 with the newer, more standards compilant zsdcc C compiler. Neither the original
 sccz80 compiler nor the classic library is discussed.
@@ -8,8 +8,10 @@ sccz80 compiler nor the classic library is discussed.
 This document covers the BiFrost library which provides multicolour graphics
 support for Spectrum programs. Although this might be considered a rather niche
 topic, the discussion also covers other aspects of Z88DK which will be referred
-to in future installments. The reader is encouraged to at least skim read the
-document even if they have no particular interest in BiFrost.
+to in future installments. We introduce separately loaded libraries and the
+BASIC loader required to load them, more advanced appmake usage, and a
+makefile. The reader is encouraged to at least skim read the document even if
+they have no particular interest in BiFrost.
 
 ## Assumptions
 
@@ -40,9 +42,9 @@ you require.
 BiFrost places coloured _tiles_ within its display area. Although tiles can be
 animated and moved around to some extent, they're not the _sprite_ type of
 graphics which you might think of as floating freely around the screen. BiFrost
-isn't suitable for Space Invaders, but it will help you to write puzzle games,
-board games, strategy and turn playing games, and will do so providing a level
-of colour which the Spectrum shouldn't really be capable of.
+isn't suitable for Space Invaders, but it will help you to write puzzle games
+like Tetris, board games, strategy and turn playing games, and will do so
+providing a level of colour which the Spectrum shouldn't really be capable of.
 
 Technical limitations mean BiFrost can't use the whole screen. It's restricted
 to 18 character rows by 18 character columns. That's 144x144 pixels, as seen in
@@ -121,7 +123,9 @@ artistic abilities to the absolute limit, created the coloured ball seen below:
 
 ![alt text](images/coloured_ball_editor.png "Coloured ball")
 
-ZX Paintbrush saves ctiles in a 16KB file containing 256 tiles, so all your
+Details on how to use ZX Paintbrush to save ctiles are
+[here](https://www.worldofspectrum.org/forums/discussion/40773/redirect/p1). In
+short, ZX Paintbrush saves ctiles in a 16KB file containing 256 tiles, so all your
 tiles would normally be saved and loaded via a single file. For this example we
 only needed a single ctile, so the 64 byte file was created using ZX
 Paintbrush's export function, which will create a ctile file containing a single
@@ -196,7 +200,10 @@ tile data the assembly language file makes available. That is, the ctile data is
 the graphics tile data the program can use and place on the screen. This data is
 loaded into BiFrost's tile images data area using the BIFROSTL_resetTileImages()
 function. This area has enough space for 256 tiles, although in this example
-only the first tile, tile 0, is used - the coloured ball.
+only the first tile, tile 0, is used - the coloured ball. (In this example we
+add the constant value BIFROSTL_STATIC to the tile index. This is an indicator
+to the BiFrost engine that that we don't want BiFrost to animate the tile, which
+is a topic we're not covering here.)
 
 The BiFrost tile map is the in-memory representation of what's on the
 screen. Set a value in this array and the BiFrost engine will magically render a
@@ -221,6 +228,23 @@ data array, plus a value which indicates to the engine that this tile shouldn't
 be animated), at position 0,0 which is the top left corner. With everything in
 place we then fire up the BiFrost engine and go into an infinite loop. (If we
 return to BASIC BiFrost stops.)
+
+If you change the line:
+
+```
+BIFROSTL_setTile(0, 0, 0+BIFROSTL_STATIC);
+```
+
+to:
+
+```
+BIFROSTL_setTile(1, 1, 0+BIFROSTL_STATIC);
+```
+
+and rebuild, you'll see that the ball tile is now placed a complete tile's width
+and height further down and along the display - i.e. 16 pixels further in each
+direction. This is the restriction of working with the low resolution BiFrost
+library: it works in full tile coordinates, which are 16 pixels wide.
 
 This example program has 2 pragma instructions at the top. These are important,
 as we'll see in a few moments. First, we need to see how to build this program.
@@ -439,6 +463,110 @@ library. That will not end well when your program calls it.
 
 ### Another BiFrost Program - High Resolution
 
+Let's take a brief look at the high resolution variant of the BiFrost
+library. We're not going to linger on this topic, firstly because it's very
+similar to the low resolution variant, but also because it's very similar to
+BiFrost2 which we look at next. There's a bit more to investigate there.
+
+Here's an updated version of our low resolution, bifrost_01.c program:
+
+```
+#pragma output REGISTER_SP  = -1
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+
+#include <string.h>
+#include <arch/zx.h>
+#include <arch/zx/bifrost_h.h>
+
+extern unsigned char ctiles[];
+
+int main()
+{
+  unsigned char line, col;
+
+  BIFROSTH_resetTileImages(_ctiles);
+
+  memset(BIFROSTH_tilemap, BIFROSTH_DISABLED, 81);
+
+  zx_cls(PAPER_WHITE);
+
+  for(line = 0; line <=160; line++)
+    for(col = 0; col <= 18; col++)
+      BIFROSTH_fillTileAttrH(line, col, INK_WHITE+(8*INK_WHITE));
+
+  BIFROSTH_setTile(4, 4, 0+BIFROSTH_STATIC);
+
+  BIFROSTH_start();
+
+  line = 0;
+  col = 1;
+  while(1) {
+    BIFROSTH_halt();
+
+    if( line != 16 )
+      line++;
+
+    BIFROSTH_drawTileH(line,     col, 0);
+    BIFROSTH_drawTileH(160-line, col, 0);
+  }
+
+}
+```
+
+and its makefile:
+
+```
+all: bifrost_02.tap
+
+bifrost_02_CODE.bin: bifrost_02.c ctile.asm coloured_ball.ctile
+	zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_02.c ctile.asm -o bifrost_02
+
+bifrost_02_code.tap: bifrost_02_CODE.bin
+	appmake +zx -b bifrost_02_CODE.bin -o bifrost_02_code.tap --noloader --org 32768 --blockname bifrost_02_code
+	appmake +zx -b bifrost_02_BIFROSTH.bin -o bifrosth.tap --noloader --org 57047 --blockname bifrosth
+
+bifrost_02.tap: bifrost_02_code.tap
+	cat bifrost_loader.tap bifrost_02_code.tap bifrosth.tap > bifrost_02.tap```
+
+Let's just look at the updates we've made for high resolution mode.
+
+The main difference is the location addressing. The set tile function works the
+same way as with the low resolution code:
+
+```
+BIFROSTH_setTile(4, 4, 0+BIFROSTH_STATIC);
+```
+
+This sets the centre tile's entry in the memory map containing the tiles to be
+displayed. The ball appears in the middle of the 9x9 grid of 16x16 tiles, just
+as before.
+
+However, the function _BIFROSTH_drawTileH(line, col, tile_index)_ works
+differently. Firstly, it updates the screen directly. It doesn't work by setting
+a value in the tile map and letting the BiFrost engine do the rendering, it
+draws a tile directly into the display. Because BiFrost is precisely
+synchronised with the Spectrum's interrupt, and the BIFROSTH_drawTileH function
+must not be interrupted, it's best to call it directly after waiting for the
+interrupt, hence the BIFROST_halt function call.
+
+Also note the line numbering for both the attribute fill and the tile drawing is
+based on 160 vertical lines. That's pixel level positioning in the Y-axis. The
+columns are 0 to 18, so tiles can be placed on 8 pixel boundaries, which is
+better than the low resolution variant of BiFrost which places tiles on 16 pixel
+boundaries.
+
+One more thing: the positioning coordinate values for the high resolution
+variant of BiFrost start _outside_ the display area! Y position 0 is 16 pixels
+_above_ the display area, which means a tile placed there won't be shown. Column
+0 is off the left side of the display as well. This approach was chosen so a
+tile can be placed off the edge of the display and moved into the display a
+pixel at the time (vertically), or a character cell at a time
+(horizontally). The example above slides the top and bottom tiles into the
+display a pixel at the time.
+
+In the makefile you'll see that the BiFrost high resolution library loads at
+location 57047, so it costs you about 1.5KB over the low resolution version.
+
 ### BiFrost2
 
 ### Where To Go From Here
@@ -446,6 +574,12 @@ library. That will not end well when your program calls it.
 Given this basic understanding of how Z88DK and BiFrost work together, the Z88DK
 BiFrost examples are the next logical step. They're
 [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx).
+
+The [advanced tutorials](https://www.ime.usp.br/~einar/bifrost/), from the
+BiFrost author, describe further possibilities, including animation and
+pre-shifted tiles for horizontal pixel level precision. The timing contraints of
+BiFrost need to be explored and understood before the library can be expertly
+deployed.
 
 Even if BiFrost isn't your thing, the lessons learned here will be useful going
 forwards. With resources so limited every byte matters in Spectrum

@@ -78,8 +78,8 @@ By default the DATA section, which contains initialised data values, and the BSS
 section, which contains uninitialised data values, sit directly above the
 compiled code. The bigger the code gets, the higher in memory these sections are
 placed. The heap, which is the area of memory Z88DK's "malloc" allocates memory
-from, sits between the BSS section and the stack. In a C program, which malloc's
-and free's working memory as it runs, this heap area is the program's "working
+from, sits between the BSS section and the stack. In a C program which malloc()s
+and free()s working memory as it runs this heap area is the program's "working
 memory."
 
 So far in this series we've used the default values for the runtime
@@ -102,7 +102,7 @@ and are used like this:
 #pragma output CRT_ORG_CODE = 36864
 ```
 
-You can put these where in the source files you like. This one would push the
+You can put these anywhere in the source files you like. This one would push the
 compiled C 4KB up in memory. If you need to do something like this remember to
 change your BASIC loader to:
 
@@ -118,7 +118,7 @@ Here's an interesting pragma to move the initial stack location:
 #pragma output REGISTER_SP           = -1
 ```
 
-Setting the stack point to the special value of -1 means "don't move it." In
+Setting the stack pointer to the special value of -1 means "don't move it." In
 this case the stack will remain where the BASIC loader left it, which is just
 below the location of the CLEAR command in the loader. If your loader starts
 with:
@@ -127,9 +127,10 @@ with:
 10 CLEAR 32767
 ```
 
-the stack will start just beneath your program and grow down towards the
-screen. That's slower, contended memory, but the stack would be out of the way
-of the heap, which might be useful if your program needs lots of head space:
+and your program loads into the default location of 32768, the stack will start
+just beneath your program and grow down towards the screen. That's slower,
+contended memory, but the stack would be out of the way of the heap, which might
+be useful if your program needs lots of heap space:
 
 ```
 |             |
