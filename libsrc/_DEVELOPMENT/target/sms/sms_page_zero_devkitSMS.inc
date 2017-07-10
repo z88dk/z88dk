@@ -48,14 +48,22 @@ __RST18_SMS_crt0_RST18:
 
    defs 0x0028 - ASMPC
 
-IF (__crt_enable_rst & $20)
+IF ((__crt_enable_rst & $2020) = $20)
 
    EXTERN _z80_rst_28h
    jp     _z80_rst_28h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $2020) = $2020)
+
+   jp     __z80_rst_28h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -80,14 +88,22 @@ l_ret:
 
    defs 0x0030 - ASMPC
 
-IF (__crt_enable_rst & $40)
+IF ((__crt_enable_rst & $4040) = $40)
 
    EXTERN _z80_rst_30h
    jp     _z80_rst_30h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $4040) = $4040)
+
+   jp     __z80_rst_30h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -145,10 +161,15 @@ ENDIF
 
    defs 0x0038 - ASMPC
 
-IF (__crt_enable_rst & $80)
+IF ((__crt_enable_rst & $8080) = $80)
 
    EXTERN _z80_rst_38h
-   jp _z80_rst_38h
+   jp     _z80_rst_38h
+
+ELSE
+IF ((__crt_enable_rst & $8080) = $8080)
+
+   jp     __z80_rst_38h
 
 ELSE
 IF (__SMSLIB_ENABLE_MDPAD = 0)
@@ -161,6 +182,7 @@ ELSE
    EXTERN asm_SMSlib_isr_mdpad
    jp     asm_SMSlib_isr_mdpad
 
+ENDIF
 ENDIF
 ENDIF
 
@@ -232,16 +254,22 @@ error_mc:
 
    defs 0x0066 - ASMPC
 
-IF __crt_enable_nmi
+IF (__crt_enable_nmi = 1)
 
    EXTERN _z80_nmi
-   jp _z80_nmi
+   jp     _z80_nmi
+
+ELSE
+IF (__crt_enable_nmi > 1)
+
+   jp     __z80_nmi
 
 ELSE
 
    EXTERN asm_SMSlib_nmi_isr
    jp     asm_SMSlib_nmi_isr
 
+ENDIF
 ENDIF
 
 IF (__crt_enable_nmi <= 1)

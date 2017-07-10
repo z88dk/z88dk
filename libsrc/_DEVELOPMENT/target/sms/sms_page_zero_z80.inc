@@ -9,14 +9,22 @@
 
    defs 0x0008 - ASMPC
 
-IF (__crt_enable_rst & $02)
+IF ((__crt_enable_rst & $0202) = $02)
 
    EXTERN _z80_rst_08h
    jp     _z80_rst_08h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $0202) = $0202)
+
+   jp     __z80_rst_08h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -33,14 +41,22 @@ ENDIF
 
    defs 0x0010 - ASMPC
 
-IF (__crt_enable_rst & $04)
+IF ((__crt_enable_rst & $0404) = $04)
 
    EXTERN _z80_rst_10h
    jp     _z80_rst_10h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $0404) = $0404)
+
+   jp     __z80_rst_10h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -57,14 +73,22 @@ ENDIF
 
    defs 0x0018 - ASMPC
    
-IF (__crt_enable_rst & $08)
+IF ((__crt_enable_rst & $0808) = $08)
 
    EXTERN _z80_rst_18h
    jp     _z80_rst_18h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $0808) = $0808)
+
+   jp     __z80_rst_18h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -89,14 +113,22 @@ l_dec_de:
 
    defs 0x0020 - ASMPC
 
-IF (__crt_enable_rst & $10)
+IF ((__crt_enable_rst & $1010) = $10)
 
    EXTERN _z80_rst_20h
    jp     _z80_rst_20h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $1010) = $1010)
+
+   jp     __z80_rst_20h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -121,14 +153,22 @@ l_dec_bc:
 
    defs 0x0028 - ASMPC
 
-IF (__crt_enable_rst & $20)
+IF ((__crt_enable_rst & $2020) = $20)
 
    EXTERN _z80_rst_28h
    jp     _z80_rst_28h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $2020) = $2020)
+
+   jp     __z80_rst_28h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -153,14 +193,22 @@ l_ret:
 
    defs 0x0030 - ASMPC
 
-IF (__crt_enable_rst & $40)
+IF ((__crt_enable_rst & $4040) = $40)
 
    EXTERN _z80_rst_30h
    jp     _z80_rst_30h
 
 ELSE
 
-   jp l_ret
+   IF ((__crt_enable_rst & $4040) = $4040)
+
+   jp     __z80_rst_30h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
 
 ENDIF
 
@@ -218,17 +266,15 @@ ENDIF
 
    defs 0x0038 - ASMPC
 
-IF (__crt_enable_rst & $80)
+IF ((__crt_enable_rst & $8080) = $80)
 
    EXTERN _z80_rst_38h
-   jp _z80_rst_38h
+   jp     _z80_rst_38h
 
-   IF ((__crt_enable_rst & $8080) = $80)
-   
-      PUBLIC _z80_rst_38h_vector
-      defc   _z80_rst_38h_vector = $39
-      
-   ENDIF
+ELSE
+IF ((__crt_enable_rst & $8080) = $8080)
+
+   jp     __z80_rst_38h
 
 ELSE
 
@@ -238,6 +284,14 @@ ELSE
    ei
    ret
 
+ENDIF
+ENDIF
+
+IF ((__crt_enable_rst & $8080) = $80)
+   
+   PUBLIC _z80_rst_38h_vector
+   defc   _z80_rst_38h_vector = $39
+      
 ENDIF
 
    PUBLIC l_setmem_hl
@@ -297,15 +351,23 @@ error_lznc:
 
    defs 0x0066 - ASMPC
 
-IF __crt_enable_nmi
+IF (__crt_enable_nmi = 1)
 
    EXTERN _z80_nmi
    jp     _z80_nmi
 
 ELSE
 
+   IF (__crt_enable_nmi > 1)
+
+   jp     __z80_nmi
+
+   ELSE
+
    EXTERN l_retn
    jp     l_retn
+
+   ENDIF
 
 ENDIF
 
