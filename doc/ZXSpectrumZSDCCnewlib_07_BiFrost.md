@@ -567,7 +567,18 @@ display a pixel at the time.
 In the makefile you'll see that the BiFrost high resolution library loads at
 location 57047, so it costs you about 1.5KB over the low resolution version.
 
-### BiFrost2
+### BiFrost*2
+
+BiFrost*2 is an advancement on the original BiFrost. It's implemented to support
+the same pixel/character block level tile positioning (vertically and horizontally,
+respectively) as BiFrost's high resolution implementation, only it can do so in
+a 20x22 character cell grid. That's 160 pixels wide by 176 pixels deep:
+
+![alt text](images/bifrost2_area1.png "BiFrost*2 area")
+
+At 13KB the library is considerably larger than the high resolution variant of
+BiFrost. It loads at address 51625.
+
 
 ### Where To Go From Here
 
