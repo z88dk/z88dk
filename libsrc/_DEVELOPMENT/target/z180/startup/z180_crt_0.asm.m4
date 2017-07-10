@@ -54,7 +54,7 @@ include(`../clib_instantiate_end.m4')
 
 SECTION CODE
 
-PUBLIC __Start, __Exit, __Leave
+PUBLIC __Start, __Exit
 
 EXTERN _main
 
@@ -129,8 +129,6 @@ SECTION code_crt_main
    ; call user program
    
    call _main                  ; hl = return status
-
-__Leave:
 
    ; run exit stack
 
