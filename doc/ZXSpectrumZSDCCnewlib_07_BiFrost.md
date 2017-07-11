@@ -652,13 +652,14 @@ int main()
 
 This is very similar to the BiFrost high resolution code, except the line and
 column positioning is tweaked to access the larger display area of
-BiFrost*2. You will also notice the _BIFROST2_install()_ function call at the
-top. BiFrost*2 needs to initialise itself differently depending on the Spectrum
+BiFrost2. You will also notice the _BIFROST2_install()_ function call at the
+top. BiFrost2 needs to initialise itself differently depending on the Spectrum
 model it finds itself running on.
 
 When you run this you'll also notice the artefacts the horizontally moving ball
 leaves just off the sides of the BiFrost*2 display area. This is where the
-border with the same colour INK and PAPER comes in handy.
+tricky of using the border with the same colour INK and PAPER as described above
+comes in handy.
 
 As an extra bonus at the end of this article, let's skip the makefile and use a
 different approach for building. Use these commands to build the example:
