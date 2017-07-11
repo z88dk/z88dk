@@ -260,11 +260,11 @@ We can compile our little program with this:
 zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_01.c ctile.asm -o bifrost_01
 ```
 
-We use crt31 since we're not using the standard IO. Also note there's no
+We use crt31 since we're not using Z88DK's standard IO. Also note there's no
 specific mention of the BiFrost library on the compile line. For Spectrum
 programs Z88DK's standard library makes BiFrost available automatically.
 
-Once this has run you'll notice it's created two binary files in the local
+Once this has run you'll notice it's created _two_ binary files in the local
 directory:
 
 ```
@@ -272,12 +272,14 @@ bifrost_01_CODE.bin
 bifrost_01_BIFROSTL.bin
 ```
 
-The first of those is programmer's code, the second is the BiFrost
-library. These files contain raw machine code, so we need to convert them into
-.TAP files which the Spectrum can load via the BASIC loader we've already
+The first of those is programmer's code, the second is the BiFrost library. The
+generation of 2 separate files is a feature of the linker and how it responds to
+the way BiFrost is implemented in Z88DK. For now just accept that that's the way
+it does it. These files contain raw machine code, so we need to convert them
+into .TAP files which the Spectrum can load via the BASIC loader we've already
 created. In previous examples we've used zcc's -create-app option to do this
 step, but since we're now working with multiple code files which are beyond
-zcc's remit we need to do it manually. 
+zcc's remit we need to do it manually.
 
 The command to convert a binary machine code file to a .TAP file is _appmake_
 and for our first piece of code we build a command as follows.
