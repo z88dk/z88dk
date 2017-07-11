@@ -468,11 +468,11 @@ library. That will not end well when your program calls it.
 #### High Resolution BiFrost
 
 Let's take a brief look at the two high resolution variants of the BiFrost
-library. There are BiFrost_h and BiFrost*2. In practical terms there isn't a
-great deal of difference in the use of these variants over the use of the low
-resolution variant. All the principles we've discussed so far apply in the same
-way. The main differences are coordinate specification in the code and how much
-memory the library code takes up.
+library. These are BiFrost_h and BiFrost*2. As far as the programming interface
+is concerned there isn't a great deal of difference in the use of these variants
+over the use of the low resolution variant. All the principles we've discussed
+so far apply in the same way. The main differences are coordinate specification
+in the code and how much memory the library code takes up.
 
 Here's an updated version of our low resolution, bifrost_01.c program, reworked
 for the BiFrost high resolution library:
@@ -546,8 +546,8 @@ BIFROSTH_setTile(4, 4, 0+BIFROSTH_STATIC);
 ```
 
 This sets the centre tile's entry in the memory map containing the tiles to be
-displayed. The ball appears in the middle of the 9x9 grid of 16x16 tiles, just
-as before.
+displayed. The ball appears in the middle of the 9x9 grid of 16x16 pixel tiles,
+just as before.
 
 However, the function _BIFROSTH_drawTileH(line, col, tile_index)_ works
 differently. Firstly, it updates the screen directly. It doesn't work by setting
@@ -576,8 +576,9 @@ typically one character cell wide and has the INK and PAPER set the same. This
 hides any artefacts caused by partially visible tiles being outside the area
 BiFrost controls.
 
-In the makefile you'll see that the BiFrost high resolution library loads at
-location 57047, so it costs you about 1.5KB over the low resolution version.
+In the makefile you'll see that the BiFrost high resolution library has to be
+loaded at location 57047, so it costs you about 1.5KB over the low resolution
+version.
 
 #### BiFrost*2
 
@@ -649,13 +650,15 @@ int main()
 }
 ```
 
-This is very similar to the BiFrost high resolution code, except the line/column
-positioning is tweaked to access the larger display area of BiFrost*2. You'll
-also notice the _BIFROST2_install()_ function call the top. BiFrost*2 needs to
-initialise itself differently depending in the Spectrum model it finds itself
-running on. When you run this you'll also notice the artefacts the horizontally
-moving ball leaves just off the sides of the BiFrost*2 display area. This is
-where the border with the same colour INK and PAPER comes in handy.
+This is very similar to the BiFrost high resolution code, except the line and
+column positioning is tweaked to access the larger display area of
+BiFrost*2. You will also notice the _BIFROST2_install()_ function call at the
+top. BiFrost*2 needs to initialise itself differently depending on the Spectrum
+model it finds itself running on.
+
+When you run this you'll also notice the artefacts the horizontally moving ball
+leaves just off the sides of the BiFrost*2 display area. This is where the
+border with the same colour INK and PAPER comes in handy.
 
 As an extra bonus at the end of this article, let's skip the makefile and use a
 different approach for building. Use these commands to build the example:
@@ -669,8 +672,9 @@ appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03
 The -m option to zcc causes it to output a _map_ file. The map is a text file
 containing the address of all the symbols the compiler used in generating its
 output. You can use it to find the location of main(), BiFrost, the tile
-buffers, etc. In this build, the first run of appmake uses the +glue target and
-(by implication) the map file to generate a single TAP file containing the C
+buffers, etc., which can be useful when working with a disassembler, debugger or
+memory monitor. In this build, the first run of appmake uses the +glue target
+and (by implication) the map file to generate a single TAP file containing the C
 program and the BiFrost*2 library. It _glues_ the two binary pieces together,
 filling the hole between them with zeroes. This negates the need for the BASIC
 loader we've used throughout the examples, which loads two piece of CODE. The
