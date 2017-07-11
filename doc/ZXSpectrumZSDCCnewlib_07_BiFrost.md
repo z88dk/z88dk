@@ -530,7 +530,8 @@ bifrost_02_code.tap: bifrost_02_CODE.bin
 	appmake +zx -b bifrost_02_BIFROSTH.bin -o bifrosth.tap --noloader --org 57047 --blockname bifrosth
 
 bifrost_02.tap: bifrost_02_code.tap
-	cat bifrost_loader.tap bifrost_02_code.tap bifrosth.tap > bifrost_02.tap```
+	cat bifrost_loader.tap bifrost_02_code.tap bifrosth.tap > bifrost_02.tap
+```
 
 Let's just look at the updates we've made for high resolution mode.
 
