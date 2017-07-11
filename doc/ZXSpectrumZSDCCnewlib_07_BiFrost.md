@@ -658,7 +658,7 @@ model it finds itself running on.
 
 When you run this you'll also notice the artefacts the horizontally moving ball
 leaves just off the sides of the BiFrost*2 display area. This is where the
-tricky of using the border with the same colour INK and PAPER as described above
+trick of using the border with the same colour INK and PAPER as described above
 comes in handy.
 
 As an extra bonus at the end of this article, let's skip the makefile and use a
@@ -671,7 +671,7 @@ appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03
 ```
 
 The -m option to zcc causes it to output a _map_ file. The map is a text file
-containing the address of all the symbols the compiler used in generating its
+containing the addresses of all the symbols the compiler used in generating its
 output. You can use it to find the location of main(), BiFrost, the tile
 buffers, etc., which can be useful when working with a disassembler, debugger or
 memory monitor. In this build, the first run of appmake uses the +glue target
@@ -679,7 +679,7 @@ and (by implication) the map file to generate a single TAP file containing the C
 program and the BiFrost*2 library. It _glues_ the two binary pieces together,
 filling the hole between them with zeroes. This negates the need for the BASIC
 loader we've used throughout the examples, which loads two piece of CODE. The
-second call the appmake takes this one large binary file and wraps a standard
+second call to appmake takes this one large binary file and wraps a standard
 BASIC loader around it.
 
 The +glue approach is much less fussy than building the two separate binary
