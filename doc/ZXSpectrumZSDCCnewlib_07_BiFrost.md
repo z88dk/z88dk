@@ -125,9 +125,9 @@ artistic abilities to the absolute limit, created the coloured ball seen below:
 
 Details on how to use ZX Paintbrush to save ctiles are
 [here](https://www.worldofspectrum.org/forums/discussion/40773/redirect/p1). In
-short, ZX Paintbrush saves ctiles in a 16KB file containing 256 tiles, so all your
-tiles would normally be saved and loaded via a single file. For this example we
-only needed a single ctile, so the 64 byte file was created using ZX
+short, ZX Paintbrush saves ctiles in a 16KB file containing 256 tiles, so all
+your tiles would normally be saved and loaded via a single file. For this
+example we only needed a single ctile, so the 64 byte file was created using ZX
 Paintbrush's export function, which will create a ctile file containing a single
 ctile.
 
@@ -154,7 +154,8 @@ called __ctiles_, the leading underscore of which exports it so it's visible to
 the C program, as we'll see in a moment.
 
 The assembler's BINARY command loads the binary data from the named file, which
-is the output from ZX Paintbrush.
+is the output from ZX Paintbrush. The ctile file is available
+[here](https://github.com/z88dk/z88dk/tree/master/doc/resources/coloured_ball.ctile)
 
 ### A Simple BiFrost Program - Low Resolution
 
@@ -461,14 +462,17 @@ be. But don't get greedy - if your program, plus its DATA and BSS sections, plus
 its heap, all reach up beyond address 58625 your heap will wipe out the BiFrost
 library. That will not end well when your program calls it.
 
-### Another BiFrost Program - High Resolution
+#### High Resolution BiFrost
 
-Let's take a brief look at the high resolution variant of the BiFrost
-library. We're not going to linger on this topic, firstly because it's very
-similar to the low resolution variant, but also because it's very similar to
-BiFrost2 which we look at next. There's a bit more to investigate there.
+Let's take a brief look at the two high resolution variants of the BiFrost
+library. There are BiFrost_h and BiFrost*2. In practical terms there isn't a
+great deal of difference in the use of these variants over the use of the low
+resolution variant. All the principles we've discussed so far apply in the same
+way. The main differences are coordinate specification in the code and how much
+memory the library code takes up.
 
-Here's an updated version of our low resolution, bifrost_01.c program:
+Here's an updated version of our low resolution, bifrost_01.c program, reworked
+for the BiFrost high resolution library:
 
 ```
 #pragma output REGISTER_SP  = -1
@@ -530,7 +534,7 @@ bifrost_02.tap: bifrost_02_code.tap
 
 Let's just look at the updates we've made for high resolution mode.
 
-The main difference is the location addressing. The set tile function works the
+The main difference is the screen location positioning. The set tile function works the
 same way as with the low resolution code:
 
 ```
@@ -546,14 +550,14 @@ differently. Firstly, it updates the screen directly. It doesn't work by setting
 a value in the tile map and letting the BiFrost engine do the rendering, it
 draws a tile directly into the display. Because BiFrost is precisely
 synchronised with the Spectrum's interrupt, and the BIFROSTH_drawTileH function
-must not be interrupted, it's best to call it directly after waiting for the
+must not be interrupted, it must be called directly after waiting for the
 interrupt, hence the BIFROST_halt function call.
 
-Also note the line numbering for both the attribute fill and the tile drawing is
-based on 160 vertical lines. That's pixel level positioning in the Y-axis. The
-columns are 0 to 18, so tiles can be placed on 8 pixel boundaries, which is
-better than the low resolution variant of BiFrost which places tiles on 16 pixel
-boundaries.
+Also note the line numbering (Y-axis) for both the attribute fill and the tile
+drawing is based on 160 vertical lines. That's pixel level positioning in the
+Y-axis. The columns are 0 to 18, so tiles can be placed on 8 pixel boundaries,
+which is better than the low resolution variant of BiFrost which places tiles on
+16 pixel horizontal boundaries.
 
 One more thing: the positioning coordinate values for the high resolution
 variant of BiFrost start _outside_ the display area! Y position 0 is 16 pixels
@@ -562,22 +566,129 @@ _above_ the display area, which means a tile placed there won't be shown. Column
 tile can be placed off the edge of the display and moved into the display a
 pixel at the time (vertically), or a character cell at a time
 (horizontally). The example above slides the top and bottom tiles into the
-display a pixel at the time.
+display a pixel at the time. Many BiFrost program which take advantage of this
+approach place a border around the BiFrost display area. This border is
+typically one character cell wide and has the INK and PAPER set the same. This
+hides any artefacts caused by partially visible tiles being outside the area
+BiFrost controls.
 
 In the makefile you'll see that the BiFrost high resolution library loads at
 location 57047, so it costs you about 1.5KB over the low resolution version.
 
-### BiFrost*2
+#### BiFrost*2
 
-BiFrost*2 is an advancement on the original BiFrost. It's implemented to support
-the same pixel/character block level tile positioning (vertically and horizontally,
-respectively) as BiFrost's high resolution implementation, only it can do so in
-a 20x22 character cell grid. That's 160 pixels wide by 176 pixels deep:
+BiFrost*2 is an advancement on the BiFrost concept, released 4 years after the
+original BiFrost. It's implemented to support the same pixel/character block
+level tile positioning (vertically and horizontally, respectively) as BiFrost's
+high resolution implementation, only it can do so in a 20x22 character cell
+grid. That's 160 pixels wide by 176 pixels deep:
 
 ![alt text](images/bifrost2_area1.png "BiFrost*2 area")
 
 At 13KB the library is considerably larger than the high resolution variant of
-BiFrost. It loads at address 51625.
+BiFrost, although you can reduce its display size by tweaking its [compile
+time](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/config/config_bifrost_2.m4)
+options. By default it loads at address 51625.
+
+Here's an example which animates our ball twice, once vertically and once
+horizontally:
+
+```
+#pragma output REGISTER_SP  = -1
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+
+#include <string.h>
+#include <arch/zx.h>
+#include <arch/zx/bifrost2.h>
+
+extern unsigned char ctiles[];
+
+int main()
+{
+  unsigned char line, col;
+
+  zx_border(INK_BLACK);
+
+  BIFROST2_install();
+
+  BIFROST2_resetTileImages(_ctiles);
+
+  memset(BIFROST2_tilemap, BIFROST2_DISABLED, 110);
+
+  zx_cls(PAPER_WHITE);
+
+  for(line = 0; line <=192; line++) {
+    for(col = 0; col <= 20; col++) {
+      BIFROST2_fillTileAttrH(line, col, INK_WHITE+(8*INK_WHITE));
+    }
+  }
+
+  BIFROST2_start();
+
+  col = 0;
+
+  while(1) {
+    for( line=0; line<=192; line++ ) {
+
+      BIFROST2_halt();
+
+      BIFROST2_fillTileAttrH(line-1,10,INK_WHITE+(8*INK_WHITE));
+      BIFROST2_drawTileH(line, 10, 0);
+
+      BIFROST2_fillTileAttrH(80,col-1,INK_WHITE+(8*INK_WHITE));
+      BIFROST2_drawTileH(80, col, 0);
+      if( ++col == 21 )
+	col = 0;
+    }
+  }
+
+}
+```
+
+This is very similar to the BiFrost high resolution code, except the line/column
+positioning is tweaked to access the larger display area of BiFrost*2. You'll
+also notice the _BIFROST2_install()_ function call the top. BiFrost*2 needs to
+initialise itself differently depending in the Spectrum model it finds itself
+running on. When you run this you'll also notice the artefacts the horizontally
+moving ball leaves just off the sides of the BiFrost*2 display area. This is
+where the border with the same colour INK and PAPER comes in handy.
+
+As an extra bonus at the end of this article, let's skip the makefile and use a
+different approach for building. Use these commands to build the example:
+
+```
+zcc +zx -vn -m -startup=31 -clib=sdcc_iy bifrost_03.c ctile.asm -o bifrost_03
+appmake +glue -b bifrost_03 --filler 0 --clean
+appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03.tap
+```
+
+The -m option to zcc causes it to output a _map_ file. The map is a text file
+containing the address of all the symbols the compiler used in generating its
+output. You can use it to find the location of main(), BiFrost, the tile
+buffers, etc. In this build, the first run of appmake uses the +glue target and
+(by implication) the map file to generate a single TAP file containing the C
+program and the BiFrost*2 library. It _glues_ the two binary pieces together,
+filling the hole between them with zeroes. This negates the need for the BASIC
+loader we've used throughout the examples, which loads two piece of CODE. The
+second call the appmake takes this one large binary file and wraps a standard
+BASIC loader around it.
+
+The +glue approach is much less fussy than building the two separate binary
+files and a special BASIC loader to get them into place. The drawback is the
+much larger LOADable file, which is mainly full of zeroes. With emulators this
+isn't a problem as loading from "tape" is instantaneous, so +glue is the best
+option for development work.
+
+
+### Conclusion
+
+This has been a long and rather complicated story. BiFrost is clever software
+which opens up a whole host of possibilities for the Spectrum programmer, and
+its interface with Z88DK makes it available for C programmers.
+
+BiFrost is also rather involved and complex to deal with; we've used this
+complexity to introduce a host of new concepts, features and approaches which
+the Z88DK programmer will hopefully find useful as we move forward.
 
 
 ### Where To Go From Here
@@ -593,7 +704,7 @@ BiFrost need to be explored and understood before the library can be expertly
 deployed.
 
 Even if BiFrost isn't your thing, the lessons learned here will be useful going
-forwards. With resources so limited every byte matters in Spectrum
-programs, and it's an unforgiving environment. Get anything wrong and the
-program will crash. The programmer needs to adopt a mindset where he or she sees the
-complete picture.
+forwards. With resources so limited every byte matters in Spectrum programs, and
+it's an unforgiving environment. Get anything wrong and the program will
+crash. The programmer needs to adopt a mindset where he or she sees the complete
+picture.
