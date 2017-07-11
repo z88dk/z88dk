@@ -282,7 +282,7 @@ step, but since we're now working with multiple code files which are beyond
 zcc's remit we need to do it manually.
 
 The command to convert a binary machine code file to a .TAP file is _appmake_
-and for our first piece of code we build a command as follows.
+and for our piece of code we build a command as follows.
 
 Our target machine, as ever, will be a ZX Spectrum:
 
@@ -367,8 +367,8 @@ towards the top left corner of the screen.
 ### Memory Map and the Pragmas
 
 The example program has 2 pragma instructions to the compiler at the top. The
-use of pragmas was covered in [installment
-6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
+use of pragmas was covered in
+[installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
 of this series. Of more interest is _why_ they are needed here.
 
 Without the pragmas the memory map of the program, together with the BiFrost
@@ -418,8 +418,7 @@ tile map data as it grows downwards.
 
 So the first thing we have to do is move the stack somewhere safer, where it's
 got a bit of room to grow. That's what the REGISTER_SP pragma does, and as we
-saw in [installment
-6]((https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md),
+saw in [installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md),
 setting it to -1 leaves the stack pointer where the BASIC loader puts it, which
 in our case is address 32767, safely below our program:
 
