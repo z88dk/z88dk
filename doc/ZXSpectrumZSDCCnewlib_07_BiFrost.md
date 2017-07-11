@@ -10,8 +10,8 @@ support for Spectrum programs. Although this might be considered a rather niche
 topic, the discussion also covers other aspects of Z88DK which will be referred
 to in future installments. We introduce separately loaded libraries and the
 BASIC loader required to load them, more advanced appmake usage, and a
-makefile. The reader is encouraged to at least skim read the document even if
-they have no particular interest in BiFrost.
+makefile. The reader is encouraged to read the document even if they have no
+particular interest in BiFrost.
 
 ## Assumptions
 
@@ -32,7 +32,7 @@ same way as the Spectrum's native 8x8 pixel blocks which have the INK and PAPER
 attributes, but since BiFrost's blocks occupy 1 pixel row instead of 8, the
 programmer can get a much more colourful display.
 
-There are 2 versions of BiFrost: the original and BiFrost2. Somewhat
+There are 2 versions of BiFrost: the original and BiFrost*2. Somewhat
 confusingly, the original BiFrost also comes in 2 versions, low resolution and
 high resolution. Which of the 3 versions you chose depends on what capabilities
 you require.
@@ -53,15 +53,16 @@ green:
 ![alt text](images/bifrost_area1.png "BiFrost area")
 
 The low resolution version of BiFrost can place a 16x16 pixel multicolour "tile"
-at 8 pixel boundaries, i.e. aligned to character locations. The high resolution
-version of BiFrost can place a multicolour tile at any vertical pixel, although
-still aligned to 8 pixel horizonal coordinates, at the expense of more memory
+at 16 pixel boundaries, i.e. aligned to every other character location. The high
+resolution version of BiFrost can place a multicolour tile at any vertical pixel
+aligned to 8 pixel horizonal coordinates, at the expense of more memory
 consumption and greater CPU processing requirement over the low resolution
 version.
 
-BiFrost2 is an improvement on the high resolution version of BiFrost. It can
-place a 16x16 pixel multicolour tile at any vertical pixel, and can do so within
-a 20x22 character grid. That's a 160x176 pixel area of the screen.
+BiFrost*2 is an improvement on the high resolution version of BiFrost. It can
+place a 16x16 pixel multicolour tile at any vertical pixel, on any 8 pixel
+horizontal boundary, and can do so within a 20x22 character grid. That's a
+160x176 pixel area of the screen.
 
 ## A BiFrost Program BASIC Loader
 
