@@ -150,3 +150,8 @@ demonstrated a couple of useful features of zcc. It's a powerful and flexible
 tool which is worth exploring, and is documented
 [here](https://www.z88dk.org/wiki/doku.php?id=zcc)
 
+### Where To Go From Here
+
+The next installment in this series takes a step back and looks at some of the
+details of how Z88DK C programs are arranged in memory.
+Part 6 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
