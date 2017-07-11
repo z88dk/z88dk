@@ -9,9 +9,9 @@ SECTION CODE
 
 org __crt_org_code
 
-IF __crt_org_vector_table < 0
+IF (__crt_org_vector_table = -0x80) || (__crt_org_vector_table = -0x100)
 
-section code_vector
+section interrupt_vectors
 section code_crt_start
 
 ENDIF
@@ -21,6 +21,12 @@ section code_crt_main
 section code_crt_exit
 section code_crt_return
 section code_crt_common
+
+IF (__crt_org_vector_table) && (__crt_org_vector_table != -0x80) && (__crt_org_vector_table != -0x100)
+
+section interrupt_vectors
+
+ENDIF
 
 section code_driver
 section code_font
@@ -70,6 +76,7 @@ section data_align_8
 section data_align_4
 section data_align_2
 
+section smc_jump_vectors
 section smc_driver
 section smc_font
 section smc_clib
@@ -132,11 +139,11 @@ SECTION BSS_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_org_vector_table >= 0
+IF (__crt_org_vector_table = 0)
 
-SECTION code_vector
-org __crt_org_vector_table
+section interrupt_vectors
+org 0
 
 ENDIF
 
-;; end memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

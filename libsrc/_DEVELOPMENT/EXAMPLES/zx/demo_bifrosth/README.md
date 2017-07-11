@@ -3,6 +3,8 @@
 [Original Documentation](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/arch/zx/bifrost_h)  
 [Plain Header File in Z88DK](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/clang/arch/zx/bifrost_h.h)
 
+The examples from the author's tutorial series "Bifrost* Advanced Programming" have been updated and reproduced here.
+
 Before using Bifrost_H, it should be configured.
 
 The default configuration is:
@@ -31,7 +33,7 @@ This program assumes the default configuration so nothing needs to be done to co
 ## Bifrost_H Configuration
 
 However in other circumstances, the bifrost_h target configuration file should be edited to change the settings
-("z88dk/libsrc/_DEVELOPMENT/target/zx/config_bifrost_h.m4") and then the zx library should be rebuilt by running:
+("z88dk/libsrc/_DEVELOPMENT/target/zx/config/config_bifrost_h.m4") and then the zx library should be rebuilt by running:
 
 `Winmake zx` (windows)  
 `make TARGET=zx` (other)

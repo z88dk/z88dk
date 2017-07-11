@@ -54,7 +54,7 @@ include(`../clib_instantiate_end.m4')
 
 SECTION CODE
 
-PUBLIC __Start, __Exit, __Leave
+PUBLIC __Start, __Exit
 
 EXTERN _main
 
@@ -85,18 +85,7 @@ ENDIF
 
 __Start:
 
-   IF __page_zero_present = 0
-   
-      include "../crt_start_di.inc"
-   
-   ENDIF
-
-   EXTERN __code_vector_head
-   
-   ld a,__code_vector_head/256
-   ld i,a
-
-   include "../crt_set_interrupt_mode.inc"
+   include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -128,6 +117,10 @@ __Restart_2:
 
    include "../clib_init_bss.inc"
 
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -136,8 +129,6 @@ SECTION code_crt_main
    ; call user program
    
    call _main                  ; hl = return status
-
-__Leave:
 
    ; run exit stack
 

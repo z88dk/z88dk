@@ -1,12 +1,4 @@
-z180/z180/__z180_nmi
-z180/z180/__z180_rst_08h
-z180/z180/__z180_rst_10h
-z180/z180/__z180_rst_18h
-z180/z180/__z180_rst_20h
-z180/z180/__z180_rst_28h
-z180/z180/__z180_rst_30h
-z180/z180/__z180_rst_38h
-z180/z180/__z180_trap
+z180/z180/__Unhandled_Trap
 z180/z180/asm_z180_delay_ms
 z180/z180/asm_z180_delay_tstate
 z180/z180/asm_z180_get_int_state

@@ -16,7 +16,8 @@ zx_01_output_char_32_oterm_msg_cls:
    call l_offset_ix_de         ; hl = window.rect *
    
    push hl
-   ld l,(ix+25)                ; l = background colour
+   ld l,(ix+23)                ; l = foreground colour
+   ld (ix+25),l                ; foreground colour copied to background colour
    
    ex (sp),ix                  ; ix = window.rect *
    call asm_zx_cls_wc
