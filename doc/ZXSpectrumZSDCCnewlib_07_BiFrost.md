@@ -69,7 +69,7 @@ horizontal boundary, and can do so within a 20x22 character grid. That's a
 BiFrost based programs created with Z88DK LOAD in a slightly different way to
 most Spectrum programs. The compliation process generates _two_ blocks of
 machine code. The first is the programmer's code, the compiled C, as usual. The
-second is the BiFrost library itself, which is loaded separately into a
+second is the BiFrost library itself, which needs to be loaded separately into a
 specifically allocated area of high memory. The details of why aren't really
 important at this getting started level. The important thing is to understand
 the loading process the Spectrum will have to go through:
@@ -155,7 +155,8 @@ called __ctiles_, the leading underscore of which exports it so it's visible to
 the C program, as we'll see in a moment.
 
 The assembler's BINARY command loads the binary data from the named file, which
-is the output from ZX Paintbrush. The ctile file is available
+is the output from ZX Paintbrush. For those following along, the ctile file is
+available
 [here](https://github.com/z88dk/z88dk/tree/master/doc/resources/coloured_ball.ctile)
 
 ### A Simple BiFrost Program - Low Resolution
