@@ -35,7 +35,7 @@ libsrc/_DEVELOPMENT/target/zx/crt_config.inc
 Skim read this file and you'll find the CRT_ORG_CODE value set to 32768. You'll
 also find the stack register is initially set to 65368 (REGISTER_SP) which
 places it immediately below the user defined graphics area. This is so that if
-the program returns to BASIC the UDGs will still be intact. The stack size is
+the program returns to BASIC the UDGs will still be intact. The stack size is set to 
 512 bytes. There's quite a few other things in there too, and they're documented
 [here](https://www.z88dk.org/wiki/doku.php?id=temp:front#crt_configuration).
 
@@ -45,22 +45,25 @@ So by default the Spectrum's memory map for a Z88DK program is:
 +-------------+
 |0xFFFF  65535|
 |             | User Defined Graphics
+|0xFF58  65368| <-- SP
 |-------------|
-|0xFF58  65368| Z88DK program's stack
-|-------------| Grows downwards, remember!
-|             |
+|0xFF58  65367| Z88DK program's stack
+| (512 bytes) | Grows downwards, remember!
+|0xFD57  64855|
+|-------------|
+|0xFD56  64854|
 |             |
 |             | Z88DK heap memory
 |             |
 |             |
 |-------------|
-|             | Z88DK BSS section  (CRT_BSS_DATA)
+|             | Z88DK BSS section  (CRT_ORG_BSS)
 |             | Z88DK DATA section (CRT_ORG_DATA)
 |-------------| ^^^
 |             |
 |0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
 |-------------|
-|             | Lower RAM, includes
+|             | Lower RAM, includes basic program,
 |             | sys vars, print buffer, etc.
 |             | Slower, "contended memory"
 |-------------|
@@ -74,12 +77,12 @@ So by default the Spectrum's memory map for a Z88DK program is:
 +-------------+
 ```
 
-By default the DATA section, which contains initialised data values, and the BSS
-section, which contains uninitialised data values, sit directly above the
+By default the DATA section, which contains initialised variables, and the BSS
+section, which contains uninitialised variables, sit directly above the
 compiled code. The bigger the code gets, the higher in memory these sections are
 placed. The heap, which is the area of memory Z88DK's "malloc" allocates memory
 from, sits between the BSS section and the stack. In a C program which malloc()s
-and free()s working memory as it runs this heap area is the program's "working
+and free()s working memory as it runs, this heap area is the program's "dynamic
 memory."
 
 So far in this series we've used the default values for the runtime
@@ -87,30 +90,34 @@ configuration so our programs will have run in a layout like the one shown
 above. But we're heading into places where we need to be more aware of what's
 going on, so getting a mental picture of the above layout will be useful.
 
-### Changing the Layout
+### Changing the Memory Layout
 
-There are two ways to change the default layout a Z88DK C program will run
-in. The first is to change the values in a crt_cfg.inc file and rebuild
-Z88DK. We're not going to cover this approach here.
+There are several ways to change the default settings of a Z88DK compile but the
+simplest approach is to use special statements called _pragma_s to change these
+settings.  Pragmas are compiler specific extensions to the C language that can
+override the default CRT configuration at compile time.
 
-The simpler approach is to use a special statement in your C code called a
-_pragma_. These are compiler specific extensions to the C language. Pragmas can
-be used to override the default CRT configuration values from within the C code,
-and are used like this:
+For a large project, these pragmas can be collected into a single file, for example
+"zpragma.inc", and can be incorporated into the compile using `-pragma-include:zpragma.inc`
+on the compile line.
+
+However for small projects with few source files, it can be more convenient just
+to include them within the C code itself like this:
 
 ```
 #pragma output CRT_ORG_CODE = 36864
 ```
 
 You can put these anywhere in the source files you like. This one would push the
-compiled C 4KB up in memory. If you need to do something like this remember to
-change your BASIC loader to:
+compiled C 4KB up in memory from the usual org address of 32768. If you need to do
+something like this remember to change your BASIC loader to:
 
 ```
 RANDOMIZE USR 36864
 ```
 
-since that's where your code will now be loaded.
+since that's where your code will now be loaded.  If you use `-create-app` on the
+compile line, z88dk automatically does this for you in the tap file it creates.
 
 Here's an interesting pragma to move the initial stack location:
 
@@ -152,18 +159,19 @@ The default heap size on Spectrum programs is set to -1, which is a special
 value which says "use all the memory above the program's BBS section and the
 below the stack for heap." This is frequently the best option since it allows
 the program to malloc as much memory as possible as it needs it. The problem is
-that the memory is initialised to zeroes:
+that the heap memory is formatted for allocation with malloc():
 
 ```
 |             |
 |-------------|
 |0xFF58  65368| Z88DK program's stack
-|-------------| Grows downwards, remember!
-|0000000000000|
-|0000000000000|
-|0000000000000| Z88DK heap memory
-|0000000000000|
-|0000000000000|
+| (512 bytes) | Grows downwards, remember!
+|-------------|
+|xxxxxxxxxxxxx|
+|xxxxxxxxxxxxx|
+|xxxxxxxxxxxxx| Z88DK heap memory
+|xxxxxxxxxxxxx|
+|xxxxxxxxxxxxx|
 |-------------|
 |             | Z88DK BSS section  (CRT_BSS_DATA)
 |             | Z88DK DATA section (CRT_ORG_DATA)
@@ -175,7 +183,7 @@ that the memory is initialised to zeroes:
 ```
 
 Normally that's fine, but if you've already loaded something else into that
-memory, having it initialised (i.e. reset to zeroes) in order to use as heap
+memory, having it initialised (e.g. reset to zeroes) in order to use as heap
 would be unwelcome. Specifically setting a heap size to zero (or, if you do
 actually need some heap, any other amount which leaves your valuable memory
 areas alone) stops this initialisation of memory. As we'll see in another

@@ -188,7 +188,7 @@ int main()
 
   for(row = 1; row <=17; row++)
     for(col = 1; col <= 17; col+=2)
-      BIFROSTL_fillTileAttrL(row, col, INK_WHITE+(8*INK_WHITE));
+      BIFROSTL_fillTileAttrL(row, col, INK_WHITE+PAPER_WHITE);
 
   BIFROSTL_setTile(0, 0, 0+BIFROSTL_STATIC);
 
@@ -198,11 +198,14 @@ int main()
 }
 ```
 
-This C program references the external symbol _ctiles_ which is the array of
-tile data the assembly language file makes available. That is, the ctile data is
-the graphics tile data the program can use and place on the screen. This data is
-loaded into BiFrost's tile images data area using the BIFROSTL_resetTileImages()
-function. This area has enough space for 256 tiles, although in this example
+The C program references the external symbol _ctiles_ which the C compiler
+changes to include a leading underscore `_ctiles` when it translates the C
+to assembler.  `_ctiles` is the tile data that the assembly language file
+makes available. That is, the ctile data is
+the graphics tile data the program can use and place on the screen. Bifrost is
+told to change its tile images area to the location of this ctile using the
+BIFROSTL_resetTileImages() function. The tile images area can hold up to 256 tiles,
+although in this example
 only the first tile, tile 0, is used - the coloured ball. (In this example we
 add the constant value BIFROSTL_STATIC to the tile index. This is an indicator
 to the BiFrost engine that that we don't want BiFrost to animate the tile, which
@@ -221,10 +224,7 @@ values in the BIFROSTL_tilemap array.
 
 We start our example by reseting all the BIFROSTL_tilemap entries to
 BIFROSTL_DISABLED which ensures no tiles are rendered to start with, then we set
-the attributes of the display area to all white. (Note the rather unusual
-looking values used in the two loops around the call to
-BIFROSTL_fillTileAttrL() - this is explained in the [function's entry in the header
-file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/bifrost_l.h).
+the attributes of the display area to all white.
 
 We then place our single tile, the coloured ball (index 0 in our tiles image
 data array, plus a value which indicates to the engine that this tile shouldn't
@@ -248,6 +248,9 @@ and rebuild, you'll see that the ball tile is now placed a complete tile's width
 and height further down and along the display - i.e. 16 pixels further in each
 direction. This is the restriction of working with the low resolution BiFrost
 library: it works in full tile coordinates, which are 16 pixels wide.
+
+You may want to check out the available BIFROSTL functions in the
+[header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/bifrost_l.h).
 
 This example program has 2 pragma instructions at the top. These are important,
 as we'll see in a few moments. First, we need to see how to build this program.
@@ -383,13 +386,13 @@ library, would look like this:
 |0xFF51  65361|
 |             | BiFrost 81 byte tile map
 |0xFF01  65281|
-|-------------|
-|0xFF00  65280|
-|             | BiFrost Library
-|0xE501  58625|
-|-------------|
-|             |
-|             | Z88DK heap memory
+|-------------|                    
+|0xFF00  65280|                  <--+ (64854)
+|             | BiFrost Library     |
+|0xE501  58625|                     |
+|-------------|                     |
+|             |                     |
+|             | Z88DK heap memory --+
 |             |
 |             |
 |-------------|
@@ -438,7 +441,7 @@ in our case is address 32767, safely below our program:
 |-------------|
 |             |
 |             | Z88DK heap memory
-|             |
+|             | (error - negative size)
 |             |
 |-------------|
 |             | Z88DK BSS section  (CRT_BSS_DATA)
@@ -460,7 +463,7 @@ heap of negative size. As discussed
 Z88DK doesn't like that and will exit the program immediately if that's how it's
 set up. We get round it in this example by simply setting the heap size to zero
 bytes, which is what the second pragma instruction does. If your program does
-need a heap you'll need to use the pragma to specify it how big it needs to
+need a heap you'll need to use the pragma to specify how big it needs to
 be. But don't get greedy - if your program, plus its DATA and BSS sections, plus
 its heap, all reach up beyond address 58625 your heap will wipe out the BiFrost
 library. That will not end well when your program calls it.
@@ -499,7 +502,7 @@ int main()
 
   for(line = 0; line <=160; line++)
     for(col = 0; col <= 18; col++)
-      BIFROSTH_fillTileAttrH(line, col, INK_WHITE+(8*INK_WHITE));
+      BIFROSTH_fillTileAttrH(line, col, INK_WHITE+PAPER_WHITE);
 
   BIFROSTH_setTile(4, 4, 0+BIFROSTH_STATIC);
 
@@ -568,9 +571,9 @@ variant of BiFrost start _outside_ the display area! Y position 0 is 16 pixels
 _above_ the display area, which means a tile placed there won't be shown. Column
 0 is off the left side of the display as well. This approach was chosen so a
 tile can be placed off the edge of the display and moved into the display a
-pixel at the time (vertically), or a character cell at a time
-(horizontally). The example above slides the top and bottom tiles into the
-display a pixel at the time. Many BiFrost program which take advantage of this
+pixel at the time vertically, or a character cell at a time
+horizontally. The example above slides the top and bottom tiles into the
+display a pixel at the time. Many BiFrost programs which take advantage of this
 approach place a border around the BiFrost display area. This border is
 typically one character cell wide and has the INK and PAPER set the same. This
 hides any artefacts caused by partially visible tiles being outside the area
@@ -591,7 +594,7 @@ grid. That's 160 pixels wide by 176 pixels deep:
 ![alt text](images/bifrost2_area1.png "BiFrost*2 area")
 
 At 13KB the library is considerably larger than the high resolution variant of
-BiFrost, although you can reduce its display size by tweaking its [compile
+BiFrost, although you can reduce its display size by tweaking its [library build
 time](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/config/config_bifrost_2.m4)
 options. By default it loads at address 51625.
 
@@ -624,7 +627,7 @@ int main()
 
   for(line = 0; line <=192; line++) {
     for(col = 0; col <= 20; col++) {
-      BIFROST2_fillTileAttrH(line, col, INK_WHITE+(8*INK_WHITE));
+      BIFROST2_fillTileAttrH(line, col, INK_WHITE+PAPER_WHITE);
     }
   }
 
@@ -643,10 +646,9 @@ int main()
       BIFROST2_fillTileAttrH(80,col-1,INK_WHITE+(8*INK_WHITE));
       BIFROST2_drawTileH(80, col, 0);
       if( ++col == 21 )
-	col = 0;
-    }
+        col = 0;
+    }  
   }
-
 }
 ```
 
@@ -671,14 +673,14 @@ appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03
 ```
 
 The -m option to zcc causes it to output a _map_ file. The map is a text file
-containing the addresses of all the symbols the compiler used in generating its
+containing the addresses of all the symbols the compiler encountered in generating its
 output. You can use it to find the location of main(), BiFrost, the tile
 buffers, etc., which can be useful when working with a disassembler, debugger or
 memory monitor. In this build, the first run of appmake uses the +glue target
-and (by implication) the map file to generate a single TAP file containing the C
+and (by implication) the map file to generate a single binary file containing the C
 program and the BiFrost*2 library. It _glues_ the two binary pieces together,
 filling the hole between them with zeroes. This negates the need for the BASIC
-loader we've used throughout the examples, which loads two piece of CODE. The
+loader we've used throughout the examples, which loads two pieces of CODE. The
 second call to appmake takes this one large binary file and wraps a standard
 BASIC loader around it.
 
@@ -710,10 +712,10 @@ The [advanced tutorials](https://www.ime.usp.br/~einar/bifrost/), from the
 BiFrost author, describe further possibilities, including animation and
 pre-shifted tiles for horizontal pixel level precision. The timing contraints of
 BiFrost need to be explored and understood before the library can be expertly
-deployed.
+employed.
 
 Even if BiFrost isn't your thing, the lessons learned here will be useful going
-forwards. With resources so limited every byte matters in Spectrum programs, and
+forward. With resources so limited every byte matters in Spectrum programs, and
 it's an unforgiving environment. Get anything wrong and the program will
 crash. The programmer needs to adopt a mindset where he or she sees the complete
 picture.
