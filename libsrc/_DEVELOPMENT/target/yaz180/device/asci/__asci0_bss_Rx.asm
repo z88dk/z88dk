@@ -2,6 +2,8 @@ INCLUDE "config_private.inc"
 
 SECTION bss_driver
 
+EXTERN ASCI0_RX_SIZE
+
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut
  
 asci0RxCount:    defb 0                 ; Space for Rx Buffer Management 
@@ -13,7 +15,7 @@ SECTION data_align_256
 
 PUBLIC asci0RxBuffer
 
-asci0RxBuffer:   defs asci0_RX_SIZE     ; Space for the Rx Buffer
+asci0RxBuffer:   defs ASCI0_RX_SIZE     ; Space for the Rx Buffer
 
 ; pad to next 256 byte boundary
 

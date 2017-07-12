@@ -20,5 +20,8 @@
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
+@target/yaz180/default/default.lst
+@target/yaz180/device/device.lst
+@target/yaz180/driver/driver.lst
 @threads/threads_sccz80.lst
 @z180/z180_sccz80.lst

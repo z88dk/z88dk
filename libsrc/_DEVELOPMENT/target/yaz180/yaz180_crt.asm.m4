@@ -102,29 +102,6 @@ ifelse(__STARTUP, 17,
    include(`startup/yaz180_crt_17.asm.m4')
 ')
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; compressed rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ifelse(__STARTUP, 2,
-`
-   ; generic embedded system
-   ; no files, no fds
-
-   IFNDEF __CRTCFG
-   
-      defc __CRTCFG = 2
-   
-   ENDIF
-   
-   IFNDEF __MMAP
-   
-      defc __MMAP = 0
-   
-   ENDIF
-
-   include(`startup/yaz180_crt_0.asm.m4')
-')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; none ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
