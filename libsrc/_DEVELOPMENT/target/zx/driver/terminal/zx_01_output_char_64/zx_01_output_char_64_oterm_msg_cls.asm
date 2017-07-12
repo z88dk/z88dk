@@ -12,8 +12,9 @@ zx_01_output_char_64_oterm_msg_cls:
    call zx_01_output_char_64_proc_stack_window_32
    
    ; stack = window *
-   
-   ld l,(ix+25)                ; l = background colour
+
+   ld l,(ix+23)                ; l = foreground colour
+   ld (ix+25),l                ; foreground colour copied to background colour
    
    push ix
    
