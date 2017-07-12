@@ -27,6 +27,17 @@
       ENDIF
       
       ld i,a
+
+      INCLUDE "config_private.inc"
+
+      IF (__Z180)
+      
+        ; Set the z180 interrupt vector low byte  
+            
+        ld a,__crt_org_vector_table%256
+        out (IL),a
+        
+      ENDIF
    
    ENDIF
    
