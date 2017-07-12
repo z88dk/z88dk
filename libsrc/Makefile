@@ -1459,6 +1459,7 @@ osca_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
+	$(MAKE) -C games TARGET=osca
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C fcntl/osca
