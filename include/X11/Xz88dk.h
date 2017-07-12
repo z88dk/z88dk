@@ -12,29 +12,14 @@
 //#include <stdio.h>
 
 
-#ifdef _BUILDING_X
+extern int _x_proportional;
+extern int _y_proportional;
+extern char *_xchar_proportional;
+extern int _X_int1;
+extern int _X_int2;
+extern int _X_int3;
 
-  extern int _x_proportional;
-  extern int _y_proportional;
-  extern char *_xchar_proportional;
-  extern int _X_int1;
-  extern int _X_int2;
-  extern int _X_int3;
-
-  extern int _x_must_expose;
-
-#else
-
-  int _x_proportional;
-  int _y_proportional;
-  char *_xchar_proportional;
-  int _X_int1;
-  int _X_int2;
-  int _X_int3;
-
-  int _x_must_expose=1;
-
-#endif
+extern int _x_must_expose;
 
 
 /* Base X objects */

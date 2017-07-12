@@ -37,3 +37,4 @@ XTextWidth
 XUnloadFont
 _xfindchar
 _xfputc
+variables
