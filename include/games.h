@@ -52,103 +52,140 @@ extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
 #define MOVE_FIRE4 128
 
 
-#ifndef MAKE_LIB
+extern unsigned char *joystick_type[];
 
 #ifdef __C128__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN"};
+#endif
 	#define GAME_DEVICES 3
 #endif
 
 #ifdef __CPC__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
+#endif
 	#define GAME_DEVICES 3
 #endif
 
 #ifdef __ENTERPRISE__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2"};
+#endif
 	#define GAME_DEVICES 3
 #endif
 
 #ifdef __PC6001__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Stick/Cursor"};
+#endif
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef __MSX__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
+#endif
 	#define GAME_DEVICES 3
 #endif
 
 #ifdef __MTX__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+#endif
 	#define GAME_DEVICES 2
 #endif
 
 #ifdef __BEE__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Arrows and SPACE", "Arrows + SPACE (256TC)", "Joystick on parallel port"};
+#endif
 	#define GAME_DEVICES 3
 #endif
 
 #ifdef __MC1000__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Joystick A", "Joystick B"};
+#endif
 	#define GAME_DEVICES 2
 #endif
 
 #ifdef __OSCA__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Cursor", "Joystick"};
+#endif
 	#define GAME_DEVICES 2
 #endif
 
 #ifdef __SVI__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
+#endif
 	#define GAME_DEVICES 3
 #endif
 
 #ifdef __SPECTRUM__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller"};
+#endif
 	#define GAME_DEVICES 5
 #endif
 
 #ifdef __ZX81__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
+#endif
 	#define GAME_DEVICES 4
 #endif
 
 #ifdef __TI82__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
+#endif
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef __TI83__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
+#endif
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef __TI85__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
+#endif
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef __TI86__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
+#endif
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef __ZXVGS__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
+#endif
 	#define GAME_DEVICES 4
 #endif
 
 #ifdef __Z9001__
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+#endif
 	#define GAME_DEVICES 2
 #endif
 
 #ifndef GAME_DEVICES
+#ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"QAOP-MN","8246-05"};
+#endif
 	#define GAME_DEVICES 2
 #endif
 
-#endif
 
 #endif
