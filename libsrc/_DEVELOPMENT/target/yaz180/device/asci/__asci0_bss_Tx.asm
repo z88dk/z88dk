@@ -2,6 +2,8 @@ INCLUDE "config_private.inc"
 
 SECTION bss_driver
 
+EXTERN ASCI0_TX_SIZE
+
 PUBLIC asci0TxCount, asci0TxIn, asci0TxOut, asci0TxLock
 
 asci0TxCount:    defb 0                 ; Space for Tx Buffer Management
@@ -13,7 +15,7 @@ SECTION data_align_256
 
 PUBLIC asci0TxBuffer
 
-asci0TxBuffer:   defs asci0_TX_SIZE     ; Space for the Tx Buffer
+asci0TxBuffer:   defs ASCI0_TX_SIZE     ; Space for the Tx Buffer
 
 ; pad to next 256 byte boundary
 

@@ -20,5 +20,8 @@
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
+@target/yaz180/default/default.lst
+@target/yaz180/device/device.lst
+@target/yaz180/driver/driver.lst
 @threads/threads_sdcc_iy.lst
 @z180/z180_sdcc.lst

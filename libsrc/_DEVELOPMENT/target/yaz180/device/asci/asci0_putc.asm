@@ -6,6 +6,8 @@
     
     EXTERN STAT0, TDR0
     EXTERN  __IO_STAT0_TDRE, __IO_STAT0_TIE
+    
+    EXTERN ASCI0_TX_SIZE
 
     EXTERN asci0TxCount, asci0TxIn
     EXTERN asm_z180_push_di, asm_z180_pop_ei_jp

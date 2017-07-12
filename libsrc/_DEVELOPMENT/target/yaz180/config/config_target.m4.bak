@@ -7,7 +7,13 @@ divert(-1)
 
 # Announce target
 
-define(`__EMBEDDED_Z180', 1)
+define(`__YAZ180', 1)
+
+
+# ASCI0 driver
+
+define(`ASCI0_RX_SIZE', 0x100)       # Size of the Rx Buffer
+define(`ASCI0_TX_SIZE', 0x100)       # Size of the Tx Buffer
 
 #
 # END OF USER CONFIGURATION
@@ -21,7 +27,7 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `__EMBEDDED_Z180'
+PUBLIC `__YAZ180'
 ')
 
 dnl#
@@ -30,7 +36,7 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `__EMBEDDED_Z180' = __EMBEDDED_Z180
+defc `__YAZ180' = __YAZ180
 ')
 
 dnl#
@@ -39,6 +45,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-`#undef'  `__EMBEDDED_Z180'
-`#define' `__EMBEDDED_Z180'  __EMBEDDED_Z180
+`#undef'  `__YAZ180'
+`#define' `__YAZ180'  __YAZ180
 ')

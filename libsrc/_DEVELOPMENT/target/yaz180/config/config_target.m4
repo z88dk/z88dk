@@ -9,6 +9,12 @@ divert(-1)
 
 define(`__YAZ180', 1)
 
+
+# ASCI0 driver
+
+define(`ASCI0_RX_SIZE', 0x100)       # Size of the Rx Buffer
+define(`ASCI0_TX_SIZE', 0x100)       # Size of the Tx Buffer
+
 #
 # END OF USER CONFIGURATION
 ###############################################################

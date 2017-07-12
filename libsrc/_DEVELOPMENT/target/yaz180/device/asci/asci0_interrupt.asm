@@ -5,10 +5,13 @@
     
     EXTERN asci0RxCount, asci0RxIn
     EXTERN asci0TxCount, asci0TxOut
+
+    EXTERN ASCI0_RX_SIZE
    
-    EXTERN STAT0, TDRO
+    EXTERN CNTLA0, STAT0, TDR0, RDR0
     EXTERN __IO_CNTLA0_EFR
-    EXTERN __IO_STAT0_RDRF, __IO_STAT0_OVRN, __IO_STAT0_PE, __IO_STAT0_FE, __IO_STAT0_TIE
+    EXTERN __IO_STAT0_RDRF, __IO_STAT0_OVRN, __IO_STAT0_PE, __IO_STAT0_FE
+    EXTERN __IO_STAT0_TDRE, __IO_STAT0_TIE
 
     _asci0_interrupt:
 
@@ -26,7 +29,7 @@ ASCI0_RX_GET:
         jr nz, ASCI0_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
         ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer      
-        cp ASCI0_RX_BUFSIZE-1       ; check whether there is space in the buffer
+        cp ASCI0_RX_SIZE-1          ; check whether there is space in the buffer
         jr nc, ASCI0_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
 
         ld a, l                     ; get Rx byte from l
@@ -47,11 +50,11 @@ ASCI0_RX_ERROR:
 
 ASCI0_RX_CHECK:                     ; Z8S180 has 4 byte Rx H/W FIFO
         in0 a, (STAT0)              ; load the ASCI0 status register
-        tst ASCI_RDRF               ; test whether we have received on ASCI0
+        tst __IO_STAT0_RDRF         ; test whether we have received on ASCI0
         jr nz, ASCI0_RX_GET         ; if still more bytes in H/W FIFO, get them
 
 ASCI0_TX_CHECK:                     ; now start doing the Tx stuff
-        and ASCI_TDRE               ; test whether we can transmit on ASCI0
+        and __IO_STAT0_TDRE         ; test whether we can transmit on ASCI0
         jr z, ASCI0_TX_END          ; if not, then end
 
         ld a, (asci0TxCount)        ; get the number of bytes in the Tx buffer
