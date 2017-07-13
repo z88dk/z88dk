@@ -27,12 +27,17 @@
 		push	ix
 		ld	ix,2
 		add	ix,sp
-		ld	e,(ix+2)	;y1
-		ld	d,(ix+4)	;x1
 		ld	l,(ix+6)	;y0
 		ld	h,(ix+8)	;x0
+		ld	e,(ix+2)	;y1
+		ld	d,(ix+4)	;x1
+		call    swapgfxbk
+		push	hl
+		push    de
+		call	respixel
+		pop     de
+		pop	hl
                 ld      ix,respixel
-                call    swapgfxbk
                 call    Line
-                jp      __graphics_end
+		jp	__graphics_end
 
