@@ -35,7 +35,7 @@ extern Window __LIB__ XCreateSimpleWindow(struct _XDisplay *display, Window root
 extern int __LIB__ XDestroyWindow(struct _XDisplay *display, Window win) __smallc;
 
 extern struct GC __LIB__ *XCreateGC(struct _XDisplay *display, Window win, int valuemask, int values) __smallc;
-extern void __LIB__ XFreeGC(struct _XDisplay *display, struct _XGC gc) __smallc;
+extern void __LIB__ XFreeGC(struct _XDisplay *display, struct _XGC *gc) __smallc;
 
 /* Base X objects properties */
 extern char __LIB__ *XDisplayName(char *display_name);
@@ -47,9 +47,9 @@ extern int __LIB__ WhitePixel(struct _XDisplay *display, int screen) __smallc;
 
 extern void __LIB__ XMapWindow(struct _XDisplay *display, Window win) __smallc;
 
-extern void __LIB__ XSetForeground(struct _XDisplay *display, struct _XGC gc, int color) __smallc;
-extern void __LIB__ XSetLineAttributes(struct _XDisplay *display, struct _XGC gc, int line_width, int line_style, int cap_style, int join_style) __smallc;
-extern void __LIB__ XSetDashes(struct _XDisplay *display, struct _XGC gc, int dash_offset, int dash_list, int list_length) __smallc;
+extern void __LIB__ XSetForeground(struct _XDisplay *display, struct _XGC *gc, int color) __smallc;
+extern void __LIB__ XSetLineAttributes(struct _XDisplay *display, struct _XGC *gc, int line_width, int line_style, int cap_style, int join_style) __smallc;
+extern void __LIB__ XSetDashes(struct _XDisplay *display, struct _XGC *gc, int dash_offset, int dash_list, int list_length) __smallc;
 extern void __LIB__ XSetStandardProperties(struct _XDisplay *display, Window win, char *window_name, char *icon_name, char *icon_pixmap, char *argv, int argc, int size_hints) __smallc;
 
 
@@ -66,10 +66,10 @@ extern int __LIB__ XFlush(struct _XDisplay *display);
 
 extern int __LIB__ XTextWidth(struct _XFontStruct *font_struct, char *string, int count) __smallc;
 extern struct _XFontStruct __LIB__ *XLoadQueryFont(struct _XDisplay *display, char *fontname) __smallc;
-extern void __LIB__ XDrawString(struct _XDisplay *display, Window win, struct _XGC gc, int x, int y, char *text, int textlen) __smallc;
+extern void __LIB__ XDrawString(struct _XDisplay *display, Window win, struct _XGC *gc, int x, int y, char *text, int textlen) __smallc;
 
 extern void  __LIB__ XUnloadFont(struct _XDisplay *display, Font font) __smallc;
-extern void  __LIB__ XSetFont(struct _XDisplay *display, struct _XGC gc, Font font) __smallc;
+extern void  __LIB__ XSetFont(struct _XDisplay *display, struct _XGC *gc, Font font) __smallc;
 
 
 /* Pictures handling */
@@ -81,10 +81,10 @@ extern Pixmap __LIB__ XCreateBitmapFromData(struct _XDisplay *display, Window wi
 
 // It could even work, but the window positioning offset !
 //#define XDrawRectangle drawb
-extern void __LIB__ XDrawRectangle(struct _XDisplay *display, Window win, struct _XGC gc, int x, int y, int width, int height) __smallc;
-extern void __LIB__ XDrawPoint(struct _XDisplay *display, Window win, struct _XGC gc, int x, int y) __smallc;
-extern void __LIB__ XDrawLine(struct _XDisplay *display, Window win, struct _XGC gc, int x1, int y1, int x2, int y2) __smallc;
-extern void __LIB__ XClearWindow(struct _XDisplay *display, Window win, struct _XGC gc, int x, int y, int width, int height, Bool Exposures) __smallc;
+extern void __LIB__ XDrawRectangle(struct _XDisplay *display, Window win, struct _XGC *gc, int x, int y, int width, int height) __smallc;
+extern void __LIB__ XDrawPoint(struct _XDisplay *display, Window win, struct _XGC *gc, int x, int y) __smallc;
+extern void __LIB__ XDrawLine(struct _XDisplay *display, Window win, struct _XGC *gc, int x1, int y1, int x2, int y2) __smallc;
+extern void __LIB__ XClearWindow(struct _XDisplay *display, Window win, struct _XGC *gc, int x, int y, int width, int height, Bool Exposures) __smallc;
 
 
 /*  Internal declarations  */
