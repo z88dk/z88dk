@@ -28,7 +28,9 @@ enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY
               LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE };
 
 // Color translation table
+
 static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
+
 // QUICK C syntax
 #define settextcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
 // TURBO C syntax
@@ -66,8 +68,8 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define getche() fgetc_cons()               // not sure about this one...
 #define _getche() fgetc_cons()                // not sure about this one...
 // Direct output to console
-#define putch(a) fputc_cons()
-#define _putch(a) fputc_cons()
+#define putch(a) fputc_cons(a)
+#define _putch(a) fputc_cons(a)
 
 // can't be fixed easily.. i.e. the simplified gets won't work
 //#define ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
