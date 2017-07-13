@@ -15,10 +15,8 @@ __xchar_proportional:	defw	0
 __X_int1:		defw	0
 __X_int2:		defw	0
 __X_int3:		defw	0
-__x_must_expose:	defw	0
 
-	SECTION		code_crt_init
+	SECTION		data_clib
 
-	ld	a,1
-	ld	(__x_must_expose),a
+__x_must_expose:	defw	1
 
