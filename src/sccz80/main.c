@@ -448,7 +448,7 @@ static void dumpfns()
                         ot("=\t");
                         outdec(ptr->size);
                         nl();
-                    } else if (ident != ENUM && type != ENUM && ident != MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF) {
+                    } else if (ident != ENUM && type != ENUM && ident != MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
                         if (storage == EXTERNAL)
                             GlobalPrefix(XREF);
                         else
@@ -566,7 +566,7 @@ void dumpvars()
             type = ptr->type;
             storage = ptr->storage;
             if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && 
-                storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
+                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
                 type != PORT8 && type != PORT16) {
                 prefix();
                 outname(ptr->name, 1);

@@ -75,7 +75,8 @@ enum storage_type {
     LSTATIC = 6,
     FAR = 7 ,
     LSTKEXT = 8,
-    TYPDEF = 9
+    TYPDEF = 9,
+    STATIC_INITIALISED = 10,
 };
 
 
