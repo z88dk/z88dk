@@ -734,14 +734,18 @@ __reset:
 
    include "../crt_start_di.inc"
 
-IF REGISTER_SP = -1
+IF (REGISTER_SP = -1)
    
    pop af
    
 ENDIF
-   
+
+IF (__crt_org_vector_table = 0)
+
    ld a,__IO_VECTOR_BASE
    out0 (IL),a
+
+ENDIF
 
 ;; fall through to __Start
 
