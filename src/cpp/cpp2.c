@@ -113,7 +113,7 @@ int             counter;        /* Pending newline counter              */
          * hash is set to a unique value corresponding to the
          * control keyword (or L_nogood if we think it's nonsense).
          */
-        if (infile->fp == NULL)
+        if (infile && infile->fp == NULL)
             cwarn("Control line \"%s\" within macro expansion", token);
         if (!compiling) {                       /* Not compiling now    */
             switch (hash) {
