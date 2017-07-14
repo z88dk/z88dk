@@ -21,7 +21,7 @@ IF __CRTCFG = 0
 
    defc TAR__crt_org_code              = 0
    defc TAR__crt_org_data              = 0x8000
-   defc TAR__crt_org_bss               = -1
+   defc TAR__crt_org_bss               = 0
 
    defc TAR__crt_model                 = 2
    
@@ -33,7 +33,7 @@ IF __CRTCFG = 0
    defc TAR__crt_include_preamble      = 0
 
    defc TAR__crt_org_vector_table      = 0
-   defc TAR__crt_interrupt_mode        = -1
+   defc TAR__crt_interrupt_mode        = 1
    
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0x80
@@ -72,10 +72,10 @@ IF __CRTCFG = 1
 
    defc TAR__crt_model                 = 0
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0x9000
    defc TAR__crt_stack_size            = 512
       
-   defc TAR__crt_initialize_bss        = 0
+   defc TAR__crt_initialize_bss        = 1
    
    defc TAR__crt_include_preamble      = 0
 
@@ -97,7 +97,7 @@ IF __CRTCFG = 1
    defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
    
-   defc TAR__clib_malloc_heap_size     = -1
+   defc TAR__clib_malloc_heap_size     = -0xFFFF
    defc TAR__clib_stdio_heap_size      = 128
    
    defc TAR__clib_balloc_table_size    = 0
@@ -119,10 +119,10 @@ IF __CRTCFG = 2
 
    defc TAR__crt_model                 = 0
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0x9000
    defc TAR__crt_stack_size            = 512
       
-   defc TAR__crt_initialize_bss        = 0
+   defc TAR__crt_initialize_bss        = 1
    
    defc TAR__crt_include_preamble      = 0
 
@@ -144,7 +144,7 @@ IF __CRTCFG = 2
    defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
    
-   defc TAR__clib_malloc_heap_size     = -1
+   defc TAR__clib_malloc_heap_size     = -0xFFFF
    defc TAR__clib_stdio_heap_size      = 128
    
    defc TAR__clib_balloc_table_size    = 0
