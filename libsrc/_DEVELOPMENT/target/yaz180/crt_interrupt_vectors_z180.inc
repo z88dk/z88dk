@@ -1,8 +1,6 @@
-IF __page_zero_present
+IF (__page_zero_present) && (__crt_org_vector_table != 0)
 
-IF __crt_org_vector_table > 0
-
-INCLUDE "config_private.inc"
+IF (__Z180 != 0)
 
 ; defc __Z180 = 0x04
 
@@ -12,11 +10,34 @@ INCLUDE "config_private.inc"
 
 SECTION interrupt_vectors
 
-;_vector_rst_08h:
-;   defw default_rst_08h
+EXTERN l_ret
 
-_vector_asci0:
-defw __Z180 ; just an example currently
+;_z180_int_int1:
+defw l_ret
+
+;_z180_int_int2:
+defw l_ret
+
+;_z180_int_prt0:
+defw l_ret
+
+;_z180_int_prt1:
+defw l_ret
+
+;_z180_int_dma0:
+defw l_ret
+
+;_z180_int_dma1:
+defw l_ret
+
+;_z180_int_csio:
+defw l_ret
+
+EXTERN _z180_int_asci0  ; FTDI interface on asci0
+defw _z180_int_asci0
+
+;_z180_int_asci1:
+defw l_ret
 
 ENDIF
 

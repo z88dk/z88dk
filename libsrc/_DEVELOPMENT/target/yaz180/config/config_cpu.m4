@@ -252,7 +252,7 @@ define(`__IO_CNTLB0_SS_DIV_4',  0x02)
 define(`__IO_CNTLB0_SS_DIV_2',  0x01)
 define(`__IO_CNTLB0_SS_DIV_1',  0x00)
 
-define(`__IO_CNTLB0_MPBT',      0x80)
+define(`__IO_CNTLB1_MPBT',      0x80)
 define(`__IO_CNTLB1_MP',        0x40)
 define(`__IO_CNTLB1_CTS',       0x20)
 define(`__IO_CNTLB1_PS',        0x20)
@@ -300,10 +300,53 @@ define(`__IO_CNTR_SS_DIV_80',   0x02)
 define(`__IO_CNTR_SS_DIV_40',   0x01)
 define(`__IO_CNTR_SS_DIV_20',   0x00)
 
+# DMA REGISTER BIT FIELDS
 
+define(`__IO_DCNTL_MWI1',       0x80)
+define(`__IO_DCNTL_MWI0',       0x40)
+define(`__IO_DCNTL_IWI1',       0x20)
+define(`__IO_DCNTL_IWI0',       0x10)
+define(`__IO_DCNTL_DMS1',       0x08)
+define(`__IO_DCNTL_DMS0',       0x04)
+define(`__IO_DCNTL_DIM1',       0x02)
+define(`__IO_DCNTL_DIM0',       0x01)
 
+# INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
 
+define(`__IO_ITC_TRAP',         0x80)
+define(`__IO_ITC_UFO',          0x40)
+define(`__IO_ITC_ITE2',         0x04)
+define(`__IO_ITC_ITE1',         0x02)
+define(`__IO_ITC_ITE0',         0x01)
 
+#   Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+define(`__IO_RCR_REFE',         0x80)
+define(`__IO_RCR_REFW',         0x40)
+define(`__IO_RCR_CYC1',         0x02)
+define(`__IO_RCR_CYC0',         0x01)
+
+#   Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+define(`__IO_OMCR_M1E',         0x80)
+define(`__IO_OMCR_M1TE',        0x40)
+define(`__IO_OMCR_IOC',         0x20)
+
+# CPU CLOCK MULTIPLIER REGISTER (CMR) BIT FIELDS (Z8S180 & higher Only)
+
+define(`__IO_CMR_X2',           0x80)
+define(`__IO_CMR_LN_XTAL',      0x40)
+
+# CPU CONTROL REGISTER (CCR) BIT FIELDS (Z8S180 & higher Only)
+
+define(`__IO_CCR_XTAL_X2',      0x80)
+define(`__IO_CCR_STANDBY',      0x40)
+define(`__IO_CCR_BREXT',        0x20)
+define(`__IO_CCR_LNPHI',        0x10)
+define(`__IO_CCR_IDLE',         0x08)
+define(`__IO_CCR_LNIO',         0x04)
+define(`__IO_CCR_LNCPUCTL',     0x02)
+define(`__IO_CCR_LNAD',         0x01)
 
 #
 # END OF USER CONFIGURATION
@@ -393,6 +436,136 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    PUBLIC `OMCR'
    PUBLIC `ICR'
+
+   ; I/O REGISTER BIT FIELDS
+
+   PUBLIC `CNTLA0_MPE'
+   PUBLIC `CNTLA0_RE'
+   PUBLIC `CNTLA0_TE'
+   PUBLIC `CNTLA0_RTS0'
+   PUBLIC `CNTLA0_MPBR'
+   PUBLIC `CNTLA0_EFR'
+   PUBLIC `CNTLA0_MODE_MASK'
+   PUBLIC `CNTLA0_MODE_8P2'
+   PUBLIC `CNTLA0_MODE_8P1'
+   PUBLIC `CNTLA0_MODE_8N2'
+   PUBLIC `CNTLA0_MODE_8N1'
+   PUBLIC `CNTLA0_MODE_7P2'
+   PUBLIC `CNTLA0_MODE_7P1'
+   PUBLIC `CNTLA0_MODE_7N2'
+   PUBLIC `CNTLA0_MODE_7N1'
+
+   PUBLIC `CNTLA1_MPE'
+   PUBLIC `CNTLA1_RE'
+   PUBLIC `CNTLA1_TE'
+   PUBLIC `CNTLA1_CKA1D'
+   PUBLIC `CNTLA1_MPBR'
+   PUBLIC `CNTLA1_EFR'
+   PUBLIC `CNTLA1_MODE_MASK'
+   PUBLIC `CNTLA1_MODE_8P2'
+   PUBLIC `CNTLA1_MODE_8P1'
+   PUBLIC `CNTLA1_MODE_8N2'
+   PUBLIC `CNTLA1_MODE_8N1'
+   PUBLIC `CNTLA1_MODE_7P2'
+   PUBLIC `CNTLA1_MODE_7P1'
+   PUBLIC `CNTLA1_MODE_7N2'
+   PUBLIC `CNTLA1_MODE_7N1'
+
+   PUBLIC `CNTLB0_MPBT'
+   PUBLIC `CNTLB0_MP'
+   PUBLIC `CNTLB0_CTS'
+   PUBLIC `CNTLB0_PS'
+   PUBLIC `CNTLB0_PEO'
+   PUBLIC `CNTLB0_DR'
+   PUBLIC `CNTLB0_SS_MASK'
+   PUBLIC `CNTLB0_SS_EXT'
+   PUBLIC `CNTLB0_SS_DIV_64'
+   PUBLIC `CNTLB0_SS_DIV_32'
+   PUBLIC `CNTLB0_SS_DIV_16'
+   PUBLIC `CNTLB0_SS_DIV_8'
+   PUBLIC `CNTLB0_SS_DIV_4'
+   PUBLIC `CNTLB0_SS_DIV_2'
+   PUBLIC `CNTLB0_SS_DIV_1'
+
+   PUBLIC `CNTLB1_MPBT'
+   PUBLIC `CNTLB1_MP'
+   PUBLIC `CNTLB1_CTS'
+   PUBLIC `CNTLB1_PS'
+   PUBLIC `CNTLB1_PEO'
+   PUBLIC `CNTLB1_DR'
+   PUBLIC `CNTLB1_SS_MASK'
+   PUBLIC `CNTLB1_SS_EXT'
+   PUBLIC `CNTLB1_SS_DIV_64'
+   PUBLIC `CNTLB1_SS_DIV_32'
+   PUBLIC `CNTLB1_SS_DIV_16'
+   PUBLIC `CNTLB1_SS_DIV_8'
+   PUBLIC `CNTLB1_SS_DIV_4'
+   PUBLIC `CNTLB1_SS_DIV_2'
+   PUBLIC `CNTLB1_SS_DIV_1'
+
+   PUBLIC `STAT0_RDRF'
+   PUBLIC `STAT0_OVRN'
+   PUBLIC `STAT0_PE'
+   PUBLIC `STAT0_FE'
+   PUBLIC `STAT0_RIE'
+   PUBLIC `STAT0_DCD0'
+   PUBLIC `STAT0_TDRE'
+   PUBLIC `STAT0_TIE'
+
+   PUBLIC `STAT1_RDRF'
+   PUBLIC `STAT1_OVRN'
+   PUBLIC `STAT1_PE'
+   PUBLIC `STAT1_FE'
+   PUBLIC `STAT1_RIE'
+   PUBLIC `STAT1_CTS1E'
+   PUBLIC `STAT1_TDRE'
+   PUBLIC `STAT1_TIE'
+
+   PUBLIC `CNTR_EF'
+   PUBLIC `CNTR_EIE'
+   PUBLIC `CNTR_RE'
+   PUBLIC `CNTR_TE'
+   PUBLIC `CNTR_SS_MASK'
+   PUBLIC `CNTR_SS_EXT'
+   PUBLIC `CNTR_SS_DIV_1280'
+   PUBLIC `CNTR_SS_DIV_640'
+   PUBLIC `CNTR_SS_DIV_320'
+   PUBLIC `CNTR_SS_DIV_160'
+   PUBLIC `CNTR_SS_DIV_80'
+   PUBLIC `CNTR_SS_DIV_40'
+   PUBLIC `CNTR_SS_DIV_20'
+
+   ; DMA REGISTER BIT FIELDS
+
+   PUBLIC `DCNTL_MWI1'
+   PUBLIC `DCNTL_MWI0'
+   PUBLIC `DCNTL_IWI1'
+   PUBLIC `DCNTL_IWI0'
+   PUBLIC `DCNTL_DMS1'
+   PUBLIC `DCNTL_DMS0'
+   PUBLIC `DCNTL_DIM1'
+   PUBLIC `DCNTL_DIM0'
+
+   ; INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   PUBLIC `ITC_TRAP'
+   PUBLIC `ITC_UFO'
+   PUBLIC `ITC_ITE2'
+   PUBLIC `ITC_ITE1'
+   PUBLIC `ITC_ITE0'
+
+   ; Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   PUBLIC `RCR_REFE'
+   PUBLIC `RCR_REFW'
+   PUBLIC `RCR_CYC1'
+   PUBLIC `RCR_CYC0'
+
+   ; Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   PUBLIC `OMCR_M1E'
+   PUBLIC `OMCR_M1TE'
+   PUBLIC `OMCR_IOC'
 ',
 `
    ; Z8S180 / Z8L180 CLASS
@@ -462,6 +635,152 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    PUBLIC `OMCR'
    PUBLIC `ICR'
+   
+   ; I/O REGISTER BIT FIELDS
+
+   PUBLIC `CNTLA0_MPE'
+   PUBLIC `CNTLA0_RE'
+   PUBLIC `CNTLA0_TE'
+   PUBLIC `CNTLA0_RTS0'
+   PUBLIC `CNTLA0_MPBR'
+   PUBLIC `CNTLA0_EFR'
+   PUBLIC `CNTLA0_MODE_MASK'
+   PUBLIC `CNTLA0_MODE_8P2'
+   PUBLIC `CNTLA0_MODE_8P1'
+   PUBLIC `CNTLA0_MODE_8N2'
+   PUBLIC `CNTLA0_MODE_8N1'
+   PUBLIC `CNTLA0_MODE_7P2'
+   PUBLIC `CNTLA0_MODE_7P1'
+   PUBLIC `CNTLA0_MODE_7N2'
+   PUBLIC `CNTLA0_MODE_7N1'
+
+   PUBLIC `CNTLA1_MPE'
+   PUBLIC `CNTLA1_RE'
+   PUBLIC `CNTLA1_TE'
+   PUBLIC `CNTLA1_CKA1D'
+   PUBLIC `CNTLA1_MPBR'
+   PUBLIC `CNTLA1_EFR'
+   PUBLIC `CNTLA1_MODE_MASK'
+   PUBLIC `CNTLA1_MODE_8P2'
+   PUBLIC `CNTLA1_MODE_8P1'
+   PUBLIC `CNTLA1_MODE_8N2'
+   PUBLIC `CNTLA1_MODE_8N1'
+   PUBLIC `CNTLA1_MODE_7P2'
+   PUBLIC `CNTLA1_MODE_7P1'
+   PUBLIC `CNTLA1_MODE_7N2'
+   PUBLIC `CNTLA1_MODE_7N1'
+
+   PUBLIC `CNTLB0_MPBT'
+   PUBLIC `CNTLB0_MP'
+   PUBLIC `CNTLB0_CTS'
+   PUBLIC `CNTLB0_PS'
+   PUBLIC `CNTLB0_PEO'
+   PUBLIC `CNTLB0_DR'
+   PUBLIC `CNTLB0_SS_MASK'
+   PUBLIC `CNTLB0_SS_EXT'
+   PUBLIC `CNTLB0_SS_DIV_64'
+   PUBLIC `CNTLB0_SS_DIV_32'
+   PUBLIC `CNTLB0_SS_DIV_16'
+   PUBLIC `CNTLB0_SS_DIV_8'
+   PUBLIC `CNTLB0_SS_DIV_4'
+   PUBLIC `CNTLB0_SS_DIV_2'
+   PUBLIC `CNTLB0_SS_DIV_1'
+
+   PUBLIC `CNTLB1_MPBT'
+   PUBLIC `CNTLB1_MP'
+   PUBLIC `CNTLB1_CTS'
+   PUBLIC `CNTLB1_PS'
+   PUBLIC `CNTLB1_PEO'
+   PUBLIC `CNTLB1_DR'
+   PUBLIC `CNTLB1_SS_MASK'
+   PUBLIC `CNTLB1_SS_EXT'
+   PUBLIC `CNTLB1_SS_DIV_64'
+   PUBLIC `CNTLB1_SS_DIV_32'
+   PUBLIC `CNTLB1_SS_DIV_16'
+   PUBLIC `CNTLB1_SS_DIV_8'
+   PUBLIC `CNTLB1_SS_DIV_4'
+   PUBLIC `CNTLB1_SS_DIV_2'
+   PUBLIC `CNTLB1_SS_DIV_1'
+
+   PUBLIC `STAT0_RDRF'
+   PUBLIC `STAT0_OVRN'
+   PUBLIC `STAT0_PE'
+   PUBLIC `STAT0_FE'
+   PUBLIC `STAT0_RIE'
+   PUBLIC `STAT0_DCD0'
+   PUBLIC `STAT0_TDRE'
+   PUBLIC `STAT0_TIE'
+
+   PUBLIC `STAT1_RDRF'
+   PUBLIC `STAT1_OVRN'
+   PUBLIC `STAT1_PE'
+   PUBLIC `STAT1_FE'
+   PUBLIC `STAT1_RIE'
+   PUBLIC `STAT1_CTS1E'
+   PUBLIC `STAT1_TDRE'
+   PUBLIC `STAT1_TIE'
+
+   PUBLIC `CNTR_EF'
+   PUBLIC `CNTR_EIE'
+   PUBLIC `CNTR_RE'
+   PUBLIC `CNTR_TE'
+   PUBLIC `CNTR_SS_MASK'
+   PUBLIC `CNTR_SS_EXT'
+   PUBLIC `CNTR_SS_DIV_1280'
+   PUBLIC `CNTR_SS_DIV_640'
+   PUBLIC `CNTR_SS_DIV_320'
+   PUBLIC `CNTR_SS_DIV_160'
+   PUBLIC `CNTR_SS_DIV_80'
+   PUBLIC `CNTR_SS_DIV_40'
+   PUBLIC `CNTR_SS_DIV_20'
+
+   ; DMA REGISTER BIT FIELDS
+
+   PUBLIC `DCNTL_MWI1'
+   PUBLIC `DCNTL_MWI0'
+   PUBLIC `DCNTL_IWI1'
+   PUBLIC `DCNTL_IWI0'
+   PUBLIC `DCNTL_DMS1'
+   PUBLIC `DCNTL_DMS0'
+   PUBLIC `DCNTL_DIM1'
+   PUBLIC `DCNTL_DIM0'
+
+   ; INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   PUBLIC `ITC_TRAP'
+   PUBLIC `ITC_UFO'
+   PUBLIC `ITC_ITE2'
+   PUBLIC `ITC_ITE1'
+   PUBLIC `ITC_ITE0'
+
+   ; Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   PUBLIC `RCR_REFE'
+   PUBLIC `RCR_REFW'
+   PUBLIC `RCR_CYC1'
+   PUBLIC `RCR_CYC0'
+
+   ; Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   PUBLIC `OMCR_M1E'
+   PUBLIC `OMCR_M1TE'
+   PUBLIC `OMCR_IOC'
+
+   ; CPU CLOCK MULTIPLIER REGISTER (CMR) BIT FIELDS (Z8S180 & higher Only)
+
+   PUBLIC `CMR_X2'
+   PUBLIC `CMR_LN_XTAL'
+
+   ; CPU CONTROL REGISTER (CCR) BIT FIELDS (Z8S180 & higher Only)
+
+   PUBLIC `CCR_XTAL_X2'
+   PUBLIC `CCR_STANDBY'
+   PUBLIC `CCR_BREXT'
+   PUBLIC `CCR_LNPHI'
+   PUBLIC `CCR_IDLE'
+   PUBLIC `CCR_LNIO'
+   PUBLIC `CCR_LNCPUCTL'
+   PUBLIC `CCR_LNAD'
 ')
 ')
 
@@ -547,6 +866,136 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    defc `OMCR' = __IO_OMCR
    defc `ICR' = __IO_ICR
+
+   ; I/O REGISTER BIT FIELDS
+
+   defc `CNTLA0_MPE' = __IO_CNTLA0_MPE
+   defc `CNTLA0_RE' = __IO_CNTLA0_RE
+   defc `CNTLA0_TE' = __IO_CNTLA0_TE
+   defc `CNTLA0_RTS0' = __IO_CNTLA0_RTS0
+   defc `CNTLA0_MPBR' = __IO_CNTLA0_MPBR
+   defc `CNTLA0_EFR' = __IO_CNTLA0_EFR
+   defc `CNTLA0_MODE_MASK' = __IO_CNTLA0_MODE_MASK
+   defc `CNTLA0_MODE_8P2' = __IO_CNTLA0_MODE_8P2
+   defc `CNTLA0_MODE_8P1' = __IO_CNTLA0_MODE_8P1
+   defc `CNTLA0_MODE_8N2' = __IO_CNTLA0_MODE_8N2
+   defc `CNTLA0_MODE_8N1' = __IO_CNTLA0_MODE_8N1
+   defc `CNTLA0_MODE_7P2' = __IO_CNTLA0_MODE_7P2
+   defc `CNTLA0_MODE_7P1' = __IO_CNTLA0_MODE_7P1
+   defc `CNTLA0_MODE_7N2' = __IO_CNTLA0_MODE_7N2
+   defc `CNTLA0_MODE_7N1' = __IO_CNTLA0_MODE_7N1
+
+   defc `CNTLA1_MPE' = __IO_CNTLA1_MPE
+   defc `CNTLA1_RE' = __IO_CNTLA1_RE
+   defc `CNTLA1_TE' = __IO_CNTLA1_TE
+   defc `CNTLA1_CKA1D' = __IO_CNTLA1_CKA1D
+   defc `CNTLA1_MPBR' = __IO_CNTLA1_MPBR
+   defc `CNTLA1_EFR' = __IO_CNTLA1_EFR
+   defc `CNTLA1_MODE_MASK' = __IO_CNTLA1_MODE_MASK
+   defc `CNTLA1_MODE_8P2' = __IO_CNTLA1_MODE_8P2
+   defc `CNTLA1_MODE_8P1' = __IO_CNTLA1_MODE_8P1
+   defc `CNTLA1_MODE_8N2' = __IO_CNTLA1_MODE_8N2
+   defc `CNTLA1_MODE_8N1' = __IO_CNTLA1_MODE_8N1
+   defc `CNTLA1_MODE_7P2' = __IO_CNTLA1_MODE_7P2
+   defc `CNTLA1_MODE_7P1' = __IO_CNTLA1_MODE_7P1
+   defc `CNTLA1_MODE_7N2' = __IO_CNTLA1_MODE_7N2
+   defc `CNTLA1_MODE_7N1' = __IO_CNTLA1_MODE_7N1
+
+   defc `CNTLB0_MPBT' = __IO_CNTLB0_MPBT
+   defc `CNTLB0_MP' = __IO_CNTLB0_MP
+   defc `CNTLB0_CTS' = __IO_CNTLB0_CTS
+   defc `CNTLB0_PS' = __IO_CNTLB0_PS
+   defc `CNTLB0_PEO' = __IO_CNTLB0_PEO
+   defc `CNTLB0_DR' = __IO_CNTLB0_DR
+   defc `CNTLB0_SS_MASK' = __IO_CNTLB0_SS_MASK
+   defc `CNTLB0_SS_EXT' = __IO_CNTLB0_SS_EXT
+   defc `CNTLB0_SS_DIV_64' = __IO_CNTLB0_SS_DIV_64
+   defc `CNTLB0_SS_DIV_32' = __IO_CNTLB0_SS_DIV_32
+   defc `CNTLB0_SS_DIV_16' = __IO_CNTLB0_SS_DIV_16
+   defc `CNTLB0_SS_DIV_8' = __IO_CNTLB0_SS_DIV_8
+   defc `CNTLB0_SS_DIV_4' = __IO_CNTLB0_SS_DIV_4
+   defc `CNTLB0_SS_DIV_2' = __IO_CNTLB0_SS_DIV_2
+   defc `CNTLB0_SS_DIV_1' = __IO_CNTLB0_SS_DIV_1
+
+   defc `CNTLB1_MPBT' = __IO_CNTLB1_MPBT
+   defc `CNTLB1_MP' = __IO_CNTLB1_MP
+   defc `CNTLB1_CTS' = __IO_CNTLB1_CTS
+   defc `CNTLB1_PS' = __IO_CNTLB1_PS
+   defc `CNTLB1_PEO' = __IO_CNTLB1_PEO
+   defc `CNTLB1_DR' = __IO_CNTLB1_DR
+   defc `CNTLB1_SS_MASK' = __IO_CNTLB1_SS_MASK
+   defc `CNTLB1_SS_EXT' = __IO_CNTLB1_SS_EXT
+   defc `CNTLB1_SS_DIV_64' = __IO_CNTLB1_SS_DIV_64
+   defc `CNTLB1_SS_DIV_32' = __IO_CNTLB1_SS_DIV_32
+   defc `CNTLB1_SS_DIV_16' = __IO_CNTLB1_SS_DIV_16
+   defc `CNTLB1_SS_DIV_8' = __IO_CNTLB1_SS_DIV_8
+   defc `CNTLB1_SS_DIV_4' = __IO_CNTLB1_SS_DIV_4
+   defc `CNTLB1_SS_DIV_2' = __IO_CNTLB1_SS_DIV_2
+   defc `CNTLB1_SS_DIV_1' = __IO_CNTLB1_SS_DIV_1
+
+   defc `STAT0_RDRF' = __IO_STAT0_RDRF
+   defc `STAT0_OVRN' = __IO_STAT0_OVRN
+   defc `STAT0_PE' = __IO_STAT0_PE
+   defc `STAT0_FE' = __IO_STAT0_FE
+   defc `STAT0_RIE' = __IO_STAT0_RIE
+   defc `STAT0_DCD0' = __IO_STAT0_DCD0
+   defc `STAT0_TDRE' = __IO_STAT0_TDRE
+   defc `STAT0_TIE' = __IO_STAT0_TIE
+
+   defc `STAT1_RDRF' = __IO_STAT1_RDRF
+   defc `STAT1_OVRN' = __IO_STAT1_OVRN
+   defc `STAT1_PE' = __IO_STAT1_PE
+   defc `STAT1_FE' = __IO_STAT1_FE
+   defc `STAT1_RIE' = __IO_STAT1_RIE
+   defc `STAT1_CTS1E' = __IO_STAT1_CTS1E
+   defc `STAT1_TDRE' = __IO_STAT1_TDRE
+   defc `STAT1_TIE' = __IO_STAT1_TIE
+
+   defc `CNTR_EF' = __IO_CNTR_EF
+   defc `CNTR_EIE' = __IO_CNTR_EIE
+   defc `CNTR_RE' = __IO_CNTR_RE
+   defc `CNTR_TE' = __IO_CNTR_TE
+   defc `CNTR_SS_MASK' = __IO_CNTR_SS_MASK
+   defc `CNTR_SS_EXT' = __IO_CNTR_SS_EXT
+   defc `CNTR_SS_DIV_1280' = __IO_CNTR_SS_DIV_1280
+   defc `CNTR_SS_DIV_640' = __IO_CNTR_SS_DIV_640
+   defc `CNTR_SS_DIV_320' = __IO_CNTR_SS_DIV_320
+   defc `CNTR_SS_DIV_160' = __IO_CNTR_SS_DIV_160
+   defc `CNTR_SS_DIV_80' = __IO_CNTR_SS_DIV_80
+   defc `CNTR_SS_DIV_40' = __IO_CNTR_SS_DIV_40
+   defc `CNTR_SS_DIV_20' = __IO_CNTR_SS_DIV_20
+
+   ; DMA REGISTER BIT FIELDS
+
+   defc `DCNTL_MWI1' = __IO_DCNTL_MWI1
+   defc `DCNTL_MWI0' = __IO_DCNTL_MWI0
+   defc `DCNTL_IWI1' = __IO_DCNTL_IWI1
+   defc `DCNTL_IWI0' = __IO_DCNTL_IWI0
+   defc `DCNTL_DMS1' = __IO_DCNTL_DMS1
+   defc `DCNTL_DMS0' = __IO_DCNTL_DMS0
+   defc `DCNTL_DIM1' = __IO_DCNTL_DIM1
+   defc `DCNTL_DIM0' = __IO_DCNTL_DIM0
+
+   ; INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   defc `ITC_TRAP' = __IO_ITC_TRAP
+   defc `ITC_UFO' = __IO_ITC_UFO
+   defc `ITC_ITE2' = __IO_ITC_ITE2
+   defc `ITC_ITE1' = __IO_ITC_ITE1
+   defc `ITC_ITE0' = __IO_ITC_ITE0
+
+   ; Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   defc `RCR_REFE' = __IO_RCR_REFE
+   defc `RCR_REFW' = __IO_RCR_REFW
+   defc `RCR_CYC1' = __IO_RCR_CYC1
+   defc `RCR_CYC0' = __IO_RCR_CYC0
+
+   ; Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   defc `OMCR_M1E' = __IO_OMCR_M1E
+   defc `OMCR_M1TE' = __IO_OMCR_M1TE
+   defc `OMCR_IOC' = __IO_OMCR_IOC
 ',
 `
    ; Z8S180 / Z8L180 CLASS
@@ -616,6 +1065,152 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    defc `OMCR' = __IO_OMCR
    defc `ICR' = __IO_ICR
+
+   ; I/O REGISTER BIT FIELDS
+
+   defc `CNTLA0_MPE' = __IO_CNTLA0_MPE
+   defc `CNTLA0_RE' = __IO_CNTLA0_RE
+   defc `CNTLA0_TE' = __IO_CNTLA0_TE
+   defc `CNTLA0_RTS0' = __IO_CNTLA0_RTS0
+   defc `CNTLA0_MPBR' = __IO_CNTLA0_MPBR
+   defc `CNTLA0_EFR' = __IO_CNTLA0_EFR
+   defc `CNTLA0_MODE_MASK' = __IO_CNTLA0_MODE_MASK
+   defc `CNTLA0_MODE_8P2' = __IO_CNTLA0_MODE_8P2
+   defc `CNTLA0_MODE_8P1' = __IO_CNTLA0_MODE_8P1
+   defc `CNTLA0_MODE_8N2' = __IO_CNTLA0_MODE_8N2
+   defc `CNTLA0_MODE_8N1' = __IO_CNTLA0_MODE_8N1
+   defc `CNTLA0_MODE_7P2' = __IO_CNTLA0_MODE_7P2
+   defc `CNTLA0_MODE_7P1' = __IO_CNTLA0_MODE_7P1
+   defc `CNTLA0_MODE_7N2' = __IO_CNTLA0_MODE_7N2
+   defc `CNTLA0_MODE_7N1' = __IO_CNTLA0_MODE_7N1
+
+   defc `CNTLA1_MPE' = __IO_CNTLA1_MPE
+   defc `CNTLA1_RE' = __IO_CNTLA1_RE
+   defc `CNTLA1_TE' = __IO_CNTLA1_TE
+   defc `CNTLA1_CKA1D' = __IO_CNTLA1_CKA1D
+   defc `CNTLA1_MPBR' = __IO_CNTLA1_MPBR
+   defc `CNTLA1_EFR' = __IO_CNTLA1_EFR
+   defc `CNTLA1_MODE_MASK' = __IO_CNTLA1_MODE_MASK
+   defc `CNTLA1_MODE_8P2' = __IO_CNTLA1_MODE_8P2
+   defc `CNTLA1_MODE_8P1' = __IO_CNTLA1_MODE_8P1
+   defc `CNTLA1_MODE_8N2' = __IO_CNTLA1_MODE_8N2
+   defc `CNTLA1_MODE_8N1' = __IO_CNTLA1_MODE_8N1
+   defc `CNTLA1_MODE_7P2' = __IO_CNTLA1_MODE_7P2
+   defc `CNTLA1_MODE_7P1' = __IO_CNTLA1_MODE_7P1
+   defc `CNTLA1_MODE_7N2' = __IO_CNTLA1_MODE_7N2
+   defc `CNTLA1_MODE_7N1' = __IO_CNTLA1_MODE_7N1
+
+   defc `CNTLB0_MPBT' = __IO_CNTLB0_MPBT
+   defc `CNTLB0_MP' = __IO_CNTLB0_MP
+   defc `CNTLB0_CTS' = __IO_CNTLB0_CTS
+   defc `CNTLB0_PS' = __IO_CNTLB0_PS
+   defc `CNTLB0_PEO' = __IO_CNTLB0_PEO
+   defc `CNTLB0_DR' = __IO_CNTLB0_DR
+   defc `CNTLB0_SS_MASK' = __IO_CNTLB0_SS_MASK
+   defc `CNTLB0_SS_EXT' = __IO_CNTLB0_SS_EXT
+   defc `CNTLB0_SS_DIV_64' = __IO_CNTLB0_SS_DIV_64
+   defc `CNTLB0_SS_DIV_32' = __IO_CNTLB0_SS_DIV_32
+   defc `CNTLB0_SS_DIV_16' = __IO_CNTLB0_SS_DIV_16
+   defc `CNTLB0_SS_DIV_8' = __IO_CNTLB0_SS_DIV_8
+   defc `CNTLB0_SS_DIV_4' = __IO_CNTLB0_SS_DIV_4
+   defc `CNTLB0_SS_DIV_2' = __IO_CNTLB0_SS_DIV_2
+   defc `CNTLB0_SS_DIV_1' = __IO_CNTLB0_SS_DIV_1
+
+   defc `CNTLB1_MPBT' = __IO_CNTLB1_MPBT
+   defc `CNTLB1_MP' = __IO_CNTLB1_MP
+   defc `CNTLB1_CTS' = __IO_CNTLB1_CTS
+   defc `CNTLB1_PS' = __IO_CNTLB1_PS
+   defc `CNTLB1_PEO' = __IO_CNTLB1_PEO
+   defc `CNTLB1_DR' = __IO_CNTLB1_DR
+   defc `CNTLB1_SS_MASK' = __IO_CNTLB1_SS_MASK
+   defc `CNTLB1_SS_EXT' = __IO_CNTLB1_SS_EXT
+   defc `CNTLB1_SS_DIV_64' = __IO_CNTLB1_SS_DIV_64
+   defc `CNTLB1_SS_DIV_32' = __IO_CNTLB1_SS_DIV_32
+   defc `CNTLB1_SS_DIV_16' = __IO_CNTLB1_SS_DIV_16
+   defc `CNTLB1_SS_DIV_8' = __IO_CNTLB1_SS_DIV_8
+   defc `CNTLB1_SS_DIV_4' = __IO_CNTLB1_SS_DIV_4
+   defc `CNTLB1_SS_DIV_2' = __IO_CNTLB1_SS_DIV_2
+   defc `CNTLB1_SS_DIV_1' = __IO_CNTLB1_SS_DIV_1
+
+   defc `STAT0_RDRF' = __IO_STAT0_RDRF
+   defc `STAT0_OVRN' = __IO_STAT0_OVRN
+   defc `STAT0_PE' = __IO_STAT0_PE
+   defc `STAT0_FE' = __IO_STAT0_FE
+   defc `STAT0_RIE' = __IO_STAT0_RIE
+   defc `STAT0_DCD0' = __IO_STAT0_DCD0
+   defc `STAT0_TDRE' = __IO_STAT0_TDRE
+   defc `STAT0_TIE' = __IO_STAT0_TIE
+
+   defc `STAT1_RDRF' = __IO_STAT1_RDRF
+   defc `STAT1_OVRN' = __IO_STAT1_OVRN
+   defc `STAT1_PE' = __IO_STAT1_PE
+   defc `STAT1_FE' = __IO_STAT1_FE
+   defc `STAT1_RIE' = __IO_STAT1_RIE
+   defc `STAT1_CTS1E' = __IO_STAT1_CTS1E
+   defc `STAT1_TDRE' = __IO_STAT1_TDRE
+   defc `STAT1_TIE' = __IO_STAT1_TIE
+
+   defc `CNTR_EF' = __IO_CNTR_EF
+   defc `CNTR_EIE' = __IO_CNTR_EIE
+   defc `CNTR_RE' = __IO_CNTR_RE
+   defc `CNTR_TE' = __IO_CNTR_TE
+   defc `CNTR_SS_MASK' = __IO_CNTR_SS_MASK
+   defc `CNTR_SS_EXT' = __IO_CNTR_SS_EXT
+   defc `CNTR_SS_DIV_1280' = __IO_CNTR_SS_DIV_1280
+   defc `CNTR_SS_DIV_640' = __IO_CNTR_SS_DIV_640
+   defc `CNTR_SS_DIV_320' = __IO_CNTR_SS_DIV_320
+   defc `CNTR_SS_DIV_160' = __IO_CNTR_SS_DIV_160
+   defc `CNTR_SS_DIV_80' = __IO_CNTR_SS_DIV_80
+   defc `CNTR_SS_DIV_40' = __IO_CNTR_SS_DIV_40
+   defc `CNTR_SS_DIV_20' = __IO_CNTR_SS_DIV_20
+
+   ; DMA REGISTER BIT FIELDS
+
+   defc `DCNTL_MWI1' = __IO_DCNTL_MWI1
+   defc `DCNTL_MWI0' = __IO_DCNTL_MWI0
+   defc `DCNTL_IWI1' = __IO_DCNTL_IWI1
+   defc `DCNTL_IWI0' = __IO_DCNTL_IWI0
+   defc `DCNTL_DMS1' = __IO_DCNTL_DMS1
+   defc `DCNTL_DMS0' = __IO_DCNTL_DMS0
+   defc `DCNTL_DIM1' = __IO_DCNTL_DIM1
+   defc `DCNTL_DIM0' = __IO_DCNTL_DIM0
+
+   ; INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   defc `ITC_TRAP' = __IO_ITC_TRAP
+   defc `ITC_UFO' = __IO_ITC_UFO
+   defc `ITC_ITE2' = __IO_ITC_ITE2
+   defc `ITC_ITE1' = __IO_ITC_ITE1
+   defc `ITC_ITE0' = __IO_ITC_ITE0
+
+   ; Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   defc `RCR_REFE' = __IO_RCR_REFE
+   defc `RCR_REFW' = __IO_RCR_REFW
+   defc `RCR_CYC1' = __IO_RCR_CYC1
+   defc `RCR_CYC0' = __IO_RCR_CYC0
+
+   ; Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   defc `OMCR_M1E' = __IO_OMCR_M1E
+   defc `OMCR_M1TE' = __IO_OMCR_M1TE
+   defc `OMCR_IOC' = __IO_OMCR_IOC
+
+   ; CPU CLOCK MULTIPLIER REGISTER (CMR) BIT FIELDS (Z8S180 & higher Only)
+
+   defc `CMR_X2' = __IO_CMR_X2
+   defc `CMR_LN_XTAL' = __IO_CMR_LN_XTAL
+
+   ; CPU CONTROL REGISTER (CCR) BIT FIELDS (Z8S180 & higher Only)
+
+   defc `CCR_XTAL_X2' = __IO_CCR_XTAL_X2
+   defc `CCR_STANDBY' = __IO_CCR_STANDBY
+   defc `CCR_BREXT' = __IO_CCR_BREXT
+   defc `CCR_LNPHI' = __IO_CCR_LNPHI
+   defc `CCR_IDLE' = __IO_CCR_IDLE
+   defc `CCR_LNIO' = __IO_CCR_LNIO
+   defc `CCR_LNCPUCTL' = __IO_CCR_LNCPUCTL
+   defc `CCR_LNAD' = __IO_CCR_LNAD
 ')
 ')
 
@@ -702,6 +1297,136 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    `#define' `__IO_OMCR'  __IO_OMCR
    `#define' `__IO_ICR'  __IO_ICR
+
+   // I/O REGISTER BIT FIELDS
+
+   `#define' `__IO_CNTLA0_MPE'   __IO_CNTLA0_MPE
+   `#define' `__IO_CNTLA0_RE'   __IO_CNTLA0_RE
+   `#define' `__IO_CNTLA0_TE'   __IO_CNTLA0_TE
+   `#define' `__IO_CNTLA0_RTS0'   __IO_CNTLA0_RTS0
+   `#define' `__IO_CNTLA0_MPBR'   __IO_CNTLA0_MPBR
+   `#define' `__IO_CNTLA0_EFR'   __IO_CNTLA0_EFR
+   `#define' `__IO_CNTLA0_MODE_MASK'   __IO_CNTLA0_MODE_MASK
+   `#define' `__IO_CNTLA0_MODE_8P2'   __IO_CNTLA0_MODE_8P2
+   `#define' `__IO_CNTLA0_MODE_8P1'   __IO_CNTLA0_MODE_8P1
+   `#define' `__IO_CNTLA0_MODE_8N2'   __IO_CNTLA0_MODE_8N2
+   `#define' `__IO_CNTLA0_MODE_8N1'   __IO_CNTLA0_MODE_8N1
+   `#define' `__IO_CNTLA0_MODE_7P2'   __IO_CNTLA0_MODE_7P2
+   `#define' `__IO_CNTLA0_MODE_7P1'   __IO_CNTLA0_MODE_7P1
+   `#define' `__IO_CNTLA0_MODE_7N2'   __IO_CNTLA0_MODE_7N2
+   `#define' `__IO_CNTLA0_MODE_7N1'   __IO_CNTLA0_MODE_7N1
+
+   `#define' `__IO_CNTLA1_MPE'   __IO_CNTLA1_MPE
+   `#define' `__IO_CNTLA1_RE'   __IO_CNTLA1_RE
+   `#define' `__IO_CNTLA1_TE'   __IO_CNTLA1_TE
+   `#define' `__IO_CNTLA1_CKA1D'   __IO_CNTLA1_CKA1D
+   `#define' `__IO_CNTLA1_MPBR'   __IO_CNTLA1_MPBR
+   `#define' `__IO_CNTLA1_EFR'   __IO_CNTLA1_EFR
+   `#define' `__IO_CNTLA1_MODE_MASK'   __IO_CNTLA1_MODE_MASK
+   `#define' `__IO_CNTLA1_MODE_8P2'   __IO_CNTLA1_MODE_8P2
+   `#define' `__IO_CNTLA1_MODE_8P1'   __IO_CNTLA1_MODE_8P1
+   `#define' `__IO_CNTLA1_MODE_8N2'   __IO_CNTLA1_MODE_8N2
+   `#define' `__IO_CNTLA1_MODE_8N1'   __IO_CNTLA1_MODE_8N1
+   `#define' `__IO_CNTLA1_MODE_7P2'   __IO_CNTLA1_MODE_7P2
+   `#define' `__IO_CNTLA1_MODE_7P1'   __IO_CNTLA1_MODE_7P1
+   `#define' `__IO_CNTLA1_MODE_7N2'   __IO_CNTLA1_MODE_7N2
+   `#define' `__IO_CNTLA1_MODE_7N1'   __IO_CNTLA1_MODE_7N1
+
+   `#define' `__IO_CNTLB0_MPBT'   __IO_CNTLB0_MPBT
+   `#define' `__IO_CNTLB0_MP'   __IO_CNTLB0_MP
+   `#define' `__IO_CNTLB0_CTS'   __IO_CNTLB0_CTS
+   `#define' `__IO_CNTLB0_PS'   __IO_CNTLB0_PS
+   `#define' `__IO_CNTLB0_PEO'   __IO_CNTLB0_PEO
+   `#define' `__IO_CNTLB0_DR'   __IO_CNTLB0_DR
+   `#define' `__IO_CNTLB0_SS_MASK'   __IO_CNTLB0_SS_MASK
+   `#define' `__IO_CNTLB0_SS_EXT'   __IO_CNTLB0_SS_EXT
+   `#define' `__IO_CNTLB0_SS_DIV_64'   __IO_CNTLB0_SS_DIV_64
+   `#define' `__IO_CNTLB0_SS_DIV_32'   __IO_CNTLB0_SS_DIV_32
+   `#define' `__IO_CNTLB0_SS_DIV_16'   __IO_CNTLB0_SS_DIV_16
+   `#define' `__IO_CNTLB0_SS_DIV_8'   __IO_CNTLB0_SS_DIV_8
+   `#define' `__IO_CNTLB0_SS_DIV_4'   __IO_CNTLB0_SS_DIV_4
+   `#define' `__IO_CNTLB0_SS_DIV_2'   __IO_CNTLB0_SS_DIV_2
+   `#define' `__IO_CNTLB0_SS_DIV_1'   __IO_CNTLB0_SS_DIV_1
+
+   `#define' `__IO_CNTLB1_MPBT'   __IO_CNTLB1_MPBT
+   `#define' `__IO_CNTLB1_MP'   __IO_CNTLB1_MP
+   `#define' `__IO_CNTLB1_CTS'   __IO_CNTLB1_CTS
+   `#define' `__IO_CNTLB1_PS'   __IO_CNTLB1_PS
+   `#define' `__IO_CNTLB1_PEO'   __IO_CNTLB1_PEO
+   `#define' `__IO_CNTLB1_DR'   __IO_CNTLB1_DR
+   `#define' `__IO_CNTLB1_SS_MASK'   __IO_CNTLB1_SS_MASK
+   `#define' `__IO_CNTLB1_SS_EXT'   __IO_CNTLB1_SS_EXT
+   `#define' `__IO_CNTLB1_SS_DIV_64'   __IO_CNTLB1_SS_DIV_64
+   `#define' `__IO_CNTLB1_SS_DIV_32'   __IO_CNTLB1_SS_DIV_32
+   `#define' `__IO_CNTLB1_SS_DIV_16'   __IO_CNTLB1_SS_DIV_16
+   `#define' `__IO_CNTLB1_SS_DIV_8'   __IO_CNTLB1_SS_DIV_8
+   `#define' `__IO_CNTLB1_SS_DIV_4'   __IO_CNTLB1_SS_DIV_4
+   `#define' `__IO_CNTLB1_SS_DIV_2'   __IO_CNTLB1_SS_DIV_2
+   `#define' `__IO_CNTLB1_SS_DIV_1'   __IO_CNTLB1_SS_DIV_1
+
+   `#define' `__IO_STAT0_RDRF'   __IO_STAT0_RDRF
+   `#define' `__IO_STAT0_OVRN'   __IO_STAT0_OVRN
+   `#define' `__IO_STAT0_PE'   __IO_STAT0_PE
+   `#define' `__IO_STAT0_FE'   __IO_STAT0_FE
+   `#define' `__IO_STAT0_RIE'   __IO_STAT0_RIE
+   `#define' `__IO_STAT0_DCD0'   __IO_STAT0_DCD0
+   `#define' `__IO_STAT0_TDRE'   __IO_STAT0_TDRE
+   `#define' `__IO_STAT0_TIE'   __IO_STAT0_TIE
+
+   `#define' `__IO_STAT1_RDRF'   __IO_STAT1_RDRF
+   `#define' `__IO_STAT1_OVRN'   __IO_STAT1_OVRN
+   `#define' `__IO_STAT1_PE'   __IO_STAT1_PE
+   `#define' `__IO_STAT1_FE'   __IO_STAT1_FE
+   `#define' `__IO_STAT1_RIE'   __IO_STAT1_RIE
+   `#define' `__IO_STAT1_CTS1E'   __IO_STAT1_CTS1E
+   `#define' `__IO_STAT1_TDRE'   __IO_STAT1_TDRE
+   `#define' `__IO_STAT1_TIE'   __IO_STAT1_TIE
+
+   `#define' `__IO_CNTR_EF'   __IO_CNTR_EF
+   `#define' `__IO_CNTR_EIE'   __IO_CNTR_EIE
+   `#define' `__IO_CNTR_RE'   __IO_CNTR_RE
+   `#define' `__IO_CNTR_TE'   __IO_CNTR_TE
+   `#define' `__IO_CNTR_SS_MASK'   __IO_CNTR_SS_MASK
+   `#define' `__IO_CNTR_SS_EXT'   __IO_CNTR_SS_EXT
+   `#define' `__IO_CNTR_SS_DIV_1280'   __IO_CNTR_SS_DIV_1280
+   `#define' `__IO_CNTR_SS_DIV_640'   __IO_CNTR_SS_DIV_640
+   `#define' `__IO_CNTR_SS_DIV_320'   __IO_CNTR_SS_DIV_320
+   `#define' `__IO_CNTR_SS_DIV_160'   __IO_CNTR_SS_DIV_160
+   `#define' `__IO_CNTR_SS_DIV_80'   __IO_CNTR_SS_DIV_80
+   `#define' `__IO_CNTR_SS_DIV_40'   __IO_CNTR_SS_DIV_40
+   `#define' `__IO_CNTR_SS_DIV_20'   __IO_CNTR_SS_DIV_20
+
+   // DMA REGISTER BIT FIELDS
+
+   `#define' `__IO_DCNTL_MWI1'   __IO_DCNTL_MWI1
+   `#define' `__IO_DCNTL_MWI0'   __IO_DCNTL_MWI0
+   `#define' `__IO_DCNTL_IWI1'   __IO_DCNTL_IWI1
+   `#define' `__IO_DCNTL_IWI0'   __IO_DCNTL_IWI0
+   `#define' `__IO_DCNTL_DMS1'   __IO_DCNTL_DMS1
+   `#define' `__IO_DCNTL_DMS0'   __IO_DCNTL_DMS0
+   `#define' `__IO_DCNTL_DIM1'   __IO_DCNTL_DIM1
+   `#define' `__IO_DCNTL_DIM0'   __IO_DCNTL_DIM0
+
+   // INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   `#define' `__IO_ITC_TRAP'   __IO_ITC_TRAP
+   `#define' `__IO_ITC_UFO'   __IO_ITC_UFO
+   `#define' `__IO_ITC_ITE2'   __IO_ITC_ITE2
+   `#define' `__IO_ITC_ITE1'   __IO_ITC_ITE1
+   `#define' `__IO_ITC_ITE0'   __IO_ITC_ITE0
+
+   // Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   `#define' `__IO_RCR_REFE'   __IO_RCR_REFE
+   `#define' `__IO_RCR_REFW'   __IO_RCR_REFW
+   `#define' `__IO_RCR_CYC1'   __IO_RCR_CYC1
+   `#define' `__IO_RCR_CYC0'   __IO_RCR_CYC0
+
+   // Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   `#define' `__IO_OMCR_M1E'   __IO_OMCR_M1E
+   `#define' `__IO_OMCR_M1TE'   __IO_OMCR_M1TE
+   `#define' `__IO_OMCR_IOC'   __IO_OMCR_IOC
 ',
 `
    // Z8S180 / Z8L180 CLASS
@@ -771,5 +1496,151 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    `#define' `__IO_OMCR'  __IO_OMCR
    `#define' `__IO_ICR'  __IO_ICR
+
+   // I/O REGISTER BIT FIELDS
+
+   `#define' `__IO_CNTLA0_MPE'   __IO_CNTLA0_MPE
+   `#define' `__IO_CNTLA0_RE'   __IO_CNTLA0_RE
+   `#define' `__IO_CNTLA0_TE'   __IO_CNTLA0_TE
+   `#define' `__IO_CNTLA0_RTS0'   __IO_CNTLA0_RTS0
+   `#define' `__IO_CNTLA0_MPBR'   __IO_CNTLA0_MPBR
+   `#define' `__IO_CNTLA0_EFR'   __IO_CNTLA0_EFR
+   `#define' `__IO_CNTLA0_MODE_MASK'   __IO_CNTLA0_MODE_MASK
+   `#define' `__IO_CNTLA0_MODE_8P2'   __IO_CNTLA0_MODE_8P2
+   `#define' `__IO_CNTLA0_MODE_8P1'   __IO_CNTLA0_MODE_8P1
+   `#define' `__IO_CNTLA0_MODE_8N2'   __IO_CNTLA0_MODE_8N2
+   `#define' `__IO_CNTLA0_MODE_8N1'   __IO_CNTLA0_MODE_8N1
+   `#define' `__IO_CNTLA0_MODE_7P2'   __IO_CNTLA0_MODE_7P2
+   `#define' `__IO_CNTLA0_MODE_7P1'   __IO_CNTLA0_MODE_7P1
+   `#define' `__IO_CNTLA0_MODE_7N2'   __IO_CNTLA0_MODE_7N2
+   `#define' `__IO_CNTLA0_MODE_7N1'   __IO_CNTLA0_MODE_7N1
+
+   `#define' `__IO_CNTLA1_MPE'   __IO_CNTLA1_MPE
+   `#define' `__IO_CNTLA1_RE'   __IO_CNTLA1_RE
+   `#define' `__IO_CNTLA1_TE'   __IO_CNTLA1_TE
+   `#define' `__IO_CNTLA1_CKA1D'   __IO_CNTLA1_CKA1D
+   `#define' `__IO_CNTLA1_MPBR'   __IO_CNTLA1_MPBR
+   `#define' `__IO_CNTLA1_EFR'   __IO_CNTLA1_EFR
+   `#define' `__IO_CNTLA1_MODE_MASK'   __IO_CNTLA1_MODE_MASK
+   `#define' `__IO_CNTLA1_MODE_8P2'   __IO_CNTLA1_MODE_8P2
+   `#define' `__IO_CNTLA1_MODE_8P1'   __IO_CNTLA1_MODE_8P1
+   `#define' `__IO_CNTLA1_MODE_8N2'   __IO_CNTLA1_MODE_8N2
+   `#define' `__IO_CNTLA1_MODE_8N1'   __IO_CNTLA1_MODE_8N1
+   `#define' `__IO_CNTLA1_MODE_7P2'   __IO_CNTLA1_MODE_7P2
+   `#define' `__IO_CNTLA1_MODE_7P1'   __IO_CNTLA1_MODE_7P1
+   `#define' `__IO_CNTLA1_MODE_7N2'   __IO_CNTLA1_MODE_7N2
+   `#define' `__IO_CNTLA1_MODE_7N1'   __IO_CNTLA1_MODE_7N1
+
+   `#define' `__IO_CNTLB0_MPBT'   __IO_CNTLB0_MPBT
+   `#define' `__IO_CNTLB0_MP'   __IO_CNTLB0_MP
+   `#define' `__IO_CNTLB0_CTS'   __IO_CNTLB0_CTS
+   `#define' `__IO_CNTLB0_PS'   __IO_CNTLB0_PS
+   `#define' `__IO_CNTLB0_PEO'   __IO_CNTLB0_PEO
+   `#define' `__IO_CNTLB0_DR'   __IO_CNTLB0_DR
+   `#define' `__IO_CNTLB0_SS_MASK'   __IO_CNTLB0_SS_MASK
+   `#define' `__IO_CNTLB0_SS_EXT'   __IO_CNTLB0_SS_EXT
+   `#define' `__IO_CNTLB0_SS_DIV_64'   __IO_CNTLB0_SS_DIV_64
+   `#define' `__IO_CNTLB0_SS_DIV_32'   __IO_CNTLB0_SS_DIV_32
+   `#define' `__IO_CNTLB0_SS_DIV_16'   __IO_CNTLB0_SS_DIV_16
+   `#define' `__IO_CNTLB0_SS_DIV_8'   __IO_CNTLB0_SS_DIV_8
+   `#define' `__IO_CNTLB0_SS_DIV_4'   __IO_CNTLB0_SS_DIV_4
+   `#define' `__IO_CNTLB0_SS_DIV_2'   __IO_CNTLB0_SS_DIV_2
+   `#define' `__IO_CNTLB0_SS_DIV_1'   __IO_CNTLB0_SS_DIV_1
+
+   `#define' `__IO_CNTLB1_MPBT'   __IO_CNTLB1_MPBT
+   `#define' `__IO_CNTLB1_MP'   __IO_CNTLB1_MP
+   `#define' `__IO_CNTLB1_CTS'   __IO_CNTLB1_CTS
+   `#define' `__IO_CNTLB1_PS'   __IO_CNTLB1_PS
+   `#define' `__IO_CNTLB1_PEO'   __IO_CNTLB1_PEO
+   `#define' `__IO_CNTLB1_DR'   __IO_CNTLB1_DR
+   `#define' `__IO_CNTLB1_SS_MASK'   __IO_CNTLB1_SS_MASK
+   `#define' `__IO_CNTLB1_SS_EXT'   __IO_CNTLB1_SS_EXT
+   `#define' `__IO_CNTLB1_SS_DIV_64'   __IO_CNTLB1_SS_DIV_64
+   `#define' `__IO_CNTLB1_SS_DIV_32'   __IO_CNTLB1_SS_DIV_32
+   `#define' `__IO_CNTLB1_SS_DIV_16'   __IO_CNTLB1_SS_DIV_16
+   `#define' `__IO_CNTLB1_SS_DIV_8'   __IO_CNTLB1_SS_DIV_8
+   `#define' `__IO_CNTLB1_SS_DIV_4'   __IO_CNTLB1_SS_DIV_4
+   `#define' `__IO_CNTLB1_SS_DIV_2'   __IO_CNTLB1_SS_DIV_2
+   `#define' `__IO_CNTLB1_SS_DIV_1'   __IO_CNTLB1_SS_DIV_1
+
+   `#define' `__IO_STAT0_RDRF'   __IO_STAT0_RDRF
+   `#define' `__IO_STAT0_OVRN'   __IO_STAT0_OVRN
+   `#define' `__IO_STAT0_PE'   __IO_STAT0_PE
+   `#define' `__IO_STAT0_FE'   __IO_STAT0_FE
+   `#define' `__IO_STAT0_RIE'   __IO_STAT0_RIE
+   `#define' `__IO_STAT0_DCD0'   __IO_STAT0_DCD0
+   `#define' `__IO_STAT0_TDRE'   __IO_STAT0_TDRE
+   `#define' `__IO_STAT0_TIE'   __IO_STAT0_TIE
+
+   `#define' `__IO_STAT1_RDRF'   __IO_STAT1_RDRF
+   `#define' `__IO_STAT1_OVRN'   __IO_STAT1_OVRN
+   `#define' `__IO_STAT1_PE'   __IO_STAT1_PE
+   `#define' `__IO_STAT1_FE'   __IO_STAT1_FE
+   `#define' `__IO_STAT1_RIE'   __IO_STAT1_RIE
+   `#define' `__IO_STAT1_CTS1E'   __IO_STAT1_CTS1E
+   `#define' `__IO_STAT1_TDRE'   __IO_STAT1_TDRE
+   `#define' `__IO_STAT1_TIE'   __IO_STAT1_TIE
+
+   `#define' `__IO_CNTR_EF'   __IO_CNTR_EF
+   `#define' `__IO_CNTR_EIE'   __IO_CNTR_EIE
+   `#define' `__IO_CNTR_RE'   __IO_CNTR_RE
+   `#define' `__IO_CNTR_TE'   __IO_CNTR_TE
+   `#define' `__IO_CNTR_SS_MASK'   __IO_CNTR_SS_MASK
+   `#define' `__IO_CNTR_SS_EXT'   __IO_CNTR_SS_EXT
+   `#define' `__IO_CNTR_SS_DIV_1280'   __IO_CNTR_SS_DIV_1280
+   `#define' `__IO_CNTR_SS_DIV_640'   __IO_CNTR_SS_DIV_640
+   `#define' `__IO_CNTR_SS_DIV_320'   __IO_CNTR_SS_DIV_320
+   `#define' `__IO_CNTR_SS_DIV_160'   __IO_CNTR_SS_DIV_160
+   `#define' `__IO_CNTR_SS_DIV_80'   __IO_CNTR_SS_DIV_80
+   `#define' `__IO_CNTR_SS_DIV_40'   __IO_CNTR_SS_DIV_40
+   `#define' `__IO_CNTR_SS_DIV_20'   __IO_CNTR_SS_DIV_20
+
+   // DMA REGISTER BIT FIELDS
+
+   `#define' `__IO_DCNTL_MWI1'   __IO_DCNTL_MWI1
+   `#define' `__IO_DCNTL_MWI0'   __IO_DCNTL_MWI0
+   `#define' `__IO_DCNTL_IWI1'   __IO_DCNTL_IWI1
+   `#define' `__IO_DCNTL_IWI0'   __IO_DCNTL_IWI0
+   `#define' `__IO_DCNTL_DMS1'   __IO_DCNTL_DMS1
+   `#define' `__IO_DCNTL_DMS0'   __IO_DCNTL_DMS0
+   `#define' `__IO_DCNTL_DIM1'   __IO_DCNTL_DIM1
+   `#define' `__IO_DCNTL_DIM0'   __IO_DCNTL_DIM0
+
+   // INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   `#define' `__IO_ITC_TRAP'   __IO_ITC_TRAP
+   `#define' `__IO_ITC_UFO'   __IO_ITC_UFO
+   `#define' `__IO_ITC_ITE2'   __IO_ITC_ITE2
+   `#define' `__IO_ITC_ITE1'   __IO_ITC_ITE1
+   `#define' `__IO_ITC_ITE0'   __IO_ITC_ITE0
+
+   // Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   `#define' `__IO_RCR_REFE'   __IO_RCR_REFE
+   `#define' `__IO_RCR_REFW'   __IO_RCR_REFW
+   `#define' `__IO_RCR_CYC1'   __IO_RCR_CYC1
+   `#define' `__IO_RCR_CYC0'   __IO_RCR_CYC0
+
+   // Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   `#define' `__IO_OMCR_M1E'   __IO_OMCR_M1E
+   `#define' `__IO_OMCR_M1TE'   __IO_OMCR_M1TE
+   `#define' `__IO_OMCR_IOC'   __IO_OMCR_IOC
+
+   // CPU CLOCK MULTIPLIER REGISTER (CMR) BIT FIELDS (Z8S180 & higher Only)
+
+   `#define' `__IO_CMR_X2'   __IO_CMR_X2
+   `#define' `__IO_CMR_LN_XTAL'   __IO_CMR_LN_XTAL
+
+   // CPU CONTROL REGISTER (CCR) BIT FIELDS (Z8S180 & higher Only)
+
+   `#define' `__IO_CCR_XTAL_X2'   __IO_CCR_XTAL_X2
+   `#define' `__IO_CCR_STANDBY'   __IO_CCR_STANDBY
+   `#define' `__IO_CCR_BREXT'   __IO_CCR_BREXT
+   `#define' `__IO_CCR_LNPHI'   __IO_CCR_LNPHI
+   `#define' `__IO_CCR_IDLE'   __IO_CCR_IDLE
+   `#define' `__IO_CCR_LNIO'   __IO_CCR_LNIO
+   `#define' `__IO_CCR_LNCPUCTL'   __IO_CCR_LNCPUCTL
+   `#define' `__IO_CCR_LNAD'   __IO_CCR_LNAD
 ')
 ')

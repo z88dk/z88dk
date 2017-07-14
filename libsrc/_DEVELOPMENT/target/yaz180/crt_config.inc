@@ -30,7 +30,7 @@ IF __CRTCFG = 0
       
    defc TAR__crt_initialize_bss        = 1
    
-   defc TAR__crt_include_preamble      = 0
+   defc TAR__crt_include_preamble      = 1
 
    defc TAR__crt_org_vector_table      = 0x2000
    defc TAR__crt_interrupt_mode        = 1

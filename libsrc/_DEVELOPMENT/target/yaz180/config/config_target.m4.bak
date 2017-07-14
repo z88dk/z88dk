@@ -28,6 +28,10 @@ dnl#
 ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__YAZ180'
+
+PUBLIC `ASCI0_RX_SIZE'
+PUBLIC `ASCI0_TX_SIZE'
+
 ')
 
 dnl#
@@ -37,6 +41,10 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 defc `__YAZ180' = __YAZ180
+
+defc `ASCI0_RX_SIZE' = ASCI0_RX_SIZE
+defc `ASCI0_TX_SIZE' = ASCI0_TX_SIZE
+
 ')
 
 dnl#
@@ -45,6 +53,11 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
+
 `#undef'  `__YAZ180'
 `#define' `__YAZ180'  __YAZ180
+
+`#define' `ASCI0_RX_SIZE'  ASCI0_RX_SIZE
+`#define' `ASCI0_TX_SIZE'  ASCI0_TX_SIZE
+
 ')

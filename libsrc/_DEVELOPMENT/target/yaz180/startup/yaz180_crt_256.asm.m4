@@ -39,13 +39,13 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/character/rc_00_input_asci.m4')
+dnl#include(`driver/character/rc_00_input_asci0.m4')
 dnl#include(`driver/character/rc_00_input_basic.m4')
 dnl#include(`driver/terminal/rc_01_input_basic_dcio.m4')
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/character/rc_00_output_asci.m4')
+dnl#include(`driver/character/rc_00_output_asci0.m4')
 dnl#include(`driver/character/rc_00_output_basic.m4')
 dnl#include(`driver/terminal/rc_01_input_basic_dcio.m4')
 dnl

@@ -1,9 +1,9 @@
 dnl############################################################
-dnl##       RC2014_CRT_16.ASM.M4 - EXAMPLE TARGET            ##
+dnl##      YAZ180_CRT_0.ASM.M4 - STANDALONE TARGET           ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                yaz180 standalone target                   ;;
-;; generated from target/yaz180/startup/yaz180_crt_17.asm.m4   ;;
+;; generated from target/yaz180/startup/yaz180_crt_17.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -39,15 +39,15 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/character/rc_00_input_acia.m4')
+dnl#include(`driver/character/rc_00_input_asci0.m4')
 dnl#include(`driver/character/rc_00_input_basic.m4')
 dnl#include(`driver/terminal/rc_01_input_basic_dcio.m4')
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/character/rc_00_output_acia.m4')
+dnl#include(`driver/character/rc_00_output_asci0.m4')
 dnl#include(`driver/character/rc_00_output_basic.m4')
-dnl#include(`driver/terminal/rc_01_output_basic_dcio.m4')
+dnl#include(`driver/terminal/rc_01_input_basic_dcio.m4')
 dnl
 dnl## file dup
 dnl
