@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_arch
 
@@ -34,7 +36,12 @@ asm_zx_cxy2saddr:
    
    ld a,h
    and $18
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   or $c0
+ELSE
    or $40
-   ld h,a
-   
+ENDIF
+
+   ld h,a   
    ret

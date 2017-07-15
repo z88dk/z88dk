@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_arch
 
@@ -31,5 +33,11 @@ asm_zx_aaddrcup:
    dec h
    
    ld a,h
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   cp $d8
+ELSE
    cp $58
+ENDIF
+
    ret
