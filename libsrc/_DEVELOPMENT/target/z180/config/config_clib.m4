@@ -435,24 +435,23 @@ define(`__CLIB_OPT_SCANF_2_lli', 0x40)
 ; ## STDLIB Options ###########################################
 ; #############################################################
 
-; Select whether fast memset and fast memcpy are enabled.
-; For copies of minimum size unrolled loops will be used.
+; Select whether copy operations are unrolled.
 
-define(`__CLIB_OPT_FASTCOPY', 0x00)
+define(`__CLIB_OPT_UNROLL', 0x00)
 
-define(`__CLIB_OPT_FASTCOPY_MEMCPY',     0x01)
-define(`__CLIB_OPT_FASTCOPY_MEMSET',     0x02)
-define(`__CLIB_OPT_FASTCOPY_LDIR',       0x20)
-define(`__CLIB_OPT_FASTCOPY_LDIR_SMC',   0x40)
-define(`__CLIB_OPT_FASTCOPY_MEMCPY_SMC', 0x80)
+define(`__CLIB_OPT_UNROLL_MEMCPY',     0x01)
+define(`__CLIB_OPT_UNROLL_MEMSET',     0x02)
+define(`__CLIB_OPT_UNROLL_OTIR',       0x10)
+define(`__CLIB_OPT_UNROLL_LDIR',       0x20)
+define(`__CLIB_OPT_UNROLL_USER_SMC',   0x40)
+define(`__CLIB_OPT_UNROLL_LIB_SMC',    0x80)
 
-; bit 0 = $01 = enable fast memcpy
-; bit 1 = $02 = enable fast memset
-; bit 5 = $20 = enable fast ldir for some library functions
-; bit 6 = $40 = enable self-modifying fast ldir implementation for the library
-;         (faster but makes code non#reentrant)
-; bit 7 = $80 = self-modifying l_fast_memcpy_smc made available for user code only
-;         (does not enable self-modifying code for the lib; bit 6 set also makes available)
+; bit 0 = $01 = enable unrolled memcpy
+; bit 1 = $02 = enable unrolled memset
+; bit 4 - $10 = enable unrolled otir
+; bit 5 = $20 = enable unrolled ldir for some library functions
+; bit 6 = $40 = enable unrolled smc functions for the user only
+; bit 7 = $80 = enable unrolled smc functions for the lib & user (multithreading issues)
 
 ; Select whether strtod() and atof() include code to parse
 ; hex floats and nan/inf strings.
@@ -682,13 +681,14 @@ PUBLIC `__CLIB_OPT_SCANF_2_llX'
 PUBLIC `__CLIB_OPT_SCANF_2_llo'
 PUBLIC `__CLIB_OPT_SCANF_2_lli'
 
-PUBLIC `__CLIB_OPT_FASTCOPY'
+PUBLIC `__CLIB_OPT_UNROLL'
 
-PUBLIC `__CLIB_OPT_FASTCOPY_MEMCPY'
-PUBLIC `__CLIB_OPT_FASTCOPY_MEMSET'
-PUBLIC `__CLIB_OPT_FASTCOPY_LDIR'
-PUBLIC `__CLIB_OPT_FASTCOPY_LDIR_SMC'
-PUBLIC `__CLIB_OPT_FASTCOPY_MEMCPY_SMC'
+PUBLIC `__CLIB_OPT_UNROLL_MEMCPY'
+PUBLIC `__CLIB_OPT_UNROLL_MEMSET'
+PUBLIC `__CLIB_OPT_UNROLL_OTIR'
+PUBLIC `__CLIB_OPT_UNROLL_LDIR'
+PUBLIC `__CLIB_OPT_UNROLL_USER_SMC'
+PUBLIC `__CLIB_OPT_UNROLL_LIB_SMC'
 
 PUBLIC `__CLIB_OPT_STRTOD'
 
@@ -884,13 +884,14 @@ defc `__CLIB_OPT_SCANF_2_llX' = __CLIB_OPT_SCANF_2_llX
 defc `__CLIB_OPT_SCANF_2_llo' = __CLIB_OPT_SCANF_2_llo
 defc `__CLIB_OPT_SCANF_2_lli' = __CLIB_OPT_SCANF_2_lli
 
-defc `__CLIB_OPT_FASTCOPY' = __CLIB_OPT_FASTCOPY
+defc `__CLIB_OPT_UNROLL' = __CLIB_OPT_UNROLL
 
-defc `__CLIB_OPT_FASTCOPY_MEMCPY' = __CLIB_OPT_FASTCOPY_MEMCPY
-defc `__CLIB_OPT_FASTCOPY_MEMSET' = __CLIB_OPT_FASTCOPY_MEMSET
-defc `__CLIB_OPT_FASTCOPY_LDIR' = __CLIB_OPT_FASTCOPY_LDIR
-defc `__CLIB_OPT_FASTCOPY_LDIR_SMC' = __CLIB_OPT_FASTCOPY_LDIR_SMC
-defc `__CLIB_OPT_FASTCOPY_MEMCPY_SMC' = __CLIB_OPT_FASTCOPY_MEMCPY_SMC
+defc `__CLIB_OPT_UNROLL_MEMCPY' = __CLIB_OPT_UNROLL_MEMCPY
+defc `__CLIB_OPT_UNROLL_MEMSET' = __CLIB_OPT_UNROLL_MEMSET
+defc `__CLIB_OPT_UNROLL_OTIR' = __CLIB_OPT_UNROLL_OTIR
+defc `__CLIB_OPT_UNROLL_LDIR' = __CLIB_OPT_UNROLL_LDIR
+defc `__CLIB_OPT_UNROLL_USER_SMC' = __CLIB_OPT_UNROLL_USER_SMC
+defc `__CLIB_OPT_UNROLL_LIB_SMC' = __CLIB_OPT_UNROLL_LIB_SMC
 
 defc `__CLIB_OPT_STRTOD' = __CLIB_OPT_STRTOD
 
@@ -1086,13 +1087,14 @@ ifdef(`CFG_C_DEF',
 `#define' `__CLIB_OPT_SCANF_2_llo'  __CLIB_OPT_SCANF_2_llo
 `#define' `__CLIB_OPT_SCANF_2_lli'  __CLIB_OPT_SCANF_2_lli
 
-`#define' `__CLIB_OPT_FASTCOPY'  __CLIB_OPT_FASTCOPY
+`#define' `__CLIB_OPT_UNROLL'  __CLIB_OPT_UNROLL
 
-`#define' `__CLIB_OPT_FASTCOPY_MEMCPY'  __CLIB_OPT_FASTCOPY_MEMCPY
-`#define' `__CLIB_OPT_FASTCOPY_MEMSET'  __CLIB_OPT_FASTCOPY_MEMSET
-`#define' `__CLIB_OPT_FASTCOPY_LDIR'  __CLIB_OPT_FASTCOPY_LDIR
-`#define' `__CLIB_OPT_FASTCOPY_LDIR_SMC'  __CLIB_OPT_FASTCOPY_LDIR_SMC
-`#define' `__CLIB_OPT_FASTCOPY_MEMCPY_SMC'  __CLIB_OPT_FASTCOPY_MEMCPY_SMC
+`#define' `__CLIB_OPT_UNROLL_MEMCPY'  __CLIB_OPT_UNROLL_MEMCPY
+`#define' `__CLIB_OPT_UNROLL_MEMSET'  __CLIB_OPT_UNROLL_MEMSET
+`#define' `__CLIB_OPT_UNROLL_OTIR'  __CLIB_OPT_UNROLL_OTIR
+`#define' `__CLIB_OPT_UNROLL_LDIR'  __CLIB_OPT_UNROLL_LDIR
+`#define' `__CLIB_OPT_UNROLL_USER_SMC'  __CLIB_OPT_UNROLL_USER_SMC
+`#define' `__CLIB_OPT_UNROLL_LIB_SMC'  __CLIB_OPT_UNROLL_LIB_SMC
 
 `#define' `__CLIB_OPT_STRTOD'  __CLIB_OPT_STRTOD
 

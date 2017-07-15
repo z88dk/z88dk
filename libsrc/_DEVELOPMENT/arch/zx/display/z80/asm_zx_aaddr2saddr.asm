@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_arch
 
@@ -28,7 +30,12 @@ asm_zx_aaddr2saddr:
    rlca
    rlca
    rlca
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   xor $06
+ELSE
    xor $82
-   
+ENDIF
+
    ld h,a
    ret

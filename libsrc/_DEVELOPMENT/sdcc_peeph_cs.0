@@ -5,6 +5,67 @@
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_intrinsic_outi_num_256
+} by {
+	call	l_outi_256
+	; peephole z88dk-intrinsic-outi-num-256
+}
+
+replace restart {
+	jp	_intrinsic_outi_num_256
+} by {
+	jp	l_outi_256
+	; peephole z88dk-intrinsic-outi-num-256
+}
+
+replace restart {
+	call	_intrinsic_outi_num_128
+} by {
+	call	l_outi_128
+	; peephole z88dk-intrinsic-outi-num-128
+}
+
+replace restart {
+	jp	_intrinsic_outi_num_128
+} by {
+	jp	l_outi_128
+	; peephole z88dk-intrinsic-outi-num-128
+}
+
+barrier
+
+replace restart {
+	call	_intrinsic_outi_num_%1
+} by {
+	call	l_outi-(%1*2)
+	; peephole z88dk-intrinsic-outi-num-%1
+}
+
+replace restart {
+	jp	_intrinsic_outi_num_%1
+} by {
+	jp	l_outi-(%1*2)
+	; peephole z88dk-intrinsic-outi-num-%1
+}
+
+replace restart {
+	call	_intrinsic_outi_port_%1
+} by {
+	ld	c,#%1  ; outi
+	; peephole z88dk-intrinsic-outi-port-%1
+}
+
+replace restart {
+	call	_intrinsic_outi
+} by {
+	; peephole z88dk-intrinsic-outi
+}
+
+
+barrier
+
+
+replace restart {
 	call	_intrinsic_slp
 } by {
 	slp

@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_arch
 
@@ -25,8 +27,12 @@ asm_zx_aaddrcright:
    ; uses  : af, hl
    
    inc hl
-   
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   ld a,$da
+ELSE
    ld a,$5a
-   cp h
-   
+ENDIF
+
+   cp h   
    ret
