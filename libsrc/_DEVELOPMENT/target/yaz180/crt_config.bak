@@ -25,7 +25,7 @@ IF __CRTCFG = 0
 
    defc TAR__crt_model                 = 2
    
-   defc TAR__register_sp               = 0x4000
+   defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
@@ -67,13 +67,13 @@ IF __CRTCFG = 1
    ;; basic driver model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0x8000
+   defc TAR__crt_org_code              = 0x8200
    defc TAR__crt_org_data              = 0x2800
-   defc TAR__crt_org_bss               = 0
+   defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0x4000
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
@@ -115,13 +115,13 @@ IF __CRTCFG = 2
    ;; no drivers model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0x8000
+   defc TAR__crt_org_code              = 0x8200
    defc TAR__crt_org_data              = 0x2800
-   defc TAR__crt_org_bss               = 0
+   defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
    
-   defc TAR__register_sp               = -1
+   defc TAR__register_sp               = 0x4000
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1

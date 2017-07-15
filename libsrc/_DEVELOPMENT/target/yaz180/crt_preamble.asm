@@ -1,8 +1,9 @@
-IF (__crt_org_code = 0) && __crt_include_preamble
+
+IF (__crt_org_code = 0)
 
 SECTION code_crt_init
 
-EXTERN __IO_OMCR_M1E, __IO_CMR_X2, __IO_DCNTL_IWI0
+EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
 
     XOR     A               ; Zero Accumulator
 
