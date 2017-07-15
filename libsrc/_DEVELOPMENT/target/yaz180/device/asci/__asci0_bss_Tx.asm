@@ -1,5 +1,3 @@
-INCLUDE "config_private.inc"
-
 SECTION bss_driver
 
 EXTERN ASCI0_TX_SIZE

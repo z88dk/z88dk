@@ -39,13 +39,13 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/character/rc_00_input_asci.m4')
+dnl#include(`driver/character/rc_00_input_asci0.m4')
 dnl#include(`driver/character/rc_00_input_basic.m4')
 dnl#include(`driver/terminal/rc_01_input_basic_dcio.m4')
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/character/rc_00_output_asci.m4')
+dnl#include(`driver/character/rc_00_output_asci0.m4')
 dnl#include(`driver/character/rc_00_output_basic.m4')
 dnl#include(`driver/terminal/rc_01_input_basic_dcio.m4')
 dnl
@@ -66,11 +66,11 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`driver/character/rc_00_input_asci.m4')
-   m4_rc_00_input_asci(_stdin, 0x0100)
+   include(`driver/character/rc_00_input_asci0.m4')
+   m4_rc_00_input_asci0(_stdin, 0x0100)
 
-   include(`driver/character/rc_00_output_asci.m4')
-   m4_rc_00_output_asci(_stdout, 0x0100)
+   include(`driver/character/rc_00_output_asci0.m4')
+   m4_rc_00_output_asci0(_stdout, 0x0100)
 
    include(`../m4_file_dup.m4')
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)

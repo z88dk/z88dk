@@ -1,11 +1,10 @@
-
     SECTION code_driver
     SECTION code_driver_character_output
 
     PUBLIC _asci0_putc
     
     EXTERN STAT0, TDR0
-    EXTERN  __IO_STAT0_TDRE, __IO_STAT0_TIE
+    EXTERN STAT0_TDRE, STAT0_TIE
     
     EXTERN ASCI0_TX_SIZE
 
@@ -24,7 +23,7 @@
         jr nz, put_buffer_tx        ; buffer not empty, so abandon immediate Tx
 
         in0 a, (STAT0)              ; get the ASCI0 status register
-        and __IO_STAT0_TDRE         ; test whether we can transmit on ASCI0
+        and STAT0_TDRE              ; test whether we can transmit on ASCI0
         jr z, put_buffer_tx         ; if not, so abandon immediate Tx
 
         ld a, l                     ; Retrieve Tx character for immediate Tx
@@ -56,12 +55,12 @@
     clean_up_tx:
         
         in0 a, (STAT0)              ; load the ASCI0 status register
-        and __IO_STAT0_TIE          ; test whether ASCI0 interrupt is set
+        and STAT0_TIE               ; test whether ASCI0 interrupt is set
         ret nz                      ; if so then just return
 
         call asm_z180_push_di       ; critical section begin
         in0 a, (STAT0)              ; get the ASCI status register again
-        or __IO_STAT0_TIE           ; mask in (enable) the Tx Interrupt
+        or STAT0_TIE                ; mask in (enable) the Tx Interrupt
         out0 (STAT0), a             ; set the ASCI status register
         
         jp asm_z180_pop_ei_jp       ; critical section end

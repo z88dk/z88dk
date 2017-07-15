@@ -1,4 +1,3 @@
-
     SECTION code_driver
 
     PUBLIC _asci0_interrupt
@@ -9,9 +8,9 @@
     EXTERN ASCI0_RX_SIZE
    
     EXTERN CNTLA0, STAT0, TDR0, RDR0
-    EXTERN __IO_CNTLA0_EFR
-    EXTERN __IO_STAT0_RDRF, __IO_STAT0_OVRN, __IO_STAT0_PE, __IO_STAT0_FE
-    EXTERN __IO_STAT0_TDRE, __IO_STAT0_TIE
+    EXTERN CNTLA0_EFR
+    EXTERN STAT0_RDRF, STAT0_OVRN, STAT0_PE, STAT0_FE
+    EXTERN STAT0_TDRE, STAT0_TIE
 
     _asci0_interrupt:
 
@@ -19,13 +18,13 @@
         push hl
                                     ; start doing the Rx stuff
         in0 a, (STAT0)              ; load the ASCI0 status register
-        tst __IO_STAT0_RDRF         ; test whether we have received on ASCI0
+        tst STAT0_RDRF              ; test whether we have received on ASCI0
         jr z, ASCI0_TX_CHECK        ; if not, go check for bytes to transmit
 
 ASCI0_RX_GET:
         in0 l, (RDR0)               ; move Rx byte from the ASCI0 RDR to l
         
-        and __IO_STAT0_OVRN|__IO_STAT0_PE|__IO_STAT0_FE   ; test whether we have error on ASCI0
+        and STAT0_OVRN|STAT0_PE|STAT0_FE ; test whether we have error on ASCI0
         jr nz, ASCI0_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
         ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer      
@@ -45,16 +44,16 @@ ASCI0_RX_GET:
 
 ASCI0_RX_ERROR:
         in0 a, (CNTLA0)             ; get the CNTRLA0 register
-        and ~__IO_CNTLA0_EFR        ; to clear the error flag, EFR, to 0 
+        and ~  CNTLA0_EFR           ; to clear the error flag, EFR, to 0 
         out0 (CNTLA0), a            ; and write it back
 
 ASCI0_RX_CHECK:                     ; Z8S180 has 4 byte Rx H/W FIFO
         in0 a, (STAT0)              ; load the ASCI0 status register
-        tst __IO_STAT0_RDRF         ; test whether we have received on ASCI0
+        tst STAT0_RDRF              ; test whether we have received on ASCI0
         jr nz, ASCI0_RX_GET         ; if still more bytes in H/W FIFO, get them
 
 ASCI0_TX_CHECK:                     ; now start doing the Tx stuff
-        and __IO_STAT0_TDRE         ; test whether we can transmit on ASCI0
+        and STAT0_TDRE              ; test whether we can transmit on ASCI0
         jr z, ASCI0_TX_END          ; if not, then end
 
         ld a, (asci0TxCount)        ; get the number of bytes in the Tx buffer
@@ -75,7 +74,7 @@ ASCI0_TX_CHECK:                     ; now start doing the Tx stuff
 
 ASCI0_TX_TIE0_CLEAR:
         in0 a, (STAT0)              ; get the ASCI0 status register
-        and ~__IO_STAT0_TIE         ; mask out (disable) the Tx Interrupt
+        and ~STAT0_TIE              ; mask out (disable) the Tx Interrupt
         out0 (STAT0), a             ; set the ASCI0 status register
 
 ASCI0_TX_END:
