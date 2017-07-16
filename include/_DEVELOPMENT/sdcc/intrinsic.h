@@ -19,7 +19,6 @@
 #define intrinsic_label(name)  { extern void intrinsic_label_##name(void); intrinsic_label_##name(); }
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
-extern void intrinsic_ldi(void*,void*,unsigned char);
 extern void intrinsic_outi(void*,unsigned char,unsigned char);
 
 #endif

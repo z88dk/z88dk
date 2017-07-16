@@ -86,24 +86,33 @@ __DPROTO(,,size_t,,strxfrm,char *dst,const char *src,size_t n)
 
 #ifdef __SCCZ80
 
-   #ifndef __SCCZ80_DISABLE_BUILTIN
+   #ifndef __DISABLE_BUILTIN
 
-	extern void __LIB__    *__builtin_memset(void *dst, int c, size_t n) __smallc;
-   extern void __LIB__    *__builtin_memcpy(void *dst, void *src,size_t n) __smallc;
-   extern char __LIB__    *__builtin_strcpy(char *dst, const char *src) __smallc;
-   extern char __LIB__    *__builtin_strchr(const char *haystack, int needle) __smallc;
-
-   #undef memset
-   #undef memcpy
-   #undef strcpy
-   #undef strchr
-
-   #define strcpy(a,b)     __builtin_strcpy(a,b)
-   #define strchr(a,b)     __builtin_strchr(a,b)
+   #ifndef __DISABLE_BUILTIN_MEMSET
+   #undef  memset
    #define memset(a,b,c)   __builtin_memset(a,b,c)
+   extern void __LIB__    *__builtin_memset(void *dst, int c, size_t n) __smallc;
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_MEMCPY
+   #undef  memcpy
    #define memcpy(a,b,c)   __builtin_memcpy(a,b,c)
+   extern void __LIB__    *__builtin_memcpy(void *dst, void *src,size_t n) __smallc;
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_STRCPY
+   #undef  strcpy
+   #define strcpy(a,b)     __builtin_strcpy(a,b)
+   extern char __LIB__    *__builtin_strcpy(char *dst, const char *src) __smallc;
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_STRCHR
+   #undef  strchr
+   #define strchr(a,b)     __builtin_strchr(a,b)
+   extern char __LIB__    *__builtin_strchr(const char *haystack, int needle) __smallc;
+   #endif
 
-	#endif
+   #endif
 
 #endif
 
@@ -113,19 +122,32 @@ __DPROTO(,,size_t,,strxfrm,char *dst,const char *src,size_t n)
    extern int ffsll_callee(long long i) __preserves_regs(b,c) __z88dk_callee;
    #define ffsll(a) ffsll_callee(a)
 
-   #ifndef __SDCC_DISABLE_BUILTIN
+   #ifndef __DISABLE_BUILTIN
 
-   #undef memcpy
-   #undef strcpy
-   #undef strncpy
-   #undef strchr
-   #undef memset
-
-   #define memcpy(dst, src, n)          __builtin_memcpy(dst, src, n)
-   #define strcpy(dst, src)             __builtin_strcpy(dst, src)
-   #define strncpy(dst, src, n)         __builtin_strncpy(dst, src, n)
-   #define strchr(s, c)                 __builtin_strchr(s, c)
-   #define memset(dst, c, n)            __builtin_memset(dst, c, n)
+   #ifndef __DISABLE_BUILTIN_MEMCPY
+   #undef  memcpy
+   #define memcpy(dst, src, n)    __builtin_memcpy(dst, src, n)
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_STRCPY
+   #undef  strcpy
+   #define strcpy(dst, src)       __builtin_strcpy(dst, src)
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_STRNCPY
+   #undef  strncpy
+   #define strncpy(dst, src, n)   __builtin_strncpy(dst, src, n)
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_STRCHR
+   #undef  strchr
+   #define strchr(s, c)           __builtin_strchr(s, c)
+   #endif
+   
+   #ifndef __DISABLE_BUILTIN_MEMSET
+   #undef  memset
+   #define memset(dst, c, n)      __builtin_memset(dst, c, n)
+   #endif
 
    #endif
 
