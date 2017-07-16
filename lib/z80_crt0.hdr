@@ -24,6 +24,14 @@
 	EXTERN     l_jphl        ; another jp(hl)
 	EXTERN     l_jpix        ; jp(ix)
 	EXTERN     l_jpiy        ; jp(iy)
+
+	EXTERN     l_ldi
+	EXTERN     l_ldi_128
+	EXTERN     l_ldi_256
+
+	EXTERN     l_outi
+	EXTERN     l_outi_128
+	EXTERN     l_outi_256
         
 
 ;------------------------------------
