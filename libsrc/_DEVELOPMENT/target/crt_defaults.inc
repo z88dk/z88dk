@@ -20,6 +20,7 @@
    defc DEF__crt_include_preamble      = 0       ;; if non-zero, user supplies code in file "crt_preamble.asm" that is inserted at the start of the binary
 
    defc DEF__crt_org_vector_table      = 0       ;; if negative and Z88DK supplies page zero code, creates a section "code_vector" aligned to a page boundary to hold int vectors
+   defc DEF__crt_io_vector_base        = 0       ;; io vector base address for z180 internal peripherals
    defc DEF__crt_interrupt_mode        = -1      ;; if 0-2 crt inserts appropriate im x instruction
 
    defc DEF__crt_enable_commandline    = 2       ;; generate argc and argv from command line (targets without command line will get argc=1, argv[0]="", argv[1]=NULL)

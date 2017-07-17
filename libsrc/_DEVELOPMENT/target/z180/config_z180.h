@@ -63,8 +63,6 @@
 
 #define __CPU_INFO_ENABLE_SLL  0x01
 
-#define __IO_VECTOR_BASE  128
-
 #define __IO_BASE_ADDRESS  0
 
 
