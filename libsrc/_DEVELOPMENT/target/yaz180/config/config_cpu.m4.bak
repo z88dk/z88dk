@@ -24,9 +24,10 @@ define(`__CPU_INFO', 0x00)
 define(`__CPU_INFO_ENABLE_SLL', 0x01)
 
 # INTERNAL INTERRUPT VECTOR BASE ID
-
-define(`__IO_VECTOR_BASE', 0x80)
-define(`__IO_VECTOR_BASE', eval(__IO_VECTOR_BASE & 0xe0))
+# moved to crt variable "CRT_IO_VECTOR_BASE"
+#
+#define(`__IO_VECTOR_BASE', 0x80)
+#define(`__IO_VECTOR_BASE', eval(__IO_VECTOR_BASE & 0xe0))
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 
@@ -371,8 +372,6 @@ PUBLIC `__CPU_CLOCK'
 PUBLIC `__CPU_INFO'
 
 PUBLIC `__CPU_INFO_ENABLE_SLL'
-
-PUBLIC `__IO_VECTOR_BASE'
 
 PUBLIC `__IO_BASE_ADDRESS'
 
@@ -802,8 +801,6 @@ defc `__CPU_INFO' = __CPU_INFO
 
 defc `__CPU_INFO_ENABLE_SLL' = __CPU_INFO_ENABLE_SLL
 
-defc `__IO_VECTOR_BASE' = __IO_VECTOR_BASE
-
 defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
@@ -1232,8 +1229,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__CPU_INFO'  __CPU_INFO
 
 `#define' `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
-
-`#define' `__IO_VECTOR_BASE'  __IO_VECTOR_BASE
 
 `#define' `__IO_BASE_ADDRESS'  __IO_BASE_ADDRESS
 

@@ -7,6 +7,12 @@ l/sdcc/____sdcc_4_ldi_nosave_bc
 l/sdcc/____sdcc_4_ldi_save_bc
 l/sdcc/____sdcc_4_push_hlix
 l/sdcc/____sdcc_4_push_mhl
+l/sdcc/____sdcc_cpu_pop_ei
+l/sdcc/____sdcc_cpu_pop_ei_jp
+l/sdcc/____sdcc_cpu_push_di
+l/sdcc/____sdcc_ldi
+l/sdcc/____sdcc_ldi_128
+l/sdcc/____sdcc_ldi_256
 l/sdcc/____sdcc_lib_setmem_hl
 l/sdcc/____sdcc_ll_add_de_bc_hl
 l/sdcc/____sdcc_ll_add_de_bc_hlix
@@ -47,6 +53,9 @@ l/sdcc/____sdcc_load_debc_deix
 l/sdcc/____sdcc_load_dehl_deix
 l/sdcc/____sdcc_load_debc_mhl
 l/sdcc/____sdcc_load_hlde_mhl
+l/sdcc/____sdcc_outi
+l/sdcc/____sdcc_outi_128
+l/sdcc/____sdcc_outi_256
 l/sdcc/____sdcc_store_debc_hlix
 l/sdcc/____sdcc_store_debc_mhl
 l/sdcc/____sdcc_store_dehl_bcix

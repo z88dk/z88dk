@@ -17,6 +17,8 @@ include(__link__.m4)
 #define intrinsic_label(name)  { extern void intrinsic_label_##name(void); intrinsic_label_##name(); }
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
+
+extern void intrinsic_ldi(void*,void*,unsigned char);
 extern void intrinsic_outi(void*,unsigned char,unsigned char);
 
 #endif
@@ -26,7 +28,12 @@ extern void intrinsic_outi(void*,unsigned char,unsigned char);
 #define intrinsic_label(name)  { extern void intrinsic_label_##name(void) __preserves_regs(a,b,c,d,e,h,l); intrinsic_label_##name(); }
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
-#define intrinsic_outi(src,port,num)  { extern void intrinsic_outi(void*) __z88dk_fastcall; intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
+
+extern void intrinsic_ldi(void*,void*) __z88dk_callee;
+#define intrinsic_ldi(dst,src,num)  { intrinsic_ldi(dst,src); intrinsic_ldi_num_##num(); }
+
+extern void intrinsic_outi(void*) __z88dk_fastcall;
+#define intrinsic_outi(src,port,num)  { intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
 
 #endif
 
@@ -35,7 +42,12 @@ extern void intrinsic_outi(void*,unsigned char,unsigned char);
 #define intrinsic_label(name)  asm(#name":")
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
-#define intrinsic_outi(src,port,num)  { extern void intrinsic_outi(void*) __z88dk_fastcall; intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
+
+extern void intrinsic_ldi(void*,void*) __z88dk_callee;
+#define intrinsic_ldi(dst,src,num)  { intrinsic_ldi(dst,src); intrinsic_ldi_num_##num(); }
+
+extern void intrinsic_outi(void*) __z88dk_fastcall;
+#define intrinsic_outi(src,port,num)  { intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
 
 #endif
 

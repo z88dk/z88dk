@@ -66,7 +66,7 @@ ENDIF
 
 IF __clib_malloc_heap_size < -1
 
-   ; place malloc heap between bss section and address abs(CLIB_MALLOC_HEAP_SIZE)
+   ; place malloc heap between bss section and including address abs(CLIB_MALLOC_HEAP_SIZE)
    
    SECTION data_clib
    SECTION data_alloc_malloc
@@ -79,20 +79,15 @@ IF __clib_malloc_heap_size < -1
    
    SECTION code_crt_init
 
-   ld hl,-__clib_malloc_heap_size - 1
+   ld hl,-__clib_malloc_heap_size - 13
    ld de,__BSS_END_tail
    
    xor a
    sbc hl,de
-   inc hl                      ; hl = available heap size
 
-   jp c, __Exit                ; if bss is overlapped, this is a fatal error
+   jp c, __Exit                ; if no room for minimum size heap, fatal error
    
-   ld bc,14                    ; minimum heap size
-   sbc hl,bc
-   
-   jp c, __Exit                ; if no room for heap, this is a fatal error
-
+   ld bc,14
    add hl,bc
    
    ld c,l
