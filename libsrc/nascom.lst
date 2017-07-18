@@ -30,7 +30,6 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite2
 graphics/liner
-graphics/draw_profile
 graphics/stencil_render2
 graphics/nascom/swapgfxbk
 games/joystick
