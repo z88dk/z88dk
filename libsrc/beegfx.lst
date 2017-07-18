@@ -13,6 +13,7 @@ graphics/drawr
 graphics/xordrawr
 graphics/draw_profile
 graphics/stencil_render2
+graphics/dither_pattern
 graphics/stencil_add_circle
 graphics/stencil_add_liner
 graphics/stencil_add_lineto
