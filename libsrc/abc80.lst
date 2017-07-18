@@ -31,7 +31,8 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite3
 graphics/liner
-graphics/draw_profile_nostencil
+graphics/draw_profile
+graphics/stencil_render2
 graphics/swapgfxbk_foo
 games/obj/${TARGET}/joystick
 abc80/abc_inv
