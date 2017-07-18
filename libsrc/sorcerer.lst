@@ -18,7 +18,6 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite3
 graphics/liner
-graphics/draw_profile
 graphics/stencil_render2
 graphics/sorcerer/swapgfxbk
 games/joystick
