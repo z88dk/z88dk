@@ -12,8 +12,6 @@
 
 char *version = "v" Z88DK_VERSION "\n";
 
-
-
 #if defined(MSDOS)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 #define PREFIX "c:\\z88dk"
