@@ -64,9 +64,25 @@ extern void __LIB__ __FASTCALL__ zx_border(unsigned char colour) __smallc;
 extern void __LIB__ __FASTCALL__ zx_cls(unsigned char attr) __smallc;
 
 
+extern void __LIB__ __FASTCALL__ zx_cls_attr(unsigned char attr) __smallc;
+
+
+extern void __LIB__ __FASTCALL__ zx_cls_pix(unsigned char pix) __smallc;
+
+
 extern void __LIB__ zx_cls_wc(struct r_Rect8 *r,unsigned char attr) __smallc;
 extern void __LIB__ __CALLEE__ zx_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __smallc;
 #define zx_cls_wc(a,b) zx_cls_wc_callee(a,b)
+
+
+extern void __LIB__ zx_cls_wc_attr(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ zx_cls_wc_attr_callee(struct r_Rect8 *r,unsigned char attr) __smallc;
+#define zx_cls_wc_attr(a,b) zx_cls_wc_attr_callee(a,b)
+
+
+extern void __LIB__ zx_cls_wc_pix(struct r_Rect8 *r,unsigned char pix) __smallc;
+extern void __LIB__ __CALLEE__ zx_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __smallc;
+#define zx_cls_wc_pix(a,b) zx_cls_wc_pix_callee(a,b)
 
 
 extern void __LIB__ zx_scroll_up(unsigned char rows,unsigned char attr) __smallc;
@@ -74,11 +90,76 @@ extern void __LIB__ __CALLEE__ zx_scroll_up_callee(unsigned char rows,unsigned c
 #define zx_scroll_up(a,b) zx_scroll_up_callee(a,b)
 
 
+extern void __LIB__ zx_scroll_up_attr(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ zx_scroll_up_attr_callee(unsigned char rows,unsigned char attr) __smallc;
+#define zx_scroll_up_attr(a,b) zx_scroll_up_attr_callee(a,b)
+
+
+extern void __LIB__ zx_scroll_up_pix(unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ __CALLEE__ zx_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __smallc;
+#define zx_scroll_up_pix(a,b) zx_scroll_up_pix_callee(a,b)
+
+
 extern void __LIB__ zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
 extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
 #define zx_scroll_wc_up(a,b,c) zx_scroll_wc_up_callee(a,b,c)
 
 
+extern void __LIB__ zx_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ zx_scroll_wc_up_attr_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+#define zx_scroll_wc_up_attr(a,b,c) zx_scroll_wc_up_attr_callee(a,b,c)
+
+
+extern void __LIB__ zx_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ __CALLEE__ zx_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc;
+#define zx_scroll_wc_up_pix(a,b,c) zx_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+#ifdef __CLANG
+
+extern void __LIB__ zx_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ __CALLEE__ zx_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+#define zx_visit_wc_attr(a,b) zx_visit_wc_attr_callee(a,b)
+
+
+extern void __LIB__ zx_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ __CALLEE__ zx_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+#define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void __LIB__ zx_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ __CALLEE__ zx_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+#define zx_visit_wc_attr(a,b) zx_visit_wc_attr_callee(a,b)
+
+
+extern void __LIB__ zx_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ __CALLEE__ zx_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+#define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void __LIB__ zx_visit_wc_attr(struct r_Rect8 *r,void *visit) __smallc;
+extern void __LIB__ __CALLEE__ zx_visit_wc_attr_callee(struct r_Rect8 *r,void *visit) __smallc;
+#define zx_visit_wc_attr(a,b) zx_visit_wc_attr_callee(a,b)
+
+
+extern void __LIB__ zx_visit_wc_pix(struct r_Rect8 *r,void *visit) __smallc;
+extern void __LIB__ __CALLEE__ zx_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __smallc;
+#define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
 
 // display
 

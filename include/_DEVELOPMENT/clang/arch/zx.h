@@ -64,15 +64,72 @@ extern void zx_border(unsigned char colour);
 extern void zx_cls(unsigned char attr);
 
 
+extern void zx_cls_attr(unsigned char attr);
+
+
+extern void zx_cls_pix(unsigned char pix);
+
+
 extern void zx_cls_wc(struct r_Rect8 *r,unsigned char attr);
+
+
+extern void zx_cls_wc_attr(struct r_Rect8 *r,unsigned char attr);
+
+
+extern void zx_cls_wc_pix(struct r_Rect8 *r,unsigned char pix);
 
 
 extern void zx_scroll_up(unsigned char rows,unsigned char attr);
 
 
+extern void zx_scroll_up_attr(unsigned char rows,unsigned char attr);
+
+
+extern void zx_scroll_up_pix(unsigned char rows,unsigned char pix);
+
+
 extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
 
 
+extern void zx_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
+
+
+extern void zx_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix);
+
+
+
+#ifdef __CLANG
+
+extern void zx_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *));
+
+
+extern void zx_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void zx_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *));
+
+
+extern void zx_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void zx_visit_wc_attr(struct r_Rect8 *r,void *visit);
+
+
+extern void zx_visit_wc_pix(struct r_Rect8 *r,void *visit);
+
+
+
+#endif
 
 // display
 
