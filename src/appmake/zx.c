@@ -65,7 +65,8 @@ static char              fast         = 0;
 static char              dumb         = 0;
 static char              noloader     = 0;
 static char              noheader     = 0;
-static unsigned char     parity = 0;
+static unsigned char     parity       = 0;
+static char              sna          = 0;
 
 
 // These values are set accordingly with the turbo loader timing and should not be changed
@@ -82,6 +83,7 @@ option_t zx_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0,  "sna",      "Make .sna snapshot instead of .tap", OPT_BOOL, &sna },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "ts2068",   "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &ts2068 },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
@@ -200,6 +202,8 @@ void turbo_rawout (FILE *fpout, unsigned char b)
 }
 
 
+int make_sna(void);
+
 
 int zx_exec(char *target)
 {
@@ -222,6 +226,9 @@ int zx_exec(char *target)
         
     if ( help )
         return -1;
+
+    if (sna)
+        return make_sna();
 
     if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
@@ -758,3 +765,200 @@ int zx_exec(char *target)
     return 0;
 }
 
+
+/*
+   48k/128k SNA SNAPSHOT
+
+   July 2017 aralbrec
+*/
+
+#define ZX_SNA_PROTOTYPE  "bin/appmake/zx_48.sna"
+
+enum
+{
+    SNA_REG_I = 0,
+    SNA_REGP_HL = 1,
+    SNA_REGP_DE = 3,
+    SNA_REGP_BC = 5,
+    SNA_REGP_AF = 7,
+    SNA_REG_HL = 9,
+    SNA_REG_DE = 11,
+    SNA_REG_BC = 13,
+    SNA_REG_IX = 15,
+    SNA_REG_IY = 17,
+    SNA_IFF2 = 19,
+    SNA_REG_R = 20,
+    SNA_REG_AF = 21,
+    SNA_REG_SP = 23,
+    SNA_IntMode = 25,
+    SNA_BorderColor = 26,
+    SNA_128_PC = 27,
+    SNA_128_port_7FFD = 29,
+    SNA_128_TRDOS = 30
+};
+
+uint8_t sna_state[31];
+
+int make_sna(void)
+{
+    FILE *fin, *fout;
+    char filename[FILENAME_MAX + 1];
+    char crtname[FILENAME_MAX + 1];
+    char outname[FILENAME_MAX + 1];
+    char memory[49152];
+    int c, i;
+    char *p;
+    int is_128k;
+    struct stat st_file;
+
+    if (binname == NULL) return -1;
+
+    if (crtfile == NULL)
+    {
+        strcpy(crtname, binname);
+        suffix_change(crtname, "");
+    }
+    else
+        strcpy(crtname, crtfile);
+
+    // find code origin
+
+    if ((origin == -1) && ((origin = get_org_addr(crtname)) == -1))
+        exit_log(1, "Error: ORG address cannot be determined\n");
+
+    if ((origin -= 0x4000) < 0x4000)
+        exit_log(1, "Error: ORG address %u not in range\n", origin);
+
+    // determine output file
+
+    if (outfile == NULL)
+    {
+        strcpy(outname, binname);
+        suffix_change(outname, ".sna");
+    }
+    else
+        strcpy(outname, outfile);
+
+    if (strcmp(binname, outname) == 0)
+        exit_log(1, "Error: Input and output filenames must be different\n");
+
+    // prime snapshot memory contents
+
+    snprintf(filename, sizeof(filename), "%s" ZX_SNA_PROTOTYPE, c_install_dir);
+
+    if ((fin = fopen(filename, "rb")) == NULL)
+        exit_log(1, "Error: File %s not found\n", filename);
+
+    fread(sna_state, 27, 1, fin);
+    if (fread(memory, sizeof(memory), 1, fin) < 1)
+    {
+        fclose(fin);
+        exit_log(1, "Error: File %s shorter than 49179 bytes\n", filename);
+    }
+
+    fclose(fin);
+
+    memset(memory, 0, 6144);
+
+    // initialize snapshot state
+
+    memory[sna_state[SNA_REG_SP] + 256*sna_state[SNA_REG_SP+1] - 0x4000] = (origin + 0x4000) % 256;
+    memory[sna_state[SNA_REG_SP] + 256*sna_state[SNA_REG_SP + 1] + 1 - 0x4000] = (origin + 0x4000) / 256;
+
+    sna_state[SNA_128_PC] = (origin + 0x4000) % 256;
+    sna_state[SNA_128_PC + 1] = (origin + 0x4000) / 256;
+    sna_state[SNA_128_port_7FFD] = 0x10;
+    sna_state[SNA_128_TRDOS] = 1;
+
+    // load main bank code
+
+    if ((fin = fopen_bin(binname, crtname)) == NULL)
+        exit_log(1, "Can't open input file %s\n", binname);
+
+    for (p = &memory[origin]; (p < &memory[sizeof(memory)]) && ((c = fgetc(fin)) != EOF); ++p)
+        *p = c;
+
+    fclose(fin);
+
+    if (c != EOF)
+        exit_log(1, "Error: Truncated main bank because it spilled past 64k\n");
+
+    // create sna file
+
+    if ((fout = fopen(outname, "wb")) == NULL)
+        exit_log(1, "Error: Could not create output file %s\n", outname);
+
+    fwrite(sna_state, 27, 1, fout);
+
+    // expand to 128k sna if memory banks are involved
+
+    is_128k = 0;
+    for (i = 0; i <= 7; ++i)
+    {
+        snprintf(filename, sizeof(filename), "%s_BANK_%02X.bin", binname, i);
+
+        if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fin = fopen(filename, "rb")) == NULL))
+            continue;
+
+        if ((i == 0) || (i == 2) || (i == 5))
+        {
+            // bank belongs in the main bank
+
+            snprintf(outname, sizeof(outname), "__BANK_%02X_head", i);
+            if (((origin = parameter_search(crtname, ".map", outname)) >= 0) && ((origin -= 0x4000) >= 0x4000))
+            {
+                printf("Notice: Adding bank %02X to the main code\n", i);
+                for (p = &memory[origin]; (p < &memory[sizeof(memory)]) && ((c = fgetc(fin)) != EOF); ++p)
+                    *p = c;
+
+                if (c != EOF)
+                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 64k\n", filename);
+            }
+            else
+                printf("Warning: Ignoring bank %02X\n", i);
+        }
+        else
+            is_128k = 1;
+
+        fclose(fin);
+    }
+
+    // generate memory snapshot
+
+    fwrite(memory, sizeof(memory), 1, fout);
+
+    if (is_128k)
+    {
+        // 128k sna header follows
+
+        fwrite(&sna_state[SNA_128_PC], 4, 1, fout);
+
+        // append remaining memory banks
+
+        for (i = 0; i <= 7; ++i)
+        {
+            if ((i == 0) || (i == 2) || (i == 5))
+                continue;
+
+            snprintf(filename, sizeof(filename), "%s_BANK_%02X.bin", binname, i);
+            memset(memory, 0, 16384);
+
+            if ((stat(filename, &st_file) >= 0) && (st_file.st_size != 0) && ((fin = fopen(filename, "rb")) != NULL))
+            {
+                // copy bank to snapshot
+                for (p = memory; (p < &memory[16384]) && ((c = fgetc(fin)) != EOF); ++p)
+                    *p = c;
+
+                if (c != EOF)
+                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 64k\n", filename);
+
+                fclose(fin);
+            }
+
+            fwrite(memory, 16384, 1, fout);
+        }
+    }
+
+    fclose(fout);
+    return 0;
+}

@@ -1,6 +1,8 @@
 
 ; void *fzx_string_partition_ww(struct fzx_font *ff, char *s, uint16_t allowed_width)
 
+INCLUDE "config_private.inc"
+
 SECTION code_font
 SECTION code_font_fzx
 
@@ -36,6 +38,12 @@ consume_spaces_loop:
    or a
    jr z, end_string_accept
    
+   cp CHAR_LF
+   jr z, end_string_accept
+   
+   cp CHAR_CR
+   jr z, end_string_accept
+   
    cp ' '
    jr nz, consume_word_loop
 
@@ -56,6 +64,12 @@ consume_word_loop:
    or a
    jr z, end_string_accept
    
+   cp CHAR_LF
+   jr z, end_string_accept
+   
+   cp CHAR_CR
+   jr z, end_string_accept
+   
    cp ' '
    jr nz, consume_word_loop
    
@@ -69,7 +83,7 @@ consume_word_loop:
 end_string_accept:
 
    ex de,hl
-   jp l_inc_sp - 6             ; junk last save point
+   jp l_inc_sp - 4             ; junk last save point
 
 end_string:
 
