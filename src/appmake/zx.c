@@ -772,7 +772,7 @@ int zx_exec(char *target)
    July 2017 aralbrec
 */
 
-#define ZX_SNA_PROTOTYPE  "bin/appmake/zx_48.sna"
+#define ZX_SNA_PROTOTYPE  "src/appmake/data/zx_48.sna"
 
 enum
 {
