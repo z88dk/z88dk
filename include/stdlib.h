@@ -244,7 +244,7 @@ extern unsigned int  __LIB__  wpeek(const void *addr) __z88dk_fastcall;
 // ACCURATE T-STATE DELAY
 extern void   __LIB__    t_delay(unsigned int tstates) __z88dk_fastcall;   // at least 141 T
 
-extern void   __LIB__     sleep (int secs) __z88dk_fastcall;
+extern void   __LIB__ __SAVEFRAME__     sleep (int secs) __z88dk_fastcall;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
 extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
 extern void   __LIB__     delay (long milliseconds) __z88dk_fastcall;
