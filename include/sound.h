@@ -30,7 +30,7 @@ extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int 
 extern void __LIB__ bit_beep(int duration, int period) __smallc;
 
 /* Real frequency !  Duration is in ms */
-extern void __LIB__ bit_frequency(float duration, float frequency);
+extern void __LIB__ bit_frequency(double_t duration, double_t frequency);
 
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
 extern void __LIB__ bit_play(unsigned char melody[]);
