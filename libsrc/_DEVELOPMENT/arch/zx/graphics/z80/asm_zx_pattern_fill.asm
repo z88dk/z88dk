@@ -71,8 +71,8 @@
 ; Each entry in the queue is a 3-byte struct that grows down in memory:
 ;       screen address      (2-bytes, MSB first)
 ;       fill byte           (1-byte)
-; A screen address with MSB < 0x40 is used to indicate the end of a block.
-; A screen address with MSB >= 0x80 is used to mark the physical end of the Q.
+; A screen address with MSB = 0xfe is used to indicate the end of a block.
+; A screen address with MSB = 0xff is used to mark the physical end of the Q.
 ;
 ; The fill pattern is a typical 8x8 pixel character, stored in 8 bytes.
 ;
@@ -85,6 +85,9 @@ PUBLIC asm_zx_pattern_fill
 
 EXTERN error_einval_mc, error_enomem_mc, error_znc, asm_zx_pxy2saddr, asm_zx_px2bitmask
 EXTERN asm_zx_saddrup, asm_zx_saddrpdown, asm_zx_saddrpup, asm_zx_saddrcleft, asm_zx_saddrcright
+
+defc MARK_END_OF_BLOCK = 0xfe
+defc MARK_END_OF_QUEUE = 0xff
 
 asm_zx_pattern_fill:
 
@@ -146,7 +149,7 @@ viable:
    add hl,sp
    push hl                     ; create new block pointer
 
-   xor a
+   ld a,MARK_END_OF_BLOCK
    push af
    dec sp                      ; mark end of pattern block
    
@@ -175,8 +178,8 @@ viable:
    ld (hl),0                   ; zero last byte in queue
    ld sp,hl                    ; move stack below queue
    
-   ld a,$80
-   push af                     ; mark end of queue with $80 byte
+   ld a,MARK_END_OF_QUEUE
+   push af                     ; mark end of queue
    inc sp
    
    ld e,l
@@ -223,7 +226,7 @@ viable:
 ;|-     new block       -|
 ;|                       |
 ;+-----------------------+
-;|  end of block marker  |  <- ix = pattern block = top of queue
+;|   MARK_END_OF_BLOCK   |  <- ix = pattern block = top of queue
 ;|          ?            |
 ;|          ?            |
 ;+-----------------------+
@@ -231,7 +234,7 @@ viable:
 ;|  screen address LSB   |
 ;|      fill byte        |
 ;+-----------------------+
-;|  end of block marker  |
+;|   MARK_END_OF_BLOCK   |
 ;|          ?            |
 ;|          ?            |
 ;+-----------------------+
@@ -246,7 +249,7 @@ viable:
 ;|        ......         |
 ;|                       |
 ;+-----------------------+
-;|         0x80           |  <- sp, special byte marks end of queue
+;|   MARK_END_OF_QUEUE   |  <- sp, special byte marks end of queue
 ;+-----------------------+
 
 pf_loop:
@@ -280,8 +283,8 @@ pf_loop:
    ld (ix+6),h                 ; save pattern block
 
    ld a,(hl)                   ; done if the investigate block was empty
-   cp $40
-   jr nc, pf_loop
+   cp MARK_END_OF_BLOCK
+   jr nz, pf_loop
 
 pf_end:
 
@@ -297,8 +300,8 @@ pf_end:
 investigate:
 
    ld a,(hl)		
-   cp $80                      ; bit 15 of screen addr set if time to wrap		
-   jr c, i_no_wrap
+   cp MARK_END_OF_QUEUE
+   jr nz, i_no_wrap
    
    push ix
    pop hl                      ; hl = ix = top of queue
@@ -307,8 +310,8 @@ investigate:
 
 i_no_wrap:
 
-   cp $40                      ; screen address < $4000 marks end of block
-   jr c, investigate_end       ; are we done yet?
+   cp MARK_END_OF_BLOCK
+   jr z, investigate_end       ; are we done yet?
    
    ld b,a
    dec hl
@@ -410,15 +413,15 @@ investigate_end:
    dec hl                      ; investigate_block now points at new_block
 
    ld a,(de)                   ; check if new_block is at end of queue
-   cp $80
-   jr c, no_wrap_new
+   cp MARK_END_OF_QUEUE
+   jr nz, no_wrap_new
    
    push ix
    pop de                      ; de = ix = top of queue
 
 no_wrap_new:
 
-   xor a
+   ld a,MARK_END_OF_BLOCK
    ld (de),a                   ; store end marker for new block
    
    dec de
@@ -485,8 +488,8 @@ add_new:
    pop hl                      ; hl = screen address
 
    ld a,(de)                   ; check if new_block is at end of queue
-   cp $80
-   jr c, an_no_wrap
+   cp MARK_END_OF_QUEUE
+   jr nz, an_no_wrap
    
    push ix
    pop de                      ; de = ix = top of queue
@@ -521,7 +524,7 @@ bail:
    xor (hl)
    ld (hl),a                   ; remove this fill byte from screen
 
-   xor a
+   ld a,MARK_END_OF_BLOCK
    ld (de),a                   ; mark end of new block
 
    ld l,(ix+5)
@@ -543,8 +546,8 @@ bail:
 apply_pattern:
 
    ld a,(hl)
-   cp $80                      ; bit 15 of screen addr set if time to wrap
-   jr c, ap_no_wrap
+   cp MARK_END_OF_QUEUE
+   jr nz, ap_no_wrap
    
    push ix
    pop hl                      ; hl = ix = top of queue
@@ -553,8 +556,8 @@ apply_pattern:
 
 ap_no_wrap:
 
-   cp $40                      ; screen address < $4000 marks end of block
-   jr c, apply_end             ; are we done yet?
+   cp MARK_END_OF_BLOCK
+   jr z, apply_end             ; are we done yet?
 
    and $07                     ; use scan line 0..7 to index pattern
    add a,(ix+9)

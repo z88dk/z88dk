@@ -42,7 +42,7 @@ asm_memset:
    inc de
    dec bc
 
-IF (__CLIB_OPT_UNROLL & 0x02)
+IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMSET)
 
    ld a,b
    or a

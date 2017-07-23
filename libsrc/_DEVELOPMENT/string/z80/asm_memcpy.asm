@@ -30,7 +30,7 @@ asm_memcpy:
    ;
    ; uses  : af, bc, de, hl
 
-IF (__CLIB_OPT_UNROLL & 0x01)
+IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMCPY)
 
    ld a,b
    or a

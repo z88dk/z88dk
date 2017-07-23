@@ -1,0 +1,10 @@
+target/zx/driver/terminal/_font_8x8_rom
+@target/zx/driver/terminal/zx_01_input_kbd_inkey.lst
+@target/zx/driver/terminal/zx_01_input_kbd_lastk.lst
+@target/zx/driver/terminal/zx_01_output_char_32.lst
+@target/zx/driver/terminal/zx_01_output_char_64.lst
+@target/zx/driver/terminal/zx_01_output_fzx.lst
+@target/zx/driver/terminal/zx_01_output_char_32_tty_z88dk.lst
+@target/zx/driver/terminal/zx_01_output_char_64_tty_z88dk.lst
+@target/zx/driver/terminal/zx_01_output_fzx_tty_z88dk.lst
+@target/zx/driver/terminal/zx_tty.lst
