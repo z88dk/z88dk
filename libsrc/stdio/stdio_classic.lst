@@ -41,7 +41,6 @@ stdio/obj/sprintf_outc
 stdio/obj/ungetc
 stdio/obj/vfprintf
 stdio/obj/vsnprintf
-stdio/obj/getk
 stdio/obj/__scanf_common_start
 stdio/obj/__scanf_consume_whitespace
 stdio/obj/__scanf_format_table
