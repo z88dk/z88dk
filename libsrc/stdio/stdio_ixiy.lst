@@ -96,3 +96,4 @@ stdio/obj/ixiy/__printf_handle_lld
 stdio/obj/ixiy/__printf_handle_llo
 stdio/obj/ixiy/__printf_handle_llu
 stdio/obj/ixiy/__printf_handle_llx
+stdio/obj/ixiy/kbhit

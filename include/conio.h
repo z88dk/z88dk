@@ -16,7 +16,7 @@
 #define __CONIO_H__
 
 // this is used by getch, putch and ungetch.
-//#include <sys/compiler.h>
+#include <sys/compiler.h>
 #include <stdio.h>
 #include <stdlib.h>
 //#include <graphics.h>
@@ -61,12 +61,9 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
 #define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
 
-/* Reads a character directly from the console, (without echo?) */
-#define getch()  fgetc_cons()
-#define _getch()  fgetc_cons()
 /* Reads a character directly from the console, (with echo ?) */
-#define getche() fgetc_cons()               // not sure about this one...
-#define _getche() fgetc_cons()                // not sure about this one...
+#define getche() getch()               // not sure about this one...
+#define _getche() getch()                // not sure about this one...
 // Direct output to console
 #define putch(a) fputc_cons(a)
 #define _putch(a) fputc_cons(a)
@@ -75,13 +72,10 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 //#define ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 //#define _ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 
-#ifndef kbhit
-#define kbhit() (getk() ? 1 : 0)
-#define _kbhit() (getk() ? 1 : 0)
-#endif
-
 #define random(a) rand()%a
 
+extern int __LIB__ kbhit(void);
+extern int __LIB__ getch(void);
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);

@@ -95,3 +95,4 @@ stdio/obj/r2k/__printf_handle_lld
 stdio/obj/r2k/__printf_handle_llo
 stdio/obj/r2k/__printf_handle_llu
 stdio/obj/r2k/__printf_handle_llx
+stdio/obj/r2k/kbhit
