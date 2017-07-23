@@ -39,4 +39,8 @@
 #include <../../../libsrc/_DEVELOPMENT/target/yaz180/config_yaz180.h>
 #endif
 
+#ifdef __ZXNEXT
+#include <../../../libsrc/_DEVELOPMENT/target/zxn/config_zxn.h>
+#endif
+
 #endif

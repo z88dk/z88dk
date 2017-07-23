@@ -2,7 +2,7 @@
 Z80ASM = $(EXEC_PREFIX)z80asm
 ZX7 = $(EXEC_PREFIX)zx7
 
-TARGET ?= z80 cpm m rc2014 sms yaz180 z180 zx
+TARGET ?= z80 cpm m rc2014 sms yaz180 z180 zx zxn
 
 jobs := $(foreach target,$(TARGET),job-$(target))
 cleans := $(foreach target,$(TARGET),clean-$(target))
@@ -28,6 +28,12 @@ ${jobs}: job-%:
 	m4 -DCFG_C_DEF target/$(target)/config.m4 > target/$(target)/config_$(target).h
 	cp target/$(target)/config_$(target)_private.inc config_private.inc
 	@if [ "$(target)" = "zx" ]; then \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+	fi;
+	@if [ "$(target)" = "zxn" ]; then \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
