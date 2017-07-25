@@ -41,16 +41,86 @@ extern unsigned char GLOBAL_ZX_PORT_7FFD;
 
 #ifdef __CLANG
 
+// SPECTRUM
+
 extern unsigned char IO_FE;
 extern unsigned char IO_1FFD;
 extern unsigned char IO_7FFD;
 
+// TBBLUE I/O Port system
+
+extern unsigned char IO_REGISTRY_REG;
+extern unsigned char IO_REGISTRY_DAT;
+
+extern unsigned char IO_253B;
+extern unsigned char IO_243B;
+
+// Hardware Sprites
+
+extern unsigned char IO_SPRITE_SLOT;   // write
+extern unsigned char IO_SPRITE_FLAGS;  // read
+
+extern unsigned char IO_SPRITE_PALETTE;
+extern unsigned char IO_SPRITE_ATTRIBUTE;
+extern unsigned char IO_SPRITE_PATTERN;
+
+extern unsigned char IO_303B;
+
+extern unsigned char IO_53;
+extern unsigned char IO_57;
+extern unsigned char IO_5B;
+
+// Audio
+
+extern unsigned char IO_AUDIO_SELECT;
+
+extern unsigned char IO_AUDIO_REG;
+extern unsigned char IO_AUDIO_DAT;
+
+extern unsigned char IO_FFFD;
+extern unsigned char IO_BFFD;
+
 #else
+
+// SPECTRUM
 
 __sfr __at 0xfe IO_FE;
 
 __sfr __banked __at 0x1ffd IO_1FFD;
 __sfr __banked __at 0x7ffd IO_7FFD;
+
+// TBBLUE I/O Port system
+
+__sfr __banked __at __IO_REGISTRY_REG IO_REGISTRY_REG;
+__sfr __banked __at __IO_REGISTRY_DAT IO_REGISTRY_DAT;
+
+__sfr __banked __at 0x253b IO_253B;
+__sfr __banked __at 0x243b IO_243B;
+
+// Hardware Sprites
+
+__sfr __banked __at __IO_SPRITE_SLOT  IO_SPRITE_SLOT;   // write
+__sfr __banked __at __IO_SPRITE_FLAGS IO_SPRITE_FLAGS;  // read
+
+__sfr __at __IO_SPRITE_PALETTE   IO_SPRITE_PALETTE;
+__sfr __at __IO_SPRITE_ATTRIBUTE IO_SPRITE_ATTRIBUTE;
+__sfr __at __IO_SPRITE_PATTERN   IO_SPRITE_PATTERN;
+
+__sfr __banked __at 0x303b IO_303B;
+
+__sfr __at 0x53 IO_53;
+__sfr __at 0x57 IO_57;
+__sfr __at 0x5b IO_5B;
+
+// Audio
+
+__sfr __banked __at __IO_AUDIO_SELECT IO_AUDIO_SELECT;
+
+__sfr __banked __at __IO_AUDIO_REG    IO_AUDIO_REG;
+__sfr __banked __at __IO_AUDIO_DAT    IO_AUDIO_DAT;
+
+__sfr __banked __at 0xfffd IO_FFFD;
+__sfr __banked __at 0xbffd IO_BFFD;
 
 #endif
 

@@ -27,12 +27,17 @@
 #include <../../../libsrc/_DEVELOPMENT/target/z180/config_z180.h>
 #endif
 
+#ifndef __ZXNEXT
+
 #ifdef __SPECTRUM
 #include <../../../libsrc/_DEVELOPMENT/target/zx/config_zx.h>
+#endif
 #endif
 
 #ifdef __TS2068
 #include <../../../libsrc/_DEVELOPMENT/target/ts2068/config_ts2068.h>
+#endif
+
 #endif
 
 #ifdef __YAZ180
