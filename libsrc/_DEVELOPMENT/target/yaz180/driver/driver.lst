@@ -4,3 +4,5 @@
 @target/yaz180/driver/character/rc_00_output_basic.lst
 @target/yaz180/driver/terminal/rc_01_input_basic_dcio.lst
 @target/yaz180/driver/terminal/rc_01_output_basic_dcio.lst
+@target/yaz180/driver/ide/ide.lst
+@target/yaz180/driver/diskio/diskio.lst
