@@ -32,12 +32,12 @@ define(`IO_BREAK', 0x2000)  # Any value written $2000->$21FF, halts CPU
 
 # 82C55 PIO Port Definitions
 
-define(`PIO',    0x4000)    # Base Address for 82C55
+define(`PIO', 0x4000)              # Base Address for 82C55
 
-define(`PIOA', PIO+0x00)    # Address for Port A
-define(`PIOB', PIO+0x01)    # Address for Port B
-define(`PIOC', PIO+0x02)    # Address for Port C
-define(`PIOCNTL', PIO+0x03) # Address for Control Byte
+define(`PIOA', eval(PIO + 0x00))    # Address for Port A
+define(`PIOB', eval(PIO + 0x01))    # Address for Port B
+define(`PIOC', eval(PIO + 0x02))    # Address for Port C
+define(`PIOCNTL', eval(PIO + 0x03)) # Address for Control Byte
 
 # 82C55 PIO Mode Definitions
 
@@ -71,9 +71,9 @@ define(`PIOCNTL15', 0x9B)   # ->A, ->B, ->CH, ->CL
 
 # Am9511A-1 APU Port Definitions
 
-define(`APU',  0xC000)          # Base Address for Am9511A
-define(`APUDATA',  APU+0x00)    # APU Data Port
-define(`APUCNTL',  APU+0x01)    # APU Control Port
+define(`APU',  0xC000)                  # Base Address for Am9511A
+define(`APUDATA',  eval(APU + 0x00))    # APU Data Port
+define(`APUCNTL',  eval(APU + 0x01))    # APU Control Port
 
 define(`APU_OP_ENT',  0x40)
 define(`APU_OP_REM',  0x50)

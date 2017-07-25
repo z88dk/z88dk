@@ -43,6 +43,63 @@
 #define ASCI0_RX_SIZE  0x100
 #define ASCI0_TX_SIZE  0x100
 
+#define ASCI1_RX_SIZE  0x100
+#define ASCI1_TX_SIZE  0x100
+
+#define APU_CMD_SIZE  0x100
+#define APU_PTR_SIZE  0x100
+
+#define IO_BREAK  0x2000
+
+#define PIO  0x4000
+
+#define PIOA  16384
+#define PIOB  16385
+#define PIOC  16386
+#define PIOCNTL  16387
+
+#define PIOCNTL00  0x80
+#define PIOCNTL01  0x81
+#define PIOCNTL02  0x82
+#define PIOCNTL03  0x83
+
+#define PIOCNTL04  0x88
+#define PIOCNTL05  0x89
+#define PIOCNTL06  0x8A
+#define PIOCNTL07  0x8B
+
+#define PIOCNTL08  0x90
+#define PIOCNTL09  0x91
+#define PIOCNTL10  0x92
+#define PIOCNTL11  0x83
+
+#define PIOCNTL12  0x98
+#define PIOCNTL13  0x99
+#define PIOCNTL14  0x9A
+#define PIOCNTL15  0x9B
+
+#define APU  0xC000
+#define APUDATA  49152
+#define APUCNTL  49153
+
+#define APU_OP_ENT  0x40
+#define APU_OP_REM  0x50
+#define APU_OP_ENT16  0x40
+#define APU_OP_ENT32  0x41
+#define APU_OP_REM16  0x50
+#define APU_OP_REM32  0x51
+
+#define APU_CNTL_BUSY  0x80
+#define APU_CNTL_SIGN  0x40
+#define APU_CNTL_ZERO  0x20
+#define APU_CNTL_DIV0  0x10
+#define APU_CNTL_NEGRT  0x08
+#define APU_CNTL_UNDFL  0x04
+#define APU_CNTL_OVRFL  0x02
+#define APU_CNTL_CARRY  0x01
+
+#define APU_CNTL_ERROR  0x1E
+
 
 
 
