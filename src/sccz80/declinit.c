@@ -152,7 +152,7 @@ int str_init(TAG_SYMBOL* tag)
                             needchar('}');
                         }
                     } else {
-                        init(sz, ptr->ident, &dim, 1, 1, 1, ptr->flags & FAR);
+                        init(sz, ptr->ident, &dim, 1, 1, 1, ptr->flags & FARPTR);
                     }
 
                     if (cmatch(',') == 0)
@@ -162,7 +162,7 @@ int str_init(TAG_SYMBOL* tag)
                 needchar('}');
                 dumpzero(sz, dim);
             } else {
-                init(sz, ptr->ident, &dim, ptr->more, 1, 1, ptr->flags & FAR);
+                init(sz, ptr->ident, &dim, ptr->more, 1, 1, ptr->flags & FARPTR);
             }
             /* Pad out afterwards */
         } else { /* Run out of data for this initialisation, set blank */

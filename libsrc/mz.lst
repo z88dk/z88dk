@@ -28,7 +28,7 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite2
 graphics/liner
-graphics/stencil_render
+graphics/stencil_render2
 graphics/swapgfxbk_foo
 games/joystick
 @z80.lst

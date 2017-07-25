@@ -12,8 +12,6 @@
 #ifndef __PC_H__
 #define __PC_H__
 
-#ifndef kbhit
-#define kbhit() (getk() ? 1 : 0)
-#endif
+#include <conio.h>
 
 #endif

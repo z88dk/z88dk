@@ -101,3 +101,4 @@ stdio/obj/net/__printf_handle_lld
 stdio/obj/net/__printf_handle_llo
 stdio/obj/net/__printf_handle_llu
 stdio/obj/net/__printf_handle_llx
+stdio/obj/net/kbhit

@@ -17,7 +17,7 @@ PUBLIC asm_zx_scroll_wc_up
 PUBLIC asm0_zx_scroll_wc_up
 
 EXTERN asm_zx_cls_wc, asm_zx_cxy2saddr, asm_zx_saddr2aaddr
-EXTERN asm0_zx_saddrpdown, asm_memset
+EXTERN asm0_zx_saddrpdown
 
 asm_zx_scroll_wc_up:
 
@@ -152,19 +152,34 @@ copy_up_loop_1:
    ex de,hl
    exx
 
+   pop de
+   ld a,e                      ; a = attr
+   
 vacate_loop_0:
 
    ;; clear row of attributes
    
    exx
    
-   pop de
-   push de                     ; e = attribute
-   
    ld c,(ix+1)                 ; bc = rect.width
    
-   call asm_memset
+   ld (hl),a
    
+   dec c
+   jr z, end_attr_x
+   
+   push hl
+   
+   ld e,l
+   ld d,h
+   inc e
+   
+   ldir
+   
+   pop hl
+
+end_attr_x:
+
    ld c,32
    add hl,bc
    
@@ -181,18 +196,33 @@ vacate_loop_1:
    ld b,0
    ld c,(ix+1)                 ; bc = rect.width
    
-   ld e,b
-   call asm_memset
+   ld (hl),b
    
+   dec c
+   jr z, end_pix_x
+   
+   push hl
+   
+   ld e,l
+   ld d,h
+   inc e
+   
+   ldir
+   
+   pop hl
+
+end_pix_x:
+
    inc h
    
    pop bc
    djnz vacate_loop_1
    
+   ld e,a
    call asm0_zx_saddrpdown
-
+   ld a,e
+   
    dec c
    jr nz, vacate_loop_0
-   
-   pop de
+
    ret

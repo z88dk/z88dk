@@ -5,7 +5,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= z80 cpm m rc2014 sms yaz180 z180 zx 
+set alltargets= z80 cpm m rc2014 sms yaz180 z180 zx zxn 
 
 if "%1" == "" (
    echo.
@@ -55,6 +55,13 @@ for %%t in (%targets%) do (
       copy /Y target\%%t\config_%%t_private.inc config_private.inc 1> nul
 
       if "%%t" == "zx" (
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+      )
+
+		if "%%t" == "zxn" (
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin

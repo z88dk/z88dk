@@ -56,7 +56,12 @@ asm0_zx_scroll_up:
    
    ex de,hl
    call asm_zx_cy2saddr        ; hl = screen address corresponding to first scroll row L
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   ld de,$c000
+ELSE
    ld de,$4000                 ; de = destination address of first scroll row
+ENDIF
    
    exx
    
@@ -64,8 +69,13 @@ asm0_zx_scroll_up:
    push hl                     ; hl = scroll amount
    
    call asm_zx_cy2aaddr        ; hl = attribute address corresponding to first scroll row L
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   ld de,$d800
+ELSE
    ld de,$5800                 ; de = destination address of first scroll row
-   
+ENDIF
+
    exx
    
 copy_up_loop_0:
@@ -74,12 +84,10 @@ copy_up_loop_0:
    
    exx
 
-IF __CLIB_OPT_FASTCOPY & $20
+IF __CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_LDIR
 
-   EXTERN l_fast_ldir_0
-
-   ld bc,32
-   call l_fast_ldir_0
+   EXTERN l_ldi_32
+   call   l_ldi_32
 
 ELSE
 
@@ -101,10 +109,10 @@ copy_up_loop_1:
    push de
    push hl
 
-IF __CLIB_OPT_FASTCOPY & $20
+IF __CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_LDIR
 
-   ld bc,32
-   call l_fast_ldir_0
+   EXTERN l_ldi_32
+   call   l_ldi_32
 
 ELSE
 
@@ -148,24 +156,21 @@ vacate_loop_0:
    pop de
    push de                     ; e = attr
 
-IF __CLIB_OPT_FASTCOPY & $20
-
    ld (hl),e
    
    ld e,l
    ld d,h
+   inc e
    
-   inc de
-   
-   ld bc,31
-   call l_fast_ldir_0 + 2
+IF __CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_LDIR
+
+   EXTERN l_ldi
+   call   l_ldi - (31*2)
 
 ELSE
 
-   EXTERN asm_memset
-   
-   ld bc,32
-   call asm_memset
+   ld bc,31
+   ldir
 
 ENDIF
 
@@ -182,23 +187,21 @@ vacate_loop_1:
    push bc
    push hl
 
-IF __CLIB_OPT_FASTCOPY & $20
-
    ld (hl),0
    
    ld e,l
    ld d,h
-   
-   inc de
-   
-   ld bc,31
-   call l_fast_ldir_0 + 2
+   inc e
+
+IF __CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_LDIR
+
+   EXTERN l_ldi
+   call   l_ldi - (31*2)
 
 ELSE
 
-   ld e,0
-   ld bc,32
-   call asm_memset
+   ld bc,31
+   ldir
 
 ENDIF
 

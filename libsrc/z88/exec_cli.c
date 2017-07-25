@@ -10,12 +10,14 @@
 #include <z88.h>
 #include <string.h>
 
+static int exec_cli_i(char *str, size_t len);
+
 int exec_cli(char *str)
 {
 	return (exec_cli_i(str,strlen(str)));
 }
 
-int exec_cli_i(char *str, size_t len)
+static int exec_cli_i(char *str, size_t len)
 {
 #asm
 	INCLUDE	"director.def"

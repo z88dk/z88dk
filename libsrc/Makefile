@@ -713,6 +713,7 @@ sorcerer_clib.lib:
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=srr

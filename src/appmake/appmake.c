@@ -26,7 +26,7 @@
 #endif
 
 
-
+char                c_install_dir[FILENAME_MAX + 1];
 
 static char         chain_temp_filename[FILENAME_MAX+1];
 static char        *program_name = NULL;
@@ -57,6 +57,14 @@ int main(int argc, char *argv[])
     /* Randomize temporary filenames for windows */
     snprintf(tmpnambuf, sizeof(tmpnambuf), "apm%04X", ((unsigned int)time(NULL)) & 0xffff);
 #endif
+
+    if ((ptr = getenv("ZCCCFG")) != NULL) {
+#ifdef WIN32
+        snprintf(c_install_dir, sizeof(c_install_dir), "%s\\..\\..\\", ptr);
+#else
+        snprintf(c_install_dir, sizeof(c_install_dir), "%s/../../", ptr);
+#endif
+    }
 
     chain_temp_filename[0] = 0;
 

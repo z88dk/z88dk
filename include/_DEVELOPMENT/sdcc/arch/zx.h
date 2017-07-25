@@ -68,9 +68,29 @@ extern void zx_cls_fastcall(unsigned char attr) __preserves_regs(iyl,iyh) __z88d
 #define zx_cls(a) zx_cls_fastcall(a)
 
 
+extern void zx_cls_attr(unsigned char attr) __preserves_regs(iyl,iyh);
+extern void zx_cls_attr_fastcall(unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define zx_cls_attr(a) zx_cls_attr_fastcall(a)
+
+
+extern void zx_cls_pix(unsigned char pix) __preserves_regs(iyl,iyh);
+extern void zx_cls_pix_fastcall(unsigned char pix) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define zx_cls_pix(a) zx_cls_pix_fastcall(a)
+
+
 extern void zx_cls_wc(struct r_Rect8 *r,unsigned char attr);
 extern void zx_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __z88dk_callee;
 #define zx_cls_wc(a,b) zx_cls_wc_callee(a,b)
+
+
+extern void zx_cls_wc_attr(struct r_Rect8 *r,unsigned char attr);
+extern void zx_cls_wc_attr_callee(struct r_Rect8 *r,unsigned char attr) __z88dk_callee;
+#define zx_cls_wc_attr(a,b) zx_cls_wc_attr_callee(a,b)
+
+
+extern void zx_cls_wc_pix(struct r_Rect8 *r,unsigned char pix);
+extern void zx_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __z88dk_callee;
+#define zx_cls_wc_pix(a,b) zx_cls_wc_pix_callee(a,b)
 
 
 extern void zx_scroll_up(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh);
@@ -78,11 +98,76 @@ extern void zx_scroll_up_callee(unsigned char rows,unsigned char attr) __preserv
 #define zx_scroll_up(a,b) zx_scroll_up_callee(a,b)
 
 
+extern void zx_scroll_up_attr(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh);
+extern void zx_scroll_up_attr_callee(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define zx_scroll_up_attr(a,b) zx_scroll_up_attr_callee(a,b)
+
+
+extern void zx_scroll_up_pix(unsigned char rows,unsigned char pix) __preserves_regs(iyl,iyh);
+extern void zx_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define zx_scroll_up_pix(a,b) zx_scroll_up_pix_callee(a,b)
+
+
 extern void zx_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
 extern void zx_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __z88dk_callee;
 #define zx_scroll_wc_up(a,b,c) zx_scroll_wc_up_callee(a,b,c)
 
 
+extern void zx_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
+extern void zx_scroll_wc_up_attr_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __z88dk_callee;
+#define zx_scroll_wc_up_attr(a,b,c) zx_scroll_wc_up_attr_callee(a,b,c)
+
+
+extern void zx_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix);
+extern void zx_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __z88dk_callee;
+#define zx_scroll_wc_up_pix(a,b,c) zx_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+#ifdef __CLANG
+
+extern void zx_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void zx_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define zx_visit_wc_attr(a,b) zx_visit_wc_attr_callee(a,b)
+
+
+extern void zx_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void zx_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void zx_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void zx_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define zx_visit_wc_attr(a,b) zx_visit_wc_attr_callee(a,b)
+
+
+extern void zx_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void zx_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void zx_visit_wc_attr(struct r_Rect8 *r,void *visit);
+extern void zx_visit_wc_attr_callee(struct r_Rect8 *r,void *visit) __z88dk_callee;
+#define zx_visit_wc_attr(a,b) zx_visit_wc_attr_callee(a,b)
+
+
+extern void zx_visit_wc_pix(struct r_Rect8 *r,void *visit);
+extern void zx_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __z88dk_callee;
+#define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
 
 // display
 

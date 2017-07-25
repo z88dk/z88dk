@@ -9,66 +9,24 @@
 ;
 ; ===============================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_cls
+
+EXTERN asm_zx_cls_attr
+EXTERN asm_zx_cls_pix
 
 asm_zx_cls:
 
    ; enter : l = attr
    ;
    ; uses  : af, bc, de, hl
- 
-   ; attributes
 
-IF __CLIB_OPT_FASTCOPY & $20
-
-   EXTERN l_fast_ldir_0
-
-   ld a,l
+   push hl
    
-   ld hl,$5800
-   ld (hl),a
-   
-   ld de,$5801
-   ld bc,767
-   
-   call l_fast_ldir_0 + 2
+   ld l,0
+   call asm_zx_cls_pix
 
-ELSE
-
-   EXTERN asm_memset
-   
-   ld e,l
-   
-   ld hl,$5800
-   ld bc,768
-   
-   call asm_memset
-
-ENDIF
-
-   ; pixels
-
-IF __CLIB_OPT_FASTCOPY & $20
-
-   ld hl,$4000
-   ld (hl),l
-   
-   ld de,$4001
-   ld bc,6143
-   
-   jp l_fast_ldir_0 + 2
-
-ELSE
-
-   ld hl,$4000
-   ld e,l
-   ld bc,6144
-   
-   jp asm_memset
-
-ENDIF
+   pop hl
+   jp asm_zx_cls_attr

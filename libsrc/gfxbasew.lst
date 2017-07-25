@@ -23,6 +23,7 @@ graphics/w_stencil_add_side
 graphics/w_stencil_add_point
 graphics/w_stencil_add_pixel
 graphics/w_stencil_init
+graphics/w_stencil_render2
 graphics/dither_pattern
 graphics/w_multipoint
 graphics/rbitmask

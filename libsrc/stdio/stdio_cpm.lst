@@ -95,3 +95,4 @@ stdio/obj/cpm/__printf_handle_lld
 stdio/obj/cpm/__printf_handle_llo
 stdio/obj/cpm/__printf_handle_llu
 stdio/obj/cpm/__printf_handle_llx
+stdio/obj/cpm/kbhit

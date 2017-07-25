@@ -31,7 +31,8 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite2
 graphics/liner
-graphics/draw_profile_nostencil
+graphics/draw_profile
+graphics/stencil_render2
 graphics/swapgfxbk_foo
 @games/games.lst
 @ace/ace.lst

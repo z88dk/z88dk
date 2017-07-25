@@ -1,6 +1,8 @@
 
 ; void *fzx_buffer_partition(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width)
 
+INCLUDE "config_private.inc"
+
 SECTION code_font
 SECTION code_font_fzx
 
@@ -34,6 +36,12 @@ partition_loop:
    jr z, end_buffer
    
    ld a,(de)
+   
+   cp CHAR_LF
+   jr z, end_buffer
+   
+   cp CHAR_CR
+   jr z, end_buffer
    
    call __fzx_buffer_glyph_width
    jr c, end_buffer

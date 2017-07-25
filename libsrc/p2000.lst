@@ -30,7 +30,7 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite2
 graphics/liner
-graphics/stencil_render
+graphics/stencil_render2
 graphics/p2000/swapgfxbk
 games/p2000/bit_open
 games/p2000/bit_open_di

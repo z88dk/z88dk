@@ -24,9 +24,6 @@
 	EXTERN	__gfx_coords
 
 	EXTERN swapgfxbk
-	EXTERN pixeladdress
-	;EXTERN leftbitmask, rightbitmask
-	;EXTERN swapgfxbk1
 	EXTERN __graphics_end
 
 ;	
@@ -47,7 +44,9 @@
 		ld		hl,(__gfx_coords)
 		push	hl
 		push	bc
-.yloop		pop	bc
+
+.yloop
+		pop	bc
 		dec	c
 		;jp	z,swapgfxbk1
 		jr	nz,noret
@@ -94,6 +93,7 @@
 			sub d		; X2-X1 = line lenght in pixels
 			ld	b,d		; X1
 			ld	d,a
+			inc d
 			
 			
 			ld	l,c	; Y
