@@ -39,7 +39,7 @@ eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib  cpcfs.lib cpc_math.lib
 
-z88libs: z88_math.lib  z88_clib.lib net.lib z88net_clib.lib farz88.lib 
+z88libs: z88_math.lib  z88_clib.lib net.lib farz88.lib 
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
@@ -238,25 +238,6 @@ z88_clib.lib:
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C z88 
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
-
-# Network stdio - dom
-z88net_clib.lib: 
-	@echo ''
-	@echo '--- Building Z88 Network Aware Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	$(MAKE) -C fcntl/z88
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C stdlib TARGET=z88
-	$(MAKE) -C strings 
-	$(MAKE) -C regex
-	$(MAKE) -C time
-	$(MAKE) -C rs232 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert 
-	$(MAKE) -C games TARGET=z88
-	TARGET=z88 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
 
 # ZX Spectrum fcntl - dom/stefano
 zxfcntl:

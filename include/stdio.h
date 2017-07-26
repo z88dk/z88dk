@@ -94,11 +94,22 @@ struct filestr {
         intptr_t extra;
 };
 
+/* Entry: ix = fp for all */
+#define __STDIO_MSG_GETC		1
+#define __STDIO_MSG_PUTC		2
+#define __STDIO_MSG_READ		3
+#define __STDIO_MSG_WRITE		4
+#define __STDIO_MSG_SEEK		5
+#define __STDIO_MSG_FLUSH		6
+#define __STDIO_MSG_CLOSE		7
+#define __STDIO_MSG_IOCTL		8
+
 /* funopen functions, placed in extra */
 struct filestr_operations {
         int     (*readfn)();    /* (void *, char *, int) */
         int     (*writefn)();   /* (void *, char *, int) */
         fpos_t  (*seekfn)();    /* (void *, fpos_t, int) */
+        int     (*flushfn)();   /* (void *) */
         int     (*closefn)();   /* (void *) */
 };
 
@@ -127,7 +138,7 @@ typedef struct filestr FILE;
 #define _IOWRITE        4
 #define _IOEOF          8
 #define _IOSYSTEM      16
-#define _IONETWORK     32
+#define _IOEXTRA       32
 #define _IOTEXT        64
 #define _IOSTRING     128
 
@@ -149,11 +160,8 @@ extern struct filestr _sgoioblk_end;
 
 
 #define clearerr(f)
-#ifdef NET_STDIO
+extern FILE __LIB__ *fopen_zsock(char *name);
 extern int __LIB__ fflush(FILE *);
-#else
-#define fflush(f)
-#endif
 
 /* Our new and improved functions!! */
 
@@ -229,7 +237,7 @@ extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __sm
 
 /* Block read/writing */
 extern int __LIB__ __SAVEFRAME__ fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
-extern int __LIB__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__ __SAVEFRAME__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
@@ -314,15 +322,6 @@ extern int __LIB__ getk();
 #define getkey() fgetc_cons()
 extern void __LIB__ puts_cons(const char *message);
 extern int __LIB__ printk(const char *fmt,...);
-
-
-/*
- * Networking stdio routines
- */
-
-#ifdef NET_STDIO
-#include <net/stdio.h>
-#endif
 
 
 
