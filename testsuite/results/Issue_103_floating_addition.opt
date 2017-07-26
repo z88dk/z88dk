@@ -685,6 +685,8 @@
 	EXTERN	__FOPEN_MAX
 	EXTERN	__sgoioblk
 	EXTERN	__sgoioblk_end
+	EXTERN	fopen_zsock
+	EXTERN	fflush
 	EXTERN	fopen
 	EXTERN	freopen
 	EXTERN	fdopen
