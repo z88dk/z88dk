@@ -373,6 +373,7 @@ Define rules for a ragel-based parser.
 
 #include "cpu_opcodes.h"
 #include "cpu_opcodes2.h"
+#include "tools/cpu_rules.h"
 
 		/*---------------------------------------------------------------------
 		*   8-bit load group

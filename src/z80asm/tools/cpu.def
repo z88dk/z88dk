@@ -1,0 +1,315 @@
+#------------------------------------------------------------------------------
+# Z88DK Z80 Macro Assembler
+#
+# Z80/Z180/RCM2000/RCM3000 assembly table
+# The order is important: an instruction is only loaded if not yet defined
+#
+# Copyright (C) Paulo Custodio, 2011-2017
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/z88dk/z88dk
+#------------------------------------------------------------------------------
+# 8 bit load group
+
+
+ld	<b.c.d.e.h.l..a>,<b.c.d.e.h.l..a>			=> 40+<1>*8+<2>
+ld	<b.c.d.e.h.l..a>,N							=> 06+<1>*8 N
+ld	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8
+ld	a,(NN) 										=> 3A NNl NNh
+
+
+__END__
+
+ldi	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8 23
+ldd	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8 2B
+
+ld	<b.c.d.e.h.l..a>,(ix+DIS)					=> DD 46+<1>*8 DIS
+ldi	<b.c.d.e.h.l..a>,(ix+DIS)					=> DD 46+<1>*8 DIS DD 23
+ldd	<b.c.d.e.h.l..a>,(ix+DIS)					=> DD 46+<1>*8 DIS DD 2B
+
+ld	<b.c.d.e.h.l..a>,(iy+DIS)					=> FD 46+<1>*8 DIS
+ldi	<b.c.d.e.h.l..a>,(iy+DIS)					=> FD 46+<1>*8 DIS FD 23
+ldd	<b.c.d.e.h.l..a>,(iy+DIS)					=> FD 46+<1>*8 DIS FD 2B
+
+ld	(hl),<b.c.d.e.h.l..a>						=> 70+<2>
+ldi	(hl),<b.c.d.e.h.l..a>						=> 70+<2> 23
+ldd	(hl),<b.c.d.e.h.l..a>						=> 70+<2> 2B
+
+ld	(ix+DIS),<b.c.d.e.h.l..a>					=> DD 70+<2> DIS
+ldi	(ix+DIS),<b.c.d.e.h.l..a>					=> DD 70+<2> DIS DD 23
+ldd	(ix+DIS),<b.c.d.e.h.l..a>					=> DD 70+<2> DIS DD 2B
+
+ld	(iy+DIS),<b.c.d.e.h.l..a>					=> FD 70+<2> DIS
+ldi	(iy+DIS),<b.c.d.e.h.l..a>					=> FD 70+<2> DIS FD 23
+ldd	(iy+DIS),<b.c.d.e.h.l..a>					=> FD 70+<2> DIS FD 2B
+
+ld	(hl),N										=> 36 N
+ldi	(hl),N										=> 36 N 23
+ldd	(hl),N										=> 36 N 2B
+
+ld	(ix+DIS),N									=> DD 36 DIS N
+ldi	(ix+DIS),N									=> DD 36 DIS N DD	23
+ldd	(ix+DIS),N									=> DD 36 DIS N DD	2B
+
+ld	(iy+DIS),N									=> FD 36 DIS N
+ldi	(iy+DIS),N									=> FD 36 DIS N FD	23
+ldd	(iy+DIS),N									=> FD 36 DIS N FD	2B
+
+ld	a,<(bc).(de)>								=> 0A+<2>*10
+ldi	a,<(bc).(de)>								=> 0A+<2>*10 03+<2>*10
+ldd	a,<(bc).(de)>								=> 0A+<2>*10 0B+<2>*10
+
+ld	<(bc).(de)>,a								=> 02+<1>*10
+ldi	<(bc).(de)>,a								=> 02+<1>*10 03+<1>*10
+ldd	<(bc).(de)>,a								=> 02+<1>*10 0B+<1>*10
+
+ld	a,(NN) 										=> 3A NNl NNh
+ld	(NN),a 										=> 32 NNl NNh
+
+ld	a,<i.r>										=> ED 57+<2>*8
+ld	<i.r>,a										=> ED 47+<1>*8
+
+# load 16 bits
+
+ld	<bc..de..hl>,<bc..de..hl>	=> 40+<1>*8+<2>      49+<1>*8+<2>
+ld	<bc..de..>,ix				=> DD 44+<1>*8     DD 4D+<1>*8
+ld	<bc..de..>,iy				=> FD 44+<1>*8     FD 4D+<1>*8
+
+ld	<bc..de..>,(hl)				=> 4E+<1>*8 23     46+<1>*8 2B
+ldi	<bc..de..>,(hl)				=> 4E+<1>*8 23     46+<1>*8 23
+
+ld	<bc..de..hl>,(ix+DIS)		=> DD 4E+<1>*8 DIS           DD 46+<1>*8 DIS+1
+ldi	<bc..de..hl>,(ix+DIS)		=> DD 4E+<1>*8 DIS DD 23 DD 46+<1>*8 DIS DD 23 
+
+ld	<bc..de..hl>,(iy+DIS)		=> FD 4E+<1>*8 DIS           FD 46+<1>*8 DIS+1
+ldi	<bc..de..hl>,(iy+DIS)		=> FD 4E+<1>*8 DIS FD 23 FD 46+<1>*8 DIS FD 23
+
+ld 	(hl),<bc..de>				=> 71+<2> 23     70+<2> 2B
+ldi	(hl),<bc..de>				=> 71+<2> 23     70+<2> 23
+
+ld 	(ix+DIS),<bc..de..hl>		=> DD 71+<2> DIS           DD 70+<2> DIS+1
+ldi	(ix+DIS),<bc..de..hl>		=> DD 71+<2> DIS DD 23 DD 70+<2> DIS DD 23
+
+ld 	(iy+DIS),<bc..de..hl>		=> FD 71+<2> DIS FD 70+<2> DIS+1
+ldi	(iy+DIS),<bc..de..hl>		=> FD 71+<2> DIS FD 23 FD 70+<2> DIS FD 23
+
+ld 	hl,ix						=> DD E5 E1
+ld 	hl,iy						=> FD E5 E1
+
+ld	ix,<bc..de..>				=> DD 69+<2>       DD 60+<2>
+ld	iy,<bc..de..>				=> FD 69+<2>       FD 60+<2>
+
+ld ix,hl						=> E5 DD E1
+ld iy,hl						=> E5 FD E1
+
+ld ix,ix						=> DD 6D DD 64
+ld ix,iy						=> FD E5 DD E1
+
+ld iy,iy						=> FD 6D FD 64
+ld iy,ix						=> DD E5 FD E1
+
+#------------------------------------------------------------------------------
+# 16 bit load group
+
+ld	<bc.de.hl.sp>,NN					 		=> 01+<1>*10 NNl NNh
+ld	ix,NN								 		=> DD 21 NNl NNh
+ld	iy,NN								 		=> FD 21 NNl NNh
+
+ld	hl,(NN)										=> 2A NNl NNh
+ld	ix,(NN)										=> DD 2A NNl NNh
+ld	iy,(NN)										=> FD 2A NNl NNh
+
+ld	<bc.de.hl.sp>,(NN)							=> ED 4B+<1>*10 NNl NNh
+
+ld	(NN),hl										=> 22 NNl NNh
+ld	(NN),ix										=> DD 22 NNl NNh
+ld	(NN),iy										=> FD 22 NNl NNh
+
+ld	(NN),<bc.de.hl.sp>							=> ED 43+<2>*10 NNl NNh
+
+ld	sp,hl										=> F9
+ld	sp,ix										=> DD F9
+ld	sp,iy										=> FD F9
+
+push <bc.de.hl.af>								=> C5+<1>*10
+push ix											=> DD E5
+push iy											=> FD E5
+
+pop <bc.de.hl.af>								=> C1+<1>*10
+pop ix											=> DD E1
+pop iy											=> FD E1
+
+#------------------------------------------------------------------------------
+# Exchange, block transfer, search group
+
+ex	de,hl										=> EB
+ex	af,af'										=>		08	# '
+exx												=> 		D9
+
+ex	(sp),hl										=>		E3
+ex	(sp),ix										=> DD E3
+ex	(sp),iy										=> FD E3
+
+ldi												=> ED A0
+ldir											=> ED B0
+ldd												=> ED A8
+lddr											=> ED B8
+
+cpi												=> ED A1
+cpir											=> ED B1
+cpd												=> ED A9
+cpdr											=> ED B9
+
+#------------------------------------------------------------------------------
+# 8 bit arithmetic and logical group
+
+<add.adc..sbc> a,<b.c.d.e.h.l..a>				=> 80+<0:3>+<2>
+<add.adc..sbc> a,<....ixh.ixl..>				=> DD 80+<0:3>+<2>
+<add.adc..sbc> a,<....iyh.iyl..>				=> FD 80+<0:3>+<2>
+<add.adc..sbc> a,N								=>		C6+<0:3> N
+<add.adc..sbc> a,(hl)							=> 86+<0:3>
+<add.adc..sbc> a,(ix+DIS)						=> DD 86+<0:3> DIS
+<add.adc..sbc> a,(iy+DIS)						=> FD 86+<0:3> DIS
+
+<..sub..and.xor.or.cp>   <b.c.d.e.h.l..a>		=> 80+<0:3>+<1>
+<..sub..and.xor.or.cp>   <....ixh.ixl..>		=> DD 80+<0:3>+<1>
+<..sub..and.xor.or.cp>   <....iyh.iyl..>		=> FD 80+<0:3>+<1>
+<..sub..and.xor.or.cp>   N						=>		C6+<0:3> N
+<..sub..and.xor.or.cp>   (hl)					=> 86+<0:3>
+<..sub..and.xor.or.cp>   (ix+DIS)				=> DD 86+<0:3> DIS
+<..sub..and.xor.or.cp>   (iy+DIS)				=> FD 86+<0:3> DIS
+
+<....inc.dec> <b.c.d.e.h.l..a>					=> 00+<0>+<1>*8
+<....inc.dec> <....ixh.ixl..>					=> DD 00+<0>+<1>*8
+<....inc.dec> <....iyh.iyl..>					=> FD 00+<0>+<1>*8
+
+<....inc.dec> (hl)								=> 30+<0>
+<....inc.dec> (ix+DIS)							=> DD 30+<0> DIS
+<....inc.dec> (iy+DIS)							=> FD 30+<0> DIS
+
+#------------------------------------------------------------------------------
+# General purpose arithmetic and CPU control group
+
+daa 											=> 27
+cpl 											=> 2F
+neg 											=> ED 44
+ccf 											=> 3F
+scf 											=> 37
+nop 											=> 00
+halt											=> 76
+di 												=> F3
+ei	 											=> FB
+im	0 											=> ED 46
+im	1 											=> ED 56
+im	2 											=> ED 5E
+
+#------------------------------------------------------------------------------
+# 8 bit arithmetic and logical group
+
+add hl,<bc.de.hl.sp>							=>		09+<2>*10
+add ix,<bc.de.ix.sp>							=> DD 09+<2>*10
+add iy,<bc.de.iy.sp>							=> FD 09+<2>*10
+
+<sbc.adc> hl,<bc.de.hl.sp>						=> ED 42+<0:3>+<2>*10
+sub hl,<bc.de.hl.sp>							=> B7 ED 42+<2>*10
+
+<inc.dec> <bc.de.hl.sp>							=>		03+<0:3>+<1>*10
+<inc.dec> <..ix.>								=> DD 03+<0:3>+<1>*10
+<inc.dec> <..iy.>								=> FD 03+<0:3>+<1>*10
+
+#------------------------------------------------------------------------------
+# rotate and shift group
+
+<rlca.rrca.rla.rra>											=>		07+<0:3>
+
+<rlc.rrc.rl.rr.sla.sra.sll.srl> <b.c.d.e.h.l..a>			=> 		CB     00+<0:3>+<1>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (hl)						=> CB     06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (ix+DIS)					=> DD CB DIS 06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (iy+DIS)					=> FD CB DIS 06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS 00+<0:3>+<2>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS 00+<0:3>+<2>
+
+<rlc.rrc.rl.rr.sla.sra.sli.srl> <b.c.d.e.h.l..a>			=> 		CB     00+<0:3>+<1>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (hl)						=> CB     06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (ix+DIS)					=> DD CB DIS 06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (iy+DIS)					=> FD CB DIS 06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS 00+<0:3>+<2>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS 00+<0:3>+<2>
+
+rld															=> ED 6F
+rrd															=> ED 67
+
+# rotate 16 bits
+
+rl <bc..de..hl>					=> CB 11+<1> CB 10+<1>
+rr <bc..de..hl>					=> CB 18+<1> CB 19+<1>
+
+sla hl							=> 29			# special case: add hl,hl
+sla <bc..de..hl>				=> CB 21+<1> CB 10+<1>
+sll <bc..de..hl>				=> CB 31+<1> CB 10+<1>
+sli <bc..de..hl>				=> CB 31+<1> CB 10+<1>
+
+sra <bc..de..hl>				=> CB 28+<1> CB 19+<1>
+srl <bc..de..hl>				=> CB 38+<1> CB 19+<1>
+
+#------------------------------------------------------------------------------
+# Bit Set, Reset and Test Group
+
+<.bit.res.set> <0.1.2.3.4.5.6.7>,<b.c.d.e.h.l..a>			=> CB     <0:6>+<1>*8+<2>
+<.bit.res.set> <0.1.2.3.4.5.6.7>,(hl)						=> CB     <0:6>+<1>*8+6
+<.bit.res.set> <0.1.2.3.4.5.6.7>,(ix+DIS)					=> DD CB DIS <0:6>+<1>*8+6
+<.bit.res.set> <0.1.2.3.4.5.6.7>,(iy+DIS)					=> FD CB DIS <0:6>+<1>*8+6
+<..res.set>    <0.1.2.3.4.5.6.7>,(ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS <0:6>+<1>*8+<3>
+<..res.set>    <0.1.2.3.4.5.6.7>,(iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS <0:6>+<1>*8+<3>
+
+#------------------------------------------------------------------------------
+# Jump Group
+
+jp NN											=> 		C3       NNl NNh
+jp <nz.z.nc.c.po.pe.p.m>,NN						=> 		C2+<1>*8 NNl NNh
+
+jr NN											=> 		18       NNo
+jr <nz.z.nc.c>,NN								=> 		20+<1>*8 NNo
+jr <....po.pe.p.m>,NN							=> 		C2+<1>*8 NNl NNh
+djnz NN											=>		10       NNo
+
+jp (hl)											=> 		E9
+jp (ix)											=> DD	E9
+jp (iy)											=> FD	E9
+
+#------------------------------------------------------------------------------
+# Call and Return Group
+
+call NN											=> 		CD       NNl NNh
+call <nz.z.nc.c.po.pe.p.m>,NN					=> 		C4+<1>*8 NNl NNh
+ret												=> 		C9
+ret <nz.z.nc.c.po.pe.p.m>						=> 		C0+<1>*8
+reti											=> ED 4D
+retn											=> ED 45
+rst <0.8.16.24.32.40.48.56>						=> 		C7+(<1>*8&0b00111000)
+rst <0.1.2.3.4.5.6.7>							=> 		C7+(<1>*8&0b00111000)
+
+#------------------------------------------------------------------------------
+# Input and Output Group
+
+in a,(N)										=>		DB N
+in <b.c.d.e.h.l..a>,(c)							=> ED 40+<1>*8
+in f,(c)										=> ED 70
+
+ini												=> ED A2
+inir											=> ED B2
+ind												=> ED AA
+indr											=> ED BA
+
+out (N),a										=>		D3 N
+out (c),<b.c.d.e.h.l..a>						=> ED 41+<2>*8
+out (c),0										=> ED 71
+
+outi											=> ED A3
+otir											=> ED B3
+outd											=> ED AB
+otdr											=> ED BB
+
+#------------------------------------------------------------------------------
+# Special instruction for CPU::Emulator::Z80
+
+stop											=> DD DD 00
