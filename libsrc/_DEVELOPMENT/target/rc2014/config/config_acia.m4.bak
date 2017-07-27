@@ -5,49 +5,49 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-define(`ACIA_CTRL_ADDR', 0x80)      # Address of Control Register (write only)
-define(`ACIA_STATUS_ADDR', 0x80)    # Address of Status Register (read only)
-define(`ACIA_DATA_ADDR', 0x81)      # Address of Data Register
+define(`__ACIA_CONTROL_REGISTER', 0x80) # Address of Control Register (write only)
+define(`__ACIA_STATUS_REGISTER', 0x80)  # Address of Status Register (read only)
+define(`__ACIA_DATA_REGISTER', 0x81)    # Address of Data Register
 
-define(`ACIA_CLK_DIV_01', 0x00)     # Divide the Clock by 1
-define(`ACIA_CLK_DIV_16', 0x01)     # Divide the Clock by 16
-define(`ACIA_CLK_DIV_64', 0x02)     # Divide the Clock by 64 (default value)
-define(`ACIA_RESET', 0x03)          # Master Reset (issue before any other Control word)
+define(`__ACIA_CR_CLK_DIV_01', 0x00)    # Divide the Clock by 1
+define(`__ACIA_CR_CLK_DIV_16', 0x01)    # Divide the Clock by 16
+define(`__ACIA_CR_CLK_DIV_64', 0x02)    # Divide the Clock by 64 (default value)
+define(`__ACIA_CR_RESET', 0x03)         # Master Reset (issue before any other Control word)
 
-define(`ACIA_7E2', 0x00)            # 7 Bits Even Parity 2 Stop Bits
-define(`ACIA_7O2', 0x04)            # 7 Bits  Odd Parity 2 Stop Bits
-define(`ACIA_7E1', 0x08)            # 7 Bits Even Parity 1 Stop Bit
-define(`ACIA_7O1', 0x0C)            # 7 Bits  Odd Parity 1 Stop Bit
-define(`ACIA_8N2', 0x10)            # 8 Bits   No Parity 2 Stop Bits
-define(`ACIA_8N1', 0x14)            # 8 Bits   No Parity 1 Stop Bit
-define(`ACIA_8E1', 0x18)            # 8 Bits Even Parity 1 Stop Bit
-define(`ACIA_8O1', 0x1C)            # 8 Bits  Odd Parity 1 Stop Bit
+define(`__ACIA_CR_7E2', 0x00)           # 7 Bits Even Parity 2 Stop Bits
+define(`__ACIA_CR_7O2', 0x04)           # 7 Bits  Odd Parity 2 Stop Bits
+define(`__ACIA_CR_7E1', 0x08)           # 7 Bits Even Parity 1 Stop Bit
+define(`__ACIA_CR_7O1', 0x0C)           # 7 Bits  Odd Parity 1 Stop Bit
+define(`__ACIA_CR_8N2', 0x10)           # 8 Bits   No Parity 2 Stop Bits
+define(`__ACIA_CR_8N1', 0x14)           # 8 Bits   No Parity 1 Stop Bit
+define(`__ACIA_CR_8E1', 0x18)           # 8 Bits Even Parity 1 Stop Bit
+define(`__ACIA_CR_8O1', 0x1C)           # 8 Bits  Odd Parity 1 Stop Bit
 
-define(`ACIA_TDI_RTS0', 0x00)       # _RTS low,  Transmitting Interrupt Disabled
-define(`ACIA_TEI_RTS0', 0x20)       # _RTS low,  Transmitting Interrupt Enabled
-define(`ACIA_TDI_RTS1', 0x40)       # _RTS high, Transmitting Interrupt Disabled
-define(`ACIA_TDI_BRK', 0x60)        # _RTS low,  Transmitting Interrupt Disabled, BRK on Tx
+define(`__ACIA_CR_TDI_RTS0', 0x00)      # _RTS low,  Transmitting Interrupt Disabled
+define(`__ACIA_CR_TEI_RTS0', 0x20)      # _RTS low,  Transmitting Interrupt Enabled
+define(`__ACIA_CR_TDI_RTS1', 0x40)      # _RTS high, Transmitting Interrupt Disabled
+define(`__ACIA_CR_TDI_BRK', 0x60)       # _RTS low,  Transmitting Interrupt Disabled, BRK on Tx
    
-define(`ACIA_TEI_MASK', 0x60)       # Mask for the Tx Interrupt & RTS bits
+define(`__ACIA_CR_TEI_MASK', 0x60)      # Mask for the Tx Interrupt & RTS bits
 
-define(`ACIA_REI', 0x80)            # Receive Interrupt Enabled
+define(`__ACIA_CR_REI', 0x80)           # Receive Interrupt Enabled
 
-define(`ACIA_RDRF', 0x01)           # Receive Data Register Full
-define(`ACIA_TDRE', 0x02)           # Transmit Data Register Empty
-define(`ACIA_DCD', 0x04)            # Data Carrier Detect
-define(`ACIA_CTS', 0x08)            # Clear To Send
-define(`ACIA_FE', 0x10)             # Framing Error (Received Byte)
-define(`ACIA_OVRN', 0x20)           # Overrun (Received Byte
-define(`ACIA_PE', 0x40)             # Parity Error (Received Byte)
-define(`ACIA_IRQ', 0x80)            # IRQ (Either Transmitted or Received Byte)
+define(`__ACIA_SR_RDRF', 0x01)          # Receive Data Register Full
+define(`__ACIA_SR_TDRE', 0x02)          # Transmit Data Register Empty
+define(`__ACIA_SR_DCD', 0x04)           # Data Carrier Detect
+define(`__ACIA_SR_CTS', 0x08)           # Clear To Send
+define(`__ACIA_SR_FE', 0x10)            # Framing Error (Received Byte)
+define(`__ACIA_SR_OVRN', 0x20)          # Overrun (Received Byte
+define(`__ACIA_SR_PE', 0x40)            # Parity Error (Received Byte)
+define(`__ACIA_SR_IRQ', 0x80)           # IRQ (Either Transmitted or Received Byte)
 
 # MC68C50 ACIA driver
 
-define(`ACIA_RX_SIZE', 0x100)       # Size of the Rx Buffer
-define(`ACIA_RX_FULLISH', eval(ACIA_RX_SIZE-8))
-                                    # Size of the Rx Buffer, when not_RTS is signalled
-define(`ACIA_RX_EMPTYSIZE', 0x08)   # Fullness of the Rx Buffer, when RTS is signalled
-define(`ACIA_TX_SIZE', 0x10)        # Size of the Tx Buffer   
+define(`__ACIA_RX_SIZE', 0x100)         # Size of the Rx Buffer
+define(`__ACIA_RX_FULLISH', eval(__ACIA_RX_SIZE-8))
+                                        # Size of the Rx Buffer, when not_RTS is signalled
+define(`__ACIA_RX_EMPTYISH', 0x08)      # Fullness of the Rx Buffer, when RTS is signalled
+define(`__ACIA_TX_SIZE', 0x10)          # Size of the Tx Buffer   
 
 #
 # END OF USER CONFIGURATION
@@ -61,46 +61,46 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `ACIA_CTRL_ADDR'
-PUBLIC `ACIA_STATUS_ADDR'
-PUBLIC `ACIA_DATA_ADDR'
+PUBLIC `__ACIA_CONTROL_REGISTER'
+PUBLIC `__ACIA_STATUS_REGISTER'
+PUBLIC `__ACIA_DATA_REGISTER'
 
-PUBLIC `ACIA_CLK_DIV_01'
-PUBLIC `ACIA_CLK_DIV_16'
-PUBLIC `ACIA_CLK_DIV_64'
-PUBLIC `ACIA_RESET'
+PUBLIC `__ACIA_CR_CLK_DIV_01'
+PUBLIC `__ACIA_CR_CLK_DIV_16'
+PUBLIC `__ACIA_CR_CLK_DIV_64'
+PUBLIC `__ACIA_CR_RESET'
 
-PUBLIC `ACIA_7E2'
-PUBLIC `ACIA_7O2'
-PUBLIC `ACIA_7E1'
-PUBLIC `ACIA_7O1'
-PUBLIC `ACIA_8N2'
-PUBLIC `ACIA_8N1'
-PUBLIC `ACIA_8E1'
-PUBLIC `ACIA_8O1'
+PUBLIC `__ACIA_CR_7E2'
+PUBLIC `__ACIA_CR_7O2'
+PUBLIC `__ACIA_CR_7E1'
+PUBLIC `__ACIA_CR_7O1'
+PUBLIC `__ACIA_CR_8N2'
+PUBLIC `__ACIA_CR_8N1'
+PUBLIC `__ACIA_CR_8E1'
+PUBLIC `__ACIA_CR_8O1'
 
-PUBLIC `ACIA_TDI_RTS0'
-PUBLIC `ACIA_TEI_RTS0'
-PUBLIC `ACIA_TDI_RTS1'
-PUBLIC `ACIA_TDI_BRK'
+PUBLIC `__ACIA_CR_TDI_RTS0'
+PUBLIC `__ACIA_CR_TEI_RTS0'
+PUBLIC `__ACIA_CR_TDI_RTS1'
+PUBLIC `__ACIA_CR_TDI_BRK'
    
-PUBLIC `ACIA_TEI_MASK'
+PUBLIC `__ACIA_CR_TEI_MASK'
 
-PUBLIC `ACIA_REI'
+PUBLIC `__ACIA_CR_REI'
 
-PUBLIC `ACIA_RDRF'
-PUBLIC `ACIA_TDRE'
-PUBLIC `ACIA_DCD'
-PUBLIC `ACIA_CTS'
-PUBLIC `ACIA_FE'
-PUBLIC `ACIA_OVRN'
-PUBLIC `ACIA_PE'
-PUBLIC `ACIA_IRQ'
+PUBLIC `__ACIA_SR_RDRF'
+PUBLIC `__ACIA_SR_TDRE'
+PUBLIC `__ACIA_SR_DCD'
+PUBLIC `__ACIA_SR_CTS'
+PUBLIC `__ACIA_SR_FE'
+PUBLIC `__ACIA_SR_OVRN'
+PUBLIC `__ACIA_SR_PE'
+PUBLIC `__ACIA_SR_IRQ'
 
-PUBLIC `ACIA_RX_SIZE'
-PUBLIC `ACIA_RX_FULLISH'
-PUBLIC `ACIA_RX_EMPTYSIZE'
-PUBLIC `ACIA_TX_SIZE'
+PUBLIC `__ACIA_RX_SIZE'
+PUBLIC `__ACIA_RX_FULLISH'
+PUBLIC `__ACIA_RX_EMPTYISH'
+PUBLIC `__ACIA_TX_SIZE'
 ')
 
 dnl#
@@ -109,46 +109,46 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `ACIA_CTRL_ADDR'   = ACIA_CTRL_ADDR
-defc `ACIA_STATUS_ADDR' = ACIA_STATUS_ADDR
-defc `ACIA_DATA_ADDR'   = ACIA_DATA_ADDR
+defc `__ACIA_CONTROL_REGISTER'   = __ACIA_CONTROL_REGISTER
+defc `__ACIA_STATUS_REGISTER' = __ACIA_STATUS_REGISTER
+defc `__ACIA_DATA_REGISTER'   = __ACIA_DATA_REGISTER
 
-defc `ACIA_CLK_DIV_01'  = ACIA_CLK_DIV_01
-defc `ACIA_CLK_DIV_16'  = ACIA_CLK_DIV_16
-defc `ACIA_CLK_DIV_64'  = ACIA_CLK_DIV_64
-defc `ACIA_RESET'       = ACIA_RESET
+defc `__ACIA_CR_CLK_DIV_01'  = __ACIA_CR_CLK_DIV_01
+defc `__ACIA_CR_CLK_DIV_16'  = __ACIA_CR_CLK_DIV_16
+defc `__ACIA_CR_CLK_DIV_64'  = __ACIA_CR_CLK_DIV_64
+defc `__ACIA_CR_RESET'       = __ACIA_CR_RESET
 
-defc `ACIA_7E2'         = ACIA_7E2
-defc `ACIA_7O2'         = ACIA_7O2
-defc `ACIA_7E1'         = ACIA_7E1
-defc `ACIA_7O1'         = ACIA_7O1
-defc `ACIA_8N2'         = ACIA_8N2
-defc `ACIA_8N1'         = ACIA_8N1
-defc `ACIA_8E1'         = ACIA_8E1
-defc `ACIA_8O1'         = ACIA_8O1
+defc `__ACIA_CR_7E2'         = __ACIA_CR_7E2
+defc `__ACIA_CR_7O2'         = __ACIA_CR_7O2
+defc `__ACIA_CR_7E1'         = __ACIA_CR_7E1
+defc `__ACIA_CR_7O1'         = __ACIA_CR_7O1
+defc `__ACIA_CR_8N2'         = __ACIA_CR_8N2
+defc `__ACIA_CR_8N1'         = __ACIA_CR_8N1
+defc `__ACIA_CR_8E1'         = __ACIA_CR_8E1
+defc `__ACIA_CR_8O1'         = __ACIA_CR_8O1
 
-defc `ACIA_TDI_RTS0'    = ACIA_TDI_RTS0
-defc `ACIA_TEI_RTS0'    = ACIA_TEI_RTS0
-defc `ACIA_TDI_RTS1'    = ACIA_TDI_RTS1
-defc `ACIA_TDI_BRK'     = ACIA_TDI_BRK
+defc `__ACIA_CR_TDI_RTS0'    = __ACIA_CR_TDI_RTS0
+defc `__ACIA_CR_TEI_RTS0'    = __ACIA_CR_TEI_RTS0
+defc `__ACIA_CR_TDI_RTS1'    = __ACIA_CR_TDI_RTS1
+defc `__ACIA_CR_TDI_BRK'     = __ACIA_CR_TDI_BRK
    
-defc `ACIA_TEI_MASK'    = ACIA_TEI_MASK
+defc `__ACIA_CR_TEI_MASK'    = __ACIA_CR_TEI_MASK
 
-defc `ACIA_REI'         = ACIA_REI
+defc `__ACIA_CR_REI'         = __ACIA_CR_REI
 
-defc `ACIA_RDRF'        = ACIA_RDRF
-defc `ACIA_TDRE'        = ACIA_TDRE
-defc `ACIA_DCD'         = ACIA_DCD
-defc `ACIA_CTS'         = ACIA_CTS
-defc `ACIA_FE'          = ACIA_FE
-defc `ACIA_OVRN'        = ACIA_OVRN
-defc `ACIA_PE'          = ACIA_PE
-defc `ACIA_IRQ'         = ACIA_IRQ
+defc `__ACIA_SR_RDRF'        = __ACIA_SR_RDRF
+defc `__ACIA_SR_TDRE'        = __ACIA_SR_TDRE
+defc `__ACIA_SR_DCD'         = __ACIA_SR_DCD
+defc `__ACIA_SR_CTS'         = __ACIA_SR_CTS
+defc `__ACIA_SR_FE'          = __ACIA_SR_FE
+defc `__ACIA_SR_OVRN'        = __ACIA_SR_OVRN
+defc `__ACIA_SR_PE'          = __ACIA_SR_PE
+defc `__ACIA_SR_IRQ'         = __ACIA_SR_IRQ
 
-defc `ACIA_RX_SIZE'     = ACIA_RX_SIZE
-defc `ACIA_RX_FULLISH'  = ACIA_RX_FULLISH
-defc `ACIA_RX_EMPTYSIZE' = ACIA_RX_EMPTYSIZE
-defc `ACIA_TX_SIZE'     = ACIA_TX_SIZE
+defc `__ACIA_RX_SIZE'     = __ACIA_RX_SIZE
+defc `__ACIA_RX_FULLISH'  = __ACIA_RX_FULLISH
+defc `__ACIA_RX_EMPTYISH' = __ACIA_RX_EMPTYISH
+defc `__ACIA_TX_SIZE'     = __ACIA_TX_SIZE
 ')
 
 dnl#
@@ -157,44 +157,44 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-`#define' `ACIA_CTRL_ADDR'    ACIA_CTRL_ADDR
-`#define' `ACIA_STATUS_ADDR'  ACIA_STATUS_ADDR
-`#define' `ACIA_DATA_ADDR'    ACIA_DATA_ADDR
+`#define' `__ACIA_CONTROL_REGISTER'    __ACIA_CONTROL_REGISTER
+`#define' `__ACIA_STATUS_REGISTER'  __ACIA_STATUS_REGISTER
+`#define' `__ACIA_DATA_REGISTER'    __ACIA_DATA_REGISTER
 
-`#define' `ACIA_CLK_DIV_01'   ACIA_CLK_DIV_01
-`#define' `ACIA_CLK_DIV_16'   ACIA_CLK_DIV_16
-`#define' `ACIA_CLK_DIV_64'   ACIA_CLK_DIV_64
-`#define' `ACIA_RESET'        ACIA_RESET
+`#define' `__ACIA_CR_CLK_DIV_01'   __ACIA_CR_CLK_DIV_01
+`#define' `__ACIA_CR_CLK_DIV_16'   __ACIA_CR_CLK_DIV_16
+`#define' `__ACIA_CR_CLK_DIV_64'   __ACIA_CR_CLK_DIV_64
+`#define' `__ACIA_CR_RESET'        __ACIA_CR_RESET
 
-`#define' `ACIA_7E2'          ACIA_7E2
-`#define' `ACIA_7O2'          ACIA_7O2
-`#define' `ACIA_7E1'          ACIA_7E1
-`#define' `ACIA_7O1'          ACIA_7O1
-`#define' `ACIA_8N2'          ACIA_8N2
-`#define' `ACIA_8N1'          ACIA_8N1
-`#define' `ACIA_8E1'          ACIA_8E1
-`#define' `ACIA_8O1'          ACIA_8O1
+`#define' `__ACIA_CR_7E2'          __ACIA_CR_7E2
+`#define' `__ACIA_CR_7O2'          __ACIA_CR_7O2
+`#define' `__ACIA_CR_7E1'          __ACIA_CR_7E1
+`#define' `__ACIA_CR_7O1'          __ACIA_CR_7O1
+`#define' `__ACIA_CR_8N2'          __ACIA_CR_8N2
+`#define' `__ACIA_CR_8N1'          __ACIA_CR_8N1
+`#define' `__ACIA_CR_8E1'          __ACIA_CR_8E1
+`#define' `__ACIA_CR_8O1'          __ACIA_CR_8O1
 
-`#define' `ACIA_TDI_RTS0'     ACIA_TDI_RTS0
-`#define' `ACIA_TEI_RTS0'     ACIA_TEI_RTS0
-`#define' `ACIA_TDI_RTS1'     ACIA_TDI_RTS1
-`#define' `ACIA_TDI_BRK'      ACIA_TDI_BRK
+`#define' `__ACIA_CR_TDI_RTS0'     __ACIA_CR_TDI_RTS0
+`#define' `__ACIA_CR_TEI_RTS0'     __ACIA_CR_TEI_RTS0
+`#define' `__ACIA_CR_TDI_RTS1'     __ACIA_CR_TDI_RTS1
+`#define' `__ACIA_CR_TDI_BRK'      __ACIA_CR_TDI_BRK
    
-`#define' `ACIA_TEI_MASK'     ACIA_TEI_MASK
+`#define' `__ACIA_CR_TEI_MASK'     __ACIA_CR_TEI_MASK
 
-`#define' `ACIA_REI'          ACIA_REI
+`#define' `__ACIA_CR_REI'          __ACIA_CR_REI
 
-`#define' `ACIA_RDRF'         ACIA_RDRF
-`#define' `ACIA_TDRE'         ACIA_TDRE
-`#define' `ACIA_DCD'          ACIA_DCD
-`#define' `ACIA_CTS'          ACIA_CTS
-`#define' `ACIA_FE'           ACIA_FE
-`#define' `ACIA_OVRN'         ACIA_OVRN
-`#define' `ACIA_PE'           ACIA_PE
-`#define' `ACIA_IRQ'          ACIA_IRQ
+`#define' `__ACIA_SR_RDRF'         __ACIA_SR_RDRF
+`#define' `__ACIA_SR_TDRE'         __ACIA_SR_TDRE
+`#define' `__ACIA_SR_DCD'          __ACIA_SR_DCD
+`#define' `__ACIA_SR_CTS'          __ACIA_SR_CTS
+`#define' `__ACIA_SR_FE'           __ACIA_SR_FE
+`#define' `__ACIA_SR_OVRN'         __ACIA_SR_OVRN
+`#define' `__ACIA_SR_PE'           __ACIA_SR_PE
+`#define' `__ACIA_SR_IRQ'          __ACIA_SR_IRQ
 
-`#define' `ACIA_RX_SIZE'      ACIA_RX_SIZE
-`#define' `ACIA_RX_FULLISH'   ACIA_RX_FULLISH
-`#define' `ACIA_RX_EMPTYSIZE' ACIA_RX_EMPTYSIZE
-`#define' `ACIA_TX_SIZE'      ACIA_TX_SIZE
+`#define' `__ACIA_RX_SIZE'      __ACIA_RX_SIZE
+`#define' `__ACIA_RX_FULLISH'   __ACIA_RX_FULLISH
+`#define' `__ACIA_RX_EMPTYISH' __ACIA_RX_EMPTYISH
+`#define' `__ACIA_TX_SIZE'      __ACIA_TX_SIZE
 ')
