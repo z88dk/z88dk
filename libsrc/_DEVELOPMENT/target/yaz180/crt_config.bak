@@ -69,7 +69,7 @@ IF __CRTCFG = 1
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x8200
-   defc TAR__crt_org_data              = 0x2800
+   defc TAR__crt_org_data              = 0
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
@@ -118,7 +118,7 @@ IF __CRTCFG = 2
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x8200
-   defc TAR__crt_org_data              = 0x2800
+   defc TAR__crt_org_data              = 0
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
