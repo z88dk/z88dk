@@ -47,4 +47,5 @@ before_script:
   - export ZCCCFG=`pwd`/lib/config
 
 script: 
-  - make && make -C libsrc && make -C libsrc install && make -C libsrc/_DEVELOPMENT && make -C examples && make -C test
+  - travis_wait make
+  - make -C libsrc && make -C libsrc install && make -C libsrc/_DEVELOPMENT && make -C examples && make -C test
