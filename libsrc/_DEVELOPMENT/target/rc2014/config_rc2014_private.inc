@@ -67,46 +67,46 @@ defc __CPU_INFO_ENABLE_SLL = 0x01
 
 
 
-defc __ACIA_CONTROL_REGISTER   = 0x80
-defc __ACIA_STATUS_REGISTER = 0x80
-defc __ACIA_DATA_REGISTER   = 0x81
+defc __IO_ACIA_CONTROL_REGISTER   = 0x80
+defc __IO_ACIA_STATUS_REGISTER = 0x80
+defc __IO_ACIA_DATA_REGISTER   = 0x81
 
-defc __ACIA_CR_CLK_DIV_01  = 0x00
-defc __ACIA_CR_CLK_DIV_16  = 0x01
-defc __ACIA_CR_CLK_DIV_64  = 0x02
-defc __ACIA_CR_RESET       = 0x03
+defc __IO_ACIA_CR_CLK_DIV_01  = 0x00
+defc __IO_ACIA_CR_CLK_DIV_16  = 0x01
+defc __IO_ACIA_CR_CLK_DIV_64  = 0x02
+defc __IO_ACIA_CR_RESET       = 0x03
 
-defc __ACIA_CR_7E2         = 0x00
-defc __ACIA_CR_7O2         = 0x04
-defc __ACIA_CR_7E1         = 0x08
-defc __ACIA_CR_7O1         = 0x0C
-defc __ACIA_CR_8N2         = 0x10
-defc __ACIA_CR_8N1         = 0x14
-defc __ACIA_CR_8E1         = 0x18
-defc __ACIA_CR_8O1         = 0x1C
+defc __IO_ACIA_CR_7E2         = 0x00
+defc __IO_ACIA_CR_7O2         = 0x04
+defc __IO_ACIA_CR_7E1         = 0x08
+defc __IO_ACIA_CR_7O1         = 0x0C
+defc __IO_ACIA_CR_8N2         = 0x10
+defc __IO_ACIA_CR_8N1         = 0x14
+defc __IO_ACIA_CR_8E1         = 0x18
+defc __IO_ACIA_CR_8O1         = 0x1C
 
-defc __ACIA_CR_TDI_RTS0    = 0x00
-defc __ACIA_CR_TEI_RTS0    = 0x20
-defc __ACIA_CR_TDI_RTS1    = 0x40
-defc __ACIA_CR_TDI_BRK     = 0x60
+defc __IO_ACIA_CR_TDI_RTS0    = 0x00
+defc __IO_ACIA_CR_TEI_RTS0    = 0x20
+defc __IO_ACIA_CR_TDI_RTS1    = 0x40
+defc __IO_ACIA_CR_TDI_BRK     = 0x60
    
-defc __ACIA_CR_TEI_MASK    = 0x60
+defc __IO_ACIA_CR_TEI_MASK    = 0x60
 
-defc __ACIA_CR_REI         = 0x80
+defc __IO_ACIA_CR_REI         = 0x80
 
-defc __ACIA_SR_RDRF        = 0x01
-defc __ACIA_SR_TDRE        = 0x02
-defc __ACIA_SR_DCD         = 0x04
-defc __ACIA_SR_CTS         = 0x08
-defc __ACIA_SR_FE          = 0x10
-defc __ACIA_SR_OVRN        = 0x20
-defc __ACIA_SR_PE          = 0x40
-defc __ACIA_SR_IRQ         = 0x80
+defc __IO_ACIA_SR_RDRF        = 0x01
+defc __IO_ACIA_SR_TDRE        = 0x02
+defc __IO_ACIA_SR_DCD         = 0x04
+defc __IO_ACIA_SR_CTS         = 0x08
+defc __IO_ACIA_SR_FE          = 0x10
+defc __IO_ACIA_SR_OVRN        = 0x20
+defc __IO_ACIA_SR_PE          = 0x40
+defc __IO_ACIA_SR_IRQ         = 0x80
 
-defc __ACIA_RX_SIZE     = 0x100
-defc __ACIA_RX_FULLISH  = 248
-defc __ACIA_RX_EMPTYISH = 0x08
-defc __ACIA_TX_SIZE     = 0x10
+defc __IO_ACIA_RX_SIZE     = 0x100
+defc __IO_ACIA_RX_FULLISH  = 248
+defc __IO_ACIA_RX_EMPTYISH = 0x08
+defc __IO_ACIA_TX_SIZE     = 0x10
 
 
 
