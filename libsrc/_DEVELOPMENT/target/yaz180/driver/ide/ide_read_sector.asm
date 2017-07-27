@@ -3,9 +3,9 @@ SECTION code_driver
 
 PUBLIC ide_read_sector
 
-EXTERN IDE_COMMAND
+EXTERN __IO_IDE_COMMAND
 
-EXTERN IDE_CMD_READ
+EXTERN __IDE_CMD_READ
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_test_error, ide_setup_lba
@@ -28,8 +28,8 @@ ide_read_sector:
     call ide_wait_ready     ;make sure drive is ready
     ret nc
     call ide_setup_lba      ;tell it which sector we want in BCDE
-    ld a, IDE_COMMAND
-    ld e, IDE_CMD_READ
+    ld e, __IDE_CMD_READ    
+    ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;ask the drive to read it
     call ide_wait_ready     ;make sure drive is ready to proceed
     ret nc

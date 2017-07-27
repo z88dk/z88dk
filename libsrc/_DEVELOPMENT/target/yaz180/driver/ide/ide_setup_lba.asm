@@ -3,8 +3,8 @@ SECTION code_driver
 
 PUBLIC ide_setup_lba
 
-EXTERN IDE_SEC_CNT
-EXTERN IDE_LBA0, IDE_LBA1, IDE_LBA2, IDE_LBA3
+EXTERN __IO_IDE_SEC_CNT
+EXTERN __IO_IDE_LBA0, __IO_IDE_LBA1, __IO_IDE_LBA2, __IO_IDE_LBA3
 
 EXTERN ide_write_byte
 
@@ -23,13 +23,13 @@ EXTERN idestatus
 ide_setup_lba:
     push af
     push hl
-    ld a, IDE_LBA0
+    ld a, __IO_IDE_LBA0
     call ide_write_byte     ;set LBA0 0:7
     ld e, d
-    ld a, IDE_LBA1
+    ld a, __IO_IDE_LBA1
     call ide_write_byte     ;set LBA1 8:15
     ld e, c
-    ld a, IDE_LBA2
+    ld a, __IO_IDE_LBA2
     call ide_write_byte     ;set LBA2 16:23
     ld a, b
     and 00001111b           ;lowest 4 bits used only
@@ -40,10 +40,10 @@ ide_setup_lba:
     or $10                  ;if it is a slave, set that bit
 ide_setup_master:
     ld e, a
-    ld a, IDE_LBA3
+    ld a, __IO_IDE_LBA3
     call ide_write_byte     ;set LBA3 24:27 + bits 5:7=111
     ld e, $1
-    ld a, IDE_SEC_CNT    
+    ld a, __IO_IDE_SEC_CNT    
     call ide_write_byte     ;set sector count to 1
     pop hl
     pop af

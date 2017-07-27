@@ -1,6 +1,6 @@
 SECTION bss_driver
 
-EXTERN ASCI0_RX_SIZE
+EXTERN __ASCI0_RX_SIZE
 
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut
  
@@ -13,7 +13,7 @@ SECTION data_align_256
 
 PUBLIC asci0RxBuffer
 
-asci0RxBuffer:   defs ASCI0_RX_SIZE     ; Space for the Rx Buffer
+asci0RxBuffer:   defs __ASCI0_RX_SIZE   ; Space for the Rx Buffer
 
 ; pad to next 256 byte boundary
 

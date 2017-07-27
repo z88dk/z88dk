@@ -3,9 +3,9 @@ SECTION code_driver
 
 PUBLIC ide_spinup
 
-EXTERN IDE_COMMAND
+EXTERN __IO_IDE_COMMAND
 
-EXTERN IDE_CMD_SPINUP
+EXTERN __IDE_CMD_SPINUP
 
 EXTERN ide_wait_ready
 
@@ -22,8 +22,8 @@ ide_spinup:
     push de
     call ide_wait_ready
     ret nc
-    ld e, IDE_CMD_SPINUP
-    ld a, IDE_COMMAND
+    ld e, __IDE_CMD_SPINUP
+    ld a, __IO_IDE_COMMAND
     call ide_write_byte
     call ide_wait_ready
     ret nc

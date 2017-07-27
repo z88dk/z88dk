@@ -3,9 +3,9 @@ SECTION code_driver
 
 PUBLIC ide_write_sector
 
-EXTERN IDE_COMMAND
+EXTERN __IO_IDE_COMMAND
 
-EXTERN IDE_CMD_WRITE, IDE_CMD_CACHE_FLUSH
+EXTERN __IDE_CMD_WRITE, __IDE_CMD_CACHE_FLUSH
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_test_error, ide_setup_lba
@@ -28,8 +28,8 @@ ide_write_sector:
     call ide_wait_ready     ;make sure drive is ready
     ret nc
     call ide_setup_lba      ;tell it which sector we want in BCDE
-    ld a, IDE_COMMAND
-    ld e, IDE_CMD_WRITE
+    ld e, __IDE_CMD_WRITE    
+    ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;instruct drive to write a sector
     call ide_wait_ready     ;make sure drive is ready to proceed
     ret nc
@@ -42,8 +42,8 @@ ide_write_sector:
     ret nc
     call ide_test_error     ;ensure no error was reported
     ret nc
-    ld a, IDE_COMMAND
-    ld e, IDE_CMD_CACHE_FLUSH
+    ld e, __IDE_CMD_CACHE_FLUSH
+    ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;tell drive to flush its hardware cache
     call ide_wait_ready     ;wait until the write is complete
     ret nc

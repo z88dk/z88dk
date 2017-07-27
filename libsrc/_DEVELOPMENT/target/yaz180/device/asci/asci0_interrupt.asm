@@ -5,7 +5,7 @@
     EXTERN asci0RxCount, asci0RxIn
     EXTERN asci0TxCount, asci0TxOut
 
-    EXTERN ASCI0_RX_SIZE
+    EXTERN __ASCI0_RX_SIZE
    
     EXTERN CNTLA0, STAT0, TDR0, RDR0
     EXTERN CNTLA0_EFR
@@ -28,7 +28,7 @@ ASCI0_RX_GET:
         jr nz, ASCI0_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
         ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer      
-        cp ASCI0_RX_SIZE-1          ; check whether there is space in the buffer
+        cp __ASCI0_RX_SIZE-1        ; check whether there is space in the buffer
         jr nc, ASCI0_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
 
         ld a, l                     ; get Rx byte from l
