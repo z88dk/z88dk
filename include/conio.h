@@ -23,12 +23,35 @@
 #include <dos.h>
 #include <X11/Xz88dk.h>
 
+
+#if defined __SVI__ || defined __MSX__
+#define gotoxy(a,b)     printf("\033Y%c%c",b+31,a+31)
+#define delline()	printf("\033M")
+#define clrscr() printf("\033E")
+#define clreol() printf("\033K")
+#endif
+
+#if __SC3000__
+char *sc_cursor_pos = 0x9489;
+#define gotoxy(a,b)     sc_cursor_pos[0]=a; sc_cursor_pos[1]=b
+#define clrscr() printf("\014")
+#endif
+
+#if __M5__
+unsigned char *sc_cursor_pos = 0x70A6;
+#define gotoxy(a,b)     sc_cursor_pos[1]=a-1; sc_cursor_pos[0]=b-1
+#define clrscr() printf("\014")
+#endif
+
+
+/* Fallback to ANSI VT escape sequences */
+#ifndef gotoxy
+
 #define MAXCOLORS       15
 enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
               LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE };
 
 // Color translation table
-
 static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 // QUICK C syntax
@@ -46,6 +69,11 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define clrscr() printf("\033[%um\033[%um%c",30,47,12)
 #define clreol() printf("\033[K")
 
+#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+
+#endif
+
 /* The leading underscores are for compatibility with the 
  * Digital Mars library */
 
@@ -57,9 +85,6 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define _cgets gets
 #define cscanf scanf
 #define _cscanf scanf
-
-#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
-#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
 
 /* Reads a character directly from the console, (with echo ?) */
 #define getche() getch()               // not sure about this one...
