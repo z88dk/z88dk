@@ -18,7 +18,7 @@ use File::Basename;
 use File::Copy;
 use File::Slurp;
 
-my $RAGEL = "ragel -G2";
+my $RAGEL = "ragel -T0";
 
 my @TEMP;
 @ARGV == 1 or die "Usage: ",basename($0)," INPUT.rl";
