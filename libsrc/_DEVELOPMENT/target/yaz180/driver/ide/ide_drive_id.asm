@@ -3,11 +3,11 @@ SECTION code_driver
 
 PUBLIC ide_drive_id
 
-EXTERN IDE_COMMAND
+EXTERN __IO_IDE_COMMAND
 
-EXTERN IDE_HEAD
+EXTERN __IO_IDE_HEAD
 
-EXTERN IDE_CMD_ID
+EXTERN __IDE_CMD_ID
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_test_error
@@ -30,12 +30,12 @@ ide_drive_id:
     call ide_wait_ready
     ret nc
     ld e, 11100000b
-    ld a, IDE_HEAD
+    ld a, __IO_IDE_HEAD
     call ide_write_byte     ;select the master device, LBA mode
     call ide_wait_ready
     ret nc
-    ld e, IDE_CMD_ID
-    ld a, IDE_COMMAND
+    ld e, __IDE_CMD_ID
+    ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;issue the command
     call ide_wait_ready     ;make sure drive is ready to proceed
     ret nc

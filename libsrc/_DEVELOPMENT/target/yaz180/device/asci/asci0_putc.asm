@@ -6,7 +6,7 @@
     EXTERN STAT0, TDR0
     EXTERN STAT0_TDRE, STAT0_TIE
     
-    EXTERN ASCI0_TX_SIZE
+    EXTERN __ASCI0_TX_SIZE
 
     EXTERN asci0TxCount, asci0TxIn
     EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
@@ -35,7 +35,7 @@
     put_buffer_tx:
 
         ld a, (asci0TxCount)        ; Get the number of bytes in the Tx buffer
-        cp ASCI0_TX_SIZE - 1        ; check whether there is space in the buffer
+        cp __ASCI0_TX_SIZE - 1      ; check whether there is space in the buffer
         ld a,l                      ; Tx byte
 
         ld l,1

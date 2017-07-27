@@ -40,65 +40,139 @@
 #undef  __YAZ180
 #define __YAZ180  1
 
-#define ASCI0_RX_SIZE  0x100
-#define ASCI0_TX_SIZE  0x100
+#define __ASCI0_RX_SIZE  0x100
+#define __ASCI0_TX_SIZE  0x100
 
-#define ASCI1_RX_SIZE  0x100
-#define ASCI1_TX_SIZE  0x100
+#define __ASCI1_RX_SIZE  0x100
+#define __ASCI1_TX_SIZE  0x100
 
-#define APU_CMD_SIZE  0x100
-#define APU_PTR_SIZE  0x100
+#define __APU_CMD_SIZE  0x100
+#define __APU_PTR_SIZE  0x100
 
-#define IO_BREAK  0x2000
+#define __IO_BREAK  0x2000
 
-#define PIO  0x4000
+#define __IO_PIO_PORT_BASE  0x4000
 
-#define PIOA  16384
-#define PIOB  16385
-#define PIOC  16386
-#define PIOCNTL  16387
+#define __IO_PIO_PORT_A  16384
+#define __IO_PIO_PORT_B  16385
+#define __IO_PIO_PORT_C  16386
+#define __IO_PIO_CONTROL  16387
 
-#define PIOCNTL00  0x80
-#define PIOCNTL01  0x81
-#define PIOCNTL02  0x82
-#define PIOCNTL03  0x83
+#define __IO_PIO_CNTL_00  0x80
+#define __IO_PIO_CNTL_01  0x81
+#define __IO_PIO_CNTL_02  0x82
+#define __IO_PIO_CNTL_03  0x83
 
-#define PIOCNTL04  0x88
-#define PIOCNTL05  0x89
-#define PIOCNTL06  0x8A
-#define PIOCNTL07  0x8B
+#define __IO_PIO_CNTL_04  0x88
+#define __IO_PIO_CNTL_05  0x89
+#define __IO_PIO_CNTL_06  0x8A
+#define __IO_PIO_CNTL_07  0x8B
 
-#define PIOCNTL08  0x90
-#define PIOCNTL09  0x91
-#define PIOCNTL10  0x92
-#define PIOCNTL11  0x83
+#define __IO_PIO_CNTL_08  0x90
+#define __IO_PIO_CNTL_09  0x91
+#define __IO_PIO_CNTL_10  0x92
+#define __IO_PIO_CNTL_11  0x83
 
-#define PIOCNTL12  0x98
-#define PIOCNTL13  0x99
-#define PIOCNTL14  0x9A
-#define PIOCNTL15  0x9B
+#define __IO_PIO_CNTL_12  0x98
+#define __IO_PIO_CNTL_13  0x99
+#define __IO_PIO_CNTL_14  0x9A
+#define __IO_PIO_CNTL_15  0x9B
 
-#define APU  0xC000
-#define APUDATA  49152
-#define APUCNTL  49153
 
-#define APU_OP_ENT  0x40
-#define APU_OP_REM  0x50
-#define APU_OP_ENT16  0x40
-#define APU_OP_ENT32  0x41
-#define APU_OP_REM16  0x50
-#define APU_OP_REM32  0x51
+#define __IO_PCA9665_1_PORT_BASE  0xA000
+#define __IO_PCA9665_2_PORT_BASE  0x8000
 
-#define APU_CNTL_BUSY  0x80
-#define APU_CNTL_SIGN  0x40
-#define APU_CNTL_ZERO  0x20
-#define APU_CNTL_DIV0  0x10
-#define APU_CNTL_NEGRT  0x08
-#define APU_CNTL_UNDFL  0x04
-#define APU_CNTL_OVRFL  0x02
-#define APU_CNTL_CARRY  0x01
+#define __IO_PCA1_PORT_MSB  160
+#define __IO_PCA2_PORT_MSB  128
 
-#define APU_CNTL_ERROR  0x1E
+#define __IO_PCA_PORT_STA  0x00
+#define __IO_PCA_PORT_INDPTR  0x00
+#define __IO_PCA_PORT_DAT  0x01
+#define __IO_PCA_PORT_IND  0x02
+#define __IO_PCA_PORT_CON  0x03
+
+#define __IO_PCA_PORT_ICOUNT  0x00
+#define __IO_PCA_PORT_IADR  0x01
+#define __IO_PCA_PORT_ISCLL  0x02
+#define __IO_PCA_PORT_ISCLH  0x03
+#define __IO_PCA_PORT_ITO  0x04
+#define __IO_PCA_PORT_IPRESET  0x05
+#define __IO_PCA_PORT_IMODE  0x06
+
+#define __IO_PCA_STA_ILLEGAL_START_STOP  0x00
+#define __IO_PCA_STA_MASTER_START_TX  0x08
+#define __IO_PCA_STA_MASTER_RESTART_TX  0x10
+#define __IO_PCA_STA_MASTER_SLA_W_ACK  0x18
+#define __IO_PCA_STA_MASTER_SLA_W_NAK  0x20
+#define __IO_PCA_STA_MASTER_DATA_W_ACK  0x28
+#define __IO_PCA_STA_MASTER_DATA_W_NAK  0x30
+#define __IO_PCA_STA_MASTER_ARB_LOST  0x38
+#define __IO_PCA_STA_MASTER_SLA_R_ACK  0x40
+#define __IO_PCA_STA_MASTER_SLA_R_NAK  0x48
+#define __IO_PCA_STA_MASTER_DATA_R_ACK  0x50
+#define __IO_PCA_STA_MASTER_DATA_R_NAK  0x58
+#define __IO_PCA_STA_SLAVE_AD_W  0x60
+#define __IO_PCA_STA_SLAVE_AL_AD_W  0x68
+#define __IO_PCA_STA_SDA_STUCK  0x70
+#define __IO_PCA_STA_SCL_STUCK  0x78
+#define __IO_PCA_STA_SLAVE_DATA_RX_ACK  0x80
+#define __IO_PCA_STA_SLAVE_DATA_RX_NAK  0x88
+#define __IO_PCA_STA_SLAVE_STOP_OR_RESTART  0xA0
+#define __IO_PCA_STA_SLAVE_AD_R  0xA8
+#define __IO_PCA_STA_SLAVE_AL_AD_R  0xB0
+#define __IO_PCA_STA_SLAVE_DATA_TX_ACK  0xB8
+#define __IO_PCA_STA_SLAVE_DATA_TX_NAK  0xC0
+#define __IO_PCA_STA_SLAVE_LST_TX_ACK  0xC8
+#define __IO_PCA_STA_SLAVE_GC  0xD0
+#define __IO_PCA_STA_SLAVE_GC_AL  0xD8
+#define __IO_PCA_STA_SLAVE_GC_RX_ACK  0xE0
+#define __IO_PCA_STA_SLAVE_GC_RX_NAK  0xE8
+#define __IO_PCA_STA_IDLE  0xF8
+#define __IO_PCA_STA_ILLEGAL_ICOUNT  0xFC
+
+#define __IO_PCA_CON_AA  0x80
+#define __IO_PCA_CON_ENSIO  0x40
+#define __IO_PCA_CON_STA  0x20
+#define __IO_PCA_CON_STO  0x10
+#define __IO_PCA_CON_SI  0x08
+#define __IO_PCA_CON_MODE  0x01
+
+#define __IO_PCA_CON_ECHO_BUS_STOP  0x10
+#define __IO_PCA_CON_ECHO_SI  0x08
+#define __IO_PCA_CON_ECHO_BUS_RESTART  0x04
+#define __IO_PCA_CON_ECHO_BUS_ILLEGAL  0x02
+
+#define __IO_PCA_ICOUNT_LB  0x80
+
+#define __IO_PCA_ITO_TE  0x80
+
+#define __IO_PCA_IMODE_STD  0x00
+#define __IO_PCA_IMODE_FAST  0x01
+#define __IO_PCA_IMODE_FASTP  0x02
+#define __IO_PCA_IMODE_TURBO  0x03
+#define __IO_PCA_IMODE_CR  0x07
+
+#define __IO_APU_PORT_BASE  0xC000
+#define __IO_APU_PORT_DATA  49152
+#define __IO_APU_PORT_CONTROL  49153
+
+#define __IO_APU_OP_ENT  0x40
+#define __IO_APU_OP_REM  0x50
+#define __IO_APU_OP_ENT16  0x40
+#define __IO_APU_OP_ENT32  0x41
+#define __IO_APU_OP_REM16  0x50
+#define __IO_APU_OP_REM32  0x51
+
+#define __IO_APU_CNTL_BUSY  0x80
+#define __IO_APU_CNTL_SIGN  0x40
+#define __IO_APU_CNTL_ZERO  0x20
+#define __IO_APU_CNTL_DIV0  0x10
+#define __IO_APU_CNTL_NEGRT  0x08
+#define __IO_APU_CNTL_UNDFL  0x04
+#define __IO_APU_CNTL_OVRFL  0x02
+#define __IO_APU_CNTL_CARRY  0x01
+
+#define __IO_APU_CNTL_ERROR  0x1E
 
 
 

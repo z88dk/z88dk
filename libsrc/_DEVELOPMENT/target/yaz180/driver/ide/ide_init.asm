@@ -3,11 +3,11 @@ SECTION code_driver
 
 PUBLIC ide_init
 
-EXTERN IDE_COMMAND
+EXTERN __IO_IDE_COMMAND
 
-EXTERN IDE_HEAD
+EXTERN __IO_IDE_HEAD
 
-EXTERN IDE_CMD_INIT
+EXTERN __IDE_CMD_INIT
 
 EXTERN ide_wait_ready
 
@@ -27,12 +27,12 @@ ide_init:
     xor a
     ld (idestatus), a   ;set master device
     ld e, 11100000b
-    ld a, IDE_HEAD
+    ld a, __IO_IDE_HEAD
     call ide_write_byte ;select the master device, LBA mode
     call ide_wait_ready
     ret nc
-    ld e, IDE_CMD_INIT  ;needed for old drives
-    ld a, IDE_COMMAND
+    ld e, __IDE_CMD_INIT  ;needed for old drives
+    ld a, __IO_IDE_COMMAND
     call ide_write_byte ;do init parameters command
     pop de
     pop af
