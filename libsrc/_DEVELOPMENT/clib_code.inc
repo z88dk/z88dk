@@ -36,6 +36,7 @@ section code_driver_terminal_input
 section code_driver_terminal_output
 section code_driver_tty
 section code_error
+section code_esxdos
 section code_fcntl
 section code_font_fzx
 section code_fp_genmath
