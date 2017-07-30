@@ -8,6 +8,6 @@
 
 // ULA+ Colour from Layer 2 Colour
 
-#define ULAP_COLOR_LAYER2(C)  ULAP_COLOR_RGB332(C)
+#define ULAP_COLOR_FROM_LAYER2(C)  ULAP_COLOR_RGB332(C)
 
 #endif
