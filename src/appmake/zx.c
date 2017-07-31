@@ -67,6 +67,7 @@ static char              noloader     = 0;
 static char              noheader     = 0;
 static unsigned char     parity       = 0;
 static char              sna          = 0;
+static char              dot          = 0;
 
 
 // These values are set accordingly with the turbo loader timing and should not be changed
@@ -84,6 +85,7 @@ option_t zx_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "sna",      "Make .sna snapshot instead of .tap", OPT_BOOL, &sna },
+    {  0,  "dot",      "Make an esxdos dot command instead of .tap", OPT_BOOL, &dot },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "ts2068",   "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &ts2068 },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
@@ -202,6 +204,7 @@ void turbo_rawout (FILE *fpout, unsigned char b)
 }
 
 
+int make_dot(void);
 int make_sna(void);
 
 
@@ -229,6 +232,9 @@ int zx_exec(char *target)
 
     if (sna)
         return make_sna();
+
+    if (dot)
+        return make_dot();
 
     if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
@@ -767,6 +773,62 @@ int zx_exec(char *target)
 
 
 /*
+   ESXDOS Dot Command
+
+   July 2017 aralbrec
+*/
+
+int make_dot(void)
+{
+    FILE *fin, *fout;
+    char crtname[FILENAME_MAX + 1];
+    char outname[FILENAME_MAX + 1];
+    int c;
+
+    if (binname == NULL) return -1;
+
+    if (crtfile == NULL)
+    {
+        strcpy(crtname, binname);
+        suffix_change(crtname, "");
+    }
+    else
+        strcpy(crtname, crtfile);
+
+    // determine output file
+
+    if (outfile == NULL)
+    {
+        strcpy(outname, binname);
+        suffix_change(outname, "");
+    }
+    else
+        strcpy(outname, outfile);
+
+    // truncate output filename to eight characters
+
+    outname[8] = 0;
+    strupr(outname);
+
+    // create output file
+
+    if ((fin = fopen_bin(binname, crtname)) == NULL)
+        exit_log(1, "Can't open input file %s\n", binname);
+
+    if ((fout = fopen(outname, "wb")) == NULL)
+        exit_log(1, "Error: Could not create output file %s\n", outname);
+
+    while ((c = fgetc(fin)) != EOF)
+        fputc(c, fout);
+
+    fclose(fout);
+    fclose(fin);
+
+    return 0;
+}
+
+
+/*
    48k/128k SNA SNAPSHOT
 
    July 2017 aralbrec
@@ -859,6 +921,7 @@ int make_sna(void)
     fclose(fin);
 
     memset(memory, 0, 6144);
+    memset(memory + 6144, 0x38, 768);
 
     // initialize snapshot state
 

@@ -60,6 +60,11 @@ define(`__ESXDOS_SYS_F_CHMOD', eval(__ESXDOS_BASE_FSYS + 23))       # unimplemen
 define(`__ESXDOS_SYS_F_RENAME', eval(__ESXDOS_BASE_FSYS + 24))      # unimplemented
 define(`__ESXDOS_SYS_F_GETFREE', eval(__ESXDOS_BASE_FSYS + 25))     # unimplemented
 
+# Limits
+
+define(`__ESXDOS_PATH_MAX', 128)           # max pathname length in bytes including terminating \0
+define(`__ESXDOS_NAME_MAX', 12)            # max filename length in bytes not including terminating \0
+
 # File Access Mode
 
 define(`__ESXDOS_MODE_READ', 0x01)            # read access
@@ -169,6 +174,9 @@ PUBLIC `__ESXDOS_SYS_F_CHMOD'
 PUBLIC `__ESXDOS_SYS_F_RENAME'
 PUBLIC `__ESXDOS_SYS_F_GETFREE'
 
+PUBLIC `__ESXDOS_PATH_MAX'
+PUBLIC `__ESXDOS_NAME_MAX'
+
 PUBLIC `__ESXDOS_MODE_READ'
 PUBLIC `__ESXDOS_MODE_WRITE'
 PUBLIC `__ESXDOS_MODE_OPEN_EXIST'
@@ -265,6 +273,9 @@ defc `__ESXDOS_SYS_F_CHMOD' = __ESXDOS_SYS_F_CHMOD
 defc `__ESXDOS_SYS_F_RENAME' = __ESXDOS_SYS_F_RENAME
 defc `__ESXDOS_SYS_F_GETFREE' = __ESXDOS_SYS_F_GETFREE
 
+defc `__ESXDOS_PATH_MAX' = __ESXDOS_PATH_MAX
+defc `__ESXDOS_NAME_MAX' = __ESXDOS_NAME_MAX
+
 defc `__ESXDOS_MODE_READ' = __ESXDOS_MODE_READ
 defc `__ESXDOS_MODE_WRITE' = __ESXDOS_MODE_WRITE
 defc `__ESXDOS_MODE_OPEN_EXIST' = __ESXDOS_MODE_OPEN_EXIST
@@ -360,6 +371,9 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESXDOS_SYS_F_CHMOD'  __ESXDOS_SYS_F_CHMOD
 `#define' `__ESXDOS_SYS_F_RENAME'  __ESXDOS_SYS_F_RENAME
 `#define' `__ESXDOS_SYS_F_GETFREE'  __ESXDOS_SYS_F_GETFREE
+
+`#define' `__ESXDOS_PATH_MAX'  __ESXDOS_PATH_MAX
+`#define' `__ESXDOS_NAME_MAX'  __ESXDOS_NAME_MAX
 
 `#define' `__ESXDOS_MODE_READ'  __ESXDOS_MODE_READ
 `#define' `__ESXDOS_MODE_WRITE'  __ESXDOS_MODE_WRITE
