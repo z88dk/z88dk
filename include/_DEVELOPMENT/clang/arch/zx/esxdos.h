@@ -8,6 +8,11 @@
 #include <arch.h>
 #include <stdint.h>
 
+// Limits
+
+#define ESXDOS_PATH_MAX  __ESXDOS_PATH_MAX   // max pathname length in bytes including terminating \0
+#define ESXDOS_NAME_MAX  __ESXDOS_NAME_MAX   // max filename length in bytes not including terminating \0
+
 // Esxdos Drive Shortcuts
 
 #define ESXDOS_DRIVE_CURRENT  __ESXDOS_DRIVE_CURRENT
