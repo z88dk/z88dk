@@ -24,7 +24,8 @@ asm_esxdos_f_open:
    ;
    ; On return if OK, A=file handle.
    ;
-   ; enter : ix/hl = char *filename
+   ; enter :     a = uchar drive
+   ;         ix/hl = char *filename
    ;             b = mode (__ESXDOS_MODE_*)
    ;            de = (optional) dst for +3 header (mode contains __ESXDOS_MODE_USE_HEADER)
    ;

@@ -64,7 +64,7 @@ dnl############################################################
 dnl
 dnl#; Some default fonts:
 dnl#;
-dnl#; _font_8x8_rom
+dnl#; _font_8x8_zx_system
 dnl#; _font_4x8_default
 dnl#; _ff_ind_Termino
 
