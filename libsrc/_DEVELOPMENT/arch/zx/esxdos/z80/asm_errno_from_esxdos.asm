@@ -1,20 +1,23 @@
+; uchar errno_from_esxdos(uchar code)
+
 INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_esxdos
 
-PUBLIC __esxdos_error_translate
+PUBLIC asm_errno_from_esxdos
+
+asm_errno_from_esxdos:
+
+   ; translate esxdos error code to errno error code
+   ;
+   ; enter : l = esxdos error code
+   ; 
+   ; exit  : l = errno error code
 
 IF __CLIB_OPT_ERROR
 
-__esxdos_error_translate:
-
-   ; translate esxdos error code to library error code
-   ;
-   ; enter : a = esxdos error code (1-based)
-   ; 
-   ; exit  : l = library error code
-
+   ld a,l
    ld l,$ff
 
    cp table_end - table
@@ -56,11 +59,19 @@ table:
    defb $ff          ; __ESXDOS_ENOCMD
    defb $ff          ; __ESXDOS_EINUSE
    defb $ff          ; __ESXDOS_ERDONLY
+   defb $ff          ; __ESXDOS_EVERIFY
+   defb $ff          ; __ESXDOS_ELOADINGKO
+   defb $ff          ; __ESXDOS_EDIRINUSE
+   defb $ff          ; __ESXDOS_EMAPRAMACTIVE
+   defb $ff          ; __ESXDOS_EDRIVEBUSY
+   defb $ff          ; __ESXDOS_EFSUNKNOWN
+   defb $ff          ; __ESXDOS_EDEVICEBUSY
 
 table_end:
 
 ELSE
 
+   ld a,l
    ld l,0
    
    cp __ESXDOS_EOK + 1

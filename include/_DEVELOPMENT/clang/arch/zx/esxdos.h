@@ -37,6 +37,44 @@
 #define ESXDOS_SEEK_FWD  __ESXDOS_SEEK_FWD   // forward from file pointer
 #define ESXDOS_SEEK_BWD  __ESXDOS_SEEK_BWD   // backward from file pointer
 
+// Esxdos Error Codes (can also be return value from dot commands to return error to basic)
+
+#define ESXDOS_OK         __ESXDOS_OK                  // 0 OK 0:1
+#define ESXDOS_EOK        __ESXDOS_EOK                 // O.K. ESXDOS, 0:1
+#define ESXDOS_ENONSENSE  __ESXDOS_ENONSENSE           // Nonsense in ESXDOS, 0:1
+#define ESXDOS_ESTEND     __ESXDOS_ESTEND              // Statement END error, 0:1
+#define ESXDOS_EWRTYPE    __ESXDOS_EWRTYPE             // Wrong file TYPE, 0:1
+#define ESXDOS_ENOENT     __ESXDOS_ENOENT              // No such FILE or DIR, 0:1
+#define ESXDOS_EIO        __ESXDOS_EIO                 // I/O ERROR, 0:1
+#define ESXDOS_EINVAL     __ESXDOS_EINVAL              // Invalid FILENAME, 0:1
+#define ESXDOS_EACCES     __ESXDOS_EACCES              // Access DENIED, 0:1
+#define ESXDOS_ENOSPC     __ESXDOS_ENOSPC              // Drive FULL, 0:1
+#define ESXDOS_ENXIO      __ESXDOS_ENXIO               // Invalid I/O REQUEST, 0:1
+#define ESXDOS_ENODRV     __ESXDOS_ENODRV              // No such DRIVE, 0:1
+#define ESXDOS_ENFILE     __ESXDOS_ENFILE              // Too many OPEN FILES, 0:1
+#define ESXDOS_EBADF      __ESXDOS_EBADF               // Bad file DESCRIPTOR, 0:1
+#define ESXDOS_ENODEV     __ESXDOS_ENODEV              // No such DEVICE, 0:1
+#define ESXDOS_EOVERFLOW  __ESXDOS_EOVERFLOW           // File pointer OVERFLOW, 0:1
+#define ESXDOS_EISDIR     __ESXDOS_EISDIR              // Is a DIRECTORY, 0:1
+#define ESXDOS_ENOTDIR    __ESXDOS_ENOTDIR             // Not a DIRECTORY, 0:1
+#define ESXDOS_EEXIST     __ESXDOS_EEXIST              // File already EXISTS, 0:1
+#define ESXDOS_EPATH      __ESXDOS_EPATH               // Invalid PATH, 0:1
+#define ESXDOS_ENOSYS     __ESXDOS_ENOSYS              // No SYS, 0:1
+#define ESXDOS_ENAMETOOLONG  __ESXDOS_ENAMETOOLONG     // Path too LONG, 0:1
+#define ESXDOS_ENOCMD     __ESXDOS_ENOCMD              // No such COMMAND, 0:1
+#define ESXDOS_EINUSE     __ESXDOS_EINUSE              // File in USE, 0:1
+#define ESXDOS_ERDONLY    __ESXDOS_ERDONLY             // File is READ ONLY, 0:1
+
+// these were not documented but were found in emulation
+
+#define ESXDOS_EVERIFY      __ESXDOS_EVERIFY           // Verify FAILED, 0:1
+#define ESXDOS_ELOADINGKO   __ESXDOS_ELOADINGKO        // Loading .KO FAILED, 0:1
+#define ESXDOS_EDIRINUSE    __ESXDOS_EDIRINUSE         // Directory NOT EMPTY, 0:1
+#define ESXDOS_EMAPRAMACTIVE  __ESXDOS_EMAPRAMACTIVE   // MAPRAM is ACTIVE, 0:1
+#define ESXDOS_EDRIVEBUSY   __ESXDOS_EDRIVEBUSY        // Drive is BUSY, 0:1
+#define ESXDOS_EFSUNKNOWN   __ESXDOS_EFSUNKNOWN        // Unknown FILESYSTEM, 0:1
+#define ESXDOS_EDEVICEBUSY  __ESXDOS_EDEVICEBUSY       // Device is BUSY, 0:1
+
 // Esxdos Data Structures
 
 struct esx_device
@@ -141,6 +179,12 @@ struct esx_stat
 #define esxdos_f_write       esxdos_ram_f_write
 
 #endif
+
+// Translate ESXDOS Error Code to Library errno
+
+extern unsigned char errno_from_esxdos(unsigned char esxdos_error);
+
+
 
 //
 // ESXDOS FROM DOT COMMANDS

@@ -1,6 +1,6 @@
 arch/zx/esxdos/z80/__esxdos_error_mc
-arch/zx/esxdos/z80/__esxdos_error_translate
 arch/zx/esxdos/z80/__esxdos_error_zc
+arch/zx/esxdos/z80/asm_errno_from_esxdos
 arch/zx/esxdos/z80/asm_esxdos_disk_info
 arch/zx/esxdos/z80/asm_esxdos_disk_read
 arch/zx/esxdos/z80/asm_esxdos_disk_write

@@ -1,4 +1,5 @@
 @arch/zx/esxdos/esxdos_asm.lst
+arch/zx/esxdos/c/sccz80/errno_from_esxdos
 arch/zx/esxdos/c/sccz80/esxdos_dot_disk_info
 arch/zx/esxdos/c/sccz80/esxdos_dot_disk_info_callee
 arch/zx/esxdos/c/sccz80/esxdos_dot_disk_read

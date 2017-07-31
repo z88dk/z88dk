@@ -1,4 +1,6 @@
 @arch/zx/esxdos/esxdos_asm.lst
+arch/zx/esxdos/c/sdcc_iy/errno_from_esxdos
+arch/zx/esxdos/c/sdcc_iy/errno_from_esxdos_fastcall
 arch/zx/esxdos/c/sdcc_iy/esxdos_dot_disk_info
 arch/zx/esxdos/c/sdcc_iy/esxdos_dot_disk_info_callee
 arch/zx/esxdos/c/sdcc_iy/esxdos_dot_disk_read

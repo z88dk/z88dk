@@ -88,30 +88,41 @@ define(`__ESXDOS_SEEK_BWD', 2)
 
 # Error Codes
 
-define(`__ESXDOS_EOK', 1)
-define(`__ESXDOS_ENONSENSE', 2)
-define(`__ESXDOS_ESTEND', 3)
-define(`__ESXDOS_EWRTYPE', 4)
-define(`__ESXDOS_ENOENT', 5)                # No such file or directory
-define(`__ESXDOS_EIO', 6)                   # I/O error
-define(`__ESXDOS_EINVAL', 7)                # Invalid filename
-define(`__ESXDOS_EACCES', 8)                # Access denied
-define(`__ESXDOS_ENOSPC', 9)                # No space left on device
-define(`__ESXDOS_ENXIO', 10)                # Request beyond the limits of the device
-define(`__ESXDOS_ENODRV', 11)               # No such drive
-define(`__ESXDOS_ENFILE', 12)               # Too many files open in system
-define(`__ESXDOS_EBADF', 13)                # Bad file descriptor
-define(`__ESXDOS_ENODEV', 14)               # No such device
-define(`__ESXDOS_EOVERFLOW', 15)
-define(`__ESXDOS_EISDIR', 16)
-define(`__ESXDOS_ENOTDIR', 17)
-define(`__ESXDOS_EEXIST', 18)
-define(`__ESXDOS_EPATH', 19)                # Invalid path
-define(`__ESXDOS_ENOSYS', 20)
-define(`__ESXDOS_ENAMETOOLONG', 21)
-define(`__ESXDOS_ENOCMD', 22)
-define(`__ESXDOS_EINUSE', 23)
-define(`__ESXDOS_ERDONLY', 24)
+define(`__ESXDOS_OK', 0)                    # 0 OK 0:1
+define(`__ESXDOS_EOK', 1)                   # O.K. ESXDOS, 0:1
+define(`__ESXDOS_ENONSENSE', 2)             # Nonsense in ESXDOS, 0:1
+define(`__ESXDOS_ESTEND', 3)                # Statement END error, 0:1
+define(`__ESXDOS_EWRTYPE', 4)               # Wrong file TYPE, 0:1
+define(`__ESXDOS_ENOENT', 5)                # No such FILE or DIR, 0:1
+define(`__ESXDOS_EIO', 6)                   # I/O ERROR, 0:1
+define(`__ESXDOS_EINVAL', 7)                # Invalid FILENAME, 0:1
+define(`__ESXDOS_EACCES', 8)                # Access DENIED, 0:1
+define(`__ESXDOS_ENOSPC', 9)                # Drive FULL, 0:1
+define(`__ESXDOS_ENXIO', 10)                # Invalid I/O REQUEST, 0:1
+define(`__ESXDOS_ENODRV', 11)               # No such DRIVE, 0:1
+define(`__ESXDOS_ENFILE', 12)               # Too many OPEN FILES, 0:1
+define(`__ESXDOS_EBADF', 13)                # Bad file DESCRIPTOR, 0:1
+define(`__ESXDOS_ENODEV', 14)               # No such DEVICE, 0:1
+define(`__ESXDOS_EOVERFLOW', 15)            # File pointer OVERFLOW, 0:1
+define(`__ESXDOS_EISDIR', 16)               # Is a DIRECTORY, 0:1
+define(`__ESXDOS_ENOTDIR', 17)              # Not a DIRECTORY, 0:1
+define(`__ESXDOS_EEXIST', 18)               # File already EXISTS, 0:1
+define(`__ESXDOS_EPATH', 19)                # Invalid PATH, 0:1
+define(`__ESXDOS_ENOSYS', 20)               # No SYS, 0:1
+define(`__ESXDOS_ENAMETOOLONG', 21)         # Path too LONG, 0:1
+define(`__ESXDOS_ENOCMD', 22)               # No such COMMAND, 0:1
+define(`__ESXDOS_EINUSE', 23)               # File in USE, 0:1
+define(`__ESXDOS_ERDONLY', 24)              # File is READ ONLY, 0:1
+
+# these were not documented but were found in emulation
+
+define(`__ESXDOS_EVERIFY', 25)              # Verify FAILED, 0:1
+define(`__ESXDOS_ELOADINGKO', 26)           # Loading .KO FAILED, 0:1
+define(`__ESXDOS_EDIRINUSE', 27)            # Directory NOT EMPTY, 0:1
+define(`__ESXDOS_EMAPRAMACTIVE', 28)        # MAPRAM is ACTIVE, 0:1
+define(`__ESXDOS_EDRIVEBUSY', 29)           # Drive is BUSY, 0:1
+define(`__ESXDOS_EFSUNKNOWN', 30)           # Unknown FILESYSTEM, 0:1
+define(`__ESXDOS_EDEVICEBUSY', 31)          # Device is BUSY, 0:1
 
 #
 # END CONFIGURATION
@@ -216,6 +227,13 @@ PUBLIC `__ESXDOS_ENAMETOOLONG'
 PUBLIC `__ESXDOS_ENOCMD'
 PUBLIC `__ESXDOS_EINUSE'
 PUBLIC `__ESXDOS_ERDONLY'
+PUBLIC `__ESXDOS_EVERIFY'
+PUBLIC `__ESXDOS_ELOADINGKO'
+PUBLIC `__ESXDOS_EDIRINUSE'
+PUBLIC `__ESXDOS_EMAPRAMACTIVE'
+PUBLIC `__ESXDOS_EDRIVEBUSY'
+PUBLIC `__ESXDOS_EFSUNKNOWN'
+PUBLIC `__ESXDOS_EDEVICEBUSY'
 ')
 
 dnl#
@@ -315,6 +333,13 @@ defc `__ESXDOS_ENAMETOOLONG' = __ESXDOS_ENAMETOOLONG
 defc `__ESXDOS_ENOCMD' = __ESXDOS_ENOCMD
 defc `__ESXDOS_EINUSE' = __ESXDOS_EINUSE
 defc `__ESXDOS_ERDONLY' = __ESXDOS_ERDONLY
+defc `__ESXDOS_EVERIFY' = __ESXDOS_EVERIFY
+defc `__ESXDOS_ELOADINGKO' = __ESXDOS_ELOADINGKO
+defc `__ESXDOS_EDIRINUSE' = __ESXDOS_EDIRINUSE
+defc `__ESXDOS_EMAPRAMACTIVE' = __ESXDOS_EMAPRAMACTIVE
+defc `__ESXDOS_EDRIVEBUSY' = __ESXDOS_EDRIVEBUSY
+defc `__ESXDOS_EFSUNKNOWN' = __ESXDOS_EFSUNKNOWN
+defc `__ESXDOS_EDEVICEBUSY' = __ESXDOS_EDEVICEBUSY
 ')
 
 dnl#
@@ -414,4 +439,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESXDOS_ENOCMD'  __ESXDOS_ENOCMD
 `#define' `__ESXDOS_EINUSE'  __ESXDOS_EINUSE
 `#define' `__ESXDOS_ERDONLY'  __ESXDOS_ERDONLY
+`#define' `__ESXDOS_EVERIFY'  __ESXDOS_EVERIFY
+`#define' `__ESXDOS_ELOADINGKO'  __ESXDOS_ELOADINGKO
+`#define' `__ESXDOS_EDIRINUSE'  __ESXDOS_EDIRINUSE
+`#define' `__ESXDOS_EMAPRAMACTIVE'  __ESXDOS_EMAPRAMACTIVE
+`#define' `__ESXDOS_EDRIVEBUSY'  __ESXDOS_EDRIVEBUSY
+`#define' `__ESXDOS_EFSUNKNOWN'  __ESXDOS_EFSUNKNOWN
+`#define' `__ESXDOS_EDEVICEBUSY'  __ESXDOS_EDEVICEBUSY
 ')
