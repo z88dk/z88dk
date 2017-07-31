@@ -808,7 +808,8 @@ int make_dot(void)
     // truncate output filename to eight characters
 
     outname[8] = 0;
-    strupr(outname);
+    for (c = 0; outname[c]; ++c)
+        outname[c] = toupper(outname[c]);
 
     // create output file
 
