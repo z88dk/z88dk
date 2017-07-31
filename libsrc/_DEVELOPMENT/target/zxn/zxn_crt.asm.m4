@@ -179,6 +179,29 @@ ifelse(__STARTUP, 9,
    include(`startup/zxn_crt_9.asm.m4')
 ')
 
+ifelse(__STARTUP, 30,
+`
+   ; standard 32 column display using rst 0x10
+   ;
+   ; stdin  = none
+   ; stdout = zx_01_output_rom_rst full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 0
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/zxn_crt_30.asm.m4')
+')
+
 ifelse(__STARTUP, 31,
 `
    ; no instantiated FILEs
@@ -338,6 +361,29 @@ ifelse(__STARTUP, 265,
    ENDIF
 
    include(`startup/zxn_crt_265.asm.m4')
+')
+
+ifelse(__STARTUP, 286,
+`
+   ; standard 32 column display using rst 0x10
+   ;
+   ; stdin  = none
+   ; stdout = zx_01_output_rom_rst full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/zxn_crt_286.asm.m4')
 ')
 
 ifelse(__STARTUP, 287,
