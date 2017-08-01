@@ -75,6 +75,8 @@
 #define ESXDOS_EFSUNKNOWN   __ESXDOS_EFSUNKNOWN        // Unknown FILESYSTEM, 0:1
 #define ESXDOS_EDEVICEBUSY  __ESXDOS_EDEVICEBUSY       // Device is BUSY, 0:1
 
+#define ESXDOS_EMAXCODE     __ESXDOS_EMAXCODE          // Largest valid error code
+
 // Esxdos Data Structures
 
 struct esx_device

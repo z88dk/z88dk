@@ -124,6 +124,8 @@ define(`__ESXDOS_EDRIVEBUSY', 29)           # Drive is BUSY, 0:1
 define(`__ESXDOS_EFSUNKNOWN', 30)           # Unknown FILESYSTEM, 0:1
 define(`__ESXDOS_EDEVICEBUSY', 31)          # Device is BUSY, 0:1
 
+define(`__ESXDOS_EMAXCODE', 31)             # Largest valid error code
+
 #
 # END CONFIGURATION
 ###############################################################
@@ -234,6 +236,7 @@ PUBLIC `__ESXDOS_EMAPRAMACTIVE'
 PUBLIC `__ESXDOS_EDRIVEBUSY'
 PUBLIC `__ESXDOS_EFSUNKNOWN'
 PUBLIC `__ESXDOS_EDEVICEBUSY'
+PUBLIC `__ESXDOS_EMAXCODE'
 ')
 
 dnl#
@@ -340,6 +343,7 @@ defc `__ESXDOS_EMAPRAMACTIVE' = __ESXDOS_EMAPRAMACTIVE
 defc `__ESXDOS_EDRIVEBUSY' = __ESXDOS_EDRIVEBUSY
 defc `__ESXDOS_EFSUNKNOWN' = __ESXDOS_EFSUNKNOWN
 defc `__ESXDOS_EDEVICEBUSY' = __ESXDOS_EDEVICEBUSY
+defc `__ESXDOS_EMAXCODE' = __ESXDOS_EMAXCODE
 ')
 
 dnl#
@@ -446,4 +450,5 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESXDOS_EDRIVEBUSY'  __ESXDOS_EDRIVEBUSY
 `#define' `__ESXDOS_EFSUNKNOWN'  __ESXDOS_EFSUNKNOWN
 `#define' `__ESXDOS_EDEVICEBUSY'  __ESXDOS_EDEVICEBUSY
+`#define' `__ESXDOS_EMAXCODE'  __ESXDOS_EMAXCODE
 ')
