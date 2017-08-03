@@ -66,14 +66,26 @@ define(`__ESXDOS_PATH_MAX', 128)           # max pathname length in bytes includ
 define(`__ESXDOS_NAME_MAX', 12)            # max filename length in bytes not including terminating \0
 
 # File Access Mode
+# there is one file pointer per file shared by reads and writes
 
 define(`__ESXDOS_MODE_READ', 0x01)            # read access
 define(`__ESXDOS_MODE_WRITE', 0x02)           # write access
-define(`__ESXDOS_MODE_OPEN_EXIST', 0x00)      # open if exists else error
-define(`__ESXDOS_MODE_OPEN_CREAT', 0x08)      # open if exists else create
-define(`__ESXDOS_MODE_CREAT_NOEXIST', 0x04)   # create if no exist
-define(`__ESXDOS_MODE_CREAT_TRUNC', 0x0c)     # create and/or truncate
+
+define(`__ESXDOS_MODE_OPEN_EXIST', 0x00)      # open if exists else error; fp = 0
+define(`__ESXDOS_MODE_OPEN_CREAT', 0x08)      # open if exists else create; fp = 0
+define(`__ESXDOS_MODE_CREAT_NOEXIST', 0x04)   # if file exists error else create; fp = 0
+define(`__ESXDOS_MODE_CREAT_TRUNC', 0x0c)     # create or replace an existing file; fp = 0
 define(`__ESXDOS_MODE_USE_HEADER', 0x40)      # use +3DOS header passed in DE
+
+# File Attribute ("like MSDOS")
+# these are taken from MSDOS
+
+define(`__ESXDOS_ATTR_READ_ONLY', 0x01)     # File is read-only
+define(`__ESXDOS_ATTR_HIDDEN', 0x02)        # File should be hidden in some listings
+define(`__ESXDOS_ATTR_SYSTEM', 0x04)        # Ill-defined
+define(`__ESXDOS_ATTR_VOLUME_LABEL', 0x08)  # File stores volume label
+define(`__ESXDOS_ATTR_DIRECTORY', 0x10)     # File is a directory
+define(`__ESXDOS_ATTR_ARCHIVE', 0x20)       # File has been modified so should be backed up
 
 # Shortcut Drive Identifiers
 
@@ -198,6 +210,13 @@ PUBLIC `__ESXDOS_MODE_CREAT_NOEXIST'
 PUBLIC `__ESXDOS_MODE_CREAT_TRUNC'
 PUBLIC `__ESXDOS_MODE_USE_HEADER'
 
+PUBLIC `__ESXDOS_ATTR_READ_ONLY'
+PUBLIC `__ESXDOS_ATTR_HIDDEN'
+PUBLIC `__ESXDOS_ATTR_SYSTEM'
+PUBLIC `__ESXDOS_ATTR_VOLUME_LABEL'
+PUBLIC `__ESXDOS_ATTR_DIRECTORY'
+PUBLIC `__ESXDOS_ATTR_ARCHIVE'
+
 PUBLIC `__ESXDOS_DRIVE_CURRENT'
 PUBLIC `__ESXDOS_DRIVE_SYSTEM'
 
@@ -305,6 +324,13 @@ defc `__ESXDOS_MODE_CREAT_NOEXIST' = __ESXDOS_MODE_CREAT_NOEXIST
 defc `__ESXDOS_MODE_CREAT_TRUNC' = __ESXDOS_MODE_CREAT_TRUNC
 defc `__ESXDOS_MODE_USE_HEADER' = __ESXDOS_MODE_USE_HEADER
 
+defc `__ESXDOS_ATTR_READ_ONLY' = __ESXDOS_ATTR_READ_ONLY
+defc `__ESXDOS_ATTR_HIDDEN' = __ESXDOS_ATTR_HIDDEN
+defc `__ESXDOS_ATTR_SYSTEM' = __ESXDOS_ATTR_SYSTEM
+defc `__ESXDOS_ATTR_VOLUME_LABEL' = __ESXDOS_ATTR_VOLUME_LABEL
+defc `__ESXDOS_ATTR_DIRECTORY' = __ESXDOS_ATTR_DIRECTORY
+defc `__ESXDOS_ATTR_ARCHIVE' = __ESXDOS_ATTR_ARCHIVE
+
 defc `__ESXDOS_DRIVE_CURRENT' = __ESXDOS_DRIVE_CURRENT
 defc `__ESXDOS_DRIVE_SYSTEM' = __ESXDOS_DRIVE_SYSTEM
 
@@ -411,6 +437,13 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESXDOS_MODE_CREAT_NOEXIST'  __ESXDOS_MODE_CREAT_NOEXIST
 `#define' `__ESXDOS_MODE_CREAT_TRUNC'  __ESXDOS_MODE_CREAT_TRUNC
 `#define' `__ESXDOS_MODE_USE_HEADER'  __ESXDOS_MODE_USE_HEADER
+
+`#define' `__ESXDOS_ATTR_READ_ONLY'  __ESXDOS_ATTR_READ_ONLY
+`#define' `__ESXDOS_ATTR_HIDDEN'  __ESXDOS_ATTR_HIDDEN
+`#define' `__ESXDOS_ATTR_SYSTEM'  __ESXDOS_ATTR_SYSTEM
+`#define' `__ESXDOS_ATTR_VOLUME_LABEL'  __ESXDOS_ATTR_VOLUME_LABEL
+`#define' `__ESXDOS_ATTR_DIRECTORY'  __ESXDOS_ATTR_DIRECTORY
+`#define' `__ESXDOS_ATTR_ARCHIVE'  __ESXDOS_ATTR_ARCHIVE
 
 `#define' `__ESXDOS_DRIVE_CURRENT'  __ESXDOS_DRIVE_CURRENT
 `#define' `__ESXDOS_DRIVE_SYSTEM'  __ESXDOS_DRIVE_SYSTEM

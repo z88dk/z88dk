@@ -7,6 +7,7 @@
 
 #include <arch.h>
 #include <stdint.h>
+#include <stddef.h>
 
 // Limits
 
@@ -19,17 +20,27 @@
 #define ESXDOS_DRIVE_SYSTEM   __ESXDOS_DRIVE_SYSTEM
 
 // Esxdos File Mode
+// One file pointer per file, shared by both read and write actions
 
 #define ESXDOS_MODE_R   __ESXDOS_MODE_READ
 #define ESXDOS_MODE_W   __ESXDOS_MODE_WRITE
 
-#define ESXDOS_MODE_OE  __ESXDOS_MODE_OPEN_EXIST
-#define ESXDOS_MODE_OC  __ESXDOS_MODE_OPEN_CREAT
+#define ESXDOS_MODE_OE  __ESXDOS_MODE_OPEN_EXIST       // open if file exists else error; fp = 0
+#define ESXDOS_MODE_OC  __ESXDOS_MODE_OPEN_CREAT       // open if file exists else create; fp = 0
 
-#define ESXDOS_MODE_CN  __ESXDOS_MODE_CREAT_NOEXIST
-#define ESXDOS_MODE_CT  __ESXDOS_MODE_CREAT_TRUNC
+#define ESXDOS_MODE_CN  __ESXDOS_MODE_CREAT_NOEXIST    // if file exists error else create; fp = 0
+#define ESXDOS_MODE_CT  __ESXDOS_MODE_CREAT_TRUNC      // create or replace an existing file; fp = 0
 
 #define ESXDOS_MODE_P3  __ESXDOS_MODE_USE_HEADER
+
+// Esxdos File Attribute Masks
+
+#define ESXDOS_ATTR_RO   __ESXDOS_ATTR_READ_ONLY       // File is read-only
+#define ESXDOS_ATTR_HID  __ESXDOS_ATTR_HIDDEN          // File should be hidden in some listings
+#define ESXDOS_ATTR_SYS  __ESXDOS_ATTR_SYSTEM          // Ill-defined
+#define ESXDOS_ATTR_VOL  __ESXDOS_ATTR_VOLUME_LABEL    // File stores volume label
+#define ESXDOS_ATTR_DIR  __ESXDOS_ATTR_DIRECTORY       // File is a directory
+#define ESXDOS_ATTR_AR   __ESXDOS_ATTR_ARCHIVE         // File has been modified so should be backed up
 
 // Esxdos Seek Whence
 
@@ -98,6 +109,18 @@ struct esx_stat
 {
    uint8_t  drive;
    uint8_t  device;
+   uint8_t  attr;
+   uint32_t date;
+   uint32_t size;
+};
+
+struct esx_dirent                         // <asciiz> file/dirname
+{                                         // <byte>   attributes
+   uint8_t  dir[__ESXDOS_NAME_MAX+1+9];   // <dword>  date
+};                                        // <dword>  filesize
+
+struct esx_dirent_slice
+{
    uint8_t  attr;
    uint32_t date;
    uint32_t size;
@@ -229,7 +252,7 @@ extern unsigned char esxdos_dot_f_opendir(void *pathname);
 extern unsigned char esxdos_dot_f_opendir_p3(void *pathname);
 
 
-extern unsigned char esxdos_dot_f_readdir(unsigned char handle,void *dirent);
+extern unsigned char esxdos_dot_f_readdir(unsigned char handle,struct esx_dirent *dirent);
 
 
 
