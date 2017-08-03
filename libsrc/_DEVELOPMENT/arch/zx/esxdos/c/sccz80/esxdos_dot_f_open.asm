@@ -18,6 +18,9 @@ esxdos_dot_f_open:
    push hl
    push bc
    push af
-   
+
+   ld a,__ESXDOS_DRIVE_CURRENT
+   ld de,0
+	
    ld b,c
    jp asm_esxdos_f_open

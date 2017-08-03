@@ -16,6 +16,8 @@ esxdos_ram_f_open_p3_callee:
    pop bc
    pop ix
    push af
-   
+
+   ld a,__ESXDOS_DRIVE_CURRENT
+
    ld b,c
    jp asm_esxdos_f_open

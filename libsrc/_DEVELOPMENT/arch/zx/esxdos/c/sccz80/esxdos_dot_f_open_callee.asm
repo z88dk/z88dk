@@ -14,6 +14,9 @@ esxdos_dot_f_open_callee:
    pop hl
    pop bc
    ex (sp),hl
-   
+
+   ld a,__ESXDOS_DRIVE_CURRENT
+   ld de,0
+
    ld b,c
    jp asm_esxdos_f_open

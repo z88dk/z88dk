@@ -20,6 +20,8 @@ _esxdos_ram_f_open_p3:
    push bc
    push de
    push af
-   
+
+   ld a,__ESXDOS_DRIVE_CURRENT
+
    ld b,c
    jp asm_esxdos_f_open
