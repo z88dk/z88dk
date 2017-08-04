@@ -1,7 +1,49 @@
+ adc a,ixh              ; Error
+ adc a,ixl              ; Error
+ adc a,iyh              ; Error
+ adc a,iyl              ; Error
+ adc ixh                ; Error
+ adc ixl                ; Error
+ adc iyh                ; Error
+ adc iyl                ; Error
+ add a,ixh              ; Error
+ add a,ixl              ; Error
+ add a,iyh              ; Error
+ add a,iyl              ; Error
+ add ixh                ; Error
+ add ixl                ; Error
+ add iyh                ; Error
+ add iyl                ; Error
+ and a,ixh              ; Error
+ and a,ixl              ; Error
+ and a,iyh              ; Error
+ and a,iyl              ; Error
+ and ixh                ; Error
+ and ixl                ; Error
+ and iyh                ; Error
+ and iyl                ; Error
+ cp a,ixh               ; Error
+ cp a,ixl               ; Error
+ cp a,iyh               ; Error
+ cp a,iyl               ; Error
+ cp ixh                 ; Error
+ cp ixl                 ; Error
+ cp iyh                 ; Error
+ cp iyl                 ; Error
+ dec ixh                ; Error
+ dec ixl                ; Error
+ dec iyh                ; Error
+ dec iyl                ; Error
+ inc ixh                ; Error
+ inc ixl                ; Error
+ inc iyh                ; Error
+ inc iyl                ; Error
+ ld a,i                 ; Error
  ld a,ixh               ; Error
  ld a,ixl               ; Error
  ld a,iyh               ; Error
  ld a,iyl               ; Error
+ ld a,r                 ; Error
  ld b,ixh               ; Error
  ld b,ixl               ; Error
  ld b,iyh               ; Error
@@ -18,6 +60,7 @@
  ld e,ixl               ; Error
  ld e,iyh               ; Error
  ld e,iyl               ; Error
+ ld i,a                 ; Error
  ld ixh,N               ; Error
  ld ixh,a               ; Error
  ld ixh,b               ; Error
@@ -50,3 +93,36 @@
  ld iyl,e               ; Error
  ld iyl,iyh             ; Error
  ld iyl,iyl             ; Error
+ ld r,a                 ; Error
+ or a,ixh               ; Error
+ or a,ixl               ; Error
+ or a,iyh               ; Error
+ or a,iyl               ; Error
+ or ixh                 ; Error
+ or ixl                 ; Error
+ or iyh                 ; Error
+ or iyl                 ; Error
+ sbc a,ixh              ; Error
+ sbc a,ixl              ; Error
+ sbc a,iyh              ; Error
+ sbc a,iyl              ; Error
+ sbc ixh                ; Error
+ sbc ixl                ; Error
+ sbc iyh                ; Error
+ sbc iyl                ; Error
+ sub a,ixh              ; Error
+ sub a,ixl              ; Error
+ sub a,iyh              ; Error
+ sub a,iyl              ; Error
+ sub ixh                ; Error
+ sub ixl                ; Error
+ sub iyh                ; Error
+ sub iyl                ; Error
+ xor a,ixh              ; Error
+ xor a,ixl              ; Error
+ xor a,iyh              ; Error
+ xor a,iyl              ; Error
+ xor ixh                ; Error
+ xor ixl                ; Error
+ xor iyh                ; Error
+ xor iyl                ; Error

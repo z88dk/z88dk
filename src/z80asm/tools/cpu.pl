@@ -85,10 +85,31 @@ sub add_2 {
 	my($cpu_tag, $asm, $bin) = @_;
 	
 	# expand altd op r, ; op r',
-	if ($asm =~ / ^ (ld) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af)(,.*) /x && $asm !~ /i[xy][hl]/) {
+	my $for_rabbit = ($asm !~ / \b (?: i[xy][hl] | i | r ) \b /x);
+		
+	# ld r,*
+	if ($asm =~ / ^ (ld) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af)(,.*) /x && $for_rabbit) {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		add_3('rabbit', "$asm1 $asm2'$asm3",     "76 $bin");
 		add_3('rabbit', "altd $asm1 $asm2$asm3", "76 $bin");
+	}
+	# arithm a,*
+	elsif ($asm =~ / ^ (add|adc|sub|sbc|and|xor|or|cp) \s+ (a) \s* , \s* (.*) /x) {
+		my($asm1, $asm2, $asm3) = ($1, $2, $3);
+		
+		add_3($cpu_tag, "$asm1 $asm3", 				$bin);			# add r
+		
+		if ($for_rabbit) {
+			add_3('rabbit', "altd $asm1 $asm3", 		"76 $bin");		# altd add r
+			add_3('rabbit', "$asm1 $asm2',$asm3",   	"76 $bin");		# add a',r
+			add_3('rabbit', "altd $asm1 $asm2,$asm3",	"76 $bin");		# altd add a,r
+		}
+	}
+	# inc|dec r
+	if ($asm =~ / ^ (inc|dec) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af) $ /x && $for_rabbit) {
+		my($asm1, $asm2) = ($1, $2);
+		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
+		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
 	}
 
 	add_3($cpu_tag, $asm, $bin);
@@ -143,9 +164,12 @@ sub encode_ixiy_bin {
 	my($bin, $pfx, $dis) = @_;
 	my @bin = split ' ', $bin;
 	my @out;
+	
+	# remove prefixes
 	if ($bin[0] eq '76') { 
 		push @out, shift @bin;
 	}
+	
 	push @out, $pfx;			# 1st byte
 	push @out, shift @bin;		# 2nd byte
 	push @out, $dis;			# 3rd byte
@@ -338,7 +362,10 @@ sub c_code1 {
 	}
 
 	my $stmt = "";
-	if ($bin =~ s/ N$//) {
+	if ($bin =~ s/ DIS N$//) {
+		$stmt = "DO_stmt_idx_n";
+	}
+	elsif ($bin =~ s/ N$//) {
 		$stmt = "DO_stmt_n";
 	}
 	elsif ($bin =~ s/ NNl NNh$//) {
@@ -385,8 +412,8 @@ sub build_tokens {
 
 		s/,/ COMMA /g;
 		s/'/1/g;
-		s/ \( (hl|ix|iy) \+? / IND_$1 /x;
-		s/ \)                / RPAREN /x;
+		s/ \( (hl|ix|iy|bc|de) \+? / IND_$1 /x;
+		s/ \)                      / RPAREN /x;
 	}
 	my @tokens = split(' ', $asm);
 	for (@tokens) {

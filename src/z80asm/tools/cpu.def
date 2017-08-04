@@ -8,67 +8,51 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-# 8 bit load group
 
+# 8-bit load group
 
 ld	<b.c.d.e.h.l..a>,<b.c.d.e.h.l..a>			=> 40+<1>*8+<2>
 ld	<b.c.d.e.h.l..a>,N							=> 06+<1>*8 N
 ld	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8
-ld	a,(NN) 										=> 3A NNl NNh
 
-
-__END__
-
-ldi	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8 23
-ldd	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8 2B
-
-ld	<b.c.d.e.h.l..a>,(ix+DIS)					=> DD 46+<1>*8 DIS
-ldi	<b.c.d.e.h.l..a>,(ix+DIS)					=> DD 46+<1>*8 DIS DD 23
-ldd	<b.c.d.e.h.l..a>,(ix+DIS)					=> DD 46+<1>*8 DIS DD 2B
-
-ld	<b.c.d.e.h.l..a>,(iy+DIS)					=> FD 46+<1>*8 DIS
-ldi	<b.c.d.e.h.l..a>,(iy+DIS)					=> FD 46+<1>*8 DIS FD 23
-ldd	<b.c.d.e.h.l..a>,(iy+DIS)					=> FD 46+<1>*8 DIS FD 2B
-
-ld	(hl),<b.c.d.e.h.l..a>						=> 70+<2>
-ldi	(hl),<b.c.d.e.h.l..a>						=> 70+<2> 23
-ldd	(hl),<b.c.d.e.h.l..a>						=> 70+<2> 2B
-
-ld	(ix+DIS),<b.c.d.e.h.l..a>					=> DD 70+<2> DIS
-ldi	(ix+DIS),<b.c.d.e.h.l..a>					=> DD 70+<2> DIS DD 23
-ldd	(ix+DIS),<b.c.d.e.h.l..a>					=> DD 70+<2> DIS DD 2B
-
-ld	(iy+DIS),<b.c.d.e.h.l..a>					=> FD 70+<2> DIS
-ldi	(iy+DIS),<b.c.d.e.h.l..a>					=> FD 70+<2> DIS FD 23
-ldd	(iy+DIS),<b.c.d.e.h.l..a>					=> FD 70+<2> DIS FD 2B
-
+ld	(hl),<b.c.d.e.h.l..a>						=> 70+<1>
 ld	(hl),N										=> 36 N
-ldi	(hl),N										=> 36 N 23
-ldd	(hl),N										=> 36 N 2B
-
-ld	(ix+DIS),N									=> DD 36 DIS N
-ldi	(ix+DIS),N									=> DD 36 DIS N DD	23
-ldd	(ix+DIS),N									=> DD 36 DIS N DD	2B
-
-ld	(iy+DIS),N									=> FD 36 DIS N
-ldi	(iy+DIS),N									=> FD 36 DIS N FD	23
-ldd	(iy+DIS),N									=> FD 36 DIS N FD	2B
-
-ld	a,<(bc).(de)>								=> 0A+<2>*10
-ldi	a,<(bc).(de)>								=> 0A+<2>*10 03+<2>*10
-ldd	a,<(bc).(de)>								=> 0A+<2>*10 0B+<2>*10
-
-ld	<(bc).(de)>,a								=> 02+<1>*10
-ldi	<(bc).(de)>,a								=> 02+<1>*10 03+<1>*10
-ldd	<(bc).(de)>,a								=> 02+<1>*10 0B+<1>*10
 
 ld	a,(NN) 										=> 3A NNl NNh
 ld	(NN),a 										=> 32 NNl NNh
 
-ld	a,<i.r>										=> ED 57+<2>*8
-ld	<i.r>,a										=> ED 47+<1>*8
+ld	a,<(bc).(de)>								=> 0A+<1>*10
+ld	<(bc).(de)>,a								=> 02+<1>*10
 
-# load 16 bits
+[zilog]		ld	i,a								=> ED 47
+[zilog]		ld	a,i								=> ED 57
+
+[zilog]		ld	r,a								=> ED 4F
+[zilog]		ld	a,r								=> ED 5F
+
+[rabbit] 	ld	eir,a							=> ED 47
+[rabbit] 	ld	a,eir							=> ED 57
+
+[rabbit] 	ld	iir,a							=> ED 4F
+[rabbit] 	ld	a,iir							=> ED 5F
+
+[rabbit] 	ld	xpc,a							=> ED 67
+[rabbit] 	ld	a,xpc							=> ED 77
+
+# 8 bit arithmetic and logical group
+
+<add.adc.sub.sbc.and.xor.or.cp> a,<b.c.d.e.h.l..a>	=> 80+<1>*8+<2>
+<add.adc.sub.sbc.and.xor.or.cp> a,N					=> C6+<1>*8 N
+<add.adc.sub.sbc.and.xor.or.cp> a,(hl)				=> 86+<1>*8
+<inc.dec> <b.c.d.e.h.l..a>							=> 04+<1>+<2>*8
+<inc.dec> (hl)										=> 34+<1>
+
+
+__END__
+
+
+
+# 16-bits load group
 
 ld	<bc..de..hl>,<bc..de..hl>	=> 40+<1>*8+<2>      49+<1>*8+<2>
 ld	<bc..de..>,ix				=> DD 44+<1>*8     DD 4D+<1>*8
@@ -158,33 +142,6 @@ cpi												=> ED A1
 cpir											=> ED B1
 cpd												=> ED A9
 cpdr											=> ED B9
-
-#------------------------------------------------------------------------------
-# 8 bit arithmetic and logical group
-
-<add.adc..sbc> a,<b.c.d.e.h.l..a>				=> 80+<0:3>+<2>
-<add.adc..sbc> a,<....ixh.ixl..>				=> DD 80+<0:3>+<2>
-<add.adc..sbc> a,<....iyh.iyl..>				=> FD 80+<0:3>+<2>
-<add.adc..sbc> a,N								=>		C6+<0:3> N
-<add.adc..sbc> a,(hl)							=> 86+<0:3>
-<add.adc..sbc> a,(ix+DIS)						=> DD 86+<0:3> DIS
-<add.adc..sbc> a,(iy+DIS)						=> FD 86+<0:3> DIS
-
-<..sub..and.xor.or.cp>   <b.c.d.e.h.l..a>		=> 80+<0:3>+<1>
-<..sub..and.xor.or.cp>   <....ixh.ixl..>		=> DD 80+<0:3>+<1>
-<..sub..and.xor.or.cp>   <....iyh.iyl..>		=> FD 80+<0:3>+<1>
-<..sub..and.xor.or.cp>   N						=>		C6+<0:3> N
-<..sub..and.xor.or.cp>   (hl)					=> 86+<0:3>
-<..sub..and.xor.or.cp>   (ix+DIS)				=> DD 86+<0:3> DIS
-<..sub..and.xor.or.cp>   (iy+DIS)				=> FD 86+<0:3> DIS
-
-<....inc.dec> <b.c.d.e.h.l..a>					=> 00+<0>+<1>*8
-<....inc.dec> <....ixh.ixl..>					=> DD 00+<0>+<1>*8
-<....inc.dec> <....iyh.iyl..>					=> FD 00+<0>+<1>*8
-
-<....inc.dec> (hl)								=> 30+<0>
-<....inc.dec> (ix+DIS)							=> DD 30+<0> DIS
-<....inc.dec> (iy+DIS)							=> FD 30+<0> DIS
 
 #------------------------------------------------------------------------------
 # General purpose arithmetic and CPU control group

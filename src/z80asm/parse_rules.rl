@@ -376,20 +376,6 @@ Define rules for a ragel-based parser.
 #include "tools/cpu_rules.h"
 
 		/*---------------------------------------------------------------------
-		*   8-bit load group
-		*--------------------------------------------------------------------*/
-
-		/* load I, R */
-#foreach <IR> in I, IIR, R, EIR, XPC
-		|	label? _TK_LD _TK_<IR> _TK_COMMA _TK_A _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_<IR>_A ); }
-		|	label? _TK_LD _TK_A _TK_COMMA _TK_<IR> _TK_NEWLINE \
-			@{ DO_stmt( Z80_LD_A_<IR> ); }
-		|	label? _TK_LD _TK_A1 _TK_COMMA _TK_<IR> _TK_NEWLINE \
-			@{ DO_stmt(Z80_ALTD); DO_stmt( Z80_LD_A_<IR> ); }
-#endfor  <IR>
-
-		/*---------------------------------------------------------------------
 		*   16-bit load group
 		*--------------------------------------------------------------------*/
 
