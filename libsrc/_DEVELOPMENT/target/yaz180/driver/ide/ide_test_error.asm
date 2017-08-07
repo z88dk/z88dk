@@ -28,7 +28,7 @@ ide_test_error:
     bit 5, a
     jr nz, ide_test2        ;test write error bit
     
-    ld a, __IO_IDE_ERROR         ;select error register
+    ld a, __IO_IDE_ERROR    ;select error register
     call ide_read_byte      ;get error register in A
 ide_test2:
     or a                    ;make carry flag zero = error!

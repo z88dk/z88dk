@@ -1,40 +1,30 @@
 
 SECTION code_driver
 
-PUBLIC ide_init
+PUBLIC ide_standby
 
 EXTERN __IO_IDE_COMMAND
 
-EXTERN __IO_IDE_HEAD
-
-EXTERN __IDE_CMD_INIT
+EXTERN __IDE_CMD_STANDBY
 
 EXTERN ide_wait_ready
-EXTERN ide_test_error
 
 EXTERN ide_write_byte
-
-EXTERN idestatus
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; initialize the ide drive
+; tell the drive to spin down though standby command
 
-ide_init:
+ide_standby:
     push af
     push de
-    xor a
-    ld (idestatus), a       ;set master device
-    ld e, 11100000b
-    ld a, __IO_IDE_HEAD
-    call ide_write_byte     ;select the master device, LBA mode
     call ide_wait_ready
     jr nc, error
-    ld e, __IDE_CMD_INIT    ;needed for old drives
+    ld e, __IDE_CMD_STANDBY
     ld a, __IO_IDE_COMMAND
-    call ide_write_byte     ;do init parameters command
+    call ide_write_byte
     call ide_wait_ready
     jr nc, error
     pop de 
@@ -45,5 +35,5 @@ ide_init:
 error:
     pop de 
     pop af
-    jp ide_test_error       ;carry = 0 on return = operation failed
-
+    or a                    ;carry = 0 on return = operation failed
+    ret
