@@ -15,6 +15,8 @@ l/z80/l_inc_sp
 l/z80/l_jphl
 l/z80/l_jpix
 l/z80/l_jpiy
+l/z80/l_ldd
+l/z80/l_ldd_loop
 l/z80/l_ldi
 l/z80/l_ldi_loop
 l/z80/l_offset_ix_bc

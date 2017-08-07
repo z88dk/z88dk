@@ -123,7 +123,7 @@ int fnumber(LVALUE *lval)
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
-    if ( line[lptr] = 'f' ) {
+    if ( line[lptr] == 'f' ) {
         lptr++;
     }
 

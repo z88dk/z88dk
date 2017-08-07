@@ -15,6 +15,7 @@ SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_cls_pix
+PUBLIC asm0_zx_cls_pix
 
 asm_zx_cls_pix:
 
@@ -31,6 +32,8 @@ ELSE
    ld hl,$4000
    ld de,$4001
 ENDIF
+
+asm0_zx_cls_pix:
 
    ld (hl),a
    ld bc,6143

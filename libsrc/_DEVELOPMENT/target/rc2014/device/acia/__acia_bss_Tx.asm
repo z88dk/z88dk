@@ -11,4 +11,4 @@ aciaTxLock:     defb 0                  ; lock flag for Tx exclusion
 
 PUBLIC aciaTxBuffer
 
-aciaTxBuffer:   defs ACIA_TX_SIZE       ; Space for the Tx Buffer
+aciaTxBuffer:   defs __IO_ACIA_TX_SIZE  ; Space for the Tx Buffer

@@ -32,7 +32,6 @@
 #ifdef __SPECTRUM
 #include <../../../libsrc/_DEVELOPMENT/target/zx/config_zx.h>
 #endif
-#endif
 
 #ifdef __TS2068
 #include <../../../libsrc/_DEVELOPMENT/target/ts2068/config_ts2068.h>

@@ -12,102 +12,6 @@ IF !DEFINED_startup
 ENDIF
 
 
-IF !DEFINED_CRT_ENABLE_TRAP      
-	defc	DEFINED_CRT_ENABLE_TRAP       = 1
-	defc CRT_ENABLE_TRAP       = 0x2
-	IFNDEF CRT_ENABLE_TRAP      
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CRT_ENABLE_RST       
-	defc	DEFINED_CRT_ENABLE_RST        = 1
-	defc CRT_ENABLE_RST        = 0xffff
-	IFNDEF CRT_ENABLE_RST       
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CRT_ENABLE_NMI       
-	defc	DEFINED_CRT_ENABLE_NMI        = 1
-	defc CRT_ENABLE_NMI        = 0x2
-	IFNDEF CRT_ENABLE_NMI       
-	ENDIF
-ENDIF
-
-
-IF !DEFINED__z180_trap         
-	PUBLIC _z180_trap         
-	EXTERN l_ret
-	defc	DEFINED__z180_trap          = 1
-	defc _z180_trap          = l_ret
-ENDIF
-
-
-IF !DEFINED__z180_rst_08h      
-	PUBLIC _z180_rst_08h      
-	EXTERN rc_00_output_asci0
-	defc	DEFINED__z180_rst_08h       = 1
-	defc _z180_rst_08h       = rc_00_output_asci0
-ENDIF
-
-
-IF !DEFINED__z180_rst_10h      
-	PUBLIC _z180_rst_10h      
-	EXTERN rc_00_input_asci0
-	defc	DEFINED__z180_rst_10h       = 1
-	defc _z180_rst_10h       = rc_00_input_asci0
-ENDIF
-
-
-IF !DEFINED__z180_rst_18h      
-	PUBLIC _z180_rst_18h      
-	EXTERN l_ret
-	defc	DEFINED__z180_rst_18h       = 1
-	defc _z180_rst_18h       = l_ret
-ENDIF
-
-
-IF !DEFINED__z180_rst_20h      
-	PUBLIC _z180_rst_20h      
-	EXTERN l_ret
-	defc	DEFINED__z180_rst_20h       = 1
-	defc _z180_rst_20h       = l_ret
-ENDIF
-
-
-IF !DEFINED__z180_rst_28h      
-	PUBLIC _z180_rst_28h      
-	EXTERN l_ret
-	defc	DEFINED__z180_rst_28h       = 1
-	defc _z180_rst_28h       = l_ret
-ENDIF
-
-
-IF !DEFINED__z180_rst_30h      
-	PUBLIC _z180_rst_30h      
-	EXTERN l_ret
-	defc	DEFINED__z180_rst_30h       = 1
-	defc _z180_rst_30h       = l_ret
-ENDIF
-
-
-IF !DEFINED__z180_rst_38h      
-	PUBLIC _z180_rst_38h      
-	EXTERN l_ei_reti
-	defc	DEFINED__z180_rst_38h       = 1
-	defc _z180_rst_38h       = l_ei_reti
-ENDIF
-
-
-IF !DEFINED__z180_nmi          
-	PUBLIC _z180_nmi          
-	EXTERN l_retn
-	defc	DEFINED__z180_nmi           = 1
-	defc _z180_nmi           = l_retn
-ENDIF
-
-
 IF !DEFINED_CRT_OPT_PRINTF 
 	defc	DEFINED_CRT_OPT_PRINTF  = 1
 	defc CRT_OPT_PRINTF  = 0x102
@@ -376,6 +280,28 @@ include "crt_config.inc"
       ENDIF
       
    ENDIF
+
+IF __Z180
+
+   IFDEF CRT_IO_VECTOR_BASE
+   
+      defc __crt_io_vector_base = CRT_IO_VECTOR_BASE
+   
+   ELSE
+   
+      IFDEF TAR__crt_io_vector_base
+      
+         defc __crt_io_vector_base = TAR__crt_io_vector_base
+      
+      ELSE
+      
+         defc __crt_io_vector_base = DEF__crt_io_vector_base
+      
+      ENDIF
+      
+   ENDIF
+
+ENDIF
 
    IFDEF CRT_INTERRUPT_MODE
    
@@ -705,6 +631,54 @@ include "crt_config.inc"
    
    defc __exit_stack_size = __clib_exit_stack_size
    defc __quickexit_stack_size = __clib_quickexit_stack_size
+
+   IF __Z180
+   
+      PUBLIC __IO_VECTOR_BASE
+      
+      IF __crt_io_vector_base < 0
+      
+         IF (__crt_org_vector_table < 0)
+         
+            IF (-__crt_org_vector_table) & 0x1f
+            
+               "Cannot place __IO_VECTOR_BASE at start of interrupt vector table"
+            
+            ELSE
+            
+               defc __IO_VECTOR_BASE = (-__crt_org_vector_table) & 0xe0
+               
+            ENDIF
+         
+         ELSE
+         
+            IF __crt_org_vector_table & 0x1f
+            
+               "Cannot place __IO_VECTOR_BASE at start of interrupt vector table"
+            
+            ELSE
+            
+               defc __IO_VECTOR_BASE = __crt_org_vector_table & 0xe0
+
+            ENDIF
+            
+         ENDIF
+      
+      ELSE
+      
+         IF __crt_io_vector_base & 0x1f
+         
+            "Illegal __IO_VECTOR_BASE"
+         
+         ELSE
+
+            defc __IO_VECTOR_BASE = __crt_io_vector_base & 0xe0
+         
+         ENDIF
+      
+      ENDIF
+   
+   ENDIF
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

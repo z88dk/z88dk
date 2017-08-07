@@ -79,8 +79,16 @@ dnl#__DPROTO(,,uint16_t,,in_stick_keyboard,udk_t *u)
 #include <input/input_sms.h>
 #endif
 
+#ifndef __ZXNEXT
+
 #ifdef __SPECTRUM
 #include <input/input_zx.h>
+#endif
+
+#endif
+
+#ifdef __ZXNEXT
+#include <input/input_zxn.h>
 #endif
 
 #endif
