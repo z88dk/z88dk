@@ -783,6 +783,8 @@ int make_dot(void)
     FILE *fin, *fout;
     char crtname[FILENAME_MAX + 1];
     char outname[FILENAME_MAX + 1];
+    char outnamex[FILENAME_MAX + 1];
+    int  fnamex;
     int c;
 
     if (binname == NULL) return -1;
@@ -795,15 +797,14 @@ int make_dot(void)
     else
         strcpy(crtname, crtfile);
 
-    // determine output file
+    // determine output filename
 
     if (outfile == NULL)
-    {
         strcpy(outname, binname);
-        suffix_change(outname, "");
-    }
     else
         strcpy(outname, outfile);
+
+    suffix_change(outname, "");
 
     // truncate output filename to eight characters
 
@@ -811,19 +812,69 @@ int make_dot(void)
     for (c = 0; outname[c]; ++c)
         outname[c] = toupper(outname[c]);
 
-    // create output file
+    // create main binary
 
     if ((fin = fopen_bin(binname, crtname)) == NULL)
         exit_log(1, "Can't open input file %s\n", binname);
 
     if ((fout = fopen(outname, "wb")) == NULL)
+    {
+        fclose(fin);
         exit_log(1, "Error: Could not create output file %s\n", outname);
+    }
 
     while ((c = fgetc(fin)) != EOF)
         fputc(c, fout);
 
-    fclose(fout);
     fclose(fin);
+    fclose(fout);
+
+    // create optional extended dot binary
+
+    suffix_change(binname, "_DTX.bin");
+
+    strcpy(outnamex, outname);
+    strcat(outnamex, ".DTX");
+
+    if ((fin = fopen(binname, "rb")) == NULL)
+        return 0;
+
+    fnamex = parameter_search(crtfile, ".map", "__esxdos_dtx_fname");
+
+    if ((fnamex < 0) || ((fout = fopen(outnamex, "wb")) == NULL))
+    {
+        fclose(fin);
+        remove(outname);
+
+        if (fnamex < 0)
+            exit_log(1, "Error: Could not locate FILENAME for extended dot command\n");
+
+        exit_log(1, "Error: Could not create output file %s\n", outnamex);
+    }
+
+    while ((c = fgetc(fin)) != EOF)
+        fputc(c, fout);
+
+    fclose(fin);
+    fclose(fout);
+
+    // insert dtx filename into main binary
+
+    if ((fout = fopen(outname, "rb+")) == NULL)
+    {
+        remove(outname);
+        remove(outnamex);
+        exit_log(1, "Error: Could not write dtx filename into main binary\n");
+    }
+
+    memmove(outnamex + 5, outnamex, strlen(outnamex) + 1);
+    memcpy(outnamex, "/BIN/", 5);
+
+    fseek(fout, fnamex - 0x2000, SEEK_SET);
+
+    fprintf(fout, "%s", outnamex);
+
+    fclose(fout);
 
     return 0;
 }
@@ -1014,7 +1065,7 @@ int make_sna(void)
                     *p = c;
 
                 if (c != EOF)
-                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 64k\n", filename);
+                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 16k\n", filename);
 
                 fclose(fin);
             }

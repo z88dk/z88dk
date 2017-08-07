@@ -7,6 +7,10 @@
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   IFNDEF CRT_ORG_DTX
+      defc CRT_ORG_DTX     = 0x8000
+   ENDIF
+
    IFNDEF CRT_ORG_BANK_00
       defc CRT_ORG_BANK_00 = 0xc000
    ENDIF

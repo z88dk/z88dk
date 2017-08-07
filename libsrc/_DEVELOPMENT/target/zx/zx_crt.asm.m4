@@ -572,3 +572,187 @@ ifelse(__STARTUP, 287,
 
    include(`startup/zx_crt_287.asm.m4')
 ')
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; esxdos extended dot command ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 512,
+`
+   ; standard 32 column display
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_32 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_512.asm.m4')
+')
+
+ifelse(__STARTUP, 513,
+`
+   ; standard 32 column display tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_32_tty_z88dk full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_513.asm.m4')
+')
+
+ifelse(__STARTUP, 516,
+`
+   ; 64 column display using fixed width 4x8 font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_64 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_516.asm.m4')
+')
+
+ifelse(__STARTUP, 517,
+`
+   ; 64 column display using fixed width 4x8 font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_64_tty_z88dk full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_517.asm.m4')
+')
+
+ifelse(__STARTUP, 520,
+`
+   ; fzx terminal using ff_ind_Termino font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_520.asm.m4')
+')
+
+ifelse(__STARTUP, 521,
+`
+   ; fzx terminal using ff_ind_Termino font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_521.asm.m4')
+')
+
+ifelse(__STARTUP, 542,
+`
+   ; standard 32 column display using rst 0x10
+   ;
+   ; stdin  = none
+   ; stdout = zx_01_output_rom_rst full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_542.asm.m4')
+')
+
+ifelse(__STARTUP, 543,
+`
+   ; no instantiated FILEs
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zx_crt_543.asm.m4')
+')
