@@ -94,7 +94,8 @@ struct filestr {
         intptr_t extra;
 };
 
-/* Entry: ix = fp for all */
+/* extra may point to an asm label that can be used to add extra stdio functionality
+ * Entry: ix = fp for all */
 #define __STDIO_MSG_GETC		1
 #define __STDIO_MSG_PUTC		2
 #define __STDIO_MSG_READ		3
@@ -103,15 +104,6 @@ struct filestr {
 #define __STDIO_MSG_FLUSH		6
 #define __STDIO_MSG_CLOSE		7
 #define __STDIO_MSG_IOCTL		8
-
-/* funopen functions, placed in extra */
-struct filestr_operations {
-        int     (*readfn)();    /* (void *, char *, int) */
-        int     (*writefn)();   /* (void *, char *, int) */
-        fpos_t  (*seekfn)();    /* (void *, fpos_t, int) */
-        int     (*flushfn)();   /* (void *) */
-        int     (*closefn)();   /* (void *) */
-};
 
 
 /* For asm routines kinda handy to have a nice DEFVARS of the structure*/
