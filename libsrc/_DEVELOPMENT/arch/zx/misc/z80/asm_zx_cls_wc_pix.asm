@@ -13,6 +13,7 @@ SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_cls_wc_pix
+PUBLIC asm0_zx_cls_wc_pix
 
 EXTERN asm_zx_cxy2saddr
 EXTERN asm0_zx_saddrpdown
@@ -30,6 +31,8 @@ asm_zx_cls_wc_pix:
    ld h,(ix+2)                 ; h = rect.y
    
    call asm_zx_cxy2saddr       ; hl = screen address
+
+asm0_zx_cls_wc_pix:
 
    ld a,c
    

@@ -67,6 +67,7 @@ static char              noloader     = 0;
 static char              noheader     = 0;
 static unsigned char     parity       = 0;
 static char              sna          = 0;
+static char              dot          = 0;
 
 
 // These values are set accordingly with the turbo loader timing and should not be changed
@@ -84,6 +85,7 @@ option_t zx_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "sna",      "Make .sna snapshot instead of .tap", OPT_BOOL, &sna },
+    {  0,  "dot",      "Make an esxdos dot command instead of .tap", OPT_BOOL, &dot },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "ts2068",   "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &ts2068 },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
@@ -202,6 +204,7 @@ void turbo_rawout (FILE *fpout, unsigned char b)
 }
 
 
+int make_dot(void);
 int make_sna(void);
 
 
@@ -229,6 +232,9 @@ int zx_exec(char *target)
 
     if (sna)
         return make_sna();
+
+    if (dot)
+        return make_dot();
 
     if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
@@ -767,6 +773,114 @@ int zx_exec(char *target)
 
 
 /*
+   ESXDOS Dot Command
+
+   July 2017 aralbrec
+*/
+
+int make_dot(void)
+{
+    FILE *fin, *fout;
+    char crtname[FILENAME_MAX + 1];
+    char outname[FILENAME_MAX + 1];
+    char outnamex[FILENAME_MAX + 1];
+    int  fnamex;
+    int c;
+
+    if (binname == NULL) return -1;
+
+    if (crtfile == NULL)
+    {
+        strcpy(crtname, binname);
+        suffix_change(crtname, "");
+    }
+    else
+        strcpy(crtname, crtfile);
+
+    // determine output filename
+
+    if (outfile == NULL)
+        strcpy(outname, binname);
+    else
+        strcpy(outname, outfile);
+
+    suffix_change(outname, "");
+
+    // truncate output filename to eight characters
+
+    outname[8] = 0;
+    for (c = 0; outname[c]; ++c)
+        outname[c] = toupper(outname[c]);
+
+    // create main binary
+
+    if ((fin = fopen_bin(binname, crtname)) == NULL)
+        exit_log(1, "Can't open input file %s\n", binname);
+
+    if ((fout = fopen(outname, "wb")) == NULL)
+    {
+        fclose(fin);
+        exit_log(1, "Error: Could not create output file %s\n", outname);
+    }
+
+    while ((c = fgetc(fin)) != EOF)
+        fputc(c, fout);
+
+    fclose(fin);
+    fclose(fout);
+
+    // create optional extended dot binary
+
+    suffix_change(binname, "_DTX.bin");
+
+    strcpy(outnamex, outname);
+    strcat(outnamex, ".DTX");
+
+    if ((fin = fopen(binname, "rb")) == NULL)
+        return 0;
+
+    fnamex = parameter_search(crtfile, ".map", "__esxdos_dtx_fname");
+
+    if ((fnamex < 0) || ((fout = fopen(outnamex, "wb")) == NULL))
+    {
+        fclose(fin);
+        remove(outname);
+
+        if (fnamex < 0)
+            exit_log(1, "Error: Could not locate FILENAME for extended dot command\n");
+
+        exit_log(1, "Error: Could not create output file %s\n", outnamex);
+    }
+
+    while ((c = fgetc(fin)) != EOF)
+        fputc(c, fout);
+
+    fclose(fin);
+    fclose(fout);
+
+    // insert dtx filename into main binary
+
+    if ((fout = fopen(outname, "rb+")) == NULL)
+    {
+        remove(outname);
+        remove(outnamex);
+        exit_log(1, "Error: Could not write dtx filename into main binary\n");
+    }
+
+    memmove(outnamex + 5, outnamex, strlen(outnamex) + 1);
+    memcpy(outnamex, "/BIN/", 5);
+
+    fseek(fout, fnamex - 0x2000, SEEK_SET);
+
+    fprintf(fout, "%s", outnamex);
+
+    fclose(fout);
+
+    return 0;
+}
+
+
+/*
    48k/128k SNA SNAPSHOT
 
    July 2017 aralbrec
@@ -859,6 +973,7 @@ int make_sna(void)
     fclose(fin);
 
     memset(memory, 0, 6144);
+    memset(memory + 6144, 0x38, 768);
 
     // initialize snapshot state
 
@@ -950,7 +1065,7 @@ int make_sna(void)
                     *p = c;
 
                 if (c != EOF)
-                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 64k\n", filename);
+                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 16k\n", filename);
 
                 fclose(fin);
             }
