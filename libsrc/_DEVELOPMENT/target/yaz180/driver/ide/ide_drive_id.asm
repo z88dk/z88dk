@@ -28,25 +28,27 @@ ide_drive_id:
     push af
     push de
     call ide_wait_ready
-    ret nc
+    jr nc, error
     ld e, 11100000b
     ld a, __IO_IDE_HEAD
     call ide_write_byte     ;select the master device, LBA mode
     call ide_wait_ready
-    ret nc
+    jr nc, error
     ld e, __IDE_CMD_ID
     ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;issue the command
     call ide_wait_ready     ;make sure drive is ready to proceed
-    ret nc
-    call ide_test_error     ;ensure no error was reported
-    ret nc
+    jr nc, error
     call ide_wait_drq       ;wait until it's got the data
-    ret nc
+    jr nc, error
     call ide_read_block     ;grab the data buffer in (HL++)
     pop de
     pop af
     scf                     ;carry = 1 on return = operation ok
     ret
 
+error:
+    pop de 
+    pop af
+    jp ide_test_error       ;carry = 0 on return = operation failed
 
