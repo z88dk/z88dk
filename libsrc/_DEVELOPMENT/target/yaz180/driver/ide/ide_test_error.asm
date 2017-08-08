@@ -29,11 +29,11 @@ ide_test_error:
     jr nz, ide_test2        ;test write error bit
     
     ld a, __IO_IDE_ERROR    ;select error register
-    call ide_read_byte      ;get error register in A
+    call ide_read_byte      ;get error register in a
 ide_test2:
-    or a                    ;make carry flag zero = error!
     inc sp                  ;pop old af
     inc sp
+    ccf                     ;make carry flag zero = error!
     ret                     ;if a = 0, ide write busy timed out
 
 ide_test_success:

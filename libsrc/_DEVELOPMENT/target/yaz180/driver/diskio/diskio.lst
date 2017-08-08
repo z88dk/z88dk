@@ -1,6 +1,5 @@
-;will be added in next commit
-;target/yaz180/driver/diskio/disk_initialize
-;target/yaz180/driver/diskio/disk_ioctl
-;target/yaz180/driver/diskio/disk_status
-;target/yaz180/driver/diskio/disk_read
-;target/yaz180/driver/diskio/disk_write
+target/yaz180/driver/diskio/z180/asm_disk_initialise
+target/yaz180/driver/diskio/z180/asm_disk_ioctl
+target/yaz180/driver/diskio/z180/asm_disk_status
+target/yaz180/driver/diskio/z180/asm_disk_read
+target/yaz180/driver/diskio/z180/asm_disk_write
