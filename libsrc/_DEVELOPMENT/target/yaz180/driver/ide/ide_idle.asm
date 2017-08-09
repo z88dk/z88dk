@@ -8,6 +8,7 @@ EXTERN __IO_IDE_COMMAND
 EXTERN __IDE_CMD_IDLE
 
 EXTERN ide_wait_ready
+EXTERN ide_test_error
 
 EXTERN ide_write_byte
 
@@ -35,6 +36,5 @@ ide_idle:
 error:
     pop de 
     pop af
-    or a                    ;carry = 0 on return = operation failed
-    ret
+    jp ide_test_error       ;carry = 0 on return = operation failed
 
