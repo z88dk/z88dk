@@ -154,9 +154,6 @@ TOKEN_KW(IIR, )
 TOKEN_KW(R,   )
 TOKEN_KW(EIR, )
 
-/* indirect 8-bit register */
-TOKEN_RE(TK_IND_C, "(C", "(" hspace "C"i, )
-
 /* 16-bit registers */
 TOKEN_KW(BC, )
 TOKEN_KW(DE, )
@@ -185,7 +182,7 @@ TOKEN(TK_DE1, "DE'", )
 TOKEN(TK_HL1, "HL'", )
 TOKEN(TK_AF1, "AF'", )
 
-/* indirect 16-bit registers */
+/* indirect 8- and 16-bit registers */
 /* TK_IND_IX|IY|HL is followed by ')', '+' or '-', but follow char is not matched - 
 *  can collect expression, will be positive or negative depending on symbol */
 TOKEN_RE(TK_IND_BC, "(BC", "(" hspace "BC"i index_reg_suffix, p--; te--)
@@ -194,6 +191,8 @@ TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HL, "(HL", "(" hspace "HL"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_SP, "(SP", "(" hspace "SP"i index_reg_suffix, p--; te--)
+
+TOKEN_RE(TK_IND_C,  "(C",  "(" hspace "C"i  index_reg_suffix, p--; te--)
 
 /* assembly directives */
 TOKEN_OPCODE(BINARY		)

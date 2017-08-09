@@ -617,17 +617,21 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	
 	SetTemporaryLine("f (c) (\t c \t) "
-					 "F (C) (\t C \t) ");
+					 "F (C) (\t C \t) "
+					 "(cur)");		// (c is not interpreted as TK_IND_C
 	T_GET(TK_F,     "f");
 	T_GET(TK_IND_C, "(c");
 	T_RPAREN();
-	T_GET(TK_IND_C, "(\t c");
+	T_GET(TK_IND_C, "(\t c \t");
 	T_RPAREN();
 					 
 	T_GET(TK_F,     "F");
 	T_GET(TK_IND_C, "(C");
 	T_RPAREN();
-	T_GET(TK_IND_C, "(\t C");
+	T_GET(TK_IND_C, "(\t C \t");
+	T_RPAREN();
+	T_LPAREN();
+	T_NAME("cur");
 	T_RPAREN();
 	T_END();
 					 
