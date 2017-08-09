@@ -274,6 +274,54 @@
   DO_stmt(0x8C); 
 }
 
+/* adc hl,bc */
+| label? _TK_ADC _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+  DO_stmt(0xED4A); 
+}
+
+/* adc hl,de */
+| label? _TK_ADC _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+  DO_stmt(0xED5A); 
+}
+
+/* adc hl,hl */
+| label? _TK_ADC _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
+  DO_stmt(0xED6A); 
+}
+
+/* adc hl,sp */
+| label? _TK_ADC _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+  DO_stmt(0xED7A); 
+}
+
+/* adc hl',bc */
+| label? _TK_ADC _TK_HL1 _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED4A); 
+}
+
+/* adc hl',de */
+| label? _TK_ADC _TK_HL1 _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED5A); 
+}
+
+/* adc hl',hl */
+| label? _TK_ADC _TK_HL1 _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED6A); 
+}
+
+/* adc hl',sp */
+| label? _TK_ADC _TK_HL1 _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED7A); 
+}
+
 /* adc (hl) */
 | label? _TK_ADC _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
   DO_stmt(0x8E); 
@@ -650,6 +698,54 @@
   DO_stmt(0x84); 
 }
 
+/* add hl,bc */
+| label? _TK_ADD _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+  DO_stmt(0x09); 
+}
+
+/* add hl,de */
+| label? _TK_ADD _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+  DO_stmt(0x19); 
+}
+
+/* add hl,hl */
+| label? _TK_ADD _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
+  DO_stmt(0x29); 
+}
+
+/* add hl,sp */
+| label? _TK_ADD _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+  DO_stmt(0x39); 
+}
+
+/* add hl',bc */
+| label? _TK_ADD _TK_HL1 _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x09); 
+}
+
+/* add hl',de */
+| label? _TK_ADD _TK_HL1 _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x19); 
+}
+
+/* add hl',hl */
+| label? _TK_ADD _TK_HL1 _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x29); 
+}
+
+/* add hl',sp */
+| label? _TK_ADD _TK_HL1 _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x39); 
+}
+
 /* add (hl) */
 | label? _TK_ADD _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
   DO_stmt(0x86); 
@@ -695,6 +791,46 @@
   }
 }
 
+/* add ix,bc */
+| label? _TK_ADD _TK_IX _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD09); 
+  }
+  else {
+    DO_stmt(0xFD09); 
+  }
+}
+
+/* add ix,de */
+| label? _TK_ADD _TK_IX _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD19); 
+  }
+  else {
+    DO_stmt(0xFD19); 
+  }
+}
+
+/* add ix,ix */
+| label? _TK_ADD _TK_IX _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD29); 
+  }
+  else {
+    DO_stmt(0xFD29); 
+  }
+}
+
+/* add ix,sp */
+| label? _TK_ADD _TK_IX _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD39); 
+  }
+  else {
+    DO_stmt(0xFD39); 
+  }
+}
+
 /* add ixh */
 | label? _TK_ADD _TK_IXH _TK_NEWLINE @{
   if ((opts.cpu & (CPU_Z80)) == 0) { error_illegal_ident(); return FALSE; }
@@ -714,6 +850,46 @@
   }
   else {
     DO_stmt(0xFD85); 
+  }
+}
+
+/* add iy,bc */
+| label? _TK_ADD _TK_IY _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD09); 
+  }
+  else {
+    DO_stmt(0xDD09); 
+  }
+}
+
+/* add iy,de */
+| label? _TK_ADD _TK_IY _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD19); 
+  }
+  else {
+    DO_stmt(0xDD19); 
+  }
+}
+
+/* add iy,iy */
+| label? _TK_ADD _TK_IY _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD29); 
+  }
+  else {
+    DO_stmt(0xDD29); 
+  }
+}
+
+/* add iy,sp */
+| label? _TK_ADD _TK_IY _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD39); 
+  }
+  else {
+    DO_stmt(0xDD39); 
   }
 }
 
@@ -906,6 +1082,34 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x8C); 
+}
+
+/* altd adc hl,bc */
+| label? _TK_ALTD _TK_ADC _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED4A); 
+}
+
+/* altd adc hl,de */
+| label? _TK_ALTD _TK_ADC _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED5A); 
+}
+
+/* altd adc hl,hl */
+| label? _TK_ALTD _TK_ADC _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED6A); 
+}
+
+/* altd adc hl,sp */
+| label? _TK_ALTD _TK_ADC _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED7A); 
 }
 
 /* altd adc (hl) */
@@ -1138,6 +1342,34 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x84); 
+}
+
+/* altd add hl,bc */
+| label? _TK_ALTD _TK_ADD _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x09); 
+}
+
+/* altd add hl,de */
+| label? _TK_ALTD _TK_ADD _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x19); 
+}
+
+/* altd add hl,hl */
+| label? _TK_ALTD _TK_ADD _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x29); 
+}
+
+/* altd add hl,sp */
+| label? _TK_ALTD _TK_ADD _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x39); 
 }
 
 /* altd add (hl) */
@@ -1446,6 +1678,20 @@
   DO_stmt_n(0xE6); 
 }
 
+/* altd ccf */
+| label? _TK_ALTD _TK_CCF _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x3F); 
+}
+
+/* altd ccf f */
+| label? _TK_ALTD _TK_CCF _TK_F _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x3F); 
+}
+
 /* altd cp a */
 | label? _TK_ALTD _TK_CP _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -1678,6 +1924,20 @@
   DO_stmt_n(0xFE); 
 }
 
+/* altd cpl */
+| label? _TK_ALTD _TK_CPL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x2F); 
+}
+
+/* altd cpl a */
+| label? _TK_ALTD _TK_CPL _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x2F); 
+}
+
 /* altd dec a */
 | label? _TK_ALTD _TK_DEC _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -1690,6 +1950,13 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x05); 
+}
+
+/* altd dec bc */
+| label? _TK_ALTD _TK_DEC _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x0B); 
 }
 
 /* altd dec c */
@@ -1706,6 +1973,13 @@
   DO_stmt(0x15); 
 }
 
+/* altd dec de */
+| label? _TK_ALTD _TK_DEC _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x1B); 
+}
+
 /* altd dec e */
 | label? _TK_ALTD _TK_DEC _TK_E _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -1720,11 +1994,26 @@
   DO_stmt(0x25); 
 }
 
+/* altd dec hl */
+| label? _TK_ALTD _TK_DEC _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x2B); 
+}
+
 /* altd dec l */
 | label? _TK_ALTD _TK_DEC _TK_L _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x2D); 
+}
+
+/* altd djnz NN */
+| label? _TK_ALTD _TK_DJNZ expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt(0x76);
+  DO_stmt_jr(0x10); 
 }
 
 /* altd inc a */
@@ -1741,6 +2030,13 @@
   DO_stmt(0x04); 
 }
 
+/* altd inc bc */
+| label? _TK_ALTD _TK_INC _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x03); 
+}
+
 /* altd inc c */
 | label? _TK_ALTD _TK_INC _TK_C _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -1755,6 +2051,13 @@
   DO_stmt(0x14); 
 }
 
+/* altd inc de */
+| label? _TK_ALTD _TK_INC _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x13); 
+}
+
 /* altd inc e */
 | label? _TK_ALTD _TK_INC _TK_E _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -1767,6 +2070,13 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x24); 
+}
+
+/* altd inc hl */
+| label? _TK_ALTD _TK_INC _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x23); 
 }
 
 /* altd inc l */
@@ -2049,6 +2359,20 @@
   DO_stmt_n(0x06); 
 }
 
+/* altd ld bc,(NN) */
+/* altd ld bc,NN */
+| label? _TK_ALTD _TK_LD _TK_BC _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) {
+    DO_stmt(0x76);
+    DO_stmt_nn(0xED4B); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x01); 
+  }
+}
+
 /* altd ld c,a */
 | label? _TK_ALTD _TK_LD _TK_C _TK_COMMA _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -2279,6 +2603,20 @@
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt(0x76);
   DO_stmt_n(0x16); 
+}
+
+/* altd ld de,(NN) */
+/* altd ld de,NN */
+| label? _TK_ALTD _TK_LD _TK_DE _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) {
+    DO_stmt(0x76);
+    DO_stmt_nn(0xED5B); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x11); 
+  }
 }
 
 /* altd ld e,a */
@@ -2513,6 +2851,112 @@
   DO_stmt_n(0x26); 
 }
 
+/* altd ld hl,(hl) */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xDDE400); 
+}
+
+/* altd ld hl,(hl+DIS) */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IND_HL expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt_idx(0xDDE4); 
+}
+
+/* altd ld hl,(ix) */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xE400); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xFDE400); 
+  }
+}
+
+/* altd ld hl,(ix+DIS) */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xE4); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xFDE4); 
+  }
+}
+
+/* altd ld hl,(iy) */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xFDE400); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xE400); 
+  }
+}
+
+/* altd ld hl,(iy+DIS) */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xFDE4); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xE4); 
+  }
+}
+
+/* altd ld hl,ix */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xDD7C); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xFD7C); 
+  }
+}
+
+/* altd ld hl,iy */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xFD7C); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xDD7C); 
+  }
+}
+
+/* altd ld hl,(NN) */
+/* altd ld hl,NN */
+| label? _TK_ALTD _TK_LD _TK_HL _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x2A); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x21); 
+  }
+}
+
 /* altd ld l,a */
 | label? _TK_ALTD _TK_LD _TK_L _TK_COMMA _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -2627,6 +3071,20 @@
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt(0x76);
   DO_stmt_n(0x2E); 
+}
+
+/* altd neg */
+| label? _TK_ALTD _TK_NEG _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED44); 
+}
+
+/* altd neg a */
+| label? _TK_ALTD _TK_NEG _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED44); 
 }
 
 /* altd or a */
@@ -2861,6 +3319,34 @@
   DO_stmt_n(0xF6); 
 }
 
+/* altd pop af */
+| label? _TK_ALTD _TK_POP _TK_AF _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xF1); 
+}
+
+/* altd pop bc */
+| label? _TK_ALTD _TK_POP _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xC1); 
+}
+
+/* altd pop de */
+| label? _TK_ALTD _TK_POP _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xD1); 
+}
+
+/* altd pop hl */
+| label? _TK_ALTD _TK_POP _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xE1); 
+}
+
 /* altd sbc a */
 | label? _TK_ALTD _TK_SBC _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -3019,6 +3505,34 @@
   DO_stmt(0x9C); 
 }
 
+/* altd sbc hl,bc */
+| label? _TK_ALTD _TK_SBC _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED42); 
+}
+
+/* altd sbc hl,de */
+| label? _TK_ALTD _TK_SBC _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED52); 
+}
+
+/* altd sbc hl,hl */
+| label? _TK_ALTD _TK_SBC _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED62); 
+}
+
+/* altd sbc hl,sp */
+| label? _TK_ALTD _TK_SBC _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED72); 
+}
+
 /* altd sbc (hl) */
 | label? _TK_ALTD _TK_SBC _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -3091,6 +3605,20 @@
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt(0x76);
   DO_stmt_n(0xDE); 
+}
+
+/* altd scf */
+| label? _TK_ALTD _TK_SCF _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x37); 
+}
+
+/* altd scf f */
+| label? _TK_ALTD _TK_SCF _TK_F _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x37); 
 }
 
 /* altd sub a */
@@ -3933,6 +4461,91 @@
   DO_stmt_n(0xE6); 
 }
 
+/* call c,NN */
+| label? _TK_CALL _TK_C _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(C); 
+}
+
+/* call lo,NN */
+| label? _TK_CALL _TK_LO _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xEC); 
+}
+
+/* call lz,NN */
+| label? _TK_CALL _TK_LZ _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xE4); 
+}
+
+/* call m,NN */
+| label? _TK_CALL _TK_M _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(M); 
+}
+
+/* call nc,NN */
+| label? _TK_CALL _TK_NC _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(NC); 
+}
+
+/* call nz,NN */
+| label? _TK_CALL _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(NZ); 
+}
+
+/* call p,NN */
+| label? _TK_CALL _TK_P _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(P); 
+}
+
+/* call pe,NN */
+| label? _TK_CALL _TK_PE _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(PE); 
+}
+
+/* call po,NN */
+| label? _TK_CALL _TK_PO _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(PO); 
+}
+
+/* call z,NN */
+| label? _TK_CALL _TK_Z _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_call_flag(Z); 
+}
+
+/* call NN */
+| label? _TK_CALL expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xCD); 
+}
+
+/* ccf */
+| label? _TK_CCF _TK_NEWLINE @{
+  DO_stmt(0x3F); 
+}
+
+/* ccf f */
+| label? _TK_CCF _TK_F _TK_NEWLINE @{
+  DO_stmt(0x3F); 
+}
+
+/* ccf f' */
+| label? _TK_CCF _TK_F1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x3F); 
+}
+
 /* cp a */
 | label? _TK_CP _TK_A _TK_NEWLINE @{
   DO_stmt(0xBF); 
@@ -4309,6 +4922,49 @@
   DO_stmt_n(0xFE); 
 }
 
+/* cpd */
+| label? _TK_CPD _TK_NEWLINE @{
+  DO_stmt_emul(0xEDA9, rcmx_cpd); 
+}
+
+/* cpdr */
+| label? _TK_CPDR _TK_NEWLINE @{
+  DO_stmt_emul(0xEDB9, rcmx_cpdr); 
+}
+
+/* cpi */
+| label? _TK_CPI _TK_NEWLINE @{
+  DO_stmt_emul(0xEDA1, rcmx_cpi); 
+}
+
+/* cpir */
+| label? _TK_CPIR _TK_NEWLINE @{
+  DO_stmt_emul(0xEDB1, rcmx_cpir); 
+}
+
+/* cpl */
+| label? _TK_CPL _TK_NEWLINE @{
+  DO_stmt(0x2F); 
+}
+
+/* cpl a */
+| label? _TK_CPL _TK_A _TK_NEWLINE @{
+  DO_stmt(0x2F); 
+}
+
+/* cpl a' */
+| label? _TK_CPL _TK_A1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x2F); 
+}
+
+/* daa */
+| label? _TK_DAA _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x27); 
+}
+
 /* dec a */
 | label? _TK_DEC _TK_A _TK_NEWLINE @{
   DO_stmt(0x3D); 
@@ -4331,6 +4987,18 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x05); 
+}
+
+/* dec bc */
+| label? _TK_DEC _TK_BC _TK_NEWLINE @{
+  DO_stmt(0x0B); 
+}
+
+/* dec bc' */
+| label? _TK_DEC _TK_BC1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x0B); 
 }
 
 /* dec c */
@@ -4357,6 +5025,18 @@
   DO_stmt(0x15); 
 }
 
+/* dec de */
+| label? _TK_DEC _TK_DE _TK_NEWLINE @{
+  DO_stmt(0x1B); 
+}
+
+/* dec de' */
+| label? _TK_DEC _TK_DE1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x1B); 
+}
+
 /* dec e */
 | label? _TK_DEC _TK_E _TK_NEWLINE @{
   DO_stmt(0x1D); 
@@ -4379,6 +5059,18 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x25); 
+}
+
+/* dec hl */
+| label? _TK_DEC _TK_HL _TK_NEWLINE @{
+  DO_stmt(0x2B); 
+}
+
+/* dec hl' */
+| label? _TK_DEC _TK_HL1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x2B); 
 }
 
 /* dec (hl) */
@@ -4426,6 +5118,16 @@
   }
 }
 
+/* dec ix */
+| label? _TK_DEC _TK_IX _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD2B); 
+  }
+  else {
+    DO_stmt(0xFD2B); 
+  }
+}
+
 /* dec ixh */
 | label? _TK_DEC _TK_IXH _TK_NEWLINE @{
   if ((opts.cpu & (CPU_Z80)) == 0) { error_illegal_ident(); return FALSE; }
@@ -4445,6 +5147,16 @@
   }
   else {
     DO_stmt(0xFD2D); 
+  }
+}
+
+/* dec iy */
+| label? _TK_DEC _TK_IY _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD2B); 
+  }
+  else {
+    DO_stmt(0xDD2B); 
   }
 }
 
@@ -4482,6 +5194,186 @@
   DO_stmt(0x2D); 
 }
 
+/* dec sp */
+| label? _TK_DEC _TK_SP _TK_NEWLINE @{
+  DO_stmt(0x3B); 
+}
+
+/* di */
+| label? _TK_DI _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xF3); 
+}
+
+/* djnz b,NN */
+| label? _TK_DJNZ _TK_B _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x10); 
+}
+
+/* djnz b',NN */
+| label? _TK_DJNZ _TK_B1 _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt(0x76);
+  DO_stmt_jr(0x10); 
+}
+
+/* djnz NN */
+| label? _TK_DJNZ expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x10); 
+}
+
+/* ei */
+| label? _TK_EI _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xFB); 
+}
+
+/* halt */
+| label? _TK_HALT _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76); 
+}
+
+/* idet */
+| label? _TK_IDET _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x5B); 
+}
+
+/* im 0 */
+/* im 1 */
+/* im 2 */
+| label? _TK_IM const_expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_error) return FALSE;
+  if (expr_value == 0) {
+    DO_stmt(0xED46); 
+  }
+  else if (expr_value == 1) {
+    DO_stmt(0xED56); 
+  }
+  else if (expr_value == 2) {
+    DO_stmt(0xED5E); 
+  }
+  else
+    error_int_range(expr_value);
+
+}
+
+/* in a,(c) */
+| label? _TK_IN _TK_A _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED78); 
+}
+
+/* in a,(N) */
+| label? _TK_IN _TK_A _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xDB); 
+}
+
+/* in b,(c) */
+| label? _TK_IN _TK_B _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED40); 
+}
+
+/* in c,(c) */
+| label? _TK_IN _TK_C _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED48); 
+}
+
+/* in d,(c) */
+| label? _TK_IN _TK_D _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED50); 
+}
+
+/* in e,(c) */
+| label? _TK_IN _TK_E _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED58); 
+}
+
+/* in f,(c) */
+| label? _TK_IN _TK_F _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED70); 
+}
+
+/* in h,(c) */
+| label? _TK_IN _TK_H _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED60); 
+}
+
+/* in l,(c) */
+| label? _TK_IN _TK_L _TK_COMMA _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED68); 
+}
+
+/* in0 a,(N) */
+| label? _TK_IN0 _TK_A _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED38); 
+}
+
+/* in0 b,(N) */
+| label? _TK_IN0 _TK_B _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED00); 
+}
+
+/* in0 c,(N) */
+| label? _TK_IN0 _TK_C _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED08); 
+}
+
+/* in0 d,(N) */
+| label? _TK_IN0 _TK_D _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED10); 
+}
+
+/* in0 e,(N) */
+| label? _TK_IN0 _TK_E _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED18); 
+}
+
+/* in0 f,(N) */
+| label? _TK_IN0 _TK_F _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED30); 
+}
+
+/* in0 h,(N) */
+| label? _TK_IN0 _TK_H _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED20); 
+}
+
+/* in0 l,(N) */
+| label? _TK_IN0 _TK_L _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED28); 
+}
+
 /* inc a */
 | label? _TK_INC _TK_A _TK_NEWLINE @{
   DO_stmt(0x3C); 
@@ -4504,6 +5396,18 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x04); 
+}
+
+/* inc bc */
+| label? _TK_INC _TK_BC _TK_NEWLINE @{
+  DO_stmt(0x03); 
+}
+
+/* inc bc' */
+| label? _TK_INC _TK_BC1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x03); 
 }
 
 /* inc c */
@@ -4530,6 +5434,18 @@
   DO_stmt(0x14); 
 }
 
+/* inc de */
+| label? _TK_INC _TK_DE _TK_NEWLINE @{
+  DO_stmt(0x13); 
+}
+
+/* inc de' */
+| label? _TK_INC _TK_DE1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x13); 
+}
+
 /* inc e */
 | label? _TK_INC _TK_E _TK_NEWLINE @{
   DO_stmt(0x1C); 
@@ -4552,6 +5468,18 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x24); 
+}
+
+/* inc hl */
+| label? _TK_INC _TK_HL _TK_NEWLINE @{
+  DO_stmt(0x23); 
+}
+
+/* inc hl' */
+| label? _TK_INC _TK_HL1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x23); 
 }
 
 /* inc (hl) */
@@ -4599,6 +5527,16 @@
   }
 }
 
+/* inc ix */
+| label? _TK_INC _TK_IX _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD23); 
+  }
+  else {
+    DO_stmt(0xFD23); 
+  }
+}
+
 /* inc ixh */
 | label? _TK_INC _TK_IXH _TK_NEWLINE @{
   if ((opts.cpu & (CPU_Z80)) == 0) { error_illegal_ident(); return FALSE; }
@@ -4618,6 +5556,16 @@
   }
   else {
     DO_stmt(0xFD2C); 
+  }
+}
+
+/* inc iy */
+| label? _TK_INC _TK_IY _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD23); 
+  }
+  else {
+    DO_stmt(0xDD23); 
   }
 }
 
@@ -4653,6 +5601,250 @@
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0x76);
   DO_stmt(0x2C); 
+}
+
+/* inc sp */
+| label? _TK_INC _TK_SP _TK_NEWLINE @{
+  DO_stmt(0x33); 
+}
+
+/* ind */
+| label? _TK_IND _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDAA); 
+}
+
+/* indr */
+| label? _TK_INDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDBA); 
+}
+
+/* ini */
+| label? _TK_INI _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDA2); 
+}
+
+/* inir */
+| label? _TK_INIR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDB2); 
+}
+
+/* ioe ld a,(NN) */
+| label? _TK_IOE _TK_LD _TK_A _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xDB3A); 
+}
+
+/* ioe ldd */
+| label? _TK_IOE _TK_LDD _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xDBEDA8); 
+}
+
+/* ioe lddr */
+| label? _TK_IOE _TK_LDDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xDBEDB8); 
+}
+
+/* ioe ldi */
+| label? _TK_IOE _TK_LDI _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xDBEDA0); 
+}
+
+/* ioe ldir */
+| label? _TK_IOE _TK_LDIR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xDBEDB0); 
+}
+
+/* ioi ld a,(NN) */
+| label? _TK_IOI _TK_LD _TK_A _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xD33A); 
+}
+
+/* ioi ldd */
+| label? _TK_IOI _TK_LDD _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xD3EDA8); 
+}
+
+/* ioi lddr */
+| label? _TK_IOI _TK_LDDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xD3EDB8); 
+}
+
+/* ioi ldi */
+| label? _TK_IOI _TK_LDI _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xD3EDA0); 
+}
+
+/* ioi ldir */
+| label? _TK_IOI _TK_LDIR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xD3EDB0); 
+}
+
+/* ipres */
+| label? _TK_IPRES _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED5D); 
+}
+
+/* ipset 0 */
+/* ipset 1 */
+/* ipset 2 */
+/* ipset 3 */
+| label? _TK_IPSET const_expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_error) return FALSE;
+  if (expr_value == 0) {
+    DO_stmt(0xED46); 
+  }
+  else if (expr_value == 1) {
+    DO_stmt(0xED56); 
+  }
+  else if (expr_value == 2) {
+    DO_stmt(0xED4E); 
+  }
+  else if (expr_value == 3) {
+    DO_stmt(0xED5E); 
+  }
+  else
+    error_int_range(expr_value);
+
+}
+
+/* jp c,NN */
+| label? _TK_JP _TK_C _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xDA); 
+}
+
+/* jp (hl) */
+| label? _TK_JP _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  DO_stmt(0xE9); 
+}
+
+/* jp (ix) */
+| label? _TK_JP _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDDE9); 
+  }
+  else {
+    DO_stmt(0xFDE9); 
+  }
+}
+
+/* jp (iy) */
+| label? _TK_JP _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFDE9); 
+  }
+  else {
+    DO_stmt(0xDDE9); 
+  }
+}
+
+/* jp lo,NN */
+| label? _TK_JP _TK_LO _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xEA); 
+}
+
+/* jp lz,NN */
+| label? _TK_JP _TK_LZ _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xE2); 
+}
+
+/* jp m,NN */
+| label? _TK_JP _TK_M _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xFA); 
+}
+
+/* jp nc,NN */
+| label? _TK_JP _TK_NC _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xD2); 
+}
+
+/* jp nz,NN */
+| label? _TK_JP _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xC2); 
+}
+
+/* jp p,NN */
+| label? _TK_JP _TK_P _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xF2); 
+}
+
+/* jp pe,NN */
+| label? _TK_JP _TK_PE _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xEA); 
+}
+
+/* jp po,NN */
+| label? _TK_JP _TK_PO _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xE2); 
+}
+
+/* jp z,NN */
+| label? _TK_JP _TK_Z _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xCA); 
+}
+
+/* jp NN */
+| label? _TK_JP expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xC3); 
+}
+
+/* jr c,NN */
+| label? _TK_JR _TK_C _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x38); 
+}
+
+/* jr nc,NN */
+| label? _TK_JR _TK_NC _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x30); 
+}
+
+/* jr nz,NN */
+| label? _TK_JR _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x20); 
+}
+
+/* jr z,NN */
+| label? _TK_JR _TK_Z _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x28); 
+}
+
+/* jr NN */
+| label? _TK_JR expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_jr(0x18); 
 }
 
 /* ld a,a */
@@ -5233,6 +6425,31 @@
   DO_stmt_n(0x06); 
 }
 
+/* ld bc,(NN) */
+/* ld bc,NN */
+| label? _TK_LD _TK_BC _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) {
+    DO_stmt_nn(0xED4B); 
+  }
+  else {
+    DO_stmt_nn(0x01); 
+  }
+}
+
+/* ld bc',(NN) */
+/* ld bc',NN */
+| label? _TK_LD _TK_BC1 _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) {
+    DO_stmt(0x76);
+    DO_stmt_nn(0xED4B); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x01); 
+  }
+}
+
 /* ld c,a */
 | label? _TK_LD _TK_C _TK_COMMA _TK_A _TK_NEWLINE @{
   DO_stmt(0x4F); 
@@ -5725,6 +6942,31 @@
   DO_stmt_n(0x16); 
 }
 
+/* ld de,(NN) */
+/* ld de,NN */
+| label? _TK_LD _TK_DE _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) {
+    DO_stmt_nn(0xED5B); 
+  }
+  else {
+    DO_stmt_nn(0x11); 
+  }
+}
+
+/* ld de',(NN) */
+/* ld de',NN */
+| label? _TK_LD _TK_DE1 _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) {
+    DO_stmt(0x76);
+    DO_stmt_nn(0xED5B); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x11); 
+  }
+}
+
 /* ld e,a */
 | label? _TK_LD _TK_E _TK_COMMA _TK_A _TK_NEWLINE @{
   DO_stmt(0x5F); 
@@ -6179,6 +7421,201 @@
   DO_stmt_n(0x26); 
 }
 
+/* ld hl,(hl) */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xDDE400); 
+}
+
+/* ld hl,(hl+DIS) */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IND_HL expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt_idx(0xDDE4); 
+}
+
+/* ld hl,(ix) */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xE400); 
+  }
+  else {
+    DO_stmt(0xFDE400); 
+  }
+}
+
+/* ld hl,(ix+DIS) */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt_idx(0xE4); 
+  }
+  else {
+    DO_stmt_idx(0xFDE4); 
+  }
+}
+
+/* ld hl,(iy) */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFDE400); 
+  }
+  else {
+    DO_stmt(0xE400); 
+  }
+}
+
+/* ld hl,(iy+DIS) */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt_idx(0xFDE4); 
+  }
+  else {
+    DO_stmt_idx(0xE4); 
+  }
+}
+
+/* ld hl,ix */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD7C); 
+  }
+  else {
+    DO_stmt(0xFD7C); 
+  }
+}
+
+/* ld hl,iy */
+| label? _TK_LD _TK_HL _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD7C); 
+  }
+  else {
+    DO_stmt(0xDD7C); 
+  }
+}
+
+/* ld hl,(NN) */
+/* ld hl,NN */
+| label? _TK_LD _TK_HL _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) {
+    DO_stmt_nn(0x2A); 
+  }
+  else {
+    DO_stmt_nn(0x21); 
+  }
+}
+
+/* ld hl',(hl) */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xDDE400); 
+}
+
+/* ld hl',(hl+DIS) */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_HL expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt_idx(0xDDE4); 
+}
+
+/* ld hl',(ix) */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xE400); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xFDE400); 
+  }
+}
+
+/* ld hl',(ix+DIS) */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xE4); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xFDE4); 
+  }
+}
+
+/* ld hl',(iy) */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xFDE400); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xE400); 
+  }
+}
+
+/* ld hl',(iy+DIS) */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xFDE4); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_idx(0xE4); 
+  }
+}
+
+/* ld hl',ix */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xDD7C); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xFD7C); 
+  }
+}
+
+/* ld hl',iy */
+| label? _TK_LD _TK_HL1 _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0x76);
+    DO_stmt(0xFD7C); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt(0xDD7C); 
+  }
+}
+
+/* ld hl',(NN) */
+/* ld hl',NN */
+| label? _TK_LD _TK_HL1 _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x2A); 
+  }
+  else {
+    DO_stmt(0x76);
+    DO_stmt_nn(0x21); 
+  }
+}
+
 /* ld i,a */
 | label? _TK_LD _TK_I _TK_COMMA _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
@@ -6231,6 +7668,12 @@
   DO_stmt(0x74); 
 }
 
+/* ld (hl),hl */
+| label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xDDF400); 
+}
+
 /* ld (hl),l */
 | label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA _TK_L _TK_NEWLINE @{
   DO_stmt(0x75); 
@@ -6240,6 +7683,12 @@
 | label? _TK_LD _TK_IND_HL _TK_RPAREN _TK_COMMA expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_n(0x36); 
+}
+
+/* ld (hl+DIS),hl */
+| label? _TK_LD _TK_IND_HL expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt_idx(0xDDF4); 
 }
 
 /* ld (ix),a */
@@ -6299,6 +7748,17 @@
   }
   else {
     DO_stmt(0xFD7400); 
+  }
+}
+
+/* ld (ix),hl */
+| label? _TK_LD _TK_IND_IX _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xF400); 
+  }
+  else {
+    DO_stmt(0xFDF400); 
   }
 }
 
@@ -6383,6 +7843,17 @@
   }
 }
 
+/* ld (ix+DIS),hl */
+| label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt_idx(0xF4); 
+  }
+  else {
+    DO_stmt_idx(0xFDF4); 
+  }
+}
+
 /* ld (ix+DIS),l */
 | label? _TK_LD _TK_IND_IX expr _TK_RPAREN _TK_COMMA _TK_L _TK_NEWLINE @{
   if (!opts.swap_ix_iy) {
@@ -6461,6 +7932,17 @@
   }
   else {
     DO_stmt(0xDD7400); 
+  }
+}
+
+/* ld (iy),hl */
+| label? _TK_LD _TK_IND_IY _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFDF400); 
+  }
+  else {
+    DO_stmt(0xF400); 
   }
 }
 
@@ -6545,6 +8027,17 @@
   }
 }
 
+/* ld (iy+DIS),hl */
+| label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt_idx(0xFDF4); 
+  }
+  else {
+    DO_stmt_idx(0xF4); 
+  }
+}
+
 /* ld (iy+DIS),l */
 | label? _TK_LD _TK_IND_IY expr _TK_RPAREN _TK_COMMA _TK_L _TK_NEWLINE @{
   if (!opts.swap_ix_iy) {
@@ -6563,6 +8056,38 @@
   }
   else {
     DO_stmt_idx_n(0xDD36); 
+  }
+}
+
+/* ld ix,hl */
+| label? _TK_LD _TK_IX _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD7D); 
+  }
+  else {
+    DO_stmt(0xFD7D); 
+  }
+}
+
+/* ld ix,(NN) */
+/* ld ix,NN */
+| label? _TK_LD _TK_IX _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) {
+    if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xDD2A); 
+  }
+  else {
+    DO_stmt_nn(0xFD2A); 
+  }
+  }
+  else {
+    if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xDD21); 
+  }
+  else {
+    DO_stmt_nn(0xFD21); 
+  }
   }
 }
 
@@ -6741,6 +8266,38 @@
   }
   else {
     DO_stmt_n(0xFD2E); 
+  }
+}
+
+/* ld iy,hl */
+| label? _TK_LD _TK_IY _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD7D); 
+  }
+  else {
+    DO_stmt(0xDD7D); 
+  }
+}
+
+/* ld iy,(NN) */
+/* ld iy,NN */
+| label? _TK_LD _TK_IY _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) {
+    if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xFD2A); 
+  }
+  else {
+    DO_stmt_nn(0xDD2A); 
+  }
+  }
+  else {
+    if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xFD21); 
+  }
+  else {
+    DO_stmt_nn(0xDD21); 
+  }
   }
 }
 
@@ -7130,6 +8687,42 @@
   DO_stmt(0xED4F); 
 }
 
+/* ld sp,hl */
+| label? _TK_LD _TK_SP _TK_COMMA _TK_HL _TK_NEWLINE @{
+  DO_stmt(0xF9); 
+}
+
+/* ld sp,ix */
+| label? _TK_LD _TK_SP _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDDF9); 
+  }
+  else {
+    DO_stmt(0xFDF9); 
+  }
+}
+
+/* ld sp,iy */
+| label? _TK_LD _TK_SP _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFDF9); 
+  }
+  else {
+    DO_stmt(0xDDF9); 
+  }
+}
+
+/* ld sp,(NN) */
+/* ld sp,NN */
+| label? _TK_LD _TK_SP _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) {
+    DO_stmt_nn(0xED7B); 
+  }
+  else {
+    DO_stmt_nn(0x31); 
+  }
+}
+
 /* ld xpc,a */
 | label? _TK_LD _TK_XPC _TK_COMMA _TK_A _TK_NEWLINE @{
   if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
@@ -7140,6 +8733,278 @@
 | label? _TK_LD expr _TK_COMMA _TK_A _TK_NEWLINE @{
   if (!expr_in_parens) return FALSE;
   DO_stmt_nn(0x32); 
+}
+
+/* ld (NN),bc */
+| label? _TK_LD expr _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xED43); 
+}
+
+/* ld (NN),de */
+| label? _TK_LD expr _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xED53); 
+}
+
+/* ld (NN),hl */
+| label? _TK_LD expr _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0x22); 
+}
+
+/* ld (NN),ix */
+| label? _TK_LD expr _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if (!expr_in_parens) return FALSE;
+  if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xDD22); 
+  }
+  else {
+    DO_stmt_nn(0xFD22); 
+  }
+}
+
+/* ld (NN),iy */
+| label? _TK_LD expr _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if (!expr_in_parens) return FALSE;
+  if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xFD22); 
+  }
+  else {
+    DO_stmt_nn(0xDD22); 
+  }
+}
+
+/* ld (NN),sp */
+| label? _TK_LD expr _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xED73); 
+}
+
+/* ldd */
+| label? _TK_LDD _TK_NEWLINE @{
+  DO_stmt(0xEDA8); 
+}
+
+/* lddr */
+| label? _TK_LDDR _TK_NEWLINE @{
+  DO_stmt(0xEDB8); 
+}
+
+/* lddsr */
+| label? _TK_LDDSR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED98); 
+}
+
+/* ldi */
+| label? _TK_LDI _TK_NEWLINE @{
+  DO_stmt(0xEDA0); 
+}
+
+/* ldir */
+| label? _TK_LDIR _TK_NEWLINE @{
+  DO_stmt(0xEDB0); 
+}
+
+/* ldisr */
+| label? _TK_LDISR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED90); 
+}
+
+/* ldp hl,(hl) */
+| label? _TK_LDP _TK_HL _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED6C); 
+}
+
+/* ldp hl,(ix) */
+| label? _TK_LDP _TK_HL _TK_COMMA _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD6C); 
+  }
+  else {
+    DO_stmt(0xFD6C); 
+  }
+}
+
+/* ldp hl,(iy) */
+| label? _TK_LDP _TK_HL _TK_COMMA _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD6C); 
+  }
+  else {
+    DO_stmt(0xDD6C); 
+  }
+}
+
+/* ldp hl,(NN) */
+| label? _TK_LDP _TK_HL _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xED6D); 
+}
+
+/* ldp (hl),hl */
+| label? _TK_LDP _TK_IND_HL _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED64); 
+}
+
+/* ldp (ix),hl */
+| label? _TK_LDP _TK_IND_IX _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDD64); 
+  }
+  else {
+    DO_stmt(0xFD64); 
+  }
+}
+
+/* ldp (iy),hl */
+| label? _TK_LDP _TK_IND_IY _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFD64); 
+  }
+  else {
+    DO_stmt(0xDD64); 
+  }
+}
+
+/* ldp ix,(NN) */
+| label? _TK_LDP _TK_IX _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xDD6D); 
+  }
+  else {
+    DO_stmt_nn(0xFD6D); 
+  }
+}
+
+/* ldp iy,(NN) */
+| label? _TK_LDP _TK_IY _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xFD6D); 
+  }
+  else {
+    DO_stmt_nn(0xDD6D); 
+  }
+}
+
+/* ldp (NN),hl */
+| label? _TK_LDP expr _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_nn(0xED65); 
+}
+
+/* ldp (NN),ix */
+| label? _TK_LDP expr _TK_COMMA _TK_IX _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xDD65); 
+  }
+  else {
+    DO_stmt_nn(0xFD65); 
+  }
+}
+
+/* ldp (NN),iy */
+| label? _TK_LDP expr _TK_COMMA _TK_IY _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  if (!opts.swap_ix_iy) {
+    DO_stmt_nn(0xFD65); 
+  }
+  else {
+    DO_stmt_nn(0xDD65); 
+  }
+}
+
+/* lsddr */
+| label? _TK_LSDDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDD8); 
+}
+
+/* lsdr */
+| label? _TK_LSDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDF8); 
+}
+
+/* lsidr */
+| label? _TK_LSIDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDD0); 
+}
+
+/* lsir */
+| label? _TK_LSIR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDF0); 
+}
+
+/* mlt bc */
+| label? _TK_MLT _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED4C); 
+}
+
+/* mlt de */
+| label? _TK_MLT _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED5C); 
+}
+
+/* mlt hl */
+| label? _TK_MLT _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED6C); 
+}
+
+/* mlt sp */
+| label? _TK_MLT _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED7C); 
+}
+
+/* mul */
+| label? _TK_MUL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xF7); 
+}
+
+/* neg */
+| label? _TK_NEG _TK_NEWLINE @{
+  DO_stmt(0xED44); 
+}
+
+/* neg a */
+| label? _TK_NEG _TK_A _TK_NEWLINE @{
+  DO_stmt(0xED44); 
+}
+
+/* neg a' */
+| label? _TK_NEG _TK_A1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED44); 
+}
+
+/* nop */
+| label? _TK_NOP _TK_NEWLINE @{
+  DO_stmt(0x00); 
 }
 
 /* or a */
@@ -7518,6 +9383,422 @@
   DO_stmt_n(0xF6); 
 }
 
+/* otdm */
+| label? _TK_OTDM _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED8B); 
+}
+
+/* otdmr */
+| label? _TK_OTDMR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED9B); 
+}
+
+/* otdr */
+| label? _TK_OTDR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDBB); 
+}
+
+/* otim */
+| label? _TK_OTIM _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED83); 
+}
+
+/* otimr */
+| label? _TK_OTIMR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED93); 
+}
+
+/* otir */
+| label? _TK_OTIR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDB3); 
+}
+
+/* out (c),a */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED79); 
+}
+
+/* out (c),b */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_B _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED41); 
+}
+
+/* out (c),c */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_C _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED49); 
+}
+
+/* out (c),d */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_D _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED51); 
+}
+
+/* out (c),e */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_E _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED59); 
+}
+
+/* out (c),h */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_H _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED61); 
+}
+
+/* out (c),l */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA _TK_L _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED69); 
+}
+
+/* out (c),0 */
+| label? _TK_OUT _TK_IND_C _TK_RPAREN _TK_COMMA const_expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_error) return FALSE;
+  if (expr_value == 0) {
+    DO_stmt(0xED71); 
+  }
+  else
+    error_int_range(expr_value);
+
+}
+
+/* out (N),a */
+| label? _TK_OUT expr _TK_COMMA _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xD3); 
+}
+
+/* out0 (N),a */
+| label? _TK_OUT0 expr _TK_COMMA _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED39); 
+}
+
+/* out0 (N),b */
+| label? _TK_OUT0 expr _TK_COMMA _TK_B _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED01); 
+}
+
+/* out0 (N),c */
+| label? _TK_OUT0 expr _TK_COMMA _TK_C _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED09); 
+}
+
+/* out0 (N),d */
+| label? _TK_OUT0 expr _TK_COMMA _TK_D _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED11); 
+}
+
+/* out0 (N),e */
+| label? _TK_OUT0 expr _TK_COMMA _TK_E _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED19); 
+}
+
+/* out0 (N),h */
+| label? _TK_OUT0 expr _TK_COMMA _TK_H _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED21); 
+}
+
+/* out0 (N),l */
+| label? _TK_OUT0 expr _TK_COMMA _TK_L _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (!expr_in_parens) return FALSE;
+  DO_stmt_n(0xED29); 
+}
+
+/* outd */
+| label? _TK_OUTD _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDAB); 
+}
+
+/* outi */
+| label? _TK_OUTI _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDA3); 
+}
+
+/* pop af */
+| label? _TK_POP _TK_AF _TK_NEWLINE @{
+  DO_stmt(0xF1); 
+}
+
+/* pop af' */
+| label? _TK_POP _TK_AF1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xF1); 
+}
+
+/* pop bc */
+| label? _TK_POP _TK_BC _TK_NEWLINE @{
+  DO_stmt(0xC1); 
+}
+
+/* pop bc' */
+| label? _TK_POP _TK_BC1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xC1); 
+}
+
+/* pop de */
+| label? _TK_POP _TK_DE _TK_NEWLINE @{
+  DO_stmt(0xD1); 
+}
+
+/* pop de' */
+| label? _TK_POP _TK_DE1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xD1); 
+}
+
+/* pop hl */
+| label? _TK_POP _TK_HL _TK_NEWLINE @{
+  DO_stmt(0xE1); 
+}
+
+/* pop hl' */
+| label? _TK_POP _TK_HL1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xE1); 
+}
+
+/* pop ip */
+| label? _TK_POP _TK_IP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED7E); 
+}
+
+/* pop ix */
+| label? _TK_POP _TK_IX _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDDE1); 
+  }
+  else {
+    DO_stmt(0xFDE1); 
+  }
+}
+
+/* pop iy */
+| label? _TK_POP _TK_IY _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFDE1); 
+  }
+  else {
+    DO_stmt(0xDDE1); 
+  }
+}
+
+/* pop su */
+| label? _TK_POP _TK_SU _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED6E); 
+}
+
+/* push af */
+| label? _TK_PUSH _TK_AF _TK_NEWLINE @{
+  DO_stmt(0xF5); 
+}
+
+/* push bc */
+| label? _TK_PUSH _TK_BC _TK_NEWLINE @{
+  DO_stmt(0xC5); 
+}
+
+/* push de */
+| label? _TK_PUSH _TK_DE _TK_NEWLINE @{
+  DO_stmt(0xD5); 
+}
+
+/* push hl */
+| label? _TK_PUSH _TK_HL _TK_NEWLINE @{
+  DO_stmt(0xE5); 
+}
+
+/* push ip */
+| label? _TK_PUSH _TK_IP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED76); 
+}
+
+/* push ix */
+| label? _TK_PUSH _TK_IX _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xDDE5); 
+  }
+  else {
+    DO_stmt(0xFDE5); 
+  }
+}
+
+/* push iy */
+| label? _TK_PUSH _TK_IY _TK_NEWLINE @{
+  if (!opts.swap_ix_iy) {
+    DO_stmt(0xFDE5); 
+  }
+  else {
+    DO_stmt(0xDDE5); 
+  }
+}
+
+/* push su */
+| label? _TK_PUSH _TK_SU _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED66); 
+}
+
+/* rdmode */
+| label? _TK_RDMODE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED7F); 
+}
+
+/* ret */
+| label? _TK_RET _TK_NEWLINE @{
+  DO_stmt(0xC9); 
+}
+
+/* ret c */
+| label? _TK_RET _TK_C _TK_NEWLINE @{
+  DO_stmt(0xD8); 
+}
+
+/* ret lo */
+| label? _TK_RET _TK_LO _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xE8); 
+}
+
+/* ret lz */
+| label? _TK_RET _TK_LZ _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xE0); 
+}
+
+/* ret m */
+| label? _TK_RET _TK_M _TK_NEWLINE @{
+  DO_stmt(0xF8); 
+}
+
+/* ret nc */
+| label? _TK_RET _TK_NC _TK_NEWLINE @{
+  DO_stmt(0xD0); 
+}
+
+/* ret nz */
+| label? _TK_RET _TK_NZ _TK_NEWLINE @{
+  DO_stmt(0xC0); 
+}
+
+/* ret p */
+| label? _TK_RET _TK_P _TK_NEWLINE @{
+  DO_stmt(0xF0); 
+}
+
+/* ret pe */
+| label? _TK_RET _TK_PE _TK_NEWLINE @{
+  DO_stmt(0xE8); 
+}
+
+/* ret po */
+| label? _TK_RET _TK_PO _TK_NEWLINE @{
+  DO_stmt(0xE0); 
+}
+
+/* ret z */
+| label? _TK_RET _TK_Z _TK_NEWLINE @{
+  DO_stmt(0xC8); 
+}
+
+/* reti */
+| label? _TK_RETI _TK_NEWLINE @{
+  DO_stmt(0xED4D); 
+}
+
+/* retn */
+| label? _TK_RETN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED45); 
+}
+
+/* rld */
+| label? _TK_RLD _TK_NEWLINE @{
+  DO_stmt_emul(0xED6F, rcmx_rld); 
+}
+
+/* rrd */
+| label? _TK_RRD _TK_NEWLINE @{
+  DO_stmt_emul(0xED67, rcmx_rrd); 
+}
+
+/* rst 0 */
+/* rst 16 */
+/* rst 24 */
+/* rst 32 */
+/* rst 40 */
+/* rst 48 */
+/* rst 56 */
+/* rst 8 */
+| label? _TK_RST const_expr _TK_NEWLINE @{
+  if (expr_error) return FALSE;
+  if (expr_value == 0) {
+    if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+    DO_stmt(0xC7); 
+  }
+  else if (expr_value == 8) {
+    if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+    DO_stmt(0xCF); 
+  }
+  else if (expr_value == 16) {
+    DO_stmt(0xD7); 
+  }
+  else if (expr_value == 24) {
+    DO_stmt(0xDF); 
+  }
+  else if (expr_value == 32) {
+    DO_stmt(0xE7); 
+  }
+  else if (expr_value == 40) {
+    DO_stmt(0xEF); 
+  }
+  else if (expr_value == 48) {
+    if ((opts.cpu & (CPU_ZILOG)) == 0) { error_illegal_ident(); return FALSE; }
+    DO_stmt(0xF7); 
+  }
+  else if (expr_value == 56) {
+    DO_stmt(0xFF); 
+  }
+  else
+    error_int_range(expr_value);
+
+}
+
 /* sbc a */
 | label? _TK_SBC _TK_A _TK_NEWLINE @{
   DO_stmt(0x9F); 
@@ -7794,6 +10075,54 @@
   DO_stmt(0x9C); 
 }
 
+/* sbc hl,bc */
+| label? _TK_SBC _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+  DO_stmt(0xED42); 
+}
+
+/* sbc hl,de */
+| label? _TK_SBC _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+  DO_stmt(0xED52); 
+}
+
+/* sbc hl,hl */
+| label? _TK_SBC _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
+  DO_stmt(0xED62); 
+}
+
+/* sbc hl,sp */
+| label? _TK_SBC _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+  DO_stmt(0xED72); 
+}
+
+/* sbc hl',bc */
+| label? _TK_SBC _TK_HL1 _TK_COMMA _TK_BC _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED42); 
+}
+
+/* sbc hl',de */
+| label? _TK_SBC _TK_HL1 _TK_COMMA _TK_DE _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED52); 
+}
+
+/* sbc hl',hl */
+| label? _TK_SBC _TK_HL1 _TK_COMMA _TK_HL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED62); 
+}
+
+/* sbc hl',sp */
+| label? _TK_SBC _TK_HL1 _TK_COMMA _TK_SP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0xED72); 
+}
+
 /* sbc (hl) */
 | label? _TK_SBC _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
   DO_stmt(0x9E); 
@@ -7892,6 +10221,35 @@
 | label? _TK_SBC expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_n(0xDE); 
+}
+
+/* scf */
+| label? _TK_SCF _TK_NEWLINE @{
+  DO_stmt(0x37); 
+}
+
+/* scf f */
+| label? _TK_SCF _TK_F _TK_NEWLINE @{
+  DO_stmt(0x37); 
+}
+
+/* scf f' */
+| label? _TK_SCF _TK_F1 _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0x76);
+  DO_stmt(0x37); 
+}
+
+/* setusr */
+| label? _TK_SETUSR _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED6F); 
+}
+
+/* slp */
+| label? _TK_SLP _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED76); 
 }
 
 /* sub a */
@@ -8268,6 +10626,147 @@
 | label? _TK_SUB expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_n(0xD6); 
+}
+
+/* sures */
+| label? _TK_SURES _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED7D); 
+}
+
+/* syscall */
+| label? _TK_SYSCALL _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED75); 
+}
+
+/* tst a */
+| label? _TK_TST _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED3C); 
+}
+
+/* tst a,a */
+| label? _TK_TST _TK_A _TK_COMMA _TK_A _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED3C); 
+}
+
+/* tst a,b */
+| label? _TK_TST _TK_A _TK_COMMA _TK_B _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED04); 
+}
+
+/* tst a,c */
+| label? _TK_TST _TK_A _TK_COMMA _TK_C _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED0C); 
+}
+
+/* tst a,d */
+| label? _TK_TST _TK_A _TK_COMMA _TK_D _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED14); 
+}
+
+/* tst a,e */
+| label? _TK_TST _TK_A _TK_COMMA _TK_E _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED1C); 
+}
+
+/* tst a,h */
+| label? _TK_TST _TK_A _TK_COMMA _TK_H _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED24); 
+}
+
+/* tst a,(hl) */
+| label? _TK_TST _TK_A _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED34); 
+}
+
+/* tst a,l */
+| label? _TK_TST _TK_A _TK_COMMA _TK_L _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED2C); 
+}
+
+/* tst a,N */
+| label? _TK_TST _TK_A _TK_COMMA expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_n(0xED64); 
+}
+
+/* tst b */
+| label? _TK_TST _TK_B _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED04); 
+}
+
+/* tst c */
+| label? _TK_TST _TK_C _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED0C); 
+}
+
+/* tst d */
+| label? _TK_TST _TK_D _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED14); 
+}
+
+/* tst e */
+| label? _TK_TST _TK_E _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED1C); 
+}
+
+/* tst h */
+| label? _TK_TST _TK_H _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED24); 
+}
+
+/* tst (hl) */
+| label? _TK_TST _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED34); 
+}
+
+/* tst l */
+| label? _TK_TST _TK_L _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xED2C); 
+}
+
+/* tst N */
+| label? _TK_TST expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_n(0xED64); 
+}
+
+/* tstio N */
+| label? _TK_TSTIO expr _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_n(0xED74); 
+}
+
+/* uma */
+| label? _TK_UMA _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDC0); 
+}
+
+/* ums */
+| label? _TK_UMS _TK_NEWLINE @{
+  if ((opts.cpu & (CPU_R3K)) == 0) { error_illegal_ident(); return FALSE; }
+  DO_stmt(0xEDC8); 
 }
 
 /* xor a */

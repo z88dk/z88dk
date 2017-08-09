@@ -35,22 +35,13 @@ scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 	
 all : parse_rules.h
 
-cpu_opcodes2.h : cpu_opcodes.def cpu_opcodes.pl
-	perl cpu_opcodes.pl
-
-cpu_opcodes.h : cpu_opcodes.py
-	python cpu_opcodes.py
-
 tools\cpu_rules.h : tools\cpu.def tools\cpu.pl
 	perl tools\cpu.pl
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile \
-				cpu_opcodes.h \
-				cpu_opcodes2.h \
 				tools\cpu_rules.h
 	perl parse_ragel.pl parse_rules.rl
-#	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)
 	
 #------------------------------------------------------------------------------
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation

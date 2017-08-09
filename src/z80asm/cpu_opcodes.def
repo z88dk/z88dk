@@ -2,44 +2,10 @@
 ; List of all the CPU opcodes
 ;------------------------------------------------------------------------------
 
-;------------------------------------------------------------------------------
-; 16-bit load group
-;------------------------------------------------------------------------------
-
-[rabbit]	ld hl['],  (HL+SN)			=> DD, E4
-[rabbit]	ld hl['],  (IX+SN)			=>     E4
-[rabbit]	ld hl['],  (IY+SN)			=> FD, E4
-
-[rabbit]	ld (HL+SN), hl				=> DD, F4
-[rabbit]	ld (IX+SN), hl				=>     F4
-[rabbit]	ld (IY+SN), hl				=> FD, F4
-
-[rabbit]	ldp IMN, hl					=> ED, 65, N, M
-[rabbit]	ldp IMN, ix					=> DD, 65, N, M
-[rabbit]	ldp IMN, iy					=> FD, 65, N, M
-
-[rabbit]	ldp hl, IMN					=> ED, 6D, N, M
-[rabbit]	ldp ix, IMN					=> DD, 6D, N, M
-[rabbit]	ldp iy, IMN					=> FD, 6D, N, M
-
-[rabbit]	ldp (hl), hl				=> ED, 64
-[rabbit]	ldp (ix), hl				=> DD, 64
-[rabbit]	ldp (iy), hl				=> FD, 64
-
-[rabbit]	ldp hl, (hl)				=> ED, 6C
-[rabbit]	ldp hl, (ix)				=> DD, 6C
-[rabbit]	ldp hl, (iy)				=> FD, 6C
-
 __END__
 [rabbit]	ld (SP+N), hl				=>     D4
 [rabbit]	ld (SP+N), ix				=> DD, D4
 [rabbit]	ld (SP+N), iy				=> FD, D4
-
-
-
-
-
-
 
 [rabbit]	ld (sp + N), hl				=>     D4, N
 [rabbit]	ld (sp + N), ix				=> DD, D4, N
@@ -55,20 +21,7 @@ __END__
 ;------------------------------------------------------------------------------
 ; 16-Bit Arithmetic Group
 ;------------------------------------------------------------------------------
-			add hl,  {bc de hl sp}		=>     09 + $1*10
-[rabbit]	add hl', {bc de hl sp}		=> 76, 09 + $1*10
-
-			add ix, {bc de ix sp}		=>     DD, 09 + $1*10
-			add iy, {bc de iy sp}		=>     FD, 09 + $1*10
                                                
-			{sbc adc} hl,  {bc de hl sp}=>     ED, 42 + $1*8 + $2*10
-[rabbit]	{sbc adc} hl', {bc de hl sp}=> 76, ED, 42 + $1*8 + $2*10
-
-			{inc dec} {bc de hl sp}		=>     03 + $1*8 + $2*10
-[rabbit]	{inc dec} {bc de hl . }'	=> 76, 03 + $1*8 + $2*10
-			{inc dec} {.  .  ix . }		=> DD, 03 + $1*8 + $2*10
-			{inc dec} {.  .  iy . }		=> FD, 03 + $1*8 + $2*10
-			
 [rabbit]	add sp, D					=>     27, D
 
 [rabbit]	{and or} hl,  de			=>         DC + $1*10
@@ -81,13 +34,6 @@ __END__
 [rabbit]	bool hl'					=> 76, CC
 [rabbit]	bool ix						=> DD, CC
 [rabbit]	bool iy						=> FD, CC
-
-[not_z80]	mlt {bc de hl . }			=> ED, 4C + $1*10
-[z180]		mlt {.  .  .  sp}			=> ED, 4C + $1*10
-[rabbit]	mul							=> F7
-
-[r3k]		uma							=> ED, C0
-[r3k]		ums							=> ED, C8
 
 ;------------------------------------------------------------------------------
 ; Exchange Group
@@ -139,147 +85,10 @@ __END__
 			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (ix+D) .}		=> DD, CB, D, $1*40 + $2*8 + $3
 			{. bit res set} {0 1 2 3 4 5 6 7}, {. . . . . . (iy+D) .}		=> FD, CB, D, $1*40 + $2*8 + $3
 			
-;------------------------------------------------------------------------------
-; Block Transfer Group
-;------------------------------------------------------------------------------
-			ldi 				=> ED, A0
-			ldir				=> ED, B0
-			ldd 				=> ED, A8
-			lddr				=> ED, B8
-
-[r3k]		ldisr				=> ED, 90
-[r3k]		lddsr				=> ED, 98
-
-[r3k]		lsdr				=> ED, F8
-[r3k]		lsir				=> ED, F0
-[r3k]		lsddr				=> ED, D8
-[r3k]		lsidr				=> ED, D0
-
-;------------------------------------------------------------------------------
-; Search Group
-;------------------------------------------------------------------------------
-[zilog]		cpi 				=> ED, A1
-[zilog]		cpir				=> ED, B1
-[zilog]		cpd 				=> ED, A9
-[zilog]		cpdr				=> ED, B9
-
-;------------------------------------------------------------------------------
-; CPU Control Group
-;------------------------------------------------------------------------------
-			nop					=>     00
-[zilog]		halt				=>     76
-[z180]		slp					=> ED, 76
-	
 ; TODO: add all ALTD combinations
 [rabbit]	altd				=>     76
-[rabbit]	ld a,  xpc			=>     ED, 77
-[rabbit]	ld a', xpc			=> 76, ED, 77
-[rabbit]	ld xpc, a			=>     ED, 67
 
-[r3k]		rdmode				=> ED, 7F
-[r3k]		setusr				=> ED, 6F
-[r3k]		sures				=> ED, 7D
-[r3k]		syscall				=> ED, 75
-
-;------------------------------------------------------------------------------
-; Jump Group
-;------------------------------------------------------------------------------
-			jp MN							=> C3, N, M
-			jp {nz z nc c po pe p m}, MN	=> C2 + $1*8, N, M
-[rabbit]	jp {.  . .  . lz lo . .}, MN	=> C2 + $1*8, N, M
-
-; TODO: LJP not supported
-
-			jp (hl)							=>     E9
-			jp (ix)							=> DD, E9
-			jp (iy)							=> FD, E9
-			
-			djnz ASMPC						=>     10, FE
-			djnz b,  ASMPC					=>     10, FE
-[rabbit]	djnz b', ASMPC					=> 76, 10, FE
-
-; TODO: check that address is corretly computed in DJNZ B', LABEL
-
-			jr ASMPC						=> 18, FE
-			jr {nz z nc c}, ASMPC			=> 20 + $1*8, FE
-
-;------------------------------------------------------------------------------
-; Call and Return Group
-;------------------------------------------------------------------------------
-			call MN							=> CD, N, M
-[zilog]		call {nz z nc c po pe p m}, MN	=> C4 + $1*8, N, M
-
-; TODO: LCALL not supported
-
-			ret								=> C9
-			ret {nz z nc c po pe p m}		=> C0 + $1*8
-[rabbit]	ret {.  . .  . lz lo . .}		=> C0 + $1*8
-
-; TODO: LRET not supported
-
-			rst {. . 16 24 32 40 .  56}		=> C7 + $1*8
-[zilog]		rst {0 8 .  .  .  .  48 . }		=> C7 + $1*8
-
-;------------------------------------------------------------------------------
-; Input and Output Group
-;------------------------------------------------------------------------------
-[zilog]		in  a, (N)						=>     DB, N
-[zilog]		in  {b c d e h l f a}, (c)		=> ED, 40 + $1*8
-[z180]		in0 {b c d e h l f a}, (N)		=> ED, 00 + $1*8, N
-
-[zilog]		out  (N), a						=>     D3, N
-[zilog]		out  (c), {b c d e h l 0 a}		=> ED, 41 + $1*8
-[z180]		out0 (N), {b c d e h l . a}		=> ED, 01 + $1*8, N
-
-[z180]		tstio N			=> ED, 74, N
-
+; TODO: add all IOE IOI combinations
 [rabbit]	ioe				=>     DB
 [rabbit]	ioi				=>     D3
 
-[zilog]		ini				=> ED, A2
-[zilog]		inir			=> ED, B2
-[zilog]		ind				=> ED, AA
-[zilog]		indr			=> ED, BA
-	
-[zilog]		outi			=> ED, A3
-[zilog]		otir			=> ED, B3
-[zilog]		outd			=> ED, AB
-[zilog]		otdr			=> ED, BB
-
-[z180]		otdm			=> ED, 8B
-[z180]		otdmr			=> ED, 9B
-[z180]		otim			=> ED, 83
-[z180]		otimr			=> ED, 93
-
-;------------------------------------------------------------------------------
-; Interrupt control group
-;------------------------------------------------------------------------------
-[zilog]		di				=>     F3
-[zilog]		ei				=>     FB
-[zilog]		im 0			=> ED, 46
-[zilog]		im 1			=> ED, 56
-[zilog]		im 2			=> ED, 5E
-
-[rabbit]	ipset 0			=> ED, 46
-[rabbit]	ipset 1			=> ED, 56
-[rabbit]	ipset 2			=> ED, 4E
-[rabbit]	ipset 3			=> ED, 5E
-
-[rabbit]	ipres			=> ED, 5D
-
-[zilog]		ld i, a			=> ED, 47
-[zilog]		ld a, i			=> ED, 57
-[zilog]		ld r, a			=> ED, 4F
-[zilog]		ld a, r			=> ED, 5F
-
-[rabbit]	ld iir, a		=>     ED, 4F
-[rabbit]	ld a,  iir		=>     ED, 5F
-[rabbit]	ld a', iir		=> 76, ED, 5F
-[rabbit]	ld eir, a		=>     ED, 47
-[rabbit]	ld a,  eir		=>     ED, 57
-[rabbit]	ld a', eir		=> 76, ED, 57
-
-			reti			=> ED, 4D
-[zilog]		retn			=> ED, 45
-                               
-[r3k]		idet			=>     5B

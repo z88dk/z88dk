@@ -45,7 +45,21 @@ for my $file (<tools/cpu_test*.asm>) {
 		ok system($cmd)==0, $cmd;
 		ok -s "test.err" == 0, "no errors in stderr";
 		ok !-f $file_err, "no $file_err";
-		ok slurp($file_bin) eq $bin, "$file_bin ok";
+		if (-f $file_err) {
+			diag slurp($file_err);
+		}
+		my $out_bin = slurp($file_bin);
+		ok $out_bin eq $bin, "$file_bin ok";
+		if ($out_bin ne $bin) {
+			my $addr = 0;
+			while ($addr < length($out_bin) && $addr < length($bin) 
+					&& substr($out_bin, $addr, 1) eq substr($bin, $addr, 1)) {
+				$addr++;
+			}
+			diag sprintf("Output difers at \$%04X", $addr);
+			diag "expected ", hexdump(substr($bin, $addr, 10));
+			diag "got      ", hexdump(substr($out_bin, $addr, 10));
+		}
 	}
 	else {
 		# check that all lines have error messages
@@ -77,4 +91,13 @@ sub slurp {
 	local $/;
 	open(my $fh, "<:raw", $file) or die "$file: $!";
 	return <$fh>;
+}
+
+sub hexdump {
+	my($str) = @_;
+	my $ret = '';
+	for (split //, $str) {
+		$ret .= sprintf("%02X ", ord($_));
+	}
+	return $ret;
 }

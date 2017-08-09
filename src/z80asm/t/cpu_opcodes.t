@@ -45,39 +45,6 @@ for (@CPU) {
 	close $errf;
 	
 	test_asm($cpu, $asm_file, $err_file, $bmk_file);
-
-	# test cpu_opcodes_* built by cpu_opcodes.pl
-	$asm_file = "t/data/cpu_opcodes_".$cpu."_ok.asm";
-	$err_file = "t/data/cpu_opcodes_".$cpu."_err.asm";
-	$bmk_file = "t/data/cpu_opcodes_".$cpu."_ok.bmk";
-
-	# build bmk
-	my $bytes = '';
-	for (path($asm_file)->lines) {
-		s/.*;;\s*//;
-		for (split(' ', $_)) {
-			$bytes .= chr(hex($_));
-		}
-	}
-	path($bmk_file)->spew_raw($bytes);
-	test_asm($cpu, $asm_file, $err_file, $bmk_file);
-	unlink($bmk_file);
-
-	# test cpu* built by cpu_opcodes.py
-	$asm_file = "t/data/".$cpu."-ok.asm";
-	$err_file = "t/data/".$cpu."-err.asm";
-	$bmk_file = "t/data/".$cpu."-ok.bmk";
-
-	# build bmk
-	($bytes, my $bytes_ixiy) = get_bytes($asm_file);
-
-	path($bmk_file)->spew_raw($bytes);
-	test_asm($cpu, $asm_file, $err_file, $bmk_file);
-	unlink($bmk_file);
-
-	path($bmk_file)->spew_raw($bytes_ixiy);
-	test_asm($cpu, $asm_file, $err_file, $bmk_file, "--IXIY");
-	unlink($bmk_file);
 }
 
 done_testing;

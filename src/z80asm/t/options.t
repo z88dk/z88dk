@@ -941,7 +941,6 @@ t_z80asm_ok(0, "
 	out0 (13),e
 	out0 (14),h
 	out0 (15),l
-	out0 (16),f
 	out0 (17),a
 	
 	otim
@@ -994,7 +993,6 @@ t_z80asm_ok(0, "
 	0xED, 0x19, 13,	
 	0xED, 0x21, 14,	
 	0xED, 0x29, 15,	
-	0xED, 0x31, 16,	
 	0xED, 0x39, 17,	
 	
 	0xED, 0x83,		# otxx
@@ -1038,6 +1036,19 @@ t_z80asm_error("otdmr		", "Error at file 'test.asm' line 1: illegal identifier")
 t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier");
 t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
-
+#------------------------------------------------------------------------------
+# --cpu=r2k
+t_z80asm_ok(0, "
+	altd ld a,31
+	ioi ld a,(0xFE)
+	ioe ld a,(0xFE)
+	
+", pack("C*", 
+	0x76, 0x3E, 0x1F,
+	0xD3, 0x3A, 0xFE, 0x00,
+	0xDB, 0x3A, 0xFE, 0x00,
+	
+), "--cpu=r2k");
+	
 unlink_testfiles();
 done_testing();

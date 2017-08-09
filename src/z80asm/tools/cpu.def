@@ -11,9 +11,8 @@
 
 # 8-bit load group
 
-ld	<b.c.d.e.h.l..a>,<b.c.d.e.h.l..a>			=> 40+<1>*8+<2>
+ld	<b.c.d.e.h.l..a>,<b.c.d.e.h.l.(hl).a>		=> 40+<1>*8+<2>
 ld	<b.c.d.e.h.l..a>,N							=> 06+<1>*8 N
-ld	<b.c.d.e.h.l..a>,(hl)						=> 46+<1>*8
 
 ld	(hl),<b.c.d.e.h.l..a>						=> 70+<1>
 ld	(hl),N										=> 36 N
@@ -24,31 +23,223 @@ ld	(NN),a 										=> 32 NNl NNh
 ld	a,<(bc).(de)>								=> 0A+<1>*10
 ld	<(bc).(de)>,a								=> 02+<1>*10
 
-[zilog]		ld	i,a								=> ED 47
-[zilog]		ld	a,i								=> ED 57
-
-[zilog]		ld	r,a								=> ED 4F
-[zilog]		ld	a,r								=> ED 5F
-
-[rabbit] 	ld	eir,a							=> ED 47
-[rabbit] 	ld	a,eir							=> ED 57
-
-[rabbit] 	ld	iir,a							=> ED 4F
-[rabbit] 	ld	a,iir							=> ED 5F
-
-[rabbit] 	ld	xpc,a							=> ED 67
-[rabbit] 	ld	a,xpc							=> ED 77
-
 # 8 bit arithmetic and logical group
 
-<add.adc.sub.sbc.and.xor.or.cp> a,<b.c.d.e.h.l..a>	=> 80+<1>*8+<2>
-<add.adc.sub.sbc.and.xor.or.cp> a,N					=> C6+<1>*8 N
-<add.adc.sub.sbc.and.xor.or.cp> a,(hl)				=> 86+<1>*8
-<inc.dec> <b.c.d.e.h.l..a>							=> 04+<1>+<2>*8
-<inc.dec> (hl)										=> 34+<1>
+<add.adc.sub.sbc.and.xor.or.cp> a,<b.c.d.e.h.l.(hl).a>	=> 80+<1>*8+<2>
+<add.adc.sub.sbc.and.xor.or.cp> a,N						=> C6+<1>*8 N
+<inc.dec> <b.c.d.e.h.l.(hl).a>							=> 04+<1>+<2>*8
 
+[not_z80]	tst	a,<b.c.d.e.h.l.(hl).a>			=> ED 04+<1>*8
+[not_z80]	tst	a,N								=> ED 64 N
+
+[zilog]		daa					=> 27
+
+[zilog]		rrd					=> ED 67
+[zilog]		rld					=> ED 6F
+
+cpl	a 							=> 2F
+neg a							=> ED 44
+ccf f							=> 3F
+scf f							=> 37
+
+# 16 bit load group
+
+ld	<bc.de.hl.sp>,NN			=> 01+<1>*10 NNl NNh
+ld	hl,(NN)						=> 2A NNl NNh
+ld	<bc.de..sp>,(NN)			=> ED 4B+<1>*10 NNl NNh
+
+ld	(NN),hl						=> 22 NNl NNh
+ld	(NN),<bc.de..sp>			=> ED 43+<1>*10 NNl NNh
+
+ld	sp,hl						=> F9
+
+			push <bc.de.hl.af>	=> C5+<1>*10
+[rabbit]	push ip				=> ED 76
+[r3k]		push su				=> ED 66
+
+			pop  <bc.de.hl.af>	=> C1+<1>*10
+[rabbit]	pop  ip				=> ED 7E
+[r3k]		pop  su				=> ED 6E
+
+[rabbit]	ld	hl,ix			=> DD 7C
+[rabbit]	ld	hl,iy			=> FD 7C
+
+[rabbit]	ld	ix,hl			=> DD 7D
+[rabbit]	ld	iy,hl			=> FD 7D
+
+[rabbit]	ld 	hl,(hl+DIS)		=> DD E4 DIS
+[rabbit]	ld 	hl,(ix+DIS)		=>    E4 DIS
+[rabbit]	ld 	hl,(iy+DIS)		=> FD E4 DIS
+
+[rabbit]	ld 	(hl+DIS),hl		=> DD F4 DIS
+[rabbit]	ld 	(ix+DIS),hl		=>    F4 DIS
+[rabbit]	ld 	(iy+DIS),hl		=> FD F4 DIS
+
+[rabbit]	ldp (NN),hl			=> ED 65 NNl NNh
+[rabbit]	ldp (NN),ix			=> DD 65 NNl NNh
+[rabbit]	ldp (NN),iy			=> FD 65 NNl NNh
+
+[rabbit]	ldp hl,(NN)			=> ED 6D NNl NNh
+[rabbit]	ldp ix,(NN)			=> DD 6D NNl NNh
+[rabbit]	ldp iy,(NN)			=> FD 6D NNl NNh
+
+[rabbit]	ldp (hl),hl			=> ED 64
+[rabbit]	ldp (ix),hl			=> DD 64
+[rabbit]	ldp (iy),hl			=> FD 64
+
+[rabbit]	ldp hl,(hl)			=> ED 6C
+[rabbit]	ldp hl,(ix)			=> DD 6C
+[rabbit]	ldp hl,(iy)			=> FD 6C
+
+# 16 bit arithmetic and logical group
+
+add hl,<bc.de.hl.sp>			=> 09+<1>*10
+<sbc.adc> hl,<bc.de.hl.sp>		=> ED 42+<1>*8+<2>*10
+
+<inc.dec> <bc.de.hl.sp>			=> 03+<1>*8+<2>*10
+
+[not_z80]	mlt <bc.de.hl.>		=> ED 4C+<1>*10
+[z180]		mlt <...sp>			=> ED 4C+<1>*10
+[rabbit]	mul					=> F7
+
+[r3k]		uma					=> ED C0
+[r3k]		ums					=> ED C8
+
+# CPU control group
+
+nop								=>    00
+
+[zilog]		halt				=>    76
+[z180]		slp					=> ED 76
+
+[r3k]		rdmode				=> ED 7F
+[r3k]		setusr				=> ED 6F
+[r3k]		sures				=> ED 7D
+[r3k]		syscall				=> ED 75
+
+# Interrupt control group
+
+[zilog]		di					=> F3
+[zilog]		ei					=> FB
+
+[zilog]		im	CONST			=> ED choose(0:46 1:56 2:5E)
+
+[zilog]		ld	i,a				=> ED 47
+[zilog]		ld	a,i				=> ED 57
+
+[zilog]		ld	r,a				=> ED 4F
+[zilog]		ld	a,r				=> ED 5F
+
+[rabbit] 	ld	eir,a			=> ED 47
+[rabbit] 	ld	a,eir			=> ED 57
+
+[rabbit] 	ld	iir,a			=> ED 4F
+[rabbit] 	ld	a,iir			=> ED 5F
+
+[rabbit]	ipset CONST			=> ED choose(0:46 1:56 2:4E 3:5E)
+[rabbit]	ipres				=> ED 5D
+
+reti							=> ED 4D
+
+[zilog]		retn				=> ED 45
+[r3k]		idet				=> 5B
+
+# Jump Group
+
+jp 	NN							=> C3 NNl NNh
+jp 	<nz.z.nc.c.po.pe.p.m>,NN	=> C2+<1>*8 NNl NNh
+[rabbit] 	jp	<....lz.lo..>,NN => C2+<1>*8 NNl NNh
+
+jp 	(hl)						=> E9
+
+jr 	NN							=> 18 NNe
+jr 	<nz.z.nc.c>,NN				=> 20+<1>*8 NNe
+
+djnz NN							=> 10 NNe
+djnz b,NN						=> 10 NNe
+
+# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
+[rabbit]	altd djnz NN		=> 76 10 NNe
+[rabbit]	djnz b',NN			=> 76 10 NNe
+
+[rabbit] 	ld	xpc,a			=> ED 67
+[rabbit] 	ld	a,xpc			=> ED 77
+
+# TODO: LJP not supported
+
+# Call and Return Group
+
+call NN							=> CD NNl NNh
+call <nz.z.nc.c.po.pe.p.m>,NN	=> C4+<1>*8 NNl NNh
+[rabbit] call <....lz.lo..>,NN	=> C4+<1>*8 NNl NNh
+
+# TODO: LCALL not supported
+
+rst CONST						=> choose(            16:D7 24:DF 32:E7 40:EF       56:FF)
+[zilog]		rst CONST			=> choose( 0:C7  8:CF                         48:F7      )
+
+ret								=> C9
+ret <nz.z.nc.c.po.pe.p.m>		=> C0+<1>*8
+[rabbit] ret <....lz.lo..>		=> C0+<1>*8
+
+# TODO: LRET not supported
+
+# Block Transfer Group
+
+ldi 							=> ED A0
+ldir							=> ED B0
+ldd 							=> ED A8
+lddr							=> ED B8
+
+[r3k]		ldisr				=> ED 90
+[r3k]		lddsr				=> ED 98
+
+[r3k]		lsdr				=> ED F8
+[r3k]		lsir				=> ED F0
+[r3k]		lsddr				=> ED D8
+[r3k]		lsidr				=> ED D0
+
+# Search Group
+
+[zilog]		cpi 				=> ED A1
+[zilog]		cpir				=> ED B1
+[zilog]		cpd 				=> ED A9
+[zilog]		cpdr				=> ED B9
+
+# Input and Output Group
+
+[zilog]		in  a,(N)					=> DB N
+[zilog]		in  <b.c.d.e.h.l.f.a>,(c)	=> ED 40+<1>*8
+[z180]		in0 <b.c.d.e.h.l.f.a>,(N)	=> ED 00+<1>*8 N
+
+[zilog]		out  (N),a					=> D3 N
+[zilog]		out  (c),<b.c.d.e.h.l..a>	=> ED 41+<1>*8
+[zilog]		out  (c),CONST				=> ED 41+choose(0:6)*8
+
+[z180]		out0 (N),<b.c.d.e.h.l..a>	=> ED 01+<1>*8 N
+
+[z180]		tstio N						=> ED 74 N
+
+[zilog]		ini				=> ED A2
+[zilog]		inir			=> ED B2
+[zilog]		ind				=> ED AA
+[zilog]		indr			=> ED BA
+	
+[zilog]		outi			=> ED A3
+[zilog]		otir			=> ED B3
+[zilog]		outd			=> ED AB
+[zilog]		otdr			=> ED BB
+
+[z180]		otdm			=> ED 8B
+[z180]		otdmr			=> ED 9B
+[z180]		otim			=> ED 83
+[z180]		otimr			=> ED 93
 
 __END__
+
+#------------------------------------------------------------------------------
+
+
 
 
 
@@ -94,33 +285,9 @@ ld iy,ix						=> DD E5 FD E1
 #------------------------------------------------------------------------------
 # 16 bit load group
 
-ld	<bc.de.hl.sp>,NN					 		=> 01+<1>*10 NNl NNh
-ld	ix,NN								 		=> DD 21 NNl NNh
-ld	iy,NN								 		=> FD 21 NNl NNh
 
-ld	hl,(NN)										=> 2A NNl NNh
-ld	ix,(NN)										=> DD 2A NNl NNh
-ld	iy,(NN)										=> FD 2A NNl NNh
 
-ld	<bc.de.hl.sp>,(NN)							=> ED 4B+<1>*10 NNl NNh
 
-ld	(NN),hl										=> 22 NNl NNh
-ld	(NN),ix										=> DD 22 NNl NNh
-ld	(NN),iy										=> FD 22 NNl NNh
-
-ld	(NN),<bc.de.hl.sp>							=> ED 43+<2>*10 NNl NNh
-
-ld	sp,hl										=> F9
-ld	sp,ix										=> DD F9
-ld	sp,iy										=> FD F9
-
-push <bc.de.hl.af>								=> C5+<1>*10
-push ix											=> DD E5
-push iy											=> FD E5
-
-pop <bc.de.hl.af>								=> C1+<1>*10
-pop ix											=> DD E1
-pop iy											=> FD E1
 
 #------------------------------------------------------------------------------
 # Exchange, block transfer, search group
@@ -142,22 +309,6 @@ cpi												=> ED A1
 cpir											=> ED B1
 cpd												=> ED A9
 cpdr											=> ED B9
-
-#------------------------------------------------------------------------------
-# General purpose arithmetic and CPU control group
-
-daa 											=> 27
-cpl 											=> 2F
-neg 											=> ED 44
-ccf 											=> 3F
-scf 											=> 37
-nop 											=> 00
-halt											=> 76
-di 												=> F3
-ei	 											=> FB
-im	0 											=> ED 46
-im	1 											=> ED 56
-im	2 											=> ED 5E
 
 #------------------------------------------------------------------------------
 # 8 bit arithmetic and logical group
@@ -192,8 +343,6 @@ sub hl,<bc.de.hl.sp>							=> B7 ED 42+<2>*10
 <rlc.rrc.rl.rr.sla.sra.sli.srl> (ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS 00+<0:3>+<2>
 <rlc.rrc.rl.rr.sla.sra.sli.srl> (iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS 00+<0:3>+<2>
 
-rld															=> ED 6F
-rrd															=> ED 67
 
 # rotate 16 bits
 

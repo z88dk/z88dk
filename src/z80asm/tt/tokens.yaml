@@ -137,7 +137,7 @@ tokens:
 
   # Indirect 8-bit register
   - name	: IND_C
-    regexp	: '"(" hspace "C"i hspace ")"'
+    regexp	: '"(" hspace "C"i'
 
   # Indirect 16-bit register
   # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 

@@ -18,23 +18,26 @@ Define rules for a ragel-based parser.
 
 /* macros for actions - labels */
 #define DO_STMT_LABEL() \
-			if (str_len(stmt_label)) { \
-				asm_LABEL(str_data(stmt_label)); \
-				str_len(stmt_label) = 0; \
-			}
+			do { \
+				if (str_len(stmt_label)) { \
+					asm_LABEL(str_data(stmt_label)); \
+					str_len(stmt_label) = 0; \
+				} \
+			} while(0)
 
 /* macros for actions - statements */
 #define DO_stmt(opcode) \
-			{ \
+			do { \
 				DO_STMT_LABEL(); \
 				add_opcode(opcode); \
-			}
+			} while(0)
 
 #define _DO_stmt_(suffix, opcode) \
-			{ 	Expr *expr = pop_expr(ctx); \
+			do { \
+			 	Expr *expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_##suffix((opcode), expr); \
-			}
+			} while(0)
 
 #define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
 #define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
@@ -43,22 +46,25 @@ Define rules for a ragel-based parser.
 #define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
 
 #define DO_stmt_idx_n(opcode) \
-			{ 	Expr *n_expr   = pop_expr(ctx); \
+			do { \
+			 	Expr *n_expr   = pop_expr(ctx); \
 				Expr *idx_expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_idx_n((opcode), idx_expr, n_expr); \
-			}
+			} while(0)
 
 #define DO_stmt_emul(opcode, emul_func) \
-			{	DO_STMT_LABEL(); \
+			do { \
+				DO_STMT_LABEL(); \
 				add_opcode_emul((opcode), #emul_func); \
-			}
+			} while(0)
 
 #define DO_stmt_call_flag(flag) \
-			{ 	Expr *expr = pop_expr(ctx); \
+			do { \
+			 	Expr *expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_call_flag(FLAG_##flag, expr); \
-			}
+			} while(0)
 
 /*-----------------------------------------------------------------------------
 *   State Machine
@@ -371,8 +377,6 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 		| label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 
-#include "cpu_opcodes.h"
-#include "cpu_opcodes2.h"
 #include "tools/cpu_rules.h"
 
 		/*---------------------------------------------------------------------
@@ -445,44 +449,8 @@ Define rules for a ragel-based parser.
 #endfor <R1>
 		
 		/*---------------------------------------------------------------------
-		*   Emulated opcodes
-		*--------------------------------------------------------------------*/
-#foreach <OP> in CPI, CPIR, CPD, CPDR
-		| label? _TK_<OP> _TK_NEWLINE \
-		  @{ DO_stmt_emul( Z80_<OP>, #LCASE( rcmx_<OP> ) ); }  
-#endfor  <OP>
-
-		/*---------------------------------------------------------------------
 		*   16-bit ALU
 		*--------------------------------------------------------------------*/
-#foreach <X> in HL, IX, IY
-  #foreach <DD> in BC, DE, HL, SP
-		| label? _TK_ADD _TK_<X> _TK_COMMA 
-					#SUBST( _TK_<DD>, HL, <X> ) 
-					_TK_NEWLINE
-		  @{ DO_stmt( P_<X> + Z80_ADD16( REG_<DD> ) ); }
-  #endfor  <DD>
-#endfor  <X>
-
-#foreach <DD> in BC, DE, HL, SP
-		| label? _TK_ADD _TK_HL1 _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_ADD16( REG_<DD> ) ); }
-#endfor  <DD>
-
-#foreach <OP> in SBC, ADC
-  #foreach <DD> in BC, DE, HL, SP
-		| label? _TK_<OP> _TK_HL _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( Z80_<OP>16( REG_<DD> ) ); }
-		  
-		| label? _TK_<OP> _TK_HL1 _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP>16( REG_<DD> ) ); }
-  #endfor  <DD>
-#endfor  <OP>
-
-#foreach <DD> in BC, DE, HL, SP
-		| label? _TK_MLT _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( Z80_MLT( REG_<DD> ) ); }
-#endfor  <DD>
 
 		/* ADD SP, d */
 		| label? _TK_ADD _TK_SP _TK_COMMA expr _TK_NEWLINE
@@ -499,21 +467,6 @@ Define rules for a ragel-based parser.
 		| label? _TK_<OP> _TK_HL1 _TK_COMMA _TK_DE _TK_NEWLINE
 		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP>_HL_DE ); }
 #endfor <OP>
-
-		/*---------------------------------------------------------------------
-		*   INC / DEC
-		*--------------------------------------------------------------------*/
-#foreach <OP> in INC, DEC
-  #foreach <DD> in BC, DE, HL, SP, IX, IY
-		| label? _TK_<OP> _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( P_<DD> + Z80_<OP>16( REG_<DD> ) ); }
-  #endfor  <DD>
-  
-  #foreach <DD> in BC, DE, HL
-		| label? _TK_<OP> _TK_<DD>1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP>16( REG_<DD> ) ); }
-  #endfor  <DD>
-#endfor  <OP>
 
 		/*---------------------------------------------------------------------
 		*   Rotate and shift group
@@ -618,118 +571,14 @@ Define rules for a ragel-based parser.
 #endfor  <OP>
 
 		/*---------------------------------------------------------------------
-		*   JP, JR, DJNZ, CALL, RET
-		*--------------------------------------------------------------------*/
-#foreach <OP> in JR, DJNZ
-		| label? _TK_<OP> expr _TK_NEWLINE
-		  @{ DO_stmt_jr( Z80_<OP> ); }
-#endfor  <OP>
-
-		| label? _TK_DJNZ _TK_B _TK_COMMA expr _TK_NEWLINE
-		  @{ DO_stmt_jr( Z80_DJNZ ); }
-
-		| label? _TK_DJNZ _TK_B1 _TK_COMMA expr _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt_jr( Z80_DJNZ ); }
-
-#foreach <OP> in JP, CALL
-		| label? _TK_<OP> expr _TK_NEWLINE
-		  @{ DO_stmt_nn( Z80_<OP> ); }
-#endfor  <OP>
-
-#foreach <FLAG> in NZ, Z, NC, C
-		| label? _TK_JR _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
-		  @{ DO_stmt_jr( Z80_JR_FLAG( FLAG_<FLAG> ) ); }
-#endfor  <FLAG>
-
-#foreach <FLAG> in NZ, Z, NC, C, PO, PE, P, M, LZ, LO
-		| label? _TK_JP _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
-		  @{ DO_stmt_nn( Z80_JP_FLAG( FLAG_<FLAG> ) ); }
-
-		| label? _TK_CALL _TK_<FLAG> _TK_COMMA expr _TK_NEWLINE
-		  @{ DO_stmt_call_flag( <FLAG> ); }
-
-		| label? _TK_RET _TK_<FLAG> _TK_NEWLINE
-		  @{ DO_stmt( Z80_RET_FLAG( FLAG_<FLAG> ) ); }
-#endfor  <FLAG>
-
-		| label? _TK_JP _TK_IND_HL _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt( Z80_JP_idx ); }
-		
-#foreach <X> in IX, IY
-		| label? _TK_JP _TK_IND_<X> _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt( P_<X> + Z80_JP_idx ); }
-#endfor  <X>
-
-		/*---------------------------------------------------------------------
-		*   IN, OUT
-		*--------------------------------------------------------------------*/
-#foreach <R> in B, C, D, E, H, L, A
-		| label? _TK_OUT _TK_IND_C _TK_COMMA _TK_<R> _TK_NEWLINE 
-		  @{ DO_stmt( Z80_OUT_C_REG( REG_<R> ) ); }
-#endfor  <R>
-
-		| label? _TK_OUT _TK_IND_C _TK_COMMA const_expr _TK_NEWLINE 
-		  @{ if (!expr_error) {
-			   if (expr_value != 0) 
-			     error_int_range(expr_value);
-			   else 
-			     DO_stmt( Z80_OUT_C_REG( REG_idx ) ); 
-			 }
-		  }
-
-#foreach <R> in B, C, D, E, H, L, F, A
-		| label? _TK_IN _TK_<R> _TK_COMMA _TK_IND_C _TK_NEWLINE
-		  @{ DO_stmt( Z80_IN_REG_C( REG_<R> ) ); }
-		
-		| label? _TK_IN0 _TK_<R> _TK_COMMA expr _TK_NEWLINE
-		  @{ if (!expr_in_parens) return FALSE;
-		     DO_stmt_n( Z80_IN0( REG_<R> ) ); }		
-
-	    | label? _TK_OUT0 expr _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ if (!expr_in_parens) return FALSE;
-		     DO_stmt_n( Z80_OUT0( REG_<R> ) ); }		
-#endfor  <R>
-
-		| label? _TK_IN _TK_A _TK_COMMA expr _TK_NEWLINE
-		  @{ if (!expr_in_parens) return FALSE;
-		     DO_stmt_n( Z80_IN_A_n ); }
-		
-		| label? _TK_OUT expr _TK_COMMA _TK_A _TK_NEWLINE 
-		  @{ if (!expr_in_parens) return FALSE;
-		     DO_stmt_n( Z80_OUT_n_A ); }
-
-		| label? _TK_TSTIO expr _TK_NEWLINE
-		  @{ DO_stmt_n( Z80_TSTIO ); }
-		
-		/*---------------------------------------------------------------------
 		*   opcodes without arguments
 		*--------------------------------------------------------------------*/
 #foreach <OP> in RLA, RLCA, RRA, RRCA, \
-				 NOP, \
-				 DI, EI, HALT, \
-				 LDI, LDIR, LDD, LDDR, \
-				 INI, INIR, IND, INDR, \
-				 RET, RETN, RETI, \
-				 OTDR, OTIR, OUTD, OUTI, \
-				 SLP, \
-				 OTIM, OTIMR, OTDM, OTDMR, \
-				 IOI, IOE, IPRES, \
-				 IDET, \
-				 LDDSR, LDISR, LSDR, LSIR, LSDDR, LSIDR, \
-				 MUL, RDMODE, SETUSR, SURES, SYSCALL, UMA, UMS
+				 IOI, IOE
 		| label? _TK_<OP> _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP> ); }
 #endfor  <OP>	
 
-		/*---------------------------------------------------------------------
-		*   opcodes constant argument
-		*--------------------------------------------------------------------*/
-#foreach <OP> in IM, RST, IPSET
-		| label? _TK_<OP> const_expr _TK_NEWLINE
-		  @{ if (!expr_error)
-				DO_stmt( Z80_<OP>( expr_value ) );
-		  }
-#endfor  <OP>
 
 		/*---------------------------------------------------------------------
 		*   Rabbit Opcodes

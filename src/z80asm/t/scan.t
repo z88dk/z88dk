@@ -619,12 +619,16 @@ t_compile_module($init, <<'END', $objs);
 	SetTemporaryLine("f (c) (\t c \t) "
 					 "F (C) (\t C \t) ");
 	T_GET(TK_F,     "f");
-	T_GET(TK_IND_C, "(c)");
-	T_GET(TK_IND_C, "(\t c \t)");
+	T_GET(TK_IND_C, "(c");
+	T_RPAREN();
+	T_GET(TK_IND_C, "(\t c");
+	T_RPAREN();
 					 
 	T_GET(TK_F,     "F");
-	T_GET(TK_IND_C, "(C)");
-	T_GET(TK_IND_C, "(\t C \t)");
+	T_GET(TK_IND_C, "(C");
+	T_RPAREN();
+	T_GET(TK_IND_C, "(\t C");
+	T_RPAREN();
 	T_END();
 					 
 	SetTemporaryLine("bc bc' de de' hl hl' af af' sp ix iy "

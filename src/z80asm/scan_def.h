@@ -155,7 +155,7 @@ TOKEN_KW(R,   )
 TOKEN_KW(EIR, )
 
 /* indirect 8-bit register */
-TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )
+TOKEN_RE(TK_IND_C, "(C", "(" hspace "C"i, )
 
 /* 16-bit registers */
 TOKEN_KW(BC, )
