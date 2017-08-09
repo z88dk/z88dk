@@ -85,18 +85,7 @@ ENDIF
 
 __Start:
 
-   IF __page_zero_present = 0
-   
-      include "../crt_start_di.inc"
-   
-   ENDIF
-
-   EXTERN __code_vector_head
-   
-   ld a,__code_vector_head/256
-   ld i,a
-
-   include "../crt_set_interrupt_mode.inc"
+   include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -128,6 +117,10 @@ __Restart_2:
 
    include "../clib_init_bss.inc"
 
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -136,8 +129,6 @@ SECTION code_crt_main
    ; call user program
    
    call _main                  ; hl = return status
-
-__Leave:
 
    ; run exit stack
 
@@ -174,6 +165,8 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "../crt_jump_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

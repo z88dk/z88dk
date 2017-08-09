@@ -179,6 +179,28 @@
       
    ENDIF
 
+IF __Z180
+
+   IFDEF CRT_IO_VECTOR_BASE
+   
+      defc __crt_io_vector_base = CRT_IO_VECTOR_BASE
+   
+   ELSE
+   
+      IFDEF TAR__crt_io_vector_base
+      
+         defc __crt_io_vector_base = TAR__crt_io_vector_base
+      
+      ELSE
+      
+         defc __crt_io_vector_base = DEF__crt_io_vector_base
+      
+      ENDIF
+      
+   ENDIF
+
+ENDIF
+
    IFDEF CRT_INTERRUPT_MODE
    
       defc __crt_interrupt_mode = CRT_INTERRUPT_MODE
@@ -507,5 +529,53 @@
    
    defc __exit_stack_size = __clib_exit_stack_size
    defc __quickexit_stack_size = __clib_quickexit_stack_size
+
+   IF __Z180
+   
+      PUBLIC __IO_VECTOR_BASE
+      
+      IF __crt_io_vector_base < 0
+      
+         IF (__crt_org_vector_table < 0)
+         
+            IF (-__crt_org_vector_table) & 0x1f
+            
+               "Cannot place __IO_VECTOR_BASE at start of interrupt vector table"
+            
+            ELSE
+            
+               defc __IO_VECTOR_BASE = (-__crt_org_vector_table) & 0xe0
+               
+            ENDIF
+         
+         ELSE
+         
+            IF __crt_org_vector_table & 0x1f
+            
+               "Cannot place __IO_VECTOR_BASE at start of interrupt vector table"
+            
+            ELSE
+            
+               defc __IO_VECTOR_BASE = __crt_org_vector_table & 0xe0
+
+            ENDIF
+            
+         ENDIF
+      
+      ELSE
+      
+         IF __crt_io_vector_base & 0x1f
+         
+            "Illegal __IO_VECTOR_BASE"
+         
+         ELSE
+
+            defc __IO_VECTOR_BASE = __crt_io_vector_base & 0xe0
+         
+         ENDIF
+      
+      ENDIF
+   
+   ENDIF
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

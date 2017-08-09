@@ -1,6 +1,8 @@
 
 ; void *fzx_string_partition(struct fzx_font *ff, char *s, uint16_t allowed_width)
 
+INCLUDE "config_private.inc"
+
 SECTION code_font
 SECTION code_font_fzx
 
@@ -29,6 +31,12 @@ partition_loop:
 
    ld a,(de)
    or a
+   jr z, end_string_0
+   
+   cp CHAR_LF
+   jr z, end_string_0
+   
+   cp CHAR_CR
    jr z, end_string_0
    
    call __fzx_string_glyph_width

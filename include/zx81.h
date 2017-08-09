@@ -321,13 +321,13 @@ extern int  __LIB__              zx_getstr(char variable, char *value) __smallc;
 extern void __LIB__              zx_setstr(char variable, char *value) __smallc;
 extern int  __LIB__  zx_getint(char *variable) __z88dk_fastcall;
 extern void __LIB__              zx_setint(char *variable, int value) __smallc;
-extern double __LIB__  zx_getfloat(char *variable) __z88dk_fastcall;
-extern void __LIB__              zx_setfloat(char *variable, float value) __smallc;
+extern double_t __LIB__  zx_getfloat(char *variable) __z88dk_fastcall;
+extern void __LIB__              zx_setfloat(char *variable, double_t value) __smallc;
 
 extern int  __LIB__    zx_getstr_callee(char variable, char *value) __smallc __z88dk_callee;
 extern void __LIB__    zx_setstr_callee(char variable, char *value) __smallc __z88dk_callee;
 extern void __LIB__    zx_setint_callee(char *variable, int value) __smallc __z88dk_callee;
-extern void __LIB__    zx_setfloat_callee(char *variable, float value) __smallc __z88dk_callee;
+extern void __LIB__    zx_setfloat_callee(char *variable, double_t value) __smallc __z88dk_callee;
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)

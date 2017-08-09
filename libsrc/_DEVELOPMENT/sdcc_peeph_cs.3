@@ -3213,6 +3213,127 @@ barrier
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_intrinsic_outi_num_256
+} by {
+	call	____sdcc_outi_256
+	; peephole z88dk-intrinsic-outi-num-256
+}
+
+replace restart {
+	jp	_intrinsic_outi_num_256
+} by {
+	jp	____sdcc_outi_256
+	; peephole z88dk-intrinsic-outi-num-256
+}
+
+replace restart {
+	call	_intrinsic_outi_num_128
+} by {
+	call	____sdcc_outi_128
+	; peephole z88dk-intrinsic-outi-num-128
+}
+
+replace restart {
+	jp	_intrinsic_outi_num_128
+} by {
+	jp	____sdcc_outi_128
+	; peephole z88dk-intrinsic-outi-num-128
+}
+
+barrier
+
+replace restart {
+	call	_intrinsic_outi_num_%1
+} by {
+	call	____sdcc_outi-(%1*2)
+	; peephole z88dk-intrinsic-outi-num-%1
+}
+
+replace restart {
+	jp	_intrinsic_outi_num_%1
+} by {
+	jp	____sdcc_outi-(%1*2)
+	; peephole z88dk-intrinsic-outi-num-%1
+}
+
+replace restart {
+	call	_intrinsic_outi_port_%1
+} by {
+	ld	c,#%1
+	; peephole z88dk-intrinsic-outi-port-%1
+}
+
+replace restart {
+	call	_intrinsic_outi
+} by {
+	; peephole z88dk-intrinsic-outi
+}
+
+barrier
+
+replace restart {
+	call	_intrinsic_ldi_num_256
+} by {
+	call	____sdcc_ldi_256
+	; peephole z88dk-intrinsic-ldi-num-256
+}
+
+replace restart {
+	jp	_intrinsic_ldi_num_256
+} by {
+	jp	____sdcc_ldi_256
+	; peephole z88dk-intrinsic-ldi-num-256
+}
+
+replace restart {
+	call	_intrinsic_ldi_num_128
+} by {
+	call	____sdcc_ldi_128
+	; peephole z88dk-intrinsic-ldi-num-128
+}
+
+replace restart {
+	jp	_intrinsic_ldi_num_128
+} by {
+	jp	____sdcc_ldi_128
+	; peephole z88dk-intrinsic-ldi-num-128
+}
+
+barrier
+
+replace restart {
+	call	_intrinsic_ldi_num_%1
+} by {
+	call	____sdcc_ldi-(%1*2)
+	; peephole z88dk-intrinsic-ldi-num-%1
+}
+
+replace restart {
+	jp	_intrinsic_ldi_num_%1
+} by {
+	jp	____sdcc_ldi-(%1*2)
+	; peephole z88dk-intrinsic-ldi-num-%1
+}
+
+replace restart {
+	call	_intrinsic_ldi
+} by {
+	pop	de
+	pop	hl
+	; peephole z88dk-intrinsic-ldi
+}
+
+replace restart {
+	call	____sdcc_ldi%1
+	ret
+} by {
+	jp	____sdcc_ldi%1
+	; peephole z88dk-intrinsic-ldi-tailcall
+}
+
+barrier
+
+replace restart {
 	call	_intrinsic_slp
 } by {
 	slp
@@ -28212,6 +28333,16 @@ replace restart {
 	ld	a,h
 	; peephole z88dk-606ay
 }
+
+replace restart {
+	ld	%1,%2
+	ld	%3,%4
+	ld	%2,%1
+} by {
+	ld	%1,%2
+	ld	%3,%4
+	; peephole z88dk-606az
+} if notSame(%1 %3), notSame(%2 %3), same(%1 'a' 'b' 'c' 'd' 'e' 'h' 'l'), same(%2 'a' 'b' 'c' 'd' 'e' 'h' 'l')
 
 replace restart {
 	ld	hl,#%1

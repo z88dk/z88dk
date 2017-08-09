@@ -1,6 +1,8 @@
 
 ; void *fzx_buffer_partition_ww(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width)
 
+INCLUDE "config_private.inc"
+
 SECTION code_font
 SECTION code_font_fzx
 
@@ -42,6 +44,12 @@ consume_spaces_loop:
 
    ld a,(de)
    
+   cp CHAR_LF
+   jr z, end_buffer_accept
+   
+   cp CHAR_CR
+   jr z, end_buffer_accept
+   
    cp ' '
    jr nz, consume_word_loop
 
@@ -67,11 +75,17 @@ consume_word_loop:
    
    ld a,(de)
    
+   cp CHAR_LF
+   jr z, end_buffer_accept
+   
+   cp CHAR_CR
+   jr z, end_buffer_accept
+   
    cp ' '
    jr nz, consume_word_loop
 
    ; word ends
-   
+
    pop af                      ; junk last save point
    pop af
    pop af

@@ -73,46 +73,46 @@
 
 
 
-#define ACIA_CTRL_ADDR    0x80
-#define ACIA_STATUS_ADDR  0x80
-#define ACIA_DATA_ADDR    0x81
+#define __IO_ACIA_CONTROL_REGISTER    0x80
+#define __IO_ACIA_STATUS_REGISTER  0x80
+#define __IO_ACIA_DATA_REGISTER    0x81
 
-#define ACIA_CLK_DIV_01   0x00
-#define ACIA_CLK_DIV_16   0x01
-#define ACIA_CLK_DIV_64   0x02
-#define ACIA_RESET        0x03
+#define __IO_ACIA_CR_CLK_DIV_01   0x00
+#define __IO_ACIA_CR_CLK_DIV_16   0x01
+#define __IO_ACIA_CR_CLK_DIV_64   0x02
+#define __IO_ACIA_CR_RESET        0x03
 
-#define ACIA_7E2          0x00
-#define ACIA_7O2          0x04
-#define ACIA_7E1          0x08
-#define ACIA_7O1          0x0C
-#define ACIA_8N2          0x10
-#define ACIA_8N1          0x14
-#define ACIA_8E1          0x18
-#define ACIA_8O1          0x1C
+#define __IO_ACIA_CR_7E2          0x00
+#define __IO_ACIA_CR_7O2          0x04
+#define __IO_ACIA_CR_7E1          0x08
+#define __IO_ACIA_CR_7O1          0x0C
+#define __IO_ACIA_CR_8N2          0x10
+#define __IO_ACIA_CR_8N1          0x14
+#define __IO_ACIA_CR_8E1          0x18
+#define __IO_ACIA_CR_8O1          0x1C
 
-#define ACIA_TDI_RTS0     0x00
-#define ACIA_TEI_RTS0     0x20
-#define ACIA_TDI_RTS1     0x40
-#define ACIA_TDI_BRK      0x60
+#define __IO_ACIA_CR_TDI_RTS0     0x00
+#define __IO_ACIA_CR_TEI_RTS0     0x20
+#define __IO_ACIA_CR_TDI_RTS1     0x40
+#define __IO_ACIA_CR_TDI_BRK      0x60
    
-#define ACIA_TEI_MASK     0x60
+#define __IO_ACIA_CR_TEI_MASK     0x60
 
-#define ACIA_REI          0x80
+#define __IO_ACIA_CR_REI          0x80
 
-#define ACIA_RDRF         0x01
-#define ACIA_TDRE         0x02
-#define ACIA_DCD          0x04
-#define ACIA_CTS          0x08
-#define ACIA_FE           0x10
-#define ACIA_OVRN         0x20
-#define ACIA_PE           0x40
-#define ACIA_IRQ          0x80
+#define __IO_ACIA_SR_RDRF         0x01
+#define __IO_ACIA_SR_TDRE         0x02
+#define __IO_ACIA_SR_DCD          0x04
+#define __IO_ACIA_SR_CTS          0x08
+#define __IO_ACIA_SR_FE           0x10
+#define __IO_ACIA_SR_OVRN         0x20
+#define __IO_ACIA_SR_PE           0x40
+#define __IO_ACIA_SR_IRQ          0x80
 
-#define ACIA_RX_SIZE      0x100
-#define ACIA_RX_FULLISH   248
-#define ACIA_RX_EMPTYSIZE 0x08
-#define ACIA_TX_SIZE      0x10
+#define __IO_ACIA_RX_SIZE      0x100
+#define __IO_ACIA_RX_FULLISH   248
+#define __IO_ACIA_RX_EMPTYISH 0x08
+#define __IO_ACIA_TX_SIZE      0x10
 
 
 
@@ -193,7 +193,7 @@
 
 #define CHAR_CR  13
 #define CHAR_LF  10
-#define CHAR_BS  12
+#define CHAR_BS  8
 #define CHAR_ESC  27
 #define CHAR_CAPS  6
 #define CHAR_BELL  7
@@ -287,13 +287,14 @@
 #define __CLIB_OPT_SCANF_2_llo  0x10
 #define __CLIB_OPT_SCANF_2_lli  0x40
 
-#define __CLIB_OPT_FASTCOPY  0x00
+#define __CLIB_OPT_UNROLL  0x00
 
-#define __CLIB_OPT_FASTCOPY_MEMCPY  0x01
-#define __CLIB_OPT_FASTCOPY_MEMSET  0x02
-#define __CLIB_OPT_FASTCOPY_LDIR  0x20
-#define __CLIB_OPT_FASTCOPY_LDIR_SMC  0x40
-#define __CLIB_OPT_FASTCOPY_MEMCPY_SMC  0x80
+#define __CLIB_OPT_UNROLL_MEMCPY  0x01
+#define __CLIB_OPT_UNROLL_MEMSET  0x02
+#define __CLIB_OPT_UNROLL_OTIR  0x10
+#define __CLIB_OPT_UNROLL_LDIR  0x20
+#define __CLIB_OPT_UNROLL_USER_SMC  0x40
+#define __CLIB_OPT_UNROLL_LIB_SMC  0x80
 
 #define __CLIB_OPT_STRTOD  0x00
 

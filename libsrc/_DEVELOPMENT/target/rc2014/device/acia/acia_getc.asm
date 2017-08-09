@@ -4,8 +4,9 @@
 
     PUBLIC _acia_getc
 
-    EXTERN ACIA_RX_SIZE, ACIA_RX_EMPTYSIZE
-    EXTERN ACIA_TEI_MASK, ACIA_TDI_RTS0, ACIA_CTRL_ADDR
+    EXTERN __IO_ACIA_CONTROL_REGISTER
+    EXTERN __IO_ACIA_CR_TEI_MASK, __IO_ACIA_CR_TDI_RTS0
+    EXTERN __IO_ACIA_RX_EMPTYISH
 
     EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
     EXTERN asm_z80_push_di, asm_z80_pop_ei
@@ -34,16 +35,16 @@
         dec (hl)                    ; atomically decrement Rx count
         ld a,(hl)                   ; get the newly decremented Rx count
 
-        cp ACIA_RX_EMPTYSIZE        ; compare the count with the preferred empty size
+        cp __IO_ACIA_RX_EMPTYISH    ; compare the count with the preferred empty size
         jr nc, get_clean_up_rx      ; if the buffer is full, don't change the RTS
 
         call asm_z80_push_di        ; critical section begin
         
         ld a, (aciaControl)         ; get the ACIA control echo byte
-        and ~ACIA_TEI_MASK          ; mask out the Tx interrupt bits
-        or ACIA_TDI_RTS0            ; set RTS low.
+        and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
+        or __IO_ACIA_CR_TDI_RTS0    ; set RTS low.
         ld (aciaControl), a	        ; write the ACIA control echo byte back
-        out (ACIA_CTRL_ADDR), a     ; set the ACIA CTRL register
+        out (__IO_ACIA_CONTROL_REGISTER), a    ; set the ACIA CTRL register
         
         call asm_z80_pop_ei         ; critical section end
 

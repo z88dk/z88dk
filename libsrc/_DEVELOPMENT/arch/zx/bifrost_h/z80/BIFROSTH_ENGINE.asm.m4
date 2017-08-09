@@ -47,7 +47,7 @@ draw_updown_tiles:
         ld      a, d
         add     a, 16
         ld      d, a
-		  
+        
 PUBLIC asm_BIFROSTH_drawTilePosH
 
 asm_BIFROSTH_drawTilePosH:
@@ -84,7 +84,7 @@ fill_tile_attr:
         ld      h, attribs/512
         ld      l, d
         add     hl, hl
-        ld      bc, attribs-(attribs/512)*512
+        ld      bc, attribs-((attribs/512)*512)
         add     hl, bc
         ld      sp, hl
         ld      h, deltas/256
@@ -572,11 +572,11 @@ exit_raster:
         pop     de
         pop     bc
         pop     af
-		  
+        
 _BIFROSTH_ISR_HOOK:
 
         ei
-		  reti
+        reti
 
 ; -----------------------------------------------------------------------------
 ; RAND USR 64995 to activate engine
@@ -592,22 +592,27 @@ asm_BIFROSTH_start:
         ld      a, $fe
         ld      i, a
         im      2
+        ld      hl,main_engine
+        ld      ($fdfe),hl
         ei
         ret
 
 ; -----------------------------------------------------------------------------
 ; RAND USR 65012 to deactivate engine
+; replaced
+;
+;PUBLIC asm_BIFROSTH_stop
+;
+;asm_BIFROSTH_stop:
+;
+;        di
+;        ld      a, $3f
+;        ld      i, a
+;        im      1
+;        ei
+;        ret
 
-PUBLIC asm_BIFROSTH_stop
-
-asm_BIFROSTH_stop:
-
-        di
-        ld      a, $3f
-        ld      i, a
-        im      1
-        ei
-        ret
+defs $fdfd - $ded7 - ASMPC
 
 ; -----------------------------------------------------------------------------
 ; interrupt address at $fdfd

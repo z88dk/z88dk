@@ -42,7 +42,75 @@
 	EXTERN	ansifont_is_packed
 	EXTERN	ansifont
 
-.ansi_CHAR
+ansi_CHAR:
+	ld	b,a		;save character
+	ld	a,ansicharacter_pixelwidth
+	cp	8
+	ld	a,b
+	jr	nz,ansi_CHAR_flexible
+; So we can fast path 32 column printing
+	ex	af,af		;save character
+	ld	a,(ansi_COLUMN)
+	ld	l,a
+	ld	a,(ansi_ROW)
+	ld	h,a
+	rrca
+	rrca
+	rrca
+	and	0xe0
+	or	l
+	ld	e,a
+	ld	a,h
+	and	0x18
+	or	0x40
+	ld	d,a		;hl = screen address
+
+	ex	af,af		;a = character to print
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	bc,ansifont-256
+	add	hl,bc		;hl = bitmap to print
+
+	ld	b,7
+	ld	a,(INVRS)
+	ld	c,a
+char_loop:
+	ld	a,(hl)
+	bit	0,c
+	jr	z,no_invers
+	cpl
+no_invers:
+	ld	(de),a
+	inc	hl
+	inc	d
+	djnz 	char_loop
+; Now check for underline
+	ld	c,(hl)		;next row to print
+	ld	a,(INVRS+2)
+	cp	24		;some magic change i think
+	jr	z,no_underline
+	ld	c,255
+no_underline:
+	ld	a,c
+	ld	(de),a
+
+; Now convert display address into attribute
+	ld	a,d
+	rra	
+	rra
+	rra
+	and	3
+	or	0x58
+	ld	d,a
+  	ld	a,(23693)  ;Current color attributes
+	ld	(de),a
+	ret
+; End of fast path for 32 columns
+
+.ansi_CHAR_flexible
   ld (char+1),a
   ld a,(ansi_ROW)       ; Line text position
   push af

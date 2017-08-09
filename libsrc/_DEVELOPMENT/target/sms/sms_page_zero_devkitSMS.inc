@@ -34,7 +34,7 @@ __RST08_SMS_crt0_RST08:
 _SMS_crt0_RST18:               ; Restart 18h - write HL to VDP Data Port
 __RST18_SMS_crt0_RST18:
 
-   ld a,l                      ; (respecting VRAM time costraints)
+   ld a,l                      ; (respecting VRAM time constraints)
    out (__IO_VDP_DATA),a       ; 11
    ld a,h                      ; 4
    sub 0                       ; 7
@@ -48,15 +48,30 @@ __RST18_SMS_crt0_RST18:
 
    defs 0x0028 - ASMPC
 
-IF (__crt_enable_rst & $20)
+IF ((__crt_enable_rst & $2020) = $20)
 
    EXTERN _z80_rst_28h
-   jp _z80_rst_28h
+   jp     _z80_rst_28h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $2020) = $2020)
 
+   jp     __z80_rst_28h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $2020) != $2020)
+   
+   PUBLIC _z80_rst_28h_vector
+   defc   _z80_rst_28h_vector = $29
+      
 ENDIF
 
    PUBLIC l_ret
@@ -73,15 +88,30 @@ l_ret:
 
    defs 0x0030 - ASMPC
 
-IF (__crt_enable_rst & $40)
+IF ((__crt_enable_rst & $4040) = $40)
 
    EXTERN _z80_rst_30h
-   jp _z80_rst_30h
+   jp     _z80_rst_30h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $4040) = $4040)
 
+   jp     __z80_rst_30h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $4040) != $4040)
+   
+   PUBLIC _z80_rst_30h_vector
+   defc   _z80_rst_30h_vector = $31
+      
 ENDIF
 
 IF __SDCC_IY
@@ -131,10 +161,15 @@ ENDIF
 
    defs 0x0038 - ASMPC
 
-IF (__crt_enable_rst & $80)
+IF ((__crt_enable_rst & $8080) = $80)
 
    EXTERN _z80_rst_38h
-   jp _z80_rst_38h
+   jp     _z80_rst_38h
+
+ELSE
+IF ((__crt_enable_rst & $8080) = $8080)
+
+   jp     __z80_rst_38h
 
 ELSE
 IF (__SMSLIB_ENABLE_MDPAD = 0)
@@ -148,6 +183,14 @@ ELSE
    jp     asm_SMSlib_isr_mdpad
 
 ENDIF
+ENDIF
+ENDIF
+
+IF ((__crt_enable_rst & $8080) != $8080)
+   
+   PUBLIC _z80_rst_38h_vector
+   defc   _z80_rst_38h_vector = $39
+      
 ENDIF
 
    PUBLIC l_setmem_hl
@@ -211,10 +254,15 @@ error_mc:
 
    defs 0x0066 - ASMPC
 
-IF __crt_enable_nmi
+IF (__crt_enable_nmi = 1)
 
    EXTERN _z80_nmi
-   jp _z80_nmi
+   jp     _z80_nmi
+
+ELSE
+IF (__crt_enable_nmi > 1)
+
+   jp     __z80_nmi
 
 ELSE
 
@@ -222,3 +270,13 @@ ELSE
    jp     asm_SMSlib_nmi_isr
 
 ENDIF
+ENDIF
+
+IF (__crt_enable_nmi <= 1)
+   
+   PUBLIC _z80_nmi_vector
+   defc   _z80_nmi_vector = $67
+      
+ENDIF
+
+defc __page_zero_present = 1

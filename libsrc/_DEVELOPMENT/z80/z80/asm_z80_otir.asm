@@ -9,11 +9,21 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_otir
 PUBLIC asm_cpu_otir
+
+IF (__CLIB_OPT_UNROLL & 0x10)
+
+EXTERN l_outi_loop
+defc   asm_z80_otir = l_outi_loop
+defc   asm_cpu_otir = l_outi_loop
+
+ELSE
 
 asm_z80_otir:
 asm_cpu_otir:
@@ -28,3 +38,5 @@ asm_cpu_otir:
    
    otir
    ret
+
+ENDIF

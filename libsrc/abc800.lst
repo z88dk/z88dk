@@ -17,7 +17,8 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite_smc
 graphics/liner
-graphics/stencil_render
+graphics/draw_profile
+graphics/stencil_render2
 graphics/swapgfxbk_foo
 games/obj/${TARGET}/joystick
 abc800/abc_cursor

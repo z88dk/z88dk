@@ -16,19 +16,44 @@
 #define __CONIO_H__
 
 // this is used by getch, putch and ungetch.
-//#include <sys/compiler.h>
+#include <sys/compiler.h>
 #include <stdio.h>
 #include <stdlib.h>
 //#include <graphics.h>
 #include <dos.h>
 #include <X11/Xz88dk.h>
 
+
+#if defined __SVI__ || defined __MSX__
+#define gotoxy(a,b)     printf("\033Y%c%c",b+31,a+31)
+#define delline()	printf("\033M")
+#define clrscr() printf("\033E")
+#define clreol() printf("\033K")
+#endif
+
+#if __SC3000__
+char *sc_cursor_pos = 0x9489;
+#define gotoxy(a,b)     sc_cursor_pos[0]=a; sc_cursor_pos[1]=b
+#define clrscr() printf("\014")
+#endif
+
+#if __M5__
+unsigned char *sc_cursor_pos = 0x70A6;
+#define gotoxy(a,b)     sc_cursor_pos[1]=a-1; sc_cursor_pos[0]=b-1
+#define clrscr() printf("\014")
+#endif
+
+
+/* Fallback to ANSI VT escape sequences */
+#ifndef gotoxy
+
 #define MAXCOLORS       15
 enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
               LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE };
 
 // Color translation table
-int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
+static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
+
 // QUICK C syntax
 #define settextcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
 // TURBO C syntax
@@ -44,6 +69,11 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define clrscr() printf("\033[%um\033[%um%c",30,47,12)
 #define clreol() printf("\033[K")
 
+#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+
+#endif
+
 /* The leading underscores are for compatibility with the 
  * Digital Mars library */
 
@@ -56,30 +86,21 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define cscanf scanf
 #define _cscanf scanf
 
-#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
-#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
-
-/* Reads a character directly from the console, (without echo?) */
-#define getch()  fgetc_cons()
-#define _getch()  fgetc_cons()
 /* Reads a character directly from the console, (with echo ?) */
-#define getche() fgetc_cons()               // not sure about this one...
-#define _getche() fgetc_cons()                // not sure about this one...
+#define getche() getch()               // not sure about this one...
+#define _getche() getch()                // not sure about this one...
 // Direct output to console
-#define putch(a) fputc_cons()
-#define _putch(a) fputc_cons()
+#define putch(a) fputc_cons(a)
+#define _putch(a) fputc_cons(a)
 
 // can't be fixed easily.. i.e. the simplified gets won't work
 //#define ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 //#define _ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 
-#ifndef kbhit
-#define kbhit() (getk() ? 1 : 0)
-#define _kbhit() (getk() ? 1 : 0)
-#endif
-
 #define random(a) rand()%a
 
+extern int __LIB__ kbhit(void);
+extern int __LIB__ getch(void);
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);

@@ -5,20 +5,41 @@
    ld a,__IO_BASE_ADDRESS
 
    jp __Test_Trap
+
+   PUBLIC l_retn
+
+l_retn:
+
+   retn
    
 ; address = 0x0008
 
    defs 0x0008 - ASMPC
 
-IF (__crt_enable_rst & $02)
+IF ((__crt_enable_rst & $0202) = $02)
 
    EXTERN _z180_rst_08h
-   jp _z180_rst_08h
+   jp     _z180_rst_08h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $0202) = $0202)
 
+   jp     __z180_rst_08h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $0202) != $0202)
+   
+   PUBLIC _z180_rst_08h_vector
+   defc   _z180_rst_08h_vector = $09
+      
 ENDIF
 
    defm "Z88DK"
@@ -27,15 +48,30 @@ ENDIF
 
    defs 0x0010 - ASMPC
 
-IF (__crt_enable_rst & $04)
+IF ((__crt_enable_rst & $0404) = $04)
 
    EXTERN _z180_rst_10h
-   jp _z180_rst_10h
+   jp     _z180_rst_10h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $0404) = $0404)
 
+   jp     __z180_rst_10h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $0404) != $0404)
+   
+   PUBLIC _z180_rst_10h_vector
+   defc   _z180_rst_10h_vector = $11
+      
 ENDIF
 
    defm "1.99C"
@@ -43,16 +79,31 @@ ENDIF
 ; address = 0x0018
 
    defs 0x0018 - ASMPC
-   
-IF (__crt_enable_rst & $08)
+
+IF ((__crt_enable_rst & $0808) = $08)
 
    EXTERN _z180_rst_18h
-   jp _z180_rst_18h
+   jp     _z180_rst_18h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $0808) = $0808)
 
+   jp     __z180_rst_18h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $0808) != $0808)
+   
+   PUBLIC _z180_rst_18h_vector
+   defc   _z180_rst_18h_vector = $19
+      
 ENDIF
 
    PUBLIC l_dec_de
@@ -69,15 +120,30 @@ l_dec_de:
 
    defs 0x0020 - ASMPC
 
-IF (__crt_enable_rst & $10)
+IF ((__crt_enable_rst & $1010) = $10)
 
    EXTERN _z180_rst_20h
-   jp _z180_rst_20h
+   jp     _z180_rst_20h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $1010) = $1010)
 
+   jp     __z180_rst_20h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $1010) != $1010)
+   
+   PUBLIC _z180_rst_20h_vector
+   defc   _z180_rst_20h_vector = $21
+      
 ENDIF
 
    PUBLIC l_dec_bc
@@ -94,15 +160,30 @@ l_dec_bc:
 
    defs 0x0028 - ASMPC
 
-IF (__crt_enable_rst & $20)
+IF ((__crt_enable_rst & $2020) = $20)
 
    EXTERN _z180_rst_28h
-   jp _z180_rst_28h
+   jp     _z180_rst_28h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $2020) = $2020)
 
+   jp     __z180_rst_28h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $2020) != $2020)
+   
+   PUBLIC _z180_rst_28h_vector
+   defc   _z180_rst_28h_vector = $29
+      
 ENDIF
 
    PUBLIC l_ret
@@ -119,15 +200,30 @@ l_ret:
 
    defs 0x0030 - ASMPC
 
-IF (__crt_enable_rst & $40)
+IF ((__crt_enable_rst & $4040) = $40)
 
    EXTERN _z180_rst_30h
-   jp _z180_rst_30h
+   jp     _z180_rst_30h
 
 ELSE
 
-   ret
+   IF ((__crt_enable_rst & $4040) = $4040)
 
+   jp     __z180_rst_30h
+
+   ELSE
+
+   jp     l_ret
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $4040) != $4040)
+   
+   PUBLIC _z180_rst_30h_vector
+   defc   _z180_rst_30h_vector = $31
+      
 ENDIF
 
 IF __SDCC_IY
@@ -177,16 +273,31 @@ ENDIF
 
    defs 0x0038 - ASMPC
 
-IF (__crt_enable_rst & $80)
+IF ((__crt_enable_rst & $8080) = $80)
 
    EXTERN _z180_rst_38h
-   jp _z180_rst_38h
+   jp     _z180_rst_38h
 
 ELSE
 
-   ei
-   reti
+   IF ((__crt_enable_rst & $8080) = $8080)
 
+   jp     __z180_rst_38h
+
+   ELSE
+
+   EXTERN l_ei_reti
+   jp     l_ei_reti
+
+   ENDIF
+
+ENDIF
+
+IF ((__crt_enable_rst & $8080) != $8080)
+   
+   PUBLIC _z180_rst_38h_vector
+   defc   _z180_rst_38h_vector = $39
+      
 ENDIF
 
 PUBLIC l_setmem_hl
@@ -253,15 +364,30 @@ l_inc_hl:
 
    defs 0x0066 - ASMPC
 
-IF __crt_enable_nmi
+IF (__crt_enable_nmi = 1)
 
    EXTERN _z180_nmi
-   jp _z180_nmi
+   jp     _z180_nmi
 
 ELSE
 
-   retn
+   IF (__crt_enable_nmi > 1)
 
+   jp     __z180_nmi
+
+   ELSE
+
+   jp     l_retn
+
+   ENDIF
+
+ENDIF
+
+IF (__crt_enable_nmi <= 1)
+   
+   PUBLIC _z180_nmi_vector
+   defc   _z180_nmi_vector = $67
+      
 ENDIF
 
 IF __crt_org_vector_table = -0x0080
@@ -304,7 +430,7 @@ section code_crt_start
 
 ENDIF
 
-IF (__crt_org_vector_table = -0x0100) || (__crt_org_vector_table = -1)
+IF (__crt_org_vector_table = -0x0100)
 
 ; place vector table at address 0x0100
 
@@ -577,36 +703,49 @@ __Test_Trap:
    
    out0 (ITC),a
 
-IF __crt_enable_trap
+IF (__crt_enable_trap = 1)
 
-   ; user handles trap
-
-   pop af
-   
    EXTERN _z180_trap
    jp     _z180_trap
 
 ELSE
 
-   ; trap is not handled
-   ; perform a program exit
+   IF (__crt_enable_trap > 1)
 
-   jp __Leave
+   jp     __z180_trap
 
+   ELSE
+
+   EXTERN __Unhandled_Trap
+   jp     __Unhandled_Trap
+
+   ENDIF
+
+ENDIF
+
+IF (__crt_enable_trap <= 1)
+   
+   PUBLIC _z180_trap_vector
+   defc   _z180_trap_vector = ASMPC - 2
+      
 ENDIF
 
 __reset:
 
    include "../crt_start_di.inc"
 
-IF REGISTER_SP = -1
+IF (REGISTER_SP = -1)
    
    pop af
    
 ENDIF
-   
+
+IF (__crt_org_vector_table = 0)
+
    ld a,__IO_VECTOR_BASE
    out0 (IL),a
+
+ENDIF
 
 ;; fall through to __Start
 

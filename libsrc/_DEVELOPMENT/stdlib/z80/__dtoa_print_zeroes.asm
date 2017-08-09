@@ -6,11 +6,14 @@ PUBLIC __dtoa_print_zeroes
 
 __dtoa_print_zeroes:
 
-   or a
+   inc a
+
+loop:
+
+   dec a
    ret z
    
    ld (hl),'0'
    inc hl
    
-   dec a
-   jr __dtoa_print_zeroes
+   jr loop

@@ -68,6 +68,53 @@
 	ld	hl,%2
 	ld	(%1),hl
 
+	call	_intrinsic_ldi
+=
+	pop hl
+	pop de
+
+	call	_intrinsic_ldi_num_128
+=
+	call	l_ldi_128
+
+	call	_intrinsic_ldi_num_256
+=
+	call	l_ldi_256
+
+	call	_intrinsic_ldi_num_%1
+=
+	call	l_ldi-(%1*2)
+
+	call	l_ldi%1
+	ret
+=
+	jp	l_ldi%1
+
+	call	_intrinsic_outi_num_128
+=
+	call	l_outi_128
+
+	call	_intrinsic_outi_num_256
+=
+	call	l_outi_256
+
+	call	_intrinsic_outi_num_%1
+=
+	call	l_outi-(%1*2)
+
+	call	l_outi%1
+	ret
+=
+	jp	l_outi%1
+
+	call	_intrinsic_outi_port_%1
+=
+	ld	c,%1
+
+	call	_intrinsic_outi
+=
+
+
 	call	intrinsic_reti
 =
 	reti

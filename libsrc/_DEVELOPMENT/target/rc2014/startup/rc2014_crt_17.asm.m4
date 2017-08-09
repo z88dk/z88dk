@@ -108,7 +108,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "rc2014_page_zero_z80.inc"
+   include "../crt_page_zero_z80.inc"
 
 ENDIF
 
@@ -119,17 +119,6 @@ ENDIF
 __Start:
 
    include "../crt_start_di.inc"
-
-   IF __crt_org_vector_table != 0
-   
-      EXTERN __code_vector_head
-      
-      ld a,__code_vector_head/256
-      ld i,a
-      
-   ENDIF
-
-   include "../crt_set_interrupt_mode.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -160,6 +149,10 @@ __Restart_2:
    ; initialize bss section
 
    include "../clib_init_bss.inc"
+
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
 
@@ -234,6 +227,8 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "../crt_jump_vectors_z80.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

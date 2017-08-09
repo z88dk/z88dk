@@ -24,10 +24,9 @@ asm_zx_aaddr2px:
 
    ld a,l
    
-   rla
-   rla
-   rla
-   and $f8
+   add a,a
+   add a,a
+   add a,a
    
    ld l,a
    ret

@@ -289,6 +289,7 @@ asm_NIRVANAP_paintC:
 ; -----------------------------------------------------------------------------
 
 PUBLIC _NIRVANAP_ISR_HOOK
+PUBLIC _NIRVANAP_ISR_STOP
 
 main_engine:
 ; preserve all registers
@@ -371,13 +372,13 @@ IF (__SPECTRUM & __SPECTRUM_PENTAGON)
 ; pentagon timing
 
         ld      b, 92                       ; extra delay
-        djnz	ASMPC                        ; extra delay
-        djnz	ASMPC                        ; extra delay
+        djnz   ASMPC                        ; extra delay
+        djnz   ASMPC                        ; extra delay
         nop                                 ; extra delay
         nop                                 ; extra delay
         jp      race_raster
 
-		  defs 56693 - org_nirvanap - ASMPC
+        defs 56693 - org_nirvanap - ASMPC
 
 ; race the raster beam to update attributes on screen at the right time
 race_raster:
@@ -528,6 +529,7 @@ _NIRVANAP_ISR_HOOK:
         pop     bc
         pop     af
 
+_NIRVANAP_ISR_STOP:
         ei
         reti
 
@@ -760,29 +762,25 @@ ENDIF
         ld      a, $fe
         ld      i, a
         im      2
+        ld      hl,main_engine
+        ld      ($fdfe),hl
         ei
         ret
-; -----------------------------------------------------------------------------
-; Insert Space Here
-; -----------------------------------------------------------------------------
-
-defs 65012 - org_nirvanap - ASMPC
 
 ; -----------------------------------------------------------------------------
 ; Deactivate NIRVANA engine.
-;
-; Address: 65012
+; replaced
 ; -----------------------------------------------------------------------------
-
-PUBLIC asm_NIRVANAP_stop
-
-asm_NIRVANAP_stop:
-        di
-        ld      a, $3f
-        ld      i, a
-        im      1
-        ei
-        ret
+;
+;PUBLIC asm_NIRVANAP_stop
+;
+;asm_NIRVANAP_stop:
+;        di
+;        ld      a, $3f
+;        ld      i, a
+;        im      1
+;        ei
+;        ret
 
 ; -----------------------------------------------------------------------------
 ; Insert Space Here

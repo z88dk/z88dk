@@ -27,29 +27,28 @@ activate_engine:
         ld      a, $fe
         ld      i, a
         im      2
+        ld      hl,main_engine
+        ld      ($fdfe),hl
         ei
         ret
 
 ; -----------------------------------------------------------------------------
 ; Stop engine
-;
-; Destroys:
-;   AF
-;
-; Address:
-;   51634
+; replaced
 ; -----------------------------------------------------------------------------
+;
+;PUBLIC asm_BIFROST2_stop
+;
+;asm_BIFROST2_stop:
+;deactivate_engine:
+;        di
+;        ld      a, $3f
+;        ld      i, a
+;        im      1
+;        ei
+;        ret
 
-PUBLIC asm_BIFROST2_stop
-
-asm_BIFROST2_stop:
-deactivate_engine:
-        di
-        ld      a, $3f
-        ld      i, a
-        im      1
-        ei
-        ret
+defs 51650 - 7 - 51625 - ASMPC
 
 ; -----------------------------------------------------------------------------
 ; Internal routine
@@ -572,6 +571,7 @@ Z88DK_FOR(`LOOP', `1', `16',
 ; -----------------------------------------------------------------------------
 
 PUBLIC _BIFROST2_ISR_HOOK
+PUBLIC _BIFROST2_ISR_STOP
 
 main_engine:
 ; preserve all registers
@@ -890,8 +890,10 @@ _BIFROST2_ISR_HOOK:
         pop     de
         pop     bc
         pop     af
+
+_BIFROST2_ISR_STOP:
         ei
-		  reti
+        reti
 
 ; -----------------------------------------------------------------------------
         defs 64829 - 51625 - ASMPC

@@ -53,14 +53,14 @@ extern unsigned char BIFROST2_HOLE[BIFROST2_HOLE_SIZE];
 // Activate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-extern void BIFROST2_start(void) __preserves_regs(b,c,d,e,h,l);
+extern void BIFROST2_start(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-extern void BIFROST2_stop(void) __preserves_regs(b,c,d,e,h,l);
+extern void BIFROST2_stop(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------

@@ -1,3 +1,4 @@
+z180/z180/__Unhandled_Trap
 z180/z180/asm_z180_delay_ms
 z180/z180/asm_z180_delay_tstate
 z180/z180/asm_z180_get_int_state

@@ -64,6 +64,42 @@ IF __clib_malloc_heap_size = -1
    
 ENDIF
 
+IF __clib_malloc_heap_size < -1
+
+   ; place malloc heap between bss section and including address abs(CLIB_MALLOC_HEAP_SIZE)
+   
+   SECTION data_clib
+   SECTION data_alloc_malloc
+   
+   PUBLIC __malloc_heap
+
+   EXTERN __BSS_END_tail
+
+   __malloc_heap:              defw __BSS_END_tail
+   
+   SECTION code_crt_init
+
+   ld hl,-__clib_malloc_heap_size - 13
+   ld de,__BSS_END_tail
+   
+   xor a
+   sbc hl,de
+
+   jp c, __Exit                ; if no room for minimum size heap, fatal error
+   
+   ld bc,14
+   add hl,bc
+   
+   ld c,l
+   ld b,h                      ; bc = available heap size
+   
+   ex de,hl                    ; hl = __BSS_END_tail = start of heap
+   
+   EXTERN asm_heap_init
+   call asm_heap_init
+
+ENDIF
+
 IF __clib_malloc_heap_size > 14
 
    ; create malloc heap in bss section

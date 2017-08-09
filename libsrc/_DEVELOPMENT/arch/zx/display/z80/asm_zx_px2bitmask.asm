@@ -22,18 +22,18 @@ asm_zx_px2bitmask:
    ;
    ; uses  : af, hl
    
-	ld a,l
-	and $07
-	
-	add a,mask_table & 0xff
-	ld l,a
-	ld a,0
-	adc a,mask_table / 256
-	ld h,a
-	
-	ld l,(hl)
-	ret
+   ld a,l
+   and $07
+   
+   add a,mask_table & 0xff
+   ld l,a
+   adc a,mask_table / 256
+   sub l
+   ld h,a
+   
+   ld l,(hl)
+   ret
 
 mask_table:
 
-   defb $80, $40, $20, $10, $08, $04, $02, $01	
+   defb $80, $40, $20, $10, $08, $04, $02, $01  

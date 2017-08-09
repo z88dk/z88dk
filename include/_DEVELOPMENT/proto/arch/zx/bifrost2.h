@@ -50,13 +50,13 @@ extern unsigned char BIFROST2_HOLE[BIFROST2_HOLE_SIZE];
 // Activate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROST2_start,void)
+__OPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROST2_start,void)
 
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROST2_stop,void)
+__OPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROST2_stop,void)
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).

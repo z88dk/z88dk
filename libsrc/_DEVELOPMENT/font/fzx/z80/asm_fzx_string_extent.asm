@@ -62,7 +62,7 @@ loop:
    ld a,(de)
    or a
    jr nz, loop
-   
+
    ; remove tracking on last char
    
    ld c,(hl)                   ; bc = tracking
@@ -70,5 +70,4 @@ loop:
    
 ;;   scf
    sbc hl,bc
-   
    ret

@@ -95,3 +95,4 @@ stdio/obj/stdesc/__printf_handle_lld
 stdio/obj/stdesc/__printf_handle_llo
 stdio/obj/stdesc/__printf_handle_llu
 stdio/obj/stdesc/__printf_handle_llx
+stdio/obj/stdesc/kbhit

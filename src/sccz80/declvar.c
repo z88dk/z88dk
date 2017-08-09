@@ -436,7 +436,12 @@ void declglb(
                 else
                     myptr->size = size_st;
                 if (defstatic) {
-                    myptr->storage = DECLEXTN;
+                    if ( storage == LSTATIC ) {
+                        myptr->storage = STATIC_INITIALISED;
+                    }
+                    if (myptr->storage == STATIK) {
+                        myptr->storage = DECLEXTN;
+                    }
                 }
             }
 
@@ -644,13 +649,13 @@ void declloc(
                         snprintf(newname, sizeof(newname),"auto_%s_%s",currfn->name, cptr->name);
                         int alloc_size = initials(newname, cptr->type, cptr->ident, dsize, more, otag, var->zfar, var->isconst);
 
-			declared += (alloc_size - size);
+                        declared += (alloc_size - size);
                         if ( ident == ARRAY ) {
                             cptr->offset.i -= (alloc_size - size);
                             cptr->size += (alloc_size - size);
                         }
                         Zsp = modstk(Zsp - declared, NO, NO);
-			declared = 0;
+                        declared = 0;
                         copy_to_stack(newname, 0, alloc_size);
                         cptr->isassigned = YES;
 

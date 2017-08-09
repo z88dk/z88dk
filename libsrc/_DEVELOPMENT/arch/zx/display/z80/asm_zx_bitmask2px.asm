@@ -23,12 +23,11 @@ asm_zx_bitmask2px:
    ; uses  : af, l
    
    ld a,l
-   ld l,0
-   
+
    or a
    ret z
    
-   dec l
+   ld l,$ff
    
 loop:
 

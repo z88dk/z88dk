@@ -111,10 +111,11 @@ int fnumber(LVALUE *lval)
         s++;
         return 0;
     }
+    s++;
     while (numeric(*s))
         ++s;
-    lptr = (s--) - line; /* save ending point */
 
+    lptr = (s--) - line; /* save ending point */
     dval = strtod(start, &end);
     if (end == start)
         return 0;
@@ -122,6 +123,9 @@ int fnumber(LVALUE *lval)
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
+    if ( line[lptr] == 'f' ) {
+        lptr++;
+    }
 
     lval->const_val = dval;
 
@@ -184,13 +188,16 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = LONG;
     }
-    while (rcmatch('L') || rcmatch('U') || rcmatch('S')) {
+    
+    while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
         if (cmatch('L'))
             lval->val_type = LONG;
         if (cmatch('U'))
             lval->flags |= UNSIGNED;
         if (cmatch('S'))
             lval->flags &= ~UNSIGNED;
+        if (cmatch('f'))
+            lval->val_type = DOUBLE;
     }
     return (1);
 }

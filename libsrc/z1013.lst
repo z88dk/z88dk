@@ -30,7 +30,6 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite3
 graphics/liner
-graphics/stencil_render
-graphics/draw_profile_nostencil
+graphics/stencil_render2
 graphics/text/swapgfxbk
 @z80.lst

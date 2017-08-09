@@ -159,6 +159,10 @@ __Restart_2:
 
    include "../clib_init_bss.inc"
 
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -203,6 +207,8 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "../crt_jump_vectors_z80.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

@@ -28,7 +28,7 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite2
 graphics/liner
-graphics/stencil_render
+graphics/stencil_render2
 graphics/vg5k/swapgfxbk
 games/vg5k/joystick
 games/vg5k/bit_open

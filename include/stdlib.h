@@ -204,8 +204,8 @@ extern uint __LIB__  isqrt(uint n) __z88dk_fastcall;
 // used to inline code if the parameters resolve to constants.
 
 extern unsigned int  __LIB__  inp(unsigned int port) __z88dk_fastcall;
-extern void          __LIB__              outp(unsigned int port, unsigned char byte) __smallc;
-extern void          __LIB__    outp_callee(unsigned int port, unsigned char byte) __smallc __z88dk_callee;
+extern void          __LIB__              outp(unsigned int port, unsigned int byte) __smallc;
+extern void          __LIB__    outp_callee(unsigned int port, unsigned int byte) __smallc __z88dk_callee;
 
 #define outp(a,b) outp_callee(a,b)
 
@@ -244,7 +244,7 @@ extern unsigned int  __LIB__  wpeek(const void *addr) __z88dk_fastcall;
 // ACCURATE T-STATE DELAY
 extern void   __LIB__    t_delay(unsigned int tstates) __z88dk_fastcall;   // at least 141 T
 
-extern void   __LIB__     sleep (int secs) __z88dk_fastcall;
+extern void   __LIB__ __SAVEFRAME__     sleep (int secs) __z88dk_fastcall;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
 extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
 extern void   __LIB__     delay (long milliseconds) __z88dk_fastcall;

@@ -31,7 +31,7 @@ graphics/fill
 graphics/dfill
 graphics/getsprite
 graphics/liner
-graphics/stencil_render
+graphics/stencil_render2
 graphics/pc6001/putsprite
 graphics/pc6001/bksave
 graphics/pc6001/bkrestore

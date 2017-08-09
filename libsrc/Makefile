@@ -713,6 +713,7 @@ sorcerer_clib.lib:
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=srr
@@ -1459,6 +1460,7 @@ osca_clib.lib:
 	$(MAKE) -C compress/zx7 
 	$(MAKE) -C rs232 
 	$(MAKE) -C setjmp
+	$(MAKE) -C games TARGET=osca
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C fcntl/osca

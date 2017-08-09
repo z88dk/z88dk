@@ -30,6 +30,51 @@ asm_memcpy:
    ;
    ; uses  : af, bc, de, hl
 
+IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMCPY)
+
+   ld a,b
+   or a
+   
+   jr nz, big
+   
+   or c
+   jr z, zero_n
+   
+   push de
+
+   EXTERN l_ldi_loop_small
+   call   l_ldi_loop_small
+
+   pop hl
+   
+   or a
+   ret
+
+big:
+
+   push de
+   
+   EXTERN l_ldi_loop_0
+   call   l_ldi_loop_0
+   
+   pop hl
+   
+   or a
+   ret
+
+asm0_memcpy:
+
+   push de
+   
+   call l_ldi_loop
+   
+   pop hl
+   
+   or a
+   ret
+
+ELSE
+
    ld a,b
    or c
    jr z, zero_n
@@ -38,50 +83,14 @@ asm0_memcpy:
 
    push de
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-IF __CLIB_OPT_FASTCOPY & $01
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ld a,b
-   or a
-   jr nz, fast_memcpy
-   
-   ld a,c
-
-IF __CLIB_OPT_FASTCOPY & $40
-
-   cp 19                       ; self-modifying code break even
-
-ELSE
-
-   cp 25                       ; break even
-
-ENDIF
-
-   jr c, slow_memcpy
-
-fast_memcpy:
-
-   EXTERN l_fast_memcpy
-   call l_fast_memcpy
-   
-   pop hl
-   
-   or a
-   ret
-
-slow_memcpy:
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ENDIF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
    ldir
-   
+
    pop hl
    
    or a
    ret
+
+ENDIF
 
 asm1_memcpy:
 zero_n:

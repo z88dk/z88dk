@@ -197,6 +197,7 @@ static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -2;
+static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
@@ -426,6 +427,7 @@ static arg_t     myargs[] = {
 	{ "pragma-include",AF_MORE,PragmaInclude,NULL, NULL, "Process include file containing pragmas" },
 	{ "subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" },
 	{ "clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" },
+    { "startupoffset", AF_MORE, SetNumber, &c_startupoffset, NULL, "Startup offset value (internal)" },
 	{ "startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
 	{ "zorg", AF_MORE, SetNumber, &c_zorg, NULL, "Set the origin (only certain targets)" },
 	{ "nostdlib", AF_BOOL_TRUE, SetBoolean, &c_nostdlib, NULL, "If set ignore INCPATH, STARTUPLIB" },
@@ -490,6 +492,7 @@ typedef struct pragma_m4_s pragma_m4_t;
 
 pragma_m4_t important_pragmas[] = {
     { 0, "startup", "__STARTUP" },
+    { 0, "startupoffset", "__STARTUP_OFFSET" },
     { 0, "CRT_INCLUDE_DRIVER_INSTANTIATION", "M4__CRT_INCLUDE_DRIVER_INSTANTIATION" },
     { 0, "CRT_ITERM_EDIT_BUFFER_SIZE", "M4__CRT_ITERM_EDIT_BUFFER_SIZE" },
     { 0, "CRT_OTERM_FZX_DRAW_MODE", "M4__CRT_OTERM_FZX_DRAW_MODE" },
@@ -2255,6 +2258,10 @@ static void configure_misc_options()
 	if (c_startup >= -1) {
 		write_zcc_defined("startup", c_startup, 0);
 	}
+
+    if (c_startupoffset >= 0) {
+        write_zcc_defined("startupoffset", c_startupoffset, 0);
+    }
 
 	if (linkargs == NULL) {
 		linkargs = muststrdup("");

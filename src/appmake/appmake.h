@@ -20,6 +20,8 @@
 #include <unistd.h>
 #endif
 
+extern char c_install_dir[];
+
 /* Conversion routines */
 
 #define OPT_BASE_MASK 127
