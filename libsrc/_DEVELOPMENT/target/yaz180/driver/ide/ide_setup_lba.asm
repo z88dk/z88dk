@@ -7,7 +7,7 @@ EXTERN __IO_IDE_LBA0, __IO_IDE_LBA1, __IO_IDE_LBA2, __IO_IDE_LBA3
 
 EXTERN ide_write_byte
 
-EXTERN idestatus
+EXTERN ideStatus
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -34,7 +34,7 @@ ide_setup_lba:
     ld a, b
     and 00001111b           ;lowest 4 bits used only
     or  11100000b           ;to enable LBA address mode
-    ld hl, idestatus        ;set bit 4 accordingly
+    ld hl, ideStatus        ;set bit 4 accordingly
     bit 0, (hl)
     jr z, ide_setup_master
     or $10                  ;if it is a slave, set that bit

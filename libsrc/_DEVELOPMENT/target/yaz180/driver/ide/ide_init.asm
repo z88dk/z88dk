@@ -14,7 +14,7 @@ EXTERN ide_test_error
 
 EXTERN ide_write_byte
 
-EXTERN idestatus
+EXTERN ideStatus
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
@@ -26,7 +26,7 @@ ide_init:
     push af
     push de
     xor a
-    ld (idestatus), a       ;set master device
+    ld (ideStatus), a       ;set master device
     ld e, 11100000b
     ld a, __IO_IDE_HEAD
     call ide_write_byte     ;select the master device, LBA mode
