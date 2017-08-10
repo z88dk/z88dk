@@ -69,5 +69,5 @@ rc_00_output_basic_ochar_msg_putc:
                                ; block until the character has been
                                ; put in the buffer, or transmitted
    
-   or a                        ; ensure the carry flag is cleared
+   ccf                         ; ensure the carry flag is cleared
    ret                         ; carry is reset

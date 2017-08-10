@@ -85,7 +85,7 @@ block_loop:
    cp CHAR_CTRL_Z
    jp z, error_mc              ; generate EOF (ctrl-z is from cp/m)
    
-   or a                        ; reset carry to indicate no error
+   ccf                         ; reset carry to indicate no error
    ret
    
 no_match_0:

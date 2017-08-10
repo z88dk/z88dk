@@ -73,6 +73,6 @@ block_loop:
    dec l
    jr z, block_loop            ; if Tx buffer is full
    
-   or a                        ; ensure the carry flag is cleared
+   ccf                         ; ensure the carry flag is cleared
    
    ret                         ; carry is reset
