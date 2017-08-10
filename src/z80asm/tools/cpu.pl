@@ -71,7 +71,7 @@ sub add_1 {
 	
 	# expand ixh, ixl, iyh, iyl
 	if ($asm =~ / \b [hl] \b /x && $asm !~ /hl|ix|iy/ &&
-		check_cpu_tag('z80', $cpu_tag) && $bin !~ /^ED /) {
+		check_cpu_tag('z80', $cpu_tag) && $bin !~ /^(?:ED|CB) /) {
 		for ([ix => 'DD'], [iy => 'FD']) {
 			my($r, $b) = @$_;
 			(my $asm1 = $asm) =~ s/ \b ([hl]) \b /$r$1/gx;
@@ -89,13 +89,25 @@ sub add_2 {
 	my $for_rabbit = ($asm !~ / \b (?: i[xy][hl] | i | r ) \b /x);
 		
 	# ld r,*
-	if ($asm =~ / ^ (ld) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af)(,.*) /x && $for_rabbit) {
+	if ($asm =~ /^ (ld) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af)(,.*) /x && $for_rabbit) {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		add_3('rabbit', "$asm1 $asm2'$asm3",     "76 $bin");
 		add_3('rabbit', "altd $asm1 $asm2$asm3", "76 $bin");
 	}
+	# rl de
+	elsif ($asm =~ /^ (rl) \s+ (de) $/x && $for_rabbit) {
+		my($asm1, $asm2) = ($1, $2);
+		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
+		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
+	}
+	# rr de|hl
+	elsif ($asm =~ /^ (rr) \s+ (de|hl) $/x && $for_rabbit) {
+		my($asm1, $asm2) = ($1, $2);
+		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
+		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
+	}
 	# arithm a,*
-	elsif ($asm =~ / ^ (add|adc|sub|sbc|and|xor|or|cp) \s+ (a) \s* , \s* (.*) /x) {
+	elsif ($asm =~ /^ (add|adc|sub|sbc|and|xor|or|cp) \s+ (a) \s* , \s* (.*) /x) {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		
 		add_3($cpu_tag, "$asm1 $asm3", 				$bin);			# add r
@@ -107,7 +119,7 @@ sub add_2 {
 		}
 	}
 	# arithm hl,*
-	elsif ($asm =~ / ^ (add|adc|sbc) \s+ (hl) \s* , \s* (.*) /x) {
+	elsif ($asm =~ /^ (add|adc|sbc) \s+ (hl) \s* , \s* (.*) /x) {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		
 		if ($for_rabbit) {
@@ -116,20 +128,20 @@ sub add_2 {
 		}
 	}
 	# tst a,*
-	elsif ($asm =~ / ^ (tst) \s+ (a) \s* , \s* (.*) /x) {
+	elsif ($asm =~ /^ (tst) \s+ (a) \s* , \s* (.*) /x) {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		
 		add_3($cpu_tag, "$asm1 $asm3", 				$bin);				# tst r
 	}
 	# inc|dec r
-	elsif ($asm =~ / ^ (inc|dec|pop) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af) $ /x
+	elsif ($asm =~ /^ (inc|dec|pop) \s+ (b|c|d|e|h|l|a|f|bc|de|hl|af) $ /x
 			&& $for_rabbit) {
 		my($asm1, $asm2) = ($1, $2);
 		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
 		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
 	}
 	# cpl|neg a
-	elsif ($asm =~ / ^ (cpl|neg|ccf|scf) \s+ (a|f) $ /x) {
+	elsif ($asm =~ /^ (cpl|neg|ccf|scf) \s+ (a|f) $ /x) {
 		my($asm1, $asm2) = ($1, $2);
 		add_3($cpu_tag, $asm1, $bin);	# cpl
 		
@@ -164,11 +176,17 @@ sub add_4 {
 	my($cpu_tag, $asm, $bin) = @_;
 	
 	# expand hl to ix, iy
-	if ($asm =~ / ( .* [^\(] ) ( hl ) (.*) /x && $bin !~ /^(?:76 )?ED /
+	if ($asm =~ / ( .* [^\(] ) ( hl ) (.*) /x 
+		&& $bin !~ /^(?:76 )?ED /
+		&& $asm !~ /^ex/
 		&& $cpu_tag eq 'all') {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		add_5($cpu_tag, replace($asm, "hl", "ix"),	"DD $bin");
 		add_5($cpu_tag, replace($asm, "hl", "iy"),	"FD $bin");
+	}
+	elsif ($asm =~ / ^ rr \s+ hl $ /x) {
+		add_5($cpu_tag, "rr ix", "DD $bin");
+		add_5($cpu_tag, "rr iy", "FD $bin");
 	}
 	
 	add_5($cpu_tag, $asm, $bin);
@@ -379,12 +397,31 @@ sub write_tests {
 						(my $asm1 = $asm) =~ s/(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
 						$bin = $Tests{$cpu}{$ok}{$asm1};
 					}
+					$bin = expand_cpu_query($bin, $cpu);
 					$bin = 'Error' if $ok eq 'err';
 					print $fh sprintf(" %-23s; %s\n", $asm, $bin)
 				}
 			}
 		}
 	}
+}
+
+# expand bin containing cpu?op,op:op,op
+sub expand_cpu_query {
+	my($bin, $cpu) = @_;
+	
+	if ($bin =~ / (.*?) \b (\w+) \s* \? (.*?) : (.*) /x) {
+		my($bin1, $cpu_tag, $bin_true, $bin_false) = ($1, $2, $3, $4);
+
+		if (check_cpu_tag($cpu, $cpu_tag)) {
+			$bin = join(' ', split(' ', "$bin1 $bin_true"));
+		}
+		else {
+			$bin = join(' ', split(' ', "$bin1 $bin_false"));
+		}
+	}
+	
+	return $bin;
 }
 
 # build %Parser from %Opcodes
@@ -447,7 +484,7 @@ sub build_parser {
 					"  $if (expr_value == $value) {\n";
 				if (!defined($cpu_tag) && $v1->{cpu_tag} ne 'all') {
 					push @{$Parser{$tokens}{code}}, 
-						"    if ((opts.cpu & (CPU_".uc($v1->{cpu_tag}).")) == 0) {".
+						"    if ((opts.cpu & CPU_".uc($v1->{cpu_tag}).") == 0) {".
 						" error_illegal_ident(); return FALSE; }\n";
 				}
 				push @{$Parser{$tokens}{code}}, 
@@ -497,13 +534,15 @@ sub c_code {
 	my($asm, $bin) = ($v->{asm}, $v->{bin});
 	$level ||= 0;
 
-	my $ixiy_bin = ixiy_bin($asm);
-	if ($ixiy_bin) {
-		return "if (!opts.swap_ix_iy) {\n".
-			   "    ".c_code_1($asm, $bin, $level+1)."\n".
+	# expand bin containing cpu?op,op:op,op
+	if ($bin =~ / (.*?) \b (\w+) \s* \? (.*?) : (.*) /x) {
+		my($bin1, $cpu_tag, $bin_true, $bin_false) = ($1, $2, $3, $4);
+		
+		return "if ((opts.cpu & CPU_".uc($cpu_tag).") != 0) {\n".
+			   "    ".c_code_1($asm, "$bin1 $bin_true", $level+1)."\n".
 			   "  }\n".
 			   "  else {\n".
-			   "    ".c_code_1($asm, $ixiy_bin, $level+1)."\n".
+			   "    ".c_code_1($asm, "$bin1 $bin_false", $level+1)."\n".
 			   "  }";
 	}
 	else {
@@ -512,6 +551,24 @@ sub c_code {
 }
 
 sub c_code_1 {
+	my($asm, $bin, $level) = @_;
+	my $indent = "  " x (++$level);
+
+	my $ixiy_bin = ixiy_bin($asm);
+	if ($ixiy_bin) {
+		return "if (!opts.swap_ix_iy) {\n".
+			   "    ".c_code_2($asm, $bin, $level+1)."\n".
+			   "  }\n".
+			   "  else {\n".
+			   "    ".c_code_2($asm, $ixiy_bin, $level+1)."\n".
+			   "  }";
+	}
+	else {
+		return c_code_2($asm, $bin, $level);
+	}
+}
+
+sub c_code_2 {
 	my($asm, $bin, $level) = @_;
 	my $indent = "  " x (++$level);
 	my $ret = '';
@@ -556,7 +613,7 @@ sub c_code_1 {
 		push @hex, sprintf("%02X", hex( eval { $_ } ));
 		die $bin if $@;
 	}
-	@hex > 0 && @hex <= 3 or die $bin;
+	@hex > 0 && @hex <= 4 or die $bin;
 	
 	$ret .= $stmt."(0x".join("", @hex).$extra_arg."); ";
 	
@@ -589,8 +646,8 @@ sub build_tokens {
 
 		s/,/ COMMA /g;
 		s/'/1/g;
-		s/ \( (hl|ix|iy|bc|de|c) \+? / IND_$1 /x;
-		s/ \)                        / RPAREN /x;
+		s/ \( (hl|ix|iy|bc|de|sp|c) \+? / IND_$1 /x;
+		s/ \)                           / RPAREN /x;
 	}
 	my @tokens = split(' ', $asm);
 	for (@tokens) {

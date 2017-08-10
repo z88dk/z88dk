@@ -663,8 +663,6 @@
  djnz b', ASMPC         ;; 0C16:  76 10 FE
  ret lz                 ;; 0CCB:  E0
  ret lo                 ;; 0CCB:  E8
- ioe                    ;; 0DC3:  DB
- ioi                    ;; 0DC3:  D3
  ipset 0                ;; 0DE3:  ED 46
  ipset 1                ;; 0DE3:  ED 56
  ipset 2                ;; 0DE3:  ED 4E

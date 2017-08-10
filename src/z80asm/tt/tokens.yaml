@@ -350,6 +350,7 @@ tokens:
   - name	: SET
   - name	: SLA
   - name	: SLL
+  - name	: SLI
   - name	: SRA
   - name	: SRL
   - name	: SUB

@@ -291,26 +291,26 @@
  tstio 85               ;; 1242:  ED 74 55
  tstio 170              ;; 1242:  ED 74 AA
  tstio 255              ;; 1242:  ED 74 FF
- ini                    ;; 1244:  ED A2
- inir                   ;; 1244:  ED B2
- ind                    ;; 1244:  ED AA
- indr                   ;; 1244:  ED BA
- outi                   ;; 1244:  ED A3
- otir                   ;; 1244:  ED B3
- outd                   ;; 1244:  ED AB
- otdr                   ;; 1244:  ED BB
- otdm                   ;; 1244:  ED 8B
- otdmr                  ;; 1244:  ED 9B
- otim                   ;; 1244:  ED 83
- otimr                  ;; 1244:  ED 93
- di                     ;; 1244:  F3
- ei                     ;; 1244:  FB
- im 0                   ;; 1244:  ED 46
- im 1                   ;; 1244:  ED 56
- im 2                   ;; 1244:  ED 5E
- ld i, a                ;; 124E:  ED 47
- ld a, i                ;; 124E:  ED 57
- ld r, a                ;; 124E:  ED 4F
- ld a, r                ;; 124E:  ED 5F
- retn                   ;; 125E:  ED 45
- idet                   ;; 125E:  5B
+ ini                    ;; 1242:  ED A2
+ inir                   ;; 1242:  ED B2
+ ind                    ;; 1242:  ED AA
+ indr                   ;; 1242:  ED BA
+ outi                   ;; 1242:  ED A3
+ otir                   ;; 1242:  ED B3
+ outd                   ;; 1242:  ED AB
+ otdr                   ;; 1242:  ED BB
+ otdm                   ;; 1242:  ED 8B
+ otdmr                  ;; 1242:  ED 9B
+ otim                   ;; 1242:  ED 83
+ otimr                  ;; 1242:  ED 93
+ di                     ;; 1242:  F3
+ ei                     ;; 1242:  FB
+ im 0                   ;; 1242:  ED 46
+ im 1                   ;; 1242:  ED 56
+ im 2                   ;; 1242:  ED 5E
+ ld i, a                ;; 124C:  ED 47
+ ld a, i                ;; 124C:  ED 57
+ ld r, a                ;; 124C:  ED 4F
+ ld a, r                ;; 124C:  ED 5F
+ retn                   ;; 125C:  ED 45
+ idet                   ;; 125C:  5B

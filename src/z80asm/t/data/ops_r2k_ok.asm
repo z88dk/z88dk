@@ -1743,17 +1743,15 @@
  rst 32                 ;; 123F:  E7
  rst 40                 ;; 1240:  EF
  rst 56                 ;; 1241:  FF
- ioe                    ;; 1242:  DB
- ioi                    ;; 1243:  D3
- ipset 0                ;; 1244:  ED 46
- ipset 1                ;; 1246:  ED 56
- ipset 2                ;; 1248:  ED 4E
- ipset 3                ;; 124A:  ED 5E
- ipres                  ;; 124C:  ED 5D
- ld iir, a              ;; 124E:  ED 4F
- ld a, iir              ;; 1250:  ED 5F
- ld a', iir             ;; 1252:  76 ED 5F
- ld eir, a              ;; 1255:  ED 47
- ld a, eir              ;; 1257:  ED 57
- ld a', eir             ;; 1259:  76 ED 57
- reti                   ;; 125C:  ED 4D
+ ipset 0                ;; 1242:  ED 46
+ ipset 1                ;; 1244:  ED 56
+ ipset 2                ;; 1246:  ED 4E
+ ipset 3                ;; 1248:  ED 5E
+ ipres                  ;; 124A:  ED 5D
+ ld iir, a              ;; 124C:  ED 4F
+ ld a, iir              ;; 124E:  ED 5F
+ ld a', iir             ;; 1250:  76 ED 5F
+ ld eir, a              ;; 1253:  ED 47
+ ld a, eir              ;; 1255:  ED 57
+ ld a', eir             ;; 1257:  76 ED 57
+ reti                   ;; 125A:  ED 4D

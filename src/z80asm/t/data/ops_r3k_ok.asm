@@ -1757,18 +1757,16 @@
  rst 32                 ;; 125B:  E7
  rst 40                 ;; 125C:  EF
  rst 56                 ;; 125D:  FF
- ioe                    ;; 125E:  DB
- ioi                    ;; 125F:  D3
- ipset 0                ;; 1260:  ED 46
- ipset 1                ;; 1262:  ED 56
- ipset 2                ;; 1264:  ED 4E
- ipset 3                ;; 1266:  ED 5E
- ipres                  ;; 1268:  ED 5D
- ld iir, a              ;; 126A:  ED 4F
- ld a, iir              ;; 126C:  ED 5F
- ld a', iir             ;; 126E:  76 ED 5F
- ld eir, a              ;; 1271:  ED 47
- ld a, eir              ;; 1273:  ED 57
- ld a', eir             ;; 1275:  76 ED 57
- reti                   ;; 1278:  ED 4D
- idet                   ;; 127A:  5B
+ ipset 0                ;; 125E:  ED 46
+ ipset 1                ;; 1260:  ED 56
+ ipset 2                ;; 1262:  ED 4E
+ ipset 3                ;; 1264:  ED 5E
+ ipres                  ;; 1266:  ED 5D
+ ld iir, a              ;; 1268:  ED 4F
+ ld a, iir              ;; 126A:  ED 5F
+ ld a', iir             ;; 126C:  76 ED 5F
+ ld eir, a              ;; 126F:  ED 47
+ ld a, eir              ;; 1271:  ED 57
+ ld a', eir             ;; 1273:  76 ED 57
+ reti                   ;; 1276:  ED 4D
+ idet                   ;; 1278:  5B

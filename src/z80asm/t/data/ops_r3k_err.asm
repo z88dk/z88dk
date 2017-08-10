@@ -277,25 +277,25 @@
  tstio 85               ;; 125E:  ED 74 55
  tstio 170              ;; 125E:  ED 74 AA
  tstio 255              ;; 125E:  ED 74 FF
- ini                    ;; 1260:  ED A2
- inir                   ;; 1260:  ED B2
- ind                    ;; 1260:  ED AA
- indr                   ;; 1260:  ED BA
- outi                   ;; 1260:  ED A3
- otir                   ;; 1260:  ED B3
- outd                   ;; 1260:  ED AB
- otdr                   ;; 1260:  ED BB
- otdm                   ;; 1260:  ED 8B
- otdmr                  ;; 1260:  ED 9B
- otim                   ;; 1260:  ED 83
- otimr                  ;; 1260:  ED 93
- di                     ;; 1260:  F3
- ei                     ;; 1260:  FB
- im 0                   ;; 1260:  ED 46
- im 1                   ;; 1260:  ED 56
- im 2                   ;; 1260:  ED 5E
- ld i, a                ;; 126A:  ED 47
- ld a, i                ;; 126A:  ED 57
- ld r, a                ;; 126A:  ED 4F
- ld a, r                ;; 126A:  ED 5F
- retn                   ;; 127A:  ED 45
+ ini                    ;; 125E:  ED A2
+ inir                   ;; 125E:  ED B2
+ ind                    ;; 125E:  ED AA
+ indr                   ;; 125E:  ED BA
+ outi                   ;; 125E:  ED A3
+ otir                   ;; 125E:  ED B3
+ outd                   ;; 125E:  ED AB
+ otdr                   ;; 125E:  ED BB
+ otdm                   ;; 125E:  ED 8B
+ otdmr                  ;; 125E:  ED 9B
+ otim                   ;; 125E:  ED 83
+ otimr                  ;; 125E:  ED 93
+ di                     ;; 125E:  F3
+ ei                     ;; 125E:  FB
+ im 0                   ;; 125E:  ED 46
+ im 1                   ;; 125E:  ED 56
+ im 2                   ;; 125E:  ED 5E
+ ld i, a                ;; 1268:  ED 47
+ ld a, i                ;; 1268:  ED 57
+ ld r, a                ;; 1268:  ED 4F
+ ld a, r                ;; 1268:  ED 5F
+ retn                   ;; 1278:  ED 45

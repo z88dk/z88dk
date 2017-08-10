@@ -418,36 +418,6 @@ Define rules for a ragel-based parser.
   #endfor <D2>
 #endfor <D1>
 
-
-		/*---------------------------------------------------------------------
-		*   EX, EXX
-		*--------------------------------------------------------------------*/
-		| label? _TK_EXX _TK_NEWLINE
-		  @{ DO_stmt( Z80_EXX ); }
-		  
-#foreach <DD> in AF, AF1
-		| label? _TK_EX _TK_AF _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( Z80_EX_AF_AF ); }
-#endfor  <DD>
-
-		| label? _TK_EX _TK_IND_SP _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE
-		  @{ DO_stmt( Z80_EX_IND_SP_HL ); }
-
-		| label? _TK_EX _TK_IND_SP _TK_RPAREN _TK_COMMA _TK_HL1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_EX_IND_SP_HL ); }
-
-#foreach <DD> in IX, IY
-		| label? _TK_EX _TK_IND_SP _TK_RPAREN _TK_COMMA _TK_<DD> _TK_NEWLINE
-		  @{ DO_stmt( P_<DD> + Z80_EX_IND_SP_idx ); }
-#endfor  <DD>
-
-#foreach <R1> in DE, DE1
-  #foreach <R2> in HL, HL1
-		| label? _TK_EX _TK_<R1> _TK_COMMA _TK_<R2> _TK_NEWLINE
-		  @{ DO_stmt( Z80_EX_<R1>_<R2> ); }
-  #endfor <R2>
-#endfor <R1>
-		
 		/*---------------------------------------------------------------------
 		*   16-bit ALU
 		*--------------------------------------------------------------------*/
@@ -467,56 +437,6 @@ Define rules for a ragel-based parser.
 		| label? _TK_<OP> _TK_HL1 _TK_COMMA _TK_DE _TK_NEWLINE
 		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_<OP>_HL_DE ); }
 #endfor <OP>
-
-		/*---------------------------------------------------------------------
-		*   Rotate and shift group
-		*--------------------------------------------------------------------*/
-#foreach <OP> in RLC, RRC, RL, RR, SLA, SRA, SLL, SRL
-	#foreach <R> in B, C, D, E, H, L, A
-		| label? _TK_<OP> _TK_<R> _TK_NEWLINE
-		  @{ DO_stmt( Z80_<OP>( REG_<R> ) ); }
-	#endfor  <R>
-
-	#foreach <X> in IX, IY
-		/* (x) */
-		| label? _TK_<OP>  
-					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt( ((P_<X>               << 16) & 0xFF000000) +
-					  ((Z80_<OP>( REG_idx ) << 8 ) & 0x00FF0000) +
-					  ((0                   << 8 ) & 0x0000FF00) +
-					  ((Z80_<OP>( REG_idx ) << 0 ) & 0x000000FF) ); }
-			
-		/* (x+d) */
-		| label? _TK_<OP>  
-					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
-						  Z80_<OP>( REG_idx ) ); }
-	#endfor  <X>
-	
-		/* (hl) */
-		| label? _TK_<OP> _TK_IND_HL _TK_RPAREN _TK_NEWLINE
-		  @{ DO_stmt( Z80_<OP>( REG_idx ) ); }
-#endfor  <OP>
-		
-		/* rl de */
-		| label? _TK_RL _TK_DE _TK_NEWLINE
-		  @{ DO_stmt( Z80_RL_DE ); }
-
-		/* rl de' */
-		| label? _TK_RL _TK_DE1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_RL_DE ); }
-
-#foreach <R> in HL, DE, IX, IY
-		/* rr de|hl */
-		| label? _TK_RR _TK_<R> _TK_NEWLINE
-		  @{ DO_stmt( Z80_RR_<R> ); }
-#endfor <R>
-
-#foreach <R> in HL, DE
-		/* rr de'|hl' */
-		| label? _TK_RR _TK_<R>1 _TK_NEWLINE
-		  @{ DO_stmt(Z80_ALTD); DO_stmt( Z80_RR_<R> ); }
-#endfor <R>
 
 		/*---------------------------------------------------------------------
 		*   Bit Set, Reset and Test Group
@@ -569,16 +489,6 @@ Define rules for a ragel-based parser.
 		  }
 	#endfor  <R>
 #endfor  <OP>
-
-		/*---------------------------------------------------------------------
-		*   opcodes without arguments
-		*--------------------------------------------------------------------*/
-#foreach <OP> in RLA, RLCA, RRA, RRCA, \
-				 IOI, IOE
-		| label? _TK_<OP> _TK_NEWLINE
-		  @{ DO_stmt( Z80_<OP> ); }
-#endfor  <OP>	
-
 
 		/*---------------------------------------------------------------------
 		*   Rabbit Opcodes

@@ -640,8 +640,6 @@
  tstio 85               ;; 0DB9:  ED 74 55
  tstio 170              ;; 0DB9:  ED 74 AA
  tstio 255              ;; 0DB9:  ED 74 FF
- ioe                    ;; 0DB9:  DB
- ioi                    ;; 0DB9:  D3
  otdm                   ;; 0DC9:  ED 8B
  otdmr                  ;; 0DC9:  ED 9B
  otim                   ;; 0DC9:  ED 83

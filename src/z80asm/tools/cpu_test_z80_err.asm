@@ -159,6 +159,9 @@
  altd dec hl            ; Error
  altd dec l             ; Error
  altd djnz NN           ; Error
+ altd ex (sp),hl        ; Error
+ altd ex de',hl         ; Error
+ altd ex de,hl          ; Error
  altd inc a             ; Error
  altd inc b             ; Error
  altd inc bc            ; Error
@@ -312,6 +315,9 @@
  altd pop bc            ; Error
  altd pop de            ; Error
  altd pop hl            ; Error
+ altd rl de             ; Error
+ altd rr de             ; Error
+ altd rr hl             ; Error
  altd sbc (hl)          ; Error
  altd sbc (ix)          ; Error
  altd sbc (ix+DIS)      ; Error
@@ -437,6 +443,10 @@
  dec hl'                ; Error
  dec l'                 ; Error
  djnz b',NN             ; Error
+ ex (sp),hl'            ; Error
+ ex de',hl              ; Error
+ ex de',hl'             ; Error
+ ex de,hl'              ; Error
  idet                   ; Error
  im -1                  ; Error
  im 3                   ; Error
@@ -671,6 +681,14 @@
  rdmode                 ; Error
  ret lo                 ; Error
  ret lz                 ; Error
+ rl de                  ; Error
+ rl de'                 ; Error
+ rr de                  ; Error
+ rr de'                 ; Error
+ rr hl                  ; Error
+ rr hl'                 ; Error
+ rr ix                  ; Error
+ rr iy                  ; Error
  rst -1                 ; Error
  rst 49                 ; Error
  rst 57                 ; Error

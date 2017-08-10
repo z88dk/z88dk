@@ -372,9 +372,6 @@
 
 [z180]		tstio N			=> ED, 74, N
 
-[rabbit]	ioe				=>     DB
-[rabbit]	ioi				=>     D3
-
 [zilog]		ini				=> ED, A2
 [zilog]		inir			=> ED, B2
 [zilog]		ind				=> ED, AA

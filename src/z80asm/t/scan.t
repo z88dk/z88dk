@@ -879,6 +879,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SET,  	T_ALL)
 	T_OPCODE(SLA,  	T_ALL)
 	T_OPCODE(SLL,  	T_Z80)
+	T_OPCODE(SLI,  	T_Z80)
 	T_OPCODE(SRA,  	T_ALL)
 	T_OPCODE(SRL,  	T_ALL)
 	T_OPCODE(SUB,	T_ALL);
