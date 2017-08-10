@@ -1,0 +1,13 @@
+target/yaz180/driver/diskio/c/sdcc_iy/disk_initialise
+target/yaz180/driver/diskio/c/sdcc_iy/disk_initialise_callee
+target/yaz180/driver/diskio/c/sdcc_iy/disk_initialise_fastcall
+target/yaz180/driver/diskio/c/sdcc_iy/disk_ioctl
+target/yaz180/driver/diskio/c/sdcc_iy/disk_ioctl_callee
+target/yaz180/driver/diskio/c/sdcc_iy/disk_status
+target/yaz180/driver/diskio/c/sdcc_iy/disk_status_callee
+target/yaz180/driver/diskio/c/sdcc_iy/disk_status_fastcall
+target/yaz180/driver/diskio/c/sdcc_iy/disk_read
+target/yaz180/driver/diskio/c/sdcc_iy/disk_read_callee
+target/yaz180/driver/diskio/c/sdcc_iy/disk_write
+target/yaz180/driver/diskio/c/sdcc_iy/disk_write_callee
+@target/yaz180/driver/diskio/diskio_asm.lst

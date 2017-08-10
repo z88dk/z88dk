@@ -5,7 +5,9 @@ PUBLIC asm_disk_ioctl
 EXTERN ide_drive_id
 EXTERN ide_cache_flush
 
-EXTERN idestatus
+EXTERN ideStatus, ideBuffer
+
+EXTERN l_fast_mulu_32_16x16, l_fast_mulu_32_32x32
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called from diskio.h
@@ -30,11 +32,14 @@ EXTERN idestatus
 ; entry
 ; c = BYTE pdrv
 ; b = BYTE cmd
-; hl = void* buff
+; hl = void* buff (for the result)
+;
+; no guarentee that buff will be large enough to hold the whole ioctl response
+; so use our own buffer, ideBuffer.
 ;
 ; exit
-; b = DRESULT, set carry flag
-; hl = void* buff
+; l = DRESULT, set carry flag
+;
     
 ; control the ide drive
 
@@ -42,11 +47,11 @@ asm_disk_ioctl:
     push af
     push de
 
-    xor a       ; clear a
-    or c        ; check that that it is drive 0
+    xor a                   ; clear a
+    or c                    ; check that that it is drive 0
     jr nz, dresult_error
     
-    inc b       ; start checking the cmd byte in b
+    inc b                   ; start checking the cmd byte in b
     djnz get_sector_count
 
     call ide_cache_flush    ; cmd = 0
@@ -55,17 +60,19 @@ asm_disk_ioctl:
 
 get_sector_count:
     djnz get_sector_size
-
+    
+    push hl                 ; save the output buffer origin
+    ld hl, ideBuffer        ; insert our own scratch buffer
     call ide_drive_id       ; cmd = 1 get the drive id info.
     jr nc, dresult_error
-    ld de, 10               ; prepare the sector count offset
-    ex de, hl               ; swap buffer origin to de
-    add hl, de              ; put sector count origin in hl
-    ldi
-    ldi                     ; one word
+
+    ld bc, 4                ; number of bytes to move
+    pop de                  ; get calling buffer origin in de
+    ld hl, ideBuffer+120    ; prepare the logical sectors offset
+    ldir                    ; 4 bytes
     
-                            ; FIXME -> this count is incorrect.
-                            ; need to multiply all sector count fields.
+    ld a, (hl)
+
     jr dresult_ok
 
 get_sector_size:
@@ -84,56 +91,62 @@ get_block_size:
     ld (hl), 2              ; set value at pointer to 0x200 (512)
     jr dresult_ok
 
-ata_get_rev:
-    ld a, b
-    sub 17                  ; gap to next ATA commands
-    ld b, a
-    jr nz, ata_get_model
-
-    call ide_drive_id       ; cmd = 20 get the drive firmware revision.
-    jr nc, dresult_error
-    ld bc, 8                ; number of bytes to move
-    ld de, 46               ; prepare the firmware offset
-    ex de, hl               ; swap buffer origin to de
-    add hl, de              ; put firmware origin in hl
-    ldir                    ; 8 bytes
-    jr dresult_ok
-
-ata_get_model:
-    djnz ata_get_sn
-    
-    call ide_drive_id       ; cmd = 21 get the drive model number.
-    jr nc, dresult_error
-    ld bc, 40               ; number of bytes to move
-    ld de, 54               ; prepare the model number offset
-    ex de, hl               ; swap buffer origin to de
-    add hl, de              ; put model number origin in hl
-    ldir                    ; 40 bytes
-    jr dresult_ok
-     
-ata_get_sn:
-    djnz dresult_error
-    
-    call ide_drive_id       ; cmd = 22 get the serial number.
-    jr nc, dresult_error
-    ld bc, 20               ; number of bytes to move
-    ld de, 20               ; prepare the serial number offset
-    ex de, hl               ; swap buffer origin to de
-    add hl, de              ; put serial number origin in hl
-    ldir                    ; 20 bytes
-;   jr dresult_ok
-    
 dresult_ok:
-    ld b, 0                 ; set DRESULT RES_OK
+    ld hl, 0                ; set DRESULT RES_OK
     pop de
     pop af
     scf
     ret
 
 dresult_error:
-    ld b, 1                 ; set DRESULT RES_ERROR
+    ld hl, 1                ; set DRESULT RES_ERROR
     pop de
     pop af
     or a
     ret
+
+ata_get_rev:
+    ld a, b
+    sub 17                  ; gap to next ATA commands
+    ld b, a
+    jr nz, ata_get_model
+
+    push hl                 ; save the output buffer origin
+    ld hl, ideBuffer        ; insert our own scratch buffer
+    call ide_drive_id       ; cmd = 20 get the drive firmware revision.
+    jr nc, dresult_error
+
+    ld bc, 8                ; number of bytes to move
+    pop de                  ; get calling buffer origin in de
+    ld hl, ideBuffer+46     ; prepare the firmware offset
+    ldir                    ; 8 bytes
+    jr dresult_ok
+
+ata_get_model:
+    djnz ata_get_sn
+
+    push hl                 ; save the output buffer origin
+    ld hl, ideBuffer        ; insert our own scratch buffer
+    call ide_drive_id       ; cmd = 21 get the drive model number.
+    jr nc, dresult_error
+
+    ld bc, 40               ; number of bytes to move
+    pop de                  ; get calling buffer origin in de
+    ld hl, ideBuffer+54     ; prepare the model number offset
+    ldir                    ; 40 bytes
+    jr dresult_ok
+     
+ata_get_sn:
+    djnz dresult_error
+
+    push hl                 ; save the output buffer origin
+    ld hl, ideBuffer        ; insert our own scratch buffer
+    call ide_drive_id       ; cmd = 22 get the serial number.
+    jr nc, dresult_error
+
+    ld bc, 20               ; number of bytes to move
+    pop de                  ; get calling buffer origin in de
+    ld hl, ideBuffer+20     ; prepare the serial number offset
+    ldir                    ; 20 bytes
+    jr dresult_ok
 

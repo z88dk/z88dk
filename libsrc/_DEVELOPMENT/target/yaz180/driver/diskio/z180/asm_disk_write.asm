@@ -8,10 +8,10 @@ EXTERN ide_write_sector
 ; Routines that talk with the IDE drive, these should be called from diskio.h
 ;
 ; DRESULT disk_write (
-;   BYTE pdrv,          /* Physical drive nmuber to identify the drive */
-;   const BYTE *buff,   /* Data to be written */
-;   DWORD sector,       /* Start sector in LBA */
-;   UINT count          /* Number of sectors to write */ ) __z88dk_callee;
+;   BYTE pdrv,                      /* Physical drive number to identify the drive */
+;   const BYTE *buff,               /* Data to be written */
+;   DWORD sector,                   /* Start sector in LBA */
+;   UINT count ) __z88dk_callee;    /* Number of sectors to write (<256) */
 ;
 ; entry
 ; a = number of sectors (< 256)
@@ -19,21 +19,17 @@ EXTERN ide_write_sector
 ; hl = the address pointer to the buffer to fill
 ;
 ; exit
-; a = number of written sectors (< 256), set carry flag
-; bcde = LBA following sectors written
-; hl = the address pointer to the buffer filled
-
+; l = DRESULT, set carry flag
+;
 
 asm_disk_write:
-    push af                 ; save total sector count
-    push hl                 ; save origin pointer
     or a                    ; check sectors != 0
-    jr z, error
+    jr z, dresult_error
 loop:
     call ide_write_sector    ; with the logical block address in bcde, write one sector
-    jr nc, error
+    jr nc, dresult_error
     dec a
-    jr z, success
+    jr z, dresult_ok
     push bc
     ld bc, 512
     add hl, bc              ; increment the buffer pointer by 512 bytes
@@ -47,14 +43,12 @@ loop:
     inc bc                  ; otherwise increment LBA upper word
     jr loop
     
-success:
-    pop hl
-    pop af
+dresult_ok:
+    ld hl, 0                ; set DRESULT RES_OK
     scf
     ret
 
-error:
-    pop hl
-    pop af
+dresult_error:
+    ld hl, 1                ; set DRESULT RES_ERROR
     or a
     ret
