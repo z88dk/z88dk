@@ -76,5 +76,5 @@ rc_00_input_basic_ichar_msg_getc:
    cp CHAR_CTRL_Z
    jp z, error_mc              ; generate EOF (ctrl-z is from cp/m)
    
-   ccf                         ; reset carry to indicate no error
+   or a                        ; reset carry to indicate no error
    ret
