@@ -29,6 +29,6 @@ asm_disk_status:
 sta_nodisk:
     ld l, 2             ; set DSTATUS STA_NODISK
     pop af
-    ccf
+    or a
     ret
 

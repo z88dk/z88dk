@@ -38,6 +38,6 @@ ide_wait_ready2:
 
 ide_wait_error:
     pop af
-    ccf                     ;clear carry flag on failure
+    or a                    ;clear carry flag on failure
     ret
 

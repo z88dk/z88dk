@@ -56,5 +56,5 @@ success:
 error:
     pop hl
     pop af
-    ccf
+    or a
     ret

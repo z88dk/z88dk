@@ -134,6 +134,6 @@ dresult_error:
     ld b, 1                 ; set DRESULT RES_ERROR
     pop de
     pop af
-    ccf
+    or a
     ret
 

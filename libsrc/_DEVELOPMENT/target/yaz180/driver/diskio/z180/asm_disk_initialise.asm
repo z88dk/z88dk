@@ -44,12 +44,12 @@ asm_disk_initialise:
 sta_noinit:
     ld l, 1             ; set DSTATUS STA_NOINIT
     pop af
-    ccf
+    or a
     ret
 
 sta_nodisk:
     ld l, 2             ; set DSTATUS STA_NODISK
     pop af
-    ccf
+    or a
     ret
 
