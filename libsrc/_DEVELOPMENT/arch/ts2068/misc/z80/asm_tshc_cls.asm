@@ -8,55 +8,23 @@
 ;
 ; ===============================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_tshc_cls
+
+EXTERN asm_tshc_cls_pix, asm_tshc_cls_attr
 
 asm_tshc_cls:
 
    ; enter : l = attr
    ;
    ; uses  : af, bc, de, hl
- 
-   ; attributes
 
-   ld a,l
+   push hl
    
-   ld hl,$6000
-   ld (hl),a
-   
-   ld de,$6001
-   ld bc,6143
+   ld l,0
+   call asm_tshc_cls_pix
 
-IF __CLIB_OPT_FASTCOPY & $20
-
-   EXTERN l_fast_ldir_0
-   call   l_fast_ldir_0 + 2
-
-ELSE
-
-   ldir
-
-ENDIF
-
-   ; pixels
-
-   ld hl,$4000
-   ld (hl),l
-   
-   ld de,$4001
-   ld bc,6143
-
-IF __CLIB_OPT_FASTCOPY & $20
-
-   jp l_fast_ldir_0 + 2
-
-ELSE
-
-   ldir
-   ret
-
-ENDIF
+   pop hl
+   jp asm_tshc_cls_attr
