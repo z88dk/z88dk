@@ -63,7 +63,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define highvideo()	printf("\033[1m")
 #define lowvideo()	printf("\033[2m")
 #define normvideo()	printf("\033[m")
-#define delline()	printf("\033[m")
+#define delline()	printf("\033[M")
 //#define clrscr() textattr(7);fputc_cons(12)
 /* In this way we can do some sort of color and setcolor functions redefinition */
 #define clrscr() printf("\033[%um\033[%um%c",30,47,12)
