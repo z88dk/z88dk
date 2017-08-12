@@ -42,6 +42,10 @@ for %%t in (%targets%) do (
       ) else (
          if "%%t" == "z180" (
             set cpu="--cpu=z180"
+         ) else (
+            if "%%t" == "zxn" (
+               set cpu="--cpu=z80-zxn"
+            )
          )
       )
       
@@ -61,7 +65,7 @@ for %%t in (%targets%) do (
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
-		if "%%t" == "zxn" (
+      if "%%t" == "zxn" (
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
