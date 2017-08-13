@@ -663,6 +663,12 @@
  call lz,-32768         ; E4 00 80
  call lz,32767          ; E4 FF 7F
  call lz,65535          ; E4 FF FF
+ call nv,-32768         ; E4 00 80
+ call nv,32767          ; E4 FF 7F
+ call nv,65535          ; E4 FF FF
+ call v,-32768          ; EC 00 80
+ call v,32767           ; EC FF 7F
+ call v,65535           ; EC FF FF
  ccf                    ; 3F
  ccf f                  ; 3F
  ccf f'                 ; 76 3F
@@ -834,6 +840,9 @@
  jp nc,-32768           ; D2 00 80
  jp nc,32767            ; D2 FF 7F
  jp nc,65535            ; D2 FF FF
+ jp nv,-32768           ; E2 00 80
+ jp nv,32767            ; E2 FF 7F
+ jp nv,65535            ; E2 FF FF
  jp nz,-32768           ; C2 00 80
  jp nz,32767            ; C2 FF 7F
  jp nz,65535            ; C2 FF FF
@@ -846,6 +855,9 @@
  jp po,-32768           ; E2 00 80
  jp po,32767            ; E2 FF 7F
  jp po,65535            ; E2 FF FF
+ jp v,-32768            ; EA 00 80
+ jp v,32767             ; EA FF 7F
+ jp v,65535             ; EA FF FF
  jp z,-32768            ; CA 00 80
  jp z,32767             ; CA FF 7F
  jp z,65535             ; CA FF FF
@@ -1405,10 +1417,12 @@
  ret lz                 ; E0
  ret m                  ; F8
  ret nc                 ; D0
+ ret nv                 ; E0
  ret nz                 ; C0
  ret p                  ; F0
  ret pe                 ; E8
  ret po                 ; E0
+ ret v                  ; E8
  ret z                  ; C8
  reti                   ; ED 4D
  rl (hl)                ; CB 16

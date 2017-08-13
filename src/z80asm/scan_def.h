@@ -129,6 +129,8 @@ TOKEN_KW(P,  )
 TOKEN_KW(M,  )
 TOKEN_KW(LZ, )
 TOKEN_KW(LO, )
+TOKEN_KW(NV, )
+TOKEN_KW(V,  )
 
 /* 8-bit registers */
 TOKEN_KW(B, )

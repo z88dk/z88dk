@@ -12,26 +12,26 @@
 #------------------------------------------------------------------------------
 # 8-bit load group
 #------------------------------------------------------------------------------
-ld	<b.c.d.e.h.l..a>,<b.c.d.e.h.l.(hl).a>		=> 40+<1>*8+<2>
-ld	<b.c.d.e.h.l..a>,N							=> 06+<1>*8 N
+ld	{b|c|d|e|h|l||a},{b|c|d|e|h|l|(hl)|a}		=> 40+$1*8+$2
+ld	{b|c|d|e|h|l||a},N							=> 06+$1*8 N
 
-ld	(hl),<b.c.d.e.h.l..a>						=> 70+<1>
+ld	(hl),{b|c|d|e|h|l||a}						=> 70+$1
 ld	(hl),N										=> 36 N
 
 ld	a,(NN) 										=> 3A NNl NNh
 ld	(NN),a 										=> 32 NNl NNh
 
-ld	a,<(bc).(de)>								=> 0A+<1>*10
-ld	<(bc).(de)>,a								=> 02+<1>*10
+ld	a,{(bc)|(de)}								=> 0A+$1*10
+ld	{(bc)|(de)},a								=> 02+$1*10
 
 #------------------------------------------------------------------------------
 # 8 bit arithmetic and logical group
 #------------------------------------------------------------------------------
-<add.adc.sub.sbc.and.xor.or.cp> a,<b.c.d.e.h.l.(hl).a>	=> 80+<1>*8+<2>
-<add.adc.sub.sbc.and.xor.or.cp> a,N						=> C6+<1>*8 N
-<inc.dec> <b.c.d.e.h.l.(hl).a>							=> 04+<1>+<2>*8
+{add|adc|sub|sbc|and|xor|or|cp} a,{b|c|d|e|h|l|(hl)|a}	=> 80+$1*8+$2
+{add|adc|sub|sbc|and|xor|or|cp} a,N						=> C6+$1*8 N
+{inc|dec} {b|c|d|e|h|l|(hl)|a}							=> 04+$1+$2*8
 
-[not_z80]	tst	a,<b.c.d.e.h.l.(hl).a>			=> ED 04+<1>*8
+[not_z80]	tst	a,{b|c|d|e|h|l|(hl)|a}			=> ED 04+$1*8
 [not_z80]	tst	a,N								=> ED 64 N
 
 [zilog]		daa					=> 27
@@ -47,20 +47,20 @@ scf f							=> 37
 #------------------------------------------------------------------------------
 # 16 bit load group
 #------------------------------------------------------------------------------
-ld	<bc.de.hl.sp>,NN			=> 01+<1>*10 NNl NNh
-ld	hl,(NN)						=> 2A NNl NNh
-ld	<bc.de..sp>,(NN)			=> ED 4B+<1>*10 NNl NNh
+			ld	{bc|de|hl|sp},NN	=> 01+$1*10 NNl NNh
+			ld	hl,(NN)				=> 2A NNl NNh
+			ld	{bc|de||sp},(NN)	=> ED 4B+$1*10 NNl NNh
 
-ld	(NN),hl						=> 22 NNl NNh
-ld	(NN),<bc.de..sp>			=> ED 43+<1>*10 NNl NNh
+			ld	(NN),hl				=> 22 NNl NNh
+			ld	(NN),{bc|de||sp}	=> ED 43+$1*10 NNl NNh
 
-ld	sp,hl						=> F9
+			ld	sp,hl				=> F9
 
-			push <bc.de.hl.af>	=> C5+<1>*10
+			push {bc|de|hl|af}	=> C5+$1*10
 [rabbit]	push ip				=> ED 76
 [r3k]		push su				=> ED 66
 
-			pop  <bc.de.hl.af>	=> C1+<1>*10
+			pop  {bc|de|hl|af}	=> C1+$1*10
 [rabbit]	pop  ip				=> ED 7E
 [r3k]		pop  su				=> ED 6E
 
@@ -97,7 +97,7 @@ ld	sp,hl						=> F9
 #------------------------------------------------------------------------------
 # Exchange group
 #------------------------------------------------------------------------------
-ex af,<af.af'>					=> 08
+ex af,{af|af'}					=> 08
 exx								=> D9
 
 ex (sp),hl						=> zilog ? E3 : ED 54
@@ -119,32 +119,28 @@ ex (sp),iy						=> FD E3
 #------------------------------------------------------------------------------
 # 16 bit arithmetic and logical group
 #------------------------------------------------------------------------------
-add hl,<bc.de.hl.sp>			=> 09+<1>*10
-<sbc.adc> hl,<bc.de.hl.sp>		=> ED 42+<1>*8+<2>*10
+			add hl,{bc|de|hl|sp}			=> 09+$1*10
+			{sbc|adc} hl,{bc|de|hl|sp}		=> ED 42+$1*8+$2*10
 
-<inc.dec> <bc.de.hl.sp>			=> 03+<1>*8+<2>*10
+			{inc|dec} {bc|de|hl|sp}			=> 03+$1*8+$2*10
 
-[not_z80]	mlt <bc.de.hl.>		=> ED 4C+<1>*10
-[z180]		mlt <...sp>			=> ED 4C+<1>*10
-[rabbit]	mul					=> F7
+[not_z80]	mlt {bc|de|hl|}					=> ED 4C+$1*10
+[z180]		mlt {|||sp}						=> ED 4C+$1*10
+[rabbit]	mul								=> F7
 
-[r3k]		uma					=> ED C0
-[r3k]		ums					=> ED C8
+[r3k]		uma								=> ED C0
+[r3k]		ums								=> ED C8
 
 #------------------------------------------------------------------------------
 # 8 Bit Rotate and Shift Group
 #------------------------------------------------------------------------------
-			<rlca.rrca.rla.rra>									=> 07+<1>*8
+			{rlca|rrca|rla|rra}									=> 07+$1*8
 	
-			<rlc.rrc.rl.rr.sla.sra..srl> <b.c.d.e.h.l.(hl).a>	=> CB <1>*8+<2>
-[zilog]		<......sll.>                 <b.c.d.e.h.l.(hl).a>	=> CB <1>*8+<2>
-[zilog]		<......sli.>                 <b.c.d.e.h.l.(hl).a>	=> CB <1>*8+<2>
+			{rlc|rrc|rl|rr|sla|sra|         |srl} {b|c|d|e|h|l|(hl)|a}	=> CB $1*8+$2
+[zilog]		{   |   |  |  |   |   |{sll|sli}|   } {b|c|d|e|h|l|(hl)|a}	=> CB $1*8+$3
 
-[z80]		<rlc.rrc.rl.rr.sla.sra.sll.srl> (ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS <1>*8+<2>
-[z80]		<......sli.>                    (ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS <1>*8+<2>
 
-[z80]		<rlc.rrc.rl.rr.sla.sra.sll.srl> (iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS <1>*8+<2>
-[z80]		<......sli.>                    (iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS <1>*8+<2>
+[z80]		{rlc|rrc|rl|rr|sla|sra|{sll|sli}|srl} ({ix|iy}+DIS),{b|c|d|e|h|l||a}	=> DD+$3*20 CB DIS $1*8+$4
 
 #------------------------------------------------------------------------------
 # 16 Bit Rotate and Shift Group
@@ -197,14 +193,14 @@ reti							=> ED 4D
 #------------------------------------------------------------------------------
 # Jump Group
 #------------------------------------------------------------------------------
-jp 	NN							=> C3 NNl NNh
-jp 	<nz.z.nc.c.po.pe.p.m>,NN	=> C2+<1>*8 NNl NNh
-[rabbit] 	jp	<....lz.lo..>,NN => C2+<1>*8 NNl NNh
+			jp 	NN							=> C3 NNl NNh
+			jp 	{nz|z|nc|c|{po|nv}|{pe|v}|p|m},NN	=> C2+$1*8 NNl NNh
+[rabbit] 	jp	{||||lz|lo||},NN => C2+$1*8 NNl NNh
 
 jp 	(hl)						=> E9
 
 jr 	NN							=> 18 NNe
-jr 	<nz.z.nc.c>,NN				=> 20+<1>*8 NNe
+jr 	{nz|z|nc|c},NN				=> 20+$1*8 NNe
 
 djnz NN							=> 10 NNe
 djnz b,NN						=> 10 NNe
@@ -221,18 +217,18 @@ djnz b,NN						=> 10 NNe
 #------------------------------------------------------------------------------
 # Call and Return Group
 #------------------------------------------------------------------------------
-call NN							=> CD NNl NNh
-call <nz.z.nc.c.po.pe.p.m>,NN	=> C4+<1>*8 NNl NNh
-[rabbit] call <....lz.lo..>,NN	=> C4+<1>*8 NNl NNh
+			call NN							=> CD NNl NNh
+			call {nz|z|nc|c|{po|nv}|{pe|v}|p|m},NN	=> C4+$1*8 NNl NNh
+[rabbit] 	call {||||lz|lo||},NN	=> C4+$1*8 NNl NNh
 
 # TODO: LCALL not supported
 
-rst CONST						=> choose(            16:D7 24:DF 32:E7 40:EF       56:FF)
-[zilog]		rst CONST			=> choose( 0:C7  8:CF                         48:F7      )
+rst CONST							=> choose(            16:D7 24:DF 32:E7 40:EF       56:FF)
+[zilog]		rst CONST				=> choose( 0:C7  8:CF                         48:F7      )
 
-ret								=> C9
-ret <nz.z.nc.c.po.pe.p.m>		=> C0+<1>*8
-[rabbit] ret <....lz.lo..>		=> C0+<1>*8
+			ret							=> C9
+			ret {nz|z|nc|c|{po|nv}|{pe|v}|p|m}	=> C0+$1*8
+[rabbit] 	ret {||||lz|lo||}	=> C0+$1*8
 
 # TODO: LRET not supported
 
@@ -264,14 +260,14 @@ lddr							=> ED B8
 # Input and Output Group
 #------------------------------------------------------------------------------
 [zilog]		in  a,(N)					=> DB N
-[zilog]		in  <b.c.d.e.h.l.f.a>,(c)	=> ED 40+<1>*8
-[z180]		in0 <b.c.d.e.h.l.f.a>,(N)	=> ED 00+<1>*8 N
+[zilog]		in  {b|c|d|e|h|l|f|a},(c)	=> ED 40+$1*8
+[z180]		in0 {b|c|d|e|h|l|f|a},(N)	=> ED 00+$1*8 N
 
 [zilog]		out  (N),a					=> D3 N
-[zilog]		out  (c),<b.c.d.e.h.l..a>	=> ED 41+<1>*8
+[zilog]		out  (c),{b|c|d|e|h|l||a}	=> ED 41+$1*8
 [zilog]		out  (c),CONST				=> ED 41+choose(0:6)*8
 
-[z180]		out0 (N),<b.c.d.e.h.l..a>	=> ED 01+<1>*8 N
+[z180]		out0 (N),{b|c|d|e|h|l||a}	=> ED 01+$1*8 N
 
 [z180]		tstio N						=> ED 74 N
 
@@ -314,33 +310,33 @@ __END__
 
 # 16-bits load group
 
-ld	<bc..de..hl>,<bc..de..hl>	=> 40+<1>*8+<2>      49+<1>*8+<2>
-ld	<bc..de..>,ix				=> DD 44+<1>*8     DD 4D+<1>*8
-ld	<bc..de..>,iy				=> FD 44+<1>*8     FD 4D+<1>*8
+ld	{bc||de||hl},{bc||de||hl}	=> 40+$1*8+$2      49+$1*8+$2
+ld	{bc||de||},ix				=> DD 44+$1*8     DD 4D+$1*8
+ld	{bc||de||},iy				=> FD 44+$1*8     FD 4D+$1*8
 
-ld	<bc..de..>,(hl)				=> 4E+<1>*8 23     46+<1>*8 2B
-ldi	<bc..de..>,(hl)				=> 4E+<1>*8 23     46+<1>*8 23
+ld	{bc||de||},(hl)				=> 4E+$1*8 23     46+$1*8 2B
+ldi	{bc||de||},(hl)				=> 4E+$1*8 23     46+$1*8 23
 
-ld	<bc..de..hl>,(ix+DIS)		=> DD 4E+<1>*8 DIS           DD 46+<1>*8 DIS+1
-ldi	<bc..de..hl>,(ix+DIS)		=> DD 4E+<1>*8 DIS DD 23 DD 46+<1>*8 DIS DD 23 
+ld	{bc||de||hl},(ix+DIS)		=> DD 4E+$1*8 DIS           DD 46+$1*8 DIS+1
+ldi	{bc||de||hl},(ix+DIS)		=> DD 4E+$1*8 DIS DD 23 DD 46+$1*8 DIS DD 23 
 
-ld	<bc..de..hl>,(iy+DIS)		=> FD 4E+<1>*8 DIS           FD 46+<1>*8 DIS+1
-ldi	<bc..de..hl>,(iy+DIS)		=> FD 4E+<1>*8 DIS FD 23 FD 46+<1>*8 DIS FD 23
+ld	{bc||de||hl},(iy+DIS)		=> FD 4E+$1*8 DIS           FD 46+$1*8 DIS+1
+ldi	{bc||de||hl},(iy+DIS)		=> FD 4E+$1*8 DIS FD 23 FD 46+$1*8 DIS FD 23
 
-ld 	(hl),<bc..de>				=> 71+<2> 23     70+<2> 2B
-ldi	(hl),<bc..de>				=> 71+<2> 23     70+<2> 23
+ld 	(hl),{bc||de}				=> 71+$2 23     70+$2 2B
+ldi	(hl),{bc||de}				=> 71+$2 23     70+$2 23
 
-ld 	(ix+DIS),<bc..de..hl>		=> DD 71+<2> DIS           DD 70+<2> DIS+1
-ldi	(ix+DIS),<bc..de..hl>		=> DD 71+<2> DIS DD 23 DD 70+<2> DIS DD 23
+ld 	(ix+DIS),{bc||de||hl}		=> DD 71+$2 DIS           DD 70+$2 DIS+1
+ldi	(ix+DIS),{bc||de||hl}		=> DD 71+$2 DIS DD 23 DD 70+$2 DIS DD 23
 
-ld 	(iy+DIS),<bc..de..hl>		=> FD 71+<2> DIS FD 70+<2> DIS+1
-ldi	(iy+DIS),<bc..de..hl>		=> FD 71+<2> DIS FD 23 FD 70+<2> DIS FD 23
+ld 	(iy+DIS),{bc||de||hl}		=> FD 71+$2 DIS FD 70+$2 DIS+1
+ldi	(iy+DIS),{bc||de||hl}		=> FD 71+$2 DIS FD 23 FD 70+$2 DIS FD 23
 
 ld 	hl,ix						=> DD E5 E1
 ld 	hl,iy						=> FD E5 E1
 
-ld	ix,<bc..de..>				=> DD 69+<2>       DD 60+<2>
-ld	iy,<bc..de..>				=> FD 69+<2>       FD 60+<2>
+ld	ix,{bc||de||}				=> DD 69+$2       DD 60+$2
+ld	iy,{bc||de||}				=> FD 69+$2       FD 60+$2
 
 ld ix,hl						=> E5 DD E1
 ld iy,hl						=> E5 FD E1
@@ -382,75 +378,75 @@ cpdr											=> ED B9
 #------------------------------------------------------------------------------
 # 8 bit arithmetic and logical group
 
-add hl,<bc.de.hl.sp>							=>		09+<2>*10
-add ix,<bc.de.ix.sp>							=> DD 09+<2>*10
-add iy,<bc.de.iy.sp>							=> FD 09+<2>*10
+add hl,{bc|de|hl|sp}							=>		09+$2*10
+add ix,{bc|de|ix|sp}							=> DD 09+$2*10
+add iy,{bc|de|iy|sp}							=> FD 09+$2*10
 
-<sbc.adc> hl,<bc.de.hl.sp>						=> ED 42+<0:3>+<2>*10
-sub hl,<bc.de.hl.sp>							=> B7 ED 42+<2>*10
+{sbc|adc} hl,{bc|de|hl|sp}						=> ED 42+{0:3}+$2*10
+sub hl,{bc|de|hl|sp}							=> B7 ED 42+$2*10
 
-<inc.dec> <bc.de.hl.sp>							=>		03+<0:3>+<1>*10
-<inc.dec> <..ix.>								=> DD 03+<0:3>+<1>*10
-<inc.dec> <..iy.>								=> FD 03+<0:3>+<1>*10
+{inc|dec} {bc|de|hl|sp}							=>		03+{0:3}+$1*10
+{inc|dec} {||ix|}								=> DD 03+{0:3}+$1*10
+{inc|dec} {||iy|}								=> FD 03+{0:3}+$1*10
 
 #------------------------------------------------------------------------------
 # rotate and shift group
 
 # rotate 16 bits
 
-rl <bc..de..hl>					=> CB 11+<1> CB 10+<1>
-rr <bc..de..hl>					=> CB 18+<1> CB 19+<1>
+rl {bc||de||hl}					=> CB 11+$1 CB 10+$1
+rr {bc||de||hl}					=> CB 18+$1 CB 19+$1
 
 sla hl							=> 29			# special case: add hl,hl
-sla <bc..de..hl>				=> CB 21+<1> CB 10+<1>
-sll <bc..de..hl>				=> CB 31+<1> CB 10+<1>
-sli <bc..de..hl>				=> CB 31+<1> CB 10+<1>
+sla {bc||de||hl}				=> CB 21+$1 CB 10+$1
+sll {bc||de||hl}				=> CB 31+$1 CB 10+$1
+sli {bc||de||hl}				=> CB 31+$1 CB 10+$1
 
-sra <bc..de..hl>				=> CB 28+<1> CB 19+<1>
-srl <bc..de..hl>				=> CB 38+<1> CB 19+<1>
+sra {bc||de||hl}				=> CB 28+$1 CB 19+$1
+srl {bc||de||hl}				=> CB 38+$1 CB 19+$1
 
 #------------------------------------------------------------------------------
 # Bit Set, Reset and Test Group
 
-<.bit.res.set> <0.1.2.3.4.5.6.7>,<b.c.d.e.h.l..a>			=> CB     <0:6>+<1>*8+<2>
-<.bit.res.set> <0.1.2.3.4.5.6.7>,(hl)						=> CB     <0:6>+<1>*8+6
-<.bit.res.set> <0.1.2.3.4.5.6.7>,(ix+DIS)					=> DD CB DIS <0:6>+<1>*8+6
-<.bit.res.set> <0.1.2.3.4.5.6.7>,(iy+DIS)					=> FD CB DIS <0:6>+<1>*8+6
-<..res.set>    <0.1.2.3.4.5.6.7>,(ix+DIS),<b.c.d.e.h.l..a>	=> DD CB DIS <0:6>+<1>*8+<3>
-<..res.set>    <0.1.2.3.4.5.6.7>,(iy+DIS),<b.c.d.e.h.l..a>	=> FD CB DIS <0:6>+<1>*8+<3>
+{|bit|res|set} {0|1|2|3|4|5|6|7},{b|c|d|e|h|l||a}			=> CB     {0:6}+$1*8+$2
+{|bit|res|set} {0|1|2|3|4|5|6|7},(hl)						=> CB     {0:6}+$1*8+6
+{|bit|res|set} {0|1|2|3|4|5|6|7},(ix+DIS)					=> DD CB DIS {0:6}+$1*8+6
+{|bit|res|set} {0|1|2|3|4|5|6|7},(iy+DIS)					=> FD CB DIS {0:6}+$1*8+6
+{||res|set}    {0|1|2|3|4|5|6|7},(ix+DIS),{b|c|d|e|h|l||a}	=> DD CB DIS {0:6}+$1*8+$3
+{||res|set}    {0|1|2|3|4|5|6|7},(iy+DIS),{b|c|d|e|h|l||a}	=> FD CB DIS {0:6}+$1*8+$3
 
 #------------------------------------------------------------------------------
 # Jump Group
 
-jp NN											=> 		C3       NNl NNh
-jp <nz.z.nc.c.po.pe.p.m>,NN						=> 		C2+<1>*8 NNl NNh
+			jp NN											=> 		C3       NNl NNh
+			jp {nz|z|nc|c|{po|nv}|{pe|v}|p|m},NN						=> 		C2+$1*8 NNl NNh
 
-jr NN											=> 		18       NNo
-jr <nz.z.nc.c>,NN								=> 		20+<1>*8 NNo
-jr <....po.pe.p.m>,NN							=> 		C2+<1>*8 NNl NNh
-djnz NN											=>		10       NNo
+			jr NN											=> 		18       NNo
+			jr {nz|z|nc|c},NN								=> 		20+$1*8 NNo
+			jr {||||{po|nv}|{pe|v}|p|m},NN							=> 		C2+$1*8 NNl NNh
+			djnz NN											=>		10       NNo
 
-jp (hl)											=> 		E9
-jp (ix)											=> DD	E9
-jp (iy)											=> FD	E9
+			jp (hl)											=> 		E9
+			jp (ix)											=> DD	E9
+			jp (iy)											=> FD	E9
 
 #------------------------------------------------------------------------------
 # Call and Return Group
 
 call NN											=> 		CD       NNl NNh
-call <nz.z.nc.c.po.pe.p.m>,NN					=> 		C4+<1>*8 NNl NNh
+call {nz|z|nc|c|{po|nv}|{pe|v}|p|m},NN					=> 		C4+$1*8 NNl NNh
 ret												=> 		C9
-ret <nz.z.nc.c.po.pe.p.m>						=> 		C0+<1>*8
+ret {nz|z|nc|c|{po|nv}|{pe|v}|p|m}						=> 		C0+$1*8
 reti											=> ED 4D
 retn											=> ED 45
-rst <0.8.16.24.32.40.48.56>						=> 		C7+(<1>*8&0b00111000)
-rst <0.1.2.3.4.5.6.7>							=> 		C7+(<1>*8&0b00111000)
+rst {0|8|16|24|32|40|48|56}						=> 		C7+($1*8&0b00111000)
+rst {0|1|2|3|4|5|6|7}							=> 		C7+($1*8&0b00111000)
 
 #------------------------------------------------------------------------------
 # Input and Output Group
 
 in a,(N)										=>		DB N
-in <b.c.d.e.h.l..a>,(c)							=> ED 40+<1>*8
+in {b|c|d|e|h|l||a},(c)							=> ED 40+$1*8
 in f,(c)										=> ED 70
 
 ini												=> ED A2
@@ -459,7 +455,7 @@ ind												=> ED AA
 indr											=> ED BA
 
 out (N),a										=>		D3 N
-out (c),<b.c.d.e.h.l..a>						=> ED 41+<2>*8
+out (c),{b|c|d|e|h|l||a}						=> ED 41+$2*8
 out (c),0										=> ED 71
 
 outi											=> ED A3

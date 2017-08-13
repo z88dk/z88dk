@@ -4535,6 +4535,12 @@
   DO_stmt_call_flag(NC); 
 }
 
+/* call nv,NN */
+| label? _TK_CALL _TK_NV _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xE4); 
+}
+
 /* call nz,NN */
 | label? _TK_CALL _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
@@ -4557,6 +4563,12 @@
 | label? _TK_CALL _TK_PO _TK_COMMA expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_call_flag(PO); 
+}
+
+/* call v,NN */
+| label? _TK_CALL _TK_V _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xEC); 
 }
 
 /* call z,NN */
@@ -5900,6 +5912,12 @@
   DO_stmt_nn(0xD2); 
 }
 
+/* jp nv,NN */
+| label? _TK_JP _TK_NV _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xE2); 
+}
+
 /* jp nz,NN */
 | label? _TK_JP _TK_NZ _TK_COMMA expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
@@ -5922,6 +5940,12 @@
 | label? _TK_JP _TK_PO _TK_COMMA expr _TK_NEWLINE @{
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_nn(0xE2); 
+}
+
+/* jp v,NN */
+| label? _TK_JP _TK_V _TK_COMMA expr _TK_NEWLINE @{
+  if (expr_in_parens) warn_expr_in_parens();
+  DO_stmt_nn(0xEA); 
 }
 
 /* jp z,NN */
@@ -9830,6 +9854,11 @@
   DO_stmt(0xD0); 
 }
 
+/* ret nv */
+| label? _TK_RET _TK_NV _TK_NEWLINE @{
+  DO_stmt(0xE0); 
+}
+
 /* ret nz */
 | label? _TK_RET _TK_NZ _TK_NEWLINE @{
   DO_stmt(0xC0); 
@@ -9848,6 +9877,11 @@
 /* ret po */
 | label? _TK_RET _TK_PO _TK_NEWLINE @{
   DO_stmt(0xE0); 
+}
+
+/* ret v */
+| label? _TK_RET _TK_V _TK_NEWLINE @{
+  DO_stmt(0xE8); 
 }
 
 /* ret z */

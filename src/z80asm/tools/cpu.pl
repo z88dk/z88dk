@@ -45,19 +45,32 @@ write_tests($test_file_base);
 
 # expand and recurse, call add_final at the end
 sub add {
-	my($cpu_tag, $asm, $bin, $level) = @_;
-	$level ||= 1;
+	my($cpu_tag, $asm, $bin) = @_;
 
-	# expand <b.c...>, <expr>
-	if ($asm =~ / (.*?) < (.*?) > (.*) /x) {
-		my($asm1, $asm2, $asm3) = ($1, $2, $3);
-		my @l = split(/\./, $asm2);
-		@l = map { [ $_, $l[$_] ] } (0..$#l);
-		for (@l) {
+	# expand <b.c.<ix.iy>..>, <expr>
+	my $count = 1;
+	if ($asm =~ s/\{/ '{'.($count++).':' /ge) {
+		# number sub-expressions and expand
+		add_expand_list($cpu_tag, $asm, $bin);
+	}
+	else {
+		add_1($cpu_tag, $asm, $bin);
+	}
+}
+
+# expand <...> lists
+sub add_expand_list {
+	my($cpu_tag, $asm, $bin) = @_;
+	
+	if ($asm =~ / (.*?) \{ (\d+) : ([^{}]*) \} (.*) /x) {
+		my($asm1, $level, $list, $asm2) = ($1, $2, $3, $4);
+		my @list = split(/\s*\|\s*/, $list);
+		@list = map { [ $_, $list[$_] ] } (0..$#list);
+		for (@list) {
 			my($i, $v) = @$_;
 			next if $v eq '';
-			(my $bin1 = $bin) =~ s/<$level>/$i/;
-			add($cpu_tag, "$asm1$v$asm3", $bin1, $level+1);
+			(my $bin1 = $bin) =~ s/\$$level/$i/;
+			add_expand_list($cpu_tag, "$asm1$v$asm2", $bin1);
 		}
 		return;
 	}
@@ -258,11 +271,15 @@ sub add_final {
 	# compute bin
 	while ($bin =~ s/ ( [0-9a-f]+ ) \* ( [0-9a-f]+ ) / sprintf("%02X", hex($1) * hex($2)) /xie) {}
 	while ($bin =~ s/ ( [0-9a-f]+ ) \+ ( [0-9a-f]+ ) / sprintf("%02X", hex($1) + hex($2)) /xie) {}
+
+	# add opcode if not same already
+	if ($Opcodes{$asm}) {
+		die if $Opcodes{$asm}[0] ne $cpu_tag;
+		die if $Opcodes{$asm}[1] ne $bin;
+		return;
+	}
 	
 	say sprintf("%-16s%-24s%s", $cpu_tag, $asm, $bin) if $ENV{DEBUG};
-
-	# add opcode
-	die $asm if $Opcodes{$asm};
 	$Opcodes{$asm} = [ $cpu_tag, $bin ];
 	
 	# add test

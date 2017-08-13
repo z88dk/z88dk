@@ -180,7 +180,9 @@ tokens:
   - name	: M
   - name	: LZ
   - name	: LO
-  
+  - name	: NV
+  - name	: V
+
   # 8-bit registers
   - name	: B
   - name	: D
