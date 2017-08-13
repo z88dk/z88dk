@@ -124,6 +124,8 @@
  add iy,iy              ; FD 29
  add iy,sp              ; FD 39
  add l                  ; 85
+ add sp,-128            ; 27 80
+ add sp,127             ; 27 7F
  altd adc (hl)          ; 76 8E
  altd adc (ix)          ; 76 DD 8E 00
  altd adc (ix+127)      ; 76 DD 8E 7F
@@ -233,7 +235,9 @@
  altd and d             ; 76 A2
  altd and e             ; 76 A3
  altd and h             ; 76 A4
+ altd and hl,de         ; 76 DC
  altd and l             ; 76 A5
+ altd bool hl           ; 76 CC
  altd ccf               ; 76 3F
  altd ccf f             ; 76 3F
  altd cp (hl)           ; 76 BE
@@ -430,6 +434,10 @@
  altd ld hl,(iy)        ; 76 FD E4 00
  altd ld hl,(iy+127)    ; 76 FD E4 7F
  altd ld hl,(iy-128)    ; 76 FD E4 80
+ altd ld hl,(sp)        ; 76 C4 00
+ altd ld hl,(sp+-128)   ; 76 C4 80
+ altd ld hl,(sp+127)    ; 76 C4 7F
+ altd ld hl,(sp+255)    ; 76 C4 FF
  altd ld hl,-32768      ; 76 21 00 80
  altd ld hl,32767       ; 76 21 FF 7F
  altd ld hl,65535       ; 76 21 FF FF
@@ -487,11 +495,68 @@
  altd or d              ; 76 B2
  altd or e              ; 76 B3
  altd or h              ; 76 B4
+ altd or hl,de          ; 76 EC
  altd or l              ; 76 B5
  altd pop af            ; 76 F1
  altd pop bc            ; 76 C1
  altd pop de            ; 76 D1
  altd pop hl            ; 76 E1
+ altd res 0,a           ; 76 CB 87
+ altd res 0,b           ; 76 CB 80
+ altd res 0,c           ; 76 CB 81
+ altd res 0,d           ; 76 CB 82
+ altd res 0,e           ; 76 CB 83
+ altd res 0,h           ; 76 CB 84
+ altd res 0,l           ; 76 CB 85
+ altd res 1,a           ; 76 CB 8F
+ altd res 1,b           ; 76 CB 88
+ altd res 1,c           ; 76 CB 89
+ altd res 1,d           ; 76 CB 8A
+ altd res 1,e           ; 76 CB 8B
+ altd res 1,h           ; 76 CB 8C
+ altd res 1,l           ; 76 CB 8D
+ altd res 2,a           ; 76 CB 97
+ altd res 2,b           ; 76 CB 90
+ altd res 2,c           ; 76 CB 91
+ altd res 2,d           ; 76 CB 92
+ altd res 2,e           ; 76 CB 93
+ altd res 2,h           ; 76 CB 94
+ altd res 2,l           ; 76 CB 95
+ altd res 3,a           ; 76 CB 9F
+ altd res 3,b           ; 76 CB 98
+ altd res 3,c           ; 76 CB 99
+ altd res 3,d           ; 76 CB 9A
+ altd res 3,e           ; 76 CB 9B
+ altd res 3,h           ; 76 CB 9C
+ altd res 3,l           ; 76 CB 9D
+ altd res 4,a           ; 76 CB A7
+ altd res 4,b           ; 76 CB A0
+ altd res 4,c           ; 76 CB A1
+ altd res 4,d           ; 76 CB A2
+ altd res 4,e           ; 76 CB A3
+ altd res 4,h           ; 76 CB A4
+ altd res 4,l           ; 76 CB A5
+ altd res 5,a           ; 76 CB AF
+ altd res 5,b           ; 76 CB A8
+ altd res 5,c           ; 76 CB A9
+ altd res 5,d           ; 76 CB AA
+ altd res 5,e           ; 76 CB AB
+ altd res 5,h           ; 76 CB AC
+ altd res 5,l           ; 76 CB AD
+ altd res 6,a           ; 76 CB B7
+ altd res 6,b           ; 76 CB B0
+ altd res 6,c           ; 76 CB B1
+ altd res 6,d           ; 76 CB B2
+ altd res 6,e           ; 76 CB B3
+ altd res 6,h           ; 76 CB B4
+ altd res 6,l           ; 76 CB B5
+ altd res 7,a           ; 76 CB BF
+ altd res 7,b           ; 76 CB B8
+ altd res 7,c           ; 76 CB B9
+ altd res 7,d           ; 76 CB BA
+ altd res 7,e           ; 76 CB BB
+ altd res 7,h           ; 76 CB BC
+ altd res 7,l           ; 76 CB BD
  altd rl de             ; 76 F3
  altd rr de             ; 76 FB
  altd rr hl             ; 76 FC
@@ -535,6 +600,62 @@
  altd sbc l             ; 76 9D
  altd scf               ; 76 37
  altd scf f             ; 76 37
+ altd set 0,a           ; 76 CB C7
+ altd set 0,b           ; 76 CB C0
+ altd set 0,c           ; 76 CB C1
+ altd set 0,d           ; 76 CB C2
+ altd set 0,e           ; 76 CB C3
+ altd set 0,h           ; 76 CB C4
+ altd set 0,l           ; 76 CB C5
+ altd set 1,a           ; 76 CB CF
+ altd set 1,b           ; 76 CB C8
+ altd set 1,c           ; 76 CB C9
+ altd set 1,d           ; 76 CB CA
+ altd set 1,e           ; 76 CB CB
+ altd set 1,h           ; 76 CB CC
+ altd set 1,l           ; 76 CB CD
+ altd set 2,a           ; 76 CB D7
+ altd set 2,b           ; 76 CB D0
+ altd set 2,c           ; 76 CB D1
+ altd set 2,d           ; 76 CB D2
+ altd set 2,e           ; 76 CB D3
+ altd set 2,h           ; 76 CB D4
+ altd set 2,l           ; 76 CB D5
+ altd set 3,a           ; 76 CB DF
+ altd set 3,b           ; 76 CB D8
+ altd set 3,c           ; 76 CB D9
+ altd set 3,d           ; 76 CB DA
+ altd set 3,e           ; 76 CB DB
+ altd set 3,h           ; 76 CB DC
+ altd set 3,l           ; 76 CB DD
+ altd set 4,a           ; 76 CB E7
+ altd set 4,b           ; 76 CB E0
+ altd set 4,c           ; 76 CB E1
+ altd set 4,d           ; 76 CB E2
+ altd set 4,e           ; 76 CB E3
+ altd set 4,h           ; 76 CB E4
+ altd set 4,l           ; 76 CB E5
+ altd set 5,a           ; 76 CB EF
+ altd set 5,b           ; 76 CB E8
+ altd set 5,c           ; 76 CB E9
+ altd set 5,d           ; 76 CB EA
+ altd set 5,e           ; 76 CB EB
+ altd set 5,h           ; 76 CB EC
+ altd set 5,l           ; 76 CB ED
+ altd set 6,a           ; 76 CB F7
+ altd set 6,b           ; 76 CB F0
+ altd set 6,c           ; 76 CB F1
+ altd set 6,d           ; 76 CB F2
+ altd set 6,e           ; 76 CB F3
+ altd set 6,h           ; 76 CB F4
+ altd set 6,l           ; 76 CB F5
+ altd set 7,a           ; 76 CB FF
+ altd set 7,b           ; 76 CB F8
+ altd set 7,c           ; 76 CB F9
+ altd set 7,d           ; 76 CB FA
+ altd set 7,e           ; 76 CB FB
+ altd set 7,h           ; 76 CB FC
+ altd set 7,l           ; 76 CB FD
  altd sub (hl)          ; 76 96
  altd sub (ix)          ; 76 DD 96 00
  altd sub (ix+127)      ; 76 DD 96 7F
@@ -653,7 +774,127 @@
  and d                  ; A2
  and e                  ; A3
  and h                  ; A4
+ and hl',de             ; 76 DC
+ and hl,de              ; DC
+ and ix,de              ; DD DC
+ and iy,de              ; FD DC
  and l                  ; A5
+ bit 0,(hl)             ; CB 46
+ bit 0,(ix)             ; DD CB 00 46
+ bit 0,(ix+127)         ; DD CB 7F 46
+ bit 0,(ix-128)         ; DD CB 80 46
+ bit 0,(iy)             ; FD CB 00 46
+ bit 0,(iy+127)         ; FD CB 7F 46
+ bit 0,(iy-128)         ; FD CB 80 46
+ bit 0,a                ; CB 47
+ bit 0,b                ; CB 40
+ bit 0,c                ; CB 41
+ bit 0,d                ; CB 42
+ bit 0,e                ; CB 43
+ bit 0,h                ; CB 44
+ bit 0,l                ; CB 45
+ bit 1,(hl)             ; CB 4E
+ bit 1,(ix)             ; DD CB 00 4E
+ bit 1,(ix+127)         ; DD CB 7F 4E
+ bit 1,(ix-128)         ; DD CB 80 4E
+ bit 1,(iy)             ; FD CB 00 4E
+ bit 1,(iy+127)         ; FD CB 7F 4E
+ bit 1,(iy-128)         ; FD CB 80 4E
+ bit 1,a                ; CB 4F
+ bit 1,b                ; CB 48
+ bit 1,c                ; CB 49
+ bit 1,d                ; CB 4A
+ bit 1,e                ; CB 4B
+ bit 1,h                ; CB 4C
+ bit 1,l                ; CB 4D
+ bit 2,(hl)             ; CB 56
+ bit 2,(ix)             ; DD CB 00 56
+ bit 2,(ix+127)         ; DD CB 7F 56
+ bit 2,(ix-128)         ; DD CB 80 56
+ bit 2,(iy)             ; FD CB 00 56
+ bit 2,(iy+127)         ; FD CB 7F 56
+ bit 2,(iy-128)         ; FD CB 80 56
+ bit 2,a                ; CB 57
+ bit 2,b                ; CB 50
+ bit 2,c                ; CB 51
+ bit 2,d                ; CB 52
+ bit 2,e                ; CB 53
+ bit 2,h                ; CB 54
+ bit 2,l                ; CB 55
+ bit 3,(hl)             ; CB 5E
+ bit 3,(ix)             ; DD CB 00 5E
+ bit 3,(ix+127)         ; DD CB 7F 5E
+ bit 3,(ix-128)         ; DD CB 80 5E
+ bit 3,(iy)             ; FD CB 00 5E
+ bit 3,(iy+127)         ; FD CB 7F 5E
+ bit 3,(iy-128)         ; FD CB 80 5E
+ bit 3,a                ; CB 5F
+ bit 3,b                ; CB 58
+ bit 3,c                ; CB 59
+ bit 3,d                ; CB 5A
+ bit 3,e                ; CB 5B
+ bit 3,h                ; CB 5C
+ bit 3,l                ; CB 5D
+ bit 4,(hl)             ; CB 66
+ bit 4,(ix)             ; DD CB 00 66
+ bit 4,(ix+127)         ; DD CB 7F 66
+ bit 4,(ix-128)         ; DD CB 80 66
+ bit 4,(iy)             ; FD CB 00 66
+ bit 4,(iy+127)         ; FD CB 7F 66
+ bit 4,(iy-128)         ; FD CB 80 66
+ bit 4,a                ; CB 67
+ bit 4,b                ; CB 60
+ bit 4,c                ; CB 61
+ bit 4,d                ; CB 62
+ bit 4,e                ; CB 63
+ bit 4,h                ; CB 64
+ bit 4,l                ; CB 65
+ bit 5,(hl)             ; CB 6E
+ bit 5,(ix)             ; DD CB 00 6E
+ bit 5,(ix+127)         ; DD CB 7F 6E
+ bit 5,(ix-128)         ; DD CB 80 6E
+ bit 5,(iy)             ; FD CB 00 6E
+ bit 5,(iy+127)         ; FD CB 7F 6E
+ bit 5,(iy-128)         ; FD CB 80 6E
+ bit 5,a                ; CB 6F
+ bit 5,b                ; CB 68
+ bit 5,c                ; CB 69
+ bit 5,d                ; CB 6A
+ bit 5,e                ; CB 6B
+ bit 5,h                ; CB 6C
+ bit 5,l                ; CB 6D
+ bit 6,(hl)             ; CB 76
+ bit 6,(ix)             ; DD CB 00 76
+ bit 6,(ix+127)         ; DD CB 7F 76
+ bit 6,(ix-128)         ; DD CB 80 76
+ bit 6,(iy)             ; FD CB 00 76
+ bit 6,(iy+127)         ; FD CB 7F 76
+ bit 6,(iy-128)         ; FD CB 80 76
+ bit 6,a                ; CB 77
+ bit 6,b                ; CB 70
+ bit 6,c                ; CB 71
+ bit 6,d                ; CB 72
+ bit 6,e                ; CB 73
+ bit 6,h                ; CB 74
+ bit 6,l                ; CB 75
+ bit 7,(hl)             ; CB 7E
+ bit 7,(ix)             ; DD CB 00 7E
+ bit 7,(ix+127)         ; DD CB 7F 7E
+ bit 7,(ix-128)         ; DD CB 80 7E
+ bit 7,(iy)             ; FD CB 00 7E
+ bit 7,(iy+127)         ; FD CB 7F 7E
+ bit 7,(iy-128)         ; FD CB 80 7E
+ bit 7,a                ; CB 7F
+ bit 7,b                ; CB 78
+ bit 7,c                ; CB 79
+ bit 7,d                ; CB 7A
+ bit 7,e                ; CB 7B
+ bit 7,h                ; CB 7C
+ bit 7,l                ; CB 7D
+ bool hl                ; CC
+ bool hl'               ; 76 CC
+ bool ix                ; DD CC
+ bool iy                ; FD CC
  call -32768            ; CD 00 80
  call 32767             ; CD FF 7F
  call 65535             ; CD FF FF
@@ -968,6 +1209,18 @@
  ld (iy-128),h          ; FD 74 80
  ld (iy-128),hl         ; FD F4 80
  ld (iy-128),l          ; FD 75 80
+ ld (sp),hl             ; D4 00
+ ld (sp),ix             ; DD D4 00
+ ld (sp),iy             ; FD D4 00
+ ld (sp+-128),hl        ; D4 80
+ ld (sp+-128),ix        ; DD D4 80
+ ld (sp+-128),iy        ; FD D4 80
+ ld (sp+127),hl         ; D4 7F
+ ld (sp+127),ix         ; DD D4 7F
+ ld (sp+127),iy         ; FD D4 7F
+ ld (sp+255),hl         ; D4 FF
+ ld (sp+255),ix         ; DD D4 FF
+ ld (sp+255),iy         ; FD D4 FF
  ld a',(-32768)         ; 76 3A 00 80
  ld a',(32767)          ; 76 3A FF 7F
  ld a',(65535)          ; 76 3A FF FF
@@ -1058,6 +1311,8 @@
  ld bc',-32768          ; 76 01 00 80
  ld bc',32767           ; 76 01 FF 7F
  ld bc',65535           ; 76 01 FF FF
+ ld bc',bc              ; ED 49
+ ld bc',de              ; ED 41
  ld bc,(-32768)         ; ED 4B 00 80
  ld bc,(32767)          ; ED 4B FF 7F
  ld bc,(65535)          ; ED 4B FF FF
@@ -1138,6 +1393,8 @@
  ld de',-32768          ; 76 11 00 80
  ld de',32767           ; 76 11 FF 7F
  ld de',65535           ; 76 11 FF FF
+ ld de',bc              ; ED 59
+ ld de',de              ; ED 51
  ld de,(-32768)         ; ED 5B 00 80
  ld de,(32767)          ; ED 5B FF 7F
  ld de,(65535)          ; ED 5B FF FF
@@ -1225,9 +1482,15 @@
  ld hl',(iy)            ; 76 FD E4 00
  ld hl',(iy+127)        ; 76 FD E4 7F
  ld hl',(iy-128)        ; 76 FD E4 80
+ ld hl',(sp)            ; 76 C4 00
+ ld hl',(sp+-128)       ; 76 C4 80
+ ld hl',(sp+127)        ; 76 C4 7F
+ ld hl',(sp+255)        ; 76 C4 FF
  ld hl',-32768          ; 76 21 00 80
  ld hl',32767           ; 76 21 FF 7F
  ld hl',65535           ; 76 21 FF FF
+ ld hl',bc              ; ED 69
+ ld hl',de              ; ED 61
  ld hl',ix              ; 76 DD 7C
  ld hl',iy              ; 76 FD 7C
  ld hl,(-32768)         ; 2A 00 80
@@ -1242,6 +1505,10 @@
  ld hl,(iy)             ; FD E4 00
  ld hl,(iy+127)         ; FD E4 7F
  ld hl,(iy-128)         ; FD E4 80
+ ld hl,(sp)             ; C4 00
+ ld hl,(sp+-128)        ; C4 80
+ ld hl,(sp+127)         ; C4 7F
+ ld hl,(sp+255)         ; C4 FF
  ld hl,-32768           ; 21 00 80
  ld hl,32767            ; 21 FF 7F
  ld hl,65535            ; 21 FF FF
@@ -1251,6 +1518,10 @@
  ld ix,(-32768)         ; DD 2A 00 80
  ld ix,(32767)          ; DD 2A FF 7F
  ld ix,(65535)          ; DD 2A FF FF
+ ld ix,(sp)             ; DD C4 00
+ ld ix,(sp+-128)        ; DD C4 80
+ ld ix,(sp+127)         ; DD C4 7F
+ ld ix,(sp+255)         ; DD C4 FF
  ld ix,-32768           ; DD 21 00 80
  ld ix,32767            ; DD 21 FF 7F
  ld ix,65535            ; DD 21 FF FF
@@ -1258,6 +1529,10 @@
  ld iy,(-32768)         ; FD 2A 00 80
  ld iy,(32767)          ; FD 2A FF 7F
  ld iy,(65535)          ; FD 2A FF FF
+ ld iy,(sp)             ; FD C4 00
+ ld iy,(sp+-128)        ; FD C4 80
+ ld iy,(sp+127)         ; FD C4 7F
+ ld iy,(sp+255)         ; FD C4 FF
  ld iy,-32768           ; FD 21 00 80
  ld iy,32767            ; FD 21 FF 7F
  ld iy,65535            ; FD 21 FF FF
@@ -1392,6 +1667,10 @@
  or d                   ; B2
  or e                   ; B3
  or h                   ; B4
+ or hl',de              ; 76 EC
+ or hl,de               ; EC
+ or ix,de               ; DD EC
+ or iy,de               ; FD EC
  or l                   ; B5
  pop af                 ; F1
  pop af'                ; 76 F1
@@ -1411,6 +1690,174 @@
  push ip                ; ED 76
  push ix                ; DD E5
  push iy                ; FD E5
+ res 0,(hl)             ; CB 86
+ res 0,(ix)             ; DD CB 00 86
+ res 0,(ix+127)         ; DD CB 7F 86
+ res 0,(ix-128)         ; DD CB 80 86
+ res 0,(iy)             ; FD CB 00 86
+ res 0,(iy+127)         ; FD CB 7F 86
+ res 0,(iy-128)         ; FD CB 80 86
+ res 0,a                ; CB 87
+ res 0,a'               ; 76 CB 87
+ res 0,b                ; CB 80
+ res 0,b'               ; 76 CB 80
+ res 0,c                ; CB 81
+ res 0,c'               ; 76 CB 81
+ res 0,d                ; CB 82
+ res 0,d'               ; 76 CB 82
+ res 0,e                ; CB 83
+ res 0,e'               ; 76 CB 83
+ res 0,h                ; CB 84
+ res 0,h'               ; 76 CB 84
+ res 0,l                ; CB 85
+ res 0,l'               ; 76 CB 85
+ res 1,(hl)             ; CB 8E
+ res 1,(ix)             ; DD CB 00 8E
+ res 1,(ix+127)         ; DD CB 7F 8E
+ res 1,(ix-128)         ; DD CB 80 8E
+ res 1,(iy)             ; FD CB 00 8E
+ res 1,(iy+127)         ; FD CB 7F 8E
+ res 1,(iy-128)         ; FD CB 80 8E
+ res 1,a                ; CB 8F
+ res 1,a'               ; 76 CB 8F
+ res 1,b                ; CB 88
+ res 1,b'               ; 76 CB 88
+ res 1,c                ; CB 89
+ res 1,c'               ; 76 CB 89
+ res 1,d                ; CB 8A
+ res 1,d'               ; 76 CB 8A
+ res 1,e                ; CB 8B
+ res 1,e'               ; 76 CB 8B
+ res 1,h                ; CB 8C
+ res 1,h'               ; 76 CB 8C
+ res 1,l                ; CB 8D
+ res 1,l'               ; 76 CB 8D
+ res 2,(hl)             ; CB 96
+ res 2,(ix)             ; DD CB 00 96
+ res 2,(ix+127)         ; DD CB 7F 96
+ res 2,(ix-128)         ; DD CB 80 96
+ res 2,(iy)             ; FD CB 00 96
+ res 2,(iy+127)         ; FD CB 7F 96
+ res 2,(iy-128)         ; FD CB 80 96
+ res 2,a                ; CB 97
+ res 2,a'               ; 76 CB 97
+ res 2,b                ; CB 90
+ res 2,b'               ; 76 CB 90
+ res 2,c                ; CB 91
+ res 2,c'               ; 76 CB 91
+ res 2,d                ; CB 92
+ res 2,d'               ; 76 CB 92
+ res 2,e                ; CB 93
+ res 2,e'               ; 76 CB 93
+ res 2,h                ; CB 94
+ res 2,h'               ; 76 CB 94
+ res 2,l                ; CB 95
+ res 2,l'               ; 76 CB 95
+ res 3,(hl)             ; CB 9E
+ res 3,(ix)             ; DD CB 00 9E
+ res 3,(ix+127)         ; DD CB 7F 9E
+ res 3,(ix-128)         ; DD CB 80 9E
+ res 3,(iy)             ; FD CB 00 9E
+ res 3,(iy+127)         ; FD CB 7F 9E
+ res 3,(iy-128)         ; FD CB 80 9E
+ res 3,a                ; CB 9F
+ res 3,a'               ; 76 CB 9F
+ res 3,b                ; CB 98
+ res 3,b'               ; 76 CB 98
+ res 3,c                ; CB 99
+ res 3,c'               ; 76 CB 99
+ res 3,d                ; CB 9A
+ res 3,d'               ; 76 CB 9A
+ res 3,e                ; CB 9B
+ res 3,e'               ; 76 CB 9B
+ res 3,h                ; CB 9C
+ res 3,h'               ; 76 CB 9C
+ res 3,l                ; CB 9D
+ res 3,l'               ; 76 CB 9D
+ res 4,(hl)             ; CB A6
+ res 4,(ix)             ; DD CB 00 A6
+ res 4,(ix+127)         ; DD CB 7F A6
+ res 4,(ix-128)         ; DD CB 80 A6
+ res 4,(iy)             ; FD CB 00 A6
+ res 4,(iy+127)         ; FD CB 7F A6
+ res 4,(iy-128)         ; FD CB 80 A6
+ res 4,a                ; CB A7
+ res 4,a'               ; 76 CB A7
+ res 4,b                ; CB A0
+ res 4,b'               ; 76 CB A0
+ res 4,c                ; CB A1
+ res 4,c'               ; 76 CB A1
+ res 4,d                ; CB A2
+ res 4,d'               ; 76 CB A2
+ res 4,e                ; CB A3
+ res 4,e'               ; 76 CB A3
+ res 4,h                ; CB A4
+ res 4,h'               ; 76 CB A4
+ res 4,l                ; CB A5
+ res 4,l'               ; 76 CB A5
+ res 5,(hl)             ; CB AE
+ res 5,(ix)             ; DD CB 00 AE
+ res 5,(ix+127)         ; DD CB 7F AE
+ res 5,(ix-128)         ; DD CB 80 AE
+ res 5,(iy)             ; FD CB 00 AE
+ res 5,(iy+127)         ; FD CB 7F AE
+ res 5,(iy-128)         ; FD CB 80 AE
+ res 5,a                ; CB AF
+ res 5,a'               ; 76 CB AF
+ res 5,b                ; CB A8
+ res 5,b'               ; 76 CB A8
+ res 5,c                ; CB A9
+ res 5,c'               ; 76 CB A9
+ res 5,d                ; CB AA
+ res 5,d'               ; 76 CB AA
+ res 5,e                ; CB AB
+ res 5,e'               ; 76 CB AB
+ res 5,h                ; CB AC
+ res 5,h'               ; 76 CB AC
+ res 5,l                ; CB AD
+ res 5,l'               ; 76 CB AD
+ res 6,(hl)             ; CB B6
+ res 6,(ix)             ; DD CB 00 B6
+ res 6,(ix+127)         ; DD CB 7F B6
+ res 6,(ix-128)         ; DD CB 80 B6
+ res 6,(iy)             ; FD CB 00 B6
+ res 6,(iy+127)         ; FD CB 7F B6
+ res 6,(iy-128)         ; FD CB 80 B6
+ res 6,a                ; CB B7
+ res 6,a'               ; 76 CB B7
+ res 6,b                ; CB B0
+ res 6,b'               ; 76 CB B0
+ res 6,c                ; CB B1
+ res 6,c'               ; 76 CB B1
+ res 6,d                ; CB B2
+ res 6,d'               ; 76 CB B2
+ res 6,e                ; CB B3
+ res 6,e'               ; 76 CB B3
+ res 6,h                ; CB B4
+ res 6,h'               ; 76 CB B4
+ res 6,l                ; CB B5
+ res 6,l'               ; 76 CB B5
+ res 7,(hl)             ; CB BE
+ res 7,(ix)             ; DD CB 00 BE
+ res 7,(ix+127)         ; DD CB 7F BE
+ res 7,(ix-128)         ; DD CB 80 BE
+ res 7,(iy)             ; FD CB 00 BE
+ res 7,(iy+127)         ; FD CB 7F BE
+ res 7,(iy-128)         ; FD CB 80 BE
+ res 7,a                ; CB BF
+ res 7,a'               ; 76 CB BF
+ res 7,b                ; CB B8
+ res 7,b'               ; 76 CB B8
+ res 7,c                ; CB B9
+ res 7,c'               ; 76 CB B9
+ res 7,d                ; CB BA
+ res 7,d'               ; 76 CB BA
+ res 7,e                ; CB BB
+ res 7,e'               ; 76 CB BB
+ res 7,h                ; CB BC
+ res 7,h'               ; 76 CB BC
+ res 7,l                ; CB BD
+ res 7,l'               ; 76 CB BD
  ret                    ; C9
  ret c                  ; D8
  ret lo                 ; E8
@@ -1560,6 +2007,174 @@
  scf                    ; 37
  scf f                  ; 37
  scf f'                 ; 76 37
+ set 0,(hl)             ; CB C6
+ set 0,(ix)             ; DD CB 00 C6
+ set 0,(ix+127)         ; DD CB 7F C6
+ set 0,(ix-128)         ; DD CB 80 C6
+ set 0,(iy)             ; FD CB 00 C6
+ set 0,(iy+127)         ; FD CB 7F C6
+ set 0,(iy-128)         ; FD CB 80 C6
+ set 0,a                ; CB C7
+ set 0,a'               ; 76 CB C7
+ set 0,b                ; CB C0
+ set 0,b'               ; 76 CB C0
+ set 0,c                ; CB C1
+ set 0,c'               ; 76 CB C1
+ set 0,d                ; CB C2
+ set 0,d'               ; 76 CB C2
+ set 0,e                ; CB C3
+ set 0,e'               ; 76 CB C3
+ set 0,h                ; CB C4
+ set 0,h'               ; 76 CB C4
+ set 0,l                ; CB C5
+ set 0,l'               ; 76 CB C5
+ set 1,(hl)             ; CB CE
+ set 1,(ix)             ; DD CB 00 CE
+ set 1,(ix+127)         ; DD CB 7F CE
+ set 1,(ix-128)         ; DD CB 80 CE
+ set 1,(iy)             ; FD CB 00 CE
+ set 1,(iy+127)         ; FD CB 7F CE
+ set 1,(iy-128)         ; FD CB 80 CE
+ set 1,a                ; CB CF
+ set 1,a'               ; 76 CB CF
+ set 1,b                ; CB C8
+ set 1,b'               ; 76 CB C8
+ set 1,c                ; CB C9
+ set 1,c'               ; 76 CB C9
+ set 1,d                ; CB CA
+ set 1,d'               ; 76 CB CA
+ set 1,e                ; CB CB
+ set 1,e'               ; 76 CB CB
+ set 1,h                ; CB CC
+ set 1,h'               ; 76 CB CC
+ set 1,l                ; CB CD
+ set 1,l'               ; 76 CB CD
+ set 2,(hl)             ; CB D6
+ set 2,(ix)             ; DD CB 00 D6
+ set 2,(ix+127)         ; DD CB 7F D6
+ set 2,(ix-128)         ; DD CB 80 D6
+ set 2,(iy)             ; FD CB 00 D6
+ set 2,(iy+127)         ; FD CB 7F D6
+ set 2,(iy-128)         ; FD CB 80 D6
+ set 2,a                ; CB D7
+ set 2,a'               ; 76 CB D7
+ set 2,b                ; CB D0
+ set 2,b'               ; 76 CB D0
+ set 2,c                ; CB D1
+ set 2,c'               ; 76 CB D1
+ set 2,d                ; CB D2
+ set 2,d'               ; 76 CB D2
+ set 2,e                ; CB D3
+ set 2,e'               ; 76 CB D3
+ set 2,h                ; CB D4
+ set 2,h'               ; 76 CB D4
+ set 2,l                ; CB D5
+ set 2,l'               ; 76 CB D5
+ set 3,(hl)             ; CB DE
+ set 3,(ix)             ; DD CB 00 DE
+ set 3,(ix+127)         ; DD CB 7F DE
+ set 3,(ix-128)         ; DD CB 80 DE
+ set 3,(iy)             ; FD CB 00 DE
+ set 3,(iy+127)         ; FD CB 7F DE
+ set 3,(iy-128)         ; FD CB 80 DE
+ set 3,a                ; CB DF
+ set 3,a'               ; 76 CB DF
+ set 3,b                ; CB D8
+ set 3,b'               ; 76 CB D8
+ set 3,c                ; CB D9
+ set 3,c'               ; 76 CB D9
+ set 3,d                ; CB DA
+ set 3,d'               ; 76 CB DA
+ set 3,e                ; CB DB
+ set 3,e'               ; 76 CB DB
+ set 3,h                ; CB DC
+ set 3,h'               ; 76 CB DC
+ set 3,l                ; CB DD
+ set 3,l'               ; 76 CB DD
+ set 4,(hl)             ; CB E6
+ set 4,(ix)             ; DD CB 00 E6
+ set 4,(ix+127)         ; DD CB 7F E6
+ set 4,(ix-128)         ; DD CB 80 E6
+ set 4,(iy)             ; FD CB 00 E6
+ set 4,(iy+127)         ; FD CB 7F E6
+ set 4,(iy-128)         ; FD CB 80 E6
+ set 4,a                ; CB E7
+ set 4,a'               ; 76 CB E7
+ set 4,b                ; CB E0
+ set 4,b'               ; 76 CB E0
+ set 4,c                ; CB E1
+ set 4,c'               ; 76 CB E1
+ set 4,d                ; CB E2
+ set 4,d'               ; 76 CB E2
+ set 4,e                ; CB E3
+ set 4,e'               ; 76 CB E3
+ set 4,h                ; CB E4
+ set 4,h'               ; 76 CB E4
+ set 4,l                ; CB E5
+ set 4,l'               ; 76 CB E5
+ set 5,(hl)             ; CB EE
+ set 5,(ix)             ; DD CB 00 EE
+ set 5,(ix+127)         ; DD CB 7F EE
+ set 5,(ix-128)         ; DD CB 80 EE
+ set 5,(iy)             ; FD CB 00 EE
+ set 5,(iy+127)         ; FD CB 7F EE
+ set 5,(iy-128)         ; FD CB 80 EE
+ set 5,a                ; CB EF
+ set 5,a'               ; 76 CB EF
+ set 5,b                ; CB E8
+ set 5,b'               ; 76 CB E8
+ set 5,c                ; CB E9
+ set 5,c'               ; 76 CB E9
+ set 5,d                ; CB EA
+ set 5,d'               ; 76 CB EA
+ set 5,e                ; CB EB
+ set 5,e'               ; 76 CB EB
+ set 5,h                ; CB EC
+ set 5,h'               ; 76 CB EC
+ set 5,l                ; CB ED
+ set 5,l'               ; 76 CB ED
+ set 6,(hl)             ; CB F6
+ set 6,(ix)             ; DD CB 00 F6
+ set 6,(ix+127)         ; DD CB 7F F6
+ set 6,(ix-128)         ; DD CB 80 F6
+ set 6,(iy)             ; FD CB 00 F6
+ set 6,(iy+127)         ; FD CB 7F F6
+ set 6,(iy-128)         ; FD CB 80 F6
+ set 6,a                ; CB F7
+ set 6,a'               ; 76 CB F7
+ set 6,b                ; CB F0
+ set 6,b'               ; 76 CB F0
+ set 6,c                ; CB F1
+ set 6,c'               ; 76 CB F1
+ set 6,d                ; CB F2
+ set 6,d'               ; 76 CB F2
+ set 6,e                ; CB F3
+ set 6,e'               ; 76 CB F3
+ set 6,h                ; CB F4
+ set 6,h'               ; 76 CB F4
+ set 6,l                ; CB F5
+ set 6,l'               ; 76 CB F5
+ set 7,(hl)             ; CB FE
+ set 7,(ix)             ; DD CB 00 FE
+ set 7,(ix+127)         ; DD CB 7F FE
+ set 7,(ix-128)         ; DD CB 80 FE
+ set 7,(iy)             ; FD CB 00 FE
+ set 7,(iy+127)         ; FD CB 7F FE
+ set 7,(iy-128)         ; FD CB 80 FE
+ set 7,a                ; CB FF
+ set 7,a'               ; 76 CB FF
+ set 7,b                ; CB F8
+ set 7,b'               ; 76 CB F8
+ set 7,c                ; CB F9
+ set 7,c'               ; 76 CB F9
+ set 7,d                ; CB FA
+ set 7,d'               ; 76 CB FA
+ set 7,e                ; CB FB
+ set 7,e'               ; 76 CB FB
+ set 7,h                ; CB FC
+ set 7,h'               ; 76 CB FC
+ set 7,l                ; CB FD
+ set 7,l'               ; 76 CB FD
  sla (hl)               ; CB 26
  sla (ix)               ; DD CB 00 26
  sla (ix+127)           ; DD CB 7F 26

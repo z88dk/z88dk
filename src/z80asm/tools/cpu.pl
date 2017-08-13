@@ -20,9 +20,15 @@ my @CPUS = qw( z80 z180 r2k r3k );
 (my $data_file = $0) =~ s/\.pl$/.def/;
 open(my $fh, "<", $data_file) or die "$data_file: $!";
 while (<$fh>) {
+	# continuation lines
+	while (s/ \\ \s* $/ /x) {
+		$_ .= <$fh>;
+	}
+
+	# delete blanks
 	s/^\s+//; s/\s+$//; s/\s+/ /g;
 	last if /^ __END__ /x;
-	next if /^ \# /x;
+	next if /^ ; /x;
 	next unless /\S/;
 	
 	# check for cpu tag
@@ -31,6 +37,7 @@ while (<$fh>) {
 		($cpu_tag, $_) = ($1, $2);
 	}
 	my($asm, $bin) = split(/\s*=>\s*/, $_, 2);
+	$asm =~ s/\s*,\s*/,/g;
 	
 	add($cpu_tag, $asm, $bin);
 }
@@ -113,6 +120,12 @@ sub add_2 {
 		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
 		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
 	}
+	# bool hl
+	elsif ($asm =~ /^ (bool) \s+ (hl) $/x && $for_rabbit) {
+		my($asm1, $asm2) = ($1, $2);
+		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
+		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
+	}
 	# rr de|hl
 	elsif ($asm =~ /^ (rr) \s+ (de|hl) $/x && $for_rabbit) {
 		my($asm1, $asm2) = ($1, $2);
@@ -132,7 +145,7 @@ sub add_2 {
 		}
 	}
 	# arithm hl,*
-	elsif ($asm =~ /^ (add|adc|sbc) \s+ (hl) \s* , \s* (.*) /x) {
+	elsif ($asm =~ /^ (add|adc|sbc|and|or) \s+ (hl) \s* , \s* (.*) /x) {
 		my($asm1, $asm2, $asm3) = ($1, $2, $3);
 		
 		if ($for_rabbit) {
@@ -152,6 +165,12 @@ sub add_2 {
 		my($asm1, $asm2) = ($1, $2);
 		add_3('rabbit', "$asm1 $asm2'",     "76 $bin");
 		add_3('rabbit', "altd $asm1 $asm2", "76 $bin");
+	}
+	# res|set b, r
+	elsif ($asm =~ /^ (res|set) \s+ (CONST) \s* , \s* (b|c|d|e|h|l|a) $ /x) {
+		my($op, $bit, $reg) = ($1, $2, $3);
+		add_3('rabbit', "$op $bit,$reg'",     "76 $bin");
+		add_3('rabbit', "altd $op $bit,$reg", "76 $bin");
 	}
 	# cpl|neg a
 	elsif ($asm =~ /^ (cpl|neg|ccf|scf) \s+ (a|f) $ /x) {
@@ -197,9 +216,10 @@ sub add_4 {
 		add_5($cpu_tag, replace($asm, "hl", "ix"),	"DD $bin");
 		add_5($cpu_tag, replace($asm, "hl", "iy"),	"FD $bin");
 	}
-	elsif ($asm =~ / ^ rr \s+ hl $ /x) {
-		add_5($cpu_tag, "rr ix", "DD $bin");
-		add_5($cpu_tag, "rr iy", "FD $bin");
+	elsif ($asm =~ / ^ (rr|and|or|bool) \s+ hl \s* (,.*|) $/x) {
+		my($op, $rest) = ($1, $2);
+		add_5($cpu_tag, "$op ix$rest", "DD $bin");
+		add_5($cpu_tag, "$op iy$rest", "FD $bin");
 	}
 	
 	add_5($cpu_tag, $asm, $bin);
@@ -208,10 +228,10 @@ sub add_4 {
 sub add_5 {
 	my($cpu_tag, $asm, $bin) = @_;
 	
-	# replace +DIS with 0
-	if ($asm =~ / ( .* ) ( \+ \s* DIS ) (.*) /x) {
-		my($asm1, $asm2, $asm3) = ($1, $2, $3);
-		(my $bin1 = $bin) =~ s/DIS/00/;
+	# replace +DIS or +N with 0
+	if ($asm =~ / ( .* ) ( \+ \s* (DIS|N) ) (.*) /x) {
+		my($asm1, $asm2, $offset, $asm3) = ($1, $2, $3, $4);
+		(my $bin1 = $bin) =~ s/\b $offset \b/00/x;
 		add_6($cpu_tag, $asm1.$asm3, $bin1);
 	}
 	add_6($cpu_tag, $asm, $bin);
@@ -359,19 +379,23 @@ sub add_test {
 		add_test('zilog', replace($asm, qr/NN/,  32767), replace($bin, qr/NNl NNh/, "FF 7F"));
 		add_test('zilog', replace($asm, qr/NN/, -32768), replace($bin, qr/NNl NNh/, "00 80"));
 	}
-	elsif ($asm =~ /NN/) {
+	elsif ($asm =~ /\b NN \b/x) {
 		add_test($cpu, replace($asm, qr/NN/,  65535), replace($bin, qr/NNl NNh/, "FF FF"));
 		add_test($cpu, replace($asm, qr/NN/,  32767), replace($bin, qr/NNl NNh/, "FF 7F"));
 		add_test($cpu, replace($asm, qr/NN/, -32768), replace($bin, qr/NNl NNh/, "00 80"));
 	}
-	elsif ($asm =~ /N/) {
+	elsif ($asm =~ /\b N \b/x) {
 		add_test($cpu, replace($asm, qr/N/,  255), replace($bin, qr/N/, "FF"));
 		add_test($cpu, replace($asm, qr/N/,  127), replace($bin, qr/N/, "7F"));
 		add_test($cpu, replace($asm, qr/N/, -128), replace($bin, qr/N/, "80"));
 	}
-	elsif ($asm =~ /DIS/) {
+	elsif ($asm =~ /\+DIS \b/x) {
 		add_test($cpu, replace($asm, qr/\+DIS/, "+127"), replace($bin, qr/DIS/, "7F"));
 		add_test($cpu, replace($asm, qr/\+DIS/, "-128"), replace($bin, qr/DIS/, "80"));
+	}
+	elsif ($asm =~ /\b SN \b/x) {
+		add_test($cpu, replace($asm, qr/SN/,  "127"), replace($bin, qr/SN/, "7F"));
+		add_test($cpu, replace($asm, qr/SN/, "-128"), replace($bin, qr/SN/, "80"));
 	}
 	else {
 		$Tests{$cpu}{ok}{$asm} = $bin;
@@ -607,6 +631,9 @@ sub c_code_2 {
 	elsif ($bin =~ s/ N$//) {
 		$stmt = "DO_stmt_n";
 	}
+	elsif ($bin =~ s/ SN$//) {
+		$stmt = "DO_stmt_d";
+	}
 	elsif ($asm =~ / ^ call \s+ (nz|z|nc|c|po|pe|p|m) /x) {
 		return "DO_stmt_call_flag(".uc($1)."); ";
 	}
@@ -656,6 +683,7 @@ sub build_tokens {
 		s/ ( \( NN \) ) / expr /x and $expr = $1;
 		s/ ( \( N  \) ) / expr /x and $expr = $1;
 		s/ (    NN    ) / expr /x and $expr = $1;
+		s/ (    SN    ) / expr /x and $expr = $1;
 		s/ (    N     ) / expr /x and $expr = $1;
 		s/ \b (\d+) \b  / const_expr /x and $expr = $1;
 

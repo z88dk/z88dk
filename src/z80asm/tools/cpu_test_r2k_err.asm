@@ -14,6 +14,34 @@
  add ixl                ; Error
  add iyh                ; Error
  add iyl                ; Error
+ altd res -1,a          ; Error
+ altd res -1,b          ; Error
+ altd res -1,c          ; Error
+ altd res -1,d          ; Error
+ altd res -1,e          ; Error
+ altd res -1,h          ; Error
+ altd res -1,l          ; Error
+ altd res 8,a           ; Error
+ altd res 8,b           ; Error
+ altd res 8,c           ; Error
+ altd res 8,d           ; Error
+ altd res 8,e           ; Error
+ altd res 8,h           ; Error
+ altd res 8,l           ; Error
+ altd set -1,a          ; Error
+ altd set -1,b          ; Error
+ altd set -1,c          ; Error
+ altd set -1,d          ; Error
+ altd set -1,e          ; Error
+ altd set -1,h          ; Error
+ altd set -1,l          ; Error
+ altd set 8,a           ; Error
+ altd set 8,b           ; Error
+ altd set 8,c           ; Error
+ altd set 8,d           ; Error
+ altd set 8,e           ; Error
+ altd set 8,h           ; Error
+ altd set 8,l           ; Error
  and a,ixh              ; Error
  and a,ixl              ; Error
  and a,iyh              ; Error
@@ -22,6 +50,30 @@
  and ixl                ; Error
  and iyh                ; Error
  and iyl                ; Error
+ bit -1,(hl)            ; Error
+ bit -1,(ix)            ; Error
+ bit -1,(ix+DIS)        ; Error
+ bit -1,(iy)            ; Error
+ bit -1,(iy+DIS)        ; Error
+ bit -1,a               ; Error
+ bit -1,b               ; Error
+ bit -1,c               ; Error
+ bit -1,d               ; Error
+ bit -1,e               ; Error
+ bit -1,h               ; Error
+ bit -1,l               ; Error
+ bit 8,(hl)             ; Error
+ bit 8,(ix)             ; Error
+ bit 8,(ix+DIS)         ; Error
+ bit 8,(iy)             ; Error
+ bit 8,(iy+DIS)         ; Error
+ bit 8,a                ; Error
+ bit 8,b                ; Error
+ bit 8,c                ; Error
+ bit 8,d                ; Error
+ bit 8,e                ; Error
+ bit 8,h                ; Error
+ bit 8,l                ; Error
  cp a,ixh               ; Error
  cp a,ixl               ; Error
  cp a,iyh               ; Error
@@ -175,6 +227,44 @@
  pop su                 ; Error
  push su                ; Error
  rdmode                 ; Error
+ res -1,(hl)            ; Error
+ res -1,(ix)            ; Error
+ res -1,(ix+DIS)        ; Error
+ res -1,(iy)            ; Error
+ res -1,(iy+DIS)        ; Error
+ res -1,a               ; Error
+ res -1,a'              ; Error
+ res -1,b               ; Error
+ res -1,b'              ; Error
+ res -1,c               ; Error
+ res -1,c'              ; Error
+ res -1,d               ; Error
+ res -1,d'              ; Error
+ res -1,e               ; Error
+ res -1,e'              ; Error
+ res -1,h               ; Error
+ res -1,h'              ; Error
+ res -1,l               ; Error
+ res -1,l'              ; Error
+ res 8,(hl)             ; Error
+ res 8,(ix)             ; Error
+ res 8,(ix+DIS)         ; Error
+ res 8,(iy)             ; Error
+ res 8,(iy+DIS)         ; Error
+ res 8,a                ; Error
+ res 8,a'               ; Error
+ res 8,b                ; Error
+ res 8,b'               ; Error
+ res 8,c                ; Error
+ res 8,c'               ; Error
+ res 8,d                ; Error
+ res 8,d'               ; Error
+ res 8,e                ; Error
+ res 8,e'               ; Error
+ res 8,h                ; Error
+ res 8,h'               ; Error
+ res 8,l                ; Error
+ res 8,l'               ; Error
  retn                   ; Error
  rl (ix),a              ; Error
  rl (ix),b              ; Error
@@ -304,6 +394,44 @@
  sbc ixl                ; Error
  sbc iyh                ; Error
  sbc iyl                ; Error
+ set -1,(hl)            ; Error
+ set -1,(ix)            ; Error
+ set -1,(ix+DIS)        ; Error
+ set -1,(iy)            ; Error
+ set -1,(iy+DIS)        ; Error
+ set -1,a               ; Error
+ set -1,a'              ; Error
+ set -1,b               ; Error
+ set -1,b'              ; Error
+ set -1,c               ; Error
+ set -1,c'              ; Error
+ set -1,d               ; Error
+ set -1,d'              ; Error
+ set -1,e               ; Error
+ set -1,e'              ; Error
+ set -1,h               ; Error
+ set -1,h'              ; Error
+ set -1,l               ; Error
+ set -1,l'              ; Error
+ set 8,(hl)             ; Error
+ set 8,(ix)             ; Error
+ set 8,(ix+DIS)         ; Error
+ set 8,(iy)             ; Error
+ set 8,(iy+DIS)         ; Error
+ set 8,a                ; Error
+ set 8,a'               ; Error
+ set 8,b                ; Error
+ set 8,b'               ; Error
+ set 8,c                ; Error
+ set 8,c'               ; Error
+ set 8,d                ; Error
+ set 8,d'               ; Error
+ set 8,e                ; Error
+ set 8,e'               ; Error
+ set 8,h                ; Error
+ set 8,h'               ; Error
+ set 8,l                ; Error
+ set 8,l'               ; Error
  setusr                 ; Error
  sla (ix),a             ; Error
  sla (ix),b             ; Error
