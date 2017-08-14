@@ -35,12 +35,12 @@ scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 	
 all : parse_rules.h
 
-tools\cpu_rules.h : tools\cpu.def tools\cpu.pl
-	perl tools\cpu.pl
+codegen\cpu_rules.h : codegen\cpu.def codegen\cpu.pl
+	perl codegen\cpu.pl
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile \
-				tools\cpu_rules.h
+				codegen\cpu_rules.h
 	perl parse_ragel.pl parse_rules.rl
 	
 #------------------------------------------------------------------------------
