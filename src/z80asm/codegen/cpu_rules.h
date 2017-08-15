@@ -17936,110 +17936,110 @@
 
 /* tst a */
 | label? _TK_TST _TK_A _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED3C); 
 }
 
 /* tst a,a */
 | label? _TK_TST _TK_A _TK_COMMA _TK_A _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED3C); 
 }
 
 /* tst a,b */
 | label? _TK_TST _TK_A _TK_COMMA _TK_B _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED04); 
 }
 
 /* tst a,c */
 | label? _TK_TST _TK_A _TK_COMMA _TK_C _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED0C); 
 }
 
 /* tst a,d */
 | label? _TK_TST _TK_A _TK_COMMA _TK_D _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED14); 
 }
 
 /* tst a,e */
 | label? _TK_TST _TK_A _TK_COMMA _TK_E _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED1C); 
 }
 
 /* tst a,h */
 | label? _TK_TST _TK_A _TK_COMMA _TK_H _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED24); 
 }
 
 /* tst a,(hl) */
 | label? _TK_TST _TK_A _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED34); 
 }
 
 /* tst a,l */
 | label? _TK_TST _TK_A _TK_COMMA _TK_L _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED2C); 
 }
 
 /* tst a,N */
 | label? _TK_TST _TK_A _TK_COMMA expr _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_n(0xED64); 
 }
 
 /* tst b */
 | label? _TK_TST _TK_B _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED04); 
 }
 
 /* tst c */
 | label? _TK_TST _TK_C _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED0C); 
 }
 
 /* tst d */
 | label? _TK_TST _TK_D _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED14); 
 }
 
 /* tst e */
 | label? _TK_TST _TK_E _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED1C); 
 }
 
 /* tst h */
 | label? _TK_TST _TK_H _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED24); 
 }
 
 /* tst (hl) */
 | label? _TK_TST _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED34); 
 }
 
 /* tst l */
 | label? _TK_TST _TK_L _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   DO_stmt(0xED2C); 
 }
 
 /* tst N */
 | label? _TK_TST expr _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   if (expr_in_parens) warn_expr_in_parens();
   DO_stmt_n(0xED64); 
 }

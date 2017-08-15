@@ -2281,28 +2281,6 @@
  sub l                  ; 95
  sures                  ; ED 7D
  syscall                ; ED 75
- tst (hl)               ; ED 34
- tst -128               ; ED 64 80
- tst 127                ; ED 64 7F
- tst 255                ; ED 64 FF
- tst a                  ; ED 3C
- tst a,(hl)             ; ED 34
- tst a,-128             ; ED 64 80
- tst a,127              ; ED 64 7F
- tst a,255              ; ED 64 FF
- tst a,a                ; ED 3C
- tst a,b                ; ED 04
- tst a,c                ; ED 0C
- tst a,d                ; ED 14
- tst a,e                ; ED 1C
- tst a,h                ; ED 24
- tst a,l                ; ED 2C
- tst b                  ; ED 04
- tst c                  ; ED 0C
- tst d                  ; ED 14
- tst e                  ; ED 1C
- tst h                  ; ED 24
- tst l                  ; ED 2C
  uma                    ; ED C0
  ums                    ; ED C8
  xor (hl)               ; AE

@@ -73,12 +73,12 @@
 			{inc dec} (ix + D)				=> DD, 34 + $1, D
 			{inc dec} (iy + D)				=> FD, 34 + $1, D
 
-[not_z80]	tst a, {b c d e   h   l . a}	=> ED, 04 + $1*8
-[not_z80]	tst    {b c d e   h   l . a}	=> ED, 04 + $1*8
-[not_z80]	tst a, N						=> ED, 64, N
-[not_z80]	tst    N						=> ED, 64, N
-[not_z80]	tst a, (hl)						=> ED, 34
-[not_z80]	tst    (hl)						=> ED, 34
+[z180]		tst a, {b c d e   h   l . a}	=> ED, 04 + $1*8
+[z180]		tst    {b c d e   h   l . a}	=> ED, 04 + $1*8
+[z180]		tst a, N						=> ED, 64, N
+[z180]		tst    N						=> ED, 64, N
+[z180]		tst a, (hl)						=> ED, 34
+[z180]		tst    (hl)						=> ED, 34
 
 ;------------------------------------------------------------------------------
 ; General-Purpose Arithmetic Group

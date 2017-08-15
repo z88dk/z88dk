@@ -31578,110 +31578,110 @@ _match:
 	break;
 	case 1857:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED3C); } while(0);
 }
 	break;
 	case 1858:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED3C); } while(0);
 }
 	break;
 	case 1859:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED04); } while(0);
 }
 	break;
 	case 1860:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED0C); } while(0);
 }
 	break;
 	case 1861:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED14); } while(0);
 }
 	break;
 	case 1862:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED1C); } while(0);
 }
 	break;
 	case 1863:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED24); } while(0);
 }
 	break;
 	case 1864:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED34); } while(0);
 }
 	break;
 	case 1865:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED2C); } while(0);
 }
 	break;
 	case 1866:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   if (expr_in_parens) warn_expr_in_parens();
   do { Expr *expr = pop_expr(ctx); do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode_n((0xED64), expr); } while(0);
 }
 	break;
 	case 1867:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED04); } while(0);
 }
 	break;
 	case 1868:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED0C); } while(0);
 }
 	break;
 	case 1869:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED14); } while(0);
 }
 	break;
 	case 1870:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED1C); } while(0);
 }
 	break;
 	case 1871:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED24); } while(0);
 }
 	break;
 	case 1872:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED34); } while(0);
 }
 	break;
 	case 1873:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   do { do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode(0xED2C); } while(0);
 }
 	break;
 	case 1874:
 	{
-  if ((opts.cpu & (CPU_NOT_Z80)) == 0) { error_illegal_ident(); return FALSE; }
+  if ((opts.cpu & (CPU_Z180)) == 0) { error_illegal_ident(); return FALSE; }
   if (expr_in_parens) warn_expr_in_parens();
   do { Expr *expr = pop_expr(ctx); do { if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; } } while(0); add_opcode_n((0xED64), expr); } while(0);
 }

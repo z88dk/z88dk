@@ -114,188 +114,212 @@
  inc iyl                ;; 065A:  FD 2C
  dec iyh                ;; 065A:  FD 25
  dec iyl                ;; 065A:  FD 2D
- daa                    ;; 06B8:  27
- rld                    ;; 06B8:  ED 6F
- rrd                    ;; 06B8:  ED 67
- mlt sp                 ;; 0AEC:  ED 7C
- sll b                  ;; 0B77:  CB 30
- sll c                  ;; 0B77:  CB 31
- sll d                  ;; 0B77:  CB 32
- sll e                  ;; 0B77:  CB 33
- sll h                  ;; 0B77:  CB 34
- sll l                  ;; 0B77:  CB 35
- sll (hl)               ;; 0B77:  CB 36
- sll a                  ;; 0B77:  CB 37
- sll (ix+-128)          ;; 0BCB:  DD CB 80 36
- sll (ix)               ;; 0BCB:  DD CB 00 36
- sll (ix+127)           ;; 0BCB:  DD CB 7F 36
- sll (iy+-128)          ;; 0C1F:  FD CB 80 36
- sll (iy)               ;; 0C1F:  FD CB 00 36
- sll (iy+127)           ;; 0C1F:  FD CB 7F 36
- cpi                    ;; 1150:  ED A1
- cpir                   ;; 1150:  ED B1
- cpd                    ;; 1150:  ED A9
- cpdr                   ;; 1150:  ED B9
- halt                   ;; 1151:  76
- slp                    ;; 1151:  ED 76
- call nz, 0             ;; 124E:  C4 00 00
- call nz, 291           ;; 124E:  C4 23 01
- call nz, 17767         ;; 124E:  C4 67 45
- call nz, 35243         ;; 124E:  C4 AB 89
- call nz, 52719         ;; 124E:  C4 EF CD
- call nz, 65535         ;; 124E:  C4 FF FF
- call z, 0              ;; 124E:  CC 00 00
- call z, 291            ;; 124E:  CC 23 01
- call z, 17767          ;; 124E:  CC 67 45
- call z, 35243          ;; 124E:  CC AB 89
- call z, 52719          ;; 124E:  CC EF CD
- call z, 65535          ;; 124E:  CC FF FF
- call nc, 0             ;; 124E:  D4 00 00
- call nc, 291           ;; 124E:  D4 23 01
- call nc, 17767         ;; 124E:  D4 67 45
- call nc, 35243         ;; 124E:  D4 AB 89
- call nc, 52719         ;; 124E:  D4 EF CD
- call nc, 65535         ;; 124E:  D4 FF FF
- call c, 0              ;; 124E:  DC 00 00
- call c, 291            ;; 124E:  DC 23 01
- call c, 17767          ;; 124E:  DC 67 45
- call c, 35243          ;; 124E:  DC AB 89
- call c, 52719          ;; 124E:  DC EF CD
- call c, 65535          ;; 124E:  DC FF FF
- call po, 0             ;; 124E:  E4 00 00
- call po, 291           ;; 124E:  E4 23 01
- call po, 17767         ;; 124E:  E4 67 45
- call po, 35243         ;; 124E:  E4 AB 89
- call po, 52719         ;; 124E:  E4 EF CD
- call po, 65535         ;; 124E:  E4 FF FF
- call pe, 0             ;; 124E:  EC 00 00
- call pe, 291           ;; 124E:  EC 23 01
- call pe, 17767         ;; 124E:  EC 67 45
- call pe, 35243         ;; 124E:  EC AB 89
- call pe, 52719         ;; 124E:  EC EF CD
- call pe, 65535         ;; 124E:  EC FF FF
- call p, 0              ;; 124E:  F4 00 00
- call p, 291            ;; 124E:  F4 23 01
- call p, 17767          ;; 124E:  F4 67 45
- call p, 35243          ;; 124E:  F4 AB 89
- call p, 52719          ;; 124E:  F4 EF CD
- call p, 65535          ;; 124E:  F4 FF FF
- call m, 0              ;; 124E:  FC 00 00
- call m, 291            ;; 124E:  FC 23 01
- call m, 17767          ;; 124E:  FC 67 45
- call m, 35243          ;; 124E:  FC AB 89
- call m, 52719          ;; 124E:  FC EF CD
- call m, 65535          ;; 124E:  FC FF FF
- rst 0                  ;; 125E:  C7
- rst 8                  ;; 125E:  CF
- rst 48                 ;; 125E:  F7
- in a, (0)              ;; 125E:  DB 00
- in a, (85)             ;; 125E:  DB 55
- in a, (170)            ;; 125E:  DB AA
- in a, (255)            ;; 125E:  DB FF
- in b, (c)              ;; 125E:  ED 40
- in c, (c)              ;; 125E:  ED 48
- in d, (c)              ;; 125E:  ED 50
- in e, (c)              ;; 125E:  ED 58
- in h, (c)              ;; 125E:  ED 60
- in l, (c)              ;; 125E:  ED 68
- in f, (c)              ;; 125E:  ED 70
- in a, (c)              ;; 125E:  ED 78
- in0 b, (0)             ;; 125E:  ED 00 00
- in0 b, (85)            ;; 125E:  ED 00 55
- in0 b, (170)           ;; 125E:  ED 00 AA
- in0 b, (255)           ;; 125E:  ED 00 FF
- in0 c, (0)             ;; 125E:  ED 08 00
- in0 c, (85)            ;; 125E:  ED 08 55
- in0 c, (170)           ;; 125E:  ED 08 AA
- in0 c, (255)           ;; 125E:  ED 08 FF
- in0 d, (0)             ;; 125E:  ED 10 00
- in0 d, (85)            ;; 125E:  ED 10 55
- in0 d, (170)           ;; 125E:  ED 10 AA
- in0 d, (255)           ;; 125E:  ED 10 FF
- in0 e, (0)             ;; 125E:  ED 18 00
- in0 e, (85)            ;; 125E:  ED 18 55
- in0 e, (170)           ;; 125E:  ED 18 AA
- in0 e, (255)           ;; 125E:  ED 18 FF
- in0 h, (0)             ;; 125E:  ED 20 00
- in0 h, (85)            ;; 125E:  ED 20 55
- in0 h, (170)           ;; 125E:  ED 20 AA
- in0 h, (255)           ;; 125E:  ED 20 FF
- in0 l, (0)             ;; 125E:  ED 28 00
- in0 l, (85)            ;; 125E:  ED 28 55
- in0 l, (170)           ;; 125E:  ED 28 AA
- in0 l, (255)           ;; 125E:  ED 28 FF
- in0 f, (0)             ;; 125E:  ED 30 00
- in0 f, (85)            ;; 125E:  ED 30 55
- in0 f, (170)           ;; 125E:  ED 30 AA
- in0 f, (255)           ;; 125E:  ED 30 FF
- in0 a, (0)             ;; 125E:  ED 38 00
- in0 a, (85)            ;; 125E:  ED 38 55
- in0 a, (170)           ;; 125E:  ED 38 AA
- in0 a, (255)           ;; 125E:  ED 38 FF
- out (0), a             ;; 125E:  D3 00
- out (85), a            ;; 125E:  D3 55
- out (170), a           ;; 125E:  D3 AA
- out (255), a           ;; 125E:  D3 FF
- out (c), b             ;; 125E:  ED 41
- out (c), c             ;; 125E:  ED 49
- out (c), d             ;; 125E:  ED 51
- out (c), e             ;; 125E:  ED 59
- out (c), h             ;; 125E:  ED 61
- out (c), l             ;; 125E:  ED 69
- out (c), 0             ;; 125E:  ED 71
- out (c), a             ;; 125E:  ED 79
- out0 (0), b            ;; 125E:  ED 01 00
- out0 (85), b           ;; 125E:  ED 01 55
- out0 (170), b          ;; 125E:  ED 01 AA
- out0 (255), b          ;; 125E:  ED 01 FF
- out0 (0), c            ;; 125E:  ED 09 00
- out0 (85), c           ;; 125E:  ED 09 55
- out0 (170), c          ;; 125E:  ED 09 AA
- out0 (255), c          ;; 125E:  ED 09 FF
- out0 (0), d            ;; 125E:  ED 11 00
- out0 (85), d           ;; 125E:  ED 11 55
- out0 (170), d          ;; 125E:  ED 11 AA
- out0 (255), d          ;; 125E:  ED 11 FF
- out0 (0), e            ;; 125E:  ED 19 00
- out0 (85), e           ;; 125E:  ED 19 55
- out0 (170), e          ;; 125E:  ED 19 AA
- out0 (255), e          ;; 125E:  ED 19 FF
- out0 (0), h            ;; 125E:  ED 21 00
- out0 (85), h           ;; 125E:  ED 21 55
- out0 (170), h          ;; 125E:  ED 21 AA
- out0 (255), h          ;; 125E:  ED 21 FF
- out0 (0), l            ;; 125E:  ED 29 00
- out0 (85), l           ;; 125E:  ED 29 55
- out0 (170), l          ;; 125E:  ED 29 AA
- out0 (255), l          ;; 125E:  ED 29 FF
- out0 (0), a            ;; 125E:  ED 39 00
- out0 (85), a           ;; 125E:  ED 39 55
- out0 (170), a          ;; 125E:  ED 39 AA
- out0 (255), a          ;; 125E:  ED 39 FF
- tstio 0                ;; 125E:  ED 74 00
- tstio 85               ;; 125E:  ED 74 55
- tstio 170              ;; 125E:  ED 74 AA
- tstio 255              ;; 125E:  ED 74 FF
- ini                    ;; 125E:  ED A2
- inir                   ;; 125E:  ED B2
- ind                    ;; 125E:  ED AA
- indr                   ;; 125E:  ED BA
- outi                   ;; 125E:  ED A3
- otir                   ;; 125E:  ED B3
- outd                   ;; 125E:  ED AB
- otdr                   ;; 125E:  ED BB
- otdm                   ;; 125E:  ED 8B
- otdmr                  ;; 125E:  ED 9B
- otim                   ;; 125E:  ED 83
- otimr                  ;; 125E:  ED 93
- di                     ;; 125E:  F3
- ei                     ;; 125E:  FB
- im 0                   ;; 125E:  ED 46
- im 1                   ;; 125E:  ED 56
- im 2                   ;; 125E:  ED 5E
- ld i, a                ;; 1268:  ED 47
- ld a, i                ;; 1268:  ED 57
- ld r, a                ;; 1268:  ED 4F
- ld a, r                ;; 1268:  ED 5F
- retn                   ;; 1278:  ED 45
+ tst a, b               ;; 0680:  ED 04
+ tst a, c               ;; 0680:  ED 0C
+ tst a, d               ;; 0680:  ED 14
+ tst a, e               ;; 0680:  ED 1C
+ tst a, h               ;; 0680:  ED 24
+ tst a, l               ;; 0680:  ED 2C
+ tst a, a               ;; 0680:  ED 3C
+ tst b                  ;; 0680:  ED 04
+ tst c                  ;; 0680:  ED 0C
+ tst d                  ;; 0680:  ED 14
+ tst e                  ;; 0680:  ED 1C
+ tst h                  ;; 0680:  ED 24
+ tst l                  ;; 0680:  ED 2C
+ tst a                  ;; 0680:  ED 3C
+ tst a, 0               ;; 0680:  ED 64 00
+ tst a, 85              ;; 0680:  ED 64 55
+ tst a, 170             ;; 0680:  ED 64 AA
+ tst a, 255             ;; 0680:  ED 64 FF
+ tst 0                  ;; 0680:  ED 64 00
+ tst 85                 ;; 0680:  ED 64 55
+ tst 170                ;; 0680:  ED 64 AA
+ tst 255                ;; 0680:  ED 64 FF
+ tst a, (hl)            ;; 0680:  ED 34
+ tst (hl)               ;; 0680:  ED 34
+ daa                    ;; 0680:  27
+ rld                    ;; 0680:  ED 6F
+ rrd                    ;; 0680:  ED 67
+ mlt sp                 ;; 0AB4:  ED 7C
+ sll b                  ;; 0B3F:  CB 30
+ sll c                  ;; 0B3F:  CB 31
+ sll d                  ;; 0B3F:  CB 32
+ sll e                  ;; 0B3F:  CB 33
+ sll h                  ;; 0B3F:  CB 34
+ sll l                  ;; 0B3F:  CB 35
+ sll (hl)               ;; 0B3F:  CB 36
+ sll a                  ;; 0B3F:  CB 37
+ sll (ix+-128)          ;; 0B93:  DD CB 80 36
+ sll (ix)               ;; 0B93:  DD CB 00 36
+ sll (ix+127)           ;; 0B93:  DD CB 7F 36
+ sll (iy+-128)          ;; 0BE7:  FD CB 80 36
+ sll (iy)               ;; 0BE7:  FD CB 00 36
+ sll (iy+127)           ;; 0BE7:  FD CB 7F 36
+ cpi                    ;; 1118:  ED A1
+ cpir                   ;; 1118:  ED B1
+ cpd                    ;; 1118:  ED A9
+ cpdr                   ;; 1118:  ED B9
+ halt                   ;; 1119:  76
+ slp                    ;; 1119:  ED 76
+ call nz, 0             ;; 1216:  C4 00 00
+ call nz, 291           ;; 1216:  C4 23 01
+ call nz, 17767         ;; 1216:  C4 67 45
+ call nz, 35243         ;; 1216:  C4 AB 89
+ call nz, 52719         ;; 1216:  C4 EF CD
+ call nz, 65535         ;; 1216:  C4 FF FF
+ call z, 0              ;; 1216:  CC 00 00
+ call z, 291            ;; 1216:  CC 23 01
+ call z, 17767          ;; 1216:  CC 67 45
+ call z, 35243          ;; 1216:  CC AB 89
+ call z, 52719          ;; 1216:  CC EF CD
+ call z, 65535          ;; 1216:  CC FF FF
+ call nc, 0             ;; 1216:  D4 00 00
+ call nc, 291           ;; 1216:  D4 23 01
+ call nc, 17767         ;; 1216:  D4 67 45
+ call nc, 35243         ;; 1216:  D4 AB 89
+ call nc, 52719         ;; 1216:  D4 EF CD
+ call nc, 65535         ;; 1216:  D4 FF FF
+ call c, 0              ;; 1216:  DC 00 00
+ call c, 291            ;; 1216:  DC 23 01
+ call c, 17767          ;; 1216:  DC 67 45
+ call c, 35243          ;; 1216:  DC AB 89
+ call c, 52719          ;; 1216:  DC EF CD
+ call c, 65535          ;; 1216:  DC FF FF
+ call po, 0             ;; 1216:  E4 00 00
+ call po, 291           ;; 1216:  E4 23 01
+ call po, 17767         ;; 1216:  E4 67 45
+ call po, 35243         ;; 1216:  E4 AB 89
+ call po, 52719         ;; 1216:  E4 EF CD
+ call po, 65535         ;; 1216:  E4 FF FF
+ call pe, 0             ;; 1216:  EC 00 00
+ call pe, 291           ;; 1216:  EC 23 01
+ call pe, 17767         ;; 1216:  EC 67 45
+ call pe, 35243         ;; 1216:  EC AB 89
+ call pe, 52719         ;; 1216:  EC EF CD
+ call pe, 65535         ;; 1216:  EC FF FF
+ call p, 0              ;; 1216:  F4 00 00
+ call p, 291            ;; 1216:  F4 23 01
+ call p, 17767          ;; 1216:  F4 67 45
+ call p, 35243          ;; 1216:  F4 AB 89
+ call p, 52719          ;; 1216:  F4 EF CD
+ call p, 65535          ;; 1216:  F4 FF FF
+ call m, 0              ;; 1216:  FC 00 00
+ call m, 291            ;; 1216:  FC 23 01
+ call m, 17767          ;; 1216:  FC 67 45
+ call m, 35243          ;; 1216:  FC AB 89
+ call m, 52719          ;; 1216:  FC EF CD
+ call m, 65535          ;; 1216:  FC FF FF
+ rst 0                  ;; 1226:  C7
+ rst 8                  ;; 1226:  CF
+ rst 48                 ;; 1226:  F7
+ in a, (0)              ;; 1226:  DB 00
+ in a, (85)             ;; 1226:  DB 55
+ in a, (170)            ;; 1226:  DB AA
+ in a, (255)            ;; 1226:  DB FF
+ in b, (c)              ;; 1226:  ED 40
+ in c, (c)              ;; 1226:  ED 48
+ in d, (c)              ;; 1226:  ED 50
+ in e, (c)              ;; 1226:  ED 58
+ in h, (c)              ;; 1226:  ED 60
+ in l, (c)              ;; 1226:  ED 68
+ in f, (c)              ;; 1226:  ED 70
+ in a, (c)              ;; 1226:  ED 78
+ in0 b, (0)             ;; 1226:  ED 00 00
+ in0 b, (85)            ;; 1226:  ED 00 55
+ in0 b, (170)           ;; 1226:  ED 00 AA
+ in0 b, (255)           ;; 1226:  ED 00 FF
+ in0 c, (0)             ;; 1226:  ED 08 00
+ in0 c, (85)            ;; 1226:  ED 08 55
+ in0 c, (170)           ;; 1226:  ED 08 AA
+ in0 c, (255)           ;; 1226:  ED 08 FF
+ in0 d, (0)             ;; 1226:  ED 10 00
+ in0 d, (85)            ;; 1226:  ED 10 55
+ in0 d, (170)           ;; 1226:  ED 10 AA
+ in0 d, (255)           ;; 1226:  ED 10 FF
+ in0 e, (0)             ;; 1226:  ED 18 00
+ in0 e, (85)            ;; 1226:  ED 18 55
+ in0 e, (170)           ;; 1226:  ED 18 AA
+ in0 e, (255)           ;; 1226:  ED 18 FF
+ in0 h, (0)             ;; 1226:  ED 20 00
+ in0 h, (85)            ;; 1226:  ED 20 55
+ in0 h, (170)           ;; 1226:  ED 20 AA
+ in0 h, (255)           ;; 1226:  ED 20 FF
+ in0 l, (0)             ;; 1226:  ED 28 00
+ in0 l, (85)            ;; 1226:  ED 28 55
+ in0 l, (170)           ;; 1226:  ED 28 AA
+ in0 l, (255)           ;; 1226:  ED 28 FF
+ in0 f, (0)             ;; 1226:  ED 30 00
+ in0 f, (85)            ;; 1226:  ED 30 55
+ in0 f, (170)           ;; 1226:  ED 30 AA
+ in0 f, (255)           ;; 1226:  ED 30 FF
+ in0 a, (0)             ;; 1226:  ED 38 00
+ in0 a, (85)            ;; 1226:  ED 38 55
+ in0 a, (170)           ;; 1226:  ED 38 AA
+ in0 a, (255)           ;; 1226:  ED 38 FF
+ out (0), a             ;; 1226:  D3 00
+ out (85), a            ;; 1226:  D3 55
+ out (170), a           ;; 1226:  D3 AA
+ out (255), a           ;; 1226:  D3 FF
+ out (c), b             ;; 1226:  ED 41
+ out (c), c             ;; 1226:  ED 49
+ out (c), d             ;; 1226:  ED 51
+ out (c), e             ;; 1226:  ED 59
+ out (c), h             ;; 1226:  ED 61
+ out (c), l             ;; 1226:  ED 69
+ out (c), 0             ;; 1226:  ED 71
+ out (c), a             ;; 1226:  ED 79
+ out0 (0), b            ;; 1226:  ED 01 00
+ out0 (85), b           ;; 1226:  ED 01 55
+ out0 (170), b          ;; 1226:  ED 01 AA
+ out0 (255), b          ;; 1226:  ED 01 FF
+ out0 (0), c            ;; 1226:  ED 09 00
+ out0 (85), c           ;; 1226:  ED 09 55
+ out0 (170), c          ;; 1226:  ED 09 AA
+ out0 (255), c          ;; 1226:  ED 09 FF
+ out0 (0), d            ;; 1226:  ED 11 00
+ out0 (85), d           ;; 1226:  ED 11 55
+ out0 (170), d          ;; 1226:  ED 11 AA
+ out0 (255), d          ;; 1226:  ED 11 FF
+ out0 (0), e            ;; 1226:  ED 19 00
+ out0 (85), e           ;; 1226:  ED 19 55
+ out0 (170), e          ;; 1226:  ED 19 AA
+ out0 (255), e          ;; 1226:  ED 19 FF
+ out0 (0), h            ;; 1226:  ED 21 00
+ out0 (85), h           ;; 1226:  ED 21 55
+ out0 (170), h          ;; 1226:  ED 21 AA
+ out0 (255), h          ;; 1226:  ED 21 FF
+ out0 (0), l            ;; 1226:  ED 29 00
+ out0 (85), l           ;; 1226:  ED 29 55
+ out0 (170), l          ;; 1226:  ED 29 AA
+ out0 (255), l          ;; 1226:  ED 29 FF
+ out0 (0), a            ;; 1226:  ED 39 00
+ out0 (85), a           ;; 1226:  ED 39 55
+ out0 (170), a          ;; 1226:  ED 39 AA
+ out0 (255), a          ;; 1226:  ED 39 FF
+ tstio 0                ;; 1226:  ED 74 00
+ tstio 85               ;; 1226:  ED 74 55
+ tstio 170              ;; 1226:  ED 74 AA
+ tstio 255              ;; 1226:  ED 74 FF
+ ini                    ;; 1226:  ED A2
+ inir                   ;; 1226:  ED B2
+ ind                    ;; 1226:  ED AA
+ indr                   ;; 1226:  ED BA
+ outi                   ;; 1226:  ED A3
+ otir                   ;; 1226:  ED B3
+ outd                   ;; 1226:  ED AB
+ otdr                   ;; 1226:  ED BB
+ otdm                   ;; 1226:  ED 8B
+ otdmr                  ;; 1226:  ED 9B
+ otim                   ;; 1226:  ED 83
+ otimr                  ;; 1226:  ED 93
+ di                     ;; 1226:  F3
+ ei                     ;; 1226:  FB
+ im 0                   ;; 1226:  ED 46
+ im 1                   ;; 1226:  ED 56
+ im 2                   ;; 1226:  ED 5E
+ ld i, a                ;; 1230:  ED 47
+ ld a, i                ;; 1230:  ED 57
+ ld r, a                ;; 1230:  ED 4F
+ ld a, r                ;; 1230:  ED 5F
+ retn                   ;; 1240:  ED 45

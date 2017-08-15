@@ -595,6 +595,24 @@
  sub ixl                ; Error
  sub iyh                ; Error
  sub iyl                ; Error
+ tst (hl)               ; Error
+ tst N                  ; Error
+ tst a                  ; Error
+ tst a,(hl)             ; Error
+ tst a,N                ; Error
+ tst a,a                ; Error
+ tst a,b                ; Error
+ tst a,c                ; Error
+ tst a,d                ; Error
+ tst a,e                ; Error
+ tst a,h                ; Error
+ tst a,l                ; Error
+ tst b                  ; Error
+ tst c                  ; Error
+ tst d                  ; Error
+ tst e                  ; Error
+ tst h                  ; Error
+ tst l                  ; Error
  tstio N                ; Error
  xor a,ixh              ; Error
  xor a,ixl              ; Error
