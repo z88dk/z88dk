@@ -50,6 +50,7 @@ include(`target/zxn/config/config_nirvanap.m4')
 include(`target/zxn/config/config_sound_bit.m4')
 include(`target/zxn/config/config_sp1.m4')
 include(`target/zxn/config/config_ulaplus.m4')
+include(`target/zxn/config/config_layer2_color.m4')
 
 dnl############################################################
 dnl# END IF GUARDS
