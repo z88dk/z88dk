@@ -15,10 +15,21 @@
 =
 	add	hl,+(%1)
 
-	ld	hl,0
+	ld	hl,0	;const
 	add	hl,sp
 =
 	ld	hl,sp
+
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2
+=
+	push	%1	;const
+	ld	hl,%2
+
+	push	%1	;const
+=
+	defb	0xeb,0x8a, +(%1 % 256), +(%1 / 256)	; push %1
 
 	add	hl,+(%1)
 =
