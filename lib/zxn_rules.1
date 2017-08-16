@@ -4,11 +4,11 @@
 
 	call	l_inclong
 =
-	inc	dehl
+	inc	hlde
 
 	call	l_declong
 =
-	dec	dehl
+	dec	hlde
 
 	ld	bc,%1
 	add	hl,bc
@@ -27,9 +27,21 @@
 	push	%1	;const
 	ld	hl,%2
 
+	push	de
+	push	hl
+	ld	hl,%1	;const
+	ld	de,0
+	call	l_long_add
+=
+	add	dehl,%1	;const
+
+	add	dehl,%1	;const
+=
+	defb	0xed,0x34, +(%1 % 256), +(%1 / 256)	; add dehl,%1
+
 	push	%1	;const
 =
-	defb	0xeb,0x8a, +(%1 % 256), +(%1 / 256)	; push %1
+	defb	0xed,0x8a, +(%1 % 256), +(%1 / 256)	; push %1
 
 	add	hl,+(%1)
 =
@@ -43,10 +55,10 @@
 =
 	defb	0xed, 0x30	; mul
 
-	inc	dehl
+	inc	hlde
 =
-	defb	0xed, 0x37	; inc dehl
+	defb	0xed, 0x37	; inc hlde
 
-	dec	dehl
+	dec	hlde
 =
-	defb	0xed, 0x38	; dec dehl
+	defb	0xed, 0x38	; dec hlde
