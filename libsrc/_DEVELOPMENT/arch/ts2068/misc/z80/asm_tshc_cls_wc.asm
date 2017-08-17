@@ -13,8 +13,8 @@ SECTION code_arch
 
 PUBLIC asm_tshc_cls_wc
 
-EXTERN asm_memset
-EXTERN asm_tshc_cxy2aaddr, asm0_tshc_aaddrpdown
+EXTERN asm_tshc_cls_wc_pix
+EXTERN asm_tshc_cls_wc_attr
 
 asm_tshc_cls_wc:
 
@@ -23,53 +23,10 @@ asm_tshc_cls_wc:
    ;
    ; uses  : af, bc, de, hl
 
-	ld a,l
-	push af                     ; save attribute
+   push hl                     ; save attribute
 
-   ld l,(ix+0)                 ; l = rect.x
-   ld h,(ix+2)                 ; h = rect.y
+   ld l,0
+   call asm_tshc_cls_wc_pix
    
-   call asm_tshc_cxy2aaddr     ; hl = attribute address
-
-   ; ix = rect *
-   ; hl = attribute address
-   ; stack = attribute
-
-   ld c,(ix+3)                 ; c = rect.height
-
-pixel_loop_0:
-
-   ld b,8
-
-pixel_loop_1:
-
-   pop af
-	push af
-	ld e,a                      ; e = attribute
-
-   push bc
-   
-   ld b,0
-   ld c,(ix+1)                 ; bc = rect.width
-
-   call asm_memset             ; set attributes
-   
-	ld c,(ix+1)                 ; bc = rect.width
-	ld e,b
-
-	res 5,h
-	call asm_memset             ; clear pixels
-	
-	set 5,h
-	inc h
-
-   pop bc
-   djnz pixel_loop_1
-   
-   call asm0_tshc_aaddrpdown
-   
-   dec c
-   jr nz, pixel_loop_0
-
-   pop hl                      ; junk attribute
-	ret
+   pop hl
+   jp asm_tshc_cls_wc_attr

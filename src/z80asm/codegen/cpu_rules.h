@@ -10703,12 +10703,6 @@
   DO_stmt(0xED7C); 
 }
 
-/* mul */
-| label? _TK_MUL _TK_NEWLINE @{
-  if ((opts.cpu & (CPU_RABBIT)) == 0) { error_illegal_ident(); return FALSE; }
-  DO_stmt(0xF7); 
-}
-
 /* neg */
 | label? _TK_NEG _TK_NEWLINE @{
   DO_stmt(0xED44); 

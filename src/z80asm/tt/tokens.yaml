@@ -357,7 +357,15 @@ tokens:
   - name	: SRL
   - name	: SUB
   - name	: XOR 
-  
+
+  # Z80-ZXN specific opcodes
+  - name    : SWAPNIB
+  - name    : OUTINB
+  - name    : LDIX
+  - name    : LDIRX
+  - name    : LDDX
+  - name    : LDDRX
+
   # Z180 specific opcodes
   - name	: SLP 
   - name	: MLT 

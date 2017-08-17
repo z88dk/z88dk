@@ -17,15 +17,16 @@ Parse command line options
 /*-----------------------------------------------------------------------------
 *   CPU type
 *----------------------------------------------------------------------------*/
-#define CPU_Z80     1
-#define CPU_Z180    2
-#define CPU_R2K		4
-#define CPU_R3K		8
+#define CPU_Z80     (1 << 0)
+#define CPU_Z80_ZXN	(1 << 1)
+#define CPU_Z180    (1 << 2)
+#define CPU_R2K		(1 << 3)
+#define CPU_R3K		(1 << 4)
 
-#define CPU_RABBIT 	(CPU_R2K   |  CPU_R3K   )
-#define CPU_ZILOG  	(CPU_Z80   |  CPU_Z180  )
-#define CPU_ALL    	(CPU_ZILOG |  CPU_RABBIT)
-#define CPU_NOT_Z80	(CPU_ALL   & ~CPU_Z80   )
+#define CPU_ZILOG	(CPU_Z80 | CPU_Z80_ZXN| CPU_Z180)
+#define CPU_RABBIT	(CPU_R2K | CPU_R3K)
+#define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
+#define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80_ZXN))
 
 /*-----------------------------------------------------------------------------
 *   APPMAKE type

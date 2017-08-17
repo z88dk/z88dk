@@ -920,7 +920,6 @@
  lsdr                   ; Error
  lsidr                  ; Error
  lsir                   ; Error
- mul                    ; Error
  neg a'                 ; Error
  or a',(hl)             ; Error
  or a',(ix)             ; Error

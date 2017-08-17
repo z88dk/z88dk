@@ -55,6 +55,7 @@ static void option_define( char *symbol );
 static void option_make_lib( char *library );
 static void option_use_lib( char *library );
 static void option_cpu_z80(void);
+static void option_cpu_z80_zxn(void);
 static void option_cpu_z180(void);
 static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
@@ -553,6 +554,11 @@ static void option_use_lib( char *library )
 static void option_cpu_z80(void)
 {
 	opts.cpu = CPU_Z80;
+}
+
+static void option_cpu_z80_zxn(void)
+{
+	opts.cpu = CPU_Z80_ZXN;
 }
 
 static void option_cpu_z180(void)

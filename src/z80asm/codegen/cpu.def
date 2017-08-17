@@ -141,7 +141,9 @@
 
 [not_z80]	mlt {bc|de|hl|}						=> ED 4C+$1*10
 [z180]		mlt {|||sp}							=> ED 4C+$1*10
-[rabbit]	mul									=> F7
+
+; mul coded in parse_rules.rl as it has different opcodes for Rabbit and Z80-ZXN
+; [rabbit]	mul									=> F7
 	
 [r3k]		uma									=> ED C0
 [r3k]		ums									=> ED C8

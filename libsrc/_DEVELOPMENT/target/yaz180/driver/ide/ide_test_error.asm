@@ -33,7 +33,7 @@ ide_test_error:
 ide_test2:
     inc sp                  ;pop old af
     inc sp
-    ccf                     ;make carry flag zero = error!
+    or a                    ;make carry flag zero = error!
     ret                     ;if a = 0, ide write busy timed out
 
 ide_test_success:

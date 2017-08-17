@@ -840,7 +840,6 @@
  mlt de                 ; Error
  mlt hl                 ; Error
  mlt sp                 ; Error
- mul                    ; Error
  neg a'                 ; Error
  or a',(hl)             ; Error
  or a',(ix)             ; Error

@@ -379,8 +379,79 @@ Define rules for a ragel-based parser.
 
 #include "codegen/cpu_rules.h"
 
-		; /* end of main */
+		/*---------------------------------------------------------------------
+		*   Z80-ZXN opcodes for ZX Next
+		*--------------------------------------------------------------------*/
+		| label? _TK_SWAPNIB _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED23);
+		  }
+
+		| label? _TK_MUL _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & CPU_RABBIT) != 0) {
+				  DO_stmt(0xF7); 				  
+			  }
+			  else if ((opts.cpu & CPU_Z80_ZXN) != 0) { 
+				  DO_stmt(0xED30);
+			  }
+			  else {
+				  error_illegal_ident(); 
+				  return FALSE;
+			  }
+		  }
 		
+		| label? _TK_ADD _TK_HL _TK_COMMA _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED31);
+		  }
+		
+		| label? _TK_ADD _TK_DE _TK_COMMA _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED32);
+		  }
+		
+		| label? _TK_ADD _TK_BC _TK_COMMA _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED33);
+		  }
+		
+		| label? _TK_OUTINB _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED90);
+		  }
+		
+		| label? _TK_LDIX _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDA4);
+		  }
+		
+		| label? _TK_LDIRX _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDB4);
+		  }
+		
+		| label? _TK_LDDX _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDAC);
+		  }
+		
+		| label? _TK_LDDRX _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDBC);
+		  }
+		
+		; /* end of main */
+
 }%%
 
 %%write data;

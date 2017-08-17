@@ -1619,7 +1619,6 @@
  mlt bc                 ; ED 4C
  mlt de                 ; ED 5C
  mlt hl                 ; ED 6C
- mul                    ; F7
  neg                    ; ED 44
  neg a                  ; ED 44
  neg a'                 ; 76 ED 44
