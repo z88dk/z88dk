@@ -95,11 +95,18 @@ struct filestr {
 };
 
 /* extra may point to an asm label that can be used to add extra stdio functionality
- * Entry: ix = fp for all */
+ * Entry: ix = fp for all 
+ */
+
+/* Exit: hl = byte read, c = error, nc = success */
 #define __STDIO_MSG_GETC		1
+/* Entry: bc = byte to write, Exit: hl = byte written (or EOF) */
 #define __STDIO_MSG_PUTC		2
+/* Entry: de = buf, bc = len, Exit: hl = bytes read */
 #define __STDIO_MSG_READ		3
+/* Entry: de = buf, bc = len, Exit: hl = bytes written */
 #define __STDIO_MSG_WRITE		4
+/* Entry: debc = offset, a' = whence */
 #define __STDIO_MSG_SEEK		5
 #define __STDIO_MSG_FLUSH		6
 #define __STDIO_MSG_CLOSE		7
@@ -153,7 +160,6 @@ extern struct filestr _sgoioblk_end;
 
 #define clearerr(f)
 extern FILE __LIB__ *fopen_zsock(char *name);
-extern int __LIB__ fflush(FILE *);
 
 /* Our new and improved functions!! */
 
@@ -161,8 +167,16 @@ extern FILE __LIB__ *fopen(const char *name, const char *mode) __smallc;
 extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
 extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
+#ifdef __SCCZ80
+extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(), int (*writefn)(), fpos_t (*seekfn)(), int (*closefn)());
+#else
+extern FILE  *funopen(const void     *cookie, int (*readfn)(void *, char *, int),
+			int (*writefn)(void *, const char *, int),
+			fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
+#endif
 
 extern int __LIB__ fclose(FILE *fp);
+extern int __LIB__ fflush(FILE *);
 
 extern void __LIB__ closeall();
 
@@ -221,8 +235,8 @@ extern int __LIB__ puts(const char *);
 #endif
 
 /* Routines for file positioning */
-extern fpos_t __LIB__ ftell(FILE *fp);
-extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
+extern fpos_t __LIB__ __SAVEFRAME__ ftell(FILE *fp);
+extern int __LIB__ __SAVEFRAME__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
