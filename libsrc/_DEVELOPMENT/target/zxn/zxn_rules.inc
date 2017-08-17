@@ -43,6 +43,102 @@
       defc CRT_ORG_BANK_07 = 0xc000
    ENDIF
 
+   IFNDEF CRT_ORG_BANK_08
+      defc CRT_ORG_BANK_08 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_09
+      defc CRT_ORG_BANK_09 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0A
+      defc CRT_ORG_BANK_0A = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0B
+      defc CRT_ORG_BANK_0B = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0C
+      defc CRT_ORG_BANK_0C = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0D
+      defc CRT_ORG_BANK_0D = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0E
+      defc CRT_ORG_BANK_0E = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_0F
+      defc CRT_ORG_BANK_0F = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_10
+      defc CRT_ORG_BANK_10 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_11
+      defc CRT_ORG_BANK_11 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_12
+      defc CRT_ORG_BANK_12 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_13
+      defc CRT_ORG_BANK_13 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_14
+      defc CRT_ORG_BANK_14 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_15
+      defc CRT_ORG_BANK_15 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_16
+      defc CRT_ORG_BANK_16 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_17
+      defc CRT_ORG_BANK_17 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_18
+      defc CRT_ORG_BANK_18 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_19
+      defc CRT_ORG_BANK_19 = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1A
+      defc CRT_ORG_BANK_1A = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1B
+      defc CRT_ORG_BANK_1B = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1C
+      defc CRT_ORG_BANK_1C = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1D
+      defc CRT_ORG_BANK_1D = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1E
+      defc CRT_ORG_BANK_1E = 0xc000
+   ENDIF
+
+   IFNDEF CRT_ORG_BANK_1F
+      defc CRT_ORG_BANK_1F = 0xc000
+   ENDIF
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
