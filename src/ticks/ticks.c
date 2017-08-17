@@ -702,6 +702,7 @@ int main (int argc, char **argv){
 
 
   do{
+    debugger();
     if( pc==start )
       st= 0,
       stint= intr,

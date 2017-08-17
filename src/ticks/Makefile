@@ -1,7 +1,8 @@
 
-OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o
+OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o disassemble.o disassembler/arguments.o \
+	 disassembler/mnemonics.o disassembler/sizes.o debugger.o linenoise.o
 
-CFLAGS += 
+CFLAGS += -Idisassembler/
 
 INSTALL ?= install
 
