@@ -51,24 +51,28 @@ _funopen:
 	inc	hl
 	ld	e,(ix + 6)	;readfn
 	ld	d,(ix + 7)
+	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
 	ld	e,(ix + 4)	;writefn
 	ld	d,(ix + 5)
+	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
 	ld	e,(ix + 2)	;seekfn
 	ld	d,(ix + 3)
+	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
 	ld	e,(ix + 0)	;closefn
 	ld	d,(ix + 1)
+	call	noop_becomes_dummy
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -76,7 +80,19 @@ _funopen:
 	pop	ix		;restore callers
 	ret
 	
-	
+noop_becomes_dummy:
+	ld	a,d
+	or	e
+	ret	nz
+	ld	de,dummy_func
+	ret
+
+dummy_func:
+	ld	hl,-1
+	ld	d,h
+	ld	e,l
+	scf
+	ret
 
 funopen_trampoline:
         cp      __STDIO_MSG_GETC
@@ -91,6 +107,12 @@ funopen_trampoline:
         jr      z,handle_seek
         cp      __STDIO_MSG_CLOSE
         jr      z,handle_close
+	ld	hl,-1
+	ld	d,h
+	ld	e,l
+	ret
+
+
 
 handle_getc:
 	push	hl	; storage space
@@ -149,6 +171,7 @@ handle_read:
 	push	bc
 	ld	l,(ix + fp_extra + 2 + fu_readfn)
 	ld	h,(ix + fp_extra + 2 + fu_readfn + 1)
+exec_3args:
 	call	l_jphl
 	pop	bc
 	pop	bc
@@ -166,18 +189,7 @@ handle_write:
 	push	bc
 	ld	l,(ix + fp_extra + 2 + fu_writefn)
 	ld	h,(ix + fp_extra + 2 + fu_writefn + 1)
-	call	l_jphl
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
-
-
-handle_seek:
-        scf     ; error
-        ret
-
-
+	jr	exec_3args
 
 handle_close:
 	ld	l,(ix + fp_extra + 2 + fu_closefn)
@@ -192,6 +204,31 @@ handle_close:
 	call	free		; and free the descriptor
 	pop	bc
 	ret
+
+
+; Entry: ix=fp
+; debc=posn
+; alt-a = whence
+; Exit: dehl = current position or -1
+handle_seek:
+	ld	l,(ix+fp_desc)
+	ld	h,(ix+fp_desc+1)
+	push	hl		;void *
+	push	bc		;posn
+	push	de
+	ex	af,af
+	ld	c,a
+	ld	b,0
+	push	bc		;whence
+	ld	l,(ix + fp_extra + 2 + fu_seekfn)
+	ld	h,(ix + fp_extra + 2 + fu_seekfn + 1)
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+        ret
+
 
 			
 #endasm
