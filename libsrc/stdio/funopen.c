@@ -114,6 +114,7 @@ handle_returncodes:
 	ret
 eof:
 error:
+	scf
 	ld	hl,EOF
 	ret
 	
