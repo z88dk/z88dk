@@ -77,11 +77,6 @@ _funopen:
 	ret
 	
 	
-	
-
-
-
-
 
 funopen_trampoline:
         cp      __STDIO_MSG_GETC
@@ -96,10 +91,87 @@ funopen_trampoline:
         jr      z,handle_seek
         cp      __STDIO_MSG_CLOSE
         jr      z,handle_close
+
 handle_getc:
+	push	hl	; storage space
+	ld	hl,0
+	add	hl,sp
+	ex	de,hl	;de = buf
+	ld	bc,1
+	call	handle_read
+handle_returncodes:
+	pop	bc	; c = byte read (if any)
+	ld	a,h
+	or	l
+	jr	z,eof
+	inc	hl
+	ld	a,h
+	or	l
+	jr	z,error
+	; Successful return, return new character
+	ld	l,c
+	ld	h,0
+	ret
+eof:
+error:
+	ld	hl,EOF
+	ret
+	
+; Entry: ix = fp
+;        bc = character
+; Exit: hl = result
 handle_putc:
+	push	bc
+	ld	hl,0
+	add	hl,sp
+	ex	de,hl
+	ld	bc,1
+	call	handle_write
+	pop	bc	; byte we wrote
+	inc	hl
+	ld	a,h
+	or	l
+	jr	z,eof
+	; Successful return, return character written
+	ld	l,c
+	ld	h,0
+	ret
+
+; ix = fp
+; de = buf,
+; bc = length
 handle_read:
+	ld	l,(ix+fp_desc)
+	ld	h,(ix+fp_desc+1)
+	push	hl
+	push	de
+	push	bc
+	ld	l,(ix + fp_extra + 2 + fu_readfn)
+	ld	h,(ix + fp_extra + 2 + fu_readfn + 1)
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+; ix = fp
+; de = buf,
+; bc = length	
 handle_write:
+	ld	l,(ix+fp_desc)
+	ld	h,(ix+fp_desc+1)
+	push	hl
+	push	de
+	push	bc
+	ld	l,(ix + fp_extra + 2 + fu_writefn)
+	ld	h,(ix + fp_extra + 2 + fu_writefn + 1)
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
 handle_seek:
         scf     ; error
         ret
