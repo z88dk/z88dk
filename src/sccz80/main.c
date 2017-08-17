@@ -91,6 +91,7 @@ static option  sccz80_opts[] = {
     { 'v', "verbose", OPT_BOOL, "Be verbose", &c_verbose, 0 },
     { 'h', "help", OPT_FUNCTION|OPT_BOOL, "Show this help page", DispInfo, 0 },
     { 0, "", OPT_HEADER, "CPU Targetting:", NULL, 0 },
+    { 0, "mz80-zxn", OPT_ASSIGN|OPT_INT, "Generate output for the z80-zxn", &c_cpu, CPU_Z80ZXN },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, CPU_Z80 },
     { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, CPU_Z180 },
     { 0, "mr2k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, CPU_R2K },
