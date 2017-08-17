@@ -1,6 +1,6 @@
 
-EXTERN __IO_PIO_PORT_A, __IO_PIO_PORT_B, __IO_PIO_PORT_C, __IO_PIO_PORT_CONTROL
-EXTERN __IO_PIO_PORT_CNTL_00, __IO_PIO_PORT_CNTL_10
+EXTERN __IO_PIO_PORT_A, __IO_PIO_PORT_B, __IO_PIO_PORT_C, __IO_PIO_CONTROL
+EXTERN __IO_PIO_CNTL_00, __IO_PIO_CNTL_10
 
 PUBLIC __IO_PIO_IDE_LSB, __IO_PIO_IDE_MSB, __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
 PUBLIC __IO_PIO_IDE_RD, __IO_PIO_IDE_WR
@@ -23,12 +23,12 @@ PUBLIC __IO_IDE_LBA0, __IO_IDE_LBA1, __IO_IDE_LBA2, __IO_IDE_LBA3
 ; upper and lower data bytes.  The last two are mode setting for the
 ; 8255 to configure its ports, which must correspond to the way that
 ; the first three lines define which ports are connected.
-DEFC    __IO_PIO_IDE_LSB     =   __IO_PIO_PORT_A        ;IDE lower 8 bits
-DEFC    __IO_PIO_IDE_MSB     =   __IO_PIO_PORT_B        ;IDE upper 8 bits
-DEFC    __IO_PIO_IDE_CTL     =   __IO_PIO_PORT_C        ;IDE control lines
-DEFC    __IO_PIO_IDE_CONFIG  =   __IO_PIO_PORT_CONTROL  ;PIO configuration
-DEFC    __IO_PIO_IDE_RD      =   __IO_PIO_PORT_CNTL_10  ;_IO_PIO_IDE_CTL out, _IO_PIO_IDE_LSB/MSB input
-DEFC    __IO_PIO_IDE_WR      =   __IO_PIO_PORT_CNTL_00  ;all PIO ports output
+DEFC    __IO_PIO_IDE_LSB     =   __IO_PIO_PORT_A    ;IDE lower 8 bits
+DEFC    __IO_PIO_IDE_MSB     =   __IO_PIO_PORT_B    ;IDE upper 8 bits
+DEFC    __IO_PIO_IDE_CTL     =   __IO_PIO_PORT_C    ;IDE control lines
+DEFC    __IO_PIO_IDE_CONFIG  =   __IO_PIO_CONTROL   ;PIO configuration
+DEFC    __IO_PIO_IDE_RD      =   __IO_PIO_CNTL_10   ;_IO_PIO_IDE_CTL out, _IO_PIO_IDE_LSB/MSB input
+DEFC    __IO_PIO_IDE_WR      =   __IO_PIO_CNTL_00   ;all PIO ports output
 
 ; IDE control lines for use with __IO_PIO_IDE_CTL. Change these 8
 ; constants to reflect where each signal of the 8255 each of the

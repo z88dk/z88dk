@@ -179,20 +179,27 @@
 #define _TK_SRL	174
 #define _TK_SUB	175
 #define _TK_XOR	176
-#define _TK_SLP	177
-#define _TK_MLT	178
-#define _TK_IN0	179
-#define _TK_OUT0	180
-#define _TK_OTIM	181
-#define _TK_OTIMR	182
-#define _TK_OTDM	183
-#define _TK_OTDMR	184
-#define _TK_TST	185
-#define _TK_TSTIO	186
-#define _TK_CALL_OZ	187
-#define _TK_CALL_PKG	188
-#define _TK_FPP	189
-#define _TK_INVOKE	190
+#define _TK_SWAPNIB	177
+#define _TK_MUL	178
+#define _TK_OUTINB	179
+#define _TK_LDIX	180
+#define _TK_LDIRX	181
+#define _TK_LDDX	182
+#define _TK_LDDRX	183
+#define _TK_SLP	184
+#define _TK_MLT	185
+#define _TK_IN0	186
+#define _TK_OUT0	187
+#define _TK_OTIM	188
+#define _TK_OTIMR	189
+#define _TK_OTDM	190
+#define _TK_OTDMR	191
+#define _TK_TST	192
+#define _TK_TSTIO	193
+#define _TK_CALL_OZ	194
+#define _TK_CALL_PKG	195
+#define _TK_FPP	196
+#define _TK_INVOKE	197
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -374,19 +381,26 @@ typedef enum tokid_t
 	TK_SRL	= 174,
 	TK_SUB	= 175,
 	TK_XOR	= 176,
-	TK_SLP	= 177,
-	TK_MLT	= 178,
-	TK_IN0	= 179,
-	TK_OUT0	= 180,
-	TK_OTIM	= 181,
-	TK_OTIMR	= 182,
-	TK_OTDM	= 183,
-	TK_OTDMR	= 184,
-	TK_TST	= 185,
-	TK_TSTIO	= 186,
-	TK_CALL_OZ	= 187,
-	TK_CALL_PKG	= 188,
-	TK_FPP	= 189,
-	TK_INVOKE	= 190,
+	TK_SWAPNIB	= 177,
+	TK_MUL	= 178,
+	TK_OUTINB	= 179,
+	TK_LDIX	= 180,
+	TK_LDIRX	= 181,
+	TK_LDDX	= 182,
+	TK_LDDRX	= 183,
+	TK_SLP	= 184,
+	TK_MLT	= 185,
+	TK_IN0	= 186,
+	TK_OUT0	= 187,
+	TK_OTIM	= 188,
+	TK_OTIMR	= 189,
+	TK_OTDM	= 190,
+	TK_OTDMR	= 191,
+	TK_TST	= 192,
+	TK_TSTIO	= 193,
+	TK_CALL_OZ	= 194,
+	TK_CALL_PKG	= 195,
+	TK_FPP	= 196,
+	TK_INVOKE	= 197,
 } tokid_t;
 #endif

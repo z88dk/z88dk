@@ -17,6 +17,7 @@ EXTERN __IO_IDE_CONTROL, __IO_IDE_ALT_STATUS
 ide_write_block:
     push bc
     push de
+    push hl
     ld bc, __IO_PIO_IDE_CONFIG
     ld d, __IO_PIO_IDE_WR
     out (c), d              ;config 8255 chip, write mode
@@ -42,6 +43,7 @@ ide_wrblk2:
     ld bc, __IO_PIO_IDE_CONFIG
     ld d, __IO_PIO_IDE_RD
     out (c), d              ;config 8255 chip, read mode
+    pop hl
     pop de
     pop bc
     ret

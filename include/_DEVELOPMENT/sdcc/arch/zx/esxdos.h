@@ -90,14 +90,14 @@
 
 // Esxdos Data Structures
 
-struct esx_device
+struct esxdos_device
 {
    uint8_t  path;    // bits 7..3 = major, bits 2..0 = minor
    uint8_t  flags;
    uint32_t size;    // device size in blocks
 };
 
-struct esx_p3_hdr
+struct esxdos_p3_hdr
 {
    uint8_t  type;    // 0 = program, 1 = numeric array, 2 = char array, 3 = code
    uint16_t length;
@@ -105,7 +105,7 @@ struct esx_p3_hdr
    uint8_t  unused;
 };
 
-struct esx_stat
+struct esxdos_stat
 {
    uint8_t  drive;
    uint8_t  device;
@@ -114,12 +114,12 @@ struct esx_stat
    uint32_t size;
 };
 
-struct esx_dirent                         // <asciiz> file/dirname
+struct esxdos_dirent                      // <asciiz> file/dirname
 {                                         // <byte>   attributes
    uint8_t  dir[__ESXDOS_NAME_MAX+1+9];   // <dword>  date
 };                                        // <dword>  filesize
 
-struct esx_dirent_slice
+struct esxdos_dirent_slice
 {
    uint8_t  attr;
    uint32_t date;

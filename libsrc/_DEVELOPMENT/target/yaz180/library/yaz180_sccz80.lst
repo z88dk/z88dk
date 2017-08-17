@@ -22,6 +22,6 @@
 @string/string_sccz80.lst
 @target/yaz180/default/default.lst
 @target/yaz180/device/device.lst
-@target/yaz180/driver/driver.lst
+@target/yaz180/driver/driver_sccz80.lst
 @threads/threads_sccz80.lst
 @z180/z180_sccz80.lst

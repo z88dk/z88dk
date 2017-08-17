@@ -3,12 +3,11 @@ SECTION code_driver
 
 PUBLIC ide_setup_lba
 
-EXTERN __IO_IDE_SEC_CNT
 EXTERN __IO_IDE_LBA0, __IO_IDE_LBA1, __IO_IDE_LBA2, __IO_IDE_LBA3
 
 EXTERN ide_write_byte
 
-EXTERN idestatus
+EXTERN ideStatus
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -22,6 +21,7 @@ EXTERN idestatus
     
 ide_setup_lba:
     push af
+    push de
     push hl
     ld a, __IO_IDE_LBA0
     call ide_write_byte     ;set LBA0 0:7
@@ -34,7 +34,7 @@ ide_setup_lba:
     ld a, b
     and 00001111b           ;lowest 4 bits used only
     or  11100000b           ;to enable LBA address mode
-    ld hl, idestatus        ;set bit 4 accordingly
+    ld hl, ideStatus        ;set bit 4 accordingly
     bit 0, (hl)
     jr z, ide_setup_master
     or $10                  ;if it is a slave, set that bit
@@ -42,10 +42,8 @@ ide_setup_master:
     ld e, a
     ld a, __IO_IDE_LBA3
     call ide_write_byte     ;set LBA3 24:27 + bits 5:7=111
-    ld e, $1
-    ld a, __IO_IDE_SEC_CNT    
-    call ide_write_byte     ;set sector count to 1
     pop hl
+    pop de
     pop af
     ret
 

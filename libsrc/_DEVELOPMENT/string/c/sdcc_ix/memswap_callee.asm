@@ -8,7 +8,7 @@ PUBLIC _memswap_callee
 
 EXTERN asm_memswap
 
-_memswap:
+_memswap_callee:
 
    pop af
    pop hl

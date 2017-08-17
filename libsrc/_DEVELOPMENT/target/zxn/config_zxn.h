@@ -51,8 +51,8 @@
 
 #define __USE_SPECTRUM_128_SECOND_DFILE  0
 
-#define __IO_REGISTRY_REG  0x253b
-#define __IO_REGISTRY_DAT  0x243b
+#define __IO_REGISTRY_REG  0x243b
+#define __IO_REGISTRY_DAT  0x253b
 
 #define __IO_REGISTRY_REG_MACHINE_ID  0
 
@@ -87,7 +87,7 @@
 #define __IO_RRP1_JOY2_SINCLAIR  0x00
 #define __IO_RRP1_JOY2_KEMPSTON  0x10
 #define __IO_RRP1_JOY2_CURSOR  0x20
-#define __IO_RRP1_ULA_PLUS  0x08
+#define __IO_RRP1_ULA_ENHANCED  0x08
 #define __IO_RRP1_RATE_50  0x00
 #define __IO_RRP1_RATE_60  0x04
 #define __IO_RRP1_SCANLINES  0x02
@@ -126,11 +126,13 @@
 #define __IO_RRAB_BUTTON_DIVMMC  0x02
 #define __IO_RRAB_BUTTON_MULTIFACE  0x01
 
-#define __IO_REGISTRY_REG_LAYER_2_RAM_PAGE  19
-#define __IO_RRL2RP_MASK  0x0f
+#define __IO_REGISTRY_REG_LAYER_2_BUFFER_FRONT  18
+#define __IO_RRL2BF_MASK  0x0f
+
+#define __IO_REGISTRY_REG_LAYER_2_BUFFER_BACK  19
+#define __IO_RRL2BB_MASK  0x0f
 
 #define __IO_REGISTRY_REG_LAYER_2_TRANSPARENCY_COLOR  20
-#define __IO_REGISTRY_REG_LAYER_2_TRANSPARENCY_COLOUR  20
 #define __IO_RRL2TC_MASK  0x0f
 #define __IO_RRL2TC_BRIGHT  0x08
 #define __IO_RRL2TC_BLACK  0
@@ -178,6 +180,15 @@
 
 #define __IO_REGISTRY_REG_DEBUG_LEDS  0xff
 
+#define __IO_LAYER_2_ACCESS  0x123b
+#define __IO_L2A_LOWER_16K_ENABLE  0x01
+#define __IO_L2A_ENABLE  0x02
+#define __IO_L2A_PAGE_BACK_BUFFER  0x08
+#define __IO_L2A_VRAM_BANK_SELECT_MASK  0xc0
+#define __IO_L2A_VRAM_BANK_SELECT_0  0x00
+#define __IO_L2A_VRAM_BANK_SELECT_1  0x40
+#define __IO_L2A_VRAM_BANK_SELECT_2  0x80
+
 #define __IO_SPRITE_SLOT  0x303b
 #define __IO_SPRITE_FLAGS  0x303b
 #define __IO_SF_MAX_PER_LINE  0x02
@@ -190,7 +201,6 @@
 #define __IO_SPRITE_PATTERN  0x5b
 
 #define __SPRITE_TRANSPARENT_COLOR  0xe3
-#define __SPRITE_TRANSPARENT_COLOUR  0xe3
 
 #define __IO_AUDIO_SELECT  0xfffd
 
@@ -730,6 +740,13 @@
 #define __ESXDOS_MODE_CREAT_TRUNC  0x0c
 #define __ESXDOS_MODE_USE_HEADER  0x40
 
+#define __ESXDOS_ATTR_READ_ONLY  0x01
+#define __ESXDOS_ATTR_HIDDEN  0x02
+#define __ESXDOS_ATTR_SYSTEM  0x04
+#define __ESXDOS_ATTR_VOLUME_LABEL  0x08
+#define __ESXDOS_ATTR_DIRECTORY  0x10
+#define __ESXDOS_ATTR_ARCHIVE  0x20
+
 #define __ESXDOS_DRIVE_CURRENT  0x2a
 #define __ESXDOS_DRIVE_SYSTEM  0x24
 
@@ -924,6 +941,42 @@
 #define __ULAP_COLOR_ZX_BRIGHT_CYAN  0xe3
 #define __ULAP_COLOR_ZX_BRIGHT_YELLOW  0xfc
 #define __ULAP_COLOR_ZX_BRIGHT_WHITE  0xff
+
+#define __ULAP_COLOR_ZXNR_NAVY  0x01
+#define __ULAP_COLOR_ZXNR_MAROON  0x08
+#define __ULAP_COLOR_ZXNR_INDIGO  0x09
+#define __ULAP_COLOR_ZXNR_RACING_GREEN  0x40
+#define __ULAP_COLOR_ZXNR_SHERPA_BLUE  0x41
+#define __ULAP_COLOR_ZXNR_OLIVE  0x48
+#define __ULAP_COLOR_ZXNR_BLACK  0x00
+#define __ULAP_COLOR_ZXNR_MIDNIGHT_BLUE  0x02
+#define __ULAP_COLOR_ZXNR_DARK_RED  0x10
+#define __ULAP_COLOR_ZXNR_DARK_VIOLET  0x12
+#define __ULAP_COLOR_ZXNR_ISLAMIC_GREEN  0x80
+#define __ULAP_COLOR_ZXNR_BONDI_BLUE  0x82
+#define __ULAP_COLOR_ZXNR_BRIGHT_OLIVE  0x90
+#define __ULAP_COLOR_ZXNR_GUNPOWDER_GRAY  0x49
+#define __ULAP_COLOR_ZXNR_BLUE  0x03
+#define __ULAP_COLOR_ZXNR_RED  0x1c
+#define __ULAP_COLOR_ZXNR_MAGENTA  0x3f
+#define __ULAP_COLOR_ZXNR_GREEN  0xe0
+#define __ULAP_COLOR_ZXNR_AQUA  0xe3
+#define __ULAP_COLOR_ZXNR_YELLOW  0xfc
+#define __ULAP_COLOR_ZXNR_MIST_GRAY  0xb6
+#define __ULAP_COLOR_ZXNR_SLATE_BLUE  0x6f
+#define __ULAP_COLOR_ZXNR_BITTERSWEET  0x7d
+#define __ULAP_COLOR_ZXNR_ULTRA_PINK  0x7f
+#define __ULAP_COLOR_ZXNR_SCREAMING_GREEN  0xed
+#define __ULAP_COLOR_ZXNR_ELECTRIC_BLUE  0xf3
+#define __ULAP_COLOR_ZXNR_LASER_LEMON  0xfd
+#define __ULAP_COLOR_ZXNR_WHITE  0xff
+#define __ULAP_COLOR_ZXNR_LAVENDER_BLUE  0xb7
+#define __ULAP_COLOR_ZXNR_MELON  0xbe
+#define __ULAP_COLOR_ZXNR_LAVENDER_ROSE  0xbf
+#define __ULAP_COLOR_ZXNR_MINT_GREEN  0xf6
+#define __ULAP_COLOR_ZXNR_COLUMBIA_BLUE  0xf7
+#define __ULAP_COLOR_ZXNR_CANARY  0xfe
+#define __ULAP_COLOR_ZXNR_BRIGHT_MAGENTA  0x1f
 
 #define __ULAP_COLOR_C64_BLACK  0x00
 #define __ULAP_COLOR_C64_WHITE  0xff
@@ -1125,6 +1178,303 @@
 #define __ULAP_COLOR_HTML_LightYellow  255
 #define __ULAP_COLOR_HTML_Ivory  255
 #define __ULAP_COLOR_HTML_White  255
+
+
+
+
+
+
+
+
+
+
+
+#define __LAYER2_COLOR_MONO_BLACK  0x00
+#define __LAYER2_COLOR_MONO_GREY_0  0x00
+#define __LAYER2_COLOR_MONO_GREY_1  0x49
+#define __LAYER2_COLOR_MONO_GREY_2  0x92
+#define __LAYER2_COLOR_MONO_GREY_3  0xff
+#define __LAYER2_COLOR_MONO_WHITE  0xff
+
+#define __LAYER2_COLOR_AMBER_0  0x00
+#define __LAYER2_COLOR_AMBER_1  0x20
+#define __LAYER2_COLOR_AMBER_2  0x44
+#define __LAYER2_COLOR_AMBER_3  0x64
+#define __LAYER2_COLOR_AMBER_4  0x88
+#define __LAYER2_COLOR_AMBER_5  0xa8
+#define __LAYER2_COLOR_AMBER_6  0xcc
+#define __LAYER2_COLOR_AMBER_7  0xec
+
+#define __LAYER2_COLOR_GREEN_0  0x00
+#define __LAYER2_COLOR_GREEN_1  0x04
+#define __LAYER2_COLOR_GREEN_2  0x08
+#define __LAYER2_COLOR_GREEN_3  0x0c
+#define __LAYER2_COLOR_GREEN_4  0x10
+#define __LAYER2_COLOR_GREEN_5  0x14
+#define __LAYER2_COLOR_GREEN_6  0x18
+#define __LAYER2_COLOR_GREEN_7  0x1c
+
+#define __LAYER2_COLOR_RB_RED  0xe0
+#define __LAYER2_COLOR_RB_ORANGE  0xec
+#define __LAYER2_COLOR_RB_YELLOW  0xfc
+#define __LAYER2_COLOR_RB_GREEN  0x1c
+#define __LAYER2_COLOR_RB_BLUE  0x03
+#define __LAYER2_COLOR_RB_VIOLET  0x42
+#define __LAYER2_COLOR_RB_INDIGO  0x83
+
+#define __LAYER2_COLOR_ZX_BLACK  0x00
+#define __LAYER2_COLOR_ZX_BLUE  0x02
+#define __LAYER2_COLOR_ZX_RED  0xc0
+#define __LAYER2_COLOR_ZX_MAGENTA  0xc3
+#define __LAYER2_COLOR_ZX_GREEN  0x18
+#define __LAYER2_COLOR_ZX_CYAN  0x1b
+#define __LAYER2_COLOR_ZX_YELLOW  0xd8
+#define __LAYER2_COLOR_ZX_WHITE  0xdb
+#define __LAYER2_COLOR_ZX_BRIGHT_BLACK  0x00
+#define __LAYER2_COLOR_ZX_BRIGHT_BLUE  0x03
+#define __LAYER2_COLOR_ZX_BRIGHT_RED  0xe0
+#define __LAYER2_COLOR_ZX_BRIGHT_MAGENTA  0xe3
+#define __LAYER2_COLOR_ZX_BRIGHT_GREEN  0x1c
+#define __LAYER2_COLOR_ZX_BRIGHT_CYAN  0x1f
+#define __LAYER2_COLOR_ZX_BRIGHT_YELLOW  0xfc
+#define __LAYER2_COLOR_ZX_BRIGHT_WHITE  0xff
+
+#define __LAYER2_COLOR_ZXNR_NAVY  0x01
+#define __LAYER2_COLOR_ZXNR_MAROON  0x40
+#define __LAYER2_COLOR_ZXNR_INDIGO  0x41
+#define __LAYER2_COLOR_ZXNR_RACING_GREEN  0x08
+#define __LAYER2_COLOR_ZXNR_SHERPA_BLUE  0x09
+#define __LAYER2_COLOR_ZXNR_OLIVE  0x48
+#define __LAYER2_COLOR_ZXNR_BLACK  0x00
+#define __LAYER2_COLOR_ZXNR_MIDNIGHT_BLUE  0x02
+#define __LAYER2_COLOR_ZXNR_DARK_RED  0x80
+#define __LAYER2_COLOR_ZXNR_DARK_VIOLET  0x82
+#define __LAYER2_COLOR_ZXNR_ISLAMIC_GREEN  0x10
+#define __LAYER2_COLOR_ZXNR_BONDI_BLUE  0x12
+#define __LAYER2_COLOR_ZXNR_BRIGHT_OLIVE  0x90
+#define __LAYER2_COLOR_ZXNR_GUNPOWDER_GRAY  0x49
+#define __LAYER2_COLOR_ZXNR_BLUE  0x03
+#define __LAYER2_COLOR_ZXNR_RED  0xe0
+#define __LAYER2_COLOR_ZXNR_MAGENTA  0xe7
+#define __LAYER2_COLOR_ZXNR_GREEN  0x1c
+#define __LAYER2_COLOR_ZXNR_AQUA  0x1f
+#define __LAYER2_COLOR_ZXNR_YELLOW  0xfc
+#define __LAYER2_COLOR_ZXNR_MIST_GRAY  0xb6
+#define __LAYER2_COLOR_ZXNR_SLATE_BLUE  0x6f
+#define __LAYER2_COLOR_ZXNR_BITTERSWEET  0xed
+#define __LAYER2_COLOR_ZXNR_ULTRA_PINK  0xef
+#define __LAYER2_COLOR_ZXNR_SCREAMING_GREEN  0x7d
+#define __LAYER2_COLOR_ZXNR_ELECTRIC_BLUE  0x9f
+#define __LAYER2_COLOR_ZXNR_LASER_LEMON  0xfd
+#define __LAYER2_COLOR_ZXNR_WHITE  0xff
+#define __LAYER2_COLOR_ZXNR_LAVENDER_BLUE  0xb7
+#define __LAYER2_COLOR_ZXNR_MELON  0xf6
+#define __LAYER2_COLOR_ZXNR_LAVENDER_ROSE  0xf7
+#define __LAYER2_COLOR_ZXNR_MINT_GREEN  0xbe
+#define __LAYER2_COLOR_ZXNR_COLUMBIA_BLUE  0xbf
+#define __LAYER2_COLOR_ZXNR_CANARY  0xfe
+#define __LAYER2_COLOR_ZXNR_BRIGHT_MAGENTA  0xe3
+
+#define __LAYER2_COLOR_C64_BLACK  0x00
+#define __LAYER2_COLOR_C64_WHITE  0xff
+#define __LAYER2_COLOR_C64_RED  0x84
+#define __LAYER2_COLOR_C64_CYAN  0x77
+#define __LAYER2_COLOR_C64_VIOLET  0x8a
+#define __LAYER2_COLOR_C64_GREEN  0x75
+#define __LAYER2_COLOR_C64_BLUE  0x26
+#define __LAYER2_COLOR_C64_YELLOW  0xd9
+#define __LAYER2_COLOR_C64_ORANGE  0x88
+#define __LAYER2_COLOR_C64_BROWN  0x48
+#define __LAYER2_COLOR_C64_LIGHTRED  0xad
+#define __LAYER2_COLOR_C64_GREY1  0x49
+#define __LAYER2_COLOR_C64_GREY2  0x92
+#define __LAYER2_COLOR_C64_LIGHTGREEN  0xbe
+#define __LAYER2_COLOR_C64_LIGHTBLUE  0x6f
+#define __LAYER2_COLOR_C64_GREY3  0xb6
+
+#define __LAYER2_COLOR_G1_BLACK  0x00
+#define __LAYER2_COLOR_G1_GREY  0x6d
+#define __LAYER2_COLOR_G1_SILVER  0xb6
+#define __LAYER2_COLOR_G1_DARK_TEAL  0x0e
+#define __LAYER2_COLOR_G1_GREEN  0x14
+#define __LAYER2_COLOR_G1_GREENYELLOW  0x9c
+#define __LAYER2_COLOR_G1_MAROON  0x60
+#define __LAYER2_COLOR_G1_SIENNA  0xa8
+#define __LAYER2_COLOR_G1_SANDYBROWN  0xf0
+#define __LAYER2_COLOR_G1_KHAKI  0xfd
+#define __LAYER2_COLOR_G1_WHITE  0xff
+#define __LAYER2_COLOR_G1_SKYBLUE  0x9b
+#define __LAYER2_COLOR_G1_SLATEBLUE  0x4f
+#define __LAYER2_COLOR_G1_BLUE  0x02
+
+#define __LAYER2_COLOR_STD_DARK_BLUE  0x02
+#define __LAYER2_COLOR_STD_BRIGHT_BLUE  0xdb
+#define __LAYER2_COLOR_STD_BLUE  0x03
+#define __LAYER2_COLOR_STD_CYAN  0x1f
+#define __LAYER2_COLOR_STD_BRIGHT_YELLOW  0xf9
+#define __LAYER2_COLOR_STD_YELLOW  0xfc
+#define __LAYER2_COLOR_STD_ORANGE  0xf1
+#define __LAYER2_COLOR_STD_BRIGHT_RED  0xe9
+#define __LAYER2_COLOR_STD_RED  0xe0
+#define __LAYER2_COLOR_STD_DARK_RED  0x80
+#define __LAYER2_COLOR_STD_MAGENTA  0xe3
+#define __LAYER2_COLOR_STD_BRIGHT_GREEN  0x9e
+#define __LAYER2_COLOR_STD_GREEN  0x1c
+#define __LAYER2_COLOR_STD_DARK_GREEN  0x10
+#define __LAYER2_COLOR_STD_BRIGHT_GREY  0x49
+#define __LAYER2_COLOR_STD_LIGHT_GREY  0x6d
+#define __LAYER2_COLOR_STD_GREY  0x24
+#define __LAYER2_COLOR_STD_WHITE  0xff
+#define __LAYER2_COLOR_STD_BLACK  0x00
+
+#define __LAYER2_COLOR_HTML_Black  0x00
+#define __LAYER2_COLOR_HTML_Navy  0x02
+#define __LAYER2_COLOR_HTML_DarkBlue  0x02
+#define __LAYER2_COLOR_HTML_MediumBlue  0x03
+#define __LAYER2_COLOR_HTML_Blue  0x03
+#define __LAYER2_COLOR_HTML_DarkGreen  0x0c
+#define __LAYER2_COLOR_HTML_Green  0x10
+#define __LAYER2_COLOR_HTML_Teal  0x12
+#define __LAYER2_COLOR_HTML_DarkCyan  0x12
+#define __LAYER2_COLOR_HTML_DeepSkyBlue  0x17
+#define __LAYER2_COLOR_HTML_DarkTurquoise  0x1b
+#define __LAYER2_COLOR_HTML_MediumSpringGreen  0x1e
+#define __LAYER2_COLOR_HTML_Lime  0x1c
+#define __LAYER2_COLOR_HTML_SpringGreen  0x1d
+#define __LAYER2_COLOR_HTML_Aqua  0x1f
+#define __LAYER2_COLOR_HTML_Cyan  0x1f
+#define __LAYER2_COLOR_HTML_MidnightBlue  0x01
+#define __LAYER2_COLOR_HTML_DodgerBlue  0x13
+#define __LAYER2_COLOR_HTML_LightSeaGreen  0x36
+#define __LAYER2_COLOR_HTML_ForestGreen  0x30
+#define __LAYER2_COLOR_HTML_SeaGreen  0x31
+#define __LAYER2_COLOR_HTML_DarkSlateGray  0x29
+#define __LAYER2_COLOR_HTML_DarkSlateGrey  0x29
+#define __LAYER2_COLOR_HTML_LimeGreen  0x38
+#define __LAYER2_COLOR_HTML_MediumSeaGreen  0x35
+#define __LAYER2_COLOR_HTML_Turquoise  0x5f
+#define __LAYER2_COLOR_HTML_RoyalBlue  0x4f
+#define __LAYER2_COLOR_HTML_SteelBlue  0x52
+#define __LAYER2_COLOR_HTML_DarkSlateBlue  0x46
+#define __LAYER2_COLOR_HTML_MediumTurquoise  0x5b
+#define __LAYER2_COLOR_HTML_Indigo  0x42
+#define __LAYER2_COLOR_HTML_DarkOliveGreen  0x4c
+#define __LAYER2_COLOR_HTML_CadetBlue  0x52
+#define __LAYER2_COLOR_HTML_CornflowerBlue  0x73
+#define __LAYER2_COLOR_HTML_RebeccaPurple  0x66
+#define __LAYER2_COLOR_HTML_MediumAquaMarine  0x7a
+#define __LAYER2_COLOR_HTML_DimGray  0x6d
+#define __LAYER2_COLOR_HTML_DimGrey  0x6d
+#define __LAYER2_COLOR_HTML_SlateBlue  0x6b
+#define __LAYER2_COLOR_HTML_OliveDrab  0x70
+#define __LAYER2_COLOR_HTML_SlateGray  0x72
+#define __LAYER2_COLOR_HTML_SlateGrey  0x72
+#define __LAYER2_COLOR_HTML_LightSlateGray  0x72
+#define __LAYER2_COLOR_HTML_LightSlateGrey  0x72
+#define __LAYER2_COLOR_HTML_MediumSlateBlue  0x6f
+#define __LAYER2_COLOR_HTML_LawnGreen  0x7c
+#define __LAYER2_COLOR_HTML_Chartreuse  0x7c
+#define __LAYER2_COLOR_HTML_Aquamarine  0x7f
+#define __LAYER2_COLOR_HTML_Maroon  0x80
+#define __LAYER2_COLOR_HTML_Purple  0x82
+#define __LAYER2_COLOR_HTML_Olive  0x90
+#define __LAYER2_COLOR_HTML_Gray  0x92
+#define __LAYER2_COLOR_HTML_Grey  0x92
+#define __LAYER2_COLOR_HTML_SkyBlue  0x9b
+#define __LAYER2_COLOR_HTML_LightSkyBlue  0x9b
+#define __LAYER2_COLOR_HTML_BlueViolet  0x87
+#define __LAYER2_COLOR_HTML_DarkRed  0x80
+#define __LAYER2_COLOR_HTML_DarkMagenta  0x82
+#define __LAYER2_COLOR_HTML_SaddleBrown  0x88
+#define __LAYER2_COLOR_HTML_DarkSeaGreen  0x96
+#define __LAYER2_COLOR_HTML_LightGreen  0x9e
+#define __LAYER2_COLOR_HTML_MediumPurple  0x8f
+#define __LAYER2_COLOR_HTML_DarkViolet  0x83
+#define __LAYER2_COLOR_HTML_PaleGreen  0x9e
+#define __LAYER2_COLOR_HTML_DarkOrchid  0x87
+#define __LAYER2_COLOR_HTML_YellowGreen  0x98
+#define __LAYER2_COLOR_HTML_Sienna  0xa8
+#define __LAYER2_COLOR_HTML_Brown  0xa4
+#define __LAYER2_COLOR_HTML_DarkGray  0xb6
+#define __LAYER2_COLOR_HTML_DarkGrey  0xb6
+#define __LAYER2_COLOR_HTML_LightBlue  0xbb
+#define __LAYER2_COLOR_HTML_GreenYellow  0xbc
+#define __LAYER2_COLOR_HTML_PaleTurquoise  0xbf
+#define __LAYER2_COLOR_HTML_LightSteelBlue  0xbb
+#define __LAYER2_COLOR_HTML_PowderBlue  0xbf
+#define __LAYER2_COLOR_HTML_FireBrick  0xa4
+#define __LAYER2_COLOR_HTML_DarkGoldenRod  0xb0
+#define __LAYER2_COLOR_HTML_MediumOrchid  0xab
+#define __LAYER2_COLOR_HTML_RosyBrown  0xb2
+#define __LAYER2_COLOR_HTML_DarkKhaki  0xb5
+#define __LAYER2_COLOR_HTML_Silver  0xdb
+#define __LAYER2_COLOR_HTML_MediumVioletRed  0xc2
+#define __LAYER2_COLOR_HTML_IndianRed  0xc9
+#define __LAYER2_COLOR_HTML_Peru  0xd0
+#define __LAYER2_COLOR_HTML_Chocolate  0xcc
+#define __LAYER2_COLOR_HTML_Tan  0xd6
+#define __LAYER2_COLOR_HTML_LightGray  0xdb
+#define __LAYER2_COLOR_HTML_LightGrey  0xdb
+#define __LAYER2_COLOR_HTML_Thistle  0xd7
+#define __LAYER2_COLOR_HTML_Orchid  0xcf
+#define __LAYER2_COLOR_HTML_GoldenRod  0xd4
+#define __LAYER2_COLOR_HTML_PaleVioletRed  0xce
+#define __LAYER2_COLOR_HTML_Crimson  0xc0
+#define __LAYER2_COLOR_HTML_Gainsboro  0xdb
+#define __LAYER2_COLOR_HTML_Plum  0xd7
+#define __LAYER2_COLOR_HTML_BurlyWood  0xd6
+#define __LAYER2_COLOR_HTML_LightCyan  0xff
+#define __LAYER2_COLOR_HTML_Lavender  0xff
+#define __LAYER2_COLOR_HTML_DarkSalmon  0xf1
+#define __LAYER2_COLOR_HTML_Violet  0xf3
+#define __LAYER2_COLOR_HTML_PaleGoldenRod  0xfe
+#define __LAYER2_COLOR_HTML_LightCoral  0xf2
+#define __LAYER2_COLOR_HTML_Khaki  0xfe
+#define __LAYER2_COLOR_HTML_AliceBlue  0xff
+#define __LAYER2_COLOR_HTML_HoneyDew  0xff
+#define __LAYER2_COLOR_HTML_Azure  0xff
+#define __LAYER2_COLOR_HTML_SandyBrown  0xf5
+#define __LAYER2_COLOR_HTML_Wheat  0xfa
+#define __LAYER2_COLOR_HTML_Beige  0xff
+#define __LAYER2_COLOR_HTML_WhiteSmoke  0xff
+#define __LAYER2_COLOR_HTML_MintCream  0xff
+#define __LAYER2_COLOR_HTML_GhostWhite  0xff
+#define __LAYER2_COLOR_HTML_Salmon  0xf1
+#define __LAYER2_COLOR_HTML_AntiqueWhite  0xff
+#define __LAYER2_COLOR_HTML_Linen  0xff
+#define __LAYER2_COLOR_HTML_LightGoldenRodYellow  0xff
+#define __LAYER2_COLOR_HTML_OldLace  0xff
+#define __LAYER2_COLOR_HTML_Red  0xe0
+#define __LAYER2_COLOR_HTML_Fuchsia  0xe3
+#define __LAYER2_COLOR_HTML_Magenta  0xe3
+#define __LAYER2_COLOR_HTML_DeepPink  0xe2
+#define __LAYER2_COLOR_HTML_OrangeRed  0xe8
+#define __LAYER2_COLOR_HTML_Tomato  0xed
+#define __LAYER2_COLOR_HTML_HotPink  0xee
+#define __LAYER2_COLOR_HTML_Coral  0xed
+#define __LAYER2_COLOR_HTML_DarkOrange  0xf0
+#define __LAYER2_COLOR_HTML_LightSalmon  0xf5
+#define __LAYER2_COLOR_HTML_Orange  0xf4
+#define __LAYER2_COLOR_HTML_LightPink  0xf7
+#define __LAYER2_COLOR_HTML_Pink  0xfb
+#define __LAYER2_COLOR_HTML_Gold  0xf8
+#define __LAYER2_COLOR_HTML_PeachPuff  0xfa
+#define __LAYER2_COLOR_HTML_NavajoWhite  0xfa
+#define __LAYER2_COLOR_HTML_Moccasin  0xfe
+#define __LAYER2_COLOR_HTML_Bisque  0xff
+#define __LAYER2_COLOR_HTML_MistyRose  0xff
+#define __LAYER2_COLOR_HTML_BlanchedAlmond  0xff
+#define __LAYER2_COLOR_HTML_PapayaWhip  0xff
+#define __LAYER2_COLOR_HTML_LavenderBlush  0xff
+#define __LAYER2_COLOR_HTML_SeaShell  0xff
+#define __LAYER2_COLOR_HTML_Cornsilk  0xff
+#define __LAYER2_COLOR_HTML_LemonChiffon  0xff
+#define __LAYER2_COLOR_HTML_FloralWhite  0xff
+#define __LAYER2_COLOR_HTML_Snow  0xff
+#define __LAYER2_COLOR_HTML_Yellow  0xfc
+#define __LAYER2_COLOR_HTML_LightYellow  0xff
+#define __LAYER2_COLOR_HTML_Ivory  0xff
+#define __LAYER2_COLOR_HTML_White  0xff
 
 
 

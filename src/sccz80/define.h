@@ -355,6 +355,7 @@ struct varid {
 #define CPU_Z180     2
 #define CPU_R2K      4
 #define CPU_R3K      8
+#define CPU_Z80ZXN   16
 
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
 

@@ -17,6 +17,7 @@ EXTERN __IO_IDE_CONTROL, __IO_IDE_ALT_STATUS
 ide_read_block:
     push bc
     push de
+    push hl
     ld bc, __IO_PIO_IDE_CTL
     ld d, __IO_IDE_DATA    
     out (c), d              ;drive address onto control lines
@@ -36,6 +37,7 @@ ide_rdblk2:
    ;ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
     ld d, $0
     out (c), d              ;deassert all control pins
+    pop hl
     pop de
     pop bc
     ret

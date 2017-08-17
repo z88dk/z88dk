@@ -6,6 +6,7 @@ PUBLIC ide_soft_reset
 EXTERN __IO_IDE_CONTROL
 
 EXTERN ide_wait_ready
+EXTERN ide_test_error
 
 EXTERN ide_write_byte
 
@@ -20,13 +21,21 @@ EXTERN ide_write_byte
 ide_soft_reset:
     push af
     push de
-    ld e, 00000110b     ;no interrupt, set drives reset
+    ld e, 00000110b         ;no interrupt, set drives reset
     ld a, __IO_IDE_CONTROL
     call ide_write_byte
-    ld e, 00000010b     ;no interrupt, clear drives reset
+    ld e, 00000010b         ;no interrupt, clear drives reset
     ld a, __IO_IDE_CONTROL    
     call ide_write_byte
-    pop de
+    call ide_wait_ready
+    jr nc, error
+    pop de 
     pop af
-    jp ide_wait_ready
+    scf                     ;carry = 1 on return = operation ok
+    ret
+
+error:
+    pop de 
+    pop af
+    jp ide_test_error       ;carry = 0 on return = operation failed
 

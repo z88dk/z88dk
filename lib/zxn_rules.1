@@ -1,0 +1,64 @@
+	call	l_mult
+=
+	mul
+
+	call	l_inclong
+=
+	inc	hlde
+
+	call	l_declong
+=
+	dec	hlde
+
+	ld	bc,%1
+	add	hl,bc
+=
+	add	hl,+(%1)
+
+	ld	hl,0	;const
+	add	hl,sp
+=
+	ld	hl,sp
+
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2
+=
+	push	%1	;const
+	ld	hl,%2
+
+	push	de
+	push	hl
+	ld	hl,%1	;const
+	ld	de,0
+	call	l_long_add
+=
+	add	dehl,%1	;const
+
+	add	dehl,%1	;const
+=
+	defb	0xed,0x34, +(%1 % 256), +(%1 / 256)	; add dehl,%1
+
+	push	%1	;const
+=
+	defb	0xed,0x8a, +(%1 % 256), +(%1 / 256)	; push %1
+
+	add	hl,+(%1)
+=
+	defb	0xed, 0x34, +(%1 % 256), +(%1 / 256) ; add hl,+(%1)
+
+	ld	hl,sp
+=
+	defb	0xed, 0x25	; ld hl,sp
+
+	mul
+=
+	defb	0xed, 0x30	; mul
+
+	inc	hlde
+=
+	defb	0xed, 0x37	; inc hlde
+
+	dec	hlde
+=
+	defb	0xed, 0x38	; dec hlde

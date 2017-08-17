@@ -82,7 +82,9 @@ ELSE
    ret c
    
 ENDIF
-   
+
+   push af                     ; save file handle
+
    EXTERN __BSS_END_tail
    
    ld bc,__BSS_END_tail - __DTX_head
@@ -91,6 +93,16 @@ ENDIF
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_READ
 
+   pop hl                      ; h = file handle
+   push af
+   
+   ld a,h
+   
+   rst  __ESXDOS_SYSCALL
+   defb __ESXDOS_SYS_F_CLOSE
+   
+   pop af
+   
 IF __crt_enable_commandline >= 2
 
    pop hl
