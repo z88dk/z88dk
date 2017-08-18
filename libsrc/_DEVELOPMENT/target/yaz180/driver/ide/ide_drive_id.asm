@@ -15,11 +15,13 @@ EXTERN ide_test_error
 EXTERN ide_write_byte
 EXTERN ide_read_block
 
+EXTERN ideBuffer
+
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; do the identify drive command, and return with the IDEBuffer 
+; do the identify drive command, and return with the buffer 
 ; filled with info about the drive.
 
 ; the buffer to fill is in HL
@@ -48,7 +50,7 @@ ide_drive_id:
     ret
 
 error:
-    pop de 
+    pop de
     pop af
     jp ide_test_error       ;carry = 0 on return = operation failed
 

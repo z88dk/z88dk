@@ -7,8 +7,6 @@ EXTERN __IO_IDE_COMMAND
 
 EXTERN __IO_IDE_HEAD
 
-EXTERN __IDE_CMD_INIT
-
 EXTERN ide_wait_ready
 EXTERN ide_test_error
 
@@ -30,20 +28,6 @@ ide_init:
     ld e, 11100000b
     ld a, __IO_IDE_HEAD
     call ide_write_byte     ;select the master device, LBA mode
-    call ide_wait_ready
-    jr nc, error
-    ld e, __IDE_CMD_INIT    ;needed for old drives
-    ld a, __IO_IDE_COMMAND
-    call ide_write_byte     ;do init parameters command
-    call ide_wait_ready
-    jr nc, error
     pop de 
     pop af
-    scf                     ;carry = 1 on return = operation ok
-    ret
-
-error:
-    pop de 
-    pop af
-    jp ide_test_error       ;carry = 0 on return = operation failed
-
+    jp ide_wait_ready
