@@ -7,13 +7,13 @@
 
 include ../Make.config
 
-CFILES = $(filter-out fflush.c, $(wildcard *.c))
-ZSFILES = $(wildcard zsock/*.c) fflush.c
+CFILES = $(wildcard *.c)
+ZSFILES = $(wildcard zsock/*.c) 
 AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
-all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
+all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
 
 obj/ixiy/%.o: %.asm
 	zcc +test $(CFLAGS) -Ca--IXIY -Ca-I../ -c -o $@ $^
@@ -22,10 +22,10 @@ obj/ixiy/%.o: %.c
 	zcc +test $(CFLAGS) -Ca--IXIY -c -o $@ $^
 
 obj/net/%.o: %.asm
-	zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -DNET_STDIO -Ca-I../ -c -o $@ $^
+	zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/net/%.o: %.c
-	zcc +z88 $(CFLAGS) -Cc-standard-escape-chars -DNET_STDIO -c -o $@ $^
+	zcc +z88 $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
 
 obj/cpm/%.o: %.asm
 	zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^

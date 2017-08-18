@@ -685,11 +685,14 @@
 	EXTERN	__FOPEN_MAX
 	EXTERN	__sgoioblk
 	EXTERN	__sgoioblk_end
+	EXTERN	fopen_zsock
 	EXTERN	fopen
 	EXTERN	freopen
 	EXTERN	fdopen
 	EXTERN	fmemopen
+	EXTERN	funopen
 	EXTERN	fclose
+	EXTERN	fflush
 	EXTERN	closeall
 	EXTERN	fgets
 	EXTERN	fputs

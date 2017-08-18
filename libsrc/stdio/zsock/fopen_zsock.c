@@ -13,13 +13,24 @@
 #include <net/resolv.h>
 #include <net/socket.h>
 
+extern void zsock_trampoline();
+static int open_net1(char *host, int port, int proto);
 
-int opennet(FILE *fp,char *name)
+FILE *fopen_zsock(char *name)
 {
 	char	host[50];
 	int	proto;
 	char	*next,*next2;
 	int 	len;
+        FILE   *fp;
+
+        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
+                if (fp->flags == 0 ) break;
+        }
+
+        if (fp >= _sgoioblk_end) {
+                return NULL; /* No free slots */
+        }
 
 	if (strncmp(name,":UDP",4) == 0 ) proto=17;
 	else if (strncmp(name,":TCP",4) == 0 ) proto=6;
@@ -34,14 +45,15 @@ int opennet(FILE *fp,char *name)
 	len=open_net1(host,atoi(++next2),proto);
 	if ( len ) {
 			fp->desc.ptr=(char *)len;
-			fp->flags=_IONETWORK|_IOUSE;
+			fp->flags=_IOEXTRA|_IOUSE;
 			fp->ungetc=0;
-			return 1;
+                        fp->extra = zsock_trampoline;
+			return fp;
 	}
-	return 0;	/* Failed */
+	return NULL;	/* Failed */
 }
 
-int open_net1(char *host, int port, int proto)
+static int open_net1(char *host, int port, int proto)
 {
 	ipaddr_t addr;
 	SOCKET *s;

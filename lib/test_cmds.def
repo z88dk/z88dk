@@ -14,7 +14,7 @@ lstoff
         defc    CMD_READBYTE = 6
         defc    CMD_WRITEBLOCK = 7
         defc    CMD_READBLOCK = 8
-        defc    CMD_SEEK = 0
+        defc    CMD_SEEK = 9
         defc    CMD_STAT = 10
 
 
