@@ -14,7 +14,7 @@ EXTERN ide_init
 ; l = drive number, must be 0
 ;
 ; exit
-; l = DSTATUS, set carry flag
+; hl = DSTATUS, set carry flag
 ;
 
 
@@ -28,6 +28,7 @@ asm_disk_initialise:
 
     ; hard reset the drive
     call ide_hard_reset
+    jr nc, sta_noinit
 
     ; soft reset the drive
     call ide_soft_reset
@@ -37,19 +38,19 @@ asm_disk_initialise:
     call ide_init
     jr nc, sta_noinit
 
-    ld l, 0             ; set DSTATUS OK
+    ld hl, 0            ; set DSTATUS OK
     pop af
     scf                 
     ret
 
 sta_noinit:
-    ld l, 1             ; set DSTATUS STA_NOINIT
+    ld hl, 1            ; set DSTATUS STA_NOINIT
     pop af
     or a
     ret
 
 sta_nodisk:
-    ld l, 2             ; set DSTATUS STA_NODISK
+    ld hl, 2            ; set DSTATUS STA_NODISK
     pop af
     or a
     ret
