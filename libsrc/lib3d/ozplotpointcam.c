@@ -7,7 +7,7 @@ Copyright© 2002, Mark Hamilton
 
 */
 
-#include "lib3d.h"
+#include <lib3d.h>
 
 void ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p)
 {
