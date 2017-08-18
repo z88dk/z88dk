@@ -940,7 +940,7 @@ int make_sna(void)
     if ((origin == -1) && ((origin = get_org_addr(crtname)) == -1))
         exit_log(1, "Error: ORG address cannot be determined\n");
 
-    if ((origin -= 0x4000) < 0x4000)
+    if ((origin -= 0x4000) < 0)
         exit_log(1, "Error: ORG address %u not in range\n", origin);
 
     // determine output file
@@ -1020,9 +1020,16 @@ int make_sna(void)
             // bank belongs in the main bank
 
             snprintf(outname, sizeof(outname), "__BANK_%02X_head", i);
-            if (((origin = parameter_search(crtname, ".map", outname)) >= 0) && ((origin -= 0x4000) >= 0x4000))
+            if ((origin = parameter_search(crtname, ".map", outname)) >= 0)
             {
-                printf("Notice: Adding bank %02X to the main code\n", i);
+                origin &= 0x3fff;
+                
+                if (i == 2)
+                    origin += 0x4000;
+                else if (i == 0)
+                    origin += 0x8000;
+
+                printf("Notice: Adding bank %02X to the main code at 0x%04X\n", i, origin + 0x4000);
                 for (p = &memory[origin]; (p < &memory[sizeof(memory)]) && ((c = fgetc(fin)) != EOF); ++p)
                     *p = c;
 

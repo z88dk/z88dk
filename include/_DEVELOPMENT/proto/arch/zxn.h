@@ -55,6 +55,11 @@ extern unsigned char IO_REGISTRY_DAT;
 extern unsigned char IO_253B;
 extern unsigned char IO_243B;
 
+// Layer 2
+
+extern unsigned char IO_LAYER_2_ACCESS;
+extern unsigned char IO_123B;
+
 // Hardware Sprites
 
 extern unsigned char IO_SPRITE_SLOT;   // write
@@ -96,6 +101,11 @@ __sfr __banked __at __IO_REGISTRY_DAT IO_REGISTRY_DAT;
 
 __sfr __banked __at 0x253b IO_253B;
 __sfr __banked __at 0x243b IO_243B;
+
+// Layer 2
+
+__sfr __banked __at __IO_LAYER_2_ACCESS IO_LAYER_2_ACCESS;
+__sfr __banked __at 0x123b IO_123B;
 
 // Hardware Sprites
 

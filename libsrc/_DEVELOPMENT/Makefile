@@ -20,6 +20,9 @@ ${jobs}: job-%:
 		elif \
 			[ "$(target)" = "yaz180" ]; then \
 			echo "--cpu=z180"; \
+		elif \
+			[ "$(target)" = "zxn" ]; then \
+			echo "--cpu=z80-zxn"; \
 		else \
 			echo "";  \
 		fi) )

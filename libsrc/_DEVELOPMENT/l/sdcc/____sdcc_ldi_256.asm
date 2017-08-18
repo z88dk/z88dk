@@ -6,4 +6,4 @@ PUBLIC ____sdcc_ldi_256
 
 EXTERN l_ldi_256
 
-defc ____sdcc_ldi = l_ldi_256
+defc ____sdcc_ldi_256 = l_ldi_256

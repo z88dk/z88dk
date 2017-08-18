@@ -131,6 +131,7 @@ Help Options:
   -v, --verbose          Be verbose
 
 Code Generation Options:
+  --cpu=z80-zxn          Assemble for the Z80 variant of ZX Next
   --cpu=z80              Assemble for the Z80
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000
@@ -650,6 +651,21 @@ z80asm(
 
 t_z80asm_ok(0, "ex (sp),hl", "\xE3");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--cpu=r2k");
+
+#------------------------------------------------------------------------------
+# --cpu=z80-zxn
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "swapnib",	pack("C*", 0xED, 0x23), "--cpu=z80-zxn");	# A bits 7-4 swap with A bits 3-0
+t_z80asm_ok(0, "mul",		pack("C*", 0xED, 0x30), "--cpu=z80-zxn");	# multiply HL*DE = HLDE (no flags set)
+t_z80asm_ok(0, "add hl,a",	pack("C*", 0xED, 0x31), "--cpu=z80-zxn");	# Add A to HL (no flags set)
+t_z80asm_ok(0, "add de,a",	pack("C*", 0xED, 0x32), "--cpu=z80-zxn");	# Add A to DE (no flags set)
+t_z80asm_ok(0, "add bc,a",	pack("C*", 0xED, 0x33), "--cpu=z80-zxn");	# Add A to BC (no flags set)
+t_z80asm_ok(0, "outinb",	pack("C*", 0xED, 0x90), "--cpu=z80-zxn");	# out (c),(hl), hl++
+t_z80asm_ok(0, "ldix",		pack("C*", 0xED, 0xA4), "--cpu=z80-zxn");	# As LDI,  but if byte==A does not copy
+t_z80asm_ok(0, "ldirx",		pack("C*", 0xED, 0xB4), "--cpu=z80-zxn");	# As LDIR, but if byte==A does not copy
+t_z80asm_ok(0, "lddx",		pack("C*", 0xED, 0xAC), "--cpu=z80-zxn");	# As LDD,  but if byte==A does not copy, and DE is incremented
+t_z80asm_ok(0, "lddrx",		pack("C*", 0xED, 0xBC), "--cpu=z80-zxn");	# As LDDR,  but if byte==A does not copy
 
 #------------------------------------------------------------------------------
 # --ti83plus

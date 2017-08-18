@@ -5,11 +5,13 @@
 *.cpp   text eol=lf
 *.def   text eol=lf
 *.h     text eol=lf
+*.opt   text eol=lf
 *.pl    text eol=lf
 *.py    text eol=lf
 *.pm    text eol=lf
 *.rl    text eol=lf
 *.t     text eol=lf
+*.sh    text eol=lf
 *.tt    text eol=lf
 *.yaml  text eol=lf
 Makefile text eol=lf

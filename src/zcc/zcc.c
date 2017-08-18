@@ -201,6 +201,7 @@ static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
+static int             mz80_zxn = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
@@ -414,6 +415,7 @@ static arg_t     myargs[] = {
 	{ "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
 	{ "asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)" },
 	{ "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
+    { "mz80-zxn", AF_BOOL_TRUE, SetBoolean, &mz80_zxn, NULL, "Target the zx next z80 cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
 	{ "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2/3000 cpu" },
 	{ "crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
@@ -481,6 +483,47 @@ static arg_t     myargs[] = {
 	{ "", 0, NULL, NULL }
 };
 
+enum {
+    CPU_MAP_TOOL_Z80ASM = 0,
+    CPU_MAP_TOOL_SCCZ80,
+    CPU_MAP_TOOL_ZSDCC,
+    CPU_MAP_TOOL_SIZE
+};
+
+struct cpu_map_s {
+    char *tool[CPU_MAP_TOOL_SIZE];
+};
+
+typedef struct cpu_map_s cpu_map_t;
+
+enum {
+    CPU_TYPE_Z80 = 0,
+    CPU_TYPE_Z80_ZXN,
+    CPU_TYPE_Z180,
+    CPU_TYPE_R2K,
+    CPU_TYPE_SIZE
+};
+
+cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
+    { "--cpu=z80",     "-mz80" , "-mz80" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "--cpu=z80-zxn", "-mz80",  "-mz80" },                     // CPU_TYPE_Z80_ZXN : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "--cpu=z180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "--cpu=r2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+};
+
+char *select_cpu(int n)
+{
+    if (mz180)
+        return cpu_map[CPU_TYPE_Z180].tool[n];
+
+    if (mr2k)
+        return cpu_map[CPU_TYPE_R2K].tool[n];
+
+    if (mz80_zxn)
+        return cpu_map[CPU_TYPE_Z80_ZXN].tool[n];
+
+    return cpu_map[CPU_TYPE_Z80].tool[n];
+}
 
 struct pragma_m4_s {
     int         seen;
@@ -643,9 +686,9 @@ int linkthem(char *linker)
 
 	if (compileonly)
     {
-		len = offs = zcc_asprintf(&temp, "%s %s --output=\"%s\" %s",
-			linker,
-            mz180 ? "--cpu=z180" : "",
+        len = offs = zcc_asprintf(&temp, "%s %s --output=\"%s\" %s",
+            linker,
+            select_cpu(CPU_MAP_TOOL_Z80ASM),
 			outputfile,
 			linkargs);
 	}
@@ -654,7 +697,7 @@ int linkthem(char *linker)
 		len = offs = zcc_asprintf(&temp, "%s %s %s -d %s %s -x\"%s\"",
 			linker,
 			(z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v" : "",
-            mz180 ? "--cpu=z180" : "",
+            select_cpu(CPU_MAP_TOOL_Z80ASM),
 			IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
 			linkargs,
 			outputfile);
@@ -670,7 +713,7 @@ int linkthem(char *linker)
 
         len = offs = zcc_asprintf(&temp, "%s %s -b -d %s -o%s\"%s\" %s%s%s%s%s%s%s%s%s",
             linker,
-            mz180 ? "--cpu=z180" : "",
+            select_cpu(CPU_MAP_TOOL_Z80ASM),
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linker_output_separate_arg ? " " : "",
             outputfile,
@@ -1735,7 +1778,7 @@ void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 		offs += snprintf(dest + offs, destlen - offs, "%s%s%s%s",
 			prefix,
 			z80verbose ? " -v " : " ",
-            mz180 ? " --cpu=z180 " : " ",
+            select_cpu(CPU_MAP_TOOL_Z80ASM),
 			symbolson ? " -s " : " ");
 	}
 
@@ -2371,7 +2414,7 @@ static void configure_compiler()
 	if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
 		compiler_type = CC_SDCC;
 		snprintf(buf, sizeof(buf), "%s --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
-            (mz180 ? "-mz180 -portmode=z180" : ( mr2k ? "-mr2k" : "-mz80")), \
+            select_cpu(CPU_MAP_TOOL_ZSDCC), \
             (sdcc_signed_char ? "--fsigned-char" : ""), \
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
             (opt_code_size ? "--opt-code-size" : ""));
@@ -2393,7 +2436,7 @@ static void configure_compiler()
 		BuildOptions(&cpparg, preprocarg);
 		/* Indicate to sccz80 what assembler we want */
 		snprintf(buf, sizeof(buf), "-asm=%s -ext=opt %s", c_assembler_type,
-		            (mz180 ? "-mz180" : ( mr2k ? "-mr2k" : "-mz80")));
+		            select_cpu(CPU_MAP_TOOL_SCCZ80));
 
 		add_option_to_compiler(buf);
 		if (sccz80arg) {

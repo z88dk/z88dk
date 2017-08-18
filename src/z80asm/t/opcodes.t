@@ -6,7 +6,7 @@ use Modern::Perl;
 BEGIN {
 	use lib ".";
 	use t::TestZ80asm;
-}
+};
 
 z80asm(
     options => "-l -b",
