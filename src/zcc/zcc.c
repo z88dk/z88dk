@@ -366,7 +366,7 @@ static arg_t  config[] = {
 	{ "COPTEXE", 0, SetStringConfig, &c_copt_exe, NULL, "" },
 	{ "COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, "" },
 
-	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-I\"DESTDIR/include\" " },
+	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-isystem\"DESTDIR/include\" " },
 	{ "CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "-isystem \"DESTDIR/include/_DEVELOPMENT/clang\" " },
 	{ "M4OPTS", 0, SetStringConfig, &c_m4opts, NULL, "", " -I \"DESTDIR/src/m4\" " },
 	{ "COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "\"DESTDIR/lib/z80rules.1\"" },
@@ -452,6 +452,8 @@ static arg_t     myargs[] = {
 	{ "D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option" },
 	{ "U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option" },
 	{ "I", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
+	{ "iquote", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
+	{ "isystem", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
 	{ "L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path" },
 	{ "l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library" },
 	{ "O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt" },
@@ -2022,11 +2024,17 @@ void BuildOptionsQuoted(char **list, char *arg)
     if (((strncmp(arg, "-I", 2) == 0) || (strncmp(arg, "-L", 2) == 0)) && (strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL))
     {
         zcc_asprintf(&val, "%s%.2s\"%s\" ", orig ? orig : "", arg, arg+2);
-
         free(orig);
         *list = val;
-    }
-    else
+    } else if ( strncmp(arg,"-isystem", 8) == 0 && (strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL)) {
+        zcc_asprintf(&val, "%s%.8s\"%s\" ", orig ? orig : "", arg, arg+8);
+        free(orig);
+        *list = val;
+    } else if ( strncmp(arg,"-iquote", 7) == 0 && (strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL)) {
+        zcc_asprintf(&val, "%s%.7s\"%s\" ", orig ? orig : "", arg, arg+7);
+        free(orig);
+        *list = val;
+    } else
         BuildOptions(list, arg);
 }
 

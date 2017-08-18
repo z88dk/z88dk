@@ -379,7 +379,6 @@ doinclude(void)
 #if HOST == SYS_VMS
         char                    def_filename[NAM$C_MAXRSS + 1];
 #endif
-
         delim = macroid(skipws());
         if (delim != '<' && delim != '"')
             goto incerr;
@@ -496,6 +495,46 @@ int             searchlocal;            /* TRUE if #include "file"      */
                     return (TRUE);
             }
         }
+        if ( searchlocal ) {
+            for (incptr = quotedir; incptr < quoteend; incptr++) {
+                if (strlen(*incptr) + strlen(filename) >= (NWORK - 1))
+                    cfatal("Filename work buffer overflow", NULLST);
+                else {
+    #if HOST == SYS_UNIX
+                    if (filename[0] == '/')
+                        strcpy(tmpname, filename);
+                    else {
+                        sprintf(tmpname, "%s/%s", *incptr, filename);
+                    }
+    #else
+                    if (!hasdirectory(filename, tmpname))
+                        sprintf(tmpname, "%s%s", *incptr, filename);
+    #endif
+                    if (openfile(tmpname))
+                        return (TRUE);
+                }
+            }        
+        } else {
+            for (incptr = systemdir; incptr < systemend; incptr++) {
+                if (strlen(*incptr) + strlen(filename) >= (NWORK - 1))
+                    cfatal("Filename work buffer overflow", NULLST);
+                else {
+        #if HOST == SYS_UNIX
+                    if (filename[0] == '/')
+                        strcpy(tmpname, filename);
+                    else {
+                        sprintf(tmpname, "%s/%s", *incptr, filename);
+                    }
+        #else
+                    if (!hasdirectory(filename, tmpname))
+                        sprintf(tmpname, "%s%s", *incptr, filename);
+        #endif
+                    if (openfile(tmpname))
+                        return (TRUE);
+                }
+            }            
+        }
+
         return (FALSE);
 }
 
