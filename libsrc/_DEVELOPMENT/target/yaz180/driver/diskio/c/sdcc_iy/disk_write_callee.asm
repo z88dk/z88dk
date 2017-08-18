@@ -20,8 +20,9 @@ EXTERN asm_disk_write
 ;
 
 _disk_write_callee:
+    pop af      ; pop return address
+    ex af,af
 
-    pop ix      ; pop return address
     inc sp      ; drop single byte pdrv (not evaluated)
     pop hl      ; buff to hl
     pop de      ; start sector to bcde
@@ -29,7 +30,8 @@ _disk_write_callee:
     dec sp      ; move sp to get INT into a
     pop af      ; get sector count to a from an INT
     inc sp
-    
-    push ix     ; push return address    
+
+    ex af,af
+    push af     ; push return address
 
     jp asm_disk_write

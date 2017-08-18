@@ -15,8 +15,7 @@ EXTERN asm_disk_ioctl
 ; hl = void* buff
 ;
 ; exit
-; b = DRESULT, set carry flag
-; hl = void* buff
+; l = DRESULT, set carry flag
     
 ; control the ide drive
 
