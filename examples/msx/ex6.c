@@ -19,7 +19,7 @@ Contact the author:
 =========================================================================*/
 
 #include <stdio.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 extern char diamond[];
 extern char diamond_attr[];
