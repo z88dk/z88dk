@@ -53,10 +53,10 @@ extern void add_Z88_FPP(int argument);
 extern void add_Z88_INVOKE(int argument);
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		(!(opts.cpu & CPU_Z80) ? \
+#define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80_ZXN)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _EXCEPT_Z80(x)		((opts.cpu & CPU_Z80) ? \
+#define _EXCEPT_Z80(x)		((opts.cpu & (CPU_Z80|CPU_Z80_ZXN)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 #define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
