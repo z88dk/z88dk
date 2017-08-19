@@ -23,14 +23,16 @@ static char **parse_words(char *line, int *argc);
 static int cmd_step(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
+static int cmd_registers(int argc, char **argv);
 
 
 
 
 static command commands[] = {
-    { "step",   cmd_step,       "Step the instruction" },
-    { "cont",   cmd_continue,   "Continue execution" },
+    { "step",   cmd_step,           "Step the instruction" },
+    { "cont",   cmd_continue,       "Continue execution" },
     { "dis",    cmd_disassemble,    "Disassemble current instruction" },
+    { "reg",    cmd_registers,      "Display the registers" },
     { NULL, NULL, NULL }
 };
 
@@ -204,5 +206,18 @@ static int cmd_continue(int argc, char **argv)
 static int cmd_disassemble(int argc, char **argv)
 {
     disassemble(mem + pc, pc);
+    return 0;
+}
+
+static int cmd_registers(int argc, char **argv) 
+{
+    printf("pc\t%04x\t\tsp\t%04x\n", pc,sp);
+    
+    printf("a\t%02x\t\ta'\t%02x\n",a,a_);
+    printf("hl\t%02x%02x\t\thl'\t%02x%02x\n", h, l, h_, l_);
+    printf("de\t%02x%02x\t\tde'\t%02x%02x\n", d, e, d_, e_);
+    printf("bc\t%02x%02x\t\tbc'\t%02x%02x\n", b, c, b_, c_);
+    printf("ix\t%02x%02x\t\tiy\t%02x%02x\n", xh, xl, yh, yl);
+    
     return 0;
 }

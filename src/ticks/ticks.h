@@ -7,7 +7,9 @@
 #include "cmds.h"
 
 extern unsigned char a,b,c,d,e,h,l;
-extern unsigned short ff, pc;
+extern unsigned char a_,b_,c_,d_,e_,h_,l_;
+extern unsigned char xh, xl, yh, yl;
+extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
 
 #define SET_ERROR(error) do {                   \
