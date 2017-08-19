@@ -42,6 +42,8 @@ extern void      hook_init(void);
 extern void      hook_io_init(hook_command *cmds);
 extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_console_init(hook_command *cmds);
+extern void      debugger_init();
+extern void      debugger();
 
 
 #endif

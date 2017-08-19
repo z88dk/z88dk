@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ticks.h"
+
 #if defined(_WIN32) || defined(WIN32)
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
