@@ -62,6 +62,7 @@ static void            AddPreProc(arg_t *arg, char *);
 static void            AddPreProcIncPath(arg_t *arg, char *);
 static void            AddToArgs(arg_t *arg, char *);
 static void            AddToArgsQuoted(arg_t *arg, char *);
+static void            AddToArgsQuotedFull(arg_t *argument, char *arg);
 static void            AddAppmake(arg_t *arg, char *);
 static void            AddLinkLibrary(arg_t *arg, char *);
 static void            AddLinkSearchPath(arg_t *arg, char *);
@@ -452,8 +453,8 @@ static arg_t     myargs[] = {
 	{ "D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option" },
 	{ "U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option" },
 	{ "I", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
-	{ "iquote", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
-	{ "isystem", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
+	{ "iquote", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a quoted include path for the preprocessor" },
+	{ "isystem", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a system include path for the preprocessor" },
 	{ "L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path" },
 	{ "l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library" },
 	{ "O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt" },
@@ -1876,7 +1877,6 @@ static char *expand_macros(char *arg)
 	char  *value = muststrdup(arg);
 	char   varname[300];
 
-
 	start = value;
 	while ((ptr = strchr(start, '$')) != NULL) {
 		if (*(ptr + 1) == '{') {
@@ -1903,6 +1903,7 @@ static char *expand_macros(char *arg)
 
 	nval = replace_str(value, "DESTDIR", c_install_dir);
 	free(value);
+
 	return nval;
 }
 
@@ -1955,6 +1956,11 @@ void AddToArgs(arg_t *argument, char *arg)
 void AddToArgsQuoted(arg_t *argument, char *arg)
 {
     BuildOptionsQuoted(argument->data, arg + 3);
+}
+
+void AddToArgsQuotedFull(arg_t *argument, char *arg)
+{
+    BuildOptionsQuoted(argument->data, arg);
 }
 
 void AddPreProcIncPath(arg_t *argument, char *arg)
@@ -2020,18 +2026,21 @@ void BuildOptionsQuoted(char **list, char *arg)
 {
     char           *val;
     char           *orig = *list;
+    int             len = -1;
 
-    if (((strncmp(arg, "-I", 2) == 0) || (strncmp(arg, "-L", 2) == 0)) && (strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL))
+    if ((strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL))
     {
-        zcc_asprintf(&val, "%s%.2s\"%s\" ", orig ? orig : "", arg, arg+2);
-        free(orig);
-        *list = val;
-    } else if ( strncmp(arg,"-isystem", 8) == 0 && (strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL)) {
-        zcc_asprintf(&val, "%s%.8s\"%s\" ", orig ? orig : "", arg, arg+8);
-        free(orig);
-        *list = val;
-    } else if ( strncmp(arg,"-iquote", 7) == 0 && (strchr(arg, '"') == NULL) && (strchr(arg, '\'') == NULL)) {
-        zcc_asprintf(&val, "%s%.7s\"%s\" ", orig ? orig : "", arg, arg+7);
+        if ((strncmp(arg, "-I", 2) == 0) || (strncmp(arg, "-L", 2) == 0))
+            len = 2;
+        else if (strncmp(arg, "-iquote", 7) == 0)
+            len = 7;
+        else if (strncmp(arg, "-isystem", 8) == 0)
+            len = 8;
+    }
+
+    if (len > 0)
+    {
+        zcc_asprintf(&val, "%s%.*s\"%s\" ", orig ? orig : "", len, arg, arg+len);
         free(orig);
         *list = val;
     } else

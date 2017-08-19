@@ -166,6 +166,8 @@ char		*argv[];
 		argv[j++] = argv[i];
 	    else {
 		c = *ap++;			/* Option byte		*/
+		if (c != 'i')			/* Normalize case	*/
+		    c = toupper(c);
 		switch (c) {			/* Command character	*/
 		case 'C':			/* Keep comments	*/
 		    cflag = TRUE;
@@ -271,6 +273,8 @@ char		*argv[];
                     "  -C\t\t\tWrite source file comments to output\n"
                     "  -Dsymbol=value\tDefine a symbol with the given (optional) value\n"
                     "  -Idirectory\t\tAdd a directory to the #include search list\n"
+                    "  -iquoteDIRECTORY\tSynonym for -I\n"
+                    "  -isystemDIRECTORY\tSynonym for -I\n"
                     "  -N\t\t\tDon't predefine target-specific names\n"
                     "  -Stext\t\tSpecify sizes for #if sizeof\n"
                     "  -Usymbol\t\tUndefine symbol\n"
