@@ -4,11 +4,23 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "utlist.h"
+
 #include "ticks.h"
 #include "linenoise.h"
 
 #define HISTORY_FILE ".ticks_history.txt"
 
+typedef enum {
+    BREAK_PC,
+    BREAK_REG
+} breakpoint_type;
+
+typedef struct breakpoint {
+    breakpoint_type   type;
+    int               value;
+    struct breakpoint *next;
+} breakpoint;
 
 typedef struct {
     char   *cmd;
@@ -24,6 +36,7 @@ static int cmd_step(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
+static int cmd_break(int argc, char **argv);
 
 
 
@@ -33,10 +46,12 @@ static command commands[] = {
     { "cont",   cmd_continue,       "Continue execution" },
     { "dis",    cmd_disassemble,    "Disassemble current instruction" },
     { "reg",    cmd_registers,      "Display the registers" },
+    { "break",  cmd_break,          "Handle breakpoints" },
     { NULL, NULL, NULL }
 };
 
 
+static breakpoint *breakpoints;
 
 static int debugger_active = 1;
 
@@ -66,8 +81,19 @@ void debugger()
     char  *line;
 
     if ( debugger_active == 0 ) {
+        breakpoint *elem;
+        int         i = 1;
+        int         dodebug = 0;
+        LL_FOREACH(breakpoints, elem) {
+            if ( elem->type == BREAK_PC && elem->value == pc ) {
+                printf("Hit breakpoint %d\n",i);
+                dodebug=1;
+                break;
+            }
+            i++;
+        }
         /* Check breakpoints */
-        return;
+        if ( dodebug == 0 ) return;
     }
 
 
@@ -219,5 +245,35 @@ static int cmd_registers(int argc, char **argv)
     printf("bc\t%02x%02x\t\tbc'\t%02x%02x\n", b, c, b_, c_);
     printf("ix\t%02x%02x\t\tiy\t%02x%02x\n", xh, xl, yh, yl);
     
+    return 0;
+}
+
+static int cmd_break(int argc, char **argv)
+{
+    if ( argc == 1 ) {
+        breakpoint *elem;
+        int         i = 1;
+
+        /* Just show the breakpoints */
+        LL_FOREACH(breakpoints, elem) {
+            if ( elem->type == BREAK_PC) {
+                printf("%d:\tPC=%04x\n",i, elem->value);
+            }
+            i++;
+        }
+    } else if ( argc == 2 ) {
+        char *end;
+        breakpoint *elem;
+        int value = strtol(argv[1], &end,0);
+
+        if ( end != argv[1] ) {
+            elem = malloc(sizeof(*elem));
+            elem->type = BREAK_PC;
+            elem->value = value;
+            LL_APPEND(breakpoints, elem);
+        } else {
+            printf("Cannot break on '%s'\n",argv[1]);
+        }
+    }
     return 0;
 }
