@@ -385,6 +385,7 @@
 
 FILE * ft;
 unsigned char * tapbuf;
+int    debugger_enabled = 0;
   
 int     v
       , wavpos= 0
@@ -511,6 +512,7 @@ int main (int argc, char **argv){
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
+    printf("  -d             Enable debugger\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
@@ -537,6 +539,11 @@ int main (int argc, char **argv){
         case 'c':
           sscanf(argv[1], "%llu", &counter);
           counter<0 && (counter= 9e18);
+          break;
+        case 'd':
+          debugger_enabled = 1;
+          argv--;
+          argc++;
           break;
         case 'o':
           output= argv[1];
@@ -702,7 +709,7 @@ int main (int argc, char **argv){
 
 
   do{
-    debugger();
+    if ( debugger_enabled ) debugger();
     if( pc==start )
       st= 0,
       stint= intr,
