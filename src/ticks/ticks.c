@@ -541,6 +541,7 @@ int main (int argc, char **argv){
           counter<0 && (counter= 9e18);
           break;
         case 'd':
+          debugger_init();
           debugger_enabled = 1;
           argv--;
           argc++;
