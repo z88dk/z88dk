@@ -37,7 +37,7 @@ all : parse_rules.h
 
 codegen/cpu_rules.h : codegen/cpu.def codegen/cpu.pl
 	perl codegen/cpu.pl
-	perl -i.bak -pe "s/\bCPU_Z80\b/(CPU_Z80|CPU_Z80_ZXN)/g" codegen/cpu_rules.h 
+#	perl -i.bak -pe "s/\bCPU_Z80\b/(CPU_Z80|CPU_Z80_ZXN)/g" codegen/cpu_rules.h 
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile \

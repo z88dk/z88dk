@@ -44,11 +44,11 @@ while (<$fh>) {
 
 build_parser();
 
-(my $ragel_file = $0) =~ s/\.pl$/_rules.h/;
+(my $ragel_file = $0) =~ s/\.pl$/_rules_old.h/;
 write_ragel($ragel_file);
 
-(my $test_file_base = $0) =~ s/\.pl$/_test/;
-write_tests($test_file_base);
+# (my $test_file_base = $0) =~ s/\.pl$/_testold/;
+# write_tests($test_file_base);
 
 # expand and recurse, call add_final at the end
 sub add {
@@ -267,8 +267,8 @@ sub add_final {
 
 	# add opcode if not same already
 	if ($Opcodes{$asm}) {
-		die if $Opcodes{$asm}[0] ne $cpu_tag;
-		die if $Opcodes{$asm}[1] ne $bin;
+		die "($cpu_tag, $asm, $bin)" if $Opcodes{$asm}[0] ne $cpu_tag;
+		die "($cpu_tag, $asm, $bin)" if $Opcodes{$asm}[1] ne $bin;
 		return;
 	}
 	
@@ -694,3 +694,598 @@ if ($ENV{DEBUG}) {
 	say "Tests:";
 	say dump \%Tests;
 }
+
+
+#------------------------------------------------------------------------------
+# New programatic opcode generator
+# asm placeholders:
+#	%s	signed byte
+#	%n	unsigned byte
+#	%m	unsigned word
+#	%j	jr offset
+#	%c	constant (im, bit, rst, ...)
+#	$d	signed register indirect offset
+#	%u	unsigned register indirect offset
+#------------------------------------------------------------------------------
+@CPUS = qw( z80 z80_zxn z180 r2k r3k );
+
+my @R8	= qw( b c d e   h   l (hl) a );
+my @R8X = qw( b c d e ixh ixl (hl) a );
+my @R8Y = qw( b c d e iyh iyl (hl) a );
+
+my @X	= qw( ix iy );
+my @DIS	= ('0', '%d');
+my @IO	= ('', qw( ioi ioe ));
+my @ALTD= ('', qw( altd ));
+
+my %V = (
+	'' => '',
+	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, a => 7,
+	ix => 0xDD, iy => 0xFD, 
+	altd => 0x76, ioi => 0xD3, ioe => 0xDB,
+);
+
+#------------------------------------------------------------------------------
+# build %Opcodes
+#------------------------------------------------------------------------------
+%Opcodes = ();
+for my $cpu (@CPUS) {
+	my $rabbit	= ($cpu =~ /^r/);
+	my $z80 	= ($cpu =~ /^z80/);
+	
+	# 8-bit load group
+	for my $r (@R8) { 
+		for my $s (@R8) {
+			my $op = 0x40 + $V{$r}*8 + $V{$s};
+			add_opc($cpu, "ld $r, $s", $op);
+		}
+		add_opc($cpu, "ld $r, %n", 0x06 + $V{$r}*8, '%n');
+	}
+	add_opc($cpu, "ld a, (%m)", 0x3A, '%m', '%m');
+}
+
+#------------------------------------------------------------------------------
+# build %Parser
+#------------------------------------------------------------------------------
+%Parser = ();
+
+for my $asm (sort keys %Opcodes) {
+	my $tokens = parser_tokens($asm);
+	
+	# asm for swap_ix_iy
+	(my $asm_swap = $asm) =~ s/(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
+	
+	# check for parens
+	my $parens;
+	if    ($asm =~ /\(%[nm]\)/) {		$parens = 'expr_in_parens'; }
+	elsif ($asm =~ /%[snmjc]/) {		$parens = 'expr_no_parens'; }
+	else {								$parens = 'no_expr';   }
+		
+	for my $cpu (sort keys %{$Opcodes{$asm}}) {
+		my @bin = @{$Opcodes{$asm}{$cpu}};
+		my @bin_swap = @{$Opcodes{$asm_swap}{$cpu}};
+		
+		$Parser{$tokens}{$cpu}{$parens}{ixiy} = [$asm, @bin];
+		$Parser{$tokens}{$cpu}{$parens}{iyix} = [$asm_swap, @bin_swap];
+	}
+}
+
+open(my $rules, ">", "codegen/cpu_rules.h") or die $!;
+for my $tokens (sort keys %Parser) {
+	print $rules $tokens, ' @{', "\n";
+	print $rules merge_cpu($Parser{$tokens});
+	print $rules '}', "\n\n";
+}
+
+#------------------------------------------------------------------------------
+# build %Tests
+#------------------------------------------------------------------------------
+%Tests = ();
+
+for my $asm (sort keys %Opcodes) {
+	for my $cpu (sort keys %{$Opcodes{$asm}}) {
+		my $bin = join(' ', @{$Opcodes{$asm}{$cpu}});
+		
+		add_tests($cpu, $asm, $bin);
+	}
+}
+
+# open tests files
+my %fh;
+for my $cpu (@CPUS) {
+	for my $ixiy ('', '_ixiy') {
+		for my $ok ('ok', 'err') {
+			next if $ixiy && $ok eq 'err';
+			
+			my $filename = "codegen/cpu_test_${cpu}${ixiy}_${ok}.asm";
+			open($fh{$cpu}{$ixiy}{$ok}, ">", $filename ) or die "$filename: $!";
+		}
+	}
+}
+
+for my $asm (sort keys %Tests) {
+	my $asmf = sprintf(" %-31s", $asm);
+	for my $cpu (@CPUS) {
+		if (exists $Tests{$asm}{$cpu}) {
+			for my $ixiy ('', '_ixiy') {
+				my $asm1 = $asm;
+				if ($ixiy) {
+					$asm1 =~ s/(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
+				}
+				my $bin1 = $Tests{$asm1}{$cpu};
+				my @bin = split(' ', $bin1);
+			
+				$fh{$cpu}{$ixiy}{ok}->print($asmf."; ".fmthex(@bin)."\n");
+			}
+		}
+		else {
+			$fh{$cpu}{''}{err}->print($asmf."; Error\n");
+		}
+	}
+}
+
+
+#------------------------------------------------------------------------------
+# Opcodes
+#------------------------------------------------------------------------------
+sub add_opc {
+	my($cpu, $asm, @bin) = @_;
+
+	# filter invalid opcodes
+	return if $asm eq 'ld (hl), (hl)';
+	
+	add_opc_1($cpu, $asm, @bin);
+	
+	# expand ixh, ixl, ...
+	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && $asm !~ /hl|ix|iy/) {
+		(my $asm1 = $asm) =~ s/\b([hl])\b/ix$1/g;
+		add_opc_1($cpu, $asm1, $V{ix}, @bin);
+		(   $asm1 = $asm) =~ s/\b([hl])\b/iy$1/g;
+		add_opc_1($cpu, $asm1, $V{iy}, @bin);
+	}
+}
+
+sub add_opc_1 {
+	my($cpu, $asm, @bin) = @_;
+
+	add_opc_2($cpu, $asm, @bin);
+	
+	# expand (ix+%d)
+	if ($asm =~ /\(hl\)/) {
+		(my $asm1 = $asm) =~ s/\(hl\)/(ix+%d)/g;
+		add_opc_2($cpu, $asm1, $V{ix}, $bin[0], '%d', @bin[1..$#bin]);
+		(   $asm1 = $asm) =~ s/\(hl\)/(iy+%d)/g;
+		add_opc_2($cpu, $asm1, $V{iy}, $bin[0], '%d', @bin[1..$#bin]);
+	}
+}
+
+sub add_opc_2 {
+	my($cpu, $asm, @bin) = @_;
+
+	# (ix+%d) -> (ix)
+	if ($asm =~ /\+%d/) {
+		(my $asm1 = $asm) =~ s/\+%d//;
+		my @bin1 = map {/%d/ ? 0 : $_} @bin;
+		add_opc_3($cpu, $asm1, @bin1);
+	}
+
+	add_opc_3($cpu, $asm, @bin);
+}
+	
+sub add_opc_3 {
+	my($cpu, $asm, @bin) = @_;
+
+	add_opc_4($cpu, $asm, @bin);
+
+	return unless $cpu =~ /^r/;
+	
+	# expand ioi ioe
+	my $has_io;
+	if ($asm =~ /\((ix|iy|hl|%m)/) {
+		add_opc_4($cpu, "ioi $asm", $V{ioi}, @bin);
+		add_opc_4($cpu, "ioe $asm", $V{ioe}, @bin);
+		$has_io++;
+	}
+	
+	# expand altd
+	if ($asm =~ /^(ld (?:a|b|c|d|e|h|l|af|bc|de|hl))(.*)/) {
+		if ($has_io) {
+			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
+			add_opc_4($cpu, "ioi $1'$2", $V{ioi}, $V{altd}, @bin);
+			add_opc_4($cpu, "ioe $1'$2", $V{ioe}, $V{altd}, @bin);
+			
+			add_opc_4($cpu, "altd $1$2", $V{altd}, @bin);
+			add_opc_4($cpu, "altd ioi $1$2", $V{altd}, $V{ioi}, @bin);
+			add_opc_4($cpu, "altd ioe $1$2", $V{altd}, $V{ioe}, @bin);
+			add_opc_4($cpu, "ioi altd $1$2", $V{ioi}, $V{altd}, @bin);
+			add_opc_4($cpu, "ioe altd $1$2", $V{ioe}, $V{altd}, @bin);
+		}
+		else {
+			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
+			add_opc_4($cpu, "altd $1$2", $V{altd}, @bin);
+		}
+	}
+}
+
+sub add_opc_4 {
+	my($cpu, $asm, @bin) = @_;
+
+	if ($Opcodes{$asm}{$cpu}) {
+		my $old = fmthex(@{$Opcodes{$asm}{$cpu}});
+		my $new = fmthex(@bin);
+		if ($old ne $new) {
+			die "$cpu: $asm: ($old) or ($new)?";
+		}
+	}
+	else {
+		say sprintf("%-8s%-24s%s", $cpu, $asm, fmthex(@bin));
+
+		$Opcodes{$asm}{$cpu} = \@bin;
+	}
+}
+
+#------------------------------------------------------------------------------
+# Parser
+#------------------------------------------------------------------------------
+sub parser_tokens {
+	local($_) = @_;
+	my @tokens = ();
+	
+	while (!/\G \z 				/gcx) {
+		if (/\G \s+ 			/gcx) {}
+		elsif (/\G \( (\w+) 	/gcx) { push @tokens, "_TK_IND_".uc($1); }
+		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
+		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
+		elsif (/\G \( %[nm] \)	/gcx) { push @tokens, "expr"; }
+		elsif (/\G \+ %[du]		/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[snmj]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
+		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
+		elsif (/\G    (\w+)		/gcx) { push @tokens, "_TK_".uc($1); }
+		else { die "$_ ; ", substr($_, pos($_)||0) }
+	}
+	return join(' ', ('| label?', @tokens, "_TK_NEWLINE"));
+}
+
+sub parse_code {
+	my($cpu, $asm, @bin) = @_;
+	my @code;
+	
+	# store prefixes
+	if ($cpu =~ /^r/) {
+		while (@bin && 
+				($bin[0] == $V{altd} ||
+				 $bin[0] == $V{ioi} ||
+				 $bin[0] == $V{ioe})) {
+			push @code, "DO_stmt(0x".fmthex(shift @bin).");"
+		}
+	}
+	
+	# check for argument type
+	my($stmt, $extra_arg) = ("", "");
+	my $bin = join(' ', @bin);
+	if (is_emulated($asm)) {
+		$stmt = "DO_stmt_emul";
+		$extra_arg = ", rcmx_".$asm;
+	}
+	elsif ($bin =~ s/ %d %n$//) {
+		$stmt = "DO_stmt_idx_n";
+	}
+	elsif ($bin =~ s/ %n$//) {
+		$stmt = "DO_stmt_n";
+	}
+	elsif ($bin =~ s/ %s$//) {
+		$stmt = "DO_stmt_d";
+	}
+	elsif ($asm =~ / ^ call \s+ (nz|z|nc|c|po|pe|nv|v|lz|lo|p|m) /x) {
+		return "DO_stmt_call_flag(".uc($1)."); ";
+	}
+	elsif ($bin =~ s/ %m %m$//) {
+		$stmt = "DO_stmt_nn";
+	}
+	elsif ($bin =~ s/ %j$//) {
+		$stmt = "DO_stmt_jr";
+	}
+	elsif ($bin =~ s/ %d//) {
+		$stmt = "DO_stmt_idx";
+	}
+	else {
+		$stmt = "DO_stmt";
+	}
+	$stmt or die $bin;
+
+	# build statement
+	@bin = split(' ', $bin);
+	my $opc = "0x";
+	for (@bin) {
+		eval($_); die "$cpu, $asm, @bin, $_" if $@;
+		$opc .= fmthex($_);
+	}
+	push @code, $stmt."(".$opc.$extra_arg.");";
+	
+	my $code = join(' ', @code);
+	return $code;
+}
+
+sub merge_cpu {
+	my($t) = @_;
+	my $ret = '';
+	my %code;
+	
+	for my $cpu (@CPUS) {
+		if (exists $t->{$cpu}) {
+			my $code = merge_parens($cpu, $t->{$cpu});
+			$code{$code}{$cpu}++;
+		}
+	}
+	
+	$ret .= "switch (opts.cpu) {\n";
+	for my $code (sort keys %code) {
+		for my $cpu (sort keys %{$code{$code}}) {
+			$ret .= "case CPU_".uc($cpu).": ";
+		}
+		$ret .= "\n$code\nbreak;\n"
+	}
+	$ret .= "default: error_illegal_ident(); }\n";
+	
+	return $ret;
+}
+
+sub merge_parens {
+	my($cpu, $t) = @_;
+	my $ret = '';
+	
+	if ($t->{no_expr}) {
+		die if $t->{expr_no_parens} || $t->{expr_in_parens};
+		return merge_ixiy($cpu, $t->{no_expr});
+	}
+	elsif (!$t->{expr_no_parens} && !$t->{expr_in_parens}) {
+		die;
+	}
+	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
+		return "if (!expr_in_parens) return FALSE;\n".
+				merge_ixiy($cpu, $t->{expr_in_parens});			
+	}
+	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
+		return "if (expr_in_parens) warn_expr_in_parens();\n".
+				merge_ixiy($cpu, $t->{expr_no_parens});
+	}
+	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
+		my($common, $in_parens, $no_parens) = 
+			extract_common(merge_ixiy($cpu, $t->{expr_in_parens}),
+						   merge_ixiy($cpu, $t->{expr_no_parens}));
+		return $common.
+				"if (expr_in_parens) { $in_parens } else { $no_parens }";
+	}
+	else {
+		die;
+	}
+}
+
+sub merge_ixiy {
+	my($cpu, $t) = @_;
+	
+	my $ixiy = parse_code($cpu, @{$t->{ixiy}});
+	my $iyix = parse_code($cpu, @{$t->{iyix}});
+	
+	if ($ixiy eq $iyix) {
+		return $ixiy;
+	}
+	else {
+		(my $common, $ixiy, $iyix) = extract_common($ixiy, $iyix);
+		return $common.
+				"if (!opts.swap_ix_iy) { $ixiy } else { $iyix }";
+	}
+}
+
+sub extract_common {
+	my($a, $b) = @_;
+	my $common = '';
+	
+	while ($a =~ /(.*?;)\s*/ && 
+			substr($a, 0, length($1)) eq
+			substr($b, 0, length($1)) ) {
+		$common .= $1." ";
+		$a = substr($a, length($&));
+		$b = substr($b, length($&));
+	}
+	$common .= "\n" if $common;
+	
+	return ($common, $a, $b);
+}
+
+#------------------------------------------------------------------------------
+# Tests
+#------------------------------------------------------------------------------
+sub add_tests {
+	my($cpu, $asm, $bin) = @_;
+
+	if ($asm =~ /%s/) {
+		add_tests($cpu, replace($asm, '%s', 127), replace($bin, '%s', 0x7F));
+		add_tests($cpu, replace($asm, '%s', -128), replace($bin, '%s', 0x80));
+	}
+	elsif ($asm =~ /%n/) {
+		add_tests($cpu, replace($asm, '%n', 255), replace($bin, '%n', 0xFF));
+		add_tests($cpu, replace($asm, '%n', 127), replace($bin, '%n', 0x7F));
+		add_tests($cpu, replace($asm, '%n', -128), replace($bin, '%n', 0x80));
+	}
+	elsif ($asm =~ /%m/) {
+		add_tests($cpu, replace($asm, '%m', 65535), replace($bin, '%m %m', 0xFF." ".0xFF));
+		add_tests($cpu, replace($asm, '%m', 32767), replace($bin, '%m %m', 0xFF." ".0x7F));
+		add_tests($cpu, replace($asm, '%m',-32768), replace($bin, '%m %m', 0x00." ".0x80));
+	}
+	elsif ($asm =~ /%j/) {
+		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
+	}
+	elsif ($asm =~ /%c/) {
+		die;
+	}
+	elsif ($asm =~ /%d/) {
+		add_tests($cpu, replace($asm, qr/\+%d/, "+127"), replace($bin, '%d', 0x7F));
+		add_tests($cpu, replace($asm, qr/\+%d/, "-128"), replace($bin, '%d', 0x80));
+	}
+	elsif ($asm =~ /%u/) {
+		add_tests($cpu, replace($asm, qr/\+%u/, "+255"), replace($bin, '%u', 0xFF));
+		add_tests($cpu, replace($asm, qr/\+%u/, "+0"  ), replace($bin, '%u', 0x80));
+	}
+	else {
+		$Tests{$asm}{$cpu} = $bin;
+	}
+}
+
+
+sub fmthex {
+	return join(' ', map {/\D/ ? $_ : sprintf('%02X', $_)} @_);
+}
+
+use Data::Dump 'dump';
+say "\n%Opcodes:\n", dump \%Opcodes;
+say "\n%Parser:\n", dump \%Parser;
+say "\n%Tests:\n", dump \%Tests;
+
+__END__
+			
+			if ($op != 0x76) {
+				
+				if ($r eq '(hl)') {
+					for my $io (@IO) {
+						add_opc($cpu, "$io ld $r, $s", $V{$io}, $op) if $rabbit;
+						
+						for my $x (@X) {
+							for my $d (@DIS) {
+								add_opc($cpu, "$io ld ($x+$d), $s", $V{$io}, $V{$x}, $op, $d) if $rabbit;
+							}
+						}
+					}
+				}
+				else {
+					add_opc($cpu, "ld $r', $s", $V{altd}, $op) if $rabbit;
+					for my $altd (@ALTD) {
+						add_opc($cpu, "$altd ld $r, $s", $V{$altd}, $op) if $rabbit;
+
+						for my $x (@X) {
+							for my $d (@DIS) {
+								add_opc($cpu, "$io ld $r, ($x+$d)", $V{$io}, $V{$x}, $op, $d) if $rabbit;
+							}
+						}
+					}
+				}
+
+				if ($s eq '(hl)') {
+					for my $io (@IO) {
+						add_opc($cpu, "$io ld $r, $s", $V{$io}, $op) if $rabbit;
+						
+						for my $x (@X) {
+							for my $d (@DIS) {
+								add_opc($cpu, "$io ld $r, ($x+$d)", $V{$io}, $V{$x}, $op, $d) if $rabbit;
+							}
+						}
+					}
+				}
+				
+				if ($z80 && 
+					$r =~ /\b[hl]\b/ && $s ne '(hl)' || 
+				    $s =~ /\b[hl]\b/ && $r ne '(hl)' ) {
+					add_opc($cpu, "ld ".$R8X[$V{$r}].", ".$R8X[$V{$s}], $V{ix}, $op);
+					add_opc($cpu, "ld ".$R8Y[$V{$r}].", ".$R8Y[$V{$s}], $V{iy}, $op);
+				}
+			}
+		}
+	}
+}
+
+
+
+__END__
+	my $z80 = ($cpu =~ /z80/);
+	my $z180 = ($cpu =~ /z180/);
+	my $zilog = ($cpu =~ /^z/);
+	
+	# 8-bit load group
+	for my $r (0..7) {
+		for my $s (0..7) {
+			my $op = 0x40 + $r*8 + $s;
+			
+			if ($op != 0x76) {
+				my @ops = (["ld $R8[$r],$R8[$s]", $op]);
+				@ops = expand_ix8(@ops) if $z80;
+				@ops = expand_ind_ix(@ops);
+				
+				add_ops($cpu, @ops);
+				add_ix8($cpu, "ld $R8[$r1],$R8[$r2]", $op);
+				add_iix($cpu, "ld $R8[$r1],$R8[$r2]", $op);
+				if ($cpu =~ /^r/) {
+					if ($r1 != 6) {
+						add_ops($cpu, "altd ld $R8[$r1],$R8[$r2]", $ALTD, $op);
+						add_ops($cpu, "ld $R8[$r1]',$R8[$r2]", $ALTD, $op);
+					}
+					elsif ($r1 == 6 || $r2 == 6) {
+						add_ops($cpu, "ioi ld $R8[$r1],$R8[$r2]", $IOI, $op);
+						add_ops($cpu, "ioe ld $R8[$r1],$R8[$r2]", $IOE, $op);
+					}
+				}
+			}
+		}
+	}
+}
+
+sub add_ops {
+	my($cpu, @ops) = @_;
+
+	for (@ops) {
+		my($asm, @bin) = @$_;
+
+		$Opcodes{$asm}{$cpu} and die "$cpu, $asm, @bin";
+		$Opcodes{$asm}{$cpu} = \@bin;
+	}
+}
+
+
+sub expand_ix8 {
+	my(@ops) = @_;
+	my @ret;
+	
+	for (@ops) {
+		my($asm, @bin) = @$_;
+
+		push @ret, [$asm, $bin];
+
+		if ($asm !~ /hl|ix|iy/) {
+			if ((my $asm1 = $asm) =~ s/\b([lh])\b/ix$1/g) {
+				push @ret, [$asm1, $IX, @bin];
+			}
+
+			if ((my $asm1 = $asm) =~ s/\b([lh])\b/iy$1/g) {
+				push @ret, [$asm1, $IX, @bin];
+			}
+		}
+	}
+	
+	return @ret;
+}
+
+sub expand_ind_ix {
+	my(@ops) = @_;
+	my @ret;
+	
+	for (@ops) {
+		my($asm, @bin) = @$_;
+
+		push @ret, [$asm, @bin];
+
+		if ((my $asm1 = $asm) =~ s/\(hl\)/ix+%d/g) {
+			push @ret, [$asm1, $IX, @bin[0..1], '%d', @bin[2..$#bin]];
+			$asm1 =~ s/+%d\b//; 
+			push @ret, [$asm1, $IX, @bin[0..1], 0, @bin[2..$#bin]];
+		}
+
+		if ((my $asm1 = $asm) =~ s/\(hl\)/iy+%d/g) {
+			push @ret, [$asm1, $IY, @bin[0..1], '%d', @bin[2..$#bin]];
+			$asm1 =~ s/+%d\b//; 
+			push @ret, [$asm1, $IY, @bin[0..1], 0, @bin[2..$#bin]];
+		}
+	}
+	
+	return @ret;
+}
+

@@ -14,7 +14,7 @@ for my $file (<codegen/cpu_test*.asm>) {
 	my $base = basename($file, ".asm");
 	my $ok = $base =~ s/_ok//; $base =~ s/_err//;
 	my $ixiy = $base =~ s/_ixiy//;
-	my($cpu) = $base =~ /cpu_test_(\w+)$/;
+	my($cpu) = $base =~ /cpu_test(?:old)?_(\w+)$/; $cpu =~ tr/_/-/;
 	
 	# build command line
 	my $cmd = "z80asm --cpu=$cpu --no-emul ".

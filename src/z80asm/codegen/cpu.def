@@ -12,15 +12,15 @@
 ;------------------------------------------------------------------------------
 ; 8-bit load group
 ;------------------------------------------------------------------------------
-		ALTD ld {b|c|d|e|h|l||a}, {b|c|d|e|h|l|(hl)|a} \
-												=> 40+$1*8+$2
-		ALTD ld {b|c|d|e|h|l||a}, N				=> 06+$1*8 N
+		; ALTD ld {b|c|d|e|h|l||a}, {b|c|d|e|h|l|(hl)|a} \
+												; => 40+$1*8+$2
+		; ALTD ld {b|c|d|e|h|l||a}, N				=> 06+$1*8 N
 
-			ld	(hl), {b|c|d|e|h|l||a}			=> 70+$1
-			ld	(hl), N							=> 36 N
+			; ld	(hl), {b|c|d|e|h|l||a}			=> 70+$1
+			; ld	(hl), N							=> 36 N
 
-		ALTD ld a, (NN) 						=> 3A NNl NNh
-		IO   ld a, (NN) 						=> 3A NNl NNh
+		; ALTD ld a, (NN) 						=> 3A NNl NNh
+		; IO   ld a, (NN) 						=> 3A NNl NNh
 			ld	(NN), a 						=> 32 NNl NNh
 
 		ALTD ld a, {(bc)|(de)}					=> 0A+$1*10
