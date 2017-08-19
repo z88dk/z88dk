@@ -83,6 +83,14 @@
 	and	a
 	rr	de
 
+	ld	a,2
+	call	l_long_aslo
+=
+	add	hl,hl
+	rl	de
+	add	hl,hl
+	rl	de
+
 %check -128 <= %1 <= 126
 	inc	hl
 	ld	hl,(hl + %1)
