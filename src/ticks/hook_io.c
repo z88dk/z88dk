@@ -67,9 +67,8 @@ static void cmd_openfile(void)
     int   slot = find_slot();
 
     l = h = 255; 
-
     if ( slot != -1 ) {
-        int fd = open(filename, flags, mode);
+        int fd = open(filename, flags);
         
         if ( fd != -1 ) {
             slots[slot] = fd;
@@ -109,23 +108,23 @@ static void cmd_writebyte(void)
 static void cmd_readbyte(void)
 {
     char  val;
-    int   ret = -1;
+    int ret;
 
     CHECK_FD();
-
     if ( read(slots[b], &val, 1) == 1 ) {
         ret = val;
         SET_ERROR(Z88DK_ENONE);
     } else {
+        ret = 65535;
         SET_ERROR(normalise_errno());
     }
-    l = ret;
-    h = 0;
+    l = ret % 256;
+    h = ret / 256;
 }
 
 static void cmd_writeblock(void)
 {
-    int   ret = -1;
+    int ret = -1;
 
     CHECK_FD();
 
@@ -133,6 +132,7 @@ static void cmd_writeblock(void)
     if ( ret != -1 ) {
         SET_ERROR(Z88DK_ENONE);
     } else {
+        ret = 65535;
         SET_ERROR(normalise_errno());
     }
     l = ret % 256;

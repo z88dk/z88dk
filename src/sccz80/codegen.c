@@ -1296,7 +1296,11 @@ void quikmult(int type, int32_t size, char preserve)
         if (preserve)
             ol("push\tde");
         const2(size);
-        callrts("l_mult"); /* WATCH OUT!! */
+        if ( c_cpu == CPU_Z80ZXN ) {
+            ol("mul");
+        } else {
+            callrts("l_mult"); /* WATCH OUT!! */
+        }
         if (preserve)
             ol("pop\tde");
         break;
@@ -1421,7 +1425,11 @@ void mult(LVALUE* lval)
         Zsp += 6;
         break;
     default:
-        callrts("l_mult");
+        if ( c_cpu == CPU_Z80ZXN ) {
+            ol("mul");
+        } else {
+            callrts("l_mult"); 
+        }
     }
 }
 
@@ -2064,7 +2072,11 @@ void inc(LVALUE* lval)
         break;
     case LONG:
     case CPTR:
-        callrts("l_inclong");
+        if ( c_cpu == CPU_Z80ZXN ) {
+            ol("inc\tdehl");
+        } else {
+            callrts("l_inclong");
+        }
         break;
     default:
         ol("inc\thl");
@@ -2088,7 +2100,11 @@ void dec(LVALUE* lval)
         break;
     case LONG:
     case CPTR:
-        callrts("l_declong");
+        if ( c_cpu == CPU_Z80ZXN ) {
+            ol("dec\tdehl");
+        } else {
+            callrts("l_declong");
+        }
         break;
     default:
         ol("dec\thl");
@@ -2624,9 +2640,14 @@ void constbc(int32_t val)
 
 void addbchl(int val)
 {
-    ot("ld\tbc,");
-    outdec(val);
-    outstr("\n\tadd\thl,bc\n");
+    if ( c_cpu == CPU_Z80ZXN ) {
+        ot("add\thl,");
+        outdec(val); nl();
+    } else {
+        ot("ld\tbc,");
+        outdec(val);
+        outstr("\n\tadd\thl,bc\n");
+    }
 }
 
 /* Load accumulator with lower half of int */

@@ -39,9 +39,6 @@ FILE *freopen(const char *name, const char *mode, FILE *fp)
 	    flags ^= _IOTEXT;
 #endif
 
-#ifdef NET_STDIO
-	if (opennet(fp,name) ) return (fp);
-#endif
 	{
 
 		// Others, pass int mode

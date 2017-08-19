@@ -16,9 +16,7 @@
 
 int fflush(FILE *fp)
 {
-#ifdef Z80
 #asm
-#ifdef NET_STDIO
 	pop	bc
 	pop	hl
 	push	hl
@@ -28,29 +26,20 @@ int fflush(FILE *fp)
 	ld	d,(hl)
 	inc	hl
 	ld	a,(hl)
-	and	_IOUSE|_IONETWORK
+	and	_IOUSE|_IOEXTRA
 	jr	z,fflush_error 	;not used
-	push	de
-	call	fflush_net
-	pop	bc
-        ret
+	push	ix	;save callers ix
+	dec	hl
+	dec	hl	;hl = fp
+	push	hl
+	pop	ix
+	ld	a,__STDIO_MSG_FLUSH
+	ld	l,(ix+fp_extra)
+	ld	h,(ix+fp_extra+1)
+	jp	l_jphl
 .fflush_error
 	ld	hl,-1	; EOF
-	ret
-#else
-	ld	hl,0
-#endif
 #endasm
-#else
-#ifdef NET_STDIO
-	if	(fp->flags&(_IOUSE|_IONETWORK) == _IOUSE|_IONETWORK ) {
-		return (fflush_net(fp->desc.fd));
-	}
-	return 0;
-#else
-	return 0;
-#endif
-#endif
 }
 
 

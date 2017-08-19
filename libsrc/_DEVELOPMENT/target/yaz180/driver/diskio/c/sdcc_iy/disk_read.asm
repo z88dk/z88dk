@@ -20,8 +20,9 @@ EXTERN asm_disk_read
 ;
 
 _disk_read:
+    pop af      ; pop return address
+    ex af,af
 
-    pop ix      ; pop return address
     inc sp      ; drop single byte pdrv (not evaluated)
     pop hl      ; buff to hl
     pop de      ; start sector to bcde
@@ -39,7 +40,8 @@ _disk_read:
     push de
     push hl
     dec sp      ; leave a byte for pdrv (not used)
-    
-    push ix     ; push return address
-    
+
+    ex af,af
+    push af     ; push return address
+
     ret

@@ -166,7 +166,7 @@ char		*argv[];
 		argv[j++] = argv[i];
 	    else {
 		c = *ap++;			/* Option byte		*/
-		if (islower(c))			/* Normalize case	*/
+		if (c != 'i')			/* Normalize case	*/
 		    c = toupper(c);
 		switch (c) {			/* Command character	*/
 		case 'C':			/* Keep comments	*/
@@ -202,6 +202,15 @@ char		*argv[];
 		case 'P':			/* No #line 		*/
 		    pflag = TRUE;
 		    break;
+
+        case 'i':			/* -isystem, -iquote, treat as -I	*/
+            if (!strncmp(ap, "system", 6))
+                ap += 6;
+            else if (!strncmp(ap, "quote", 5))
+                ap += 5;
+
+            /* fall through to -I */
+
 		case 'I':			/* Include directory	*/
 		    if (incend >= &incdir[MAXINCLUDE])
 			cfatal("Too many include directories", NULLST);
@@ -266,6 +275,8 @@ char		*argv[];
                     "  -C\t\t\tWrite source file comments to output\n"
                     "  -Dsymbol=value\tDefine a symbol with the given (optional) value\n"
                     "  -Idirectory\t\tAdd a directory to the #include search list\n"
+                    "  -iquoteDIRECTORY\tSynonym for -I\n"
+                    "  -isystemDIRECTORY\tSynonym for -I\n"
                     "  -N\t\t\tDon't predefine target-specific names\n"
                     "  -Stext\t\tSpecify sizes for #if sizeof\n"
                     "  -Usymbol\t\tUndefine symbol\n"

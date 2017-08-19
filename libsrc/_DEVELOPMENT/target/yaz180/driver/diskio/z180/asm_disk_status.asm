@@ -11,7 +11,7 @@ PUBLIC asm_disk_status
 ; l = drive number, must be 0
 ;
 ; exit
-; l = DSTATUS, set carry flag
+; hl = DSTATUS, set carry flag
 ;
 
 ; get the ide drive status
@@ -22,13 +22,13 @@ asm_disk_status:
     or l            ; check that that it is drive 0
     jr nz, sta_nodisk
 
-    ld l, 0         ; set DSTATUS OK
+    ld hl, 0        ; set DSTATUS OK
     pop af
     scf
     ret
 
 sta_nodisk:
-    ld l, 2         ; set DSTATUS STA_NODISK
+    ld hl, 2        ; set DSTATUS STA_NODISK
     pop af
     or a
     ret

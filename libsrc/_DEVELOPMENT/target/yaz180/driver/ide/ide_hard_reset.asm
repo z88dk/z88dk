@@ -8,6 +8,8 @@ EXTERN __IO_PIO_IDE_RD
 
 EXTERN  __IO_IDE_RST_LINE
 
+EXTERN ide_wait_ready
+
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
@@ -27,11 +29,14 @@ ide_hard_reset:
     out (c),a           ;hard reset the disk drive
     ld b, $0
 ide_rst_dly:
-    djnz ide_rst_dly   ;delay 256 nop 150us (reset minimum 25us)
+    djnz ide_rst_dly    ;delay 256 nop 150us (reset minimum 25us)
     ld bc, __IO_PIO_IDE_CTL
     xor a
     out (c),a           ;no ide control lines asserted
+    ld b, $0
+ide_rst_dly2:
+    djnz ide_rst_dly2   ;delay 256 nop 150us
     pop bc
     pop af
-    ret
+    jp ide_wait_ready
 
