@@ -59,14 +59,22 @@ fpos_t ftell(FILE *fp)
 	; Call the seek function via the trampoline
 	dec	hl
 	dec	hl
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	ix,hl
+ELSE
 	push	hl
 	pop	ix	;ix = fp
+ENDIF
 	ld	de,0	;posn
 	ld	bc,0
 	ld	a,SEEK_CUR
 	ex	af,af
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+fp_extra)
+ELSE
 	ld	l,(ix+fp_extra)
 	ld	h,(ix+fp_extra+1)
+ENDIF
 	ld	a,__STDIO_MSG_SEEK
 	call	l_jphl
 #endasm

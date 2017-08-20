@@ -28,6 +28,11 @@ int fgetc(FILE *fp)
 {
 //#ifdef Z80
 #asm
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(sp + 2)
+	push	ix		;save callers ix
+	ld	ix,sp
+ELSE
 	pop	bc
 	pop	hl	; fp
 	push	hl
@@ -35,6 +40,7 @@ int fgetc(FILE *fp)
 	push	ix	; callers ix
 	push	hl
 	pop	ix
+ENDIF
 
 	ld	hl,-1	;EOF
 	ld	a,(ix+fp_flags)	;get flags
@@ -78,8 +84,12 @@ int fgetc(FILE *fp)
 	ld	a,(ix+fp_flags)
 	and	_IOEXTRA
 	jr	z,not_extra_fp
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix + fp_extra)
+ELSE
 	ld	l,(ix+fp_extra)
 	ld	h,(ix+fp_extra+1)
+ENDIF
 	ld	a,__STDIO_MSG_GETC
 	call	l_jphl
 	jr	nc, fgetc_end
@@ -100,8 +110,12 @@ int fgetc(FILE *fp)
 	pop	hl
 	jr	fgetc_end	; always succeeds - never EOF when EOF has not been defined.
 .no_stdin
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+fp_desc)
+ELSE
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
+ENDIF
 	push	ix
 	call	readbyte	; readbyte sorts out stack (fastcall)
 	pop	ix		; get fp back
