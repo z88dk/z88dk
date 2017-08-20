@@ -19,7 +19,7 @@ Contact the author:
 =========================================================================*/
 
 #include <stdlib.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 main() {
 	u_int addr;

@@ -6,11 +6,11 @@
 
 */
 
-#include "stdio.h"
-#include "malloc.h"
-#include "graphics.h"
-#include "games.h"
-#include "gui.h"
+#include <stdio.h>
+#include <malloc.h>
+#include <graphics.h>
+#include <games.h>
+#include <gui.h>
 #include <ctype.h>
 
 #define HPSIZE 2048

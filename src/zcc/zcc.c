@@ -453,8 +453,8 @@ static arg_t     myargs[] = {
 	{ "D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option" },
 	{ "U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option" },
 	{ "I", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
-    { "iquote", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a quoted include path for the preprocessor" },
-    { "isystem", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a system include path for the preprocessor" },
+	{ "iquote", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a quoted include path for the preprocessor" },
+	{ "isystem", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a system include path for the preprocessor" },
 	{ "L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path" },
 	{ "l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library" },
 	{ "O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt" },
@@ -2041,11 +2041,9 @@ void BuildOptionsQuoted(char **list, char *arg)
     if (len > 0)
     {
         zcc_asprintf(&val, "%s%.*s\"%s\" ", orig ? orig : "", len, arg, arg+len);
-
         free(orig);
         *list = val;
-    }
-    else
+    } else
         BuildOptions(list, arg);
 }
 

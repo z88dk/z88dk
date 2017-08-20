@@ -202,15 +202,13 @@ char		*argv[];
 		case 'P':			/* No #line 		*/
 		    pflag = TRUE;
 		    break;
-
-        case 'i':			/* -isystem, -iquote, treat as -I	*/
-            if (!strncmp(ap, "system", 6))
-                ap += 6;
-            else if (!strncmp(ap, "quote", 5))
-                ap += 5;
-
-            /* fall through to -I */
-
+		case 'i':
+			if ( strncmp(arg + 1, "iquote", 6) == 0 && quoteend < &quotedir[MAXINCLUDE]) {
+				*quoteend++ = arg + strlen("-iquote");
+			} else if ( strncmp(arg + 1, "isystem", 7) == 0 && systemend < &systemdir[MAXINCLUDE]) {
+				*systemend++ = arg + strlen("-isystem");
+			}
+		    break;
 		case 'I':			/* Include directory	*/
 		    if (incend >= &incdir[MAXINCLUDE])
 			cfatal("Too many include directories", NULLST);
