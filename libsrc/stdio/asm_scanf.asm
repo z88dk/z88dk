@@ -35,9 +35,13 @@ asm_scanf:
 	ld	ix,0
 	add	ix,sp		; Now the frame pointer
 				; ix+2, ix+3 = arg pointer
+IF __CPU_R2K__ | __CPU_R3K__
+	add	sp,-50
+ELSE
 	ld	hl,-50		; make some space on the stack
 	add	hl,sp
 	ld	sp,hl
+ENDIF
 
 	; -1, -2 = conversions done
         ; -3 = flags [000a*WL0]
@@ -50,8 +54,12 @@ asm_scanf:
 	ld	(ix-4),a
 	ld	(ix-5),a
 
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+4)
+ELSE
         ld      l,(ix+4)        ;format pointer
         ld      h,(ix+5)
+ENDIF
 
 scanf_loop:
 __scanf_noop:			;noop destination
@@ -89,9 +97,13 @@ scanf_exit:
 	ld	e,(ix-1)
 	ld	d,0
 scanf_exit2:
+IF __CPU_R2K__ | __CPU_R3K__
+	add	sp,50
+ELSE
 	ld	hl,50
 	add	hl,sp
 	ld	sp,hl
+ENDIF
 	ex	de,hl
 	ret
 
@@ -166,8 +178,12 @@ format_nomatch:
 
 __scanf_nextarg:
 	push	hl	;hl=fmt, save it
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+2)
+ELSE
 	ld	l,(ix+2)
 	ld	h,(ix+3)
+ENDIF
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)		;de = buffer, hl=ap+1
@@ -175,8 +191,12 @@ __scanf_nextarg:
 	jr	nz,__scanf_nextarg_decrement
 	inc	hl
 __scanf_nextarg_exit:
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	(ix+2),hl
+ELSE
 	ld	(ix+2),l
 	ld	(ix+3),h
+ENDIF
 	pop	hl	;restore fmt
 	ret
 __scanf_nextarg_decrement:
@@ -191,8 +211,12 @@ __scanf_getchar:
 	push	bc		;save callers
 	push	de		;save dest
 	push	hl		;fmt
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+8)
+ELSE
 	ld	l,(ix+8)	;fp
 	ld	h,(ix+9)
+ENDIF
 	push	hl
 	call	fgetc
 	pop	bc

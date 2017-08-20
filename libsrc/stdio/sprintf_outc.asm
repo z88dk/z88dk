@@ -6,6 +6,12 @@
 
 
 sprintf_outc:
+IF __CPU_R2K__ | __CPU_R3K__
+	push	ix			;save ix
+	ld	ix,(sp+4)		;fp
+	ld	hl,(sp+6)		;character
+	ex	de,hl
+ELSE
 	pop	bc
 	pop	hl	;fp
 	pop	de	;charcter
@@ -13,6 +19,7 @@ sprintf_outc:
 	push	ix	;save ix
 	push	hl	;get fp into ix
 	pop	ix
+ENDIF
 
 	ld	c,(ix+2)
 	ld	b,(ix+3)
@@ -22,8 +29,12 @@ sprintf_outc:
 	dec	bc		;reduce space
 	ld	(ix+2),c
 	ld	(ix+3),b
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+0)
+ELSE
 	ld	l,(ix+0)
 	ld	h,(ix+1)
+ENDIF
 	ld	a,b		;make sure we can terminate
 	or	c
 	jr	z,just_terminate
@@ -31,8 +42,12 @@ sprintf_outc:
 	inc	hl
 just_terminate:
 	ld	(hl),0
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	(ix+0),hl
+ELSE
 	ld	(ix+0),l
 	ld	(ix+1),h
+ENDIF
 no_space:
 	pop	ix
 	ret
