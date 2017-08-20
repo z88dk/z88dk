@@ -28,9 +28,7 @@ asm_esxdos_f_readdir:
    ; of dir. FIXME-A should return size of entry, 0 if end of dir.
    ;
    ; enter :     a = uchar handle
-   ;         ix/hl = void *buf
-   ;
-   ; note  : hl is the parameter for dot commands and ix is used otherwise
+   ;            hl = void *buf
    ;
    ; exit  : success
    ;
@@ -43,6 +41,14 @@ asm_esxdos_f_readdir:
    ;            carry set, errno set
    ;
    ; uses  : unknown
+
+IF __SDCC_IY
+   push hl
+   pop iy
+ELSE
+   push hl
+   pop ix
+ENDIF
 
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_READDIR
