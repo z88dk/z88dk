@@ -183,8 +183,7 @@ copy_word:
     dec hl
     ldi                 ; Get LSB byte, Copy it
     inc hl
-    ld a, b             ; Continue until BC = 00
-    or c
-    jr nz, copy_word
+    jp pe, copy_word    ; Continue until BC = 00 (p/v reset)
+    xor a
     ld (de), a          ; add a null on the end of the string
     ret
