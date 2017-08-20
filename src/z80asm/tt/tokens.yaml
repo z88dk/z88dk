@@ -321,12 +321,14 @@ tokens:
 
   # Z80-ZXN specific opcodes
   - name    : SWAPNIB
+  - name    : SWAP
   - name    : MUL
   - name    : OUTINB
   - name    : LDIX
   - name    : LDIRX
   - name    : LDDX
   - name    : LDDRX
+  - name    : FILL
   - name    : FILLDE
   - name    : MIRROR
   - name    : POPX
@@ -334,6 +336,7 @@ tokens:
   - name    : PIXELDN
   - name    : PIXELAD
   - name    : SETAE
+  - name    : TEST
 
   # Z180 specific opcodes
   - name	: SLP 

@@ -182,33 +182,36 @@
 #define _TK_SUB	177
 #define _TK_XOR	178
 #define _TK_SWAPNIB	179
-#define _TK_MUL	180
-#define _TK_OUTINB	181
-#define _TK_LDIX	182
-#define _TK_LDIRX	183
-#define _TK_LDDX	184
-#define _TK_LDDRX	185
-#define _TK_FILLDE	186
-#define _TK_MIRROR	187
-#define _TK_POPX	188
-#define _TK_NEXTREG	189
-#define _TK_PIXELDN	190
-#define _TK_PIXELAD	191
-#define _TK_SETAE	192
-#define _TK_SLP	193
-#define _TK_MLT	194
-#define _TK_IN0	195
-#define _TK_OUT0	196
-#define _TK_OTIM	197
-#define _TK_OTIMR	198
-#define _TK_OTDM	199
-#define _TK_OTDMR	200
-#define _TK_TST	201
-#define _TK_TSTIO	202
-#define _TK_CALL_OZ	203
-#define _TK_CALL_PKG	204
-#define _TK_FPP	205
-#define _TK_INVOKE	206
+#define _TK_SWAP	180
+#define _TK_MUL	181
+#define _TK_OUTINB	182
+#define _TK_LDIX	183
+#define _TK_LDIRX	184
+#define _TK_LDDX	185
+#define _TK_LDDRX	186
+#define _TK_FILL	187
+#define _TK_FILLDE	188
+#define _TK_MIRROR	189
+#define _TK_POPX	190
+#define _TK_NEXTREG	191
+#define _TK_PIXELDN	192
+#define _TK_PIXELAD	193
+#define _TK_SETAE	194
+#define _TK_TEST	195
+#define _TK_SLP	196
+#define _TK_MLT	197
+#define _TK_IN0	198
+#define _TK_OUT0	199
+#define _TK_OTIM	200
+#define _TK_OTIMR	201
+#define _TK_OTDM	202
+#define _TK_OTDMR	203
+#define _TK_TST	204
+#define _TK_TSTIO	205
+#define _TK_CALL_OZ	206
+#define _TK_CALL_PKG	207
+#define _TK_FPP	208
+#define _TK_INVOKE	209
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -393,32 +396,35 @@ typedef enum tokid_t
 	TK_SUB	= 177,
 	TK_XOR	= 178,
 	TK_SWAPNIB	= 179,
-	TK_MUL	= 180,
-	TK_OUTINB	= 181,
-	TK_LDIX	= 182,
-	TK_LDIRX	= 183,
-	TK_LDDX	= 184,
-	TK_LDDRX	= 185,
-	TK_FILLDE	= 186,
-	TK_MIRROR	= 187,
-	TK_POPX	= 188,
-	TK_NEXTREG	= 189,
-	TK_PIXELDN	= 190,
-	TK_PIXELAD	= 191,
-	TK_SETAE	= 192,
-	TK_SLP	= 193,
-	TK_MLT	= 194,
-	TK_IN0	= 195,
-	TK_OUT0	= 196,
-	TK_OTIM	= 197,
-	TK_OTIMR	= 198,
-	TK_OTDM	= 199,
-	TK_OTDMR	= 200,
-	TK_TST	= 201,
-	TK_TSTIO	= 202,
-	TK_CALL_OZ	= 203,
-	TK_CALL_PKG	= 204,
-	TK_FPP	= 205,
-	TK_INVOKE	= 206,
+	TK_SWAP	= 180,
+	TK_MUL	= 181,
+	TK_OUTINB	= 182,
+	TK_LDIX	= 183,
+	TK_LDIRX	= 184,
+	TK_LDDX	= 185,
+	TK_LDDRX	= 186,
+	TK_FILL	= 187,
+	TK_FILLDE	= 188,
+	TK_MIRROR	= 189,
+	TK_POPX	= 190,
+	TK_NEXTREG	= 191,
+	TK_PIXELDN	= 192,
+	TK_PIXELAD	= 193,
+	TK_SETAE	= 194,
+	TK_TEST	= 195,
+	TK_SLP	= 196,
+	TK_MLT	= 197,
+	TK_IN0	= 198,
+	TK_OUT0	= 199,
+	TK_OTIM	= 200,
+	TK_OTIMR	= 201,
+	TK_OTDM	= 202,
+	TK_OTDMR	= 203,
+	TK_TST	= 204,
+	TK_TSTIO	= 205,
+	TK_CALL_OZ	= 206,
+	TK_CALL_PKG	= 207,
+	TK_FPP	= 208,
+	TK_INVOKE	= 209,
 } tokid_t;
 #endif
