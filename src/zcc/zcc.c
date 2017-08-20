@@ -367,7 +367,7 @@ static arg_t  config[] = {
 	{ "COPTEXE", 0, SetStringConfig, &c_copt_exe, NULL, "" },
 	{ "COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, "" },
 
-	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-I\"DESTDIR/include\" " },
+	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-isystem\"DESTDIR/include\" " },
 	{ "CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "-isystem \"DESTDIR/include/_DEVELOPMENT/clang\" " },
 	{ "M4OPTS", 0, SetStringConfig, &c_m4opts, NULL, "", " -I \"DESTDIR/src/m4\" " },
 	{ "COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "\"DESTDIR/lib/z80rules.1\"" },
