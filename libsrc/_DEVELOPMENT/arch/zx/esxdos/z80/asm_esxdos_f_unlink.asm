@@ -17,9 +17,7 @@ asm_esxdos_f_unlink:
    ; A=drive, HL=pointer to asciiz file/path
    ;
    ; enter :     a = uchar drive
-   ;         ix/hl = void *filename
-   ;
-   ; note  : hl is the parameter for dot commands and ix is used otherwise
+   ;            hl = void *filename
    ;
    ; exit  : success
    ;
@@ -32,7 +30,15 @@ asm_esxdos_f_unlink:
    ;            carry set, errno set
    ;
    ; uses  : unknown
-   
+
+IF __SDCC_IY
+   push hl
+   pop iy
+ELSE
+   push hl
+   pop ix
+ENDIF
+
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_UNLINK
    

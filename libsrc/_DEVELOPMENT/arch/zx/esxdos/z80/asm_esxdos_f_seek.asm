@@ -18,9 +18,7 @@ asm_esxdos_f_seek:
    ;
    ; enter :     a = uchar handle
    ;          bcde = ulong seek distance
-   ;         ixl/l = uchar whence
-   ;
-   ; note  : hl is the parameter for dot commands and ix is used otherwise
+   ;             l = uchar whence
    ;
    ; exit  : success
    ;
@@ -33,7 +31,15 @@ asm_esxdos_f_seek:
    ;            carry set, errno set
    ;
    ; uses  : unknown
-   
+
+IF __SDCC_IY
+   push hl
+   pop iy
+ELSE
+   push hl
+   pop ix
+ENDIF
+
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_SEEK
    

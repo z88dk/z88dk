@@ -211,6 +211,10 @@ extern int	recursion;			/* Macro depth counter		*/
 extern char	ifstack[BLK_NEST];	/* #if information		*/
 #define	compiling ifstack[0]
 extern char	*ifptr;				/* -> current ifstack item	*/
+extern char *quotedir[NINCLUDE];
+extern char **quoteend;
+extern char *systemdir[NINCLUDE];
+extern char **systemend;
 extern char	*incdir[NINCLUDE];	/* -i directories		*/
 extern char	**incend;			/* -> active end of incdir	*/
 extern int	cflag;				/* -C option (keep comments)	*/

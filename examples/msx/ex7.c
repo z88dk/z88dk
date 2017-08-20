@@ -20,7 +20,7 @@ Contact the author:
 
 // note: this is my personal favorite demo :) - Rafael
 
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 // shapes and attributes
 

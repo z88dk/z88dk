@@ -16,8 +16,10 @@
  */
 
 #define ANSI_STDIO
-
+#define STDIO_ASM
 #include <stdio.h>
+
+static int fread1(void *ptr, size_t len, FILE *fp) __z88dk_callee;
 
 int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
@@ -42,7 +44,7 @@ int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 		    /* Horrible hack around here */
 		    if ( c >= 0 ) {
 			*ptr = (unsigned char )c;
-			readen=read(fp->desc.fd,ptr+1,readen-1);
+			readen=fread1(ptr+1,readen-1,fp);
 			++readen;
 			/* Return number of members read */
 			return (readen/size);
@@ -53,4 +55,36 @@ int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 	return 0;
 }
 
+
+#ifndef __STDIO_BINARY
+
+#asm
+; (buf, size, fp)
+_fread1:
+        pop     hl
+        pop     ix              ;fp
+        pop     bc              ;size
+        pop     de              ;buf
+        push    hl              ;restore return address
+        ld      a,(ix+fp_flags)
+        and     _IOEXTRA
+        jr      z,fread_direct
+        ; Calling via the extra hook
+        ld      l,(ix+fp_extra)
+        ld      h,(ix+fp_extra+1)
+        ld      a,__STDIO_MSG_READ
+        jp      l_jphl
+fread_direct:
+        ld      l,(ix+fp_desc)
+        ld      h,(ix+fp_desc+1)
+        push    hl
+        push    de
+        push    bc
+        call    read
+        pop     bc
+        pop     bc
+        pop     bc
+        ret
+#endasm
+#endif
 

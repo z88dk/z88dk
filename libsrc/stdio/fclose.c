@@ -20,7 +20,6 @@
 
 int __FASTCALL__ fclose(FILE *fp)
 {
-#ifdef Z80
 #asm
 	pop	de
 	pop	hl
@@ -40,17 +39,23 @@ fclose_inuse:
 	ld	a,(hl)
 	and	_IOSTRING
 	jr	nz,fclose_success
-#ifdef NET_STDIO
 	ld	a,(hl)
-	and	_IONETWORK
+	and	_IOEXTRA
 	jr	z,fclose_no_net
-
-	push	de
+; We have to go via trampoline here
+	push	hl	;save flags pointer
+	dec	hl
+	dec	hl	;hl = fp
+	push	ix	;Save callers ix
 	push	hl
-	call	closenet
+	pop	ix	;ix = fp
+	ld	l,(ix+fp_extra)
+	ld	h,(ix+fp_extra+1)
+	ld	a,__STDIO_MSG_CLOSE
+	call	l_jphl
+	pop	ix	;restore callers ix
 	jr	fclose_check_success
 fclose_no_net:
-#endif
 	ld	a,(hl)
 	and	_IOSYSTEM
 	jr	nz, fclose_success
@@ -58,8 +63,8 @@ fclose_no_net:
 	push	hl	; points to flags
 	push	de
 	call	close
-fclose_check_success:
 	pop	bc	;fd
+fclose_check_success:
 	pop	de	;flags pointer
 	ld	a,h	; an error
 	or	l
@@ -74,14 +79,4 @@ fclose_success:
 	ld	(hl),e
 	ex	de,hl
 #endasm
-#else
-        if ( (fp->flags&_IOUSE ==0 )  ||  (fp->flags&_IOSTRING) )  return(EOF);
-
-	if (fchkstd(fp) == 0 ) {
-		if (close(fp->desc.fd) ) return EOF;
-	}
-	fp->desc.fd=0;
-	fp->flags=0;
-	return 0;
-#endif
 }

@@ -25,11 +25,9 @@ asm_esxdos_f_open:
    ; On return if OK, A=file handle.
    ;
    ; enter :     a = uchar drive
-   ;         ix/hl = char *filename
+   ;            hl = char *filename
    ;             b = mode (__ESXDOS_MODE_*)
    ;            de = (optional) dst for +3 header (mode contains __ESXDOS_MODE_USE_HEADER)
-   ;
-   ; note  : hl is the parameter for dot commands and ix is used otherwise
    ;
    ; exit  : success
    ;
@@ -42,7 +40,15 @@ asm_esxdos_f_open:
    ;            carry set, errno set
    ;
    ; uses  : unknown
-   
+
+IF __SDCC_IY
+   push hl
+   pop iy
+ELSE
+   push hl
+   pop ix
+ENDIF
+
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_OPEN
    

@@ -20,7 +20,7 @@ Contact the author:
 
 #include <stdio.h>
 #include <math.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 typedef struct {
 	int x;
