@@ -273,12 +273,12 @@ char		*argv[];
                     "  -C\t\t\tWrite source file comments to output\n"
                     "  -Dsymbol=value\tDefine a symbol with the given (optional) value\n"
                     "  -Idirectory\t\tAdd a directory to the #include search list\n"
-                    "  -iquoteDIRECTORY\tSynonym for -I\n"
-                    "  -isystemDIRECTORY\tSynonym for -I\n"
+                    "  -iquoteDIRECTORY\tAdd a directory to the quoted #include search list\n"
+                    "  -isystemDIRECTORY\tAdd a directory to the system #include search list\n"
                     "  -N\t\t\tDon't predefine target-specific names\n"
                     "  -Stext\t\tSpecify sizes for #if sizeof\n"
                     "  -Usymbol\t\tUndefine symbol\n"
-		    "  -P\t\t\tDon't produce # lines\n");
+		            "  -P\t\t\tDon't produce # lines\n");
 #if DEBUG
 		    fprintf(stderr, "  -Xvalue\t\tSet internal debug flag\n");
 #endif
