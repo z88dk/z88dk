@@ -1156,6 +1156,56 @@ t_z80asm_error("otdmr		", "Error at file 'test.asm' line 1: illegal identifier")
 t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier");
 t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
+#------------------------------------------------------------------------------
+# __CPU_xxx_contants___
+#------------------------------------------------------------------------------
+write_file("test.asm", <<END);
+	if __CPU_Z80__
+	defb 1
+	else 
+	if __CPU_Z80_ZXN__
+	defb 2
+	else
+	if __CPU_Z180__
+	defb 3
+	else
+	if __CPU_R2K__
+	defb 4
+	else
+	if __CPU_R3K__
+	defb 5
+	else
+	defb 6
+	endif
+	endif
+	endif
+	endif
+	endif
+END
+
+unlink "test.bin";
+t_z80asm_capture('-b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\1");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=z80 -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\1");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=z80-zxn -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\2");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=z180 -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\3");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=r2k -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\4");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=r3k -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\5");
 
 unlink_testfiles();
 done_testing();

@@ -346,6 +346,8 @@ int main( int argc, char *argv[] )
 	/* If filename starts with '@', reads the file as a list of filenames
 	*	and assembles each one in turn */
 	parse_argv(argc, argv);
+	define_assembly_defines();
+
 	for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
 		assemble_file(*pfile);
 
