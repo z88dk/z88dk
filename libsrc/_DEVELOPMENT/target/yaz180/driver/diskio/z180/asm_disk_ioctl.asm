@@ -90,7 +90,7 @@ get_sector_size:
 
     ld (hl), 0              ; cmd = 2
     inc hl
-    ld (hl), 2              ; set value at pointer to 0x200 (512)
+    ld (hl), 2              ; set value at pointer to 0x0200 (512)
     jr dresult_ok
 
 get_block_size:
@@ -98,7 +98,7 @@ get_block_size:
 
     ld (hl), 1              ; cmd = 3
     inc hl
-    ld (hl), 0              ; set value at pointer to 0x01 sectors
+    ld (hl), 0              ; set value at pointer to 0x0001 sectors
     jr dresult_ok
 
 dresult_error:
@@ -131,7 +131,6 @@ ata_get_rev:
     
     jr nc, dresult_error    
 
-;   ldir
     call copy_word          ; 8 bytes
     jr dresult_ok
 
@@ -148,7 +147,6 @@ ata_get_model:
 
     jr nc, dresult_error
 
-;   ldir
     call copy_word          ; 40 bytes
     jr dresult_ok
      
@@ -165,7 +163,6 @@ ata_get_sn:
 
     jr nc, dresult_error
 
-;   ldir
     call copy_word          ; 20 bytes
     jr dresult_ok
 
@@ -185,8 +182,8 @@ copy_word:
     dec hl
     dec hl
     ldi                 ; Get LSB byte, Copy it
-    ld a, b             ; Continue until BC = 00
-    or c
-    jr nz, copy_word
+    inc hl
+    jp pe, copy_word    ; Continue until BC = 00 (p/v reset)
+    xor a
     ld (de), a          ; add a null on the end of the string
     ret

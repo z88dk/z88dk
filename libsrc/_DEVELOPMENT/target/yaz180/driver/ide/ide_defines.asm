@@ -1,6 +1,6 @@
 
 PUBLIC __IDE_CMD_READ, __IDE_CMD_WRITE
-PUBLIC __IDE_CMD_SLEEP, __IDE_CMD_SPINUP, __IDE_CMD_POWERDOWN
+PUBLIC __IDE_CMD_STANDBY, __IDE_CMD_IDLE, __IDE_CMD_SLEEP
 PUBLIC __IDE_CMD_CACHE_FLUSH, __IDE_CMD_ID
 
 ;==============================================================================
