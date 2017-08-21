@@ -9,6 +9,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] Bug fixes for memrchr() and gets()
 - [classiclib] Compiler intrinsics are now available
 - [classiclib] fmemopen is now available
+- [classiclib] funopen is now available
 - [classiclib] ROM cartridge support for PC6001
 - [classiclib] +test target now supports amalloc and command line arguments
 - [classiclib] printf format %s now supports a precision field
@@ -24,6 +25,8 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +nc100 graphics support has been added
 - [classiclib] +msx fixed an initialisation error that prevented ROMs from
   working correctly
+- [classiclib] +zx ROM screen printer now available
+- [classiclib] +zx Default console font can be changed at compile time (CRT_FONT)
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -49,7 +52,10 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #155: The section names used by sccz80 can now be configured
 - [sccz80] #188: sccz80 now provides builtin functions for memcpy, memset, strcpy, strchr
 - [sccz80] #220: sccz80 now supports __critical blocks and functions
+- [sccz80] #275: don't swallow white space before constant L,U,S modify 
+- [sccz80] ZX Next specific code can be generated
 - [ticks] [classiclib] #101,#106: Now supports the +test target
+- [ticks] [classiclib] File IO is now available
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [zcc] Custom optimisation rules can be supplied with -custom-copt-rules=
 - [zcc] A target must now be supplied to zcc
