@@ -205,6 +205,14 @@ char		*ifptr = ifstack;		/* -> current ifstack[] */
  * incdir[] stores the -i directories (and the system-specific
  * #include <...> directories.
  */
+
+char	*quotedir[NINCLUDE];
+char	**quoteend = quotedir;
+
+char	*systemdir[NINCLUDE];
+char	**systemend = systemdir;
+
+
 char	*incdir[NINCLUDE];		/* -i directories		*/
 char	**incend = incdir;		/* -> free space in incdir[]	*/
 

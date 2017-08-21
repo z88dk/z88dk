@@ -143,12 +143,12 @@ sub add_ind_ix {
 sub add_alu8 {
 	my($cpu_tag, $asm, $bin) = @_;
 
-	if ($asm =~ /^ (add|adc|sub|sbc|and|xor|or|cp|tst) \s+ (a) \s* , \s* (.*) /x) {
+	if ($asm =~ /^ (add|adc|sub|sbc|and|xor|or|cp|tst|test) \s+ (a) \s* , \s* (.*) /x) {
 		my($opcode, $a, $rest) = ($1, $2, $3);
 		
 		add_altd($cpu_tag, "$opcode $rest", 			    $bin);			# add r
 		
-		if ($opcode eq 'tst') {		# only Z180
+		if ($opcode eq 'tst' || $opcode eq 'test' ) {		# only Z180
 			add_altd($cpu_tag, "$opcode $a,$rest",	 	   $bin);			# add a,r
 		}
 		else {		

@@ -69,7 +69,7 @@ typedef unsigned char * va_list;
 extern int __LIB__ getarg(void);
 
 #define va_list                 unsigned char *
-#define va_start(ap,last)       ap=(getarg()*2)+&last-2
+#define va_start(ap,last)       ap=(getarg()*2)+&last-5
 #define va_arg(ap,type)         *((type*)(ap-=sizeof(type)))
 #define va_copy(dst, src)       dst = src
 #define va_end(ap)

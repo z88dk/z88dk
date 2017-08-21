@@ -1,0 +1,218 @@
+
+
+
+	MODULE	rabbit_rabbit_optimisations
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._getviapointer
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	defb	0xdd, 0xe4, +0	;ld hl,(hl+0)
+	ret
+
+
+
+._mult
+	defb	0x27, -4	;add sp,-4
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	ex	de,hl
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	call	l_mult
+	defb	0x27, 4	;add sp,4
+	ret
+
+
+
+._negate
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	defb	0x4d	; neg hl
+	ret
+
+
+
+._or
+	defb	0xc4, 4	; ld hl,(sp + 4)
+	ex	de,hl
+	defb	0xc4, 4	; ld hl,(sp + 4)
+	defb	0xec	; or hl,de
+	push	hl
+	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	a,l
+	or	255
+	ld	l,a
+	defb	0xd4, 0	; ld (sp + 0),hl
+	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	de,511
+	defb	0xec	; or hl,de
+	defb	0x27, 2	;add sp,2
+	ret
+
+
+
+._and
+	defb	0xc4, 4	; ld hl,(sp + 4)
+	ex	de,hl
+	defb	0xc4, 4	; ld hl,(sp + 4)
+	defb	0xdc	; and hl,de
+	push	hl
+	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	h,0
+	defb	0xd4, 0	; ld (sp + 0),hl
+	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	de,511
+	defb	0xdc	; and hl,de
+	defb	0x27, 2	;add sp,2
+	ret
+
+
+
+._rshift
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	and	a
+	defb	0xfc	; rr hl
+	ret
+
+
+
+._lshift
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	add	hl,hl
+	ret
+
+
+
+._lshift_long
+	defb	0xc4, 2 + 2	; ld hl,(sp + 2 + 2)
+	ex	de,hl
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	add	hl,hl
+	rl	e
+	rl	d
+	push	de
+	push	hl
+	defb	0xcc	; bool hl
+	defb	0xfc	; rr hl
+	add	hl,sp
+	push	hl
+	defb	0xc4, 8 + 2	; ld hl,(sp + 8 + 2)
+	ex	de,hl
+	defb	0xc4, 8	; ld hl,(sp + 8)
+	add	hl,hl
+	defb	0xf3	; rl de
+	add	hl,hl
+	defb	0xf3	; rl de
+	pop	bc
+	call	l_plong
+	defb	0xcc	; bool hl
+	defb	0xfc	; rr hl
+	add	hl,sp
+	push	hl
+	defb	0xc4, 8 + 2	; ld hl,(sp + 8 + 2)
+	ex	de,hl
+	defb	0xc4, 8	; ld hl,(sp + 8)
+	ld	a,3
+	call	l_long_aslo
+	pop	bc
+	call	l_plong
+	defb	0xcc	; bool hl
+	defb	0xfc	; rr hl
+	defb	0x27, 4	;add sp,4
+	ret
+
+
+
+._addition
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	bc,10
+	add	hl,bc
+	push	hl
+	call	_mult
+	defb	0xc4, 0	; ld hl,(sp + 0)
+	defb	0x27, 2	;add sp,2
+	ret
+
+
+
+._subtract
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	bc,-10
+	add	hl,bc
+	push	hl
+	call	_mult
+	defb	0xc4, 0	; ld hl,(sp + 0)
+	defb	0x27, 2	;add sp,2
+	ret
+
+
+
+._longops
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+	call	l_declong
+	ret
+
+
+
+._longadd
+	defb	0xc4, 2 + 2	; ld hl,(sp + 2 + 2)
+	ex	de,hl
+	defb	0xc4, 2	; ld hl,(sp + 2)
+	push	de
+	push	hl
+	ld	hl,10	;const
+	ld	de,0
+	call	l_long_add
+	ret
+
+
+
+._pushinstr
+	ld	hl,1	;const
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	ld	hl,3	;const
+	push	hl
+	call	_anotherfunc
+	defb	0x27, 6	;add sp,6
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	PUBLIC	_getviapointer
+	PUBLIC	_mult
+	PUBLIC	_negate
+	PUBLIC	_or
+	PUBLIC	_and
+	PUBLIC	_rshift
+	PUBLIC	_lshift
+	PUBLIC	_lshift_long
+	PUBLIC	_addition
+	PUBLIC	_subtract
+	PUBLIC	_longops
+	PUBLIC	_longadd
+	EXTERN	_anotherfunc
+	PUBLIC	_pushinstr
+
+
+
+

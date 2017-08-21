@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <nc.h>
+#include <string.h>
+#include <dirent.h>
 
 /*
  *	Glue to make opendir API appear to work on an NC100

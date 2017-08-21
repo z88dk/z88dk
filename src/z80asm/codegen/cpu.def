@@ -35,8 +35,10 @@
 												=> C6+$1*8 N
 		ALTD {inc|dec} {b|c|d|e|h|l|(hl)|a}		=> 04+$1+$2*8
 
-[z180]		tst a, {b|c|d|e|h|l|(hl)|a}			=> ED 04+$1*8
-[z180] 		tst a, N							=> ED 64 N
+[z180]		{test|tst} a, {b|c|d|e|h|l|(hl)|a}	=> ED 04+$2*8
+
+; tst coded in parse_rules.rl as it has different opcodes for Rabbit and Z80-ZXN
+; [z180]	{test|tst} a, N						=> ED 64 N
 
 [zilog]		daa									=> 27
 							

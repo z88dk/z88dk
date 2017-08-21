@@ -920,6 +920,7 @@ int make_sna(void)
     char crtname[FILENAME_MAX + 1];
     char outname[FILENAME_MAX + 1];
     char memory[49152];
+    int stackloc, intstate;
     int c, i;
     char *p;
     int is_128k;
@@ -942,6 +943,19 @@ int make_sna(void)
 
     if ((origin -= 0x4000) < 0)
         exit_log(1, "Error: ORG address %u not in range\n", origin);
+
+    // determine stack location
+
+    if ((stackloc = parameter_search(crtname, ".map", "__register_sp")) < -1)
+        stackloc = -stackloc;
+
+    if (stackloc > 1)
+        stackloc -= 2;
+
+    // determine initial ei/di state
+
+    intstate = parameter_search(crtname, ".map", "__crt_enable_eidi");
+    intstate = (intstate == -1) ? 0xff : ((intstate & 0x01) ? 0 : 0xff);
 
     // determine output file
 
@@ -977,13 +991,18 @@ int make_sna(void)
 
     // initialize snapshot state
 
-    memory[sna_state[SNA_REG_SP] + 256*sna_state[SNA_REG_SP+1] - 0x4000] = (origin + 0x4000) % 256;
-    memory[sna_state[SNA_REG_SP] + 256*sna_state[SNA_REG_SP + 1] + 1 - 0x4000] = (origin + 0x4000) / 256;
+    if (stackloc >= 0)
+    {
+        sna_state[SNA_REG_SP] = stackloc % 256;
+        sna_state[SNA_REG_SP + 1] = stackloc / 256;
+    }
+
+    sna_state[SNA_IFF2] = intstate;
 
     sna_state[SNA_128_PC] = (origin + 0x4000) % 256;
     sna_state[SNA_128_PC + 1] = (origin + 0x4000) / 256;
     sna_state[SNA_128_port_7FFD] = 0x10;
-    sna_state[SNA_128_TRDOS] = 1;
+    sna_state[SNA_128_TRDOS] = 0;
 
     // load main bank code
 
@@ -1046,6 +1065,12 @@ int make_sna(void)
     }
 
     // generate memory snapshot
+
+    if (!is_128k)
+    {
+        memory[sna_state[SNA_REG_SP] + 256 * sna_state[SNA_REG_SP + 1] - 0x4000] = sna_state[SNA_128_PC];
+        memory[sna_state[SNA_REG_SP] + 256 * sna_state[SNA_REG_SP + 1] + 1 - 0x4000] = sna_state[SNA_128_PC + 1];
+    }
 
     fwrite(memory, sizeof(memory), 1, fout);
 

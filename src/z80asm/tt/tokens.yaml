@@ -201,7 +201,7 @@ tokens:
   - name	: IXL
   - name	: IYL
   
-  # 8-bit registers
+  # 16-bit registers
   - name	: BC
   - name	: DE
   - name	: HL
@@ -245,6 +245,10 @@ tokens:
   
   - name	: AF1
     regexp	: "\"AF'\"i"
+  
+  # 32-bit registers
+  - name	: A32
+  - name	: DEHL
   
   # Assembly directives
   - name	: BINARY
@@ -360,11 +364,21 @@ tokens:
 
   # Z80-ZXN specific opcodes
   - name    : SWAPNIB
+  - name    : SWAP
   - name    : OUTINB
   - name    : LDIX
   - name    : LDIRX
   - name    : LDDX
   - name    : LDDRX
+  - name    : FILL
+  - name    : FILLDE
+  - name    : MIRROR
+  - name    : POPX
+  - name    : NEXTREG
+  - name    : PIXELDN
+  - name    : PIXELAD
+  - name    : SETAE
+  - name    : TEST
 
   # Z180 specific opcodes
   - name	: SLP 

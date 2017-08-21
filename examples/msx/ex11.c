@@ -21,8 +21,8 @@ Contact the author:
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "lib3d.h"
-#include "msx/line.h"
+#include <lib3d.h>
+#include <msx/line.h>
 
 // build a pyramid mesh
 

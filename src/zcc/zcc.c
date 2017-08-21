@@ -367,7 +367,7 @@ static arg_t  config[] = {
 	{ "COPTEXE", 0, SetStringConfig, &c_copt_exe, NULL, "" },
 	{ "COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, "" },
 
-	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-I\"DESTDIR/include\" " },
+	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-isystem\"DESTDIR/include\" " },
 	{ "CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "-isystem \"DESTDIR/include/_DEVELOPMENT/clang\" " },
 	{ "M4OPTS", 0, SetStringConfig, &c_m4opts, NULL, "", " -I \"DESTDIR/src/m4\" " },
 	{ "COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "\"DESTDIR/lib/z80rules.1\"" },
@@ -453,8 +453,8 @@ static arg_t     myargs[] = {
 	{ "D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option" },
 	{ "U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option" },
 	{ "I", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
-    { "iquote", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a quoted include path for the preprocessor" },
-    { "isystem", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a system include path for the preprocessor" },
+	{ "iquote", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a quoted include path for the preprocessor" },
+	{ "isystem", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a system include path for the preprocessor" },
 	{ "L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path" },
 	{ "l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library" },
 	{ "O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt" },
@@ -2041,11 +2041,9 @@ void BuildOptionsQuoted(char **list, char *arg)
     if (len > 0)
     {
         zcc_asprintf(&val, "%s%.*s\"%s\" ", orig ? orig : "", len, arg, arg+len);
-
         free(orig);
         *list = val;
-    }
-    else
+    } else
         BuildOptions(list, arg);
 }
 

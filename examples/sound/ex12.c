@@ -19,7 +19,7 @@ Contact the author:
 =========================================================================*/
 
 #include <stdio.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 main() {
 	// prepare for the lamest example ever :)

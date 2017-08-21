@@ -576,6 +576,29 @@ static void option_cpu_r3k(void)
 	opts.cpu = CPU_R3K;
 }
 
+void define_assembly_defines()
+{
+	switch (opts.cpu) {
+	case CPU_Z80:
+	    define_static_def_sym("__CPU_Z80__", 1);
+		break;
+	case CPU_Z80_ZXN:
+	    define_static_def_sym("__CPU_Z80_ZXN__", 1);
+		break;
+	case CPU_Z180:
+	    define_static_def_sym("__CPU_Z180__", 1);
+		break;
+	case CPU_R2K:
+	    define_static_def_sym("__CPU_R2K__", 1);
+		break;
+	case CPU_R3K:
+	    define_static_def_sym("__CPU_R3K__", 1);
+		break;
+	default:
+		assert(0);
+	}
+}
+
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
 *	strpool

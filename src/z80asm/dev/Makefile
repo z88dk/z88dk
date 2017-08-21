@@ -20,24 +20,24 @@ ASTYLE = astyle \
 #------------------------------------------------------------------------------
 # force generation of version with make dev
 #------------------------------------------------------------------------------
-all:
+all::
 	touch hist.c
 
 #------------------------------------------------------------------------------
 # ragel parser generator
 #------------------------------------------------------------------------------
-all : scan_rules.h
+all:: scan_rules.h
 
 scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile 
 	perl parse_ragel.pl scan_rules.rl
 #	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
 	
-all : parse_rules.h
+all:: parse_rules.h
 
-codegen/cpu_rules.h : codegen/cpu.def codegen/cpu.pl
+codegen/cpu_rules.h : codegen/cpu.def codegen/cpu.pl codegen/cpu_rules_old.h dev/Makefile
 	perl codegen/cpu.pl
-#	perl -i.bak -pe "s/\bCPU_Z80\b/(CPU_Z80|CPU_Z80_ZXN)/g" codegen/cpu_rules.h 
+	perl -i.bak -pe "s/\bCPU_Z80\b/(CPU_Z80|CPU_Z80_ZXN)/g" codegen/cpu_rules_old.h 
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile \
@@ -47,7 +47,7 @@ parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 #------------------------------------------------------------------------------
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation
 #------------------------------------------------------------------------------
-all: t/opcodes.t
+all:: t/opcodes.t
 
 t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm dev/Makefile
 	perl dev/build_opcodes.pl
@@ -65,7 +65,7 @@ astyle:
 #LEMON_SRC := 	dev/lemon.c
 #LEMON_TMPL := 	dev/lempar.c
 #
-#all : grammar.c
+#all:: grammar.c
 #
 #grammar.c grammar.h : $(LEMON) $(LEMON_TMPL) grammar.y dev/Makefile
 #	$(LEMON) grammar.y
@@ -83,5 +83,5 @@ astyle:
 #parse.c parse.h : parse.y
 #	bison parse.y
 
-all:
+all::
 	$(MAKE)

@@ -21,6 +21,9 @@
 
 
 	EXTERN  call_rom3
+	EXTERN	CRT_FONT
+	EXTERN	CRT_FONT_64
+
 ;
 ; Entry:	a= char to print
 ;
@@ -99,7 +102,7 @@
 	add	hl,hl  
 	add	hl,hl  
 	add	hl,hl  
-	ld	bc,zxfont_64-256
+	ld	bc,CRT_FONT_64-256
 	add	hl,bc
 
 	; a = mask
@@ -555,13 +558,9 @@ ENDIF
 
 	SECTION data_clib
 
-.fontaddr	defw	15616
+.fontaddr	defw	CRT_FONT
 .udgaddr	defw	65368
 .attr		defb	56
 .print_routine	defw	print64
 .deltax		defb	1		;how much to move in x 
 
-        SECTION         rodata_clib
-
-zxfont_64:
-        BINARY  "stdio/spectrum/font64.bin"

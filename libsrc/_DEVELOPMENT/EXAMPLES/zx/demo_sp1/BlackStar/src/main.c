@@ -43,14 +43,6 @@ struct sp1_pss ps0;
 
 unsigned int keys[3] = { 'o', 'p', ' ' };
 
-#ifdef __SCCZ80
-#define JOYFUNC void*
-#endif
-
-#ifdef __SDCC
-typedef uint16_t (*JOYFUNC)(udk_t *);
-#endif
-
 JOYFUNC joyfunc;
 udk_t   joy_k;
 

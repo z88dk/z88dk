@@ -13,11 +13,11 @@ fire - exits
 */
 
 //#include <oz.h>
-#include "lib3d.h"
-#include "stdio.h"
-#include "stdlib.h"
+#include <lib3d.h>
+#include <stdio.h>
+#include <stdlib.h>
 //#include "graphics.h"
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 
 #define MX	MODE2_WIDTH/2
