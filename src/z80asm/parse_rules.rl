@@ -607,20 +607,6 @@ Define rules for a ragel-based parser.
 			  DO_stmt(0xED95);
 		  }
 
-		/* N */
-		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? expr _TK_NEWLINE
-		  @{
-			  if (opts.cpu & CPU_Z80_ZXN) {
-				  DO_stmt_n(0xED27);
-			  }
-			  else if (opts.cpu & CPU_Z180) {
-				  DO_stmt_n(0xED64);
-			  }
-			  else {
-				  error_illegal_ident(); return FALSE;
-			  }
-		  }
-
 		; /* end of main */
 
 }%%

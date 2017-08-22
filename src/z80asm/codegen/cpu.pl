@@ -706,21 +706,24 @@ if ($ENV{DEBUG}) {
 #	%c	constant (im, bit, rst, ...)
 #	$d	signed register indirect offset
 #	%u	unsigned register indirect offset
+#	@label	unsigned word with given global label address
 #------------------------------------------------------------------------------
 @CPUS = qw( z80 z80_zxn z180 r2k r3k );
 
-my @R8	= qw( b c d e   h   l (hl) a );
-my @R8X = qw( b c d e ixh ixl (hl) a );
-my @R8Y = qw( b c d e iyh iyl (hl) a );
+my @R8	= qw( b c d e h l (hl) a );
+my @ALU = qw( add adc sub sbc and xor or cp );
+my @TEST= qw( tst test );
 
 my @X	= qw( ix iy );
 my @DIS	= ('0', '%d');
 my @IO	= ('', qw( ioi ioe ));
 my @ALTD= ('', qw( altd ));
+my @A_  = ('a, ', '');
 
 my %V = (
 	'' => '',
 	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, a => 7,
+	add => 0, adc => 1, sub => 2, sbc => 3, and => 4, xor => 5, or => 6, cp => 7,
 	ix => 0xDD, iy => 0xFD, 
 	altd => 0x76, ioi => 0xD3, ioe => 0xDB,
 );
@@ -732,6 +735,9 @@ my %V = (
 for my $cpu (@CPUS) {
 	my $rabbit	= ($cpu =~ /^r/);
 	my $z80 	= ($cpu =~ /^z80/);
+	my $z80_zxn	= ($cpu =~ /^z80_zxn/);
+	my $z180 	= ($cpu =~ /^z180/);
+	my $zilog	= ($cpu =~ /^z/);
 	
 	# 8-bit load group
 	for my $r (@R8) { 
@@ -742,6 +748,48 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ld $r, %n", 0x06 + $V{$r}*8, '%n');
 	}
 	add_opc($cpu, "ld a, (%m)", 0x3A, '%m', '%m');
+	add_opc($cpu, "ld (%m), a", 0x32, '%m', '%m');
+	add_opc($cpu, "ld (bc), a", 0x02);
+	add_opc($cpu, "ld a, (bc)", 0x0A);
+	add_opc($cpu, "ld (de), a", 0x12);
+	add_opc($cpu, "ld a, (de)", 0x1A);
+
+	# 8-bit ALU group
+	for my $op (@ALU) {
+		for my $r (@R8) {
+			for my $a (@A_) {
+				add_opc($cpu, "$op $a$r", 0x80 + $V{$op}*8 + $V{$r});
+			}
+		}
+		for my $a (@A_) {
+			add_opc($cpu, "$op $a%n", 0xC6 + $V{$op}*8, '%n');
+		}
+	}
+	for my $r (@R8) { 
+		add_opc($cpu, "inc $r", 0x04 + $V{$r}*8);
+		add_opc($cpu, "dec $r", 0x05 + $V{$r}*8);
+		
+		for my $op (@TEST) {
+			for my $a (@A_) {
+				if ($z180) {
+					add_opc($cpu, "$op $a$r",  0xED, 0x04 + $V{$r}*8);
+					add_opc($cpu, "$op $a%n",  0xED, 0x64, '%n');
+				}
+				elsif ($z80_zxn) {
+					add_opc($cpu, "$op $a%n",  0xED, 0x27, '%n');
+				}
+			}
+		}
+	}
+	if ($zilog) {
+		add_opc($cpu, "daa", 0x27);
+		# add_opc($cpu, "rrd", 0xED, 0x67);
+		# add_opc($cpu, "rld", 0xED, 0x6F);
+	}
+	elsif ($rabbit) {
+		# add_opc($cpu, "rrd", 0xCD, '@__z80asm_rrd__');
+		# add_opc($cpu, "rld", 0xCD, '@__z80asm_rld__');
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -881,14 +929,16 @@ sub add_opc_3 {
 	
 	# expand ioi ioe
 	my $has_io;
-	if ($asm =~ /\((ix|iy|hl|%m)/) {
+	if ($asm =~ /\((ix|iy|hl|bc|de|%m)/) {
 		add_opc_4($cpu, "ioi $asm", $V{ioi}, @bin);
 		add_opc_4($cpu, "ioe $asm", $V{ioe}, @bin);
 		$has_io++;
 	}
 	
 	# expand altd
-	if ($asm =~ /^(ld (?:a|b|c|d|e|h|l|af|bc|de|hl))(.*)/) {
+	if ($asm =~ /^ (?| ( (?:ld|inc|dec) \s+ (?:a|b|c|d|e|h|l|af|bc|de|hl))(.*)
+					 | ( (?:add|adc|sub|sbc|and|xor|or) \s+ a)(,.*)
+				   ) $/x) {
 		if ($has_io) {
 			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
 			add_opc_4($cpu, "ioi $1'$2", $V{ioi}, $V{altd}, @bin);
@@ -903,6 +953,20 @@ sub add_opc_3 {
 		else {
 			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
 			add_opc_4($cpu, "altd $1$2", $V{altd}, @bin);
+		}
+	}
+	elsif ($asm =~ /^ (?| ( (?:add|adc|sub|sbc|and|xor|or) \s+ [^,]+ )
+					    | (cp .*) 
+					  ) $/x) {
+		if ($has_io) {
+			add_opc_4($cpu, "altd $1", $V{altd}, @bin);
+			add_opc_4($cpu, "altd ioi $1", $V{altd}, $V{ioi}, @bin);
+			add_opc_4($cpu, "altd ioe $1", $V{altd}, $V{ioe}, @bin);
+			add_opc_4($cpu, "ioi altd $1", $V{ioi}, $V{altd}, @bin);
+			add_opc_4($cpu, "ioe altd $1", $V{ioe}, $V{altd}, @bin);
+		}
+		else {
+			add_opc_4($cpu, "altd $1", $V{altd}, @bin);
 		}
 	}
 }
@@ -1012,21 +1076,31 @@ sub merge_cpu {
 	my $ret = '';
 	my %code;
 	
+	my $last_code;
 	for my $cpu (@CPUS) {
 		if (exists $t->{$cpu}) {
 			my $code = merge_parens($cpu, $t->{$cpu});
 			$code{$code}{$cpu}++;
+			$last_code = $code;
 		}
 	}
 	
-	$ret .= "switch (opts.cpu) {\n";
-	for my $code (sort keys %code) {
-		for my $cpu (sort keys %{$code{$code}}) {
-			$ret .= "case CPU_".uc($cpu).": ";
-		}
-		$ret .= "\n$code\nbreak;\n"
+	if (scalar(keys %code) == 1 && 
+	    scalar(keys %{$code{$last_code}}) == scalar(@CPUS)) {
+		# no variants
+		$ret .= $last_code."\n";
 	}
-	$ret .= "default: error_illegal_ident(); }\n";
+	else {
+		# variants per CPU
+		$ret .= "switch (opts.cpu) {\n";
+		for my $code (sort keys %code) {
+			for my $cpu (sort keys %{$code{$code}}) {
+				$ret .= "case CPU_".uc($cpu).": ";
+			}
+			$ret .= "\n$code\nbreak;\n"
+		}
+		$ret .= "default: error_illegal_ident(); }\n";
+	}
 	
 	return $ret;
 }

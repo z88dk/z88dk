@@ -924,23 +924,6 @@
  cp 127                 ; FE 7F
  cp 255                 ; FE FF
  cp a                   ; BF
- cp a',(hl)             ; 76 BE
- cp a',(ix)             ; 76 DD BE 00
- cp a',(ix+127)         ; 76 DD BE 7F
- cp a',(ix-128)         ; 76 DD BE 80
- cp a',(iy)             ; 76 FD BE 00
- cp a',(iy+127)         ; 76 FD BE 7F
- cp a',(iy-128)         ; 76 FD BE 80
- cp a',-128             ; 76 FE 80
- cp a',127              ; 76 FE 7F
- cp a',255              ; 76 FE FF
- cp a',a                ; 76 BF
- cp a',b                ; 76 B8
- cp a',c                ; 76 B9
- cp a',d                ; 76 BA
- cp a',e                ; 76 BB
- cp a',h                ; 76 BC
- cp a',l                ; 76 BD
  cp a,(hl)              ; BE
  cp a,(ix)              ; DD BE 00
  cp a,(ix+127)          ; DD BE 7F
