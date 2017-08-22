@@ -31,7 +31,7 @@ int fgetc(FILE *fp)
 IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 	push	ix		;save callers ix
-	ld	ix,sp
+	ld	ix,hl
 ELSE
 	pop	bc
 	pop	hl	; fp
