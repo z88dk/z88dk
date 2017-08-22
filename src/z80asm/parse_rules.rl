@@ -648,12 +648,12 @@ Define rules for a ragel-based parser.
 #endfor  <OP>
 
 #foreach <R> in B, C, D, E, H, L, A
-		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
+		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
 		  @{ DO_stmt( Z80_TST( REG_<R> ) ); }
 #endfor  <R>
 
 		/* (hl) */
-		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
+		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
 		  @{ DO_stmt( Z80_TST( REG_idx ) ); }
 
 		/*---------------------------------------------------------------------
@@ -881,7 +881,7 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   Z80-ZXN opcodes for ZX Next
 		*--------------------------------------------------------------------*/
-		| label? _TK_SWAPNIB _TK_NEWLINE
+		| label? (_TK_SWAPNIB|_TK_SWAP) _TK_NEWLINE
 		  @{
 			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
 			  DO_stmt(0xED23);
@@ -962,7 +962,7 @@ Define rules for a ragel-based parser.
 			  DO_stmt(0xEDBC);
 		  }
 		
-		| label? _TK_FILLDE _TK_NEWLINE
+		| label? (_TK_FILLDE|_TK_FILL _TK_DE) _TK_NEWLINE
 		  @{
 			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
 			  DO_stmt(0xEDB5);
@@ -1091,7 +1091,7 @@ Define rules for a ragel-based parser.
 		  }
 
 		/* N */
-		| label? _TK_TST (_TK_A _TK_COMMA)? expr _TK_NEWLINE
+		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? expr _TK_NEWLINE
 		  @{
 			  if (opts.cpu & CPU_Z80_ZXN) {
 				  DO_stmt_n(0xED27);

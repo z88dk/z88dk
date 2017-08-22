@@ -4,6 +4,8 @@ stdio/spectrum/fputc_cons_rom_rst
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fputc_cons
 stdio/spectrum/getk
+stdio/spectrum/CRT_FONT
+stdio/spectrum/CRT_FONT_64
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
@@ -31,3 +33,7 @@ psg/spectrum/get_psg
 psg/spectrum/psg_init
 @psg/psg.lst
 @z80.lst
+_DEVELOPMENT/font/font_8x8/_font_8x8_bbc_system.asm
+_DEVELOPMENT/font/font_8x8/_font_8x8_clairsys.asm
+_DEVELOPMENT/font/font_8x8/_font_8x8_clairsys_bold.asm
+_DEVELOPMENT/font/font_8x8/_font_8x8_zx_system.asm

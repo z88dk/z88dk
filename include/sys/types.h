@@ -52,6 +52,11 @@ typedef signed int pid_t;
 typedef unsigned char bool_t;
 #endif
 
+#ifndef _INO_T
+#define _INO_T
+typedef unsigned int ino_t;
+#endif
+
 #ifndef _TIME_T
 #define _TIME_T
 typedef long time_t;

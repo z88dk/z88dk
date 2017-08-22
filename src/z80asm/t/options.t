@@ -657,6 +657,7 @@ t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--cpu=r2k");
 # New Z80 opcodes on the NEXT (more to come)
 #------------------------------------------------------------------------------
 
+t_z80asm_ok(0, "swap",		pack("C*", 0xED, 0x23), "--cpu=z80-zxn");	# A bits 7-4 swap with A bits 3-0
 t_z80asm_ok(0, "swapnib",	pack("C*", 0xED, 0x23), "--cpu=z80-zxn");	# A bits 7-4 swap with A bits 3-0
 t_z80asm_ok(0, "mul",		pack("C*", 0xED, 0x30), "--cpu=z80-zxn");	# multiply HL*DE = DEHL (no flags set)
 t_z80asm_ok(0, "add hl,a",	pack("C*", 0xED, 0x31), "--cpu=z80-zxn");	# Add A to HL (no flags set)
@@ -678,6 +679,7 @@ t_z80asm_ok(0, "lddx",		pack("C*", 0xED, 0xAC), "--cpu=z80-zxn");	# As LDD,  but
 																		# and DE is incremented
 t_z80asm_ok(0, "lddrx",		pack("C*", 0xED, 0xBC), "--cpu=z80-zxn");	# As LDDR,  but if byte==A does not copy
 t_z80asm_ok(0, "fillde",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
+t_z80asm_ok(0, "fill de",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
 t_z80asm_ok(0, "ld hl,sp",	pack("C*", 0xED, 0x25), "--cpu=z80-zxn");	# transfer SP to HL
 t_z80asm_ok(0, "ld a32,dehl",
 							pack("C*", 0xED, 0x20), "--cpu=z80-zxn");	# transfer dehl into A32
@@ -720,7 +722,12 @@ t_z80asm_ok(0, "setae",		pack("C*", 0xED, 0x95), "--cpu=z80-zxn");	# Using the l
 t_z80asm_ok(0, "tst 31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
 																		# And A with NN and set all flags. A is not affected.
    
+t_z80asm_ok(0, "test 31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
+																		# And A with NN and set all flags. A is not affected.
+   
 t_z80asm_ok(0, "tst a,31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
+																		# And A with NN and set all flags. A is not affected.
+t_z80asm_ok(0, "test a,31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
 																		# And A with NN and set all flags. A is not affected.
    
 #------------------------------------------------------------------------------
@@ -1043,6 +1050,26 @@ t_z80asm_ok(0, "
 	tst a
 	tst 23
 	
+	test a,b
+	test a,c
+	test a,d
+	test a,e
+	test a,h
+	test a,l
+	test a,(hl)
+	test a,a
+	test a,23
+	
+	test b
+	test c
+	test d
+	test e
+	test h
+	test l
+	test (hl)
+	test a
+	test 23
+	
 ", pack("C*", 
 	0xED, 0x76,		# slp
 	
@@ -1096,6 +1123,25 @@ t_z80asm_ok(0, "
 	0xED, 0x3C,
 	0xED, 0x64, 23, 
 	
+	0xED, 0x04,		# test
+	0xED, 0x0C,
+	0xED, 0x14,
+	0xED, 0x1C,
+	0xED, 0x24,
+	0xED, 0x2C,
+	0xED, 0x34,
+	0xED, 0x3C,
+	0xED, 0x64, 23, 
+	
+	0xED, 0x04,		# test
+	0xED, 0x0C,
+	0xED, 0x14,
+	0xED, 0x1C,
+	0xED, 0x24,
+	0xED, 0x2C,
+	0xED, 0x34,
+	0xED, 0x3C,
+	0xED, 0x64, 23, 
 	
 ), "--cpu=z180");
 
@@ -1110,6 +1156,56 @@ t_z80asm_error("otdmr		", "Error at file 'test.asm' line 1: illegal identifier")
 t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier");
 t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
+#------------------------------------------------------------------------------
+# __CPU_xxx_contants___
+#------------------------------------------------------------------------------
+write_file("test.asm", <<END);
+	if __CPU_Z80__
+	defb 1
+	else 
+	if __CPU_Z80_ZXN__
+	defb 2
+	else
+	if __CPU_Z180__
+	defb 3
+	else
+	if __CPU_R2K__
+	defb 4
+	else
+	if __CPU_R3K__
+	defb 5
+	else
+	defb 6
+	endif
+	endif
+	endif
+	endif
+	endif
+END
+
+unlink "test.bin";
+t_z80asm_capture('-b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\1");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=z80 -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\1");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=z80-zxn -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\2");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=z180 -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\3");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=r2k -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\4");
+
+unlink "test.bin";
+t_z80asm_capture('--cpu=r3k -b test.asm', "", "", 0);
+t_binary(read_binfile("test.bin"), "\5");
 
 unlink_testfiles();
 done_testing();
