@@ -29,8 +29,12 @@ int setjmp(jmp_buf env)
 	ld	(hl),d
 	inc	hl
 	ex	de,hl	;de=&env, hl=scratch
+IF __CPU_Z80_ZXN__
+	ld	hl,sp
+ELSE
 	ld	hl,0
 	add	hl,sp	;stack pointer
+ENDIF
 	ex	de,hl	;hl=env+2, de=sp
 	ld	(hl),e	;sp
 	inc	hl

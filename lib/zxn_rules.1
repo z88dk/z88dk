@@ -34,3 +34,21 @@
 	call	l_long_add
 =
 	add	dehl,%1	;const
+
+	push	de
+	push	hl
+	ld	hl,%1	;const
+	ld	de,65535
+	call	l_long_add
+=
+	sub	dehl,+(65536 - %1)	;const
+
+	ld	hl,%1	;const
+	ld	de,%2
+	push	de
+	push	hl
+	ld	hl,%3
+=
+	push	%1
+	push	%2
+	ld	hl,%3
