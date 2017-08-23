@@ -30,7 +30,7 @@ typedef struct {
 
 
 
-static void completion(const char *buf, linenoiseCompletions *lc);
+static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static char **parse_words(char *line, int *argc);
 static int cmd_step(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
@@ -58,12 +58,12 @@ static int debugger_active = 1;
 
 void debugger_init()
 {
-    linenoiseSetCompletionCallback(completion);
+    linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
 }
 
 
-static void completion(const char *buf, linenoiseCompletions *lc) 
+static void completion(const char *buf, linenoiseCompletions *lc, void *ctx) 
 {
     command *cmd= &commands[0];
 

@@ -5,6 +5,7 @@
 
 
 #include "cmds.h"
+#include <inttypes.h>
 
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
@@ -49,6 +50,6 @@ extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
-
+extern void      disassemble(const uint8_t *bytes, int pc);
 
 #endif
