@@ -21,6 +21,11 @@ extern unsigned char *mem;
         }                                         \
     } while (0)
 
+#define CPU_Z80      1
+#define CPU_Z180     2
+#define CPU_R2K      4
+#define CPU_R3K      8
+#define CPU_Z80_ZXN  16
 
 #define Z88DK_SEEK_SET 0
 #define Z88DK_SEEK_END 1
