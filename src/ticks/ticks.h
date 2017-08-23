@@ -5,6 +5,7 @@
 
 
 #include "cmds.h"
+#include <sys/types.h>
 #include <inttypes.h>
 
 extern unsigned char a,b,c,d,e,h,l;
