@@ -11,10 +11,10 @@ EXTERN __IO_IDE_WR_LINE, __IO_IDE_RD_LINE, __IO_IDE_RST_LINE
     ;Do a write bus cycle to the drive, via the 8255
     ;input A = ide register address
     ;input E = lsb to write to IDE drive
-    ;uses DE
+    ;not preserved D (push / pop de in calling functions)
 ide_write_byte:
     push bc
-    ld d, a                 ;copy address to D (unused MSB)
+    ld d, a                 ;copy address to D
     ld bc, __IO_PIO_IDE_CONFIG
     ld a, __IO_PIO_IDE_WR
     out (c), a              ;config 8255 chip, write mode

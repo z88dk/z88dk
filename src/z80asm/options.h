@@ -51,6 +51,9 @@ extern Opts opts;
 *----------------------------------------------------------------------------*/
 extern void parse_argv( int argc, char *argv[] );
 
+// define static symbols depending on options
+extern void define_assembly_defines();
+
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
 *	strpool

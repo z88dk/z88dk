@@ -19,12 +19,13 @@ EXTERN ide_write_sector
 ; hl = the address pointer to the buffer to fill
 ;
 ; exit
-; l = DRESULT, set carry flag
+; hl = DRESULT, set carry flag
 ;
 
 asm_disk_write:
     or a                    ; check sectors != 0
     jr z, dresult_error
+
 loop:
     call ide_write_sector    ; with the logical block address in bcde, write one sector
     jr nc, dresult_error

@@ -87,6 +87,15 @@ void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n_expr);
 }
 
+/* add opcode followed by two 8-bit expressions */
+void add_opcode_n_n(int opcode, struct Expr *n1_expr,
+								struct Expr *n2_expr )
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n1_expr);
+	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n2_expr);
+}
+
 /* add "call flag", or emulation on a Rabbit */
 void add_call_flag(int flag, Expr *target)
 {

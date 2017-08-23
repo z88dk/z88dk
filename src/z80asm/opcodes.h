@@ -37,6 +37,10 @@ extern void add_opcode_idx(int opcode, struct Expr *expr);
 extern void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
 										 struct Expr *n_expr );
 
+/* add opcode followed by two 8-bit expressions */
+extern void add_opcode_n_n(int opcode, struct Expr *n1_expr,
+									   struct Expr *n2_expr );
+
 /* add "call flag", or emulation on a Rabbit */
 extern void add_call_flag(int flag, struct Expr *target);
 

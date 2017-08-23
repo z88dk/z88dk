@@ -40,6 +40,9 @@ fpos_t ftell(FILE *fp)
 	ld	a,(hl)
 	and	_IOSYSTEM
 	jr	nz,ftell_abort
+	ld	a,(hl)
+	and	_IOEXTRA
+	jr	nz,ftell_trampoline
 	push	de
 	call	fdtell
 	pop	bc
@@ -50,6 +53,22 @@ fpos_t ftell(FILE *fp)
 	ld	l,e
 	ld	h,d
         pop     ix
+	ret
+
+.ftell_trampoline:
+	; Call the seek function via the trampoline
+	dec	hl
+	dec	hl
+	push	hl
+	pop	ix	;ix = fp
+	ld	de,0	;posn
+	ld	bc,0
+	ld	a,SEEK_CUR
+	ex	af,af
+	ld	l,(ix+fp_extra)
+	ld	h,(ix+fp_extra+1)
+	ld	a,__STDIO_MSG_SEEK
+	call	l_jphl
 #endasm
 #else
 */

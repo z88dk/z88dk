@@ -166,7 +166,7 @@ char		*argv[];
 		argv[j++] = argv[i];
 	    else {
 		c = *ap++;			/* Option byte		*/
-		if (islower(c))			/* Normalize case	*/
+		if (c != 'i')			/* Normalize case	*/
 		    c = toupper(c);
 		switch (c) {			/* Command character	*/
 		case 'C':			/* Keep comments	*/
@@ -201,6 +201,13 @@ char		*argv[];
 
 		case 'P':			/* No #line 		*/
 		    pflag = TRUE;
+		    break;
+		case 'i':
+			if ( strncmp(arg + 1, "iquote", 6) == 0 && quoteend < &quotedir[MAXINCLUDE]) {
+				*quoteend++ = arg + strlen("-iquote");
+			} else if ( strncmp(arg + 1, "isystem", 7) == 0 && systemend < &systemdir[MAXINCLUDE]) {
+				*systemend++ = arg + strlen("-isystem");
+			}
 		    break;
 		case 'I':			/* Include directory	*/
 		    if (incend >= &incdir[MAXINCLUDE])
@@ -266,10 +273,12 @@ char		*argv[];
                     "  -C\t\t\tWrite source file comments to output\n"
                     "  -Dsymbol=value\tDefine a symbol with the given (optional) value\n"
                     "  -Idirectory\t\tAdd a directory to the #include search list\n"
+                    "  -iquoteDIRECTORY\tAdd a directory to the quoted #include search list\n"
+                    "  -isystemDIRECTORY\tAdd a directory to the system #include search list\n"
                     "  -N\t\t\tDon't predefine target-specific names\n"
                     "  -Stext\t\tSpecify sizes for #if sizeof\n"
                     "  -Usymbol\t\tUndefine symbol\n"
-		    "  -P\t\t\tDon't produce # lines\n");
+		            "  -P\t\t\tDon't produce # lines\n");
 #if DEBUG
 		    fprintf(stderr, "  -Xvalue\t\tSet internal debug flag\n");
 #endif

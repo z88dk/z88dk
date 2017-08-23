@@ -19,12 +19,13 @@ EXTERN ide_read_sector
 ; hl = the address pointer to the buffer to fill
 ;
 ; exit
-; l = DRESULT, set carry flag
+; hl = DRESULT, set carry flag
 ;
 
 asm_disk_read:
     or a                    ; check sectors != 0
     jr z, dresult_error
+
 loop:
     call ide_read_sector    ; with the logical block address in bcde, read one sector
     jr nc, dresult_error

@@ -4,3 +4,15 @@ stdio/test/fputc_cons.asm
 time/test/time
 @time/time.lst
 @z80.lst
+fcntl/test/close.asm
+fcntl/test/creat.asm
+fcntl/test/fdgetpos.asm
+fcntl/test/fdtell.asm
+fcntl/test/lseek.asm
+fcntl/test/open.asm
+fcntl/test/read.asm
+fcntl/test/readbyte.asm
+fcntl/test/remove.asm
+fcntl/test/rename.asm
+fcntl/test/write.asm
+fcntl/test/writebyte.asm

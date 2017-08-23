@@ -20,8 +20,9 @@ EXTERN asm_disk_read
 ;
 
 _disk_read:
+    pop af      ; pop return address
+    ex af,af
 
-    pop iy      ; pop return address
     dec sp      ; move sp to get a    
     pop af      ; get sector count to a  
     pop de      ; start sector to bcde
@@ -39,6 +40,8 @@ _disk_read:
     push de
     push af     ; push sectors read
     inc sp   
-    push iy     ; push return address
-    
+
+    ex af,af
+    push af     ; push return address
+
     ret

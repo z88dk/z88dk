@@ -48,6 +48,13 @@ Define rules for a ragel-based parser.
 				add_opcode_idx_n((opcode), idx_expr, n_expr); \
 			}
 
+#define DO_stmt_n_n(opcode) \
+			{ 	Expr *n2_expr = pop_expr(ctx); \
+				Expr *n1_expr = pop_expr(ctx); \
+				DO_STMT_LABEL(); \
+				add_opcode_n_n((opcode), n1_expr, n2_expr); \
+			}
+
 #define DO_stmt_emul(opcode, emul_func) \
 			{	DO_STMT_LABEL(); \
 				add_opcode_emul((opcode), #emul_func); \
@@ -641,17 +648,13 @@ Define rules for a ragel-based parser.
 #endfor  <OP>
 
 #foreach <R> in B, C, D, E, H, L, A
-		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
+		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
 		  @{ DO_stmt( Z80_TST( REG_<R> ) ); }
 #endfor  <R>
 
 		/* (hl) */
-		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
+		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
 		  @{ DO_stmt( Z80_TST( REG_idx ) ); }
-
-		/* N */
-		| label? _TK_TST (_TK_A _TK_COMMA)? expr _TK_NEWLINE
-		  @{ DO_stmt_n( Z80_TST_n ); }
 
 		/*---------------------------------------------------------------------
 		*   16-bit ALU
@@ -878,7 +881,7 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   Z80-ZXN opcodes for ZX Next
 		*--------------------------------------------------------------------*/
-		| label? _TK_SWAPNIB _TK_NEWLINE
+		| label? (_TK_SWAPNIB|_TK_SWAP) _TK_NEWLINE
 		  @{
 			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
 			  DO_stmt(0xED23);
@@ -906,6 +909,27 @@ Define rules for a ragel-based parser.
 		  @{
 			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
 			  DO_stmt(0xED33);
+		  }
+		
+		| label? _TK_ADD _TK_HL _TK_COMMA expr _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  if (expr_in_parens) return FALSE;
+			  DO_stmt_nn(0xED34);
+		  }
+		
+		| label? _TK_ADD _TK_DE _TK_COMMA expr _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  if (expr_in_parens) return FALSE;
+			  DO_stmt_nn(0xED35);
+		  }
+		
+		| label? _TK_ADD _TK_BC _TK_COMMA expr _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  if (expr_in_parens) return FALSE;
+			  DO_stmt_nn(0xED36);
 		  }
 		
 		| label? _TK_OUTINB _TK_NEWLINE
@@ -938,6 +962,148 @@ Define rules for a ragel-based parser.
 			  DO_stmt(0xEDBC);
 		  }
 		
+		| label? (_TK_FILLDE|_TK_FILL _TK_DE) _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDB5);
+		  }
+		
+		| label? _TK_LD _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED25);
+		  }
+		
+		| label? _TK_LD _TK_A32 _TK_COMMA _TK_DEHL _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED20);
+		  }
+		
+		| label? _TK_LD _TK_DEHL _TK_COMMA _TK_A32 _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED21);
+		  }
+		
+		| label? _TK_EX _TK_A32 _TK_COMMA _TK_DEHL _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED22);
+		  }
+		
+		| label? _TK_INC _TK_DEHL _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED37);
+		  }
+		
+		| label? _TK_DEC _TK_DEHL _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED38);
+		  }
+		
+		| label? _TK_ADD _TK_DEHL _TK_COMMA _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED39);
+		  }
+		
+		| label? _TK_ADD _TK_DEHL _TK_COMMA _TK_BC _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED3A);
+		  }
+		
+		| label? _TK_ADD _TK_DEHL _TK_COMMA expr _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  if (expr_in_parens) return FALSE;
+			  DO_stmt_nn(0xED3B);
+		  }
+		
+		| label? _TK_SUB _TK_DEHL _TK_COMMA _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED3C);
+		  }
+		
+		| label? _TK_SUB _TK_DEHL _TK_COMMA _TK_BC _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED3D);
+		  }
+		
+		| label? _TK_MIRROR _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED24);
+		  }
+
+		| label? _TK_MIRROR _TK_DE _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED26);
+		  }
+
+		| label? _TK_PUSH expr _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  if (expr_in_parens) return FALSE;
+			  DO_stmt_nn(0xED8A);
+		  }
+		
+		| label? _TK_POPX _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED8B);
+		  }
+
+		| label? _TK_NEXTREG expr _TK_COMMA expr _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt_n_n(0xED91);
+		  }
+
+		| label? _TK_NEXTREG expr _TK_COMMA _TK_A _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt_n(0xED92);
+		  }
+
+		| label? _TK_PIXELDN _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED93);
+		  }
+
+		| label? _TK_PIXELAD _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED94);
+		  }
+
+		| label? _TK_SETAE _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xED95);
+		  }
+
+		/* N */
+		| label? (_TK_TST|_TK_TEST) (_TK_A _TK_COMMA)? expr _TK_NEWLINE
+		  @{
+			  if (opts.cpu & CPU_Z80_ZXN) {
+				  DO_stmt_n(0xED27);
+			  }
+			  else if (opts.cpu & CPU_Z180) {
+				  DO_stmt_n(0xED64);
+			  }
+			  else {
+				  error_illegal_ident(); return FALSE;
+			  }
+		  }
+
 		; /* end of main */
 
 }%%

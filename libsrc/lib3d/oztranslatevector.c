@@ -7,7 +7,7 @@ Copyright© 2002, Mark Hamilton
 
 */
 
-#include "lib3d.h"
+#include <lib3d.h>
 
 void oztranslatevector(Vector_t *v, Vector_t *offset)
 {

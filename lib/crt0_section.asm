@@ -75,6 +75,9 @@ ENDIF
 		SECTION rodata_compiler
 		SECTION rodata_clib
 		SECTION rodata_user
+		SECTION rodata_font
+		SECTION rodata_font_4x8
+		SECTION rodata_font_8x8
 		SECTION ROMABLE_END
 IF !__crt_model
 		SECTION DATA
