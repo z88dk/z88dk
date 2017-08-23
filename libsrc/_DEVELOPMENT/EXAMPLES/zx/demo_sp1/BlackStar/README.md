@@ -41,8 +41,7 @@ appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noload
 appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
 copy /b loader.tap + screen.tap + game.tap blackstar.tap
 ~~~
-`zsdcc` compile (optimization is high so compile time will be long)  \
-([open github issue concerning this example and zsdcc](https://github.com/z88dk/z88dk/issues/232))
+`zsdcc` compile (optimization is high so compile time will be long)
 ~~~
 zcc +zx -v -startup=31 -DWFRAMES=3 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --fsigned-char @zproject.lst -o blackstar -pragma-include:zpragma.inc
 appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noloader

@@ -28,7 +28,6 @@ ide_write_sector:
     call ide_wait_ready     ;make sure drive is ready
     jr nc, error
     call ide_setup_lba      ;tell it which sector we want in BCDE
-    push de
     ld e, $1
     ld a, __IO_IDE_SEC_CNT    
     call ide_write_byte     ;set sector count to 1
@@ -47,13 +46,11 @@ ide_write_sector:
     call ide_write_byte     ;tell drive to flush its hardware cache
     call ide_wait_ready     ;wait until the write is complete
     jr nc, error
-    pop de
     pop af
     scf                     ;carry = 1 on return = operation ok
     ret
 
 error:
-    pop de
     pop af
     jp ide_test_error       ;carry = 0 on return = operation failed
 

@@ -22,7 +22,7 @@ Contact the author:
 // pixels
 
 #include <stdlib.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 // 8x8 sprite with only the top-left pixel lit
 char star[] = {128,0,0,0,0,0,0,0};

@@ -24,7 +24,7 @@ asm_esxdos_f_opendir:
    ;
    ; enter :     a = uchar drive
    ;             b = 0 or __ESXDOS_MODE_USE_HEADER
-   ;         ix/hl = char *path
+   ;            hl = char *path
    ;
    ; note  : hl is the parameter for dot commands and ix is used otherwise
    ;
@@ -39,6 +39,14 @@ asm_esxdos_f_opendir:
    ;            carry set, errno set
    ;
    ; uses  : unknown
+
+IF __SDCC_IY
+   push hl
+   pop iy
+ELSE
+   push hl
+   pop ix
+ENDIF
 
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_OPENDIR

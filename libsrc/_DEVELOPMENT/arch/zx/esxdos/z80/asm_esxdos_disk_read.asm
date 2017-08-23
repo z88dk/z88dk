@@ -20,9 +20,7 @@ asm_esxdos_disk_read:
    ;
    ; enter :     a = uchar device
    ;          bcde = ulong position
-   ;         ix/hl = void *dst
-   ;
-   ; note  : hl is the parameter for dot commands and ix is used otherwise
+   ;            hl = void *dst
    ;
    ; exit  : success
    ;
@@ -35,7 +33,15 @@ asm_esxdos_disk_read:
    ;            carry set, errno set
    ;
    ; uses  : unknown
-   
+
+IF __SDCC_IY
+   push hl
+   pop iy
+ELSE
+   push hl
+   pop ix
+ENDIF
+
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_DISK_READ
    

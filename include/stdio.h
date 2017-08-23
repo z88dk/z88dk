@@ -94,13 +94,23 @@ struct filestr {
         intptr_t extra;
 };
 
-/* funopen functions, placed in extra */
-struct filestr_operations {
-        int     (*readfn)();    /* (void *, char *, int) */
-        int     (*writefn)();   /* (void *, char *, int) */
-        fpos_t  (*seekfn)();    /* (void *, fpos_t, int) */
-        int     (*closefn)();   /* (void *) */
-};
+/* extra may point to an asm label that can be used to add extra stdio functionality
+ * Entry: ix = fp for all 
+ */
+
+/* Exit: hl = byte read, c = error, nc = success */
+#define __STDIO_MSG_GETC		1
+/* Entry: bc = byte to write, Exit: hl = byte written (or EOF) */
+#define __STDIO_MSG_PUTC		2
+/* Entry: de = buf, bc = len, Exit: hl = bytes read */
+#define __STDIO_MSG_READ		3
+/* Entry: de = buf, bc = len, Exit: hl = bytes written */
+#define __STDIO_MSG_WRITE		4
+/* Entry: debc = offset, a' = whence */
+#define __STDIO_MSG_SEEK		5
+#define __STDIO_MSG_FLUSH		6
+#define __STDIO_MSG_CLOSE		7
+#define __STDIO_MSG_IOCTL		8
 
 
 /* For asm routines kinda handy to have a nice DEFVARS of the structure*/
@@ -127,7 +137,7 @@ typedef struct filestr FILE;
 #define _IOWRITE        4
 #define _IOEOF          8
 #define _IOSYSTEM      16
-#define _IONETWORK     32
+#define _IOEXTRA       32
 #define _IOTEXT        64
 #define _IOSTRING     128
 
@@ -149,11 +159,7 @@ extern struct filestr _sgoioblk_end;
 
 
 #define clearerr(f)
-#ifdef NET_STDIO
-extern int __LIB__ fflush(FILE *);
-#else
-#define fflush(f)
-#endif
+extern FILE __LIB__ *fopen_zsock(char *name);
 
 /* Our new and improved functions!! */
 
@@ -161,8 +167,16 @@ extern FILE __LIB__ *fopen(const char *name, const char *mode) __smallc;
 extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
 extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
+#ifdef __SCCZ80
+extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(), int (*writefn)(), fpos_t (*seekfn)(), int (*closefn)());
+#else
+extern FILE  *funopen(const void     *cookie, int (*readfn)(void *, char *, int),
+			int (*writefn)(void *, const char *, int),
+			fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
+#endif
 
 extern int __LIB__ fclose(FILE *fp);
+extern int __LIB__ fflush(FILE *);
 
 extern void __LIB__ closeall();
 
@@ -221,15 +235,15 @@ extern int __LIB__ puts(const char *);
 #endif
 
 /* Routines for file positioning */
-extern fpos_t __LIB__ ftell(FILE *fp);
-extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
+extern fpos_t __LIB__ __SAVEFRAME__ ftell(FILE *fp);
+extern int __LIB__ __SAVEFRAME__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
 
 /* Block read/writing */
 extern int __LIB__ __SAVEFRAME__ fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
-extern int __LIB__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__ __SAVEFRAME__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
@@ -314,15 +328,6 @@ extern int __LIB__ getk();
 #define getkey() fgetc_cons()
 extern void __LIB__ puts_cons(const char *message);
 extern int __LIB__ printk(const char *fmt,...);
-
-
-/*
- * Networking stdio routines
- */
-
-#ifdef NET_STDIO
-#include <net/stdio.h>
-#endif
 
 
 

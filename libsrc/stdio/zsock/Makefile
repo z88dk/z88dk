@@ -3,11 +3,10 @@
 include ../../Make.config
 
 CFILES = \
-	closenet.c \
-	fflush_net.c \
 	fgetc_net.c \
 	fputc_net.c \
-	opennet.c 
+	fopen_zsock.c  \
+	zsock_trampoline.c
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
@@ -15,7 +14,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 .c.o:
-	zcc +z88 $(CFLAGS) -DNET_STDIO $*.c
+	zcc +z88 $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def *.sym *.map *.i $(AFILES)

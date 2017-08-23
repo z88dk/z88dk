@@ -422,5 +422,10 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 extern int  __LIB__  zxgetfname(char *zxfname);
 extern int  __LIB__  zxgetfname2(char *zxfname);
 
+/* dirent */
+struct dirent {
+    ino_t      d_ino;
+    char       d_name[12];
+};
 
 #endif
