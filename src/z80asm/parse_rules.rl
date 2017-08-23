@@ -384,8 +384,8 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 		| label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 
-#include "codegen/cpu_rules_old.h"
-#include "codegen/cpu_rules.h"
+#include "dev/cpu/cpu_rules_old.h"
+#include "dev/cpu/cpu_rules.h"
 
 		/*---------------------------------------------------------------------
 		*   Z80-ZXN opcodes for ZX Next

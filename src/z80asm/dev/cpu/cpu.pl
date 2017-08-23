@@ -818,7 +818,7 @@ for my $asm (sort keys %Opcodes) {
 	}
 }
 
-open(my $rules, ">", "codegen/cpu_rules.h") or die $!;
+open(my $rules, ">", "dev/cpu/cpu_rules.h") or die $!;
 for my $tokens (sort keys %Parser) {
 	print $rules $tokens, ' @{', "\n";
 	print $rules merge_cpu($Parser{$tokens});
@@ -845,7 +845,7 @@ for my $cpu (@CPUS) {
 		for my $ok ('ok', 'err') {
 			next if $ixiy && $ok eq 'err';
 			
-			my $filename = "codegen/cpu_test_${cpu}${ixiy}_${ok}.asm";
+			my $filename = "dev/cpu/cpu_test_${cpu}${ixiy}_${ok}.asm";
 			open($fh{$cpu}{$ixiy}{$ok}, ">", $filename ) or die "$filename: $!";
 		}
 	}

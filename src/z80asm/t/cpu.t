@@ -1,7 +1,7 @@
 #!perl
 
 #------------------------------------------------------------------------------
-# Test cpu opcode files created by ../codegen/cpu.pl
+# Test cpu opcode files created by ../dev/cpu/cpu.pl
 #------------------------------------------------------------------------------
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use v5.10;
 use Test::More;
 use File::Basename;
 
-for my $file (<codegen/cpu_test*.asm>) {
+for my $file (<dev/cpu/cpu_test*.asm>) {
 	# build cpu, ixiy, ok options from file name
 	my $base = basename($file, ".asm");
 	my $ok = $base =~ s/_ok//; $base =~ s/_err//;
