@@ -202,6 +202,7 @@ static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
+static int             mr3k = 0;
 static int             mz80_zxn = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
@@ -418,7 +419,8 @@ static arg_t     myargs[] = {
 	{ "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
     { "mz80-zxn", AF_BOOL_TRUE, SetBoolean, &mz80_zxn, NULL, "Target the zx next z80 cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
-	{ "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2/3000 cpu" },
+	{ "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2000 cpu" },
+    { "mr3k", AF_BOOL_TRUE, SetBoolean, &mr3k, NULL, "Target the Rabbit 3000 cpu" },
 	{ "crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
 	{ "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
 	{ "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
@@ -504,6 +506,7 @@ enum {
     CPU_TYPE_Z80_ZXN,
     CPU_TYPE_Z180,
     CPU_TYPE_R2K,
+    CPU_TYPE_R3K,
     CPU_TYPE_SIZE
 };
 
@@ -512,12 +515,16 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     { "--cpu=z80-zxn", "-mz80",  "-mz80" },                     // CPU_TYPE_Z80_ZXN : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "--cpu=z180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "--cpu=r2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "--cpu=r3k",     "-mr2k",  "-mr3ka" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
 };
 
 char *select_cpu(int n)
 {
     if (mz180)
         return cpu_map[CPU_TYPE_Z180].tool[n];
+
+    if (mr3k)
+        return cpu_map[CPU_TYPE_R3K].tool[n];
 
     if (mr2k)
         return cpu_map[CPU_TYPE_R2K].tool[n];
