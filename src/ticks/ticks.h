@@ -53,6 +53,6 @@ extern void      debugger_init();
 extern void      debugger();
 extern int       disassemble(int pc);
 extern void      read_symbol_file(char *filename);
-extern char     *find_symbol(int addr);
+extern const char     *find_symbol(int addr);
 
 #endif

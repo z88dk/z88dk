@@ -1032,7 +1032,7 @@ int disassemble(int pc)
     if (label ) {
        printf("%s:\t",label);
     } else {
-      printf("l_%04x:\t",pc);
+      printf("l_%04x:\t",pc % 65536);
     }
     do {
 	char     buf1[100];

@@ -135,6 +135,10 @@ void debugger()
                 /* Out of the linenoise loop */
                 break;
             }
+        } else {
+            /* Empty line is step */
+            debugger_active = 1;
+            break;
         }
     }
 }
@@ -271,7 +275,7 @@ static int bsearch_find(const void *key, const void *elem)
      return sym->address - val;
 }
 
-char *find_symbol(int addr)
+const char *find_symbol(int addr)
 {
     symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find);
     return sym ? sym->name : NULL;
@@ -292,7 +296,13 @@ static int cmd_continue(int argc, char **argv)
 
 static int cmd_disassemble(int argc, char **argv)
 {
-    disassemble(pc);
+    int   i = 0;
+    int   where = pc;
+
+    while ( i < 10 ) {
+       where += disassemble(where);
+       i++;
+    }
     return 0;
 }
 
