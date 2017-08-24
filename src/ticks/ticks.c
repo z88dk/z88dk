@@ -2815,6 +2815,7 @@ int main (int argc, char **argv){
           case 0x8b:                                         // (ZXN) popx
             if ( c_cpu == CPU_Z80_ZXN ) {
               sp += 2;
+              st += 4;
             } else {
               st += 8;
             }
