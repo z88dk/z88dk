@@ -97,7 +97,7 @@ void debugger()
     }
 
 
-    disassemble(mem + pc, pc);
+    disassemble(pc);
     /* In the debugger, loop continuously for commands */
     snprintf(prompt,sizeof(prompt)," %04x >", pc);  // TODO: Symbol address
 
@@ -231,7 +231,7 @@ static int cmd_continue(int argc, char **argv)
 
 static int cmd_disassemble(int argc, char **argv)
 {
-    disassemble(mem + pc, pc);
+    disassemble(pc);
     return 0;
 }
 

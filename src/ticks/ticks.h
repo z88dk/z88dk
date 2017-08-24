@@ -51,6 +51,6 @@ extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
-extern void      disassemble(const uint8_t *bytes, int pc);
+extern int       disassemble(int pc);
 
 #endif
