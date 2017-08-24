@@ -45,6 +45,7 @@ static int cmd_continue(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
 static int cmd_break(int argc, char **argv);
+static int cmd_examine(int argc, char **argv);
 
 
 
@@ -56,6 +57,7 @@ static command commands[] = {
     { "dis",    cmd_disassemble,    "Disassemble current instruction" },
     { "reg",    cmd_registers,      "Display the registers" },
     { "break",  cmd_break,          "Handle breakpoints" },
+    { "x",      cmd_examine,        "Examine memory" },
     { NULL, NULL, NULL }
 };
 
@@ -418,6 +420,36 @@ static int cmd_break(int argc, char **argv)
                 break;
             }
         }          
+    }
+    return 0;
+}
+
+static int cmd_examine(int argc, char **argv)
+{
+    if ( argc == 2 ) {
+        char *end;
+        int addr = strtol(argv[1], &end, 0);
+
+        if ( end != argv[1] ) {
+            char  buf[100];
+            char  abuf[17];
+            size_t offs;
+            int    i;
+
+            abuf[16] = 0;
+            addr %= 65536;
+
+            offs = snprintf(buf,sizeof(buf),"%04x: ", addr);
+            for ( i = 0; i < 128; i++ ) {
+                uint8_t b = mem[ (addr + i) % 65536];
+                offs += snprintf(buf + offs, sizeof(buf) - offs,"%02x ", b);
+                abuf[i % 16] = isprint(b) ? b : '.';
+                if ( i % 16 == 15  && i != 0 ) {
+                    printf("%s  %s\n",buf,abuf);
+                    offs = snprintf(buf,sizeof(buf),"%04x: ", (addr + i) % 65536);
+                }
+            }
+        }
     }
     return 0;
 }
