@@ -115,6 +115,7 @@ unlink_testfiles();
 write_file("test.asm", $asm);
 ($out, $err, $exit) = capture { system "./z80asm +zx -v test.asm"; };
 is $out, <<'END';
+Reading library 'z80asm.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 4 bytes
@@ -277,6 +278,7 @@ unlink_testfiles();
 write_file("test.asm", $asm);
 ($out, $err, $exit) = capture { system "./z80asm +zx81 -v test.asm"; };
 is $out, <<'END';
+Reading library 'z80asm.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 4 bytes

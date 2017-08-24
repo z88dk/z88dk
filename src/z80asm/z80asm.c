@@ -266,6 +266,9 @@ char *GetLibfile( char *filename )
 		else
 		{
 			opts.library = TRUE;
+
+			if (opts.verbose)
+				printf("Reading library '%s'\n", found_libfilename);
 		}
 
 		myfclose(file);
@@ -347,8 +350,6 @@ int main( int argc, char *argv[] )
 	*	and assembles each one in turn */
 	parse_argv(argc, argv);
 	if (!get_num_errors()) {
-		define_assembly_defines();
-
 		for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
 			assemble_file(*pfile);
 	}

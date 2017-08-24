@@ -200,6 +200,7 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
+Reading library 'z80asm.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 3 bytes
