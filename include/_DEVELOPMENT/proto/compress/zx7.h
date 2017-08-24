@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _COMPRESS_ZX7_H
-#define _COMPRESS_ZX7_H
+#ifndef __COMPRESS_ZX7_H__
+#define __COMPRESS_ZX7_H__
 
 //////////////////////////////////////////////////////////////
 //                ZX7 FAMILY OF DECOMPRESSORS               //

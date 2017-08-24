@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _SETJMP_H
-#define _SETJMP_H
+#ifndef __SETJMP_H__
+#define __SETJMP_H__
 
 #define setjmp(env)         l_setjmp(&(env))
 #define longjmp(env, val)   l_longjmp(&(env), val)

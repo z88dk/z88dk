@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _INPUT_SMS_H
-#define _INPUT_SMS_H
+#ifndef __INPUT_SMS_H__
+#define __INPUT_SMS_H__
 
 #include <stdint.h>
 

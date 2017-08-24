@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ARCH_ZX_H
-#define _ARCH_ZX_H
+#ifndef __ARCH_ZXN_H__
+#define __ARCH_ZXN_H__
 
 #include <arch.h>
 

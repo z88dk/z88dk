@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ULAPLUS_H
-#define _ULAPLUS_H
+#ifndef __ULAPLUS_H__
+#define __ULAPLUS_H__
 
 #include <arch.h>
 

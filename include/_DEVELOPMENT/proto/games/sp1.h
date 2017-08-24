@@ -1,8 +1,5 @@
 include(__link__.m4)
 
-#ifndef _SP1_H
-#define _SP1_H
-
 ///////////////////////////////////////////////////////////
 //                  SPRITE PACK v3.0                     //
 //            aralbrec - April / May 2006                //
@@ -22,6 +19,4 @@ include(__link__.m4)
 
 #ifdef __SPECTRUM
 #include <arch/zx/sp1.h>
-#endif
-
 #endif
