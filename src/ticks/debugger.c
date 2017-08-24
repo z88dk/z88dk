@@ -36,6 +36,7 @@ typedef struct {
 
 
 
+static symbol *find_symbol_byname(const char *name);
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static char **parse_words(char *line, int *argc);
 static int cmd_step(int argc, char **argv);
@@ -275,6 +276,18 @@ static int bsearch_find(const void *key, const void *elem)
      return sym->address - val;
 }
 
+symbol *find_symbol_byname(const char *name)
+{
+    int i;
+
+    for ( i = 0; i < symbols_num; i++ ) {
+        if ( strcmp(symbols[i].name,name) == 0 ) {
+            return &symbols[i];
+        }
+    }
+    return NULL;
+}
+
 const char *find_symbol(int addr)
 {
     symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find);
@@ -343,7 +356,16 @@ static int cmd_break(int argc, char **argv)
             elem->value = value;
             LL_APPEND(breakpoints, elem);
         } else {
-            printf("Cannot break on '%s'\n",argv[1]);
+            symbol *sym = find_symbol_byname(argv[1]);
+            if ( sym != NULL ) {
+                elem = malloc(sizeof(*elem));
+                elem->type = BREAK_PC;
+                elem->value = sym->address;
+                LL_APPEND(breakpoints, elem);
+                printf("Adding breakpoint at '%s', $%04x\n",argv[1], sym->address);
+            } else {
+                printf("Cannot break on '%s'\n",argv[1]);
+            }
         }
     }
     return 0;
