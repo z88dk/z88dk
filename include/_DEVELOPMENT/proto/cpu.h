@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _CPU_H
-#define _CPU_H
+#ifndef __CPU_H__
+#define __CPU_H__
 
 // Z80
 

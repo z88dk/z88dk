@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef __STDARG_H__
+#define __STDARG_H__
 
 #ifdef __CLANG
 

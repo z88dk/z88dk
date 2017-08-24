@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _RECT_H
-#define _RECT_H
+#ifndef __RECT_H__
+#define __RECT_H__
 
 #include <stdint.h>
 

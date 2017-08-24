@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _FONT_FZX_H
-#define _FONT_FZX_H
+#ifndef __FONT_FZX_H__
+#define __FONT_FZX_H__
 
 #include <stddef.h>
 #include <stdint.h>

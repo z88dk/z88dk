@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ARPA_INET_H
-#define _ARPA_INET_H
+#ifndef __ARPA_INET_H__
+#define __ARPA_INET_H__
 
 #include <intrinsic.h>
 #include <netinet/in.h>

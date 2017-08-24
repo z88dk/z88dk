@@ -220,7 +220,7 @@ PUBLIC ASMDISP_STRTOL_CALLEE
    
 .noadj2
 
-IF FORrcmx000
+IF __CPU_R2K__ | __CPU_R3K__
 
    push bc
    
@@ -243,8 +243,12 @@ ENDIF
 
    push bc                   ; save char *
    push af
-   
+
+IF __CPU_Z80_ZXN__
+   push   0
+ELSE   
    ld bc,0                   ; push base on stack
+ENDIF
    push bc
    push ix
    call l_long_mult          ; dehl = dehl * base
@@ -253,13 +257,17 @@ ENDIF
    pop bc                    ; bc = char *
    
    ; now add in digit
-      
+IF __CPU_Z80_ZXN__
+   add  dehl,a
+ELSE      
    add a,l
    ld l,a
    jp nc, loop
    inc h
    jp nz, loop
    inc de
+ENDIF
+
 
    jp loop
    

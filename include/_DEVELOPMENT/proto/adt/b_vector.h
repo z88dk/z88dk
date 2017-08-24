@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ADT_B_VECTOR_H
-#define _ADT_B_VECTOR_H
+#ifndef __ADT_B_VECTOR_H__
+#define __ADT_B_VECTOR_H__
 
 #include <stddef.h>
 

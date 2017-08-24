@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _INTRINSIC_H
-#define _INTRINSIC_H
+#ifndef __INTRINSIC_H__
+#define __INTRINSIC_H__
 
 #ifdef __SDCC
 

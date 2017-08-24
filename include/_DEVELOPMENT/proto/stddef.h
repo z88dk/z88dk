@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STDDEF_H
-#define _STDDEF_H
+#ifndef __STDDEF_H__
+#define __STDDEF_H__
 
 #ifndef NULL
 #define NULL          ((void *)0)

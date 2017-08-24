@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ALLOC_MALLOC_H
-#define _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
+#define __ALLOC_MALLOC_H__
 
 #include <stddef.h>
 

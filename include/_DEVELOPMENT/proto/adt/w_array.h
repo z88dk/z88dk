@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ADT_W_ARRAY_H
-#define _ADT_W_ARRAY_H
+#ifndef __ADT_W_ARRAY_H__
+#define __ADT_W_ARRAY_H__
 
 #include <stddef.h>
 

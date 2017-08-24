@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef __MATH_H__
+#define __MATH_H__
 
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 

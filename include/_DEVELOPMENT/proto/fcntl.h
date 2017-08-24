@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _FCNTL_H
-#define _FCNTL_H
+#ifndef __FCNTL_H__
+#define __FCNTL_H__
 
 typedef unsigned int  mode_t;
 

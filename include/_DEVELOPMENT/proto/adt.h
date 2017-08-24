@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ADT_H
-#define _ADT_H
+#ifndef __ADT_H__
+#define __ADT_H__
 
 #include <adt/b_array.h>
 #include <adt/b_vector.h>
