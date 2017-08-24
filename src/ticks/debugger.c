@@ -11,6 +11,12 @@
 
 #define HISTORY_FILE ".ticks_history.txt"
 
+typedef struct {
+   const char    *name;
+   const char    *file;
+   int            address;
+} symbol;
+
 typedef enum {
     BREAK_PC,
     BREAK_REG
@@ -55,6 +61,8 @@ static breakpoint *breakpoints;
 
 static int debugger_active = 1;
 
+static symbol  *symbols = NULL;
+static int      symbols_num = 0;
 
 void debugger_init()
 {
@@ -218,6 +226,58 @@ static char **parse_words(char *line, int *argc)
     return args;
 }
 
+
+
+
+
+static int symbol_compare(const void *p1, const void *p2)
+{
+    const symbol *s1 = p1, *s2 = p2;
+
+    return s2->address - s1->address;
+}
+
+void read_symbol_file(char *filename)
+{
+    char  buf[256];
+    FILE *fp = fopen(filename,"r");
+
+    if ( fp != NULL ) {
+        while ( fgets(buf, sizeof(buf), fp) != NULL ) {
+            int argc;
+            char **argv = parse_words(buf,&argc);
+
+            // Ignore
+            if ( argc < 6 ) {
+                free(argv);
+                continue;
+            }
+            symbols = realloc(symbols, (symbols_num + 1) * sizeof(symbols[0]));
+            symbols[symbols_num].name = strdup(argv[0]);
+            symbols[symbols_num].file = strdup(argv[5]);
+            symbols[symbols_num].address = strtol(argv[2] + 1, NULL, 16);
+            symbols_num++;
+            free(argv);
+        }
+    }
+    qsort(symbols, symbols_num, sizeof(symbols[0]),symbol_compare);
+}
+
+static int bsearch_find(const void *key, const void *elem)
+{
+     int val = *(int *)key;
+     const symbol *sym = elem;
+
+     return sym->address - val;
+}
+
+char *find_symbol(int addr)
+{
+    symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find);
+    return sym ? sym->name : NULL;
+}
+
+
 static int cmd_step(int argc, char **argv)
 {
     return 1;  /* We should exit the loop */
@@ -277,3 +337,7 @@ static int cmd_break(int argc, char **argv)
     }
     return 0;
 }
+
+
+
+

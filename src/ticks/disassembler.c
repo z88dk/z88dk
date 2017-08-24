@@ -1009,10 +1009,16 @@ int disassemble(int pc)
     uint8_t     b;
     instruction *table = main_page;
     instruction *instr;
+    char        *label;
 
     state->pc = pc;
 
-    printf("l_%04x:\t",pc);
+    label = find_symbol(pc);
+    if (label ) {
+       printf("%s:\t",label);
+    } else {
+      printf("l_%04x:\t",pc);
+    }
     do {
 	char     buf1[100];
 	char     buf2[100];
