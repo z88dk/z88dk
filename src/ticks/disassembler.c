@@ -42,7 +42,7 @@ typedef enum {
    OP_I,
    OP_R,
    OP_IM,
-
+   OP_DEHL
 } operand;
 
 #define F_IXY   1   /* ix */
@@ -647,7 +647,7 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x20 */
+    { NULL,     OP_NONE,  OP_NONE,    0 },   /* 0x20 */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -664,24 +664,24 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x40 */
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "mul",    OP_NONE,  OP_NONE,    F_ZXN },  /* 0x30 */
+    { "add",    OP_HL,    OP_A,       F_ZXN },
+    { "add",    OP_DE,    OP_A,       F_ZXN }, /* 0xed32 */
+    { "add",    OP_BC,    OP_A,       F_ZXN }, /* 0xed33 */
+    { "add",    OP_HL,    OP_IMMED16, F_ZXN }, /* 0xed34 */
+    { "add",    OP_DE,    OP_IMMED16, F_ZXN }, /* 0xed35 */
+    { "add",    OP_BC,    OP_IMMED16, F_ZXN }, /* 0xed36 */
+    { "inc",    OP_DEHL,  OP_NONE,    F_ZXN }, /* 0xed37 */
+    { "dec",    OP_DEHL,  OP_NONE,    F_ZXN }, /* 0xed38 */
+    { "add",    OP_DEHL,  OP_A,       F_ZXN }, /* 0xed39 */
+    { "add",    OP_DEHL,  OP_BC,      F_ZXN }, /* 0xed3a */
+    { "add",    OP_DEHL,  OP_IMMED16, F_ZXN }, /* 0xed3b */
+    { "sub",    OP_DEHL,  OP_A,       F_ZXN }, /* 0xed3c */
+    { "sub",    OP_DEHL,  OP_BC,      F_ZXN }, /* 0xed3d */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { "in",     OP_B,     OP_PORTC,   0 }, /* 0x50 */
+    { "in",     OP_B,     OP_PORTC,   0 }, /* 0x40 */
     { "out",    OP_PORTC, OP_B,       0 },
     { "sbc",    OP_HL,    OP_BC,      0 },
     { "ld",     OP_IND16, OP_BC,      0 },
@@ -698,7 +698,7 @@ instruction ed_page[] = {
     { "[im0]",  OP_NONE,  OP_NONE,    0 },
     { "ld",     OP_R,     OP_A,       0 },
 
-    { "in",     OP_D,     OP_PORTC,   0 }, /* 0x60 */
+    { "in",     OP_D,     OP_PORTC,   0 }, /* 0x50 */
     { "out",    OP_PORTC, OP_D,       0 },
     { "sbc",    OP_HL,    OP_DE,      0 },
     { "ld",     OP_IND16, OP_DE,      0 },
@@ -716,7 +716,7 @@ instruction ed_page[] = {
     { "ld",     OP_A,     OP_R,       0 },
 
 
-    { "in",     OP_H,     OP_PORTC,   0 },  /* 0x70 */
+    { "in",     OP_H,     OP_PORTC,   0 },  /* 0x60 */
     { "out",    OP_PORTC, OP_H,       0 },
     { "sbc",    OP_HL,    OP_HL,      0 },
     { "ld",     OP_IND16, OP_HL,      0 },
@@ -733,7 +733,7 @@ instruction ed_page[] = {
     { "[im0]",  OP_NONE,  OP_NONE,    0 },
     { "rld",    OP_NONE,  OP_NONE,    0 },
 
-    { "in",     OP_F,     OP_PORTC,   0 }, /* 0x80 */
+    { "in",     OP_F,     OP_PORTC,   0 }, /* 0x70 */
     { "out",    OP_PORTC, OP_F,       0 },
     { "sbc",    OP_HL,    OP_SP,      0 },
     { "ld",     OP_IND16, OP_SP,      0 },
@@ -749,6 +749,23 @@ instruction ed_page[] = {
     { "[reti]", OP_NONE,  OP_NONE,    0 },
     { "[im2]",  OP_NONE,  OP_NONE,    0 },
     { "[ld r,r]", OP_NONE,OP_NONE,    0 },
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x80 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "push",   OP_IMMED16, OP_NONE,  F_ZXN }, /* 0xed8a */
+    { "popx",   OP_NONE,  OP_NONE,    F_ZXN }, /* 0xed8b */
+    { "tst",    OP_IMMED8, OP_NONE,   F_ZXN }, /* 0xed8ac*/
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
     { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x90 */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -767,24 +784,7 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0xA0 */
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-
-    { "ldi",    OP_NONE,  OP_NONE,    0 }, /* 0xB0 */
+    { "ldi",    OP_NONE,  OP_NONE,    0 }, /* 0xa0 */
     { "cpi",    OP_NONE,  OP_NONE,    0 },
     { "ini",    OP_NONE,  OP_NONE,    0 },
     { "oti",    OP_NONE,  OP_NONE,    0 },
@@ -801,7 +801,7 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { "ldir",   OP_NONE,  OP_NONE,    0 }, /* 0xc0 */
+    { "ldir",   OP_NONE,  OP_NONE,    0 }, /* 0xb0 */
     { "cpir",   OP_NONE,  OP_NONE,    0 },
     { "inIr",   OP_NONE,  OP_NONE,    0 },
     { "otir",   OP_NONE,  OP_NONE,    0 },
@@ -813,6 +813,23 @@ instruction ed_page[] = {
     { "cpdr",   OP_NONE,  OP_NONE,    0 },
     { "indr",   OP_NONE,  OP_NONE,    0 },
     { "otdr",   OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0xc0 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -866,7 +883,7 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "trap",   OP_NONE,  OP_NONE,    0 }, /* 0xedfe - Our emulator trap */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 };
 
