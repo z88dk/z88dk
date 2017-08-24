@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ARCH_H
-#define _ARCH_H
+#ifndef __ARCH_H__
+#define __ARCH_H__
 
 // target configuration goes here
 

@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _IM2_H
-#define _IM2_H
+#ifndef __IM2_H__
+#define __IM2_H__
 
 #include <stdint.h>
 

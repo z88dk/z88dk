@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _THREADS_H
-#define _THREADS_H
+#ifndef __THREADS_H__
+#define __THREADS_H__
 
 #include <stdint.h>
 

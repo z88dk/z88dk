@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ARCH_SMS_H
-#define _ARCH_SMS_H
+#ifndef __ARCH_SMS_H__
+#define __ARCH_SMS_H__
 
 #include <arch.h>
 #include <rect.h>

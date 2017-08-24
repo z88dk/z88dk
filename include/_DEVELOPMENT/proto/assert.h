@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ASSERT_H
-#define _ASSERT_H
+#ifndef __ASSERT_H__
+#define __ASSERT_H__
 
 #include <stdio.h>
 #include <stdlib.h>

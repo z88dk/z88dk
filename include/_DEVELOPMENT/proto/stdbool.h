@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STDBOOL_H
-#define _STDBOOL_H
+#ifndef __STDBOOL_H__
+#define __STDBOOL_H__
 
 #define bool        _Bool
 

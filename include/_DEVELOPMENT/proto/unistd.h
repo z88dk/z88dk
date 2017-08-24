@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _UNISTD_H
-#define _UNISTD_H
+#ifndef __UNISTD_H__
+#define __UNISTD_H__
 
 #ifndef NULL
 #define NULL                   ((void*)(0))

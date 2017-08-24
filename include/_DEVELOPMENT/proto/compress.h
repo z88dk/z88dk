@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _COMPRESS_H
-#define _COMPRESS_H
+#ifndef __COMPRESS_H__
+#define __COMPRESS_H__
 
 // data compression / decompression
 

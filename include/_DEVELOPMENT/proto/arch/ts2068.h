@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ARCH_TS2068_H
-#define _ARCH_TS2068_H
+#ifndef __ARCH_TS2068_H__
+#define __ARCH_TS2068_H__
 
 #include <arch.h>
 

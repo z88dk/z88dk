@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ALLOC_H
-#define _ALLOC_H
+#ifndef __ALLOC_H__
+#define __ALLOC_H__
 
 #include <alloc/balloc.h>
 #include <alloc/malloc.h>

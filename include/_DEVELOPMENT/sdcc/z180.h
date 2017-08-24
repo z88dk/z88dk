@@ -4,8 +4,8 @@
 
 #ifdef __Z180
 
-#ifndef _Z180_H
-#define _Z180_H
+#ifndef __Z180_H__
+#define __Z180_H__
 
 #include <arch.h>
 #include <stdint.h>

@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STDLIB_H
-#define _STDLIB_H
+#ifndef __STDLIB_H__
+#define __STDLIB_H__
 
 #include <stddef.h>
 #include <stdint.h>

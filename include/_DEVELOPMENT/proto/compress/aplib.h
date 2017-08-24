@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _COMPRESS_APLIB_H
-#define _COMPRESS_APLIB_H
+#ifndef __COMPRESS_APLIB_H__
+#define __COMPRESS_APLIB_H__
 
 //////////////////////////////////////////////////////////////////
 //                      APLIB DECOMPRESSOR                      //

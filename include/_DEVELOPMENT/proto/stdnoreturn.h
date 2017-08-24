@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STDNORETURN_H
-#define _STDNORETURN_H
+#ifndef __STDNORETURN_H__
+#define __STDNORETURN_H__
 
 #define noreturn   _Noreturn
 #define _Noreturn
