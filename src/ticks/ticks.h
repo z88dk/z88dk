@@ -51,7 +51,7 @@ extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
-extern int       disassemble(int pc);
+extern int       disassemble(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr);
 

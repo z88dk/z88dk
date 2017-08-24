@@ -905,7 +905,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     int8_t displacement = 0;
     uint8_t msb, lsb;
     const char   *label;
-    
+
     switch ( op ) {
     case OP_NONE:
         return NULL;
@@ -1034,7 +1034,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     }
 }
 
-int disassemble(int pc)
+int disassemble(int pc, char *buf, size_t buflen)
 {
     dcontext    s_state = {0};
     dcontext   *state = &s_state;
@@ -1043,14 +1043,18 @@ int disassemble(int pc)
     instruction *table = main_page;
     instruction *instr;
     const char  *label;
+    size_t       offs = 0;
 
     state->pc = pc;
 
     label = find_symbol(pc);
     if (label ) {
-       printf("%s:\t",label);
+        offs += snprintf(buf + offs, buflen - offs, "%s:",label);
     } else {
-      printf("l_%04x:\t",pc % 65536);
+        offs += snprintf(buf + offs, buflen - offs,"l_%04x:",pc % 65536);
+    }
+    if ( offs < 20 ) {
+        offs = snprintf(buf, buflen, "%-20s", buf);
     }
     do {
         char     buf1[100];
@@ -1080,27 +1084,26 @@ int disassemble(int pc)
 
         /* We now have the instruction (TODO: CPU flags) */
         if ( instr->opcode == NULL ) {
-            printf("\t[nop]\t\t;");
+            offs += snprintf(buf + offs, buflen - offs,"\t[nop]\t\t;");
         } else {
-            printf("\t%-8s", instr->opcode);
+            offs += snprintf(buf + offs, buflen - offs,"\t%-8s", instr->opcode);
             op1 = get_operand(state, instr, instr->op1,buf1,sizeof(buf1));
             op2 = get_operand(state, instr, instr->op2,buf2,sizeof(buf2));
 
             if ( op1 ) {
-                printf("%s",op1);
+                offs += snprintf(buf + offs, buflen - offs,"%s",op1);
                 if ( op2 ) {
-                    printf(",%s",op2);
+                    offs += snprintf(buf + offs, buflen - offs,",%s",op2);
                 }
             }
-            printf("\t\t;");
+            offs += snprintf(buf + offs, buflen - offs,"\t\t;");
         }
         break;
     } while ( 1 );
 
     for ( i = 0; i < state->len; i++ ) {
-        printf("%s%02x", i ? " " : "", state->instr_bytes[i]);
+        offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
     }
-    printf("\n");
 
     return state->len;
 }

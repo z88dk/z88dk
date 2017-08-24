@@ -39,6 +39,7 @@ typedef struct {
 static symbol *find_symbol_byname(const char *name);
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static char **parse_words(char *line, int *argc);
+static int cmd_next(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
@@ -49,7 +50,8 @@ static int cmd_break(int argc, char **argv);
 
 
 static command commands[] = {
-    { "step",   cmd_step,           "Step the instruction" },
+    { "next",   cmd_next,           "Step the instruction (over calls)" },
+    { "step",   cmd_step,           "Step the instruction (including into calls)" },
     { "cont",   cmd_continue,       "Continue execution" },
     { "dis",    cmd_disassemble,    "Disassemble current instruction" },
     { "reg",    cmd_registers,      "Display the registers" },
@@ -61,6 +63,7 @@ static command commands[] = {
 static breakpoint *breakpoints;
 
 static int debugger_active = 1;
+static int next_address = -1;
 
 static symbol  *symbols = NULL;
 static int      symbols_num = 0;
@@ -86,6 +89,7 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
 
 void debugger()
 {
+    char   buf[256];
     char   prompt[100];
     char  *line;
 
@@ -101,12 +105,17 @@ void debugger()
             }
             i++;
         }
+        if ( pc == next_address ) {
+            next_address = -1;
+            dodebug = 1;
+        }
         /* Check breakpoints */
         if ( dodebug == 0 ) return;
     }
 
 
-    disassemble(pc);
+    disassemble(pc, buf, sizeof(buf));
+    printf("%s\n",buf);
     /* In the debugger, loop continuously for commands */
     snprintf(prompt,sizeof(prompt)," %04x >", pc);  // TODO: Symbol address
 
@@ -294,6 +303,34 @@ const char *find_symbol(int addr)
     return sym ? sym->name : NULL;
 }
 
+static int cmd_next(int argc, char **argv)
+{
+    char  buf[100];
+    int   len;
+    uint8_t opcode = mem[pc];
+
+    len = disassemble(pc, buf, sizeof(buf));
+
+    // Set a breakpoint after the call
+    printf("%02x %02x %02x\n",opcode,opcode & 0xc0, opcode & 0x07);
+    switch ( opcode ) {
+    case 0xc4:
+    case 0xcc:
+    case 0xcd:
+    case 0xd4:
+    case 0xdc:
+    case 0xe4:
+    case 0xec:
+    case 0xf4:
+        // It's a call
+        debugger_active = 0;
+        next_address = pc + len;
+        return 1;
+    }
+
+    debugger_active = 1;
+    return 1;  /* We should exit the loop */
+}
 
 static int cmd_step(int argc, char **argv)
 {
@@ -309,11 +346,13 @@ static int cmd_continue(int argc, char **argv)
 
 static int cmd_disassemble(int argc, char **argv)
 {
+    char  buf[256];
     int   i = 0;
     int   where = pc;
 
     while ( i < 10 ) {
-       where += disassemble(where);
+       where += disassemble(where, buf, sizeof(buf));
+       printf("%s\n",buf);
        i++;
     }
     return 0;
@@ -341,7 +380,7 @@ static int cmd_break(int argc, char **argv)
         /* Just show the breakpoints */
         LL_FOREACH(breakpoints, elem) {
             if ( elem->type == BREAK_PC) {
-                printf("%d:\tPC=%04x\n",i, elem->value);
+                printf("%d:\tPC = $%04x\n",i, elem->value);
             }
             i++;
         }
@@ -367,6 +406,18 @@ static int cmd_break(int argc, char **argv)
                 printf("Cannot break on '%s'\n",argv[1]);
             }
         }
+    } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
+        int num = atoi(argv[2]);
+        breakpoint *elem;
+
+        LL_FOREACH(breakpoints, elem) {
+            num--;
+            if ( num == 0 ) {
+                printf("Deleting breakpoint %d\n",atoi(argv[2]));
+                LL_DELETE(breakpoints,elem);
+                break;
+            }
+        }          
     }
     return 0;
 }
