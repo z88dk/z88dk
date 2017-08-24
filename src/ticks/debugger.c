@@ -280,6 +280,7 @@ char *find_symbol(int addr)
 
 static int cmd_step(int argc, char **argv)
 {
+    debugger_active = 1;
     return 1;  /* We should exit the loop */
 }
 

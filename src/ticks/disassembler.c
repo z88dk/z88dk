@@ -26,6 +26,7 @@ typedef enum {
    OP_IND16,
    OP_IMMED8,
    OP_IMMED16,
+   OP_ADDR16,
    OP_Z,
    OP_NZ,
    OP_Ca,
@@ -270,9 +271,9 @@ instruction main_page[] = {
 
     { "ret",    OP_NZ,    OP_NONE,    0 },
     { "pop",    OP_BC,    OP_NONE,    0 },
-    { "jp",     OP_NZ,    OP_IMMED16, 0 },
-    { "jp",     OP_IMMED16, OP_NONE,  0 },
-    { "call",   OP_NZ,    OP_IMMED16, 0 },
+    { "jp",     OP_NZ,    OP_ADDR16, 0 },
+    { "jp",     OP_ADDR16, OP_NONE,  0 },
+    { "call",   OP_NZ,    OP_ADDR16, 0 },
     { "push",   OP_BC,    OP_NONE,    0 },
     { "add",    OP_A,     OP_IMMED8,  0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
@@ -280,8 +281,8 @@ instruction main_page[] = {
     { "ret",    OP_NONE,  OP_NONE,    0 },
     { "jp",     OP_Z,     OP_IMMED16, 0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },   /* CB */
-    { "call",   OP_Z,     OP_IMMED16, 0 },
-    { "call",   OP_IMMED16, OP_NONE,  0 },
+    { "call",   OP_Z,     OP_ADDR16, 0 },
+    { "call",   OP_ADDR16, OP_NONE,  0 },
     { "adc",    OP_A,     OP_IMMED8,  0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
 
@@ -289,49 +290,49 @@ instruction main_page[] = {
     { "pop",    OP_DE,    OP_NONE,    0 },
     { "jp",     OP_NC,    OP_IMMED16, 0 },
     { "out",    OP_IND8,  OP_A,       0 },
-    { "call",   OP_NC,    OP_IMMED16, 0 },
+    { "call",   OP_NC,    OP_ADDR16, 0 },
     { "push",   OP_DE,    OP_NONE,    0 },
     { "sub",    OP_A,     OP_IMMED8,  0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
     { "ret",    OP_Ca,    OP_NONE,    0 },
     { "exx",    OP_NONE,  OP_NONE,    0 },
-    { "jp",     OP_C,     OP_IMMED16, 0 },
+    { "jp",     OP_C,     OP_ADDR16, 0 },
     { "in",     OP_A,     OP_IND8,    0 },
-    { "call",   OP_Ca,    OP_IMMED16, 0 },
+    { "call",   OP_Ca,    OP_ADDR16, 0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },   /* DD */
     { "sbc",    OP_A,     OP_IMMED8,  0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
 
     { "ret",    OP_PO,    OP_NONE,    0 },
     { "pop",    OP_HL,    OP_NONE,    F_IXY },
-    { "jp",     OP_PO,    OP_IMMED16, 0 },
+    { "jp",     OP_PO,    OP_ADDR16, 0 },
     { "ex",     OP_INDSP, OP_HL,      F_IXY },
-    { "call",   OP_PO,    OP_IMMED16, 0 },
+    { "call",   OP_PO,    OP_ADDR16, 0 },
     { "push",   OP_HL,    OP_NONE,    F_IXY },
     { "and",    OP_IMMED8, OP_NONE,   0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
     { "ret",    OP_PE,    OP_NONE,    0 },
     { "jp",     OP_INDHL, OP_NONE,    0 },
-    { "jp",     OP_PE,    OP_IMMED16, 0 },
+    { "jp",     OP_PE,    OP_ADDR16, 0 },
     { "ex",     OP_DE,    OP_HL,      0 },
-    { "call",   OP_PE,    OP_IMMED16, 0 },
+    { "call",   OP_PE,    OP_ADDR16, 0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },   /* DD */
     { "xor",    OP_IMMED8, OP_NONE,   0 },
 
     { "rst",    OP_RST,   OP_NONE,    0 },
     { "ret",    OP_P,     OP_NONE,    0 },
     { "pop",    OP_AF,    OP_NONE,    0 },
-    { "jp",     OP_P,     OP_IMMED16, 0 },
+    { "jp",     OP_P,     OP_ADDR16, 0 },
     { "di",     OP_NONE,  OP_NONE,    0 },
-    { "call",   OP_P,     OP_IMMED16, 0 },
+    { "call",   OP_P,     OP_ADDR16, 0 },
     { "push",   OP_AF,    OP_NONE,    0 },
     { "or",     OP_IMMED8, OP_NONE,   0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
     { "ret",    OP_M,     OP_NONE,    0 },
     { "ld",     OP_SP,    OP_HL,      F_IXY },
-    { "jp",     OP_M,     OP_IMMED16, 0 },
+    { "jp",     OP_M,     OP_ADDR16, 0 },
     { "ei",     OP_NONE,  OP_NONE,    0 },
-    { "call",   OP_M,     OP_IMMED16, 0 },
+    { "call",   OP_M,     OP_ADDR16, 0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },   /* FD */
     { "cp",     OP_IMMED8, OP_NONE,   0 },
     { "rst",    OP_RST,   OP_NONE,    0 }
@@ -886,6 +887,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
 {
     int8_t displacement = 0;
     uint8_t msb, lsb;
+    char   *label;
 
 
     switch ( op ) {
@@ -975,10 +977,23 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
 	READ_BYTE(state, lsb);
 	READ_BYTE(state, msb);
 	snprintf(buf,buflen,"($%02x%02x)", msb, lsb);
+        label = find_symbol(lsb + msb * 256);
+        if (label ) {
+             snprintf(buf,buflen,"(%s)",label);
+        }
 	return buf;
     case OP_IMMED8:
 	READ_BYTE(state, lsb);
 	snprintf(buf,buflen,"$%02x", lsb);
+	return buf;
+    case OP_ADDR16:
+	READ_BYTE(state, lsb);
+	READ_BYTE(state, msb);
+	snprintf(buf,buflen,"$%02x%02x", msb, lsb);
+        label = find_symbol(lsb + msb * 256);
+        if (label ) {
+             snprintf(buf,buflen,"%s",label);
+        }
 	return buf;
     case OP_IMMED16:
 	READ_BYTE(state, lsb);
