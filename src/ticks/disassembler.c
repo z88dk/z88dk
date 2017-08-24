@@ -64,7 +64,7 @@ typedef struct {
 
 
 instruction main_page[] = {
-    { "nop",	OP_NONE,  OP_NONE,    0 },
+    { "nop",    OP_NONE,  OP_NONE,    0 },
     { "ld",     OP_BC,    OP_IMMED16, 0 },
     { "ld",     OP_INDBC, OP_A,       0 },
     { "inc",    OP_BC,    OP_NONE,    0 }, 
@@ -904,132 +904,133 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
 {
     int8_t displacement = 0;
     uint8_t msb, lsb;
-    char   *label;
-
-
+    const char   *label;
+    
     switch ( op ) {
     case OP_NONE:
-	return NULL;
+        return NULL;
     case OP_A:
-	return "a";
+        return "a";
     case OP_B:
-	return "b";
+        return "b";
     case OP_C:
-	return "c";
+        return "c";
     case OP_D:
-	return "d";
+        return "d";
     case OP_E:
-	return "e";
+        return "e";
     case OP_H:
-	if ( state->index == 0xDD && instr->flags & F_IXY) {
-	    return "ixh";
-	} else if ( state->index == 0xFD && instr->flags & F_IXY) {
-	    return "iyh";
+        if ( state->index == 0xDD && instr->flags & F_IXY) {
+            return "ixh";
+        } else if ( state->index == 0xFD && instr->flags & F_IXY) {
+            return "iyh";
         }
-	return "h";
+        return "h";
     case OP_L:
-	if ( state->index == 0xDD && instr->flags & F_IXY) {
-	    return "ixl";
-	} else if ( state->index == 0xFD && instr->flags & F_IXY) {
-	    return "iyl";
+        if ( state->index == 0xDD && instr->flags & F_IXY) {
+            return "ixl";
+        } else if ( state->index == 0xFD && instr->flags & F_IXY) {
+            return "iyl";
         }
-	return "l";
+        return "l";
     case OP_AF:
-	return "af";
+        return "af";
     case OP_BC:
-	return "bc";
+        return "bc";
     case OP_DE:
-	return "de";
+        return "de";
     case OP_HL:
-	if ( state->index == 0xDD ) {
-	    return "ix";
-	} else if ( state->index == 0xFD ) {
-	    return "iy";
+        if ( state->index == 0xDD ) {
+            return "ix";
+        } else if ( state->index == 0xFD ) {
+            return "iy";
         }
-	return "hl";
+        return "hl";
     case OP_SP:
-	return "sp";
+        return "sp";
     case OP_INDDE:
-	return "(de)";
+        return "(de)";
     case OP_INDBC:
-	return "(bc)";
+        return "(bc)";
     case OP_INDSP:
-	return "(sp)";
+        return "(sp)";
     case OP_Z:
-	return "z";
+        return "z";
     case OP_NZ:
-	return "nz";
+        return "nz";
     case OP_Ca:
-	return "c";
+        return "c";
     case OP_NC:
-	return "nc";
+        return "nc";
     case OP_P:
-	return "p";
+        return "p";
     case OP_PO:
-	return "po";
+        return "po";
     case OP_PE:
-	return "pe";
+        return "pe";
     case OP_M:
-	return "m";
+        return "m";
     case OP_PORTC:
-	return "(c)";
+        return "(c)";
     case OP_F:
-	return "f";
+        return "f";
     case OP_I:
-	return "i";
+        return "i";
     case OP_R:
-	return "r";
+        return "r";
     case OP_INDHL:
-	if ( instr->flags & F_INDXY && state->index ) {
-	    READ_BYTE(state, displacement);
-	    snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "ix" : "iy", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
-	    return buf;
+        if ( instr->flags & F_INDXY && state->index ) {
+            READ_BYTE(state, displacement);
+            snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "ix" : "iy", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
+            return buf;
         }
-	return "(hl)";
+        return "(hl)";
     case OP_IND8:
-	READ_BYTE(state, lsb);
-	snprintf(buf,buflen,"($%02x", lsb);
-	return buf;
+        READ_BYTE(state, lsb);
+        snprintf(buf,buflen,"($%02x", lsb);
+        return buf;
     case OP_IND16:
-	READ_BYTE(state, lsb);
-	READ_BYTE(state, msb);
-	snprintf(buf,buflen,"($%02x%02x)", msb, lsb);
+        READ_BYTE(state, lsb);
+        READ_BYTE(state, msb);
+        snprintf(buf,buflen,"($%02x%02x)", msb, lsb);
         label = find_symbol(lsb + msb * 256);
         if (label ) {
              snprintf(buf,buflen,"(%s)",label);
         }
-	return buf;
+        return buf;
     case OP_IMMED8:
-	READ_BYTE(state, lsb);
-	snprintf(buf,buflen,"$%02x", lsb);
-	return buf;
+        READ_BYTE(state, lsb);
+        snprintf(buf,buflen,"$%02x", lsb);
+        return buf;
     case OP_ADDR16:
-	READ_BYTE(state, lsb);
-	READ_BYTE(state, msb);
-	snprintf(buf,buflen,"$%02x%02x", msb, lsb);
+      READ_BYTE(state, lsb);
+        READ_BYTE(state, msb);
+        snprintf(buf,buflen,"$%02x%02x", msb, lsb);
         label = find_symbol(lsb + msb * 256);
         if (label ) {
              snprintf(buf,buflen,"%s",label);
         }
-	return buf;
+        return buf;
     case OP_IMMED16:
-	READ_BYTE(state, lsb);
-	READ_BYTE(state, msb);
-	snprintf(buf,buflen,"$%02x%02x", msb, lsb);
-	return buf;
+        READ_BYTE(state, lsb);
+        READ_BYTE(state, msb);
+        snprintf(buf,buflen,"$%02x%02x", msb, lsb);
+        return buf;
     case OP_REL8:
-	READ_BYTE(state, lsb);
-	snprintf(buf,buflen,"$%04x", state->pc + lsb); // TODO...
-	return buf;
+        READ_BYTE(state, lsb);
+        snprintf(buf,buflen,"$%04x", state->pc + lsb); // TODO...
+        return buf;
     case OP_BIT:
-	snprintf(buf,buflen,"%d", (( state->opcode ) & 0x38) >> 3);
-	return buf;
+        snprintf(buf,buflen,"%d", (( state->opcode ) & 0x38) >> 3);
+        return buf;
     case OP_RST:
-	snprintf(buf,buflen,"%d", ( state->opcode ) & 0x38);
-	return buf;
+        snprintf(buf,buflen,"%d", ( state->opcode ) & 0x38);
+        return buf;
     case OP_IM:
         snprintf(buf, buflen, "%d", !(state->opcode & (1 << 4)) ? 0 : !(state->opcode & (1 << 3)) ? 1 : 2);
-	return buf; 
+        return buf; 
+    case OP_DEHL:
+        return "dehl";
     }
 }
 
@@ -1041,7 +1042,7 @@ int disassemble(int pc)
     uint8_t     b;
     instruction *table = main_page;
     instruction *instr;
-    char        *label;
+    const char  *label;
 
     state->pc = pc;
 
@@ -1052,52 +1053,52 @@ int disassemble(int pc)
       printf("l_%04x:\t",pc % 65536);
     }
     do {
-	char     buf1[100];
-	char     buf2[100];
-	char    *op1 = NULL;
-	char    *op2 = NULL;
+        char     buf1[100];
+        char     buf2[100];
+        char    *op1 = NULL;
+        char    *op2 = NULL;
 
-	if ( state->len > 5 ) {
-	    /* Instruction too long */
-	    break;
-	}
+        if ( state->len > 5 ) {
+            /* Instruction too long */
+            break;
+        }
         READ_BYTE(state,b);
         if ( b == 0xDD || b == 0xFD ) {
             state->index = b;
-	    continue;
+            continue;
         }
-	if ( b == 0xED ) {
-	    table = ed_page;
+        if ( b == 0xED ) {
+            table = ed_page;
             READ_BYTE(state,b);
-	    state->index = 0; // Index ops not permitted
-	} else if ( b == 0xcb ) {
-	    table = cb_page;
+            state->index = 0; // Index ops not permitted
+        } else if ( b == 0xcb ) {
+            table = cb_page;
             READ_BYTE(state,b);
-	}
-	state->opcode = b;
-	instr = &table[b];
+        }
+        state->opcode = b;
+        instr = &table[b];
 
-	/* We now have the instruction (TODO: CPU flags) */
-	if ( instr->opcode == NULL ) {
-	    printf("\t[nop]\t\t;");
-	} else {
+        /* We now have the instruction (TODO: CPU flags) */
+        if ( instr->opcode == NULL ) {
+            printf("\t[nop]\t\t;");
+        } else {
             printf("\t%-8s", instr->opcode);
-	    op1 = get_operand(state, instr, instr->op1,buf1,sizeof(buf1));
-	    op2 = get_operand(state, instr, instr->op2,buf2,sizeof(buf2));
+            op1 = get_operand(state, instr, instr->op1,buf1,sizeof(buf1));
+            op2 = get_operand(state, instr, instr->op2,buf2,sizeof(buf2));
 
-	    if ( op1 ) {
-		printf("%s",op1);
-		if ( op2 ) {
-		    printf(",%s",op2);
-		}
+            if ( op1 ) {
+                printf("%s",op1);
+                if ( op2 ) {
+                    printf(",%s",op2);
+                }
             }
-	    printf("\t\t;");
-	}
-	break;
+            printf("\t\t;");
+        }
+        break;
     } while ( 1 );
 
     for ( i = 0; i < state->len; i++ ) {
-	printf("%s%02x", i ? " " : "", state->instr_bytes[i]);
+        printf("%s%02x", i ? " " : "", state->instr_bytes[i]);
     }
     printf("\n");
 
