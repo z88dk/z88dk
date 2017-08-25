@@ -2654,6 +2654,7 @@ int main (int argc, char **argv){
               e = (result >> 16) & 0xff;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2663,6 +2664,7 @@ int main (int argc, char **argv){
               int16_t result = (( h * 256 ) + l) + a;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2672,6 +2674,7 @@ int main (int argc, char **argv){
               int16_t result = (( d * 256 ) + e) + a;
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2681,6 +2684,7 @@ int main (int argc, char **argv){
               int16_t result = (( b * 256 ) + c) + a;
               b  = (result >> 8 ) & 0xff;
               c = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2692,6 +2696,7 @@ int main (int argc, char **argv){
               int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 12;
             } else {
               st += 8;
             }
@@ -2703,6 +2708,7 @@ int main (int argc, char **argv){
               int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
+              st += 12;
             } else {
               st += 8;
             }
@@ -2714,6 +2720,7 @@ int main (int argc, char **argv){
               int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
               b = (result >> 8 ) & 0xff;
               c = result & 0xff;
+              st += 12;
             } else {
               st += 8;
             }
@@ -2722,6 +2729,7 @@ int main (int argc, char **argv){
             if ( c_cpu == CPU_Z80_ZXN ) {
               h = ( sp / 256);
               l = ( sp % 256);
+              st += 4;
             } else {
               st += 8;
             }
@@ -2732,6 +2740,7 @@ int main (int argc, char **argv){
                 if ( ++h == 0 ) 
                   if ( ++e == 0 ) 
                     ++d;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2742,6 +2751,7 @@ int main (int argc, char **argv){
                 if ( --h == 0xff ) 
                   if ( --e == 0xff ) 
                     --d;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2753,6 +2763,7 @@ int main (int argc, char **argv){
               e = (result >> 16) & 0xff;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2764,6 +2775,7 @@ int main (int argc, char **argv){
               e = (result >> 16) & 0xff;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2777,6 +2789,7 @@ int main (int argc, char **argv){
               e = (result >> 16) & 0xff;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 12;
             } else {
               st += 8;
             }
@@ -2788,6 +2801,7 @@ int main (int argc, char **argv){
               e = (result >> 16) & 0xff;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2799,6 +2813,7 @@ int main (int argc, char **argv){
               e = (result >> 16) & 0xff;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
+              st += 4;
             } else {
               st += 8;
             }
@@ -2808,6 +2823,7 @@ int main (int argc, char **argv){
               uint8_t lsb = mem[pc++];
               uint8_t msb = mem[pc++];
               PUSH(msb,lsb);
+              st += 12;
             } else {
               st += 8;
             }
@@ -2825,6 +2841,7 @@ int main (int argc, char **argv){
               uint8_t olda = a;
               AND(mem[pc++], 0);
               a = olda;
+              st += 7;
             } else {
               st += 8;
             }
