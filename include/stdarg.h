@@ -23,16 +23,18 @@
 #define __STDARG_H__
 
 
-
-
 #ifdef __Z88DK_R2L_CALLING_CONVENTION
 
 /* sdcc/sccz80 in r2l mode is a lot more standard */
 typedef unsigned char * va_list;
+
 #define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
 #define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
 #define va_copy(dest, src)      { dest = src; }
 #define va_end(marker)          { marker = (va_list) 0; };
+
+#define va_ptr(marker, type)    *((type *)(marker - sizeof(type)))
+
 #else
 
 /* sccz80 (l2r) variant*/
@@ -41,10 +43,14 @@ typedef unsigned char * va_list;
 extern int __LIB__ getarg(void);
 #endif
 
-#define va_list unsigned char *
-#define va_start(ap,last) ap=(getarg()*2)+&last-2
-#define va_arg(ap,type) (type *)*(ap-=sizeof(type))
+#define va_list                 unsigned char *
+#define va_start(ap,last)       ap=(getarg()*2)+&last-5
+#define va_arg(ap,type)         (*(type*)(ap-=sizeof(type),ap+1))
+#define va_copy(dst, src)       dst = src
 #define va_end(ap)
+
+#define va_ptr(ap,type)         (*(type*)(ap+1))
+
 
 /*
  * This (non-standard) macro could be used by routines
