@@ -15,7 +15,7 @@ crt0_init_bss:
         ld      hl,__BSS_head
         ld      de,__BSS_head + 1
         ld      bc,__BSS_END_tail - __BSS_head - 1
-        xor     a               ;Reset atexit() count
+        xor     a 
 	ld	(hl),a
         ldir
 
@@ -31,8 +31,7 @@ IF !DEFINED_nostreams
         ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc
-    EXTERN __tail
-	ld	hl,__tail
+	ld	hl,__BSS_END_tail
 	ld	(_heap),hl
 ENDIF
 IF ( __crt_model & 1 )
