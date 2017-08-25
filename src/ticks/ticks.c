@@ -2626,9 +2626,9 @@ int main (int argc, char **argv){
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-          case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+          case 0xa5: case 0xa6: case 0xa7:
           case 0xac: case 0xad: case 0xae: case 0xaf:
-          case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+          case 0xb5: case 0xb6: case 0xb7:
           case 0xbc: case 0xbd: case 0xbe: case 0xbf:
           case 0xc0: case 0xc1: case 0xc2: case 0xc3:
           case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -2846,6 +2846,42 @@ int main (int argc, char **argv){
               st += 8;
             }
             break;
+          case 0xa4: st+= 16;                                // (ZXN) ldix
+              t = mem[l | h<<8];
+              if ( t != a ) {
+                  mem[e | d<<8]= t= mem[l | h<<8];
+              }
+              mem[e | d<<8]= t= mem[l | h<<8];
+              ++l || h++;
+              ++e || d++;
+              c-- || b--;
+              fr && (fr= 1);
+              t+= a;
+              ff=  ff    & -41
+                    | t     &   8
+                    | t<<4  &  32;
+              fa= 0;
+              b|c && (fa= 128);
+              fb= fa; break;
+          case 0xb4: st+= 16;                                // (ZXN) ldirx
+              t = mem[l | h<<8];
+              if ( t != a ) {
+                  mem[e | d<<8]= t= mem[l | h<<8];
+              }
+              ++l || h++;
+              ++e || d++;
+              c-- || b--;
+              fr && (fr= 1);
+              t+= a;
+              ff=  ff    & -41
+                 | t     &   8
+                 | t<<4  &  32;
+              fa= 0;
+              b|c && ( fa= 128,
+                       st+= 5,
+                       mp= --pc,
+                              --pc);
+                     fb= fa; break;
           case 0xfe: PatchZ80(); break;
           case 0x40: INR(b); break;                          // IN B,(C)
           case 0x48: INR(c); break;                          // IN C,(C)

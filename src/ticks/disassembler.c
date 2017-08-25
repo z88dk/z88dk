@@ -788,7 +788,7 @@ instruction ed_page[] = {
     { "cpi",    OP_NONE,  OP_NONE,    0 },
     { "ini",    OP_NONE,  OP_NONE,    0 },
     { "oti",    OP_NONE,  OP_NONE,    0 },
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "ldix",   OP_NONE,  OP_NONE,    F_ZXN }, /* 0xa4 */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -803,9 +803,9 @@ instruction ed_page[] = {
 
     { "ldir",   OP_NONE,  OP_NONE,    0 }, /* 0xb0 */
     { "cpir",   OP_NONE,  OP_NONE,    0 },
-    { "inIr",   OP_NONE,  OP_NONE,    0 },
+    { "inir",   OP_NONE,  OP_NONE,    0 },
     { "otir",   OP_NONE,  OP_NONE,    0 },
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "ldirx",  OP_NONE,  OP_NONE,    F_ZXN }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
