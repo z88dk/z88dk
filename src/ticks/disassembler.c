@@ -654,7 +654,7 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_IMMED8, OP_NONE,   F_ZXN }, /* 0xed27 */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -762,7 +762,7 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "push",   OP_IMMED16, OP_NONE,  F_ZXN }, /* 0xed8a */
     { "popx",   OP_NONE,  OP_NONE,    F_ZXN }, /* 0xed8b */
-    { "tst",    OP_IMMED8, OP_NONE,   F_ZXN }, /* 0xed8ac*/
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 

@@ -2613,7 +2613,7 @@ int main (int argc, char **argv){
           case 0x18: case 0x19: case 0x1a: case 0x1b:
           case 0x1c: case 0x1d: case 0x1e: case 0x1f:
           case 0x20: case 0x21: case 0x22: case 0x23:
-          case 0x24: case 0x26: case 0x27:
+          case 0x24: case 0x26: 
           case 0x28: case 0x29: case 0x2a: case 0x2b:
           case 0x2c: case 0x2d: case 0x2e: case 0x2f:
           case 0x3e: case 0x3f:
@@ -2621,7 +2621,7 @@ int main (int argc, char **argv){
           case 0x80: case 0x81: case 0x82: case 0x83:
           case 0x84: case 0x85: case 0x86: case 0x87:
           case 0x88: case 0x89: 
-          case 0x8d: case 0x8e: case 0x8f:
+          case 0x8c: case 0x8d: case 0x8e: case 0x8f:
           case 0x90: case 0x91: case 0x92: case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
@@ -2836,7 +2836,7 @@ int main (int argc, char **argv){
               st += 8;
             }
             break;
-          case 0x8c:                                         // (ZXN) tst $xx
+          case 0x27:                                         // (ZXN) tst $xx
             if ( c_cpu == CPU_Z80_ZXN ) {
               uint8_t olda = a;
               AND(mem[pc++], 0);
