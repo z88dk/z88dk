@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _CTYPE_H
-#define _CTYPE_H
+#ifndef __CTYPE_H__
+#define __CTYPE_H__
 
 __DPROTO(`b,c,d,e',`b,c,d,e',int,,isalnum,int)
 __DPROTO(`b,c,d,e',`b,c,d,e',int,,isalpha,int)

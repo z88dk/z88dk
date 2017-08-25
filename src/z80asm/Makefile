@@ -36,6 +36,10 @@ STD = -std=gnu99
 LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 
+TARGET_LIB =	z80asm.lib
+TARGET_LST =	dev/z80asm_lib/z80asm_lib.lst
+TARGET_ASM =	$(wildcard dev/z80asm_lib/*.asm)
+
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
@@ -55,6 +59,16 @@ $(TARGET): ../config.h $(OBJS)
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
 
 #------------------------------------------------------------------------------
+# library
+#------------------------------------------------------------------------------
+all: $(TARGET_LIB)
+$(TARGET_LIB): $(TARGET) $(TARGET_LST) $(TARGET_ASM)
+	./$(TARGET) -x$(TARGET_LIB) -d @$(TARGET_LST)
+
+clean::
+	$(RM) $(TARGET_LIB) $(TARGET_ASM:.asm=.o)
+
+#------------------------------------------------------------------------------
 # developer generated source files, and test libs
 #------------------------------------------------------------------------------
 .PHONY: dev
@@ -72,8 +86,9 @@ clean::
 # intall
 #------------------------------------------------------------------------------
 install:
-	$(INSTALL) $(TARGET) $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
-	$(INSTALL) asmpp.pl  $(PREFIX)/bin/
+	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
+	$(INSTALL) $(TARGET_LIB) $(PREFIX)/lib/$(TARGET_LIB)
+	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
 
 #------------------------------------------------------------------------------
 # clean

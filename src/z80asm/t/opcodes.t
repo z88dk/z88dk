@@ -9,7 +9,7 @@ BEGIN {
 };
 
 z80asm(
-    options => "-l -b",
+    options => "-l -b --cpu=z80",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -2427,7 +2427,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b",
+    options => "-l -b --cpu=z80",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -2564,7 +2564,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b -DRABBIT --cpu=r2k -i".z80emu(),
+    options => "-l -b --cpu=r2k -DRABBIT -i".z80emu(),
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -3152,10 +3152,10 @@ IF      !RABBIT
         ld   a,i
         ld   a,r
 ELSE    
-        ld   iir,a                      ;; ED 47
-        ld   eir,a                      ;; ED 4F
-        ld   a,iir                      ;; ED 57
-        ld   a,eir                      ;; ED 5F
+        ld   iir,a                      ;; ED 4F
+        ld   eir,a                      ;; ED 47
+        ld   a,iir                      ;; ED 5F
+        ld   a,eir                      ;; ED 57
 ENDIF   
 
 ;------------------------------------------------------------------------------
@@ -4821,7 +4821,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b -DRABBIT --cpu=r2k -i".z80emu(),
+    options => "-l -b --cpu=r2k -DRABBIT -i".z80emu(),
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error

@@ -62,6 +62,9 @@ static void option_cpu_r3k(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
 static void option_filler( char *filler_arg );
+static void define_assembly_defines();
+static void include_z80asm_lib(char *prog_name);
+static char *search_z80asm_lib(char *prog_name);
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -126,15 +129,19 @@ void parse_argv( int argc, char *argv[] )
     init_module();
 
     if ( argc == 1 )
-        exit_copyright();				/* exit if no arguments */
+        exit_copyright();					/* exit if no arguments */
 
     process_options( &arg, argc, argv );	/* process all options, set arg to next */
 
     if ( arg >= argc )
-        error_no_src_file();			/* no source file */
+        error_no_src_file();				/* no source file */
 
-    if ( ! get_num_errors() )
+	include_z80asm_lib(argv[0]);			/* search for z80asm.lib, append to library path */
+
+	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
+
+	define_assembly_defines();
 }
 
 /*-----------------------------------------------------------------------------
@@ -248,9 +255,45 @@ static void process_options( int *parg, int argc, char *argv[] )
 /*-----------------------------------------------------------------------------
 *   process a file
 *----------------------------------------------------------------------------*/
+
+/* search for the first file in path, with the given extension,
+* with .asm extension and with .o extension
+* if not found, return original file */
+static char *search_source(char *filename)
+{
+	char *f;
+
+	if (file_exists(filename))
+		return filename;
+
+	f = search_file(filename, opts.inc_path);
+	if (file_exists(f))
+		return f;
+
+	f = get_asm_filename(filename);
+	if (file_exists(f))
+		return f;
+
+	f = search_file(f, opts.inc_path);
+	if (file_exists(f))
+		return f;
+
+	f = get_obj_filename(filename);
+	if (file_exists(f))
+		return f;
+
+	f = search_file(f, opts.inc_path);
+	if (file_exists(f))
+		return f;
+
+	error_read_file(filename);
+	return filename;
+}
+
 static void process_file( char *filename )
 {
 	char *line;
+	char *lst_dirname;
 
     strip( filename );
 
@@ -271,11 +314,19 @@ static void process_file( char *filename )
 		/* loop on file to read each line and recurse */
 		src_push();
 		{
+			/* append the directoy of the list file to the include path	and remove it at the end */
+			lst_dirname = path_dirname(filename);
+			utarray_push_back(opts.inc_path, &lst_dirname);
+
 			if (src_open(filename, NULL))
 			{
 				while ((line = src_getline()) != NULL)
 					process_file(line);
 			}
+
+			/* finished assembly, remove dirname from include path */
+			utarray_pop_back(opts.inc_path);
+
 		}
 		src_pop();
 		break;
@@ -284,6 +335,7 @@ static void process_file( char *filename )
 		break;
 	default:
 		filename = expand_environment_variables(filename);
+		filename = search_source(filename);
 		utarray_push_back(opts.files, &filename);
     }
 }
@@ -568,7 +620,7 @@ static void option_cpu_z180(void)
 
 static void option_cpu_r2k(void)
 {
-    opts.cpu = CPU_R2K;
+	opts.cpu = CPU_R2K;
 }
 
 static void option_cpu_r3k(void)
@@ -718,4 +770,44 @@ void checkrun_appmake(void)
 				error_cmd_failed(str_data(cmd));
 		}
 	}
+}
+
+/*-----------------------------------------------------------------------------
+*   z80asm standard library
+*	search in current die, then in exe path, then in exe path/../lib, then in ZCCCFG/..
+*	Ignore if not found, probably benign - user will see undefined symbols
+*	__z80asm__xxx if the library routines are called
+*----------------------------------------------------------------------------*/
+static void include_z80asm_lib(char *prog_name)
+{
+	char *library = search_z80asm_lib(prog_name);
+
+	if (library != NULL)
+		option_use_lib(library);
+}
+
+static char *search_z80asm_lib(char *prog_name)
+{
+	char *prog_dir;
+	char *expanded_file;
+	STR_DEFINE(f, STR_SIZE);
+
+	if (file_exists(Z80ASM_LIB))
+		return Z80ASM_LIB;
+
+	prog_dir = path_dirname(prog_name);
+	str_sprintf(f, "%s/%s", prog_dir, Z80ASM_LIB);
+	if (file_exists(str_data(f)))
+		return strpool_add(str_data(f));
+
+	str_sprintf(f, "%s/../lib/%s", prog_dir, Z80ASM_LIB);
+	if (file_exists(str_data(f)))
+		return strpool_add(str_data(f));
+
+	str_sprintf(f, "${ZCCCFG}/../%s", Z80ASM_LIB);
+	expanded_file = expand_environment_variables(str_data(f));
+	if (file_exists(expanded_file))
+		return expanded_file;
+
+	return NULL;		/* not found */
 }

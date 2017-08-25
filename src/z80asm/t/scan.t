@@ -617,21 +617,32 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	
 	SetTemporaryLine("f (c) (\t c \t) "
-					 "F (C) (\t C \t) ");
+					 "F (C) (\t C \t) "
+					 "(cur)");		// (c is not interpreted as TK_IND_C
 	T_GET(TK_F,     "f");
-	T_GET(TK_IND_C, "(c)");
-	T_GET(TK_IND_C, "(\t c \t)");
+	T_GET(TK_IND_C, "(c");
+	T_RPAREN();
+	T_GET(TK_IND_C, "(\t c \t");
+	T_RPAREN();
 					 
 	T_GET(TK_F,     "F");
-	T_GET(TK_IND_C, "(C)");
-	T_GET(TK_IND_C, "(\t C \t)");
+	T_GET(TK_IND_C, "(C");
+	T_RPAREN();
+	T_GET(TK_IND_C, "(\t C \t");
+	T_RPAREN();
+	T_LPAREN();
+	T_NAME("cur");
+	T_RPAREN();
 	T_END();
 					 
-	SetTemporaryLine("bc de hl af af' sp ix iy "
-					 "BC DE HL AF AF' SP IX IY ");
+	SetTemporaryLine("bc bc' de de' hl hl' af af' sp ix iy "
+					 "BC BC' DE DE' HL HL' AF AF' SP IX IY ");
 	T_GET(TK_BC,  "bc");  
+	T_GET(TK_BC1, "bc'");  
 	T_GET(TK_DE,  "de");  
+	T_GET(TK_DE1, "de'");  
 	T_GET(TK_HL,  "hl");  
+	T_GET(TK_HL1, "hl'");  
 	T_GET(TK_AF,  "af");  
 	T_GET(TK_AF1, "af'"); 
 	T_GET(TK_SP,  "sp");  
@@ -639,8 +650,11 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IY,  "iy");  
 	
 	T_GET(TK_BC,  "BC");  
+	T_GET(TK_BC1, "BC'");  
 	T_GET(TK_DE,  "DE");  
+	T_GET(TK_DE1, "DE'");  
 	T_GET(TK_HL,  "HL");  
+	T_GET(TK_HL1, "HL'");  
 	T_GET(TK_AF,  "AF");  
 	T_GET(TK_AF1, "AF'"); 
 	T_GET(TK_SP,  "SP");  
@@ -650,25 +664,25 @@ t_compile_module($init, <<'END', $objs);
 	
 	SetTemporaryLine("(bc) (de) (hl) (sp) (\t bc \t) (\t de \t) (\t hl \t) (\t sp \t) "
 					 "(BC) (DE) (HL) (SP) (\t BC \t) (\t DE \t) (\t HL \t) (\t SP \t) ");
-	T_GET(TK_IND_BC, "(bc)"); 
-	T_GET(TK_IND_DE, "(de)"); 
-	T_GET(TK_IND_HL, "(hl)"); 
-	T_GET(TK_IND_SP, "(sp)"); 
+	T_GET(TK_IND_BC, "(bc"); T_RPAREN();
+	T_GET(TK_IND_DE, "(de"); T_RPAREN();
+	T_GET(TK_IND_HL, "(hl"); T_RPAREN();
+	T_GET(TK_IND_SP, "(sp"); T_RPAREN();
 
-	T_GET(TK_IND_BC, "(\t bc \t)"); 
-	T_GET(TK_IND_DE, "(\t de \t)"); 
-	T_GET(TK_IND_HL, "(\t hl \t)"); 
-	T_GET(TK_IND_SP, "(\t sp \t)"); 
+	T_GET(TK_IND_BC, "(\t bc \t"); T_RPAREN();
+	T_GET(TK_IND_DE, "(\t de \t"); T_RPAREN();
+	T_GET(TK_IND_HL, "(\t hl \t"); T_RPAREN();
+	T_GET(TK_IND_SP, "(\t sp \t"); T_RPAREN();
 	
-	T_GET(TK_IND_BC, "(BC)"); 
-	T_GET(TK_IND_DE, "(DE)"); 
-	T_GET(TK_IND_HL, "(HL)"); 
-	T_GET(TK_IND_SP, "(SP)"); 
+	T_GET(TK_IND_BC, "(BC"); T_RPAREN();
+	T_GET(TK_IND_DE, "(DE"); T_RPAREN();
+	T_GET(TK_IND_HL, "(HL"); T_RPAREN();
+	T_GET(TK_IND_SP, "(SP"); T_RPAREN();
 	
-	T_GET(TK_IND_BC, "(\t BC \t)");
-	T_GET(TK_IND_DE, "(\t DE \t)");
-	T_GET(TK_IND_HL, "(\t HL \t)");
-	T_GET(TK_IND_SP, "(\t SP \t)");
+	T_GET(TK_IND_BC, "(\t BC \t"); T_RPAREN();
+	T_GET(TK_IND_DE, "(\t DE \t"); T_RPAREN();
+	T_GET(TK_IND_HL, "(\t HL \t"); T_RPAREN();
+	T_GET(TK_IND_SP, "(\t SP \t"); T_RPAREN();
 	T_END();
 	
 	SetTemporaryLine("(ix) (iy) (\t ix \t) (\t iy \t) "
@@ -757,7 +771,7 @@ t_compile_module($init, <<'END', $objs);
 
 	
 	/* assembly operands */
-	SetTemporaryLine("i r I R iir eir IIR EIR ");
+	SetTemporaryLine("i r I R iir eir IIR EIR xpc XPC");
 	scan_expect_operands();
 	T_GET(TK_I,    "i");
 	T_GET(TK_R,    "r");
@@ -767,6 +781,8 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_EIR,   "eir");
 	T_GET(TK_IIR,   "IIR");
 	T_GET(TK_EIR,   "EIR");
+	T_GET(TK_XPC,   "xpc");
+	T_GET(TK_XPC,   "XPC");
 	T_END();
 
 	
@@ -863,6 +879,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SET,  	T_ALL)
 	T_OPCODE(SLA,  	T_ALL)
 	T_OPCODE(SLL,  	T_Z80)
+	T_OPCODE(SLI,  	T_Z80)
 	T_OPCODE(SRA,  	T_ALL)
 	T_OPCODE(SRL,  	T_ALL)
 	T_OPCODE(SUB,	T_ALL);

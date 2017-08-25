@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _INPUT_CPM_H
-#define _INPUT_CPM_H
+#ifndef __INPUT_CPM_H__
+#define __INPUT_CPM_H__
 
 #include <stdint.h>
 

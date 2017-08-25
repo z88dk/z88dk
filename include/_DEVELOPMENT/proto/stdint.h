@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STDINT_H
-#define _STDINT_H
+#ifndef __STDINT_H__
+#define __STDINT_H__
 
 typedef signed char            int8_t;
 typedef signed int             int16_t;

@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _SYS_IOCTL_H
-#define _SYS_IOCTL_H
+#ifndef __SYS_IOCTL_H__
+#define __SYS_IOCTL_H__
 
 // ioctls are defined in arch.h
 

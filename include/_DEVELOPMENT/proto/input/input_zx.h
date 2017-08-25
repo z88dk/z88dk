@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _INPUT_ZX_H
-#define _INPUT_ZX_H
+#ifndef __INPUT_ZX_H__
+#define __INPUT_ZX_H__
 
 #include <stdint.h>
 

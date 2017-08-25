@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ALLOC_BALLOC_H
-#define _ALLOC_BALLOC_H
+#ifndef __ALLOC_BALLOC_H__
+#define __ALLOC_BALLOC_H__
 
 #include <stddef.h>
 

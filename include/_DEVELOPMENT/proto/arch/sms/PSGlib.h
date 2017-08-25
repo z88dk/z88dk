@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _SMS_PSGLIB_H
-#define _SMS_PSGLIB_H
+#ifndef __SMS_PSGLIB_H__
+#define __SMS_PSGLIB_H__
 
 #include <arch.h>
 
