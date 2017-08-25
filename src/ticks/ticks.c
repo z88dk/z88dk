@@ -2847,41 +2847,43 @@ int main (int argc, char **argv){
             }
             break;
           case 0xa4: st+= 16;                                // (ZXN) ldix
-              t = mem[l | h<<8];
-              if ( t != a ) {
-                  mem[e | d<<8]= t= mem[l | h<<8];
-              }
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
               mem[e | d<<8]= t= mem[l | h<<8];
-              ++l || h++;
-              ++e || d++;
-              c-- || b--;
-              fr && (fr= 1);
-              t+= a;
-              ff=  ff    & -41
-                    | t     &   8
-                    | t<<4  &  32;
-              fa= 0;
-              b|c && (fa= 128);
-              fb= fa; break;
+            }
+            mem[e | d<<8]= t= mem[l | h<<8];
+            ++l || h++;
+            ++e || d++;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+                  | t     &   8
+                  | t<<4  &  32;
+            fa= 0;
+            b|c && (fa= 128);
+            fb= fa; break;
           case 0xb4: st+= 16;                                // (ZXN) ldirx
-              t = mem[l | h<<8];
-              if ( t != a ) {
-                  mem[e | d<<8]= t= mem[l | h<<8];
-              }
-              ++l || h++;
-              ++e || d++;
-              c-- || b--;
-              fr && (fr= 1);
-              t+= a;
-              ff=  ff    & -41
-                 | t     &   8
-                 | t<<4  &  32;
-              fa= 0;
-              b|c && ( fa= 128,
-                       st+= 5,
-                       mp= --pc,
-                              --pc);
-                     fb= fa; break;
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            ++l || h++;
+            ++e || d++;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && ( fa= 128,
+                     st+= 5,
+                     mp= --pc,
+                            --pc);
+                   fb= fa; break;
           case 0xfe: PatchZ80(); break;
           case 0x40: INR(b); break;                          // IN B,(C)
           case 0x48: INR(c); break;                          // IN C,(C)
