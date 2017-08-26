@@ -796,7 +796,7 @@ instruction ed_page[] = {
     { "cpd",    OP_NONE,  OP_NONE,    0 },
     { "ind",    OP_NONE,  OP_NONE,    0 },
     { "otd",    OP_NONE,  OP_NONE,    0 },
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "lddx",   OP_NONE,  OP_NONE,    F_ZXN }, /* 0xac */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -813,7 +813,7 @@ instruction ed_page[] = {
     { "cpdr",   OP_NONE,  OP_NONE,    0 },
     { "indr",   OP_NONE,  OP_NONE,    0 },
     { "otdr",   OP_NONE,  OP_NONE,    0 },
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "lddrx",  OP_NONE,  OP_NONE,    F_ZXN }, /* 0xbc */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
