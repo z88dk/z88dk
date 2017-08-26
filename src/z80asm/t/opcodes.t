@@ -1378,14 +1378,6 @@ ENDIF
 ; sll ...
 ; sli ...
 
-IF      !RABBIT
-        rld                             ;; ED 6F
-        rrd                             ;; ED 67
-ELSE    
-        rld
-        rrd
-ENDIF   
-
 ; # rotate 16 bits
 ;
 ; rl bc     =} 0xCB 0x11+<1 0xCB 0x10+<1
@@ -2486,9 +2478,6 @@ IF      !RABBIT
 ELSE    
 ENDIF   
 IF      !RABBIT
-ELSE    
-ENDIF   
-IF      !RABBIT
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
         im   undefined                  ;; error: symbol 'undefined' not defined
@@ -3293,10 +3282,10 @@ IF      !RABBIT
         cpd
         cpdr
 ELSE    
-        cpi                             ;; CD 72 0A
-        cpir                            ;; CD 8F 0A
-        cpd                             ;; CD 29 0A
-        cpdr                            ;; CD 46 0A
+        cpi                             ;; CD 6C 0A
+        cpir                            ;; CD 89 0A
+        cpd                             ;; CD 23 0A
+        cpdr                            ;; CD 40 0A
 ENDIF   
 
 ;------------------------------------------------------------------------------
@@ -3800,14 +3789,6 @@ ENDIF
 ; srl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
 ; sll ...
 ; sli ...
-
-IF      !RABBIT
-        rld
-        rrd
-ELSE    
-        rld                             ;; CD BB 0A
-        rrd                             ;; CD DD 0A
-ENDIF   
 
 ; # rotate 16 bits
 ;
@@ -4451,10 +4432,10 @@ ELSE
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA AE 09 CD 30 00
-        call pe,NN                      ;; E2 B4 09 CD 30 00
-        call p,NN                       ;; FA BA 09 CD 30 00
-        call m,NN                       ;; F2 C0 09 CD 30 00
+        call po,NN                      ;; EA A8 09 CD 30 00
+        call pe,NN                      ;; E2 AE 09 CD 30 00
+        call p,NN                       ;; FA B4 09 CD 30 00
+        call m,NN                       ;; F2 BA 09 CD 30 00
 
 
         rst  10h                        ;; D7
@@ -4817,7 +4798,7 @@ ENDIF
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4E 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 97 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD C2 0A 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD E4 0A 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 48 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 91 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9
 END_ASM
 );
 z80asm(
@@ -5010,9 +4991,6 @@ ELSE
         dec  ixl                        ;; error: illegal identifier
         inc  iyl                        ;; error: illegal identifier
         dec  iyl                        ;; error: illegal identifier
-ENDIF   
-IF      !RABBIT
-ELSE    
 ENDIF   
 IF      !RABBIT
 ELSE    

@@ -385,7 +385,7 @@ sub replace {
 sub write_ragel {
 	my($file) = @_;
 	
-	open(my $fh, ">", $file) or die "$file: $!";
+	open(my $fh, ">:raw", $file) or die "$file: $!";
 	for my $tokens (sort keys %Parser) {
 		my $v = $Parser{$tokens};
 		
@@ -404,7 +404,7 @@ sub write_tests {
 			for my $ok ('ok', 'err') {
 				next if $ixiy && $ok eq 'err';
 				my $file = $test_file_base."_".$cpu.$ixiy."_".$ok.".asm";
-				open(my $fh, ">", $file) or die "$file: $!";
+				open(my $fh, ">:raw", $file) or die "$file: $!";
 				for my $asm (sort keys %{$Tests{$cpu}{$ok}}) {
 					my $bin = $Tests{$cpu}{$ok}{$asm};
 					if ($ixiy) {
@@ -783,12 +783,12 @@ for my $cpu (@CPUS) {
 	}
 	if ($zilog) {
 		add_opc($cpu, "daa", 0x27);
-		# add_opc($cpu, "rrd", 0xED, 0x67);
-		# add_opc($cpu, "rld", 0xED, 0x6F);
+		add_opc($cpu, "rrd", 0xED, 0x67);
+		add_opc($cpu, "rld", 0xED, 0x6F);
 	}
 	elsif ($rabbit) {
-		# add_opc($cpu, "rrd", 0xCD, '@__z80asm__rrd');
-		# add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
+		add_opc($cpu, "rrd", 0xCD, '@__z80asm__rrd');
+		add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
 	}
 }
 
@@ -818,7 +818,7 @@ for my $asm (sort keys %Opcodes) {
 	}
 }
 
-open(my $rules, ">", "dev/cpu/cpu_rules.h") or die $!;
+open(my $rules, ">:raw", "dev/cpu/cpu_rules.h") or die $!;
 for my $tokens (sort keys %Parser) {
 	print $rules $tokens, ' @{', "\n";
 	print $rules merge_cpu($Parser{$tokens});
@@ -846,7 +846,7 @@ for my $cpu (@CPUS) {
 			next if $ixiy && $ok eq 'err';
 			
 			my $filename = "dev/cpu/cpu_test_${cpu}${ixiy}_${ok}.asm";
-			open($fh{$cpu}{$ixiy}{$ok}, ">", $filename ) or die "$filename: $!";
+			open($fh{$cpu}{$ixiy}{$ok}, ">:raw", $filename ) or die "$filename: $!";
 		}
 	}
 }
@@ -1028,9 +1028,14 @@ sub parse_code {
 	# check for argument type
 	my($stmt, $extra_arg) = ("", "");
 	my $bin = join(' ', @bin);
-	if (is_emulated($asm)) {
-		$stmt = "DO_stmt_emul";
-		$extra_arg = ", rcmx_".$asm;
+	
+	if ($bin =~ s/ \@(\w+)//) {
+		my $func = $1;
+		push @code, 
+			"DO_STMT_LABEL();",
+			"declare_extern_symbol(\"$func\");",
+			"Expr *emul_func = parse_expr(\"$func\");",
+			"add_opcode_nn(0xCD, emul_func);";
 	}
 	elsif ($bin =~ s/ %d %n$//) {
 		$stmt = "DO_stmt_idx_n";
@@ -1056,7 +1061,6 @@ sub parse_code {
 	else {
 		$stmt = "DO_stmt";
 	}
-	$stmt or die $bin;
 
 	# build statement
 	@bin = split(' ', $bin);
@@ -1065,9 +1069,9 @@ sub parse_code {
 		eval($_); die "$cpu, $asm, @bin, $_" if $@;
 		$opc .= fmthex($_);
 	}
-	push @code, $stmt."(".$opc.$extra_arg.");";
+	$stmt and push @code, $stmt."(".$opc.$extra_arg.");";
 	
-	my $code = join(' ', @code);
+	my $code = join("\n", @code);
 	return $code;
 }
 

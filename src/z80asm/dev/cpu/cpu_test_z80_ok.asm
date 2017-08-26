@@ -504,6 +504,8 @@
  or iyh                         ; FD B4
  or iyl                         ; FD B5
  or l                           ; B5
+ rld                            ; ED 6F
+ rrd                            ; ED 67
  sbc (hl)                       ; 9E
  sbc (ix)                       ; DD 9E 00
  sbc (ix+127)                   ; DD 9E 7F

@@ -5835,11 +5835,6 @@
   DO_stmt(0x07); 
 }
 
-/* rld */
-| label? _TK_RLD _TK_NEWLINE @{
-  DO_stmt_emul(0xED6F, rcmx_rld); 
-}
-
 /* rr a */
 | label? _TK_RR _TK_A _TK_NEWLINE @{
   DO_stmt(0xCB1F); 
@@ -6672,11 +6667,6 @@
 /* rrca */
 | label? _TK_RRCA _TK_NEWLINE @{
   DO_stmt(0x0F); 
-}
-
-/* rrd */
-| label? _TK_RRD _TK_NEWLINE @{
-  DO_stmt_emul(0xED67, rcmx_rrd); 
 }
 
 /* rst 0 */

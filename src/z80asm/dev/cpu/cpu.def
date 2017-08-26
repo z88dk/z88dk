@@ -12,21 +12,6 @@
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
 ;------------------------------------------------------------------------------
-			; {add|adc|sub|sbc|and|xor|or|cp} a, {b|c|d|e|h|l|(hl)|a}	\
-												; => 80+$1*8+$2
-			; {add|adc|sub|sbc|and|xor|or|cp} a, N \
-												; => C6+$1*8 N
-		; ALTD {inc|dec} {b|c|d|e|h|l|(hl)|a}		=> 04+$1+$2*8
-
-; [z180]		{test|tst} a, {b|c|d|e|h|l|(hl)|a}	=> ED 04+$2*8
-
-; tst coded in parse_rules.rl as it has different opcodes for Rabbit and Z80-ZXN
-; [z180]	{test|tst} a, N						=> ED 64 N
-
-; [zilog]		daa									=> 27
-							
-[zilog]		rrd									=> ED 67
-[zilog]		rld									=> ED 6F
 
 			cpl	a 								=> 2F
 			neg a								=> ED 44

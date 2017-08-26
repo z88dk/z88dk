@@ -139,8 +139,6 @@
  tst a, (hl)            ;; 0680:  ED 34
  tst (hl)               ;; 0680:  ED 34
  daa                    ;; 0680:  27
- rld                    ;; 0680:  ED 6F
- rrd                    ;; 0680:  ED 67
  mlt sp                 ;; 0AB4:  ED 7C
  sll b                  ;; 0B3F:  CB 30
  sll c                  ;; 0B3F:  CB 31

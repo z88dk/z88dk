@@ -84,8 +84,6 @@
 ; General-Purpose Arithmetic Group
 ;------------------------------------------------------------------------------
 [zilog]		daa					=>         27
-[zilog]		rld					=>     ED, 6F
-[zilog]		rrd					=>     ED, 67
 
 			cpl					=>         2F
 			cpl a				=>         2F

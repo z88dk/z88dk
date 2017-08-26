@@ -2391,6 +2391,8 @@
  or e                           ; B3
  or h                           ; B4
  or l                           ; B5
+ rld                            ; CD @__z80asm__rld
+ rrd                            ; CD @__z80asm__rrd
  sbc (hl)                       ; 9E
  sbc (ix)                       ; DD 9E 00
  sbc (ix+127)                   ; DD 9E 7F

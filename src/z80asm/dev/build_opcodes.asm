@@ -464,14 +464,6 @@ ENDIF
 ;	{rlc rrc rl rr sla sra srl} (iy+DIS),{b c d e h l a}	=} 0xFD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{sll sli} ...
 
-IF !RABBIT
-	rld
-	rrd
-ELSE
-	rld									;;	call rcmx_rld
-	rrd									;;	call rcmx_rrd
-ENDIF
-
 ;	# rotate 16 bits
 ;
 ;	rl {bc  de  hl}					=} 0xCB 0x11+{<1} 0xCB 0x10+{<1}

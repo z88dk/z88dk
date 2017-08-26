@@ -19,27 +19,44 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	# build command line
 	my $cmd = "z80asm --cpu=$cpu --no-emul ".
 			($ixiy ? "--IXIY " : "").
-			" -l -b $file 2> test.err";
+			" -m -l -b $file 2> test.err";
 	
 	# assembler output files
 	(my $file_bin = $file) =~ s/\.asm$/.bin/;
 	(my $file_o   = $file) =~ s/\.asm$/.o/;
 	(my $file_err = $file) =~ s/\.asm$/.err/;
 	(my $file_lis = $file) =~ s/\.asm$/.lis/;
-	unlink "test.err", $file_bin, $file_o, $file_err, $file_lis;
+	(my $file_map = $file) =~ s/\.asm$/.map/;
+	unlink "test.err", $file_bin, $file_o, $file_err, $file_lis, $file_map;
 	
 	if ($ok) {
 		# build binary image
-		my $bin = '';
+		my $addr = 0;
+		my %labels;
+		my @patch;
+		my @bin;
 		if ($ok) {
 			local(@ARGV) = $file;
 			while (<>) {
-				s/.*;//;
-				for (split(' ', $_)) {
-					$bin .= chr(hex($_));
+				if (/^(\w+):/) {
+					$labels{$1} = $addr;
+				}
+				else {
+					s/.*;//;
+					for (split(' ', $_)) {
+						if (/^@(\w+)/) {
+							push @patch, [$addr, $1];
+							$bin[$addr++] = 0;
+							$bin[$addr++] = 0;
+						}
+						else {
+							$bin[$addr++] = hex($_);							
+						}
+					}
 				}
 			}
 		}
+		my $length = $addr;		# only compare output up to $length
 		
 		# run assembler
 		ok system($cmd)==0, $cmd;
@@ -48,7 +65,31 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		if (-f $file_err) {
 			diag slurp($file_err);
 		}
-		my $out_bin = slurp($file_bin);
+
+		# read labels from map file and patch @bin
+		{
+			local(@ARGV) = $file_map;
+			while (<>) {
+				if (/^ (\w+) \s* = \s* \$ ([0-9a-f]+) \s* ; \s* G /ix) {
+					my($name, $addr) = ($1, hex($2));
+					if (exists $labels{$name}) {
+						$labels{$name} == $addr or die "$name address mismatch";
+					}
+					else {
+						$labels{$name} = $addr;
+					}
+				}
+			}
+			for (@patch) {
+				my($addr, $name) = @$_;
+				defined(my $value = $labels{$name}) or die "$name not found";
+				$bin[$addr++] = $value & 0xFF;
+				$bin[$addr++] = ($value >> 8) & 0xFF;
+			}
+		}
+		my $bin = join('', map {chr} @bin);
+		
+		my $out_bin = substr(slurp($file_bin), 0, $length);
 		ok $out_bin eq $bin, "$file_bin ok";
 		if ($out_bin ne $bin) {
 			my $addr = 0;
@@ -80,7 +121,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	}
 	
 	if (Test::More->builder->is_passing) {
-		unlink "test.err", $file_bin, $file_o, $file_err, $file_lis;
+		unlink "test.err", $file_bin, $file_o, $file_err, $file_lis, $file_map;
 	}
 }
 

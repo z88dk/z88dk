@@ -396,6 +396,8 @@
  or e                           ; B3
  or h                           ; B4
  or l                           ; B5
+ rld                            ; ED 6F
+ rrd                            ; ED 67
  sbc (hl)                       ; 9E
  sbc (ix)                       ; FD 9E 00
  sbc (ix+127)                   ; FD 9E 7F
