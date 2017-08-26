@@ -42,7 +42,12 @@ typedef enum {
    OP_I,
    OP_R,
    OP_IM,
-   OP_DEHL
+   OP_DEHL,
+   /* Rabbit */
+   OP_IMMED24,
+   OP_INDX, 
+   OP_DE_,
+   OP_INDSP2
 } operand;
 
 #define F_IXY   1   /* ix */
@@ -337,6 +342,283 @@ instruction main_page[] = {
     { "cp",     OP_IMMED8, OP_NONE,   0 },
     { "rst",    OP_RST,   OP_NONE,    0 }
 };
+
+instruction rabbit_main_page[] = {
+    { "nop",    OP_NONE,  OP_NONE,    0 },
+    { "ld",     OP_BC,    OP_IMMED16, 0 },
+    { "ld",     OP_INDBC, OP_A,       0 },
+    { "inc",    OP_BC,    OP_NONE,    0 }, 
+    { "inc",    OP_B,     OP_NONE,    0 }, 
+    { "dec",    OP_B,     OP_NONE,    0 }, 
+    { "ld",     OP_B,     OP_IMMED8,  0 }, 
+    { "rlca",   OP_NONE,  OP_NONE,    0 },
+    { "ex",     OP_AF,    OP_AF,      0 },
+    { "add",    OP_HL,    OP_BC,      F_IXY },
+    { "ld",     OP_A,     OP_INDBC,   0 },
+    { "dec",    OP_BC,    OP_NONE,    0 }, 
+    { "inc",    OP_C,     OP_NONE,    0 }, 
+    { "dec",    OP_C,     OP_NONE,    0 }, 
+    { "ld",     OP_C,     OP_IMMED8,  0 }, 
+    { "rrca",   OP_NONE,  OP_NONE,    0 },
+
+
+    { "djnz",   OP_REL8,  OP_NONE,    0 },  /* 10 */
+    { "ld",     OP_DE,    OP_IMMED16, 0 },
+    { "ld",     OP_INDDE, OP_A,       0 },
+    { "inc",    OP_DE,    OP_NONE,    0 }, 
+    { "inc",    OP_D,     OP_NONE,    0 }, 
+    { "dec",    OP_D,     OP_NONE,    0 }, 
+    { "ld",     OP_D,     OP_IMMED8,  0 }, 
+    { "rla",    OP_NONE,  OP_NONE,    0 },
+    { "jr",     OP_REL8,  OP_NONE,    0 },
+    { "add",    OP_HL,    OP_DE,      F_IXY },
+    { "ld",     OP_A,     OP_INDDE,   0 },
+    { "dec",    OP_DE,    OP_NONE,    0 }, 
+    { "inc",    OP_E,     OP_NONE,    0 }, 
+    { "dec",    OP_E,     OP_NONE,    0 }, 
+    { "ld",     OP_E,     OP_IMMED8,  0 }, 
+    { "rra",    OP_NONE,  OP_NONE,    0 },
+
+    { "jr",     OP_NZ,    OP_REL8,    0 },  /* 20 */
+    { "ld",     OP_HL,    OP_IMMED16, F_IXY },
+    { "ld",     OP_IND16, OP_HL,      F_IXY },
+    { "inc",    OP_HL,    OP_NONE,    F_IXY }, 
+    { "inc",    OP_H,     OP_NONE,    0 },
+    { "dec",    OP_H,     OP_NONE,    0 },
+    { "ld",     OP_H,     OP_IMMED8,  F_INDXY }, 
+    { "daa",    OP_NONE,  OP_NONE,    0 },
+    { "jr",     OP_Z,     OP_REL8,    0 },
+    { "add",    OP_HL,    OP_HL,      F_IXY },
+    { "ld",     OP_HL,    OP_IND16,   F_IXY },
+    { "dec",    OP_HL,    OP_NONE,    F_IXY }, 
+    { "inc",    OP_L,     OP_NONE,    0 }, 
+    { "dec",    OP_L,     OP_NONE,    0 }, 
+    { "ld",     OP_L,     OP_IMMED8,  F_INDXY }, 
+    { "cpl",    OP_NONE,  OP_NONE,    0 },
+
+    { "jr",     OP_NC,    OP_REL8,    0 }, /* 30 */
+    { "ld",     OP_SP,    OP_IMMED16, 0 },
+    { "ld",     OP_IND16, OP_A,       0 },
+    { "inc",    OP_SP,    OP_NONE,    0 },
+    { "inc",    OP_INDHL, OP_NONE,    0 },
+    { "dec",    OP_INDHL, OP_NONE,    0 },
+    { "ld",     OP_INDHL, OP_IMMED8,  0 },
+    { "scf",    OP_NONE,  OP_NONE,    0 },
+    { "jr",     OP_Ca,    OP_REL8,    0 },
+    { "add",    OP_HL,    OP_SP,      F_IXY },
+    { "ld",     OP_A,     OP_IND16,   0 },
+    { "dec",    OP_SP,    OP_NONE,    0 },
+    { "inc",    OP_A,     OP_NONE,    0 },
+    { "dec",    OP_A,     OP_NONE,    0 },
+    { "ld",     OP_A,     OP_IMMED8,  0 },
+    { "ccf",    OP_NONE,  OP_NONE,    0 },
+
+    { "ld",     OP_B,     OP_B,       0 }, /* 40 */
+    { "ld",     OP_B,     OP_C,       0 },
+    { "ld",     OP_B,     OP_D,       0 },
+    { "ld",     OP_B,     OP_E,       0 },
+    { "ld",     OP_B,     OP_H,       0 },
+    { "ld",     OP_B,     OP_L,       0 },
+    { "ld",     OP_B,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_B,     OP_A,       0 },
+    { "ld",     OP_C,     OP_B,       0 },
+    { "ld",     OP_C,     OP_C,       0 },
+    { "ld",     OP_C,     OP_D,       0 },
+    { "ld",     OP_C,     OP_E,       0 },
+    { "ld",     OP_C,     OP_H,       0 },
+    { "ld",     OP_C,     OP_L,       0 },
+    { "ld",     OP_C,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_C,     OP_A,       0 },
+
+    { "ld",     OP_D,     OP_B,       0 }, /* 50 */
+    { "ld",     OP_D,     OP_C,       0 },
+    { "ld",     OP_D,     OP_D,       0 },
+    { "ld",     OP_D,     OP_E,       0 },
+    { "ld",     OP_D,     OP_H,       0 },
+    { "ld",     OP_D,     OP_L,       0 },
+    { "ld",     OP_D,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_D,     OP_A,       0 },
+    { "ld",     OP_E,     OP_B,       0 },
+    { "ld",     OP_E,     OP_C,       0 },
+    { "ld",     OP_E,     OP_D,       0 },
+    { "ld",     OP_E,     OP_E,       0 },
+    { "ld",     OP_E,     OP_H,       0 },
+    { "ld",     OP_E,     OP_L,       0 },
+    { "ld",     OP_E,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_E,     OP_A,       0 },
+
+    { "ld",     OP_H,     OP_B,       0 }, /* 60 */
+    { "ld",     OP_H,     OP_C,       0 },
+    { "ld",     OP_H,     OP_D,       0 },
+    { "ld",     OP_H,     OP_E,       0 },
+    { "ld",     OP_H,     OP_H,       0 },
+    { "ld",     OP_H,     OP_L,       0 },
+    { "ld",     OP_H,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_H,     OP_A,       0 },
+    { "ld",     OP_L,     OP_B,       0 },
+    { "ld",     OP_L,     OP_C,       0 },
+    { "ld",     OP_L,     OP_D,       0 },
+    { "ld",     OP_L,     OP_E,       0 },
+    { "ld",     OP_L,     OP_H,       0 },
+    { "ld",     OP_L,     OP_L,       0 },
+    { "ld",     OP_L,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_L,     OP_A,       0 },
+
+    { "ld",     OP_INDHL, OP_B,       F_INDXY }, /* 70 */
+    { "ld",     OP_INDHL, OP_C,       F_INDXY },
+    { "ld",     OP_INDHL, OP_D,       F_INDXY },
+    { "ld",     OP_INDHL, OP_E,       F_INDXY },
+    { "ld",     OP_INDHL, OP_H,       F_INDXY },
+    { "ld",     OP_INDHL, OP_L,       F_INDXY },
+    { "altd",   OP_NONE,  OP_NONE,    0 },
+    { "ld",     OP_INDHL, OP_A,       F_INDXY },
+    { "ld",     OP_A,     OP_B,       0 },
+    { "ld",     OP_A,     OP_C,       0 },
+    { "ld",     OP_A,     OP_D,       0 },
+    { "ld",     OP_A,     OP_E,       0 },
+    { "ld",     OP_A,     OP_H,       0 },
+    { "ld",     OP_A,     OP_L,       0 },
+    { "ld",     OP_A,     OP_INDHL,   F_INDXY },
+    { "ld",     OP_A,     OP_A,       0 },
+
+    { "add",    OP_A,     OP_B,       0 },
+    { "add",    OP_A,     OP_C,       0 },
+    { "add",    OP_A,     OP_D,       0 },
+    { "add",    OP_A,     OP_E,       0 },
+    { "add",    OP_A,     OP_H,       0 },
+    { "add",    OP_A,     OP_L,       0 },
+    { "add",    OP_A,     OP_INDHL,   F_INDXY },
+    { "add",    OP_A,     OP_A,       0 },
+    { "adc",    OP_A,     OP_B,       0 },
+    { "adc",    OP_A,     OP_C,       0 },
+    { "adc",    OP_A,     OP_D,       0 },
+    { "adc",    OP_A,     OP_E,       0 },
+    { "adc",    OP_A,     OP_H,       0 },
+    { "adc",    OP_A,     OP_L,       0 },
+    { "adc",    OP_A,     OP_INDHL,   F_INDXY },
+    { "adc",    OP_A,     OP_A,       0 },
+
+    { "sub",    OP_A,     OP_B,       0 },
+    { "sub",    OP_A,     OP_C,       0 },
+    { "sub",    OP_A,     OP_D,       0 },
+    { "sub",    OP_A,     OP_E,       0 },
+    { "sub",    OP_A,     OP_H,       0 },
+    { "sub",    OP_A,     OP_L,       0 },
+    { "sub",    OP_A,     OP_INDHL,   F_INDXY },
+    { "sub",    OP_A,     OP_A,       0 },
+    { "sbc",    OP_A,     OP_B,       0 },
+    { "sbc",    OP_A,     OP_C,       0 },
+    { "sbc",    OP_A,     OP_D,       0 },
+    { "sbc",    OP_A,     OP_E,       0 },
+    { "sbc",    OP_A,     OP_H,       0 },
+    { "sbc",    OP_A,     OP_L,       0 },
+    { "sbc",    OP_A,     OP_INDHL,   F_INDXY },
+    { "sbc",    OP_A,     OP_A,       0 },
+
+    { "and",    OP_A,     OP_B,       0 },
+    { "and",    OP_A,     OP_C,       0 },
+    { "and",    OP_A,     OP_D,       0 },
+    { "and",    OP_A,     OP_E,       0 },
+    { "and",    OP_A,     OP_H,       0 },
+    { "and",    OP_A,     OP_L,       0 },
+    { "and",    OP_A,     OP_INDHL,   F_INDXY },
+    { "and",    OP_A,     OP_A,       0 },
+    { "xor",    OP_A,     OP_B,       0 },
+    { "xor",    OP_A,     OP_C,       0 },
+    { "xor",    OP_A,     OP_D,       0 },
+    { "xor",    OP_A,     OP_E,       0 },
+    { "xor",    OP_A,     OP_H,       0 },
+    { "xor",    OP_A,     OP_L,       0 },
+    { "xor",    OP_A,     OP_INDHL,   F_INDXY },
+    { "xor",    OP_A,     OP_A,       0 },
+
+    { "or",     OP_A,     OP_B,       0 },
+    { "or",     OP_A,     OP_C,       0 },
+    { "or",     OP_A,     OP_D,       0 },
+    { "or",     OP_A,     OP_E,       0 },
+    { "or",     OP_A,     OP_H,       0 },
+    { "or",     OP_A,     OP_L,       0 },
+    { "or",     OP_A,     OP_INDHL,   F_INDXY },
+    { "or",     OP_A,     OP_A,       0 },
+    { "cp",     OP_A,     OP_B,       0 },
+    { "cp",     OP_A,     OP_C,       0 },
+    { "cp",     OP_A,     OP_D,       0 },
+    { "cp",     OP_A,     OP_E,       0 },
+    { "cp",     OP_A,     OP_H,       0 },
+    { "cp",     OP_A,     OP_L,       0 },
+    { "cp",     OP_A,     OP_INDHL,   F_INDXY },
+    { "cp",     OP_A,     OP_A,       0 },
+
+    { "ret",    OP_NZ,    OP_NONE,    0 },
+    { "pop",    OP_BC,    OP_NONE,    0 },
+    { "jp",     OP_NZ,    OP_ADDR16, 0 },
+    { "jp",     OP_ADDR16, OP_NONE,  0 },
+    { "ld",     OP_HL,    OP_INDSP2,  0 },
+    { "push",   OP_BC,    OP_NONE,    0 },
+    { "add",    OP_A,     OP_IMMED8,  0 },
+    { "ljp",    OP_IMMED24, OP_NONE,  0 },
+    { "ret",    OP_Z,     OP_NONE,    0 },
+    { "ret",    OP_NONE,  OP_NONE,    0 },
+    { "jp",     OP_Z,     OP_IMMED16, 0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 },   /* CB */
+    { "bool",   OP_HL,     OP_NONE,  0 },
+    { "call",   OP_ADDR16, OP_NONE,  0 },
+    { "adc",    OP_A,     OP_IMMED8,  0 },
+    { "lcall",  OP_IMMED24, OP_NONE,    0 },
+
+    { "ret",    OP_NC,    OP_NONE,    0 },
+    { "pop",    OP_DE,    OP_NONE,    0 },
+    { "jp",     OP_NC,    OP_IMMED16, 0 },
+    { "ioi",    OP_NONE,  OP_NONE,    0 },
+    { "ld",     OP_INDSP2, OP_HL,      0 },
+    { "push",   OP_DE,    OP_NONE,    0 },
+    { "sub",    OP_A,     OP_IMMED8,  0 },
+    { "rst",    OP_RST,   OP_NONE,    0 },
+    { "ret",    OP_Ca,    OP_NONE,    0 },
+    { "exx",    OP_NONE,  OP_NONE,    0 },
+    { "jp",     OP_C,     OP_ADDR16, 0 },
+    { "ioe",    OP_NONE,  OP_NONE,    0 },
+    { "and",    OP_HL,    OP_DE,      0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 },   /* DD */
+    { "sbc",    OP_A,     OP_IMMED8,  0 },
+    { "rst",    OP_RST,   OP_NONE,    0 },
+
+    { "ret",    OP_PO,    OP_NONE,    0 },
+    { "pop",    OP_HL,    OP_NONE,    F_IXY },
+    { "jp",     OP_PO,    OP_ADDR16, 0 },
+    { "ex",     OP_DE_,   OP_HL,     0 },
+    { "ld",     OP_HL,    OP_INDX,   0 },
+    { "push",   OP_HL,    OP_NONE,    F_IXY },
+    { "and",    OP_IMMED8, OP_NONE,   0 },
+    { "rst",    OP_RST,   OP_NONE,    0 },
+    { "ret",    OP_PE,    OP_NONE,    0 },
+    { "jp",     OP_INDHL, OP_NONE,    0 },
+    { "jp",     OP_PE,    OP_ADDR16, 0 },
+    { "ex",     OP_DE,    OP_HL,      0 },
+    { "or",     OP_HL,    OP_DE,      0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 },   /* DD */
+    { "xor",    OP_IMMED8, OP_NONE,   0 },
+    { "rst",    OP_RST,   OP_NONE,    0 },
+
+    { "ret",    OP_P,     OP_NONE,    0 },
+    { "pop",    OP_AF,    OP_NONE,    0 },
+    { "jp",     OP_P,     OP_ADDR16, 0 },
+    { "rl",     OP_DE,    OP_NONE,   0 },
+    { "ld",     OP_INDX,  OP_HL,     0 },
+    { "push",   OP_AF,    OP_NONE,    0 },
+    { "or",     OP_IMMED8, OP_NONE,   0 },
+    { "mul",    OP_NONE,   OP_NONE,  0 },
+    { "ret",    OP_M,     OP_NONE,    0 },
+    { "ld",     OP_SP,    OP_HL,      F_IXY },
+    { "jp",     OP_M,     OP_ADDR16, 0 },
+    { "rr",     OP_DE,    OP_NONE,   0 },
+    { "rr",     OP_HL,    OP_NONE,   0 },
+    { "ei",     OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 },   /* FD */
+    { "cp",     OP_IMMED8, OP_NONE,   0 },
+    { "rst",    OP_RST,   OP_NONE,    0 }
+};
+
 
 instruction cb_page[] = {
     { "rlc",    OP_B,     OP_NONE,    0 },
@@ -903,6 +1185,7 @@ typedef struct {
 char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, size_t buflen)
 {
     int8_t displacement = 0;
+    uint8_t udisplacement = 0;
     uint8_t msb, lsb;
     const char   *label;
 
@@ -1003,7 +1286,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         snprintf(buf,buflen,"$%02x", lsb);
         return buf;
     case OP_ADDR16:
-      READ_BYTE(state, lsb);
+        READ_BYTE(state, lsb);
         READ_BYTE(state, msb);
         snprintf(buf,buflen,"$%02x%02x", msb, lsb);
         label = find_symbol(lsb + msb * 256);
@@ -1031,6 +1314,22 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         return buf; 
     case OP_DEHL:
         return "dehl";
+    case OP_DE_:
+        return "de'";
+    case OP_IMMED24: /* Address then xpc */
+        READ_BYTE(state, lsb);
+        READ_BYTE(state, msb);
+        READ_BYTE(state, udisplacement);
+        snprintf(buf,buflen,"$%02x,$%02x%02x",udisplacement, msb, lsb);
+        return buf; 
+    case OP_INDSP2:
+        READ_BYTE(state, udisplacement);
+        snprintf(buf,buflen,"(sp+%02x)",  udisplacement);
+        return buf;
+    case OP_INDX:
+        READ_BYTE(state, displacement);
+        snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xfd ? "iy" : "ix", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
+        return buf;
     }
 }
 
