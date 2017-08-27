@@ -1839,7 +1839,6 @@ instruction rabbit_ed_page[] = {
     { "sbc",    OP_HL,    OP_HL,      0 },
     { "ld",     OP_IND16, OP_HL,      0 },
     { "ldp",    OP_INDHL, OP_HL,      0 },
-    { "ldp",    OP_INDHL, OP_HL,      0 },
     { "ldp",    OP_ADDR16, OP_HL,     0 },
     { "push",   OP_SU,    OP_NONE,    0 },
     { "ld",     OP_XPC,   OP_A,       0 },

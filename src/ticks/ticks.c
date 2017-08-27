@@ -581,6 +581,8 @@ int main (int argc, char **argv){
           } else {
             printf("Unknown CPU: %s\n",&argv[0][1]);
           }
+          argv--;
+          argc++;
           break;
         case 'o':
           output= argv[1];
@@ -1951,13 +1953,13 @@ int main (int argc, char **argv){
           st += 9;
           if ( ih ) {
             l = mem[offset++];
-            h = mem[offset++];
+            h = mem[offset
           } else if ( iy ) {
             yl = mem[offset++];
-            yh = mem[offset++];
+            yh = mem[offset
           } else {
             xl = mem[offset++];
-            xh = mem[offset++];
+            xh = mem[offset
           }
         } else {
           CALLCI(fr);
@@ -1984,13 +1986,13 @@ int main (int argc, char **argv){
 
           if ( ih ) {
             mem[offset++] = l;
-            mem[offset++] = h;
+            mem[offset= h;
           } else if ( iy ) {
             mem[offset++] = yl;
-            mem[offset++] = yh;
+            mem[offset= yh;
           } else {
             mem[offset++] = xl;
-            mem[offset++] = xh;
+            mem[offset] = xh;
           }
         } else {
           CALLC(ff&256);
@@ -2015,16 +2017,17 @@ int main (int argc, char **argv){
         ih=1;break;
       case 0xe4: // CALL PO / (RCM) LD HL,(IX+D)
         if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          t = (mem[pc++]^128)-128;
           st += 11;
           if ( ih ) {    // ld (ix+d),hl
-            l = mem[t= (mem[pc++]^128)-128+(xl|xh<<8)];
-            h = mem[t= 1 + (mem[pc++]^128)-128+(xl|xh<<8)];
+            l = mem[t+(xl|xh<<8)];
+            h = mem[t=+(xl|xh<<8) + 1];
           } else if ( iy ) { // ld (iy+d),hl
-            l = mem[t= (mem[pc++]^128)-128+(yl|yh<<8)];
-            h = mem[t= 1 + (mem[pc++]^128)-128+(yl|yh<<8)];
+            l = mem[t+(yl|yh<<8)];
+            h = mem[t+(yl|yh<<8) + 1];
           } else { // ld (hl+d),hl
-            l = mem[t= (mem[pc++]^128)-128+(l|h<<8)];
-            h = mem[t= 1 + (mem[pc++]^128)-128+(l|h<<8)];
+            l = mem[t+(l|h<<8)];
+            h = mem[t+(l|h<<8) + 1];
           }
         } else {
           CALLC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
@@ -2049,16 +2052,17 @@ int main (int argc, char **argv){
         ih=1;break;
       case 0xf4: // CALL P or (RCM) LD (IX+D),HL
         if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          t = (mem[pc++]^128)-128;
           st += 11;
           if ( ih ) {    // ld (ix+d),hl
-            mem[t= (mem[pc++]^128)-128+(xl|xh<<8)] = l;
-            mem[t= 1 + (mem[pc++]^128)-128+(xl|xh<<8)] = h;
+            mem[t+(xl|xh<<8)] = l;
+            mem[t+(xl|xh<<8) + 1] = h;
           } else if ( iy ) { // ld (iy+d),hl
-            mem[t= (mem[pc++]^128)-128+(yl|yh<<8)] = l;
-            mem[t= 1 + (mem[pc++]^128)-128+(yl|yh<<8)] = h;
+            mem[t+(yl|yh<<8)] = l;
+            mem[t+(yl|yh<<8) + 1] = h;
           } else { // ld (hl+d),hl
-            mem[t= (mem[pc++]^128)-128+(l|h<<8)] = l;
-            mem[t= 1 + (mem[pc++]^128)-128+(l|h<<8)] = h;
+            mem[t+(l|h<<8)] = l;
+            mem[t=+(l|h<<8) + 1] = h;
           }
         } else {
           CALLC(ff&128);
