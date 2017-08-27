@@ -5,10 +5,23 @@
 
 
 #include "cmds.h"
+#include <sys/types.h>
+#include <inttypes.h>
+
+
+typedef struct {
+   const char    *name;
+   const char    *file;
+   int            address;
+} symbol;
 
 extern unsigned char a,b,c,d,e,h,l;
-extern unsigned short ff;
+extern unsigned char a_,b_,c_,d_,e_,h_,l_;
+extern unsigned char xh, xl, yh, yl;
+extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
+
+extern int c_cpu;
 
 #define SET_ERROR(error) do {                   \
         if ( (error) == Z88DK_ENONE ) {           \
@@ -19,6 +32,11 @@ extern unsigned char *mem;
         }                                         \
     } while (0)
 
+#define CPU_Z80      1
+#define CPU_Z180     2
+#define CPU_R2K      4
+#define CPU_R3K      8
+#define CPU_Z80_ZXN  16
 
 #define Z88DK_SEEK_SET 0
 #define Z88DK_SEEK_END 1
@@ -40,6 +58,13 @@ extern void      hook_init(void);
 extern void      hook_io_init(hook_command *cmds);
 extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_console_init(hook_command *cmds);
-
+extern void      debugger_init();
+extern void      debugger();
+extern int       disassemble(int pc, char *buf, size_t buflen);
+extern void      read_symbol_file(char *filename);
+extern const char     *find_symbol(int addr);
+extern symbol   *find_symbol_byname(const char *name);
+extern uint8_t   get_memory(int pc);
+extern char **parse_words(char *line, int *argc);
 
 #endif
