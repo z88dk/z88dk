@@ -396,20 +396,6 @@ Define rules for a ragel-based parser.
 			  DO_stmt(0xED23);
 		  }
 
-		| label? _TK_MUL _TK_NEWLINE
-		  @{
-			  if ((opts.cpu & CPU_RABBIT) != 0) {
-				  DO_stmt(0xF7); 				  
-			  }
-			  else if ((opts.cpu & CPU_Z80_ZXN) != 0) { 
-				  DO_stmt(0xED30);
-			  }
-			  else {
-				  error_illegal_ident(); 
-				  return FALSE;
-			  }
-		  }
-		
 		| label? _TK_ADD _TK_HL _TK_COMMA _TK_A _TK_NEWLINE
 		  @{
 			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }

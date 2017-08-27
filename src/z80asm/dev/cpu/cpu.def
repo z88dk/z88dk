@@ -10,63 +10,6 @@
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
-; Exchange group
-;------------------------------------------------------------------------------
-			ex af, {af|af'}						=> 08
-			exx									=> D9
-	
-			ex (sp), hl							=> zilog ? E3 : ED 54
-			ex (sp), ix							=> DD E3
-			ex (sp), iy							=> FD E3
-
-[rabbit] 	     ex (sp), hl'					=> 76 ED 54
-[rabbit]	altd ex (sp), hl					=> 76 ED 54
-
-	
-				 ex de, hl						=>    EB
-[rabbit]		 ex de', hl						=>    E3
-[rabbit]		 ex de, hl'						=> 76 EB
-[rabbit]		 ex de', hl'					=> 76 E3
-				
-[rabbit]	altd ex de, hl						=> 76 EB
-[rabbit]	altd ex de', hl						=> 76 E3
-
-;------------------------------------------------------------------------------
-; 16 bit arithmetic and logical group
-;------------------------------------------------------------------------------
-		ALTD add hl, {bc|de|hl|sp}				=> 09+$1*10
-		ALTD {sbc|adc} hl, {bc|de|hl|sp}		=> ED 42+$1*8+$2*10
-	
-		ALTD {inc|dec} {bc|de|hl|sp}			=> 03+$1*8+$2*10
-
-[rabbit]	add sp, SN							=> 27 SN
-[rabbit] ALTD {and|or} hl, de						=> DC+$1*10
-[rabbit] ALTD bool hl							=> CC
-
-[not_z80]	mlt {bc|de|hl|}						=> ED 4C+$1*10
-[z180]		mlt {|||sp}							=> ED 4C+$1*10
-
-; mul coded in parse_rules.rl as it has different opcodes for Rabbit and Z80-ZXN
-; [rabbit]	mul									=> F7
-	
-[r3k]		uma									=> ED C0
-[r3k]		ums									=> ED C8
-
-;------------------------------------------------------------------------------
-; 8 Bit Rotate and Shift Group
-;------------------------------------------------------------------------------
-			{rlca|rrca|rla|rra}					=> 07+$1*8
-	
-			{rlc|rrc|rl|rr|sla|sra|         |srl} {b|c|d|e|h|l|(hl)|a} \
-												=> CB $1*8+$2
-[zilog]		{   |   |  |  |   |   |{sll|sli}|   } {b|c|d|e|h|l|(hl)|a} \
-												=> CB $1*8+$3
-
-
-[z80]		{rlc|rrc|rl|rr|sla|sra|{sll|sli}|srl} ({ix|iy}+DIS), {b|c|d|e|h|l||a} \
-												=> DD+$3*20 CB DIS $1*8+$4
-
-;------------------------------------------------------------------------------
 ; Bit Set, Reset, and Test Group
 ;------------------------------------------------------------------------------
 			{|bit|ALTD res|ALTD set} CONST, {b|c|d|e|h|l|(hl)|a} \

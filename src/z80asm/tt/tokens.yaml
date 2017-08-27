@@ -342,13 +342,17 @@ tokens:
   - name	: RETN
   - name	: RL
   - name	: RLA
+  - name	: RLA1
   - name	: RLC
   - name	: RLCA
+  - name	: RLCA1
   - name	: RLD
   - name	: RR
   - name	: RRA
+  - name	: RRA1
   - name	: RRC
   - name	: RRCA
+  - name	: RRCA1
   - name	: RRD
   - name	: RST
   - name	: SBC

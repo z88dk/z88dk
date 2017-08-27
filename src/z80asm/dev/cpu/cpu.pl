@@ -715,6 +715,8 @@ my @R16SP = qw( bc de hl sp );
 my @R16AF = qw( bc de hl af );
 my @ALU = qw( add adc sub sbc and xor or cp );
 my @TEST= qw( tst test );
+my @ROTA= qw( rlca rrca rla rra );
+my @ROT = qw( rlc rrc rl rr sla sra sll sli srl );
 
 my @X	= qw( ix iy );
 my @DIS	= ('0', '%d');
@@ -727,6 +729,8 @@ my %V = (
 	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, a => 7,
 	bc => 0, de => 1, hl => 2, sp => 3, af => 3,
 	add => 0, adc => 1, sub => 2, sbc => 3, and => 4, xor => 5, or => 6, cp => 7,
+	rlca => 0, rrca => 1, rla => 2, rra => 3,
+	rlc => 0, rrc => 1, rl => 2, rr => 3, sla => 4, sra => 5, sll => 6, sli => 6, srl => 7, 
 	ix => 0xDD, iy => 0xFD, 
 	altd => 0x76, ioi => 0xD3, ioe => 0xDB,
 );
@@ -902,6 +906,111 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "ldp hl, ($r)", $pfx, 0x6C);
 		}
 	}
+	
+	# exchange group
+	add_opc($cpu, "ex af, af'", 0x08);
+	add_opc($cpu, "ex af, af",  0x08);
+	
+	add_opc($cpu, "exx",  0xD9);
+	
+	if ($zilog) {
+		add_opc($cpu, "ex (sp), hl", 0xE3);
+	}
+	elsif ($rabbit) {
+		add_opc($cpu, "ex (sp), hl", 0xED, 0x54);
+		add_opc($cpu, "ex (sp), hl'", $V{altd}, 0xED, 0x54);
+		add_opc($cpu, "altd ex (sp), hl", $V{altd}, 0xED, 0x54);
+	}
+	else {}
+	
+	for my $x (@X) {
+		add_opc($cpu, "ex (sp), $x", $V{$x}, 0xE3);
+	}
+	
+	add_opc($cpu, "ex de, hl", 0xEB);
+	if ($rabbit) {
+		add_opc($cpu, "ex de', hl", 0xE3);
+		add_opc($cpu, "ex de, hl'", 0x76, 0xEB);
+		add_opc($cpu, "ex de', hl'", 0x76, 0xE3);
+		
+		add_opc($cpu, "altd ex de, hl", 0x76, 0xEB);
+		add_opc($cpu, "altd ex de', hl", 0x76, 0xE3);
+	}
+	
+	# 16-bit ALU group
+	for my $r (@R16SP) {
+		add_opc($cpu, "add hl, $r", 0x09 + $V{$r}*16);
+		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16);
+		add_opc($cpu, "adc hl, $r", 0xED, 0x4A + $V{$r}*16);
+		
+		add_opc($cpu, "inc $r", 0x03 + $V{$r}*16);
+		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
+	}
+	
+	for my $x (@X) {
+		for my $r (@R16SP) {
+			add_opc($cpu, "add $x, ".replace($r, qr/hl/, $x), $V{$x}, 0x09 + $V{$r}*16);
+		}
+		add_opc($cpu, "inc $x", $V{$x}, 0x03 + 2*16);
+		add_opc($cpu, "dec $x", $V{$x}, 0x0B + 2*16);
+	}
+	
+	if ($rabbit) {
+		add_opc($cpu, "add sp, %s", 0x27, '%s');
+		
+		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
+			my($r, @pfx) = @$_;
+			
+			add_opc($cpu, "and $r, de", @pfx, 0xDC);
+			add_opc($cpu, "or $r, de", @pfx, 0xEC);
+			add_opc($cpu, "bool $r", @pfx, 0xCC);
+		}
+	}
+	
+	for my $r (@R16SP) {
+		if ($r eq 'sp') {
+			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16) if $z180;
+		}
+		else {
+			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16) if !$z80;
+		}
+	}
+	
+	if ($z80_zxn) {
+		add_opc($cpu, "mul", 0xED, 0x30);
+	}
+	elsif ($rabbit) {
+		add_opc($cpu, "mul", 0xF7);
+	}
+	else {}
+	
+	if ($r3k) {
+		add_opc($cpu, "uma", 0xED, 0xC0);
+		add_opc($cpu, "ums", 0xED, 0xC8);
+	}
+	
+	# 8-bit rotate and shift group
+	for my $op (@ROTA) {
+		add_opc($cpu, $op, 0x07 + $V{$op}*8);
+	}
+	
+	for my $op (@ROT) {
+		next if $op =~ /sll|sli/ && !$zilog;
+		for my $r (@R8) {
+			add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r});
+		}
+	}
+	
+	if ($z80) {
+		for my $op (@ROT) {
+			for my $x (@X) {
+				for my $r (@R8) {
+					next if $r eq '(hl)';
+					add_opc($cpu, "$op ($x+%d), $r", $V{$x}, 0xCB, '%d', $V{$op}*8 + $V{$r});
+				}
+			}
+		}			
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -1050,9 +1159,11 @@ sub add_opc_3 {
 	}
 	
 	# expand altd
-	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop) \s+ (?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
-					 | ( (?:add|adc|sub|sbc|and|xor|or|cpl|neg) \s+ a)(,.*)
+	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ 
+									(?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
+					 | ( (?:add|adc|sub|sbc|and|xor|or|cpl|neg) \s+ (?:a|hl) )(,.*)
 					 | ( (?:ccf|scf) \s+ f)(,.*)
+					 | ( (?:rlca|rrca|rla|rra)) (.*)
 				   ) $/x) {
 		if ($has_io) {
 			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
@@ -1072,6 +1183,7 @@ sub add_opc_3 {
 	}
 	elsif ($asm =~ /^ (?| ( (?:add|adc|sub|sbc|and|xor|or) \s+ [^,]+ )
 					    | (cp .*) 
+						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
 					  ) $/x) {
 		if ($has_io) {
 			add_opc_4($cpu, "altd $1", $V{altd}, @bin);

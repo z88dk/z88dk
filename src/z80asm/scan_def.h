@@ -33,6 +33,10 @@ Define lexer tokens
 #define TOKEN_OPCODE(opcode)
 #endif
 
+#ifndef TOKEN_OPCODE1
+#define TOKEN_OPCODE1(opcode, string)
+#endif
+
 TOKEN(	TK_END,			"",)	/* = 0; end of file reached */
 TOKEN(	TK_NIL,			"", )	/* returned for rubish */
 TOKEN(	TK_NAME,		"", )
@@ -285,13 +289,17 @@ TOKEN_OPCODE(RETI )
 TOKEN_OPCODE(RETN )
 TOKEN_OPCODE(RL   )
 TOKEN_OPCODE(RLA  )
+TOKEN_OPCODE1(RLA1, "rla'")
 TOKEN_OPCODE(RLC  )
 TOKEN_OPCODE(RLCA )
+TOKEN_OPCODE1(RLCA1, "rlca'")
 TOKEN_OPCODE(RLD  )
 TOKEN_OPCODE(RR   )
 TOKEN_OPCODE(RRA  )
+TOKEN_OPCODE1(RRA1, "rra'")
 TOKEN_OPCODE(RRC  )
 TOKEN_OPCODE(RRCA )
+TOKEN_OPCODE1(RRCA1, "rrca'")
 TOKEN_OPCODE(RRD  )
 TOKEN_OPCODE(RST  )
 TOKEN_OPCODE(SBC  )
