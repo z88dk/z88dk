@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "ticks.h"
 
-static uint8_t get_memory(int pc);
-
 typedef enum {
    OP_NONE,
    OP_A,
@@ -2003,8 +2001,3 @@ int disassemble(int pc, char *buf, size_t buflen)
 }
 
 
-
-static uint8_t get_memory(int pc)
-{
-    return mem[pc % 65536];
-}

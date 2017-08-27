@@ -8,11 +8,20 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
+
+typedef struct {
+   const char    *name;
+   const char    *file;
+   int            address;
+} symbol;
+
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
+
+extern int c_cpu;
 
 #define SET_ERROR(error) do {                   \
         if ( (error) == Z88DK_ENONE ) {           \
@@ -54,5 +63,8 @@ extern void      debugger();
 extern int       disassemble(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr);
+extern symbol   *find_symbol_byname(const char *name);
+extern uint8_t   get_memory(int pc);
+extern char **parse_words(char *line, int *argc);
 
 #endif
