@@ -405,14 +405,14 @@ instruction cb_page[] = {
     { "sra",    OP_INDHL, OP_NONE,    F_INDXY },
     { "sra",    OP_A,     OP_NONE,    0 },
 
-    { "sl1",    OP_B,     OP_NONE,    0 },
-    { "sl1",    OP_C,     OP_NONE,    0 },
-    { "sl1",    OP_D,     OP_NONE,    0 },
-    { "sl1",    OP_E,     OP_NONE,    0 },
-    { "sl1",    OP_H,     OP_NONE,    0 },
-    { "sl1",    OP_L,     OP_NONE,    0 },
-    { "sl1",    OP_INDHL, OP_NONE,    F_INDXY },
-    { "sl1",    OP_A,     OP_NONE,    0 },
+    { "sl1",    OP_B,     OP_NONE,    F_Z80 },
+    { "sl1",    OP_C,     OP_NONE,    F_Z80 },
+    { "sl1",    OP_D,     OP_NONE,    F_Z80 },
+    { "sl1",    OP_E,     OP_NONE,    F_Z80 },
+    { "sl1",    OP_H,     OP_NONE,    F_Z80 },
+    { "sl1",    OP_L,     OP_NONE,    F_Z80 },
+    { "sl1",    OP_INDHL, OP_NONE,    F_Z80|F_INDXY },
+    { "sl1",    OP_A,     OP_NONE,    F_Z80 },
     { "srl",    OP_B,     OP_NONE,    0 },
     { "srl",    OP_C,     OP_NONE,    0 },
     { "srl",    OP_D,     OP_NONE,    0 },
@@ -727,7 +727,7 @@ instruction ed_page[] = {
     { "ld",     OP_DE,    OP_IND16,   0 },
     { "[neg]",  OP_NONE,  OP_NONE,    0 },
     { "[reti]", OP_NONE,  OP_NONE,    0 },
-    { "IM",     OP_IM,    OP_NONE,    0 },
+    { "im",     OP_IM,    OP_NONE,    0 },
     { "ld",     OP_A,     OP_R,       0 },
 
 
@@ -899,6 +899,280 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "trap",   OP_NONE,  OP_NONE,    0 }, /* 0xedfe - Our emulator trap */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+};
+
+instruction z180_ed_page[] = {
+    { "in0",    OP_B,     OP_IND8,    0 }, /* 0x00 */
+    { "out0",   OP_IND8,  OP_B,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_B,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "in0",    OP_C,     OP_IND8,    0 },
+    { "out0",   OP_IND8,  OP_C,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_C,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { "in0",    OP_D,     OP_IND8,    0 }, /* 10 */
+    { "out0",   OP_IND8,  OP_D,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_D,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "in0",    OP_E,     OP_IND8,    0 },
+    { "out0",   OP_IND8,  OP_E,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_E,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { "in0",    OP_H,     OP_IND8,    0 }, /* 20 */
+    { "out0",   OP_IND8,  OP_H,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_H,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "in0",    OP_L,     OP_IND8,    0 },
+    { "out0",   OP_IND8,  OP_L,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_L,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { "in0",    OP_F,     OP_IND8,    0 }, /* 30 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_INDHL,   0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "in0",    OP_A,     OP_IND8,    0 },
+    { "out0",   OP_IND8,  OP_A,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "tst",    OP_A,     OP_A,       0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { "in",     OP_B,     OP_PORTC,   0 }, /* 0x40 */
+    { "out",    OP_PORTC, OP_B,       0 },
+    { "sbc",    OP_HL,    OP_BC,      0 },
+    { "ld",     OP_IND16, OP_BC,      0 },
+    { "neg",    OP_NONE,  OP_NONE,    0 },
+    { "retn",   OP_NONE,  OP_NONE,    0 },
+    { "im",     OP_IM,    OP_NONE,    0 },
+    { "ld",     OP_I,     OP_A,       0},
+    { "in",     OP_C,     OP_PORTC,   0 },
+    { "out",    OP_PORTC, OP_C,       0 },
+    { "adc",    OP_HL,    OP_BC,      0 },
+    { "ld",     OP_BC,    OP_IND16,   0 },
+    { "mult",   OP_BC,  OP_NONE,    0 },
+    { "reti",   OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "ld",     OP_R,     OP_A,       0 },
+
+    { "in",     OP_D,     OP_PORTC,   0 }, /* 0x50 */
+    { "out",    OP_PORTC, OP_D,       0 },
+    { "sbc",    OP_HL,    OP_DE,      0 },
+    { "ld",     OP_IND16, OP_DE,      0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "im",     OP_IM,    OP_NONE,    0 },
+    { "ld",     OP_A,     OP_I,       0 },
+    { "in",     OP_E,     OP_PORTC,   0 },
+    { "out",    OP_PORTC, OP_E,       0 },
+    { "adc",    OP_HL,    OP_DE,      0 },
+    { "ld",     OP_DE,    OP_IND16,   0 },
+    { "mult",   OP_DE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "im",     OP_IM,    OP_NONE,    0 },
+    { "ld",     OP_A,     OP_R,       0 },
+
+    { "in",     OP_H,     OP_PORTC,   0 },  /* 0x60 */
+    { "out",    OP_PORTC, OP_H,       0 },
+    { "sbc",    OP_HL,    OP_HL,      0 },
+    { "ld",     OP_IND16, OP_HL,      0 },
+    { "tst",    OP_A,     OP_IMMED8,  0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "rrd",    OP_NONE,  OP_NONE,    0 },
+    { "in",     OP_L,     OP_PORTC,   0 },
+    { "out",    OP_PORTC, OP_L,       0 },
+    { "adc",    OP_HL,    OP_HL,      0 },
+    { "ld",     OP_HL,    OP_IND16,   0 },
+    { "mult",   OP_HL,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "rld",    OP_NONE,  OP_NONE,    0 },
+
+    { "in",     OP_F,     OP_PORTC,   0 }, /* 0x70 */
+    { "out",    OP_PORTC, OP_F,       0 },
+    { "sbc",    OP_HL,    OP_SP,      0 },
+    { "ld",     OP_IND16, OP_SP,      0 },
+    { "tst",    OP_PORTC, OP_IMMED8,  0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "slp",    OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "in",     OP_A,     OP_PORTC,   0 },
+    { "out",    OP_PORTC, OP_A,       0 },
+    { "adc",    OP_HL,    OP_SP,      0 },
+    { "ld",     OP_SP,    OP_IND16,   0 },
+    { "mult",   OP_SP,    OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x80 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "otim",   OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "otdm",   OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x90 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "otimr",  OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "otdmr",  OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { "ldi",    OP_NONE,  OP_NONE,    0 }, /* 0xa0 */
+    { "cpi",    OP_NONE,  OP_NONE,    0 },
+    { "ini",    OP_NONE,  OP_NONE,    0 },
+    { "oti",    OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "ldd",    OP_NONE,  OP_NONE,    0 },
+    { "cpd",    OP_NONE,  OP_NONE,    0 },
+    { "ind",    OP_NONE,  OP_NONE,    0 },
+    { "otd",    OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { "ldir",   OP_NONE,  OP_NONE,    0 }, /* 0xb0 */
+    { "cpir",   OP_NONE,  OP_NONE,    0 },
+    { "inir",   OP_NONE,  OP_NONE,    0 },
+    { "otir",   OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "lddr",   OP_NONE,  OP_NONE,    0 },
+    { "cpdr",   OP_NONE,  OP_NONE,    0 },
+    { "indr",   OP_NONE,  OP_NONE,    0 },
+    { "otdr",   OP_NONE,  OP_NONE,    0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0xc0 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0xd0 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0xe0 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0xf0 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 };
 
@@ -1768,17 +2042,21 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     case OP_E:
         return "e";
     case OP_H:
-        if ( state->index == 0xDD && instr->flags & F_IXY) {
-            return "ixh";
-        } else if ( state->index == 0xFD && instr->flags & F_IXY) {
-            return "iyh";
+        if ( c_cpu == CPU_Z80 ) {
+            if ( state->index == 0xDD && instr->flags & F_IXY) {
+                return "ixl";
+            } else if ( state->index == 0xFD && instr->flags & F_IXY) {
+                return "iyl";
+            }
         }
         return "h";
     case OP_L:
-        if ( state->index == 0xDD && instr->flags & F_IXY) {
-            return "ixl";
-        } else if ( state->index == 0xFD && instr->flags & F_IXY) {
-            return "iyl";
+        if ( c_cpu == CPU_Z80 ) {
+            if ( state->index == 0xDD && instr->flags & F_IXY) {
+                return "ixl";
+            } else if ( state->index == 0xFD && instr->flags & F_IXY) {
+                return "iyl";
+            }
         }
         return "l";
     case OP_AF:
@@ -1835,7 +2113,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         return "(hl)";
     case OP_IND8:
         READ_BYTE(state, lsb);
-        snprintf(buf,buflen,"($%02x", lsb);
+        snprintf(buf,buflen,"($%02x)", lsb);
         return buf;
     case OP_IND16:
         READ_BYTE(state, lsb);
@@ -1979,6 +2257,8 @@ int disassemble(int pc, char *buf, size_t buflen)
             table = ed_page;
             if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
                 table = rabbit_ed_page;
+            } else if ( c_cpu == CPU_Z180 ) {
+                table = z180_ed_page;
             }
             READ_BYTE(state,b);
             state->index = 0; // Index ops not permitted

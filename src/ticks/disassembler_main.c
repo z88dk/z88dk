@@ -21,6 +21,7 @@ static void usage(char *program)
     printf("  -s             Address to start disassembling from\n");
     printf("  -e             Address to disassemble to\n");
     printf("  -mz80          Disassemble z80 code\n");
+    printf("  -mz180         Disassemble z180 code\n");
     printf("  -mz80-zxn      Disassemble z80 ZXN code\n");
     printf("  -mr2k          Disassemble Rabbit 2000 code\n");
     printf("  -mr3k          Disassemble Rabbit 2000 code\n");
@@ -64,6 +65,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_Z80;
                 } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
                     c_cpu = CPU_Z80_ZXN;
+                } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
+                    c_cpu = CPU_Z180;
                 } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
                     c_cpu = CPU_R2K;
                 } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
