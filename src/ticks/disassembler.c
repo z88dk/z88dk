@@ -55,7 +55,8 @@ typedef enum {
    OP_IP,
    OP_XPC,
    OP_IPSET,
-   OP_INDSP2
+   OP_INDSP2,
+   OP_INDHL2,
 } operand;
 
 #define F_IXY   1   /* ix */
@@ -65,6 +66,7 @@ typedef enum {
 #define F_ZXN  64
 #define F_R2K  128
 #define F_R3K  256
+#define F_NOIX 512  /* Don't switch to ix in dd page */
 
 typedef struct {
     const char   *opcode;
@@ -942,7 +944,7 @@ instruction rabbit_main_page[] = {
     { "inc",    OP_H,     OP_NONE,    0 },
     { "dec",    OP_H,     OP_NONE,    0 },
     { "ld",     OP_H,     OP_IMMED8,  F_INDXY }, 
-    { "daa",    OP_NONE,  OP_NONE,    0 },
+    { "add",    OP_SP,    OP_IMMED8,  0 },
     { "jr",     OP_Z,     OP_REL8,    0 },
     { "add",    OP_HL,    OP_HL,      F_IXY },
     { "ld",     OP_HL,    OP_IND16,   F_IXY },
@@ -1421,7 +1423,7 @@ instruction rabbit_dd_page[] = {
     { "pop",    OP_HL,    OP_NONE,    F_IXY },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { "ex",     OP_SP,    OP_HL,       F_IXY },
-    { "ld",     OP_HL,    OP_INDHL,   0 },
+    { "ld",     OP_HL,    OP_INDHL2,  F_NOIX },
     { "push",   OP_HL,    OP_NONE,    F_IXY },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
@@ -1438,7 +1440,7 @@ instruction rabbit_dd_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
-    { "ld",     OP_INDHL, OP_HL,      0 },
+    { "ld",     OP_INDHL2, OP_HL,     F_NOIX  },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
@@ -1785,7 +1787,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     case OP_DE:
         return "de";
     case OP_HL:
-        if ( state->index == 0xDD ) {
+        if ( state->index == 0xDD && (instr->flags & F_NOIX) == 0) {
             return "ix";
         } else if ( state->index == 0xFD ) {
             return "iy";
@@ -1905,7 +1907,11 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         return buf; 
     case OP_INDSP2:
         READ_BYTE(state, udisplacement);
-        snprintf(buf,buflen,"(sp+%02x)",  udisplacement);
+        snprintf(buf,buflen,"(sp+$%02x)",  udisplacement);
+        return buf;
+    case OP_INDHL2:
+        READ_BYTE(state, displacement);
+        snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "hl" : "iy", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
         return buf;
     case OP_IPSET:
         {
@@ -1934,6 +1940,9 @@ int disassemble(int pc, char *buf, size_t buflen)
     const char  *label;
     size_t       offs = 0;
 
+    if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
+        table = rabbit_main_page;
+    }
     state->pc = pc;
 
     label = find_symbol(pc);
@@ -1960,7 +1969,7 @@ int disassemble(int pc, char *buf, size_t buflen)
             state->index = b;
             table = main_page; 
             if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
-                table = rabbit_main_page;
+                table = rabbit_dd_page;
             }
             continue;
         }
