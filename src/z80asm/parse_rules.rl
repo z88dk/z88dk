@@ -17,13 +17,7 @@ Define rules for a ragel-based parser.
 *----------------------------------------------------------------------------*/
 
 /* macros for actions - labels */
-#define DO_STMT_LABEL() \
-			do { \
-				if (str_len(stmt_label)) { \
-					asm_LABEL(str_data(stmt_label)); \
-					str_len(stmt_label) = 0; \
-				} \
-			} while(0)
+#define DO_STMT_LABEL() asm_cond_LABEL(stmt_label)
 
 /* macros for actions - statements */
 #define DO_stmt(opcode) \

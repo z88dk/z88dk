@@ -717,6 +717,7 @@ my @ALU = qw( add adc sub sbc and xor or cp );
 my @TEST= qw( tst test );
 my @ROTA= qw( rlca rrca rla rra );
 my @ROT = qw( rlc rrc rl rr sla sra sll sli srl );
+my @BIT = qw( bit res set );
 
 my @X	= qw( ix iy );
 my @DIS	= ('0', '%d');
@@ -731,6 +732,7 @@ my %V = (
 	add => 0, adc => 1, sub => 2, sbc => 3, and => 4, xor => 5, or => 6, cp => 7,
 	rlca => 0, rrca => 1, rla => 2, rra => 3,
 	rlc => 0, rrc => 1, rl => 2, rr => 3, sla => 4, sra => 5, sll => 6, sli => 6, srl => 7, 
+	bit => 1, res => 2, set => 3,
 	ix => 0xDD, iy => 0xFD, 
 	altd => 0x76, ioi => 0xD3, ioe => 0xDB,
 );
@@ -1011,6 +1013,13 @@ for my $cpu (@CPUS) {
 			}
 		}			
 	}
+	
+	# bit set, reset and test group
+	for my $op (@BIT) {
+		for my $r (@R8) {
+			add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
+		}
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -1091,6 +1100,11 @@ for my $asm (sort keys %Tests) {
 			$fh{$cpu}{''}{err}->print($asmf."; Error\n");
 		}
 	}
+	if (exists $Tests{$asm}{''}) {
+		for my $cpu (@CPUS) {
+			$fh{$cpu}{''}{err}->print($asmf."; Error\n");
+		}
+	}
 }
 
 
@@ -1164,6 +1178,7 @@ sub add_opc_3 {
 					 | ( (?:add|adc|sub|sbc|and|xor|or|cpl|neg) \s+ (?:a|hl) )(,.*)
 					 | ( (?:ccf|scf) \s+ f)(,.*)
 					 | ( (?:rlca|rrca|rla|rra)) (.*)
+					 | ( (?:res|set) \s+ %c \s* , \s* (?:a|b|c|d|e|h|l)) ( $ | \b [^'] .*)
 				   ) $/x) {
 		if ($has_io) {
 			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
@@ -1182,7 +1197,7 @@ sub add_opc_3 {
 		}
 	}
 	elsif ($asm =~ /^ (?| ( (?:add|adc|sub|sbc|and|xor|or) \s+ [^,]+ )
-					    | (cp .*) 
+					    | ( (?:cp|bit) .*) 
 						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
 					  ) $/x) {
 		if ($has_io) {
@@ -1285,6 +1300,22 @@ sub parse_code {
 	elsif ($bin =~ s/ %j$//) {
 		$stmt = "DO_stmt_jr";
 	}
+	elsif ($bin =~ s/%c\((.*?)\)/expr_value/) {
+		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
+		push @code,
+			"if (expr_error) return FALSE;",
+			"switch (expr_value) {",
+			join(" ", map {"case $_:"} @values)." break;",
+			"default: error_int_range(expr_value);",
+			"}";
+			
+		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
+			$stmt = "DO_stmt_idx";
+		} 
+		else {
+			$stmt = "DO_stmt";
+		}
+	}
 	elsif ($bin =~ s/ %d//) {
 		$stmt = "DO_stmt_idx";
 	}
@@ -1292,12 +1323,33 @@ sub parse_code {
 		$stmt = "DO_stmt";
 	}
 
-	# build statement
+	# build statement - need to leave expressions for C compiler
 	@bin = split(' ', $bin);
-	my $opc = "0x";
+	my @expr;
 	for (@bin) {
-		eval($_); die "$cpu, $asm, @bin, $_" if $@;
-		$opc .= fmthex($_);
+		if (/[+*?]/) {
+			my $offset = 0;
+			if (s/^(\d+)\+//) {
+				$offset = $1;
+			}
+			$_ =~ s/(\d+)/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
+			push @expr, $_;
+			$_ = fmthex($offset);
+		}
+		else {
+			push @expr, undef;
+			$_ = eval($_); die "$cpu, $asm, @bin, $_" if $@;
+			$_ = fmthex($_);
+		}
+	}
+	
+	my $opc = "0x".join('', @bin);
+	for (0..$#expr) {
+		next unless defined $expr[$_];
+		my $bytes_shift = scalar(@bin) - $_ - 1;
+		$opc .= '+(('.($expr[$_]).')';
+		$opc .= ' << '.($bytes_shift * 8) if $bytes_shift;
+		$opc .= ')';
 	}
 	$stmt and push @code, $stmt."(".$opc.$extra_arg.");";
 	
@@ -1390,10 +1442,11 @@ sub extract_common {
 	my($a, $b) = @_;
 	my $common = '';
 	
-	while ($a =~ /(.*?;)\s*/ && 
+	while ($a =~ /(.*?[;}])/s && 
 			substr($a, 0, length($1)) eq
 			substr($b, 0, length($1)) ) {
-		$common .= $1." ";
+		$common .= $1;
+		
 		$a = substr($a, length($&));
 		$b = substr($b, length($&));
 	}
@@ -1426,7 +1479,20 @@ sub add_tests {
 		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
 	}
 	elsif ($asm =~ /%c/) {
-		die;
+		$bin =~ s/%c\((.*?)\)/%c/ or die $bin;
+		my @values = eval($1); die "$cpu, $asm, $bin, $1" if $@;
+		my($min, $max) = ($values[0], $values[-1]);
+		for (@values) {
+			my @bin = split(' ', replace($bin, '%c', $_));
+			for (@bin) {
+				$_ = eval($_) if /[+*?]/; die $@ if $@;
+			}
+			add_tests($cpu, replace($asm, '%c', $_), join(' ', @bin));
+			$min = $_ if $_ < $min;
+			$max = $_ if $_ > $max;
+		}
+		add_tests('', replace($asm, '%c', $min-1), replace($bin, '%c', $min-1));
+		add_tests('', replace($asm, '%c', $max+1), replace($bin, '%c', $max+1));
 	}
 	elsif ($asm =~ /%d/) {
 		add_tests($cpu, replace($asm, qr/\+%d/, "+127"), replace($bin, '%d', 0x7F));
@@ -1440,7 +1506,6 @@ sub add_tests {
 		$Tests{$asm}{$cpu} = $bin;
 	}
 }
-
 
 sub fmthex {
 	return join(' ', map {/\D/ ? $_ : sprintf('%02X', $_)} @_);
