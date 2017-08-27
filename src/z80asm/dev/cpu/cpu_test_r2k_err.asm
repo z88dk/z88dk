@@ -107,6 +107,8 @@
  or ixl                         ; Error
  or iyh                         ; Error
  or iyl                         ; Error
+ pop su                         ; Error
+ push su                        ; Error
  sbc a, ixh                     ; Error
  sbc a, ixl                     ; Error
  sbc a, iyh                     ; Error

@@ -704,13 +704,15 @@ if ($ENV{DEBUG}) {
 #	%m	unsigned word
 #	%j	jr offset
 #	%c	constant (im, bit, rst, ...)
-#	$d	signed register indirect offset
+#	%d	signed register indirect offset
 #	%u	unsigned register indirect offset
 #	@label	unsigned word with given global label address
 #------------------------------------------------------------------------------
 @CPUS = qw( z80 z80_zxn z180 r2k r3k );
 
 my @R8	= qw( b c d e h l (hl) a );
+my @R16SP = qw( bc de hl sp );
+my @R16AF = qw( bc de hl af );
 my @ALU = qw( add adc sub sbc and xor or cp );
 my @TEST= qw( tst test );
 
@@ -723,6 +725,7 @@ my @A_  = ('a, ', '');
 my %V = (
 	'' => '',
 	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, a => 7,
+	bc => 0, de => 1, hl => 2, sp => 3, af => 3,
 	add => 0, adc => 1, sub => 2, sbc => 3, and => 4, xor => 5, or => 6, cp => 7,
 	ix => 0xDD, iy => 0xFD, 
 	altd => 0x76, ioi => 0xD3, ioe => 0xDB,
@@ -734,6 +737,7 @@ my %V = (
 %Opcodes = ();
 for my $cpu (@CPUS) {
 	my $rabbit	= ($cpu =~ /^r/);
+	my $r3k		= ($cpu =~ /^r3k/);
 	my $z80 	= ($cpu =~ /^z80/);
 	my $z80_zxn	= ($cpu =~ /^z80_zxn/);
 	my $z180 	= ($cpu =~ /^z180/);
@@ -781,14 +785,122 @@ for my $cpu (@CPUS) {
 			}
 		}
 	}
+	
 	if ($zilog) {
-		add_opc($cpu, "daa", 0x27);
+		add_opc($cpu, "daa", 0x27);			# TODO: daa as library call
 		add_opc($cpu, "rrd", 0xED, 0x67);
 		add_opc($cpu, "rld", 0xED, 0x6F);
 	}
 	elsif ($rabbit) {
 		add_opc($cpu, "rrd", 0xCD, '@__z80asm__rrd');
 		add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
+	}
+	
+	add_opc($cpu, "cpl", 		0x2F);
+	add_opc($cpu, "cpl a", 		0x2F);
+	add_opc($cpu, "cpl a'", 	$V{altd}, 0x2F) if $rabbit;
+	add_opc($cpu, "altd cpl",	$V{altd}, 0x2F) if $rabbit;
+	add_opc($cpu, "altd cpl a",	$V{altd}, 0x2F) if $rabbit;
+	
+	add_opc($cpu, "neg", 		0xED, 0x44);
+	add_opc($cpu, "neg a", 		0xED, 0x44);
+	add_opc($cpu, "neg a'", 	$V{altd}, 0xED, 0x44) if $rabbit;
+	add_opc($cpu, "altd neg",	$V{altd}, 0xED, 0x44) if $rabbit;
+	add_opc($cpu, "altd neg a",	$V{altd}, 0xED, 0x44) if $rabbit;
+	
+	add_opc($cpu, "ccf", 		0x3F);
+	add_opc($cpu, "ccf f", 		0x3F);
+	add_opc($cpu, "ccf f'", 	$V{altd}, 0x3F) if $rabbit;
+	add_opc($cpu, "altd ccf",	$V{altd}, 0x3F) if $rabbit;
+	add_opc($cpu, "altd ccf f",	$V{altd}, 0x3F) if $rabbit;
+	
+	add_opc($cpu, "scf", 		0x37);
+	add_opc($cpu, "scf f", 		0x37);
+	add_opc($cpu, "scf f'", 	$V{altd}, 0x37) if $rabbit;
+	add_opc($cpu, "altd scf",	$V{altd}, 0x37) if $rabbit;
+	add_opc($cpu, "altd scf f",	$V{altd}, 0x37) if $rabbit;
+	
+	# 16-bit load group
+	for my $r (@R16SP) {
+		add_opc($cpu, "ld $r, %m", 0x01 + $V{$r}*16, '%m', '%m');
+		if ($r eq 'hl') {
+			add_opc($cpu, "ld $r, (%m)", 0x2A, '%m', '%m');
+			add_opc($cpu, "ld (%m), $r", 0x22, '%m', '%m');
+			
+			for my $x (@X) {
+				add_opc($cpu, "ld $x, %m", $V{$x}, 0x01 + $V{$r}*16, '%m', '%m');
+				add_opc($cpu, "ld $x, (%m)", $V{$x}, 0x2A, '%m', '%m');
+				add_opc($cpu, "ld (%m), $x", $V{$x}, 0x22, '%m', '%m');
+			}
+		}
+		else {
+			add_opc($cpu, "ld $r, (%m)", 0xED, 0x4B + $V{$r}*16, '%m', '%m');
+			add_opc($cpu, "ld (%m), $r", 0xED, 0x43 + $V{$r}*16, '%m', '%m');
+		}
+	}
+	
+	add_opc($cpu, "ld sp, hl", 0xF9);
+	for my $x (@X) {
+		add_opc($cpu, "ld sp, $x", $V{$x}, 0xF9);
+	}
+	
+	for my $r (@R16AF) {
+		add_opc($cpu, "push $r", 0xC5 + $V{$r}*16);
+		add_opc($cpu, "pop $r", 0xC1 + $V{$r}*16);
+		
+		if ($r eq 'hl') {
+			for my $x (@X) {
+				add_opc($cpu, "push $x", $V{$x}, 0xC5 + $V{$r}*16);
+				add_opc($cpu, "pop $x", $V{$x}, 0xC1 + $V{$r}*16);
+			}
+		}
+	}
+	
+	if ($rabbit) {
+		add_opc($cpu, "push ip", 0xED, 0x76);
+		add_opc($cpu, "pop ip", 0xED, 0x7E);
+	}
+	
+	if ($r3k) {
+		add_opc($cpu, "push su", 0xED, 0x66) if $r3k;
+		add_opc($cpu, "pop su", 0xED, 0x6E) if $r3k;
+	}
+	
+	if ($rabbit) {
+		for my $x (@X) {
+			add_opc($cpu, "ld hl, $x", $V{$x}, 0x7C);
+			add_opc($cpu, "ld $x, hl", $V{$x}, 0x7D);
+		}
+		
+		for ([hl => 0xDD], [ix => ()], [iy => 0xFD]) {
+			my($r, @pfx) = @$_;
+		
+			add_opc($cpu, "ld hl, ($r+%d)", @pfx, 0xE4, '%d');
+			add_opc($cpu, "ld ($r+%d), hl", @pfx, 0xF4, '%d');
+		}
+			
+		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
+			my($r, @pfx) = @$_;
+		
+			add_opc($cpu, "ld (sp+%u), $r", @pfx, 0xD4, '%u');
+			add_opc($cpu, "ld $r, (sp+%u)", @pfx, 0xC4, '%u');
+		}
+		
+		for my $r (qw(bc de hl)) {
+			for my $s (qw(bc de)) {
+				add_opc($cpu, "ld $r', $s", 	0xED, 0x41 + $V{$r}*16 + (1-$V{$s})*8);
+				add_opc($cpu, "altd ld $r, $s", 0xED, 0x41 + $V{$r}*16 + (1-$V{$s})*8);
+			}
+		}
+		
+		for ([hl => 0xED], [ix => 0xDD], [iy => 0xFD]) {
+			my($r, $pfx) = @$_;
+			
+			add_opc($cpu, "ldp (%m), $r", $pfx, 0x65, '%m', '%m');
+			add_opc($cpu, "ldp $r, (%m)", $pfx, 0x6D, '%m', '%m');
+			add_opc($cpu, "ldp ($r), hl", $pfx, 0x64);
+			add_opc($cpu, "ldp hl, ($r)", $pfx, 0x6C);
+		}
 	}
 }
 
@@ -899,6 +1011,8 @@ sub add_opc_1 {
 	add_opc_2($cpu, $asm, @bin);
 	
 	# expand (ix+%d)
+	return if $asm =~ /^ldp/;
+	
 	if ($asm =~ /\(hl\)/) {
 		(my $asm1 = $asm) =~ s/\(hl\)/(ix+%d)/g;
 		add_opc_2($cpu, $asm1, $V{ix}, $bin[0], '%d', @bin[1..$#bin]);
@@ -911,9 +1025,9 @@ sub add_opc_2 {
 	my($cpu, $asm, @bin) = @_;
 
 	# (ix+%d) -> (ix)
-	if ($asm =~ /\+%d/) {
-		(my $asm1 = $asm) =~ s/\+%d//;
-		my @bin1 = map {/%d/ ? 0 : $_} @bin;
+	if ($asm =~ /\+%[du]/) {
+		(my $asm1 = $asm) =~ s/\+%[du]//;
+		my @bin1 = map {/%[du]/ ? 0 : $_} @bin;
 		add_opc_3($cpu, $asm1, @bin1);
 	}
 
@@ -929,15 +1043,16 @@ sub add_opc_3 {
 	
 	# expand ioi ioe
 	my $has_io;
-	if ($asm =~ /\((ix|iy|hl|bc|de|%m)/) {
+	if ($asm =~ /\((ix|iy|hl|bc|de|%m)/ && $asm !~ /^ldp/) {
 		add_opc_4($cpu, "ioi $asm", $V{ioi}, @bin);
 		add_opc_4($cpu, "ioe $asm", $V{ioe}, @bin);
 		$has_io++;
 	}
 	
 	# expand altd
-	if ($asm =~ /^ (?| ( (?:ld|inc|dec) \s+ (?:a|b|c|d|e|h|l|af|bc|de|hl))(.*)
-					 | ( (?:add|adc|sub|sbc|and|xor|or) \s+ a)(,.*)
+	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop) \s+ (?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
+					 | ( (?:add|adc|sub|sbc|and|xor|or|cpl|neg) \s+ a)(,.*)
+					 | ( (?:ccf|scf) \s+ f)(,.*)
 				   ) $/x) {
 		if ($has_io) {
 			add_opc_4($cpu, "$1'$2", $V{altd}, @bin);
@@ -1041,6 +1156,9 @@ sub parse_code {
 		$stmt = "DO_stmt_idx_n";
 	}
 	elsif ($bin =~ s/ %n$//) {
+		$stmt = "DO_stmt_n";
+	}
+	elsif ($bin =~ s/ %u$//) {
 		$stmt = "DO_stmt_n";
 	}
 	elsif ($bin =~ s/ %s$//) {
@@ -1204,7 +1322,7 @@ sub add_tests {
 	}
 	elsif ($asm =~ /%u/) {
 		add_tests($cpu, replace($asm, qr/\+%u/, "+255"), replace($bin, '%u', 0xFF));
-		add_tests($cpu, replace($asm, qr/\+%u/, "+0"  ), replace($bin, '%u', 0x80));
+		add_tests($cpu, replace($asm, qr/\+%u/, "+0"  ), replace($bin, '%u', 0x00));
 	}
 	else {
 		$Tests{$asm}{$cpu} = $bin;
