@@ -1817,7 +1817,7 @@ instruction rabbit_ed_page[] = {
     { "ld",     OP_IIR,   OP_A,       0 },
 
     { NULL,     OP_NONE,  OP_NONE,    0 },  /* 50 */
-    { "out",    OP_DE_,   OP_DE,      0 },
+    { "ld",     OP_DE_,   OP_DE,      0 },
     { "sbc",    OP_HL,    OP_DE,      0 },
     { "ld",     OP_IND16, OP_DE,      0 },
     { "ex",     OP_INDSP, OP_HL,      0 },
