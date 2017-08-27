@@ -564,8 +564,6 @@ int main (int argc, char **argv){
           } else {
             printf("Unknown CPU: %s\n",&argv[0][1]);
           }
-          argv--;
-          argc++;
           break;
         case 'o':
           output= argv[1];

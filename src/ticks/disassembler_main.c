@@ -13,15 +13,36 @@ unsigned char *mem;
 int  c_cpu = CPU_Z80;
 
 
+static void usage(char *program)
+{
+    printf("z88dk disassembler\n\n");
+    printf("%s [options] [file]\n\n",program);
+    printf("  -o             Address to load code from\n");
+    printf("  -s             Address to start disassembling from\n");
+    printf("  -e             Address to disassemble to\n");
+    printf("  -mz80          Disassemble z80 code\n");
+    printf("  -mz80-zxn      Disassemble z80 ZXN code\n");
+    printf("  -mr2k          Disassemble Rabbit 2000 code\n");
+    printf("  -mr3k          Disassemble Rabbit 2000 code\n");
+    printf("  -x <file>      Symbol file to read\n");
+
+    exit(1);
+}
+
 int main(int argc, char **argv)
 {
+    char  *program = argv[0];
     char  *filename;
-    int    org = 0;
-    int    start = 0;
-    int    end = 65535;
+    uint16_t    org = 0;
+    uint16_t    start = 0;
+    uint16_t    end = 65535;
     int    loaded = 0;
 
     mem = calloc(1,65536);
+
+    if ( argc == 1 ) {
+        usage(program);
+    }
 
     while ( argc > 1  ) {
         if( argv[1][0] == '-' && argv[2] ) {
@@ -50,22 +71,28 @@ int main(int argc, char **argv)
                 } else {
                     printf("Unknown CPU: %s\n",&argv[0][1]);
                 }
-                argv--;
-                argc++;
                 break;
             }
         } else {
             FILE *fp = fopen(argv[1],"r");
 
             if ( fp != NULL ) {
-                fread(mem + org, sizeof(char), 65536 - start, fp);
+                size_t r = fread(mem + org, sizeof(char), 65536 - start, fp);
                 loaded = 1;
                 fclose(fp);
+                if ( r < end - org ) {
+                    end = org + r;
+                }
+            } else {
+                fprintf(stderr, "Cannot load file '%s'\n",argv[1]);
             }
+            argc--; argv++;
         }
     }
     if ( loaded ) {
         disassemble_loop(start,end);
+    } else {
+        usage(program);
     }
     exit(0);
 }

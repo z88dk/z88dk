@@ -65,8 +65,6 @@ typedef enum {
 #define F_ZXN  64
 #define F_R2K  128
 #define F_R3K  256
-#define F_ALT  512
-#define F_IO   1024
 
 typedef struct {
     const char   *opcode;
@@ -1960,11 +1958,17 @@ int disassemble(int pc, char *buf, size_t buflen)
         READ_BYTE(state,b);
         if ( b == 0xDD || b == 0xFD ) {
             state->index = b;
-            table = main_page; // TODO: Rabbit switch
+            table = main_page; 
+            if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
+                table = rabbit_main_page;
+            }
             continue;
         }
         if ( b == 0xED ) {
             table = ed_page;
+            if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
+                table = rabbit_ed_page;
+            }
             READ_BYTE(state,b);
             state->index = 0; // Index ops not permitted
         } else if ( b == 0xcb ) {
@@ -1974,8 +1978,15 @@ int disassemble(int pc, char *buf, size_t buflen)
         state->opcode = b;
         instr = &table[b];
 
+        if (instr->flags & F_ZXN && c_cpu != CPU_Z80_ZXN ) {
+            instr = NULL;
+        }
+        if (instr->flags & F_R3K && c_cpu != CPU_R3K ) {
+            instr = NULL;
+        }
+
         /* We now have the instruction (TODO: CPU flags) */
-        if ( instr->opcode == NULL ) {
+        if ( instr == NULL || instr->opcode == NULL ) {
             offs += snprintf(buf + offs, buflen - offs,"\t[nop]\t\t;");
         } else {
             offs += snprintf(buf + offs, buflen - offs,"\t%-8s", instr->opcode);
