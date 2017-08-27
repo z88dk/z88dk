@@ -41,6 +41,7 @@ typedef enum {
    OP_R,
    OP_IM,
    OP_DEHL,
+   OP_A32,
    /* Rabbit */
    OP_IMMED24,
    OP_INDXYd,  /* With displacement */
@@ -661,13 +662,13 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { NULL,     OP_NONE,  OP_NONE,    0 },   /* 0x20 */
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "ld",     OP_A32,   OP_DEHL,    F_ZXN }, /* 0x20 */
+    { "ld",     OP_DEHL,  OP_A32,     F_ZXN },
+    { "ex",     OP_A32,   OP_DEHL,    F_ZXN },
+    { "swapnib",OP_NONE,  OP_NONE,    F_ZXN },  /* 0x23 */
+    { "mirror", OP_A,     OP_NONE,    F_ZXN },
+    { "ld",     OP_HL,    OP_SP,      F_ZXN }, 
+    { "mirror", OP_DE,    OP_NONE,    F_ZXN },
     { "tst",    OP_IMMED8, OP_NONE,   F_ZXN }, /* 0xed27 */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -781,12 +782,12 @@ instruction ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
 
-    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x90 */
+    { "outinb", OP_NONE,  OP_NONE,    F_ZXN }, /* 0x90 */
+    { "nextreg",OP_IMMED8, OP_IMMED8, F_ZXN },
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "pixeldn",OP_NONE,  OP_NONE,    F_ZXN }, 
+    { "pixelad",OP_NONE,  OP_NONE,    F_ZXN }, 
+    { "setae",  OP_NONE,  OP_NONE,    F_ZXN }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
@@ -820,7 +821,7 @@ instruction ed_page[] = {
     { "inir",   OP_NONE,  OP_NONE,    0 },
     { "otir",   OP_NONE,  OP_NONE,    0 },
     { "ldirx",  OP_NONE,  OP_NONE,    F_ZXN }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "fillde", OP_NONE,  OP_NONE,    F_ZXN },  /* 0xb5 */
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "lddr",   OP_NONE,  OP_NONE,    0 },
@@ -1878,7 +1879,8 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         return buf; 
     case OP_DEHL:
         return "dehl";
-
+    case OP_A32:
+        return "a32";
     case OP_IXY:
         return state->index == 0xfd ? "iy" : "ix";
     case OP_INDXY:
