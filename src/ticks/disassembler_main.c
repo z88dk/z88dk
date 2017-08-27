@@ -24,7 +24,7 @@ static void usage(char *program)
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mz80-zxn      Disassemble z80 ZXN code\n");
     printf("  -mr2k          Disassemble Rabbit 2000 code\n");
-    printf("  -mr3k          Disassemble Rabbit 2000 code\n");
+    printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
