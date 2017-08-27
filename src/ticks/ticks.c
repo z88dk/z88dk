@@ -1953,13 +1953,13 @@ int main (int argc, char **argv){
           st += 9;
           if ( ih ) {
             l = mem[offset++];
-            h = mem[offset
+            h = mem[offset];
           } else if ( iy ) {
             yl = mem[offset++];
-            yh = mem[offset
+            yh = mem[offset];
           } else {
             xl = mem[offset++];
-            xh = mem[offset
+            xh = mem[offset];
           }
         } else {
           CALLCI(fr);
@@ -1986,10 +1986,10 @@ int main (int argc, char **argv){
 
           if ( ih ) {
             mem[offset++] = l;
-            mem[offset= h;
+            mem[offset] = h;
           } else if ( iy ) {
             mem[offset++] = yl;
-            mem[offset= yh;
+            mem[offset] = yh;
           } else {
             mem[offset++] = xl;
             mem[offset] = xh;
