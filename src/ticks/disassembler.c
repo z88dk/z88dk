@@ -784,7 +784,7 @@ instruction ed_page[] = {
 
     { "outinb", OP_NONE,  OP_NONE,    F_ZXN }, /* 0x90 */
     { "nextreg",OP_IMMED8, OP_IMMED8, F_ZXN },
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "nextreg",OP_IMMED8, OP_A,      0 },
     { "pixeldn",OP_NONE,  OP_NONE,    F_ZXN }, 
     { "pixelad",OP_NONE,  OP_NONE,    F_ZXN }, 
     { "setae",  OP_NONE,  OP_NONE,    F_ZXN }, 
