@@ -18,16 +18,13 @@ The Am9511A Arithmetic Processing Unit (APU) is a monolithic MOS/LSI device that
 
 All transfers, including operand, result, status and command information, take place over an 8-bit bidirectional data bus. Operands are pushed onto an internal stack and a command is issued to perform operations on the data in the stack. Results are then available to be retrieved from the internal stack, or additional commands may be entered.
 
-<code>
-
-;  Am9511a, Intel 8008, Intel 8080: floating point UCRL-51940
-
-;  7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0
-; +-+-------------+-----------------------------------------------+
-; |S|  Two's exp. |                 positive mantissa             |
-; +-+-------------+-----------------------------------------------+
-
-</code>
+__Am9511a, Intel 8008, Intel 8080: floating point UCRL-51940__
+```
+ 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0
++-+-------------+-----------------------------------------------+
+|S|  Two's exp. |                 positive mantissa             |
++-+-------------+-----------------------------------------------+
+```
 
 The format for floating-point values in the Am9511A is given above. The mantissa is expressed as a 24-bit (fractional) value; the exponent is expressed as an unbiased two's complement 7-bit value having a range of -64 to +63. The most significant bit is the sign of the mantissa (0 = positive, 1 = negative), for a total of 32 bits. The binary point is assumed to be to the left of the most significant mantissa bit (bit 23). All floating-point data values must be normalized. Bit 23 must be equal to 1, except for the value zero, which is represented by all zeros.
 
@@ -51,9 +48,7 @@ A calculation sequence can continue after an operand (result) has been unloaded,
 
 Example code for a two operand calculation,
 for the hypotenuse of Pythagoras Triangle.
-
-
-<code>
+```asm
 
                             ;EXAMPLE CODE - INITIALISATION
                             
@@ -123,5 +118,4 @@ for the hypotenuse of Pythagoras Triangle.
     CALL _am9511a_chk_idle  ;CHECK, because it could be doing a last command
     
                             ;CALCULATION RESULT IS NOW STORED AT SCRPG-RSULT
-</code>
-
+```
