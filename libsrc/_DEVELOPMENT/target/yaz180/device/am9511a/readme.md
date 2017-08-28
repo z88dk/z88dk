@@ -1,6 +1,6 @@
 # The Am9511A
 
-The Am9511A Arithmetic Processing Unit (APU) is a monolithic MOS/LSI device that provides high performance fixed and floating point arithmetic and a variety of floating pOint trigonometric and mathematical operations. It may be used to enhance the computational capability of a wide variety of processor-oriented systems. 
+The Am9511A Arithmetic Processing Unit (APU) is a monolithic MOS/LSI device that provides high performance fixed and floating point arithmetic and a variety of floating point trigonometric and mathematical operations. It may be used to enhance the computational capability of a wide variety of processor-oriented systems. 
 
 - Fixed point 16 and 32 bit operations
 - Floating point 32 bit operations
@@ -36,9 +36,9 @@ The Am9511A works similarly to a HP Reverse Polish Notation (RPN) calculator, wi
 
 The driver implements two FIFO buffers, which are managed by an interrupt attached (on the yaz180) to the NMI.
 
-The command buffer is 255 commands deep, which allows for complex calculations to be programmed, and then the result will be calculated with no further action from the controlling program. Operand loading (pushing) or unloading (popping) commands are included in the commands
+The command buffer is 255 commands deep, which allows for complex calculations to be programmed, and then the result will be calculated with no further action from the controlling program. Operand loading (pushing) or unloading (popping) commands are included in the command buffer sequence, allowing operands to be loaded at the correct time within a calculation.
 
-The operand pointer buffer is 127 operands deep. As an operand can be either 16 or 32 bits in width, using a pointer buffer allows for the buffer managment to be simplified (accelerated).
+The operand pointer buffer is 127 operands deep. As an operand can be either 16 bits or 32 bits (fixed or floating) in width. Using a pointer buffer allows for the operand buffer managment to be simplified (accelerated).
 
 Four special commands (non-Am9511A intrinsic) are provided to permit operands to be loaded (or pushed) onto the Am9511A internal stack and, at the end of the calculation sequence, also to allow results to be unloaded (or popped) from the Am9511A stack to a location provided in the operand pointer buffer.
 
@@ -46,7 +46,7 @@ A calculation sequence can continue after an operand (result) has been unloaded,
 
 ## Driver usage
 
-Example code for a two operand calculation,
+Example code for a simple two operand calculation,
 for the hypotenuse of Pythagoras Triangle.
 ```asm
 
