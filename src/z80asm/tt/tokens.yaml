@@ -328,6 +328,8 @@ tokens:
   - name    : LDIRX
   - name    : LDDX
   - name    : LDDRX
+  - name    : LDIRSCALE
+  - name    : LDPIRX
   - name    : FILL
   - name    : FILLDE
   - name    : MIRROR

@@ -962,6 +962,18 @@ Define rules for a ragel-based parser.
 			  DO_stmt(0xEDBC);
 		  }
 		
+		| label? _TK_LDIRSCALE _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDB6);
+		  }
+		
+		| label? _TK_LDPIRX _TK_NEWLINE
+		  @{
+			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }
+			  DO_stmt(0xEDB7);
+		  }
+		
 		| label? (_TK_FILLDE|_TK_FILL _TK_DE) _TK_NEWLINE
 		  @{
 			  if ((opts.cpu & (CPU_Z80_ZXN)) == 0) { error_illegal_ident(); return FALSE; }

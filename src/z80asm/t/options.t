@@ -678,6 +678,9 @@ t_z80asm_ok(0, "ldirx",		pack("C*", 0xED, 0xB4), "--cpu=z80-zxn");	# As LDIR, bu
 t_z80asm_ok(0, "lddx",		pack("C*", 0xED, 0xAC), "--cpu=z80-zxn");	# As LDD,  but if byte==A does not copy, 
 																		# and DE is incremented
 t_z80asm_ok(0, "lddrx",		pack("C*", 0xED, 0xBC), "--cpu=z80-zxn");	# As LDDR,  but if byte==A does not copy
+t_z80asm_ok(0, "ldirscale",	pack("C*", 0xED, 0xB6), "--cpu=z80-zxn");	# As LDIRX,  if(hl)!=A then (de)=(hl); HL_A'+=BC'; DE+=DE'; dec BC; Loop.
+t_z80asm_ok(0, "ldpirx",	pack("C*", 0xED, 0xB7), "--cpu=z80-zxn");	# (de) = ( (hl&$fff8)+(E&7) ) when != A
+
 t_z80asm_ok(0, "fillde",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
 t_z80asm_ok(0, "fill de",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
 t_z80asm_ok(0, "ld hl,sp",	pack("C*", 0xED, 0x25), "--cpu=z80-zxn");	# transfer SP to HL

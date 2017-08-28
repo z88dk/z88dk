@@ -189,29 +189,31 @@
 #define _TK_LDIRX	184
 #define _TK_LDDX	185
 #define _TK_LDDRX	186
-#define _TK_FILL	187
-#define _TK_FILLDE	188
-#define _TK_MIRROR	189
-#define _TK_POPX	190
-#define _TK_NEXTREG	191
-#define _TK_PIXELDN	192
-#define _TK_PIXELAD	193
-#define _TK_SETAE	194
-#define _TK_TEST	195
-#define _TK_SLP	196
-#define _TK_MLT	197
-#define _TK_IN0	198
-#define _TK_OUT0	199
-#define _TK_OTIM	200
-#define _TK_OTIMR	201
-#define _TK_OTDM	202
-#define _TK_OTDMR	203
-#define _TK_TST	204
-#define _TK_TSTIO	205
-#define _TK_CALL_OZ	206
-#define _TK_CALL_PKG	207
-#define _TK_FPP	208
-#define _TK_INVOKE	209
+#define _TK_LDIRSCALE	187
+#define _TK_LDPIRX	188
+#define _TK_FILL	189
+#define _TK_FILLDE	190
+#define _TK_MIRROR	191
+#define _TK_POPX	192
+#define _TK_NEXTREG	193
+#define _TK_PIXELDN	194
+#define _TK_PIXELAD	195
+#define _TK_SETAE	196
+#define _TK_TEST	197
+#define _TK_SLP	198
+#define _TK_MLT	199
+#define _TK_IN0	200
+#define _TK_OUT0	201
+#define _TK_OTIM	202
+#define _TK_OTIMR	203
+#define _TK_OTDM	204
+#define _TK_OTDMR	205
+#define _TK_TST	206
+#define _TK_TSTIO	207
+#define _TK_CALL_OZ	208
+#define _TK_CALL_PKG	209
+#define _TK_FPP	210
+#define _TK_INVOKE	211
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -403,28 +405,30 @@ typedef enum tokid_t
 	TK_LDIRX	= 184,
 	TK_LDDX	= 185,
 	TK_LDDRX	= 186,
-	TK_FILL	= 187,
-	TK_FILLDE	= 188,
-	TK_MIRROR	= 189,
-	TK_POPX	= 190,
-	TK_NEXTREG	= 191,
-	TK_PIXELDN	= 192,
-	TK_PIXELAD	= 193,
-	TK_SETAE	= 194,
-	TK_TEST	= 195,
-	TK_SLP	= 196,
-	TK_MLT	= 197,
-	TK_IN0	= 198,
-	TK_OUT0	= 199,
-	TK_OTIM	= 200,
-	TK_OTIMR	= 201,
-	TK_OTDM	= 202,
-	TK_OTDMR	= 203,
-	TK_TST	= 204,
-	TK_TSTIO	= 205,
-	TK_CALL_OZ	= 206,
-	TK_CALL_PKG	= 207,
-	TK_FPP	= 208,
-	TK_INVOKE	= 209,
+	TK_LDIRSCALE	= 187,
+	TK_LDPIRX	= 188,
+	TK_FILL	= 189,
+	TK_FILLDE	= 190,
+	TK_MIRROR	= 191,
+	TK_POPX	= 192,
+	TK_NEXTREG	= 193,
+	TK_PIXELDN	= 194,
+	TK_PIXELAD	= 195,
+	TK_SETAE	= 196,
+	TK_TEST	= 197,
+	TK_SLP	= 198,
+	TK_MLT	= 199,
+	TK_IN0	= 200,
+	TK_OUT0	= 201,
+	TK_OTIM	= 202,
+	TK_OTIMR	= 203,
+	TK_OTDM	= 204,
+	TK_OTDMR	= 205,
+	TK_TST	= 206,
+	TK_TSTIO	= 207,
+	TK_CALL_OZ	= 208,
+	TK_CALL_PKG	= 209,
+	TK_FPP	= 210,
+	TK_INVOKE	= 211,
 } tokid_t;
 #endif
