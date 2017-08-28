@@ -16,15 +16,16 @@ The Am9511A Arithmetic Processing Unit (APU) is a monolithic MOS/LSI device that
 - General purpose 8-bit data bus interface
 - 100% MIL-STD-883 reliability assurance testing
 
-All transfers, including operand, result, status and command information, take place over an 8-bit bidirectional data bus. Operands are pushed onto an internal stack and a command is issued to perform operations on the data in the stack. Results are then available to be retrieved from the stack, or additional commands may be entered.
+All transfers, including operand, result, status and command information, take place over an 8-bit bidirectional data bus. Operands are pushed onto an internal stack and a command is issued to perform operations on the data in the stack. Results are then available to be retrieved from the internal stack, or additional commands may be entered.
 
+<code>
 Am9511a, Intel 8008, Intel 8080: floating point UCRL-51940
 
  7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0 7 6 5 4 3 2 1 0
 +-+-------------+-----------------------------------------------+
 |S|  Two's exp. |                 positive mantissa             |
 +-+-------------+-----------------------------------------------+
-
+</code>
 
 The format for floating-point values in the Am9511A is given above. The mantissa is expressed as a 24-bit (fractional) value; the exponent is expressed as an unbiased two's complement 7-bit value having a range of -64 to +63. The most significant bit is the sign of the mantissa (0 = positive, 1 = negative), for a total of 32 bits. The binary point is assumed to be to the left of the most significant mantissa bit (bit 23). All floating-point data values must be normalized. Bit 23 must be equal to 1, except for the value zero, which is represented by all zeros.
 
@@ -36,35 +37,42 @@ The Am9511A works similarly to a HP Reverse Polish Notation (RPN) calculator, wi
 
 The driver implements two FIFO buffers, which are managed by an interrupt attached (on the yaz180) to the NMI.
 
-The command buffer is 255 commands deep, which allows for complex calculations to be programmed, and then the result will be calculated with no further action from the controlling program.
+The command buffer is 255 commands deep, which allows for complex calculations to be programmed, and then the result will be calculated with no further action from the controlling program. Operand loading (pushing) or unloading (popping) commands are included in the commands
 
 The operand pointer buffer is 127 operands deep. As an operand can be either 16 or 32 bits in width, using a pointer buffer allows for the buffer managment to be simplified (accelerated).
 
-Four special commands are provided to permit operands to be loaded (or pushed) onto the Am9511A internal stack and, at the end of the calculation sequence, also to allow results to be unloaded (or popped) from the Am9511A stack to a location provided in the operand pointer buffer.
+Four special commands (non-Am9511A intrinsic) are provided to permit operands to be loaded (or pushed) onto the Am9511A internal stack and, at the end of the calculation sequence, also to allow results to be unloaded (or popped) from the Am9511A stack to a location provided in the operand pointer buffer.
 
-A calculation sequence can continue after one operand has been unloaded, and this may be necessary if the Am9511A stack is not deep enough to maintain an intermediate result. Clearly using an internal XCHx command to rearange the Am9511A stack will be substantially faster than popping and pushing an intermediate result using the operand pointer buffer.
+A calculation sequence can continue after an operand (result) has been unloaded, and this may be necessary if the Am9511A stack is not deep enough to maintain an intermediate result. Clearly using the relevant Am9511A XCH(SDF) command to rearrange the Am9511A stack will be substantially faster than popping and pushing an intermediate result using the operand pointer buffer.
 
 ## Driver usage
 
-Example code for a two operand calculation of Pythagoras Triangle
+Example code for a two operand calculation,
+for the hypotenuse of Pythagoras Triangle.
 
 <code>
-
                             ;EXAMPLE CODE - INITIALISATION
+                            
+                            ;SCRPG = MSB OPERAND ADDRESS
+                            ;OP1   = LSB OF OPERAND 1
+                            ;OP2   = LSB OF OPERAND 2
+                            ;RSULT = LSB OF RESULT
 
-    ld hl, INT_NMI_ADDR     ;GET NMI VECTOR ADDRESS
-    CALL _am9511a_reset     ;INITIALISE THE APU
+    ld hl, INT_NMI_ADDR     ;GET Z80 INTERRUPT NMI VECTOR ADDRESS
+    CALL _am9511a_reset     ;INITIALISE (RESET) THE APU
+                            ;ONLY IF NOT USING A CRT
+                            ;OR IF DESIRED TO FLUSH BUFFERS
 
                             ;EXAMPLE CODE - TWO OPERAND INPUT LOADING 
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP1               ;POINTER TO OPERAND 1
-    LD a, __IO_APU_OP_ENT32 ;ENTER 32 bit (double word from INPUT)
+    LD a, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
     CALL _am9511a_op_ld     ;POINTER TO OPERAND IN OPERAND BUFFER
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP2               ;POINTER TO OPERAND 2
-    LD A, __IO_APU_OP_ENT32 ;ENTER 32 bit (double word from INPUT)
+    LD A, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
     CALL _am9511a_op_ld     ;POINTER TO OPERAND IN OPERAND BUFFER
 
                             ;EXAMPLE CODE - COMMAND LOADING
@@ -109,6 +117,7 @@ Example code for a two operand calculation of Pythagoras Triangle
     CALL _am9511a_isr       ;KICK OFF APU PROCESS, WHICH THEN INTERRUPTS
 
     CALL _am9511a_chk_idle  ;CHECK, because it could be doing a last command
-
+    
+                            ;CALCULATION RESULT IS NOW STORED AT SCRPG-RSULT
 </code>
 
