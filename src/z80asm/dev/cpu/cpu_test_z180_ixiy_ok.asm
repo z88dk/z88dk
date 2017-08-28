@@ -287,6 +287,8 @@
  dec iy                         ; DD 2B
  dec l                          ; 2D
  dec sp                         ; 3B
+ di                             ; F3
+ ei                             ; FB
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; FD E3
  ex (sp), iy                    ; DD E3
@@ -294,6 +296,10 @@
  ex af, af'                     ; 08
  ex de, hl                      ; EB
  exx                            ; D9
+ halt                           ; 76
+ im 0                           ; ED 46
+ im 1                           ; ED 56
+ im 2                           ; ED 5E
  inc (hl)                       ; 34
  inc (ix)                       ; FD 34 00
  inc (ix+127)                   ; FD 34 7F
@@ -428,7 +434,9 @@
  ld a, d                        ; 7A
  ld a, e                        ; 7B
  ld a, h                        ; 7C
+ ld a, i                        ; ED 57
  ld a, l                        ; 7D
+ ld a, r                        ; ED 5F
  ld b, (hl)                     ; 46
  ld b, (ix)                     ; FD 46 00
  ld b, (ix+127)                 ; FD 46 7F
@@ -532,6 +540,7 @@
  ld hl, -32768                  ; 21 00 80
  ld hl, 32767                   ; 21 FF 7F
  ld hl, 65535                   ; 21 FF FF
+ ld i, a                        ; ED 47
  ld ix, (-32768)                ; FD 2A 00 80
  ld ix, (32767)                 ; FD 2A FF 7F
  ld ix, (65535)                 ; FD 2A FF FF
@@ -561,6 +570,7 @@
  ld l, e                        ; 6B
  ld l, h                        ; 6C
  ld l, l                        ; 6D
+ ld r, a                        ; ED 4F
  ld sp, (-32768)                ; ED 7B 00 80
  ld sp, (32767)                 ; ED 7B FF 7F
  ld sp, (65535)                 ; ED 7B FF FF
@@ -576,6 +586,7 @@
  mlt sp                         ; ED 7C
  neg                            ; ED 44
  neg a                          ; ED 44
+ nop                            ; 00
  or (hl)                        ; B6
  or (ix)                        ; FD B6 00
  or (ix+127)                    ; FD B6 7F
@@ -734,6 +745,8 @@
  res 7, e                       ; CB BB
  res 7, h                       ; CB BC
  res 7, l                       ; CB BD
+ reti                           ; ED 4D
+ retn                           ; ED 45
  rl (hl)                        ; CB 16
  rl (ix)                        ; FD CB 00 16
  rl (ix+127)                    ; FD CB 7F 16
@@ -990,6 +1003,7 @@
  sll e                          ; CB 33
  sll h                          ; CB 34
  sll l                          ; CB 35
+ slp                            ; ED 76
  sra (hl)                       ; CB 2E
  sra (ix)                       ; FD CB 00 2E
  sra (ix+127)                   ; FD CB 7F 2E

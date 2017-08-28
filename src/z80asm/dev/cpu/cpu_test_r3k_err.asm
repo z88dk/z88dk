@@ -307,6 +307,16 @@
  dec ixl                        ; Error
  dec iyh                        ; Error
  dec iyl                        ; Error
+ di                             ; Error
+ ei                             ; Error
+ halt                           ; Error
+ im -1                          ; Error
+ im -1                          ; Error
+ im 0                           ; Error
+ im 1                           ; Error
+ im 2                           ; Error
+ im 3                           ; Error
+ im 3                           ; Error
  inc ixh                        ; Error
  inc ixl                        ; Error
  inc iyh                        ; Error
@@ -535,10 +545,16 @@
  ioi set 8, (iy+127)            ; Error
  ioi set 8, (iy-128)            ; Error
  ioi set 8, (iy-128)            ; Error
+ ipset -1                       ; Error
+ ipset -1                       ; Error
+ ipset 4                        ; Error
+ ipset 4                        ; Error
+ ld a, i                        ; Error
  ld a, ixh                      ; Error
  ld a, ixl                      ; Error
  ld a, iyh                      ; Error
  ld a, iyl                      ; Error
+ ld a, r                        ; Error
  ld b, ixh                      ; Error
  ld b, ixl                      ; Error
  ld b, iyh                      ; Error
@@ -555,6 +571,7 @@
  ld e, ixl                      ; Error
  ld e, iyh                      ; Error
  ld e, iyl                      ; Error
+ ld i, a                        ; Error
  ld ixh, -128                   ; Error
  ld ixh, 127                    ; Error
  ld ixh, 255                    ; Error
@@ -595,6 +612,7 @@
  ld iyl, e                      ; Error
  ld iyl, iyh                    ; Error
  ld iyl, iyl                    ; Error
+ ld r, a                        ; Error
  mlt sp                         ; Error
  or a, ixh                      ; Error
  or a, ixl                      ; Error
@@ -736,6 +754,7 @@
  res 8, l                       ; Error
  res 8, l'                      ; Error
  res 8, l'                      ; Error
+ retn                           ; Error
  rl (ix), a                     ; Error
  rl (ix), b                     ; Error
  rl (ix), c                     ; Error
@@ -1226,6 +1245,7 @@
  sll iyh                        ; Error
  sll iyl                        ; Error
  sll l                          ; Error
+ slp                            ; Error
  sra (ix), a                    ; Error
  sra (ix), b                    ; Error
  sra (ix), c                    ; Error

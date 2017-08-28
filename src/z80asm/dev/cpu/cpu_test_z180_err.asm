@@ -1054,7 +1054,9 @@
  altd ld a, c                   ; Error
  altd ld a, d                   ; Error
  altd ld a, e                   ; Error
+ altd ld a, eir                 ; Error
  altd ld a, h                   ; Error
+ altd ld a, iir                 ; Error
  altd ld a, l                   ; Error
  altd ld b, (hl)                ; Error
  altd ld b, (ix)                ; Error
@@ -1332,6 +1334,7 @@
  altd rl b                      ; Error
  altd rl c                      ; Error
  altd rl d                      ; Error
+ altd rl de                     ; Error
  altd rl e                      ; Error
  altd rl h                      ; Error
  altd rl l                      ; Error
@@ -1362,8 +1365,10 @@
  altd rr b                      ; Error
  altd rr c                      ; Error
  altd rr d                      ; Error
+ altd rr de                     ; Error
  altd rr e                      ; Error
  altd rr h                      ; Error
+ altd rr hl                     ; Error
  altd rr l                      ; Error
  altd rra                       ; Error
  altd rrc (hl)                  ; Error
@@ -1780,6 +1785,11 @@
  ex de', hl                     ; Error
  ex de', hl'                    ; Error
  ex de, hl'                     ; Error
+ idet                           ; Error
+ im -1                          ; Error
+ im -1                          ; Error
+ im 3                           ; Error
+ im 3                           ; Error
  inc a'                         ; Error
  inc b'                         ; Error
  inc bc'                        ; Error
@@ -3890,6 +3900,15 @@
  ioi xor a, (iy)                ; Error
  ioi xor a, (iy+127)            ; Error
  ioi xor a, (iy-128)            ; Error
+ ipres                          ; Error
+ ipset -1                       ; Error
+ ipset -1                       ; Error
+ ipset 0                        ; Error
+ ipset 1                        ; Error
+ ipset 2                        ; Error
+ ipset 3                        ; Error
+ ipset 4                        ; Error
+ ipset 4                        ; Error
  ld (hl), hl                    ; Error
  ld (hl+127), hl                ; Error
  ld (hl-128), hl                ; Error
@@ -3928,8 +3947,12 @@
  ld a', c                       ; Error
  ld a', d                       ; Error
  ld a', e                       ; Error
+ ld a', eir                     ; Error
  ld a', h                       ; Error
+ ld a', iir                     ; Error
  ld a', l                       ; Error
+ ld a, eir                      ; Error
+ ld a, iir                      ; Error
  ld a, ixh                      ; Error
  ld a, ixl                      ; Error
  ld a, iyh                      ; Error
@@ -4034,6 +4057,7 @@
  ld e, ixl                      ; Error
  ld e, iyh                      ; Error
  ld e, iyl                      ; Error
+ ld eir, a                      ; Error
  ld h', (hl)                    ; Error
  ld h', (ix)                    ; Error
  ld h', (ix+127)                ; Error
@@ -4087,6 +4111,7 @@
  ld hl, (sp+255)                ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
+ ld iir, a                      ; Error
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
  ld ix, (sp+255)                ; Error
@@ -4215,6 +4240,7 @@
  pop su                         ; Error
  push ip                        ; Error
  push su                        ; Error
+ rdmode                         ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error
  res -1, (ix)                   ; Error
@@ -4449,6 +4475,8 @@
  rl b'                          ; Error
  rl c'                          ; Error
  rl d'                          ; Error
+ rl de                          ; Error
+ rl de'                         ; Error
  rl e'                          ; Error
  rl h'                          ; Error
  rl ixh                         ; Error
@@ -4557,10 +4585,16 @@
  rr b'                          ; Error
  rr c'                          ; Error
  rr d'                          ; Error
+ rr de                          ; Error
+ rr de'                         ; Error
  rr e'                          ; Error
  rr h'                          ; Error
+ rr hl                          ; Error
+ rr hl'                         ; Error
+ rr ix                          ; Error
  rr ixh                         ; Error
  rr ixl                         ; Error
+ rr iy                          ; Error
  rr iyh                         ; Error
  rr iyl                         ; Error
  rr l'                          ; Error
@@ -4837,6 +4871,7 @@
  set 8, l                       ; Error
  set 8, l'                      ; Error
  set 8, l'                      ; Error
+ setusr                         ; Error
  sla (ix), a                    ; Error
  sla (ix), b                    ; Error
  sla (ix), c                    ; Error
@@ -5113,6 +5148,8 @@
  sub ixl                        ; Error
  sub iyh                        ; Error
  sub iyl                        ; Error
+ sures                          ; Error
+ syscall                        ; Error
  uma                            ; Error
  ums                            ; Error
  xor a', (hl)                   ; Error

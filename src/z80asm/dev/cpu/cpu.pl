@@ -1020,6 +1020,55 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 		}
 	}
+	
+	# 16-bit rotate and shift group
+	if ($rabbit) {
+		add_opc($cpu, "rl de", 0xF3);
+		add_opc($cpu, "rr de", 0xFB);
+		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
+			my($x, @pfx) = @$_;
+			add_opc($cpu, "rr $x", @pfx, 0xFC);
+		}
+	}
+	
+	# CPU control group
+	add_opc($cpu, "nop", 0x00);
+	add_opc($cpu, "halt", 0x76) if $zilog;
+	add_opc($cpu, "slp", 0xED, 0x76) if $z180;
+	
+	if ($r3k) {
+		add_opc($cpu, "rdmode", 0xED, 0x7F);
+		add_opc($cpu, "setusr", 0xED, 0x6F);
+		add_opc($cpu, "sures", 0xED, 0x7D);
+		add_opc($cpu, "syscall", 0xED, 0x75);
+	}
+	
+	# Interrupt control group
+	if ($zilog) {
+		add_opc($cpu, "di", 0xF3);
+		add_opc($cpu, "ei", 0xFB);
+
+		add_opc($cpu, "im %c", 0xED, "%c(0..2)==0?0x46:%c==1?0x56:0x5E");
+
+		add_opc($cpu, "ld i, a", 0xED, 0x47);
+		add_opc($cpu, "ld a, i", 0xED, 0x57);
+		add_opc($cpu, "ld r, a", 0xED, 0x4F);
+		add_opc($cpu, "ld a, r", 0xED, 0x5F);
+	}
+	
+	if ($rabbit) {
+		add_opc($cpu, "ld eir, a", 0xED, 0x47);
+		add_opc($cpu, "ld a, eir", 0xED, 0x57);
+		add_opc($cpu, "ld iir, a", 0xED, 0x4F);
+		add_opc($cpu, "ld a, iir", 0xED, 0x5F);
+	
+		add_opc($cpu, "ipset %c", 0xED, "%c(0..3)==0?0x46:%c==1?0x56:%c==2?0x4E:0x5E");
+		add_opc($cpu, "ipres", 0xED, 0x5D);
+	}
+
+	add_opc($cpu, "reti", 0xED, 0x4D);
+	add_opc($cpu, "retn", 0xED, 0x45) if $zilog;
+	add_opc($cpu, "idet", 0x5B) if $r3k;
 }
 
 #------------------------------------------------------------------------------
@@ -1302,6 +1351,7 @@ sub parse_code {
 	}
 	elsif ($bin =~ s/%c\((.*?)\)/expr_value/) {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
+		$bin =~ s/%c/expr_value/g;		# replace all other %c in bin
 		push @code,
 			"if (expr_error) return FALSE;",
 			"switch (expr_value) {",
@@ -1332,7 +1382,7 @@ sub parse_code {
 			if (s/^(\d+)\+//) {
 				$offset = $1;
 			}
-			$_ =~ s/(\d+)/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
+			$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
 			push @expr, $_;
 			$_ = fmthex($offset);
 		}

@@ -355,6 +355,8 @@
  dec iyl                        ; FD 2D
  dec l                          ; 2D
  dec sp                         ; 3B
+ di                             ; F3
+ ei                             ; FB
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; DD E3
  ex (sp), iy                    ; FD E3
@@ -362,6 +364,10 @@
  ex af, af'                     ; 08
  ex de, hl                      ; EB
  exx                            ; D9
+ halt                           ; 76
+ im 0                           ; ED 46
+ im 1                           ; ED 56
+ im 2                           ; ED 5E
  inc (hl)                       ; 34
  inc (ix)                       ; DD 34 00
  inc (ix+127)                   ; DD 34 7F
@@ -500,11 +506,13 @@
  ld a, d                        ; 7A
  ld a, e                        ; 7B
  ld a, h                        ; 7C
+ ld a, i                        ; ED 57
  ld a, ixh                      ; DD 7C
  ld a, ixl                      ; DD 7D
  ld a, iyh                      ; FD 7C
  ld a, iyl                      ; FD 7D
  ld a, l                        ; 7D
+ ld a, r                        ; ED 5F
  ld b, (hl)                     ; 46
  ld b, (ix)                     ; DD 46 00
  ld b, (ix+127)                 ; DD 46 7F
@@ -624,6 +632,7 @@
  ld hl, -32768                  ; 21 00 80
  ld hl, 32767                   ; 21 FF 7F
  ld hl, 65535                   ; 21 FF FF
+ ld i, a                        ; ED 47
  ld ix, (-32768)                ; DD 2A 00 80
  ld ix, (32767)                 ; DD 2A FF 7F
  ld ix, (65535)                 ; DD 2A FF FF
@@ -693,6 +702,7 @@
  ld l, e                        ; 6B
  ld l, h                        ; 6C
  ld l, l                        ; 6D
+ ld r, a                        ; ED 4F
  ld sp, (-32768)                ; ED 7B 00 80
  ld sp, (32767)                 ; ED 7B FF 7F
  ld sp, (65535)                 ; ED 7B FF FF
@@ -705,6 +715,7 @@
  mul                            ; ED 30
  neg                            ; ED 44
  neg a                          ; ED 44
+ nop                            ; 00
  or (hl)                        ; B6
  or (ix)                        ; DD B6 00
  or (ix+127)                    ; DD B6 7F
@@ -903,6 +914,8 @@
  res 7, iyh                     ; FD CB BC
  res 7, iyl                     ; FD CB BD
  res 7, l                       ; CB BD
+ reti                           ; ED 4D
+ retn                           ; ED 45
  rl (hl)                        ; CB 16
  rl (ix)                        ; DD CB 00 16
  rl (ix), a                     ; DD CB 00 17
