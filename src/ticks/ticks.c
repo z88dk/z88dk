@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ticks.h"
+
 #if defined(_WIN32) || defined(WIN32)
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
@@ -385,6 +387,7 @@
 
 FILE * ft;
 unsigned char * tapbuf;
+int    debugger_enabled = 0;
   
 int     v
       , wavpos= 0
@@ -449,6 +452,8 @@ unsigned char * mem;
 char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
+int    c_cpu = CPU_Z80;
+
 long tapcycles(void){
   mues= 1;
   wavpos!=0x20000 && (ear^= 64);
@@ -511,6 +516,10 @@ int main (int argc, char **argv){
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
+    printf("  -d             Enable debugger\n"),
+    printf("  -mz80          Emulate a z80\n"),
+    printf("  -mz80-zxn      Emulate a Spectrum Next Z80\n"),
+    printf("  -x <file>      Symbol file to read\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
@@ -537,6 +546,24 @@ int main (int argc, char **argv){
         case 'c':
           sscanf(argv[1], "%llu", &counter);
           counter<0 && (counter= 9e18);
+          break;
+        case 'd':
+          debugger_init();
+          debugger_enabled = 1;
+          argv--;
+          argc++;
+          break;
+        case 'x':
+          read_symbol_file(argv[1]);
+          break;
+        case 'm':
+          if ( strcmp(&argv[0][1],"mz80") == 0 ) {
+            c_cpu = CPU_Z80;
+          } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
+            c_cpu = CPU_Z80_ZXN;
+          } else {
+            printf("Unknown CPU: %s\n",&argv[0][1]);
+          }
           break;
         case 'o':
           output= argv[1];
@@ -702,6 +729,7 @@ int main (int argc, char **argv){
 
 
   do{
+    if ( debugger_enabled ) debugger();
     if( pc==start )
       st= 0,
       stint= intr,
@@ -2583,26 +2611,23 @@ int main (int argc, char **argv){
           case 0x18: case 0x19: case 0x1a: case 0x1b:
           case 0x1c: case 0x1d: case 0x1e: case 0x1f:
           case 0x20: case 0x21: case 0x22: case 0x23:
-          case 0x24: case 0x25: case 0x26: case 0x27:
+          case 0x24: case 0x26: 
           case 0x28: case 0x29: case 0x2a: case 0x2b:
           case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-          case 0x30: case 0x31: case 0x32: case 0x33:
-          case 0x34: case 0x35: case 0x36: case 0x37:
-          case 0x38: case 0x39: case 0x3a: case 0x3b:
-          case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+          case 0x3e: case 0x3f:
           case 0x77: case 0x7f:
           case 0x80: case 0x81: case 0x82: case 0x83:
           case 0x84: case 0x85: case 0x86: case 0x87:
-          case 0x88: case 0x89: case 0x8a: case 0x8b:
+          case 0x88: case 0x89: 
           case 0x8c: case 0x8d: case 0x8e: case 0x8f:
           case 0x90: case 0x91: case 0x92: case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-          case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-          case 0xac: case 0xad: case 0xae: case 0xaf:
-          case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-          case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+          case 0xa5: case 0xa6: case 0xa7:
+          case 0xad: case 0xae: case 0xaf:
+          case 0xb5: case 0xb6: case 0xb7:
+          case 0xbd: case 0xbe: case 0xbf:
           case 0xc0: case 0xc1: case 0xc2: case 0xc3:
           case 0xc4: case 0xc5: case 0xc6: case 0xc7:
           case 0xc8: case 0xc9: case 0xca: case 0xcb:
@@ -2620,6 +2645,280 @@ int main (int argc, char **argv){
           case 0xf8: case 0xf9: case 0xfa: case 0xfb:
           case 0xfc: case 0xfd: case 0xff:
             st+= 8; break;
+          case 0x30:                                         // (ZXN) mul
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = (( d * 256 ) + e) * (( h * 256 ) + l);
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x31:                                         // (ZXN) add hl,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int16_t result = (( h * 256 ) + l) + a;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x32:                                         // (ZXN) add de,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int16_t result = (( d * 256 ) + e) + a;
+              d  = (result >> 8 ) & 0xff;
+              e = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x33:                                         // (ZXN) add bc,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int16_t result = (( b * 256 ) + c) + a;
+              b  = (result >> 8 ) & 0xff;
+              c = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x34:                                         // (ZXN) add hl,$xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x35:                                         // (ZXN) add de,$xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
+              d  = (result >> 8 ) & 0xff;
+              e = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x36:                                         // (ZXN) add bc,$xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
+              b = (result >> 8 ) & 0xff;
+              c = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x25:                                         // (ZXN) ld hl,sp
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              h = ( sp / 256);
+              l = ( sp % 256);
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x37:                                         // (ZXN) inc dehl
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              if ( ++l == 0 ) 
+                if ( ++h == 0 ) 
+                  if ( ++e == 0 ) 
+                    ++d;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x38:                                         // (ZXN) dec dehl
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              if ( --l == 0xff ) 
+                if ( --h == 0xff ) 
+                  if ( --e == 0xff ) 
+                    --d;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x39:                                         // (ZXN) add dehl,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + a;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3A:                                         // (ZXN) add dehl,bc
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + (( b * 256) + c);;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3B:                                         // (ZXN) add dehl,$XXXX
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + ( lsb + msb * 256);
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3C:                                         // (ZXN) sub dehl,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) - a;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3D:                                         // (ZXN) sub dehl,bc
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) - (( b * 256) + c);;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x8a:                                         // (ZXN) push $xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              PUSH(msb,lsb);
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x8b:                                         // (ZXN) popx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              sp += 2;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x27:                                         // (ZXN) tst $xx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t olda = a;
+              AND(mem[pc++], 0);
+              a = olda;
+              st += 7;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0xa4: st+= 16;                                // (ZXN) ldix
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+              mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            mem[e | d<<8]= t= mem[l | h<<8];
+            ++l || h++;
+            ++e || d++;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+                  | t     &   8
+                  | t<<4  &  32;
+            fa= 0;
+            b|c && (fa= 128);
+            fb= fa; break;
+          case 0xac: st+= 16;                                // (ZXN) lddx
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            l-- || h--;
+            e-- || d--;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && (fa= 128);
+            fb= fa; break;
+          case 0xb4: st+= 16;                                // (ZXN) ldirx
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            ++l || h++;
+            ++e || d++;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && ( fa= 128,
+                     st+= 5,
+                     mp= --pc,
+                            --pc);
+                   fb= fa; break;
+          case 0xbc: st+= 16;                                // LDDR
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            l-- || h--;
+            e-- || d--;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && ( fa= 128,
+                     st+= 5,
+                     mp= --pc,
+                     --pc);
+            fb= fa; break;
           case 0xfe: PatchZ80(); break;
           case 0x40: INR(b); break;                          // IN B,(C)
           case 0x48: INR(c); break;                          // IN C,(C)

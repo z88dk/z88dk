@@ -329,4 +329,9 @@ fzx proportional fonts, no control code support
 
 fzx proportional fonts, control codes supported
 
+#### -startup=30 (crt30)
+
+32x24 rom print routine, no scanf
+much smaller than other crts because the rom is used for output
+
 [... continue to Part 3: Simple Graphics](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_03_SimpleGraphics.md)

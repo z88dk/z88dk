@@ -379,30 +379,30 @@ library, would look like this:
 
 ```
 ...
-|             |
-|-------------|
-|0xFF58  65368| Z88DK program's stack
-|-------------| Grows downwards, remember!
-|0xFF51  65361|
-|             | BiFrost 81 byte tile map
-|0xFF01  65281|
-|-------------|                    
-|0xFF00  65280|                  <--+ (64854)
-|             | BiFrost Library     |
-|0xE501  58625|                     |
-|-------------|                     |
-|             |                     |
-|             | Z88DK heap memory --+
-|             |
-|             |
-|-------------|
-|             | Z88DK BSS section  (CRT_BSS_DATA)
-|             | Z88DK DATA section (CRT_ORG_DATA)
-|-------------| ^^^
-|             |
-|0x8000  32768| Z88DK compiled C   (CRT_ORG_CODE)
-|-------------|
-|             |
+|               |
+|---------------|
+|0xFF58  65368  | Z88DK program's stack
+|---------------| Grows downwards, remember!
+|0xFF51  65361  |
+|               | BiFrost 81 byte tile map
+|0xFF01  65281  |
+|---------------|                    
+|0xFF00  65280  |
+|              X| BiFrost Library
+|0xE501  58625 X|
+|--------------X|
+|XXXXXXXXXXXXXXX|
+|XXXXXXXXXXXXXXX| Z88DK heap memory
+|XXXXXXXXXXXXXXX|
+|XXXXXXXXXXXXXXX|
+|---------------|
+|               | Z88DK BSS section  (CRT_BSS_DATA)
+|               | Z88DK DATA section (CRT_ORG_DATA)
+|---------------| ^^^
+|               |
+|0x8000  32768  | Z88DK compiled C   (CRT_ORG_CODE)
+|---------------|
+|               |
 ...
 ```
 
