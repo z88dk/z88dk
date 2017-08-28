@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _NETINET_IN_H
-#define _NETINET_IN_H
+#ifndef __NETINET_IN_H__
+#define __NETINET_IN_H__
 
 #include <stdint.h>
 

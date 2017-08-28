@@ -22,9 +22,12 @@ EXTERN cleanup
 
 .randomize
 ._randomize
-
+IF __CPU_Z80_ZXN__
+   ld   hl,sp
+ELSE
    ld	hl,0
    add	hl,sp
+ENDIF
    call	agarble
    ld	e,a
    
@@ -35,7 +38,7 @@ EXTERN cleanup
    
    ld	h,a
 
-IF FORrcmx000
+IF __CPU_R2K__ | __CPU_R3K__
    ld	a,eir
 ELSE
    ld	a,r

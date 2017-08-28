@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _SOUND_BIT_H
-#define _SOUND_BIT_H
+#ifndef __SOUND_BIT_H__
+#define __SOUND_BIT_H__
 
 #include <stdint.h>
 

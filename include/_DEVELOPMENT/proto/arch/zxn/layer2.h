@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _LAYER2_H
-#define _LAYER2_H
+#ifndef __LAYER2_H__
+#define __LAYER2_H__
 
 // COLOUR MACROS
 // Generate Layer 2 colours from various RGB formats

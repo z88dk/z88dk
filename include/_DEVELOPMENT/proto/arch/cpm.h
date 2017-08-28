@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ARCH_CPM_H
-#define _ARCH_CPM_H
+#ifndef __ARCH_CPM_H__
+#define __ARCH_CPM_H__
 
 #include <arch.h>
 

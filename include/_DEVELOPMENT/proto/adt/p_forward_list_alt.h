@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ADT_P_FORWARD_LIST_ALT
-#define _ADT_P_FORWARD_LIST_ALT
+#ifndef __ADT_P_FORWARD_LIST_ALT__
+#define __ADT_P_FORWARD_LIST_ALT__
 
 #include <stddef.h>
 

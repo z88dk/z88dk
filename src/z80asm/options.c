@@ -248,9 +248,45 @@ static void process_options( int *parg, int argc, char *argv[] )
 /*-----------------------------------------------------------------------------
 *   process a file
 *----------------------------------------------------------------------------*/
+
+/* search for the first file in path, with the given extension,
+* with .asm extension and with .o extension
+* if not found, return original file */
+static char *search_source(char *filename)
+{
+	char *f;
+
+	if (file_exists(filename))
+		return filename;
+
+	f = search_file(filename, opts.inc_path);
+	if (file_exists(f))
+		return f;
+
+	f = get_asm_filename(filename);
+	if (file_exists(f))
+		return f;
+
+	f = search_file(f, opts.inc_path);
+	if (file_exists(f))
+		return f;
+
+	f = get_obj_filename(filename);
+	if (file_exists(f))
+		return f;
+
+	f = search_file(f, opts.inc_path);
+	if (file_exists(f))
+		return f;
+
+	error_read_file(filename);
+	return filename;
+}
+
 static void process_file( char *filename )
 {
 	char *line;
+	char *lst_dirname;
 
     strip( filename );
 
@@ -271,11 +307,19 @@ static void process_file( char *filename )
 		/* loop on file to read each line and recurse */
 		src_push();
 		{
+			/* append the directoy of the list file to the include path	and remove it at the end */
+			lst_dirname = path_dirname(filename);
+			utarray_push_back(opts.inc_path, &lst_dirname);
+
 			if (src_open(filename, NULL))
 			{
 				while ((line = src_getline()) != NULL)
 					process_file(line);
 			}
+
+			/* finished assembly, remove dirname from include path */
+			utarray_pop_back(opts.inc_path);
+
 		}
 		src_pop();
 		break;
@@ -284,6 +328,7 @@ static void process_file( char *filename )
 		break;
 	default:
 		filename = expand_environment_variables(filename);
+		filename = search_source(filename);
 		utarray_push_back(opts.files, &filename);
     }
 }
@@ -574,6 +619,29 @@ static void option_cpu_r2k(void)
 static void option_cpu_r3k(void)
 {
 	opts.cpu = CPU_R3K;
+}
+
+void define_assembly_defines()
+{
+	switch (opts.cpu) {
+	case CPU_Z80:
+	    define_static_def_sym("__CPU_Z80__", 1);
+		break;
+	case CPU_Z80_ZXN:
+	    define_static_def_sym("__CPU_Z80_ZXN__", 1);
+		break;
+	case CPU_Z180:
+	    define_static_def_sym("__CPU_Z180__", 1);
+		break;
+	case CPU_R2K:
+	    define_static_def_sym("__CPU_R2K__", 1);
+		break;
+	case CPU_R3K:
+	    define_static_def_sym("__CPU_R3K__", 1);
+		break;
+	default:
+		assert(0);
+	}
 }
 
 /*-----------------------------------------------------------------------------

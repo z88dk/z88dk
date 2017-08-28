@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _STRING_H
-#define _STRING_H
+#ifndef __STRING_H__
+#define __STRING_H__
 
 #include <stddef.h>
 

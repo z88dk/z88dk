@@ -2,8 +2,8 @@ include(__link__.m4)
 
 #ifdef __Z80
 
-#ifndef _Z80_H
-#define _Z80_H
+#ifndef __Z80_H__
+#define __Z80_H__
 
 #include <stdint.h>
 #include <im2.h>

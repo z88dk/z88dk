@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ALLOC_OBSTACK_H
-#define _ALLOC_OBSTACK_H
+#ifndef __ALLOC_OBSTACK_H__
+#define __ALLOC_OBSTACK_H__
 
 #include <stddef.h>
 

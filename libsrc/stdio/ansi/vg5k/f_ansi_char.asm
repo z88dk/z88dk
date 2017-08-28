@@ -61,4 +61,10 @@
 	inc  hl
 	ld   a,e
 	ld   (hl),a
-	ret
+	
+	ld hl,_ef9345
+	jp $AD			; hide cursor
+
+_ef9345:
+	defb 0x04,0x20,0x82,0x29,0x00
+

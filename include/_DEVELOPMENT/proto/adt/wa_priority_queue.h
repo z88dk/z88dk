@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ADT_WA_PRIORITY_QUEUE_H
-#define _ADT_WA_PRIORITY_QUEUE_H
+#ifndef __ADT_WA_PRIORITY_QUEUE_H__
+#define __ADT_WA_PRIORITY_QUEUE_H__
 
 #include <stddef.h>
 

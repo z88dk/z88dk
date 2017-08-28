@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _ERRNO_H
-#define _ERRNO_H
+#ifndef __ERRNO_H__
+#define __ERRNO_H__
 
 #include <arch.h>
 

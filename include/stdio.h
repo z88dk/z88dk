@@ -257,8 +257,8 @@ extern int __LIB__ printf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fprintf(FILE *f,const char *fmt,...) __vasmallc;
 extern int __LIB__ sprintf(char *s,const char *fmt,...) __vasmallc;
 extern int __LIB__ snprintf(char *s,size_t n,const char *fmt,...) __vasmallc;
-extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap) __smallc;
-extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap) __smallc;
+extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap);
+extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap);
 
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
 #define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
@@ -274,8 +274,8 @@ extern void __LIB__ printn(int number, int radix,FILE *file) __smallc;
 extern int __LIB__ scanf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fscanf(FILE *,const char *fmt,...) __vasmallc;
 extern int __LIB__ sscanf(char *,const char *fmt,...) __vasmallc;
-extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap) __smallc;
-extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap) __smallc;
+extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap); 
+extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap);
 #define vscanf(ctl,arg) vfscanf(stdin,ctl,arg)
 
 

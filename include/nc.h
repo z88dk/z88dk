@@ -51,13 +51,4 @@ struct dirent {
   unsigned int d_date;
 };
 
-typedef unsigned int	 DIR;		/* compiler limit */
-
-extern DIR __LIB__  *opendir(const char *name);
-extern int  __LIB__ closedir(DIR *p);
-extern struct dirent  __LIB__ *readdir(DIR *p);
-extern long  __LIB__ telldir(DIR *p);
-extern int  __LIB__ seekdir(DIR *p, long v);
-
-
 #endif

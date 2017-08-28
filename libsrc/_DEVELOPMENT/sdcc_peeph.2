@@ -688,6 +688,27 @@ replace restart
 	; peephole z88dk-bugfix-12b
 }
 
+replace restart
+{
+	push	hl
+	pop	iy
+	push	hl
+	push	bc
+	push	de
+	push	iy
+	pop	de
+	pop	hl
+	pop	bc
+	pop	hl
+	push	hl
+} by {
+	push	hl
+	push	hl
+	pop	iy
+	ex	de,hl
+	; peephole z88dk-bugfix-13
+}
+
 barrier
 
 

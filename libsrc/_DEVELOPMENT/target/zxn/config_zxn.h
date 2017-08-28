@@ -42,11 +42,11 @@
 #undef  __SPECTRUM
 #define __SPECTRUM  2
 
-#define __SPECTRUM_48        1
-#define __SPECTRUM_128       2
-#define __SPECTRUM_128_P2    4
-#define __SPECTRUM_128_P2A   8
-#define __SPECTRUM_128_P3    16
+#define __SPECTRUM_48  1
+#define __SPECTRUM_128  2
+#define __SPECTRUM_128_P2  4
+#define __SPECTRUM_128_P2A  8
+#define __SPECTRUM_128_P3  16
 #define __SPECTRUM_PENTAGON  32
 
 #define __USE_SPECTRUM_128_SECOND_DFILE  0
@@ -61,24 +61,24 @@
 #define __IO_RRV_MINOR  0x0f
 
 #define __IO_REGISTRY_REG_RESET  2
-#define __IO_RRR_POWER_ON  0x04
-#define __IO_RRR_HARD  0x02
-#define __IO_RRR_SOFT  0x01
+#define __IO_RRR_POWER_ON_RESET  0x04
+#define __IO_RRR_HARD_RESET  0x02
+#define __IO_RRR_SOFT_RESET  0x01
 
 #define __IO_REGISTRY_REG_MACHINE_TYPE  3
 #define __IO_RRMT_LOCK_TIMING  0x80
 #define __IO_RRMT_TIMING_48  0x10
 #define __IO_RRMT_TIMING_128  0x20
-#define __IO_RRMT_TIMING_P3  0x30
+#define __IO_RRMT_TIMING_P3E  0x30
 #define __IO_RRMT_TIMING_PENTAGON  0x40
-#define __IO_RRMT_CONFIG  0x00
+#define __IO_RRMT_CONFIG_MODE  0x00
 #define __IO_RRMT_48  0x01
 #define __IO_RRMT_128  0x02
-#define __IO_RRMT_P3  0x03
+#define __IO_RRMT_P3E  0x03
 #define __IO_RRMT_PENTAGON  0x04
 
 #define __IO_REGISTRY_REG_PAGE_RAM  4
-#define __IO_RRPM_MASK  0x0f
+#define __IO_RRPM_MASK  __IO_RRPM_MASK
 
 #define __IO_REGISTRY_REG_PERIPHERAL_1  5
 #define __IO_RRP1_JOY1_SINCLAIR  0x00
@@ -87,19 +87,18 @@
 #define __IO_RRP1_JOY2_SINCLAIR  0x00
 #define __IO_RRP1_JOY2_KEMPSTON  0x10
 #define __IO_RRP1_JOY2_CURSOR  0x20
-#define __IO_RRP1_ULA_ENHANCED  0x08
 #define __IO_RRP1_RATE_50  0x00
 #define __IO_RRP1_RATE_60  0x04
-#define __IO_RRP1_SCANLINES  0x02
-#define __IO_RRP1_SCANDOUBLER  0x01
+#define __IO_RRP1_ENABLE_SCANLINES  0x02
+#define __IO_RRP1_ENABLE_SCANDOUBLER  0x01
 
 #define __IO_REGISTRY_REG_PERIPHERAL_2  6
-#define __IO_RRP2_TURBO  0x80
+#define __IO_RRP2_ENABLE_TURBO  0x80
 #define __IO_RRP2_DAC_I2S  0x00
 #define __IO_RRP2_DAC_JAP  0x40
-#define __IO_RRP2_LIGHTPEN  0x20
-#define __IO_RRP2_DIVMMC  0x10
-#define __IO_RRP2_MULTIFACE  0x08
+#define __IO_RRP2_ENABLE_LIGHTPEN  0x20
+#define __IO_RRP2_ENABLE_DIVMMC  0x10
+#define __IO_RRP2_ENABLE_MULTIFACE  0x08
 #define __IO_RRP2_PS2_KEYBOARD  0x00
 #define __IO_RRP2_PS2_MOUSE  0x04
 #define __IO_RRP2_PSGMODE_AY  0x03
@@ -115,58 +114,49 @@
 #define __IO_REGISTRY_REG_PERIPHERAL_3  8
 #define __IO_RRP3_STEREO_ABC  0x00
 #define __IO_RRP3_STEREO_ACB  0x20
-#define __IO_RRP3_SPEAKER  0x10
-#define __IO_RRP3_SPECDRUM  0x08
-#define __IO_RRP3_COVOX  0x08
-#define __IO_RRP3_TIMEX  0x04
-#define __IO_RRP3_TURBOSOUND  0x02
+#define __IO_RRP3_ENABLE_SPEAKER  0x10
+#define __IO_RRP3_ENABLE_SPECDRUM  0x08
+#define __IO_RRP3_ENABLE_COVOX  0x08
+#define __IO_RRP3_ENABLE_TIMEX  0x04
+#define __IO_RRP3_ENABLE_TURBOSOUND  0x02
 
 #define __IO_REGISTRY_REG_ANTI_BRICK  10
-#define __IO_RRAB_START_NORMAL  0x80
+#define __IO_RRAB_START_NORMAL_CORE  0x80
 #define __IO_RRAB_BUTTON_DIVMMC  0x02
 #define __IO_RRAB_BUTTON_MULTIFACE  0x01
 
-#define __IO_REGISTRY_REG_LAYER_2_BUFFER_FRONT  18
-#define __IO_RRL2BF_MASK  0x0f
+#define __IO_REGISTRY_REG_LAYER_2_RAM_PAGE  18
+#define __IO_RRL2RP_MASK  0x3f
 
-#define __IO_REGISTRY_REG_LAYER_2_BUFFER_BACK  19
-#define __IO_RRL2BB_MASK  0x0f
+#define __IO_REGISTRY_REG_LAYER_2_SHADOW_RAM_PAGE  19
+#define __IO_RRL2SRP_MASK  0x0f
 
-#define __IO_REGISTRY_REG_LAYER_2_TRANSPARENCY_COLOR  20
-#define __IO_RRL2TC_MASK  0x0f
-#define __IO_RRL2TC_BRIGHT  0x08
-#define __IO_RRL2TC_BLACK  0
-#define __IO_RRL2TC_BLUE  1
-#define __IO_RRL2TC_RED  2
-#define __IO_RRL2TC_MAGENTA  3
-#define __IO_RRL2TC_GREEN  4
-#define __IO_RRL2TC_CYAN  5
-#define __IO_RRL2TC_YELLOW  6
-#define __IO_RRL2TC_WHITE  7
+#define __IO_REGISTRY_REG_LAYER_2_GLOBAL_TRANSPARENCY_COLOR  20
 
 #define __IO_REGISTRY_REG_SPRITE_LAYER_SYSTEM  21
-#define __IO_RRSLS_SPRITES_IN_BORDER  0x02
-#define __IO_RRSLS_SPRITES_VISIBLE  0x01
+#define __IO_RRSLS_ENABLE_LORES  0x80
 #define __IO_RRSLS_LAYER_PRIORITY_SLU  0x00
 #define __IO_RRSLS_LAYER_PRIORITY_LSU  0x04
 #define __IO_RRSLS_LAYER_PRIORITY_SUL  0x08
 #define __IO_RRSLS_LAYER_PRIORITY_LUS  0x0c
 #define __IO_RRSLS_LAYER_PRIORITY_USL  0x10
 #define __IO_RRSLS_LAYER_PRIORITY_ULS  0x14
+#define __IO_RRSLS_SPRITES_OVER_BORDER  0x02
+#define __IO_RRSLS_SPRITES_VISIBLE  0x01
 
 #define __IO_REGISTRY_REG_LAYER_2_OFFSET_X  22
 
 #define __IO_REGISTRY_REG_LAYER_2_OFFSET_Y  23
 
-#define __IO_REGISTRY_REG_RASTER_LINE_MSB  30
+#define __IO_REGISTRY_REG_ACTIVE_VIDEO_LINE_MSB  30
 
-#define __IO_REGISTRY_REG_RASTER_LINE_LSB  31
+#define __IO_REGISTRY_REG_ACTIVE_VIDEO_LINE_LSB  31
 
 #define __IO_REGISTRY_REG_RASTER_LINE_INTERRUPT_CONTROL  34
-#define __IO_RRRLIC_FLAG_INT  0x80
-#define __IO_RRRLIC_DISABLE_ULA_INT  0x04
-#define __IO_RRRLIC_ENABLE_RASTER_INT  0x02
-#define __IO_RRRLIC_RASTER_LINE_INTERRUPT_VALUE_MSB  0x01
+#define __IO_RRRLIC_INTERRUPT_FLAG  0x80
+#define __IO_RRRLIC_DISABLE_ULA_INTERRUPT  0x04
+#define __IO_RRRLIC_ENABLE_LINE_INTERRUPT  0x02
+#define __IO_RRRLIC_LINE_INTERRUPT_VALUE_MSB  0x01
 
 #define __IO_REGISTRY_REG_RASTER_LINE_INTERRUPT_VALUE_LSB  35
 
@@ -178,20 +168,31 @@
 
 #define __IO_REGISTRY_REG_KEYMAP_DATA_LSB  43
 
+#define __IO_REGISTRY_REG_LORES_OFFSET_X  50
+
+#define __IO_REGISTRY_REG_LORES_OFFSET_Y  51
+
+#define __IO_REGISTRY_REG_ULA_PALETTE_INDEX  64
+#define __IO_RRUPI_REMOVE_FLASH  0x80
+#define __IO_RRUPI_PALETTE_INDEX_MASK  0x1f
+
+#define __IO_REGISTRY_REG_PALETTE_VALUE  65
+
 #define __IO_REGISTRY_REG_DEBUG_LEDS  0xff
 
 #define __IO_LAYER_2_ACCESS  0x123b
-#define __IO_L2A_LOWER_16K_ENABLE  0x01
-#define __IO_L2A_ENABLE  0x02
-#define __IO_L2A_PAGE_BACK_BUFFER  0x08
+#define __IO_L2A_ENABLE_LOWER_16K  0x01
+#define __IO_L2A_ENABLE_LAYER_2  0x02
+#define __IO_L2A_ENABLE_LAYER_2_SHADOW_BUFFER  0x08
 #define __IO_L2A_VRAM_BANK_SELECT_MASK  0xc0
 #define __IO_L2A_VRAM_BANK_SELECT_0  0x00
 #define __IO_L2A_VRAM_BANK_SELECT_1  0x40
 #define __IO_L2A_VRAM_BANK_SELECT_2  0x80
 
 #define __IO_SPRITE_SLOT  0x303b
+
 #define __IO_SPRITE_FLAGS  0x303b
-#define __IO_SF_MAX_PER_LINE  0x02
+#define __IO_SF_MAX_SPRITES_PER_LINE  0x02
 #define __IO_SF_COLLISION  0x01
 
 #define __IO_SPRITE_PALETTE  0x53
@@ -200,10 +201,7 @@
 
 #define __IO_SPRITE_PATTERN  0x5b
 
-#define __SPRITE_TRANSPARENT_COLOR  0xe3
-
 #define __IO_AUDIO_SELECT  0xfffd
-
 #define __IO_AS_ENABLE  0xfc
 #define __IO_AS_LEFT_ENABLE  0xdc
 #define __IO_AS_RIGHT_ENABLE  0xbc
@@ -889,306 +887,6 @@
 
 
 
-#define __IO_ULAP_REGISTER  0xbf3b
-#define __IO_ULAP_DATA      0xff3b
-
-#define __ULAP_COLOR_MONO_BLACK  0x00
-#define __ULAP_COLOR_MONO_GREY_0  0x00
-#define __ULAP_COLOR_MONO_GREY_1  0x49
-#define __ULAP_COLOR_MONO_GREY_2  0x92
-#define __ULAP_COLOR_MONO_GREY_3  0xff
-#define __ULAP_COLOR_MONO_WHITE  0xff
-
-#define __ULAP_COLOR_AMBER_0  0x00
-#define __ULAP_COLOR_AMBER_1  0x04
-#define __ULAP_COLOR_AMBER_2  0x28
-#define __ULAP_COLOR_AMBER_3  0x2c
-#define __ULAP_COLOR_AMBER_4  0x50
-#define __ULAP_COLOR_AMBER_5  0x54
-#define __ULAP_COLOR_AMBER_6  0x78
-#define __ULAP_COLOR_AMBER_7  0x7c
-
-#define __ULAP_COLOR_GREEN_0  0x00
-#define __ULAP_COLOR_GREEN_1  0x20
-#define __ULAP_COLOR_GREEN_2  0x40
-#define __ULAP_COLOR_GREEN_3  0x60
-#define __ULAP_COLOR_GREEN_4  0x80
-#define __ULAP_COLOR_GREEN_5  0xa0
-#define __ULAP_COLOR_GREEN_6  0xc0
-#define __ULAP_COLOR_GREEN_7  0xe0
-
-#define __ULAP_COLOR_RB_RED  0x1c
-#define __ULAP_COLOR_RB_ORANGE  0x7c
-#define __ULAP_COLOR_RB_YELLOW  0xfc
-#define __ULAP_COLOR_RB_GREEN  0xe0
-#define __ULAP_COLOR_RB_BLUE  0x03
-#define __ULAP_COLOR_RB_VIOLET  0x0a
-#define __ULAP_COLOR_RB_INDIGO  0x13
-
-#define __ULAP_COLOR_ZX_BLACK  0x00
-#define __ULAP_COLOR_ZX_BLUE  0x02
-#define __ULAP_COLOR_ZX_RED  0x18
-#define __ULAP_COLOR_ZX_MAGENTA  0x1b
-#define __ULAP_COLOR_ZX_GREEN  0xc0
-#define __ULAP_COLOR_ZX_CYAN  0xc3
-#define __ULAP_COLOR_ZX_YELLOW  0xd8
-#define __ULAP_COLOR_ZX_WHITE  0xdb
-#define __ULAP_COLOR_ZX_BRIGHT_BLACK  0x00
-#define __ULAP_COLOR_ZX_BRIGHT_BLUE  0x03
-#define __ULAP_COLOR_ZX_BRIGHT_RED  0x1c
-#define __ULAP_COLOR_ZX_BRIGHT_MAGENTA  0x1f
-#define __ULAP_COLOR_ZX_BRIGHT_GREEN  0xe0
-#define __ULAP_COLOR_ZX_BRIGHT_CYAN  0xe3
-#define __ULAP_COLOR_ZX_BRIGHT_YELLOW  0xfc
-#define __ULAP_COLOR_ZX_BRIGHT_WHITE  0xff
-
-#define __ULAP_COLOR_ZXNR_NAVY  0x01
-#define __ULAP_COLOR_ZXNR_MAROON  0x08
-#define __ULAP_COLOR_ZXNR_INDIGO  0x09
-#define __ULAP_COLOR_ZXNR_RACING_GREEN  0x40
-#define __ULAP_COLOR_ZXNR_SHERPA_BLUE  0x41
-#define __ULAP_COLOR_ZXNR_OLIVE  0x48
-#define __ULAP_COLOR_ZXNR_BLACK  0x00
-#define __ULAP_COLOR_ZXNR_MIDNIGHT_BLUE  0x02
-#define __ULAP_COLOR_ZXNR_DARK_RED  0x10
-#define __ULAP_COLOR_ZXNR_DARK_VIOLET  0x12
-#define __ULAP_COLOR_ZXNR_ISLAMIC_GREEN  0x80
-#define __ULAP_COLOR_ZXNR_BONDI_BLUE  0x82
-#define __ULAP_COLOR_ZXNR_BRIGHT_OLIVE  0x90
-#define __ULAP_COLOR_ZXNR_GUNPOWDER_GRAY  0x49
-#define __ULAP_COLOR_ZXNR_BLUE  0x03
-#define __ULAP_COLOR_ZXNR_RED  0x1c
-#define __ULAP_COLOR_ZXNR_MAGENTA  0x3f
-#define __ULAP_COLOR_ZXNR_GREEN  0xe0
-#define __ULAP_COLOR_ZXNR_AQUA  0xe3
-#define __ULAP_COLOR_ZXNR_YELLOW  0xfc
-#define __ULAP_COLOR_ZXNR_MIST_GRAY  0xb6
-#define __ULAP_COLOR_ZXNR_SLATE_BLUE  0x6f
-#define __ULAP_COLOR_ZXNR_BITTERSWEET  0x7d
-#define __ULAP_COLOR_ZXNR_ULTRA_PINK  0x7f
-#define __ULAP_COLOR_ZXNR_SCREAMING_GREEN  0xed
-#define __ULAP_COLOR_ZXNR_ELECTRIC_BLUE  0xf3
-#define __ULAP_COLOR_ZXNR_LASER_LEMON  0xfd
-#define __ULAP_COLOR_ZXNR_WHITE  0xff
-#define __ULAP_COLOR_ZXNR_LAVENDER_BLUE  0xb7
-#define __ULAP_COLOR_ZXNR_MELON  0xbe
-#define __ULAP_COLOR_ZXNR_LAVENDER_ROSE  0xbf
-#define __ULAP_COLOR_ZXNR_MINT_GREEN  0xf6
-#define __ULAP_COLOR_ZXNR_COLUMBIA_BLUE  0xf7
-#define __ULAP_COLOR_ZXNR_CANARY  0xfe
-#define __ULAP_COLOR_ZXNR_BRIGHT_MAGENTA  0x1f
-
-#define __ULAP_COLOR_C64_BLACK  0x00
-#define __ULAP_COLOR_C64_WHITE  0xff
-#define __ULAP_COLOR_C64_RED  0x30
-#define __ULAP_COLOR_C64_CYAN  0xaf
-#define __ULAP_COLOR_C64_VIOLET  0x52
-#define __ULAP_COLOR_C64_GREEN  0xad
-#define __ULAP_COLOR_C64_BLUE  0x26
-#define __ULAP_COLOR_C64_YELLOW  0xd9
-#define __ULAP_COLOR_C64_ORANGE  0x50
-#define __ULAP_COLOR_C64_BROWN  0x48
-#define __ULAP_COLOR_C64_LIGHTRED  0x75
-#define __ULAP_COLOR_C64_GREY1  0x49
-#define __ULAP_COLOR_C64_GREY2  0x92
-#define __ULAP_COLOR_C64_LIGHTGREEN  0xf6
-#define __ULAP_COLOR_C64_LIGHTBLUE  0x6f
-#define __ULAP_COLOR_C64_GREY3  0xb6
-
-#define __ULAP_COLOR_G1_BLACK  0x00
-#define __ULAP_COLOR_G1_GREY  0x6d
-#define __ULAP_COLOR_G1_SILVER  0xb6
-#define __ULAP_COLOR_G1_DARK_TEAL  0x62
-#define __ULAP_COLOR_G1_GREEN  0xa0
-#define __ULAP_COLOR_G1_GREENYELLOW  0xf0
-#define __ULAP_COLOR_G1_MAROON  0x0c
-#define __ULAP_COLOR_G1_SIENNA  0x54
-#define __ULAP_COLOR_G1_SANDYBROWN  0x9c
-#define __ULAP_COLOR_G1_KHAKI  0xfd
-#define __ULAP_COLOR_G1_WHITE  0xff
-#define __ULAP_COLOR_G1_SKYBLUE  0xd3
-#define __ULAP_COLOR_G1_SLATEBLUE  0x6b
-#define __ULAP_COLOR_G1_BLUE  0x02
-
-#define __ULAP_COLOR_STD_DARK_BLUE  0x02
-#define __ULAP_COLOR_STD_BRIGHT_BLUE  0xdb
-#define __ULAP_COLOR_STD_BLUE  0x03
-#define __ULAP_COLOR_STD_CYAN  0xe3
-#define __ULAP_COLOR_STD_BRIGHT_YELLOW  0xdd
-#define __ULAP_COLOR_STD_YELLOW  0xfc
-#define __ULAP_COLOR_STD_ORANGE  0x9d
-#define __ULAP_COLOR_STD_BRIGHT_RED  0x5d
-#define __ULAP_COLOR_STD_RED  0x1c
-#define __ULAP_COLOR_STD_DARK_RED  0x10
-#define __ULAP_COLOR_STD_MAGENTA  0x1f
-#define __ULAP_COLOR_STD_BRIGHT_GREEN  0xf2
-#define __ULAP_COLOR_STD_GREEN  0xe0
-#define __ULAP_COLOR_STD_DARK_GREEN  0x80
-#define __ULAP_COLOR_STD_BRIGHT_GREY  0x49
-#define __ULAP_COLOR_STD_LIGHT_GREY  0x6d
-#define __ULAP_COLOR_STD_GREY  0x24
-#define __ULAP_COLOR_STD_WHITE  0xff
-#define __ULAP_COLOR_STD_BLACK  0x00
-
-#define __ULAP_COLOR_HTML_Black  0
-#define __ULAP_COLOR_HTML_Navy  2
-#define __ULAP_COLOR_HTML_DarkBlue  2
-#define __ULAP_COLOR_HTML_MediumBlue  3
-#define __ULAP_COLOR_HTML_Blue  3
-#define __ULAP_COLOR_HTML_DarkGreen  96
-#define __ULAP_COLOR_HTML_Green  128
-#define __ULAP_COLOR_HTML_Teal  130
-#define __ULAP_COLOR_HTML_DarkCyan  130
-#define __ULAP_COLOR_HTML_DeepSkyBlue  163
-#define __ULAP_COLOR_HTML_DarkTurquoise  195
-#define __ULAP_COLOR_HTML_MediumSpringGreen  226
-#define __ULAP_COLOR_HTML_Lime  224
-#define __ULAP_COLOR_HTML_SpringGreen  225
-#define __ULAP_COLOR_HTML_Aqua  227
-#define __ULAP_COLOR_HTML_Cyan  227
-#define __ULAP_COLOR_HTML_MidnightBlue  1
-#define __ULAP_COLOR_HTML_DodgerBlue  131
-#define __ULAP_COLOR_HTML_LightSeaGreen  166
-#define __ULAP_COLOR_HTML_ForestGreen  132
-#define __ULAP_COLOR_HTML_SeaGreen  133
-#define __ULAP_COLOR_HTML_DarkSlateGray  69
-#define __ULAP_COLOR_HTML_DarkSlateGrey  69
-#define __ULAP_COLOR_HTML_LimeGreen  196
-#define __ULAP_COLOR_HTML_MediumSeaGreen  165
-#define __ULAP_COLOR_HTML_Turquoise  235
-#define __ULAP_COLOR_HTML_RoyalBlue  107
-#define __ULAP_COLOR_HTML_SteelBlue  138
-#define __ULAP_COLOR_HTML_DarkSlateBlue  42
-#define __ULAP_COLOR_HTML_MediumTurquoise  203
-#define __ULAP_COLOR_HTML_Indigo  10
-#define __ULAP_COLOR_HTML_DarkOliveGreen  104
-#define __ULAP_COLOR_HTML_CadetBlue  138
-#define __ULAP_COLOR_HTML_CornflowerBlue  143
-#define __ULAP_COLOR_HTML_RebeccaPurple  46
-#define __ULAP_COLOR_HTML_MediumAquaMarine  206
-#define __ULAP_COLOR_HTML_DimGray  109
-#define __ULAP_COLOR_HTML_DimGrey  109
-#define __ULAP_COLOR_HTML_SlateBlue  79
-#define __ULAP_COLOR_HTML_OliveDrab  140
-#define __ULAP_COLOR_HTML_SlateGray  142
-#define __ULAP_COLOR_HTML_SlateGrey  142
-#define __ULAP_COLOR_HTML_LightSlateGray  142
-#define __ULAP_COLOR_HTML_LightSlateGrey  142
-#define __ULAP_COLOR_HTML_MediumSlateBlue  111
-#define __ULAP_COLOR_HTML_LawnGreen  236
-#define __ULAP_COLOR_HTML_Chartreuse  236
-#define __ULAP_COLOR_HTML_Aquamarine  239
-#define __ULAP_COLOR_HTML_Maroon  16
-#define __ULAP_COLOR_HTML_Purple  18
-#define __ULAP_COLOR_HTML_Olive  144
-#define __ULAP_COLOR_HTML_Gray  146
-#define __ULAP_COLOR_HTML_Grey  146
-#define __ULAP_COLOR_HTML_SkyBlue  211
-#define __ULAP_COLOR_HTML_LightSkyBlue  211
-#define __ULAP_COLOR_HTML_BlueViolet  51
-#define __ULAP_COLOR_HTML_DarkRed  16
-#define __ULAP_COLOR_HTML_DarkMagenta  18
-#define __ULAP_COLOR_HTML_SaddleBrown  80
-#define __ULAP_COLOR_HTML_DarkSeaGreen  178
-#define __ULAP_COLOR_HTML_LightGreen  242
-#define __ULAP_COLOR_HTML_MediumPurple  115
-#define __ULAP_COLOR_HTML_DarkViolet  19
-#define __ULAP_COLOR_HTML_PaleGreen  242
-#define __ULAP_COLOR_HTML_DarkOrchid  51
-#define __ULAP_COLOR_HTML_YellowGreen  208
-#define __ULAP_COLOR_HTML_Sienna  84
-#define __ULAP_COLOR_HTML_Brown  52
-#define __ULAP_COLOR_HTML_DarkGray  182
-#define __ULAP_COLOR_HTML_DarkGrey  182
-#define __ULAP_COLOR_HTML_LightBlue  215
-#define __ULAP_COLOR_HTML_GreenYellow  244
-#define __ULAP_COLOR_HTML_PaleTurquoise  247
-#define __ULAP_COLOR_HTML_LightSteelBlue  215
-#define __ULAP_COLOR_HTML_PowderBlue  247
-#define __ULAP_COLOR_HTML_FireBrick  52
-#define __ULAP_COLOR_HTML_DarkGoldenRod  148
-#define __ULAP_COLOR_HTML_MediumOrchid  87
-#define __ULAP_COLOR_HTML_RosyBrown  150
-#define __ULAP_COLOR_HTML_DarkKhaki  181
-#define __ULAP_COLOR_HTML_Silver  219
-#define __ULAP_COLOR_HTML_MediumVioletRed  26
-#define __ULAP_COLOR_HTML_IndianRed  89
-#define __ULAP_COLOR_HTML_Peru  152
-#define __ULAP_COLOR_HTML_Chocolate  120
-#define __ULAP_COLOR_HTML_Tan  186
-#define __ULAP_COLOR_HTML_LightGray  219
-#define __ULAP_COLOR_HTML_LightGrey  219
-#define __ULAP_COLOR_HTML_Thistle  187
-#define __ULAP_COLOR_HTML_Orchid  123
-#define __ULAP_COLOR_HTML_GoldenRod  184
-#define __ULAP_COLOR_HTML_PaleVioletRed  122
-#define __ULAP_COLOR_HTML_Crimson  24
-#define __ULAP_COLOR_HTML_Gainsboro  219
-#define __ULAP_COLOR_HTML_Plum  187
-#define __ULAP_COLOR_HTML_BurlyWood  186
-#define __ULAP_COLOR_HTML_LightCyan  255
-#define __ULAP_COLOR_HTML_Lavender  255
-#define __ULAP_COLOR_HTML_DarkSalmon  157
-#define __ULAP_COLOR_HTML_Violet  159
-#define __ULAP_COLOR_HTML_PaleGoldenRod  254
-#define __ULAP_COLOR_HTML_LightCoral  158
-#define __ULAP_COLOR_HTML_Khaki  254
-#define __ULAP_COLOR_HTML_AliceBlue  255
-#define __ULAP_COLOR_HTML_HoneyDew  255
-#define __ULAP_COLOR_HTML_Azure  255
-#define __ULAP_COLOR_HTML_SandyBrown  189
-#define __ULAP_COLOR_HTML_Wheat  222
-#define __ULAP_COLOR_HTML_Beige  255
-#define __ULAP_COLOR_HTML_WhiteSmoke  255
-#define __ULAP_COLOR_HTML_MintCream  255
-#define __ULAP_COLOR_HTML_GhostWhite  255
-#define __ULAP_COLOR_HTML_Salmon  157
-#define __ULAP_COLOR_HTML_AntiqueWhite  255
-#define __ULAP_COLOR_HTML_Linen  255
-#define __ULAP_COLOR_HTML_LightGoldenRodYellow  255
-#define __ULAP_COLOR_HTML_OldLace  255
-#define __ULAP_COLOR_HTML_Red  28
-#define __ULAP_COLOR_HTML_Fuchsia  31
-#define __ULAP_COLOR_HTML_Magenta  31
-#define __ULAP_COLOR_HTML_DeepPink  30
-#define __ULAP_COLOR_HTML_OrangeRed  92
-#define __ULAP_COLOR_HTML_Tomato  125
-#define __ULAP_COLOR_HTML_HotPink  126
-#define __ULAP_COLOR_HTML_Coral  125
-#define __ULAP_COLOR_HTML_DarkOrange  156
-#define __ULAP_COLOR_HTML_LightSalmon  189
-#define __ULAP_COLOR_HTML_Orange  188
-#define __ULAP_COLOR_HTML_LightPink  191
-#define __ULAP_COLOR_HTML_Pink  223
-#define __ULAP_COLOR_HTML_Gold  220
-#define __ULAP_COLOR_HTML_PeachPuff  222
-#define __ULAP_COLOR_HTML_NavajoWhite  222
-#define __ULAP_COLOR_HTML_Moccasin  254
-#define __ULAP_COLOR_HTML_Bisque  255
-#define __ULAP_COLOR_HTML_MistyRose  255
-#define __ULAP_COLOR_HTML_BlanchedAlmond  255
-#define __ULAP_COLOR_HTML_PapayaWhip  255
-#define __ULAP_COLOR_HTML_LavenderBlush  255
-#define __ULAP_COLOR_HTML_SeaShell  255
-#define __ULAP_COLOR_HTML_Cornsilk  255
-#define __ULAP_COLOR_HTML_LemonChiffon  255
-#define __ULAP_COLOR_HTML_FloralWhite  255
-#define __ULAP_COLOR_HTML_Snow  255
-#define __ULAP_COLOR_HTML_Yellow  252
-#define __ULAP_COLOR_HTML_LightYellow  255
-#define __ULAP_COLOR_HTML_Ivory  255
-#define __ULAP_COLOR_HTML_White  255
-
-
-
-
-
-
-
-
-
-
-
 #define __LAYER2_COLOR_MONO_BLACK  0x00
 #define __LAYER2_COLOR_MONO_GREY_0  0x00
 #define __LAYER2_COLOR_MONO_GREY_1  0x49
@@ -1273,7 +971,6 @@
 #define __LAYER2_COLOR_ZXNR_MINT_GREEN  0xbe
 #define __LAYER2_COLOR_ZXNR_COLUMBIA_BLUE  0xbf
 #define __LAYER2_COLOR_ZXNR_CANARY  0xfe
-#define __LAYER2_COLOR_ZXNR_BRIGHT_MAGENTA  0xe3
 
 #define __LAYER2_COLOR_C64_BLACK  0x00
 #define __LAYER2_COLOR_C64_WHITE  0xff

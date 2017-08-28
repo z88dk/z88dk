@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _INTTYPES_H
-#define _INTTYPES_H
+#ifndef __INTTYPES_H__
+#define __INTTYPES_H__
 
 #include <stdint.h>
 

@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _LIMITS_H
-#define _LIMITS_H
+#ifndef __LIMITS_H__
+#define __LIMITS_H__
 
 extern unsigned char   _MAX_OPEN[];
 #define OPEN_MAX       ((unsigned int)_MAX_OPEN)

@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _SMS_SMSLIB_H
-#define _SMS_SMSLIB_H
+#ifndef __SMS_SMSLIB_H__
+#define __SMS_SMSLIB_H__
 
 #include <arch.h>
 
