@@ -822,8 +822,8 @@ instruction ed_page[] = {
     { "otir",   OP_NONE,  OP_NONE,    0 },
     { "ldirx",  OP_NONE,  OP_NONE,    F_ZXN }, 
     { "fillde", OP_NONE,  OP_NONE,    F_ZXN },  /* 0xb5 */
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "ldirscale",OP_NONE,  OP_NONE,  F_ZXN }, 
+    { "ldpirx", OP_NONE,  OP_NONE,    F_ZXN }, 
     { "lddr",   OP_NONE,  OP_NONE,    0 },
     { "cpdr",   OP_NONE,  OP_NONE,    0 },
     { "indr",   OP_NONE,  OP_NONE,    0 },

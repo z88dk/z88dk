@@ -17,14 +17,14 @@ static void usage(char *program)
 {
     printf("z88dk disassembler\n\n");
     printf("%s [options] [file]\n\n",program);
-    printf("  -o             Address to load code from\n");
-    printf("  -s             Address to start disassembling from\n");
-    printf("  -e             Address to disassemble to\n");
+    printf("  -o <addr>      Address to load code from\n");
+    printf("  -s <addr>      Address to start disassembling from\n");
+    printf("  -e <addr>      Address to disassemble to\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mz80-zxn      Disassemble z80 ZXN code\n");
     printf("  -mr2k          Disassemble Rabbit 2000 code\n");
-    printf("  -mr3k          Disassemble Rabbit 2000 code\n");
+    printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 {
     char  *program = argv[0];
     char  *filename;
+    char  *endp;
     uint16_t    org = 0;
     uint16_t    start = 0;
     uint16_t    end = 65535;
@@ -49,16 +50,20 @@ int main(int argc, char **argv)
         if( argv[1][0] == '-' && argv[2] ) {
             switch (argc--, argv++[1][1]){
             case 'o':
-                org = atoi(argv[1]);
+                org = strtol(argv[1], &endp, 0);
+                argc--; argv++;
                 break;
             case 's':
-                start = atoi(argv[1]);
+                start = strtol(argv[1], &endp, 0);
+                argc--; argv++;
                 break;
             case 'e':
-                end = atoi(argv[1]);
+                end = strtol(argv[1], &endp, 0);
+                argc--; argv++;
                 break;
             case 'x':
                 read_symbol_file(argv[1]);
+                argc--; argv++;
                 break;
             case 'm':
                 if ( strcmp(&argv[0][1],"mz80") == 0 ) {
