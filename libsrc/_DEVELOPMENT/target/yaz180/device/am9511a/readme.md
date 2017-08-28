@@ -67,12 +67,12 @@ for the hypotenuse of Pythagoras Triangle.
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP1               ;POINTER TO OPERAND 1
     LD a, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
-    CALL _am9511a_op_ld     ;POINTER TO OPERAND IN OPERAND BUFFER
+    CALL _am9511a_cmd_ld    ;POINTER TO OPERAND IN OPERAND BUFFER
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP2               ;POINTER TO OPERAND 2
     LD A, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
-    CALL _am9511a_op_ld     ;POINTER TO OPERAND IN OPERAND BUFFER
+    CALL _am9511a_cmd_ld    ;POINTER TO OPERAND IN OPERAND BUFFER
 
                             ;EXAMPLE CODE - COMMAND LOADING
                             
@@ -109,7 +109,7 @@ for the hypotenuse of Pythagoras Triangle.
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, RSULT             ;(D)E POINTER NOW RSULT
     LD A, __IO_APU_OP_REM32 ;REMOVE 32 bit OPERAND
-    CALL _am9511a_op_ld
+    CALL _am9511a_cmd_ld
 
                             ;EXAMPLE CODE - PROCESSING
                             
