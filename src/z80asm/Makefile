@@ -31,8 +31,7 @@ TEST_SRC_LIB:=t/testlib.c
 TARGET =		z80asm$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
-# parser is too big to optimize with -O3
-OPT = -O1
+OPT = -O3
 
 STD = -std=gnu99
 LOCAL_LIB :=	lib
@@ -59,6 +58,10 @@ $(TARGET): ../config.h $(OBJS)
 
 %.o: %.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
+
+# parser is too big to optimize with -O3
+parse.o: parse.c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
 # library
