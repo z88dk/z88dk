@@ -69,8 +69,14 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define clrscr() printf("\033[%um\033[%um%c",30,47,12)
 #define clreol() printf("\033[K")
 
-#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
-#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+extern int ansi_COLUMN;
+extern int ansi_ROW;
+
+#define gotoxy(a,b);  ansi_COLUMN=a-1; ansi_ROW=b-1;
+#define _gotoxy(a,b);  ansi_COLUMN=a-1; ansi_ROW=b-1;
+
+//#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+//#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
 
 #endif
 
