@@ -369,11 +369,8 @@
  rrc (iy+DIS),h         ; Error
  rrc (iy+DIS),l         ; Error
  rst -1                 ; Error
- rst 0                  ; Error
- rst 48                 ; Error
  rst 49                 ; Error
  rst 57                 ; Error
- rst 8                  ; Error
  sbc a,ixh              ; Error
  sbc a,ixl              ; Error
  sbc a,iyh              ; Error

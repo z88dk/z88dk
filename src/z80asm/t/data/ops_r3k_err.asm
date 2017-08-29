@@ -160,57 +160,6 @@
  cpdr                   ;; 1118:  ED B9
  halt                   ;; 1119:  76
  slp                    ;; 1119:  ED 76
- call nz, 0             ;; 1216:  C4 00 00
- call nz, 291           ;; 1216:  C4 23 01
- call nz, 17767         ;; 1216:  C4 67 45
- call nz, 35243         ;; 1216:  C4 AB 89
- call nz, 52719         ;; 1216:  C4 EF CD
- call nz, 65535         ;; 1216:  C4 FF FF
- call z, 0              ;; 1216:  CC 00 00
- call z, 291            ;; 1216:  CC 23 01
- call z, 17767          ;; 1216:  CC 67 45
- call z, 35243          ;; 1216:  CC AB 89
- call z, 52719          ;; 1216:  CC EF CD
- call z, 65535          ;; 1216:  CC FF FF
- call nc, 0             ;; 1216:  D4 00 00
- call nc, 291           ;; 1216:  D4 23 01
- call nc, 17767         ;; 1216:  D4 67 45
- call nc, 35243         ;; 1216:  D4 AB 89
- call nc, 52719         ;; 1216:  D4 EF CD
- call nc, 65535         ;; 1216:  D4 FF FF
- call c, 0              ;; 1216:  DC 00 00
- call c, 291            ;; 1216:  DC 23 01
- call c, 17767          ;; 1216:  DC 67 45
- call c, 35243          ;; 1216:  DC AB 89
- call c, 52719          ;; 1216:  DC EF CD
- call c, 65535          ;; 1216:  DC FF FF
- call po, 0             ;; 1216:  E4 00 00
- call po, 291           ;; 1216:  E4 23 01
- call po, 17767         ;; 1216:  E4 67 45
- call po, 35243         ;; 1216:  E4 AB 89
- call po, 52719         ;; 1216:  E4 EF CD
- call po, 65535         ;; 1216:  E4 FF FF
- call pe, 0             ;; 1216:  EC 00 00
- call pe, 291           ;; 1216:  EC 23 01
- call pe, 17767         ;; 1216:  EC 67 45
- call pe, 35243         ;; 1216:  EC AB 89
- call pe, 52719         ;; 1216:  EC EF CD
- call pe, 65535         ;; 1216:  EC FF FF
- call p, 0              ;; 1216:  F4 00 00
- call p, 291            ;; 1216:  F4 23 01
- call p, 17767          ;; 1216:  F4 67 45
- call p, 35243          ;; 1216:  F4 AB 89
- call p, 52719          ;; 1216:  F4 EF CD
- call p, 65535          ;; 1216:  F4 FF FF
- call m, 0              ;; 1216:  FC 00 00
- call m, 291            ;; 1216:  FC 23 01
- call m, 17767          ;; 1216:  FC 67 45
- call m, 35243          ;; 1216:  FC AB 89
- call m, 52719          ;; 1216:  FC EF CD
- call m, 65535          ;; 1216:  FC FF FF
- rst 0                  ;; 1226:  C7
- rst 8                  ;; 1226:  CF
- rst 48                 ;; 1226:  F7
  in a, (0)              ;; 1226:  DB 00
  in a, (85)             ;; 1226:  DB 55
  in a, (170)            ;; 1226:  DB AA

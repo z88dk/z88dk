@@ -898,18 +898,6 @@
  call -32768            ; CD 00 80
  call 32767             ; CD FF 7F
  call 65535             ; CD FF FF
- call lo,-32768         ; EC 00 80
- call lo,32767          ; EC FF 7F
- call lo,65535          ; EC FF FF
- call lz,-32768         ; E4 00 80
- call lz,32767          ; E4 FF 7F
- call lz,65535          ; E4 FF FF
- call nv,-32768         ; E4 00 80
- call nv,32767          ; E4 FF 7F
- call nv,65535          ; E4 FF FF
- call v,-32768          ; EC 00 80
- call v,32767           ; EC FF 7F
- call v,65535           ; EC FF FF
  ccf                    ; 3F
  ccf f                  ; 3F
  ccf f'                 ; 76 3F

@@ -344,7 +344,7 @@
 ; Call and Return Group
 ;------------------------------------------------------------------------------
 			call MN							=> CD, N, M
-[zilog]		call {nz z nc c po pe p m}, MN	=> C4 + $1*8, N, M
+;[zilog]		call {nz z nc c po pe p m}, MN	=> C4 + $1*8, N, M
 
 ; TODO: LCALL not supported
 
@@ -355,7 +355,7 @@
 ; TODO: LRET not supported
 
 			rst {. . 16 24 32 40 .  56}		=> C7 + $1*8
-[zilog]		rst {0 8 .  .  .  .  48 . }		=> C7 + $1*8
+;[zilog]		rst {0 8 .  .  .  .  48 . }		=> C7 + $1*8
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group

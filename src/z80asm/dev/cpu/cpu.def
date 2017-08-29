@@ -10,50 +10,6 @@
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
-; Jump Group
-;------------------------------------------------------------------------------
-			jp 	NN								=> C3 NNl NNh
-			jp 	{nz|z|nc|c|{po|nv}|{pe|v}|p|m}, NN \
-												=> C2+$1*8 NNl NNh
-[rabbit] 	jp	{||||lz|lo||}, NN 				=> C2+$1*8 NNl NNh
-
-			jp 	(hl)							=> E9
-
-			jr 	NN								=> 18 NNe
-			jr 	{nz|z|nc|c}, NN					=> 20+$1*8 NNe
-
-			djnz NN								=> 10 NNe
-			djnz b, NN							=> 10 NNe
-
-; TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
-[rabbit]	altd djnz NN						=> 76 10 NNe
-[rabbit]	djnz b', NN							=> 76 10 NNe
-
-[rabbit]      ld xpc, a							=> ED 67
-[rabbit] ALTD ld a, xpc							=> ED 77
-
-; TODO: LJP not supported
-
-;------------------------------------------------------------------------------
-; Call and Return Group
-;------------------------------------------------------------------------------
-			call NN								=> CD NNl NNh
-			call {nz|z|nc|c|{po|nv}|{pe|v}|p|m}, NN	\
-												=> C4+$1*8 NNl NNh
-[rabbit] 	call {||||lz|lo||}, NN				=> C4+$1*8 NNl NNh
-
-; TODO: LCALL not supported
-
-			rst CONST							=> choose(       16:D7 24:DF 32:E7 40:EF 56:FF)
-[zilog]		rst CONST							=> choose(0:C7 8:CF                   48:F7   )
-
-			ret									=> C9
-			ret {nz|z|nc|c|{po|nv}|{pe|v}|p|m}	=> C0+$1*8
-[rabbit] 	ret {||||lz|lo||}					=> C0+$1*8
-
-; TODO: LRET not supported
-
-;------------------------------------------------------------------------------
 ; Block Transfer Group
 ;------------------------------------------------------------------------------
 		IO	ldi 								=> ED A0

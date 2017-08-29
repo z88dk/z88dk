@@ -116,7 +116,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 			/^Error .*? line (\d+)/ and $err_lines[$1]++;
 		}
 		for (1..$num_lines) {
-			ok $err_lines[$_], "expected error at line $_";
+			ok $err_lines[$_], "$file: expected error at line $_";
 		}
 	}
 	

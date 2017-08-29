@@ -174,57 +174,6 @@
  setusr                 ;; 110C:  ED 6F
  sures                  ;; 110C:  ED 7D
  syscall                ;; 110C:  ED 75
- call nz, 0             ;; 11FA:  C4 00 00
- call nz, 291           ;; 11FA:  C4 23 01
- call nz, 17767         ;; 11FA:  C4 67 45
- call nz, 35243         ;; 11FA:  C4 AB 89
- call nz, 52719         ;; 11FA:  C4 EF CD
- call nz, 65535         ;; 11FA:  C4 FF FF
- call z, 0              ;; 11FA:  CC 00 00
- call z, 291            ;; 11FA:  CC 23 01
- call z, 17767          ;; 11FA:  CC 67 45
- call z, 35243          ;; 11FA:  CC AB 89
- call z, 52719          ;; 11FA:  CC EF CD
- call z, 65535          ;; 11FA:  CC FF FF
- call nc, 0             ;; 11FA:  D4 00 00
- call nc, 291           ;; 11FA:  D4 23 01
- call nc, 17767         ;; 11FA:  D4 67 45
- call nc, 35243         ;; 11FA:  D4 AB 89
- call nc, 52719         ;; 11FA:  D4 EF CD
- call nc, 65535         ;; 11FA:  D4 FF FF
- call c, 0              ;; 11FA:  DC 00 00
- call c, 291            ;; 11FA:  DC 23 01
- call c, 17767          ;; 11FA:  DC 67 45
- call c, 35243          ;; 11FA:  DC AB 89
- call c, 52719          ;; 11FA:  DC EF CD
- call c, 65535          ;; 11FA:  DC FF FF
- call po, 0             ;; 11FA:  E4 00 00
- call po, 291           ;; 11FA:  E4 23 01
- call po, 17767         ;; 11FA:  E4 67 45
- call po, 35243         ;; 11FA:  E4 AB 89
- call po, 52719         ;; 11FA:  E4 EF CD
- call po, 65535         ;; 11FA:  E4 FF FF
- call pe, 0             ;; 11FA:  EC 00 00
- call pe, 291           ;; 11FA:  EC 23 01
- call pe, 17767         ;; 11FA:  EC 67 45
- call pe, 35243         ;; 11FA:  EC AB 89
- call pe, 52719         ;; 11FA:  EC EF CD
- call pe, 65535         ;; 11FA:  EC FF FF
- call p, 0              ;; 11FA:  F4 00 00
- call p, 291            ;; 11FA:  F4 23 01
- call p, 17767          ;; 11FA:  F4 67 45
- call p, 35243          ;; 11FA:  F4 AB 89
- call p, 52719          ;; 11FA:  F4 EF CD
- call p, 65535          ;; 11FA:  F4 FF FF
- call m, 0              ;; 11FA:  FC 00 00
- call m, 291            ;; 11FA:  FC 23 01
- call m, 17767          ;; 11FA:  FC 67 45
- call m, 35243          ;; 11FA:  FC AB 89
- call m, 52719          ;; 11FA:  FC EF CD
- call m, 65535          ;; 11FA:  FC FF FF
- rst 0                  ;; 120A:  C7
- rst 8                  ;; 120A:  CF
- rst 48                 ;; 120A:  F7
  in a, (0)              ;; 120A:  DB 00
  in a, (85)             ;; 120A:  DB 55
  in a, (170)            ;; 120A:  DB AA

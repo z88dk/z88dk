@@ -574,85 +574,85 @@
  jp lo, 52719           ;; 0CBF:  EA EF CD
  jp lo, 65535           ;; 0CBF:  EA FF FF
  djnz b', ASMPC         ;; 0CC8:  76 10 FE
- ret lz                 ;; 0D7D:  E0
- ret lo                 ;; 0D7D:  E8
- in0 b, (0)             ;; 0D9D:  ED 00 00
- in0 b, (85)            ;; 0D9D:  ED 00 55
- in0 b, (170)           ;; 0D9D:  ED 00 AA
- in0 b, (255)           ;; 0D9D:  ED 00 FF
- in0 c, (0)             ;; 0D9D:  ED 08 00
- in0 c, (85)            ;; 0D9D:  ED 08 55
- in0 c, (170)           ;; 0D9D:  ED 08 AA
- in0 c, (255)           ;; 0D9D:  ED 08 FF
- in0 d, (0)             ;; 0D9D:  ED 10 00
- in0 d, (85)            ;; 0D9D:  ED 10 55
- in0 d, (170)           ;; 0D9D:  ED 10 AA
- in0 d, (255)           ;; 0D9D:  ED 10 FF
- in0 e, (0)             ;; 0D9D:  ED 18 00
- in0 e, (85)            ;; 0D9D:  ED 18 55
- in0 e, (170)           ;; 0D9D:  ED 18 AA
- in0 e, (255)           ;; 0D9D:  ED 18 FF
- in0 h, (0)             ;; 0D9D:  ED 20 00
- in0 h, (85)            ;; 0D9D:  ED 20 55
- in0 h, (170)           ;; 0D9D:  ED 20 AA
- in0 h, (255)           ;; 0D9D:  ED 20 FF
- in0 l, (0)             ;; 0D9D:  ED 28 00
- in0 l, (85)            ;; 0D9D:  ED 28 55
- in0 l, (170)           ;; 0D9D:  ED 28 AA
- in0 l, (255)           ;; 0D9D:  ED 28 FF
- in0 f, (0)             ;; 0D9D:  ED 30 00
- in0 f, (85)            ;; 0D9D:  ED 30 55
- in0 f, (170)           ;; 0D9D:  ED 30 AA
- in0 f, (255)           ;; 0D9D:  ED 30 FF
- in0 a, (0)             ;; 0D9D:  ED 38 00
- in0 a, (85)            ;; 0D9D:  ED 38 55
- in0 a, (170)           ;; 0D9D:  ED 38 AA
- in0 a, (255)           ;; 0D9D:  ED 38 FF
- out0 (0), b            ;; 0DB5:  ED 01 00
- out0 (85), b           ;; 0DB5:  ED 01 55
- out0 (170), b          ;; 0DB5:  ED 01 AA
- out0 (255), b          ;; 0DB5:  ED 01 FF
- out0 (0), c            ;; 0DB5:  ED 09 00
- out0 (85), c           ;; 0DB5:  ED 09 55
- out0 (170), c          ;; 0DB5:  ED 09 AA
- out0 (255), c          ;; 0DB5:  ED 09 FF
- out0 (0), d            ;; 0DB5:  ED 11 00
- out0 (85), d           ;; 0DB5:  ED 11 55
- out0 (170), d          ;; 0DB5:  ED 11 AA
- out0 (255), d          ;; 0DB5:  ED 11 FF
- out0 (0), e            ;; 0DB5:  ED 19 00
- out0 (85), e           ;; 0DB5:  ED 19 55
- out0 (170), e          ;; 0DB5:  ED 19 AA
- out0 (255), e          ;; 0DB5:  ED 19 FF
- out0 (0), h            ;; 0DB5:  ED 21 00
- out0 (85), h           ;; 0DB5:  ED 21 55
- out0 (170), h          ;; 0DB5:  ED 21 AA
- out0 (255), h          ;; 0DB5:  ED 21 FF
- out0 (0), l            ;; 0DB5:  ED 29 00
- out0 (85), l           ;; 0DB5:  ED 29 55
- out0 (170), l          ;; 0DB5:  ED 29 AA
- out0 (255), l          ;; 0DB5:  ED 29 FF
- out0 (0), a            ;; 0DB5:  ED 39 00
- out0 (85), a           ;; 0DB5:  ED 39 55
- out0 (170), a          ;; 0DB5:  ED 39 AA
- out0 (255), a          ;; 0DB5:  ED 39 FF
- tstio 0                ;; 0DB5:  ED 74 00
- tstio 85               ;; 0DB5:  ED 74 55
- tstio 170              ;; 0DB5:  ED 74 AA
- tstio 255              ;; 0DB5:  ED 74 FF
- otdm                   ;; 0DC5:  ED 8B
- otdmr                  ;; 0DC5:  ED 9B
- otim                   ;; 0DC5:  ED 83
- otimr                  ;; 0DC5:  ED 93
- ipset 0                ;; 0DCD:  ED 46
- ipset 1                ;; 0DCD:  ED 56
- ipset 2                ;; 0DCD:  ED 4E
- ipset 3                ;; 0DCD:  ED 5E
- ipres                  ;; 0DCD:  ED 5D
- ld iir, a              ;; 0DD5:  ED 4F
- ld a, iir              ;; 0DD5:  ED 5F
- ld a', iir             ;; 0DD5:  76 ED 5F
- ld eir, a              ;; 0DD5:  ED 47
- ld a, eir              ;; 0DD5:  ED 57
- ld a', eir             ;; 0DD5:  76 ED 57
- idet                   ;; 0DD9:  5B
+ ret lz                 ;; 0CED:  E0
+ ret lo                 ;; 0CED:  E8
+ in0 b, (0)             ;; 0D0A:  ED 00 00
+ in0 b, (85)            ;; 0D0A:  ED 00 55
+ in0 b, (170)           ;; 0D0A:  ED 00 AA
+ in0 b, (255)           ;; 0D0A:  ED 00 FF
+ in0 c, (0)             ;; 0D0A:  ED 08 00
+ in0 c, (85)            ;; 0D0A:  ED 08 55
+ in0 c, (170)           ;; 0D0A:  ED 08 AA
+ in0 c, (255)           ;; 0D0A:  ED 08 FF
+ in0 d, (0)             ;; 0D0A:  ED 10 00
+ in0 d, (85)            ;; 0D0A:  ED 10 55
+ in0 d, (170)           ;; 0D0A:  ED 10 AA
+ in0 d, (255)           ;; 0D0A:  ED 10 FF
+ in0 e, (0)             ;; 0D0A:  ED 18 00
+ in0 e, (85)            ;; 0D0A:  ED 18 55
+ in0 e, (170)           ;; 0D0A:  ED 18 AA
+ in0 e, (255)           ;; 0D0A:  ED 18 FF
+ in0 h, (0)             ;; 0D0A:  ED 20 00
+ in0 h, (85)            ;; 0D0A:  ED 20 55
+ in0 h, (170)           ;; 0D0A:  ED 20 AA
+ in0 h, (255)           ;; 0D0A:  ED 20 FF
+ in0 l, (0)             ;; 0D0A:  ED 28 00
+ in0 l, (85)            ;; 0D0A:  ED 28 55
+ in0 l, (170)           ;; 0D0A:  ED 28 AA
+ in0 l, (255)           ;; 0D0A:  ED 28 FF
+ in0 f, (0)             ;; 0D0A:  ED 30 00
+ in0 f, (85)            ;; 0D0A:  ED 30 55
+ in0 f, (170)           ;; 0D0A:  ED 30 AA
+ in0 f, (255)           ;; 0D0A:  ED 30 FF
+ in0 a, (0)             ;; 0D0A:  ED 38 00
+ in0 a, (85)            ;; 0D0A:  ED 38 55
+ in0 a, (170)           ;; 0D0A:  ED 38 AA
+ in0 a, (255)           ;; 0D0A:  ED 38 FF
+ out0 (0), b            ;; 0D22:  ED 01 00
+ out0 (85), b           ;; 0D22:  ED 01 55
+ out0 (170), b          ;; 0D22:  ED 01 AA
+ out0 (255), b          ;; 0D22:  ED 01 FF
+ out0 (0), c            ;; 0D22:  ED 09 00
+ out0 (85), c           ;; 0D22:  ED 09 55
+ out0 (170), c          ;; 0D22:  ED 09 AA
+ out0 (255), c          ;; 0D22:  ED 09 FF
+ out0 (0), d            ;; 0D22:  ED 11 00
+ out0 (85), d           ;; 0D22:  ED 11 55
+ out0 (170), d          ;; 0D22:  ED 11 AA
+ out0 (255), d          ;; 0D22:  ED 11 FF
+ out0 (0), e            ;; 0D22:  ED 19 00
+ out0 (85), e           ;; 0D22:  ED 19 55
+ out0 (170), e          ;; 0D22:  ED 19 AA
+ out0 (255), e          ;; 0D22:  ED 19 FF
+ out0 (0), h            ;; 0D22:  ED 21 00
+ out0 (85), h           ;; 0D22:  ED 21 55
+ out0 (170), h          ;; 0D22:  ED 21 AA
+ out0 (255), h          ;; 0D22:  ED 21 FF
+ out0 (0), l            ;; 0D22:  ED 29 00
+ out0 (85), l           ;; 0D22:  ED 29 55
+ out0 (170), l          ;; 0D22:  ED 29 AA
+ out0 (255), l          ;; 0D22:  ED 29 FF
+ out0 (0), a            ;; 0D22:  ED 39 00
+ out0 (85), a           ;; 0D22:  ED 39 55
+ out0 (170), a          ;; 0D22:  ED 39 AA
+ out0 (255), a          ;; 0D22:  ED 39 FF
+ tstio 0                ;; 0D22:  ED 74 00
+ tstio 85               ;; 0D22:  ED 74 55
+ tstio 170              ;; 0D22:  ED 74 AA
+ tstio 255              ;; 0D22:  ED 74 FF
+ otdm                   ;; 0D32:  ED 8B
+ otdmr                  ;; 0D32:  ED 9B
+ otim                   ;; 0D32:  ED 83
+ otimr                  ;; 0D32:  ED 93
+ ipset 0                ;; 0D3A:  ED 46
+ ipset 1                ;; 0D3A:  ED 56
+ ipset 2                ;; 0D3A:  ED 4E
+ ipset 3                ;; 0D3A:  ED 5E
+ ipres                  ;; 0D3A:  ED 5D
+ ld iir, a              ;; 0D42:  ED 4F
+ ld a, iir              ;; 0D42:  ED 5F
+ ld a', iir             ;; 0D42:  76 ED 5F
+ ld eir, a              ;; 0D42:  ED 47
+ ld a, eir              ;; 0D42:  ED 57
+ ld a', eir             ;; 0D42:  76 ED 57
+ idet                   ;; 0D46:  5B

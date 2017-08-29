@@ -706,6 +706,7 @@ if ($ENV{DEBUG}) {
 #	%c	constant (im, bit, rst, ...)
 #	%d	signed register indirect offset
 #	%u	unsigned register indirect offset
+#	%t	temp jump label
 #	@label	unsigned word with given global label address
 #------------------------------------------------------------------------------
 @CPUS = qw( z80 z80_zxn z180 r2k r3k );
@@ -718,7 +719,19 @@ my @TEST= qw( tst test );
 my @ROTA= qw( rlca rrca rla rra );
 my @ROT = qw( rlc rrc rl rr sla sra sll sli srl );
 my @BIT = qw( bit res set );
-
+my @FLAGS = qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m );
+my %INV_FLAG = qw( 	_nz	_z 
+					_z 	_nz
+					_nc _c 
+					_c	_nc
+					_po _pe 
+					_pe	_po
+					_nv _v 
+					_v	_nv
+					_lz _lo 
+					_lo	_lz
+					_p 	_m
+					_m	_p );
 my @X	= qw( ix iy );
 my @DIS	= ('0', '%d');
 my @IO	= ('', qw( ioi ioe ));
@@ -729,6 +742,10 @@ my %V = (
 	'' => '',
 	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, a => 7,
 	bc => 0, de => 1, hl => 2, sp => 3, af => 3,
+	_nz => 0, _z => 1, _nc => 2, _c => 3, 
+	_po => 4, _pe => 5,
+	_nv => 4, _v => 5,
+	_lz => 4, _lo => 5, _p => 6, _m => 7,
 	add => 0, adc => 1, sub => 2, sbc => 3, and => 4, xor => 5, or => 6, cp => 7,
 	rlca => 0, rrca => 1, rla => 2, rra => 3,
 	rlc => 0, rrc => 1, rl => 2, rr => 3, sla => 4, sra => 5, sll => 6, sli => 6, srl => 7, 
@@ -1069,6 +1086,76 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "reti", 0xED, 0x4D);
 	add_opc($cpu, "retn", 0xED, 0x45) if $zilog;
 	add_opc($cpu, "idet", 0x5B) if $r3k;
+	
+	# Jump group
+	add_opc($cpu, "jr %j", 0x18, '%j');
+	add_opc($cpu, "jp %m", 0xC3, '%m', '%m');
+
+	# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
+	add_opc($cpu, "djnz %j", 0x10, '%j');
+	add_opc($cpu, "djnz b, %j", 0x10, '%j');
+	
+	
+	for my $_f (@FLAGS) {
+		my $f = substr($_f, 1);		# remove leading _
+		if ($f =~ /lz|lo/) {
+			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m') if $rabbit;
+		}
+		elsif ($f =~ /^(nz|z|nc|c)$/) {
+			add_opc($cpu, "jr $f, %j", 0x20 + $V{$_f}*8, '%j');
+			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
+		}
+		else {
+			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
+		}
+	}
+	
+	for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
+		my($x, @pfx) = @$_;
+		add_opc($cpu, "jp ($x)", @pfx, 0xE9);
+	}
+
+	if ($rabbit) {
+		# TODO: LJP not supported
+		add_opc($cpu, "ld xpc, a", 0xED, 0x67);
+		add_opc($cpu, "ld a, xpc", 0xED, 0x77);
+	}
+	
+	# Call and return group
+	add_opc($cpu, "call %m", 0xCD, '%m', '%m');
+	add_opc($cpu, "ret", 0xC9);
+	
+	for my $_f (@FLAGS) {
+		my $f = substr($_f, 1);					# remove leading _
+		my $_inv_f = $INV_FLAG{$_f};			# inverted flag
+		my $inv_f = substr($_inv_f, 1);			# remove leading _
+
+		if ($rabbit) {
+			# TODO: LCALL not supported
+			if ($f =~ /^(nz|z|nc|c)$/) {
+				add_opc($cpu, "call $f, %m", 
+								0x20 + $V{$_inv_f}*8, 3,			# jump !flag
+								0xCD, '%m', '%m');					# call 
+			}
+			else {
+				add_opc($cpu, "call $f, %m", 
+								0xC2 + $V{$_inv_f}*8, '%t', '%t',	# jump !flag, label
+								0xCD, '%m', '%m');					# call 
+			}
+		}
+		else {
+			if ($f !~ /lz|lo/) {
+				add_opc($cpu, "call $f, %m", 0xC4 + $V{$_f}*8, '%m', '%m');			
+			}
+		}
+		
+		if ($f =~ /lz|lo/ && $rabbit || $f !~ /lz|lo/) {
+			# TODO: LRET not supported
+			add_opc($cpu, "ret $f", 0xC0 + $V{$_f}*8);
+		}
+	}
+	
+	add_opc($cpu, "rst %c", "0xC7+%c");
 }
 
 #------------------------------------------------------------------------------
@@ -1119,6 +1206,7 @@ for my $asm (sort keys %Opcodes) {
 
 # open tests files
 my %fh;
+my %pc;
 for my $cpu (@CPUS) {
 	for my $ixiy ('', '_ixiy') {
 		for my $ok ('ok', 'err') {
@@ -1140,9 +1228,15 @@ for my $asm (sort keys %Tests) {
 					$asm1 =~ s/(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
 				}
 				my $bin1 = $Tests{$asm1}{$cpu};
+				
+				# build jumps to %t
+				my $next = ($pc{$cpu}{$ixiy}{ok} || 0) + scalar(split(' ', $bin1));
+				$bin1 =~ s/%t %t/ ($next & 0xFF)." ".(($next >> 8) & 0xFF) /e;
+				$bin1 =~ s/%t/3/;
 				my @bin = split(' ', $bin1);
 			
 				$fh{$cpu}{$ixiy}{ok}->print($asmf."; ".fmthex(@bin)."\n");
+				$pc{$cpu}{$ixiy}{ok} = $next;
 			}
 		}
 		else {
@@ -1183,7 +1277,7 @@ sub add_opc_1 {
 	add_opc_2($cpu, $asm, @bin);
 	
 	# expand (ix+%d)
-	return if $asm =~ /^ldp/;
+	return if $asm =~ /^(ldp|jp)/;
 	
 	if ($asm =~ /\(hl\)/) {
 		(my $asm1 = $asm) =~ s/\(hl\)/(ix+%d)/g;
@@ -1215,14 +1309,14 @@ sub add_opc_3 {
 	
 	# expand ioi ioe
 	my $has_io;
-	if ($asm =~ /\((ix|iy|hl|bc|de|%m)/ && $asm !~ /^ldp/) {
+	if ($asm =~ /\((ix|iy|hl|bc|de|%m)/ && $asm !~ /^(ldp|jp)/) {
 		add_opc_4($cpu, "ioi $asm", $V{ioi}, @bin);
 		add_opc_4($cpu, "ioe $asm", $V{ioe}, @bin);
 		$has_io++;
 	}
 	
 	# expand altd
-	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ 
+	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rlc|rrc|rl|rr|sla|sra|sll|sli|srl|djnz) \s+ 
 									(?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
 					 | ( (?:add|adc|sub|sbc|and|xor|or|cpl|neg) \s+ (?:a|hl) )(,.*)
 					 | ( (?:ccf|scf) \s+ f)(,.*)
@@ -1246,7 +1340,7 @@ sub add_opc_3 {
 		}
 	}
 	elsif ($asm =~ /^ (?| ( (?:add|adc|sub|sbc|and|xor|or) \s+ [^,]+ )
-					    | ( (?:cp|bit) .*) 
+					    | ( (?:cp|bit|djnz) .*) 
 						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
 					  ) $/x) {
 		if ($has_io) {
@@ -1308,7 +1402,7 @@ sub parse_code {
 	
 	# store prefixes
 	if ($cpu =~ /^r/) {
-		while (@bin && 
+		while (@bin && $bin[0] =~ /^\d+$/ &&
 				($bin[0] == $V{altd} ||
 				 $bin[0] == $V{ioi} ||
 				 $bin[0] == $V{ioe})) {
@@ -1328,6 +1422,25 @@ sub parse_code {
 			"Expr *emul_func = parse_expr(\"$func\");",
 			"add_opcode_nn(0xCD, emul_func);";
 	}
+	elsif ($asm =~ /^rst/) {
+		push @code, 
+			"DO_STMT_LABEL();",
+			"if (expr_error) return FALSE;",
+			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
+			"switch (expr_value) {",
+			"case 0x00: case 0x08: case 0x30:",
+			"  if (opts.cpu & CPU_RABBIT)",
+			"    DO_stmt(0xCD0000 + (expr_value << 8));",
+			"  else",
+			"    DO_stmt(0xC7 + expr_value);",
+			"  break;",
+			"case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:",
+			"  DO_stmt(0xC7 + expr_value); break;",
+			"default: error_int_range(expr_value);",
+			"}";
+		my $code = join("\n", @code);
+		return $code;
+	}
 	elsif ($bin =~ s/ %d %n$//) {
 		$stmt = "DO_stmt_idx_n";
 	}
@@ -1340,8 +1453,17 @@ sub parse_code {
 	elsif ($bin =~ s/ %s$//) {
 		$stmt = "DO_stmt_d";
 	}
-	elsif ($asm =~ / ^ call \s+ (nz|z|nc|c|po|pe|nv|v|lz|lo|p|m) /x) {
-		return "DO_stmt_call_flag(".uc($1)."); ";
+	elsif ($bin =~ /%t %t/) {
+		push @code,
+			"DO_STMT_LABEL();",
+			"Expr *target_expr = pop_expr(ctx);",
+			"char *end_label = autolabel();",
+			"Expr *end_label_expr = parse_expr(end_label);",
+			"add_opcode_nn(0x".fmthex($bin[0]).", end_label_expr);",	# jump over
+			"add_opcode_nn(0x".fmthex($bin[3]).", target_expr);",		# call
+			"asm_LABEL_offset(end_label, 6);";
+		my $code = join("\n", @code);
+		return $code;
 	}
 	elsif ($bin =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
@@ -1528,6 +1650,28 @@ sub add_tests {
 	elsif ($asm =~ /%j/) {
 		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
 	}
+	elsif ($asm =~ /^rst %c/) {		# special case
+		for my $div (1, 8) {
+			if ($cpu =~ /^r/) {
+				add_tests($cpu, replace($asm, '%c', 0x00/$div), join(' ', 0xCD, 0x00, 0x00));
+				add_tests($cpu, replace($asm, '%c', 0x08/$div), join(' ', 0xCD, 0x08, 0x00));
+				add_tests($cpu, replace($asm, '%c', 0x30/$div), join(' ', 0xCD, 0x30, 0x00));
+			}
+			else {
+				add_tests($cpu, replace($asm, '%c', 0x00/$div), join(' ', 0xC7));
+				add_tests($cpu, replace($asm, '%c', 0x08/$div), join(' ', 0xCF));
+				add_tests($cpu, replace($asm, '%c', 0x30/$div), join(' ', 0xF7));
+			}
+			add_tests($cpu, replace($asm, '%c', 0x10/$div), join(' ', 0xD7));
+			add_tests($cpu, replace($asm, '%c', 0x18/$div), join(' ', 0xDF));
+			add_tests($cpu, replace($asm, '%c', 0x20/$div), join(' ', 0xE7));
+			add_tests($cpu, replace($asm, '%c', 0x28/$div), join(' ', 0xEF));
+			add_tests($cpu, replace($asm, '%c', 0x38/$div), join(' ', 0xFF));
+		}
+		for my $invalid (-1, 9..15, 17..23, 25..31, 33..39, 41..47, 49..55, 57..64) {
+			add_tests('', replace($asm, '%c', $invalid), '');
+		}
+	}
 	elsif ($asm =~ /%c/) {
 		$bin =~ s/%c\((.*?)\)/%c/ or die $bin;
 		my @values = eval($1); die "$cpu, $asm, $bin, $1" if $@;
@@ -1541,8 +1685,8 @@ sub add_tests {
 			$min = $_ if $_ < $min;
 			$max = $_ if $_ > $max;
 		}
-		add_tests('', replace($asm, '%c', $min-1), replace($bin, '%c', $min-1));
-		add_tests('', replace($asm, '%c', $max+1), replace($bin, '%c', $max+1));
+		add_tests('', replace($asm, '%c', $min-1), '');
+		add_tests('', replace($asm, '%c', $max+1), '');
 	}
 	elsif ($asm =~ /%d/) {
 		add_tests($cpu, replace($asm, qr/\+%d/, "+127"), replace($bin, '%d', 0x7F));

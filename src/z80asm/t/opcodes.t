@@ -1989,14 +1989,6 @@ jr2:
         ret  p                          ;; F0
         ret  m                          ;; F8
         reti                            ;; ED 4D
-; rst 0
-; rst 1
-; rst 2
-; rst 3
-; rst 4
-; rst 5
-; rst 6
-; rst 7
 
 
 IF      !RABBIT
@@ -2011,14 +2003,6 @@ IF      !RABBIT
 
         retn                            ;; ED 45
 
-        rst  00h                        ;; C7
-        rst  08h                        ;; CF
-        rst  10h                        ;; D7
-        rst  18h                        ;; DF
-        rst  20h                        ;; E7
-        rst  28h                        ;; EF
-        rst  30h                        ;; F7
-        rst  38h                        ;; FF
 ELSE    
         call nz,NN
         call z,NN
@@ -2031,16 +2015,7 @@ ELSE
 
         retn
 
-        rst  10h
-        rst  18h
-        rst  20h
-        rst  28h
-        rst  38h
-        rst  00h
-        rst  08h
-        rst  30h
 ENDIF   
-
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group
@@ -2508,22 +2483,6 @@ IF      !RABBIT
 ELSE    
 ENDIF   
         rst  undefined                  ;; error: symbol 'undefined' not defined
-        rst  -1                         ;; error: integer '-1' out of range
-        rst  1                          ;; error: integer '1' out of range
-        rst  7                          ;; error: integer '7' out of range
-        rst  9                          ;; error: integer '9' out of range
-        rst  15                         ;; error: integer '15' out of range
-        rst  17                         ;; error: integer '17' out of range
-        rst  23                         ;; error: integer '23' out of range
-        rst  25                         ;; error: integer '25' out of range
-        rst  31                         ;; error: integer '31' out of range
-        rst  33                         ;; error: integer '33' out of range
-        rst  39                         ;; error: integer '39' out of range
-        rst  41                         ;; error: integer '41' out of range
-        rst  47                         ;; error: integer '47' out of range
-        rst  49                         ;; error: integer '49' out of range
-        rst  55                         ;; error: integer '55' out of range
-        rst  57                         ;; error: integer '57' out of range
 IF      !RABBIT
 ELSE    
 ENDIF   
@@ -3282,10 +3241,10 @@ IF      !RABBIT
         cpd
         cpdr
 ELSE    
-        cpi                             ;; CD 6C 0A
-        cpir                            ;; CD 89 0A
-        cpd                             ;; CD 23 0A
-        cpdr                            ;; CD 40 0A
+        cpi                             ;; CD 67 0A
+        cpir                            ;; CD 84 0A
+        cpd                             ;; CD 1E 0A
+        cpdr                            ;; CD 3B 0A
 ENDIF   
 
 ;------------------------------------------------------------------------------
@@ -4397,14 +4356,6 @@ jr2:
         ret  p                          ;; F0
         ret  m                          ;; F8
         reti                            ;; ED 4D
-; rst 0
-; rst 1
-; rst 2
-; rst 3
-; rst 4
-; rst 5
-; rst 6
-; rst 7
 
 
 IF      !RABBIT
@@ -4419,14 +4370,6 @@ IF      !RABBIT
 
         retn
 
-        rst  00h
-        rst  08h
-        rst  10h
-        rst  18h
-        rst  20h
-        rst  28h
-        rst  30h
-        rst  38h
 ELSE    
         call nz,NN                      ;; 28 03 CD 30 00
         call z,NN                       ;; 20 03 CD 30 00
@@ -4438,13 +4381,7 @@ ELSE
         call m,NN                       ;; F2 BA 09 CD 30 00
 
 
-        rst  10h                        ;; D7
-        rst  18h                        ;; DF
-        rst  20h                        ;; E7
-        rst  28h                        ;; EF
-        rst  38h                        ;; FF
 ENDIF   
-
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group
@@ -4798,7 +4735,7 @@ ENDIF
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 48 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 91 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9
+        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 43 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 8C 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9
 END_ASM
 );
 z80asm(
@@ -5026,27 +4963,8 @@ ENDIF
 IF      !RABBIT
 ELSE    
         retn                            ;; error: illegal identifier
-        rst  00h                        ;; error: illegal identifier
-        rst  08h                        ;; error: illegal identifier
-        rst  30h                        ;; error: illegal identifier
 ENDIF   
         rst  undefined                  ;; error: symbol 'undefined' not defined
-        rst  -1                         ;; error: integer '-1' out of range
-        rst  1                          ;; error: integer '1' out of range
-        rst  7                          ;; error: integer '7' out of range
-        rst  9                          ;; error: integer '9' out of range
-        rst  15                         ;; error: integer '15' out of range
-        rst  17                         ;; error: integer '17' out of range
-        rst  23                         ;; error: integer '23' out of range
-        rst  25                         ;; error: integer '25' out of range
-        rst  31                         ;; error: integer '31' out of range
-        rst  33                         ;; error: integer '33' out of range
-        rst  39                         ;; error: integer '39' out of range
-        rst  41                         ;; error: integer '41' out of range
-        rst  47                         ;; error: integer '47' out of range
-        rst  49                         ;; error: integer '49' out of range
-        rst  55                         ;; error: integer '55' out of range
-        rst  57                         ;; error: integer '57' out of range
 IF      !RABBIT
 ELSE    
         in   a,(0)                      ;; error: illegal identifier

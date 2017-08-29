@@ -579,7 +579,6 @@ jr2:
 	ret
 	ret {nz z nc c po pe p m}
 	reti
-;	rst {0 1 2 3 4 5 6 7}
 
 
 IF !RABBIT
@@ -587,20 +586,15 @@ IF !RABBIT
 	
 	retn
 	
-	rst {00h 08h 10h 18h 20h 28h 30h 38h}
 ELSE
 	call {nz z nc c},NN					;;	jr {1!},$+5 ;; call NN
 	call {po pe p m},NN					;;	jp {1!},$+6 ;; call NN
 	
 	retn								;; error: illegal identifier
 	
-	rst {        10h 18h 20h 28h     38h}
-	rst {00h 08h                 30h    } ;; error: illegal identifier
 ENDIF
 
 	rst	undefined		   								;; error: symbol 'undefined' not defined
-	rst {-1 1 7 9 15 17 23 25 31 33 39 41 47 49 55 57}	;; error: integer '{1}' out of range
-
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------

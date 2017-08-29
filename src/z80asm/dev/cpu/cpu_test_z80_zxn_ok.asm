@@ -284,6 +284,39 @@
  bit 7, iyh                     ; FD CB 7C
  bit 7, iyl                     ; FD CB 7D
  bit 7, l                       ; CB 7D
+ call -32768                    ; CD 00 80
+ call 32767                     ; CD FF 7F
+ call 65535                     ; CD FF FF
+ call c, -32768                 ; DC 00 80
+ call c, 32767                  ; DC FF 7F
+ call c, 65535                  ; DC FF FF
+ call m, -32768                 ; FC 00 80
+ call m, 32767                  ; FC FF 7F
+ call m, 65535                  ; FC FF FF
+ call nc, -32768                ; D4 00 80
+ call nc, 32767                 ; D4 FF 7F
+ call nc, 65535                 ; D4 FF FF
+ call nv, -32768                ; E4 00 80
+ call nv, 32767                 ; E4 FF 7F
+ call nv, 65535                 ; E4 FF FF
+ call nz, -32768                ; C4 00 80
+ call nz, 32767                 ; C4 FF 7F
+ call nz, 65535                 ; C4 FF FF
+ call p, -32768                 ; F4 00 80
+ call p, 32767                  ; F4 FF 7F
+ call p, 65535                  ; F4 FF FF
+ call pe, -32768                ; EC 00 80
+ call pe, 32767                 ; EC FF 7F
+ call pe, 65535                 ; EC FF FF
+ call po, -32768                ; E4 00 80
+ call po, 32767                 ; E4 FF 7F
+ call po, 65535                 ; E4 FF FF
+ call v, -32768                 ; EC 00 80
+ call v, 32767                  ; EC FF 7F
+ call v, 65535                  ; EC FF FF
+ call z, -32768                 ; CC 00 80
+ call z, 32767                  ; CC FF 7F
+ call z, 65535                  ; CC FF FF
  ccf                            ; 3F
  ccf f                          ; 3F
  cp (hl)                        ; BE
@@ -356,6 +389,8 @@
  dec l                          ; 2D
  dec sp                         ; 3B
  di                             ; F3
+ djnz ASMPC                     ; 10 FE
+ djnz b, ASMPC                  ; 10 FE
  ei                             ; FB
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; DD E3
@@ -392,6 +427,47 @@
  inc iyl                        ; FD 2C
  inc l                          ; 2C
  inc sp                         ; 33
+ jp (hl)                        ; E9
+ jp (ix)                        ; DD E9
+ jp (iy)                        ; FD E9
+ jp -32768                      ; C3 00 80
+ jp 32767                       ; C3 FF 7F
+ jp 65535                       ; C3 FF FF
+ jp c, -32768                   ; DA 00 80
+ jp c, 32767                    ; DA FF 7F
+ jp c, 65535                    ; DA FF FF
+ jp m, -32768                   ; FA 00 80
+ jp m, 32767                    ; FA FF 7F
+ jp m, 65535                    ; FA FF FF
+ jp nc, -32768                  ; D2 00 80
+ jp nc, 32767                   ; D2 FF 7F
+ jp nc, 65535                   ; D2 FF FF
+ jp nv, -32768                  ; E2 00 80
+ jp nv, 32767                   ; E2 FF 7F
+ jp nv, 65535                   ; E2 FF FF
+ jp nz, -32768                  ; C2 00 80
+ jp nz, 32767                   ; C2 FF 7F
+ jp nz, 65535                   ; C2 FF FF
+ jp p, -32768                   ; F2 00 80
+ jp p, 32767                    ; F2 FF 7F
+ jp p, 65535                    ; F2 FF FF
+ jp pe, -32768                  ; EA 00 80
+ jp pe, 32767                   ; EA FF 7F
+ jp pe, 65535                   ; EA FF FF
+ jp po, -32768                  ; E2 00 80
+ jp po, 32767                   ; E2 FF 7F
+ jp po, 65535                   ; E2 FF FF
+ jp v, -32768                   ; EA 00 80
+ jp v, 32767                    ; EA FF 7F
+ jp v, 65535                    ; EA FF FF
+ jp z, -32768                   ; CA 00 80
+ jp z, 32767                    ; CA FF 7F
+ jp z, 65535                    ; CA FF FF
+ jr ASMPC                       ; 18 FE
+ jr c, ASMPC                    ; 38 FE
+ jr nc, ASMPC                   ; 30 FE
+ jr nz, ASMPC                   ; 20 FE
+ jr z, ASMPC                    ; 28 FE
  ld (-32768), a                 ; 32 00 80
  ld (-32768), bc                ; ED 43 00 80
  ld (-32768), de                ; ED 53 00 80
@@ -914,6 +990,17 @@
  res 7, iyh                     ; FD CB BC
  res 7, iyl                     ; FD CB BD
  res 7, l                       ; CB BD
+ ret                            ; C9
+ ret c                          ; D8
+ ret m                          ; F8
+ ret nc                         ; D0
+ ret nv                         ; E0
+ ret nz                         ; C0
+ ret p                          ; F0
+ ret pe                         ; E8
+ ret po                         ; E0
+ ret v                          ; E8
+ ret z                          ; C8
  reti                           ; ED 4D
  retn                           ; ED 45
  rl (hl)                        ; CB 16
@@ -1162,6 +1249,21 @@
  rrc l                          ; CB 0D
  rrca                           ; 0F
  rrd                            ; ED 67
+ rst 0                          ; C7
+ rst 1                          ; CF
+ rst 16                         ; D7
+ rst 2                          ; D7
+ rst 24                         ; DF
+ rst 3                          ; DF
+ rst 32                         ; E7
+ rst 4                          ; E7
+ rst 40                         ; EF
+ rst 48                         ; F7
+ rst 5                          ; EF
+ rst 56                         ; FF
+ rst 6                          ; F7
+ rst 7                          ; FF
+ rst 8                          ; CF
  sbc (hl)                       ; 9E
  sbc (ix)                       ; DD 9E 00
  sbc (ix+127)                   ; DD 9E 7F
