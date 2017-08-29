@@ -407,6 +407,18 @@
  im 0                           ; ED 46
  im 1                           ; ED 56
  im 2                           ; ED 5E
+ in (c)                         ; ED 70
+ in a, (-128)                   ; DB 80
+ in a, (127)                    ; DB 7F
+ in a, (255)                    ; DB FF
+ in a, (c)                      ; ED 78
+ in b, (c)                      ; ED 40
+ in c, (c)                      ; ED 48
+ in d, (c)                      ; ED 50
+ in e, (c)                      ; ED 58
+ in f, (c)                      ; ED 70
+ in h, (c)                      ; ED 60
+ in l, (c)                      ; ED 68
  inc (hl)                       ; 34
  inc (ix)                       ; DD 34 00
  inc (ix+127)                   ; DD 34 7F
@@ -431,6 +443,10 @@
  inc iyl                        ; FD 2C
  inc l                          ; 2C
  inc sp                         ; 33
+ ind                            ; ED AA
+ indr                           ; ED BA
+ ini                            ; ED A2
+ inir                           ; ED B2
  jp (hl)                        ; E9
  jp (ix)                        ; DD E9
  jp (iy)                        ; FD E9
@@ -841,6 +857,21 @@
  or iyh                         ; FD B4
  or iyl                         ; FD B5
  or l                           ; B5
+ otdr                           ; ED BB
+ otir                           ; ED B3
+ out (-128), a                  ; D3 80
+ out (127), a                   ; D3 7F
+ out (255), a                   ; D3 FF
+ out (c), 0                     ; ED 71
+ out (c), a                     ; ED 79
+ out (c), b                     ; ED 41
+ out (c), c                     ; ED 49
+ out (c), d                     ; ED 51
+ out (c), e                     ; ED 59
+ out (c), h                     ; ED 61
+ out (c), l                     ; ED 69
+ outd                           ; ED AB
+ outi                           ; ED A3
  pop af                         ; F1
  pop bc                         ; C1
  pop de                         ; D1

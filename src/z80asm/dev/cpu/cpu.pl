@@ -711,7 +711,9 @@ if ($ENV{DEBUG}) {
 #------------------------------------------------------------------------------
 @CPUS = qw( z80 z80_zxn z180 r2k r3k );
 
-my @R8	= qw( b c d e h l (hl) a );
+my @R8	= qw( b c d e h l      a );
+my @R8I	= qw( b c d e h l (hl) a );
+my @R8F	= qw( b c d e h l f    a );
 my @R16SP = qw( bc de hl sp );
 my @R16AF = qw( bc de hl af );
 my @ALU = qw( add adc sub sbc and xor or cp );
@@ -740,7 +742,7 @@ my @A_  = ('a, ', '');
 
 my %V = (
 	'' => '',
-	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, a => 7,
+	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, a => 7,
 	bc => 0, de => 1, hl => 2, sp => 3, af => 3,
 	_nz => 0, _z => 1, _nc => 2, _c => 3, 
 	_po => 4, _pe => 5,
@@ -767,8 +769,8 @@ for my $cpu (@CPUS) {
 	my $zilog	= ($cpu =~ /^z/);
 	
 	# 8-bit load group
-	for my $r (@R8) { 
-		for my $s (@R8) {
+	for my $r (@R8I) { 
+		for my $s (@R8I) {
 			my $op = 0x40 + $V{$r}*8 + $V{$s};
 			add_opc($cpu, "ld $r, $s", $op);
 		}
@@ -783,7 +785,7 @@ for my $cpu (@CPUS) {
 
 	# 8-bit ALU group
 	for my $op (@ALU) {
-		for my $r (@R8) {
+		for my $r (@R8I) {
 			for my $a (@A_) {
 				add_opc($cpu, "$op $a$r", 0x80 + $V{$op}*8 + $V{$r});
 			}
@@ -792,7 +794,7 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "$op $a%n", 0xC6 + $V{$op}*8, '%n');
 		}
 	}
-	for my $r (@R8) { 
+	for my $r (@R8I) { 
 		add_opc($cpu, "inc $r", 0x04 + $V{$r}*8);
 		add_opc($cpu, "dec $r", 0x05 + $V{$r}*8);
 		
@@ -1015,7 +1017,7 @@ for my $cpu (@CPUS) {
 	
 	for my $op (@ROT) {
 		next if $op =~ /sll|sli/ && !$zilog;
-		for my $r (@R8) {
+		for my $r (@R8I) {
 			add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r});
 		}
 	}
@@ -1024,7 +1026,6 @@ for my $cpu (@CPUS) {
 		for my $op (@ROT) {
 			for my $x (@X) {
 				for my $r (@R8) {
-					next if $r eq '(hl)';
 					add_opc($cpu, "$op ($x+%d), $r", $V{$x}, 0xCB, '%d', $V{$op}*8 + $V{$r});
 				}
 			}
@@ -1033,7 +1034,7 @@ for my $cpu (@CPUS) {
 	
 	# bit set, reset and test group
 	for my $op (@BIT) {
-		for my $r (@R8) {
+		for my $r (@R8I) {
 			add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 		}
 	}
@@ -1187,6 +1188,43 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "cpdr", 	0xCD, '@__z80asm__cpdr');
 	}
 
+	# Input and Output Group
+	if ($zilog) {
+		add_opc($cpu, "in a, (%n)", 		0xDB, '%n');
+		add_opc($cpu, "in (c)", 			0xED, 0x40 + $V{f}*8);
+		add_opc($cpu, "in0 (%n)", 			0xED, 0x00 + $V{f}*8, '%n') if $z180;
+		for my $r (@R8F) {
+			add_opc($cpu, "in $r, (c)", 	0xED, 0x40 + $V{$r}*8);
+			add_opc($cpu, "in0 $r, (%n)", 	0xED, 0x00 + $V{$r}*8, '%n') if $z180;
+		}
+		
+		add_opc($cpu, "out (%n), a", 		0xD3, '%n');
+		add_opc($cpu, "out (c), %c", 		0xED, '0x41+%c(0)+6*8');
+
+		for my $r (@R8) {
+			add_opc($cpu, "out (c), $r", 	0xED, 0x41 + $V{$r}*8);
+			add_opc($cpu, "out0 (%n), $r", 	0xED, 0x01 + $V{$r}*8, '%n') if $z180;
+		}
+		
+		add_opc($cpu, "tstio %n", 			0xED, 0x74, '%n') if $z180;
+
+		add_opc($cpu, "ini", 	0xED, 0xA2);
+		add_opc($cpu, "inir", 	0xED, 0xB2);
+		add_opc($cpu, "ind", 	0xED, 0xAA);
+		add_opc($cpu, "indr", 	0xED, 0xBA);
+
+		add_opc($cpu, "outi", 	0xED, 0xA3);
+		add_opc($cpu, "otir", 	0xED, 0xB3);
+		add_opc($cpu, "outd", 	0xED, 0xAB);
+		add_opc($cpu, "otdr", 	0xED, 0xBB);
+
+		if ($z180) {
+			add_opc($cpu, "otdm", 	0xED, 0x8B);
+			add_opc($cpu, "otdmr", 	0xED, 0x9B);
+			add_opc($cpu, "otim", 	0xED, 0x83);
+			add_opc($cpu, "otimr", 	0xED, 0x93);
+		}
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -1294,7 +1332,7 @@ sub add_opc {
 	add_opc_1($cpu, $asm, @bin);
 	
 	# expand ixh, ixl, ...
-	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && $asm !~ /hl|ix|iy/) {
+	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && $asm !~ /\b(hl|ix|iy|in|out)\b/) {
 		(my $asm1 = $asm) =~ s/\b([hl])\b/ix$1/g;
 		add_opc_1($cpu, $asm1, $V{ix}, @bin);
 		(   $asm1 = $asm) =~ s/\b([hl])\b/iy$1/g;
@@ -1806,21 +1844,21 @@ __END__
 			my $op = 0x40 + $r*8 + $s;
 			
 			if ($op != 0x76) {
-				my @ops = (["ld $R8[$r],$R8[$s]", $op]);
+				my @ops = (["ld $R8I[$r],$R8I[$s]", $op]);
 				@ops = expand_ix8(@ops) if $z80;
 				@ops = expand_ind_ix(@ops);
 				
 				add_ops($cpu, @ops);
-				add_ix8($cpu, "ld $R8[$r1],$R8[$r2]", $op);
-				add_iix($cpu, "ld $R8[$r1],$R8[$r2]", $op);
+				add_ix8($cpu, "ld $R8I[$r1],$R8I[$r2]", $op);
+				add_iix($cpu, "ld $R8I[$r1],$R8I[$r2]", $op);
 				if ($cpu =~ /^r/) {
 					if ($r1 != 6) {
-						add_ops($cpu, "altd ld $R8[$r1],$R8[$r2]", $ALTD, $op);
-						add_ops($cpu, "ld $R8[$r1]',$R8[$r2]", $ALTD, $op);
+						add_ops($cpu, "altd ld $R8I[$r1],$R8I[$r2]", $ALTD, $op);
+						add_ops($cpu, "ld $R8I[$r1]',$R8I[$r2]", $ALTD, $op);
 					}
 					elsif ($r1 == 6 || $r2 == 6) {
-						add_ops($cpu, "ioi ld $R8[$r1],$R8[$r2]", $IOI, $op);
-						add_ops($cpu, "ioe ld $R8[$r1],$R8[$r2]", $IOE, $op);
+						add_ops($cpu, "ioi ld $R8I[$r1],$R8I[$r2]", $IOI, $op);
+						add_ops($cpu, "ioe ld $R8I[$r1],$R8I[$r2]", $IOE, $op);
 					}
 				}
 			}

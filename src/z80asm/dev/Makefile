@@ -35,9 +35,8 @@ scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 	
 all:: parse_rules.h
 
-dev/cpu/cpu_rules.h : dev/cpu/cpu.def dev/cpu/cpu.pl dev/cpu/cpu_rules_old.h dev/Makefile
+dev/cpu/cpu_rules.h : dev/cpu/cpu.def dev/cpu/cpu.pl dev/Makefile
 	perl dev/cpu/cpu.pl
-	perl -i.bak -pe "s/\bCPU_Z80\b/(CPU_Z80|CPU_Z80_ZXN)/g" dev/cpu/cpu_rules_old.h 
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile \

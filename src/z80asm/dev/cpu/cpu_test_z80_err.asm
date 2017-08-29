@@ -1732,6 +1732,33 @@
  im -1                          ; Error
  im 3                           ; Error
  im 3                           ; Error
+ in0 (-128)                     ; Error
+ in0 (127)                      ; Error
+ in0 (255)                      ; Error
+ in0 a, (-128)                  ; Error
+ in0 a, (127)                   ; Error
+ in0 a, (255)                   ; Error
+ in0 b, (-128)                  ; Error
+ in0 b, (127)                   ; Error
+ in0 b, (255)                   ; Error
+ in0 c, (-128)                  ; Error
+ in0 c, (127)                   ; Error
+ in0 c, (255)                   ; Error
+ in0 d, (-128)                  ; Error
+ in0 d, (127)                   ; Error
+ in0 d, (255)                   ; Error
+ in0 e, (-128)                  ; Error
+ in0 e, (127)                   ; Error
+ in0 e, (255)                   ; Error
+ in0 f, (-128)                  ; Error
+ in0 f, (127)                   ; Error
+ in0 f, (255)                   ; Error
+ in0 h, (-128)                  ; Error
+ in0 h, (127)                   ; Error
+ in0 h, (255)                   ; Error
+ in0 l, (-128)                  ; Error
+ in0 l, (127)                   ; Error
+ in0 l, (255)                   ; Error
  inc a'                         ; Error
  inc b'                         ; Error
  inc bc'                        ; Error
@@ -4141,6 +4168,35 @@
  or hl, de                      ; Error
  or ix, de                      ; Error
  or iy, de                      ; Error
+ otdm                           ; Error
+ otdmr                          ; Error
+ otim                           ; Error
+ otimr                          ; Error
+ out (c), -1                    ; Error
+ out (c), -1                    ; Error
+ out (c), 1                     ; Error
+ out (c), 1                     ; Error
+ out0 (-128), a                 ; Error
+ out0 (-128), b                 ; Error
+ out0 (-128), c                 ; Error
+ out0 (-128), d                 ; Error
+ out0 (-128), e                 ; Error
+ out0 (-128), h                 ; Error
+ out0 (-128), l                 ; Error
+ out0 (127), a                  ; Error
+ out0 (127), b                  ; Error
+ out0 (127), c                  ; Error
+ out0 (127), d                  ; Error
+ out0 (127), e                  ; Error
+ out0 (127), h                  ; Error
+ out0 (127), l                  ; Error
+ out0 (255), a                  ; Error
+ out0 (255), b                  ; Error
+ out0 (255), c                  ; Error
+ out0 (255), d                  ; Error
+ out0 (255), e                  ; Error
+ out0 (255), h                  ; Error
+ out0 (255), l                  ; Error
  pop af'                        ; Error
  pop bc'                        ; Error
  pop de'                        ; Error
@@ -4738,6 +4794,9 @@
  tst e                          ; Error
  tst h                          ; Error
  tst l                          ; Error
+ tstio -128                     ; Error
+ tstio 127                      ; Error
+ tstio 255                      ; Error
  uma                            ; Error
  ums                            ; Error
  xor a', (hl)                   ; Error

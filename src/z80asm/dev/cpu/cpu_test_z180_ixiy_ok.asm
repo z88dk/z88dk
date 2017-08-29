@@ -339,6 +339,45 @@
  im 0                           ; ED 46
  im 1                           ; ED 56
  im 2                           ; ED 5E
+ in (c)                         ; ED 70
+ in a, (-128)                   ; DB 80
+ in a, (127)                    ; DB 7F
+ in a, (255)                    ; DB FF
+ in a, (c)                      ; ED 78
+ in b, (c)                      ; ED 40
+ in c, (c)                      ; ED 48
+ in d, (c)                      ; ED 50
+ in e, (c)                      ; ED 58
+ in f, (c)                      ; ED 70
+ in h, (c)                      ; ED 60
+ in l, (c)                      ; ED 68
+ in0 (-128)                     ; ED 30 80
+ in0 (127)                      ; ED 30 7F
+ in0 (255)                      ; ED 30 FF
+ in0 a, (-128)                  ; ED 38 80
+ in0 a, (127)                   ; ED 38 7F
+ in0 a, (255)                   ; ED 38 FF
+ in0 b, (-128)                  ; ED 00 80
+ in0 b, (127)                   ; ED 00 7F
+ in0 b, (255)                   ; ED 00 FF
+ in0 c, (-128)                  ; ED 08 80
+ in0 c, (127)                   ; ED 08 7F
+ in0 c, (255)                   ; ED 08 FF
+ in0 d, (-128)                  ; ED 10 80
+ in0 d, (127)                   ; ED 10 7F
+ in0 d, (255)                   ; ED 10 FF
+ in0 e, (-128)                  ; ED 18 80
+ in0 e, (127)                   ; ED 18 7F
+ in0 e, (255)                   ; ED 18 FF
+ in0 f, (-128)                  ; ED 30 80
+ in0 f, (127)                   ; ED 30 7F
+ in0 f, (255)                   ; ED 30 FF
+ in0 h, (-128)                  ; ED 20 80
+ in0 h, (127)                   ; ED 20 7F
+ in0 h, (255)                   ; ED 20 FF
+ in0 l, (-128)                  ; ED 28 80
+ in0 l, (127)                   ; ED 28 7F
+ in0 l, (255)                   ; ED 28 FF
  inc (hl)                       ; 34
  inc (ix)                       ; FD 34 00
  inc (ix+127)                   ; FD 34 7F
@@ -359,6 +398,10 @@
  inc iy                         ; DD 23
  inc l                          ; 2C
  inc sp                         ; 33
+ ind                            ; ED AA
+ indr                           ; ED BA
+ ini                            ; ED A2
+ inir                           ; ED B2
  jp (hl)                        ; E9
  jp (ix)                        ; FD E9
  jp (iy)                        ; DD E9
@@ -705,6 +748,46 @@
  or e                           ; B3
  or h                           ; B4
  or l                           ; B5
+ otdm                           ; ED 8B
+ otdmr                          ; ED 9B
+ otdr                           ; ED BB
+ otim                           ; ED 83
+ otimr                          ; ED 93
+ otir                           ; ED B3
+ out (-128), a                  ; D3 80
+ out (127), a                   ; D3 7F
+ out (255), a                   ; D3 FF
+ out (c), 0                     ; ED 71
+ out (c), a                     ; ED 79
+ out (c), b                     ; ED 41
+ out (c), c                     ; ED 49
+ out (c), d                     ; ED 51
+ out (c), e                     ; ED 59
+ out (c), h                     ; ED 61
+ out (c), l                     ; ED 69
+ out0 (-128), a                 ; ED 39 80
+ out0 (-128), b                 ; ED 01 80
+ out0 (-128), c                 ; ED 09 80
+ out0 (-128), d                 ; ED 11 80
+ out0 (-128), e                 ; ED 19 80
+ out0 (-128), h                 ; ED 21 80
+ out0 (-128), l                 ; ED 29 80
+ out0 (127), a                  ; ED 39 7F
+ out0 (127), b                  ; ED 01 7F
+ out0 (127), c                  ; ED 09 7F
+ out0 (127), d                  ; ED 11 7F
+ out0 (127), e                  ; ED 19 7F
+ out0 (127), h                  ; ED 21 7F
+ out0 (127), l                  ; ED 29 7F
+ out0 (255), a                  ; ED 39 FF
+ out0 (255), b                  ; ED 01 FF
+ out0 (255), c                  ; ED 09 FF
+ out0 (255), d                  ; ED 11 FF
+ out0 (255), e                  ; ED 19 FF
+ out0 (255), h                  ; ED 21 FF
+ out0 (255), l                  ; ED 29 FF
+ outd                           ; ED AB
+ outi                           ; ED A3
  pop af                         ; F1
  pop bc                         ; C1
  pop de                         ; D1
@@ -1244,6 +1327,9 @@
  tst e                          ; ED 1C
  tst h                          ; ED 24
  tst l                          ; ED 2C
+ tstio -128                     ; ED 74 80
+ tstio 127                      ; ED 74 7F
+ tstio 255                      ; ED 74 FF
  xor (hl)                       ; AE
  xor (ix)                       ; FD AE 00
  xor (ix+127)                   ; FD AE 7F

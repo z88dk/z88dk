@@ -9,36 +9,6 @@
 ; Repository: https://github.com/z88dk/z88dk
 ;------------------------------------------------------------------------------
 
-;------------------------------------------------------------------------------
-; Input and Output Group
-;------------------------------------------------------------------------------
-[zilog]		in  a, (N)							=> DB N
-[zilog]		in  {b|c|d|e|h|l|f|a}, (c)			=> ED 40+$1*8
-[z180]		in0 {b|c|d|e|h|l|f|a}, (N)			=> ED 00+$1*8 N
-		
-[zilog]		out  (N), a							=> D3 N
-[zilog]		out  (c), {b|c|d|e|h|l||a}			=> ED 41+$1*8
-[zilog]		out  (c), CONST						=> ED 41+choose(0:6)*8
-		
-[z180]		out0 (N), {b|c|d|e|h|l||a}			=> ED 01+$1*8 N
-		
-[z180]		tstio N								=> ED 74 N
-
-[zilog]		ini									=> ED A2
-[zilog]		inir								=> ED B2
-[zilog]		ind									=> ED AA
-[zilog]		indr								=> ED BA
-
-[zilog]		outi								=> ED A3
-[zilog]		otir								=> ED B3
-[zilog]		outd								=> ED AB
-[zilog]		otdr								=> ED BB
-					
-[z180]		otdm								=> ED 8B
-[z180]		otdmr								=> ED 9B
-[z180]		otim								=> ED 83
-[z180]		otimr								=> ED 93
-
 __END__
 
 ;------------------------------------------------------------------------------

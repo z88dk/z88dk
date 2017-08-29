@@ -378,7 +378,6 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 		| label _TK_NEWLINE @{ DO_STMT_LABEL(); }
 
-#include "dev/cpu/cpu_rules_old.h"
 #include "dev/cpu/cpu_rules.h"
 
 		/*---------------------------------------------------------------------

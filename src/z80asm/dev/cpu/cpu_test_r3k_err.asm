@@ -317,10 +317,53 @@
  im 2                           ; Error
  im 3                           ; Error
  im 3                           ; Error
+ in (c)                         ; Error
+ in a, (-128)                   ; Error
+ in a, (127)                    ; Error
+ in a, (255)                    ; Error
+ in a, (c)                      ; Error
+ in b, (c)                      ; Error
+ in c, (c)                      ; Error
+ in d, (c)                      ; Error
+ in e, (c)                      ; Error
+ in f, (c)                      ; Error
+ in h, (c)                      ; Error
+ in l, (c)                      ; Error
+ in0 (-128)                     ; Error
+ in0 (127)                      ; Error
+ in0 (255)                      ; Error
+ in0 a, (-128)                  ; Error
+ in0 a, (127)                   ; Error
+ in0 a, (255)                   ; Error
+ in0 b, (-128)                  ; Error
+ in0 b, (127)                   ; Error
+ in0 b, (255)                   ; Error
+ in0 c, (-128)                  ; Error
+ in0 c, (127)                   ; Error
+ in0 c, (255)                   ; Error
+ in0 d, (-128)                  ; Error
+ in0 d, (127)                   ; Error
+ in0 d, (255)                   ; Error
+ in0 e, (-128)                  ; Error
+ in0 e, (127)                   ; Error
+ in0 e, (255)                   ; Error
+ in0 f, (-128)                  ; Error
+ in0 f, (127)                   ; Error
+ in0 f, (255)                   ; Error
+ in0 h, (-128)                  ; Error
+ in0 h, (127)                   ; Error
+ in0 h, (255)                   ; Error
+ in0 l, (-128)                  ; Error
+ in0 l, (127)                   ; Error
+ in0 l, (255)                   ; Error
  inc ixh                        ; Error
  inc ixl                        ; Error
  inc iyh                        ; Error
  inc iyl                        ; Error
+ ind                            ; Error
+ indr                           ; Error
+ ini                            ; Error
+ inir                           ; Error
  ioe altd bit -1, (hl)          ; Error
  ioe altd bit -1, (hl)          ; Error
  ioe altd bit -1, (ix)          ; Error
@@ -622,6 +665,50 @@
  or ixl                         ; Error
  or iyh                         ; Error
  or iyl                         ; Error
+ otdm                           ; Error
+ otdmr                          ; Error
+ otdr                           ; Error
+ otim                           ; Error
+ otimr                          ; Error
+ otir                           ; Error
+ out (-128), a                  ; Error
+ out (127), a                   ; Error
+ out (255), a                   ; Error
+ out (c), -1                    ; Error
+ out (c), -1                    ; Error
+ out (c), 0                     ; Error
+ out (c), 1                     ; Error
+ out (c), 1                     ; Error
+ out (c), a                     ; Error
+ out (c), b                     ; Error
+ out (c), c                     ; Error
+ out (c), d                     ; Error
+ out (c), e                     ; Error
+ out (c), h                     ; Error
+ out (c), l                     ; Error
+ out0 (-128), a                 ; Error
+ out0 (-128), b                 ; Error
+ out0 (-128), c                 ; Error
+ out0 (-128), d                 ; Error
+ out0 (-128), e                 ; Error
+ out0 (-128), h                 ; Error
+ out0 (-128), l                 ; Error
+ out0 (127), a                  ; Error
+ out0 (127), b                  ; Error
+ out0 (127), c                  ; Error
+ out0 (127), d                  ; Error
+ out0 (127), e                  ; Error
+ out0 (127), h                  ; Error
+ out0 (127), l                  ; Error
+ out0 (255), a                  ; Error
+ out0 (255), b                  ; Error
+ out0 (255), c                  ; Error
+ out0 (255), d                  ; Error
+ out0 (255), e                  ; Error
+ out0 (255), h                  ; Error
+ out0 (255), l                  ; Error
+ outd                           ; Error
+ outi                           ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error
  res -1, (ix)                   ; Error
@@ -1516,6 +1603,9 @@
  tst e                          ; Error
  tst h                          ; Error
  tst l                          ; Error
+ tstio -128                     ; Error
+ tstio 127                      ; Error
+ tstio 255                      ; Error
  xor a, ixh                     ; Error
  xor a, ixl                     ; Error
  xor a, iyh                     ; Error

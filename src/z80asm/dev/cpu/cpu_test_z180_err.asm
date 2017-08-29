@@ -4277,6 +4277,10 @@
  or iy, de                      ; Error
  or iyh                         ; Error
  or iyl                         ; Error
+ out (c), -1                    ; Error
+ out (c), -1                    ; Error
+ out (c), 1                     ; Error
+ out (c), 1                     ; Error
  pop af'                        ; Error
  pop bc'                        ; Error
  pop de'                        ; Error
