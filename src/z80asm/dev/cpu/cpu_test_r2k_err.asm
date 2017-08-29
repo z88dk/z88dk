@@ -378,6 +378,12 @@
  ioe bit 8, (iy+127)            ; Error
  ioe bit 8, (iy-128)            ; Error
  ioe bit 8, (iy-128)            ; Error
+ ioe lddsr                      ; Error
+ ioe ldisr                      ; Error
+ ioe lsddr                      ; Error
+ ioe lsdr                       ; Error
+ ioe lsidr                      ; Error
+ ioe lsir                       ; Error
  ioe res -1, (hl)               ; Error
  ioe res -1, (hl)               ; Error
  ioe res -1, (ix)               ; Error
@@ -490,6 +496,12 @@
  ioi bit 8, (iy+127)            ; Error
  ioi bit 8, (iy-128)            ; Error
  ioi bit 8, (iy-128)            ; Error
+ ioi lddsr                      ; Error
+ ioi ldisr                      ; Error
+ ioi lsddr                      ; Error
+ ioi lsdr                       ; Error
+ ioi lsidr                      ; Error
+ ioi lsir                       ; Error
  ioi res -1, (hl)               ; Error
  ioi res -1, (hl)               ; Error
  ioi res -1, (ix)               ; Error
@@ -614,6 +626,12 @@
  ld iyl, iyh                    ; Error
  ld iyl, iyl                    ; Error
  ld r, a                        ; Error
+ lddsr                          ; Error
+ ldisr                          ; Error
+ lsddr                          ; Error
+ lsdr                           ; Error
+ lsidr                          ; Error
+ lsir                           ; Error
  mlt sp                         ; Error
  or a, ixh                      ; Error
  or a, ixl                      ; Error

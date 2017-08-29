@@ -38,13 +38,13 @@ LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 
 TARGET_LIB =	z80asm.lib
-TARGET_LST =	dev/z80asm_lib/z80asm_lib.lst
 TARGET_ASM =	$(wildcard dev/z80asm_lib/*.asm)
 
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
 .PHONY: all
+
 all: $(TARGET)
 
 $(TARGET): ../config.h $(OBJS)
@@ -67,8 +67,9 @@ parse.o: parse.c
 # library
 #------------------------------------------------------------------------------
 all: $(TARGET_LIB)
-$(TARGET_LIB): $(TARGET) $(TARGET_LST) $(TARGET_ASM)
-	./$(TARGET) -x$(TARGET_LIB) -d @$(TARGET_LST)
+
+$(TARGET_LIB): $(TARGET) $(TARGET_ASM)
+	./$(TARGET) -x$(TARGET_LIB) -d $(TARGET_ASM)
 
 clean::
 	$(RM) $(TARGET_LIB) $(TARGET_ASM:.asm=.o)

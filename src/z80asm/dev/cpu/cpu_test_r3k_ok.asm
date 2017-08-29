@@ -1770,6 +1770,10 @@
  cp e                           ; BB
  cp h                           ; BC
  cp l                           ; BD
+ cpd                            ; CD @__z80asm__cpd
+ cpdr                           ; CD @__z80asm__cpdr
+ cpi                            ; CD @__z80asm__cpi
+ cpir                           ; CD @__z80asm__cpir
  cpl                            ; 2F
  cpl a                          ; 2F
  cpl a'                         ; 76 2F
@@ -2539,6 +2543,16 @@
  ioe ld sp, (-32768)            ; DB ED 7B 00 80
  ioe ld sp, (32767)             ; DB ED 7B FF 7F
  ioe ld sp, (65535)             ; DB ED 7B FF FF
+ ioe ldd                        ; DB ED A8
+ ioe lddr                       ; DB ED B8
+ ioe lddsr                      ; DB ED 98
+ ioe ldi                        ; DB ED A0
+ ioe ldir                       ; DB ED B0
+ ioe ldisr                      ; DB ED 90
+ ioe lsddr                      ; DB ED D8
+ ioe lsdr                       ; DB ED F8
+ ioe lsidr                      ; DB ED D0
+ ioe lsir                       ; DB ED F0
  ioe or (hl)                    ; DB B6
  ioe or (ix)                    ; DB DD B6 00
  ioe or (ix+127)                ; DB DD B6 7F
@@ -3475,6 +3489,16 @@
  ioi ld sp, (-32768)            ; D3 ED 7B 00 80
  ioi ld sp, (32767)             ; D3 ED 7B FF 7F
  ioi ld sp, (65535)             ; D3 ED 7B FF FF
+ ioi ldd                        ; D3 ED A8
+ ioi lddr                       ; D3 ED B8
+ ioi lddsr                      ; D3 ED 98
+ ioi ldi                        ; D3 ED A0
+ ioi ldir                       ; D3 ED B0
+ ioi ldisr                      ; D3 ED 90
+ ioi lsddr                      ; D3 ED D8
+ ioi lsdr                       ; D3 ED F8
+ ioi lsidr                      ; D3 ED D0
+ ioi lsir                       ; D3 ED F0
  ioi or (hl)                    ; D3 B6
  ioi or (ix)                    ; D3 DD B6 00
  ioi or (ix+127)                ; D3 DD B6 7F
@@ -4239,6 +4263,12 @@
  ld sp, ix                      ; DD F9
  ld sp, iy                      ; FD F9
  ld xpc, a                      ; ED 67
+ ldd                            ; ED A8
+ lddr                           ; ED B8
+ lddsr                          ; ED 98
+ ldi                            ; ED A0
+ ldir                           ; ED B0
+ ldisr                          ; ED 90
  ldp (-32768), hl               ; ED 65 00 80
  ldp (-32768), ix               ; DD 65 00 80
  ldp (-32768), iy               ; FD 65 00 80
@@ -4263,6 +4293,10 @@
  ldp iy, (-32768)               ; FD 6D 00 80
  ldp iy, (32767)                ; FD 6D FF 7F
  ldp iy, (65535)                ; FD 6D FF FF
+ lsddr                          ; ED D8
+ lsdr                           ; ED F8
+ lsidr                          ; ED D0
+ lsir                           ; ED F0
  mlt bc                         ; ED 4C
  mlt de                         ; ED 5C
  mlt hl                         ; ED 6C

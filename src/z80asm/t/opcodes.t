@@ -792,18 +792,6 @@ ENDIF
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-IF      !RABBIT
-        cpi                             ;; ED A1
-        cpir                            ;; ED B1
-        cpd                             ;; ED A9
-        cpdr                            ;; ED B9
-ELSE    
-        cpi
-        cpir
-        cpd
-        cpdr
-ENDIF   
-
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
 ;------------------------------------------------------------------------------
@@ -2450,9 +2438,6 @@ IF      !RABBIT
 ELSE    
 ENDIF   
 IF      !RABBIT
-ELSE    
-ENDIF   
-IF      !RABBIT
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
         im   undefined                  ;; error: symbol 'undefined' not defined
@@ -3234,18 +3219,6 @@ ENDIF
         ldir                            ;; ED B0
         ldd                             ;; ED A8
         lddr                            ;; ED B8
-
-IF      !RABBIT
-        cpi
-        cpir
-        cpd
-        cpdr
-ELSE    
-        cpi                             ;; CD 67 0A
-        cpir                            ;; CD 84 0A
-        cpd                             ;; CD 1E 0A
-        cpdr                            ;; CD 3B 0A
-ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -4375,10 +4348,10 @@ ELSE
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA A8 09 CD 30 00
-        call pe,NN                      ;; E2 AE 09 CD 30 00
-        call p,NN                       ;; FA B4 09 CD 30 00
-        call m,NN                       ;; F2 BA 09 CD 30 00
+        call po,NN                      ;; EA 9C 09 CD 30 00
+        call pe,NN                      ;; E2 A2 09 CD 30 00
+        call p,NN                       ;; FA A8 09 CD 30 00
+        call m,NN                       ;; F2 AE 09 CD 30 00
 
 
 ENDIF   
@@ -4735,7 +4708,7 @@ ENDIF
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 43 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 8C 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9
+        invoke 65535                    ;; CD FF FF
 END_ASM
 );
 z80asm(
@@ -4845,9 +4818,6 @@ ENDIF
         ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
         ld   (de),N                     ;; error: syntax error
-IF      !RABBIT
-ELSE    
-ENDIF   
 IF      !RABBIT
 ELSE    
 ENDIF   

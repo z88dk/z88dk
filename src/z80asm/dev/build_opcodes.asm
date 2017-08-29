@@ -402,18 +402,6 @@ ENDIF
 	ldd
 	lddr
 
-IF !RABBIT
-	cpi
-	cpir
-	cpd	
-	cpdr
-ELSE
-	cpi									;;	call rcmx_cpi
-	cpir								;;	call rcmx_cpir
-	cpd									;;	call rcmx_cpd
-	cpdr								;;	call rcmx_cpdr
-ENDIF
-
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
 ;------------------------------------------------------------------------------

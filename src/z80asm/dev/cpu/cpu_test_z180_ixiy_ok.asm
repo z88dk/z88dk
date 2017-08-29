@@ -297,6 +297,10 @@
  cp e                           ; BB
  cp h                           ; BC
  cp l                           ; BD
+ cpd                            ; ED A9
+ cpdr                           ; ED B9
+ cpi                            ; ED A1
+ cpir                           ; ED B1
  cpl                            ; 2F
  cpl a                          ; 2F
  daa                            ; 27
@@ -656,6 +660,10 @@
  ld sp, hl                      ; F9
  ld sp, ix                      ; FD F9
  ld sp, iy                      ; DD F9
+ ldd                            ; ED A8
+ lddr                           ; ED B8
+ ldi                            ; ED A0
+ ldir                           ; ED B0
  mlt bc                         ; ED 4C
  mlt de                         ; ED 5C
  mlt hl                         ; ED 6C

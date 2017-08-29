@@ -641,37 +641,37 @@
  lsir                   ;; 0B5B:  ED F0
  lsddr                  ;; 0B5B:  ED D8
  lsidr                  ;; 0B5B:  ED D0
- ld a, xpc              ;; 0B67:  ED 77
- ld a', xpc             ;; 0B67:  76 ED 77
- ld xpc, a              ;; 0B67:  ED 67
- rdmode                 ;; 0B67:  ED 7F
- setusr                 ;; 0B67:  ED 6F
- sures                  ;; 0B67:  ED 7D
- syscall                ;; 0B67:  ED 75
- jp lz, 0               ;; 0C09:  E2 00 00
- jp lz, 291             ;; 0C09:  E2 23 01
- jp lz, 17767           ;; 0C09:  E2 67 45
- jp lz, 35243           ;; 0C09:  E2 AB 89
- jp lz, 52719           ;; 0C09:  E2 EF CD
- jp lz, 65535           ;; 0C09:  E2 FF FF
- jp lo, 0               ;; 0C09:  EA 00 00
- jp lo, 291             ;; 0C09:  EA 23 01
- jp lo, 17767           ;; 0C09:  EA 67 45
- jp lo, 35243           ;; 0C09:  EA AB 89
- jp lo, 52719           ;; 0C09:  EA EF CD
- jp lo, 65535           ;; 0C09:  EA FF FF
- djnz b', ASMPC         ;; 0C12:  76 10 FE
- ret lz                 ;; 0C37:  E0
- ret lo                 ;; 0C37:  E8
- ipset 0                ;; 0D4C:  ED 46
- ipset 1                ;; 0D4C:  ED 56
- ipset 2                ;; 0D4C:  ED 4E
- ipset 3                ;; 0D4C:  ED 5E
- ipres                  ;; 0D4C:  ED 5D
- ld iir, a              ;; 0D54:  ED 4F
- ld a, iir              ;; 0D54:  ED 5F
- ld a', iir             ;; 0D54:  76 ED 5F
- ld eir, a              ;; 0D54:  ED 47
- ld a, eir              ;; 0D54:  ED 57
- ld a', eir             ;; 0D54:  76 ED 57
- idet                   ;; 0D58:  5B
+ ld a, xpc              ;; 0B5F:  ED 77
+ ld a', xpc             ;; 0B5F:  76 ED 77
+ ld xpc, a              ;; 0B5F:  ED 67
+ rdmode                 ;; 0B5F:  ED 7F
+ setusr                 ;; 0B5F:  ED 6F
+ sures                  ;; 0B5F:  ED 7D
+ syscall                ;; 0B5F:  ED 75
+ jp lz, 0               ;; 0C01:  E2 00 00
+ jp lz, 291             ;; 0C01:  E2 23 01
+ jp lz, 17767           ;; 0C01:  E2 67 45
+ jp lz, 35243           ;; 0C01:  E2 AB 89
+ jp lz, 52719           ;; 0C01:  E2 EF CD
+ jp lz, 65535           ;; 0C01:  E2 FF FF
+ jp lo, 0               ;; 0C01:  EA 00 00
+ jp lo, 291             ;; 0C01:  EA 23 01
+ jp lo, 17767           ;; 0C01:  EA 67 45
+ jp lo, 35243           ;; 0C01:  EA AB 89
+ jp lo, 52719           ;; 0C01:  EA EF CD
+ jp lo, 65535           ;; 0C01:  EA FF FF
+ djnz b', ASMPC         ;; 0C0A:  76 10 FE
+ ret lz                 ;; 0C2F:  E0
+ ret lo                 ;; 0C2F:  E8
+ ipset 0                ;; 0D44:  ED 46
+ ipset 1                ;; 0D44:  ED 56
+ ipset 2                ;; 0D44:  ED 4E
+ ipset 3                ;; 0D44:  ED 5E
+ ipres                  ;; 0D44:  ED 5D
+ ld iir, a              ;; 0D4C:  ED 4F
+ ld a, iir              ;; 0D4C:  ED 5F
+ ld a', iir             ;; 0D4C:  76 ED 5F
+ ld eir, a              ;; 0D4C:  ED 47
+ ld a, eir              ;; 0D4C:  ED 57
+ ld a', eir             ;; 0D4C:  76 ED 57
+ idet                   ;; 0D50:  5B

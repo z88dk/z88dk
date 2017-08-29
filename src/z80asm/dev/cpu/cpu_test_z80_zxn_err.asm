@@ -2489,6 +2489,16 @@
  ioe ld sp, (-32768)            ; Error
  ioe ld sp, (32767)             ; Error
  ioe ld sp, (65535)             ; Error
+ ioe ldd                        ; Error
+ ioe lddr                       ; Error
+ ioe lddsr                      ; Error
+ ioe ldi                        ; Error
+ ioe ldir                       ; Error
+ ioe ldisr                      ; Error
+ ioe lsddr                      ; Error
+ ioe lsdr                       ; Error
+ ioe lsidr                      ; Error
+ ioe lsir                       ; Error
  ioe or (hl)                    ; Error
  ioe or (ix)                    ; Error
  ioe or (ix+127)                ; Error
@@ -3537,6 +3547,16 @@
  ioi ld sp, (-32768)            ; Error
  ioi ld sp, (32767)             ; Error
  ioi ld sp, (65535)             ; Error
+ ioi ldd                        ; Error
+ ioi lddr                       ; Error
+ ioi lddsr                      ; Error
+ ioi ldi                        ; Error
+ ioi ldir                       ; Error
+ ioi ldisr                      ; Error
+ ioi lsddr                      ; Error
+ ioi lsdr                       ; Error
+ ioi lsidr                      ; Error
+ ioi lsir                       ; Error
  ioi or (hl)                    ; Error
  ioi or (ix)                    ; Error
  ioi or (ix+127)                ; Error
@@ -4064,6 +4084,8 @@
  ld l', h                       ; Error
  ld l', l                       ; Error
  ld xpc, a                      ; Error
+ lddsr                          ; Error
+ ldisr                          ; Error
  ldp (-32768), hl               ; Error
  ldp (-32768), ix               ; Error
  ldp (-32768), iy               ; Error
@@ -4088,6 +4110,10 @@
  ldp iy, (-32768)               ; Error
  ldp iy, (32767)                ; Error
  ldp iy, (65535)                ; Error
+ lsddr                          ; Error
+ lsdr                           ; Error
+ lsidr                          ; Error
+ lsir                           ; Error
  mlt bc                         ; Error
  mlt de                         ; Error
  mlt hl                         ; Error

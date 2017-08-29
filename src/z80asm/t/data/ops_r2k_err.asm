@@ -164,10 +164,6 @@
  lsir                   ;; 1104:  ED F0
  lsddr                  ;; 1104:  ED D8
  lsidr                  ;; 1104:  ED D0
- cpi                    ;; 1104:  ED A1
- cpir                   ;; 1104:  ED B1
- cpd                    ;; 1104:  ED A9
- cpdr                   ;; 1104:  ED B9
  halt                   ;; 1105:  76
  slp                    ;; 1105:  ED 76
  rdmode                 ;; 110C:  ED 7F

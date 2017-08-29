@@ -154,10 +154,6 @@
  sll (iy+-128)          ;; 0BE7:  FD CB 80 36
  sll (iy)               ;; 0BE7:  FD CB 00 36
  sll (iy+127)           ;; 0BE7:  FD CB 7F 36
- cpi                    ;; 1118:  ED A1
- cpir                   ;; 1118:  ED B1
- cpd                    ;; 1118:  ED A9
- cpdr                   ;; 1118:  ED B9
  halt                   ;; 1119:  76
  slp                    ;; 1119:  ED 76
  in a, (0)              ;; 1226:  DB 00

@@ -1770,6 +1770,10 @@
  cp e                           ; BB
  cp h                           ; BC
  cp l                           ; BD
+ cpd                            ; CD @__z80asm__cpd
+ cpdr                           ; CD @__z80asm__cpdr
+ cpi                            ; CD @__z80asm__cpi
+ cpir                           ; CD @__z80asm__cpir
  cpl                            ; 2F
  cpl a                          ; 2F
  cpl a'                         ; 76 2F
@@ -2538,6 +2542,10 @@
  ioe ld sp, (-32768)            ; DB ED 7B 00 80
  ioe ld sp, (32767)             ; DB ED 7B FF 7F
  ioe ld sp, (65535)             ; DB ED 7B FF FF
+ ioe ldd                        ; DB ED A8
+ ioe lddr                       ; DB ED B8
+ ioe ldi                        ; DB ED A0
+ ioe ldir                       ; DB ED B0
  ioe or (hl)                    ; DB B6
  ioe or (ix)                    ; DB FD B6 00
  ioe or (ix+127)                ; DB FD B6 7F
@@ -3474,6 +3482,10 @@
  ioi ld sp, (-32768)            ; D3 ED 7B 00 80
  ioi ld sp, (32767)             ; D3 ED 7B FF 7F
  ioi ld sp, (65535)             ; D3 ED 7B FF FF
+ ioi ldd                        ; D3 ED A8
+ ioi lddr                       ; D3 ED B8
+ ioi ldi                        ; D3 ED A0
+ ioi ldir                       ; D3 ED B0
  ioi or (hl)                    ; D3 B6
  ioi or (ix)                    ; D3 FD B6 00
  ioi or (ix+127)                ; D3 FD B6 7F
@@ -4238,6 +4250,10 @@
  ld sp, ix                      ; FD F9
  ld sp, iy                      ; DD F9
  ld xpc, a                      ; ED 67
+ ldd                            ; ED A8
+ lddr                           ; ED B8
+ ldi                            ; ED A0
+ ldir                           ; ED B0
  ldp (-32768), hl               ; ED 65 00 80
  ldp (-32768), ix               ; FD 65 00 80
  ldp (-32768), iy               ; DD 65 00 80

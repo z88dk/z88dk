@@ -1156,6 +1156,37 @@ for my $cpu (@CPUS) {
 	}
 	
 	add_opc($cpu, "rst %c", "0xC7+%c");
+	
+	# Block transfer group
+	add_opc($cpu, "ldi", 	0xED, 0xA0);
+	add_opc($cpu, "ldir", 	0xED, 0xB0);
+	add_opc($cpu, "ldd", 	0xED, 0xA8);
+	add_opc($cpu, "lddr", 	0xED, 0xB8);
+
+	if ($r3k) {
+		add_opc($cpu, "ldisr", 	0xED, 0x90);
+		add_opc($cpu, "lddsr", 	0xED, 0x98);
+		
+		add_opc($cpu, "lsdr", 	0xED, 0xF8);
+		add_opc($cpu, "lsir", 	0xED, 0xF0);
+		add_opc($cpu, "lsddr", 	0xED, 0xD8);
+		add_opc($cpu, "lsidr", 	0xED, 0xD0);
+	}
+
+	# Search group
+	if ($zilog) {
+		add_opc($cpu, "cpi", 	0xED, 0xA1);
+		add_opc($cpu, "cpir", 	0xED, 0xB1);
+		add_opc($cpu, "cpd", 	0xED, 0xA9);
+		add_opc($cpu, "cpdr", 	0xED, 0xB9);
+	}
+	else  {
+		add_opc($cpu, "cpi", 	0xCD, '@__z80asm__cpi');
+		add_opc($cpu, "cpir", 	0xCD, '@__z80asm__cpir');
+		add_opc($cpu, "cpd", 	0xCD, '@__z80asm__cpd');
+		add_opc($cpu, "cpdr", 	0xCD, '@__z80asm__cpdr');
+	}
+
 }
 
 #------------------------------------------------------------------------------
@@ -1309,7 +1340,8 @@ sub add_opc_3 {
 	
 	# expand ioi ioe
 	my $has_io;
-	if ($asm =~ /\((ix|iy|hl|bc|de|%m)/ && $asm !~ /^(ldp|jp)/) {
+	if (($asm =~ /\((ix|iy|hl|bc|de|%m)/ && $asm !~ /^(ldp|jp)/) ||
+		($asm =~ /^(ldi|ldir|ldd|lddr|ldisr|lddsr|lsdr|lsir|lsddr|lsidr)$/)) {
 		add_opc_4($cpu, "ioi $asm", $V{ioi}, @bin);
 		add_opc_4($cpu, "ioe $asm", $V{ioe}, @bin);
 		$has_io++;
@@ -1340,7 +1372,7 @@ sub add_opc_3 {
 		}
 	}
 	elsif ($asm =~ /^ (?| ( (?:add|adc|sub|sbc|and|xor|or) \s+ [^,]+ )
-					    | ( (?:cp|bit|djnz) .*) 
+					    | ( (?:cp|cpl|bit|djnz) \s+ .*) 
 						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
 					  ) $/x) {
 		if ($has_io) {
