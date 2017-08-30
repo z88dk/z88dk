@@ -44,6 +44,7 @@ static int cmd_examine(int argc, char **argv);
 static int cmd_set(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
+static int cmd_quit(int argc, char **argv);
 
 
 
@@ -52,13 +53,14 @@ static command commands[] = {
     { "next",   cmd_next,          "",  "Step the instruction (over calls)" },
     { "step",   cmd_step,          "",  "Step the instruction (including into calls)" },
     { "cont",   cmd_continue,      "",  "Continue execution" },
-    { "dis",    cmd_disassemble,   "",  "Disassemble current instruction" },
+    { "dis",    cmd_disassemble,   "[<address>]",  "Disassemble from pc/<address>" },
     { "reg",    cmd_registers,     "",  "Display the registers" },
     { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
     { "x",      cmd_examine,       "<address>",   "Examine memory" },
     { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
     { "help",   cmd_help,          "",   "Display this help text" },
+    { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
 
@@ -210,6 +212,11 @@ static int cmd_disassemble(int argc, char **argv)
     char  buf[256];
     int   i = 0;
     int   where = pc;
+
+    if ( argc == 2 ) {
+        char *end;
+        where = strtol(argv[1], &end, 0);
+    }
 
     while ( i < 10 ) {
        where += disassemble(where, buf, sizeof(buf));
@@ -404,6 +411,11 @@ static int cmd_help(int argc, char **argv)
          cmd++;
      }
      return 0;
+}
+
+static int cmd_quit(int argc, char **argv)
+{
+    exit(0);
 }
 
 uint8_t get_memory(int pc)
