@@ -42,6 +42,7 @@ Module 'test' size: 4 bytes
 
 Linking library module 'z80asm_rld'
 Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
 END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
@@ -55,6 +56,7 @@ Module 'test' size: 4 bytes
 
 Linking library module 'z80asm_rld'
 Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
 END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
@@ -68,6 +70,7 @@ Module 'test' size: 4 bytes
 
 Linking library module 'z80asm_rld'
 Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
 END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
@@ -81,6 +84,7 @@ Module 'test' size: 4 bytes
 
 Linking library module 'z80asm_rld'
 Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
 END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
@@ -94,6 +98,7 @@ Module 'test' size: 4 bytes
 
 Linking library module 'z80asm_rld'
 Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
 END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 

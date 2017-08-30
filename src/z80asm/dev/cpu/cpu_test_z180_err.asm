@@ -168,6 +168,8 @@
  altd and e                     ; Error
  altd and h                     ; Error
  altd and hl, de                ; Error
+ altd and ix, de                ; Error
+ altd and iy, de                ; Error
  altd and l                     ; Error
  altd bit -1, (hl)              ; Error
  altd bit -1, (hl)              ; Error
@@ -338,6 +340,8 @@
  altd bit 8, l                  ; Error
  altd bit 8, l                  ; Error
  altd bool hl                   ; Error
+ altd bool ix                   ; Error
+ altd bool iy                   ; Error
  altd ccf                       ; Error
  altd ccf f                     ; Error
  altd cp (hl)                   ; Error
@@ -377,6 +381,13 @@
  altd cpl                       ; Error
  altd cpl a                     ; Error
  altd cpl a'                    ; Error
+ altd dec (hl)                  ; Error
+ altd dec (ix)                  ; Error
+ altd dec (ix+127)              ; Error
+ altd dec (ix-128)              ; Error
+ altd dec (iy)                  ; Error
+ altd dec (iy+127)              ; Error
+ altd dec (iy-128)              ; Error
  altd dec a                     ; Error
  altd dec b                     ; Error
  altd dec bc                    ; Error
@@ -392,6 +403,13 @@
  altd ex (sp), hl               ; Error
  altd ex de', hl                ; Error
  altd ex de, hl                 ; Error
+ altd inc (hl)                  ; Error
+ altd inc (ix)                  ; Error
+ altd inc (ix+127)              ; Error
+ altd inc (ix-128)              ; Error
+ altd inc (iy)                  ; Error
+ altd inc (iy+127)              ; Error
+ altd inc (iy-128)              ; Error
  altd inc a                     ; Error
  altd inc b                     ; Error
  altd inc bc                    ; Error
@@ -542,6 +560,20 @@
  altd ioe cp a, (iy)            ; Error
  altd ioe cp a, (iy+127)        ; Error
  altd ioe cp a, (iy-128)        ; Error
+ altd ioe dec (hl)              ; Error
+ altd ioe dec (ix)              ; Error
+ altd ioe dec (ix+127)          ; Error
+ altd ioe dec (ix-128)          ; Error
+ altd ioe dec (iy)              ; Error
+ altd ioe dec (iy+127)          ; Error
+ altd ioe dec (iy-128)          ; Error
+ altd ioe inc (hl)              ; Error
+ altd ioe inc (ix)              ; Error
+ altd ioe inc (ix+127)          ; Error
+ altd ioe inc (ix-128)          ; Error
+ altd ioe inc (iy)              ; Error
+ altd ioe inc (iy+127)          ; Error
+ altd ioe inc (iy-128)          ; Error
  altd ioe ld a, (-32768)        ; Error
  altd ioe ld a, (32767)         ; Error
  altd ioe ld a, (65535)         ; Error
@@ -859,6 +891,20 @@
  altd ioi cp a, (iy)            ; Error
  altd ioi cp a, (iy+127)        ; Error
  altd ioi cp a, (iy-128)        ; Error
+ altd ioi dec (hl)              ; Error
+ altd ioi dec (ix)              ; Error
+ altd ioi dec (ix+127)          ; Error
+ altd ioi dec (ix-128)          ; Error
+ altd ioi dec (iy)              ; Error
+ altd ioi dec (iy+127)          ; Error
+ altd ioi dec (iy-128)          ; Error
+ altd ioi inc (hl)              ; Error
+ altd ioi inc (ix)              ; Error
+ altd ioi inc (ix+127)          ; Error
+ altd ioi inc (ix-128)          ; Error
+ altd ioi inc (iy)              ; Error
+ altd ioi inc (iy+127)          ; Error
+ altd ioi inc (iy-128)          ; Error
  altd ioi ld a, (-32768)        ; Error
  altd ioi ld a, (32767)         ; Error
  altd ioi ld a, (65535)         ; Error
@@ -1237,6 +1283,8 @@
  altd or e                      ; Error
  altd or h                      ; Error
  altd or hl, de                 ; Error
+ altd or ix, de                 ; Error
+ altd or iy, de                 ; Error
  altd or l                      ; Error
  altd pop af                    ; Error
  altd pop bc                    ; Error
@@ -1372,6 +1420,8 @@
  altd rr e                      ; Error
  altd rr h                      ; Error
  altd rr hl                     ; Error
+ altd rr ix                     ; Error
+ altd rr iy                     ; Error
  altd rr l                      ; Error
  altd rra                       ; Error
  altd rrc (hl)                  ; Error
@@ -1767,6 +1817,7 @@
  call lz, 32767                 ; Error
  call lz, 65535                 ; Error
  ccf f'                         ; Error
+ ccf'                           ; Error
  cp a, ixh                      ; Error
  cp a, ixl                      ; Error
  cp a, iyh                      ; Error
@@ -1996,6 +2047,20 @@
  ioe altd cp a, (iy)            ; Error
  ioe altd cp a, (iy+127)        ; Error
  ioe altd cp a, (iy-128)        ; Error
+ ioe altd dec (hl)              ; Error
+ ioe altd dec (ix)              ; Error
+ ioe altd dec (ix+127)          ; Error
+ ioe altd dec (ix-128)          ; Error
+ ioe altd dec (iy)              ; Error
+ ioe altd dec (iy+127)          ; Error
+ ioe altd dec (iy-128)          ; Error
+ ioe altd inc (hl)              ; Error
+ ioe altd inc (ix)              ; Error
+ ioe altd inc (ix+127)          ; Error
+ ioe altd inc (ix-128)          ; Error
+ ioe altd inc (iy)              ; Error
+ ioe altd inc (iy+127)          ; Error
+ ioe altd inc (iy-128)          ; Error
  ioe altd ld a, (-32768)        ; Error
  ioe altd ld a, (32767)         ; Error
  ioe altd ld a, (65535)         ; Error
@@ -3054,6 +3119,20 @@
  ioi altd cp a, (iy)            ; Error
  ioi altd cp a, (iy+127)        ; Error
  ioi altd cp a, (iy-128)        ; Error
+ ioi altd dec (hl)              ; Error
+ ioi altd dec (ix)              ; Error
+ ioi altd dec (ix+127)          ; Error
+ ioi altd dec (ix-128)          ; Error
+ ioi altd dec (iy)              ; Error
+ ioi altd dec (iy+127)          ; Error
+ ioi altd dec (iy-128)          ; Error
+ ioi altd inc (hl)              ; Error
+ ioi altd inc (ix)              ; Error
+ ioi altd inc (ix+127)          ; Error
+ ioi altd inc (ix-128)          ; Error
+ ioi altd inc (iy)              ; Error
+ ioi altd inc (iy+127)          ; Error
+ ioi altd inc (iy-128)          ; Error
  ioi altd ld a, (-32768)        ; Error
  ioi altd ld a, (32767)         ; Error
  ioi altd ld a, (65535)         ; Error
@@ -4836,6 +4915,7 @@
  sbc iyh                        ; Error
  sbc iyl                        ; Error
  scf f'                         ; Error
+ scf'                           ; Error
  set -1, (hl)                   ; Error
  set -1, (hl)                   ; Error
  set -1, (ix)                   ; Error

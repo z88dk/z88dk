@@ -298,6 +298,7 @@ tokens:
   - name	: BIT
   - name	: CALL
   - name	: CCF
+  - name	: CCF1
   - name	: CP
   - name	: CPD
   - name	: CPDR
@@ -357,6 +358,7 @@ tokens:
   - name	: RST
   - name	: SBC
   - name	: SCF
+  - name	: SCF1
   - name	: SET
   - name	: SLA
   - name	: SLL

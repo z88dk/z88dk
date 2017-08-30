@@ -835,12 +835,14 @@ for my $cpu (@CPUS) {
 	
 	add_opc($cpu, "ccf", 		0x3F);
 	add_opc($cpu, "ccf f", 		0x3F);
+	add_opc($cpu, "ccf'", 		$V{altd}, 0x3F) if $rabbit;
 	add_opc($cpu, "ccf f'", 	$V{altd}, 0x3F) if $rabbit;
 	add_opc($cpu, "altd ccf",	$V{altd}, 0x3F) if $rabbit;
 	add_opc($cpu, "altd ccf f",	$V{altd}, 0x3F) if $rabbit;
 	
 	add_opc($cpu, "scf", 		0x37);
 	add_opc($cpu, "scf f", 		0x37);
+	add_opc($cpu, "scf'", 		$V{altd}, 0x37) if $rabbit;
 	add_opc($cpu, "scf f'", 	$V{altd}, 0x37) if $rabbit;
 	add_opc($cpu, "altd scf",	$V{altd}, 0x37) if $rabbit;
 	add_opc($cpu, "altd scf f",	$V{altd}, 0x37) if $rabbit;
@@ -988,16 +990,13 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
-	for my $r (@R16SP) {
-		if ($r eq 'sp') {
-			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16) if $z180;
-		}
-		else {
-			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16) if !$z80;
+	# Multiply
+	if ($z180) {
+		for my $r (@R16SP) {
+			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16);
 		}
 	}
-	
-	if ($z80_zxn) {
+	elsif ($z80_zxn) {
 		add_opc($cpu, "mul", 0xED, 0x30);
 	}
 	elsif ($rabbit) {
@@ -1410,6 +1409,9 @@ sub add_opc_3 {
 		}
 	}
 	elsif ($asm =~ /^ (?| ( (?:add|adc|sub|sbc|and|xor|or) \s+ [^,]+ )
+						| ( (?:and|or) \s+ (ix|iy) \s* , .* )
+						| ( (?:inc|dec) \s+ \( .* )
+						| ( (?:bool|rr) \s+ (ix|iy) .* )
 					    | ( (?:cp|cpl|bit|djnz) \s+ .*) 
 						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
 					  ) $/x) {

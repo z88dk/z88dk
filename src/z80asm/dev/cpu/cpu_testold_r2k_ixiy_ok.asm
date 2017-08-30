@@ -1580,9 +1580,6 @@
  ldp iy,(-32768)        ; DD 6D 00 80
  ldp iy,(32767)         ; DD 6D FF 7F
  ldp iy,(65535)         ; DD 6D FF FF
- mlt bc                 ; ED 4C
- mlt de                 ; ED 5C
- mlt hl                 ; ED 6C
  neg                    ; ED 44
  neg a                  ; ED 44
  neg a'                 ; 76 ED 44

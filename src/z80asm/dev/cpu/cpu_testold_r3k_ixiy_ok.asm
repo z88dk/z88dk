@@ -1587,9 +1587,6 @@
  lsdr                   ; ED F8
  lsidr                  ; ED D0
  lsir                   ; ED F0
- mlt bc                 ; ED 4C
- mlt de                 ; ED 5C
- mlt hl                 ; ED 6C
  neg                    ; ED 44
  neg a                  ; ED 44
  neg a'                 ; 76 ED 44

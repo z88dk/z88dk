@@ -1,6 +1,7 @@
 ; Substitute for z80 cpi instruction
 ; aralbrec 06.2007
 
+SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpi
 
 .__z80asm__cpi

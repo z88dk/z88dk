@@ -220,8 +220,7 @@
 [rabbit]	bool ix						=> DD, CC
 [rabbit]	bool iy						=> FD, CC
 
-[not_z80]	mlt {bc de hl . }			=> ED, 4C + $1*10
-[z180]		mlt {.  .  .  sp}			=> ED, 4C + $1*10
+[z180]		mlt {bc de hl sp}			=> ED, 4C + $1*10
 [rabbit]	mul							=> F7
 
 [r3k]		uma							=> ED, C0

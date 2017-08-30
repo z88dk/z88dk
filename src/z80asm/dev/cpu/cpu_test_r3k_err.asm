@@ -656,6 +656,9 @@
  ld iyl, iyh                    ; Error
  ld iyl, iyl                    ; Error
  ld r, a                        ; Error
+ mlt bc                         ; Error
+ mlt de                         ; Error
+ mlt hl                         ; Error
  mlt sp                         ; Error
  or a, ixh                      ; Error
  or a, ixl                      ; Error
