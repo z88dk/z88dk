@@ -136,7 +136,37 @@ __sfr __banked __at 0xbffd IO_BFFD;
 
 #endif
 
-// misc
+// tape i/o
+
+struct zxtapehdr
+{
+	unsigned char hdtype;      // 0 = program, 1 = num array, 2 = char array, 3 = code/binary
+	unsigned char hdname[10];  // space padded
+	unsigned int  hdlen;       // ELINE - PROG, length field, length field, length in bytes
+	unsigned int  hdadd;       // starting line number 0x8000 = none, lsb=0 msb=id, lsb=0 msb=id, address
+	unsigned int  hdvars;      // VARS - PROG, 0, 0, 0
+};
+
+#define ZXT_TYPE_HEADER  0
+#define ZXT_TYPE_DATA    0xff
+
+extern unsigned char __LIB__ zx_tape_load(void *dst,unsigned int len,unsigned char type) __smallc;
+extern unsigned char __LIB__ __CALLEE__ zx_tape_load_callee(void *dst,unsigned int len,unsigned char type) __smallc;
+#define zx_tape_load(a,b,c) zx_tape_load_callee(a,b,c)
+
+
+extern unsigned char __LIB__ zx_tape_save(void *src,unsigned int len,unsigned char type) __smallc;
+extern unsigned char __LIB__ __CALLEE__ zx_tape_save_callee(void *src,unsigned int len,unsigned char type) __smallc;
+#define zx_tape_save(a,b,c) zx_tape_save_callee(a,b,c)
+
+
+extern unsigned char __LIB__ zx_tape_verify(void *dst,unsigned int len,unsigned char type) __smallc;
+extern unsigned char __LIB__ __CALLEE__ zx_tape_verify_callee(void *dst,unsigned int len,unsigned char type) __smallc;
+#define zx_tape_verify(a,b,c) zx_tape_verify_callee(a,b,c)
+
+
+
+// miscellaneous
 
 extern void __LIB__ __FASTCALL__ zx_border(unsigned char colour) __smallc;
 
