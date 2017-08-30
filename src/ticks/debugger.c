@@ -27,6 +27,7 @@ typedef struct breakpoint {
 typedef struct {
     char   *cmd;
     int   (*func)(int argc, char **argv);
+    char   *options;
     char   *help;
 } command;
 
@@ -40,18 +41,26 @@ static int cmd_disassemble(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
 static int cmd_break(int argc, char **argv);
 static int cmd_examine(int argc, char **argv);
+static int cmd_set(int argc, char **argv);
+static int cmd_trace(int argc, char **argv);
+static int cmd_help(int argc, char **argv);
+static int cmd_quit(int argc, char **argv);
 
 
 
 
 static command commands[] = {
-    { "next",   cmd_next,           "Step the instruction (over calls)" },
-    { "step",   cmd_step,           "Step the instruction (including into calls)" },
-    { "cont",   cmd_continue,       "Continue execution" },
-    { "dis",    cmd_disassemble,    "Disassemble current instruction" },
-    { "reg",    cmd_registers,      "Display the registers" },
-    { "break",  cmd_break,          "Handle breakpoints" },
-    { "x",      cmd_examine,        "Examine memory" },
+    { "next",   cmd_next,          "",  "Step the instruction (over calls)" },
+    { "step",   cmd_step,          "",  "Step the instruction (including into calls)" },
+    { "cont",   cmd_continue,      "",  "Continue execution" },
+    { "dis",    cmd_disassemble,   "[<address>]",  "Disassemble from pc/<address>" },
+    { "reg",    cmd_registers,     "",  "Display the registers" },
+    { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
+    { "x",      cmd_examine,       "<address>",   "Examine memory" },
+    { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
+    { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
+    { "help",   cmd_help,          "",   "Display this help text" },
+    { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
 
@@ -60,6 +69,7 @@ static breakpoint *breakpoints;
 
 static int debugger_active = 1;
 static int next_address = -1;
+static int trace = 0;
 
 
 void debugger_init()
@@ -86,6 +96,11 @@ void debugger()
     char   buf[256];
     char   prompt[100];
     char  *line;
+
+    if ( trace ) {
+        disassemble(pc, buf, sizeof(buf));
+        printf("%s\n",buf);     
+    }
 
     if ( debugger_active == 0 ) {
         breakpoint *elem;
@@ -198,6 +213,11 @@ static int cmd_disassemble(int argc, char **argv)
     int   i = 0;
     int   where = pc;
 
+    if ( argc == 2 ) {
+        char *end;
+        where = strtol(argv[1], &end, 0);
+    }
+
     while ( i < 10 ) {
        where += disassemble(where, buf, sizeof(buf));
        printf("%s\n",buf);
@@ -300,7 +320,103 @@ static int cmd_examine(int argc, char **argv)
     return 0;
 }
 
+struct reg {
+    char    *name;
+    uint8_t  *low;
+    uint8_t  *high;
+    uint16_t *word;
+};
 
+static int cmd_set(int argc, char **argv)
+{
+    struct reg registers[] = {
+        { "hl",  &l,  &h },
+        { "de",  &e,  &d },
+        { "bc",  &c,  &b },
+        { "hl'", &l_, &h_ },
+        { "de'", &e_, &d_ },
+        { "bc'", &c_, &b_ },  
+        { "ix'", &xl, &xh },   
+        { "iy'", &yl, &yh },  
+        { "sp",  NULL, NULL, &sp }, 
+        { "pc",  NULL, NULL, &pc }, 
+        { "a",   &a,   NULL },
+        { "a'",  &a_,  NULL },
+        { "b",   &b,   NULL },
+        { "b'",  &b_,  NULL },
+        { "c",   &c,   NULL },
+        { "c'",  &c_,  NULL },             
+        { "d",   &d,   NULL },
+        { "d'",  &d_,  NULL },
+        { "e",   &e,   NULL },
+        { "e'",  &e_,  NULL },  
+        { "h",   &h,   NULL },
+        { "h'",  &h_,  NULL },  
+        { "l",   &l,   NULL },
+        { "l'",  &l_,  NULL },  
+        { "ixh", &xh,  NULL },
+        { "ixl", &xl,  NULL },
+        { "iyh", &yh,  NULL },
+        { "iyl", &yl,  NULL },
+        { NULL, NULL, NULL },
+    };
+    struct reg *search = &registers[0];
+
+    if ( argc == 3 ) {
+        char *end;
+        int val = strtol(argv[2], &end, 0);
+
+        if ( end != NULL ) {
+            while ( search->name != NULL ) {
+                if ( strcmp(argv[1], search->name) == 0 ) {
+                    if ( search->word ) {
+                        *search->word = val % 65536;
+                    } else {
+                        *search->low = val % 256;
+                        if ( search->high != NULL ) {
+                            *search->high = (val % 65536) / 256;
+                        }
+                    }
+                    break;
+                }
+                search++;
+            }
+        }
+    } else {
+        printf("Incorrect number of arguments\n");
+    }
+    return 0;
+}
+
+
+static int cmd_trace(int argc, char **argv)
+{
+    if ( argc == 2 ) {
+        if ( strcmp(argv[1], "on") == 0 ) {
+            trace = 1;
+        } else if ( strcmp(argv[1],"off") == 0 ) {
+            trace = 1;
+        }
+        printf("Tracing is %s\n", trace ? "on" : "off");
+    }
+    return 0;
+}
+
+static int cmd_help(int argc, char **argv)
+{
+     command *cmd = &commands[0];
+
+     while ( cmd->cmd != NULL ) {
+         printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
+         cmd++;
+     }
+     return 0;
+}
+
+static int cmd_quit(int argc, char **argv)
+{
+    exit(0);
+}
 
 uint8_t get_memory(int pc)
 {
