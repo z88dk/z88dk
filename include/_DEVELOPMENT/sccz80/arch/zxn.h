@@ -150,19 +150,19 @@ struct zxtapehdr
 #define ZXT_TYPE_HEADER  0
 #define ZXT_TYPE_DATA    0xff
 
-extern unsigned char __LIB__ zx_tape_load(void *dst,unsigned int len,unsigned char type) __smallc;
-extern unsigned char __LIB__ __CALLEE__ zx_tape_load_callee(void *dst,unsigned int len,unsigned char type) __smallc;
-#define zx_tape_load(a,b,c) zx_tape_load_callee(a,b,c)
+extern unsigned char __LIB__ zx_tape_load_block(void *dst,unsigned int len,unsigned char type) __smallc;
+extern unsigned char __LIB__ __CALLEE__ zx_tape_load_block_callee(void *dst,unsigned int len,unsigned char type) __smallc;
+#define zx_tape_load_block(a,b,c) zx_tape_load_block_callee(a,b,c)
 
 
-extern unsigned char __LIB__ zx_tape_save(void *src,unsigned int len,unsigned char type) __smallc;
-extern unsigned char __LIB__ __CALLEE__ zx_tape_save_callee(void *src,unsigned int len,unsigned char type) __smallc;
-#define zx_tape_save(a,b,c) zx_tape_save_callee(a,b,c)
+extern unsigned char __LIB__ zx_tape_save_block(void *src,unsigned int len,unsigned char type) __smallc;
+extern unsigned char __LIB__ __CALLEE__ zx_tape_save_block_callee(void *src,unsigned int len,unsigned char type) __smallc;
+#define zx_tape_save_block(a,b,c) zx_tape_save_block_callee(a,b,c)
 
 
-extern unsigned char __LIB__ zx_tape_verify(void *dst,unsigned int len,unsigned char type) __smallc;
-extern unsigned char __LIB__ __CALLEE__ zx_tape_verify_callee(void *dst,unsigned int len,unsigned char type) __smallc;
-#define zx_tape_verify(a,b,c) zx_tape_verify_callee(a,b,c)
+extern unsigned char __LIB__ zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __smallc;
+extern unsigned char __LIB__ __CALLEE__ zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __smallc;
+#define zx_tape_verify_block(a,b,c) zx_tape_verify_block_callee(a,b,c)
 
 
 

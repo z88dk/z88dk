@@ -148,9 +148,9 @@ struct zxtapehdr
 #define ZXT_TYPE_HEADER  0
 #define ZXT_TYPE_DATA    0xff
 
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_load,void *dst,unsigned int len,unsigned char type)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_save,void *src,unsigned int len,unsigned char type)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_verify,void *dst,unsigned int len,unsigned char type)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_load_block,void *dst,unsigned int len,unsigned char type)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_save_block,void *src,unsigned int len,unsigned char type)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_verify_block,void *dst,unsigned int len,unsigned char type)
 
 // miscellaneous
 

@@ -1,7 +1,7 @@
 @arch/zx/tape/tape_asm.lst
-arch/zx/tape/c/sdcc_ix/zx_tape_load
-arch/zx/tape/c/sdcc_ix/zx_tape_load_callee
-arch/zx/tape/c/sdcc_ix/zx_tape_save
-arch/zx/tape/c/sdcc_ix/zx_tape_save_callee
-arch/zx/tape/c/sdcc_ix/zx_tape_verify
-arch/zx/tape/c/sdcc_ix/zx_tape_verify_callee
+arch/zx/tape/c/sdcc_ix/zx_tape_load_block
+arch/zx/tape/c/sdcc_ix/zx_tape_load_block_callee
+arch/zx/tape/c/sdcc_ix/zx_tape_save_block
+arch/zx/tape/c/sdcc_ix/zx_tape_save_block_callee
+arch/zx/tape/c/sdcc_ix/zx_tape_verify_block
+arch/zx/tape/c/sdcc_ix/zx_tape_verify_block_callee

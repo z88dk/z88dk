@@ -1,15 +1,15 @@
-; unsigned char zx_tape_save(void *src, unsigned int len, unsigned char type)
+; unsigned char zx_tape_save_block(void *src, unsigned int len, unsigned char type)
 
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC asm_zx_tape_save
+PUBLIC asm_zx_tape_save_block
 
 EXTERN _GLOBAL_ZX_PORT_FE
 EXTERN asm_cpu_push_di, asm_cpu_pop_ei
 EXTERN error_znc, error_mc
 
-asm_zx_tape_save:
+asm_zx_tape_save_block:
 
    ; enter : ix = source address
    ;         de = block length
