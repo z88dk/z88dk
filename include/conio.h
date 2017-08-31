@@ -60,9 +60,16 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define textcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
 #define textbackground(a)	printf("\033[%um",PCDOS_COLORS[a]+40)
 #define textattr(a)	printf("\033[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
-#define highvideo()	printf("\033[1m")
-#define lowvideo()	printf("\033[2m")
-#define normvideo()	printf("\033[m")
+// Much faster shortcut passing the colors in vt-ansi mode (equivalent to a "set text rendition" ESC sequence)
+#define vtrendition(a)   asm("EXTERN\tansi_attr\nld\ta,"#a"\ncall\tansi_attr\n");
+
+//#define highvideo()	printf("\033[1m")
+#define highvideo()   asm("EXTERN\tansi_attr\nld\ta,1\ncall\tansi_attr\n");
+//#define lowvideo()	printf("\033[2m")
+#define lowvideo()   asm("EXTERN\tansi_attr\nld\ta,2\ncall\tansi_attr\n");
+//#define normvideo()	printf("\033[m")
+#define normvideo()  asm("EXTERN\tansi_attr\nxor\ta\ncall\tansi_attr\n");
+
 #define delline()	printf("\033[M")
 //#define clrscr() textattr(7);fputc_cons(12)
 /* In this way we can do some sort of color and setcolor functions redefinition */
@@ -71,6 +78,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 extern int ansi_COLUMN;
 extern int ansi_ROW;
+
 
 #define gotoxy(a,b);  ansi_COLUMN=a-1; ansi_ROW=b-1;
 #define _gotoxy(a,b);  ansi_COLUMN=a-1; ansi_ROW=b-1;
