@@ -263,13 +263,14 @@ static int cmd_break(int argc, char **argv)
             elem->value = value;
             LL_APPEND(breakpoints, elem);
         } else {
-            symbol *sym = find_symbol_byname(argv[1]);
-            if ( sym != NULL ) {
+            int value = symbol_resolve(argv[1]);
+
+            if ( value != -1 ) {
                 elem = malloc(sizeof(*elem));
                 elem->type = BREAK_PC;
-                elem->value = sym->address;
+                elem->value = value;
                 LL_APPEND(breakpoints, elem);
-                printf("Adding breakpoint at '%s', $%04x\n",argv[1], sym->address);
+                printf("Adding breakpoint at '%s', $%04x\n",argv[1], value);
             } else {
                 printf("Cannot break on '%s'\n",argv[1]);
             }

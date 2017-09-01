@@ -122,6 +122,39 @@ symbol *find_symbol_byname(const char *name)
     return NULL;
 }
 
+int symbol_resolve(char *name)
+{
+    symbol *sym = find_symbol_byname(name);
+    char   *ptr;
+
+    if ( sym != NULL ) {
+        return sym->address;
+    }
+
+    /* Check for it being a file */
+    if ( ( ptr = strchr(name, ':') ) != NULL ) {
+        char filename[FILENAME_MAX+1];
+        int  line;
+        cfile *cf;
+
+        snprintf(filename, sizeof(filename),"%.*s", ptr - name, name);
+        line = atoi(ptr+1);
+
+        HASH_FIND_STR(cfiles, filename, cf);
+
+        if ( cf != NULL ) {
+            cline *cl;
+
+            HASH_FIND_INT(cf->lines, &line, cl);
+
+            if ( cl != NULL ) {
+                return cl->address;
+            }
+        }
+    }
+    return -1;
+}
+
 const char *find_symbol(int addr)
 {
     symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find);

@@ -80,6 +80,7 @@ extern int       disassemble(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr);
 extern symbol   *find_symbol_byname(const char *name);
+extern int symbol_resolve(char *name);
 extern uint8_t   get_memory(int pc);
 extern char **parse_words(char *line, int *argc);
 
