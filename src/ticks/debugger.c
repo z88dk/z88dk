@@ -254,6 +254,7 @@ static int cmd_break(int argc, char **argv)
         }
     } else if ( argc == 2 ) {
         char *end;
+        const char *sym;
         breakpoint *elem;
         int value = strtol(argv[1], &end,0);
 
@@ -262,6 +263,8 @@ static int cmd_break(int argc, char **argv)
             elem->type = BREAK_PC;
             elem->value = value;
             LL_APPEND(breakpoints, elem);
+            sym = find_symbol(value);
+            printf("Adding breakpoint at '%s' $%04x (%s)\n",argv[1], value,  sym ? sym : "<unknown>");
         } else {
             int value = symbol_resolve(argv[1]);
 
@@ -270,7 +273,8 @@ static int cmd_break(int argc, char **argv)
                 elem->type = BREAK_PC;
                 elem->value = value;
                 LL_APPEND(breakpoints, elem);
-                printf("Adding breakpoint at '%s', $%04x\n",argv[1], value);
+                sym = find_symbol(value);
+                printf("Adding breakpoint at '%s', $%04x (%s)\n",argv[1], value, sym ? sym : "<unknown>");
             } else {
                 printf("Cannot break on '%s'\n",argv[1]);
             }
