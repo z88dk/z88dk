@@ -137,7 +137,7 @@ int symbol_resolve(char *name)
         int  line;
         cfile *cf;
 
-        snprintf(filename, sizeof(filename),"%.*s", ptr - name, name);
+        snprintf(filename, sizeof(filename),"%.*s", (int)(ptr - name), name);
         line = atoi(ptr+1);
 
         HASH_FIND_STR(cfiles, filename, cf);
