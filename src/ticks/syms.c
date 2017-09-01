@@ -94,7 +94,7 @@ void read_symbol_file(char *filename)
                 cl->line = lineno;
                 cl->address = strtol(argv[2] + 1, NULL, 16);
                 HASH_ADD_INT(cf->lines, line, cl);
-                printf("C source code line %s:%d at %04x\n",cf->file, cl->line, cl->address);
+                //printf("C source code line %s:%d at %04x\n",cf->file, cl->line, cl->address);
             }
             free(argv);
         }

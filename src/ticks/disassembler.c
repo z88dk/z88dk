@@ -2215,6 +2215,7 @@ int disassemble(int pc, char *buf, size_t buflen)
     instruction *instr;
     const char  *label;
     size_t       offs = 0;
+    int          start_pc = pc;
 
     if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
         table = rabbit_main_page;
@@ -2222,11 +2223,11 @@ int disassemble(int pc, char *buf, size_t buflen)
     state->pc = pc;
 
     label = find_symbol(pc);
+    buf[0] = 0;
     if (label ) {
         offs += snprintf(buf + offs, buflen - offs, "%s:",label);
-    } else {
-        offs += snprintf(buf + offs, buflen - offs,"l_%04x:",pc % 65536);
-    }
+    } 
+     
     if ( offs < 20 ) {
         offs = snprintf(buf, buflen, "%-20s", buf);
     }
@@ -2291,6 +2292,7 @@ int disassemble(int pc, char *buf, size_t buflen)
         break;
     } while ( 1 );
 
+    offs += snprintf(buf + offs, buflen - offs, "[%04x] ", start_pc);
     for ( i = 0; i < state->len; i++ ) {
         offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
     }
