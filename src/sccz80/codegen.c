@@ -2697,7 +2697,7 @@ void GlobalPrefix(char type)
 
 static void mangle_filename(const char *input, char *buf, size_t len)
 {
-    char  hex[] = "1234567890ABCDEF";
+    char  hex[] = "0123456789ABCDEF";
 
     while (*input && len > 3 ) {
         unsigned char c = *input++;
@@ -2730,7 +2730,7 @@ void EmitLine(int line)
     if ( c_line_labels ) {
         char buf[FILENAME_MAX+1];
         mangle_filename(Filename, buf, sizeof(buf));
-        outfmt(".__CLINE__%s_%d\n", buf, line);
+        outfmt(".__CLINE__%s_3a%d\n", buf, line);
     }
 }
 
