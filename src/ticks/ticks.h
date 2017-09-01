@@ -8,12 +8,28 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
+#include "uthash.h"
+#include "utlist.h"
+
 
 typedef struct {
-   const char    *name;
-   const char    *file;
-   int            address;
+    const char    *name;
+    const char    *file;
+    int            address;
 } symbol;
+
+
+typedef struct {
+    int             line;
+    int             address;
+    UT_hash_handle hh;
+} cline;
+
+typedef struct {
+    char          *file;
+    cline         *lines;
+    UT_hash_handle hh;
+} cfile;
 
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;

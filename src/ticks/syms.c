@@ -8,6 +8,40 @@ static symbol  *symbols = NULL;
 static int      symbols_num = 0;
 
 
+static cfile   *cfiles = NULL;
+
+static void demangle_filename(const char *input, char *buf, size_t buflen, int *lineno)
+{
+    char *start = buf;
+    char *ptr;
+
+    *lineno = -1;
+    input += strlen("__CFILE___33");
+
+    while ( *input ) {
+        char   c = *input++;
+        if ( c != '_' ) {
+            *buf++ = c;
+        } else {
+            unsigned char d;
+
+            c = *input++;
+            d = (c >= 'A' ? c - 'A' + 10 : c - '0' ) << 4;
+            c = *input++;
+            d |= (c >= 'A' ? c - 'A' + 10 : c-'0');
+            *buf++ = d;
+        }
+    }
+    *buf = 0;
+
+    /* Line number is at end after quotes (random sccz80 thing, to be fixed) */
+    ptr = strrchr(start, '"');
+    if ( ptr != NULL ) {
+        *ptr = 0;
+        ptr++;
+        *lineno = atoi(ptr+1);
+    }
+}
 
 
 static int symbol_compare(const void *p1, const void *p2)
@@ -32,11 +66,36 @@ void read_symbol_file(char *filename)
                 free(argv);
                 continue;
             }
-            symbols = realloc(symbols, (symbols_num + 1) * sizeof(symbols[0]));
-            symbols[symbols_num].name = strdup(argv[0]);
-            symbols[symbols_num].file = strdup(argv[5]);
-            symbols[symbols_num].address = strtol(argv[2] + 1, NULL, 16);
-            symbols_num++;
+            if ( strncmp(argv[0], "__CLINE__",9) ) {
+                symbols = realloc(symbols, (symbols_num + 1) * sizeof(symbols[0]));
+                symbols[symbols_num].name = strdup(argv[0]);
+                symbols[symbols_num].file = strdup(argv[5]);
+                symbols[symbols_num].address = strtol(argv[2] + 1, NULL, 16);
+                symbols_num++;
+            } else {
+                /* It's a cline symbol */
+                char   filename[FILENAME_MAX+1];
+                int    lineno;
+                cfile *cf;
+                cline *cl;
+
+                demangle_filename(argv[0], filename, sizeof(filename),&lineno);
+
+                HASH_FIND_STR(cfiles, filename, cf);
+
+                if ( cf == NULL ) {
+                    cf = calloc(1,sizeof(*cf));
+                    cf->file = strdup(filename);
+                    cf->lines = NULL;
+                    HASH_ADD_KEYPTR(hh, cfiles, cf->file, strlen(cf->file), cf);
+                }
+
+                cl = calloc(1,sizeof(*cl));
+                cl->line = lineno;
+                cl->address = strtol(argv[2] + 1, NULL, 16);
+                HASH_ADD_INT(cf->lines, line, cl);
+                printf("C source code line %s:%d at %04x\n",cf->file, cl->line, cl->address);
+            }
             free(argv);
         }
     }
