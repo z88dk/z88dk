@@ -319,7 +319,7 @@ void listlibs(char *name, char *src)
 int main(int argc, char **argv)
 {
     void *tmp;
-    int numlibs;
+    int i, numlibs;
     int newlib, classiclib;
 
     program_name = argv[0];
@@ -340,7 +340,7 @@ int main(int argc, char **argv)
     libnames[0] = 0;
     numlibs = 0;
 
-    for (int i = 1; i < argc; ++i)
+    for (i = 1; i < argc; ++i)
     {
         if (argv[i][0] == '+')
         {
@@ -383,11 +383,11 @@ int main(int argc, char **argv)
 
     // Generate paths
 
-    for (int i = 0; i < CLASSIC_SIZE; ++i)
+    for (i = 0; i < CLASSIC_SIZE; ++i)
         if (classic_paths[i])
             classic_paths[i] = generate_path(4, ZCCCFG, classic_paths[i], target, "/");
 
-    for (int i = 0; i < NEWLIB_HDR_MAKE; ++i)
+    for (i = 0; i < NEWLIB_HDR_MAKE; ++i)
         if (newlib_paths[i])
             newlib_paths[i] = generate_path(4, ZCCCFG, newlib_paths[i], target, "/");
 
