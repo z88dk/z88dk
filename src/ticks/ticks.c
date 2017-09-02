@@ -2019,15 +2019,17 @@ int main (int argc, char **argv){
         if ( c_cpu & (CPU_R2K|CPU_R3K)) {
           t = (mem[pc++]^128)-128;
           st += 11;
-          if ( ih ) {    // ld (ix+d),hl
+          if ( ih ) {    // ld hl,(ix+d)
             l = mem[t+(xl|xh<<8)];
             h = mem[t=+(xl|xh<<8) + 1];
-          } else if ( iy ) { // ld (iy+d),hl
+          } else if ( iy ) { // ld hl,(iy+d)
             l = mem[t+(yl|yh<<8)];
             h = mem[t+(yl|yh<<8) + 1];
-          } else { // ld (hl+d),hl
-            l = mem[t+(l|h<<8)];
+          } else { // ld hl,(hl+d)
+            unsigned char lt;
+            lt = mem[t+(l|h<<8)];
             h = mem[t+(l|h<<8) + 1];
+            l = lt;
           }
         } else {
           CALLC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
@@ -2061,8 +2063,9 @@ int main (int argc, char **argv){
             mem[t+(yl|yh<<8)] = l;
             mem[t+(yl|yh<<8) + 1] = h;
           } else { // ld (hl+d),hl
-            mem[t+(l|h<<8)] = l;
-            mem[t=+(l|h<<8) + 1] = h;
+            int addr = t+(l|h<<8);
+            mem[addr] = l;
+            mem[addr + 1] = h;
           }
         } else {
           CALLC(ff&128);
