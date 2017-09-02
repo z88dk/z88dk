@@ -202,6 +202,7 @@ char get_response(char *s)
     {
         scanf(" %c%*[^\n]", &r);
     } while (strchr(s, r) == NULL);
+    return r;
 }
 
 //
