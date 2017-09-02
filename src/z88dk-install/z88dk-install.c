@@ -2,11 +2,13 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <sys/stat.h>
 #include <ctype.h>
 
 #ifdef WIN32
 #include <Windows.h>
+#define strcasecmp(a,b) stricmp(a,b)
 #else
 #include <dirent.h>
 #endif
@@ -197,11 +199,13 @@ void remove_extension(char *s)
 char get_response(char *s)
 {
     char r;
+    int i;
 
     do
     {
-        scanf(" %c%*[^\n]", &r);
-    } while (strchr(s, r) == NULL);
+        i = scanf(" %c%*[^\n]", &r);
+    } while ((i == 0) || (strchr(s, r) == NULL));
+
     return r;
 }
 
@@ -296,7 +300,7 @@ void listlibs(char *name, char *src)
     do
     {
         if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-            printf("..%s \"%s\"\n", name, ffd.cFileName);
+            printf("..%s \"%s\" %u bytes\n", name, ffd.cFileName, (unsigned int)ffd.nFileSizeLow);
     } while (FindNextFileA(hfind, &ffd) != 0);
 
     FindClose(hfind);
@@ -305,12 +309,16 @@ void listlibs(char *name, char *src)
 
     DIR *in;
     struct dirent *entry;
+    struct stat st;
 
     if ((in = opendir(src)) == NULL)
         return;
 
     while ((entry = readdir(in)) != NULL)
-        printf("..%s \"%s\"\n", name, entry->d_name);
+    {
+        if ((stat(entry->d_name, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)))
+            printf("..%s \"%s\" %u bytes\n", name, entry->d_name, (unsigned int)st.st_size);
+    }
 
     closedir(in);
 
