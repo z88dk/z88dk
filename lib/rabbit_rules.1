@@ -7,13 +7,70 @@
 	j%1	%2
 	ld	hl,%3
 
-%check 0 <= %1 <= 255
+	push	hl
+	ld	hl,%1
+	pop	de
+=
+	ex	de,hl
+	ld	hl,%1
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+=
+	ld	hl,(sp+%1)
+	ex	de,hl
+
+%check 0 <= %1 <= 254
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
 =
 	ld	hl,(sp + %1)
 
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp + %1)
+	inc	hl
+	ld	(sp + %1),hl
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp + %1)
+	dec	hl
+	ld	(sp + %1),hl
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,%2
+	ex	de,hl
+	call	l_pint
+=
+	ld	hl,%2
+	ld	(sp + %1),hl
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
