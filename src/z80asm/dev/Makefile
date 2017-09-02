@@ -35,7 +35,7 @@ scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 	
 all:: parse_rules.h
 
-dev/cpu/cpu_rules.h : dev/cpu/cpu.def dev/cpu/cpu.pl dev/Makefile
+dev/cpu/cpu_rules.h : dev/cpu/cpu.pl dev/Makefile
 	perl dev/cpu/cpu.pl
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
