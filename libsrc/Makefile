@@ -25,7 +25,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
+	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
@@ -1342,6 +1342,21 @@ test_clib.lib:
 	$(MAKE) -C time
 	$(MAKE) -C assert
 	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
+
+testrcm_clib.lib:
+	@echo ''
+	@echo '--- Building Test System Library ---'
+	@echo ''
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdlib TARGET=test
+	$(MAKE) -C stdio 
+	$(MAKE) -C compress/zx7 
+	$(MAKE) -C setjmp
+	$(MAKE) -C time
+	$(MAKE) -C assert
+	TARGET=test TYPE=r2k $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(LISTFILE_DIRECTORY)/testrcm.lst
+
 
 # TRS 80 - stefano
 trs80_clib.lib:
