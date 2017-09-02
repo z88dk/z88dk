@@ -19,5 +19,5 @@
 	push	de
 	ld	b,c
 	ld	a,CMD_WRITEBYTE
-	rst	8
+	rst	16
 	ret

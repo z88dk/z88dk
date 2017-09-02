@@ -22,5 +22,5 @@
         push    af
         ld      b,c
         ld      a,CMD_WRITEBLOCK
-        rst     8
+        rst     16
         ret

@@ -74,15 +74,17 @@ if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
 ; IM1 interrupt routine
+IF !__CPU_R2K__
 	ei
+ENDIF
 	ret
 
-restart08:
+restart10:
 	; a = command to execute
 	defb	$ED, $FE	;trap
 	ret
 ; Restart routines, nothing sorted yet
-restart10:
+restart08:
 restart18:
 restart20:
 restart28:
@@ -96,7 +98,9 @@ program:
 	ld	sp,hl
 	call    crt0_init_bss
 	ld	(exitsp),sp
+IF !__CPU_R2K__
     	ei
+ENDIF
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
@@ -119,7 +123,7 @@ ENDIF
 	pop	bc
 cleanup:
 	ld	a,CMD_EXIT	;exit
-	rst	8
+	rst	16
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
