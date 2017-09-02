@@ -8,4 +8,5 @@
 @arch/zx/misc/misc_sdcc_ix.lst
 @arch/zx/nirvanam/nirvanam_sdcc_ix.lst
 @arch/zx/nirvanap/nirvanap_sdcc_ix.lst
+@arch/zx/tape/tape_sdcc_ix.lst
 @arch/zx/ulaplus/ulaplus_sdcc.lst

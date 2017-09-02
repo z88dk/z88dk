@@ -60,6 +60,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zpragma", "zpragma\zpragma.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "config", "config\config.vcxproj", "{E82ADEEF-219A-44C3-A670-AACFD2D419EA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-dis", "z88dk-dis\z88dk-dis.vcxproj", "{C2A88546-B677-424A-8348-8737FFFDD36D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-install", "z88dk-install\z88dk-install.vcxproj", "{FD985972-6500-4DCA-AE01-390180135C97}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -164,6 +174,22 @@ Global
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|Win32.Build.0 = Release|Win32
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|x64.ActiveCfg = Release|x64
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA}.Release|x64.Build.0 = Release|x64
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Debug|Win32.Build.0 = Debug|Win32
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Debug|x64.ActiveCfg = Debug|x64
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Debug|x64.Build.0 = Debug|x64
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Release|Win32.ActiveCfg = Release|Win32
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Release|Win32.Build.0 = Release|Win32
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Release|x64.ActiveCfg = Release|x64
+		{C2A88546-B677-424A-8348-8737FFFDD36D}.Release|x64.Build.0 = Release|x64
+		{FD985972-6500-4DCA-AE01-390180135C97}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FD985972-6500-4DCA-AE01-390180135C97}.Debug|Win32.Build.0 = Debug|Win32
+		{FD985972-6500-4DCA-AE01-390180135C97}.Debug|x64.ActiveCfg = Debug|x64
+		{FD985972-6500-4DCA-AE01-390180135C97}.Debug|x64.Build.0 = Debug|x64
+		{FD985972-6500-4DCA-AE01-390180135C97}.Release|Win32.ActiveCfg = Release|Win32
+		{FD985972-6500-4DCA-AE01-390180135C97}.Release|Win32.Build.0 = Release|Win32
+		{FD985972-6500-4DCA-AE01-390180135C97}.Release|x64.ActiveCfg = Release|x64
+		{FD985972-6500-4DCA-AE01-390180135C97}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

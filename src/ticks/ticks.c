@@ -2,36 +2,43 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ticks.h"
+
 #if defined(_WIN32) || defined(WIN32)
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
 
+// fr = zero, ff = carry, ff&128 = s/p
 
+// TODO: Setting P flag
+#define BOOL(hi, lo) \
+          lo = fr = hi|lo ? 1 : 0, hi = 0, ff &= ~256;
+          
 #define LDRIM(r)                \
-          st+= 7,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 7, \
           r= mem[pc++]
 
 #define LDRRIM(a, b)            \
-          st+= 10,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 6 : 10, \
           b= mem[pc++],         \
           a= mem[pc++]
 
 #define LDRP(a, b, r)           \
-          st+= 7,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? (&a == &h) ? 2 : 6 : 7, \
           r= mem[mp= b|a<<8],   \
           ++mp
 
 #define LDRPI(a, b, r)          \
-          st+= 15,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 8 : 15, \
           r= mem[((mem[pc++]^128)-128+(b|a<<8))&65535]
 
 #define LDPR(a, b, r)           \
-          st+= 7,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? (&a == &h) ? 6 : 7 : 7, \
           mem[b|a<<8]= r,       \
           mp= b+1&255 | a<<8
 
 #define LDPRI(a, b, r)          \
-          st+= 15,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 11 : 15, \
           mem[((mem[pc++]^128)-128+(b|a<<8))&65535]= r
 
 #define LDRR(a, b, n)           \
@@ -50,31 +57,31 @@
           mem[((t^128)-128+(b|a<<8))&65535]= mem[pc++]
 
 #define INCW(a, b)              \
-          st+= 6,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 6, \
           ++b || a++
 
 #define DECW(a, b)              \
-          st+= 6,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 6, \
           b-- || a--
 
 #define INC(r)                  \
-          st+= 4,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4, \
           ff= ff&256            \
             | (fr= r= (fa= r)+(fb= 1))
 
 #define DEC(r)                  \
-          st+= 4,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4, \
           ff= ff&256            \
             | (fr= r= (fa= r)+(fb= -1))
 
 #define INCPI(a, b)             \
-          st+= 19,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 12 : 19, \
           fa= mem[t= (mem[pc++]^128)-128+(b|a<<8)], \
           ff= ff&256            \
             | (fr= mem[t]= fa+(fb=1))
 
 #define DECPI(a, b)             \
-          st+= 19,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 12 : 19, \
           fa= mem[t= (mem[pc++]^128)-128+(b|a<<8)], \
           ff= ff&256            \
             | (fr= mem[t]= fa+(fb=-1))
@@ -145,6 +152,10 @@
           fa= ~(a= ff= fr= a&b),\
           fb= 0
 
+#define AND2(r1, r2)              \
+          fa= ~(a= ff= fr= r1&r2),\
+          fb= 0
+
 #define XOR(b, n)               \
           st+= n,               \
           fa= 256               \
@@ -155,6 +166,11 @@
           st+= n,               \
           fa= 256               \
             | (ff= fr= a|= b),  \
+          fb= 0
+
+#define OR2(r1, r2)             \
+          fa= 256               \
+            | (ff= fr= r1|= r2),  \
           fb= 0
 
 #define CP(b, n)                \
@@ -307,7 +323,7 @@
           fb= 0
 
 #define BIT(n, r)               \
-          st+= 8,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 8, \
           ff= ff  & -256        \
             | r   &   40        \
             | (fr= r & n),      \
@@ -315,7 +331,7 @@
           fb= 0
 
 #define BITHL(n)                \
-          st+= 12,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 7 : 12, \
           t= mem[l | h<<8],     \
           ff= ff    & -256      \
             | mp>>8 &   40      \
@@ -323,8 +339,9 @@
           fa= ~(fr= t),         \
           fb= 0
 
+// 11T has already been added
 #define BITI(n)                 \
-          st+= 5,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? -1 : 5, \
           ff= ff    & -256      \
             | mp>>8 &   40      \
             | -41   & (t&= n),  \
@@ -332,19 +349,19 @@
           fb= 0
 
 #define RES(n, r)               \
-          st+= 8,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 8, \
           r&= n
 
 #define RESHL(n)                \
-          st+= 15,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 10 : 15, \
           mem[t]= mem[t= l|h<<8] & n
 
 #define SET(n, r)               \
-          st+= 8,               \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 8, \
           r|= n
 
 #define SETHL(n)                \
-          st+= 15,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 10 : 15, \
           mem[t]= mem[t= l|h<<8] | n
 
 #define INR(r)                  \
@@ -362,7 +379,7 @@
           ++mp
 
 #define SBCHLRR(a, b)           \
-          st+= 15,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 15, \
           v= l-b+(h-a<<8)-(ff>>8&1),\
           mp= l+1+(h<<8),       \
           ff= v>>8,             \
@@ -373,7 +390,7 @@
           fr= h|l<<8
 
 #define ADCHLRR(a, b)           \
-          st+= 15,              \
+          st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 15, \
           v= l+b+(h+a<<8)+(ff>>8&1),\
           mp= l+1+(h<<8),       \
           ff= v>>8,             \
@@ -385,6 +402,7 @@
 
 FILE * ft;
 unsigned char * tapbuf;
+int    debugger_enabled = 0;
   
 int     v
       , wavpos= 0
@@ -449,6 +467,8 @@ unsigned char * mem;
 char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
+int    c_cpu = CPU_Z80;
+
 long tapcycles(void){
   mues= 1;
   wavpos!=0x20000 && (ear^= 64);
@@ -511,6 +531,10 @@ int main (int argc, char **argv){
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
+    printf("  -d             Enable debugger\n"),
+    printf("  -mz80          Emulate a z80\n"),
+    printf("  -mz80-zxn      Emulate a Spectrum Next Z80\n"),
+    printf("  -x <file>      Symbol file to read\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
@@ -537,6 +561,28 @@ int main (int argc, char **argv){
         case 'c':
           sscanf(argv[1], "%llu", &counter);
           counter<0 && (counter= 9e18);
+          break;
+        case 'd':
+          debugger_init();
+          debugger_enabled = 1;
+          argv--;
+          argc++;
+          break;
+        case 'x':
+          read_symbol_file(argv[1]);
+          break;
+        case 'm':
+          if ( strcmp(&argv[0][1],"mz80") == 0 ) {
+            c_cpu = CPU_Z80;
+          } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
+            c_cpu = CPU_Z80_ZXN;
+          } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
+            c_cpu = CPU_R2K;
+          } else {
+            printf("Unknown CPU: %s\n",&argv[0][1]);
+          }
+          argv--;
+          argc++;
           break;
         case 'o':
           output= argv[1];
@@ -702,6 +748,7 @@ int main (int argc, char **argv){
 
 
   do{
+    if ( debugger_enabled ) debugger();
     if( pc==start )
       st= 0,
       stint= intr,
@@ -876,8 +923,8 @@ int main (int argc, char **argv){
           INC(xl);
         ih=1;break;
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
-        if( ih )
-          st+= 11,
+        if( ih ) 
+          st+= c_cpu & (CPU_R2K|CPU_R3K) ? 8 : 11,
           fa= mem[t= l | h<<8],
           ff= ff&256
             | (fr= mem[t]= fa+(fb=+1));
@@ -919,7 +966,7 @@ int main (int argc, char **argv){
         ih=1;break;
       case 0x35: // DEC (HL) // DEC (IX+d) // DEC (IY+d)
         if( ih )
-          st+= 11,
+          st+= c_cpu & (CPU_R2K|CPU_R3K) ? 8 : 11,
           fa= mem[t= l | h<<8],
           ff= ff&256
             | (fr= mem[t]= fa+(fb=-1));
@@ -1079,20 +1126,25 @@ int main (int argc, char **argv){
           st+= 8,
           pc++;
         ih=1;break;
-      case 0x27: // DAA
-        st+= 4;
-        t= (fr^fa^fb^fb>>8) & 16;
-        u= 0;
-        (a | ff&256)>153 && (u= 352);
-        (a&15 | t)>9 && (u+= 6);
-        fa= a|256;
-        if( fb&512 )
-          a-= u,
-          fb= ~u;
-        else
-          a+= fb= u;
-        ff= (fr= a)
-          | u&256;
+      case 0x27: // DAA / add sp,d
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          st += 4;
+          sp += (mem[pc++]^128)-128; // TODO: Carry
+        } else {
+          st+= 4;
+          t= (fr^fa^fb^fb>>8) & 16;
+          u= 0;
+          (a | ff&256)>153 && (u= 352);
+          (a&15 | t)>9 && (u+= 6);
+          fa= a|256;
+          if( fb&512 )
+            a-= u,
+            fb= ~u;
+          else
+            a+= fb= u;
+          ff= (fr= a)
+            | u&256;
+        }
         ih=1;break;
       case 0x2f: // CPL
         st+= 4;
@@ -1895,30 +1947,147 @@ int main (int argc, char **argv){
         mem[--sp]= t>>8;
         mem[--sp]= t;
         ih=1;break;
-      case 0xc4: // CALL NZ
-        CALLCI(fr);
+      case 0xc4: // CALL NZ / (RCM) LD HL,(SP+N)
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          int     offset = sp + mem[pc++];
+          st += 9;
+          if ( ih ) {
+            l = mem[offset++];
+            h = mem[offset];
+          } else if ( iy ) {
+            yl = mem[offset++];
+            yh = mem[offset];
+          } else {
+            xl = mem[offset++];
+            xh = mem[offset];
+          }
+        } else {
+          CALLCI(fr);
+        }
         ih=1;break;
-      case 0xcc: // CALL Z
-        CALLC(fr);
+      case 0xcc: // CALL Z / (RCM) BOOL HL
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          if ( ih ) {
+            BOOL(h,l);
+          } else if ( iy ) {
+            BOOL(yh, yl);
+          } else {
+            BOOL(xh,xl);
+          }
+          st += 2;
+        } else {
+          CALLC(fr);
+        }
         ih=1;break;
-      case 0xd4: // CALL NC
-        CALLC(ff&256);
+      case 0xd4: // CALL NC / (RCM) LD (SP+N),HL
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          int     offset = sp + mem[pc++];
+          st += 9;
+
+          if ( ih ) {
+            mem[offset++] = l;
+            mem[offset] = h;
+          } else if ( iy ) {
+            mem[offset++] = yl;
+            mem[offset] = yh;
+          } else {
+            mem[offset++] = xl;
+            mem[offset] = xh;
+          }
+        } else {
+          CALLC(ff&256);
+        }
         ih=1;break;
-      case 0xdc: // CALL C
-        CALLCI(ff&256);
+      case 0xdc: // CALL C / (RCM) AND HL,DE
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          if ( ih ) { 
+            AND2(h,d);
+            AND2(l,e);
+          } else if ( iy ) {
+            AND2(yh, d);
+            AND2(yl, e);
+          } else {
+            AND2(xh, d);
+            AND2(xl, e);
+          }
+          st += 2;
+        } else {
+          CALLCI(ff&256);
+        }
         ih=1;break;
-      case 0xe4: // CALL PO
-        CALLC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+      case 0xe4: // CALL PO / (RCM) LD HL,(IX+D)
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          t = (mem[pc++]^128)-128;
+          st += 11;
+          if ( ih ) {    // ld (ix+d),hl
+            l = mem[t+(xl|xh<<8)];
+            h = mem[t=+(xl|xh<<8) + 1];
+          } else if ( iy ) { // ld (iy+d),hl
+            l = mem[t+(yl|yh<<8)];
+            h = mem[t+(yl|yh<<8) + 1];
+          } else { // ld (hl+d),hl
+            l = mem[t+(l|h<<8)];
+            h = mem[t+(l|h<<8) + 1];
+          }
+        } else {
+          CALLC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+        }
         ih=1;break;
-      case 0xec: // CALL PE
-        CALLCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+      case 0xec: // CALL PE / (RCM) OR HL,DE
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          if ( ih ) { 
+            OR2(h,d);
+            OR2(l,e);
+          } else if ( iy ) {
+            OR2(yh, d);
+            OR2(yl, e);
+          } else {
+            OR2(xh, d);
+            OR2(xl, e);
+          }
+          st += 2;
+        } else {
+          CALLCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+        }
         ih=1;break;
-      case 0xf4: // CALL P
-        CALLC(ff&128);
+      case 0xf4: // CALL P or (RCM) LD (IX+D),HL
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          t = (mem[pc++]^128)-128;
+          st += 11;
+          if ( ih ) {    // ld (ix+d),hl
+            mem[t+(xl|xh<<8)] = l;
+            mem[t+(xl|xh<<8) + 1] = h;
+          } else if ( iy ) { // ld (iy+d),hl
+            mem[t+(yl|yh<<8)] = l;
+            mem[t+(yl|yh<<8) + 1] = h;
+          } else { // ld (hl+d),hl
+            mem[t+(l|h<<8)] = l;
+            mem[t=+(l|h<<8) + 1] = h;
+          }
+        } else {
+          CALLC(ff&128);
+        }
         ih=1;break;
-      case 0xfc: // CALL M
-        CALLCI(ff&128);
-        ih=1;break;
+      case 0xfc: // CALL M  / (RCM) RR HL
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          long long savest = st;
+          if ( ih ) {
+            RR(h);
+            RR(l);
+          } else if ( iy ) {
+            RR(yh);
+            RR(yl);
+          } else {
+            RR(xh);
+            RR(xl);            
+          }
+          st = savest;
+          st += 2;
+        } else {
+          CALLCI(ff&128);
+        }
+        ih=1;
+        break;
       case 0xc6: // ADD A,n
         ADD(mem[pc++], 7);
         ih=1;break;
@@ -1962,8 +2131,18 @@ int main (int argc, char **argv){
       case 0xef: // RST 0x28
         RST(0x28);
         ih=1;break;
-      case 0xf7: // RST 0x30
-        RST(0x30);
+      case 0xf7: // RST 0x30, (RCM) mul
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          // HL:BC = BC • DE
+          int32_t result = (( d * 256 ) + e) * (( b * 256 ) + c);
+          h = (result >> 24);
+          l = (result >> 16) & 0xff;
+          b  = (result >> 8 ) & 0xff;
+          c = result & 0xff;
+          st += 12;
+        } else {
+          RST(0x30);
+        }
         ih=1;break;
       case 0xff: // RST 0x38
         RST(0x38);
@@ -1974,21 +2153,39 @@ int main (int argc, char **argv){
         mp= mp&65280
           | ++mp;
         ih=1;break;
-      case 0xdb: // IN A,(n)
+      case 0xdb: // IN A,(n) // (RCM) ioe
         st+= 11;
         a= in(mp= mem[pc++] | a<<8);
         ++mp;
         ih=1;break;
-      case 0xf3: // DI
-        st+= 4;
-        iff= 0;
-        ih=1;break;
-      case 0xfb: // EI
-        st+= 4;
-        iff= 1;
-        ih=1;break;
+      case 0xf3: // DI  / (RCM) RL DE
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          long long savest = st;
+          RL(e);
+          RL(d);
+          st = savest;
+          st += 2;
+        } else {
+          st+= 4;
+          iff= 0;
+          ih=1;
+        }
+        break;
+      case 0xfb: // EI / (RCM) RR DE
+        if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+          long long savest = st;
+          RR(d);
+          RR(e);
+          st = savest;
+          st += 2;
+        } else {
+          st+= 4;
+          iff= 1;
+        }
+        ih=1;
+        break;
       case 0xeb: // EX DE,HL
-        st+= 4;
+        st+= c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4;
         t= d;
         d= h;
         h= t;
@@ -1997,7 +2194,7 @@ int main (int argc, char **argv){
         l= t;
         ih=1;break;
       case 0xd9: // EXX
-        st+= 4;
+        st+= c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4;
         t = b;
         b = b_;
         b_= t;
@@ -2017,13 +2214,23 @@ int main (int argc, char **argv){
         l = l_;
         l_= t;
         ih=1;break;
-      case 0xe3: // EX (SP),HL // EX (SP),IX // EX (SP),IY
-        if( ih )
-          EXSPI(h, l);
-        else if( iy )
-          EXSPI(yh, yl);
-        else
-          EXSPI(xh, xl);
+      case 0xe3: // EX (SP),HL // EX (SP),IX // EX (SP),IY or (RCM) EX DE',HL
+        if ( c_cpu & (CPU_R2K|CPU_R3K) && ih ) {
+          t = h;
+          h = d_;
+          d_ = t;
+          t = l;
+          l = e_;
+          e_ = l;
+          st += 2;
+        } else {
+          if( ih )
+            EXSPI(h, l);
+          else if( iy )
+            EXSPI(yh, yl);
+          else
+            EXSPI(xh, xl);
+        }
         ih=1;break;
       case 0xe9: // JP (HL)
         st+= 4;
@@ -2035,7 +2242,7 @@ int main (int argc, char **argv){
           pc= xl | xh<<8;
         ih=1;break;
       case 0xf9: // LD SP,HL
-        st+= 4;
+        st+= c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4;
         if( ih )
           sp= l | h<<8;
         else if( iy )
@@ -2044,11 +2251,11 @@ int main (int argc, char **argv){
           sp= xl | xh<<8;
         ih=1;break;
       case 0xdd: // OP DD
-        st+= 4;
+        st+= c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4;
         ih= iy= 0;
         ih=0;break;
       case 0xfd: // OP FD
-        st+= 4;
+        st+= c_cpu & (CPU_R2K|CPU_R3K) ? 2 : 4;
         ih= 0;
         iy= 1;
         ih=0;break;
@@ -2446,7 +2653,7 @@ int main (int argc, char **argv){
             case 0x83: RES(254, t); mem[mp]= e= t; break;    // LD E,RES 0,(IX+d) // LD E,RES 0,(IY+d)
             case 0x84: RES(254, t); mem[mp]= h= t; break;    // LD H,RES 0,(IX+d) // LD H,RES 0,(IY+d)
             case 0x85: RES(254, t); mem[mp]= l= t; break;    // LD L,RES 0,(IX+d) // LD L,RES 0,(IY+d)
-            case 0x86: RES(254, t); mem[mp]= t; break;       // RES 0,(IX+d) // RES 0,(IY+d)
+            case 0x86: RES(254, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K) ) st -= 9; break;       // RES 0,(IX+d) // RES 0,(IY+d)
             case 0x87: RES(254, t); mem[mp]= a= t; break;    // LD A,RES 0,(IX+d) // LD A,RES 0,(IY+d)
             case 0x88: RES(253, t); mem[mp]= b= t; break;    // LD B,RES 1,(IX+d) // LD B,RES 1,(IY+d)
             case 0x89: RES(253, t); mem[mp]= c= t; break;    // LD C,RES 1,(IX+d) // LD C,RES 1,(IY+d)
@@ -2454,7 +2661,7 @@ int main (int argc, char **argv){
             case 0x8b: RES(253, t); mem[mp]= e= t; break;    // LD E,RES 1,(IX+d) // LD E,RES 1,(IY+d)
             case 0x8c: RES(253, t); mem[mp]= h= t; break;    // LD H,RES 1,(IX+d) // LD H,RES 1,(IY+d)
             case 0x8d: RES(253, t); mem[mp]= l= t; break;    // LD L,RES 1,(IX+d) // LD L,RES 1,(IY+d)
-            case 0x8e: RES(253, t); mem[mp]= t; break;       // RES 1,(IX+d) // RES 1,(IY+d)
+            case 0x8e: RES(253, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K) ) st -= 9; break;       // RES 1,(IX+d) // RES 1,(IY+d)
             case 0x8f: RES(253, t); mem[mp]= a= t; break;    // LD A,RES 1,(IX+d) // LD A,RES 1,(IY+d)
             case 0x90: RES(251, t); mem[mp]= b= t; break;    // LD B,RES 2,(IX+d) // LD B,RES 2,(IY+d)
             case 0x91: RES(251, t); mem[mp]= c= t; break;    // LD C,RES 2,(IX+d) // LD C,RES 2,(IY+d)
@@ -2462,7 +2669,7 @@ int main (int argc, char **argv){
             case 0x93: RES(251, t); mem[mp]= e= t; break;    // LD E,RES 2,(IX+d) // LD E,RES 2,(IY+d)
             case 0x94: RES(251, t); mem[mp]= h= t; break;    // LD H,RES 2,(IX+d) // LD H,RES 2,(IY+d)
             case 0x95: RES(251, t); mem[mp]= l= t; break;    // LD L,RES 2,(IX+d) // LD L,RES 2,(IY+d)
-            case 0x96: RES(251, t); mem[mp]= t; break;       // RES 2,(IX+d) // RES 2,(IY+d)
+            case 0x96: RES(251, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K) ) st -= 9; break;       // RES 2,(IX+d) // RES 2,(IY+d)
             case 0x97: RES(251, t); mem[mp]= a= t; break;    // LD A,RES 2,(IX+d) // LD A,RES 2,(IY+d)
             case 0x98: RES(247, t); mem[mp]= b= t; break;    // LD B,RES 3,(IX+d) // LD B,RES 3,(IY+d)
             case 0x99: RES(247, t); mem[mp]= c= t; break;    // LD C,RES 3,(IX+d) // LD C,RES 3,(IY+d)
@@ -2470,7 +2677,7 @@ int main (int argc, char **argv){
             case 0x9b: RES(247, t); mem[mp]= e= t; break;    // LD E,RES 3,(IX+d) // LD E,RES 3,(IY+d)
             case 0x9c: RES(247, t); mem[mp]= h= t; break;    // LD H,RES 3,(IX+d) // LD H,RES 3,(IY+d)
             case 0x9d: RES(247, t); mem[mp]= l= t; break;    // LD L,RES 3,(IX+d) // LD L,RES 3,(IY+d)
-            case 0x9e: RES(247, t); mem[mp]= t; break;       // RES 3,(IX+d) // RES 3,(IY+d)
+            case 0x9e: RES(247, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K) ) st -= 9; break;       // RES 3,(IX+d) // RES 3,(IY+d)
             case 0x9f: RES(247, t); mem[mp]= a= t; break;    // LD A,RES 3,(IX+d) // LD A,RES 3,(IY+d)
             case 0xa0: RES(239, t); mem[mp]= b= t; break;    // LD B,RES 4,(IX+d) // LD B,RES 4,(IY+d)
             case 0xa1: RES(239, t); mem[mp]= c= t; break;    // LD C,RES 4,(IX+d) // LD C,RES 4,(IY+d)
@@ -2478,7 +2685,7 @@ int main (int argc, char **argv){
             case 0xa3: RES(239, t); mem[mp]= e= t; break;    // LD E,RES 4,(IX+d) // LD E,RES 4,(IY+d)
             case 0xa4: RES(239, t); mem[mp]= h= t; break;    // LD H,RES 4,(IX+d) // LD H,RES 4,(IY+d)
             case 0xa5: RES(239, t); mem[mp]= l= t; break;    // LD L,RES 4,(IX+d) // LD L,RES 4,(IY+d)
-            case 0xa6: RES(239, t); mem[mp]= t; break;       // RES 4,(IX+d) // RES 4,(IY+d)
+            case 0xa6: RES(239, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K) ) st -= 9; break;       // RES 4,(IX+d) // RES 4,(IY+d)
             case 0xa7: RES(239, t); mem[mp]= a= t; break;    // LD A,RES 4,(IX+d) // LD A,RES 4,(IY+d)
             case 0xa8: RES(223, t); mem[mp]= b= t; break;    // LD B,RES 5,(IX+d) // LD B,RES 5,(IY+d)
             case 0xa9: RES(223, t); mem[mp]= c= t; break;    // LD C,RES 5,(IX+d) // LD C,RES 5,(IY+d)
@@ -2486,7 +2693,7 @@ int main (int argc, char **argv){
             case 0xab: RES(223, t); mem[mp]= e= t; break;    // LD E,RES 5,(IX+d) // LD E,RES 5,(IY+d)
             case 0xac: RES(223, t); mem[mp]= h= t; break;    // LD H,RES 5,(IX+d) // LD H,RES 5,(IY+d)
             case 0xad: RES(223, t); mem[mp]= l= t; break;    // LD L,RES 5,(IX+d) // LD L,RES 5,(IY+d)
-            case 0xae: RES(223, t); mem[mp]= t; break;       // RES 5,(IX+d) // RES 5,(IY+d)
+            case 0xae: RES(223, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;       // RES 5,(IX+d) // RES 5,(IY+d)
             case 0xaf: RES(223, t); mem[mp]= a= t; break;    // LD A,RES 5,(IX+d) // LD A,RES 5,(IY+d)
             case 0xb0: RES(191, t); mem[mp]= b= t; break;    // LD B,RES 6,(IX+d) // LD B,RES 6,(IY+d)
             case 0xb1: RES(191, t); mem[mp]= c= t; break;    // LD C,RES 6,(IX+d) // LD C,RES 6,(IY+d)
@@ -2494,7 +2701,7 @@ int main (int argc, char **argv){
             case 0xb3: RES(191, t); mem[mp]= e= t; break;    // LD E,RES 6,(IX+d) // LD E,RES 6,(IY+d)
             case 0xb4: RES(191, t); mem[mp]= h= t; break;    // LD H,RES 6,(IX+d) // LD H,RES 6,(IY+d)
             case 0xb5: RES(191, t); mem[mp]= l= t; break;    // LD L,RES 6,(IX+d) // LD L,RES 6,(IY+d)
-            case 0xb6: RES(191, t); mem[mp]= t; break;       // RES 6,(IX+d) // RES 6,(IY+d)
+            case 0xb6: RES(191, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;       // RES 6,(IX+d) // RES 6,(IY+d)
             case 0xb7: RES(191, t); mem[mp]= a= t; break;    // LD A,RES 6,(IX+d) // LD A,RES 6,(IY+d)
             case 0xb8: RES(127, t); mem[mp]= b= t; break;    // LD B,RES 7,(IX+d) // LD B,RES 7,(IY+d)
             case 0xb9: RES(127, t); mem[mp]= c= t; break;    // LD C,RES 7,(IX+d) // LD C,RES 7,(IY+d)
@@ -2502,7 +2709,7 @@ int main (int argc, char **argv){
             case 0xbb: RES(127, t); mem[mp]= e= t; break;    // LD E,RES 7,(IX+d) // LD E,RES 7,(IY+d)
             case 0xbc: RES(127, t); mem[mp]= h= t; break;    // LD H,RES 7,(IX+d) // LD H,RES 7,(IY+d)
             case 0xbd: RES(127, t); mem[mp]= l= t; break;    // LD L,RES 7,(IX+d) // LD L,RES 7,(IY+d)
-            case 0xbe: RES(127, t); mem[mp]= t; break;       // RES 7,(IX+d) // RES 7,(IY+d)
+            case 0xbe: RES(127, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;       // RES 7,(IX+d) // RES 7,(IY+d)
             case 0xbf: RES(127, t); mem[mp]= a= t; break;    // LD A,RES 7,(IX+d) // LD A,RES 7,(IY+d)
             case 0xc0: SET(1, t); mem[mp]= b= t; break;      // LD B,SET 0,(IX+d) // LD B,SET 0,(IY+d)
             case 0xc1: SET(1, t); mem[mp]= c= t; break;      // LD C,SET 0,(IX+d) // LD C,SET 0,(IY+d)
@@ -2510,7 +2717,7 @@ int main (int argc, char **argv){
             case 0xc3: SET(1, t); mem[mp]= e= t; break;      // LD E,SET 0,(IX+d) // LD E,SET 0,(IY+d)
             case 0xc4: SET(1, t); mem[mp]= h= t; break;      // LD H,SET 0,(IX+d) // LD H,SET 0,(IY+d)
             case 0xc5: SET(1, t); mem[mp]= l= t; break;      // LD L,SET 0,(IX+d) // LD L,SET 0,(IY+d)
-            case 0xc6: SET(1, t); mem[mp]= t; break;         // SET 0,(IX+d) // SET 0,(IY+d)
+            case 0xc6: SET(1, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;         // SET 0,(IX+d) // SET 0,(IY+d)
             case 0xc7: SET(1, t); mem[mp]= a= t; break;      // LD A,SET 0,(IX+d) // LD A,SET 0,(IY+d)
             case 0xc8: SET(2, t); mem[mp]= b= t; break;      // LD B,SET 1,(IX+d) // LD B,SET 1,(IY+d)
             case 0xc9: SET(2, t); mem[mp]= c= t; break;      // LD C,SET 1,(IX+d) // LD C,SET 1,(IY+d)
@@ -2518,7 +2725,7 @@ int main (int argc, char **argv){
             case 0xcb: SET(2, t); mem[mp]= e= t; break;      // LD E,SET 1,(IX+d) // LD E,SET 1,(IY+d)
             case 0xcc: SET(2, t); mem[mp]= h= t; break;      // LD H,SET 1,(IX+d) // LD H,SET 1,(IY+d)
             case 0xcd: SET(2, t); mem[mp]= l= t; break;      // LD L,SET 1,(IX+d) // LD L,SET 1,(IY+d)
-            case 0xce: SET(2, t); mem[mp]= t; break;         // SET 1,(IX+d) // SET 1,(IY+d)
+            case 0xce: SET(2, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;         // SET 1,(IX+d) // SET 1,(IY+d)
             case 0xcf: SET(2, t); mem[mp]= a= t; break;      // LD A,SET 1,(IX+d) // LD A,SET 1,(IY+d)
             case 0xd0: SET(4, t); mem[mp]= b= t; break;      // LD B,SET 2,(IX+d) // LD B,SET 2,(IY+d)
             case 0xd1: SET(4, t); mem[mp]= c= t; break;      // LD C,SET 2,(IX+d) // LD C,SET 2,(IY+d)
@@ -2526,7 +2733,7 @@ int main (int argc, char **argv){
             case 0xd3: SET(4, t); mem[mp]= e= t; break;      // LD E,SET 2,(IX+d) // LD E,SET 2,(IY+d)
             case 0xd4: SET(4, t); mem[mp]= h= t; break;      // LD H,SET 2,(IX+d) // LD H,SET 2,(IY+d)
             case 0xd5: SET(4, t); mem[mp]= l= t; break;      // LD L,SET 2,(IX+d) // LD L,SET 2,(IY+d)
-            case 0xd6: SET(4, t); mem[mp]= t; break;         // SET 2,(IX+d) // SET 2,(IY+d)
+            case 0xd6: SET(4, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;         // SET 2,(IX+d) // SET 2,(IY+d)
             case 0xd7: SET(4, t); mem[mp]= a= t; break;      // LD A,SET 2,(IX+d) // LD A,SET 2,(IY+d)
             case 0xd8: SET(8, t); mem[mp]= b= t; break;      // LD B,SET 3,(IX+d) // LD B,SET 3,(IY+d)
             case 0xd9: SET(8, t); mem[mp]= c= t; break;      // LD C,SET 3,(IX+d) // LD C,SET 3,(IY+d)
@@ -2534,7 +2741,7 @@ int main (int argc, char **argv){
             case 0xdb: SET(8, t); mem[mp]= e= t; break;      // LD E,SET 3,(IX+d) // LD E,SET 3,(IY+d)
             case 0xdc: SET(8, t); mem[mp]= h= t; break;      // LD H,SET 3,(IX+d) // LD H,SET 3,(IY+d)
             case 0xdd: SET(8, t); mem[mp]= l= t; break;      // LD L,SET 3,(IX+d) // LD L,SET 3,(IY+d)
-            case 0xde: SET(8, t); mem[mp]= t; break;         // SET 3,(IX+d) // SET 3,(IY+d)
+            case 0xde: SET(8, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;         // SET 3,(IX+d) // SET 3,(IY+d)
             case 0xdf: SET(8, t); mem[mp]= a= t; break;      // LD A,SET 3,(IX+d) // LD A,SET 3,(IY+d)
             case 0xe0: SET(16, t); mem[mp]= b= t; break;     // LD B,SET 4,(IX+d) // LD B,SET 4,(IY+d)
             case 0xe1: SET(16, t); mem[mp]= c= t; break;     // LD C,SET 4,(IX+d) // LD C,SET 4,(IY+d)
@@ -2542,7 +2749,7 @@ int main (int argc, char **argv){
             case 0xe3: SET(16, t); mem[mp]= e= t; break;     // LD E,SET 4,(IX+d) // LD E,SET 4,(IY+d)
             case 0xe4: SET(16, t); mem[mp]= h= t; break;     // LD H,SET 4,(IX+d) // LD H,SET 4,(IY+d)
             case 0xe5: SET(16, t); mem[mp]= l= t; break;     // LD L,SET 4,(IX+d) // LD L,SET 4,(IY+d)
-            case 0xe6: SET(16, t); mem[mp]= t; break;        // SET 4,(IX+d) // SET 4,(IY+d)
+            case 0xe6: SET(16, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;        // SET 4,(IX+d) // SET 4,(IY+d)
             case 0xe7: SET(16, t); mem[mp]= a= t; break;     // LD A,SET 4,(IX+d) // LD A,SET 4,(IY+d)
             case 0xe8: SET(32, t); mem[mp]= b= t; break;     // LD B,SET 5,(IX+d) // LD B,SET 5,(IY+d)
             case 0xe9: SET(32, t); mem[mp]= c= t; break;     // LD C,SET 5,(IX+d) // LD C,SET 5,(IY+d)
@@ -2550,7 +2757,7 @@ int main (int argc, char **argv){
             case 0xeb: SET(32, t); mem[mp]= e= t; break;     // LD E,SET 5,(IX+d) // LD E,SET 5,(IY+d)
             case 0xec: SET(32, t); mem[mp]= h= t; break;     // LD H,SET 5,(IX+d) // LD H,SET 5,(IY+d)
             case 0xed: SET(32, t); mem[mp]= l= t; break;     // LD L,SET 5,(IX+d) // LD L,SET 5,(IY+d)
-            case 0xee: SET(32, t); mem[mp]= t; break;        // SET 5,(IX+d) // SET 5,(IY+d)
+            case 0xee: SET(32, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;        // SET 5,(IX+d) // SET 5,(IY+d)
             case 0xef: SET(32, t); mem[mp]= a= t; break;     // LD A,SET 5,(IX+d) // LD A,SET 5,(IY+d)
             case 0xf0: SET(64, t); mem[mp]= b= t; break;     // LD B,SET 6,(IX+d) // LD B,SET 6,(IY+d)
             case 0xf1: SET(64, t); mem[mp]= c= t; break;     // LD C,SET 6,(IX+d) // LD C,SET 6,(IY+d)
@@ -2558,7 +2765,7 @@ int main (int argc, char **argv){
             case 0xf3: SET(64, t); mem[mp]= e= t; break;     // LD E,SET 6,(IX+d) // LD E,SET 6,(IY+d)
             case 0xf4: SET(64, t); mem[mp]= h= t; break;     // LD H,SET 6,(IX+d) // LD H,SET 6,(IY+d)
             case 0xf5: SET(64, t); mem[mp]= l= t; break;     // LD L,SET 6,(IX+d) // LD L,SET 6,(IY+d)
-            case 0xf6: SET(64, t); mem[mp]= t; break;        // SET 6,(IX+d) // SET 6,(IY+d)
+            case 0xf6: SET(64, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;        // SET 6,(IX+d) // SET 6,(IY+d)
             case 0xf7: SET(64, t); mem[mp]= a= t; break;     // LD A,SET 6,(IX+d) // LD A,SET 6,(IY+d)
             case 0xf8: SET(128, t); mem[mp]= b= t; break;    // LD B,SET 7,(IX+d) // LD B,SET 7,(IY+d)
             case 0xf9: SET(128, t); mem[mp]= c= t; break;    // LD C,SET 7,(IX+d) // LD C,SET 7,(IY+d)
@@ -2566,7 +2773,7 @@ int main (int argc, char **argv){
             case 0xfb: SET(128, t); mem[mp]= e= t; break;    // LD E,SET 7,(IX+d) // LD E,SET 7,(IY+d)
             case 0xfc: SET(128, t); mem[mp]= h= t; break;    // LD H,SET 7,(IX+d) // LD H,SET 7,(IY+d)
             case 0xfd: SET(128, t); mem[mp]= l= t; break;    // LD L,SET 7,(IX+d) // LD L,SET 7,(IY+d)
-            case 0xfe: SET(128, t); mem[mp]= t; break;       // SET 7,(IX+d) // SET 7,(IY+d)
+            case 0xfe: SET(128, t); mem[mp]= t; if ( c_cpu & (CPU_R2K|CPU_R3K)) st -= 9; break;       // SET 7,(IX+d) // SET 7,(IY+d)
             case 0xff: SET(128, t); mem[mp]= a= t; break;    // LD A,SET 7,(IX+d) // LD A,SET 7,(IY+d)
           }
         }
@@ -2583,26 +2790,23 @@ int main (int argc, char **argv){
           case 0x18: case 0x19: case 0x1a: case 0x1b:
           case 0x1c: case 0x1d: case 0x1e: case 0x1f:
           case 0x20: case 0x21: case 0x22: case 0x23:
-          case 0x24: case 0x25: case 0x26: case 0x27:
+          case 0x24: case 0x26: 
           case 0x28: case 0x29: case 0x2a: case 0x2b:
           case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-          case 0x30: case 0x31: case 0x32: case 0x33:
-          case 0x34: case 0x35: case 0x36: case 0x37:
-          case 0x38: case 0x39: case 0x3a: case 0x3b:
-          case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+          case 0x3e: case 0x3f:
           case 0x77: case 0x7f:
           case 0x80: case 0x81: case 0x82: case 0x83:
           case 0x84: case 0x85: case 0x86: case 0x87:
-          case 0x88: case 0x89: case 0x8a: case 0x8b:
+          case 0x88: case 0x89: 
           case 0x8c: case 0x8d: case 0x8e: case 0x8f:
           case 0x90: case 0x91: case 0x92: case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-          case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-          case 0xac: case 0xad: case 0xae: case 0xaf:
-          case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-          case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+          case 0xa5: case 0xa6: case 0xa7:
+          case 0xad: case 0xae: case 0xaf:
+          case 0xb5: case 0xb6: case 0xb7:
+          case 0xbd: case 0xbe: case 0xbf:
           case 0xc0: case 0xc1: case 0xc2: case 0xc3:
           case 0xc4: case 0xc5: case 0xc6: case 0xc7:
           case 0xc8: case 0xc9: case 0xca: case 0xcb:
@@ -2620,6 +2824,280 @@ int main (int argc, char **argv){
           case 0xf8: case 0xf9: case 0xfa: case 0xfb:
           case 0xfc: case 0xfd: case 0xff:
             st+= 8; break;
+          case 0x30:                                         // (ZXN) mul
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = (( d * 256 ) + e) * (( h * 256 ) + l);
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x31:                                         // (ZXN) add hl,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int16_t result = (( h * 256 ) + l) + a;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x32:                                         // (ZXN) add de,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int16_t result = (( d * 256 ) + e) + a;
+              d  = (result >> 8 ) & 0xff;
+              e = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x33:                                         // (ZXN) add bc,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int16_t result = (( b * 256 ) + c) + a;
+              b  = (result >> 8 ) & 0xff;
+              c = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x34:                                         // (ZXN) add hl,$xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x35:                                         // (ZXN) add de,$xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
+              d  = (result >> 8 ) & 0xff;
+              e = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x36:                                         // (ZXN) add bc,$xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
+              b = (result >> 8 ) & 0xff;
+              c = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x25:                                         // (ZXN) ld hl,sp
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              h = ( sp / 256);
+              l = ( sp % 256);
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x37:                                         // (ZXN) inc dehl
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              if ( ++l == 0 ) 
+                if ( ++h == 0 ) 
+                  if ( ++e == 0 ) 
+                    ++d;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x38:                                         // (ZXN) dec dehl
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              if ( --l == 0xff ) 
+                if ( --h == 0xff ) 
+                  if ( --e == 0xff ) 
+                    --d;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x39:                                         // (ZXN) add dehl,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + a;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3A:                                         // (ZXN) add dehl,bc
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + (( b * 256) + c);;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3B:                                         // (ZXN) add dehl,$XXXX
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + ( lsb + msb * 256);
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3C:                                         // (ZXN) sub dehl,a
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) - a;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x3D:                                         // (ZXN) sub dehl,bc
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) - (( b * 256) + c);;
+              d = (result >> 24);
+              e = (result >> 16) & 0xff;
+              h  = (result >> 8 ) & 0xff;
+              l = result & 0xff;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x8a:                                         // (ZXN) push $xxxx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t lsb = mem[pc++];
+              uint8_t msb = mem[pc++];
+              PUSH(msb,lsb);
+              st += 12;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x8b:                                         // (ZXN) popx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              sp += 2;
+              st += 4;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x27:                                         // (ZXN) tst $xx
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t olda = a;
+              AND(mem[pc++], 0);
+              a = olda;
+              st += 7;
+            } else {
+              st += 8;
+            }
+            break;
+          case 0xa4: st+= 16;                                // (ZXN) ldix
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+              mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            mem[e | d<<8]= t= mem[l | h<<8];
+            ++l || h++;
+            ++e || d++;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+                  | t     &   8
+                  | t<<4  &  32;
+            fa= 0;
+            b|c && (fa= 128);
+            fb= fa; break;
+          case 0xac: st+= 16;                                // (ZXN) lddx
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            l-- || h--;
+            e-- || d--;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && (fa= 128);
+            fb= fa; break;
+          case 0xb4: st+= 16;                                // (ZXN) ldirx
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            ++l || h++;
+            ++e || d++;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && ( fa= 128,
+                     st+= 5,
+                     mp= --pc,
+                            --pc);
+                   fb= fa; break;
+          case 0xbc: st+= 16;                                // LDDR
+            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            t = mem[l | h<<8];
+            if ( t != a ) {
+                mem[e | d<<8]= t= mem[l | h<<8];
+            }
+            l-- || h--;
+            e-- || d--;
+            c-- || b--;
+            fr && (fr= 1);
+            t+= a;
+            ff=  ff    & -41
+               | t     &   8
+               | t<<4  &  32;
+            fa= 0;
+            b|c && ( fa= 128,
+                     st+= 5,
+                     mp= --pc,
+                     --pc);
+            fb= fa; break;
           case 0xfe: PatchZ80(); break;
           case 0x40: INR(b); break;                          // IN B,(C)
           case 0x48: INR(c); break;                          // IN C,(C)
@@ -2675,7 +3153,16 @@ int main (int argc, char **argv){
                      t= mem[pc++];
                      sp= mem[t|= mem[pc++]<<8];
                      sp|= mem[mp= t+1] << 8; break;
-          case 0x44: case 0x4c: case 0x54: case 0x5c:        // NEG
+          case 0x54:
+            if ( c_cpu & (CPU_R2K|CPU_R3K)) {
+              long long saved = st;
+              EXSPI(h, l);
+              st = saved;
+              st += 15;
+              break;
+            }
+            // Fall through for z80 case
+          case 0x44: case 0x4c: case 0x5c:        // NEG
           case 0x64: case 0x6c: case 0x74: case 0x7c:
                      st+= 8;
                      fr= a= (ff= (fb= ~a)+1);
@@ -2689,14 +3176,14 @@ int main (int argc, char **argv){
                      st+= 8; im= 1; break;
           case 0x5e: case 0x7e:                              // IM 2
                      st+= 8; im= 2; break;
-          case 0x47: LDRR(i, a, 9); break;                   // LD I,A
-          case 0x4f: LDRR(r, a, 9); r7= r; break;            // LD R,A
-          case 0x57: st+= 9;                                 // LD A,I
+          case 0x47: LDRR(i, a, c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 9); break;                   // LD I,A
+          case 0x4f: LDRR(r, a, c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 9); r7= r; break;            // LD R,A
+          case 0x57: st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 9;                                 // LD A,I
                      ff=  ff&-256
                         | (a= i);
                      fr= !!a;
                      fa= fb= iff<<7 & 128; break;
-          case 0x5f: st+= 9;                                 // LD A,R
+          case 0x5f: st += c_cpu & (CPU_R2K|CPU_R3K) ? 4 : 9;                                     // LD A,R
                      ff=  ff&-256
                         | (a= (r&127|r7&128));
                      fr= !!a;
@@ -2721,7 +3208,7 @@ int main (int argc, char **argv){
                      fa= a|256;
                      fb= 0;
                      mem[mp++]= t; break;
-          case 0xa0: st+= 16;                                // LDI
+          case 0xa0: st+= c_cpu & (CPU_R2K|CPU_R3K) ? 10 :  16;                               // LDI
                      mem[e | d<<8]= t= mem[l | h<<8];
                      ++l || h++;
                      ++e || d++;
@@ -2734,7 +3221,7 @@ int main (int argc, char **argv){
                      fa= 0;
                      b|c && (fa= 128);
                      fb= fa; break;
-          case 0xa8: st+= 16;                                // LDD
+          case 0xa8: st+= c_cpu & (CPU_R2K|CPU_R3K) ? 10 :  16;                                // LDD
                      mem[e | d<<8]= t= mem[l | h<<8];
                      l-- || h--;
                      e-- || d--;
@@ -2747,7 +3234,7 @@ int main (int argc, char **argv){
                      fa= 0;
                      b|c && (fa= 128);
                      fb= fa; break;
-          case 0xb0: st+= 16;                                // LDIR
+          case 0xb0: st+= c_cpu & (CPU_R2K|CPU_R3K) ? 7 :  16;                                // LDIR
                      mem[e | d<<8]= t= mem[l | h<<8];
                      ++l || h++;
                      ++e || d++;
@@ -2759,11 +3246,11 @@ int main (int argc, char **argv){
                         | t<<4  &  32;
                      fa= 0;
                      b|c && ( fa= 128,
-                              st+= 5,
+                              st+= c_cpu & (CPU_R2K|CPU_R3K) ? 6 :  5,
                               mp= --pc,
                               --pc);
                      fb= fa; break;
-          case 0xb8: st+= 16;                                // LDDR
+          case 0xb8: st+= c_cpu & (CPU_R2K|CPU_R3K) ? 7 : 16;                                // LDDR
                      mem[e | d<<8]= t= mem[l | h<<8];
                      l-- || h--;
                      e-- || d--;
@@ -2775,7 +3262,7 @@ int main (int argc, char **argv){
                         | t<<4  &  32;
                      fa= 0;
                      b|c && ( fa= 128,
-                              st+= 5,
+                              st+= c_cpu & (CPU_R2K|CPU_R3K) ? 6 : 5,
                               mp= --pc,
                               --pc);
                      fb= fa; break;

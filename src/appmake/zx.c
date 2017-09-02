@@ -949,8 +949,8 @@ int make_sna(void)
     if ((stackloc = parameter_search(crtname, ".map", "__register_sp")) < -1)
         stackloc = -stackloc;
 
-    if (stackloc > 1)
-        stackloc -= 2;
+    if (stackloc >= 0)
+        stackloc = (stackloc - 2) & 0xffff;
 
     // determine initial ei/di state
 

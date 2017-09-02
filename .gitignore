@@ -47,10 +47,14 @@ win32/copt/Debug/
 win32/zcc/Release/
 win32/zcc/Debug/
 win32/zcpp/Release/
+win32/z88dk-dis/Debug/
+win32/z88dk-dis/Release/
 win32/zpragma/Debug/
 win32/zx7/Debug/
 win32/zpragma/Release/
 win32/zx7/Release/
+win32/z88dk-install/Debug/
+win32/z88dk-install/Release/
 win32/.vs/
 win32/z88dk.VC.VC.opendb
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/asm_NIRVANAP.asm

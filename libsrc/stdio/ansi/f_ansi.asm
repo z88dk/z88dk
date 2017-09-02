@@ -958,11 +958,15 @@ push de
 ; Variables declaration
 ;-----------------------------------------
 	SECTION		bss_clib
+        PUBLIC    	_ansi_COLUMN
         PUBLIC    	ansi_COLUMN
+		PUBLIC    	_ansi_ROW
         PUBLIC    	ansi_ROW
 
+._ansi_COLUMN
 .ansi_COLUMN    defb    0
-.ansi_ROW       defb    0
+._ansi_ROW
+.ansi_ROW       defw    0
 
 .scp_x  defb 0
 .scp_y  defb 0

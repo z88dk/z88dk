@@ -587,6 +587,7 @@
 #define __ESXDOS_SEEK_FWD  1
 #define __ESXDOS_SEEK_BWD  2
 
+#define __ESXDOS_OK  0
 #define __ESXDOS_EOK  1
 #define __ESXDOS_ENONSENSE  2
 #define __ESXDOS_ESTEND  3

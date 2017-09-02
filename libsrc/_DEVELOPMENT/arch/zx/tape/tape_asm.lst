@@ -1,0 +1,2 @@
+arch/zx/tape/z80/asm_zx_tape_load_block
+arch/zx/tape/z80/asm_zx_tape_save_block

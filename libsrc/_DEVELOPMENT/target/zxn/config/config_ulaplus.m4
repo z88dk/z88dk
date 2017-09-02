@@ -2,7 +2,7 @@ divert(-1)
 
 ###############################################################
 # ULAPLUS CONFIGURATION
-# nothing to configure, not exported for zxn target
+# defines colours only, no ula+ export for zxn target
 
 # Colours
 

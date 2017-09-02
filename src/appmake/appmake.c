@@ -243,7 +243,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
         {
             snprintf(cmdline, sizeof(cmdline), "__data_align_%d_head", c);
             if (((start = parameter_search(crtfile, ".map", cmdline)) & (c - 1)) != 0)
-                fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", strlen(cmdline) - 5, cmdline, start);
+                fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", (int)strlen(cmdline) - 5, cmdline, start);
         }
 
         // bss sections
@@ -253,7 +253,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
         {
             snprintf(cmdline, sizeof(cmdline), "__bss_align_%d_head", c);
             if (((start = parameter_search(crtfile, ".map", cmdline)) & (c - 1)) != 0)
-                fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", strlen(cmdline) - 5, cmdline, start);
+                fprintf(stderr, "Warning: SECTION %*s is not aligned with start address %#x\n", (int)strlen(cmdline) - 5, cmdline, start);
         }
     }
 
