@@ -14,5 +14,5 @@
 ._readbyte
 	ld	b,l
 	ld	a,CMD_READBYTE
-	rst	8
+	rst	16
 	ret

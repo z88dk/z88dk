@@ -16,6 +16,6 @@
 .fgetc_cons
 ._fgetc_cons
 	ld	a,CMD_READKEY
-	rst	8
+	rst	16
 	ret
 

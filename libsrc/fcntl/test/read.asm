@@ -21,5 +21,5 @@
 	push	af
 	ld	b,c
 	ld	a,CMD_READBLOCK
-	rst	8
+	rst	16
 	ret

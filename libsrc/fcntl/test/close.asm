@@ -17,5 +17,5 @@
 	push	hl
 	ld	b,c
 	ld	a,CMD_CLOSEF
-	rst	8
+	rst	16
 	ret
