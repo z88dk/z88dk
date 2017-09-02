@@ -748,7 +748,7 @@ int main (int argc, char **argv){
 
 
   do{
-    if ( debugger_enabled ) debugger();
+    if ( debugger_enabled && ih ) debugger();
     if( pc==start )
       st= 0,
       stint= intr,

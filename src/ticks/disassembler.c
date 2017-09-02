@@ -2011,6 +2011,8 @@ typedef struct {
     int       index;
     int       pc;
     int       len;
+    uint8_t   prefix;
+    uint8_t   displacement;
     uint8_t   opcode;
     uint8_t   instr_bytes[6];
 } dcontext;
@@ -2105,7 +2107,11 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         return c_cpu & (CPU_R2K|CPU_R3K) ? "iir" : "r";
     case OP_INDHL:
         if ( instr->flags & F_INDXY && state->index ) {
-            READ_BYTE(state, displacement);
+            if ( state->prefix != 0xCB ) {
+                READ_BYTE(state, displacement);
+            } else {
+                displacement = state->displacement;
+            }
             snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "ix" : "iy", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
             return buf;
         }
@@ -2244,6 +2250,7 @@ int disassemble(int pc, char *buf, size_t buflen)
         READ_BYTE(state,b);
         if ( b == 0xDD || b == 0xFD ) {
             state->index = b;
+            state->prefix = 0;
             table = main_page; 
             if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
                 table = rabbit_dd_page;
@@ -2252,6 +2259,7 @@ int disassemble(int pc, char *buf, size_t buflen)
         }
         if ( b == 0xED ) {
             table = ed_page;
+            state->prefix = 0xED;
             if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
                 table = rabbit_ed_page;
             } else if ( c_cpu == CPU_Z180 ) {
@@ -2261,6 +2269,10 @@ int disassemble(int pc, char *buf, size_t buflen)
             state->index = 0; // Index ops not permitted
         } else if ( b == 0xcb ) {
             table = cb_page;
+            state->prefix = 0xCB;
+            if ( state->index ) {
+                READ_BYTE(state, state->displacement);
+            }
             READ_BYTE(state,b);
         }
         state->opcode = b;
