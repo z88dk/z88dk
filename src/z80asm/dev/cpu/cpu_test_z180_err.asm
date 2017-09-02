@@ -48,10 +48,27 @@
  add a, ixl                     ; Error
  add a, iyh                     ; Error
  add a, iyl                     ; Error
+ add bc, -32768                 ; Error
+ add bc, 32767                  ; Error
+ add bc, 65535                  ; Error
+ add bc, a                      ; Error
+ add de, -32768                 ; Error
+ add de, 32767                  ; Error
+ add de, 65535                  ; Error
+ add de, a                      ; Error
+ add dehl, -32768               ; Error
+ add dehl, 32767                ; Error
+ add dehl, 65535                ; Error
+ add dehl, a                    ; Error
+ add dehl, bc                   ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
+ add hl, -32768                 ; Error
+ add hl, 32767                  ; Error
+ add hl, 65535                  ; Error
+ add hl, a                      ; Error
  add ixh                        ; Error
  add ixl                        ; Error
  add iyh                        ; Error
@@ -1833,6 +1850,7 @@
  dec c'                         ; Error
  dec d'                         ; Error
  dec de'                        ; Error
+ dec dehl                       ; Error
  dec e'                         ; Error
  dec h'                         ; Error
  dec hl'                        ; Error
@@ -1843,9 +1861,12 @@
  dec l'                         ; Error
  djnz b', ASMPC                 ; Error
  ex (sp), hl'                   ; Error
+ ex a32, dehl                   ; Error
  ex de', hl                     ; Error
  ex de', hl'                    ; Error
  ex de, hl'                     ; Error
+ fill de                        ; Error
+ fillde                         ; Error
  idet                           ; Error
  im -1                          ; Error
  im -1                          ; Error
@@ -1857,6 +1878,7 @@
  inc c'                         ; Error
  inc d'                         ; Error
  inc de'                        ; Error
+ inc dehl                       ; Error
  inc e'                         ; Error
  inc h'                         ; Error
  inc hl'                        ; Error
@@ -4074,6 +4096,7 @@
  ld a, iyh                      ; Error
  ld a, iyl                      ; Error
  ld a, xpc                      ; Error
+ ld a32, dehl                   ; Error
  ld b', (hl)                    ; Error
  ld b', (ix)                    ; Error
  ld b', (ix+127)                ; Error
@@ -4153,6 +4176,7 @@
  ld de', 65535                  ; Error
  ld de', bc                     ; Error
  ld de', de                     ; Error
+ ld dehl, a32                   ; Error
  ld e', (hl)                    ; Error
  ld e', (ix)                    ; Error
  ld e', (ix+127)                ; Error
@@ -4228,6 +4252,7 @@
  ld hl, (sp+255)                ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
+ ld hl, sp                      ; Error
  ld iir, a                      ; Error
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
@@ -4295,8 +4320,13 @@
  ld l', h                       ; Error
  ld l', l                       ; Error
  ld xpc, a                      ; Error
+ lddrx                          ; Error
  lddsr                          ; Error
+ lddx                           ; Error
+ ldirscale                      ; Error
+ ldirx                          ; Error
  ldisr                          ; Error
+ ldix                           ; Error
  ldp (-32768), hl               ; Error
  ldp (-32768), ix               ; Error
  ldp (-32768), iy               ; Error
@@ -4321,12 +4351,21 @@
  ldp iy, (-32768)               ; Error
  ldp iy, (32767)                ; Error
  ldp iy, (65535)                ; Error
+ ldpirx                         ; Error
  lsddr                          ; Error
  lsdr                           ; Error
  lsidr                          ; Error
  lsir                           ; Error
+ mirror a                       ; Error
+ mirror de                      ; Error
  mul                            ; Error
  neg a'                         ; Error
+ nextreg -128, -128             ; Error
+ nextreg -128, a                ; Error
+ nextreg 127, 127               ; Error
+ nextreg 127, a                 ; Error
+ nextreg 255, 255               ; Error
+ nextreg 255, a                 ; Error
  or a', (hl)                    ; Error
  or a', (ix)                    ; Error
  or a', (ix+127)                ; Error
@@ -4360,12 +4399,19 @@
  out (c), -1                    ; Error
  out (c), 1                     ; Error
  out (c), 1                     ; Error
+ outinb                         ; Error
+ pixelad                        ; Error
+ pixeldn                        ; Error
  pop af'                        ; Error
  pop bc'                        ; Error
  pop de'                        ; Error
  pop hl'                        ; Error
  pop ip                         ; Error
  pop su                         ; Error
+ popx                           ; Error
+ push -32768                    ; Error
+ push 32767                     ; Error
+ push 65535                     ; Error
  push ip                        ; Error
  push su                        ; Error
  rdmode                         ; Error
@@ -5104,6 +5150,7 @@
  set 8, l                       ; Error
  set 8, l'                      ; Error
  set 8, l'                      ; Error
+ setae                          ; Error
  setusr                         ; Error
  sla (ix), a                    ; Error
  sla (ix), b                    ; Error
@@ -5377,11 +5424,15 @@
  sub a, ixl                     ; Error
  sub a, iyh                     ; Error
  sub a, iyl                     ; Error
+ sub dehl, a                    ; Error
+ sub dehl, bc                   ; Error
  sub ixh                        ; Error
  sub ixl                        ; Error
  sub iyh                        ; Error
  sub iyl                        ; Error
  sures                          ; Error
+ swap                           ; Error
+ swapnib                        ; Error
  syscall                        ; Error
  uma                            ; Error
  ums                            ; Error

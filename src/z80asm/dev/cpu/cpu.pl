@@ -540,6 +540,63 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "otimr", 	0xED, 0x93);
 		}
 	}
+	
+	# Z80-ZXN opcodes for ZX Next
+	if ($z80_zxn) {
+		add_opc($cpu, "ld a32, dehl", 	0xED, 0x20);
+		add_opc($cpu, "ld dehl, a32", 	0xED, 0x21);
+		add_opc($cpu, "ex a32, dehl", 	0xED, 0x22);
+		
+		add_opc($cpu, "swapnib", 		0xED, 0x23);
+		add_opc($cpu, "swap", 			0xED, 0x23);
+		add_opc($cpu, "mirror a", 		0xED, 0x24);
+		
+		add_opc($cpu, "ld hl, sp",		0xED, 0x25);
+
+		add_opc($cpu, "mirror de", 		0xED, 0x26);
+		
+		add_opc($cpu, "add hl, a",		0xED, 0x31);
+		add_opc($cpu, "add de, a",		0xED, 0x32);
+		add_opc($cpu, "add bc, a",		0xED, 0x33);
+		
+		add_opc($cpu, "add hl, %m",		0xED, 0x34, '%m', '%m');
+		add_opc($cpu, "add de, %m",		0xED, 0x35, '%m', '%m');
+		add_opc($cpu, "add bc, %m",		0xED, 0x36, '%m', '%m');
+		
+		add_opc($cpu, "inc dehl",	 	0xED, 0x37);
+		add_opc($cpu, "dec dehl",	 	0xED, 0x38);
+
+		add_opc($cpu, "add dehl, a", 	0xED, 0x39);
+		add_opc($cpu, "add dehl, bc", 	0xED, 0x3A);
+		add_opc($cpu, "add dehl, %m", 	0xED, 0x3B, '%m', '%m');
+		
+		add_opc($cpu, "sub dehl, a", 	0xED, 0x3C);
+		add_opc($cpu, "sub dehl, bc", 	0xED, 0x3D);
+		
+		add_opc($cpu, "push %m",	 	0xED, 0x8A, '%m', '%m');
+		add_opc($cpu, "popx",		 	0xED, 0x8B);
+
+		add_opc($cpu, "outinb",			0xED, 0x90);
+		
+		add_opc($cpu, "nextreg %n, %n",	0xED, 0x91, '%n', '%n');
+		add_opc($cpu, "nextreg %n, a",	0xED, 0x92, '%n');
+
+		add_opc($cpu, "pixeldn",		0xED, 0x93);
+		add_opc($cpu, "pixelad",		0xED, 0x94);
+		add_opc($cpu, "setae",			0xED, 0x95);
+		
+		add_opc($cpu, "ldix",			0xED, 0xA4);
+		add_opc($cpu, "lddx",			0xED, 0xAC);
+		add_opc($cpu, "ldirx",			0xED, 0xB4);
+		add_opc($cpu, "lddrx",			0xED, 0xBC);
+		
+		add_opc($cpu, "ldirscale",		0xED, 0xB6);
+		
+		add_opc($cpu, "fill de",		0xED, 0xB5);
+		add_opc($cpu, "fillde",			0xED, 0xB5);
+		
+		add_opc($cpu, "ldpirx",			0xED, 0xB7);
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -551,7 +608,7 @@ for my $asm (sort keys %Opcodes) {
 	my $tokens = parser_tokens($asm);
 	
 	# asm for swap_ix_iy
-	(my $asm_swap = $asm) =~ s/(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
+	(my $asm_swap = $asm) =~ s/\b(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
 	
 	# check for parens
 	my $parens;
@@ -609,7 +666,7 @@ for my $asm (sort keys %Tests) {
 			for my $ixiy ('', '_ixiy') {
 				my $asm1 = $asm;
 				if ($ixiy) {
-					$asm1 =~ s/(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
+					$asm1 =~ s/\b(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
 				}
 				my $bin1 = $Tests{$asm1}{$cpu};
 				
@@ -831,6 +888,9 @@ sub parse_code {
 	}
 	elsif ($bin =~ s/ %d %n$//) {
 		$stmt = "DO_stmt_idx_n";
+	}
+	elsif ($bin =~ s/ %n %n$//) {
+		$stmt = "DO_stmt_n_n";
 	}
 	elsif ($bin =~ s/ %n$//) {
 		$stmt = "DO_stmt_n";
