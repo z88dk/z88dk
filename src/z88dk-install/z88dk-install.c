@@ -352,9 +352,9 @@ int main(int argc, char **argv)
             if (*target == 0)
                 exit_log(1, "Nonsensical target %s\n", argv[i]);
         }
-        else if (stricmp(argv[i], "-f") == 0)
+        else if (strcasecmp(argv[i], "-f") == 0)
             force = 1;
-        else if ((stricmp(argv[i], "-r") == 0) || (stricmp(argv[i], "--remove") == 0))
+        else if ((strcasecmp(argv[i], "-r") == 0) || (strcasecmp(argv[i], "--remove") == 0))
             delete = 1;
         else if (argv[i][0] == '-')
             exit_log(1, "Unrecognized option %s\n", argv[i]);
