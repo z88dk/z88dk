@@ -33,6 +33,10 @@ Define lexer tokens
 #define TOKEN_OPCODE(opcode)
 #endif
 
+#ifndef TOKEN_OPCODE1
+#define TOKEN_OPCODE1(opcode, string)
+#endif
+
 TOKEN(	TK_END,			"",)	/* = 0; end of file reached */
 TOKEN(	TK_NIL,			"", )	/* returned for rubish */
 TOKEN(	TK_NAME,		"", )
@@ -127,6 +131,10 @@ TOKEN_KW(PO, )
 TOKEN_KW(PE, )
 TOKEN_KW(P,  )
 TOKEN_KW(M,  )
+TOKEN_KW(LZ, )
+TOKEN_KW(LO, )
+TOKEN_KW(NV, )
+TOKEN_KW(V,  )
 
 /* 8-bit registers */
 TOKEN_KW(B, )
@@ -152,9 +160,6 @@ TOKEN_KW(IIR, )
 TOKEN_KW(R,   )
 TOKEN_KW(EIR, )
 
-/* indirect 8-bit register */
-TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )
-
 /* 16-bit registers */
 TOKEN_KW(BC, )
 TOKEN_KW(DE, )
@@ -165,21 +170,35 @@ TOKEN_KW(IY, )
 
 TOKEN_KW(AF, )
 TOKEN_KW(SP, )
+TOKEN_KW(IP, )
+TOKEN_KW(SU, )
+TOKEN_KW(XPC, )
 
+TOKEN(TK_B1, "B'", )
+TOKEN(TK_C1, "C'", )
+TOKEN(TK_D1, "D'", )
+TOKEN(TK_E1, "E'", )
+TOKEN(TK_H1, "H'", )
+TOKEN(TK_L1, "L'", )
+TOKEN(TK_A1, "A'", )
+TOKEN(TK_F1, "F'", )
+
+TOKEN(TK_BC1, "BC'", )
+TOKEN(TK_DE1, "DE'", )
+TOKEN(TK_HL1, "HL'", )
 TOKEN(TK_AF1, "AF'", )
 
-/* indirect 16-bit registers */
-TOKEN_RE(TK_IND_BC, "(BC)", "(" hspace "BC"i hspace ")", )
-TOKEN_RE(TK_IND_DE, "(DE)", "(" hspace "DE"i hspace ")", )
-
-TOKEN_RE(TK_IND_HL, "(HL)", "(" hspace "HL"i hspace ")", )
-
-/* TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
+/* indirect 8- and 16-bit registers */
+/* TK_IND_IX|IY|HL is followed by ')', '+' or '-', but follow char is not matched - 
 *  can collect expression, will be positive or negative depending on symbol */
+TOKEN_RE(TK_IND_BC, "(BC", "(" hspace "BC"i index_reg_suffix, p--; te--)
+TOKEN_RE(TK_IND_DE, "(DE", "(" hspace "DE"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IX, "(IX", "(" hspace "IX"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, p--; te--)
+TOKEN_RE(TK_IND_HL, "(HL", "(" hspace "HL"i index_reg_suffix, p--; te--)
+TOKEN_RE(TK_IND_SP, "(SP", "(" hspace "SP"i index_reg_suffix, p--; te--)
 
-TOKEN_RE(TK_IND_SP, "(SP)", "(" hspace "SP"i hspace ")", )
+TOKEN_RE(TK_IND_C,  "(C",  "(" hspace "C"i  index_reg_suffix, p--; te--)
 
 /* 32-bit registers */
 TOKEN_KW(A32, )
@@ -226,6 +245,7 @@ TOKEN_OPCODE(AND  )
 TOKEN_OPCODE(BIT  )
 TOKEN_OPCODE(CALL )
 TOKEN_OPCODE(CCF  )
+TOKEN_OPCODE1(CCF1, "ccf'")
 TOKEN_OPCODE(CP   )
 TOKEN_OPCODE(CPD  )
 TOKEN_OPCODE(CPDR )
@@ -270,20 +290,26 @@ TOKEN_OPCODE(RETI )
 TOKEN_OPCODE(RETN )
 TOKEN_OPCODE(RL   )
 TOKEN_OPCODE(RLA  )
+TOKEN_OPCODE1(RLA1, "rla'")
 TOKEN_OPCODE(RLC  )
 TOKEN_OPCODE(RLCA )
+TOKEN_OPCODE1(RLCA1, "rlca'")
 TOKEN_OPCODE(RLD  )
 TOKEN_OPCODE(RR   )
 TOKEN_OPCODE(RRA  )
+TOKEN_OPCODE1(RRA1, "rra'")
 TOKEN_OPCODE(RRC  )
 TOKEN_OPCODE(RRCA )
+TOKEN_OPCODE1(RRCA1, "rrca'")
 TOKEN_OPCODE(RRD  )
 TOKEN_OPCODE(RST  )
 TOKEN_OPCODE(SBC  )
 TOKEN_OPCODE(SCF  )
+TOKEN_OPCODE1(SCF1, "scf'")
 TOKEN_OPCODE(SET  )
 TOKEN_OPCODE(SLA  )
 TOKEN_OPCODE(SLL  )
+TOKEN_OPCODE(SLI  )
 TOKEN_OPCODE(SRA  )
 TOKEN_OPCODE(SRL  )
 TOKEN_OPCODE(SUB  )
@@ -292,7 +318,6 @@ TOKEN_OPCODE(XOR  )
 /* Z80-ZXN specific opcodes */
 TOKEN_OPCODE(SWAPNIB)
 TOKEN_OPCODE(SWAP)
-TOKEN_OPCODE(MUL)
 TOKEN_OPCODE(OUTINB)
 TOKEN_OPCODE(LDIX)
 TOKEN_OPCODE(LDIRX)
@@ -311,16 +336,39 @@ TOKEN_OPCODE(SETAE)
 TOKEN_OPCODE(TEST)
 
 /* Z180 opcodes */
-TOKEN_OPCODE(SLP)
-TOKEN_OPCODE(MLT)
 TOKEN_OPCODE(IN0)
-TOKEN_OPCODE(OUT0)
-TOKEN_OPCODE(OTIM)
-TOKEN_OPCODE(OTIMR)
+TOKEN_OPCODE(MLT)
 TOKEN_OPCODE(OTDM)
 TOKEN_OPCODE(OTDMR)
+TOKEN_OPCODE(OTIM)
+TOKEN_OPCODE(OTIMR)
+TOKEN_OPCODE(OUT0)
+TOKEN_OPCODE(SLP)
 TOKEN_OPCODE(TST)
 TOKEN_OPCODE(TSTIO)
+
+/* Rabbit opcodes */
+TOKEN_OPCODE(ALTD)
+TOKEN_OPCODE(BOOL)
+TOKEN_OPCODE(IDET)
+TOKEN_OPCODE(IOE)
+TOKEN_OPCODE(IOI)
+TOKEN_OPCODE(IPRES)
+TOKEN_OPCODE(IPSET)
+TOKEN_OPCODE(LDDSR)
+TOKEN_OPCODE(LDISR)
+TOKEN_OPCODE(LDP)
+TOKEN_OPCODE(LSDR)
+TOKEN_OPCODE(LSIR)
+TOKEN_OPCODE(LSDDR)
+TOKEN_OPCODE(LSIDR)
+TOKEN_OPCODE(MUL)
+TOKEN_OPCODE(RDMODE)
+TOKEN_OPCODE(SETUSR)
+TOKEN_OPCODE(SURES)
+TOKEN_OPCODE(SYSCALL)
+TOKEN_OPCODE(UMA)
+TOKEN_OPCODE(UMS)
 
 /* Z88DK specific opcodes */
 TOKEN_OPCODE(CALL_OZ)

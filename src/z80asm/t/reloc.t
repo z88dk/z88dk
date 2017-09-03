@@ -190,7 +190,7 @@ t_binary(read_binfile("test_code.reloc"),
 							   
 t_binary(read_binfile("test_data.bin"), 
 		CPU::Z80::Assembler::z80asm(data_asm("").data_asm("1").data_asm("2")));
-ok ! -f "test_data.reloc";
+t_binary(read_binfile("test_data.reloc"), "");
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
 __head                          = $0000 ; G 
@@ -317,7 +317,7 @@ ok ! -f "test_code2.reloc";
 
 t_binary(read_binfile("test_data.bin"), 
 		CPU::Z80::Assembler::z80asm(data_asm("").data_asm("1").data_asm("2")));
-ok ! -f "test_data.reloc";
+t_binary(read_binfile("test_data.reloc"), "");
 
 ok ! -f "test_data1.bin";
 ok ! -f "test_data1.reloc";

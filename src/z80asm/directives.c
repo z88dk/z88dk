@@ -38,6 +38,14 @@ void asm_LABEL(char *name)
 	asm_LABEL_offset(name, 0);
 }
 
+void asm_cond_LABEL(Str *label)
+{
+	if (str_len(label)) {
+		asm_LABEL(str_data(label));
+		str_len(label) = 0;
+	}
+}
+
 /*-----------------------------------------------------------------------------
 *   DEFGROUP
 *----------------------------------------------------------------------------*/
