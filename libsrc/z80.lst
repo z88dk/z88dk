@@ -1,5 +1,6 @@
 @assert/assert.lst
 @ctype/ctype.lst
+@malloc/malloc.lst
 setjmp/longjmp
 setjmp/setjmp
 @stdlib/stdlib.lst

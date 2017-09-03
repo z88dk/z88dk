@@ -6,7 +6,7 @@ SOURCES += $(wildcard *.c)
 
 CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
-all:	test.bin 
+all:	test.bin  test_rcm.bin
 
 
 %.opt: %.c
@@ -16,5 +16,9 @@ test.bin: $(SOURCES)
 	$(compile)
 	$(runtest)
 
+test_rcm.bin: $(SOURCES)
+	$(compile_rcm)
+	$(runtest_rcm)
+
 clean:
-	rm -f test.bin $(OBJECTS) zcc_opt.def *~
+	rm -f test*bin $(OBJECTS) zcc_opt.def *~

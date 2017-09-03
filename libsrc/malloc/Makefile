@@ -1,22 +1,48 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile,v 1.20 2016-07-02 15:42:55 dom Exp $
 
 include ../Make.config
 
-all: $(OUTPUT_DIRECTORY)/malloc.lib $(OUTPUT_DIRECTORY)/malloc_rcm.lib
+TARGET ?= test
+GENOBJECTS = 
+CUSTOBJECTS = 
+ASMFILES = $(wildcard *.asm) strings/strdup.asm
 
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
 
-$(OUTPUT_DIRECTORY)/malloc.lib: $(wildcard *.asm) malllist
-	$(RM) *.o
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/malloc @malllist
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS))
 
-$(OUTPUT_DIRECTORY)/malloc_rcm.lib: $(wildcard *.asm) malllist
-	$(RM) *.o
-	$(LIBLINKER) --cpu=r2k -x$(OUTPUT_DIRECTORY)/malloc_rcm @malllist
+obj/z80/%.o: %.c
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/z80/%.o: %.asm
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/z80-zxn/%.o: %.c
+	zcc +test -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1  $(CFLAGS) -o $@  $^
+
+obj/z80-zxn/%.o: %.asm
+	zcc +test -mz80-zxn $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.c
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.asm
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.c
+	zcc +rcmx000 $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.asm
+	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
+
+obj/$(TARGET)/%.o: %.c
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+obj/$(TARGET)/%.o: %.asm
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+dirs:
+	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/z80-zxn obj/$(TARGET)
+	@mkdir -p obj/z80/strings obj/r2k/strings obj/ixiy/strings obj/z80-zxn/strings obj/$(TARGET)
 
 clean:
-	cd strings ; $(RM) *.o* ; cd ..
-	$(RM) *.o* *.sym *.map *~ *.err zcc_opt.def *.i 
-
+	$(RM) -fr obj

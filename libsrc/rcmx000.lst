@@ -1,5 +1,6 @@
 @stdio/stdio_r2k.lst
 @ctype/ctype.lst
+@malloc/malloc.lst
 stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
 stdio/rcmx000/getk
