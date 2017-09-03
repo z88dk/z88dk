@@ -88,6 +88,13 @@
 	ex	de,hl
 	ld	hl,(sp + %1)
 
+%check 0 <= %1 <= 253
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint
+=
+	ld	hl,(sp + %1)
+
 %check 0 <= %1 <= 127
 	ld	hl,%1	;const
 	add	hl,sp
@@ -105,10 +112,6 @@
 =
 	add	sp,#(%1 - 65536)
 	ld	hl,%2
-
-	call	l_neg
-=
-	neg	hl
 
 	call	l_or
 =
