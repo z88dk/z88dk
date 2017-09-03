@@ -68,8 +68,7 @@ enum
     NEWLIB_LIB_SDCC_IY,
     NEWLIB_LIB_END,
     NEWLIB_HDR_SCCZ80,
-    NEWLIB_HDR_SDCC_IX,
-    NEWLIB_HDR_SDCC_IY,
+    NEWLIB_HDR_SDCC,
     NEWLIB_HDR_CLANG,
     NEWLIB_HDR_END,
     NEWLIB_HDR_PROTO,
@@ -83,12 +82,11 @@ char *newlib_paths[NEWLIB_SIZE] = {
     "/../../libsrc/_DEVELOPMENT/lib/sdcc_iy/lib/",    // NEWLIB_LIB_SDCC_IY
     0,
     "/../../include/_DEVELOPMENT/sccz80/lib/",        // NEWLIB_HDR_SCCZ80
-    "/../../include/_DEVELOPMENT/sdcc_ix/lib/",       // NEWLIB_HDR_SDCC_IX
-    "/../../include/_DEVELOPMENT/sdcc_iy/lib/",       // NEWLIB_HDR_SDCC_IY
+    "/../../include/_DEVELOPMENT/sdcc/lib/",          // NEWLIB_HDR_SDCC
     "/../../include/_DEVELOPMENT/clang/lib/",         // NEWLIB_HDR_CLANG
     0,
     "/../../include/_DEVELOPMENT/proto/lib/",         // NEWLIB_HDR_PROTO
-    "/../../include/_DEVELOPMENT/"                    // NEWLIB_HDR_MAKE
+    "/../../include/_DEVELOPMENT"                     // NEWLIB_HDR_MAKE
 };
 
 //
@@ -214,7 +212,7 @@ char get_response(char *s)
 int copy(char *dst, char *src)
 {
     FILE *in, *out;
-    char c;
+    int c;
 
     if ((in = fopen(src, "rb")) == NULL)
         return 1;
@@ -245,7 +243,7 @@ int uninstall(char *name, char *s)
 
         if (!force)
         {
-            printf(delete ? "..remove? (y/n) " : "..overwrite? (y/n) ");
+            printf(delete ? "....remove? (y/n) " : "..overwrite? (y/n) ");
             fflush(stdout);
             yes = toupper(get_response("YyNn"));
         }
@@ -253,10 +251,10 @@ int uninstall(char *name, char *s)
         if (yes == 'Y')
         {
             if (remove(s) == 0)
-                printf("..removed %s\n", name);
+                printf("....removed %s\n", name);
             else
             {
-                printf("..failed to remove %s\n", name);
+                printf("....failed to remove %s\n", name);
                 return 1;
             }
         }
@@ -280,10 +278,12 @@ int install(char *name, char *dst, char *src)
         return 1;
 
     if (copy(dst, src))
-        printf("..failed to install %s\n", name);
-    else
-        printf("..installed %s\n", name);
+    {
+        printf("....failed to install %s\n", name);
+        return 1;
+    }
 
+    printf("....installed %s\n", name);
     return 0;
 }
 
@@ -299,7 +299,7 @@ void listlibs(char *name, char *src)
 
     do
     {
-        if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+        if (((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) && (strcasecmp(ffd.cFileName, "README") != 0))
             printf("..%s \"%s\" %u bytes\n", name, ffd.cFileName, (unsigned int)ffd.nFileSizeLow);
     } while (FindNextFileA(hfind, &ffd) != 0);
 
@@ -311,12 +311,14 @@ void listlibs(char *name, char *src)
     struct dirent *entry;
     struct stat st;
 
+    src[strlen(src) - 2] = 0;   // get rid of trailing '/*'
+
     if ((in = opendir(src)) == NULL)
         return;
 
     while ((entry = readdir(in)) != NULL)
     {
-        if ((stat(entry->d_name, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)))
+        if ((stat(entry->d_name, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (strcasecmp(entry->d_name, "README") != 0))
             printf("..%s \"%s\" %u bytes\n", name, entry->d_name, (unsigned int)st.st_size);
     }
 
@@ -403,9 +405,9 @@ int main(int argc, char **argv)
     // Shell command to make newlib headers
 
 #ifdef WIN32
-    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(3, ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], "Winmake 1> nul");
+    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && Winmake 1> nul");
 #else
-    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(3, ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], "make > /dev/nul");
+    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && make > /dev/nul");
 #endif
 
     //
@@ -418,39 +420,41 @@ int main(int argc, char **argv)
 
         // classic header
 
-        snprintf(src, sizeof(src), "%s", classic_paths[CLASSIC_HDR]);
+        snprintf(src, sizeof(src), "%s*", classic_paths[CLASSIC_HDR]);
         listlibs("classic hdr", src);
 
         // classic library
 
-        snprintf(src, sizeof(src), "%s", classic_paths[CLASSIC_LIB]);
+        snprintf(src, sizeof(src), "%s*", classic_paths[CLASSIC_LIB]);
         listlibs("classic lib", src);
 
         // newlib header
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SCCZ80]);
+        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_HDR_SCCZ80]);
         listlibs("newlib hdr sccz80", src);
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SDCC_IX]);
-        listlibs("newlib hdr sdcc_ix", src);
+        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_HDR_SDCC]);
+        listlibs("newlib hdr sdcc", src);
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SDCC_IY]);
-        listlibs("newlib hdr sdcc_iy", src);
+        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_HDR_CLANG]);
+        listlibs("newlib hdr clang", src);
 
         // newlib library
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SCCZ80]);
+        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_LIB_SCCZ80]);
         listlibs("newlib lib sccz80", src);
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SDCC_IX]);
+        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_LIB_SDCC_IX]);
         listlibs("newlib lib sdcc_ix", src);
 
-        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SDCC_IY]);
+        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_LIB_SDCC_IY]);
         listlibs("newlib lib sdcc_iy", src);
     }
     else
     {
         // install or remove libraries
+
+        int generate = 0;
 
         for (tmp = strtok(libnames, " "); tmp != NULL; tmp = strtok(NULL, " "))
         {
@@ -468,21 +472,21 @@ int main(int argc, char **argv)
 
                 classiclib = 0;
 
-                snprintf(src, sizeof(src), "%s%s", name, ".h");
+                snprintf(src, sizeof(src), "%s/%s/include/classic/%s%s", name, target, basename, ".h");
                 snprintf(dst, sizeof(dst), "%s%s%s", classic_paths[CLASSIC_HDR], basename, ".h");
 
                 if (delete)
-                    uninstall("classic hdr", dst);
+                    classiclib += !uninstall("classic hdr", dst);
                 else
                     classiclib += !install("classic hdr", dst, src);
 
                 // classic library
 
-                snprintf(src, sizeof(src), "%s%s", name, ".lib");
+                snprintf(src, sizeof(src), "%s/%s/lib/classic/%s%s", name, target, basename, ".lib");
                 snprintf(dst, sizeof(dst), "%s%s%s", classic_paths[CLASSIC_LIB], basename, ".lib");
 
                 if (delete)
-                    uninstall("classic lib", dst);
+                    classiclib += !uninstall("classic lib", dst);
                 else
                     classiclib += !install("classic lib", dst, src);
 
@@ -490,11 +494,11 @@ int main(int argc, char **argv)
 
                 newlib = 0;
 
-                snprintf(src, sizeof(src), "%s%s", name, "_newlib.h");
+                snprintf(src, sizeof(src), "%s/%s/include/newlib/%s%s", name, target, basename, ".h");
                 snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_PROTO], basename, ".h");
 
                 if (delete)
-                    uninstall("newlib hdr prototype", dst);
+                    newlib += !uninstall("newlib hdr prototype", dst);
                 else
                     newlib += !install("newlib hdr prototype", dst, src);
 
@@ -503,51 +507,54 @@ int main(int argc, char **argv)
                     snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SCCZ80], basename, ".h");
                     uninstall("newlib hdr sccz80", dst);
 
-                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SDCC_IX], basename, ".h");
-                    uninstall("newlib hdr sdcc_ix", dst);
-
-                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SDCC_IY], basename, ".h");
-                    uninstall("newlib hdr sdcc_iy", dst);
+                    snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_SDCC], basename, ".h");
+                    uninstall("newlib hdr sdcc", dst);
 
                     snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_HDR_CLANG], basename, ".h");
                     uninstall("newlib hdr clang", dst);
                 }
 
-                if (newlib)
-                {
-                    printf("..generating newlib headers\n");
-                    system(newlib_paths[NEWLIB_HDR_MAKE]);
-                }
+                generate += newlib;   // if changes have occurred to newlib headers, generate new headers at end
 
                 // newlib libraries
 
-                snprintf(src, sizeof(src), "%s%s", name, "_sccz80.lib");
+                snprintf(src, sizeof(src), "%s/%s/lib/newlib/sccz80/%s%s", name, target, basename, ".lib");
                 snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_LIB_SCCZ80], basename, ".lib");
 
                 if (delete)
-                    uninstall("newlib lib sccz80", dst);
+                    newlib += !uninstall("newlib lib sccz80", dst);
                 else
                     newlib += !install("newlib lib sccz80", dst, src);
 
-                snprintf(src, sizeof(src), "%s%s", name, "_sdcc_ix.lib");
+                snprintf(src, sizeof(src), "%s/%s/lib/newlib/sdcc_ix/%s%s", name, target, basename, ".lib");
                 snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_LIB_SDCC_IX], basename, ".lib");
 
                 if (delete)
-                    uninstall("newlib lib sdcc_ix", dst);
+                    newlib += !uninstall("newlib lib sdcc_ix", dst);
                 else
                     newlib += !install("newlib lib sdcc_ix", dst, src);
 
-                snprintf(src, sizeof(src), "%s%s", name, "_sdcc_iy.lib");
+                snprintf(src, sizeof(src), "%s/%s/lib/newlib/sdcc_iy/%s%s", name, target, basename, ".lib");
                 snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_LIB_SDCC_IY], basename, ".lib");
 
                 if (delete)
-                    uninstall("newlib lib sdcc_iy", dst);
+                    newlib += !uninstall("newlib lib sdcc_iy", dst);
                 else
                     newlib += !install("newlib lib sdcc_iy", dst, src);
 
                 if (!classiclib && !newlib)
                     printf("..not found\n");
             }
+        }
+
+        if (generate)
+        {
+            printf("\nGenerating newlib headers..(wait)..");
+            fflush(stdout);
+
+            system(newlib_paths[NEWLIB_HDR_MAKE]);
+            
+            printf("(done)\n\n");
         }
     }
 

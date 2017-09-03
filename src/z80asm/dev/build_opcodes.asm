@@ -327,10 +327,10 @@ IF !RABBIT
 	ld	{i r},a
 	ld	a,{i r}
 ELSE
- 	ld	iir,a							;; 	ld	i,a
- 	ld	eir,a							;; 	ld	r,a
- 	ld	a,iir							;; 	ld	a,i
- 	ld	a,eir							;; 	ld	a,r
+ 	ld	iir,a							;; 	ld	r,a
+ 	ld	eir,a							;; 	ld	i,a
+ 	ld	a,iir							;; 	ld	a,r
+ 	ld	a,eir							;; 	ld	a,i
 ENDIF
 
 ;------------------------------------------------------------------------------
@@ -402,18 +402,6 @@ ENDIF
 	ldd
 	lddr
 
-IF !RABBIT
-	cpi
-	cpir
-	cpd	
-	cpdr
-ELSE
-	cpi									;;	call rcmx_cpi
-	cpir								;;	call rcmx_cpir
-	cpd									;;	call rcmx_cpd
-	cpdr								;;	call rcmx_cpdr
-ENDIF
-
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
 ;------------------------------------------------------------------------------
@@ -463,14 +451,6 @@ ENDIF
 ;	{rlc rrc rl rr sla sra srl} (ix+DIS),{b c d e h l a}	=} 0xDD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{rlc rrc rl rr sla sra srl} (iy+DIS),{b c d e h l a}	=} 0xFD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{sll sli} ...
-
-IF !RABBIT
-	rld
-	rrd
-ELSE
-	rld									;;	call rcmx_rld
-	rrd									;;	call rcmx_rrd
-ENDIF
 
 ;	# rotate 16 bits
 ;
@@ -587,7 +567,6 @@ jr2:
 	ret
 	ret {nz z nc c po pe p m}
 	reti
-;	rst {0 1 2 3 4 5 6 7}
 
 
 IF !RABBIT
@@ -595,20 +574,15 @@ IF !RABBIT
 	
 	retn
 	
-	rst {00h 08h 10h 18h 20h 28h 30h 38h}
 ELSE
 	call {nz z nc c},NN					;;	jr {1!},$+5 ;; call NN
 	call {po pe p m},NN					;;	jp {1!},$+6 ;; call NN
 	
 	retn								;; error: illegal identifier
 	
-	rst {        10h 18h 20h 28h     38h}
-	rst {00h 08h                 30h    } ;; error: illegal identifier
 ENDIF
 
 	rst	undefined		   								;; error: symbol 'undefined' not defined
-	rst {-1 1 7 9 15 17 23 25 31 33 39 41 47 49 55 57}	;; error: integer '{1}' out of range
-
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
