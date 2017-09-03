@@ -24,6 +24,9 @@ Contact the author:
 #include <lib3d.h>
 #include <msx/line.h>
 
+
+#pragma printf %s
+
 // build a pyramid mesh
 
 #define HPSIZE 3000
