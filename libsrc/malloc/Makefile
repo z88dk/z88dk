@@ -5,8 +5,16 @@
 
 include ../Make.config
 
-default: $(wildcard *.asm) malllist
+all: $(OUTPUT_DIRECTORY)/malloc.lib $(OUTPUT_DIRECTORY)/malloc_rcm.lib
+
+
+$(OUTPUT_DIRECTORY)/malloc.lib: $(wildcard *.asm) malllist
+	$(RM) *.o
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/malloc @malllist
+
+$(OUTPUT_DIRECTORY)/malloc_rcm.lib: $(wildcard *.asm) malllist
+	$(RM) *.o
+	$(LIBLINKER) --cpu=r2k -x$(OUTPUT_DIRECTORY)/malloc_rcm @malllist
 
 clean:
 	cd strings ; $(RM) *.o* ; cd ..

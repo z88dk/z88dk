@@ -6,17 +6,14 @@
 
 
 sprintf_outc:
-IF __CPU_R2K__ | __CPU_R3K__
-	push	ix			;save ix
-	ld	ix,(sp+4)		;fp
-	ld	hl,(sp+6)		;character
-	ex	de,hl
-ELSE
 	pop	bc
 	pop	hl	;fp
 	pop	de	;charcter
 	push	bc
 	push	ix	;save ix
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	ix,hl
+ELSE
 	push	hl	;get fp into ix
 	pop	ix
 ENDIF
