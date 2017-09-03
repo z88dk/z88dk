@@ -1503,12 +1503,23 @@ int main (int argc, char **argv){
           LDRR(a, xh, 4);
         ih=1;break;
       case 0x7d: // LD A,L // LD A,IXl // LD A,IYl
-        if( ih )
+        if( ih ) {
           LDRR(a, l, 4);
-        else if( iy )
-          LDRR(a, yl, 4);
-        else
-          LDRR(a, xl, 4);
+        } else if( iy ) {
+          if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
+              yl = l; yh = h;      // LD IY,HL
+              st += 4;
+          } else {
+              LDRR(a, yl, 4);
+          }
+        } else {
+          if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
+              xl = l; xh = h;     // LD IX,HL
+              st += 4;
+          } else {
+              LDRR(a, xl, 4);
+          }
+        }
         ih=1;break;
       case 0x7e: // LD A,(HL) // LD A,(IX+d) // LD A,(IY+d)
         if( ih )
@@ -2021,7 +2032,7 @@ int main (int argc, char **argv){
           st += 11;
           if ( ih ) {    // ld hl,(ix+d)
             l = mem[t+(xl|xh<<8)];
-            h = mem[t=+(xl|xh<<8) + 1];
+            h = mem[t+(xl|xh<<8) + 1];
           } else if ( iy ) { // ld hl,(iy+d)
             l = mem[t+(yl|yh<<8)];
             h = mem[t+(yl|yh<<8) + 1];
