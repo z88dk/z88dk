@@ -20,8 +20,9 @@
 ._mult
 	add	sp,-4
 	ld	hl,(sp + 2)
-	ex	de,hl
+	push	hl
 	ld	hl,(sp + 2)
+	pop	de
 	call	l_mult
 	add	sp,4
 	ret
@@ -37,8 +38,9 @@
 
 ._or
 	ld	hl,(sp + 4)
-	ex	de,hl
+	push	hl
 	ld	hl,(sp + 4)
+	pop	de
 	or	hl,de
 	push	hl
 	ld	hl,(sp + 6)
@@ -56,8 +58,9 @@
 
 ._and
 	ld	hl,(sp + 4)
-	ex	de,hl
+	push	hl
 	ld	hl,(sp + 4)
+	pop	de
 	and	hl,de
 	push	hl
 	ld	hl,(sp + 6)
