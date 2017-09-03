@@ -24,21 +24,33 @@ int fchkstd(FILE *fp)
 {
 #ifdef Z80
 #asm
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(sp + 2)
+	ex	de,hl
+ELSE
 	pop	af
 	pop	de
 	push	de
 	push	af
+ENDIF
 	ld	hl,0
 	inc	de
 	inc	de	; points to +fp_flags
 	ld	a,(de)
+IF __CPU_Z80_ZXN__ | __CPU_Z180__
+	tst	_IOSYSTEM
+	scf
+	ret	z
+	dec	hl
+	tst	_IOREAD
+ELSE
 	and	_IOSYSTEM
 	scf
 	ret	z	;non system return 0
 	dec	hl	;-1
 	ld	a,(de)
 	and	_IOREAD
-	and	a	;don`t think this is necessary
+ENDIF
 	ret	nz
 	inc	hl
 	inc	hl	;write, return 1
