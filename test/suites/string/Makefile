@@ -15,7 +15,11 @@ test.bin: $(SOURCES)
 	$(compile)
 	$(runtest)
 
+test_rcm.bin: $(SOURCES)
+	$(compile_rcm)
+	$(runtest_rcm)
+
 
 
 clean:
-	rm -f test.bin $(OBJECTS) zcc_opt.def *~
+	rm -f test*.bin $(OBJECTS) zcc_opt.def *~
