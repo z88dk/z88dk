@@ -17,7 +17,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	my($cpu) = $base =~ /cpu_test(?:old)?_(\w+)$/; $cpu =~ tr/_/-/;
 	
 	# build command line
-	my $cmd = "z80asm --cpu=$cpu --no-emul ".
+	my $cmd = "z80asm --cpu=$cpu ".
 			($ixiy ? "--IXIY " : "").
 			" -m -l -b $file 2> test.err";
 	

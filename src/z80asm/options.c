@@ -136,7 +136,7 @@ void parse_argv( int argc, char *argv[] )
     if ( arg >= argc )
         error_no_src_file();				/* no source file */
 
-	include_z80asm_lib(argv[0]);			/* search for z80asm.lib, append to library path */
+	include_z80asm_lib(argv[0]);			/* search for z80asm-*.lib, append to library path */
 
 	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
@@ -606,26 +606,31 @@ static void option_use_lib( char *library )
 static void option_cpu_z80(void)
 {
 	opts.cpu = CPU_Z80;
+	opts.cpu_name = CPU_Z80_NAME;
 }
 
 static void option_cpu_z80_zxn(void)
 {
 	opts.cpu = CPU_Z80_ZXN;
+	opts.cpu_name = CPU_Z80_ZXN_NAME;
 }
 
 static void option_cpu_z180(void)
 {
 	opts.cpu = CPU_Z180;
+	opts.cpu_name = CPU_Z180_NAME;
 }
 
 static void option_cpu_r2k(void)
 {
 	opts.cpu = CPU_R2K;
+	opts.cpu_name = CPU_R2K_NAME;
 }
 
 static void option_cpu_r3k(void)
 {
 	opts.cpu = CPU_R3K;
+	opts.cpu_name = CPU_R3K_NAME;
 }
 
 void define_assembly_defines()
@@ -790,21 +795,27 @@ static char *search_z80asm_lib(char *prog_name)
 {
 	char *prog_dir;
 	char *expanded_file;
+	STR_DEFINE(lib_name_str, STR_SIZE);
+	char *lib_name;
 	STR_DEFINE(f, STR_SIZE);
 
-	if (file_exists(Z80ASM_LIB))
-		return Z80ASM_LIB;
+	/* Build libary file name */
+	str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
+	lib_name = strpool_add(str_data(lib_name_str));
+
+	if (file_exists(lib_name))
+		return lib_name;
 
 	prog_dir = path_dirname(prog_name);
-	str_sprintf(f, "%s/%s", prog_dir, Z80ASM_LIB);
+	str_sprintf(f, "%s/%s", prog_dir, lib_name);
 	if (file_exists(str_data(f)))
 		return strpool_add(str_data(f));
 
-	str_sprintf(f, "%s/../lib/%s", prog_dir, Z80ASM_LIB);
+	str_sprintf(f, "%s/../lib/%s", prog_dir, lib_name);
 	if (file_exists(str_data(f)))
 		return strpool_add(str_data(f));
 
-	str_sprintf(f, "${ZCCCFG}/../%s", Z80ASM_LIB);
+	str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
 	expanded_file = expand_environment_variables(str_data(f));
 	if (file_exists(expanded_file))
 		return expanded_file;
