@@ -7,7 +7,7 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test.bin 
+all:	test.bin test_rcm.bin
 
 
 
