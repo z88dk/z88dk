@@ -24,6 +24,6 @@
 	ld	d, (ix + 7)
 
 	ld	a,CMD_SEEK
-	rst	8
+	rst	16
 	pop	ix		;restore callers
 	ret

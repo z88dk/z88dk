@@ -56,6 +56,11 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] ZX Next specific code can be generated
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [ticks] [classiclib] File IO is now available
+- [ticks] A debugger is now available
+- [z80asm] Rabbit 2000 and 3000 are now fully supported
+- [z80asm] ZX Spectrum Next CPU extensions are supported
+- [z88dk-dis] A new standalone diassembler is available
+- [z88dk-install] A new program to install 3rd party libraries is now available
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [zcc] Custom optimisation rules can be supplied with -custom-copt-rules=
 - [zcc] A target must now be supplied to zcc

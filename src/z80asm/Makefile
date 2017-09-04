@@ -14,6 +14,7 @@ endif
 
 CC 			?= gcc
 INSTALL 	?= install
+CROSS		?= 0
 
 #------------------------------------------------------------------------------
 # Object files
@@ -32,14 +33,19 @@ TARGET =		z80asm$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 OPT = -O3
-STD = -std=gnu99
+
+STD = -std=gnu11
 LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
+
+TARGET_LIB =	z80asm.lib
+TARGET_ASM =	$(wildcard dev/z80asm_lib/*.asm)
 
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
 .PHONY: all
+
 all: $(TARGET)
 
 $(TARGET): ../config.h $(OBJS)
@@ -53,6 +59,23 @@ $(TARGET): ../config.h $(OBJS)
 
 %.o: %.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
+
+# parser is too big to optimize with -O3
+parse.o: parse.c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
+
+#------------------------------------------------------------------------------
+# library
+#------------------------------------------------------------------------------
+all: $(TARGET_LIB)
+
+$(TARGET_LIB): $(TARGET) $(TARGET_ASM)
+ifeq ($(CROSS),0)
+	./$(TARGET) --cpu=r2k -x$(TARGET_LIB) -d $(TARGET_ASM)
+endif
+
+clean::
+	$(RM) $(TARGET_LIB) $(TARGET_ASM:.asm=.o)
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
@@ -72,8 +95,9 @@ clean::
 # intall
 #------------------------------------------------------------------------------
 install:
-	$(INSTALL) $(TARGET) $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
-	$(INSTALL) asmpp.pl  $(PREFIX)/bin/
+	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
+	$(INSTALL) $(TARGET_LIB) $(PREFIX)/lib/$(TARGET_LIB)
+	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
 
 #------------------------------------------------------------------------------
 # clean

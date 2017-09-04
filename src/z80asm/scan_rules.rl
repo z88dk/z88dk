@@ -24,8 +24,8 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN2(name, string, set_value)	\
 		TOKEN(name, string, set_value)
 
-#define TOKEN_OPCODE(opcode)	 \
-	#opcode <CAT> i										<NL> \
+#define TOKEN_OPCODE1(opcode, string)	 \
+	string <CAT> i										<NL> \
 	{													<NL> \
 		<TAB>		if (expect_opcode) {				<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
@@ -38,6 +38,9 @@ ragel, to expand token definition from token_def.h.
 		<TAB>		}									<NL> \
 		<TAB>		fbreak; 							<NL> \
 	};													<NL>
+
+#define TOKEN_OPCODE(opcode)	 \
+	TOKEN_OPCODE1(opcode, #opcode)
 
 %%{
 machine lexer;

@@ -2695,6 +2695,26 @@ void GlobalPrefix(char type)
     }
 }
 
+static void mangle_filename(const char *input, char *buf, size_t len)
+{
+    char  hex[] = "0123456789ABCDEF";
+
+    while (*input && len > 3 ) {
+        unsigned char c = *input++;
+
+        if ( isalnum(c) ) {
+            *buf++ = c;
+            len--;
+        } else {
+            *buf++ = '_';
+            *buf++ = hex[(( c >> 4 ) & 0x0f)];
+            *buf++ = hex[(( c >> 0 ) & 0x0f)];
+            len -= 3;
+        }
+    }
+    *buf = 0;
+}
+
 /*
  *  Emit a LINE opcode for assembler
  *  error reporting
@@ -2706,6 +2726,11 @@ void EmitLine(int line)
         ot("LINE\t");
         outdec(line);
         nl();
+    }
+    if ( c_line_labels ) {
+        char buf[FILENAME_MAX+1];
+        mangle_filename(Filename, buf, sizeof(buf));
+        outfmt(".__CLINE__%s_3a%d\n", buf, line);
     }
 }
 

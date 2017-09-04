@@ -11,6 +11,8 @@ Assembly directives.
 
 #pragma once
 
+#include "str.h"
+
 struct Expr;
 
 enum {
@@ -23,6 +25,7 @@ enum {
 /* define a label at the current location, or current location + offset */
 extern void asm_LABEL(char *name);
 extern void asm_LABEL_offset(char *name, int offset);
+extern void asm_cond_LABEL(Str *label);		// define label if not empty
 
 /* start a new DEFVARS context, closing any previously open one */
 extern void asm_DEFVARS_start(int start_addr);

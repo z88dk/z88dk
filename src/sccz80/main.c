@@ -36,6 +36,7 @@ int c_shared_file; /* File contains routines which are to be
 int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
+int c_line_labels = 0;
 
 char *c_rodata_section = "rodata_compiler";
 char *c_data_section = "data_compiler";
@@ -127,6 +128,7 @@ static option  sccz80_opts[] = {
     { 0, "shared-file", OPT_BOOL, "All functions with this file are shared", &c_shared_file, 0 },
     { 0, "use-shared", OPT_BOOL, "Use shared library functions", &c_useshared, 0 },
     { 0, "share-offset", OPT_INT, "=<val> Define the shared offset (use with -make-shared)", &c_share_offset, 0 },
+    { 0, "glabels", OPT_BOOL, "Generate line labels", &c_line_labels, 0 },
 
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },

@@ -119,10 +119,10 @@
 	cpl
 	and	(hl)
 	ld	(hl),a
-	ld	a,(inverse_flag)
-	and	a
+	ld	a,(control_flags)
+	rrca
 	ld	a,(de)
-	jr	z,no_inverse64
+	jr	nc,no_inverse64
 	cpl
 .no_inverse64
 	and	c
@@ -174,11 +174,10 @@
 	add	hl,bc
 .print32_entry
 	ld	b,8
-	ld	a,(inverse_flag)
+	ld	a,(control_flags)
 	ld	c,a
 .loop32
-	ld	a,c
-	and	a
+	bit	0,c
 	ld	a,(hl)
 	jr	z,no_inverse32
 	cpl
@@ -212,7 +211,9 @@ calc_screen_address:
 	ld	a,h
 	cp	24
 	jr	c,noscroll
-	call	scrollup
+	ld	hl,control_flags
+	bit	1,(hl)
+	call	z,scrollup
 	ld	hl,23*256
 	ld	(chrloc),hl
 noscroll:
@@ -261,7 +262,7 @@ just_calculate:
 	defw    switch    ; 1 - SOH
 	defw    setfont32 ; 2
 	defw    setudg    ; 3
-	defw    noop    ; 4
+	defw    setvscroll ; 4
 	defw    noop    ; 5
 	defw    noop    ; 6
 	defw    noop    ; 7 - BEL
@@ -371,7 +372,9 @@ ENDIF
 	ld      a,h
 	cp      23
 	jr	nz,cr_1
-	call	scrollup
+	ld	a,(control_flags)
+	bit	1,a
+	call	z,scrollup
 	ld	h,22
 .cr_1
 	inc     h
@@ -381,38 +384,41 @@ ENDIF
 
 ; Set attributes etc
 .doinverse
+	ld	hl,control_flags
+	set	0,(hl)
 	ld	a,(params)
-	ld	b,1
 	rrca
-	jr	c,doinverse1
-	ld	b,0	;nop
-.doinverse1
-	ld	a,b
-	ld	(inverse_flag),a
+	ret	c
+	res	0,(hl)
+	ret
+
+.dovscroll
+	ld	hl,control_flags
+	res	1,(hl)
+	ld	a,(params)
+	rrca
+	ret	c
+	set	1,(hl)
 	ret
 
 
 .dobright
 	ld	hl,attr
+	set	6,(hl)
 	ld	a,(params)
 	rrca
-	jr	c,dobright1
+	ret	c
 	res	6,(hl)
-	ret
-.dobright1
-	set	6,(hl)
 	ret
 
 
 .doflash
 	ld	hl,attr
+	set	7,(hl)
 	ld	a,(params)
 	rrca
-	jr	c,doflash1
+	ret	c
 	res	7,(hl)
-	ret
-.doflash1
-	set	7,(hl)
 	ret
 
 .dopaper
@@ -458,7 +464,9 @@ ENDIF
 	ld	a,2
 	jr 	setparams
 	
-
+.setvscroll
+	ld	hl,dovscroll
+	jr	setink1
 .setinverse
 	ld	hl,doinverse
 	jr	setink1
@@ -554,7 +562,9 @@ ENDIF
 .params
 	defs    5
 
-.inverse_flag	defb	0
+; Bit 0 = inverse
+; Bit 1 = scroll disabled
+.control_flags	defb	0
 
 	SECTION data_clib
 

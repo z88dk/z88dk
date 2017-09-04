@@ -29,6 +29,11 @@ Parse command line options
 #define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80_ZXN))
 
 /*-----------------------------------------------------------------------------
+*   Assembler standard library
+*----------------------------------------------------------------------------*/
+#define Z80ASM_LIB	"z80asm.lib"
+
+/*-----------------------------------------------------------------------------
 *   APPMAKE type
 *----------------------------------------------------------------------------*/
 typedef enum { APPMAKE_NONE, APPMAKE_ZX81, APPMAKE_ZX } appmake_t;
@@ -50,9 +55,6 @@ extern Opts opts;
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
 extern void parse_argv( int argc, char *argv[] );
-
-// define static symbols depending on options
-extern void define_assembly_defines();
 
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in

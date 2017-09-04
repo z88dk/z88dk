@@ -2176,7 +2176,7 @@
 	dec	(hl)
 	ld	a,(hl)
 	inc	hl
-	cp  255
+	cp	255
 	jr	nz,ASMPC+3
 	dec	(hl)
 	ld	h,(hl)
@@ -2482,3 +2482,9 @@
 	ld	hl,%2	;const
 	ld	(%1),hl
 	ld	hl,%3
+
+	call	l_gintspsp	;
+	pop	hl
+=
+	add	hl,sp
+	call	l_gint

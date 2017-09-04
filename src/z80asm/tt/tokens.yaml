@@ -137,23 +137,27 @@ tokens:
 
   # Indirect 8-bit register
   - name	: IND_C
-    regexp	: '"(" hspace "C"i hspace ")"'
+    regexp	: '"(" hspace "C"i index_reg_suffix'
 
   # Indirect 16-bit register
-  - name	: IND_BC
-    regexp	: '"(" hspace "BC"i hspace ")"'
-
-  - name	: IND_DE
-    regexp	: '"(" hspace "DE"i hspace ")"'
-
-  - name	: IND_HL
-    regexp	: '"(" hspace "HL"i hspace ")"'
-
-  - name	: IND_SP
-    regexp	: '"(" hspace "SP"i hspace ")"'
-
   # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
   # can collect expression, will be positive or negative depending on symbol
+  - name	: IND_BC
+    regexp	: '"(" hspace "BC"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
+  - name	: IND_DE
+    regexp	: '"(" hspace "DE"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
+  - name	: IND_HL
+    regexp	: '"(" hspace "HL"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
+  - name	: IND_SP
+    regexp	: '"(" hspace "SP"i index_reg_suffix'
+    lexcode	: 'p--; te--;'
+
   - name	: IND_IX
     regexp	: '"(" hspace "IX"i index_reg_suffix'
     lexcode	: 'p--; te--;'
@@ -174,7 +178,11 @@ tokens:
   - name	: PE
   - name	: P
   - name	: M
-  
+  - name	: LZ
+  - name	: LO
+  - name	: NV
+  - name	: V
+
   # 8-bit registers
   - name	: B
   - name	: D
@@ -187,6 +195,7 @@ tokens:
   - name	: R
   - name	: IIR
   - name	: EIR
+  - name	: XPC
   - name	: IXH
   - name	: IYH
   - name	: IXL
@@ -200,6 +209,39 @@ tokens:
   - name	: IY
   - name	: AF
   - name	: SP
+  
+  - name	: B1
+    regexp	: "\"B'\"i"
+  
+  - name	: C1
+    regexp	: "\"C'\"i"
+  
+  - name	: D1
+    regexp	: "\"D'\"i"
+  
+  - name	: E1
+    regexp	: "\"E'\"i"
+  
+  - name	: H1
+    regexp	: "\"H'\"i"
+  
+  - name	: L1
+    regexp	: "\"L'\"i"
+  
+  - name	: A1
+    regexp	: "\"A'\"i"
+  
+  - name	: F1
+    regexp	: "\"F'\"i"
+  
+  - name	: BC1
+    regexp	: "\"BC'\"i"
+  
+  - name	: DE1
+    regexp	: "\"DE'\"i"
+  
+  - name	: HL1
+    regexp	: "\"HL'\"i"
   
   - name	: AF1
     regexp	: "\"AF'\"i"
@@ -256,6 +298,7 @@ tokens:
   - name	: BIT
   - name	: CALL
   - name	: CCF
+  - name	: CCF1
   - name	: CP
   - name	: CPD
   - name	: CPDR
@@ -300,20 +343,26 @@ tokens:
   - name	: RETN
   - name	: RL
   - name	: RLA
+  - name	: RLA1
   - name	: RLC
   - name	: RLCA
+  - name	: RLCA1
   - name	: RLD
   - name	: RR
   - name	: RRA
+  - name	: RRA1
   - name	: RRC
   - name	: RRCA
+  - name	: RRCA1
   - name	: RRD
   - name	: RST
   - name	: SBC
   - name	: SCF
+  - name	: SCF1
   - name	: SET
   - name	: SLA
   - name	: SLL
+  - name	: SLI
   - name	: SRA
   - name	: SRL
   - name	: SUB
@@ -322,12 +371,13 @@ tokens:
   # Z80-ZXN specific opcodes
   - name    : SWAPNIB
   - name    : SWAP
-  - name    : MUL
   - name    : OUTINB
   - name    : LDIX
   - name    : LDIRX
   - name    : LDDX
   - name    : LDDRX
+  - name    : LDIRSCALE
+  - name    : LDPIRX
   - name    : FILL
   - name    : FILLDE
   - name    : MIRROR
@@ -350,8 +400,34 @@ tokens:
   - name	: TST
   - name	: TSTIO
 
+  # Rabbit 2000/3000 specific opcodes
+  - name	: ALTD
+  - name	: BOOL
+  - name	: IOE
+  - name	: IOI
+  - name	: IPRES
+  - name	: IPSET
+  - name    : IDET
+  - name    : LDDSR
+  - name    : LDISR
+  - name    : LDP
+  - name    : LSDR
+  - name    : LSIR
+  - name    : LSDDR
+  - name    : LSIDR
+  - name	: MUL
+  - name	: IP
+  - name	: SU
+  - name	: RDMODE
+  - name	: SETUSR
+  - name	: SURES
+  - name	: SYSCALL
+  - name	: UMA
+  - name	: UMS
+  
   # Z88DK specific opcodes
   - name	: CALL_OZ
   - name	: CALL_PKG
   - name	: FPP
   - name	: INVOKE
+  

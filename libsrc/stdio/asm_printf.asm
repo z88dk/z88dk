@@ -34,6 +34,12 @@ asm_printf:
 	; -10 = length of buffer
 	;
 	; -80->-11 = buffer (69 bytes)
+IF __CPU_R2K__ | __CPU_R3K__
+	add	sp,-80
+	ld	hl,(ix+2)
+	ex	de,hl
+	ld	hl,(ix+4)
+ELSE
 	ld	hl,-80
 	add	hl,sp
 	ld	sp,hl
@@ -41,6 +47,7 @@ asm_printf:
 	ld	d,(ix+3)
 	ld	l,(ix+4)	;format pointer
 	ld	h,(ix+5)
+ENDIF
 	xor	a
 	ld	(ix-1),a
 	ld	(ix-2),a
@@ -60,9 +67,13 @@ asm_printf:
 	inc	hl
 	and	a
 	jr	nz,cont
+IF __CPU_R2K__ | __CPU_R3K__
+	add	sp,78
+ELSE
 	ld	hl,78		;adjust the stack
 	add	hl,sp
 	ld	sp,hl
+ENDIF
 	pop	hl		;grab the number of bytes written
 __printf_get_flags_noop:	
 	ret

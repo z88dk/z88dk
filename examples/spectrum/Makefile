@@ -112,16 +112,16 @@ smallgfx2:
 	zcc +zx -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2.bin
 
 wintest:
-	zcc +zx -vn ../graphics/wintest.c -lndos -lm -lx11 -lmalloc -create-app -owintest.bin
+	zcc +zx -vn ../graphics/wintest.c -lndos -lm -lx11  -create-app -owintest.bin
 
 sinwave_fast:
-	zcc +zx -vn ../graphics/sinwave.c -lndos -lm -lmalloc -create-app -osinwave_fast.bin
+	zcc +zx -vn ../graphics/sinwave.c -lndos -lm  -create-app -osinwave_fast.bin
 
 sinwave_small:
 	zcc +zx -vn ../graphics/sinwave.c -lndos -lmzx_tiny -O3 -create-app -osinwave_small.bin
 
 coswave_fast:
-	zcc +zx -vn ../graphics/coswave.c -lndos -lm -lmalloc -create-app -ocoswave_fast.bin
+	zcc +zx -vn ../graphics/coswave.c -lndos -lm  -create-app -ocoswave_fast.bin
 
 coswave_small:
 	zcc +zx -vn ../graphics/coswave.c -lndos -lmzx_tiny -O3 -create-app -ocoswave_small.bin

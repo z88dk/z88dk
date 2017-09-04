@@ -40,6 +40,7 @@ typedef enum {
    OP_I,
    OP_R,
    OP_IM,
+   /* ZXN */
    OP_DEHL,
    OP_A32,
    /* Rabbit */
@@ -50,14 +51,12 @@ typedef enum {
    OP_BC_,
    OP_HL_,
    OP_IXY,
-   OP_EIR,
-   OP_IIR,
    OP_SU,
    OP_IP,
    OP_XPC,
    OP_IPSET,
-   OP_INDSP2,
-   OP_INDHL2,
+   OP_INDSPd,
+   OP_INDHLd,
 } operand;
 
 #define F_IXY   1   /* ix */
@@ -68,6 +67,7 @@ typedef enum {
 #define F_R2K  128
 #define F_R3K  256
 #define F_NOIX 512  /* Don't switch to ix in dd page */
+#define F_NOXY 1024 /* Don't switch hl to ix/iy */
 
 typedef struct {
     const char   *opcode;
@@ -784,7 +784,7 @@ instruction ed_page[] = {
 
     { "outinb", OP_NONE,  OP_NONE,    F_ZXN }, /* 0x90 */
     { "nextreg",OP_IMMED8, OP_IMMED8, F_ZXN },
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "nextreg",OP_IMMED8, OP_A,      F_ZXN },
     { "pixeldn",OP_NONE,  OP_NONE,    F_ZXN }, 
     { "pixelad",OP_NONE,  OP_NONE,    F_ZXN }, 
     { "setae",  OP_NONE,  OP_NONE,    F_ZXN }, 
@@ -1386,7 +1386,7 @@ instruction rabbit_main_page[] = {
     { "pop",    OP_BC,    OP_NONE,    0 },
     { "jp",     OP_NZ,    OP_ADDR16, 0 },
     { "jp",     OP_ADDR16, OP_NONE,  0 },
-    { "ld",     OP_HL,    OP_INDSP2,  0 },
+    { "ld",     OP_HL,    OP_INDSPd,  0 },
     { "push",   OP_BC,    OP_NONE,    0 },
     { "add",    OP_A,     OP_IMMED8,  0 },
     { "ljp",    OP_IMMED24, OP_NONE,  0 },
@@ -1403,7 +1403,7 @@ instruction rabbit_main_page[] = {
     { "pop",    OP_DE,    OP_NONE,    0 },
     { "jp",     OP_NC,    OP_IMMED16, 0 },
     { "ioi",    OP_NONE,  OP_NONE,    0 },
-    { "ld",     OP_INDSP2, OP_HL,      0 },
+    { "ld",     OP_INDSPd, OP_HL,      0 },
     { "push",   OP_DE,    OP_NONE,    0 },
     { "sub",    OP_A,     OP_IMMED8,  0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
@@ -1586,8 +1586,8 @@ instruction rabbit_dd_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
-    { "ld",     OP_HL,    OP_IXY,     0 },
-    { "ld",     OP_IXY,   OP_HL,      0 },
+    { "ld",     OP_HL,    OP_IXY,     F_NOXY },
+    { "ld",     OP_IXY,   OP_HL,      F_NOXY },
     { "ld",     OP_A,     OP_INDHL,   F_INDXY },
     { NULL,     OP_NONE,  OP_NONE,    0 },
 
@@ -1664,7 +1664,7 @@ instruction rabbit_dd_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
-    { "ld",     OP_IXY,   OP_INDSP2,  0 },
+    { "ld",     OP_IXY,   OP_INDSPd,  0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
@@ -1681,7 +1681,7 @@ instruction rabbit_dd_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
-    { "ld",     OP_INDSP2, OP_IXY,    0 },
+    { "ld",     OP_INDSPd, OP_IXY,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
@@ -1698,7 +1698,7 @@ instruction rabbit_dd_page[] = {
     { "pop",    OP_HL,    OP_NONE,    F_IXY },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { "ex",     OP_SP,    OP_HL,       F_IXY },
-    { "ld",     OP_HL,    OP_INDHL2,  F_NOIX },
+    { "ld",     OP_HL,    OP_INDHLd,  F_NOIX },
     { "push",   OP_HL,    OP_NONE,    F_IXY },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
@@ -1715,7 +1715,7 @@ instruction rabbit_dd_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
-    { "ld",     OP_INDHL2, OP_HL,     F_NOIX  },
+    { "ld",     OP_INDHLd, OP_HL,     F_NOIX  },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },
@@ -1806,7 +1806,7 @@ instruction rabbit_ed_page[] = {
     { "neg",    OP_NONE,  OP_NONE,    0 },
     { "lret",   OP_NONE,  OP_NONE,    0 },
     { "ipset",  OP_IPSET, OP_NONE,    0 },
-    { "ld",     OP_EIR,   OP_A,       0},
+    { "ld",     OP_I,     OP_A,       0},
     { "cp",     OP_HL,    OP_DE,      0 },
     { "ld",     OP_BC_,   OP_BC,      0 },
     { "adc",    OP_HL,    OP_BC,      0 },
@@ -1814,7 +1814,7 @@ instruction rabbit_ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "reti",   OP_NONE,  OP_NONE,    0 },
     { "ipset",  OP_IPSET, OP_NONE,    0 },
-    { "ld",     OP_IIR,   OP_A,       0 },
+    { "ld",     OP_R,     OP_A,       0 },
 
     { NULL,     OP_NONE,  OP_NONE,    0 },  /* 50 */
     { "ld",     OP_DE_,   OP_DE,      0 },
@@ -1823,7 +1823,7 @@ instruction rabbit_ed_page[] = {
     { "ex",     OP_INDSP, OP_HL,      0 },
     { "syscall", OP_NONE,  OP_NONE,   F_R3K },
     { "ipset",  OP_IPSET, OP_NONE,    0 },
-    { "ld",     OP_A,     OP_EIR,       0 },
+    { "ld",     OP_A,     OP_I,       0 },
     { NULL,     OP_NONE,  OP_NONE,    0 },  
     { "ld",     OP_DE_,   OP_BC,      0 },
     { "adc",    OP_HL,    OP_DE,      0 },
@@ -1831,14 +1831,13 @@ instruction rabbit_ed_page[] = {
     { NULL,     OP_NONE,  OP_NONE,    0 },  
     { "ipret",  OP_NONE,  OP_NONE,    0 },
     { "ipset",  OP_IPSET, OP_NONE,    0 },
-    { "ld",     OP_A,     OP_IIR,     0 },
+    { "ld",     OP_A,     OP_R,       0 },
 
 
     { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x60 */
     { "ld",     OP_HL_,   OP_DE,      0 },
     { "sbc",    OP_HL,    OP_HL,      0 },
     { "ld",     OP_IND16, OP_HL,      0 },
-    { "ldp",    OP_INDHL, OP_HL,      0 },
     { "ldp",    OP_INDHL, OP_HL,      0 },
     { "ldp",    OP_ADDR16, OP_HL,     0 },
     { "push",   OP_SU,    OP_NONE,    0 },
@@ -2012,6 +2011,8 @@ typedef struct {
     int       index;
     int       pc;
     int       len;
+    uint8_t   prefix;
+    uint8_t   displacement;
     uint8_t   opcode;
     uint8_t   instr_bytes[6];
 } dcontext;
@@ -2042,7 +2043,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     case OP_E:
         return "e";
     case OP_H:
-        if ( c_cpu == CPU_Z80 ) {
+        if ( c_cpu & (CPU_Z80|CPU_Z80_ZXN) ) {
             if ( state->index == 0xDD && instr->flags & F_IXY) {
                 return "ixl";
             } else if ( state->index == 0xFD && instr->flags & F_IXY) {
@@ -2051,7 +2052,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         }
         return "h";
     case OP_L:
-        if ( c_cpu == CPU_Z80 ) {
+        if ( c_cpu & (CPU_Z80|CPU_Z80_ZXN) ) {
             if ( state->index == 0xDD && instr->flags & F_IXY) {
                 return "ixl";
             } else if ( state->index == 0xFD && instr->flags & F_IXY) {
@@ -2066,9 +2067,9 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     case OP_DE:
         return "de";
     case OP_HL:
-        if ( state->index == 0xDD && (instr->flags & F_NOIX) == 0) {
+        if ( state->index == 0xDD && (instr->flags & (F_NOIX|F_NOXY)) == 0) {
             return "ix";
-        } else if ( state->index == 0xFD ) {
+        } else if ( state->index == 0xFD && (instr->flags & F_NOXY) == 0 ) {
             return "iy";
         }
         return "hl";
@@ -2101,12 +2102,16 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
     case OP_F:
         return "f";
     case OP_I:
-        return "i";
+        return c_cpu & (CPU_R2K|CPU_R3K) ? "eir" : "i";
     case OP_R:
-        return "r";
+        return c_cpu & (CPU_R2K|CPU_R3K) ? "iir" : "r";
     case OP_INDHL:
         if ( instr->flags & F_INDXY && state->index ) {
-            READ_BYTE(state, displacement);
+            if ( state->prefix != 0xCB ) {
+                READ_BYTE(state, displacement);
+            } else {
+                displacement = state->displacement;
+            }
             snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "ix" : "iy", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
             return buf;
         }
@@ -2169,10 +2174,6 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         return "hl'";
     case OP_BC_:
         return "bc'";
-    case OP_IIR:
-        return "iir";
-    case OP_EIR:
-        return "eir";
     case OP_IP:
         return "ip";
     case OP_SU:
@@ -2185,17 +2186,17 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         READ_BYTE(state, udisplacement);
         snprintf(buf,buflen,"$%02x,$%02x%02x",udisplacement, msb, lsb);
         return buf; 
-    case OP_INDSP2:
+    case OP_INDSPd:
         READ_BYTE(state, udisplacement);
         snprintf(buf,buflen,"(sp+$%02x)",  udisplacement);
         return buf;
-    case OP_INDHL2:
+    case OP_INDHLd:
         READ_BYTE(state, displacement);
-        snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "hl" : "iy", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
+        snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xdd ? "hl" : state->index == 0xfd ? "iy" : "ix", 
+                                            displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
         return buf;
     case OP_IPSET:
         {
-          
             int val = state->opcode == 0x46 ? 0 :
                       state->opcode == 0x5E ? 2 :
                       state->opcode == 0x56 ? 1 : 3;
@@ -2204,7 +2205,8 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         }
     case OP_INDXYd:
         READ_BYTE(state, displacement);
-        snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xfd ? "iy" : "ix", displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
+        snprintf(buf,buflen,"(%s%s$%02x)", state->index == 0xfd ? "iy" : "ix", 
+                                            displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
         return buf;
     }
 }
@@ -2219,6 +2221,7 @@ int disassemble(int pc, char *buf, size_t buflen)
     instruction *instr;
     const char  *label;
     size_t       offs = 0;
+    int          start_pc = pc;
 
     if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
         table = rabbit_main_page;
@@ -2226,11 +2229,11 @@ int disassemble(int pc, char *buf, size_t buflen)
     state->pc = pc;
 
     label = find_symbol(pc);
+    buf[0] = 0;
     if (label ) {
         offs += snprintf(buf + offs, buflen - offs, "%s:",label);
-    } else {
-        offs += snprintf(buf + offs, buflen - offs,"l_%04x:",pc % 65536);
-    }
+    } 
+     
     if ( offs < 20 ) {
         offs = snprintf(buf, buflen, "%-20s", buf);
     }
@@ -2247,6 +2250,7 @@ int disassemble(int pc, char *buf, size_t buflen)
         READ_BYTE(state,b);
         if ( b == 0xDD || b == 0xFD ) {
             state->index = b;
+            state->prefix = 0;
             table = main_page; 
             if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
                 table = rabbit_dd_page;
@@ -2255,6 +2259,7 @@ int disassemble(int pc, char *buf, size_t buflen)
         }
         if ( b == 0xED ) {
             table = ed_page;
+            state->prefix = 0xED;
             if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
                 table = rabbit_ed_page;
             } else if ( c_cpu == CPU_Z180 ) {
@@ -2264,6 +2269,10 @@ int disassemble(int pc, char *buf, size_t buflen)
             state->index = 0; // Index ops not permitted
         } else if ( b == 0xcb ) {
             table = cb_page;
+            state->prefix = 0xCB;
+            if ( state->index ) {
+                READ_BYTE(state, state->displacement);
+            }
             READ_BYTE(state,b);
         }
         state->opcode = b;
@@ -2276,7 +2285,7 @@ int disassemble(int pc, char *buf, size_t buflen)
             instr = NULL;
         }
 
-        /* We now have the instruction (TODO: CPU flags) */
+        /* We now have the instruction */
         if ( instr == NULL || instr->opcode == NULL ) {
             offs += snprintf(buf + offs, buflen - offs,"\t[nop]\t\t;");
         } else {
@@ -2295,6 +2304,7 @@ int disassemble(int pc, char *buf, size_t buflen)
         break;
     } while ( 1 );
 
+    offs += snprintf(buf + offs, buflen - offs, "[%04x] ", start_pc);
     for ( i = 0; i < state->len; i++ ) {
         offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
     }

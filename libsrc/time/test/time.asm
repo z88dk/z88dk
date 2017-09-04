@@ -17,7 +17,7 @@
 	push	bc
 	push	hl	;save store
 	ld	a,CMD_GETTIME
-	rst	8
+	rst	16
 	pop	bc
 	ld	a,b
 	or	c

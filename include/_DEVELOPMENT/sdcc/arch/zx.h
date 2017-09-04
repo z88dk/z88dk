@@ -56,7 +56,37 @@ __sfr __banked __at 0x7ffd IO_7FFD;
 
 #endif
 
-// misc
+// tape i/o
+
+struct zxtapehdr
+{
+	unsigned char hdtype;      // 0 = program, 1 = num array, 2 = char array, 3 = code/binary
+	unsigned char hdname[10];  // space padded
+	unsigned int  hdlen;       // ELINE - PROG, length field, length field, length in bytes
+	unsigned int  hdadd;       // starting line number 0x8000 = none, lsb=0 msb=id, lsb=0 msb=id, address
+	unsigned int  hdvars;      // VARS - PROG, 0, 0, 0
+};
+
+#define ZXT_TYPE_HEADER  0
+#define ZXT_TYPE_DATA    0xff
+
+extern unsigned char zx_tape_load_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
+extern unsigned char zx_tape_load_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define zx_tape_load_block(a,b,c) zx_tape_load_block_callee(a,b,c)
+
+
+extern unsigned char zx_tape_save_block(void *src,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
+extern unsigned char zx_tape_save_block_callee(void *src,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define zx_tape_save_block(a,b,c) zx_tape_save_block_callee(a,b,c)
+
+
+extern unsigned char zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
+extern unsigned char zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define zx_tape_verify_block(a,b,c) zx_tape_verify_block_callee(a,b,c)
+
+
+
+// miscellaneous
 
 extern void zx_border(unsigned char colour) __preserves_regs(b,c,d,e,iyl,iyh);
 extern void zx_border_fastcall(unsigned char colour) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;

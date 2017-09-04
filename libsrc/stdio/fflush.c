@@ -17,10 +17,14 @@
 int fflush(FILE *fp)
 {
 #asm
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(sp + 2)
+ELSE
 	pop	bc
 	pop	hl
 	push	hl
 	push	bc
+ENDIF
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -31,12 +35,25 @@ int fflush(FILE *fp)
 	push	ix	;save callers ix
 	dec	hl
 	dec	hl	;hl = fp
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,ix
+	ld	hl,(ix+fp_extra)
+ELSE
 	push	hl
 	pop	ix
-	ld	a,__STDIO_MSG_FLUSH
 	ld	l,(ix+fp_extra)
 	ld	h,(ix+fp_extra+1)
-	jp	l_jphl
+ENDIF
+	ld	a,__STDIO_MSG_FLUSH
+	call	l_jphl
+	pop	ix	;restore callers
+IF __CPU_R2K__ | __CPU_R3K__
+	bool	hl
+	rr	hl
+ELSE
+	ld	hl,0
+ENDIF
+	ret
 .fflush_error
 	ld	hl,-1	; EOF
 #endasm

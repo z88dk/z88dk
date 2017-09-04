@@ -48,11 +48,18 @@ void add_opcode_jr(int opcode, Expr *expr)
 	Pass2infoExpr(RANGE_JR_OFFSET, expr);
 }
 
-/* add opcode followed by 8-bit expression */
+/* add opcode followed by 8-bit unsigned expression */
 void add_opcode_n(int opcode, Expr *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
+}
+
+/* add opcode followed by 8-bit signed expression */
+void add_opcode_d(int opcode, Expr *expr)
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
 }
 
 /* add opcode followed by 16-bit expression */
@@ -105,6 +112,8 @@ void add_call_flag(int flag, Expr *target)
 
 	if (!(opts.cpu & CPU_RABBIT))
 		add_opcode_nn(Z80_CALL_FLAG(flag), target);
+	else if (opts.no_emul)
+		error_illegal_ident();
 	else
 	{
 		end_label = autolabel();
@@ -134,6 +143,8 @@ void add_opcode_emul(int opcode, char *emul_func)
 
 	if (!(opts.cpu & CPU_RABBIT))
 		add_opcode(opcode);
+	else if (opts.no_emul)
+		error_illegal_ident();
 	else
 	{
 		declare_extern_symbol(emul_func);

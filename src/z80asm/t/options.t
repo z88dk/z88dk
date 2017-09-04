@@ -200,6 +200,7 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
+Reading library 'z80asm.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 3 bytes
@@ -678,6 +679,9 @@ t_z80asm_ok(0, "ldirx",		pack("C*", 0xED, 0xB4), "--cpu=z80-zxn");	# As LDIR, bu
 t_z80asm_ok(0, "lddx",		pack("C*", 0xED, 0xAC), "--cpu=z80-zxn");	# As LDD,  but if byte==A does not copy, 
 																		# and DE is incremented
 t_z80asm_ok(0, "lddrx",		pack("C*", 0xED, 0xBC), "--cpu=z80-zxn");	# As LDDR,  but if byte==A does not copy
+t_z80asm_ok(0, "ldirscale",	pack("C*", 0xED, 0xB6), "--cpu=z80-zxn");	# As LDIRX,  if(hl)!=A then (de)=(hl); HL_A'+=BC'; DE+=DE'; dec BC; Loop.
+t_z80asm_ok(0, "ldpirx",	pack("C*", 0xED, 0xB7), "--cpu=z80-zxn");	# (de) = ( (hl&$fff8)+(E&7) ) when != A
+
 t_z80asm_ok(0, "fillde",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
 t_z80asm_ok(0, "fill de",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
 t_z80asm_ok(0, "ld hl,sp",	pack("C*", 0xED, 0x25), "--cpu=z80-zxn");	# transfer SP to HL
@@ -995,6 +999,7 @@ t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 #------------------------------------------------------------------------------
 # --split-bin, ORG -1: tested in directives.t
 
+
 #------------------------------------------------------------------------------
 # --cpu=z180
 t_z80asm_ok(0, "
@@ -1020,7 +1025,6 @@ t_z80asm_ok(0, "
 	out0 (13),e
 	out0 (14),h
 	out0 (15),l
-	out0 (16),f
 	out0 (17),a
 	
 	otim
@@ -1093,7 +1097,6 @@ t_z80asm_ok(0, "
 	0xED, 0x19, 13,	
 	0xED, 0x21, 14,	
 	0xED, 0x29, 15,	
-	0xED, 0x31, 16,	
 	0xED, 0x39, 17,	
 	
 	0xED, 0x83,		# otxx
@@ -1157,6 +1160,19 @@ t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier
 t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
 #------------------------------------------------------------------------------
+# --cpu=r2k
+t_z80asm_ok(0, "
+	altd ld a,31
+	ioi ld a,(0xFE)
+	ioe ld a,(0xFE)
+	
+", pack("C*", 
+	0x76, 0x3E, 0x1F,
+	0xD3, 0x3A, 0xFE, 0x00,
+	0xDB, 0x3A, 0xFE, 0x00,
+	
+), "--cpu=r2k");
+	
 # __CPU_xxx_contants___
 #------------------------------------------------------------------------------
 write_file("test.asm", <<END);

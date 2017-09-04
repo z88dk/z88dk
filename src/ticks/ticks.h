@@ -8,12 +8,28 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
+#include "uthash.h"
+#include "utlist.h"
+
 
 typedef struct {
-   const char    *name;
-   const char    *file;
-   int            address;
+    const char    *name;
+    const char    *file;
+    int            address;
 } symbol;
+
+
+typedef struct {
+    int             line;
+    int             address;
+    UT_hash_handle hh;
+} cline;
+
+typedef struct {
+    char          *file;
+    cline         *lines;
+    UT_hash_handle hh;
+} cfile;
 
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
@@ -64,6 +80,7 @@ extern int       disassemble(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr);
 extern symbol   *find_symbol_byname(const char *name);
+extern int symbol_resolve(char *name);
 extern uint8_t   get_memory(int pc);
 extern char **parse_words(char *line, int *argc);
 

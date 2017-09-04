@@ -25,10 +25,10 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
+	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
+genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib gendos.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -183,14 +183,6 @@ x11.lib:
 	@echo ''
 	$(MAKE) -C graphics lx11 
 
-# simple malloc library - dom
-# adding multiple heaps and realloc - aralbrec
-malloc.lib:
-	@echo ''
-	@echo '--- Building Near Malloc Library ---'
-	@echo ''
-	$(MAKE) -C malloc 
-
 ndos.lib:
 	$(MAKE) -C fcntl/dummy 
 
@@ -228,6 +220,7 @@ z88_clib.lib:
 	$(MAKE) -C fcntl/z88
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
@@ -257,6 +250,7 @@ zx_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -282,6 +276,7 @@ ts2068_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -346,6 +341,7 @@ pacman_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=pacman
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -361,6 +357,7 @@ p2000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=p2000
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -377,6 +374,7 @@ pc6001_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=pc6001
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -393,6 +391,7 @@ pps_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=pps
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -429,6 +428,7 @@ vz_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=vz
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -445,6 +445,7 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=zx80
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -463,6 +464,7 @@ zx81_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -481,6 +483,7 @@ lambda_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -581,6 +584,7 @@ ti82_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=ti82
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -597,6 +601,7 @@ ti83_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=ti83
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -613,6 +618,7 @@ ti83p_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=ti8x
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -629,6 +635,7 @@ ti85_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=ti85
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -645,6 +652,7 @@ ti86_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=ti86
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -664,6 +672,7 @@ ozansi_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=oz
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -681,6 +690,7 @@ cpm_clib.lib:
 	$(MAKE) -C fcntl/cpm
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=cpm
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -697,6 +707,7 @@ sorcerer_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=srr
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -712,6 +723,7 @@ mz_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=mz
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -727,6 +739,7 @@ abc80_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=abc80
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -743,6 +756,7 @@ abc800_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=abc800
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -759,6 +773,8 @@ ace_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=ace
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -776,6 +792,7 @@ aquarius_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=aquarius
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -802,6 +819,7 @@ bee_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=bee
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -833,6 +851,7 @@ c7420_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=c7420
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -847,6 +866,7 @@ rex_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=rex
 	$(MAKE) -C setjmp
 	$(MAKE) -C rex
@@ -860,6 +880,7 @@ sam_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=sam
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -877,6 +898,7 @@ svi_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=svi
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -897,6 +919,7 @@ msx_clib.lib:
 	$(MAKE) -C fcntl/cpm
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=msx
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -916,6 +939,7 @@ mtx_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=mtx
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -934,6 +958,7 @@ enterprise_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=enterprise
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7
@@ -981,6 +1006,7 @@ m5_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=m5
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -998,6 +1024,7 @@ mc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=mc1000
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1015,6 +1042,7 @@ nascom_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=nascom
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1030,6 +1058,7 @@ z1013_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=z1013
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1045,6 +1074,7 @@ z9001_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=z9001
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1071,6 +1101,7 @@ kc_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=kc
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1085,6 +1116,7 @@ nc_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=nc
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1125,6 +1157,7 @@ cpc_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C fcntl/cpc
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=cpc
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -1155,6 +1188,7 @@ c128ansi_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=c128
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1200,6 +1234,7 @@ newbrain_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=newbrain
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1226,6 +1261,7 @@ rcmx000_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=rcmx000
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1240,6 +1276,7 @@ embedded_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=embedded
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1255,6 +1292,7 @@ gal_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=gal
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1270,6 +1308,7 @@ g800_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=g800
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1286,6 +1325,7 @@ lynx_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=lynx
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1302,6 +1342,7 @@ sms_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=sms
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1319,6 +1360,7 @@ sc3000_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=sc3000
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1335,6 +1377,7 @@ test_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=test
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1343,6 +1386,22 @@ test_clib.lib:
 	$(MAKE) -C assert
 	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 
+testrcm_clib.lib:
+	@echo ''
+	@echo '--- Building Test System Library ---'
+	@echo ''
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C malloc
+	$(MAKE) -C stdlib TARGET=test
+	$(MAKE) -C stdio 
+	$(MAKE) -C compress/zx7 
+	$(MAKE) -C setjmp
+	$(MAKE) -C time
+	$(MAKE) -C assert
+	TARGET=test TYPE=r2k $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(LISTFILE_DIRECTORY)/testrcm.lst
+
+
 # TRS 80 - stefano
 trs80_clib.lib:
 	@echo ''
@@ -1350,6 +1409,7 @@ trs80_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=trs80
 	$(MAKE) -C stdio
 	$(MAKE) -C compress/zx7 
@@ -1374,6 +1434,7 @@ x07_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=x07
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1388,6 +1449,7 @@ x1ansi_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=x1
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1406,6 +1468,7 @@ vg5k_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=vg5k
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1421,6 +1484,7 @@ sos_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=sos
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 
@@ -1436,6 +1500,7 @@ osca_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) -C malloc
 	$(MAKE) -C stdlib TARGET=osca
 	$(MAKE) -C stdio 
 	$(MAKE) -C compress/zx7 

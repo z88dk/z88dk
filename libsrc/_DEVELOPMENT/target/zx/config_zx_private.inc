@@ -584,6 +584,7 @@ defc __ESXDOS_SEEK_SET = 0
 defc __ESXDOS_SEEK_FWD = 1
 defc __ESXDOS_SEEK_BWD = 2
 
+defc __ESXDOS_OK = 0
 defc __ESXDOS_EOK = 1
 defc __ESXDOS_ENONSENSE = 2
 defc __ESXDOS_ESTEND = 3

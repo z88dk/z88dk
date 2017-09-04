@@ -43,13 +43,21 @@ _fwrite1:
 	and	_IOEXTRA
 	jr	z,fwrite_direct
 	; Calling via the extra hook
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+fp_extra)
+ELSE
 	ld	l,(ix+fp_extra)
 	ld	h,(ix+fp_extra+1)
+ENDIF
 	ld	a,__STDIO_MSG_WRITE
 	jp	l_jphl
 fwrite_direct:
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+fp_desc)
+ELSE
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
+ENDIF
 	push	hl
 	push	de
 	push	bc

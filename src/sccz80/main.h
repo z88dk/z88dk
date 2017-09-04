@@ -17,4 +17,5 @@ extern int c_notaltreg;
 extern int c_makeshare;
 extern int c_useshared;
 extern int c_shared_file;
+extern int c_line_labels;
 
