@@ -5,8 +5,10 @@
 ;       and we'll be interrupted for Command entry.
 ;       Use after the first APU_ISR call.
 ;
-;       A = contents of APUError (aggregation of any errors found)
-;       SCF if no errors
+;       A = contents of (APUStatus || APUError)
+;       SCF if no errors (aggregation of any errors found)
+;
+;       APUError is zeroed on return
 
     INCLUDE "config_private.inc"
 
@@ -17,22 +19,19 @@
     EXTERN APUStatus, APUError
 
     _am9511a_chk_idle:
-        push bc
+        push hl
 
     am9511a_check_loop:
-        ld a, (APUStatus)       ; get the status of the APU
-        or a                    ; check it is zero (NOP) command
-        jr nz, am9511a_check_loop   ; otherwise wait
+        ld a, (APUStatus)       ; get the status of the APU (but don't disturb APU)
+        tst __IO_APU_STATUS_BUSY    ; check busy bit is set,
+        jr nz, am9511a_check_loop   ; so we wait
 
-        ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in bc
-        in a, (c)               ; read the APU status port
-        and __IO_APU_STATUS_BUSY    ; busy bit set?
-        jr nz, am9511a_check_loop   ; yes, then wait
-
-        pop bc        
-
-        ld a, (APUError)        ; get the aggregated errors collected
-        or a
-        ret nz                  ; return with no carrry if errors
+        ld hl, APUError
+        or (hl)                 ; collect the aggregated errors, with APUStatus
+        tst __IO_APU_STATUS_ERROR   ; any errors?
+        ld (hl), 0              ; clear any aggregated errors in APUError
+        pop hl
+        ret nz                  ; return with no carry if errors
         scf                     ; set carry flag
-        ret                     ; return with APUError in a, carry set if no errors
+        ret                     ; return with (APUStatus || APUError) with carry set if no errors
+

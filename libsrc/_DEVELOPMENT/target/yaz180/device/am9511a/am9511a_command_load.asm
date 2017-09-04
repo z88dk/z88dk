@@ -37,15 +37,15 @@
 
         and $F0                 ; mask only most significant nibble of COMMAND
         cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
-        jr z, am9511a_isr_op    ; load an OPERAND pointer
+        jr z, am9511a_cmd_op    ; load an OPERAND pointer
         cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
-        jr z, am9511a_isr_op    ; load an OPERAND pointer
+        jr z, am9511a_cmd_op    ; load an OPERAND pointer
 
     am9511a_command_exit:
         pop hl                  ; recover HL
         ret
 
-    am9511a_isr_op:
+    am9511a_cmd_op:
         ld hl, (APUPTRInPtr)    ; get the pointer to where we poke
         ld (hl), e              ; write the low byte of OPERAND PTR to the APUPTRInPtr   
         inc l                   ; move the POINTER low byte along, 0xFF rollover
