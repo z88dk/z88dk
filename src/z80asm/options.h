@@ -23,6 +23,12 @@ Parse command line options
 #define CPU_R2K		(1 << 3)
 #define CPU_R3K		(1 << 4)
 
+#define CPU_Z80_NAME		"z80"
+#define CPU_Z80_ZXN_NAME	"z80_zxn"
+#define CPU_Z180_NAME		"z180"
+#define CPU_R2K_NAME		"r2k"
+#define CPU_R3K_NAME		"r3k"
+
 #define CPU_ZILOG	(CPU_Z80 | CPU_Z80_ZXN| CPU_Z180)
 #define CPU_RABBIT	(CPU_R2K | CPU_R3K)
 #define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
@@ -31,7 +37,8 @@ Parse command line options
 /*-----------------------------------------------------------------------------
 *   Assembler standard library
 *----------------------------------------------------------------------------*/
-#define Z80ASM_LIB	"z80asm.lib"
+#define Z80ASM_LIB	"z80asm-%s-%s.lib"
+#define SWAP_IX_IY_NAME	(opts.swap_ix_iy ? "ixiy" : "")
 
 /*-----------------------------------------------------------------------------
 *   APPMAKE type

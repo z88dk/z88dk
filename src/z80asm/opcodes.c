@@ -103,54 +103,11 @@ void add_opcode_n_n(int opcode, struct Expr *n1_expr,
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n2_expr);
 }
 
-/* add "call flag", or emulation on a Rabbit */
-void add_call_flag(int flag, Expr *target)
-{
-	char *end_label;
-	Expr *end_label_expr;
-	int jump_size;
-
-	if (!(opts.cpu & CPU_RABBIT))
-		add_opcode_nn(Z80_CALL_FLAG(flag), target);
-	else if (opts.no_emul)
-		error_illegal_ident();
-	else
-	{
-		end_label = autolabel();
-		end_label_expr = parse_expr(end_label);
-
-		if (flag <= FLAG_C)
-		{
-			add_opcode_jr(Z80_JR_FLAG(NOT_FLAG(flag)), end_label_expr);
-			jump_size = 2;
-		}
-		else
-		{
-			add_opcode_nn(Z80_JP_FLAG(NOT_FLAG(flag)), end_label_expr);
-			jump_size = 3;
-		}
-
-		add_opcode_nn(Z80_CALL, target);
-
-		asm_LABEL_offset(end_label, jump_size + 3);
-	}
-}
-
-/* add opcode, or call emulation function on a Rabbit */
-void add_opcode_emul(int opcode, char *emul_func)
-{
-	Expr *emul_func_expr;
-
-	if (!(opts.cpu & CPU_RABBIT))
-		add_opcode(opcode);
-	else if (opts.no_emul)
-		error_illegal_ident();
-	else
-	{
-		declare_extern_symbol(emul_func);
-		emul_func_expr = parse_expr(emul_func);
-		add_opcode_nn(Z80_CALL, emul_func_expr);
-	}
+void add_call_emul_func(char * emul_func)
+{ 
+	declare_extern_symbol(emul_func);
+	Expr *emul_expr = parse_expr(emul_func);
+	add_opcode_nn(0xCD, emul_expr);
 }
 
 /* add Z88's opcodes */

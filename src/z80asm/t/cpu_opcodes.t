@@ -229,7 +229,7 @@ sub test_asm {
 	$options //= '';
 	
 	# build OK
-	my $cmd = "./z80asm --cpu=$cpu -l -b --no-emul $options $asm_file";
+	my $cmd = "./z80asm --cpu=$cpu -l -b $options $asm_file";
 	ok 1, $cmd;
 	my($out, $err, $exit) = capture { system($cmd) };
 	$err =~ s/^Warning .* interpreting indirect value as immediate\s*//gm;
@@ -258,7 +258,7 @@ sub test_asm {
 	# build failure for invalid opcodes
 	my $num_errors = scalar($err_file->lines);
 	if ($num_errors > 0) {
-		$cmd = "./z80asm --cpu=$cpu -l -b --no-emul $err_file";
+		$cmd = "./z80asm --cpu=$cpu -l -b $err_file";
 
 		my($stdout, $stderr, $exit) = capture {	system($cmd); };
 		is $stdout, "", "output of $cmd";
