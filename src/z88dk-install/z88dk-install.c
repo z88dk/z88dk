@@ -44,11 +44,11 @@ char *ZCCCFG = "ZCCCFG";
 
 enum
 {
-   CLASSIC_LIB = 0,
-   CLASSIC_LIB_END,
-   CLASSIC_HDR,
-   CLASSIC_HDR_END,
-   CLASSIC_SIZE
+    CLASSIC_LIB = 0,
+    CLASSIC_LIB_END,
+    CLASSIC_HDR,
+    CLASSIC_HDR_END,
+    CLASSIC_SIZE
 };
 
 char *classic_paths[CLASSIC_SIZE] = {
@@ -94,12 +94,22 @@ char *newlib_paths[NEWLIB_SIZE] = {
 char *generate_path(int n, ...)
 {
     char tmp[1024];
+    char *p;
+    int len;
 
     va_list arg;
     va_start(arg, n);
 
+    len = 0;
     for (*tmp = 0; n; --n)
-        snprintf(tmp, sizeof(tmp), "%s%s", tmp, (char *)va_arg(arg, char*));
+    {
+        p = (char *)va_arg(arg, char*);
+        if ((len + strlen(p)) < (sizeof(tmp) / sizeof(*tmp)))
+        {
+            strcpy(tmp + len, p);
+            len += strlen(p);
+        }
+    }
 
     va_end(arg);
 
@@ -236,7 +246,7 @@ int uninstall(char *name, char *s)
 {
     struct stat st;
     char yes;
-    
+
     if ((stat(s, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)))
     {
         yes = 'Y';
@@ -310,6 +320,7 @@ void listlibs(char *name, char *src)
     DIR *in;
     struct dirent *entry;
     struct stat st;
+    char fname[PATHSIZE];
 
     src[strlen(src) - 2] = 0;   // get rid of trailing '/*'
 
@@ -318,7 +329,9 @@ void listlibs(char *name, char *src)
 
     while ((entry = readdir(in)) != NULL)
     {
-        if ((stat(entry->d_name, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (strcasecmp(entry->d_name, "README") != 0))
+        snprintf(fname, sizeof(fname), "%s/%s", src, entry->d_name);
+
+        if ((stat(fname, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (strcasecmp(entry->d_name, "README") != 0))
             printf("..%s \"%s\" %u bytes\n", name, entry->d_name, (unsigned int)st.st_size);
     }
 
@@ -407,7 +420,7 @@ int main(int argc, char **argv)
 #ifdef WIN32
     newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && Winmake 1> nul");
 #else
-    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && make > /dev/nul");
+    newlib_paths[NEWLIB_HDR_MAKE] = generate_path(4, "cd ", ZCCCFG, newlib_paths[NEWLIB_HDR_MAKE], " && make > /dev/null");
 #endif
 
     //
@@ -553,7 +566,7 @@ int main(int argc, char **argv)
             fflush(stdout);
 
             system(newlib_paths[NEWLIB_HDR_MAKE]);
-            
+
             printf("(done)\n\n");
         }
     }
