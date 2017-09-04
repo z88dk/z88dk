@@ -5,22 +5,31 @@ rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
 # All headers in proto tree
 
-HEADERS  := $(call rwildcard,proto/,*.h)
+HEADERS  := $(call rwildcard,proto,*)
 
-SCCZ80_HEADERS := $(subst proto,sccz80/,$(HEADERS))
+SCCZ80_HEADERS := $(subst proto,sccz80,$(HEADERS))
 SDCC_HEADERS   := $(subst proto,sdcc,$(HEADERS))
 CLANG_HEADERS  := $(subst proto,clang,$(HEADERS))
 
 default: dirs $(SCCZ80_HEADERS) $(SDCC_HEADERS) $(CLANG_HEADERS)
 
-sccz80/%: proto/%
+sccz80/%.h: proto/%.h
 	m4 -Dm4_SCCZ80 $^ > $@
 
-sdcc/%: proto/%
+sdcc/%.h: proto/%.h
 	m4 -Dm4_SDCC $^ > $@
 
-clang/%: proto/%
+clang/%.h: proto/%.h
 	m4 -Dm4_CLANG $^ > $@
+
+sccz80/%README: proto/%README
+	cp $^ $@
+
+sdcc/%README: proto/%README
+	cp $^ $@
+
+clang/%README: proto/%README
+	cp $^ $@
 
 dirs:
 	@mkdir -p $(dir $(SCCZ80_HEADERS))
