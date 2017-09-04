@@ -54,19 +54,6 @@ Define rules for a ragel-based parser.
 				add_opcode_n_n((opcode), n1_expr, n2_expr); \
 			}
 
-#define DO_stmt_emul(opcode, emul_func) \
-			do { \
-				DO_STMT_LABEL(); \
-				add_opcode_emul((opcode), #emul_func); \
-			} while(0)
-
-#define DO_stmt_call_flag(flag) \
-			do { \
-			 	Expr *expr = pop_expr(ctx); \
-				DO_STMT_LABEL(); \
-				add_call_flag(FLAG_##flag, expr); \
-			} while(0)
-
 /*-----------------------------------------------------------------------------
 *   State Machine
 *----------------------------------------------------------------------------*/

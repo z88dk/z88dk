@@ -863,9 +863,7 @@ sub parse_code {
 		my $func = $1;
 		push @code, 
 			"DO_STMT_LABEL();",
-			"declare_extern_symbol(\"$func\");",
-			"Expr *emul_func = parse_expr(\"$func\");",
-			"add_opcode_nn(0xCD, emul_func);";
+			"add_call_emul_func(\"$func\");";
 	}
 	elsif ($asm =~ /^rst/) {
 		push @code, 

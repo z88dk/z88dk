@@ -260,16 +260,16 @@ z80asm(
 	asm		=> <<'ASM',
 			cpi				;; ED A1
 ASM
-	options	=> "-i".z80emu()." $list -b",
+	options	=> "$list -b",
 );
 z80asm(
 	asm		=> <<'ASM',
 			cpi				;; CD 03 00
-							;; 38 12 BE 23 0B F5 E3 CB 85 CB D5 78
-							;; B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5
-							;; E3 CB C5 18 EC
+							;; 38 14 BE 23 0B F5 ED 54 CB 85 CB D5 
+							;; 78 B1 20 02 CB 95 ED 54 F1 C9 BE 23 
+							;; 0B F5 ED 54 CB C5 18 EA
 ASM
-	options	=> "-i".z80emu()." $list -b --cpu=r2k",
+	options	=> "$list -b --cpu=r2k",
 );
 }
 

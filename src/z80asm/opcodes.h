@@ -44,11 +44,8 @@ extern void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
 extern void add_opcode_n_n(int opcode, struct Expr *n1_expr,
 									   struct Expr *n2_expr );
 
-/* add "call flag", or emulation on a Rabbit */
-extern void add_call_flag(int flag, struct Expr *target);
-
-/* add opcode, or call emulation function on a Rabbit */
-extern void add_opcode_emul(int opcode, char *emul_func);
+/* call emulation function by name */
+extern void add_call_emul_func(char *emul_func);
 
 /* add Z88's opcodes */
 extern void add_Z88_CALL_OZ(int argument);
