@@ -529,7 +529,7 @@ int main(int argc, char **argv)
 
                 generate += newlib;   // if changes have occurred to newlib headers, generate new headers at end
 
-                                      // newlib libraries
+                // newlib libraries
 
                 snprintf(src, sizeof(src), "%s/%s/lib/newlib/sccz80/%s%s", name, target, basename, ".lib");
                 snprintf(dst, sizeof(dst), "%s%s%s", newlib_paths[NEWLIB_LIB_SCCZ80], basename, ".lib");
