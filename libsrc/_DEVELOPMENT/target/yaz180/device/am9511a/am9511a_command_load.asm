@@ -8,12 +8,12 @@
 
     SECTION code_driver
 
-    PUBLIC _am9511a_cmd_ld    
+    PUBLIC asm_am9511a_cmd_ld    
 
     EXTERN APUCMDInPtr, APUPTRInPtr
     EXTERN APUCMDBufUsed, APUPTRBufUsed
 
-    _am9511a_cmd_ld:
+    asm_am9511a_cmd_ld:
         push hl                 ; store HL so we don't clobber it
         ld l, a                 ; store COMMAND so we don't clobber it
 

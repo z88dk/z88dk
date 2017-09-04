@@ -1,0 +1,4 @@
+target/yaz180/driver/apu/c/sdcc/apu_isr
+target/yaz180/driver/apu/c/sdcc/apu_reset
+target/yaz180/driver/apu/c/sdcc/apu_check_idle
+target/yaz180/driver/apu/c/sdcc/apu_command_load

@@ -16,12 +16,12 @@
 
     SECTION code_driver
 
-    PUBLIC _am9511a_isr
+    PUBLIC asm_am9511a_isr
 
     EXTERN APUCMDOutPtr, APUPTROutPtr
     EXTERN APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError
 
-    _am9511a_isr:
+    asm_am9511a_isr:
         push af                 ; store AF, etc, so we don't clobber them
         push bc
         push de
