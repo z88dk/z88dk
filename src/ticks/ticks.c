@@ -515,7 +515,7 @@ int main (int argc, char **argv){
   char * output= NULL;
   FILE * fh;
 
-  mem = malloc(0x10000);
+  mem = calloc(0x10000, 1);
 
   hook_init();
 
