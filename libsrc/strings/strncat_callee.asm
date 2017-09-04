@@ -7,7 +7,6 @@ PUBLIC strncat_callee
 PUBLIC _strncat_callee
 PUBLIC ASMDISP_STRNCAT_CALLEE
 
-EXTERN  rcmx_cpir
 
 .strncat_callee
 ._strncat_callee

@@ -4,9 +4,6 @@
 
 PUBLIC asm_ispunct
 
-IF FORrcmx000
-EXTERN  rcmx_cpir
-ENDIF
 
 ; determine if the char is punctuation
 
@@ -18,11 +15,7 @@ ENDIF
 
    ld hl,punc_tbl
    ld bc,punc_end - punc_tbl
-IF FORrcmx000
-   call rcmx_cpir
-ELSE
    cpir
-ENDIF
    ret
 
 .punc_tbl

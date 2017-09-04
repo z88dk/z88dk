@@ -6,9 +6,6 @@ PUBLIC strlcpy_callee
 PUBLIC _strlcpy_callee
 PUBLIC ASMDISP_STRLCPY_CALLEE
 
-IF FORrcmx000
-EXTERN  rcmx_cpir
-ENDIF
 
 .strlcpy_callee
 ._strlcpy_callee
@@ -50,11 +47,7 @@ ENDIF
    ;  a = 0
    ; bc = 0
 
-IF FORrcmx000
-   call rcmx_cpir
-ELSE
    cpir                        ; find end of char *src
-ENDIF
 
 .done
 

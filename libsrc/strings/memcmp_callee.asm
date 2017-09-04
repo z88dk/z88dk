@@ -6,7 +6,6 @@ SECTION code_clib
 PUBLIC memcmp_callee
 PUBLIC _memcmp_callee
 PUBLIC ASMDISP_MEMCMP_CALLEE
-EXTERN     rcmx_cpi
 
 
 .memcmp_callee
