@@ -69,7 +69,9 @@ parse.o: parse.c
 all: $(TARGET_LIB)
 
 $(TARGET_LIB): $(TARGET) $(TARGET_ASM)
-	./$(TARGET) -x$(TARGET_LIB) -d $(TARGET_ASM)
+ifeq ($(CROSS),0)
+	./$(TARGET) --cpu=r2k -x$(TARGET_LIB) -d $(TARGET_ASM)
+endif
 
 clean::
 	$(RM) $(TARGET_LIB) $(TARGET_ASM:.asm=.o)

@@ -17,10 +17,11 @@ INSTALL ?= install
 CFLAGS ?= -O2
 CC ?= gcc
 EXEC_PREFIX ?= 
+CROSS ?= 0
 
 # --> End of Configurable Options
 
-export CC INSTALL CFLAGS EXEC_PREFIX
+export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
 all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite z88dk-install
 
