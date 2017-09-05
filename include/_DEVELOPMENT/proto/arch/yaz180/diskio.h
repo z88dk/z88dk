@@ -74,9 +74,6 @@ typedef uint16_t    	WCHAR;
 typedef int32_t			LONG;
 typedef uint32_t    	DWORD;
 
-/* This type MUST be 64-bit (Remove this for ANSI C (C89) compatibility) */
-typedef uint64_t        QWORD;
-
 /* Status of Disk Functions */
 typedef BYTE DSTATUS;
 
@@ -94,10 +91,10 @@ typedef enum {
 // DISK COMMANDS
 //
 
-__DPROTO(`b,c,d,e,ixh,ixl,iyh,iyl',`b,c,d,e,ixh,ixl,iyh,iyl',DSTATUS,,disk_initialise,BYTE pdrv)
-__DPROTO(`d,e,ixh,ixl,iyh,iyl',`d,e,ixh,ixl,iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
-__DPROTO(`ixh,ixl,iyh,iyl',`ixh,ixl,iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
-__DPROTO(`ixh,ixl,iyh,iyl',`ixh,ixl,iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
-__DPROTO(`d,e,ixh,ixl,iyh,iyl',`d,e,ixh,ixl,iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',DSTATUS,,disk_initialise,BYTE pdrv)
+__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
+__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
+__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
 
 #endif
