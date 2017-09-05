@@ -20,7 +20,7 @@ void PatchZ80(void)
 
 static void cmd_exit(void)
 {
-	printf("Ticks: %llu\n",st);
+	printf("\nTicks: %llu\n",st);
     exit(l);
 }
 

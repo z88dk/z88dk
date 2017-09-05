@@ -60,7 +60,7 @@ static command commands[] = {
     { "x",      cmd_examine,       "<address>",   "Examine memory" },
     { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
-    { "hotspot",cmd_hotspot,       "<on/off>", "Disassemble every instruction"},
+    { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
     { "help",   cmd_help,          "",   "Display this help text" },
     { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
@@ -112,7 +112,6 @@ void debugger()
     if ( hotspot ) {
         if ( pc > max_hotspot_addr) {
             max_hotspot_addr = pc;
-            printf("Max address %d\n",max_hotspot_addr);
         }
         hotspots[pc]++;
     }
@@ -464,12 +463,13 @@ static void print_hotspots()
     FILE  *fp;
 
     if ( hotspot == 0 ) return;
-    fp = fopen("hotspots", "w");
-    for ( i = 0; i < max_hotspot_addr; i++) {
-        if ( hotspots[i] != 0 ) {
-            disassemble(i, buf, sizeof(buf));
-            fprintf(fp, "%d\t\t%s\n",hotspots[i],buf);
+    if ( (fp = fopen("hotspots", "w")) != NULL ) {
+        for ( i = 0; i < max_hotspot_addr; i++) {
+            if ( hotspots[i] != 0 ) {
+                disassemble(i, buf, sizeof(buf));
+                fprintf(fp, "%d\t\t%s\n",hotspots[i],buf);
+            }
         }
+        fclose(fp);
     }
-    fclose(fp);
 }
