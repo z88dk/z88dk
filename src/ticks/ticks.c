@@ -197,15 +197,30 @@
           else { fa= ~(a= ff= fr= a&b);  fb= 0; } \
       } while (0)
 
-#define AND2(r1, r2)              \
-          fa= ~(a= ff= fr= r1&r2),\
-          fb= 0
+// TODO: Flags not right
+#define AND2(r1, r2, ra) do {            \
+          if ( altd ) {                  \
+            fa_= ~(ra= ff_= fr_= r1&r2); \
+            fb_= 0;                      \
+          } else {                       \
+            fa= ~(r1= ff= fr= r1&r2);    \
+            fb= 0;                       \
+          }                              \
+        } while (0)
 
-#define XOR(b, n)               \
-          st+= n,               \
-          fa= 256               \
-            | (ff= fr= a^= b),  \
-          fb= 0
+
+#define XOR(b, n) do {               \
+          st+= n;                    \
+          if ( altd ) {              \
+            fa_= 256                 \
+              | (ff_= fr_= a_= a^b); \
+            fb_= 0;                  \
+          } else {                   \
+            fa= 256                  \
+              | (ff= fr= a^= b);     \
+            fb= 0;                   \
+          }                          \
+        } while (0)
 
 #define OR(b, n) do {                  \
           st += n;                     \
@@ -220,6 +235,7 @@
           } \
         } while (0)
 
+// TODO: Flags not right
 #define OR2(r1, r2)             \
           fa= 256               \
             | (ff= fr= r1|= r2),  \
@@ -392,13 +408,22 @@
           fb= 0
 
 // 11T has already been added
-#define BITI(n)                 \
-          st += israbbit() ? -1 : 5, \
-          ff= ff    & -256      \
-            | mp>>8 &   40      \
-            | -41   & (t&= n),  \
-          fa= ~(fr= t),         \
-          fb= 0
+#define BITI(n) do {               \
+          st += israbbit() ? -1 : 5; \
+          if ( altd ) {           \
+            ff_= ff_    & -256    \
+              | mp>>8 &   40      \
+              | -41   & (t&= n);  \
+            fa_= ~(fr_= t);       \
+            fb_= 0;               \
+          } else {                \
+            ff= ff    & -256      \
+              | mp>>8 &   40      \
+              | -41   & (t&= n);  \
+            fa= ~(fr= t);         \
+            fb= 0;                \
+          }                       \
+        } while ( 0 )
 
 #define RES(n, r)               \
           st += israbbit() ? 4 : 8, \
@@ -2224,14 +2249,14 @@ int main (int argc, char **argv){
       case 0xdc: // CALL C / (RCM) AND HL,DE
         if ( israbbit()) {
           if ( ih ) { 
-            AND2(h,d);
-            AND2(l,e);
+            AND2(h,d,h_);
+            AND2(l,e,e_);
           } else if ( iy ) {
-            AND2(yh, d);
-            AND2(yl, e);
+            AND2(yh, d, yh);
+            AND2(yl, e, yl);
           } else {
-            AND2(xh, d);
-            AND2(xl, e);
+            AND2(xh, d, xh);
+            AND2(xl, e, xl);
           }
           st += 2;
         } else {
