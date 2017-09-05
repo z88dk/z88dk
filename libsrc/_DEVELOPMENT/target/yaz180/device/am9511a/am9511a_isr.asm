@@ -65,6 +65,10 @@
         pop af                  ; recover the COMMAND 
         ld bc, __IO_APU_PORT_CONTROL    ; the address of the APU control port in BC
         out (c), a              ; load the COMMAND, and do it
+        
+        and $7F                 ; Check for NOP COMMAND, excluding SVREQ
+        jr z, am9511a_isr_end   ; if so end, as NOP doesn't interrupt
+                                ; use NOP to break up compute "sentences"
 
     am9511a_isr_exit:
         ld a, CMR_X2            ; set internal clock = crystal x 2 = 36.864MHz
