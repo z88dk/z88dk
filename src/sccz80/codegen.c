@@ -1405,18 +1405,13 @@ void zadd_const(LVALUE *lval, int32_t value)
         break;
     default:
         if ( lval->val_type == LONG || lval->val_type == CPTR ) {
-#if 1   
-            constbc(((uint32_t)value) % 65536);
-            ol("add\thl,bc");
-            ol("ex\tde,hl");
-            constbc(((uint32_t)value) / 65536);
-            ol("adc\thl,bc");
-            ol("ex\tde,hl");
-#else
-            lpush();
-            vlongconst(value);
-            zadd(lval);
-#endif
+            // 11 bytes, 54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
+            constbc(((uint32_t)value) % 65536);   // 3, 10
+            ol("add\thl,bc");                     // 1, 11
+            ol("ex\tde,hl");                      // 1, 4
+            constbc(((uint32_t)value) / 65536);   // 3, 10
+            ol("adc\thl,bc");                     // 2, 15
+            ol("ex\tde,hl");                      // 1, 4
         } else {
             addbchl(value);
         }
@@ -1938,6 +1933,11 @@ void asr_const(LVALUE *lval, int32_t value)
         } else if ( value == 16 && utype(lval)) {
             ol("ex\tde,hl");
             ol("ld\tde,0");
+        } else if ( value == 17 && utype(lval)) {
+            ol("srl\td");
+            ol("rr\te");
+            ol("ex\tde,hl");
+            ol("ld\tde,0");
         } else if ( value == 20 && utype(lval)) {
             ol("ex\tde,hl");
             ol("ld\tde,0");
@@ -1999,6 +1999,9 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sra\th");
             }
             ol("rr\tl");
+        } else if ( value == 8 && utype(lval) ) {
+            ol("ld\tl,h");
+            ol("ld\th,0");
         } else if ( value != 0 ) {
             const2(value);
             swap();
