@@ -2542,3 +2542,45 @@
 	or	(hl)
 	ld	d,a
 	ex	de,hl
+
+	call	l_glong
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
+=
+	ld	a,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	h,a
+	ld	l,0
+
+	call	l_glong
+	ld	l,d
+	ld	h,0
+	ld	de,0
+	ld	h,0
+=
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+
+	call	l_glong
+	ld	l,h
+	ld	h,e
+	ld	e,d
+	ld	d,0
+=
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl

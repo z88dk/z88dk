@@ -1913,6 +1913,14 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
+        } else if ( value == 9 && utype(lval) ) {
+            ol("ld\tl,h");
+            ol("ld\th,e");
+            ol("ld\te,d");
+            ol("ld\td,0");
+            ol("srl\te");
+            ol("rr\th");
+            ol("rr\tl");
         } else if ( value == 10 && utype(lval) )  {
             ol("ld\tl,h");
             ol("ld\th,e");
@@ -1924,6 +1932,13 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\te");
             ol("rr\th");
             ol("rr\tl");
+        } else if ( (value == 11 || value == 12 || value == 13 || value == 14) && utype(lval) ) {
+            ol("ld\tl,h");
+            ol("ld\th,e");
+            ol("ld\te,d");
+            ol("ld\td,0");
+            ot("ld\tc,"); outdec(value -8); nl();
+            callrts("l_long_asr_uo");
         } else if ( value == 15 && utype(lval)) {
             ol("ex\tde,hl");
             ol("rl\td");                // Lowest bit
@@ -1938,6 +1953,13 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\te");
             ol("ex\tde,hl");
             ol("ld\tde,0");
+        } else if ( value == 18 && utype(lval) ) {
+            ol("ld\thl,0");
+            ol("ex\tde,hl");
+            ol("srl\th");
+            ol("rr\tl");
+            ol("srl\th");
+            ol("rr\tl");
         } else if ( value == 20 && utype(lval)) {
             ol("ex\tde,hl");
             ol("ld\tde,0");
@@ -2054,6 +2076,18 @@ void asl_const(LVALUE *lval, int32_t value)
                 ol("add\thl,hl");;
                 ol("rl\te");
                 ol("rl\td");   
+                break;
+            case 9:
+            case 10:
+            case 11:
+            case 12: 
+                // Shift by 8, 5 bytes then call 4 bytes
+                ol("ld\td,e");
+                ol("ld\te,h");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                loada( value - 8 ); 
+                callrts("l_long_aslo");
                 break;
             default: //  5 bytes
                 if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
