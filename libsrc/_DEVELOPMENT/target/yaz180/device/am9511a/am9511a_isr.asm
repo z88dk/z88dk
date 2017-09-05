@@ -65,10 +65,6 @@
         pop af                  ; recover the COMMAND 
         ld bc, __IO_APU_PORT_CONTROL    ; the address of the APU control port in BC
         out (c), a              ; load the COMMAND, and do it
-        
-        and $7F                 ; Check for NOP COMMAND, excluding SVREQ
-        jr z, am9511a_isr_end   ; if so end, as NOP doesn't interrupt
-                                ; use NOP to break up compute "sentences"
 
     am9511a_isr_exit:
         ld a, CMR_X2            ; set internal clock = crystal x 2 = 36.864MHz
@@ -80,9 +76,11 @@
         pop af
         retn
 
-    am9511a_isr_end:            ; we've finished a COMMAND sequence
+    am9511a_isr_end:            ; we've finished a COMMAND sentence
         ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
         in a, (c)               ; read the APU
+        tst __IO_APU_STATUS_BUSY    ; test the STATUS byte is valid (i.e. we're not busy)
+        jr nz, am9511a_isr_end
         ld (APUStatus), a       ; update status byte
         jr am9511a_isr_exit     ; we're done here
 
