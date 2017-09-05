@@ -134,6 +134,20 @@ __sfr __banked __at 0xbffd IO_BFFD;
 
 #endif
 
+// special zx next opcodes
+
+#ifdef __CLANG
+#define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
+#endif
+
+#ifdef __SDCC
+#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
+#endif
+
+#ifdef __SCCZ80
+#define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
+#endif
+
 // tape i/o
 
 struct zxtapehdr
