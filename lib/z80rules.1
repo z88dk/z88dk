@@ -1937,7 +1937,7 @@
 =
 	ld	a,(hl)
 	cp	#( %1 % 256)
-	ld	hl,0
+	ld	hl,0	;const
 	jr	nz,ASMPC+3
 	inc	hl
 
@@ -2488,3 +2488,57 @@
 =
 	add	hl,sp
 	call	l_gint
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
+=
+	ld	h,(hl)
+	ld	l,0
+	ld	de,0
+
+	ld	de,0
+	call	l_long_or
+=
+	pop	de
+	call	l_or
+	pop	de
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+	ld	d,l
+	ld	e,0
+	ld	hl,0	;const
+=
+	ld	d,(hl)
+	ld	e,0
+	ld	h,e
+	ld	l,h
+
+	ld	de,0
+	ld	l,0
+	rl	d
+	rl	l
+	rl	d
+	rl	l
+	ld	h,0
+	ld	de,0
+=
+	ld	hl,0	;const
+	ld	de,0
+
+	ld	h,(hl)
+	ld	l,0
+	pop	de
+	call	l_or
+=
+	pop	de
+	ld	a,d
+	or	(hl)
+	ld	d,a
+	ex	de,hl

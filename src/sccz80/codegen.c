@@ -1225,6 +1225,33 @@ void quikmult(int type, int32_t size, char preserve)
         return;
     }
 
+    // CINT here
+    // ZXN: ld de,nnnn ; mul = 14T
+    if ( c_cpu & CPU_Z80ZXN ) {
+        switch (size) {
+        case 0: // 10T
+            vconst(0);
+            break;
+        case 1:
+            break;
+        case 2: // 11T
+            ol("add\thl,hl");
+            break;
+        case 256: // 11T
+            ol("ld\th,l");
+            ol("ld\tl,0");
+            break;
+        default:
+            if (preserve)
+                ol("push\tde");
+            const2(size);
+            ol("mul");
+            if (preserve)
+                ol("pop\tde");
+            break;
+        }
+        return;
+    }
 
     switch (size) {
     case 0:
@@ -1296,11 +1323,7 @@ void quikmult(int type, int32_t size, char preserve)
         if (preserve)
             ol("push\tde");
         const2(size);
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("mul");
-        } else {
-            callrts("l_mult"); /* WATCH OUT!! */
-        }
+        callrts("l_mult"); /* WATCH OUT!! */
         if (preserve)
             ol("pop\tde");
         break;
@@ -1382,9 +1405,18 @@ void zadd_const(LVALUE *lval, int32_t value)
         break;
     default:
         if ( lval->val_type == LONG || lval->val_type == CPTR ) {
+#if 1   
+            constbc(((uint32_t)value) % 65536);
+            ol("add\thl,bc");
+            ol("ex\tde,hl");
+            constbc(((uint32_t)value) / 65536);
+            ol("adc\thl,bc");
+            ol("ex\tde,hl");
+#else
             lpush();
             vlongconst(value);
             zadd(lval);
+#endif
         } else {
             addbchl(value);
         }
@@ -1881,6 +1913,79 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\te");
             ol("rr\th");
             ol("rr\tl");
+        } else if ( value == 8 && utype(lval) )  {
+            ol("ld\tl,h");
+            ol("ld\th,e");
+            ol("ld\te,d");
+            ol("ld\td,0");
+        } else if ( value == 10 && utype(lval) )  {
+            ol("ld\tl,h");
+            ol("ld\th,e");
+            ol("ld\te,d");
+            ol("ld\td,0");
+            ol("srl\te");
+            ol("rr\th");
+            ol("rr\tl");
+            ol("srl\te");
+            ol("rr\th");
+            ol("rr\tl");
+        } else if ( value == 15 && utype(lval)) {
+            ol("ex\tde,hl");
+            ol("rl\td");                // Lowest bit
+            ol("adc\thl,hl");
+            ol("ld\tde,0");
+            ol("rl\te");
+        } else if ( value == 16 && utype(lval)) {
+            ol("ex\tde,hl");
+            ol("ld\tde,0");
+        } else if ( value == 20 && utype(lval)) {
+            ol("ex\tde,hl");
+            ol("ld\tde,0");
+            ol("srl\th");
+            ol("rr\tl");
+            ol("srl\th");
+            ol("rr\tl");
+            ol("srl\th");
+            ol("rr\tl");
+            ol("srl\th");
+            ol("rr\tl");
+        } else if ( value == 23 && utype(lval)) {
+            ol("ld\tl,d");
+            ol("rl\te");
+            ol("rl\tl");
+            ol("ld\th,0");
+            ol("rl\th");
+            ol("ld\tde,0");
+        } else if ( value == 24 && utype(lval)) {
+            ol("ld\tl,d");
+            ol("ld\th,0");
+            ol("ld\tde,0");
+        } else if ( value == 25 && utype(lval)) {
+            ol("ld\tl,d");
+            ol("srl\tl");
+            ol("ld\th,0");
+            ol("ld\tde,0");
+        } else if ( value == 27 && utype(lval)) {
+            ol("ld\tl,d");
+            ol("srl\tl");
+            ol("srl\tl");
+            ol("srl\tl");
+            ol("ld\th,0");
+            ol("ld\tde,0");
+        } else if ( value == 29 && utype(lval)) {
+            ol("ld\tl,0");
+            ol("rl\td");
+            ol("rl\tl");
+            ol("rl\td");
+            ol("rl\tl");
+            ol("ld\th,0");
+            ol("ld\tde,0");
+        } else if  ( value == 31 && utype(lval)) {
+            ol("ld\tl,0");
+            ol("rl\td");
+            ol("rl\tl");
+            ol("ld\th,0");
+            ol("ld\tde,0");
         } else if ( value != 0 ) {
             lpush();
             vlongconst(value);
