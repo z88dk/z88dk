@@ -136,7 +136,6 @@ Code Generation Options:
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000
   --cpu=r3k              Assemble for the Rabbit 3000
-  --no-emul              Do not call emulation routines for missing opcodes
   --ti83plus             Interpret 'Invoke' as RST 28h
   --IXIY                 Swap IX and IY registers
   -C, --line-mode        Enable LINE directive
@@ -200,7 +199,7 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-Reading library 'z80asm.lib'
+Reading library 'z80asm-z80-.lib'
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 3 bytes

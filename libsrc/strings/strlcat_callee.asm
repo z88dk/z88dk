@@ -6,9 +6,6 @@ PUBLIC strlcat_callee
 PUBLIC _strlcat_callee
 PUBLIC ASMDISP_STRLCAT_CALLEE
 
-IF FORrcmx000
-EXTERN  rcmx_cpir
-ENDIF
 
 ; The openBSD implementation returns an oddball value when size
 ; is less than strlen(dst).  Instead this version always returns
@@ -42,11 +39,7 @@ ENDIF
    
    xor a
 
-IF FORrcmx000
-   call rcmx_cpir
-ELSE
    cpir
-ENDIF
    
    dec hl                      ; hl parked on \0 and bc decr by one extra for the \0
    jp po, szexceeded0          ; oops, size exceeded within string dst
@@ -79,11 +72,7 @@ ENDIF
 
    push hl                     ; save current position in src to compute strlens later   
 
-IF FORrcmx000
-   call rcmx_cpir
-ELSE
    cpir
-ENDIF
 
    dec hl                      ; hl = end of char *src (pointing at \0)
    
@@ -107,11 +96,7 @@ ENDIF
 
    xor a
 
-IF FORrcmx000
-   call rcmx_cpir
-ELSE
    cpir
-ENDIF
 
    dec hl                       ; hl = end of char *dst (pointing at \0)
    

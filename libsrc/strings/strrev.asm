@@ -10,7 +10,6 @@ SECTION code_clib
 PUBLIC strrev
 PUBLIC _strrev
 PUBLIC ASMDISP_STRREV
-EXTERN     rcmx_cpir
 
 
 .strrev

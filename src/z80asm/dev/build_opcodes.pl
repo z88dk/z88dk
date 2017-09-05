@@ -72,7 +72,7 @@ for my $cpu ('z80', 'r2k') { #, 'z80-zxn', 'z180', 'r3k') {
 		if (@asm) {
 			push @OUTPUT, "z80asm(\n";
 			push @OUTPUT, "    options => \"-l -b --cpu=$cpu".
-						  ($rabbit ? " -DRABBIT -i\".z80emu()" : "\"").",\n";
+						  ($rabbit ? " -DRABBIT" : "")."\",\n";
 			unless ($error) {
 				push @OUTPUT, "    asm1 => <<'END_ASM',\n";
 				push @OUTPUT, $asm1;

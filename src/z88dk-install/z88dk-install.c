@@ -7,7 +7,7 @@
 #include <ctype.h>
 
 #ifdef WIN32
-#include <windows.h>
+#include "dirent.h"
 #ifndef strcasecmp
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
@@ -95,22 +95,16 @@ char *newlib_paths[NEWLIB_SIZE] = {
 
 char *generate_path(int n, ...)
 {
-    char tmp[1024];
-    char *p;
-    int len;
+    char tmp[PATHSIZE];
+    int  tmplen;
 
     va_list arg;
     va_start(arg, n);
 
-    len = 0;
     for (*tmp = 0; n; --n)
     {
-        p = (char *)va_arg(arg, char*);
-        if ((len + strlen(p)) < (sizeof(tmp) / sizeof(*tmp)))
-        {
-            strcpy(tmp + len, p);
-            len += strlen(p);
-        }
+        tmplen = strlen(tmp);
+        snprintf(tmp + tmplen, sizeof(tmp) / sizeof(*tmp) - tmplen - 1, "%s", (char *)va_arg(arg, char*));
     }
 
     va_end(arg);
@@ -301,30 +295,12 @@ int install(char *name, char *dst, char *src)
 
 void listlibs(char *name, char *src)
 {
-#ifdef WIN32
-
-    HANDLE hfind;
-    WIN32_FIND_DATAA ffd;
-
-    if ((hfind = FindFirstFileA(src, &ffd)) == INVALID_HANDLE_VALUE)
-        return;
-
-    do
-    {
-        if (((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) && (strcasecmp(ffd.cFileName, "README") != 0))
-            printf("..%s \"%s\" %u bytes\n", name, ffd.cFileName, (unsigned int)ffd.nFileSizeLow);
-    } while (FindNextFileA(hfind, &ffd) != 0);
-
-    FindClose(hfind);
-
-#else
-
     DIR *in;
     struct dirent *entry;
     struct stat st;
     char fname[PATHSIZE];
 
-    src[strlen(src) - 2] = 0;   // get rid of trailing '/*'
+    src[strlen(src) - 1] = 0;   // get rid of trailing '/'
 
     if ((in = opendir(src)) == NULL)
         return;
@@ -333,13 +309,11 @@ void listlibs(char *name, char *src)
     {
         snprintf(fname, sizeof(fname), "%s/%s", src, entry->d_name);
 
-        if ((stat(fname, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (strcasecmp(entry->d_name, "README") != 0))
+        if ((strcasecmp(entry->d_name, "README") != 0) && (stat(fname, &st) == 0) && (S_IFREG == (st.st_mode & S_IFMT)))
             printf("..%s \"%s\" %u bytes\n", name, entry->d_name, (unsigned int)st.st_size);
     }
 
     closedir(in);
-
-#endif
 }
 
 int main(int argc, char **argv)
@@ -386,7 +360,8 @@ int main(int argc, char **argv)
             exit_log(1, "Unrecognized option %s\n", argv[i]);
         else
         {
-            snprintf(libnames, sizeof(libnames), "%s%s ", (*libnames == 0) ? "" : libnames, argv[i]);
+            int len = strlen(libnames);
+            snprintf(libnames + len, sizeof(libnames) / sizeof(*libnames) - len, "%s ", argv[i]);
             ++numlibs;
         }
     }
@@ -435,34 +410,34 @@ int main(int argc, char **argv)
 
         // classic header
 
-        snprintf(src, sizeof(src), "%s*", classic_paths[CLASSIC_HDR]);
+        snprintf(src, sizeof(src), "%s", classic_paths[CLASSIC_HDR]);
         listlibs("classic hdr", src);
 
         // classic library
 
-        snprintf(src, sizeof(src), "%s*", classic_paths[CLASSIC_LIB]);
+        snprintf(src, sizeof(src), "%s", classic_paths[CLASSIC_LIB]);
         listlibs("classic lib", src);
 
         // newlib header
 
-        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_HDR_SCCZ80]);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SCCZ80]);
         listlibs("newlib hdr sccz80", src);
 
-        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_HDR_SDCC]);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_SDCC]);
         listlibs("newlib hdr sdcc", src);
 
-        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_HDR_CLANG]);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_HDR_CLANG]);
         listlibs("newlib hdr clang", src);
 
         // newlib library
 
-        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_LIB_SCCZ80]);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SCCZ80]);
         listlibs("newlib lib sccz80", src);
 
-        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_LIB_SDCC_IX]);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SDCC_IX]);
         listlibs("newlib lib sdcc_ix", src);
 
-        snprintf(src, sizeof(src), "%s*", newlib_paths[NEWLIB_LIB_SDCC_IY]);
+        snprintf(src, sizeof(src), "%s", newlib_paths[NEWLIB_LIB_SDCC_IY]);
         listlibs("newlib lib sdcc_iy", src);
     }
     else

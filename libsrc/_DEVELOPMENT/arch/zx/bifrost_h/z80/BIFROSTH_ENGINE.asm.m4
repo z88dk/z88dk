@@ -303,7 +303,7 @@ asm_BIFROSTH_showNextTile:
 show_next_tile:
         ld      de, $1001               ; D = lin (16,32,48..144), E = col (1,3,5..17)
         ld      a, e
-        sub     (9-__BIFROSTH_TILE_ORDER)*2
+        sub     +(9-__BIFROSTH_TILE_ORDER)*2
         ld      e, a
         jr      nc, prev_lin
         add     a, 18

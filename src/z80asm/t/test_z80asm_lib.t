@@ -7,7 +7,7 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
-# Test loading of z80asm.lib
+# Test loading of z80asm-*.lib
 
 use Modern::Perl;
 use Test::More;
@@ -23,83 +23,43 @@ my @RLD_AT_0004 = map {hex} qw(
     16 CE 00 B7 C9 );
 
 path("test.asm")->spew(<<END);
-	extern __z80asm__rld
-	call __z80asm__rld
+	extern	__z80asm__rld
+	call 	__z80asm__rld
 	ret
 END
 
 # setup sandbox
-path('test')->remove_tree;
-path('test/root/bin')->mkpath;
-path('test/root/lib/config')->mkpath;
+path('testdir')->remove_tree;
+path('testdir/root/bin')->mkpath;
+path('testdir/root/lib/config')->mkpath;
 
 # run from current dir
-run("./z80asm -b -v test.asm", 0, <<'END', "");
-Reading library 'z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
-
-Linking library module 'z80asm_rld'
-Code size: 38 bytes ($0000 to $0025)
-Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
-END
+run("./z80asm -b -v test.asm", 0, 
+	exp_output("z80asm-z80-.lib"), "");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
 # run from bin with lib in the current directory
-copy('z80asm'.$Config{_exe}, 'test/root/bin/z80asm'.$Config{_exe});
-run("test/root/bin/z80asm -b -v test.asm", 0, <<'END', "");
-Reading library 'z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
-
-Linking library module 'z80asm_rld'
-Code size: 38 bytes ($0000 to $0025)
-Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
-END
+copy('z80asm'.$Config{_exe}, 'testdir/root/bin/z80asm'.$Config{_exe});
+run("testdir/root/bin/z80asm -b -v test.asm", 0, 
+	exp_output("z80asm-z80-.lib"), "");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
 # run from bin with lib in bin
-move('z80asm.lib', 'test/root/bin/z80asm.lib');
-run("test/root/bin/z80asm -b -v test.asm", 0, <<'END', "");
-Reading library 'test/root/bin//z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
-
-Linking library module 'z80asm_rld'
-Code size: 38 bytes ($0000 to $0025)
-Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
-END
+move('z80asm-z80-.lib', 'testdir/root/bin/z80asm-z80-.lib');
+run("testdir/root/bin/z80asm -b -v test.asm", 0, 
+	exp_output("testdir/root/bin//z80asm-z80-.lib"), "");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
 # run from bin with lib ../lib
-move('test/root/bin/z80asm.lib', 'test/root/lib/z80asm.lib');
-run("test/root/bin/z80asm -b -v test.asm", 0, <<'END', "");
-Reading library 'test/root/bin//../lib/z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
-
-Linking library module 'z80asm_rld'
-Code size: 38 bytes ($0000 to $0025)
-Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
-END
+move('testdir/root/bin/z80asm-z80-.lib', 'testdir/root/lib/z80asm-z80-.lib');
+run("testdir/root/bin/z80asm -b -v test.asm", 0, 
+	exp_output("testdir/root/bin//../lib/z80asm-z80-.lib"), "");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
 # run from here with lib pointed bt ZCCCFG
-$ENV{ZCCCFG} = 'test/root/lib/config';
-run("./z80asm -b -v test.asm", 0, <<'END', "");
-Reading library 'test/root/lib/config/../z80asm.lib'
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
-
-Linking library module 'z80asm_rld'
-Code size: 38 bytes ($0000 to $0025)
-Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
-END
+$ENV{ZCCCFG} = 'testdir/root/lib/config';
+run("./z80asm -b -v test.asm", 0, 
+	exp_output("testdir/root/lib/config/../z80asm-z80-.lib"), "");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
 # run from here without library
@@ -115,10 +75,29 @@ Error at file 'test.asm' line 2: symbol '__z80asm__rld' not defined
 1 errors occurred during assembly
 ERR
 
-# restore z80asm.lib
-move('test/root/lib/z80asm.lib', 'z80asm.lib');
+# restore z80asm-z80-.lib
+move('testdir/root/lib/z80asm-z80-.lib', 'z80asm-z80-.lib');
 
-path('test')->remove_tree;
+# test loading of each different library for different CPUs
+run("./z80asm -b -v                      test.asm", 0, exp_output("z80asm-z80-.lib"), "");
+run("./z80asm -b -v               --IXIY test.asm", 0, exp_output("z80asm-z80-ixiy.lib"), "");
+
+run("./z80asm -b -v --cpu=z80            test.asm", 0, exp_output("z80asm-z80-.lib"), "");
+run("./z80asm -b -v --cpu=z80     --IXIY test.asm", 0, exp_output("z80asm-z80-ixiy.lib"), "");
+
+run("./z80asm -b -v --cpu=z80-zxn        test.asm", 0, exp_output("z80asm-z80_zxn-.lib"), "");
+run("./z80asm -b -v --cpu=z80-zxn --IXIY test.asm", 0, exp_output("z80asm-z80_zxn-ixiy.lib"), "");
+
+run("./z80asm -b -v --cpu=z180            test.asm", 0, exp_output("z80asm-z180-.lib"), "");
+run("./z80asm -b -v --cpu=z180     --IXIY test.asm", 0, exp_output("z80asm-z180-ixiy.lib"), "");
+
+run("./z80asm -b -v --cpu=r2k             test.asm", 0, exp_output("z80asm-r2k-.lib"), "");
+run("./z80asm -b -v --cpu=r2k      --IXIY test.asm", 0, exp_output("z80asm-r2k-ixiy.lib"), "");
+
+run("./z80asm -b -v --cpu=r3k             test.asm", 0, exp_output("z80asm-r3k-.lib"), "");
+run("./z80asm -b -v --cpu=r3k      --IXIY test.asm", 0, exp_output("z80asm-r3k-ixiy.lib"), "");
+
+path('testdir')->remove_tree;
 unlink_testfiles();
 done_testing;
 
@@ -131,3 +110,17 @@ sub run {
 	ok !!$return == !!($ret // 0), "exit value";
 }
 
+sub exp_output {
+	my($library) = @_;
+	
+	return <<END;
+Reading library '$library'
+Assembling 'test.asm' to 'test.o'
+Reading 'test.asm'
+Module 'test' size: 4 bytes
+
+Linking library module 'z80asm_rld'
+Code size: 38 bytes (\$0000 to \$0025)
+Section 'code_crt0_sccz80' size: 34 bytes (\$0004 to \$0025)
+END
+}

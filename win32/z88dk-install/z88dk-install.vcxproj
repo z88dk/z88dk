@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\z88dk-install\z88dk-install.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z88dk-install\dirent.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FD985972-6500-4DCA-AE01-390180135C97}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

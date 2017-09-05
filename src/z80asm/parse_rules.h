@@ -50928,9 +50928,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFE)
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
-declare_extern_symbol("__z80asm__cpd");
-Expr *emul_func = parse_expr("__z80asm__cpd");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpd");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA9); } while(0);
@@ -50943,9 +50941,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
-declare_extern_symbol("__z80asm__cpdr");
-Expr *emul_func = parse_expr("__z80asm__cpdr");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpdr");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB9); } while(0);
@@ -50958,9 +50954,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
-declare_extern_symbol("__z80asm__cpi");
-Expr *emul_func = parse_expr("__z80asm__cpi");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpi");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA1); } while(0);
@@ -50973,9 +50967,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
-declare_extern_symbol("__z80asm__cpir");
-Expr *emul_func = parse_expr("__z80asm__cpir");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpir");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB1); } while(0);
@@ -69939,9 +69931,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
-declare_extern_symbol("__z80asm__rld");
-Expr *emul_func = parse_expr("__z80asm__rld");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__rld");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED6F); } while(0);
@@ -70876,9 +70866,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
-declare_extern_symbol("__z80asm__rrd");
-Expr *emul_func = parse_expr("__z80asm__rrd");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__rrd");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED67); } while(0);

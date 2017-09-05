@@ -10992,9 +10992,7 @@ DO_stmt_n(0xFE);
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
-declare_extern_symbol("__z80asm__cpd");
-Expr *emul_func = parse_expr("__z80asm__cpd");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpd");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0xEDA9);
@@ -11006,9 +11004,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
-declare_extern_symbol("__z80asm__cpdr");
-Expr *emul_func = parse_expr("__z80asm__cpdr");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpdr");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0xEDB9);
@@ -11020,9 +11016,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
-declare_extern_symbol("__z80asm__cpi");
-Expr *emul_func = parse_expr("__z80asm__cpi");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpi");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0xEDA1);
@@ -11034,9 +11028,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
-declare_extern_symbol("__z80asm__cpir");
-Expr *emul_func = parse_expr("__z80asm__cpir");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__cpir");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0xEDB1);
@@ -28186,9 +28178,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
-declare_extern_symbol("__z80asm__rld");
-Expr *emul_func = parse_expr("__z80asm__rld");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__rld");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0xED6F);
@@ -29010,9 +29000,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
-declare_extern_symbol("__z80asm__rrd");
-Expr *emul_func = parse_expr("__z80asm__rrd");
-add_opcode_nn(0xCD, emul_func);
+add_call_emul_func("__z80asm__rrd");
 break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0xED67);
