@@ -79,9 +79,9 @@ include(__link__.m4)
 
 // Functions
 
-__OPROTO(`a,f,b,c,d,e,ixh,ixl,iyh,iyl',`a,f,b,c,d,e,ixh,ixl,iyh,iyl',void,,apu_reset,void *int_addr)
-__DPROTO(`b,c,d,e,ixh,ixl,iyh,iyl',`b,c,d,e,ixh,ixl,iyh,iyl',void,,apu_cmd_ld,void *op_addr,uint8_t command)
-__OPROTO(`b,c,d,e,ixh,ixl,iyh,iyl',`b,c,d,e,ixh,ixl,iyh,iyl',uint8_t,,apu_chk_idle,void)
-__OPROTO(`a,f,b,c,d,e,h,l,ixh,ixl,iyh,iyl',`a,f,b,c,d,e,h,l,ixh,ixl,iyh,iyl',void,,apu_isr,void)
+__OPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,apu_reset,void *int_addr)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,apu_cmd_ld,void *op_addr,uint8_t command)
+__OPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,apu_chk_idle,void)
+__OPROTO(`a,b,c,d,e,h,l,iyh,iyl',`a,b,c,d,e,h,l,iyh,iyl',void,,apu_isr,void)
 
 #endif
