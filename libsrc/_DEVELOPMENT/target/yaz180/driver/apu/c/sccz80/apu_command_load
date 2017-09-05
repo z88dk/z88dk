@@ -1,0 +1,26 @@
+;------------------------------------------------------------------------------
+;       APU_CMD_LD
+;
+;       DE = POINTER to OPERAND, IF REQUIRED
+;       A = APU COMMAND
+;
+;       void apu_cmd_ld( void * operand, uint8_t command );
+
+    SECTION code_driver
+
+    PUBLIC _apu_cmd_ld
+    
+    EXTERN asm_am9511a_cmd_ld
+
+_apu_cmd_ld:
+    pop af    
+    pop hl
+    pop de
+    push de
+    push hl
+    push af
+
+    ld a, l
+
+    jp asm_am9511a_cmd_ld
+

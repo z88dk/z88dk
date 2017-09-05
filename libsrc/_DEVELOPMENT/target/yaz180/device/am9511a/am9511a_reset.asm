@@ -7,15 +7,15 @@
 
     SECTION code_driver
 
-    PUBLIC _am9511a_reset
+    PUBLIC asm_am9511a_reset
 
-    EXTERN _am9511a_isr
+    EXTERN asm_am9511a_isr
 
     EXTERN APUCMDBuf, APUPTRBuf
     EXTERN APUCMDInPtr, APUCMDOutPtr, APUPTRInPtr, APUPTROutPtr
     EXTERN APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError
 
-    _am9511a_reset:
+    asm_am9511a_reset:
         push af
         push bc
         push de
@@ -54,7 +54,7 @@
         ld (APUError), a        ; clear APU errors
 
         pop hl                  ; load the jump table nmi address
-        ld de, _am9511a_isr     ; load our interrupt origin
+        ld de, asm_am9511a_isr  ; load our interrupt origin
                                 ; initially there is a RETN there
         ld (hl), e              ; load the address of the APU NMI jump
         inc hl

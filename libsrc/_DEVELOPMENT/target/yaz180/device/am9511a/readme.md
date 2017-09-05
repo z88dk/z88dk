@@ -58,7 +58,7 @@ for the hypotenuse of Pythagoras Triangle.
                             ;RSULT = LSB OF RESULT
 
     ld hl, INT_NMI_ADDR     ;GET Z80 INTERRUPT NMI VECTOR ADDRESS
-    CALL _am9511a_reset     ;INITIALISE (RESET) THE APU
+    CALL asm_am9511a_reset  ;INITIALISE (RESET) THE APU
                             ;ONLY IF NOT USING A CRT
                             ;OR IF DESIRED TO FLUSH BUFFERS
 
@@ -67,55 +67,55 @@ for the hypotenuse of Pythagoras Triangle.
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP1               ;POINTER TO OPERAND 1
     LD a, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
-    CALL _am9511a_cmd_ld    ;POINTER TO OPERAND IN OPERAND BUFFER
+    CALL asm_am9511a_cmd_ld ;POINTER TO OPERAND IN OPERAND BUFFER
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP2               ;POINTER TO OPERAND 2
     LD A, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
-    CALL _am9511a_cmd_ld    ;POINTER TO OPERAND IN OPERAND BUFFER
+    CALL asm_am9511a_cmd_ld ;POINTER TO OPERAND IN OPERAND BUFFER
 
                             ;EXAMPLE CODE - COMMAND LOADING
                             
     LD A, __IO_APU_OP_FLTD  ;COMMAND for FLTD (float double)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_PTOF  ;COMMAND for PTOF (push float)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_FMUL  ;COMMAND for FMUL (floating multiply)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_XCHF  ;COMMAND for XCHF (swap float)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_FLTD  ;COMMAND for FLTD (float double)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_PTOF  ;COMMAND for PTOF (push floating)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_FMUL  ;COMMAND for FMUL (floating multiply)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_FADD  ;COMMAND for FADD (floating add)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_SQRT  ;COMMAND for SQRT (floating square root)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD A, __IO_APU_OP_FIXD  ;COMMAND for FIXD (fix double)
-    CALL _am9511a_cmd_ld    ;ENTER a COMMAND
+    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, RSULT             ;(D)E POINTER NOW RSULT
     LD A, __IO_APU_OP_REM32 ;REMOVE 32 bit OPERAND
-    CALL _am9511a_cmd_ld
+    CALL asm_am9511a_cmd_ld
 
                             ;EXAMPLE CODE - PROCESSING
                             
-    CALL _am9511a_isr       ;KICK OFF APU PROCESS, WHICH THEN INTERRUPTS
+    CALL asm_am9511a_isr    ;KICK OFF APU PROCESS, WHICH THEN INTERRUPTS
 
-    CALL _am9511a_chk_idle  ;CHECK, because it could be doing a last command
+    CALL asm_am9511a_chk_idle  ;CHECK, because it could be doing a last command
     
                             ;CALCULATION RESULT IS NOW STORED AT SCRPG-RSULT
 ```

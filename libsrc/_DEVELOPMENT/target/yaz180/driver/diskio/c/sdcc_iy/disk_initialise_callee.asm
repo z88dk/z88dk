@@ -12,7 +12,6 @@ EXTERN asm_disk_initialise
 ; initialize the ide drive
 
 _disk_initialise_callee:
-
     pop af
     dec sp
     pop hl
