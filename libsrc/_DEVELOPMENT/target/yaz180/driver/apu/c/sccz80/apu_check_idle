@@ -1,0 +1,22 @@
+;------------------------------------------------------------------------------
+;       Confirms whether the APU is idle
+;       Loop until it returns ready
+;       Operand Entry and Removal takes little time,
+;       and we'll be interrupted for Command entry.
+;       Use after the first APU_ISR call.
+;
+;       L = contents of (APUStatus || APUError)
+;       SCF if no errors (aggregation of any errors found)
+;
+;       APUError is zeroed on return
+;
+;       uint8_t apu_chk_idle( void );
+
+    SECTION code_driver
+
+    PUBLIC _apu_chk_idle
+
+    EXTERN asm_am9511a_chk_idle
+
+    defc _apu_chk_idle = asm_am9511a_chk_idle
+
