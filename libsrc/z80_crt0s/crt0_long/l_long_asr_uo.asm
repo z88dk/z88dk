@@ -23,7 +23,7 @@ PUBLIC l_long_asr_uo
 .l_long_asr_uo
 
         ld a,c
-        or a
+        and	31
         ret z
         
         ld b,a
