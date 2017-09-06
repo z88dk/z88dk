@@ -37,6 +37,7 @@ int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
 int c_line_labels = 0;
+uint32_t c_size_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 
 char *c_rodata_section = "rodata_compiler";
 char *c_data_section = "data_compiler";

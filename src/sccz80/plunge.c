@@ -228,9 +228,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     /* ensure that operation is valid for double */
     if (  doper != NULL || intcheck(lval,lval2) == 0 ) {
         if ( lval->is_const && lval2->is_const ) {
+            int is16bit = lval->val_type == CINT || lval->val_type == CCHAR || lval2->val_type == CINT || lval2->val_type == CCHAR;
             if ( lhs_val_type == DOUBLE ) decrement_double_ref(lval);
             if ( rhs_val_type == DOUBLE ) decrement_double_ref(lval2);
-            lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
+            if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
+                lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
+            else
+                lval->const_val = calc(lval->const_val, oper, lval2->const_val, is16bit);
 
             // Promote as necessary
             if ( lhs_val_type == DOUBLE || rhs_val_type == DOUBLE ) {
@@ -273,12 +277,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         /* both operands constant taking respect of sign now,
          * unsigned takes precedence.. 
          */
+        int is16bit = lval->val_type == CINT || lval->val_type == CCHAR || lval2->val_type == CINT || lval2->val_type == CCHAR;
         if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
         if ( lval2->val_type == DOUBLE ) decrement_double_ref(lval2);
         if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
             lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
         else
-            lval->const_val = calc(lval->const_val, oper, lval2->const_val);
+            lval->const_val = calc(lval->const_val, oper, lval2->const_val, is16bit);
         clearstage(before, 0);
         Zsp = savesp;
     } else {

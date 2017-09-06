@@ -1900,7 +1900,7 @@ void asr_const(LVALUE *lval, int32_t value)
 {
     if  (lval->val_type == LONG || lval->val_type == CPTR ) {
         if ( value == 1 ) {
-            if ( utype(lval) ) {
+            if ( utype(lval) ) { /* 8 bytes */
                 ol("srl\td");
             } else {
                 ol("sra\td");
@@ -1909,20 +1909,20 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\th");
             ol("rr\tl");
         } else if ( value == 8 && utype(lval) )  {
-            ol("ld\tl,h");
+            ol("ld\tl,h"); /* 5 bytes */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
         } else if ( value == 9 && utype(lval) ) {
-            ol("ld\tl,h");
+            ol("ld\tl,h");  /* 11 bytes */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
             ol("srl\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( value == 10 && utype(lval) )  {
-            ol("ld\tl,h");
+        } else if ( value == 10 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32) )  {
+            ol("ld\tl,h"); /* 17 bytes */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
@@ -1933,35 +1933,35 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\th");
             ol("rr\tl");
         } else if ( (value == 11 || value == 12 || value == 13 || value == 14) && utype(lval) ) {
-            ol("ld\tl,h");
+            ol("ld\tl,h"); /* 12 bytes */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
             ot("ld\tc,"); outdec(value -8); nl();
             callrts("l_long_asr_uo");
         } else if ( value == 15 && utype(lval)) {
-            ol("ex\tde,hl");
+            ol("ex\tde,hl"); /* 10 bytes */
             ol("rl\td");                // Lowest bit
             ol("adc\thl,hl");
             ol("ld\tde,0");
             ol("rl\te");
         } else if ( value == 16 && utype(lval)) {
-            ol("ex\tde,hl");
+            ol("ex\tde,hl"); /* 4 bytes */
             ol("ld\tde,0");
         } else if ( value == 17 && utype(lval)) {
-            ol("srl\td");
+            ol("srl\td"); /* 8 bytes */
             ol("rr\te");
             ol("ex\tde,hl");
             ol("ld\tde,0");
         } else if ( value == 18 && utype(lval) ) {
-            ol("ld\thl,0");
+            ol("ld\thl,0"); /* 12 bytes */
             ol("ex\tde,hl");
             ol("srl\th");
             ol("rr\tl");
             ol("srl\th");
             ol("rr\tl");
-        } else if ( value == 20 && utype(lval)) {
-            ol("ex\tde,hl");
+        } else if ( value == 20 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32) ) {
+            ol("ex\tde,hl"); /* 20 bytes */
             ol("ld\tde,0");
             ol("srl\th");
             ol("rr\tl");
@@ -1972,30 +1972,30 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\th");
             ol("rr\tl");
         } else if ( value == 23 && utype(lval)) {
-            ol("ld\tl,d");
+            ol("ld\tl,d"); /* 12 bytes */
             ol("rl\te");
             ol("rl\tl");
             ol("ld\th,0");
             ol("rl\th");
             ol("ld\tde,0");
         } else if ( value == 24 && utype(lval)) {
-            ol("ld\tl,d");
+            ol("ld\tl,d"); /* 6 bytes */
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if ( value == 25 && utype(lval)) {
-            ol("ld\tl,d");
+            ol("ld\tl,d"); /* 8 bytes */
             ol("srl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if ( value == 27 && utype(lval)) {
-            ol("ld\tl,d");
+            ol("ld\tl,d"); /* 12 bytes */
             ol("srl\tl");
             ol("srl\tl");
             ol("srl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
-        } else if ( value == 29 && utype(lval)) {
-            ol("ld\tl,0");
+        } else if ( value == 30 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32)) {
+            ol("ld\tl,0"); /* 15 bytes */
             ol("rl\td");
             ol("rl\tl");
             ol("rl\td");
@@ -2003,15 +2003,22 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if  ( value == 31 && utype(lval)) {
-            ol("ld\tl,0");
+            ol("ld\tl,0"); /* 12 bytes */
             ol("rl\td");
             ol("rl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if ( value != 0 ) {
-            lpush();
-            vlongconst(value);
-            asr(lval);
+            value &= 31;
+            if ( value >= 16 && utype(lval)) {
+                vconst( value - 16);  /* 7 bytes */
+                callrts("l_asr_u");
+                ol("inc\te");
+            } else {
+                lpush();  /* 11 bytes */
+                vlongconst(value);
+                asr(lval);
+            }
         }
     } else {
         if ( value == 1 ) {
@@ -2081,7 +2088,7 @@ void asl_const(LVALUE *lval, int32_t value)
             case 10:
             case 11:
             case 12: 
-                // Shift by 8, 5 bytes then call 4 bytes
+                // Shift by 8, 5 bytes then call 5 bytes
                 ol("ld\td,e");
                 ol("ld\te,h");
                 ol("ld\th,l");
