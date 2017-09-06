@@ -20,6 +20,8 @@ include(__link__.m4)
 
 #define APU_STATUS_ERROR  __IO_APU_STATUS_ERROR
 
+#define APU_COMMAND_SVREQ __IO_APU_COMMAND_SVREQ
+
 #define APU_OP_ENT   __IO_APU_OP_ENT
 #define APU_OP_REM   __IO_APU_OP_REM
 #define APU_OP_ENT16 __IO_APU_OP_ENT16
