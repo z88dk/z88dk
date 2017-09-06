@@ -1372,7 +1372,16 @@ void zadd(LVALUE* lval)
     switch (lval->val_type) {
     case LONG:
     case CPTR:
-        callrts("l_long_add");
+        if ( c_size_optimisation & OPT_ADD32 ) {
+            ol("pop\tbc");        /* 7 bytes, 54T */
+            ol("add\thl,bc");
+            ol("ex\tde,hl");
+            ol("pop\tbc");
+            ol("adc\thl,bc");
+            ol("ex\tde,hl");
+        } else {
+            callrts("l_long_add"); /* 3 bytes, 76 + 17 = 93T */
+        }
         Zsp += 4;
         break;
     case DOUBLE:
@@ -1900,7 +1909,7 @@ void asr_const(LVALUE *lval, int32_t value)
 {
     if  (lval->val_type == LONG || lval->val_type == CPTR ) {
         if ( value == 1 ) {
-            if ( utype(lval) ) { /* 8 bytes */
+            if ( utype(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */
                 ol("srl\td");
             } else {
                 ol("sra\td");
@@ -1909,12 +1918,12 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\th");
             ol("rr\tl");
         } else if ( value == 8 && utype(lval) )  {
-            ol("ld\tl,h"); /* 5 bytes */
+            ol("ld\tl,h"); /* 5 bytes, 4 + 4 + 4 +7 = 19T */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
         } else if ( value == 9 && utype(lval) ) {
-            ol("ld\tl,h");  /* 11 bytes */
+            ol("ld\tl,h");  /* 11 bytes, 4+ 4 +4 +7 + 8 +8 + 8 = 43T */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
@@ -1922,7 +1931,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\th");
             ol("rr\tl");
         } else if ( value == 10 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32) )  {
-            ol("ld\tl,h"); /* 17 bytes */
+            ol("ld\tl,h"); /* 17 bytes, 19 + 48 = 67T */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
@@ -1940,28 +1949,28 @@ void asr_const(LVALUE *lval, int32_t value)
             ot("ld\tc,"); outdec(value -8); nl();
             callrts("l_long_asr_uo");
         } else if ( value == 15 && utype(lval)) {
-            ol("ex\tde,hl"); /* 10 bytes */
+            ol("ex\tde,hl"); /* 10 bytes, 45T */
             ol("rl\td");                // Lowest bit
             ol("adc\thl,hl");
             ol("ld\tde,0");
             ol("rl\te");
         } else if ( value == 16 && utype(lval)) {
-            ol("ex\tde,hl"); /* 4 bytes */
+            ol("ex\tde,hl"); /* 4 bytes 14T */
             ol("ld\tde,0");
         } else if ( value == 17 && utype(lval)) {
-            ol("srl\td"); /* 8 bytes */
+            ol("srl\td"); /* 8 bytes 30T */
             ol("rr\te");
             ol("ex\tde,hl");
             ol("ld\tde,0");
         } else if ( value == 18 && utype(lval) ) {
-            ol("ld\thl,0"); /* 12 bytes */
+            ol("ld\thl,0"); /* 12 bytes, 46T */
             ol("ex\tde,hl");
             ol("srl\th");
             ol("rr\tl");
             ol("srl\th");
             ol("rr\tl");
         } else if ( value == 20 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32) ) {
-            ol("ex\tde,hl"); /* 20 bytes */
+            ol("ex\tde,hl"); /* 20 bytes, 78T */
             ol("ld\tde,0");
             ol("srl\th");
             ol("rr\tl");
@@ -1972,30 +1981,30 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\th");
             ol("rr\tl");
         } else if ( value == 23 && utype(lval)) {
-            ol("ld\tl,d"); /* 12 bytes */
+            ol("ld\tl,d"); /* 12 bytes, 37T */
             ol("rl\te");
             ol("rl\tl");
             ol("ld\th,0");
             ol("rl\th");
             ol("ld\tde,0");
         } else if ( value == 24 && utype(lval)) {
-            ol("ld\tl,d"); /* 6 bytes */
+            ol("ld\tl,d"); /* 6 bytes , 21T */
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if ( value == 25 && utype(lval)) {
-            ol("ld\tl,d"); /* 8 bytes */
+            ol("ld\tl,d"); /* 8 bytes, 29T */
             ol("srl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if ( value == 27 && utype(lval)) {
-            ol("ld\tl,d"); /* 12 bytes */
+            ol("ld\tl,d"); /* 12 bytes, 47T */
             ol("srl\tl");
             ol("srl\tl");
             ol("srl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if ( value == 30 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32)) {
-            ol("ld\tl,0"); /* 15 bytes */
+            ol("ld\tl,0"); /* 15 bytes, 51T */
             ol("rl\td");
             ol("rl\tl");
             ol("rl\td");
@@ -2003,7 +2012,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\th,0");
             ol("ld\tde,0");
         } else if  ( value == 31 && utype(lval)) {
-            ol("ld\tl,0"); /* 12 bytes */
+            ol("ld\tl,0"); /* 12 bytes, 40T */
             ol("rl\td");
             ol("rl\tl");
             ol("ld\th,0");
@@ -2015,20 +2024,20 @@ void asr_const(LVALUE *lval, int32_t value)
                 callrts("l_asr_u");
                 ol("inc\te");
             } else {
-                lpush();  /* 11 bytes */
+                lpush();  /* 11 bytes, optimised to 5 */
                 vlongconst(value);
                 asr(lval);
             }
         }
     } else {
-        if ( value == 1 ) {
+        if ( value == 1 ) { /* 4 bytes, 16T */
             if ( utype(lval) ) {
                 ol("srl\th");
             } else {
                 ol("sra\th");
             }
             ol("rr\tl");
-        } else if ( value == 8 && utype(lval) ) {
+        } else if ( value == 8 && utype(lval) ) { /* 3 bytes, 11T */
             ol("ld\tl,h");
             ol("ld\th,0");
         } else if ( value != 0 ) {
@@ -2060,36 +2069,36 @@ void asl_16bit_const(LVALUE *lval, int value)
     switch ( value ) {
         case 0:
             return;
-        case 10:  // 7 bytes
+        case 10:  // 7 bytes, 8 + 8 + 4 + 7 = 27T
             ol("sla\tl");
             ol("sla\tl");
             ol("ld\th,l");
             ol("ld\tl,0");
             break;
-        case 9: // 6 bytes
-            ol("sla\tl");
+        case 9: // 6 bytes, 8 + 4 + 7 = 19T
+            ol("sla\tl"); 
             ol("ld\th,l");
             ol("ld\tl,0");
             break;
-        case 8: // 3 bytes
+        case 8: // 3 bytes, 4 + 7 = 11T
             ol("ld\th,l");
             ol("ld\tl,0");
         break;
         case 7:
-            ol("add\thl,hl");
+            ol("add\thl,hl");  // 77T
         case 6:
-            ol("add\thl,hl");
+            ol("add\thl,hl");  // 66T
             // Fall through
         case 5:
-            ol("add\thl,hl");
+            ol("add\thl,hl");  // 55T
         case 4:
-            ol("add\thl,hl");
+            ol("add\thl,hl"); // 44T
         case 3:
-            ol("add\thl,hl");
+            ol("add\thl,hl"); // 33T
         case 2:
-            ol("add\thl,hl");
+            ol("add\thl,hl"); // 22T
         case 1:
-            ol("add\thl,hl");
+            ol("add\thl,hl"); // 11T
             break;
         default: // 7 bytes
             if ( value >= 16 ) {
@@ -2110,25 +2119,25 @@ void asl_const(LVALUE *lval, int32_t value)
         switch ( value ) {
         case 0: 
             return;
-        case 24: // 6 bytes
+        case 24: // 6 bytes, 4 + 7 + 10 = 21T
             ol("ld\td,l");
             ol("ld\te,0");
             vconst(0);
             break;
         case 17: // 5 bytes
-            ol("add\thl,hl");
+            ol("add\thl,hl");  // 5 bytes, 11 + 4 + 10 = 25T
             // Fall through
         case 16: // 4 bytes
             swap();
             vconst(0);
             break;
-        case 8: // 5 bytes
+        case 8: // 5 bytes, 4 + 4 + 4 +7 = 19T
             ol("ld\td,e");
             ol("ld\te,h");
             ol("ld\th,l");
             ol("ld\tl,0");
             break;         
-        case 1: /* 5 bytes */
+        case 1: /* 5 bytes, 11 + 8 + 8 = 27T */
             ol("add\thl,hl");;
             ol("rl\te");
             ol("rl\td");   
@@ -2137,7 +2146,7 @@ void asl_const(LVALUE *lval, int32_t value)
         case 10:
         case 11:
         case 12: 
-            // Shift by 8, 5 bytes then call 5 bytes
+            // Shift by 8, 10 bytes, 4 + 4 + 4+ 7 = 19T + 
             ol("ld\td,e");
             ol("ld\te,h");
             ol("ld\th,l");

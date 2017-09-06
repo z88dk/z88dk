@@ -407,7 +407,8 @@ struct lvalue_s {
 /* Enable optimisations that are longer than the conventional sequence */ 
 enum optimisation {
         OPT_LSHIFT32 = (1 << 0 ),
-        OPT_RSHIFT32 = (1 << 1 )
+        OPT_RSHIFT32 = (1 << 1 ),
+        OPT_ADD32    = (1 << 2 )
 };
 
 
