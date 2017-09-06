@@ -25,18 +25,18 @@ ide_write_block:
     out (c), d              ;drive address onto control lines
     ld e, $0                ;keep iterative count in e
 ide_wrblk2: 
-    ld bc, __IO_PIO_IDE_CTL|__IO_IDE_WR_LINE
+    ld d, __IO_IDE_DATA|__IO_IDE_WR_LINE
     out (c), d              ;and assert write pin
-    ld bc, __IO_PIO_IDE_LSB      ;drive lower lines with lsb
+    ld bc, __IO_PIO_IDE_LSB ;drive lower lines with lsb
     outi                    ;write the lower byte (HL++)
-    ld bc, __IO_PIO_IDE_MSB      ;drive upper lines with msb
+    ld bc, __IO_PIO_IDE_MSB ;drive upper lines with msb
     outi                    ;write the upper byte (HL++)
     ld bc, __IO_PIO_IDE_CTL
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert write pin
     dec e                   ;keep iterative count in e
     jr nz, ide_wrblk2
-   ;ld bc, __IO_PIO_IDE_CTL      ;remembering what's in bc
+   ;ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
     ld d, $0
     out (c), d              ;deassert all control pins
     ld bc, __IO_PIO_IDE_CONFIG

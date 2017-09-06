@@ -29,9 +29,9 @@ ide_write_sector:
     jr nc, error
     call ide_setup_lba      ;tell it which sector we want in BCDE
     ld e, $1
-    ld a, __IO_IDE_SEC_CNT    
+    ld a, __IO_IDE_SEC_CNT
     call ide_write_byte     ;set sector count to 1
-    ld e, __IDE_CMD_WRITE    
+    ld e, __IDE_CMD_WRITE
     ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;instruct drive to write a sector
     call ide_wait_ready     ;make sure drive is ready to proceed

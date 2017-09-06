@@ -16,7 +16,7 @@ EXTERN ide_write_sector
 ; entry
 ; a = number of sectors (< 256)
 ; bcde = LBA specified by the 4 bytes in BCDE
-; hl = the address pointer to the buffer to fill
+; hl = the address pointer to the buffer read from
 ;
 ; exit
 ; hl = DRESULT, set carry flag
@@ -27,7 +27,7 @@ asm_disk_write:
     jr z, dresult_error
 
 loop:
-    call ide_write_sector    ; with the logical block address in bcde, write one sector
+    call ide_write_sector   ; with the logical block address in bcde, write one sector
     jr nc, dresult_error
     dec a
     jr z, dresult_ok
@@ -37,7 +37,7 @@ loop:
     inc de                  ; increment the LBA lower word    
     ld b, a                 ; free a for LBA increment testing
     ld a, e
-    or d                    ; lower de word non-zero, therefore no carry to bc
+    or a, d                 ; lower de word non-zero, therefore no carry to bc
     ld a, b                 ; recover a value
     pop bc                  ; recover the bc value
     jr nz, loop

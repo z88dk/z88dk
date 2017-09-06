@@ -37,7 +37,7 @@ loop:
     inc de                  ; increment the LBA lower word   
     ld b, a                 ; free a for LBA increment testing
     ld a, e
-    or d                    ; lower de word non-zero, therefore no carry to bc
+    or a, d                 ; lower de word non-zero, therefore no carry to bc
     ld a, b                 ; recover a value
     pop bc                  ; recover the bc value
     jr nz, loop
