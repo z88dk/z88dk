@@ -2081,7 +2081,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             ol("add\thl,hl");
             // Fall through
         case 5:
-                ol("add\thl,hl");
+            ol("add\thl,hl");
         case 4:
             ol("add\thl,hl");
         case 3:
@@ -2098,7 +2098,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             } else {
                 const2(value);
                 swap();
-                asl(lval);
+                callrts("l_asl");
             }
             break;
     }
