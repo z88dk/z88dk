@@ -2579,3 +2579,36 @@
 	ld	l,(hl)
 	ld	h,0
 	ex	de,hl
+
+	call	l_gint	;
+	call	l_glong
+=
+	call	l_glonghlp
+
+	ld	hl,%1
+	ld	hl,%2	;const
+=
+	ld	hl,%2	;const
+
+	call	l_glong
+	ex	de,hl
+	ld	de,0
+=
+	inc	hl
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	ld	de,0
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,0	;const
+	call	l_long_or
+=
+	ld	a,(hl)
+	pop	hl
+	pop	de
+	or	e
+	ld	e,a

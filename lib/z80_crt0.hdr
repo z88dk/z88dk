@@ -98,6 +98,7 @@
 	EXTERN     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
 	EXTERN     l_long2int_s	;Long->int signed conversion
 	EXTERN     l_glong		;Get long
+	EXTERN     l_glonghlp		;Get pointer, then get long
 	EXTERN     l_glongsp	;Get long and copy on stack (peephole opt)
 	EXTERN     l_long_add
 	EXTERN     l_long_and

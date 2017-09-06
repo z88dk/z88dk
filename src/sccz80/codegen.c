@@ -2010,8 +2010,8 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\tde,0");
         } else if ( value != 0 ) {
             value &= 31;
-            if ( value >= 16 && utype(lval)) {
-                vconst( value - 16);  /* 7 bytes */
+            if ( value >= 16 && utype(lval)) {  /* 7 bytes */
+                ot("ld\thl,");outdec( value - 16); nl(); /* We don't want it marked as const otherwise it gets optimised away */
                 callrts("l_asr_u");
                 ol("inc\te");
             } else {
@@ -2055,100 +2055,111 @@ void asl(LVALUE* lval)
     }
 }
 
+void asl_16bit_const(LVALUE *lval, int value)
+{
+    switch ( value ) {
+        case 0:
+            return;
+        case 10:  // 7 bytes
+            ol("sla\tl");
+            ol("sla\tl");
+            ol("ld\th,l");
+            ol("ld\tl,0");
+            break;
+        case 9: // 6 bytes
+            ol("sla\tl");
+            ol("ld\th,l");
+            ol("ld\tl,0");
+            break;
+        case 8: // 3 bytes
+            ol("ld\th,l");
+            ol("ld\tl,0");
+        break;
+        case 7:
+            ol("add\thl,hl");
+        case 6:
+            ol("add\thl,hl");
+            // Fall through
+        case 5:
+                ol("add\thl,hl");
+        case 4:
+            ol("add\thl,hl");
+        case 3:
+            ol("add\thl,hl");
+        case 2:
+            ol("add\thl,hl");
+        case 1:
+            ol("add\thl,hl");
+            break;
+        default: // 7 bytes
+            if ( value >= 16 ) {
+                warning(W_LEFTSHIFT_TOO_BIG);
+                vconst(0);
+            } else {
+                const2(value);
+                swap();
+                asl(lval);
+            }
+            break;
+    }
+}
+
 void asl_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == LONG  ) { 
         switch ( value ) {
-            case 0: 
-                return;
-            case 24: // 6 bytes
-                ol("ld\td,l");
-                ol("ld\te,0");
-                vconst(0);
-                break;
-            case 17: // 5 bytes
-                ol("add\thl,hl");
-                // Fall through
-            case 16: // 4 bytes
+        case 0: 
+            return;
+        case 24: // 6 bytes
+            ol("ld\td,l");
+            ol("ld\te,0");
+            vconst(0);
+            break;
+        case 17: // 5 bytes
+            ol("add\thl,hl");
+            // Fall through
+        case 16: // 4 bytes
+            swap();
+            vconst(0);
+            break;
+        case 8: // 5 bytes
+            ol("ld\td,e");
+            ol("ld\te,h");
+            ol("ld\th,l");
+            ol("ld\tl,0");
+            break;         
+        case 1: /* 5 bytes */
+            ol("add\thl,hl");;
+            ol("rl\te");
+            ol("rl\td");   
+            break;
+        case 9:
+        case 10:
+        case 11:
+        case 12: 
+            // Shift by 8, 5 bytes then call 5 bytes
+            ol("ld\td,e");
+            ol("ld\te,h");
+            ol("ld\th,l");
+            ol("ld\tl,0");
+            loada( value - 8 ); 
+            callrts("l_long_aslo");
+            break;
+        default: //  5 bytes
+            if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
+            value &= 31;
+            if (  value >= 16 ) {
+                asl_16bit_const(lval, value - 16);
                 swap();
-                vconst(0);
-                break;
-            case 8: // 5 bytes
-                ol("ld\td,e");
-                ol("ld\te,h");
-                ol("ld\th,l");
-                ol("ld\tl,0");
-                break;         
-            case 1: /* 5 bytes */
-                ol("add\thl,hl");;
-                ol("rl\te");
-                ol("rl\td");   
-                break;
-            case 9:
-            case 10:
-            case 11:
-            case 12: 
-                // Shift by 8, 5 bytes then call 5 bytes
-                ol("ld\td,e");
-                ol("ld\te,h");
-                ol("ld\th,l");
-                ol("ld\tl,0");
-                loada( value - 8 ); 
-                callrts("l_long_aslo");
-                break;
-            default: //  5 bytes
-                if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
+                ot("ld\thl,"); outdec(0); nl();
+            } else {
                 loada( value );
                 callrts("l_long_aslo");
-                break;
+            }
+            break;
         }
-
     } else {
-        switch ( value ) {
-            case 0:
-                return;
-            case 10:  // 7 bytes
-                ol("sla\tl");
-                ol("sla\tl");
-                ol("ld\th,l");
-                ol("ld\tl,0");
-                break;
-            case 9: // 6 bytes
-                ol("sla\tl");
-                ol("ld\th,l");
-                ol("ld\tl,0");
-                break;
-            case 8: // 3 bytes
-                ol("ld\th,l");
-                ol("ld\tl,0");
-	        break;
-            case 7:
-                ol("add\thl,hl");
-            case 6:
-                ol("add\thl,hl");
-                // Fall through
-            case 5:
-                 ol("add\thl,hl");
-            case 4:
-                ol("add\thl,hl");
-            case 3:
-                ol("add\thl,hl");
-            case 2:
-                ol("add\thl,hl");
-            case 1:
-                ol("add\thl,hl");
-                break;
-            default: // 7 bytes
-                if ( value >= 16 ) {
-                    warning(W_LEFTSHIFT_TOO_BIG);
-                    vconst(0);
-                } else {
-                    const2(value);
-                    swap();
-                    asl(lval);
-                }
-                break;
-        }
+        asl_16bit_const(lval, value);
     }
 }
 
