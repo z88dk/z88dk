@@ -16,7 +16,7 @@ EXTERN ide_write_sector
 ; entry
 ; a = number of sectors (< 256)
 ; bcde = LBA specified by the 4 bytes in BCDE
-; hl = the address pointer to the buffer read from
+; hl = the address pointer to the buffer read from (incremented by ide_write_sector)
 ;
 ; exit
 ; hl = DRESULT, set carry flag
@@ -31,15 +31,11 @@ loop:
     jr nc, dresult_error
     dec a
     jr z, dresult_ok
-    push bc
-    ld bc, 512
-    add hl, bc              ; increment the buffer pointer by 512 bytes
-    inc de                  ; increment the LBA lower word    
-    ld b, a                 ; free a for LBA increment testing
+    push af                 ; free a for LBA increment testing
+    inc de                  ; increment the LBA lower word
     ld a, e
     or a, d                 ; lower de word non-zero, therefore no carry to bc
-    ld a, b                 ; recover a value
-    pop bc                  ; recover the bc value
+    pop af                  ; recover a value
     jr nz, loop
     inc bc                  ; otherwise increment LBA upper word
     jr loop

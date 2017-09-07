@@ -20,11 +20,14 @@ EXTERN ide_read_block
 ; read a sector
 ; LBA specified by the 4 bytes in BCDE
 ; the address of the buffer to fill is in HL
+; HL is left incremented by 512 bytes
 
 ; return carry on success, no carry for an error
 
 ide_read_sector:
     push af
+    push bc
+    push de
     call ide_wait_ready     ;make sure drive is ready
     jr nc, error
     call ide_setup_lba      ;tell it which sector we want in BCDE
@@ -39,11 +42,15 @@ ide_read_sector:
     call ide_wait_drq       ;wait until it's got the data
     jr nc, error
     call ide_read_block     ;grab the data into (HL++)
+    pop de
+    pop bc
     pop af
     scf                     ;carry = 1 on return = operation ok
     ret
 
 error:
+    pop de
+    pop bc
     pop af
     jp ide_test_error       ;carry = 0 on return = operation failed
 

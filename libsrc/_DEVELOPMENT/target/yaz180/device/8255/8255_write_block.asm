@@ -36,7 +36,7 @@ ide_wrblk2:
     out (c), d              ;deassert write pin
     dec e                   ;keep iterative count in e
     jr nz, ide_wrblk2
-   ;ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
+;   ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
     ld d, $0
     out (c), d              ;deassert all control pins
     ld bc, __IO_PIO_IDE_CONFIG
