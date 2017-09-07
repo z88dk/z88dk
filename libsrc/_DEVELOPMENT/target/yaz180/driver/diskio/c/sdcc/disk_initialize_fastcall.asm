@@ -1,8 +1,8 @@
 SECTION code_driver
 
-PUBLIC _disk_initialise_fastcall
+PUBLIC _disk_initialize_fastcall
 
-EXTERN asm_disk_initialise
+EXTERN asm_disk_initialize
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called from diskio.h
@@ -11,4 +11,4 @@ EXTERN asm_disk_initialise
 
 ; initialize the ide drive
 
-defc _disk_initialise_fastcall = asm_disk_initialise
+defc _disk_initialize_fastcall = asm_disk_initialize

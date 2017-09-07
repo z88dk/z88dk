@@ -1,8 +1,8 @@
 SECTION code_driver
 
-PUBLIC _disk_initialise
+PUBLIC _disk_initialize
 
-EXTERN asm_disk_initialise
+EXTERN asm_disk_initialize
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called from diskio.h
@@ -11,11 +11,11 @@ EXTERN asm_disk_initialise
 
 ; initialize the ide drive
 
-_disk_initialise:
+_disk_initialize:
 
     pop af
     pop hl
     push hl
     push af
 
-    jp asm_disk_initialise
+    jp asm_disk_initialize
