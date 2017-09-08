@@ -1,5 +1,5 @@
-target/yaz180/driver/diskio/c/sccz80/disk_initialise
-target/yaz180/driver/diskio/c/sccz80/disk_initialise_fastcall
+target/yaz180/driver/diskio/c/sccz80/disk_initialize
+target/yaz180/driver/diskio/c/sccz80/disk_initialize_fastcall
 target/yaz180/driver/diskio/c/sccz80/disk_ioctl
 target/yaz180/driver/diskio/c/sccz80/disk_ioctl_callee
 target/yaz180/driver/diskio/c/sccz80/disk_status
