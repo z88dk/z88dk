@@ -192,8 +192,10 @@ typecheck:
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
         if (cmatch('L'))
             lval->val_type = LONG;
-        if (cmatch('U'))
+        if (cmatch('U')) {
             lval->flags |= UNSIGNED;
+            lval->const_val = (uint32_t)k;
+        }
         if (cmatch('S'))
             lval->flags &= ~UNSIGNED;
         if (cmatch('f'))

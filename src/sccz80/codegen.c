@@ -2596,6 +2596,16 @@ void vlongconst(uint32_t val)
     const2(val / 65536);
 }
 
+
+void vlongconst_tostack(uint32_t val)
+{
+    constbc(val / 65536);
+    ol("push\tbc");
+    constbc(val % 65536);
+    ol("push\tbc");
+    Zsp -= 4;
+}
+
 void vlongconst_noalt(uint32_t val)
 {
     constbc(val / 65536);
