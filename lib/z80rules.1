@@ -2612,3 +2612,36 @@
 	pop	de
 	or	e
 	ld	e,a
+
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,%2
+	pop	de
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%2
+
+	ld	l,%1
+	ld	h,%2
+	pop	de
+	ex	de,hl
+=
+	ld	e,%1
+	ld	h,%2
+	pop	hl
+
+	push	hl
+	ld	hl,%1
+	ld	de,%2
+	pop	bc
+	call	l_plong
+=
+	ld	b,h
+	ld	c,l
+	ld	hl,%1
+	ld	de,%2
+	call	l_plong
