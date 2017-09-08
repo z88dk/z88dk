@@ -20,18 +20,19 @@ EXTERN asm_disk_read
 ;
 
 _disk_read_callee:
-    pop af      ; pop return address
-    ex af,af
+    pop hl      ; pop return address
 
     inc sp      ; drop single byte pdrv (not evaluated)
-    pop hl      ; buff to hl
+    pop af      ; *buff to af
     pop de      ; start sector to bcde
     pop bc
-    dec sp      ; move sp to get INT into a
-    pop af      ; get sector count to a from an INT
-    inc sp
+    ex (sp),hl  ; get sector count to hl (return address on stack)
 
-    ex af,af
-    push af     ; push return address
+    push af     ; push *buff   
+    push hl     ; push sector count
+    dec sp      ; get BYTE sector count
+    pop af      ; pop sector count into a
+    inc sp      ; balance for sector pop
+    pop hl      ; pop *buff
 
     jp asm_disk_read

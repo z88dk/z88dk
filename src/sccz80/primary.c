@@ -167,9 +167,9 @@ double calcun(
     void (*oper)(LVALUE *),
     double right)
 {
-    if (oper == zdiv)
+    if (oper == zdiv)   {
         return (left / right);
-    else if (oper == zmod)
+    } else if (oper == zmod)
         return ((unsigned int)left % (unsigned int)right);
     else if (oper == zle)
         return (left <= right);
@@ -340,6 +340,10 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
                 convSint2long();
             lval->val_type = LONG;
         }
+    }
+    if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED)) {
+         lval->flags |= UNSIGNED;
+         lval2->flags |= UNSIGNED;
     }
 }
 

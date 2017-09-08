@@ -158,8 +158,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->val_type == LONG) {
             widenlong(lval, lval2);
             lval2->val_type = LONG; /* Kludge */
-            lpush();
-            vlongconst(lval->const_val);
+            if ( oper == zdiv || oper == zmod ) {
+                vlongconst_tostack(lval->const_val);
+            } else {
+                lpush();
+                vlongconst(lval->const_val);
+            }
         } else {
             if ( lval2->val_type == LONG ) {
                 vlongconst_noalt(lval->const_val); 

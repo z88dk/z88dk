@@ -76,9 +76,11 @@
         pop af
         retn
 
-    am9511a_isr_end:            ; we've finished a COMMAND sequence
+    am9511a_isr_end:            ; we've finished a COMMAND sentence
         ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
         in a, (c)               ; read the APU
+        tst __IO_APU_STATUS_BUSY    ; test the STATUS byte is valid (i.e. we're not busy)
+        jr nz, am9511a_isr_end
         ld (APUStatus), a       ; update status byte
         jr am9511a_isr_exit     ; we're done here
 

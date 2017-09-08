@@ -1,20 +1,14 @@
 SECTION code_driver
 
-PUBLIC _disk_initialise_callee
+PUBLIC _disk_initialize_fastcall
 
-EXTERN asm_disk_initialise
+EXTERN asm_disk_initialize
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called from diskio.h
-; extern DSTATUS disk_initialize (BYTE pdrv) __z88dk_callee;
+; extern DSTATUS disk_initialize (BYTE pdrv) __z88dk_fastcall;
 ;
 
 ; initialize the ide drive
 
-_disk_initialise_callee:
-
-    pop af
-    pop hl
-    push af
-
-    jp asm_disk_initialise
+defc _disk_initialize_fastcall = asm_disk_initialize

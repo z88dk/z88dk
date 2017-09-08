@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC asm_disk_initialise
+PUBLIC asm_disk_initialize
 
 EXTERN ide_hard_reset
 EXTERN ide_soft_reset
@@ -20,7 +20,7 @@ EXTERN ide_init
 
 ; initialize the ide drive
 
-asm_disk_initialise:
+asm_disk_initialize:
     push af
     xor a       ; clear a
     or l        ; check that that it is drive 0

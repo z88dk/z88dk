@@ -62,6 +62,7 @@ ENDIF
 		SECTION code_clib
 		SECTION code_crt0_sccz80
 		SECTION code_l_sdcc
+		SECTION code_l_sccz80
 		SECTION code_l
 		SECTION code_compress_zx7
 		SECTION code_fp
