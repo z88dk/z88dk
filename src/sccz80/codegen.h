@@ -93,6 +93,7 @@ extern void convUlong2doub(void);
 extern void convdoub2int(void);
 extern void DoubSwap(void);
 extern void vlongconst(uint32_t val);
+extern void vlongconst_tostack(uint32_t val);
 extern void vlongconst_noalt(uint32_t val);
 extern void vconst(int32_t val);
 extern void const2(int32_t val);
