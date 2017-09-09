@@ -116,11 +116,11 @@ File test1.o at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-__size                          = $0038 ; G 
-__head                          = $1234 ; G 
-a1                              = $1247 ; G test
-a2                              = $1263 ; G test1
-__tail                          = $126C ; G 
+a1                              = $1247 ; addr, public, , test, ,
+a2                              = $1263 ; addr, public, , test1, ,
+__head                          = $1234 ; const, public, def, , ,
+__tail                          = $126C ; const, public, def, , ,
+__size                          = $0038 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -263,23 +263,23 @@ File test1.o at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-__data_size                     = $000C ; G 
-__code_size                     = $0025 ; G 
-__size                          = $0031 ; G 
-__code_head                     = $1234 ; G 
-__head                          = $1234 ; G 
-start                           = $1234 ; L test
-prmes                           = $1250 ; G test1
-__code_tail                     = $1259 ; G 
-__data_head                     = $1259 ; G 
-mes1                            = $1259 ; L test
-mes1end                         = $125E ; L test
-mes2                            = $125E ; L test
-mes0                            = $1264 ; G test1
-mes2end                         = $1264 ; L test
-__data_tail                     = $1265 ; G 
-__tail                          = $1265 ; G 
-mes0end                         = $1265 ; G test1
+mes1                            = $1259 ; addr, local, , test, data,
+start                           = $1234 ; addr, local, , test, code,
+mes1end                         = $125E ; addr, local, , test, data,
+mes2                            = $125E ; addr, local, , test, data,
+mes2end                         = $1264 ; addr, local, , test, data,
+prmes                           = $1250 ; addr, public, , test1, code,
+mes0                            = $1264 ; addr, public, , test1, data,
+mes0end                         = $1265 ; addr, public, , test1, data,
+__head                          = $1234 ; const, public, def, , ,
+__tail                          = $1265 ; const, public, def, , ,
+__size                          = $0031 ; const, public, def, , ,
+__code_head                     = $1234 ; const, public, def, , ,
+__code_tail                     = $1259 ; const, public, def, , ,
+__code_size                     = $0025 ; const, public, def, , ,
+__data_head                     = $1259 ; const, public, def, , ,
+__data_tail                     = $1265 ; const, public, def, , ,
+__data_size                     = $000C ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -922,20 +922,19 @@ File test.o at $0000: Z80RMF08
 END
 
 eq_or_diff_text scalar(read_file("test.sym")), <<'END';
-main                            = $0000 ; G 
-print                           = $0000 ; G 
-test1_mess                      = $0000 ; L 
-test2_printa1                   = $0000 ; L 
-test2_mess                      = $0006 ; L 
-test3_mess                      = $000B ; L 
-printa                          = $000D ; G 
-test3_dollar                    = $000D ; L 
-test2__delay                    = $0018 ; L 
-test2__delay_1                  = $001A ; L 
-print1                          = $001F ; G 
-code_end                        = $0025 ; G 
+test1_mess                      = $0000 ; addr, local, , , data,
+test2_printa1                   = $0000 ; comput, local, , , ,
+test2__delay                    = $0018 ; addr, local, , , code,
+test2__delay_1                  = $001A ; addr, local, , , code,
+test2_mess                      = $0006 ; addr, local, , , data,
+test3_mess                      = $000B ; addr, local, , , data,
+test3_dollar                    = $000D ; addr, local, , , data,
+main                            = $0000 ; addr, public, , , code,
+print                           = $0000 ; comput, public, , , ,
+printa                          = $000D ; addr, public, , , code,
+print1                          = $001F ; addr, public, , , code,
+code_end                        = $0025 ; addr, public, , , code,
 END
-
 
 # at address 0
 unlink "test.asm", "test.bin";
@@ -949,31 +948,30 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0));
 
 eq_or_diff_text scalar(read_file("test.map")), <<'END';
-__code_head                     = $0000 ; G 
-__head                          = $0000 ; G 
-lib_end                         = $0000 ; G test_lib
-lib_start                       = $0000 ; G test_lib
-main                            = $0000 ; G test
-printa                          = $000D ; G test
-test2_printa1                   = $000D ; L test
-__data_size                     = $000F ; G 
-test2__delay                    = $0018 ; L test
-test2__delay_1                  = $001A ; L test
-print1                          = $001F ; G test
-print                           = $001F ; G test
-__code_size                     = $0025 ; G 
-__code_tail                     = $0025 ; G 
-__data_head                     = $0025 ; G 
-code_end                        = $0025 ; G test
-test1_mess                      = $0025 ; L test
-test2_mess                      = $002B ; L test
-test3_mess                      = $0030 ; L test
-test3_dollar                    = $0032 ; L test
-__data_tail                     = $0034 ; G 
-__size                          = $0034 ; G 
-__tail                          = $0034 ; G 
+test1_mess                      = $0025 ; addr, local, , test, data,
+test2_printa1                   = $000D ; addr, local, , test, ,
+test2__delay                    = $0018 ; addr, local, , test, code,
+test2__delay_1                  = $001A ; addr, local, , test, code,
+test2_mess                      = $002B ; addr, local, , test, data,
+test3_mess                      = $0030 ; addr, local, , test, data,
+test3_dollar                    = $0032 ; addr, local, , test, data,
+main                            = $0000 ; addr, public, , test, code,
+print                           = $001F ; addr, public, , test, ,
+printa                          = $000D ; addr, public, , test, code,
+print1                          = $001F ; addr, public, , test, code,
+code_end                        = $0025 ; addr, public, , test, code,
+lib_start                       = $0000 ; const, public, , test_lib, ,
+lib_end                         = $0000 ; const, public, , test_lib, ,
+__head                          = $0000 ; const, public, def, , ,
+__tail                          = $0034 ; const, public, def, , ,
+__size                          = $0034 ; const, public, def, , ,
+__code_head                     = $0000 ; const, public, def, , ,
+__code_tail                     = $0025 ; const, public, def, , ,
+__code_size                     = $0025 ; const, public, def, , ,
+__data_head                     = $0025 ; const, public, def, , ,
+__data_tail                     = $0034 ; const, public, def, , ,
+__data_size                     = $000F ; const, public, def, , ,
 END
-
 
 # at address 0x1234
 unlink "test.asm", "test.bin";
@@ -987,29 +985,29 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0x1234));
 
 eq_or_diff_text scalar(read_file("test.map")), <<'END';
-lib_end                         = $0000 ; G test_lib
-lib_start                       = $0000 ; G test_lib
-__data_size                     = $000F ; G 
-__code_size                     = $0025 ; G 
-__size                          = $0034 ; G 
-__code_head                     = $1234 ; G 
-__head                          = $1234 ; G 
-main                            = $1234 ; G test
-printa                          = $1241 ; G test
-test2_printa1                   = $1241 ; L test
-test2__delay                    = $124C ; L test
-test2__delay_1                  = $124E ; L test
-print1                          = $1253 ; G test
-print                           = $1253 ; G test
-__code_tail                     = $1259 ; G 
-__data_head                     = $1259 ; G 
-code_end                        = $1259 ; G test
-test1_mess                      = $1259 ; L test
-test2_mess                      = $125F ; L test
-test3_mess                      = $1264 ; L test
-test3_dollar                    = $1266 ; L test
-__data_tail                     = $1268 ; G 
-__tail                          = $1268 ; G 
+test1_mess                      = $1259 ; addr, local, , test, data,
+test2_printa1                   = $1241 ; addr, local, , test, ,
+test2__delay                    = $124C ; addr, local, , test, code,
+test2__delay_1                  = $124E ; addr, local, , test, code,
+test2_mess                      = $125F ; addr, local, , test, data,
+test3_mess                      = $1264 ; addr, local, , test, data,
+test3_dollar                    = $1266 ; addr, local, , test, data,
+main                            = $1234 ; addr, public, , test, code,
+print                           = $1253 ; addr, public, , test, ,
+printa                          = $1241 ; addr, public, , test, code,
+print1                          = $1253 ; addr, public, , test, code,
+code_end                        = $1259 ; addr, public, , test, code,
+lib_start                       = $0000 ; const, public, , test_lib, ,
+lib_end                         = $0000 ; const, public, , test_lib, ,
+__head                          = $1234 ; const, public, def, , ,
+__tail                          = $1268 ; const, public, def, , ,
+__size                          = $0034 ; const, public, def, , ,
+__code_head                     = $1234 ; const, public, def, , ,
+__code_tail                     = $1259 ; const, public, def, , ,
+__code_size                     = $0025 ; const, public, def, , ,
+__data_head                     = $1259 ; const, public, def, , ,
+__data_tail                     = $1268 ; const, public, def, , ,
+__data_size                     = $000F ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------

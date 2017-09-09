@@ -93,10 +93,6 @@ extern void declare_public_symbol(char *name);
 /* declare an EXTERN symbol */
 extern void declare_extern_symbol( char *name );
 
-/* sort functions for SymbolHash_sort */
-extern int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b );
-extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
-
 /*-----------------------------------------------------------------------------
 *   Write symbols to files
 *----------------------------------------------------------------------------*/

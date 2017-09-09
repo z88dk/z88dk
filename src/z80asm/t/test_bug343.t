@@ -42,5 +42,5 @@ isnt $bin1, $bin2, "binary different";
 # END
 # run("zcc +test -v -clib=rabbit test.c");
 
-unlink_tests();
+unlink_testfiles();
 done_testing();
