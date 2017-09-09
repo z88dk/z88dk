@@ -62,6 +62,9 @@ static void option_cpu_r3k(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
 static void option_filler( char *filler_arg );
+static void define_assembly_defines();
+static void include_z80asm_lib(char *prog_name);
+static char *search_z80asm_lib(char *prog_name);
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -126,15 +129,19 @@ void parse_argv( int argc, char *argv[] )
     init_module();
 
     if ( argc == 1 )
-        exit_copyright();				/* exit if no arguments */
+        exit_copyright();					/* exit if no arguments */
 
     process_options( &arg, argc, argv );	/* process all options, set arg to next */
 
     if ( arg >= argc )
-        error_no_src_file();			/* no source file */
+        error_no_src_file();				/* no source file */
 
-    if ( ! get_num_errors() )
+	include_z80asm_lib(argv[0]);			/* search for z80asm-*.lib, append to library path */
+
+	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
+
+	define_assembly_defines();
 }
 
 /*-----------------------------------------------------------------------------
@@ -599,26 +606,31 @@ static void option_use_lib( char *library )
 static void option_cpu_z80(void)
 {
 	opts.cpu = CPU_Z80;
+	opts.cpu_name = CPU_Z80_NAME;
 }
 
 static void option_cpu_z80_zxn(void)
 {
 	opts.cpu = CPU_Z80_ZXN;
+	opts.cpu_name = CPU_Z80_ZXN_NAME;
 }
 
 static void option_cpu_z180(void)
 {
 	opts.cpu = CPU_Z180;
+	opts.cpu_name = CPU_Z180_NAME;
 }
 
 static void option_cpu_r2k(void)
 {
-    opts.cpu = CPU_R2K;
+	opts.cpu = CPU_R2K;
+	opts.cpu_name = CPU_R2K_NAME;
 }
 
 static void option_cpu_r3k(void)
 {
 	opts.cpu = CPU_R3K;
+	opts.cpu_name = CPU_R3K_NAME;
 }
 
 void define_assembly_defines()
@@ -763,4 +775,50 @@ void checkrun_appmake(void)
 				error_cmd_failed(str_data(cmd));
 		}
 	}
+}
+
+/*-----------------------------------------------------------------------------
+*   z80asm standard library
+*	search in current die, then in exe path, then in exe path/../lib, then in ZCCCFG/..
+*	Ignore if not found, probably benign - user will see undefined symbols
+*	__z80asm__xxx if the library routines are called
+*----------------------------------------------------------------------------*/
+static void include_z80asm_lib(char *prog_name)
+{
+	char *library = search_z80asm_lib(prog_name);
+
+	if (library != NULL)
+		option_use_lib(library);
+}
+
+static char *search_z80asm_lib(char *prog_name)
+{
+	char *prog_dir;
+	char *expanded_file;
+	STR_DEFINE(lib_name_str, STR_SIZE);
+	char *lib_name;
+	STR_DEFINE(f, STR_SIZE);
+
+	/* Build libary file name */
+	str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
+	lib_name = strpool_add(str_data(lib_name_str));
+
+	if (file_exists(lib_name))
+		return lib_name;
+
+	prog_dir = path_dirname(prog_name);
+	str_sprintf(f, "%s/%s", prog_dir, lib_name);
+	if (file_exists(str_data(f)))
+		return strpool_add(str_data(f));
+
+	str_sprintf(f, "%s/../lib/%s", prog_dir, lib_name);
+	if (file_exists(str_data(f)))
+		return strpool_add(str_data(f));
+
+	str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
+	expanded_file = expand_environment_variables(str_data(f));
+	if (file_exists(expanded_file))
+		return expanded_file;
+
+	return NULL;		/* not found */
 }

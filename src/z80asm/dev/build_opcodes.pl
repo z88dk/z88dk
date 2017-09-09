@@ -54,7 +54,8 @@ my $INPUT = read_file(dirname($0).'/'.basename($0, '.pl').'.asm');
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
-for my $rabbit (0, 1) {
+for my $cpu ('z80', 'r2k') { #, 'z80-zxn', 'z180', 'r3k') {
+	my $rabbit = ($cpu =~ /r[23]k/);
 	for my $error (0, 1) {
 		my $iter = 	format_iter(
 					add_hex_iter(
@@ -70,8 +71,8 @@ for my $rabbit (0, 1) {
 		# write test code
 		if (@asm) {
 			push @OUTPUT, "z80asm(\n";
-			push @OUTPUT, "    options => \"-l -b".
-						  ($rabbit ? " -DRABBIT --cpu=r2k -i\".z80emu()" : "\"").",\n";
+			push @OUTPUT, "    options => \"-l -b --cpu=$cpu".
+						  ($rabbit ? " -DRABBIT" : "")."\",\n";
 			unless ($error) {
 				push @OUTPUT, "    asm1 => <<'END_ASM',\n";
 				push @OUTPUT, $asm1;

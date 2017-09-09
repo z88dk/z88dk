@@ -20,18 +20,21 @@ EXTERN ide_write_block
 ; write a sector
 ; specified by the 4 bytes in BCDE
 ; the address of the origin buffer is in HL
+; HL is left incremented by 512 bytes
 
 ; return carry on success, no carry for an error
 
 ide_write_sector:
     push af
+    push bc
+    push de
     call ide_wait_ready     ;make sure drive is ready
     jr nc, error
     call ide_setup_lba      ;tell it which sector we want in BCDE
     ld e, $1
-    ld a, __IO_IDE_SEC_CNT    
+    ld a, __IO_IDE_SEC_CNT
     call ide_write_byte     ;set sector count to 1
-    ld e, __IDE_CMD_WRITE    
+    ld e, __IDE_CMD_WRITE
     ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;instruct drive to write a sector
     call ide_wait_ready     ;make sure drive is ready to proceed
@@ -41,16 +44,19 @@ ide_write_sector:
     call ide_write_block    ;send the data to the drive from (HL++)
     call ide_wait_ready
     jr nc, error
-    ld e, __IDE_CMD_CACHE_FLUSH
-    ld a, __IO_IDE_COMMAND
-    call ide_write_byte     ;tell drive to flush its hardware cache
-    call ide_wait_ready     ;wait until the write is complete
-    jr nc, error
+;   ld e, __IDE_CMD_CACHE_FLUSH
+;   ld a, __IO_IDE_COMMAND
+;   call ide_write_byte     ;tell drive to flush its hardware cache
+;   call ide_wait_ready     ;wait until the write is complete
+;   jr nc, error
+    pop de
+    pop bc
     pop af
     scf                     ;carry = 1 on return = operation ok
     ret
 
 error:
+    pop de
+    pop bc
     pop af
     jp ide_test_error       ;carry = 0 on return = operation failed
-

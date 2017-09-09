@@ -6,7 +6,6 @@ SECTION code_clib
 PUBLIC memrchr_callee
 PUBLIC _memrchr_callee
 PUBLIC ASMDISP_MEMRCHR_CALLEE
-EXTERN     rcmx_cpdr
 
 
 .memrchr_callee

@@ -327,10 +327,10 @@ IF !RABBIT
 	ld	{i r},a
 	ld	a,{i r}
 ELSE
- 	ld	iir,a							;; 	ld	i,a
- 	ld	eir,a							;; 	ld	r,a
- 	ld	a,iir							;; 	ld	a,i
- 	ld	a,eir							;; 	ld	a,r
+ 	ld	iir,a							;; 	ld	r,a
+ 	ld	eir,a							;; 	ld	i,a
+ 	ld	a,iir							;; 	ld	a,r
+ 	ld	a,eir							;; 	ld	a,i
 ENDIF
 
 ;------------------------------------------------------------------------------
@@ -402,18 +402,6 @@ ENDIF
 	ldd
 	lddr
 
-IF !RABBIT
-	cpi
-	cpir
-	cpd	
-	cpdr
-ELSE
-	cpi									;;	call rcmx_cpi
-	cpir								;;	call rcmx_cpir
-	cpd									;;	call rcmx_cpd
-	cpdr								;;	call rcmx_cpdr
-ENDIF
-
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
 ;------------------------------------------------------------------------------
@@ -463,14 +451,6 @@ ENDIF
 ;	{rlc rrc rl rr sla sra srl} (ix+DIS),{b c d e h l a}	=} 0xDD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{rlc rrc rl rr sla sra srl} (iy+DIS),{b c d e h l a}	=} 0xFD 0xCB DIS 0x00+{<0:3}+{<2}
 ;	{sll sli} ...
-
-IF !RABBIT
-	rld
-	rrd
-ELSE
-	rld									;;	call rcmx_rld
-	rrd									;;	call rcmx_rrd
-ENDIF
 
 ;	# rotate 16 bits
 ;
@@ -587,7 +567,6 @@ jr2:
 	ret
 	ret {nz z nc c po pe p m}
 	reti
-;	rst {0 1 2 3 4 5 6 7}
 
 
 IF !RABBIT
@@ -595,20 +574,15 @@ IF !RABBIT
 	
 	retn
 	
-	rst {00h 08h 10h 18h 20h 28h 30h 38h}
 ELSE
 	call {nz z nc c},NN					;;	jr {1!},$+5 ;; call NN
 	call {po pe p m},NN					;;	jp {1!},$+6 ;; call NN
 	
 	retn								;; error: illegal identifier
 	
-	rst {        10h 18h 20h 28h     38h}
-	rst {00h 08h                 30h    } ;; error: illegal identifier
 ENDIF
 
 	rst	undefined		   								;; error: symbol 'undefined' not defined
-	rst {-1 1 7 9 15 17 23 25 31 33 39 41 47 49 55 57}	;; error: integer '{1}' out of range
-
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
@@ -829,86 +803,6 @@ ds:	defs not_defined	; BUG_0007		;; error: symbol 'not_defined' not defined
 		defs 2,2						;; defb 2,2
 	endif								;;
 
-;------------------------------------------------------------------------------
-; DEFVARS
-;------------------------------------------------------------------------------
-	defc defvars_base = 0x80			;;
-	defvars defvars_base				;;
-										;;
-	{									;;
-		df1 ds.b 4						;; ; df1 = 0x80
-		df2 ds.w 2						;; ; df2 = 0x80 + 4 = 0x84
-		df3 ds.p 2						;; ; df3 = 0x84 + 2*2 = 0x88
-		df4 ds.q 2						;; ; df4 = 0x88 + 2*3 = 0x8E
-		df5 							;; ; df5 = 0x8E + 2*4 = 0x96
-		rr								;; ; opcode can be used as constant
-										;;
-	}									;;
-	defb df1, df2, df3, df4, df5, rr	;; defb 80h, 84h, 88h, 8Eh, 96h, 96h
-	
-	defvars 0 {							;;
-		df6 ds.b 1						;; ; df6 = 0
-		df7 ds.b 1						;; ; df7 = 1
-		df8 							;; ; df8 = 2
-	}									;;
-	defb df6, df7, df8					;; defb 0, 1, 2
-	
-	defvars -1 ; continue after df5		;;
-	{									;;
-		df9  ds.b 1						;; ; df9 = 0x96
-		df10 ds.b 1						;; ; df10 = 0x97
-		df11							;; ; df11 = 0x98
-		df12							;; ; df12 = 0x98
-	}									;;
-	defb df9, df10, df11, df12			;; defb 96h, 97h, 98h, 98h
-
-	defvars 0 {							;;
-		df13 ds.b 1						;; ; df13 = 0
-		df14 ds.b 1						;; ; df14 = 1
-		df15 							;; ; df15 = 2
-	}									;;
-	defb df13, df14, df15				;; defb 0, 1, 2
-	
-	defvars -1 ; continue after df12	;;
-	{									;;
-		df16 ds.b 1						;; ; df16 = 0x98
-		df17 ds.b 1						;; ; df17 = 0x99
-		df18 ds.b 0						;; ; df18 = 0x9A
-		df19							;; ; df19 = 0x9A
-	}									;;
-	defb df16, df17, df18, df19			;; defb 98h, 99h, 9Ah, 9Ah
-
-	; check with conditional assembly
-	if 1								;;
-		defvars 0 						;;
-		{								;;
-			df20 ds.b 1					;;
-			df21						;;
-		}								;;
-	else								;;
-		defvars 0						;;
-		{								;;
-			df20 ds.w 1					;;
-			df21						;;
-		}								;;
-	endif								;;
-	defb df20, df21						;; defb 0, 1
-	
-	if 0								;;
-		defvars 0 						;;
-		{								;;
-			df30 ds.b 1					;;
-			df31						;;
-		}								;;
-	else								;;
-		defvars 0						;;
-		{								;;
-			df30 ds.w 1					;;
-			df31						;;
-		}								;;
-	endif								;;
-	defb df30, df31						;; defb 0, 2
-	
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------

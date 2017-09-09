@@ -462,6 +462,22 @@ t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "",
 		1);
 
 #------------------------------------------------------------------------------
+# warn_expr_in_parens
+unlink_testfiles();
+write_file("test.asm", "cp (16)");
+t_z80asm_capture("-b test.asm", "",
+		"Warning at file 'test.asm' line 1: interpreting indirect value as immediate\n",
+		0);
+t_binary(read_binfile("test.bin"), "\xFE\x10");
+
+unlink_testfiles();
+write_file("test.asm", "cp +(16)");
+t_z80asm_capture("-b test.asm", "",
+		"",
+		0);
+t_binary(read_binfile("test.bin"), "\xFE\x10");
+
+#------------------------------------------------------------------------------
 # White box tests
 #------------------------------------------------------------------------------
 unlink_testfiles();

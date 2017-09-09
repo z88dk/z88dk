@@ -30,7 +30,6 @@ _disk_ioctl:
     push hl
     push af
     
-    ld b, c
-    ld c, e
+    ld b, e
 
     jp asm_disk_ioctl

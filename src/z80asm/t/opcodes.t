@@ -9,7 +9,7 @@ BEGIN {
 };
 
 z80asm(
-    options => "-l -b",
+    options => "-l -b --cpu=z80",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -792,18 +792,6 @@ ENDIF
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-IF      !RABBIT
-        cpi                             ;; ED A1
-        cpir                            ;; ED B1
-        cpd                             ;; ED A9
-        cpdr                            ;; ED B9
-ELSE    
-        cpi
-        cpir
-        cpd
-        cpdr
-ENDIF   
-
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
 ;------------------------------------------------------------------------------
@@ -1377,14 +1365,6 @@ ENDIF
 ; srl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
 ; sll ...
 ; sli ...
-
-IF      !RABBIT
-        rld                             ;; ED 6F
-        rrd                             ;; ED 67
-ELSE    
-        rld
-        rrd
-ENDIF   
 
 ; # rotate 16 bits
 ;
@@ -1997,14 +1977,6 @@ jr2:
         ret  p                          ;; F0
         ret  m                          ;; F8
         reti                            ;; ED 4D
-; rst 0
-; rst 1
-; rst 2
-; rst 3
-; rst 4
-; rst 5
-; rst 6
-; rst 7
 
 
 IF      !RABBIT
@@ -2019,14 +1991,6 @@ IF      !RABBIT
 
         retn                            ;; ED 45
 
-        rst  00h                        ;; C7
-        rst  08h                        ;; CF
-        rst  10h                        ;; D7
-        rst  18h                        ;; DF
-        rst  20h                        ;; E7
-        rst  28h                        ;; EF
-        rst  30h                        ;; F7
-        rst  38h                        ;; FF
 ELSE    
         call nz,NN
         call z,NN
@@ -2039,16 +2003,7 @@ ELSE
 
         retn
 
-        rst  10h
-        rst  18h
-        rst  20h
-        rst  28h
-        rst  38h
-        rst  00h
-        rst  08h
-        rst  30h
 ENDIF   
-
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group
@@ -2296,87 +2251,6 @@ ENDIF
         endif
 
 ;------------------------------------------------------------------------------
-; DEFVARS
-;------------------------------------------------------------------------------
-        defc defvars_base = 0x80
-        defvars defvars_base
-
-        {
-          df1  ds.b 4
-          df2  ds.w 2
-          df3  ds.p 2
-          df4  ds.q 2
-          df5
-          rr
-
-        }
-        defb df1, df2, df3, df4, df5, rr
-                                        ;; 80 84 88 8E 96 96
-
-        defvars 0 {
-          df6  ds.b 1
-          df7  ds.b 1
-          df8
-        }
-        defb df6, df7, df8              ;; 00 01 02
-
-        defvars -1                      ; continue after df5
-        {
-          df9  ds.b 1
-          df10 ds.b 1
-          df11
-          df12
-        }
-        defb df9, df10, df11, df12      ;; 96 97 98 98
-
-        defvars 0 {
-          df13 ds.b 1
-          df14 ds.b 1
-          df15
-        }
-        defb df13, df14, df15           ;; 00 01 02
-
-        defvars -1                      ; continue after df12
-        {
-          df16 ds.b 1
-          df17 ds.b 1
-          df18 ds.b 0
-          df19
-        }
-        defb df16, df17, df18, df19     ;; 98 99 9A 9A
-
-                                        ; check with conditional assembly
-        if   1
-          defvars 0
-          {
-            df20 ds.b 1
-            df21
-          }
-        else
-          defvars 0
-          {
-            df20 ds.w 1
-            df21
-          }
-        endif
-        defb df20, df21                 ;; 00 01
-
-        if   0
-          defvars 0
-          {
-            df30 ds.b 1
-            df31
-          }
-        else
-          defvars 0
-          {
-            df30 ds.w 1
-            df31
-          }
-        endif
-        defb df30, df31                 ;; 00 02
-
-;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
@@ -2427,7 +2301,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b",
+    options => "-l -b --cpu=z80",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -2483,12 +2357,6 @@ IF      !RABBIT
 ELSE    
 ENDIF   
 IF      !RABBIT
-ELSE    
-ENDIF   
-IF      !RABBIT
-ELSE    
-ENDIF   
-IF      !RABBIT
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
         im   undefined                  ;; error: symbol 'undefined' not defined
@@ -2519,22 +2387,6 @@ IF      !RABBIT
 ELSE    
 ENDIF   
         rst  undefined                  ;; error: symbol 'undefined' not defined
-        rst  -1                         ;; error: integer '-1' out of range
-        rst  1                          ;; error: integer '1' out of range
-        rst  7                          ;; error: integer '7' out of range
-        rst  9                          ;; error: integer '9' out of range
-        rst  15                         ;; error: integer '15' out of range
-        rst  17                         ;; error: integer '17' out of range
-        rst  23                         ;; error: integer '23' out of range
-        rst  25                         ;; error: integer '25' out of range
-        rst  31                         ;; error: integer '31' out of range
-        rst  33                         ;; error: integer '33' out of range
-        rst  39                         ;; error: integer '39' out of range
-        rst  41                         ;; error: integer '41' out of range
-        rst  47                         ;; error: integer '47' out of range
-        rst  49                         ;; error: integer '49' out of range
-        rst  55                         ;; error: integer '55' out of range
-        rst  57                         ;; error: integer '57' out of range
 IF      !RABBIT
 ELSE    
 ENDIF   
@@ -2564,7 +2416,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b -DRABBIT --cpu=r2k -i".z80emu(),
+    options => "-l -b --cpu=r2k -DRABBIT",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -3152,10 +3004,10 @@ IF      !RABBIT
         ld   a,i
         ld   a,r
 ELSE    
-        ld   iir,a                      ;; ED 47
-        ld   eir,a                      ;; ED 4F
-        ld   a,iir                      ;; ED 57
-        ld   a,eir                      ;; ED 5F
+        ld   iir,a                      ;; ED 4F
+        ld   eir,a                      ;; ED 47
+        ld   a,iir                      ;; ED 5F
+        ld   a,eir                      ;; ED 57
 ENDIF   
 
 ;------------------------------------------------------------------------------
@@ -3286,18 +3138,6 @@ ENDIF
         ldir                            ;; ED B0
         ldd                             ;; ED A8
         lddr                            ;; ED B8
-
-IF      !RABBIT
-        cpi
-        cpir
-        cpd
-        cpdr
-ELSE    
-        cpi                             ;; CD 72 0A
-        cpir                            ;; CD 8F 0A
-        cpd                             ;; CD 29 0A
-        cpdr                            ;; CD 46 0A
-ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -3800,14 +3640,6 @@ ENDIF
 ; srl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
 ; sll ...
 ; sli ...
-
-IF      !RABBIT
-        rld
-        rrd
-ELSE    
-        rld                             ;; CD BB 0A
-        rrd                             ;; CD DD 0A
-ENDIF   
 
 ; # rotate 16 bits
 ;
@@ -4416,14 +4248,6 @@ jr2:
         ret  p                          ;; F0
         ret  m                          ;; F8
         reti                            ;; ED 4D
-; rst 0
-; rst 1
-; rst 2
-; rst 3
-; rst 4
-; rst 5
-; rst 6
-; rst 7
 
 
 IF      !RABBIT
@@ -4438,32 +4262,18 @@ IF      !RABBIT
 
         retn
 
-        rst  00h
-        rst  08h
-        rst  10h
-        rst  18h
-        rst  20h
-        rst  28h
-        rst  30h
-        rst  38h
 ELSE    
         call nz,NN                      ;; 28 03 CD 30 00
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA AE 09 CD 30 00
-        call pe,NN                      ;; E2 B4 09 CD 30 00
-        call p,NN                       ;; FA BA 09 CD 30 00
-        call m,NN                       ;; F2 C0 09 CD 30 00
+        call po,NN                      ;; EA 9C 09 CD 30 00
+        call pe,NN                      ;; E2 A2 09 CD 30 00
+        call p,NN                       ;; FA A8 09 CD 30 00
+        call m,NN                       ;; F2 AE 09 CD 30 00
 
 
-        rst  10h                        ;; D7
-        rst  18h                        ;; DF
-        rst  20h                        ;; E7
-        rst  28h                        ;; EF
-        rst  38h                        ;; FF
 ENDIF   
-
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group
@@ -4687,87 +4497,6 @@ ENDIF
         endif
 
 ;------------------------------------------------------------------------------
-; DEFVARS
-;------------------------------------------------------------------------------
-        defc defvars_base = 0x80
-        defvars defvars_base
-
-        {
-          df1  ds.b 4
-          df2  ds.w 2
-          df3  ds.p 2
-          df4  ds.q 2
-          df5
-          rr
-
-        }
-        defb df1, df2, df3, df4, df5, rr
-                                        ;; 80 84 88 8E 96 96
-
-        defvars 0 {
-          df6  ds.b 1
-          df7  ds.b 1
-          df8
-        }
-        defb df6, df7, df8              ;; 00 01 02
-
-        defvars -1                      ; continue after df5
-        {
-          df9  ds.b 1
-          df10 ds.b 1
-          df11
-          df12
-        }
-        defb df9, df10, df11, df12      ;; 96 97 98 98
-
-        defvars 0 {
-          df13 ds.b 1
-          df14 ds.b 1
-          df15
-        }
-        defb df13, df14, df15           ;; 00 01 02
-
-        defvars -1                      ; continue after df12
-        {
-          df16 ds.b 1
-          df17 ds.b 1
-          df18 ds.b 0
-          df19
-        }
-        defb df16, df17, df18, df19     ;; 98 99 9A 9A
-
-                                        ; check with conditional assembly
-        if   1
-          defvars 0
-          {
-            df20 ds.b 1
-            df21
-          }
-        else
-          defvars 0
-          {
-            df20 ds.w 1
-            df21
-          }
-        endif
-        defb df20, df21                 ;; 00 01
-
-        if   0
-          defvars 0
-          {
-            df30 ds.b 1
-            df31
-          }
-        else
-          defvars 0
-          {
-            df30 ds.w 1
-            df31
-          }
-        endif
-        defb df30, df31                 ;; 00 02
-
-;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
@@ -4817,11 +4546,11 @@ ENDIF
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4E 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 97 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD C2 0A 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD E4 0A 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 65535                    ;; CD FF FF
 END_ASM
 );
 z80asm(
-    options => "-l -b -DRABBIT --cpu=r2k -i".z80emu(),
+    options => "-l -b --cpu=r2k -DRABBIT",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -4935,9 +4664,6 @@ ELSE
 ENDIF   
 IF      !RABBIT
 ELSE    
-ENDIF   
-IF      !RABBIT
-ELSE    
         add  a,ixh                      ;; error: illegal identifier
         adc  a,ixh                      ;; error: illegal identifier
         sbc  a,ixh                      ;; error: illegal identifier
@@ -5013,9 +4739,6 @@ ELSE
 ENDIF   
 IF      !RABBIT
 ELSE    
-ENDIF   
-IF      !RABBIT
-ELSE    
         daa                             ;; error: illegal identifier
         di                              ;; error: illegal identifier
         ei                              ;; error: illegal identifier
@@ -5048,27 +4771,8 @@ ENDIF
 IF      !RABBIT
 ELSE    
         retn                            ;; error: illegal identifier
-        rst  00h                        ;; error: illegal identifier
-        rst  08h                        ;; error: illegal identifier
-        rst  30h                        ;; error: illegal identifier
 ENDIF   
         rst  undefined                  ;; error: symbol 'undefined' not defined
-        rst  -1                         ;; error: integer '-1' out of range
-        rst  1                          ;; error: integer '1' out of range
-        rst  7                          ;; error: integer '7' out of range
-        rst  9                          ;; error: integer '9' out of range
-        rst  15                         ;; error: integer '15' out of range
-        rst  17                         ;; error: integer '17' out of range
-        rst  23                         ;; error: integer '23' out of range
-        rst  25                         ;; error: integer '25' out of range
-        rst  31                         ;; error: integer '31' out of range
-        rst  33                         ;; error: integer '33' out of range
-        rst  39                         ;; error: integer '39' out of range
-        rst  41                         ;; error: integer '41' out of range
-        rst  47                         ;; error: integer '47' out of range
-        rst  49                         ;; error: integer '49' out of range
-        rst  55                         ;; error: integer '55' out of range
-        rst  57                         ;; error: integer '57' out of range
 IF      !RABBIT
 ELSE    
         in   a,(0)                      ;; error: illegal identifier

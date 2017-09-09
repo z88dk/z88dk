@@ -6,7 +6,6 @@ SECTION code_clib
 PUBLIC strrstr_callee
 PUBLIC _strrstr_callee
 PUBLIC ASMDISP_STRRSTR_CALLEE
-EXTERN     rcmx_cpir
 
 
 .strrstr_callee

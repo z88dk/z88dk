@@ -7,10 +7,10 @@ wc.com: ../osca/wc.c
 	zcc +cpm -vn $(CFLAGS) -DWILDCARD ../osca/wc.c -create-app -owc.bin
 
 tail.com: ../osca/tail.c
-	zcc +cpm -vn $(CFLAGS)  -lmalloc -DAMALLOC -O3 ../osca/tail.c -create-app -otail.bin
+	zcc +cpm -vn $(CFLAGS)  -DAMALLOC -O3 ../osca/tail.c -create-app -otail.bin
 
 sort.com: ../osca/sort.c
-	zcc +cpm -vn $(CFLAGS)  -lmalloc -DAMALLOC -O3 ../osca/sort.c -create-app -osort.bin
+	zcc +cpm -vn $(CFLAGS)  -DAMALLOC -O3 ../osca/sort.c -create-app -osort.bin
 
 ddir.com: ../osca/ddir.c
 	zcc +cpm -vn  $(CFLAGS) ../osca/ddir.c -O3 -create-app -oddir.bin

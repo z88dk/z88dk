@@ -11,141 +11,144 @@
 
 
 ._getviapointer
-	defb	0xc4, 2	; ld hl,(sp + 2)
-	defb	0xdd, 0xe4, +0	;ld hl,(hl+0)
+	ld	hl,(sp + 2)
+	ld	hl,(hl+0)
 	ret
 
 
 
 ._mult
-	defb	0x27, -4	;add sp,-4
-	defb	0xc4, 2	; ld hl,(sp + 2)
-	ex	de,hl
-	defb	0xc4, 2	; ld hl,(sp + 2)
+	add	sp,-4
+	ld	hl,(sp + 2)
+	push	hl
+	ld	hl,(sp + 2)
+	pop	de
 	call	l_mult
-	defb	0x27, 4	;add sp,4
+	add	sp,4
 	ret
 
 
 
 ._negate
-	defb	0xc4, 2	; ld hl,(sp + 2)
-	defb	0x4d	; neg hl
+	ld	hl,(sp + 2)
+	call	l_neg
 	ret
 
 
 
 ._or
-	defb	0xc4, 4	; ld hl,(sp + 4)
-	ex	de,hl
-	defb	0xc4, 4	; ld hl,(sp + 4)
-	defb	0xec	; or hl,de
+	ld	hl,(sp + 4)
 	push	hl
-	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	hl,(sp + 4)
+	pop	de
+	or	hl,de
+	push	hl
+	ld	hl,(sp + 6)
 	ld	a,l
 	or	255
 	ld	l,a
-	defb	0xd4, 0	; ld (sp + 0),hl
-	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	(sp + 0),hl
+	ld	hl,(sp + 6)
 	ld	de,511
-	defb	0xec	; or hl,de
-	defb	0x27, 2	;add sp,2
+	or	hl,de
+	add	sp,2
 	ret
 
 
 
 ._and
-	defb	0xc4, 4	; ld hl,(sp + 4)
-	ex	de,hl
-	defb	0xc4, 4	; ld hl,(sp + 4)
-	defb	0xdc	; and hl,de
+	ld	hl,(sp + 4)
 	push	hl
-	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	hl,(sp + 4)
+	pop	de
+	and	hl,de
+	push	hl
+	ld	hl,(sp + 6)
 	ld	h,0
-	defb	0xd4, 0	; ld (sp + 0),hl
-	defb	0xc4, 6	; ld hl,(sp + 6)
+	ld	(sp + 0),hl
+	ld	hl,(sp + 6)
 	ld	de,511
-	defb	0xdc	; and hl,de
-	defb	0x27, 2	;add sp,2
+	and	hl,de
+	add	sp,2
 	ret
 
 
 
 ._rshift
-	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	hl,(sp + 2)
 	and	a
-	defb	0xfc	; rr hl
+	rr	hl
 	ret
 
 
 
 ._lshift
-	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	hl,(sp + 2)
 	add	hl,hl
 	ret
 
 
 
 ._lshift_long
-	defb	0xc4, 2 + 2	; ld hl,(sp + 2 + 2)
+	ld	hl,(sp + 2 + 2)
 	ex	de,hl
-	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	hl,(sp + 2)
 	add	hl,hl
 	rl	e
 	rl	d
 	push	de
 	push	hl
-	defb	0xcc	; bool hl
-	defb	0xfc	; rr hl
+	bool	hl
+	rr	hl
 	add	hl,sp
 	push	hl
-	defb	0xc4, 8 + 2	; ld hl,(sp + 8 + 2)
+	ld	hl,(sp + 8 + 2)
 	ex	de,hl
-	defb	0xc4, 8	; ld hl,(sp + 8)
+	ld	hl,(sp + 8)
 	add	hl,hl
-	defb	0xf3	; rl de
+	rl	de
 	add	hl,hl
-	defb	0xf3	; rl de
+	rl	de
 	pop	bc
 	call	l_plong
-	defb	0xcc	; bool hl
-	defb	0xfc	; rr hl
+	bool	hl
+	rr	hl
 	add	hl,sp
 	push	hl
-	defb	0xc4, 8 + 2	; ld hl,(sp + 8 + 2)
+	ld	hl,(sp + 8 + 2)
 	ex	de,hl
-	defb	0xc4, 8	; ld hl,(sp + 8)
+	ld	hl,(sp + 8)
 	ld	a,3
 	call	l_long_aslo
 	pop	bc
 	call	l_plong
-	defb	0xcc	; bool hl
-	defb	0xfc	; rr hl
-	defb	0x27, 4	;add sp,4
+	bool	hl
+	rr	hl
+	add	sp,4
 	ret
 
 
 
 ._addition
-	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	hl,(sp + 2)
 	ld	bc,10
 	add	hl,bc
 	push	hl
 	call	_mult
-	defb	0xc4, 0	; ld hl,(sp + 0)
-	defb	0x27, 2	;add sp,2
+	ld	hl,(sp + 0)
+	add	sp,2
 	ret
 
 
 
 ._subtract
-	defb	0xc4, 2	; ld hl,(sp + 2)
+	ld	hl,(sp + 2)
 	ld	bc,-10
 	add	hl,bc
 	push	hl
 	call	_mult
-	defb	0xc4, 0	; ld hl,(sp + 0)
-	defb	0x27, 2	;add sp,2
+	ld	hl,(sp + 0)
+	add	sp,2
 	ret
 
 
@@ -164,14 +167,15 @@
 
 
 ._longadd
-	defb	0xc4, 2 + 2	; ld hl,(sp + 2 + 2)
+	ld	hl,(sp + 2 + 2)
 	ex	de,hl
-	defb	0xc4, 2	; ld hl,(sp + 2)
-	push	de
-	push	hl
-	ld	hl,10	;const
-	ld	de,0
-	call	l_long_add
+	ld	hl,(sp + 2)
+	ld	bc,10
+	add	hl,bc
+	ex	de,hl
+	ld	bc,0
+	adc	hl,bc
+	ex	de,hl
 	ret
 
 
@@ -184,7 +188,7 @@
 	ld	hl,3	;const
 	push	hl
 	call	_anotherfunc
-	defb	0x27, 6	;add sp,6
+	add	sp,6
 	ret
 
 

@@ -80,6 +80,7 @@ if [ $do_libbuild = 1 ]; then
     $MAKE -C libsrc 
     $MAKE -C libsrc install 
     $MAKE -C libsrc/_DEVELOPMENT 
+    $MAKE -C include/_DEVELOPMENT 
 fi
 if [ $do_tests = 1 ]; then
     $MAKE -C testsuite 

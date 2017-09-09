@@ -21,5 +21,5 @@
 	push	bc
 	push	af
 	ld	a,CMD_OPENF
-	rst	8
+	rst	16
 	ret

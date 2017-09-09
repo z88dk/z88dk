@@ -1,10 +1,11 @@
 #------------------------------------------------------------------------------
-# Z88DK Z80 Macro Assembler
+# Z88DK Z80 Module Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
+PROJ		:= z80asm
 
 ifeq ($(OS),Windows_NT)
   EXE 		:= .exe
@@ -14,12 +15,12 @@ endif
 
 CC 			?= gcc
 INSTALL 	?= install
+CROSS		?= 0
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS1 		:= $(wildcard *.c lib/*.c)
-SRCS		:= $(SRCS1:test.c=)
+SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c))
 OBJS 		:= $(SRCS:.c=.o)
 DEPENDS		:= $(SRCS:.c=.d)
 TEST_SRC_MAIN:= $(wildcard t/test_*.c)
@@ -28,11 +29,12 @@ TEST_SRC_LIB:=t/testlib.c
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET =		z80asm$(EXE)
+TARGET =		$(PROJ)$(EXE)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 OPT = -O3
-STD = -std=gnu99
+
+STD = -std=gnu11
 LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 
@@ -40,6 +42,7 @@ LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 # main
 #------------------------------------------------------------------------------
 .PHONY: all
+
 all: $(TARGET)
 
 $(TARGET): ../config.h $(OBJS)
@@ -53,6 +56,26 @@ $(TARGET): ../config.h $(OBJS)
 
 %.o: %.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
+
+# parser is too big to optimize with -O3
+parse.o: parse.c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
+
+#------------------------------------------------------------------------------
+# libraries
+#------------------------------------------------------------------------------
+.PHONY: z80asm_lib
+all: z80asm_lib
+
+z80asm_lib:
+ifeq ($(CROSS),0)
+	make -C dev/z80asm_lib
+	cp dev/z80asm_lib/$(PROJ)-*.lib .
+endif
+
+clean::
+	make -C dev/z80asm_lib clean
+	$(RM) $(PROJ)-*.lib
 
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
@@ -72,8 +95,9 @@ clean::
 # intall
 #------------------------------------------------------------------------------
 install:
-	$(INSTALL) $(TARGET) $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
-	$(INSTALL) asmpp.pl  $(PREFIX)/bin/
+	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
+	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
+	make -C dev/z80asm_lib install
 
 #------------------------------------------------------------------------------
 # clean
@@ -96,7 +120,7 @@ clean::
 all: t/libtestlib.a
 
 t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
-	ar rcs t/libtestlib.a $(OBJS:z80asm.o=) $(TEST_SRC_LIB:.c=.o)
+	ar rcs t/libtestlib.a $(OBJS:$(PROJ).o=) $(TEST_SRC_LIB:.c=.o)
 
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
@@ -109,7 +133,7 @@ $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 clean::
 	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXE))
 
-test:
+test: $(TARGET) z80asm_lib
 	$(MAKE) dev
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
@@ -156,7 +180,7 @@ clean::
 # build with msvc - need to build manualy, devenv not available in Express
 #------------------------------------------------------------------------------
 $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
-	@echo Build z80asm inside Microsoft Visual C++ 2010 Express
+	@echo Build $(PROJ) inside Microsoft Visual C++ 2010 Express
 	@exit 1
 
 

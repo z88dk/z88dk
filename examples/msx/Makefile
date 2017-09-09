@@ -7,7 +7,7 @@
 #include ../../libsrc/Make.config
 
 CC = zcc
-CFLAGS = +msx -vn -llib3d -lmalloc -lm -lndos -create-app
+CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app
 
 
 CFILES = \

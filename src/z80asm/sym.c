@@ -9,12 +9,30 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 One symbol from the assembly code - label or constant.
 */
 
+#include "errors.h"
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
 #include "str.h"
 #include "sym.h"
 #include "symbol.h"
+
+/*-----------------------------------------------------------------------------
+*   Constant tables
+*----------------------------------------------------------------------------*/
+char *sym_type_str[] = {
+	"undef",
+	"const",
+	"addr",
+	"comput",
+};
+
+char *sym_scope_str[] = {
+	"local",
+	"public",
+	"extern",
+	"global",
+};
 
 /*-----------------------------------------------------------------------------
 *   Symbol
@@ -40,6 +58,8 @@ Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope
 	self->scope = scope;
 	self->module = module;
 	self->section = section;
+	self->filename = get_error_file();
+	self->line_nr = get_error_line();
 
     return self;              						/* pointer to new symbol */
 }

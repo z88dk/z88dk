@@ -6,10 +6,10 @@ wc.exe: wc.c
 	zcc +osca -vn -lflosdos -DWILDCARD wc.c -create-app -owc.bin
 
 tail.exe: tail.c
-	zcc +osca -vn -lflosxdos -lmalloc -DAMALLOC -O3 tail.c -create-app -otail.bin
+	zcc +osca -vn -lflosxdos  -DAMALLOC -O3 tail.c -create-app -otail.bin
 
 sort.exe: sort.c
-	zcc +osca -vn -lflosxdos -lmalloc -DAMALLOC -O3 sort.c -create-app -osort.bin
+	zcc +osca -vn -lflosxdos  -DAMALLOC -O3 sort.c -create-app -osort.bin
 
 ddir.exe: ddir.c
 	zcc +osca -vn -lndos ddir.c -O3 -create-app -oddir.bin

@@ -147,9 +147,7 @@
 ._sub_1
 	ld	hl,2	;const
 	add	hl,sp
-	call	l_glong
-	push	de
-	push	hl
+	call	l_glong2sp
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
@@ -176,9 +174,7 @@
 ._sub2_1
 	ld	hl,2	;const
 	add	hl,sp
-	call	l_glong
-	push	de
-	push	hl
+	call	l_glong2sp
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong

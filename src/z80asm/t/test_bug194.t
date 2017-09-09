@@ -10,24 +10,19 @@
 # Test https://github.com/z88dk/z88dk/issues/194
 # z80asm: wrong assembly of DDCB with no index
 
-use Modern::Perl;
-use Capture::Tiny::Extended 'capture';
-BEGIN { 
-	use lib '.'; 
-	use t::TestZ80asm;
-	use t::Listfile;
-};
+use strict;
+use warnings;
+use v5.10;
+use Test::More;
+require './t/testlib.pl';
 
-my($out, $err, $exit);
 
-unlink "test.o", "test.bin", "test.lis";
-write_file("test.asm", <<'END');
- rlc (ix+0)
- rlc (ix)
+unlink_testfiles();
+z80asm(<<'END', "-b -s -l");
+	rlc (ix+0)
+	rlc (ix)
 END
-($out, $err, $exit) = capture { system "./z80asm -b -l test.asm"; };
-is $out, "";
-is $err, "";
-is $exit, 0;
-test_binfile("test.bin", 		pack("C*", (0xDD, 0xCB, 0x00, 0x06) x 2));
+check_bin_file("test.bin", pack("C*", (0xDD, 0xCB, 0x00, 0x06) x 2));
 
+unlink_testfiles();
+done_testing();

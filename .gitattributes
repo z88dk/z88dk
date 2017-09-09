@@ -1,10 +1,12 @@
 *.pdf   binary
 *.asm   text eol=lf
-*.bmk   text eol=lf
+*.bmk   binary
 *.c     text eol=lf
 *.cpp   text eol=lf
 *.def   text eol=lf
 *.h     text eol=lf
+*.in    text eol=lf
+*.lst   text eol=lf
 *.opt   text eol=lf
 *.pl    text eol=lf
 *.py    text eol=lf

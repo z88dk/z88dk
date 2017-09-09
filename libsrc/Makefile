@@ -25,10 +25,10 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
+	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
+genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib gendos.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -49,6 +49,23 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
+
+
+define buildgeneric
+	$(MAKE) -C ctype
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C malloc
+	$(MAKE) -C stdio
+	$(MAKE) -C setjmp
+	$(MAKE) -C time
+	$(MAKE) -C debug
+	$(MAKE) -C assert
+	$(MAKE) -C stdlib TARGET=$(1)
+	$(MAKE) -C compress/zx7
+	$(MAKE) -C rs232 
+	$(MAKE) -C psg
+endef
 
 #  short script to sort out gfx dependencies
 gfxdeps:
@@ -183,14 +200,6 @@ x11.lib:
 	@echo ''
 	$(MAKE) -C graphics lx11 
 
-# simple malloc library - dom
-# adding multiple heaps and realloc - aralbrec
-malloc.lib:
-	@echo ''
-	@echo '--- Building Near Malloc Library ---'
-	@echo ''
-	$(MAKE) -C malloc 
-
 ndos.lib:
 	$(MAKE) -C fcntl/dummy 
 
@@ -225,16 +234,8 @@ z88_clib.lib:
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(call buildgeneric,z88)
 	$(MAKE) -C fcntl/z88
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C stdlib TARGET=z88
-	$(MAKE) -C strings 
-	$(MAKE) -C regex
-	$(MAKE) -C time
-	$(MAKE) -C rs232 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert 
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C z88 
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
@@ -255,15 +256,8 @@ zx_clib.lib:
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings 
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=zx
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,zx)
 	$(MAKE) -C spectrum
-	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/zxcpm.lst
@@ -280,16 +274,8 @@ ts2068_clib.lib:
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=zx
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C time 
+	$(call buildgeneric,zx)
 	$(MAKE) -C spectrum
-	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
@@ -344,13 +330,7 @@ pacman_clib.lib:
 	@echo '--- Building PacMan HW Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=pacman
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,pacman)
 	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
 
 # Philips P2000 lib - Stefano
@@ -359,13 +339,7 @@ p2000_clib.lib:
 	@echo '--- Building Philips P2000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=p2000
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,p2000)
 	$(MAKE) -C games TARGET=p2000
 	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
@@ -375,14 +349,7 @@ pc6001_clib.lib:
 	@echo '--- Building PC6001 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=pc6001
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C psg
+	$(call buildgeneric,pc6001)
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 
 # Native for sprinter - dom
@@ -391,17 +358,9 @@ pps_clib.lib:
 	@echo '--- Building Sprinter Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=pps
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
+	$(call buildgeneric,pps)
 	$(MAKE) -C fcntl/sprinter
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C time 
 	$(MAKE) -C spectrum 
-	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
@@ -427,13 +386,7 @@ vz_clib.lib:
 	@echo '--- Building VZ200/300 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=vz
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,vz)
 	$(MAKE) -C games TARGET=vz
 	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
 
@@ -443,15 +396,8 @@ zx80_clib.lib:
 	@echo '--- Building ZX80 Library ---'
 	@echo ''
 	$(MAKE) zx81deps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=zx80
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,zx80)
 	$(MAKE) -C games TARGET=zx80
-	$(MAKE) -C psg
 	TARGET=zx80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
 
@@ -461,15 +407,8 @@ zx81_clib.lib:
 	@echo '--- Building ZX81 Library ---'
 	@echo ''
 	$(MAKE) zx81deps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=zx81
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp 
-	$(MAKE) -C assert 
+	$(call buildgeneric,zx81)
 	$(MAKE) -C games TARGET=zx81
-	$(MAKE) -C psg 
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS --IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
 
@@ -479,15 +418,8 @@ lambda_clib.lib:
 	@echo '--- Building Lambda 8300 Library ---'
 	@echo ''
 	$(MAKE) zx81deps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=zx81
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp 
-	$(MAKE) -C assert 
+	$(call buildgeneric,zx81)
 	$(MAKE) -C games TARGET=zx81
-	$(MAKE) -C psg 
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS --IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE) zx81deps
 
@@ -579,13 +511,7 @@ ti82_clib.lib:
 	@echo '--- Building TI82 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=ti82
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,ti82)
 	$(RM) games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti82
 	TARGET=ti82 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
@@ -595,13 +521,7 @@ ti83_clib.lib:
 	@echo '--- Building TI83 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=ti83
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,ti83)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti83
 	TARGET=ti83 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
@@ -611,13 +531,7 @@ ti83p_clib.lib:
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
 	$(MAKE) tideps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=ti8x
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,ti8x)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti8x
 	TARGET=ti8x TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
@@ -627,13 +541,7 @@ ti85_clib.lib:
 	@echo '--- Building TI85 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=ti85
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,ti85)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti85
 	TARGET=ti85 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
@@ -643,13 +551,7 @@ ti86_clib.lib:
 	@echo '--- Building TI86 Library ---'
 	@echo ''
 	$(MAKE) tideps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=ti86
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,ti86)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti86
 	TARGET=ti86 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORti86 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
@@ -662,13 +564,7 @@ ozansi_clib.lib:
 	@echo ''
 	$(RM) -f stdio/ansi/oz/f_ansi_char.o
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=oz
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,oz)
 	$(MAKE) -C oz 
 	$(MAKE) -C games TARGET=oz
 	TARGET=oz TYPE=z80 $(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
@@ -678,15 +574,8 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
+	$(call buildgeneric,cpm)
 	$(MAKE) -C fcntl/cpm
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=cpm
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C time 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
 	TARGET=cpm TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 
 # Sorcerer Exidy lib - Stefano
@@ -695,13 +584,7 @@ sorcerer_clib.lib:
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=srr
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,srr)
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
 
 # Sharp MZ lib - Stefano
@@ -710,13 +593,7 @@ mz_clib.lib:
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=mz
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
 
 # ABC80 Library - Stefano
@@ -725,13 +602,7 @@ abc80_clib.lib:
 	@echo '--- Building ABC80 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=abc80
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,abc80)
 	$(MAKE) -C games TARGET=abc80 SUBSET=joystick.asm
 	TARGET=abc80 TYPE=z80 $(LIBLINKER)  -DFORabc80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
 
@@ -741,13 +612,7 @@ abc800_clib.lib:
 	@echo '--- Building ABC800 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=abc800
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,abc800)
 	$(MAKE) -C games TARGET=abc800 SUBSET=joystick.asm
 	TARGET=abc800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
 
@@ -757,13 +622,7 @@ ace_clib.lib:
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=ace
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,ace)
 	$(MAKE) -C ace 
 	$(MAKE) -C games TARGET=ace
 	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
@@ -774,14 +633,7 @@ aquarius_clib.lib:
 	@echo '--- Building Mattel Aquarius Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=aquarius
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C psg
+	$(call buildgeneric,aquarius)
 	$(MAKE) -C games TARGET=aquarius 
 	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 	
@@ -800,13 +652,7 @@ bee_clib.lib:
 	@echo '--- Building MicroBee Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=bee
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,bee)
 	$(MAKE) -C games TARGET=bee
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
 
@@ -831,13 +677,7 @@ c7420_clib.lib:
 	@echo '--- Building Philips Videopac C7420 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=c7420
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,c7420)
 	TARGET=c7420 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(LISTFILE_DIRECTORY)/c7420.lst
 
 # Xircom REX 6000 library - Dominic
@@ -845,10 +685,7 @@ rex_clib.lib:
 	@echo ''
 	@echo '--- Building Xircom Rex Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=rex
-	$(MAKE) -C setjmp
+	$(call buildgeneric,rex)
 	$(MAKE) -C rex
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
 
@@ -858,14 +695,7 @@ sam_clib.lib:
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=sam
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C time 
+	$(call buildgeneric,sam)
 	$(MAKE) -C games TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
@@ -875,17 +705,10 @@ svi_clib.lib:
 	@echo '--- Building Spectravideo Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=svi
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,svi)
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C msx
-	$(MAKE) -C psg
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
@@ -894,18 +717,11 @@ msx_clib.lib:
 	@echo '--- Building MSX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(call buildgeneric,msx)
 	$(MAKE) -C fcntl/cpm
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=msx
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx
-	$(MAKE) -C psg
 	TARGET=msx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
@@ -914,16 +730,9 @@ mtx_clib.lib:
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=mtx
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C msx
-	$(MAKE) -C psg
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
@@ -932,14 +741,7 @@ enterprise_clib.lib:
 	@echo '--- Building Enterprise 64/128 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=enterprise
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7
-	$(MAKE) -C setjmp
-	$(MAKE) -C time
-	$(MAKE) -C assert
+	$(call buildgeneric,enterprise)
 	$(MAKE) -C games TARGET=enterprise
 	$(MAKE) -C enterprise 
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
@@ -979,15 +781,8 @@ m5_clib.lib:
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C strings 
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=m5
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,m5)
 	$(MAKE) -C msx
-	$(MAKE) -C psg
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
@@ -996,15 +791,8 @@ mc1000_clib.lib:
 	@echo '--- Building CCE MC-1000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings 
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=mc1000
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,mc1000)
 	$(MAKE) -C games TARGET=mc1000
-	$(MAKE) -C psg
 	TARGET=mc1000 TYPE=z80 $(LIBLINKER) -DFORmc1000 -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
 
 # NASCOM library - Stefano
@@ -1013,13 +801,7 @@ nascom_clib.lib:
 	@echo '--- Building NASCOM Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=nascom
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,nascom)
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
 	
 # Robotron Z1013 library - Stefano
@@ -1028,13 +810,7 @@ z1013_clib.lib:
 	@echo '--- Building Robotron Z1013 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=z1013
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,z1013)
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
@@ -1043,13 +819,7 @@ z9001_clib.lib:
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=z9001
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,z9001)
 	$(MAKE) -C games TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
 	@echo ''
@@ -1069,13 +839,7 @@ kc_clib.lib:
 	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=kc
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,kc)
 	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
 # Untested C lib for NC100 machines - dom
@@ -1083,14 +847,8 @@ nc_clib.lib:
 	@echo ''
 	@echo '--- Building Amstrad NC100 Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=nc
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
+	$(call buildgeneric,nc)
 	$(MAKE) -C fcntl/nc100
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
 	
 # NC-100 graphics lib - Stefano
@@ -1122,16 +880,8 @@ cpc_clib.lib:
 	@echo '--- Building Amstrad CPC Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
+	$(call buildgeneric,cpc)
 	$(MAKE) -C fcntl/cpc
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=cpc
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C rs232 
-	$(MAKE) -C psg
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
@@ -1153,15 +903,8 @@ c128ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=c128
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,c128)
 	$(MAKE) -C c128
-	$(MAKE) -C psg c128
 	$(MAKE) -C games TARGET=c128
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
@@ -1198,15 +941,8 @@ newbrain_clib.lib:
 	@echo '--- Building Grundy NewBrain Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=newbrain
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
+	$(call buildgeneric,newbrain)
 	$(MAKE) -C fcntl/newbrain
-	$(MAKE) -C setjmp
-	$(MAKE) -C time 
-	$(MAKE) -C assert
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
@@ -1224,13 +960,7 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=rcmx000
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,rcmx000)
 	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) --cpu=r2k -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
@@ -1238,13 +968,7 @@ embedded_clib.lib:
 	@echo ''
 	@echo '--- Building Embedded (ns16450) Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=embedded
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,embedded)
 	TARGET=embedded TYPE=z80 $(LIBLINKER) -DFORembedded -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/embedded_clib @$(LISTFILE_DIRECTORY)/embedded.lst
 
 # Galaksija - Stefano Bodrato
@@ -1253,13 +977,7 @@ gal_clib.lib:
 	@echo '--- Building Galaksija Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=gal
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,gal)
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 
@@ -1268,13 +986,7 @@ g800_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp PC-G8xx/E2xx Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=g800
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,g800)
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(LISTFILE_DIRECTORY)/g800.lst
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(LISTFILE_DIRECTORY)/g850.lst
 
@@ -1284,13 +996,7 @@ lynx_clib.lib:
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=lynx
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,lynx)
 	$(MAKE) -C games TARGET=lynx
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
 
@@ -1300,15 +1006,8 @@ sms_clib.lib:
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=sms
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,sms)
 	$(MAKE) -C msx
-	$(MAKE) -C psg
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
@@ -1317,15 +1016,8 @@ sc3000_clib.lib:
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=sc3000
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,sc3000)
 	$(MAKE) -C msx
-	$(MAKE) -C psg
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
@@ -1333,30 +1025,24 @@ test_clib.lib:
 	@echo ''
 	@echo '--- Building Test System Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=test
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C time
-	$(MAKE) -C assert
+	$(call buildgeneric,test)
 	TARGET=test TYPE=z80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
+
+testrcm_clib.lib:
+	@echo ''
+	@echo '--- Building Test System Library ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=r2k $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(LISTFILE_DIRECTORY)/testrcm.lst
+
 
 # TRS 80 - stefano
 trs80_clib.lib:
 	@echo ''
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=trs80
-	$(MAKE) -C stdio
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,trs80)
 	$(MAKE) -C games TARGET=trs80
-	$(MAKE) -C psg
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
 	@echo ''
@@ -1372,13 +1058,7 @@ x07_clib.lib:
 	@echo ''
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=x07
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,x07)
 	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
@@ -1386,15 +1066,7 @@ x1ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp X1 ANSI Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=x1
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C time 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
-	$(MAKE) -C psg
+	$(call buildgeneric,x1)
 	$(MAKE) -C x1 
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
@@ -1404,13 +1076,7 @@ vg5k_clib.lib:
 	@echo '--- Building Philips VG5000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=vg5k
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,vg5k)
 	$(MAKE) -C games TARGET=vg5k
 	TARGET=vg5k TYPE=z80 $(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
 
@@ -1419,13 +1085,7 @@ sos_clib.lib:
 	@echo ''
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=sos
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C setjmp
-	$(MAKE) -C assert
+	$(call buildgeneric,sos)
 	$(MAKE) -C sos 
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
@@ -1434,15 +1094,8 @@ osca_clib.lib:
 	@echo ''
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''
-	$(MAKE) -C strings
-	$(MAKE) -C regex
-	$(MAKE) -C stdlib TARGET=osca
-	$(MAKE) -C stdio 
-	$(MAKE) -C compress/zx7 
-	$(MAKE) -C rs232 
-	$(MAKE) -C setjmp
+	$(call buildgeneric,osca)
 	$(MAKE) -C games TARGET=osca
-	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C fcntl/osca
 	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst

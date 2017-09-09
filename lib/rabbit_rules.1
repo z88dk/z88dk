@@ -7,13 +7,70 @@
 	j%1	%2
 	ld	hl,%3
 
-%check 0 <= %1 <= 255
+	push	hl
+	ld	hl,%1	;const
+	pop	de
+=
+	ex	de,hl
+	ld	hl,%1	;const
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+=
+	ld	hl,(sp+%1)
+	ex	de,hl
+
+%check 0 <= %1 <= 254
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
 =
 	ld	hl,(sp + %1)
 
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp + %1)
+	inc	hl
+	ld	(sp + %1),hl
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp + %1)
+	dec	hl
+	ld	(sp + %1),hl
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,%2
+	ex	de,hl
+	call	l_pint
+=
+	ld	hl,%2
+	ld	(sp + %1),hl
 
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
@@ -29,6 +86,13 @@
 =
 	ld	hl,(sp + %1 + 2)
 	ex	de,hl
+	ld	hl,(sp + %1)
+
+%check 0 <= %1 <= 253
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint
+=
 	ld	hl,(sp + %1)
 
 %check 0 <= %1 <= 127
@@ -48,10 +112,6 @@
 =
 	add	sp,#(%1 - 65536)
 	ld	hl,%2
-
-	call	l_neg
-=
-	neg	hl
 
 	call	l_or
 =
@@ -124,7 +184,7 @@
 	ld	hl,(sp + 0)
 
 	pop	bc
-	defb	0xc4, 0	; ld hl,(sp + 0)
+	ld	hl,(sp + 0)
 	push	bc
 =
 	ld	hl,(sp + 2)
@@ -183,129 +243,11 @@
 	bool	hl
 	call	z,%1
 
-	ld	hl,(sp + %1)
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1
 =
-	defb	0xc4, %1	; ld hl,(sp + %1)
-
-	ld	ix,(sp + %1)
-=
-	defb	0xdd, 0xc4, %1	; ld ix,(sp + %1)
-
-	ld	iy,(sp + %1)
-=
-	defb	0xfd, 0xc4, %1	; ld iy,(sp + %1)
-
-	ld	(sp + %1),hl
-=
-	defb	0xd4, %1	; ld (sp + %1),hl
-
-	ld	(sp + %1),ix
-=
-	defb	0xdd, 0xd4, %1	; ld (sp + %1),ix
-
-	ld	(sp + %1),iy
-=
-	defb	0xfd, 0xd4, %1	; ld (sp + %1),iy
-
-	neg	hl
-=
-	defb	0x4d	; neg hl
-
-	or	hl,de
-=
-	defb	0xec	; or hl,de
-
-	and	hl,de
-=
-	defb	0xdc	; and hl,de
-
-	mul
-=
-	defb	0xf7	; mul
-
-	rl	de
-=
-	defb	0xf3	; rl de
-
-	rr	de
-=
-	defb	0xfb	; rr de
-
-	rr	hl
-=
-	defb	0xfc	; rr hl
-
-	rr	ix
-=
-	defb	0xdd, 0xfc	; rr ix
-
-	rr	iy
-=
-	defb	0xfd, 0xfc	; rr iy
-
-	push	hl
-	defb	0xc4, %2
-	pop	de
-=
+	ld	hl,(hl+0)
 	ex	de,hl
-	defb	0xc4, %2
-
-	ld	hl,(hl%1)
-=
-	defb	0xdd, 0xe4, %1	;ld hl,(hl%1)
-
-	ld	hl,(iy%1)
-=
-	defb	0xfd, 0xe4, %1	;ld hl,(iy%1)
-
-	ld	hl,(ix%1)
-=
-	defb	0xe4, %1	;ld hl,(ix%1)
-
-	ld	(hl%1),hl
-=
-	defb	0xdd, 0xf4, %1	;ld (hl%1),hl
-
-	ld	(ix%1),hl
-=
-	defb	0xf4, %1	;ld (ix%1),hl
-
-	ld	(iy%1),hl
-=
-	defb	0xfd, 0xf4, %1	;ld (iy%1),hl
-
-	altd
-=
-	defb	0x76
-
-	bool	hl
-=
-	defb	0xcc	; bool hl
-
-	bool	ix
-=
-	defb	0xdd, 0xcc	; bool ix
-
-	bool	iy
-=
-	defb	0xfd, 0xcc	; bool iy
-
-	add	sp,%1
-=
-	defb	0x27, %1	;add sp,%1
-
-	halt
-=
-	Halt is not supported on RCM
-
-	di
-=
-	di is not supported on RCM
-
-	ei
-=
-	ei is not supported on RCM
-
-	ioi
-=
-	defb	0xd3		;ioi
+	ld	hl,%1

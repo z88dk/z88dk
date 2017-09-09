@@ -678,15 +678,6 @@
 	ld	hl,%1	;const
 	call	l_gintsp	;
 
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_glong
-	push	de
-	push	hl
-=
-	ld	hl,%1	;const
-	call	l_glongsp	;
-
 	call	l_int2long_s
 	call	float
 =

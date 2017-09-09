@@ -10,24 +10,20 @@
 # Test https://github.com/z88dk/z88dk/issues/222
 # z80asm: Can I use the assembler to make a .tap image, like pasmo does?
 
-use Modern::Perl;
-use Capture::Tiny::Extended 'capture';
-BEGIN { 
-	use lib '.'; 
-	use t::TestZ80asm;
-	use t::Listfile;
-};
+use strict;
+use warnings;
+use v5.10;
+use Test::More;
+require './t/testlib.pl';
 
-sub unlink_testfiles {
-	unlink "test.o", "test.bin", "test.lis", "test.tap", "test.P";
-}
+build_appmake();
 
 #------------------------------------------------------------------------------
 # appmake +zx
 #------------------------------------------------------------------------------
 my $asm = <<END;
- ld bc,1234
- ret
+	ld bc, 1234
+	ret
 END
 my $bin = pack("C", 0x01).pack("v", 1234).pack("C", 0xC9);
 
@@ -98,104 +94,76 @@ my $ramtop_tap =
 		);
 
 
-my($out, $err, $exit);
-
 # no org, not verbose
 unlink_testfiles();
-write_file("test.asm", $asm);
-($out, $err, $exit) = capture { system "./z80asm +zx test.asm"; };
-is $out, "";
-is $err, "";
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.tap", $rem_tap);
+z80asm($asm, "+zx");
+check_bin_file("test.bin", $bin);
+check_bin_file("test.tap", $rem_tap);
+
 
 # no org, verbose
 unlink_testfiles();
-write_file("test.asm", $asm);
-($out, $err, $exit) = capture { system "./z80asm +zx -v test.asm"; };
-is $out, <<'END';
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
+z80asm($asm, "+zx -v", 0, <<'END');
+	Reading library 'z80asm-z80-.lib'
+	Assembling 'test.asm' to 'test.o'
+	Reading 'test.asm'
+	Module 'test' size: 4 bytes
 
-Code size: 4 bytes ($5CD0 to $5CD3)
-appmake +zx -b "test.bin" -o "test.tap" --org 23760
+	Code size: 4 bytes ($5CD0 to $5CD3)
+	appmake +zx -b "test.bin" -o "test.tap" --org 23760
 END
-is $err, "";
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.tap", $rem_tap);
+check_bin_file("test.bin", $bin);
+check_bin_file("test.tap", $rem_tap);
+
 
 # ignore ORG statements
 unlink_testfiles();
-write_file("test.asm", "org 20000\n".$asm);
-($out, $err, $exit) = capture { system "./z80asm +zx test.asm"; };
-is $out, "";
-is $err, "";
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.tap", $rem_tap);
+z80asm("org 20000\n".$asm, "+zx");
+check_bin_file("test.bin", $bin);
+check_bin_file("test.tap", $rem_tap);
+
 
 # error for -r below 23760
 unlink_testfiles();
-write_file("test.asm", $asm);
-($out, $err, $exit) = capture { system "./z80asm +zx -r23759 test.asm"; };
-is $out, "";
-is $err, <<'END';
-Error: invalid ORG value '23759'
-1 errors occurred during assembly
+z80asm($asm, "+zx -r23759", 1, "", <<'END');
+	Error: invalid ORG value '23759'
+	1 errors occurred during assembly
 END
-ok $exit!=0;
-test_binfile("test.bin", $bin);
-ok ! -f "test.tap";
+check_bin_file("test.bin", $bin);
+ok ! -f "test.tap", "no test.tap";
+
 
 # ignore split sections
 unlink_testfiles();
-write_file("test.asm", <<'END');
- section code1
- org 23760
- ld bc,1234
- 
- section code2
- org 50000
- ret
+z80asm(<<'END', "+zx", 0, "", <<'END');
+	section code1
+	org 23760
+	ld bc, 1234
+
+	section code2
+	org 50000
+	ret
 END
-($out, $err, $exit) = capture { system "./z80asm +zx test.asm"; };
-is $out, "";
-is $err, <<'END';
-Warning: ORG ignored at file 'test.o', section 'code1'
-Warning: ORG ignored at file 'test.o', section 'code2'
+	Warning: ORG ignored at file 'test.o', section 'code1'
+	Warning: ORG ignored at file 'test.o', section 'code2'
 END
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.tap", $rem_tap);
+check_bin_file("test.bin", $bin);
+check_bin_file("test.tap", $rem_tap);
+
 
 # above ramtop
 unlink_testfiles();
-write_file("test.asm", $asm);
-($out, $err, $exit) = capture { system "./z80asm +zx -r24000 test.asm"; };
-is $out, "";
-is $err, "";
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.tap", $ramtop_tap);
+z80asm($asm, "+zx -r24000");
+check_bin_file("test.bin", $bin);
+check_bin_file("test.tap", $ramtop_tap);
 
-sub tap_block {
-	my($data) = @_;
-	my $size = length($data);
-	my $checksum = 0;
-	for (split(//, $data)) {
-		$checksum ^= ord($_);
-	}
-	return pack("v", $size+1).$data.pack("C", $checksum & 0xFF);
-}
 
 #------------------------------------------------------------------------------
 # appmake +zx81
 #------------------------------------------------------------------------------
 my $rem_P = 
-	# SYSTEM VARS before "VERSN" are not saved (ERR_NR, FLAGS, ERR_SP, RAMTOP, MODE, PPC are preserved)
+	# SYSTEM VARS before "VERSN" are not saved 
+	# (ERR_NR, FLAGS, ERR_SP, RAMTOP, MODE, PPC are preserved)
 	pack("C*", 0).				# VERSN ($4009)
 	pack("v*", 1,				# E_PPC
 			   16534,			# D_FILE
@@ -264,28 +232,36 @@ my $rem_P =
 
 # no org, not verbose
 unlink_testfiles();
-write_file("test.asm", $asm);
-($out, $err, $exit) = capture { system "./z80asm +zx81 test.asm"; };
-is $out, "";
-is $err, "";
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.P", $rem_P);
+z80asm($asm, "+zx81");
+check_bin_file("test.bin", $bin);
+check_bin_file("test.P", $rem_P);
+
 
 # no org, verbose
 unlink_testfiles();
-write_file("test.asm", $asm);
-($out, $err, $exit) = capture { system "./z80asm +zx81 -v test.asm"; };
-is $out, <<'END';
-Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
-Module 'test' size: 4 bytes
+z80asm($asm, "+zx81 -v", 0, <<'END', "");
+	Reading library 'z80asm-z80-.lib'
+	Assembling 'test.asm' to 'test.o'
+	Reading 'test.asm'
+	Module 'test' size: 4 bytes
 
-Code size: 4 bytes ($4082 to $4085)
-appmake +zx81 -b "test.bin" -o "test.P" --org 16514
+	Code size: 4 bytes ($4082 to $4085)
+	appmake +zx81 -b "test.bin" -o "test.P" --org 16514
 END
-is $err, "";
-ok $exit==0;
-test_binfile("test.bin", $bin);
-test_binfile("test.P", $rem_P);
+check_bin_file("test.bin", $bin);
+check_bin_file("test.P", $rem_P);
 
+
+unlink_testfiles();
+done_testing();
+
+
+sub tap_block {
+	my($data) = @_;
+	my $size = length($data);
+	my $checksum = 0;
+	for (split(//, $data)) {
+		$checksum ^= ord($_);
+	}
+	return pack("v", $size+1).$data.pack("C", $checksum & 0xFF);
+}

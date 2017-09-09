@@ -20,28 +20,30 @@ EXTERN asm_disk_read
 ;
 
 _disk_read:
-    pop af      ; pop return address
-    ex af,af
+    inc sp      ; pop return address
+;   inc sp
 
-    dec sp      ; move sp to get a    
-    pop af      ; get sector count to a  
-    pop de      ; start sector to bcde
-    pop bc
-    pop hl      ; buff to hl    
-    inc sp      ; drop pdrv (not evaluated)
+;   dec sp
+    pop af      ; get BYTE sector count to a
     inc sp
 
-    call asm_disk_read
+    pop de      ; lba to bcde
+    pop bc
 
-    dec sp      ; leave an int for pdrv (not used)
+    pop hl      ; *buff to hl
+
+    dec sp      ; balance pop *buff
     dec sp
-    push hl  
-    push bc
-    push de
-    push af     ; push sectors read
-    inc sp   
 
-    ex af,af
-    push af     ; push return address
+    dec sp      ; balance pop lba
+    dec sp
+    dec sp
+    dec sp
 
-    ret
+    dec sp      ; balance ns
+    dec sp
+
+    dec sp      ; balance return address
+    dec sp
+
+    jp asm_disk_read

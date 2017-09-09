@@ -7,18 +7,17 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
-# Test https://github.com/z88dk/z88dk/issues/233
+# Test https://github.com/z88dk/z88dk/issues/252
 # z80asm: z80asm ignores _map file if 0 bytes
 
-use Modern::Perl;
+use strict;
+use warnings;
+use v5.10;
 use Test::More;
-use Path::Tiny;
-use Test::Differences;
-use Data::HexDump;
-use Capture::Tiny::Extended 'capture';
-require './t/test_utils.pl';
+require './t/testlib.pl';
 
-path("map.asm")->spew(<<END);
+
+my $test_map = <<'END';
 	section s0
 	org 0
 	section s1
@@ -32,7 +31,7 @@ path("map.asm")->spew(<<END);
 	section b1
 END
 
-path("source.asm")->spew(<<END);
+my $test_source = <<'END';
 	section s0
 	defb 0
 
@@ -59,109 +58,65 @@ path("source.asm")->spew(<<END);
 END
 
 my $exp_map = <<'END';
-__head                          = $0000 ; G 
-__s0_head                       = $0000 ; G 
-__a0_size                       = $0001 ; G 
-__a1_size                       = $0001 ; G 
-__b0_size                       = $0001 ; G 
-__b1_size                       = $0001 ; G 
-__s0_size                       = $0001 ; G 
-__s0_tail                       = $0001 ; G 
-__s1_head                       = $0001 ; G 
-__s1_size                       = $0001 ; G 
-__s2_size                       = $0001 ; G 
-__s3_size                       = $0001 ; G 
-__s1_tail                       = $0002 ; G 
-__s2_head                       = $0002 ; G 
-__s2_tail                       = $0003 ; G 
-__s3_head                       = $0003 ; G 
-__s3_tail                       = $0004 ; G 
-__a0_head                       = $0100 ; G 
-__a0_tail                       = $0101 ; G 
-__a1_head                       = $0101 ; G 
-__a1_tail                       = $0102 ; G 
-__b0_head                       = $0200 ; G 
-__b0_tail                       = $0201 ; G 
-__b1_head                       = $0201 ; G 
-__b1_tail                       = $0202 ; G 
-__size                          = $0202 ; G 
-__tail                          = $0202 ; G 
+	__head                          = $0000 ; const, public, def, , ,
+	__tail                          = $0202 ; const, public, def, , ,
+	__size                          = $0202 ; const, public, def, , ,
+	__s0_head                       = $0000 ; const, public, def, , ,
+	__s0_tail                       = $0001 ; const, public, def, , ,
+	__s0_size                       = $0001 ; const, public, def, , ,
+	__s1_head                       = $0001 ; const, public, def, , ,
+	__s1_tail                       = $0002 ; const, public, def, , ,
+	__s1_size                       = $0001 ; const, public, def, , ,
+	__s2_head                       = $0002 ; const, public, def, , ,
+	__s2_tail                       = $0003 ; const, public, def, , ,
+	__s2_size                       = $0001 ; const, public, def, , ,
+	__s3_head                       = $0003 ; const, public, def, , ,
+	__s3_tail                       = $0004 ; const, public, def, , ,
+	__s3_size                       = $0001 ; const, public, def, , ,
+	__a0_head                       = $0100 ; const, public, def, , ,
+	__a0_tail                       = $0101 ; const, public, def, , ,
+	__a0_size                       = $0001 ; const, public, def, , ,
+	__a1_head                       = $0101 ; const, public, def, , ,
+	__a1_tail                       = $0102 ; const, public, def, , ,
+	__a1_size                       = $0001 ; const, public, def, , ,
+	__b0_head                       = $0200 ; const, public, def, , ,
+	__b0_tail                       = $0201 ; const, public, def, , ,
+	__b0_size                       = $0001 ; const, public, def, , ,
+	__b1_head                       = $0201 ; const, public, def, , ,
+	__b1_tail                       = $0202 ; const, public, def, , ,
+	__b1_size                       = $0001 ; const, public, def, , ,
 END
 
-my $exp_bin = <<'END';
-          00 01 02 03 04 05 06 07 - 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF
+my $exp_bin = pack("C*", 
+			0, 1, 2, 3, (0xFF) x (0x100 - 4), 
+			10, 11, (0xFF) x (0x100 - 2), 
+			20, 21);
 
-00000000  00 01 02 03 FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000010  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000020  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000030  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000040  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000050  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000060  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000070  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000080  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000090  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000000A0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000000B0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000000C0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000000D0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000000E0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000000F0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000100  0A 0B FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000110  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000120  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000130  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000140  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000150  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000160  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000170  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000180  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000190  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000001A0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000001B0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000001C0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000001D0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000001E0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-000001F0  FF FF FF FF FF FF FF FF - FF FF FF FF FF FF FF FF  ................
-00000200  14 15                                              ..
+for my $one_step (0, 1) {
+	unlink_testfiles();
+	spew("test_map.asm", $test_map);
+	spew("test_source.asm", $test_source);
+
+	if ($one_step) {
+		run("z80asm -b -o=test -m test_map.asm test_source.asm");
+	}
+	else {
+		run("z80asm test_map.asm test_source.asm");
+		run("z80asm -b -o=test -m test_map.o test_source.o");
+	}
+
+	check_bin_file("test_s0.bin", pack("C*", 0, 1, 2, 3));
+	check_bin_file("test_a0.bin", pack("C*", 10, 11));
+	check_bin_file("test_b0.bin", pack("C*", 20, 21));
+	check_text_file("test_map.map", $exp_map);
+
+	build_appmake();
+	run("appmake +glue -b test -c test_map --clean", 0, <<'END');
+		Creating test__.bin (org 0x0000 = 0)
 END
-
-unlink_tests();
-run("./z80asm -b -o=test -m map.asm source.asm");
-t_binary(path("test_s0.bin")->slurp_raw, pack("C*", 0, 1, 2, 3));
-t_binary(path("test_a0.bin")->slurp_raw, pack("C*", 10, 11));
-t_binary(path("test_b0.bin")->slurp_raw, pack("C*", 20, 21));
-eq_or_diff scalar(path("map.map")->slurp), $exp_map, "mapfile contents";
-
-run("appmake +glue -b test -c map --clean", "Creating test__.bin (org 0x0000 = 0)\n");
-eq_or_diff HexDump(scalar(path("test__.bin")->slurp_raw)), $exp_bin, "binary contents";
+	check_bin_file("test__.bin", $exp_bin);
+}
 
 
-unlink_tests();
-run("./z80asm map.asm source.asm");
-run("./z80asm -b -o=test -m map.o source.o");
-t_binary(path("test_s0.bin")->slurp_raw, pack("C*", 0, 1, 2, 3));
-t_binary(path("test_a0.bin")->slurp_raw, pack("C*", 10, 11));
-t_binary(path("test_b0.bin")->slurp_raw, pack("C*", 20, 21));
-
-eq_or_diff scalar(path("map.map")->slurp), $exp_map, "mapfile contents";
-
-run("appmake +glue -b test -c map --clean", "Creating test__.bin (org 0x0000 = 0)\n");
-eq_or_diff HexDump(scalar(path("test__.bin")->slurp_raw)), $exp_bin, "binary contents";
-
-unlink_tests("map.asm", "source.asm");
-
+unlink_testfiles();
 done_testing;
-
-sub run {
-	my($cmd, $out, $err) = @_;
-	ok 1, $cmd;
-	my($stdout, $stderr, $return) = capture { system $cmd; };
-	is $stdout, ($out // ""), "stdout";
-	is $stderr, ($err // ""), "stderr";
-	ok $return == 0, "exit value";
-}
-
-sub unlink_tests {
-	unlink_testfiles("map.o", "map.map", "source.o", @_);
-}

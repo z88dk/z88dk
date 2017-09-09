@@ -21,10 +21,14 @@
 int __FASTCALL__ fclose(FILE *fp)
 {
 #asm
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(sp + 2)
+ELSE
 	pop	de
 	pop	hl
 	push	hl
 	push	de
+ENDIF
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -49,8 +53,12 @@ fclose_inuse:
 	push	ix	;Save callers ix
 	push	hl
 	pop	ix	;ix = fp
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(ix+fp_extra)
+ELSE
 	ld	l,(ix+fp_extra)
 	ld	h,(ix+fp_extra+1)
+ENDIF
 	ld	a,__STDIO_MSG_CLOSE
 	call	l_jphl
 	pop	ix	;restore callers ix
