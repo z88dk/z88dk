@@ -166,13 +166,6 @@ static void test_symtab( void )
 	_define_sym(S("Three"),	3, TYPE_CONSTANT, 0, NULL, NULL, &symtab);
 	_define_sym(S("Four"),	4, TYPE_CONSTANT, 0, NULL, NULL, &symtab);
 	dump_SymbolHash(symtab, "tab");
-	
-	SymbolHash_sort(symtab, SymbolHash_by_name);
-	dump_SymbolHash(symtab, "tab by name");
-
-	SymbolHash_sort(symtab, SymbolHash_by_value);
-	dump_SymbolHash(symtab, "tab by value");
-
 	OBJ_DELETE( symtab );
 
 	warn("Use local symbol before definition\n");

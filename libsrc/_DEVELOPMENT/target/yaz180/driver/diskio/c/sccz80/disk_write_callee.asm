@@ -16,22 +16,27 @@ EXTERN asm_disk_write
 ; entry
 ; a = number of sectors (< 256)
 ; bcde = LBA specified by the 4 bytes in BCDE
-; hl = the address pointer to the buffer to fill
+; hl = the address pointer to the buffer to read from
 ;
 
 _disk_write_callee:
-    pop af      ; pop return address
-    ex af,af
+    pop hl      ; pop return address
 
-    dec sp      ; move sp to get a    
-    pop af      ; get sector count to a  
-    pop de      ; start sector to bcde
-    pop bc
-    pop hl      ; buff to hl    
-    inc sp      ; drop pdrv (not evaluated)
+    dec sp
+    pop af      ; get BYTE sector count to a
     inc sp
 
-    ex af,af
-    push af     ; push return address
+    pop de      ; start sector to bcde
+    pop bc
+
+    inc sp      ; bypass *buff
+    inc sp
+
+    ex (sp),hl  ; return address on stack, over pdrv
+
+    dec sp      ; go back for *buff
+    dec sp
+
+    pop hl      ; get *buff
 
     jp asm_disk_write

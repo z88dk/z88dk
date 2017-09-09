@@ -28,7 +28,6 @@ _disk_ioctl_callee:
 
     push af
     
-    ld b, c
-    ld c, e
+    ld b, e
 
     jp asm_disk_ioctl

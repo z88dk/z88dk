@@ -20,6 +20,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "options.h"
 #include "symbol.h"
 #include "symtab.h"
+#include "str.h"
 #include "z80asm.h"
 
 #include <assert.h>
@@ -106,6 +107,8 @@ Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
 		sym->is_defined = TRUE;
         sym->module = module;
 		sym->section = section;
+		sym->filename = get_error_file();
+		sym->line_nr = get_error_line();
     }
     else											/* already defined */
     {
@@ -307,6 +310,8 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
 		sym->is_defined = TRUE;
         sym->module  = CURRENTMODULE;						/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
+		sym->filename = get_error_file();
+		sym->line_nr = get_error_line();
     }
 
 	return sym;
@@ -341,6 +346,8 @@ Symbol *define_symbol(char *name, long value, sym_type_t type)
 		sym->is_defined = TRUE;
 		sym->module = CURRENTMODULE;		/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
+		sym->filename = get_error_file();
+		sym->line_nr = get_error_line();
 	}
 
 	return sym;
@@ -558,19 +565,6 @@ void declare_extern_symbol(char *name)
 }
 
 /*-----------------------------------------------------------------------------
-*   sort functions for SymbolHash_sort
-*----------------------------------------------------------------------------*/
-int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b )
-{
-    return strcmp( a->key, b->key );
-}
-
-int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
-{
-    return ( ( Symbol * )( a->value ) )->value - ( ( Symbol * )( b->value ) )->value;
-}
-
-/*-----------------------------------------------------------------------------
 *   generate output files with lists of symbols
 *----------------------------------------------------------------------------*/
 static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbol *sym),
@@ -581,6 +575,7 @@ static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbo
 	SymbolHashElem *iter;
 	Symbol         *sym;
 	long			reloc_offset;
+	STR_DEFINE(line, STR_SIZE);
 
 	if (opts.relocatable && module == NULL)		// module is NULL in link phase
 		reloc_offset = sizeof_relocroutine + sizeof_reloctable + 4;
@@ -592,19 +587,28 @@ static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbo
 	{
 		symbols = select_module_symbols(module, cond);
 
-		/* write symbols numerically, then alphabetical */
-		SymbolHash_sort(symbols, SymbolHash_by_name);
-		SymbolHash_sort(symbols, SymbolHash_by_value);
-
+		// show symbols in the order they appear in the source
 		for (iter = SymbolHash_first(symbols); iter; iter = SymbolHash_next(iter))
 		{
 			sym = (Symbol *)iter->value;
-			fprintf(file, "%s%-*s = $%04lX ; %c %s\n",
-				prefix,
-				COLUMN_WIDTH - 1, sym->name,
-				sym->value + reloc_offset,
-				(!type_flag) ? ' ' : (sym->scope == SCOPE_LOCAL) ? 'L' : 'G',
-				(module == NULL && sym->module != NULL) ? sym->module->modname : "");
+
+			str_set(line, prefix);
+			str_append_sprintf(line, "%-*s", COLUMN_WIDTH - 1, sym->name);
+			str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
+
+			if (type_flag) {
+				str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
+				str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
+				str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
+				str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
+				str_append_sprintf(line, ", %s", sym->section->name);
+				str_append_sprintf(line, ", ");
+				if (sym->filename && sym->filename[0]) {
+					str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
+				}
+			}
+			str_strip(line);
+			fprintf(file, "%s\n", str_data(line));
 		}
 
 		OBJ_DELETE(symbols);

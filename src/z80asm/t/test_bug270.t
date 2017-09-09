@@ -10,13 +10,12 @@
 # Test https://github.com/z88dk/z88dk/issues/270
 # z80asm: ignoring org -1 for sections when data is in object file separate from memory map file
 
-use Modern::Perl;
+use strict;
+use warnings;
+use v5.10;
 use Test::More;
-use Path::Tiny;
-use Test::Differences;
-use Data::HexDump;
-use Capture::Tiny::Extended 'capture';
-require './t/test_utils.pl';
+require './t/testlib.pl';
+
 
 my $test1_asm = <<END;
 	SECTION CODE
@@ -40,80 +39,84 @@ my $test2_asm = <<END;
 	defs 3
 END
 
-my $exp_map = norm_nl(<<'END');
-__CODE_head                     = $0000 ; G
-__head                          = $0000 ; G
-__BSS_size                      = $0003 ; G
-__DATA_size                     = $0004 ; G
-__CODE_size                     = $0005 ; G
-__CODE_tail                     = $0005 ; G
-__DATA_head                     = $8000 ; G
-__BSS_head                      = $8004 ; G
-__DATA_tail                     = $8004 ; G
-__BSS_tail                      = $8007 ; G
-__size                          = $8007 ; G
-__tail                          = $8007 ; G
+my $exp_map = <<'END';
+	__head                          = $0000 ; const, public, def, , ,
+	__tail                          = $8007 ; const, public, def, , ,
+	__size                          = $8007 ; const, public, def, , ,
+	__CODE_head                     = $0000 ; const, public, def, , ,
+	__CODE_tail                     = $0005 ; const, public, def, , ,
+	__CODE_size                     = $0005 ; const, public, def, , ,
+	__DATA_head                     = $8000 ; const, public, def, , ,
+	__DATA_tail                     = $8004 ; const, public, def, , ,
+	__DATA_size                     = $0004 ; const, public, def, , ,
+	__BSS_head                      = $8004 ; const, public, def, , ,
+	__BSS_tail                      = $8007 ; const, public, def, , ,
+	__BSS_size                      = $0003 ; const, public, def, , ,
 END
 
-unlink_testfiles();
-path("test1.asm")->spew($test1_asm);
-path("test2.asm")->spew($test2_asm);
-run("./z80asm -b -o=test -m test1.asm test2.asm");
-t_binary(path("test_CODE.bin")->slurp_raw, pack("C*", 1, 2, 3, 4, 5));
-t_binary(path("test_DATA.bin")->slurp_raw, pack("C*", 10, 11, 12, 13));
-t_binary(path("test_BSS.bin")->slurp_raw, pack("C*", 0, 0, 0));
-eq_or_diff norm_nl(scalar(path("test1.map"))->slurp), $exp_map, "mapfile contents";
 
-unlink_testfiles();
-path("test1.asm")->spew($test1_asm);
-path("test2.asm")->spew($test2_asm);
-run("./z80asm test1.asm");
-run("./z80asm test2.asm");
-run("./z80asm -b -o=test -m test1.o test2.o");
-t_binary(path("test_CODE.bin")->slurp_raw, pack("C*", 1, 2, 3, 4, 5));
-t_binary(path("test_DATA.bin")->slurp_raw, pack("C*", 10, 11, 12, 13));
-t_binary(path("test_BSS.bin")->slurp_raw, pack("C*", 0, 0, 0));
-eq_or_diff norm_nl(scalar(path("test1.map"))->slurp), $exp_map, "mapfile contents";
+for my $one_step (0, 1) {
+	unlink_testfiles();
+	spew("test1.asm", $test1_asm);
+	spew("test2.asm", $test2_asm);
 
-unlink_testfiles();
-path("test.c")->spew(<<END);
-	// DATA
-	unsigned char data[] = "Hello";
-
-	// BSS
-	unsigned buffer[100];
-
-	// CODE
-	int main(void)
-	{
-		return 1;
+	if ($one_step) {
+		run("z80asm -b -o=test -m test1.asm test2.asm");
 	}
-END
+	else {
+		run("z80asm test1.asm");
+		run("z80asm test2.asm");
+		run("z80asm -b -o=test -m test1.o test2.o");
+	}
+
+
+	check_bin_file("test_CODE.bin",	pack("C*", 1, 2, 3, 4, 5));
+	check_bin_file("test_DATA.bin",	pack("C*", 10, 11, 12, 13));
+	check_bin_file("test_BSS.bin", 	pack("C*", 0, 0, 0));
+	check_text_file("test1.map", $exp_map);
+}
+
 
 # C test code that causes failure
 if (0) {
+	unlink_testfiles();
+	spew("test.c", <<'END');
+		// DATA
+		unsigned char data[] = "Hello";
+
+		// BSS
+		unsigned buffer[100];
+
+		// CODE
+		int main(void)
+		{
+			return 1;
+		}
+END
+
 	run("zcc +z80 -v -clib=sdcc_iy test.c -o test -m");
 
 	ok -f "test_CODE.bin", "test_CODE.bin exists";
 	ok -s "test_CODE.bin" >= 4, "test_CODE.bin size OK";
-	my $code = path("test_CODE.bin")->slurp_raw;
+	my $code = slurp("test_CODE.bin");
 	ok $code =~ /\x21\x01\x00\xc9\x00\z/, "test_CODE.bin contents";
 
 	ok -f "test_DATA.bin", "test_DATA.bin exists";
 	ok -s "test_DATA.bin" >= 6, "test_DATA.bin size OK";
-	my $data = path("test_DATA.bin")->slurp_raw;
+	my $data = slurp("test_DATA.bin");
 	ok $data =~ /Hello\0\z/, "test_DATA.bin contents";
 
 	ok -f "test_BSS.bin", "test_BSS.bin exists";
 	ok -s "test_BSS.bin" >= 200, "test_BSS.bin size OK";
-	my $bss = path("test_BSS.bin")->slurp_raw;
+	my $bss = slurp("test_BSS.bin");
 	my $buffer = "\0" x 200;
 	ok $bss =~ /$buffer\z/, "test_BSS.bin contents";
 }
 
+
 # reduce C exmaple above to minimum that reproduces failure
 unlink_testfiles();
-path("test1.asm")->spew(<<'END');
+spew("test1.asm", <<'END');
 	section CODE
 	ORG $0000
 	
@@ -129,7 +132,7 @@ path("test1.asm")->spew(<<'END');
 
 	section bss_compiler
 END
-path("test2.asm")->spew(<<END);
+spew("test2.asm", <<'END');
 	section bss_compiler
 	defs 100*2, 0
 
@@ -140,39 +143,27 @@ path("test2.asm")->spew(<<END);
 	section data_compiler
 	defb "Hello", 0
 END
-run("./z80asm test1.asm");
-run("./z80asm test2.asm");
-run("./z80asm -b -o=test -m test1.o test2.o");
+
+run("z80asm test1.asm");
+run("z80asm test2.asm");
+run("z80asm -b -o=test -m test1.o test2.o");
 
 ok -f "test_CODE.bin", "test_CODE.bin exists";
 ok -s "test_CODE.bin" >= 4, "test_CODE.bin size OK";
-my $code = path("test_CODE.bin")->slurp_raw;
+my $code = slurp("test_CODE.bin");
 ok $code =~ /\x21\x01\x00\xc9\z/, "test_CODE.bin contents";
 
 ok -f "test_DATA.bin", "test_DATA.bin exists";
 ok -s "test_DATA.bin" >= 6, "test_DATA.bin size OK";
-my $data = path("test_DATA.bin")->slurp_raw;
+my $data = slurp("test_DATA.bin");
 ok $data =~ /Hello\0\z/, "test_DATA.bin contents";
 
 ok -f "test_BSS.bin", "test_BSS.bin exists";
 ok -s "test_BSS.bin" >= 200, "test_BSS.bin size OK";
-my $bss = path("test_BSS.bin")->slurp_raw;
+my $bss = slurp("test_BSS.bin");
 my $buffer = "\0" x 200;
 ok $bss =~ /$buffer\z/, "test_BSS.bin contents";
 
+
+unlink_testfiles();
 done_testing;
-
-sub run {
-	my($cmd, $out, $err) = @_;
-	ok 1, $cmd;
-	my($stdout, $stderr, $return) = capture { system $cmd; };
-	is $stdout, ($out // ""), "stdout";
-	is $stderr, ($err // ""), "stderr";
-	ok $return == 0, "exit value";
-}
-
-sub norm_nl {
-	local $_ = shift;
-	s/[ \t\r]+\n/\n/g;
-	return $_;
-}

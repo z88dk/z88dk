@@ -6,3 +6,4 @@
 @target/yaz180/driver/terminal/rc_01_output_basic_dcio.lst
 @target/yaz180/driver/ide/ide.lst
 @target/yaz180/driver/diskio/diskio_sdcc_iy.lst
+@target/yaz180/driver/apu/apu_sdcc_iy.lst

@@ -13,8 +13,13 @@
 // fr = zero, ff = carry, ff&128 = s/p
 
 // TODO: Setting P flag
-#define BOOL(hi, lo) \
-          lo = fr = hi|lo ? 1 : 0, hi = 0, ff &= ~256;
+#define BOOL(hi, lo, hia, loa, isalt) do {                \
+          if ( isalt ) {                  \
+            loa = fr_ = hi|lo ? 1 : 0; hia = 0; ff_ &= ~256; \
+          } else {                       \
+            lo = fr = hi|lo ? 1 : 0; hi = 0; ff &= ~256; \
+          }                              \
+        } while (0)
           
 #define LDRIM(r)                \
           st += israbbit() ? 2 : 7, \
@@ -43,10 +48,12 @@
           st += israbbit() ? 11 : 15, \
           mem[((mem[pc++]^128)-128+(b|a<<8))&65535]= r
 
-#define LDRR(a, b, n)           \
-          st+= n,               \
-          a= b
-
+#define LDRR(dr, sr, dr_, n) do {          \
+            st+= n;               \
+            if ( altd ) dr_ = sr; \
+            else dr = sr; \
+          } while(0)
+            
 #define LDPNNRR(a, b, n)        \
           st+= n,               \
           t= mem[pc++],         \
@@ -190,22 +197,45 @@
           else { fa= ~(a= ff= fr= a&b);  fb= 0; } \
       } while (0)
 
-#define AND2(r1, r2)              \
-          fa= ~(a= ff= fr= r1&r2),\
-          fb= 0
+// TODO: Flags not right
+#define AND2(r1, r2, ra) do {            \
+          if ( altd ) {                  \
+            fa_= ~(ra= ff_= fr_= r1&r2); \
+            fb_= 0;                      \
+          } else {                       \
+            fa= ~(r1= ff= fr= r1&r2);    \
+            fb= 0;                       \
+          }                              \
+        } while (0)
 
-#define XOR(b, n)               \
-          st+= n,               \
-          fa= 256               \
-            | (ff= fr= a^= b),  \
-          fb= 0
 
-#define OR(b, n)                \
-          st+= n,               \
-          fa= 256               \
-            | (ff= fr= a|= b),  \
-          fb= 0
+#define XOR(b, n) do {               \
+          st+= n;                    \
+          if ( altd ) {              \
+            fa_= 256                 \
+              | (ff_= fr_= a_= a^b); \
+            fb_= 0;                  \
+          } else {                   \
+            fa= 256                  \
+              | (ff= fr= a^= b);     \
+            fb= 0;                   \
+          }                          \
+        } while (0)
 
+#define OR(b, n) do {                  \
+          st += n;                     \
+          if ( altd ) {                \
+            fa_= 256                   \
+              | (ff_= fr_= a_ = a|b);  \
+            fb_= 0;                    \
+          } else {                     \
+            fa= 256                    \
+              | (ff= fr= a|= b);       \
+            fb= 0;                     \
+          } \
+        } while (0)
+
+// TODO: Flags not right
 #define OR2(r1, r2)             \
           fa= 256               \
             | (ff= fr= r1|= r2),  \
@@ -378,13 +408,22 @@
           fb= 0
 
 // 11T has already been added
-#define BITI(n)                 \
-          st += israbbit() ? -1 : 5, \
-          ff= ff    & -256      \
-            | mp>>8 &   40      \
-            | -41   & (t&= n),  \
-          fa= ~(fr= t),         \
-          fb= 0
+#define BITI(n) do {               \
+          st += israbbit() ? -1 : 5; \
+          if ( altd ) {           \
+            ff_= ff_    & -256    \
+              | mp>>8 &   40      \
+              | -41   & (t&= n);  \
+            fa_= ~(fr_= t);       \
+            fb_= 0;               \
+          } else {                \
+            ff= ff    & -256      \
+              | mp>>8 &   40      \
+              | -41   & (t&= n);  \
+            fa= ~(fr= t);         \
+            fb= 0;                \
+          }                       \
+        } while ( 0 )
 
 #define RES(n, r)               \
           st += israbbit() ? 4 : 8, \
@@ -515,7 +554,7 @@ long tapcycles(void){
     fseek( ft, wavpos-0x20000, SEEK_CUR ),
     wavlen-= wavpos,
     wavpos= 0,
-    fread(tapbuf, 1, 0x20000, ft);
+    (void)fread(tapbuf, 1, 0x20000, ft);
   while( (tapbuf[++wavpos]^ear<<1)&0x80 && wavpos<0x20000 )
     mues+= 81;  // correct value must be 79.365, adjusted to simulate contention in Alkatraz
   if( wavlen<=wavpos )
@@ -631,7 +670,7 @@ int main (int argc, char **argv){
           if( !ft )
             printf("\nTape file not found: %s\n", argv[1]),
             exit(-1);
-          fread(tapbuf, 1, 0x20000, ft);
+          (void)fread(tapbuf, 1, 0x20000, ft);
           memcpy(&wavlen, tapbuf+4, 4);
           wavlen+= 8;
           if( *(int*) tapbuf != 0x46464952 )
@@ -684,98 +723,98 @@ int main (int argc, char **argv){
         if( !fk )
           printf("\nZX Spectrum ROM file not found: 48.rom\n"),
           exit(-1);
-        fread(mem, 1, 16384, fk);
+        (void)fread(mem, 1, 16384, fk);
         fclose(fk);
-        fread(&i, 1, 1, fh);
-        fread(&l_, 1, 1, fh);
-        fread(&h_, 1, 1, fh);
-        fread(&e_, 1, 1, fh);
-        fread(&d_, 1, 1, fh);
-        fread(&c_, 1, 1, fh);
-        fread(&b_, 1, 1, fh);
-        fread(&w, 1, 1, fh);
+        (void)fread(&i, 1, 1, fh);
+        (void)fread(&l_, 1, 1, fh);
+        (void)fread(&h_, 1, 1, fh);
+        (void)fread(&e_, 1, 1, fh);
+        (void)fread(&d_, 1, 1, fh);
+        (void)fread(&c_, 1, 1, fh);
+        (void)fread(&b_, 1, 1, fh);
+        (void)fread(&w, 1, 1, fh);
         setf(w);
         ff_= ff;
         fr_= fr;
         fa_= fa;
         fb_= fb;
-        fread(&a_, 1, 1, fh);
-        fread(&l, 1, 1, fh);
-        fread(&h, 1, 1, fh);
-        fread(&e, 1, 1, fh);
-        fread(&d, 1, 1, fh);
-        fread(&c, 1, 1, fh);
-        fread(&b, 1, 1, fh);
-        fread(&yl, 1, 1, fh);
-        fread(&yh, 1, 1, fh);
-        fread(&xl, 1, 1, fh);
-        fread(&xh, 1, 1, fh);
-        fread(&iff, 1, 1, fh);
+        (void)fread(&a_, 1, 1, fh);
+        (void)fread(&l, 1, 1, fh);
+        (void)fread(&h, 1, 1, fh);
+        (void)fread(&e, 1, 1, fh);
+        (void)fread(&d, 1, 1, fh);
+        (void)fread(&c, 1, 1, fh);
+        (void)fread(&b, 1, 1, fh);
+        (void)fread(&yl, 1, 1, fh);
+        (void)fread(&yh, 1, 1, fh);
+        (void)fread(&xl, 1, 1, fh);
+        (void)fread(&xh, 1, 1, fh);
+        (void)fread(&iff, 1, 1, fh);
         iff>>= 2;
-        fread(&r, 1, 1, fh);
+        (void)fread(&r, 1, 1, fh);
         r7= r;
-        fread(&w, 1, 1, fh);
+        (void)fread(&w, 1, 1, fh);
         setf(w);
-        fread(&a, 1, 1, fh);
-        fread(&sp, 2, 1, fh);
-        fread(&im, 1, 1, fh);
-        fread(&w, 1, 1, fh);
-        fread(mem+0x4000, 1, 0xc000, fh);
+        (void)fread(&a, 1, 1, fh);
+        (void)fread(&sp, 2, 1, fh);
+        (void)fread(&im, 1, 1, fh);
+        (void)fread(&w, 1, 1, fh);
+        (void)fread(mem+0x4000, 1, 0xc000, fh);
         RET(0);
       }
       else if( size==65574 )
-        fread(mem, 1, 65536, fh),
-        fread(&w, 1, 1, fh),
+        (void)fread(mem, 1, 65536, fh),
+        (void)fread(&w, 1, 1, fh),
         u= w,
-        fread(&a, 1, 1, fh),
-        fread(&c, 1, 1, fh),
-        fread(&b, 1, 1, fh),
-        fread(&l, 1, 1, fh),
-        fread(&h, 1, 1, fh),
-        fread(&pc, 2, 1, fh),
-        fread(&sp, 2, 1, fh),
-        fread(&i, 1, 1, fh),
-        fread(&r, 1, 1, fh),
+        (void)fread(&a, 1, 1, fh),
+        (void)fread(&c, 1, 1, fh),
+        (void)fread(&b, 1, 1, fh),
+        (void)fread(&l, 1, 1, fh),
+        (void)fread(&h, 1, 1, fh),
+        (void)fread(&pc, 2, 1, fh),
+        (void)fread(&sp, 2, 1, fh),
+        (void)fread(&i, 1, 1, fh),
+        (void)fread(&r, 1, 1, fh),
         r7= r,
-        fread(&e, 1, 1, fh),
-        fread(&d, 1, 1, fh),
-        fread(&c_, 1, 1, fh),
-        fread(&b_, 1, 1, fh),
-        fread(&e_, 1, 1, fh),
-        fread(&d_, 1, 1, fh),
-        fread(&l_, 1, 1, fh),
-        fread(&h_, 1, 1, fh),
-        fread(&w, 1, 1, fh),
+        (void)fread(&e, 1, 1, fh),
+        (void)fread(&d, 1, 1, fh),
+        (void)fread(&c_, 1, 1, fh),
+        (void)fread(&b_, 1, 1, fh),
+        (void)fread(&e_, 1, 1, fh),
+        (void)fread(&d_, 1, 1, fh),
+        (void)fread(&l_, 1, 1, fh),
+        (void)fread(&h_, 1, 1, fh),
+        (void)fread(&w, 1, 1, fh),
         setf(w),
         ff_= ff,
         fr_= fr,
         fa_= fa,
         fb_= fb,
         setf(u),
-        fread(&a_, 1, 1, fh),
-        fread(&yl, 1, 1, fh),
-        fread(&yh, 1, 1, fh),
-        fread(&xl, 1, 1, fh),
-        fread(&xh, 1, 1, fh),
-        fread(&iff, 1, 1, fh),
-        fread(&im, 1, 1, fh),
-        fread(&mp, 2, 1, fh);
+        (void)fread(&a_, 1, 1, fh),
+        (void)fread(&yl, 1, 1, fh),
+        (void)fread(&yh, 1, 1, fh),
+        (void)fread(&xl, 1, 1, fh),
+        (void)fread(&xh, 1, 1, fh),
+        (void)fread(&iff, 1, 1, fh),
+        (void)fread(&im, 1, 1, fh),
+        (void)fread(&mp, 2, 1, fh);
       else
-        fread(mem, 1, size, fh);
+        (void)fread(mem, 1, size, fh);
     }
     ++argv;
     --argc;
   }
   if( size==65574 ){
-    fread(&wavpos, 4, 1, fh);
+    (void)fread(&wavpos, 4, 1, fh);
     ear= wavpos<<6 | 191;
     wavpos>>= 1;
     if( wavpos && ft )
       fseek(ft, wavlen-wavpos, SEEK_SET),
       wavlen= wavpos,
       wavpos= 0,
-      fread(tapbuf, 1, 0x20000, ft);
-    fread(&sttap, 4, 1, fh);
+      (void)fread(tapbuf, 1, 0x20000, ft);
+    (void)fread(&sttap, 4, 1, fh);
     tap= sttap;
   }
   else
@@ -1325,34 +1364,29 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;break;
       case 0x41: // LD B,C
-        if ( altd ) LDRR(b_, c, israbbit() ? 2 : 4);
-        else LDRR(b, c, israbbit() ? 2 : 4);
+        LDRR(b, c, b_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x42: // LD B,D
-        if ( altd ) LDRR(b_, d, israbbit() ? 2 : 4);
-        else LDRR(b, d, israbbit() ? 2 : 4);
+        LDRR(b, d, b_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x43: // LD B,E
-        if ( altd ) LDRR(b_, e, israbbit() ? 2 : 4);
-        else LDRR(b, e, israbbit() ? 2 : 4);
+        LDRR(b, e, e_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x44: // LD B,H // LD B,IXh // LD B,IYh
         if( ih ) {
-          if ( altd ) LDRR(b_, h, israbbit() ? 2 : 4);
-          else LDRR(b, h, israbbit() ? 2 : 4);
+          LDRR(b, h, h_, israbbit() ? 2 : 4);
         } else if( iy && !israbbit() )
-          LDRR(b, yh, 4);
+          LDRR(b, yh, b, 4);
         else if ( !israbbit() )
-          LDRR(b, xh, 4);
+          LDRR(b, xh, b, 4);
         ih=1;altd=0;break;
       case 0x45: // LD B,L // LD B,IXl // LD B,IYl
         if( ih ) {
-          if ( altd ) LDRR(b_, l, israbbit() ? 2 : 4);
-          else LDRR(b, l, israbbit() ? 2 : 4);
+          LDRR(b, l, b_, israbbit() ? 2 : 4);
         } else if( iy && !israbbit() )
-          LDRR(b, yl, 4);
+          LDRR(b, yl, b, 4);
         else if ( !israbbit() )
-          LDRR(b, xl, 4);
+          LDRR(b, xl, b, 4);
         ih=1;altd=0;break;
       case 0x46: // LD B,(HL) // LD B,(IX+d) // LD B,(IY+d)
         if( ih ) {
@@ -1364,33 +1398,32 @@ int main (int argc, char **argv){
           LDRPI(xh, xl, b);
         ih=1;altd=0;break;
       case 0x47: // LD B,A
-        if ( altd ) LDRR(b_, a, israbbit() ? 2 : 4);
-        else LDRR(b, a, israbbit() ? 2 : 4);
+        LDRR(b, a, b_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x48: // LD C,B
-        LDRR(c, b, 4);
+        LDRR(c, b, c_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x4a: // LD C,D
-        LDRR(c, d, 4);
+        LDRR(c, d, c_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x4b: // LD C,E
-        LDRR(c, e, 4);
+        LDRR(c, e,c_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x4c: // LD C,H // LD C,IXh // LD C,IYh
         if( ih )
-          LDRR(c, h, 4);
-        else if( iy )
-          LDRR(c, yh, 4);
-        else
-          LDRR(c, xh, 4);
+          LDRR(c, h, c_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(c, yh, c, 4);
+        else if ( !israbbit() )
+          LDRR(c, xh, c, 4);
         ih=1;altd=0;break;
       case 0x4d: // LD C,L // LD C,IXl // LD C,IYl
         if( ih )
-          LDRR(c, l, 4);
-        else if( iy )
-          LDRR(c, yl, 4);
-        else
-          LDRR(c, xl, 4);
+          LDRR(c, l, c_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(c, yl, c, 4);
+        else if ( !israbbit() )
+          LDRR(c, xl, c, 4);
         ih=1;altd=0;break;
       case 0x4e: // LD C,(HL) // LD C,(IX+d) // LD C,(IY+d)
         if( ih )
@@ -1401,32 +1434,32 @@ int main (int argc, char **argv){
           LDRPI(xh, xl, c);
         ih=1;altd=0;break;
       case 0x4f: // LD C,A
-        LDRR(c, a, 4);
+        LDRR(c, a, c_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x50: // LD D,B
-        LDRR(d, b, 4);
+        LDRR(d, b, d_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x51: // LD D,C
-        LDRR(d, c, 4);
+        LDRR(d, c,  d_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x53: // LD D,E
-        LDRR(d, e, 4);
+        LDRR(d, e,  d_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x54: // LD D,H // LD D,IXh // LD D,IYh
         if( ih )
-          LDRR(d, h, 4);
-        else if( iy )
-          LDRR(d, yh, 4);
-        else
-          LDRR(d, xh, 4);
+          LDRR(d, h,  d_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(d, yh, d, 4);
+        else if ( !israbbit() )
+          LDRR(d, xh, d, 4);
         ih=1;altd=0;break;
       case 0x55: // LD D,L // LD D,IXl // LD D,IYl
         if( ih )
-          LDRR(d, l, 4);
-        else if( iy )
-          LDRR(d, yl, 4);
-        else
-          LDRR(d, xl, 4);
+          LDRR(d, l,  d_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(d, yl, d, 4);
+        else if (!israbbit() )
+          LDRR(d, xl, d, 4);
         ih=1;altd=0;break;
       case 0x56: // LD D,(HL) // LD D,(IX+d) // LD D,(IY+d)
         if( ih )
@@ -1437,32 +1470,32 @@ int main (int argc, char **argv){
           LDRPI(xh, xl, d);
         ih=1;altd=0;break;
       case 0x57: // LD D,A
-        LDRR(d, a, 4);
+        LDRR(d, a,  d_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x58: // LD E,B
-        LDRR(e, b, 4);
+        LDRR(e, b, e_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x59: // LD E,C
-        LDRR(e, c, 4);
+        LDRR(e, c, e_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x5a: // LD E,D
-        LDRR(e, d, 4);
+        LDRR(e, d, e_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x5c: // LD E,H // LD E,IXh // LD E,IYh
         if( ih )
-          LDRR(e, h, 4);
-        else if( iy )
-          LDRR(e, yh, 4);
+          LDRR(e, h, e_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(e, yh, e, 4);
         else
-          LDRR(e, xh, 4);
+          LDRR(e, xh, e, 4);
         ih=1;altd=0;break;
       case 0x5d: // LD E,L // LD E,IXl // LD E,IYl
         if( ih )
-          LDRR(e, l, 4);
-        else if( iy )
-          LDRR(e, yl, 4);
-        else
-          LDRR(e, xl, 4);
+          LDRR(e, l, e_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(e, yl, e, 4);
+        else if ( !israbbit() )
+          LDRR(e, xl, e, 4);
         ih=1;altd=0;break;
       case 0x5e: // LD E,(HL) // LD E,(IX+d) // LD E,(IY+d)
         if( ih )
@@ -1473,47 +1506,47 @@ int main (int argc, char **argv){
           LDRPI(xh, xl, e);
         ih=1;altd=0;break;
       case 0x5f: // LD E,A
-        LDRR(e, a, 4);
+        LDRR(e, a, e_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x60: // LD H,B // LD IXh,B // LD IYh,B
         if( ih )
-          LDRR(h, b, 4);
-        else if( iy )
-          LDRR(yh, b, 4);
-        else
-          LDRR(xh, b, 4);
+          LDRR(h, b, h_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yh, b, yh, 4);
+        else if ( !israbbit() )
+          LDRR(xh, b, xh, 4);
         ih=1;altd=0;break;
       case 0x61: // LD H,C // LD IXh,C // LD IYh,C
         if( ih )
-          LDRR(h, c, 4);
-        else if( iy )
-          LDRR(yh, c, 4);
-        else
-          LDRR(xh, c, 4);
+          LDRR(h, c, h_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yh, c, yh, 4);
+        else if ( !israbbit() )
+          LDRR(xh, c, xh, 4);
         ih=1;altd=0;break;
       case 0x62: // LD H,D // LD IXh,D // LD IYh,D
         if( ih )
-          LDRR(h, d, 4);
-        else if( iy )
-          LDRR(yh, d, 4);
-        else
-          LDRR(xh, d, 4);
+          LDRR(h, d,  h_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yh, d, yh, 4);
+        else if ( !israbbit() )
+          LDRR(xh, d, xh, 4);
         ih=1;altd=0;break;
       case 0x63: // LD H,E // LD IXh,E // LD IYh,E
         if( ih )
-          LDRR(h, e, 4);
-        else if( iy )
-          LDRR(yh, e, 4);
-        else
-          LDRR(xh, e, 4);
+          LDRR(h, e,  h_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yh, e, yh, 4);
+        else if ( !israbbit() )
+          LDRR(xh, e, xh, 4);
         ih=1;altd=0;break;
       case 0x65: // LD H,L // LD IXh,IXl // LD IYh,IYl
         if( ih )
-          LDRR(h, l, 4);
-        else if( iy )
-          LDRR(yh, yl, 4);
-        else
-          LDRR(xh, xl, 4);
+          LDRR(h, l, h_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yh, yl, yh, 4);
+        else if ( !israbbit() )
+          LDRR(xh, yl, xh, 4);
         ih=1;altd=0;break;
       case 0x66: // LD H,(HL) // LD H,(IX+d) // LD H,(IY+d)
         if( ih )
@@ -1525,51 +1558,51 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x67: // LD H,A // LD IXh,A // LD IYh,A
         if( ih )
-          LDRR(h, a, 4);
-        else if( iy )
-          LDRR(yh, a, 4);
-        else
-          LDRR(xh, a, 4);
+          LDRR(h, a, h_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yh, a, yh, 4);
+        else if ( !israbbit() )
+          LDRR(xh, a, xh, 4);
         ih=1;altd=0;break;
       case 0x68: // LD L,B // LD IXl,B // LD IYl,B
         if( ih )
-          LDRR(l, b, 4);
-        else if( iy )
-          LDRR(yl, b, 4);
-        else
-          LDRR(xl, b, 4);
+          LDRR(l, b, l_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yl, b, yl, 4);
+        else if ( !israbbit() )
+          LDRR(xl, b, xl, 4);
         ih=1;altd=0;break;
       case 0x69: // LD L,C // LD IXl,C // LD IYl,C
         if( ih )
-          LDRR(l, c, 4);
-        else if( iy )
-          LDRR(yl, c, 4);
-        else
-          LDRR(xl, c, 4);
+          LDRR(l, c, l_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yl, c, yl, 4);
+        else if ( !israbbit() )
+          LDRR(xl, c, xl, 4);
         ih=1;altd=0;break;
       case 0x6a: // LD L,D // LD IXl,D // LD IYl,D
         if( ih )
-          LDRR(l, d, 4);
-        else if( iy )
-          LDRR(yl, d, 4);
-        else
-          LDRR(xl, d, 4);
+          LDRR(l, d, l_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yl, d, yl, 4);
+        else if ( !israbbit() )
+          LDRR(xl, d, xl, 4);
         ih=1;altd=0;break;
       case 0x6b: // LD L,E // LD IXl,E // LD IYl,E
         if( ih )
-          LDRR(l, e, 4);
-        else if( iy )
-          LDRR(yl, e, 4);
-        else
-          LDRR(xl, e, 4);
+          LDRR(l, e, l_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yl, e, yl, 4);
+        else if ( !israbbit() )
+          LDRR(xl, e, xl, 4);
         ih=1;altd=0;break;
       case 0x6c: // LD L,H // LD IXl,IXh // LD IYl,IYh
         if( ih )
-          LDRR(l, h, 4);
-        else if( iy )
-          LDRR(yl, yh, 4);
-        else
-          LDRR(xl, xh, 4);
+          LDRR(l, h, l_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yl, yh, yl, 4);
+        else if ( !israbbit() )
+          LDRR(xl, xh, xl, 4);
         ih=1;altd=0;break;
       case 0x6e: // LD L,(HL) // LD L,(IX+d) // LD L,(IY+d)
         if( ih )
@@ -1581,11 +1614,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x6f: // LD L,A // LD IXl,A // LD IYl,A
         if( ih )
-          LDRR(l, a, 4);
-        else if( iy )
-          LDRR(yl, a, 4);
-        else
-          LDRR(xl, a, 4);
+          LDRR(l, a, l_, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
+          LDRR(yl, a, yl, 4);
+        else if ( !israbbit() )
+          LDRR(xl, a, xl, 4);
         ih=1;altd=0;break;
       case 0x70: // LD (HL),B // LD (IX+d),B // LD (IY+d),B
         if( ih )
@@ -1644,22 +1677,21 @@ int main (int argc, char **argv){
           LDPRI(xh, xl, a);
         ih=1;altd=0;break;
       case 0x78: // LD A,B
-        LDRR(a, b, 4);
+        LDRR(a, b, a_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x79: // LD A,C
-        LDRR(a, c, 4);
+        LDRR(a, c, a_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x7a: // LD A,D
-        LDRR(a, d, 4);
+        LDRR(a, d, a_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x7b: // LD A,E
-        LDRR(a, e, 4);
+        LDRR(a, e, a_, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0x7c: // LD A,H // LD A,IXh // LD A,IYh (RCM) LD HL,IX LD HL,IY
         if ( israbbit()) {
           if ( ih ) {
-            if ( altd ) LDRR(a_,h, 2); 
-            else LDRR(a,h, 2);
+             LDRR(a,h,a_, 2);
           } else if ( iy ) {
             if ( altd ) { h_ = yh; l_ = yl; }
             else { h = yh; l = yl; }
@@ -1671,29 +1703,29 @@ int main (int argc, char **argv){
           }
         } else {
           if( ih )
-            LDRR(a, h, 4);
+            LDRR(a, h, a, 4);
           else if( iy )
-            LDRR(a, yh, 4);
+            LDRR(a, yh, a, 4);
           else
-            LDRR(a, xh, 4);
+            LDRR(a, xh, a, 4);
         }
         ih=1;altd=0;break;
       case 0x7d: // LD A,L // LD A,IXl // LD A,IYl
         if( ih ) {
-          LDRR(a, l, 4);
+          LDRR(a, l, a_, israbbit() ? 2 : 4);
         } else if( iy ) {
           if ( israbbit() ) {
               yl = l; yh = h;      // LD IY,HL
               st += 4;
           } else {
-              LDRR(a, yl, 4);
+              LDRR(a, yl, a, 4);
           }
         } else {
           if ( israbbit() ) {
               xl = l; xh = h;     // LD IX,HL
               st += 4;
           } else {
-              LDRR(a, xl, 4);
+              LDRR(a, xl, a, 4);
           }
         }
         ih=1;altd=0;break;
@@ -1967,46 +1999,52 @@ int main (int argc, char **argv){
         fa= 256;
         ih=1;altd=0;break;
       case 0xb0: // OR B
-        OR(b, 4);
+        OR(b, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0xb1: // OR C
-        OR(c, 4);
+        OR(c,  israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0xb2: // OR D
-        OR(d, 4);
+        OR(d, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0xb3: // OR E
-        OR(e, 4);
+        OR(e, israbbit() ? 2 : 4);
         ih=1;altd=0;break;
       case 0xb4: // OR H // OR IXh // OR IYh
         if( ih )
-          OR(h, 4);
-        else if( iy )
+          OR(h, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
           OR(yh, 4);
-        else
+        else if ( !israbbit() )
           OR(xh, 4);
         ih=1;altd=0;break;
       case 0xb5: // OR L // OR IXl // OR IYl
         if( ih )
-          OR(l, 4);
-        else if( iy )
+          OR(l, israbbit() ? 2 : 4);
+        else if( iy && !israbbit() )
           OR(yl, 4);
-        else
+        else if ( !israbbit() )
           OR(xl, 4);
         ih=1;altd=0;break;
       case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
         if( ih )
-          OR(mem[l|h<<8], 7);
+          OR(mem[l|h<<8], israbbit() ? 5 : 7);
         else if( iy )
           OR(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], 7);
         else
           OR(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], 7);
         ih=1;altd=0;break;
       case 0xb7: // OR A
-        st+= 4;
-        fa= 256
-          | (ff= fr= a);
-        fb= 0;
+        st+= israbbit() ? 2 : 4;
+        if ( altd ) {
+          fa_= 256
+            | (ff_= fr_= a);
+          fb_= 0;
+        } else {
+          fa= 256
+            | (ff= fr= a);
+          fb= 0;
+        }
         ih=1;altd=0;break;
       case 0xb8: // CP B
         CP(b, 4);
@@ -2023,17 +2061,17 @@ int main (int argc, char **argv){
       case 0xbc: // CP H // CP IXh // CP IYh
         if( ih )
           CP(h, 4);
-        else if( iy )
+        else if( iy && !israbbit() )
           CP(yh, 4);
-        else
+        else if ( !israbbit() )
           CP(xh, 4);
         ih=1;altd=0;break;
       case 0xbd: // CP L // CP IXl // CP IYl
         if( ih )
           CP(l, 4);
-        else if( iy )
+        else if( iy && !israbbit() )
           CP(yl, 4);
-        else
+        else if (!israbbit())
           CP(xl, 4);
         ih=1;altd=0;break;
       case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d)
@@ -2049,9 +2087,15 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xbf: // CP A
         st+= 4;
-        fr= 0;
-        fb= ~(fa= a);
-        ff= a&40;
+        if ( altd ) {
+          fr_= 0;
+          fb_= ~(fa_= a);
+          ff_= a&40;
+        } else {
+          fr= 0;
+          fb= ~(fa= a);
+          ff= a&40;
+        }
         ih=1;altd=0;break;
       case 0xc9: // RET
         RET(10);
@@ -2172,11 +2216,11 @@ int main (int argc, char **argv){
       case 0xcc: // CALL Z / (RCM) BOOL HL
         if ( israbbit()) {
           if ( ih ) {
-            BOOL(h,l);
+            BOOL(h,l, h_, l_, altd);
           } else if ( iy ) {
-            BOOL(yh, yl);
+            BOOL(yh, yl, yh, yl, 0);
           } else {
-            BOOL(xh,xl);
+            BOOL(xh,xl,xh,xl, 0);
           }
           st += 2;
         } else {
@@ -2205,14 +2249,14 @@ int main (int argc, char **argv){
       case 0xdc: // CALL C / (RCM) AND HL,DE
         if ( israbbit()) {
           if ( ih ) { 
-            AND2(h,d);
-            AND2(l,e);
+            AND2(h,d,h_);
+            AND2(l,e,e_);
           } else if ( iy ) {
-            AND2(yh, d);
-            AND2(yl, e);
+            AND2(yh, d, yh);
+            AND2(yl, e, yl);
           } else {
-            AND2(xh, d);
-            AND2(xl, e);
+            AND2(xh, d, xh);
+            AND2(xl, e, xl);
           }
           st += 2;
         } else {
@@ -3207,7 +3251,7 @@ int main (int argc, char **argv){
               uint8_t lsb = mem[pc++];
               uint8_t msb = mem[pc++];
               PUSH(msb,lsb);
-              st += 12;
+              st += 1;
             } else {
               st += 8;
             }
@@ -3431,8 +3475,8 @@ int main (int argc, char **argv){
                      st+= 8; im= 1; break;
           case 0x5e: case 0x7e:                              // IM 2
                      st+= 8; im= 2; break;
-          case 0x47: LDRR(i, a, israbbit() ? 4 : 9); break;                   // LD I,A
-          case 0x4f: LDRR(r, a, israbbit() ? 4 : 9); r7= r; break;            // LD R,A
+          case 0x47: LDRR(i, a, i, israbbit() ? 4 : 9); break;                   // LD I,A
+          case 0x4f: LDRR(r, a, r, israbbit() ? 4 : 9); r7= r; break;            // LD R,A
           case 0x57: st += israbbit() ? 4 : 9;                                 // LD A,I
                      ff=  ff&-256
                         | (a= i);

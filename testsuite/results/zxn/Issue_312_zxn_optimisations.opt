@@ -32,7 +32,8 @@
 	pop	hl
 	push	hl
 	push	bc
-	add	hl,+(10)
+	ld	bc,10
+	add	hl,bc
 	push	hl
 	call	_mult
 	pop	hl
@@ -45,7 +46,8 @@
 	pop	hl
 	push	hl
 	push	bc
-	add	hl,+(-10)
+	ld	bc,-10
+	add	hl,bc
 	push	hl
 	call	_mult
 	pop	hl
@@ -70,7 +72,12 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	add	dehl,10	;const
+	ld	bc,10
+	add	hl,bc
+	ex	de,hl
+	ld	bc,0
+	adc	hl,bc
+	ex	de,hl
 	ret
 
 
@@ -79,13 +86,23 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	sub	dehl,+(65536 - 65516)	;const
+	ld	bc,65516
+	add	hl,bc
+	ex	de,hl
+	ld	bc,65535
+	adc	hl,bc
+	ex	de,hl
 	push	de
 	push	hl
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	sub	dehl,+(65536 - 15536)	;const
+	ld	bc,15536
+	add	hl,bc
+	ex	de,hl
+	ld	bc,65535
+	adc	hl,bc
+	ex	de,hl
 	pop	bc
 	pop	bc
 	ret
@@ -96,13 +113,23 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	sub	dehl,+(65536 - 65516)	;const
+	ld	bc,65516
+	add	hl,bc
+	ex	de,hl
+	ld	bc,65535
+	adc	hl,bc
+	ex	de,hl
 	push	de
 	push	hl
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	sub	dehl,+(65536 - 15536)	;const
+	ld	bc,15536
+	add	hl,bc
+	ex	de,hl
+	ld	bc,65535
+	adc	hl,bc
+	ex	de,hl
 	pop	bc
 	pop	bc
 	ret

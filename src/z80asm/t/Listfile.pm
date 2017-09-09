@@ -17,11 +17,13 @@ use Object::Tiny::RW qw(
 		LINENR_STACK
 		ADDR 		
 		LABEL_ADDR	
-		LABEL_GLOBAL
+		LABEL_TYPE
+		LABEL_SCOPE
 		LIST_ASM	
 		LIST_BIN	
 		LIST_LST	
-		LIST_ON 	
+		LIST_ON 
+		LABELS
 );
 use Test::More;
 use Test::Differences; 
@@ -51,7 +53,8 @@ sub new {
 		LINENR_STACK	=> [],
 		ADDR 			=> 0,
 		LABEL_ADDR		=> {},
-		LABEL_GLOBAL	=> {},
+		LABEL_TYPE		=> {},
+		LABEL_SCOPE		=> {},
 		LIST_ASM		=> [],
 		LIST_BIN		=> [],
 		LIST_LST		=> [],
@@ -87,12 +90,16 @@ sub push_asm {
 		
 		if ($asm =~ /^\s*($LABEL_RE)\s*:/) {		# define label
 			$self->LABEL_ADDR->{$1} = $self->ADDR;
+			$self->LABEL_TYPE->{$1} = 'addr';
+			$self->LABEL_SCOPE->{$1} ||= 'local';
 		}
 		elsif ($asm =~ /^\s*defc\s+($LABEL_RE)\s*=\s*(.*)/) {		# define constant
 			$self->LABEL_ADDR->{$1} = 0+eval($2);
+			$self->LABEL_TYPE->{$1} = 'const';
+			$self->LABEL_SCOPE->{$1} ||= 'local';
 		}
 		elsif ($asm =~ /(?i:public)\s+($LABEL_RE)/) {	# global label
-			$self->LABEL_GLOBAL->{$1}++;
+			$self->LABEL_SCOPE->{$1} = 'public';
 		}
 		elsif ($asm =~ /^\s*lstoff\s*$/i) {
 			$new_list_on = 0;
@@ -176,8 +183,9 @@ sub compare_list_file {
 
 	note "Test at ",join(" ", caller);
 	
-	my @got = read_file($file);
+	my @got = sort(read_file($file));
 	chomp(@got);
+	@expected = sort(@expected);
 	
 	eq_or_diff \@got, \@expected, "compare $file";
 }
@@ -188,11 +196,15 @@ sub sym_lines {
 	my($self) = @_;
 	my @sym;
 	
-	for (sort {$self->LABEL_ADDR->{$a} <=> $self->LABEL_ADDR->{$b}} keys %{$self->LABEL_ADDR}) {
-		push @sym, sprintf("%-*s = \$%04X ; %s ", 
+	for (keys %{$self->LABEL_ADDR}) {
+		my $line = sprintf("%-*s = \$%04X ; %-7s %-7s", 
 					 $COLUMN_WIDTH - 1, $_, 
 					 $self->LABEL_ADDR->{$_},
-					 $self->LABEL_GLOBAL->{$_} ? "G" : "L");
+					 $self->LABEL_TYPE->{$_},
+					 $self->LABEL_SCOPE->{$_});
+		$line =~ s/\s+$//;
+		push @sym, $line;
+
 	}
 	return @sym;
 }

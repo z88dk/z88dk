@@ -16,7 +16,7 @@ require '../../t/testlib.pl';
 # CPUs not supported by ticks: z80-zxn z180 r3k
 my @CPUS = (qw( z80 r2k ));
 
-# CPI
+# CPI / CPD
 for my $cpu (@CPUS) {
 	for my $carry (0, 1) {
 		for my $data (1, 2, 3) {
@@ -56,6 +56,6 @@ END
 	}
 }
 
-unlink_tests();
+unlink_testfiles();
 done_testing();
 

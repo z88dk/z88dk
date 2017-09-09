@@ -211,5 +211,7 @@ void hook_io_init(hook_command *cmds)
     cmds[CMD_WRITEBYTE] = cmd_writebyte;
     cmds[CMD_READBYTE] = cmd_readbyte;
     cmds[CMD_SEEK] = cmd_seek;
+    cmds[CMD_READBLOCK] = cmd_readblock;
+    cmds[CMD_WRITEBLOCK] = cmd_writeblock;
 }
 

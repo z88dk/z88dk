@@ -11,27 +11,66 @@ use strict;
 use warnings;
 use v5.10;
 use Test::More;
+use Cwd qw( cwd abs_path );
 use File::Basename;
 
+my $IS_WIN32 = $^O eq 'MSWin32';
+my @TEST_EXT = qw( asm bin c d def err inc lis lst map o P out sym tap );
+
+
 # add path to z80asm top directory
-my $IS_WIN32 = $^O =~ /MSWin32/;
-my $root = dirname(dirname(__FILE__));
-$root =~ s!/!\\!g if $IS_WIN32;
-$ENV{PATH} = $root . ($IS_WIN32 ? ';' : ':') . $ENV{PATH};
+_prepend_path(_root());
 
+#------------------------------------------------------------------------------
+# Portability
+#------------------------------------------------------------------------------
 
-sub slurp {
-	my($file) = @_;
-	local $/;
-	open(my $fh, "<:raw", $file) or die "$file: $!";
-	return <$fh>;
+# return the top directory of z80asm
+sub _root {
+	our $root;
+	$root or $root = abs_path(dirname(dirname(__FILE__)));
+	return $root
 }
 
-sub spew {
-	my($file, @text) = @_;
-	open(my $fh, ">:raw", $file) or die "$file: $!";
-	print $fh @text;
+sub _prepend_path {
+	my($dir) = @_;
+	$ENV{PATH} = $dir . ($IS_WIN32 ? ';' : ':') . $ENV{PATH};
 }
+
+#------------------------------------------------------------------------------
+# Build z88dk tools
+#------------------------------------------------------------------------------
+
+sub _build_tool {
+	my($tool) = @_;
+	our %have_built;
+	
+	unless ($have_built{$tool}) {
+		note "Building $tool";
+		
+		my $dir = cwd();
+		chdir _root()."/../$tool" or die;
+		
+		my $tool_dir = abs_path(cwd());
+		
+		# cannot make -C because make does not understand \\ in filenames
+		run("make", 0, 'IGNORE', 'IGNORE');	
+		
+		chdir $dir or die;
+		
+		_prepend_path($tool_dir);
+		
+		$have_built{$tool}++;
+	}
+}
+
+sub build_appmake {	_build_tool('appmake'); }
+sub build_ticks	{	_build_tool('ticks');	}
+sub build_z80nm {	_build_tool('z80nm');	}
+
+#------------------------------------------------------------------------------
+# Run tools
+#------------------------------------------------------------------------------
 
 sub run {
 	my($cmd, $return, $out, $err) = @_;
@@ -40,6 +79,7 @@ sub run {
 	$err //= '';
 	
 	$cmd .= " >test.stdout 2>test.stderr";
+	$cmd =~ s!/!\\!g if $IS_WIN32;
 	
 	ok 1, $cmd;
 	ok !!$return == !!system($cmd), "exit value";
@@ -51,14 +91,14 @@ sub run {
 		note "test.stdout: ", $gotout;
 	}
 	else {
-		is norm_nl($gotout), norm_nl($out), "test.stdout";
+		_test_text($gotout, $out, "test.stdout");
 	}
 	
 	if ($err eq "IGNORE") {
 		note "test.stderr: ", $goterr;
 	}
 	else {
-		is norm_nl($goterr), norm_nl($err), "test.stderr";
+		_test_text($goterr, $err, "test.stderr");
 	}
 	
 	if (Test::More->builder->is_passing) {
@@ -66,50 +106,32 @@ sub run {
 	}
 }
 
-sub norm_nl {
-	my(@lines) = @_;
-	for (@lines) {
-		s/[ \t\r]+\n/\n/g;
-	}
-	return wantarray ? @lines : join('', @lines);
-}
-
-sub hexdump {
-	my($str) = @_;
-	my $ret = '';
-	for (split //, $str) {
-		$ret .= sprintf("%02X ", ord($_));
-	}
-	return $ret;
-}
-
-sub unlink_tests {
-	if ($ENV{KEEP}) {
-		note "kept test files";
-	}
-	else {
-		if (Test::More->builder->is_passing) {
-			for (qw(test.asm test.bin test.c test.err test.lis test.map test.o test.out)) {
-				-f $_ and ok unlink($_), "unlink $_";
-			}
-		}
-	}
-}
-
 sub z80asm {
-	my($source, $options) = @_;
+	my($source, $options, $return, $out, $err) = @_;
 	$options //= "-b";
 	
 	spew("test.asm", $source);
-	run("z80asm $options test.asm");
+	run("z80asm $options test.asm", $return, $out, $err);
+}
+
+sub appmake {
+	my($args) = @_;
+	
+	build_appmake();
+	run("appmake $args", 0, 'IGNORE');
 }
 
 sub ticks {
 	my($source, $options) = @_;
+
+	build_ticks();
 	z80asm($source, $options);
+	
 	my $cpu = ($options =~ /--cpu=(\S+)/) ? $1 : "z80";
 	my $end = -s "test.bin";
-	run("ticks test.bin -m$cpu -end ".sprintf("%04X", $end)." -output test.out", 0, "IGNORE");
+	run("ticks test.bin -m$cpu -end ".sprintf("%04X", $end)." -output test.out", 
+		0, "IGNORE");
+
 	my $bin = slurp("test.out");
 	my $mem = substr($bin, 0, 0x10000); $mem =~ s/\0+$//;
 	my @mem = map {ord} split //, $mem;
@@ -160,6 +182,165 @@ sub ticks {
 	@regs == 8 or die;
 	
 	return $ret;
+}
+
+sub z80nm {
+	my($file, $out) = @_;
+	
+	build_z80nm();
+	run("z80nm -a $file", 0, $out);
+}
+
+#------------------------------------------------------------------------------
+# Read and write files
+#------------------------------------------------------------------------------
+
+sub slurp {
+	my($file) = @_;
+	ok -f $file, $file;
+	local $/;
+	open(my $fh, "<:raw", $file) or die "$file: $!";
+	return <$fh> // "";
+}
+
+sub spew {
+	my($file, @text) = @_;
+	open(my $fh, ">:raw", $file) or die "$file: $!";
+	print $fh @text;
+}
+
+sub unlink_testfiles {
+	if ($ENV{KEEP}) {
+		note "kept test files";
+	}
+	else {
+		if (Test::More->builder->is_passing) {
+			for (@TEST_EXT) {
+				for (<test*.$_>) {
+					-f $_ and ok unlink($_), "unlink $_";
+				}
+			}
+		}
+	}
+}
+
+#------------------------------------------------------------------------------
+# Compare files
+#------------------------------------------------------------------------------
+
+sub trim {
+	local $_ = shift;
+	s/^[ \t\f\v\r]+//mg;
+	s/[ \t\f\v\r]+$//mg;
+	s/[ \t\f\r\r]+/ /g;
+	return $_;
+}
+
+sub hexdump {
+	my($str) = @_;
+	my $ret = '';
+	my $addr = 0;
+	my @bytes = map {ord} split //, $str;
+	while (@bytes) {
+		$ret .= sprintf("%04X:", $addr);
+		for (1..8) {
+			if (@bytes) {
+				$ret .= sprintf(" %02X", shift @bytes);
+			}
+			$addr++;
+		}
+		$ret .= "\n";
+	}
+	return $ret;
+}
+
+sub check_text_file {
+	my($file, $exp, $title) = @_;
+	$title //= $file." contents";
+	my $loc = " at file ".((caller)[1])." line ".((caller)[2]);
+	
+	ok -f $file, "$file exists".$loc;
+	if (-f $file) {
+		_test_text(
+				slurp($file), 
+				$exp, 
+				$title.$loc);
+	}
+}
+
+sub check_bin_file {
+	my($file, $exp, $title) = @_;
+	$title //= $file." contents";
+	my $loc = " at file ".((caller)[1])." line ".((caller)[2]);
+	
+	ok -f $file, "$file exists".$loc;
+
+	if (-f $file) {
+		_test_text(
+				hexdump(slurp($file)),
+				hexdump($exp),
+				$title.$loc);
+	}
+}
+
+sub _test_text {
+	my($out, $exp, $title) = @_;
+
+	my $out_t = trim($out);
+	my $exp_t = trim($exp);
+	
+	ok $out_t eq $exp_t, $title;
+	if ($out_t ne $exp_t) {
+		my $line_nr = 0;
+		my @out = map {(++$line_nr).": ".$_} split(/\n/, $out);
+		my @out_t = map {trim($_)} @out;
+
+		$line_nr = 0;
+		my @exp = map {(++$line_nr).": ".$_} split(/\n/, $exp);
+		my @exp_t = map {trim($_)} @exp;
+		
+		while (@out || @exp) {
+			# remove same lines
+			while (@out && @exp && $out_t[0] eq $exp_t[0]) {
+				shift @out; shift @out_t;
+				shift @exp; shift @exp_t;
+			}
+			
+			# check for one input finished
+			if (@out && !@exp) {
+				diag scalar(@out)." lines differ";
+				diag "---";
+				diag "> ".$_ for @out;
+				diag ".";
+				@out = @out_t = ();
+			}
+			elsif (!@out && @exp) {
+				diag scalar(@exp)." lines differ";
+				diag "< ".$_ for @exp;
+				diag "---";
+				diag ".";
+				@exp = @exp_t = ();
+			}
+			else {
+				# count different lines and show them
+				my $count = 0;
+				while ($count < @out && $count < @exp && $out_t[$count] ne $exp_t[$count]) {
+					$count++;
+				}
+				diag "$count lines differ";
+				for (0..$count-1) {
+					diag "< ".$exp[$_];
+				}
+				diag "---";
+				for (0..$count-1) {
+					diag "> ".$out[$_];
+				}
+				diag ".";
+				splice(@out, 0, $count); splice(@out_t, 0, $count);
+				splice(@exp, 0, $count); splice(@exp_t, 0, $count);
+			}
+		}
+	}
 }
 
 1;

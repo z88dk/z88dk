@@ -1,0 +1,5 @@
+target/yaz180/driver/apu/c/sccz80/apu_isr
+target/yaz180/driver/apu/c/sccz80/apu_reset
+target/yaz180/driver/apu/c/sccz80/apu_check_idle
+target/yaz180/driver/apu/c/sccz80/apu_command_load
+target/yaz180/driver/apu/c/sccz80/apu_command_load_callee

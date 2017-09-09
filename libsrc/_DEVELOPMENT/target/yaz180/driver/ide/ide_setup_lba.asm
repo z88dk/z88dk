@@ -20,7 +20,6 @@ EXTERN ideStatus
 ; LBA is contained in BCDE registers
     
 ide_setup_lba:
-    push af
     push hl
     ld a, __IO_IDE_LBA0
     call ide_write_byte     ;set LBA0 0:7
@@ -42,6 +41,4 @@ ide_setup_master:
     ld a, __IO_IDE_LBA3
     call ide_write_byte     ;set LBA3 24:27 + bits 5:7=111
     pop hl
-    pop af
     ret
-
