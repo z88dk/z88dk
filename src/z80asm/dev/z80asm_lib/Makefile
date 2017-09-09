@@ -49,3 +49,6 @@ $(PROJ).lst: $(SRC)
 
 clean::
 	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin
+
+test: all
+	prove test.pl
