@@ -2645,3 +2645,17 @@
 	ld	hl,%1
 	ld	de,%2
 	call	l_plong
+
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,%1
+=
+	call	l_glong2sp
+	ld	hl,%1
+
+	call	l_glonghlp
+	push	de
+	push	hl
+=
+	call	l_glong2sp_hlp

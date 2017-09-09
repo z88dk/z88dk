@@ -99,7 +99,8 @@
 	EXTERN     l_long2int_s	;Long->int signed conversion
 	EXTERN     l_glong		;Get long
 	EXTERN     l_glonghlp		;Get pointer, then get long
-	EXTERN     l_glongsp	;Get long and copy on stack (peephole opt)
+	EXTERN     l_glong2sp	;Get long and copy on stack (peephole opt)
+	EXTERN     l_glong2sp_hlp
 	EXTERN     l_long_add
 	EXTERN     l_long_and
 	EXTERN     l_long_asl

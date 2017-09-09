@@ -30,7 +30,7 @@ l/sccz80/crt0/l_gintsp
 l/sccz80/crt0/l_gintspchar
 l/sccz80/crt0/l_gintspsp
 l/sccz80/crt0/l_glong
-l/sccz80/crt0/l_glonghlp
+l/sccz80/crt0/l_glong2sp
 l/sccz80/crt0/l_glongsp
 l/sccz80/crt0/l_gt
 l/sccz80/crt0/l_le
