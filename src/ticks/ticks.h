@@ -36,6 +36,7 @@ extern unsigned char a_,b_,c_,d_,e_,h_,l_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
+extern long long st;
 
 extern int c_cpu;
 

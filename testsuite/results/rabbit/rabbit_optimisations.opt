@@ -170,11 +170,12 @@
 	ld	hl,(sp + 2 + 2)
 	ex	de,hl
 	ld	hl,(sp + 2)
-	push	de
-	push	hl
-	ld	hl,10	;const
-	ld	de,0
-	call	l_long_add
+	ld	bc,10
+	add	hl,bc
+	ex	de,hl
+	ld	bc,0
+	adc	hl,bc
+	ex	de,hl
 	ret
 
 

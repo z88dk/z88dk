@@ -161,6 +161,8 @@ defc __IO_APU_STATUS_CARRY = 0x01
 
 defc __IO_APU_STATUS_ERROR = 0x1E
 
+defc __IO_APU_COMMAND_SVREQ = 0x80
+
 defc __IO_APU_OP_ENT = 0x40
 defc __IO_APU_OP_REM = 0x50
 defc __IO_APU_OP_ENT16 = 0x40

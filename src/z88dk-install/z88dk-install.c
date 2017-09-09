@@ -7,7 +7,11 @@
 #include <ctype.h>
 
 #ifdef WIN32
+#ifndef __MINGW__
 #include "dirent.h"
+#else
+#include <dirent.h>
+#endif
 #ifndef strcasecmp
 #define strcasecmp(a,b) stricmp(a,b)
 #endif

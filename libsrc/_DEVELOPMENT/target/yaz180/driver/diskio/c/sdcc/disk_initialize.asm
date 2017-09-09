@@ -1,23 +1,21 @@
 SECTION code_driver
 
-PUBLIC _disk_status_callee
+PUBLIC _disk_initialize
 
-EXTERN asm_disk_status
+EXTERN asm_disk_initialize
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called from diskio.h
-; extern DSTATUS disk_status (BYTE pdrv) __z88dk_callee;
+; extern DSTATUS disk_initialize (BYTE pdrv);
 ;
 
-; get the ide drive status
+; initialize the ide drive
 
-_disk_status_callee:
+_disk_initialize:
 
     pop af
-    dec sp
     pop hl
+    push hl
     push af
 
-    ld l,h
-
-    jp asm_disk_status
+    jp asm_disk_initialize
