@@ -34,3 +34,26 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
+
+	call	l_glong		;ignore
+	call	l_long_and
+=
+	pop	de
+	ld	a,(hl)
+	and	e	
+	ld	e,a
+	inc	hl
+	ld	a,(hl)
+	and	d
+	ld	d,a
+	inc	hl
+	pop	bc
+	ld	a,(hl)
+	and	c
+	ld	c,a
+	inc	hl
+	ld	a,(hl)
+	and	b
+	ld	h,a
+	ld	l,c
+	ex	de,hl

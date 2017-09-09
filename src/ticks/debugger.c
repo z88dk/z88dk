@@ -43,9 +43,10 @@ static int cmd_break(int argc, char **argv);
 static int cmd_examine(int argc, char **argv);
 static int cmd_set(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
+static int cmd_hotspot(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
-
+static void print_hotspots();
 
 
 
@@ -59,6 +60,7 @@ static command commands[] = {
     { "x",      cmd_examine,       "<address>",   "Examine memory" },
     { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
+    { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
     { "help",   cmd_help,          "",   "Display this help text" },
     { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
@@ -70,12 +72,17 @@ static breakpoint *breakpoints;
 static int debugger_active = 1;
 static int next_address = -1;
 static int trace = 0;
+static int hotspot = 0;
+static int max_hotspot_addr = 0;
+static int hotspots[65536];
 
 
 void debugger_init()
 {
     linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
+    atexit(print_hotspots);
+    memset(hotspots, 0, sizeof(hotspots));
 }
 
 
@@ -100,6 +107,13 @@ void debugger()
     if ( trace ) {
         disassemble(pc, buf, sizeof(buf));
         printf("%s\n",buf);     
+    }
+
+    if ( hotspot ) {
+        if ( pc > max_hotspot_addr) {
+            max_hotspot_addr = pc;
+        }
+        hotspots[pc]++;
     }
 
     if ( debugger_active == 0 ) {
@@ -400,9 +414,22 @@ static int cmd_trace(int argc, char **argv)
         if ( strcmp(argv[1], "on") == 0 ) {
             trace = 1;
         } else if ( strcmp(argv[1],"off") == 0 ) {
-            trace = 1;
+            trace = 0;
         }
         printf("Tracing is %s\n", trace ? "on" : "off");
+    }
+    return 0;
+}
+
+static int cmd_hotspot(int argc, char **argv)
+{
+    if ( argc == 2 ) {
+        if ( strcmp(argv[1], "on") == 0 ) {
+            hotspot = 1;
+        } else if ( strcmp(argv[1],"off") == 0 ) {
+            hotspot = 0;
+        }
+        printf("Hotspots are %s\n", hotspot ? "on" : "off");
     }
     return 0;
 }
@@ -426,4 +453,23 @@ static int cmd_quit(int argc, char **argv)
 uint8_t get_memory(int pc)
 {
     return mem[pc % 65536];
+}
+
+
+static void print_hotspots()
+{
+    char   buf[256];
+    int    i;
+    FILE  *fp;
+
+    if ( hotspot == 0 ) return;
+    if ( (fp = fopen("hotspots", "w")) != NULL ) {
+        for ( i = 0; i < max_hotspot_addr; i++) {
+            if ( hotspots[i] != 0 ) {
+                disassemble(i, buf, sizeof(buf));
+                fprintf(fp, "%d\t\t%s\n",hotspots[i],buf);
+            }
+        }
+        fclose(fp);
+    }
 }

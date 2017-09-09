@@ -21,7 +21,7 @@ PUBLIC    l_long_asro
 .l_long_asro
 
         ld a,c
-        or a
+        and	31
         ret z
         
         ld b,a

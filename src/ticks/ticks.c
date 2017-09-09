@@ -3251,7 +3251,7 @@ int main (int argc, char **argv){
               uint8_t lsb = mem[pc++];
               uint8_t msb = mem[pc++];
               PUSH(msb,lsb);
-              st += 12;
+              st += 1;
             } else {
               st += 8;
             }

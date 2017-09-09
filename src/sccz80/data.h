@@ -98,4 +98,5 @@ extern char *c_rodata_section;
 extern int c_fp_mantissa_bytes;
 extern int c_fp_exponent_bias;
 extern int c_disable_builtins;
+extern uint32_t c_size_optimisation;
 extern int incritical;
