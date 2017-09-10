@@ -212,11 +212,8 @@ static char            c_sccz80_r2l_calling;
 static char            filenamebuf[FILENAME_MAX + 1];
 static char            tmpnambuf[] = "zccXXXX";
 
-#define ASM_Z80ASM 0
-#define ASM_ASXX   1
-#define ASM_VASM   2
-#define ASM_GNU    3
-static char           *c_assembler_type = "z80asm";
+#define ASM_Z80ASM     0
+#define IS_ASM(x)  ( assembler_type == (x) )
 static int             assembler_type = ASM_Z80ASM;
 static enum iostyle    assembler_style = outimplied;
 static int             linker_output_separate_arg = 0;
@@ -228,7 +225,6 @@ static enum iostyle    compiler_style = outimplied;
 static char           *c_compiler_type = "sccz80";
 static int             compiler_type = CC_SCCZ80;
 
-#define IS_ASM(x)  ( assembler_type == (x) )
 
 
 static char           *defaultout = "a.bin";
@@ -330,22 +326,6 @@ static int    c_clib_array_num = 0;
 static arg_t  config[] = {
 	{ "OPTIONS", 0, SetStringConfig, &c_options, NULL, "Extra options for port" },
 
-	{ "MPMEXE", 0, SetStringConfig, &c_mpm_exe, NULL,"Name of the mpm binary" },
-
-	{ "VASMEXE", 0, SetStringConfig, &c_vasm_exe, NULL, "Name of the vasm binary" },
-	{ "VLINKEXE", 0, SetStringConfig, &c_vlink_exe, NULL, "Name of the vlink binary" },
-	{ "VASMOPTS", 0, SetStringConfig, &c_vasmopts, NULL, "Options for VASM", "-quiet -Fvobj -I\"DESTDIR/lib\"" },
-	{ "VLINKOPTS", 0, SetStringConfig, &c_vlinkopts, NULL, "", "-L\"DESTDIR/lib/vlink/\"" },
-
-	{ "GNUASEXE", 0, SetStringConfig, &c_gnuas_exe, NULL, "Name of the GNU as binary" },
-	{ "GNULDEXE", 0, SetStringConfig, &c_gnuld_exe, NULL, "Name of the GNU ld binary" },
-	{ "GNUASOPTS", 0, SetStringConfig, &c_gnuasopts, NULL, "" },
-	{ "GNULINKOPTS", 0, SetStringConfig, &c_gnulinkopts, NULL, "" },
-
-	{ "ASZ80EXE", 0, SetStringConfig, &c_asz80_exe, NULL, "Name of the asz80 binary" },
-	{ "ASLINKEXE", 0, SetStringConfig, &c_aslink_exe, NULL, "Name of the aslink binary" },
-	{ "ASZ80OPTS", 0, SetStringConfig, &c_asz80opts, NULL, "" },
-	{ "ASLINKOPTS", 0, SetStringConfig, &c_aslinkopts, NULL, "" },
 
 	{ "CPP", 0, SetStringConfig, &c_cpp_exe, NULL, "Name of the cpp binary" },
 	{ "SDCPP", 0, SetStringConfig, &c_sdcc_preproc_exe, NULL, "Name of the SDCC cpp binary" },
@@ -415,7 +395,6 @@ static arg_t     myargs[] = {
 	{ "preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run" },
 	{ "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
 	{ "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
-	{ "asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)" },
 	{ "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
     { "mz80-zxn", AF_BOOL_TRUE, SetBoolean, &mz80_zxn, NULL, "Target the zx next z80 cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
@@ -2374,47 +2353,11 @@ static void configure_assembler()
 	char           *linker = NULL;
 	int             type = ASM_Z80ASM;
 	enum iostyle    style = outimplied;
-	char           *name = c_assembler_type;
 
-	if (strcasecmp(name, "z80asm") == 0) {
-		type = ASM_Z80ASM;
-		linker = c_z80asm_exe;
-		assembler = c_z80asm_exe;
-	}
-	else if (strcasecmp(name, "mpm") == 0) {
-		type = ASM_Z80ASM;
-		linker = c_mpm_exe;
-		assembler = c_mpm_exe;
-	}
-	else if (strcasecmp(name, "asxx") == 0) {
-		type = ASM_ASXX;
-		linker = c_aslink_exe;
-		assembler = c_asz80_exe;
-		c_asmopts = c_asz80opts;
-		c_linkopts = c_aslinkopts;
-	}
-	else if (strcasecmp(name, "vasm") == 0) {
-		type = ASM_VASM;
-		linker = c_vlink_exe;
-		assembler = c_vasm_exe;
+	type = ASM_Z80ASM;
+	linker = c_z80asm_exe;
+	assembler = c_z80asm_exe;
 
-		/* Switch config around */
-		c_asmopts = c_vasmopts;
-		c_linkopts = c_vlinkopts;
-
-		style = outspecified_flag;
-		linker_output_separate_arg = 1;
-	}
-	else if (strcasecmp(name, "binutils") == 0) {
-		type = ASM_GNU;
-		linker = c_gnuld_exe;
-		assembler = c_gnuas_exe;
-
-		c_asmopts = c_gnuasopts;
-		c_linkopts = c_gnulinkopts;
-		style = outspecified_flag;
-		linker_output_separate_arg = 1;
-	}
 	assembler_type = type;
 	assembler_style = style;
 	if (assembler) {
@@ -2449,9 +2392,6 @@ static void configure_compiler()
 		}
 		preprocarg = " -D__SDCC";
 		BuildOptions(&cpparg, preprocarg);
-		//if ( assembler_type == ASM_Z80ASM ) {
-		//    parse_cmdline_arg("-Ca-sdcc");
-		//}
 		c_compiler = c_sdcc_exe;
 		c_cpp_exe = c_sdcc_preproc_exe;
 		compiler_style = filter_outspecified_flag;
@@ -2460,8 +2400,7 @@ static void configure_compiler()
 		preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
 		BuildOptions(&cpparg, preprocarg);
 		/* Indicate to sccz80 what assembler we want */
-		snprintf(buf, sizeof(buf), "-asm=%s -ext=opt %s", c_assembler_type,
-		            select_cpu(CPU_MAP_TOOL_SCCZ80));
+		snprintf(buf, sizeof(buf), "-ext=opt %s", select_cpu(CPU_MAP_TOOL_SCCZ80));
 
 		add_option_to_compiler(buf);
 		if (sccz80arg) {
