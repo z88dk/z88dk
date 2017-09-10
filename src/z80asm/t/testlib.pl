@@ -128,8 +128,7 @@ sub ticks {
 	z80asm($source, $options);
 	
 	my $cpu = ($options =~ /--cpu=(\S+)/) ? $1 : "z80";
-	my $end = -s "test.bin";
-	run("ticks test.bin -m$cpu -end ".sprintf("%04X", $end)." -output test.out", 
+	run("ticks test.bin -m$cpu -output test.out", 
 		0, "IGNORE");
 
 	my $bin = slurp("test.out");

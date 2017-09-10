@@ -15,18 +15,21 @@ require '../../t/testlib.pl';
 
 # CPUs not supported by ticks: z80-zxn z180 r3k
 my @CPUS = (qw( z80 r2k ));
+my $test_nr;
 
 # CPI / CPD
+# CPIR / CPDR with BC = 1
 for my $cpu (@CPUS) {
 	for my $carry (0, 1) {
 		for my $data (1, 2, 3) {
 			my $a = 2;
 			for my $bc (2, 1) {
-				for my $op (qw(cpi cpd)) {
-					note "cpu: $cpu, data: $data, a: $a, bc: $bc, op: $op";
+				for my $op (qw( cpi cpd cpir cpdr )) {
+					next if $bc != 1 && $op =~ /cpir|cpdr/;
+					$test_nr++;
+					note "Test $test_nr: cpu: $cpu, carry:$carry, data: $data, a: $a, bc: $bc, op: $op";
 					my $carry_set = $carry ? "scf" : "and a";
 					my $r = ticks(<<END, "--cpu=$cpu -b -m -l");
-						extern __tail
 						defc data = 0x100
 								$carry_set
 								ld hl, data
@@ -36,23 +39,68 @@ for my $cpu (@CPUS) {
 								
 								$op
 								
-								jp __tail
+								rst 0
 END
-					# system "z88dk-dis -m$cpu -x test.map test.bin";
-					# use Data::Dump 'dump'; say dump($r);
-					
 					is $r->{F_S}, ($a <  $data 		? 1 : 0), "S";
 					is $r->{F_Z}, ($a == $data 		? 1 : 0), "Z";
 					is $r->{F_H}, ($a <  $data 		? 1 : 0), "Hf";
 					is $r->{F_PV}, ($r->{BC} == 0 	? 0 : 1), "PV";
 					is $r->{F_N}, 1,						  "N";
 					is $r->{F_C}, $carry,					  "C";					
-					is $r->{HL}, $op eq 'cpi' ? 0x101 : 0x0FF,"HL";
+					is $r->{HL}, $op =~ /cpi/ ? 0x101 : 0x0FF,"HL";
 					is $r->{BC}, $bc - 1,					  "BC";
+					
+					# die if $test_nr == 37;
 				}
 			}
 		}
+	}
+}
 
+# CPIR / CPDR with BC > 1
+for my $cpu (@CPUS) {
+	for my $carry (0, 1) {
+		for my $op (qw( cpir cpdr )) {
+			for my $data (1, 2, 3) {
+				my $a = 2;
+				$test_nr++;
+				note "Test $test_nr: cpu: $cpu, carry:$carry, data: $data, a: $a, op: $op";
+				my $carry_set = $carry ? "scf" : "and a";
+				my $start = $op =~ /cpir/ ? 'data' : 'end-1';
+				my $r = ticks(<<END, "--cpu=$cpu -b");
+								jr start
+						.data	defs 5, $data
+						.end
+								
+						.start	$carry_set
+								ld hl, $start
+								ld a, $a
+								ld bc, end-data
+								
+								$op
+								
+								rst 0
+END
+				is $r->{F_S}, ($a <  $data 		? 1 : 0), 	"S";
+				is $r->{F_Z}, ($a == $data 		? 1 : 0), 	"Z";
+				is $r->{F_H}, ($a <  $data 		? 1 : 0), 	"Hf";
+				is $r->{F_PV}, ($r->{BC} == 0 	? 0 : 1), 	"PV";
+				is $r->{F_N}, 1,						  	"N";
+				is $r->{F_C}, $carry,					  	"C";
+				if ($a == $data) {
+					is $r->{HL}, $op =~ /cpir/ ? 0x02+1 
+											   : 0x02+5-1-1, "HL";
+					is $r->{BC}, 5-1,					  	"BC";
+				}
+				else {
+					is $r->{HL}, $op =~ /cpir/ ? 0x02+5 
+											   : 0x02-1,  	"HL";
+					is $r->{BC}, 0,						  	"BC";
+				}
+					
+				# die if $test_nr == 73;
+			}
+		}
 	}
 }
 
