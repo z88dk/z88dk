@@ -333,10 +333,10 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 main
+    L A $0000 main test.asm:1
   Code: 1 bytes
     C $0000: C9
 END
@@ -350,10 +350,10 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: lib
   Names:
-    L A $0000 main
+    L A $0000 main test.asm:2
   Code: 1 bytes
     C $0000: C9
 END
@@ -368,14 +368,13 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: lib2
   Names:
-    L A $0000 main
+    L A $0000 main test.asm:3
   Code: 1 bytes
     C $0000: C9
 END
-
 
 
 #------------------------------------------------------------------------------
@@ -608,15 +607,16 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 __C_LINE_10
-    L A $0003 __C_LINE_20
-    L A $0006 __C_LINE_30
+    L A $0000 __C_LINE_10 test.asm:2
+    L A $0003 __C_LINE_20 test.asm:4
+    L A $0006 __C_LINE_30 test.asm:6
   Code: 9 bytes, ORG at $0100
     C $0000: 01 01 01 11 11 11 21 21 21
 END
+
 
 #------------------------------------------------------------------------------
 # BINARY

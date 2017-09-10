@@ -17,7 +17,7 @@ use Test::Differences;
 use List::AllUtils 'uniq';
 use Data::HexDump;
 
-my $OBJ_FILE_VERSION = "08";
+my $OBJ_FILE_VERSION = "09";
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";
@@ -391,10 +391,11 @@ sub objfile {
 	if ($args{SYMBOLS}) {
 		store_ptr(\$o, $symbols_addr);
 		for (@{$args{SYMBOLS}}) {
-			@$_ == 5 or die;
-			my($scope, $type, $section, $value, $name) = @$_;
+			@$_ == 7 or die;
+			my($scope, $type, $section, $value, $name, $def_filename, $line_nr) = @$_;
 			$o .= $scope . $type . pack_string($section) . 
-					pack("V", $value) . pack_string($name);
+					pack("V", $value) . pack_string($name) .
+					pack_string($def_filename) . pack("V", $line_nr);
 		}
 		$o .= "\0";
 	}
