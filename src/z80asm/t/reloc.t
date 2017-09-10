@@ -92,12 +92,12 @@ t_binary(read_binfile("test_data.bin"),
 ok ! -f "test.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-start                           = $1020 ; addr, local, , test, code,
-string                          = $3040 ; addr, local, , test, data,
-string1                         = $304A ; addr, local, , test, data,
-string2                         = $3055 ; addr, local, , test, data,
-start1                          = $1032 ; addr, local, , test, code,
-start2                          = $1044 ; addr, local, , test, code,
+start                           = $1020 ; addr, local, , test, code, test.asm:3
+string                          = $3040 ; addr, local, , test, data, test.asm:12
+string1                         = $304A ; addr, local, , test, data, test.asm:23
+string2                         = $3055 ; addr, local, , test, data, test.asm:34
+start1                          = $1032 ; addr, local, , test, code, test.asm:15
+start2                          = $1044 ; addr, local, , test, code, test.asm:26
 __head                          = $0000 ; const, public, def, , ,
 __tail                          = $3060 ; const, public, def, , ,
 __size                          = $3060 ; const, public, def, , ,
@@ -135,12 +135,12 @@ ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-start                           = $005F ; addr, local, , test, code,
-string                          = $0095 ; addr, local, , test, data,
-string1                         = $009F ; addr, local, , test, data,
-string2                         = $00AA ; addr, local, , test, data,
-start1                          = $0071 ; addr, local, , test, code,
-start2                          = $0083 ; addr, local, , test, code,
+start                           = $005F ; addr, local, , test, code, test.asm:3
+string                          = $0095 ; addr, local, , test, data, test.asm:12
+string1                         = $009F ; addr, local, , test, data, test.asm:23
+string2                         = $00AA ; addr, local, , test, data, test.asm:34
+start1                          = $0071 ; addr, local, , test, code, test.asm:15
+start2                          = $0083 ; addr, local, , test, code, test.asm:26
 __head                          = $005F ; const, public, def, , ,
 __tail                          = $00B5 ; const, public, def, , ,
 __size                          = $00B5 ; const, public, def, , ,
@@ -193,12 +193,12 @@ t_binary(read_binfile("test_data.bin"),
 t_binary(read_binfile("test_data.reloc"), "");
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-start                           = $1020 ; addr, public, , test, code,
-string                          = $3040 ; addr, public, , test, data,
-start1                          = $1032 ; addr, public, , test1, code,
-string1                         = $304A ; addr, public, , test1, data,
-start2                          = $1044 ; addr, public, , test2, code,
-string2                         = $3055 ; addr, public, , test2, data,
+start                           = $1020 ; addr, public, , test, code, test.asm:5
+string                          = $3040 ; addr, public, , test, data, test.asm:14
+start1                          = $1032 ; addr, public, , test1, code, test1.asm:4
+string1                         = $304A ; addr, public, , test1, data, test1.asm:12
+start2                          = $1044 ; addr, public, , test2, code, test2.asm:4
+string2                         = $3055 ; addr, public, , test2, data, test2.asm:12
 __head                          = $0000 ; const, public, def, , ,
 __tail                          = $3060 ; const, public, def, , ,
 __size                          = $3060 ; const, public, def, , ,
@@ -257,12 +257,12 @@ ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-start                           = $005F ; addr, public, , test, code,
-string                          = $0095 ; addr, public, , test, data,
-start1                          = $0071 ; addr, public, , test1, code,
-string1                         = $009F ; addr, public, , test1, data,
-start2                          = $0083 ; addr, public, , test2, code,
-string2                         = $00AA ; addr, public, , test2, data,
+start                           = $005F ; addr, public, , test, code, test.asm:5
+string                          = $0095 ; addr, public, , test, data, test.asm:14
+start1                          = $0071 ; addr, public, , test1, code, test1.asm:4
+string1                         = $009F ; addr, public, , test1, data, test1.asm:12
+start2                          = $0083 ; addr, public, , test2, code, test2.asm:4
+string2                         = $00AA ; addr, public, , test2, data, test2.asm:12
 __head                          = $005F ; const, public, def, , ,
 __tail                          = $00B5 ; const, public, def, , ,
 __size                          = $00B5 ; const, public, def, , ,
@@ -325,12 +325,12 @@ ok ! -f "test_data2.bin";
 ok ! -f "test_data2.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-start                           = $1020 ; addr, local, , test, code,
-string                          = $3040 ; addr, local, , test, data,
-string1                         = $304A ; addr, local, , test, data1,
-string2                         = $3055 ; addr, local, , test, data2,
-start1                          = $1032 ; addr, local, , test, code1,
-start2                          = $1044 ; addr, local, , test, code2,
+start                           = $1020 ; addr, local, , test, code, test.asm:12
+string                          = $3040 ; addr, local, , test, data, test.asm:36
+string1                         = $304A ; addr, local, , test, data1, test.asm:39
+string2                         = $3055 ; addr, local, , test, data2, test.asm:42
+start1                          = $1032 ; addr, local, , test, code1, test.asm:20
+start2                          = $1044 ; addr, local, , test, code2, test.asm:28
 __head                          = $0000 ; const, public, def, , ,
 __tail                          = $3060 ; const, public, def, , ,
 __size                          = $3060 ; const, public, def, , ,

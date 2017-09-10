@@ -46,9 +46,9 @@ check_text_file("test.sym", <<'END');
 	asm_BIFROST2_stop               = $C9B2 ; const, public, , , , test.asm:9
 END
 check_text_file("test.map", <<'END');
-	program                         = $FDE8 ; addr, public, , test, ,
-	asm_BIFROST2_start              = $C9A9 ; const, public, , test, ,
-	asm_BIFROST2_stop               = $C9B2 ; const, public, , test, ,
+	program                         = $FDE8 ; addr, public, , test, , test.asm:18
+	asm_BIFROST2_start              = $C9A9 ; const, public, , test, , test.asm:8
+	asm_BIFROST2_stop               = $C9B2 ; const, public, , test, , test.asm:9
 	__head                          = $FDE8 ; const, public, def, , ,
 	__tail                          = $FDE9 ; const, public, def, , ,
 	__size                          = $0001 ; const, public, def, , ,
@@ -62,16 +62,15 @@ END
 
 z80nm("test.o", <<'END');
 
-	File test.o at $0000: Z80RMF08
+	File test.o at $0000: Z80RMF09
 	  Name: test
 	  Names:
-		G A $0000 program
-		G C $C9A9 asm_BIFROST2_start
-		G C $C9B2 asm_BIFROST2_stop
+		G A $0000 program test.asm:18
+		G C $C9A9 asm_BIFROST2_start test.asm:8
+		G C $C9B2 asm_BIFROST2_stop test.asm:9
 	  Code: 1 bytes, ORG at $FDE8
 		C $0000: C9
 END
-
 
 unlink_testfiles();
 done_testing();

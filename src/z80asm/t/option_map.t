@@ -86,16 +86,16 @@ run("z80asm -b -m test.asm test1.asm");
 ok -f "test.map", "found test.map";
 check_bin_file("test.bin", $bin);
 check_text_file("test.map", <<'END');
-	zero                            = $0000 ; const, local, , test, ,
-	loop                            = $0002 ; addr, local, , test, ,
-	x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; addr, local, , test, ,
-	x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; addr, local, , test, ,
-	loop                            = $0008 ; addr, local, , test1, ,
-	main                            = $0000 ; addr, public, , test, ,
-	last                            = $0004 ; addr, public, , test, ,
-	alias_main                      = $0000 ; addr, public, , test1, ,
-	alias_last                      = $0004 ; addr, public, , test1, ,
-	func                            = $0006 ; addr, public, , test1, ,
+	zero                            = $0000 ; const, local, , test, , test.asm:3
+	loop                            = $0002 ; addr, local, , test, , test.asm:6
+	x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; addr, local, , test, , test.asm:9
+	x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; addr, local, , test, , test.asm:10
+	loop                            = $0008 ; addr, local, , test1, , test1.asm:15
+	main                            = $0000 ; addr, public, , test, , test.asm:5
+	last                            = $0004 ; addr, public, , test, , test.asm:8
+	alias_main                      = $0000 ; addr, public, , test1, , test1.asm:7
+	alias_last                      = $0004 ; addr, public, , test1, , test1.asm:11
+	func                            = $0006 ; addr, public, , test1, , test1.asm:14
 	__head                          = $0000 ; const, public, def, , ,
 	__tail                          = $000B ; const, public, def, , ,
 	__size                          = $000B ; const, public, def, , ,

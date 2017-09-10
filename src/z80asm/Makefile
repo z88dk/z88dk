@@ -97,7 +97,7 @@ clean::
 install:
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
-	make -C dev/z80asm_lib install
+	make -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
 
 #------------------------------------------------------------------------------
 # clean
