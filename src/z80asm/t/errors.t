@@ -443,7 +443,7 @@ t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test",
 unlink_testfiles();
 write_binfile(o_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
-								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD"] ] ));
+								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
 t_z80asm_capture("-b -d ".o_file(),
 				 "",
 				 "Error at module 'test': file 'test.o' not an object file\n".

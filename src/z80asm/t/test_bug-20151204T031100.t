@@ -46,8 +46,8 @@ ok -f "test_AAA.bin", "test_AAA.bin";
 ok -f "test.map", "no test.map";
 check_bin_file("test_AAA.bin", "\x02\x00\xCD\x02\x00");
 check_text_file("test.map", <<'END');
-var_1                           = $0002 ; addr, local, , test, BBB,
-var_2                           = $0002 ; addr, local, , test, CCC,
+var_1                           = $0002 ; addr, local, , test, BBB, test.asm:13
+var_2                           = $0002 ; addr, local, , test, CCC, test.asm:19
 __head                          = $0000 ; const, public, def, , ,
 __tail                          = $0005 ; const, public, def, , ,
 __size                          = $0005 ; const, public, def, , ,
@@ -61,7 +61,6 @@ __CCC_head                      = $0003 ; const, public, def, , ,
 __CCC_tail                      = $0005 ; const, public, def, , ,
 __CCC_size                      = $0002 ; const, public, def, , ,
 END
-
 
 unlink_testfiles();
 spew("test.asm", "
@@ -90,8 +89,8 @@ ok -f "test_AAA.bin", "test_AAA.bin";
 ok -f "test.map", "no test.map";
 check_bin_file("test_AAA.bin", "\x02\x00\xCD\x02\x00");
 check_text_file("test.map", <<'END');
-var_1                           = $0002 ; addr, local, , test, BBB,
-var_2                           = $0002 ; addr, local, , test, BBB,
+var_1                           = $0002 ; addr, local, , test, BBB, test.asm:13
+var_2                           = $0002 ; addr, local, , test, BBB, test.asm:20
 __head                          = $0000 ; const, public, def, , ,
 __tail                          = $0005 ; const, public, def, , ,
 __size                          = $0005 ; const, public, def, , ,
@@ -105,7 +104,6 @@ __CCC_head                      = $0003 ; const, public, def, , ,
 __CCC_tail                      = $0005 ; const, public, def, , ,
 __CCC_size                      = $0002 ; const, public, def, , ,
 END
-
 
 unlink_testfiles();
 done_testing();

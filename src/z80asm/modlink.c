@@ -48,11 +48,13 @@ extern char *reloctable, *relocptr;
 struct linklist *linkhdr;
 int totaladdr, curroffset;
 
-static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name)
+static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name, Str *def_filename)
 {
     int scope, symbol_char;
 	sym_type_t type = TYPE_UNKNOWN;
     long value;
+	long line_nr;
+	Symbol *sym = NULL;
 
     while (TRUE)
     {
@@ -67,6 +69,10 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 		value		= xfget_int32( file );		/* read symbol (long) integer */
 		xfget_count_byte_Str( file, name );		/* read symbol name */
 
+		// read symbol definition location
+		xfget_count_byte_Str(file, def_filename);
+		line_nr = xfget_int32(file);
+
 		new_section( str_data(section_name) );		/* define CURRENTSECTION */
 
         switch ( symbol_char )
@@ -80,11 +86,17 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 
         switch ( scope )
         {
-		case 'L': define_local_sym(str_data(name), value, type); break;
-		case 'G': define_global_sym(str_data(name), value, type); break;
+		case 'L': sym = define_local_sym(str_data(name), value, type); break;
+		case 'G': sym = define_global_sym(str_data(name), value, type); break;
         default:
             error_not_obj_file( filename );
         }
+
+		// set symbol definition
+		if (sym) {
+			sym->filename = strpool_add(str_data(def_filename));
+			sym->line_nr = line_nr;
+		}
     }
 }
 
@@ -92,11 +104,13 @@ void ReadNames(char *filename, FILE *file)
 {
 	STR_DEFINE(section_name, STR_SIZE);
 	STR_DEFINE(name, STR_SIZE);
+	STR_DEFINE(def_filename, STR_SIZE);
 
-	ReadNames_1(filename, file, section_name, name);
+	ReadNames_1(filename, file, section_name, name, def_filename);
 
 	STR_DELETE(section_name);
 	STR_DELETE(name);
+	STR_DELETE(def_filename);
 }
 
 
@@ -588,6 +602,7 @@ static Bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 	Bool linked = FALSE;
 	Bool found_symbol;
 	STR_DEFINE(module_name, STR_SIZE);
+	STR_DEFINE(def_filename, STR_SIZE);
 	STR_DEFINE(symbol_name, STR_SIZE);
 	STR_DEFINE(section_name, STR_SIZE);
 
@@ -616,6 +631,8 @@ static Bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 			xfget_count_byte_Str(file, section_name);
 			xfget_int32(file);			/* value */
 			xfget_count_byte_Str(file, symbol_name);
+			xfget_count_byte_Str(file, def_filename);
+			xfget_int32(file);			/* line_nr */
 
 			if (scope == 'G' && StrHash_exists(extern_syms, str_data(symbol_name)))
 				found_symbol = TRUE;
@@ -629,6 +646,7 @@ static Bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 	}
 
 	STR_DELETE(module_name);
+	STR_DELETE(def_filename);
 	STR_DELETE(symbol_name);
 	STR_DELETE(section_name);
 

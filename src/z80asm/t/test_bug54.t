@@ -52,12 +52,12 @@ check_text_file("test.sym", <<'END');
 	asm_BIFROST2_showNext2Tiles     = $C9C2 ; const, public, , , , test.asm:11
 END
 check_text_file("test.map", <<'END');
-	here                            = $FDE8 ; addr, local, , test, ,
-	there                           = $FDE8 ; addr, local, , test, ,
-	program                         = $FDE8 ; addr, public, , test, ,
-	asm_BIFROST2_start              = $C9A9 ; addr, public, , test, ,
-	asm_BIFROST2_stop               = $C9B2 ; addr, public, , test, ,
-	asm_BIFROST2_showNext2Tiles     = $C9C2 ; const, public, , test, ,
+	here                            = $FDE8 ; addr, local, , test, , test.asm:20
+	there                           = $FDE8 ; addr, local, , test, , test.asm:21
+	program                         = $FDE8 ; addr, public, , test, , test.asm:19
+	asm_BIFROST2_start              = $C9A9 ; addr, public, , test, , test.asm:9
+	asm_BIFROST2_stop               = $C9B2 ; addr, public, , test, , test.asm:10
+	asm_BIFROST2_showNext2Tiles     = $C9C2 ; const, public, , test, , test.asm:11
 	__head                          = $FDE8 ; const, public, def, , ,
 	__tail                          = $FDE9 ; const, public, def, , ,
 	__size                          = $0001 ; const, public, def, , ,
@@ -72,22 +72,21 @@ END
 
 z80nm("test.o", <<'END');
 
-	File test.o at $0000: Z80RMF08
+	File test.o at $0000: Z80RMF09
 	  Name: test
 	  Names:
-		L A $0000 here
-		L A $0000 there
-		G A $0000 program
-		G = $0000 asm_BIFROST2_start
-		G = $0000 asm_BIFROST2_stop
-		G C $C9C2 asm_BIFROST2_showNext2Tiles
+		L A $0000 here test.asm:20
+		L A $0000 there test.asm:21
+		G A $0000 program test.asm:19
+		G = $0000 asm_BIFROST2_start test.asm:9
+		G = $0000 asm_BIFROST2_stop test.asm:10
+		G C $C9C2 asm_BIFROST2_showNext2Tiles test.asm:11
 	  Expressions:
 		E =  (test.asm:9) $0000 $0000: asm_BIFROST2_start := 51625+ASMPC-ASMPC
 		E =  (test.asm:10) $0000 $0000: asm_BIFROST2_stop := 51634+here-there
 	  Code: 1 bytes, ORG at $FDE8
 		C $0000: C9
 END
-
 
 unlink_testfiles();
 done_testing();

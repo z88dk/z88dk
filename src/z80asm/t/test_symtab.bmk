@@ -37,16 +37,6 @@ Symtab "tab":
   Symbol Two (Two) = 2, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
   Symbol Three (Three) = 3, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
   Symbol Four (Four) = 4, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-Symtab "tab by name": 
-  Symbol Four (Four) = 4, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-  Symbol One (One) = 1, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-  Symbol Three (Three) = 3, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-  Symbol Two (Two) = 2, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-Symtab "tab by value": 
-  Symbol One (One) = 1, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-  Symbol Two (Two) = 2, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-  Symbol Three (Three) = 3, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
-  Symbol Four (Four) = 4, [DEFINED TYPE_CONSTANT LOCAL ], owner = NULL
 Use local symbol before definition
 Symbol NN (NN@MODULE) = 12, [DEFINED TOUCHED TYPE_ADDRESS LOCAL ], owner = CURRENTMODULE
 Symtab "global tab": 

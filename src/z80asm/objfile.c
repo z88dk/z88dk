@@ -129,6 +129,10 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 			xfput_uint32(fp, sym->value);
 			xfput_count_byte_strz(fp, sym->name);
 
+			// write symbol definition location
+			xfput_count_byte_strz(fp, sym->filename ? sym->filename : "");
+			xfput_uint32(fp, sym->line_nr);
+
 			written++;
 		}
     }
