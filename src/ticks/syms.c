@@ -62,14 +62,23 @@ void read_symbol_file(char *filename)
             char **argv = parse_words(buf,&argc);
 
             // Ignore
-            if ( argc < 6 ) {
+            if ( argc < 9 ) {
                 free(argv);
                 continue;
             }
             if ( strncmp(argv[0], "__CLINE__",9) ) {
                 symbols = realloc(symbols, (symbols_num + 1) * sizeof(symbols[0]));
                 symbols[symbols_num].name = strdup(argv[0]);
-                symbols[symbols_num].file = strdup(argv[5]);
+                symbols[symbols_num].file = strdup(argv[8]);
+                symbols[symbols_num].section = strdup(argv[8]); // TODO, comma
+                symbols[symbols_num].islocal = 0;
+                if ( strcmp(argv[5], "local,")) {
+                    symbols[symbols_num].islocal = 1;
+                }
+                symbols[symbols_num].symtype = SYM_ADDRESS;
+                if ( strcmp(argv[4],"const,") == 0 ) {
+                    symbols[symbols_num].symtype = SYM_CONST;
+                }
                 symbols[symbols_num].address = strtol(argv[2] + 1, NULL, 16);
                 symbols_num++;
             } else {
@@ -102,7 +111,7 @@ void read_symbol_file(char *filename)
     qsort(symbols, symbols_num, sizeof(symbols[0]),symbol_compare);
 }
 
-static int bsearch_find(const void *key, const void *elem)
+static int bsearch_find_byaddress(const void *key, const void *elem)
 {
      int val = *(int *)key;
      const symbol *sym = elem;
@@ -157,7 +166,7 @@ int symbol_resolve(char *name)
 
 const char *find_symbol(int addr)
 {
-    symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find);
+    symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find_byaddress);
     return sym ? sym->name : NULL;
 }
 

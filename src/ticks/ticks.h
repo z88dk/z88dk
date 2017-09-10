@@ -11,11 +11,18 @@
 #include "uthash.h"
 #include "utlist.h"
 
+typedef enum {
+    SYM_CONST = 1,
+    SYM_ADDRESS = 2,
+} symboltype;
 
 typedef struct {
     const char    *name;
     const char    *file;
     int            address;
+    symboltype     symtype;
+    char           islocal;
+    const char    *section;
 } symbol;
 
 
