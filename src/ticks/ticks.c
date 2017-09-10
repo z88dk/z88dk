@@ -589,7 +589,7 @@ void setf(int a){
 }
 
 int main (int argc, char **argv){
-  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0;
+  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, trace=0;
   char * output= NULL;
   FILE * fh;
 
@@ -603,6 +603,7 @@ int main (int argc, char **argv){
     printf("  ticks <input_file> [-pc X] [-start X] [-end X] [-counter X] [-output <file>]\n\n"),
     printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n"),
     printf("  -tape <file>   emulates ZX tape in port $FE from a .WAV file\n"),
+    printf("  -trace         outputs register values and disassembly while executing\n"),
     printf("  -pc X          X in hexadecimal is the initial PC value\n"),
     printf("  -start X       X in hexadecimal is the PC condition to start the counter\n"),
     printf("  -end X         X in hexadecimal is the PC condition to exit\n"),
@@ -666,32 +667,43 @@ int main (int argc, char **argv){
           output= argv[1];
           break;
         case 't':
-          ft= fopen(argv[1], "rb");
-          if( !ft )
-            printf("\nTape file not found: %s\n", argv[1]),
+          if (strcmp(&argv[0][1], "tape") == 0) {
+            ft= fopen(argv[1], "rb");
+            if( !ft )
+              printf("\nTape file not found: %s\n", argv[1]),
+              exit(-1);
+            (void)fread(tapbuf, 1, 0x20000, ft);
+            memcpy(&wavlen, tapbuf+4, 4);
+            wavlen+= 8;
+            if( *(int*) tapbuf != 0x46464952 )
+              printf("\nInvalid WAV header\n"),
+              exit(-1);
+            if( *(int*)(tapbuf+16) != 16 )
+              printf("\nInvalid subchunk size\n"),
+              exit(-1);
+            if( *(int*)(tapbuf+20) != 0x10001 )
+              printf("\nInvalid number of channels or compression (only Mono and PCM allowed)\n"),
+              exit(-1);
+            if( *(int*)(tapbuf+24) != 44100 )
+              printf("\nInvalid sample rate (only 44100Hz allowed)\n"),
+              exit(-1);
+            if( *(int*)(tapbuf+32) != 0x80001 )
+              printf("\nInvalid align or bits per sample (only 8-bits samples allowed)\n"),
+              exit(-1);
+            if( *(int*)(tapbuf+40)+44 != wavlen )
+              printf("\nInvalid header size\n"),
+              exit(-1);
+            wavpos= 44;
+          }
+          else if (strcmp(&argv[0][1], "trace") == 0) {
+            trace = 1;
+            argv--;
+            argc++;
+          }
+          else {
+            printf("\nWrong Argument: %s\n", argv[0]);
             exit(-1);
-          (void)fread(tapbuf, 1, 0x20000, ft);
-          memcpy(&wavlen, tapbuf+4, 4);
-          wavlen+= 8;
-          if( *(int*) tapbuf != 0x46464952 )
-            printf("\nInvalid WAV header\n"),
-            exit(-1);
-          if( *(int*)(tapbuf+16) != 16 )
-            printf("\nInvalid subchunk size\n"),
-            exit(-1);
-          if( *(int*)(tapbuf+20) != 0x10001 )
-            printf("\nInvalid number of channels or compression (only Mono and PCM allowed)\n"),
-            exit(-1);
-          if( *(int*)(tapbuf+24) != 44100 )
-            printf("\nInvalid sample rate (only 44100Hz allowed)\n"),
-            exit(-1);
-          if( *(int*)(tapbuf+32) != 0x80001 )
-            printf("\nInvalid align or bits per sample (only 8-bits samples allowed)\n"),
-            exit(-1);
-          if( *(int*)(tapbuf+40)+44 != wavlen )
-            printf("\nInvalid header size\n"),
-            exit(-1);
-          wavpos= 44;
+          }
           break;
         case '-':
           while ( argc > 1 ) {
@@ -826,6 +838,7 @@ int main (int argc, char **argv){
 
 
   do{
+    char buf[256];
     if ( debugger_enabled && ih ) debugger();
     if( pc==start )
       st= 0,
@@ -856,8 +869,14 @@ int main (int argc, char **argv){
     if( tap && st>sttap )
       sttap= st+( tap= tapcycles() );
     r++;
-// printf("pc=%04X, [pc]=%02X, bc=%04X, de=%04X, hl=%04X, af=%04X, ix=%04X, iy=%04X\n",
-//         pc, mem[pc], c|b<<8, e|d<<8, l|h<<8, f()|a<<8, xl|xh<<8, yl|yh<<8);
+    if (trace) {
+      printf("pc=%04X, [pc]=%02X, bc=%04X, de=%04X, hl=%04X, af=%04X, ix=%04X, iy=%04X\n"
+             "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
+             pc, mem[pc], c | b << 8, e | d << 8, l | h << 8, f() | a << 8, xl | xh << 8, yl | yh << 8,
+             (f() & 0x80) ? 1 : 0, (f() & 0x40) ? 1 : 0, (f() & 0x10) ? 1 : 0, (f() & 0x04) ? 1 : 0, (f() & 0x02) ? 1 : 0, (f() & 0x01) ? 1 : 0);
+      disassemble(pc, buf, sizeof(buf));
+      printf("%s\n", buf);
+    }
     switch( mem[pc++] ){
       case 0x00: // NOP
       case 0x40: // LD B,B
