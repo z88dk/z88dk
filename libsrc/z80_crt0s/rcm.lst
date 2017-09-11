@@ -1,10 +1,4 @@
 crt0_rcm/l_asr_u.asm	
 crt0_rcm/l_mult.asm
-z80_emu/rcmx_cpd
-z80_emu/rcmx_cpdr
-z80_emu/rcmx_cpi
-z80_emu/rcmx_cpir
-z80_emu/rcmx_rld
-z80_emu/rcmx_rrd
 @crt0.lst
 
