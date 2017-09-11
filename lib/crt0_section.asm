@@ -65,6 +65,7 @@ ENDIF
 		SECTION code_l_sccz80
 		SECTION code_l
 		SECTION code_compress_zx7
+		SECTION code_esxdos
 		SECTION code_fp
 		SECTION code_fp_math48
 		SECTION code_math
