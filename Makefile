@@ -126,10 +126,12 @@ testsuite:
 
 install-clean:
 	$(MAKE) -C libsrc install-clean
+	$(RM) lib/z80asm*.lib
 
 clean: clean-bins
 	$(MAKE) -C libsrc clean
 	$(RM) lib/clibs/*.lib
+	$(RM) lib/z80asm*.lib
 
 
 clean-bins:

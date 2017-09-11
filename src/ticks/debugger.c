@@ -15,12 +15,16 @@
 
 typedef enum {
     BREAK_PC,
-    BREAK_REG
+    BREAK_CHECK8,
+    BREAK_CHECK16
 } breakpoint_type;
 
 typedef struct breakpoint {
-    breakpoint_type   type;
-    int               value;
+    breakpoint_type    type;
+    int                value;
+    void              *check_ptr;
+    char               enabled;
+    char              *text;
     struct breakpoint *next;
 } breakpoint;
 
@@ -69,9 +73,9 @@ static command commands[] = {
 
 static breakpoint *breakpoints;
 
-static int debugger_active = 1;
+       int debugger_active = 0;
 static int next_address = -1;
-static int trace = 0;
+       int trace = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
 static int hotspots[65536];
@@ -105,6 +109,7 @@ void debugger()
     char  *line;
 
     if ( trace ) {
+        cmd_registers(0, NULL);
         disassemble(pc, buf, sizeof(buf));
         printf("%s\n",buf);     
     }
@@ -121,8 +126,23 @@ void debugger()
         int         i = 1;
         int         dodebug = 0;
         LL_FOREACH(breakpoints, elem) {
+            if ( elem->enabled == 0 ) {
+                continue;
+            }
             if ( elem->type == BREAK_PC && elem->value == pc ) {
                 printf("Hit breakpoint %d\n",i);
+                dodebug=1;
+                break;
+            } else if ( elem->type == BREAK_CHECK8 && *(uint8_t *)elem->check_ptr == elem->value ) {
+                printf("Hit breakpoint %d\n",i);
+                elem->enabled = 0;
+                dodebug=1;
+                break;
+            } else if ( elem->type == BREAK_CHECK16 && 
+                        *(uint8_t *)elem->check_ptr == (elem->value % 256) &&
+                         *(((uint8_t *)elem->check_ptr)+1) == (elem->value %65536) / 256 ) {
+                printf("Hit breakpoint %d\n",i);
+                elem->enabled = 0;
                 dodebug=1;
                 break;
             }
@@ -242,13 +262,12 @@ static int cmd_disassemble(int argc, char **argv)
 
 static int cmd_registers(int argc, char **argv) 
 {
-    printf("pc\t%04x\t\tsp\t%04x\n", pc,sp);
-    
-    printf("a\t%02x\t\ta'\t%02x\n",a,a_);
-    printf("hl\t%02x%02x\t\thl'\t%02x%02x\n", h, l, h_, l_);
-    printf("de\t%02x%02x\t\tde'\t%02x%02x\n", d, e, d_, e_);
-    printf("bc\t%02x%02x\t\tbc'\t%02x%02x\n", b, c, b_, c_);
-    printf("ix\t%02x%02x\t\tiy\t%02x%02x\n", xh, xl, yh, yl);
+   printf("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
+          "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
+          "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
+          pc, get_memory(pc), c | b << 8, e | d << 8, l | h << 8, f() | a << 8, xl | xh << 8, yl | yh << 8,
+          sp, (get_memory(sp+1) << 8 | get_memory(sp)), c_ | b_ << 8, e_ | d_ << 8, l_ | h_ << 8, f_() | a_ << 8,
+          (f() & 0x80) ? 1 : 0, (f() & 0x40) ? 1 : 0, (f() & 0x10) ? 1 : 0, (f() & 0x04) ? 1 : 0, (f() & 0x02) ? 1 : 0, (f() & 0x01) ? 1 : 0);
     
     return 0;
 }
@@ -262,10 +281,16 @@ static int cmd_break(int argc, char **argv)
         /* Just show the breakpoints */
         LL_FOREACH(breakpoints, elem) {
             if ( elem->type == BREAK_PC) {
-                printf("%d:\tPC = $%04x\n",i, elem->value);
+                printf("%d:\tPC = $%04x%s\n",i, elem->value,elem->enabled ? "" : " (disabled)");
+            } else if ( elem->type == BREAK_CHECK8 ) {
+                printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+            } else if ( elem->type == BREAK_CHECK16 ) {
+                printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
             }
             i++;
         }
+    } else if ( argc == 2 && strcmp(argv[2],"--help") == 0 ) {
+        printf("Breakpoint help - to be written\n");
     } else if ( argc == 2 ) {
         char *end;
         const char *sym;
@@ -276,6 +301,7 @@ static int cmd_break(int argc, char **argv)
             elem = malloc(sizeof(*elem));
             elem->type = BREAK_PC;
             elem->value = value;
+            elem->enabled = 1;
             LL_APPEND(breakpoints, elem);
             sym = find_symbol(value);
             printf("Adding breakpoint at '%s' $%04x (%s)\n",argv[1], value,  sym ? sym : "<unknown>");
@@ -286,6 +312,7 @@ static int cmd_break(int argc, char **argv)
                 elem = malloc(sizeof(*elem));
                 elem->type = BREAK_PC;
                 elem->value = value;
+                elem->enabled = 1;
                 LL_APPEND(breakpoints, elem);
                 sym = find_symbol(value);
                 printf("Adding breakpoint at '%s', $%04x (%s)\n",argv[1], value, sym ? sym : "<unknown>");
@@ -296,15 +323,73 @@ static int cmd_break(int argc, char **argv)
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
-
         LL_FOREACH(breakpoints, elem) {
             num--;
             if ( num == 0 ) {
                 printf("Deleting breakpoint %d\n",atoi(argv[2]));
-                LL_DELETE(breakpoints,elem);
+                LL_DELETE(breakpoints,elem); // TODO: Freeing
                 break;
             }
-        }          
+        }  
+    } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
+        int num = atoi(argv[2]);
+        breakpoint *elem;
+        LL_FOREACH(breakpoints, elem) {
+            num--;
+            if ( num == 0 ) {
+                printf("Disabling breakpoint %d\n",atoi(argv[2]));
+                elem->enabled = 0;
+                break;
+            }
+        }    
+   } else if ( argc == 3 && strcmp(argv[1],"enable") == 0 ) {
+        int num = atoi(argv[2]);
+        breakpoint *elem;
+        LL_FOREACH(breakpoints, elem) {
+            num--;
+            if ( num == 0 ) {
+                printf("Enabling breakpoint %d\n",atoi(argv[2]));
+                elem->enabled = 1;
+                break;
+            }
+        }              
+    } else if ( argc == 5 && strcmp(argv[1], "memory8") == 0 ) {
+        // break memory8 <addr> = <value>
+        char  *end;
+        int value = strtol(argv[2], &end,0);
+        
+        if ( end == argv[2] ) {
+            value =  symbol_resolve(argv[2]);
+        }
+       
+        if ( value != -1 ) {
+            breakpoint *elem = malloc(sizeof(*elem));
+            elem->type = BREAK_CHECK8;
+            elem->check_ptr = &mem[value % 65536];
+            elem->value = atoi(argv[4]);
+            elem->enabled = 1;
+            elem->text = strdup(argv[2]);
+            LL_APPEND(breakpoints, elem);
+        }      
+    } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
+        char  *end;
+        int value = strtol(argv[2], &end,0);
+        
+        if ( end == argv[2] ) {
+            value =  symbol_resolve(argv[2]);
+        }
+       
+        if ( value != -1 ) {
+            breakpoint *elem = malloc(sizeof(*elem));
+            elem->type = BREAK_CHECK16;
+            elem->check_ptr = &mem[value % 65536];
+            elem->value = atoi(argv[4]);
+            elem->enabled = 1;
+            elem->text = strdup(argv[2]);
+            LL_APPEND(breakpoints, elem);
+        }      
+    } else if ( argc == 5 && strncmp(argv[1], "reg",3) == 0 ) {
+        
     }
     return 0;
 }
