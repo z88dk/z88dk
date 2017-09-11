@@ -23,15 +23,18 @@ for my $cpu (@CPUS) {
 	for my $carry (0, 1) {
 		for my $data (1, 2, 3) {
 			my $a = 2;
+			my $de = 0x4321;
 			for my $bc (2, 1) {
 				for my $op (qw( cpi cpd cpir cpdr )) {
 					next if $bc != 1 && $op =~ /cpir|cpdr/;
 					$test_nr++;
-					note "Test $test_nr: cpu: $cpu, carry:$carry, data: $data, a: $a, bc: $bc, op: $op";
+					note "Test $test_nr: cpu:$cpu, carry:$carry, data:$data, a:$a, bc:$bc, op:$op";
 					my $carry_set = $carry ? "scf" : "and a";
 					my $r = ticks(<<END, "--cpu=$cpu -b -m -l");
 						defc data = 0x100
 								$carry_set
+								ld de, $de
+
 								ld hl, data
 								ld (hl), $data
 								ld a, $a
@@ -49,6 +52,7 @@ END
 					is $r->{F_C}, $carry,					  "C";					
 					is $r->{HL}, $op =~ /cpi/ ? 0x101 : 0x0FF,"HL";
 					is $r->{BC}, $bc - 1,					  "BC";
+					is $r->{DE}, $de,						  "DE";
 					
 					# die if $test_nr == 37;
 				}
@@ -63,8 +67,9 @@ for my $cpu (@CPUS) {
 		for my $op (qw( cpir cpdr )) {
 			for my $data (1, 2, 3) {
 				my $a = 2;
+				my $de = 0x4321;
 				$test_nr++;
-				note "Test $test_nr: cpu: $cpu, carry:$carry, data: $data, a: $a, op: $op";
+				note "Test $test_nr: cpu:$cpu, carry:$carry, data:$data, a:$a, op:$op";
 				my $carry_set = $carry ? "scf" : "and a";
 				my $start = $op =~ /cpir/ ? 'data' : 'end-1';
 				my $r = ticks(<<END, "--cpu=$cpu -b");
@@ -73,6 +78,8 @@ for my $cpu (@CPUS) {
 						.end
 								
 						.start	$carry_set
+								ld de, $de
+
 								ld hl, $start
 								ld a, $a
 								ld bc, end-data
@@ -97,8 +104,60 @@ END
 											   : 0x02-1,  	"HL";
 					is $r->{BC}, 0,						  	"BC";
 				}
+				is $r->{DE}, $de,							"DE";
 					
 				# die if $test_nr == 73;
+			}
+		}
+	}
+}
+
+# RLD / RRD
+for my $cpu (@CPUS) {
+	for my $carry (0, 1) {
+		for my $op (qw( rld rrd )) {
+			for my $a (0x12, 0xF2, 0x01) {
+				for my $data (0x34, 0x01) {
+					my $bc = 0x8765;
+					my $de = 0x4321;
+					$test_nr++;
+					note "Test $test_nr: cpu:$cpu, carry:$carry, a:$a, data:$data, op:$op";
+					my $carry_set = $carry ? "scf" : "and a";
+					my $r = ticks(<<END, "--cpu=$cpu -b");
+						defc data = 0x100
+								$carry_set
+								ld bc, $bc
+								ld de, $de
+
+								ld hl, data
+								ld (hl), $data
+								ld a, $a
+								
+								$op
+								
+								rst 0
+END
+					my $exp_a = ($a & 0xF0) | 
+								($op eq 'rld' ? ($data >> 4) & 0x0F 
+											  : $data & 0x0F);
+					my $exp_data = $op eq 'rld' ? 
+						(($data << 4) & 0xF0) | ($a & 0x0F) : 
+						(($data >> 4) & 0x0F) | (($a << 4) & 0xF0);
+
+					is $r->{A}, $exp_a, 						"A";
+					is $r->{mem}[0x100], $exp_data,				"(HL)";
+					
+					is $r->{F_S}, ($exp_a & 0x80	? 1 : 0), 	"S";
+					is $r->{F_Z}, ($exp_a == 0 		? 1 : 0), 	"Z";
+					is $r->{F_H}, 0,						 	"Hf";
+					is $r->{F_PV}, parity($exp_a),			 	"PV";
+					is $r->{F_N}, 0,						  	"N";
+					is $r->{F_C}, $carry,					  	"C";
+					is $r->{BC}, $bc,							"BC";
+					is $r->{DE}, $de,							"DE";
+						
+					# die if $test_nr == 73;
+				}
 			}
 		}
 	}
@@ -107,3 +166,16 @@ END
 unlink_testfiles();
 done_testing();
 
+sub parity {
+	my($a) = @_;
+	my $bits = 0;
+	$bits++ if $a & 0x80;
+	$bits++ if $a & 0x40;
+	$bits++ if $a & 0x20;
+	$bits++ if $a & 0x10;
+	$bits++ if $a & 0x08;
+	$bits++ if $a & 0x04;
+	$bits++ if $a & 0x02;
+	$bits++ if $a & 0x01;
+	return ($bits & 1) == 0 ? 1 : 0;
+}
