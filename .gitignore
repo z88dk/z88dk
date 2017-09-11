@@ -53,8 +53,8 @@ win32/zpragma/Debug/
 win32/zx7/Debug/
 win32/zpragma/Release/
 win32/zx7/Release/
-win32/z88dk-install/Debug/
-win32/z88dk-install/Release/
+win32/z88dk-lib/Debug/
+win32/z88dk-lib/Release/
 win32/.vs/
 win32/z88dk.VC.VC.opendb
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/asm_NIRVANAP.asm

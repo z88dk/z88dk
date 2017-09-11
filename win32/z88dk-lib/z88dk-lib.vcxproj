@@ -19,17 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z88dk-install\z88dk-install.c" />
+    <ClCompile Include="..\..\src\z88dk-lib\z88dk-lib.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z88dk-install\dirent.h" />
+    <ClInclude Include="..\..\src\z88dk-lib\dirent.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FD985972-6500-4DCA-AE01-390180135C97}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>z88dk-install</RootNamespace>
+    <RootNamespace>z88dk-lib</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>z88dk-install</ProjectName>
+    <ProjectName>z88dk-lib</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

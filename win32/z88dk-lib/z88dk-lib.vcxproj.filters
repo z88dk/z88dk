@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z88dk-install\z88dk-install.c">
+    <ClCompile Include="..\..\src\z88dk-lib\z88dk-lib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z88dk-install\dirent.h">
+    <ClInclude Include="..\..\src\z88dk-lib\dirent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

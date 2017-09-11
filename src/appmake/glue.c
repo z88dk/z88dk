@@ -137,7 +137,7 @@ int glue_exec(char *target)
 
                 // check if there's a corresponding binary file
 
-                if ((strcmp(symbol_name + i - 4, "head") == 0) && (stat(filename, &st_file) >= 0))
+                if ((strcmp(symbol_name + i - 4, "head") == 0) && (stat(filename, &st_file) >= 0) && (st_file.st_size > 0))
                 {
                     // found a section binary, find out which memory bank it belongs to
 
@@ -227,7 +227,7 @@ int glue_exec(char *target)
             k = 0;
             for (j = 0; j < memory_banks[i].num; ++j)
             {
-                if ((memory_banks[i].array[j].org + memory_banks[i].array[j].size) > 0xffff)
+                if ((memory_banks[i].array[j].org + memory_banks[i].array[j].size) > 0x10000)
                 {
                     fprintf(stderr, "Error: section %s overruns 64k memory space [0x%04x,0x%04x]\n", memory_banks[i].array[j].section_name, memory_banks[i].array[j].org, memory_banks[i].array[j].org + memory_banks[i].array[j].size - 1);
                     k = 1;
