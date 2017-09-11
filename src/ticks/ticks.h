@@ -46,6 +46,12 @@ extern unsigned char *mem;
 extern long long st;
 
 extern int c_cpu;
+extern int trace;
+extern int debugger_active;
+
+/* Break down flags */
+extern int f(void);
+extern int f_(void);
 
 #define SET_ERROR(error) do {                   \
         if ( (error) == Z88DK_ENONE ) {           \

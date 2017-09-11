@@ -73,9 +73,9 @@ static command commands[] = {
 
 static breakpoint *breakpoints;
 
-static int debugger_active = 1;
+       int debugger_active = 0;
 static int next_address = -1;
-static int trace = 0;
+       int trace = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
 static int hotspots[65536];
@@ -109,6 +109,7 @@ void debugger()
     char  *line;
 
     if ( trace ) {
+        cmd_registers(0, NULL);
         disassemble(pc, buf, sizeof(buf));
         printf("%s\n",buf);     
     }
@@ -261,13 +262,12 @@ static int cmd_disassemble(int argc, char **argv)
 
 static int cmd_registers(int argc, char **argv) 
 {
-    printf("pc\t%04x\t\tsp\t%04x\n", pc,sp);
-    
-    printf("a\t%02x\t\ta'\t%02x\n",a,a_);
-    printf("hl\t%02x%02x\t\thl'\t%02x%02x\n", h, l, h_, l_);
-    printf("de\t%02x%02x\t\tde'\t%02x%02x\n", d, e, d_, e_);
-    printf("bc\t%02x%02x\t\tbc'\t%02x%02x\n", b, c, b_, c_);
-    printf("ix\t%02x%02x\t\tiy\t%02x%02x\n", xh, xl, yh, yl);
+   printf("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
+          "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
+          "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
+          pc, get_memory(pc), c | b << 8, e | d << 8, l | h << 8, f() | a << 8, xl | xh << 8, yl | yh << 8,
+          sp, (get_memory(sp+1) << 8 | get_memory(sp)), c_ | b_ << 8, e_ | d_ << 8, l_ | h_ << 8, f_() | a_ << 8,
+          (f() & 0x80) ? 1 : 0, (f() & 0x40) ? 1 : 0, (f() & 0x10) ? 1 : 0, (f() & 0x04) ? 1 : 0, (f() & 0x02) ? 1 : 0, (f() & 0x01) ? 1 : 0);
     
     return 0;
 }
