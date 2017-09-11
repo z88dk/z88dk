@@ -479,7 +479,6 @@
 
 FILE * ft;
 unsigned char * tapbuf;
-int    debugger_enabled = 0;
   
 int     v
       , wavpos= 0
@@ -582,6 +581,17 @@ int f(void){
             : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4;
 }
 
+int f_(void){
+  return  ff_ & 168
+        | ff_ >> 8 & 1
+        | !fr_ << 6
+        | fb_ >> 8 & 2
+        | (fr_ ^ fa_ ^ fb_ ^ fb_ >> 8) & 16
+        | (fa_ & -256 
+            ? 154020 >> ((fr_ ^ fr_ >> 4) & 15)
+            : ((fr_ ^ fa_) & (fr_ ^ fb_)) >> 5) & 4;
+}
+
 void setf(int a){
   fr= ~a & 64;
   ff= a|= a<<8;
@@ -589,13 +599,14 @@ void setf(int a){
 }
 
 int main (int argc, char **argv){
-  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, trace=0;
+  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0;
   char * output= NULL;
   FILE * fh;
 
   mem = calloc(0x10000, 1);
 
   hook_init();
+  debugger_init();
 
   tapbuf= (unsigned char *) malloc (0x20000);
   if( argc==1 )
@@ -642,8 +653,7 @@ int main (int argc, char **argv){
           counter<0 && (counter= 9e18);
           break;
         case 'd':
-          debugger_init();
-          debugger_enabled = 1;
+          debugger_active = 1;
           argv--;
           argc++;
           break;
@@ -696,6 +706,7 @@ int main (int argc, char **argv){
             wavpos= 44;
           }
           else if (strcmp(&argv[0][1], "trace") == 0) {
+            debugger_active = 0;
             trace = 1;
             argv--;
             argc++;
@@ -839,7 +850,7 @@ int main (int argc, char **argv){
 
   do{
     char buf[256];
-    if ( debugger_enabled && ih ) debugger();
+    if ( ih ) debugger();
     if( pc==start )
       st= 0,
       stint= intr,
@@ -869,14 +880,6 @@ int main (int argc, char **argv){
     if( tap && st>sttap )
       sttap= st+( tap= tapcycles() );
     r++;
-    if (trace) {
-      printf("pc=%04X, [pc]=%02X, bc=%04X, de=%04X, hl=%04X, af=%04X, ix=%04X, iy=%04X\n"
-             "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
-             pc, mem[pc], c | b << 8, e | d << 8, l | h << 8, f() | a << 8, xl | xh << 8, yl | yh << 8,
-             (f() & 0x80) ? 1 : 0, (f() & 0x40) ? 1 : 0, (f() & 0x10) ? 1 : 0, (f() & 0x04) ? 1 : 0, (f() & 0x02) ? 1 : 0, (f() & 0x01) ? 1 : 0);
-      disassemble(pc, buf, sizeof(buf));
-      printf("%s\n", buf);
-    }
     switch( mem[pc++] ){
       case 0x00: // NOP
       case 0x40: // LD B,B
