@@ -23,7 +23,7 @@ CROSS ?= 0
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
 
-all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite z88dk-install
+all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite z88dk-lib
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -85,9 +85,9 @@ ticks:
 	$(MAKE) -C src/ticks
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
-z88dk-install:
-	$(MAKE) -C src/z88dk-install
-	$(MAKE) -C src/z88dk-install PREFIX=`pwd` install
+z88dk-lib:
+	$(MAKE) -C src/z88dk-lib
+	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
 
 
 libs:
@@ -106,7 +106,7 @@ install: install-clean
 	cd src/zx7 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80nm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/ticks ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z88dk-install ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/z88dk-lib ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd support/graphics; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{}  \;
 	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{}  \;
@@ -145,7 +145,7 @@ clean-bins:
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
-	$(MAKE) -C src/z88dk-install clean
+	$(MAKE) -C src/z88dk-lib clean
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 .PHONY: test testsuite
