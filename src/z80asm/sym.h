@@ -37,6 +37,8 @@ typedef enum {
 										   that has this symbol as target */
 } sym_type_t;
 
+extern char *sym_type_str[];
+
 /*-----------------------------------------------------------------------------
 *   Scope of symbol
 *	Initially defined as LOCAL
@@ -47,6 +49,8 @@ typedef enum {
 	SCOPE_EXTERN,						/* not defined and imported */
 	SCOPE_GLOBAL,						/* PUBLIC if defined, EXTERN if not defined */
 } sym_scope_t;
+
+extern char *sym_scope_str[];
 
 /*-----------------------------------------------------------------------------
 *   Symbol
@@ -64,6 +68,8 @@ CLASS( Symbol )
 	Bool			is_global_def : 1;	/* true for __head, __tail, __size symbols */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
+	char		   *filename;			/* file where defined */
+	int				line_nr;			/* line where defined */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------

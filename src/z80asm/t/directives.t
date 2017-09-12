@@ -322,177 +322,6 @@ z80asm(asm => "x1: DEFS 65529,0xAA \n x2: DEFQ 0xAAAAAAAA, 0xAAAAAAAA ;; error: 
 
 
 #------------------------------------------------------------------------------
-# DEFVARS - simple use tested in opcodes.t
-# test multi-file and error messages here
-#------------------------------------------------------------------------------
-z80asm(
-	asm		=> <<END,
-	defc defvars_base = 0x80			
-	defvars defvars_base				
-										
-	{									
-		df1 ds.b 4;						; df1 = 0x80
-		df2 ds.w 2;						; df2 = 0x80 + 4 = 0x84
-		df3 ds.p 2;						; df3 = 0x84 + 2*2 = 0x88
-		df4 ds.q 2;						; df4 = 0x88 + 2*3 = 0x8E
-		df5 							; df5 = 0x8E + 2*4 = 0x96
-										
-	}									
-	defb df1, df2, df3, df4, df5		;; 80 84 88 8E 96
-END
-	asm1	=> <<END,
-	defvars -1 ; continue after df5		
-	{									
-		df9  ds.b 1						; df9 = 0x96
-		df10 ds.b 1						; df10 = 0x97
-		df11							; df11 = 0x98
-		df12							; df12 = 0x98
-	}									
-	defb df9, df10, df11, df12			;; 96 97 98 98
-END
-	asm2 	=> <<END,
-	defvars -1 ; continue after df12	
-	{									
-		df16 ds.b 1						; df16 = 0x98
-		df17 ds.b 1						; df17 = 0x99
-		df18							; df18 = 0x9A
-	}									
-	defb df16, df17, df18				;; 98 99 9A
-END
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars -1 ; continue from 0
-	{
-		df1	ds.b 1
-	}
-	defb df1							;; 00
-END
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars 0
-	{
-		df1	ds.q 10
-		df2	ds.q 16383					;; error: integer '65572' out of range
-	}
-END
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars 0
-	{
-		df2	ds.q 16384					;; error: integer '65536' out of range
-	}
-END
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars 							;; error: syntax error
-END
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars 0
-END
-	error	=> "Error at file 'test.asm' line 2: missing {} block",
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars 0 {
-END
-	error	=> "Error at file 'test.asm' line 2: {} block not closed",
-);
-
-z80asm(
-	asm 	=> <<END,
-	defvars undefined					;; error: symbol 'undefined' not defined
-	{
-		df2	ds.q 1
-	}
-END
-);
-
-# BUG_0051: DEFC and DEFVARS constants do not appear in map file
-z80asm(
-	asm		=> <<'ASM',
-			public minus_d_var, defc_var, defvars_var, public_label
-			defc defc_var = 2
-			defvars 3 { 
-			defvars_var ds.b 1
-			}
-		public_label: 
-			defb minus_d_var	;; 01
-			defb defc_var		;; 02
-			defb defvars_var	;; 03
-			defb public_label	;; 04
-			defb local_label 	;; 09
-		local_label:
-ASM
-	options	=> "-r4 -b -m -g -Dminus_d_var"
-);
-
-eq_or_diff scalar(read_file("test.def")), <<'END', "test.def";
-DEFC minus_d_var                     = $0001 ;   test
-DEFC defc_var                        = $0002 ;   test
-DEFC defvars_var                     = $0003 ;   test
-DEFC public_label                    = $0004 ;   test
-END
-
-eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
-minus_d_var                     = $0001 ; G test
-defc_var                        = $0002 ; G test
-defvars_var                     = $0003 ; G test
-__head                          = $0004 ; G 
-public_label                    = $0004 ; G test
-__size                          = $0005 ; G 
-__tail                          = $0009 ; G 
-local_label                     = $0009 ; L test
-END
-
-# Empty sections do not appear in the map file, except "" section
-z80asm(
-	asm		=> <<'ASM',
-				; empty			;; 
-ASM
-	options	=> "-b -m",
-	ok		=> 1,
-);
-
-eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
-__head                          = $0000 ; G 
-__size                          = $0000 ; G 
-__tail                          = $0000 ; G 
-END
-
-z80asm(
-	asm		=> <<'ASM',
-				section empty
-				section code
-				nop				;; 00
-ASM
-	options	=> "-b -m"
-);
-
-eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
-__code_head                     = $0000 ; G 
-__empty_head                    = $0000 ; G 
-__empty_size                    = $0000 ; G 
-__empty_tail                    = $0000 ; G 
-__head                          = $0000 ; G 
-__code_size                     = $0001 ; G 
-__code_tail                     = $0001 ; G 
-__size                          = $0001 ; G 
-__tail                          = $0001 ; G 
-END
-
-#------------------------------------------------------------------------------
 # MODULE
 #------------------------------------------------------------------------------
 
@@ -504,10 +333,10 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 main
+    L A $0000 main test.asm:1
   Code: 1 bytes
     C $0000: C9
 END
@@ -521,10 +350,10 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: lib
   Names:
-    L A $0000 main
+    L A $0000 main test.asm:2
   Code: 1 bytes
     C $0000: C9
 END
@@ -539,14 +368,13 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: lib2
   Names:
-    L A $0000 main
+    L A $0000 main test.asm:3
   Code: 1 bytes
     C $0000: C9
 END
-
 
 
 #------------------------------------------------------------------------------
@@ -779,15 +607,16 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 __C_LINE_10
-    L A $0003 __C_LINE_20
-    L A $0006 __C_LINE_30
+    L A $0000 __C_LINE_10 test.asm:2
+    L A $0003 __C_LINE_20 test.asm:4
+    L A $0006 __C_LINE_30 test.asm:6
   Code: 9 bytes, ORG at $0100
     C $0000: 01 01 01 11 11 11 21 21 21
 END
+
 
 #------------------------------------------------------------------------------
 # BINARY

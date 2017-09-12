@@ -10,18 +10,14 @@
 # Test https://github.com/z88dk/z88dk/issues/65
 # z80asm: separate BSS section not generated from object file if BSS org was -1 at assembly time
 
-use Modern::Perl;
-use Capture::Tiny::Extended 'capture';
-BEGIN { 
-	use lib '.'; 
-	use t::TestZ80asm;
-	use t::Listfile;
-};
+use strict;
+use warnings;
+use v5.10;
+use Test::More;
+require './t/testlib.pl';
 
-my($out, $err, $exit);
 
-unlink "test.o", "test.bin", "test_CODE.bin", "test_DATA.bin", "test_BSS.bin";
-write_file("test.asm", <<'END');
+my $asm = <<'END';
 	section CODE
 	ret
 	section DATA
@@ -31,24 +27,24 @@ write_file("test.asm", <<'END');
 	org -1	; split file here
 	defw 1
 END
-($out, $err, $exit) = capture { system "./z80asm -b test.asm"; };
-is $out, "";
-is $err, "";
-is $exit, 0;
-test_binfile("test.bin", 		pack("C*", 0xC9));
-test_binfile("test_DATA.bin", 	pack("C*", 0x00, 0x00));
-test_binfile("test_BSS.bin", 	pack("C*", 0x01, 0x00));
 
-unlink "test.o", "test.bin", "test_CODE.bin", "test_DATA.bin", "test_BSS.bin";
-($out, $err, $exit) = capture { system "./z80asm test.asm"; };
-is $out, "";
-is $err, "";
-is $exit, 0;
-($out, $err, $exit) = capture { system "./z80asm -b test.o"; };
-is $out, "";
-is $err, "";
-is $exit, 0;
-test_binfile("test.bin", 		pack("C*", 0xC9));
-test_binfile("test_DATA.bin", 	pack("C*", 0x00, 0x00));
-test_binfile("test_BSS.bin", 	pack("C*", 0x01, 0x00));
 
+# compile and link in one step
+unlink_testfiles();
+z80asm($asm);
+check_bin_file("test.bin", 		pack("C*", 0xC9));
+check_bin_file("test_DATA.bin", pack("C*", 0x00, 0x00));
+check_bin_file("test_BSS.bin", 	pack("C*", 0x01, 0x00));
+
+
+# compile and link in two step
+unlink_testfiles();
+z80asm($asm, "");
+run("z80asm -b test.o");
+check_bin_file("test.bin", 		pack("C*", 0xC9));
+check_bin_file("test_DATA.bin", 	pack("C*", 0x00, 0x00));
+check_bin_file("test_BSS.bin", 	pack("C*", 0x01, 0x00));
+
+
+unlink_testfiles();
+done_testing();

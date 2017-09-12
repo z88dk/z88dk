@@ -141,7 +141,7 @@ int primary(LVALUE* lval)
 double calc(
     double left,
     void (*oper)(LVALUE *),
-    double right)
+    double right, int is16bit)
 {
     if (oper == zdiv && right != 0.0)
         return (left / right);
@@ -155,9 +155,10 @@ double calc(
         return (left < right);
     else if (oper == zgt)
         return (left > right);
-    else if (oper == asr)
-        return ((int)left >> (int)right);
-    else
+    else if (oper == asr) {
+        if ( is16bit ) return ((int16_t)left >> (int16_t)right);
+        else return ((int)left >> (int)right);
+    } else
         return (CalcStand(left, oper, right));
 }
 
@@ -166,9 +167,9 @@ double calcun(
     void (*oper)(LVALUE *),
     double right)
 {
-    if (oper == zdiv)
+    if (oper == zdiv)   {
         return (left / right);
-    else if (oper == zmod)
+    } else if (oper == zmod)
         return ((unsigned int)left % (unsigned int)right);
     else if (oper == zle)
         return (left <= right);
@@ -339,6 +340,10 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
                 convSint2long();
             lval->val_type = LONG;
         }
+    }
+    if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED)) {
+         lval->flags |= UNSIGNED;
+         lval2->flags |= UNSIGNED;
     }
 }
 

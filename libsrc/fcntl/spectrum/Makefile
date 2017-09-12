@@ -1,4 +1,4 @@
-SUBDIRS = microdrive plus3 zxbasdrv
+SUBDIRS = microdrive plus3 zxbasdrv esxdos
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
      

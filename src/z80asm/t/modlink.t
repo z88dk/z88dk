@@ -66,10 +66,10 @@ z80asm(
 
 z80nm("test.o test1.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    G A $0013 a1
+    G A $0013 a1 test.asm:13
   External names:
     U         a2
     U         __head
@@ -90,10 +90,10 @@ File test.o at $0000: Z80RMF08
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Names:
-    G A $0013 a2
+    G A $0013 a2 test1.asm:11
   External names:
     U         a1
     U         __head
@@ -116,11 +116,11 @@ File test1.o at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-__size                          = $0038 ; G 
-__head                          = $1234 ; G 
-a1                              = $1247 ; G test
-a2                              = $1263 ; G test1
-__tail                          = $126C ; G 
+a1                              = $1247 ; addr, public, , test, , test.asm:13
+a2                              = $1263 ; addr, public, , test1, , test1.asm:11
+__head                          = $1234 ; const, public, def, , ,
+__tail                          = $126C ; const, public, def, , ,
+__size                          = $0038 ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -220,14 +220,14 @@ z80asm(
 
 z80nm("test.o test1.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 mes1 (section data)
-    L A $0000 start (section code)
-    L A $0005 mes1end (section data)
-    L A $0005 mes2 (section data)
-    L A $000B mes2end (section data)
+    L A $0000 mes1 (section data) test.asm:10
+    L A $0000 start (section code) test.asm:6
+    L A $0005 mes1end (section data) test.asm:11
+    L A $0005 mes2 (section data) test.asm:20
+    L A $000B mes2end (section data) test.asm:21
   External names:
     U         prmes
     U         mes0
@@ -249,12 +249,12 @@ File test.o at $0000: Z80RMF08
   Code: 11 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Names:
-    G A $0000 prmes (section code)
-    G A $0000 mes0 (section data)
-    G A $0001 mes0end (section data)
+    G A $0000 prmes (section code) test1.asm:7
+    G A $0000 mes0 (section data) test1.asm:3
+    G A $0001 mes0end (section data) test1.asm:4
   Code: 0 bytes, ORG at $1234
   Code: 9 bytes (section code)
     C $0000: 78 B1 C8 7E 23 D7 0B 18 F7
@@ -263,23 +263,23 @@ File test1.o at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-__data_size                     = $000C ; G 
-__code_size                     = $0025 ; G 
-__size                          = $0031 ; G 
-__code_head                     = $1234 ; G 
-__head                          = $1234 ; G 
-start                           = $1234 ; L test
-prmes                           = $1250 ; G test1
-__code_tail                     = $1259 ; G 
-__data_head                     = $1259 ; G 
-mes1                            = $1259 ; L test
-mes1end                         = $125E ; L test
-mes2                            = $125E ; L test
-mes0                            = $1264 ; G test1
-mes2end                         = $1264 ; L test
-__data_tail                     = $1265 ; G 
-__tail                          = $1265 ; G 
-mes0end                         = $1265 ; G test1
+mes1                            = $1259 ; addr, local, , test, data, test.asm:10
+start                           = $1234 ; addr, local, , test, code, test.asm:6
+mes1end                         = $125E ; addr, local, , test, data, test.asm:11
+mes2                            = $125E ; addr, local, , test, data, test.asm:20
+mes2end                         = $1264 ; addr, local, , test, data, test.asm:21
+prmes                           = $1250 ; addr, public, , test1, code, test1.asm:7
+mes0                            = $1264 ; addr, public, , test1, data, test1.asm:3
+mes0end                         = $1265 ; addr, public, , test1, data, test1.asm:4
+__head                          = $1234 ; const, public, def, , ,
+__tail                          = $1265 ; const, public, def, , ,
+__size                          = $0031 ; const, public, def, , ,
+__code_head                     = $1234 ; const, public, def, , ,
+__code_tail                     = $1259 ; const, public, def, , ,
+__code_size                     = $0025 ; const, public, def, , ,
+__data_head                     = $1259 ; const, public, def, , ,
+__data_tail                     = $1265 ; const, public, def, , ,
+__data_size                     = $000C ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -313,21 +313,21 @@ ASM2
 );
 z80nm("test.o test1.o test2.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.o at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF09
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -342,21 +342,21 @@ z80asm(
 );
 z80nm("test.o test1.o test2.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.o at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF09
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -388,13 +388,13 @@ z80asm(
 
 z80nm("test.o", <<'...');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 start
-    L A $0008 end1
-    L A $0008 end2
-    L A $0008 end3
+    L A $0000 start test.asm:2
+    L A $0008 end1 test.asm:4
+    L A $0008 end2 test.asm:5
+    L A $0008 end3 test.asm:6
   Expressions:
     E Cw (test.asm:3) $0000 $0000: start
     E Cw (test.asm:3) $0000 $0002: end1
@@ -467,7 +467,7 @@ z80asm(
 
 z80nm("test.o test1.o test2.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   External names:
     U         func1_alias
@@ -482,25 +482,25 @@ File test.o at $0000: Z80RMF08
     C $0000: CD 00 00 CD 00 00 C3 00 00
   Code: 0 bytes (section lib)
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Names:
-    G A $0000 func1 (section lib)
-    G A $0000 func2 (section code)
+    G A $0000 func1 (section lib) test1.asm:7
+    G A $0000 func2 (section code) test1.asm:10
   Code: 0 bytes, ORG at $1000
   Code: 1 bytes (section code)
     C $0000: C8
   Code: 1 bytes (section lib)
     C $0000: C9
 
-File test2.o at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF09
   Name: test2
   Names:
-    L A $FFFFFFFF chain1 (section lib)
-    L A $0000 chain2 (section lib)
-    G = $0000 func1_alias (section lib)
-    G = $0000 func2_alias (section lib)
-    G A $0000 computed_end (section lib)
+    L A $FFFFFFFF chain1 (section lib) test2.asm:11
+    L A $0000 chain2 (section lib) test2.asm:12
+    G = $0000 func1_alias (section lib) test2.asm:7
+    G = $0000 func2_alias (section lib) test2.asm:8
+    G A $0000 computed_end (section lib) test2.asm:10
   External names:
     U         func1
     U         func2
@@ -565,10 +565,10 @@ z80asm(
 
 z80nm("test.o test1.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    G A $0000 func1
+    G A $0000 func1 test.asm:1
   External names:
     U         func2
   Expressions:
@@ -576,10 +576,10 @@ File test.o at $0000: Z80RMF08
   Code: 4 bytes, ORG at $1000
     C $0000: CD 00 00 C9
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Names:
-    G A $0000 func2
+    G A $0000 func2 test1.asm:1
   External names:
     U         func1
   Expressions:
@@ -638,27 +638,27 @@ z80asm(
 
 z80nm("test.o test1.o test2.o", <<'...');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    G = $0000 asm_b_vector_at
+    G = $0000 asm_b_vector_at test.asm:4
   External names:
     U         asm_b_array_at
   Expressions:
     E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
   Code: 0 bytes, ORG at $1000
 
-File test1.o at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF09
   Name: test1
   Names:
-    G A $0000 asm_b_array_at
+    G A $0000 asm_b_array_at test1.asm:3
   Code: 1 bytes, ORG at $1000
     C $0000: C9
 
-File test2.o at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF09
   Name: test2
   Names:
-    L A $0000 start
+    L A $0000 start test2.asm:4
   External names:
     U         asm_b_vector_at
     U         asm_b_array_at
@@ -883,21 +883,21 @@ ok !!$return == !!0, "retval";
 
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF08
+File test.o at $0000: Z80RMF09
   Name: test
   Names:
-    L A $0000 test1_mess (section data)
-    L = $0000 test2_printa1
-    L A $0018 test2__delay (section code)
-    L A $001A test2__delay_1 (section code)
-    L A $0006 test2_mess (section data)
-    L A $000B test3_mess (section data)
-    L A $000D test3_dollar (section data)
-    G A $0000 main (section code)
-    G = $0000 print
-    G A $000D printa (section code)
-    G A $001F print1 (section code)
-    G A $0025 code_end (section code)
+    L A $0000 test1_mess (section data) test1.asm:12
+    L = $0000 test2_printa1 test2.asm:4
+    L A $0018 test2__delay (section code) test2.asm:16
+    L A $001A test2__delay_1 (section code) test2.asm:18
+    L A $0006 test2_mess (section data) test2.asm:24
+    L A $000B test3_mess (section data) test3.asm:11
+    L A $000D test3_dollar (section data) test3.asm:12
+    G A $0000 main (section code) test1.asm:4
+    G = $0000 print test2.asm:3
+    G A $000D printa (section code) test2.asm:7
+    G A $001F print1 (section code) test3.asm:4
+    G A $0025 code_end (section code) test4.asm:4
   External names:
     U         lib_start
     U         lib_end
@@ -922,20 +922,19 @@ File test.o at $0000: Z80RMF08
 END
 
 eq_or_diff_text scalar(read_file("test.sym")), <<'END';
-main                            = $0000 ; G 
-print                           = $0000 ; G 
-test1_mess                      = $0000 ; L 
-test2_printa1                   = $0000 ; L 
-test2_mess                      = $0006 ; L 
-test3_mess                      = $000B ; L 
-printa                          = $000D ; G 
-test3_dollar                    = $000D ; L 
-test2__delay                    = $0018 ; L 
-test2__delay_1                  = $001A ; L 
-print1                          = $001F ; G 
-code_end                        = $0025 ; G 
+test1_mess                      = $0000 ; addr, local, , , data, test1.asm:12
+test2_printa1                   = $0000 ; comput, local, , , , test2.asm:4
+test2__delay                    = $0018 ; addr, local, , , code, test2.asm:16
+test2__delay_1                  = $001A ; addr, local, , , code, test2.asm:18
+test2_mess                      = $0006 ; addr, local, , , data, test2.asm:24
+test3_mess                      = $000B ; addr, local, , , data, test3.asm:11
+test3_dollar                    = $000D ; addr, local, , , data, test3.asm:12
+main                            = $0000 ; addr, public, , , code, test1.asm:4
+print                           = $0000 ; comput, public, , , , test2.asm:3
+printa                          = $000D ; addr, public, , , code, test2.asm:7
+print1                          = $001F ; addr, public, , , code, test3.asm:4
+code_end                        = $0025 ; addr, public, , , code, test4.asm:4
 END
-
 
 # at address 0
 unlink "test.asm", "test.bin";
@@ -949,31 +948,30 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0));
 
 eq_or_diff_text scalar(read_file("test.map")), <<'END';
-__code_head                     = $0000 ; G 
-__head                          = $0000 ; G 
-lib_end                         = $0000 ; G test_lib
-lib_start                       = $0000 ; G test_lib
-main                            = $0000 ; G test
-printa                          = $000D ; G test
-test2_printa1                   = $000D ; L test
-__data_size                     = $000F ; G 
-test2__delay                    = $0018 ; L test
-test2__delay_1                  = $001A ; L test
-print1                          = $001F ; G test
-print                           = $001F ; G test
-__code_size                     = $0025 ; G 
-__code_tail                     = $0025 ; G 
-__data_head                     = $0025 ; G 
-code_end                        = $0025 ; G test
-test1_mess                      = $0025 ; L test
-test2_mess                      = $002B ; L test
-test3_mess                      = $0030 ; L test
-test3_dollar                    = $0032 ; L test
-__data_tail                     = $0034 ; G 
-__size                          = $0034 ; G 
-__tail                          = $0034 ; G 
+test1_mess                      = $0025 ; addr, local, , test, data, test1.asm:12
+test2_printa1                   = $000D ; addr, local, , test, , test2.asm:4
+test2__delay                    = $0018 ; addr, local, , test, code, test2.asm:16
+test2__delay_1                  = $001A ; addr, local, , test, code, test2.asm:18
+test2_mess                      = $002B ; addr, local, , test, data, test2.asm:24
+test3_mess                      = $0030 ; addr, local, , test, data, test3.asm:11
+test3_dollar                    = $0032 ; addr, local, , test, data, test3.asm:12
+main                            = $0000 ; addr, public, , test, code, test1.asm:4
+print                           = $001F ; addr, public, , test, , test2.asm:3
+printa                          = $000D ; addr, public, , test, code, test2.asm:7
+print1                          = $001F ; addr, public, , test, code, test3.asm:4
+code_end                        = $0025 ; addr, public, , test, code, test4.asm:4
+lib_start                       = $0000 ; const, public, , test_lib, , test_lib.asm:3
+lib_end                         = $0000 ; const, public, , test_lib, , test_lib.asm:4
+__head                          = $0000 ; const, public, def, , ,
+__tail                          = $0034 ; const, public, def, , ,
+__size                          = $0034 ; const, public, def, , ,
+__code_head                     = $0000 ; const, public, def, , ,
+__code_tail                     = $0025 ; const, public, def, , ,
+__code_size                     = $0025 ; const, public, def, , ,
+__data_head                     = $0025 ; const, public, def, , ,
+__data_tail                     = $0034 ; const, public, def, , ,
+__data_size                     = $000F ; const, public, def, , ,
 END
-
 
 # at address 0x1234
 unlink "test.asm", "test.bin";
@@ -987,29 +985,29 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0x1234));
 
 eq_or_diff_text scalar(read_file("test.map")), <<'END';
-lib_end                         = $0000 ; G test_lib
-lib_start                       = $0000 ; G test_lib
-__data_size                     = $000F ; G 
-__code_size                     = $0025 ; G 
-__size                          = $0034 ; G 
-__code_head                     = $1234 ; G 
-__head                          = $1234 ; G 
-main                            = $1234 ; G test
-printa                          = $1241 ; G test
-test2_printa1                   = $1241 ; L test
-test2__delay                    = $124C ; L test
-test2__delay_1                  = $124E ; L test
-print1                          = $1253 ; G test
-print                           = $1253 ; G test
-__code_tail                     = $1259 ; G 
-__data_head                     = $1259 ; G 
-code_end                        = $1259 ; G test
-test1_mess                      = $1259 ; L test
-test2_mess                      = $125F ; L test
-test3_mess                      = $1264 ; L test
-test3_dollar                    = $1266 ; L test
-__data_tail                     = $1268 ; G 
-__tail                          = $1268 ; G 
+test1_mess                      = $1259 ; addr, local, , test, data, test1.asm:12
+test2_printa1                   = $1241 ; addr, local, , test, , test2.asm:4
+test2__delay                    = $124C ; addr, local, , test, code, test2.asm:16
+test2__delay_1                  = $124E ; addr, local, , test, code, test2.asm:18
+test2_mess                      = $125F ; addr, local, , test, data, test2.asm:24
+test3_mess                      = $1264 ; addr, local, , test, data, test3.asm:11
+test3_dollar                    = $1266 ; addr, local, , test, data, test3.asm:12
+main                            = $1234 ; addr, public, , test, code, test1.asm:4
+print                           = $1253 ; addr, public, , test, , test2.asm:3
+printa                          = $1241 ; addr, public, , test, code, test2.asm:7
+print1                          = $1253 ; addr, public, , test, code, test3.asm:4
+code_end                        = $1259 ; addr, public, , test, code, test4.asm:4
+lib_start                       = $0000 ; const, public, , test_lib, , test_lib.asm:3
+lib_end                         = $0000 ; const, public, , test_lib, , test_lib.asm:4
+__head                          = $1234 ; const, public, def, , ,
+__tail                          = $1268 ; const, public, def, , ,
+__size                          = $0034 ; const, public, def, , ,
+__code_head                     = $1234 ; const, public, def, , ,
+__code_tail                     = $1259 ; const, public, def, , ,
+__code_size                     = $0025 ; const, public, def, , ,
+__data_head                     = $1259 ; const, public, def, , ,
+__data_tail                     = $1268 ; const, public, def, , ,
+__data_size                     = $000F ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -1080,15 +1078,15 @@ test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 2, 0xC9));
 
 z80nm("test_plat1.lib", <<'END');
 
-File test_plat1.lib at $0000: Z80LMF08
+File test_plat1.lib at $0000: Z80LMF09
 
-File test_plat1.lib at $0010: Z80RMF08
+File test_plat1.lib at $0010: Z80RMF09
   Name: test_plat1
 
-File test_plat1.lib at $003F: Z80RMF08
+File test_plat1.lib at $003F: Z80RMF09
   Name: test_gen
   Names:
-    G A $0000 putpixel
+    G A $0000 putpixel test_gen.asm:3
   Code: 3 bytes
     C $0000: 3E 01 C9
 END
@@ -1096,19 +1094,19 @@ END
 
 z80nm("test_plat2.lib", <<'END');
 
-File test_plat2.lib at $0000: Z80LMF08
+File test_plat2.lib at $0000: Z80LMF09
 
-File test_plat2.lib at $0010: Z80RMF08
+File test_plat2.lib at $0010: Z80RMF09
   Name: test_plat2
   Names:
-    G A $0000 putpixel
+    G A $0000 putpixel test_plat2.asm:3
   Code: 3 bytes
     C $0000: 3E 02 C9
 
-File test_plat2.lib at $0060: Z80RMF08
+File test_plat2.lib at $0073: Z80RMF09
   Name: test_gen
   Names:
-    G A $0000 putpixel
+    G A $0000 putpixel test_gen.asm:3
   Code: 3 bytes
     C $0000: 3E 01 C9
 END

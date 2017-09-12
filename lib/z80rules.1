@@ -1937,7 +1937,7 @@
 =
 	ld	a,(hl)
 	cp	#( %1 % 256)
-	ld	hl,0
+	ld	hl,0	;const
 	jr	nz,ASMPC+3
 	inc	hl
 
@@ -2230,11 +2230,6 @@
 =
 	ld	hl,%1
 
-	call	l_glong
-	ld	hl,%1
-=
-	ld	hl,%1
-
 	push	hl
 	call	l_gint	;%1
 	ld	a,h
@@ -2488,3 +2483,179 @@
 =
 	add	hl,sp
 	call	l_gint
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
+=
+	ld	h,(hl)
+	ld	l,0
+	ld	de,0
+
+	ld	de,0
+	call	l_long_or
+=
+	pop	de
+	call	l_or
+	pop	de
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+	ld	d,l
+	ld	e,0
+	ld	hl,0	;const
+=
+	ld	d,(hl)
+	ld	e,0
+	ld	h,e
+	ld	l,h
+
+	ld	de,0
+	ld	l,0
+	rl	d
+	rl	l
+	rl	d
+	rl	l
+	ld	h,0
+	ld	de,0
+=
+	ld	hl,0	;const
+	ld	de,0
+
+	ld	h,(hl)
+	ld	l,0
+	pop	de
+	call	l_or
+=
+	pop	de
+	ld	a,d
+	or	(hl)
+	ld	d,a
+	ex	de,hl
+
+	call	l_glong
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
+=
+	ld	a,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	h,a
+	ld	l,0
+
+	call	l_glong
+	ld	l,d
+	ld	h,0
+	ld	de,0
+	ld	h,0
+=
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+
+	call	l_glong
+	ld	l,h
+	ld	h,e
+	ld	e,d
+	ld	d,0
+=
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+
+	call	l_gint	;
+	call	l_glong
+=
+	call	l_glonghlp
+
+	ld	hl,%1
+	ld	hl,%2	;const
+=
+	ld	hl,%2	;const
+
+	call	l_glong
+	ex	de,hl
+	ld	de,0
+=
+	inc	hl
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	ld	de,0
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,0	;const
+	call	l_long_or
+=
+	ld	a,(hl)
+	pop	hl
+	pop	de
+	or	e
+	ld	e,a
+
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,%2
+	pop	de
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%2
+
+	ld	l,%1
+	ld	h,%2
+	pop	de
+	ex	de,hl
+=
+	ld	e,%1
+	ld	h,%2
+	pop	hl
+
+	push	hl
+	ld	hl,%1
+	ld	de,%2
+	pop	bc
+	call	l_plong
+=
+	ld	b,h
+	ld	c,l
+	ld	hl,%1
+	ld	de,%2
+	call	l_plong
+
+	call	l_glong
+	push	de
+	push	hl
+	ld	hl,%1
+=
+	call	l_glong2sp
+	ld	hl,%1
+
+	call	l_glonghlp
+	push	de
+	push	hl
+=
+	call	l_glong2sp_hlp

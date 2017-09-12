@@ -24,7 +24,7 @@ PUBLIC    l_long_asr
         pop     hl
         pop     de
         
-        or a
+	and	31
         jr z, done
         
         ld b,a

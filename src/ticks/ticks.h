@@ -11,11 +11,18 @@
 #include "uthash.h"
 #include "utlist.h"
 
+typedef enum {
+    SYM_CONST = 1,
+    SYM_ADDRESS = 2,
+} symboltype;
 
 typedef struct {
     const char    *name;
     const char    *file;
     int            address;
+    symboltype     symtype;
+    char           islocal;
+    const char    *section;
 } symbol;
 
 
@@ -36,8 +43,15 @@ extern unsigned char a_,b_,c_,d_,e_,h_,l_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
+extern long long st;
 
 extern int c_cpu;
+extern int trace;
+extern int debugger_active;
+
+/* Break down flags */
+extern int f(void);
+extern int f_(void);
 
 #define SET_ERROR(error) do {                   \
         if ( (error) == Z88DK_ENONE ) {           \

@@ -92,21 +92,21 @@ t_binary(read_binfile("test_data.bin"),
 ok ! -f "test.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-__head                          = $0000 ; G 
-__data_size                     = $0020 ; G 
-__code_size                     = $0036 ; G 
-__code_head                     = $1020 ; G 
-start                           = $1020 ; L test
-start1                          = $1032 ; L test
-start2                          = $1044 ; L test
-__code_tail                     = $1056 ; G 
-__data_head                     = $3040 ; G 
-string                          = $3040 ; L test
-string1                         = $304A ; L test
-string2                         = $3055 ; L test
-__data_tail                     = $3060 ; G 
-__size                          = $3060 ; G 
-__tail                          = $3060 ; G 
+start                           = $1020 ; addr, local, , test, code, test.asm:3
+string                          = $3040 ; addr, local, , test, data, test.asm:12
+string1                         = $304A ; addr, local, , test, data, test.asm:23
+string2                         = $3055 ; addr, local, , test, data, test.asm:34
+start1                          = $1032 ; addr, local, , test, code, test.asm:15
+start2                          = $1044 ; addr, local, , test, code, test.asm:26
+__head                          = $0000 ; const, public, def, , ,
+__tail                          = $3060 ; const, public, def, , ,
+__size                          = $3060 ; const, public, def, , ,
+__code_head                     = $1020 ; const, public, def, , ,
+__code_tail                     = $1056 ; const, public, def, , ,
+__code_size                     = $0036 ; const, public, def, , ,
+__data_head                     = $3040 ; const, public, def, , ,
+__data_tail                     = $3060 ; const, public, def, , ,
+__data_size                     = $0020 ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
@@ -135,21 +135,21 @@ ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-__code_head                     = $005F ; G 
-__head                          = $005F ; G 
-start                           = $005F ; L test
-start1                          = $0071 ; L test
-__data_size                     = $007F ; G 
-start2                          = $0083 ; L test
-__code_size                     = $0095 ; G 
-__code_tail                     = $0095 ; G 
-__data_head                     = $0095 ; G 
-string                          = $0095 ; L test
-string1                         = $009F ; L test
-string2                         = $00AA ; L test
-__data_tail                     = $00B5 ; G 
-__size                          = $00B5 ; G 
-__tail                          = $00B5 ; G 
+start                           = $005F ; addr, local, , test, code, test.asm:3
+string                          = $0095 ; addr, local, , test, data, test.asm:12
+string1                         = $009F ; addr, local, , test, data, test.asm:23
+string2                         = $00AA ; addr, local, , test, data, test.asm:34
+start1                          = $0071 ; addr, local, , test, code, test.asm:15
+start2                          = $0083 ; addr, local, , test, code, test.asm:26
+__head                          = $005F ; const, public, def, , ,
+__tail                          = $00B5 ; const, public, def, , ,
+__size                          = $00B5 ; const, public, def, , ,
+__code_head                     = $005F ; const, public, def, , ,
+__code_tail                     = $0095 ; const, public, def, , ,
+__code_size                     = $0095 ; const, public, def, , ,
+__data_head                     = $0095 ; const, public, def, , ,
+__data_tail                     = $00B5 ; const, public, def, , ,
+__data_size                     = $007F ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
@@ -193,21 +193,21 @@ t_binary(read_binfile("test_data.bin"),
 t_binary(read_binfile("test_data.reloc"), "");
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-__head                          = $0000 ; G 
-__data_size                     = $0020 ; G 
-__code_size                     = $0036 ; G 
-__code_head                     = $1020 ; G 
-start                           = $1020 ; G test
-start1                          = $1032 ; G test1
-start2                          = $1044 ; G test2
-__code_tail                     = $1056 ; G 
-__data_head                     = $3040 ; G 
-string                          = $3040 ; G test
-string1                         = $304A ; G test1
-string2                         = $3055 ; G test2
-__data_tail                     = $3060 ; G 
-__size                          = $3060 ; G 
-__tail                          = $3060 ; G 
+start                           = $1020 ; addr, public, , test, code, test.asm:5
+string                          = $3040 ; addr, public, , test, data, test.asm:14
+start1                          = $1032 ; addr, public, , test1, code, test1.asm:4
+string1                         = $304A ; addr, public, , test1, data, test1.asm:12
+start2                          = $1044 ; addr, public, , test2, code, test2.asm:4
+string2                         = $3055 ; addr, public, , test2, data, test2.asm:12
+__head                          = $0000 ; const, public, def, , ,
+__tail                          = $3060 ; const, public, def, , ,
+__size                          = $3060 ; const, public, def, , ,
+__code_head                     = $1020 ; const, public, def, , ,
+__code_tail                     = $1056 ; const, public, def, , ,
+__code_size                     = $0036 ; const, public, def, , ,
+__data_head                     = $3040 ; const, public, def, , ,
+__data_tail                     = $3060 ; const, public, def, , ,
+__data_size                     = $0020 ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
@@ -257,21 +257,21 @@ ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-__code_head                     = $005F ; G 
-__head                          = $005F ; G 
-start                           = $005F ; G test
-start1                          = $0071 ; G test1
-__data_size                     = $007F ; G 
-start2                          = $0083 ; G test2
-__code_size                     = $0095 ; G 
-__code_tail                     = $0095 ; G 
-__data_head                     = $0095 ; G 
-string                          = $0095 ; G test
-string1                         = $009F ; G test1
-string2                         = $00AA ; G test2
-__data_tail                     = $00B5 ; G 
-__size                          = $00B5 ; G 
-__tail                          = $00B5 ; G 
+start                           = $005F ; addr, public, , test, code, test.asm:5
+string                          = $0095 ; addr, public, , test, data, test.asm:14
+start1                          = $0071 ; addr, public, , test1, code, test1.asm:4
+string1                         = $009F ; addr, public, , test1, data, test1.asm:12
+start2                          = $0083 ; addr, public, , test2, code, test2.asm:4
+string2                         = $00AA ; addr, public, , test2, data, test2.asm:12
+__head                          = $005F ; const, public, def, , ,
+__tail                          = $00B5 ; const, public, def, , ,
+__size                          = $00B5 ; const, public, def, , ,
+__code_head                     = $005F ; const, public, def, , ,
+__code_tail                     = $0095 ; const, public, def, , ,
+__code_size                     = $0095 ; const, public, def, , ,
+__data_head                     = $0095 ; const, public, def, , ,
+__data_tail                     = $00B5 ; const, public, def, , ,
+__data_size                     = $007F ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
@@ -325,33 +325,33 @@ ok ! -f "test_data2.bin";
 ok ! -f "test_data2.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-__head                          = $0000 ; G 
-__data_size                     = $000A ; G 
-__data1_size                    = $000B ; G 
-__data2_size                    = $000B ; G 
-__code1_size                    = $0012 ; G 
-__code2_size                    = $0012 ; G 
-__code_size                     = $0012 ; G 
-__code_head                     = $1020 ; G 
-start                           = $1020 ; L test
-__code1_head                    = $1032 ; G 
-__code_tail                     = $1032 ; G 
-start1                          = $1032 ; L test
-__code1_tail                    = $1044 ; G 
-__code2_head                    = $1044 ; G 
-start2                          = $1044 ; L test
-__code2_tail                    = $1056 ; G 
-__data_head                     = $3040 ; G 
-string                          = $3040 ; L test
-__data1_head                    = $304A ; G 
-__data_tail                     = $304A ; G 
-string1                         = $304A ; L test
-__data1_tail                    = $3055 ; G 
-__data2_head                    = $3055 ; G 
-string2                         = $3055 ; L test
-__data2_tail                    = $3060 ; G 
-__size                          = $3060 ; G 
-__tail                          = $3060 ; G 
+start                           = $1020 ; addr, local, , test, code, test.asm:12
+string                          = $3040 ; addr, local, , test, data, test.asm:36
+string1                         = $304A ; addr, local, , test, data1, test.asm:39
+string2                         = $3055 ; addr, local, , test, data2, test.asm:42
+start1                          = $1032 ; addr, local, , test, code1, test.asm:20
+start2                          = $1044 ; addr, local, , test, code2, test.asm:28
+__head                          = $0000 ; const, public, def, , ,
+__tail                          = $3060 ; const, public, def, , ,
+__size                          = $3060 ; const, public, def, , ,
+__code_head                     = $1020 ; const, public, def, , ,
+__code_tail                     = $1032 ; const, public, def, , ,
+__code_size                     = $0012 ; const, public, def, , ,
+__code1_head                    = $1032 ; const, public, def, , ,
+__code1_tail                    = $1044 ; const, public, def, , ,
+__code1_size                    = $0012 ; const, public, def, , ,
+__code2_head                    = $1044 ; const, public, def, , ,
+__code2_tail                    = $1056 ; const, public, def, , ,
+__code2_size                    = $0012 ; const, public, def, , ,
+__data_head                     = $3040 ; const, public, def, , ,
+__data_tail                     = $304A ; const, public, def, , ,
+__data_size                     = $000A ; const, public, def, , ,
+__data1_head                    = $304A ; const, public, def, , ,
+__data1_tail                    = $3055 ; const, public, def, , ,
+__data1_size                    = $000B ; const, public, def, , ,
+__data2_head                    = $3055 ; const, public, def, , ,
+__data2_tail                    = $3060 ; const, public, def, , ,
+__data2_size                    = $000B ; const, public, def, , ,
 ...
 
 unlink_testfiles();

@@ -20,7 +20,7 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 8
+#define MAX_VERSION 9
 
 enum file_type { is_none, is_library, is_object };
 
@@ -193,8 +193,8 @@ void print_section_name( char *section_name )
 void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 {
 	int scope, type;
-	long value;
-	char *section_name, *name;
+	long value, line_nr;
+	char *name, *section_name, *def_filename;
 
 	if ( file_version >= 5 )				/* signal end by zero type */
 		fp_end = MAX_FP;
@@ -203,6 +203,10 @@ void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 	fseek( fp, fp_start, SEEK_SET );
 	while ( ftell( fp ) < fp_end )
 	{
+		name = NULL;
+		section_name = NULL;
+		def_filename = NULL;
+
 		scope = xfread_byte( fp, filename );
 		if ( scope == 0 )
 			break;							/* end marker */
@@ -213,18 +217,28 @@ void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 			section_name = strdup( xfread_string( fp, filename ) );
 
 		value = xfread_long( fp, filename );
-		name  = xfread_string( fp, filename );
+		name = strdup(xfread_string(fp, filename));
+
+		if (file_version >= 9) {			// add definition location
+			def_filename = strdup(xfread_string(fp, filename));
+			line_nr = xfread_long(fp, filename);
+		}
 
 		if ( opt_showlocal || scope != 'L' )
 		{
-			printf("    %c %c $%04X %s", scope, type, value, name );
-			if ( file_version >= 5 )
-			{
-				print_section_name( section_name );
-				free( section_name );
+			printf("    %c %c $%04X %s", scope, type, (int)value, name );
+			if (file_version >= 5) {
+				print_section_name(section_name);
+			}
+			if (file_version >= 9) {
+				printf(" %s:%d", def_filename, (int)line_nr);
 			}
 			printf("\n");
 		}
+
+		free(name);
+		free(section_name);
+		free(def_filename);
 	}
 }
 

@@ -1,6 +1,6 @@
 /* primary.c */
 extern int primary(LVALUE *lval);
-extern double calc(double left, void (*oper)(LVALUE *), double right);
+extern double calc(double left, void (*oper)(LVALUE *), double right, int is16bit);
 extern double calcun(double left, void (*oper)(LVALUE *),double right);
 extern double CalcStand(double left, void (*oper)(LVALUE *), double right);
 extern int intcheck(LVALUE *lval, LVALUE *lval2);

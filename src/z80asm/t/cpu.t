@@ -70,7 +70,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		{
 			local(@ARGV) = $file_map;
 			while (<>) {
-				if (/^ (\w+) \s* = \s* \$ ([0-9a-f]+) \s* ; \s* G /ix) {
+				if (/^ (\w+) \s* = \s* \$ ([0-9a-f]+) \s* ; \s* \w+ , \s+ public /ix) {
 					my($name, $addr) = ($1, hex($2));
 					if (exists $labels{$name}) {
 						$labels{$name} == $addr or die "$name address mismatch";

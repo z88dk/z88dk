@@ -6,9 +6,8 @@
 #
 
 # ---> Configurable parameters are below his point
-
-prefix = /usr/local
-prefix_share = $(prefix)/share
+prefix ?= /usr/local
+prefix_share = $(prefix)/share/z88dk
 git_rev = $(shell git rev-parse --short HEAD)
 git_count = $(shell git rev-list --count HEAD)
 version := $(shell date +%Y%m%d)
@@ -16,24 +15,25 @@ version := $(shell date +%Y%m%d)
 INSTALL ?= install
 CFLAGS ?= -O2
 CC ?= gcc
+# Prefix for executables (eg z88dk-, hence z88dk-z80asm, z88dk-copt etc)
 EXEC_PREFIX ?= 
 CROSS ?= 0
 
 # --> End of Configurable Options
 
-export CC INSTALL CFLAGS EXEC_PREFIX CROSS
+export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
 
-all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite z88dk-install
+all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite z88dk-lib
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
-	    echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h; \
+	    echo '#define PREFIX "${prefix_share}"' > src/config.h; \
 	    echo '#define UNIX 1' >> src/config.h; \
 	    echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
 	    echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
 	fi)
 	$(shell if [ ! -f src/config.h ]; then \
-	    echo '#define PREFIX "${prefix_share}$"/z88dk"' > src/config.h; \
+	    echo '#define PREFIX "${prefix_share}"' > src/config.h; \
 	    echo '#define UNIX 1' >> src/config.h; \
 	    echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
 	    echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
@@ -59,7 +59,7 @@ sccz80:
 
 z80asm:
 	$(MAKE) -C src/z80asm
-	$(MAKE) -C src/z80asm PREFIX=`pwd` install
+	$(MAKE) -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
 
 zcc:
 	$(MAKE) -C src/zcc
@@ -85,9 +85,9 @@ ticks:
 	$(MAKE) -C src/ticks
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
-z88dk-install:
-	$(MAKE) -C src/z88dk-install
-	$(MAKE) -C src/z88dk-install PREFIX=`pwd` install
+z88dk-lib:
+	$(MAKE) -C src/z88dk-lib
+	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
 
 
 libs:
@@ -95,24 +95,25 @@ libs:
 	cd libsrc ; $(MAKE) install
 
 install: install-clean
+	install -d $(DESTDIR)/$(prefix) $(DESTDIR)/$(prefix_share)/lib 
 	cd src/appmake ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/copt ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/cpp ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) PREFIX_SHARE=$(DESTDIR)/$(prefix_share) install
 	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zpragma ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zx7 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80nm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/ticks ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z88dk-install ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/z88dk-lib ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd support/graphics; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{}  \;
-	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{}  \;
-	find lib -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
-	find lib -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
-	find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
-	find libsrc -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/z88dk/}{} \;
+	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{}  \;
+	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{}  \;
+	find lib -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{} \;
+	find lib -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{} \;
+	find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{} \;
+	find libsrc -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{} \;
 
 
 # Needs libs to have been installed, no dependency yet since rebuilding libsrc
@@ -125,10 +126,12 @@ testsuite:
 
 install-clean:
 	$(MAKE) -C libsrc install-clean
+	$(RM) lib/z80asm*.lib
 
 clean: clean-bins
 	$(MAKE) -C libsrc clean
 	$(RM) lib/clibs/*.lib
+	$(RM) lib/z80asm*.lib
 
 
 clean-bins:
@@ -144,7 +147,7 @@ clean-bins:
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
-	$(MAKE) -C src/z88dk-install clean
+	$(MAKE) -C src/z88dk-lib clean
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 .PHONY: test testsuite

@@ -210,7 +210,7 @@ END
 for my $options ('-v', '--verbose') {
 	unlink_testfiles();
 	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-b -d -s -l -g $options ".asm_file(), 
+	t_z80asm_capture("-b -s -l -g $options ".asm_file(), 
 					$verbose_text, "", 0);
 	ok -f o_file();
 	ok -f bin_file();
@@ -359,88 +359,6 @@ for my $options ('-l', '--list') {
 }
 
 #------------------------------------------------------------------------------
-# -m, --map
-#------------------------------------------------------------------------------
-note "BUG_0036";
-$asm = "
-	define not_shown
-	defc zero=0
-	PUBLIC main
-main: ld b,10
-loop: djnz loop
-	PUBLIC last
-last:
-x31_x31_x31_x31_x31_x31_x31_x31: defb zero
-x_32_x32_x32_x32_x32_x32_x32_x32: defb zero
-";
-my $asm2 = "
-	define not_shown
-	
-	; show DEFC alias in map file
-	PUBLIC alias_main
-	EXTERN main
-	defc alias_main = main
-	
-	PUBLIC alias_last
-	EXTERN last
-	defc alias_last = last
-
-	PUBLIC func
-func: ld b,10
-loop: djnz loop
-	  ret
-";
-$bin = "\x06\x0A\x10\xFE\x00\x00\x06\x0A\x10\xFE\xC9";
-
-# no -m
-t_z80asm(
-	asm		=> "ld b,10 : djnz ASMPC : defw 0",
-	asm2	=> "ld b,10 : djnz ASMPC : ret",
-	bin		=> $bin,
-);
-ok ! -f map_file(), map_file();
-
-# -m, no symbols
-for my $options ('-m', '--map') {
-	t_z80asm(
-		asm		=> "ld b,10 : djnz ASMPC : defw 0",
-		asm2	=> "ld b,10 : djnz ASMPC : ret",
-		bin		=> $bin,
-		options	=> $options,
-	);
-	ok -f map_file(), map_file();
-	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-__head                          = $0000 ; G 
-__size                          = $000B ; G 
-__tail                          = $000B ; G 
-END
-}
-
-# -m
-t_z80asm(
-	asm		=> $asm,
-	asm2	=> $asm2,
-	bin		=> $bin,
-	options	=> '-m',
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-__head                          = $0000 ; G 
-alias_main                      = $0000 ; G test2
-main                            = $0000 ; G test
-zero                            = $0000 ; L test
-loop                            = $0002 ; L test
-alias_last                      = $0004 ; G test2
-last                            = $0004 ; G test
-x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; L test
-x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; L test
-func                            = $0006 ; G test2
-loop                            = $0008 ; L test2
-__size                          = $000B ; G 
-__tail                          = $000B ; G 
-END
-
-#------------------------------------------------------------------------------
 # -g, --globaldef
 #------------------------------------------------------------------------------
 $asm = "
@@ -452,7 +370,7 @@ last:
 x31_x31_x31_x31_x31_x31_x31_x31: defb 0
 x_32_x32_x32_x32_x32_x32_x32_x32: defb 0
 ";
-$asm2 = "
+my $asm2 = "
 
 	; show DEFC alias in map file
 	PUBLIC alias_main
@@ -487,13 +405,13 @@ for my $options ('-g', '--globaldef') {
 	);
 	ok -f def_file(), def_file();
 	eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
-DEFC alias_main                      = $0000 ;   test2
-DEFC main                            = $0000 ;   test
-DEFC alias_last                      = $0004 ;   test2
-DEFC last                            = $0004 ;   test
-DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ;   test
-DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ;   test
-DEFC func                            = $0006 ;   test2
+DEFC main                            = $0000
+DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004
+DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005
+DEFC last                            = $0004
+DEFC alias_main                      = $0000
+DEFC alias_last                      = $0004
+DEFC func                            = $0006
 END
 }
 

@@ -10,7 +10,7 @@
 =
 	dec	dehl
 
-	ld	bc,%1
+	ld	bc,%1	; Would be better if ZXN opcode affected carry
 	add	hl,bc
 =
 	add	hl,+(%1)
@@ -34,14 +34,6 @@
 	call	l_long_add
 =
 	add	dehl,%1	;const
-
-	push	de
-	push	hl
-	ld	hl,%1	;const
-	ld	de,65535
-	call	l_long_add
-=
-	sub	dehl,+(65536 - %1)	;const
 
 	ld	hl,%1	;const
 	ld	de,%2
