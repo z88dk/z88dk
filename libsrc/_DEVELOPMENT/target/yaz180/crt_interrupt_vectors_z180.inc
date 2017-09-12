@@ -29,7 +29,8 @@ defc z180_int_int2  = __crt_org_vector_table + __IO_VECTOR_BASE + 0x02
 defw l_ret
 
 defc z180_int_prt0  = __crt_org_vector_table + __IO_VECTOR_BASE + 0x04
-defw l_ret
+EXTERN _z180_int_prt0   ; a system tick
+defw _z180_int_prt0
 
 defc z180_int_prt1  = __crt_org_vector_table + __IO_VECTOR_BASE + 0x06
 defw l_ret
