@@ -306,6 +306,11 @@ IF (startup=2)
 ENDIF
 	INCLUDE		"crt0_section.asm"
 
+        SECTION		data_crt
+
+	PUBLIC		_sc_cursor_pos
+
+_sc_cursor_pos:	defw	0x9489
 
 	SECTION		bss_crt
 
