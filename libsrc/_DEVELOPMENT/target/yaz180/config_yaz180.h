@@ -249,6 +249,8 @@
 
 #define __CPU_INFO_ENABLE_SLL  0x01
 
+#define __CPU_TIMER_SCALE  20
+
 #define __IO_BASE_ADDRESS  0
 
 
@@ -417,6 +419,17 @@
    #define __IO_CNTR_SS_DIV_80   0x02
    #define __IO_CNTR_SS_DIV_40   0x01
    #define __IO_CNTR_SS_DIV_20   0x00
+
+   // PRT REGISTER BIT FIELDS
+
+   #define __IO_TCR_TIF1    0x80
+   #define __IO_TCR_TIF0    0x40
+   #define __IO_TCR_TIE1    0x20
+   #define __IO_TCR_TIE0    0x10
+   #define __IO_TCR_TOC1    0x08
+   #define __IO_TCR_TOC0    0x04
+   #define __IO_TCR_TDE1    0x02
+   #define __IO_TCR_TDE0    0x01
 
    // DMA REGISTER BIT FIELDS
 

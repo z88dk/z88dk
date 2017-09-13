@@ -22,11 +22,54 @@ typedef enum {
 typedef struct breakpoint {
     breakpoint_type    type;
     int                value;
-    void              *check_ptr;
+    unsigned char      lvalue;
+    unsigned char     *lcheck_ptr;
+    unsigned char       hvalue;
+    unsigned char     *hcheck_ptr;
     char               enabled;
     char              *text;
     struct breakpoint *next;
 } breakpoint;
+
+
+struct reg {
+    char    *name;
+    uint8_t  *low;
+    uint8_t  *high;
+    uint16_t *word;
+};
+
+static struct reg registers[] = {
+    { "hl",  &l,  &h },
+    { "de",  &e,  &d },
+    { "bc",  &c,  &b },
+    { "hl'", &l_, &h_ },
+    { "de'", &e_, &d_ },
+    { "bc'", &c_, &b_ },  
+    { "ix'", &xl, &xh },   
+    { "iy'", &yl, &yh },  
+    { "sp",  NULL, NULL, &sp }, 
+    { "pc",  NULL, NULL, &pc }, 
+    { "a",   &a,   NULL },
+    { "a'",  &a_,  NULL },
+    { "b",   &b,   NULL },
+    { "b'",  &b_,  NULL },
+    { "c",   &c,   NULL },
+    { "c'",  &c_,  NULL },             
+    { "d",   &d,   NULL },
+    { "d'",  &d_,  NULL },
+    { "e",   &e,   NULL },
+    { "e'",  &e_,  NULL },  
+    { "h",   &h,   NULL },
+    { "h'",  &h_,  NULL },  
+    { "l",   &l,   NULL },
+    { "l'",  &l_,  NULL },  
+    { "ixh", &xh,  NULL },
+    { "ixl", &xl,  NULL },
+    { "iyh", &yh,  NULL },
+    { "iyl", &yl,  NULL },
+    { NULL, NULL, NULL },
+};
 
 typedef struct {
     char   *cmd;
@@ -133,15 +176,15 @@ void debugger()
                 printf("Hit breakpoint %d\n",i);
                 dodebug=1;
                 break;
-            } else if ( elem->type == BREAK_CHECK8 && *(uint8_t *)elem->check_ptr == elem->value ) {
-                printf("Hit breakpoint %d\n",i);
+            } else if ( elem->type == BREAK_CHECK8 && *elem->lcheck_ptr == elem->lvalue ) {
+                printf("Hit breakpoint %d (%s = $%02x)\n",i,elem->text, elem->lvalue);
                 elem->enabled = 0;
                 dodebug=1;
                 break;
             } else if ( elem->type == BREAK_CHECK16 && 
-                        *(uint8_t *)elem->check_ptr == (elem->value % 256) &&
-                         *(((uint8_t *)elem->check_ptr)+1) == (elem->value %65536) / 256 ) {
-                printf("Hit breakpoint %d\n",i);
+                        *elem->lcheck_ptr == elem->lvalue  &&
+                         *elem->hcheck_ptr == elem->hvalue  ) {
+                printf("Hit breakpoint %d (%s = $%02x%02x)\n",i,elem->text, elem->hvalue, elem->lvalue);
                 elem->enabled = 0;
                 dodebug=1;
                 break;
@@ -365,31 +408,75 @@ static int cmd_break(int argc, char **argv)
         if ( value != -1 ) {
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK8;
-            elem->check_ptr = &mem[value % 65536];
-            elem->value = atoi(argv[4]);
+            elem->lcheck_ptr = &mem[value % 65536];
+            elem->lvalue = atoi(argv[4]);
             elem->enabled = 1;
             elem->text = strdup(argv[2]);
             LL_APPEND(breakpoints, elem);
-        }      
+            printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
+        }   
     } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
         char  *end;
-        int value = strtol(argv[2], &end,0);
+        int addr = strtol(argv[2], &end,0);
         
         if ( end == argv[2] ) {
-            value =  symbol_resolve(argv[2]);
+            addr =  symbol_resolve(argv[2]);
         }
        
-        if ( value != -1 ) {
+        if ( addr != -1 ) {
+            int value = atoi(argv[4]);
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK16;
-            elem->check_ptr = &mem[value % 65536];
-            elem->value = atoi(argv[4]);
+            elem->lcheck_ptr = &mem[addr % 65536];
+            elem->lvalue = value % 256;
+            elem->hcheck_ptr = &mem[(addr + 1 )% 65536];
+            elem->hvalue = (value % 65536 ) /    256;
             elem->enabled = 1;
             elem->text = strdup(argv[2]);
             LL_APPEND(breakpoints, elem);
+            printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
         }      
-    } else if ( argc == 5 && strncmp(argv[1], "reg",3) == 0 ) {
-        
+    } else if ( argc == 5 && strncmp(argv[1], "register",3) == 0 ) {
+        struct reg *search = &registers[0];
+
+        while ( search->name != NULL  ) {
+            if ( strcmp(search->name, argv[2]) == 0 ) {
+                break;
+            }
+            search++;
+        }
+
+        if ( search->name != NULL ) {
+            int value = atoi(argv[4]);
+            breakpoint *elem = malloc(sizeof(*elem));
+            elem->type = search->high == NULL && search->word == NULL ? BREAK_CHECK8 : BREAK_CHECK16;
+            if  ( search->word != NULL ) {
+#ifdef __BIG_ENDIAN__
+                elem->lcheck_ptr = ((uint8_t *)search->word) + 1;
+                elem->hcheck_ptr = ((uint8_t *)search->word);
+#else
+                elem->hcheck_ptr = ((uint8_t *)search->word) + 1;
+                elem->lcheck_ptr = ((uint8_t *)search->word);
+#endif
+                printf("%p %p %p\n",elem->lcheck_ptr, elem->hcheck_ptr, &pc);
+            } else {
+                elem->lcheck_ptr = search->low;
+                elem->hcheck_ptr = search->high;
+            }
+            elem->lvalue = (value % 256);
+            elem->hvalue = (value % 65536) / 256;
+            elem->enabled = 1;
+            elem->text = strdup(argv[2]);
+            LL_APPEND(breakpoints, elem);
+            if ( elem->type == BREAK_CHECK8 ) {
+                printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
+            } else {
+                printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
+            }
+        } else {
+            printf("No such register %s\n",argv[2]);
+        }
+
     }
     return 0;
 }
@@ -424,46 +511,9 @@ static int cmd_examine(int argc, char **argv)
     return 0;
 }
 
-struct reg {
-    char    *name;
-    uint8_t  *low;
-    uint8_t  *high;
-    uint16_t *word;
-};
 
 static int cmd_set(int argc, char **argv)
 {
-    struct reg registers[] = {
-        { "hl",  &l,  &h },
-        { "de",  &e,  &d },
-        { "bc",  &c,  &b },
-        { "hl'", &l_, &h_ },
-        { "de'", &e_, &d_ },
-        { "bc'", &c_, &b_ },  
-        { "ix'", &xl, &xh },   
-        { "iy'", &yl, &yh },  
-        { "sp",  NULL, NULL, &sp }, 
-        { "pc",  NULL, NULL, &pc }, 
-        { "a",   &a,   NULL },
-        { "a'",  &a_,  NULL },
-        { "b",   &b,   NULL },
-        { "b'",  &b_,  NULL },
-        { "c",   &c,   NULL },
-        { "c'",  &c_,  NULL },             
-        { "d",   &d,   NULL },
-        { "d'",  &d_,  NULL },
-        { "e",   &e,   NULL },
-        { "e'",  &e_,  NULL },  
-        { "h",   &h,   NULL },
-        { "h'",  &h_,  NULL },  
-        { "l",   &l,   NULL },
-        { "l'",  &l_,  NULL },  
-        { "ixh", &xh,  NULL },
-        { "ixl", &xl,  NULL },
-        { "iyh", &yh,  NULL },
-        { "iyl", &yl,  NULL },
-        { NULL, NULL, NULL },
-    };
     struct reg *search = &registers[0];
 
     if ( argc == 3 ) {

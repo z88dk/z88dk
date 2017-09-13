@@ -23,6 +23,8 @@ define(`__CPU_INFO', 0x00)
 
 define(`__CPU_INFO_ENABLE_SLL', 0x01)
 
+define(`__CPU_TIMER_SCALE', 20)
+
 # INTERNAL INTERRUPT VECTOR BASE ID
 # moved to crt variable "CRT_IO_VECTOR_BASE"
 #
@@ -301,6 +303,17 @@ define(`__IO_CNTR_SS_DIV_80',   0x02)
 define(`__IO_CNTR_SS_DIV_40',   0x01)
 define(`__IO_CNTR_SS_DIV_20',   0x00)
 
+# PRT REGISTER BIT FIELDS
+
+define(`__IO_TCR_TIF1',       0x80)
+define(`__IO_TCR_TIF0',       0x40)
+define(`__IO_TCR_TIE1',       0x20)
+define(`__IO_TCR_TIE0',       0x10)
+define(`__IO_TCR_TOC1',       0x08)
+define(`__IO_TCR_TOC0',       0x04)
+define(`__IO_TCR_TDE1',       0x02)
+define(`__IO_TCR_TDE0',       0x01)
+
 # DMA REGISTER BIT FIELDS
 
 define(`__IO_DCNTL_MWI1',       0x80)
@@ -372,6 +385,8 @@ PUBLIC `__CPU_CLOCK'
 PUBLIC `__CPU_INFO'
 
 PUBLIC `__CPU_INFO_ENABLE_SLL'
+
+PUBLIC `__CPU_TIMER_SCALE'
 
 PUBLIC `__IO_BASE_ADDRESS'
 
@@ -533,6 +548,17 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `CNTR_SS_DIV_80'
    PUBLIC `CNTR_SS_DIV_40'
    PUBLIC `CNTR_SS_DIV_20'
+
+   ; PRT REGISTER BIT FIELDS
+
+   PUBLIC `TCR_TIF1'
+   PUBLIC `TCR_TIF0'
+   PUBLIC `TCR_TIE1'
+   PUBLIC `TCR_TIE0'
+   PUBLIC `TCR_TOC1'
+   PUBLIC `TCR_TOC0'
+   PUBLIC `TCR_TDE1'
+   PUBLIC `TCR_TDE0'
 
    ; DMA REGISTER BIT FIELDS
 
@@ -733,6 +759,17 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `CNTR_SS_DIV_40'
    PUBLIC `CNTR_SS_DIV_20'
 
+   ; PRT REGISTER BIT FIELDS
+
+   PUBLIC `TCR_TIF1'
+   PUBLIC `TCR_TIF0'
+   PUBLIC `TCR_TIE1'
+   PUBLIC `TCR_TIE0'
+   PUBLIC `TCR_TOC1'
+   PUBLIC `TCR_TOC0'
+   PUBLIC `TCR_TDE1'
+   PUBLIC `TCR_TDE0'
+
    ; DMA REGISTER BIT FIELDS
 
    PUBLIC `DCNTL_MWI1'
@@ -800,6 +837,8 @@ defc `__CPU_CLOCK' = __CPU_CLOCK
 defc `__CPU_INFO' = __CPU_INFO
 
 defc `__CPU_INFO_ENABLE_SLL' = __CPU_INFO_ENABLE_SLL
+
+defc `__CPU_TIMER_SCALE' = __CPU_TIMER_SCALE
 
 defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
@@ -961,6 +1000,17 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `CNTR_SS_DIV_80' = __IO_CNTR_SS_DIV_80
    defc `CNTR_SS_DIV_40' = __IO_CNTR_SS_DIV_40
    defc `CNTR_SS_DIV_20' = __IO_CNTR_SS_DIV_20
+
+   ; PRT REGISTER BIT FIELDS
+
+   defc `TCR_TIF1' = __IO_TCR_TIF1
+   defc `TCR_TIF0' = __IO_TCR_TIF0
+   defc `TCR_TIE1' = __IO_TCR_TIE1
+   defc `TCR_TIE0' = __IO_TCR_TIE0
+   defc `TCR_TOC1' = __IO_TCR_TOC1
+   defc `TCR_TOC0' = __IO_TCR_TOC0
+   defc `TCR_TDE1' = __IO_TCR_TDE1
+   defc `TCR_TDE0' = __IO_TCR_TDE0
 
    ; DMA REGISTER BIT FIELDS
 
@@ -1161,6 +1211,17 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `CNTR_SS_DIV_40' = __IO_CNTR_SS_DIV_40
    defc `CNTR_SS_DIV_20' = __IO_CNTR_SS_DIV_20
 
+   ; PRT REGISTER BIT FIELDS
+
+   defc `TCR_TIF1' = __IO_TCR_TIF1
+   defc `TCR_TIF0' = __IO_TCR_TIF0
+   defc `TCR_TIE1' = __IO_TCR_TIE1
+   defc `TCR_TIE0' = __IO_TCR_TIE0
+   defc `TCR_TOC1' = __IO_TCR_TOC1
+   defc `TCR_TOC0' = __IO_TCR_TOC0
+   defc `TCR_TDE1' = __IO_TCR_TDE1
+   defc `TCR_TDE0' = __IO_TCR_TDE0
+
    ; DMA REGISTER BIT FIELDS
 
    defc `DCNTL_MWI1' = __IO_DCNTL_MWI1
@@ -1229,6 +1290,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__CPU_INFO'  __CPU_INFO
 
 `#define' `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
+
+`#define' `__CPU_TIMER_SCALE'  __CPU_TIMER_SCALE
 
 `#define' `__IO_BASE_ADDRESS'  __IO_BASE_ADDRESS
 
@@ -1390,6 +1453,17 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `__IO_CNTR_SS_DIV_80'   __IO_CNTR_SS_DIV_80
    `#define' `__IO_CNTR_SS_DIV_40'   __IO_CNTR_SS_DIV_40
    `#define' `__IO_CNTR_SS_DIV_20'   __IO_CNTR_SS_DIV_20
+
+   // PRT REGISTER BIT FIELDS
+
+   `#define' `__IO_TCR_TIF1'    __IO_TCR_TIF1
+   `#define' `__IO_TCR_TIF0'    __IO_TCR_TIF0
+   `#define' `__IO_TCR_TIE1'    __IO_TCR_TIE1
+   `#define' `__IO_TCR_TIE0'    __IO_TCR_TIE0
+   `#define' `__IO_TCR_TOC1'    __IO_TCR_TOC1
+   `#define' `__IO_TCR_TOC0'    __IO_TCR_TOC0
+   `#define' `__IO_TCR_TDE1'    __IO_TCR_TDE1
+   `#define' `__IO_TCR_TDE0'    __IO_TCR_TDE0
 
    // DMA REGISTER BIT FIELDS
 
@@ -1589,6 +1663,17 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `__IO_CNTR_SS_DIV_80'   __IO_CNTR_SS_DIV_80
    `#define' `__IO_CNTR_SS_DIV_40'   __IO_CNTR_SS_DIV_40
    `#define' `__IO_CNTR_SS_DIV_20'   __IO_CNTR_SS_DIV_20
+
+   // PRT REGISTER BIT FIELDS
+
+   `#define' `__IO_TCR_TIF1'    __IO_TCR_TIF1
+   `#define' `__IO_TCR_TIF0'    __IO_TCR_TIF0
+   `#define' `__IO_TCR_TIE1'    __IO_TCR_TIE1
+   `#define' `__IO_TCR_TIE0'    __IO_TCR_TIE0
+   `#define' `__IO_TCR_TOC1'    __IO_TCR_TOC1
+   `#define' `__IO_TCR_TOC0'    __IO_TCR_TOC0
+   `#define' `__IO_TCR_TDE1'    __IO_TCR_TDE1
+   `#define' `__IO_TCR_TDE0'    __IO_TCR_TDE0
 
    // DMA REGISTER BIT FIELDS
 

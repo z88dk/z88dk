@@ -5,7 +5,7 @@ include(__link__.m4)
 
 // Z80
 
-#ifdef __Z80
+#if __Z80 || __Z80_ZXN
 
 #include <z80.h>
 
@@ -26,7 +26,7 @@ include(__link__.m4)
 
 // Z180
 
-#ifdef __Z180
+#if __Z180
 
 #include <z180.h>
 

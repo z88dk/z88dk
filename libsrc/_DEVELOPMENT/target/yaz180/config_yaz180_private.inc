@@ -241,6 +241,8 @@ defc __CPU_INFO = 0x00
 
 defc __CPU_INFO_ENABLE_SLL = 0x01
 
+defc __CPU_TIMER_SCALE = 20
+
 defc __IO_BASE_ADDRESS = 0
 
 
@@ -409,6 +411,17 @@ defc __IO_BASE_ADDRESS = 0
    defc CNTR_SS_DIV_80 = 0x02
    defc CNTR_SS_DIV_40 = 0x01
    defc CNTR_SS_DIV_20 = 0x00
+
+   ; PRT REGISTER BIT FIELDS
+
+   defc TCR_TIF1 = 0x80
+   defc TCR_TIF0 = 0x40
+   defc TCR_TIE1 = 0x20
+   defc TCR_TIE0 = 0x10
+   defc TCR_TOC1 = 0x08
+   defc TCR_TOC0 = 0x04
+   defc TCR_TDE1 = 0x02
+   defc TCR_TDE0 = 0x01
 
    ; DMA REGISTER BIT FIELDS
 

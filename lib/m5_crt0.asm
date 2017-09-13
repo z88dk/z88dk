@@ -106,6 +106,12 @@ msxbios:
 
         INCLUDE "crt0_section.asm"
 
+	SECTION	data_clib
+	
+	PUBLIC	_sc_cursor_pos
+
+_sc_cursor_pos	defw	0x70a6
+
 	SECTION	bss_crt
 
 	PUBLIC	RG0SAV		;keeping track of VDP register values

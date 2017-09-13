@@ -12,43 +12,6 @@ IF !DEFINED_startup
 ENDIF
 
 
-IF !NEED_floatpack
-	DEFINE	NEED_floatpack
-ENDIF
-
-
-IF !DEFINED_CRT_printf_format
-	defc	DEFINED_CRT_printf_format = 1
-	defc CRT_printf_format = 0x00000001
-ELSE
-	UNDEFINE temp_printf_format
-	defc temp_printf_format = CRT_printf_format
-	UNDEFINE CRT_printf_format
-	defc CRT_printf_format = temp_printf_format | 0x00000001
-ENDIF
-
-
-IF !NEED_printf
-	DEFINE	NEED_printf
-ENDIF
-
-
-IF !DEFINED_CRT_scanf_format
-	defc	DEFINED_CRT_scanf_format = 1
-	defc CRT_scanf_format = 0x00000002
-ELSE
-	UNDEFINE temp_scanf_format
-	defc temp_scanf_format = CRT_scanf_format
-	UNDEFINE CRT_scanf_format
-	defc CRT_scanf_format = temp_scanf_format | 0x00000002
-ENDIF
-
-
-IF !NEED_scanf
-	DEFINE	NEED_scanf
-ENDIF
-
-
 
 
 

@@ -32,13 +32,13 @@
 #endif
 
 #if __SC3000__
-char *sc_cursor_pos = 0x9489;
+extern unsigned char *sc_cursor_pos;
 #define gotoxy(a,b)     sc_cursor_pos[0]=a; sc_cursor_pos[1]=b
 #define clrscr() printf("\014")
 #endif
 
 #if __M5__
-unsigned char *sc_cursor_pos = 0x70A6;
+extern unsigned char *sc_cursor_pos;
 #define gotoxy(a,b)     sc_cursor_pos[1]=a-1; sc_cursor_pos[0]=b-1
 #define clrscr() printf("\014")
 #endif

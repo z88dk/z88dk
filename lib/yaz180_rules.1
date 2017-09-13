@@ -1,0 +1,15 @@
+	call	___BREAK_HELPER
+=
+	IFNDEF __IO_BREAK
+	EXTERN	__IO_BREAK
+	ENDIF
+	ld	bc,__IO_BREAK
+	out	(c),c
+
+	call	__BREAK_HELPER
+=
+	IFNDEF __IO_BREAK
+	EXTERN	__IO_BREAK
+	ENDIF
+	ld	bc,__IO_BREAK
+	out	(c),c
