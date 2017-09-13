@@ -24,6 +24,9 @@
 #define cpu_otir  z80_otir
 #define cpu_otdr  z80_otdr
 
+#define cpu_pop_ei         z80_pop_ei
+#define cpu_push_di        z80_push_di
+
 #endif
 
 // Z180
@@ -44,6 +47,9 @@
 #define cpu_indr  z180_indr
 #define cpu_otir  z180_otir
 #define cpu_otdr  z180_otdr
+
+#define cpu_pop_ei         z180_pop_ei
+#define cpu_push_di        z180_push_di
 
 #define cpu_otimr  z180_otimr
 #define cpu_otdmr  z180_otdmr

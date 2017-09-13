@@ -31,6 +31,11 @@ __DPROTO(`d,e',`d,e',void,*,z180_otdr,void *src,uint8_t port,uint8_t num)
 __DPROTO(`d,e',`d,e',void,*,z180_otimr,void *dst,uint8_t port,uint8_t num)
 __DPROTO(`d,e',`d,e',void,*,z180_otdmr,void *src,uint8_t port,uint8_t num)
 
+// Interrupt Management
+
+__OPROTO(`a,b,d,e,h,l,iyl,iyh',`a,b,d,e,h,l,iyh,iyl',void,,z180_pop_ei,void)
+__OPROTO(`a,b,d,e,h,l,iyl,iyh',`a,b,d,e,h,l,iyh,iyl',void,,z180_push_di,void)
+
 // Memory by Address
 
 #define z180_bpoke(a,b)  (*(unsigned char *)(a) = b)
