@@ -17,7 +17,6 @@
 	
 .getk
 ._getk
-		exx
 
         ld      bc,$00ff		; Scan all columns at once.
         in      a,(c)			; Read the results.
