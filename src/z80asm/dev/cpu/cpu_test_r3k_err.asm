@@ -319,7 +319,6 @@
  cp ixl                         ; Error
  cp iyh                         ; Error
  cp iyl                         ; Error
- daa                            ; Error
  dec dehl                       ; Error
  dec ixh                        ; Error
  dec ixl                        ; Error

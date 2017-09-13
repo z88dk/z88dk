@@ -1828,6 +1828,7 @@
  cpl                            ; 2F
  cpl a                          ; 2F
  cpl a'                         ; 76 2F
+ daa                            ; CD @__z80asm__daa
  dec (hl)                       ; 35
  dec (ix)                       ; DD 35 00
  dec (ix+127)                   ; DD 35 7F

@@ -1414,7 +1414,6 @@ IF      !RABBIT
         im   2                          ;; ED 5E
 
 ELSE    
-        daa
         di
         ei
         halt
@@ -4739,7 +4738,6 @@ ELSE
 ENDIF   
 IF      !RABBIT
 ELSE    
-        daa                             ;; error: illegal identifier
         di                              ;; error: illegal identifier
         ei                              ;; error: illegal identifier
         halt                            ;; error: illegal identifier

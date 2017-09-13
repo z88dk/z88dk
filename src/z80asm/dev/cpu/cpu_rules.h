@@ -11055,6 +11055,10 @@ DO_stmt(0x2F);
 
 | label? _TK_DAA _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__daa");
+break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN: 
 DO_stmt(0x27);
 break;

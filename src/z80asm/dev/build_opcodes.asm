@@ -488,7 +488,7 @@ IF !RABBIT
 	im 	{-1 3}							;; error: integer '{1}' out of range
 	im 	undefined						;; error: symbol 'undefined' not defined
 ELSE
-	{daa di ei halt}					;; error: illegal identifier
+	{di ei halt}						;; error: illegal identifier
 	im {0 1 2} 							;; error: illegal identifier
 ENDIF
 
