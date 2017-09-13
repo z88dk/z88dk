@@ -6,12 +6,8 @@ include(__link__.m4)
 #include <arch.h>
 
 // Halt the YAZ180 with single step hardware.
-// Affects BC, so restore these if you need them.
 
-#define __BREAK             \
-        __asm               \
-        ld  bc,__IO_BREAK   \
-        out (c),c           \
-        __endasm;
+#define __BREAK  __BREAK_HELPER()
+__OPROTO(`a,d,e,h,l,iy,iyh',`a,d,e,h,l,iyl,iyh',void,,__BREAK_HELPER,void)
 
 #endif

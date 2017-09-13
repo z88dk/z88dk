@@ -8,12 +8,10 @@
 #include <arch.h>
 
 // Halt the YAZ180 with single step hardware.
-// Affects BC, so restore these if you need them.
 
-#define __BREAK             \
-        __asm               \
-        ld  bc,__IO_BREAK   \
-        out (c),c           \
-        __endasm;
+#define __BREAK  __BREAK_HELPER()
+extern void __LIB__ __BREAK_HELPER(void) __smallc;
+
+
 
 #endif
