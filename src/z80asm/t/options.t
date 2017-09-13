@@ -200,6 +200,7 @@ ERR
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
 Reading library 'z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 3 bytes
