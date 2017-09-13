@@ -1,6 +1,6 @@
 include(__link__.m4)
 
-#ifdef __Z180
+#if __Z180
 
 #ifndef __Z180_H__
 #define __Z180_H__
