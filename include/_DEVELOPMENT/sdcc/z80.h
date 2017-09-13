@@ -59,6 +59,11 @@ extern void *z80_otdr_callee(void *src,uint8_t port,uint8_t num) __preserves_reg
 
 
 
+extern void z80_pop_ei(void) __preserves_regs(a,b,d,e,h,l,iyh,iyl);
+
+extern void z80_push_di(void) __preserves_regs(a,b,d,e,h,l,iyh,iyl);
+
+
 #define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 #define z80_lpoke(a,b)  (*(unsigned long *)(a) = b)

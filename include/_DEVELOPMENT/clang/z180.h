@@ -57,6 +57,15 @@ extern void *z180_otdmr(void *src,uint8_t port,uint8_t num);
 
 
 
+// Interrupt Management
+
+extern void z180_pop_ei(void);
+
+
+extern void z180_push_di(void);
+
+
+
 // Memory by Address
 
 #define z180_bpoke(a,b)  (*(unsigned char *)(a) = b)
