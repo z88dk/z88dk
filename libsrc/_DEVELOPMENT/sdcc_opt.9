@@ -45,3 +45,10 @@
 %"[ \t]*"0jp%"[ \tNZCMPOE]+"1,%"[ \t]*"2____sdcc_cpu_pop_ei
 =
 	jp%1, ____sdcc_cpu_pop_ei_jp
+
+%"[ \t]*"0pop%"[ \t]+"1ix
+%"[ \t]*"2jp%"[ \t]+"3____sdcc_cpu_pop_ei_jp
+=
+	call	____sdcc_cpu_pop_ei
+	pop	ix
+	ret
