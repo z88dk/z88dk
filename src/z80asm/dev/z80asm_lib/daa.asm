@@ -41,7 +41,7 @@ t1_cont:
 		ld 		a, h
 		cp 		0x99+1
 		jr 		c, t2_cont
-		
+
 t2_true:
 		ld 		a, 0x60
 		or		b

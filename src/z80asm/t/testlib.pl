@@ -125,7 +125,7 @@ sub ticks {
 	my($source, $options) = @_;
 
 	build_ticks();
-	z80asm($source, $options);
+	z80asm($source, $options." -b");
 	
 	my $cpu = ($options =~ /--cpu=(\S+)/) ? $1 : "z80";
 	run("ticks test.bin -m$cpu -output test.out", 
@@ -181,6 +181,20 @@ sub ticks {
 	@regs == 8 or die;
 	
 	return $ret;
+}
+
+sub parity {
+	my($a) = @_;
+	my $bits = 0;
+	$bits++ if $a & 0x80;
+	$bits++ if $a & 0x40;
+	$bits++ if $a & 0x20;
+	$bits++ if $a & 0x10;
+	$bits++ if $a & 0x08;
+	$bits++ if $a & 0x04;
+	$bits++ if $a & 0x02;
+	$bits++ if $a & 0x01;
+	return ($bits & 1) == 0 ? 1 : 0;
 }
 
 sub z80nm {
