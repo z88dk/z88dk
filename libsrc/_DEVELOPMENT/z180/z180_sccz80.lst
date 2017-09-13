@@ -16,7 +16,5 @@ z180/c/sccz80/z180_otir
 z180/c/sccz80/z180_otir_callee
 z180/c/sccz80/z180_outp
 z180/c/sccz80/z180_outp_callee
-z180/c/sccz80/z180_pop_ei
-z180/c/sccz80/z180_push_di
 z180/c/sccz80/z180_set_int_state
 @z180/z180_asm.lst

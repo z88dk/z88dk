@@ -20,9 +20,6 @@ __DPROTO(`d,e',`d,e',void,,z80_outp,uint16_t port,uint8_t data)
 __DPROTO(`d,e',`d,e',void,*,z80_otir,void *src,uint8_t port,uint8_t num)
 __DPROTO(`d,e',`d,e',void,*,z80_otdr,void *src,uint8_t port,uint8_t num)
 
-__OPROTO(`a,b,d,e,h,l,iyl,iyh',`a,b,d,e,h,l,iyh,iyl',void,,z80_pop_ei,void)
-__OPROTO(`a,b,d,e,h,l,iyl,iyh',`a,b,d,e,h,l,iyh,iyl',void,,z80_push_di,void)
-
 #define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 #define z80_lpoke(a,b)  (*(unsigned long *)(a) = b)

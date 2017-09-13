@@ -42,13 +42,6 @@ extern void *z80_otdr(void *src,uint8_t port,uint8_t num);
 
 
 
-extern void z80_pop_ei(void);
-
-
-extern void z80_push_di(void);
-
-
-
 #define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 #define z80_lpoke(a,b)  (*(unsigned long *)(a) = b)

@@ -71,15 +71,6 @@ extern void __LIB__ __CALLEE__ *z180_otdmr_callee(void *src,uint8_t port,uint8_t
 
 
 
-// Interrupt Management
-
-extern void __LIB__ z180_pop_ei(void) __smallc;
-
-
-extern void __LIB__ z180_push_di(void) __smallc;
-
-
-
 // Memory by Address
 
 #define z180_bpoke(a,b)  (*(unsigned char *)(a) = b)

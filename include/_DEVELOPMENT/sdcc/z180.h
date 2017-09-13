@@ -78,13 +78,6 @@ extern void *z180_otdmr_callee(void *src,uint8_t port,uint8_t num) __preserves_r
 
 
 
-// Interrupt Management
-
-extern void z180_pop_ei(void) __preserves_regs(a,b,d,e,h,l,iyh,iyl);
-
-extern void z180_push_di(void) __preserves_regs(a,b,d,e,h,l,iyh,iyl);
-
-
 // Memory by Address
 
 #define z180_bpoke(a,b)  (*(unsigned char *)(a) = b)

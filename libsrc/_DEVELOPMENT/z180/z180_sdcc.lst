@@ -19,8 +19,6 @@ z180/c/sdcc/z180_otir
 z180/c/sdcc/z180_otir_callee
 z180/c/sdcc/z180_outp
 z180/c/sdcc/z180_outp_callee
-z180/c/sdcc/z180_pop_ei
-z180/c/sdcc/z180_push_di
 z180/c/sdcc/z180_set_int_state
 z180/c/sdcc/z180_set_int_state_fastcall
 @z180/z180_asm.lst

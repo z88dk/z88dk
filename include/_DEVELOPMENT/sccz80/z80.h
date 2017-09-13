@@ -52,13 +52,6 @@ extern void __LIB__ __CALLEE__ *z80_otdr_callee(void *src,uint8_t port,uint8_t n
 
 
 
-extern void __LIB__ z80_pop_ei(void) __smallc;
-
-
-extern void __LIB__ z80_push_di(void) __smallc;
-
-
-
 #define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 #define z80_lpoke(a,b)  (*(unsigned long *)(a) = b)

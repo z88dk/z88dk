@@ -15,8 +15,6 @@ z80/c/sdcc/z80_otir
 z80/c/sdcc/z80_otir_callee
 z80/c/sdcc/z80_outp
 z80/c/sdcc/z80_outp_callee
-z80/c/sdcc/z80_pop_ei
-z80/c/sdcc/z80_push_di
 z80/c/sdcc/z80_set_int_state
 z80/c/sdcc/z80_set_int_state_fastcall
 @z80/z80_asm.lst
