@@ -50998,6 +50998,10 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x2F); } while(0);
 	case 1180:
 	{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K:
+asm_cond_LABEL(stmt_label);
+add_call_emul_func("__z80asm__daa");
+break;
 case CPU_Z180: case CPU_Z80: case CPU_Z80_ZXN:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x27); } while(0);
 break;

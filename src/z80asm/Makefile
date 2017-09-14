@@ -135,6 +135,8 @@ clean::
 
 test: $(TARGET) z80asm_lib
 	$(MAKE) dev
+	$(MAKE) z80asm_lib
+	#$(MAKE) -C dev\z80asm_lib test
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
 	$(MAKE) test_enigma

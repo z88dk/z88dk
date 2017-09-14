@@ -2,12 +2,7 @@ stdio/z88/puts_cons
 stdio/z88/fgets_cons
 @stdio/stdio.lst
 @stdio/stdio_net.lst
-stdio/ansi/f_ansi
-stdio/ansi/f_ansi_lf
-stdio/ansi/f_ansi_putc
-stdio/ansi/fputc_cons
-stdio/ansi/puts_cons
-stdio/ansi/f_ansi_dsr6
+@stdio/ansicore.lst
 stdio/ansi/z88/f_ansi_attr
 stdio/ansi/z88/f_ansi_bel
 stdio/ansi/z88/f_ansi_char

@@ -138,7 +138,6 @@
  tst 255                ;; 0680:  ED 64 FF
  tst a, (hl)            ;; 0680:  ED 34
  tst (hl)               ;; 0680:  ED 34
- daa                    ;; 0680:  27
  push su                ;; 08CA:  ED 66
  pop su                 ;; 08DC:  ED 6E
  mlt bc                 ;; 0AAA:  ED 4C

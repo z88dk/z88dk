@@ -4,23 +4,37 @@ Z88DK Z80 Module Assembler Change Log
 2017
 ----
 
-- 2016-01-30 Fix #49 implement z180 as a target
+- 2017-01-30 Fix #49 implement z180 as a target
 - 2017-01-26 Fix #47 accept more that one MODULE directive
 - 2017-02-08 Fix #53 public constants not being listed in global .def file
 - 2017-02-09 Fix #54 overflow errors in calculated constants at linking stage
 - 2017-02-12 Fix #65 separate BSS section not generated from object file if BSS org was -1 at assembly time
-- 2017-04-12 Fix #159 allow environment variables ${VAR} in the command line options and arguments and list files (contribution from dom@suborbital.org.uk)
+- 2017-04-12 Fix #159 allow environment variables ${VAR} in the command line options and arguments 
+             and list files (contribution from dom@suborbital.org.uk)
 - 2017-04-25 Fix #194 wrong assembly of DDCB with no index
 - 2017-04-30 Fix #209 add a --cpu=z80 option
 - 2017-04-30 Fix #216 replace --RCMX000 by --cpu=r2k and --cpu=r3k
 - 2017-05-03 Fix #222 z80asm: add +zx and +zx81 options to z80asm to generate .tap and .P files
 - 2017-05-21 Fix #233 force the name of the output file to use section names with defined ORG
-- 2017-06-18 Fix #239 z80asm: empty sections with org are causing empty binaries to be produced (thank you @aralbrec)
+- 2017-06-18 Fix #239 z80asm: empty sections with org are causing empty binaries to be produced 
+             (thank you @aralbrec)
 - 2017-06-21 Fix #252 z80asm ignores _map file if 0 bytes
 - 2017-06-24 Fix #259 show source code version in z80asm
 - 2017-06-24 Fix #264 Fix test scripts for Perl 5.26
 - 2017-06-29 Fix #248 z80asm - cli setting for DEFS
 - 2017-07-02 Fix #270 ignoring org -1 for sections when data is in object file separate from memory map file
+- 2017-07-02 Add missing warning "interpreting indirect value as immediate"
+- 2017-08-21 Fix #320 Define macro naming the CPU used in the --cpu option
+- 2017-08-24 Fix #326 Add directory of list file to include path during assembly
+- 2017-08-26 Create a z80asm.lib file with routines that might be called by the assembler
+- 2017-08-28 Fix #312 ZX Next (--cpu=z80-zxn) opcodes in z80asm
+- 2017-09-03 Fix #331 Implement Rabbit opcodes in z80asm
+- 2017-09-03 Change z80asm to use C-11
+- 2017-09-04 Fix #343 Generate different z80asm*.lib libraries for different CPUs
+- 2017-09-10 Ref #341 Add section, file and line nr information to .sym and .map files
+- 2017-09-11 Fix #359 Remove functions that now are part of z80asm*.lib
+- 2017-09-11 Fix #350 Fix the clean and install-clean targets
+- 2017-09-13 Fix #340 Emulation library for DAA on a Rabbit
 
 2016
 ----

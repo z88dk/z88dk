@@ -2,12 +2,7 @@
 stdio/z1013/fgetc_cons
 stdio/z1013/getk
 stdio/z1013/fputc_cons
-stdio/ansi/f_ansi
-stdio/ansi/f_ansi_lf
-stdio/ansi/f_ansi_putc
-stdio/ansi/fputc_cons
-stdio/ansi/puts_cons
-stdio/ansi/f_ansi_dsr6
+@stdio/ansicore.lst
 stdio/ansi/z1013/f_ansi_attr
 stdio/ansi/z1013/f_ansi_bel
 stdio/ansi/z1013/f_ansi_char

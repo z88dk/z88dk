@@ -14,16 +14,16 @@ PUBLIC __z80asm__cpi
    
    push af
    ex (sp),hl
-   res 0,l
+   res 0,l 			; clear carry
 
 .rejoin
 
-   set 2,l
+   set 2,l			; set P/V -> BC != 0
 
    ld a,b
    or c
    jr nz, exitcpi
-   res 2,l
+   res 2,l			; clear P/V -> BC == 0
 
 .exitcpi
 
@@ -39,5 +39,5 @@ PUBLIC __z80asm__cpi
    
    push af
    ex (sp),hl
-   set 0,l
+   set 0,l 			; set carry
    jr rejoin

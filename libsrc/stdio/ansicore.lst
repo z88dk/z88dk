@@ -1,0 +1,9 @@
+stdio/ansi/gotoxy
+stdio/ansi/gotoxy_callee
+stdio/ansi/vtrendition
+stdio/ansi/f_ansi
+stdio/ansi/f_ansi_lf
+stdio/ansi/f_ansi_putc
+stdio/ansi/fputc_cons
+stdio/ansi/puts_cons
+stdio/ansi/f_ansi_dsr6

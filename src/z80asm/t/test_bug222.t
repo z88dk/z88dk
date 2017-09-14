@@ -105,6 +105,7 @@ check_bin_file("test.tap", $rem_tap);
 unlink_testfiles();
 z80asm($asm, "+zx -v", 0, <<'END');
 	Reading library 'z80asm-z80-.lib'
+	Predefined constant: __CPU_Z80__ = $0001
 	Assembling 'test.asm' to 'test.o'
 	Reading 'test.asm'
 	Module 'test' size: 4 bytes
@@ -241,6 +242,7 @@ check_bin_file("test.P", $rem_P);
 unlink_testfiles();
 z80asm($asm, "+zx81 -v", 0, <<'END', "");
 	Reading library 'z80asm-z80-.lib'
+	Predefined constant: __CPU_Z80__ = $0001
 	Assembling 'test.asm' to 'test.o'
 	Reading 'test.asm'
 	Module 'test' size: 4 bytes

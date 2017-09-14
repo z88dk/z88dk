@@ -153,9 +153,12 @@ Symbol *get_used_symbol( char *name )
 *----------------------------------------------------------------------------*/
 Symbol *define_static_def_sym( char *name, long value )
 {
-    return _define_sym( name, value, TYPE_CONSTANT, SCOPE_LOCAL, 
+    Symbol *sym = _define_sym( name, value, TYPE_CONSTANT, SCOPE_LOCAL, 
 						NULL, get_first_section(NULL), 
 						& static_symtab );
+	if (opts.verbose) 
+		printf("Predefined constant: %s = $%04X\n", name, (int)value);
+	return sym;
 }
 
 /*-----------------------------------------------------------------------------

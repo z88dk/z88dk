@@ -19,8 +19,8 @@ SRC			:= $(filter-out test.asm,$(wildcard *.asm))
 define MAKE_LIB
 all: $(PROJ)-$(strip $(1)).lib
 
-$(PROJ)-$(strip $(1)).lib: $(PROJ).lst $(SRC) Makefile
-	$(Z80ASM) -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ).lst
+$(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile
+	$(Z80ASM) -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
 
 clean::
 	$(RM) $(PROJ)-$(strip $(1)).lib
@@ -43,9 +43,12 @@ $(eval $(call MAKE_LIB,	r2k-ixiy,		--cpu=r2k 		--IXIY	))
 $(eval $(call MAKE_LIB,	r3k-,			--cpu=r3k				))
 $(eval $(call MAKE_LIB,	r3k-ixiy,		--cpu=r3k 		--IXIY	))
 
-$(PROJ).lst: $(SRC)
-	$(RM) $(PROJ).lst
-	$(foreach file, $(SRC), echo $(file) >> $(PROJ).lst; )
+$(PROJ)_lib.lst: $(SRC)
+	$(RM) $(PROJ)_lib.lst
+	$(foreach file, $(SRC), echo $(file) >> $(PROJ)_lib.lst; )
 
 clean::
 	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin
+
+test: all
+	prove t/*.t

@@ -10,8 +10,12 @@ PUBLIC __z80asm__cpdr
    jr nc, enterloop
  
    call enterloop
-   scf
-   ret
+   
+; scf clears N and H - must set carry the hard way
+   push af
+   ex (sp),hl
+   set 0,l 			; set carry
+   jr retflags
 
 .loop
 
@@ -20,30 +24,28 @@ PUBLIC __z80asm__cpdr
 .enterloop
 
    dec bc
-   cp (hl)
+   cp (hl)			; compare, set flags
    jr z, match
    
    inc c
    dec c
    jr nz, loop
-
+  
    inc b
    djnz loop
    
-.nomatch
+; .nomatch
 
-   cp (hl)
+   cp (hl)			; compare, set flags
    dec hl
    push af
  
 .joinbc0
  
    ex (sp),hl
-   res 0,l
-   res 2,l
-   ex (sp),hl
-   pop af
-   ret
+   res 0,l 			; clear carry
+   res 2,l			; clear P/V -> BC == 0
+   jr retflags
 
 .match
 
@@ -55,8 +57,10 @@ PUBLIC __z80asm__cpdr
    jr z, joinbc0
   
    ex (sp),hl
-   res 0,l 
-   set 2,l
+   res 0,l 			; clear carry
+   set 2,l			; set P/V -> BC != 0
+
+.retflags
    ex (sp),hl
    pop af
    ret

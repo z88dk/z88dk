@@ -110,10 +110,7 @@ for my $one_step (0, 1) {
 	check_bin_file("test_b0.bin", pack("C*", 20, 21));
 	check_text_file("test_map.map", $exp_map);
 
-	build_appmake();
-	run("appmake +glue -b test -c test_map --clean", 0, <<'END');
-		Creating test__.bin (org 0x0000 = 0)
-END
+	appmake("+glue -b test -c test_map --clean");
 	check_bin_file("test__.bin", $exp_bin);
 }
 

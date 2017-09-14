@@ -24,12 +24,16 @@
 #include <X11/Xz88dk.h>
 
 
+/*
+// Old crap gotoxy() stuff
+
 #if defined __SVI__ || defined __MSX__
 #define gotoxy(a,b)     printf("\033Y%c%c",b+31,a+31)
 #define delline()	printf("\033M")
 #define clrscr() printf("\033E")
 #define clreol() printf("\033K")
 #endif
+*/
 
 #if __SC3000__
 extern unsigned char *sc_cursor_pos;
@@ -43,7 +47,6 @@ extern unsigned char *sc_cursor_pos;
 #define clrscr() printf("\014")
 #endif
 
-
 /* Fallback to ANSI VT escape sequences */
 #ifndef gotoxy
 
@@ -54,37 +57,33 @@ enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY
 // Color translation table
 static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
-// QUICK C syntax
-#define settextcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
-// TURBO C syntax
-#define textcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
-#define textbackground(a)	printf("\033[%um",PCDOS_COLORS[a]+40)
-#define textattr(a)	printf("\033[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
 // Much faster shortcut passing the colors in vt-ansi mode (equivalent to a "set text rendition" ESC sequence)
-#define vtrendition(a)   asm("EXTERN\tansi_attr\nld\ta,"#a"\ncall\tansi_attr\n");
+extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 
-//#define highvideo()	printf("\033[1m")
-#define highvideo()   asm("EXTERN\tansi_attr\nld\ta,1\ncall\tansi_attr\n");
-//#define lowvideo()	printf("\033[2m")
-#define lowvideo()   asm("EXTERN\tansi_attr\nld\ta,2\ncall\tansi_attr\n");
-//#define normvideo()	printf("\033[m")
-#define normvideo()  asm("EXTERN\tansi_attr\nxor\ta\ncall\tansi_attr\n");
+// QUICK C syntax
+#define settextcolor(a)    vtrendition(PCDOS_COLORS[a]+30)
 
-#define delline()	printf("\033[M")
-//#define clrscr() textattr(7);fputc_cons(12)
-/* In this way we can do some sort of color and setcolor functions redefinition */
-#define clrscr() printf("\033[%um\033[%um%c",30,47,12)
-#define clreol() printf("\033[K")
+// TURBO C syntax
+#define textcolor(a)       vtrendition(PCDOS_COLORS[a]+30)
+#define textbackground(a)  vtrendition(PCDOS_COLORS[a]+40)
 
-extern int ansi_COLUMN;
-extern int ansi_ROW;
+#define textattr(a)		   vtrendition(PCDOS_COLORS[a&0xF]+30); vtrendition(PCDOS_COLORS[a>>4]+40)
 
+#define highvideo()        vtrendition(1)
+#define lowvideo()         vtrendition(2)
+#define normvideo()        vtrendition(0)
 
-#define gotoxy(a,b);  ansi_COLUMN=a-1; ansi_ROW=b-1;
-#define _gotoxy(a,b);  ansi_COLUMN=a-1; ansi_ROW=b-1;
+// Useless, DL is not fully implemented in the VT-ansi engine
+//#define delline()	       printf("\033[M")
 
-//#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
-//#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+#define clrscr()           vtrendition(47); vtrendition(30); fputc_cons(12)
+#define clreol()           printf("\033[K")
+
+extern void    __LIB__     gotoxy(unsigned int x, unsigned int y) __smallc;
+extern void    __LIB__     gotoxy_callee(unsigned int x, unsigned int y) __smallc __z88dk_callee;
+
+#define gotoxy(a,b) gotoxy_callee(a,b)
+
 
 #endif
 

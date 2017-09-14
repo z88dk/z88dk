@@ -633,7 +633,7 @@ static void option_cpu_r3k(void)
 	opts.cpu_name = CPU_R3K_NAME;
 }
 
-void define_assembly_defines()
+static void define_assembly_defines()
 {
 	switch (opts.cpu) {
 	case CPU_Z80:
@@ -653,6 +653,10 @@ void define_assembly_defines()
 		break;
 	default:
 		assert(0);
+	}
+
+	if (opts.swap_ix_iy) {
+		define_static_def_sym("__SWAP_IX_IY__", 1);
 	}
 }
 

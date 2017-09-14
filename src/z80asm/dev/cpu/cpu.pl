@@ -128,11 +128,12 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($zilog) {
-		add_opc($cpu, "daa", 0x27);			# TODO: daa as library call
+		add_opc($cpu, "daa", 0x27);
 		add_opc($cpu, "rrd", 0xED, 0x67);
 		add_opc($cpu, "rld", 0xED, 0x6F);
 	}
 	elsif ($rabbit) {
+		add_opc($cpu, "daa", 0xCD, '@__z80asm__daa');
 		add_opc($cpu, "rrd", 0xCD, '@__z80asm__rrd');
 		add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
 	}

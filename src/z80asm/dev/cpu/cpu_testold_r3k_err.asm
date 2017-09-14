@@ -82,7 +82,6 @@
  cp ixl                 ; Error
  cp iyh                 ; Error
  cp iyl                 ; Error
- daa                    ; Error
  dec ixh                ; Error
  dec ixl                ; Error
  dec iyh                ; Error

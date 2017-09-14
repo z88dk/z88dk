@@ -138,7 +138,6 @@
  tst 255                ;; 0680:  ED 64 FF
  tst a, (hl)            ;; 0680:  ED 34
  tst (hl)               ;; 0680:  ED 34
- daa                    ;; 0680:  27
  mlt bc                 ;; 0AAE:  ED 4C
  mlt de                 ;; 0AAE:  ED 5C
  mlt hl                 ;; 0AAE:  ED 6C
