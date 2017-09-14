@@ -9,8 +9,7 @@
 #endif
 
 #define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
-
-
+#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
 
 uint8_t get_memory(int pc)
@@ -498,6 +497,13 @@ uint8_t put_memory(int pc, uint8_t b)
           l= v,                 \
           fr= h|l<<8
 
+#define TEST(v, ticks) do {  \
+      uint8_t olda = a;        \
+      AND(v, 0);\
+      a = olda;                \
+      st += ticks;             \
+    } while (0)
+
 FILE * ft;
 unsigned char * tapbuf;
   
@@ -684,6 +690,8 @@ int main (int argc, char **argv){
         case 'm':
           if ( strcmp(&argv[0][1],"mz80") == 0 ) {
             c_cpu = CPU_Z80;
+          } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
+            c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
             c_cpu = CPU_Z80_ZXN;
           } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
@@ -1062,18 +1070,18 @@ int main (int argc, char **argv){
         if( ih ) {
           if ( altd ) INC(h_);
           else INC(h);
-        } else if( iy && !israbbit() )
+        } else if( iy && canixh() )
           INC(yh);
-        else if ( !israbbit() )
+        else if ( canixh() )
           INC(xh);
         ih=1;altd=0;break;
       case 0x2c: // INC L // INC IXl // INC IYl
         if( ih ) {
           if ( altd ) INC(l_);
           else INC(l);
-        } else if( iy && !israbbit() )
+        } else if( iy && canixh() )
           INC(yl);
-        else if ( !israbbit() )
+        else if ( canixh() )
           INC(xl);
         ih=1;altd=0;break;
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
@@ -1153,18 +1161,18 @@ int main (int argc, char **argv){
         if( ih ) {
           if ( altd ) LDRIM(h_);
           else LDRIM(h);
-        } else if( iy && !israbbit() )
+        } else if( iy && canixh() )
           LDRIM(yh);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRIM(xh);
         ih=1;altd=0;break;
       case 0x2e: // LD L,n // LD IXl,n // LD IYl,n
         if( ih ) {
           if ( altd ) LDRIM(l_);
           else LDRIM(l);
-        } else if( iy && !israbbit() )
+        } else if( iy && canixh() )
           LDRIM(yl);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRIM(xl);
         ih=1;altd=0;break;
       case 0x36: // LD (HL),n // LD (IX+d),n // LD (IY+d),n
@@ -1418,17 +1426,17 @@ int main (int argc, char **argv){
       case 0x44: // LD B,H // LD B,IXh // LD B,IYh
         if( ih ) {
           LDRR(b, h, h_, israbbit() ? 2 : 4);
-        } else if( iy && !israbbit() )
+        } else if( iy && canixh() )
           LDRR(b, yh, b, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(b, xh, b, 4);
         ih=1;altd=0;break;
       case 0x45: // LD B,L // LD B,IXl // LD B,IYl
         if( ih ) {
           LDRR(b, l, b_, israbbit() ? 2 : 4);
-        } else if( iy && !israbbit() )
+        } else if( iy && canixh() )
           LDRR(b, yl, b, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(b, xl, b, 4);
         ih=1;altd=0;break;
       case 0x46: // LD B,(HL) // LD B,(IX+d) // LD B,(IY+d)
@@ -1455,17 +1463,17 @@ int main (int argc, char **argv){
       case 0x4c: // LD C,H // LD C,IXh // LD C,IYh
         if( ih )
           LDRR(c, h, c_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(c, yh, c, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(c, xh, c, 4);
         ih=1;altd=0;break;
       case 0x4d: // LD C,L // LD C,IXl // LD C,IYl
         if( ih )
           LDRR(c, l, c_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(c, yl, c, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(c, xl, c, 4);
         ih=1;altd=0;break;
       case 0x4e: // LD C,(HL) // LD C,(IX+d) // LD C,(IY+d)
@@ -1491,17 +1499,17 @@ int main (int argc, char **argv){
       case 0x54: // LD D,H // LD D,IXh // LD D,IYh
         if( ih )
           LDRR(d, h,  d_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(d, yh, d, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(d, xh, d, 4);
         ih=1;altd=0;break;
       case 0x55: // LD D,L // LD D,IXl // LD D,IYl
         if( ih )
           LDRR(d, l,  d_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(d, yl, d, 4);
-        else if (!israbbit() )
+        else if (canixh() )
           LDRR(d, xl, d, 4);
         ih=1;altd=0;break;
       case 0x56: // LD D,(HL) // LD D,(IX+d) // LD D,(IY+d)
@@ -1527,17 +1535,17 @@ int main (int argc, char **argv){
       case 0x5c: // LD E,H // LD E,IXh // LD E,IYh
         if( ih )
           LDRR(e, h, e_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(e, yh, e, 4);
-        else
+        else if ( canixh() )
           LDRR(e, xh, e, 4);
         ih=1;altd=0;break;
       case 0x5d: // LD E,L // LD E,IXl // LD E,IYl
         if( ih )
           LDRR(e, l, e_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(e, yl, e, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(e, xl, e, 4);
         ih=1;altd=0;break;
       case 0x5e: // LD E,(HL) // LD E,(IX+d) // LD E,(IY+d)
@@ -1554,41 +1562,41 @@ int main (int argc, char **argv){
       case 0x60: // LD H,B // LD IXh,B // LD IYh,B
         if( ih )
           LDRR(h, b, h_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yh, b, yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xh, b, xh, 4);
         ih=1;altd=0;break;
       case 0x61: // LD H,C // LD IXh,C // LD IYh,C
         if( ih )
           LDRR(h, c, h_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yh, c, yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xh, c, xh, 4);
         ih=1;altd=0;break;
       case 0x62: // LD H,D // LD IXh,D // LD IYh,D
         if( ih )
           LDRR(h, d,  h_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yh, d, yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xh, d, xh, 4);
         ih=1;altd=0;break;
       case 0x63: // LD H,E // LD IXh,E // LD IYh,E
         if( ih )
           LDRR(h, e,  h_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yh, e, yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xh, e, xh, 4);
         ih=1;altd=0;break;
       case 0x65: // LD H,L // LD IXh,IXl // LD IYh,IYl
         if( ih )
           LDRR(h, l, h_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yh, yl, yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xh, yl, xh, 4);
         ih=1;altd=0;break;
       case 0x66: // LD H,(HL) // LD H,(IX+d) // LD H,(IY+d)
@@ -1602,49 +1610,49 @@ int main (int argc, char **argv){
       case 0x67: // LD H,A // LD IXh,A // LD IYh,A
         if( ih )
           LDRR(h, a, h_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yh, a, yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xh, a, xh, 4);
         ih=1;altd=0;break;
       case 0x68: // LD L,B // LD IXl,B // LD IYl,B
         if( ih )
           LDRR(l, b, l_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yl, b, yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xl, b, xl, 4);
         ih=1;altd=0;break;
       case 0x69: // LD L,C // LD IXl,C // LD IYl,C
         if( ih )
           LDRR(l, c, l_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yl, c, yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xl, c, xl, 4);
         ih=1;altd=0;break;
       case 0x6a: // LD L,D // LD IXl,D // LD IYl,D
         if( ih )
           LDRR(l, d, l_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yl, d, yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xl, d, xl, 4);
         ih=1;altd=0;break;
       case 0x6b: // LD L,E // LD IXl,E // LD IYl,E
         if( ih )
           LDRR(l, e, l_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yl, e, yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xl, e, xl, 4);
         ih=1;altd=0;break;
       case 0x6c: // LD L,H // LD IXl,IXh // LD IYl,IYh
         if( ih )
           LDRR(l, h, l_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yl, yh, yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xl, xh, xl, 4);
         ih=1;altd=0;break;
       case 0x6e: // LD L,(HL) // LD L,(IX+d) // LD L,(IY+d)
@@ -1658,9 +1666,9 @@ int main (int argc, char **argv){
       case 0x6f: // LD L,A // LD IXl,A // LD IYl,A
         if( ih )
           LDRR(l, a, l_, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           LDRR(yl, a, yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           LDRR(xl, a, xl, 4);
         ih=1;altd=0;break;
       case 0x70: // LD (HL),B // LD (IX+d),B // LD (IY+d),B
@@ -1795,17 +1803,17 @@ int main (int argc, char **argv){
       case 0x84: // ADD A,H // ADD A,IXh // ADD A,IYh
         if( ih )
           ADD(h, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           ADD(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           ADD(xh, 4);
         ih=1;altd=0;break;
       case 0x85: // ADD A,L // ADD A,IXl // ADD A,IYl
         if( ih )
           ADD(l, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           ADD(yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           ADD(xl, 4);
         ih=1;altd=0;break;
       case 0x86: // ADD A,(HL) // ADD A,(IX+d) // ADD A,(IY+d)
@@ -1836,17 +1844,17 @@ int main (int argc, char **argv){
       case 0x8c: // ADC A,H // ADC A,IXh // ADC A,IYh
         if( ih )
           ADC(h,israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           ADC(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           ADC(xh, 4);
         ih=1;altd=0;break;
       case 0x8d: // ADC A,L // ADC A,IXl // ADC A,IYl
         if( ih )
           ADC(l, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           ADC(yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           ADC(xl, 4);
         ih=1;altd=0;break;
       case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d)
@@ -1877,17 +1885,17 @@ int main (int argc, char **argv){
       case 0x94: // SUB H // SUB IXh // SUB IYh
         if( ih )
           SUB(h, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           SUB(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           SUB(xh, 4);
         ih=1;altd=0;break;
       case 0x95: // SUB L // SUB IXl // SUB IYl
         if( ih )
           SUB(l, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           SUB(yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           SUB(xl, 4);
         ih=1;altd=0;break;
       case 0x96: // SUB (HL) // SUB (IX+d) // SUB (IY+d)
@@ -1923,17 +1931,17 @@ int main (int argc, char **argv){
       case 0x9c: // SBC A,H // SBC A,IXh // SBC A,IYh
         if( ih )
           SBC(h, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           SBC(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           SBC(xh, 4);
         ih=1;altd=0;break;
       case 0x9d: // SBC A,L // SBC A,IXl // SBC A,IYl
         if( ih )
           SBC(l, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           SBC(yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           SBC(xl, 4);
         ih=1;altd=0;break;
       case 0x9e: // SBC A,(HL) // SBC A,(IX+d) // SBC A,(IY+d)
@@ -1969,17 +1977,17 @@ int main (int argc, char **argv){
       case 0xa4: // AND H // AND IXh // AND IYh
         if( ih )
           AND(h, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           AND(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           AND(xh, 4);
         ih=1;altd=0;break;
       case 0xa5: // AND L // AND IXl // AND IYl
         if( ih )
           AND(l, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           AND(yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           AND(xl, 4);
         ih=1;altd=0;break;
       case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
@@ -2056,17 +2064,17 @@ int main (int argc, char **argv){
       case 0xb4: // OR H // OR IXh // OR IYh
         if( ih )
           OR(h, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           OR(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           OR(xh, 4);
         ih=1;altd=0;break;
       case 0xb5: // OR L // OR IXl // OR IYl
         if( ih )
           OR(l, israbbit() ? 2 : 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           OR(yl, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           OR(xl, 4);
         ih=1;altd=0;break;
       case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
@@ -2104,17 +2112,17 @@ int main (int argc, char **argv){
       case 0xbc: // CP H // CP IXh // CP IYh
         if( ih )
           CP(h, 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           CP(yh, 4);
-        else if ( !israbbit() )
+        else if ( canixh() )
           CP(xh, 4);
         ih=1;altd=0;break;
       case 0xbd: // CP L // CP IXl // CP IYl
         if( ih )
           CP(l, 4);
-        else if( iy && !israbbit() )
+        else if( iy && canixh() )
           CP(yl, 4);
-        else if (!israbbit())
+        else if (canixh())
           CP(xl, 4);
         ih=1;altd=0;break;
       case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d)
@@ -3075,18 +3083,70 @@ int main (int argc, char **argv){
       case 0xed: // OP ED
         r++;
         switch( get_memory(pc++) ){
+          case 0x04:    // (Z180) TST A,C
+            if ( c_cpu == CPU_Z180 ) {
+              TEST(b, 8);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x0c:    // (Z180) TST A,C
+            if ( c_cpu == CPU_Z180 ) {
+              TEST(c, 8);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x14:    // (Z180) TST A,D
+            if ( c_cpu == CPU_Z180 ) {
+              TEST(d, 8);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x1c:    // (Z180) TST A,E
+            if ( c_cpu == CPU_Z180 ) {
+              TEST(e, 8);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x24:    // (Z180) TST A,D
+            if ( c_cpu == CPU_Z180 ) {
+              TEST(h, 8);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x2c:    // (Z180) TST A,E
+            if ( c_cpu == CPU_Z180 ) {
+              TEST(l, 8);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x64:    // (Z180) TST A,n
+            if ( c_cpu == CPU_Z180 ) {
+              uint8_t v = get_memory(pc++);
+              TEST(v, 8);
+            } else {    // Z80 (Undocumented NEG)
+              st+= 8;
+              fr= a= (ff= (fb= ~a)+1);
+              fa= 0; break;
+            }
+            break;
           case 0x00: case 0x01: case 0x02: case 0x03:        // NOP
-          case 0x04: case 0x05: case 0x06: case 0x07:
+          case 0x05: case 0x06: case 0x07:
           case 0x08: case 0x09: case 0x0a: case 0x0b:
-          case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+          case 0x0d: case 0x0e: case 0x0f:
           case 0x10: case 0x11: case 0x12: case 0x13:
-          case 0x14: case 0x15: case 0x16: case 0x17:
+          case 0x15: case 0x16: case 0x17:
           case 0x18: case 0x19: case 0x1a: case 0x1b:
-          case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+          case 0x1d: case 0x1e: case 0x1f:
           case 0x20: case 0x21: case 0x22: case 0x23:
-          case 0x24: case 0x26: 
+          case 0x26: 
           case 0x28: case 0x29: case 0x2a: case 0x2b:
-          case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+          case 0x2d: case 0x2e: case 0x2f:
           case 0x3e: case 0x3f:
           case 0x77: case 0x7f:
           case 0x80: case 0x81: case 0x82: case 0x83:
@@ -3168,6 +3228,9 @@ int main (int argc, char **argv){
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
               st += 12;
+            } else if ( c_cpu == CPU_Z180 ) {               // (Z180) TST A,(HL)
+              uint8_t v = get_memory(l | h << 8);
+              TEST(v, 8);
             } else {
               st += 8;
             }
@@ -3273,6 +3336,8 @@ int main (int argc, char **argv){
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
               st += 4;
+            } else if ( c_cpu == CPU_Z180 ) {               // (Z180) TST A,A
+              TEST(a, 8);
             } else {
               st += 8;
             }
@@ -3309,10 +3374,8 @@ int main (int argc, char **argv){
             break;
           case 0x27:                                         // (ZXN) tst $xx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t olda = a;
-              AND(get_memory(pc++), 0);
-              a = olda;
-              st += 7;
+              uint8_t v = get_memory(pc++);
+              TEST(v, 7);
             } else {
               st += 8;
             }
@@ -3495,6 +3558,42 @@ int main (int argc, char **argv){
                      t= get_memory(pc++);
                      sp= get_memory(t|= get_memory(pc++)<<8);
                      sp|= get_memory(mp= t+1) << 8; break;
+          case 0x4c:                                         // (Z180) MLT BC
+            if ( c_cpu & CPU_Z180 ) {
+              uint16_t v = b * c;
+              b = v >> 8;
+              c = v;
+              st += 8;
+            } else {  // (Z80) Undocumented NEG
+                st+= 8;
+                fr= a= (ff= (fb= ~a)+1);
+                fa= 0;
+            }
+            break;
+          case 0x5c:                                         // (Z180) MLT DE
+            if ( c_cpu & CPU_Z180 ) {
+              uint16_t v = d * e;
+              d = v >> 8;
+              e = v;
+              st += 8;
+            } else {  // (Z80) Undocumented NEG
+                st+= 8;
+                fr= a= (ff= (fb= ~a)+1);
+                fa= 0;
+            }
+            break;
+          case 0x6c:                                         // (Z180) MLT HL
+            if ( c_cpu & CPU_Z180 ) {
+              uint16_t v = h * l;
+              h = v >> 8;
+              l = v;
+              st += 8;
+            } else {  // (Z80) Undocumented NEG
+                st+= 8;
+                fr= a= (ff= (fb= ~a)+1);
+                fa= 0;
+            }
+            break;
           case 0x54:
             if ( israbbit()) {
               long long saved = st;
@@ -3504,8 +3603,8 @@ int main (int argc, char **argv){
               break;
             }
             // Fall through for z80 case
-          case 0x44: case 0x4c: case 0x5c:        // NEG
-          case 0x64: case 0x6c: case 0x74: case 0x7c:
+          case 0x44:       // NEG
+          case 0x74: case 0x7c:
                      st+= 8;
                      fr= a= (ff= (fb= ~a)+1);
                      fa= 0; break;
