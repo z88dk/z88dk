@@ -10,6 +10,25 @@
 
 #define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
 
+
+
+
+uint8_t get_memory(int pc)
+{
+  return mem[pc & 65535];
+}
+
+
+uint8_t *get_memory_addr(int pc)
+{
+  return &mem[pc & 65535];
+}
+
+uint8_t put_memory(int pc, uint8_t b)
+{
+  return mem[pc & 65535] = b;
+}
+
 // fr = zero, ff = carry, ff&128 = s/p
 
 // TODO: Setting P flag
@@ -23,30 +42,30 @@
           
 #define LDRIM(r)                \
           st += israbbit() ? 2 : 7, \
-          r= mem[pc++]
+          r= get_memory(pc++)
 
 #define LDRRIM(a, b)            \
           st += israbbit() ? 6 : 10, \
-          b= mem[pc++],         \
-          a= mem[pc++]
+          b= get_memory(pc++),         \
+          a= get_memory(pc++)
 
 #define LDRP(a, b, r)           \
           st += israbbit() ? (&a == &h) ? 2 : 6 : 7, \
-          r= mem[mp= b|a<<8],   \
+          r= get_memory(mp= b|a<<8),   \
           ++mp
 
 #define LDRPI(a, b, r)          \
           st += israbbit() ? 8 : 15, \
-          r= mem[((mem[pc++]^128)-128+(b|a<<8))&65535]
+          r= get_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535)
 
 #define LDPR(a, b, r)           \
           st += israbbit() ? (&a == &h) ? 6 : 7 : 7, \
-          mem[b|a<<8]= r,       \
+          put_memory(b|a<<8,r),       \
           mp= b+1&255 | a<<8
 
 #define LDPRI(a, b, r)          \
           st += israbbit() ? 11 : 15, \
-          mem[((mem[pc++]^128)-128+(b|a<<8))&65535]= r
+          put_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535,r)
 
 #define LDRR(dr, sr, dr_, n) do {          \
             st+= n;               \
@@ -56,14 +75,14 @@
             
 #define LDPNNRR(a, b, n)        \
           st+= n,               \
-          t= mem[pc++],         \
-          mem[t|= mem[pc++]<<8]= b, \
-          mem[mp= t+1]= a
+          t= get_memory(pc++),         \
+          put_memory(t|= get_memory(pc++)<<8, b), \
+          put_memory(mp= t+1,a)
 
 #define LDPIN(a, b)             \
           st+= 15,              \
-          t= mem[pc++],         \
-          mem[((t^128)-128+(b|a<<8))&65535]= mem[pc++]
+          t= get_memory(pc++),         \
+          put_memory(((t^128)-128+(b|a<<8))&65535, get_memory(pc++))
 
 #define INCW(a, b)              \
           st += israbbit() ? 2 : 6, \
@@ -88,16 +107,16 @@
 // TODO: Should affect alternate flags if altd
 #define INCPI(a, b)             \
           st += israbbit() ? 12 : 19, \
-          fa= mem[t= (mem[pc++]^128)-128+(b|a<<8)], \
+          fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
-            | (fr= mem[t]= fa+(fb=1))
+            | (fr= put_memory(t,fa+(fb=1)))
 
 // TODO: Should affect alternate flags if altd
 #define DECPI(a, b)             \
           st += israbbit() ? 12 : 19, \
-          fa= mem[t= (mem[pc++]^128)-128+(b|a<<8)], \
+          fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
-            | (fr= mem[t]= fa+(fb=-1))
+            | (fr= put_memory(t,fa+(fb=-1)))
 
 #define ADDRRRR(a, b, c, d)     \
           st+= israbbit() ? 2 :11,              \
@@ -126,7 +145,7 @@
 #define JRCI(c)                 \
           if(c)                 \
             st+= 12,            \
-            pc+= (mem[pc]^128)-127; \
+            pc+= (get_memory(pc)^128)-127; \
           else                  \
             st+= 7,             \
             pc++
@@ -137,13 +156,13 @@
             pc++;               \
           else                  \
             st+= 12,            \
-            pc+= (mem[pc]^128)-127
+            pc+= (get_memory(pc)^128)-127
 
 #define LDRRPNN(a, b, n)        \
           st+= n,               \
-          t= mem[pc++],         \
-          b= mem[t|= mem[pc++]<<8], \
-          a= mem[mp= t+1]
+          t= get_memory(pc++),         \
+          b= get_memory(t|= get_memory(pc++)<<8), \
+          a= get_memory(mp= t+1)
 
 #define ADDISP(a, b)            \
           st+= 11,              \
@@ -251,46 +270,46 @@
 
 #define RET(n)                  \
           st+= n,               \
-          mp= mem[sp++],        \
-          pc= mp|= mem[sp++]<<8
+          mp= get_memory(sp++),        \
+          pc= mp|= get_memory(sp++)<<8
 
 #define RETC(c)                 \
           if(c)                 \
             st+= 5;             \
           else                  \
             st+= 11,            \
-            mp= mem[sp++],      \
-            pc= mp|= mem[sp++]<<8
+            mp= get_memory(sp++),      \
+            pc= mp|= get_memory(sp++)<<8
 
 #define RETCI(c)                \
           if(c)                 \
             st+= 11,            \
-            mp= mem[sp++],      \
-            pc= mp|= mem[sp++]<<8;\
+            mp= get_memory(sp++),      \
+            pc= mp|= get_memory(sp++)<<8; \
           else                  \
             st+= 5
 
 #define PUSH(a, b)              \
           st+= 11,              \
-          mem[--sp]= a,         \
-          mem[--sp]= b
+          put_memory(--sp,a),   \
+          put_memory(--sp,b)
 
 #define POP(a, b)               \
           st+= 10,              \
-          b= mem[sp++],         \
-          a= mem[sp++]
+          b= get_memory(sp++),  \
+          a= get_memory(sp++)
 
 #define JPC(c)                  \
           st+= 10;              \
           if(c)                 \
             pc+= 2;             \
           else                  \
-            pc= mem[pc] | mem[pc+1]<<8
+            pc= get_memory(pc) | get_memory(pc+1)<<8
 
 #define JPCI(c)                 \
           st+= 10;              \
           if(c)                 \
-            pc= mem[pc] | mem[pc+1]<<8; \
+            pc= get_memory(pc) | get_memory(pc+1)<<8; \
           else                  \
             pc+= 2
 
@@ -301,34 +320,34 @@
           else                  \
             st+= 17,            \
             t= pc+2,            \
-            mp= pc= mem[pc] | mem[pc+1]<<8, \
-            mem[--sp]= t>>8,    \
-            mem[--sp]= t
+            mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
+            put_memory(--sp,t>>8),    \
+            put_memory(--sp,t)
 
 #define CALLCI(c)               \
           if(c)                 \
             st+= 17,            \
             t= pc+2,            \
-            mp= pc= mem[pc] | mem[pc+1]<<8, \
-            mem[--sp]= t>>8,    \
-            mem[--sp]= t;       \
+            mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
+            put_memory(--sp,t>>8),    \
+            put_memory(--sp,t);    \
           else                  \
             st+= 10,            \
             pc+= 2
 
 #define RST(n)                  \
           st+= 11,              \
-          mem[--sp]= pc>>8,     \
-          mem[--sp]= pc,        \
+          put_memory(--sp,pc>>8),     \
+          put_memory(--sp,pc),        \
           mp= pc= n
 
 #define EXSPI(a, b)             \
           st+= 19,              \
-          t= mem[sp],           \
-          mem[sp++]= b,         \
+          t= get_memory(sp),    \
+          put_memory(sp++,b),   \
           b= t,                 \
-          t= mem[sp],           \
-          mem[sp--]= a,         \
+          t= get_memory(sp),    \
+          put_memory(sp--,a),   \
           a= t,                 \
           mp= b | a<<8
 
@@ -400,7 +419,7 @@
 
 #define BITHL(n)                \
           st += israbbit() ? 7 : 12, \
-          t= mem[l | h<<8],     \
+          t = get_memory(l | h<<8),     \
           ff= ff    & -256      \
             | mp>>8 &   40      \
             | -41   & (t&= n),  \
@@ -431,16 +450,18 @@
 
 #define RESHL(n)                \
           st += israbbit() ? 10 : 15, \
-          mem[t]= mem[t= l|h<<8] & n
-
+          t = l|h<<8, \
+          put_memory(t, get_memory(t) & n) 
+          
 #define SET(n, r)               \
           st += israbbit() ? 4 : 8, \
           r|= n
 
 #define SETHL(n)                \
           st += israbbit() ? 10 : 15, \
-          mem[t]= mem[t= l|h<<8] | n
-
+          t = l|h<<8, \
+          put_memory(t, get_memory(t) | n)
+          
 #define INR(r)                  \
           st+= 12,              \
           r= in(mp= b<<8 | c),  \
@@ -860,8 +881,8 @@ int main (int argc, char **argv){
       if( iff ){
         halted && (pc++, halted= 0);
         iff= 0;
-        mem[--sp]= pc>>8;
-        mem[--sp]= pc;
+        put_memory(--sp,pc>>8);
+        put_memory(--sp,pc);
         r++;
         switch( im ){
           case 1:
@@ -871,8 +892,8 @@ int main (int argc, char **argv){
             st+= 12;
             break;
           default:
-            pc= mem[t= 255 | i << 8];
-            pc|= mem[++t] << 8;
+            pc= get_memory(t= 255 | i << 8);
+            pc|= get_memory(++t) << 8;
             st+= 19;
         }
       }
@@ -880,7 +901,7 @@ int main (int argc, char **argv){
     if( tap && st>sttap )
       sttap= st+( tap= tapcycles() );
     r++;
-    switch( mem[pc++] ){
+    switch( get_memory(pc++) ){
       case 0x00: // NOP
       case 0x40: // LD B,B
         if ( altd ) { b_ = b; st += 2; break; }
@@ -929,8 +950,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x31: // LD SP,nn
         st+= israbbit() ? 6 : 10;
-        sp= mem[pc++];
-        sp|= mem[pc++]<<8;
+        sp= get_memory(pc++);
+        sp|= get_memory(pc++)<<8;
         ih=1;altd=0;break;
       case 0x02: // LD (BC),A
         LDPR(b, c, a);
@@ -956,8 +977,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x32: // LD (nn),A
         st+= israbbit() ? 10 : 13;
-        t= mem[pc++];
-        mem[t|= mem[pc++]<<8]= a;
+        t= get_memory(pc++);
+        put_memory(t|= get_memory(pc++)<<8,a);
         mp= t+1 & 255
           | a<<8;
         ih=1;altd=0;break;
@@ -972,9 +993,9 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x3a: // LD A,(nn)
         st+= israbbit() ? 9 : 13;
-        mp= mem[pc++];
-        if ( altd ) a_ = mem[mp|= mem[pc++]<<8];
-        else a= mem[mp|= mem[pc++]<<8];
+        mp= get_memory(pc++);
+        if ( altd ) a_ = get_memory(mp|= get_memory(pc++)<<8);
+        else a= get_memory(mp|= get_memory(pc++)<<8);
         ++mp;
         ih=1;altd=0;break;
       case 0x03: // INC BC
@@ -1058,9 +1079,9 @@ int main (int argc, char **argv){
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
         if( ih ) 
           st+= israbbit() ? 8 : 11,
-          fa= mem[t= l | h<<8],
+          fa= get_memory(t= l | h<<8),
           ff= ff&256
-            | (fr= mem[t]= fa+(fb=+1));
+            | (fr= put_memory(t,fa+(fb=+1)));
         else if( iy )
           INCPI(yh, yl);
         else
@@ -1100,9 +1121,9 @@ int main (int argc, char **argv){
       case 0x35: // DEC (HL) // DEC (IX+d) // DEC (IY+d)
         if( ih )
           st+= israbbit() ? 8 : 11,
-          fa= mem[t= l | h<<8],
+          fa= get_memory(t= l | h<<8),
           ff= ff&256
-            | (fr= mem[t]= fa+(fb=-1));
+            | (fr= put_memory(t,fa+(fb=-1)));
         else if( iy )
           DECPI(yh, yl);
         else
@@ -1149,7 +1170,7 @@ int main (int argc, char **argv){
       case 0x36: // LD (HL),n // LD (IX+d),n // LD (IY+d),n
         if( ih )
           st+= israbbit() ? 7 : 10,
-          mem[l|h<<8]= mem[pc++];
+          put_memory(l|h<<8,get_memory(pc++));
         else if( iy )
           LDPIN(yh, yl);
         else
@@ -1277,7 +1298,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x18: // JR
         st+= 12;
-        mp= pc+= (mem[pc]^128)-127;
+        mp= pc+= (get_memory(pc)^128)-127;
         ih=1;altd=0;break;
       case 0x20: // JR NZ,s8
         JRCI(fr);
@@ -1312,7 +1333,7 @@ int main (int argc, char **argv){
       case 0x10: // DJNZ
         if( ( altd && --b_) || ( altd == 0 && --b) )
           st+= israbbit() ? 5 : 13,
-          mp= pc+= (mem[pc]^128)-127;
+          mp= pc+= (get_memory(pc)^128)-127;
         else
           st+= israbbit() ? 5 : 8,
           pc++;
@@ -1320,7 +1341,7 @@ int main (int argc, char **argv){
       case 0x27: // DAA / add sp,d
         if ( israbbit()) {
           st += 4;
-          sp += (mem[pc++]^128)-128; // TODO: Carry
+          sp += (get_memory(pc++)^128)-128; // TODO: Carry
         } else {
           st+= 4;
           t= (fr^fa^fb^fb>>8) & 16;
@@ -1789,11 +1810,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x86: // ADD A,(HL) // ADD A,(IX+d) // ADD A,(IY+d)
         if( ih )
-          ADD(mem[l|h<<8], israbbit() ? 5 : 7);
+          ADD(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          ADD(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], israbbit() ? 5 : 7);
+          ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
         else
-          ADD(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], israbbit() ? 5 : 7);
+          ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);
         ih=1;altd=0;break;
       case 0x87: // ADD A,A
         st+= israbbit() ? 2 : 4;
@@ -1830,11 +1851,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d)
         if( ih )
-          ADC(mem[l|h<<8], israbbit() ? 5 : 7);
+          ADC(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          ADC(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], 7);
+          ADC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
-          ADC(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], 7);
+          ADC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
         ih=1;altd=0;break;
       case 0x8f: // ADC A,A
         st+= israbbit() ? 2 : 4;
@@ -1871,11 +1892,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x96: // SUB (HL) // SUB (IX+d) // SUB (IY+d)
         if( ih )
-          SUB(mem[l|h<<8], israbbit() ? 5 : 7);
+          SUB(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          SUB(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], israbbit() ? 5 : 7);
+          SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
         else
-          SUB(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], israbbit() ? 5 : 7);
+          SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);
         ih=1;altd=0;break;
       case 0x97: // SUB A
         st+= israbbit() ? 2 : 4;
@@ -1917,11 +1938,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0x9e: // SBC A,(HL) // SBC A,(IX+d) // SBC A,(IY+d)
         if( ih )
-          SBC(mem[l|h<<8], israbbit() ? 5 : 7);
+          SBC(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          SBC(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], israbbit() ? 5 : 7);
+          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
         else
-          SBC(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], israbbit() ? 5 : 7);;
+          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);;
         ih=1;altd=0;break;
       case 0x9f: // SBC A,A
         st+=  israbbit() ? 2 : 4;
@@ -1963,11 +1984,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
         if( ih )
-          AND(mem[l|h<<8], israbbit() ? 5 : 7);
+          AND(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          AND(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535],israbbit() ? 5 : 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),israbbit() ? 5 : 7);
         else
-          AND(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535],israbbit() ? 5 : 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),israbbit() ? 5 : 7);
         ih=1;altd=0;break;
       case 0xa7: // AND A
         st+=israbbit() ? 2 : 4;
@@ -2009,11 +2030,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xae: // XOR (HL) // XOR (IX+d) // XOR (IY+d)
         if( ih )
-          XOR(mem[l|h<<8], 7);
+          XOR(get_memory(l|h<<8), 7);
         else if( iy )
-          XOR(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], 7);
+          XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
-          XOR(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], 7);
+          XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
         ih=1;altd=0;break;
       case 0xaf: // XOR A
         st+= 4;
@@ -2050,11 +2071,11 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
         if( ih )
-          OR(mem[l|h<<8], israbbit() ? 5 : 7);
+          OR(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          OR(mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535], 7);
+          OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
-          OR(mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535], 7);
+          OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
         ih=1;altd=0;break;
       case 0xb7: // OR A
         st+= israbbit() ? 2 : 4;
@@ -2098,13 +2119,13 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d)
         if( ih )
-          w= mem[l|h<<8],
+          w= get_memory(l|h<<8),
           CP(w, 7);
         else if( iy )
-          w= mem[((mem[pc++]^128)-128+(yl|yh<<8))&65535],
+          w= get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),
           CP(w, 7);
         else
-          w= mem[((mem[pc++]^128)-128+(xl|xh<<8))&65535],
+          w= get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),
           CP(w, 7);
         ih=1;altd=0;break;
       case 0xbf: // CP A
@@ -2162,8 +2183,8 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xf1: // POP AF
         st+= 10;
-        setf(mem[sp++]);
-        a= mem[sp++];
+        setf(get_memory(sp++));
+        a= get_memory(sp++);
         ih=1;altd=0;break;
       case 0xc5: // PUSH BC
         PUSH(b, c);
@@ -2184,7 +2205,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xc3: // JP nn
         st+= 10;
-        mp= pc= mem[pc] | mem[pc+1]<<8;
+        mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
         ih=1;altd=0;break;
       case 0xc2: // JP NZ
         JPCI(fr);
@@ -2213,23 +2234,23 @@ int main (int argc, char **argv){
       case 0xcd: // CALL nn
         st+= 17;
         t= pc+2;
-        mp= pc= mem[pc] | mem[pc+1]<<8;
-        mem[--sp]= t>>8;
-        mem[--sp]= t;
+        mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+        put_memory(--sp,t>>8);
+        put_memory(--sp,t);
         ih=1;altd=0;break;
       case 0xc4: // CALL NZ / (RCM) LD HL,(SP+N)
         if ( israbbit()) {
-          int     offset = sp + mem[pc++];
+          int     offset = sp + get_memory(pc++);
           st += 9;
           if ( ih ) {
-            l = mem[offset++];
-            h = mem[offset];
+            l = get_memory(offset++);
+            h = get_memory(offset);
           } else if ( iy ) {
-            yl = mem[offset++];
-            yh = mem[offset];
+            yl = get_memory(offset++);
+            yh = get_memory(offset);
           } else {
-            xl = mem[offset++];
-            xh = mem[offset];
+            xl = get_memory(offset++);
+            xh = get_memory(offset);
           }
         } else {
           CALLCI(fr);
@@ -2251,18 +2272,18 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xd4: // CALL NC / (RCM) LD (SP+N),HL
         if ( israbbit()) {
-          int     offset = sp + mem[pc++];
+          int     offset = sp + get_memory(pc++);
           st += 9;
 
           if ( ih ) {
-            mem[offset++] = l;
-            mem[offset] = h;
+            put_memory(offset++,l);
+            put_memory(offset, h);
           } else if ( iy ) {
-            mem[offset++] = yl;
-            mem[offset] = yh;
+            put_memory(offset++,yl);
+            put_memory(offset, yh);
           } else {
-            mem[offset++] = xl;
-            mem[offset] = xh;
+            put_memory(offset++,xl);
+            put_memory(offset, xh);
           }
         } else {
           CALLC(ff&256);
@@ -2287,18 +2308,18 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xe4: // CALL PO / (RCM) LD HL,(IX+D)
         if ( israbbit()) {
-          t = (mem[pc++]^128)-128;
+          t = (get_memory(pc++)^128)-128;
           st += 11;
           if ( ih ) {    // ld hl,(ix+d)
-            l = mem[t+(xl|xh<<8)];
-            h = mem[t+(xl|xh<<8) + 1];
+            l = get_memory(t+(xl|xh<<8));
+            h = get_memory(t+(xl|xh<<8) + 1);
           } else if ( iy ) { // ld hl,(iy+d)
-            l = mem[t+(yl|yh<<8)];
-            h = mem[t+(yl|yh<<8) + 1];
+            l = get_memory(t+(yl|yh<<8));
+            h = get_memory(t+(yl|yh<<8) + 1);
           } else { // ld hl,(hl+d)
             unsigned char lt;
-            lt = mem[t+(l|h<<8)];
-            h = mem[t+(l|h<<8) + 1];
+            lt = get_memory(t+(l|h<<8));
+            h = get_memory(t+(l|h<<8) + 1);
             l = lt;
           }
         } else {
@@ -2324,18 +2345,18 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xf4: // CALL P or (RCM) LD (IX+D),HL
         if ( israbbit()) {
-          t = (mem[pc++]^128)-128;
+          t = (get_memory(pc++)^128)-128;
           st += 11;
           if ( ih ) {    // ld (ix+d),hl
-            mem[t+(xl|xh<<8)] = l;
-            mem[t+(xl|xh<<8) + 1] = h;
+            put_memory(t+(xl|xh<<8),l);
+            put_memory(t+(xl|xh<<8) + 1,h);
           } else if ( iy ) { // ld (iy+d),hl
-            mem[t+(yl|yh<<8)] = l;
-            mem[t+(yl|yh<<8) + 1] = h;
+            put_memory(t+(yl|yh<<8),l);
+            put_memory(t+(yl|yh<<8) + 1,h);
           } else { // ld (hl+d),hl
             int addr = t+(l|h<<8);
-            mem[addr] = l;
-            mem[addr + 1] = h;
+            put_memory(addr,l);
+            put_memory(addr + 1, h);
           }
         } else {
           CALLC(ff&128);
@@ -2362,28 +2383,28 @@ int main (int argc, char **argv){
         ih=1;altd=0;
         break;
       case 0xc6: // ADD A,n
-        ADD(mem[pc++], 7);
+        ADD(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xce: // ADC A,n
-        ADC(mem[pc++], 7);
+        ADC(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xd6: // SUB n
-        SUB(mem[pc++], 7);
+        SUB(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xde: // SBC A,n
-        SBC(mem[pc++], 7);
+        SBC(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xe6: // AND n
-        AND(mem[pc++], 7);
+        AND(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xee: // XOR A,n
-        XOR(mem[pc++], 7);
+        XOR(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xf6: // OR n
-        OR(mem[pc++], 7);
+        OR(get_memory(pc++), 7);
         ih=1;altd=0;break;
       case 0xfe: // CP A,n
-        w= mem[pc++];
+        w= get_memory(pc++);
         CP(w, 7);
         ih=1;altd=0;break;
       case 0xc7: // RST 0x00
@@ -2422,13 +2443,13 @@ int main (int argc, char **argv){
         ih=1;altd=0;break;
       case 0xd3: // OUT (n),A
         st+= 11;
-        out(mp= mem[pc++] | a<<8, a);
+        out(mp= get_memory(pc++) | a<<8, a);
         mp= mp&65280
           | ++mp;
         ih=1;altd=0;break;
       case 0xdb: // IN A,(n) // (RCM) ioe
         st+= 11;
-        a= in(mp= mem[pc++] | a<<8);
+        a= in(mp= get_memory(pc++) | a<<8);
         ++mp;
         ih=1;altd=0;break;
       case 0xf3: // DI  / (RCM) RL DE
@@ -2535,7 +2556,7 @@ int main (int argc, char **argv){
       case 0xcb: // OP CB
         r++;
         if( ih )
-          switch( mem[pc++] ){
+          switch( get_memory(pc++) ){
             case 0x00:  RLC(b); break;                       // RLC B
             case 0x01:  RLC(c); break;                       // RLC C
             case 0x02:  RLC(d); break;                       // RLC D
@@ -2544,9 +2565,9 @@ int main (int argc, char **argv){
             case 0x05:  RLC(l); break;                       // RLC L
             case 0x06:  st+= 7;                              // RLC (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         RLC(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x07:  RLC(a); break;                       // RLC A
             case 0x08:  RRC(b); break;                       // RRC B
             case 0x09:  RRC(c); break;                       // RRC C
@@ -2556,9 +2577,9 @@ int main (int argc, char **argv){
             case 0x0d:  RRC(l); break;                       // RRC L
             case 0x0e:  st+= 7;                              // RRC (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         RRC(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x0f:  RRC(a); break;                       // RRC A
             case 0x10:  RL(b); break;                        // RL B
             case 0x11:  RL(c); break;                        // RL C
@@ -2568,9 +2589,9 @@ int main (int argc, char **argv){
             case 0x15:  RL(l); break;                        // RL L
             case 0x16:  st+= 7;                              // RL (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         RL(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x17:  RL(a); break;                        // RL A
             case 0x18:  RR(b); break;                        // RR B
             case 0x19:  RR(c); break;                        // RR C
@@ -2580,9 +2601,9 @@ int main (int argc, char **argv){
             case 0x1d:  RR(l); break;                        // RR L
             case 0x1e:  st+= 7;                              // RR (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         RR(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x1f:  RR(a); break;                        // RR A
             case 0x20:  SLA(b); break;                       // SLA B
             case 0x21:  SLA(c); break;                       // SLA C
@@ -2592,9 +2613,9 @@ int main (int argc, char **argv){
             case 0x25:  SLA(l); break;                       // SLA L
             case 0x26:  st+= 7;                              // SLA (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         SLA(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x27:  SLA(a); break;                       // SLA A
             case 0x28:  SRA(b); break;                       // SRA B
             case 0x29:  SRA(c); break;                       // SRA C
@@ -2604,9 +2625,9 @@ int main (int argc, char **argv){
             case 0x2d:  SRA(l); break;                       // SRA L
             case 0x2e:  st+= 7;                              // SRA (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         SRA(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x2f:  SRA(a); break;                       // SRA A
             case 0x30:  SLL(b); break;                       // SLL B
             case 0x31:  SLL(c); break;                       // SLL C
@@ -2616,9 +2637,9 @@ int main (int argc, char **argv){
             case 0x35:  SLL(l); break;                       // SLL L
             case 0x36:  st+= 7;                              // SLL (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         SLL(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x37:  SLL(a); break;                       // SLL A
             case 0x38:  SRL(b); break;                       // SRL B
             case 0x39:  SRL(c); break;                       // SRL C
@@ -2628,9 +2649,9 @@ int main (int argc, char **argv){
             case 0x3d:  SRL(l); break;                       // SRL L
             case 0x3e:  st+= 7;                              // SRL (HL)
                         t= l|h<<8;
-                        u= mem[t];
+                        get_memory(t);
                         SRL(u);
-                        mem[t]= u; break;                        
+                        put_memory(t, u); break;                        
             case 0x3f:  SRL(a); break;                       // SRL A
             case 0x40:  BIT(1, b); break;                    // BIT 0,B
             case 0x41:  BIT(1, c); break;                    // BIT 0,C
@@ -2828,74 +2849,74 @@ int main (int argc, char **argv){
         else{
           st+= 11;
           if( iy )
-            t= mem[mp= ((mem[pc++]^128)-128+(yl|yh<<8))];
+            t= get_memory(mp= ((get_memory(pc++)^128)-128+(yl|yh<<8)));
           else
-            t= mem[mp= ((mem[pc++]^128)-128+(xl|xh<<8))];
-          switch( mem[pc++] ){
-            case 0x00: RLC(t); mem[mp]= b= t; break;         // LD B,RLC (IX+d) // LD B,RLC (IY+d)
-            case 0x01: RLC(t); mem[mp]= c= t; break;         // LD C,RLC (IX+d) // LD C,RLC (IY+d)
-            case 0x02: RLC(t); mem[mp]= d= t; break;         // LD D,RLC (IX+d) // LD D,RLC (IY+d)
-            case 0x03: RLC(t); mem[mp]= e= t; break;         // LD E,RLC (IX+d) // LD E,RLC (IY+d)
-            case 0x04: RLC(t); mem[mp]= h= t; break;         // LD H,RLC (IX+d) // LD H,RLC (IY+d)
-            case 0x05: RLC(t); mem[mp]= l= t; break;         // LD L,RLC (IX+d) // LD L,RLC (IY+d)
-            case 0x06: RLC(t); mem[mp]= t; break;            // RLC (IX+d) // RLC (IY+d)
-            case 0x07: RLC(t); mem[mp]= a= t; break;         // LD A,RLC (IX+d) // LD A,RLC (IY+d)
-            case 0x08: RRC(t); mem[mp]= b= t; break;         // LD B,RRC (IX+d) // LD B,RRC (IY+d)
-            case 0x09: RRC(t); mem[mp]= c= t; break;         // LD C,RRC (IX+d) // LD C,RRC (IY+d)
-            case 0x0a: RRC(t); mem[mp]= d= t; break;         // LD D,RRC (IX+d) // LD D,RRC (IY+d)
-            case 0x0b: RRC(t); mem[mp]= e= t; break;         // LD E,RRC (IX+d) // LD E,RRC (IY+d)
-            case 0x0c: RRC(t); mem[mp]= h= t; break;         // LD H,RRC (IX+d) // LD H,RRC (IY+d)
-            case 0x0d: RRC(t); mem[mp]= l= t; break;         // LD L,RRC (IX+d) // LD L,RRC (IY+d)
-            case 0x0e: RRC(t); mem[mp]= t; break;            // RRC (IX+d) // RRC (IY+d)
-            case 0x0f: RRC(t); mem[mp]= a= t; break;         // LD A,RRC (IX+d) // LD A,RRC (IY+d)
-            case 0x10: RL(t); mem[mp]= b= t; break;          // LD B,RL (IX+d) // LD B,RL (IY+d)
-            case 0x11: RL(t); mem[mp]= c= t; break;          // LD C,RL (IX+d) // LD C,RL (IY+d)
-            case 0x12: RL(t); mem[mp]= d= t; break;          // LD D,RL (IX+d) // LD D,RL (IY+d)
-            case 0x13: RL(t); mem[mp]= e= t; break;          // LD E,RL (IX+d) // LD E,RL (IY+d)
-            case 0x14: RL(t); mem[mp]= h= t; break;          // LD H,RL (IX+d) // LD H,RL (IY+d)
-            case 0x15: RL(t); mem[mp]= l= t; break;          // LD L,RL (IX+d) // LD L,RL (IY+d)
-            case 0x16: RL(t); mem[mp]= t; break;             // RL (IX+d) // RL (IY+d)
-            case 0x17: RL(t); mem[mp]= a= t; break;          // LD A,RL (IX+d) // LD A,RL (IY+d)
-            case 0x18: RR(t); mem[mp]= b= t; break;          // LD B,RR (IX+d) // LD B,RR (IY+d)
-            case 0x19: RR(t); mem[mp]= c= t; break;          // LD C,RR (IX+d) // LD C,RR (IY+d)
-            case 0x1a: RR(t); mem[mp]= d= t; break;          // LD D,RR (IX+d) // LD D,RR (IY+d)
-            case 0x1b: RR(t); mem[mp]= e= t; break;          // LD E,RR (IX+d) // LD E,RR (IY+d)
-            case 0x1c: RR(t); mem[mp]= h= t; break;          // LD H,RR (IX+d) // LD H,RR (IY+d)
-            case 0x1d: RR(t); mem[mp]= l= t; break;          // LD L,RR (IX+d) // LD L,RR (IY+d)
-            case 0x1e: RR(t); mem[mp]= t; break;             // RR (IX+d) // RR (IY+d)
-            case 0x1f: RR(t); mem[mp]= a= t; break;          // LD A,RR (IX+d) // LD A,RR (IY+d)
-            case 0x20: SLA(t); mem[mp]= b= t; break;         // LD B,SLA (IX+d) // LD B,SLA (IY+d)
-            case 0x21: SLA(t); mem[mp]= c= t; break;         // LD C,SLA (IX+d) // LD C,SLA (IY+d)
-            case 0x22: SLA(t); mem[mp]= d= t; break;         // LD D,SLA (IX+d) // LD D,SLA (IY+d)
-            case 0x23: SLA(t); mem[mp]= e= t; break;         // LD E,SLA (IX+d) // LD E,SLA (IY+d)
-            case 0x24: SLA(t); mem[mp]= h= t; break;         // LD H,SLA (IX+d) // LD H,SLA (IY+d)
-            case 0x25: SLA(t); mem[mp]= l= t; break;         // LD L,SLA (IX+d) // LD L,SLA (IY+d)
-            case 0x26: SLA(t); mem[mp]= t; break;            // SLA (IX+d) // SLA (IY+d)
-            case 0x27: SLA(t); mem[mp]= a= t; break;         // LD A,SLA (IX+d) // LD A,SLA (IY+d)
-            case 0x28: SRA(t); mem[mp]= b= t; break;         // LD B,SRA (IX+d) // LD B,SRA (IY+d)
-            case 0x29: SRA(t); mem[mp]= c= t; break;         // LD C,SRA (IX+d) // LD C,SRA (IY+d)
-            case 0x2a: SRA(t); mem[mp]= d= t; break;         // LD D,SRA (IX+d) // LD D,SRA (IY+d)
-            case 0x2b: SRA(t); mem[mp]= e= t; break;         // LD E,SRA (IX+d) // LD E,SRA (IY+d)
-            case 0x2c: SRA(t); mem[mp]= h= t; break;         // LD H,SRA (IX+d) // LD H,SRA (IY+d)
-            case 0x2d: SRA(t); mem[mp]= l= t; break;         // LD L,SRA (IX+d) // LD L,SRA (IY+d)
-            case 0x2e: SRA(t); mem[mp]= t; break;            // SRA (IX+d) // SRA (IY+d)
-            case 0x2f: SRA(t); mem[mp]= a= t; break;         // LD A,SRA (IX+d) // LD A,SRA (IY+d)
-            case 0x30: SLL(t); mem[mp]= b= t; break;         // LD B,SLL (IX+d) // LD B,SLL (IY+d)
-            case 0x31: SLL(t); mem[mp]= c= t; break;         // LD C,SLL (IX+d) // LD C,SLL (IY+d)
-            case 0x32: SLL(t); mem[mp]= d= t; break;         // LD D,SLL (IX+d) // LD D,SLL (IY+d)
-            case 0x33: SLL(t); mem[mp]= e= t; break;         // LD E,SLL (IX+d) // LD E,SLL (IY+d)
-            case 0x34: SLL(t); mem[mp]= h= t; break;         // LD H,SLL (IX+d) // LD H,SLL (IY+d)
-            case 0x35: SLL(t); mem[mp]= l= t; break;         // LD L,SLL (IX+d) // LD L,SLL (IY+d)
-            case 0x36: SLL(t); mem[mp]= t; break;            // SLL (IX+d) // SLL (IY+d)
-            case 0x37: SLL(t); mem[mp]= a= t; break;         // LD A,SLL (IX+d) // LD A,SLL (IY+d)
-            case 0x38: SRL(t); mem[mp]= b= t; break;         // LD B,SRL (IX+d) // LD B,SRL (IY+d)
-            case 0x39: SRL(t); mem[mp]= c= t; break;         // LD C,SRL (IX+d) // LD C,SRL (IY+d)
-            case 0x3a: SRL(t); mem[mp]= d= t; break;         // LD D,SRL (IX+d) // LD D,SRL (IY+d)
-            case 0x3b: SRL(t); mem[mp]= e= t; break;         // LD E,SRL (IX+d) // LD E,SRL (IY+d)
-            case 0x3c: SRL(t); mem[mp]= h= t; break;         // LD H,SRL (IX+d) // LD H,SRL (IY+d)
-            case 0x3d: SRL(t); mem[mp]= l= t; break;         // LD L,SRL (IX+d) // LD L,SRL (IY+d)
-            case 0x3e: SRL(t); mem[mp]= t; break;            // SRL (IX+d) // SRL (IY+d)
-            case 0x3f: SRL(t); mem[mp]= a= t; break;         // LD A,SRL (IX+d) // LD A,SRL (IY+d)
+            t= get_memory(mp= ((get_memory(pc++)^128)-128+(xl|xh<<8)));
+          switch( get_memory(pc++) ){
+            case 0x00: RLC(t); put_memory(mp, b=t); break;         // LD B,RLC (IX+d) // LD B,RLC (IY+d)
+            case 0x01: RLC(t); put_memory(mp, c=t); break;         // LD C,RLC (IX+d) // LD C,RLC (IY+d)
+            case 0x02: RLC(t); put_memory(mp, d=t); break;         // LD D,RLC (IX+d) // LD D,RLC (IY+d)
+            case 0x03: RLC(t); put_memory(mp, e=t); break;         // LD E,RLC (IX+d) // LD E,RLC (IY+d)
+            case 0x04: RLC(t); put_memory(mp, h=t); break;         // LD H,RLC (IX+d) // LD H,RLC (IY+d)
+            case 0x05: RLC(t); put_memory(mp, l=t); break;         // LD L,RLC (IX+d) // LD L,RLC (IY+d)
+            case 0x06: RLC(t); put_memory(mp, t); break;            // RLC (IX+d) // RLC (IY+d)
+            case 0x07: RLC(t); put_memory(mp, a=t); break;         // LD A,RLC (IX+d) // LD A,RLC (IY+d)
+            case 0x08: RRC(t); put_memory(mp, b=t); break;         // LD B,RRC (IX+d) // LD B,RRC (IY+d)
+            case 0x09: RRC(t); put_memory(mp, c=t); break;         // LD C,RRC (IX+d) // LD C,RRC (IY+d)
+            case 0x0a: RRC(t); put_memory(mp, d=t); break;         // LD D,RRC (IX+d) // LD D,RRC (IY+d)
+            case 0x0b: RRC(t); put_memory(mp, e=t); break;         // LD E,RRC (IX+d) // LD E,RRC (IY+d)
+            case 0x0c: RRC(t); put_memory(mp, h=t); break;         // LD H,RRC (IX+d) // LD H,RRC (IY+d)
+            case 0x0d: RRC(t); put_memory(mp, l=t); break;         // LD L,RRC (IX+d) // LD L,RRC (IY+d)
+            case 0x0e: RRC(t); put_memory(mp, t); break;            // RRC (IX+d) // RRC (IY+d)
+            case 0x0f: RRC(t); put_memory(mp, a=t); break;         // LD A,RRC (IX+d) // LD A,RRC (IY+d)
+            case 0x10: RL(t); put_memory(mp, b=t); break;          // LD B,RL (IX+d) // LD B,RL (IY+d)
+            case 0x11: RL(t); put_memory(mp, c=t); break;          // LD C,RL (IX+d) // LD C,RL (IY+d)
+            case 0x12: RL(t); put_memory(mp, d=t); break;          // LD D,RL (IX+d) // LD D,RL (IY+d)
+            case 0x13: RL(t); put_memory(mp, e=t); break;          // LD E,RL (IX+d) // LD E,RL (IY+d)
+            case 0x14: RL(t); put_memory(mp, h=t); break;          // LD H,RL (IX+d) // LD H,RL (IY+d)
+            case 0x15: RL(t); put_memory(mp, l=t); break;          // LD L,RL (IX+d) // LD L,RL (IY+d)
+            case 0x16: RL(t); put_memory(mp, t); break;             // RL (IX+d) // RL (IY+d)
+            case 0x17: RL(t); put_memory(mp, a=t); break;          // LD A,RL (IX+d) // LD A,RL (IY+d)
+            case 0x18: RR(t); put_memory(mp, b=t); break;          // LD B,RR (IX+d) // LD B,RR (IY+d)
+            case 0x19: RR(t); put_memory(mp, c=t); break;          // LD C,RR (IX+d) // LD C,RR (IY+d)
+            case 0x1a: RR(t); put_memory(mp, d=t); break;          // LD D,RR (IX+d) // LD D,RR (IY+d)
+            case 0x1b: RR(t); put_memory(mp, e=t); break;          // LD E,RR (IX+d) // LD E,RR (IY+d)
+            case 0x1c: RR(t); put_memory(mp, h=t); break;          // LD H,RR (IX+d) // LD H,RR (IY+d)
+            case 0x1d: RR(t); put_memory(mp, l=t); break;          // LD L,RR (IX+d) // LD L,RR (IY+d)
+            case 0x1e: RR(t); put_memory(mp, t); break;             // RR (IX+d) // RR (IY+d)
+            case 0x1f: RR(t); put_memory(mp, a=t); break;          // LD A,RR (IX+d) // LD A,RR (IY+d)
+            case 0x20: SLA(t); put_memory(mp, b=t); break;         // LD B,SLA (IX+d) // LD B,SLA (IY+d)
+            case 0x21: SLA(t); put_memory(mp, c=t); break;         // LD C,SLA (IX+d) // LD C,SLA (IY+d)
+            case 0x22: SLA(t); put_memory(mp, d=t); break;         // LD D,SLA (IX+d) // LD D,SLA (IY+d)
+            case 0x23: SLA(t); put_memory(mp, e=t); break;         // LD E,SLA (IX+d) // LD E,SLA (IY+d)
+            case 0x24: SLA(t); put_memory(mp, h=t); break;         // LD H,SLA (IX+d) // LD H,SLA (IY+d)
+            case 0x25: SLA(t); put_memory(mp, l=t); break;         // LD L,SLA (IX+d) // LD L,SLA (IY+d)
+            case 0x26: SLA(t); put_memory(mp, t); break;            // SLA (IX+d) // SLA (IY+d)
+            case 0x27: SLA(t); put_memory(mp, a=t); break;         // LD A,SLA (IX+d) // LD A,SLA (IY+d)
+            case 0x28: SRA(t); put_memory(mp, b=t); break;         // LD B,SRA (IX+d) // LD B,SRA (IY+d)
+            case 0x29: SRA(t); put_memory(mp, c=t); break;         // LD C,SRA (IX+d) // LD C,SRA (IY+d)
+            case 0x2a: SRA(t); put_memory(mp, d=t); break;         // LD D,SRA (IX+d) // LD D,SRA (IY+d)
+            case 0x2b: SRA(t); put_memory(mp, e=t); break;         // LD E,SRA (IX+d) // LD E,SRA (IY+d)
+            case 0x2c: SRA(t); put_memory(mp, h=t); break;         // LD H,SRA (IX+d) // LD H,SRA (IY+d)
+            case 0x2d: SRA(t); put_memory(mp, l=t); break;         // LD L,SRA (IX+d) // LD L,SRA (IY+d)
+            case 0x2e: SRA(t); put_memory(mp, t); break;            // SRA (IX+d) // SRA (IY+d)
+            case 0x2f: SRA(t); put_memory(mp, a=t); break;         // LD A,SRA (IX+d) // LD A,SRA (IY+d)
+            case 0x30: SLL(t); put_memory(mp, b=t); break;         // LD B,SLL (IX+d) // LD B,SLL (IY+d)
+            case 0x31: SLL(t); put_memory(mp, c=t); break;         // LD C,SLL (IX+d) // LD C,SLL (IY+d)
+            case 0x32: SLL(t); put_memory(mp, d=t); break;         // LD D,SLL (IX+d) // LD D,SLL (IY+d)
+            case 0x33: SLL(t); put_memory(mp, e=t); break;         // LD E,SLL (IX+d) // LD E,SLL (IY+d)
+            case 0x34: SLL(t); put_memory(mp, h=t); break;         // LD H,SLL (IX+d) // LD H,SLL (IY+d)
+            case 0x35: SLL(t); put_memory(mp, l=t); break;         // LD L,SLL (IX+d) // LD L,SLL (IY+d)
+            case 0x36: SLL(t); put_memory(mp, t); break;            // SLL (IX+d) // SLL (IY+d)
+            case 0x37: SLL(t); put_memory(mp, a=t); break;         // LD A,SLL (IX+d) // LD A,SLL (IY+d)
+            case 0x38: SRL(t); put_memory(mp, b=t); break;         // LD B,SRL (IX+d) // LD B,SRL (IY+d)
+            case 0x39: SRL(t); put_memory(mp, c=t); break;         // LD C,SRL (IX+d) // LD C,SRL (IY+d)
+            case 0x3a: SRL(t); put_memory(mp, d=t); break;         // LD D,SRL (IX+d) // LD D,SRL (IY+d)
+            case 0x3b: SRL(t); put_memory(mp, e=t); break;         // LD E,SRL (IX+d) // LD E,SRL (IY+d)
+            case 0x3c: SRL(t); put_memory(mp, h=t); break;         // LD H,SRL (IX+d) // LD H,SRL (IY+d)
+            case 0x3d: SRL(t); put_memory(mp, l=t); break;         // LD L,SRL (IX+d) // LD L,SRL (IY+d)
+            case 0x3e: SRL(t); put_memory(mp, t); break;            // SRL (IX+d) // SRL (IY+d)
+            case 0x3f: SRL(t); put_memory(mp, a=t); break;         // LD A,SRL (IX+d) // LD A,SRL (IY+d)
             case 0x40: case 0x41: case 0x42: case 0x43:      // BIT 0,(IX+d) // BIT 0,(IY+d)
             case 0x44: case 0x45: case 0x46: case 0x47:
                        BITI(1); break;
@@ -2920,140 +2941,140 @@ int main (int argc, char **argv){
             case 0x78: case 0x79: case 0x7a: case 0x7b:      // BIT 7,(IX+d) // BIT 7,(IY+d)
             case 0x7c: case 0x7d: case 0x7e: case 0x7f:
                        BITI(128); break;
-            case 0x80: RES(254, t); mem[mp]= b= t; break;    // LD B,RES 0,(IX+d) // LD B,RES 0,(IY+d)
-            case 0x81: RES(254, t); mem[mp]= c= t; break;    // LD C,RES 0,(IX+d) // LD C,RES 0,(IY+d)
-            case 0x82: RES(254, t); mem[mp]= d= t; break;    // LD D,RES 0,(IX+d) // LD D,RES 0,(IY+d)
-            case 0x83: RES(254, t); mem[mp]= e= t; break;    // LD E,RES 0,(IX+d) // LD E,RES 0,(IY+d)
-            case 0x84: RES(254, t); mem[mp]= h= t; break;    // LD H,RES 0,(IX+d) // LD H,RES 0,(IY+d)
-            case 0x85: RES(254, t); mem[mp]= l= t; break;    // LD L,RES 0,(IX+d) // LD L,RES 0,(IY+d)
-            case 0x86: RES(254, t); mem[mp]= t; if ( israbbit() ) st -= 9; break;       // RES 0,(IX+d) // RES 0,(IY+d)
-            case 0x87: RES(254, t); mem[mp]= a= t; break;    // LD A,RES 0,(IX+d) // LD A,RES 0,(IY+d)
-            case 0x88: RES(253, t); mem[mp]= b= t; break;    // LD B,RES 1,(IX+d) // LD B,RES 1,(IY+d)
-            case 0x89: RES(253, t); mem[mp]= c= t; break;    // LD C,RES 1,(IX+d) // LD C,RES 1,(IY+d)
-            case 0x8a: RES(253, t); mem[mp]= d= t; break;    // LD D,RES 1,(IX+d) // LD D,RES 1,(IY+d)
-            case 0x8b: RES(253, t); mem[mp]= e= t; break;    // LD E,RES 1,(IX+d) // LD E,RES 1,(IY+d)
-            case 0x8c: RES(253, t); mem[mp]= h= t; break;    // LD H,RES 1,(IX+d) // LD H,RES 1,(IY+d)
-            case 0x8d: RES(253, t); mem[mp]= l= t; break;    // LD L,RES 1,(IX+d) // LD L,RES 1,(IY+d)
-            case 0x8e: RES(253, t); mem[mp]= t; if ( israbbit() ) st -= 9; break;       // RES 1,(IX+d) // RES 1,(IY+d)
-            case 0x8f: RES(253, t); mem[mp]= a= t; break;    // LD A,RES 1,(IX+d) // LD A,RES 1,(IY+d)
-            case 0x90: RES(251, t); mem[mp]= b= t; break;    // LD B,RES 2,(IX+d) // LD B,RES 2,(IY+d)
-            case 0x91: RES(251, t); mem[mp]= c= t; break;    // LD C,RES 2,(IX+d) // LD C,RES 2,(IY+d)
-            case 0x92: RES(251, t); mem[mp]= d= t; break;    // LD D,RES 2,(IX+d) // LD D,RES 2,(IY+d)
-            case 0x93: RES(251, t); mem[mp]= e= t; break;    // LD E,RES 2,(IX+d) // LD E,RES 2,(IY+d)
-            case 0x94: RES(251, t); mem[mp]= h= t; break;    // LD H,RES 2,(IX+d) // LD H,RES 2,(IY+d)
-            case 0x95: RES(251, t); mem[mp]= l= t; break;    // LD L,RES 2,(IX+d) // LD L,RES 2,(IY+d)
-            case 0x96: RES(251, t); mem[mp]= t; if ( israbbit() ) st -= 9; break;       // RES 2,(IX+d) // RES 2,(IY+d)
-            case 0x97: RES(251, t); mem[mp]= a= t; break;    // LD A,RES 2,(IX+d) // LD A,RES 2,(IY+d)
-            case 0x98: RES(247, t); mem[mp]= b= t; break;    // LD B,RES 3,(IX+d) // LD B,RES 3,(IY+d)
-            case 0x99: RES(247, t); mem[mp]= c= t; break;    // LD C,RES 3,(IX+d) // LD C,RES 3,(IY+d)
-            case 0x9a: RES(247, t); mem[mp]= d= t; break;    // LD D,RES 3,(IX+d) // LD D,RES 3,(IY+d)
-            case 0x9b: RES(247, t); mem[mp]= e= t; break;    // LD E,RES 3,(IX+d) // LD E,RES 3,(IY+d)
-            case 0x9c: RES(247, t); mem[mp]= h= t; break;    // LD H,RES 3,(IX+d) // LD H,RES 3,(IY+d)
-            case 0x9d: RES(247, t); mem[mp]= l= t; break;    // LD L,RES 3,(IX+d) // LD L,RES 3,(IY+d)
-            case 0x9e: RES(247, t); mem[mp]= t; if ( israbbit() ) st -= 9; break;       // RES 3,(IX+d) // RES 3,(IY+d)
-            case 0x9f: RES(247, t); mem[mp]= a= t; break;    // LD A,RES 3,(IX+d) // LD A,RES 3,(IY+d)
-            case 0xa0: RES(239, t); mem[mp]= b= t; break;    // LD B,RES 4,(IX+d) // LD B,RES 4,(IY+d)
-            case 0xa1: RES(239, t); mem[mp]= c= t; break;    // LD C,RES 4,(IX+d) // LD C,RES 4,(IY+d)
-            case 0xa2: RES(239, t); mem[mp]= d= t; break;    // LD D,RES 4,(IX+d) // LD D,RES 4,(IY+d)
-            case 0xa3: RES(239, t); mem[mp]= e= t; break;    // LD E,RES 4,(IX+d) // LD E,RES 4,(IY+d)
-            case 0xa4: RES(239, t); mem[mp]= h= t; break;    // LD H,RES 4,(IX+d) // LD H,RES 4,(IY+d)
-            case 0xa5: RES(239, t); mem[mp]= l= t; break;    // LD L,RES 4,(IX+d) // LD L,RES 4,(IY+d)
-            case 0xa6: RES(239, t); mem[mp]= t; if ( israbbit() ) st -= 9; break;       // RES 4,(IX+d) // RES 4,(IY+d)
-            case 0xa7: RES(239, t); mem[mp]= a= t; break;    // LD A,RES 4,(IX+d) // LD A,RES 4,(IY+d)
-            case 0xa8: RES(223, t); mem[mp]= b= t; break;    // LD B,RES 5,(IX+d) // LD B,RES 5,(IY+d)
-            case 0xa9: RES(223, t); mem[mp]= c= t; break;    // LD C,RES 5,(IX+d) // LD C,RES 5,(IY+d)
-            case 0xaa: RES(223, t); mem[mp]= d= t; break;    // LD D,RES 5,(IX+d) // LD D,RES 5,(IY+d)
-            case 0xab: RES(223, t); mem[mp]= e= t; break;    // LD E,RES 5,(IX+d) // LD E,RES 5,(IY+d)
-            case 0xac: RES(223, t); mem[mp]= h= t; break;    // LD H,RES 5,(IX+d) // LD H,RES 5,(IY+d)
-            case 0xad: RES(223, t); mem[mp]= l= t; break;    // LD L,RES 5,(IX+d) // LD L,RES 5,(IY+d)
-            case 0xae: RES(223, t); mem[mp]= t; if ( israbbit()) st -= 9; break;       // RES 5,(IX+d) // RES 5,(IY+d)
-            case 0xaf: RES(223, t); mem[mp]= a= t; break;    // LD A,RES 5,(IX+d) // LD A,RES 5,(IY+d)
-            case 0xb0: RES(191, t); mem[mp]= b= t; break;    // LD B,RES 6,(IX+d) // LD B,RES 6,(IY+d)
-            case 0xb1: RES(191, t); mem[mp]= c= t; break;    // LD C,RES 6,(IX+d) // LD C,RES 6,(IY+d)
-            case 0xb2: RES(191, t); mem[mp]= d= t; break;    // LD D,RES 6,(IX+d) // LD D,RES 6,(IY+d)
-            case 0xb3: RES(191, t); mem[mp]= e= t; break;    // LD E,RES 6,(IX+d) // LD E,RES 6,(IY+d)
-            case 0xb4: RES(191, t); mem[mp]= h= t; break;    // LD H,RES 6,(IX+d) // LD H,RES 6,(IY+d)
-            case 0xb5: RES(191, t); mem[mp]= l= t; break;    // LD L,RES 6,(IX+d) // LD L,RES 6,(IY+d)
-            case 0xb6: RES(191, t); mem[mp]= t; if ( israbbit()) st -= 9; break;       // RES 6,(IX+d) // RES 6,(IY+d)
-            case 0xb7: RES(191, t); mem[mp]= a= t; break;    // LD A,RES 6,(IX+d) // LD A,RES 6,(IY+d)
-            case 0xb8: RES(127, t); mem[mp]= b= t; break;    // LD B,RES 7,(IX+d) // LD B,RES 7,(IY+d)
-            case 0xb9: RES(127, t); mem[mp]= c= t; break;    // LD C,RES 7,(IX+d) // LD C,RES 7,(IY+d)
-            case 0xba: RES(127, t); mem[mp]= d= t; break;    // LD D,RES 7,(IX+d) // LD D,RES 7,(IY+d)
-            case 0xbb: RES(127, t); mem[mp]= e= t; break;    // LD E,RES 7,(IX+d) // LD E,RES 7,(IY+d)
-            case 0xbc: RES(127, t); mem[mp]= h= t; break;    // LD H,RES 7,(IX+d) // LD H,RES 7,(IY+d)
-            case 0xbd: RES(127, t); mem[mp]= l= t; break;    // LD L,RES 7,(IX+d) // LD L,RES 7,(IY+d)
-            case 0xbe: RES(127, t); mem[mp]= t; if ( israbbit()) st -= 9; break;       // RES 7,(IX+d) // RES 7,(IY+d)
-            case 0xbf: RES(127, t); mem[mp]= a= t; break;    // LD A,RES 7,(IX+d) // LD A,RES 7,(IY+d)
-            case 0xc0: SET(1, t); mem[mp]= b= t; break;      // LD B,SET 0,(IX+d) // LD B,SET 0,(IY+d)
-            case 0xc1: SET(1, t); mem[mp]= c= t; break;      // LD C,SET 0,(IX+d) // LD C,SET 0,(IY+d)
-            case 0xc2: SET(1, t); mem[mp]= d= t; break;      // LD D,SET 0,(IX+d) // LD D,SET 0,(IY+d)
-            case 0xc3: SET(1, t); mem[mp]= e= t; break;      // LD E,SET 0,(IX+d) // LD E,SET 0,(IY+d)
-            case 0xc4: SET(1, t); mem[mp]= h= t; break;      // LD H,SET 0,(IX+d) // LD H,SET 0,(IY+d)
-            case 0xc5: SET(1, t); mem[mp]= l= t; break;      // LD L,SET 0,(IX+d) // LD L,SET 0,(IY+d)
-            case 0xc6: SET(1, t); mem[mp]= t; if ( israbbit()) st -= 9; break;         // SET 0,(IX+d) // SET 0,(IY+d)
-            case 0xc7: SET(1, t); mem[mp]= a= t; break;      // LD A,SET 0,(IX+d) // LD A,SET 0,(IY+d)
-            case 0xc8: SET(2, t); mem[mp]= b= t; break;      // LD B,SET 1,(IX+d) // LD B,SET 1,(IY+d)
-            case 0xc9: SET(2, t); mem[mp]= c= t; break;      // LD C,SET 1,(IX+d) // LD C,SET 1,(IY+d)
-            case 0xca: SET(2, t); mem[mp]= d= t; break;      // LD D,SET 1,(IX+d) // LD D,SET 1,(IY+d)
-            case 0xcb: SET(2, t); mem[mp]= e= t; break;      // LD E,SET 1,(IX+d) // LD E,SET 1,(IY+d)
-            case 0xcc: SET(2, t); mem[mp]= h= t; break;      // LD H,SET 1,(IX+d) // LD H,SET 1,(IY+d)
-            case 0xcd: SET(2, t); mem[mp]= l= t; break;      // LD L,SET 1,(IX+d) // LD L,SET 1,(IY+d)
-            case 0xce: SET(2, t); mem[mp]= t; if ( israbbit()) st -= 9; break;         // SET 1,(IX+d) // SET 1,(IY+d)
-            case 0xcf: SET(2, t); mem[mp]= a= t; break;      // LD A,SET 1,(IX+d) // LD A,SET 1,(IY+d)
-            case 0xd0: SET(4, t); mem[mp]= b= t; break;      // LD B,SET 2,(IX+d) // LD B,SET 2,(IY+d)
-            case 0xd1: SET(4, t); mem[mp]= c= t; break;      // LD C,SET 2,(IX+d) // LD C,SET 2,(IY+d)
-            case 0xd2: SET(4, t); mem[mp]= d= t; break;      // LD D,SET 2,(IX+d) // LD D,SET 2,(IY+d)
-            case 0xd3: SET(4, t); mem[mp]= e= t; break;      // LD E,SET 2,(IX+d) // LD E,SET 2,(IY+d)
-            case 0xd4: SET(4, t); mem[mp]= h= t; break;      // LD H,SET 2,(IX+d) // LD H,SET 2,(IY+d)
-            case 0xd5: SET(4, t); mem[mp]= l= t; break;      // LD L,SET 2,(IX+d) // LD L,SET 2,(IY+d)
-            case 0xd6: SET(4, t); mem[mp]= t; if ( israbbit()) st -= 9; break;         // SET 2,(IX+d) // SET 2,(IY+d)
-            case 0xd7: SET(4, t); mem[mp]= a= t; break;      // LD A,SET 2,(IX+d) // LD A,SET 2,(IY+d)
-            case 0xd8: SET(8, t); mem[mp]= b= t; break;      // LD B,SET 3,(IX+d) // LD B,SET 3,(IY+d)
-            case 0xd9: SET(8, t); mem[mp]= c= t; break;      // LD C,SET 3,(IX+d) // LD C,SET 3,(IY+d)
-            case 0xda: SET(8, t); mem[mp]= d= t; break;      // LD D,SET 3,(IX+d) // LD D,SET 3,(IY+d)
-            case 0xdb: SET(8, t); mem[mp]= e= t; break;      // LD E,SET 3,(IX+d) // LD E,SET 3,(IY+d)
-            case 0xdc: SET(8, t); mem[mp]= h= t; break;      // LD H,SET 3,(IX+d) // LD H,SET 3,(IY+d)
-            case 0xdd: SET(8, t); mem[mp]= l= t; break;      // LD L,SET 3,(IX+d) // LD L,SET 3,(IY+d)
-            case 0xde: SET(8, t); mem[mp]= t; if ( israbbit()) st -= 9; break;         // SET 3,(IX+d) // SET 3,(IY+d)
-            case 0xdf: SET(8, t); mem[mp]= a= t; break;      // LD A,SET 3,(IX+d) // LD A,SET 3,(IY+d)
-            case 0xe0: SET(16, t); mem[mp]= b= t; break;     // LD B,SET 4,(IX+d) // LD B,SET 4,(IY+d)
-            case 0xe1: SET(16, t); mem[mp]= c= t; break;     // LD C,SET 4,(IX+d) // LD C,SET 4,(IY+d)
-            case 0xe2: SET(16, t); mem[mp]= d= t; break;     // LD D,SET 4,(IX+d) // LD D,SET 4,(IY+d)
-            case 0xe3: SET(16, t); mem[mp]= e= t; break;     // LD E,SET 4,(IX+d) // LD E,SET 4,(IY+d)
-            case 0xe4: SET(16, t); mem[mp]= h= t; break;     // LD H,SET 4,(IX+d) // LD H,SET 4,(IY+d)
-            case 0xe5: SET(16, t); mem[mp]= l= t; break;     // LD L,SET 4,(IX+d) // LD L,SET 4,(IY+d)
-            case 0xe6: SET(16, t); mem[mp]= t; if ( israbbit()) st -= 9; break;        // SET 4,(IX+d) // SET 4,(IY+d)
-            case 0xe7: SET(16, t); mem[mp]= a= t; break;     // LD A,SET 4,(IX+d) // LD A,SET 4,(IY+d)
-            case 0xe8: SET(32, t); mem[mp]= b= t; break;     // LD B,SET 5,(IX+d) // LD B,SET 5,(IY+d)
-            case 0xe9: SET(32, t); mem[mp]= c= t; break;     // LD C,SET 5,(IX+d) // LD C,SET 5,(IY+d)
-            case 0xea: SET(32, t); mem[mp]= d= t; break;     // LD D,SET 5,(IX+d) // LD D,SET 5,(IY+d)
-            case 0xeb: SET(32, t); mem[mp]= e= t; break;     // LD E,SET 5,(IX+d) // LD E,SET 5,(IY+d)
-            case 0xec: SET(32, t); mem[mp]= h= t; break;     // LD H,SET 5,(IX+d) // LD H,SET 5,(IY+d)
-            case 0xed: SET(32, t); mem[mp]= l= t; break;     // LD L,SET 5,(IX+d) // LD L,SET 5,(IY+d)
-            case 0xee: SET(32, t); mem[mp]= t; if ( israbbit()) st -= 9; break;        // SET 5,(IX+d) // SET 5,(IY+d)
-            case 0xef: SET(32, t); mem[mp]= a= t; break;     // LD A,SET 5,(IX+d) // LD A,SET 5,(IY+d)
-            case 0xf0: SET(64, t); mem[mp]= b= t; break;     // LD B,SET 6,(IX+d) // LD B,SET 6,(IY+d)
-            case 0xf1: SET(64, t); mem[mp]= c= t; break;     // LD C,SET 6,(IX+d) // LD C,SET 6,(IY+d)
-            case 0xf2: SET(64, t); mem[mp]= d= t; break;     // LD D,SET 6,(IX+d) // LD D,SET 6,(IY+d)
-            case 0xf3: SET(64, t); mem[mp]= e= t; break;     // LD E,SET 6,(IX+d) // LD E,SET 6,(IY+d)
-            case 0xf4: SET(64, t); mem[mp]= h= t; break;     // LD H,SET 6,(IX+d) // LD H,SET 6,(IY+d)
-            case 0xf5: SET(64, t); mem[mp]= l= t; break;     // LD L,SET 6,(IX+d) // LD L,SET 6,(IY+d)
-            case 0xf6: SET(64, t); mem[mp]= t; if ( israbbit()) st -= 9; break;        // SET 6,(IX+d) // SET 6,(IY+d)
-            case 0xf7: SET(64, t); mem[mp]= a= t; break;     // LD A,SET 6,(IX+d) // LD A,SET 6,(IY+d)
-            case 0xf8: SET(128, t); mem[mp]= b= t; break;    // LD B,SET 7,(IX+d) // LD B,SET 7,(IY+d)
-            case 0xf9: SET(128, t); mem[mp]= c= t; break;    // LD C,SET 7,(IX+d) // LD C,SET 7,(IY+d)
-            case 0xfa: SET(128, t); mem[mp]= d= t; break;    // LD D,SET 7,(IX+d) // LD D,SET 7,(IY+d)
-            case 0xfb: SET(128, t); mem[mp]= e= t; break;    // LD E,SET 7,(IX+d) // LD E,SET 7,(IY+d)
-            case 0xfc: SET(128, t); mem[mp]= h= t; break;    // LD H,SET 7,(IX+d) // LD H,SET 7,(IY+d)
-            case 0xfd: SET(128, t); mem[mp]= l= t; break;    // LD L,SET 7,(IX+d) // LD L,SET 7,(IY+d)
-            case 0xfe: SET(128, t); mem[mp]= t; if ( israbbit()) st -= 9; break;       // SET 7,(IX+d) // SET 7,(IY+d)
-            case 0xff: SET(128, t); mem[mp]= a= t; break;    // LD A,SET 7,(IX+d) // LD A,SET 7,(IY+d)
+            case 0x80: RES(254, t); put_memory(mp, b=t); break;    // LD B,RES 0,(IX+d) // LD B,RES 0,(IY+d)
+            case 0x81: RES(254, t); put_memory(mp, c=t); break;    // LD C,RES 0,(IX+d) // LD C,RES 0,(IY+d)
+            case 0x82: RES(254, t); put_memory(mp, d=t); break;    // LD D,RES 0,(IX+d) // LD D,RES 0,(IY+d)
+            case 0x83: RES(254, t); put_memory(mp, e=t); break;    // LD E,RES 0,(IX+d) // LD E,RES 0,(IY+d)
+            case 0x84: RES(254, t); put_memory(mp, h=t); break;    // LD H,RES 0,(IX+d) // LD H,RES 0,(IY+d)
+            case 0x85: RES(254, t); put_memory(mp, l=t); break;    // LD L,RES 0,(IX+d) // LD L,RES 0,(IY+d)
+            case 0x86: RES(254, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 0,(IX+d) // RES 0,(IY+d)
+            case 0x87: RES(254, t); put_memory(mp, a=t); break;    // LD A,RES 0,(IX+d) // LD A,RES 0,(IY+d)
+            case 0x88: RES(253, t); put_memory(mp, b=t); break;    // LD B,RES 1,(IX+d) // LD B,RES 1,(IY+d)
+            case 0x89: RES(253, t); put_memory(mp, c=t); break;    // LD C,RES 1,(IX+d) // LD C,RES 1,(IY+d)
+            case 0x8a: RES(253, t); put_memory(mp, d=t); break;    // LD D,RES 1,(IX+d) // LD D,RES 1,(IY+d)
+            case 0x8b: RES(253, t); put_memory(mp, e=t); break;    // LD E,RES 1,(IX+d) // LD E,RES 1,(IY+d)
+            case 0x8c: RES(253, t); put_memory(mp, h=t); break;    // LD H,RES 1,(IX+d) // LD H,RES 1,(IY+d)
+            case 0x8d: RES(253, t); put_memory(mp, l=t); break;    // LD L,RES 1,(IX+d) // LD L,RES 1,(IY+d)
+            case 0x8e: RES(253, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 1,(IX+d) // RES 1,(IY+d)
+            case 0x8f: RES(253, t); put_memory(mp, a=t); break;    // LD A,RES 1,(IX+d) // LD A,RES 1,(IY+d)
+            case 0x90: RES(251, t); put_memory(mp, b=t); break;    // LD B,RES 2,(IX+d) // LD B,RES 2,(IY+d)
+            case 0x91: RES(251, t); put_memory(mp, c=t); break;    // LD C,RES 2,(IX+d) // LD C,RES 2,(IY+d)
+            case 0x92: RES(251, t); put_memory(mp, d=t); break;    // LD D,RES 2,(IX+d) // LD D,RES 2,(IY+d)
+            case 0x93: RES(251, t); put_memory(mp, e=t); break;    // LD E,RES 2,(IX+d) // LD E,RES 2,(IY+d)
+            case 0x94: RES(251, t); put_memory(mp, h=t); break;    // LD H,RES 2,(IX+d) // LD H,RES 2,(IY+d)
+            case 0x95: RES(251, t); put_memory(mp, l=t); break;    // LD L,RES 2,(IX+d) // LD L,RES 2,(IY+d)
+            case 0x96: RES(251, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 2,(IX+d) // RES 2,(IY+d)
+            case 0x97: RES(251, t); put_memory(mp, a=t); break;    // LD A,RES 2,(IX+d) // LD A,RES 2,(IY+d)
+            case 0x98: RES(247, t); put_memory(mp, b=t); break;    // LD B,RES 3,(IX+d) // LD B,RES 3,(IY+d)
+            case 0x99: RES(247, t); put_memory(mp, c=t); break;    // LD C,RES 3,(IX+d) // LD C,RES 3,(IY+d)
+            case 0x9a: RES(247, t); put_memory(mp, d=t); break;    // LD D,RES 3,(IX+d) // LD D,RES 3,(IY+d)
+            case 0x9b: RES(247, t); put_memory(mp, e=t); break;    // LD E,RES 3,(IX+d) // LD E,RES 3,(IY+d)
+            case 0x9c: RES(247, t); put_memory(mp, h=t); break;    // LD H,RES 3,(IX+d) // LD H,RES 3,(IY+d)
+            case 0x9d: RES(247, t); put_memory(mp, l=t); break;    // LD L,RES 3,(IX+d) // LD L,RES 3,(IY+d)
+            case 0x9e: RES(247, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 3,(IX+d) // RES 3,(IY+d)
+            case 0x9f: RES(247, t); put_memory(mp, a=t); break;    // LD A,RES 3,(IX+d) // LD A,RES 3,(IY+d)
+            case 0xa0: RES(239, t); put_memory(mp, b=t); break;    // LD B,RES 4,(IX+d) // LD B,RES 4,(IY+d)
+            case 0xa1: RES(239, t); put_memory(mp, c=t); break;    // LD C,RES 4,(IX+d) // LD C,RES 4,(IY+d)
+            case 0xa2: RES(239, t); put_memory(mp, d=t); break;    // LD D,RES 4,(IX+d) // LD D,RES 4,(IY+d)
+            case 0xa3: RES(239, t); put_memory(mp, e=t); break;    // LD E,RES 4,(IX+d) // LD E,RES 4,(IY+d)
+            case 0xa4: RES(239, t); put_memory(mp, h=t); break;    // LD H,RES 4,(IX+d) // LD H,RES 4,(IY+d)
+            case 0xa5: RES(239, t); put_memory(mp, l=t); break;    // LD L,RES 4,(IX+d) // LD L,RES 4,(IY+d)
+            case 0xa6: RES(239, t); put_memory(mp, t); if ( israbbit() ) st -= 9; break;       // RES 4,(IX+d) // RES 4,(IY+d)
+            case 0xa7: RES(239, t); put_memory(mp, a=t); break;    // LD A,RES 4,(IX+d) // LD A,RES 4,(IY+d)
+            case 0xa8: RES(223, t); put_memory(mp, b=t); break;    // LD B,RES 5,(IX+d) // LD B,RES 5,(IY+d)
+            case 0xa9: RES(223, t); put_memory(mp, c=t); break;    // LD C,RES 5,(IX+d) // LD C,RES 5,(IY+d)
+            case 0xaa: RES(223, t); put_memory(mp, d=t); break;    // LD D,RES 5,(IX+d) // LD D,RES 5,(IY+d)
+            case 0xab: RES(223, t); put_memory(mp, e=t); break;    // LD E,RES 5,(IX+d) // LD E,RES 5,(IY+d)
+            case 0xac: RES(223, t); put_memory(mp, h=t); break;    // LD H,RES 5,(IX+d) // LD H,RES 5,(IY+d)
+            case 0xad: RES(223, t); put_memory(mp, l=t); break;    // LD L,RES 5,(IX+d) // LD L,RES 5,(IY+d)
+            case 0xae: RES(223, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;       // RES 5,(IX+d) // RES 5,(IY+d)
+            case 0xaf: RES(223, t); put_memory(mp, a=t); break;    // LD A,RES 5,(IX+d) // LD A,RES 5,(IY+d)
+            case 0xb0: RES(191, t); put_memory(mp, b=t); break;    // LD B,RES 6,(IX+d) // LD B,RES 6,(IY+d)
+            case 0xb1: RES(191, t); put_memory(mp, c=t); break;    // LD C,RES 6,(IX+d) // LD C,RES 6,(IY+d)
+            case 0xb2: RES(191, t); put_memory(mp, d=t); break;    // LD D,RES 6,(IX+d) // LD D,RES 6,(IY+d)
+            case 0xb3: RES(191, t); put_memory(mp, e=t); break;    // LD E,RES 6,(IX+d) // LD E,RES 6,(IY+d)
+            case 0xb4: RES(191, t); put_memory(mp, h=t); break;    // LD H,RES 6,(IX+d) // LD H,RES 6,(IY+d)
+            case 0xb5: RES(191, t); put_memory(mp, l=t); break;    // LD L,RES 6,(IX+d) // LD L,RES 6,(IY+d)
+            case 0xb6: RES(191, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;       // RES 6,(IX+d) // RES 6,(IY+d)
+            case 0xb7: RES(191, t); put_memory(mp, a=t); break;    // LD A,RES 6,(IX+d) // LD A,RES 6,(IY+d)
+            case 0xb8: RES(127, t); put_memory(mp, b=t); break;    // LD B,RES 7,(IX+d) // LD B,RES 7,(IY+d)
+            case 0xb9: RES(127, t); put_memory(mp, c=t); break;    // LD C,RES 7,(IX+d) // LD C,RES 7,(IY+d)
+            case 0xba: RES(127, t); put_memory(mp, d=t); break;    // LD D,RES 7,(IX+d) // LD D,RES 7,(IY+d)
+            case 0xbb: RES(127, t); put_memory(mp, e=t); break;    // LD E,RES 7,(IX+d) // LD E,RES 7,(IY+d)
+            case 0xbc: RES(127, t); put_memory(mp, h=t); break;    // LD H,RES 7,(IX+d) // LD H,RES 7,(IY+d)
+            case 0xbd: RES(127, t); put_memory(mp, l=t); break;    // LD L,RES 7,(IX+d) // LD L,RES 7,(IY+d)
+            case 0xbe: RES(127, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;       // RES 7,(IX+d) // RES 7,(IY+d)
+            case 0xbf: RES(127, t); put_memory(mp, a=t); break;    // LD A,RES 7,(IX+d) // LD A,RES 7,(IY+d)
+            case 0xc0: SET(1, t); put_memory(mp, b=t); break;      // LD B,SET 0,(IX+d) // LD B,SET 0,(IY+d)
+            case 0xc1: SET(1, t); put_memory(mp, c=t); break;      // LD C,SET 0,(IX+d) // LD C,SET 0,(IY+d)
+            case 0xc2: SET(1, t); put_memory(mp, d=t); break;      // LD D,SET 0,(IX+d) // LD D,SET 0,(IY+d)
+            case 0xc3: SET(1, t); put_memory(mp, e=t); break;      // LD E,SET 0,(IX+d) // LD E,SET 0,(IY+d)
+            case 0xc4: SET(1, t); put_memory(mp, h=t); break;      // LD H,SET 0,(IX+d) // LD H,SET 0,(IY+d)
+            case 0xc5: SET(1, t); put_memory(mp, l=t); break;      // LD L,SET 0,(IX+d) // LD L,SET 0,(IY+d)
+            case 0xc6: SET(1, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;         // SET 0,(IX+d) // SET 0,(IY+d)
+            case 0xc7: SET(1, t); put_memory(mp, a=t); break;      // LD A,SET 0,(IX+d) // LD A,SET 0,(IY+d)
+            case 0xc8: SET(2, t); put_memory(mp, b=t); break;      // LD B,SET 1,(IX+d) // LD B,SET 1,(IY+d)
+            case 0xc9: SET(2, t); put_memory(mp, c=t); break;      // LD C,SET 1,(IX+d) // LD C,SET 1,(IY+d)
+            case 0xca: SET(2, t); put_memory(mp, d=t); break;      // LD D,SET 1,(IX+d) // LD D,SET 1,(IY+d)
+            case 0xcb: SET(2, t); put_memory(mp, e=t); break;      // LD E,SET 1,(IX+d) // LD E,SET 1,(IY+d)
+            case 0xcc: SET(2, t); put_memory(mp, h=t); break;      // LD H,SET 1,(IX+d) // LD H,SET 1,(IY+d)
+            case 0xcd: SET(2, t); put_memory(mp, l=t); break;      // LD L,SET 1,(IX+d) // LD L,SET 1,(IY+d)
+            case 0xce: SET(2, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;         // SET 1,(IX+d) // SET 1,(IY+d)
+            case 0xcf: SET(2, t); put_memory(mp, a=t); break;      // LD A,SET 1,(IX+d) // LD A,SET 1,(IY+d)
+            case 0xd0: SET(4, t); put_memory(mp, b=t); break;      // LD B,SET 2,(IX+d) // LD B,SET 2,(IY+d)
+            case 0xd1: SET(4, t); put_memory(mp, c=t); break;      // LD C,SET 2,(IX+d) // LD C,SET 2,(IY+d)
+            case 0xd2: SET(4, t); put_memory(mp, d=t); break;      // LD D,SET 2,(IX+d) // LD D,SET 2,(IY+d)
+            case 0xd3: SET(4, t); put_memory(mp, e=t); break;      // LD E,SET 2,(IX+d) // LD E,SET 2,(IY+d)
+            case 0xd4: SET(4, t); put_memory(mp, h=t); break;      // LD H,SET 2,(IX+d) // LD H,SET 2,(IY+d)
+            case 0xd5: SET(4, t); put_memory(mp, l=t); break;      // LD L,SET 2,(IX+d) // LD L,SET 2,(IY+d)
+            case 0xd6: SET(4, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;         // SET 2,(IX+d) // SET 2,(IY+d)
+            case 0xd7: SET(4, t); put_memory(mp, a=t); break;      // LD A,SET 2,(IX+d) // LD A,SET 2,(IY+d)
+            case 0xd8: SET(8, t); put_memory(mp, b=t); break;      // LD B,SET 3,(IX+d) // LD B,SET 3,(IY+d)
+            case 0xd9: SET(8, t); put_memory(mp, c=t); break;      // LD C,SET 3,(IX+d) // LD C,SET 3,(IY+d)
+            case 0xda: SET(8, t); put_memory(mp, d=t); break;      // LD D,SET 3,(IX+d) // LD D,SET 3,(IY+d)
+            case 0xdb: SET(8, t); put_memory(mp, e=t); break;      // LD E,SET 3,(IX+d) // LD E,SET 3,(IY+d)
+            case 0xdc: SET(8, t); put_memory(mp, h=t); break;      // LD H,SET 3,(IX+d) // LD H,SET 3,(IY+d)
+            case 0xdd: SET(8, t); put_memory(mp, l=t); break;      // LD L,SET 3,(IX+d) // LD L,SET 3,(IY+d)
+            case 0xde: SET(8, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;         // SET 3,(IX+d) // SET 3,(IY+d)
+            case 0xdf: SET(8, t); put_memory(mp, a=t); break;      // LD A,SET 3,(IX+d) // LD A,SET 3,(IY+d)
+            case 0xe0: SET(16, t); put_memory(mp, b=t); break;     // LD B,SET 4,(IX+d) // LD B,SET 4,(IY+d)
+            case 0xe1: SET(16, t); put_memory(mp, c=t); break;     // LD C,SET 4,(IX+d) // LD C,SET 4,(IY+d)
+            case 0xe2: SET(16, t); put_memory(mp, d=t); break;     // LD D,SET 4,(IX+d) // LD D,SET 4,(IY+d)
+            case 0xe3: SET(16, t); put_memory(mp, e=t); break;     // LD E,SET 4,(IX+d) // LD E,SET 4,(IY+d)
+            case 0xe4: SET(16, t); put_memory(mp, h=t); break;     // LD H,SET 4,(IX+d) // LD H,SET 4,(IY+d)
+            case 0xe5: SET(16, t); put_memory(mp, l=t); break;     // LD L,SET 4,(IX+d) // LD L,SET 4,(IY+d)
+            case 0xe6: SET(16, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;        // SET 4,(IX+d) // SET 4,(IY+d)
+            case 0xe7: SET(16, t); put_memory(mp, a=t); break;     // LD A,SET 4,(IX+d) // LD A,SET 4,(IY+d)
+            case 0xe8: SET(32, t); put_memory(mp, b=t); break;     // LD B,SET 5,(IX+d) // LD B,SET 5,(IY+d)
+            case 0xe9: SET(32, t); put_memory(mp, c=t); break;     // LD C,SET 5,(IX+d) // LD C,SET 5,(IY+d)
+            case 0xea: SET(32, t); put_memory(mp, d=t); break;     // LD D,SET 5,(IX+d) // LD D,SET 5,(IY+d)
+            case 0xeb: SET(32, t); put_memory(mp, e=t); break;     // LD E,SET 5,(IX+d) // LD E,SET 5,(IY+d)
+            case 0xec: SET(32, t); put_memory(mp, h=t); break;     // LD H,SET 5,(IX+d) // LD H,SET 5,(IY+d)
+            case 0xed: SET(32, t); put_memory(mp, l=t); break;     // LD L,SET 5,(IX+d) // LD L,SET 5,(IY+d)
+            case 0xee: SET(32, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;        // SET 5,(IX+d) // SET 5,(IY+d)
+            case 0xef: SET(32, t); put_memory(mp, a=t); break;     // LD A,SET 5,(IX+d) // LD A,SET 5,(IY+d)
+            case 0xf0: SET(64, t); put_memory(mp, b=t); break;     // LD B,SET 6,(IX+d) // LD B,SET 6,(IY+d)
+            case 0xf1: SET(64, t); put_memory(mp, c=t); break;     // LD C,SET 6,(IX+d) // LD C,SET 6,(IY+d)
+            case 0xf2: SET(64, t); put_memory(mp, d=t); break;     // LD D,SET 6,(IX+d) // LD D,SET 6,(IY+d)
+            case 0xf3: SET(64, t); put_memory(mp, e=t); break;     // LD E,SET 6,(IX+d) // LD E,SET 6,(IY+d)
+            case 0xf4: SET(64, t); put_memory(mp, h=t); break;     // LD H,SET 6,(IX+d) // LD H,SET 6,(IY+d)
+            case 0xf5: SET(64, t); put_memory(mp, l=t); break;     // LD L,SET 6,(IX+d) // LD L,SET 6,(IY+d)
+            case 0xf6: SET(64, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;        // SET 6,(IX+d) // SET 6,(IY+d)
+            case 0xf7: SET(64, t); put_memory(mp, a=t); break;     // LD A,SET 6,(IX+d) // LD A,SET 6,(IY+d)
+            case 0xf8: SET(128, t); put_memory(mp, b=t); break;    // LD B,SET 7,(IX+d) // LD B,SET 7,(IY+d)
+            case 0xf9: SET(128, t); put_memory(mp, c=t); break;    // LD C,SET 7,(IX+d) // LD C,SET 7,(IY+d)
+            case 0xfa: SET(128, t); put_memory(mp, d=t); break;    // LD D,SET 7,(IX+d) // LD D,SET 7,(IY+d)
+            case 0xfb: SET(128, t); put_memory(mp, e=t); break;    // LD E,SET 7,(IX+d) // LD E,SET 7,(IY+d)
+            case 0xfc: SET(128, t); put_memory(mp, h=t); break;    // LD H,SET 7,(IX+d) // LD H,SET 7,(IY+d)
+            case 0xfd: SET(128, t); put_memory(mp, l=t); break;    // LD L,SET 7,(IX+d) // LD L,SET 7,(IY+d)
+            case 0xfe: SET(128, t); put_memory(mp, t); if ( israbbit()) st -= 9; break;       // SET 7,(IX+d) // SET 7,(IY+d)
+            case 0xff: SET(128, t); put_memory(mp, a=t); break;    // LD A,SET 7,(IX+d) // LD A,SET 7,(IY+d)
           }
         }
         ih=1;altd=0;break;
       case 0xed: // OP ED
         r++;
-        switch( mem[pc++] ){
+        switch( get_memory(pc++) ){
           case 0x00: case 0x01: case 0x02: case 0x03:        // NOP
           case 0x04: case 0x05: case 0x06: case 0x07:
           case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -3141,8 +3162,8 @@ int main (int argc, char **argv){
             break;
           case 0x34:                                         // (ZXN) add hl,$xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t lsb = mem[pc++];
-              uint8_t msb = mem[pc++];
+              uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
@@ -3153,8 +3174,8 @@ int main (int argc, char **argv){
             break;
           case 0x35:                                         // (ZXN) add de,$xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t lsb = mem[pc++];
-              uint8_t msb = mem[pc++];
+              uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
@@ -3165,8 +3186,8 @@ int main (int argc, char **argv){
             break;
           case 0x36:                                         // (ZXN) add bc,$xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t lsb = mem[pc++];
-              uint8_t msb = mem[pc++];
+              uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
               b = (result >> 8 ) & 0xff;
               c = result & 0xff;
@@ -3232,8 +3253,8 @@ int main (int argc, char **argv){
             break;
           case 0x3B:                                         // (ZXN) add dehl,$XXXX
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t lsb = mem[pc++];
-              uint8_t msb = mem[pc++];
+              uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               int32_t result = ((( d * 256 ) + e) * 65536) + (( h * 256 ) + l) + ( lsb + msb * 256);
               d = (result >> 24);
               e = (result >> 16) & 0xff;
@@ -3270,8 +3291,8 @@ int main (int argc, char **argv){
             break;
           case 0x8a:                                         // (ZXN) push $xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t lsb = mem[pc++];
-              uint8_t msb = mem[pc++];
+              uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               PUSH(msb,lsb);
               st += 1;
             } else {
@@ -3289,7 +3310,7 @@ int main (int argc, char **argv){
           case 0x27:                                         // (ZXN) tst $xx
             if ( c_cpu == CPU_Z80_ZXN ) {
               uint8_t olda = a;
-              AND(mem[pc++], 0);
+              AND(get_memory(pc++), 0);
               a = olda;
               st += 7;
             } else {
@@ -3298,11 +3319,11 @@ int main (int argc, char **argv){
             break;
           case 0xa4: st+= 16;                                // (ZXN) ldix
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
-            t = mem[l | h<<8];
+            t = get_memory(l | h<<8);
             if ( t != a ) {
-              mem[e | d<<8]= t= mem[l | h<<8];
+              put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
-            mem[e | d<<8]= t= mem[l | h<<8];
+            put_memory(e | d<<8, t= get_memory(l | h<<8));
             ++l || h++;
             ++e || d++;
             c-- || b--;
@@ -3316,9 +3337,9 @@ int main (int argc, char **argv){
             fb= fa; break;
           case 0xac: st+= 16;                                // (ZXN) lddx
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
-            t = mem[l | h<<8];
+            t = get_memory(l | h<<8);
             if ( t != a ) {
-                mem[e | d<<8]= t= mem[l | h<<8];
+                put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
             l-- || h--;
             e-- || d--;
@@ -3333,9 +3354,9 @@ int main (int argc, char **argv){
             fb= fa; break;
           case 0xb4: st+= 16;                                // (ZXN) ldirx
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
-            t = mem[l | h<<8];
+            t = get_memory(l | h<<8);
             if ( t != a ) {
-                mem[e | d<<8]= t= mem[l | h<<8];
+                put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
             ++l || h++;
             ++e || d++;
@@ -3353,9 +3374,9 @@ int main (int argc, char **argv){
                    fb= fa; break;
           case 0xbc: st+= 16;                                // LDDR
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
-            t = mem[l | h<<8];
+            t = get_memory(l | h<<8);
             if ( t != a ) {
-                mem[e | d<<8]= t= mem[l | h<<8];
+                put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
             l-- || h--;
             e-- || d--;
@@ -3464,16 +3485,16 @@ int main (int argc, char **argv){
           case 0x53: LDPNNRR(d, e, 20); break;               // LD (NN),DE
           case 0x63: LDPNNRR(h, l, 20); break;               // LD (NN),HL
           case 0x73: st+= 20;                                // LD (NN),SP
-                     mp= mem[pc++];
-                     mem[mp|= mem[pc++]<<8]= sp;
-                     mem[++mp]= sp>>8; break;
+                     mp= get_memory(pc++);
+                     put_memory(mp|= get_memory(pc++)<<8, sp);
+                     put_memory(++mp,sp>>8); break;
           case 0x4b: LDRRPNN(b, c, 20); break;               // LD BC,(NN)
           case 0x5b: LDRRPNN(d, e, 20); break;               // LD DE,(NN)
           case 0x6b: LDRRPNN(h, l, 20); break;               // LD HL,(NN)
           case 0x7b: st+= 20;                                // LD SP,(NN)
-                     t= mem[pc++];
-                     sp= mem[t|= mem[pc++]<<8];
-                     sp|= mem[mp= t+1] << 8; break;
+                     t= get_memory(pc++);
+                     sp= get_memory(t|= get_memory(pc++)<<8);
+                     sp|= get_memory(mp= t+1) << 8; break;
           case 0x54:
             if ( israbbit()) {
               long long saved = st;
@@ -3510,7 +3531,7 @@ int main (int argc, char **argv){
                      fr= !!a;
                      fa= fb= iff<<7 & 128; break;
           case 0x67: st+= 18;                                // RRD
-                     t= mem[mp= l|h<<8]
+                     t= get_memory(mp= l|h<<8)
                       | a<<8;
                      a= a &240
                       | t & 15;
@@ -3518,9 +3539,9 @@ int main (int argc, char **argv){
                         | (fr= a);
                      fa= a|256;
                      fb= 0;
-                     mem[mp++]= t>>4; break;
+                     put_memory(mp++,t>>4); break;
           case 0x6f: st+= 18;                                // RLD
-                     t= mem[mp= l|h<<8]<<4
+                     t= get_memory(mp= l|h<<8)<<4
                       | a&15;
                      a= a &240
                       | t>>8;
@@ -3528,9 +3549,9 @@ int main (int argc, char **argv){
                         | (fr= a);
                      fa= a|256;
                      fb= 0;
-                     mem[mp++]= t; break;
+                     put_memory(mp++,t); break;
           case 0xa0: st+= israbbit() ? 10 :  16;                               // LDI
-                     mem[e | d<<8]= t= mem[l | h<<8];
+                     put_memory(e | d<<8, t= get_memory(l | h<<8));
                      ++l || h++;
                      ++e || d++;
                      c-- || b--;
@@ -3543,7 +3564,7 @@ int main (int argc, char **argv){
                      b|c && (fa= 128);
                      fb= fa; break;
           case 0xa8: st+= israbbit() ? 10 :  16;                                // LDD
-                     mem[e | d<<8]= t= mem[l | h<<8];
+                     put_memory(e | d<<8, t= get_memory(l | h<<8));
                      l-- || h--;
                      e-- || d--;
                      c-- || b--;
@@ -3556,7 +3577,7 @@ int main (int argc, char **argv){
                      b|c && (fa= 128);
                      fb= fa; break;
           case 0xb0: st+= israbbit() ? 7 :  16;                                // LDIR
-                     mem[e | d<<8]= t= mem[l | h<<8];
+                     put_memory(e | d<<8, t= get_memory(l | h<<8));
                      ++l || h++;
                      ++e || d++;
                      c-- || b--;
@@ -3572,7 +3593,7 @@ int main (int argc, char **argv){
                               --pc);
                      fb= fa; break;
           case 0xb8: st+= israbbit() ? 7 : 16;                                // LDDR
-                     mem[e | d<<8]= t= mem[l | h<<8];
+                     put_memory(e | d<<8, t= get_memory(l | h<<8));
                      l-- || h--;
                      e-- || d--;
                      c-- || b--;
@@ -3588,7 +3609,7 @@ int main (int argc, char **argv){
                               --pc);
                      fb= fa; break;
           case 0xa1: st+= 16;                                // CPI
-                     w= a-(t= mem[l|h<<8]);
+                     w= a-(t= get_memory(l|h<<8));
                      ++l || h++;
                      c-- || b--;
                      ++mp;
@@ -3604,7 +3625,7 @@ int main (int argc, char **argv){
                     ff|= w<<4 & 32
                        | w    &  8; break;
           case 0xa9: st+= 16;                                // CPD
-                     w= a-(t= mem[l|h<<8]);
+                     w= a-(t= get_memory(l|h<<8));
                      l-- || h--;
                      c-- || b--;
                      --mp;
@@ -3620,7 +3641,7 @@ int main (int argc, char **argv){
                     ff|= w<<4 & 32
                        | w    &  8; break;
           case 0xb1: st+= 16;                                // CPIR
-                     w= a-(t= mem[l|h<<8]);
+                     w= a-(t= get_memory(l|h<<8));
                      ++l || h++;
                      c-- || b--;
                      ++mp;
@@ -3637,7 +3658,7 @@ int main (int argc, char **argv){
                     ff|= w<<4 & 32
                        | w    &  8; break;
           case 0xb9: st+= 16;                                // CPDR
-                     w= a-(t= mem[l|h<<8]);
+                     w= a-(t= get_memory(l|h<<8));
                      l-- || h--;
                      c-- || b--;
                      --mp;
@@ -3654,7 +3675,7 @@ int main (int argc, char **argv){
                     ff|= w<<4 & 32
                        | w    &  8; break;
           case 0xa2: st+= 16;                                // INI
-                     mem[l | h<<8]= t= in(mp= c | b<<8);
+                     put_memory(l | h<<8,t= in(mp= c | b<<8));
                      ++l || h++;
                      ++mp;
                      u= t+(c+1&255);
@@ -3666,7 +3687,7 @@ int main (int argc, char **argv){
                         | u>>4
                         | (t&128)<<2; break;
           case 0xaa: st+= 16;                                // IND
-                     mem[l | h<<8]= t= in(mp= c | b<<8);
+                     put_memory(l | h<<8, t= in(mp= c | b<<8));
                      l-- || h--;
                      --mp;
                      u= t+(c-1&255);
@@ -3678,7 +3699,7 @@ int main (int argc, char **argv){
                         | u>>4
                         | (t&128)<<2; break;
           case 0xb2: st+= 16;                                // INIR
-                     mem[l | h<<8]= t= in(mp= c | b<<8);
+                     put_memory(l | h<<8, t= in(mp= c | b<<8));
                      ++l || h++;
                      ++mp;
                      u= t+(c+1&255);
@@ -3690,7 +3711,7 @@ int main (int argc, char **argv){
                         | u>>4
                         | (t&128)<<2; break;
           case 0xba: st+= 16;                                // INDR
-                     mem[l | h<<8]= t= in(mp= c | b<<8);
+                     put_memory(l | h<<8, t= in(mp= c | b<<8));
                      l-- || h--;
                      --mp;
                      u= t+(c-1&255);
@@ -3704,7 +3725,7 @@ int main (int argc, char **argv){
           case 0xa3: st+= 16;                                // OUTI
                      --b;
                      out( mp= c | b<<8,
-                          t= mem[l | h<<8]);
+                          t = get_memory(l | h<<8));
                      ++mp;
                      ++l || h++;
                      u= t+l;
@@ -3717,7 +3738,7 @@ int main (int argc, char **argv){
           case 0xab: st+= 16;                                // OUTD
                      --b;
                      out( mp= c | b<<8,
-                          t= mem[l | h<<8]);
+                          t = get_memory(l | h<<8));
                      --mp;
                      l-- || h--;
                      u= t+l;
@@ -3730,7 +3751,7 @@ int main (int argc, char **argv){
           case 0xb3: st+= 16;                                // OTIR
                      --b;
                      out( mp= c | b<<8,
-                          t= mem[l | h<<8]);
+                          t = get_memory(l | h<<8));
                      ++mp;
                      ++l || h++;
                      u= t+l;
@@ -3744,7 +3765,7 @@ int main (int argc, char **argv){
           case 0xbb: st+= 16;                                // OTDR
                      --b;
                      out( mp= c | b<<8,
-                          t= mem[l | h<<8]);
+                          t = get_memory(l | h<<8));
                      --mp;
                      l-- || h--;
                      u= t+l;
@@ -3773,8 +3794,8 @@ int main (int argc, char **argv){
       printf("\nCannot create or write in file: %s\n", output),
       exit(-1);
     if( !strcasecmp(strchr(output, '.'), ".sna" ) )
-      mem[--sp]= pc>>8,
-      mem[--sp]= pc,
+      put_memory(--sp,pc>>8),
+      put_memory(--sp,pc),
       fwrite(&i, 1, 1, fh),
       fwrite(&l_, 1, 1, fh),
       fwrite(&h_, 1, 1, fh),

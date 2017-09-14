@@ -247,7 +247,7 @@ static int cmd_next(int argc, char **argv)
 {
     char  buf[100];
     int   len;
-    uint8_t opcode = mem[pc];
+    uint8_t opcode = get_memory(pc);
 
     len = disassemble(pc, buf, sizeof(buf));
 
@@ -408,7 +408,7 @@ static int cmd_break(int argc, char **argv)
         if ( value != -1 ) {
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK8;
-            elem->lcheck_ptr = &mem[value % 65536];
+            elem->lcheck_ptr = get_memory_addr(value);
             elem->lvalue = atoi(argv[4]);
             elem->enabled = 1;
             elem->text = strdup(argv[2]);
@@ -427,9 +427,9 @@ static int cmd_break(int argc, char **argv)
             int value = atoi(argv[4]);
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK16;
-            elem->lcheck_ptr = &mem[addr % 65536];
+            elem->lcheck_ptr = get_memory_addr(addr);
             elem->lvalue = value % 256;
-            elem->hcheck_ptr = &mem[(addr + 1 )% 65536];
+            elem->hcheck_ptr = get_memory_addr(addr+1);
             elem->hvalue = (value % 65536 ) /    256;
             elem->enabled = 1;
             elem->text = strdup(argv[2]);
@@ -498,7 +498,7 @@ static int cmd_examine(int argc, char **argv)
 
             offs = snprintf(buf,sizeof(buf),"%04x: ", addr);
             for ( i = 0; i < 128; i++ ) {
-                uint8_t b = mem[ (addr + i) % 65536];
+                uint8_t b = get_memory( (addr + i) );
                 offs += snprintf(buf + offs, sizeof(buf) - offs,"%02x ", b);
                 abuf[i % 16] = isprint(b) ? b : '.';
                 if ( i % 16 == 15  && i != 0 ) {
@@ -585,10 +585,6 @@ static int cmd_quit(int argc, char **argv)
     exit(0);
 }
 
-uint8_t get_memory(int pc)
-{
-    return mem[pc % 65536];
-}
 
 
 static void print_hotspots()
