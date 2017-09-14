@@ -1,12 +1,7 @@
 @stdio/stdio.lst
 stdio/vg5k/fgetc_cons
 stdio/vg5k/getk
-stdio/ansi/puts_cons
-stdio/ansi/f_ansi
-stdio/ansi/f_ansi_lf
-stdio/ansi/f_ansi_putc
-stdio/ansi/fputc_cons
-stdio/ansi/f_ansi_dsr6
+@stdio/ansicore.lst
 stdio/ansi/vg5k/f_ansi_attr
 stdio/ansi/vg5k/f_ansi_bel
 stdio/ansi/vg5k/f_ansi_char
