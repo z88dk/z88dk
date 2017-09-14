@@ -2,12 +2,7 @@
 stdio/cpc/fgetc_cons
 stdio/cpc/fputc_cons
 stdio/cpc/getk
-stdio/ansi/f_ansi
-stdio/ansi/f_ansi_lf
-stdio/ansi/f_ansi_putc
-stdio/ansi/fputc_cons
-stdio/ansi/puts_cons
-stdio/ansi/f_ansi_dsr6
+@stdio/ansicore.lst
 stdio/ansi/cpc/f_ansi_attr
 stdio/ansi/cpc/f_ansi_bel
 stdio/ansi/cpc/f_ansi_char

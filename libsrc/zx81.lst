@@ -3,12 +3,7 @@
 stdio/zx81/fgetc_cons
 stdio/zx81/getk
 stdio/zx81/fputc_cons
-stdio/ansi/puts_cons
-stdio/ansi/f_ansi
-stdio/ansi/f_ansi_lf
-stdio/ansi/f_ansi_putc
-stdio/ansi/fputc_cons
-stdio/ansi/f_ansi_dsr6
+@stdio/ansicore.lst
 stdio/ansi/zx81/f_ansi_attr
 stdio/ansi/zx81/f_ansi_bel
 @stdlib/stdlib.lst
