@@ -19,5 +19,12 @@ strncasecmp:
    push hl
    push bc
    push af
-   
+
+IF CLASSIC
+   push ix   
+   call  asm_strncasecmp
+   pop  ix
+   ret
+ELSE
    jp asm_strncasecmp
+ENDIF

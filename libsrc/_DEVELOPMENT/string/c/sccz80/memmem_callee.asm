@@ -14,7 +14,23 @@ memmem_callee:
    pop bc
    pop de
    pop hl
+IF CLASSIC
+   exx
+   pop bc
+   exx
+ELSE
    pop ix
+ENDIF
    push af
-   
+  
+IF CLASSIC
+   exx
+   push bc
+   exx
+   ex (sp),ix
+   call asm_memmem
+   pop  ix
+   ret
+ELSE 
    jp asm_memmem
+ENDIF
