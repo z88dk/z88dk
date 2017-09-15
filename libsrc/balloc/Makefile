@@ -1,11 +1,47 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
+
 include ../Make.config
 
-all: $(wildcard *.asm) balloc.lst
-	$(LIBLINKER)  -x$(OUTPUT_DIRECTORY)/balloc @balloc.lst
+TARGET ?= test
+GENOBJECTS = 
+CUSTOBJECTS = 
+ASMFILES = $(wildcard *.asm)
+
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
+
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS))
+
+obj/z80/%.o: %.c
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/z80/%.o: %.asm
+	zcc +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/z80-zxn/%.o: %.c
+	zcc +test -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1  $(CFLAGS) -o $@  $^
+
+obj/z80-zxn/%.o: %.asm
+	zcc +test -mz80-zxn $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.c
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: %.asm
+	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.c
+	zcc +rcmx000 $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: %.asm
+	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
+
+obj/$(TARGET)/%.o: %.c
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+obj/$(TARGET)/%.o: %.asm
+	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+
+dirs:
+	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/z80-zxn 
 
 clean:
-	$(RM) *.o* *.sym *.map zcc_opt.def
-
+	$(RM) -fr obj
