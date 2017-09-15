@@ -28,7 +28,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib adt.lib  \
+genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -67,6 +67,7 @@ define buildgeneric
 	$(MAKE) -C psg
 	$(MAKE) -C balloc
 	$(MAKE) -C debug
+	$(MAKE) -C adt
 endef
 
 #  short script to sort out gfx dependencies
@@ -138,13 +139,6 @@ rect.lib:
 	@echo '--- Building Rectangles Library ---'
 	@echo ''
 	$(MAKE) -C rect 
-
-# abstract data types library - aralbrec
-adt.lib:
-	@echo ''
-	@echo '--- Building Abstract Data Types Library ---'
-	@echo ''
-	$(MAKE) -C adt 
 
 # interrupt mode 2 library - aralbrec
 im2.lib:

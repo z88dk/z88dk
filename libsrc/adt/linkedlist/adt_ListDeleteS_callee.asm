@@ -35,9 +35,13 @@ EXTERN _u_free
    ld de,justret
 
 .deletenotnull
-
+IF __CPU_R2K__ | __CPU_R3K__
+   push de
+   pop  ix
+ELSE
    ld ixl,e
    ld ixh,d
+ENDIF
 
    ld de,5
    add hl,de             ; hl = head
