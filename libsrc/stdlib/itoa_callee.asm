@@ -10,7 +10,7 @@ PUBLIC ASMDISP_ITOA_CALLEE
 PUBLIC LIBDISP_ITOA_CALLEE
 
 EXTERN l_deneg, l_div_u, strrev
-EXTERN stdio_basechar, error_einval_zc
+EXTERN itox_basechar, error_einval_zc
 
 .itoa_callee
 ._itoa_callee
@@ -80,7 +80,7 @@ EXTERN stdio_basechar, error_einval_zc
    call l_div_u              ; hl = num / radix, de = num % radix
    
    ex de,hl
-   ld bc,stdio_basechar
+   ld bc,itox_basechar
    add hl,bc
    ld c,(hl)                 ; c = ascii digit
    

@@ -11,11 +11,6 @@ setjmp/longjmp
 setjmp/setjmp
 @assert/assert.lst
 time/rcmx000/clock
-stdio_new/error/stdio_error_zc
-stdio_new/general/stdio_basechar
-stdio_new/general/stdio_atou
-stdio_new/general/stdio_ultoa_any
-stdio_new/general/stdio_utoa_any
 @regex/regex.lst
 stdio/ansi/ansifont_f3
 stdio/ansi/ansifont_f4

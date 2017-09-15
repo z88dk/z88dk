@@ -9,7 +9,7 @@ PUBLIC ASMDISP_LTOA_CALLEE
 PUBLIC LIBDISP_LTOA_CALLEE
 
 EXTERN l_long_neg, l_long_div_u, strrev
-EXTERN stdio_basechar, error_einval_zc
+EXTERN itox_basechar, error_einval_zc
 
 .ltoa_callee
 ._ltoa_callee
@@ -122,7 +122,7 @@ ELSE
 ENDIF
 
    exx
-   ld de, stdio_basechar
+   ld de, itox_basechar
    add hl,de
    ld a,(hl)                   ; a = digit to output
    exx

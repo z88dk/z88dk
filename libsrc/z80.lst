@@ -4,9 +4,6 @@
 setjmp/longjmp
 setjmp/setjmp
 @stdlib/stdlib.lst
-stdio_new/general/stdio_basechar
-stdio_new/general/stdio_ultoa_any
-stdio_new/general/stdio_utoa_any
 @strings/string.lst
 @regex/regex.lst
 stdio/ansi/ansifont_f3
