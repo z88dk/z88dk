@@ -37,341 +37,138 @@ option_t glue_options[] = {
 };
 
 
-
-struct binary_blob {
-    char *filename;
-    char *section_name;
-    int   org;
-    int   size;
-};
-
-struct {
-    int   num;
-    struct binary_blob *array;
-} memory_banks[257];
-
-struct aligned_blob {
-    char *section_name;
-    int   alignment;
-    int   org;
-    int   size;
-};
-
-struct {
-    int num;
-    struct aligned_blob *array;
-} aligned_sections;
-
-int compare_bank(const struct binary_blob *a, const struct binary_blob *b)
-{
-    return a->org - b->org;
-}
-
-int compare_aligned(const struct aligned_blob *a, const struct aligned_blob *b)
-{
-    return strcmp(a->section_name, b->section_name);
-}
-
-
 /*
 * Execution starts here
 */
 
-#define GLUELINEMAX 512
+#define LINELEN  1024
 
 int glue_exec(char *target)
 {
-    int i, j, k, bank;
-    char *p;
-    FILE *fin, *fout, *fihx;
-    char buffer[GLUELINEMAX + 1];
-    char filename[FILENAME_MAX * 2 + 1];
-    char ihexname[FILENAME_MAX * 2 + 1];
-    char symbol_name[GLUELINEMAX];
-    char section_name[GLUELINEMAX];
-    long symbol_value;
-    struct stat st_file;
+    struct banked_memory memory;
+    struct aligned_data aligned;
+    char filename[LINELEN];
+    char ihexname[LINELEN];
+    FILE *fmap, *fbin, *fhex;
+    int error;
 
     if (help) return -1;
 
     if (crtfile == NULL) crtfile = binname;
     if (binname == NULL) return -1;
 
-    strcpy(filename, crtfile);
+    // initialize banked memory representation
+
+    memset(&memory, 0, sizeof(memory));
+    mb_create_bankspace(&memory, "BANK");
+
+    memset(&aligned, 0, sizeof(aligned));
+
+    // open map file
+
+    snprintf(filename, sizeof(filename) - 4, "%s", crtfile);
     suffix_change(filename, ".map");
 
-    // formally initialize state even though not strictly necessary
+    if ((fmap = fopen(filename, "r")) == NULL)
+        exit_log(1, "Error: Cannot open map file %s\n", filename);
 
-    memset(memory_banks, 0, sizeof(memory_banks));
-    memset(&aligned_sections, 0, sizeof(aligned_sections));
+    // enumerate memory banks in map file
 
-    // iterate over map file
+    mb_enumerate_banks(fmap, binname, &memory, &aligned);
 
-    if ((fin = fopen(filename, "r")) == NULL)
-        exit_log(1, "Error: cannot open map file %s\n", filename);
+    // close map file
 
-    while (fgets(buffer, GLUELINEMAX, fin) != NULL)
-    {
-        if (sscanf(buffer, "%s = $%lx", symbol_name, &symbol_value) == 2)
-        {
-            // symbol and value have been read
-            
-            i = strlen(symbol_name);
-            if ((i >= 6) && (strncmp(symbol_name, "__", 2) == 0) && ((strcmp(symbol_name + i - 5, "_head") == 0) || (strcmp(symbol_name + i - 5, "_size") == 0)))
-            {
-                // section found, extract section name and form binary filename
+    fclose(fmap);
 
-                if (i == 6)
-                {
-                    section_name[0] = 0;
-                    sprintf(filename, "%s.bin", binname);
-                    if (stat(filename, &st_file) < 0)
-                        suffix_change(filename, "");
-                }
-                else
-                {
-                    strcpy(section_name, &symbol_name[2]);
-                    section_name[i - 7] = 0;
-                    sprintf(filename, "%s_%s.bin", binname, section_name);
-                }
+    // check for section alignment errors
+    // but treat them like warnings
 
-                // check if there's a corresponding binary file
+    mb_check_alignment(&aligned);
 
-                if ((strcmp(symbol_name + i - 4, "head") == 0) && (stat(filename, &st_file) >= 0) && (st_file.st_size > 0))
-                {
-                    // found a section binary, find out which memory bank it belongs to
+    // sort the memory banks and look for section overlaps
 
-                    bank = 256;
-                    if (p = strstr(symbol_name, "BANK_"))
-                        if ((sscanf(p, "BANK_%x", &bank) != 1) || (bank > 255))
-                            bank = -1;
-
-                    if ((bank < 0) || (bank > 256))
-                    {
-                        bank = 256;
-                        fprintf(stderr, "Warning: section %s is being placed in the main bank\n", section_name);
-                    }
-
-                    // add binary info to corresponding memory bank list
-
-                    j = memory_banks[bank].num++;
-                    memory_banks[bank].array = realloc(memory_banks[bank].array, (j + 1) * sizeof(struct binary_blob));
-
-                    if (memory_banks[bank].array == NULL)
-                        exit_log(1, "Error: out of memory\n");
-
-                    memory_banks[bank].array[j].filename = strdup(filename);
-                    memory_banks[bank].array[j].org = symbol_value;
-                    memory_banks[bank].array[j].size = st_file.st_size;
-                    memory_banks[bank].array[j].section_name = strdup(section_name);
-
-                    if ((memory_banks[bank].array[j].filename == NULL) || (memory_banks[bank].array[j].section_name == NULL))
-                        exit_log(1, "Error: out of memory\n");
-                }
-
-                // record aligned section
-
-                if ((p = strstr(section_name, "_align_")) && (sscanf(p, "_align_%u", &j) == 1))
-                {
-                    // look for existing entry for aligned section
-
-                    for (k = 0; k < aligned_sections.num; ++k)
-                        if (strcmp(aligned_sections.array[k].section_name, section_name) == 0)
-                            break;
-
-                    // if no existing entry, make a new one
-
-                    if (k >= aligned_sections.num)
-                    {
-                        k = aligned_sections.num++;
-                        aligned_sections.array = realloc(aligned_sections.array, (k + 1) * sizeof(struct aligned_blob));
-
-                        if (aligned_sections.array == NULL)
-                            exit_log(1, "Error: out of memory\n");
-
-                        aligned_sections.array[k].section_name = strdup(section_name);
-                        aligned_sections.array[k].alignment = j;
-                        aligned_sections.array[k].org = -1;
-                        aligned_sections.array[k].size = 0;
-
-                        if (aligned_sections.array[k].section_name == NULL)
-                            exit_log(1, "Error: out of memory\n");
-                    }
-
-                    if (strcmp(symbol_name + i - 4, "head") == 0)
-                        aligned_sections.array[k].org = symbol_value;
-                    else
-                        aligned_sections.array[k].size = symbol_value;
-                }
-            }
-        }
-        else
-        {
-            for (p = buffer; isspace(*p); ++p);
-
-            if (*p)
-                fprintf(stderr, "Warning: unable to parse line from map file\n\t%s\n", buffer);
-        }
-    }
-
-    fclose(fin);
-
-    // sort the memory banks and look for overlaps
-
-    for (i = 0; i < sizeof(memory_banks) / sizeof(*memory_banks); ++i)
-    {
-        if (memory_banks[i].num > 0)
-        {
-            qsort(memory_banks[i].array, memory_banks[i].num, sizeof(struct binary_blob), compare_bank);
-
-            k = 0;
-            for (j = 0; j < memory_banks[i].num; ++j)
-            {
-                if ((memory_banks[i].array[j].org + memory_banks[i].array[j].size) > 0x10000)
-                {
-                    fprintf(stderr, "Error: section %s overruns 64k memory space [0x%04x,0x%04x]\n", memory_banks[i].array[j].section_name, memory_banks[i].array[j].org, memory_banks[i].array[j].org + memory_banks[i].array[j].size - 1);
-                    k = 1;
-                    break;
-                }
-
-                if (j > 0)
-                {
-                    if (memory_banks[i].array[j].org < (memory_banks[i].array[j - 1].org + memory_banks[i].array[j - 1].size))
-                    {
-                        fprintf(stderr, "Error: section %s overlaps section %s by %d bytes\n", memory_banks[i].array[j - 1].section_name, memory_banks[i].array[j].section_name, memory_banks[i].array[j - 1].org + memory_banks[i].array[j - 1].size - memory_banks[i].array[j].org);
-                        k = 1;
-                    }
-                }
-            }
-        }
-    }
-
-    // look for alignment errors
-
-    if (aligned_sections.num > 0)
-    {
-        qsort(aligned_sections.array, aligned_sections.num, sizeof(struct aligned_blob), compare_aligned);
-
-        for (i = 0; i < aligned_sections.num; ++i)
-        {
-            if ((aligned_sections.array[i].size > 0) && (aligned_sections.array[i].org & (aligned_sections.array[i].alignment - 1)))
-                fprintf(stderr, "Warning: section %s at address 0x%04x is not properly aligned\n", aligned_sections.array[i].section_name, aligned_sections.array[i].org);
-        }
-    }
-
-    if (k) exit_log(1, "Aborting... errors in one or more binaries\n");
+    if (mb_sort_banks(&memory))
+        exit_log(1, "Aborting... errors in one or more binaries\n");
 
     // generate output binaries
 
-    for (i = 0; i < sizeof(memory_banks) / sizeof(*memory_banks); ++i)
+    if (memory.mainbank.num > 0)
     {
-        if (memory_banks[i].num > 0)
-        {
-            sprintf(filename, (i == 256) ? "%s__.bin" : "%s__%02x.bin", binname, i);
+        // the main bank contains sections
 
+        snprintf(filename, sizeof(filename), "%s__.bin", binname);
+        strcpy(ihexname, filename);
+        suffix_change(ihexname, ".ihx");
+
+        fbin = fhex = NULL;
+
+        if ((fbin = fopen(filename, "wb+")) == NULL)
+            exit_log(1, "Error: Cannot create file %s\n", filename);
+
+        if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
+            exit_log(1, "Error: Cannot create file %s\n", ihexname);
+
+        printf("Creating %s (org 0x%04x = %d)\n", filename, memory.mainbank.secbin[0].org, memory.mainbank.secbin[0].org);
+
+        error = mb_generate_output_binary(fbin, romfill, fhex, ipad, recsize, &memory.mainbank);
+
+        fclose(fbin);
+        if (fhex != NULL) fclose(fhex);
+
+        if (error)
+            exit_log(1, "Aborting... section unavailable\n");
+    }
+
+    for (int i = 0; i < MAXBANKS; ++i)
+    {
+        struct memory_bank *mb = &memory.bankspace[0].membank[i];
+
+        if (mb->num > 0)
+        {
+            // the memory bank contains sections
+
+            snprintf(filename, sizeof(filename), "%s__%03d.bin", binname, i);
             strcpy(ihexname, filename);
             suffix_change(ihexname, ".ihx");
 
-            if ((fout = fopen(filename, "wb")) == NULL)
-                fprintf(stderr, "Error: cannot create file %s, skipping\n", filename);
-            else
-            {
-                fihx = NULL;
-                if (ihex && ((fihx = fopen(ihexname, "wb")) == NULL))
-                    fprintf(stderr, "Error: cannot create file %s, skipping\n", filename);
+            fbin = fhex = NULL;
 
-                printf("Creating %s (org 0x%04x = %d)\n", filename, memory_banks[i].array[0].org, memory_banks[i].array[0].org);
+            if ((fbin = fopen(filename, "wb+")) == NULL)
+                exit_log(1, "Error: Cannot create file %s\n", filename);
 
-                for (j = 0; j < memory_banks[i].num; ++j)
-                {
-                    if ((fin = fopen(memory_banks[i].array[j].filename, "rb")) == NULL)
-                    {
-                        fprintf(stderr, "Error: removing %s, cannot read input file %s\n", filename, memory_banks[i].array[j].filename);
-                        fclose(fout);
-                        fout = NULL;
-                        remove(filename);
-                        if (fihx)
-                        {
-                            fclose(fihx);
-                            fihx = NULL;
-                            remove(ihexname);
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        // pad
+            if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
+                exit_log(1, "Error: Cannot create file %s\n", ihexname);
 
-                        if (j > 0)
-                        {
-                            k = memory_banks[i].array[j].org - memory_banks[i].array[j - 1].org - memory_banks[i].array[j - 1].size;
-                            while (k-- > 0)
-                                fputc(romfill, fout);
-                        }
+            printf("Creating %s (org 0x%04x = %d)\n", filename, mb->secbin[0].org, mb->secbin[0].org);
 
-                        // write
+            error = mb_generate_output_binary(fbin, romfill, fhex, ipad, recsize, mb);
 
-                        while ((k = fgetc(fin)) != EOF)
-                            fputc(k, fout);
+            fclose(fbin);
+            if (fhex != NULL) fclose(fhex);
 
-                        // ihex
-
-                        if (fihx && !ipad)
-                        {
-                            rewind(fin);
-                            bin2hex(fin, fihx, memory_banks[i].array[j].org, recsize, 0);
-                        }
-
-                        fclose(fin);
-                    }
-                }
-
-                if (fout) fclose(fout);
-                if (fihx)
-                {
-                    if (ipad)
-                    {
-                        // request is for a padded ihex file
-                        // nothing has been written to the ihex file yet, use the generate bin file as input source
-
-                        if ((fin = fopen(filename, "rb")) == NULL)
-                        {
-                            fprintf(stderr, "Error: cannot read file %s to generate %s, skipping\n", filename, ihexname);
-                            fclose(fihx);
-                            remove(ihexname);
-                        }
-                        else
-                        {
-                            bin2hex(fin, fihx, memory_banks[i].array[0].org, recsize, 1);
-                            fclose(fin);
-                            fclose(fihx);
-                        }
-
-                    }
-                    else
-                    {
-                        fprintf(fihx, ":00000001FF\n");
-                        fclose(fihx);
-                    }
-                }
-            }
+            if (error)
+                exit_log(1, "Aborting... section unavailable\n");
         }
     }
 
-    // clean
+    // clean up
 
-    free(aligned_sections.array);
-
-    for (i = 0; i < sizeof(memory_banks) / sizeof(*memory_banks); ++i)
+    if (clean)
     {
-        if (clean)
-        {
-            for (j = 0; j < memory_banks[i].num; ++j)
-                remove(memory_banks[i].array[j].filename);
-        }
+        for (int i = 0; i < memory.mainbank.num; ++i)
+            remove(memory.mainbank.secbin[i].filename);
 
-        free(memory_banks[i].array);
+        for (int i = 0; i < MAXBANKS; ++i)
+        {
+            struct memory_bank *mb = &memory.bankspace[0].membank[i];
+
+            for (int j = 0; j < mb->num; ++j)
+                remove(mb->secbin[j].filename);
+        }
     }
+
+    mb_cleanup_memory(&memory);
+    mb_cleanup_aligned(&aligned);
 
     return 0;
 }

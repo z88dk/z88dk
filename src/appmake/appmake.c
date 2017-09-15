@@ -375,6 +375,35 @@ void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
     strcat(name,suffix);
 }
 
+void *must_malloc(size_t sz)
+{
+    void *p;
+
+    if ((p = malloc(sz)) == NULL)
+        exit_log(1, "Error: Out of memory\n");
+
+    return p;
+}
+
+void *must_realloc(void *p, size_t sz)
+{
+    void *r;
+
+    if ((r = realloc(p, sz)) == NULL)
+        exit_log(1, "Error: Out of memory\n");
+
+    return r;
+}
+
+void *must_strdup(char *p)
+{
+    void *r;
+
+    if ((r = strdup(p)) == NULL)
+        exit_log(1, "Error: Out of memory\n");
+
+    return r;
+}
 
 /* Print the overall usage information */
 void main_usage(void)
@@ -948,4 +977,394 @@ static void  cleanup_temporary_files(void)
     for ( i = 0; i < num_temp_files; i++ ) {
          remove(temp_files[i]);
     }
+}
+
+
+/* memory banks */
+
+#define MBLINEMAX 1024
+
+void mb_create_bankspace(struct banked_memory *memory, char *bank_id)
+{
+    memory->num++;
+    memory->bankspace = must_realloc(memory->bankspace, memory->num * sizeof(*memory->bankspace));
+
+    memset(&memory->bankspace[memory->num - 1], 0, sizeof(*memory->bankspace));
+    memory->bankspace[memory->num - 1].bank_id = must_strdup(bank_id);
+}
+
+enum
+{
+    TYPE_HEAD = 1,
+    TYPE_SIZE
+};
+
+void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned)
+{
+    char buffer[MBLINEMAX];
+    char symbol_name[MBLINEMAX];
+    long symbol_value;
+    char section_name[MBLINEMAX];
+    char bfilename[MBLINEMAX];
+    int  c;
+    struct stat st;
+
+    // organize output binaries into banks
+
+    while (fgets(buffer, MBLINEMAX, fmap) != NULL)
+    {
+        // have one line of the map file
+        // make sure the entire line is consumed
+
+        if (buffer[strlen(buffer) - 1] != '\n')
+            while (((c = fgetc(fmap)) != EOF) && (c != '\n'));
+
+        // get symbol name and value
+
+        if (sscanf(buffer, "%s = $%lx", symbol_name, &symbol_value) == 2)
+        {
+            // find out if symbol corresponds to a section name
+
+            int len = strlen(symbol_name);
+            int type = 0;
+
+            if ((len >= 6) && (symbol_name[0] == '_') && (symbol_name[1] == '_'))
+            {
+                if (strcmp(symbol_name + len - 5, "_head") == 0)
+                    type = TYPE_HEAD;
+                else if (strcmp(symbol_name + len - 5, "_size") == 0)
+                    type = TYPE_SIZE;
+
+                if (type)
+                {
+                    char *p;
+
+                    // section found
+                    // extract section name and form binary filename
+
+                    if (len == 6)
+                    {
+                        // section name is empty
+                        // classic can generate main bank binaries with empty section names
+
+                        section_name[0] = 0;
+                        snprintf(bfilename, sizeof(bfilename), "%s.bin", binname);
+                        if ((stat(bfilename, &st) < 0) || (S_IFREG != (st.st_mode & S_IFMT)))
+                            suffix_change(bfilename, "");
+                    }
+                    else
+                    {
+                        // section name is present
+
+                        snprintf(section_name, sizeof(section_name), "%s", &symbol_name[2]);
+                        section_name[len - 7] = 0;
+                        snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname, section_name);
+                    }
+
+                    // if section head
+                    // check if a corresponding binary output file exists
+
+                    if ((type == TYPE_HEAD) && (stat(bfilename, &st) >= 0) && (S_IFREG == (st.st_mode & S_IFMT)) && (st.st_size > 0))
+                    {
+                        // found a section binary
+                        // find out which memory bank it belongs to
+
+                        struct memory_bank *mb = &memory->mainbank;
+
+                        for (int i = 0; i < memory->num; ++i)
+                        {
+                            if (p = strstr(section_name, memory->bankspace[i].bank_id))
+                            {
+                                int banknum;
+
+                                if (sscanf(p + strlen(memory->bankspace[i].bank_id), "_%d", &banknum) == 1)
+                                {
+                                    if ((banknum >= 0) && (banknum < MAXBANKS))
+                                    {
+                                        mb = &memory->bankspace[i].membank[banknum];
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        fprintf(stderr, "Warning: Bank number in %s is out of range\n(will likely end up in main bank)\n", section_name);
+                                    }
+                                }
+                            }
+                        }
+
+                        // mb is the memory bank the section belongs to
+                        // section duplicates cannot occur so simply add to list
+
+                        mb->num++;
+                        mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
+
+                        // add new section information
+
+                        struct section_bin *sb = &mb->secbin[mb->num - 1];
+
+                        sb->filename = must_strdup(bfilename);
+                        sb->section_name = must_strdup(section_name);
+                        sb->org = symbol_value;
+                        sb->size = st.st_size;
+                    }
+
+                    // record an aligned section
+
+                    int alignment;
+
+                    if ((p = strstr(section_name, "_align_")) && (sscanf(p, "_align_%d", &alignment) == 1))
+                    {
+                        // look for an existing entry for the section
+
+                        int index;
+
+                        for (index = 0; index < aligned->num; ++index)
+                            if (strcmp(section_name, aligned->array[index].section_name) == 0)
+                                break;
+
+                        if (index >= aligned->num)
+                        {
+                            // existing entry not found so make new entry
+
+                            aligned->num++;
+                            aligned->array = must_realloc(aligned->array, aligned->num * sizeof(*aligned->array));
+
+                            memset(&aligned->array[index], 0, sizeof(aligned->array[index]));
+                            aligned->array[index].section_name = must_strdup(section_name);
+                            aligned->array[index].alignment = alignment;
+                        }
+
+                        // collect section information
+
+                        if (type == TYPE_HEAD)
+                            aligned->array[index].org = (int)symbol_value;
+                        else
+                            aligned->array[index].size = (int)symbol_value;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // map file line is wrong format
+            // flag error if the line is not blank
+
+            char *p;
+
+            for (p = buffer; isspace(*p); ++p) ;
+
+            if (*p)
+                fprintf(stderr, "Warning: Unable to parse line from map file\n\t%s\n", buffer);
+        }
+    }
+}
+
+int mb_compare_aligned(const struct section_aligned *a, const struct section_aligned *b)
+{
+    return strcmp(a->section_name, b->section_name);
+}
+
+int mb_check_alignment(struct aligned_data *aligned)
+{
+    int errors = 0;
+
+    qsort(aligned->array, aligned->num, sizeof(*aligned->array), mb_compare_aligned);
+
+    for (int i = 0; i < aligned->num; ++i)
+    {
+        if ((aligned->array[i].size > 0) && (aligned->array[i].org & (aligned->array[i].alignment - 1)))
+        {
+            errors++;
+            fprintf(stderr, "Warning: Section %s at address 0x%04x is not properly aligned\n", aligned->array[i].section_name, aligned->array[i].org);
+        }
+    }
+
+    return errors;
+}
+
+int mb_compare_banks(const struct section_bin *a, const struct section_bin *b)
+{
+    return a->org - b->org;
+}
+
+int mb_sort_banks_check(struct memory_bank *mb)
+{
+    int errors = 0;
+
+    if (mb->num)
+    {
+        qsort(mb->secbin, mb->num, sizeof(*mb->secbin), mb_compare_banks);
+
+        for (int k = 0; k < mb->num; ++k)
+        {
+            // check if section exceeds 64k address space
+
+            if ((mb->secbin[k].org < 0x10000) && ((mb->secbin[k].org + mb->secbin[k].size) > 0x10000))
+            {
+                errors++;
+                fprintf(stderr, "Error: Section %s exceeds 64k [0x%04x,0x%04x]\n", mb->secbin[k].section_name, mb->secbin[k].org, mb->secbin[k].org + mb->secbin[k].size - 1);
+            }
+
+            // check for section overlap
+
+            if (k > 0)
+            {
+                if (mb->secbin[k].org < (mb->secbin[k - 1].org + mb->secbin[k - 1].size))
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s overlaps section %s by %d bytes\n", mb->secbin[k - 1].section_name, mb->secbin[k].section_name, mb->secbin[k - 1].org + mb->secbin[k - 1].size - mb->secbin[k].org);
+                }
+            }
+        }
+    }
+
+    return errors;
+}
+
+int mb_sort_banks(struct banked_memory *memory)
+{
+    int errors;
+
+    // sort the main bank
+
+    errors = mb_sort_banks_check(&memory->mainbank);
+
+    // sort each bank space
+
+    for (int i = 0; i < memory->num; ++i)
+    {
+        struct bank_space *bs = &memory->bankspace[i];
+
+        for (int j = 0; j < MAXBANKS; ++j)
+        {
+            struct memory_bank *mb = &bs->membank[j];
+            errors += mb_sort_banks_check(&bs->membank[j]);
+        }
+    }
+
+    return errors;
+}
+
+int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int irecsz, struct memory_bank *mb)
+{
+    // fhex may be NULL to indicate hex file not wanted
+    // fbin should be opened in "wb+" mode
+    // filler is fill byte for gaps between sections
+    // ipad is non-zero if hex file should use filler in gaps
+    // irecsz is intel hex record size
+
+    FILE *fin;
+    int   c;
+
+    // iterate over all sections in memory bank
+
+    for (int i = 0; i < mb->num; ++i)
+    {
+        // open section binary file
+
+        if ((fin = fopen(mb->secbin[i].filename, "rb")) == NULL)
+        {
+            fprintf(stderr, "Error: Cannot read section binary %s\n", mb->secbin[i].filename);
+            return 1;
+        }
+
+        // pad space between sections in memory bank
+
+        if (i > 0)
+        {
+            c = mb->secbin[i].org - mb->secbin[i - 1].org - mb->secbin[i - 1].size;
+            while (c-- > 0)
+                fputc(filler, fbin);
+        }
+
+        // add section binary to memory bank
+
+        while ((c = fgetc(fin)) != EOF)
+            fputc(c, fbin);
+
+        // generate into ihex file if padding is off
+
+        if ((fhex != NULL) && !ipad)
+        {
+            rewind(fin);
+            bin2hex(fin, fhex, mb->secbin[i].org, irecsz, 0);
+        }
+
+        // close section binary file
+
+        fclose(fin);
+    }
+
+    // terminate ihex file
+
+    if (fhex != NULL)
+    {
+        if (ipad)
+        {
+            // nothing has been written to the hex file yet
+            // use the generated binary file as it contains filler bytes
+
+            fflush(fbin);
+            rewind(fbin);
+            bin2hex(fbin, fhex, mb->secbin[0].org, irecsz, 1);
+        }
+        else
+            fprintf(fhex, ":00000001FF\n");
+    }
+
+    return 0;
+}
+
+void mb_cleanup_memory(struct banked_memory *memory)
+{
+    // does not free "memory"
+
+    for (int i = 0; i < memory->num; ++i)
+    {
+        struct bank_space *bs = &memory->bankspace[i];
+        
+        for (int j = 0; j < MAXBANKS; ++j)
+        {
+            struct memory_bank *mb = &bs->membank[j];
+
+            for (int k = 0; k < mb->num; ++k)
+            {
+                struct section_bin *sb = &mb->secbin[k];
+
+                free(sb->filename);
+                free(sb->section_name);
+            }
+
+            free(mb->secbin);
+        }
+
+        free(bs->bank_id);
+    }
+
+    free(memory->bankspace);
+
+    memory->num = 0;
+    memory->bankspace = NULL;
+
+    free(memory->mainbank.secbin);
+
+    memory->mainbank.num = 0;
+    memory->mainbank.secbin = NULL;
+}
+
+void mb_cleanup_aligned(struct aligned_data *aligned)
+{
+    // does not free "aligned"
+
+    for (int i = 0; i < aligned->num; ++i)
+    {
+        struct section_aligned *sa = &aligned->array[i];
+
+        free(sa->section_name);
+    }
+
+    free(aligned->array);
+
+    aligned->num = 0;
+    aligned->array = NULL;
 }
