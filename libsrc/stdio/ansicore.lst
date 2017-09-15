@@ -1,5 +1,9 @@
+stdio/ansi/wherex
+stdio/ansi/wherey
 stdio/ansi/gotoxy
 stdio/ansi/gotoxy_callee
+stdio/ansi/screensize
+stdio/ansi/screensize_callee
 stdio/ansi/vtrendition
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
