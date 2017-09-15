@@ -1159,6 +1159,61 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
     }
 }
 
+int mb_remove_section(struct banked_memory *memory, char *section_name)
+{
+    // remove a particular section from the bank enumeration
+
+    // first find out which memory bank the section belongs to
+
+    char  *p;
+    struct memory_bank *mb = &memory->mainbank;
+
+    for (int i = 0; i < memory->num; ++i)
+    {
+        if (p = strstr(section_name, memory->bankspace[i].bank_id))
+        {
+            int banknum;
+
+            if (sscanf(p + strlen(memory->bankspace[i].bank_id), "_%d", &banknum) == 1)
+            {
+                if ((banknum >= 0) && (banknum < MAXBANKS))
+                {
+                    mb = &memory->bankspace[i].membank[banknum];
+                    break;
+                }
+            }
+        }
+    }
+
+    // remove the section from the memory bank
+
+    for (int i = 0; i < mb->num; ++i)
+    {
+        if (strcmp(mb->secbin[i].section_name, section_name) == 0)
+        {
+            // section has been found
+            // free allocated memory, remove it from the section array
+
+            free(mb->secbin[i].filename);
+            free(mb->secbin[i].section_name);
+
+            memcpy(&mb->secbin[i], &mb->secbin[i + 1], (mb->num - i - 1) * sizeof(*mb->secbin));
+
+            if (--mb->num > 0)
+                mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
+            else
+            {
+                free(mb->secbin);
+                mb->secbin = NULL;
+            }
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 int mb_compare_aligned(const struct section_aligned *a, const struct section_aligned *b)
 {
     return strcmp(a->section_name, b->section_name);
@@ -1313,6 +1368,27 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
     }
 
     return 0;
+}
+
+void mb_delete_source_binaries(struct banked_memory *memory)
+{
+    // remove main bank binaries
+
+    for (int i = 0; i < memory->mainbank.num; ++i)
+        remove(memory->mainbank.secbin[i].filename);
+
+    // remove binaries from all bank spaces
+
+    for (int i = 0; i < memory->num; ++i)
+    {
+        for (int j = 0; j < MAXBANKS; ++j)
+        {
+            struct memory_bank *mb = &memory->bankspace[i].membank[j];
+
+            for (int k = 0; k < mb->num; ++k)
+                remove(mb->secbin[k].filename);
+        }
+    }
 }
 
 void mb_cleanup_memory(struct banked_memory *memory)
