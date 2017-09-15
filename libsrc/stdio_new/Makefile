@@ -5,7 +5,5 @@
 include ../Make.config
 
 clean:
-	$(RM) stream-general/*.o
-	$(RM) stream-out/*.o
 	$(RM) error/*.o
 	$(RM) general/*.o
