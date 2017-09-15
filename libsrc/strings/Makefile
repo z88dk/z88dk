@@ -6,16 +6,23 @@
 include ../Make.config
 
 TARGET ?= test
-ASMFILES = $(wildcard *.asm)
+CLASSIC_ASM = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm strrstr.asm strrstr_callee.asm
+ASMFILES = $(wildcard $(NEWLIB_DIRECTORY)/string/z80/*.asm) $(wildcard $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm) $(CLASSIC_ASM)
 
 OBJECTS = $(GENOBJECTS) $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
 .PHONY: dirs
 
-all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))
+all: dirs $(addprefix obj/z80/, $(notdir $(OBJECTS))) $(addprefix obj/r2k/,$(notdir $(OBJECTS))) $(addprefix obj/ixiy/,$(notdir $(OBJECTS)))
 
 obj/z80/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+	zcc +$(TARGET) $(CFLAGS) -o @  $^
+
+obj/z80/%.o: $(NEWLIB_DIRECTORY)/string/z80/%.asm
+	zcc +$(TARGET) -Ca-I../ $(CFLAGS) -o $@  $^
+
+obj/z80/%.o: $(NEWLIB_DIRECTORY)/string/c/sccz80/%.asm
+	zcc +$(TARGET) -Ca-I../ $(CFLAGS) -o $@  $^
 
 obj/z80/%.o: %.asm
 	zcc +$(TARGET) $(CFLAGS) -o $@  $^
@@ -23,11 +30,23 @@ obj/z80/%.o: %.asm
 obj/ixiy/%.o: %.c
 	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $@  $^
 
+obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/string/z80/%.asm
+	zcc +$(TARGET) -Ca-I../ -Ca--IXIY $(CFLAGS) -o $@  $^
+
+obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/string/c/sccz80/%.asm
+	zcc +$(TARGET) -Ca-I../ -Ca--IXIY $(CFLAGS) -o $@  $^
+
 obj/ixiy/%.o: %.asm
-	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $@  $^
+	zcc +$(TARGET) -Ca-I../ -Ca--IXIY $(CFLAGS) -o $@  $^
 
 obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $@  $^
+
+obj/r2k/%.o: $(NEWLIB_DIRECTORY)/string/z80/%.asm
+	zcc +rcmx000 $(CFLAGS) -Ca-I../ -Ca-DFORrcmx000 -o $@  $^
+
+obj/r2k/%.o: $(NEWLIB_DIRECTORY)/string/c/sccz80/%.asm
+	zcc +rcmx000 -Ca-I../ $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
 
 obj/r2k/%.o: %.asm
 	zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
