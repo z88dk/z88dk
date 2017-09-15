@@ -109,9 +109,6 @@ msxdeps:
 
 zx81deps:
 	@$(RM) -f stdio/zx81/*.o
-	@$(RM) -f stdio_new/stream-general/*.o
-	@$(RM) -f stdio_new/stream-out/stdio_basechar.o
-	@$(RM) -f stdio_new/stream-general/stdio_atou.o
 	@$(RM) -f stdio/ansi/zx81/*.o
 	@$(RM) -f input/spectrum/*.o
 	@$(RM) -f input/zx81/*.o
@@ -1174,7 +1171,6 @@ classic-clean:
 	$(MAKE) -C sos clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
-	$(MAKE) -C stdio_new clean
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C x1 clean
