@@ -79,10 +79,16 @@ extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 #define clrscr()           vtrendition(47); vtrendition(30); fputc_cons(12)
 #define clreol()           printf("\033[K")
 
+extern int     __LIB__     wherex (void);
+extern int     __LIB__     wherey (void);
 extern void    __LIB__     gotoxy(unsigned int x, unsigned int y) __smallc;
 extern void    __LIB__     gotoxy_callee(unsigned int x, unsigned int y) __smallc __z88dk_callee;
 
-#define gotoxy(a,b) gotoxy_callee(a,b)
+extern void    __LIB__     screensize(unsigned int *x, unsigned int *y) __smallc;
+extern void    __LIB__     screensize_callee(unsigned char *x, unsigned char *y) __smallc __z88dk_callee;
+
+#define gotoxy(a,b) screensize_callee(a,b)
+#define screensize(a,b) screensize_callee(a,b)
 
 
 #endif
@@ -117,8 +123,6 @@ extern int __LIB__ getch(void);
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);
-//extern int  __LIB__ wherex (void);
-//extern int  __LIB__ wherey (void);
 //extern int  __LIB__ gettext (int left, int top, int right, int bottom, void *destin);
 
 
