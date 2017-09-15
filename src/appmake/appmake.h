@@ -498,8 +498,10 @@ struct aligned_data
 
 extern void mb_create_bankspace(struct banked_memory *memory, char *bank_id);
 extern void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned);
+extern int  mb_remove_section(struct banked_memory *memory, char *section_name);
 extern int  mb_check_alignment(struct aligned_data *aligned);
 extern int  mb_sort_banks(struct banked_memory *memory);
 extern int  mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int irecsz, struct memory_bank *mb);
+extern void mb_delete_source_binaries(struct banked_memory *memory);
 extern void mb_cleanup_memory(struct banked_memory *memory);
 extern void mb_cleanup_aligned(struct aligned_data *aligned);
