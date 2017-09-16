@@ -29,7 +29,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
-	 im2.lib algorithm.lib lib3d.lib x11.lib
+	 im2.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
@@ -68,6 +68,7 @@ define buildgeneric
 	$(MAKE) -C balloc
 	$(MAKE) -C debug
 	$(MAKE) -C adt
+	$(MAKE) -C algorithm
 	$(MAKE) -C rect
 endef
 
@@ -123,13 +124,6 @@ zx81deps:
 	@$(RM) -f zx81/basic/*.o
 	@$(RM) -f zx81/chroma81/*.o
 	@$(RM) -f time/zx81/*.o
-
-# interesting algorithms - aralbrec
-algorithm.lib:
-	@echo ''
-	@echo '--- Building Algorithm Library ---'
-	@echo ''
-	$(MAKE) -C algorithm 
 
 
 # interrupt mode 2 library - aralbrec

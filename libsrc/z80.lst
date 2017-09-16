@@ -33,3 +33,4 @@ _DEVELOPMENT/l/z80/ascii/l_num2char
 @balloc/balloc.lst
 @debug/debug.lst
 @rect/rect.lst
+@algorithm/alg.lst
