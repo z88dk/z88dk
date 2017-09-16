@@ -53,7 +53,9 @@ int glue_exec(char *target)
     struct aligned_data aligned;
     char filename[LINELEN];
     char ihexname[LINELEN];
+    int  i,j;
     FILE *fmap, *fbin, *fhex;
+    char *s;
     int error;
 
     if (help) return -1;
@@ -64,7 +66,7 @@ int glue_exec(char *target)
     // initialize banked memory representation
 
     memset(&memory, 0, sizeof(memory));
-    for (char *s = strtok(banked_space, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
+    for (s = strtok(banked_space, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
     {
         printf("Creating bank space %s\n", s);
         mb_create_bankspace(&memory, s);
@@ -93,7 +95,7 @@ int glue_exec(char *target)
     if (excluded_sections != NULL)
     {
         printf("Excluding sections from output\n");
-        for (char *s = strtok(excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
+        for (s = strtok(excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
         {
             if (mb_remove_section(&memory, s))
                 printf("..removed section %s\n", s);
@@ -141,9 +143,9 @@ int glue_exec(char *target)
             exit_log(1, "Aborting... section unavailable\n");
     }
 
-    for (int j = 0; j < memory.num; ++j)
+    for (j = 0; j < memory.num; ++j)
     {
-        for (int i = 0; i < MAXBANKS; ++i)
+        for (i = 0; i < MAXBANKS; ++i)
         {
             struct memory_bank *mb = &memory.bankspace[j].membank[i];
 

@@ -1008,7 +1008,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
     long symbol_value;
     char section_name[MBLINEMAX];
     char bfilename[MBLINEMAX];
-    int  c;
+    int  c,i;
     struct stat st;
 
     // organize output binaries into banks
@@ -1073,9 +1073,9 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
 
                         struct memory_bank *mb = &memory->mainbank;
 
-                        for (int i = 0; i < memory->num; ++i)
+                        for (i = 0; i < memory->num; ++i)
                         {
-                            if (p = strstr(section_name, memory->bankspace[i].bank_id))
+                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) == NULL)
                             {
                                 int banknum;
 
@@ -1194,13 +1194,13 @@ int mb_remove_section(struct banked_memory *memory, char *section_name)
     // remove a particular section from the bank enumeration
 
     // first find out which memory bank the section belongs to
-
+    int    i;
     char  *p;
     struct memory_bank *mb = &memory->mainbank;
 
-    for (int i = 0; i < memory->num; ++i)
+    for (i = 0; i < memory->num; ++i)
     {
-        if (p = strstr(section_name, memory->bankspace[i].bank_id))
+        if ((p = strstr(section_name, memory->bankspace[i].bank_id)) != NULL)
         {
             int banknum;
 
@@ -1217,7 +1217,7 @@ int mb_remove_section(struct banked_memory *memory, char *section_name)
 
     // remove the section from the memory bank
 
-    for (int i = 0; i < mb->num; ++i)
+    for (i = 0; i < mb->num; ++i)
     {
         if (strcmp(mb->secbin[i].section_name, section_name) == 0)
         {
@@ -1252,10 +1252,11 @@ int mb_compare_aligned(const struct section_aligned *a, const struct section_ali
 int mb_check_alignment(struct aligned_data *aligned)
 {
     int errors = 0;
+    int i;
 
     qsort(aligned->array, aligned->num, sizeof(*aligned->array), mb_compare_aligned);
 
-    for (int i = 0; i < aligned->num; ++i)
+    for (i = 0; i < aligned->num; ++i)
     {
         if ((aligned->array[i].size > 0) && (aligned->array[i].org & (aligned->array[i].alignment - 1)))
         {
@@ -1275,12 +1276,13 @@ int mb_compare_banks(const struct section_bin *a, const struct section_bin *b)
 int mb_sort_banks_check(struct memory_bank *mb)
 {
     int errors = 0;
+    int k;
 
     if (mb->num)
     {
         qsort(mb->secbin, mb->num, sizeof(*mb->secbin), mb_compare_banks);
 
-        for (int k = 0; k < mb->num; ++k)
+        for (k = 0; k < mb->num; ++k)
         {
             // check if section exceeds 64k address space
 
@@ -1313,7 +1315,7 @@ int mb_sort_banks_check(struct memory_bank *mb)
 
 int mb_sort_banks(struct banked_memory *memory)
 {
-    int errors;
+    int errors, i, j;
 
     // sort the main bank
 
@@ -1321,11 +1323,11 @@ int mb_sort_banks(struct banked_memory *memory)
 
     // sort each bank space
 
-    for (int i = 0; i < memory->num; ++i)
+    for (i = 0; i < memory->num; ++i)
     {
         struct bank_space *bs = &memory->bankspace[i];
 
-        for (int j = 0; j < MAXBANKS; ++j)
+        for (j = 0; j < MAXBANKS; ++j)
         {
             struct memory_bank *mb = &bs->membank[j];
             errors += mb_sort_banks_check(&bs->membank[j]);
@@ -1344,11 +1346,11 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
     // irecsz is intel hex record size
 
     FILE *fin;
-    int   c;
+    int   c, i;
 
     // iterate over all sections in memory bank
 
-    for (int i = 0; i < mb->num; ++i)
+    for (i = 0; i < mb->num; ++i)
     {
         // open section binary file
 
@@ -1407,20 +1409,21 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
 
 void mb_delete_source_binaries(struct banked_memory *memory)
 {
+    int  i,j,k;
     // remove main bank binaries
 
-    for (int i = 0; i < memory->mainbank.num; ++i)
+    for (i = 0; i < memory->mainbank.num; ++i)
         remove(memory->mainbank.secbin[i].filename);
 
     // remove binaries from all bank spaces
 
-    for (int i = 0; i < memory->num; ++i)
+    for (i = 0; i < memory->num; ++i)
     {
-        for (int j = 0; j < MAXBANKS; ++j)
+        for (j = 0; j < MAXBANKS; ++j)
         {
             struct memory_bank *mb = &memory->bankspace[i].membank[j];
 
-            for (int k = 0; k < mb->num; ++k)
+            for (k = 0; k < mb->num; ++k)
                 remove(mb->secbin[k].filename);
         }
     }
@@ -1428,17 +1431,18 @@ void mb_delete_source_binaries(struct banked_memory *memory)
 
 void mb_cleanup_memory(struct banked_memory *memory)
 {
+    int i,j,k;
     // does not free "memory"
 
-    for (int i = 0; i < memory->num; ++i)
+    for (i = 0; i < memory->num; ++i)
     {
         struct bank_space *bs = &memory->bankspace[i];
         
-        for (int j = 0; j < MAXBANKS; ++j)
+        for (j = 0; j < MAXBANKS; ++j)
         {
             struct memory_bank *mb = &bs->membank[j];
 
-            for (int k = 0; k < mb->num; ++k)
+            for (k = 0; k < mb->num; ++k)
             {
                 struct section_bin *sb = &mb->secbin[k];
 
@@ -1465,9 +1469,10 @@ void mb_cleanup_memory(struct banked_memory *memory)
 
 void mb_cleanup_aligned(struct aligned_data *aligned)
 {
+    int  i;
     // does not free "aligned"
 
-    for (int i = 0; i < aligned->num; ++i)
+    for (i = 0; i < aligned->num; ++i)
     {
         struct section_aligned *sa = &aligned->array[i];
 
