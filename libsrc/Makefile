@@ -28,8 +28,8 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib gendos.lib ndos.lib adt.lib balloc.lib \
-	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
+genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
+	 im2.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
@@ -65,91 +65,66 @@ define buildgeneric
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C rs232 
 	$(MAKE) -C psg
+	$(MAKE) -C balloc
+	$(MAKE) -C debug
+	$(MAKE) -C adt
+	$(MAKE) -C algorithm
+	$(MAKE) -C rect
 endef
 
 #  short script to sort out gfx dependencies
 gfxdeps:
-	$(RM) -f graphics/*.o
-	$(RM) -f graphics/nc/*.o
-	$(RM) -f graphics/c128/*.o
-	$(RM) -f graphics/ticalc/*.o
-	$(RM) -f graphics/gray/*.o
-	$(RM) -f graphics/gray/ticalc/*.o
-	$(RM) -f graphics/spectrum/*.o
-	$(RM) -f graphics/z88/*.o
-	$(RM) -f graphics/text/*.o
-	$(RM) -f graphics/text6/*.o
-	$(RM) -f graphics/x11/*.o
+	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/nc/*.o
+	@$(RM) -f graphics/c128/*.o
+	@$(RM) -f graphics/ticalc/*.o
+	@$(RM) -f graphics/gray/*.o
+	@$(RM) -f graphics/gray/ticalc/*.o
+	@$(RM) -f graphics/spectrum/*.o
+	@$(RM) -f graphics/z88/*.o
+	@$(RM) -f graphics/text/*.o
+	@@$(RM) -f graphics/text6/*.o
+	@$(RM) -f graphics/x11/*.o
 
 #  short script to sort out ticalc dependencies
 tideps:
-	$(RM) -f stdio/ticalc/*.o
-	$(RM) -f stdio/ansi/ticalc/*.o
-	$(RM) -f games/*.o
-	$(RM) -f games/ticalc/*.o
-	$(RM) -f graphics/*.o
-	$(RM) -f graphics/ticalc/*.o
-	$(RM) -f graphics/gray/*.o
-	$(RM) -f graphics/gray/ticalc/*.o
+	@$(RM) -f stdio/ticalc/*.o
+	@$(RM) -f stdio/ansi/ticalc/*.o
+	@$(RM) -f games/*.o
+	@$(RM) -f games/ticalc/*.o
+	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/ticalc/*.o
+	@$(RM) -f graphics/gray/*.o
+	@$(RM) -f graphics/gray/ticalc/*.o
 
 #  short script to sort out ticalc dependencies
 msxdeps:
-	$(RM) -f stdio/msx/*.o
-	$(RM) -f games/*.o
-	$(RM) -f games/msx/*.o
-	$(RM) -f graphics/*.o
-	$(RM) -f graphics/msx/*.o
-	$(RM) -f graphics/msx/surface/*.o
-	$(RM) -f psg/msx/*.o
-	$(RM) -f msx/*.o
+	@$(RM) -f stdio/msx/*.o
+	@$(RM) -f games/*.o
+	@$(RM) -f games/msx/*.o
+	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/msx/*.o
+	@$(RM) -f graphics/msx/surface/*.o
+	@$(RM) -f psg/msx/*.o
+	@$(RM) -f msx/*.o
 
 zx81deps:
-	$(RM) -f stdio/zx81/*.o
-	$(RM) -f stdio_new/stream-general/*.o
-	$(RM) -f stdio_new/stream-out/stdio_basechar.o
-	$(RM) -f stdio_new/stream-general/stdio_atou.o
-	$(RM) -f stdio/ansi/zx81/*.o
-	$(RM) -f input/spectrum/*.o
-	$(RM) -f input/zx81/*.o
-	$(RM) -f games/zx81/*.o
-	$(RM) -f graphics/*.o
-	$(RM) -f graphics/zx81/*.o
-	$(RM) -f graphics/zx81/hr/*.o
-	$(RM) -f graphics/zx81/udg/*.o
-	$(RM) -f graphics/gray/*.o
-	$(RM) -f zx81/*.o
-	$(RM) -f zx81/tape/*.o
-	$(RM) -f zx81/basic/*.o
-	$(RM) -f zx81/chroma81/*.o
-	$(RM) -f time/zx81/*.o
+	@$(RM) -f stdio/zx81/*.o
+	@$(RM) -f stdio/ansi/zx81/*.o
+	@$(RM) -f input/spectrum/*.o
+	@$(RM) -f input/zx81/*.o
+	@$(RM) -f games/zx81/*.o
+	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/zx81/*.o
+	@$(RM) -f graphics/zx81/hr/*.o
+	@$(RM) -f graphics/zx81/udg/*.o
+	@$(RM) -f graphics/gray/*.o
+	@$(RM) -f zx81/*.o
+	@$(RM) -f zx81/tape/*.o
+	@$(RM) -f zx81/basic/*.o
+	@$(RM) -f zx81/chroma81/*.o
+	@$(RM) -f time/zx81/*.o
 
-# interesting algorithms - aralbrec
-algorithm.lib:
-	@echo ''
-	@echo '--- Building Algorithm Library ---'
-	@echo ''
-	$(MAKE) -C algorithm 
-
-# rectangles, intervals and points - aralbrec
-rect.lib:
-	@echo ''
-	@echo '--- Building Rectangles Library ---'
-	@echo ''
-	$(MAKE) -C rect 
-
-# abstract data types library - aralbrec
-adt.lib:
-	@echo ''
-	@echo '--- Building Abstract Data Types Library ---'
-	@echo ''
-	$(MAKE) -C adt 
-
-# block memory allocator - aralbrec
-balloc.lib:
-	@echo ''
-	@echo '--- Building Block Memory Allocator Library ---'
-	@echo ''
-	$(MAKE) -C balloc 
 
 # interrupt mode 2 library - aralbrec
 im2.lib:
@@ -212,13 +187,6 @@ z80_crt0.lib:
 	@echo '--- Building Z80 crt0 Library ---'
 	@echo ''
 	$(MAKE) -C z80_crt0s 
-
-# Z88DK DEBUG utilities
-debug.lib:
-	@echo ''
-	@echo '--- Building DEBUG Library ---'
-	@echo ''
-	$(MAKE) -C debug 
 
 
 # ZSock API (wrappers to package calls) - dom
@@ -1197,7 +1165,6 @@ classic-clean:
 	$(MAKE) -C sos clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
-	$(MAKE) -C stdio_new clean
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C x1 clean

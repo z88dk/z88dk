@@ -9,7 +9,7 @@ PUBLIC ASMDISP_LTOA_CALLEE
 PUBLIC LIBDISP_LTOA_CALLEE
 
 EXTERN l_long_neg, l_long_div_u, strrev
-EXTERN stdio_basechar, stdio_error_zc
+EXTERN itox_basechar, error_einval_zc
 
 .ltoa_callee
 ._ltoa_callee
@@ -32,13 +32,13 @@ EXTERN stdio_basechar, stdio_error_zc
 
    ld a,c
    or a
-   jp z, stdio_error_zc        ; divide by zero
+   jp z, error_einval_zc       ; divide by zero
 
    dec a                       ; radix = 1 makes no sense
-   jp z, stdio_error_zc
+   jp z, error_einval_zc
 
    cp 36
-   jp nc, stdio_error_zc       ; max radix (37 - 1!)
+   jp nc, error_einval_zc      ; max radix (37 - 1!)
    
    ld b,0                      ; num chars output = 0
    
@@ -122,7 +122,7 @@ ELSE
 ENDIF
 
    exx
-   ld de, stdio_basechar
+   ld de, itox_basechar
    add hl,de
    ld a,(hl)                   ; a = digit to output
    exx
@@ -144,7 +144,7 @@ ENDIF
    ; ix = address of soon-to-be-written '\0' in buffer
    ; hl = char *s
 
-IF FORrcmx000
+IF __CPU_R2K__|__CPU_R3K__
 
    push ix
    pop de

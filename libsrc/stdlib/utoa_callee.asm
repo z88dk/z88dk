@@ -8,7 +8,7 @@ PUBLIC utoa_callee
 PUBLIC _utoa_callee
 PUBLIC ASMDISP_UTOA_CALLEE
 
-EXTERN itoa_callee, stdio_error_zc
+EXTERN itoa_callee, error_einval_zc
 EXTERN LIBDISP_ITOA_CALLEE
 
 .utoa_callee
@@ -24,13 +24,13 @@ EXTERN LIBDISP_ITOA_CALLEE
 
    ld a,c
    or a
-   jp z, stdio_error_zc        ; divide by zero
+   jp z, error_einval_zc       ; divide by zero
    
    dec a
-   jp z, stdio_error_zc        ; radix = 1 makes no sense
+   jp z, error_einval_zc       ; radix = 1 makes no sense
    
    cp 36
-   jp nc, stdio_error_zc       ; max radix (37 - 1!)
+   jp nc, error_einval_zc      ; max radix (37 - 1!)
    
    ld b,0
    jp itoa_callee + LIBDISP_ITOA_CALLEE

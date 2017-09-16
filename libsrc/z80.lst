@@ -4,11 +4,6 @@
 setjmp/longjmp
 setjmp/setjmp
 @stdlib/stdlib.lst
-stdio_new/error/stdio_error_zc
-stdio_new/general/stdio_basechar
-stdio_new/general/stdio_atou
-stdio_new/general/stdio_ultoa_any
-stdio_new/general/stdio_utoa_any
 @strings/string.lst
 @regex/regex.lst
 stdio/ansi/ansifont_f3
@@ -34,4 +29,8 @@ _DEVELOPMENT/stdlib/c/sdcc_ix/atoll
 _DEVELOPMENT/stdlib/c/sdcc_ix/atoll_callee
 _DEVELOPMENT/l/z80/ascii/l_valid_base
 _DEVELOPMENT/l/z80/ascii/l_num2char
-
+@adt/adt.lst
+@balloc/balloc.lst
+@debug/debug.lst
+@rect/rect.lst
+@algorithm/alg.lst

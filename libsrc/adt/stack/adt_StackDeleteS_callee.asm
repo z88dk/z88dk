@@ -34,8 +34,13 @@ EXTERN _u_free
    
 .notzero
    push  ix				;save callers ix
+IF __CPU_R2K__ | __CPU_R3K__
+   push  de
+   pop   ix
+ELSE
    ld ixl,e
    ld ixh,d
+ENDIF
 
    inc hl
    inc hl

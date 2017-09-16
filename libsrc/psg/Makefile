@@ -31,14 +31,9 @@ SIDOBJECTS = $(SIDFILES:.c=.o)
 
 all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECTS)) $(addprefix obj/, $(SIDOBJECTS))
 
-obj/z80/%.o: %.c
-	zcc +test -mz80 $(CFLAGS) -o $@  $^
 
 obj/c128/%.o: c128/%.c
 	zcc +c128 -mz80 $(CFLAGS) -o $@  $^
-
-obj/ixiy/%.o: %.c
-	zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
 
 
 dirs:

@@ -11,6 +11,7 @@ EXTERN asm_strlcpy
 strlcpy_callee:
 
    pop af
+   pop bc
    pop hl
    pop de
    push af

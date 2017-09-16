@@ -1,17 +1,20 @@
-#
-# $Id: Makefile,v 1.2 2008-07-18 07:51:12 stefano Exp $
+# $Id: Makefile,v 1.6 2012-06-26 06:09:52 stefano Exp $
 
-all:
-	@echo ''
-	@echo '---> Building CPC RS232 library (STI) <---'
-	@echo ''
-	cd sti ; $(MAKE) ; cd ..
+SUBDIRS = booster sti
 
-	@echo ''
-	@echo '---> Building CPC RS232 library (BOOSTER) <---'
-	@echo ''
-	cd booster ; $(MAKE) ; cd ..
+all: subdirs-all
+
+subdirs-all:	$(SUBDIRS)
+
+
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 clean:
-	cd sti ; $(MAKE) clean ; cd ..
-	cd booster ; $(MAKE) clean ; cd ..
+	@for s in $(SUBDIRS); \
+	do \
+		$(MAKE) -C $$s clean; \
+	done
+
+.PHONY: $(SUBDIRS) subdirs-all
+

@@ -33,7 +33,7 @@ void stricmp_less()
 
 void stricmp_greater()
 {
-    Assert(func("equal","EQUAM") > 0, "Should be > 0");
+    Assert(func("equam","EQUAL") > 0, "Should be > 0");
 }
 
 

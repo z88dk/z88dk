@@ -10,7 +10,7 @@ PUBLIC ASMDISP_ITOA_CALLEE
 PUBLIC LIBDISP_ITOA_CALLEE
 
 EXTERN l_deneg, l_div_u, strrev
-EXTERN stdio_basechar, stdio_error_zc
+EXTERN itox_basechar, error_einval_zc
 
 .itoa_callee
 ._itoa_callee
@@ -32,13 +32,13 @@ EXTERN stdio_basechar, stdio_error_zc
 
    ld a,c
    or a                      ; divide by zero
-   jp z, stdio_error_zc
+   jp z, error_einval_zc
    
    dec a
-   jp z, stdio_error_zc      ; radix = 1 makes no sense
+   jp z, error_einval_zc     ; radix = 1 makes no sense
    
    cp 36                     ; max radix (37 - 1!)
-   jp nc, stdio_error_zc
+   jp nc, error_einval_zc
 
    ld b,0                    ; num chars output = 0
 
@@ -80,7 +80,7 @@ EXTERN stdio_basechar, stdio_error_zc
    call l_div_u              ; hl = num / radix, de = num % radix
    
    ex de,hl
-   ld bc,stdio_basechar
+   ld bc,itox_basechar
    add hl,bc
    ld c,(hl)                 ; c = ascii digit
    
