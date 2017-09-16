@@ -9,7 +9,8 @@
 
 // Halt the YAZ180 with single step hardware.
 
-#define __BREAK  __BREAK_HELPER()
+#define __BREAK __BREAK_HELPER()
+
 extern void __LIB__ __BREAK_HELPER(void) __smallc;
 
 
