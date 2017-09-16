@@ -206,8 +206,10 @@ long get_org_addr(char *crtfile)
 {
     long    pos;
 
-    if ( ( pos = parameter_search(crtfile,".sym","__crt_org_code") ) == -1 )
-        pos = parameter_search(crtfile,".sym","CRT_ORG_CODE");
+    if ((pos = parameter_search(crtfile, ".sym", "__crt_org_code")) == -1)
+        if ((pos = parameter_search(crtfile, ".sym", "CRT_ORG_CODE")) == -1)
+            if ((pos = parameter_search(crtfile, ".map", "__crt_org_code")) == -1)
+                pos = parameter_search(crtfile, ".map", "CRT_ORG_CODE");
 
     return(pos);
 }
@@ -1159,6 +1161,34 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
     }
 }
 
+int mb_remove_bank(struct bank_space *bs, unsigned int index)
+{
+    if (index < MAXBANKS)
+    {
+        struct memory_bank *mb = &bs->membank[index];
+
+        if (mb->num > 0)
+        {
+            int i;
+
+            for (i = 0; i < mb->num; ++i)
+            {
+                free(mb->secbin[i].filename);
+                free(mb->secbin[i].section_name);
+            }
+
+            free(mb->secbin);
+
+            mb->num = 0;
+            mb->secbin = NULL;
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 int mb_remove_section(struct banked_memory *memory, char *section_name)
 {
     // remove a particular section from the bank enumeration
@@ -1254,7 +1284,12 @@ int mb_sort_banks_check(struct memory_bank *mb)
         {
             // check if section exceeds 64k address space
 
-            if ((mb->secbin[k].org < 0x10000) && ((mb->secbin[k].org + mb->secbin[k].size) > 0x10000))
+            if (mb->secbin[k].org < 0)
+            {
+                errors++;
+                fprintf(stderr, "Error: Section %s has negative org %d\n", mb->secbin[k].section_name, mb->secbin[k].org);
+            }
+            else if ((mb->secbin[k].org < 0x10000) && ((mb->secbin[k].org + mb->secbin[k].size) > 0x10000))
             {
                 errors++;
                 fprintf(stderr, "Error: Section %s exceeds 64k [0x%04x,0x%04x]\n", mb->secbin[k].section_name, mb->secbin[k].org, mb->secbin[k].org + mb->secbin[k].size - 1);
