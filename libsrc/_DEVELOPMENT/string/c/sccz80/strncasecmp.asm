@@ -20,7 +20,7 @@ strncasecmp:
    push bc
    push af
 
-IF CLASSIC
+IF __CLASSIC
    push ix   
    call  asm_strncasecmp
    pop  ix

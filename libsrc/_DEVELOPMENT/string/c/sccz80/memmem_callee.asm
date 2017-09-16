@@ -14,7 +14,7 @@ memmem_callee:
    pop bc
    pop de
    pop hl
-IF CLASSIC
+IF __CLASSIC
    exx
    pop bc
    exx
@@ -23,7 +23,7 @@ ELSE
 ENDIF
    push af
   
-IF CLASSIC
+IF __CLASSIC
    exx
    push bc
    exx

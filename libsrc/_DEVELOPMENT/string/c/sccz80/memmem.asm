@@ -15,7 +15,7 @@ memmem:
    pop bc
    pop de
    pop hl
-IF CLASSIC
+IF __CLASSIC
    exx
    pop bc
    push bc
@@ -30,7 +30,7 @@ ENDIF
    push bc
    push af
    
-IF CLASSIC
+IF __CLASSIC
    exx
    push bc
    exx
