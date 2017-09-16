@@ -289,7 +289,7 @@ struct {
       "Create the header for a Residos package",
       NULL,
       residos_exec,    &residos_options },
-    { "rompad",    "rom",       "(C) 2014 Stefano Bodrato",
+    { "rompad",    "rom",       "(C) 2014,2017 Stefano Bodrato & Alvin Albrecht",
       "Embed a binary inside a rom, padding if necessary",
       NULL,
       rom_exec,    &rom_options },
@@ -385,8 +385,10 @@ struct {
       "Creates a zxvgs application file",
       NULL,
       zxvgs_exec,   &zxvgs_options},
-    { "bin2tap",  "zx",       "(C) 2000,2003 Dominic Morris & Stefano Bodrato", 
-      "Generates a .TAP file complete with BASIC header, optional WAV file",
+    { "bin2tap",  "zx",  "(C) 2000,2003,2017 Morris, Bodrato, Albrecht", 
+      "Generates a .TAP file complete with BASIC header, optional WAV file\n"
+      "Generates 48k/128k SNA Snapshots from binary files\n"
+      "Generates ESXDOS dot commands",
       NULL,
       zx_exec,      &zx_options },
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
@@ -498,6 +500,7 @@ struct aligned_data
 
 extern void mb_create_bankspace(struct banked_memory *memory, char *bank_id);
 extern void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned);
+extern int  mb_remove_bank(struct bank_space *bs, unsigned int index);
 extern int  mb_remove_section(struct banked_memory *memory, char *section_name);
 extern int  mb_check_alignment(struct aligned_data *aligned);
 extern int  mb_sort_banks(struct banked_memory *memory);
