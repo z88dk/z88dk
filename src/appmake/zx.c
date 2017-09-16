@@ -1065,7 +1065,7 @@ int make_sna(int is_zxn)
             {
                 // adjust org appropriately
 
-                for (int j = 0; j < mb->num; ++j)
+                for (j = 0; j < mb->num; ++j)
                 {
                     if (i == 0)
                         mb->secbin[j].org += 0xc000;
