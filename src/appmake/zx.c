@@ -11,6 +11,8 @@
  *        Stefano Bodrato - 2010,2011  - AUDIO options and single BASIC block mode
  *        Stefano Bodrato - 01/02/2013 - Turbo tape option
  *        Stefano Bodrato - 13/02/2013 - Extreme turbo tape option
+ *        Alvin Albrecht  - 08/2017    - ESXDOS dot command generation
+ *        Alvin Albrecht  - 09/2017    - SNA snapshot generation
  *
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        You can use tapmaker to customize your work.
@@ -68,6 +70,10 @@ static char              noheader     = 0;
 static unsigned char     parity       = 0;
 static char              sna          = 0;
 static char              dot          = 0;
+static int               stackloc     = -1;
+static int               intstate     = -1;
+static char             *excluded_sections = NULL;
+static char              clean        = 0;
 
 
 // These values are set accordingly with the turbo loader timing and should not be changed
@@ -83,9 +89,17 @@ option_t zx_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
-    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    { 'o', "output",   "Name of output file\n",      OPT_STR,   &outfile },
+
     {  0,  "sna",      "Make .sna snapshot instead of .tap", OPT_BOOL, &sna },
-    {  0,  "dot",      "Make an esxdos dot command instead of .tap", OPT_BOOL, &dot },
+    {  0,  "sna-org",  "Start address of .sna",      OPT_INT,  &origin },
+    {  0,  "sna-sp",   "Stack location in .sna",     OPT_INT,  &stackloc },
+    {  0,  "sna-di",   "Di on start if non-zero (default = 0)", OPT_INT, &intstate },
+    {  0,  "sna-exclude", "Exclude section names from output",  OPT_STR, &excluded_sections },
+    {  0,  "sna-clean", "Remove consumed source binaries\n",    OPT_BOOL, &clean },
+
+    {  0,  "dot",      "Make an esxdos dot command instead of .tap\n", OPT_BOOL, &dot },
+
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "ts2068",   "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &ts2068 },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
@@ -205,7 +219,7 @@ void turbo_rawout (FILE *fpout, unsigned char b)
 
 
 int make_dot(void);
-int make_sna(void);
+int make_sna(int is_zxn);
 
 
 int zx_exec(char *target)
@@ -231,7 +245,7 @@ int zx_exec(char *target)
         return -1;
 
     if (sna)
-        return make_sna();
+        return make_sna(0);
 
     if (dot)
         return make_dot();
@@ -912,19 +926,22 @@ enum
 };
 
 uint8_t sna_state[31];
+uint8_t mem128[49152+16384*8];
 
-int make_sna(void)
+int zxn_collapse_banks(struct bank_space *bs)
 {
+    return 0;
+}
+
+int make_sna(int is_zxn)
+{
+    struct banked_memory memory;
+    struct aligned_data aligned;
     FILE *fin, *fout;
-    char filename[FILENAME_MAX + 1];
     char crtname[FILENAME_MAX + 1];
-    char outname[FILENAME_MAX + 1];
-    char memory[49152];
-    int stackloc, intstate;
-    int c, i;
-    char *p;
-    int is_128k;
-    struct stat st_file;
+    char filename[FILENAME_MAX + 1];
+    int i, j;
+    int is_128 = 0;
 
     if (binname == NULL) return -1;
 
@@ -941,171 +958,287 @@ int make_sna(void)
     if ((origin == -1) && ((origin = get_org_addr(crtname)) == -1))
         exit_log(1, "Error: ORG address cannot be determined\n");
 
-    if ((origin -= 0x4000) < 0)
-        exit_log(1, "Error: ORG address %u not in range\n", origin);
+    if ((origin < 0) || (origin > 0xffff))
+        exit_log(1, "Error: ORG address %d not in range\n", origin);
+
+    // rom model warning
+
+    if (parameter_search(crtname, ".map", "__crt_model") > 0)
+        fprintf(stderr, "Warning: the DATA binary should be manually attached to CODE for rom model compiles\n");
 
     // determine stack location
 
-    if ((stackloc = parameter_search(crtname, ".map", "__register_sp")) < -1)
-        stackloc = -stackloc;
+    if (stackloc == -1)
+        stackloc = parameter_search(crtname, ".map", "__register_sp");
 
-    if (stackloc >= 0)
-        stackloc = (stackloc - 2) & 0xffff;
+    if (abs(stackloc) > 0xffff)
+        exit_log(1, "Error: Stack pointer %d out of range\n", stackloc);
 
     // determine initial ei/di state
 
-    intstate = parameter_search(crtname, ".map", "__crt_enable_eidi");
+    if (intstate == -1)
+        intstate = parameter_search(crtname, ".map", "__crt_enable_eidi");
+
     intstate = (intstate == -1) ? 0xff : ((intstate & 0x01) ? 0 : 0xff);
 
-    // determine output file
+    // load up the memory banks
 
-    if (outfile == NULL)
+    memset(&memory, 0, sizeof(memory));
+    mb_create_bankspace(&memory, "BANK");
+    memset(&aligned, 0, sizeof(aligned));
+
+    snprintf(filename, sizeof(filename) - 4, "%s", crtname);
+    suffix_change(filename, ".map");
+
+    if ((fin = fopen(filename, "r")) == NULL)
+        exit_log(1, "Error: Cannot open map file %s\n", filename);
+
+    mb_enumerate_banks(fin, binname, &memory, &aligned);
+
+    fclose(fin);
+
+    // exclude memory banks 8+
+
+    for (i = 8; i < MAXBANKS; ++i)
+        if (mb_remove_bank(&memory.bankspace[0], i))
+            printf("Excluding BANK %03d from sna\n", i);
+
+    // exclude unwanted sections
+
+    if (excluded_sections != NULL)
     {
-        strcpy(outname, binname);
-        suffix_change(outname, ".sna");
-    }
-    else
-        strcpy(outname, outfile);
+        char *s;
 
-    if (strcmp(binname, outname) == 0)
-        exit_log(1, "Error: Input and output filenames must be different\n");
+        printf("Excluding sections from output\n");
+        for (s = strtok(excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
+        {
+            if (mb_remove_section(&memory, s))
+                printf("..removed section %s\n", s);
+            else
+                printf("..section %s not found\n", s);
+        }
+    }
+
+    // zx next target collapses banks to 16k
+
+    if (is_zxn && zxn_collapse_banks(&memory.bankspace[0]))
+        exit_log(1, "Aborting... errors in one or more banks\n");
+
+    // merge banks 5,2,0 into the main binary
+    // check that banks are limited to 16k
+
+    for (i = 0; i < 8; ++i)
+    {
+        struct memory_bank *mb = &memory.bankspace[0].membank[i];
+
+        if (mb->num > 0)
+        {
+            // zxn target has already had banks checked
+
+            if (!is_zxn)
+            {
+                int errors = 0;
+
+                for (j = 0; j < mb->num; ++j)
+                {
+                    if ((mb->secbin[j].org < 0xc000) || ((mb->secbin[j].org + mb->secbin[j].size) > 0x10000))
+                    {
+                        errors++;
+                        fprintf(stderr, "Error: Section %s is not confined to 16k [0x%04x,0x%04x]\n", mb->secbin[j].section_name, mb->secbin[j].org, mb->secbin[j].org + mb->secbin[j].size - 1);
+                    }
+
+                    // adjust org of banks 5,2,0 for merge step
+                    // all will have org address offset from 0x0
+
+                    if ((i == 0) || (i == 2) || (i == 5))
+                        mb->secbin[j].org -= 0xc000;
+                }
+
+                if (errors)
+                    exit_log(1, "Aborting... errors in one or more banks\n");
+            }
+
+            // merge banks 5,2,0 into main bank
+            // sections in these banks have org offset from 0x0
+
+            if ((i == 0) || (i == 2) || (i == 5))
+            {
+                // adjust org appropriately
+
+                for (int j = 0; j < mb->num; ++j)
+                {
+                    if (i == 0)
+                        mb->secbin[j].org += 0xc000;
+                    else if (i == 2)
+                        mb->secbin[j].org += 0x8000;
+                    else
+                        mb->secbin[j].org += 0x4000;
+                }
+
+                // move sections to main bank
+
+                memory.mainbank.secbin = must_realloc(memory.mainbank.secbin, (memory.mainbank.num + mb->num) * sizeof(*memory.mainbank.secbin));
+                memcpy(&memory.mainbank.secbin[memory.mainbank.num], mb->secbin, mb->num * sizeof(*memory.mainbank.secbin));
+                memory.mainbank.num += mb->num;
+
+                free(mb->secbin);
+
+                mb->num = 0;
+                mb->secbin = NULL;
+
+                printf("Notice: Merged BANK_%03d into the main memory bank\n", i);
+            }
+            else
+                is_128++;
+        }
+    }
+
+    // check for section alignment errors
+    // but treat them like warnings
+
+    mb_check_alignment(&aligned);
+
+    // check for section overlaps
+
+    if (mb_sort_banks(&memory))
+        exit_log(1, "Aborting... errors in one or more binaries\n");
 
     // prime snapshot memory contents
+
+    memset(mem128, 0, sizeof(mem128));
 
     snprintf(filename, sizeof(filename), "%s" ZX_SNA_PROTOTYPE, c_install_dir);
 
     if ((fin = fopen(filename, "rb")) == NULL)
-        exit_log(1, "Error: File %s not found\n", filename);
+        exit_log(1, "Error: SNA prototype %s not found\n", filename);
 
     fread(sna_state, 27, 1, fin);
-    if (fread(memory, sizeof(memory), 1, fin) < 1)
+    if (fread(mem128, 49152, 1, fin) < 1)
     {
         fclose(fin);
-        exit_log(1, "Error: File %s shorter than 49179 bytes\n", filename);
+        exit_log(1, "Error: SNA prototype %s is shorter than 49179 bytes\n", filename);
     }
 
     fclose(fin);
 
-    memset(memory, 0, 6144);
-    memset(memory + 6144, 0x38, 768);
+    memset(mem128, 0, 6144);
+    memset(mem128 + 6144, 0x38, 768);
 
-    // initialize snapshot state
+    // write main bank into memory image
 
-    if (stackloc >= 0)
+    for (i = 0; i < memory.mainbank.num; ++i)
     {
-        sna_state[SNA_REG_SP] = stackloc % 256;
-        sna_state[SNA_REG_SP + 1] = stackloc / 256;
-    }
+        struct section_bin *sb = &memory.mainbank.secbin[i];
 
-    sna_state[SNA_IFF2] = intstate;
+        if (sb->org < 0x4000)
+            exit_log(1, "Error: Section %s has org in rom %0x04x\n", sb->section_name, sb->org);
 
-    sna_state[SNA_128_PC] = (origin + 0x4000) % 256;
-    sna_state[SNA_128_PC + 1] = (origin + 0x4000) / 256;
-    sna_state[SNA_128_port_7FFD] = 0x10;
-    sna_state[SNA_128_TRDOS] = 0;
+        if ((fin = fopen(sb->filename, "rb")) == NULL)
+            exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
 
-    // load main bank code
-
-    if ((fin = fopen_bin(binname, crtname)) == NULL)
-        exit_log(1, "Can't open input file %s\n", binname);
-
-    for (p = &memory[origin]; (p < &memory[sizeof(memory)]) && ((c = fgetc(fin)) != EOF); ++p)
-        *p = c;
-
-    fclose(fin);
-
-    if (c != EOF)
-        exit_log(1, "Error: Truncated main bank because it spilled past 64k\n");
-
-    // create sna file
-
-    if ((fout = fopen(outname, "wb")) == NULL)
-        exit_log(1, "Error: Could not create output file %s\n", outname);
-
-    fwrite(sna_state, 27, 1, fout);
-
-    // expand to 128k sna if memory banks are involved
-
-    is_128k = 0;
-    for (i = 0; i <= 7; ++i)
-    {
-        snprintf(filename, sizeof(filename), "%s_BANK_%02X.bin", binname, i);
-
-        if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fin = fopen(filename, "rb")) == NULL))
-            continue;
-
-        if ((i == 0) || (i == 2) || (i == 5))
+        if (fread(&mem128[sb->org - 0x4000], sb->size, 1, fin) < 1)
         {
-            // bank belongs in the main bank
-
-            snprintf(outname, sizeof(outname), "__BANK_%02X_head", i);
-            if ((origin = parameter_search(crtname, ".map", outname)) >= 0)
-            {
-                origin &= 0x3fff;
-                
-                if (i == 2)
-                    origin += 0x4000;
-                else if (i == 0)
-                    origin += 0x8000;
-
-                printf("Notice: Adding bank %02X to the main code at 0x%04X\n", i, origin + 0x4000);
-                for (p = &memory[origin]; (p < &memory[sizeof(memory)]) && ((c = fgetc(fin)) != EOF); ++p)
-                    *p = c;
-
-                if (c != EOF)
-                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 64k\n", filename);
-            }
-            else
-                printf("Warning: Ignoring bank %02X\n", i);
+            fclose(fin);
+            exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
         }
-        else
-            is_128k = 1;
 
         fclose(fin);
     }
 
-    // generate memory snapshot
+    // write other memory banks into memory image
 
-    if (!is_128k)
+    if (is_128)
     {
-        memory[sna_state[SNA_REG_SP] + 256 * sna_state[SNA_REG_SP + 1] - 0x4000] = sna_state[SNA_128_PC];
-        memory[sna_state[SNA_REG_SP] + 256 * sna_state[SNA_REG_SP + 1] + 1 - 0x4000] = sna_state[SNA_128_PC + 1];
-    }
-
-    fwrite(memory, sizeof(memory), 1, fout);
-
-    if (is_128k)
-    {
-        // 128k sna header follows
-
-        fwrite(&sna_state[SNA_128_PC], 4, 1, fout);
-
-        // append remaining memory banks
-
-        for (i = 0; i <= 7; ++i)
+        for (i = 0; i < 8; ++i)
         {
-            if ((i == 0) || (i == 2) || (i == 5))
-                continue;
-
-            snprintf(filename, sizeof(filename), "%s_BANK_%02X.bin", binname, i);
-            memset(memory, 0, 16384);
-
-            if ((stat(filename, &st_file) >= 0) && (st_file.st_size != 0) && ((fin = fopen(filename, "rb")) != NULL))
+            for (j = 0; j < memory.bankspace[0].membank[i].num; ++j)
             {
-                // copy bank to snapshot
-                for (p = memory; (p < &memory[16384]) && ((c = fgetc(fin)) != EOF); ++p)
-                    *p = c;
+                struct section_bin *sb = &memory.bankspace[0].membank[i].secbin[j];
 
-                if (c != EOF)
-                    fprintf(stderr, "Warning: %s truncated because it is too big to fit in 16k\n", filename);
+                if ((fin = fopen(sb->filename, "rb")) == NULL)
+                    exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
+
+                if (fread(&mem128[49152 + i*16384 + sb->org - (is_zxn ? 0 : 0xc000)], sb->size, 1, fin) < 1)
+                {
+                    fclose(fin);
+                    exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
+                }
 
                 fclose(fin);
             }
+        }
+    }
 
-            fwrite(memory, 16384, 1, fout);
+    // initialize snapshot state
+
+    if (stackloc < -1)
+    {
+        if (stackloc > -0x4000)
+            stackloc = -1;
+        else
+            stackloc = mem128[abs(stackloc) - 0x4000] + 256 * mem128[abs(stackloc) - 0x4000 + 1];
+    }
+
+    if (stackloc < 0)
+        stackloc = sna_state[SNA_REG_SP] + 256 * sna_state[SNA_REG_SP + 1];
+
+    if (!is_128)
+    {
+        stackloc = (stackloc - 2) & 0xffff;
+        mem128[stackloc - 0x4000] = origin & 0xff;
+        mem128[stackloc - 0x4000 + 1] = origin / 256;
+    }
+
+    sna_state[SNA_REG_SP] = stackloc & 0xff;
+    sna_state[SNA_REG_SP + 1] = stackloc / 256;
+
+    sna_state[SNA_IFF2] = intstate;
+
+    sna_state[SNA_128_PC] = origin & 0xff;
+    sna_state[SNA_128_PC + 1] = origin / 256;
+
+    sna_state[SNA_128_port_7FFD] = 0x10;
+    sna_state[SNA_128_TRDOS] = 0;
+
+    // determine output filename
+
+    if (outfile == NULL)
+    {
+        strcpy(filename, binname);
+        suffix_change(filename, ".sna");
+    }
+    else
+        strcpy(filename, outfile);
+
+    if (strcmp(binname, filename) == 0)
+        exit_log(1, "Error: Input and output filenames must be different\n");
+
+    // create sna file
+
+    if ((fout = fopen(filename, "wb")) == NULL)
+        exit_log(1, "Error: Could not create output file %s\n", filename);
+
+    fwrite(sna_state, 27, 1, fout);
+    fwrite(mem128, 49152, 1, fout);
+
+    if (is_128)
+    {
+        fwrite(&sna_state[SNA_128_PC], 4, 1, fout);
+
+        for (i = 0; i < 8; ++i)
+        {
+            if ((i != 0) && (i != 2) && (i != 5))
+                fwrite(&mem128[49152 + i * 16384], 16384, 1, fout);
         }
     }
 
     fclose(fout);
+
+    // clean up
+
+    if (clean) mb_delete_source_binaries(&memory);
+    mb_cleanup_memory(&memory);
+    mb_cleanup_aligned(&aligned);
+
     return 0;
 }
