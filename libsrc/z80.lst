@@ -29,7 +29,7 @@ _DEVELOPMENT/stdlib/c/sdcc_ix/atoll
 _DEVELOPMENT/stdlib/c/sdcc_ix/atoll_callee
 _DEVELOPMENT/l/z80/ascii/l_valid_base
 _DEVELOPMENT/l/z80/ascii/l_num2char
-@adt/adt.lst
+@adt-newlib/adt.lst
 @balloc/balloc.lst
 @debug/debug.lst
 @rect/rect.lst
