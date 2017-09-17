@@ -15,7 +15,7 @@ EXTERN OCHAR_MSG_PUTC
 ;EXTERN console_01_output_terminal_char
 EXTERN character_00_output
 
-EXTERN vgl_output_char_oterm_msg_printc
+;EXTERN vgl_output_char_oterm_msg_printc
 ;EXTERN zx_01_output_char_32_iterm_msg_print_cursor
 ;EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_char_32_stdio_msg_ictl
 ;EXTERN zx_01_output_char_32_oterm_msg_scroll, zx_01_output_char_32_oterm_msg_cls
@@ -56,7 +56,7 @@ vgl_output_char:
    jp nz, character_00_output  ; forward other messages to library
 
     ; Put to VRAM
-   ld hl, 	0xdca0	; VRAM start
+   ld hl, 	0xdca0+8	; VRAM start
    ld (hl), c
    
    ; Refresh row(s)
