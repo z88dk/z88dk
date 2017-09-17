@@ -1,14 +1,16 @@
 @adt/adt_sdcc_iy.lst
 @alloc/alloc_sdcc_iy.lst
+@arch/vgl/vgl_sdcc_iy.lst
 @compress/compress_sdcc_iy.lst
 @ctype/ctype_sdcc_iy.lst
 @drivers/drivers.lst
 @error/error.lst
 @fcntl/fcntl_sdcc_iy.lst
-@im2/im2_sdcc.lst
+@im2/im2_sdcc_iy.lst
+@input/vgl/input_sdcc_iy.lst
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
-@l/sdcc.lst
+@l/sdcc_iy.lst
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_float_sdcc_iy.lst
@@ -17,5 +19,6 @@
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
+@target/vgl/driver/driver.lst
 @threads/threads_sdcc_iy.lst
-@z80/z80_sdcc.lst
+@z80/z80_sdcc_iy.lst

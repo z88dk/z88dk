@@ -1,0 +1,2 @@
+@target/vgl/driver/terminal/vgl_input.lst
+@target/vgl/driver/terminal/vgl_output_char.lst

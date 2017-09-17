@@ -1,11 +1,13 @@
 @adt/adt_sccz80.lst
 @alloc/alloc_sccz80.lst
+@arch/vgl/vgl_sccz80.lst
 @compress/compress_sccz80.lst
 @ctype/ctype_sccz80.lst
 @drivers/drivers.lst
 @error/error.lst
 @fcntl/fcntl_sccz80.lst
 @im2/im2_sccz80.lst
+@input/vgl/input_sccz80.lst
 @inttypes/inttypes_sccz80.lst
 @l/l.lst
 @l/sccz80.lst
@@ -17,5 +19,6 @@
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
+@target/vgl/driver/driver.lst
 @threads/threads_sccz80.lst
 @z80/z80_sccz80.lst
