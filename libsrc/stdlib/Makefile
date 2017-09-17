@@ -20,5 +20,5 @@ dirs:
 	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/z80-zxn obj/$(TARGET)
 
 clean:
-	$(RM) -fr obj zcc_opt.def
+	$(RM) -fr obj zcc_opt.def *.c.asm
 	$(MAKE) -C z88 clean

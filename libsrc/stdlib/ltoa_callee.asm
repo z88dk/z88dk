@@ -50,7 +50,7 @@ EXTERN itox_basechar, error_einval_zc
    call l_long_neg             ; dehl = -dehl
    inc b                       ; count++
 
-IF FORrcmx000
+IF __CPU_R2K__|__CPU_R3K__
 
    push bc
    
@@ -100,7 +100,7 @@ ENDIF
    
    call l_long_div_u           ; dehl = num/radix, de'hl' = num % radix
 
-IF FORrcmx000
+IF __CPU_R2K__|__CPU_R3K__
 
    push ix
    pop bc
