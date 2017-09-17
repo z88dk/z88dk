@@ -1,0 +1,30 @@
+
+"Penius Cheater" is a debugging console for the "V-Tech Genius Leader" learning computer.
+
+It can be compiled using the free Z88DK.
+
+* Call "penius_compile" to compile the "penius.c" to "penius.bin". It will produce a binary file that can be burned onto an EEPROM and connected to the cartridge port of a "V-Tech Genius Leader 2000/4000" learning computer.
+
+* You can burn that file onto an EEPROM (8 kilobyte or more), connect it to the cartridge port and run it.
+
+* Smaller code fragments can also be put into "payload.c" and compiled using "payload_compile.bat". This file can be uploaded/injected into a running system without the need to burn an EEPROM. The computer must be running the penius ROM for that.
+
+
+"Penius Cheater"
+================
+
+The program will auto-start on power-on (no need to press "DISK").
+
+The program gives you a shell to issue all sorts of commands. I mainly used it to learn all the hardware details of the system and to try out different memory accesses and port I/O.
+
+Enter "help" for a list of commands.
+
+I also created "vtech.h" which provides some nice functions (text output, key input, beeps, printer output, bit-bang software serial port, ...).
+
+In order to compile you will have to use the files located in "lib/". You can either copy them to the z88dk directory or use my hackish compile batch file which sets the paths of the z88dk to the local one since I am not using any sophisticated stdio or stuff.
+
+
+Have fun!
+
+Bernhard "HotKey" Slawik
+2017-02-20
