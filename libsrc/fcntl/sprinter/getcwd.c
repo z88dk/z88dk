@@ -5,9 +5,6 @@
  *
  *      djm 27/4/99
  *
- *      Close a file descriptor, pretty well identical to
- *      fclose from the other stuff
- *
  * -----
  * $Id: getcwd.c,v 1.1 2002-11-20 20:28:44 dom Exp $
  */
@@ -16,6 +13,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <string.h>
 
 
 char *getcwd(char *buf,size_t size)

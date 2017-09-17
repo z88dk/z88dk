@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = balloc
+SUBDIRS = balloc obstack farz88
 
 all: subdirs-all
 
