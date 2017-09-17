@@ -65,7 +65,7 @@ define buildgeneric
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C rs232 
 	$(MAKE) -C psg
-	$(MAKE) -C balloc
+	$(MAKE) -C alloc
 	$(MAKE) -C debug
 	$(MAKE) -C adt
 	$(MAKE) -C adt-newlib
@@ -1143,7 +1143,7 @@ classic-clean:
 	$(MAKE) -C zxvgs clean
 	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
-	$(MAKE) -C balloc clean
+	$(MAKE) -C alloc clean
 	$(MAKE) -C im2 clean
 	$(MAKE) -C rect clean
 	$(MAKE) -C algorithm clean

@@ -108,6 +108,7 @@ IF !__crt_model
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
+		SECTION data_alloc_balloc
 		SECTION DATA_END
 ENDIF
 
@@ -157,6 +158,7 @@ IF __crt_org_bss_compiler_start
 ENDIF
 		SECTION bss_clib
 		SECTION bss_string
+		SECTION bss_alloc_balloc
 		SECTION bss_user
 IF __crt_model > 0
         SECTION DATA
@@ -168,6 +170,26 @@ IF __crt_model > 0
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
+		SECTION data_alloc_balloc
 		SECTION DATA_END
 ENDIF
 		SECTION BSS_END
+
+
+IF CLIB_BALLOC_TABLE_SIZE > 0
+
+   ; create balloc table
+
+   SECTION data_clib
+   SECTION data_alloc_balloc
+
+   PUBLIC __balloc_array
+
+   __balloc_array:             defw __balloc_table
+
+   SECTION bss_clib
+   SECTION bss_alloc_balloc
+
+   __balloc_table:             defs CLIB_BALLOC_TABLE_SIZE * 2
+
+ENDIF
