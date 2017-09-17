@@ -26,3 +26,10 @@ obstack_copy0_callee:
    ex (sp),hl
    
    jp asm_obstack_copy0
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_copy0_callee
+defc _obstack_copy0_callee = obstack_copy0_callee
+ENDIF
+

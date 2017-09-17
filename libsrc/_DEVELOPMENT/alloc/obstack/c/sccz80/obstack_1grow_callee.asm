@@ -23,3 +23,10 @@ obstack_1grow_callee:
    ex (sp),hl
    
    jp asm_obstack_1grow
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_1grow_callee
+defc _obstack_1grow_callee = obstack_1grow_callee
+ENDIF
+

@@ -17,3 +17,10 @@ PUBLIC obstack_base
 EXTERN asm_obstack_base
 
 defc obstack_base = asm_obstack_base
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_base
+defc _obstack_base = obstack_base
+ENDIF
+

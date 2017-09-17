@@ -26,3 +26,10 @@ obstack_blank_fast_callee:
    ex (sp),hl
    
    jp asm_obstack_blank_fast
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_blank_fast_callee
+defc _obstack_blank_fast_callee = obstack_blank_fast_callee
+ENDIF
+

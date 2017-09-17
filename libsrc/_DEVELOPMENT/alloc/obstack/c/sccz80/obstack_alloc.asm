@@ -19,3 +19,10 @@ obstack_alloc:
    push af
    
    jp asm_obstack_alloc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_alloc
+defc _obstack_alloc = obstack_alloc
+ENDIF
+

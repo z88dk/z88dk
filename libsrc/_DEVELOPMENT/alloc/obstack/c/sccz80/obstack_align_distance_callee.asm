@@ -24,3 +24,10 @@ obstack_align_distance_callee:
    ex (sp),hl
    
    jp asm_obstack_align_distance
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_align_distance_callee
+defc _obstack_align_distance_callee = obstack_align_distance_callee
+ENDIF
+

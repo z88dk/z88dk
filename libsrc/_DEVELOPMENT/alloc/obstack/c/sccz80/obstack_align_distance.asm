@@ -19,3 +19,10 @@ obstack_align_distance:
    push af
    
    jp asm_obstack_align_distance
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_align_distance
+defc _obstack_align_distance = obstack_align_distance
+ENDIF
+
