@@ -20,3 +20,10 @@ balloc_firstfit:
    
    ld h,e
    jp l0_balloc_firstfit_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _balloc_firstfit
+defc _balloc_firstfit = balloc_firstfit
+ENDIF
+

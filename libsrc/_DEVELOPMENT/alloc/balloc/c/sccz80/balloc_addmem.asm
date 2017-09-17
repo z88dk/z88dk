@@ -25,3 +25,10 @@ balloc_addmem:
    push ix
 
    jp asm_balloc_addmem
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _balloc_addmem
+defc _balloc_addmem = balloc_addmem
+ENDIF
+
