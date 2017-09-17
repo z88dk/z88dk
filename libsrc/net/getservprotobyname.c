@@ -7,6 +7,7 @@
  */
 
 #include <net/resolv.h>
+#include <string.h>
 
 i8_t getservprotobyname(char *name )
 {

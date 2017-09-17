@@ -17,7 +17,7 @@
 #include <fcntl.h>
 
 
-size_t read(int fd, void *ptr, size_t len)
+ssize_t read(int fd, void *ptr, size_t len)
 {
 #asm
 	push	ix

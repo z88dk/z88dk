@@ -7,6 +7,8 @@
  */
 
 #include <net/resolv.h>
+#include <stdio.h>
+#include <string.h>
 
 char *getxxbyport(type, port, store_in )
 	struct data_entry *type;

@@ -7,6 +7,7 @@
  */
 
 #include <net/resolv.h>
+#include <string.h>
 
 tcpport_t getxxbyname(struct data_entry *type, char *name )
 {

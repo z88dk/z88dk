@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <flos.h>
 
-int write(int myfile, void *buf, size_t len)
+ssize_t write(int myfile, void *buf, size_t len)
 {
 	struct flos_file *flosfile;
 
