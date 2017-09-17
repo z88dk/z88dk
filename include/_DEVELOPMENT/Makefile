@@ -11,7 +11,7 @@ SCCZ80_HEADERS := $(subst proto,sccz80,$(HEADERS))
 SDCC_HEADERS   := $(subst proto,sdcc,$(HEADERS))
 CLANG_HEADERS  := $(subst proto,clang,$(HEADERS))
 
-default: dirs $(SCCZ80_HEADERS) $(SDCC_HEADERS) $(CLANG_HEADERS)
+default: dirs $(SCCZ80_HEADERS) $(SDCC_HEADERS) $(CLANG_HEADERS) classic
 
 sccz80/%.h: proto/%.h
 	m4 -Dm4_SCCZ80 $^ > $@
@@ -31,9 +31,14 @@ sdcc/%README: proto/%README
 clang/%README: proto/%README
 	cp $^ $@
 
+# Copy files for clasisc up
+classic:
+	cp -r sccz80/adt ../
+	cp -r sccz80/alloc ../
+
 dirs:
 	@mkdir -p $(dir $(SCCZ80_HEADERS))
 	@mkdir -p $(dir $(SDCC_HEADERS))
 	@mkdir -p $(dir $(CLANG_HEADERS))
 
-.PHONY: dirs
+.PHONY: dirs classic

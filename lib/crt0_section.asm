@@ -90,6 +90,8 @@ ENDIF
 		SECTION	code_adt_wa_stack
 		SECTION	code_adt_wv_priority_queue
 		SECTION	code_adt_wv_stack
+		SECTION code_alloc_balloc
+		SECTION code_alloc_obstack
 
 		SECTION code_user
 		SECTION rodata_fp

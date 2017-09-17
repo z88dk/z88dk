@@ -12,8 +12,10 @@
 #define __vasmallc
 #define __Z88DK_R2L_CALLING_CONVENTION 1
 #define __stdc
+#define __z88dk_deprecated
 #else
 #define __vasmallc __smallc
+#define __z88dk_deprecated
 #endif
 
 #define __CHAR_LF '\n'
