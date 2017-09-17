@@ -18,36 +18,28 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 all: dirs $(OBJECTS) balloc-newlib.lst
 
 obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC -o$@ $^
 
 obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC -o$@ $^
 
 obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC -o$@ $^
 
 obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC -o$@ $^
 
 obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC -o$@ $^
 
 obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC -o$@ $^
 
 obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC -o$@ $^
 
 obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC -o$@ $^
 
 obj/z80/%.o: %.c
 	zcc +$(TARGET) $(CFLAGS) -o   $^

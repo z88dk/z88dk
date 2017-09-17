@@ -6,10 +6,7 @@
 include ../../Make.config
 
 all:
-	@echo ''
-	@echo '---> Building OSCA RS232 library <---'
-	@echo ''
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232osca @oscalist
+	@$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232osca @oscalist
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i
