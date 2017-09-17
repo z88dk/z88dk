@@ -14,7 +14,7 @@ z88dk-lstmanip$(EXESUFFIX):	$(OBJS)
 	$(CC) -o $@ $(CFLAGS) $(OBJS)
 
 install: 
-	$(INSTALL) z88dk-lstmanip$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z80nm$(EXESUFFIX)
+	$(INSTALL) z88dk-lstmanip$(EXESUFFIX) $(PREFIX)/bin/z88dk-lstmanip$(EXESUFFIX)
 
 clean:
 	$(RM) z88dk-lstmanip$(EXESUFFIX) lstmanip.o core
