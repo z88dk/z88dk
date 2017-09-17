@@ -29,6 +29,8 @@ _out_0x0a:
 ;	ret
 ;
 ;
+
+;PUBLIC _delay_1fff
 ;_delay_1fff:
 ;	; Used for screen functions (after putting stuff to ports 0x0a or 0x0b)
 ;	push	hl

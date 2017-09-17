@@ -234,6 +234,7 @@ void delay_0x010f() {
 	#endasm
 }
 
+
 void delay(word cycles) {
 	#asm
 		;pop	bc
@@ -1148,29 +1149,48 @@ void main(void) {
 	vtech_init();	// Checks for system architecture and sets up stuff
 	
 	screen_reset();	// Especially when you compile in "rom_autorun" mode (where the screen is not yet properly initialized)
+	//cursor_reset();
 	
 	key_reset();
 	
 	screen_clear();	// Clear screen (contains garbage left in RAM)
 	
-	put("VTECH Tester\n");
+	put("Hello V-Tech\n");
 	//put("\n2017 B HotKey Slawik\n");
 	//beep();
 	pause();
 	
+	/*
 	sprintf(buffer, "sprintfput\0");
 	put(buffer);
 	pause();
+	*/
 	
-	printf("printf!");
+	/*
+	// Output to VRAM
+	#asm
+	ld hl,0xdca0
+	ld a,0x41
+	ld (hl),a
 	
+	
+	ld hl,0xdcf0
+	ld a,0x01
+	ld (hl),a
+	#endasm
 	pause();
+	*/
 	
+	printf("printf");
+	pause();
+	printf("printf2");
+	pause();
 	
 	
 	for (c=0; c<10; c++) {
 		put_char('0'+c);
 	}
+	pause();
 	
 	
 	key_peek_arm();	// Arm the system to detect next key
