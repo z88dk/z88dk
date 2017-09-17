@@ -67,6 +67,7 @@ define buildgeneric
 	$(MAKE) -C psg
 	$(MAKE) -C balloc
 	$(MAKE) -C debug
+	$(MAKE) -C adt
 	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
@@ -1140,6 +1141,7 @@ classic-clean:
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C z88 clean
 	$(MAKE) -C zxvgs clean
+	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
 	$(MAKE) -C balloc clean
 	$(MAKE) -C im2 clean
