@@ -66,7 +66,7 @@ obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $  $^
 
 string-newlib.lst:
-	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/string/string_sccz80.lst -p $(NEWLIB_DIRECTORY) -c -o string-newlib.lst
+	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/string/string_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'strings/obj/$${TYPE}' -c -o string-newlib.lst
 
 dirs:
 	@mkdir -p $(dir $(OBJECTS))

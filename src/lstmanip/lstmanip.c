@@ -21,6 +21,8 @@ static char *newlibpath = NULL;
 static int    num_files = 0;
 static char **files = NULL;
 
+static char  *prefix = "obj/${TYPE}";
+
 /* 
  * -i input
  * -o output
@@ -38,7 +40,7 @@ int main(int argc, char **argv)
     FILE *inp;
     FILE *outp = stdout;
 
-    while ((opt = getopt(argc, argv,"ctp:i:o:")) != -1 ) {
+    while ((opt = getopt(argc, argv,"ctx:p:i:o:")) != -1 ) {
         switch ( opt ) {
             case 'c':
                 convert = 1;
@@ -51,6 +53,9 @@ int main(int argc, char **argv)
                 break;
             case 'p':
                 newlibpath = optarg;
+                break;
+            case 'x':
+                prefix = optarg;
                 break;
             case 'o':
                 output = optarg;
@@ -77,7 +82,7 @@ int main(int argc, char **argv)
         int i;
         // Convert to correct path
         for ( i = 0; i < num_files; i++ ) {
-            fprintf(outp, "obj/${TYPE}/%s\n", files[i]);
+            fprintf(outp, "%s/%s\n", prefix, files[i]);
         }
     } else if ( makefile ) {
         int i;
