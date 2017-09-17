@@ -880,36 +880,28 @@ include "crt_memory_map.inc"
 
 
    
-   
-   
+
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : _stdout
+   ; FILE  : _stdin
    ;
-   ; driver: vgl_output_char
+   ; driver: vgl_00_input_char
    ; fd    : 0
-   ; mode  : write only
-   ; type  : 002 = output terminal
+   ; mode  : read only
+   ; type  : 003 = character input
    ;
-   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
-   ; cursor coord  : (0,0)
-   ; window        : (CRT_OTERM_WINDOW_X,CRT_OTERM_WINDOW_WIDTH,CRT_OTERM_WINDOW_Y,CRT_OTERM_WINDOW_HEIGHT)
-   ; scroll limit  : 0
-   ; font address  : 0
-   ; text colour   : 0
-   ; text mask     : 0
-   ; background    : 0
+   ; ioctl_flags   : 0x0100
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
       
    SECTION data_clib
    SECTION data_stdio
    
    ; FILE *
       
-   PUBLIC _stdout
+   PUBLIC _stdin
       
-   _stdout:  defw __i_stdio_file_0 + 2
+   _stdin:  defw __i_stdio_file_0 + 2
    
    ; FILE structure
    
@@ -923,6 +915,120 @@ include "crt_memory_map.inc"
       
       defb 195
       defw __i_fcntl_fdstruct_0
+
+      ; state_flags_0
+      ; state_flags_1
+      ; conversion flags
+      ; ungetc
+
+      defb 0x40      ; read + stdio manages ungetc + normal file type
+      defb 0x02      ; last operation was read
+      defb 0
+      defb 0
+      
+      ; mtx_recursive
+      
+      defb 0         ; thread owner = none
+      defb 0x02      ; mtx_recursive
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+    
+         
+   ; fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw __i_fcntl_fdstruct_0
+
+   ; FDSTRUCT structure
+   
+   SECTION data_fcntl_stdio_heap_body
+   
+   EXTERN console_01_input_terminal_fdriver
+   EXTERN vgl_00_input_char
+   
+   __i_fcntl_heap_0:
+   
+      ; heap header
+      
+      defw __i_fcntl_heap_1
+      defw 23
+      defw 0
+   
+   __i_fcntl_fdstruct_0:
+
+      ; FDSTRUCT structure
+      
+      ; call to first entry to driver
+      
+      defb 205
+      defw console_01_input_terminal_fdriver
+      
+      ; jump to driver
+      
+      defb 195
+      defw vgl_00_input_char
+      
+      ; flags
+      ; reference_count
+      ; mode_byte
+      
+      defb 0x03      ; stdio handles ungetc + type = character input
+      defb 2
+      defb 0x01      ; read only
+      
+      ; ioctl_flags
+      
+      defw 0x0100
+      
+      ; mtx_plain
+      
+      defb 0         ; thread owner = none
+      defb 0x01      ; mtx_plain
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+
+            
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   
+   
+
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE  : _stdout
+   ;
+   ; driver: vgl_00_output_char
+   ; fd    : 1
+   ; mode  : write only
+   ; type  : 004 = character output
+   ;
+   ; ioctl_flags   : 0x0100
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+      
+   SECTION data_clib
+   SECTION data_stdio
+   
+   ; FILE *
+      
+   PUBLIC _stdout
+      
+   _stdout:  defw __i_stdio_file_1 + 2
+   
+   ; FILE structure
+   
+   __i_stdio_file_1:
+   
+      ; open files link
+      
+      defw __i_stdio_file_0
+      
+      ; jump to underlying fd
+      
+      defb 195
+      defw __i_fcntl_fdstruct_1
 
       ; state_flags_0
       ; state_flags_1
@@ -946,24 +1052,24 @@ include "crt_memory_map.inc"
    ; fd table entry
    
    SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_0
+   defw __i_fcntl_fdstruct_1
 
    ; FDSTRUCT structure
    
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN vgl_output_char
+   EXTERN vgl_00_output_char
    
-   __i_fcntl_heap_0:
+   __i_fcntl_heap_1:
    
       ; heap header
       
-      defw __i_fcntl_heap_1
-      defw 35
-      defw 0
+      defw __i_fcntl_heap_2
+      defw 23
+      defw __i_fcntl_heap_0
 
-   __i_fcntl_fdstruct_0:
+   __i_fcntl_fdstruct_1:
    
       ; FDSTRUCT structure
       
@@ -975,19 +1081,19 @@ include "crt_memory_map.inc"
       ; jump to driver
       
       defb 195
-      defw vgl_output_char
+      defw vgl_00_output_char
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x02      ; type = output terminal
+      defb 0x04      ; type = character output
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw CRT_OTERM_TERMINAL_FLAGS
+      defw 0x0100
       
       ; mtx_plain
       
@@ -997,28 +1103,84 @@ include "crt_memory_map.inc"
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-      ; cursor coordinate
-      ; window rectangle
-      ; scroll limit
-
-      defb 0, 0
-      defb CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT
-      defb 0
-      
-;      ; font address
-;      ; text colour
-;      ; text mask
-;      ; background colour
-;      
-;      EXTERN 0
-;      
-;      defw 0 - 256
-;      defb 0
-;      defb 0
-;      defb 0
-
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; DUPED FILE DESCRIPTOR
+   ;
+   ; FILE  : _stderr
+   ; flags : 0x80
+   ;
+   ; fd    : 2
+   ; dup fd: __i_fcntl_fdstruct_1
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+      
+   SECTION data_clib
+   SECTION data_stdio
+      
+   ; FILE *
+      
+   PUBLIC _stderr
+      
+   _stderr:  defw __i_stdio_file_2 + 2
+      
+   ; FILE structure
+      
+   __i_stdio_file_2:
+   
+      ; open files link
+      
+      defw __i_stdio_file_1
+      
+      ; jump to duped fd
+      
+      defb 195
+      defw __i_fcntl_fdstruct_1
+
+      ; state_flags_0
+      ; state_flags_1
+      ; conversion flags
+      ; ungetc
+
+      defb 0x80
+      defb 0
+      defb 0
+      defb 0
+      
+      ; mtx_recursive
+      
+      defb 0         ; thread owner = none
+      defb 0x02      ; mtx_recursive
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+
+         
+   ; fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw __i_fcntl_fdstruct_1
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_2 = __i_fcntl_fdstruct_1
+   
+   ; adjust reference count on duped FDSTRUCT
+   
+   SECTION code_crt_init
+   
+   ld hl,__i_fcntl_fdstruct_1 + 7     ; & FDSTRUCT.ref_count
+   inc (hl)
+   inc (hl)
+
+      
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 
 
@@ -1027,7 +1189,7 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; __clib_fopen_max   = max number of open FILEs specified by user
-   ; 1 = number of static FILEs instantiated in crt
+   ; 3 = number of static FILEs instantiated in crt
    ; __i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
 
 	PUBLIC __MAX_FOPEN
@@ -1035,13 +1197,13 @@ include "crt_memory_map.inc"
    SECTION data_clib
    SECTION data_stdio
 
-   IF (__clib_fopen_max > 0) || (1 > 0)
+   IF (__clib_fopen_max > 0) || (3 > 0)
 
       ; number of FILEs > 0
 
       ; construct list of open files
 
-      IF 1 > 0
+      IF 3 > 0
    
          ; number of FILEs statically generated > 0
       
@@ -1050,7 +1212,7 @@ include "crt_memory_map.inc"
       
          PUBLIC __stdio_open_file_list
       
-         __stdio_open_file_list:  defw __i_stdio_file_0
+         __stdio_open_file_list:  defw __i_stdio_file_2
    
       ELSE
    
@@ -1074,7 +1236,7 @@ include "crt_memory_map.inc"
    
       __stdio_closed_file_list:   defw 0, __stdio_closed_file_list
    
-      IF __clib_fopen_max > 1
+      IF __clib_fopen_max > 3
 
 		   defc __MAX_FOPEN = __clib_fopen_max
 		
@@ -1083,13 +1245,13 @@ include "crt_memory_map.inc"
          SECTION bss_clib
          SECTION bss_stdio
       
-         __stdio_file_extra:      defs (__clib_fopen_max - 1) * 15
+         __stdio_file_extra:      defs (__clib_fopen_max - 3) * 15
       
          SECTION code_crt_init
       
             ld bc,__stdio_closed_file_list
             ld de,__stdio_file_extra
-            ld l,__clib_fopen_max - 1
+            ld l,__clib_fopen_max - 3
      
          loop:
       
@@ -1109,13 +1271,13 @@ include "crt_memory_map.inc"
 				
       ELSE
 
-         defc __MAX_FOPEN = 1
+         defc __MAX_FOPEN = 3
 				
       ENDIF   
 
    ENDIF
 
-   IF (__clib_fopen_max = 0) && (1 = 0)
+   IF (__clib_fopen_max = 0) && (3 = 0)
    
       defc __MAX_FOPEN = 0
 	
@@ -1135,7 +1297,7 @@ include "crt_memory_map.inc"
 
    ENDIF
 
-   IF (__clib_fopen_max < 0) && (1 = 0)
+   IF (__clib_fopen_max < 0) && (3 = 0)
 
       defc __MAX_FOPEN = 0
 
@@ -1146,12 +1308,12 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_open_max  = max number of open fds specified by user
-   ; 1 = number of static file descriptors created
+   ; 3 = number of static file descriptors created
 	
    PUBLIC __fcntl_fdtbl
    PUBLIC __fcntl_fdtbl_size
    
-   IF 1 > 0
+   IF 3 > 0
    
       ; create rest of fd table in data segment
       
@@ -1161,16 +1323,16 @@ include "crt_memory_map.inc"
       
       defc __fcntl_fdtbl = __data_fcntl_fdtable_body_head
       
-      IF __clib_open_max > 1
+      IF __clib_open_max > 3
       
          SECTION data_fcntl_fdtable_body
          
-         defs (__clib_open_max - 1) * 2
+         defs (__clib_open_max - 3) * 2
          defc __fcntl_fdtbl_size = __clib_open_max
       
       ELSE
       
-         defc __fcntl_fdtbl_size = 1
+         defc __fcntl_fdtbl_size = 3
       
       ENDIF
    
@@ -1205,11 +1367,11 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 35  = byte size of static FDSTRUCTs
-   ; 1   = number of heap allocations
+   ; 46  = byte size of static FDSTRUCTs
+   ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 35 > 0
+   IF 46 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1230,24 +1392,24 @@ include "crt_memory_map.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (35 + 14)
+      IF __clib_stdio_heap_size > (46 + 14)
       
          ; expand stdio heap to desired size
          
          SECTION data_fcntl_stdio_heap_body
          
-         __i_fcntl_heap_1:
+         __i_fcntl_heap_2:
           
-            defw __i_fcntl_heap_2
+            defw __i_fcntl_heap_3
             defw 0
-            defw __i_fcntl_heap_0
-            defs __clib_stdio_heap_size - 35 - 14
+            defw __i_fcntl_heap_1
+            defs __clib_stdio_heap_size - 46 - 14
          
          ; terminate stdio heap
          
          SECTION data_fcntl_stdio_heap_tail
          
-         __i_fcntl_heap_2:   defw 0
+         __i_fcntl_heap_3:   defw 0
       
       ELSE
       
@@ -1255,7 +1417,7 @@ include "crt_memory_map.inc"
       
          SECTION data_fcntl_stdio_heap_tail
       
-         __i_fcntl_heap_1:   defw 0
+         __i_fcntl_heap_2:   defw 0
       
       ENDIF
       
@@ -1363,7 +1525,7 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;@FIXME: This is just for bare bone debugging. Provides some essential debug tools
+;@FIXME: This is just for bare bone debugging. Provides some essential debug tools. Please remove when not needed any more.
 include "startup/vgl_debug.inc"
 
 
@@ -1406,6 +1568,10 @@ __Restart_2:
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
+
+   ; Prepare hardware (timers etc.)
+   
+   
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"

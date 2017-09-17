@@ -7,7 +7,6 @@
 @error/error.lst
 @fcntl/fcntl_sccz80.lst
 @im2/im2_sccz80.lst
-@input/vgl/input_sccz80.lst
 @inttypes/inttypes_sccz80.lst
 @l/l.lst
 @l/sccz80.lst

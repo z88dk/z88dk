@@ -6,11 +6,10 @@
 @drivers/drivers.lst
 @error/error.lst
 @fcntl/fcntl_sdcc_ix.lst
-@im2/im2_sdcc_ix.lst
-@input/vgl/input_sdcc_ix.lst
+@im2/im2_sdcc.lst
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
-@l/sdcc_ix.lst
+@l/sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_float_sdcc_ix.lst
@@ -21,4 +20,4 @@
 @string/string_sdcc_ix.lst
 @target/vgl/driver/driver.lst
 @threads/threads_sdcc_ix.lst
-@z80/z80_sdcc_ix.lst
+@z80/z80_sdcc.lst

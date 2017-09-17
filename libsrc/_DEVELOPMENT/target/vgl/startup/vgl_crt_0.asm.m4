@@ -42,15 +42,17 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/terminal/vgl_input.m4')dnl
+dnl#include(`driver/character/vgl_00_input_char.m4')dnl
+dnl#include(`driver/terminal/vgl_01_input.m4')dnl
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/terminal/vgl_output_char.m4')dnl
+dnl#include(`driver/character/vgl_00_output_char.m4')dnl
+dnl#include(`driver/terminal/vgl_01_output.m4')dnl
 dnl
 dnl## file dup
 dnl
-dnl---dnl
+dnl#include(`../m4_file_dup.m4')dnl
 dnl
 dnl## empty fd slot
 dnl
@@ -72,10 +74,14 @@ dnl;;;		include(`../m4_file_dup.m4')dnl
 dnl;;;		m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,`
-   include(`driver/terminal/vgl_input.m4')dnl
+   include(`driver/character/vgl_00_input_char.m4')
+   m4_vgl_00_input_char(_stdin, 0x0100)
    
-   include(`driver/terminal/vgl_output_char.m4')dnl
-   m4_vgl_output_char(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, 0, 0, 0, 0)dnl
+   include(`driver/character/vgl_00_output_char.m4')
+   m4_vgl_00_output_char(_stdout, 0x0100)
+   
+   include(`../m4_file_dup.m4')
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
 ',
 `
    include(`crt_driver_instantiation.asm.m4')
@@ -154,7 +160,7 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;@FIXME: This is just for bare bone debugging. Provides some essential debug tools
+;@FIXME: This is just for bare bone debugging. Provides some essential debug tools. Please remove when not needed any more.
 include "startup/vgl_debug.inc"
 
 
@@ -197,6 +203,10 @@ __Restart_2:
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
+
+   ; Prepare hardware (timers etc.)
+   
+   
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"
