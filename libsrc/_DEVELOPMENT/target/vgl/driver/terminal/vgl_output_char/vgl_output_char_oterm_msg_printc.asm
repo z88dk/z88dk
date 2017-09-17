@@ -26,16 +26,23 @@ code_ok:
    ;ZX:	call asm_zx_cxy2saddr
    ;	ex de,hl                    ; de = screen address
    ;	ld a,b                      ; a = colour
-   ld de, 	0xdca0	; VRAM
-
-__print_loop:
-
-   ld a,(hl)
-   ld (de),a
+   ld hl, 	0xdca0	; VRAM start
+   ld (hl), c
    
-   inc hl
-   inc d
+
+;	__print_loop:
+;	
+;	   ld a,(hl)
+;	   ld (de),a
+;	   
+;	   inc hl
+;	   inc d
+;	   
+;	   djnz __print_loop
    
-   djnz __print_loop
+   
+   ; Refresh row(s)
+   ld hl,0xdcf0	;+row-num
+   ld (hl),0x01
    
    ret

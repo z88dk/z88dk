@@ -123,7 +123,7 @@ define(`m4_vgl_output_char',dnl
       ; reference_count
       ; mode_byte
       
-      defb 0x02      ; type = output terminal
+      defb 0x04      ; type = 2=output terminal, 4=character output
       defb `ifelse($1,0,1,2)'
       defb 0x02      ; write only
       
@@ -139,14 +139,14 @@ define(`m4_vgl_output_char',dnl
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-      ; cursor coordinate
-      ; window rectangle
-      ; scroll limit
-
-      defb `$3, $4'
-      defb `$5, $6, $7, $8'
-      defb $9
-      
+;      ; cursor coordinate
+;      ; window rectangle
+;      ; scroll limit
+;
+;      defb `$3, $4'
+;      defb `$5, $6, $7, $8'
+;      defb $9
+;      
 ;      ; font address
 ;      ; text colour
 ;      ; text mask
