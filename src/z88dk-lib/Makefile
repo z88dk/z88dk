@@ -10,7 +10,7 @@ z88dk-lib$(EXESUFFIX):	$(OBJS)
 	$(CC) -o z88dk-lib$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:
-	$(INSTALL) z88dk-lib$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z88dk-lib$(EXESUFFIX)
+	$(INSTALL) z88dk-lib$(EXESUFFIX) $(PREFIX)/bin/z88dk-lib$(EXESUFFIX)
 
 clean:
 	$(RM) z88dk-lib$(EXESUFFIX) z88dk-lib.o core$(EXESUFFIX)
