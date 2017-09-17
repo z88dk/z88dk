@@ -12,16 +12,20 @@ OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80,$(NEWLIBOBJ)) $(subst $(NEWLIB_DI
 all: dirs $(OBJECTS) adt.lst
 
 obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@zcc +test -mz80 $(CFLAGS) -o $@  $^
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@zcc +test -mz80 -Ca--IXIY -Cl--IXIY $(CFLAGS) -o $@  $^
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@zcc +rcmx000 $(CFLAGS) -o $@  $^
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@zcc +test -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o $@  $^
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 adt.lst:
 	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/adt/adt_sccz80.lst -p $(NEWLIB_DIRECTORY) -c -o adt.lst
