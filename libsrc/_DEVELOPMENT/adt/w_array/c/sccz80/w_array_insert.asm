@@ -21,3 +21,10 @@ w_array_insert:
    push af
    
    jp asm_w_array_insert
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_array_insert
+defc _w_array_insert = w_array_insert
+ENDIF
+

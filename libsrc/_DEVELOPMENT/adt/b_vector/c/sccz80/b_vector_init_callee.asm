@@ -17,3 +17,10 @@ b_vector_init_callee:
    push af
    
    jp asm_b_vector_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_init_callee
+defc _b_vector_init_callee = b_vector_init_callee
+ENDIF
+

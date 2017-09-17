@@ -21,3 +21,10 @@ b_vector_init:
    push af
    
    jp asm_b_vector_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_init
+defc _b_vector_init = b_vector_init
+ENDIF
+

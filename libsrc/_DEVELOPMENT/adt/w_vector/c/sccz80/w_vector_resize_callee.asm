@@ -15,3 +15,10 @@ w_vector_resize_callee:
    ex (sp),hl
    
    jp asm_w_vector_resize
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_resize_callee
+defc _w_vector_resize_callee = w_vector_resize_callee
+ENDIF
+

@@ -9,3 +9,10 @@ PUBLIC wv_stack_reserve
 EXTERN w_vector_reserve
 
 defc wv_stack_reserve = w_vector_reserve
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wv_stack_reserve
+defc _wv_stack_reserve = wv_stack_reserve
+ENDIF
+

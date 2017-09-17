@@ -9,3 +9,10 @@ PUBLIC wv_priority_queue_size
 EXTERN asm_wv_priority_queue_size
 
 defc wv_priority_queue_size = asm_wv_priority_queue_size
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wv_priority_queue_size
+defc _wv_priority_queue_size = wv_priority_queue_size
+ENDIF
+

@@ -19,3 +19,10 @@ p_list_remove:
    push af
    
    jp asm_p_list_remove
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_list_remove
+defc _p_list_remove = p_list_remove
+ENDIF
+

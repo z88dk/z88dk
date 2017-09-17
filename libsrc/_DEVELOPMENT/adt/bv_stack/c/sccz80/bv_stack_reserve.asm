@@ -9,3 +9,10 @@ PUBLIC bv_stack_reserve
 EXTERN b_vector_reserve
 
 defc bv_stack_reserve = b_vector_reserve
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_stack_reserve
+defc _bv_stack_reserve = bv_stack_reserve
+ENDIF
+

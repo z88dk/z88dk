@@ -21,3 +21,10 @@ b_vector_insert_block:
    push af
    
    jp asm_b_vector_insert_block
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_insert_block
+defc _b_vector_insert_block = b_vector_insert_block
+ENDIF
+

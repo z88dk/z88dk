@@ -9,3 +9,10 @@ PUBLIC bv_priority_queue_destroy
 EXTERN asm_bv_priority_queue_destroy
 
 defc bv_priority_queue_destroy = asm_bv_priority_queue_destroy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_priority_queue_destroy
+defc _bv_priority_queue_destroy = bv_priority_queue_destroy
+ENDIF
+

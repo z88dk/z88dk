@@ -19,3 +19,10 @@ p_forward_list_alt_remove:
    push af
 
    jp asm_p_forward_list_alt_remove
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_forward_list_alt_remove
+defc _p_forward_list_alt_remove = p_forward_list_alt_remove
+ENDIF
+

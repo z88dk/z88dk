@@ -18,3 +18,10 @@ wa_priority_queue_init_callee:
    ex (sp),hl
    
    jp asm_wa_priority_queue_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wa_priority_queue_init_callee
+defc _wa_priority_queue_init_callee = wa_priority_queue_init_callee
+ENDIF
+

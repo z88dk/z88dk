@@ -24,3 +24,10 @@ b_vector_insert_n:
    push ix
 
    jp asm_b_vector_insert_n
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_insert_n
+defc _b_vector_insert_n = b_vector_insert_n
+ENDIF
+

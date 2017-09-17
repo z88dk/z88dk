@@ -9,3 +9,10 @@ PUBLIC bv_priority_queue_pop
 EXTERN asm_bv_priority_queue_pop
 
 defc bv_priority_queue_pop = asm_bv_priority_queue_pop
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_priority_queue_pop
+defc _bv_priority_queue_pop = bv_priority_queue_pop
+ENDIF
+

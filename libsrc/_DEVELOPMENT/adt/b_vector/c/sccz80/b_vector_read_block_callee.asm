@@ -9,3 +9,10 @@ PUBLIC b_vector_read_block_callee
 EXTERN b_array_read_block_callee
 
 defc b_vector_read_block_callee = b_array_read_block_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_read_block_callee
+defc _b_vector_read_block_callee = b_vector_read_block_callee
+ENDIF
+

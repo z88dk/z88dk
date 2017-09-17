@@ -9,3 +9,10 @@ PUBLIC w_vector_capacity
 EXTERN asm_w_vector_capacity
 
 defc w_vector_capacity = asm_w_vector_capacity
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_capacity
+defc _w_vector_capacity = w_vector_capacity
+ENDIF
+

@@ -19,3 +19,10 @@ b_array_resize:
    push af
    
    jp asm_b_array_resize
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_resize
+defc _b_array_resize = b_array_resize
+ENDIF
+

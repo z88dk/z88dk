@@ -19,3 +19,10 @@ bv_priority_queue_push:
    push af
    
    jp asm_bv_priority_queue_push
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_priority_queue_push
+defc _bv_priority_queue_push = bv_priority_queue_push
+ENDIF
+

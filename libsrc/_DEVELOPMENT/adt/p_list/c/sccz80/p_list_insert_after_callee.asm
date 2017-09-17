@@ -17,3 +17,10 @@ p_list_insert_after_callee:
    push af
    
    jp asm_p_list_insert_after
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_list_insert_after_callee
+defc _p_list_insert_after_callee = p_list_insert_after_callee
+ENDIF
+

@@ -15,3 +15,10 @@ b_array_resize_callee:
    ex (sp),hl
    
    jp asm_b_array_resize
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_resize_callee
+defc _b_array_resize_callee = b_array_resize_callee
+ENDIF
+

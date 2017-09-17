@@ -19,3 +19,10 @@ w_array_at:
    push af
    
    jp asm_w_array_at
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_array_at
+defc _w_array_at = w_array_at
+ENDIF
+

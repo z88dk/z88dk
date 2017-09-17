@@ -9,3 +9,10 @@ PUBLIC w_vector_push_back
 EXTERN w_vector_append
 
 defc w_vector_push_back = w_vector_append
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_push_back
+defc _w_vector_push_back = w_vector_push_back
+ENDIF
+

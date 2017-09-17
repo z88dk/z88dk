@@ -19,3 +19,10 @@ b_array_append_block:
    push af
    
    jp b_array_append_block_entry
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_append_block
+defc _b_array_append_block = b_array_append_block
+ENDIF
+

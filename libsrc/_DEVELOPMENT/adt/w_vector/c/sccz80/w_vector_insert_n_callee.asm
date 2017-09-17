@@ -18,3 +18,10 @@ w_vector_insert_n_callee:
    push ix
    
    jp asm_w_vector_insert_n
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_insert_n_callee
+defc _w_vector_insert_n_callee = w_vector_insert_n_callee
+ENDIF
+

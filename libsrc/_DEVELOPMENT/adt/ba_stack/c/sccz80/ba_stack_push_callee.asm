@@ -9,3 +9,10 @@ PUBLIC ba_stack_push_callee
 EXTERN b_array_append_callee
 
 defc ba_stack_push_callee = b_array_append_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ba_stack_push_callee
+defc _ba_stack_push_callee = ba_stack_push_callee
+ENDIF
+

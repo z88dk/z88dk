@@ -16,3 +16,10 @@ b_array_init_callee:
    ex (sp),hl
    
    jp asm_b_array_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_init_callee
+defc _b_array_init_callee = b_array_init_callee
+ENDIF
+

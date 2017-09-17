@@ -9,3 +9,10 @@ PUBLIC w_vector_erase_range_callee
 EXTERN w_array_erase_range_callee
 
 defc w_vector_erase_range_callee = w_array_erase_range_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_erase_range_callee
+defc _w_vector_erase_range_callee = w_vector_erase_range_callee
+ENDIF
+

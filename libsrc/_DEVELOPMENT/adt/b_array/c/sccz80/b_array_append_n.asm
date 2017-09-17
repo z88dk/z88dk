@@ -21,3 +21,10 @@ b_array_append_n:
    push af
    
    jp asm_b_array_append_n
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_append_n
+defc _b_array_append_n = b_array_append_n
+ENDIF
+

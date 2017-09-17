@@ -24,3 +24,10 @@ ba_priority_queue_init:
    push af
    
    jp asm_ba_priority_queue_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ba_priority_queue_init
+defc _ba_priority_queue_init = ba_priority_queue_init
+ENDIF
+

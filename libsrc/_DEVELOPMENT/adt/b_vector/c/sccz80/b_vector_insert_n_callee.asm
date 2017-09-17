@@ -18,3 +18,10 @@ b_vector_insert_n_callee:
    ex (sp),hl
    
    jp asm_b_vector_insert_n
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_insert_n_callee
+defc _b_vector_insert_n_callee = b_vector_insert_n_callee
+ENDIF
+

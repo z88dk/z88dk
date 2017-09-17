@@ -9,3 +9,10 @@ PUBLIC wa_stack_init
 EXTERN w_array_init
 
 defc wa_stack_init = w_array_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wa_stack_init
+defc _wa_stack_init = wa_stack_init
+ENDIF
+

@@ -15,3 +15,10 @@ bv_priority_queue_reserve_callee:
    ex (sp),hl
 
    jp asm_bv_priority_queue_reserve
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_priority_queue_reserve_callee
+defc _bv_priority_queue_reserve_callee = bv_priority_queue_reserve_callee
+ENDIF
+
