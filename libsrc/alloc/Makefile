@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = balloc obstack farz88
+SUBDIRS = balloc obstack farz88 malloc-classic
 
 all: subdirs-all
 

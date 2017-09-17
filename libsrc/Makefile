@@ -55,7 +55,6 @@ define buildgeneric
 	$(MAKE) -C ctype
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C malloc
 	$(MAKE) -C stdio
 	$(MAKE) -C setjmp
 	$(MAKE) -C time
@@ -1119,7 +1118,6 @@ classic-clean:
 	$(MAKE) -C math/cpcmath clean
 	$(MAKE) -C math/zxmath clean
 	$(MAKE) -C graphics clean
-	$(MAKE) -C malloc clean
 	$(MAKE) -C net clean
 	$(MAKE) -C rex clean
 	$(MAKE) -C rs232 clean
