@@ -10,3 +10,10 @@ PUBLIC bcmp_callee
 EXTERN memcmp_callee
 
 defc bcmp_callee = memcmp_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bcmp_callee
+defc _bcmp_callee = bcmp_callee
+ENDIF
+

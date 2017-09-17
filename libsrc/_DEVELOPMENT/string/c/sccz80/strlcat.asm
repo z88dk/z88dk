@@ -21,3 +21,10 @@ strlcat:
    push af
    
    jp asm_strlcat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strlcat
+defc _strlcat = strlcat
+ENDIF
+

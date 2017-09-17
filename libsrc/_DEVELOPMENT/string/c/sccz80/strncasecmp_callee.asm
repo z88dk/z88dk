@@ -17,3 +17,10 @@ strncasecmp_callee:
    push af
    
    jp asm_strncasecmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strncasecmp_callee
+defc _strncasecmp_callee = strncasecmp_callee
+ENDIF
+

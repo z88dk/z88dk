@@ -20,3 +20,10 @@ bzero:
    push af
    
    jp asm_bzero
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bzero
+defc _bzero = bzero
+ENDIF
+

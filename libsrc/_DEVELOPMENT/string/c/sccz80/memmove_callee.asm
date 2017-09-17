@@ -17,3 +17,10 @@ memmove_callee:
    push af
    
    jp asm_memmove
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memmove_callee
+defc _memmove_callee = memmove_callee
+ENDIF
+

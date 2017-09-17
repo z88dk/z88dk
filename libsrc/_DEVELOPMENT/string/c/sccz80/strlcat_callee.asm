@@ -16,3 +16,10 @@ strlcat_callee:
    ex (sp),hl
    
    jp asm_strlcat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strlcat_callee
+defc _strlcat_callee = strlcat_callee
+ENDIF
+

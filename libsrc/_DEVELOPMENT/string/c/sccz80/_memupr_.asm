@@ -19,3 +19,10 @@ _memupr_:
    push af
    
    jp asm__memupr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __memupr_
+defc __memupr_ = _memupr_
+ENDIF
+

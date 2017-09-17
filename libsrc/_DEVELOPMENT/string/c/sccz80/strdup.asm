@@ -9,3 +9,10 @@ PUBLIC strdup
 EXTERN asm_strdup
 
 defc strdup = asm_strdup
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strdup
+defc _strdup = strdup
+ENDIF
+

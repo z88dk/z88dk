@@ -19,3 +19,10 @@ strndup:
    push af
    
    jp asm_strndup
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strndup
+defc _strndup = strndup
+ENDIF
+

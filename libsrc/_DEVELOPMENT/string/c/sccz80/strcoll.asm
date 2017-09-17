@@ -19,3 +19,10 @@ strcoll:
    push af
    
    jp asm_strcoll
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strcoll
+defc _strcoll = strcoll
+ENDIF
+

@@ -15,3 +15,10 @@ _memlwr__callee:
    ex (sp),hl
    
    jp asm__memlwr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __memlwr__callee
+defc __memlwr__callee = _memlwr__callee
+ENDIF
+

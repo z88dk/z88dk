@@ -20,3 +20,10 @@ rawmemchr:
    push af
 
    jp l0_rawmemchr_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _rawmemchr
+defc _rawmemchr = rawmemchr
+ENDIF
+

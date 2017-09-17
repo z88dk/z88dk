@@ -10,3 +10,10 @@ PUBLIC index
 EXTERN strchr
 
 defc index = strchr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _index
+defc _index = index
+ENDIF
+

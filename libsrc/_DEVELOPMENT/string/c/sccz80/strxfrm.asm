@@ -21,3 +21,10 @@ strxfrm:
    push af
    
    jp asm_strxfrm
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strxfrm
+defc _strxfrm = strxfrm
+ENDIF
+

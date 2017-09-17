@@ -9,3 +9,10 @@ PUBLIC ffsl
 EXTERN asm_ffsl
 
 defc ffsl = asm_ffsl
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ffsl
+defc _ffsl = ffsl
+ENDIF
+

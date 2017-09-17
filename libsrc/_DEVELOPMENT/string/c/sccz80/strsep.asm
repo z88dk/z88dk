@@ -19,3 +19,10 @@ strsep:
    push af
    
    jp asm_strsep
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strsep
+defc _strsep = strsep
+ENDIF
+

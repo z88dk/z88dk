@@ -19,3 +19,10 @@ strchrnul:
    push af
    
    jp asm_strchrnul
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strchrnul
+defc _strchrnul = strchrnul
+ENDIF
+

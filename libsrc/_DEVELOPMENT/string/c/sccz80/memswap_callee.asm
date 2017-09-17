@@ -16,3 +16,10 @@ memswap_callee:
    ex (sp),hl
    
    jp asm_memswap
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memswap_callee
+defc _memswap_callee = memswap_callee
+ENDIF
+

@@ -17,3 +17,10 @@ _memstrcpy__callee:
    push af
    
    jp asm__memstrcpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __memstrcpy__callee
+defc __memstrcpy__callee = _memstrcpy__callee
+ENDIF
+

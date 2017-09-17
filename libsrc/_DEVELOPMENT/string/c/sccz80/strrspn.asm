@@ -19,3 +19,10 @@ strrspn:
    push af
    
    jp asm_strrspn
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strrspn
+defc _strrspn = strrspn
+ENDIF
+

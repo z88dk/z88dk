@@ -16,3 +16,10 @@ strcmp_callee:
    push af
    
    jp asm_strcmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strcmp_callee
+defc _strcmp_callee = strcmp_callee
+ENDIF
+

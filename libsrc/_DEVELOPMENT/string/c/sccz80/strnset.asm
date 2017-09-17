@@ -21,3 +21,10 @@ strnset:
    push af
    
    jp asm_strnset
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strnset
+defc _strnset = strnset
+ENDIF
+

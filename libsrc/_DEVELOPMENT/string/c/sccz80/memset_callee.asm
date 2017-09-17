@@ -16,3 +16,10 @@ memset_callee:
    ex (sp),hl
    
    jp asm_memset
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memset_callee
+defc _memset_callee = memset_callee
+ENDIF
+
