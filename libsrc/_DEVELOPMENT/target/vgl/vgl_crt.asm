@@ -1363,7 +1363,8 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "startup/vgl_helpers.inc"
+;@FIXME: This is just for bare bone debugging. Provides some essential debug tools
+include "startup/vgl_debug.inc"
 
 
 __Start:

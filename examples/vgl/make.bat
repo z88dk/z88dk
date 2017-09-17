@@ -16,12 +16,21 @@ REM zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o 
 REM zcc +vgl -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
 
 REM Use SCCZ80 compiler
-zcc +vgl -vn -clib=new %PROGNAME%.c -o %PROGNAME% -create-app
-REM zcc +vgl -v -clib=new %PROGNAME%.c -o %PROGNAME% -create-app
+zcc +vgl -v -clib=new %PROGNAME%.c -o %PROGNAME% -create-app
+IF ERRORLEVEL 1 GOTO:ERROR
+GOTO:NOERROR
 
+:ERROR
+ECHO Compiler did not exit cleanly :-(
+GOTO:END
+
+:NOERROR
+REM Clean
 DEL %PROGNAME%_BSS.bin
 DEL %PROGNAME%_CODE.bin
 DEL %PROGNAME%_DATA.bin
 DEL %PROGNAME%_interrupt_vectors.bin
-
 CALL emu.bat
+GOTO:END
+
+:END

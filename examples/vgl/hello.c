@@ -160,8 +160,7 @@ extern byte get_line_c			@ (VAR_START_VTECH + 26);
 extern byte get_line_count	@ (VAR_START_VTECH + 27);
 
 #define VAR_SIZE_VTECH 28
-
-
+#define VAR_START_USER (VAR_START_VTECH + VAR_SIZE_VTECH)
 
 
 void put(byte *text) {
@@ -951,7 +950,8 @@ void sound_note(word n, word len) {
 
 void beep() {
 	//sound(0x0303, 0x011f);
-	sound_note(12*3 + 0, 0x2000);
+	//sound_note(12*3 + 0, 0x2000);	// Sounds OK
+	sound_note(12*3 + 0, 0x0800);
 }
 
 
@@ -1134,8 +1134,16 @@ void vtech_init() {
 unsigned char buffer[100];
 unsigned char c;
 
-void main(void)
-{
+unsigned char i;
+
+void pause() {
+	beep();
+	for(i=0; i<10; i++) {
+		delay_0x1fff();
+	}
+}
+
+void main(void) {
 	
 	vtech_init();	// Checks for system architecture and sets up stuff
 	
@@ -1145,10 +1153,18 @@ void main(void)
 	
 	screen_clear();	// Clear screen (contains garbage left in RAM)
 	
-	put("VTECH Terminal");
-	put("\n2017 B HotKey Slawik");
+	put("VTECH Tester\n");
+	//put("\n2017 B HotKey Slawik\n");
+	//beep();
+	pause();
 	
-	beep();
+	sprintf(buffer, "sprintfput\0");
+	put(buffer);
+	pause();
+	
+	printf("printf!");
+	
+	pause();
 	
 	
 	

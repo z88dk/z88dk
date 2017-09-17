@@ -26,8 +26,7 @@ code_ok:
    ;ZX:	call asm_zx_cxy2saddr
    ;	ex de,hl                    ; de = screen address
    ;	ld a,b                      ; a = colour
-   ld hl, 	0xdca0	; VRAM
-   ex de, hl
+   ld de, 	0xdca0	; VRAM
 
 __print_loop:
 
