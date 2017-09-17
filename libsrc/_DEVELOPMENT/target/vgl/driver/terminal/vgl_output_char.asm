@@ -19,8 +19,8 @@ EXTERN vgl_output_char_oterm_msg_printc
 
 vgl_output_char:
 
-   cp OTERM_MSG_PRINTC
-   jp z, zx_01_output_char_32_oterm_msg_printc
+;   cp OTERM_MSG_PRINTC
+;   jp z, zx_01_output_char_32_oterm_msg_printc
 
 ;   cp ITERM_MSG_PRINT_CURSOR
 ;   jp z, zx_01_output_char_32_iterm_msg_print_cursor
@@ -45,4 +45,7 @@ vgl_output_char:
 ;   cp OTERM_MSG_BELL
 ;   jp z, zx_01_output_char_32_oterm_msg_bell
 
-   jp console_01_output_terminal_char     ; forward to library
+;   jp console_01_output_terminal_char     ; forward to library
+
+
+jp zx_01_output_char_32_oterm_msg_printc	; Forward all calls for now (early development)

@@ -1311,6 +1311,7 @@ EXTERN _main
 
 ; These bytes indicate what kind of cartridge we have.
 ; They must be the very first bytes in the ROM
+; They could also be moved to the "create-app" part, but this provides easier debugging possibilities for now
 
 IF (startup=1)
 	
@@ -1335,8 +1336,6 @@ ELSE
 	ENDIF
 
 ENDIF
-
-include "startup/vgl_helpers.inc"
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1364,6 +1363,9 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+include "startup/vgl_helpers.inc"
+
+
 __Start:
 
    include "../crt_start_di.inc"
@@ -1371,7 +1373,7 @@ __Start:
 
 __Restart:
 
-   include "../crt_init_sp.inc"
+;   include "../crt_init_sp.inc"
    
    ; command line
    
