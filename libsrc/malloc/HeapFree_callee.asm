@@ -4,6 +4,7 @@
 SECTION code_clib
 PUBLIC HeapFree_callee
 PUBLIC _HeapFree_callee
+PUBLIC MAHeapFree
 PUBLIC ASMDISP_HEAPFREE_CALLEE
 
 .HeapFree_callee

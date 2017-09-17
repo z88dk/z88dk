@@ -24,3 +24,5 @@ malloc/obj/${TYPE}/realloc_callee
 malloc/obj/${TYPE}/sbrk
 malloc/obj/${TYPE}/sbrk_callee
 malloc/obj/${TYPE}/strings/strdup
+malloc/obj/${TYPE}/asm_realloc
+malloc/obj/${TYPE}/asm_free
