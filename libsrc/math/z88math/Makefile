@@ -10,7 +10,7 @@ CFILES = \
 	tanh.c 
 
 AFILES  = $(wildcard *.asm)
-OBJECTS = $(CFILES:.c=.o) 
+OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
 all: $(OUTPUT_DIRECTORY)/z88_math.lib
@@ -22,6 +22,8 @@ $(OUTPUT_DIRECTORY)/z88_math.lib: $(OBJECTS)
 %.o: %.c
 	zcc +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
 
+%.o: %.asm
+	zcc +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
 
 
 clean:

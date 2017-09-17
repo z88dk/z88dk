@@ -18,8 +18,8 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +c128 improvements
 - [classiclib] [math48] #108: Single parameter library math functions now work correctly
 - [classiclib] +rcmx000 support has been restored and optimisations applied
-- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable them all
-  -D__DISABLE_BUILTIN or individually with __DISABLE_BUILTIN_[function]
+- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable with
+  -D__SDCC_DISABLE_BUILTIN or -D__SCCZ80_DISABLE_BUILTIN as appropriate
 - [classiclib] +sms fixed an issue with tile corruption due to sdcc compatiblity
   code being inserted in the wrong place
 - [classiclib] +nc100 graphics support has been added
@@ -27,9 +27,6 @@ z88dk vX.XX  - XX.XX.XXXX
   working correctly
 - [classiclib] +zx ROM screen printer now available
 - [classiclib] +zx Default console font can be changed at compile time (CRT_FONT)
-- [classiclib] imported obstack, balloc and adt libraries from newlib. balloc can now
-  be configured in the same was as newlib (-pragma-define:CLIB_BALLOC_TABLE_SIZE=n)
-- [classiclib] Marked adt and balloc classic apis as deprecated
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.

@@ -21,4 +21,4 @@ subdirs-clean:
 .PHONY:	subdirs-all $(SUBDIRS)
 
 $(SUBDIRS):
-	@$(MAKE) -C $@ all
+	$(MAKE) -C $@ all

@@ -22,40 +22,48 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 all: dirs $(OBJECTS) adt-newlib.lst
 
 obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC -o$@ $^
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o $@ $^
+	zcc +$(TARGET) $(CFLAGS) -o   $^
 
 obj/z80-zxn/%.o: %.c
-	zcc +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   -o$@ $^
+	zcc +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
 
 obj/ixiy/%.o: %.c
-	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $@ $^
+	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
 
 obj/r2k/%.o: %.c
-	zcc +rcmx000 $(CFLAGS) -o $@ $^
+	zcc +rcmx000 $(CFLAGS) -o $  $^
 
 adt-newlib.lst:
 	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/adt/adt_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'adt-newlib/obj/$${TYPE}' -c -o adt-newlib.lst

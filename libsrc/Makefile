@@ -52,24 +52,24 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 
 
 define buildgeneric
-	@$(MAKE) -C ctype
-	@$(MAKE) -C strings
-	@$(MAKE) -C regex
-	@$(MAKE) -C stdio
-	@$(MAKE) -C setjmp
-	@$(MAKE) -C time
-	@$(MAKE) -C debug
-	@$(MAKE) -C assert
-	@$(MAKE) -C stdlib TARGET=$(1)
-	@$(MAKE) -C compress/zx7
-	@$(MAKE) -C rs232 
-	@$(MAKE) -C psg
-	@$(MAKE) -C alloc
-	@$(MAKE) -C debug
-	@$(MAKE) -C adt
-	@$(MAKE) -C adt-newlib
-	@$(MAKE) -C algorithm
-	@$(MAKE) -C rect
+	$(MAKE) -C ctype
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdio
+	$(MAKE) -C setjmp
+	$(MAKE) -C time
+	$(MAKE) -C debug
+	$(MAKE) -C assert
+	$(MAKE) -C stdlib TARGET=$(1)
+	$(MAKE) -C compress/zx7
+	$(MAKE) -C rs232 
+	$(MAKE) -C psg
+	$(MAKE) -C alloc
+	$(MAKE) -C debug
+	$(MAKE) -C adt
+	$(MAKE) -C adt-newlib
+	$(MAKE) -C algorithm
+	$(MAKE) -C rect
 endef
 
 #  short script to sort out gfx dependencies
