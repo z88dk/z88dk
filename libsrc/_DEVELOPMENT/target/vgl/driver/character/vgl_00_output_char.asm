@@ -69,14 +69,14 @@ vgl_00_output_char_ochar_msg_putc:
 	;ld hl,0xdca0
 	
 	;@FIXME: This is just a proof-of-concept!
-	; Get cursor pos
+	; Get cursor_ofs from hello.c
 	ld hl, 0xc000 + 20	; cursor_ofs variable of hello.c
 	ld a, (hl)
 	inc a
-	; wrap/scroll
+	;@TODO: wrap/scroll
 	ld (hl), a
 	
-	; Into VRAM at 0xdca0
+	; Into VRAM at 0xdca0+cursor_ofs
 	add 0xa0
 	ld l, a
 	ld h, 0xdc
