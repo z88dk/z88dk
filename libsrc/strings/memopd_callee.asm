@@ -31,7 +31,7 @@ EXTERN l_jpix, memops
 
    push hl
 
-IF FORrcmx000
+IF __CPU_R2K__|__CPU_R3K__
 
    push ix
    pop hl
@@ -100,7 +100,7 @@ ENDIF
    pop hl
    ret
 
-IF FORrcmx000
+IF __CPU_R2K__|__CPU_R3K__
 
 .func_enter
 

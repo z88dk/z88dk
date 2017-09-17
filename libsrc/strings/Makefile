@@ -6,54 +6,71 @@
 include ../Make.config
 
 TARGET ?= test
-CLASSIC_ASM = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm strrstr.asm strrstr_callee.asm $(wildcard _*.asm)
-ASMFILES = $(wildcard $(NEWLIB_DIRECTORY)/string/z80/*.asm) $(wildcard $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm) $(CLASSIC_ASM)
 
-OBJECTS = $(GENOBJECTS) $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
+CLASSIC_ASM = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm strrstr.asm strrstr_callee.asm $(wildcard _*.asm)
+CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
+
+NEWLIBASM := $(shell z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/string/string_sccz80.lst -p $(NEWLIB_DIRECTORY) -t)
+NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
+NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy,$(NEWLIBOBJ))
+
+OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
 .PHONY: dirs
 
-all: dirs $(addprefix obj/z80/, $(notdir $(OBJECTS))) $(addprefix obj/r2k/,$(notdir $(OBJECTS))) $(addprefix obj/ixiy/,$(notdir $(OBJECTS)))
+all: dirs $(OBJECTS) string-newlib.lst
 
-obj/z80/%.o: %.c
-	@zcc +$(TARGET) $(CFLAGS) -o @  $^
+obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/string/z80/%.asm
-	@zcc +$(TARGET) -Ca-D__CLASSIC -Ca-I../ $(CFLAGS) -o $@  $^
+obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/string/c/sccz80/%.asm
-	@zcc +$(TARGET) -Ca-D__CLASSIC -Ca-I../ $(CFLAGS) -o $@  $^
+obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
+
+obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.asm
-	@zcc +$(TARGET) $(CFLAGS) -o $@  $^
-
-obj/ixiy/%.o: %.c
-	@zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $@  $^
-
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/string/z80/%.asm
-	@zcc +$(TARGET) -Ca-D__CLASSIC -Ca-I../ -Ca--IXIY $(CFLAGS) -o $@  $^
-
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/string/c/sccz80/%.asm
-	@zcc +$(TARGET) -Ca-D__CLASSIC -Ca-I../ -Ca--IXIY $(CFLAGS) -o $@  $^
+	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: %.asm
-	@zcc +$(TARGET) -Ca-D__CLASSIC -Ca-I../ -Ca--IXIY $(CFLAGS) -o $@  $^
-
-obj/r2k/%.o: %.c
-	@zcc +rcmx000 $(CFLAGS) -o $@  $^
-
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/string/z80/%.asm
-	@zcc +rcmx000 $(CFLAGS) -Ca-D__CLASSIC -Ca-I../ -Ca-DFORrcmx000 -o $@  $^
-
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/string/c/sccz80/%.asm
-	@zcc +rcmx000 -Ca-D__CLASSIC -Ca-I../ $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
+	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.asm
-	@zcc +rcmx000 $(CFLAGS) -Ca-DFORrcmx000 -o $@  $^
+	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
+
+obj/z80-zxn/%.o: %.asm
+	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
+
+obj/z80/%.o: %.c
+	zcc +$(TARGET) $(CFLAGS) -o   $^
+
+obj/z80-zxn/%.o: %.c
+	zcc +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
+
+obj/ixiy/%.o: %.c
+	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
+
+obj/r2k/%.o: %.c
+	zcc +rcmx000 $(CFLAGS) -o $  $^
+
+string-newlib.lst:
+	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/string/string_sccz80.lst -p $(NEWLIB_DIRECTORY) -c -o string-newlib.lst
 
 dirs:
-	@mkdir -p obj/z80 obj/r2k obj/ixiy
+	@mkdir -p $(dir $(OBJECTS))
 
 
 clean:
-	$(RM) -fr obj
+	$(RM) -fr obj string-newlib.lst
