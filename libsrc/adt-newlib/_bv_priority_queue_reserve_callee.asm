@@ -1,0 +1,11 @@
+; int bv_priority_queue_reserve(bv_priority_queue_t *q, size_t n)
+
+SECTION code_clib
+SECTION code_string
+
+MODULE _bv_priority_queue_reserve_callee_sdcc
+GLOBAL _bv_priority_queue_reserve_callee
+GLOBAL bv_priority_queue_reserve_callee
+
+defc _bv_priority_queue_reserve_callee = bv_priority_queue_reserve_callee
+
