@@ -19,3 +19,10 @@ toupper:
    
    ld l,a
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _toupper
+defc _toupper = toupper
+ENDIF
+

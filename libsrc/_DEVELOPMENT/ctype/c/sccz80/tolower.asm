@@ -19,3 +19,10 @@ tolower:
    
    ld l,a
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tolower
+defc _tolower = tolower
+ENDIF
+

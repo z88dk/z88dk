@@ -22,3 +22,10 @@ iscntrl:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _iscntrl
+defc _iscntrl = iscntrl
+ENDIF
+

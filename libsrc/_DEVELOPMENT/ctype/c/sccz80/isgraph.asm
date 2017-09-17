@@ -22,3 +22,10 @@ isgraph:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isgraph
+defc _isgraph = isgraph
+ENDIF
+

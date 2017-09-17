@@ -22,3 +22,10 @@ isspace:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isspace
+defc _isspace = isspace
+ENDIF
+

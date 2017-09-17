@@ -22,3 +22,10 @@ isblank:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isblank
+defc _isblank = isblank
+ENDIF
+
