@@ -61,9 +61,9 @@ ENDIF
 		SECTION code_compiler
 		SECTION code_clib
 		SECTION code_crt0_sccz80
+		SECTION code_l
 		SECTION code_l_sdcc
 		SECTION code_l_sccz80
-		SECTION code_l
 		SECTION code_compress_zx7
 		SECTION code_esxdos
 		SECTION code_fp
@@ -72,6 +72,24 @@ ENDIF
 		SECTION code_error
 		SECTION code_stdlib
 		SECTION code_string
+		SECTION	code_adt_b_array
+		SECTION	code_adt_b_vector
+		SECTION	code_adt_ba_priority_queue
+		SECTION	code_adt_ba_stack
+		SECTION	code_adt_bv_priority_queue
+		SECTION	code_adt_bv_stack
+		SECTION	code_adt_p_forward_list
+		SECTION	code_adt_p_forward_list_alt
+		SECTION	code_adt_p_list
+		SECTION	code_adt_p_queue
+		SECTION	code_adt_p_stack
+		SECTION	code_adt_w_array
+		SECTION	code_adt_w_vector
+		SECTION	code_adt_wa_priority_queue
+		SECTION	code_adt_wa_stack
+		SECTION	code_adt_wv_priority_queue
+		SECTION	code_adt_wv_stack
+
 		SECTION code_user
 		SECTION rodata_fp
 		SECTION rodata_compiler
@@ -137,6 +155,7 @@ IF __crt_org_bss_compiler_start
 		org	__crt_org_bss_compiler_start
 ENDIF
 		SECTION bss_clib
+		SECTION bss_string
 		SECTION bss_user
 IF __crt_model > 0
         SECTION DATA
