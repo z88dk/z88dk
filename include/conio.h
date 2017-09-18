@@ -87,7 +87,7 @@ extern void    __LIB__     gotoxy_callee(unsigned int x, unsigned int y) __small
 extern void    __LIB__     screensize(unsigned int *x, unsigned int *y) __smallc;
 extern void    __LIB__     screensize_callee(unsigned char *x, unsigned char *y) __smallc __z88dk_callee;
 
-#define gotoxy(a,b) screensize_callee(a,b)
+#define gotoxy(a,b) gotoxy_callee(a,b)
 #define screensize(a,b) screensize_callee(a,b)
 
 
