@@ -657,6 +657,8 @@ int main (int argc, char **argv){
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
     printf("  -mz80          Emulate a z80\n"),
+    printf("  -mz180         Emulate a z180\n"),
+    printf("  -mr2k          Emulate a Rabbit 2000\n"),
     printf("  -mz80-zxn      Emulate a Spectrum Next Z80\n"),
     printf("  -x <file>      Symbol file to read\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
@@ -2159,7 +2161,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc9: // RET
-        RET(israbbit() ?  8 : 10);
+        RET(israbbit() ?  8 : isz180() ? 9 : 10);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc0: // RET NZ
         RETCI(fr);
@@ -2250,7 +2252,7 @@ int main (int argc, char **argv){
         JPCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xcd: // CALL nn
-        st+= israbbit() ? 12 : 17;
+        st+= israbbit() ? 12 : isz180() ? 16 : 17;
         t= pc+2;
         mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
         put_memory(--sp,t>>8);
