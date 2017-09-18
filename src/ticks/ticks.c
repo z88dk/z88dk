@@ -42,11 +42,11 @@ uint8_t put_memory(int pc, uint8_t b)
         } while (0)
           
 #define LDRIM(r)                \
-          st += israbbit() ? 2 : 7, \
+          st += israbbit() ? 2 : isz180() ? 6 : 7, \
           r= get_memory(pc++)
 
 #define LDRRIM(a, b)            \
-          st += israbbit() ? 6 : 10, \
+          st += israbbit() ? 6 : isz180() ? 9 : 10, \
           b= get_memory(pc++),         \
           a= get_memory(pc++)
 
@@ -56,7 +56,7 @@ uint8_t put_memory(int pc, uint8_t b)
           ++mp
 
 #define LDRPI(a, b, r)          \
-          st += israbbit() ? 8 : 15, \
+          st += israbbit() ? 7 : isz180() ? 11 : 15, \
           r= get_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535)
 
 #define LDPR(a, b, r)           \
@@ -296,30 +296,32 @@ uint8_t put_memory(int pc, uint8_t b)
           put_memory(--sp,b)
 
 #define POP(a, b)               \
-          st+= israbbit() ? 7 : 10,              \
+          st+= israbbit() ? 7 : isz180() ? 9 : 10,              \
           b= get_memory(sp++),  \
           a= get_memory(sp++)
 
 #define JPC(c)                  \
-          st+= israbbit() ? 7 : 10;              \
+          st+= israbbit() ? 7 : isz180() ? 6 : 10;              \
           if(c)                 \
             pc+= 2;             \
           else                  \
+            st += isz180() ? 3 : 0,  \
             pc= get_memory(pc) | get_memory(pc+1)<<8
 
 #define JPCI(c)                 \
-          st+= israbbit() ? 7 : 10;              \
+          st+= israbbit() ? 7 : isz180() ? 6 : 10;              \
           if(c)                 \
+            st += isz180() ? 3 : 0,  \
             pc= get_memory(pc) | get_memory(pc+1)<<8; \
           else                  \
             pc+= 2
 
 #define CALLC(c)                \
           if(c)                 \
-            st+= 10,            \
+            st+= isz180() ? 6 : 10,            \
             pc+= 2;             \
           else                  \
-            st+= 17,            \
+            st+= isz180() ? 16 : 17,            \
             t= pc+2,            \
             mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
@@ -327,13 +329,13 @@ uint8_t put_memory(int pc, uint8_t b)
 
 #define CALLCI(c)               \
           if(c)                 \
-            st+= 17,            \
+            st+= isz180() ? 16 : 17,            \
             t= pc+2,            \
             mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
             put_memory(--sp,t);    \
           else                  \
-            st+= 10,            \
+            st+= isz180() ? 6 : 10,            \
             pc+= 2
 
 #define RST(n)                  \
@@ -343,7 +345,7 @@ uint8_t put_memory(int pc, uint8_t b)
           mp= pc= n
 
 #define EXSPI(a, b)             \
-          st+= 19,              \
+          st+= israbbit() ? 13 : isz180() ? 16 : 19,              \
           t= get_memory(sp),    \
           put_memory(sp++,b),   \
           b= t,                 \
@@ -353,14 +355,14 @@ uint8_t put_memory(int pc, uint8_t b)
           mp= b | a<<8
 
 #define RLC(r)                  \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff= r*257>>7,         \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define RRC(r)                  \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff=  r >> 1           \
               | ((r&1)+1 ^ 1)<<7, \
           fa= 256               \
@@ -368,7 +370,7 @@ uint8_t put_memory(int pc, uint8_t b)
           fb= 0
 
 #define RL(r)                   \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff= r << 1            \
             | ff  >> 8 & 1,     \
           fa= 256               \
@@ -376,21 +378,21 @@ uint8_t put_memory(int pc, uint8_t b)
           fb= 0
 
 #define RR(r)                   \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff= (r*513 | ff&256)>>1, \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define SLA(r)                  \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff= r<<1,             \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define SRA(r)                  \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff= (r*513+128^128)>>1, \
           fa= 256               \
             | (fr= r= ff),      \
@@ -405,14 +407,14 @@ uint8_t put_memory(int pc, uint8_t b)
             fb= 0
 
 #define SRL(r)                  \
-          st+= israbbit() ? 4 : 8,               \
+          st+= israbbit() ? 4 : isz180() ? 7 : 8,               \
           ff= r*513 >> 1,       \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define BIT(n, r)               \
-          st += israbbit() ? 4 : 8, \
+          st += israbbit() ? 4 : isz180() ? 6 : 8, \
           ff= ff  & -256        \
             | r   &   40        \
             | (fr= r & n),      \
@@ -420,7 +422,7 @@ uint8_t put_memory(int pc, uint8_t b)
           fb= 0
 
 #define BITHL(n)                \
-          st += israbbit() ? 7 : 12, \
+          st += israbbit() ? 7 : isz180() ? 9 : 12, \
           t = get_memory(l | h<<8),     \
           ff= ff    & -256      \
             | mp>>8 &   40      \
@@ -430,7 +432,7 @@ uint8_t put_memory(int pc, uint8_t b)
 
 // 11T has already been added
 #define BITI(n) do {               \
-          st += israbbit() ? -1 : 5; \
+          st += israbbit() ? -1 : isz180() ? 4 : 5; \
           if ( altd ) {           \
             ff_= ff_    & -256    \
               | mp>>8 &   40      \
@@ -447,20 +449,20 @@ uint8_t put_memory(int pc, uint8_t b)
         } while ( 0 )
 
 #define RES(n, r)               \
-          st += israbbit() ? 4 : 8, \
+          st += israbbit() ? 4 : isz180() ? 7 : 8, \
           r&= n
 
 #define RESHL(n)                \
-          st += israbbit() ? 10 : 15, \
+          st += israbbit() ? 10 : isz180() ? 13 : 15, \
           t = l|h<<8, \
           put_memory(t, get_memory(t) & n) 
           
 #define SET(n, r)               \
-          st += israbbit() ? 4 : 8, \
+          st += israbbit() ? 4 : isz180() ? 7 : 8, \
           r|= n
 
 #define SETHL(n)                \
-          st += israbbit() ? 10 : 15, \
+          st += israbbit() ? 10 : isz180() ? 13 : 15, \
           t = l|h<<8, \
           put_memory(t, get_memory(t) | n)
           
@@ -479,7 +481,7 @@ uint8_t put_memory(int pc, uint8_t b)
           ++mp
 
 #define SBCHLRR(a, b)           \
-          st += israbbit() ? 4 : 15, \
+          st += israbbit() ? 4 : isz180() ? 10 : 15, \
           v= l-b+((h-a)<<8)-(ff>>8&1),\
           mp= l+1+(h<<8),       \
           ff= v>>8,             \
@@ -490,7 +492,7 @@ uint8_t put_memory(int pc, uint8_t b)
           fr= h|l<<8
 
 #define ADCHLRR(a, b)           \
-          st += israbbit() ? 4 : 15, \
+          st += israbbit() ? 4 : isz180() ? 10 : 15, \
           v= l+b+(h+a<<8)+(ff>>8&1),\
           mp= l+1+(h<<8),       \
           ff= v>>8,             \
@@ -1001,11 +1003,11 @@ int main (int argc, char **argv){
       case 0x2a: // LD HL,(nn) // LD IX,(nn) // LD IY,(nn)
         if( ih ) {
           if ( altd ) LDRRPNN(h_, l_, 11);
-          else LDRRPNN(h, l, israbbit() ? 11 : 16);
+          else LDRRPNN(h, l, israbbit() ? 11 : isz180() ? 15 : 16);
         } else if( iy )
-          LDRRPNN(yh, yl, israbbit() ? 13 : 16);
+          LDRRPNN(yh, yl, israbbit() ? 13 : isz180() ? 15 : 16);
         else
-          LDRRPNN(xh, xl, israbbit() ? 13 : 16);
+          LDRRPNN(xh, xl, israbbit() ? 13 : isz180() ? 15 : 16);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3a: // LD A,(nn)
         st+= israbbit() ? 9 : 13;
@@ -1197,7 +1199,7 @@ int main (int argc, char **argv){
         else LDRIM(a);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x07: // RLCA
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         if ( altd ) {
           a_= t= a_*257>>7;
           ff_= ff_&215
@@ -1213,7 +1215,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0f: // RRCA
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         if ( altd ) {
           a_= t= a_>>1
               | ((a_&1)+1^1)<<7;
@@ -1231,7 +1233,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x17: // RLA
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         if ( altd ) {
           a_= t= a_<<1
               | ff_>>8 & 1;
@@ -1249,7 +1251,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1f: // RRA
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 :isz180() ? 3 : 4;
         if ( altd ) {
           a_= t= (a_*513 | ff_&256)>>1;
           ff_= ff_&215
@@ -3547,7 +3549,7 @@ int main (int argc, char **argv){
           case 0x42: SBCHLRR(b, c); break;                   // SBC HL,BC
           case 0x52: SBCHLRR(d, e); break;                   // SBC HL,DE
           case 0x62: SBCHLRR(h, l); break;                   // SBC HL,HL
-          case 0x72: st+= 15;                                // SBC HL,SP
+          case 0x72: st+= israbbit() ? 4 : isz180() ? 10 : 15;                                // SBC HL,SP
                      v= (mp= l|h<<8)-sp-(ff>>8&1);
                      ++mp;
                      ff= v>>8;
@@ -3559,7 +3561,7 @@ int main (int argc, char **argv){
           case 0x4a: ADCHLRR(b, c); break;                   // ADC HL,BC
           case 0x5a: ADCHLRR(d, e); break;                   // ADC HL,DE
           case 0x6a: ADCHLRR(h, l); break;                   // ADC HL,HL
-          case 0x7a: st+= 15;                                // ADC HL,SP
+          case 0x7a: st+= israbbit() ? 4 : isz180() ? 10 : 15;                                // ADC HL,SP
                      v= (mp= l|h<<8)+sp+(ff>>8&1);
                      ++mp;
                      ff= v>>8;
@@ -3568,17 +3570,17 @@ int main (int argc, char **argv){
                      h= ff;
                      l= v;
                      fr= h | l<<8; break;
-          case 0x43: LDPNNRR(b, c, 20); break;               // LD (NN),BC
-          case 0x53: LDPNNRR(d, e, 20); break;               // LD (NN),DE
-          case 0x63: LDPNNRR(h, l, 20); break;               // LD (NN),HL
-          case 0x73: st+= 20;                                // LD (NN),SP
+          case 0x43: LDPNNRR(b, c, israbbit() ? 15 : isz180() ? 19 : 20); break;               // LD (NN),BC
+          case 0x53: LDPNNRR(d, e, israbbit() ? 15 : isz180() ? 19 : 20); break;               // LD (NN),DE
+          case 0x63: LDPNNRR(h, l, israbbit() ? 15 : isz180() ? 19 : 20); break;               // LD (NN),HL
+          case 0x73: st+= israbbit() ? 15 : isz180() ? 19 : 20;                                // LD (NN),SP
                      mp= get_memory(pc++);
                      put_memory(mp|= get_memory(pc++)<<8, sp);
                      put_memory(++mp,sp>>8); break;
-          case 0x4b: LDRRPNN(b, c, 20); break;               // LD BC,(NN)
-          case 0x5b: LDRRPNN(d, e, 20); break;               // LD DE,(NN)
-          case 0x6b: LDRRPNN(h, l, 20); break;               // LD HL,(NN)
-          case 0x7b: st+= 20;                                // LD SP,(NN)
+          case 0x4b: LDRRPNN(b, c, israbbit() ? 13 : isz180() ? 18 : 20); break;               // LD BC,(NN)
+          case 0x5b: LDRRPNN(d, e, israbbit() ? 13 : isz180() ? 18 : 20); break;               // LD DE,(NN)
+          case 0x6b: LDRRPNN(h, l, israbbit() ? 13 : isz180() ? 18 : 20); break;               // LD HL,(NN)
+          case 0x7b: st+= israbbit() ? 13 : isz180() ? 18 : 20;                                // LD SP,(NN)
                      t= get_memory(pc++);
                      sp= get_memory(t|= get_memory(pc++)<<8);
                      sp|= get_memory(mp= t+1) << 8; break;
@@ -3620,10 +3622,8 @@ int main (int argc, char **argv){
             break;
           case 0x54:
             if ( israbbit()) {
-              long long saved = st;
               EXSPI(h, l);
-              st = saved;
-              st += 15;
+              st += 2;
               break;
             }
             // Fall through for z80 case
