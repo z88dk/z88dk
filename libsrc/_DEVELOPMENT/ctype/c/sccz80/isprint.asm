@@ -22,3 +22,10 @@ isprint:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isprint
+defc _isprint = isprint
+ENDIF
+

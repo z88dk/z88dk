@@ -289,7 +289,7 @@ struct {
       "Create the header for a Residos package",
       NULL,
       residos_exec,    &residos_options },
-    { "rompad",    "rom",       "(C) 2014 Stefano Bodrato",
+    { "rompad",    "rom",       "(C) 2014,2017 Stefano Bodrato & Alvin Albrecht",
       "Embed a binary inside a rom, padding if necessary",
       NULL,
       rom_exec,    &rom_options },
@@ -385,8 +385,10 @@ struct {
       "Creates a zxvgs application file",
       NULL,
       zxvgs_exec,   &zxvgs_options},
-    { "bin2tap",  "zx",       "(C) 2000,2003 Dominic Morris & Stefano Bodrato", 
-      "Generates a .TAP file complete with BASIC header, optional WAV file",
+    { "bin2tap",  "zx",  "(C) 2000,2003,2017 Morris, Bodrato, Albrecht", 
+      "Generates a .TAP file complete with BASIC header, optional WAV file\n"
+      "Generates 48k/128k SNA Snapshots from binary files\n"
+      "Generates ESXDOS dot commands",
       NULL,
       zx_exec,      &zx_options },
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
@@ -410,6 +412,10 @@ extern FILE         *fopen_bin(char *fname, char *crtfile);
 extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);
+
+extern void        *must_malloc(size_t sz);
+extern void        *must_realloc(void *p, size_t sz);
+extern void        *must_strdup(char *p);
 
 extern void         writebyte(unsigned char c, FILE *fp);
 extern void         writeword(unsigned int i, FILE *fp);
@@ -444,3 +450,61 @@ extern uint32_t     num2bcd(uint32_t num);
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #endif
+
+/* memory banks */
+
+#define MAXBANKS  256     // maximum number of memory banks
+
+// all pointers are dynamic data
+
+struct section_bin
+{
+    char *filename;       // name of file holding binary data
+    char *section_name;   // section name corresponding to binary data
+    int   org;
+    int   size;
+};
+
+struct memory_bank
+{
+    int    num;                   // number of sections in bank
+    struct section_bin *secbin;   // array of sections
+};
+
+struct bank_space
+{
+    char *bank_id;                          // substring of section name that identifies a bank space
+    struct memory_bank membank[MAXBANKS];   // independent 64k banks in bank space
+};
+
+struct banked_memory
+{
+    int    num;                      // number of independent bank spaces
+    struct bank_space  *bankspace;   // an array of independent bank spaces
+    struct memory_bank  mainbank;    // the main memory bank
+};
+
+struct section_aligned
+{
+    char *section_name;   // section name corresponding to aligned data
+    int   alignment;      // power of two
+    int   org;
+    int   size;
+};
+
+struct aligned_data
+{
+    int num;                         // number of aligned sections
+    struct section_aligned *array;   // array of sections
+};
+
+extern void mb_create_bankspace(struct banked_memory *memory, char *bank_id);
+extern void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned);
+extern int  mb_remove_bank(struct bank_space *bs, unsigned int index);
+extern int  mb_remove_section(struct banked_memory *memory, char *section_name);
+extern int  mb_check_alignment(struct aligned_data *aligned);
+extern int  mb_sort_banks(struct banked_memory *memory);
+extern int  mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int irecsz, struct memory_bank *mb);
+extern void mb_delete_source_binaries(struct banked_memory *memory);
+extern void mb_cleanup_memory(struct banked_memory *memory);
+extern void mb_cleanup_aligned(struct aligned_data *aligned);

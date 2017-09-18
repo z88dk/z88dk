@@ -21,3 +21,10 @@ memcmp:
    push af
    
    jp asm_memcmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memcmp
+defc _memcmp = memcmp
+ENDIF
+

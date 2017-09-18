@@ -9,3 +9,10 @@ PUBLIC wa_stack_size
 EXTERN asm_wa_stack_size
 
 defc wa_stack_size = asm_wa_stack_size
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wa_stack_size
+defc _wa_stack_size = wa_stack_size
+ENDIF
+

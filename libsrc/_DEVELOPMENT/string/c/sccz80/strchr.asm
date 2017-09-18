@@ -19,3 +19,10 @@ strchr:
    push af
    
    jp asm_strchr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strchr
+defc _strchr = strchr
+ENDIF
+

@@ -9,3 +9,10 @@ PUBLIC w_vector_data
 EXTERN asm_w_vector_data
 
 defc w_vector_data = asm_w_vector_data
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_data
+defc _w_vector_data = w_vector_data
+ENDIF
+

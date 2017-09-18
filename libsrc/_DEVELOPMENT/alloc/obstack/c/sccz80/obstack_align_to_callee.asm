@@ -25,3 +25,10 @@ obstack_align_to_callee:
    ex (sp),hl
    
    jp asm_obstack_align_to
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_align_to_callee
+defc _obstack_align_to_callee = obstack_align_to_callee
+ENDIF
+

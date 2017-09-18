@@ -1,17 +1,20 @@
-#
-# $Id: Makefile,v 1.6 2014-11-18 07:06:41 stefano Exp $
+# $Id: Makefile,v 1.6 2012-06-26 06:09:52 stefano Exp $
 
-all:
-	@echo ''
-	@echo '---> Building ZX Plus RS232 library <---'
-	@echo ''
-	cd plus3 ; $(MAKE) ; cd ..
-	@echo ''
-	@echo '---> Building Interface 1 RS232 library <---'
-	@echo ''
-	cd if1 ; $(MAKE) ; cd ..
+SUBDIRS = if1 plus3
 
+all: subdirs-all
+
+subdirs-all:	$(SUBDIRS)
+
+
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 clean:
-	cd plus3 ; $(MAKE) clean ; cd ..
-	cd if1 ; $(MAKE) clean ; cd ..
+	@for s in $(SUBDIRS); \
+	do \
+		$(MAKE) -C $$s clean; \
+	done
+
+.PHONY: $(SUBDIRS) subdirs-all
+

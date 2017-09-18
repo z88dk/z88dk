@@ -9,3 +9,10 @@ PUBLIC ba_stack_size
 EXTERN asm_ba_stack_size
 
 defc ba_stack_size = asm_ba_stack_size
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ba_stack_size
+defc _ba_stack_size = ba_stack_size
+ENDIF
+

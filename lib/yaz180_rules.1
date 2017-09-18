@@ -1,4 +1,8 @@
-	call	___BREAK_HELPER
+;;
+;; Inlined C macro __BREAK
+;;
+
+%"[ \t]*"0call%"[ \t]*"1___BREAK_HELPER
 =
 	IFNDEF __IO_BREAK
 	EXTERN	__IO_BREAK
@@ -6,10 +10,48 @@
 	ld	bc,__IO_BREAK
 	out	(c),c
 
-	call	__BREAK_HELPER
+%"[ \t]*"0call%"[ \t]*"1__BREAK_HELPER
 =
 	IFNDEF __IO_BREAK
 	EXTERN	__IO_BREAK
 	ENDIF
 	ld	bc,__IO_BREAK
 	out	(c),c
+
+%"[ \t]*"0jp%"[ \t]*"1___BREAK_HELPER
+=
+	IFNDEF __IO_BREAK
+	EXTERN	__IO_BREAK
+	ENDIF
+	ld	bc,__IO_BREAK
+	out	(c),c
+	ret
+
+%"[ \t]*"0jp%"[ \t]*"1__BREAK_HELPER
+=
+	IFNDEF __IO_BREAK
+	EXTERN	__IO_BREAK
+	ENDIF
+	ld	bc,__IO_BREAK
+	out	(c),c
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"4%"[ \t]*"2=%"[ \t]*"3___BREAK_HELPER
+=
+%4:
+	IFNDEF __IO_BREAK
+	EXTERN	__IO_BREAK
+	ENDIF
+	ld	bc,__IO_BREAK
+	out	(c),c
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"4%"[ \t]*"2=%"[ \t]*"3__BREAK_HELPER
+=
+%4:
+	IFNDEF __IO_BREAK
+	EXTERN	__IO_BREAK
+	ENDIF
+	ld	bc,__IO_BREAK
+	out	(c),c
+	ret

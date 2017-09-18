@@ -21,3 +21,10 @@ p_list_insert:
    push af
    
    jp asm_p_list_insert
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_list_insert
+defc _p_list_insert = p_list_insert
+ENDIF
+

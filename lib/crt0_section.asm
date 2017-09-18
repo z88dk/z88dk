@@ -61,16 +61,38 @@ ENDIF
 		SECTION code_compiler
 		SECTION code_clib
 		SECTION code_crt0_sccz80
+		SECTION code_l
 		SECTION code_l_sdcc
 		SECTION code_l_sccz80
-		SECTION code_l
 		SECTION code_compress_zx7
+		SECTION code_ctype
 		SECTION code_esxdos
 		SECTION code_fp
 		SECTION code_fp_math48
 		SECTION code_math
 		SECTION code_error
 		SECTION code_stdlib
+		SECTION code_string
+		SECTION	code_adt_b_array
+		SECTION	code_adt_b_vector
+		SECTION	code_adt_ba_priority_queue
+		SECTION	code_adt_ba_stack
+		SECTION	code_adt_bv_priority_queue
+		SECTION	code_adt_bv_stack
+		SECTION	code_adt_p_forward_list
+		SECTION	code_adt_p_forward_list_alt
+		SECTION	code_adt_p_list
+		SECTION	code_adt_p_queue
+		SECTION	code_adt_p_stack
+		SECTION	code_adt_w_array
+		SECTION	code_adt_w_vector
+		SECTION	code_adt_wa_priority_queue
+		SECTION	code_adt_wa_stack
+		SECTION	code_adt_wv_priority_queue
+		SECTION	code_adt_wv_stack
+		SECTION code_alloc_balloc
+		SECTION code_alloc_obstack
+
 		SECTION code_user
 		SECTION rodata_fp
 		SECTION rodata_compiler
@@ -88,6 +110,7 @@ IF !__crt_model
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
+		SECTION data_alloc_balloc
 		SECTION DATA_END
 ENDIF
 
@@ -136,6 +159,8 @@ IF __crt_org_bss_compiler_start
 		org	__crt_org_bss_compiler_start
 ENDIF
 		SECTION bss_clib
+		SECTION bss_string
+		SECTION bss_alloc_balloc
 		SECTION bss_user
 IF __crt_model > 0
         SECTION DATA
@@ -147,6 +172,26 @@ IF __crt_model > 0
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
+		SECTION data_alloc_balloc
 		SECTION DATA_END
 ENDIF
 		SECTION BSS_END
+
+
+IF CLIB_BALLOC_TABLE_SIZE > 0
+
+   ; create balloc table
+
+   SECTION data_clib
+   SECTION data_alloc_balloc
+
+   PUBLIC __balloc_array
+
+   __balloc_array:             defw __balloc_table
+
+   SECTION bss_clib
+   SECTION bss_alloc_balloc
+
+   __balloc_table:             defs CLIB_BALLOC_TABLE_SIZE * 2
+
+ENDIF

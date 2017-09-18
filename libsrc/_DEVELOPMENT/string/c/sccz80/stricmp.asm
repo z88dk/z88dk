@@ -9,3 +9,10 @@ PUBLIC stricmp
 EXTERN strcasecmp
 
 defc stricmp = strcasecmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _stricmp
+defc _stricmp = stricmp
+ENDIF
+

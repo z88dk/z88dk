@@ -9,3 +9,10 @@ PUBLIC ba_stack_top
 EXTERN asm_ba_stack_top
 
 defc ba_stack_top = asm_ba_stack_top
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ba_stack_top
+defc _ba_stack_top = ba_stack_top
+ENDIF
+

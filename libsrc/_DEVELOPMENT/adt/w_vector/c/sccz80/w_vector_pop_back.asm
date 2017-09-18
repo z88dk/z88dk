@@ -9,3 +9,10 @@ PUBLIC w_vector_pop_back
 EXTERN asm_w_vector_pop_back
 
 defc w_vector_pop_back = asm_w_vector_pop_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_pop_back
+defc _w_vector_pop_back = w_vector_pop_back
+ENDIF
+

@@ -17,3 +17,10 @@ bcopy_callee:
    ex (sp),hl
    
    jp asm_bcopy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bcopy_callee
+defc _bcopy_callee = bcopy_callee
+ENDIF
+

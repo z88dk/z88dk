@@ -21,3 +21,10 @@ memchr:
    push af
 
    jp l0_memchr_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memchr
+defc _memchr = memchr
+ENDIF
+

@@ -112,6 +112,10 @@ crt0_fp/fasign
 crt0_fp/fp_seed
 crt0_fp/__convert_sdccf2reg
 ../_DEVELOPMENT/l/z80/l_ret
+../_DEVELOPMENT//l/z80/ascii/txt_to_num/l_atou.asm
+../_DEVELOPMENT//l/z80/ascii/txt_to_num/small/l_small_atou.asm
+../_DEVELOPMENT//l/z80/ascii/txt_to_num/fast/l_fast_atou.asm
+../_DEVELOPMENT/l/z80/ascii/l_eat_ws
 ../_DEVELOPMENT/z80/z80/asm_z80_push_di
 ../_DEVELOPMENT/z80/z80/asm_z80_pop_ei
 crt0/l_push_di

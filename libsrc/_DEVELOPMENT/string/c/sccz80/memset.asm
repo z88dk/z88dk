@@ -21,3 +21,10 @@ memset:
    push af
    
    jp asm_memset
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memset
+defc _memset = memset
+ENDIF
+

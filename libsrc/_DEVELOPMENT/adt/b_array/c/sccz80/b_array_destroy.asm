@@ -9,3 +9,10 @@ PUBLIC b_array_destroy
 EXTERN asm_b_array_destroy
 
 defc b_array_destroy = asm_b_array_destroy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_destroy
+defc _b_array_destroy = b_array_destroy
+ENDIF
+

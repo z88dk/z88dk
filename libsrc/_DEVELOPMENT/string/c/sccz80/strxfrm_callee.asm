@@ -17,3 +17,10 @@ strxfrm_callee:
    push af
    
    jp asm_strxfrm
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strxfrm_callee
+defc _strxfrm_callee = strxfrm_callee
+ENDIF
+

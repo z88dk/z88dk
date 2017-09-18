@@ -332,7 +332,7 @@ static int cmd_break(int argc, char **argv)
             }
             i++;
         }
-    } else if ( argc == 2 && strcmp(argv[2],"--help") == 0 ) {
+    } else if ( argc == 2 && strcmp(argv[1],"--help") == 0 ) {
         printf("Breakpoint help - to be written\n");
     } else if ( argc == 2 ) {
         char *end;

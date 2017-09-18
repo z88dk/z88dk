@@ -13,7 +13,7 @@
 #include <cpm.h>
 
 
-unsigned int read(int fd, void *buf, size_t len)
+ssize_t read(int fd, void *buf, size_t len)
 {   
     char    buffer[SECSIZE+2];
     unsigned char uid;

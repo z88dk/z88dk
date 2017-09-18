@@ -24,3 +24,10 @@ memccpy:
 	push ix
 
    jp asm_memccpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memccpy
+defc _memccpy = memccpy
+ENDIF
+

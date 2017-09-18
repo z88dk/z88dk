@@ -1,20 +1,19 @@
-#
-# $Id: Makefile,v 1.9 2016-07-02 16:15:37 dom Exp $
 
 include ../Make.config
 
-CFILES = dump.c
+TARGET ?= test
+GENCFILES = $(wildcard *.c)
+GENOBJECTS = $(GENCFILES:.c=.o)
+CUSTOBJECTS = 
+ASMFILES = $(wildcard *.asm)
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
 
-all: $(OUTPUT_DIRECTORY)/debug.lib
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS))
 
-$(OUTPUT_DIRECTORY)/debug.lib: $(OBJECTS) $(wildcard *.asm) debug.lst
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/debug @debug.lst
 
-.c.o:  
-	zcc +test $(CFLAGS) $*.c
+dirs:
+	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/z80-zxn obj/$(TARGET)
 
 clean:
-	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)
+	$(RM) -fr obj zcc_opt.def

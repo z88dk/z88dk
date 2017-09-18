@@ -19,7 +19,7 @@ PUBLIC ASMDISP_OUTP_CALLEE
    ; bc = port
    ; e = byte
 
-IF FORrcmx000
+IF __CPU_R2K__|__CPU_R3K__
 
    ld h,b
    ld l,c

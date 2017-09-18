@@ -10,3 +10,10 @@ PUBLIC rindex_callee
 EXTERN strrchr_callee
 
 defc rindex_callee = strrchr_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _rindex_callee
+defc _rindex_callee = rindex_callee
+ENDIF
+

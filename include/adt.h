@@ -1,6 +1,29 @@
 #ifndef _ADT_H
 #define _ADT_H
 
+#include <sys/compiler.h>
+
+/* Include adt library lifted from newlib */
+#include <adt/b_array.h>
+#include <adt/b_vector.h>
+#include <adt/ba_priority_queue.h>
+#include <adt/ba_stack.h>
+#include <adt/bv_priority_queue.h>
+#include <adt/bv_stack.h>
+#include <adt/p_forward_list.h>
+#include <adt/p_forward_list_alt.h>
+#include <adt/p_list.h>
+#include <adt/p_queue.h>
+#include <adt/p_stack.h>
+#include <adt/w_array.h>
+#include <adt/w_vector.h>
+#include <adt/wa_priority_queue.h>
+#include <adt/wa_stack.h>
+#include <adt/wv_priority_queue.h>
+#include <adt/wv_stack.h>
+
+/* Below here is the deprecated classic adt. Code should be migrated */
+
 /*
  * Abstract Data Types Library
  *
@@ -64,39 +87,39 @@ struct adt_List {                  /* One as handle for each list */
    struct adt_ListNode *tail;      /* points at last NODE in list, big endian */
 };
 
-extern struct adt_List __LIB__ *adt_ListCreate(void);
-extern void __LIB__  adt_ListCreateS(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  adt_ListDelete(struct adt_List *list, void *delete) __smallc;   /* from C: del = 0 to do nothing */
-extern void __LIB__  adt_ListDeleteS(struct adt_List *list, void *delete) __smallc;  /* from C: del = 0 to do nothing */
-extern uint __LIB__  adt_ListCount(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  *adt_ListFirst(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  *adt_ListLast(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  *adt_ListNext(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  *adt_ListPrev(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  *adt_ListCurr(struct adt_List *list) __z88dk_fastcall;
-extern int  __LIB__  adt_ListAdd(struct adt_List *list, void *item) __smallc;
-extern int  __LIB__  adt_ListInsert(struct adt_List *list, void *item) __smallc;
-extern int  __LIB__  adt_ListAppend(struct adt_List *list, void *item) __smallc;
-extern int  __LIB__  adt_ListPrepend(struct adt_List *list, void *item) __smallc;
-extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2) __smallc;
-extern void __LIB__  *adt_ListTrim(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  *adt_ListPopFront(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  adt_ListSetCurrBefore(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__  adt_ListSetCurrAfter(struct adt_List *list) __z88dk_fastcall;
-extern void __LIB__ adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n) __smallc;
-extern void __LIB__ *adt_ListSearch(struct adt_List *list, void *match, void *item1) __smallc;
+extern struct adt_List __LIB__ *adt_ListCreate(void) __z88dk_deprecated;
+extern void __LIB__  adt_ListCreateS(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  adt_ListDelete(struct adt_List *list, void *delete) __smallc __z88dk_deprecated;   /* from C: del = 0 to do nothing */
+extern void __LIB__  adt_ListDeleteS(struct adt_List *list, void *delete) __smallc __z88dk_deprecated;  /* from C: del = 0 to do nothing */
+extern uint __LIB__  adt_ListCount(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_ListFirst(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_ListLast(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_ListNext(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_ListPrev(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_ListCurr(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern int  __LIB__  adt_ListAdd(struct adt_List *list, void *item) __smallc __z88dk_deprecated;
+extern int  __LIB__  adt_ListInsert(struct adt_List *list, void *item) __smallc __z88dk_deprecated;
+extern int  __LIB__  adt_ListAppend(struct adt_List *list, void *item) __smallc __z88dk_deprecated;
+extern int  __LIB__  adt_ListPrepend(struct adt_List *list, void *item) __smallc __z88dk_deprecated;
+extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2) __smallc __z88dk_deprecated;
+extern void __LIB__  *adt_ListTrim(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_ListPopFront(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  adt_ListSetCurrBefore(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  adt_ListSetCurrAfter(struct adt_List *list) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__ adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n) __smallc __z88dk_deprecated;
+extern void __LIB__ *adt_ListSearch(struct adt_List *list, void *match, void *item1) __smallc __z88dk_deprecated;
 
 // make CALLEE linkage default
 
-extern void __LIB__  adt_ListDelete_callee(struct adt_List *list, void *delete) __smallc __z88dk_callee;   /* from C: del = 0 to do nothing */
-extern void __LIB__  adt_ListDeleteS_callee(struct adt_List *list, void *delete) __smallc __z88dk_callee;  /* from C: del = 0 to do nothing */
-extern int  __LIB__  adt_ListAdd_callee(struct adt_List *list, void *item) __smallc __z88dk_callee;
-extern int  __LIB__  adt_ListInsert_callee(struct adt_List *list, void *item) __smallc __z88dk_callee;
-extern int  __LIB__  adt_ListAppend_callee(struct adt_List *list, void *item) __smallc __z88dk_callee;
-extern int  __LIB__  adt_ListPrepend_callee(struct adt_List *list, void *item) __smallc __z88dk_callee;
-extern void __LIB__  adt_ListConcat_callee(struct adt_List *list1, struct adt_List *list2) __smallc __z88dk_callee;
-extern void __LIB__  adt_ListSetCurr_callee(struct adt_List *list, struct adt_ListNode *n) __smallc __z88dk_callee;
-extern void __LIB__  *adt_ListSearch_callee(struct adt_List *list, void *match, void *item1) __smallc __z88dk_callee;
+extern void __LIB__  adt_ListDelete_callee(struct adt_List *list, void *delete) __smallc __z88dk_callee __z88dk_deprecated;   /* from C: del = 0 to do nothing */
+extern void __LIB__  adt_ListDeleteS_callee(struct adt_List *list, void *delete) __smallc __z88dk_callee __z88dk_deprecated;  /* from C: del = 0 to do nothing */
+extern int  __LIB__  adt_ListAdd_callee(struct adt_List *list, void *item) __smallc __z88dk_callee __z88dk_deprecated;
+extern int  __LIB__  adt_ListInsert_callee(struct adt_List *list, void *item) __smallc __z88dk_callee __z88dk_deprecated;
+extern int  __LIB__  adt_ListAppend_callee(struct adt_List *list, void *item) __smallc __z88dk_callee __z88dk_deprecated;
+extern int  __LIB__  adt_ListPrepend_callee(struct adt_List *list, void *item) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__  adt_ListConcat_callee(struct adt_List *list1, struct adt_List *list2) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__  adt_ListSetCurr_callee(struct adt_List *list, struct adt_ListNode *n) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__  *adt_ListSearch_callee(struct adt_List *list, void *match, void *item1) __smallc __z88dk_callee __z88dk_deprecated;
 
 #define adt_ListDelete(a,b)     adt_ListDelete_callee(a,b)
 #define adt_ListDeleteS(a,b)    adt_ListDeleteS_callee(a,b)
@@ -144,15 +167,15 @@ the heap.
 
 */
 
-extern void __LIB__  adt_Heapify(void **array, uint n, void *compare) __smallc;
-extern void __LIB__  adt_HeapAdd(void *item, void **array, uint *n, void *compare) __smallc;
-extern void __LIB__ *adt_HeapExtract(void **array, uint *n, void *compare) __smallc;
+extern void __LIB__  adt_Heapify(void **array, uint n, void *compare) __smallc __z88dk_deprecated;
+extern void __LIB__  adt_HeapAdd(void *item, void **array, uint *n, void *compare) __smallc __z88dk_deprecated;
+extern void __LIB__ *adt_HeapExtract(void **array, uint *n, void *compare) __smallc __z88dk_deprecated;
 
 // make CALLEE linkage default
 
-extern void __LIB__   adt_Heapify_callee(void **array, uint n, void *compare) __smallc __z88dk_callee;
-extern void __LIB__   adt_HeapAdd_callee(void *item, void **array, uint *n, void *compare) __smallc __z88dk_callee;
-extern void __LIB__  *adt_HeapExtract_callee(void **array, uint *n, void *compare) __smallc __z88dk_callee;
+extern void __LIB__   adt_Heapify_callee(void **array, uint n, void *compare) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__   adt_HeapAdd_callee(void *item, void **array, uint *n, void *compare) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__  *adt_HeapExtract_callee(void **array, uint *n, void *compare) __smallc __z88dk_callee __z88dk_deprecated;
 
 #define adt_Heapify(a,b,c)      adt_Heapify_callee(a,b,c)
 #define adt_HeapAdd(a,b,c,d)    adt_HeapAdd_callee(a,b,c,d)
@@ -182,24 +205,24 @@ struct adt_Queue {                    /* A single handle for each queue created 
    struct adt_QueueNode *back;
 };
 
-extern struct adt_Queue __LIB__  *adt_QueueCreate(void);
-extern void __LIB__  *adt_QueueCreateS(struct adt_Queue *q) __z88dk_fastcall;
-extern void __LIB__ adt_QueueDelete(struct adt_Queue *q, void *delete) __smallc;  /* from C: del = 0 to do nothing */
-extern void __LIB__ adt_QueueDeleteS(struct adt_Queue *q, void *delete) __smallc; /* from C: del = 0 to do nothing */
-extern uint __LIB__  adt_QueueCount(struct adt_Queue *q) __z88dk_fastcall;
-extern void __LIB__  *adt_QueueFront(struct adt_Queue *q) __z88dk_fastcall;
-extern void __LIB__  *adt_QueueBack(struct adt_Queue *q) __z88dk_fastcall;
-extern void __LIB__  *adt_QueuePopFront(struct adt_Queue *q) __z88dk_fastcall;
-extern void __LIB__  *adt_QueuePopBack(struct adt_Queue *q) __z88dk_fastcall;
-extern int  __LIB__ adt_QueuePushFront(struct adt_Queue *q, void *item) __smallc;
-extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item) __smallc;
+extern struct adt_Queue __LIB__  *adt_QueueCreate(void) __z88dk_deprecated;
+extern void __LIB__  *adt_QueueCreateS(struct adt_Queue *q) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__ adt_QueueDelete(struct adt_Queue *q, void *delete) __smallc __z88dk_deprecated;  /* from C: del = 0 to do nothing */
+extern void __LIB__ adt_QueueDeleteS(struct adt_Queue *q, void *delete) __smallc __z88dk_deprecated; /* from C: del = 0 to do nothing */
+extern uint __LIB__  adt_QueueCount(struct adt_Queue *q) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_QueueFront(struct adt_Queue *q) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_QueueBack(struct adt_Queue *q) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_QueuePopFront(struct adt_Queue *q) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_QueuePopBack(struct adt_Queue *q) __z88dk_fastcall __z88dk_deprecated;
+extern int  __LIB__ adt_QueuePushFront(struct adt_Queue *q, void *item) __smallc __z88dk_deprecated;
+extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item) __smallc __z88dk_deprecated;
 
 // make CALLEE linkage default
 
-extern void __LIB__  adt_QueueDelete_callee(struct adt_Queue *q, void *delete) __smallc __z88dk_callee;
-extern void __LIB__  adt_QueueDeleteS_callee(struct adt_Queue *q, void *delete) __smallc __z88dk_callee;
-extern int  __LIB__  adt_QueuePushFront_callee(struct adt_Queue *q, void *item) __smallc __z88dk_callee;
-extern int  __LIB__  adt_QueuePushBack_callee(struct adt_Queue *q, void *item) __smallc __z88dk_callee;
+extern void __LIB__  adt_QueueDelete_callee(struct adt_Queue *q, void *delete) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__  adt_QueueDeleteS_callee(struct adt_Queue *q, void *delete) __smallc __z88dk_callee __z88dk_deprecated;
+extern int  __LIB__  adt_QueuePushFront_callee(struct adt_Queue *q, void *item) __smallc __z88dk_callee __z88dk_deprecated;
+extern int  __LIB__  adt_QueuePushBack_callee(struct adt_Queue *q, void *item) __smallc __z88dk_callee __z88dk_deprecated;
 
 #define adt_QueueDelete(a,b)     adt_QueueDelete_callee(a,b)
 #define adt_QueueDeleteS(a,b)    adt_QueueDeleteS_callee(a,b)
@@ -228,20 +251,20 @@ struct adt_Stack {
    struct adt_StackNode *next;         /* Pointer to top item in stack */
 };
 
-extern struct adt_Stack __LIB__  *adt_StackCreate(void);
-extern void __LIB__   adt_StackCreateS(struct adt_Stack *s) __z88dk_fastcall;
-extern void __LIB__ adt_StackDelete(struct adt_Stack *s, void *delete) __smallc;   /* from C: del = 0 to do nothing */
-extern void __LIB__ adt_StackDeleteS(struct adt_Stack *s, void *delete) __smallc;  /* from C: del = 0 to do nothing */
-extern int  __LIB__ adt_StackPush(struct adt_Stack *s, void *item) __smallc;
-extern void __LIB__  *adt_StackPop(struct adt_Stack *s) __z88dk_fastcall;
-extern void __LIB__  *adt_StackPeek(struct adt_Stack *s) __z88dk_fastcall;
-extern uint __LIB__   adt_StackCount(struct adt_Stack *s) __z88dk_fastcall;
+extern struct adt_Stack __LIB__  *adt_StackCreate(void) __z88dk_deprecated;
+extern void __LIB__   adt_StackCreateS(struct adt_Stack *s) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__ adt_StackDelete(struct adt_Stack *s, void *delete) __smallc __z88dk_deprecated;   /* from C: del = 0 to do nothing */
+extern void __LIB__ adt_StackDeleteS(struct adt_Stack *s, void *delete) __smallc __z88dk_deprecated;  /* from C: del = 0 to do nothing */
+extern int  __LIB__ adt_StackPush(struct adt_Stack *s, void *item) __smallc __z88dk_deprecated;
+extern void __LIB__  *adt_StackPop(struct adt_Stack *s) __z88dk_fastcall __z88dk_deprecated;
+extern void __LIB__  *adt_StackPeek(struct adt_Stack *s) __z88dk_fastcall __z88dk_deprecated;
+extern uint __LIB__   adt_StackCount(struct adt_Stack *s) __z88dk_fastcall __z88dk_deprecated;
 
 // make CALLEE linkage default
 
-extern void __LIB__  adt_StackDelete_callee(struct adt_Stack *s, void *delete) __smallc __z88dk_callee;
-extern void __LIB__  adt_StackDeleteS_callee(struct adt_Stack *s, void *delete) __smallc __z88dk_callee;
-extern int  __LIB__  adt_StackPush_callee(struct adt_Stack *s, void *item) __smallc __z88dk_callee;
+extern void __LIB__  adt_StackDelete_callee(struct adt_Stack *s, void *delete) __smallc __z88dk_callee __z88dk_deprecated;
+extern void __LIB__  adt_StackDeleteS_callee(struct adt_Stack *s, void *delete) __smallc __z88dk_callee __z88dk_deprecated;
+extern int  __LIB__  adt_StackPush_callee(struct adt_Stack *s, void *item) __smallc __z88dk_callee __z88dk_deprecated;
 
 #define adt_StackDelete(a,b)   adt_StackDelete_callee(a,b)
 #define adt_StackDeleteS(a,b)  adt_StackDeleteS_callee(a,b)

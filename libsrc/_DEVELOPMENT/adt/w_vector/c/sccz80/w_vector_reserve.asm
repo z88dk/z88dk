@@ -19,3 +19,10 @@ w_vector_reserve:
    push af
    
    jp asm_w_vector_reserve
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_reserve
+defc _w_vector_reserve = w_vector_reserve
+ENDIF
+

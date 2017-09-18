@@ -1,6 +1,10 @@
 @stdio/stdio_r2k.lst
+@adt/adt.lst
+@adt-newlib/adt.lst
+@algorithm/alg.lst
+@alloc/alloc.lst
 @ctype/ctype.lst
-@malloc/malloc.lst
+@debug/debug.lst
 stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
 stdio/rcmx000/getk
@@ -11,11 +15,7 @@ setjmp/longjmp
 setjmp/setjmp
 @assert/assert.lst
 time/rcmx000/clock
-stdio_new/error/stdio_error_zc
-stdio_new/general/stdio_basechar
-stdio_new/general/stdio_atou
-stdio_new/general/stdio_ultoa_any
-stdio_new/general/stdio_utoa_any
+@rect/rect.lst
 @regex/regex.lst
 stdio/ansi/ansifont_f3
 stdio/ansi/ansifont_f4

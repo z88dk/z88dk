@@ -20,3 +20,10 @@ b_vector_write_block_callee:
    push af
    
    jp asm_b_vector_write_block
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_write_block_callee
+defc _b_vector_write_block_callee = b_vector_write_block_callee
+ENDIF
+

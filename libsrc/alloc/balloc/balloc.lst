@@ -1,0 +1,9 @@
+alloc/balloc/obj/${TYPE}/ba_AddMem
+alloc/balloc/obj/${TYPE}/ba_AddMem_callee
+alloc/balloc/obj/${TYPE}/ba_BestFit
+alloc/balloc/obj/${TYPE}/ba_BestFit_callee
+alloc/balloc/obj/${TYPE}/ba_BlockCount
+alloc/balloc/obj/${TYPE}/ba_Free
+alloc/balloc/obj/${TYPE}/ba_Init
+alloc/balloc/obj/${TYPE}/ba_Malloc
+@alloc/balloc/balloc-newlib.lst

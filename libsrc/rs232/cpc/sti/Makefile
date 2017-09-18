@@ -5,7 +5,9 @@
 
 include ../../../Make.config
 
-all:
+all: $(OUTPUT_DIRECTORY)/rs232cpc_sti.lib
+
+$(OUTPUT_DIRECTORY)/rs232cpc_sti.lib: $(wildcard *.asm)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232cpc_sti @stilist
 
 clean:

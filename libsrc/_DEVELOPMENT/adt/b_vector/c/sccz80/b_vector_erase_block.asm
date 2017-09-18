@@ -9,3 +9,10 @@ PUBLIC b_vector_erase_block
 EXTERN b_array_erase_block
 
 defc b_vector_erase_block = b_array_erase_block
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_erase_block
+defc _b_vector_erase_block = b_vector_erase_block
+ENDIF
+

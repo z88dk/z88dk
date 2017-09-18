@@ -11,8 +11,16 @@ EXTERN asm_strlcpy
 strlcpy_callee:
 
    pop af
+   pop bc
    pop hl
    pop de
    push af
    
    jp asm_strlcpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strlcpy_callee
+defc _strlcpy_callee = strlcpy_callee
+ENDIF
+

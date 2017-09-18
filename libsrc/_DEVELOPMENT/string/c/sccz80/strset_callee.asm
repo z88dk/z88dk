@@ -15,3 +15,10 @@ strset_callee:
    ex (sp),hl
    
    jp asm_strset
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strset_callee
+defc _strset_callee = strset_callee
+ENDIF
+

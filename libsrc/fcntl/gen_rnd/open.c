@@ -74,7 +74,7 @@ switch (flags) {
 			free(myfile);
 			return(-1);
 		}
-		if (lseek(myfile,0L,SEEK_END)==EOF) {
+		if (lseek((int)myfile,0L,SEEK_END)==EOF) {
 			free((myfile)->blockptr);
 			free(myfile);
 			return(-1);
@@ -96,7 +96,7 @@ switch (flags) {
 				return(-1);
 			}
 			// The control block creation ("_<filename>) is in "close.c"
-		} else if (lseek(myfile,0L,SEEK_SET)==EOF) {
+		} else if (lseek((int)myfile,0L,SEEK_SET)==EOF) {
 			free((myfile)->blockptr);
 			free(myfile);
 			return(-1);

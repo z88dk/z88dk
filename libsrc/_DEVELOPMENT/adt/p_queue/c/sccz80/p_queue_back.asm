@@ -9,3 +9,10 @@ PUBLIC p_queue_back
 EXTERN asm_p_queue_back
 
 defc p_queue_back = asm_p_queue_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_queue_back
+defc _p_queue_back = p_queue_back
+ENDIF
+
