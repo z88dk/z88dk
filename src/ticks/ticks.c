@@ -10,6 +10,7 @@
 
 #define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
 
 uint8_t get_memory(int pc)
@@ -120,11 +121,11 @@ uint8_t put_memory(int pc, uint8_t b)
 #define ADDRRRR(a, b, c, d)     \
           st+= israbbit() ? 2 :11,              \
           v= b+d+               \
-           ( a+c << 8 ),        \
-          ff= ff    & 128       \
-            | v>>8  & 296,      \
-          fb= fb&128            \
-            | (v>>8^a^c^fr^fa)&16,  \
+           ( (a+c) << 8 ),        \
+          ff= (ff    & 128)       \
+            | (v>>8  & 296),      \
+          fb= (fb&128)            \
+            | ((v>>8^a^c^fr^fa)&16),  \
           mp= b+1+( a<<8 ),     \
           a= v>>8,              \
           b= v
@@ -132,11 +133,11 @@ uint8_t put_memory(int pc, uint8_t b)
 #define ADDRRRR_ALTD(a, b, c, d, dh, dl)     \
           st+= israbbit() ? 2 :11,              \
           v= b+d+               \
-           ( a+c << 8 ),        \
-          ff_= ff_    & 128       \
-            | v>>8  & 296,      \
-          fb_= fb_&128            \
-            | (v>>8^a^c^fr_^fa_)&16,  \
+           ( (a+c) << 8 ),        \
+          ff_= (ff_    & 128)       \
+            | ((v>>8)  & 296),      \
+          fb_= (fb_&128)            \
+            | ((v>>8^a^c^fr_^fa_)&16),  \
           mp= b+1+( a<<8 ),     \
           dh= v>>8,              \
           dl= v
@@ -274,39 +275,39 @@ uint8_t put_memory(int pc, uint8_t b)
 
 #define RETC(c)                 \
           if(c)                 \
-            st+= 5;             \
+            st+= israbbit() ? 2 : 5;             \
           else                  \
-            st+= 11,            \
+            st+= israbbit() ? 8 : 11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8
 
 #define RETCI(c)                \
           if(c)                 \
-            st+= 11,            \
+            st+= israbbit() ? 8 : 11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8; \
           else                  \
-            st+= 5
+            st+= israbbit() ? 2 : 5
 
 #define PUSH(a, b)              \
-          st+= 11,              \
+          st+= israbbit() ? 10 : 11,              \
           put_memory(--sp,a),   \
           put_memory(--sp,b)
 
 #define POP(a, b)               \
-          st+= 10,              \
+          st+= israbbit() ? 7 : 10,              \
           b= get_memory(sp++),  \
           a= get_memory(sp++)
 
 #define JPC(c)                  \
-          st+= 10;              \
+          st+= israbbit() ? 7 : 10;              \
           if(c)                 \
             pc+= 2;             \
           else                  \
             pc= get_memory(pc) | get_memory(pc+1)<<8
 
 #define JPCI(c)                 \
-          st+= 10;              \
+          st+= israbbit() ? 7 : 10;              \
           if(c)                 \
             pc= get_memory(pc) | get_memory(pc+1)<<8; \
           else                  \
@@ -335,7 +336,7 @@ uint8_t put_memory(int pc, uint8_t b)
             pc+= 2
 
 #define RST(n)                  \
-          st+= 11,              \
+          st+= israbbit() ? 8 : 11,              \
           put_memory(--sp,pc>>8),     \
           put_memory(--sp,pc),        \
           mp= pc= n
@@ -351,14 +352,14 @@ uint8_t put_memory(int pc, uint8_t b)
           mp= b | a<<8
 
 #define RLC(r)                  \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff= r*257>>7,         \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define RRC(r)                  \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff=  r >> 1           \
               | ((r&1)+1 ^ 1)<<7, \
           fa= 256               \
@@ -366,7 +367,7 @@ uint8_t put_memory(int pc, uint8_t b)
           fb= 0
 
 #define RL(r)                   \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff= r << 1            \
             | ff  >> 8 & 1,     \
           fa= 256               \
@@ -374,35 +375,36 @@ uint8_t put_memory(int pc, uint8_t b)
           fb= 0
 
 #define RR(r)                   \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff= (r*513 | ff&256)>>1, \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define SLA(r)                  \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff= r<<1,             \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define SRA(r)                  \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff= (r*513+128^128)>>1, \
           fa= 256               \
             | (fr= r= ff),      \
           fb= 0
 
 #define SLL(r)                  \
-          st+= 8,               \
-          ff= r<<1 | 1,         \
-          fa= 256               \
-            | (fr= r= ff),      \
-          fb= 0
+          if ( cansll() )       \
+            st+= 8,             \
+            ff= r<<1 | 1,       \
+            fa= 256             \
+              | (fr= r= ff),    \
+            fb= 0
 
 #define SRL(r)                  \
-          st+= 8,               \
+          st+= israbbit() ? 4 : 8,               \
           ff= r*513 >> 1,       \
           fa= 256               \
             | (fr= r= ff),      \
@@ -477,7 +479,7 @@ uint8_t put_memory(int pc, uint8_t b)
 
 #define SBCHLRR(a, b)           \
           st += israbbit() ? 4 : 15, \
-          v= l-b+(h-a<<8)-(ff>>8&1),\
+          v= l-b+((h-a)<<8)-(ff>>8&1),\
           mp= l+1+(h<<8),       \
           ff= v>>8,             \
           fa= h,                \
@@ -564,6 +566,8 @@ unsigned char
       , ear= 255
       , halted= 0
       , altd = 0
+      , ioi = 0
+      , ioe = 0
       ;
 
 unsigned char * mem;
@@ -926,7 +930,7 @@ int main (int argc, char **argv){
       case 0x7f: // LD A,A
         if ( altd ) { a_ = a; st += 2; break; }
         st+= israbbit() ? 2 : 4;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x76: // HALT
         if ( israbbit()) {
           altd = 1;
@@ -935,18 +939,18 @@ int main (int argc, char **argv){
           st+= 4;
           halted= 1;
           pc--;
-          altd=0;
+          altd=0;ioi=0;ioe=0;
         }
         ih=1;
         break;
       case 0x01: // LD BC,nn
         if ( altd ) LDRRIM(b_,c_);
         else LDRRIM(b, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x11: // LD DE,nn
         if ( altd ) LDRRIM(d_,e_);
         else LDRRIM(d, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x21: // LD HL,nn // LD IX,nn // LD IY,nn
         if( ih ) {
           if ( altd ) LDRRIM(h_,l_);
@@ -955,26 +959,26 @@ int main (int argc, char **argv){
           LDRRIM(yh, yl);
         else
           LDRRIM(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x31: // LD SP,nn
         st+= israbbit() ? 6 : 10;
         sp= get_memory(pc++);
         sp|= get_memory(pc++)<<8;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x02: // LD (BC),A
         LDPR(b, c, a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x12: // LD (DE),A
         LDPR(d, e, a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0a: // LD A,(BC)
         if ( altd ) LDRP(b, c, a_);
         else LDRP(b, c, a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1a: // LD A,(DE)
         if ( altd ) LDRP(d, e, a_);
         else LDRP(d, e, a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x22: // LD (nn),HL // LD (nn),IX // LD (nn),IY
         if( ih )
           LDPNNRR(h, l, israbbit() ? 13 : 16);
@@ -982,14 +986,14 @@ int main (int argc, char **argv){
           LDPNNRR(yh, yl, israbbit() ? 13 : 16);
         else
           LDPNNRR(xh, xl, israbbit() ? 13 : 16);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x32: // LD (nn),A
         st+= israbbit() ? 10 : 13;
         t= get_memory(pc++);
         put_memory(t|= get_memory(pc++)<<8,a);
         mp= t+1 & 255
           | a<<8;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2a: // LD HL,(nn) // LD IX,(nn) // LD IY,(nn)
         if( ih ) {
           if ( altd ) LDRRPNN(h_, l_, 11);
@@ -998,23 +1002,23 @@ int main (int argc, char **argv){
           LDRRPNN(yh, yl, israbbit() ? 13 : 16);
         else
           LDRRPNN(xh, xl, israbbit() ? 13 : 16);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3a: // LD A,(nn)
         st+= israbbit() ? 9 : 13;
         mp= get_memory(pc++);
         if ( altd ) a_ = get_memory(mp|= get_memory(pc++)<<8);
         else a= get_memory(mp|= get_memory(pc++)<<8);
         ++mp;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x03: // INC BC
         if ( altd ) INCW(b_,c_);
         else INCW(b, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
         break;
       case 0x13: // INC DE
         if ( altd ) INCW(d_,e_);
         else INCW(d, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x23: // INC HL // INC IX // INC IY
         if( ih ) {
           if ( altd ) INCW(h_,l_);
@@ -1023,19 +1027,19 @@ int main (int argc, char **argv){
           INCW(yh, yl);
         else
           INCW(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x33: // INC SP
         st+= 6;
         sp++;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0b: // DEC BC
         if ( altd ) DECW(b_,c_);
         else DECW(b, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1b: // DEC DE
         if ( altd ) DECW(d_,e_);
         else DECW(d, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2b: // DEC HL // DEC IX // DEC IY
         if( ih ) {
           if ( altd ) DECW(h_,l_);
@@ -1044,28 +1048,28 @@ int main (int argc, char **argv){
           DECW(yh, yl);
         else
           DECW(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3b: // DEC SP
         st+= 6;
         sp--;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x04: // INC B
         if ( altd ) INC(b_);
         else INC(b);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
         break;
       case 0x0c: // INC C
         if ( altd ) INC(c_);
         else INC(c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x14: // INC D
         if ( altd ) INC(d_);
         else INC(d);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1c: // INC E
         if ( altd ) INC(e_);
         else INC(e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x24: // INC H // INC IXh // INC IYh
         if( ih ) {
           if ( altd ) INC(h_);
@@ -1074,7 +1078,7 @@ int main (int argc, char **argv){
           INC(yh);
         else if ( canixh() )
           INC(xh);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2c: // INC L // INC IXl // INC IYl
         if( ih ) {
           if ( altd ) INC(l_);
@@ -1083,7 +1087,7 @@ int main (int argc, char **argv){
           INC(yl);
         else if ( canixh() )
           INC(xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
         if( ih ) 
           st+= israbbit() ? 8 : 11,
@@ -1094,22 +1098,22 @@ int main (int argc, char **argv){
           INCPI(yh, yl);
         else
           INCPI(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3c: // INC A
         INC(a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x05: // DEC B
         DEC(b);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0d: // DEC C
         DEC(c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x15: // DEC D
         DEC(d);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1d: // DEC E
         DEC(e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x25: // DEC H // DEC IXh // DEC IYh
         if( ih )
           DEC(h);
@@ -1117,7 +1121,7 @@ int main (int argc, char **argv){
           DEC(yh);
         else
           DEC(xh);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2d: // DEC L // DEC IXl // DEC IYl
         if( ih )
           DEC(l);
@@ -1125,7 +1129,7 @@ int main (int argc, char **argv){
           DEC(yl);
         else
           DEC(xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x35: // DEC (HL) // DEC (IX+d) // DEC (IY+d)
         if( ih )
           st+= israbbit() ? 8 : 11,
@@ -1136,27 +1140,27 @@ int main (int argc, char **argv){
           DECPI(yh, yl);
         else
           DECPI(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3d: // DEC A
         if ( altd ) DEC(a_);
         else DEC(a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x06: // LD B,n
         if ( altd ) LDRIM(b_);
         else LDRIM(b);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0e: // LD C,n
         if ( altd ) LDRIM(c_);
         else LDRIM(c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x16: // LD D,n
         if ( altd ) LDRIM(d_);
         else LDRIM(d);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1e: // LD E,n
         if ( altd ) LDRIM(e_);
         else LDRIM(e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x26: // LD H,n // LD IXh,n // LD IYh,n
         if( ih ) {
           if ( altd ) LDRIM(h_);
@@ -1165,7 +1169,7 @@ int main (int argc, char **argv){
           LDRIM(yh);
         else if ( canixh() )
           LDRIM(xh);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2e: // LD L,n // LD IXl,n // LD IYl,n
         if( ih ) {
           if ( altd ) LDRIM(l_);
@@ -1174,7 +1178,7 @@ int main (int argc, char **argv){
           LDRIM(yl);
         else if ( canixh() )
           LDRIM(xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x36: // LD (HL),n // LD (IX+d),n // LD (IY+d),n
         if( ih )
           st+= israbbit() ? 7 : 10,
@@ -1183,11 +1187,11 @@ int main (int argc, char **argv){
           LDPIN(yh, yl);
         else
           LDPIN(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3e: // LD A,n
         if ( altd ) LDRIM(a_);
         else LDRIM(a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x07: // RLCA
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1203,7 +1207,7 @@ int main (int argc, char **argv){
           fb= fb      &128
             | (fa^fr) & 16;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0f: // RRCA
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1221,7 +1225,7 @@ int main (int argc, char **argv){
           fb= fb      &128
             | (fa^fr) & 16;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x17: // RLA
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1239,7 +1243,7 @@ int main (int argc, char **argv){
           fb= fb      & 128
             | (fa^fr) &  16;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1f: // RRA
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1255,7 +1259,7 @@ int main (int argc, char **argv){
           fb= fb      &128
             | (fa^fr) & 16;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x09: // ADD HL,BC // ADD IX,BC // ADD IY,BC
         if( ih ) {
           if ( altd ) ADDRRRR_ALTD(h, l, b, c, h_, l_);
@@ -1267,7 +1271,7 @@ int main (int argc, char **argv){
           if ( altd ) ADDRRRR_ALTD(xh, xl, b, c, xh, xl);
           else ADDRRRR(xh, xl, b, c);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x19: // ADD HL,DE // ADD IX,DE // ADD IY,DE
         if( ih ) {
           if ( altd ) ADDRRRR_ALTD(h, l, d, e, h_, l_);
@@ -1279,7 +1283,7 @@ int main (int argc, char **argv){
           if ( altd ) ADDRRRR_ALTD(xh, xl, d, e, xh, xl);
           else ADDRRRR(xh, xl, d, e);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x29: // ADD HL,HL // ADD IX,IX // ADD IY,IY
         if( ih ) {
           if ( altd ) ADDRRRR_ALTD(h, l, h, l, h_, l_);
@@ -1291,7 +1295,7 @@ int main (int argc, char **argv){
           if ( altd ) ADDRRRR_ALTD(xh, xl, xh, xl, xh, xl);
           else ADDRRRR(xh, xl, xh, xl);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x39: // ADD HL,SP // ADD IX,SP // ADD IY,SP
         if( ih ) {
           if ( altd ) ADDISP_ALTD(h, l, h_, l_);
@@ -1303,23 +1307,23 @@ int main (int argc, char **argv){
           if ( altd ) ADDISP_ALTD(xh, xl, xh, xl);
           ADDISP(xh, xl);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x18: // JR
         st+= 12;
         mp= pc+= (get_memory(pc)^128)-127;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x20: // JR NZ,s8
         JRCI(fr);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
         JRC(fr);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x30: // JR NC,s8
         JRC(ff&256);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x38: // JR C,s8
         JRCI(ff&256);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x08: // EX AF,AF'
         st+= 4;
         t  =  a_;
@@ -1337,7 +1341,7 @@ int main (int argc, char **argv){
         t  =  fb_;
         fb_=  fb;
         fb =  t;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x10: // DJNZ
         if( ( altd && --b_) || ( altd == 0 && --b) )
           st+= israbbit() ? 5 : 13,
@@ -1345,7 +1349,7 @@ int main (int argc, char **argv){
         else
           st+= israbbit() ? 5 : 8,
           pc++;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x27: // DAA / add sp,d
         if ( israbbit()) {
           st += 4;
@@ -1365,7 +1369,7 @@ int main (int argc, char **argv){
           ff= (fr= a)
             | u&256;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2f: // CPL
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1381,7 +1385,7 @@ int main (int argc, char **argv){
           fa=  fa & -17
             | ~fr &  16; 
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x37: // SCF
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1397,7 +1401,7 @@ int main (int argc, char **argv){
             | ff  &128
             | a   & 40;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3f: // CCF
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1413,16 +1417,16 @@ int main (int argc, char **argv){
             | ff  & 128
             | a   &  40;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x41: // LD B,C
         LDRR(b, c, b_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x42: // LD B,D
         LDRR(b, d, b_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x43: // LD B,E
         LDRR(b, e, e_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x44: // LD B,H // LD B,IXh // LD B,IYh
         if( ih ) {
           LDRR(b, h, h_, israbbit() ? 2 : 4);
@@ -1430,7 +1434,7 @@ int main (int argc, char **argv){
           LDRR(b, yh, b, 4);
         else if ( canixh() )
           LDRR(b, xh, b, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x45: // LD B,L // LD B,IXl // LD B,IYl
         if( ih ) {
           LDRR(b, l, b_, israbbit() ? 2 : 4);
@@ -1438,7 +1442,7 @@ int main (int argc, char **argv){
           LDRR(b, yl, b, 4);
         else if ( canixh() )
           LDRR(b, xl, b, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x46: // LD B,(HL) // LD B,(IX+d) // LD B,(IY+d)
         if( ih ) {
           if ( altd ) LDRP(h, l, b_);
@@ -1447,19 +1451,19 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, b);
         else
           LDRPI(xh, xl, b);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x47: // LD B,A
         LDRR(b, a, b_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x48: // LD C,B
         LDRR(c, b, c_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4a: // LD C,D
         LDRR(c, d, c_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4b: // LD C,E
         LDRR(c, e,c_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4c: // LD C,H // LD C,IXh // LD C,IYh
         if( ih )
           LDRR(c, h, c_, israbbit() ? 2 : 4);
@@ -1467,7 +1471,7 @@ int main (int argc, char **argv){
           LDRR(c, yh, c, 4);
         else if ( canixh() )
           LDRR(c, xh, c, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4d: // LD C,L // LD C,IXl // LD C,IYl
         if( ih )
           LDRR(c, l, c_, israbbit() ? 2 : 4);
@@ -1475,7 +1479,7 @@ int main (int argc, char **argv){
           LDRR(c, yl, c, 4);
         else if ( canixh() )
           LDRR(c, xl, c, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4e: // LD C,(HL) // LD C,(IX+d) // LD C,(IY+d)
         if( ih )
           LDRP(h, l, c);
@@ -1483,19 +1487,19 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, c);
         else
           LDRPI(xh, xl, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4f: // LD C,A
         LDRR(c, a, c_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x50: // LD D,B
         LDRR(d, b, d_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x51: // LD D,C
         LDRR(d, c,  d_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x53: // LD D,E
         LDRR(d, e,  d_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x54: // LD D,H // LD D,IXh // LD D,IYh
         if( ih )
           LDRR(d, h,  d_, israbbit() ? 2 : 4);
@@ -1503,7 +1507,7 @@ int main (int argc, char **argv){
           LDRR(d, yh, d, 4);
         else if ( canixh() )
           LDRR(d, xh, d, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x55: // LD D,L // LD D,IXl // LD D,IYl
         if( ih )
           LDRR(d, l,  d_, israbbit() ? 2 : 4);
@@ -1511,7 +1515,7 @@ int main (int argc, char **argv){
           LDRR(d, yl, d, 4);
         else if (canixh() )
           LDRR(d, xl, d, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x56: // LD D,(HL) // LD D,(IX+d) // LD D,(IY+d)
         if( ih )
           LDRP(h, l, d);
@@ -1519,19 +1523,19 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, d);
         else
           LDRPI(xh, xl, d);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x57: // LD D,A
         LDRR(d, a,  d_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x58: // LD E,B
         LDRR(e, b, e_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x59: // LD E,C
         LDRR(e, c, e_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5a: // LD E,D
         LDRR(e, d, e_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5c: // LD E,H // LD E,IXh // LD E,IYh
         if( ih )
           LDRR(e, h, e_, israbbit() ? 2 : 4);
@@ -1539,7 +1543,7 @@ int main (int argc, char **argv){
           LDRR(e, yh, e, 4);
         else if ( canixh() )
           LDRR(e, xh, e, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5d: // LD E,L // LD E,IXl // LD E,IYl
         if( ih )
           LDRR(e, l, e_, israbbit() ? 2 : 4);
@@ -1547,7 +1551,7 @@ int main (int argc, char **argv){
           LDRR(e, yl, e, 4);
         else if ( canixh() )
           LDRR(e, xl, e, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5e: // LD E,(HL) // LD E,(IX+d) // LD E,(IY+d)
         if( ih )
           LDRP(h, l, e);
@@ -1555,10 +1559,10 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, e);
         else
           LDRPI(xh, xl, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x5f: // LD E,A
         LDRR(e, a, e_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x60: // LD H,B // LD IXh,B // LD IYh,B
         if( ih )
           LDRR(h, b, h_, israbbit() ? 2 : 4);
@@ -1566,7 +1570,7 @@ int main (int argc, char **argv){
           LDRR(yh, b, yh, 4);
         else if ( canixh() )
           LDRR(xh, b, xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x61: // LD H,C // LD IXh,C // LD IYh,C
         if( ih )
           LDRR(h, c, h_, israbbit() ? 2 : 4);
@@ -1574,7 +1578,7 @@ int main (int argc, char **argv){
           LDRR(yh, c, yh, 4);
         else if ( canixh() )
           LDRR(xh, c, xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x62: // LD H,D // LD IXh,D // LD IYh,D
         if( ih )
           LDRR(h, d,  h_, israbbit() ? 2 : 4);
@@ -1582,7 +1586,7 @@ int main (int argc, char **argv){
           LDRR(yh, d, yh, 4);
         else if ( canixh() )
           LDRR(xh, d, xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x63: // LD H,E // LD IXh,E // LD IYh,E
         if( ih )
           LDRR(h, e,  h_, israbbit() ? 2 : 4);
@@ -1590,7 +1594,7 @@ int main (int argc, char **argv){
           LDRR(yh, e, yh, 4);
         else if ( canixh() )
           LDRR(xh, e, xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x65: // LD H,L // LD IXh,IXl // LD IYh,IYl
         if( ih )
           LDRR(h, l, h_, israbbit() ? 2 : 4);
@@ -1598,7 +1602,7 @@ int main (int argc, char **argv){
           LDRR(yh, yl, yh, 4);
         else if ( canixh() )
           LDRR(xh, yl, xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x66: // LD H,(HL) // LD H,(IX+d) // LD H,(IY+d)
         if( ih )
           LDRP(h, l, h);
@@ -1606,7 +1610,7 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, h);
         else
           LDRPI(xh, xl, h);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x67: // LD H,A // LD IXh,A // LD IYh,A
         if( ih )
           LDRR(h, a, h_, israbbit() ? 2 : 4);
@@ -1614,7 +1618,7 @@ int main (int argc, char **argv){
           LDRR(yh, a, yh, 4);
         else if ( canixh() )
           LDRR(xh, a, xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x68: // LD L,B // LD IXl,B // LD IYl,B
         if( ih )
           LDRR(l, b, l_, israbbit() ? 2 : 4);
@@ -1622,7 +1626,7 @@ int main (int argc, char **argv){
           LDRR(yl, b, yl, 4);
         else if ( canixh() )
           LDRR(xl, b, xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x69: // LD L,C // LD IXl,C // LD IYl,C
         if( ih )
           LDRR(l, c, l_, israbbit() ? 2 : 4);
@@ -1630,7 +1634,7 @@ int main (int argc, char **argv){
           LDRR(yl, c, yl, 4);
         else if ( canixh() )
           LDRR(xl, c, xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6a: // LD L,D // LD IXl,D // LD IYl,D
         if( ih )
           LDRR(l, d, l_, israbbit() ? 2 : 4);
@@ -1638,7 +1642,7 @@ int main (int argc, char **argv){
           LDRR(yl, d, yl, 4);
         else if ( canixh() )
           LDRR(xl, d, xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6b: // LD L,E // LD IXl,E // LD IYl,E
         if( ih )
           LDRR(l, e, l_, israbbit() ? 2 : 4);
@@ -1646,7 +1650,7 @@ int main (int argc, char **argv){
           LDRR(yl, e, yl, 4);
         else if ( canixh() )
           LDRR(xl, e, xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6c: // LD L,H // LD IXl,IXh // LD IYl,IYh
         if( ih )
           LDRR(l, h, l_, israbbit() ? 2 : 4);
@@ -1654,7 +1658,7 @@ int main (int argc, char **argv){
           LDRR(yl, yh, yl, 4);
         else if ( canixh() )
           LDRR(xl, xh, xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6e: // LD L,(HL) // LD L,(IX+d) // LD L,(IY+d)
         if( ih )
           LDRP(h, l, l);
@@ -1662,7 +1666,7 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, l);
         else
           LDRPI(xh, xl, l);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x6f: // LD L,A // LD IXl,A // LD IYl,A
         if( ih )
           LDRR(l, a, l_, israbbit() ? 2 : 4);
@@ -1670,7 +1674,7 @@ int main (int argc, char **argv){
           LDRR(yl, a, yl, 4);
         else if ( canixh() )
           LDRR(xl, a, xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x70: // LD (HL),B // LD (IX+d),B // LD (IY+d),B
         if( ih )
           LDPR(h, l, b);
@@ -1678,7 +1682,7 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, b);
         else
           LDPRI(xh, xl, b);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x71: // LD (HL),C // LD (IX+d),C // LD (IY+d),C
         if( ih )
           LDPR(h, l, c);
@@ -1686,7 +1690,7 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, c);
         else
           LDPRI(xh, xl, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x72: // LD (HL),D // LD (IX+d),D // LD (IY+d),D
         if( ih )
           LDPR(h, l, d);
@@ -1694,7 +1698,7 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, d);
         else
           LDPRI(xh, xl, d);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x73: // LD (HL),E // LD (IX+d),E // LD (IY+d),E
         if( ih )
           LDPR(h, l, e);
@@ -1702,7 +1706,7 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, e);
         else
           LDPRI(xh, xl, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x74: // LD (HL),H // LD (IX+d),H // LD (IY+d),H
         if( ih )
           LDPR(h, l, h);
@@ -1710,7 +1714,7 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, h);
         else
           LDPRI(xh, xl, h);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x75: // LD (HL),L // LD (IX+d),L // LD (IY+d),L
         if( ih )
           LDPR(h, l, l);
@@ -1718,7 +1722,7 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, l);
         else
           LDPRI(xh, xl, l);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x77: // LD (HL),A // LD (IX+d),A // LD (IY+d),A
         if( ih )
           LDPR(h, l, a);
@@ -1726,19 +1730,19 @@ int main (int argc, char **argv){
           LDPRI(yh, yl, a);
         else
           LDPRI(xh, xl, a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x78: // LD A,B
         LDRR(a, b, a_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x79: // LD A,C
         LDRR(a, c, a_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x7a: // LD A,D
         LDRR(a, d, a_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x7b: // LD A,E
         LDRR(a, e, a_, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x7c: // LD A,H // LD A,IXh // LD A,IYh (RCM) LD HL,IX LD HL,IY
         if ( israbbit()) {
           if ( ih ) {
@@ -1760,7 +1764,7 @@ int main (int argc, char **argv){
           else
             LDRR(a, xh, a, 4);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x7d: // LD A,L // LD A,IXl // LD A,IYl
         if( ih ) {
           LDRR(a, l, a_, israbbit() ? 2 : 4);
@@ -1779,7 +1783,7 @@ int main (int argc, char **argv){
               LDRR(a, xl, a, 4);
           }
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x7e: // LD A,(HL) // LD A,(IX+d) // LD A,(IY+d)
         if( ih )
           LDRP(h, l, a);
@@ -1787,19 +1791,19 @@ int main (int argc, char **argv){
           LDRPI(yh, yl, a);
         else
           LDRPI(xh, xl, a);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x80: // ADD A,B
         ADD(b, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x81: // ADD A,C
         ADD(c, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x82: // ADD A,D
         ADD(d, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x83: // ADD A,E
         ADD(e, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x84: // ADD A,H // ADD A,IXh // ADD A,IYh
         if( ih )
           ADD(h, israbbit() ? 2 : 4);
@@ -1807,7 +1811,7 @@ int main (int argc, char **argv){
           ADD(yh, 4);
         else if ( canixh() )
           ADD(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x85: // ADD A,L // ADD A,IXl // ADD A,IYl
         if( ih )
           ADD(l, israbbit() ? 2 : 4);
@@ -1815,7 +1819,7 @@ int main (int argc, char **argv){
           ADD(yl, 4);
         else if ( canixh() )
           ADD(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x86: // ADD A,(HL) // ADD A,(IX+d) // ADD A,(IY+d)
         if( ih )
           ADD(get_memory(l|h<<8), israbbit() ? 5 : 7);
@@ -1823,24 +1827,24 @@ int main (int argc, char **argv){
           ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
         else
           ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x87: // ADD A,A
         st+= israbbit() ? 2 : 4;
         if ( altd ) fr_= a_= (ff_= 2*(fa_= fb_= a));
         else fr= a= (ff= 2*(fa= fb= a));
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x88: // ADC A,B
         ADC(b, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x89: // ADC A,C
         ADC(c, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8a: // ADC A,D
         ADC(d, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8b: // ADC A,E
         ADC(e, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8c: // ADC A,H // ADC A,IXh // ADC A,IYh
         if( ih )
           ADC(h,israbbit() ? 2 : 4);
@@ -1848,7 +1852,7 @@ int main (int argc, char **argv){
           ADC(yh, 4);
         else if ( canixh() )
           ADC(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8d: // ADC A,L // ADC A,IXl // ADC A,IYl
         if( ih )
           ADC(l, israbbit() ? 2 : 4);
@@ -1856,7 +1860,7 @@ int main (int argc, char **argv){
           ADC(yl, 4);
         else if ( canixh() )
           ADC(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8e: // ADC A,(HL) // ADC A,(IX+d) // ADC A,(IY+d)
         if( ih )
           ADC(get_memory(l|h<<8), israbbit() ? 5 : 7);
@@ -1864,24 +1868,24 @@ int main (int argc, char **argv){
           ADC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
           ADC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8f: // ADC A,A
         st+= israbbit() ? 2 : 4;
         if ( altd ) fr_= a_= (ff_= 2*(fa_= fb_= a)+(ff_>>8&1));
         else fr= a= (ff= 2*(fa= fb= a)+(ff>>8&1));
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x90: // SUB B
         SUB(b,israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x91: // SUB C
         SUB(c,israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x92: // SUB D
         SUB(d, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x93: // SUB E
         SUB(e,israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x94: // SUB H // SUB IXh // SUB IYh
         if( ih )
           SUB(h, israbbit() ? 2 : 4);
@@ -1889,7 +1893,7 @@ int main (int argc, char **argv){
           SUB(yh, 4);
         else if ( canixh() )
           SUB(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x95: // SUB L // SUB IXl // SUB IYl
         if( ih )
           SUB(l, israbbit() ? 2 : 4);
@@ -1897,7 +1901,7 @@ int main (int argc, char **argv){
           SUB(yl, 4);
         else if ( canixh() )
           SUB(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x96: // SUB (HL) // SUB (IX+d) // SUB (IY+d)
         if( ih )
           SUB(get_memory(l|h<<8), israbbit() ? 5 : 7);
@@ -1905,7 +1909,7 @@ int main (int argc, char **argv){
           SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
         else
           SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x97: // SUB A
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1915,19 +1919,19 @@ int main (int argc, char **argv){
           fb= ~(fa= a);
           fr= a= ff= 0;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x98: // SBC A,B
         SBC(b,  israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x99: // SBC A,C
         SBC(c,  israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9a: // SBC A,D
         SBC(d,  israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9b: // SBC A,E
         SBC(e,  israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9c: // SBC A,H // SBC A,IXh // SBC A,IYh
         if( ih )
           SBC(h, israbbit() ? 2 : 4);
@@ -1935,7 +1939,7 @@ int main (int argc, char **argv){
           SBC(yh, 4);
         else if ( canixh() )
           SBC(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9d: // SBC A,L // SBC A,IXl // SBC A,IYl
         if( ih )
           SBC(l, israbbit() ? 2 : 4);
@@ -1943,7 +1947,7 @@ int main (int argc, char **argv){
           SBC(yl, 4);
         else if ( canixh() )
           SBC(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9e: // SBC A,(HL) // SBC A,(IX+d) // SBC A,(IY+d)
         if( ih )
           SBC(get_memory(l|h<<8), israbbit() ? 5 : 7);
@@ -1951,7 +1955,7 @@ int main (int argc, char **argv){
           SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
         else
           SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9f: // SBC A,A
         st+=  israbbit() ? 2 : 4;
         if ( altd ) {
@@ -1961,19 +1965,19 @@ int main (int argc, char **argv){
           fb= ~(fa= a);
           fr= a= (ff= (ff&256)/-256);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa0: // AND B
         AND(b, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa1: // AND C
         AND(c, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa2: // AND D
         AND(d, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa3: // AND E
         AND(e, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa4: // AND H // AND IXh // AND IYh
         if( ih )
           AND(h, israbbit() ? 2 : 4);
@@ -1981,7 +1985,7 @@ int main (int argc, char **argv){
           AND(yh, 4);
         else if ( canixh() )
           AND(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa5: // AND L // AND IXl // AND IYl
         if( ih )
           AND(l, israbbit() ? 2 : 4);
@@ -1989,7 +1993,7 @@ int main (int argc, char **argv){
           AND(yl, 4);
         else if ( canixh() )
           AND(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
         if( ih )
           AND(get_memory(l|h<<8), israbbit() ? 5 : 7);
@@ -1997,7 +2001,7 @@ int main (int argc, char **argv){
           AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),israbbit() ? 5 : 7);
         else
           AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),israbbit() ? 5 : 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa7: // AND A
         st+=israbbit() ? 2 : 4;
         if ( altd ) {
@@ -2007,19 +2011,19 @@ int main (int argc, char **argv){
           fa= ~(ff= fr= a);
           fb= 0;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa8: // XOR B
         XOR(b, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa9: // XOR C
         XOR(c, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaa: // XOR D
         XOR(d, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xab: // XOR E
         XOR(e, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xac: // XOR H // XOR IXh // XOR IYh
         if( ih )
           XOR(h, 4);
@@ -2027,7 +2031,7 @@ int main (int argc, char **argv){
           XOR(yh, 4);
         else
           XOR(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xad: // XOR L // XOR IXl // XOR IYl
         if( ih )
           XOR(l, 4);
@@ -2035,7 +2039,7 @@ int main (int argc, char **argv){
           XOR(yl, 4);
         else
           XOR(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xae: // XOR (HL) // XOR (IX+d) // XOR (IY+d)
         if( ih )
           XOR(get_memory(l|h<<8), 7);
@@ -2043,24 +2047,24 @@ int main (int argc, char **argv){
           XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
           XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaf: // XOR A
         st+= 4;
         a= ff= fr= fb= 0;
         fa= 256;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb0: // OR B
         OR(b, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb1: // OR C
         OR(c,  israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb2: // OR D
         OR(d, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb3: // OR E
         OR(e, israbbit() ? 2 : 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb4: // OR H // OR IXh // OR IYh
         if( ih )
           OR(h, israbbit() ? 2 : 4);
@@ -2068,7 +2072,7 @@ int main (int argc, char **argv){
           OR(yh, 4);
         else if ( canixh() )
           OR(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb5: // OR L // OR IXl // OR IYl
         if( ih )
           OR(l, israbbit() ? 2 : 4);
@@ -2076,7 +2080,7 @@ int main (int argc, char **argv){
           OR(yl, 4);
         else if ( canixh() )
           OR(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
         if( ih )
           OR(get_memory(l|h<<8), israbbit() ? 5 : 7);
@@ -2084,7 +2088,7 @@ int main (int argc, char **argv){
           OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
           OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb7: // OR A
         st+= israbbit() ? 2 : 4;
         if ( altd ) {
@@ -2096,48 +2100,48 @@ int main (int argc, char **argv){
             | (ff= fr= a);
           fb= 0;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb8: // CP B
-        CP(b, 4);
-        ih=1;altd=0;break;
+        CP(b, israbbit() ? 2 : 4);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb9: // CP C
-        CP(c, 4);
-        ih=1;altd=0;break;
+        CP(c, israbbit() ? 2 : 4);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xba: // CP D
-        CP(d, 4);
-        ih=1;altd=0;break;
+        CP(d, israbbit() ? 2 : 4);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbb: // CP E
-        CP(e, 4);
-        ih=1;altd=0;break;
+        CP(e, israbbit() ? 2 : 4);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbc: // CP H // CP IXh // CP IYh
         if( ih )
-          CP(h, 4);
+          CP(h, israbbit() ? 2 : 4);
         else if( iy && canixh() )
           CP(yh, 4);
         else if ( canixh() )
           CP(xh, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbd: // CP L // CP IXl // CP IYl
         if( ih )
-          CP(l, 4);
+          CP(l, israbbit() ? 2 : 4);
         else if( iy && canixh() )
           CP(yl, 4);
         else if (canixh())
           CP(xl, 4);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d)
         if( ih )
           w= get_memory(l|h<<8),
-          CP(w, 7);
+          CP(w, israbbit() ? 5 : 7);
         else if( iy )
           w= get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),
           CP(w, 7);
         else
           w= get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),
           CP(w, 7);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbf: // CP A
-        st+= 4;
+        st+= israbbit() ? 2 : 4;  
         if ( altd ) {
           fr_= 0;
           fb_= ~(fa_= a);
@@ -2147,40 +2151,40 @@ int main (int argc, char **argv){
           fb= ~(fa= a);
           ff= a&40;
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc9: // RET
-        RET(10);
-        ih=1;altd=0;break;
+        RET(israbbit() ?  8 : 10);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc0: // RET NZ
         RETCI(fr);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc8: // RET Z
         RETC(fr);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd0: // RET NC
         RETC(ff&256);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd8: // RET C
         RETCI(ff&256);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe0: // RET PO
         RETC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe8: // RET PE
         RETCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf0: // RET P
         RETC(ff&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf8: // RET M
         RETCI(ff&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc1: // POP BC
         POP(b, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd1: // POP DE
         POP(d, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe1: // POP HL // POP IX // POP IY
         if( ih )
           POP(h, l);
@@ -2188,18 +2192,18 @@ int main (int argc, char **argv){
           POP(yh, yl);
         else
           POP(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf1: // POP AF
         st+= 10;
         setf(get_memory(sp++));
         a= get_memory(sp++);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc5: // PUSH BC
         PUSH(b, c);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd5: // PUSH DE
         PUSH(d, e);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe5: // PUSH HL // PUSH IX // PUSH IY
         if( ih )
           PUSH(h, l);
@@ -2207,45 +2211,45 @@ int main (int argc, char **argv){
           PUSH(yh, yl);
         else
           PUSH(xh, xl);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf5: // PUSH AF
         PUSH(a, f());
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
-        st+= 10;
+        st+= israbbit() ? 7 : 10;
         mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc2: // JP NZ
         JPCI(fr);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xca: // JP Z
         JPC(fr);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd2: // JP NC
         JPC(ff&256);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xda: // JP C
         JPCI(ff&256);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe2: // JP PO
         JPC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xea: // JP PE
         JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf2: // JP P
         JPC(ff&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xfa: // JP M
         JPCI(ff&128);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xcd: // CALL nn
-        st+= 17;
+        st+= israbbit() ? 12 : 17;
         t= pc+2;
         mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
         put_memory(--sp,t>>8);
         put_memory(--sp,t);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc4: // CALL NZ / (RCM) LD HL,(SP+N)
         if ( israbbit()) {
           int     offset = sp + get_memory(pc++);
@@ -2263,7 +2267,7 @@ int main (int argc, char **argv){
         } else {
           CALLCI(fr);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xcc: // CALL Z / (RCM) BOOL HL
         if ( israbbit()) {
           if ( ih ) {
@@ -2277,7 +2281,7 @@ int main (int argc, char **argv){
         } else {
           CALLC(fr);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd4: // CALL NC / (RCM) LD (SP+N),HL
         if ( israbbit()) {
           int     offset = sp + get_memory(pc++);
@@ -2296,7 +2300,7 @@ int main (int argc, char **argv){
         } else {
           CALLC(ff&256);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdc: // CALL C / (RCM) AND HL,DE
         if ( israbbit()) {
           if ( ih ) { 
@@ -2313,7 +2317,7 @@ int main (int argc, char **argv){
         } else {
           CALLCI(ff&256);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe4: // CALL PO / (RCM) LD HL,(IX+D)
         if ( israbbit()) {
           t = (get_memory(pc++)^128)-128;
@@ -2333,7 +2337,7 @@ int main (int argc, char **argv){
         } else {
           CALLC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xec: // CALL PE / (RCM) OR HL,DE
         if ( israbbit()) {
           if ( ih ) { 
@@ -2350,7 +2354,7 @@ int main (int argc, char **argv){
         } else {
           CALLCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf4: // CALL P or (RCM) LD (IX+D),HL
         if ( israbbit()) {
           t = (get_memory(pc++)^128)-128;
@@ -2369,7 +2373,7 @@ int main (int argc, char **argv){
         } else {
           CALLC(ff&128);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xfc: // CALL M  / (RCM) RR HL
         if ( israbbit()) {
           long long savest = st;
@@ -2388,51 +2392,51 @@ int main (int argc, char **argv){
         } else {
           CALLCI(ff&128);
         }
-        ih=1;altd=0;
+        ih=1;altd=0;ioi=0;ioe=0;
         break;
       case 0xc6: // ADD A,n
-        ADD(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        ADD(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xce: // ADC A,n
-        ADC(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        ADC(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd6: // SUB n
-        SUB(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        SUB(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xde: // SBC A,n
-        SBC(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        SBC(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe6: // AND n
-        AND(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        AND(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xee: // XOR A,n
-        XOR(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        XOR(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf6: // OR n
-        OR(get_memory(pc++), 7);
-        ih=1;altd=0;break;
+        OR(get_memory(pc++), israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xfe: // CP A,n
         w= get_memory(pc++);
-        CP(w, 7);
-        ih=1;altd=0;break;
-      case 0xc7: // RST 0x00
+        CP(w, israbbit() ? 4 : 7);
+        ih=1;altd=0;ioi=0;ioe=0;break;
+      case 0xc7: // RST 0x00  (RCM) LJP
         RST(0);
-        ih=1;altd=0;break;
-      case 0xcf: // RST 0x08
+        ih=1;altd=0;ioi=0;ioe=0;break;
+      case 0xcf: // RST 0x08 (RCM) LCALL
         RST(8);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd7: // RST 0x10
         RST(0x10);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdf: // RST 0x18
         RST(0x18);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe7: // RST 0x20
         RST(0x20);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xef: // RST 0x28
         RST(0x28);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf7: // RST 0x30, (RCM) mul
         if ( israbbit()) {
           // HL:BC = BC • DE
@@ -2445,21 +2449,33 @@ int main (int argc, char **argv){
         } else {
           RST(0x30);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xff: // RST 0x38
         RST(0x38);
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd3: // OUT (n),A
-        st+= 11;
-        out(mp= get_memory(pc++) | a<<8, a);
-        mp= mp&65280
-          | ++mp;
-        ih=1;altd=0;break;
+        if ( israbbit()) {
+          ioi=1;
+          st+=2;
+        } else {
+          st+= 11;
+          out(mp= get_memory(pc++) | a<<8, a);
+          mp= mp&65280
+            | ++mp;
+          ih=1;altd=0;ioi=0;ioe=0;
+        }
+        break;
       case 0xdb: // IN A,(n) // (RCM) ioe
-        st+= 11;
-        a= in(mp= get_memory(pc++) | a<<8);
-        ++mp;
-        ih=1;altd=0;break;
+        if ( israbbit()) {
+          ioe=1;
+          st+=2;
+        } else {
+          st+= 11;
+          a= in(mp= get_memory(pc++) | a<<8);
+          ++mp;
+          ih=1;altd=0;ioi=0;ioe=0;
+        }
+        break;
       case 0xf3: // DI  / (RCM) RL DE
         if ( israbbit()) {
           long long savest = st;
@@ -2470,7 +2486,7 @@ int main (int argc, char **argv){
         } else {
           st+= 4;
           iff= 0;
-          ih=1;altd=0;
+          ih=1;altd=0;ioi=0;ioe=0;
         }
         break;
       case 0xfb: // EI / (RCM) RR DE
@@ -2484,7 +2500,7 @@ int main (int argc, char **argv){
           st+= 4;
           iff= 1;
         }
-        ih=1;altd=0;
+        ih=1;altd=0;ioi=0;ioe=0;
         break;
       case 0xeb: // EX DE,HL
         st+= israbbit() ? 2 : 4;
@@ -2494,7 +2510,7 @@ int main (int argc, char **argv){
         t= e;
         e= l;
         l= t;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd9: // EXX
         st+= israbbit() ? 2 : 4;
         t = b;
@@ -2515,7 +2531,7 @@ int main (int argc, char **argv){
         t = l;
         l = l_;
         l_= t;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe3: // EX (SP),HL // EX (SP),IX // EX (SP),IY or (RCM) EX DE',HL
         if ( israbbit() && ih ) {
           t = h;
@@ -2533,7 +2549,7 @@ int main (int argc, char **argv){
           else
             EXSPI(xh, xl);
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe9: // JP (HL)
         st+= 4;
         if( ih )
@@ -2542,7 +2558,7 @@ int main (int argc, char **argv){
           pc= yl | yh<<8;
         else
           pc= xl | xh<<8;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf9: // LD SP,HL
         st+= israbbit() ? 2 : 4;
         if( ih )
@@ -2551,7 +2567,7 @@ int main (int argc, char **argv){
           sp= yl | yh<<8;
         else
           sp= xl | xh<<8;
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdd: // OP DD
         st+= israbbit() ? 2 : 4;
         ih= iy= 0;
@@ -2571,7 +2587,7 @@ int main (int argc, char **argv){
             case 0x03:  RLC(e); break;                       // RLC E
             case 0x04:  RLC(h); break;                       // RLC H
             case 0x05:  RLC(l); break;                       // RLC L
-            case 0x06:  st+= 7;                              // RLC (HL)
+            case 0x06:  st+= israbbit() ? 6 : 7;             // RLC (HL)
                         t= l|h<<8;
                         get_memory(t);
                         RLC(u);
@@ -2583,7 +2599,7 @@ int main (int argc, char **argv){
             case 0x0b:  RRC(e); break;                       // RRC E
             case 0x0c:  RRC(h); break;                       // RRC H
             case 0x0d:  RRC(l); break;                       // RRC L
-            case 0x0e:  st+= 7;                              // RRC (HL)
+            case 0x0e:  st+= israbbit() ? 6 : 7;             // RRC (HL)
                         t= l|h<<8;
                         get_memory(t);
                         RRC(u);
@@ -2595,7 +2611,7 @@ int main (int argc, char **argv){
             case 0x13:  RL(e); break;                        // RL E
             case 0x14:  RL(h); break;                        // RL H
             case 0x15:  RL(l); break;                        // RL L
-            case 0x16:  st+= 7;                              // RL (HL)
+            case 0x16:  st+= israbbit() ? 6 : 7;             // RL (HL)
                         t= l|h<<8;
                         get_memory(t);
                         RL(u);
@@ -2607,7 +2623,7 @@ int main (int argc, char **argv){
             case 0x1b:  RR(e); break;                        // RR E
             case 0x1c:  RR(h); break;                        // RR H
             case 0x1d:  RR(l); break;                        // RR L
-            case 0x1e:  st+= 7;                              // RR (HL)
+            case 0x1e:  st+= israbbit() ? 6 : 7;             // RR (HL)
                         t= l|h<<8;
                         get_memory(t);
                         RR(u);
@@ -2619,7 +2635,7 @@ int main (int argc, char **argv){
             case 0x23:  SLA(e); break;                       // SLA E
             case 0x24:  SLA(h); break;                       // SLA H
             case 0x25:  SLA(l); break;                       // SLA L
-            case 0x26:  st+= 7;                              // SLA (HL)
+            case 0x26:  st+= israbbit() ? 6 : 7;             // SLA (HL)
                         t= l|h<<8;
                         get_memory(t);
                         SLA(u);
@@ -2631,7 +2647,7 @@ int main (int argc, char **argv){
             case 0x2b:  SRA(e); break;                       // SRA E
             case 0x2c:  SRA(h); break;                       // SRA H
             case 0x2d:  SRA(l); break;                       // SRA L
-            case 0x2e:  st+= 7;                              // SRA (HL)
+            case 0x2e:  st+= israbbit() ? 6 : 7;             // SRA (HL)
                         t= l|h<<8;
                         get_memory(t);
                         SRA(u);
@@ -2643,11 +2659,15 @@ int main (int argc, char **argv){
             case 0x33:  SLL(e); break;                       // SLL E
             case 0x34:  SLL(h); break;                       // SLL H
             case 0x35:  SLL(l); break;                       // SLL L
-            case 0x36:  st+= 7;                              // SLL (HL)
-                        t= l|h<<8;
-                        get_memory(t);
-                        SLL(u);
-                        put_memory(t, u); break;                        
+            case 0x36:                                       // SLL (HL)
+                        if (cansll() ) {
+                          st+= 7; 
+                          t= l|h<<8;
+                          get_memory(t);
+                          SLL(u);
+                          put_memory(t, u); 
+                        }
+                        break;                        
             case 0x37:  SLL(a); break;                       // SLL A
             case 0x38:  SRL(b); break;                       // SRL B
             case 0x39:  SRL(c); break;                       // SRL C
@@ -2655,7 +2675,7 @@ int main (int argc, char **argv){
             case 0x3b:  SRL(e); break;                       // SRL E
             case 0x3c:  SRL(h); break;                       // SRL H
             case 0x3d:  SRL(l); break;                       // SRL L
-            case 0x3e:  st+= 7;                              // SRL (HL)
+            case 0x3e:  st+= israbbit() ? 6 : 7;             // SRL (HL)
                         t= l|h<<8;
                         get_memory(t);
                         SRL(u);
@@ -3079,7 +3099,7 @@ int main (int argc, char **argv){
             case 0xff: SET(128, t); put_memory(mp, a=t); break;    // LD A,SET 7,(IX+d) // LD A,SET 7,(IY+d)
           }
         }
-        ih=1;altd=0;break;
+        ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xed: // OP ED
         r++;
         switch( get_memory(pc++) ){
@@ -3563,7 +3583,7 @@ int main (int argc, char **argv){
               uint16_t v = b * c;
               b = v >> 8;
               c = v;
-              st += 8;
+              st += 17;
             } else {  // (Z80) Undocumented NEG
                 st+= 8;
                 fr= a= (ff= (fb= ~a)+1);
@@ -3575,7 +3595,7 @@ int main (int argc, char **argv){
               uint16_t v = d * e;
               d = v >> 8;
               e = v;
-              st += 8;
+              st += 17;
             } else {  // (Z80) Undocumented NEG
                 st+= 8;
                 fr= a= (ff= (fb= ~a)+1);
@@ -3587,7 +3607,7 @@ int main (int argc, char **argv){
               uint16_t v = h * l;
               h = v >> 8;
               l = v;
-              st += 8;
+              st += 17;
             } else {  // (Z80) Undocumented NEG
                 st+= 8;
                 fr= a= (ff= (fb= ~a)+1);
@@ -3610,7 +3630,7 @@ int main (int argc, char **argv){
                      fa= 0; break;
           case 0x45: case 0x4d: case 0x55: case 0x5d:        // RETI // RETN
           case 0x65: case 0x6d: case 0x75: case 0x7d:
-                     RET(14); break;
+                     RET(israbbit() ? 12 : 14); break;
           case 0x46: case 0x4e: case 0x66: case 0x6e:        // IM 0
                      st+= 8; im= 0; break;
           case 0x56: case 0x76:                              // IM 1
@@ -3632,8 +3652,8 @@ int main (int argc, char **argv){
           case 0x67: st+= 18;                                // RRD
                      t= get_memory(mp= l|h<<8)
                       | a<<8;
-                     a= a &240
-                      | t & 15;
+                     a= (a &240)
+                      | (t & 15);
                      ff=  ff&-256
                         | (fr= a);
                      fa= a|256;
@@ -3641,8 +3661,8 @@ int main (int argc, char **argv){
                      put_memory(mp++,t>>4); break;
           case 0x6f: st+= 18;                                // RLD
                      t= get_memory(mp= l|h<<8)<<4
-                      | a&15;
-                     a= a &240
+                      | (a&15);
+                     a= (a &240)
                       | t>>8;
                      ff=  ff&-256
                         | (fr= a);
@@ -3876,7 +3896,7 @@ int main (int argc, char **argv){
                         | u>>4
                         | (t&128)<<2; break;
         }
-        ih=1;altd=0;//break;
+        ih=1;altd=0;ioi=0;ioe=0;//break;
     }
   } while ( pc != end && st < counter  );
   if ( alarmtime != 0 ) {
@@ -3922,7 +3942,7 @@ int main (int argc, char **argv){
       fwrite(&xh, 1, 1, fh),
       iff<<= 2,
       fwrite(&iff, 1, 1, fh),
-      r= (r&127|r7&128),
+      r= ((r&127)|(r7&128)),
       fwrite(&r, 1, 1, fh),
       fwrite(&t, 1, 1, fh),
       fwrite(&a, 1, 1, fh),
@@ -3946,7 +3966,7 @@ int main (int argc, char **argv){
       fwrite(&sp, 2, 1, fh);   // 10008 SPl
                                // 10009 SPh
       fwrite(&i, 1, 1, fh);    // 1000a I
-      r= (r&127|r7&128);
+      r= ((r&127)|(r7&128));
       fwrite(&r, 1, 1, fh);    // 1000b R
       fwrite(&e, 1, 1, fh);    // 1000c E
       fwrite(&d, 1, 1, fh);    // 1000d D
