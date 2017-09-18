@@ -1393,7 +1393,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x37: // SCF
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         if ( altd ) {
           fb_= fb_      &128
             | (fr_^fa_) & 16;
@@ -1409,7 +1409,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3f: // CCF
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         if ( altd ) {
           fb_= fb_            &128
             | (ff_>>4^fr_^fa_) & 16;
@@ -1830,9 +1830,9 @@ int main (int argc, char **argv){
         if( ih )
           ADD(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
+          ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
-          ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);
+          ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x87: // ADD A,A
         st+= israbbit() ? 2 : 4;
@@ -1912,9 +1912,9 @@ int main (int argc, char **argv){
         if( ih )
           SUB(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
+          SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),  7);
         else
-          SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);
+          SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),  7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x97: // SUB A
         st+= israbbit() ? 2 : 4;
@@ -1958,9 +1958,9 @@ int main (int argc, char **argv){
         if( ih )
           SBC(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), israbbit() ? 5 : 7);
+          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),  7);
         else
-          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), israbbit() ? 5 : 7);;
+          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),  7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9f: // SBC A,A
         st+=  israbbit() ? 2 : 4;
@@ -2004,9 +2004,9 @@ int main (int argc, char **argv){
         if( ih )
           AND(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
-          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),israbbit() ? 5 : 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
-          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),israbbit() ? 5 : 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa7: // AND A
         st+=israbbit() ? 2 : 4;
@@ -2019,16 +2019,16 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa8: // XOR B
-        XOR(b, 4);
+        XOR(b,  israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa9: // XOR C
-        XOR(c, 4);
+        XOR(c,  israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaa: // XOR D
-        XOR(d, 4);
+        XOR(d,  israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xab: // XOR E
-        XOR(e, 4);
+        XOR(e,  israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xac: // XOR H // XOR IXh // XOR IYh
         if( ih )
@@ -2040,15 +2040,15 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xad: // XOR L // XOR IXl // XOR IYl
         if( ih )
-          XOR(l, 4);
-        else if( iy )
+          XOR(l,  israbbit() ? 2 : 4);
+        else if( iy && canixh() )
           XOR(yl, 4);
-        else
+        else if ( canixh() )
           XOR(xl, 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xae: // XOR (HL) // XOR (IX+d) // XOR (IY+d)
         if( ih )
-          XOR(get_memory(l|h<<8), 7);
+          XOR(get_memory(l|h<<8), israbbit() ? 5 : 7);
         else if( iy )
           XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
         else
