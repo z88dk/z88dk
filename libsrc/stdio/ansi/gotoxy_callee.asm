@@ -23,8 +23,8 @@ EXTERN ansi_ROW
    ld	a,c
    dec	a
    ld	(ansi_COLUMN),a
-   dec	a
    ld	a,e
+   dec	a
    ld	(ansi_ROW),a
 
    ret
