@@ -9,3 +9,10 @@ PUBLIC wv_stack_init_callee
 EXTERN w_vector_init_callee
 
 defc wv_stack_init_callee = w_vector_init_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wv_stack_init_callee
+defc _wv_stack_init_callee = wv_stack_init_callee
+ENDIF
+

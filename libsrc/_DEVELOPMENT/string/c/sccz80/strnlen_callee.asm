@@ -15,3 +15,10 @@ strnlen_callee:
    ex (sp),hl
    
    jp asm_strnlen
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strnlen_callee
+defc _strnlen_callee = strnlen_callee
+ENDIF
+

@@ -9,3 +9,10 @@ PUBLIC bv_stack_shrink_to_fit
 EXTERN asm_bv_stack_shrink_to_fit
 
 defc bv_stack_shrink_to_fit = asm_bv_stack_shrink_to_fit
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_stack_shrink_to_fit
+defc _bv_stack_shrink_to_fit = bv_stack_shrink_to_fit
+ENDIF
+

@@ -19,3 +19,10 @@ strcasecmp:
    push af
    
    jp asm_strcasecmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strcasecmp
+defc _strcasecmp = strcasecmp
+ENDIF
+

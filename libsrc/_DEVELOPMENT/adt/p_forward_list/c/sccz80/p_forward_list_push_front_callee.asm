@@ -9,3 +9,10 @@ PUBLIC p_forward_list_push_front_callee
 EXTERN p_forward_list_insert_after_callee
 
 defc p_forward_list_push_front_callee = p_forward_list_insert_after_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_forward_list_push_front_callee
+defc _p_forward_list_push_front_callee = p_forward_list_push_front_callee
+ENDIF
+

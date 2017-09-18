@@ -9,3 +9,10 @@ PUBLIC bv_stack_init_callee
 EXTERN b_vector_init_callee
 
 defc bv_stack_init_callee = b_vector_init_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bv_stack_init_callee
+defc _bv_stack_init_callee = bv_stack_init_callee
+ENDIF
+

@@ -20,3 +20,10 @@ l0_rawmemchr_callee:
    ld a,c
    
    jp asm_rawmemchr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _rawmemchr_callee
+defc _rawmemchr_callee = rawmemchr_callee
+ENDIF
+

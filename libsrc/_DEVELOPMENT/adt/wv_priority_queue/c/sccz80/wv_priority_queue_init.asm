@@ -24,3 +24,10 @@ wv_priority_queue_init:
    push af
    
    jp asm_wv_priority_queue_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wv_priority_queue_init
+defc _wv_priority_queue_init = wv_priority_queue_init
+ENDIF
+

@@ -21,3 +21,10 @@ strncmp:
    push af
    
    jp asm_strncmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strncmp
+defc _strncmp = strncmp
+ENDIF
+

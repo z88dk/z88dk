@@ -22,3 +22,10 @@ isalpha:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isalpha
+defc _isalpha = isalpha
+ENDIF
+

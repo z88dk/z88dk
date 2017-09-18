@@ -21,3 +21,10 @@ b_array_erase_range:
    push af
    
    jp asm_b_array_erase_range
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_erase_range
+defc _b_array_erase_range = b_array_erase_range
+ENDIF
+

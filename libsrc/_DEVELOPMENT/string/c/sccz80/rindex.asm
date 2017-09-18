@@ -10,3 +10,10 @@ PUBLIC rindex
 EXTERN strrchr
 
 defc rindex = strrchr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _rindex
+defc _rindex = rindex
+ENDIF
+

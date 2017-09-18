@@ -15,3 +15,10 @@ strchrnul_callee:
    ex (sp),hl
    
    jp asm_strchrnul
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strchrnul_callee
+defc _strchrnul_callee = strchrnul_callee
+ENDIF
+

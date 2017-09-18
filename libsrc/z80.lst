@@ -1,6 +1,5 @@
 @assert/assert.lst
 @ctype/ctype.lst
-@malloc/malloc.lst
 setjmp/longjmp
 setjmp/setjmp
 @stdlib/stdlib.lst
@@ -30,7 +29,8 @@ _DEVELOPMENT/stdlib/c/sdcc_ix/atoll_callee
 _DEVELOPMENT/l/z80/ascii/l_valid_base
 _DEVELOPMENT/l/z80/ascii/l_num2char
 @adt/adt.lst
-@balloc/balloc.lst
+@adt-newlib/adt.lst
+@alloc/alloc.lst
 @debug/debug.lst
 @rect/rect.lst
 @algorithm/alg.lst

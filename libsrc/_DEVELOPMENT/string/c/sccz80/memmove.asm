@@ -21,3 +21,10 @@ memmove:
    push af
    
    jp asm_memmove
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memmove
+defc _memmove = memmove
+ENDIF
+

@@ -10,6 +10,7 @@
 #include <spectrum.h>
 
 
+static int fabandon1(int fd);
 
 void fabandon(FILE *fp)
 {
@@ -19,7 +20,7 @@ void fabandon(FILE *fp)
 	fp->ungetc=0;
 }
 
-int fabandon1(int fd)
+static int fabandon1(int fd)
 {
 #asm
 	INCLUDE	"p3dos.def"

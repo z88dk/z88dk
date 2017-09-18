@@ -15,3 +15,10 @@ p_list_push_back_callee:
    ex (sp),hl
    
    jp asm_p_list_push_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_list_push_back_callee
+defc _p_list_push_back_callee = p_list_push_back_callee
+ENDIF
+

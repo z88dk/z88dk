@@ -21,3 +21,10 @@ stpncpy:
    push af
    
    jp asm_stpncpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _stpncpy
+defc _stpncpy = stpncpy
+ENDIF
+

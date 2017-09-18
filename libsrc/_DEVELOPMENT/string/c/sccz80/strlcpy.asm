@@ -21,3 +21,10 @@ strlcpy:
    push af
    
    jp asm_strlcpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strlcpy
+defc _strlcpy = strlcpy
+ENDIF
+

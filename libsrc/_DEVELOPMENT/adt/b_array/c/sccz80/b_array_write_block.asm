@@ -25,3 +25,10 @@ b_array_write_block:
    push af
    
    jp asm_b_array_write_block
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_write_block
+defc _b_array_write_block = b_array_write_block
+ENDIF
+

@@ -19,3 +19,10 @@ p_list_push_front:
    push af
 
    jp asm_p_list_push_front
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_list_push_front
+defc _p_list_push_front = p_list_push_front
+ENDIF
+

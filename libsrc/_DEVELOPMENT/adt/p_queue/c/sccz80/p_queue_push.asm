@@ -9,3 +9,10 @@ PUBLIC p_queue_push
 EXTERN p_forward_list_alt_push_back
 
 defc p_queue_push = p_forward_list_alt_push_back
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_queue_push
+defc _p_queue_push = p_queue_push
+ENDIF
+

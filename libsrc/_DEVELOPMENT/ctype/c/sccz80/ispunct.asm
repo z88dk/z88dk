@@ -22,3 +22,10 @@ ispunct:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ispunct
+defc _ispunct = ispunct
+ENDIF
+

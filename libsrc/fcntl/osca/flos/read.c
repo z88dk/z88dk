@@ -15,7 +15,7 @@
 #include <flos.h>
 
 
-size_t read(int myfile, void *ptr, size_t len)
+ssize_t read(int myfile, void *ptr, size_t len)
 {
 	struct flos_file *flosfile;
 

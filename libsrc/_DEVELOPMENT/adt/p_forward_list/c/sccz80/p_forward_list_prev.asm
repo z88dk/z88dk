@@ -19,3 +19,10 @@ p_forward_list_prev:
    push af
    
    jp asm_p_forward_list_prev
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_forward_list_prev
+defc _p_forward_list_prev = p_forward_list_prev
+ENDIF
+

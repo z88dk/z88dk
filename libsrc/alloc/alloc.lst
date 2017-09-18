@@ -1,0 +1,3 @@
+@alloc/balloc/balloc.lst
+@alloc/obstack/obstack.lst
+@alloc/malloc-classic/malloc.lst

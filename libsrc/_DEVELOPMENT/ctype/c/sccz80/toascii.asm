@@ -12,3 +12,10 @@ toascii:
    res 7,l
    
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _toascii
+defc _toascii = toascii
+ENDIF
+

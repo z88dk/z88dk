@@ -21,3 +21,10 @@ strtok_r:
    push af
    
    jp asm_strtok_r
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtok_r
+defc _strtok_r = strtok_r
+ENDIF
+

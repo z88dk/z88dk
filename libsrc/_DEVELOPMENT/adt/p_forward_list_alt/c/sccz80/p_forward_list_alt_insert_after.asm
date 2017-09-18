@@ -21,3 +21,10 @@ p_forward_list_alt_insert_after:
    push af
 
    jp asm_p_forward_list_alt_insert_after
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_forward_list_alt_insert_after
+defc _p_forward_list_alt_insert_after = p_forward_list_alt_insert_after
+ENDIF
+

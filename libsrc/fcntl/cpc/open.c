@@ -19,6 +19,7 @@
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
+#include <string.h>
 #include "cpcfcntl.h"
 
 int open(char *name, int flags, mode_t mode)

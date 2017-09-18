@@ -21,3 +21,10 @@ memswap:
    push af
    
    jp asm_memswap
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memswap
+defc _memswap = memswap
+ENDIF
+

@@ -25,3 +25,10 @@ b_vector_write_block:
    push af
    
    jp asm_b_vector_write_block
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_vector_write_block
+defc _b_vector_write_block = b_vector_write_block
+ENDIF
+

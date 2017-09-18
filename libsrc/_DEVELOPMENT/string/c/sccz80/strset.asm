@@ -19,3 +19,10 @@ strset:
    push af
    
    jp asm_strset
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strset
+defc _strset = strset
+ENDIF
+

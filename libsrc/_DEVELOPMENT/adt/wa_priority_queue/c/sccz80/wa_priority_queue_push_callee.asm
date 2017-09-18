@@ -15,3 +15,10 @@ wa_priority_queue_push_callee:
    ex (sp),hl
    
    jp asm_wa_priority_queue_push
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wa_priority_queue_push_callee
+defc _wa_priority_queue_push_callee = wa_priority_queue_push_callee
+ENDIF
+

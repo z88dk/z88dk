@@ -24,3 +24,10 @@ obstack_alloc_callee:
    ex (sp),hl
    
    jp asm_obstack_alloc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_alloc_callee
+defc _obstack_alloc_callee = obstack_alloc_callee
+ENDIF
+

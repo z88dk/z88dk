@@ -21,3 +21,10 @@ isascii:
 
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isascii
+defc _isascii = isascii
+ENDIF
+
