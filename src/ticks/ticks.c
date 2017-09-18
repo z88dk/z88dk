@@ -9,6 +9,7 @@
 #endif
 
 #define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
+#define isz180() ( c_cpu & (CPU_Z180))
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 #define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
@@ -915,6 +916,9 @@ int main (int argc, char **argv){
     r++;
     switch( get_memory(pc++) ){
       case 0x00: // NOP
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
+        ih=1;altd=0;ioi=0;ioe=0;break;
+        break;
       case 0x40: // LD B,B
         if ( altd ) { b_ = b; st += 2; break; }
       case 0x49: // LD C,C
@@ -1371,7 +1375,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2f: // CPL
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         if ( altd ) {
           ff= ff      &-41
             | (a_ = a^255)& 40;
@@ -2216,7 +2220,7 @@ int main (int argc, char **argv){
         PUSH(a, f());
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
-        st+= israbbit() ? 7 : 10;
+        st+= israbbit() ? 7 : isz180() ? 9 : 10;
         mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc2: // JP NZ
@@ -2484,7 +2488,7 @@ int main (int argc, char **argv){
           st = savest;
           st += 2;
         } else {
-          st+= 4;
+          st+= isz180() ? 3 : 4;
           iff= 0;
           ih=1;altd=0;ioi=0;ioe=0;
         }
@@ -2497,7 +2501,7 @@ int main (int argc, char **argv){
           st = savest;
           st += 2;
         } else {
-          st+= 4;
+          st+= isz180() ? 3 : 4;
           iff= 1;
         }
         ih=1;altd=0;ioi=0;ioe=0;
@@ -2512,7 +2516,7 @@ int main (int argc, char **argv){
         l= t;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd9: // EXX
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         t = b;
         b = b_;
         b_= t;
@@ -2551,7 +2555,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe9: // JP (HL)
-        st+= 4;
+        st+= isz180() ? 3 : 4;
         if( ih )
           pc= l | h<<8;
         else if( iy )
@@ -2569,11 +2573,11 @@ int main (int argc, char **argv){
           sp= xl | xh<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdd: // OP DD
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         ih= iy= 0;
         ih=0;break;
       case 0xfd: // OP FD
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : isz180() ? 3 : 4;
         ih= 0;
         iy= 1;
         ih=0;break;
