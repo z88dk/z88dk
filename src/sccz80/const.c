@@ -420,6 +420,58 @@ unsigned char litchar()
     }
 }
 
+/* Perform an offsetof(structure, member) */
+void offset_of(LVALUE *lval)
+{
+    char   struct_name[NAMESIZE];
+    char   memb_name[NAMESIZE];
+    char   foundit = 0;
+
+    memb_name[0] = struct_name[0] = 0;
+    needchar('(');
+    if ( symname(struct_name) ) {
+        needchar(',');
+        if ( symname(memb_name) ) {
+            TAG_SYMBOL* tag = findtag(struct_name);
+
+            /* Consider typedefs */
+            if ( tag == NULL ) {
+                SYMBOL *ptr;
+                
+                if (((ptr = findloc(struct_name)) != NULL) || ((ptr = findstc(struct_name)) != NULL) || ((ptr = findglb(struct_name)) != NULL)) {
+                    if ( ptr->type == STRUCT ) {
+                        tag = tagtab + ptr->tag_idx;
+                    } else {
+                        printf("%d\n",ptr->type);
+                    }
+                }
+            }
+            if ( tag != NULL ) {
+                SYMBOL *ptr = tag->ptr;
+                while ( ptr != tag->end ) {
+                    if ( strcmp(ptr->name, memb_name) == 0 ) {
+                        lval->const_val = ptr->offset.i;
+                        foundit = 1;
+                        break;
+                    }
+                    ptr++;
+                }
+            }
+        }
+    }
+    needchar(')');
+    if ( foundit ) {
+        lval->is_const = 1;
+        lval->val_type = CINT;
+        lval->ident = VARIABLE;
+        vconst(lval->const_val);
+    } else {
+        error(E_OFFSETOF, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
+    }
+
+
+}
+
 /* Perform a sizeof (works on variables as well */
 void size_of(LVALUE* lval)
 {
