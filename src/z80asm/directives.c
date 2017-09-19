@@ -44,6 +44,16 @@ void asm_cond_LABEL(Str *label)
 		asm_LABEL(str_data(label));
 		str_len(label) = 0;
 	}
+
+	if (opts.debug_info) {
+		STR_DEFINE(name, STR_SIZE);
+
+		str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
+		if (!find_local_symbol(str_data(name)))
+			asm_LABEL(str_data(name));
+
+		STR_DELETE(name);
+	}
 }
 
 /*-----------------------------------------------------------------------------

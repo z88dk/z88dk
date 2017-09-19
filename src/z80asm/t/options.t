@@ -2,7 +2,6 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
@@ -99,101 +98,6 @@ END
 t_z80asm_capture('-b @test1.lst', "", "", 0);
 t_binary(read_binfile("test1.bin"), "\1\2\3\4");
 ok unlink "test1.bin";
-
-#------------------------------------------------------------------------------
-# --help, -h
-#------------------------------------------------------------------------------
-my $help_text = $copyrightmsg . <<'END';
-
-Usage:
-  z80asm [options] { @<modulefile> | <filename> }
-
-  [] = optional, {} = may be repeated, | = OR clause.
-
-  To assemble 'fred.asm' use 'fred' or 'fred.asm'
-
-  <modulefile> contains list of file names of all modules to be linked,
-  one module per line.
-
-  File types recognized or created by z80asm:
-    .asm   = source file
-    .o     = object file
-    .lis   = list file
-    .bin   = Z80 binary file
-    .sym   = symbols file
-    .map   = map file
-    .reloc = reloc file
-    .def   = global address definition file
-    .err   = error file
-
-Help Options:
-  -h, --help             Show help options
-  -v, --verbose          Be verbose
-
-Code Generation Options:
-  --cpu=z80-zxn          Assemble for the Z80 variant of ZX Next
-  --cpu=z80              Assemble for the Z80
-  --cpu=z180             Assemble for the Z180
-  --cpu=r2k              Assemble for the Rabbit 2000
-  --cpu=r3k              Assemble for the Rabbit 3000
-  --ti83plus             Interpret 'Invoke' as RST 28h
-  --IXIY                 Swap IX and IY registers
-  -C, --line-mode        Enable LINE directive
-
-Environment:
-  -I, --inc-path=PATH    Add directory to include search path
-  -L, --lib-path=PATH    Add directory to library search path
-  -D, --define=SYMBOL    Define a static symbol
-
-Libraries:
-  -x, --make-lib=FILE    Create a library file.lib
-  -i, --use-lib=FILE     Link library file.lib
-
-Binary Output:
-  -o, --output=FILE      Output binary file
-  -b, --make-bin         Assemble and link/relocate to file.bin
-  --split-bin            Create one binary file per section
-  -d, --date-stamp       Assemble only updated files
-  -r, --origin=ADDR      Relocate binary file to given address (decimal or hex)
-  -R, --relocatable      Create relocatable code
-  --reloc-info           Geneate binary file relocation information
-  --filler=BYTE          Default value to fill in DEFS (decimal or hex)
-
-Output File Options:
-  -s, --symtable         Create symbol table file.sym
-  -l, --list             Create listing file.lis
-  -m, --map              Create address map file.map
-  -g, --globaldef        Create global definition file.def
-
-Appmake Options:
-  +zx81                  Generate ZX81 .P file, origin at 16514
-  +zx                    Generate ZX Spectrum .tap file, origin defaults to
-                         23760 (in a REM), but can be set with -rORG >= 24000
-                         for above RAMTOP
-END
-
-unlink_testfiles();
-t_z80asm_capture("-h", 		$help_text, 	"", 0);
-t_z80asm_capture("--help", 	$help_text, 	"", 0);
-
-# make sure help fist in 80 columns
-my $out = capture_merged { system z80asm()." --help"; };
-my @long_lines = grep {length > 80} split(/\n/, $out);
-ok !@long_lines, "help within 80 columns";
-diag join("\n", @long_lines) if @long_lines;
-
-# check no arguments
-t_z80asm_capture("-h=x", 	"", 	<<'ERR', 1);
-Error: illegal option '-h=x'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
-
-t_z80asm_capture("--help=x", 	"", 	<<'ERR', 1);
-Error: illegal option '--help=x'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
 
 #------------------------------------------------------------------------------
 # --verbose, -v
