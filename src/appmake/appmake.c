@@ -1075,7 +1075,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
 
                         for (i = 0; i < memory->num; ++i)
                         {
-                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) == NULL)
+                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) != NULL)
                             {
                                 int banknum;
 
