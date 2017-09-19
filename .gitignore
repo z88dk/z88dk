@@ -57,6 +57,8 @@ win32/z88dk-lib/Debug/
 win32/z88dk-lib/Release/
 win32/.vs/
 win32/z88dk.VC.VC.opendb
+win32/lstmanip/Debug
+win32/lstmanip/Release
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/asm_NIRVANAP.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanam/z80/asm_NIRVANAM.asm
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm
