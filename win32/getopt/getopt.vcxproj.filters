@@ -15,7 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80nm\ar.c">
+    <ClInclude Include="..\..\src\getopt\getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\getopt\getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

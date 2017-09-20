@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80nm\ar.c">
+    <ClCompile Include="..\..\src\lstmanip\lstmanip.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
