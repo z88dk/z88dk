@@ -42,11 +42,11 @@ static struct zx_sna zxs = {
     -1          // intstate
 };
 
-static char tap = 0;
-static char sna = 0;
-static char dot = 0;
-static char zxn = 0;
-static char bin = 0;
+static char tap = 0;   // .tap tape
+static char sna = 0;   // .sna 48k/128k snapshot
+static char dot = 0;   //  esxdos dot command
+static char zxn = 0;   // .zxn full size memory executable
+static char bin = 0;   // .bin output binaries with banks correctly merged
 
 /* Options that are available for this module */
 option_t zxn_options[] = {
@@ -83,17 +83,213 @@ option_t zxn_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
+/*
+* Execution starts here
+*/
+
+#define LINELEN  1024
 
 int zxn_exec(char *target)
 {
-    if (zxc.help)
-        return -1;
+    struct banked_memory memory;
+    struct aligned_data aligned;
+    char   filename[LINELEN];
+    char   crtname[LINELEN];
+    FILE  *fmap;
+    char  *p;
+    int i, j, k, errors, ret;
 
-    if (sna)
-        return zx_sna(&zxc, &zxs, 0);
+    ret = -1;
+
+    if (zxc.help)
+        return ret;
+
+    // filenames
+
+    if (zxc.binname == NULL) return ret;
+
+    if (zxc.crtfile == NULL)
+    {
+        snprintf(crtname, sizeof(crtname) - 4, "%s", zxc.binname);
+        suffix_change(crtname, "");
+        zxc.crtfile = crtname;
+    }
+
+    // generate output
+
+    tap = !dot && !sna && !zxn && !bin;
+
+    if (tap)
+        return zx_tape(&zxc, &zxt);
 
     if (dot)
         return zx_dot_command(&zxc);
 
-    return zx_tape(&zxc, &zxt);
+    // output formats below need banked memory model
+
+    // warning about rom model compiles as this isn't solved yet
+
+    if (parameter_search(zxc.crtfile, ".map", "__crt_model") > 0)
+        fprintf(stderr, "Warning: the DATA binary should be manually attached to CODE for rom model compiles\n");
+
+    // initialize banked memory representation
+
+    memset(&memory, 0, sizeof(memory));
+    mb_create_bankspace(&memory, "BANK");   // bank space 0
+    mb_create_bankspace(&memory, "DIV");    // bank space 1
+
+    memset(&aligned, 0, sizeof(aligned));
+
+    // enumerate memory banks in map file
+
+    snprintf(filename, sizeof(filename) - 4, "%s", zxc.crtfile);
+    suffix_change(filename, ".map");
+
+    if ((fmap = fopen(filename, "r")) == NULL)
+        exit_log(1, "Error: Cannot open map file %s\n", filename);
+
+    mb_enumerate_banks(fmap, zxc.binname, &memory, &aligned);
+
+    fclose(fmap);
+
+    // exclude unwanted banks
+
+    if (zxc.excluded_banks != NULL)
+    {
+        char *s;
+
+        printf("Excluding banks from output\n");
+        for (s = strtok(zxc.excluded_banks, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
+        {
+            switch (mb_user_remove_bank(&memory, s))
+            {
+            case 1:
+                printf("..removed bank space %s\n", s);
+                break;
+            case 2:
+                printf("..removed bank %s\n", s);
+            default:
+                break;
+            }
+        }
+    }
+
+    // exclude unwanted sections
+
+    if (zxc.excluded_sections != NULL)
+    {
+        char *s;
+
+        printf("Excluding sections from output\n");
+        for (s = strtok(zxc.excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
+        {
+            if (mb_remove_section(&memory, s))
+                printf("..removed section %s\n", s);
+            else
+                printf("..section %s not found\n", s);
+        }
+    }
+
+    // check for section alignment errors
+    // but treat them like warnings
+
+    mb_check_alignment(&aligned);
+
+    // collapse zxn's relocatable 16k banks in bank space BANK
+
+    errors = 0;
+
+    for (i = 0; i < MAXBANKS; ++i)
+    {
+        struct memory_bank *mb = &memory.bankspace[0].membank[i];
+
+        for (j = 0; j < mb->num; ++j)
+        {
+            struct section_bin *sb = &mb->secbin[j];
+
+            if ((p = strstr(sb->section_name, "BANK")) != NULL)
+            {
+                if (sscanf(p, "BANK_%d_L", &k) == 1)
+                {
+                    // this is an 8k bank in the lower part of the 16k BANK_nnn
+
+                    sb->org &= 0x1fff;
+
+                    if ((sb->org + sb->size) > 0x2000)
+                    {
+                        errors++;
+                        fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x2000);
+                    }
+                }
+                else if (sscanf(p, "BANK_%d_H", &k) == 1)
+                {
+                    // this is an 8k bank in the upper part of the 16k BANK_nnn
+
+                    sb->org = (sb->org & 0x1fff) + 0x2000;
+
+                    if ((sb->org + sb->size) > 0x4000)
+                    {
+                        errors++;
+                        fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+                    }
+                }
+                else
+                {
+                    // this is destined for the full 16k
+
+                    sb->org &= 0x3fff;
+
+                    if ((sb->org + sb->size) > 0x4000)
+                    {
+                        errors++;
+                        fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+                    }
+                }
+            }
+        }
+    }
+
+    // check divmmc banks for size violations
+
+    for (i = 0; i < MAXBANKS; ++i)
+    {
+        struct memory_bank *mb = &memory.bankspace[1].membank[i];
+
+        for (j = 0; j < mb->num; ++j)
+        {
+            struct section_bin *sb = &mb->secbin[j];
+
+            if (sb->org < 0x2000)
+            {
+                errors++;
+                fprintf(stderr, "Error: Section %s has org less than 0x2000 (%#04x)\n", sb->section_name, sb->org);
+            }
+            else if ((sb->org + sb->size) > 0x4000)
+            {
+                errors++;
+                fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+            }
+        }
+    }
+
+    if (errors)
+        exit_log(1, "Aborting... errors in one or more memory banks\n");
+
+    // sort the memory banks and look for section overlaps
+
+    if (mb_sort_banks(&memory))
+        exit_log(1, "Aborting... one or more binaries overlap\n");
+
+    // now the output formats
+
+    if (sna)
+        ret = zx_sna(&zxc, &zxs, &memory, 1);
+
+    // cleanup
+
+    if (zxc.clean) mb_delete_source_binaries(&memory);
+    mb_cleanup_memory(&memory);
+    mb_cleanup_aligned(&aligned);
+
+    return ret;
 }
