@@ -1236,14 +1236,16 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index)
     return 0;
 }
 
-int mb_remove_section(struct banked_memory *memory, char *section_name)
+int mb_find_section(struct banked_memory *memory, char *section_name, struct memory_bank **mb_r, int *secnum_r)
 {
-    // remove a particular section from the bank enumeration
+    // find the given section, return in mb_r & secnum_r
+    // return of 0 indicates section not found
 
-    // first find out which memory bank the section belongs to
     int    i;
     char  *p;
     struct memory_bank *mb = &memory->mainbank;
+
+    // first find out which memory bank the section belongs to
 
     for (i = 0; i < memory->num; ++i)
     {
@@ -1262,30 +1264,56 @@ int mb_remove_section(struct banked_memory *memory, char *section_name)
         }
     }
 
-    // remove the section from the memory bank
+    // memory bank to search is in mb
+    // look for the specific section
 
     for (i = 0; i < mb->num; ++i)
     {
         if (strcmp(mb->secbin[i].section_name, section_name) == 0)
         {
             // section has been found
-            // free allocated memory, remove it from the section array
 
-            free(mb->secbin[i].filename);
-            free(mb->secbin[i].section_name);
-
-            memcpy(&mb->secbin[i], &mb->secbin[i + 1], (mb->num - i - 1) * sizeof(*mb->secbin));
-
-            if (--mb->num > 0)
-                mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
-            else
-            {
-                free(mb->secbin);
-                mb->secbin = NULL;
-            }
+            *mb_r = mb;
+            *secnum_r = i;
 
             return 1;
         }
+    }
+
+    // section not found
+
+    *mb_r = NULL;
+    *secnum_r = -1;
+
+    return 0;
+}
+
+int mb_remove_section(struct banked_memory *memory, char *section_name)
+{
+    // remove a particular section from the bank enumeration
+
+    int    secnum;
+    struct memory_bank *mb = &memory->mainbank;
+
+    if (mb_find_section(memory, section_name, &mb, &secnum))
+    {
+        // section has been found
+        // free allocated memory, remove it from the section array
+
+        free(mb->secbin[secnum].filename);
+        free(mb->secbin[secnum].section_name);
+
+        memcpy(&mb->secbin[secnum], &mb->secbin[secnum + 1], (mb->num - secnum - 1) * sizeof(*mb->secbin));
+
+        if (--mb->num > 0)
+            mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
+        else
+        {
+            free(mb->secbin);
+            mb->secbin = NULL;
+        }
+
+        return 1;
     }
 
     return 0;
