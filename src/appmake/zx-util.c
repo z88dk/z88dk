@@ -139,9 +139,6 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
     unsigned char * loader;
     int		loader_len;
 
-    if (zxc->binname == NULL || (!zxt->dumb && (zxc->crtfile == NULL && zxc->origin == -1)))
-        return -1;
-
     loader = turbo_loader;
     loader_len = sizeof(turbo_loader);
 
@@ -698,21 +695,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 int zx_dot_command(struct zx_common *zxc)
 {
     FILE *fin, *fout;
-    char crtname[FILENAMELEN];
     char outname[FILENAMELEN];
     char outnamex[FILENAMELEN];
     int  fnamex;
     int c;
-
-    if (zxc->binname == NULL) return -1;
-
-    if (zxc->crtfile == NULL)
-    {
-        strcpy(crtname, zxc->binname);
-        suffix_change(crtname, "");
-    }
-    else
-        strcpy(crtname, zxc->crtfile);
 
     // determine output filename
 
@@ -731,7 +717,7 @@ int zx_dot_command(struct zx_common *zxc)
 
     // create main binary
 
-    if ((fin = fopen_bin(zxc->binname, crtname)) == NULL)
+    if ((fin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL)
         exit_log(1, "Can't open input file %s\n", zxc->binname);
 
     if ((fout = fopen(outname, "wb")) == NULL)
@@ -827,43 +813,25 @@ enum
 uint8_t sna_state[31];
 uint8_t mem128[49152 + 16384 * 8];
 
-int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
+int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memory, int is_zxn)
 {
-    struct banked_memory memory;
-    struct aligned_data aligned;
     FILE *fin, *fout;
-    char crtname[FILENAME_MAX + 1];
     char filename[FILENAME_MAX + 1];
     int i, j;
     int is_128 = 0;
 
-    if (zxc->binname == NULL) return -1;
-
-    if (zxc->crtfile == NULL)
-    {
-        strcpy(crtname, zxc->binname);
-        suffix_change(crtname, "");
-    }
-    else
-        strcpy(crtname, zxc->crtfile);
-
     // find code origin
 
-    if ((zxc->origin == -1) && ((zxc->origin = get_org_addr(crtname)) == -1))
+    if ((zxc->origin == -1) && ((zxc->origin = get_org_addr(zxc->crtfile)) == -1))
         exit_log(1, "Error: ORG address cannot be determined\n");
 
     if ((zxc->origin < 0) || (zxc->origin > 0xffff))
         exit_log(1, "Error: ORG address %d not in range\n", zxc->origin);
 
-    // rom model warning
-
-    if (parameter_search(crtname, ".map", "__crt_model") > 0)
-        fprintf(stderr, "Warning: the DATA binary should be manually attached to CODE for rom model compiles\n");
-
     // determine stack location
 
     if (zxs->stackloc == -1)
-        zxs->stackloc = parameter_search(crtname, ".map", "__register_sp");
+        zxs->stackloc = parameter_search(zxc->crtfile, ".map", "__register_sp");
 
     if (abs(zxs->stackloc) > 0xffff)
         exit_log(1, "Error: Stack pointer %d out of range\n", zxs->stackloc);
@@ -871,89 +839,29 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
     // determine initial ei/di state
 
     if (zxs->intstate == -1)
-        zxs->intstate = parameter_search(crtname, ".map", "__crt_enable_eidi");
+        zxs->intstate = parameter_search(zxc->crtfile, ".map", "__crt_enable_eidi");
 
     zxs->intstate = (zxs->intstate == -1) ? 0xff : ((zxs->intstate & 0x01) ? 0 : 0xff);
 
-    // load up the memory banks
+    // exclude divmmc memory
 
-    memset(&memory, 0, sizeof(memory));
-    mb_create_bankspace(&memory, "BANK");
-    memset(&aligned, 0, sizeof(aligned));
-
-    snprintf(filename, sizeof(filename) - 4, "%s", crtname);
-    suffix_change(filename, ".map");
-
-    if ((fin = fopen(filename, "r")) == NULL)
-        exit_log(1, "Error: Cannot open map file %s\n", filename);
-
-    mb_enumerate_banks(fin, zxc->binname, &memory, &aligned);
-
-    fclose(fin);
+    mb_remove_bankspace(memory, "DIV");
 
     // exclude memory banks 8+
 
     for (i = 8; i < MAXBANKS; ++i)
-        if (mb_remove_bank(&memory.bankspace[0], i))
+        if (mb_remove_bank(&memory->bankspace[0], i))
             printf("Excluding BANK %03d from sna\n", i);
 
-    // exclude unwanted sections
-
-    if (zxc->excluded_sections != NULL)
-    {
-        char *s;
-
-        printf("Excluding sections from output\n");
-        for (s = strtok(zxc->excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
-        {
-            if (mb_remove_section(&memory, s))
-                printf("..removed section %s\n", s);
-            else
-                printf("..section %s not found\n", s);
-        }
-    }
-
-    // zx next target collapses banks to 16k
-
-//    if (is_zxn && zxn_collapse_banks(&memory.bankspace[0]))
-//        exit_log(1, "Aborting... errors in one or more banks\n");
-
     // merge banks 5,2,0 into the main binary
-    // check that banks are limited to 16k
 
     for (i = 0; i < 8; ++i)
     {
-        struct memory_bank *mb = &memory.bankspace[0].membank[i];
+        struct memory_bank *mb = &memory->bankspace[0].membank[i];
 
         if (mb->num > 0)
         {
-            // zxn target has already had banks checked
-
-            if (!is_zxn)
-            {
-                int errors = 0;
-
-                for (j = 0; j < mb->num; ++j)
-                {
-                    if ((mb->secbin[j].org < 0xc000) || ((mb->secbin[j].org + mb->secbin[j].size) > 0x10000))
-                    {
-                        errors++;
-                        fprintf(stderr, "Error: Section %s is not confined to 16k [0x%04x,0x%04x]\n", mb->secbin[j].section_name, mb->secbin[j].org, mb->secbin[j].org + mb->secbin[j].size - 1);
-                    }
-
-                    // adjust org of banks 5,2,0 for merge step
-                    // all will have org address offset from 0x0
-
-                    if ((i == 0) || (i == 2) || (i == 5))
-                        mb->secbin[j].org -= 0xc000;
-                }
-
-                if (errors)
-                    exit_log(1, "Aborting... errors in one or more banks\n");
-            }
-
             // merge banks 5,2,0 into main bank
-            // sections in these banks have org offset from 0x0
 
             if ((i == 0) || (i == 2) || (i == 5))
             {
@@ -962,18 +870,18 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
                 for (j = 0; j < mb->num; ++j)
                 {
                     if (i == 0)
-                        mb->secbin[j].org += 0xc000;
+                        mb->secbin[j].org += 0xc000 - (is_zxn ? 0 : 0xc000);
                     else if (i == 2)
-                        mb->secbin[j].org += 0x8000;
+                        mb->secbin[j].org += 0x8000 - (is_zxn ? 0 : 0xc000);
                     else
-                        mb->secbin[j].org += 0x4000;
+                        mb->secbin[j].org += 0x4000 - (is_zxn ? 0 : 0xc000);
                 }
 
                 // move sections to main bank
 
-                memory.mainbank.secbin = must_realloc(memory.mainbank.secbin, (memory.mainbank.num + mb->num) * sizeof(*memory.mainbank.secbin));
-                memcpy(&memory.mainbank.secbin[memory.mainbank.num], mb->secbin, mb->num * sizeof(*memory.mainbank.secbin));
-                memory.mainbank.num += mb->num;
+                memory->mainbank.secbin = must_realloc(memory->mainbank.secbin, (memory->mainbank.num + mb->num) * sizeof(*memory->mainbank.secbin));
+                memcpy(&memory->mainbank.secbin[memory->mainbank.num], mb->secbin, mb->num * sizeof(*memory->mainbank.secbin));
+                memory->mainbank.num += mb->num;
 
                 free(mb->secbin);
 
@@ -987,14 +895,9 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
         }
     }
 
-    // check for section alignment errors
-    // but treat them like warnings
-
-    mb_check_alignment(&aligned);
-
     // check for section overlaps
 
-    if (mb_sort_banks(&memory))
+    if (mb_sort_banks(memory))
         exit_log(1, "Aborting... errors in one or more binaries\n");
 
     // prime snapshot memory contents
@@ -1015,14 +918,16 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
 
     fclose(fin);
 
+    // clear screen
+
     memset(mem128, 0, 6144);
     memset(mem128 + 6144, 0x38, 768);
 
     // write main bank into memory image
 
-    for (i = 0; i < memory.mainbank.num; ++i)
+    for (i = 0; i < memory->mainbank.num; ++i)
     {
-        struct section_bin *sb = &memory.mainbank.secbin[i];
+        struct section_bin *sb = &memory->mainbank.secbin[i];
 
         if (sb->org < 0x4000)
             exit_log(1, "Error: Section %s has org in rom %0x04x\n", sb->section_name, sb->org);
@@ -1045,9 +950,9 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
     {
         for (i = 0; i < 8; ++i)
         {
-            for (j = 0; j < memory.bankspace[0].membank[i].num; ++j)
+            for (j = 0; j < memory->bankspace[0].membank[i].num; ++j)
             {
-                struct section_bin *sb = &memory.bankspace[0].membank[i].secbin[j];
+                struct section_bin *sb = &memory->bankspace[0].membank[i].secbin[j];
 
                 if ((fin = fopen(sb->filename, "rb")) == NULL)
                     exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
@@ -1070,7 +975,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
         if (zxs->stackloc > -0x4000)
             zxs->stackloc = -1;
         else
-            zxs->stackloc = mem128[abs(zxs->stackloc) - 0x4000] + 256 * mem128[abs(zxs->stackloc) - 0x4000 + 1];
+            zxs->stackloc = mem128[abs(zxs->stackloc) - 0x4000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) & 0xbfff];
     }
 
     if (zxs->stackloc < 0)
@@ -1079,8 +984,8 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
     if (!is_128)
     {
         zxs->stackloc = (zxs->stackloc - 2) & 0xffff;
-        mem128[zxs->stackloc - 0x4000] = zxc->origin & 0xff;
-        mem128[zxs->stackloc - 0x4000 + 1] = zxc->origin / 256;
+        mem128[(zxs->stackloc - 0x4000) & 0xbfff] = zxc->origin & 0xff;
+        mem128[(zxs->stackloc - 0x4000 + 1) & 0xbfff] = zxc->origin / 256;
     }
 
     sna_state[SNA_REG_SP] = zxs->stackloc & 0xff;
@@ -1127,12 +1032,6 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn)
     }
 
     fclose(fout);
-
-    // clean up
-
-    if (zxc->clean) mb_delete_source_binaries(&memory);
-    mb_cleanup_memory(&memory);
-    mb_cleanup_aligned(&aligned);
 
     return 0;
 }

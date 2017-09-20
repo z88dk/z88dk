@@ -40,7 +40,7 @@ struct zx_sna
 
 extern int zx_tape(struct zx_common *zxc, struct zx_tape *zxt);
 extern int zx_dot_command(struct zx_common *zxc);
-extern int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, int is_zxn);
+extern int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memory, int is_zxn);
 
 
 #endif
