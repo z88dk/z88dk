@@ -87,7 +87,7 @@ extern void __LIB__ apu_reset(void *int_addr) __smallc;
 
 
 extern void __LIB__ apu_cmd_ld(void *op_addr,uint8_t command) __smallc;
-extern void __LIB__ __CALLEE__ apu_cmd_ld_callee(void *op_addr,uint8_t command) __smallc;
+extern void __LIB__ apu_cmd_ld_callee(void *op_addr,uint8_t command) __smallc __z88dk_callee;
 #define apu_cmd_ld(a,b) apu_cmd_ld_callee(a,b)
 
 

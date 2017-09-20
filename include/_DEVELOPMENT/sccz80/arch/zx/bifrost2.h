@@ -93,7 +93,7 @@ extern void __LIB__ BIFROST2_stop(void) __smallc;
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROST2_setTile(unsigned char px,unsigned char py,unsigned char tile) __smallc;
-extern void __LIB__ __CALLEE__ BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __smallc;
+extern void __LIB__ BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __smallc __z88dk_callee;
 #define BIFROST2_setTile(a,b,c) BIFROST2_setTile_callee(a,b,c)
 
 
@@ -114,7 +114,7 @@ extern void __LIB__ __CALLEE__ BIFROST2_setTile_callee(unsigned char px,unsigned
 // ----------------------------------------------------------------
 
 extern unsigned char __LIB__ BIFROST2_getTile(unsigned char px,unsigned char py) __smallc;
-extern unsigned char __LIB__ __CALLEE__ BIFROST2_getTile_callee(unsigned char px,unsigned char py) __smallc;
+extern unsigned char __LIB__ BIFROST2_getTile_callee(unsigned char px,unsigned char py) __smallc __z88dk_callee;
 #define BIFROST2_getTile(a,b) BIFROST2_getTile_callee(a,b)
 
 
@@ -131,7 +131,7 @@ extern unsigned char __LIB__ __CALLEE__ BIFROST2_getTile_callee(unsigned char px
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ __FASTCALL__ BIFROST2_getAnimGroup(unsigned char tile) __smallc;
+extern unsigned char __LIB__ BIFROST2_getAnimGroup(unsigned char tile) __smallc __z88dk_fastcall;
 
 
 
@@ -148,7 +148,7 @@ extern unsigned char __LIB__ __FASTCALL__ BIFROST2_getAnimGroup(unsigned char ti
 // ----------------------------------------------------------------
 
 extern unsigned char __LIB__ *BIFROST2_findAttrH(unsigned char lin,unsigned char col) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *BIFROST2_findAttrH_callee(unsigned char lin,unsigned char col) __smallc;
+extern unsigned char __LIB__ *BIFROST2_findAttrH_callee(unsigned char lin,unsigned char col) __smallc __z88dk_callee;
 #define BIFROST2_findAttrH(a,b) BIFROST2_findAttrH_callee(a,b)
 
 
@@ -212,7 +212,7 @@ extern void __LIB__ BIFROST2_resetAnim4Frames(void) __smallc;
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROST2_drawTileH(unsigned char lin,unsigned char col,unsigned char tile) __smallc;
-extern void __LIB__ __CALLEE__ BIFROST2_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile) __smallc;
+extern void __LIB__ BIFROST2_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile) __smallc __z88dk_callee;
 #define BIFROST2_drawTileH(a,b,c) BIFROST2_drawTileH_callee(a,b,c)
 
 
@@ -230,7 +230,7 @@ extern void __LIB__ __CALLEE__ BIFROST2_drawTileH_callee(unsigned char lin,unsig
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROST2_showTilePosH(unsigned char lin,unsigned char col) __smallc;
-extern void __LIB__ __CALLEE__ BIFROST2_showTilePosH_callee(unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ BIFROST2_showTilePosH_callee(unsigned char lin,unsigned char col) __smallc __z88dk_callee;
 #define BIFROST2_showTilePosH(a,b) BIFROST2_showTilePosH_callee(a,b)
 
 
@@ -276,7 +276,7 @@ extern void __LIB__ BIFROST2_showNext2Tiles(void) __smallc;
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROST2_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
-extern void __LIB__ __CALLEE__ BIFROST2_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
+extern void __LIB__ BIFROST2_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr) __smallc __z88dk_callee;
 #define BIFROST2_fillTileAttrH(a,b,c) BIFROST2_fillTileAttrH_callee(a,b,c)
 
 

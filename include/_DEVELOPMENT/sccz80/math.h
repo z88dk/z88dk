@@ -101,251 +101,251 @@
 
 #endif
 
-extern double_t __LIB__ __FASTCALL__ acos(double_t x) __smallc;
+extern double_t __LIB__ acos(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ asin(double_t x) __smallc;
+extern double_t __LIB__ asin(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ atan(double_t x) __smallc;
+extern double_t __LIB__ atan(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ atan2(double_t y,double_t x) __smallc;
-extern double_t __LIB__ __CALLEE__ atan2_callee(double_t y,double_t x) __smallc;
+extern double_t __LIB__ atan2_callee(double_t y,double_t x) __smallc __z88dk_callee;
 #define atan2(a,b) atan2_callee(a,b)
 
 
 
-extern double_t __LIB__ __FASTCALL__ cos(double_t x) __smallc;
+extern double_t __LIB__ cos(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ sin(double_t x) __smallc;
+extern double_t __LIB__ sin(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ tan(double_t x) __smallc;
-
-
-
-extern double_t __LIB__ __FASTCALL__ acosh(double_t x) __smallc;
-
-
-extern double_t __LIB__ __FASTCALL__ asinh(double_t x) __smallc;
-
-
-extern double_t __LIB__ __FASTCALL__ atanh(double_t x) __smallc;
+extern double_t __LIB__ tan(double_t x) __smallc __z88dk_fastcall;
 
 
 
-extern double_t __LIB__ __FASTCALL__ cosh(double_t x) __smallc;
+extern double_t __LIB__ acosh(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ sinh(double_t x) __smallc;
+extern double_t __LIB__ asinh(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ tanh(double_t x) __smallc;
+extern double_t __LIB__ atanh(double_t x) __smallc __z88dk_fastcall;
 
 
 
-extern double_t __LIB__ __FASTCALL__ exp(double_t x) __smallc;
+extern double_t __LIB__ cosh(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ exp2(double_t x) __smallc;
+extern double_t __LIB__ sinh(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ expm1(double_t x) __smallc;
+extern double_t __LIB__ tanh(double_t x) __smallc __z88dk_fastcall;
+
+
+
+extern double_t __LIB__ exp(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ exp2(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ expm1(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ frexp(double_t value,int *exp) __smallc;
-extern double_t __LIB__ __CALLEE__ frexp_callee(double_t value,int *exp) __smallc;
+extern double_t __LIB__ frexp_callee(double_t value,int *exp) __smallc __z88dk_callee;
 #define frexp(a,b) frexp_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ ilogb(double_t x) __smallc;
+extern int __LIB__ ilogb(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ ldexp(double_t x,int exp) __smallc;
-extern double_t __LIB__ __CALLEE__ ldexp_callee(double_t x,int exp) __smallc;
+extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
 
 
 
-extern double_t __LIB__ __FASTCALL__ log(double_t x) __smallc;
+extern double_t __LIB__ log(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ log10(double_t x) __smallc;
+extern double_t __LIB__ log10(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ log1p(double_t x) __smallc;
+extern double_t __LIB__ log1p(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ log2(double_t x) __smallc;
+extern double_t __LIB__ log2(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ logb(double_t x) __smallc;
+extern double_t __LIB__ logb(double_t x) __smallc __z88dk_fastcall;
 
 
 
 extern double_t __LIB__ scalbn(double_t x,int n) __smallc;
-extern double_t __LIB__ __CALLEE__ scalbn_callee(double_t x,int n) __smallc;
+extern double_t __LIB__ scalbn_callee(double_t x,int n) __smallc __z88dk_callee;
 #define scalbn(a,b) scalbn_callee(a,b)
 
 
 extern double_t __LIB__ scalbln(double_t x,int n) __smallc;
-extern double_t __LIB__ __CALLEE__ scalbln_callee(double_t x,int n) __smallc;
+extern double_t __LIB__ scalbln_callee(double_t x,int n) __smallc __z88dk_callee;
 #define scalbln(a,b) scalbln_callee(a,b)
 
 
 
-extern double_t __LIB__ __FASTCALL__ fabs(double_t x) __smallc;
+extern double_t __LIB__ fabs(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ hypot(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ hypot_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define hypot(a,b) hypot_callee(a,b)
 
 
 
 extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ pow_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
 
 
-extern double_t __LIB__ __FASTCALL__ sqrt(double_t x) __smallc;
+extern double_t __LIB__ sqrt(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ cbrt(double_t x) __smallc;
-
-
-
-extern double_t __LIB__ __FASTCALL__ erf(double_t x) __smallc;
-
-
-extern double_t __LIB__ __FASTCALL__ erfc(double_t x) __smallc;
-
-
-extern double_t __LIB__ __FASTCALL__ lgamma(double_t x) __smallc;
-
-
-extern double_t __LIB__ __FASTCALL__ tgamma(double_t x) __smallc;
+extern double_t __LIB__ cbrt(double_t x) __smallc __z88dk_fastcall;
 
 
 
-extern double_t __LIB__ __FASTCALL__ ceil(double_t x) __smallc;
+extern double_t __LIB__ erf(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ floor(double_t x) __smallc;
+extern double_t __LIB__ erfc(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ nearbyint(double_t x) __smallc;
+extern double_t __LIB__ lgamma(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ rint(double_t x) __smallc;
+extern double_t __LIB__ tgamma(double_t x) __smallc __z88dk_fastcall;
 
 
-extern long __LIB__ __FASTCALL__ lrint(double_t x) __smallc;
+
+extern double_t __LIB__ ceil(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ round(double_t x) __smallc;
+extern double_t __LIB__ floor(double_t x) __smallc __z88dk_fastcall;
 
 
-extern long __LIB__ __FASTCALL__ lround(double_t x) __smallc;
+extern double_t __LIB__ nearbyint(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ __FASTCALL__ trunc(double_t x) __smallc;
+extern double_t __LIB__ rint(double_t x) __smallc __z88dk_fastcall;
+
+
+extern long __LIB__ lrint(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ round(double_t x) __smallc __z88dk_fastcall;
+
+
+extern long __LIB__ lround(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ trunc(double_t x) __smallc __z88dk_fastcall;
 
 
 
 extern double_t __LIB__ modf(double_t value,double_t *iptr) __smallc;
-extern double_t __LIB__ __CALLEE__ modf_callee(double_t value,double_t *iptr) __smallc;
+extern double_t __LIB__ modf_callee(double_t value,double_t *iptr) __smallc __z88dk_callee;
 #define modf(a,b) modf_callee(a,b)
 
 
 extern double_t __LIB__ fmod(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ fmod_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ fmod_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmod(a,b) fmod_callee(a,b)
 
 
 extern double_t __LIB__ remainder(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ remainder_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ remainder_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define remainder(a,b) remainder_callee(a,b)
 
 
 extern double_t __LIB__ remquo(double_t x,double_t y,int *quo) __smallc;
-extern double_t __LIB__ __CALLEE__ remquo_callee(double_t x,double_t y,int *quo) __smallc;
+extern double_t __LIB__ remquo_callee(double_t x,double_t y,int *quo) __smallc __z88dk_callee;
 #define remquo(a,b,c) remquo_callee(a,b,c)
 
 
 
 extern double_t __LIB__ copysign(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ copysign_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ copysign_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define copysign(a,b) copysign_callee(a,b)
 
 
-extern double_t __LIB__ __FASTCALL__ nan(const char *tagp) __smallc;
+extern double_t __LIB__ nan(const char *tagp) __smallc __z88dk_fastcall;
 
 
 
 extern double_t __LIB__ nextafter(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ nextafter_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ nextafter_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define nextafter(a,b) nextafter_callee(a,b)
 
 
 extern double_t __LIB__ nexttoward(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ nexttoward_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ nexttoward_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define nexttoward(a,b) nexttoward_callee(a,b)
 
 
 
 extern double_t __LIB__ fdim(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ fdim_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ fdim_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fdim(a,b) fdim_callee(a,b)
 
 
 
 extern double_t __LIB__ fmax(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ fmax_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ fmax_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmax(a,b) fmax_callee(a,b)
 
 
 extern double_t __LIB__ fmin(double_t x,double_t y) __smallc;
-extern double_t __LIB__ __CALLEE__ fmin_callee(double_t x,double_t y) __smallc;
+extern double_t __LIB__ fmin_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define fmin(a,b) fmin_callee(a,b)
 
 
 
 extern double_t __LIB__ fma(double_t x,double_t y,double_t z) __smallc;
-extern double_t __LIB__ __CALLEE__ fma_callee(double_t x,double_t y,double_t z) __smallc;
+extern double_t __LIB__ fma_callee(double_t x,double_t y,double_t z) __smallc __z88dk_callee;
 #define fma(a,b,c) fma_callee(a,b,c)
 
 
 
 extern int __LIB__ isgreater(double_t x,double_t y) __smallc;
-extern int __LIB__ __CALLEE__ isgreater_callee(double_t x,double_t y) __smallc;
+extern int __LIB__ isgreater_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define isgreater(a,b) isgreater_callee(a,b)
 
 
 extern int __LIB__ isgreaterequal(double_t x,double_t y) __smallc;
-extern int __LIB__ __CALLEE__ isgreaterequal_callee(double_t x,double_t y) __smallc;
+extern int __LIB__ isgreaterequal_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define isgreaterequal(a,b) isgreaterequal_callee(a,b)
 
 
 extern int __LIB__ isless(double_t x,double_t y) __smallc;
-extern int __LIB__ __CALLEE__ isless_callee(double_t x,double_t y) __smallc;
+extern int __LIB__ isless_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define isless(a,b) isless_callee(a,b)
 
 
 extern int __LIB__ islessequal(double_t x,double_t y) __smallc;
-extern int __LIB__ __CALLEE__ islessequal_callee(double_t x,double_t y) __smallc;
+extern int __LIB__ islessequal_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define islessequal(a,b) islessequal_callee(a,b)
 
 
 extern int __LIB__ islessgreater(double_t x,double_t y) __smallc;
-extern int __LIB__ __CALLEE__ islessgreater_callee(double_t x,double_t y) __smallc;
+extern int __LIB__ islessgreater_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define islessgreater(a,b) islessgreater_callee(a,b)
 
 
 extern int __LIB__ isunordered(double_t x,double_t y) __smallc;
-extern int __LIB__ __CALLEE__ isunordered_callee(double_t x,double_t y) __smallc;
+extern int __LIB__ isunordered_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define isunordered(a,b) isunordered_callee(a,b)
 
 
