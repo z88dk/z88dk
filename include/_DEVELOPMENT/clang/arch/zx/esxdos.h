@@ -138,7 +138,7 @@ extern unsigned char errno_from_esxdos(unsigned char esxdos_error);
 
 // Raw Disk IO on Specific Device
 
-extern int esxdos_disk_info(unsigned char device,struct esx_device *ed);
+extern int esxdos_disk_info(unsigned char device,struct esxdos_device *ed);
 
 
 extern int esxdos_disk_read(unsigned char device,uint32_t position,void *dst);
@@ -173,7 +173,7 @@ extern unsigned char esxdos_f_opendir(void *pathname);
 extern unsigned char esxdos_f_opendir_p3(void *pathname);
 
 
-extern unsigned char esxdos_f_readdir(unsigned char handle,struct esx_dirent *dirent);
+extern unsigned char esxdos_f_readdir(unsigned char handle,struct esxdos_dirent *dirent);
 
 
 
@@ -194,7 +194,7 @@ extern int esxdos_f_unlink(void *filename);
 extern unsigned char esxdos_f_open(void *filename,unsigned char mode);
 
 
-extern unsigned char esxdos_f_open_p3(void *filename,unsigned char mode,struct esx_p3_hdr *h);
+extern unsigned char esxdos_f_open_p3(void *filename,unsigned char mode,struct esxdos_p3_hdr *h);
 
 
 extern int esxdos_f_close(unsigned char handle);
@@ -204,7 +204,7 @@ extern int esxdos_f_close(unsigned char handle);
 extern int esxdos_f_sync(unsigned char handle);
 
 
-extern int esxdos_f_fstat(unsigned char handle,struct esx_stat *es);
+extern int esxdos_f_fstat(unsigned char handle,struct esxdos_stat *es);
 
 
 extern uint32_t esxdos_f_fgetpos(unsigned char handle);

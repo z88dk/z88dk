@@ -140,8 +140,8 @@ extern unsigned char errno_from_esxdos_fastcall(unsigned char esxdos_error) __pr
 
 // Raw Disk IO on Specific Device
 
-extern int esxdos_disk_info(unsigned char device,struct esx_device *ed);
-extern int esxdos_disk_info_callee(unsigned char device,struct esx_device *ed) __z88dk_callee;
+extern int esxdos_disk_info(unsigned char device,struct esxdos_device *ed);
+extern int esxdos_disk_info_callee(unsigned char device,struct esxdos_device *ed) __z88dk_callee;
 #define esxdos_disk_info(a,b) esxdos_disk_info_callee(a,b)
 
 
@@ -184,8 +184,8 @@ extern unsigned char esxdos_f_opendir_p3_fastcall(void *pathname) __z88dk_fastca
 #define esxdos_f_opendir_p3(a) esxdos_f_opendir_p3_fastcall(a)
 
 
-extern unsigned char esxdos_f_readdir(unsigned char handle,struct esx_dirent *dirent);
-extern unsigned char esxdos_f_readdir_callee(unsigned char handle,struct esx_dirent *dirent) __z88dk_callee;
+extern unsigned char esxdos_f_readdir(unsigned char handle,struct esxdos_dirent *dirent);
+extern unsigned char esxdos_f_readdir_callee(unsigned char handle,struct esxdos_dirent *dirent) __z88dk_callee;
 #define esxdos_f_readdir(a,b) esxdos_f_readdir_callee(a,b)
 
 
@@ -215,8 +215,8 @@ extern unsigned char esxdos_f_open_callee(void *filename,unsigned char mode) __z
 #define esxdos_f_open(a,b) esxdos_f_open_callee(a,b)
 
 
-extern unsigned char esxdos_f_open_p3(void *filename,unsigned char mode,struct esx_p3_hdr *h);
-extern unsigned char esxdos_f_open_p3_callee(void *filename,unsigned char mode,struct esx_p3_hdr *h) __z88dk_callee;
+extern unsigned char esxdos_f_open_p3(void *filename,unsigned char mode,struct esxdos_p3_hdr *h);
+extern unsigned char esxdos_f_open_p3_callee(void *filename,unsigned char mode,struct esxdos_p3_hdr *h) __z88dk_callee;
 #define esxdos_f_open_p3(a,b,c) esxdos_f_open_p3_callee(a,b,c)
 
 
@@ -231,8 +231,8 @@ extern int esxdos_f_sync_fastcall(unsigned char handle) __z88dk_fastcall;
 #define esxdos_f_sync(a) esxdos_f_sync_fastcall(a)
 
 
-extern int esxdos_f_fstat(unsigned char handle,struct esx_stat *es);
-extern int esxdos_f_fstat_callee(unsigned char handle,struct esx_stat *es) __z88dk_callee;
+extern int esxdos_f_fstat(unsigned char handle,struct esxdos_stat *es);
+extern int esxdos_f_fstat_callee(unsigned char handle,struct esxdos_stat *es) __z88dk_callee;
 #define esxdos_f_fstat(a,b) esxdos_f_fstat_callee(a,b)
 
 
