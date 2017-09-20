@@ -17,6 +17,7 @@ static char              help = 0;
 static char             *binname = NULL;
 static char             *crtfile = NULL;
 static char             *banked_space = "BANK";
+static char             *excluded_banks = NULL;
 static char             *excluded_sections = NULL;
 static int               romfill = 255;
 static char              ihex = 0;
@@ -31,7 +32,8 @@ option_t glue_options[] = {
     { 'b', "binfile",   "Basename of binary output files",         OPT_STR,   &binname },
     { 'c', "crt0file",  "Basename of map file (default=binfile)",  OPT_STR,   &crtfile },
     {  0 , "bankspace", "Create custom named memory banks",        OPT_STR,   &banked_space },
-    {  0 , "exclude",   "Exclude section names from output",       OPT_STR,   &excluded_sections },
+    {  0,  "exclude-banks", "Exclude memory banks from output",    OPT_STR,   &excluded_banks },
+    {  0 , "exclude-sections", "Exclude section names from output", OPT_STR,  &excluded_sections },
     { 'f', "filler",    "Filler byte (default: 0xFF)",             OPT_INT,   &romfill },
     {  0,  "ihex",      "Generate an iHEX file",                   OPT_BOOL,  &ihex },
     { 'p', "pad",       "Pad iHEX file",                           OPT_BOOL,  &ipad },
@@ -52,6 +54,7 @@ int glue_exec(char *target)
     struct banked_memory memory;
     struct aligned_data aligned;
     char filename[LINELEN];
+    char crtname[LINELEN];
     char ihexname[LINELEN];
     int  i,j;
     FILE *fmap, *fbin, *fhex;
@@ -60,8 +63,19 @@ int glue_exec(char *target)
 
     if (help) return -1;
 
-    if (crtfile == NULL) crtfile = binname;
     if (binname == NULL) return -1;
+
+    if (crtfile == NULL)
+    {
+        snprintf(crtname, sizeof(crtname) - 4, "%s", binname);
+        suffix_change(crtname, "");
+        crtfile = crtname;
+    }
+
+    // warning about rom model compiles as this isn't solved yet
+
+    if (parameter_search(crtfile, ".map", "__crt_model") > 0)
+        fprintf(stderr, "Warning: the DATA binary should be manually attached to CODE for rom model compiles\n");
 
     // initialize banked memory representation
 
@@ -74,7 +88,7 @@ int glue_exec(char *target)
 
     memset(&aligned, 0, sizeof(aligned));
 
-    // open map file
+    // enumerate memory banks in map file
 
     snprintf(filename, sizeof(filename) - 4, "%s", crtfile);
     suffix_change(filename, ".map");
@@ -82,13 +96,29 @@ int glue_exec(char *target)
     if ((fmap = fopen(filename, "r")) == NULL)
         exit_log(1, "Error: Cannot open map file %s\n", filename);
 
-    // enumerate memory banks in map file
-
     mb_enumerate_banks(fmap, binname, &memory, &aligned);
 
-    // close map file
-
     fclose(fmap);
+
+    // exclude unwanted banks
+
+    if (excluded_banks != NULL)
+    {
+        printf("Excluding banks from output\n");
+        for (s = strtok(excluded_banks, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
+        {
+            switch (mb_user_remove_bank(&memory, s))
+            {
+                case 1:
+                    printf("..removed bank space %s\n", s);
+                    break;
+                case 2:
+                    printf("..removed bank %s\n", s);
+                default:
+                    break;
+            }
+        }
+    }
 
     // exclude unwanted sections
 
