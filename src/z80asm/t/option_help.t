@@ -52,7 +52,6 @@ Code Generation Options:
   --cpu=r3k              Assemble for the Rabbit 3000
   --ti83plus             Interpret 'Invoke' as RST 28h
   --IXIY                 Swap IX and IY registers
-  -C, --line-mode        Enable LINE directive
   --debug                Add debug info to map file
 
 Environment:

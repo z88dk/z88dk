@@ -45,7 +45,7 @@ void asm_cond_LABEL(Str *label)
 		str_len(label) = 0;
 	}
 
-	if (opts.debug_info) {
+	if (opts.debug_info && !scr_is_c_source()) {
 		STR_DEFINE(name, STR_SIZE);
 
 		str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
@@ -146,17 +146,36 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_nr)
+void asm_LINE(int line_nr, char *filename)
 {
 	STR_DEFINE(name, STR_SIZE);
 
-	if (opts.line_mode)
-		set_error_line(line_nr);
-
-	str_sprintf(name, "__C_LINE_%ld", line_nr);
-	asm_LABEL(str_data(name));
+	src_set_filename(filename);
+	src_set_line_nr(line_nr, 1);
+	set_error_file(filename);
+	set_error_line(line_nr);
 
 	STR_DELETE(name);
+}
+
+void asm_C_LINE(int line_nr, char *filename)
+{
+	src_set_filename(filename);
+	src_set_line_nr(line_nr, 0);		// do not increment line numbers
+	src_set_c_source();
+	
+	set_error_file(filename);
+	set_error_line(line_nr);
+	
+	if (opts.debug_info) {
+		STR_DEFINE(name, STR_SIZE);
+
+		str_sprintf(name, "__C_LINE_%ld", line_nr);
+		if (!find_local_symbol(str_data(name)))
+			asm_LABEL(str_data(name));
+
+		STR_DELETE(name);
+	}
 }
 
 void asm_ORG(int address)

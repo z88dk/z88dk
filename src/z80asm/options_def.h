@@ -23,7 +23,6 @@ OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
 OPT_VAR( Bool,		map,		FALSE	)
 OPT_VAR( Bool,		ti83plus,	FALSE	)
 OPT_VAR( Bool,		swap_ix_iy,	FALSE	)
-OPT_VAR( Bool,		line_mode,	FALSE	)
 OPT_VAR( Bool,      debug_info, FALSE   )	/* add debug info to map file */
 OPT_VAR( Bool,		globaldef,	FALSE	)
 OPT_VAR( Bool,		make_bin,	FALSE	)
@@ -76,7 +75,6 @@ OPT(OptCall, option_cpu_r2k, "", "--cpu=r2k", "Assemble for the Rabbit 2000", ""
 OPT(OptCall, option_cpu_r3k, "", "--cpu=r3k", "Assemble for the Rabbit 3000", "")
 OPT(OptSet, &opts.ti83plus, "", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
 OPT(OptSet, &opts.swap_ix_iy, "", "--IXIY", "Swap IX and IY registers", "")
-OPT(OptSet, &opts.line_mode, "-C", "--line-mode", "Enable LINE directive", "")
 OPT(OptCall, option_debug_info, "", "--debug", "Add debug info to map file", "")
 
 OPT_TITLE("Environment:")

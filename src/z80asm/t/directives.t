@@ -2,7 +2,6 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
@@ -577,46 +576,6 @@ END
 	options => "-b",
 );
 ok ! -f "test.lis", "test.lis does not exist";
-
-#------------------------------------------------------------------------------
-# LINE, -C, --line-mode
-#------------------------------------------------------------------------------
-z80asm(
-	asm		=> "line 10 \n ld",
-	error	=> "Error at file 'test.asm' line 2: syntax error",
-);
-
-for my $option (qw( -C --line-mode )) {
-	z80asm(
-		asm		=> "line 10 \n ld",
-		options	=> $option,
-		error	=> "Error at file 'test.asm' line 10: syntax error",
-	);
-}
-
-z80asm(
-	asm		=> <<'END',
-		org 100h
-		line 10
-		ld bc,101h			;; 01 01 01
-		line 20
-		ld de,1111h			;; 11 11 11
-		line 30
-		ld hl,2121h			;; 21 21 21
-END
-);
-z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF09
-  Name: test
-  Names:
-    L A $0000 __C_LINE_10 test.asm:2
-    L A $0003 __C_LINE_20 test.asm:4
-    L A $0006 __C_LINE_30 test.asm:6
-  Code: 9 bytes, ORG at $0100
-    C $0000: 01 01 01 11 11 11 21 21 21
-END
-
 
 #------------------------------------------------------------------------------
 # BINARY

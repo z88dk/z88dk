@@ -270,6 +270,7 @@ tokens:
   - name	: IFNDEF
   - name	: INCLUDE
   - name	: LINE
+  - name	: C_LINE
   - name	: LSTOFF
   - name	: LSTON
   - name	: MODULE
