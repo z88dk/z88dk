@@ -1075,7 +1075,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
 
                         for (i = 0; i < memory->num; ++i)
                         {
-                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) == NULL)
+                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) != NULL)
                             {
                                 int banknum;
 
@@ -1161,6 +1161,53 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
     }
 }
 
+int mb_find_bankspace(struct banked_memory *memory, char *bankspace_name)
+{
+    int i;
+
+    for (i = 0; i < memory->num; ++i)
+        if (strcmp(memory->bankspace[i].bank_id, bankspace_name) == 0)
+            return i;
+
+    return -1;
+}
+
+int mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name)
+{
+    int index;
+
+    if ((index = mb_find_bankspace(memory, bankspace_name)) >= 0)
+    {
+        // found the bank space by name
+
+        int i;
+        struct bank_space *bs = &memory->bankspace[index];
+
+        // delete all memory banks in the bank space
+
+        for (i = 0; i < MAXBANKS; ++i)
+            mb_remove_bank(bs, i);
+
+        free(bs->bank_id);
+
+        // remove the bank space from the memory model
+
+        memcpy(&memory->bankspace[index], &memory->bankspace[index + 1], (memory->num - index - 1) * sizeof(*memory->bankspace));
+
+        if (--memory->num > 0)
+            memory->bankspace = must_realloc(memory->bankspace, memory->num * sizeof(*memory->bankspace));
+        else
+        {
+            free(memory->bankspace);
+            memory->bankspace = NULL;
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
 int mb_remove_bank(struct bank_space *bs, unsigned int index)
 {
     if (index < MAXBANKS)
@@ -1240,6 +1287,46 @@ int mb_remove_section(struct banked_memory *memory, char *section_name)
             return 1;
         }
     }
+
+    return 0;
+}
+
+int mb_user_remove_bank(struct banked_memory *memory, char *bankname)
+{
+    int i;
+    int banknum;
+
+    // first check if a bank space matches the name, if so remove the entire bank space (eg "BANK")
+    // second check if the bank name is composed of a bank space and bank number, if so delete the bank (eg "BANK_5")
+
+    // try to delete a bank space
+
+    if (mb_remove_bankspace(memory, bankname))
+        return 1;
+
+    // try to delete an individual memory bank
+
+    // find bank space that bankname belongs to
+
+    for (i = 0; i < memory->num; ++i)
+    {
+        char *p;
+
+        if ((p = strstr(bankname, memory->bankspace[i].bank_id)) != NULL)
+        {
+            if (sscanf(p + strlen(memory->bankspace[i].bank_id), "_%d", &banknum) == 1)
+            {
+                if ((banknum >= 0) && (banknum < MAXBANKS))
+                    break;
+            }
+        }
+    }
+
+    // memory bank found in
+    // bankspace i, memory bank banknum
+
+    if ((i < memory->num) && mb_remove_bank(&memory->bankspace[i], banknum))
+        return 2;
 
     return 0;
 }
