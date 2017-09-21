@@ -843,16 +843,6 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
     zxs->intstate = (zxs->intstate == -1) ? 0xff : ((zxs->intstate & 0x01) ? 0 : 0xff);
 
-    // exclude divmmc memory
-
-    mb_remove_bankspace(memory, "DIV");
-
-    // exclude memory banks 8+
-
-    for (i = 8; i < MAXBANKS; ++i)
-        if (mb_remove_bank(&memory->bankspace[0], i))
-            printf("Excluding BANK %03d from sna\n", i);
-
     // merge banks 5,2,0 into the main binary
 
     for (i = 0; i < 8; ++i)

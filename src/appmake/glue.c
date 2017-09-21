@@ -55,9 +55,7 @@ int glue_exec(char *target)
     struct aligned_data aligned;
     char filename[LINELEN];
     char crtname[LINELEN];
-    char ihexname[LINELEN];
-    int  i,j;
-    FILE *fmap, *fbin, *fhex;
+    FILE *fmap;
     char *s;
     int error;
 
@@ -146,67 +144,7 @@ int glue_exec(char *target)
 
     // generate output binaries
 
-    if (memory.mainbank.num > 0)
-    {
-        // the main bank contains sections
-
-        snprintf(filename, sizeof(filename), "%s__.bin", binname);
-        strcpy(ihexname, filename);
-        suffix_change(ihexname, ".ihx");
-
-        fbin = fhex = NULL;
-
-        if ((fbin = fopen(filename, "wb+")) == NULL)
-            exit_log(1, "Error: Cannot create file %s\n", filename);
-
-        if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
-            exit_log(1, "Error: Cannot create file %s\n", ihexname);
-
-        printf("Creating %s (org 0x%04x = %d)\n", filename, memory.mainbank.secbin[0].org, memory.mainbank.secbin[0].org);
-
-        error = mb_generate_output_binary(fbin, romfill, fhex, ipad, recsize, &memory.mainbank);
-
-        fclose(fbin);
-        if (fhex != NULL) fclose(fhex);
-
-        if (error)
-            exit_log(1, "Aborting... section unavailable\n");
-    }
-
-    for (j = 0; j < memory.num; ++j)
-    {
-        for (i = 0; i < MAXBANKS; ++i)
-        {
-            struct memory_bank *mb = &memory.bankspace[j].membank[i];
-
-            if (mb->num > 0)
-            {
-                // the memory bank contains sections
-
-                snprintf(filename, sizeof(filename), "%s__%s_%03d.bin", binname, memory.bankspace[j].bank_id, i);
-                strcpy(ihexname, filename);
-                suffix_change(ihexname, ".ihx");
-
-                fbin = fhex = NULL;
-
-                if ((fbin = fopen(filename, "wb+")) == NULL)
-                    exit_log(1, "Error: Cannot create file %s\n", filename);
-
-                if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
-                    exit_log(1, "Error: Cannot create file %s\n", ihexname);
-
-                printf("Creating %s (org 0x%04x = %d)\n", filename, mb->secbin[0].org, mb->secbin[0].org);
-
-                error = mb_generate_output_binary(fbin, romfill, fhex, ipad, recsize, mb);
-
-                fclose(fbin);
-                if (fhex != NULL) fclose(fhex);
-
-                if (error)
-                    exit_log(1, "Aborting... section unavailable\n");
-            }
-        }
-    }
+    mb_generate_output_binary_complete(binname, ihex, romfill, ipad, recsize, &memory);
 
     // clean up
 

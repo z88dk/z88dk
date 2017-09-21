@@ -1186,7 +1186,7 @@ int mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name)
         // delete all memory banks in the bank space
 
         for (i = 0; i < MAXBANKS; ++i)
-            mb_remove_bank(bs, i);
+            mb_remove_bank(bs, i, 0);
 
         free(bs->bank_id);
 
@@ -1208,7 +1208,7 @@ int mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name)
     return 0;
 }
 
-int mb_remove_bank(struct bank_space *bs, unsigned int index)
+int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 {
     if (index < MAXBANKS)
     {
@@ -1220,6 +1220,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index)
 
             for (i = 0; i < mb->num; ++i)
             {
+                if (clean) remove(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }
@@ -1353,7 +1354,7 @@ int mb_user_remove_bank(struct banked_memory *memory, char *bankname)
     // memory bank found in
     // bankspace i, memory bank banknum
 
-    if ((i < memory->num) && mb_remove_bank(&memory->bankspace[i], banknum))
+    if ((i < memory->num) && mb_remove_bank(&memory->bankspace[i], banknum, 0))
         return 2;
 
     return 0;
@@ -1520,6 +1521,78 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
     }
 
     return 0;
+}
+
+void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int ipad, int irecsz, struct banked_memory *memory)
+{
+    char filename[MBLINEMAX];
+    char ihexname[MBLINEMAX];
+    FILE *fbin, *fhex;
+    int   i, j, error;
+
+    // generate output binaries
+
+    if (memory->mainbank.num > 0)
+    {
+        // the main bank contains sections
+
+        snprintf(filename, sizeof(filename), "%s__.bin", binname);
+        strcpy(ihexname, filename);
+        suffix_change(ihexname, ".ihx");
+
+        fbin = fhex = NULL;
+
+        if ((fbin = fopen(filename, "wb+")) == NULL)
+            exit_log(1, "Error: Cannot create file %s\n", filename);
+
+        if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
+            exit_log(1, "Error: Cannot create file %s\n", ihexname);
+
+        printf("Creating %s (org 0x%04x = %d)\n", filename, memory->mainbank.secbin[0].org, memory->mainbank.secbin[0].org);
+
+        error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, &memory->mainbank);
+
+        fclose(fbin);
+        if (fhex != NULL) fclose(fhex);
+
+        if (error)
+            exit_log(1, "Aborting... section unavailable\n");
+    }
+
+    for (j = 0; j < memory->num; ++j)
+    {
+        for (i = 0; i < MAXBANKS; ++i)
+        {
+            struct memory_bank *mb = &memory->bankspace[j].membank[i];
+
+            if (mb->num > 0)
+            {
+                // the memory bank contains sections
+
+                snprintf(filename, sizeof(filename), "%s__%s_%03d.bin", binname, memory->bankspace[j].bank_id, i);
+                strcpy(ihexname, filename);
+                suffix_change(ihexname, ".ihx");
+
+                fbin = fhex = NULL;
+
+                if ((fbin = fopen(filename, "wb+")) == NULL)
+                    exit_log(1, "Error: Cannot create file %s\n", filename);
+
+                if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
+                    exit_log(1, "Error: Cannot create file %s\n", ihexname);
+
+                printf("Creating %s (org 0x%04x = %d)\n", filename, mb->secbin[0].org, mb->secbin[0].org);
+
+                error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, mb);
+
+                fclose(fbin);
+                if (fhex != NULL) fclose(fhex);
+
+                if (error)
+                    exit_log(1, "Aborting... section unavailable\n");
+            }
+        }
+    }
 }
 
 void mb_delete_source_binaries(struct banked_memory *memory)
