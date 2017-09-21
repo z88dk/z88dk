@@ -860,11 +860,11 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
                 for (j = 0; j < mb->num; ++j)
                 {
                     if (i == 0)
-                        mb->secbin[j].org += 0xc000 - (is_zxn ? 0 : 0xc000);
+                        mb->secbin[j].org += 0xc000 - 0xc000;
                     else if (i == 2)
-                        mb->secbin[j].org += 0x8000 - (is_zxn ? 0 : 0xc000);
+                        mb->secbin[j].org += 0x8000 - 0xc000;
                     else
-                        mb->secbin[j].org += 0x4000 - (is_zxn ? 0 : 0xc000);
+                        mb->secbin[j].org += 0x4000 - 0xc000;
                 }
 
                 // move sections to main bank
@@ -947,7 +947,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
                 if ((fin = fopen(sb->filename, "rb")) == NULL)
                     exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
 
-                if (fread(&mem128[49152 + i * 16384 + sb->org - (is_zxn ? 0 : 0xc000)], sb->size, 1, fin) < 1)
+                if (fread(&mem128[49152 + i * 16384 + sb->org - 0xc000], sb->size, 1, fin) < 1)
                 {
                     fclose(fin);
                     exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
