@@ -34,7 +34,6 @@
     EXTERN  __system_time_fraction, __system_time
 
     asm_system_tick:
-        di                          ; interrupts are enabled
         push af
         push hl
 
