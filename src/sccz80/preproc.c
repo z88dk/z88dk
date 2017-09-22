@@ -97,6 +97,7 @@ void vinline()
                 outstr(line);
                 nl();
             }
+            EmitLine(lineno);
             lptr = 0;
             return;
         }
