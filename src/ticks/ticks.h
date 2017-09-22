@@ -19,6 +19,7 @@ typedef enum {
 typedef struct {
     const char    *name;
     const char    *file;
+    const char    *module;
     int            address;
     symboltype     symtype;
     char           islocal;
