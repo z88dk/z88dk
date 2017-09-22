@@ -7,17 +7,21 @@
 ;	Improved functions by Rafael de Oliveira Jannone
 ;	Originally released in 2004 for GFX - a small graphics library
 ;
-;	$Id: msx_vpoke.asm,v 1.8 2016-06-16 19:30:25 dom Exp $
+;	$Id: msx_vpoke.asm$
 ;
 
         SECTION code_clib
+	PUBLIC	vpoke
+	PUBLIC	_vpoke
 	PUBLIC	msx_vpoke
 	PUBLIC	_msx_vpoke
-	EXTERN	msxbios
 	
-	INCLUDE	"msx/vdp.inc"
+EXTERN msx_vpoke_callee
+EXTERN ASMDISP_MSX_VPOKE_CALLEE
 
 
+vpoke:
+_vpoke:
 msx_vpoke:
 _msx_vpoke:
 
@@ -27,23 +31,6 @@ _msx_vpoke:
 	push	hl	; VRAM address
 	push	de	; value
 	push	bc	; RET address
-	ld	a,e
-	;ld	ix,WRTVRM
-	;jp	msxbios
+	
+   jp msx_vpoke_callee + ASMDISP_MSX_VPOKE_CALLEE
 
-	; enter vdp address pointer
-	push	af
-	ld	a,l
-	di
-	out	(VDP_CMD), a
-	ld	a,h
-	and	@00111111
-	or 	@01000000
-	ei
-	out	(VDP_CMD), a
-
-	; enter data
-	pop 	af
-	out	(VDP_DATA), a
-
-	ret
