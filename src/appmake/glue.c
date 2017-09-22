@@ -16,7 +16,7 @@
 static char              help = 0;
 static char             *binname = NULL;
 static char             *crtfile = NULL;
-static char             *banked_space = "BANK";
+static char             *banked_space = NULL;
 static char             *excluded_banks = NULL;
 static char             *excluded_sections = NULL;
 static int               romfill = 255;
@@ -78,6 +78,10 @@ int glue_exec(char *target)
     // initialize banked memory representation
 
     memset(&memory, 0, sizeof(memory));
+
+    if (banked_space == NULL)
+        banked_space = must_strdup("BANK");
+
     for (s = strtok(banked_space, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
     {
         printf("Creating bank space %s\n", s);
