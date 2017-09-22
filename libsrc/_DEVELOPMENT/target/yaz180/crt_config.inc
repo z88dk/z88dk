@@ -74,7 +74,7 @@ IF __CRTCFG = 1
 
    defc TAR__crt_model                 = 0
 
-   defc TAR__register_sp               = 0xFFFF
+   defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 512
 
    defc TAR__crt_initialize_bss        = 1
@@ -123,7 +123,7 @@ IF __CRTCFG = 2
 
    defc TAR__crt_model                 = 0
 
-   defc TAR__register_sp               = 0xFFFF
+   defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 512
 
    defc TAR__crt_initialize_bss        = 1
