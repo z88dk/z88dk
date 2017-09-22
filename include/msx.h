@@ -88,13 +88,19 @@ extern void __LIB__ msx_set_char(int c, void* form, void *attr, unsigned int col
 
 
 // VRAM read
-extern int __LIB__  msx_vpeek(int address) __z88dk_fastcall;
+extern int __LIB__     msx_vpeek(int address) __z88dk_fastcall;
+#define vpeek(addr)    msx_vpeek(addr)
 
 // VRAM block read
 extern void __LIB__ msx_vread(unsigned int source, char* dest, unsigned int count) __smallc;
 
 // VRAM write
-extern void __LIB__ msx_vpoke(int address, int value) __smallc;
+extern int  __LIB__               vpoke(int address, int value) __smallc;
+extern int  __LIB__           msx_vpoke(int address, int value) __smallc;
+extern int  __LIB__    msx_vpoke_callee(int address, int value) __smallc __z88dk_callee;
+#define msx_vpoke(a,b) msx_vpoke_callee(a,b)
+#define vpoke(a,b)     msx_vpoke_callee(a,b)
+
 
 // VRAM block write
 extern void __LIB__ msx_vwrite(void* source, unsigned int dest, unsigned int count) __smallc;
