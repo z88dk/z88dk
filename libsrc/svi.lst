@@ -72,6 +72,7 @@ msx/msx_vfill_v
 msx/msx_vmerge
 msx/msx_vpeek
 msx/msx_vpoke
+msx/msx_vpoke_callee
 msx/svi_vram
 msx/msx_vread
 msx/msx_vwrite
