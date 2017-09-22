@@ -2902,8 +2902,10 @@ static void mangle_filename(const char *input, char *buf, size_t len)
 void EmitLine(int line)
 {
     if (ISASM(ASM_Z80ASM) && c_intermix_ccode) {
-        ot("LINE\t");
+        ot("C_LINE\t");
         outdec(line);
+	outstr(",");
+	outstr(Filename);
         nl();
     }
     if ( c_line_labels ) {
