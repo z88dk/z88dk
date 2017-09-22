@@ -2,7 +2,7 @@
 
 #include <fcntl.h>
 
-size_t read(int handle, void *buf, size_t len) __naked
+ssize_t read(int handle, void *buf, size_t len) __naked
 {
 #asm 
 	EXTERN	asm_esxdos_f_read

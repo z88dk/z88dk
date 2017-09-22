@@ -28,3 +28,10 @@ IF __CLASSIC
 ELSE
    jp asm_strncasecmp
 ENDIF
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strncasecmp
+defc _strncasecmp = strncasecmp
+ENDIF
+

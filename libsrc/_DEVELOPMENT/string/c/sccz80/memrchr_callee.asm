@@ -20,3 +20,10 @@ l0_memrchr_callee:
    ld a,e
    
    jp asm_memrchr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memrchr_callee
+defc _memrchr_callee = memrchr_callee
+ENDIF
+

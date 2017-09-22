@@ -25,10 +25,10 @@ extern void __LIB__ SMS_init(void) __smallc;
 
 /** VDP OPERATIVE MODE HANDLING FUNCTIONS */
 
-extern void __LIB__ __FASTCALL__ SMS_VDPturnOnFeature(unsigned int feature) __smallc;
+extern void __LIB__ SMS_VDPturnOnFeature(unsigned int feature) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_VDPturnOffFeature(unsigned int feature) __smallc;
+extern void __LIB__ SMS_VDPturnOffFeature(unsigned int feature) __smallc __z88dk_fastcall;
 
 
 
@@ -60,19 +60,19 @@ extern void __LIB__ __FASTCALL__ SMS_VDPturnOffFeature(unsigned int feature) __s
 
 /** */
 
-extern void __LIB__ __FASTCALL__ SMS_setBGScrollX(unsigned char scrollX) __smallc;
+extern void __LIB__ SMS_setBGScrollX(unsigned char scrollX) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setBGScrollY(unsigned char scrollY) __smallc;
+extern void __LIB__ SMS_setBGScrollY(unsigned char scrollY) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setBackdropColor(unsigned char entry) __smallc;
+extern void __LIB__ SMS_setBackdropColor(unsigned char entry) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_useFirstHalfTilesforSprites(unsigned char usefirsthalf) __smallc;
+extern void __LIB__ SMS_useFirstHalfTilesforSprites(unsigned char usefirsthalf) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setSpriteMode(unsigned char mode) __smallc;
+extern void __LIB__ SMS_setSpriteMode(unsigned char mode) __smallc __z88dk_fastcall;
 
 
 
@@ -113,12 +113,12 @@ extern void __LIB__ SMS_waitForVBlank(void) __smallc;
 /** FUNCTIONS TO LOAD TILES INTO VRAM */
 
 extern void __LIB__ SMS_loadTiles(void *src,unsigned int tileFrom,unsigned int size) __smallc;
-extern void __LIB__ __CALLEE__ SMS_loadTiles_callee(void *src,unsigned int tileFrom,unsigned int size) __smallc;
+extern void __LIB__ SMS_loadTiles_callee(void *src,unsigned int tileFrom,unsigned int size) __smallc __z88dk_callee;
 #define SMS_loadTiles(a,b,c) SMS_loadTiles_callee(a,b,c)
 
 
 extern void __LIB__ SMS_loadPSGaidencompressedTiles(void *src,unsigned int tilefrom) __smallc;
-extern void __LIB__ __CALLEE__ SMS_loadPSGaidencompressedTiles_callee(void *src,unsigned int tilefrom) __smallc;
+extern void __LIB__ SMS_loadPSGaidencompressedTiles_callee(void *src,unsigned int tilefrom) __smallc __z88dk_callee;
 #define SMS_loadPSGaidencompressedTiles(a,b) SMS_loadPSGaidencompressedTiles_callee(a,b)
 
 
@@ -126,7 +126,7 @@ extern void __LIB__ __CALLEE__ SMS_loadPSGaidencompressedTiles_callee(void *src,
 /** FUNCTIONS FOR THE TILEMAP */
 
 extern void __LIB__ SMS_loadTileMap(unsigned char x,unsigned char y,void *src,unsigned int size) __smallc;
-extern void __LIB__ __CALLEE__ SMS_loadTileMap_callee(unsigned char x,unsigned char y,void *src,unsigned int size) __smallc;
+extern void __LIB__ SMS_loadTileMap_callee(unsigned char x,unsigned char y,void *src,unsigned int size) __smallc __z88dk_callee;
 #define SMS_loadTileMap(a,b,c,d) SMS_loadTileMap_callee(a,b,c,d)
 
 
@@ -134,7 +134,7 @@ extern void __LIB__ SMS_loadSTMcompressedTileMapArea(unsigned char x,unsigned ch
 
 
 extern void __LIB__ SMS_loadTileMapArea(unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height) __smallc;
-extern void __LIB__ __CALLEE__ SMS_loadTileMapArea_callee(unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height) __smallc;
+extern void __LIB__ SMS_loadTileMapArea_callee(unsigned char x,unsigned char y,void *src,unsigned char width,unsigned char height) __smallc __z88dk_callee;
 #define SMS_loadTileMapArea(a,b,c,d,e) SMS_loadTileMapArea_callee(a,b,c,d,e)
 
 
@@ -203,7 +203,7 @@ extern void __LIB__ SMS_initSprites(void) __smallc;
 
 // returns -1 if no more sprites are available
 extern signed char __LIB__ SMS_addSprite(unsigned char x,unsigned char y,unsigned char tile) __smallc;
-extern signed char __LIB__ __CALLEE__ SMS_addSprite_callee(unsigned char x,unsigned char y,unsigned char tile) __smallc;
+extern signed char __LIB__ SMS_addSprite_callee(unsigned char x,unsigned char y,unsigned char tile) __smallc __z88dk_callee;
 #define SMS_addSprite(a,b,c) SMS_addSprite_callee(a,b,c)
 
 
@@ -211,26 +211,26 @@ extern signed char __LIB__ SMS_reserveSprite(void) __smallc;
 
 
 extern void __LIB__ SMS_updateSpritePosition(unsigned char sprite,unsigned char x,unsigned char y) __smallc;
-extern void __LIB__ __CALLEE__ SMS_updateSpritePosition_callee(unsigned char sprite,unsigned char x,unsigned char y) __smallc;
+extern void __LIB__ SMS_updateSpritePosition_callee(unsigned char sprite,unsigned char x,unsigned char y) __smallc __z88dk_callee;
 #define SMS_updateSpritePosition(a,b,c) SMS_updateSpritePosition_callee(a,b,c)
 
 
 extern void __LIB__ SMS_updateSpriteImage(unsigned char sprite,unsigned char image) __smallc;
-extern void __LIB__ __CALLEE__ SMS_updateSpriteImage_callee(unsigned char sprite,unsigned char image) __smallc;
+extern void __LIB__ SMS_updateSpriteImage_callee(unsigned char sprite,unsigned char image) __smallc __z88dk_callee;
 #define SMS_updateSpriteImage(a,b) SMS_updateSpriteImage_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ SMS_hideSprite(unsigned char sprite) __smallc;
+extern void __LIB__ SMS_hideSprite(unsigned char sprite) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ SMS_setClippingWindow(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1) __smallc;
-extern void __LIB__ __CALLEE__ SMS_setClippingWindow_callee(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1) __smallc;
+extern void __LIB__ SMS_setClippingWindow_callee(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1) __smallc __z88dk_callee;
 #define SMS_setClippingWindow(a,b,c,d) SMS_setClippingWindow_callee(a,b,c,d)
 
 
 // returns -1 if no more sprites are available or sprite clipped
 extern signed char __LIB__ SMS_addSpriteClipping(int x,int y,unsigned char tile) __smallc;
-extern signed char __LIB__ __CALLEE__ SMS_addSpriteClipping_callee(int x,int y,unsigned char tile) __smallc;
+extern signed char __LIB__ SMS_addSpriteClipping_callee(int x,int y,unsigned char tile) __smallc __z88dk_callee;
 #define SMS_addSpriteClipping(a,b,c) SMS_addSpriteClipping_callee(a,b,c)
 
 
@@ -250,26 +250,26 @@ extern void __LIB__ SMS_copySpritestoSAT(void) __smallc;
 // SMS functions to set a color / load palette
 
 extern void __LIB__ SMS_setBGPaletteColor(unsigned char entry,unsigned char color) __smallc;
-extern void __LIB__ __CALLEE__ SMS_setBGPaletteColor_callee(unsigned char entry,unsigned char color) __smallc;
+extern void __LIB__ SMS_setBGPaletteColor_callee(unsigned char entry,unsigned char color) __smallc __z88dk_callee;
 #define SMS_setBGPaletteColor(a,b) SMS_setBGPaletteColor_callee(a,b)
 
 
 extern void __LIB__ SMS_setSpritePaletteColor(unsigned char entry,unsigned char color) __smallc;
-extern void __LIB__ __CALLEE__ SMS_setSpritePaletteColor_callee(unsigned char entry,unsigned char color) __smallc;
+extern void __LIB__ SMS_setSpritePaletteColor_callee(unsigned char entry,unsigned char color) __smallc __z88dk_callee;
 #define SMS_setSpritePaletteColor(a,b) SMS_setSpritePaletteColor_callee(a,b)
 
 
-extern void __LIB__ __FASTCALL__ SMS_loadBGPalette(void *palette) __smallc;
+extern void __LIB__ SMS_loadBGPalette(void *palette) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_loadSpritePalette(void *palette) __smallc;
+extern void __LIB__ SMS_loadSpritePalette(void *palette) __smallc __z88dk_fastcall;
 
 
 
 #define SMS_setNextBGColoratIndex(i)       SMS_setAddr(SMS_CRAMAddress|(i))
 #define SMS_setNextSpriteColoratIndex(i)   SMS_setAddr(SMS_CRAMAddress|0x10|(i))
 
-extern void __LIB__ __FASTCALL__ SMS_setColor(unsigned char color) __smallc;
+extern void __LIB__ SMS_setColor(unsigned char color) __smallc __z88dk_fastcall;
 
 
 
@@ -279,10 +279,10 @@ extern void __LIB__ __FASTCALL__ SMS_setColor(unsigned char color) __smallc;
 #define RGB8(r,g,b)       (((r)>>6)|(((g)>>6)<<2)|(((b)>>6)<<4))
 #define RGBHTML(RGB24bit) (((RGB24bit)>>22)|((((RGB24bit)&0xFFFF)>>14)<<2)|((((RGB24bit)&0xFF)>>6)<<4))
 
-extern void __LIB__ __FASTCALL__ SMS_loadBGPaletteHalfBrightness(void *palette) __smallc;
+extern void __LIB__ SMS_loadBGPaletteHalfBrightness(void *palette) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_loadSpritePaletteHalfBrightness(void *palette) __smallc;
+extern void __LIB__ SMS_loadSpritePaletteHalfBrightness(void *palette) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ SMS_zeroBGPalette(void) __smallc;
@@ -395,10 +395,10 @@ extern volatile unsigned char _SMSlib_VDPFlags;
 
 /** LINE INTERRUPT */
 
-extern void __LIB__ __FASTCALL__ SMS_setLineInterruptHandler(void *theHandlerFunction) __smallc;
+extern void __LIB__ SMS_setLineInterruptHandler(void *theHandlerFunction) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ SMS_setLineCounter(unsigned char count) __smallc;
+extern void __LIB__ SMS_setLineCounter(unsigned char count) __smallc __z88dk_fastcall;
 
 
 
@@ -417,22 +417,22 @@ extern unsigned char __LIB__ SMS_getHCount(void) __smallc;
 /** LOW LEVEL FUNCTIONS */
 
 extern void __LIB__ SMS_VRAMmemcpy(unsigned int dst,void *src,unsigned int size) __smallc;
-extern void __LIB__ __CALLEE__ SMS_VRAMmemcpy_callee(unsigned int dst,void *src,unsigned int size) __smallc;
+extern void __LIB__ SMS_VRAMmemcpy_callee(unsigned int dst,void *src,unsigned int size) __smallc __z88dk_callee;
 #define SMS_VRAMmemcpy(a,b,c) SMS_VRAMmemcpy_callee(a,b,c)
 
 
 extern void __LIB__ SMS_VRAMmemcpy_brief(unsigned int dst,void *src,unsigned char size) __smallc;
-extern void __LIB__ __CALLEE__ SMS_VRAMmemcpy_brief_callee(unsigned int dst,void *src,unsigned char size) __smallc;
+extern void __LIB__ SMS_VRAMmemcpy_brief_callee(unsigned int dst,void *src,unsigned char size) __smallc __z88dk_callee;
 #define SMS_VRAMmemcpy_brief(a,b,c) SMS_VRAMmemcpy_brief_callee(a,b,c)
 
 
 extern void __LIB__ SMS_VRAMmemset(unsigned int dst,unsigned char value,unsigned int size) __smallc;
-extern void __LIB__ __CALLEE__ SMS_VRAMmemset_callee(unsigned int dst,unsigned char value,unsigned int size) __smallc;
+extern void __LIB__ SMS_VRAMmemset_callee(unsigned int dst,unsigned char value,unsigned int size) __smallc __z88dk_callee;
 #define SMS_VRAMmemset(a,b,c) SMS_VRAMmemset_callee(a,b,c)
 
 
 extern void __LIB__ SMS_VRAMmemsetW(unsigned int dst,unsigned int value,unsigned int size) __smallc;
-extern void __LIB__ __CALLEE__ SMS_VRAMmemsetW_callee(unsigned int dst,unsigned int value,unsigned int size) __smallc;
+extern void __LIB__ SMS_VRAMmemsetW_callee(unsigned int dst,unsigned int value,unsigned int size) __smallc __z88dk_callee;
 #define SMS_VRAMmemsetW(a,b,c) SMS_VRAMmemsetW_callee(a,b,c)
 
 
@@ -443,17 +443,17 @@ extern void __LIB__ UNSAFE_SMS_copySpritestoSAT(void) __smallc;
 
 
 extern void __LIB__ UNSAFE_SMS_VRAMmemcpy32(unsigned int dst,void *src) __smallc;
-extern void __LIB__ __CALLEE__ UNSAFE_SMS_VRAMmemcpy32_callee(unsigned int dst,void *src) __smallc;
+extern void __LIB__ UNSAFE_SMS_VRAMmemcpy32_callee(unsigned int dst,void *src) __smallc __z88dk_callee;
 #define UNSAFE_SMS_VRAMmemcpy32(a,b) UNSAFE_SMS_VRAMmemcpy32_callee(a,b)
 
 
 extern void __LIB__ UNSAFE_SMS_VRAMmemcpy64(unsigned int dst,void *src) __smallc;
-extern void __LIB__ __CALLEE__ UNSAFE_SMS_VRAMmemcpy64_callee(unsigned int dst,void *src) __smallc;
+extern void __LIB__ UNSAFE_SMS_VRAMmemcpy64_callee(unsigned int dst,void *src) __smallc __z88dk_callee;
 #define UNSAFE_SMS_VRAMmemcpy64(a,b) UNSAFE_SMS_VRAMmemcpy64_callee(a,b)
 
 
 extern void __LIB__ UNSAFE_SMS_VRAMmemcpy128(unsigned int dst,void *src) __smallc;
-extern void __LIB__ __CALLEE__ UNSAFE_SMS_VRAMmemcpy128_callee(unsigned int dst,void *src) __smallc;
+extern void __LIB__ UNSAFE_SMS_VRAMmemcpy128_callee(unsigned int dst,void *src) __smallc __z88dk_callee;
 #define UNSAFE_SMS_VRAMmemcpy128(a,b) UNSAFE_SMS_VRAMmemcpy128_callee(a,b)
 
 

@@ -21,3 +21,10 @@ obstack_copy:
    push af
 
    jp asm_obstack_copy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_copy
+defc _obstack_copy = obstack_copy
+ENDIF
+

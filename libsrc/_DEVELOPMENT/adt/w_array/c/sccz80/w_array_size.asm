@@ -9,3 +9,10 @@ PUBLIC w_array_size
 EXTERN asm_w_array_size
 
 defc w_array_size = asm_w_array_size
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_array_size
+defc _w_array_size = w_array_size
+ENDIF
+

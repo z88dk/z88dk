@@ -21,3 +21,10 @@ w_vector_append_n:
    push af
    
    jp asm_w_vector_append_n
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_append_n
+defc _w_vector_append_n = w_vector_append_n
+ENDIF
+

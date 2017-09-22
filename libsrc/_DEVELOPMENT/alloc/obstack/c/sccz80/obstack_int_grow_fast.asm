@@ -19,3 +19,10 @@ obstack_int_grow_fast:
    push af
    
    jp asm_obstack_int_grow_fast
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_int_grow_fast
+defc _obstack_int_grow_fast = obstack_int_grow_fast
+ENDIF
+

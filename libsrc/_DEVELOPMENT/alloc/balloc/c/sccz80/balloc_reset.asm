@@ -8,3 +8,10 @@ PUBLIC balloc_reset
 EXTERN asm_balloc_reset
 
 defc balloc_reset = asm_balloc_reset
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _balloc_reset
+defc _balloc_reset = balloc_reset
+ENDIF
+

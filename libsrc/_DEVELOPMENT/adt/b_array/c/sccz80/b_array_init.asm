@@ -21,3 +21,10 @@ b_array_init:
    push af
    
    jp asm_b_array_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_init
+defc _b_array_init = b_array_init
+ENDIF
+

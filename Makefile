@@ -23,7 +23,7 @@ CROSS ?= 0
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
 
-all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg testsuite z88dk-lib
+all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm lstmanip ticks z80svg testsuite z88dk-lib
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -77,6 +77,10 @@ z80nm:
 	$(MAKE) -C src/z80nm
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
+lstmanip:
+	$(MAKE) -C src/lstmanip
+	$(MAKE) -C src/lstmanip PREFIX=`pwd` install
+
 z80svg:
 	$(MAKE) -C support/graphics
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
@@ -105,6 +109,7 @@ install: install-clean
 	cd src/zpragma ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zx7 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z80nm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/lstmanip; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/ticks ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/z88dk-lib ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd support/graphics; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install

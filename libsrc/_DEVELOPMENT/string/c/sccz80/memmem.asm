@@ -41,3 +41,10 @@ IF __CLASSIC
 ELSE
    jp asm_memmem
 ENDIF
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memmem
+defc _memmem = memmem
+ENDIF
+

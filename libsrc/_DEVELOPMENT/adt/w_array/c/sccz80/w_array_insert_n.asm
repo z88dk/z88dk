@@ -23,3 +23,10 @@ w_array_insert_n:
    push ix
    
    jp asm_w_array_insert_n
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_array_insert_n
+defc _w_array_insert_n = w_array_insert_n
+ENDIF
+

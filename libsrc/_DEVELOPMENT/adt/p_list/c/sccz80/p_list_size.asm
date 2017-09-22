@@ -9,3 +9,10 @@ PUBLIC p_list_size
 EXTERN asm_p_list_size
 
 defc p_list_size = asm_p_list_size
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_list_size
+defc _p_list_size = p_list_size
+ENDIF
+

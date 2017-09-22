@@ -19,3 +19,10 @@ memccpy_callee:
    push ix
 
    jp asm_memccpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _memccpy_callee
+defc _memccpy_callee = memccpy_callee
+ENDIF
+

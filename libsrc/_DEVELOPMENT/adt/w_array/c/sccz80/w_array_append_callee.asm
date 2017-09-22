@@ -15,3 +15,10 @@ w_array_append_callee:
    ex (sp),hl
    
    jp asm_w_array_append
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_array_append_callee
+defc _w_array_append_callee = w_array_append_callee
+ENDIF
+

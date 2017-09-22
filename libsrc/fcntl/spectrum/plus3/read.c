@@ -8,7 +8,7 @@
 
 #include <fcntl.h>
 
-size_t read(int handle, void *buf, size_t len)
+ssize_t read(int handle, void *buf, size_t len)
 {
 #asm
 	INCLUDE	"p3dos.def"

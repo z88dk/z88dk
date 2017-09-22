@@ -17,7 +17,7 @@ extern uint8_t  _system_time_fraction;
 
 // system_tick_init( void *prt0_isr) is needed for non-asci0 subtypes (basic, basic_dcio)
 
-extern void __LIB__ __FASTCALL__ system_tick_init(void *prt0_isr) __smallc;
+extern void __LIB__ system_tick_init(void *prt0_isr) __smallc __z88dk_fastcall;
 
 
 

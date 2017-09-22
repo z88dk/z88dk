@@ -9,6 +9,8 @@
 */
 
 #include <fcntl.h>
+#include <malloc.h>
+#include <string.h>
 
 
 int remove(char *name)

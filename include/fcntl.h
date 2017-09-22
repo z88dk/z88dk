@@ -38,8 +38,8 @@ typedef int mode_t;
 extern int __LIB__ open(const char *name, int flags, mode_t mode) __smallc;
 extern int __LIB__ creat(const char *name, mode_t mode) __smallc;
 extern int __LIB__ close(int fd);
-extern size_t __LIB__ read(int fd, void *ptr, size_t len) __smallc;
-extern size_t __LIB__ write(int fd, const void *ptr, size_t len) __smallc;
+extern ssize_t __LIB__ read(int fd, void *ptr, size_t len) __smallc;
+extern ssize_t __LIB__ write(int fd, const void *ptr, size_t len) __smallc;
 extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
 
 extern int __LIB__  readbyte(int fd) __smallc __z88dk_fastcall;
@@ -93,8 +93,8 @@ struct RND_FILE {
 
 
 /* The following three functions are target specific */
-extern int  __LIB__ rnd_loadblock(char *name, size_t loadstart, size_t len) __smallc;
-extern int  __LIB__ rnd_saveblock(char *name, size_t loadstart, size_t len) __smallc;
+extern int  __LIB__ rnd_loadblock(char *name, void *loadstart, size_t len) __smallc;
+extern int  __LIB__ rnd_saveblock(char *name, void *loadstart, size_t len) __smallc;
 extern int  __LIB__  rnd_erase(char *name) __smallc __z88dk_fastcall;
 
 /* ********************************************************* */

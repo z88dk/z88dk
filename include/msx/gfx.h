@@ -71,10 +71,10 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 
 
 /// set \a value at a given vram address \a addr
-#define vpoke(addr,value) msx_vpoke(addr,value)
+//define vpoke(addr,value) msx_vpoke(addr,value)
 
 /// get value from a given vram address \a addr
-#define vpeek(addr) msx_vpeek(addr)
+//#define vpeek(addr) msx_vpeek(addr)
 
 /// set \a value at a given vram address \a addr, merging bits (OR) with the existing value
 #define vmerge(addr,value) msx_vmerge(addr,value)

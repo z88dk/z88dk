@@ -3918,6 +3918,17 @@ replace restart
 	; peephole z88dk-bugfix-13
 }
 
+replace restart {
+	ld	a,l
+	ld	d,h
+	ld	d,a
+	ld	h,d
+} by {
+	ld	a,l
+	ld	d,l
+	; peephole z88dk-bugfix-14
+}
+
 barrier
 
 

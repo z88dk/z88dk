@@ -9,3 +9,10 @@ PUBLIC wv_priority_queue_pop
 EXTERN asm_wv_priority_queue_pop
 
 defc wv_priority_queue_pop = asm_wv_priority_queue_pop
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wv_priority_queue_pop
+defc _wv_priority_queue_pop = wv_priority_queue_pop
+ENDIF
+

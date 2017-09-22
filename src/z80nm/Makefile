@@ -4,8 +4,8 @@ OBJS = ar.o
 INSTALL ?= install
 
 ifeq ($(EXEPREFIX),.exe)
-OBJS += getopt/getopt.o
-CFLAGS += -Igetopt
+OBJS += ../getopt/getopt.o
+CFLAGS += -I../getopt
 endif
 
 all: z80nm$(EXESUFFIX)

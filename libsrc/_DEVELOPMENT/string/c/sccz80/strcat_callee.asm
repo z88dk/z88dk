@@ -16,3 +16,10 @@ strcat_callee:
    push af
    
    jp asm_strcat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strcat_callee
+defc _strcat_callee = strcat_callee
+ENDIF
+

@@ -21,5 +21,13 @@ typedef int wchar_t;
 #define NULL ((void *)0)
 #endif
 
+#ifdef __SDCC
+#define offsetof(t,m) __builtin_offsetof(t,m)
+#endif
+
+#ifdef __SCCZ80
+#define offsetof(t,m) __builtin_offsetof(t,m)
+#endif
+
 #endif
 

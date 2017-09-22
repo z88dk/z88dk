@@ -21,3 +21,10 @@ b_array_append_block_entry:
    ret nc
    
    jp error_zc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_append_block_callee
+defc _b_array_append_block_callee = b_array_append_block_callee
+ENDIF
+

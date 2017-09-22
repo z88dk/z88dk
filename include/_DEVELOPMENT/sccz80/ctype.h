@@ -5,58 +5,58 @@
 #ifndef __CTYPE_H__
 #define __CTYPE_H__
 
-extern int __LIB__ __FASTCALL__ isalnum(int) __smallc;
+extern int __LIB__ isalnum(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isalpha(int) __smallc;
+extern int __LIB__ isalpha(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isascii(int) __smallc;
+extern int __LIB__ isascii(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isbdigit(int) __smallc;
+extern int __LIB__ isbdigit(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isblank(int) __smallc;
+extern int __LIB__ isblank(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ iscntrl(int) __smallc;
+extern int __LIB__ iscntrl(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isdigit(int) __smallc;
+extern int __LIB__ isdigit(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isgraph(int) __smallc;
+extern int __LIB__ isgraph(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ islower(int) __smallc;
+extern int __LIB__ islower(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isodigit(int) __smallc;
+extern int __LIB__ isodigit(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isprint(int) __smallc;
+extern int __LIB__ isprint(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ ispunct(int) __smallc;
+extern int __LIB__ ispunct(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isspace(int) __smallc;
+extern int __LIB__ isspace(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isupper(int) __smallc;
+extern int __LIB__ isupper(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ isxdigit(int) __smallc;
+extern int __LIB__ isxdigit(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ toascii(int) __smallc;
+extern int __LIB__ toascii(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ tolower(int) __smallc;
+extern int __LIB__ tolower(int) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ toupper(int) __smallc;
+extern int __LIB__ toupper(int) __smallc __z88dk_fastcall;
 
 
 

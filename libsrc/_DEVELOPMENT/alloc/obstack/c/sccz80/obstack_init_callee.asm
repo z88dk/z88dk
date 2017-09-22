@@ -25,3 +25,10 @@ obstack_init_callee:
    push hl
    
    jp asm_obstack_init
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_init_callee
+defc _obstack_init_callee = obstack_init_callee
+ENDIF
+

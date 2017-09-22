@@ -15,3 +15,10 @@ strndup_callee:
    ex (sp),hl
    
    jp asm_strndup
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strndup_callee
+defc _strndup_callee = strndup_callee
+ENDIF
+

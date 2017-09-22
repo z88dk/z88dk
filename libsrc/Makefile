@@ -39,7 +39,7 @@ eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib  cpcfs.lib cpc_math.lib
 
-z88libs: z88_math.lib  z88_clib.lib net.lib farz88.lib 
+z88libs: z88_math.lib  z88_clib.lib net.lib  
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
@@ -55,7 +55,6 @@ define buildgeneric
 	$(MAKE) -C ctype
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C malloc
 	$(MAKE) -C stdio
 	$(MAKE) -C setjmp
 	$(MAKE) -C time
@@ -65,9 +64,10 @@ define buildgeneric
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C rs232 
 	$(MAKE) -C psg
-	$(MAKE) -C balloc
+	$(MAKE) -C alloc
 	$(MAKE) -C debug
 	$(MAKE) -C adt
+	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
 endef
@@ -132,13 +132,6 @@ im2.lib:
 	@echo '--- Building IM 2 Library ---'
 	@echo ''
 	$(MAKE) -C im2 
-
-# Garry's z88 far library - garry (probably dom now)
-farz88.lib:
-	@echo ''
-	@echo '--- Building Z88 Far Malloc Library ---'
-	@echo ''
-	$(MAKE) -C farz88 
 
 # Generic maths build - dom, stefano
 gen_math.lib:
@@ -1119,14 +1112,12 @@ classic-clean:
 	$(MAKE) -C c128 clean
 	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
-	$(MAKE) -C farz88 clean
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math/genmath clean
 	$(MAKE) -C math/z88math clean
 	$(MAKE) -C math/cpcmath clean
 	$(MAKE) -C math/zxmath clean
 	$(MAKE) -C graphics clean
-	$(MAKE) -C malloc clean
 	$(MAKE) -C net clean
 	$(MAKE) -C rex clean
 	$(MAKE) -C rs232 clean
@@ -1141,7 +1132,8 @@ classic-clean:
 	$(MAKE) -C z88 clean
 	$(MAKE) -C zxvgs clean
 	$(MAKE) -C adt clean
-	$(MAKE) -C balloc clean
+	$(MAKE) -C adt-newlib clean
+	$(MAKE) -C alloc clean
 	$(MAKE) -C im2 clean
 	$(MAKE) -C rect clean
 	$(MAKE) -C algorithm clean

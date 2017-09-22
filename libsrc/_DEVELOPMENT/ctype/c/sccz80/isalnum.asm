@@ -22,3 +22,10 @@ isalnum:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isalnum
+defc _isalnum = isalnum
+ENDIF
+

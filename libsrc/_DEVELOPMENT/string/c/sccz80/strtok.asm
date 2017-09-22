@@ -19,3 +19,10 @@ strtok:
    push af
    
    jp asm_strtok
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtok
+defc _strtok = strtok
+ENDIF
+
