@@ -2901,16 +2901,20 @@ static void mangle_filename(const char *input, char *buf, size_t len)
 
 void EmitLine(int line)
 {
-    if (ISASM(ASM_Z80ASM) && c_intermix_ccode) {
-        ot("C_LINE\t");
-        outdec(line);
-	outstr(",");
-	outstr(Filename);
-        nl();
+    char filen[FILENAME_LEN];
+    char  *ptr;
+
+    snprintf(filen, sizeof(filen),"%s", Filename[0] == '\"'? Filename + 1 : Filename);
+    if ( (ptr = strrchr(filen,'\"')) != NULL ) {
+        *ptr = 0;
+    }
+
+    if (ISASM(ASM_Z80ASM) && (c_cline_directive || c_intermix_ccode)) {
+        outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
     }
     if ( c_line_labels ) {
         char buf[FILENAME_MAX+1];
-        mangle_filename(Filename, buf, sizeof(buf));
+        mangle_filename(filen, buf, sizeof(buf));
         outfmt(".__CLINE__%s_3a%d\n", buf, line);
     }
 }
