@@ -845,6 +845,54 @@
  ldpirx                         ; ED B7
  mirror a                       ; ED 24
  mirror de                      ; ED 26
+ mmu 0, -128                    ; ED 80 80
+ mmu 0, 127                     ; ED 80 7F
+ mmu 0, 255                     ; ED 80 FF
+ mmu 1, -128                    ; ED 81 80
+ mmu 1, 127                     ; ED 81 7F
+ mmu 1, 255                     ; ED 81 FF
+ mmu 2, -128                    ; ED 82 80
+ mmu 2, 127                     ; ED 82 7F
+ mmu 2, 255                     ; ED 82 FF
+ mmu 3, -128                    ; ED 83 80
+ mmu 3, 127                     ; ED 83 7F
+ mmu 3, 255                     ; ED 83 FF
+ mmu 4, -128                    ; ED 84 80
+ mmu 4, 127                     ; ED 84 7F
+ mmu 4, 255                     ; ED 84 FF
+ mmu 5, -128                    ; ED 85 80
+ mmu 5, 127                     ; ED 85 7F
+ mmu 5, 255                     ; ED 85 FF
+ mmu 6, -128                    ; ED 86 80
+ mmu 6, 127                     ; ED 86 7F
+ mmu 6, 255                     ; ED 86 FF
+ mmu 7, -128                    ; ED 87 80
+ mmu 7, 127                     ; ED 87 7F
+ mmu 7, 255                     ; ED 87 FF
+ mmu0 -128                      ; ED 80 80
+ mmu0 127                       ; ED 80 7F
+ mmu0 255                       ; ED 80 FF
+ mmu1 -128                      ; ED 81 80
+ mmu1 127                       ; ED 81 7F
+ mmu1 255                       ; ED 81 FF
+ mmu2 -128                      ; ED 82 80
+ mmu2 127                       ; ED 82 7F
+ mmu2 255                       ; ED 82 FF
+ mmu3 -128                      ; ED 83 80
+ mmu3 127                       ; ED 83 7F
+ mmu3 255                       ; ED 83 FF
+ mmu4 -128                      ; ED 84 80
+ mmu4 127                       ; ED 84 7F
+ mmu4 255                       ; ED 84 FF
+ mmu5 -128                      ; ED 85 80
+ mmu5 127                       ; ED 85 7F
+ mmu5 255                       ; ED 85 FF
+ mmu6 -128                      ; ED 86 80
+ mmu6 127                       ; ED 86 7F
+ mmu6 255                       ; ED 86 FF
+ mmu7 -128                      ; ED 87 80
+ mmu7 127                       ; ED 87 7F
+ mmu7 255                       ; ED 87 FF
  mul                            ; ED 30
  neg                            ; ED 44
  neg a                          ; ED 44
