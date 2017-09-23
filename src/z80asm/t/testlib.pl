@@ -13,9 +13,10 @@ use v5.10;
 use Test::More;
 use Cwd qw( cwd abs_path );
 use File::Basename;
+use File::Path 'remove_tree';
 
 my $IS_WIN32 = $^O eq 'MSWin32';
-my @TEST_EXT = qw( asm bin c d def err inc lis lst map o P out sym tap );
+my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
 
 
 # add path to z80asm top directory
@@ -230,8 +231,11 @@ sub unlink_testfiles {
 		if (Test::More->builder->is_passing) {
 			for (@TEST_EXT) {
 				for (<test*.$_>) {
-					-f $_ and ok unlink($_), "unlink $_";
+					if (-f $_) { ok unlink($_), "unlink $_"; }
 				}
+			}
+			for (<test_dir*>) {
+				if (-d $_) { ok remove_tree($_), "remove_tree $_"; }
 			}
 		}
 	}

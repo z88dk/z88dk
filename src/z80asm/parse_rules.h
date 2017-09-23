@@ -38743,6 +38743,7 @@ _match:
 	break;
 	case 35:
 	{ asm_cond_LABEL(stmt_label);
+     str_compress_escapes(name);
      asm_DEFB_str(str_data(name), str_len(name));
      if ( ctx->p->tok == TK_COMMA )
       {( ctx->cs) = 3;goto _again;}

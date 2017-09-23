@@ -237,6 +237,7 @@ Define rules for a ragel-based parser.
 			(
 				string (_TK_COMMA | _TK_NEWLINE)
 				@{	DO_STMT_LABEL();
+					str_compress_escapes(name);
 					asm_DEFB_str(str_data(name), str_len(name));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_DEFB_next;

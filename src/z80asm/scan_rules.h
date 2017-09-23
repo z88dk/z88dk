@@ -4578,14 +4578,20 @@ _eof_trans:
 	case 258:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
-  if ( get_sym_string() &&
-                             te - ts == 1 )
+  sym.number = 0;
+  if ( get_sym_string() )
   {
-   sym.number = *ts;
+   STR_DEFINE(string, STR_SIZE);
+   str_set_bytes(string, ts, te-ts);
+   str_compress_escapes(string);
+   if (str_len(string) == 1)
+    sym.number = str_data(string)[0];
+   else
+    error_invalid_squoted_string();
+   STR_DELETE(string);
   }
   else
   {
-   sym.number = 0;
    error_invalid_squoted_string();
   }
   ts = te = p;
