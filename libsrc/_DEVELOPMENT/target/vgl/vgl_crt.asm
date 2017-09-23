@@ -879,18 +879,24 @@ include "crt_memory_map.inc"
 
 
 
-   
 
+
+   
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
-   ; driver: vgl_00_input_char
+   ; driver: vgl_01_input_kbd
    ; fd    : 0
    ; mode  : read only
-   ; type  : 003 = character input
+   ; type  : 001 = input terminal
+   ; tie   : __i_fcntl_fdstruct_1
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : 0x100
+   ; buffer size   : 0x10 bytes
+   ; debounce      : 0x00 ms
+   ; repeat_start  : 0x00 ms
+   ; repeat_period : 0x00 ms
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -945,14 +951,14 @@ include "crt_memory_map.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN vgl_00_input_char
+   EXTERN vgl_01_input_kbd
    
    __i_fcntl_heap_0:
    
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 23
+      defw 57
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -967,19 +973,19 @@ include "crt_memory_map.inc"
       ; jump to driver
       
       defb 195
-      defw vgl_00_input_char
+      defw vgl_01_input_kbd
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x03      ; stdio handles ungetc + type = character input
+      defb 0x01      ; stdio handles ungetc + type = input terminal
       defb 2
       defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw 0x100
       
       ; mtx_plain
       
@@ -989,22 +995,60 @@ include "crt_memory_map.inc"
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
+      ; tied output terminal
+      ; pending_char
+      ; read_index
+      
+      defw __i_fcntl_fdstruct_1
+      defb 0
+      defw 0
+      
+      ; b_array_t edit_buffer
+      
+      defw __edit_buffer_0
+      defw 0
+      defw 0x10
+      
+      ; getk_state
+      ; getk_lastk
+      ; getk_debounce_ms
+      ; getk_repeatbegin_ms
+      ; getk_repeatperiod_ms
+      
+      defb 0
+      defb 0
+      defb 0x00
+      defw 0x00
+      defw 0x00
+      
+            
+      ; reserve space for edit buffer
+      
+      __edit_buffer_0:   defs 0x10
+      
+
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    
    
-
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: vgl_00_output_char
+   ; driver: vgl_01_output_char
    ; fd    : 1
    ; mode  : write only
-   ; type  : 004 = character output
+   ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : 0x100
+   ; cursor coord  : (0,0)
+   ; window        : (0,20,0,2)
+   ; scroll limit  : 0
+   ; X font address  : 
+   ; X text colour   : 
+   ; X text mask     : 
+   ; X background    : 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -1059,14 +1103,14 @@ include "crt_memory_map.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN vgl_00_output_char
+   EXTERN vgl_01_output_char
    
    __i_fcntl_heap_1:
    
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 23
+      defw 35	;@TODO: Is this the size? We do not use so many extra bytes
       defw __i_fcntl_heap_0
 
    __i_fcntl_fdstruct_1:
@@ -1081,19 +1125,19 @@ include "crt_memory_map.inc"
       ; jump to driver
       
       defb 195
-      defw vgl_00_output_char
+      defw vgl_01_output_char
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x04      ; type = character output
+      defb 0x02      ; type = output terminal
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw 0x100
       
       ; mtx_plain
       
@@ -1103,12 +1147,31 @@ include "crt_memory_map.inc"
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
+      ; cursor coordinate
+      ; window rectangle
+      ; scroll limit
+
+      defb 0, 0
+      defb 0, 20, 0, 2
+      defb 0
+      
+      ; X font address
+      ; X text colour
+      ; X text mask
+      ; X background colour
+      
+      ; X EXTERN 
+      
+      ; X defw  - 256
+      ; X defb 
+      ; X defb 
+      ; X defb 
+
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    
-   
-   
+      
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
@@ -1367,11 +1430,11 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 46  = byte size of static FDSTRUCTs
+   ; 92  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 46 > 0
+   IF 92 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1392,7 +1455,7 @@ include "crt_memory_map.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (46 + 14)
+      IF __clib_stdio_heap_size > (92 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1403,7 +1466,7 @@ include "crt_memory_map.inc"
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 46 - 14
+            defs __clib_stdio_heap_size - 92 - 14
          
          ; terminate stdio heap
          
