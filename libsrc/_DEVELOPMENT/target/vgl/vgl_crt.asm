@@ -12,6 +12,22 @@ IF !DEFINED_startup
 ENDIF
 
 
+IF !DEFINED_CRT_printf_format
+	defc	DEFINED_CRT_printf_format = 1
+	defc CRT_printf_format = 0x00000001
+ELSE
+	UNDEFINE temp_printf_format
+	defc temp_printf_format = CRT_printf_format
+	UNDEFINE CRT_printf_format
+	defc CRT_printf_format = temp_printf_format | 0x00000001
+ENDIF
+
+
+IF !NEED_printf
+	DEFINE	NEED_printf
+ENDIF
+
+
 
 
 
@@ -1043,7 +1059,7 @@ include "crt_memory_map.inc"
    ;
    ; ioctl_flags   : 0x100
    ; cursor coord  : (0,0)
-   ; window        : (0,20,0,2)
+   ; window        : (0,20,0,4)
    ; scroll limit  : 0
    ; X font address  : 
    ; X text colour   : 
@@ -1152,7 +1168,7 @@ include "crt_memory_map.inc"
       ; scroll limit
 
       defb 0, 0
-      defb 0, 20, 0, 2
+      defb 0, 20, 0, 4
       defb 0
       
       ; X font address

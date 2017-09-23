@@ -84,7 +84,7 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,`
    m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, 0x100, 0x10, 0x00, 0x00, 0x00)
    
    include(`driver/terminal/vgl_01_output_char.m4')dnl
-   m4_vgl_01_output_char(_stdout, 0x100, 0, 0, 0, 20, 0, 2, 0)
+   m4_vgl_01_output_char(_stdout, 0x100, 0, 0,	0, 20,	0, 4,	0)
    
    include(`../m4_file_dup.m4')dnl
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)

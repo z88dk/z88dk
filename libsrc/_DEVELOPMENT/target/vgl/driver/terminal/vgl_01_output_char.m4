@@ -102,7 +102,7 @@ define(`m4_vgl_01_output_char',dnl
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw 35	;@TODO: Is this the size? We do not use so many extra bytes
+      defw 35
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
 
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:

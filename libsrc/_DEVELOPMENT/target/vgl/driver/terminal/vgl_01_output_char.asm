@@ -185,14 +185,14 @@ vgl_01_output_char:
 ;   cp STDIO_MSG_ICTL
 ;   jp z, zx_01_output_char_32_stdio_msg_ictl
 ;
-;   cp OTERM_MSG_SCROLL
-;   jp z, zx_01_output_char_32_oterm_msg_scroll
-;
-;   jp c, console_01_output_terminal_char  ; forward to library
-;
-;   cp OTERM_MSG_CLS
-;   jp z, zx_01_output_char_32_oterm_msg_cls
-;   
+   cp OTERM_MSG_SCROLL
+   jp z, vgl_01_output_char_oterm_msg_scroll
+    
+   jp c, console_01_output_terminal_char  ; forward to library
+    
+   cp OTERM_MSG_CLS
+   jp z, vgl_01_output_char_oterm_msg_cls
+   
 ;   cp OTERM_MSG_PAUSE
 ;   jp z, zx_01_output_char_32_oterm_msg_pause
 ;   
@@ -202,77 +202,122 @@ vgl_01_output_char:
    jp console_01_output_terminal_char     ; forward to library
 
 
+
 vgl_01_output_char_oterm_msg_printc:
+    ;   enter  :  c = ascii code
+    ;             b = parameter (foreground colour, 255 if none specified)
+    ;             l = absolute x coordinate
+    ;             h = absolute y coordinate
+    ;   can use:  af, bc, de, hl
+    
+    ; Store HL (coordinates) for later
+    ex de, hl
+    
+    ; Put to VRAM at 0xdca0 + (Y*COLS) + X
+    
+    ; a = Y*20
+    ld a, h
+    ;add a	; *2
+    ;add a	; *4
+    ;add a	; *8
+    ;add a	; *16
+    ld b, 4
+    sla b
+    add h	; *17
+    add h	; *18
+    add h	; *19
+    add h	; *20
+    ; To VRAM 0xdca0
+    add 0xa0
+    ld h, 0xdc
+    add l	; Add X
+    ld l, a
+    
+    ld (hl), c	; Put character
+    
+    jp vgl_01_output_char_refresh
 
-   ;   enter  :  c = ascii code
-   ;             b = parameter (foreground colour, 255 if none specified)
-   ;             l = absolute x coordinate
-   ;             h = absolute y coordinate
-   ;   can use:  af, bc, de, hl
+vgl_01_output_char_refresh:
+    ; Refresh all row(s)
+    ;@TODO: Use a bulk-load opcode
+    ld hl,0xdcf0
+    ld a,0x01
+    ld (hl),a
+    inc l
+    ld (hl),a
+    inc l
+    ld (hl),a
+    inc l
+    ld (hl),a
+    
+    ;	; Refresh only that row
+    ;	ex de, hl	; Restore HL (coordinates)
+    ;	ld a, h	; get Y coordinate
+    ;	; Convert to 0xdcf0 + Y
+    ;	add 0xf0
+    ;	ld l, a
+    ;	ld h, 0xdc
+    ;	; Put "1" there
+    ;	ld a, 1
+    ;	ld (hl), a
+    
+    
+    ;	; Output via ports 0x0b and 0x0a
+    ;	ld a,c
+    ;	out(0x0b),a
+    ;	
+    ;	
+    ;	;Delay 1fff
+    ;	;call _delay_1fff
+    ;	push	hl
+    ;	ld	hl, 1fffh
+    ;	vgl_00_output_char_delay_1fff_loop:
+    ;	dec	l
+    ;	jr	nz, vgl_00_output_char_delay_1fff_loop
+    ;	dec	h
+    ;	jr	nz, vgl_00_output_char_delay_1fff_loop
+    ;	pop	hl
+    ret
 
-;   ld a,c
-;   cp 32
-;   jr nc, code_ok
-;   
-;   ld c,'?'
-;
-;code_ok:
-	
-	; Put to VRAM
-	;ld a,c
-	;ld hl,0xdca0
-	
-	; Get the address of the row
-	;ex de,hl
-	;ld hl, 0xdca0
-	
-	; a = Y*20
-	ld a, h
-	add a	; *2
-	add a	; *4
-	add a	; *8
-	add a	; *16
-	add h	; *17
-	add h	; *18
-	add h	; *19
-	add h	; *20
-	; To VRAM 0xdca0
-	add 0xa0
-	ld h, 0xdc
-	add l	; Add X
-	ld l, a
-	
-	ld (hl), c	; Put character
-	
-	
-	; Refresh all row(s)
-	ld hl,0xdcf0
-	ld a,0x01
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-	inc l
-	ld (hl),a
-	
-	
-;	; Output via ports 0x0b and 0x0a
-;	ld a,c
-;	out(0x0b),a
-;	
-;	
-;	;Delay 1fff
-;	;call _delay_1fff
-;	push	hl
-;	ld	hl, 1fffh
-;	vgl_00_output_char_delay_1fff_loop:
-;	dec	l
-;	jr	nz, vgl_00_output_char_delay_1fff_loop
-;	dec	h
-;	jr	nz, vgl_00_output_char_delay_1fff_loop
-;	pop	hl
-;	
 
-   ret
+vgl_01_output_char_oterm_msg_scroll:
+    ;   enter  :   c = number of rows to scroll
+    ;   can use:  af, bc, de, hl
+    ;
+    ;   Scroll the window upward 'C' character rows.
+    
+    ; Move everything up by one row
+    ;@TODO: Implement scrolling by C rows
+    ld	bc, 20*(4-1)	;(_screen_scrollSize)
+    ld	hl, 0xdca0 + 1*20	;_LCD_VRAM_ROW1
+    ld	de, 0xdca0 + 0*20	;_LCD_VRAM_ROW0
+    ldir	; Copy BC chars from (HL) to (DE)
+    
+    ; Now clear the last row with spaces
+    ; DE, HL should already be at the right position
+    ld hl, 0xdca0 + (4-1)*20
+    ld de, 0xdca0 + (4-1)*20 + 1
+    
+    
+    ld (hl), 0x40	;0x20	; Character to use
+    ld bc, 20-1	; columns-1
+    ldir	; Copy BC bytes from (HL) to (DE)
+    
+    jp vgl_01_output_char_refresh
+    ;ret
 
+
+vgl_01_output_char_oterm_msg_cls:
+   ; clear the window
+   ;
+   ; can use : af, bc, de, hl
+   
+   ; Use LDIR to fill it
+   ld hl, 0xdca0
+   ld de, 0xdca0 + 1
+   ld bc, 20*4 - 1
+   ld (hl), 0x20	; Character to use
+   ldir	; Copy BC bytes from (HL) to (DE)
+    
+   jp vgl_01_output_char_refresh
+   ;ret

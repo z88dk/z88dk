@@ -85,7 +85,8 @@ vgl_00_output_char_ochar_msg_putc:
 	ld (hl),a
 	
 	
-	; Refresh row(s)
+	; Refresh all 4 row(s)
+	; @TODO: Use a bulk-load instruction!
 	ld hl,0xdcf0
 	ld a,0x01
 	ld (hl),a
