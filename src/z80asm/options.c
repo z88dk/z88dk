@@ -738,6 +738,7 @@ static void option_appmake_zx(void)
 	opts.appmake_origin_max = ZX_ORIGIN_MAX;
 	set_origin_option(ZX_ORIGIN);
 	opts.make_bin = TRUE;
+	opts.map = TRUE;
 }
 
 static void option_appmake_zx81(void)
@@ -749,6 +750,7 @@ static void option_appmake_zx81(void)
 	opts.appmake_origin_max = ZX81_ORIGIN_MAX;
 	set_origin_option(ZX81_ORIGIN);
 	opts.make_bin = TRUE;
+	opts.map = TRUE;
 }
 
 void checkrun_appmake(void)
