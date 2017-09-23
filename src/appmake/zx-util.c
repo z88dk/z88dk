@@ -207,12 +207,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
             }
         }
 
-
         if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
             fprintf(stderr, "Can't open input file %s\n", zxc->binname);
             myexit(NULL, 1);
         }
-
 
         /*
         *        Now we try to determine the size of the file

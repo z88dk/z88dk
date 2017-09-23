@@ -186,8 +186,9 @@ long parameter_search(char *filen, char *ext,char *target)
     strcpy(name,filen);
     strcat(name,ext);
     if ( (fp=fopen(name,"r"))==NULL) {
-        sprintf(name,"Cannot open %s%s\n",filen,ext);
-        myexit(name,1);
+//        sprintf(name,"Cannot open %s%s\n",filen,ext);
+//        myexit(name,1);
+        return -1;
     }
 
      /* Successfully opened the file so search through it.. */
@@ -292,7 +293,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
         fcode = fopen(name, "rb");
     }
 
-    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".sym", "__crt_model")) == -1))
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__crt_model")) == -1))
         crt_model = 0;
 
 
