@@ -574,6 +574,11 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "sub dehl, a", 	0xED, 0x3C);
 		add_opc($cpu, "sub dehl, bc", 	0xED, 0x3D);
 		
+		add_opc($cpu, "mmu %c, %n",		0xED, '0x80+%c(0..7)', '%n');
+		for my $page (0..7) {
+			add_opc($cpu, "mmu$page %n",0xED, 0x80+$page, '%n');
+		}
+
 		add_opc($cpu, "push %m",	 	0xED, 0x8A, '%m', '%m');
 		add_opc($cpu, "popx",		 	0xED, 0x8B);
 
@@ -882,6 +887,15 @@ sub parse_code {
 			"  DO_stmt(0xC7 + expr_value); break;",
 			"default: error_int_range(expr_value);",
 			"}";
+		my $code = join("\n", @code);
+		return $code;
+	}
+	elsif ($asm =~ /^mmu %c/) {
+		push @code, 
+			"DO_STMT_LABEL();",
+			"if (expr_error) return FALSE;",
+			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
+			"DO_stmt_n(0xED80 + expr_value);";
 		my $code = join("\n", @code);
 		return $code;
 	}

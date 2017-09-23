@@ -387,6 +387,15 @@ tokens:
   - name    : PIXELAD
   - name    : SETAE
   - name    : TEST
+  - name    : MMU
+  - name    : MMU0
+  - name    : MMU1
+  - name    : MMU2
+  - name    : MMU3
+  - name    : MMU4
+  - name    : MMU5
+  - name    : MMU6
+  - name    : MMU7
 
   # Z180 specific opcodes
   - name	: SLP 
