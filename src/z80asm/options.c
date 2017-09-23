@@ -1,7 +1,6 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
@@ -62,6 +61,7 @@ static void option_cpu_r3k(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
 static void option_filler( char *filler_arg );
+static void option_debug_info();
 static void define_assembly_defines();
 static void include_z80asm_lib(char *prog_name);
 static char *search_z80asm_lib(char *prog_name);
@@ -568,6 +568,12 @@ static void option_filler( char *filler_arg )
 		error_invalid_filler_option(filler_arg);
 	else
 		opts.filler = value;
+}
+
+static void option_debug_info()
+{
+	opts.debug_info = TRUE;
+	opts.map = TRUE;
 }
 
 static void option_define( char *symbol )

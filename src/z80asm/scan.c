@@ -248,7 +248,6 @@ static long scan_num ( char *text, int length, int base )
 static Bool get_sym_string( void )
 {
 	char quote;
-	int  len;
 
 	/* mark token start */
 	quote = *p++;
@@ -262,27 +261,13 @@ static Bool get_sym_string( void )
 			p++;						/* skip char after backslash, may be a quote */
 		else if (*p == quote)
 		{
-			*p = '\0';					/* terminate string */
-			len = compress_escapes(ts);
-			te = ts + len;
-			memset(te, ' ', p - te);	/* fill remaining chars with space */
-			*p = quote;					/* restore quote */
-
-//			te = p;
-//			str_set_n(sym_string, ts, te - ts);
-//			sym.string = sym_string->str;
-//			Str_compress_escapes(sym_string);
-
+			te = p;
 			return TRUE;
 		}
 		else if (*p == '\n' || *p == '\0')
 		{
 			te = ts;
 			p--;						/* point to before separator */
-
-//			str_clear(sym_string);
-//			sym.string = sym_string->str;
-
 			return FALSE;
 		}
 		

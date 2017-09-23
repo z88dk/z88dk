@@ -540,8 +540,6 @@ t_compile_module($init, <<'END', $objs);
 					   "\"a\"\n"
 					   "\"aa\"\n"
 					   "\"\"\n"
-					   "\"\\a\\b\\f\\n\\r\\t\\v"
-					   "\\\\" "\\\"" "\\0\\377\\xff\"\n"
 					   "0");
 	T_STRING("");
 	T_NEWLINE();
@@ -559,9 +557,6 @@ t_compile_module($init, <<'END', $objs);
 	T_NEWLINE();
 	
 	T_STRING("");
-	T_NEWLINE();
-	
-	T_STRING_N("\a\b\f\n\r\t\v\\\"\0\xff\xff", 12);
 	T_NEWLINE();
 	
 	T_NUMBER(0);

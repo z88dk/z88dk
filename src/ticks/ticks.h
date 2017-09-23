@@ -22,6 +22,7 @@ typedef struct symbol_s symbol;
 struct symbol_s {
     const char    *name;
     const char    *file;
+    const char    *module;
     int            address;
     symboltype     symtype;
     char           islocal;
