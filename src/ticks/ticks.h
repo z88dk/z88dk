@@ -12,18 +12,23 @@
 #include "utlist.h"
 
 typedef enum {
+    SYM_ANY = 0,
     SYM_CONST = 1,
     SYM_ADDRESS = 2,
 } symboltype;
 
-typedef struct {
+typedef struct symbol_s symbol;
+
+struct symbol_s {
     const char    *name;
     const char    *file;
     int            address;
     symboltype     symtype;
     char           islocal;
     const char    *section;
-} symbol;
+    symbol        *next;
+    UT_hash_handle hh;
+};
 
 
 typedef struct {
@@ -92,7 +97,7 @@ extern void      debugger_init();
 extern void      debugger();
 extern int       disassemble(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
-extern const char     *find_symbol(int addr);
+extern const char     *find_symbol(int addr, symboltype preferred_symtype);
 extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
 extern uint8_t   get_memory(int pc);

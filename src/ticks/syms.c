@@ -4,8 +4,8 @@
 #include <ctype.h>
 #include "ticks.h"
 
-static symbol  *symbols = NULL;
-static int      symbols_num = 0;
+static symbol  *symbols[65536] = {0};
+static symbol  *symbols_byname = NULL;
 
 
 static cfile   *cfiles = NULL;
@@ -67,20 +67,22 @@ void read_symbol_file(char *filename)
                 continue;
             }
             if ( strncmp(argv[0], "__CLINE__",9) ) {
-                symbols = realloc(symbols, (symbols_num + 1) * sizeof(symbols[0]));
-                symbols[symbols_num].name = strdup(argv[0]);
-                symbols[symbols_num].file = strdup(argv[8]);
-                symbols[symbols_num].section = strdup(argv[8]); // TODO, comma
-                symbols[symbols_num].islocal = 0;
+                symbol *sym = calloc(1,sizeof(*sym));
+
+                sym->name = strdup(argv[0]);
+                sym->file = strdup(argv[8]);
+                sym->section = strdup(argv[8]); // TODO, comma
+                sym->islocal = 0;
                 if ( strcmp(argv[5], "local,")) {
-                    symbols[symbols_num].islocal = 1;
+                    sym->islocal = 1;
                 }
-                symbols[symbols_num].symtype = SYM_ADDRESS;
+                sym->symtype = SYM_ADDRESS;
                 if ( strcmp(argv[4],"const,") == 0 ) {
-                    symbols[symbols_num].symtype = SYM_CONST;
+                    sym->symtype = SYM_CONST;
                 }
-                symbols[symbols_num].address = strtol(argv[2] + 1, NULL, 16);
-                symbols_num++;
+                sym->address = strtol(argv[2] + 1, NULL, 16);
+                LL_APPEND(symbols[sym->address], sym);
+                HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
             } else {
                 /* It's a cline symbol */
                 char   filename[FILENAME_MAX+1];
@@ -108,34 +110,23 @@ void read_symbol_file(char *filename)
             free(argv);
         }
     }
-    qsort(symbols, symbols_num, sizeof(symbols[0]),symbol_compare);
-}
-
-static int bsearch_find_byaddress(const void *key, const void *elem)
-{
-     int val = *(int *)key;
-     const symbol *sym = elem;
-
-     return sym->address - val;
 }
 
 symbol *find_symbol_byname(const char *name)
 {
-    int i;
+    symbol *sym;
 
-    for ( i = 0; i < symbols_num; i++ ) {
-        if ( strcmp(symbols[i].name,name) == 0 ) {
-            return &symbols[i];
-        }
-    }
-    return NULL;
+    HASH_FIND_STR(symbols_byname, name, sym);
+
+    return sym;
 }
 
 int symbol_resolve(char *name)
 {
-    symbol *sym = find_symbol_byname(name);
+    symbol *sym;
     char   *ptr;
 
+    HASH_FIND_STR(symbols_byname, name, sym);
     if ( sym != NULL ) {
         return sym->address;
     }
@@ -164,10 +155,22 @@ int symbol_resolve(char *name)
     return -1;
 }
 
-const char *find_symbol(int addr)
+const char *find_symbol(int addr, symboltype preferred_type)
 {
-    symbol *sym = bsearch(&addr, symbols, symbols_num, sizeof(symbols[0]), bsearch_find_byaddress);
-    return sym ? sym->name : NULL;
+    symbol *sym;
+    
+    sym = symbols[addr % 65536];
+
+    while ( sym != NULL ) {
+        if ( preferred_type == SYM_ANY ) {
+            return sym->name;
+        }
+        if ( preferred_type == sym->symtype ) {
+            return sym->name;
+        }
+        sym = sym->next;
+    }
+    return NULL;
 }
 
 char **parse_words(char *line, int *argc)
