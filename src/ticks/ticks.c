@@ -3121,35 +3121,35 @@ int main (int argc, char **argv){
         switch( get_memory(pc++) ){
           case 0x04:    // (Z180) TST A,C
             if ( c_cpu == CPU_Z180 ) {
-              TEST(b, 8);
+              TEST(b, 7);
             } else {
               st += 8;
             }
             break;
           case 0x0c:    // (Z180) TST A,C
             if ( c_cpu == CPU_Z180 ) {
-              TEST(c, 8);
+              TEST(c, 7);
             } else {
               st += 8;
             }
             break;
           case 0x14:    // (Z180) TST A,D
             if ( c_cpu == CPU_Z180 ) {
-              TEST(d, 8);
+              TEST(d, 7);
             } else {
               st += 8;
             }
             break;
           case 0x1c:    // (Z180) TST A,E
             if ( c_cpu == CPU_Z180 ) {
-              TEST(e, 8);
+              TEST(e, 7);
             } else {
               st += 8;
             }
             break;
           case 0x24:    // (Z180) TST A,D
             if ( c_cpu == CPU_Z180 ) {
-              TEST(h, 8);
+              TEST(h, 7);
             } else if ( c_cpu == CPU_Z80_ZXN ) {   // (ZXN) mirror a
               a = mirror_table[a & 0x0f] << 4 | mirror_table[(a & 0xf0) >> 4];
               st += 4;
@@ -3159,7 +3159,7 @@ int main (int argc, char **argv){
             break;
           case 0x2c:    // (Z180) TST A,E
             if ( c_cpu == CPU_Z180 ) {
-              TEST(l, 8);
+              TEST(l, 7);
             } else {
               st += 8;
             }
@@ -3167,7 +3167,7 @@ int main (int argc, char **argv){
           case 0x64:    // (Z180) TST A,n
             if ( c_cpu == CPU_Z180 ) {
               uint8_t v = get_memory(pc++);
-              TEST(v, 8);
+              TEST(v, 9);
             } else {    // Z80 (Undocumented NEG)
               st+= 8;
               fr= a= (ff= (fb= ~a)+1);
@@ -3283,7 +3283,7 @@ int main (int argc, char **argv){
               st += 12;
             } else if ( c_cpu == CPU_Z180 ) {               // (Z180) TST A,(HL)
               uint8_t v = get_memory(l | h << 8);
-              TEST(v, 8);
+              TEST(v, 10);
             } else {
               st += 8;
             }
@@ -3390,7 +3390,7 @@ int main (int argc, char **argv){
               l = result & 0xff;
               st += 4;
             } else if ( c_cpu == CPU_Z180 ) {               // (Z180) TST A,A
-              TEST(a, 8);
+              TEST(a, 7);
             } else {
               st += 8;
             }
