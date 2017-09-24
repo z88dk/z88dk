@@ -26289,7 +26289,7 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
 if (expr_error) return FALSE;
 if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);
-DO_stmt_n(0xED80 + expr_value);
+DO_stmt_n(0xED9150 + expr_value);
 break;
 default: error_illegal_ident(); }
 }
@@ -26298,7 +26298,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED80);
+DO_stmt_n(0xED9150);
 break;
 default: error_illegal_ident(); }
 }
@@ -26307,7 +26307,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED81);
+DO_stmt_n(0xED9151);
 break;
 default: error_illegal_ident(); }
 }
@@ -26316,7 +26316,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED82);
+DO_stmt_n(0xED9152);
 break;
 default: error_illegal_ident(); }
 }
@@ -26325,7 +26325,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED83);
+DO_stmt_n(0xED9153);
 break;
 default: error_illegal_ident(); }
 }
@@ -26334,7 +26334,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED84);
+DO_stmt_n(0xED9154);
 break;
 default: error_illegal_ident(); }
 }
@@ -26343,7 +26343,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED85);
+DO_stmt_n(0xED9155);
 break;
 default: error_illegal_ident(); }
 }
@@ -26352,7 +26352,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED86);
+DO_stmt_n(0xED9156);
 break;
 default: error_illegal_ident(); }
 }
@@ -26361,7 +26361,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xED87);
+DO_stmt_n(0xED9157);
 break;
 default: error_illegal_ident(); }
 }
