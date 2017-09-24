@@ -39,6 +39,34 @@
 #undef  __RC2014
 #define __RC2014  1
 
+#define __IO_PIO_PORT_BASE  0x4000
+
+#define __IO_PIO_PORT_A  16384
+#define __IO_PIO_PORT_B  16385
+#define __IO_PIO_PORT_C  16386
+#define __IO_PIO_CONTROL  16387
+
+#define __IO_PIO_CNTL_00  0x80
+#define __IO_PIO_CNTL_01  0x81
+#define __IO_PIO_CNTL_02  0x82
+#define __IO_PIO_CNTL_03  0x83
+
+#define __IO_PIO_CNTL_04  0x88
+#define __IO_PIO_CNTL_05  0x89
+#define __IO_PIO_CNTL_06  0x8A
+#define __IO_PIO_CNTL_07  0x8B
+
+#define __IO_PIO_CNTL_08  0x90
+#define __IO_PIO_CNTL_09  0x91
+#define __IO_PIO_CNTL_10  0x92
+#define __IO_PIO_CNTL_11  0x83
+
+#define __IO_PIO_CNTL_12  0x98
+#define __IO_PIO_CNTL_13  0x99
+#define __IO_PIO_CNTL_14  0x9A
+#define __IO_PIO_CNTL_15  0x9B
+
+
 
 
 

@@ -34,6 +34,34 @@ defc __Z88DK = 1992
 
 defc __RC2014 = 1
 
+defc __IO_PIO_PORT_BASE = 0x4000
+
+defc __IO_PIO_PORT_A = 16384
+defc __IO_PIO_PORT_B = 16385
+defc __IO_PIO_PORT_C = 16386
+defc __IO_PIO_CONTROL = 16387
+
+defc __IO_PIO_CNTL_00 = 0x80
+defc __IO_PIO_CNTL_01 = 0x81
+defc __IO_PIO_CNTL_02 = 0x82
+defc __IO_PIO_CNTL_03 = 0x83
+
+defc __IO_PIO_CNTL_04 = 0x88
+defc __IO_PIO_CNTL_05 = 0x89
+defc __IO_PIO_CNTL_06 = 0x8A
+defc __IO_PIO_CNTL_07 = 0x8B
+
+defc __IO_PIO_CNTL_08 = 0x90
+defc __IO_PIO_CNTL_09 = 0x91
+defc __IO_PIO_CNTL_10 = 0x92
+defc __IO_PIO_CNTL_11 = 0x83
+
+defc __IO_PIO_CNTL_12 = 0x98
+defc __IO_PIO_CNTL_13 = 0x99
+defc __IO_PIO_CNTL_14 = 0x9A
+defc __IO_PIO_CNTL_15 = 0x9B
+
+
 
 
 
