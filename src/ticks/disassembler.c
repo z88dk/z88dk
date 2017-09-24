@@ -765,14 +765,14 @@ instruction ed_page[] = {
     { "[im2]",  OP_NONE,  OP_NONE,    0 },
     { "[ld r,r]", OP_NONE,OP_NONE,    0 },
 
-    { "mmu0",   OP_IMMED8, OP_NONE,   F_ZXN },  /* 0x80 */
-    { "mmu1",   OP_IMMED8, OP_NONE,   F_ZXN }, 
-    { "mmu2",   OP_IMMED8, OP_NONE,   F_ZXN }, 
-    { "mmu3",   OP_IMMED8, OP_NONE,   F_ZXN }, 
-    { "mmu4",   OP_IMMED8, OP_NONE,   F_ZXN }, 
-    { "mmu5",   OP_IMMED8, OP_NONE,   F_ZXN }, 
-    { "mmu6",   OP_IMMED8, OP_NONE,   F_ZXN }, 
-    { "mmu7",   OP_IMMED8, OP_NONE,   F_ZXN },  /* 0xed87 */    
+    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x80 */
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "push",   OP_IMMED16, OP_NONE,  F_ZXN }, /* 0xed8a */
