@@ -2011,6 +2011,7 @@ typedef struct {
     int       index;
     int       pc;
     int       len;
+    int       skip;
     uint8_t   prefix;
     uint8_t   displacement;
     uint8_t   opcode;
@@ -2223,13 +2224,14 @@ int disassemble(int pc, char *buf, size_t buflen)
     size_t       offs = 0;
     int          start_pc = pc;
 
+    buf[0] = 0;
+
     if ( c_cpu & (CPU_R2K|CPU_R3K) ) {
         table = rabbit_main_page;
     }
     state->pc = pc;
 
     label = find_symbol(pc, SYM_ADDRESS);
-    buf[0] = 0;
     if (label ) {
         offs += snprintf(buf + offs, buflen - offs, "%s:",label);
     } 
@@ -2249,6 +2251,17 @@ int disassemble(int pc, char *buf, size_t buflen)
         }
         READ_BYTE(state,b);
         if ( b == 0xDD || b == 0xFD ) {
+            if ( state->index ) {
+                offs += snprintf(buf + offs, buflen - offs,"\tdefb\t$%02x\n", state->index);
+                label = find_symbol(pc, SYM_ADDRESS);
+                if ( label ) {
+                    offs += snprintf(buf + offs, buflen - offs, "%s:",label);
+                } else {
+                    offs += snprintf(buf + offs, buflen - offs, "%-20s", "");
+                }
+                start_pc = state->pc - 1;
+                state->skip = state->len;
+            }
             state->index = b;
             state->prefix = 0;
             table = main_page; 
@@ -2306,7 +2319,7 @@ int disassemble(int pc, char *buf, size_t buflen)
     } while ( 1 );
 
     offs += snprintf(buf + offs, buflen - offs, "[%04x] ", start_pc);
-    for ( i = 0; i < state->len; i++ ) {
+    for ( i = state->skip; i < state->len; i++ ) {
         offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
     }
 
