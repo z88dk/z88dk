@@ -18,7 +18,6 @@ extern void dogoto(void);
 extern int dolabel(void);
 static void docritical(void);
 static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
-static int lastline = 0;
 
 /*
  *      Statement parser
@@ -35,10 +34,6 @@ int statement()
     char locstatic; /* have we had the static keyword */
 
     blanks();
-    if (lineno != lastline) {
-        lastline = lineno;
-        EmitLine(lineno);
-    }
     if (ch() == 0 && eof) {
         return (lastst = STEXP);
     } else {

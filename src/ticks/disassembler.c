@@ -765,14 +765,14 @@ instruction ed_page[] = {
     { "[im2]",  OP_NONE,  OP_NONE,    0 },
     { "[ld r,r]", OP_NONE,OP_NONE,    0 },
 
-    { NULL,     OP_NONE,  OP_NONE,    0 },  /* 0x80 */
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
-    { NULL,     OP_NONE,  OP_NONE,    0 }, 
+    { "mmu0",   OP_IMMED8, OP_NONE,   F_ZXN },  /* 0x80 */
+    { "mmu1",   OP_IMMED8, OP_NONE,   F_ZXN }, 
+    { "mmu2",   OP_IMMED8, OP_NONE,   F_ZXN }, 
+    { "mmu3",   OP_IMMED8, OP_NONE,   F_ZXN }, 
+    { "mmu4",   OP_IMMED8, OP_NONE,   F_ZXN }, 
+    { "mmu5",   OP_IMMED8, OP_NONE,   F_ZXN }, 
+    { "mmu6",   OP_IMMED8, OP_NONE,   F_ZXN }, 
+    { "mmu7",   OP_IMMED8, OP_NONE,   F_ZXN },  /* 0xed87 */    
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "push",   OP_IMMED16, OP_NONE,  F_ZXN }, /* 0xed8a */
@@ -1429,7 +1429,7 @@ instruction rabbit_main_page[] = {
     { "jp",     OP_PE,    OP_ADDR16, 0 },
     { "ex",     OP_DE,    OP_HL,      0 },
     { "or",     OP_HL,    OP_DE,      0 },
-    { NULL,     OP_NONE,  OP_NONE,    0 },   /* DD */
+    { NULL,     OP_NONE,  OP_NONE,    0 },   /* ED */
     { "xor",    OP_IMMED8, OP_NONE,   0 },
     { "rst",    OP_RST,   OP_NONE,    0 },
 
@@ -2124,7 +2124,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         READ_BYTE(state, lsb);
         READ_BYTE(state, msb);
         snprintf(buf,buflen,"($%02x%02x)", msb, lsb);
-        label = find_symbol(lsb + msb * 256);
+        label = find_symbol(lsb + msb * 256, SYM_ADDRESS);
         if (label ) {
              snprintf(buf,buflen,"(%s)",label);
         }
@@ -2137,7 +2137,7 @@ char *get_operand(dcontext *state, instruction *instr, operand op, char *buf, si
         READ_BYTE(state, lsb);
         READ_BYTE(state, msb);
         snprintf(buf,buflen,"$%02x%02x", msb, lsb);
-        label = find_symbol(lsb + msb * 256);
+        label = find_symbol(lsb + msb * 256, SYM_ADDRESS);
         if (label ) {
              snprintf(buf,buflen,"%s",label);
         }
@@ -2228,7 +2228,7 @@ int disassemble(int pc, char *buf, size_t buflen)
     }
     state->pc = pc;
 
-    label = find_symbol(pc);
+    label = find_symbol(pc, SYM_ADDRESS);
     buf[0] = 0;
     if (label ) {
         offs += snprintf(buf + offs, buflen - offs, "%s:",label);

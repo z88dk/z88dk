@@ -237,6 +237,7 @@ Define rules for a ragel-based parser.
 			(
 				string (_TK_COMMA | _TK_NEWLINE)
 				@{	DO_STMT_LABEL();
+					str_compress_escapes(name);
 					asm_DEFB_str(str_data(name), str_len(name));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_DEFB_next;
@@ -278,24 +279,6 @@ Define rules for a ragel-based parser.
 #endfor  <OP>
 	directives_no_args = asm_LSTON | asm_LSTOFF;
 	
-	/*---------------------------------------------------------------------
-	*   directives with contant number argument
-	*--------------------------------------------------------------------*/
-#foreach <OP> in LINE, ORG
-	asm_<OP> = _TK_<OP> const_expr _TK_NEWLINE 
-			@{ if (!expr_error) asm_<OP>(expr_value); };
-#endfor  <OP>
-	directives_n = asm_LINE | asm_ORG;
-
-	/*---------------------------------------------------------------------
-	*   directives with string argument
-	*--------------------------------------------------------------------*/
-#foreach <OP> in INCLUDE, BINARY
-	asm_<OP> = _TK_<OP> string _TK_NEWLINE
-			@{ asm_<OP>(str_data(name)); };
-#endfor  <OP>
-	directives_str = asm_INCLUDE | asm_BINARY;
-
 	/*---------------------------------------------------------------------
 	*   directives with NAME argument
 	*--------------------------------------------------------------------*/
@@ -353,13 +336,44 @@ Define rules for a ragel-based parser.
 	main := 
 		  _TK_END
 		| _TK_NEWLINE
-		| directives_no_args | directives_n | directives_str
+		| directives_no_args
 		| directives_name | directives_names | directives_assign
 		| directives_DEFx
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS
 		| asm_conditional
+		/*---------------------------------------------------------------------
+		*   Directives
+		*--------------------------------------------------------------------*/
+		| _TK_ORG const_expr _TK_NEWLINE @{ 
+			if (!expr_error) asm_ORG(expr_value); 
+		}
+		  
+		| _TK_LINE const_expr _TK_NEWLINE @{ 
+			if (!expr_error) asm_LINE(expr_value, get_error_file()); 
+		}
+		
+		| _TK_LINE const_expr _TK_COMMA string _TK_NEWLINE @{ 
+			if (!expr_error) asm_LINE(expr_value, str_data(name)); 
+		}
+		
+		| _TK_C_LINE const_expr _TK_NEWLINE @{ 
+			if (!expr_error) asm_C_LINE(expr_value, get_error_file()); 
+		}
+		
+		| _TK_C_LINE const_expr _TK_COMMA string _TK_NEWLINE @{ 
+			if (!expr_error) asm_C_LINE(expr_value, str_data(name)); 
+		}
+		
+		| _TK_INCLUDE string _TK_NEWLINE @{ 
+			if (!expr_error) asm_INCLUDE(str_data(name)); 
+		}
+		
+		| _TK_BINARY string _TK_NEWLINE @{ 
+			if (!expr_error) asm_BINARY(str_data(name)); 
+		}
+		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly
 		*--------------------------------------------------------------------*/

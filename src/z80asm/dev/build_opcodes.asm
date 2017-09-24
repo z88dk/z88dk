@@ -58,8 +58,6 @@
 	ld a,'a'
 	ld a,'he'							;; error: invalid single quoted character
 	ld a,"a"							;; error: syntax error
-	defb "								;; error: unclosed quoted string
-	defb "hello							;; error: unclosed quoted string
 
 .label_1 ld a,2							;;label_1 ld a,2
 label_2: ld a,3							;;label_2 ld a,3

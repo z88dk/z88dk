@@ -43,8 +43,8 @@ extern void asm_DEFGROUP_define_const(char *name);
 extern void asm_LSTON(void);
 extern void asm_LSTOFF(void);
 
-/* directives with number argument */
-extern void asm_LINE(int line_nr);
+extern void asm_LINE(int line_nr, char *filename);
+extern void asm_C_LINE(int line_nr, char * filename);
 extern void asm_ORG(int address);
 
 /* directives with string argument */
