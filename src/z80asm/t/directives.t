@@ -2,7 +2,6 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
@@ -16,111 +15,6 @@ BEGIN {
 	use lib '.'; 
 	use t::TestZ80asm;
 };
-
-#------------------------------------------------------------------------------
-# INCLUDE
-#------------------------------------------------------------------------------
-
-# no -I, multiple levels
-write_file("test0.inc", 'ld a,10');
-for (1..9) { write_file("test$_.inc", 'include "test'.($_-1).'.inc"'."\n defb $_"); }
-z80asm(
-	asm		=> <<'END',
-		include "test9.inc"		;; 3E 0A 01 02 03 04 05 06 07 08 09
-		nop						;; 00
-END
-);
-
-# -I, --inc-path
-unlink(<test*.inc>);
-make_path("test_dir");
-	write_file("test_dir/test.inc", 'ld a,10');
-	
-	# no -I, full path : OK
-	z80asm(
-		asm		=> 'include "test_dir/test.inc"		;; 3E 0A',
-	);
-	
-	# no -I, only file name : error
-	z80asm(
-		asm		=> 'include "test.inc"	;; error: cannot read file \'test.inc\'',
-	);
-	
-	# -I : OK
-	for my $options ('-I', '-I=', '--inc-path', '--inc-path=') {
-		z80asm(
-			asm		=> 'include "test.inc"				;; 3E 0A',
-			options	=> "-b ${options}test_dir",
-		);
-	}
-	z80asm(
-		asm		=> 'include "test_dir/test.inc"		;; 3E 0A',
-		options	=> "-b -Itest_dir",
-	);
-	
-	# directory of source file is added to include path
-	write_file("test_dir/test.asm", 'include "test.inc"');
-	unlink "test_dir/test.bin";
-	ok system("./z80asm -b test_dir/test.asm") == 0;
-	ok -f "test_dir/test.bin";
-	test_binfile("test_dir/test.bin", "\x3E\x0A");
-
-remove_tree("test_dir");
-
-# error_read_file
-# BUG_0034 : If assembly process fails with fatal error, invalid library is kept
-unlink("test.lib", "test.inc");
-z80asm(
-	asm		=> <<'ASM',
-		include "test.inc"		;; error: cannot read file 'test.inc'
-ASM
-	options	=> "-xtest.lib",
-);
-ok ! -f "test.lib", "test.lib does not exist";
-
-# error_include_recursion
-write_file("test.inc", 'include "test.asm"');
-z80asm(
-	asm		=> <<'ASM',
-		include "test.inc"
-ASM
-	error	=> "Error at file 'test.inc' line 1: cannot include file 'test.asm' recursively",
-);
-
-# syntax
-z80asm(
-	asm		=> <<'ASM',
-		include 				;; error: syntax error
-ASM
-);
-
-# test -I using environment variables
-unlink "test.inc";
-make_path("test_dir");
-	write_file("test_dir/test.inc", 'ld a,10');
-	
-	z80asm(
-		asm		=> 'include "test.inc"	;; error: cannot read file \'test.inc\'',
-	);
-	
-	z80asm(
-		asm		=> 'include "test.inc"		;; 3E 0A',
-		options	=> "-b -Itest_dir",
-	);
-
-	$ENV{TEST_ENV} = 'test';
-	z80asm(
-		asm		=> 'include "test.inc"		;; 3E 0A',
-		options	=> '-b -I${TEST_ENV}_dir',
-	);
-
-	delete $ENV{TEST_ENV};
-	z80asm(
-		asm		=> 'include "test.inc"		;; 3E 0A',
-		options	=> '-b -Itest${TEST_ENV}_dir',
-	);
-
-remove_tree("test_dir");
 
 #------------------------------------------------------------------------------
 # DEFGROUP - simple use tested in opcodes.t
@@ -267,31 +161,15 @@ z80asm(
 );
 
 #------------------------------------------------------------------------------
-# DEFB, DEFM - simple use tested in opcodes.t
+# DEFS - simple use tested in opcodes.t
 # test error messages here
 #------------------------------------------------------------------------------
-z80asm(asm => "xx: DEFB 		;; error: syntax error");
-z80asm(asm => "xx: DEFB xx, 	;; error: syntax error");
-z80asm(asm => "xx: DEFB xx,xx+1	;; 00 01");
-z80asm(asm => "xx: DEFB xx,\"\\0\\1\\2\",3	;; 00 00 01 02 03");
-
 z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFB 0xAA",
 	   bin => "\xAA" x 65536);
 z80asm(asm => "x1: DEFS 65534,0xAA \n x2: DEFB 0xAA, 0xAA",
 	   bin => "\xAA" x 65536);
 z80asm(asm => "x1: DEFS 65536,0xAA \n x2: DEFB 0xAA ;; error: max. code size of 65536 bytes reached");
 z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFB 0xAA, 0xAA ;; error: max. code size of 65536 bytes reached");
-
-z80asm(asm => "xx: DEFM",
-	   error => "Error at file 'test.asm' line 1: syntax error");
-# error => "Warning at file 'test.asm' line 1: 'DEFM' is deprecated, use 'DEFB' instead\nError at file 'test.asm' line 1: syntax error");
-z80asm(asm => "xx: DEFM xx,",
-	   error => "Error at file 'test.asm' line 1: syntax error");
-# error => "Warning at file 'test.asm' line 1: 'DEFM' is deprecated, use 'DEFB' instead\nError at file 'test.asm' line 1: syntax error");
-z80asm(asm => "xx: DEFM xx,xx+1	;; 00 01");
-# ;; warn: 'DEFM' is deprecated, use 'DEFB' instead
-z80asm(asm => "xx: DEFM xx,\"\\0\\1\\2\",3	;; 00 00 01 02 03");
-# ;; warn: 'DEFM' is deprecated, use 'DEFB' instead
 
 #------------------------------------------------------------------------------
 # DEFW, DEFQ - simple use tested in opcodes.t
@@ -577,81 +455,6 @@ END
 	options => "-b",
 );
 ok ! -f "test.lis", "test.lis does not exist";
-
-#------------------------------------------------------------------------------
-# LINE, -C, --line-mode
-#------------------------------------------------------------------------------
-z80asm(
-	asm		=> "line 10 \n ld",
-	error	=> "Error at file 'test.asm' line 2: syntax error",
-);
-
-for my $option (qw( -C --line-mode )) {
-	z80asm(
-		asm		=> "line 10 \n ld",
-		options	=> $option,
-		error	=> "Error at file 'test.asm' line 10: syntax error",
-	);
-}
-
-z80asm(
-	asm		=> <<'END',
-		org 100h
-		line 10
-		ld bc,101h			;; 01 01 01
-		line 20
-		ld de,1111h			;; 11 11 11
-		line 30
-		ld hl,2121h			;; 21 21 21
-END
-);
-z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF09
-  Name: test
-  Names:
-    L A $0000 __C_LINE_10 test.asm:2
-    L A $0003 __C_LINE_20 test.asm:4
-    L A $0006 __C_LINE_30 test.asm:6
-  Code: 9 bytes, ORG at $0100
-    C $0000: 01 01 01 11 11 11 21 21 21
-END
-
-
-#------------------------------------------------------------------------------
-# BINARY
-#------------------------------------------------------------------------------
-write_binfile("test1.dat", "\x00\x0A\x0D\xFF");
-z80asm(
-	asm		=> <<'END',
-		ld bc,101h			;; 01 01 01
-		binary "test1.dat"	;; 00 0A 0D FF
-		ld de,1111h			;; 11 11 11
-END
-);
-
-write_binfile("test1.dat", "a" x 65536);
-z80asm(
-	asm		=> <<'END',
-		binary "test1.dat"
-END
-	bin		=> "a" x 65536,
-);
-
-z80asm(
-	asm		=> <<'END',
-		nop
-		binary "test1.dat"	;; error: max. code size of 65536 bytes reached
-END
-);
-
-write_binfile("test1.dat", "a" x 65537);
-z80asm(
-	asm		=> <<'END',
-		binary "test1.dat"	;; error: max. code size of 65536 bytes reached
-END
-);
-unlink("test1.dat");
 
 #------------------------------------------------------------------------------
 # IF ELSE ENDIF - simple use tested in opcodes.t

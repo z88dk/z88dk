@@ -18,4 +18,5 @@ extern int c_makeshare;
 extern int c_useshared;
 extern int c_shared_file;
 extern int c_line_labels;
+extern int c_cline_directive;
 

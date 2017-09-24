@@ -44,8 +44,11 @@ extern incl_recursion_err_cb_t set_incl_recursion_err_cb( incl_recursion_err_cb_
 CLASS( SrcFile )
 	FILE	*file;					/* open file */
 	char	*filename;				/* source file name, held in strpool */
+	char	*line_filename;			/* source file name of LINE statement, held in strpool */
 	int		 line_nr;				/* current line number, i.e. last returned */
+	int		 line_inc;				/* increment on each line read */
 	Str		*line;					/* current input line, i.e. last returned */
+	Bool	is_c_source;			/* true if C_LINE was called */
 
 	List	*line_stack;			/* stack of input lines to read by getline()
 									   before reading next line from the file.
@@ -80,7 +83,13 @@ extern void SrcFile_ungetline( SrcFile *self, char *lines );
 
 /* return the current file name and line number */
 extern char *SrcFile_filename( SrcFile *self );		/* string in strpool */
-extern int   SrcFile_line_nr(  SrcFile *self );	
+extern int   SrcFile_line_nr(SrcFile *self);
+extern Bool  ScrFile_is_c_source(SrcFile *self);
+
+
+extern void SrcFile_set_filename(SrcFile *self, char *filename);
+extern void SrcFile_set_line_nr(SrcFile *self, int line_nr, int line_inc);
+extern void SrcFile_set_c_source(SrcFile *self);
 
 /* stack of input files manipulation:
    push saves current file on the stack and prepares for a new open
