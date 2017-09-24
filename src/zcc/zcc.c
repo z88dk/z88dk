@@ -1344,7 +1344,6 @@ int main(int argc, char **argv)
                 snprintf(tmp, sizeof(tmp) - 3, "MODULE %s\n"
                                                "LINE -1, \"%s\"\n", q, original_filenames[i]);
 
-				printf("%s\n",tmp);
                 // be consistent with z80asm by not having the asm extension part of the module name
                 if ((q = find_file_ext(tmp)) && (strcmp(q, ".asm") == 0))
                     *q = '\0';
