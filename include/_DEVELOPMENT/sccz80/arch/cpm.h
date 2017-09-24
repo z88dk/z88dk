@@ -63,12 +63,12 @@ struct cpm_fcb
 };
 
 extern int __LIB__ cpm_bdos(unsigned int func,unsigned int arg) __smallc;
-extern int __LIB__ __CALLEE__ cpm_bdos_callee(unsigned int func,unsigned int arg) __smallc;
+extern int __LIB__ cpm_bdos_callee(unsigned int func,unsigned int arg) __smallc __z88dk_callee;
 #define cpm_bdos(a,b) cpm_bdos_callee(a,b)
 
 
 extern int __LIB__ cpm_bdos_hl(unsigned int func,unsigned int arg) __smallc;
-extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int arg) __smallc;
+extern int __LIB__ cpm_bdos_hl_callee(unsigned int func,unsigned int arg) __smallc __z88dk_callee;
 #define cpm_bdos_hl(a,b) cpm_bdos_hl_callee(a,b)
 
 
@@ -76,11 +76,11 @@ extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int 
 #define getuid()   cpm_bdos_hl(CPM_SUID, 0xFF)
 #define setuid(u)  cpm_bdos(CPM_SUID, u)
 
-extern unsigned long __LIB__ __FASTCALL__ cpm_get_offset(void *p) __smallc;
+extern unsigned long __LIB__ cpm_get_offset(void *p) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ cpm_set_offset(void *p,unsigned long offset) __smallc;
-extern void __LIB__ __CALLEE__ cpm_set_offset_callee(void *p,unsigned long offset) __smallc;
+extern void __LIB__ cpm_set_offset_callee(void *p,unsigned long offset) __smallc __z88dk_callee;
 #define cpm_set_offset(a,b) cpm_set_offset_callee(a,b)
 
 

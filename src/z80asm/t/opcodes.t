@@ -2310,8 +2310,6 @@ z80asm(
         ld   a,'a                       ;; error: invalid single quoted character
         ld   a,'he'                     ;; error: invalid single quoted character
         ld   a,"a"                      ;; error: syntax error
-        defb "                          ;; error: unclosed quoted string
-        defb "hello                     ;; error: unclosed quoted string
         defb 1/0                        ;; error 2: division by zero
         defb 1% 0                       ;; error 2: division by zero
         defb 1?                         ;; error: syntax error
@@ -4559,8 +4557,6 @@ z80asm(
         ld   a,'a                       ;; error: invalid single quoted character
         ld   a,'he'                     ;; error: invalid single quoted character
         ld   a,"a"                      ;; error: syntax error
-        defb "                          ;; error: unclosed quoted string
-        defb "hello                     ;; error: unclosed quoted string
         defb 1/0                        ;; error 2: division by zero
         defb 1% 0                       ;; error 2: division by zero
         defb 1?                         ;; error: syntax error

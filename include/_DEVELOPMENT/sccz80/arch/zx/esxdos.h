@@ -128,7 +128,7 @@ struct esxdos_dirent_slice
 
 // Translate ESXDOS Error Code to Library errno
 
-extern unsigned char __LIB__ __FASTCALL__ errno_from_esxdos(unsigned char esxdos_error) __smallc;
+extern unsigned char __LIB__ errno_from_esxdos(unsigned char esxdos_error) __smallc __z88dk_fastcall;
 
 
 
@@ -138,18 +138,18 @@ extern unsigned char __LIB__ __FASTCALL__ errno_from_esxdos(unsigned char esxdos
 
 // Raw Disk IO on Specific Device
 
-extern int __LIB__ esxdos_disk_info(unsigned char device,struct esx_device *ed) __smallc;
-extern int __LIB__ __CALLEE__ esxdos_disk_info_callee(unsigned char device,struct esx_device *ed) __smallc;
+extern int __LIB__ esxdos_disk_info(unsigned char device,struct esxdos_device *ed) __smallc;
+extern int __LIB__ esxdos_disk_info_callee(unsigned char device,struct esxdos_device *ed) __smallc __z88dk_callee;
 #define esxdos_disk_info(a,b) esxdos_disk_info_callee(a,b)
 
 
 extern int __LIB__ esxdos_disk_read(unsigned char device,uint32_t position,void *dst) __smallc;
-extern int __LIB__ __CALLEE__ esxdos_disk_read_callee(unsigned char device,uint32_t position,void *dst) __smallc;
+extern int __LIB__ esxdos_disk_read_callee(unsigned char device,uint32_t position,void *dst) __smallc __z88dk_callee;
 #define esxdos_disk_read(a,b,c) esxdos_disk_read_callee(a,b,c)
 
 
 extern int __LIB__ esxdos_disk_write(unsigned char device,uint32_t position,void *src) __smallc;
-extern int __LIB__ __CALLEE__ esxdos_disk_write_callee(unsigned char device,uint32_t position,void *src) __smallc;
+extern int __LIB__ esxdos_disk_write_callee(unsigned char device,uint32_t position,void *src) __smallc __z88dk_callee;
 #define esxdos_disk_write(a,b,c) esxdos_disk_write_callee(a,b,c)
 
 
@@ -159,7 +159,7 @@ extern int __LIB__ __CALLEE__ esxdos_disk_write_callee(unsigned char device,uint
 extern unsigned char __LIB__ esxdos_m_getdrv(void) __smallc;
 
 
-extern unsigned char __LIB__ __FASTCALL__ esxdos_m_setdrv(unsigned char drive) __smallc;
+extern unsigned char __LIB__ esxdos_m_setdrv(unsigned char drive) __smallc __z88dk_fastcall;
 
 
 
@@ -173,70 +173,70 @@ extern uint32_t __LIB__ esxdos_m_getdate(void) __smallc;
 
 // Operations on Directories
 
-extern unsigned char __LIB__ __FASTCALL__ esxdos_f_opendir(void *pathname) __smallc;
+extern unsigned char __LIB__ esxdos_f_opendir(void *pathname) __smallc __z88dk_fastcall;
 
 
-extern unsigned char __LIB__ __FASTCALL__ esxdos_f_opendir_p3(void *pathname) __smallc;
+extern unsigned char __LIB__ esxdos_f_opendir_p3(void *pathname) __smallc __z88dk_fastcall;
 
 
-extern unsigned char __LIB__ esxdos_f_readdir(unsigned char handle,struct esx_dirent *dirent) __smallc;
-extern unsigned char __LIB__ __CALLEE__ esxdos_f_readdir_callee(unsigned char handle,struct esx_dirent *dirent) __smallc;
+extern unsigned char __LIB__ esxdos_f_readdir(unsigned char handle,struct esxdos_dirent *dirent) __smallc;
+extern unsigned char __LIB__ esxdos_f_readdir_callee(unsigned char handle,struct esxdos_dirent *dirent) __smallc __z88dk_callee;
 #define esxdos_f_readdir(a,b) esxdos_f_readdir_callee(a,b)
 
 
 
-extern int __LIB__ __FASTCALL__ esxdos_f_getcwd(void *buf) __smallc;
+extern int __LIB__ esxdos_f_getcwd(void *buf) __smallc __z88dk_fastcall;
 
 
 
-extern int __LIB__ __FASTCALL__ esxdos_f_chdir(void *pathname) __smallc;
+extern int __LIB__ esxdos_f_chdir(void *pathname) __smallc __z88dk_fastcall;
 
 
 
-extern int __LIB__ __FASTCALL__ esxdos_f_unlink(void *filename) __smallc;
+extern int __LIB__ esxdos_f_unlink(void *filename) __smallc __z88dk_fastcall;
 
 
 
 // Operations on Files
 
 extern unsigned char __LIB__ esxdos_f_open(void *filename,unsigned char mode) __smallc;
-extern unsigned char __LIB__ __CALLEE__ esxdos_f_open_callee(void *filename,unsigned char mode) __smallc;
+extern unsigned char __LIB__ esxdos_f_open_callee(void *filename,unsigned char mode) __smallc __z88dk_callee;
 #define esxdos_f_open(a,b) esxdos_f_open_callee(a,b)
 
 
-extern unsigned char __LIB__ esxdos_f_open_p3(void *filename,unsigned char mode,struct esx_p3_hdr *h) __smallc;
-extern unsigned char __LIB__ __CALLEE__ esxdos_f_open_p3_callee(void *filename,unsigned char mode,struct esx_p3_hdr *h) __smallc;
+extern unsigned char __LIB__ esxdos_f_open_p3(void *filename,unsigned char mode,struct esxdos_p3_hdr *h) __smallc;
+extern unsigned char __LIB__ esxdos_f_open_p3_callee(void *filename,unsigned char mode,struct esxdos_p3_hdr *h) __smallc __z88dk_callee;
 #define esxdos_f_open_p3(a,b,c) esxdos_f_open_p3_callee(a,b,c)
 
 
-extern int __LIB__ __FASTCALL__ esxdos_f_close(unsigned char handle) __smallc;
+extern int __LIB__ esxdos_f_close(unsigned char handle) __smallc __z88dk_fastcall;
 
 
 
-extern int __LIB__ __FASTCALL__ esxdos_f_sync(unsigned char handle) __smallc;
+extern int __LIB__ esxdos_f_sync(unsigned char handle) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ esxdos_f_fstat(unsigned char handle,struct esx_stat *es) __smallc;
-extern int __LIB__ __CALLEE__ esxdos_f_fstat_callee(unsigned char handle,struct esx_stat *es) __smallc;
+extern int __LIB__ esxdos_f_fstat(unsigned char handle,struct esxdos_stat *es) __smallc;
+extern int __LIB__ esxdos_f_fstat_callee(unsigned char handle,struct esxdos_stat *es) __smallc __z88dk_callee;
 #define esxdos_f_fstat(a,b) esxdos_f_fstat_callee(a,b)
 
 
-extern uint32_t __LIB__ __FASTCALL__ esxdos_f_fgetpos(unsigned char handle) __smallc;
+extern uint32_t __LIB__ esxdos_f_fgetpos(unsigned char handle) __smallc __z88dk_fastcall;
 
 
 
 extern uint32_t __LIB__ esxdos_f_seek(unsigned char handle,uint32_t distance,unsigned char whence) __smallc;
-extern uint32_t __LIB__ __CALLEE__ esxdos_f_seek_callee(unsigned char handle,uint32_t distance,unsigned char whence) __smallc;
+extern uint32_t __LIB__ esxdos_f_seek_callee(unsigned char handle,uint32_t distance,unsigned char whence) __smallc __z88dk_callee;
 #define esxdos_f_seek(a,b,c) esxdos_f_seek_callee(a,b,c)
 
 
 extern int __LIB__ esxdos_f_read(unsigned char handle,void *dst,size_t nbytes) __smallc;
-extern int __LIB__ __CALLEE__ esxdos_f_read_callee(unsigned char handle,void *dst,size_t nbytes) __smallc;
+extern int __LIB__ esxdos_f_read_callee(unsigned char handle,void *dst,size_t nbytes) __smallc __z88dk_callee;
 #define esxdos_f_read(a,b,c) esxdos_f_read_callee(a,b,c)
 
 
 extern int __LIB__ esxdos_f_write(unsigned char handle,void *src,size_t nbytes) __smallc;
-extern int __LIB__ __CALLEE__ esxdos_f_write_callee(unsigned char handle,void *src,size_t nbytes) __smallc;
+extern int __LIB__ esxdos_f_write_callee(unsigned char handle,void *src,size_t nbytes) __smallc __z88dk_callee;
 #define esxdos_f_write(a,b,c) esxdos_f_write_callee(a,b,c)
 
 

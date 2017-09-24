@@ -4,8 +4,8 @@ OBJS = lstmanip.o
 INSTALL ?= install
 
 ifeq ($(EXEPREFIX),.exe)
-OBJS += ../z80nm/getopt/getopt.o
-CFLAGS += -I../z80nm/getopt
+OBJS += ../getopt/getopt.o
+CFLAGS += -I../getopt
 endif
 
 all: z88dk-lstmanip$(EXESUFFIX)

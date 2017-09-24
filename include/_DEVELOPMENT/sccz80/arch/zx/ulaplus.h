@@ -33,23 +33,23 @@ extern void __LIB__ ulap_disable(void) __smallc;
 // Read or Write Many Palette Entries
 
 extern void __LIB__ *ulap_read_palette(void *dst,unsigned char pent,unsigned char num) __smallc;
-extern void __LIB__ __CALLEE__ *ulap_read_palette_callee(void *dst,unsigned char pent,unsigned char num) __smallc;
+extern void __LIB__ *ulap_read_palette_callee(void *dst,unsigned char pent,unsigned char num) __smallc __z88dk_callee;
 #define ulap_read_palette(a,b,c) ulap_read_palette_callee(a,b,c)
 
 
 extern void __LIB__ *ulap_write_palette(void *src,unsigned char pent,unsigned char num) __smallc;
-extern void __LIB__ __CALLEE__ *ulap_write_palette_callee(void *src,unsigned char pent,unsigned char num) __smallc;
+extern void __LIB__ *ulap_write_palette_callee(void *src,unsigned char pent,unsigned char num) __smallc __z88dk_callee;
 #define ulap_write_palette(a,b,c) ulap_write_palette_callee(a,b,c)
 
 
 
 // Read or Write a Single Palette Entry
 
-extern unsigned char __LIB__ __FASTCALL__ ulap_read_color(unsigned char pent) __smallc;
+extern unsigned char __LIB__ ulap_read_color(unsigned char pent) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ ulap_write_color(unsigned char pent,unsigned char color) __smallc;
-extern void __LIB__ __CALLEE__ ulap_write_color_callee(unsigned char pent,unsigned char color) __smallc;
+extern void __LIB__ ulap_write_color_callee(unsigned char pent,unsigned char color) __smallc __z88dk_callee;
 #define ulap_write_color(a,b) ulap_write_color_callee(a,b)
 
 
@@ -57,14 +57,14 @@ extern void __LIB__ __CALLEE__ ulap_write_color_callee(unsigned char pent,unsign
 // Runtime Versions of Selected Macros
 
 extern unsigned char __LIB__ ulap_attr_from_pentp_penti(unsigned char pentp,unsigned char penti) __smallc;
-extern unsigned char __LIB__ __CALLEE__ ulap_attr_from_pentp_penti_callee(unsigned char pentp,unsigned char penti) __smallc;
+extern unsigned char __LIB__ ulap_attr_from_pentp_penti_callee(unsigned char pentp,unsigned char penti) __smallc __z88dk_callee;
 #define ulap_attr_from_pentp_penti(a,b) ulap_attr_from_pentp_penti_callee(a,b)
 
 
-extern unsigned char __LIB__ __FASTCALL__ ulap_pent_from_attr_ink(unsigned char attr) __smallc;
+extern unsigned char __LIB__ ulap_pent_from_attr_ink(unsigned char attr) __smallc __z88dk_fastcall;
 
 
-extern unsigned char __LIB__ __FASTCALL__ ulap_pent_from_attr_paper(unsigned char attr) __smallc;
+extern unsigned char __LIB__ ulap_pent_from_attr_paper(unsigned char attr) __smallc __z88dk_fastcall;
 
 
 

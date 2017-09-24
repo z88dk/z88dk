@@ -11,7 +11,7 @@
 
         SECTION code_clib
 	PUBLIC	svi_slstick
-	EXTERN	msx_readpsg
+	EXTERN	get_psg
 	
 
 IF FORmsx
@@ -30,7 +30,7 @@ svi_slstick:
 
 IF FORmsx
 	ld	l,$0f	; port B
-	call	msx_readpsg
+	call	get_psg
 	djnz	stick1
 	and	$df
 	or	$4c
@@ -40,12 +40,12 @@ stick1:	and	$af
 stick2:	out	(PSG_DATA),a
 
 	ld	l,$0e	; port A
-	call	msx_readpsg
+	call	get_psg
 
 ELSE
 
 	ld	l,$0e	; port A
-	call	msx_readpsg
+	call	get_psg
 	djnz	stick1
 
 	; SVI - Stick 2

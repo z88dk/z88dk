@@ -25,7 +25,10 @@ typedef struct FileStackElem
 {
 	FILE	*file;					/* open file */
 	char	*filename;				/* source file name, held in strpool */
+	char	*line_filename;			/* source file name of LINE statement, held in strpool */
 	int		 line_nr;				/* current line number, i.e. last returned */
+	int		 line_inc;				/* increment on each line read */
+	Bool	 is_c_source;			/* true if C_LINE was called */
 } FileStackElem;
 
 static void free_file_stack_elem( void *_elem )
@@ -80,7 +83,8 @@ void SrcFile_init( SrcFile *self )
 {
 	strpool_init();
 	
-    self->filename   = NULL;
+	self->filename = NULL;
+	self->line_filename = NULL;
 
 	self->line = str_new(STR_SIZE);
 
@@ -157,6 +161,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 		return FALSE;
 	
 	self->filename = filename_path;
+	self->line_filename = filename_path;
 
     /* open new file in binary mode, for cross-platform newline processing */
     self->file = myfopen( self->filename, "rb" );
@@ -164,6 +169,8 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 	/* init current line */
     str_clear( self->line );
     self->line_nr = 0;
+	self->line_inc = 1;
+	self->is_c_source = FALSE;
 
 	if (self->file)
 		return TRUE;
@@ -239,8 +246,8 @@ char *SrcFile_getline( SrcFile *self )
         str_append_char( self->line, '\n' );
 
 	/* signal new line, even empty one, to show end line in list */
-    self->line_nr++;
-	call_new_line_cb( self->filename, self->line_nr, str_data(self->line) );
+    self->line_nr += self->line_inc;
+	call_new_line_cb( self->line_filename, self->line_nr, str_data(self->line) );
 
 	/* check for end of file
 	   even if EOF found, we need to return any chars in line first */
@@ -304,9 +311,29 @@ void SrcFile_ungetline( SrcFile *self, char *lines )
 }
 
 /* return the current file name and line number */
-char *SrcFile_filename( SrcFile *self ) { return self->filename; }
+char *SrcFile_filename( SrcFile *self ) { return self->line_filename; }
 int   SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
 
+Bool ScrFile_is_c_source(SrcFile * self)
+{
+	return self->is_c_source;
+}
+
+void SrcFile_set_filename(SrcFile * self, char * filename)
+{
+	self->line_filename = strpool_add(filename);
+}
+
+void SrcFile_set_line_nr(SrcFile * self, int line_nr, int line_inc)
+{
+	self->line_nr = line_nr - line_inc;
+	self->line_inc = line_inc;
+}
+
+void SrcFile_set_c_source(SrcFile * self)
+{
+	self->is_c_source = TRUE;
+}
 
 /* stack of input files manipulation:
    push saves current file on the stack and prepares for a new open
@@ -317,9 +344,12 @@ void SrcFile_push( SrcFile *self )
 	FileStackElem *elem = m_new( FileStackElem );
 	
 	elem->file		= self->file;
-	elem->filename	= self->filename;
-	elem->line_nr	= self->line_nr;
-	
+	elem->filename = self->filename;
+	elem->line_filename = self->line_filename;
+	elem->line_nr   = self->line_nr;
+	elem->line_inc = self->line_inc;
+	elem->is_c_source = self->is_c_source;
+
 	List_push( & self->file_stack, elem );
 	
 	self->file		= NULL;
@@ -342,9 +372,12 @@ Bool SrcFile_pop( SrcFile *self )
 		
 	elem = List_pop( self->file_stack );
 	self->file		= elem->file;
-	self->filename	= elem->filename;
-	self->line_nr	= elem->line_nr;
-	
+	self->filename = elem->filename;
+	self->line_filename = elem->line_filename;
+	self->line_nr   = elem->line_nr;
+	self->line_inc = elem->line_inc;
+	self->is_c_source = elem->is_c_source;
+
 	m_free( elem );
 	return TRUE;
 }
