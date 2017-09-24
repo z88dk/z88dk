@@ -1,0 +1,5 @@
+target/rc2014/driver/diskio/z80/asm_disk_initialize
+target/rc2014/driver/diskio/z80/asm_disk_ioctl
+target/rc2014/driver/diskio/z80/asm_disk_status
+target/rc2014/driver/diskio/z80/asm_disk_read
+target/rc2014/driver/diskio/z80/asm_disk_write

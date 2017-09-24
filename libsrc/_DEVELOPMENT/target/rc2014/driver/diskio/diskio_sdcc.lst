@@ -1,0 +1,11 @@
+target/rc2014/driver/diskio/c/sdcc/disk_initialize
+target/rc2014/driver/diskio/c/sdcc/disk_initialize_fastcall
+target/rc2014/driver/diskio/c/sdcc/disk_ioctl
+target/rc2014/driver/diskio/c/sdcc/disk_ioctl_callee
+target/rc2014/driver/diskio/c/sdcc/disk_status
+target/rc2014/driver/diskio/c/sdcc/disk_status_fastcall
+target/rc2014/driver/diskio/c/sdcc/disk_read
+target/rc2014/driver/diskio/c/sdcc/disk_read_callee
+target/rc2014/driver/diskio/c/sdcc/disk_write
+target/rc2014/driver/diskio/c/sdcc/disk_write_callee
+@target/rc2014/driver/diskio/diskio_asm.lst
