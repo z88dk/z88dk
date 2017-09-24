@@ -20,13 +20,13 @@
 #define SFX_CHANNEL3        __PSGLIB_SFX_CHANNEL3
 #define SFX_CHANNELS2AND3   __PSGLIB_SFX_CHANNELS2AND3
 
-extern void __LIB__ __FASTCALL__ PSGPlay(void *song) __smallc;
+extern void __LIB__ PSGPlay(void *song) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ PSGCancelLoop(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ PSGPlayNoRepeat(void *song) __smallc;
+extern void __LIB__ PSGPlayNoRepeat(void *song) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ PSGStop(void) __smallc;
@@ -35,17 +35,17 @@ extern void __LIB__ PSGStop(void) __smallc;
 extern unsigned char __LIB__ PSGGetStatus(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ PSGSetMusicVolumeAttenuation(unsigned char attenuation) __smallc;
+extern void __LIB__ PSGSetMusicVolumeAttenuation(unsigned char attenuation) __smallc __z88dk_fastcall;
 
 
 
 extern void __LIB__ PSGSFXPlay(void *sfx,unsigned char channels) __smallc;
-extern void __LIB__ __CALLEE__ PSGSFXPlay_callee(void *sfx,unsigned char channels) __smallc;
+extern void __LIB__ PSGSFXPlay_callee(void *sfx,unsigned char channels) __smallc __z88dk_callee;
 #define PSGSFXPlay(a,b) PSGSFXPlay_callee(a,b)
 
 
 extern void __LIB__ PSGSFXPlayLoop(void *sfx,unsigned char channels) __smallc;
-extern void __LIB__ __CALLEE__ PSGSFXPlayLoop_callee(void *sfx,unsigned char channels) __smallc;
+extern void __LIB__ PSGSFXPlayLoop_callee(void *sfx,unsigned char channels) __smallc __z88dk_callee;
 #define PSGSFXPlayLoop(a,b) PSGSFXPlayLoop_callee(a,b)
 
 

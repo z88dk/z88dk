@@ -11,27 +11,27 @@
 
 typedef void* p_stack_t;
 
-extern void __LIB__ __FASTCALL__ p_stack_clear(p_stack_t *s) __smallc;
+extern void __LIB__ p_stack_clear(p_stack_t *s) __smallc __z88dk_fastcall;
 
 
-extern int __LIB__ __FASTCALL__ p_stack_empty(p_stack_t *s) __smallc;
+extern int __LIB__ p_stack_empty(p_stack_t *s) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ p_stack_init(void *p) __smallc;
+extern void __LIB__ p_stack_init(void *p) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ *p_stack_pop(p_stack_t *s) __smallc;
+extern void __LIB__ *p_stack_pop(p_stack_t *s) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ p_stack_push(p_stack_t *s,void *item) __smallc;
-extern void __LIB__ __CALLEE__ p_stack_push_callee(p_stack_t *s,void *item) __smallc;
+extern void __LIB__ p_stack_push_callee(p_stack_t *s,void *item) __smallc __z88dk_callee;
 #define p_stack_push(a,b) p_stack_push_callee(a,b)
 
 
-extern size_t __LIB__ __FASTCALL__ p_stack_size(p_stack_t *s) __smallc;
+extern size_t __LIB__ p_stack_size(p_stack_t *s) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ *p_stack_top(p_stack_t *s) __smallc;
+extern void __LIB__ *p_stack_top(p_stack_t *s) __smallc __z88dk_fastcall;
 
 
 

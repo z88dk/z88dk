@@ -186,8 +186,9 @@ long parameter_search(char *filen, char *ext,char *target)
     strcpy(name,filen);
     strcat(name,ext);
     if ( (fp=fopen(name,"r"))==NULL) {
-        sprintf(name,"Cannot open %s%s\n",filen,ext);
-        myexit(name,1);
+//        sprintf(name,"Cannot open %s%s\n",filen,ext);
+//        myexit(name,1);
+        return -1;
     }
 
      /* Successfully opened the file so search through it.. */
@@ -292,7 +293,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
         fcode = fopen(name, "rb");
     }
 
-    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".sym", "__crt_model")) == -1))
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__crt_model")) == -1))
         crt_model = 0;
 
 
@@ -1075,7 +1076,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
 
                         for (i = 0; i < memory->num; ++i)
                         {
-                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) == NULL)
+                            if ((p = strstr(section_name, memory->bankspace[i].bank_id)) != NULL)
                             {
                                 int banknum;
 
@@ -1161,7 +1162,54 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
     }
 }
 
-int mb_remove_bank(struct bank_space *bs, unsigned int index)
+int mb_find_bankspace(struct banked_memory *memory, char *bankspace_name)
+{
+    int i;
+
+    for (i = 0; i < memory->num; ++i)
+        if (strcmp(memory->bankspace[i].bank_id, bankspace_name) == 0)
+            return i;
+
+    return -1;
+}
+
+int mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name)
+{
+    int index;
+
+    if ((index = mb_find_bankspace(memory, bankspace_name)) >= 0)
+    {
+        // found the bank space by name
+
+        int i;
+        struct bank_space *bs = &memory->bankspace[index];
+
+        // delete all memory banks in the bank space
+
+        for (i = 0; i < MAXBANKS; ++i)
+            mb_remove_bank(bs, i, 0);
+
+        free(bs->bank_id);
+
+        // remove the bank space from the memory model
+
+        memcpy(&memory->bankspace[index], &memory->bankspace[index + 1], (memory->num - index - 1) * sizeof(*memory->bankspace));
+
+        if (--memory->num > 0)
+            memory->bankspace = must_realloc(memory->bankspace, memory->num * sizeof(*memory->bankspace));
+        else
+        {
+            free(memory->bankspace);
+            memory->bankspace = NULL;
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 {
     if (index < MAXBANKS)
     {
@@ -1173,6 +1221,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index)
 
             for (i = 0; i < mb->num; ++i)
             {
+                if (clean) remove(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }
@@ -1189,14 +1238,16 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index)
     return 0;
 }
 
-int mb_remove_section(struct banked_memory *memory, char *section_name)
+int mb_find_section(struct banked_memory *memory, char *section_name, struct memory_bank **mb_r, int *secnum_r)
 {
-    // remove a particular section from the bank enumeration
+    // find the given section, return in mb_r & secnum_r
+    // return of 0 indicates section not found
 
-    // first find out which memory bank the section belongs to
     int    i;
     char  *p;
     struct memory_bank *mb = &memory->mainbank;
+
+    // first find out which memory bank the section belongs to
 
     for (i = 0; i < memory->num; ++i)
     {
@@ -1215,31 +1266,97 @@ int mb_remove_section(struct banked_memory *memory, char *section_name)
         }
     }
 
-    // remove the section from the memory bank
+    // memory bank to search is in mb
+    // look for the specific section
 
     for (i = 0; i < mb->num; ++i)
     {
         if (strcmp(mb->secbin[i].section_name, section_name) == 0)
         {
             // section has been found
-            // free allocated memory, remove it from the section array
 
-            free(mb->secbin[i].filename);
-            free(mb->secbin[i].section_name);
-
-            memcpy(&mb->secbin[i], &mb->secbin[i + 1], (mb->num - i - 1) * sizeof(*mb->secbin));
-
-            if (--mb->num > 0)
-                mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
-            else
-            {
-                free(mb->secbin);
-                mb->secbin = NULL;
-            }
+            *mb_r = mb;
+            *secnum_r = i;
 
             return 1;
         }
     }
+
+    // section not found
+
+    *mb_r = NULL;
+    *secnum_r = -1;
+
+    return 0;
+}
+
+int mb_remove_section(struct banked_memory *memory, char *section_name)
+{
+    // remove a particular section from the bank enumeration
+
+    int    secnum;
+    struct memory_bank *mb = &memory->mainbank;
+
+    if (mb_find_section(memory, section_name, &mb, &secnum))
+    {
+        // section has been found
+        // free allocated memory, remove it from the section array
+
+        free(mb->secbin[secnum].filename);
+        free(mb->secbin[secnum].section_name);
+
+        memcpy(&mb->secbin[secnum], &mb->secbin[secnum + 1], (mb->num - secnum - 1) * sizeof(*mb->secbin));
+
+        if (--mb->num > 0)
+            mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
+        else
+        {
+            free(mb->secbin);
+            mb->secbin = NULL;
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+int mb_user_remove_bank(struct banked_memory *memory, char *bankname)
+{
+    int i;
+    int banknum;
+
+    // first check if a bank space matches the name, if so remove the entire bank space (eg "BANK")
+    // second check if the bank name is composed of a bank space and bank number, if so delete the bank (eg "BANK_5")
+
+    // try to delete a bank space
+
+    if (mb_remove_bankspace(memory, bankname))
+        return 1;
+
+    // try to delete an individual memory bank
+
+    // find bank space that bankname belongs to
+
+    for (i = 0; i < memory->num; ++i)
+    {
+        char *p;
+
+        if ((p = strstr(bankname, memory->bankspace[i].bank_id)) != NULL)
+        {
+            if (sscanf(p + strlen(memory->bankspace[i].bank_id), "_%d", &banknum) == 1)
+            {
+                if ((banknum >= 0) && (banknum < MAXBANKS))
+                    break;
+            }
+        }
+    }
+
+    // memory bank found in
+    // bankspace i, memory bank banknum
+
+    if ((i < memory->num) && mb_remove_bank(&memory->bankspace[i], banknum, 0))
+        return 2;
 
     return 0;
 }
@@ -1405,6 +1522,78 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
     }
 
     return 0;
+}
+
+void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int ipad, int irecsz, struct banked_memory *memory)
+{
+    char filename[MBLINEMAX];
+    char ihexname[MBLINEMAX];
+    FILE *fbin, *fhex;
+    int   i, j, error;
+
+    // generate output binaries
+
+    if (memory->mainbank.num > 0)
+    {
+        // the main bank contains sections
+
+        snprintf(filename, sizeof(filename), "%s__.bin", binname);
+        strcpy(ihexname, filename);
+        suffix_change(ihexname, ".ihx");
+
+        fbin = fhex = NULL;
+
+        if ((fbin = fopen(filename, "wb+")) == NULL)
+            exit_log(1, "Error: Cannot create file %s\n", filename);
+
+        if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
+            exit_log(1, "Error: Cannot create file %s\n", ihexname);
+
+        printf("Creating %s (org 0x%04x = %d)\n", filename, memory->mainbank.secbin[0].org, memory->mainbank.secbin[0].org);
+
+        error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, &memory->mainbank);
+
+        fclose(fbin);
+        if (fhex != NULL) fclose(fhex);
+
+        if (error)
+            exit_log(1, "Aborting... section unavailable\n");
+    }
+
+    for (j = 0; j < memory->num; ++j)
+    {
+        for (i = 0; i < MAXBANKS; ++i)
+        {
+            struct memory_bank *mb = &memory->bankspace[j].membank[i];
+
+            if (mb->num > 0)
+            {
+                // the memory bank contains sections
+
+                snprintf(filename, sizeof(filename), "%s__%s_%03d.bin", binname, memory->bankspace[j].bank_id, i);
+                strcpy(ihexname, filename);
+                suffix_change(ihexname, ".ihx");
+
+                fbin = fhex = NULL;
+
+                if ((fbin = fopen(filename, "wb+")) == NULL)
+                    exit_log(1, "Error: Cannot create file %s\n", filename);
+
+                if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
+                    exit_log(1, "Error: Cannot create file %s\n", ihexname);
+
+                printf("Creating %s (org 0x%04x = %d)\n", filename, mb->secbin[0].org, mb->secbin[0].org);
+
+                error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, mb);
+
+                fclose(fbin);
+                if (fhex != NULL) fclose(fhex);
+
+                if (error)
+                    exit_log(1, "Aborting... section unavailable\n");
+            }
+        }
+    }
 }
 
 void mb_delete_source_binaries(struct banked_memory *memory)

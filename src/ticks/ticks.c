@@ -580,6 +580,14 @@ int    cmd_arguments_len = 0;
 
 int    c_cpu = CPU_Z80;
 
+
+static const uint8_t mirror_table[] = {
+    0x0, 0x8, 0x4, 0xC,  /*  0-3  */
+    0x2, 0xA, 0x6, 0xE,  /*  4-7  */
+    0x1, 0x9, 0x5, 0xD,  /*  8-11 */
+    0x3, 0xB, 0x7, 0xF   /* 12-15 */
+};
+
 long tapcycles(void){
   mues= 1;
   wavpos!=0x20000 && (ear^= 64);
@@ -3142,6 +3150,9 @@ int main (int argc, char **argv){
           case 0x24:    // (Z180) TST A,D
             if ( c_cpu == CPU_Z180 ) {
               TEST(h, 8);
+            } else if ( c_cpu == CPU_Z80_ZXN ) {   // (ZXN) mirror a
+              a = mirror_table[a & 0x0f] << 4 | mirror_table[(a & 0xf0) >> 4];
+              st += 4;
             } else {
               st += 8;
             }
@@ -3171,8 +3182,7 @@ int main (int argc, char **argv){
           case 0x15: case 0x16: case 0x17:
           case 0x18: case 0x19: case 0x1a: case 0x1b:
           case 0x1d: case 0x1e: case 0x1f:
-          case 0x20: case 0x21: case 0x22: case 0x23:
-          case 0x26: 
+          case 0x20: case 0x21: case 0x22:
           case 0x28: case 0x29: case 0x2a: case 0x2b:
           case 0x2d: case 0x2e: case 0x2f:
           case 0x3e: case 0x3f:
@@ -3187,7 +3197,7 @@ int main (int argc, char **argv){
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
           case 0xa5: case 0xa6: case 0xa7:
           case 0xad: case 0xae: case 0xaf:
-          case 0xb5: case 0xb6: case 0xb7:
+          case 0xb6: case 0xb7:
           case 0xbd: case 0xbe: case 0xbf:
           case 0xc0: case 0xc1: case 0xc2: case 0xc3:
           case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -3206,6 +3216,21 @@ int main (int argc, char **argv){
           case 0xf8: case 0xf9: case 0xfa: case 0xfb:
           case 0xfc: case 0xfd: case 0xff:
             st+= 8; break;
+          case 0x23:                                         // (ZXN) swapnib
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              a = (( a & 0xf0) >> 4) | (( a & 0x0f) << 4);
+            } else {
+              st += 8;
+            }
+            break;
+          case 0x26:                                         // (ZXN) mirror de
+            if ( c_cpu != CPU_Z80_ZXN) { st += 8; break; }
+            t = (mirror_table[e & 0x0f] << 4) | mirror_table[(e & 0xf0) >> 4];
+            e = d;
+            d = t;
+            e = (mirror_table[e & 0x0f] << 4) | mirror_table[(e & 0xf0) >> 4];
+            st += 4;
+            break;
           case 0x30:                                         // (ZXN) mul
             if ( c_cpu == CPU_Z80_ZXN ) {
               int32_t result = (( d * 256 ) + e) * (( h * 256 ) + l);
@@ -3408,13 +3433,13 @@ int main (int argc, char **argv){
               st += 8;
             }
             break;
-          case 0xa4: st+= 16;                                // (ZXN) ldix
+          case 0xa4:                                        // (ZXN) ldix
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            st += 16;
             t = get_memory(l | h<<8);
             if ( t != a ) {
               put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
-            put_memory(e | d<<8, t= get_memory(l | h<<8));
             ++l || h++;
             ++e || d++;
             c-- || b--;
@@ -3424,11 +3449,12 @@ int main (int argc, char **argv){
                   | t     &   8
                   | t<<4  &  32;
             fa= 0;
-            b|c && (fa= 128);
+            b|c && (st += 5, fa= 128);
             fb= fa; break;
-          case 0xac: st+= 16;                                // (ZXN) lddx
+          case 0xac:                                       // (ZXN) lddx
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
             t = get_memory(l | h<<8);
+            st += 16;
             if ( t != a ) {
                 put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
@@ -3441,11 +3467,12 @@ int main (int argc, char **argv){
                | t     &   8
                | t<<4  &  32;
             fa= 0;
-            b|c && (fa= 128);
+            b|c && (st += 5, fa= 128);
             fb= fa; break;
-          case 0xb4: st+= 16;                                // (ZXN) ldirx
+          case 0xb4:                                        // (ZXN) ldirx
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
             t = get_memory(l | h<<8);
+            st += 16;
             if ( t != a ) {
                 put_memory(e | d<<8, t= get_memory(l | h<<8));
             }
@@ -3463,9 +3490,18 @@ int main (int argc, char **argv){
                      mp= --pc,
                             --pc);
                    fb= fa; break;
-          case 0xbc: st+= 16;                                // LDDR
+          case 0xb5:                                         // (ZXN) fillde
+            if ( c_cpu != CPU_Z80_ZXN) { st += 8; break; }
+            st += 16;
+            put_memory(e | d<<8,a);
+            ++e || d++;
+            c-- || b--;
+            b|c && ( st += 5, mp= --pc, --pc);
+            break;
+          case 0xbc:                                         // (ZXN) LDDRX
             if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
             t = get_memory(l | h<<8);
+            st += 16;
             if ( t != a ) {
                 put_memory(e | d<<8, t= get_memory(l | h<<8));
             }

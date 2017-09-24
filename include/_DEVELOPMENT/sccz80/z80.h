@@ -10,44 +10,44 @@
 #include <stdint.h>
 #include <im2.h>
 
-extern void __LIB__ __FASTCALL__ z80_delay_ms(uint16_t ms) __smallc;
+extern void __LIB__ z80_delay_ms(uint16_t ms) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ z80_delay_tstate(uint16_t tstates) __smallc;
+extern void __LIB__ z80_delay_tstate(uint16_t tstates) __smallc __z88dk_fastcall;
 
 
 extern uint8_t __LIB__ z80_get_int_state(void) __smallc;
 
 
-extern void __LIB__ __FASTCALL__ z80_set_int_state(uint8_t state) __smallc;
+extern void __LIB__ z80_set_int_state(uint8_t state) __smallc __z88dk_fastcall;
 
 
 
-extern uint8_t __LIB__ __FASTCALL__ z80_inp(uint16_t port) __smallc;
+extern uint8_t __LIB__ z80_inp(uint16_t port) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ *z80_inir(void *dst,uint8_t port,uint8_t num) __smallc;
-extern void __LIB__ __CALLEE__ *z80_inir_callee(void *dst,uint8_t port,uint8_t num) __smallc;
+extern void __LIB__ *z80_inir_callee(void *dst,uint8_t port,uint8_t num) __smallc __z88dk_callee;
 #define z80_inir(a,b,c) z80_inir_callee(a,b,c)
 
 
 extern void __LIB__ *z80_indr(void *dst,uint8_t port,uint8_t num) __smallc;
-extern void __LIB__ __CALLEE__ *z80_indr_callee(void *dst,uint8_t port,uint8_t num) __smallc;
+extern void __LIB__ *z80_indr_callee(void *dst,uint8_t port,uint8_t num) __smallc __z88dk_callee;
 #define z80_indr(a,b,c) z80_indr_callee(a,b,c)
 
 
 extern void __LIB__ z80_outp(uint16_t port,uint8_t data) __smallc;
-extern void __LIB__ __CALLEE__ z80_outp_callee(uint16_t port,uint8_t data) __smallc;
+extern void __LIB__ z80_outp_callee(uint16_t port,uint8_t data) __smallc __z88dk_callee;
 #define z80_outp(a,b) z80_outp_callee(a,b)
 
 
 extern void __LIB__ *z80_otir(void *src,uint8_t port,uint8_t num) __smallc;
-extern void __LIB__ __CALLEE__ *z80_otir_callee(void *src,uint8_t port,uint8_t num) __smallc;
+extern void __LIB__ *z80_otir_callee(void *src,uint8_t port,uint8_t num) __smallc __z88dk_callee;
 #define z80_otir(a,b,c) z80_otir_callee(a,b,c)
 
 
 extern void __LIB__ *z80_otdr(void *src,uint8_t port,uint8_t num) __smallc;
-extern void __LIB__ __CALLEE__ *z80_otdr_callee(void *src,uint8_t port,uint8_t num) __smallc;
+extern void __LIB__ *z80_otdr_callee(void *src,uint8_t port,uint8_t num) __smallc __z88dk_callee;
 #define z80_otdr(a,b,c) z80_otdr_callee(a,b,c)
 
 

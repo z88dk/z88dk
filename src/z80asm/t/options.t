@@ -2,7 +2,6 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
@@ -99,101 +98,6 @@ END
 t_z80asm_capture('-b @test1.lst', "", "", 0);
 t_binary(read_binfile("test1.bin"), "\1\2\3\4");
 ok unlink "test1.bin";
-
-#------------------------------------------------------------------------------
-# --help, -h
-#------------------------------------------------------------------------------
-my $help_text = $copyrightmsg . <<'END';
-
-Usage:
-  z80asm [options] { @<modulefile> | <filename> }
-
-  [] = optional, {} = may be repeated, | = OR clause.
-
-  To assemble 'fred.asm' use 'fred' or 'fred.asm'
-
-  <modulefile> contains list of file names of all modules to be linked,
-  one module per line.
-
-  File types recognized or created by z80asm:
-    .asm   = source file
-    .o     = object file
-    .lis   = list file
-    .bin   = Z80 binary file
-    .sym   = symbols file
-    .map   = map file
-    .reloc = reloc file
-    .def   = global address definition file
-    .err   = error file
-
-Help Options:
-  -h, --help             Show help options
-  -v, --verbose          Be verbose
-
-Code Generation Options:
-  --cpu=z80-zxn          Assemble for the Z80 variant of ZX Next
-  --cpu=z80              Assemble for the Z80
-  --cpu=z180             Assemble for the Z180
-  --cpu=r2k              Assemble for the Rabbit 2000
-  --cpu=r3k              Assemble for the Rabbit 3000
-  --ti83plus             Interpret 'Invoke' as RST 28h
-  --IXIY                 Swap IX and IY registers
-  -C, --line-mode        Enable LINE directive
-
-Environment:
-  -I, --inc-path=PATH    Add directory to include search path
-  -L, --lib-path=PATH    Add directory to library search path
-  -D, --define=SYMBOL    Define a static symbol
-
-Libraries:
-  -x, --make-lib=FILE    Create a library file.lib
-  -i, --use-lib=FILE     Link library file.lib
-
-Binary Output:
-  -o, --output=FILE      Output binary file
-  -b, --make-bin         Assemble and link/relocate to file.bin
-  --split-bin            Create one binary file per section
-  -d, --date-stamp       Assemble only updated files
-  -r, --origin=ADDR      Relocate binary file to given address (decimal or hex)
-  -R, --relocatable      Create relocatable code
-  --reloc-info           Geneate binary file relocation information
-  --filler=BYTE          Default value to fill in DEFS (decimal or hex)
-
-Output File Options:
-  -s, --symtable         Create symbol table file.sym
-  -l, --list             Create listing file.lis
-  -m, --map              Create address map file.map
-  -g, --globaldef        Create global definition file.def
-
-Appmake Options:
-  +zx81                  Generate ZX81 .P file, origin at 16514
-  +zx                    Generate ZX Spectrum .tap file, origin defaults to
-                         23760 (in a REM), but can be set with -rORG >= 24000
-                         for above RAMTOP
-END
-
-unlink_testfiles();
-t_z80asm_capture("-h", 		$help_text, 	"", 0);
-t_z80asm_capture("--help", 	$help_text, 	"", 0);
-
-# make sure help fist in 80 columns
-my $out = capture_merged { system z80asm()." --help"; };
-my @long_lines = grep {length > 80} split(/\n/, $out);
-ok !@long_lines, "help within 80 columns";
-diag join("\n", @long_lines) if @long_lines;
-
-# check no arguments
-t_z80asm_capture("-h=x", 	"", 	<<'ERR', 1);
-Error: illegal option '-h=x'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
-
-t_z80asm_capture("--help=x", 	"", 	<<'ERR', 1);
-Error: illegal option '--help=x'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
 
 #------------------------------------------------------------------------------
 # --verbose, -v
@@ -572,87 +476,6 @@ t_z80asm_ok(0, "ex (sp),hl", "\xE3");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--cpu=r2k");
 
 #------------------------------------------------------------------------------
-# --cpu=z80-zxn
-# New Z80 opcodes on the NEXT (more to come)
-#------------------------------------------------------------------------------
-
-t_z80asm_ok(0, "swap",		pack("C*", 0xED, 0x23), "--cpu=z80-zxn");	# A bits 7-4 swap with A bits 3-0
-t_z80asm_ok(0, "swapnib",	pack("C*", 0xED, 0x23), "--cpu=z80-zxn");	# A bits 7-4 swap with A bits 3-0
-t_z80asm_ok(0, "mul",		pack("C*", 0xED, 0x30), "--cpu=z80-zxn");	# multiply HL*DE = DEHL (no flags set)
-t_z80asm_ok(0, "add hl,a",	pack("C*", 0xED, 0x31), "--cpu=z80-zxn");	# Add A to HL (no flags set)
-t_z80asm_ok(0, "add de,a",	pack("C*", 0xED, 0x32), "--cpu=z80-zxn");	# Add A to DE (no flags set)
-t_z80asm_ok(0, "add bc,a",	pack("C*", 0xED, 0x33), "--cpu=z80-zxn");	# Add A to BC (no flags set)
-t_z80asm_ok(0, "add hl,32767",	
-							pack("C*", 0xED, 0x34, 0xFF, 0x7F), "--cpu=z80-zxn");
-																		# Add NNNN to HL (no flags set)
-t_z80asm_ok(0, "add de,32767",	
-							pack("C*", 0xED, 0x35, 0xFF, 0x7F), "--cpu=z80-zxn");
-																		# Add NNNN to DE (no flags set)
-t_z80asm_ok(0, "add bc,32767",	
-							pack("C*", 0xED, 0x36, 0xFF, 0x7F), "--cpu=z80-zxn");
-																		# Add NNNN to BC (no flags set)
-t_z80asm_ok(0, "outinb",	pack("C*", 0xED, 0x90), "--cpu=z80-zxn");	# out (c),(hl), hl++
-t_z80asm_ok(0, "ldix",		pack("C*", 0xED, 0xA4), "--cpu=z80-zxn");	# As LDI,  but if byte==A does not copy
-t_z80asm_ok(0, "ldirx",		pack("C*", 0xED, 0xB4), "--cpu=z80-zxn");	# As LDIR, but if byte==A does not copy
-t_z80asm_ok(0, "lddx",		pack("C*", 0xED, 0xAC), "--cpu=z80-zxn");	# As LDD,  but if byte==A does not copy, 
-																		# and DE is incremented
-t_z80asm_ok(0, "lddrx",		pack("C*", 0xED, 0xBC), "--cpu=z80-zxn");	# As LDDR,  but if byte==A does not copy
-t_z80asm_ok(0, "ldirscale",	pack("C*", 0xED, 0xB6), "--cpu=z80-zxn");	# As LDIRX,  if(hl)!=A then (de)=(hl); HL_A'+=BC'; DE+=DE'; dec BC; Loop.
-t_z80asm_ok(0, "ldpirx",	pack("C*", 0xED, 0xB7), "--cpu=z80-zxn");	# (de) = ( (hl&$fff8)+(E&7) ) when != A
-
-t_z80asm_ok(0, "fillde",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
-t_z80asm_ok(0, "fill de",	pack("C*", 0xED, 0xB5), "--cpu=z80-zxn");	# Using A fill from DE for BC bytes
-t_z80asm_ok(0, "ld hl,sp",	pack("C*", 0xED, 0x25), "--cpu=z80-zxn");	# transfer SP to HL
-t_z80asm_ok(0, "ld a32,dehl",
-							pack("C*", 0xED, 0x20), "--cpu=z80-zxn");	# transfer dehl into A32
-t_z80asm_ok(0, "ld dehl,a32",
-							pack("C*", 0xED, 0x21), "--cpu=z80-zxn");	# transfer A32 into dehl
-t_z80asm_ok(0, "ex a32,dehl",
-							pack("C*", 0xED, 0x22), "--cpu=z80-zxn");	# swap A32 with dehl
-t_z80asm_ok(0, "inc dehl",	pack("C*", 0xED, 0x37), "--cpu=z80-zxn");	# increment 32bit dehl
-t_z80asm_ok(0, "dec dehl",	pack("C*", 0xED, 0x38), "--cpu=z80-zxn");	# increment 32bit dehl
-t_z80asm_ok(0, "add dehl,a",pack("C*", 0xED, 0x39), "--cpu=z80-zxn");	# Add A to 32bit dehl
-t_z80asm_ok(0, "add dehl,bc",	
-							pack("C*", 0xED, 0x3A), "--cpu=z80-zxn");	# Add BC to 32bit dehl
-t_z80asm_ok(0, "add dehl,32767",	
-							pack("C*", 0xED, 0x3B, 0xFF, 0x7F), "--cpu=z80-zxn");	
-																		# Add NNNN to 32bit dehl
-t_z80asm_ok(0, "sub dehl,a",pack("C*", 0xED, 0x3C), "--cpu=z80-zxn");	# Subtract A from 32bit dehl
-t_z80asm_ok(0, "sub dehl,bc",
-							pack("C*", 0xED, 0x3D), "--cpu=z80-zxn");	# Subtract BC from 32bit dehl
-t_z80asm_ok(0, "mirror a",	pack("C*", 0xED, 0x24), "--cpu=z80-zxn");	# mirror the bits in A     
-t_z80asm_ok(0, "mirror de",	pack("C*", 0xED, 0x26), "--cpu=z80-zxn");	# mirror the bits in DE     
-t_z80asm_ok(0, "push 32767",
-							pack("C*", 0xED, 0x8A, 0xFF, 0x7F), "--cpu=z80-zxn");	
-																		# push 16bit immidiate value
-t_z80asm_ok(0, "popx",		pack("C*", 0xED, 0x8B), "--cpu=z80-zxn");	# pop value and disguard
-
-t_z80asm_ok(0, "nextreg 31,63", 
-							pack("C*", 0xED, 0x91, 0x1F, 0x3F), "--cpu=z80-zxn");	
-																		# Set a NEXT register 
-																		# (like doing out($243b),reg then out($253b),val )
-t_z80asm_ok(0, "nextreg 31,a",	
-							pack("C*", 0xED, 0x92, 0x1F), "--cpu=z80-zxn");
-																		# Set a NEXT register using A 
-																		# (like doing out($243b),reg then out($253b),A )
-
-t_z80asm_ok(0, "pixeldn",	pack("C*", 0xED, 0x93), "--cpu=z80-zxn");	# Move down a line on the ULA screen
-t_z80asm_ok(0, "pixelad",	pack("C*", 0xED, 0x94), "--cpu=z80-zxn");	# using D,E (as Y,X) calculate the 
-																		# ULA screen address and store in HL
-t_z80asm_ok(0, "setae",		pack("C*", 0xED, 0x95), "--cpu=z80-zxn");	# Using the lower 3 bits of E 
-																		# (X coordinate), set the correct bit value in A
-t_z80asm_ok(0, "tst 31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
-																		# And A with NN and set all flags. A is not affected.
-   
-t_z80asm_ok(0, "test 31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
-																		# And A with NN and set all flags. A is not affected.
-   
-t_z80asm_ok(0, "tst a,31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
-																		# And A with NN and set all flags. A is not affected.
-t_z80asm_ok(0, "test a,31",	pack("C*", 0xED, 0x27, 0x1F), "--cpu=z80-zxn");	
-																		# And A with NN and set all flags. A is not affected.
-   
-#------------------------------------------------------------------------------
 # --ti83plus
 #------------------------------------------------------------------------------
 
@@ -670,8 +493,6 @@ t_z80asm_ok(0, "ld iy,0x1234", "\xFD\x21\x34\x12");
 t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "--IXIY");
 
 #------------------------------------------------------------------------------
-
-# -C, --line-mode : tested in directives.t
 
 #------------------------------------------------------------------------------
 # -I, --inc-path - tested in directives.t

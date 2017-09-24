@@ -14,7 +14,7 @@ define(`__Z80_CMOS', 0x02)
 
 # Clock frequency in Hz
 
-define(`__CPU_CLOCK', 28000000)
+define(`__CPU_CLOCK', 3500000)
 
 # This will be the clock speed expected in time-sensitive functions
 # Nominal clock speed can be 3.5MHz, 7MHz, 14MHz, 28MHz

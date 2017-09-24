@@ -61,14 +61,14 @@
 extern int __LIB__ in_inkey(void) __smallc;
 
 
-extern int __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode) __smallc;
+extern int __LIB__ in_key_pressed(uint16_t scancode) __smallc __z88dk_fastcall;
 
 
-extern uint16_t __LIB__ __FASTCALL__ in_key_scancode(int c) __smallc;
+extern uint16_t __LIB__ in_key_scancode(int c) __smallc __z88dk_fastcall;
 
 
 
-extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms) __smallc;
+extern uint16_t __LIB__ in_pause(uint16_t dur_ms) __smallc __z88dk_fastcall;
 
 
 extern int __LIB__ in_test_key(void) __smallc;
@@ -97,7 +97,7 @@ typedef uint16_t (*JOYFUNC)(udk_t *);
 #define JOYFUNC  void*
 #endif
 
-extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u) __smallc;
+extern uint16_t __LIB__ in_stick_keyboard(udk_t *u) __smallc __z88dk_fastcall;
 
 
 
@@ -122,7 +122,7 @@ extern uint16_t __LIB__ in_stick_sinclair2(void) __smallc;
 ////////
 
 extern void __LIB__ in_mouse_amx_init(uint16_t x_vector,uint16_t y_vector) __smallc;
-extern void __LIB__ __CALLEE__ in_mouse_amx_init_callee(uint16_t x_vector,uint16_t y_vector) __smallc;
+extern void __LIB__ in_mouse_amx_init_callee(uint16_t x_vector,uint16_t y_vector) __smallc __z88dk_callee;
 #define in_mouse_amx_init(a,b) in_mouse_amx_init_callee(a,b)
 
 
@@ -130,12 +130,12 @@ extern void __LIB__ in_mouse_amx_reset(void) __smallc;
 
 
 extern void __LIB__ in_mouse_amx_setpos(uint16_t x,uint16_t y) __smallc;
-extern void __LIB__ __CALLEE__ in_mouse_amx_setpos_callee(uint16_t x,uint16_t y) __smallc;
+extern void __LIB__ in_mouse_amx_setpos_callee(uint16_t x,uint16_t y) __smallc __z88dk_callee;
 #define in_mouse_amx_setpos(a,b) in_mouse_amx_setpos_callee(a,b)
 
 
 extern void __LIB__ in_mouse_amx(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
-extern void __LIB__ __CALLEE__ in_mouse_amx_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
+extern void __LIB__ in_mouse_amx_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc __z88dk_callee;
 #define in_mouse_amx(a,b,c) in_mouse_amx_callee(a,b,c)
 
 
@@ -153,12 +153,12 @@ extern void __LIB__ in_mouse_kempston_reset(void) __smallc;
 
 
 extern void __LIB__ in_mouse_kempston_setpos(uint16_t x,uint16_t y) __smallc;
-extern void __LIB__ __CALLEE__ in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y) __smallc;
+extern void __LIB__ in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y) __smallc __z88dk_callee;
 #define in_mouse_kempston_setpos(a,b) in_mouse_kempston_setpos_callee(a,b)
 
 
 extern void __LIB__ in_mouse_kempston(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
-extern void __LIB__ __CALLEE__ in_mouse_kempston_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
+extern void __LIB__ in_mouse_kempston_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc __z88dk_callee;
 #define in_mouse_kempston(a,b,c) in_mouse_kempston_callee(a,b,c)
 
 

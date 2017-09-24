@@ -30,6 +30,9 @@ int primary(LVALUE* lval)
         if (strcmp(sname, "sizeof") == 0) {
             size_of(lval);
             return (0);
+        } else if ( strcmp(sname, "__builtin_offsetof") == 0 ) {
+            offset_of(lval);
+            return(0);
         } else if ((ptr = findloc(sname)) && ptr->ident != GOTOLABEL) {
             lval->offset = getloc(ptr, 0);
             lval->symbol = ptr;

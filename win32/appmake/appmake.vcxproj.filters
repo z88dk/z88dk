@@ -47,8 +47,11 @@
     <ClCompile Include="..\..\src\appmake\zxvgs.c" />
     <ClCompile Include="..\..\src\appmake\kc.c" />
     <ClCompile Include="..\..\src\appmake\glue.c" />
+    <ClCompile Include="..\..\src\appmake\zxn.c" />
+    <ClCompile Include="..\..\src\appmake\zx-util.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
+    <ClInclude Include="..\..\src\appmake\zx-util.h" />
   </ItemGroup>
 </Project>

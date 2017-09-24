@@ -86,44 +86,44 @@ extern volatile unsigned char MM_FFFC;
 
 // MISCELLANEOUS
 
-extern void __LIB__ __FASTCALL__ sms_border(unsigned char color) __smallc;
+extern void __LIB__ sms_border(unsigned char color) __smallc __z88dk_fastcall;
 
 
 extern unsigned int __LIB__ sms_cxy2saddr(unsigned char x,unsigned char y) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc;
+extern unsigned int __LIB__ sms_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc __z88dk_callee;
 #define sms_cxy2saddr(a,b) sms_cxy2saddr_callee(a,b)
 
 
 
 extern void __LIB__ *sms_copy_font_8x8_to_vram(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
-extern void __LIB__ __CALLEE__ *sms_copy_font_8x8_to_vram_callee(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc;
+extern void __LIB__ *sms_copy_font_8x8_to_vram_callee(void *font,unsigned char num,unsigned char bgnd_color,unsigned char fgnd_color) __smallc __z88dk_callee;
 #define sms_copy_font_8x8_to_vram(a,b,c,d) sms_copy_font_8x8_to_vram_callee(a,b,c,d)
 
 
 
 extern void __LIB__ sms_cls_wc(struct r_Rect8 *r,unsigned int background_char) __smallc;
-extern void __LIB__ __CALLEE__ sms_cls_wc_callee(struct r_Rect8 *r,unsigned int background_char) __smallc;
+extern void __LIB__ sms_cls_wc_callee(struct r_Rect8 *r,unsigned int background_char) __smallc __z88dk_callee;
 #define sms_cls_wc(a,b) sms_cls_wc_callee(a,b)
 
 
 extern void __LIB__ sms_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
-extern void __LIB__ __CALLEE__ sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc;
+extern void __LIB__ sms_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned int background_char) __smallc __z88dk_callee;
 #define sms_scroll_wc_up(a,b,c) sms_scroll_wc_up_callee(a,b,c)
 
 
 
 extern void __LIB__ sms_tiles_clear_area(struct r_Rect8 *r,unsigned int background_char) __smallc;
-extern void __LIB__ __CALLEE__ sms_tiles_clear_area_callee(struct r_Rect8 *r,unsigned int background_char) __smallc;
+extern void __LIB__ sms_tiles_clear_area_callee(struct r_Rect8 *r,unsigned int background_char) __smallc __z88dk_callee;
 #define sms_tiles_clear_area(a,b) sms_tiles_clear_area_callee(a,b)
 
 
 extern void __LIB__ sms_tiles_get_area(struct r_Rect8 *r,void *dst) __smallc;
-extern void __LIB__ __CALLEE__ sms_tiles_get_area_callee(struct r_Rect8 *r,void *dst) __smallc;
+extern void __LIB__ sms_tiles_get_area_callee(struct r_Rect8 *r,void *dst) __smallc __z88dk_callee;
 #define sms_tiles_get_area(a,b) sms_tiles_get_area_callee(a,b)
 
 
 extern void __LIB__ sms_tiles_put_area(struct r_Rect8 *r,void *src) __smallc;
-extern void __LIB__ __CALLEE__ sms_tiles_put_area_callee(struct r_Rect8 *r,void *src) __smallc;
+extern void __LIB__ sms_tiles_put_area_callee(struct r_Rect8 *r,void *src) __smallc __z88dk_callee;
 #define sms_tiles_put_area(a,b) sms_tiles_put_area_callee(a,b)
 
 
@@ -143,132 +143,132 @@ extern void __LIB__ __CALLEE__ sms_tiles_put_area_callee(struct r_Rect8 *r,void 
 #define sms_display_off()  sms_vdp_feature_disable(__VDP_FEATURE_SHOW_DISPLAY)
 #define sms_display_on()   sms_vdp_feature_enable(__VDP_FEATURE_SHOW_DISPLAY)
 
-extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_disable(unsigned int features) __smallc;
+extern unsigned int __LIB__ sms_vdp_feature_disable(unsigned int features) __smallc __z88dk_fastcall;
 
 
-extern unsigned int __LIB__ __FASTCALL__ sms_vdp_feature_enable(unsigned int features) __smallc;
-
-
-
-extern void __LIB__ __FASTCALL__ sms_vdp_init(void *vdp_reg_array) __smallc;
+extern unsigned int __LIB__ sms_vdp_feature_enable(unsigned int features) __smallc __z88dk_fastcall;
 
 
 
-extern void __LIB__ __FASTCALL__ sms_vdp_set_read_address(unsigned int addr) __smallc;
+extern void __LIB__ sms_vdp_init(void *vdp_reg_array) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ __FASTCALL__ sms_vdp_set_write_address(unsigned int addr) __smallc;
+
+extern void __LIB__ sms_vdp_set_read_address(unsigned int addr) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sms_vdp_set_write_address(unsigned int addr) __smallc __z88dk_fastcall;
 
 
 
 // VRAM <-> MEMORY COPY OPERATIONS
 
 extern void __LIB__ sms_copy_mem_to_vram(void *src,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_copy_mem_to_vram_callee(void *src,unsigned int n) __smallc;
+extern void __LIB__ sms_copy_mem_to_vram_callee(void *src,unsigned int n) __smallc __z88dk_callee;
 #define sms_copy_mem_to_vram(a,b) sms_copy_mem_to_vram_callee(a,b)
 
 
 extern void __LIB__ sms_copy_mem_to_vram_unsafe(void *src,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_copy_mem_to_vram_unsafe_callee(void *src,unsigned int n) __smallc;
+extern void __LIB__ sms_copy_mem_to_vram_unsafe_callee(void *src,unsigned int n) __smallc __z88dk_callee;
 #define sms_copy_mem_to_vram_unsafe(a,b) sms_copy_mem_to_vram_unsafe_callee(a,b)
 
 
 
 extern void __LIB__ sms_copy_vram_to_mem(void *dst,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_copy_vram_to_mem_callee(void *dst,unsigned int n) __smallc;
+extern void __LIB__ sms_copy_vram_to_mem_callee(void *dst,unsigned int n) __smallc __z88dk_callee;
 #define sms_copy_vram_to_mem(a,b) sms_copy_vram_to_mem_callee(a,b)
 
 
 extern void __LIB__ sms_copy_vram_to_mem_unsafe(void *dst,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_copy_vram_to_mem_unsafe_callee(void *dst,unsigned int n) __smallc;
+extern void __LIB__ sms_copy_vram_to_mem_unsafe_callee(void *dst,unsigned int n) __smallc __z88dk_callee;
 #define sms_copy_vram_to_mem_unsafe(a,b) sms_copy_vram_to_mem_unsafe_callee(a,b)
 
 
 
 extern void __LIB__ sms_set_vram(unsigned char c,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_set_vram_callee(unsigned char c,unsigned int n) __smallc;
+extern void __LIB__ sms_set_vram_callee(unsigned char c,unsigned int n) __smallc __z88dk_callee;
 #define sms_set_vram(a,b) sms_set_vram_callee(a,b)
 
 
 extern void __LIB__ sms_set_vram_unsafe(unsigned char c,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_set_vram_unsafe_callee(unsigned char c,unsigned int n) __smallc;
+extern void __LIB__ sms_set_vram_unsafe_callee(unsigned char c,unsigned int n) __smallc __z88dk_callee;
 #define sms_set_vram_unsafe(a,b) sms_set_vram_unsafe_callee(a,b)
 
 
 
 extern void __LIB__ sms_setw_vram(unsigned int c,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_setw_vram_callee(unsigned int c,unsigned int n) __smallc;
+extern void __LIB__ sms_setw_vram_callee(unsigned int c,unsigned int n) __smallc __z88dk_callee;
 #define sms_setw_vram(a,b) sms_setw_vram_callee(a,b)
 
 
 extern void __LIB__ sms_setw_vram_unsafe(unsigned int c,unsigned int n) __smallc;
-extern void __LIB__ __CALLEE__ sms_setw_vram_unsafe_callee(unsigned int c,unsigned int n) __smallc;
+extern void __LIB__ sms_setw_vram_unsafe_callee(unsigned int c,unsigned int n) __smallc __z88dk_callee;
 #define sms_setw_vram_unsafe(a,b) sms_setw_vram_unsafe_callee(a,b)
 
 
 
 extern unsigned int __LIB__ sms_memcpy_mem_to_cram(unsigned int cdst,void *src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_mem_to_cram_callee(unsigned int cdst,void *src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_mem_to_cram_callee(unsigned int cdst,void *src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_mem_to_cram(a,b,c) sms_memcpy_mem_to_cram_callee(a,b,c)
 
 
 extern unsigned int __LIB__ sms_memcpy_mem_to_cram_unsafe(unsigned int cdst,void *src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_mem_to_cram_unsafe_callee(unsigned int cdst,void *src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_mem_to_cram_unsafe_callee(unsigned int cdst,void *src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_mem_to_cram_unsafe(a,b,c) sms_memcpy_mem_to_cram_unsafe_callee(a,b,c)
 
 
 
 extern unsigned int __LIB__ sms_memcpy_mem_to_vram(unsigned int dst,void *src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_mem_to_vram_callee(unsigned int dst,void *src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_mem_to_vram_callee(unsigned int dst,void *src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_mem_to_vram(a,b,c) sms_memcpy_mem_to_vram_callee(a,b,c)
 
 
 extern unsigned int __LIB__ sms_memcpy_mem_to_vram_unsafe(unsigned int dst,void *src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_mem_to_vram_unsafe_callee(unsigned int dst,void *src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_mem_to_vram_unsafe_callee(unsigned int dst,void *src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_mem_to_vram_unsafe(a,b,c) sms_memcpy_mem_to_vram_unsafe_callee(a,b,c)
 
 
 
 extern unsigned int __LIB__ sms_memcpy_vram_to_mem(void *dst,unsigned int src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_vram_to_mem_callee(void *dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_vram_to_mem_callee(void *dst,unsigned int src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_vram_to_mem(a,b,c) sms_memcpy_vram_to_mem_callee(a,b,c)
 
 
 extern unsigned int __LIB__ sms_memcpy_vram_to_mem_unsafe(void *dst,unsigned int src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_vram_to_mem_unsafe_callee(void *dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_vram_to_mem_unsafe_callee(void *dst,unsigned int src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_vram_to_mem_unsafe(a,b,c) sms_memcpy_vram_to_mem_unsafe_callee(a,b,c)
 
 
 
 extern unsigned int __LIB__ sms_memcpy_vram_to_vram(unsigned int dst,unsigned int src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_vram_to_vram_callee(unsigned int dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_vram_to_vram_callee(unsigned int dst,unsigned int src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_vram_to_vram(a,b,c) sms_memcpy_vram_to_vram_callee(a,b,c)
 
 
 extern unsigned int __LIB__ sms_memcpy_vram_to_vram_unsafe(unsigned int dst,unsigned int src,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memcpy_vram_to_vram_unsafe_callee(unsigned int dst,unsigned int src,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memcpy_vram_to_vram_unsafe_callee(unsigned int dst,unsigned int src,unsigned int n) __smallc __z88dk_callee;
 #define sms_memcpy_vram_to_vram_unsafe(a,b,c) sms_memcpy_vram_to_vram_unsafe_callee(a,b,c)
 
 
 
 extern unsigned int __LIB__ sms_memset_vram(unsigned int dst,unsigned char c,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memset_vram_callee(unsigned int dst,unsigned char c,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memset_vram_callee(unsigned int dst,unsigned char c,unsigned int n) __smallc __z88dk_callee;
 #define sms_memset_vram(a,b,c) sms_memset_vram_callee(a,b,c)
 
 
 extern unsigned int __LIB__ sms_memset_vram_unsafe(unsigned int dst,unsigned char c,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memset_vram_unsafe_callee(unsigned int dst,unsigned char c,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memset_vram_unsafe_callee(unsigned int dst,unsigned char c,unsigned int n) __smallc __z88dk_callee;
 #define sms_memset_vram_unsafe(a,b,c) sms_memset_vram_unsafe_callee(a,b,c)
 
 
 
 extern unsigned int __LIB__ sms_memsetw_vram(unsigned int dst,unsigned int c,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memsetw_vram_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc __z88dk_callee;
 #define sms_memsetw_vram(a,b,c) sms_memsetw_vram_callee(a,b,c)
 
 
 extern unsigned int __LIB__ sms_memsetw_vram_unsafe(unsigned int dst,unsigned int c,unsigned int n) __smallc;
-extern unsigned int __LIB__ __CALLEE__ sms_memsetw_vram_unsafe_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc;
+extern unsigned int __LIB__ sms_memsetw_vram_unsafe_callee(unsigned int dst,unsigned int c,unsigned int n) __smallc __z88dk_callee;
 #define sms_memsetw_vram_unsafe(a,b,c) sms_memsetw_vram_unsafe_callee(a,b,c)
 
 
