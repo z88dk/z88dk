@@ -2280,8 +2280,9 @@ int disassemble(int pc, char *buf, size_t buflen)
 
         if (instr->flags & F_ZXN && c_cpu != CPU_Z80_ZXN ) {
             instr = NULL;
-        }
-        if (instr->flags & F_R3K && c_cpu != CPU_R3K ) {
+        } else if (instr->flags & F_R2K && (c_cpu & (CPU_R2K|CPU_R3K)) == 0  ) {
+            instr = NULL;
+        } else if (instr->flags & F_R3K && c_cpu != CPU_R3K ) {
             instr = NULL;
         }
 
