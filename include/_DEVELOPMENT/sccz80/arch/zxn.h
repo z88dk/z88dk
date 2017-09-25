@@ -150,6 +150,56 @@ __sfr __banked __at 0xbffd IO_BFFD;
 #define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
 #endif
 
+extern unsigned char __LIB__ ZXN_READ_MMU0(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU1(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU2(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU3(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU4(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU5(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU6(void) __smallc;
+
+
+extern unsigned char __LIB__ ZXN_READ_MMU7(void) __smallc;
+
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU0(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU1(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU2(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU3(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU4(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU5(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU6(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ ZXN_WRITE_MMU7(unsigned char page) __smallc __z88dk_fastcall;
+
+
+
 // tape i/o
 
 struct zxtapehdr

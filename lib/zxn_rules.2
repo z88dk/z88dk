@@ -1,3 +1,26 @@
-	call	_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"1_%"[A-Fa-f0-9xX]+"2
+%"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
 =
-	nextreg %1,%2
+	nextreg	%2,%3
+
+%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+=
+	call	%2ZXN_WRITE_MMU%3_fastcall
+	ret
+
+%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
+=
+	call	%2ZXN_READ_MMU%3
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+=
+	ld	a,l
+	nextreg	0x50+%3,a
+
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
+=
+	ld	bc,0x243b
+	ld	a,0x50+%3
+	out	(c),a
+	inc	b
+	in	l,(c)
