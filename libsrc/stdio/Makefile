@@ -13,18 +13,18 @@ AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
-all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
+all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
 
 obj/net/%.o: %.asm
 	@zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/net/%.o: %.c
-	@zcc +z88 $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
+	@zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
-obj/cpm/%.o: %.asm
+obj/binary/%.o: %.asm
 	@zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
-obj/cpm/%.o: %.c
+obj/binary/%.o: %.c
 	@zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
 obj/%.o: %.asm
@@ -44,7 +44,7 @@ obj/stdesc/%.o: %.c
 
 .PHONY: dirs
 dirs:
-	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/cpm obj/stdesc obj/r2k
+	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/binary obj/stdesc obj/r2k
 
 
 
