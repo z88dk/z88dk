@@ -7,6 +7,11 @@
 	call	%2ZXN_WRITE_MMU%3_fastcall
 	ret
 
+%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+=
+	call	%2ZXN_WRITE_MMU%3
+	ret
+
 %"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
 =
 	call	%2ZXN_READ_MMU%3
@@ -15,7 +20,12 @@
 %"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
 =
 	ld	a,l
-	nextreg	0x50+%3,a
+	mmu%3 a
+
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+=
+	ld	a,l
+	mmu%3 a
 
 %"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
 =
