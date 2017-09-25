@@ -158,6 +158,20 @@ for my $page (0..7) {
 }
 
 # 
+# 12T*  mmu0 a            ED 92 50         macro: Ram page in slot 0-8k
+# 12T*  mmu1 a            ED 92 51         macro: Ram page in slot 8k-16k
+# 12T*  mmu2 a            ED 92 52         macro: Ram page in slot 16k-24k
+# 12T*  mmu3 a            ED 92 53         macro: Ram page in slot 24k-32k
+# 12T*  mmu4 a            ED 92 54         macro: Ram page in slot 32k-40k
+# 12T*  mmu5 a            ED 92 55         macro: Ram page in slot 40k-48k
+# 12T*  mmu6 a            ED 92 56         macro: Ram page in slot 48k-56k
+# 12T*  mmu7 a            ED 92 57         macro: Ram page in slot 56k-64k
+for my $page (0..7) {
+	add("mmu$page a",	0xED, 0x92, 0x50 + $page);
+	add("mmu $page,a",	0xED, 0x92, 0x50 + $page);
+}
+
+# 
 # * Times are guesses based on other instruction times.  All of this subject to change.
 
 
