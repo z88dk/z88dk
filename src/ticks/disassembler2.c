@@ -287,6 +287,18 @@ int disassemble2(int pc, char *buf, size_t buflen)
                 if ( z == 6 && y == 6 ) {
                     if ( israbbit() ) BUF_PRINTF("altd");
                     else BUF_PRINTF("halt");
+                } else if ( israbbit() && z == 4 && y == 7 ) {
+                    BUF_PRINTF("ld\thl,%s", handle_register16(state,2, state->index));
+                } else if ( israbbit() && z == 5 && y == 7 ) {
+                    BUF_PRINTF("ld\t%s,hl", handle_register16(state,2, state->index)); 
+                } else if ( israbbit() && z == 4 && y == 4 && state->index ) {
+                    BUF_PRINTF("ldp\t(%s),hl",  handle_register16(state,2, state->index)); 
+                } else if ( israbbit() && z == 5 && y == 4 && state->index ) {
+                    BUF_PRINTF("ldp\t(%s),hl",  handle_addr16(state,opbuf1, sizeof(opbuf1)));
+                } else if ( israbbit() && z == 4 && y == 5 && state->index ) {
+                    BUF_PRINTF("ldp\thl,(%s)", handle_register16(state,2, state->index)); 
+                } else if ( israbbit() && z == 5 && y == 5 && state->index ) {
+                    BUF_PRINTF("ldp\t%s,(%s)", handle_register16(state,2, state->index),  handle_addr16(state,opbuf1, sizeof(opbuf1)));
                 } else {
                     handle_register8(state, y, opbuf1, sizeof(opbuf1));
                     handle_register8(state, z, opbuf2, sizeof(opbuf2));
@@ -358,9 +370,9 @@ int disassemble2(int pc, char *buf, size_t buflen)
                         else if ( y == 1 ) BUF_PRINTF("bool\t%s",handle_register16(state, 2, state->index));
                         else if ( y == 2 ) BUF_PRINTF("ld\t(sp+%s),%s",handle_immed8(state, opbuf1, sizeof(opbuf1)),handle_register16(state, 2, state->index));
                         else if ( y == 3 ) BUF_PRINTF("and\t%s,de", handle_register16(state,2, state->index));
-                        else if ( y == 4 ) BUF_PRINTF("ld hl,(%s%s)", handle_register16(state,2, state->index == 0 ? 1 : state->index == 1 ? 0 : 2), handle_displacement(state, opbuf1, sizeof(opbuf1)));
+                        else if ( y == 4 ) BUF_PRINTF("ld\thl,(%s%s)", handle_register16(state,2, state->index == 0 ? 1 : state->index == 1 ? 0 : 2), handle_displacement(state, opbuf1, sizeof(opbuf1)));
                         else if ( y == 5 ) BUF_PRINTF("or\t%s,de", handle_register16(state,2, state->index));
-                        else if ( y == 6 ) BUF_PRINTF("ld (%s%s),hl",handle_register16(state,2, state->index == 0 ? 1 : state->index == 1 ? 0 : 2), handle_displacement(state, opbuf1, sizeof(opbuf1)));
+                        else if ( y == 6 ) BUF_PRINTF("ld\t(%s%s),hl",handle_register16(state,2, state->index == 0 ? 1 : state->index == 1 ? 0 : 2), handle_displacement(state, opbuf1, sizeof(opbuf1)));
                         else if ( y == 7 ) BUF_PRINTF("rr\t%s", handle_register16(state,2, state->index));
                     } else BUF_PRINTF("call\t%s,%s", cc_table[y], handle_addr16(state, opbuf1, sizeof(opbuf1)));
                 } else if ( z == 5 ) {
