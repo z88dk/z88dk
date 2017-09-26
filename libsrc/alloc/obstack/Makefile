@@ -65,7 +65,7 @@ obstack-newlib.lst:
 	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/alloc/obstack/obstack_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'alloc/obstack/obj/$${TYPE}' -c -o obstack-newlib.lst
 
 dirs:
-	@mkdir -p $(dir $(OBJECTS))
+	@mkdir -p $(sort $(dir $(OBJECTS)))
 
 
 clean:
