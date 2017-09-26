@@ -11,37 +11,19 @@
       defc CRT_ORG_DTX     = 0x8000
    ENDIF
 
-   IFNDEF CRT_ORG_BANK_00
-      defc CRT_ORG_BANK_00 = 0xc000
-   ENDIF
+Z88DK_FOR(`LOOP', `0', `7',
+`
+   IFNDEF CRT_ORG_BANK_`'LOOP
+	   defc CRT_ORG_BANK_`'LOOP = 0xc000
+	ENDIF
+')
 
-   IFNDEF CRT_ORG_BANK_01
-      defc CRT_ORG_BANK_01 = 0xc000
-   ENDIF
-
-   IFNDEF CRT_ORG_BANK_02
-      defc CRT_ORG_BANK_02 = 0xc000
-   ENDIF
-
-   IFNDEF CRT_ORG_BANK_03
-      defc CRT_ORG_BANK_03 = 0xc000
-   ENDIF
-
-   IFNDEF CRT_ORG_BANK_04
-      defc CRT_ORG_BANK_04 = 0xc000
-   ENDIF
-
-   IFNDEF CRT_ORG_BANK_05
-      defc CRT_ORG_BANK_05 = 0xc000
-   ENDIF
-
-   IFNDEF CRT_ORG_BANK_06
-      defc CRT_ORG_BANK_06 = 0xc000
-   ENDIF
-
-   IFNDEF CRT_ORG_BANK_07
-      defc CRT_ORG_BANK_07 = 0xc000
-   ENDIF
+Z88DK_FOR(`LOOP', `0', `63',
+`
+   IFNDEF CRT_ORG_DIV_`'LOOP
+	   defc CRT_ORG_DIV_`'LOOP = 0x2000
+	ENDIF
+')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
