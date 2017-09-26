@@ -877,7 +877,6 @@ include "crt_memory_map.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-; @FIXME: Needs to be implemented for V-Tech: This target has no device drivers so it cannot instantiate FILEs.
 
 
 
@@ -889,8 +888,6 @@ include "crt_memory_map.inc"
 ; __i_stdio_file_n     = address of static FILE structure #n (0..__I_STDIO_NUM_FILE-1)
 ; __i_fcntl_fdstruct_n = address of static FDSTRUCT #n (0..__I_FCNTL_NUM_FD-1)
 ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
-
-
 
 
 
@@ -1126,7 +1123,7 @@ include "crt_memory_map.inc"
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 35	;@TODO: Is this the size? We do not use so many extra bytes
+      defw 35
       defw __i_fcntl_heap_0
 
    __i_fcntl_fdstruct_1:

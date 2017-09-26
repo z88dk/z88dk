@@ -73,7 +73,7 @@ IF __CRTCFG = 1
    defc TAR__crt_model                 = 1
    defc TAR__crt_autostart             = 1    ; Whether to add auto-start signature instead of default one
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0    ; MODEL4000: ld sp, 0dff0h
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
