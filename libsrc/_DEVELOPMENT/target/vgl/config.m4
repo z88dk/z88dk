@@ -41,6 +41,7 @@ include(`target/vgl/config/config_target.m4')
 include(`target/vgl/config/config_cpu.m4')
 include(`target/vgl/config/config_clib.m4')
 include(`target/vgl/config/config_clib_const.m4')
+include(`target/vgl/config/config_sound_bit.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

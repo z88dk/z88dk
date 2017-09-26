@@ -45,7 +45,7 @@ extern byte LCD_REFRESH_ROW1_MODEL2000 @ 0xdcec;	// MODEL2000: Refreshes display
 // Something is happending on these addresses: dced, dcee, dcef, dcf0
 extern byte LCD_CURSOR_COL_MODEL2000 @ 0xdcef;	// Current column + 64*row
 extern byte LCD_CURSOR_MODE_MODEL2000 @ 0xdced;	// Show cursor (0=off, 1=block 2=line)
-
+// dcf0: LCD entry mode (auto-increment)
 
 // MODEL4000
 extern byte KEY_STATUS_MODEL4000 @ 0xdb00;	// Controls reading from the keyboard on 4000 (put 0xc0 into it, wait for it to become 0xd0)
@@ -526,28 +526,7 @@ void screen_put_char(byte c) {
 
 
 
-/*
-void put_direct(char *text) {
-	// Just slab 20 bytes of data into the VRAM
-	#asm
-		pop	bc
-		pop	hl	; text in HL now
-		push	hl
-		push	bc
-		
-		push	de
-		push	bc
-		ld	de, _LCD_VRAM_ROW0
-		ld	bc, (_screen_cols)
-		xor c
-		ldir	; Copy BC bytes from (HL) to (DE)
-		pop	bc
-		pop	de
-	#endasm
-}
-*/
-
-void screen_reset() {
+void lcd_reset() {
 	// Restores sane LCD state
 	// at 0321:
 	delay_010f(); delay_010f();
@@ -576,12 +555,15 @@ void screen_reset() {
 	
 }
 
+
 void screen_clear() {
 	
-	//screen_reset();
-	out_0x0a(0x01); delay_010f(); delay_010f();
+	//lcd_reset();
 	
-	// Blank out memory
+	// Clear using LCD HD44780 controller call
+	out_0x0a(0x01); delay_010f(); delay_010f();	// Clears screen and DDRAM
+	
+	// Blank out memory manually
 	#asm
 		push hl
 		push bc
@@ -603,7 +585,7 @@ void screen_clear() {
 	
 	// First byte gets lost else
 	delay_010f();
-	//put_char('#');	// This gets lost after screen_reset...
+	//put_char('#');	// This gets lost after lcd_reset...
 	
 	cursor_col = 0;
 	cursor_row = 0;
@@ -796,48 +778,6 @@ byte key_peek_char() {
 }
 
 
-
-void port_put(char *text) {
-	
-	// Output text using port access
-	
-	#asm
-		; Get argument from stack:
-		pop	bc
-		pop	hl	; text
-		push	hl
-		push	bc
-		
-		
-		push bc	; Used for counting here
-		_put_port_loop:
-			; Load current char
-			ld	a, (hl)	
-			
-			; Check if zero (end of string)
-			cp	0
-			jr	z, _put_port_end	; Jump to end if so
-			
-			; Actually output via port
-			out	(0bh), a
-			
-			; now delay 0x1fff
-			ld	bc, 1fffh
-			_put_port_delay_1fff_loop:
-				dec	c
-				jr	nz, _put_port_delay_1fff_loop
-				dec	b
-				jr	nz, _put_port_delay_1fff_loop
-			
-			; go to next byte
-			inc	hl
-		jr	_put_port_loop
-		
-		_put_port_end:
-		pop bc
-		
-	#endasm
-}
 
 
 void sound(word frq, word len) {
@@ -1127,7 +1067,7 @@ void vtech_init() {
 	cursor_row = 0;
 	cursor_ofs = 0;
 	
-	//screen_reset();
+	//lcd_reset();
 }
 
 
@@ -1148,10 +1088,11 @@ void main(void) {
 	
 	vtech_init();	// Checks for system architecture and sets up stuff
 	
-	screen_reset();	// Especially when you compile in "rom_autorun" mode (where the screen is not yet properly initialized)
+	lcd_reset();	// Especially when you compile in "rom_autorun" mode (where the screen is not yet properly initialized)
+	
 	//cursor_reset();
 	
-	key_reset();
+	//key_reset();
 	
 	screen_clear();	// Clear screen (contains garbage left in RAM)
 	
@@ -1160,45 +1101,28 @@ void main(void) {
 	//beep();
 	pause();
 	
-	/*
-	sprintf(buffer, "sprintfput\0");
-	put(buffer);
-	pause();
-	*/
-	
-	/*
-	// Output to VRAM
-	#asm
-	ld hl,0xdca0
-	ld a,0x41
-	ld (hl),a
-	
-	
-	ld hl,0xdcf0
-	ld a,0x01
-	ld (hl),a
-	#endasm
-	pause();
-	*/
 	
 	printf("printf");
 	pause();
-	printf("printf2");
-	pause();
 	
+	//sprintf(buffer, "%d", 123); printf(buffer); pause();
+	//printf("New\nLine");
+	//pause();
 	
-	for (c=0; c<10; c++) {
-		put_char('0'+c);
-	}
-	pause();
+	//for (c=0; c<10; c++) { printf("ABC"); pause(); }
 	
+	//key_peek_arm();	// Arm the system to detect next key
 	
-	key_peek_arm();	// Arm the system to detect next key
 	while(1) {
+		
+		printf(">");
 		
 		// Check for keyboard input
 		//c = key_get_char();
-		c = key_peek_char();
+		//c = key_peek_char();	// manual
+		//key_peek_arm();
+		c = getchar();	// stdio (experimental)
+		
 		if (c != 0) {
 			// Store key
 			//keyBuf[keyBufLen++] = c;
@@ -1206,9 +1130,11 @@ void main(void) {
 			// Send it
 			//keyBuf[keyBufLen] = 0;	// Terminate string
 			
-			put_char(c);
+			//put_char(c);
+			sprintf(buffer, "%d:\"%c\"\n", c, c);
+			printf(buffer);
 			
-			key_peek_arm();	// Arm the system to detect next key
+			//key_peek_arm();	// Arm the system to detect next key
 		}
 		
 	}

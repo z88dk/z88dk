@@ -11,7 +11,7 @@ REM SET EMUSYS=gl5000
 REM SET EMUSYS=gl3000s
 
 REM -debug	Starts a nice debugger!
-"%MESSPATH%\mess.exe" -rompath "%ROMPATH%" %EMUSYS% -cart "%PROGNAME%.bin" -window -sleep
+"%MESSPATH%\mess.exe" -rompath "%ROMPATH%" %EMUSYS% -cart "%PROGNAME%.bin" -window -nomax -nofilter -sleep
 
 REM Remove MESS config directory that is created
 DEL /S cfg\*.cfg

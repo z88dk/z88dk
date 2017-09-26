@@ -1,11 +1,20 @@
 SECTION data_arch
+
+; For MODEL 4000 / 4004
+defc VGL_DISPLAY_COLS = 20
+defc VGL_DISPLAY_ROWS = 4
+defc VGL_DISPLAY_CONTROL_PORT = 0x0a
 defc VGL_DISPLAY_REFRESH_ADDRESS = 0xdcf0   ; 0xdcf0...0xdcf3 for each of the 4 rows
 defc VGL_DISPLAY_CURSOR_X_ADDRESS = 0xdcf4
 defc VGL_DISPLAY_CURSOR_Y_ADDRESS = 0xdcf5
 defc VGL_DISPLAY_CURSOR_MODE_ADDRESS = 0xdcf6
 defc VGL_DISPLAY_CLEAR_ADDRESS = 0xdcf7 ; Can be set to 0 or 1
 defc VGL_VRAM_ADDRESS_START = 0xdca0
-; The proper display init is done in gl4000 @05b4 "0x38 port concert to 0x0a"
+
+; For MODEL 4000 / 4004
+defc VGL_KEY_STATUS = 0xdb00
+defc VGL_KEY_CURRENT = 0xdb01
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; VGL_01_OUTPUT_CHAR
@@ -173,6 +182,7 @@ EXTERN ITERM_MSG_BELL, ITERM_MSG_PRINT_CURSOR, STDIO_MSG_ICTL
 EXTERN OTERM_MSG_PRINTC, OTERM_MSG_SCROLL, OTERM_MSG_CLS
 EXTERN OTERM_MSG_PAUSE, OTERM_MSG_BELL
 
+
 EXTERN console_01_output_terminal_char
 ;EXTERN zx_01_output_char_32_oterm_msg_printc, zx_01_output_char_32_iterm_msg_print_cursor
 ;EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_char_32_stdio_msg_ictl
@@ -201,9 +211,9 @@ vgl_01_output_char:
    cp OTERM_MSG_CLS
    jp z, vgl_01_output_char_oterm_msg_cls
    
-;   cp OTERM_MSG_PAUSE
-;   jp z, zx_01_output_char_32_oterm_msg_pause
-;   
+   cp OTERM_MSG_PAUSE
+   jp z, vgl_01_output_char_oterm_msg_pause
+   
 ;   cp OTERM_MSG_BELL
 ;   jp z, zx_01_output_char_32_oterm_msg_bell
 
@@ -239,8 +249,8 @@ vgl_01_output_char_oterm_msg_printc:
     add h	; *20
     ; Convert to VGL_VRAM_ADDRESS offset 0xdca0 + A + X
     add l	; Add X coordinate to A
-    add 0xa0
-    ld h, 0xdc
+    add VGL_VRAM_ADDRESS_START & 0x00ff ;0xa0
+    ld h, VGL_VRAM_ADDRESS_START >> 8   ;0xdc
     ld l, a
     
     ld (hl), c	; Put character to calculated VRAM offset
@@ -296,17 +306,17 @@ vgl_01_output_char_oterm_msg_scroll:
     
     ; Move everything up by one row
     ;@TODO: Implement scrolling by C rows
-    ld	bc, 20*(4-1)	;(_screen_scrollSize)
-    ld	hl, VGL_VRAM_ADDRESS_START + 1*20	;_LCD_VRAM_ROW1
-    ld	de, VGL_VRAM_ADDRESS_START + 0*20	;_LCD_VRAM_ROW0
+    ld	bc, VGL_DISPLAY_COLS*(VGL_DISPLAY_ROWS-1)	;(_screen_scrollSize)
+    ld	hl, VGL_VRAM_ADDRESS_START + 1*VGL_DISPLAY_COLS	;_LCD_VRAM_ROW1
+    ld	de, VGL_VRAM_ADDRESS_START + 0*VGL_DISPLAY_COLS	;_LCD_VRAM_ROW0
     ldir	; Copy BC chars from (HL) to (DE)
     
     ; Now fill the last row with spaces
-    ld hl, VGL_VRAM_ADDRESS_START + (4-1)*20
-    ld de, VGL_VRAM_ADDRESS_START + (4-1)*20 + 1
+    ld hl, VGL_VRAM_ADDRESS_START + (VGL_DISPLAY_ROWS-1)*VGL_DISPLAY_COLS
+    ld de, VGL_VRAM_ADDRESS_START + (VGL_DISPLAY_ROWS-1)*VGL_DISPLAY_COLS + 1
     
     ld (hl), 0x20	; Character to use
-    ld bc, 20-1	; columns-1
+    ld bc, VGL_DISPLAY_COLS-1	; columns-1
     ldir	; Copy BC bytes from (HL) to (DE)
     
     jp vgl_01_output_char_refresh
@@ -314,21 +324,21 @@ vgl_01_output_char_oterm_msg_scroll:
 
 
 vgl_01_output_char_oterm_msg_cls:
-   ; clear the window
-   ;
-   ; can use : af, bc, de, hl
-   
-   ; Use call to LCD driver
-   ld a, 1
-   out (0x0a), a	; Clear Display (also clear DDRAM content)
-   ; Delay afterwards!
-   
-   ; Use LDIR to fill it
-   ;ld hl, VGL_VRAM_ADDRESS_START
-   ;ld de, VGL_VRAM_ADDRESS_START + 1
-   ;ld bc, 20*4 - 1
-   ;ld (hl), 0x20	; Character to use
-   ;ldir	; Copy BC bytes from (HL) to (DE)
+    ; clear the window
+    ;
+    ; can use : af, bc, de, hl
+    
+    ; Use call to LCD driver
+    ld a, 1
+    out (VGL_DISPLAY_CONTROL_PORT), a	; Clear Display (also clear DDRAM content)
+    ; Delay afterwards!
+    
+    ; Use LDIR to fill it
+    ;ld hl, VGL_VRAM_ADDRESS_START
+    ;ld de, VGL_VRAM_ADDRESS_START + 1
+    ;ld bc, 20*4 - 1
+    ;ld (hl), 0x20	; Character to use
+    ;ldir	; Copy BC bytes from (HL) to (DE)
     
     ; As seen in gl4000 @068e
     ld hl, VGL_VRAM_ADDRESS_START
@@ -338,13 +348,14 @@ vgl_01_output_char_oterm_msg_cls:
     inc hl
     djnz vgl_01_output_char_oterm_msg_cls_loop
     
-    ; Not sure about this, but can be seen in system4000
     xor a
-    ld (VGL_DISPLAY_CLEAR_ADDRESS), a
     
     ; Set cursor
     ld (VGL_DISPLAY_CURSOR_X_ADDRESS), a
     ld (VGL_DISPLAY_CURSOR_Y_ADDRESS), a
+    
+    ; Not sure about this, but can be seen in system4000
+    ld (VGL_DISPLAY_CLEAR_ADDRESS), a
     
     jp vgl_01_output_char_refresh
     ;ret
@@ -354,7 +365,28 @@ vgl_01_output_char_iterm_msg_print_cursor:
    ; can use: af, bc, de, hl, ix
    
    ; change cursor to flashing 'C' or flashing 'L'
+   
+   ; Set cursor position
+   ld a, (ix+14)    ; in FD struct
+   ld (VGL_DISPLAY_CURSOR_X_ADDRESS), a
+   ld a, (ix+15)    ; in FD struct
+   ld (VGL_DISPLAY_CURSOR_Y_ADDRESS), a
+   
+   ld a, 2  ;0=off, 1=block 2=line
+   ld (VGL_DISPLAY_CURSOR_MODE_ADDRESS), a
    ret
+
+vgl_01_output_char_oterm_msg_pause:
+    ld a, 0xc0
+    ld (VGL_KEY_STATUS), a	; Prepare next getkey
+    
+    ; Wait for key press
+pause_getc_loop:
+    
+    ld a, (VGL_KEY_STATUS)
+    cp 0xd0
+    jr nz, pause_getc_loop
+
 
 vgl_01_output_char_iterm_msg_bell:
    ;   can use:  af, bc, de, hl

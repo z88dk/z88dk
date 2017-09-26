@@ -66,19 +66,17 @@ include(`../clib_instantiate_begin.m4')
 
 
 dnl; Cheat sheet:
-dnl;	include(`driver/character/vgl_00_input_char.m4')dnl
-dnl;	m4_vgl_00_input_char(_stdin, 0x0100)
-dnl;	include(`driver/character/vgl_00_output_char.m4')dnl
-dnl;	m4_vgl_00_output_char(_stdout, 0x0100)
-dnl;		m4_vgl_output_char(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X, CRT_OTERM_WINDOW_WIDTH, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, CRT_OTERM_FONT_8X8, CRT_OTERM_TEXT_COLOR, CRT_OTERM_TEXT_COLOR_MASK, CRT_OTERM_BACKGROUND_COLOR)dnl
-dnl;		m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE, CRT_ITERM_INKEY_DEBOUNCE, CRT_ITERM_INKEY_REPEAT_START, CRT_ITERM_INKEY_REPEAT_RATE)dnl
+dnl;   include(`driver/character/vgl_00_input_char.m4')dnl
+dnl;   m4_vgl_00_input_char(_stdin, 0x0100)
+dnl;   include(`driver/terminal/vgl_01_input_kbd.m4')dnl
+dnl;   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,`
    include(`driver/terminal/vgl_01_input_kbd.m4')dnl
-   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, 0x100, 0x10, 0x00, 0x00, 0x00)
+   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
    
    include(`driver/terminal/vgl_01_output_char.m4')dnl
-   m4_vgl_01_output_char(_stdout, 0x100,	0, 0,	0, 20,	0, 4,	0)
+   m4_vgl_01_output_char(_stdout, CRT_OTERM_TERMINAL_FLAGS,	0, 0,	0, CRT_OTERM_WINDOW_WIDTH,	0, CRT_OTERM_WINDOW_HEIGHT,	0)
    
    include(`../m4_file_dup.m4')dnl
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)

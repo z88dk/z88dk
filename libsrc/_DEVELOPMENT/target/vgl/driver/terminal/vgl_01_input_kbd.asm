@@ -1,16 +1,11 @@
 
+; For MODEL 4000 / 4004
+defc VGL_KEY_STATUS = 0xdb00
+defc VGL_KEY_CURRENT = 0xdb01
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; vvgl_01_input_kbd ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; vgl_01_input_kbd ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;
-; The keyboard is read via the library's in_inkey() function.
-;
-;   * No ROM dependency
-;   * Implements key debounce and key repeat
-;   * Contains busy wait loops
-;   * Very responsive
-;   * Reads keyboard directly
-;   * Does not return until keypress is registered
 ;
 ; This subroutine inherits the library's console_01_input
 ; terminal code which implements line editing and various
@@ -111,9 +106,9 @@
 ;   19..24                  b_array (manages edit buffer)
 ;   25                      getk_state
 ;   26                      getk_lastk
-;   27                      getk_debounce_ms
-;   28..29                  getk_repeatbegin_ms
-;   30..31                  getk_repeatperiod_ms
+;   X 27                      getk_debounce_ms
+;   X 28..29                  getk_repeatbegin_ms
+;   X 30..31                  getk_repeatperiod_ms
 
 SECTION code_driver
 SECTION code_driver_terminal_input
@@ -125,17 +120,115 @@ EXTERN ITERM_MSG_GETC, STDIO_MSG_FLSH, STDIO_MSG_ICTL
 EXTERN console_01_input_terminal
 ;EXTERN zx_01_input_inkey_iterm_msg_getc
 ;EXTERN zx_01_input_inkey_stdio_msg_flsh
+EXTERN console_01_input_stdio_msg_flsh
 ;EXTERN zx_01_input_inkey_stdio_msg_ictl
+EXTERN console_01_input_stdio_msg_ictl, console_01_input_stdio_msg_ictl_0
+EXTERN error_einval_zc, console_01_input_proc_reset
 
 vgl_01_input_kbd:
-
-;   cp ITERM_MSG_GETC
-;   jp z, zx_01_input_inkey_iterm_msg_getc
-;   
-;   cp STDIO_MSG_FLSH
-;   jp z, zx_01_input_inkey_stdio_msg_flsh
-;   
-;   cp STDIO_MSG_ICTL
-;   jp z, zx_01_input_inkey_stdio_msg_ictl
+   
+   cp ITERM_MSG_GETC
+   jp z, vgl_01_input_kbd_iterm_msg_getc
+   
+   cp STDIO_MSG_FLSH
+   jp z, vgl_01_input_stdio_msg_flsh
+   
+   cp STDIO_MSG_ICTL
+   jp z, vgl_01_input_stdio_msg_ictl
    
    jp console_01_input_terminal    ; forward to library
+
+
+vgl_01_input_kbd_iterm_msg_getc:
+   ;    enter : ix = & FDSTRUCT.JP
+   ;
+   ;     exit : a = keyboard char after character set translation
+   ;            carry set on error, hl = 0 (stream error) or -1 (eof)
+   ;
+   ;  can use : af, bc, de, hl
+   
+   ld a, 0xc0
+   ld (VGL_KEY_STATUS), a	; Prepare next getkey
+   
+   ; Wait for key press
+getc_loop:
+   
+   
+   
+   ;@FIXME Intentionally loop forever, so I can see if this function is being called AT ALL
+   ld a, 0x40
+   out (0x0b), a
+   jr getc_loop
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+   
+   ld a, (VGL_KEY_STATUS)
+   cp 0xd0
+   jr nz, getc_loop
+   
+   ; Get current key
+   ld a, (VGL_KEY_CURRENT)
+   
+   ; Map to standard keys, like: ld a,CHAR_LF / CHAR_CR / CHAR_CTRL_Z
+   
+   ld l,a
+   ld h,0                      ; a = hl = ascii code
+   
+   or a
+   ret
+
+
+
+vgl_01_input_stdio_msg_flsh:
+   jp console_01_input_stdio_msg_flsh
+   ;or a
+   ;ret
+
+
+vgl_01_input_stdio_msg_ictl:
+   ; ioctl messages understood:
+   ;
+   ; defc IOCTL_RESET            = $0000
+   ; defc IOCTL_ITERM_GET_DELAY  = $1081
+   ; defc IOCTL_ITERM_SET_DELAY  = $1001
+   ;
+   ; in addition to flags managed by stdio
+   ; and messages understood by base class
+   ;
+   ; enter : ix = & FDSTRUCT.JP
+   ;         bc = first parameter
+   ;         de = request
+   ;         hl = void *arg (0 if stdio flags)
+   ;
+   ; exit  : hl = return value
+   ;         carry set if ioctl rejected
+   ;
+   ; uses  : af, bc, de, hl
+   
+   ; flags managed by stdio?
+   
+   ld a,h
+   or l
+   jp z, console_01_input_stdio_msg_ictl
+   
+   ld a,e
+   or d
+   jp z, console_01_input_proc_reset   ; if IOCTL_RESET
+   
+   ; check the message is specifically for an input terminal
+   
+   ld a,e
+   and $07
+   cp $01                      ; input terminals are type $01
+   jp nz, error_einval_zc
+
+   ; interpret ioctl messages
+   
+   ld a,d
+      
+   cp $10
+   jp nz, console_01_input_stdio_msg_ictl_0
+   
+   
+   res 0,(ix+6)
+   ret

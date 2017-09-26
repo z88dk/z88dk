@@ -427,5 +427,23 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
+
+
+defc __SOUND_BIT_METHOD     =  1
+defc __SOUND_BIT_PORT       =  0x12
+defc __SOUND_BIT_TOGGLE     =  0x08
+defc __SOUND_BIT_TOGGLE_POS =  3
+defc __SOUND_BIT_READ_MASK  =  0x08
+defc __SOUND_BIT_WRITE_MASK =  0xf7
+
+
+
+
+
+
+
+
+
+
 ENDIF
 

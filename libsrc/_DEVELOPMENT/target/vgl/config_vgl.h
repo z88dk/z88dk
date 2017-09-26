@@ -428,6 +428,24 @@
 
 
 
+
+
+
+
+
+
+
+#define __SOUND_BIT_METHOD      1
+#define __SOUND_BIT_PORT        0x12
+#define __SOUND_BIT_TOGGLE      0x08
+#define __SOUND_BIT_TOGGLE_POS  3
+#define __SOUND_BIT_READ_MASK   0x08
+#define __SOUND_BIT_WRITE_MASK  0xf7
+
+
+
+
+
 #endif
 
 

@@ -1,3 +1,6 @@
+defc VGL_KEY_STATUS = 0xdb00
+defc VGL_KEY_CURRENT = 0xdb01
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; vgl_00_input_char ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -63,27 +66,37 @@ vgl_00_input_char:
    jp nz, character_00_input   ; forward other messages to the library
 
 vgl_00_input_char_ichar_msg_getc:
-
-;for V-Tech:
-; model 2000: 0xdce0/0xdce4
-; model 4000: 0xdb00/0xdb01
-
-	ld	a, 0c0h
-	ld	(0xdb00), a	; _KEY_STATUS_MODEL4000: Prepare next getkey (4000)
-	
-	; Wait for key press
-	_key_get_loop_MODEL4000:
-		ld	a, (0xdb00)	; _KEY_STATUS_MODEL4000
-		cp	0d0h
-	jr	nz, _key_get_loop_MODEL4000
-	
-	; Get current key
-	ld	a, (0xdb01)	; _KEY_CURRENT_MODEL4000
-
-   ; a = ascii code
-   
-   cp CHAR_CTRL_Z
-   jp z, error_mc              ; generate EOF (ctrl-z is from cp/m)
-   
-   or a                        ; reset carry to indicate no error
-   ret
+    ;     exit : a = keyboard char after character set translation
+    ;            carry set on error, hl = 0 (stream error) or -1 (eof)
+    ;
+    ;  can use : af, bc, de, hl
+    
+    
+    ld a, 0xc0
+    ld (VGL_KEY_STATUS), a
+    
+    ; Wait for key press
+getc_loop:
+    
+    
+    
+    ;@FIXME Intentionally loop forever, so I can see if this function is being called AT ALL
+    ld a, 0x40
+    out (0x0b), a
+    jr getc_loop
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
+    ld a, (VGL_KEY_STATUS)
+    cp 0xd0
+    jr nz, getc_loop
+    
+    ; Get current key
+    ld a, (VGL_KEY_CURRENT)
+    
+    ; a = ascii code
+    
+    ;cp CHAR_CTRL_Z
+    ;jp z, error_mc              ; generate EOF (ctrl-z is from cp/m)
+    
+    or a                        ; reset carry to indicate no error
+    ret

@@ -73,7 +73,7 @@ IF __CRTCFG = 1
    defc TAR__crt_model                 = 1
    defc TAR__crt_autostart             = 1    ; Whether to add auto-start signature instead of default one
    
-   defc TAR__register_sp               = 0    ; MODEL4000: ld sp, 0dff0h
+   defc TAR__register_sp               = 0xdff0    ; MODEL4000: ld sp, 0dff0h
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
@@ -99,7 +99,7 @@ IF __CRTCFG = 1
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 128
+   defc TAR__clib_stdio_heap_size      = 256
    
    defc TAR__clib_balloc_table_size    = 0
    

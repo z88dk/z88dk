@@ -14,12 +14,12 @@ ENDIF
 
 IF !DEFINED_CRT_printf_format
 	defc	DEFINED_CRT_printf_format = 1
-	defc CRT_printf_format = 0x00000001
+	defc CRT_printf_format = 0x00000401
 ELSE
 	UNDEFINE temp_printf_format
 	defc temp_printf_format = CRT_printf_format
 	UNDEFINE CRT_printf_format
-	defc CRT_printf_format = temp_printf_format | 0x00000001
+	defc CRT_printf_format = temp_printf_format | 0x00000401
 ENDIF
 
 
@@ -736,29 +736,13 @@ ENDIF
       defc CRT_ITERM_EDIT_BUFFER_SIZE = 64
    ENDIF
 
-;   ;
-;   ; LASTK Input Terminal Only
-;   ;
-;
-;   IFNDEF CRT_ITERM_LASTK_ADDRESS
-;      defc CRT_ITERM_LASTK_ADDRESS = 23560
-;   ENDIF
-;
-;   ;
-;   ; INKEY Input Terminal Only (used by supplied CRTs)
-;   ;
-;
-;   IFNDEF CRT_ITERM_INKEY_DEBOUNCE
-;      defc CRT_ITERM_INKEY_DEBOUNCE = 1
-;   ENDIF
-;
-;   IFNDEF CRT_ITERM_INKEY_REPEAT_START
-;      defc CRT_ITERM_INKEY_REPEAT_START = 500
-;   ENDIF
-;
-;   IFNDEF CRT_ITERM_INKEY_REPEAT_RATE
-;      defc CRT_ITERM_INKEY_REPEAT_RATE = 15
-;   ENDIF
+  ;
+  ; LASTK Input Terminal Only
+  ;
+
+  IFNDEF CRT_ITERM_LASTK_ADDRESS
+     defc CRT_ITERM_LASTK_ADDRESS = 0xdb01  ; on MODEL4000
+  ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Output Terminal Settings
@@ -785,84 +769,9 @@ ENDIF
    ENDIF
    
    IFNDEF CRT_OTERM_WINDOW_HEIGHT
-      defc CRT_OTERM_WINDOW_HEIGHT = 4
+      defc CRT_OTERM_WINDOW_HEIGHT = 4  ; 1 for 1000, 2 for 2000/P/C, 4 for 400x
    ENDIF
 
-;   ;
-;   ; Terminal Text Colour
-;   ;
-;
-;   IFNDEF CRT_OTERM_TEXT_COLOR
-;      defc CRT_OTERM_TEXT_COLOR = 0x38
-;   ENDIF
-;   
-;   IFNDEF CRT_OTERM_TEXT_COLOR_MASK
-;      defc CRT_OTERM_TEXT_COLOR_MASK = 0x00
-;   ENDIF
-;
-;   IFNDEF CRT_OTERM_BACKGROUND_COLOR
-;      defc CRT_OTERM_BACKGROUND_COLOR = 0x38
-;   ENDIF
-;
-;   ;  
-;   ; FZX Proportional Font Output Terminals
-;   ;
-;
-;   ; The terminal window contains the paper into
-;   ; which fzx characters are drawn
-;
-;   IFNDEF CRT_OTERM_FZX_PAPER_X
-;      defc CRT_OTERM_FZX_PAPER_X = 0
-;   ENDIF
-;
-;   IFNDEF CRT_OTERM_FZX_PAPER_WIDTH
-;      defc CRT_OTERM_FZX_PAPER_WIDTH = 256
-;   ENDIF
-;
-;   IFNDEF CRT_OTERM_FZX_PAPER_Y
-;      defc CRT_OTERM_FZX_PAPER_Y = 0
-;   ENDIF
-;
-;   IFNDEF CRT_OTERM_FZX_PAPER_HEIGHT
-;      defc CRT_OTERM_FZX_PAPER_HEIGHT = 192
-;   ENDIF
-;
-;   ; draw mode must be available to m4 (requires special case in zcc)
-;   ; 0 = OR, 1 = XOR, 2 = CLEAR
-;
-;   
-;
-;   IFNDEF CRT_OTERM_FZX_DRAW_MODE
-;      defc CRT_OTERM_FZX_DRAW_MODE = 1
-;   ENDIF
-;
-;   ; 0 = single, 1 = 1.5, 2 = double
-;
-;   IFNDEF CRT_OTERM_FZX_LINE_SPACING
-;      defc CRT_OTERM_FZX_LINE_SPACING = 0
-;   ENDIF
-;
-;   ; left margin in pixels to allow kerning
-;
-;   IFNDEF CRT_OTERM_FZX_LEFT_MARGIN
-;      defc CRT_OTERM_FZX_LEFT_MARGIN = 3
-;   ENDIF
-;
-;   ; space character width expansion in pixels
-;
-;   IFNDEF CRT_OTERM_FZX_SPACE_EXPAND
-;      defc CRT_OTERM_FZX_SPACE_EXPAND = 0
-;   ENDIF
-;
-;   ;
-;   ; FONT SELECTION
-;   ; use pragam redirect to change font
-;   ;
-;   ; #pragam redirect CRT_OTERM_FONT_8X8 = _font_8x8_rom        ; 32-col font definition in rom
-;   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font
-;   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font
-;   ; #pragma redirect CRT_OTERM_FONT_FZX = _ff_ind_Termino      ; fzx proportional font
-;
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	; This file will process target-specific pragmas, of which you will initially have none.
 
@@ -905,11 +814,8 @@ include "crt_memory_map.inc"
    ; type  : 001 = input terminal
    ; tie   : __i_fcntl_fdstruct_1
    ;
-   ; ioctl_flags   : 0x100
-   ; buffer size   : 0x10 bytes
-   ; debounce      : 0x00 ms
-   ; repeat_start  : 0x00 ms
-   ; repeat_period : 0x00 ms
+   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
+   ; buffer size   : 64 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -971,7 +877,7 @@ include "crt_memory_map.inc"
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 57
+      defw 98
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -998,7 +904,7 @@ include "crt_memory_map.inc"
       
       ; ioctl_flags
       
-      defw 0x100
+      defw CRT_ITERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -1007,7 +913,9 @@ include "crt_memory_map.inc"
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
-
+      
+      ; (a character driver ends here)
+      
       ; tied output terminal
       ; pending_char
       ; read_index
@@ -1020,24 +928,12 @@ include "crt_memory_map.inc"
       
       defw __edit_buffer_0
       defw 0
-      defw 0x10
-      
-      ; getk_state
-      ; getk_lastk
-      ; getk_debounce_ms
-      ; getk_repeatbegin_ms
-      ; getk_repeatperiod_ms
-      
-      defb 0
-      defb 0
-      defb 0x00
-      defw 0x00
-      defw 0x00
+      defw 64
       
             
       ; reserve space for edit buffer
       
-      __edit_buffer_0:   defs 0x10
+      __edit_buffer_0:   defs 64
       
 
             
@@ -1054,9 +950,9 @@ include "crt_memory_map.inc"
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x100
+   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
    ; cursor coord  : (0,0)
-   ; window        : (0,20,0,4)
+   ; window        : (0,CRT_OTERM_WINDOW_WIDTH,0,CRT_OTERM_WINDOW_HEIGHT)
    ; scroll limit  : 0
    ; X font address  : 
    ; X text colour   : 
@@ -1150,7 +1046,7 @@ include "crt_memory_map.inc"
       
       ; ioctl_flags
       
-      defw 0x100
+      defw CRT_OTERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -1165,7 +1061,7 @@ include "crt_memory_map.inc"
       ; scroll limit
 
       defb 0, 0
-      defb 0, 20, 0, 4
+      defb 0, CRT_OTERM_WINDOW_WIDTH, 0, CRT_OTERM_WINDOW_HEIGHT
       defb 0
       
       ; X font address
@@ -1443,11 +1339,11 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 92  = byte size of static FDSTRUCTs
+   ; 133  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 92 > 0
+   IF 133 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1468,7 +1364,7 @@ include "crt_memory_map.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (92 + 14)
+      IF __clib_stdio_heap_size > (133 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1479,7 +1375,7 @@ include "crt_memory_map.inc"
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 92 - 14
+            defs __clib_stdio_heap_size - 133 - 14
          
          ; terminate stdio heap
          

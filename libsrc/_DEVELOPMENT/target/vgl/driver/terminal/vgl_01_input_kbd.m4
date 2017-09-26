@@ -8,9 +8,6 @@ dnl## $1 = label attached to FILE or 0 if fd only            ##
 dnl## $2 = label attached to output FDSTRUCT or 0 if none    ##
 dnl## $3 = ioctl_flags (16 bits)                             ##
 dnl## $4 = size of edit buffer attached to FDSTRUCT or 0     ##
-dnl## $5 = key debounce in ms (0 default)                    ##
-dnl## $6 = key start repeat delay in ms (500 default)        ##
-dnl## $7 = key repeat period in ms (15 default)              ##
 dnl##                                                        ##
 dnl############################################################
 
@@ -27,9 +24,6 @@ define(`m4_vgl_01_input_kbd',dnl
    ;
    ; ioctl_flags   : $3
    ; buffer size   : $4 bytes
-   ; debounce      : $5 ms
-   ; repeat_start  : $6 ms
-   ; repeat_period : $7 ms
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    `ifelse($1,0,,dnl
@@ -94,7 +88,7 @@ define(`m4_vgl_01_input_kbd',dnl
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw `eval($4 + 41)'
+      defw `eval($4 + 34)'
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
    
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
@@ -130,7 +124,9 @@ define(`m4_vgl_01_input_kbd',dnl
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
-
+      
+      ; (a character driver ends here)
+      
       ; tied output terminal
       ; pending_char
       ; read_index
@@ -145,18 +141,6 @@ define(`m4_vgl_01_input_kbd',dnl
       defw 0
       defw $4
       
-      ; getk_state
-      ; getk_lastk
-      ; getk_debounce_ms
-      ; getk_repeatbegin_ms
-      ; getk_repeatperiod_ms
-      
-      defb 0
-      defb 0
-      defb $5
-      defw $6
-      defw $7
-      
       `ifelse($4,0,,dnl
       
       ; reserve space for edit buffer
@@ -165,7 +149,7 @@ define(`m4_vgl_01_input_kbd',dnl
       )'
 
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
-   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $4 + 41))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $4 + 34))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
