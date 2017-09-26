@@ -23292,12 +23292,14 @@ replace restart {
 replace restart {
 	add	a,#0x00
 } by {
+	or	a,a
 	; peephole z88dk-450a
 }
 
 replace restart {
 	sub	a,#0x00
 } by {
+	or	a,a
 	; peephole z88dk-450b
 }
 

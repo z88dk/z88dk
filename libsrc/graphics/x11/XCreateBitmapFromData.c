@@ -10,24 +10,6 @@
 
 char _XBitmap[34];	// only space for an icon, for now
 
-Pixmap XCreateBitmapFromData(Display *display, Drawable win, char *bits, int width, int height) {
-
-	char mychar;
-
-	_XBitmap[0]=(char)width;
-	_XBitmap[1]=(char)height;
-	
-	_X_int3 = width>>3;
-
-	for (_X_int1=0; _X_int1<height; _X_int1++) {
-		for (_X_int2=0; _X_int2<_X_int3; _X_int2++) {
-			_XBitmap[2+(_X_int1*_X_int3)+_X_int2]=_ByteReverse(bits[(_X_int1*_X_int3)+_X_int2]);
-		}
-	}
-
-	return _XBitmap;
-}
-
 
 int _ByteReverse (int mybyte) {
 #asm
@@ -47,4 +29,25 @@ int _ByteReverse (int mybyte) {
 
 #endasm
 }
+
+
+Pixmap XCreateBitmapFromData(Display *display, Drawable win, char *bits, int width, int height) {
+
+	char mychar;
+
+	_XBitmap[0]=(char)width;
+	_XBitmap[1]=(char)height;
+	
+	_X_int3 = width>>3;
+
+	for (_X_int1=0; _X_int1<height; _X_int1++) {
+		for (_X_int2=0; _X_int2<_X_int3; _X_int2++) {
+			_XBitmap[2+(_X_int1*_X_int3)+_X_int2]=_ByteReverse(bits[(_X_int1*_X_int3)+_X_int2]);
+		}
+	}
+
+	return _XBitmap;
+}
+
+
 
