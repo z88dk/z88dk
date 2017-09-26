@@ -388,7 +388,14 @@ int disassemble2(int pc, char *buf, size_t buflen)
                             uint8_t p = (y & 0x06) >> 1;
                             uint8_t q = y & 0x01;
                             state->index = 0;
-                            if ( x == 1 ) {
+                            if ( x == 0 ) {
+                                if ( isz180() ) {
+                                    if ( z == 4 ) BUF_PRINTF("tst\t%s",handle_register8(state,y, opbuf1, sizeof(opbuf1)));
+                                    else if ( z == 0 ) BUF_PRINTF("in0\t%s,(%s)",handle_register8(state,y, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));
+                                    else if ( z == 1 ) BUF_PRINTF("out0\t(%s),%s",handle_immed8(state, opbuf2, sizeof(opbuf2)),handle_register8(state,y, opbuf1, sizeof(opbuf1)));
+                                    else BUF_PRINTF("nop");
+                                } else BUF_PRINTF("nop");
+                            } else if ( x == 1 ) {
                                 // 01 101 100
                                 switch ( z ) {
                                     case 0:
