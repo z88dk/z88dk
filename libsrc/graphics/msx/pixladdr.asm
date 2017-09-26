@@ -3,7 +3,7 @@
 	PUBLIC	pixeladdress
 
 	;EXTERN	base_graphics
-	EXTERN	pixelbyte
+	PUBLIC	pixelbyte
 	PUBLIC	pix_return
 
 	INCLUDE	"graphics/grafix.inc"
@@ -100,3 +100,7 @@ ENDIF
          out      (VDP_DATA), a
          pop      bc
          ret
+
+	SECTION bss_clib
+.pixelbyte
+	 defb	0
