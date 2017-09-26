@@ -51,6 +51,13 @@ extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
 extern long long st;
 
+
+#define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
+#define israbbit3k() ( c_cpu & (CPU_R3K))
+#define isz180() ( c_cpu & (CPU_Z180))
+#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+
 extern int c_cpu;
 extern int trace;
 extern int debugger_active;
@@ -97,6 +104,7 @@ extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
 extern int       disassemble(int pc, char *buf, size_t buflen);
+extern int       disassemble2(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr, symboltype preferred_symtype);
 extern symbol   *find_symbol_byname(const char *name);

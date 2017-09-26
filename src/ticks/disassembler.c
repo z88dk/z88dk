@@ -1807,7 +1807,7 @@ instruction rabbit_ed_page[] = {
     { "lret",   OP_NONE,  OP_NONE,    0 },
     { "ipset",  OP_IPSET, OP_NONE,    0 },
     { "ld",     OP_I,     OP_A,       0},
-    { "cp",     OP_HL,    OP_DE,      0 },
+    { NULL,     OP_NONE,  OP_NONE,    0 }, 
     { "ld",     OP_BC_,   OP_BC,      0 },
     { "adc",    OP_HL,    OP_BC,      0 },
     { "ld",     OP_BC,    OP_IND16,   0 },
