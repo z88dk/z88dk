@@ -177,6 +177,8 @@ static char *handle_block_instruction(dcontext *state, uint8_t z, uint8_t y)
         { "lddr", "cpdr", "indr", "otdr"}
     };
 
+    if ( israbbit() && z != 0 ) return "nop";
+
     return table[y-4][z];
 
 }
@@ -484,7 +486,7 @@ int disassemble2(int pc, char *buf, size_t buflen)
                             } else if ( x == 2 ) {
                                 // LDISR = 98 = 10 011 000
                                 if ( z <= 3 && y >= 4 ) {
-                                    BUF_PRINTF("%-8s", handle_block_instruction(state, z, y));
+                                    BUF_PRINTF("%s", handle_block_instruction(state, z, y));
                                 } else if ( israbbit3k() && z == 0 ) {
                                     if ( y == 2 ) BUF_PRINTF("ldisr");
                                     else if ( y == 3 ) BUF_PRINTF("lddsr");
