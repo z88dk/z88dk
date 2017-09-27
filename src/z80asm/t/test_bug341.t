@@ -39,14 +39,26 @@ int main()
 }
 END
 
-run("zcc +z80 -m --list -Cc-gcline -Ca--debug -no-cleanup test.c test1.asm -otest.bin", 0, 'IGNORE', '');
-#run("sccz80 -mz80 -gcline test.c test1.asm", 0, 'IGNORE', '');
-#ok -f "test.asm";
-#run("z80asm -m --debug test.asm test1.c");
-#
-
-
-#run("zcc +z80 -m --list -gcline -Ca--debug -no-cleanup test.c test1.asm -otest.bin", 0, 'IGNORE', '');
+run("zcc +z80 -m -clib=new -Cc-gcline -Ca--debug test.c test1.asm -otest.bin", 0, 'IGNORE', '');
+my $map = join("\n", grep {/test.c:|test1.asm:/} split('\n', slurp("test.map")))."\n";
+check_text($map, <<'END', "map file contents");
+__C_LINE_2                      = $0000 ; addr, local, , test, , test.c:2
+__C_LINE_3                      = $0000 ; addr, local, , test, , test.c:3
+__C_LINE_4                      = $017D ; addr, local, , test, code_compiler, test.c:4
+__C_LINE_5                      = $018D ; addr, local, , test, code_compiler, test.c:5
+__C_LINE_7                      = $018D ; addr, local, , test, code_compiler, test.c:7
+__C_LINE_8                      = $018D ; addr, local, , test, code_compiler, test.c:8
+__C_LINE_9                      = $018D ; addr, local, , test, code_compiler, test.c:9
+__C_LINE_10                     = $0191 ; addr, local, , test, code_compiler, test.c:10
+__C_LINE_11                     = $0195 ; addr, local, , test, code_compiler, test.c:11
+__C_LINE_12                     = $0195 ; addr, local, , test, code_compiler, test.c:12
+__C_LINE_13                     = $01A9 ; addr, local, , test, code_compiler, test.c:13
+__ASM_LINE_2                    = $0000 ; addr, local, , test1_asm, , test1.asm:2
+__ASM_LINE_3                    = $0000 ; addr, local, , test1_asm, , test1.asm:3
+_add                            = $017D ; addr, public, , test, code_compiler, test.c:3
+_main                           = $018D ; addr, public, , test, code_compiler, test.c:8
+func                            = $0000 ; addr, public, , test1_asm, , test1.asm:2
+END
 
 #unlink_testfiles();
 done_testing();

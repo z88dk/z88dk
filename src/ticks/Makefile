@@ -5,6 +5,8 @@ DISOBJS = disassembler_main.o disassembler.o syms.o
 
 INSTALL ?= install
 
+CFLAGS += 
+
 all: ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX)
 
 ticks$(EXESUFFIX):	$(OBJS)

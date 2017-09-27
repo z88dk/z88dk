@@ -92,14 +92,14 @@ sub run {
 		note "test.stdout: ", $gotout;
 	}
 	else {
-		_test_text($gotout, $out, "test.stdout");
+		check_text($gotout, $out, "test.stdout");
 	}
 	
 	if ($err eq "IGNORE") {
 		note "test.stderr: ", $goterr;
 	}
 	else {
-		_test_text($goterr, $err, "test.stderr");
+		check_text($goterr, $err, "test.stderr");
 	}
 	
 	if (Test::More->builder->is_passing) {
@@ -278,7 +278,7 @@ sub check_text_file {
 	
 	ok -f $file, "$file exists".$loc;
 	if (-f $file) {
-		_test_text(
+		check_text(
 				slurp($file), 
 				$exp, 
 				$title.$loc);
@@ -293,14 +293,14 @@ sub check_bin_file {
 	ok -f $file, "$file exists".$loc;
 
 	if (-f $file) {
-		_test_text(
+		check_text(
 				hexdump(slurp($file)),
 				hexdump($exp),
 				$title.$loc);
 	}
 }
 
-sub _test_text {
+sub check_text {
 	my($out, $exp, $title) = @_;
 
 	my $out_t = trim($out);

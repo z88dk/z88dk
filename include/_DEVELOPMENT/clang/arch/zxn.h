@@ -150,6 +150,56 @@ __sfr __banked __at 0xbffd IO_BFFD;
 #define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
 #endif
 
+extern unsigned char ZXN_READ_MMU0(void);
+
+
+extern unsigned char ZXN_READ_MMU1(void);
+
+
+extern unsigned char ZXN_READ_MMU2(void);
+
+
+extern unsigned char ZXN_READ_MMU3(void);
+
+
+extern unsigned char ZXN_READ_MMU4(void);
+
+
+extern unsigned char ZXN_READ_MMU5(void);
+
+
+extern unsigned char ZXN_READ_MMU6(void);
+
+
+extern unsigned char ZXN_READ_MMU7(void);
+
+
+
+extern unsigned char ZXN_WRITE_MMU0(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU1(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU2(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU3(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU4(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU5(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU6(unsigned char page);
+
+
+extern unsigned char ZXN_WRITE_MMU7(unsigned char page);
+
+
+
 // tape i/o
 
 struct zxtapehdr

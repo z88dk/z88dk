@@ -39,6 +39,8 @@ Z88DK_FOR(`LOOP', `0', `31',
 	org CRT_ORG_DIV_`'LOOP
 ')
 
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
 ENDIF
@@ -68,6 +70,8 @@ Z88DK_FOR(`LOOP', `0', `31',
    SECTION DIV_`'LOOP
 	org CRT_ORG_DIV_`'LOOP
 ')
+
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    

@@ -282,6 +282,11 @@ extern size_t strrspn_callee(const char *s,const char *set) __z88dk_callee;
 #define strrspn(a,b) strrspn_callee(a,b)
 
 
+extern char *strrstr(const char *s,const char *subs);
+extern char *strrstr_callee(const char *s,const char *subs) __z88dk_callee;
+#define strrstr(a,b) strrstr_callee(a,b)
+
+
 extern char *strrstrip(char *s);
 extern char *strrstrip_fastcall(char *s) __preserves_regs(h,l) __z88dk_fastcall;
 #define strrstrip(a) strrstrip_fastcall(a)

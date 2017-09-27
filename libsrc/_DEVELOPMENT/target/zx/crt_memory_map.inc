@@ -21,29 +21,19 @@ IF __MMAP = 0
 
    INCLUDE "../crt_memory_model_z80.inc"
 
-   SECTION BANK_00
-   org CRT_ORG_BANK_00
-   
-   SECTION BANK_01
-   org CRT_ORG_BANK_01
+Z88DK_FOR(`LOOP', `0', `7',
+`
+   SECTION BANK_`'LOOP
+	org CRT_ORG_BANK_`'LOOP
+')
 
-   SECTION BANK_02
-   org CRT_ORG_BANK_02
-   
-   SECTION BANK_03
-   org CRT_ORG_BANK_03
+Z88DK_FOR(`LOOP', `0', `63',
+`
+   SECTION DIV_`'LOOP
+	org CRT_ORG_DIV_`'LOOP
+')
 
-   SECTION BANK_04
-   org CRT_ORG_BANK_04
-   
-   SECTION BANK_05
-   org CRT_ORG_BANK_05
-
-   SECTION BANK_06
-   org CRT_ORG_BANK_06
-   
-   SECTION BANK_07
-   org CRT_ORG_BANK_07
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
@@ -57,29 +47,19 @@ IF __MMAP = 1
 
    INCLUDE "crt_memory_model_dotx.inc"
 
-   SECTION BANK_00
-   org CRT_ORG_BANK_00
-   
-   SECTION BANK_01
-   org CRT_ORG_BANK_01
+Z88DK_FOR(`LOOP', `0', `7',
+`
+   SECTION BANK_`'LOOP
+	org CRT_ORG_BANK_`'LOOP
+')
 
-   SECTION BANK_02
-   org CRT_ORG_BANK_02
-   
-   SECTION BANK_03
-   org CRT_ORG_BANK_03
+Z88DK_FOR(`LOOP', `0', `63',
+`
+   SECTION DIV_`'LOOP
+	org CRT_ORG_DIV_`'LOOP
+')
 
-   SECTION BANK_04
-   org CRT_ORG_BANK_04
-   
-   SECTION BANK_05
-   org CRT_ORG_BANK_05
-
-   SECTION BANK_06
-   org CRT_ORG_BANK_06
-   
-   SECTION BANK_07
-   org CRT_ORG_BANK_07
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    

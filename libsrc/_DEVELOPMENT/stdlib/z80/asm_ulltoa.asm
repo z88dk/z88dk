@@ -38,7 +38,7 @@ asm_ulltoa:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    push ix
    ex (sp),hl

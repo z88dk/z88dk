@@ -98,7 +98,9 @@ void read_symbol_file(char *filename)
                     sym->symtype = SYM_CONST;
                 }
                 sym->address = strtol(argv[2] + 1, NULL, 16);
-                LL_APPEND(symbols[sym->address], sym);
+                if ( sym->address >= 0 && sym->address <= 65535 ) {
+                    LL_APPEND(symbols[sym->address], sym);
+                }
                 HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
             } else {
                 /* It's a cline symbol */

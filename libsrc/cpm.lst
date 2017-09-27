@@ -1,4 +1,4 @@
-@stdio/stdio_cpm.lst
+@stdio/stdio_binary.lst
 stdio/cpm/fgetc_cons
 stdio/cpm/getk
 stdio/cpm/fputc_cons

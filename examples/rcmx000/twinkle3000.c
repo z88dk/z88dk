@@ -13,12 +13,12 @@ void setup_io()
     ; Rabbit3000 manuals ;
 
     ld a,0 ;
-    defb 0d3h; ioi ;
-    ld (4eh),a ;
+    defb 0xd3; ioi ;
+    ld (0x4e),a ;
 
     ld a,0ffh ;
-    defb 0d3h; ioi ;
-    ld (4fh),a ;
+    defb 0xd3; ioi ;
+    ld (0x4f),a ;
 #endasm
 }
 
@@ -27,8 +27,8 @@ void leds_on()
 {
 #asm
     ld a,0  ; leds on ;
-    defb 0d3h; ioi ;
-    ld (48h),a ;
+    defb 0xd3; ioi ;
+    ld (0x48),a ;
 #endasm
 }	
 	
@@ -36,9 +36,9 @@ void leds_on()
 void leds_off()
 {
 #asm
-    ld a,ffh  ; leds off ;
-    defb 0d3h; ioi ;
-    ld (48h),a ;
+    ld a,0xff  ; leds off ;
+    defb 0xd3; ioi ;
+    ld (0x48),a ;
 #endasm
 }
 
@@ -50,13 +50,13 @@ static int wait_rtc()
 
 wait:
 
-    defb 0d3h ; ioi ;
+    defb 0xd3 ; ioi ;
     ld (2),a		; Any write triggers transfer ;
-    defb 0d3h ; ioi ;
+    defb 0xd3 ; ioi ;
     ld hl,(2)		; RTC byte 0-1 ;
 
     ld de,7fffh ;
-    defb 0dch ; and hl,de ;
+    defb 0xdc ; and hl,de ;
     jr nz, wait ;
 
     pop hl ;

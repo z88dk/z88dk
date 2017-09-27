@@ -21,6 +21,8 @@ IF __MMAP = 0
 
    INCLUDE "../crt_memory_model_z80.inc"
 
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
 ENDIF

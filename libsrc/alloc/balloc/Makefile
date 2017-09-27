@@ -65,7 +65,7 @@ balloc-newlib.lst:
 	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/alloc/balloc/balloc_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'alloc/balloc/obj/$${TYPE}' -c -o balloc-newlib.lst
 
 dirs:
-	@mkdir -p $(dir $(OBJECTS))
+	@mkdir -p $(sort $(dir $(OBJECTS)))
 
 
 clean:

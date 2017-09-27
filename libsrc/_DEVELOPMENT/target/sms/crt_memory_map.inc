@@ -112,6 +112,8 @@ IF __MMAP = 0
    SECTION BANK_1F
    org CRT_ORG_BANK_1F
 
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
 ENDIF

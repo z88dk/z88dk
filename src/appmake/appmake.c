@@ -1390,7 +1390,7 @@ int mb_compare_banks(const struct section_bin *a, const struct section_bin *b)
     return a->org - b->org;
 }
 
-int mb_sort_banks_check(struct memory_bank *mb)
+int mb_sort_banks_check(struct memory_bank *mb, int borg, int bsize)
 {
     int errors = 0;
     int k;
@@ -1412,6 +1412,11 @@ int mb_sort_banks_check(struct memory_bank *mb)
             {
                 errors++;
                 fprintf(stderr, "Error: Section %s exceeds 64k [0x%04x,0x%04x]\n", mb->secbin[k].section_name, mb->secbin[k].org, mb->secbin[k].org + mb->secbin[k].size - 1);
+            }
+            else if ((bsize > 0) && ((mb->secbin[k].org < borg) || ((mb->secbin[k].org - borg + mb->secbin[k].size) > bsize)))
+            {
+                errors++;
+                fprintf(stderr, "Error: Section %s occupies [0x%04x,0x%04x] which exceeds fixed bank size [0x%04x,0x%04x]\n", mb->secbin[k].section_name, mb->secbin[k].org, mb->secbin[k].org + mb->secbin[k].size - 1, borg, borg + bsize - 1);
             }
 
             // check for section overlap
@@ -1436,7 +1441,7 @@ int mb_sort_banks(struct banked_memory *memory)
 
     // sort the main bank
 
-    errors = mb_sort_banks_check(&memory->mainbank);
+    errors = mb_sort_banks_check(&memory->mainbank, 0, 0);
 
     // sort each bank space
 
@@ -1447,14 +1452,14 @@ int mb_sort_banks(struct banked_memory *memory)
         for (j = 0; j < MAXBANKS; ++j)
         {
             struct memory_bank *mb = &bs->membank[j];
-            errors += mb_sort_banks_check(&bs->membank[j]);
+            errors += mb_sort_banks_check(&bs->membank[j], bs->org, bs->size);
         }
     }
 
     return errors;
 }
 
-int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int irecsz, struct memory_bank *mb)
+int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int irecsz, struct memory_bank *mb, int borg, int bsize)
 {
     // fhex may be NULL to indicate hex file not wanted
     // fbin should be opened in "wb+" mode
@@ -1463,9 +1468,11 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
     // irecsz is intel hex record size
 
     FILE *fin;
-    int   c, i;
+    int   c, i, total;
 
     // iterate over all sections in memory bank
+
+    total = 0;
 
     for (i = 0; i < mb->num; ++i)
     {
@@ -1479,17 +1486,26 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
 
         // pad space between sections in memory bank
 
-        if (i > 0)
-        {
+        c = 0;
+
+        if ((i == 0) && (bsize > 0))
+            c = mb->secbin[i].org - borg;
+        else if (i > 0)
             c = mb->secbin[i].org - mb->secbin[i - 1].org - mb->secbin[i - 1].size;
-            while (c-- > 0)
-                fputc(filler, fbin);
+
+        while (c-- > 0)
+        {
+            total++;
+            fputc(filler, fbin);
         }
 
         // add section binary to memory bank
 
         while ((c = fgetc(fin)) != EOF)
+        {
+            total++;
             fputc(c, fbin);
+        }
 
         // generate into ihex file if padding is off
 
@@ -1504,6 +1520,11 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
         fclose(fin);
     }
 
+    // pad section if bankspace has size set
+
+    while (total++ < bsize)
+        fputc(filler, fbin);
+
     // terminate ihex file
 
     if (fhex != NULL)
@@ -1515,7 +1536,7 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
 
             fflush(fbin);
             rewind(fbin);
-            bin2hex(fbin, fhex, mb->secbin[0].org, irecsz, 1);
+            bin2hex(fbin, fhex, (bsize > 0) ? borg : mb->secbin[0].org, irecsz, 1);
         }
         else
             fprintf(fhex, ":00000001FF\n");
@@ -1551,7 +1572,7 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
 
         printf("Creating %s (org 0x%04x = %d)\n", filename, memory->mainbank.secbin[0].org, memory->mainbank.secbin[0].org);
 
-        error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, &memory->mainbank);
+        error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, &memory->mainbank, 0, 0);
 
         fclose(fbin);
         if (fhex != NULL) fclose(fhex);
@@ -1562,9 +1583,11 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
 
     for (j = 0; j < memory->num; ++j)
     {
+        struct bank_space *bs = &memory->bankspace[j];
+
         for (i = 0; i < MAXBANKS; ++i)
         {
-            struct memory_bank *mb = &memory->bankspace[j].membank[i];
+            struct memory_bank *mb = &bs->membank[i];
 
             if (mb->num > 0)
             {
@@ -1582,9 +1605,9 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
                 if (ihex && ((fhex = fopen(ihexname, "w")) == NULL))
                     exit_log(1, "Error: Cannot create file %s\n", ihexname);
 
-                printf("Creating %s (org 0x%04x = %d)\n", filename, mb->secbin[0].org, mb->secbin[0].org);
+                printf("Creating %s (org 0x%04x = %d)\n", filename, (bs->size > 0) ? bs->org : mb->secbin[0].org, (bs->size > 0) ? bs->org : mb->secbin[0].org);
 
-                error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, mb);
+                error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, mb, bs->org, bs->size);
 
                 fclose(fbin);
                 if (fhex != NULL) fclose(fhex);

@@ -1,4 +1,4 @@
-SUBDIRS = genmath z88math zxmath math48 cpcmath
+SUBDIRS = genmath z88math zxmath math48 cpcmath fastmath
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
      

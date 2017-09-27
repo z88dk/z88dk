@@ -83,6 +83,14 @@ static struct zx_sna zxs = {
     -1          // intstate
 };
 
+static struct zx_bin zxb = {
+    0,          // fullsize
+    0xff,       // romfill
+    0,          // ihex
+    0,          // ipad
+    16          // recsize
+};
+
 static char tap = 0;   // .tap tape
 static char sna = 0;   // .sna 48k/128k snapshot
 static char dot = 0;   //  esxdos dot command
@@ -96,10 +104,21 @@ option_t zx_options[] = {
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &zxc.origin },
     { 'o', "output",   "Name of output file\n",      OPT_STR,   &zxc.outfile },
 
+    { 0,  "bin",      "Make .bin instead of .tap",  OPT_BOOL,  &bin },
+    { 0,  "fullsize", "Banks are output full size", OPT_BOOL,  &zxb.fullsize },
+    {'f', "filler",   "Filler byte (default: 0xFF)", OPT_INT,  &zxb.romfill },
+    { 0,  "ihex",     "Generate an iHEX file",      OPT_BOOL,  &zxb.ihex },
+    {'p', "pad",      "Pad iHEX file",              OPT_BOOL,  &zxb.ipad },
+    {'r', "recsize",  "Record size for iHEX file (default: 16)", OPT_INT, &zxb.recsize },
+    { 0,  "exclude-banks",    "Exclude memory banks from output", OPT_STR, &zxc.excluded_banks },
+    { 0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
+    { 0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
+
     { 0,  "sna",      "Make .sna instead of .tap",  OPT_BOOL,  &sna },
     { 0,  "org",      "Start address of .sna",      OPT_INT,   &zxc.origin },
     { 0,  "sna-sp",   "Stack location in .sna",     OPT_INT,   &zxs.stackloc },
     { 0,  "sna-di",   "Di on start if non-zero (default = 0)", OPT_INT, &zxs.intstate },
+    { 0,  "fullsize", "Banks are output full size", OPT_BOOL,  &zxb.fullsize },
     { 0,  "exclude-banks",    "Exclude memory banks from output", OPT_STR, &zxc.excluded_banks },
     { 0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     { 0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
@@ -176,6 +195,15 @@ int zx_exec(char *target)
     memset(&memory, 0, sizeof(memory));
     mb_create_bankspace(&memory, "BANK");   // bank space 0
     mb_create_bankspace(&memory, "DIV");    // bank space 1
+
+    if (zxb.fullsize)
+    {
+        memory.bankspace[0].org = 0xc000;
+        memory.bankspace[0].size = 0x4000;
+
+        memory.bankspace[1].org = 0x2000;
+        memory.bankspace[1].size = 0x2000;
+    }
 
     memset(&aligned, 0, sizeof(aligned));
 
@@ -293,7 +321,38 @@ int zx_exec(char *target)
     // now the output formats
 
     if (sna)
-        ret = zx_sna(&zxc, &zxs, &memory, 0);
+    {
+        if ((ret = zx_sna(&zxc, &zxs, &memory, 1)) != 0)
+            return ret;
+
+        // sna snapshot is out but we need to process the rest of the binaries too
+        // so remove mainbank and banks 0-7 from memory model so as not to treat those again
+
+        for (i = 0; i < memory.mainbank.num; ++i)
+        {
+            struct section_bin *sb = &memory.mainbank.secbin[i];
+
+            if (zxc.clean)
+                remove(sb->filename);
+
+            free(sb->filename);
+            free(sb->section_name);
+        }
+
+        free(memory.mainbank.secbin);
+
+        memory.mainbank.num = 0;
+        memory.mainbank.secbin = NULL;
+
+        for (i = 0; i < 8; ++i)
+            mb_remove_bank(&memory.bankspace[0], i, zxc.clean);
+    }
+
+    if (bin || sna)
+    {
+        mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
+        ret = 0;
+    }
 
     // cleanup
 
