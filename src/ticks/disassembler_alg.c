@@ -49,12 +49,18 @@ static char *handle_rot(dcontext *state,  uint8_t z)
 
 static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
 {
-    size_t offs = 0;
-    int8_t displacement;
+    const char   *label;
+    size_t  offs = 0;
+    int8_t  displacement;
 
     READ_BYTE(state, displacement);
+
+    if ( (label = find_symbol(state->pc + displacement, SYM_ADDRESS)) != NULL ) {
+        BUF_PRINTF("%s",label);
+    } else {
+        BUF_PRINTF("$%04x", state->pc + displacement);
+    }
     
-    BUF_PRINTF("$%04x", state->pc + displacement);
     
     return buf;
 }
