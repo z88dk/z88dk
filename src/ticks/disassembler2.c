@@ -66,15 +66,19 @@ static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
 
 static char *handle_addr16(dcontext *state, char *buf, size_t buflen)
 {
-    size_t offs = 0;
-    uint8_t lsb;
-    uint8_t msb;
+    size_t   offs = 0;
+    const char    *label;
+    uint8_t  lsb;
+    uint8_t  msb;
     
     READ_BYTE(state, lsb);
     READ_BYTE(state, msb);
-    
-    BUF_PRINTF("$%02x%02x", msb, lsb);
 
+    if ( (label = find_symbol(lsb + msb * 256, SYM_ADDRESS)) != NULL ) {
+        BUF_PRINTF("%s",label);
+    } else {
+        BUF_PRINTF("$%02x%02x", msb, lsb);
+    }
     return buf;
 }
 
@@ -204,29 +208,30 @@ static char *handle_im_instructions(dcontext *state, uint8_t y)
 }   
 
 
-int disassemble2(int pc, char *buf, size_t buflen)
+int disassemble2(int pc, char *bufstart, size_t buflen)
 {
     dcontext    s_state = {0};
     dcontext   *state = &s_state;
     int         i;
     uint8_t     b;
+    char        *buf;
     const char  *label;
     size_t       offs = 0;
     int          start_pc = pc;
     char         opbuf1[256];
     char         opbuf2[256];
 
-    buf[0] = 0;
     state->pc = pc;
     
     label = find_symbol(pc, SYM_ADDRESS);
     if (label ) {
-        offs += snprintf(buf + offs, buflen - offs, "%s:",label);
+        offs += snprintf(bufstart + offs, buflen - offs, "%s:\n",label);
     }
+    buf = bufstart + offs;
+    buflen -= offs;
 
-    if ( offs < 20 ) {
-        offs = snprintf(buf, buflen, "%-20s", buf);
-    }
+    offs = snprintf(buf, buflen, "%-20s", "");
+
     
     do {
         READ_BYTE(state, b);
