@@ -176,6 +176,9 @@ extern char *strrev(char *s);
 extern size_t strrspn(const char *s,const char *set);
 
 
+extern char *strrstr(const char *s,const char *subs);
+
+
 extern char *strrstrip(char *s);
 
 

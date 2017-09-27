@@ -96,6 +96,8 @@ string/c/sdcc_iy/strrev
 string/c/sdcc_iy/strrev_fastcall
 string/c/sdcc_iy/strrspn
 string/c/sdcc_iy/strrspn_callee
+string/c/sdcc_iy/strrstr
+string/c/sdcc_iy/strrstr_callee
 string/c/sdcc_iy/strrstrip
 string/c/sdcc_iy/strrstrip_fastcall
 string/c/sdcc_iy/strsep
