@@ -34,192 +34,30 @@ defc __Z88DK = 1992
 
 defc __YAZ180 = 1
 
+defc __CPU_CLOCK = 18432000
+
+defc __IO_BASE_ADDRESS = 0
+
 defc __ASCI0_RX_SIZE = 0x100
 defc __ASCI0_TX_SIZE = 0x100
 
 defc __ASCI1_RX_SIZE = 0x100
 defc __ASCI1_TX_SIZE = 0x100
 
-defc __APU_CMD_SIZE = 0x100
-defc __APU_PTR_SIZE = 0x100
-
-defc __I2C_RX_SIZE = 0x100
-defc __I2C_TX_SIZE = 0x100
-
 defc __IO_BREAK = 0x2000
 
 defc __IO_PIO_PORT_BASE = 0x4000
 
-defc __IO_PIO_PORT_A = 16384
-defc __IO_PIO_PORT_B = 16385
-defc __IO_PIO_PORT_C = 16386
-defc __IO_PIO_CONTROL = 16387
-
-defc __IO_PIO_CNTL_00 = 0x80
-defc __IO_PIO_CNTL_01 = 0x81
-defc __IO_PIO_CNTL_02 = 0x82
-defc __IO_PIO_CNTL_03 = 0x83
-
-defc __IO_PIO_CNTL_04 = 0x88
-defc __IO_PIO_CNTL_05 = 0x89
-defc __IO_PIO_CNTL_06 = 0x8A
-defc __IO_PIO_CNTL_07 = 0x8B
-
-defc __IO_PIO_CNTL_08 = 0x90
-defc __IO_PIO_CNTL_09 = 0x91
-defc __IO_PIO_CNTL_10 = 0x92
-defc __IO_PIO_CNTL_11 = 0x83
-
-defc __IO_PIO_CNTL_12 = 0x98
-defc __IO_PIO_CNTL_13 = 0x99
-defc __IO_PIO_CNTL_14 = 0x9A
-defc __IO_PIO_CNTL_15 = 0x9B
+defc __I2C_RX_SIZE = 0x100
+defc __I2C_TX_SIZE = 0x100
 
 defc __IO_PCA9665_1_PORT_BASE = 0xA000
 defc __IO_PCA9665_2_PORT_BASE = 0x8000
 
-defc __IO_I2C1_PORT_MSB = 160
-defc __IO_I2C2_PORT_MSB = 128
-
-defc __IO_I2C_PORT_STA = 0x00
-defc __IO_I2C_PORT_IPTR = 0x00
-defc __IO_I2C_PORT_DAT = 0x01
-defc __IO_I2C_PORT_IDATA = 0x02
-defc __IO_I2C_PORT_CON = 0x03
-
-defc __IO_I2C_PORT_ICOUNT = 0x00
-defc __IO_I2C_PORT_IADDR = 0x01
-defc __IO_I2C_PORT_ISCLL = 0x02
-defc __IO_I2C_PORT_ISCLH = 0x03
-defc __IO_I2C_PORT_ITO = 0x04
-defc __IO_I2C_PORT_IPRESET = 0x05
-defc __IO_I2C_PORT_IMODE = 0x06
-
-defc __IO_I2C_STA_ILLEGAL_START_STOP = 0x00
-defc __IO_I2C_STA_MASTER_START_TX = 0x08
-defc __IO_I2C_STA_MASTER_RESTART_TX = 0x10
-defc __IO_I2C_STA_MASTER_SLA_W_ACK = 0x18
-defc __IO_I2C_STA_MASTER_SLA_W_NAK = 0x20
-defc __IO_I2C_STA_MASTER_DATA_W_ACK = 0x28
-defc __IO_I2C_STA_MASTER_DATA_W_NAK = 0x30
-defc __IO_I2C_STA_MASTER_ARB_LOST = 0x38
-defc __IO_I2C_STA_MASTER_SLA_R_ACK = 0x40
-defc __IO_I2C_STA_MASTER_SLA_R_NAK = 0x48
-defc __IO_I2C_STA_MASTER_DATA_R_ACK = 0x50
-defc __IO_I2C_STA_MASTER_DATA_R_NAK = 0x58
-defc __IO_I2C_STA_SLAVE_AD_W = 0x60
-defc __IO_I2C_STA_SLAVE_AL_AD_W = 0x68
-defc __IO_I2C_STA_SDA_STUCK = 0x70
-defc __IO_I2C_STA_SCL_STUCK = 0x78
-defc __IO_I2C_STA_SLAVE_DATA_RX_ACK = 0x80
-defc __IO_I2C_STA_SLAVE_DATA_RX_NAK = 0x88
-defc __IO_I2C_STA_SLAVE_STOP_OR_RESTART = 0xA0
-defc __IO_I2C_STA_SLAVE_AD_R = 0xA8
-defc __IO_I2C_STA_SLAVE_AL_AD_R = 0xB0
-defc __IO_I2C_STA_SLAVE_DATA_TX_ACK = 0xB8
-defc __IO_I2C_STA_SLAVE_DATA_TX_NAK = 0xC0
-defc __IO_I2C_STA_SLAVE_LST_TX_ACK = 0xC8
-defc __IO_I2C_STA_SLAVE_GC = 0xD0
-defc __IO_I2C_STA_SLAVE_GC_AL = 0xD8
-defc __IO_I2C_STA_SLAVE_GC_RX_ACK = 0xE0
-defc __IO_I2C_STA_SLAVE_GC_RX_NAK = 0xE8
-defc __IO_I2C_STA_IDLE = 0xF8
-defc __IO_I2C_STA_ILLEGAL_ICOUNT = 0xFC
-
-defc __IO_I2C_CON_AA = 0x80
-defc __IO_I2C_CON_ENSIO = 0x40
-defc __IO_I2C_CON_STA = 0x20
-defc __IO_I2C_CON_STO = 0x10
-defc __IO_I2C_CON_SI = 0x08
-defc __IO_I2C_CON_MODE = 0x01
-
-defc __IO_I2C_CON_ECHO_BUS_STOP = 0x10
-defc __IO_I2C_CON_ECHO_SI = 0x08
-defc __IO_I2C_CON_ECHO_BUS_RESTART = 0x04
-defc __IO_I2C_CON_ECHO_BUS_ILLEGAL = 0x02
-
-defc __IO_I2C_ICOUNT_LB = 0x80
-
-defc __IO_I2C_ITO_TE = 0x80
-
-defc __IO_I2C_IMODE_STD = 0x00
-defc __IO_I2C_IMODE_FAST = 0x01
-defc __IO_I2C_IMODE_FASTP = 0x02
-defc __IO_I2C_IMODE_TURBO = 0x03
-defc __IO_I2C_IMODE_CR = 0x07
+defc __APU_CMD_SIZE = 0x100
+defc __APU_PTR_SIZE = 0x100
 
 defc __IO_APU_PORT_BASE = 0xC000
-defc __IO_APU_PORT_DATA = 49152
-defc __IO_APU_PORT_CONTROL = 49153
-defc __IO_APU_PORT_STATUS = 49153
-
-defc __IO_APU_STATUS_BUSY = 0x80
-defc __IO_APU_STATUS_SIGN = 0x40
-defc __IO_APU_STATUS_ZERO = 0x20
-defc __IO_APU_STATUS_DIV0 = 0x10
-defc __IO_APU_STATUS_NEGRT = 0x08
-defc __IO_APU_STATUS_UNDFL = 0x04
-defc __IO_APU_STATUS_OVRFL = 0x02
-defc __IO_APU_STATUS_CARRY = 0x01
-
-defc __IO_APU_STATUS_ERROR = 0x1E
-
-defc __IO_APU_COMMAND_SVREQ = 0x80
-
-defc __IO_APU_OP_ENT = 0x40
-defc __IO_APU_OP_REM = 0x50
-defc __IO_APU_OP_ENT16 = 0x40
-defc __IO_APU_OP_ENT32 = 0x41
-defc __IO_APU_OP_REM16 = 0x50
-defc __IO_APU_OP_REM32 = 0x51
-
-defc __IO_APU_OP_SADD = 0x6C
-defc __IO_APU_OP_SSUB = 0x6D
-defc __IO_APU_OP_SMUL = 0x6E
-defc __IO_APU_OP_SMUU = 0x76
-defc __IO_APU_OP_SDIV = 0x6F
-
-defc __IO_APU_OP_DADD = 0x2C
-defc __IO_APU_OP_DSUB = 0x2D
-defc __IO_APU_OP_DMUL = 0x2E
-defc __IO_APU_OP_DMUU = 0x36
-defc __IO_APU_OP_DDIV = 0x2F
-
-defc __IO_APU_OP_FADD = 0x10
-defc __IO_APU_OP_FSUB = 0x11
-defc __IO_APU_OP_FMUL = 0x12
-defc __IO_APU_OP_FDIV = 0x13
-
-defc __IO_APU_OP_SQRT = 0x01
-defc __IO_APU_OP_SIN = 0x02
-defc __IO_APU_OP_COS = 0x03
-defc __IO_APU_OP_TAN = 0x04
-defc __IO_APU_OP_ASIN = 0x05
-defc __IO_APU_OP_ACOS = 0x06
-defc __IO_APU_OP_ATAN = 0x07
-defc __IO_APU_OP_LOG = 0x08
-defc __IO_APU_OP_LN = 0x09
-defc __IO_APU_OP_EXP = 0x0A
-defc __IO_APU_OP_PWR = 0x0B
-
-defc __IO_APU_OP_NOP = 0x00
-defc __IO_APU_OP_FIXS = 0x1F
-defc __IO_APU_OP_FIXD = 0x1E
-defc __IO_APU_OP_FLTS = 0x1D
-defc __IO_APU_OP_FLTD = 0x1C
-defc __IO_APU_OP_CHSS = 0x74
-defc __IO_APU_OP_CHSD = 0x34
-defc __IO_APU_OP_PTOS = 0x15
-defc __IO_APU_OP_PTOD = 0x37
-defc __IO_APU_OP_PTOF = 0x17
-defc __IO_APU_OP_POPS = 0x78
-defc __IO_APU_OP_POPD = 0x38
-defc __IO_APU_OP_POPF = 0x18
-defc __IO_APU_OP_XCHS = 0x79
-defc __IO_APU_OP_XCHD = 0x39
-defc __IO_APU_OP_XCHF = 0x19
-defc __IO_APU_OP_PUPI = 0x1A
-
 
 
 
@@ -238,15 +76,11 @@ defc __Z180_Z80180 = 0x01
 defc __Z180_Z8L180 = 0x02
 defc __Z180_Z8S180 = 0x04
 
-defc __CPU_CLOCK = 18432000
-
 defc __CPU_INFO = 0x00
 
 defc __CPU_INFO_ENABLE_SLL = 0x01
 
 defc __CPU_TIMER_SCALE = 20
-
-defc __IO_BASE_ADDRESS = 0
 
 
    ; Z8S180 / Z8L180 CLASS
@@ -835,6 +669,207 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_PIO_PORT_A = 0x4000+0x00
+defc __IO_PIO_PORT_B = 0x4000+0x01
+defc __IO_PIO_PORT_C = 0x4000+0x02
+defc __IO_PIO_CONTROL = 0x4000+0x03
+
+defc __IO_PIO_CNTL_00 = 0x80
+defc __IO_PIO_CNTL_01 = 0x81
+defc __IO_PIO_CNTL_02 = 0x82
+defc __IO_PIO_CNTL_03 = 0x83
+
+defc __IO_PIO_CNTL_04 = 0x88
+defc __IO_PIO_CNTL_05 = 0x89
+defc __IO_PIO_CNTL_06 = 0x8A
+defc __IO_PIO_CNTL_07 = 0x8B
+
+defc __IO_PIO_CNTL_08 = 0x90
+defc __IO_PIO_CNTL_09 = 0x91
+defc __IO_PIO_CNTL_10 = 0x92
+defc __IO_PIO_CNTL_11 = 0x83
+
+defc __IO_PIO_CNTL_12 = 0x98
+defc __IO_PIO_CNTL_13 = 0x99
+defc __IO_PIO_CNTL_14 = 0x9A
+defc __IO_PIO_CNTL_15 = 0x9B
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_APU_PORT_DATA = 0xC000+0x00
+defc __IO_APU_PORT_CONTROL = 0xC000+0x01
+defc __IO_APU_PORT_STATUS = 0xC000+0x01
+
+defc __IO_APU_STATUS_BUSY = 0x80
+defc __IO_APU_STATUS_SIGN = 0x40
+defc __IO_APU_STATUS_ZERO = 0x20
+defc __IO_APU_STATUS_DIV0 = 0x10
+defc __IO_APU_STATUS_NEGRT = 0x08
+defc __IO_APU_STATUS_UNDFL = 0x04
+defc __IO_APU_STATUS_OVRFL = 0x02
+defc __IO_APU_STATUS_CARRY = 0x01
+
+defc __IO_APU_STATUS_ERROR = 0x1E
+
+defc __IO_APU_COMMAND_SVREQ = 0x80
+
+defc __IO_APU_OP_ENT = 0x40
+defc __IO_APU_OP_REM = 0x50
+defc __IO_APU_OP_ENT16 = 0x40
+defc __IO_APU_OP_ENT32 = 0x41
+defc __IO_APU_OP_REM16 = 0x50
+defc __IO_APU_OP_REM32 = 0x51
+
+defc __IO_APU_OP_SADD = 0x6C
+defc __IO_APU_OP_SSUB = 0x6D
+defc __IO_APU_OP_SMUL = 0x6E
+defc __IO_APU_OP_SMUU = 0x76
+defc __IO_APU_OP_SDIV = 0x6F
+
+defc __IO_APU_OP_DADD = 0x2C
+defc __IO_APU_OP_DSUB = 0x2D
+defc __IO_APU_OP_DMUL = 0x2E
+defc __IO_APU_OP_DMUU = 0x36
+defc __IO_APU_OP_DDIV = 0x2F
+
+defc __IO_APU_OP_FADD = 0x10
+defc __IO_APU_OP_FSUB = 0x11
+defc __IO_APU_OP_FMUL = 0x12
+defc __IO_APU_OP_FDIV = 0x13
+
+defc __IO_APU_OP_SQRT = 0x01
+defc __IO_APU_OP_SIN = 0x02
+defc __IO_APU_OP_COS = 0x03
+defc __IO_APU_OP_TAN = 0x04
+defc __IO_APU_OP_ASIN = 0x05
+defc __IO_APU_OP_ACOS = 0x06
+defc __IO_APU_OP_ATAN = 0x07
+defc __IO_APU_OP_LOG = 0x08
+defc __IO_APU_OP_LN = 0x09
+defc __IO_APU_OP_EXP = 0x0A
+defc __IO_APU_OP_PWR = 0x0B
+
+defc __IO_APU_OP_NOP = 0x00
+defc __IO_APU_OP_FIXS = 0x1F
+defc __IO_APU_OP_FIXD = 0x1E
+defc __IO_APU_OP_FLTS = 0x1D
+defc __IO_APU_OP_FLTD = 0x1C
+defc __IO_APU_OP_CHSS = 0x74
+defc __IO_APU_OP_CHSD = 0x34
+defc __IO_APU_OP_PTOS = 0x15
+defc __IO_APU_OP_PTOD = 0x37
+defc __IO_APU_OP_PTOF = 0x17
+defc __IO_APU_OP_POPS = 0x78
+defc __IO_APU_OP_POPD = 0x38
+defc __IO_APU_OP_POPF = 0x18
+defc __IO_APU_OP_XCHS = 0x79
+defc __IO_APU_OP_XCHD = 0x39
+defc __IO_APU_OP_XCHF = 0x19
+defc __IO_APU_OP_PUPI = 0x1A
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_I2C1_PORT_MSB = (0xA000/0x0100)&0xE0 
+defc __IO_I2C2_PORT_MSB = (0x8000/0x0100)&0xE0 
+
+defc __IO_I2C_PORT_STA = 0x00
+defc __IO_I2C_PORT_IPTR = 0x00
+defc __IO_I2C_PORT_DAT = 0x01
+defc __IO_I2C_PORT_IDATA = 0x02
+defc __IO_I2C_PORT_CON = 0x03
+
+defc __IO_I2C_PORT_ICOUNT = 0x00
+defc __IO_I2C_PORT_IADDR = 0x01
+defc __IO_I2C_PORT_ISCLL = 0x02
+defc __IO_I2C_PORT_ISCLH = 0x03
+defc __IO_I2C_PORT_ITO = 0x04
+defc __IO_I2C_PORT_IPRESET = 0x05
+defc __IO_I2C_PORT_IMODE = 0x06
+
+defc __IO_I2C_STA_ILLEGAL_START_STOP = 0x00
+defc __IO_I2C_STA_MASTER_START_TX = 0x08
+defc __IO_I2C_STA_MASTER_RESTART_TX = 0x10
+defc __IO_I2C_STA_MASTER_SLA_W_ACK = 0x18
+defc __IO_I2C_STA_MASTER_SLA_W_NAK = 0x20
+defc __IO_I2C_STA_MASTER_DATA_W_ACK = 0x28
+defc __IO_I2C_STA_MASTER_DATA_W_NAK = 0x30
+defc __IO_I2C_STA_MASTER_ARB_LOST = 0x38
+defc __IO_I2C_STA_MASTER_SLA_R_ACK = 0x40
+defc __IO_I2C_STA_MASTER_SLA_R_NAK = 0x48
+defc __IO_I2C_STA_MASTER_DATA_R_ACK = 0x50
+defc __IO_I2C_STA_MASTER_DATA_R_NAK = 0x58
+defc __IO_I2C_STA_SLAVE_AD_W = 0x60
+defc __IO_I2C_STA_SLAVE_AL_AD_W = 0x68
+defc __IO_I2C_STA_SDA_STUCK = 0x70
+defc __IO_I2C_STA_SCL_STUCK = 0x78
+defc __IO_I2C_STA_SLAVE_DATA_RX_ACK = 0x80
+defc __IO_I2C_STA_SLAVE_DATA_RX_NAK = 0x88
+defc __IO_I2C_STA_SLAVE_STOP_OR_RESTART = 0xA0
+defc __IO_I2C_STA_SLAVE_AD_R = 0xA8
+defc __IO_I2C_STA_SLAVE_AL_AD_R = 0xB0
+defc __IO_I2C_STA_SLAVE_DATA_TX_ACK = 0xB8
+defc __IO_I2C_STA_SLAVE_DATA_TX_NAK = 0xC0
+defc __IO_I2C_STA_SLAVE_LST_TX_ACK = 0xC8
+defc __IO_I2C_STA_SLAVE_GC = 0xD0
+defc __IO_I2C_STA_SLAVE_GC_AL = 0xD8
+defc __IO_I2C_STA_SLAVE_GC_RX_ACK = 0xE0
+defc __IO_I2C_STA_SLAVE_GC_RX_NAK = 0xE8
+defc __IO_I2C_STA_IDLE = 0xF8
+defc __IO_I2C_STA_ILLEGAL_ICOUNT = 0xFC
+
+defc __IO_I2C_CON_AA = 0x80
+defc __IO_I2C_CON_ENSIO = 0x40
+defc __IO_I2C_CON_STA = 0x20
+defc __IO_I2C_CON_STO = 0x10
+defc __IO_I2C_CON_SI = 0x08
+defc __IO_I2C_CON_MODE = 0x01
+
+defc __IO_I2C_CON_ECHO_BUS_STOP = 0x10
+defc __IO_I2C_CON_ECHO_SI = 0x08
+defc __IO_I2C_CON_ECHO_BUS_RESTART = 0x04
+defc __IO_I2C_CON_ECHO_BUS_ILLEGAL = 0x02
+
+defc __IO_I2C_ICOUNT_LB = 0x80
+
+defc __IO_I2C_ITO_TE = 0x80
+
+defc __IO_I2C_IMODE_STD = 0x00
+defc __IO_I2C_IMODE_FAST = 0x01
+defc __IO_I2C_IMODE_FASTP = 0x02
+defc __IO_I2C_IMODE_TURBO = 0x03
+defc __IO_I2C_IMODE_CR = 0x07
 
 
 
