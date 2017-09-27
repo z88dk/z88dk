@@ -40,6 +40,7 @@ struct zx_sna
 
 struct zx_bin
 {
+    char           fullsize;
     int            romfill;
     char           ihex;
     char           ipad;
