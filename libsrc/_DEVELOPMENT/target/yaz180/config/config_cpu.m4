@@ -1,8 +1,7 @@
 divert(-1)
 
 ###############################################################
-# Z180 CPU USER CONFIGURATION
-# rebuild the library if changes are made
+# Z180 CPU CONFIGURATION
 #
 
 # Class of Z180 being targeted
@@ -12,10 +11,6 @@ define(`__Z180', 0x04)
 define(`__Z180_Z80180', 0x01)
 define(`__Z180_Z8L180', 0x02)
 define(`__Z180_Z8S180', 0x04)
-
-# Clock frequency in Hz
-
-define(`__CPU_CLOCK', 18432000)
 
 # CPU info
 
@@ -32,9 +27,10 @@ define(`__CPU_TIMER_SCALE', 20)
 #define(`__IO_VECTOR_BASE', eval(__IO_VECTOR_BASE & 0xe0))
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
+# moved to config_target.m4
 
-define(`__IO_BASE_ADDRESS', 0x00)
-define(`__IO_BASE_ADDRESS', eval(__IO_BASE_ADDRESS & 0xc0))
+#define(`__IO_BASE_ADDRESS', 0x00)
+#define(`__IO_BASE_ADDRESS', eval(__IO_BASE_ADDRESS & 0xc0))
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
@@ -363,7 +359,7 @@ define(`__IO_CCR_LNCPUCTL',     0x02)
 define(`__IO_CCR_LNAD',         0x01)
 
 #
-# END OF USER CONFIGURATION
+# END OF CONFIGURATION
 ###############################################################
 
 divert(0)
@@ -380,15 +376,11 @@ PUBLIC `__Z180_Z80180'
 PUBLIC `__Z180_Z8L180'
 PUBLIC `__Z180_Z8S180'
 
-PUBLIC `__CPU_CLOCK'
-
 PUBLIC `__CPU_INFO'
 
 PUBLIC `__CPU_INFO_ENABLE_SLL'
 
 PUBLIC `__CPU_TIMER_SCALE'
-
-PUBLIC `__IO_BASE_ADDRESS'
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
@@ -832,15 +824,11 @@ defc `__Z180_Z80180' = __Z180_Z80180
 defc `__Z180_Z8L180' = __Z180_Z8L180
 defc `__Z180_Z8S180' = __Z180_Z8S180
 
-defc `__CPU_CLOCK' = __CPU_CLOCK
-
 defc `__CPU_INFO' = __CPU_INFO
 
 defc `__CPU_INFO_ENABLE_SLL' = __CPU_INFO_ENABLE_SLL
 
 defc `__CPU_TIMER_SCALE' = __CPU_TIMER_SCALE
-
-defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
@@ -1285,15 +1273,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__Z180_Z8L180'  __Z180_Z8L180
 `#define' `__Z180_Z8S180'  __Z180_Z8S180
 
-`#define' `__CPU_CLOCK'  __CPU_CLOCK
-
 `#define' `__CPU_INFO'  __CPU_INFO
 
 `#define' `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
 
 `#define' `__CPU_TIMER_SCALE'  __CPU_TIMER_SCALE
-
-`#define' `__IO_BASE_ADDRESS'  __IO_BASE_ADDRESS
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
