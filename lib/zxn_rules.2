@@ -20,12 +20,12 @@
 %"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
 =
 	ld	a,l
-	mmu%3 a
+	mmu%3	a
 
 %"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
 =
 	ld	a,l
-	mmu%3 a
+	mmu%3	a
 
 %"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
 =
@@ -34,3 +34,40 @@
 	out	(c),a
 	inc	b
 	in	l,(c)
+
+;;
+;; TEMPORARY AREA
+;;
+;; Real test hardware has had zx next instructions removed
+;; as many have smaller fpgas that cannot hold all the logic.
+;;
+;; Must translate "nextreg" and "mmu" instructions we are
+;; using to actual OUTs.  This also affects the C macros
+;; used to inline these instructions in zxn.h because zsdcc
+;; is being told which registers are unaffected by the macros.
+;;
+;; This rules file only affects c code.
+;;
+
+	nextreg	%"[A-Fa-f0-9xX]+"1,%"[A-Fa-f0-9xX]+"2
+=
+	ld	bc,0x243b
+	ld	a,%1
+	out	(c),a
+	inc	b
+	ld	a,%2
+	out	(c),a
+
+	mmu%"[0-9]+"1	a
+=
+	ld	l,a
+	ld	bc,0x243b
+	ld	a,0x50+%1
+	out	(c),a
+	inc	b
+	out	(c),l
+
+	ld	a,l
+	ld	l,a
+=
+
