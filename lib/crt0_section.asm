@@ -195,3 +195,9 @@ IF CLIB_BALLOC_TABLE_SIZE > 0
    __balloc_table:             defs CLIB_BALLOC_TABLE_SIZE * 2
 
 ENDIF
+
+IF CRT_APPEND_MMAP
+
+INCLUDE "./mmap.inc"
+
+ENDIF
