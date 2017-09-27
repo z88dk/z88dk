@@ -40,12 +40,13 @@ static FILE* openfile(const char* str, const char* mode)
 
 static int get_hex(const char* pek)
 {
-  int retval;
+  int retval = -1;
   const char* peki=pek;
   
   /** state=0 (init) state=1 found '=' state=2 reading_hex */
   
   int state=0;
+
   
   while (peki-pek<1024)
     {
@@ -58,7 +59,7 @@ static int get_hex(const char* pek)
 	  }
 	case 1:
 	  {
-	    if (*peki!=' ') state=2;
+	    if (*peki=='$') state=2;
 	    break;
 	  }
 	case 2:
@@ -141,11 +142,6 @@ static void read_symfile(FILE* symfile, int* values)
    
   int i;
   
-  for (i=0;i<10;i++)
-    {
-      fgets(buf, 1024, symfile);
-    }
-
   while (!feof(symfile))
     {
       int ix;
@@ -220,7 +216,9 @@ int main(int argc, char* argv[])
   int do_raw=0;
 
   s_values=(int*)malloc(sizeof(int) * check_value_size());
-  
+  for ( i = 0; i < check_value_size(); i++ ) {
+      s_values[i] = -1;
+  } 
   if (argc!=4 && argc!=5)
     {
       usage(argv[0]);

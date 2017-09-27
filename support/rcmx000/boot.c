@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <poll.h>
 #include <unistd.h>
@@ -97,8 +98,8 @@ static void change_baudrate(int fd, int baudr)
 
   tcgetattr(fd, &ios);
 
-  if (debug_flush) fprintf(stderr, "IBaud=%d\n", cfgetispeed(&ios));
-  if (debug_flush) fprintf(stderr, "OBaud=%d\n", cfgetospeed(&ios));
+  if (debug_flush) fprintf(stderr, "IBaud=%d\n", (int)cfgetispeed(&ios));
+  if (debug_flush) fprintf(stderr, "OBaud=%d\n", (int)cfgetospeed(&ios));
 
   switch(baudr)
     {
@@ -190,18 +191,18 @@ static void usage(const char* argv0)
 {
   fprintf(stderr, "Boot mode: (Normal load and execution of program to ram)\n");
   fprintf(stderr, "Usage: %s [-p/-x <num>] -b <ttydev> <divisor> <binfile>\n", argv0);
-  fprintf(stderr, "   or\n", argv0);
+  fprintf(stderr, "   or\n");
   fprintf(stderr, "Raw mode: (Only used to get the baudrate division number)\n");
   fprintf(stderr, "Usage: %s [-p/-x <num>] -r <ttydev> <coldload binfile>\n", argv0);
-  fprintf(stderr, "   or\n", argv0);
+  fprintf(stderr, "   or\n");
 
   fprintf(stderr, "Flash mode: (Will store program permanently in flash)\n");
   fprintf(stderr, "Usage: %s -f <ttydev> <divisor> <binfile>\n", argv0);
-  fprintf(stderr, "   or\n", argv0);
+  fprintf(stderr, "   or\n");
   
   fprintf(stderr, "Direct mode: (Will copy a preloaded image from the flash to the ram and then run it\n");
-  fprintf(stderr, "Usage: %s [-p/-x <num>] -d <ttydev> <divisor> <binfile>\n", argv0);
-  fprintf(stderr, "-x is same as -p but characters will get piped to both socket and stdout\n", argv0);
+  fprintf(stderr, "Usage: %s [-p/-x <num>] -d <ttydev> <divisor> <binfile>\n",argv0);
+  fprintf(stderr, "-x is same as -p but characters will get piped to both socket and stdout\n");
 
 
   exit(1);
@@ -725,7 +726,7 @@ int main(int argc, char *argv[])
     
     fsize=ftell(binfile);
     
-    if (debug_hex) fprintf(stderr, "fsize=%d\n", fsize);
+    if (debug_hex) fprintf(stderr, "fsize=%d\n", (int)fsize);
     
     /** Network order, two bytes size (max 64k ;-) */
     ch=fsize&255;
