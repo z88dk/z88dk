@@ -59,7 +59,7 @@ ENDIF
 
 
    ; generic embedded system
-   ; no files, no fds
+   ; stdin/stdout on keyboard and lcd console
 
    IFNDEF __CRTCFG
    
@@ -733,16 +733,9 @@ ENDIF
    
 
    IFNDEF CRT_ITERM_EDIT_BUFFER_SIZE
-      defc CRT_ITERM_EDIT_BUFFER_SIZE = 64
+      defc CRT_ITERM_EDIT_BUFFER_SIZE = 32
    ENDIF
 
-  ;
-  ; LASTK Input Terminal Only
-  ;
-
-  IFNDEF CRT_ITERM_LASTK_ADDRESS
-     defc CRT_ITERM_LASTK_ADDRESS = 0xdb01  ; on MODEL4000
-  ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Output Terminal Settings
@@ -769,7 +762,7 @@ ENDIF
    ENDIF
    
    IFNDEF CRT_OTERM_WINDOW_HEIGHT
-      defc CRT_OTERM_WINDOW_HEIGHT = 4  ; 1 for 1000, 2 for 2000/P/C, 4 for 400x
+      defc CRT_OTERM_WINDOW_HEIGHT = 4  ; 1 for MODEL 1000, 2 for 2000/P/C, 4 for 400x
    ENDIF
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -815,7 +808,7 @@ include "crt_memory_map.inc"
    ; tie   : __i_fcntl_fdstruct_1
    ;
    ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
-   ; buffer size   : 64 bytes
+   ; buffer size   : 32 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -877,7 +870,7 @@ include "crt_memory_map.inc"
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 98
+      defw 66
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -928,17 +921,17 @@ include "crt_memory_map.inc"
       
       defw __edit_buffer_0
       defw 0
-      defw 64
+      defw 32
+      
       
             
       ; reserve space for edit buffer
       
-      __edit_buffer_0:   defs 64
+      __edit_buffer_0:   defs 32
       
 
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
    
    
    
@@ -1078,7 +1071,6 @@ include "crt_memory_map.inc"
 
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
    
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1152,7 +1144,6 @@ include "crt_memory_map.inc"
 
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 
 
@@ -1339,11 +1330,11 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 133  = byte size of static FDSTRUCTs
+   ; 101  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 133 > 0
+   IF 101 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1364,7 +1355,7 @@ include "crt_memory_map.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (133 + 14)
+      IF __clib_stdio_heap_size > (101 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1375,7 +1366,7 @@ include "crt_memory_map.inc"
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 133 - 14
+            defs __clib_stdio_heap_size - 101 - 14
          
          ; terminate stdio heap
          

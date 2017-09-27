@@ -65,21 +65,22 @@ dnl############################################################
 include(`../clib_instantiate_begin.m4')
 
 
-dnl; Cheat sheet:
-dnl;   include(`driver/character/vgl_00_input_char.m4')dnl
-dnl;   m4_vgl_00_input_char(_stdin, 0x0100)
-dnl;   include(`driver/terminal/vgl_01_input_kbd.m4')dnl
-dnl;   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+dnl# Cheat sheet:
+dnl#   include(`driver/character/vgl_00_input_char.m4')dnl
+dnl#   m4_vgl_00_input_char(_stdin, 0x0100)dnl
+dnl#   include(`driver/terminal/vgl_01_input_kbd.m4')dnl
+dnl#   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)dnl
 
-ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,`
+ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
+`
    include(`driver/terminal/vgl_01_input_kbd.m4')dnl
-   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)dnl
    
    include(`driver/terminal/vgl_01_output_char.m4')dnl
-   m4_vgl_01_output_char(_stdout, CRT_OTERM_TERMINAL_FLAGS,	0, 0,	0, CRT_OTERM_WINDOW_WIDTH,	0, CRT_OTERM_WINDOW_HEIGHT,	0)
+   m4_vgl_01_output_char(_stdout, CRT_OTERM_TERMINAL_FLAGS,	0, 0,	0, CRT_OTERM_WINDOW_WIDTH,	0, CRT_OTERM_WINDOW_HEIGHT,	0)dnl
    
    include(`../m4_file_dup.m4')dnl
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
 ',
 `
    include(`crt_driver_instantiation.asm.m4')

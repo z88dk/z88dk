@@ -69,7 +69,7 @@ ifelse(__STARTUP, 0,
 ifelse(__STARTUP, 1,
 `
    ; generic embedded system
-   ; no files, no fds
+   ; stdin/stdout on keyboard and lcd console
 
    IFNDEF __CRTCFG
    

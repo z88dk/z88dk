@@ -53,19 +53,12 @@
 
    ; buffer size must be available to m4 (requires special case in zcc)
    
-   ifdef(`M4__CRT_ITERM_EDIT_BUFFER_SIZE',,`define(`M4__CRT_ITERM_EDIT_BUFFER_SIZE', 64)')
+   ifdef(`M4__CRT_ITERM_EDIT_BUFFER_SIZE',,`define(`M4__CRT_ITERM_EDIT_BUFFER_SIZE', 32)')
 
    IFNDEF CRT_ITERM_EDIT_BUFFER_SIZE
       defc CRT_ITERM_EDIT_BUFFER_SIZE = M4__CRT_ITERM_EDIT_BUFFER_SIZE
    ENDIF
 
-  ;
-  ; LASTK Input Terminal Only
-  ;
-
-  IFNDEF CRT_ITERM_LASTK_ADDRESS
-     defc CRT_ITERM_LASTK_ADDRESS = 0xdb01  ; on MODEL4000
-  ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Output Terminal Settings
@@ -92,7 +85,7 @@
    ENDIF
    
    IFNDEF CRT_OTERM_WINDOW_HEIGHT
-      defc CRT_OTERM_WINDOW_HEIGHT = 4  ; 1 for 1000, 2 for 2000/P/C, 4 for 400x
+      defc CRT_OTERM_WINDOW_HEIGHT = 4  ; 1 for MODEL 1000, 2 for 2000/P/C, 4 for 400x
    ENDIF
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

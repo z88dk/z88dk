@@ -1,3 +1,9 @@
+;
+;
+;@FIXME: This implementation is not usable (just a proof-of-concept). Use the terminal driver instead.
+;
+;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; vgl_00_output_char ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -52,6 +58,20 @@ PUBLIC vgl_00_output_char
 
 EXTERN OCHAR_MSG_PUTC
 EXTERN character_00_output
+
+; from config/config_target.m4
+;EXTERN __VGL_KEY_STATUS_ADDRESS
+;EXTERN __VGL_KEY_CURRENT_ADDRESS
+;
+;EXTERN __VGL_DISPLAY_COLS
+;EXTERN __VGL_DISPLAY_ROWS
+;EXTERN __VGL_DISPLAY_CONTROL_PORT
+;EXTERN __VGL_DISPLAY_REFRESH_ADDRESS
+;EXTERN __VGL_DISPLAY_CURSOR_X_ADDRESS
+;EXTERN __VGL_DISPLAY_CURSOR_Y_ADDRESS
+;EXTERN __VGL_DISPLAY_CURSOR_MODE_ADDRESS
+;EXTERN __VGL_DISPLAY_CLEAR_ADDRESS
+;EXTERN __VGL_VRAM_ADDRESS_START
 
 vgl_00_output_char:
 

@@ -1,7 +1,7 @@
 
 ; For MODEL 4000 / 4004
-defc VGL_KEY_STATUS = 0xdb00
-defc VGL_KEY_CURRENT = 0xdb01
+;defc VGL_KEY_STATUS_ADDRESS = 0xdb00
+;defc VGL_KEY_CURRENT_ADDRESS = 0xdb01
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; vgl_01_input_kbd ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -124,8 +124,17 @@ EXTERN console_01_input_stdio_msg_flsh
 ;EXTERN zx_01_input_inkey_stdio_msg_ictl
 EXTERN console_01_input_stdio_msg_ictl, console_01_input_stdio_msg_ictl_0
 EXTERN error_einval_zc, console_01_input_proc_reset
+EXTERN l_offset_ix_de
+
+; from config/config_target.m4
+EXTERN __VGL_KEY_STATUS_ADDRESS
+EXTERN __VGL_KEY_CURRENT_ADDRESS
 
 vgl_01_input_kbd:
+   
+   ;@FIXME: Just for testing: Intentionally hang here
+   hang:
+   jp hang
    
    cp ITERM_MSG_GETC
    jp z, vgl_01_input_kbd_iterm_msg_getc
@@ -147,27 +156,34 @@ vgl_01_input_kbd_iterm_msg_getc:
    ;
    ;  can use : af, bc, de, hl
    
+   
+;   ; Modify fdstruct
+;   ld hl,25
+;   jp l_offset_ix_de           ; hl = & getk_state
+;   
+;   ;ld b,(hl)                   ; b = getk_state
+;   ld b, 0
+;   ld (hl), b
+;   inc hl
+;   
+;   ;ld c,(hl)                   ; c = getk_lastk
+;   ld c, 0
+;   ld (hl), c
+;   ;inc hl
+   
+   
+   ; Prepare next getkey
    ld a, 0xc0
-   ld (VGL_KEY_STATUS), a	; Prepare next getkey
+   ld (__VGL_KEY_STATUS_ADDRESS), a
    
    ; Wait for key press
-getc_loop:
-   
-   
-   
-   ;@FIXME Intentionally loop forever, so I can see if this function is being called AT ALL
-   ld a, 0x40
-   out (0x0b), a
-   jr getc_loop
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-   
-   ld a, (VGL_KEY_STATUS)
+vgl_01_input_kbd_iterm_msg_getc_loop:
+   ld a, (__VGL_KEY_STATUS_ADDRESS)
    cp 0xd0
-   jr nz, getc_loop
+   jr nz, vgl_01_input_kbd_iterm_msg_getc_loop
    
    ; Get current key
-   ld a, (VGL_KEY_CURRENT)
+   ld a, (__VGL_KEY_CURRENT_ADDRESS)
    
    ; Map to standard keys, like: ld a,CHAR_LF / CHAR_CR / CHAR_CTRL_Z
    
@@ -182,7 +198,7 @@ getc_loop:
 vgl_01_input_stdio_msg_flsh:
    jp console_01_input_stdio_msg_flsh
    ;or a
-   ;ret
+   ret
 
 
 vgl_01_input_stdio_msg_ictl:

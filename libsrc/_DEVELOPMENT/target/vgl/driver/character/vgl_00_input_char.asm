@@ -1,6 +1,3 @@
-defc VGL_KEY_STATUS = 0xdb00
-defc VGL_KEY_CURRENT = 0xdb01
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; vgl_00_input_char ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,6 +57,10 @@ PUBLIC vgl_00_input_char
 
 EXTERN character_00_input, error_znc, error_mc
 
+; from config/config_target.m4
+;EXTERN __VGL_KEY_STATUS_ADDRESS
+;EXTERN __VGL_KEY_CURRENT_ADDRESS
+
 vgl_00_input_char:
 
    cp ICHAR_MSG_GETC
@@ -73,25 +74,16 @@ vgl_00_input_char_ichar_msg_getc:
     
     
     ld a, 0xc0
-    ld (VGL_KEY_STATUS), a
+    ld (__VGL_KEY_STATUS_ADDRESS), a
     
     ; Wait for key press
 getc_loop:
-    
-    
-    
-    ;@FIXME Intentionally loop forever, so I can see if this function is being called AT ALL
-    ld a, 0x40
-    out (0x0b), a
-    jr getc_loop
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
-    ld a, (VGL_KEY_STATUS)
+    ld a, (__VGL_KEY_STATUS_ADDRESS)
     cp 0xd0
     jr nz, getc_loop
     
     ; Get current key
-    ld a, (VGL_KEY_CURRENT)
+    ld a, (__VGL_KEY_CURRENT_ADDRESS)
     
     ; a = ascii code
     

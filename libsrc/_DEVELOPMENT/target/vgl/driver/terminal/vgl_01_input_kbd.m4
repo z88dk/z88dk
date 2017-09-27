@@ -141,6 +141,7 @@ define(`m4_vgl_01_input_kbd',dnl
       defw 0
       defw $4
       
+      
       `ifelse($4,0,,dnl
       
       ; reserve space for edit buffer
