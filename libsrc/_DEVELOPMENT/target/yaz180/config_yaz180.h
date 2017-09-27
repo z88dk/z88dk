@@ -689,10 +689,10 @@
 
 
 
-#define __IO_PIO_PORT_A  0x4000+0x00
-#define __IO_PIO_PORT_B  0x4000+0x01
-#define __IO_PIO_PORT_C  0x4000+0x02
-#define __IO_PIO_CONTROL  0x4000+0x03
+#define __IO_PIO_PORT_A  0x4000
+#define __IO_PIO_PORT_B  0x4001
+#define __IO_PIO_PORT_C  0x4002
+#define __IO_PIO_CONTROL  0x4003
 
 #define __IO_PIO_CNTL_00  0x80
 #define __IO_PIO_CNTL_01  0x81
@@ -725,9 +725,9 @@
 
 
 
-#define __IO_APU_PORT_DATA  0xC000+0x00
-#define __IO_APU_PORT_CONTROL  0xC000+0x01
-#define __IO_APU_PORT_STATUS  0xC000+0x01
+#define __IO_APU_PORT_DATA  0xc000
+#define __IO_APU_PORT_CONTROL  0xc001
+#define __IO_APU_PORT_STATUS  0xc001
 
 #define __IO_APU_STATUS_BUSY  0x80
 #define __IO_APU_STATUS_SIGN  0x40
@@ -827,10 +827,10 @@
 
 #define __IO_PIO_PORT_BASE  0x4000
 
-#define __IO_PIO_PORT_A  0x4000+0x00
-#define __IO_PIO_PORT_B  0x4000+0x01
-#define __IO_PIO_PORT_C  0x4000+0x02
-#define __IO_PIO_CONTROL  0x4000+0x03
+#define __IO_PIO_PORT_A  0x4000
+#define __IO_PIO_PORT_B  0x4001
+#define __IO_PIO_PORT_C  0x4002
+#define __IO_PIO_CONTROL  0x4003
 
 #define __IO_PIO_CNTL_00  0x80
 #define __IO_PIO_CNTL_01  0x81
@@ -856,8 +856,8 @@
 #define __IO_PCA9665_1_PORT_BASE  0xA000
 #define __IO_PCA9665_2_PORT_BASE  0x8000
 
-#define __IO_I2C1_PORT_MSB  (0xA000/0x0100)&0xE0 
-#define __IO_I2C2_PORT_MSB  (0x8000/0x0100)&0xE0 
+#define __IO_I2C1_PORT_MSB  0xa0
+#define __IO_I2C2_PORT_MSB  0x80
 
 #define __IO_I2C_PORT_STA  0x00
 #define __IO_I2C_PORT_IPTR  0x00

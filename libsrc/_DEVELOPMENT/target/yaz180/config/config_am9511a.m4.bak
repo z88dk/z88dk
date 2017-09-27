@@ -4,9 +4,9 @@ divert(-1)
 # AM9511A CONFIGURATION
 #
 
-define(`__IO_APU_PORT_DATA',    `__IO_APU_PORT_BASE+0x00')  # APU Data Port
-define(`__IO_APU_PORT_CONTROL', `__IO_APU_PORT_BASE+0x01')  # APU Control Port
-define(`__IO_APU_PORT_STATUS',  `__IO_APU_PORT_BASE+0x01')  # APU Status Port == Control Port
+define(`__IO_APU_PORT_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU Data Port
+define(`__IO_APU_PORT_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Control Port
+define(`__IO_APU_PORT_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Status Port == Control Port
 
 define(`__IO_APU_STATUS_BUSY',  0x80)
 define(`__IO_APU_STATUS_SIGN',  0x40)

@@ -683,10 +683,10 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
-defc __IO_PIO_PORT_A = 0x4000+0x00
-defc __IO_PIO_PORT_B = 0x4000+0x01
-defc __IO_PIO_PORT_C = 0x4000+0x02
-defc __IO_PIO_CONTROL = 0x4000+0x03
+defc __IO_PIO_PORT_A = 0x4000
+defc __IO_PIO_PORT_B = 0x4001
+defc __IO_PIO_PORT_C = 0x4002
+defc __IO_PIO_CONTROL = 0x4003
 
 defc __IO_PIO_CNTL_00 = 0x80
 defc __IO_PIO_CNTL_01 = 0x81
@@ -719,9 +719,9 @@ defc __IO_PIO_CNTL_15 = 0x9B
 
 
 
-defc __IO_APU_PORT_DATA = 0xC000+0x00
-defc __IO_APU_PORT_CONTROL = 0xC000+0x01
-defc __IO_APU_PORT_STATUS = 0xC000+0x01
+defc __IO_APU_PORT_DATA = 0xc000
+defc __IO_APU_PORT_CONTROL = 0xc001
+defc __IO_APU_PORT_STATUS = 0xc001
 
 defc __IO_APU_STATUS_BUSY = 0x80
 defc __IO_APU_STATUS_SIGN = 0x40
@@ -801,8 +801,8 @@ defc __IO_APU_OP_PUPI = 0x1A
 
 
 
-defc __IO_I2C1_PORT_MSB = (0xA000/0x0100)&0xE0 
-defc __IO_I2C2_PORT_MSB = (0x8000/0x0100)&0xE0 
+defc __IO_I2C1_PORT_MSB = 0xa0
+defc __IO_I2C2_PORT_MSB = 0x80
 
 defc __IO_I2C_PORT_STA = 0x00
 defc __IO_I2C_PORT_IPTR = 0x00

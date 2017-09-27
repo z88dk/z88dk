@@ -4,10 +4,10 @@ divert(-1)
 # 82C55 CONFIGURATION
 #
 
-define(`__IO_PIO_PORT_A',   `__IO_PIO_PORT_BASE+0x00')  # Address for Port A
-define(`__IO_PIO_PORT_B',   `__IO_PIO_PORT_BASE+0x01')  # Address for Port B
-define(`__IO_PIO_PORT_C',   `__IO_PIO_PORT_BASE+0x02')  # Address for Port C
-define(`__IO_PIO_CONTROL',  `__IO_PIO_PORT_BASE+0x03')  # Address for Control Byte
+define(`__IO_PIO_PORT_A',   0x`'eval(__IO_PIO_PORT_BASE+0x00,16))  # Address for Port A
+define(`__IO_PIO_PORT_B',   0x`'eval(__IO_PIO_PORT_BASE+0x01,16))  # Address for Port B
+define(`__IO_PIO_PORT_C',   0x`'eval(__IO_PIO_PORT_BASE+0x02,16))  # Address for Port C
+define(`__IO_PIO_CONTROL',  0x`'eval(__IO_PIO_PORT_BASE+0x03,16))  # Address for Control Byte
 
 # 82C55 PIO Mode Definitions
 

@@ -6,8 +6,8 @@ divert(-1)
 
 # PCA9665 I2C I/O Register MSB addressing
 
-define(`__IO_I2C1_PORT_MSB', `(__IO_PCA9665_1_PORT_BASE/0x0100)&0xE0' )   # distinguish the device address, with MSB
-define(`__IO_I2C2_PORT_MSB', `(__IO_PCA9665_2_PORT_BASE/0x0100)&0xE0' )   # only 3 MSB bits are H/W decoded %111xxxxx
+define(`__IO_I2C1_PORT_MSB', 0x`'eval((__IO_PCA9665_1_PORT_BASE/0x0100)&0xE0,16))   # distinguish the device address, with MSB
+define(`__IO_I2C2_PORT_MSB', 0x`'eval((__IO_PCA9665_2_PORT_BASE/0x0100)&0xE0,16))   # only 3 MSB bits are H/W decoded %111xxxxx
 
 # PCA9665 I2C I/O Register LSB Addressing
 

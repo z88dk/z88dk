@@ -10,12 +10,12 @@ divert(-1)
 # upper and lower data bytes.  The last two are mode setting for the
 # 8255 to configure its ports, which must correspond to the way that
 # the first three lines define which ports are connected.
-define(`__IO_PIO_IDE_LSB',   `__IO_PIO_PORT_A')   # IDE lower 8 bits
-define(`__IO_PIO_IDE_MSB',   `__IO_PIO_PORT_B')   # IDE upper 8 bits
-define(`__IO_PIO_IDE_CTL',   `__IO_PIO_PORT_C')   # IDE control lines
-define(`__IO_PIO_IDE_CONFIG',`__IO_PIO_CONTROL')  # PIO configuration
-define(`__IO_PIO_IDE_RD',    `__IO_PIO_CNTL_10')  # _IO_PIO_IDE_CTL out, _IO_PIO_IDE_LSB/MSB input
-define(`__IO_PIO_IDE_WR',    `__IO_PIO_CNTL_00')  # all PIO ports output
+define(`__IO_PIO_IDE_LSB',    __IO_PIO_PORT_A)    # IDE lower 8 bits
+define(`__IO_PIO_IDE_MSB',    __IO_PIO_PORT_B)    # IDE upper 8 bits
+define(`__IO_PIO_IDE_CTL',    __IO_PIO_PORT_C)    # IDE control lines
+define(`__IO_PIO_IDE_CONFIG', __IO_PIO_CONTROL)   # PIO configuration
+define(`__IO_PIO_IDE_RD',     __IO_PIO_CNTL_10)   # _IO_PIO_IDE_CTL out, _IO_PIO_IDE_LSB/MSB input
+define(`__IO_PIO_IDE_WR',     __IO_PIO_CNTL_00)   # all PIO ports output
 
 # IDE control lines for use with __IO_PIO_IDE_CTL. Change these 8
 # constants to reflect where each signal of the 8255 each of the
@@ -36,23 +36,23 @@ define(`__IO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
 # IDE control lines for use with __IO_PIO_IDE_CTL. Symbolic constants
 # for the IDE registers, which makes the code more readable than
 # always specifying the address pins.
-define(`__IO_IDE_DATA',         `__IO_IDE_CS0_LINE')
-define(`__IO_IDE_ERROR',        `__IO_IDE_CS0_LINE+__IO_IDE_A0_LINE')
-define(`__IO_IDE_SEC_CNT',      `__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE')   #Typically 1 Sector only
-define(`__IO_IDE_SECTOR',       `__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE')  #LBA0
-define(`__IO_IDE_CYL_LSB',      `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE')                   #LBA1
-define(`__IO_IDE_CYL_MSB',      `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE')  #LBA2
-define(`__IO_IDE_HEAD',         `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE')  #LBA3
-define(`__IO_IDE_COMMAND',      `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE')
-define(`__IO_IDE_STATUS',       `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE')
+define(`__IO_IDE_DATA',         __IO_IDE_CS0_LINE)
+define(`__IO_IDE_ERROR',        0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A0_LINE,16))
+define(`__IO_IDE_SEC_CNT',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE,16))   #Typically 1 Sector only
+define(`__IO_IDE_SECTOR',       0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16))  #LBA0
+define(`__IO_IDE_CYL_LSB',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE,16))                   #LBA1
+define(`__IO_IDE_CYL_MSB',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE,16))  #LBA2
+define(`__IO_IDE_HEAD',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16))  #LBA3
+define(`__IO_IDE_COMMAND',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16))
+define(`__IO_IDE_STATUS',       0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16))
 
-define(`__IO_IDE_CONTROL',      `__IO_IDE_CS1_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE')
-define(`__IO_IDE_ALT_STATUS',   `__IO_IDE_CS1_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE')
+define(`__IO_IDE_CONTROL',      0x`'eval(__IO_IDE_CS1_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16))
+define(`__IO_IDE_ALT_STATUS',   0x`'eval(__IO_IDE_CS1_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16))
 
-define(`__IO_IDE_LBA0',         `__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE ') #SECTOR
-define(`__IO_IDE_LBA1',         `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE')                   #CYL_LSB
-define(`__IO_IDE_LBA2',         `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE ') #CYL_MSB
-define(`__IO_IDE_LBA3',         `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE ') #HEAD
+define(`__IO_IDE_LBA0',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16)) #SECTOR
+define(`__IO_IDE_LBA1',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE,16))                  #CYL_LSB
+define(`__IO_IDE_LBA2',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE,16)) #CYL_MSB
+define(`__IO_IDE_LBA3',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16)) #HEAD
 
 
 #==============================================================================
