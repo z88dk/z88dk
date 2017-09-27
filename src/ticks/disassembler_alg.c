@@ -124,9 +124,9 @@ static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t bufl
     size_t offs = 0;
 
     /* Turn of ixl/h handling for Rabbit and Z180 */
-    if ( !canixh() ) {
+    if ( !canixh() && y != 6 ) {
         state->index = 0;
-     }
+    }
     if ( y == 6 && state->index ) {
         int8_t displacement = state->displacement;
 
@@ -354,30 +354,32 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
 
                         if ( x == 0 ) {
                             char *instr = handle_rot(state, y);
-
-                            if ( cancbundoc() && state->index && z != 6 && instr ) {
+                            if ( state->index && z != 6 && instr ) {
                                 handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                 handle_register8(state, 6, opbuf2, sizeof(opbuf2));
-                                
-                                BUF_PRINTF("%-8s%s,%s %s","ld", opbuf1, instr, opbuf2);
+                                if ( cancbundoc() ) BUF_PRINTF("%-8s%s,%s %s","ld", opbuf1, instr, opbuf2);
+                                else BUF_PRINTF("nop");
                             } else if ( instr ) BUF_PRINTF("%-8s%s", instr, handle_register8(state, z, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");
                         } else if ( x == 1 ) {
                             if ( cancbundoc() && state->index ) {
                                 z = 6;
                             }
-                            BUF_PRINTF("%-8s%d,%s", "bit", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                            if ( !cancbundoc() && state->index && z != 6 ) BUF_PRINTF("nop");
+                            else BUF_PRINTF("%-8s%d,%s", "bit", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         } else if ( x == 2 ) {
-                            if ( cancbundoc() && state->index && z != 6 ) {
+                            if ( state->index && z != 6 ) {
                                 handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                 handle_register8(state, 6, opbuf2, sizeof(opbuf2));
-                                BUF_PRINTF("%-8s%s,%s %d,%s","ld", opbuf1, "res",y, opbuf2);
+                                if ( cancbundoc() ) BUF_PRINTF("%-8s%s,%s %d,%s","ld", opbuf1, "res",y, opbuf2);
+                                else BUF_PRINTF("nop");
                             } else BUF_PRINTF("%-8s%d,%s", "res", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         } else if ( x == 3 ) {
                             if ( cancbundoc() && state->index && z != 6 ) {
                                 handle_register8(state, z, opbuf1, sizeof(opbuf1));
                                 handle_register8(state, 6, opbuf2, sizeof(opbuf2));
-                                BUF_PRINTF("%-8s%s,%s %d,%s","ld", opbuf1, "set",y, opbuf2);
+                                if ( cancbundoc() ) BUF_PRINTF("%-8s%s,%s %d,%s","ld", opbuf1, "set",y, opbuf2);
+                                else BUF_PRINTF("nop");
                             } else BUF_PRINTF("%-8s%d,%s", "set", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         }
                         state->prefix = 0;
