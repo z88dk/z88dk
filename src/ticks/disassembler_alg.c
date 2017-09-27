@@ -6,14 +6,9 @@
 
 
 static char *rp2_table[] = { "bc", "de", "hl", "af"};
-
 static char *cc_table[] = { "nz", "z", "c", "nc", "po", "pe", "p", "m"};
-
 static char *alu_table[] = { "add", "adc", "sub", "sbc", "and", "xor", "or", "cp"};
-
-
 static char *assorted_mainpage_opcodes[] = { "rlca", "rrca", "rla", "rra", "daa", "cpl", "scf", "ccf" };
-
 
 
 typedef struct {
@@ -404,7 +399,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                     else if ( z == 1 ) BUF_PRINTF("%-8s(%s),%s","out0",handle_immed8(state, opbuf2, sizeof(opbuf2)),handle_register8(state,y, opbuf1, sizeof(opbuf1)));
                                     else BUF_PRINTF("nop");
                                 } else if ( c_cpu & CPU_Z80_ZXN ) {
-                                    if ( b == 0x20 ) BUF_PRINTF("ld      32,dehl");
+                                    if ( b == 0x20 ) BUF_PRINTF("ld      a32,dehl");
                                     else if ( b == 0x21 ) BUF_PRINTF("ld      dehl,a32");
                                     else if ( b == 0x22 ) BUF_PRINTF("ex      a32,dehl");
                                     else if ( b == 0x23 ) BUF_PRINTF("swapnib");
