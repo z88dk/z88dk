@@ -57,6 +57,7 @@ extern long long st;
 #define isz180() ( c_cpu & (CPU_Z180))
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 #define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define cancbundoc() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
 extern int c_cpu;
 extern int trace;

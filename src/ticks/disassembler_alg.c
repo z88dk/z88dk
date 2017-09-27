@@ -335,25 +335,44 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                 } else if  ( z == 3 ) {
                     if ( y == 0 ) BUF_PRINTF("%-8s%s", "jp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
                     else if ( y == 1 ) {
-                        READ_BYTE(state, b);
-                        uint8_t x = b >> 6;
-                        uint8_t y = ( b & 0x38) >> 3;
-                        uint8_t z = b & 0x07;
+                        
 
                         state->prefix = 0xcb;
                         if ( state->index ) {
                             READ_BYTE(state, state->displacement);
                         }
+                        READ_BYTE(state, b);
+                        uint8_t x = b >> 6;
+                        uint8_t y = ( b & 0x38) >> 3;
+                        uint8_t z = b & 0x07;
+
                         if ( x == 0 ) {
                             char *instr = handle_rot(state, y);
-                            if ( instr ) BUF_PRINTF("%-8s%s", instr, handle_register8(state, z, opbuf1, sizeof(opbuf1)));
+
+                            if ( cancbundoc() && state->index && z != 6 && instr ) {
+                                handle_register8(state, z, opbuf1, sizeof(opbuf1));
+                                handle_register8(state, 6, opbuf2, sizeof(opbuf2));
+                                
+                                BUF_PRINTF("%-8s%s,%s %s","ld", opbuf1, instr, opbuf2);
+                            } else if ( instr ) BUF_PRINTF("%-8s%s", instr, handle_register8(state, z, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");
                         } else if ( x == 1 ) {
+                            if ( cancbundoc() && state->index ) {
+                                z = 6;
+                            }
                             BUF_PRINTF("%-8s%d,%s", "bit", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         } else if ( x == 2 ) {
-                            BUF_PRINTF("%-8s%d,%s", "res", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                            if ( cancbundoc() && state->index && z != 6 ) {
+                                handle_register8(state, z, opbuf1, sizeof(opbuf1));
+                                handle_register8(state, 6, opbuf2, sizeof(opbuf2));
+                                BUF_PRINTF("%-8s%s,%s %d,%s","ld", opbuf1, "res",y, opbuf2);
+                            } else BUF_PRINTF("%-8s%d,%s", "res", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         } else if ( x == 3 ) {
-                            BUF_PRINTF("%-8s%d,%s", "set", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                            if ( cancbundoc() && state->index && z != 6 ) {
+                                handle_register8(state, z, opbuf1, sizeof(opbuf1));
+                                handle_register8(state, 6, opbuf2, sizeof(opbuf2));
+                                BUF_PRINTF("%-8s%s,%s %d,%s","ld", opbuf1, "set",y, opbuf2);
+                            } else BUF_PRINTF("%-8s%d,%s", "set", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         }
                         state->prefix = 0;
                     } else if ( y == 2 ) {
@@ -517,7 +536,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 if ( z == 0 && israbbit3k() ) {
                                     char *r3k_instrs[] = { "uma", "umsa", "lsidr", "lsddr", "nop", "nop", "lsir", "lsdr"};
                                     BUF_PRINTF("%s",r3k_instrs[y]);
-                                } else BUF_PRINTF("nop");
+                                } else if ( b == 0xfe ) BUF_PRINTF("trap");
+                                else BUF_PRINTF("nop");
                             }
                         } else if ( p == 3 ) { state->index = 2; continue; }
                     }
