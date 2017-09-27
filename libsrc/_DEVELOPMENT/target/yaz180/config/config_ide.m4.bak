@@ -10,7 +10,6 @@ divert(-1)
 # upper and lower data bytes.  The last two are mode setting for the
 # 8255 to configure its ports, which must correspond to the way that
 # the first three lines define which ports are connected.
-
 define(`__IO_PIO_IDE_LSB',   `__IO_PIO_PORT_A')   # IDE lower 8 bits
 define(`__IO_PIO_IDE_MSB',   `__IO_PIO_PORT_B')   # IDE upper 8 bits
 define(`__IO_PIO_IDE_CTL',   `__IO_PIO_PORT_C')   # IDE control lines
@@ -34,7 +33,6 @@ define(`__IO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
 
 # IDE I/O Register Addressing
 #
-
 # IDE control lines for use with __IO_PIO_IDE_CTL. Symbolic constants
 # for the IDE registers, which makes the code more readable than
 # always specifying the address pins
@@ -79,9 +77,9 @@ define(`__IO_IDE_LBA3',         `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_
 #       0xD    101    1    0     Not Important
 #       0xE    110    1    0     2nd Status, Interrupt, and Reset
 #       0xF    111    1    0     Active Status Register 
-;
+
 #       $$ Bits in Error Register $1
-;
+
 #       Bit 7   = BBK   Bad Block Detected
 #       Bit 6   = UNC   Uncorrectable Error
 #       Bit 5   = MC    No media
@@ -90,17 +88,17 @@ define(`__IO_IDE_LBA3',         `__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_
 #       Bit 2   = ABRT  Indecent Command - Doh!
 #       Bit 1   = TK0NF Track 0 unavailable -> Trash
 #       Bit 0   = AMNF  Address mark not found
-;
+
 #       ** Bits in LBA 3 Register $6:
-;
+
 #       Bit 7   = Always set to 1
 #       Bit 6   = Always Set to 1 for LBA Mode Access
 #       Bit 5   = Always set to 1
 #       Bit 4   = Select Master (0) or Slave (1) drive
 #       Bit 0:3 = LBA bits (24:27)
-;
+
 #       ## Bits in Command / Status Register $7:
-;
+
 #       Bit 7   = BSY   1=busy, 0=not busy
 #       Bit 6   = RDY   1=ready for command, 0=not ready yet
 #       Bit 5   = DWF   1=fault occured inside drive
