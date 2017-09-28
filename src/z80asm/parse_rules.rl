@@ -292,7 +292,7 @@ Define rules for a ragel-based parser.
 	*   directives with list of names argument, function called for each 
 	*	argument
 	*--------------------------------------------------------------------*/
-#foreach <OP> in GLOBAL, PUBLIC, EXTERN, DEFINE, UNDEFINE
+#foreach <OP> in GLOBAL, PUBLIC, EXTERN, DEFINE, UNDEFINE, XDEF, XLIB, XREF, LIB
 	action <OP>_action { asm_<OP>(str_data(name)); }
 	
 	asm_<OP> = _TK_<OP> name @<OP>_action
@@ -300,7 +300,8 @@ Define rules for a ragel-based parser.
 		    _TK_NEWLINE ;
 #endfor  <OP>
 	directives_names = asm_GLOBAL | asm_PUBLIC | asm_EXTERN | 
-					   asm_DEFINE | asm_UNDEFINE;
+					   asm_DEFINE | asm_UNDEFINE |
+					   asm_XDEF | asm_XLIB | asm_XREF | asm_LIB;
 
 	/*---------------------------------------------------------------------
 	*   directives with list of assignments
