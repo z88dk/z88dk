@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\ticks\debugger.c" />
     <ClCompile Include="..\..\src\ticks\disassembler.c" />
+    <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
     <ClCompile Include="..\..\src\ticks\hook_console.c" />
     <ClCompile Include="..\..\src\ticks\hook_io.c" />
