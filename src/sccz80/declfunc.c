@@ -8,6 +8,10 @@
 #include "ccdefs.h"
 
 
+static SYMBOL *AddFuncCode(char *n, char type, enum ident_type ident, char sign, char zfar, enum storage_type storage, int more, char check, char simple, TAG_SYMBOL *otag, int32_t *addr, int decl_only);
+static int DoFnKR(SYMBOL *currfn, char simple, int decl_only);
+static void setlocvar(SYMBOL *prevarg, SYMBOL *currfn);
+static SYMBOL *dofnansi(SYMBOL *currfn, int32_t *addr, int decl_only);
 
 /** \brief Given an argument train, add in signature information to currfn
  *
@@ -70,7 +74,8 @@ int AddNewFunc(
     char sign,
     TAG_SYMBOL* otag,
     enum ident_type ident,
-    int32_t* addr)
+    int32_t* addr,
+    int decl_only)
 {
     SYMBOL* ptr;
     LVALUE  lval = {0};
@@ -121,7 +126,7 @@ int AddNewFunc(
      *      First call AddNewFunc(), if this returns 0 then we have defined
      *      a function (including code)
      */
-    ptr = AddFuncCode(sname, type, ident, sign, zfar, storage, more, NO, simple, otag, addr);
+    ptr = AddFuncCode(sname, type, ident, sign, zfar, storage, more, NO, simple, otag, addr, decl_only);
 
     if (ptr == NULL ) { /* Defined a function */
         /* trap external int blah() { } things */
@@ -154,7 +159,7 @@ void newfunc()
         return;
     }
     warning(W_RETINT);
-    AddFuncCode(n, CINT, FUNCTION, c_default_unsigned, 0, STATIK, 0, 1, NO, 0, &addr);
+    AddFuncCode(n, CINT, FUNCTION, c_default_unsigned, 0, STATIK, 0, 1, NO, 0, &addr, 0);
 }
 
 /*
@@ -162,7 +167,7 @@ void newfunc()
  *      and also from AddNewFunc(), returns 0 if added a real
  *      function (code etc)
  */
-SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, enum storage_type storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
+SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, enum storage_type storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr, int decl_only)
 {
     uint32_t tvalue; /* Used to hold protot value */
     char typ; /* Temporary type */
@@ -254,9 +259,9 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
         if ( wasdefined ) {
             warning(W_DECLARATION_POSSIBLY_DIFFERENT, currfn->name,currfn->declared_location);
         }
-        return (dofnansi(currfn, addr)); /* So we can pass back result */
+        return (dofnansi(currfn, addr, decl_only)); /* So we can pass back result */
     }
-    DoFnKR(currfn, simple);
+    DoFnKR(currfn, simple, decl_only);
     return NULL ;
 }
 
@@ -267,7 +272,8 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
 
 int DoFnKR(
     SYMBOL* function,
-    char simple)
+    char simple,
+    int decl_only)
 {
     char n[NAMESIZE];
     SYMBOL* prevarg; /* ptr to symbol table entry of most recent argument */
@@ -303,8 +309,13 @@ int DoFnKR(
 
     check_trailing_modifiers(function);
 
+    if ( decl_only ) {
+        needchar(';');
+        currfn = NULL;
+        return -1;
+    }
+
     if ( cmatch(';')) {
-	printf("Doing something %p\n",currfn);
         currfn = NULL;
         return -1;
     }
@@ -581,7 +592,7 @@ void check_trailing_modifiers(SYMBOL *currfn)
 }
 
 /* djm Declare a function in the ansi style! */
-SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
+SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr, int decl_only)
 {
     SYMBOL* prevarg; /* ptr to symbol table entry of most recent argument */
     SYMBOL* argptr; /* Temporary holder.. */
@@ -651,10 +662,17 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
     if ( strcmp(currfn->name,"main") == 0 ) {
         currfn->flags &= ~SMALLC;
     }
+
+    if ( decl_only ) {
+        needchar(';');
+        currfn = NULL;
+        return prevarg;
+    }
+
     if (cmatch(';'))
         return (prevarg);
     setlocvar(prevarg, currfn);
-    return (0);
+    return NULL;
 }
 
 /*

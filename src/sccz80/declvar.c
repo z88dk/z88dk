@@ -27,6 +27,7 @@
 
 #include "ccdefs.h"
 
+static void declglb(int typ, enum storage_type storage, TAG_SYMBOL *mtag, TAG_SYMBOL *otag, int is_struct, struct varid *var, int declonly);
 static TAG_SYMBOL *defstruct(char *sname, enum storage_type storage, int is_struct);
 static int      needsub(void);
 static void     swallow_bitfield(void);
@@ -38,7 +39,8 @@ static void     swallow_bitfield(void);
 int dodeclare(
     enum storage_type storage,
     TAG_SYMBOL* mtag, /* tag of struct whose members are being declared, or zero */
-    int is_struct /* TRUE if struct member is being declared,                                    zero for union */
+    int is_struct, /* TRUE if struct member is being declared,                                    zero for union */
+    int decl_only  /* Set if we just want declarations rather than function definitions */
     )
 /* only matters if mtag is non-zero */
 {
@@ -55,10 +57,10 @@ int dodeclare(
             return (0); /* fail */
     }
     if (var.type == STRUCT) {
-        declglb(STRUCT, storage, mtag, otag, is_struct, &var);
+        declglb(STRUCT, storage, mtag, otag, is_struct, &var, decl_only);
         return (1);
     } else {
-        declglb(var.type, storage, mtag, NULL, is_struct, &var);
+        declglb(var.type, storage, mtag, NULL, is_struct, &var, decl_only);
         return (1);
     }
 }
@@ -113,7 +115,7 @@ defstruct(char* sname, enum storage_type storage, int is_struct)
         tag->weak = 0;
 
         needchar('{');
-        while (dodeclare(storage, tag, is_struct))
+        while (dodeclare(storage, tag, is_struct, 0))
             ;
         needchar('}');
         tag->end = membptr;
@@ -198,13 +200,14 @@ int dummy_idx(int typ, TAG_SYMBOL* otag)
  *  makes an entry in the symbol table so subsequent
  *  references can call symbol by name
  */
-void declglb(
+static void declglb(
     int typ, /* typ is CCHAR, CINT, DOUBLE, STRUCT, LONG, */
     enum storage_type storage,
     TAG_SYMBOL* mtag, /* tag of struct whose members are being declared, or zero */
     TAG_SYMBOL* otag, /* tag of struct for object being declared */
     int is_struct, /* TRUE if struct member being declared, zero if union */
-    struct varid *var)
+    struct varid *var,
+    int decl_only)
 {
     char sname[NAMESIZE];
     int size, ident, more, itag, type, size_st;
@@ -296,7 +299,7 @@ void declglb(
              * since they can't contain functions, only pointers to functions
              * this, understandably(!) makes the work here a lot, lot easier!
              */
-            storage = AddNewFunc(sname, type, storage, var->zfar, var->sign, otag, ident, &addr);
+            storage = AddNewFunc(sname, type, storage, var->zfar, var->sign, otag, ident, &addr, decl_only);
             /*
              *      On return from AddNewFunc, storage will be:
              *      EXTERNP  = external pointer, in which case addr will be set
@@ -471,6 +474,7 @@ void declglb(
             myptr = addmemb(sname, ident, type, mtag->size, storage, more, itag);
             myptr--; /* addmemb returns myptr+1 */
             myptr->size = size;
+            // TOOD: 
             myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->isassigned = YES;  // Pretend that it is
 

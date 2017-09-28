@@ -18,6 +18,7 @@ extern void dogoto(void);
 extern int dolabel(void);
 static void docritical(void);
 static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
+static int lastline = 0;
 
 /*
  *      Statement parser
@@ -34,10 +35,27 @@ int statement()
     char locstatic; /* have we had the static keyword */
 
     blanks();
+    if (lineno != lastline) {
+        lastline = lineno;
+        EmitLine(lineno);
+    }
     if (ch() == 0 && eof) {
         return (lastst = STEXP);
     } else {
         char regit = NO;
+
+        if (amatch("extern")) {
+            SYMBOL *savetab = loctab;
+            SYMBOL *savloc = locptr;
+
+            SYMBOL *newlocs = CALLOC(NUMLOC, sizeof(SYMBOL));
+            locptr = loctab = newlocs;
+            // TODO: Save local variables so that function doesn't trash them
+            dodeclare(EXTERNAL, NULL, 0,1);
+            FREENULL(newlocs);
+            locptr = savloc;
+            loctab = savetab;
+        }
         /* Ignore the register and auto keywords! */
         regit = locstatic = ((swallow("register")) | swallow("auto"));
 
@@ -507,9 +525,13 @@ void doreturn(char type)
 }
 
 /*
- * leave a function
- * If vartype is a value then save it
- * type: 1=c, 2=nc, 0=don't bother
+ * \brief Generate the leave state for a function
+ *
+ * \param vartype The type of variable we're leaving with
+ * \param type 1=c, 2=nc, 0=no carry state
+ * \param incritical - We're in a critical section, restore interrupts 
+ *
+ * \todo Move this to codegen, it's platform specific
  */
 void leave(int vartype, char type, int incritical)
 {
@@ -660,7 +682,6 @@ void doasmfunc(char wantbr)
             if (c == 10 || c == 13)
                 outstr("\n\t");
         }
-        blanks();
     } while (acmatch('"'));
     needchar(')');
     outbyte('\n');
