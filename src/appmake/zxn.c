@@ -116,7 +116,8 @@ int zxn_exec(char *target)
     char   crtname[LINELEN];
     FILE  *fmap;
     char  *p;
-    int i, j, k, errors, ret;
+    int i, j, errors, ret;
+    char k;
 
     ret = -1;
 
