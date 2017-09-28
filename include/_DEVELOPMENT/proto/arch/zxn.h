@@ -134,7 +134,7 @@ __sfr __banked __at 0xbffd IO_BFFD;
 
 #endif
 
-// special zx next opcodes
+// zx next configuration
 
 #ifdef __CLANG
 #define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
@@ -153,6 +153,10 @@ __sfr __banked __at 0xbffd IO_BFFD;
 #ifdef __SCCZ80
 #define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
 #endif
+
+__DPROTO(`a,d,e,h,iyl,iyh',`a,d,e,h,iyl,iyh',unsigned char,,ZXN_READ_NEXTREG,unsigned char reg)
+
+// zx next memory map
 
 __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU0,void)
 __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU1,void)
