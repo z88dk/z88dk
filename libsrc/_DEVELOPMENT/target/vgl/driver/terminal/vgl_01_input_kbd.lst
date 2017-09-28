@@ -1,1 +1,2 @@
 target/vgl/driver/terminal/vgl_01_input_kbd
+target/vgl/driver/terminal/vgl_01_input_kbd/vgl_01_input_kbd_iterm_msg_getc

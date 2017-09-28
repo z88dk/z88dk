@@ -51,12 +51,14 @@
 ;
 ;  8..13                    mutex
 
+INCLUDE "config_private.inc"
+
 SECTION code_driver
 SECTION code_driver_character_output
 
 PUBLIC vgl_00_output_char
 
-EXTERN OCHAR_MSG_PUTC
+;EXTERN OCHAR_MSG_PUTC
 EXTERN character_00_output
 
 ; from config/config_target.m4
