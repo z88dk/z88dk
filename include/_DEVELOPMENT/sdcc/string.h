@@ -257,8 +257,8 @@ extern size_t strnlen_callee(const char *s,size_t max_len) __z88dk_callee;
 #define strnlen(a,b) strnlen_callee(a,b)
 
 
-extern char strpbrk(const char *s,const char *set) __preserves_regs(b);
-extern char strpbrk_callee(const char *s,const char *set) __preserves_regs(b) __z88dk_callee;
+extern char *strpbrk(const char *s,const char *set) __preserves_regs(b);
+extern char *strpbrk_callee(const char *s,const char *set) __preserves_regs(b) __z88dk_callee;
 #define strpbrk(a,b) strpbrk_callee(a,b)
 
 
