@@ -16,15 +16,15 @@ vgl_01_output_char_oterm_msg_printc:
    ;             h = absolute y coordinate
    ;   can use:  af, bc, de, hl
    
-   ; Update cursor
+   
+   ; Update cursor manually?
    ld a, l
    ld (__VGL_DISPLAY_CURSOR_X_ADDRESS), a
-   
    ld a, h
    ld (__VGL_DISPLAY_CURSOR_Y_ADDRESS), a
-   
-   ;ld a, 1
+   ;ld a, 2
    ;ld (__VGL_DISPLAY_CURSOR_MODE_ADDRESS), a
+   
    
    ; Put character to VRAM at 0xdca0 + (Y*COLS) + X
    ; a = Y*20

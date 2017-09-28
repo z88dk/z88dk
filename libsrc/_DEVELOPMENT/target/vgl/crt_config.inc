@@ -67,7 +67,7 @@ IF __CRTCFG = 1
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x8000
-   defc TAR__crt_org_data              = 0xc400 ; MODEL4000: c000 is too low, c200?, c400 works
+   defc TAR__crt_org_data              = 0xc400 ; MODEL4000: c000 is too low, c2000?, c400 works
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 1

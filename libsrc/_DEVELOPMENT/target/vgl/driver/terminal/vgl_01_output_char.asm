@@ -239,6 +239,3 @@ vgl_01_output_char_refresh:
    ;	ld a, 1
    ;	ld (hl), a
    ret
-
-
-

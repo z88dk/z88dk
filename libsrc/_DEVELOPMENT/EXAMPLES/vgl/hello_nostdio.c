@@ -206,10 +206,10 @@ byte get_line(byte *get_line_buf) {
 
 //////////////////// Utils
 
-
-void delay_0x1fff() {
+void delay_1fff() {
 	// Used for screen functions (after putting stuff to ports 0x0a or 0x0b)
 	#asm
+	__delay_1fff:
 		push	hl
 		ld	hl, 1fffh
 	_delay_1fff_loop1:
@@ -221,9 +221,10 @@ void delay_0x1fff() {
 	#endasm
 }
 
-void delay_0x010f() {
+void delay_010f() {
 	// Used for screen functions (after putting stuff to ports 0x0a or 0x0b)
 	#asm
+	__delay_010f:
 		push	hl
 		ld	hl, 010fh
 	_delay_010f_loop1:
@@ -232,6 +233,16 @@ void delay_0x010f() {
 		dec	h
 		jr	nz, _delay_010f_loop1
 		pop	hl
+	#endasm
+}
+
+
+void out_0x0a() {
+	#asm
+	__out_0x0a:
+		out (0x0a), a
+	
+	call __delay_010f
 	#endasm
 }
 
@@ -414,7 +425,7 @@ void screen_scroll() {
 	
 	// Refresh screen
 	//screen_refresh_all();
-	//delay_0x1fff();
+	//delay_1fff();
 }
 
 void screen_put(byte *text) {
@@ -527,76 +538,6 @@ void screen_put_char(byte c) {
 
 
 
-void lcd_reset() {
-	// Restores sane LCD state
-	// at 0321:
-	delay_010f(); delay_010f();
-	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
-	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
-	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
-	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
-	
-	out_0x0a(0x0f);
-	out_0x0a(0x0e);
-	out_0x0a(0x0c);
-	
-	out_0x0a(0x01);
-	
-	out_0x0a(0x06);
-	out_0x0a(0x04);
-	out_0x0a(0x01); delay_010f(); delay_010f();	// delay 0x330 in total
-	
-	out_0x0a(0x02); delay_010f(); delay_010f();	// delay 0x330 in total
-	
-	// First byte is missing if we do not delay enough
-	delay_010f();
-	
-	
-	//@TODO: Also blank out by putting C0+c and 80+c to ports 0x0a and 0x0b
-	
-}
-
-
-void screen_clear() {
-	
-	//lcd_reset();
-	
-	// Clear using LCD HD44780 controller call
-	out_0x0a(0x01); delay_010f(); delay_010f();	// Clears screen and DDRAM
-	
-	// Blank out memory manually
-	#asm
-		push hl
-		push bc
-		
-		ld	hl, _LCD_VRAM_ROW0
-		ld	bc, (_screen_size)		; Number of chars
-		ld	a, 0x20					; Which char to use: SPACE
-		_screen_clear_loop:
-			ld	(hl), a
-			inc	hl
-		djnz _screen_clear_loop
-		
-		pop bc
-		pop hl
-	#endasm
-	
-	screen_refresh_all();
-	
-	
-	// First byte gets lost else
-	delay_010f();
-	//put_char('#');	// This gets lost after lcd_reset...
-	
-	cursor_col = 0;
-	cursor_row = 0;
-	cursor_ofs = 0;
-	
-	cursor_update();
-}
-
-
-
 
 void key_caps_on() {
 	// Turns on caps lock LED
@@ -629,22 +570,22 @@ void key_reset() {
 		ld	a, 0fh
 		out	(0ah), a
 	#endasm
-	delay_0x010f();
+	delay_010f();
 	
 	#asm
 		ld	a, 0eh
 		out	(0ah), a
 	#endasm
-	delay_0x010f();
+	delay_010f();
 	
 	#asm
 		ld	a, 0ch
 		out	(0ah), a
 	#endasm
-	delay_0x010f();
+	delay_010f();
 	
-	delay_0x1fff();
-	delay_0x1fff();
+	delay_1fff();
+	delay_1fff();
 }
 
 
@@ -1037,6 +978,79 @@ void sys_reboot() {
 }
 
 
+
+
+void lcd_reset() {
+	// Restores sane LCD state
+	// at 0321:
+	delay_010f(); delay_010f();
+	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
+	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
+	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
+	out_0x0a(0x38); delay_010f(); delay_010f();	// delay 0x330 in total
+	
+	out_0x0a(0x0f);
+	out_0x0a(0x0e);
+	out_0x0a(0x0c);
+	
+	out_0x0a(0x01);
+	
+	out_0x0a(0x06);
+	out_0x0a(0x04);
+	out_0x0a(0x01); delay_010f(); delay_010f();	// delay 0x330 in total
+	
+	out_0x0a(0x02); delay_010f(); delay_010f();	// delay 0x330 in total
+	
+	// First byte is missing if we do not delay enough
+	delay_010f();
+	
+	
+	//@TODO: Also blank out by putting C0+c and 80+c to ports 0x0a and 0x0b
+	
+}
+
+
+void screen_clear() {
+	
+	//lcd_reset();
+	
+	// Clear using LCD HD44780 controller call
+	//out_0x0a(0x01); delay_010f(); delay_010f();	// Clears screen and DDRAM
+	
+	// Blank out memory manually
+	#asm
+		push hl
+		push bc
+		
+		ld	hl, _LCD_VRAM_ROW0
+		ld	bc, (_screen_size)		; Number of chars
+		ld	a, 0x20					; Which char to use: SPACE
+		_screen_clear_loop:
+			ld	(hl), a
+			inc	hl
+		djnz _screen_clear_loop
+		
+		pop bc
+		pop hl
+	#endasm
+	/*
+	screen_refresh_all();
+	
+	
+	// First byte gets lost else
+	delay_010f();
+	//put_char('#');	// This gets lost after lcd_reset...
+	
+	cursor_col = 0;
+	cursor_row = 0;
+	cursor_ofs = 0;
+	
+	cursor_update();
+	*/
+}
+
+
+
 void vtech_init() {
 	
 	p_put = screen_put;
@@ -1050,6 +1064,7 @@ void vtech_init() {
 	
 	// Determine the system architecture so we know how to output stuff
 	sys_type = sys_getType();
+	//sys_type = 3;
 	
 	switch(sys_type) {
 		case 2:	// MODEL2000
@@ -1081,7 +1096,7 @@ unsigned char i;
 void pause() {
 	beep();
 	for(i=0; i<10; i++) {
-		delay_0x1fff();
+		delay_1fff();
 	}
 }
 
@@ -1092,10 +1107,10 @@ void main(void) {
 	lcd_reset();	// Especially when you compile in "rom_autorun" mode (where the screen is not yet properly initialized)
 	
 	//cursor_reset();
-	
 	//key_reset();
 	
-	screen_clear();	// Clear screen (contains garbage left in RAM)
+	screen_clear();	// Clear screen (contains garbage left in RAM). Cursor will NOT show if not done!
+	
 	
 	put("Hello V-Tech\n");
 	//put("\n2017 B HotKey Slawik\n");

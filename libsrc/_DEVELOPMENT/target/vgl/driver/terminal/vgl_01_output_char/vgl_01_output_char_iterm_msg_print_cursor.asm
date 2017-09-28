@@ -13,12 +13,16 @@ vgl_01_output_char_iterm_msg_print_cursor:
    
    ; change cursor to flashing 'C' or flashing 'L'
    
-   ; Set cursor position
-   ld a, (ix+14)    ; in FD struct
-   ld (__VGL_DISPLAY_CURSOR_X_ADDRESS), a
-   ld a, (ix+15)    ; in FD struct
-   ld (__VGL_DISPLAY_CURSOR_Y_ADDRESS), a
+   ;; Set cursor position
+   ;ld a, (ix+14)    ; in FD struct
+   ;ld (__VGL_DISPLAY_CURSOR_X_ADDRESS), a
+   ;ld a, (ix+15)    ; in FD struct
+   ;ld (__VGL_DISPLAY_CURSOR_Y_ADDRESS), a
    
-   ld a, 2  ;0=off, 1=block 2=line
+   ld a, 1  ;0=off, 1=block 2=line
    ld (__VGL_DISPLAY_CURSOR_MODE_ADDRESS), a
+   
+   ;@TODO: Switch cursor on using port 0x0a
+   
+   
    ret

@@ -31,7 +31,7 @@ DEL %PROGNAME%_BSS.bin
 DEL %PROGNAME%_CODE.bin
 DEL %PROGNAME%_DATA.bin
 DEL %PROGNAME%_interrupt_vectors.bin
-CALL emu.bat
+CALL emu.bat %PROGNAME%
 GOTO:END
 
 :END
