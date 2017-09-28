@@ -41,7 +41,7 @@
 
 #define __CPU_CLOCK  18432000
 
-#define __IO_BASE_ADDRESS 0
+#define __IO_BASE_ADDRESS 0x0
 
 #define __ASCI0_RX_SIZE  0x100
 #define __ASCI0_TX_SIZE  0x100
@@ -91,71 +91,71 @@
 
    // Z8S180 / Z8L180 CLASS
 
-   #define __IO_CNTLA0  0
-   #define __IO_CNTLA1  1
-   #define __IO_CNTLB0  2
-   #define __IO_CNTLB1  3
-   #define __IO_STAT0  4
-   #define __IO_STAT1  5
-   #define __IO_TDR0  6
-   #define __IO_TDR1  7
-   #define __IO_RDR0  8
-   #define __IO_RDR1  9
-   #define __IO_ASEXT0  18
-   #define __IO_ASEXT1  19
-   #define __IO_ASTC0L  26
-   #define __IO_ASTC0H  27
-   #define __IO_ASTC1L  28
-   #define __IO_ASTC1H  29
+   #define __IO_CNTLA0  0x0
+   #define __IO_CNTLA1  0x1
+   #define __IO_CNTLB0  0x2
+   #define __IO_CNTLB1  0x3
+   #define __IO_STAT0  0x4
+   #define __IO_STAT1  0x5
+   #define __IO_TDR0  0x6
+   #define __IO_TDR1  0x7
+   #define __IO_RDR0  0x8
+   #define __IO_RDR1  0x9
+   #define __IO_ASEXT0  0x12
+   #define __IO_ASEXT1  0x13
+   #define __IO_ASTC0L  0x1a
+   #define __IO_ASTC0H  0x1b
+   #define __IO_ASTC1L  0x1c
+   #define __IO_ASTC1H  0x1d
 
-   #define __IO_CNTR  10
-   #define __IO_TRDR  11
+   #define __IO_CNTR  0xa
+   #define __IO_TRDR  0xb
 
-   #define __IO_TMDR0L  12
-   #define __IO_TMDR0H  13
-   #define __IO_RLDR0L  14
-   #define __IO_RLDR0H  15
-   #define __IO_TCR  16
-   #define __IO_TMDR1L  20
-   #define __IO_TMDR1H  21
-   #define __IO_RLDR1L  22
-   #define __IO_RLDR1H  23
+   #define __IO_TMDR0L  0xc
+   #define __IO_TMDR0H  0xd
+   #define __IO_RLDR0L  0xe
+   #define __IO_RLDR0H  0xf
+   #define __IO_TCR  0x10
+   #define __IO_TMDR1L  0x14
+   #define __IO_TMDR1H  0x15
+   #define __IO_RLDR1L  0x16
+   #define __IO_RLDR1H  0x17
 
-   #define __IO_FRC  24
-   #define __IO_CMR  30
-   #define __IO_CCR  31
+   #define __IO_FRC  0x18
+   #define __IO_CMR  0x1e
+   #define __IO_CCR  0x1f
 
-   #define __IO_SAR0L  32
-   #define __IO_SAR0H  33
-   #define __IO_SAR0B  34
-   #define __IO_DAR0L  35
-   #define __IO_DAR0H  36
-   #define __IO_DAR0B  37
-   #define __IO_BCR0L  38
-   #define __IO_BCR0H  39
-   #define __IO_MAR1L  40
-   #define __IO_MAR1H  41
-   #define __IO_MAR1B  42
-   #define __IO_IAR1L  43
-   #define __IO_IAR1H  44
-   #define __IO_IAR1B  45
-   #define __IO_BCR1L  46
-   #define __IO_BCR1H  47
-   #define __IO_DSTAT  48
-   #define __IO_DMODE  49
-   #define __IO_DCNTL  50
+   #define __IO_SAR0L  0x20
+   #define __IO_SAR0H  0x21
+   #define __IO_SAR0B  0x22
+   #define __IO_DAR0L  0x23
+   #define __IO_DAR0H  0x24
+   #define __IO_DAR0B  0x25
+   #define __IO_BCR0L  0x26
+   #define __IO_BCR0H  0x27
+   #define __IO_MAR1L  0x28
+   #define __IO_MAR1H  0x29
+   #define __IO_MAR1B  0x2a
+   #define __IO_IAR1L  0x2b
+   #define __IO_IAR1H  0x2c
+   #define __IO_IAR1B  0x2d
+   #define __IO_BCR1L  0x2e
+   #define __IO_BCR1H  0x2f
+   #define __IO_DSTAT  0x30
+   #define __IO_DMODE  0x31
+   #define __IO_DCNTL  0x32
 
-   #define __IO_IL  51
-   #define __IO_ITC  52
+   #define __IO_IL  0x33
+   #define __IO_ITC  0x34
 
-   #define __IO_RCR  54
+   #define __IO_RCR  0x36
 
-   #define __IO_CBR  56
-   #define __IO_BBR  57
-   #define __IO_CBAR  58
+   #define __IO_CBR  0x38
+   #define __IO_BBR  0x39
+   #define __IO_CBAR  0x3a
 
-   #define __IO_OMCR  62
-   #define __IO_ICR  63
+   #define __IO_OMCR  0x3e
+   #define __IO_ICR  0x3f
 
    // I/O REGISTER BIT FIELDS
 
@@ -925,6 +925,61 @@
 #define __IO_I2C_IMODE_FASTP  0x02
 #define __IO_I2C_IMODE_TURBO  0x03
 #define __IO_I2C_IMODE_CR  0x07
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_PIO_IDE_LSB  0x4000
+#define __IO_PIO_IDE_MSB  0x4001
+#define __IO_PIO_IDE_CTL  0x4002
+#define __IO_PIO_IDE_CONFIG  0x4003
+#define __IO_PIO_IDE_RD  0x92
+#define __IO_PIO_IDE_WR  0x80
+
+#define __IO_IDE_A0_LINE  0x10
+#define __IO_IDE_A1_LINE  0x04
+#define __IO_IDE_A2_LINE  0x40
+#define __IO_IDE_CS0_LINE  0x08
+#define __IO_IDE_CS1_LINE  0x20
+#define __IO_IDE_WR_LINE  0x01
+#define __IO_IDE_RD_LINE  0x02
+#define __IO_IDE_RST_LINE  0x80
+
+#define __IO_IDE_DATA  0x08
+#define __IO_IDE_ERROR  0x18
+#define __IO_IDE_SEC_CNT  0xc
+#define __IO_IDE_SECTOR  0x1c
+#define __IO_IDE_CYL_LSB  0x48
+#define __IO_IDE_CYL_MSB  0x58
+#define __IO_IDE_HEAD  0x4c
+#define __IO_IDE_COMMAND  0x5c
+#define __IO_IDE_STATUS  0x5c
+
+#define __IO_IDE_CONTROL  0x64
+#define __IO_IDE_ALT_STATUS  0x64
+
+#define __IO_IDE_LBA0  0x1c
+#define __IO_IDE_LBA1  0x48
+#define __IO_IDE_LBA2  0x58
+#define __IO_IDE_LBA3  0x4c
+
+#define __IDE_CMD_READ  0x20
+#define __IDE_CMD_WRITE  0x30
+
+#define __IDE_CMD_STANDBY  0xE0
+#define __IDE_CMD_IDLE  0xE1
+#define __IDE_CMD_SLEEP  0xE6
+#define __IDE_CMD_CACHE_FLUSH  0xE7
+#define __IDE_CMD_ID  0xEC
 
 
 

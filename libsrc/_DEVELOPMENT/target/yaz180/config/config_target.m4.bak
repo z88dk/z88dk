@@ -18,17 +18,17 @@ define(`__CPU_CLOCK', 18432000)
 
 define(`__IO_BASE_ADDRESS', 0x00)
 
-define(`__IO_BASE_ADDRESS', eval(__IO_BASE_ADDRESS & 0xc0))
+define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS&0xc0,16))
 
 # All I/O drivers are passed through system buffers
 # This will help when user banking is used, as all I/O is via system RAM
 
-# ASCI0 driver
+# Z180 ASCI0 driver
 
 define(`__ASCI0_RX_SIZE', 0x100)  # Size of the Rx Buffer
 define(`__ASCI0_TX_SIZE', 0x100)  # Size of the Tx Buffer
 
-# ASCI1 driver
+# Z180 ASCI1 driver
 
 define(`__ASCI1_RX_SIZE', 0x100)  # Size of the Rx Buffer
 define(`__ASCI1_TX_SIZE', 0x100)  # Size of the Tx Buffer
@@ -55,7 +55,7 @@ define(`__IO_PCA9665_2_PORT_BASE', 0x8000)  # Base Address for PCA9665 2 I/O
 define(`__APU_CMD_SIZE', 0x100)   # Size of the CMD Buffer, 256 CMDs
 define(`__APU_PTR_SIZE', 0x100)   # Size of the DATA POINTER Buffer, 128 POINTERs
 
-define(`__IO_APU_PORT_BASE',  0xC000)       # Base Address for Am9511A
+define(`__IO_APU_PORT_BASE', 0xC000)        # Base Address for Am9511A
 
 #
 # END OF USER CONFIGURATION

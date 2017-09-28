@@ -24,13 +24,13 @@ define(`__IO_PIO_IDE_WR',     __IO_PIO_CNTL_00)   # all PIO ports output
 # IDE control signals is connected.  All the control signals must
 # be on the same port, but these 8 lines let you connect them to
 # whichever pins on that port.
-define(`__IO_IDE_A0_LINE',  0x10)  # direct from 8255 to ide interface
-define(`__IO_IDE_A1_LINE',  0x04)  # direct from 8255 to ide interface
-define(`__IO_IDE_A2_LINE',  0x40)  # direct from 8255 to ide interface
+define(`__IO_IDE_A0_LINE',  0x01)  # direct from 8255 to ide interface
+define(`__IO_IDE_A1_LINE',  0x02)  # direct from 8255 to ide interface
+define(`__IO_IDE_A2_LINE',  0x04)  # direct from 8255 to ide interface
 define(`__IO_IDE_CS0_LINE', 0x08)  # inverter between 8255 and ide interface
-define(`__IO_IDE_CS1_LINE', 0x20)  # inverter between 8255 and ide interface
-define(`__IO_IDE_WR_LINE',  0x01)  # inverter between 8255 and ide interface
-define(`__IO_IDE_RD_LINE',  0x02)  # inverter between 8255 and ide interface
+define(`__IO_IDE_CS1_LINE', 0x10)  # inverter between 8255 and ide interface
+define(`__IO_IDE_WR_LINE',  0x20)  # inverter between 8255 and ide interface
+define(`__IO_IDE_RD_LINE',  0x40)  # inverter between 8255 and ide interface
 define(`__IO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
 
 # IDE I/O Register Addressing

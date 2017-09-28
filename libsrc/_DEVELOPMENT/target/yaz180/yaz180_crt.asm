@@ -6,7 +6,7 @@
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 16
+	defc startup = 17
 	IFNDEF startup
 	ENDIF
 ENDIF
@@ -20,7 +20,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
    
-   defc startup = 16
+   defc startup = 17
 
 ENDIF
 
@@ -42,7 +42,9 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   ; basic drivers installed on stdin, stdout, stderr
+
+
+   ; basic drivers using installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
@@ -60,7 +62,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                yaz180 standalone target                   ;;
-;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
+;; generated from target/yaz180/startup/yaz180_crt_17.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -749,12 +751,14 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
-   ; driver: rc_00_input_basic
+   ; driver: rc_01_input_basic_dcio
    ; fd    : 0
    ; mode  : read only
-   ; type  : 003 = character input
+   ; type  : 001 = input terminal
+   ; tie   : __i_fcntl_fdstruct_1
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
+   ; buffer size   : 64 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -809,14 +813,14 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_00_input_basic
+   EXTERN rc_01_input_basic_dcio
    
    __i_fcntl_heap_0:
    
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 23
+      defw 98
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -831,19 +835,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_00_input_basic
+      defw rc_01_input_basic_dcio
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x03      ; stdio handles ungetc + type = character input
+      defb 0x01      ; stdio handles ungetc + type = input terminal
       defb 2
       defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw CRT_ITERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -852,6 +856,26 @@ ENDIF
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
+
+      ; tied output terminal
+      ; pending_char
+      ; read_index
+      
+      defw __i_fcntl_fdstruct_1
+      defb 0
+      defw 0
+      
+      ; b_array_t edit_buffer
+      
+      defw __edit_buffer_0
+      defw 0
+      defw 64
+      
+            
+      ; reserve space for edit buffer
+      
+      __edit_buffer_0:   defs 64
+      
 
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -863,12 +887,12 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: rc_00_output_basic
+   ; driver: rc_01_output_basic_dcio
    ; fd    : 1
    ; mode  : write only
-   ; type  : 004 = character output
+   ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -923,7 +947,7 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN rc_00_output_basic
+   EXTERN rc_01_output_basic_dcio
    
    __i_fcntl_heap_1:
    
@@ -945,19 +969,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_00_output_basic
+      defw rc_01_output_basic_dcio
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x04      ; type = character output
+      defb 0x02      ; type = output terminal
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw CRT_OTERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -971,8 +995,7 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   
-   
+      
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
@@ -1044,7 +1067,6 @@ ENDIF
 
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 
 
@@ -1231,11 +1253,11 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 46  = byte size of static FDSTRUCTs
+   ; 121  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 46 > 0
+   IF 121 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1256,7 +1278,7 @@ ENDIF
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (46 + 14)
+      IF __clib_stdio_heap_size > (121 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1267,7 +1289,7 @@ ENDIF
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 46 - 14
+            defs __clib_stdio_heap_size - 121 - 14
          
          ; terminate stdio heap
          
@@ -1481,8 +1503,6 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
-
-
 
 
 

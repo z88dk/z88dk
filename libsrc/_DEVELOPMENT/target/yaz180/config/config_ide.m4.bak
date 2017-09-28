@@ -1,7 +1,9 @@
 divert(-1)
 
 ###############################################################
-# 82C55 IDE CONFIGURATION
+# 82C55 IDE USER CONFIGURATION
+#
+# rebuild the library if changes are made
 #
 
 # 8255 PIO chip.  Change these to specify where the PIO is addressed,
@@ -53,7 +55,6 @@ define(`__IO_IDE_LBA0',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO
 define(`__IO_IDE_LBA1',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE,16))                  #CYL_LSB
 define(`__IO_IDE_LBA2',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE,16)) #CYL_MSB
 define(`__IO_IDE_LBA3',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16)) #HEAD
-
 
 #==============================================================================
 #
@@ -182,48 +183,48 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `__IO_IO_PIO_IDE_LSB' = __IO_IO_PIO_IDE_LSB
-defc `__IO_IO_PIO_IDE_MSB' = __IO_IO_PIO_IDE_MSB
-defc `__IO_IO_PIO_IDE_CTL' = __IO_IO_PIO_IDE_CTL
-defc `__IO_IO_PIO_IDE_CONFIG' = __IO_IO_PIO_IDE_CONFIG
-defc `__IO_IO_PIO_IDE_RD' = __IO_IO_PIO_IDE_RD
-defc `__IO_IO_PIO_IDE_WR' = __IO_IO_PIO_IDE_WR
+defc `__IO_PIO_IDE_LSB' = __IO_PIO_IDE_LSB
+defc `__IO_PIO_IDE_MSB' = __IO_PIO_IDE_MSB
+defc `__IO_PIO_IDE_CTL' = __IO_PIO_IDE_CTL
+defc `__IO_PIO_IDE_CONFIG' = __IO_PIO_IDE_CONFIG
+defc `__IO_PIO_IDE_RD' = __IO_PIO_IDE_RD
+defc `__IO_PIO_IDE_WR' = __IO_PIO_IDE_WR
 
-defc `__IO_IO_IDE_A0_LINE' = __IO_IO_IDE_A0_LINE
-defc `__IO_IO_IDE_A1_LINE' = __IO_IO_IDE_A1_LINE
-defc `__IO_IO_IDE_A2_LINE' = __IO_IO_IDE_A2_LINE
-defc `__IO_IO_IDE_CS0_LINE' = __IO_IO_IDE_CS0_LINE
-defc `__IO_IO_IDE_CS1_LINE' = __IO_IO_IDE_CS1_LINE
-defc `__IO_IO_IDE_WR_LINE' = __IO_IO_IDE_WR_LINE
-defc `__IO_IO_IDE_RD_LINE' = __IO_IO_IDE_RD_LINE
-defc `__IO_IO_IDE_RST_LINE' = __IO_IO_IDE_RST_LINE
+defc `__IO_IDE_A0_LINE' = __IO_IDE_A0_LINE
+defc `__IO_IDE_A1_LINE' = __IO_IDE_A1_LINE
+defc `__IO_IDE_A2_LINE' = __IO_IDE_A2_LINE
+defc `__IO_IDE_CS0_LINE' = __IO_IDE_CS0_LINE
+defc `__IO_IDE_CS1_LINE' = __IO_IDE_CS1_LINE
+defc `__IO_IDE_WR_LINE' = __IO_IDE_WR_LINE
+defc `__IO_IDE_RD_LINE' = __IO_IDE_RD_LINE
+defc `__IO_IDE_RST_LINE' = __IO_IDE_RST_LINE
 
-defc `__IO_IO_IDE_DATA' = __IO_IO_IDE_DATA
-defc `__IO_IO_IDE_ERROR' = __IO_IO_IDE_ERROR
-defc `__IO_IO_IDE_SEC_CNT' = __IO_IO_IDE_SEC_CNT
-defc `__IO_IO_IDE_SECTOR' = __IO_IO_IDE_SECTOR
-defc `__IO_IO_IDE_CYL_LSB' = __IO_IO_IDE_CYL_LSB
-defc `__IO_IO_IDE_CYL_MSB' = __IO_IO_IDE_CYL_MSB
-defc `__IO_IO_IDE_HEAD' = __IO_IO_IDE_HEAD
-defc `__IO_IO_IDE_COMMAND' = __IO_IO_IDE_COMMAND
-defc `__IO_IO_IDE_STATUS' = __IO_IO_IDE_STATUS
+defc `__IO_IDE_DATA' = __IO_IDE_DATA
+defc `__IO_IDE_ERROR' = __IO_IDE_ERROR
+defc `__IO_IDE_SEC_CNT' = __IO_IDE_SEC_CNT
+defc `__IO_IDE_SECTOR' = __IO_IDE_SECTOR
+defc `__IO_IDE_CYL_LSB' = __IO_IDE_CYL_LSB
+defc `__IO_IDE_CYL_MSB' = __IO_IDE_CYL_MSB
+defc `__IO_IDE_HEAD' = __IO_IDE_HEAD
+defc `__IO_IDE_COMMAND' = __IO_IDE_COMMAND
+defc `__IO_IDE_STATUS' = __IO_IDE_STATUS
 
-defc `__IO_IO_IDE_CONTROL' = __IO_IO_IDE_CONTROL
-defc `__IO_IO_IDE_ALT_STATUS' = __IO_IO_IDE_ALT_STATUS
+defc `__IO_IDE_CONTROL' = __IO_IDE_CONTROL
+defc `__IO_IDE_ALT_STATUS' = __IO_IDE_ALT_STATUS
 
-defc `__IO_IO_IDE_LBA0' = __IO_IO_IDE_LBA0
-defc `__IO_IO_IDE_LBA1' = __IO_IO_IDE_LBA1
-defc `__IO_IO_IDE_LBA2' = __IO_IO_IDE_LBA2
-defc `__IO_IO_IDE_LBA3' = __IO_IO_IDE_LBA3
+defc `__IO_IDE_LBA0' = __IO_IDE_LBA0
+defc `__IO_IDE_LBA1' = __IO_IDE_LBA1
+defc `__IO_IDE_LBA2' = __IO_IDE_LBA2
+defc `__IO_IDE_LBA3' = __IO_IDE_LBA3
 
-defc `__IO_IDE_CMD_READ' = __IO_IDE_CMD_READ
-defc `__IO_IDE_CMD_WRITE' = __IO_IDE_CMD_WRITE
+defc `__IDE_CMD_READ' = __IDE_CMD_READ
+defc `__IDE_CMD_WRITE' = __IDE_CMD_WRITE
 
-defc `__IO_IDE_CMD_STANDBY' = __IO_IDE_CMD_STANDBY
-defc `__IO_IDE_CMD_IDLE' = __IO_IDE_CMD_IDLE
-defc `__IO_IDE_CMD_SLEEP' = __IO_IDE_CMD_SLEEP
-defc `__IO_IDE_CMD_CACHE_FLUSH' = __IO_IDE_CMD_CACHE_FLUSH
-defc `__IO_IDE_CMD_ID' = __IO_IDE_CMD_ID
+defc `__IDE_CMD_STANDBY' = __IDE_CMD_STANDBY
+defc `__IDE_CMD_IDLE' = __IDE_CMD_IDLE
+defc `__IDE_CMD_SLEEP' = __IDE_CMD_SLEEP
+defc `__IDE_CMD_CACHE_FLUSH' = __IDE_CMD_CACHE_FLUSH
+defc `__IDE_CMD_ID' = __IDE_CMD_ID
 ')
 
 dnl#
@@ -232,47 +233,47 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-`#define' `__IO_IO_PIO_IDE_LSB'  __IO_IO_PIO_IDE_LSB
-`#define' `__IO_IO_PIO_IDE_MSB'  __IO_IO_PIO_IDE_MSB
-`#define' `__IO_IO_PIO_IDE_CTL'  __IO_IO_PIO_IDE_CTL
-`#define' `__IO_IO_PIO_IDE_CONFIG'  __IO_IO_PIO_IDE_CONFIG
-`#define' `__IO_IO_PIO_IDE_RD'  __IO_IO_PIO_IDE_RD
-`#define' `__IO_IO_PIO_IDE_WR'  __IO_IO_PIO_IDE_WR
+`#define' `__IO_PIO_IDE_LSB'  __IO_PIO_IDE_LSB
+`#define' `__IO_PIO_IDE_MSB'  __IO_PIO_IDE_MSB
+`#define' `__IO_PIO_IDE_CTL'  __IO_PIO_IDE_CTL
+`#define' `__IO_PIO_IDE_CONFIG'  __IO_PIO_IDE_CONFIG
+`#define' `__IO_PIO_IDE_RD'  __IO_PIO_IDE_RD
+`#define' `__IO_PIO_IDE_WR'  __IO_PIO_IDE_WR
 
-`#define' `__IO_IO_IDE_A0_LINE'  __IO_IO_IDE_A0_LINE
-`#define' `__IO_IO_IDE_A1_LINE'  __IO_IO_IDE_A1_LINE
-`#define' `__IO_IO_IDE_A2_LINE'  __IO_IO_IDE_A2_LINE
-`#define' `__IO_IO_IDE_CS0_LINE'  __IO_IO_IDE_CS0_LINE
-`#define' `__IO_IO_IDE_CS1_LINE'  __IO_IO_IDE_CS1_LINE
-`#define' `__IO_IO_IDE_WR_LINE'  __IO_IO_IDE_WR_LINE
-`#define' `__IO_IO_IDE_RD_LINE'  __IO_IO_IDE_RD_LINE
-`#define' `__IO_IO_IDE_RST_LINE'  __IO_IO_IDE_RST_LINE
+`#define' `__IO_IDE_A0_LINE'  __IO_IDE_A0_LINE
+`#define' `__IO_IDE_A1_LINE'  __IO_IDE_A1_LINE
+`#define' `__IO_IDE_A2_LINE'  __IO_IDE_A2_LINE
+`#define' `__IO_IDE_CS0_LINE'  __IO_IDE_CS0_LINE
+`#define' `__IO_IDE_CS1_LINE'  __IO_IDE_CS1_LINE
+`#define' `__IO_IDE_WR_LINE'  __IO_IDE_WR_LINE
+`#define' `__IO_IDE_RD_LINE'  __IO_IDE_RD_LINE
+`#define' `__IO_IDE_RST_LINE'  __IO_IDE_RST_LINE
 
-`#define' `__IO_IO_IDE_DATA'  __IO_IO_IDE_DATA
-`#define' `__IO_IO_IDE_ERROR'  __IO_IO_IDE_ERROR
-`#define' `__IO_IO_IDE_SEC_CNT'  __IO_IO_IDE_SEC_CNT
-`#define' `__IO_IO_IDE_SECTOR'  __IO_IO_IDE_SECTOR
-`#define' `__IO_IO_IDE_CYL_LSB'  __IO_IO_IDE_CYL_LSB
-`#define' `__IO_IO_IDE_CYL_MSB'  __IO_IO_IDE_CYL_MSB
-`#define' `__IO_IO_IDE_HEAD'  __IO_IO_IDE_HEAD
-`#define' `__IO_IO_IDE_COMMAND'  __IO_IO_IDE_COMMAND
-`#define' `__IO_IO_IDE_STATUS'  __IO_IO_IDE_STATUS
+`#define' `__IO_IDE_DATA'  __IO_IDE_DATA
+`#define' `__IO_IDE_ERROR'  __IO_IDE_ERROR
+`#define' `__IO_IDE_SEC_CNT'  __IO_IDE_SEC_CNT
+`#define' `__IO_IDE_SECTOR'  __IO_IDE_SECTOR
+`#define' `__IO_IDE_CYL_LSB'  __IO_IDE_CYL_LSB
+`#define' `__IO_IDE_CYL_MSB'  __IO_IDE_CYL_MSB
+`#define' `__IO_IDE_HEAD'  __IO_IDE_HEAD
+`#define' `__IO_IDE_COMMAND'  __IO_IDE_COMMAND
+`#define' `__IO_IDE_STATUS'  __IO_IDE_STATUS
 
-`#define' `__IO_IO_IDE_CONTROL'  __IO_IO_IDE_CONTROL
-`#define' `__IO_IO_IDE_ALT_STATUS'  __IO_IO_IDE_ALT_STATUS
+`#define' `__IO_IDE_CONTROL'  __IO_IDE_CONTROL
+`#define' `__IO_IDE_ALT_STATUS'  __IO_IDE_ALT_STATUS
 
-`#define' `__IO_IO_IDE_LBA0'  __IO_IO_IDE_LBA0
-`#define' `__IO_IO_IDE_LBA1'  __IO_IO_IDE_LBA1
-`#define' `__IO_IO_IDE_LBA2'  __IO_IO_IDE_LBA2
-`#define' `__IO_IO_IDE_LBA3'  __IO_IO_IDE_LBA3
+`#define' `__IO_IDE_LBA0'  __IO_IDE_LBA0
+`#define' `__IO_IDE_LBA1'  __IO_IDE_LBA1
+`#define' `__IO_IDE_LBA2'  __IO_IDE_LBA2
+`#define' `__IO_IDE_LBA3'  __IO_IDE_LBA3
 
-`#define' `__IO_IDE_CMD_READ'  __IO_IDE_CMD_READ
-`#define' `__IO_IDE_CMD_WRITE'  __IO_IDE_CMD_WRITE
+`#define' `__IDE_CMD_READ'  __IDE_CMD_READ
+`#define' `__IDE_CMD_WRITE'  __IDE_CMD_WRITE
 
-`#define' `__IO_IDE_CMD_STANDBY'  __IO_IDE_CMD_STANDBY
-`#define' `__IO_IDE_CMD_IDLE'  __IO_IDE_CMD_IDLE
-`#define' `__IO_IDE_CMD_SLEEP'  __IO_IDE_CMD_SLEEP
-`#define' `__IO_IDE_CMD_CACHE_FLUSH'  __IO_IDE_CMD_CACHE_FLUSH
-`#define' `__IO_IDE_CMD_ID'  __IO_IDE_CMD_ID
+`#define' `__IDE_CMD_STANDBY'  __IDE_CMD_STANDBY
+`#define' `__IDE_CMD_IDLE'  __IDE_CMD_IDLE
+`#define' `__IDE_CMD_SLEEP'  __IDE_CMD_SLEEP
+`#define' `__IDE_CMD_CACHE_FLUSH'  __IDE_CMD_CACHE_FLUSH
+`#define' `__IDE_CMD_ID'  __IDE_CMD_ID
 ')
 

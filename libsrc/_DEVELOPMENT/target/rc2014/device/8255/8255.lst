@@ -1,4 +1,3 @@
-target/rc2014/device/8255/8255_defines
 target/rc2014/device/8255/8255_read_block
 target/rc2014/device/8255/8255_write_block
 target/rc2014/device/8255/8255_read_byte
