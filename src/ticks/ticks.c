@@ -8,10 +8,7 @@
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
 
-#define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
-#define isz180() ( c_cpu & (CPU_Z180))
-#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
-#define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+
 
 
 uint8_t get_memory(int pc)
