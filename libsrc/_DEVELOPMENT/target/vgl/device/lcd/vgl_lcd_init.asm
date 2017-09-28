@@ -1,16 +1,17 @@
 SECTION data_clib
-;SECTION data_sound_bit
+;SECTION data_vgl_lcd
 
 PUBLIC vgl_lcd_init
 
 
 vgl_lcd_init:
-   ; as found in ROM and on HD44780 data sheet:
+   ; This performs the LCD initialization
+   ; as seen in several ROMs and in the HD44780 data sheet itself:
    
    call delay_010f
    call delay_010f
    
-   
+   ; Enter 8 bit mode
    ld a, 0x38
    call out_0x0a
    ; delay 0x330 in total
@@ -35,6 +36,8 @@ vgl_lcd_init:
    call delay_010f
    call delay_010f
    
+   
+   ; Cursor on?
    ld a, 0x0f
    call out_0x0a
    ld a, 0x0e
@@ -42,24 +45,34 @@ vgl_lcd_init:
    ld a, 0x0c
    call out_0x0a
    
-   ld a, 0x01
-   call out_0x0a
-   
-   ld a, 0x06
-   call out_0x0a
-   ld a, 0x04
-   call out_0x0a
-   ld a, 0x01
-   call out_0x0a
-   ; delay 0x330 in total
    call delay_010f
    call delay_010f
    
-   ld a, 0x02
-   call out_0x0a
-   ; delay 0x330 in total
-   call delay_010f
-   call delay_010f
+   
+   ;  ; CLS?
+   ;  ld a, 0x01
+   ;  call out_0x0a
+   ;  
+   ;  
+   ;  ld a, 0x06
+   ;  call out_0x0a
+   ;  ld a, 0x04
+   ;  call out_0x0a
+   ;  ld a, 0x01
+   ;  call out_0x0a
+   ;  ; delay 0x330 in total
+   ;  call delay_010f
+   ;  call delay_010f
+   ;  
+   ;  
+   ;  ld a, 0x02
+   ;  call out_0x0a
+   ;  ; delay 0x330 in total
+   ;  call delay_010f
+   ;  call delay_010f
+   ; End of init
+   
+   
    
    ; First byte is missing if we do not delay enough
    call delay_010f

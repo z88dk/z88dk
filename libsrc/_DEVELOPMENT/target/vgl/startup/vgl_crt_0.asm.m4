@@ -106,7 +106,7 @@ EXTERN _main
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; These bytes indicate what kind of cartridge we have.
-; They must be the very first bytes in the ROM
+; They must be the very first bytes in ROM at 0x8000
 ; They could also be moved to the "create-app" part, but this provides easier debugging possibilities for now
 
 IF (startup=1)
@@ -203,9 +203,11 @@ SECTION code_crt_init          ; user and library initialization
    ; Prepare hardware (timers etc.)
    
    
+   ;EXTERN vgl_model_check
    EXTERN vgl_lcd_init
    EXTERN vgl_sound_off
    
+   ;CALL vgl_model_check
    CALL vgl_sound_off
    CALL vgl_lcd_init
    

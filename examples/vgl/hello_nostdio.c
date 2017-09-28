@@ -1,6 +1,7 @@
 /*
 
-Headers for writing V-Techn ROMs
+A "hand crafted" V-Tech ROM that does not depend on stdlib
+(You can remove the stdlib include and printf's and substitute them with put() )
 
 Mostly done via reverse-engineering
 2017-01-08 Bernhard "HotKey" Slawik

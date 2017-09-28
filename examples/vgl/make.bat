@@ -6,6 +6,7 @@ SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
 SET PROGNAME=hello
+REM SET PROGNAME=hello_nostdio
 
 
 REM Clean
