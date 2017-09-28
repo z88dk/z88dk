@@ -1113,29 +1113,21 @@ void main(void) {
 	
 	//key_peek_arm();	// Arm the system to detect next key
 	
+	//gets(buffer);
+	//printf("\"%s\"", buffer);
+	c = 10;
+	
 	while(1) {
 		
 		printf(">");
 		
-		// Check for keyboard input
-		//c = key_get_char();
-		//c = key_peek_char();	// manual
-		//key_peek_arm();
+		
+		//c = getc(stdin);	// stdio (experimental)
 		c = getchar();	// stdio (experimental)
 		
-		if (c != 0) {
-			// Store key
-			//keyBuf[keyBufLen++] = c;
-			
-			// Send it
-			//keyBuf[keyBufLen] = 0;	// Terminate string
-			
-			//put_char(c);
-			sprintf(buffer, "%d:\"%c\"\n", c, c);
-			printf(buffer);
-			
-			//key_peek_arm();	// Arm the system to detect next key
-		}
+		//put_char(c);
+		sprintf(buffer, "%d:\"%c\"\n", c, c);
+		printf(buffer);
 		
 	}
 	

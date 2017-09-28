@@ -11,12 +11,12 @@ SET PROGNAME=hello
 REM Clean
 DEL %PROGNAME%.bin
 
-REM Use SDCC compiler
+REM Use SDCC compiler (can not handle inline #asm/#endasm in C!)
 REM zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
 REM zcc +vgl -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
 
 REM Use SCCZ80 compiler
-zcc +vgl -v -clib=new %PROGNAME%.c -o %PROGNAME% -create-app
+zcc +vgl -vn -clib=new %PROGNAME%.c -o %PROGNAME% -create-app
 IF ERRORLEVEL 1 GOTO:ERROR
 GOTO:NOERROR
 

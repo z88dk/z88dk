@@ -50,11 +50,38 @@ vgl_01_input_kbd_iterm_msg_getc_loop:
    ; A = ascii code
    ; Map to standard keys, like: ld a,CHAR_LF / CHAR_CR / CHAR_CTRL_Z
    
-   cp 0x60	;CHAR_CTRL_Z
+   cp 0x60    ;__VGL_KEY_BREAK=0x60 CHAR_CTRL_Z
    jp z, error_mc              ; generate EOF
+
+   ; for cpm swap CR/LF since return key only generates CR
+
+   cp 0x7c        ; __VGL_KEY_ENTER=0x7c
+   jr z, key_lf
+   ;jr z, key_cr
    
-   ;ld l,a
-   ;ld h,0                      ; a = hl = ascii code
+   ;cp 10
+   ;jr z, key_lf
+   
+   cp 0xf4        ; __VGL_KEY_BACKSPACE_X=0xf4
+   jr z, key_bs
+   
+
+exit:
+
+   ld l,a
+   ld h,0                      ; a = hl = ascii code
    
    or a
    ret
+
+key_bs:
+   ld a,8
+   jr exit
+
+key_lf:
+   ld a,CHAR_LF
+   jr exit
+
+key_cr:
+   ld a,CHAR_CR
+   jr exit

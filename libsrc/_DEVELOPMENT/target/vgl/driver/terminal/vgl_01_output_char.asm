@@ -376,6 +376,16 @@ vgl_01_output_char_iterm_msg_print_cursor:
    ret
 
 vgl_01_output_char_oterm_msg_pause:
+    
+    
+    
+    ; Pause disabled
+    ret ; Do nothing
+    
+    
+    ;@TODO: Show arrow or something
+    
+    ; Wait for keypress
     ld a, 0xc0
     ld (__VGL_KEY_STATUS_ADDRESS), a	; Prepare next getkey
     
@@ -385,6 +395,7 @@ pause_getc_loop:
     ld a, (__VGL_KEY_STATUS_ADDRESS)
     cp 0xd0
     jr nz, pause_getc_loop
+    ret
 
 
 vgl_01_output_char_iterm_msg_bell:
