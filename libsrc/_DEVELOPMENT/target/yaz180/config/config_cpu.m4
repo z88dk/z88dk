@@ -24,13 +24,13 @@ define(`__CPU_TIMER_SCALE', 20)
 # moved to crt variable "CRT_IO_VECTOR_BASE"
 #
 #define(`__IO_VECTOR_BASE', 0x80)
-#define(`__IO_VECTOR_BASE', eval(__IO_VECTOR_BASE & 0xe0))
+#define(`__IO_VECTOR_BASE', 0x`'eval(__IO_VECTOR_BASE & 0xe0,16))
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 # moved to config_target.m4
 
 #define(`__IO_BASE_ADDRESS', 0x00)
-#define(`__IO_BASE_ADDRESS', eval(__IO_BASE_ADDRESS & 0xc0))
+#define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS & 0xc0,16))
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
@@ -39,78 +39,78 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    # ASCI
 
-   define(`__IO_CNTLA0', eval(__IO_BASE_ADDRESS + 0x00))
-   define(`__IO_CNTLA1', eval(__IO_BASE_ADDRESS + 0x01))
-   define(`__IO_CNTLB0', eval(__IO_BASE_ADDRESS + 0x02))
-   define(`__IO_CNTLB1', eval(__IO_BASE_ADDRESS + 0x03))
-   define(`__IO_STAT0', eval(__IO_BASE_ADDRESS + 0x04))
-   define(`__IO_STAT1', eval(__IO_BASE_ADDRESS + 0x05))
-   define(`__IO_TDR0', eval(__IO_BASE_ADDRESS + 0x06))
-   define(`__IO_TDR1', eval(__IO_BASE_ADDRESS + 0x07))
-   define(`__IO_RDR0', eval(__IO_BASE_ADDRESS + 0x08))
-   define(`__IO_RDR1', eval(__IO_BASE_ADDRESS + 0x09))
+   define(`__IO_CNTLA0', 0x`'eval(__IO_BASE_ADDRESS + 0x00,16))
+   define(`__IO_CNTLA1', 0x`'eval(__IO_BASE_ADDRESS + 0x01,16))
+   define(`__IO_CNTLB0', 0x`'eval(__IO_BASE_ADDRESS + 0x02,16))
+   define(`__IO_CNTLB1', 0x`'eval(__IO_BASE_ADDRESS + 0x03,16))
+   define(`__IO_STAT0', 0x`'eval(__IO_BASE_ADDRESS + 0x04,16))
+   define(`__IO_STAT1', 0x`'eval(__IO_BASE_ADDRESS + 0x05,16))
+   define(`__IO_TDR0', 0x`'eval(__IO_BASE_ADDRESS + 0x06,16))
+   define(`__IO_TDR1', 0x`'eval(__IO_BASE_ADDRESS + 0x07,16))
+   define(`__IO_RDR0', 0x`'eval(__IO_BASE_ADDRESS + 0x08,16))
+   define(`__IO_RDR1', 0x`'eval(__IO_BASE_ADDRESS + 0x09,16))
 
    # CSI/O
 
-   define(`__IO_CNTR', eval(__IO_BASE_ADDRESS + 0x0a))
-   define(`__IO_TRDR', eval(__IO_BASE_ADDRESS + 0x0b))
+   define(`__IO_CNTR', 0x`'eval(__IO_BASE_ADDRESS + 0x0a,16))
+   define(`__IO_TRDR', 0x`'eval(__IO_BASE_ADDRESS + 0x0b,16))
 
    # Timer
 
-   define(`__IO_TMDR0L', eval(__IO_BASE_ADDRESS + 0x0c))
-   define(`__IO_TMDR0H', eval(__IO_BASE_ADDRESS + 0x0d))
-   define(`__IO_RLDR0L', eval(__IO_BASE_ADDRESS + 0x0e))
-   define(`__IO_RLDR0H', eval(__IO_BASE_ADDRESS + 0x0f))
-   define(`__IO_TCR', eval(__IO_BASE_ADDRESS + 0x10))
-   define(`__IO_TMDR1L', eval(__IO_BASE_ADDRESS + 0x14))
-   define(`__IO_TMDR1H', eval(__IO_BASE_ADDRESS + 0x15))
-   define(`__IO_RLDR1L', eval(__IO_BASE_ADDRESS + 0x16))
-   define(`__IO_RLDR1H', eval(__IO_BASE_ADDRESS + 0x17))
+   define(`__IO_TMDR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x0c,16))
+   define(`__IO_TMDR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x0d,16))
+   define(`__IO_RLDR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x0e,16))
+   define(`__IO_RLDR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x0f,16))
+   define(`__IO_TCR', 0x`'eval(__IO_BASE_ADDRESS + 0x10,16))
+   define(`__IO_TMDR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x14,16))
+   define(`__IO_TMDR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x15,16))
+   define(`__IO_RLDR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x16,16))
+   define(`__IO_RLDR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x17,16))
 
    # Others
 
-   define(`__IO_FRC', eval(__IO_BASE_ADDRESS + 0x18))
+   define(`__IO_FRC', 0x`'eval(__IO_BASE_ADDRESS + 0x18,16))
 
    # DMA
 
-   define(`__IO_SAR0L', eval(__IO_BASE_ADDRESS + 0x20))
-   define(`__IO_SAR0H', eval(__IO_BASE_ADDRESS + 0x21))
-   define(`__IO_SAR0B', eval(__IO_BASE_ADDRESS + 0x22))
-   define(`__IO_DAR0L', eval(__IO_BASE_ADDRESS + 0x23))
-   define(`__IO_DAR0H', eval(__IO_BASE_ADDRESS + 0x24))
-   define(`__IO_DAR0B', eval(__IO_BASE_ADDRESS + 0x25))
-   define(`__IO_BCR0L', eval(__IO_BASE_ADDRESS + 0x26))
-   define(`__IO_BCR0H', eval(__IO_BASE_ADDRESS + 0x27))
-   define(`__IO_MAR1L', eval(__IO_BASE_ADDRESS + 0x28))
-   define(`__IO_MAR1H', eval(__IO_BASE_ADDRESS + 0x29))
-   define(`__IO_MAR1B', eval(__IO_BASE_ADDRESS + 0x2a))
-   define(`__IO_IAR1L', eval(__IO_BASE_ADDRESS + 0x2b))
-   define(`__IO_IAR1H', eval(__IO_BASE_ADDRESS + 0x2c))
-   define(`__IO_BCR1L', eval(__IO_BASE_ADDRESS + 0x2e))
-   define(`__IO_BCR1H', eval(__IO_BASE_ADDRESS + 0x2f))
-   define(`__IO_DSTAT', eval(__IO_BASE_ADDRESS + 0x30))
-   define(`__IO_DMODE', eval(__IO_BASE_ADDRESS + 0x31))
-   define(`__IO_DCNTL', eval(__IO_BASE_ADDRESS + 0x32))
+   define(`__IO_SAR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x20,16))
+   define(`__IO_SAR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x21,16))
+   define(`__IO_SAR0B', 0x`'eval(__IO_BASE_ADDRESS + 0x22,16))
+   define(`__IO_DAR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x23,16))
+   define(`__IO_DAR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x24,16))
+   define(`__IO_DAR0B', 0x`'eval(__IO_BASE_ADDRESS + 0x25,16))
+   define(`__IO_BCR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x26,16))
+   define(`__IO_BCR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x27,16))
+   define(`__IO_MAR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x28,16))
+   define(`__IO_MAR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x29,16))
+   define(`__IO_MAR1B', 0x`'eval(__IO_BASE_ADDRESS + 0x2a,16))
+   define(`__IO_IAR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x2b,16))
+   define(`__IO_IAR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x2c,16))
+   define(`__IO_BCR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x2e,16))
+   define(`__IO_BCR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x2f,16))
+   define(`__IO_DSTAT', 0x`'eval(__IO_BASE_ADDRESS + 0x30,16))
+   define(`__IO_DMODE', 0x`'eval(__IO_BASE_ADDRESS + 0x31,16))
+   define(`__IO_DCNTL', 0x`'eval(__IO_BASE_ADDRESS + 0x32,16))
 
    # INT
 
-   define(`__IO_IL', eval(__IO_BASE_ADDRESS + 0x33))
-   define(`__IO_ITC', eval(__IO_BASE_ADDRESS + 0x34))
+   define(`__IO_IL', 0x`'eval(__IO_BASE_ADDRESS + 0x33,16))
+   define(`__IO_ITC', 0x`'eval(__IO_BASE_ADDRESS + 0x34,16))
 
    # Refresh
 
-   define(`__IO_RCR', eval(__IO_BASE_ADDRESS + 0x36))
+   define(`__IO_RCR', 0x`'eval(__IO_BASE_ADDRESS + 0x36,16))
 
    # MMU
 
-   define(`__IO_CBR', eval(__IO_BASE_ADDRESS + 0x38))
-   define(`__IO_BBR', eval(__IO_BASE_ADDRESS + 0x39))
-   define(`__IO_CBAR', eval(__IO_BASE_ADDRESS + 0x3a))
+   define(`__IO_CBR', 0x`'eval(__IO_BASE_ADDRESS + 0x38,16))
+   define(`__IO_BBR', 0x`'eval(__IO_BASE_ADDRESS + 0x39,16))
+   define(`__IO_CBAR', 0x`'eval(__IO_BASE_ADDRESS + 0x3a,16))
 
    # I/O
 
-   define(`__IO_OMCR', eval(__IO_BASE_ADDRESS + 0x3e))
-   define(`__IO_ICR', eval(__IO_BASE_ADDRESS + 0x3f))
+   define(`__IO_OMCR', 0x`'eval(__IO_BASE_ADDRESS + 0x3e,16))
+   define(`__IO_ICR', 0x`'eval(__IO_BASE_ADDRESS + 0x3f,16))
 ',
 `
    # Z8S180 / Z8L180 CLASS
@@ -118,87 +118,87 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    # ASCI
 
-   define(`__IO_CNTLA0', eval(__IO_BASE_ADDRESS + 0x00))
-   define(`__IO_CNTLA1', eval(__IO_BASE_ADDRESS + 0x01))
-   define(`__IO_CNTLB0', eval(__IO_BASE_ADDRESS + 0x02))
-   define(`__IO_CNTLB1', eval(__IO_BASE_ADDRESS + 0x03))
-   define(`__IO_STAT0', eval(__IO_BASE_ADDRESS + 0x04))
-   define(`__IO_STAT1', eval(__IO_BASE_ADDRESS + 0x05))
-   define(`__IO_TDR0', eval(__IO_BASE_ADDRESS + 0x06))
-   define(`__IO_TDR1', eval(__IO_BASE_ADDRESS + 0x07))
-   define(`__IO_RDR0', eval(__IO_BASE_ADDRESS + 0x08))
-   define(`__IO_RDR1', eval(__IO_BASE_ADDRESS + 0x09))
-   define(`__IO_ASEXT0', eval(__IO_BASE_ADDRESS + 0x12))
-   define(`__IO_ASEXT1', eval(__IO_BASE_ADDRESS + 0x13))
-   define(`__IO_ASTC0L', eval(__IO_BASE_ADDRESS + 0x1a))
-   define(`__IO_ASTC0H', eval(__IO_BASE_ADDRESS + 0x1b))
-   define(`__IO_ASTC1L', eval(__IO_BASE_ADDRESS + 0x1c))
-   define(`__IO_ASTC1H', eval(__IO_BASE_ADDRESS + 0x1d))
+   define(`__IO_CNTLA0', 0x`'eval(__IO_BASE_ADDRESS + 0x00,16))
+   define(`__IO_CNTLA1', 0x`'eval(__IO_BASE_ADDRESS + 0x01,16))
+   define(`__IO_CNTLB0', 0x`'eval(__IO_BASE_ADDRESS + 0x02,16))
+   define(`__IO_CNTLB1', 0x`'eval(__IO_BASE_ADDRESS + 0x03,16))
+   define(`__IO_STAT0', 0x`'eval(__IO_BASE_ADDRESS + 0x04,16))
+   define(`__IO_STAT1', 0x`'eval(__IO_BASE_ADDRESS + 0x05,16))
+   define(`__IO_TDR0', 0x`'eval(__IO_BASE_ADDRESS + 0x06,16))
+   define(`__IO_TDR1', 0x`'eval(__IO_BASE_ADDRESS + 0x07,16))
+   define(`__IO_RDR0', 0x`'eval(__IO_BASE_ADDRESS + 0x08,16))
+   define(`__IO_RDR1', 0x`'eval(__IO_BASE_ADDRESS + 0x09,16))
+   define(`__IO_ASEXT0', 0x`'eval(__IO_BASE_ADDRESS + 0x12,16))
+   define(`__IO_ASEXT1', 0x`'eval(__IO_BASE_ADDRESS + 0x13,16))
+   define(`__IO_ASTC0L', 0x`'eval(__IO_BASE_ADDRESS + 0x1a,16))
+   define(`__IO_ASTC0H', 0x`'eval(__IO_BASE_ADDRESS + 0x1b,16))
+   define(`__IO_ASTC1L', 0x`'eval(__IO_BASE_ADDRESS + 0x1c,16))
+   define(`__IO_ASTC1H', 0x`'eval(__IO_BASE_ADDRESS + 0x1d,16))
 
    # CSI/O
 
-   define(`__IO_CNTR', eval(__IO_BASE_ADDRESS + 0x0a))
-   define(`__IO_TRDR', eval(__IO_BASE_ADDRESS + 0x0b))
+   define(`__IO_CNTR', 0x`'eval(__IO_BASE_ADDRESS + 0x0a,16))
+   define(`__IO_TRDR', 0x`'eval(__IO_BASE_ADDRESS + 0x0b,16))
 
    # Timer
 
-   define(`__IO_TMDR0L', eval(__IO_BASE_ADDRESS + 0x0c))
-   define(`__IO_TMDR0H', eval(__IO_BASE_ADDRESS + 0x0d))
-   define(`__IO_RLDR0L', eval(__IO_BASE_ADDRESS + 0x0e))
-   define(`__IO_RLDR0H', eval(__IO_BASE_ADDRESS + 0x0f))
-   define(`__IO_TCR', eval(__IO_BASE_ADDRESS + 0x10))
-   define(`__IO_TMDR1L', eval(__IO_BASE_ADDRESS + 0x14))
-   define(`__IO_TMDR1H', eval(__IO_BASE_ADDRESS + 0x15))
-   define(`__IO_RLDR1L', eval(__IO_BASE_ADDRESS + 0x16))
-   define(`__IO_RLDR1H', eval(__IO_BASE_ADDRESS + 0x17))
+   define(`__IO_TMDR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x0c,16))
+   define(`__IO_TMDR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x0d,16))
+   define(`__IO_RLDR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x0e,16))
+   define(`__IO_RLDR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x0f,16))
+   define(`__IO_TCR', 0x`'eval(__IO_BASE_ADDRESS + 0x10,16))
+   define(`__IO_TMDR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x14,16))
+   define(`__IO_TMDR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x15,16))
+   define(`__IO_RLDR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x16,16))
+   define(`__IO_RLDR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x17,16))
 
    # Others
 
-   define(`__IO_FRC', eval(__IO_BASE_ADDRESS + 0x18))
-   define(`__IO_CMR', eval(__IO_BASE_ADDRESS + 0x1e))
-   define(`__IO_CCR', eval(__IO_BASE_ADDRESS + 0x1f))
+   define(`__IO_FRC', 0x`'eval(__IO_BASE_ADDRESS + 0x18,16))
+   define(`__IO_CMR', 0x`'eval(__IO_BASE_ADDRESS + 0x1e,16))
+   define(`__IO_CCR', 0x`'eval(__IO_BASE_ADDRESS + 0x1f,16))
 
    # DMA
 
-   define(`__IO_SAR0L', eval(__IO_BASE_ADDRESS + 0x20))
-   define(`__IO_SAR0H', eval(__IO_BASE_ADDRESS + 0x21))
-   define(`__IO_SAR0B', eval(__IO_BASE_ADDRESS + 0x22))
-   define(`__IO_DAR0L', eval(__IO_BASE_ADDRESS + 0x23))
-   define(`__IO_DAR0H', eval(__IO_BASE_ADDRESS + 0x24))
-   define(`__IO_DAR0B', eval(__IO_BASE_ADDRESS + 0x25))
-   define(`__IO_BCR0L', eval(__IO_BASE_ADDRESS + 0x26))
-   define(`__IO_BCR0H', eval(__IO_BASE_ADDRESS + 0x27))
-   define(`__IO_MAR1L', eval(__IO_BASE_ADDRESS + 0x28))
-   define(`__IO_MAR1H', eval(__IO_BASE_ADDRESS + 0x29))
-   define(`__IO_MAR1B', eval(__IO_BASE_ADDRESS + 0x2a))
-   define(`__IO_IAR1L', eval(__IO_BASE_ADDRESS + 0x2b))
-   define(`__IO_IAR1H', eval(__IO_BASE_ADDRESS + 0x2c))
-   define(`__IO_IAR1B', eval(__IO_BASE_ADDRESS + 0x2d))
-   define(`__IO_BCR1L', eval(__IO_BASE_ADDRESS + 0x2e))
-   define(`__IO_BCR1H', eval(__IO_BASE_ADDRESS + 0x2f))
-   define(`__IO_DSTAT', eval(__IO_BASE_ADDRESS + 0x30))
-   define(`__IO_DMODE', eval(__IO_BASE_ADDRESS + 0x31))
-   define(`__IO_DCNTL', eval(__IO_BASE_ADDRESS + 0x32))
+   define(`__IO_SAR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x20,16))
+   define(`__IO_SAR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x21,16))
+   define(`__IO_SAR0B', 0x`'eval(__IO_BASE_ADDRESS + 0x22,16))
+   define(`__IO_DAR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x23,16))
+   define(`__IO_DAR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x24,16))
+   define(`__IO_DAR0B', 0x`'eval(__IO_BASE_ADDRESS + 0x25,16))
+   define(`__IO_BCR0L', 0x`'eval(__IO_BASE_ADDRESS + 0x26,16))
+   define(`__IO_BCR0H', 0x`'eval(__IO_BASE_ADDRESS + 0x27,16))
+   define(`__IO_MAR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x28,16))
+   define(`__IO_MAR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x29,16))
+   define(`__IO_MAR1B', 0x`'eval(__IO_BASE_ADDRESS + 0x2a,16))
+   define(`__IO_IAR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x2b,16))
+   define(`__IO_IAR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x2c,16))
+   define(`__IO_IAR1B', 0x`'eval(__IO_BASE_ADDRESS + 0x2d,16))
+   define(`__IO_BCR1L', 0x`'eval(__IO_BASE_ADDRESS + 0x2e,16))
+   define(`__IO_BCR1H', 0x`'eval(__IO_BASE_ADDRESS + 0x2f,16))
+   define(`__IO_DSTAT', 0x`'eval(__IO_BASE_ADDRESS + 0x30,16))
+   define(`__IO_DMODE', 0x`'eval(__IO_BASE_ADDRESS + 0x31,16))
+   define(`__IO_DCNTL', 0x`'eval(__IO_BASE_ADDRESS + 0x32,16))
 
    # INT
 
-   define(`__IO_IL', eval(__IO_BASE_ADDRESS + 0x33))
-   define(`__IO_ITC', eval(__IO_BASE_ADDRESS + 0x34))
+   define(`__IO_IL', 0x`'eval(__IO_BASE_ADDRESS + 0x33,16))
+   define(`__IO_ITC', 0x`'eval(__IO_BASE_ADDRESS + 0x34,16))
 
    # Refresh
 
-   define(`__IO_RCR', eval(__IO_BASE_ADDRESS + 0x36))
+   define(`__IO_RCR', 0x`'eval(__IO_BASE_ADDRESS + 0x36,16))
 
    # MMU
 
-   define(`__IO_CBR', eval(__IO_BASE_ADDRESS + 0x38))
-   define(`__IO_BBR', eval(__IO_BASE_ADDRESS + 0x39))
-   define(`__IO_CBAR', eval(__IO_BASE_ADDRESS + 0x3a))
+   define(`__IO_CBR', 0x`'eval(__IO_BASE_ADDRESS + 0x38,16))
+   define(`__IO_BBR', 0x`'eval(__IO_BASE_ADDRESS + 0x39,16))
+   define(`__IO_CBAR', 0x`'eval(__IO_BASE_ADDRESS + 0x3a,16))
 
    # I/O
 
-   define(`__IO_OMCR', eval(__IO_BASE_ADDRESS + 0x3e))
-   define(`__IO_ICR', eval(__IO_BASE_ADDRESS + 0x3f))
+   define(`__IO_OMCR', 0x`'eval(__IO_BASE_ADDRESS + 0x3e,16))
+   define(`__IO_ICR', 0x`'eval(__IO_BASE_ADDRESS + 0x3f,16))
 ')
 
 # I/O REGISTER BIT FIELDS
