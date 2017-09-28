@@ -5,9 +5,9 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-define(`__IO_ACIA_CONTROL_REGISTER', 0x80) # Address of Control Register (write only)
-define(`__IO_ACIA_STATUS_REGISTER', 0x80)  # Address of Status Register (read only)
-define(`__IO_ACIA_DATA_REGISTER', 0x81)    # Address of Data Register
+define(`__IO_ACIA_CONTROL_REGISTER', 0x`'eval(__IO_ACIA_PORT_BASE+0x00,16)) # Address of Control Register (write only)
+define(`__IO_ACIA_STATUS_REGISTER', 0x`'eval(__IO_ACIA_PORT_BASE+0x00,16))  # Address of Status Register (read only)
+define(`__IO_ACIA_DATA_REGISTER', 0x`'eval(__IO_ACIA_PORT_BASE+0x01,16))    # Address of Data Register
 
 define(`__IO_ACIA_CR_CLK_DIV_01', 0x00)    # Divide the Clock by 1
 define(`__IO_ACIA_CR_CLK_DIV_16', 0x01)    # Divide the Clock by 16
@@ -44,8 +44,8 @@ define(`__IO_ACIA_SR_IRQ', 0x80)           # IRQ (Either Transmitted or Received
 # MC68C50 ACIA driver
 
 define(`__IO_ACIA_RX_SIZE', 0x100)         # Size of the Rx Buffer
-define(`__IO_ACIA_RX_FULLISH', eval(__IO_ACIA_RX_SIZE-8))
-                                           # Size of the Rx Buffer, when not_RTS is signalled
+define(`__IO_ACIA_RX_FULLISH', 0x`'eval(__IO_ACIA_RX_SIZE-8,16))
+                                           # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__IO_ACIA_RX_EMPTYISH', 0x08)      # Fullness of the Rx Buffer, when RTS is signalled
 define(`__IO_ACIA_TX_SIZE', 0x10)          # Size of the Tx Buffer   
 

@@ -1,5 +1,4 @@
 target/rc2014/driver/ide/__ide_data
-target/rc2014/driver/ide/ide_defines
 target/rc2014/driver/ide/ide_wait_ready
 target/rc2014/driver/ide/ide_wait_drq
 target/rc2014/driver/ide/ide_test_error
