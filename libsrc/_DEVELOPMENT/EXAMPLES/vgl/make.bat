@@ -8,6 +8,12 @@ SET PATH=%PATH%;%Z88DK%\bin
 SET PROGNAME=hello
 REM SET PROGNAME=hello_nostdio
 
+SET SRCPATH=..\
+SET PROGNAME=eliza
+REM SET PROGNAME=heapsort
+REM SET PROGNAME=beepfx
+
+
 
 REM Clean
 DEL %PROGNAME%.bin
@@ -17,7 +23,7 @@ REM zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o 
 REM zcc +vgl -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
 
 REM Use SCCZ80 compiler
-zcc +vgl -vn -clib=new %PROGNAME%.c -o %PROGNAME% -create-app
+zcc +vgl -vn -clib=new %SRCPATH%%PROGNAME%.c -o %PROGNAME% -create-app
 IF ERRORLEVEL 1 GOTO:ERROR
 GOTO:NOERROR
 

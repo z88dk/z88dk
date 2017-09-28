@@ -5,7 +5,7 @@ unsigned char buffer[100];
 unsigned char c;
 unsigned char i;
 
-
+#define IOCTL_OTERM_PAUSE 0xc042	// defined in target's auto-generated h file
 
 /*
 #define __VGL_KEY_STATUS_ADDRESS  0xdb00
@@ -28,7 +28,7 @@ unsigned char i;
 
 #define __VGL_DISPLAY_CURSOR_OFFSET_MODEL2000 0xdcef		// Current column + 64*row
 #define __VGL_DISPLAY_CURSOR_MODE_MODEL2000 0xdced		// Show cursor (0=off, 1=block 2=line)
-
+*/
 
 void delay_0x010f() {
 	// Used for screen functions (after putting stuff to ports 0x0a or 0x0b)
@@ -43,16 +43,25 @@ void delay_0x010f() {
 		pop	hl
 	#endasm
 }
-*/
+void delay() {
+	for(i = 0; i < 50; i++) {
+		for (c = 0; c < 200; c++) {
+			delay_0x010f();
+		}
+	}
+}
+
 
 void main(void) {
 	
-	//test();
-	
+	//ioctl(1, IOCTL_OTERM_PAUSE, 0);	// Switch off "pause after page is full". Also possible on compile time via OTERM_FLAGS when unsetting bit 6 (0x0040)
 	
 	printf("Hello, World!\n");
 	
+	//delay();
+	
 	getchar();
+	
 	
 	/*
 	printf("Beeping...");
@@ -74,7 +83,6 @@ void main(void) {
 		
 		sprintf(buffer, "%d:\"%c\"\n", c, c);
 		printf(buffer);
-		
 	}
 	
 }

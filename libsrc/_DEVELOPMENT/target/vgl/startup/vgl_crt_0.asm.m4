@@ -206,10 +206,12 @@ SECTION code_crt_init          ; user and library initialization
    ;EXTERN vgl_model_check
    EXTERN vgl_lcd_init
    EXTERN vgl_sound_off
+   EXTERN vgl_key_arm
    
-   ;CALL vgl_model_check
-   CALL vgl_sound_off
-   CALL vgl_lcd_init
+   ;call vgl_model_check
+   call vgl_sound_off
+   call vgl_lcd_init
+   call vgl_key_arm  ; Prepare key input
    
    
 

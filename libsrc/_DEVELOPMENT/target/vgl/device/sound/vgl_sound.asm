@@ -1,4 +1,5 @@
-SECTION data_clib
+;SECTION data_clib
+SECTION code_driver
 
 
 PUBLIC vgl_sound_off

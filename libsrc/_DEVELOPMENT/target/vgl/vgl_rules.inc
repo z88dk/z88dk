@@ -48,7 +48,25 @@
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IFNDEF CRT_ITERM_TERMINAL_FLAGS
-      defc CRT_ITERM_TERMINAL_FLAGS = 0x03b0
+      ; bit hex  default meaning
+      ; 15  8000         reserved (includes some state for driver base class)
+      ; 14  4000         reserved (includes some state for driver base class)
+      ; 13  2000         reserved (includes some state for driver base class)
+      ; 12  1000         reserved (includes some state for driver base class)
+      ; 11  0800         reserved (includes some state for driver base class)
+      ; 10  0400         reserved (includes some state for driver base class)
+      ;  9  0200 default = 1 to enable printed cursor
+      ;  8  0100 default = 1 to enable crlf conversion (will be filtered to generate lf only)
+      ;  7  0080 default = 1 to echo typed input characters
+      ;  6  0040         = 1 to enable password mode (input printed as *)
+      ;  5  0020 default = 1 to enable line mode (input is edited before being delivered)
+      ;  4  0010 default = 1 to enable cook mode (input characters are interpreted in some way)
+      ;  3  0008         = 1 for caps lock
+      ;  2  0004         reserved (device state)
+      ;  1  0002         reserved (device state)
+      ;  0  0001         reserved (device state)
+      ; default: 0x03b0
+      defc CRT_ITERM_TERMINAL_FLAGS = 0x0390
    ENDIF
 
    ; buffer size must be available to m4 (requires special case in zcc)
@@ -65,7 +83,25 @@
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IFNDEF CRT_OTERM_TERMINAL_FLAGS
-      defc CRT_OTERM_TERMINAL_FLAGS = 0x2370
+      ; bit hex  default  meaning
+      ; 15  8000          is currently reading input?
+      ; 14  4000          is readline
+      ; 13  2000 default  cls on paging
+      ; 12  1000          ?
+      ; 11  0800          ?
+      ; 10  0400          ?
+      ;  9  0200 default  print cursor
+      ;  8  0100 default  crlf conversion (2)
+      ;  7  0080          page mode
+      ;  6  0040 default  pause when screen is full
+      ;  5  0020 default  cook
+      ;  4  0010 default  cr/lf onverion
+      ;  3  0008          ?
+      ;  2  0004          ?
+      ;  1  0002          ?
+      ;  0  0001          ?
+      ; default: 0x2370
+      defc CRT_OTERM_TERMINAL_FLAGS = 0x2370 ; 0x2330 = 0x2370 - 0x0040=pause
    ENDIF
 
    ;

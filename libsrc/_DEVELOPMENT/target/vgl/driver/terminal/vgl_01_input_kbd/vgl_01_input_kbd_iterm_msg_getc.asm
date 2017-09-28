@@ -8,6 +8,9 @@ PUBLIC vgl_01_input_kbd_iterm_msg_getc
 
 EXTERN error_mc
 
+EXTERN vgl_key_arm
+EXTERN vgl_key_get
+EXTERN vgl_key_peek
 
 
 vgl_01_input_kbd_iterm_msg_getc:
@@ -19,43 +22,17 @@ vgl_01_input_kbd_iterm_msg_getc:
    ;  can use : af, bc, de, hl
    
    
-;   ; Modify fdstruct
-;   ld hl,25
-;   jp l_offset_ix_de           ; hl = & getk_state
-;   
-;   ;ld b,(hl)                   ; b = getk_state
-;   ld b, 0
-;   ld (hl), b
-;   inc hl
-;   
-;   ;ld c,(hl)                   ; c = getk_lastk
-;   ld c, 0
-;   ld (hl), c
-;   ;inc hl
+   call vgl_key_get       ; Blocking call
    
-   
-   
-   ; Prepare next getkey
-   ld a, 0xc0
-   ld (__VGL_KEY_STATUS_ADDRESS), a
-   
-   ; Wait for key press
-vgl_01_input_kbd_iterm_msg_getc_loop:
-   ld a, (__VGL_KEY_STATUS_ADDRESS)
-   cp 0xd0
-   jr nz, vgl_01_input_kbd_iterm_msg_getc_loop
-   
-   ; Get current key
-   ld a, (__VGL_KEY_CURRENT_ADDRESS)
-   
+   ;call vgl_key_peek       ; Non-blocking call
    
    
    
    ; A = ascii code
    ; Map to standard keys, like: ld a,CHAR_LF / CHAR_CR / CHAR_CTRL_Z
    
-   ;cp 0x00
-   ;jp z, error_mc              ; generate EOF
+   cp 0x00
+   jp z, error_mc              ; generate EOF
    
    cp 0x60        ;__VGL_KEY_BREAK=0x60
    jr z, key_esc
@@ -94,3 +71,7 @@ key_cr:
 key_esc:
    ld a,CHAR_ESC
    jr exit
+
+key_ungetc:
+   ld a, 0        ; See FDSTRUCT for which ungetc to use
+   ret

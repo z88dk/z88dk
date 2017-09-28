@@ -17,17 +17,17 @@ vgl_01_output_char_oterm_msg_printc:
    ;   can use:  af, bc, de, hl
    
    
-   ; Update cursor manually?
+   ; Show cursor on screen
    ld a, l
    ld (__VGL_DISPLAY_CURSOR_X_ADDRESS), a
    ld a, h
    ld (__VGL_DISPLAY_CURSOR_Y_ADDRESS), a
-   ;ld a, 2
+   ;ld a, 2  ;0=off, 1=block 2=line
    ;ld (__VGL_DISPLAY_CURSOR_MODE_ADDRESS), a
    
    
    ; Put character to VRAM at 0xdca0 + (Y*COLS) + X
-   ; a = Y*20
+   ; a := Y*20
    ld a, h
    add a	; *2
    add a	; *4
