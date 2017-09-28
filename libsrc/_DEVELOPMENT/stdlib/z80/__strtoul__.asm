@@ -40,7 +40,7 @@ __strtoul__:
    ;
    ; uses  : af, bc, de, hl, ix
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    dec sp
    
@@ -184,7 +184,7 @@ ENDIF
    ;   d = base
    ;   e = first numerical digit
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    ld (ix+0),d
 
@@ -215,7 +215,7 @@ loop:
    call l_char2num             ; a = digit
    jr c, number_complete
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    cp (ix+0)
    jr nc, number_complete
@@ -234,7 +234,7 @@ ENDIF
    push af                     ; save new digit
    push bc                     ; save char *
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    ld a,(ix+0)
    call l_mulu_40_32x8
@@ -285,7 +285,7 @@ u_oflow:
    ld l,c
    ld h,b                      ; hl = char *
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    ld c,(ix+0)
 

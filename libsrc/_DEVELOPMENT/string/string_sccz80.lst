@@ -87,6 +87,8 @@ string/c/sccz80/strrcspn_callee
 string/c/sccz80/strrev
 string/c/sccz80/strrspn
 string/c/sccz80/strrspn_callee
+string/c/sccz80/strrstr
+string/c/sccz80/strrstr_callee
 string/c/sccz80/strrstrip
 string/c/sccz80/strsep
 string/c/sccz80/strsep_callee

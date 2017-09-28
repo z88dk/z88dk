@@ -16,7 +16,7 @@ _strncasecmp_callee:
    pop bc
    push af
 
-IFDEF __Z180
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
 
    jp asm_strncasecmp
 

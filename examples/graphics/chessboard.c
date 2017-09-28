@@ -10,15 +10,15 @@
 // optional: -DMIDSIZE, -DFANCY
 
 #ifdef MIDSIZE
-   #include <chessb16.h>
+   #include "chessb16.h"
 #else
    #ifdef FANCY
-      #include <fancychess.h>
+      #include "fancychess.h"
    #else
       #if defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
-         #include <ti_chessboard.h>
+         #include "ti_chessboard.h"
       #else
-         #include <chessboard.h>
+         #include "chessboard.h"
       #endif
    #endif
 #endif

@@ -43,6 +43,7 @@ static struct zx_sna zxs = {
 };
 
 static struct zx_bin zxb = {
+    0,          // fullsize
     0xff,       // romfill
     0,          // ihex
     0,          // ipad
@@ -64,6 +65,7 @@ option_t zxn_options[] = {
     { 'o', "output",   "Name of output file\n",      OPT_STR,   &zxc.outfile },
 
     {  0,  "bin",      "Make .bin instead of .tap",  OPT_BOOL,  &bin },
+    {  0,  "fullsize", "Banks are output full size", OPT_BOOL,  &zxb.fullsize },
     { 'f', "filler",   "Filler byte (default: 0xFF)", OPT_INT,  &zxb.romfill },
     {  0,  "ihex",     "Generate an iHEX file",      OPT_BOOL,  &zxb.ihex },
     { 'p', "pad",      "Pad iHEX file",              OPT_BOOL,  &zxb.ipad },
@@ -76,6 +78,7 @@ option_t zxn_options[] = {
     {  0,  "org",      "Start address of .sna",      OPT_INT,   &zxc.origin },
     {  0,  "sna-sp",   "Stack location in .sna",     OPT_INT,   &zxs.stackloc },
     {  0,  "sna-di",   "Di on start if non-zero (default = 0)", OPT_INT, &zxs.intstate },
+    {  0,  "fullsize", "Banks are output full size", OPT_BOOL,  &zxb.fullsize },
     {  0,  "exclude-banks",    "Exclude memory banks from output", OPT_STR, &zxc.excluded_banks },
     {  0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
@@ -113,7 +116,8 @@ int zxn_exec(char *target)
     char   crtname[LINELEN];
     FILE  *fmap;
     char  *p;
-    int i, j, k, errors, ret;
+    int i, j, errors, ret;
+    char k;
 
     ret = -1;
 
@@ -153,6 +157,15 @@ int zxn_exec(char *target)
     memset(&memory, 0, sizeof(memory));
     mb_create_bankspace(&memory, "BANK");   // bank space 0
     mb_create_bankspace(&memory, "DIV");    // bank space 1
+
+    if (zxb.fullsize)
+    {
+        memory.bankspace[0].org = 0xc000;
+        memory.bankspace[0].size = 0x4000;
+
+        memory.bankspace[1].org = 0x2000;
+        memory.bankspace[1].size = 0x2000;
+    }
 
     memset(&aligned, 0, sizeof(aligned));
 

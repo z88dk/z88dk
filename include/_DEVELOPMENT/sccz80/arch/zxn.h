@@ -136,19 +136,31 @@ __sfr __banked __at 0xbffd IO_BFFD;
 
 #endif
 
-// special zx next opcodes
+// zx next configuration
 
 #ifdef __CLANG
 #define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
 #endif
 
 #ifdef __SDCC
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
 #endif
+
+// TEMPORARILY REPLACED DUE TO HARDWARE TESTING - SEE ZXN_RULES.2
+//
+//#ifdef __SDCC
+//#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
+//#endif
 
 #ifdef __SCCZ80
 #define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
 #endif
+
+extern unsigned char __LIB__ ZXN_READ_NEXTREG(unsigned char reg) __smallc __z88dk_fastcall;
+
+
+
+// zx next memory map
 
 extern unsigned char __LIB__ ZXN_READ_MMU0(void) __smallc;
 
@@ -197,6 +209,33 @@ extern unsigned char __LIB__ ZXN_WRITE_MMU6(unsigned char page) __smallc __z88dk
 
 
 extern unsigned char __LIB__ ZXN_WRITE_MMU7(unsigned char page) __smallc __z88dk_fastcall;
+
+
+
+// TEMPORARILY REPLACED DUE TO HARDWARE TESTING - SEE ZXN_RULES.2
+//
+//extern unsigned char __LIB__ ZXN_WRITE_MMU0(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU1(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU2(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU3(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU4(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU5(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU6(unsigned char page) __smallc __z88dk_fastcall;
+
+
+//extern unsigned char __LIB__ ZXN_WRITE_MMU7(unsigned char page) __smallc __z88dk_fastcall;
 
 
 

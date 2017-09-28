@@ -1,31 +1,52 @@
+;;
+;; ZXN_NEXTREG(reg,data)
+;;
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
+=
+	call	_ZXN_NEXTREG_%2_%3
+	ret
+
 %"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
 =
 	nextreg	%2,%3
 
-%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+;;
+;; ZXN_READ_NEXTREG(reg)
+;;
+
+%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG_fastcall
 =
-	call	%2ZXN_WRITE_MMU%3_fastcall
+	call	%2ZXN_READ_NEXTREG_fastcall
 	ret
 
-%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG_fastcall
 =
-	call	%2ZXN_WRITE_MMU%3
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	in	l,(c)
+
+	%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG
+=
+	call	%2ZXN_READ_NEXTREG
 	ret
+
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG
+=
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	in	l,(c)
+
+;;
+;; ZXN_READ_MMUn()
+;;
 
 %"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
 =
 	call	%2ZXN_READ_MMU%3
 	ret
-
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
-=
-	ld	a,l
-	mmu%3 a
-
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
-=
-	ld	a,l
-	mmu%3 a
 
 %"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
 =
@@ -34,3 +55,69 @@
 	out	(c),a
 	inc	b
 	in	l,(c)
+
+;;
+;; ZXN_WRITE_MMUn(page)
+;;
+
+%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+=
+	call	%2ZXN_WRITE_MMU%3_fastcall
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+=
+	ld	a,l
+	mmu%3	a
+
+	%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+=
+	call	%2ZXN_WRITE_MMU%3
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+=
+	ld	a,l
+	mmu%3	a
+
+;;
+;; TEMPORARY AREA
+;;
+;; Real test hardware has had zx next instructions removed
+;; as many have smaller fpgas that cannot hold all the logic.
+;;
+;; Must translate "nextreg" and "mmu" instructions we are
+;; using to actual OUTs.  This also affects the C macros
+;; used to inline these instructions in zxn.h because zsdcc
+;; is being told which registers are unaffected by the macros.
+;;
+;; This rules file only affects c code.
+;;
+
+	nextreg	%"[A-Fa-f0-9xX]+"1,%"[A-Fa-f0-9xX]+"2
+=
+	ld	bc,0x243b
+	ld	a,%1
+	out	(c),a
+	inc	b
+	ld	a,%2
+	out	(c),a
+
+	mmu%"[0-9]+"1	a
+=
+	ld	l,a
+	ld	bc,0x243b
+	ld	a,0x50+%1
+	out	(c),a
+	inc	b
+	out	(c),l
+
+	ld	a,l
+	ld	l,a
+=
+	ld	a,l
+
+	ld	l,a
+	ld	a,l
+=
+	ld	l,a

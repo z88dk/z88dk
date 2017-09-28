@@ -23,7 +23,7 @@ rcmx000_boot.o: rcmx000_boot.asm
 	z80asm $(OPTS) rcmx000_boot.asm
 
 rcmx000_boot.bin: rcmx000_boot.o
-	z80asm $(OPTS) -a -m -orcmx000_boot.bin rcmx000_boot.o
+	z80asm $(OPTS) -b -d -m -orcmx000_boot.bin rcmx000_boot.o
 
 rcmx000_boot.asm:
 	ln -s ../../lib/rcmx000_boot.asm .
@@ -35,14 +35,14 @@ RCMX000_BOOT.LOD: rcmx000_boot.bin mk_boot_code
 
 # The .LOD file for obtaining the baudrate divisor
 BAUDMEAS.LOD: baudmeas.bin mk_boot_code
-	./mk_boot_code -r rcmx000_boot.sym baudmeas.bin BAUDMEAS.LOD
+	./mk_boot_code -r rcmx000_boot.map baudmeas.bin BAUDMEAS.LOD
 
 # -s generates a symbol table which we use later...
 # We disable the flash code here since we dont need it.
 # We will download this at 2400 and saving 2k means about 10 seconds
 # faster reply time
 baudmeas.bin: baudmeas.c
-	zcc +rcmx000 -Ca-DDEFINED_NOFLASH -s -obaudmeas.bin baudmeas.c
+	zcc +rcmx000 -vn -Ca-DDEFINED_NOFLASH -s -obaudmeas.bin baudmeas.c
 
 
 # Use this to find out the baudrate of your Rabbit, but you only can know

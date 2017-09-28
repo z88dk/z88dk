@@ -266,6 +266,11 @@ extern size_t __LIB__ strrspn_callee(const char *s,const char *set) __smallc __z
 #define strrspn(a,b) strrspn_callee(a,b)
 
 
+extern char __LIB__ *strrstr(const char *s,const char *subs) __smallc;
+extern char __LIB__ *strrstr_callee(const char *s,const char *subs) __smallc __z88dk_callee;
+#define strrstr(a,b) strrstr_callee(a,b)
+
+
 extern char __LIB__ *strrstrip(char *s) __smallc __z88dk_fastcall;
 
 

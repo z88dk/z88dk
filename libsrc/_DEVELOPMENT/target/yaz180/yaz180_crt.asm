@@ -6,7 +6,7 @@
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 17
+	defc startup = 16
 	IFNDEF startup
 	ENDIF
 ENDIF
@@ -20,7 +20,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
    
-   defc startup = 17
+   defc startup = 16
 
 ENDIF
 
@@ -42,9 +42,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
-
-   ; basic drivers using installed on stdin, stdout, stderr
+   ; basic drivers installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
@@ -58,9 +56,11 @@ ENDIF
    
    ENDIF
 
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                yaz180 standalone target                   ;;
-;; generated from target/yaz180/startup/yaz180_crt_17.asm.m4 ;;
+;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -694,7 +694,37 @@ ENDIF
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "crt_memory_map.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; memory map ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __MMAP = -1
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; user supplied memory map ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+   INCLUDE "mmap.inc"
+
+ENDIF
+
+IF __MMAP = 0
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   INCLUDE "../crt_memory_model_z180.inc"
+
+
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+ENDIF
+
+;; end memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -719,14 +749,12 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
-   ; driver: rc_01_input_basic_dcio
+   ; driver: rc_00_input_basic
    ; fd    : 0
    ; mode  : read only
-   ; type  : 001 = input terminal
-   ; tie   : __i_fcntl_fdstruct_1
+   ; type  : 003 = character input
    ;
-   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
-   ; buffer size   : 64 bytes
+   ; ioctl_flags   : 0x0100
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -781,14 +809,14 @@ include "crt_memory_map.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_01_input_basic_dcio
+   EXTERN rc_00_input_basic
    
    __i_fcntl_heap_0:
    
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 98
+      defw 23
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -803,19 +831,19 @@ include "crt_memory_map.inc"
       ; jump to driver
       
       defb 195
-      defw rc_01_input_basic_dcio
+      defw rc_00_input_basic
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x01      ; stdio handles ungetc + type = input terminal
+      defb 0x03      ; stdio handles ungetc + type = character input
       defb 2
       defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw CRT_ITERM_TERMINAL_FLAGS
+      defw 0x0100
       
       ; mtx_plain
       
@@ -824,26 +852,6 @@ include "crt_memory_map.inc"
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
-
-      ; tied output terminal
-      ; pending_char
-      ; read_index
-      
-      defw __i_fcntl_fdstruct_1
-      defb 0
-      defw 0
-      
-      ; b_array_t edit_buffer
-      
-      defw __edit_buffer_0
-      defw 0
-      defw 64
-      
-            
-      ; reserve space for edit buffer
-      
-      __edit_buffer_0:   defs 64
-      
 
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -855,12 +863,12 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: rc_01_output_basic_dcio
+   ; driver: rc_00_output_basic
    ; fd    : 1
    ; mode  : write only
-   ; type  : 002 = output terminal
+   ; type  : 004 = character output
    ;
-   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
+   ; ioctl_flags   : 0x0100
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -915,7 +923,7 @@ include "crt_memory_map.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN rc_01_output_basic_dcio
+   EXTERN rc_00_output_basic
    
    __i_fcntl_heap_1:
    
@@ -937,19 +945,19 @@ include "crt_memory_map.inc"
       ; jump to driver
       
       defb 195
-      defw rc_01_output_basic_dcio
+      defw rc_00_output_basic
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x02      ; type = output terminal
+      defb 0x04      ; type = character output
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw CRT_OTERM_TERMINAL_FLAGS
+      defw 0x0100
       
       ; mtx_plain
       
@@ -963,7 +971,8 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-      
+   
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
@@ -1035,6 +1044,7 @@ include "crt_memory_map.inc"
 
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 
 
@@ -1221,11 +1231,11 @@ include "crt_memory_map.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 121  = byte size of static FDSTRUCTs
+   ; 46  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 121 > 0
+   IF 46 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1246,7 +1256,7 @@ include "crt_memory_map.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (121 + 14)
+      IF __clib_stdio_heap_size > (46 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1257,7 +1267,7 @@ include "crt_memory_map.inc"
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 121 - 14
+            defs __clib_stdio_heap_size - 46 - 14
          
          ; terminate stdio heap
          
@@ -1471,6 +1481,8 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
+
+
 
 
 
