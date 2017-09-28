@@ -3,6 +3,7 @@
 @arch/vgl/vgl_sccz80.lst
 @compress/compress_sccz80.lst
 @ctype/ctype_sccz80.lst
+@target/vgl/device/device.lst
 @drivers/drivers.lst
 @error/error.lst
 @fcntl/fcntl_sccz80.lst

@@ -159,9 +159,6 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;@FIXME: This is just for bare bone debugging. Provides some essential debug tools. Please remove when not needed any more.
-include "startup/vgl_debug.inc"
-
 
 __Start:
 
@@ -206,6 +203,14 @@ SECTION code_crt_init          ; user and library initialization
    ; Prepare hardware (timers etc.)
    
    
+   EXTERN vgl_lcd_init
+   EXTERN vgl_sound_off
+   
+   CALL vgl_sound_off
+   CALL vgl_lcd_init
+   
+   
+
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"

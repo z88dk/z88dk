@@ -14,12 +14,12 @@ ENDIF
 
 IF !DEFINED_CRT_printf_format
 	defc	DEFINED_CRT_printf_format = 1
-	defc CRT_printf_format = 0x00000401
+	defc CRT_printf_format = 0x00000601
 ELSE
 	UNDEFINE temp_printf_format
 	defc temp_printf_format = CRT_printf_format
 	UNDEFINE CRT_printf_format
-	defc CRT_printf_format = temp_printf_format | 0x00000401
+	defc CRT_printf_format = temp_printf_format | 0x00000601
 ENDIF
 
 
@@ -1488,9 +1488,6 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;@FIXME: This is just for bare bone debugging. Provides some essential debug tools. Please remove when not needed any more.
-include "startup/vgl_debug.inc"
-
 
 __Start:
 
@@ -1535,6 +1532,14 @@ SECTION code_crt_init          ; user and library initialization
    ; Prepare hardware (timers etc.)
    
    
+   EXTERN vgl_lcd_init
+   EXTERN vgl_sound_off
+   
+   CALL vgl_sound_off
+   CALL vgl_lcd_init
+   
+   
+
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"
