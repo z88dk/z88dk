@@ -136,11 +136,10 @@ void parse_argv( int argc, char *argv[] )
     if ( arg >= argc )
         error_no_src_file();				/* no source file */
 
-	include_z80asm_lib(argv[0]);			/* search for z80asm-*.lib, append to library path */
-
 	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
 
+	include_z80asm_lib(argv[0]);			/* search for z80asm-*.lib, append to library path */
 	define_assembly_defines();
 }
 
@@ -797,6 +796,9 @@ static void include_z80asm_lib(char *prog_name)
 {
 	char *library = search_z80asm_lib(prog_name);
 
+	if (opts.verbose)
+		printf("Found library '%s', trying to load it\n", library);
+
 	if (library != NULL)
 		option_use_lib(library);
 }
@@ -813,22 +815,40 @@ static char *search_z80asm_lib(char *prog_name)
 	str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
 	lib_name = strpool_add(str_data(lib_name_str));
 
+	if (opts.verbose)
+		printf("Searching support library '%s'\n", lib_name);
+
 	if (file_exists(lib_name))
 		return lib_name;
 
 	prog_dir = path_dirname(prog_name);
 	str_sprintf(f, "%s/%s", prog_dir, lib_name);
+
+	if (opts.verbose)
+		printf("Searching support library '%s'\n", str_data(f));
+
 	if (file_exists(str_data(f)))
 		return strpool_add(str_data(f));
 
 	str_sprintf(f, "%s/../lib/%s", prog_dir, lib_name);
+
+	if (opts.verbose)
+		printf("Searching support library '%s'\n", str_data(f));
+
 	if (file_exists(str_data(f)))
 		return strpool_add(str_data(f));
 
 	str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
 	expanded_file = expand_environment_variables(str_data(f));
+
+	if (opts.verbose)
+		printf("Searching support library '%s'\n", expanded_file);
+
 	if (file_exists(expanded_file))
 		return expanded_file;
+
+	if (opts.verbose)
+		printf("Support library '%s' not found\n", lib_name);
 
 	return NULL;		/* not found */
 }
