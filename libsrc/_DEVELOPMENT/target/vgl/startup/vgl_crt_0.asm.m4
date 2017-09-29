@@ -106,29 +106,29 @@ EXTERN _main
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; These bytes indicate what kind of cartridge we have.
-; They must be the very first bytes in ROM at 0x8000
+; They must be the very first bytes in ROM (memory offset 0x8000)
 ; They could also be moved to the "create-app" part, but this provides easier debugging possibilities for now
 
 IF (startup=1)
 	
 	IF (TAR__crt_autostart=1)
 	
-		include "startup/vgl_signature_autostart.inc"
+		include "startup/vgl_rom_autostart.inc"
 	
 	ELSE
 	
-		include "startup/vgl_signature_default.inc"
+		include "startup/vgl_rom_default.inc"
 	
 	ENDIF
 	
 ELSE
 
 	IF (startup=100)
-		include "startup/vgl_signature_quiz.inc"
+		include "startup/vgl_rom_quiz.inc"
 	ENDIF
 
 	IF (startup=101)
-		include "startup/vgl_signature_sram.inc"
+		include "startup/vgl_rom_storage.inc"
 	ENDIF
 
 ENDIF

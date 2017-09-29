@@ -57,10 +57,8 @@ void main(void) {
 	//ioctl(1, IOCTL_OTERM_PAUSE, 0);	// Switch off "pause after page is full". Also possible on compile time via OTERM_FLAGS when unsetting bit 6 (0x0040)
 	
 	printf("Hello, World!\n");
-	
 	//delay();
-	
-	getchar();
+	//getchar();
 	
 	
 	/*
@@ -69,7 +67,7 @@ void main(void) {
 	printf("!\n");
 	*/
 	
-	printf("Enter something: ");
+	printf("Enter something>");
 	gets(buffer);
 	printf("You entered: \"%s\"\n", buffer);
 	

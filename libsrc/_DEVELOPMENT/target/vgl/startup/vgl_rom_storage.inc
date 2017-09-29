@@ -1,5 +1,5 @@
 ;-------
-; Header for SRAM file system
+; Header for SRAM file system ("SUPERSPEICHER" 32kb)
 ;-------
 defb 55h
 defb 0aah

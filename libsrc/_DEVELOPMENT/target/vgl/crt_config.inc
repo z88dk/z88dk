@@ -19,11 +19,12 @@ IF __CRTCFG = 0
    ;; embedded ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0xc800
+   defc TAR__crt_org_code              = 0xc800       ; Should be in RAM range
    defc TAR__crt_org_data              = -1
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
+   defc TAR__crt_autostart             = 0            ; 1 to add "ROM auto-start" signature at the beginning of the file
    
    defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 512
@@ -67,13 +68,13 @@ IF __CRTCFG = 1
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x8000
-   defc TAR__crt_org_data              = 0xc400 ; MODEL4000: c000 is too low, c2000?, c400 works
+   defc TAR__crt_org_data              = 0xc400    ; MODEL4000: c000 is too low, c2000?, c400 works
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 1
-   defc TAR__crt_autostart             = 1    ; Whether to add auto-start signature instead of default one
+   defc TAR__crt_autostart             = 1         ; 1 to add "ROM auto-start" signature at the beginning of the file
    
-   defc TAR__register_sp               = 0xdff0    ; MODEL4000: ld sp, 0dff0h; default is 0
+   defc TAR__register_sp               = 0xdff0    ; MODEL4000: ld sp, 0dff0h; z88 default is 0
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
@@ -115,12 +116,12 @@ IF __CRTCFG = 2
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x8000
-   defc TAR__crt_org_data              = 0xc000
+   defc TAR__crt_org_data              = 0xc400
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 2
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0xdff0    ; MODEL4000: ld sp, 0dff0h; z88 default is 0
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
