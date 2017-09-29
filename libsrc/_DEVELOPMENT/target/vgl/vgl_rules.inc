@@ -18,30 +18,7 @@
 ;   IFNDEF CRT_ORG_BANK_01
 ;      defc CRT_ORG_BANK_01 = 0xc000
 ;   ENDIF
-;
-;   IFNDEF CRT_ORG_BANK_02
-;      defc CRT_ORG_BANK_02 = 0xc000
-;   ENDIF
-;
-;   IFNDEF CRT_ORG_BANK_03
-;      defc CRT_ORG_BANK_03 = 0xc000
-;   ENDIF
-;
-;   IFNDEF CRT_ORG_BANK_04
-;      defc CRT_ORG_BANK_04 = 0xc000
-;   ENDIF
-;
-;   IFNDEF CRT_ORG_BANK_05
-;      defc CRT_ORG_BANK_05 = 0xc000
-;   ENDIF
-;
-;   IFNDEF CRT_ORG_BANK_06
-;      defc CRT_ORG_BANK_06 = 0xc000
-;   ENDIF
-;
-;   IFNDEF CRT_ORG_BANK_07
-;      defc CRT_ORG_BANK_07 = 0xc000
-;   ENDIF
+
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
@@ -65,7 +42,7 @@
       ;  2  0004         reserved (device state)
       ;  1  0002         reserved (device state)
       ;  0  0001         reserved (device state)
-      ; default: 0x03b0
+      ; zx default: 0x03b0
       defc CRT_ITERM_TERMINAL_FLAGS = 0x0390
    ENDIF
 
@@ -100,8 +77,8 @@
       ;  2  0004          ?
       ;  1  0002          ?
       ;  0  0001          ?
-      ; default: 0x2370
-      defc CRT_OTERM_TERMINAL_FLAGS = 0x2370 ; 0x2330 = 0x2370 - 0x0040=pause
+      ; zx default: 0x2370
+      defc CRT_OTERM_TERMINAL_FLAGS = 0x2330 ; 0x2330 = 0x2370 - 0x0040=pause
    ENDIF
 
    ;
@@ -113,7 +90,7 @@
    ENDIF
    
    IFNDEF CRT_OTERM_WINDOW_WIDTH
-      defc CRT_OTERM_WINDOW_WIDTH = 20      ; ZX: multiplied by two in 64 col terminals
+      defc CRT_OTERM_WINDOW_WIDTH = 20      ; 20 for all models 1000...4004QL
    ENDIF
    
    IFNDEF CRT_OTERM_WINDOW_Y

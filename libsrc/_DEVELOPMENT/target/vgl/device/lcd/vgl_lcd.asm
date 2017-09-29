@@ -81,7 +81,7 @@ vgl_lcd_init:
    ; Fill screen manually (needed for the cursor to show up!)
    push hl
    push bc
-   ld hl, __VGL_VRAM_ADDRESS_START
+   ld hl, __VGL_DISPLAY_VRAM_START
    ld bc, __VGL_DISPLAY_COLS*__VGL_DISPLAY_ROWS  ; Number of chars
    ld a, 0x20     ; Which char to use: SPACE
    _screen_clear_loop:

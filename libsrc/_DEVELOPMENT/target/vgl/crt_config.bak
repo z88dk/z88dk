@@ -19,11 +19,12 @@ IF __CRTCFG = 0
    ;; embedded ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0
-   defc TAR__crt_org_data              = 0
-   defc TAR__crt_org_bss               = 0
+   defc TAR__crt_org_code              = 0xc800       ; Should be in RAM range
+   defc TAR__crt_org_data              = -1
+   defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
+   defc TAR__crt_autostart             = 0            ; 1 to add "ROM auto-start" signature at the beginning of the file
    
    defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 512
@@ -34,13 +35,13 @@ IF __CRTCFG = 0
 
    defc TAR__crt_org_vector_table      = 0
    defc TAR__crt_interrupt_mode        = -1
-   
+
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
    
    defc TAR__crt_enable_eidi           = 0x13
-   defc TAR__crt_on_exit               = 0x10001
+   defc TAR__crt_on_exit               = 0x10002
    
    defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0
@@ -63,16 +64,17 @@ ENDIF
 IF __CRTCFG = 1
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; embedded rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; embedded rom model (default for V-Tech) ;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0
-   defc TAR__crt_org_data              = 32768
+   defc TAR__crt_org_code              = 0x8000
+   defc TAR__crt_org_data              = 0xc400    ; MODEL4000: c000 is too low, c2000?, c400 works
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 1
+   defc TAR__crt_autostart             = 1         ; 1 to add "ROM auto-start" signature at the beginning of the file
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0xdff0    ; MODEL4000: ld sp, 0dff0h; z88 default is 0
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1
@@ -98,7 +100,7 @@ IF __CRTCFG = 1
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 128
+   defc TAR__clib_stdio_heap_size      = 256
    
    defc TAR__clib_balloc_table_size    = 0
    
@@ -113,13 +115,13 @@ IF __CRTCFG = 2
    ;; embedded compressed rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0
-   defc TAR__crt_org_data              = 32768
+   defc TAR__crt_org_code              = 0x8000
+   defc TAR__crt_org_data              = 0xc400
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 2
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0xdff0    ; MODEL4000: ld sp, 0dff0h; z88 default is 0
    defc TAR__crt_stack_size            = 512
       
    defc TAR__crt_initialize_bss        = 1

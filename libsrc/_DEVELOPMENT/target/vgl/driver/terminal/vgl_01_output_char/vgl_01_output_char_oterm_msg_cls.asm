@@ -27,7 +27,7 @@ vgl_01_output_char_oterm_msg_cls:
    ;ldir	; Copy BC bytes from (HL) to (DE)
    
    ; As seen in gl4000 @068e
-   ld hl, __VGL_VRAM_ADDRESS_START
+   ld hl, __VGL_DISPLAY_VRAM_START
    ld a, 0x20
    vgl_01_output_char_oterm_msg_cls_loop:
    ld (hl), a

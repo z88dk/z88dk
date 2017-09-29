@@ -1,3 +1,5 @@
+SECTION CODE
+
 ;-------
 ; Header for quiz ROMs (no code, just quiz data; if signature found: started via code at 0x2240 on model 4000)
 ;-------

@@ -17,13 +17,13 @@ vgl_01_output_char_oterm_msg_scroll:
     ; Move everything up by one row
     ;@TODO: Implement scrolling by C rows
     ld	bc, __VGL_DISPLAY_COLS*(__VGL_DISPLAY_ROWS-1)	;(_screen_scrollSize)
-    ld	hl, __VGL_VRAM_ADDRESS_START + 1*__VGL_DISPLAY_COLS	;_LCD_VRAM_ROW1
-    ld	de, __VGL_VRAM_ADDRESS_START + 0*__VGL_DISPLAY_COLS	;_LCD_VRAM_ROW0
+    ld	hl, __VGL_DISPLAY_VRAM_START + 1*__VGL_DISPLAY_COLS	;_LCD_VRAM_ROW1
+    ld	de, __VGL_DISPLAY_VRAM_START + 0*__VGL_DISPLAY_COLS	;_LCD_VRAM_ROW0
     ldir	; Copy BC chars from (HL) to (DE)
     
     ; Now fill the last row with spaces
-    ld hl, __VGL_VRAM_ADDRESS_START + (__VGL_DISPLAY_ROWS-1)*__VGL_DISPLAY_COLS
-    ld de, __VGL_VRAM_ADDRESS_START + (__VGL_DISPLAY_ROWS-1)*__VGL_DISPLAY_COLS + 1
+    ld hl, __VGL_DISPLAY_VRAM_START + (__VGL_DISPLAY_ROWS-1)*__VGL_DISPLAY_COLS
+    ld de, __VGL_DISPLAY_VRAM_START + (__VGL_DISPLAY_ROWS-1)*__VGL_DISPLAY_COLS + 1
     
     ld (hl), 0x20	; Character to use
     ld bc, __VGL_DISPLAY_COLS-1	; columns-1

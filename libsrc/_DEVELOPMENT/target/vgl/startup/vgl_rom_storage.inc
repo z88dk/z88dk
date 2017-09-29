@@ -1,3 +1,5 @@
+SECTION CODE
+
 ;-------
 ; Header for SRAM file system ("SUPERSPEICHER" 32kb)
 ;-------

@@ -5,7 +5,7 @@ dnl############################################################
 ;;                 V-Tech Genius Leader target               ;;
 ;;    generated from target/vgl/startup/vgl_crt_0.asm.m4     ;;
 ;;                                                           ;;
-;;                 ?flat 64k address space                   ;;
+;;                      RAM payload                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -13,7 +13,8 @@ dnl############################################################
 ;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "config_vgl_public.inc"	; This will be a file containing all the defined constants from the config directory.  When the library is built, the file will be generated.
+; This will be a file containing all the defined constants from the config directory.  When the library is built, the file will be generated.
+include "config_vgl_public.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -22,7 +23,9 @@ include "config_vgl_public.inc"	; This will be a file containing all the defined
 include "../crt_defaults.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
-include(`vgl_rules.inc')	; This file will process target-specific pragmas, of which you will initially have none.
+
+; This file will process target-specific pragmas, of which you will initially have none.
+include(`vgl_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -64,23 +67,16 @@ dnl############################################################
 
 include(`../clib_instantiate_begin.m4')
 
-
-dnl# Cheat sheet:
-dnl#   include(`driver/character/vgl_00_input_char.m4')dnl
-dnl#   m4_vgl_00_input_char(_stdin, 0x0100)dnl
-dnl#   include(`driver/terminal/vgl_01_input_kbd.m4')dnl
-dnl#   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)dnl
-
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`driver/terminal/vgl_01_input_kbd.m4')dnl
-   m4_vgl_01_input_kbd(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)dnl
+   include(`../m4_file_absent.m4')dnl
+   m4_file_absentdnl
    
-   include(`driver/terminal/vgl_01_output_char.m4')dnl
-   m4_vgl_01_output_char(_stdout, CRT_OTERM_TERMINAL_FLAGS,	0, 0,	0, CRT_OTERM_WINDOW_WIDTH,	0, CRT_OTERM_WINDOW_HEIGHT,	0)dnl
+   include(`../m4_file_absent.m4')dnl
+   m4_file_absentdnl
    
-   include(`../m4_file_dup.m4')dnl
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+   include(`../m4_file_absent.m4')dnl
+   m4_file_absentdnl
 ',
 `
    include(`crt_driver_instantiation.asm.m4')
@@ -99,39 +95,6 @@ PUBLIC __Start, __Exit
 EXTERN _main
 
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ROM SIGNATURES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; These bytes indicate what kind of cartridge we have.
-; They must be the very first bytes in ROM (memory offset 0x8000)
-; They could also be moved to the "create-app" part, but this provides easier debugging possibilities for now
-
-IF (startup=1)
-	
-	IF (TAR__crt_autostart=1)
-	
-		include "startup/vgl_rom_autostart.inc"
-	
-	ELSE
-	
-		include "startup/vgl_rom_default.inc"
-	
-	ENDIF
-	
-ELSE
-
-	IF (startup=100)
-		include "startup/vgl_rom_quiz.inc"
-	ENDIF
-
-	IF (startup=101)
-		include "startup/vgl_rom_storage.inc"
-	ENDIF
-
-ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -203,18 +166,6 @@ SECTION code_crt_init          ; user and library initialization
    ; Prepare hardware (timers etc.)
    
    
-   ;EXTERN vgl_model_check
-   EXTERN vgl_lcd_init
-   EXTERN vgl_sound_off
-   EXTERN vgl_key_arm
-   
-   ;call vgl_model_check
-   call vgl_sound_off
-   call vgl_lcd_init
-   call vgl_key_arm  ; Prepare key input
-   
-   
-
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"

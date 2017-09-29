@@ -1,18 +1,18 @@
 SECTION CODE
 
 ;-------
-; ROM signature that triggers auto-start (never used "in the wild", but the detection code was found in all V-Tech Genius Leader firmwares)
+; ROM signature for cartridges containing code
 ;-------
 defb 55h
 defb 0aah
 
-; "YE" = auto-start signature
-defb 59h	; "Y"
-defb 45h	; "E"
+; "GA" = normal signature (i.e. non-autostart)
+defb 47h	; "G"
+defb 41h	; "A"
 
 
 ; Jump past the signature
-jp __SignatureAutostartEnd	; usually "jp	801fh"
+jp __SignatureDefaultEnd	; usually jp	801fh
 
 
 ;-------
@@ -27,10 +27,10 @@ jp __SignatureAutostartEnd	; usually "jp	801fh"
    defb (0x30 + (__VGL_MODEL % 1000) / 100)
    defb (0x30 + (__VGL_MODEL % 100) / 10)
    defb (0x30 + (__VGL_MODEL % 10))
-   defb " A " ; pad to 23 characters
+   defb " C " ; pad to 23 characters
 
 .rom_version
-   defb 01h
+	defb 01h  ; at memory offset 0x8001b
 
 
-__SignatureAutostartEnd:
+__SignatureDefaultEnd:

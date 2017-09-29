@@ -41,8 +41,8 @@ vgl_01_output_char_oterm_msg_printc:
    add h	; *20
    ; Convert to VGL_VRAM_ADDRESS offset 0xdca0 + A + X
    add l	; Add X coordinate to A
-   add __VGL_VRAM_ADDRESS_START & 0x00ff ;0xa0
-   ld h, __VGL_VRAM_ADDRESS_START >> 8   ;0xdc
+   add __VGL_DISPLAY_VRAM_START & 0x00ff ;0xa0
+   ld h, __VGL_DISPLAY_VRAM_START >> 8   ;0xdc
    ld l, a
    
    ld (hl), c	; Put character to calculated VRAM offset
