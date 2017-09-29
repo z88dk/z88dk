@@ -8,6 +8,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 Parse command line options
 */
 
+#include "../config.h"
 #include "errors.h"
 #include "fileutil.h"
 #include "hist.h"
@@ -63,8 +64,8 @@ static void option_appmake_zx81(void);
 static void option_filler( char *filler_arg );
 static void option_debug_info();
 static void define_assembly_defines();
-static void include_z80asm_lib(char *prog_name);
-static char *search_z80asm_lib(char *prog_name);
+static void include_z80asm_lib();
+static char *search_z80asm_lib();
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -139,8 +140,8 @@ void parse_argv( int argc, char *argv[] )
 	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
 
-	include_z80asm_lib(argv[0]);			/* search for z80asm-*.lib, append to library path */
-	define_assembly_defines();
+	include_z80asm_lib();					/* search for z80asm-*.lib, append to library path */
+	define_assembly_defines();				/* defined options-dependent constants */
 }
 
 /*-----------------------------------------------------------------------------
@@ -792,63 +793,58 @@ void checkrun_appmake(void)
 *	Ignore if not found, probably benign - user will see undefined symbols
 *	__z80asm__xxx if the library routines are called
 *----------------------------------------------------------------------------*/
-static void include_z80asm_lib(char *prog_name)
+static void include_z80asm_lib()
 {
-	char *library = search_z80asm_lib(prog_name);
-
-	if (opts.verbose)
-		printf("Found library '%s', trying to load it\n", library);
+	char *library = search_z80asm_lib();
 
 	if (library != NULL)
 		option_use_lib(library);
 }
 
-static char *search_z80asm_lib(char *prog_name)
+static char *check_library(char *lib_name)
 {
-	char *prog_dir;
-	char *expanded_file;
+	if (file_exists(lib_name))
+		return lib_name;
+	
+	if (opts.verbose)
+		printf("Library '%s' not found\n", lib_name);
+
+	return NULL;
+}
+
+static char *search_z80asm_lib()
+{
 	STR_DEFINE(lib_name_str, STR_SIZE);
 	char *lib_name;
 	STR_DEFINE(f, STR_SIZE);
+	char *ret;
 
 	/* Build libary file name */
 	str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
 	lib_name = strpool_add(str_data(lib_name_str));
 
-	if (opts.verbose)
-		printf("Searching support library '%s'\n", lib_name);
-
-	if (file_exists(lib_name))
+	/* try to read from current directory */
+	if (check_library(lib_name))
 		return lib_name;
 
-	prog_dir = path_dirname(prog_name);
-	str_sprintf(f, "%s/%s", prog_dir, lib_name);
+	/* try to read from PREFIX/lib */
+	str_sprintf(f, "%s/lib/%s", PREFIX, lib_name);
+	ret = strpool_add(str_data(f));
+	if (check_library(ret))
+		return ret;
 
-	if (opts.verbose)
-		printf("Searching support library '%s'\n", str_data(f));
+	/* try to read form -L path */
+	ret = search_file(get_lib_filename(lib_name), opts.lib_path);
+	if (strcmp(ret, lib_name) != 0) {		// found one in path
+		if (check_library(ret))
+			return ret;
+	}
 
-	if (file_exists(str_data(f)))
-		return strpool_add(str_data(f));
-
-	str_sprintf(f, "%s/../lib/%s", prog_dir, lib_name);
-
-	if (opts.verbose)
-		printf("Searching support library '%s'\n", str_data(f));
-
-	if (file_exists(str_data(f)))
-		return strpool_add(str_data(f));
-
+	/* try to read from ZCCCFG/.. */
 	str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
-	expanded_file = expand_environment_variables(str_data(f));
-
-	if (opts.verbose)
-		printf("Searching support library '%s'\n", expanded_file);
-
-	if (file_exists(expanded_file))
-		return expanded_file;
-
-	if (opts.verbose)
-		printf("Support library '%s' not found\n", lib_name);
+	ret = expand_environment_variables(str_data(f));
+	if (check_library(ret))
+		return ret;
 
 	return NULL;		/* not found */
 }
