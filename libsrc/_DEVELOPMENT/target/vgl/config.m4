@@ -37,6 +37,7 @@ dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
 include(`target/z88dk_version.m4')
+include(`target/vgl/config/config_target_2000.m4')
 include(`target/vgl/config/config_target.m4')
 include(`target/vgl/config/config_cpu.m4')
 include(`target/vgl/config/config_clib.m4')

@@ -3,11 +3,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Must be first bytes in ROM
-SECTION CODE
+;SECTION CODE
+
 
 ; Default ROM lead-in
 defb 55h
 defb 0aah
+
 
 ; Quiz identifier
 defb 11h	; ld	de, 

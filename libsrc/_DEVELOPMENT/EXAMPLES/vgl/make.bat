@@ -13,12 +13,12 @@ REM SET PROGNAME=eliza
 REM SET PROGNAME=heapsort
 REM SET PROGNAME=beepfx
 
-SET VGLMODEL=4000
+SET VGLMODEL=2000
 
 
 
 SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
-REM SET VGLOPTS=-subtype=%VGLMODEL%_rom_cassette
+REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
 REM Clean
 DEL %PROGNAME%.bin

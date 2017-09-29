@@ -4,7 +4,7 @@
 ; Information taken from "SUPERSPEICHER" 32kb
 
 ; Must be first bytes in ROM
-SECTION CODE
+;SECTION CODE
 
 
 ; Default ROM lead-in

@@ -218,17 +218,19 @@ vgl_01_output_char:
    jp console_01_output_terminal_char     ; forward to library
 
 
-
 vgl_01_output_char_refresh:
    ; Refresh all row(s)
-   ;@TODO: Use a bulk-load opcode?
    ld a, 1
    ld (__VGL_DISPLAY_REFRESH_ADDRESS),a
-   ld (__VGL_DISPLAY_REFRESH_ADDRESS+1),a
-   ld (__VGL_DISPLAY_REFRESH_ADDRESS+2),a
-   ld (__VGL_DISPLAY_REFRESH_ADDRESS+3),a
+   IF __VGL_DISPLAY_ROWS > 1
+      ld (__VGL_DISPLAY_REFRESH_ADDRESS+1),a
+   ENDIF
+   IF __VGL_DISPLAY_ROWS > 2
+      ld (__VGL_DISPLAY_REFRESH_ADDRESS+2),a
+      ld (__VGL_DISPLAY_REFRESH_ADDRESS+3),a
+   ENDIF
    
-   ;	; Refresh only the specified row
+   ;@TODO: Refresh only one specified row
    ;	ex de, hl	; Restore HL (coordinates)
    ;	ld a, h	; get Y coordinate
    ;	; Convert to 0xdcf0 + Y

@@ -1,0 +1,188 @@
+* Genius Leader 2000 displays text via frame buffers at 0dca0/0dcb4 (and then refreshing by writing 0x01 to dceb / dcec)
+* Genius Leader 4000 uses dcf0...dcf3 for its 4 lines (same buffer)
+	-> Display memory seems to be shuffled around:
+	Characters appear in this order:
+		012389abcdef........
+		....................
+		4567................
+		....................
+
+	So there are regions of 4/8 bytes:
+		000022222222........
+		4444................
+		111133333333........
+		5555................
+
+* Port 0x0a can change the layout and the contrast (talks directly to the LCD?)
+
+
+
+
+* Update LCD / switch areas:
+	; reset terminal?
+	013c 3e11      ld      a,11h
+	013e 32efdc    ld      (0dcefh),a
+	0141 af        xor     a
+	0142 32eedc    ld      (0dceeh),a
+	0145 3c        inc     a
+	0146 32eddc    ld      (0dcedh),a
+
+	; reset keyboard
+	0149 cdfb83    call    83fbh	; output f, delay 010f; e, delay 010f; c delay 010f  to port 0x0a
+
+
+* Update all 4 rows on MODEL4000:
+	; Refresh all lines of LCD
+	067d f5        push    af
+	067e 3e01      ld      a,01h
+	0680 32f0dc    ld      (0dcf0h),a
+	0683 32f1dc    ld      (0dcf1h),a
+	0686 32f2dc    ld      (0dcf2h),a
+	0689 32f3dc    ld      (0dcf3h),a
+	068c f1        pop     af
+	068d c9        ret     
+
+
+
+
+
+* How to CLS:
+	; Clear screen completely
+	04f7 cd4d83    call    834dh	; Clear screen 1 via ports 0x0a, 0x0b
+	04fa cd5d83    call    835dh	; Clear screen 2 via ports 0x0a, 0x0b
+	04fd cd6584    call    8465h	; Write SPACES to upper line screen memory
+	0500 cd7484    call    8474h	; Write SPACES to lower line screen memory
+	0503 c9        ret     
+
+* Important function at 0428 is being called all the time:
+	; Display B and C: Output C-1+0xc0 to port 0x0a, delay 010f; then 0x02 to port 0x0a, delay 0330; then translation of B to port 0x0B and delay
+	0428 f5        push    af
+	0429 c5        push    bc
+	042a 0d        dec     c
+	042b cddb83    call    83dbh	; output C+0xC0 to port 0x0a, delay 010f; then 0x02 to port 0x0a, delay 0330 and return
+	042e 78        ld      a,b
+	042f cd6d83    call    836dh	; Translate character A to other charset
+	0432 d30b      out     (0bh),a	; output to 0x0b
+	0434 cd4684    call    8446h	; Delay 010fh
+	0437 c1        pop     bc
+	0438 f1        pop     af
+	0439 c9        ret     
+
+
+
+
+; Clear screen 1
+; Output B-1+0x80 (B+7F) to port 0x0A, output 0x20 to port 0x0B 20 times
+034d 012014    ld      bc,1420h
+0350 c5        push    bc
+0351 48        ld      c,b
+0352 0d        dec     c
+0353 cdd083    call    83d0h	; output C+0x80 to port 0x0a, delay 010f and return
+0356 c1        pop     bc
+0357 cd9a83    call    839ah	; Translate to charset and output to port 0x0B
+035a 10f4      djnz    0350h	; Repeat...
+035c c9        ret     
+
+; Clear screen 2
+; Output B-1+0x80 (B+7F) to port 0x0A, output 0x20 to port 0x0B 20 times
+035d 012014    ld      bc,1420h
+0360 c5        push    bc
+0361 48        ld      c,b
+0362 0d        dec     c
+0363 cddb83    call    83dbh	; output C+0xC0 to port 0x0a, delay 010f; then 0x02 to port 0x0a, delay 0330 and return
+0366 c1        pop     bc
+0367 cd9a83    call    839ah	; Translate to charset and output to port 0x0B
+036a 10f4      djnz    0360h
+036c c9        ret     
+
+
+
+
+
+
+; Translate character A to other charset
+036d e5        push    hl
+036e d5        push    de
+036f 217b83    ld      hl,837bh	; source table
+0372 118283    ld      de,8382h	; dest table
+0375 cd8883    call    8388h	; find character A in [HL]. If found: return corresponding byte in [DE], else return original A
+0378 d1        pop     de
+0379 e1        pop     hl
+037a c9        ret     
+
+; Charset look-up table
+	037b a8        xor     b
+	037c a9        xor     c
+	037d aa        xor     d
+	037e 8e        adc     a,(hl)
+	037f 99        sbc     a,c
+	0380 9a        sbc     a,d
+	0381 00        nop     
+
+; Charset result table
+	0382 8e        adc     a,(hl)
+	0383 99        sbc     a,c
+	0384 9a        sbc     a,d
+	0385 a8        xor     b
+	0386 a9        xor     c
+	0387 aa        xor     d
+
+
+
+
+
+
+; output C+0xC0 to port 0x0a, delay 010f; then 0x02 to port 0x0a, delay 0330 and return
+03db f5        push    af
+03dc 79        ld      a,c
+03dd c6c0      add     a,0c0h
+03df 18f3      jr      03d4h	; out (0ah),a; delay 010f
+
+03e1 3e02      ld      a,02h
+03e3 d30a      out     (0ah),a
+03e5 cd3a84    call    843ah	; delay	0x0330
+03e8 c9        ret     
+
+
+
+; Output C-1+0xc0 then 0x02 to port 0x0a, then translation of it to port 0x0B and delay
+0428 f5        push    af
+0429 c5        push    bc
+042a 0d        dec     c
+042b cddb83    call    83dbh	; output C+0xC0 to port 0x0a, delay 010f; then 0x02 to port 0x0a, delay 0330 and return
+042e 78        ld      a,b
+042f cd6d83    call    836dh	; Translate character A to other charset
+0432 d30b      out     (0bh),a
+0434 cd4684    call    8446h	; Delay 010fh
+0437 c1        pop     bc
+0438 f1        pop     af
+0439 c9        ret     
+
+
+
+
+
+
+; Write 0x13+1 SPACES to upper line
+0465 21a0dc    ld      hl,0dca0h
+0468 3e20      ld      a,20h
+046a 77        ld      (hl),a
+046b 5d        ld      e,l
+046c 54        ld      d,h
+046d 13        inc     de
+046e 011300    ld      bc,0013h
+0471 edb0      ldir    
+0473 c9        ret     
+
+; Write 0x13+1 SPACES to lower line
+0474 21b4dc    ld      hl,0dcb4h
+0477 3e20      ld      a,20h
+0479 77        ld      (hl),a
+047a 5d        ld      e,l
+047b 54        ld      d,h
+047c 13        inc     de
+047d 011300    ld      bc,0013h
+0480 edb0      ldir    
+0482 c9        ret     
+
+

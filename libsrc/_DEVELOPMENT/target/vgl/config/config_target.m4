@@ -10,19 +10,27 @@ divert(-1)
 define(`__VGL', 1)
 
 
-; For MODEL 4000 / 4004
-define(`__VGL_KEY_STATUS_ADDRESS', 0xdb00)
-define(`__VGL_KEY_CURRENT_ADDRESS', 0xdb01)
+# Model specific target config
+#     define(`__VGL_MODEL_NUMBER', 0)
+#     define(`__VGL_KEY_STATUS_ADDRESS', 0xdb00)
+#     define(`__VGL_KEY_CURRENT_ADDRESS', 0xdb01)
+#     define(`__VGL_DISPLAY_COLS', 20)
+#     define(`__VGL_DISPLAY_ROWS', 4)
+#     define(`__VGL_DISPLAY_CONTROL_PORT', 0x0a)
+#     define(`__VGL_DISPLAY_REFRESH_ADDRESS', 0xdcf0)	#0xdcf0...0xdcf3 for each of the 4 rows
+#     define(`__VGL_DISPLAY_CURSOR_X_ADDRESS', 0xdcf4)
+#     define(`__VGL_DISPLAY_CURSOR_Y_ADDRESS', 0xdcf5)
+#     define(`__VGL_DISPLAY_CURSOR_MODE_ADDRESS', 0xdcf6)
+#     define(`__VGL_DISPLAY_CLEAR_ADDRESS', 0xdcf7)	# Can be set to 0 or 1
+#     define(`__VGL_DISPLAY_VRAM_START', 0xdca0)
 
-define(`__VGL_DISPLAY_COLS', 20)
-define(`__VGL_DISPLAY_ROWS', 4)
-define(`__VGL_DISPLAY_CONTROL_PORT', 0x0a)
-define(`__VGL_DISPLAY_REFRESH_ADDRESS', 0xdcf0)	#0xdcf0...0xdcf3 for each of the 4 rows
-define(`__VGL_DISPLAY_CURSOR_X_ADDRESS', 0xdcf4)
-define(`__VGL_DISPLAY_CURSOR_Y_ADDRESS', 0xdcf5)
-define(`__VGL_DISPLAY_CURSOR_MODE_ADDRESS', 0xdcf6)
-define(`__VGL_DISPLAY_CLEAR_ADDRESS', 0xdcf7)	# Can be set to 0 or 1
-define(`__VGL_DISPLAY_VRAM_START', 0xdca0)
+#  IF __VGL_MODEL = 2000
+#     include "config_target_2000.m4"
+#  ENDIF
+#  IF __VGL_MODEL = 4000
+#     include "config_target_4000.m4"
+#  ENDIF
+
 
 
 #	// Key codes
@@ -108,6 +116,8 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__VGL'
 
+PUBLIC `__VGL_MODEL_NUMBER'
+
 PUBLIC `__VGL_KEY_STATUS_ADDRESS'
 PUBLIC `__VGL_KEY_CURRENT_ADDRESS'
 
@@ -129,6 +139,8 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 defc `__VGL' = __VGL
+
+defc `__VGL_MODEL_NUMBER' = __VGL_MODEL_NUMBER
 
 defc `__VGL_KEY_STATUS_ADDRESS' = __VGL_KEY_STATUS_ADDRESS
 defc `__VGL_KEY_CURRENT_ADDRESS' = __VGL_KEY_CURRENT_ADDRESS
@@ -152,6 +164,8 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__VGL'
 `#define' `__VGL'  __VGL
+
+`#define' `__VGL_MODEL_NUMBER'  __VGL_MODEL_NUMBER
 
 `#define' `__VGL_KEY_STATUS_ADDRESS'  __VGL_KEY_STATUS_ADDRESS
 `#define' `__VGL_KEY_CURRENT_ADDRESS'  __VGL_KEY_CURRENT_ADDRESS

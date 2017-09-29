@@ -34,6 +34,7 @@
       ; 10  0400         reserved (includes some state for driver base class)
       ;  9  0200 default = 1 to enable printed cursor
       ;  8  0100 default = 1 to enable crlf conversion (will be filtered to generate lf only)
+      ;
       ;  7  0080 default = 1 to echo typed input characters
       ;  6  0040         = 1 to enable password mode (input printed as *)
       ;  5  0020 default = 1 to enable line mode (input is edited before being delivered)
@@ -61,14 +62,15 @@
 
    IFNDEF CRT_OTERM_TERMINAL_FLAGS
       ; bit hex  default  meaning
-      ; 15  8000          is currently reading input?
+      ; 15  8000          is currently reading input
       ; 14  4000          is readline
-      ; 13  2000 default  cls on paging
+      ; 13  2000 default  cls on page
       ; 12  1000          ?
       ; 11  0800          ?
       ; 10  0400          ?
       ;  9  0200 default  print cursor
       ;  8  0100 default  crlf conversion (2)
+      ;
       ;  7  0080          page mode
       ;  6  0040 default  pause when screen is full
       ;  5  0020 default  cook
@@ -98,7 +100,15 @@
    ENDIF
    
    IFNDEF CRT_OTERM_WINDOW_HEIGHT
-      defc CRT_OTERM_WINDOW_HEIGHT = 4  ; 1 for MODEL 1000, 2 for 2000/P/C, 4 for 400x
+      IF __VGL_MODEL = 1000
+         defc CRT_OTERM_WINDOW_HEIGHT = 1
+      ENDIF
+      IF __VGL_MODEL = 2000
+         defc CRT_OTERM_WINDOW_HEIGHT = 2
+      ENDIF
+      IF __VGL_MODEL = 4000
+         defc CRT_OTERM_WINDOW_HEIGHT = 4
+      ENDIF
    ENDIF
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

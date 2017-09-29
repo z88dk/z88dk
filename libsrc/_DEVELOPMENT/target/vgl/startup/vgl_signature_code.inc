@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Must be first bytes in ROM
-SECTION CODE
+;SECTION CODE
 
 
 ; Default ROM lead-in
@@ -12,7 +12,7 @@ defb 0aah
 
 
 ; Code identifier
-IF __VGL_AUTOSTART = 1
+IF __VGL_ROM_AUTOSTART = 1
    ; ROM signature which triggers auto-start (never used "in the wild", but the detection code was found in all V-Tech Genius Leader firmwares)
    ; "YE" = auto-start signature
    defb 59h ; "Y"
@@ -44,7 +44,7 @@ jp __SignatureAutostartEnd ; usually "jp 801fh"
    defb (0x30 + (__VGL_MODEL % 100) / 10)
    defb (0x30 + (__VGL_MODEL % 10))
    defb " "
-   IF __VGL_AUTOSTART = 1
+   IF __VGL_ROM_AUTOSTART = 1
       defb "A"
    ELSE
       defb "N"

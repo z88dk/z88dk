@@ -60,12 +60,16 @@ void main(void) {
 	//delay();
 	//getchar();
 	
-	
 	/*
 	printf("Beeping...");
 	bit_beep(100, 880);
 	printf("!\n");
 	*/
+	
+	printf("Which model?\n");
+	
+	//sprintf(buffer, "MODEL%d\n", VGL_MODEL);
+	//printf(buffer);
 	
 	printf("Enter something>");
 	gets(buffer);
@@ -79,7 +83,7 @@ void main(void) {
 		//c = getc(stdin);
 		c = getchar();
 		
-		sprintf(buffer, "%d:\"%c\"\n", c, c);
+		sprintf(buffer, "\"%c\" (%d / 0x%02X)\n", c, c, c);
 		printf(buffer);
 	}
 	

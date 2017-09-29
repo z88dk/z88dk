@@ -67,8 +67,7 @@ ifelse(__STARTUP, 2000, `
    ;
    ; V-Tech Genius Leader 2000
    ;
-   ; ROM cartridge
-   ; default cassette
+   ; ROM code
    ;
    ; stdin = terminal/vgl_01_input_kbd
    ; stdout = terminal/vgl_01_output_char
@@ -83,13 +82,8 @@ ifelse(__STARTUP, 2000, `
       defc __MMAP = 0
    ENDIF
    
-   IFNDEF __VGL_MODEL
-      defc __VGL_MODEL = 2000
-   ENDIF
-   
-   IFNDEF __VGL_ROM_AUTOSTART
-      defc __VGL_ROM_AUTOSTART = 0
-   ENDIF
+   defc __VGL_MODEL = 2000
+   defc __VGL_ROM_AUTOSTART = 0
    
    include(`startup/vgl_crt_1.asm.m4')
 ')
@@ -100,8 +94,7 @@ ifelse(__STARTUP, 2001, `
    ;
    ; V-Tech Genius Leader 2000
    ;
-   ; ROM cartridge
-   ; auto-run
+   ; ROM code autostart
    ;
    ; stdin = terminal/vgl_01_input_kbd
    ; stdout = terminal/vgl_01_output_char
@@ -116,13 +109,8 @@ ifelse(__STARTUP, 2001, `
       defc __MMAP = 0
    ENDIF
    
-   IFNDEF __VGL_MODEL
-      defc __VGL_MODEL = 2000
-   ENDIF
-   
-   IFNDEF __VGL_ROM_AUTOSTART
-      defc __VGL_ROM_AUTOSTART = 1
-   ENDIF
+   defc __VGL_MODEL = 2000
+   defc __VGL_ROM_AUTOSTART = 1
    
    include(`startup/vgl_crt_1.asm.m4')
 ')
@@ -133,8 +121,7 @@ ifelse(__STARTUP, 4000, `
    ;
    ; V-Tech Genius Leader 4000
    ;
-   ; ROM cartridge
-   ; default cassette
+   ; ROM code
    ;
    ; stdin = terminal/vgl_01_input_kbd
    ; stdout = terminal/vgl_01_output_char
@@ -149,13 +136,8 @@ ifelse(__STARTUP, 4000, `
       defc __MMAP = 0
    ENDIF
    
-   IFNDEF __VGL_MODEL
-      defc __VGL_MODEL = 4000
-   ENDIF
-   
-   IFNDEF __VGL_ROM_AUTOSTART
-      defc __VGL_ROM_AUTOSTART = 0
-   ENDIF
+   defc __VGL_MODEL = 4000
+   defc __VGL_ROM_AUTOSTART = 0
    
    include(`startup/vgl_crt_1.asm.m4')
 ')
@@ -166,8 +148,7 @@ ifelse(__STARTUP, 4001, `
    ;
    ; V-Tech Genius Leader 4000
    ;
-   ; ROM cartridge
-   ; auto-run
+   ; ROM code autostart
    ;
    ; stdin = terminal/vgl_01_input_kbd
    ; stdout = terminal/vgl_01_output_char
@@ -182,13 +163,8 @@ ifelse(__STARTUP, 4001, `
       defc __MMAP = 0
    ENDIF
    
-   IFNDEF __VGL_MODEL
-      defc __VGL_MODEL = 4000
-   ENDIF
-   
-   IFNDEF __VGL_ROM_AUTOSTART
-      defc __VGL_ROM_AUTOSTART = 1
-   ENDIF
+   defc __VGL_MODEL = 4000
+   defc __VGL_ROM_AUTOSTART = 1
    
    include(`startup/vgl_crt_1.asm.m4')
 ')
