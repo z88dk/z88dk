@@ -1,16 +1,25 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ROM signature for SRAM cartridges containing a file system ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Information taken from "SUPERSPEICHER" 32kb
+
+; Must be first bytes in ROM
 SECTION CODE
 
-;-------
-; Header for SRAM file system ("SUPERSPEICHER" 32kb)
-;-------
+
+; Default ROM lead-in
 defb 55h
 defb 0aah
+
+
+; SRAM identifier (?)
 defb 0eeh
 
 ; 0x8003: Status
 defb 0
 defb 0
 defb 0
+
 
 ; 0x8006: FAT, uninitialized
 ;defb 0xbb

@@ -98,17 +98,8 @@ EXTERN _main
 ;; ROM SIGNATURE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; must be the first bytes in ROM
-IF __VGL_ROM_AUTOSTART = 1
-   
-   include(`startup/vgl_rom_autostart.inc')
-   
-ELSE
-   
-   include(`startup/vgl_rom_cassette.inc')
-   
-ENDIF
-
+; The signature must be the first few bytes in ROM
+include(`startup/vgl_rom_code.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
