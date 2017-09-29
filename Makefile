@@ -100,19 +100,19 @@ libs:
 
 install: install-clean
 	install -d $(DESTDIR)/$(prefix) $(DESTDIR)/$(prefix_share)/lib 
-	cd src/appmake ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/copt ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/cpp ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) PREFIX_SHARE=$(DESTDIR)/$(prefix_share) install
-	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/zpragma ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/zx7 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z80nm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/lstmanip; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/ticks ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z88dk-lib ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd support/graphics; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/appmake PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/copt PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/cpp PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR)/$(prefix) PREFIX_SHARE=$(DESTDIR)/$(prefix_share) install
+	$(MAKE) -C src/zcc PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/lstmanip PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C support/graphics PREFIX=$(DESTDIR)/$(prefix) install
 	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{}  \;
 	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{}  \;
 	find lib -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{} \;
