@@ -3,18 +3,20 @@
 ;	by Stefano Bodrato
 ;	MSX emulation layer
 ;
-;	FILVRM
+;	LDIRVM
 ;
 ;
-;	$Id: svi_ldirvm.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
+;	$Id: svi_ldirvm.asm$
 ;
 
         SECTION code_clib
 	PUBLIC	LDIRVM
+	PUBLIC	_LDIRVM
 	
         INCLUDE "svi.def"
 	
 LDIRVM:
+_LDIRVM:
 	ex	de,hl
 	call	$373C	;SETWRT
 
