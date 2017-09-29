@@ -1,21 +1,21 @@
 ;
 ;	z88dk library: Generic VDP support code
 ;
-;	LIDRMV
+;	LDIRMV
 ;
 ;
-;	$Id: gen_ldirmv.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
+;	$Id: gen_ldirmv.asm$
 ;
 
         SECTION code_clib
-	PUBLIC	LIDRMV
-	PUBLIC	_LIDRMV
+	PUBLIC	LDIRMV
+	PUBLIC	_LDIRMV
 	EXTERN		SETRD
 	
 	INCLUDE	"msx/vdp.inc"
 	
-LIDRMV:
-_LIDRMV:
+LDIRMV:
+_LDIRMV:
 	call	SETRD
 	ex	(sp),hl
 	ex	(sp),hl
