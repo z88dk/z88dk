@@ -289,12 +289,12 @@ void parse()
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
-            dodeclare(EXTERNAL, NULL, 0);
+            dodeclare(EXTERNAL, NULL, 0,0);
         } else if (amatch("static")) {
-            dodeclare(LSTATIC, NULL, 0);
+            dodeclare(LSTATIC, NULL, 0,0);
         } else if (amatch("typedef")) {
-            dodeclare(TYPDEF, NULL, 0);
-        } else if (dodeclare(STATIK, NULL, 0)) {
+            dodeclare(TYPDEF, NULL, 0, 0);
+        } else if (dodeclare(STATIK, NULL, 0, 0)) {
             ;
         } else if (ch() == '#') {
             if (match("#asm")) {
