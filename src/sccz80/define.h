@@ -56,6 +56,7 @@
 
 
 typedef enum {
+    KIND_NONE,
     KIND_VOID,
     KIND_BOOL,
     KIND_CHAR,
@@ -114,6 +115,7 @@ struct type_s {
     array    *fields; // Fields within the structure (SYMBOL)
     size_t    offset;  // Offset to the member
     char      weak;
+    char      isstruct;
     
     // Function
     Type    *return_type;
@@ -124,6 +126,8 @@ struct type_s {
     UT_hash_handle hh;
 };
 
+extern Type *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double;
+
 
 enum ident_type {
         NO_IDENT = 0,
@@ -131,7 +135,7 @@ enum ident_type {
         ID_ARRAY,
         POINTER,
         FUNCTION,
-        MACRO,
+        ID_MACRO,
         FUNCTIONP,
         ID_GOTOLABEL,
         ID_ENUM,
@@ -179,7 +183,7 @@ enum symbol_flags {
 
 /*      Define symbol table entry format        */
 
-typedef struct tagsymbol_s TAG_SYMBOL;
+typedef struct type_s TAG_SYMBOL;
 typedef struct symbol_s SYMBOL;
 
 
@@ -248,14 +252,6 @@ struct symbol_s {
 #define NUMTAG          300
 #define STARTTAG        tagtab
 #define ENDTAG          tagtab+NUMTAG
-
-struct tagsymbol_s {
-        char name[NAMESIZE] ;     /* structure tag name */
-        int size ;                /* size of struct in bytes */
-	char weak; 		  /* Not fully defined */
-        SYMBOL *ptr ;             /* pointer to first member */
-        SYMBOL *end ;             /* pointer to beyond end of members */
-} ;
 
 
 
@@ -368,19 +364,6 @@ struct gototab_s {
 #define GET_PACKED_FLAGS(v) ((v >> 16) & 0xffff)
 
 
-/*
- * djm, function for variable definitions now
- */
-
-struct varid {
-        unsigned char type;
-        unsigned char zfar;
-        unsigned char sign;
-        unsigned char sflag;
-        unsigned char isconst;
-        enum ident_type ident;
-        int     more;
-};
 
 /* defines for globalisation */
 
@@ -444,27 +427,24 @@ typedef struct lvalue_s LVALUE;
 
 struct lvalue_s {
         SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
-        int indirect ;                  /* type of indirect object, 0 for static object */
+        Type   *ltype;
+        Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
         int ptr_type ;                  /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         double const_val ;                        /* value of constant expression (& other uses) */
-        TAG_SYMBOL *tagsym ;    /* tag symbol address, 0 if not struct */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         int val_type ;                  /* type of value calculated */
-	int oldval_type;		/* What the valtype was */
+	Kind oldval_kind;		/* What the valtype was */
         enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
         enum ident_type ident;          /* ident (from symbol table) */
-        enum storage_type storage;	/* storage (from sym tab) */
-        char c_id;                      /* ident of cast        */
-        char c_vtype;                   /* type of value calc if cast */
-        char c_flags;                   /* flags for casting */
+     //   enum storage_type storage;	/* storage (from sym tab) */
+        Type *cast_type;
 	int  level;		/* Parenth level (cast) */
 	int  castlevel;
 	int  offset;
-        TAG_SYMBOL *c_tag;               
 } ;
 
 /* Enable optimisations that are longer than the conventional sequence */ 

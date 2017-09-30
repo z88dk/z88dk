@@ -3,6 +3,15 @@
 #include "define.h" 
 
 
+
+Type   *type_char = &(Type){ KIND_CHAR, 1, 0 };
+Type   *type_uchar = &(Type){ KIND_CHAR, 1, 1 };
+Type   *type_int = &(Type){ KIND_INT, 2, 0 };
+Type   *type_uint = &(Type){ KIND_INT, 2, 1 };
+Type   *type_long = &(Type){ KIND_LONG, 4, 0 };
+Type   *type_ulong = &(Type){ KIND_LONG, 4, 1 };
+Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0 };
+
 static int32_t needsub(void)
 {
     double  val;
@@ -79,7 +88,6 @@ void *array_get_byindex(array *arr, int index)
 Type *dodeclare2(storage_type2 storage);
 
 Type *global_hash = NULL;
-Type *tag_hash = NULL;
 
 Type *find_enum(const char *name)
 {
@@ -88,7 +96,15 @@ Type *find_enum(const char *name)
     return t;
 }
 
-Type *find_struct(const char *name)
+static Type *tag_hash = NULL;
+
+void add_tag(Type *type)
+{
+    // addglb
+    HASH_ADD_STR(tag_hash, name, type);    
+}
+
+Type *find_tag(const char *name)
 {
     Type *t;
     HASH_FIND_STR(tag_hash, name, t);
@@ -98,13 +114,11 @@ Type *find_struct(const char *name)
 
 void add_global(Type *type)
 {
+    // addglb()
     HASH_ADD_STR(global_hash, name, type);
 }
 
-void add_struct(Type *type)
-{
-    HASH_ADD_STR(tag_hash, name, type);    
-}
+
 
 static Type *parse_decl_tail(Type *base_type);
 static Type *parse_decl(char name[], Type *base_type);
@@ -117,6 +131,8 @@ void free_type(void *data)
         array_free(type->fields);
     if ( type->parameters )
         array_free(type->parameters);
+    if ( type->return_type ) 
+        free_type(type->return_type);
     FREENULL(type);
 }
 
@@ -226,7 +242,7 @@ Type *parse_struct(Type *type, int isstruct)
     static int num_structs;
 
     if ( symname(sname) ) {
-        str = find_struct(sname);
+        str = find_tag(sname);
         if ( str && str->weak == 0) {
             if (rcmatch('{')) {
                 multidef(sname);
@@ -235,6 +251,7 @@ Type *parse_struct(Type *type, int isstruct)
             type->kind = KIND_STRUCT;
             type->size = str->size;
             type->tag = str;
+            type->isstruct = isstruct;
             return type;
         } else if ( str == NULL ) {
             str = CALLOC(1,sizeof(*str));
@@ -242,7 +259,8 @@ Type *parse_struct(Type *type, int isstruct)
             str->weak = 1;
             str->size = -1;            
             str->fields = array_init(free_type);  
-            add_struct(str);                    
+            str->isstruct = isstruct;
+            add_tag(str);                    
         }
         // It's a weak reference we should define it 
     } else {
@@ -253,7 +271,8 @@ Type *parse_struct(Type *type, int isstruct)
         str->fields = array_init(free_type); 
         str->weak = 1;
         str->size = -1;
-        add_struct(str);        
+        str->isstruct = isstruct;        
+        add_tag(str);        
     } 
 
     if ( rcmatch('{')) {
@@ -376,7 +395,7 @@ Type *parse_parameter_list(Type *return_type)
         func->size = 0;
         func->oldstyle = 1;  // i.e. arbitrary number of parameters
         func->return_type = return_type;
-        func->parameters = array_init(NULL);
+        func->parameters = array_init(free_type);
         return func;
     }
 
@@ -506,7 +525,15 @@ Type *parse_decl(char name[], Type *base_type)
     return parse_decl_tail(base_type);
 }
 
+int declare_local(int isstatic)
+{
+    return 0;
+}
 
+Type *parse_expr_type()
+{
+    return NULL;
+}
 
 // Parse a declaration
 Type *dodeclare2(storage_type2 storage)

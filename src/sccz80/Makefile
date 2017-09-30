@@ -10,9 +10,7 @@ OBJS =	callfunc.o     	\
 	codegen.o	\
 	const.o		\
 	data.o		\
-	declfunc.o	\
 	declinit.o	\
-	declvar.o	\
 	error.o		\
 	expr.o		\
 	goto.o		\

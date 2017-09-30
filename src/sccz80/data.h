@@ -74,7 +74,6 @@ extern SYMBOL *currfn;
 
 extern char endasm;
 extern int ltype;
-extern char margtag;
 extern int c_share_offset;
 extern int debuglevel;
 extern int c_assembler_type;

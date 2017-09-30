@@ -49,9 +49,15 @@ extern void copy_to_stack(char *label, int stack_offset,  int size);
 #include "const.h"
 extern void dofloat(double raw, unsigned char fa[]);
 #include "data.h"
-#include "declvar.h"
-#include "declfunc.h"
 #include "declinit.h"
+
+
+extern void       array_free(array *arr);
+extern size_t     array_len(array *arr);
+extern void       array_add(array *arr, void *elem);
+extern void      *array_get_byindex(array *arr, int index);
+
+
 #include "error.h"
 #include "expr.h"
 extern GOTO_TAB *gotoq; /* Pointer for gotoq */

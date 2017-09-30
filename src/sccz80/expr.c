@@ -26,9 +26,7 @@ int expression(int  *con, double *val, uint32_t *packedArgumentType)
         type = lval.val_type;
     }
     *packedArgumentType = CalcArgValue(type, lval.ident, lval.flags);
-    margtag = 0;
-    if (lval.tagsym)
-        margtag = (lval.tagsym - tagtab);
+    // TODO: We need to send more type info
     *con = lval.is_const;
     *val = lval.const_val;
     return lval.val_type;
@@ -55,7 +53,7 @@ int heir1(LVALUE* lval)
             needlval();
             return 0;
         }
-        if (lval->indirect)
+        if (lval->indirect_kind)
             smartpush(lval, before);
         setstage(&before1, &start1);
         if (heir1(&lval2))
@@ -158,13 +156,13 @@ int heir1(LVALUE* lval)
         return 0;
     }
     lval3.symbol = lval->symbol;
-    lval3.indirect = lval->indirect;
+    lval3.ltype = lval->ltype;
+    lval3.indirect_kind = lval->indirect_kind;
     lval3.flags = lval->flags;
     lval3.val_type = lval->val_type;
     lval3.offset = lval->offset;
-    lval3.storage = lval->storage;
     /* don't clear address calc we need it on rhs */
-    if (lval->indirect)
+    if (lval->indirect_kind)
         smartpush(lval, 0);
     rvalue(lval);
     if (oper == zadd || oper == zsub)
@@ -447,43 +445,46 @@ int heir9(LVALUE* lval)
 SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     char flags;
-    flags = lval->flags;
-    if (isaddr) {
-        if (flags & FARACC)
-            flags |= FARACC;
-    } else {
-        if (flags & FARPTR)
-            flags |= FARACC;
-        else
-            flags &= ~FARACC;
-    }
-    if ( lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16 ) {
-        error(E_PORT_DEREF, lval->symbol->name);
-    }
-    /* NB it has already been determind that lval->symbol is non-zero */
-    if (lval->symbol->more == 0) {
-        /* array of/pointer to variable */
-        if (flags & FARPTR && lval->val_type == KIND_CPTR)
-            flags |= FARACC;
-        // else flags &= ~FARACC;
-        lval->val_type = lval->indirect = lval->symbol->type;
-        lval->flags = flags;
-        lval->symbol = NULL; /* forget symbol table entry */
-        lval->ptr_type = 0; /* flag as not symbol or array */
-        lval->ident = ID_VARIABLE; /* We're now a variable! */
-    } else {
-        /* array of/pointer to pointer */
-        lval->symbol = dummy_sym[(int)lval->symbol->more];
-        /* djm long pointers */
-        lval->ptr_type = lval->symbol->type;
-        /* 5/10/98 restored lval->val_type */
-        lval->indirect = lval->val_type = (flags & FARPTR ? KIND_CPTR : KIND_INT);
-        if (flags & FARPTR)
-            flags |= FARACC;
-        lval->flags = flags;
-        if (lval->symbol->type == KIND_STRUCT)
-            lval->tagsym = tagtab + lval->symbol->tag_idx;
-    }
+
+    lval->ltype = lval->ltype->ptr;
+
+    // flags = lval->flags;
+    // if (isaddr) {
+    //     if (flags & FARACC)
+    //         flags |= FARACC;
+    // } else {
+    //     if (flags & FARPTR)
+    //         flags |= FARACC;
+    //     else
+    //         flags &= ~FARACC;
+    // }
+    // if ( lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16 ) {
+    //     error(E_PORT_DEREF, lval->symbol->name);
+    // }
+    // /* NB it has already been determind that lval->symbol is non-zero */
+    // if (lval->symbol->more == 0) {
+    //     /* array of/pointer to variable */
+    //     if (flags & FARPTR && lval->val_type == KIND_CPTR)
+    //         flags |= FARACC;
+    //     // else flags &= ~FARACC;
+    //     lval->val_type = lval->indirect_kind = lval->symbol->type;
+    //     lval->flags = flags;
+    //     lval->symbol = NULL; /* forget symbol table entry */
+    //     lval->ptr_type = 0; /* flag as not symbol or array */
+    //     lval->ident = ID_VARIABLE; /* We're now a variable! */
+    // } else {
+    //     /* array of/pointer to pointer */
+    //     lval->symbol = dummy_sym[(int)lval->symbol->more];
+    //     /* djm long pointers */
+    //     lval->ptr_type = lval->symbol->type;
+    //     /* 5/10/98 restored lval->val_type */
+    //     lval->indirect_kind = lval->val_type = (flags & FARPTR ? KIND_CPTR : KIND_INT);
+    //     if (flags & FARPTR)
+    //         flags |= FARACC;
+    //     lval->flags = flags;
+    //     if (lval->symbol->type == KIND_STRUCT)
+    //         lval->tagsym = tagtab + lval->symbol->tag_idx;
+    // }
     return lval->symbol;
 }
 
@@ -491,9 +492,6 @@ int heira(LVALUE *lval)
 {
     int k, j;
     LVALUE  cast_lval={0};
-    TAG_SYMBOL* otag;
-    struct varid var;
-    char ident;
     int klptr;
     int save_fps_num;
 
@@ -501,21 +499,10 @@ int heira(LVALUE *lval)
     save_fps_num = buffer_fps_num;
     buffer_fps_num = 0;
     if (rcmatch('(')) {
+        Type  *ctype;
         klptr = lptr;
         lptr++;
-        otag = GetVarID(&var, NO);
-        var.sflag = ((var.sign & UNSIGNED) | (var.zfar & FARPTR));
-        if (var.type != NO) {
-            ident = get_ident(var.ident);
-            if (ident == PTR_TO_FN || ident == FUNCTIONP)
-                needtoken(")()");
-            /*
- * Scrunch everything together, replace c_ptype with c_id
- */
-            cast_lval.c_vtype = var.type;
-            cast_lval.c_id = ident;
-            cast_lval.c_tag = otag;
-            cast_lval.c_flags = var.sflag;
+        if ( (ctype = parse_expr_type()) != NULL ) {
             needchar(')');
             for ( j = 0; j < save_fps_num; j++ ) {
                  fprintf(buffer_fps[j],"%.*s",lptr-klptr,line+klptr);
@@ -523,12 +510,9 @@ int heira(LVALUE *lval)
             buffer_fps_num = save_fps_num;
             k = heira(lval);
             if ( k == 1 ) { // If we need to fetch then we should cast what we get 
-                lval->c_vtype = cast_lval.c_vtype;
-                lval->c_id = cast_lval.c_id;
-                lval->c_tag = cast_lval.c_tag;
-                lval->c_flags = cast_lval.c_flags;
+                lval->ltype = cast_lval.cast_type;
             } else {
-                if (cast_lval.c_vtype ) docast(&cast_lval, lval);
+                if (cast_lval.cast_type ) docast(&cast_lval, lval);
             }
             return k;
         } else {
@@ -597,11 +581,11 @@ int heira(LVALUE *lval)
             lval->ptr_type = KIND_VOID;
             lval->val_type = (lval->flags & (FARACC | FARPTR)) ? KIND_CPTR : KIND_INT;
         }
-        if (lval->indirect)
+        if (lval->indirect_kind)
             return 0;
         /* global & non-array */
         address(lval->symbol);
-        lval->indirect = lval->symbol->type;
+        lval->indirect_kind = lval->symbol->ctype->kind;
         return 0;
     }
 
@@ -710,6 +694,10 @@ int heirb(LVALUE* lval)
                     callfunction(ptr,NULL);
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
+                lval->ltype = lval->ltype->return_type;
+
+                // TODO: We need to setup stuff
+
                 if (ptr && ptr->more == 0) {
                     /* function returning variable */
                     lval->ptr_type = 0;
@@ -721,12 +709,9 @@ int heirb(LVALUE* lval)
                     lval->flags = ptr->flags & ~(CALLEE|SMALLC|FASTCALL); /* djm */
                     ptr = lval->symbol = dummy_sym[(int)ptr->more];
                     lval->ident = POINTER;
-                    lval->indirect = lval->ptr_type = ptr->type;
+                    lval->indirect_kind = lval->ptr_type = ptr->type;
                     /* djm - 24/11/98 */
                     lval->val_type = (lval->flags & FARPTR ? KIND_CPTR : KIND_INT);
-                    if (ptr->type == KIND_STRUCT) {
-                        lval->tagsym = tagtab + ptr->tag_idx;
-                    }
                 }
             }
             /* Handle structures... come in here with lval holding tehe previous
@@ -734,12 +719,12 @@ int heirb(LVALUE* lval)
             else if ((direct = cmatch('.')) || match("->")) {
                 /* Check to see if we have a cast in operation, if so then change type
                  * internally, but don't generate any code */
-                if (lval->tagsym == 0) {
+                if (lval->ltype->tag == NULL ) {
                     error(E_MEMBER);
                     junk();
                     return 0;
                 }
-                if (symname(sname) == 0 || (ptr = findmemb(lval->tagsym, sname)) == 0) {
+                if (symname(sname) == 0 || (ptr = findmemb(lval->ltype->tag, sname)) == 0) {
                     error(E_UNMEMB, sname);
                     junk();
                     return 0;
@@ -765,23 +750,21 @@ int heirb(LVALUE* lval)
 
                 zadd_const(lval, ptr->offset.i);
                 lval->symbol = ptr;
-                lval->indirect = lval->val_type = ptr->type;
+                lval->ltype = ptr->ctype;
+                lval->indirect_kind = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->ident = ID_VARIABLE;
                 lval->stage_add = NULL;
-                lval->tagsym = NULL;
                 lval->binop = NULL;
-                if (ptr->type == KIND_STRUCT)
-                    lval->tagsym = tagtab + ptr->tag_idx;
                 if (ptr->ident == POINTER) {
                     lval->ptr_type = ptr->type;
                     lval->ident = POINTER;
                     /* djm */
                     if (ptr->flags & FARPTR) {
-                        lval->indirect = KIND_CPTR;
+                        lval->indirect_kind = KIND_CPTR;
                         lval->val_type = KIND_CPTR;
                     } else {
-                        lval->indirect = KIND_INT;
+                        lval->indirect_kind = KIND_INT;
                         lval->val_type = KIND_INT;
                     }
                 }

@@ -454,7 +454,7 @@ static void dumpfns()
                         ot("=\t");
                         outdec(ptr->size);
                         nl();
-                    } else if (ident != ID_ENUM && type != KIND_ENUM && ident != MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
+                    } else if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
                         if (storage == EXTERNAL)
                             GlobalPrefix(XREF);
                         else
@@ -489,7 +489,7 @@ static void dumpfns()
      * is - this could be used for eg. to allocate space for file structures
      * etc
      */
-    if ((ptr = findglb("_FAR_PTR")) && ptr->ident == MACRO) {
+    if ((ptr = findglb("_FAR_PTR")) && ptr->ident == ID_MACRO) {
         fprintf(fp, "\nIF !NEED_farstartup\n");
         fprintf(fp, "\tDEFINE NEED_farstartup\n");
         fprintf(fp, "ENDIF\n\n");
@@ -571,7 +571,7 @@ void dumpvars()
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;
-            if (ident != ID_ENUM && type != KIND_ENUM && ident != MACRO && ident != FUNCTION && 
+            if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && ident != FUNCTION && 
                 storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
                 type != KIND_PORT8 && type != KIND_PORT16) {
                 prefix();

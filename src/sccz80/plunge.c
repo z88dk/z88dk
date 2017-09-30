@@ -39,8 +39,8 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
             postlabel(droplab);
             vconst(dropval);
             postlabel(endlab);
-            lval->val_type = lval->oldval_type = KIND_INT; /* stops the carry stuff coming in */
-            lval->indirect = lval->ptr_type = lval->is_const = lval->const_val = 0;
+            lval->val_type = lval->oldval_kind = KIND_INT; /* stops the carry stuff coming in */
+            lval->indirect_kind = lval->ptr_type = lval->is_const = lval->const_val = 0;
             lval->stage_add = NULL;
             lval->binop = dummy;
             return (0);
@@ -358,7 +358,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (dbltest(lval2, lval)) {
             int ival = val;
             /* are adding lval to pointer, adjust size */
-            cscale(lval2->ptr_type, lval2->tagsym, &ival);
+            cscale(lval2->ptr_type, lval2->ltype->tag, &ival);
             val = ival;
         }
 
@@ -455,7 +455,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if (dbltest(lval, lval2)) {
                     int ival = val;
                     /* are adding lval2 to pointer, adjust size */
-                    cscale(lval->ptr_type, lval->tagsym, &ival);
+                    cscale(lval->ptr_type, lval->ltype->tag, &ival);
                     val = ival;
                 }
                 if (oper == zsub) {
@@ -472,7 +472,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else {
             /* non-constant on both sides  */
             if (dbltest(lval, lval2))
-                scale(lval->ptr_type, lval->tagsym);
+                scale(lval->ptr_type, lval->ltype->tag);
             if (widen(lval, lval2)) {
                 /* floating point operation */
                 (*oper)(lval);
@@ -485,7 +485,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     zpop();
                 if (dbltest(lval2, lval)) {
                     swap();
-                    scale(lval2->ptr_type, lval2->tagsym);
+                    scale(lval2->ptr_type, lval2->ltype->tag);
                     /* subtraction not commutative */
                     if (oper == zsub)
                         swap();
@@ -525,7 +525,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
             zdiv_const(lval,6); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
-            zdiv_const(lval, lval->tagsym->size);
+            zdiv_const(lval, lval->ltype->tag->size);
         }
     }
     result(lval, lval2);

@@ -28,9 +28,7 @@ static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
  */
 int statement()
 {
-    TAG_SYMBOL* otag;
     int st;
-    struct varid var;
     char locstatic; /* have we had the static keyword */
 
     blanks();
@@ -51,17 +49,8 @@ int statement()
         } else
             locstatic = NO;
 
-        /* Now get the identity, STATIK is for struct definitions */
-        otag = GetVarID(&var, STATIK);
-
-        if (var.type == KIND_STRUCT) {
-            declloc(KIND_STRUCT, otag, locstatic, &var);
-            return (lastst);
-        } else if (var.type || regit) {
-            if (regit && var.type == NO)
-                var.type = KIND_INT;
-            declloc(var.type, NULL, locstatic, &var);
-            return (lastst);
+        if ( declare_local(locstatic) ) {
+            return lastst;
         }
 
         /* not a definition */

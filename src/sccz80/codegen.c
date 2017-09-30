@@ -525,9 +525,10 @@ static void loada(int n)
 void indirect(LVALUE* lval)
 {
     char sign;
-    char typeobj, flags;
+    char flags;
+    Kind typeobj;
 
-    typeobj = lval->indirect;
+    typeobj = lval->indirect_kind;
     flags = lval->flags;
 
     sign = flags & UNSIGNED;
@@ -881,11 +882,11 @@ void testjump(LVALUE* lval, int label)
     int type;
     ol("ld\ta,h");
     ol("or\tl");
-    if (lval->oldval_type == KIND_LONG) {
+    if (lval->oldval_kind == KIND_LONG) {
         ol("or\td");
         ol("or\te");
     }
-    type = lval->oldval_type;
+    type = lval->oldval_kind;
     if (lval->binop == NULL)
         type = lval->val_type;
 
@@ -908,7 +909,7 @@ void zerojump(
 {
     clearstage(lval->stage_add, 0); /* purge conventional code */
 #ifdef CHARCOMP0
-    if (lval->oldval_type == KIND_CHAR) {
+    if (lval->oldval_kind == KIND_CHAR) {
         if (oper == testjump) { /* !=0 or >=0U */
             LoadAccum();
             ol("and\ta");
@@ -2175,7 +2176,7 @@ void asl_const(LVALUE *lval, int32_t value)
 /* Form logical negation of primary register */
 void lneg(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
@@ -2294,7 +2295,7 @@ void dummy(LVALUE *lval)
 void eq0(LVALUE* lval, int label)
 {
     check_lastop_was_comparison(lval);
-    switch (lval->oldval_type) {
+    switch (lval->oldval_kind) {
 #ifdef CHARCOMP0
     case KIND_CHAR:
         ol("ld\ta,l");
@@ -2321,7 +2322,7 @@ void eq0(LVALUE* lval, int label)
 
 void lt0(LVALUE* lval, int label)
 {
-    switch (lval->oldval_type) {
+    switch (lval->oldval_kind) {
 #ifdef CHARCOMP0
     case KIND_CHAR:
         ol("xor\ta");
@@ -2348,11 +2349,11 @@ void le0(LVALUE* lval, int label)
 {
     ol("ld\ta,h");
     ol("or\tl");
-    if (lval->oldval_type == KIND_LONG) {
+    if (lval->oldval_kind == KIND_LONG) {
         ol("or\td");
         ol("or\te");
     }
-    if (lval->oldval_type == KIND_CPTR) {
+    if (lval->oldval_kind == KIND_CPTR) {
         ol("or\te");
     }
     if (ISASM(ASM_Z80ASM)) {
@@ -2367,11 +2368,11 @@ void le0(LVALUE* lval, int label)
 void gt0(LVALUE* lval, int label)
 {
     ge0(lval, label);
-    if (lval->oldval_type == KIND_LONG) {
+    if (lval->oldval_kind == KIND_LONG) {
         ol("or\th");
         ol("or\te");
     }
-    if (lval->oldval_type == KIND_CPTR) {
+    if (lval->oldval_kind == KIND_CPTR) {
         ol("or\th");
     }
     ol("or\tl");
@@ -2382,7 +2383,7 @@ void gt0(LVALUE* lval, int label)
 void ge0(LVALUE* lval, int label)
 {
     ol("xor\ta");
-    switch (lval->oldval_type) {
+    switch (lval->oldval_kind) {
     case KIND_LONG:
         ol("or\td");
         break;
@@ -2398,7 +2399,7 @@ void ge0(LVALUE* lval, int label)
 /* Test for equal */
 void zeq(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     lval->ptr_type = 0;
     lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
@@ -2435,7 +2436,7 @@ void zeq(LVALUE* lval)
 /* Test for not equal */
 void zne(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     lval->ptr_type = 0;
     lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
@@ -2472,7 +2473,7 @@ void zne(LVALUE* lval)
 /* Test for less than*/
 void zlt(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     lval->ptr_type = 0;
     lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
@@ -2517,7 +2518,7 @@ void zlt(LVALUE* lval)
 /* Test for less than or equal to (signed/unsigned) */
 void zle(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     lval->ptr_type = 0;
     lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
@@ -2572,7 +2573,7 @@ void zle(LVALUE* lval)
 /* Test for greater than (signed/unsigned) */
 void zgt(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     lval->ptr_type = 0;
     lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
@@ -2624,7 +2625,7 @@ void zgt(LVALUE* lval)
 /* Test for greater than or equal to */
 void zge(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     lval->ptr_type = 0;
     lval->ident = ID_VARIABLE;
     switch (lval->val_type) {

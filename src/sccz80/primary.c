@@ -36,17 +36,15 @@ int primary(LVALUE* lval)
         } else if ((ptr = findloc(sname))) {
             lval->offset = getloc(ptr, 0);
             lval->symbol = ptr;
-            lval->val_type = lval->indirect = ptr->type;
+            lval->ltype = ptr->ctype;
+            lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
             lval->ident = ptr->ident;
-            lval->storage = ptr->storage;
             lval->ptr_type = 0;
-            if (ptr->type == KIND_STRUCT)
-                lval->tagsym = tagtab + ptr->tag_idx;
             if (ptr->ident == POINTER) {
                 lval->ptr_type = ptr->type;
                 /* djm long pointers */
-                lval->indirect = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
+                lval->indirect_kind = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
             }
             if (ptr->ident == ID_ARRAY || (ptr->ident == ID_VARIABLE && ptr->type == KIND_STRUCT)) {
                 /* djm pointer? */
@@ -66,7 +64,7 @@ int primary(LVALUE* lval)
                     error(E_UNSYMB, sname);
                 if (ptr->type == KIND_ENUM) {
                     lval->symbol = NULL;
-                    lval->indirect = 0;
+                    lval->indirect_kind = 0;
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
                     lval->flags = FLAGS_NONE;
@@ -74,14 +72,12 @@ int primary(LVALUE* lval)
                     return (0);
                 }
                 lval->symbol = ptr;
-                lval->indirect = 0;
+                lval->ltype = ptr->ctype;
+                lval->indirect_kind = 0;
                 lval->val_type = ptr->type;
                 lval->flags = ptr->flags;
                 lval->ident = ptr->ident;
                 lval->ptr_type = 0;
-                lval->storage = ptr->storage;
-                if (ptr->type == KIND_STRUCT)
-                    lval->tagsym = tagtab + ptr->tag_idx;
                 if (ptr->ident != ID_ARRAY && (ptr->ident != ID_VARIABLE || ptr->type != KIND_STRUCT)) {
                     if (ptr->ident == POINTER) {
                         lval->ptr_type = ptr->type;
@@ -92,7 +88,7 @@ int primary(LVALUE* lval)
                 /* Handle arrays... */
                 address(ptr);
                 /* djm sommat here about pointer types? */
-                lval->indirect = lval->ptr_type = ptr->type;
+                lval->indirect_kind = lval->ptr_type = ptr->type;
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else {
@@ -118,7 +114,7 @@ int primary(LVALUE* lval)
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
-        lval->indirect = 0;
+        lval->indirect_kind = 0;
         lval->val_type = ptr->type ; /* Null function, always int */
         lval->flags = ptr->flags;
         lval->ident = FUNCTION;
@@ -126,7 +122,7 @@ int primary(LVALUE* lval)
     }
     if (constant(lval)) {
         lval->symbol = NULL;
-        lval->indirect = 0;
+        lval->indirect_kind = 0;
         lval->ident = ID_VARIABLE;
         return (0);
     } else {
@@ -377,11 +373,11 @@ void result(LVALUE* lval, LVALUE* lval2)
             lval->val_type = KIND_LONG;
         else
             lval->val_type = KIND_INT;
-        lval->indirect = 0;
+        lval->indirect_kind = 0;
         lval->ident = ID_VARIABLE;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
         lval->symbol = lval2->symbol;
-        lval->indirect = lval2->indirect;
+        lval->indirect_kind = lval2->indirect_kind;
         lval->ptr_type = lval2->ptr_type;
     }
 }
@@ -398,7 +394,7 @@ void prestep(
     if (heira(lval) == 0) {
         needlval();
     } else {
-        if (lval->indirect) {
+        if (lval->indirect_kind) {
             addstk(lval);
             if (lval->flags & FARACC)
                 lpush();
@@ -412,7 +408,7 @@ void prestep(
             zadd_const(lval, (n * 6));
             break;
         case KIND_STRUCT:
-            zadd_const(lval, n * lval->tagsym->size);
+            zadd_const(lval, n * lval->ltype->tag->size);
             break;
         case KIND_LONG:
             (*step)(lval);
@@ -441,7 +437,7 @@ void poststep(
     if (k == 0) {
         needlval();
     } else {
-        if (lval->indirect) {
+        if (lval->indirect_kind) {
             addstk(lval);
             if (lval->flags & FARACC)
                 lpush();
@@ -454,7 +450,7 @@ void poststep(
             nstep(lval, n * 6, unstep);
             break;
         case KIND_STRUCT:
-            nstep(lval, n * lval->tagsym->size, unstep);
+            nstep(lval, n * lval->ltype->tag->size, unstep);
             break;
         case KIND_LONG:
             nstep(lval, n * 4, unstep);
@@ -503,10 +499,10 @@ void store(LVALUE* lval)
         lval->symbol->isassigned = YES;
     if (lval->symbol && (lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_out(lval->symbol);
-    } else if (lval->indirect == 0)
+    } else if (lval->indirect_kind == 0)
         putmem(lval->symbol);
     else
-        putstk(lval->indirect);
+        putstk(lval->indirect_kind);
 }
 
 /*
@@ -516,7 +512,7 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
-    if (lval->indirect != KIND_INT || lval->symbol == 0 || lval->symbol->storage != STKLOC) {
+    if (lval->indirect_kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
             lpush();
@@ -547,7 +543,7 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->indirect != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
+    if (lval->indirect_kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
     } else {
         switch (lval->symbol->offset.i - Zsp) {
@@ -583,13 +579,13 @@ void rvaluest(LVALUE* lval)
 
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
-    } else if (lval->symbol && lval->indirect == 0) {
+    } else if (lval->symbol && lval->indirect_kind == 0) {
        
         getmem(lval->symbol);
     } else {
         indirect(lval);
     }
-    if (lval->c_vtype ) docast(lval, lval);
+    if (lval->cast_type ) docast(lval, lval);
 }
 
 void rvalue(LVALUE* lval)
@@ -599,12 +595,12 @@ void rvalue(LVALUE* lval)
     }
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
-    } else if (lval->symbol && lval->indirect == 0) { 
+    } else if (lval->symbol && lval->indirect_kind == 0) { 
         getmem(lval->symbol);
     } else {           
         indirect(lval);
     }
-    if (lval->c_vtype ) docast(lval, lval);
+    if (lval->cast_type ) docast(lval, lval);
 #if DEBUG_SIGN
     if (lval->flags & UNSIGNED)
         ol("; unsigned");
@@ -738,83 +734,83 @@ void cscale(
  */
 int docast(LVALUE* lval, LVALUE *dest_lval)
 {
-    SYMBOL* ptr;
-    char temp_type;
-    int itag;
-    char nam[20];
+//     SYMBOL* ptr;
+//     char temp_type;
+//     int itag;
+//     char nam[20];
 
 
-    if (lval->c_id == ID_VARIABLE) {
-        /* Straight forward variable conversion now.. */
-        if ( dest_lval->is_const == 0 ) {
-            force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
-        }
-        dest_lval->val_type = lval->c_vtype;
-        dest_lval->ptr_type = 0;
-        dest_lval->ident = ID_VARIABLE;
-        dest_lval->flags = ((dest_lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
-        dest_lval->c_id = 0;
-        dest_lval->c_vtype = 0;
-        dest_lval->c_flags = 0;
-        return (0);
-    }
+//     if (lval->c_id == ID_VARIABLE) {
+//         /* Straight forward variable conversion now.. */
+//         if ( dest_lval->is_const == 0 ) {
+//             force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
+//         }
+//         dest_lval->val_type = lval->c_vtype;
+//         dest_lval->ptr_type = 0;
+//         dest_lval->ident = ID_VARIABLE;
+//         dest_lval->flags = ((dest_lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
+//         dest_lval->c_id = 0;
+//         dest_lval->c_vtype = 0;
+//         dest_lval->c_flags = 0;
+//         return (0);
+//     }
 
-    if (lval->c_id == POINTER || lval->c_id == PTR_TO_FN) {
-        switch (lval->c_vtype) {
-        case KIND_STRUCT:
-            /* Casting a structure - has to be a pointer... */
-            dest_lval->tagsym = lval->c_tag; /* Copy tag symbol over */
-            dest_lval->ptr_type = KIND_STRUCT;
-            temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
-            if ( dest_lval->const_val == 0 ) {
-                force(temp_type, dest_lval->val_type, 0, 0, 0);
-            }
-            dest_lval->val_type = temp_type;
-            dest_lval->flags = ((lval->flags & FARACC) | lval->c_flags);
-            dest_lval->c_id = 0;
-            dest_lval->c_vtype = 0;
-            dest_lval->c_flags = 0;
-            return (1);
+//     if (lval->c_id == POINTER || lval->c_id == PTR_TO_FN) {
+//         switch (lval->c_vtype) {
+//         case KIND_STRUCT:
+//             /* Casting a structure - has to be a pointer... */
+//             dest_lval->tagsym = lval->c_tag; /* Copy tag symbol over */
+//             dest_lval->ptr_type = KIND_STRUCT;
+//             temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
+//             if ( dest_lval->const_val == 0 ) {
+//                 force(temp_type, dest_lval->val_type, 0, 0, 0);
+//             }
+//             dest_lval->val_type = temp_type;
+//             dest_lval->flags = ((lval->flags & FARACC) | lval->c_flags);
+//             dest_lval->c_id = 0;
+//             dest_lval->c_vtype = 0;
+//             dest_lval->c_flags = 0;
+//             return (1);
 
-        /* All other simple pointers.. */
-        default:
-            debug(DBG_CAST2, "Converting %d to %d", dest_lval->ptr_type, lval->c_vtype);
-            dest_lval->indirect = dest_lval->ptr_type = lval->c_vtype;
-            // Set the destination symbol type
-            dest_lval->symbol = dummy_sym[(int)lval->c_vtype];
-            temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
-            if ( dest_lval->const_val == 0 ) {
-                force(temp_type, dest_lval->val_type, 0, 0, 0);
-            }
-            dest_lval->val_type = temp_type;
-            dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
-            dest_lval->ident = POINTER;
-            dest_lval->c_id = 0;
-            dest_lval->c_vtype = 0;
-            dest_lval->c_flags = 0;
-            return (1);
-        }
-    }
-    /* Now we deal with pointers to pointers and pointers to functions 
- * returning pointers - to do this, we will define dummy symbols in
- * the local symbol table so that they do what we want them to do!
- */
-    sprintf(nam, "0dptr%p", locptr);
-    temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
-    itag = 0;
-    if (lval->c_tag)
-        itag = lval->c_tag - tagtab;
-    ptr = lval->symbol;
-    dest_lval->symbol = addloc(nam, POINTER, temp_type, dummy_idx(lval->c_vtype, lval->c_tag), itag);
-    dest_lval->symbol->offset.p = ptr;
-    if ( dest_lval->const_val == 0 ) {
-        force(temp_type, dest_lval->val_type, 0, 0, 0);
-    }
-    dest_lval->val_type = temp_type;
-    dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
-    dest_lval->c_id = 0;
-    dest_lval->c_vtype = 0;
-    dest_lval->c_flags = 0;
+//         /* All other simple pointers.. */
+//         default:
+//             debug(DBG_CAST2, "Converting %d to %d", dest_lval->ptr_type, lval->c_vtype);
+//             dest_lval->indirect_kind = dest_lval->ptr_type = lval->c_vtype;
+//             // Set the destination symbol type
+//             dest_lval->symbol = dummy_sym[(int)lval->c_vtype];
+//             temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
+//             if ( dest_lval->const_val == 0 ) {
+//                 force(temp_type, dest_lval->val_type, 0, 0, 0);
+//             }
+//             dest_lval->val_type = temp_type;
+//             dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
+//             dest_lval->ident = POINTER;
+//             dest_lval->c_id = 0;
+//             dest_lval->c_vtype = 0;
+//             dest_lval->c_flags = 0;
+//             return (1);
+//         }
+//     }
+//     /* Now we deal with pointers to pointers and pointers to functions 
+//  * returning pointers - to do this, we will define dummy symbols in
+//  * the local symbol table so that they do what we want them to do!
+//  */
+//     sprintf(nam, "0dptr%p", locptr);
+//     temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
+//     itag = 0;
+//     if (lval->c_tag)
+//         itag = lval->c_tag - tagtab;
+//     ptr = lval->symbol;
+//     dest_lval->symbol = addloc(nam, POINTER, temp_type, dummy_idx(lval->c_vtype, lval->c_tag), itag);
+//     dest_lval->symbol->offset.p = ptr;
+//     if ( dest_lval->const_val == 0 ) {
+//         force(temp_type, dest_lval->val_type, 0, 0, 0);
+//     }
+//     dest_lval->val_type = temp_type;
+//     dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
+//     dest_lval->c_id = 0;
+//     dest_lval->c_vtype = 0;
+//     dest_lval->c_flags = 0;
     return (1);
 }
 

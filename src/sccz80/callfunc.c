@@ -405,18 +405,18 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
 
     } else {
         /* Dealing with pointers.. a type mismatch!*/
-        if (((dtype != stype) && (dtype != KIND_VOID) && (stype != KIND_VOID) && (stype != KIND_CPTR)) || ((dtype == stype) && (margtag != functab))) {
-            debug(DBG_ARG3, "dtype=%d stype=%d margtab=%d functag=%d", dtype, stype, margtag, functab);
-            warning(W_PRELIM, currfn->name, lineno - fnstart);
-            warning(W_PTRTYP);
-            ExpandArgValue(dest, buffer, functab);
-            warning(W_PTRTYP1, buffer);
-            ExpandArgValue(src, buffer, margtag);
-            warning(W_PTRTYP2, buffer);
-        } else if (dtype == stype && dident != sident && sident != FUNCTION) {
-            warning(W_INTPTR);
-            expr = KIND_INT;
-        }
+        // if (((dtype != stype) && (dtype != KIND_VOID) && (stype != KIND_VOID) && (stype != KIND_CPTR)) || ((dtype == stype) && (margtag != functab))) {
+        //     debug(DBG_ARG3, "dtype=%d stype=%d margtab=%d functag=%d", dtype, stype, margtag, functab);
+        //     warning(W_PRELIM, currfn->name, lineno - fnstart);
+        //     warning(W_PTRTYP);
+        //     ExpandArgValue(dest, buffer, functab);
+        //     warning(W_PTRTYP1, buffer);
+        //     ExpandArgValue(src, buffer, margtag);
+        //     warning(W_PTRTYP2, buffer);
+        // } else if (dtype == stype && dident != sident && sident != FUNCTION) {
+        //     warning(W_INTPTR);
+        //     expr = KIND_INT;
+        // }
 
         if (dflags & FARPTR) {
             if ((dflags & FARPTR) != (sflags & FARPTR)) {

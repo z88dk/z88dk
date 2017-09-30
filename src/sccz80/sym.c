@@ -75,7 +75,7 @@ SYMBOL* findloc(char* sname)
  * find symbol in structure tag symbol table, return 0 if not found
  */
 
-TAG_SYMBOL* findtag(char* sname)
+TAG_SYMBOL *findtag(const char* sname)
 {
     TAG_SYMBOL* ptr;
 
@@ -95,16 +95,16 @@ TAG_SYMBOL* findtag(char* sname)
 
 SYMBOL* findmemb(TAG_SYMBOL* tag, char* sname)
 {
-    SYMBOL* ptr;
+    // SYMBOL* ptr;
 
-    ptr = tag->ptr;
+    // ptr = tag->ptr;
 
-    while (ptr < tag->end) {
-        if (strcmp(ptr->name, sname) == 0)
-            return ptr;
-        ++ptr;
-    }
-    return 0;
+    // while (ptr < tag->end) {
+    //     if (strcmp(ptr->name, sname) == 0)
+    //         return ptr;
+    //     ++ptr;
+    // }
+    return NULL;
 }
 
 SYMBOL* addglb(

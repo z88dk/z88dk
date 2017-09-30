@@ -447,14 +447,16 @@ void offset_of(LVALUE *lval)
                 }
             }
             if ( tag != NULL ) {
-                SYMBOL *ptr = tag->ptr;
-                while ( ptr != tag->end ) {
-                    if ( strcmp(ptr->name, memb_name) == 0 ) {
-                        lval->const_val = ptr->offset.i;
+                int   i;
+
+                for ( i = 0; i < array_len(tag->fields); i++ ) {
+                    Type *field = array_get_byindex(tag->fields, i);
+
+                    if ( strcmp(field->name, memb_name) == 0 ) {
+                        lval->const_val = field->offset;
                         foundit = 1;
                         break;
                     }
-                    ptr++;
                 }
             }
         }
@@ -477,9 +479,8 @@ void size_of(LVALUE* lval)
 {
     char sname[NAMESIZE];
     int length;
-    TAG_SYMBOL* otag;
+    Type *type;
     SYMBOL *ptr;
-    struct varid var;
     enum ident_type ident;
     int          deref = 0;
 
@@ -487,33 +488,25 @@ void size_of(LVALUE* lval)
     while ( cmatch('*') ) {
         deref++;
     }
-    otag = GetVarID(&var, NO);
-    if (var.type != NO) {
-        ident = var.ident;
-        if ( ident == POINTER && cmatch('*') ) {
-
-        } else {
-            if (match("**") || cmatch('*'))
-                ident = POINTER;
-            else
-                ident = ID_VARIABLE;
-        }
-
-        if ( deref && ident !=  POINTER  ) {
-            uint32_t   argvalue = CalcArgValue(var.type, var.ident,((var.sign & UNSIGNED) | (var.zfar & FARPTR)));
-            char       got[256];
-
-            ExpandArgValue(argvalue, got, 0);
-            error(E_SIZEOF,got);
+    if ( (type = parse_expr_type()) != NULL ) {
+        if ( deref && type->kind != KIND_PTR ) {
+            error(E_SIZEOF,"");
             lval->const_val = 2;
             return;
         }
-        if (otag && ident == ID_VARIABLE)
-            lval->const_val = otag->size;
-        if (ident == POINTER) {
-            lval->const_val = (var.zfar ? 3 : 2);
+        while ( deref && type ) {
+            Type *next = type->ptr;
+
+            FREENULL(type);
+
+            type = next;
+            deref--;
+        }
+        if ( type == NULL ) {
+            lval->const_val = 2;
+            printf("Cannot dereference far enough\n");
         } else {
-            lval->const_val = get_type_size(var.type, var.ident, (var.zfar & FARPTR), otag);
+            lval->const_val = type->size;
         }
     } else if (cmatch('"')) { /* Check size of string */
         length = 1; /* Always at least one */
@@ -530,7 +523,7 @@ void size_of(LVALUE* lval)
             enum symbol_flags ptrflags;
             TAG_SYMBOL *ptrotag = NULL;
 
-            if (ptr->ident != FUNCTION && ptr->ident != MACRO) {
+            if (ptr->ident != FUNCTION && ptr->ident != ID_MACRO) {
                 if (ptr->type != KIND_STRUCT) {
                     if ( ptr->ident == POINTER && deref ) {
                         ptrtype = ptr->type;
@@ -589,11 +582,11 @@ void size_of(LVALUE* lval)
                     if ( ptrtype != -1 ) {
                         lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
                     } else {
-                        uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
-                        char       got[256];
+                        // uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
+                        // char       got[256];
 
-                        ExpandArgValue(argvalue, got, ptr->tag_idx);
-                        error(E_SIZEOF,got);
+                        // ExpandArgValue(argvalue, got, ptr->tag_idx);
+                        // error(E_SIZEOF,got);
                     }
                 }
             } else {
