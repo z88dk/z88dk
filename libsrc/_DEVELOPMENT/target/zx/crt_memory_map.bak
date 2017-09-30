@@ -9,7 +9,10 @@ IF __MMAP = -1
    ;; user supplied memory map ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   INCLUDE "mmap.inc"
+ifelse(M4__MMAP,-1,`include(`./mmap.inc')')
+
+   SECTION UNASSIGNED
+   org 0
 
 ENDIF
 
@@ -24,16 +27,19 @@ IF __MMAP = 0
 Z88DK_FOR(`LOOP', `0', `7',
 `
    SECTION BANK_`'LOOP
-	org CRT_ORG_BANK_`'LOOP
+   org CRT_ORG_BANK_`'LOOP
 ')
 
 Z88DK_FOR(`LOOP', `0', `63',
 `
    SECTION DIV_`'LOOP
-	org CRT_ORG_DIV_`'LOOP
+   org CRT_ORG_DIV_`'LOOP
 ')
 
 ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
+
+   SECTION UNASSIGNED
+   org 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
@@ -50,16 +56,19 @@ IF __MMAP = 1
 Z88DK_FOR(`LOOP', `0', `7',
 `
    SECTION BANK_`'LOOP
-	org CRT_ORG_BANK_`'LOOP
+   org CRT_ORG_BANK_`'LOOP
 ')
 
 Z88DK_FOR(`LOOP', `0', `63',
 `
    SECTION DIV_`'LOOP
-	org CRT_ORG_DIV_`'LOOP
+   org CRT_ORG_DIV_`'LOOP
 ')
 
 ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
+
+   SECTION UNASSIGNED
+   org 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
