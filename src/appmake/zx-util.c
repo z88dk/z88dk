@@ -876,7 +876,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
                 mb->num = 0;
                 mb->secbin = NULL;
 
-                printf("Notice: Merged BANK_%03d into the main memory bank\n", i);
+                printf("Notice: Merged BANK_%d into the main memory bank\n", i);
             }
             else
                 is_128++;
@@ -918,7 +918,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         struct section_bin *sb = &memory->mainbank.secbin[i];
 
         if (sb->org < 0x4000)
-            exit_log(1, "Error: Section %s has org in rom %0x04x\n", sb->section_name, sb->org);
+            exit_log(1, "Error: Section %s has org in rom 0x%04x\n", sb->section_name, sb->org);
 
         if ((fin = fopen(sb->filename, "rb")) == NULL)
             exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);

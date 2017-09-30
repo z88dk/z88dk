@@ -31,7 +31,7 @@ option_t glue_options[] = {
     { 'h', "help",      "Display this help",                       OPT_BOOL,  &help },
     { 'b', "binfile",   "Basename of binary output files",         OPT_STR,   &binname },
     { 'c', "crt0file",  "Basename of map file (default=binfile)",  OPT_STR,   &crtfile },
-    {  0 , "bankspace", "Create custom named memory banks",        OPT_STR,   &banked_space },
+    {  0 , "bankspace", "Create custom bank spaces",               OPT_STR,   &banked_space },
     {  0,  "exclude-banks", "Exclude memory banks from output",    OPT_STR,   &excluded_banks },
     {  0 , "exclude-sections", "Exclude section names from output", OPT_STR,  &excluded_sections },
     { 'f', "filler",    "Filler byte (default: 0xFF)",             OPT_INT,   &romfill },
