@@ -37,19 +37,19 @@ int initials(char* sname,
         if (dim == 0)
             dim = -1;
         switch (type) {
-        case DOUBLE:
+        case KIND_DOUBLE:
             size = 6;
             break;
-        case CCHAR:
+        case KIND_CHAR:
             size = 1;
             break;
-        case LONG:
+        case KIND_LONG:
             size = 4;
             break;
-        case CPTR:
+        case KIND_CPTR:
             size = 3;
             break;
-        case CINT:
+        case KIND_INT:
         default:
             size = 2;
         }
@@ -67,7 +67,7 @@ int initials(char* sname,
 
         if (cmatch('{')) {
             /* aggregate initialiser */
-            if ((ident == POINTER || ident == VARIABLE) && type == STRUCT) {
+            if ((ident == POINTER || ident == VARIABLE) && type == KIND_STRUCT) {
                 /* aggregate is structure or pointer to structure */
                 dim = 0;
                 olddim = 1;
@@ -85,8 +85,8 @@ int initials(char* sname,
         }
 
         /* dump literal queue and fill tail of array with zeros */
-        if ((ident == ARRAY && more == CCHAR) || type == STRUCT) {
-            if (type == STRUCT) {
+        if ((ident == KIND_ARRAY && more == KIND_CHAR) || type == KIND_STRUCT) {
+            if (type == KIND_STRUCT) {
                 dumpzero(tag->size, dim);
                 desize = dim < 0 ? abs(dim + 1) * tag->size : olddim * tag->size;
             } else { /* Handles unsized arrays of chars */
@@ -97,9 +97,9 @@ int initials(char* sname,
             }
             dumplits(0, YES, gltptr, glblab, glbq);
         } else {
-            if (!(ident == POINTER && type == CCHAR)) {
+            if (!(ident == POINTER && type == KIND_CHAR)) {
                 dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
-                if (type != CCHAR) /* Already dumped by init? */
+                if (type != KIND_CHAR) /* Already dumped by init? */
                     desize = dumpzero(size, dim);
                 dim = dim < 0 ? abs(dim + 1) : olddim;
                 cscale(type, tag, &dim);
@@ -110,13 +110,13 @@ int initials(char* sname,
     } else {
         char *dosign, *typ;
         dosign = "";
-        if (ident == ARRAY && (dim == 0)) {
+        if (ident == KIND_ARRAY && (dim == 0)) {
             typ = ExpandType(more, &dosign, (tag - tagtab));
             warning(W_NULLARRAY, dosign, typ);
         }
         /* no initialiser present, let loader insert zero */
         if (ident == POINTER)
-            type = (zfar ? CPTR : CINT);
+            type = (zfar ? KIND_CPTR : KIND_INT);
         cscale(type, tag, &dim);
         desize = dim;
     }
@@ -142,12 +142,12 @@ int str_init(TAG_SYMBOL* tag)
             if (rcmatch('{')) {
                 needchar('{');
                 while (dim) {
-                    if (ptr->type == STRUCT) {
-                        if (ptr->ident == ARRAY)
+                    if (ptr->type == KIND_STRUCT) {
+                        if (ptr->ident == KIND_ARRAY)
                             /* array of struct */
                             needchar('{');
                         str_init(tag);
-                        if (ptr->ident == ARRAY) {
+                        if (ptr->ident == KIND_ARRAY) {
                             --dim;
                             needchar('}');
                         }
@@ -202,7 +202,7 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
 {
     int done = 0;
     while (*dim) {
-        if (ident == ARRAY && type == STRUCT) {
+        if (ident == KIND_ARRAY && type == KIND_STRUCT) {
             /* array of struct */
             if  ( done == 0 ) {
                 needchar('{');
@@ -213,7 +213,7 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
             --*dim;
             needchar('}');
         } else {
-            init(size, ident, dim, more, (ident == ARRAY && more == CCHAR), 0, zfar);
+            init(size, ident, dim, more, (ident == KIND_ARRAY && more == KIND_CHAR), 0, zfar);
         }
         done++;
         if (cmatch(',') == 0)
@@ -238,7 +238,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
-        if (ident == ARRAY && more == 0) {
+        if (ident == KIND_ARRAY && more == 0) {
             /* Dump the literals where they are, padding out as appropriate */
             if (*dim != -1 && sz > *dim) {
                 /* Ooops, initialised to long a string! */
@@ -272,7 +272,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
         if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
                 /* Actually found sommat..very good! */
-                if (ident == POINTER || (ident == ARRAY && more)) {
+                if (ident == POINTER || (ident == KIND_ARRAY && more)) {
                     defword();
                     outname(ptr->name, dopref(ptr));
                     nl();
@@ -280,7 +280,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
                         defbyte(); outdec(0); nl();
                     }
                     --*dim;
-                } else if (ptr->type == ENUM) {
+                } else if (ptr->type == KIND_ENUM) {
                     value = ptr->size;
                     goto constdecl;
                 } else {
@@ -340,7 +340,7 @@ constdecl:
                 }
                 nl();
                 /* Dump out a train of zeros as appropriate */
-                if (ident == ARRAY && more == 0) {
+                if (ident == KIND_ARRAY && more == 0) {
                     dumpzero(size, (*dim) - 1);
                 }
 
@@ -385,16 +385,16 @@ int getstsize(SYMBOL* ptr, char real)
 #endif
 
     switch (ptr->type) {
-    case STRUCT:
+    case KIND_STRUCT:
 
         return (tag->size);
-    case DOUBLE:
+    case KIND_DOUBLE:
         return (6);
-    case LONG:
+    case KIND_LONG:
         return (4);
-    case CPTR:
+    case KIND_CPTR:
         return (3);
-    case CINT:
+    case KIND_INT:
         return (2);
     default:
         return (1);

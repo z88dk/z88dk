@@ -33,7 +33,7 @@ int primary(LVALUE* lval)
         } else if ( strcmp(sname, "__builtin_offsetof") == 0 ) {
             offset_of(lval);
             return(0);
-        } else if ((ptr = findloc(sname)) && ptr->ident != GOTOLABEL) {
+        } else if ((ptr = findloc(sname))) {
             lval->offset = getloc(ptr, 0);
             lval->symbol = ptr;
             lval->val_type = lval->indirect = ptr->type;
@@ -41,17 +41,17 @@ int primary(LVALUE* lval)
             lval->ident = ptr->ident;
             lval->storage = ptr->storage;
             lval->ptr_type = 0;
-            if (ptr->type == STRUCT)
+            if (ptr->type == KIND_STRUCT)
                 lval->tagsym = tagtab + ptr->tag_idx;
             if (ptr->ident == POINTER) {
                 lval->ptr_type = ptr->type;
                 /* djm long pointers */
-                lval->indirect = lval->val_type = (ptr->flags & FARPTR ? CPTR : CINT);
+                lval->indirect = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
             }
-            if (ptr->ident == ARRAY || (ptr->ident == VARIABLE && ptr->type == STRUCT)) {
+            if (ptr->ident == KIND_ARRAY || (ptr->ident == VARIABLE && ptr->type == KIND_STRUCT)) {
                 /* djm pointer? */
                 lval->ptr_type = ptr->type;
-                lval->val_type = (ptr->flags & FARPTR ? CPTR : CINT);
+                lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else
                 return (1);
@@ -62,9 +62,9 @@ int primary(LVALUE* lval)
             ptr = findglb(sname);
         if (ptr) {
             if (ptr->ident != FUNCTION && ptr->ident != FUNCTIONP) {
-                if (ptr->ident == ENUM)
+                if (ptr->ident == ID_ENUM)
                     error(E_UNSYMB, sname);
-                if (ptr->type == ENUM) {
+                if (ptr->type == KIND_ENUM) {
                     lval->symbol = NULL;
                     lval->indirect = 0;
                     lval->is_const = 1;
@@ -80,12 +80,12 @@ int primary(LVALUE* lval)
                 lval->ident = ptr->ident;
                 lval->ptr_type = 0;
                 lval->storage = ptr->storage;
-                if (ptr->type == STRUCT)
+                if (ptr->type == KIND_STRUCT)
                     lval->tagsym = tagtab + ptr->tag_idx;
-                if (ptr->ident != ARRAY && (ptr->ident != VARIABLE || ptr->type != STRUCT)) {
+                if (ptr->ident != KIND_ARRAY && (ptr->ident != VARIABLE || ptr->type != KIND_STRUCT)) {
                     if (ptr->ident == POINTER) {
                         lval->ptr_type = ptr->type;
-                        lval->val_type = (ptr->flags & FARPTR ? CPTR : CINT);
+                        lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                     }
                     return (1);
                 }
@@ -93,7 +93,7 @@ int primary(LVALUE* lval)
                 address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect = lval->ptr_type = ptr->type;
-                lval->val_type = (ptr->flags & FARPTR ? CPTR : CINT);
+                lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else {
                 lval->ident = FUNCTION;
@@ -111,10 +111,10 @@ int primary(LVALUE* lval)
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
             warning(W_IMPLICIT_DEFINITION, sname);
-            ptr = addglb(sname, FUNCTION, CINT, 0, STATIK, 0, 0);
+            ptr = addglb(sname, FUNCTION, KIND_INT, 0, STATIK, 0, 0);
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
-            ptr->args[0] = CalcArgValue(CINT, FUNCTION, 0);
+            ptr->args[0] = CalcArgValue(KIND_INT, FUNCTION, 0);
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
@@ -218,7 +218,7 @@ double CalcStand(
 /* Complains if an operand isn't int */
 int intcheck(LVALUE* lval, LVALUE* lval2)
 {
-    if (lval->val_type == DOUBLE || lval2->val_type == DOUBLE) {
+    if (lval->val_type == KIND_DOUBLE || lval2->val_type == KIND_DOUBLE) {
         error(E_INTOPER);
         return -1;
     }
@@ -229,16 +229,16 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 /* Must take account of sign in here somewhere, also there is a problem    possibly with longs.. */
 void force(int t1, int t2, char sign1, char sign2, int lconst)
 {
-    if (t2 == CARRY) {
+    if (t2 == KIND_CARRY) {
         zcarryconv();
     }
 
-    if (t1 == DOUBLE) {
-        if (t2 != DOUBLE) {
+    if (t1 == KIND_DOUBLE) {
+        if (t2 != KIND_DOUBLE) {
             convert_int_to_double(t2, sign2);
         }
     } else {
-        if (t2 == DOUBLE) {
+        if (t2 == KIND_DOUBLE) {
             convdoub2int();
             return;
         }
@@ -246,9 +246,9 @@ void force(int t1, int t2, char sign1, char sign2, int lconst)
     /* t2 =source, t1=dest */
     /* int to long, if signed, do sign, if not ld de,0 */
     /* Check to see if constant or not... */
-    if (t1 == LONG) {
-        if (t2 != LONG && (!lconst)) {
-            if (sign2 == NO && sign1 == NO && t2 != CARRY)
+    if (t1 == KIND_LONG) {
+        if (t2 != KIND_LONG && (!lconst)) {
+            if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY)
                 convSint2long();
             else
                 convUint2long();
@@ -257,18 +257,18 @@ void force(int t1, int t2, char sign1, char sign2, int lconst)
     }
 
     /* Converting between pointer types..far and near */
-    if (t1 == CPTR && t2 == CINT)
+    if (t1 == KIND_CPTR && t2 == KIND_INT)
         convUint2long();
-    else if (t2 == CPTR && t1 == CINT)
+    else if (t2 == KIND_CPTR && t1 == KIND_INT)
         warning(W_FARNR);
 
     /* Char conversion */
-    if (t1 == CCHAR && sign2 == NO && !lconst) {
+    if (t1 == KIND_CHAR && sign2 == NO && !lconst) {
         if (sign1 == NO)
             convSint2char();
         else
             convUint2char();
-    } else if (t1 == CCHAR && sign2 == YES && !lconst) {
+    } else if (t1 == KIND_CHAR && sign2 == YES && !lconst) {
         if (sign1 == NO)
             convSint2char();
         else
@@ -277,28 +277,28 @@ void force(int t1, int t2, char sign1, char sign2, int lconst)
 }
 
 /*
- * If only one operand is DOUBLE, converts the other one to
- * DOUBLE.  Returns 1 if result will be DOUBLE
+ * If only one operand is KIND_DOUBLE, converts the other one to
+ * KIND_DOUBLE.  Returns 1 if result will be KIND_DOUBLE
  *
- * Maybe should an operand in here for LONG?
+ * Maybe should an operand in here for KIND_LONG?
  */
 int widen(LVALUE* lval, LVALUE* lval2)
 {
-    if (lval2->val_type == DOUBLE) {
-        if (lval->val_type != DOUBLE) {
+    if (lval2->val_type == KIND_DOUBLE) {
+        if (lval->val_type != KIND_DOUBLE) {
             dpush_under(lval->val_type); /* push 2nd operand UNDER 1st */
             mainpop();
-            if (lval->val_type == LONG)
+            if (lval->val_type == KIND_LONG)
                 zpop();
             convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
             DoubSwap();
-            lval->val_type = DOUBLE; /* type of result */
+            lval->val_type = KIND_DOUBLE; /* type of result */
         }
         return (1);
     } else {
-        if (lval->val_type == DOUBLE) {
+        if (lval->val_type == KIND_DOUBLE) {
             convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
-            lval2->val_type = DOUBLE;
+            lval2->val_type = KIND_DOUBLE;
             return (1);
         } else
             return (0);
@@ -307,26 +307,26 @@ int widen(LVALUE* lval, LVALUE* lval2)
 
 void widenlong(LVALUE* lval, LVALUE* lval2)
 {
-    if (lval2->val_type == CARRY) {
+    if (lval2->val_type == KIND_CARRY) {
         zcarryconv();
-        lval2->val_type = CINT;
+        lval2->val_type = KIND_INT;
     }
 
-    if (lval2->val_type == LONG) {
+    if (lval2->val_type == KIND_LONG) {
         /* Second operator is long */
-        if (lval->val_type != LONG) {
+        if (lval->val_type != KIND_LONG) {
             doexx(); /* Preserve other operator */
             mainpop();
-            force(LONG, lval->val_type, lval->flags & UNSIGNED, lval->flags & UNSIGNED, 0);
+            force(KIND_LONG, lval->val_type, lval->flags & UNSIGNED, lval->flags & UNSIGNED, 0);
             lpush(); /* Put the new expansion on stk*/
             doexx(); /* Get it back again */
-            lval->val_type = LONG;
+            lval->val_type = KIND_LONG;
         }
         return;
     }
 
-    if (lval->val_type == LONG) {
-        if (lval2->val_type != LONG && lval2->val_type != CPTR) {
+    if (lval->val_type == KIND_LONG) {
+        if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
            /*
             * FIXED!! 23/4/99 djm, if any of them is unsigned then we extend out
             * to an unsigned long.
@@ -341,7 +341,7 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
                 convUint2long();
             else
                 convSint2long();
-            lval->val_type = LONG;
+            lval->val_type = KIND_LONG;
         }
     }
     if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED)) {
@@ -357,7 +357,7 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
 int dbltest(LVALUE* lval, LVALUE* lval2)
 {
     if (lval->ptr_type) {
-        if (lval->ptr_type == CCHAR)
+        if (lval->ptr_type == KIND_CHAR)
             return (0);
         if (lval2->ptr_type)
             return (0);
@@ -373,10 +373,10 @@ void result(LVALUE* lval, LVALUE* lval2)
 {
     if (lval->ptr_type && lval2->ptr_type) {
         lval->ptr_type = 0; /* ptr-ptr => int */
-        if (lval->val_type == CPTR)
-            lval->val_type = LONG;
+        if (lval->val_type == KIND_CPTR)
+            lval->val_type = KIND_LONG;
         else
-            lval->val_type = CINT;
+            lval->val_type = KIND_INT;
         lval->indirect = 0;
         lval->ident = VARIABLE;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
@@ -408,17 +408,17 @@ void prestep(
         rvalue(lval);
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
-        case DOUBLE:
+        case KIND_DOUBLE:
             zadd_const(lval, (n * 6));
             break;
-        case STRUCT:
+        case KIND_STRUCT:
             zadd_const(lval, n * lval->tagsym->size);
             break;
-        case LONG:
+        case KIND_LONG:
             (*step)(lval);
-        case CPTR:
+        case KIND_CPTR:
             (*step)(lval);
-        case CINT:
+        case KIND_INT:
             (*step)(lval);
         default:
             (*step)(lval);
@@ -450,26 +450,26 @@ void poststep(
         }
         rvalue(lval);
         switch (lval->ptr_type) {
-        case DOUBLE:
+        case KIND_DOUBLE:
             nstep(lval, n * 6, unstep);
             break;
-        case STRUCT:
+        case KIND_STRUCT:
             nstep(lval, n * lval->tagsym->size, unstep);
             break;
-        case LONG:
+        case KIND_LONG:
             nstep(lval, n * 4, unstep);
             break;
-        case CPTR:
+        case KIND_CPTR:
             nstep(lval, n * 3, unstep);
             break;
-        case CINT:
+        case KIND_INT:
             (*step)(lval);
         default:
             (*step)(lval);
             store(lval);
             if (unstep)
                 (*unstep)(lval);
-            if (lval->ptr_type == CINT)
+            if (lval->ptr_type == KIND_INT)
                 if (unstep)
                     (*unstep)(lval);
             break;
@@ -501,7 +501,7 @@ void store(LVALUE* lval)
     }
     if ( lval->symbol ) 
         lval->symbol->isassigned = YES;
-    if (lval->symbol && (lval->symbol->type == PORT8 || lval->symbol->type == PORT16) ) {
+    if (lval->symbol && (lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_out(lval->symbol);
     } else if (lval->indirect == 0)
         putmem(lval->symbol);
@@ -516,7 +516,7 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
-    if (lval->indirect != CINT || lval->symbol == 0 || lval->symbol->storage != STKLOC) {
+    if (lval->indirect != KIND_INT || lval->symbol == 0 || lval->symbol->storage != STKLOC) {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
             lpush();
@@ -547,7 +547,7 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->indirect != CINT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
+    if (lval->indirect != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
     } else {
         switch (lval->symbol->offset.i - Zsp) {
@@ -581,7 +581,7 @@ void rvaluest(LVALUE* lval)
     if (lval->symbol && strncmp(lval->symbol->name, "0dptr", 5) == 0)
         lval->symbol = lval->symbol->offset.p;
 
-    if (lval->symbol && (lval->symbol->type == PORT8  || lval->symbol->type == PORT16) ) {
+    if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
     } else if (lval->symbol && lval->indirect == 0) {
        
@@ -597,7 +597,7 @@ void rvalue(LVALUE* lval)
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
         warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
     }
-    if (lval->symbol && (lval->symbol->type == PORT8  || lval->symbol->type == PORT16) ) {
+    if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
     } else if (lval->symbol && lval->indirect == 0) { 
         getmem(lval->symbol);
@@ -668,7 +668,7 @@ void test(int label, int parens)
     } else {
         if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
             if (lval.binop == dummy)
-                lval.val_type = CINT; /* logical always int */
+                lval.val_type = KIND_INT; /* logical always int */
             testjump(&lval, label);
         } else {
             jumpnc(label);
@@ -694,7 +694,7 @@ int constexpr(double *val, int *type, int flag)
     valtype = expression(&con, &valtemp, &packedType);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
-    if ( valtype == DOUBLE && con ) {
+    if ( valtype == KIND_DOUBLE && con ) {
         decrement_double_ref_direct(valtemp);
     }
     *type = valtype;
@@ -713,19 +713,19 @@ void cscale(
     int* val)
 {
     switch (type) {
-    case CINT:
+    case KIND_INT:
         *val *= 2;
         break;
-    case CPTR:
+    case KIND_CPTR:
         *val *= 3;
         break;
-    case LONG:
+    case KIND_LONG:
         *val *= 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         *val *= 6;
         break;
-    case STRUCT:
+    case KIND_STRUCT:
         *val *= tag->size;
         break;
     }
@@ -761,11 +761,11 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
 
     if (lval->c_id == POINTER || lval->c_id == PTR_TO_FN) {
         switch (lval->c_vtype) {
-        case STRUCT:
+        case KIND_STRUCT:
             /* Casting a structure - has to be a pointer... */
             dest_lval->tagsym = lval->c_tag; /* Copy tag symbol over */
-            dest_lval->ptr_type = STRUCT;
-            temp_type = ((lval->c_flags & FARPTR) ? CPTR : CINT);
+            dest_lval->ptr_type = KIND_STRUCT;
+            temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
             if ( dest_lval->const_val == 0 ) {
                 force(temp_type, dest_lval->val_type, 0, 0, 0);
             }
@@ -782,7 +782,7 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
             dest_lval->indirect = dest_lval->ptr_type = lval->c_vtype;
             // Set the destination symbol type
             dest_lval->symbol = dummy_sym[(int)lval->c_vtype];
-            temp_type = ((lval->c_flags & FARPTR) ? CPTR : CINT);
+            temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
             if ( dest_lval->const_val == 0 ) {
                 force(temp_type, dest_lval->val_type, 0, 0, 0);
             }
@@ -800,7 +800,7 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
  * the local symbol table so that they do what we want them to do!
  */
     sprintf(nam, "0dptr%p", locptr);
-    temp_type = ((lval->c_flags & FARPTR) ? CPTR : CINT);
+    temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
     itag = 0;
     if (lval->c_tag)
         itag = lval->c_tag - tagtab;
@@ -849,7 +849,7 @@ int check_lastop_was_testjump(LVALUE* lval)
 
 /*
  * Check whether previous operation was comparison (used for testjump!)
- * At the same time set the result to be of type CINT
+ * At the same time set the result to be of type KIND_INT
  */
 
 int check_lastop_was_comparison(LVALUE* lval)
@@ -858,7 +858,7 @@ int check_lastop_was_comparison(LVALUE* lval)
     fn = lval->binop;
 
     if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt || fn == zle) {
-        lval->val_type = CINT;
+        lval->val_type = KIND_INT;
         return (0);
     }
     return (1);
@@ -867,7 +867,7 @@ int check_lastop_was_comparison(LVALUE* lval)
 /* Generate Code to Turn integer type of signed to double, Generic now does longs */
 void convert_int_to_double(char type, char zunsign)
 {
-    if (type == CINT || type == CCHAR) {
+    if (type == KIND_INT || type == KIND_CHAR) {
         if (zunsign)
             convUint2long();
         else

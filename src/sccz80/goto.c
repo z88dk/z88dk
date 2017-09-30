@@ -64,12 +64,10 @@ int dolabel()
                 /* Label already goto'd, find some others with
                                  * same stack
                                  */
-                ptr->type = GOTOLABEL;
                 debug(DBG_GOTO, "Starting chase %s\n", sname);
                 ChaseGoto(ptr);
             } else {
                 ptr = addgotosym(sname);
-                ptr->type = GOTOLABEL;
             }
             debug(DBG_GOTO, "Adding label not called %s\n", sname);
             ptr->offset.i = Zsp; /* Save stack for label */
@@ -122,7 +120,7 @@ void dogoto()
 SYMBOL* addgotosym(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "goto_");
+    strcpy(sname2, "99goto_");
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
@@ -132,7 +130,7 @@ SYMBOL* addgotosym(char* sname)
 SYMBOL* findgoto(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "goto_");
+    strcpy(sname2, "99goto_");
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
@@ -209,11 +207,8 @@ void goto_cleanup(void)
         if (gptr->sym) {
             debug(DBG_GOTO, "Cleaning %s #%d\n", gptr->sym->name, i);
             postlabel(gptr->label);
-            if (gptr->sym->type == GOTOLABEL) {
-                modstk((gptr->sym->offset.i) - (gptr->sp), NO, NO);
-                jump(gptr->sym->size); /* label label(!) */
-            } else
-                error(E_UNGOTO, gptr->sym->name, gptr->lineno);
+            modstk((gptr->sym->offset.i) - (gptr->sp), NO, NO);
+            jump(gptr->sym->size); /* label label(!) */
         }
         gptr++;
     }

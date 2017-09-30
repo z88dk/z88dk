@@ -40,13 +40,14 @@ SYMBOL* findenum(char* sname)
     SYMBOL *ptr = findglb(sname);
 
     if ( ptr != NULL ) {
-        if ( ptr->ident == ENUM ) {
+        if ( ptr->ident == ID_ENUM ) {
             return ptr;
         }
         error(E_ENUMDEF);
     }
     return NULL;
 }
+
 
 SYMBOL* findglb(char* sname)
 {

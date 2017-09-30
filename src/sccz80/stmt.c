@@ -54,12 +54,12 @@ int statement()
         /* Now get the identity, STATIK is for struct definitions */
         otag = GetVarID(&var, STATIK);
 
-        if (var.type == STRUCT) {
-            declloc(STRUCT, otag, locstatic, &var);
+        if (var.type == KIND_STRUCT) {
+            declloc(KIND_STRUCT, otag, locstatic, &var);
             return (lastst);
         } else if (var.type || regit) {
             if (regit && var.type == NO)
-                var.type = CINT;
+                var.type = KIND_INT;
             declloc(var.type, NULL, locstatic, &var);
             return (lastst);
         }
@@ -391,7 +391,7 @@ void doswitch()
     WHILE_TAB wq;
     int endlab, swact, swdef;
     SW_TAB *swnex, *swptr;
-    char swtype; /* type of switch statement - CINT/LONG */
+    char swtype; /* type of switch statement - KIND_INT/LONG */
     t_buffer* buf;
 
     swact = swactive;
@@ -413,7 +413,7 @@ void doswitch()
     suspendbuffer();
 
     postlabel(endlab);
-    if (swtype == CCHAR) {
+    if (swtype == KIND_CHAR) {
         LoadAccum();
         while (swptr < swnext) {
             CpCharVal(swptr->value);
@@ -425,7 +425,7 @@ void doswitch()
         while (swptr < swnext) {
             defword();
             printlabel(swptr->label); /* case label */
-            if (swtype == LONG) {
+            if (swtype == KIND_LONG) {
                 outbyte('\n');
                 deflong();
             } else
@@ -467,7 +467,7 @@ void docase()
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
-    if ( valtype == DOUBLE ) 
+    if ( valtype == KIND_DOUBLE ) 
         warning(W_DOUBLE_UNEXPECTED);
     swnext->value = value;
     needchar(':');
@@ -494,8 +494,8 @@ void doreturn(char type)
     if (endst() == 0) {
         if (currfn->more) {
             /* return pointer to value */
-            force(CINT, doexpr(), YES, c_default_unsigned, 0);
-            leave(CINT, type, incritical);
+            force(KIND_INT, doexpr(), YES, c_default_unsigned, 0);
+            leave(KIND_INT, type, incritical);
         } else {
             /* return actual value */
             force(currfn->type, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
@@ -522,9 +522,9 @@ void leave(int vartype, char type, int incritical)
         return;
     }
 
-    if (vartype == CPTR) /* they are the same in any case! */
-        vartype = LONG;
-    else if ( vartype == DOUBLE ) {
+    if (vartype == KIND_CPTR) /* they are the same in any case! */
+        vartype = KIND_LONG;
+    else if ( vartype == KIND_DOUBLE ) {
         vartype = NO;
         save = NO;
     }
@@ -544,7 +544,7 @@ void leave(int vartype, char type, int incritical)
         if ( vartype  ) {
             save = NO;
             if ( c_notaltreg ) {
-                if ( vartype == LONG )
+                if ( vartype == KIND_LONG )
                     savede();
                 if ( hlsaved == NO ) savehl();
             } else {
@@ -559,7 +559,7 @@ void leave(int vartype, char type, int incritical)
         Zsp = savesp;
         if ( vartype ) {
             if ( c_notaltreg ) {
-                if ( vartype == LONG )
+                if ( vartype == KIND_LONG )
                     restorede();
                 restorehl();
             } else {

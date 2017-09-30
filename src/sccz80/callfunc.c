@@ -80,7 +80,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             constargval[argnumber] = val;
         }
         clearstage(before, start);  // Wipe out everything we did
-        if ( vconst && expr == DOUBLE ) {
+        if ( vconst && expr == KIND_DOUBLE ) {
             decrement_double_ref_direct(val);
         }
         fprintf(tmpfiles[argnumber],";\n");
@@ -165,9 +165,9 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 
             /* ordinary call */
             expr = expression(&vconst, &val, &packedArgumentType);
-            if (expr == CARRY) {
+            if (expr == KIND_CARRY) {
                 zcarryconv();
-                expr = CINT;
+                expr = KIND_INT;
                 packedArgumentType &= 0xFFFFFF00;
                 packedArgumentType |= expr;
             }
@@ -181,7 +181,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 }
 
                 protoarg = ptr->args[proto_argnumber];
-                if ((protoarg != PELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == STRUCT)))
+                if ((protoarg != PKIND_ELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == KIND_STRUCT)))
                     expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
 
 #if 0
@@ -203,13 +203,13 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                         debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
                     minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
                 }
-                if (expr == DOUBLE) {
+                if (expr == KIND_DOUBLE) {
                     dpush();
                     nargs += 6;
                 }
                 /* Longs and (ahem) long pointers! */
-                else if (expr == LONG || expr == CPTR) {
-                    if (!(fnflags & FARPTR) && expr != LONG)
+                else if (expr == KIND_LONG || expr == KIND_CPTR) {
+                    if (!(fnflags & FARPTR) && expr != KIND_LONG)
                         const2(0);
                     lpush();
 
@@ -224,17 +224,17 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
 
             zpush(); /* Push address */
             expr = expression(&vconst, &val, &packedType);
-            if (expr == CARRY) {
+            if (expr == KIND_CARRY) {
                 zcarryconv();
-                expr = CINT;
+                expr = KIND_INT;
             }
-            if (expr == LONG || expr == CPTR) {
+            if (expr == KIND_LONG || expr == KIND_CPTR) {
                 swap(); /* MSW -> hl */
                 swapstk(); /* MSW -> stack, addr -> hl */
                 zpushde(); /* LSW -> stack, addr = hl */
                 nargs += 4;
-            } else if (expr == DOUBLE) {
-                dpush_under(CINT);
+            } else if (expr == KIND_DOUBLE) {
+                dpush_under(KIND_INT);
                 nargs += 6;
                 mainpop();
             } else {
@@ -256,15 +256,15 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         debug(DBG_ARG2, "arg %d %d proto %d", argnumber, ptr->prototyped, ptr->args[1]);
 
     if (ptr && (ptr->prototyped != 0) && builtin_flags == 0 ) {
-        if ((ptr->prototyped > argnumber) && (ptr->args[1] != PVOID) && (ptr->args[1] != PELLIPSES)) {
+        if ((ptr->prototyped > argnumber) && (ptr->args[1] != PKIND_VOID) && (ptr->args[1] != PKIND_ELLIPSES)) {
             warning(W_2FAFUNC);
-        } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PELLIPSES)) {
+        } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PKIND_ELLIPSES)) {
             warning(W_2MAFUNC);
         }
     }
     if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
-        if ((ptr->prototyped) && ptr->args[1] == PELLIPSES) {
+        if ((ptr->prototyped) && ptr->args[1] == PKIND_ELLIPSES) {
             if ( (ptr->flags & SMALLC) == SMALLC ) {
                 loadargc(nargs);
             }
@@ -327,7 +327,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, ptr ? (ptr->type != DOUBLE) : YES, preserve); /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, ptr ? (ptr->type != KIND_DOUBLE) : YES, preserve); /* clean up arguments - we know what type is MOOK */
     }
 }
 
@@ -396,16 +396,16 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
             /* Converting pointer to integer/long */
             warning(W_PTRINT);
             /* Pointer is always unsigned */
-            force(dtype, ((sflags & FARPTR) ? CPTR : CINT), dflags & UNSIGNED, 0, 0);
+            force(dtype, ((sflags & FARPTR) ? KIND_CPTR : KIND_INT), dflags & UNSIGNED, 0, 0);
         }
-        if (dtype == CCHAR)
-            expr = CINT;
+        if (dtype == KIND_CHAR)
+            expr = KIND_INT;
         else
             expr = dtype;
 
     } else {
         /* Dealing with pointers.. a type mismatch!*/
-        if (((dtype != stype) && (dtype != VOID) && (stype != VOID) && (stype != CPTR)) || ((dtype == stype) && (margtag != functab))) {
+        if (((dtype != stype) && (dtype != KIND_VOID) && (stype != KIND_VOID) && (stype != KIND_CPTR)) || ((dtype == stype) && (margtag != functab))) {
             debug(DBG_ARG3, "dtype=%d stype=%d margtab=%d functag=%d", dtype, stype, margtag, functab);
             warning(W_PRELIM, currfn->name, lineno - fnstart);
             warning(W_PTRTYP);
@@ -415,21 +415,21 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
             warning(W_PTRTYP2, buffer);
         } else if (dtype == stype && dident != sident && sident != FUNCTION) {
             warning(W_INTPTR);
-            expr = CINT;
+            expr = KIND_INT;
         }
 
         if (dflags & FARPTR) {
             if ((dflags & FARPTR) != (sflags & FARPTR)) {
                 /* Widening a pointer - next line unneeded - done elsewhere*/
                 /*                                const2(0); */
-                expr = CPTR;
+                expr = KIND_CPTR;
             }
         } else {
             /* destintation is near pointer */
             if ((dflags & FARPTR) != (sflags & FARPTR)) {
                 warning(W_PRELIM, currfn->name, lineno - fnstart);
                 warning(W_FARNR);
-                expr = CINT;
+                expr = KIND_INT;
             }
         }
     }

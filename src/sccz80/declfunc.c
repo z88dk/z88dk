@@ -44,7 +44,7 @@ void StoreFunctionSignature(SYMBOL* ptr)
         currfn->args[j] = CalcArgValue(ptr2->type, ptr2->ident, ptr2->flags);
         currfn->tagarg[j] = 0;
         /* Set the tag if necessary */
-        if (ptr2->type == STRUCT) {
+        if (ptr2->type == KIND_STRUCT) {
             currfn->tagarg[j] = ptr2->tag_idx;
         }
         j--;
@@ -107,7 +107,7 @@ int AddNewFunc(
     if (ident == POINTER) {
         /* function returning pointer needs dummy symbol */
         more = dummy_idx(type, otag);
-        /*                type = (zfar ? CPTR : CINT ); */
+        /*                type = (zfar ? KIND_CPTR : KIND_INT ); */
         ident = FUNCTIONP; /* func returning ptr */
     } else
         ident = FUNCTION;
@@ -154,7 +154,7 @@ void newfunc()
         return;
     }
     warning(W_RETINT);
-    AddFuncCode(n, CINT, FUNCTION, c_default_unsigned, 0, STATIK, 0, 1, NO, 0, &addr);
+    AddFuncCode(n, KIND_INT, FUNCTION, c_default_unsigned, 0, STATIK, 0, 1, NO, 0, &addr);
 }
 
 /*
@@ -217,13 +217,13 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
     else {
         typ = type;
         if (ident == FUNCTIONP)
-            typ = (zfar ? CPTR : CINT);
+            typ = (zfar ? KIND_CPTR : KIND_INT);
 
         currfn = addglb(n, FUNCTION, typ, FUNCTION, storage, more, 0);
         currfn->size = 0;
         currfn->prototyped = 0;
         currfn->flags = (sign ? UNSIGNED : 0) | (zfar ? FARPTR : 0);
-        if (type == STRUCT)
+        if (type == KIND_STRUCT)
             currfn->tagarg[0] = itag;
         /*
          *      Set our function prototype - what we are!
@@ -232,7 +232,7 @@ SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char z
         currfn->args[0] = CalcArgValue(type, ident, currfn->flags);
     }
     tvalue = CalcArgValue(type, ident, (sign ? UNSIGNED : 0) | (zfar ? FARPTR :0));    
-    if (currfn->args[0] != tvalue || (type == STRUCT && currfn->tagarg[0] != itag)) {
+    if (currfn->args[0] != tvalue || (type == KIND_STRUCT && currfn->tagarg[0] != itag)) {
         char buffer[120];
         warning(W_DIFFTYPE);
         warning(W_DIFFTYPE2, ExpandArgValue(currfn->args[0], buffer, currfn->tagarg[0]));
@@ -284,7 +284,7 @@ int DoFnKR(
         /* any legal name bumps arg count */
         if (symname(n)) {
             /* add link to argument chain */
-            if ((cptr = addloc(n, NO_IDENT, CINT, 0, 0)))
+            if ((cptr = addloc(n, NO_IDENT, KIND_INT, 0, 0)))
                 cptr->offset.p = prevarg;
             prevarg = cptr;
             ++undeclared;
@@ -323,11 +323,11 @@ int DoFnKR(
 
         otag = GetVarID(&var, STATIK);
 
-        if (var.type == STRUCT) {
-            getarg(STRUCT, var.ident, otag, NO, 0, 0, var.zfar, NO);
+        if (var.type == KIND_STRUCT) {
+            getarg(KIND_STRUCT, var.ident, otag, NO, 0, 0, var.zfar, NO);
         } else if (var.type || regit) {
             if (regit && var.type == NO)
-                var.type = CINT;
+                var.type = KIND_INT;
             getarg(var.type, var.ident, NULL, NO, 0, var.sign, var.zfar, NO);
         } else {
             error(E_BADARG);
@@ -347,11 +347,11 @@ static int setup_function_parameter(SYMBOL *argument, int argnumber)
 
     lgh = 2; /* Default length */
     /* This is strange, previously double check for ->type */
-    if (argument->type == VOID && argument->ident != POINTER)
+    if (argument->type == KIND_VOID && argument->ident != POINTER)
         lgh = 0;
-    if (argument->type == LONG && argument->ident != POINTER)
+    if (argument->type == KIND_LONG && argument->ident != POINTER)
         lgh = 4;
-    if (argument->type == DOUBLE && argument->ident != POINTER)
+    if (argument->type == KIND_DOUBLE && argument->ident != POINTER)
         lgh = 6;
     /* Far pointers */
     if ((argument->flags & FARPTR) == FARPTR && argument->ident == POINTER)
@@ -364,7 +364,7 @@ static int setup_function_parameter(SYMBOL *argument, int argnumber)
     if (argnumber) {
         uint32_t tester = CalcArgValue(argument->type, argument->ident, argument->flags);
         if (currfn->args[argnumber] != tester) {
-            if (currfn->args[argnumber] != PELLIPSES) {
+            if (currfn->args[argnumber] != PKIND_ELLIPSES) {
                 if (currfn->args[argnumber] == 0) {
                     warning(W_2MADECL);
                 } else {
@@ -608,15 +608,15 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
             if (proto == 1)
                 warning(W_ELLIP);
             needchar(')');
-            argptr = addloc("ellp", NO_IDENT, ELLIPSES, 0, 0);
+            argptr = addloc("ellp", NO_IDENT, KIND_ELLIPSES, 0, 0);
             argptr->offset.p = prevarg;
             prevarg = argptr;
             break;
         }
         otag = GetVarID(&var, STATIK);
 
-        if (var.type == STRUCT) {
-            prevarg = getarg(STRUCT, var.ident, otag, YES, prevarg, 0, var.zfar, proto);
+        if (var.type == KIND_STRUCT) {
+            prevarg = getarg(KIND_STRUCT, var.ident, otag, YES, prevarg, 0, var.zfar, proto);
         } else if (var.type) {
             prevarg = getarg(var.type, var.ident, NULL, YES, prevarg, var.sign, var.zfar, proto);
 
@@ -640,7 +640,7 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
         double val;
         int    valtype;
         constexpr(&val,&valtype, 1);
-        if ( valtype == DOUBLE ) 
+        if ( valtype == KIND_DOUBLE ) 
             warning(W_DOUBLE_UNEXPECTED);
         *addr = val;
     }
@@ -677,9 +677,9 @@ int CheckANSI()
  *      local symbol table for each named argument
  */
 SYMBOL *getarg(
-    int typ, /* typ = CCHAR, CINT, DOUBLE or STRUCT */
+    int typ, /* typ = KIND_CHAR, KIND_INT, KIND_DOUBLE or KIND_STRUCT */
     enum ident_type ident_type,
-    TAG_SYMBOL* otag, /* structure tag for STRUCT type objects */
+    TAG_SYMBOL* otag, /* structure tag for KIND_STRUCT type objects */
     int deftype, /* YES=ANSI -> addloc NO=K&R -> findloc */
     SYMBOL* prevarg, /* ptr to previous argument, only of use to ANSI */
     char issigned, /* YES=unsigned NO=signed */
@@ -715,7 +715,7 @@ SYMBOL *getarg(
             needchar(')');
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
-            typ = (zfar ? CPTR : CINT);
+            typ = (zfar ? KIND_CPTR : KIND_INT);
             ptrtofn = YES;
         } else if (ident == PTR_TO_FN) {
             needchar(')');
@@ -736,9 +736,9 @@ SYMBOL *getarg(
             ident = (ident == POINTER) ? PTR_TO_PTR : POINTER;
         }
         if (legalname) {
-            /* For ANSI we need to add symbol name to local table - this CINT is temporary */
+            /* For ANSI we need to add symbol name to local table - this KIND_INT is temporary */
             if (deftype) {
-                argptr = addloc(n, NO_IDENT, CINT, 0, 0);
+                argptr = addloc(n, NO_IDENT, KIND_INT, 0, 0);
                 argptr->offset.p = prevarg;
             }
             /*
@@ -763,7 +763,7 @@ SYMBOL *getarg(
             if (otag) {
                 argptr->tag_idx = otag - tagtab;
                 argptr->ident = POINTER;
-                argptr->type = STRUCT;
+                argptr->type = KIND_STRUCT;
             }
             if ( ptrtofn && argptr ) {
                 argptr->flags |= FLOATINGDECL;

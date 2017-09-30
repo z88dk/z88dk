@@ -10,8 +10,10 @@
  #include "lib/uthash.h"
 
 
-#define MALLOC(x)   mymalloc(x)
-#define CALLOC(x,y) mymalloc(x * y)
+
+#define MALLOC(x)   malloc(x)
+#define CALLOC(x,y) calloc(x,y)
+#define REALLOC(x,y) realloc(x,y)
 #define FREENULL(x) do { if  (x != NULL ) { free(x); x = NULL; } } while (0)
 
 /*      Stand-alone definitions                 */
@@ -34,6 +36,7 @@
  #define NAMESIZE 127
 #endif
 
+
 #define MAXARGS 20
 
 /*      Define the symbol table parameters      */
@@ -50,20 +53,94 @@
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
-enum ident_type {
-    NO_IDENT = 0,
-    VARIABLE = 1,
-    ARRAY,
-    POINTER,
-    FUNCTION,
-    MACRO,
-    FUNCTIONP,
-    GOTOLABEL,
-    /* Only used is processing, not in symbol table */
-    PTR_TO_FN,
-    PTR_TO_PTR,
-    PTR_TO_FNP
+
+
+typedef enum {
+    KIND_VOID,
+    KIND_BOOL,
+    KIND_CHAR,
+    KIND_SHORT,
+    KIND_INT,
+    KIND_LONG,
+    KIND_FLOAT,
+    KIND_DOUBLE,
+    KIND_KIND_ARRAY,
+    KIND_PTR,
+    KIND_CPTR,
+    KIND_STRUCT, // 10
+    KIND_FUNC,
+    KIND_ELLIPSES,
+    KIND_PORT8,
+    KIND_PORT16,
+    KIND_ENUM,
+    KIND_CARRY
+} Kind;
+
+
+typedef struct {
+    size_t    size;
+    void    **elems;
+    void    (*destructor)(void *);
+} array;
+
+typedef struct type_s Type;
+
+typedef enum {
+    STORAGE_TYPEDEF = 1,
+    STORAGE_EXTERN,
+    STORAGE_STATIC,
+    STORAGE_ENUM,
+    STORAGE_CONSTANT,
+    STORAGE_AUTO,
+    STORAGE_REGISTER
+} storage_type2;
+
+
+struct type_s {
+    Kind      kind;
+    int       size;
+    char      isunsigned;
+    char      isconst;
+    char      isfar;  // Valid for pointers/array
+    char      name[NAMESIZE]; 
+    
+    Type     *ptr;   // For array, or pointer
+    int       len;   // Length of the array
+    
+    int32_t   value; // For enum, goto position
+    
+    // Structures
+    Type   *tag;     // Reference to the structure type
+    array    *fields; // Fields within the structure (SYMBOL)
+    size_t    offset;  // Offset to the member
+    char      weak;
+    
+    // Function
+    Type    *return_type;
+    array    *parameters; // (SYMBOL)
+    uint32_t  flags;        // Fast call etc
+    char      hasva;
+    char      oldstyle;
+    UT_hash_handle hh;
 };
+
+
+enum ident_type {
+        NO_IDENT = 0,
+        VARIABLE = 1,
+        KIND_ARRAY,
+        POINTER,
+        FUNCTION,
+        MACRO,
+        FUNCTIONP,
+        GOTOLABEL,
+        ID_ENUM,
+        /* Only used is processing, not in symbol table */
+        PTR_TO_FN,
+        PTR_TO_PTR,
+        PTR_TO_FNP
+    };
+
 
 enum storage_type {
     UNKNOWN = 0,
@@ -109,7 +186,8 @@ typedef struct symbol_s SYMBOL;
 struct symbol_s {
         char name[NAMESIZE] ;
         enum ident_type ident;
-        char type ;          /* DOUBLE, CINT, CCHAR, STRUCT */
+        Kind type;
+        Type *ctype;                     /* Type of this symbol */
         enum storage_type storage ;       /* STATIK, STKLOC, EXTERNAL */
         union xx  {          /* offset has a number of interpretations: */
                 int i ;      /* local symbol:  offset into stack */
@@ -137,27 +215,12 @@ struct symbol_s {
 };
 
 
-/*      Define possible entries for "type"      */
-
-
-#define DOUBLE  1
-#define CINT    2
-#define CCHAR   3
-#define LONG    4       /* was 5 */
-#define CPTR    5       /* was 6  - 3 byte pointer */
-#define STRUCT  6       /* was 4 */
-#define VOID    7       /* This does actually do sommat now */
-#define ELLIPSES 8      /* Used for ANSI defs */
-#define ENUM    9       /* ONly used in symbol table */
-#define CARRY   10      /* Carry stuff */
-#define PORT8   11
-#define PORT16  12
 
 /*
  *      Value of ellipses in prototypes
  */
 
-#define PELLIPSES 255
+#define PKIND_ELLIPSES 255
 
 /*
  *      Mask of sign in prototype
@@ -169,7 +232,7 @@ struct symbol_s {
  *      What void comes out to in a prototype
  */
 
-#define PVOID 0x107
+#define PKIND_VOID 0x107
 
 /* number of types to which pointers to pointers can be defined */
 /* 15 is more than enough! we need some dummy symbols so casting of **

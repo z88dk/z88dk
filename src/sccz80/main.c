@@ -366,18 +366,18 @@ void setup_sym()
     /* dummy symbols for pointers to char, int, double */
     /* note that the symbol names are not valid C variables */
     dummy_sym[0] = 0;
-    dummy_sym[CCHAR] = addglb("0ch", POINTER, CCHAR, 0, STATIK, 0, 0);
-    dummy_sym[CCHAR]->isassigned = YES;
-    dummy_sym[CINT] = addglb("0int", POINTER, CINT, 0, STATIK, 0, 0);
-    dummy_sym[CINT]->isassigned = YES;
-    dummy_sym[DOUBLE] = addglb("0dbl", POINTER, DOUBLE, 0, STATIK, 0, 0);
-    dummy_sym[DOUBLE]->isassigned = YES;
-    dummy_sym[LONG] = addglb("0lng", POINTER, LONG, 0, STATIK, 0, 0);
-    dummy_sym[LONG]->isassigned = YES;
-    dummy_sym[CPTR] = addglb("0cpt", POINTER, CPTR, 0, STATIK, 0, 0);
-    dummy_sym[CPTR]->isassigned = YES;
-    dummy_sym[VOID] = addglb("0vd", POINTER, VOID, 0, STATIK, 0, 0);
-    dummy_sym[VOID]->isassigned = YES;
+    dummy_sym[KIND_CHAR] = addglb("0ch", POINTER, KIND_CHAR, 0, STATIK, 0, 0);
+    dummy_sym[KIND_CHAR]->isassigned = YES;
+    dummy_sym[KIND_INT] = addglb("0int", POINTER, KIND_INT, 0, STATIK, 0, 0);
+    dummy_sym[KIND_INT]->isassigned = YES;
+    dummy_sym[KIND_DOUBLE] = addglb("0dbl", POINTER, KIND_DOUBLE, 0, STATIK, 0, 0);
+    dummy_sym[KIND_DOUBLE]->isassigned = YES;
+    dummy_sym[KIND_LONG] = addglb("0lng", POINTER, KIND_LONG, 0, STATIK, 0, 0);
+    dummy_sym[KIND_LONG]->isassigned = YES;
+    dummy_sym[KIND_CPTR] = addglb("0cpt", POINTER, KIND_CPTR, 0, STATIK, 0, 0);
+    dummy_sym[KIND_CPTR]->isassigned = YES;
+    dummy_sym[KIND_VOID] = addglb("0vd", POINTER, KIND_VOID, 0, STATIK, 0, 0);
+    dummy_sym[KIND_VOID]->isassigned = YES;
 }
 
 void info()
@@ -417,7 +417,7 @@ static void dumpfns()
                 ident = FUNCTION;
             type = ptr->type;
             storage = ptr->storage;
-            if (type == PORT8 || type == PORT16 ) {
+            if (type == KIND_PORT8 || type == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
             } else if (ident == FUNCTION && ptr->size != 0) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
@@ -454,7 +454,7 @@ static void dumpfns()
                         ot("=\t");
                         outdec(ptr->size);
                         nl();
-                    } else if (ident != ENUM && type != ENUM && ident != MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
+                    } else if (ident != ID_ENUM && type != KIND_ENUM && ident != MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
                         if (storage == EXTERNAL)
                             GlobalPrefix(XREF);
                         else
@@ -571,9 +571,9 @@ void dumpvars()
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;
-            if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && 
+            if (ident != ID_ENUM && type != KIND_ENUM && ident != MACRO && ident != FUNCTION && 
                 storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
-                type != PORT8 && type != PORT16) {
+                type != KIND_PORT8 && type != KIND_PORT16) {
                 prefix();
                 outname(ptr->name, 1);
                 col();

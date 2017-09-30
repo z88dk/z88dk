@@ -25,7 +25,8 @@ OBJS =	callfunc.o     	\
 	primary.o	\
 	stmt.o		\
 	sym.o		\
-	while.o
+	while.o 	\
+	declparse.o
 
 all: sccz80$(EXESUFFIX)
 

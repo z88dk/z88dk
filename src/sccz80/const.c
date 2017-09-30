@@ -47,17 +47,17 @@ static elem_t    *double_queue = NULL;
 int constant(LVALUE* lval)
 {
     int32_t val;
-    lval->val_type = CINT;
+    lval->val_type = KIND_INT;
     lval->flags &= ~UNSIGNED;
     lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
         load_double_into_fa(lval);
-        lval->val_type = DOUBLE;
+        lval->val_type = KIND_DOUBLE;
         lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(lval) || pstr(lval)) {
-        if (lval->val_type == LONG)
+        if (lval->val_type == KIND_LONG)
             vlongconst(lval->const_val);
         else
             vconst(lval->const_val);
@@ -65,8 +65,8 @@ int constant(LVALUE* lval)
     } else if (tstr(&val)) {
         lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
-        lval->ptr_type = CCHAR; /* djm 9/3/99 */
-        lval->val_type = CINT;
+        lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
+        lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;
         immedlit(litlab);
         outdec(lval->const_val);
@@ -184,14 +184,14 @@ int number(LVALUE *lval)
         k = (-k);
     lval->const_val = k;
 typecheck:
-    lval->val_type = CINT;
+    lval->val_type = KIND_INT;
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
-        lval->val_type = LONG;
+        lval->val_type = KIND_LONG;
     }
     
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
         if (cmatch('L'))
-            lval->val_type = LONG;
+            lval->val_type = KIND_LONG;
         if (cmatch('U')) {
             lval->flags |= UNSIGNED;
             lval->const_val = (uint32_t)k;
@@ -199,7 +199,7 @@ typecheck:
         if (cmatch('S'))
             lval->flags &= ~UNSIGNED;
         if (cmatch('f'))
-            lval->val_type = DOUBLE;
+            lval->val_type = KIND_DOUBLE;
     }
     return (1);
 }
@@ -232,7 +232,7 @@ int pstr(LVALUE *lval)
 {
     int k;
 
-    lval->val_type = CINT;
+    lval->val_type = KIND_INT;
     lval->flags &= ~UNSIGNED;
     lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     if (cmatch('\'')) {
@@ -439,7 +439,7 @@ void offset_of(LVALUE *lval)
                 SYMBOL *ptr;
                 
                 if (((ptr = findloc(struct_name)) != NULL) || ((ptr = findstc(struct_name)) != NULL) || ((ptr = findglb(struct_name)) != NULL)) {
-                    if ( ptr->type == STRUCT ) {
+                    if ( ptr->type == KIND_STRUCT ) {
                         tag = tagtab + ptr->tag_idx;
                     } else {
                         printf("%d\n",ptr->type);
@@ -462,7 +462,7 @@ void offset_of(LVALUE *lval)
     needchar(')');
     if ( foundit ) {
         lval->is_const = 1;
-        lval->val_type = CINT;
+        lval->val_type = KIND_INT;
         lval->ident = VARIABLE;
         vconst(lval->const_val);
     } else {
@@ -531,11 +531,11 @@ void size_of(LVALUE* lval)
             TAG_SYMBOL *ptrotag = NULL;
 
             if (ptr->ident != FUNCTION && ptr->ident != MACRO) {
-                if (ptr->type != STRUCT) {
+                if (ptr->type != KIND_STRUCT) {
                     if ( ptr->ident == POINTER && deref ) {
                         ptrtype = ptr->type;
                         ptrflags = ptr->flags;
-                        if ( ptr->type == STRUCT ) 
+                        if ( ptr->type == KIND_STRUCT ) 
                             ptrotag = tagtab + ptr->tag_idx;
                     } else {
                         lval->const_val = ptr->size;
@@ -551,7 +551,7 @@ void size_of(LVALUE* lval)
                             if ( ptr->ident == POINTER && deref ) {
                                 ptrtype = ptr->type;
                                 ptrflags = ptr->flags;
-                                if  (ptr->type == STRUCT) {
+                                if  (ptr->type == KIND_STRUCT) {
                                     ptrotag = tagtab + ptr->tag_idx;
                                 }
                             } else {
@@ -561,10 +561,10 @@ void size_of(LVALUE* lval)
                         } else {
                             lval->const_val = ptr->size;
                         }
-                    } while ( ptr->type == STRUCT && (rmatch2("->") || rcmatch('.')));
+                    } while ( ptr->type == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
-                if (ptr->ident == ARRAY ) {
+                if (ptr->ident == KIND_ARRAY ) {
                     if (rcmatch('[')) {
                         double val;
                         int valtype;
@@ -605,7 +605,7 @@ void size_of(LVALUE* lval)
     }
     needchar(')');
     lval->is_const = 1;
-    lval->val_type = CINT;
+    lval->val_type = KIND_INT;
     lval->ident = VARIABLE;
     vconst(lval->const_val);
 }
