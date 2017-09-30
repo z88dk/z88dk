@@ -67,7 +67,7 @@ int initials(char* sname,
 
         if (cmatch('{')) {
             /* aggregate initialiser */
-            if ((ident == POINTER || ident == VARIABLE) && type == KIND_STRUCT) {
+            if ((ident == POINTER || ident == ID_VARIABLE) && type == KIND_STRUCT) {
                 /* aggregate is structure or pointer to structure */
                 dim = 0;
                 olddim = 1;
@@ -85,7 +85,7 @@ int initials(char* sname,
         }
 
         /* dump literal queue and fill tail of array with zeros */
-        if ((ident == KIND_ARRAY && more == KIND_CHAR) || type == KIND_STRUCT) {
+        if ((ident == ID_ARRAY && more == KIND_CHAR) || type == KIND_STRUCT) {
             if (type == KIND_STRUCT) {
                 dumpzero(tag->size, dim);
                 desize = dim < 0 ? abs(dim + 1) * tag->size : olddim * tag->size;
@@ -110,7 +110,7 @@ int initials(char* sname,
     } else {
         char *dosign, *typ;
         dosign = "";
-        if (ident == KIND_ARRAY && (dim == 0)) {
+        if (ident == ID_ARRAY && (dim == 0)) {
             typ = ExpandType(more, &dosign, (tag - tagtab));
             warning(W_NULLARRAY, dosign, typ);
         }
@@ -143,11 +143,11 @@ int str_init(TAG_SYMBOL* tag)
                 needchar('{');
                 while (dim) {
                     if (ptr->type == KIND_STRUCT) {
-                        if (ptr->ident == KIND_ARRAY)
+                        if (ptr->ident == ID_ARRAY)
                             /* array of struct */
                             needchar('{');
                         str_init(tag);
-                        if (ptr->ident == KIND_ARRAY) {
+                        if (ptr->ident == ID_ARRAY) {
                             --dim;
                             needchar('}');
                         }
@@ -202,7 +202,7 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
 {
     int done = 0;
     while (*dim) {
-        if (ident == KIND_ARRAY && type == KIND_STRUCT) {
+        if (ident == ID_ARRAY && type == KIND_STRUCT) {
             /* array of struct */
             if  ( done == 0 ) {
                 needchar('{');
@@ -213,7 +213,7 @@ void agg_init(int size, int type, enum ident_type ident, int* dim, int more, TAG
             --*dim;
             needchar('}');
         } else {
-            init(size, ident, dim, more, (ident == KIND_ARRAY && more == KIND_CHAR), 0, zfar);
+            init(size, ident, dim, more, (ident == ID_ARRAY && more == KIND_CHAR), 0, zfar);
         }
         done++;
         if (cmatch(',') == 0)
@@ -238,7 +238,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
-        if (ident == KIND_ARRAY && more == 0) {
+        if (ident == ID_ARRAY && more == 0) {
             /* Dump the literals where they are, padding out as appropriate */
             if (*dim != -1 && sz > *dim) {
                 /* Ooops, initialised to long a string! */
@@ -272,7 +272,7 @@ void init(int size, enum ident_type ident, int* dim, int more, int dump, int is_
         if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
                 /* Actually found sommat..very good! */
-                if (ident == POINTER || (ident == KIND_ARRAY && more)) {
+                if (ident == POINTER || (ident == ID_ARRAY && more)) {
                     defword();
                     outname(ptr->name, dopref(ptr));
                     nl();
@@ -340,7 +340,7 @@ constdecl:
                 }
                 nl();
                 /* Dump out a train of zeros as appropriate */
-                if (ident == KIND_ARRAY && more == 0) {
+                if (ident == ID_ARRAY && more == 0) {
                     dumpzero(size, (*dim) - 1);
                 }
 

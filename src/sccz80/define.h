@@ -64,7 +64,7 @@ typedef enum {
     KIND_LONG,
     KIND_FLOAT,
     KIND_DOUBLE,
-    KIND_KIND_ARRAY,
+    KIND_ARRAY,
     KIND_PTR,
     KIND_CPTR,
     KIND_STRUCT, // 10
@@ -127,13 +127,13 @@ struct type_s {
 
 enum ident_type {
         NO_IDENT = 0,
-        VARIABLE = 1,
-        KIND_ARRAY,
+        ID_VARIABLE = 1,
+        ID_ARRAY,
         POINTER,
         FUNCTION,
         MACRO,
         FUNCTIONP,
-        GOTOLABEL,
+        ID_GOTOLABEL,
         ID_ENUM,
         /* Only used is processing, not in symbol table */
         PTR_TO_FN,

@@ -389,8 +389,8 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
 
 
 
-    if (dident == VARIABLE) {
-        if (sident == VARIABLE) {
+    if (dident == ID_VARIABLE) {
+        if (sident == ID_VARIABLE) {
             force(dtype, stype, dflags & UNSIGNED, sflags & UNSIGNED, 0);
         } else {
             /* Converting pointer to integer/long */

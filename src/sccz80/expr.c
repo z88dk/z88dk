@@ -470,7 +470,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
         lval->flags = flags;
         lval->symbol = NULL; /* forget symbol table entry */
         lval->ptr_type = 0; /* flag as not symbol or array */
-        lval->ident = VARIABLE; /* We're now a variable! */
+        lval->ident = ID_VARIABLE; /* We're now a variable! */
     } else {
         /* array of/pointer to pointer */
         lval->symbol = dummy_sym[(int)lval->symbol->more];
@@ -643,14 +643,14 @@ int heirb(LVALUE* lval)
                     return 0;
                 } else if (k && ptr->ident == POINTER)
                     rvalue(lval);
-                else if (ptr->ident != POINTER && ptr->ident != KIND_ARRAY) {
+                else if (ptr->ident != POINTER && ptr->ident != ID_ARRAY) {
                     error(E_SUBSCRIPT);
                     k = 0;
                 }
                 setstage(&before, &start);
                 if (lval->flags & FARPTR)
                     zpushde();
-                lval->ident = VARIABLE;
+                lval->ident = ID_VARIABLE;
                 zpush();
                 valtype = expression(&con, &dval, &packedType);
                 // TODO: Check valtype
@@ -664,7 +664,7 @@ int heirb(LVALUE* lval)
                         cscale(lval->val_type, tagtab + ptr->tag_idx, &val);
                     else
                         cscale(ptr->type, tagtab + ptr->tag_idx, &val);
-                    if (ptr->storage == STKLOC && ptr->ident == KIND_ARRAY) {
+                    if (ptr->storage == STKLOC && ptr->ident == ID_ARRAY) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
@@ -714,7 +714,7 @@ int heirb(LVALUE* lval)
                     /* function returning variable */
                     lval->ptr_type = 0;
                     lval->val_type = ptr->type;
-                    lval->ident = VARIABLE;
+                    lval->ident = ID_VARIABLE;
                     ptr = lval->symbol = NULL;
                 } else {
                     /* function returning pointer */
@@ -767,7 +767,7 @@ int heirb(LVALUE* lval)
                 lval->symbol = ptr;
                 lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
-                lval->ident = VARIABLE;
+                lval->ident = ID_VARIABLE;
                 lval->stage_add = NULL;
                 lval->tagsym = NULL;
                 lval->binop = NULL;
@@ -785,7 +785,7 @@ int heirb(LVALUE* lval)
                         lval->val_type = KIND_INT;
                     }
                 }
-                if (ptr->ident == KIND_ARRAY || (ptr->type == KIND_STRUCT && ptr->ident == VARIABLE)) {
+                if (ptr->ident == ID_ARRAY || (ptr->type == KIND_STRUCT && ptr->ident == ID_VARIABLE)) {
                     /* array or struct */
                     lval->ptr_type = ptr->type;
                     lval->ident = POINTER;

@@ -60,7 +60,7 @@ int dolabel()
     savelptr = lptr;
     if (symname(sname)) {
         if (gch() == ':') {
-            if ((ptr = findgoto(sname)) && ptr->ident == GOTOLABEL) {
+            if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
                 /* Label already goto'd, find some others with
                                  * same stack
                                  */
@@ -96,9 +96,9 @@ void dogoto()
     if (symname(sname) == 0)
         illname(sname);
     debug(DBG_GOTO, "goto is -->%s<--\n", sname);
-    if ((ptr = findgoto(sname)) && ptr->ident == GOTOLABEL) {
+    if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
         /* Label found, but is it actually defined? */
-        if (ptr->type == GOTOLABEL) {
+        if (ptr->type == ID_GOTOLABEL) {
             label = ptr->size;
             stkmod = ptr->offset.i;
         } else {
@@ -124,7 +124,7 @@ SYMBOL* addgotosym(char* sname)
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
-    return (addglb(sname2, GOTOLABEL, 0, 0, 0, 0, 0));
+    return (addglb(sname2, ID_GOTOLABEL, 0, 0, 0, 0, 0));
 }
 
 SYMBOL* findgoto(char* sname)

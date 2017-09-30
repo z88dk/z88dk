@@ -463,7 +463,7 @@ void offset_of(LVALUE *lval)
     if ( foundit ) {
         lval->is_const = 1;
         lval->val_type = KIND_INT;
-        lval->ident = VARIABLE;
+        lval->ident = ID_VARIABLE;
         vconst(lval->const_val);
     } else {
         error(E_OFFSETOF, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
@@ -496,7 +496,7 @@ void size_of(LVALUE* lval)
             if (match("**") || cmatch('*'))
                 ident = POINTER;
             else
-                ident = VARIABLE;
+                ident = ID_VARIABLE;
         }
 
         if ( deref && ident !=  POINTER  ) {
@@ -508,7 +508,7 @@ void size_of(LVALUE* lval)
             lval->const_val = 2;
             return;
         }
-        if (otag && ident == VARIABLE)
+        if (otag && ident == ID_VARIABLE)
             lval->const_val = otag->size;
         if (ident == POINTER) {
             lval->const_val = (var.zfar ? 3 : 2);
@@ -564,7 +564,7 @@ void size_of(LVALUE* lval)
                     } while ( ptr->type == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
-                if (ptr->ident == KIND_ARRAY ) {
+                if (ptr->ident == ID_ARRAY ) {
                     if (rcmatch('[')) {
                         double val;
                         int valtype;
@@ -572,7 +572,7 @@ void size_of(LVALUE* lval)
                         constexpr(&val, &valtype,  1);
                         needchar(']');
                         deref++;
-                        lval->const_val = get_type_size(ptr->type, VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
+                        lval->const_val = get_type_size(ptr->type, ID_VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
                     }
                     if ( deref ) {
                         if ( deref == 1 ) {
@@ -587,7 +587,7 @@ void size_of(LVALUE* lval)
                 }
                 if ( deref > 0 ) {
                     if ( ptrtype != -1 ) {
-                        lval->const_val = get_type_size(ptrtype, VARIABLE, ptrflags, ptrotag);
+                        lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
                     } else {
                         uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
                         char       got[256];
@@ -606,7 +606,7 @@ void size_of(LVALUE* lval)
     needchar(')');
     lval->is_const = 1;
     lval->val_type = KIND_INT;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     vconst(lval->const_val);
 }
 

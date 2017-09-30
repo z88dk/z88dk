@@ -48,7 +48,7 @@ int primary(LVALUE* lval)
                 /* djm long pointers */
                 lval->indirect = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
             }
-            if (ptr->ident == KIND_ARRAY || (ptr->ident == VARIABLE && ptr->type == KIND_STRUCT)) {
+            if (ptr->ident == ID_ARRAY || (ptr->ident == ID_VARIABLE && ptr->type == KIND_STRUCT)) {
                 /* djm pointer? */
                 lval->ptr_type = ptr->type;
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
@@ -70,7 +70,7 @@ int primary(LVALUE* lval)
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
                     lval->flags = FLAGS_NONE;
-                    lval->ident = VARIABLE;
+                    lval->ident = ID_VARIABLE;
                     return (0);
                 }
                 lval->symbol = ptr;
@@ -82,7 +82,7 @@ int primary(LVALUE* lval)
                 lval->storage = ptr->storage;
                 if (ptr->type == KIND_STRUCT)
                     lval->tagsym = tagtab + ptr->tag_idx;
-                if (ptr->ident != KIND_ARRAY && (ptr->ident != VARIABLE || ptr->type != KIND_STRUCT)) {
+                if (ptr->ident != ID_ARRAY && (ptr->ident != ID_VARIABLE || ptr->type != KIND_STRUCT)) {
                     if (ptr->ident == POINTER) {
                         lval->ptr_type = ptr->type;
                         lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
@@ -127,7 +127,7 @@ int primary(LVALUE* lval)
     if (constant(lval)) {
         lval->symbol = NULL;
         lval->indirect = 0;
-        lval->ident = VARIABLE;
+        lval->ident = ID_VARIABLE;
         return (0);
     } else {
         error(E_EXPRESSION);
@@ -378,7 +378,7 @@ void result(LVALUE* lval, LVALUE* lval2)
         else
             lval->val_type = KIND_INT;
         lval->indirect = 0;
-        lval->ident = VARIABLE;
+        lval->ident = ID_VARIABLE;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
         lval->symbol = lval2->symbol;
         lval->indirect = lval2->indirect;
@@ -576,7 +576,7 @@ void smartstore(LVALUE* lval)
 void rvaluest(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
+        warning(W_UNINITIALISED_ID_VARIABLE, lval->symbol->name);
     }
     if (lval->symbol && strncmp(lval->symbol->name, "0dptr", 5) == 0)
         lval->symbol = lval->symbol->offset.p;
@@ -595,7 +595,7 @@ void rvaluest(LVALUE* lval)
 void rvalue(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
+        warning(W_UNINITIALISED_ID_VARIABLE, lval->symbol->name);
     }
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
@@ -744,14 +744,14 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     char nam[20];
 
 
-    if (lval->c_id == VARIABLE) {
+    if (lval->c_id == ID_VARIABLE) {
         /* Straight forward variable conversion now.. */
         if ( dest_lval->is_const == 0 ) {
             force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
         }
         dest_lval->val_type = lval->c_vtype;
         dest_lval->ptr_type = 0;
-        dest_lval->ident = VARIABLE;
+        dest_lval->ident = ID_VARIABLE;
         dest_lval->flags = ((dest_lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
         dest_lval->c_id = 0;
         dest_lval->c_vtype = 0;

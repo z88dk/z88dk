@@ -131,7 +131,7 @@ Type *make_constant(const char *name, int32_t value)
     strcpy(type->name, name);
     type->value = value;
 
-    ptr = addglb(type->name, VARIABLE, KIND_ENUM, 0, STATIK, 0, 0);
+    ptr = addglb(type->name, ID_VARIABLE, KIND_ENUM, 0, STATIK, 0, 0);
     ptr->ctype = type;
     ptr->size = value;
 
@@ -164,7 +164,7 @@ Type *make_pointer(Type *base_type)
 Type *make_array(Type *base_type,int32_t len)
 {
     Type *type = CALLOC(1,sizeof(*type));
-    type->kind = KIND_KIND_ARRAY;
+    type->kind = KIND_ARRAY;
     type->ptr = base_type;
     type->len = len;
     if ( len != - 1 ) {
@@ -450,7 +450,7 @@ Type *parse_decl_func(Type *base_type)
         printf("Can't define a function returning a function");
         return NULL;
     }
-    if ( base_type->kind == KIND_KIND_ARRAY ) {
+    if ( base_type->kind == KIND_ARRAY ) {
         printf("Can't define a function returning an array");
         return NULL;
     }

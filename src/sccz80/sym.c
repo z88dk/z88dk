@@ -120,11 +120,11 @@ SYMBOL* addglb(
          * Useful for those programs which extern everything in header files
          * 
          */
-        if ((ptr->storage == EXTERNAL && storage != EXTERNAL) && ptr->type == typ && ptr->ident == id && ptr->more == more && itag == ptr->tag_idx) {
+        if ((ptr->storage == EXTERNAL && storage != EXTERNAL) ) {
             ptr->storage = storage;
             return (ptr);
         }
-        if ((ptr->storage == EXTERNAL && storage == EXTERNAL) && ptr->type == typ && ptr->ident == id && ptr->more == more && itag == ptr->tag_idx) {
+        if ((ptr->storage == EXTERNAL && storage == EXTERNAL) ) {
             return (ptr);
         }
 

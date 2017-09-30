@@ -411,7 +411,7 @@ static void dumpfns()
         return;
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != GOTOLABEL ) {
+        if (ptr->name[0] != '0' && ptr->ident != ID_GOTOLABEL ) {
             ident = ptr->ident;
             if (ident == FUNCTIONP)
                 ident = FUNCTION;
@@ -567,7 +567,7 @@ void dumpvars()
     output_section(c_bss_section); // output_section("bss");
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != GOTOLABEL) {
+        if (ptr->name[0] != '0' && ptr->ident != ID_GOTOLABEL) {
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;

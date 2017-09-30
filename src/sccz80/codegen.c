@@ -2400,7 +2400,7 @@ void zeq(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
     lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
@@ -2437,7 +2437,7 @@ void zne(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
     lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
@@ -2474,7 +2474,7 @@ void zlt(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
     lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
@@ -2519,7 +2519,7 @@ void zle(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
     lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
@@ -2574,7 +2574,7 @@ void zgt(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
     lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
@@ -2626,7 +2626,7 @@ void zge(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
     lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->ident = ID_VARIABLE;
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
