@@ -278,7 +278,11 @@ tokens:
   - name	: PUBLIC
   - name	: SECTION
   - name	: UNDEFINE
-  
+  - name	: XDEF
+  - name	: XLIB
+  - name	: XREF
+  - name	: LIB
+
   # DEFGROUP storage specifiers
   - name	: DS_B
     regexp	: "\"DS.B\"i"

@@ -398,12 +398,18 @@ z80asm(
 		extern 				;; error: syntax error
 		public 				;; error: syntax error
 		global 				;; error: syntax error
+		xdef 				;; error: syntax error
+		xref 				;; error: syntax error
+		xlib 				;; error: syntax error
+		lib 				;; error: syntax error
 END
 );
 
 z80asm(
 	asm		=> <<'END',
-		public	p1,p2,p3,p4
+		public	p1,p2
+		xdef p3
+		xlib p4
 		global  g1, g2
 		defc g1 = 16, g3 = 48
 		global g3, g4
@@ -416,7 +422,9 @@ z80asm(
 
 END
 	asm1	=> <<'END',
-		extern 	p1,p2,p3,p4
+		extern 	p1,p2
+		xref p3
+		lib p4
 		global  g1, g2
 		defc g2 = 32, g4 = 64
 		global g3, g4

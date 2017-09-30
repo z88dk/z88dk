@@ -237,7 +237,27 @@ void asm_EXTERN(char *name)
 	declare_extern_symbol(name);
 }
 
+void asm_XREF(char *name)
+{
+	declare_extern_symbol(name);
+}
+
+void asm_LIB(char *name)
+{
+	declare_extern_symbol(name);
+}
+
 void asm_PUBLIC(char *name)
+{
+	declare_public_symbol(name);
+}
+
+void asm_XDEF(char *name)
+{
+	declare_public_symbol(name);
+}
+
+void asm_XLIB(char *name)
 {
 	declare_public_symbol(name);
 }

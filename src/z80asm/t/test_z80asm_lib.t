@@ -30,41 +30,64 @@ END
 
 # setup sandbox
 path('testdir')->remove_tree;
-path('testdir/root/bin')->mkpath;
 path('testdir/root/lib/config')->mkpath;
 
-# run from current dir
-run("./z80asm -b -v test.asm", 0, 
-	exp_output("z80", 0, "z80asm-z80-.lib"), "");
+# run with lib in current directory
+run("./z80asm -b -v test.asm", 0, <<'END', "");
+Reading library 'z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = $0001
+Assembling 'test.asm' to 'test.o'
+Reading 'test.asm'
+Module 'test' size: 4 bytes
+
+Linking library module 'rld'
+Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
+END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
-# run from bin with lib in the current directory
-copy('z80asm'.$Config{_exe}, 'testdir/root/bin/z80asm'.$Config{_exe});
-run("testdir/root/bin/z80asm -b -v test.asm", 0, 
-	exp_output("z80", 0, "z80asm-z80-.lib"), "");
-t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
-# run from bin with lib in bin
-move('z80asm-z80-.lib', 'testdir/root/bin/z80asm-z80-.lib');
-run("testdir/root/bin/z80asm -b -v test.asm", 0, 
-	exp_output("z80", 0, "testdir/root/bin//z80asm-z80-.lib"), "");
-t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
-
-# run from bin with lib ../lib
-move('testdir/root/bin/z80asm-z80-.lib', 'testdir/root/lib/z80asm-z80-.lib');
-run("testdir/root/bin/z80asm -b -v test.asm", 0, 
-	exp_output("z80", 0, "testdir/root/bin//../lib/z80asm-z80-.lib"), "");
-t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
-
-# run from here with lib pointed bt ZCCCFG
+# run with lib pointed bt ZCCCFG
 $ENV{ZCCCFG} = 'testdir/root/lib/config';
-run("./z80asm -b -v test.asm", 0, 
-	exp_output("z80", 0, "testdir/root/lib/config/../z80asm-z80-.lib"), "");
+move('z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z80asm-z80-.lib');
+run("./z80asm -b -v test.asm", 0, <<'END', "");
+Library 'z80asm-z80-.lib' not found
+Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
+Reading library 'testdir/root/lib/config/../z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = $0001
+Assembling 'test.asm' to 'test.o'
+Reading 'test.asm'
+Module 'test' size: 4 bytes
+
+Linking library module 'rld'
+Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
+END
+t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
+delete $ENV{ZCCCFG};
+
+# point library with -L
+run("./z80asm -b -v -Ltestdir/root/lib test.asm", 0, <<'END', "");
+Library 'z80asm-z80-.lib' not found
+Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
+Reading library 'testdir/root/lib/z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = $0001
+Assembling 'test.asm' to 'test.o'
+Reading 'test.asm'
+Module 'test' size: 4 bytes
+
+Linking library module 'rld'
+Code size: 38 bytes ($0000 to $0025)
+Section 'code_crt0_sccz80' size: 34 bytes ($0004 to $0025)
+END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
-# run from here without library
-delete $ENV{ZCCCFG};
+
+# run without library
 run("./z80asm -b -v test.asm", 1, <<'OUT', <<'ERR');
+Library 'z80asm-z80-.lib' not found
+Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
+Library '/../z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
@@ -76,8 +99,10 @@ Error at file 'test.asm' line 2: symbol '__z80asm__rld' not defined
 1 errors occurred during assembly
 ERR
 
+
 # restore z80asm-z80-.lib
 move('testdir/root/lib/z80asm-z80-.lib', 'z80asm-z80-.lib');
+
 
 # test loading of each different library for different CPUs
 run("./z80asm -b -v                      test.asm", 0, exp_output("z80",	0, "z80asm-z80-.lib"), "");
@@ -109,6 +134,10 @@ sub run {
 	is $stdout, ($out // ""), "stdout";
 	is $stderr, ($err // ""), "stderr";
 	ok !!$return == !!($ret // 0), "exit value";
+
+	if (!Test::More->builder->is_passing) {
+		print "\n",$stdout,"\n";
+	}
 }
 
 sub exp_output {
@@ -116,7 +145,6 @@ sub exp_output {
 	$cpu = uc($cpu);
 	$swap_ixiy = $swap_ixiy ? "\nPredefined constant: __SWAP_IX_IY__ = \$0001" : "";
 
-	
 	return <<END;
 Reading library '$library'
 Predefined constant: __CPU_${cpu}__ = \$0001$swap_ixiy

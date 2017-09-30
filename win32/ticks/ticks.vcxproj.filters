@@ -45,6 +45,9 @@
     <ClCompile Include="..\..\src\ticks\utf8.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ticks\disassembler_alg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ticks\ticks.h">

@@ -8,6 +8,7 @@ struct zx_common
     char          *crtfile;
     char          *outfile;
     int            origin;
+    char          *banked_space;
     char          *excluded_banks;
     char          *excluded_sections;
     char           clean;

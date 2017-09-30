@@ -172,7 +172,7 @@ ELSE
         ENDIF
 ENDIF
 
-IF DEFINED_CLIB_OPT_PRINTF2
+IF DEFINED_CLIB_OPT_PRINTF_2
 	; User has specified the configuration level - force printf to be included
 	UNDEFINE NEED_printf
 	DEFINE NEED_printf
@@ -266,7 +266,7 @@ IF CLIB_OPT_PRINTF & $10000000
 	defb	'g'
 	defw	__printf_handle_f
 ENDIF
-IF CLIB_OPT_PRINTF2
+IF CLIB_OPT_PRINTF_2
 	defb	'l'
 	defw	__printf_handle_ll
 ENDIF
@@ -274,30 +274,30 @@ ENDIF
 
 __printf_format_table64:
 
-IF CLIB_OPT_PRINTF2 & $02
+IF CLIB_OPT_PRINTF_2 & $02
 	defb	'u'
 	defw	__printf_handle_llu
 ENDIF
 
-IF CLIB_OPT_PRINTF2 & $01
+IF CLIB_OPT_PRINTF_2 & $01
 	defb	'd'
 	defw	__printf_handle_lld
 ENDIF
 
-IF CLIB_OPT_PRINTF2 & $04
+IF CLIB_OPT_PRINTF_2 & $04
 	defb	'x'
 	defw	__printf_handle_llx
 ENDIF
 
-IF CLIB_OPT_PRINTF2 & $08
+IF CLIB_OPT_PRINTF_2 & $08
 	defb	'X'
 	defw	__printf_handle_llX
 ENDIF
-IF CLIB_OPT_PRINTF2  & $10
+IF CLIB_OPT_PRINTF_2  & $10
 	defb	'o'
 	defw	__printf_handle_llo
 ENDIF
-IF CLIB_OPT_PRINTF & $100
+IF CLIB_OPT_PRINTF_2 & $100
 	defb	'B'
 	defw	__printf_handle_llB
 ENDIF

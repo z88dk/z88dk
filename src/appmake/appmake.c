@@ -1104,7 +1104,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
                         // add new section information
 
                         struct section_bin *sb = &mb->secbin[mb->num - 1];
-
+////// modify org here
                         sb->filename = must_strdup(bfilename);
                         sb->section_name = must_strdup(section_name);
                         sb->org = symbol_value;
@@ -1160,6 +1160,11 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
                 fprintf(stderr, "Warning: Unable to parse line from map file\n\t%s\n", buffer);
         }
     }
+
+    // Remove the UNASSIGNED section
+
+    if (mb_remove_section(memory, "UNASSIGNED"))
+        printf("Warning: Non-empty UNASSIGNED section ignored -\n  this indicates that some code/data is not part of the memory map\n");
 }
 
 int mb_find_bankspace(struct banked_memory *memory, char *bankspace_name)
@@ -1221,7 +1226,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 
             for (i = 0; i < mb->num; ++i)
             {
-                if (clean) remove(mb->secbin[i].filename);
+                // if (clean) remove(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }

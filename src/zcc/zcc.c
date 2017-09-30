@@ -530,6 +530,7 @@ pragma_m4_t important_pragmas[] = {
     { 0, "CRT_ITERM_EDIT_BUFFER_SIZE", "M4__CRT_ITERM_EDIT_BUFFER_SIZE" },
     { 0, "CRT_OTERM_FZX_DRAW_MODE", "M4__CRT_OTERM_FZX_DRAW_MODE" },
     { 0, "CRT_APPEND_MMAP", "M4__CRT_APPEND_MMAP" },
+    { 0, "__MMAP", "M4__MMAP" },
 };
 
 
@@ -1433,11 +1434,26 @@ int main(int argc, char **argv)
 	}
 
 	/* Set the default name as necessary */
+
 	if (outputfile == NULL)
 		outputfile = c_linker_output_file ? c_linker_output_file : defaultout;
 
-	if (linkthem(c_linker))
-		exit(1);
+    strcpy(filenamebuf, outputfile);
+
+    if ((ptr = find_file_ext(filenamebuf)) != NULL)
+        *ptr = 0;
+
+    /* Link */
+
+    if (linkthem(c_linker))
+    {
+        if (build_bin && lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis"))
+            fprintf(stderr, "Cannot copy crt0 list file\n");
+
+        exit(1);
+    }
+
+    /* Build binary */
 
 	if (build_bin) {
 
@@ -1453,12 +1469,7 @@ int main(int argc, char **argv)
 		}
 
 		{
-			char *oldptr;
 			int status = 0;
-
-			strcpy(filenamebuf, outputfile);
-			if ((oldptr = find_file_ext(filenamebuf)) != NULL )
-				*oldptr = 0;
 
 			if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
 				fprintf(stderr, "Cannot copy map file\n");

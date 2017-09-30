@@ -243,8 +243,8 @@ extern size_t __LIB__ strnlen_callee(const char *s,size_t max_len) __smallc __z8
 #define strnlen(a,b) strnlen_callee(a,b)
 
 
-extern char __LIB__ strpbrk(const char *s,const char *set) __smallc;
-extern char __LIB__ strpbrk_callee(const char *s,const char *set) __smallc __z88dk_callee;
+extern char __LIB__ *strpbrk(const char *s,const char *set) __smallc;
+extern char __LIB__ *strpbrk_callee(const char *s,const char *set) __smallc __z88dk_callee;
 #define strpbrk(a,b) strpbrk_callee(a,b)
 
 

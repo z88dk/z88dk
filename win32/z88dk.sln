@@ -74,6 +74,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lstmanip", "lstmanip\lstman
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getopt", "getopt\getopt.vcxproj", "{0E6DEEBD-2979-4AB0-AB8A-5A51F6579AAF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-map", "z88dk-map\z88dk-map.vcxproj", "{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -210,6 +215,14 @@ Global
 		{0E6DEEBD-2979-4AB0-AB8A-5A51F6579AAF}.Release|Win32.Build.0 = Release|Win32
 		{0E6DEEBD-2979-4AB0-AB8A-5A51F6579AAF}.Release|x64.ActiveCfg = Release|x64
 		{0E6DEEBD-2979-4AB0-AB8A-5A51F6579AAF}.Release|x64.Build.0 = Release|x64
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Debug|Win32.Build.0 = Debug|Win32
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Debug|x64.ActiveCfg = Debug|x64
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Debug|x64.Build.0 = Debug|x64
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Release|Win32.ActiveCfg = Release|Win32
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Release|Win32.Build.0 = Release|Win32
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Release|x64.ActiveCfg = Release|x64
+		{EECB51F1-0E9B-4C9D-95D8-20E477CA3DEC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

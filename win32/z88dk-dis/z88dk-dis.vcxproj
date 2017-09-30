@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ticks\disassembler.c" />
+    <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_main.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
   </ItemGroup>
@@ -133,7 +134,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-  <CustomBuildStep>
+    <CustomBuildStep>
       <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
     </CustomBuildStep>
     <CustomBuildStep>

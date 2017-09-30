@@ -1,7 +1,7 @@
 
 OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o disassembler.o debugger.o linenoise.o utf8.o syms.o
 
-DISOBJS = disassembler_main.o disassembler.o syms.o
+DISOBJS = disassembler_main.o disassembler.o syms.o disassembler_alg.o
 
 INSTALL ?= install
 
