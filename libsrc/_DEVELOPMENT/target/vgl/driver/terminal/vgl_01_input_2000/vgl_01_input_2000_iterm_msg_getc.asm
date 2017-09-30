@@ -4,16 +4,12 @@ INCLUDE "config_private.inc"
 SECTION code_driver
 SECTION code_driver_terminal_input
 
-PUBLIC vgl_01_input_kbd_iterm_msg_getc
+PUBLIC vgl_01_input_2000_iterm_msg_getc
 
 EXTERN error_mc
 
-EXTERN vgl_key_arm
-EXTERN vgl_key_get
-EXTERN vgl_key_peek
 
-
-vgl_01_input_kbd_iterm_msg_getc:
+vgl_01_input_2000_iterm_msg_getc:
    ;    enter : ix = & FDSTRUCT.JP
    ;
    ;     exit : a = keyboard char after character set translation
@@ -22,11 +18,16 @@ vgl_01_input_kbd_iterm_msg_getc:
    ;  can use : af, bc, de, hl
    
    
-   call vgl_key_get       ; Blocking call
-   
-   ;call vgl_key_peek       ; Non-blocking call
-   
-   
+   ; Wait for keypress
+   ld a, 0xc0
+   ld (__VGL_2000_KEY_STATUS_ADDRESS), a	; Prepare next getkey
+      
+   ; Wait for key press
+   pause_getc_loop:
+      ld a, (__VGL_2000_KEY_STATUS_ADDRESS)
+      cp 0xd0
+      jr nz, pause_getc_loop
+   ld a, (__VGL_2000_KEY_CURRENT_ADDRESS)
    
    ; A = ascii code
    ; Map to standard keys, like: ld a,CHAR_LF / CHAR_CR / CHAR_CTRL_Z

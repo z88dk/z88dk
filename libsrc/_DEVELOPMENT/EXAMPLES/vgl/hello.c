@@ -71,6 +71,7 @@ void main(void) {
 	//sprintf(buffer, "MODEL%d\n", VGL_MODEL);
 	//printf(buffer);
 	
+	
 	printf("Enter something>");
 	gets(buffer);
 	printf("You entered: \"%s\"\n", buffer);

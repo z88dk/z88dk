@@ -1,46 +1,32 @@
 dnl############################################################
-dnl##      VGL_01_OUTPUT_CHAR STATIC INSTANTIATOR            ##
+dnl##      VGL_01_INPUT_4000 STATIC INSTANTIATOR             ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_vgl_01_output_char(...)                             ##
+dnl## m4_vgl_01_input_4000(...)                              ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
-dnl## $2 = ioctl_flags (16 bits)                             ##
-dnl## $3 = cursor.x coordinate                               ##
-dnl## $4 = cursor.y coordinate                               ##
-dnl## $5 = window.x coordinate                               ##
-dnl## $6 = window.width                                      ##
-dnl## $7 = window.y coordinate                               ##
-dnl## $8 = window.height                                     ##
-dnl## $9 = scroll limit (number of scrolls until pause)      ##
-dnl## X $10 = font address                                     ##
-dnl## X $11 = foreground colour (text attribute)               ##
-dnl## X $12 = foreground mask (set bits = keep screen bits)    ##
-dnl## X $13 = background colour (cls attribute)                ##
+dnl## $2 = label attached to output FDSTRUCT or 0 if none    ##
+dnl## $3 = ioctl_flags (16 bits)                             ##
+dnl## $4 = size of edit buffer attached to FDSTRUCT or 0     ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_vgl_01_output_char',dnl
+define(`m4_vgl_01_input_4000',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: vgl_01_output_char
+   ; driver: vgl_01_input_4000
    ; fd    : __I_FCNTL_NUM_FD
-   ; mode  : write only
-   ; type  : 002 = output terminal
+   ; mode  : read only
+   ; type  : 001 = input terminal
+   ; tie   : `ifelse($2,0,`(none)',$2)'
    ;
-   ; ioctl_flags   : $2
-   ; cursor coord  : `($3,$4)'
-   ; window        : `($5,$6,$7,$8)'
-   ; scroll limit  : $9
-   ; X font address  : $10
-   ; X text colour   : $11
-   ; X text mask     : $12
-   ; X background    : $13
+   ; ioctl_flags   : $3
+   ; buffer size   : $4 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-   `ifelse($1,0,,dnl   
+
+   `ifelse($1,0,,dnl
    
    SECTION data_clib
    SECTION data_stdio
@@ -69,8 +55,8 @@ define(`m4_vgl_01_output_char',dnl
       ; conversion flags
       ; ungetc
 
-      defb 0x80         ; write + normal file type
-      defb 0            ; last operation was write
+      defb 0x40      ; read + stdio manages ungetc + normal file type
+      defb 0x02      ; last operation was read
       defb 0
       defb 0
       
@@ -94,42 +80,42 @@ define(`m4_vgl_01_output_char',dnl
    
    SECTION data_fcntl_stdio_heap_body
    
-   EXTERN console_01_output_terminal_fdriver
-   EXTERN vgl_01_output_char
+   EXTERN console_01_input_terminal_fdriver
+   EXTERN vgl_01_input_4000
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw 35
+      defw `eval($4 + 34)'
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
-
-   __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
    
+   __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
+
       ; FDSTRUCT structure
       
       ; call to first entry to driver
       
       defb 205
-      defw console_01_output_terminal_fdriver
+      defw console_01_input_terminal_fdriver
       
       ; jump to driver
       
       defb 195
-      defw vgl_01_output_char
+      defw vgl_01_input_4000
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x02      ; type = output terminal
+      defb 0x01      ; stdio handles ungetc + type = input terminal
       defb `ifelse($1,0,1,2)'
-      defb 0x02      ; write only
+      defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw $2
+      defw $3
       
       ; mtx_plain
       
@@ -138,30 +124,34 @@ define(`m4_vgl_01_output_char',dnl
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
-
-      ; cursor coordinate
-      ; window rectangle
-      ; scroll limit
-
-      defb `$3, $4'
-      defb `$5, $6, $7, $8'
-      defb $9
       
-      ; X font address
-      ; X text colour
-      ; X text mask
-      ; X background colour
+      ; (a character driver ends here)
       
-      ; X EXTERN $10
+      ; tied output terminal
+      ; pending_char
+      ; read_index
       
-      ; X defw $10 - 256
-      ; X defb $11
-      ; X defb $12
-      ; X defb $13
+      defw `ifelse($2,0,0,$2)'
+      defb 0
+      defw 0
+      
+      ; b_array_t edit_buffer
+      
+      defw `ifelse($4,0,0,__edit_buffer_`'__I_FCNTL_NUM_FD)'
+      defw 0
+      defw $4
+      
+      
+      `ifelse($4,0,,dnl
+      
+      ; reserve space for edit buffer
+      
+      __edit_buffer_`'__I_FCNTL_NUM_FD:   defs $4
+      )'
 
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
-   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + 35))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $4 + 34))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
-
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )dnl

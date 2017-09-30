@@ -69,8 +69,8 @@ ifelse(__STARTUP, 2000, `
    ;
    ; ROM code
    ;
-   ; stdin = terminal/vgl_01_input_kbd
-   ; stdout = terminal/vgl_01_output_char
+   ; stdin = terminal/vgl_01_input_2000
+   ; stdout = terminal/vgl_01_output_2000
    ; stderr = dup
    ;
    
@@ -85,7 +85,7 @@ ifelse(__STARTUP, 2000, `
    defc __VGL_MODEL = 2000
    defc __VGL_ROM_AUTOSTART = 0
    
-   include(`startup/vgl_crt_1.asm.m4')
+   include(`startup/vgl_crt_2001.asm.m4')
 ')
 
 
@@ -96,8 +96,8 @@ ifelse(__STARTUP, 2001, `
    ;
    ; ROM code autostart
    ;
-   ; stdin = terminal/vgl_01_input_kbd
-   ; stdout = terminal/vgl_01_output_char
+   ; stdin = terminal/vgl_01_input_2000
+   ; stdout = terminal/vgl_01_output_2000
    ; stderr = dup
    ;
    
@@ -112,7 +112,7 @@ ifelse(__STARTUP, 2001, `
    defc __VGL_MODEL = 2000
    defc __VGL_ROM_AUTOSTART = 1
    
-   include(`startup/vgl_crt_1.asm.m4')
+   include(`startup/vgl_crt_2001.asm.m4')
 ')
 
 
@@ -123,8 +123,8 @@ ifelse(__STARTUP, 4000, `
    ;
    ; ROM code
    ;
-   ; stdin = terminal/vgl_01_input_kbd
-   ; stdout = terminal/vgl_01_output_char
+   ; stdin = terminal/vgl_01_input_4000
+   ; stdout = terminal/vgl_01_output_4000
    ; stderr = dup
    ;
    
@@ -139,7 +139,7 @@ ifelse(__STARTUP, 4000, `
    defc __VGL_MODEL = 4000
    defc __VGL_ROM_AUTOSTART = 0
    
-   include(`startup/vgl_crt_1.asm.m4')
+   include(`startup/vgl_crt_4001.asm.m4')
 ')
 
 
@@ -150,8 +150,8 @@ ifelse(__STARTUP, 4001, `
    ;
    ; ROM code autostart
    ;
-   ; stdin = terminal/vgl_01_input_kbd
-   ; stdout = terminal/vgl_01_output_char
+   ; stdin = terminal/vgl_01_input_4000
+   ; stdout = terminal/vgl_01_output_4000
    ; stderr = dup
    ;
    
@@ -166,6 +166,6 @@ ifelse(__STARTUP, 4001, `
    defc __VGL_MODEL = 4000
    defc __VGL_ROM_AUTOSTART = 1
    
-   include(`startup/vgl_crt_1.asm.m4')
+   include(`startup/vgl_crt_4001.asm.m4')
 ')
 

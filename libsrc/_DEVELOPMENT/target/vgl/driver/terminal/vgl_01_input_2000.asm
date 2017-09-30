@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; vgl_01_input_kbd ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; vgl_01_input_2000 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; This subroutine inherits the library's console_01_input
@@ -13,7 +13,7 @@
 ; ;;;;;;;;;;;;;;;;;;;;
 ;
 ; CONSOLE_01_INPUT_TERMINAL (root, abstract)
-; VGL_01_INPUT_KBD (concrete)
+; VGL_01_INPUT_2000 (concrete)
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MESSAGES CONSUMED FROM STDIO
@@ -108,30 +108,20 @@
 SECTION code_driver
 SECTION code_driver_terminal_input
 
-PUBLIC vgl_01_input_kbd
+PUBLIC vgl_01_input_2000
 
 EXTERN ITERM_MSG_GETC, STDIO_MSG_FLSH, STDIO_MSG_ICTL
 
 EXTERN console_01_input_terminal
-EXTERN vgl_01_input_kbd_iterm_msg_getc
-;EXTERN vgl_01_input_kbd_stdio_msg_flsh
+EXTERN vgl_01_input_2000_iterm_msg_getc
 EXTERN console_01_input_stdio_msg_flsh
-;EXTERN zx_01_input_inkey_stdio_msg_ictl
 EXTERN console_01_input_stdio_msg_ictl, console_01_input_stdio_msg_ictl_0
 EXTERN error_einval_zc, console_01_input_proc_reset
-;EXTERN l_offset_ix_de
-;EXTERN error_mc
 
-; from config/config_target.m4
-
-vgl_01_input_kbd:
-   
-   ;	;@FIXME: Just for testing: Intentionally hang here
-   ;	hang:
-   ;	jp hang
+vgl_01_input_2000:
    
    cp ITERM_MSG_GETC
-   jp z, vgl_01_input_kbd_iterm_msg_getc
+   jp z, vgl_01_input_2000_iterm_msg_getc
    
    ;cp STDIO_MSG_FLSH
    ;jp z, vgl_01_input_stdio_msg_flsh
@@ -141,59 +131,3 @@ vgl_01_input_kbd:
    
    jp console_01_input_terminal    ; forward to library
 
-
-
-
-vgl_01_input_stdio_msg_flsh:
-   jp console_01_input_stdio_msg_flsh
-   ;or a
-   ret
-
-
-vgl_01_input_stdio_msg_ictl:
-   ; ioctl messages understood:
-   ;
-   ; defc IOCTL_RESET            = $0000
-   ; defc IOCTL_ITERM_GET_DELAY  = $1081
-   ; defc IOCTL_ITERM_SET_DELAY  = $1001
-   ;
-   ; in addition to flags managed by stdio
-   ; and messages understood by base class
-   ;
-   ; enter : ix = & FDSTRUCT.JP
-   ;         bc = first parameter
-   ;         de = request
-   ;         hl = void *arg (0 if stdio flags)
-   ;
-   ; exit  : hl = return value
-   ;         carry set if ioctl rejected
-   ;
-   ; uses  : af, bc, de, hl
-   
-   ; flags managed by stdio?
-   
-   ld a,h
-   or l
-   jp z, console_01_input_stdio_msg_ictl
-   
-   ld a,e
-   or d
-   jp z, console_01_input_proc_reset   ; if IOCTL_RESET
-   
-   ; check the message is specifically for an input terminal
-   
-   ld a,e
-   and $07
-   cp $01                      ; input terminals are type $01
-   jp nz, error_einval_zc
-
-   ; interpret ioctl messages
-   
-   ld a,d
-      
-   cp $10
-   jp nz, console_01_input_stdio_msg_ictl_0
-   
-   
-   res 0,(ix+6)
-   ret

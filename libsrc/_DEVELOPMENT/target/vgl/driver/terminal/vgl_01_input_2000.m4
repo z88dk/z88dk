@@ -1,8 +1,8 @@
 dnl############################################################
-dnl##      VGL_01_INPUT_KBD STATIC INSTANTIATOR              ##
+dnl##      VGL_01_INPUT_2000 STATIC INSTANTIATOR             ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_vgl_01_input_kbd(...)                               ##
+dnl## m4_vgl_01_input_2000(...)                              ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
 dnl## $2 = label attached to output FDSTRUCT or 0 if none    ##
@@ -11,12 +11,12 @@ dnl## $4 = size of edit buffer attached to FDSTRUCT or 0     ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_vgl_01_input_kbd',dnl
+define(`m4_vgl_01_input_2000',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: vgl_01_input_kbd
+   ; driver: vgl_01_input_2000
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : read only
    ; type  : 001 = input terminal
@@ -81,7 +81,7 @@ define(`m4_vgl_01_input_kbd',dnl
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN vgl_01_input_kbd
+   EXTERN vgl_01_input_2000
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
@@ -103,7 +103,7 @@ define(`m4_vgl_01_input_kbd',dnl
       ; jump to driver
       
       defb 195
-      defw vgl_01_input_kbd
+      defw vgl_01_input_2000
       
       ; flags
       ; reference_count

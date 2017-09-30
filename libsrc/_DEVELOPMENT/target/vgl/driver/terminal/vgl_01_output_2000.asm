@@ -1,8 +1,8 @@
 SECTION data_arch
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; VGL_01_OUTPUT_CHAR
-; romless driver for standard 32x24 output
+; VGL_01_OUTPUT_2000
+; driver for V-Tech Genius Leader 2000/2000+/2000c
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; Windowed output terminal for fixed width fonts.
@@ -163,80 +163,74 @@ INCLUDE "config_private.inc"
 SECTION code_driver
 SECTION code_driver_terminal_output
 
-PUBLIC vgl_01_output_char
-PUBLIC vgl_01_output_char_refresh
+PUBLIC vgl_01_output_2000
+PUBLIC vgl_01_output_2000_refresh
 
 ;EXTERN ITERM_MSG_BELL, ITERM_MSG_PRINT_CURSOR, STDIO_MSG_ICTL
 ;EXTERN OTERM_MSG_PRINTC
 ;EXTERN OTERM_MSG_SCROLL, OTERM_MSG_CLS, EXTERN OTERM_MSG_PAUSE, OTERM_MSG_BELL
 
-EXTERN vgl_01_output_char_iterm_msg_bell
-EXTERN vgl_01_output_char_iterm_msg_print_cursor
+EXTERN vgl_01_output_2000_iterm_msg_bell
+EXTERN vgl_01_output_2000_iterm_msg_print_cursor
 
-EXTERN vgl_01_output_char_oterm_msg_bell
-EXTERN vgl_01_output_char_oterm_msg_cls
-EXTERN vgl_01_output_char_oterm_msg_pause
-EXTERN vgl_01_output_char_oterm_msg_printc
-EXTERN vgl_01_output_char_oterm_msg_scroll
+EXTERN vgl_01_output_2000_oterm_msg_bell
+EXTERN vgl_01_output_2000_oterm_msg_cls
+EXTERN vgl_01_output_2000_oterm_msg_pause
+EXTERN vgl_01_output_2000_oterm_msg_printc
+EXTERN vgl_01_output_2000_oterm_msg_scroll
 
 EXTERN console_01_output_terminal_char
 
 
-vgl_01_output_char:
+vgl_01_output_2000:
    
    ;@TODO: Implement "WRIT" so the LCD does not need to refresh after every single character
    
    cp OTERM_MSG_PRINTC
-   jp z, vgl_01_output_char_oterm_msg_printc
+   jp z, vgl_01_output_2000_oterm_msg_printc
    
    cp ITERM_MSG_PRINT_CURSOR
-   jp z, vgl_01_output_char_iterm_msg_print_cursor
+   jp z, vgl_01_output_2000_iterm_msg_print_cursor
    
    ;cp IOCTL_OTERM_SET_CURSOR_COORD
-   ;jp z, vgl_01_output_char_iterm_msg_print_cursor
+   ;jp z, vgl_01_output_2000_iterm_msg_print_cursor
    
    cp ITERM_MSG_BELL
-   jp z, vgl_01_output_char_iterm_msg_bell
+   jp z, vgl_01_output_2000_iterm_msg_bell
    
-;   cp STDIO_MSG_ICTL
-;   jp z, zx_01_output_char_32_stdio_msg_ictl
+   ;cp STDIO_MSG_ICTL
+   ;jp z, vgl_01_output_2000_stdio_msg_ictl
    
    cp OTERM_MSG_SCROLL
-   jp z, vgl_01_output_char_oterm_msg_scroll
+   jp z, vgl_01_output_2000_oterm_msg_scroll
    
    ;jp c, console_01_output_terminal_char  ; forward to library
    
    cp OTERM_MSG_CLS
-   jp z, vgl_01_output_char_oterm_msg_cls
+   jp z, vgl_01_output_2000_oterm_msg_cls
    
    cp OTERM_MSG_PAUSE
-   jp z, vgl_01_output_char_oterm_msg_pause
+   jp z, vgl_01_output_2000_oterm_msg_pause
    
    cp OTERM_MSG_BELL
-   jp z, vgl_01_output_char_oterm_msg_bell
+   jp z, vgl_01_output_2000_oterm_msg_bell
 
    jp console_01_output_terminal_char     ; forward to library
 
 
-vgl_01_output_char_refresh:
+vgl_01_output_2000_refresh:
    ; Refresh all row(s)
    ld a, 1
-   ld (__VGL_DISPLAY_REFRESH_ADDRESS),a
-   IF __VGL_DISPLAY_ROWS > 1
-      ld (__VGL_DISPLAY_REFRESH_ADDRESS+1),a
-   ENDIF
-   IF __VGL_DISPLAY_ROWS > 2
-      ld (__VGL_DISPLAY_REFRESH_ADDRESS+2),a
-      ld (__VGL_DISPLAY_REFRESH_ADDRESS+3),a
-   ENDIF
+   ld (__VGL_2000_DISPLAY_REFRESH_ADDRESS),a
+   ld (__VGL_2000_DISPLAY_REFRESH_ADDRESS+1),a
    
    ;@TODO: Refresh only one specified row
    ;	ex de, hl	; Restore HL (coordinates)
    ;	ld a, h	; get Y coordinate
    ;	; Convert to 0xdcf0 + Y
-   ;	add __VGL_DISPLAY_REFRESH_ADDRESS & 0x00ff
+   ;	add __VGL_2000_DISPLAY_REFRESH_ADDRESS & 0x00ff
    ;	ld l, a
-   ;	ld h, __VGL_DISPLAY_REFRESH_ADDRESS >> 8
+   ;	ld h, __VGL_2000_DISPLAY_REFRESH_ADDRESS >> 8
    ;	; Put "1" there
    ;	ld a, 1
    ;	ld (hl), a

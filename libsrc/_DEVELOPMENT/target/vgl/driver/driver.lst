@@ -1,4 +1,4 @@
-@target/vgl/driver/character/vgl_00_input_char.lst
-@target/vgl/driver/character/vgl_00_output_char.lst
-@target/vgl/driver/terminal/vgl_01_input_kbd.lst
-@target/vgl/driver/terminal/vgl_01_output_char.lst
+@target/vgl/driver/terminal/vgl_01_input_2000.lst
+@target/vgl/driver/terminal/vgl_01_input_4000.lst
+@target/vgl/driver/terminal/vgl_01_output_2000.lst
+@target/vgl/driver/terminal/vgl_01_output_4000.lst
