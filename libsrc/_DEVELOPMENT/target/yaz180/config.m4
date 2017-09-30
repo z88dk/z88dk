@@ -42,6 +42,7 @@ include(`target/yaz180/config/config_cpu.m4')
 include(`target/yaz180/config/config_clib.m4')
 include(`target/yaz180/config/config_clib_const.m4')
 
+include(`target/yaz180/config/config_basic.m4')
 include(`target/yaz180/config/config_82c55.m4')
 include(`target/yaz180/config/config_am9511a.m4')
 include(`target/yaz180/config/config_pca9665.m4')

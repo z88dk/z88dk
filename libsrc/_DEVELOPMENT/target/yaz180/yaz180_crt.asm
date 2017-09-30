@@ -707,7 +707,10 @@ IF __MMAP = -1
    ;; user supplied memory map ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   INCLUDE "mmap.inc"
+
+
+   SECTION UNASSIGNED
+   org 0
 
 ENDIF
 
@@ -720,6 +723,9 @@ IF __MMAP = 0
    INCLUDE "../crt_memory_model_z180.inc"
 
 
+
+   SECTION UNASSIGNED
+   org 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
@@ -1488,6 +1494,7 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_jump_vectors_z180.inc"
+include "crt_interrupt_vectors_basic.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
