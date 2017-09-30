@@ -24,6 +24,7 @@ Z80pass2( void )
     Expr *expr, *expr2;
     long value;
 	Bool do_patch, do_store;
+	long asmpc;		// should be an int!
 
 	/* compute all dependent expressions */
 	compute_equ_exprs( CURRENTMODULE->exprs, FALSE, TRUE );
@@ -76,7 +77,8 @@ Z80pass2( void )
             switch ( expr->range )
             {
             case RANGE_JR_OFFSET:
-                value -= get_PC() + 2;		/* get module PC at JR instruction */
+				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+                value -= asmpc + 2;		/* get module PC at JR instruction */
 
                 if ( value >= -128 && value <= 127 )
                 {

@@ -1,10 +1,9 @@
 /*
-Z88DK Z80 Macro Assembler
+Z88DK Z80 Module Assembler
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Manage the code area in memory
 */
@@ -57,7 +56,8 @@ void Section_init (Section *self)
 	self->origin_found = FALSE;
 	self->origin_opts = FALSE;
 	self->section_split = FALSE;
-	self->asmpc	= 0;
+	self->asmpc = 0;
+	self->asmpc_phase = -1;
 	self->opcode_size = 0;
 	
 	self->bytes = OBJ_NEW(ByteArray);
@@ -321,6 +321,7 @@ int new_module_id( void )
 		  section = get_next_section( &iter ) )
 	{
 		section->asmpc = 0;
+		section->asmpc_phase = -1;
 		section->opcode_size = 0;
 		(void) section_module_start( section, module_id );
 	}
@@ -348,14 +349,23 @@ int next_PC( void )
 {
     init_module();
 	g_cur_section->asmpc += g_cur_section->opcode_size;
+	if (g_cur_section->asmpc_phase >= 0)
+		g_cur_section->asmpc_phase += g_cur_section->opcode_size;
+
 	g_cur_section->opcode_size = 0;
 	return g_cur_section->asmpc;
 }
 
-int get_PC( void )
+int get_PC(void)
 {
-    init_module();
+	init_module();
 	return g_cur_section->asmpc;
+}
+
+int get_phased_PC(void)
+{
+	init_module();
+	return g_cur_section->asmpc_phase;
 }
 
 static void inc_PC( int num_bytes )
@@ -685,4 +695,17 @@ void write_origin(FILE* file, Section *section) {
 	}
 
 	xfput_int32(file, origin);
+}
+
+void set_phase_directive(int address)
+{
+	if (address >= 0 && address <= 0xFFFF)
+		CURRENTSECTION->asmpc_phase = address;
+	else
+		error_int_range(address);
+}
+
+void clear_phase_directive()
+{
+	CURRENTSECTION->asmpc_phase = -1;
 }
