@@ -14,13 +14,17 @@ use v5.10;
 use Test::More;
 require './t/testlib.pl';
 
+my $config = slurp("../config.h");
+my($version) = $config =~ /Z88DK_VERSION\s*"(.*)"/;
+ok $version, "version $version";
+
 for my $opt (qw( -h --help )) {
-	run("z80asm $opt", 0, <<'END', "");
-Z80 Module Assembler MSC build-20170919
+	run("z80asm $opt", 0, <<"END", "");
+Z80 Module Assembler $version
 (c) InterLogic 1993-2009, Paulo Custodio 2011-2017
 
 Usage:
-  z80asm [options] { @<modulefile> | <filename> }
+  z80asm [options] { \@<modulefile> | <filename> }
 
   [] = optional, {} = may be repeated, | = OR clause.
 

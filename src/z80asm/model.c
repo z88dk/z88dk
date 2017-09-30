@@ -35,8 +35,8 @@ static void new_line_cb( char *filename, int line_nr, char *text )
 		set_error_line(line_nr);
 		
         /* interface with list */
-        if ( opts.cur_list )
-            list_start_line( get_PC(), filename, line_nr, text );
+		if (opts.cur_list)
+			list_start_line(get_phased_PC() >= 0 ? get_phased_PC() : get_PC(), filename, line_nr, text);
 	}
 }
 

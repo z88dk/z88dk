@@ -46,6 +46,8 @@ extern void asm_LSTOFF(void);
 extern void asm_LINE(int line_nr, char *filename);
 extern void asm_C_LINE(int line_nr, char * filename);
 extern void asm_ORG(int address);
+extern void asm_PHASE(int address);
+extern void asm_DEPHASE();
 
 /* directives with string argument */
 extern void asm_INCLUDE(char *filename);
