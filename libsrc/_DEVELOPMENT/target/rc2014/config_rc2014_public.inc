@@ -46,7 +46,7 @@ defc __RC2014 = 1
 defc __CPU_CLOCK = 7372800
 
 defc __IO_ACIA_PORT_BASE = 0x80
-defc __IO_PIO_PORT_BASE = 0x40
+defc __IO_PIO_PORT_BASE = 0x20
 
 
 
@@ -887,10 +887,10 @@ PUBLIC __IO_PIO_CNTL_15
 
 
 
-defc __IO_PIO_PORT_A = 0x40
-defc __IO_PIO_PORT_B = 0x41
-defc __IO_PIO_PORT_C = 0x42
-defc __IO_PIO_CONTROL = 0x43
+defc __IO_PIO_PORT_A = 0x20
+defc __IO_PIO_PORT_B = 0x21
+defc __IO_PIO_PORT_C = 0x22
+defc __IO_PIO_CONTROL = 0x23
 
 defc __IO_PIO_CNTL_00 = 0x80
 defc __IO_PIO_CNTL_01 = 0x81
@@ -967,10 +967,10 @@ PUBLIC __IDE_CMD_ID
 
 
 
-defc __IO_PIO_IDE_LSB = 0x40
-defc __IO_PIO_IDE_MSB = 0x41
-defc __IO_PIO_IDE_CTL = 0x42
-defc __IO_PIO_IDE_CONFIG = 0x43
+defc __IO_PIO_IDE_LSB = 0x20
+defc __IO_PIO_IDE_MSB = 0x21
+defc __IO_PIO_IDE_CTL = 0x22
+defc __IO_PIO_IDE_CONFIG = 0x23
 defc __IO_PIO_IDE_RD = 0x92
 defc __IO_PIO_IDE_WR = 0x80
 
