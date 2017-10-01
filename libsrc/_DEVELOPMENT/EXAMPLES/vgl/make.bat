@@ -5,10 +5,12 @@ REM Change to git version
 SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
-SET VGLMODEL=2000
+SET VGLMODEL=4000
 
-SET PROGNAME=payload
-REM SET PROGNAME=test
+REM SET PROGNAME=hello
+SET PROGNAME=debug
+REM SET PROGNAME=payload
+REM SET PROGNAME=memtest
 REM SET PROGNAME=standalone
 
 REM SET SRCPATH=..\
@@ -17,11 +19,11 @@ REM SET PROGNAME=heapsort
 REM SET PROGNAME=beepfx
 
 
-REM SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
-SET VGLOPTS=-subtype=payload
+SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
+REM SET VGLOPTS=-subtype=payload
 REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
-REM Clean
+REM Pre-Clean
 DEL %PROGNAME%.bin
 DEL zcc_opt.def
 
@@ -36,13 +38,14 @@ ECHO Running %ZCCCMD%
 %ZCCCMD%
 IF ERRORLEVEL 1 GOTO:ERROR
 
-:EMU
-REM Clean
+REM Post-Clean
 REM DEL zcc_opt.def
 DEL %PROGNAME%_BSS.bin
 DEL %PROGNAME%_CODE.bin
 DEL %PROGNAME%_DATA.bin
 DEL %PROGNAME%_interrupt_vectors.bin
+
+:EMU
 CALL emu.bat %PROGNAME% gl%VGLMODEL%
 GOTO:END
 
