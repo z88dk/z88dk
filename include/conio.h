@@ -76,7 +76,7 @@ extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 // Useless, DL is not fully implemented in the VT-ansi engine
 //#define delline()	       printf("\033[M")
 
-#define clrscr()           vtrendition(40); vtrendition(37); fputc_cons(12)
+#define clrscr()           fputc_cons(12)
 #define clreol()           printf("\033[K")
 
 extern int     __LIB__     wherex (void);
