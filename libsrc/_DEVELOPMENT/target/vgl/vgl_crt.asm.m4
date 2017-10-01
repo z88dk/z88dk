@@ -54,12 +54,41 @@ ifelse(__STARTUP, 0, `
       defc __MMAP = 0
    ENDIF
    
+   defc __VGL_MODEL = 0
+   defc __VGL_ROM_AUTOSTART = 1
+   
    include(`startup/vgl_crt_0.asm.m4')
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 1, `
+   ; STARTUP = 1
+   ;
+   ; V-Tech Genius Leader 2000
+   ;
+   ; ROM code (minimal)
+   ;
+   ; stdin = --
+   ; stdout = --
+   ; stderr = --
+   ;
+   
+   IFNDEF __CRTCFG
+      defc __CRTCFG = 1
+   ENDIF
+   
+   IFNDEF __MMAP
+      defc __MMAP = 0
+   ENDIF
+   
+   defc __VGL_MODEL = 0
+   defc __VGL_ROM_AUTOSTART = 1
+   
+   include(`startup/vgl_crt_1.asm.m4')
+')
 
 
 ifelse(__STARTUP, 2000, `

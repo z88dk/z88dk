@@ -31,25 +31,28 @@ jp __SignatureAutostartEnd ; usually "jp 801fh"
 ;; V-Tech ROM text at memory offset 0x8004 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .rom_text
-   ;defb "VTECH PC-PROGCARD V1.00" ; Original text (23 bytes)
-   ;defb "2017 by Bernhard Slawik" ; My text (23 bytes)
-   ; Z88DK text with build info
-   defb "Z88DK"
-   defb " "
-   defb "VGL"
-   defb " "
-   defb "MODEL"
-   defb (0x30 + (__VGL_MODEL / 1000))
-   defb (0x30 + (__VGL_MODEL % 1000) / 100)
-   defb (0x30 + (__VGL_MODEL % 100) / 10)
-   defb (0x30 + (__VGL_MODEL % 10))
-   defb " "
-   IF __VGL_ROM_AUTOSTART = 1
-      defb "A"
+   ;defb "VTECH PC-PROGCARD V1.00"; Original text (23 bytes)
+   IFDEF __VGL_MODEL
+      ; Z88DK text with build info
+      defb "Z88DK"
+      defb " "
+      defb "VGL"
+      defb " "
+      defb "MODEL"
+      defb (0x30 + (__VGL_MODEL / 1000))
+      defb (0x30 + (__VGL_MODEL % 1000) / 100)
+      defb (0x30 + (__VGL_MODEL % 100) / 10)
+      defb (0x30 + (__VGL_MODEL % 10))
+      defb " "
+      IF __VGL_ROM_AUTOSTART = 1
+         defb "A"
+      ELSE
+         defb "N"
+      ENDIF
+      defb "  " ; pad to 23 characters
    ELSE
-      defb "N"
+      defb "Z88DK minimal config   ";
    ENDIF
-   defb "  " ; pad to 23 characters
 
 .rom_version
    defb 01h

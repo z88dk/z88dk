@@ -1,7 +1,6 @@
 /*
 
-A "hand crafted" V-Tech ROM that does not depend on stdlib
-(You can remove the stdlib include and printf's and substitute them with put() )
+A "hand crafted" V-Tech ROM that is self-contained and does not depend on external libs
 
 Mostly done via reverse-engineering
 2017-01-08 Bernhard "HotKey" Slawik
@@ -1087,7 +1086,7 @@ void vtech_init() {
 }
 
 
-#include <stdio.h>
+//#include <stdio.h>
 unsigned char buffer[100];
 unsigned char c;
 
@@ -1118,8 +1117,8 @@ void main(void) {
 	pause();
 	
 	
-	printf("printf");
-	pause();
+	//printf("printf");
+	//pause();
 	
 	//sprintf(buffer, "%d", 123); printf(buffer); pause();
 	//printf("New\nLine");
@@ -1135,18 +1134,22 @@ void main(void) {
 	
 	while(1) {
 		
-		printf(">");
+		put(">");
 		
-		
+		c = get_char();
 		//c = getc(stdin);	// stdio (experimental)
-		c = getchar();	// stdio (experimental)
+		//c = getchar();	// stdio (experimental)
 		
 		//put_char(c);
-		sprintf(buffer, "%d:\"%c\"\n", c, c);
-		printf(buffer);
+		//sprintf(buffer, "%d:\"%c\"\n", c, c);
+		//printf(buffer);
+		
+		put("0x"); put_hex8(c);
+		put(": \""); put_char(c); put("\"\n");
+		
 		
 	}
 	
 	
-	sprintf(buffer, "Hello World\n");
+	//sprintf(buffer, "Hello World\n");
 }
