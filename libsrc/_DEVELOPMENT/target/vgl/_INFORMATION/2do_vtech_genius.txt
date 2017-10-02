@@ -8,6 +8,17 @@ Things I have found out while playing around and disassembling the V-Tech Genius
 Bernhard "HotKey" Slawik
 
 
+@TODO in Z88DK:
+	* Enable multi-model stdio by changing stdin/stdout to model-specific drivers at runtime?
+	
+--------------------
+
+ROM area:
+	0x8000 - 0xBfff
+	
+RAM area
+	0xC000 - 0xDFFF
+
 --------------------
 
 

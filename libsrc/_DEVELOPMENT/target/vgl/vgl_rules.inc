@@ -44,7 +44,9 @@
       ;  1  0002         reserved (device state)
       ;  0  0001         reserved (device state)
       ; zx default: 0x03b0
-      defc CRT_ITERM_TERMINAL_FLAGS = 0x0390
+      ;defc CRT_ITERM_TERMINAL_FLAGS = 0x0390
+      ;                                 cook       line       echo     crlf     curs
+      defc CRT_ITERM_TERMINAL_FLAGS = 0x0010 + 0*0x0020 + 1*0x0080 + 0x0100 + 0x0200
    ENDIF
 
    ; buffer size must be available to m4 (requires special case in zcc)
@@ -69,18 +71,20 @@
       ; 11  0800          ?
       ; 10  0400          ?
       ;  9  0200 default  print cursor
-      ;  8  0100 default  crlf conversion (2)
+      ;  8  0100 default  ?crlf conversion (2)
       ;
       ;  7  0080          page mode
       ;  6  0040 default  pause when screen is full
       ;  5  0020 default  cook
-      ;  4  0010 default  cr/lf onverion
+      ;  4  0010 default  ?cr/lf onverion
       ;  3  0008          ?
       ;  2  0004          ?
       ;  1  0002          ?
       ;  0  0001          ?
       ; zx default: 0x2370
-      defc CRT_OTERM_TERMINAL_FLAGS = 0x2330 ; 0x2330 = 0x2370 - 0x0040=pause
+      ; defc CRT_OTERM_TERMINAL_FLAGS = 0x2330 ; 0x2330 = 0x2370 - 0x0040=pause
+      ;                                 crlf     cook     crlf     curs      cls
+      defc CRT_OTERM_TERMINAL_FLAGS = 0x0010 + 0x0020 + 0x0100 + 0x0200 + 0x2000
    ENDIF
 
    ;
