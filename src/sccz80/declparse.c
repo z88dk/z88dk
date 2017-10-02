@@ -3,7 +3,8 @@
 #include "define.h" 
 
 
-
+Type   *type_void = &(Type){ KIND_VOID, 1, 0 };
+Type   *type_carry = &(Type){ KIND_CARRY, 1, 0 };
 Type   *type_char = &(Type){ KIND_CHAR, 1, 0 };
 Type   *type_uchar = &(Type){ KIND_CHAR, 1, 1 };
 Type   *type_int = &(Type){ KIND_INT, 2, 0 };

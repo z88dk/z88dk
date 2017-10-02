@@ -112,21 +112,21 @@ struct type_s {
     
     // Structures
     Type   *tag;     // Reference to the structure type
-    array    *fields; // Fields within the structure (SYMBOL)
+    array    *fields; // Fields within the structure (Type)
     size_t    offset;  // Offset to the member
     char      weak;
     char      isstruct;
     
     // Function
     Type    *return_type;
-    array    *parameters; // (SYMBOL)
+    array    *parameters; // (Type)
     uint32_t  flags;        // Fast call etc
     char      hasva;
     char      oldstyle;
     UT_hash_handle hh;
 };
 
-extern Type *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double;
+extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double;
 
 
 enum ident_type {
