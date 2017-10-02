@@ -10,10 +10,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <ctype.h>
+#include <stdarg.h>
 
+#if defined(_WIN32) || defined(WIN32)
+#define strcasecmp(a,b) stricmp(a,b)
+#endif
 
 static void read_list_file(char *filename);
 static void usage(void);
+static void outp_filter(FILE *file, char *fmt, ...);
 
 static char *newlibpath = NULL;
 
@@ -82,12 +88,12 @@ int main(int argc, char **argv)
         int i;
         // Convert to correct path
         for ( i = 0; i < num_files; i++ ) {
-            fprintf(outp, "%s/%s\n", prefix, files[i]);
+            outp_filter(outp, "%s/%s\n", prefix, files[i]);
         }
     } else if ( makefile ) {
         int i;
         for ( i = 0; i < num_files; i++ ) {
-            fprintf(outp, "%s/%s.asm ", newlibpath,files[i]);
+            outp_filter(outp, "%s/%s.asm ", newlibpath,files[i]);
         }
     }
     if ( outp != stdout ) {
@@ -129,3 +135,57 @@ static void read_list_file(char *filename)
         }
     }
 }
+
+// <HACK>
+// MinGW inserts c:/MinGW/msys/1.0 before every path, causing the makefiles that consume
+// our output to fail
+// This function replaces c:/MinGW/msys/1.0/home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
+//                     by                  /home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
+static int substr_iseq(char *s1, int n, char *s2)
+{
+	char *s1_temp = strdup(s1);
+	s1_temp[n] = '\0';
+	int ret = strcasecmp(s1_temp, s2) == 0;
+	free(s1_temp);
+	return ret;
+}
+
+static char *remove_mingw_prefix(char *str)
+{
+	if (strlen(str) > 17 &&
+		isalpha(str[0]) &&
+		str[1] == ':' &&
+		(str[2] == '/' || str[2] == '\\') &&
+		substr_iseq(str+3, 5, "MinGW") &&
+		(str[8] == '/' || str[8] == '\\') &&
+		substr_iseq(str+9, 4, "msys") &&
+		(str[13] == '/' || str[13] == '\\') &&
+		substr_iseq(str+14, 3, "1.0") &&
+		(str[17] == '/' || str[17] == '\\'))
+		return str+17;
+	else
+		return str;
+}
+
+static char *remove_double_slash(char *path)	// modifies in place
+{
+	char *p = path;
+
+	while ((p = strstr(p, "//")) != NULL) {
+		memmove(p, p+1, strlen(p+1)+1);			// eat second slash, copy also '\0'
+	}
+	return path;
+}
+
+static void outp_filter(FILE *file, char *fmt, ...)
+{
+    char buf[FILENAME_MAX+1];
+
+	va_list args;
+	va_start(args, fmt);
+	vsprintf(buf, fmt, args);
+	va_end (args);
+
+	fprintf(file, "%s", remove_double_slash(remove_mingw_prefix(buf)));
+}
+// </HACK>

@@ -15,7 +15,7 @@ CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/
 
 NEWLIBASM := $(shell z88dk-lstmanip -i $(NEWLIB_LSTFILE) -p $(NEWLIB_DIRECTORY) -t)
 NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy,$(NEWLIBOBJ))
+NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
 
 OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
