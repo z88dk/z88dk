@@ -208,7 +208,7 @@ void outname(char* sname, char pref)
  */
 void getmem(SYMBOL* sym)
 {
-    if (sym->ident != POINTER && sym->type == KIND_CHAR) {
+    if (sym->ctype->kind == KIND_CHAR) {
         if (!(sym->flags & UNSIGNED)) {
 #ifdef PREAPR00
             ot("ld\ta,(");
@@ -242,10 +242,10 @@ void getmem(SYMBOL* sym)
         }
 
 #endif
-    } else if (sym->ident != POINTER && sym->type == KIND_DOUBLE) {
+    } else if (sym->ctype->kind == KIND_DOUBLE) {
         address(sym);
         callrts("dload");
-    } else if (sym->ident != POINTER && sym->type == KIND_LONG) {
+    } else if (sym->ctype->kind == KIND_LONG) {
         ot("ld\thl,(");
         outname(sym->name, dopref(sym));
         outstr(")\n");
@@ -258,7 +258,7 @@ void getmem(SYMBOL* sym)
         outname(sym->name, dopref(sym));
         outstr(")\n");
         /* For long pointers...load de with name+2, then d,0 */
-        if (sym->type == KIND_CPTR || (sym->ident == POINTER && sym->flags & FARPTR)) {
+        if (sym->ctype->kind == KIND_CPTR || (sym->ctype->kind == KIND_PTR && sym->flags & FARPTR)) {
             ot("ld\tde,(");
             outname(sym->name, dopref(sym));
             outstr("+2)\n\tld\td,0\n");
@@ -281,23 +281,23 @@ int getloc(SYMBOL* sym, int off)
 /*      static memory cell */
 void putmem(SYMBOL* sym)
 {
-    if (sym->ident != POINTER && sym->type == KIND_DOUBLE) {
+    if (sym->ctype->kind == KIND_DOUBLE) {
         address(sym);
         callrts("dstore");
     } else {
-        if (sym->ident != POINTER && sym->type == KIND_CHAR) {
+        if (sym->ctype->kind == KIND_CHAR) {
             LoadAccum();
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),a\n");
-        } else if (sym->ident != POINTER && sym->type == KIND_LONG) {
+        } else if (sym->ctype->kind == KIND_LONG) {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("+2),de\n");
-        } else if (sym->ident == POINTER && sym->flags & FARPTR) {
+        } else if (sym->ctype->kind == KIND_PTR && sym->flags & FARPTR) {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
@@ -305,7 +305,6 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("+2),a\n");
-
         } else {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
@@ -773,7 +772,7 @@ void zcallop(void)
 
 char dopref(SYMBOL* sym)
 {
-    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) {
+    if (sym->flags & LIBRARY && (sym->ctype->kind == KIND_FUNC ) ) { // || sym->ident == FUNCTIONP)) {
         return (0);
     }
     return (1);

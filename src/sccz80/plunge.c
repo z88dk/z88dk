@@ -272,7 +272,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     }
     /* Moved unsigned thing to below, so can fold expr correctly! */
 
-    if ((lval2->symbol && lval2->symbol->ident == POINTER)) {
+    if ((lval2->symbol && lval2->symbol->ctype->kind == KIND_PTR)) {
         (*oper)(lval);
         lval->binop = oper;
         return;

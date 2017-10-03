@@ -41,12 +41,13 @@ int primary(LVALUE* lval)
             lval->flags = ptr->flags;
             lval->ident = ptr->ident;
             lval->ptr_type = 0;
-            if (ptr->ident == POINTER) {
+            if ( lval->ltype->kind == KIND_PTR ) {
                 lval->ptr_type = ptr->type;
                 /* djm long pointers */
                 lval->indirect_kind = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
             }
-            if (ptr->ident == ID_ARRAY || (ptr->ident == ID_VARIABLE && ptr->type == KIND_STRUCT)) {
+            
+            if ( lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
                 /* djm pointer? */
                 lval->ptr_type = ptr->type;
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
@@ -59,10 +60,10 @@ int primary(LVALUE* lval)
         if (!ptr)
             ptr = findglb(sname);
         if (ptr) {
-            if (ptr->ident != FUNCTION && ptr->ident != FUNCTIONP) {
+            if (ptr->ctype->kind != KIND_FUNC && !(ptr->ctype->kind == KIND_PTR && ptr->ctype->ptr->kind == KIND_FUNC) ) {
                 if (ptr->ident == ID_ENUM)
                     error(E_UNSYMB, sname);
-                if (ptr->type == KIND_ENUM) {
+                if (ptr->ctype->kind == KIND_ENUM) {
                     lval->symbol = NULL;
                     lval->indirect_kind = 0;
                     lval->is_const = 1;
@@ -78,8 +79,8 @@ int primary(LVALUE* lval)
                 lval->flags = ptr->flags;
                 lval->ident = ptr->ident;
                 lval->ptr_type = 0;
-                if (ptr->ident != ID_ARRAY && (ptr->ident != ID_VARIABLE || ptr->type != KIND_STRUCT)) {
-                    if (ptr->ident == POINTER) {
+                if (lval->ltype->kind != KIND_ARRAY && lval->ltype->kind != KIND_STRUCT ) {
+                    if (lval->ltype->kind == KIND_PTR) {
                         lval->ptr_type = ptr->type;
                         lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                     }
@@ -107,13 +108,14 @@ int primary(LVALUE* lval)
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
             warning(W_IMPLICIT_DEFINITION, sname);
-            ptr = addglb(sname, FUNCTION, KIND_INT, 0, STATIK, 0, 0);
+            ptr = addglb(sname, 0, KIND_INT, 0, STATIK, 0, 0);
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
-            ptr->args[0] = CalcArgValue(KIND_INT, FUNCTION, 0);
+//            ptr->args[0] = CalcArgValue(KIND_INT, FUNCTION, 0);
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
+        lval->ltype = ptr->ctype;
         lval->indirect_kind = 0;
         lval->val_type = ptr->type ; /* Null function, always int */
         lval->flags = ptr->flags;

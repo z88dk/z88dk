@@ -86,7 +86,7 @@ void *array_get_byindex(array *arr, int index)
 
 
 
-Type *dodeclare2(storage_type2 storage);
+Type *dodeclare2();
 
 Type *global_hash = NULL;
 
@@ -267,7 +267,7 @@ Type *parse_struct(Type *type, int isstruct)
     } else {
         // Anonymous struct
         str = CALLOC(1,sizeof(*str));
-        snprintf(str->name, sizeof(str->name), "50__anonstruct_%d", num_structs++);
+        snprintf(str->name, sizeof(str->name), "0__anonstruct_%d", num_structs++);
         str->kind = KIND_STRUCT;
         str->fields = array_init(free_type); 
         str->weak = 1;
@@ -280,7 +280,6 @@ Type *parse_struct(Type *type, int isstruct)
         Type *elem;
         needchar('{');
 
-        printf("Starting to define struct\n");
         do {
             // Read each field now */
             elem = dodeclare2(0);
@@ -371,9 +370,7 @@ static Type *parse_type(void)
         return parse_struct(type, 1);
     } else if ( amatch("union")) {
         return parse_struct(type, 0);
-    } else {
-        printf("Inknown\n");
-    }
+    } 
     // } else if ( chase_typedef(type) < 0 ) 
     //     return NULL;
 
@@ -408,7 +405,7 @@ Type *parse_parameter_list(Type *return_type)
         func->parameters = array_init(NULL);        
         
         // TODO: K&R
-        param = dodeclare2(STORAGE_AUTO);
+        param = dodeclare2(); // STORAGE_AUTO);
         
         // A void type by itself, no parameters
         if ( param->kind == KIND_VOID ) {
@@ -434,7 +431,6 @@ Type *parse_parameter_list(Type *return_type)
                 snprintf(param->name, sizeof(param->name),"0__parameter_%lu",array_len(func->parameters));
                 param->name[0] = 0;
             }
-            printf("Adding parameter %s kind %d\n",param->name,param->kind);            
             array_add(func->parameters, param);
         }
         if ( !rcmatch(',')) 
@@ -479,9 +475,7 @@ Type *parse_decl_func(Type *base_type)
 
 
 Type *parse_decl_tail(Type *base_type)
-{
-    printf("Start tail: %s\n",line+lptr);
-    
+{    
     if ( rcmatch('['))
         return parse_decl_array(base_type);
     if ( rcmatch('('))
@@ -536,8 +530,32 @@ Type *parse_expr_type()
     return NULL;
 }
 
+Type *dodeclare(enum storage_type storage)
+{
+    while ( 1 ) {
+        Type *type = dodeclare2();
+        
+        if ( type == NULL ) {
+            break;
+        }
+        if ( cmatch(';')) {
+            if ( storage == STKLOC ) {
+                SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+                ptr->ctype = type;
+            } else {
+                SYMBOL *ptr = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+                ptr->ctype = type;
+            }
+            return NULL;
+        } else {
+            return type;
+        }
+    }
+    return NULL;
+}
+
 // Parse a declaration
-Type *dodeclare2(storage_type2 storage)
+Type *dodeclare2()
 {
     char namebuf[NAMESIZE];
     Type *type;
@@ -570,11 +588,6 @@ Type *dodeclare2(storage_type2 storage)
 
     if ( type != NULL ) {
         strcpy(type->name, namebuf);
-      //  type->storage = storage;
-        printf("%p %s thissize=%d %d -> %d size %d\n",type, type->name, type->size, type->kind, type->ptr ? type->ptr->kind : -1,type->size);
-        if ( type->ptr && type->ptr->return_type ) {
-            printf("ret type %s %d -> %d size %d\n",type->ptr->return_type->name, type->ptr->return_type->kind, type->ptr->return_type->ptr ? type->ptr->return_type->ptr->kind : -1,type->ptr->return_type->size);        
-        }
     }
 
     /* We can catch @ here */

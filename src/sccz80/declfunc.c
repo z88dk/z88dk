@@ -304,7 +304,6 @@ int DoFnKR(
     check_trailing_modifiers(function);
 
     if ( cmatch(';')) {
-	printf("Doing something %p\n",currfn);
         currfn = NULL;
         return -1;
     }
@@ -704,7 +703,7 @@ SYMBOL *getarg(
                 illname(n);
             } else {
                 /* Obligatory silly fake name */
-                sprintf(n, "sg6p_%d", proto);
+                sprintf(n, "0sg6p_%d", proto);
                 legalname = 1;
             }
         }

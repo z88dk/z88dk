@@ -9,7 +9,7 @@
 
 #include "ccdefs.h"
 
-
+// TODO: Send back type
 int expression(int  *con, double *val, uint32_t *packedArgumentType)
 {
     LVALUE lval={0};
@@ -25,7 +25,7 @@ int expression(int  *con, double *val, uint32_t *packedArgumentType)
     } else {
         type = lval.val_type;
     }
-    *packedArgumentType = CalcArgValue(type, lval.ident, lval.flags);
+    *packedArgumentType = 0; // CalcArgValue(type, lval.ident, lval.flags);
     // TODO: We need to send more type info
     *con = lval.is_const;
     *val = lval.const_val;
@@ -96,20 +96,20 @@ int heir1(LVALUE* lval)
         }
 
         // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
-        if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
-            if ( lval->symbol->flags & FLOATINGDECL) {
-                /* The function pointer was undecorated, it should take on whatever is on the RHS */
-                lval->symbol->flags &= ~(CALLEE|SMALLC);
-                lval->symbol->flags |= ( lval2.flags & (CALLEE|SMALLC));
-            } else {
-                if ( (lval->symbol->flags & CALLEE) != (lval2.flags & CALLEE)) {
-                    warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "_z88dk_callee");
-                }
-                if ( (lval->symbol->flags & SMALLC) != (lval2.flags & SMALLC)) {
-                    warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "__smallc/__stdc");
-                }
-            }
-        }
+        // if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
+        //     if ( lval->symbol->flags & FLOATINGDECL) {
+        //         /* The function pointer was undecorated, it should take on whatever is on the RHS */
+        //         lval->symbol->flags &= ~(CALLEE|SMALLC);
+        //         lval->symbol->flags |= ( lval2.flags & (CALLEE|SMALLC));
+        //     } else {
+        //         if ( (lval->symbol->flags & CALLEE) != (lval2.flags & CALLEE)) {
+        //             warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "_z88dk_callee");
+        //         }
+        //         if ( (lval->symbol->flags & SMALLC) != (lval2.flags & SMALLC)) {
+        //             warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "__smallc/__stdc");
+        //         }
+        //     }
+        // }
 
 
 #ifdef SILLYWARNING
@@ -627,7 +627,7 @@ int heirb(LVALUE* lval)
                     return 0;
                 } else if (k && ptr->ident == POINTER)
                     rvalue(lval);
-                else if (ptr->ident != POINTER && ptr->ident != ID_ARRAY) {
+                else if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_ARRAY) {
                     error(E_SUBSCRIPT);
                     k = 0;
                 }
@@ -708,7 +708,7 @@ int heirb(LVALUE* lval)
                     /* function returning pointer */
                     lval->flags = ptr->flags & ~(CALLEE|SMALLC|FASTCALL); /* djm */
                     ptr = lval->symbol = dummy_sym[(int)ptr->more];
-                    lval->ident = POINTER;
+                    //lval->ident = POINTER;
                     lval->indirect_kind = lval->ptr_type = ptr->type;
                     /* djm - 24/11/98 */
                     lval->val_type = (lval->flags & FARPTR ? KIND_CPTR : KIND_INT);
@@ -756,7 +756,7 @@ int heirb(LVALUE* lval)
                 lval->ident = ID_VARIABLE;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
-                if (ptr->ident == POINTER) {
+                if (lval->ltype->kind == KIND_PTR) {
                     lval->ptr_type = ptr->type;
                     lval->ident = POINTER;
                     /* djm */
@@ -768,7 +768,7 @@ int heirb(LVALUE* lval)
                         lval->val_type = KIND_INT;
                     }
                 }
-                if (ptr->ident == ID_ARRAY || (ptr->type == KIND_STRUCT && ptr->ident == ID_VARIABLE)) {
+                if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
                     /* array or struct */
                     lval->ptr_type = ptr->type;
                     lval->ident = POINTER;

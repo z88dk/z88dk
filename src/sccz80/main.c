@@ -289,12 +289,12 @@ void parse()
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
-            dodeclare(EXTERNAL, NULL, 0);
+            dodeclare(EXTERNAL);
         } else if (amatch("static")) {
-            dodeclare(LSTATIC, NULL, 0);
+            dodeclare(LSTATIC);
         } else if (amatch("typedef")) {
-            dodeclare(TYPDEF, NULL, 0);
-        } else if (dodeclare(STATIK, NULL, 0)) {
+            dodeclare(TYPDEF);
+        } else if (dodeclare(STATIK)) {
             ;
         } else if (ch() == '#') {
             if (match("#asm")) {
@@ -308,7 +308,7 @@ void parse()
                 blanks();
             }
         } else {
-            newfunc();
+//            newfunc();
         }
         blanks(); /* force eof if pending */
     }
@@ -401,7 +401,7 @@ void info()
 
 static void dumpfns()
 {
-    int ident, type, storage;
+    int type, storage;
     SYMBOL* ptr;
     FILE* fp;
 
@@ -411,18 +411,15 @@ static void dumpfns()
         return;
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != ID_GOTOLABEL ) {
-            ident = ptr->ident;
-            if (ident == FUNCTIONP)
-                ident = FUNCTION;
+        if (ptr->name[0] != '0' && ptr->ident != ID_GOTOLABEL && ptr->ctype ) {
             type = ptr->type;
             storage = ptr->storage;
-            if (type == KIND_PORT8 || type == KIND_PORT16 ) {
+            if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
-            } else if (ident == FUNCTION && ptr->size != 0) {
+            } else if (ptr->ctype->kind == KIND_FUNC && ptr->size != 0) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
             } else {
-                if (ident == FUNCTION && storage != LSTATIC) {
+                if (ptr->ctype->kind == KIND_FUNC && storage != LSTATIC) {
                     if (storage == EXTERNAL) {
                         if (ptr->flags & LIBRARY) {
                             GlobalPrefix(LIB);
@@ -454,7 +451,7 @@ static void dumpfns()
                         ot("=\t");
                         outdec(ptr->size);
                         nl();
-                    } else if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
+                    } else { // if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
                         if (storage == EXTERNAL)
                             GlobalPrefix(XREF);
                         else
@@ -572,13 +569,14 @@ void dumpvars()
             type = ptr->type;
             storage = ptr->storage;
             if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && ident != FUNCTION && 
-                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
+                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP 
+                && storage != LSTKEXT && storage != TYPDEF && 
                 type != KIND_PORT8 && type != KIND_PORT16) {
                 prefix();
                 outname(ptr->name, 1);
                 col();
                 defstorage();
-                outdec(ptr->size);
+                outdec(ptr->ctype->size);
                 nl();
             }
         }

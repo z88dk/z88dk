@@ -523,7 +523,7 @@ void size_of(LVALUE* lval)
             enum symbol_flags ptrflags;
             TAG_SYMBOL *ptrotag = NULL;
 
-            if (ptr->ident != FUNCTION && ptr->ident != ID_MACRO) {
+            if (ptr->ctype->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
                 if (ptr->type != KIND_STRUCT) {
                     if ( ptr->ident == POINTER && deref ) {
                         ptrtype = ptr->type;
@@ -549,7 +549,7 @@ void size_of(LVALUE* lval)
                                 }
                             } else {
                                 // tag_sym->size = numner of elements
-                                lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+//                                lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
                             }
                         } else {
                             lval->const_val = ptr->size;
@@ -557,7 +557,7 @@ void size_of(LVALUE* lval)
                     } while ( ptr->type == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
-                if (ptr->ident == ID_ARRAY ) {
+                if (ptr->ctype->kind == KIND_ARRAY ) {
                     if (rcmatch('[')) {
                         double val;
                         int valtype;
@@ -565,7 +565,7 @@ void size_of(LVALUE* lval)
                         constexpr(&val, &valtype,  1);
                         needchar(']');
                         deref++;
-                        lval->const_val = get_type_size(ptr->type, ID_VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
+//                        lval->const_val = get_type_size(ptr->type, ID_VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
                     }
                     if ( deref ) {
                         if ( deref == 1 ) {
@@ -580,7 +580,7 @@ void size_of(LVALUE* lval)
                 }
                 if ( deref > 0 ) {
                     if ( ptrtype != -1 ) {
-                        lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
+//                        lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
                     } else {
                         // uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
                         // char       got[256];
