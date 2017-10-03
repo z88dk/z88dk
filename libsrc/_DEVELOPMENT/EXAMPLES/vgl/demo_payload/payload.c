@@ -61,12 +61,13 @@ main() {
 	c = 0x40;
 	
 	for(j = 0; j < 20; j++) {
+		c = j;
 		for (i = 0; i < 80; i++) {
 			VRAM[i] = (0x41 + (c % 26));
 			c += 1;
 			
-			display_refresh();
 		}
+		display_refresh();
 	}
 	
 	/*

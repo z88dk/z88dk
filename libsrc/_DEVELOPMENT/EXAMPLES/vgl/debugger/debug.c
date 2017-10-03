@@ -13,6 +13,10 @@
 #include <string.h>	// for strlen
 #include <sound.h>
 
+#define IOCTL_OTERM_PAUSE 0xc042	// defined in target's auto-generated h file
+#define IOCTL_OTERM_CLS 0x0102	// defined in target's auto-generated h file
+#include <sys/ioctl.h>
+
 #define byte unsigned char
 #define word unsigned int
 #define INPUT_SIZE 64
@@ -25,17 +29,10 @@ extern byte memory[0x10000] @ 0x0000;
 extern word c	@ 0xc600;
 extern word x	@ 0xc602;
 extern word y	@ 0xc604;
-/*
-#asm
-._c
-	defb 0
-._x
-	defw 0
-._y
-	defw 0
-#endasm
-*/
 
+void cls() {
+	ioctl(1, IOCTL_OTERM_CLS);
+}
 
 // Little helpers
 byte hexDigit(byte c) {
@@ -117,6 +114,10 @@ byte handle(byte *input) {
 	} else
 	if (cmd_is("BEEP")) {
 		bit_beep(100, 880);
+		
+	} else
+	if (cmd_is("CLS")) {
+		cls();
 		
 	} else
 	if (cmd_is("SOUND")) {

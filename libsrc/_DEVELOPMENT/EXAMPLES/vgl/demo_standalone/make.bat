@@ -21,7 +21,6 @@ REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
 REM Pre-Clean
 DEL %PROGNAME%.bin
-DEL zcc_opt.def
 
 REM Use SDCC compiler (can not handle inline #asm/#endasm in C!)
 REM SET ZCCCMD=zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
