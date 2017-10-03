@@ -5,7 +5,7 @@ REM Change to git version
 SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
-SET VGLMODEL=2000
+SET VGLMODEL=4000
 
 REM SET PROGNAME=hello
 REM SET PROGNAME=debug
