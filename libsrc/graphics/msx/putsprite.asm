@@ -6,7 +6,7 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:36 dom Exp $
+; $Id: putsprite.asm $
 ;
 
 	SECTION   smc_clib
@@ -15,7 +15,7 @@
 	EXTERN	pixeladdress
 	EXTERN	pixelbyte
 	EXTERN     swapgfxbk
-        EXTERN	swapgfxbk1
+        EXTERN	__graphics_end
 
 	INCLUDE	"graphics/grafix.inc"
 	INCLUDE	"msx/vdp.inc"
@@ -28,7 +28,7 @@
 .putsprite
 ._putsprite
 	push	ix		;save callers
-        ld      hl,4   
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -109,8 +109,7 @@
          pop      bc                ;Restore data
          djnz     _oloop
 .putsprite_exit
-	 pop	  ix		;restore callers
-	 jp       swapgfxbk1
+	 jp       __graphics_end
 
 
 .putspritew
@@ -169,16 +168,10 @@
          push     af
 ;**************
          ld       a,l		; LSB of video memory ptr
-IF FORmsx
-         di
-ENDIF
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-IF FORmsx
-         ei
-ENDIF
          out      (VDP_CMD), a
          ld       a,(pixelbyte)
          out      (VDP_DATA), a
@@ -192,15 +185,9 @@ ENDIF
          ;inc      hl                ;Go to next byte
 ;**************
          ld       a,l		; LSB of video memory ptr
-IF FORmsx
-         di
-ENDIF
          out      (VDP_CMD), a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "read command" bits
-IF FORmsx
-         ei
-ENDIF
          out      (VDP_CMD), a
          in       a, (VDP_DATAIN)
          ld       (pixelbyte),a
@@ -212,16 +199,10 @@ ENDIF
 	push	af
 ;**************
          ld       a,l		; LSB of video memory ptr
-IF FORmsx
-         di
-ENDIF
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-IF FORmsx
-         ei
-ENDIF
          out      (VDP_CMD), a
          ld       a,(pixelbyte)
          out      (VDP_DATA), a
@@ -240,6 +221,7 @@ ENDIF
 	SECTION	rodata_clib
 .offsets_table
          defb	1,2,4,8,16,32,64,128
-	SECTION bss_clib
+
+	SECTION data_clib
 .actcoord
 	 defw	0
