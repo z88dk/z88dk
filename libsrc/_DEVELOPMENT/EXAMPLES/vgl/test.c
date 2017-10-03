@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <sound.h>
+//#include <sound.h>
 
 unsigned char buffer[100];
 unsigned char c;
@@ -71,6 +71,7 @@ void main(void) {
 	//sprintf(buffer, "MODEL%d\n", VGL_MODEL);
 	//printf(buffer);
 	
+	//bit_play("G8Ab4G8FEb4DC");
 	
 	printf("Enter something>");
 	gets(buffer);
@@ -89,3 +90,4 @@ void main(void) {
 	}
 	
 }
+
