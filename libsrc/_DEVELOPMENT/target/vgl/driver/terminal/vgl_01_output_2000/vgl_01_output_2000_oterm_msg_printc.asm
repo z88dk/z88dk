@@ -16,7 +16,9 @@ vgl_01_output_2000_oterm_msg_printc:
    ;             h = absolute y coordinate
    ;   can use:  af, bc, de, hl
    
-   ld b, h  ; Save for later (refresh)
+   ;ld b, h  ; Save for later (refresh)
+   
+   ; call vgl_01_output_2000_set_cursor_coord
    
    ; Show cursor on screen
    ; ofs = Y*64 + X

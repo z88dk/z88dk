@@ -165,10 +165,13 @@ SECTION code_driver_terminal_output
 
 PUBLIC vgl_01_output_4000
 PUBLIC vgl_01_output_4000_refresh
+PUBLIC vgl_01_output_4000_set_cursor_coord
 
 ;EXTERN ITERM_MSG_BELL, ITERM_MSG_PRINT_CURSOR, STDIO_MSG_ICTL
 ;EXTERN OTERM_MSG_PRINTC
 ;EXTERN OTERM_MSG_SCROLL, OTERM_MSG_CLS, EXTERN OTERM_MSG_PAUSE, OTERM_MSG_BELL
+;EXTERN STDIO_MSG_WRIT
+;EXTERN IOCTL_OTERM_SET_CURSOR_COORD
 
 EXTERN vgl_01_output_2000_iterm_msg_bell
 EXTERN vgl_01_output_4000_iterm_msg_print_cursor
@@ -178,6 +181,7 @@ EXTERN vgl_01_output_4000_oterm_msg_cls
 EXTERN vgl_01_output_4000_oterm_msg_pause
 EXTERN vgl_01_output_4000_oterm_msg_printc
 EXTERN vgl_01_output_4000_oterm_msg_scroll
+EXTERN vgl_01_output_4000_stdio_msg_writ
 
 EXTERN console_01_output_terminal_char
 
@@ -189,12 +193,18 @@ vgl_01_output_4000:
    cp OTERM_MSG_PRINTC
    jp z, vgl_01_output_4000_oterm_msg_printc
    
+   ; Use fast (And experimental) output (only refresh after whole string)
+   ;cp STDIO_MSG_WRIT
+   ;jp z, vgl_01_output_4000_stdio_msg_writ
+   
    cp ITERM_MSG_PRINT_CURSOR
    jp z, vgl_01_output_4000_iterm_msg_print_cursor
    
    cp ITERM_MSG_BELL
    jp z, vgl_01_output_2000_iterm_msg_bell
    
+   ;cp IOCTL_OTERM_SET_CURSOR_COORD
+   ;jp z, vgl_01_output_4000_ioctl_oterm_set_cursor_coord
    ;cp STDIO_MSG_ICTL
    ;jp z, vgl_01_output_4000_stdio_msg_ictl
    
@@ -234,3 +244,30 @@ vgl_01_output_4000_refresh:
    ;	ld a, 1
    ;	ld (hl), a
    ret
+
+vgl_01_output_4000_set_cursor_coord:
+   ;   enter  :  c = ascii code
+   ;             b = parameter (foreground colour, 255 if none specified)
+   ;             l = absolute x coordinate
+   ;             h = absolute y coordinate
+   ;   can use:  af, bc, de, hl
+   
+   ; Show cursor on screen
+   ld a, l
+   ;inc a    ;@FIXME: I have to add one!
+   ld (__VGL_4000_DISPLAY_CURSOR_X_ADDRESS), a
+   ld a, h
+   ld (__VGL_4000_DISPLAY_CURSOR_Y_ADDRESS), a
+   ret
+
+
+;; Testing
+;vgl_01_output_4000_ioctl_oterm_set_cursor_coord:
+;   
+;   ; Show cursor on screen
+;   ld a, (ix+35)
+;   ld (__VGL_4000_DISPLAY_CURSOR_X_ADDRESS), a
+;   ld a, (ix+37)
+;   ld (__VGL_4000_DISPLAY_CURSOR_Y_ADDRESS), a
+;   
+;   ret

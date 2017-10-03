@@ -5,8 +5,15 @@ REM Change to git version
 SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
-SET VGLMODEL=2000
-SET PROGNAME=test
+SET VGLMODEL=4000
+
+REM SET PROGNAME=hello
+REM SET PROGNAME=debug
+REM SET PROGNAME=payload
+REM SET PROGNAME=memtest
+REM SET PROGNAME=standalone
+SET PROGNAME=tritone
+REM SET PROGNAME=test
 
 REM SET SRCPATH=..\
 REM SET PROGNAME=eliza
@@ -20,6 +27,7 @@ REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
 REM Pre-Clean
 DEL %PROGNAME%.bin
+DEL zcc_opt.def
 
 REM Use SDCC compiler (can not handle inline #asm/#endasm in C!)
 REM SET ZCCCMD=zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app

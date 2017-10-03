@@ -5,18 +5,11 @@ REM Change to git version
 SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
-SET VGLMODEL=2000
-SET PROGNAME=test
+SET VGLMODEL=4000
 
-REM SET SRCPATH=..\
-REM SET PROGNAME=eliza
-REM SET PROGNAME=heapsort
-REM SET PROGNAME=beepfx
-
-
+SET PROGNAME=loader
 SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
-REM SET VGLOPTS=-subtype=payload
-REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
+
 
 REM Pre-Clean
 DEL %PROGNAME%.bin
@@ -39,8 +32,9 @@ DEL %PROGNAME%_CODE.bin
 DEL %PROGNAME%_DATA.bin
 DEL %PROGNAME%_interrupt_vectors.bin
 
+
 :EMU
-CALL emu.bat %PROGNAME% gl%VGLMODEL%
+CALL loader_emu.bat %PROGNAME% gl%VGLMODEL%
 GOTO:END
 
 

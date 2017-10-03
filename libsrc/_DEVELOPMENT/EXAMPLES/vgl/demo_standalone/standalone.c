@@ -1112,7 +1112,7 @@ void main(void) {
 	
 	
 	put("Hello V-Tech\n");
-	//put("\n2017 B HotKey Slawik\n");
+	put("\n2017 B HotKey Slawik\n");
 	//beep();
 	pause();
 	

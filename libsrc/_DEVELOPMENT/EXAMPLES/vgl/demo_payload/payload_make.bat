@@ -5,21 +5,16 @@ REM Change to git version
 SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
-SET VGLMODEL=2000
-SET PROGNAME=test
+SET VGLMODEL=4000
 
-REM SET SRCPATH=..\
-REM SET PROGNAME=eliza
-REM SET PROGNAME=heapsort
-REM SET PROGNAME=beepfx
+SET PROGNAME=payload
+SET VGLOPTS=-subtype=ram_payload
 
-
-SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
-REM SET VGLOPTS=-subtype=payload
-REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
 REM Pre-Clean
 DEL %PROGNAME%.bin
+DEL %PROGNAME%.inc
+DEL zcc_opt.def
 
 REM Use SDCC compiler (can not handle inline #asm/#endasm in C!)
 REM SET ZCCCMD=zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
@@ -39,9 +34,17 @@ DEL %PROGNAME%_CODE.bin
 DEL %PROGNAME%_DATA.bin
 DEL %PROGNAME%_interrupt_vectors.bin
 
-:EMU
-CALL emu.bat %PROGNAME% gl%VGLMODEL%
+REM	:DIS
+REM	CALL payload_disasm.bat
+REM	GOTO:CONVERT
+
+:CONVERT
+python payload_bin2inc.py
 GOTO:END
+
+REM	:EMU
+REM	CALL emu.bat %PROGNAME% gl%VGLMODEL%
+REM	GOTO:END
 
 
 :ERROR

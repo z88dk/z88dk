@@ -165,6 +165,7 @@ SECTION code_driver_terminal_output
 
 PUBLIC vgl_01_output_2000
 PUBLIC vgl_01_output_2000_refresh
+PUBLIC vgl_01_output_2000_set_cursor_coord
 
 ;EXTERN ITERM_MSG_BELL, ITERM_MSG_PRINT_CURSOR, STDIO_MSG_ICTL
 ;EXTERN OTERM_MSG_PRINTC
@@ -217,6 +218,22 @@ vgl_01_output_2000:
 
    jp console_01_output_terminal_char     ; forward to library
 
+
+vgl_01_output_2000_set_cursor_coord:
+   ;             l = absolute x coordinate
+   ;             h = absolute y coordinate
+   ;   can use:  af, bc, de, hl
+   
+   ld b, h  ; Save for later (refresh)
+   
+   ; Show cursor on screen
+   ; ofs = Y*64 + X
+   ld a, h
+   ld d, 6
+   sla d
+   add l
+   ld (__VGL_2000_DISPLAY_CURSOR_OFS_ADDRESS), a
+   ret
 
 vgl_01_output_2000_refresh:
    ; Refresh all row(s)

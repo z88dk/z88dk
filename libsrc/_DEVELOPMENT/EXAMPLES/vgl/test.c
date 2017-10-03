@@ -1,11 +1,14 @@
 #include <stdio.h>
-//#include <sound.h>
+#include <sys/ioctl.h>
+//#include <stdlib.h>
+#include <sound.h>
 
 unsigned char buffer[100];
 unsigned char c;
 unsigned char i;
 
 #define IOCTL_OTERM_PAUSE 0xc042	// defined in target's auto-generated h file
+#define IOCTL_OTERM_CLS 0x0102	// defined in target's auto-generated h file
 
 /*
 #define __VGL_KEY_STATUS_ADDRESS  0xdb00
@@ -51,14 +54,29 @@ void delay() {
 	}
 }
 
+void cls() {
+	ioctl(1, IOCTL_OTERM_CLS);
+}
+void pause() {
+	// Echo off
+	
+	//gets(buffer);
+	getchar();
+	
+	// Echo on
+}
+void beep() {
+	bit_beep(100, 880);
+}
 
 void main(void) {
 	
-	//ioctl(1, IOCTL_OTERM_PAUSE, 0);	// Switch off "pause after page is full". Also possible on compile time via OTERM_FLAGS when unsetting bit 6 (0x0040)
+	ioctl(1, IOCTL_OTERM_PAUSE, 0);	// Switch off "pause after page is full". Also possible on compile time via OTERM_FLAGS when unsetting bit 6 (0x0040)
+	cls();
 	
-	printf("Hello, World!\n");
-	//delay();
-	//getchar();
+	printf("V-Tech TEST\n");
+	beep();
+	pause();
 	
 	/*
 	printf("Beeping...");
@@ -66,7 +84,13 @@ void main(void) {
 	printf("!\n");
 	*/
 	
-	printf("Which model?\n");
+	cls();
+	printf("CLS?\n");
+	pause();
+	
+	cls();
+	printf("CLS 2?\n");
+	pause();
 	
 	//sprintf(buffer, "MODEL%d\n", VGL_MODEL);
 	//printf(buffer);
