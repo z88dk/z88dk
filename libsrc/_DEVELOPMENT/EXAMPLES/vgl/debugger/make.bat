@@ -5,23 +5,25 @@ REM Change to git version
 SET ZCCCFG=%Z88DK%\lib\config
 SET PATH=%PATH%;%Z88DK%\bin
 
-SET VGLMODEL=2000
+SET VGLMODEL=4000
 SET PROGNAME=debug
 
 SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
 REM SET VGLOPTS=-subtype=payload
 REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
+
+:COMPILE
 REM Pre-Clean
 DEL %PROGNAME%.bin
-DEL zcc_opt.def
+
+REM Use SCCZ80 compiler
+SET ZCCCMD=zcc +vgl -vn -clib=new %VGLOPTS% %SRCPATH%%PROGNAME%.c -o %PROGNAME% -create-app
 
 REM Use SDCC compiler (can not handle inline #asm/#endasm in C!)
 REM SET ZCCCMD=zcc +vgl -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
 REM SET ZCCCMD=zcc +vgl -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 %PROGNAME%.c -o %PROGNAME% -create-app
 
-REM Use SCCZ80 compiler
-SET ZCCCMD=zcc +vgl -vn -clib=new %VGLOPTS% %SRCPATH%%PROGNAME%.c -o %PROGNAME% -create-app
 
 ECHO Running %ZCCCMD%
 %ZCCCMD%

@@ -112,6 +112,16 @@ byte handle(byte *input) {
 		printf("This is all the help you get.\n");
 		
 	} else
+	/*
+	if (cmd_is("TEST")) {
+		
+		for(i = 0; i < 160; i++) {
+			memory[0xdcef] = i;
+			bit_beep(100, 880);
+		}
+		
+	} else
+	*/
 	if (cmd_is("BEEP")) {
 		bit_beep(100, 880);
 		

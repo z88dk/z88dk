@@ -19,17 +19,20 @@ vgl_01_output_4000_oterm_msg_printc:
    ;   can use:  af, bc, de, hl
    
    
-   ; call call vgl_01_output_4000_set_cursor_coord
+   ; call vgl_01_output_4000_set_cursor_coord
+   
    ; Show cursor on screen
    ld a, l
-   ;inc a    ;@FIXME: I have to add one!
+   inc a    ;Show NEXT pos
    ld (__VGL_4000_DISPLAY_CURSOR_X_ADDRESS), a
    ld a, h
    ld (__VGL_4000_DISPLAY_CURSOR_Y_ADDRESS), a
+   ld a, 1  ;0=off, 1=block 2=line
+   ld (__VGL_4000_DISPLAY_CURSOR_MODE_ADDRESS), a
    
    ; Put character to VRAM at 0xdca0 + (Y*COLS) + X
    ; a := Y*20
-   ;ld a, h
+   ld a, h
    add a   ; *2
    add a   ; *4
    add a   ; *8
@@ -47,7 +50,6 @@ vgl_01_output_4000_oterm_msg_printc:
    ld l, a
    
    ld (hl), c   ; Put character to calculated VRAM offset
-   
    
    jp vgl_01_output_4000_refresh
 

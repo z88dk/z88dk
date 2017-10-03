@@ -23,11 +23,19 @@ vgl_01_output_2000_oterm_msg_printc:
    ; Show cursor on screen
    ; ofs = Y*64 + X
    ld a, h
-   ld d, 6
-   sla d
+   ;ld d, 6
+   ;sla d
+   add a   ; 2
+   add a   ; 4
+   add a   ; 8
+   add a   ; 16
+   add a   ; 32
+   add a   ; 64
    add l
+   inc a ; Show NEXT pos
    ld (__VGL_2000_DISPLAY_CURSOR_OFS_ADDRESS), a
-   
+   ld a, 1  ;0=off, 1=block 2=line
+   ld (__VGL_2000_DISPLAY_CURSOR_MODE_ADDRESS), a
    
    ; Put character to VRAM at 0xdca0 + (Y*COLS) + X
    ; a := Y*20

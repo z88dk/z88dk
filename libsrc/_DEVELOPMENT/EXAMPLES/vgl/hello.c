@@ -5,10 +5,9 @@
 
 #include <stdio.h>
 
-
-main()
-{
+main() {
 	printf("Hello world!");
 	
-	gets();
+	while(1) {
+	}
 }

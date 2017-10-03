@@ -67,7 +67,7 @@ ifelse(__STARTUP, 0, `
 ifelse(__STARTUP, 1, `
    ; STARTUP = 1
    ;
-   ; V-Tech Genius Leader 2000
+   ; V-Tech Genius Leader (all)
    ;
    ; ROM code (minimal)
    ;

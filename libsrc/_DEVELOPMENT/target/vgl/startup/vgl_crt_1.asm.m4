@@ -164,9 +164,9 @@ include(`startup/vgl_signature_code.inc')
 
    include "../clib_init_bss.inc"
 
-;	   ; interrupt mode
-;	   
-;	   include "../crt_set_interrupt_mode.inc"
+   ; interrupt mode
+   
+   include "../crt_set_interrupt_mode.inc"
 ;	
 ;	SECTION code_crt_init          ; user and library initialization
 ;	

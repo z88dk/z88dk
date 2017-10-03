@@ -219,22 +219,6 @@ vgl_01_output_2000:
    jp console_01_output_terminal_char     ; forward to library
 
 
-vgl_01_output_2000_set_cursor_coord:
-   ;             l = absolute x coordinate
-   ;             h = absolute y coordinate
-   ;   can use:  af, bc, de, hl
-   
-   ld b, h  ; Save for later (refresh)
-   
-   ; Show cursor on screen
-   ; ofs = Y*64 + X
-   ld a, h
-   ld d, 6
-   sla d
-   add l
-   ld (__VGL_2000_DISPLAY_CURSOR_OFS_ADDRESS), a
-   ret
-
 vgl_01_output_2000_refresh:
    ; Refresh all row(s)
    ld a, 1
@@ -251,4 +235,29 @@ vgl_01_output_2000_refresh:
    ;	; Put "1" there
    ;	ld a, 1
    ;	ld (hl), a
+   ret
+
+
+vgl_01_output_2000_set_cursor_coord:
+   ;             l = absolute x coordinate
+   ;             h = absolute y coordinate
+   ;   can use:  af, bc, de, hl
+   
+   ld b, h  ; Save for later (refresh)
+   
+   ; Show cursor on screen
+   ; ofs = Y*64 + X
+   ld a, h
+   ;ld d, 6
+   ;sla d
+   add a   ; 2
+   add a   ; 4
+   add a   ; 8
+   add a   ; 16
+   add a   ; 32
+   add a   ; 64
+   add l
+   ld (__VGL_2000_DISPLAY_CURSOR_OFS_ADDRESS), a
+   ;ld a, 1  ;0=off, 1=block 2=line
+   ;ld (__VGL_2000_DISPLAY_CURSOR_MODE_ADDRESS), a
    ret
