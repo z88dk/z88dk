@@ -114,7 +114,7 @@
 	in	a, (VDP_DATAIN)
 	ld (chline_buffer),a
 
-	ld de,32	; next row
+	ld de,8	; next row
 	add hl,de
 	
 	ld	a,l		; LSB of video memory ptr
@@ -150,8 +150,6 @@
   add hl,de
   djnz LFONT
 .NOLFONT
-
-  ;ld de,32	; next row
 
   ld c,8
 .PRE
@@ -230,7 +228,7 @@
          ld       a,(chline_buffer)
          out      (VDP_DATA), a
 
-	ld de,32	; next row
+	ld de,8	; next row
 	add hl,de
 		 
          ld       a,l		; LSB of video memory ptr
@@ -242,7 +240,7 @@
          ld       a,(chline_buffer+1)
          out      (VDP_DATA), a
 		 
-	ld de,8192-32	; next row
+	ld de,8192-8	; next row
 	add hl,de
 		 
          ld       a,l		; LSB of video memory ptr
@@ -268,7 +266,7 @@
 	in	a, (VDP_DATAIN)
 	ld (chline_buffer),a
 
-	ld de,32	; next row
+	ld de,8	; next row
 	add hl,de
 	
 	ld	a,l		; LSB of video memory ptr
