@@ -2,6 +2,7 @@
 #include "ccdefs.h"
 #include "define.h" 
 
+static void declfunc(Type *type, enum storage_type storage);
 
 Type   *type_void = &(Type){ KIND_VOID, 1, 0 };
 Type   *type_carry = &(Type){ KIND_CARRY, 1, 0 };
@@ -370,7 +371,10 @@ static Type *parse_type(void)
         return parse_struct(type, 1);
     } else if ( amatch("union")) {
         return parse_struct(type, 0);
-    } 
+    } else {
+        FREENULL(type);
+        return type;
+    }
     // } else if ( chase_typedef(type) < 0 ) 
     //     return NULL;
 
@@ -547,6 +551,12 @@ Type *dodeclare(enum storage_type storage)
                 ptr->ctype = type;
             }
             return NULL;
+        } else if ( storage != STKLOC && rcmatch('{')) {   
+            declfunc(type, storage);
+            break;
+        } else if ( cmatch(',')) {
+            // We have another variable of same base type */
+
         } else {
             return type;
         }
@@ -596,4 +606,123 @@ Type *dodeclare2()
     }
 
     return type;
+}
+
+
+static void declfunc(Type *type, enum storage_type storage)
+{
+    int where;
+
+    currfn = findglb(type->name);
+    
+    if ( currfn != NULL ) {
+        // TODO: Check that it matches
+    } else {
+        currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+        currfn->ctype = type;   
+    }
+
+    // Setup local variables
+    output_section(c_code_section); // output_section("code");
+    
+    nl();
+    prefix();
+    outname(currfn->name, dopref(currfn));
+    col(); /* print function name */
+    if (dopref(currfn) == NO) {
+        nl();
+        prefix();
+        outname(currfn->name, YES);
+        col();
+    }
+    nl();
+
+    infunc = 1; /* In a function for sure! */
+    
+    if (((currfn->flags & SHARED) && c_makeshare) || c_shared_file) {
+        /* Shared library definition, offset the stack */
+        where = 2 + c_share_offset;
+    } else
+        where = 2;
+    /* If we use frame pointer we preserve previous framepointer on entry
+        * to each function
+        */
+    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
+        where += 2;
+
+    if ( (currfn->flags & (CRITICAL|NAKED)) == CRITICAL ) {
+        where += zcriticaloffset();
+    }
+    
+    /* main is always __stdc */
+    if ( strcmp(currfn->name,"main") == 0 ) {
+        currfn->flags &= ~SMALLC;
+    }
+    
+    
+    /* For SMALLC we need to start counting from the last argument */
+    if ( (currfn->flags & SMALLC) == SMALLC ) {
+        int i;
+        for ( i = array_len(currfn->ctype->parameters) - 1; i >= 0; i-- ) {
+            SYMBOL *ptr;
+            Type *type = array_get_byindex(currfn->ctype->parameters, i);
+            // Create a local variable
+            ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            ptr->ctype = type;
+            ptr->offset.i = where;
+            where += type->size;
+        }
+    } else {
+        int i;
+        for ( i = 0; i < array_len(currfn->ctype->parameters); i++ ) {
+            SYMBOL *ptr;
+            Type *type = array_get_byindex(currfn->ctype->parameters, i);
+            // Create a local variable
+            ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            ptr->ctype = type;            
+            ptr->offset.i = where;
+            where += type->size;
+        }
+    }
+        
+    
+    if ( (currfn->flags & CRITICAL) == CRITICAL ) {
+        zentercritical();
+    }
+    pushframe();
+    if (array_len(currfn->ctype->parameters) && (currfn->flags & (FASTCALL|NAKED)) == FASTCALL ) {
+        Type *type = array_get_byindex(currfn->ctype->parameters,0);
+        int   adjust = 1;
+
+        if ( type->size == 2 ) 
+            zpush();
+        else if ( type->size == 4)
+            lpush();
+        else if ( type->kind == KIND_DOUBLE )
+            dpush();
+        else
+            adjust = 0;
+
+        if ( adjust ) {
+            SYMBOL *ptr = findloc(type->name);
+            if ( ptr ) {
+                ptr->offset.i -= type->size;
+                where = 2;
+            }
+        }
+    }
+    
+    stackargs = where;
+    if (statement() != STRETURN) {
+        /* do a statement, but if it's a return, skip */
+        /* cleaning up the stack */
+        leave(NO, NO, 0);
+    }
+    goto_cleanup();
+    function_appendix(currfn);
+
+#ifdef INBUILT_OPTIMIZER
+    generate();
+#endif
+    infunc = 0; /* not in fn. any more */
 }

@@ -120,7 +120,7 @@ void dogoto()
 SYMBOL* addgotosym(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "99goto_");
+    strcpy(sname2, "099goto_");
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
@@ -130,7 +130,7 @@ SYMBOL* addgotosym(char* sname)
 SYMBOL* findgoto(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "99goto_");
+    strcpy(sname2, "099goto_");
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
