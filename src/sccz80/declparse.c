@@ -544,11 +544,19 @@ int declare_local(int local_static)
         if ( type == NULL ) {
             return 0;
         }
-        SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
-        ptr->ctype = type;
-        declared += type->size;
-        ptr->offset.i = Zsp - declared;
-        // TODO: Initialisation
+        if ( local_static ) {
+            char  namebuf[NAMESIZE * 2 + 10];
+            snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
+            SYMBOL *ptr = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC, 0, 0);
+            ptr->ctype = type;
+            // TODO initialisation
+        } else {
+            SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            ptr->ctype = type;
+            declared += type->size;
+            ptr->offset.i = Zsp - declared;
+            // TODO: Initialisation
+        }
     } while ( cmatch(','));
     return 1;
 }
