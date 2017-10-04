@@ -14,14 +14,14 @@ REM SET PROGNAME=heapsort
 REM SET PROGNAME=beepfx
 
 REM Which model to compile for?
-SET VGLMODEL=4000
+SET VGLMODEL=2000
 
 REM Which model to use for emulation?
 SET EMUMODEL=gl%VGLMODEL%
 
 SET VGLOPTS=-subtype=%VGLMODEL%_rom_autostart
 REM SET VGLOPTS=-subtype=payload
-SET VGLOPTS=-subtype=%VGLMODEL%_rom
+REM SET VGLOPTS=-subtype=%VGLMODEL%_rom
 
 
 :COMPILE

@@ -32,7 +32,9 @@ SET EMUSYS=%2
 
 :RUN
 REM -debug	Starts a nice debugger!
-"%MESSPATH%\mess.exe" -rompath "%ROMPATH%" %EMUSYS% -cart "%PROGNAME%.bin" -window -nomax -nofilter -sleep -volume -20
+REM -nothrottle
+REM -skip_disclaimer -skip_gameinfo -skip_warnings
+"%MESSPATH%\mess.exe" -rompath "%ROMPATH%" %EMUSYS% -cart "%PROGNAME%.bin" -window -nomax -nofilter -sleep -volume -20 -skip_gameinfo -speed 4.0
 
 REM Remove MESS config directory that is created
 DEL /S cfg\*.cfg

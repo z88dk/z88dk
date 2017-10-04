@@ -5,6 +5,11 @@
 unsigned char buffer[100];
 unsigned char c;
 unsigned char i;
+extern unsigned int pos;
+#asm
+._pos
+	defw 0x0000
+#endasm
 
 #define IOCTL_OTERM_PAUSE 0xc042	// defined in target's auto-generated h file
 
@@ -21,6 +26,18 @@ void main(void) {
 	*/
 	
 	//bit_play("G8Ab4G8FEb4DC");
+	
+	//song_synth();
+	
+	/*
+	for (i=0; i < 8 ; i++ ) {
+		printf("bit_fx(%d)\n",i);
+		bit_fx(i);
+	}
+	*/
+	
+	
+	
 	
 	// Prepare HL to point to music data...
 	#asm
@@ -42,10 +59,12 @@ void main(void) {
 		call asm_bit_play_tritone
 		ei
 		push hl
+		//ld (_pos), hl
 		#endasm
 		
 		// Time for UI
 		printf(".");
+		//printf("%04X ", pos);
 		
 	}
 	
@@ -54,4 +73,6 @@ void main(void) {
 #include "song_veeblefetzer.inc"
 //#include "song_airwolf.inc"
 //#include "song_rr.inc"
+
+#include "song_synth.inc"
 

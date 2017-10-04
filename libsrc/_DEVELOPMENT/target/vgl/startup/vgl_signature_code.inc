@@ -7,6 +7,7 @@
 
 
 ; Default ROM lead-in
+; 0x8000, 0x8001
 defb 55h
 defb 0aah
 
@@ -19,8 +20,12 @@ IF __VGL_ROM_AUTOSTART = 1
    defb 45h ; "E"
 ELSE
    ; "GA" = normal signature (i.e. non-autostart code)
-   defb 47h ; "G"
-   defb 41h ; "A"
+   ;defb 47h ; "G"
+   ;defb 41h ; "A"
+   
+   ; PreComputer1000 autostart
+   defb 0x33  ; 0x33 = autostart jump to 0x8010
+   defb 0x00  ; Dont care
 ENDIF
 
 ; Jump past the signature
@@ -40,9 +45,12 @@ jp __SignatureAutostartEnd ; usually "jp 801fh"
       defb " "
       defb "MODEL"
       defb (0x30 + (__VGL_MODEL / 1000))
-      defb (0x30 + (__VGL_MODEL % 1000) / 100)
-      defb (0x30 + (__VGL_MODEL % 100) / 10)
-      defb (0x30 + (__VGL_MODEL % 10))
+      
+      ;defb (0x30 + (__VGL_MODEL % 1000) / 100)
+      ;defb (0x30 + (__VGL_MODEL % 100) / 10)
+      ;defb (0x30 + (__VGL_MODEL % 10))
+      jp __SignatureAutostartEnd  ; 0x8010 is entry point for PreComputer 1000
+      
       defb " "
       IF __VGL_ROM_AUTOSTART = 1
          defb "A"
