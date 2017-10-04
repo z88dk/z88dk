@@ -12,43 +12,76 @@
 	nextreg	%2,%3
 
 ;;
-;; ZXN_READ_NEXTREG(reg)
+;; ZXN_READ_REG(reg)
 ;;
 
-%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG_fastcall
+;; zsdcc
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_READ_REG_fastcall
 =
-	call	%2ZXN_READ_NEXTREG_fastcall
+	call	_ZXN_READ_REG_fastcall
 	ret
 
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG_fastcall
+%"[ \t]*"0call%"[ \t]*"1_ZXN_READ_REG_fastcall
 =
 	ld	bc,0x243b
 	out	(c),l
 	inc	b
 	in	l,(c)
 
-	%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG
+;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_READ_REG
 =
-	call	%2ZXN_READ_NEXTREG
+	call	ZXN_READ_REG
 	ret
 
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_NEXTREG
+%"[ \t]*"0call%"[ \t]*"1ZXN_READ_REG
 =
 	ld	bc,0x243b
 	out	(c),l
 	inc	b
 	in	l,(c)
+	ld	h,0
+
+;;
+;; ZXN_WRITE_REG(reg,data)
+;;
+
+;; zsdcc
+
+%"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_REG_callee
+=
+	pop	hl
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	out	(c),h
+
+
+;; sccz80
+
+%"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_REG_callee
+=
+	pop	de
+	pop	hl
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	out	(c),e
 
 ;;
 ;; ZXN_READ_MMUn()
 ;;
 
-%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
+;; zsdcc
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_READ_MMU%"[0-9]+"3
 =
-	call	%2ZXN_READ_MMU%3
+	call	_ZXN_READ_MMU%3
 	ret
 
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_READ_MMU%"[0-9]+"3
+%"[ \t]*"0call%"[ \t]*"1_ZXN_READ_MMU%"[0-9]+"3
 =
 	ld	bc,0x243b
 	ld	a,0x50+%3
@@ -56,26 +89,46 @@
 	inc	b
 	in	l,(c)
 
+;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_READ_MMU%"[0-9]+"3
+=
+	call	ZXN_READ_MMU%3
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1ZXN_READ_MMU%"[0-9]+"3
+=
+	ld	bc,0x243b
+	ld	a,0x50+%3
+	out	(c),a
+	inc	b
+	in	l,(c)
+	ld	h,0
+
 ;;
 ;; ZXN_WRITE_MMUn(page)
 ;;
 
-%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+;; zsdcc
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
 =
-	call	%2ZXN_WRITE_MMU%3_fastcall
+	call	_ZXN_WRITE_MMU%3_fastcall
 	ret
 
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+%"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
 =
 	ld	a,l
 	mmu%3	a
 
-	%"[ \t]*"0jp%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
 =
-	call	%2ZXN_WRITE_MMU%3
+	call	ZXN_WRITE_MMU%3
 	ret
 
-%"[ \t]*"0call%"[ \t]*"1%"[_]*"2ZXN_WRITE_MMU%"[0-9]+"3
+%"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
 =
 	ld	a,l
 	mmu%3	a
@@ -105,12 +158,11 @@
 
 	mmu%"[0-9]+"1	a
 =
-	ld	l,a
 	ld	bc,0x243b
-	ld	a,0x50+%1
-	out	(c),a
-	inc	b
+	ld	l,0x50+%1
 	out	(c),l
+	inc	b
+	out	(c),a
 
 	ld	a,l
 	ld	l,a
