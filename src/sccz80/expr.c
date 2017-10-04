@@ -439,15 +439,14 @@ int heir9(LVALUE* lval)
  * perform lval manipulation for pointer dereferencing/array subscripting
  */
 
-/* djm, I can't make this routine distinguish between ptr->ptr and ptr
- * so if address loads dummy de,0 to ensure everything works out
- */
 SYMBOL *deref(LVALUE* lval, char isaddr)
 {
-    char flags;
-
     lval->ltype = lval->ltype->ptr;
-
+    lval->symbol = NULL;
+    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
+        lval->ptr_type = KIND_NONE;
+    lval->val_type = lval->indirect_kind = lval->ltype->kind;
+        
     // flags = lval->flags;
     // if (isaddr) {
     //     if (flags & FARACC)
@@ -470,7 +469,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     //     lval->val_type = lval->indirect_kind = lval->symbol->type;
     //     lval->flags = flags;
     //     lval->symbol = NULL; /* forget symbol table entry */
-    //     lval->ptr_type = 0; /* flag as not symbol or array */
+    //     lval->ptr_type = KIND_NONE; /* flag as not symbol or array */
     //     lval->ident = ID_VARIABLE; /* We're now a variable! */
     // } else {
     //     /* array of/pointer to pointer */
@@ -555,7 +554,7 @@ int heira(LVALUE *lval)
     } else if (cmatch('*')) { /* unary * */
         if (heira(lval))
             rvalue(lval);
-        if (lval->symbol == 0) {
+        if (lval->ltype->ptr == NULL ) {
             error(E_DEREF);
             junk();
             return 0;
@@ -703,7 +702,7 @@ int heirb(LVALUE* lval)
 
                 if (ptr && ptr->more == 0) {
                     /* function returning variable */
-                    lval->ptr_type = 0;
+                    lval->ptr_type = KIND_NONE;
                     lval->val_type = ptr->type;
                     lval->ident = ID_VARIABLE;
                     ptr = lval->symbol = NULL;

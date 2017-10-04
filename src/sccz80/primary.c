@@ -40,7 +40,7 @@ int primary(LVALUE* lval)
             lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
             lval->ident = ptr->ident;
-            lval->ptr_type = 0;
+            lval->ptr_type = KIND_NONE;
             if ( lval->ltype->kind == KIND_PTR ) {
                 lval->ptr_type = ptr->type;
                 /* djm long pointers */
@@ -78,7 +78,7 @@ int primary(LVALUE* lval)
                 lval->val_type = ptr->type;
                 lval->flags = ptr->flags;
                 lval->ident = ptr->ident;
-                lval->ptr_type = 0;
+                lval->ptr_type = KIND_NONE;
                 if (lval->ltype->kind != KIND_ARRAY && lval->ltype->kind != KIND_STRUCT ) {
                     if (lval->ltype->kind == KIND_PTR) {
                         lval->ptr_type = ptr->type;
@@ -291,12 +291,14 @@ int widen(LVALUE* lval, LVALUE* lval2)
             convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
             DoubSwap();
             lval->val_type = KIND_DOUBLE; /* type of result */
+            lval->ltype = type_double;
         }
         return (1);
     } else {
         if (lval->val_type == KIND_DOUBLE) {
             convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
             lval2->val_type = KIND_DOUBLE;
+            lval2->ltype = type_double;
             return (1);
         } else
             return (0);
@@ -370,11 +372,14 @@ int dbltest(LVALUE* lval, LVALUE* lval2)
 void result(LVALUE* lval, LVALUE* lval2)
 {
     if (lval->ptr_type && lval2->ptr_type) {
-        lval->ptr_type = 0; /* ptr-ptr => int */
-        if (lval->val_type == KIND_CPTR)
+        lval->ptr_type = KIND_NONE; /* ptr-ptr => int */
+        if (lval->val_type == KIND_CPTR) {
             lval->val_type = KIND_LONG;
-        else
+            lval->ltype = type_long;
+        } else {
             lval->val_type = KIND_INT;
+            lval->ltype = type_int;            
+        }
         lval->indirect_kind = 0;
         lval->ident = ID_VARIABLE;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
@@ -665,8 +670,10 @@ void test(int label, int parens)
             testjump(&lval, label);
     } else {
         if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
-            if (lval.binop == dummy)
+            if (lval.binop == dummy) {
                 lval.val_type = KIND_INT; /* logical always int */
+                lval.ltype = type_int;
+            }
             testjump(&lval, label);
         } else {
             jumpnc(label);
@@ -748,7 +755,7 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
 //             force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
 //         }
 //         dest_lval->val_type = lval->c_vtype;
-//         dest_lval->ptr_type = 0;
+//         dest_lval->ptr_type = KIND_NONE;
 //         dest_lval->ident = ID_VARIABLE;
 //         dest_lval->flags = ((dest_lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
 //         dest_lval->c_id = 0;
