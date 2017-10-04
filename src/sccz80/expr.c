@@ -571,6 +571,7 @@ int heira(LVALUE *lval)
         }
 
         if (lval->symbol) {
+            lval->ltype = make_pointer(lval->symbol->ctype);
             lval->ptr_type = lval->symbol->type;
             lval->val_type = (lval->flags & FARACC ? KIND_CPTR : KIND_INT);
             lval->symbol->isassigned = YES;

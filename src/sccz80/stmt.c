@@ -56,7 +56,7 @@ int statement()
         /* not a definition */
         if (declared >= 0) {
             Zsp = modstk(Zsp - declared, NO, NO);
-            declared = -1;
+            declared = 0;
         }
         st = -1;
         switch (ch()) {
@@ -210,7 +210,7 @@ void compound()
     }
     Zsp = stkstor[ncmp];
     locptr = savloc; /* delete local symbols */
-    declared = -1;
+    declared = 0;
 }
 
 /*
