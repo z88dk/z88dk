@@ -75,25 +75,25 @@ int heir1(LVALUE* lval)
         /* Now our type checking so we can give off lots of warnings about
          * type mismatches etc..
          */
-        if (lval2.val_type == KIND_VOID && lval2.ptr_type == 0)
-            warning(W_VOID);
-        /* First operand is a pointer */
-        if (lval->ptr_type) {
-            if (lval2.ptr_type && lval->ptr_type != lval2.ptr_type && (lval2.ptr_type != KIND_VOID && lval->ptr_type != KIND_VOID)) {
-#if 0
-                /*
-                * Here we have a pointer mismatch, however we don't take account of
-                * ptr2ptr, so anything involvind them will barf badly, I'm leaving
-                * this for now, since the code is fine, but commenting out the warning
-                * which is a bit of shame, but there you go...
-                */
-                warning(W_PTRTYP);
-#endif
-            } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
-                warning(W_INTPTR);
-        } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const))) {
-            warning(W_PTRINT);
-        }
+//         if (lval2.val_type == KIND_VOID && lval2.ptr_type == 0)
+//             warning(W_VOID);
+//         /* First operand is a pointer */
+//         if (lval->ptr_type) {
+//             if (lval2.ptr_type && lval->ptr_type != lval2.ptr_type && (lval2.ptr_type != KIND_VOID && lval->ptr_type != KIND_VOID)) {
+// #if 0
+//                 /*
+//                 * Here we have a pointer mismatch, however we don't take account of
+//                 * ptr2ptr, so anything involvind them will barf badly, I'm leaving
+//                 * this for now, since the code is fine, but commenting out the warning
+//                 * which is a bit of shame, but there you go...
+//                 */
+//                 warning(W_PTRTYP);
+// #endif
+//             } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
+//                 warning(W_INTPTR);
+//         } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const))) {
+//             warning(W_PTRINT);
+//         }
 
         // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
         // if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
@@ -648,7 +648,7 @@ int heirb(LVALUE* lval)
                         cscale(lval->val_type, tagtab + ptr->tag_idx, &val);
                     else
                         cscale(ptr->type, tagtab + ptr->tag_idx, &val);
-                    if (ptr->storage == STKLOC && ptr->ident == ID_ARRAY) {
+                    if (ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
@@ -686,12 +686,15 @@ int heirb(LVALUE* lval)
                     /* Bugger knows what ya doing..stop SEGV */
                     ptr = dummy_sym[KIND_VOID];
                     warning(W_INTERNAL);
-                } else if (ptr->ident != FUNCTION) {
+                } else if (ptr->ctype->kind != KIND_FUNC) {
                     if (k && lval->const_val == 0)
                         rvalue(lval);
+                    // Functino pointer call
                     callfunction(NULL,ptr);
-                } else
+                } else {
+                    // Normal function call
                     callfunction(ptr,NULL);
+                }
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
                 lval->ltype = lval->ltype->return_type;

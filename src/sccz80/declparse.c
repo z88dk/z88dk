@@ -524,20 +524,39 @@ Type *parse_decl(char name[], Type *base_type)
     return parse_decl_tail(base_type);
 }
 
-int declare_local(int isstatic)
-{
-    return 0;
-}
-
+/** \brief Parse an expression as used for a cast or a sizeof operation
+ */
 Type *parse_expr_type()
 {
-    return NULL;
+    return dodeclare2();
+}
+
+/** \brief Declare a local variableif we need to
+ */
+int declare_local(int local_static)
+{
+    Type *type;
+    Kind base_kind = KIND_NONE;
+
+    do {
+        type = dodeclare2(&base_kind);
+        
+        if ( type == NULL ) {
+            return 0;
+        }
+        SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+        ptr->ctype = type;
+        declared += type->size;
+        ptr->offset.i = Zsp - declared;
+        // TODO: Initialisation
+    } while ( cmatch(','));
+    return 1;
 }
 
 Type *dodeclare(enum storage_type storage)
 {
     while ( 1 ) {
-        Type *type = dodeclare2();
+        Type *type = dodeclare2(NULL);
         
         if ( type == NULL ) {
             break;
@@ -564,14 +583,49 @@ Type *dodeclare(enum storage_type storage)
     return NULL;
 }
 
+Type *make_type(Kind kind, Type *tag)
+{
+    Type *type = CALLOC(1,sizeof(*type));
+
+    type->kind = kind;
+    switch ( kind ) {
+    case KIND_CHAR:
+        type->size = 1;
+        break;
+    case KIND_INT:
+        type->size = 2;
+        break;
+    case KIND_CPTR:
+        type->size = 3;  // TODO: far flag
+        break;
+    case KIND_LONG:
+        type->size = 4;
+        break;
+    case KIND_DOUBLE:
+        type->size = 6;
+        break;
+    case KIND_STRUCT:
+        // TODO
+        break;
+    default:
+        type->size = 2;
+        break;
+    }
+    return type;
+}
+
 // Parse a declaration
-Type *dodeclare2()
+Type *dodeclare2(Kind *base_kind)
 {
     char namebuf[NAMESIZE];
     Type *type;
 
-    if ( (type = parse_type()) == NULL ) {
-         return NULL;
+    if ( base_kind != NULL && *base_kind != KIND_NONE) {
+        type = make_type(*base_kind, NULL);
+    } else {
+        if ( (type = parse_type()) == NULL ) {
+            return NULL;
+        }
     }
 
     // For port8/16 don't do much else beyond 
@@ -590,7 +644,6 @@ Type *dodeclare2()
 
         if ( symname(type->name) == 0 ) 
             illname(type->name);
-        // TODO: Put in hash?
         return type;
     }
 
