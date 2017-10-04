@@ -1,12 +1,9 @@
 
+INCLUDE "config_private.inc"
+
 SECTION code_driver
 
 PUBLIC ide_read_byte
-
-EXTERN __IO_PIO_IDE_LSB, __IO_PIO_IDE_MSB, __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
-EXTERN __IO_PIO_IDE_RD, __IO_PIO_IDE_WR
-
-EXTERN __IO_IDE_WR_LINE, __IO_IDE_RD_LINE, __IO_IDE_RST_LINE
 
     ;Do a read bus cycle to the drive, using the 8255.
     ;input A = ide register address
