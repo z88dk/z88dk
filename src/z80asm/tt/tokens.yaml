@@ -1,9 +1,8 @@
-# Z88DK Z80 Macro Assembler
+# Z88DK Z80 Module Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Define tokens: token name, regular expression (Ragel syntax), lexer code
 # token IDs are sequential starting at zero
@@ -12,366 +11,368 @@
 ---
 tokens:
   # = 0; end of file reached
-  - name	: END
-    regexp	: ""
+  - name    : END
+    regexp  : ""
 
   # Returned for rubish
-  - name	: NIL
-    regexp	: ""
+  - name    : NIL
+    regexp  : ""
 
   # Semantic tokens; TERN_COND : cond ? true : false
-  - name	: NAME
-    regexp	: ""
+  - name    : NAME
+    regexp  : ""
 
-  - name	: LABEL
-    regexp	: ""
+  - name    : LABEL
+    regexp  : ""
 
-  - name	: NUMBER
-    regexp	: ""
+  - name    : NUMBER
+    regexp  : ""
 
-  - name	: STRING
-    regexp	: ""
+  - name    : STRING
+    regexp  : ""
 
-  - name	: TERN_COND
-    regexp	: ""
+  - name    : TERN_COND
+    regexp  : ""
 
   # Tokens
-  - name	: NEWLINE
-    regexp	: "\n"
+  - name    : NEWLINE
+    regexp  : "\n"
 
-  - name	: LOG_NOT
-    regexp	: "!"
+  - name    : LOG_NOT
+    regexp  : "!"
 
-  - name	: CONST_EXPR
-    regexp	: "#"
+  - name    : CONST_EXPR
+    regexp  : "#"
 
-  - name	: MOD
-    regexp	: "%"
+  - name    : MOD
+    regexp  : "%"
 
-  - name	: BIN_AND
-    regexp	: "&"
+  - name    : BIN_AND
+    regexp  : "&"
 
-  - name	: LOG_AND
-    regexp	: "&&"
+  - name    : LOG_AND
+    regexp  : "&&"
 
-  - name	: LPAREN
-    regexp	: "("
+  - name    : LPAREN
+    regexp  : "("
 
-  - name	: RPAREN
-    regexp	: ")"
+  - name    : RPAREN
+    regexp  : ")"
 
-  - name	: MULTIPLY
-    regexp	: "*"
+  - name    : MULTIPLY
+    regexp  : "*"
 
-  - name	: PLUS
-    regexp	: "+"
+  - name    : PLUS
+    regexp  : "+"
 
-  - name	: COMMA
-    regexp	: ","
+  - name    : COMMA
+    regexp  : ","
 
-  - name	: MINUS
-    regexp	: "-"
+  - name    : MINUS
+    regexp  : "-"
 
-  - name	: DOT
-    regexp	: "."
+  - name    : DOT
+    regexp  : "."
 
-  - name	: DIVIDE
-    regexp	: "/"
+  - name    : DIVIDE
+    regexp  : "/"
 
-  - name	: COLON
-    regexp	: ":"
+  - name    : COLON
+    regexp  : ":"
 
-  - name	: LESS
-    regexp	: "<"
+  - name    : LESS
+    regexp  : "<"
 
-  - name	: LEFT_SHIFT
-    regexp	: "<<"
+  - name    : LEFT_SHIFT
+    regexp  : "<<"
 
-  - name	: LESS_EQ
-    regexp	: "<="
+  - name    : LESS_EQ
+    regexp  : "<="
 
-  - name	: NOT_EQ
-    regexp	: ("<>"|"!="))
+  - name    : NOT_EQ
+    regexp  : ("<>"|"!="))
 
-  - name	: EQUAL
-    regexp	: ("="|"=="))
+  - name    : EQUAL
+    regexp  : ("="|"=="))
 
-  - name	: GREATER
-    regexp	: ">"
+  - name    : GREATER
+    regexp  : ">"
 
-  - name	: RIGHT_SHIFT
-    regexp	: ">>"
+  - name    : RIGHT_SHIFT
+    regexp  : ">>"
 
-  - name	: GREATER_EQ
-    regexp	: ">="
+  - name    : GREATER_EQ
+    regexp  : ">="
 
-  - name	: QUESTION
-    regexp	: "?"
+  - name    : QUESTION
+    regexp  : "?"
 
-  - name	: LSQUARE
-    regexp	: "["
+  - name    : LSQUARE
+    regexp  : "["
 
-  - name	: RSQUARE
-    regexp	: "]"
+  - name    : RSQUARE
+    regexp  : "]"
 
-  - name	: BIN_XOR
-    regexp	: "^"
+  - name    : BIN_XOR
+    regexp  : "^"
 
-  - name	: POWER
-    regexp	: "**"
+  - name    : POWER
+    regexp  : "**"
 
-  - name	: LCURLY
-    regexp	: "{"
+  - name    : LCURLY
+    regexp  : "{"
 
-  - name	: BIN_OR
-    regexp	: "|"
+  - name    : BIN_OR
+    regexp  : "|"
 
-  - name	: LOG_OR
-    regexp	: "||"
+  - name    : LOG_OR
+    regexp  : "||"
 
-  - name	: RCURLY
-    regexp	: "}"
+  - name    : RCURLY
+    regexp  : "}"
 
-  - name	: BIN_NOT
-    regexp	: "~"
+  - name    : BIN_NOT
+    regexp  : "~"
 
   # Indirect 8-bit register
-  - name	: IND_C
-    regexp	: '"(" hspace "C"i index_reg_suffix'
+  - name    : IND_C
+    regexp  : '"(" hspace "C"i index_reg_suffix'
 
   # Indirect 16-bit register
   # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
   # can collect expression, will be positive or negative depending on symbol
-  - name	: IND_BC
-    regexp	: '"(" hspace "BC"i index_reg_suffix'
-    lexcode	: 'p--; te--;'
+  - name    : IND_BC
+    regexp  : '"(" hspace "BC"i index_reg_suffix'
+    lexcode : 'p--; te--;'
 
-  - name	: IND_DE
-    regexp	: '"(" hspace "DE"i index_reg_suffix'
-    lexcode	: 'p--; te--;'
+  - name    : IND_DE
+    regexp  : '"(" hspace "DE"i index_reg_suffix'
+    lexcode : 'p--; te--;'
 
-  - name	: IND_HL
-    regexp	: '"(" hspace "HL"i index_reg_suffix'
-    lexcode	: 'p--; te--;'
+  - name    : IND_HL
+    regexp  : '"(" hspace "HL"i index_reg_suffix'
+    lexcode : 'p--; te--;'
 
-  - name	: IND_SP
-    regexp	: '"(" hspace "SP"i index_reg_suffix'
-    lexcode	: 'p--; te--;'
+  - name    : IND_SP
+    regexp  : '"(" hspace "SP"i index_reg_suffix'
+    lexcode : 'p--; te--;'
 
-  - name	: IND_IX
-    regexp	: '"(" hspace "IX"i index_reg_suffix'
-    lexcode	: 'p--; te--;'
+  - name    : IND_IX
+    regexp  : '"(" hspace "IX"i index_reg_suffix'
+    lexcode : 'p--; te--;'
 
-  - name	: IND_IY
-    regexp	: '"(" hspace "IX"i index_reg_suffix'
-    lexcode	: 'p--; te--;'
+  - name    : IND_IY
+    regexp  : '"(" hspace "IX"i index_reg_suffix'
+    lexcode : 'p--; te--;'
 
   # Assembly keywords
-  - name	: ASMPC
+  - name    : ASMPC
   
   # Flags, C register
-  - name	: NZ
-  - name	: Z
-  - name	: NC
-  - name	: C
-  - name	: PO
-  - name	: PE
-  - name	: P
-  - name	: M
-  - name	: LZ
-  - name	: LO
-  - name	: NV
-  - name	: V
+  - name    : NZ
+  - name    : Z
+  - name    : NC
+  - name    : C
+  - name    : PO
+  - name    : PE
+  - name    : P
+  - name    : M
+  - name    : LZ
+  - name    : LO
+  - name    : NV
+  - name    : V
 
   # 8-bit registers
-  - name	: B
-  - name	: D
-  - name	: E
-  - name	: H
-  - name	: L
-  - name	: A
-  - name	: F
-  - name	: I
-  - name	: R
-  - name	: IIR
-  - name	: EIR
-  - name	: XPC
-  - name	: IXH
-  - name	: IYH
-  - name	: IXL
-  - name	: IYL
+  - name    : B
+  - name    : D
+  - name    : E
+  - name    : H
+  - name    : L
+  - name    : A
+  - name    : F
+  - name    : I
+  - name    : R
+  - name    : IIR
+  - name    : EIR
+  - name    : XPC
+  - name    : IXH
+  - name    : IYH
+  - name    : IXL
+  - name    : IYL
   
   # 16-bit registers
-  - name	: BC
-  - name	: DE
-  - name	: HL
-  - name	: IX
-  - name	: IY
-  - name	: AF
-  - name	: SP
+  - name    : BC
+  - name    : DE
+  - name    : HL
+  - name    : IX
+  - name    : IY
+  - name    : AF
+  - name    : SP
   
-  - name	: B1
-    regexp	: "\"B'\"i"
+  - name    : B1
+    regexp  : "\"B'\"i"
   
-  - name	: C1
-    regexp	: "\"C'\"i"
+  - name    : C1
+    regexp  : "\"C'\"i"
   
-  - name	: D1
-    regexp	: "\"D'\"i"
+  - name    : D1
+    regexp  : "\"D'\"i"
   
-  - name	: E1
-    regexp	: "\"E'\"i"
+  - name    : E1
+    regexp  : "\"E'\"i"
   
-  - name	: H1
-    regexp	: "\"H'\"i"
+  - name    : H1
+    regexp  : "\"H'\"i"
   
-  - name	: L1
-    regexp	: "\"L'\"i"
+  - name    : L1
+    regexp  : "\"L'\"i"
   
-  - name	: A1
-    regexp	: "\"A'\"i"
+  - name    : A1
+    regexp  : "\"A'\"i"
   
-  - name	: F1
-    regexp	: "\"F'\"i"
+  - name    : F1
+    regexp  : "\"F'\"i"
   
-  - name	: BC1
-    regexp	: "\"BC'\"i"
+  - name    : BC1
+    regexp  : "\"BC'\"i"
   
-  - name	: DE1
-    regexp	: "\"DE'\"i"
+  - name    : DE1
+    regexp  : "\"DE'\"i"
   
-  - name	: HL1
-    regexp	: "\"HL'\"i"
+  - name    : HL1
+    regexp  : "\"HL'\"i"
   
-  - name	: AF1
-    regexp	: "\"AF'\"i"
+  - name    : AF1
+    regexp  : "\"AF'\"i"
   
   # 32-bit registers
-  - name	: A32
-  - name	: DEHL
+  - name    : A32
+  - name    : DEHL
   
   # Assembly directives
-  - name	: BINARY
-  - name	: DEFB
-  - name	: DEFC
-  - name	: DEFGROUP
-  - name	: DEFINE
-  - name	: DEFQ
-  - name	: DEFM
-  - name	: DEFS
-  - name	: DEFVARS
-  - name	: DEFW
-  - name	: ELSE
-  - name	: ENDIF
-  - name	: EXTERN
-  - name	: GLOBAL
-  - name	: IF
-  - name	: IFDEF
-  - name	: IFNDEF
-  - name	: INCLUDE
-  - name	: LINE
-  - name	: C_LINE
-  - name	: LSTOFF
-  - name	: LSTON
-  - name	: MODULE
-  - name	: ORG
-  - name	: PUBLIC
-  - name	: SECTION
-  - name	: UNDEFINE
-  - name	: XDEF
-  - name	: XLIB
-  - name	: XREF
-  - name	: LIB
-
+  - name    : BINARY
+  - name    : C_LINE
+  - name    : DEFB
+  - name    : DEFC
+  - name    : DEFGROUP
+  - name    : DEFINE
+  - name    : DEFM
+  - name    : DEFQ
+  - name    : DEFS
+  - name    : DEFVARS
+  - name    : DEFW
+  - name    : DEPHASE
+  - name    : ELSE
+  - name    : ENDIF
+  - name    : EXTERN
+  - name    : GLOBAL
+  - name    : IF
+  - name    : IFDEF
+  - name    : IFNDEF
+  - name    : INCLUDE
+  - name    : LIB
+  - name    : LINE
+  - name    : LSTOFF
+  - name    : LSTON
+  - name    : MODULE
+  - name    : ORG
+  - name    : PHASE
+  - name    : PUBLIC
+  - name    : SECTION
+  - name    : UNDEFINE
+  - name    : XDEF
+  - name    : XLIB
+  - name    : XREF
+  
   # DEFGROUP storage specifiers
-  - name	: DS_B
-    regexp	: "\"DS.B\"i"
-	
-  - name	: DS_W
-    regexp	: "\"DS.W\"i"
-	
-  - name	: DS_P
-    regexp	: "\"DS.P\"i"
-	
-  - name	: DS_Q
-    regexp	: "\"DS.Q\"i"
-	
+  - name    : DS_B
+    regexp  : "\"DS.B\"i"
+    
+  - name    : DS_W
+    regexp  : "\"DS.W\"i"
+    
+  - name    : DS_P
+    regexp  : "\"DS.P\"i"
+    
+  - name    : DS_Q
+    regexp  : "\"DS.Q\"i"
+    
   # Z80 opcode specifiers
-  - name	: ADC
-  - name	: ADD
-  - name	: AND
-  - name	: BIT
-  - name	: CALL
-  - name	: CCF
-  - name	: CCF1
-  - name	: CP
-  - name	: CPD
-  - name	: CPDR
-  - name	: CPI
-  - name	: CPIR
-  - name	: CPL
-  - name	: DAA
-  - name	: DEC
-  - name	: DI
-  - name	: DJNZ
-  - name	: EI
-  - name	: EX
-  - name	: EXX
-  - name	: HALT
-  - name	: IM
-  - name	: IN
-  - name	: INC
-  - name	: IND
-  - name	: INDR
-  - name	: INI
-  - name	: INIR
-  - name	: JP
-  - name	: JR
-  - name	: LD
-  - name	: LDD
-  - name	: LDDR
-  - name	: LDI
-  - name	: LDIR
-  - name	: NEG
-  - name	: NOP
-  - name	: OR
-  - name	: OTDR
-  - name	: OTIR
-  - name	: OUT
-  - name	: OUTD
-  - name	: OUTI
-  - name	: POP
-  - name	: PUSH
-  - name	: RES
-  - name	: RET
-  - name	: RETI
-  - name	: RETN
-  - name	: RL
-  - name	: RLA
-  - name	: RLA1
-  - name	: RLC
-  - name	: RLCA
-  - name	: RLCA1
-  - name	: RLD
-  - name	: RR
-  - name	: RRA
-  - name	: RRA1
-  - name	: RRC
-  - name	: RRCA
-  - name	: RRCA1
-  - name	: RRD
-  - name	: RST
-  - name	: SBC
-  - name	: SCF
-  - name	: SCF1
-  - name	: SET
-  - name	: SLA
-  - name	: SLL
-  - name	: SLI
-  - name	: SRA
-  - name	: SRL
-  - name	: SUB
-  - name	: XOR 
+  - name    : ADC
+  - name    : ADD
+  - name    : AND
+  - name    : BIT
+  - name    : CALL
+  - name    : CCF
+  - name    : CCF1
+  - name    : CP
+  - name    : CPD
+  - name    : CPDR
+  - name    : CPI
+  - name    : CPIR
+  - name    : CPL
+  - name    : DAA
+  - name    : DEC
+  - name    : DI
+  - name    : DJNZ
+  - name    : EI
+  - name    : EX
+  - name    : EXX
+  - name    : HALT
+  - name    : IM
+  - name    : IN
+  - name    : INC
+  - name    : IND
+  - name    : INDR
+  - name    : INI
+  - name    : INIR
+  - name    : JP
+  - name    : JR
+  - name    : LD
+  - name    : LDD
+  - name    : LDDR
+  - name    : LDI
+  - name    : LDIR
+  - name    : NEG
+  - name    : NOP
+  - name    : OR
+  - name    : OTDR
+  - name    : OTIR
+  - name    : OUT
+  - name    : OUTD
+  - name    : OUTI
+  - name    : POP
+  - name    : PUSH
+  - name    : RES
+  - name    : RET
+  - name    : RETI
+  - name    : RETN
+  - name    : RL
+  - name    : RLA
+  - name    : RLA1
+  - name    : RLC
+  - name    : RLCA
+  - name    : RLCA1
+  - name    : RLD
+  - name    : RR
+  - name    : RRA
+  - name    : RRA1
+  - name    : RRC
+  - name    : RRCA
+  - name    : RRCA1
+  - name    : RRD
+  - name    : RST
+  - name    : SBC
+  - name    : SCF
+  - name    : SCF1
+  - name    : SET
+  - name    : SLA
+  - name    : SLL
+  - name    : SLI
+  - name    : SRA
+  - name    : SRL
+  - name    : SUB
+  - name    : XOR 
 
   # Z80-ZXN specific opcodes
   - name    : SWAPNIB
@@ -403,24 +404,24 @@ tokens:
   - name    : MMU7
 
   # Z180 specific opcodes
-  - name	: SLP 
-  - name	: MLT 
-  - name	: IN0
-  - name	: OUT0
-  - name	: OTIM
-  - name	: OTIMR
-  - name	: OTDM
-  - name	: OTDMR
-  - name	: TST
-  - name	: TSTIO
+  - name    : SLP 
+  - name    : MLT 
+  - name    : IN0
+  - name    : OUT0
+  - name    : OTIM
+  - name    : OTIMR
+  - name    : OTDM
+  - name    : OTDMR
+  - name    : TST
+  - name    : TSTIO
 
   # Rabbit 2000/3000 specific opcodes
-  - name	: ALTD
-  - name	: BOOL
-  - name	: IOE
-  - name	: IOI
-  - name	: IPRES
-  - name	: IPSET
+  - name    : ALTD
+  - name    : BOOL
+  - name    : IOE
+  - name    : IOI
+  - name    : IPRES
+  - name    : IPSET
   - name    : IDET
   - name    : LDDSR
   - name    : LDISR
@@ -429,19 +430,19 @@ tokens:
   - name    : LSIR
   - name    : LSDDR
   - name    : LSIDR
-  - name	: MUL
-  - name	: IP
-  - name	: SU
-  - name	: RDMODE
-  - name	: SETUSR
-  - name	: SURES
-  - name	: SYSCALL
-  - name	: UMA
-  - name	: UMS
+  - name    : MUL
+  - name    : IP
+  - name    : SU
+  - name    : RDMODE
+  - name    : SETUSR
+  - name    : SURES
+  - name    : SYSCALL
+  - name    : UMA
+  - name    : UMS
   
   # Z88DK specific opcodes
-  - name	: CALL_OZ
-  - name	: CALL_PKG
-  - name	: FPP
-  - name	: INVOKE
+  - name    : CALL_OZ
+  - name    : CALL_PKG
+  - name    : FPP
+  - name    : INVOKE
   

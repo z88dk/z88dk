@@ -1,18 +1,20 @@
 ;
-;       Clear Graphics Screen
+; 	ANSI Video handling for the MSX
 ;
-;       MSX version by Stefano Bodrato, December 2007
+; 	CLS - Clear the screen
+;	
 ;
-;	$Id: clg.asm $
+;	Stefano Bodrato - Oct. 2017
+;
+;
+;	$Id: f_ansi_cls.asm $
 ;
 
 	SECTION	code_clib
-        PUBLIC    clg
-        PUBLIC    _clg
+        PUBLIC    ansi_cls
+        PUBLIC    _ansi_cls
         EXTERN	msxbios
-
-	EXTERN     swapgfxbk
-        EXTERN	__graphics_end
+        EXTERN	msx_attr
 
         INCLUDE	"graphics/grafix.inc"
 
@@ -25,11 +27,13 @@ ELSE
         INCLUDE "svibasic.def"
 ENDIF
 
+EXTERN	clg
 
-.clg
-._clg
+.ansi_cls
+._ansi_cls
+;jp clg
+
 	push	ix	;save callers
-	call	swapgfxbk
 	ld	ix,CHGMOD
 IF FORmsx
 	ld	a,2		; set graphics mode
@@ -38,19 +42,23 @@ ELSE
 ENDIF
 	ld	(SCRMOD),a
 	call	msxbios
-	
-	ld	a,15
+
+	ld a,(msx_attr)
+	and $0F
 	ld	(BDRCLR),a	;border
 	ld	ix,CHGCLR
 	call	msxbios
 
 	ld bc,6144
 
-	ld a,$1F
+	ld a,(msx_attr)
 
 	ld hl,8192
 
 	ld ix,FILVRM
 	call	msxbios
-	
-	jp __graphics_end
+	pop	ix	;restore callers
+	ret
+
+
+

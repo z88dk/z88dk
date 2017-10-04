@@ -34,6 +34,43 @@
 =
 %0rst%1 0x38  ; call __RST38%2
 
+;;
+;; section information
+;;
+
+	call	_SECTION_SIZE_CODE
+=
+	EXTERN	__CODE_END_tail
+	EXTERN	__CODE_head
+	ld	hl,__CODE_END_tail - __CODE_head
+
+	call	_SECTION_SIZE_DATA
+=
+	EXTERN	__DATA_END_tail
+	EXTERN	__DATA_head
+	ld	hl,__DATA_END_tail - __DATA_head
+
+	call	_SECTION_SIZE_BSS
+=
+	EXTERN	__BSS_UNINITIALIZED_head
+	EXTERN	__BSS_head
+	ld	hl,__BSS_UNINITIALIZED_head - __BSS_head
+
+	call	_SECTION_ORG_%1
+=
+	EXTERN	__%1_head
+	ld	hl,__%1_head
+
+	call	_SECTION_END_%1
+=
+	EXTERN	__%1_tail
+	ld	hl,__%1_tail
+
+	call	_SECTION_SIZE_%1
+=
+	EXTERN	__%1_size
+	ld	hl,__%1_size
+
 ;;;
 ;;; intrinsics
 ;;;

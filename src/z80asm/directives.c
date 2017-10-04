@@ -28,8 +28,12 @@ Assembly directives.
 void asm_LABEL_offset(char *name, int offset)
 {
 	Symbol *sym;
+	
+	if (get_phased_PC() >= 0)
+		sym = define_symbol(name, get_phased_PC() + offset, TYPE_CONSTANT);
+	else
+		sym = define_symbol(name, get_PC() + offset, TYPE_ADDRESS);
 
-	sym = define_symbol(name, get_PC() + offset, TYPE_ADDRESS);
 	sym->is_touched = TRUE;
 }
 
@@ -181,6 +185,16 @@ void asm_C_LINE(int line_nr, char *filename)
 void asm_ORG(int address)
 {
 	set_origin_directive(address);
+}
+
+void asm_PHASE(int address)
+{
+	set_phase_directive(address);
+}
+
+void asm_DEPHASE()
+{
+	clear_phase_directive();
 }
 
 /*-----------------------------------------------------------------------------

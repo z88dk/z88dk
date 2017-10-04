@@ -100,6 +100,7 @@ tideps:
 #  short script to sort out ticalc dependencies
 msxdeps:
 	@$(RM) -f stdio/msx/*.o
+	@$(RM) -f stdio/ansi/msx/*.o
 	@$(RM) -f games/*.o
 	@$(RM) -f games/msx/*.o
 	@$(RM) -f graphics/*.o
