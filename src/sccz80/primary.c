@@ -519,7 +519,7 @@ void smartpush(LVALUE* lval, char* before)
             zpush();
         }
     } else {
-        switch (lval->symbol->offset.i - Zsp) {
+        switch ((lval->symbol->offset.i + lval->offset) - Zsp) {
         case 0:
         case 2:
             if (before)
@@ -545,7 +545,7 @@ void smartstore(LVALUE* lval)
     if (lval->indirect_kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
     } else {
-        switch (lval->symbol->offset.i - Zsp) {
+        switch ((lval->symbol->offset.i + lval->offset) - Zsp) {
         case 0:
             if ( lval->symbol->isconst && lval->symbol->isassigned ) {
                 error(E_CHANGING_CONST, lval->symbol);
@@ -678,17 +678,17 @@ void test(int label, int parens)
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(double *val, int *type, int flag)
+int constexpr(double *val, Kind *type, int flag)
 {
     char *before, *start;
     double valtemp;
     int con;
     int savesp = Zsp;
     int valtype;
-    uint32_t packedType;
-
+    Type   *type_ptr;
+    
     setstage(&before, &start);
-    valtype = expression(&con, &valtemp, &packedType);
+    valtype = expression(&con, &valtemp, &type_ptr);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     if ( valtype == KIND_DOUBLE && con ) {
@@ -704,28 +704,13 @@ int constexpr(double *val, int *type, int flag)
 /*
  * scale constant value according to type
  */
-void cscale(
-    int type,
-    TAG_SYMBOL* tag,
-    int* val)
+void cscale(Type *type, int* val)
 {
-    switch (type) {
-    case KIND_INT:
-        *val *= 2;
-        break;
-    case KIND_CPTR:
-        *val *= 3;
-        break;
-    case KIND_LONG:
-        *val *= 4;
-        break;
-    case KIND_DOUBLE:
-        *val *= 6;
-        break;
-    case KIND_STRUCT:
-        *val *= tag->size;
-        break;
+    if ( type->size == -1 ) { 
+        // It's an array of unknown length
+        *val *= type->ptr->size / type->ptr->len;
     }
+    *val *= type->size / type->len;
 }
 
 

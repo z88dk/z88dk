@@ -10,24 +10,16 @@
 #include "ccdefs.h"
 
 // TODO: Send back type
-int expression(int  *con, double *val, uint32_t *packedArgumentType)
+int expression(int  *con, double *val, Type **type)
 {
     LVALUE lval={0};
-    char type;
 
     if (heir1(&lval)) {
         rvalue(&lval);
     }
-    fnflags = lval.flags;
-    if (lval.ptr_type) {
-        type = lval.ptr_type;
-    } else {
-        type = lval.val_type;
-    }
-    *packedArgumentType = 0; // CalcArgValue(type, lval.ident, lval.flags);
-    // TODO: We need to send more type info
     *con = lval.is_const;
     *val = lval.const_val;
+    *type = lval.ltype;
     return lval.val_type;
 }
 
@@ -441,7 +433,6 @@ int heir9(LVALUE* lval)
 SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     lval->ltype = lval->ltype->ptr;
-    lval->symbol = NULL;
     if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
         lval->ptr_type = KIND_NONE;
     else
@@ -619,16 +610,11 @@ int heirb(LVALUE* lval)
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
             if (cmatch('[')) {
-                uint32_t packedType;
-
-                if (ptr == 0) {
-                    error(E_SUBSCRIPT);
-                    junk();
-                    needchar(']');
-                    return 0;
-                } else if (k && ptr->ident == POINTER)
+                Type *type;
+                
+                if (k && lval->ltype->kind == KIND_PTR ) {
                     rvalue(lval);
-                else if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_ARRAY) {
+                } else if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_ARRAY) {
                     error(E_SUBSCRIPT);
                     k = 0;
                 }
@@ -636,7 +622,7 @@ int heirb(LVALUE* lval)
                 if (lval->flags & FARPTR)
                     zpushde();
                 zpush();
-                valtype = expression(&con, &dval, &packedType);
+                valtype = expression(&con, &dval, &type);
                 // TODO: Check valtype
                 val = dval;
                 needchar(']');
@@ -644,21 +630,23 @@ int heirb(LVALUE* lval)
                     Zsp += 2; /* undo push */
                     if (lval->flags & FARPTR)
                         Zsp += 2;
-                    if (lval->symbol->more)
-                        cscale(lval->val_type, tagtab + ptr->tag_idx, &val);
-                    else
-                        cscale(ptr->type, tagtab + ptr->tag_idx, &val);
+                    cscale(lval->ltype, &val);
+                    val += lval->offset;
+                    printf("%d %d\n",val,lval->offset);
+                    
                     if (ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
-                        lval->offset = getloc(ptr, val);
+                        lval->offset = val;
+                        getloc(ptr, val);
                     } else {
                         /* add constant offset to address in primary */
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
                         zadd_const(lval, val);
+                        lval->offset = val;
                     }
                 } else {
                     /* non-constant subscript, calc at run time */

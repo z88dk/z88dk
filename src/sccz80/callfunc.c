@@ -65,7 +65,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     savesp = Zsp;
     while (ch() != ')') {
         char *before, *start;
-        uint32_t packedType;
+        Type *type;
         if (endst()) {
             break;
         }
@@ -74,7 +74,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
-        expr = expression(&vconst, &val, &packedType);
+        expr = expression(&vconst, &val, &type);
         if ( argnumber < 5 ) {
             isconstarg[argnumber] = vconst;
             constargval[argnumber] = val;
@@ -161,15 +161,14 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
         if (function_pointer_call == NO ) {
-            uint32_t    packedArgumentType;
+            Type *type;
 
             /* ordinary call */
-            expr = expression(&vconst, &val, &packedArgumentType);
+            expr = expression(&vconst, &val, &type);
             if (expr == KIND_CARRY) {
                 zcarryconv();
                 expr = KIND_INT;
-                packedArgumentType &= 0xFFFFFF00;
-                packedArgumentType |= expr;
+                type = type_int;
             }
 
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
@@ -220,13 +219,14 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 }
             }
         } else { /* call to address in HL */
-            uint32_t packedType;
+            Type *type;
 
             zpush(); /* Push address */
-            expr = expression(&vconst, &val, &packedType);
+            expr = expression(&vconst, &val, &type);
             if (expr == KIND_CARRY) {
                 zcarryconv();
                 expr = KIND_INT;
+                type = type_int;
             }
             if (expr == KIND_LONG || expr == KIND_CPTR) {
                 swap(); /* MSW -> hl */

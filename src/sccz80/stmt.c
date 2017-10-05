@@ -279,11 +279,11 @@ int doexpr()
     char *before, *start;
     double val;
     int type, vconst;
-    uint32_t packedType;
-
+    Type   *type_ptr;
+    
     while (1) {
         setstage(&before, &start);
-        type = expression(&vconst, &val, &packedType);
+        type = expression(&vconst, &val, &type_ptr);
         clearstage(before, start);
         if (ch() != ',')
             return type;
@@ -447,7 +447,7 @@ void doswitch()
 void docase()
 {
     double value;
-    int    valtype;
+    Kind   valtype;
     if (swactive == 0)
         error(E_SWITCH);
     if (swnext > swend) {

@@ -559,7 +559,7 @@ void size_of(LVALUE* lval)
                 if (ptr->ctype->kind == KIND_ARRAY ) {
                     if (rcmatch('[')) {
                         double val;
-                        int valtype;
+                        Kind valtype;
                         needchar('[');
                         constexpr(&val, &valtype,  1);
                         needchar(']');

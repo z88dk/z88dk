@@ -358,7 +358,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (dbltest(lval2, lval)) {
             int ival = val;
             /* are adding lval to pointer, adjust size */
-            cscale(lval2->ptr_type, lval2->ltype->tag, &ival);
+            cscale(lval2->ltype, &ival);
             val = ival;
         }
 
@@ -455,7 +455,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if (dbltest(lval, lval2)) {
                     int ival = val;
                     /* are adding lval2 to pointer, adjust size */
-                    cscale(lval->ptr_type, lval->ltype->tag, &ival);
+                    cscale(lval->ltype, &ival);
                     val = ival;
                 }
                 if (oper == zsub) {

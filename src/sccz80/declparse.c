@@ -17,7 +17,7 @@ Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0 };
 static int32_t needsub(void)
 {
     double  val;
-    int     valtype;
+    Kind    valtype;
 
     if (cmatch(']'))
         return (0); /* null size */
@@ -37,7 +37,7 @@ static int32_t needsub(void)
 static void swallow_bitfield(void)
 {
     double val;
-    int valtype;
+    Kind   valtype;
     if (cmatch(':')) {
         constexpr(&val, &valtype, 1);
         warning(W_BITFIELD);
@@ -163,6 +163,7 @@ Type *make_enum(const char *name)
     type->fields = array_init(NULL);    
     type->kind = KIND_ENUM;
     type->size = 2;
+    type->len = 1;
     type->isconst = 1;
     strcpy(type->name, name);
 
@@ -175,6 +176,7 @@ Type *make_pointer(Type *base_type)
     type->kind = base_type->isfar ? KIND_CPTR : KIND_PTR;
     type->ptr = base_type;
     type->size = base_type->isfar ? 3 : 2;
+    type->len = 1;
     return type;
 }
 
@@ -217,7 +219,7 @@ static Type *parse_enum(Type *type)
                 illname(sname);
             if (cmatch('=')) {
                 double dval;
-                int    valtype;
+                Kind   valtype;
 
                 constexpr(&dval, &valtype, 1);
                 if ( valtype == KIND_DOUBLE )
@@ -395,6 +397,7 @@ Type *parse_parameter_list(Type *return_type)
         func = CALLOC(1,sizeof(*func));
         func->kind = KIND_FUNC;
         func->size = 0;
+        func->len = 1;
         func->oldstyle = 1;  // i.e. arbitrary number of parameters
         func->return_type = return_type;
         func->parameters = array_init(free_type);
@@ -405,6 +408,7 @@ Type *parse_parameter_list(Type *return_type)
         func = CALLOC(1,sizeof(*func));
         func->kind = KIND_FUNC;
         func->size = 0;
+        func->len = 1;        
         func->return_type = return_type;
         func->parameters = array_init(NULL);        
         
@@ -595,6 +599,7 @@ Type *make_type(Kind kind, Type *tag)
 {
     Type *type = CALLOC(1,sizeof(*type));
 
+    type->len = 1;
     type->kind = kind;
     switch ( kind ) {
     case KIND_CHAR:
@@ -639,7 +644,7 @@ Type *dodeclare2(Kind *base_kind)
     // For port8/16 don't do much else beyond 
     if ( type->kind == KIND_PORT8 || type->kind == KIND_PORT16 ) {
         double dval;
-        int    valtype;
+        Kind   valtype;
 
         constexpr(&dval, &valtype, 1);
         if (dval < 0) {
