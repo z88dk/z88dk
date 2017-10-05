@@ -16,23 +16,33 @@
 	PUBLIC	ansi_attr
 
 	EXTERN	INVRS
+	EXTERN	BOLD
 
 .ansi_attr
-;        and     a
-;        jr      nz,noreset
-;        ret
-;.noreset
-;        cp      1
-;        jr      nz,nobold
-;        ret
-;.nobold
-;        cp      2
-;        jr      z,dim
-;        cp      8
-;        jr      nz,nodim
+        and     a
+        jr      nz,noreset
+        ld	(BOLD),a
+        ld	(BOLD+1),a
+        ret
+.noreset
+        cp      1
+        jr      nz,nobold
+        ld	a,23
+        ld	(BOLD),a
+        ld	a,182
+        ld	(BOLD+1),a
+        ret
+.nobold
+        cp      2
+        jr      z,dim
+        cp      8
+        jr      nz,nodim
 .dim
-;        ret
-;.nodim
+	xor	a
+        ld	(BOLD),a
+        ld	(BOLD+1),a
+        ret
+.nodim
         cp      4
         jr      nz,nounderline
         ld      a,32
