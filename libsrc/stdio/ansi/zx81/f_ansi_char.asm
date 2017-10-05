@@ -209,15 +209,15 @@ ENDIF
 .NOLFONT
 
 IF !ARX816
-IF G007
+ IF G007
   ld de,34	; next row
-ELSE
-IF MTHRG
+ ELSE
+  IF MTHRG
   ld de,33	; next row
-ELSE
+  ELSE
   ld de,32	; next row
-ENDIF
-ENDIF
+  ENDIF
+ ENDIF
 ENDIF
 
   ld c,8
@@ -256,7 +256,6 @@ ENDIF
   rla
   rla
   rla
-ENDIF
 
 .INVRS
 ;  cpl           ; Set to NOP to disable INVERSE
