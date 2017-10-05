@@ -1,7 +1,14 @@
-@stdio/stdio_cpm.lst
+@stdio/stdio_binary.lst
 stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
+@stdio/ansicore.lst
+stdio/ansi/msx/f_ansi_attr
+stdio/ansi/msx/f_ansi_bel
+stdio/ansi/msx/f_ansi_char
+stdio/ansi/msx/f_ansi_cls
+stdio/ansi/generic/f_ansi_dline
+stdio/ansi/msx/f_ansi_scrollup
 fcntl/cpm/bios
 fcntl/cpm/bdos
 fcntl/cpm/close
@@ -99,6 +106,7 @@ msx/msx_vfill_v
 msx/msx_vmerge
 msx/msx_vpeek
 msx/msx_vpoke
+msx/msx_vpoke_callee
 msx/msx_vram
 msx/msx_vread
 msx/msx_vwrite

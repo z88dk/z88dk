@@ -31,18 +31,12 @@ static void new_line_cb( char *filename, int line_nr, char *text )
 
 	if ( filename != NULL )
 	{
-        /* interface with error - set error location */
-        if ( ! opts.line_mode )
-            set_error_line( line_nr );
-
+		/* interface with error - set error location */
+		set_error_line(line_nr);
+		
         /* interface with list */
-        if ( opts.cur_list )
-            list_start_line( get_PC(), filename, line_nr, text );
-	}
-	else
-	{
-		if ( ! opts.line_mode )
-            set_error_line( 0 );
+		if (opts.cur_list)
+			list_start_line(get_phased_PC() >= 0 ? get_phased_PC() : get_PC(), filename, line_nr, text);
 	}
 }
 
@@ -99,6 +93,30 @@ int src_line_nr( void )
 {
 	init_module();
 	return SrcFile_line_nr( g_src_input );
+}
+
+Bool scr_is_c_source(void)
+{
+	init_module();
+	return ScrFile_is_c_source(g_src_input);
+}
+
+void src_set_filename(char * filename)
+{
+	init_module();
+	SrcFile_set_filename(g_src_input, filename);
+}
+
+void src_set_line_nr(int line_nr, int line_inc)
+{
+	init_module();
+	SrcFile_set_line_nr(g_src_input, line_nr, line_inc);
+}
+
+void src_set_c_source(void)
+{
+	init_module();
+	SrcFile_set_c_source(g_src_input);
 }
 
 void src_push( void )

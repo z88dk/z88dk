@@ -15,7 +15,7 @@ extern ushort    vdcAttrMem;
 
 /* Clear Graphics */
 
-void clg()
+void clg(void)
 {
   //vdcBitMapMemSize = 16000;
   mapvdc();

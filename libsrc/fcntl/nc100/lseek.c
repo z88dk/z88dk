@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <nc.h>
 
 extern unsigned int __LIB__ __FASTCALL__ nc_lsize(unsigned int handle);
 extern unsigned int __LIB__ __FASTCALL__ nc_ltell(unsigned int handle);

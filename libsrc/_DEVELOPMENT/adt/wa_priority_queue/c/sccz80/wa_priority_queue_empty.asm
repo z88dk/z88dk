@@ -9,3 +9,10 @@ PUBLIC wa_priority_queue_empty
 EXTERN asm_wa_priority_queue_empty
 
 defc wa_priority_queue_empty = asm_wa_priority_queue_empty
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wa_priority_queue_empty
+defc _wa_priority_queue_empty = wa_priority_queue_empty
+ENDIF
+

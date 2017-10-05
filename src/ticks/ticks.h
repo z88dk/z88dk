@@ -12,18 +12,24 @@
 #include "utlist.h"
 
 typedef enum {
+    SYM_ANY = 0,
     SYM_CONST = 1,
     SYM_ADDRESS = 2,
 } symboltype;
 
-typedef struct {
+typedef struct symbol_s symbol;
+
+struct symbol_s {
     const char    *name;
     const char    *file;
+    const char    *module;
     int            address;
     symboltype     symtype;
     char           islocal;
     const char    *section;
-} symbol;
+    symbol        *next;
+    UT_hash_handle hh;
+};
 
 
 typedef struct {
@@ -44,6 +50,14 @@ extern unsigned char xh, xl, yh, yl;
 extern unsigned short ff, pc, sp;
 extern unsigned char *mem;
 extern long long st;
+
+
+#define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
+#define israbbit3k() ( c_cpu & (CPU_R3K))
+#define isz180() ( c_cpu & (CPU_Z180))
+#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define cancbundoc() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
 extern int c_cpu;
 extern int trace;
@@ -91,11 +105,16 @@ extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
 extern int       disassemble(int pc, char *buf, size_t buflen);
+extern int       disassemble2(int pc, char *buf, size_t buflen);
 extern void      read_symbol_file(char *filename);
-extern const char     *find_symbol(int addr);
+extern const char     *find_symbol(int addr, symboltype preferred_symtype);
 extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
-extern uint8_t   get_memory(int pc);
 extern char **parse_words(char *line, int *argc);
+
+
+extern uint8_t    *get_memory_addr(int pc);
+extern uint8_t     get_memory(int pc);
+extern uint8_t     put_memory(int pc, uint8_t b);
 
 #endif

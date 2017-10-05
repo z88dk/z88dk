@@ -1,6 +1,7 @@
 /*
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
+ *      Alvin Albrecht - 2017
  *      
  *      $Id: rom.c,v 1.13 2016/07/08 02:43:24 aralbrec Exp $
  */

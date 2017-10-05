@@ -9,3 +9,10 @@ PUBLIC p_stack_size
 EXTERN asm_p_stack_size
 
 defc p_stack_size = asm_p_stack_size
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_stack_size
+defc _p_stack_size = p_stack_size
+ENDIF
+

@@ -61,24 +61,24 @@ extern intmax_t imaxabs_callee(intmax_t j) __z88dk_callee;
 
 #ifdef __SCCZ80
 
-extern intmax_t __LIB__ __FASTCALL__ imaxabs(intmax_t j) __smallc;
+extern intmax_t __LIB__ imaxabs(intmax_t j) __smallc __z88dk_fastcall;
 
 
 
 #endif
 
 extern void __LIB__ _imaxdiv_(imaxdiv_t *md,intmax_t numer,intmax_t denom) __smallc;
-extern void __LIB__ __CALLEE__ _imaxdiv__callee(imaxdiv_t *md,intmax_t numer,intmax_t denom) __smallc;
+extern void __LIB__ _imaxdiv__callee(imaxdiv_t *md,intmax_t numer,intmax_t denom) __smallc __z88dk_callee;
 #define _imaxdiv_(a,b,c) _imaxdiv__callee(a,b,c)
 
 
 extern intmax_t __LIB__ strtoimax(const char *nptr,char **endptr,int base) __smallc;
-extern intmax_t __LIB__ __CALLEE__ strtoimax_callee(const char *nptr,char **endptr,int base) __smallc;
+extern intmax_t __LIB__ strtoimax_callee(const char *nptr,char **endptr,int base) __smallc __z88dk_callee;
 #define strtoimax(a,b,c) strtoimax_callee(a,b,c)
 
 
 extern uintmax_t __LIB__ strtoumax(const char *nptr,char **endptr,int base) __smallc;
-extern uintmax_t __LIB__ __CALLEE__ strtoumax_callee(const char *nptr,char **endptr,int base) __smallc;
+extern uintmax_t __LIB__ strtoumax_callee(const char *nptr,char **endptr,int base) __smallc __z88dk_callee;
 #define strtoumax(a,b,c) strtoumax_callee(a,b,c)
 
 

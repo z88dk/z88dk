@@ -11,6 +11,7 @@ extern int qstr(double *val);
 extern void stowlit(int value, int size);
 extern unsigned char litchar(void);
 extern void size_of(LVALUE *lval);
+extern void offset_of(LVALUE *lval);
 extern void load_double_into_fa(LVALUE *lval);
 extern void write_double_queue(void);
 extern void decrement_double_ref(LVALUE *lval);

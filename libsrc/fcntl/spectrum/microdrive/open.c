@@ -75,7 +75,7 @@ switch (mode) {
 		(if1_file)->position=0;
 		(if1_file)->flags=flags;
 		(if1_file)->mode=mode;
-		lseek((if1_file), 0, SEEK_END);
+		lseek((int)(if1_file), 0, SEEK_END);
 		break;
 
 	}

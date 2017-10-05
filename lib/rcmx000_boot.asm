@@ -12,14 +12,14 @@
 ; assumptions on where the code lies in memory...
 
 
-__start_prog:
+__START_PROG:
 
 	ld sp,8000h
 
 	; If boot uses raw (-r) option we will patch this into
 	; jp _end_prog. 
 	; If we are not in raw option, this will not do anything useful
-	ld hl, __end_prog
+	ld hl, __END_PROG
 
 	jr skip_data_bytes
 
@@ -130,7 +130,7 @@ again:
 	call __sendchar
 	nop
 
-	call __end_prog 	; This will jump to main
+	call __END_PROG 	; This will jump to main
 	jp 0
 
 __recvchar:
@@ -166,7 +166,7 @@ __waitready:
 
 __endbootstrap:
 	
-__prefix:
+__PREFIX:
 
 	defb 080h, 000h, 008h			; GCSR Clock select, bit 4-2: 010 (osc)
 	defb 080h, 009h, 051h			; Watchdog
@@ -192,7 +192,7 @@ __prefix:
 	; we set them at a later point in the bootstrap code
 	; obtained via meassurebaud.c, we have it set here to an insane value
 	; so this it not forgotten...
-__patch_baudrate:
+__PATCH_BAUDRATE:
 	defb 42					; TAT4R <= baud divisor
 
 	defb 080h, 0a0h, 001h			; TACSR <= 1
@@ -204,10 +204,10 @@ __patch_baudrate:
 
 
 	;; This is the standard final I/O operation that kick starts the Rabbit from address zero in RAM
-__postfix:
+__POSTFIX:
 	defb 080h, 024h, 080h			; SPCR <= 80h
 
-__end_prog:
+__END_PROG:
 
 	; Here we put some utils for flashing and start from flash
 	; We do not want them in the 2400 baud loader since we dont need

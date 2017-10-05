@@ -16,3 +16,10 @@ p_forward_list_alt_push_front_callee:
    push af
    
    jp asm_p_forward_list_alt_push_front
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _p_forward_list_alt_push_front_callee
+defc _p_forward_list_alt_push_front_callee = p_forward_list_alt_push_front_callee
+ENDIF
+

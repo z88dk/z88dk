@@ -36,7 +36,7 @@ typedef unsigned long off_t;
 #endif
 
 extern int __LIB__ creat(char *path,mode_t mode) __smallc;
-extern int __LIB__ __CALLEE__ creat_callee(char *path,mode_t mode) __smallc;
+extern int __LIB__ creat_callee(char *path,mode_t mode) __smallc __z88dk_callee;
 #define creat(a,b) creat_callee(a,b)
 
 
@@ -44,7 +44,7 @@ extern int __LIB__ open(char *path,int oflag,...) __smallc;
 
 
 extern int __LIB__ vopen(char *path,int oflag,void *arg) __smallc;
-extern int __LIB__ __CALLEE__ vopen_callee(char *path,int oflag,void *arg) __smallc;
+extern int __LIB__ vopen_callee(char *path,int oflag,void *arg) __smallc __z88dk_callee;
 #define vopen(a,b,c) vopen_callee(a,b,c)
 
 

@@ -9,7 +9,10 @@ IF __MMAP = -1
    ;; user supplied memory map ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   INCLUDE "mmap.inc"
+ifelse(M4__MMAP,-1,`include(`./mmap.inc')')
+
+   SECTION UNASSIGNED
+   org 0
 
 ENDIF
 
@@ -20,6 +23,11 @@ IF __MMAP = 0
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    INCLUDE "../crt_memory_model_z80.inc"
+
+ifelse(M4__CRT_APPEND_MMAP,1,`include(`./mmap.inc')')
+
+   SECTION UNASSIGNED
+   org 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    

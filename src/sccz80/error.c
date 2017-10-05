@@ -189,6 +189,7 @@ struct errors {
     { "sizeof expects a pointer but got %s",1},
     { "Cannot nest __critical sections", 1},
     { "Function '%s' is both __naked and __critical, this is not permitted", 1},
+    { "Cannot evaluate __builtin_offsetof(%s,%s)", 1}
 };
 
 /*

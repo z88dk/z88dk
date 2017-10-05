@@ -1,10 +1,9 @@
 /*
-Z88-DK Z80ASM - Z80 Assembler
+Z88DK Z80 Module Assembler
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
@@ -164,14 +163,22 @@ main := |*
 	"'"
 	{ 
 		sym.tok = TK_NUMBER;
-		if ( get_sym_string() && 		/* consumes input up to end quote or \n */
-		     /* sym_string->len */ te - ts == 1 )
+		sym.number = 0;
+		if ( get_sym_string() ) /* consumes input up to end quote or \n */
 		{
-			sym.number = *ts; //sym_string->str[0];
+			STR_DEFINE(string, STR_SIZE);
+			
+			str_set_bytes(string, ts, te-ts);
+			str_compress_escapes(string);		/* process escape sequeneces */
+			if (str_len(string) == 1)
+				sym.number = str_data(string)[0];
+			else
+				error_invalid_squoted_string(); 
+				
+			STR_DELETE(string);
 		}
 		else
 		{
-			sym.number = 0;
 			error_invalid_squoted_string(); 
 		}
 		ts = te = p;

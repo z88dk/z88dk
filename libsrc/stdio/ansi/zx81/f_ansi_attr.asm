@@ -9,7 +9,7 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.6 2016-06-12 16:06:43 dom Exp $
+;	$Id: f_ansi_attr.asm  $
 ;
 
         SECTION code_clib
@@ -23,7 +23,7 @@
         jr      nz,noreset
         ld	(BOLD),a
         ld	(BOLD+1),a
-        xor     a
+;        xor     a
         ld      (INVRS),a      ; inverse 0
         ld      a, 24
         ld      (INVRS+2),a   ; underline 0
@@ -81,6 +81,6 @@
         jr      nz,noCreverse
         xor     a
         ld      (INVRS),a      ; inverse 0
-        ret
 .noCreverse
         ret
+;        ret

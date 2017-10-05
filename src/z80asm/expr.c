@@ -300,8 +300,14 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 		break;
 		
 	case ASMPC_OP:
-		expr->type = MAX( expr->type, TYPE_ADDRESS );
-		Calc_push( get_PC() ); 
+		if (get_phased_PC() >= 0) {
+			expr->type = MAX(expr->type, TYPE_CONSTANT);
+			Calc_push(get_phased_PC());
+		}
+		else {
+			expr->type = MAX(expr->type, TYPE_ADDRESS);
+			Calc_push(get_PC());
+		}
 		break;		
 
 	case NUMBER_OP:	Calc_push( self->d.value ); break;		
@@ -354,7 +360,7 @@ void Expr_init (Expr *self)
 
 	self->module	= CURRENTMODULE;
 	self->section	= CURRENTSECTION;
-    self->asmpc		= get_PC();					/* BUG_0048 */
+	self->asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();	/* BUG_0048 */
     self->code_pos	= get_cur_module_size();	/* BUG_0015 */
 
 	self->filename	= src_filename();

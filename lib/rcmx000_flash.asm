@@ -17,7 +17,7 @@ run_command:
 	; Getting here we should not use the serial download any more
 	; so we patch a direct jump from adress __start_prog+3
 	ld a,0c3h ; jp mnemonic
-	ld (__start_prog+3),a
+	ld (__START_PROG+3),a
 
 	ld a,(command)
 	ld hl,cmd_vector
@@ -145,7 +145,7 @@ jump2ext:
 
 
 	; Code now needs to be relocatable!!
-	ld hl,__prefix
+	ld hl,__PREFIX
 loopio:
 	ld a,(hl)
 	ld d,a  ; Save for later bit 7 testing
@@ -164,7 +164,7 @@ loopio:
 skipioprefix:
 	ld (bc),a
 
-	ld de,__postfix
+	ld de,__POSTFIX
 
 	ld a,h
 	sub d
@@ -174,7 +174,7 @@ skipioprefix:
 	sub e
 	jr nz, loopio
 
-	ld a,(__patch_baudrate)       ; This is saved when we receive it from host
+	ld a,(__PATCH_BAUDRATE)       ; This is saved when we receive it from host
 	defb 0d3h ; ioi
 	ld (0a9h),a 			; TAT4R baud divisor
 

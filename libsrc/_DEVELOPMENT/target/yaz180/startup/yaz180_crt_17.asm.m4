@@ -1,5 +1,7 @@
+include(`z88dk.m4')
+
 dnl############################################################
-dnl##      YAZ180_CRT_0.ASM.M4 - STANDALONE TARGET           ##
+dnl##      YAZ180_CRT_17.ASM.M4 - BASIC DCIO TARGET          ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                yaz180 standalone target                   ;;
@@ -27,7 +29,7 @@ include(`yaz180_rules.inc')
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "crt_memory_map.inc"
+include(`crt_memory_map.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -229,6 +231,7 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_jump_vectors_z180.inc"
+include "crt_interrupt_vectors_basic.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

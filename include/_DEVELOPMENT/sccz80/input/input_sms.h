@@ -11,7 +11,7 @@
 // keyboard
 ///////////
 
-extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms) __smallc;
+extern uint16_t __LIB__ in_pause(uint16_t dur_ms) __smallc __z88dk_fastcall;
 
 
 extern int __LIB__ in_test_key(void) __smallc;

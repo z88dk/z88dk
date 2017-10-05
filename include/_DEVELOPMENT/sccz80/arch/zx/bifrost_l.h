@@ -81,7 +81,7 @@ extern unsigned char BIFROSTL_ISR_HOOK[3];
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROSTL_setTile(unsigned char px,unsigned char py,unsigned char tile) __smallc;
-extern void __LIB__ __CALLEE__ BIFROSTL_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __smallc;
+extern void __LIB__ BIFROSTL_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __smallc __z88dk_callee;
 #define BIFROSTL_setTile(a,b,c) BIFROSTL_setTile_callee(a,b,c)
 
 
@@ -102,7 +102,7 @@ extern void __LIB__ __CALLEE__ BIFROSTL_setTile_callee(unsigned char px,unsigned
 // ----------------------------------------------------------------
 
 extern unsigned char __LIB__ BIFROSTL_getTile(unsigned char px,unsigned char py) __smallc;
-extern unsigned char __LIB__ __CALLEE__ BIFROSTL_getTile_callee(unsigned char px,unsigned char py) __smallc;
+extern unsigned char __LIB__ BIFROSTL_getTile_callee(unsigned char px,unsigned char py) __smallc __z88dk_callee;
 #define BIFROSTL_getTile(a,b) BIFROSTL_getTile_callee(a,b)
 
 
@@ -119,7 +119,7 @@ extern unsigned char __LIB__ __CALLEE__ BIFROSTL_getTile_callee(unsigned char px
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ __FASTCALL__ BIFROSTL_getAnimGroup(unsigned char tile) __smallc;
+extern unsigned char __LIB__ BIFROSTL_getAnimGroup(unsigned char tile) __smallc __z88dk_fastcall;
 
 
 
@@ -136,7 +136,7 @@ extern unsigned char __LIB__ __FASTCALL__ BIFROSTL_getAnimGroup(unsigned char ti
 // ----------------------------------------------------------------
 
 extern unsigned char __LIB__ *BIFROSTL_findAttrH(unsigned char lin,unsigned char col) __smallc;
-extern unsigned char __LIB__ __CALLEE__ *BIFROSTL_findAttrH_callee(unsigned char lin,unsigned char col) __smallc;
+extern unsigned char __LIB__ *BIFROSTL_findAttrH_callee(unsigned char lin,unsigned char col) __smallc __z88dk_callee;
 #define BIFROSTL_findAttrH(a,b) BIFROSTL_findAttrH_callee(a,b)
 
 
@@ -212,7 +212,7 @@ extern void __LIB__ BIFROSTL_resetAnim4Frames(void) __smallc;
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROSTL_drawTileL(unsigned char row,unsigned char col,unsigned char tile) __smallc;
-extern void __LIB__ __CALLEE__ BIFROSTL_drawTileL_callee(unsigned char row,unsigned char col,unsigned char tile) __smallc;
+extern void __LIB__ BIFROSTL_drawTileL_callee(unsigned char row,unsigned char col,unsigned char tile) __smallc __z88dk_callee;
 #define BIFROSTL_drawTileL(a,b,c) BIFROSTL_drawTileL_callee(a,b,c)
 
 
@@ -230,7 +230,7 @@ extern void __LIB__ __CALLEE__ BIFROSTL_drawTileL_callee(unsigned char row,unsig
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROSTL_showTilePosL(unsigned char row,unsigned char col) __smallc;
-extern void __LIB__ __CALLEE__ BIFROSTL_showTilePosL_callee(unsigned char row,unsigned char col) __smallc;
+extern void __LIB__ BIFROSTL_showTilePosL_callee(unsigned char row,unsigned char col) __smallc __z88dk_callee;
 #define BIFROSTL_showTilePosL(a,b) BIFROSTL_showTilePosL_callee(a,b)
 
 
@@ -260,7 +260,7 @@ extern void __LIB__ BIFROSTL_showNextTile(void) __smallc;
 // ----------------------------------------------------------------
 
 extern void __LIB__ BIFROSTL_fillTileAttrL(unsigned char row,unsigned char col,unsigned char attr) __smallc;
-extern void __LIB__ __CALLEE__ BIFROSTL_fillTileAttrL_callee(unsigned char row,unsigned char col,unsigned char attr) __smallc;
+extern void __LIB__ BIFROSTL_fillTileAttrL_callee(unsigned char row,unsigned char col,unsigned char attr) __smallc __z88dk_callee;
 #define BIFROSTL_fillTileAttrL(a,b,c) BIFROSTL_fillTileAttrL_callee(a,b,c)
 
 

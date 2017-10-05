@@ -143,7 +143,7 @@
 
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 #include <msx.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 #endif
 
 #ifdef SOUND

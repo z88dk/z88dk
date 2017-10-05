@@ -22,3 +22,10 @@ islower:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _islower
+defc _islower = islower
+ENDIF
+

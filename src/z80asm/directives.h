@@ -43,9 +43,11 @@ extern void asm_DEFGROUP_define_const(char *name);
 extern void asm_LSTON(void);
 extern void asm_LSTOFF(void);
 
-/* directives with number argument */
-extern void asm_LINE(int line_nr);
+extern void asm_LINE(int line_nr, char *filename);
+extern void asm_C_LINE(int line_nr, char * filename);
 extern void asm_ORG(int address);
+extern void asm_PHASE(int address);
+extern void asm_DEPHASE();
 
 /* directives with string argument */
 extern void asm_INCLUDE(char *filename);
@@ -61,7 +63,11 @@ extern void asm_MODULE_default(void);
 /* directives with list of names argument, function called for each argument */
 extern void asm_GLOBAL(char *name);
 extern void asm_EXTERN(char *name);
+extern void asm_XREF(char *name);
+extern void asm_LIB(char *name);
 extern void asm_PUBLIC(char *name);
+extern void asm_XDEF(char *name);
+extern void asm_XLIB(char *name);
 extern void asm_DEFINE(char *name);
 extern void asm_UNDEFINE(char *name);
 

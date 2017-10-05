@@ -23,3 +23,10 @@ PUBLIC obstack_finish
 EXTERN asm_obstack_finish
 
 defc obstack_finish = asm_obstack_finish
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_finish
+defc _obstack_finish = obstack_finish
+ENDIF
+

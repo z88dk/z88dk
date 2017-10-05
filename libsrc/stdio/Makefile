@@ -13,50 +13,38 @@ AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
-all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
-
-obj/ixiy/%.o: %.asm
-	zcc +test $(CFLAGS) -Ca--IXIY -Ca-I../ -c -o $@ $^
-
-obj/ixiy/%.o: %.c
-	zcc +test $(CFLAGS) -Ca--IXIY -c -o $@ $^
+all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
 
 obj/net/%.o: %.asm
-	zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	@zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/net/%.o: %.c
-	zcc +z88 $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
+	@zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
-obj/cpm/%.o: %.asm
-	zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+obj/binary/%.o: %.asm
+	@zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
-obj/cpm/%.o: %.c
-	zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
+obj/binary/%.o: %.c
+	@zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
 obj/%.o: %.asm
-	zcc +test $(CFLAGS) -Ca-I../ -c -o $@ $^
+	@zcc +test $(CFLAGS) -Ca-I../ -c -o $@ $^
 
 obj/%.o: %.c
-	zcc +test $(CFLAGS) -c -o $@ $^
+	@zcc +test $(CFLAGS) -c -o $@ $^
 
 obj/stdesc/%.o: %.asm
-	zcc +test $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Ca-I../ -Cc-standard-escape-chars -c -o $@ $^
+	@zcc +test $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Ca-I../ -Cc-standard-escape-chars -c -o $@ $^
 
 obj/stdesc/%.o: %.c
-	zcc +test $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
-
-obj/r2k/%.o: %.asm
-	zcc +rcmx000 -Ca-DFORrcmx000 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Ca-I../ -Cc-standard-escape-chars -c -o $@ $^
-
-obj/r2k/%.o: %.c
-	zcc +rcmx000 $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
+	@zcc +test $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
 
 
 
 
 .PHONY: dirs
 dirs:
-	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/cpm obj/stdesc obj/r2k
+	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/binary obj/stdesc obj/r2k
 
 
 
@@ -65,6 +53,6 @@ ansi-clean:
 
 clean:  ansi-clean
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i */*.o
-	$(RM) -fr obj
+	$(RM) -fr obj zcc_opt.def
 	cd zsock ; $(MAKE) clean ; cd ..
 	cd 8080 ; $(MAKE) clean ; cd ..

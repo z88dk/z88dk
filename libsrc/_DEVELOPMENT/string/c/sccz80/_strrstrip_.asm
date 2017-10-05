@@ -9,3 +9,10 @@ PUBLIC _strrstrip_
 EXTERN asm__strrstrip
 
 defc _strrstrip_ = asm__strrstrip
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __strrstrip_
+defc __strrstrip_ = _strrstrip_
+ENDIF
+

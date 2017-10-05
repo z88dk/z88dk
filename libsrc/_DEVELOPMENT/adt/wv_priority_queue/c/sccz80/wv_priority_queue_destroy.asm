@@ -9,3 +9,10 @@ PUBLIC wv_priority_queue_destroy
 EXTERN asm_wv_priority_queue_destroy
 
 defc wv_priority_queue_destroy = asm_wv_priority_queue_destroy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wv_priority_queue_destroy
+defc _wv_priority_queue_destroy = wv_priority_queue_destroy
+ENDIF
+

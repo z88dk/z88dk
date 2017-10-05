@@ -9,3 +9,10 @@ PUBLIC w_vector_at
 EXTERN w_array_at
 
 defc w_vector_at = w_array_at
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_at
+defc _w_vector_at = w_vector_at
+ENDIF
+

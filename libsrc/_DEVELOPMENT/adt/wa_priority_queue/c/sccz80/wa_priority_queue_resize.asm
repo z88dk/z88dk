@@ -19,3 +19,10 @@ wa_priority_queue_resize:
    push af
    
    jp asm_wa_priority_queue_resize
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _wa_priority_queue_resize
+defc _wa_priority_queue_resize = wa_priority_queue_resize
+ENDIF
+

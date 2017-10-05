@@ -75,6 +75,7 @@ text_rows:
 _print_char:
 	ld de,(ansi_COLUMN)
 	; D=x; E=Y
+	push	ix	;save callers
 ;	push BC
 ;	push HL
 	push DE
@@ -84,6 +85,7 @@ _print_char:
 	call update_vcell
 ;	pop HL
 ;	pop BC
+	pop	ix	;restore callers
 	ret
 
 	

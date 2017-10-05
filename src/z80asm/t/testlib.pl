@@ -13,9 +13,10 @@ use v5.10;
 use Test::More;
 use Cwd qw( cwd abs_path );
 use File::Basename;
+use File::Path 'remove_tree';
 
 my $IS_WIN32 = $^O eq 'MSWin32';
-my @TEST_EXT = qw( asm bin c d def err inc lis lst map o P out sym tap );
+my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
 
 
 # add path to z80asm top directory
@@ -91,14 +92,14 @@ sub run {
 		note "test.stdout: ", $gotout;
 	}
 	else {
-		_test_text($gotout, $out, "test.stdout");
+		check_text($gotout, $out, "test.stdout");
 	}
 	
 	if ($err eq "IGNORE") {
 		note "test.stderr: ", $goterr;
 	}
 	else {
-		_test_text($goterr, $err, "test.stderr");
+		check_text($goterr, $err, "test.stderr");
 	}
 	
 	if (Test::More->builder->is_passing) {
@@ -230,8 +231,11 @@ sub unlink_testfiles {
 		if (Test::More->builder->is_passing) {
 			for (@TEST_EXT) {
 				for (<test*.$_>) {
-					-f $_ and ok unlink($_), "unlink $_";
+					if (-f $_) { ok unlink($_), "unlink $_"; }
 				}
+			}
+			for (<test_dir*>) {
+				if (-d $_) { ok remove_tree($_), "remove_tree $_"; }
 			}
 		}
 	}
@@ -274,7 +278,7 @@ sub check_text_file {
 	
 	ok -f $file, "$file exists".$loc;
 	if (-f $file) {
-		_test_text(
+		check_text(
 				slurp($file), 
 				$exp, 
 				$title.$loc);
@@ -289,14 +293,14 @@ sub check_bin_file {
 	ok -f $file, "$file exists".$loc;
 
 	if (-f $file) {
-		_test_text(
+		check_text(
 				hexdump(slurp($file)),
 				hexdump($exp),
 				$title.$loc);
 	}
 }
 
-sub _test_text {
+sub check_text {
 	my($out, $exp, $title) = @_;
 
 	my $out_t = trim($out);

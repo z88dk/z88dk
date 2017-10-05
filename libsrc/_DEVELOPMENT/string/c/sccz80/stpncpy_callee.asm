@@ -17,3 +17,10 @@ stpncpy_callee:
    push af
    
    jp asm_stpncpy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _stpncpy_callee
+defc _stpncpy_callee = stpncpy_callee
+ENDIF
+

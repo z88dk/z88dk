@@ -22,3 +22,10 @@ isupper:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isupper
+defc _isupper = isupper
+ENDIF
+

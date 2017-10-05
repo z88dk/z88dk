@@ -12,11 +12,13 @@ CFILES = rs232_close.c rs232_get.c rs232_init.c rs232_params.c rs232_put.c
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-all:	$(OBJECTS)
+all:	$(OUTPUT_DIRECTORY)/rs232plus.lib
+
+$(OUTPUT_DIRECTORY)/rs232plus.lib: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232plus @p3list
 
-.c.o:  
-	zcc +zx $(CFLAGS) $*.c
+%.o: %.c
+	zcc +zx $(CFLAGS) $*.c -o $@
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)

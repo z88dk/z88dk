@@ -110,7 +110,7 @@ static void disassemble_loop(int start, int end)
     char   buf[256];
 
     while ( start < end ) {
-        start += disassemble(start, buf, sizeof(buf));
+        start += disassemble2(start, buf, sizeof(buf));
         printf("%s\n",buf);
     }
 }

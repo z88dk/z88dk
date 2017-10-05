@@ -15,3 +15,10 @@ w_vector_reserve_callee:
    ex (sp),hl
    
    jp asm_w_vector_reserve
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_reserve_callee
+defc _w_vector_reserve_callee = w_vector_reserve_callee
+ENDIF
+

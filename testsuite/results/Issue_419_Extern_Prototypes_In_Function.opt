@@ -1,0 +1,38 @@
+
+
+
+	MODULE	Issue_419_Extern_Prototypes_In_Function
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+
+._func
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	h,0
+	call	_ZXN_NEXTREG_0x50
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
+
+
+
+
+	PUBLIC	_func
+	PUBLIC	_ZXN_NEXTREG_0x50
+
+
+
+

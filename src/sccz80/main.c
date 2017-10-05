@@ -37,6 +37,7 @@ int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
 int c_line_labels = 0;
+int c_cline_directive = 0;
 uint32_t c_size_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 
 char *c_rodata_section = "rodata_compiler";
@@ -119,6 +120,8 @@ static option  sccz80_opts[] = {
     { 0, "bssseg", OPT_STRING, "=<name> Set the bss section name", &c_bss_section, 0 },
     { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, 0 },
     { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, 0 },
+    { 0, "glabels", OPT_BOOL, "Generate line labels", &c_line_labels, 0 },
+    { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, 0 },
 #ifdef USEFRAME
     { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},
@@ -129,7 +132,6 @@ static option  sccz80_opts[] = {
     { 0, "shared-file", OPT_BOOL, "All functions with this file are shared", &c_shared_file, 0 },
     { 0, "use-shared", OPT_BOOL, "Use shared library functions", &c_useshared, 0 },
     { 0, "share-offset", OPT_INT, "=<val> Define the shared offset (use with -make-shared)", &c_share_offset, 0 },
-    { 0, "glabels", OPT_BOOL, "Generate line labels", &c_line_labels, 0 },
 
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },
@@ -287,12 +289,12 @@ void parse()
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
-            dodeclare(EXTERNAL, NULL, 0);
+            dodeclare(EXTERNAL, NULL, 0,0);
         } else if (amatch("static")) {
-            dodeclare(LSTATIC, NULL, 0);
+            dodeclare(LSTATIC, NULL, 0,0);
         } else if (amatch("typedef")) {
-            dodeclare(TYPDEF, NULL, 0);
-        } else if (dodeclare(STATIK, NULL, 0)) {
+            dodeclare(TYPDEF, NULL, 0, 0);
+        } else if (dodeclare(STATIK, NULL, 0, 0)) {
             ;
         } else if (ch() == '#') {
             if (match("#asm")) {

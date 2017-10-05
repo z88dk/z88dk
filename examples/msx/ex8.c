@@ -19,7 +19,7 @@ Contact the author:
 =========================================================================*/
 
 #include <stdio.h>
-#include "msx/gfx.h"
+#include <msx/gfx.h>
 
 #define VRAM_OFFS	0
 #define FILE_OFFS	7

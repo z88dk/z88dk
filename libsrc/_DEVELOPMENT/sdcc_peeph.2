@@ -5,6 +5,57 @@
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_SECTION_SIZE_CODE
+} by {
+	nop	; EXTERN __CODE_END_tail
+	nop	; EXTERN __CODE_head
+	ld	hl,#(__CODE_END_tail - __CODE_head)
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
+	call	_SECTION_SIZE_DATA
+} by {
+	nop	; EXTERN __DATA_END_tail
+	nop	; EXTERN __DATA_head
+	ld	hl,#(__DATA_END_tail - __DATA_head)
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
+	call	_SECTION_SIZE_BSS
+} by {
+	nop	; EXTERN __BSS_UNINITIALIZED_head
+	nop	; EXTERN __BSS_head
+	ld	hl,#(__BSS_UNINITIALIZED_head - __BSS_head)
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
+	call	_SECTION_ORG_%1
+} by {
+	nop	; EXTERN __%1_head
+	ld	hl,#__%1_head
+	; peephole z88dk-intrinsic-section-org
+}
+
+replace restart {
+	call	_SECTION_END_%1
+} by {
+	nop	; EXTERN __%1_tail
+	ld	hl,#__%1_tail
+	; peephole z88dk-intrinsic-section-end
+}
+
+replace restart {
+	call	_SECTION_SIZE_%1
+} by {
+	nop	; EXTERN __%1_size
+	ld	hl,#__%1_size
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
 	call	_intrinsic_outi_num_256
 } by {
 	call	____sdcc_outi_256
@@ -707,6 +758,17 @@ replace restart
 	pop	iy
 	ex	de,hl
 	; peephole z88dk-bugfix-13
+}
+
+replace restart {
+	ld	a,l
+	ld	d,h
+	ld	d,a
+	ld	h,d
+} by {
+	ld	a,l
+	ld	d,l
+	; peephole z88dk-bugfix-14
 }
 
 barrier
@@ -2354,7 +2416,7 @@ replace restart {
 	pop	ix
 	jp	%1
 	; peephole115 replaced call at end of function by jump moving call beyond pop ix (tail call optimization).
-} if symmParmStack(%1)
+} if symmParmStack(%1), notSame(%1 '____sdcc_cpu_pop_ei')
 
 replace restart {
 	ld	%1,#%2

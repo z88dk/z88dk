@@ -7,6 +7,7 @@
 *.h     text eol=lf
 *.in    text eol=lf
 *.lst   text eol=lf
+*.md    text eol=lf
 *.opt   text eol=lf
 *.pl    text eol=lf
 *.py    text eol=lf
@@ -15,5 +16,7 @@
 *.t     text eol=lf
 *.sh    text eol=lf
 *.tt    text eol=lf
+*.txt   text eol=lf
 *.yaml  text eol=lf
 Makefile text eol=lf
+README* text eol=lf

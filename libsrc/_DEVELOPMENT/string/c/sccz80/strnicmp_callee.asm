@@ -9,3 +9,10 @@ PUBLIC strnicmp_callee
 EXTERN strncasecmp_callee
 
 defc strnicmp_callee = strncasecmp_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strnicmp_callee
+defc _strnicmp_callee = strnicmp_callee
+ENDIF
+

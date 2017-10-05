@@ -845,6 +845,70 @@
  ldpirx                         ; ED B7
  mirror a                       ; ED 24
  mirror de                      ; ED 26
+ mmu 0, -128                    ; ED 91 50 80
+ mmu 0, 127                     ; ED 91 50 7F
+ mmu 0, 255                     ; ED 91 50 FF
+ mmu 0, a                       ; ED 92 50
+ mmu 1, -128                    ; ED 91 51 80
+ mmu 1, 127                     ; ED 91 51 7F
+ mmu 1, 255                     ; ED 91 51 FF
+ mmu 1, a                       ; ED 92 51
+ mmu 2, -128                    ; ED 91 52 80
+ mmu 2, 127                     ; ED 91 52 7F
+ mmu 2, 255                     ; ED 91 52 FF
+ mmu 2, a                       ; ED 92 52
+ mmu 3, -128                    ; ED 91 53 80
+ mmu 3, 127                     ; ED 91 53 7F
+ mmu 3, 255                     ; ED 91 53 FF
+ mmu 3, a                       ; ED 92 53
+ mmu 4, -128                    ; ED 91 54 80
+ mmu 4, 127                     ; ED 91 54 7F
+ mmu 4, 255                     ; ED 91 54 FF
+ mmu 4, a                       ; ED 92 54
+ mmu 5, -128                    ; ED 91 55 80
+ mmu 5, 127                     ; ED 91 55 7F
+ mmu 5, 255                     ; ED 91 55 FF
+ mmu 5, a                       ; ED 92 55
+ mmu 6, -128                    ; ED 91 56 80
+ mmu 6, 127                     ; ED 91 56 7F
+ mmu 6, 255                     ; ED 91 56 FF
+ mmu 6, a                       ; ED 92 56
+ mmu 7, -128                    ; ED 91 57 80
+ mmu 7, 127                     ; ED 91 57 7F
+ mmu 7, 255                     ; ED 91 57 FF
+ mmu 7, a                       ; ED 92 57
+ mmu0 -128                      ; ED 91 50 80
+ mmu0 127                       ; ED 91 50 7F
+ mmu0 255                       ; ED 91 50 FF
+ mmu0 a                         ; ED 92 50
+ mmu1 -128                      ; ED 91 51 80
+ mmu1 127                       ; ED 91 51 7F
+ mmu1 255                       ; ED 91 51 FF
+ mmu1 a                         ; ED 92 51
+ mmu2 -128                      ; ED 91 52 80
+ mmu2 127                       ; ED 91 52 7F
+ mmu2 255                       ; ED 91 52 FF
+ mmu2 a                         ; ED 92 52
+ mmu3 -128                      ; ED 91 53 80
+ mmu3 127                       ; ED 91 53 7F
+ mmu3 255                       ; ED 91 53 FF
+ mmu3 a                         ; ED 92 53
+ mmu4 -128                      ; ED 91 54 80
+ mmu4 127                       ; ED 91 54 7F
+ mmu4 255                       ; ED 91 54 FF
+ mmu4 a                         ; ED 92 54
+ mmu5 -128                      ; ED 91 55 80
+ mmu5 127                       ; ED 91 55 7F
+ mmu5 255                       ; ED 91 55 FF
+ mmu5 a                         ; ED 92 55
+ mmu6 -128                      ; ED 91 56 80
+ mmu6 127                       ; ED 91 56 7F
+ mmu6 255                       ; ED 91 56 FF
+ mmu6 a                         ; ED 92 56
+ mmu7 -128                      ; ED 91 57 80
+ mmu7 127                       ; ED 91 57 7F
+ mmu7 255                       ; ED 91 57 FF
+ mmu7 a                         ; ED 92 57
  mul                            ; ED 30
  neg                            ; ED 44
  neg a                          ; ED 44

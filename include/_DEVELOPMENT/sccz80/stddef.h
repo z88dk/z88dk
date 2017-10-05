@@ -29,4 +29,10 @@ typedef unsigned char wchar_t;
 
 #endif
 
+#ifdef __SCCZ80
+
+#define offsetof(t,m) __builtin_offsetof(t,m)
+
+#endif
+
 #endif

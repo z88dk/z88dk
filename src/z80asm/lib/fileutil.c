@@ -343,7 +343,10 @@ void myfclose_remove( FILE *file )
 void myfclose_remove_if_empty(FILE *file)
 {
     fseek(file, 0, SEEK_END);
-    return (ftell(file) == 0) ? myfclose_remove(file) : myfclose(file);
+	if (ftell(file) == 0)
+		myfclose_remove(file);
+	else
+		myfclose(file);
 }
 
 /*-----------------------------------------------------------------------------

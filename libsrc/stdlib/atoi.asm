@@ -19,7 +19,7 @@
 SECTION code_clib
 PUBLIC atoi
 PUBLIC _atoi
-EXTERN l_neg, stdio_atou, asm_isspace
+EXTERN l_neg, l_atou, asm_isspace
 
 ; FASTCALL
 
@@ -41,12 +41,12 @@ EXTERN l_neg, stdio_atou, asm_isspace
    ex de,hl
    
    cp '+'
-   jp z, stdio_atou
+   jp z, l_atou
    
    dec de
    cp '-'
-   jp nz, stdio_atou
+   jp nz, l_atou
    
    inc de                    ; this is a negative number
-   call stdio_atou           ; do atou but come back here to negate result
+   call l_atou           ; do atou but come back here to negate result
    jp l_neg                  ; hl = -hl

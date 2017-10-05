@@ -15,3 +15,10 @@ _memupr__callee:
    ex (sp),hl
    
    jp asm__memupr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __memupr__callee
+defc __memupr__callee = _memupr__callee
+ENDIF
+

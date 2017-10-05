@@ -9,3 +9,10 @@ PUBLIC w_vector_shrink_to_fit
 EXTERN asm_w_vector_shrink_to_fit
 
 defc w_vector_shrink_to_fit = asm_w_vector_shrink_to_fit
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_vector_shrink_to_fit
+defc _w_vector_shrink_to_fit = w_vector_shrink_to_fit
+ENDIF
+

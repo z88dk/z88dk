@@ -19,3 +19,10 @@ w_array_erase:
    push af
    
    jp asm_w_array_erase
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _w_array_erase
+defc _w_array_erase = w_array_erase
+ENDIF
+

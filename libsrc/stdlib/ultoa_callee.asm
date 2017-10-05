@@ -6,7 +6,7 @@ PUBLIC ultoa_callee
 PUBLIC _ultoa_callee
 PUBLIC ASMDISP_ULTOA_CALLEE
 
-EXTERN ltoa_callee, stdio_error_zc
+EXTERN ltoa_callee, error_einval_zc
 EXTERN LIBDISP_LTOA_CALLEE
 
 .ultoa_callee
@@ -23,13 +23,13 @@ EXTERN LIBDISP_LTOA_CALLEE
 
    ld a,c
    or a
-   jp z, stdio_error_zc        ; divide by zero
+   jp z, error_einval_zc       ; divide by zero
 
    dec a
-   jp z, stdio_error_zc        ; radix = 1 makes no sense
+   jp z, error_einval_zc       ; radix = 1 makes no sense
 
    cp 36
-   jp nc, stdio_error_zc       ; max radix (37 - 1!)
+   jp nc, error_einval_zc      ; max radix (37 - 1!)
    
    ld b,0
    jp ltoa_callee + LIBDISP_LTOA_CALLEE

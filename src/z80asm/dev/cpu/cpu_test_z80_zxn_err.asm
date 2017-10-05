@@ -4224,6 +4224,22 @@
  mlt de                         ; Error
  mlt hl                         ; Error
  mlt sp                         ; Error
+ mmu -1, -128                   ; Error
+ mmu -1, -128                   ; Error
+ mmu -1, 127                    ; Error
+ mmu -1, 127                    ; Error
+ mmu -1, 255                    ; Error
+ mmu -1, 255                    ; Error
+ mmu -1, a                      ; Error
+ mmu -1, a                      ; Error
+ mmu 8, -128                    ; Error
+ mmu 8, -128                    ; Error
+ mmu 8, 127                     ; Error
+ mmu 8, 127                     ; Error
+ mmu 8, 255                     ; Error
+ mmu 8, 255                     ; Error
+ mmu 8, a                       ; Error
+ mmu 8, a                       ; Error
  neg a'                         ; Error
  or a', (hl)                    ; Error
  or a', (ix)                    ; Error

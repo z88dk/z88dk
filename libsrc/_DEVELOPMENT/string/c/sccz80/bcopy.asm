@@ -22,3 +22,10 @@ bcopy:
    push af
    
    jp asm_bcopy
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bcopy
+defc _bcopy = bcopy
+ENDIF
+

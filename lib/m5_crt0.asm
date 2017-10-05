@@ -110,7 +110,7 @@ msxbios:
 	
 	PUBLIC	_sc_cursor_pos
 
-_sc_cursor_pos	defw	0x70a6
+_sc_cursor_pos:	defw	0x70a6
 
 	SECTION	bss_crt
 

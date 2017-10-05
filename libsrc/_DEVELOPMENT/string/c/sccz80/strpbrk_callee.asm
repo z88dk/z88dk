@@ -15,3 +15,10 @@ strpbrk_callee:
    ex (sp),hl
    
    jp asm_strpbrk
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strpbrk_callee
+defc _strpbrk_callee = strpbrk_callee
+ENDIF
+

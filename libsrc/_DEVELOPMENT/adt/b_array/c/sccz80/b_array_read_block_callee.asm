@@ -20,3 +20,10 @@ b_array_read_block_callee:
    push af
    
    jp asm_b_array_read_block
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _b_array_read_block_callee
+defc _b_array_read_block_callee = b_array_read_block_callee
+ENDIF
+

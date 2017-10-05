@@ -161,7 +161,7 @@ extern int strnicmp(const char *s1,const char *s2,size_t n);
 extern size_t strnlen(const char *s,size_t max_len);
 
 
-extern char strpbrk(const char *s,const char *set);
+extern char *strpbrk(const char *s,const char *set);
 
 
 extern char *strrchr(const char *s,int c);
@@ -174,6 +174,9 @@ extern char *strrev(char *s);
 
 
 extern size_t strrspn(const char *s,const char *set);
+
+
+extern char *strrstr(const char *s,const char *subs);
 
 
 extern char *strrstrip(char *s);

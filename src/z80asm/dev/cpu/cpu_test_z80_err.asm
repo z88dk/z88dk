@@ -4257,6 +4257,86 @@
  mlt de                         ; Error
  mlt hl                         ; Error
  mlt sp                         ; Error
+ mmu -1, -128                   ; Error
+ mmu -1, -128                   ; Error
+ mmu -1, 127                    ; Error
+ mmu -1, 127                    ; Error
+ mmu -1, 255                    ; Error
+ mmu -1, 255                    ; Error
+ mmu -1, a                      ; Error
+ mmu -1, a                      ; Error
+ mmu 0, -128                    ; Error
+ mmu 0, 127                     ; Error
+ mmu 0, 255                     ; Error
+ mmu 0, a                       ; Error
+ mmu 1, -128                    ; Error
+ mmu 1, 127                     ; Error
+ mmu 1, 255                     ; Error
+ mmu 1, a                       ; Error
+ mmu 2, -128                    ; Error
+ mmu 2, 127                     ; Error
+ mmu 2, 255                     ; Error
+ mmu 2, a                       ; Error
+ mmu 3, -128                    ; Error
+ mmu 3, 127                     ; Error
+ mmu 3, 255                     ; Error
+ mmu 3, a                       ; Error
+ mmu 4, -128                    ; Error
+ mmu 4, 127                     ; Error
+ mmu 4, 255                     ; Error
+ mmu 4, a                       ; Error
+ mmu 5, -128                    ; Error
+ mmu 5, 127                     ; Error
+ mmu 5, 255                     ; Error
+ mmu 5, a                       ; Error
+ mmu 6, -128                    ; Error
+ mmu 6, 127                     ; Error
+ mmu 6, 255                     ; Error
+ mmu 6, a                       ; Error
+ mmu 7, -128                    ; Error
+ mmu 7, 127                     ; Error
+ mmu 7, 255                     ; Error
+ mmu 7, a                       ; Error
+ mmu 8, -128                    ; Error
+ mmu 8, -128                    ; Error
+ mmu 8, 127                     ; Error
+ mmu 8, 127                     ; Error
+ mmu 8, 255                     ; Error
+ mmu 8, 255                     ; Error
+ mmu 8, a                       ; Error
+ mmu 8, a                       ; Error
+ mmu0 -128                      ; Error
+ mmu0 127                       ; Error
+ mmu0 255                       ; Error
+ mmu0 a                         ; Error
+ mmu1 -128                      ; Error
+ mmu1 127                       ; Error
+ mmu1 255                       ; Error
+ mmu1 a                         ; Error
+ mmu2 -128                      ; Error
+ mmu2 127                       ; Error
+ mmu2 255                       ; Error
+ mmu2 a                         ; Error
+ mmu3 -128                      ; Error
+ mmu3 127                       ; Error
+ mmu3 255                       ; Error
+ mmu3 a                         ; Error
+ mmu4 -128                      ; Error
+ mmu4 127                       ; Error
+ mmu4 255                       ; Error
+ mmu4 a                         ; Error
+ mmu5 -128                      ; Error
+ mmu5 127                       ; Error
+ mmu5 255                       ; Error
+ mmu5 a                         ; Error
+ mmu6 -128                      ; Error
+ mmu6 127                       ; Error
+ mmu6 255                       ; Error
+ mmu6 a                         ; Error
+ mmu7 -128                      ; Error
+ mmu7 127                       ; Error
+ mmu7 255                       ; Error
+ mmu7 a                         ; Error
  mul                            ; Error
  neg a'                         ; Error
  nextreg -128, -128             ; Error

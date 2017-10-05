@@ -34,7 +34,7 @@ int fseek(FILE *fp, fpos_t posn, int whence)
 }
 
 #asm
-fseek1:
+_fseek1:
 	pop	af		;return address
 	pop	bc		;whence
 	pop	de		;posn

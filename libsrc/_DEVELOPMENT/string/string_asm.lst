@@ -47,6 +47,7 @@ string/z80/asm_strrchr
 string/z80/asm_strrcspn
 string/z80/asm_strrev
 string/z80/asm_strrspn
+string/z80/asm_strrstr
 string/z80/asm_strrstrip
 string/z80/asm_strsep
 string/z80/asm_strset

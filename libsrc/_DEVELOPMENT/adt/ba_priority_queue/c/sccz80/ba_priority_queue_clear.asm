@@ -9,3 +9,10 @@ PUBLIC ba_priority_queue_clear
 EXTERN asm_ba_priority_queue_clear
 
 defc ba_priority_queue_clear = asm_ba_priority_queue_clear
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ba_priority_queue_clear
+defc _ba_priority_queue_clear = ba_priority_queue_clear
+ENDIF
+

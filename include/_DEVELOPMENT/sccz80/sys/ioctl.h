@@ -14,7 +14,7 @@ extern int __LIB__ ioctl(int fd,uint16_t request,...) __smallc;
 
 
 extern int __LIB__ vioctl(int fd,uint16_t request,void *arg) __smallc;
-extern int __LIB__ __CALLEE__ vioctl_callee(int fd,uint16_t request,void *arg) __smallc;
+extern int __LIB__ vioctl_callee(int fd,uint16_t request,void *arg) __smallc __z88dk_callee;
 #define vioctl(a,b,c) vioctl_callee(a,b,c)
 
 

@@ -19,3 +19,10 @@ strnlen:
    push af
    
    jp asm_strnlen
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strnlen
+defc _strnlen = strnlen
+ENDIF
+

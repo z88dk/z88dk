@@ -10,3 +10,10 @@ PUBLIC bcmp
 EXTERN memcmp
 
 defc bcmp = memcmp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bcmp
+defc _bcmp = bcmp
+ENDIF
+

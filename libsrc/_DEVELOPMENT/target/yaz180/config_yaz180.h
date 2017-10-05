@@ -36,9 +36,12 @@
 
 
 
-
 #undef  __YAZ180
 #define __YAZ180  1
+
+#define __CPU_CLOCK  18432000
+
+#define __IO_BASE_ADDRESS 0x0
 
 #define __ASCI0_RX_SIZE  0x100
 #define __ASCI0_TX_SIZE  0x100
@@ -46,184 +49,20 @@
 #define __ASCI1_RX_SIZE  0x100
 #define __ASCI1_TX_SIZE  0x100
 
-#define __APU_CMD_SIZE  0x100
-#define __APU_PTR_SIZE  0x100
-
 #define __IO_BREAK  0x2000
 
 #define __IO_PIO_PORT_BASE  0x4000
 
-#define __IO_PIO_PORT_A  16384
-#define __IO_PIO_PORT_B  16385
-#define __IO_PIO_PORT_C  16386
-#define __IO_PIO_CONTROL  16387
-
-#define __IO_PIO_CNTL_00  0x80
-#define __IO_PIO_CNTL_01  0x81
-#define __IO_PIO_CNTL_02  0x82
-#define __IO_PIO_CNTL_03  0x83
-
-#define __IO_PIO_CNTL_04  0x88
-#define __IO_PIO_CNTL_05  0x89
-#define __IO_PIO_CNTL_06  0x8A
-#define __IO_PIO_CNTL_07  0x8B
-
-#define __IO_PIO_CNTL_08  0x90
-#define __IO_PIO_CNTL_09  0x91
-#define __IO_PIO_CNTL_10  0x92
-#define __IO_PIO_CNTL_11  0x83
-
-#define __IO_PIO_CNTL_12  0x98
-#define __IO_PIO_CNTL_13  0x99
-#define __IO_PIO_CNTL_14  0x9A
-#define __IO_PIO_CNTL_15  0x9B
-
+#define __I2C_RX_SIZE  0x100
+#define __I2C_TX_SIZE  0x100
 
 #define __IO_PCA9665_1_PORT_BASE  0xA000
 #define __IO_PCA9665_2_PORT_BASE  0x8000
 
-#define __IO_PCA1_PORT_MSB  160
-#define __IO_PCA2_PORT_MSB  128
-
-#define __IO_PCA_PORT_STA  0x00
-#define __IO_PCA_PORT_INDPTR  0x00
-#define __IO_PCA_PORT_DAT  0x01
-#define __IO_PCA_PORT_IND  0x02
-#define __IO_PCA_PORT_CON  0x03
-
-#define __IO_PCA_PORT_ICOUNT  0x00
-#define __IO_PCA_PORT_IADR  0x01
-#define __IO_PCA_PORT_ISCLL  0x02
-#define __IO_PCA_PORT_ISCLH  0x03
-#define __IO_PCA_PORT_ITO  0x04
-#define __IO_PCA_PORT_IPRESET  0x05
-#define __IO_PCA_PORT_IMODE  0x06
-
-#define __IO_PCA_STA_ILLEGAL_START_STOP  0x00
-#define __IO_PCA_STA_MASTER_START_TX  0x08
-#define __IO_PCA_STA_MASTER_RESTART_TX  0x10
-#define __IO_PCA_STA_MASTER_SLA_W_ACK  0x18
-#define __IO_PCA_STA_MASTER_SLA_W_NAK  0x20
-#define __IO_PCA_STA_MASTER_DATA_W_ACK  0x28
-#define __IO_PCA_STA_MASTER_DATA_W_NAK  0x30
-#define __IO_PCA_STA_MASTER_ARB_LOST  0x38
-#define __IO_PCA_STA_MASTER_SLA_R_ACK  0x40
-#define __IO_PCA_STA_MASTER_SLA_R_NAK  0x48
-#define __IO_PCA_STA_MASTER_DATA_R_ACK  0x50
-#define __IO_PCA_STA_MASTER_DATA_R_NAK  0x58
-#define __IO_PCA_STA_SLAVE_AD_W  0x60
-#define __IO_PCA_STA_SLAVE_AL_AD_W  0x68
-#define __IO_PCA_STA_SDA_STUCK  0x70
-#define __IO_PCA_STA_SCL_STUCK  0x78
-#define __IO_PCA_STA_SLAVE_DATA_RX_ACK  0x80
-#define __IO_PCA_STA_SLAVE_DATA_RX_NAK  0x88
-#define __IO_PCA_STA_SLAVE_STOP_OR_RESTART  0xA0
-#define __IO_PCA_STA_SLAVE_AD_R  0xA8
-#define __IO_PCA_STA_SLAVE_AL_AD_R  0xB0
-#define __IO_PCA_STA_SLAVE_DATA_TX_ACK  0xB8
-#define __IO_PCA_STA_SLAVE_DATA_TX_NAK  0xC0
-#define __IO_PCA_STA_SLAVE_LST_TX_ACK  0xC8
-#define __IO_PCA_STA_SLAVE_GC  0xD0
-#define __IO_PCA_STA_SLAVE_GC_AL  0xD8
-#define __IO_PCA_STA_SLAVE_GC_RX_ACK  0xE0
-#define __IO_PCA_STA_SLAVE_GC_RX_NAK  0xE8
-#define __IO_PCA_STA_IDLE  0xF8
-#define __IO_PCA_STA_ILLEGAL_ICOUNT  0xFC
-
-#define __IO_PCA_CON_AA  0x80
-#define __IO_PCA_CON_ENSIO  0x40
-#define __IO_PCA_CON_STA  0x20
-#define __IO_PCA_CON_STO  0x10
-#define __IO_PCA_CON_SI  0x08
-#define __IO_PCA_CON_MODE  0x01
-
-#define __IO_PCA_CON_ECHO_BUS_STOP  0x10
-#define __IO_PCA_CON_ECHO_SI  0x08
-#define __IO_PCA_CON_ECHO_BUS_RESTART  0x04
-#define __IO_PCA_CON_ECHO_BUS_ILLEGAL  0x02
-
-#define __IO_PCA_ICOUNT_LB  0x80
-
-#define __IO_PCA_ITO_TE  0x80
-
-#define __IO_PCA_IMODE_STD  0x00
-#define __IO_PCA_IMODE_FAST  0x01
-#define __IO_PCA_IMODE_FASTP  0x02
-#define __IO_PCA_IMODE_TURBO  0x03
-#define __IO_PCA_IMODE_CR  0x07
+#define __APU_CMD_SIZE  0x100
+#define __APU_PTR_SIZE  0x100
 
 #define __IO_APU_PORT_BASE  0xC000
-#define __IO_APU_PORT_DATA  49152
-#define __IO_APU_PORT_CONTROL  49153
-#define __IO_APU_PORT_STATUS  49153
-
-#define __IO_APU_STATUS_BUSY  0x80
-#define __IO_APU_STATUS_SIGN  0x40
-#define __IO_APU_STATUS_ZERO  0x20
-#define __IO_APU_STATUS_DIV0  0x10
-#define __IO_APU_STATUS_NEGRT  0x08
-#define __IO_APU_STATUS_UNDFL  0x04
-#define __IO_APU_STATUS_OVRFL  0x02
-#define __IO_APU_STATUS_CARRY  0x01
-
-#define __IO_APU_STATUS_ERROR  0x1E
-
-#define __IO_APU_COMMAND_SVREQ 0x80
-
-#define __IO_APU_OP_ENT  0x40
-#define __IO_APU_OP_REM  0x50
-#define __IO_APU_OP_ENT16  0x40
-#define __IO_APU_OP_ENT32  0x41
-#define __IO_APU_OP_REM16  0x50
-#define __IO_APU_OP_REM32  0x51
-
-#define __IO_APU_OP_SADD  0x6C
-#define __IO_APU_OP_SSUB  0x6D
-#define __IO_APU_OP_SMUL  0x6E
-#define __IO_APU_OP_SMUU  0x76
-#define __IO_APU_OP_SDIV  0x6F
-
-#define __IO_APU_OP_DADD  0x2C
-#define __IO_APU_OP_DSUB  0x2D
-#define __IO_APU_OP_DMUL  0x2E
-#define __IO_APU_OP_DMUU  0x36
-#define __IO_APU_OP_DDIV  0x2F
-
-#define __IO_APU_OP_FADD  0x10
-#define __IO_APU_OP_FSUB  0x11
-#define __IO_APU_OP_FMUL  0x12
-#define __IO_APU_OP_FDIV  0x13
-
-#define __IO_APU_OP_SQRT  0x01
-#define __IO_APU_OP_SIN  0x02
-#define __IO_APU_OP_COS  0x03
-#define __IO_APU_OP_TAN  0x04
-#define __IO_APU_OP_ASIN  0x05
-#define __IO_APU_OP_ACOS  0x06
-#define __IO_APU_OP_ATAN  0x07
-#define __IO_APU_OP_LOG  0x08
-#define __IO_APU_OP_LN  0x09
-#define __IO_APU_OP_EXP  0x0A
-#define __IO_APU_OP_PWR  0x0B
-
-#define __IO_APU_OP_NOP  0x00
-#define __IO_APU_OP_FIXS  0x1F
-#define __IO_APU_OP_FIXD  0x1E
-#define __IO_APU_OP_FLTS  0x1D
-#define __IO_APU_OP_FLTD  0x1C
-#define __IO_APU_OP_CHSS  0x74
-#define __IO_APU_OP_CHSD  0x34
-#define __IO_APU_OP_PTOS  0x15
-#define __IO_APU_OP_PTOD  0x37
-#define __IO_APU_OP_PTOF  0x17
-#define __IO_APU_OP_POPS  0x78
-#define __IO_APU_OP_POPD  0x38
-#define __IO_APU_OP_POPF  0x18
-#define __IO_APU_OP_XCHS  0x79
-#define __IO_APU_OP_XCHD  0x39
-#define __IO_APU_OP_XCHF  0x19
-#define __IO_APU_OP_PUPI  0x1A
-
 
 
 
@@ -243,84 +82,80 @@
 #define __Z180_Z8L180  0x02
 #define __Z180_Z8S180  0x04
 
-#define __CPU_CLOCK  18432000
-
 #define __CPU_INFO  0x00
 
 #define __CPU_INFO_ENABLE_SLL  0x01
 
 #define __CPU_TIMER_SCALE  20
 
-#define __IO_BASE_ADDRESS  0
-
 
    // Z8S180 / Z8L180 CLASS
 
-   #define __IO_CNTLA0  0
-   #define __IO_CNTLA1  1
-   #define __IO_CNTLB0  2
-   #define __IO_CNTLB1  3
-   #define __IO_STAT0  4
-   #define __IO_STAT1  5
-   #define __IO_TDR0  6
-   #define __IO_TDR1  7
-   #define __IO_RDR0  8
-   #define __IO_RDR1  9
-   #define __IO_ASEXT0  18
-   #define __IO_ASEXT1  19
-   #define __IO_ASTC0L  26
-   #define __IO_ASTC0H  27
-   #define __IO_ASTC1L  28
-   #define __IO_ASTC1H  29
+   #define __IO_CNTLA0  0x0
+   #define __IO_CNTLA1  0x1
+   #define __IO_CNTLB0  0x2
+   #define __IO_CNTLB1  0x3
+   #define __IO_STAT0  0x4
+   #define __IO_STAT1  0x5
+   #define __IO_TDR0  0x6
+   #define __IO_TDR1  0x7
+   #define __IO_RDR0  0x8
+   #define __IO_RDR1  0x9
+   #define __IO_ASEXT0  0x12
+   #define __IO_ASEXT1  0x13
+   #define __IO_ASTC0L  0x1a
+   #define __IO_ASTC0H  0x1b
+   #define __IO_ASTC1L  0x1c
+   #define __IO_ASTC1H  0x1d
 
-   #define __IO_CNTR  10
-   #define __IO_TRDR  11
+   #define __IO_CNTR  0xa
+   #define __IO_TRDR  0xb
 
-   #define __IO_TMDR0L  12
-   #define __IO_TMDR0H  13
-   #define __IO_RLDR0L  14
-   #define __IO_RLDR0H  15
-   #define __IO_TCR  16
-   #define __IO_TMDR1L  20
-   #define __IO_TMDR1H  21
-   #define __IO_RLDR1L  22
-   #define __IO_RLDR1H  23
+   #define __IO_TMDR0L  0xc
+   #define __IO_TMDR0H  0xd
+   #define __IO_RLDR0L  0xe
+   #define __IO_RLDR0H  0xf
+   #define __IO_TCR  0x10
+   #define __IO_TMDR1L  0x14
+   #define __IO_TMDR1H  0x15
+   #define __IO_RLDR1L  0x16
+   #define __IO_RLDR1H  0x17
 
-   #define __IO_FRC  24
-   #define __IO_CMR  30
-   #define __IO_CCR  31
+   #define __IO_FRC  0x18
+   #define __IO_CMR  0x1e
+   #define __IO_CCR  0x1f
 
-   #define __IO_SAR0L  32
-   #define __IO_SAR0H  33
-   #define __IO_SAR0B  34
-   #define __IO_DAR0L  35
-   #define __IO_DAR0H  36
-   #define __IO_DAR0B  37
-   #define __IO_BCR0L  38
-   #define __IO_BCR0H  39
-   #define __IO_MAR1L  40
-   #define __IO_MAR1H  41
-   #define __IO_MAR1B  42
-   #define __IO_IAR1L  43
-   #define __IO_IAR1H  44
-   #define __IO_IAR1B  45
-   #define __IO_BCR1L  46
-   #define __IO_BCR1H  47
-   #define __IO_DSTAT  48
-   #define __IO_DMODE  49
-   #define __IO_DCNTL  50
+   #define __IO_SAR0L  0x20
+   #define __IO_SAR0H  0x21
+   #define __IO_SAR0B  0x22
+   #define __IO_DAR0L  0x23
+   #define __IO_DAR0H  0x24
+   #define __IO_DAR0B  0x25
+   #define __IO_BCR0L  0x26
+   #define __IO_BCR0H  0x27
+   #define __IO_MAR1L  0x28
+   #define __IO_MAR1H  0x29
+   #define __IO_MAR1B  0x2a
+   #define __IO_IAR1L  0x2b
+   #define __IO_IAR1H  0x2c
+   #define __IO_IAR1B  0x2d
+   #define __IO_BCR1L  0x2e
+   #define __IO_BCR1H  0x2f
+   #define __IO_DSTAT  0x30
+   #define __IO_DMODE  0x31
+   #define __IO_DCNTL  0x32
 
-   #define __IO_IL  51
-   #define __IO_ITC  52
+   #define __IO_IL  0x33
+   #define __IO_ITC  0x34
 
-   #define __IO_RCR  54
+   #define __IO_RCR  0x36
 
-   #define __IO_CBR  56
-   #define __IO_BBR  57
-   #define __IO_CBAR  58
+   #define __IO_CBR  0x38
+   #define __IO_BBR  0x39
+   #define __IO_CBAR  0x3a
 
-   #define __IO_OMCR  62
-   #define __IO_ICR  63
+   #define __IO_OMCR  0x3e
+   #define __IO_ICR  0x3f
 
    // I/O REGISTER BIT FIELDS
 
@@ -840,6 +675,325 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define __Z80_VECTOR_BASE_BASIC  0x2000
+#define __Z180_VECTOR_IL_BASIC  0x40
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_PIO_PORT_A  0x4000
+#define __IO_PIO_PORT_B  0x4001
+#define __IO_PIO_PORT_C  0x4002
+#define __IO_PIO_CONTROL  0x4003
+
+#define __IO_PIO_CNTL_00  0x80
+#define __IO_PIO_CNTL_01  0x81
+#define __IO_PIO_CNTL_02  0x82
+#define __IO_PIO_CNTL_03  0x83
+
+#define __IO_PIO_CNTL_04  0x88
+#define __IO_PIO_CNTL_05  0x89
+#define __IO_PIO_CNTL_06  0x8A
+#define __IO_PIO_CNTL_07  0x8B
+
+#define __IO_PIO_CNTL_08  0x90
+#define __IO_PIO_CNTL_09  0x91
+#define __IO_PIO_CNTL_10  0x92
+#define __IO_PIO_CNTL_11  0x83
+
+#define __IO_PIO_CNTL_12  0x98
+#define __IO_PIO_CNTL_13  0x99
+#define __IO_PIO_CNTL_14  0x9A
+#define __IO_PIO_CNTL_15  0x9B
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_APU_PORT_DATA  0xc000
+#define __IO_APU_PORT_CONTROL  0xc001
+#define __IO_APU_PORT_STATUS  0xc001
+
+#define __IO_APU_STATUS_BUSY  0x80
+#define __IO_APU_STATUS_SIGN  0x40
+#define __IO_APU_STATUS_ZERO  0x20
+#define __IO_APU_STATUS_DIV0  0x10
+#define __IO_APU_STATUS_NEGRT  0x08
+#define __IO_APU_STATUS_UNDFL  0x04
+#define __IO_APU_STATUS_OVRFL  0x02
+#define __IO_APU_STATUS_CARRY  0x01
+
+#define __IO_APU_STATUS_ERROR  0x1E
+
+#define __IO_APU_COMMAND_SVREQ 0x80
+
+#define __IO_APU_OP_ENT  0x40
+#define __IO_APU_OP_REM  0x50
+#define __IO_APU_OP_ENT16  0x40
+#define __IO_APU_OP_ENT32  0x41
+#define __IO_APU_OP_REM16  0x50
+#define __IO_APU_OP_REM32  0x51
+
+#define __IO_APU_OP_SADD  0x6C
+#define __IO_APU_OP_SSUB  0x6D
+#define __IO_APU_OP_SMUL  0x6E
+#define __IO_APU_OP_SMUU  0x76
+#define __IO_APU_OP_SDIV  0x6F
+
+#define __IO_APU_OP_DADD  0x2C
+#define __IO_APU_OP_DSUB  0x2D
+#define __IO_APU_OP_DMUL  0x2E
+#define __IO_APU_OP_DMUU  0x36
+#define __IO_APU_OP_DDIV  0x2F
+
+#define __IO_APU_OP_FADD  0x10
+#define __IO_APU_OP_FSUB  0x11
+#define __IO_APU_OP_FMUL  0x12
+#define __IO_APU_OP_FDIV  0x13
+
+#define __IO_APU_OP_SQRT  0x01
+#define __IO_APU_OP_SIN  0x02
+#define __IO_APU_OP_COS  0x03
+#define __IO_APU_OP_TAN  0x04
+#define __IO_APU_OP_ASIN  0x05
+#define __IO_APU_OP_ACOS  0x06
+#define __IO_APU_OP_ATAN  0x07
+#define __IO_APU_OP_LOG  0x08
+#define __IO_APU_OP_LN  0x09
+#define __IO_APU_OP_EXP  0x0A
+#define __IO_APU_OP_PWR  0x0B
+
+#define __IO_APU_OP_NOP  0x00
+#define __IO_APU_OP_FIXS  0x1F
+#define __IO_APU_OP_FIXD  0x1E
+#define __IO_APU_OP_FLTS  0x1D
+#define __IO_APU_OP_FLTD  0x1C
+#define __IO_APU_OP_CHSS  0x74
+#define __IO_APU_OP_CHSD  0x34
+#define __IO_APU_OP_PTOS  0x15
+#define __IO_APU_OP_PTOD  0x37
+#define __IO_APU_OP_PTOF  0x17
+#define __IO_APU_OP_POPS  0x78
+#define __IO_APU_OP_POPD  0x38
+#define __IO_APU_OP_POPF  0x18
+#define __IO_APU_OP_XCHS  0x79
+#define __IO_APU_OP_XCHD  0x39
+#define __IO_APU_OP_XCHF  0x19
+#define __IO_APU_OP_PUPI  0x1A
+
+
+
+
+
+
+
+
+
+
+
+
+
+#undef  __YAZ180
+#define __YAZ180  1
+
+#define __ASCI0_RX_SIZE  0x100
+#define __ASCI0_TX_SIZE  0x100
+
+#define __ASCI1_RX_SIZE  0x100
+#define __ASCI1_TX_SIZE  0x100
+
+#define __APU_CMD_SIZE  0x100
+#define __APU_PTR_SIZE  0x100
+
+#define __I2C_RX_SIZE  0x100
+#define __I2C_TX_SIZE  0x100
+
+#define __IO_BREAK  0x2000
+
+#define __IO_PIO_PORT_BASE  0x4000
+
+#define __IO_PIO_PORT_A  0x4000
+#define __IO_PIO_PORT_B  0x4001
+#define __IO_PIO_PORT_C  0x4002
+#define __IO_PIO_CONTROL  0x4003
+
+#define __IO_PIO_CNTL_00  0x80
+#define __IO_PIO_CNTL_01  0x81
+#define __IO_PIO_CNTL_02  0x82
+#define __IO_PIO_CNTL_03  0x83
+
+#define __IO_PIO_CNTL_04  0x88
+#define __IO_PIO_CNTL_05  0x89
+#define __IO_PIO_CNTL_06  0x8A
+#define __IO_PIO_CNTL_07  0x8B
+
+#define __IO_PIO_CNTL_08  0x90
+#define __IO_PIO_CNTL_09  0x91
+#define __IO_PIO_CNTL_10  0x92
+#define __IO_PIO_CNTL_11  0x83
+
+#define __IO_PIO_CNTL_12  0x98
+#define __IO_PIO_CNTL_13  0x99
+#define __IO_PIO_CNTL_14  0x9A
+#define __IO_PIO_CNTL_15  0x9B
+
+
+#define __IO_PCA9665_1_PORT_BASE  0xA000
+#define __IO_PCA9665_2_PORT_BASE  0x8000
+
+#define __IO_I2C1_PORT_MSB  0xa0
+#define __IO_I2C2_PORT_MSB  0x80
+
+#define __IO_I2C_PORT_STA  0x00
+#define __IO_I2C_PORT_IPTR  0x00
+#define __IO_I2C_PORT_DAT  0x01
+#define __IO_I2C_PORT_IDATA  0x02
+#define __IO_I2C_PORT_CON  0x03
+
+#define __IO_I2C_PORT_ICOUNT  0x00
+#define __IO_I2C_PORT_IADDR  0x01
+#define __IO_I2C_PORT_ISCLL  0x02
+#define __IO_I2C_PORT_ISCLH  0x03
+#define __IO_I2C_PORT_ITO  0x04
+#define __IO_I2C_PORT_IPRESET  0x05
+#define __IO_I2C_PORT_IMODE  0x06
+
+#define __IO_I2C_STA_ILLEGAL_START_STOP  0x00
+#define __IO_I2C_STA_MASTER_START_TX  0x08
+#define __IO_I2C_STA_MASTER_RESTART_TX  0x10
+#define __IO_I2C_STA_MASTER_SLA_W_ACK  0x18
+#define __IO_I2C_STA_MASTER_SLA_W_NAK  0x20
+#define __IO_I2C_STA_MASTER_DATA_W_ACK  0x28
+#define __IO_I2C_STA_MASTER_DATA_W_NAK  0x30
+#define __IO_I2C_STA_MASTER_ARB_LOST  0x38
+#define __IO_I2C_STA_MASTER_SLA_R_ACK  0x40
+#define __IO_I2C_STA_MASTER_SLA_R_NAK  0x48
+#define __IO_I2C_STA_MASTER_DATA_R_ACK  0x50
+#define __IO_I2C_STA_MASTER_DATA_R_NAK  0x58
+#define __IO_I2C_STA_SLAVE_AD_W  0x60
+#define __IO_I2C_STA_SLAVE_AL_AD_W  0x68
+#define __IO_I2C_STA_SDA_STUCK  0x70
+#define __IO_I2C_STA_SCL_STUCK  0x78
+#define __IO_I2C_STA_SLAVE_DATA_RX_ACK  0x80
+#define __IO_I2C_STA_SLAVE_DATA_RX_NAK  0x88
+#define __IO_I2C_STA_SLAVE_STOP_OR_RESTART  0xA0
+#define __IO_I2C_STA_SLAVE_AD_R  0xA8
+#define __IO_I2C_STA_SLAVE_AL_AD_R  0xB0
+#define __IO_I2C_STA_SLAVE_DATA_TX_ACK  0xB8
+#define __IO_I2C_STA_SLAVE_DATA_TX_NAK  0xC0
+#define __IO_I2C_STA_SLAVE_LST_TX_ACK  0xC8
+#define __IO_I2C_STA_SLAVE_GC  0xD0
+#define __IO_I2C_STA_SLAVE_GC_AL  0xD8
+#define __IO_I2C_STA_SLAVE_GC_RX_ACK  0xE0
+#define __IO_I2C_STA_SLAVE_GC_RX_NAK  0xE8
+#define __IO_I2C_STA_IDLE  0xF8
+#define __IO_I2C_STA_ILLEGAL_ICOUNT  0xFC
+
+#define __IO_I2C_CON_AA  0x80
+#define __IO_I2C_CON_ENSIO  0x40
+#define __IO_I2C_CON_STA  0x20
+#define __IO_I2C_CON_STO  0x10
+#define __IO_I2C_CON_SI  0x08
+#define __IO_I2C_CON_MODE  0x01
+
+#define __IO_I2C_CON_ECHO_BUS_STOP  0x10
+#define __IO_I2C_CON_ECHO_SI  0x08
+#define __IO_I2C_CON_ECHO_BUS_RESTART  0x04
+#define __IO_I2C_CON_ECHO_BUS_ILLEGAL  0x02
+
+#define __IO_I2C_ICOUNT_LB  0x80
+
+#define __IO_I2C_ITO_TE  0x80
+
+#define __IO_I2C_IMODE_STD  0x00
+#define __IO_I2C_IMODE_FAST  0x01
+#define __IO_I2C_IMODE_FASTP  0x02
+#define __IO_I2C_IMODE_TURBO  0x03
+#define __IO_I2C_IMODE_CR  0x07
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_PIO_IDE_LSB  0x4000
+#define __IO_PIO_IDE_MSB  0x4001
+#define __IO_PIO_IDE_CTL  0x4002
+#define __IO_PIO_IDE_CONFIG  0x4003
+#define __IO_PIO_IDE_RD  0x92
+#define __IO_PIO_IDE_WR  0x80
+
+#define __IO_IDE_A0_LINE  0x10
+#define __IO_IDE_A1_LINE  0x04
+#define __IO_IDE_A2_LINE  0x40
+#define __IO_IDE_CS0_LINE  0x08
+#define __IO_IDE_CS1_LINE  0x20
+#define __IO_IDE_WR_LINE  0x01
+#define __IO_IDE_RD_LINE  0x02
+#define __IO_IDE_RST_LINE  0x80
+
+#define __IO_IDE_DATA  0x08
+#define __IO_IDE_ERROR  0x18
+#define __IO_IDE_SEC_CNT  0xc
+#define __IO_IDE_SECTOR  0x1c
+#define __IO_IDE_CYL_LSB  0x48
+#define __IO_IDE_CYL_MSB  0x58
+#define __IO_IDE_HEAD  0x4c
+#define __IO_IDE_COMMAND  0x5c
+#define __IO_IDE_STATUS  0x5c
+
+#define __IO_IDE_CONTROL  0x64
+#define __IO_IDE_ALT_STATUS  0x64
+
+#define __IO_IDE_LBA0  0x1c
+#define __IO_IDE_LBA1  0x48
+#define __IO_IDE_LBA2  0x58
+#define __IO_IDE_LBA3  0x4c
+
+#define __IDE_CMD_READ  0x20
+#define __IDE_CMD_WRITE  0x30
+
+#define __IDE_CMD_STANDBY  0xE0
+#define __IDE_CMD_IDLE  0xE1
+#define __IDE_CMD_SLEEP  0xE6
+#define __IDE_CMD_CACHE_FLUSH  0xE7
+#define __IDE_CMD_ID  0xEC
 
 
 

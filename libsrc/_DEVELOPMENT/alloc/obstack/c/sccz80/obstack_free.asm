@@ -19,3 +19,10 @@ obstack_free:
    push af
    
    jp asm_obstack_free
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _obstack_free
+defc _obstack_free = obstack_free
+ENDIF
+

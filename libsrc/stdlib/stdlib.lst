@@ -13,6 +13,7 @@ stdlib/obj/${TYPE}/inp
 stdlib/obj/${TYPE}/isqrt
 stdlib/obj/${TYPE}/itoa
 stdlib/obj/${TYPE}/itoa_callee
+stdlib/obj/${TYPE}/itox_basechar
 stdlib/obj/${TYPE}/l_bsearch
 stdlib/obj/${TYPE}/l_bsearch_callee
 stdlib/obj/${TYPE}/l_qsort

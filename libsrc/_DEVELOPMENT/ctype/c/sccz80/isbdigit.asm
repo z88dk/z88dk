@@ -22,3 +22,10 @@ isbdigit:
    
    inc l
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _isbdigit
+defc _isbdigit = isbdigit
+ENDIF
+
