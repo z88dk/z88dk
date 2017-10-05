@@ -616,7 +616,9 @@ int heirb(LVALUE* lval)
                     rvalue(lval);
                 } else if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_ARRAY) {
                     error(E_SUBSCRIPT);
-                    k = 0;
+                    junk();
+                    needchar(']');
+                    return 0;
                 }
                 setstage(&before, &start);
                 if (lval->flags & FARPTR)
