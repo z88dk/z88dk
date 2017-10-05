@@ -21,7 +21,6 @@ int expression(int  *con, double *val, uint32_t *packedArgumentType)
     fnflags = lval.flags;
     if (lval.ptr_type) {
         type = lval.ptr_type;
-        lval.ident = POINTER;
     } else {
         type = lval.val_type;
     }
@@ -445,6 +444,8 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     lval->symbol = NULL;
     if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
         lval->ptr_type = KIND_NONE;
+    else
+        lval->ptr_type = lval->ltype->ptr->kind;
     lval->val_type = lval->indirect_kind = lval->ltype->kind;
         
     // flags = lval->flags;
@@ -634,7 +635,6 @@ int heirb(LVALUE* lval)
                 setstage(&before, &start);
                 if (lval->flags & FARPTR)
                     zpushde();
-                lval->ident = ID_VARIABLE;
                 zpush();
                 valtype = expression(&con, &dval, &packedType);
                 // TODO: Check valtype
@@ -705,13 +705,11 @@ int heirb(LVALUE* lval)
                     /* function returning variable */
                     lval->ptr_type = KIND_NONE;
                     lval->val_type = ptr->type;
-                    lval->ident = ID_VARIABLE;
                     ptr = lval->symbol = NULL;
                 } else {
                     /* function returning pointer */
                     lval->flags = ptr->flags & ~(CALLEE|SMALLC|FASTCALL); /* djm */
                     ptr = lval->symbol = dummy_sym[(int)ptr->more];
-                    //lval->ident = POINTER;
                     lval->indirect_kind = lval->ptr_type = ptr->type;
                     /* djm - 24/11/98 */
                     lval->val_type = (lval->flags & FARPTR ? KIND_CPTR : KIND_INT);
@@ -756,12 +754,10 @@ int heirb(LVALUE* lval)
                 lval->ltype = ptr->ctype;
                 lval->indirect_kind = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
-                lval->ident = ID_VARIABLE;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
                 if (lval->ltype->kind == KIND_PTR) {
-                    lval->ptr_type = ptr->type;
-                    lval->ident = POINTER;
+                    lval->ptr_type = ptr->ctype->ptr->kind;
                     /* djm */
                     if (ptr->flags & FARPTR) {
                         lval->indirect_kind = KIND_CPTR;
@@ -774,7 +770,6 @@ int heirb(LVALUE* lval)
                 if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
                     /* array or struct */
                     lval->ptr_type = ptr->type;
-                    lval->ident = POINTER;
                     /* djm Long pointers here? */
 
                     lval->val_type = ((ptr->flags & FARPTR) ? KIND_CPTR : KIND_INT);
@@ -788,7 +783,6 @@ int heirb(LVALUE* lval)
         address(ptr);
         lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
         lval->flags = ptr->flags;
-        lval->ident = FUNCTION;
         return 0;
     }
     return k;

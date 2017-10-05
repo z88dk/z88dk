@@ -207,8 +207,6 @@ struct symbol_s {
         char prototyped;
         char isconst;        /* Set if const, affects the section the data goes into */
         char isassigned;     /* Set if we have assigned to it once */
-        uint32_t  args[MAXARGS];       /* arguments */
-        unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
         enum symbol_flags flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer
@@ -439,7 +437,7 @@ struct lvalue_s {
         enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
-        enum ident_type ident;          /* ident (from symbol table) */
+ //       enum ident_type ident;          /* ident (from symbol table) */
      //   enum storage_type storage;	/* storage (from sym tab) */
         Type *cast_type;
 	int  level;		/* Parenth level (cast) */

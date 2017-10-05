@@ -39,10 +39,9 @@ int primary(LVALUE* lval)
             lval->ltype = ptr->ctype;
             lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
-            lval->ident = ptr->ident;
             lval->ptr_type = KIND_NONE;
             if ( lval->ltype->kind == KIND_PTR ) {
-                lval->ptr_type = ptr->type;
+                lval->ptr_type = ptr->ctype->ptr->kind;
                 /* djm long pointers */
                 lval->indirect_kind = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
             }
@@ -69,19 +68,17 @@ int primary(LVALUE* lval)
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
                     lval->flags = FLAGS_NONE;
-                    lval->ident = ID_VARIABLE;
                     return (0);
                 }
                 lval->symbol = ptr;
                 lval->ltype = ptr->ctype;
                 lval->indirect_kind = 0;
-                lval->val_type = ptr->type;
+                lval->val_type = ptr->ctype->kind;
                 lval->flags = ptr->flags;
-                lval->ident = ptr->ident;
                 lval->ptr_type = KIND_NONE;
                 if (lval->ltype->kind != KIND_ARRAY && lval->ltype->kind != KIND_STRUCT ) {
                     if (lval->ltype->kind == KIND_PTR) {
-                        lval->ptr_type = ptr->type;
+                        lval->ptr_type = ptr->ctype->ptr->kind;
                         lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                     }
                     return (1);
@@ -92,9 +89,7 @@ int primary(LVALUE* lval)
                 lval->indirect_kind = lval->ptr_type = ptr->type;
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
-            } else {
-                lval->ident = FUNCTION;
-            }
+            } 
         } else {
             /* Check to see if we have a right bracket, if we don't assume
              * it's a function then we can break an awful lot of code, do it
@@ -119,13 +114,11 @@ int primary(LVALUE* lval)
         lval->indirect_kind = 0;
         lval->val_type = ptr->type ; /* Null function, always int */
         lval->flags = ptr->flags;
-        lval->ident = FUNCTION;
         return (0);
     }
     if (constant(lval)) {
         lval->symbol = NULL;
         lval->indirect_kind = 0;
-        lval->ident = ID_VARIABLE;
         return (0);
     } else {
         error(E_EXPRESSION);
@@ -381,7 +374,6 @@ void result(LVALUE* lval, LVALUE* lval2)
             lval->ltype = type_int;            
         }
         lval->indirect_kind = 0;
-        lval->ident = ID_VARIABLE;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
         lval->symbol = lval2->symbol;
         lval->indirect_kind = lval2->indirect_kind;

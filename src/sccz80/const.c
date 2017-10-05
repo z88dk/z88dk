@@ -465,7 +465,6 @@ void offset_of(LVALUE *lval)
     if ( foundit ) {
         lval->is_const = 1;
         lval->val_type = KIND_INT;
-        lval->ident = ID_VARIABLE;
         vconst(lval->const_val);
     } else {
         error(E_OFFSETOF, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
@@ -599,7 +598,6 @@ void size_of(LVALUE* lval)
     needchar(')');
     lval->is_const = 1;
     lval->val_type = KIND_INT;
-    lval->ident = ID_VARIABLE;
     vconst(lval->const_val);
 }
 

@@ -173,6 +173,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             }
 
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
+#if 0                
                 int proto_argnumber;
                 if ( (ptr->flags & SMALLC) == SMALLC)  {
                     proto_argnumber = ptr->prototyped - argnumber + 1;
@@ -184,7 +185,6 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 if ((protoarg != PKIND_ELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == KIND_STRUCT)))
                     expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
 
-#if 0
                 if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
                     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
                 }
@@ -252,19 +252,17 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     buffer_fps_num = save_fps_num ;
     FREENULL(save_fps);
 
-    if (ptr)
-        debug(DBG_ARG2, "arg %d %d proto %d", argnumber, ptr->prototyped, ptr->args[1]);
-
+ 
     if (ptr && (ptr->prototyped != 0) && builtin_flags == 0 ) {
-        if ((ptr->prototyped > argnumber) && (ptr->args[1] != PKIND_VOID) && (ptr->args[1] != PKIND_ELLIPSES)) {
-            warning(W_2FAFUNC);
-        } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PKIND_ELLIPSES)) {
-            warning(W_2MAFUNC);
-        }
+        // if ((ptr->prototyped > argnumber) && (ptr->args[1] != PKIND_VOID) && (ptr->args[1] != PKIND_ELLIPSES)) {
+        //     warning(W_2FAFUNC);
+        // } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PKIND_ELLIPSES)) {
+        //     warning(W_2MAFUNC);
+        // }
     }
     if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
-        if ((ptr->prototyped) && ptr->args[1] == PKIND_ELLIPSES) {
+        if ( ptr->ctype->hasva ) {
             if ( (ptr->flags & SMALLC) == SMALLC ) {
                 loadargc(nargs);
             }
@@ -327,7 +325,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, ptr ? (ptr->type != KIND_DOUBLE) : YES, preserve); /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, ptr ? (ptr->ctype->kind != KIND_DOUBLE) : YES, preserve); /* clean up arguments - we know what type is MOOK */
     }
 }
 
