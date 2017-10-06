@@ -52,12 +52,14 @@ extern unsigned char *mem;
 extern long long st;
 
 
+#define is8080() ( (c_cpu & CPU_8080) == CPU_8080 )
 #define isgbz80() ( (c_cpu & CPU_GBZ80) == CPU_GBZ80 )
 #define isr800() ( (c_cpu & CPU_R800) == CPU_R800 )
 #define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
 #define israbbit3k() ( c_cpu & (CPU_R3K))
 #define isz180() ( c_cpu & (CPU_Z180))
-#define canindex() ( c_cpu & (CPU_Z80|CPU_Z180|CPU_Z80_ZXN|CPU_R800|CPU_R2K|CPU_R3K))
+#define canaltreg() ( ( c_cpu & (CPU_8080|CPU_GBZ80)) == 0 )
+#define canindex() ( ( c_cpu & (CPU_8080|CPU_GBZ80)) == 0 )
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN|CPU_R800))
 #define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 #define cancbundoc() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
@@ -86,6 +88,7 @@ extern int f_(void);
 #define CPU_Z80_ZXN  16
 #define CPU_R800     32
 #define CPU_GBZ80    64
+#define CPU_8080     128
 
 #define Z88DK_SEEK_SET 0
 #define Z88DK_SEEK_END 1

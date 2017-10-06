@@ -255,12 +255,19 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                 switch ( z ) {
                     case 0:
                         if ( y == 0 ) BUF_PRINTF("nop");
-                        else if ( y == 1 && !isgbz80() ) BUF_PRINTF("%-8saf,af\'","ex");
-                        else if ( y == 1 && isgbz80() ) BUF_PRINTF("%-8s(%s),sp","ld",handle_addr16(state, opbuf1,sizeof(opbuf1)));
-                        else if ( y == 2 && !isgbz80() ) BUF_PRINTF("%-8s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));
-                        else if ( y == 2 && isgbz80()) BUF_PRINTF("%-8s%s","stop", handle_immed8(state, opbuf1, sizeof(opbuf1)));
-                        else if ( y == 3 ) BUF_PRINTF("%-8s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1)));
-                        else BUF_PRINTF("%-8s%s,%s", "jr", cc_table[y-4], handle_rel8(state, opbuf1,  sizeof(opbuf1)));
+                        else if ( y == 1 ) {
+                            if ( canaltreg()) BUF_PRINTF("%-8saf,af\'","ex");
+                            else if (isgbz80() ) BUF_PRINTF("%-8s(%s),sp","ld",handle_addr16(state, opbuf1,sizeof(opbuf1)));
+                            else BUF_PRINTF("nop");
+                        } else if ( y == 2 ) {
+                            if ( isgbz80() )  BUF_PRINTF("%-8s%s","stop", handle_immed8(state, opbuf1, sizeof(opbuf1)));
+                            else if ( is8080() ) BUF_PRINTF("nop");                            
+                            else BUF_PRINTF("%-8s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));                  
+                        } else if ( y == 3 ) {
+                            if ( !is8080() ) BUF_PRINTF("%-8s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1)));
+                            else BUF_PRINTF("nop");
+                        } else if ( !is8080() ) BUF_PRINTF("%-8s%s,%s", "jr", cc_table[y-4], handle_rel8(state, opbuf1,  sizeof(opbuf1)));  
+                        else BUF_PRINTF("nop");
                         break;
                     case 1:
                         if ( q == 0 ) BUF_PRINTF("%-8s%s,%s","ld", handle_register16(state, p,state->index), handle_immed16(state, opbuf1, sizeof(opbuf1)));

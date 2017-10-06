@@ -27,6 +27,7 @@ static void usage(char *program)
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
+    printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
     printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
@@ -82,6 +83,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_R800;
                 } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
                     c_cpu = CPU_GBZ80;
+                } else if ( strcmp(&argv[0][1],"m8080") == 0 ) {
+                    c_cpu = CPU_8080;
                 } else {
                     printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
