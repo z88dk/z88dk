@@ -11,9 +11,9 @@ CLASSIC_ASM = $(wildcard _*.asm)
 CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
 CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
 
-NEWLIBASM := $(shell z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/ctype/ctype_sccz80.lst -p $(NEWLIB_DIRECTORY) -t)
+NEWLIBASM := $(shell z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/ctype/ctype_sccz80.lst -p $(NEWLIB_DIRECTORY) -t)
 NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy,$(NEWLIBOBJ))
+NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
 
 OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
@@ -66,7 +66,7 @@ obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $  $^
 
 ctype-newlib.lst:
-	@z88dk-lstmanip -i $(NEWLIB_DIRECTORY)/ctype/ctype_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'ctype/obj/$${TYPE}' -c -o ctype-newlib.lst
+	@z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/ctype/ctype_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'ctype/obj/$${TYPE}' -c -o ctype-newlib.lst
 
 dirs:
 	@mkdir -p $(dir $(OBJECTS))
