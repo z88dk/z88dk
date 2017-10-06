@@ -190,7 +190,7 @@ static char *handle_block_instruction(dcontext *state, uint8_t z, uint8_t y)
 
 static char *handle_ed_assorted_instructions(dcontext *state, uint8_t y)
 {
-    static char *table[] =      { "ld      i,a",   "ld      r,a",   "ld      a,i",   "ld      a,r",   "rrd",           "rld",    "nop",           "ld      r,r"};
+    static char *table[] =      { "ld      i,a",   "ld      r,a",   "ld      a,i",   "ld      a,r",   "rrd",           "rld",    "ld      i,i",           "ld      r,r"};
     static char *z180_table[] = { "ld      i,a",   "ld      r,a",   "ld      a,i",   "ld      a,r",   "rrd",           "rld",    "nop",           "nop"};
     static char *r2k_table[] =  { "ld      eir,a", "ld      iir,a", "ld      a,eir", "ld      a,iir", "ld      xpc,a", "nop",    "ld      a,xpc", "nop"};
     static char *r3k_table[] =  { "ld      eir,a", "ld      iir,a", "ld      a,eir", "ld      a,iir", "ld      xpc,a", "setusr", "ld      a,xpc", "rdmode"};
