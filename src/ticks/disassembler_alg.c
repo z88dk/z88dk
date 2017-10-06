@@ -562,8 +562,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
         break;
     } while (1);
 
-    if ( offs < 60 ) {
-          offs = snprintf(buf,buflen,"%-60s",buf);
+    while ( offs < 60 ) {
+        buf[offs++] = ' ';
+        buf[offs] = 0;
     }
     offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc);
     for ( i = state->skip; i < state->len; i++ ) {
