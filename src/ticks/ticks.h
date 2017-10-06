@@ -55,7 +55,7 @@ extern long long st;
 #define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
 #define israbbit3k() ( c_cpu & (CPU_R3K))
 #define isz180() ( c_cpu & (CPU_Z180))
-#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN|CPU_R800))
 #define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 #define cancbundoc() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
@@ -81,6 +81,7 @@ extern int f_(void);
 #define CPU_R2K      4
 #define CPU_R3K      8
 #define CPU_Z80_ZXN  16
+#define CPU_R800     32
 
 #define Z88DK_SEEK_SET 0
 #define Z88DK_SEEK_END 1

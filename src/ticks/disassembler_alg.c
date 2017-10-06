@@ -34,16 +34,15 @@ typedef struct {
 
 static char *handle_rot(dcontext *state,  uint8_t z)
 {
-    char *undoc_rot_table[] = { "rlc", "rrc", "rl", "rr", "sla", "sra", "sll", "srl" };
     char *rot_table[] = { "rlc", "rrc", "rl", "rr", "sla", "sra", NULL, "srl" };
     char *instr = rot_table[z];
 
-    if ( !cansll() ) {
-        char *isntr = undoc_rot_table[z];
-    }
-    if ( instr == NULL ) {
-        return "nop";        
+    if ( z == 6 && cansll() ) {
+        instr = "sll";
+    } else if ( z == 6 && c_cpu & CPU_R800 ) {
+        instr = "test";
     } 
+
     return instr;
 }
 
@@ -544,6 +543,10 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 if ( z == 0 && israbbit3k() ) {
                                     char *r3k_instrs[] = { "uma", "umsa", "lsidr", "lsddr", "nop", "nop", "lsir", "lsdr"};
                                     BUF_PRINTF("%s",r3k_instrs[y]);
+                                } else if ( z == 1 && y != 6 && c_cpu & CPU_R800 ) {
+                                    BUF_PRINTF("%-8sa,%s","mulub", handle_register8(state, y, opbuf1, sizeof(opbuf1)));
+                                } else if ( z == 3 && c_cpu & CPU_R800 ) {
+                                    BUF_PRINTF("%-8shl,%s","muluw", handle_register16(state, p, state->index));                                    
                                 } else if ( b == 0xfe ) BUF_PRINTF("trap");
                                 else BUF_PRINTF("nop");
                             }

@@ -76,8 +76,10 @@ int main(int argc, char **argv)
                     c_cpu = CPU_R2K;
                 } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
                     c_cpu = CPU_R3K;
+                } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
+                    c_cpu = CPU_R800;
                 } else {
-                    printf("Unknown CPU: %s\n",&argv[0][1]);
+                    printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
                 break;
             }
