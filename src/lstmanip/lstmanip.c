@@ -150,13 +150,18 @@ static int substr_iseq(char *s1, int n, char *s2)
 }
 
 // <HACK>
-// MinGW inserts c:/MinGW/msys/1.0 before every path, causing the makefiles that consume
-// our output to fail
+// MinGW inserts c:/MinGW/msys/1.0 before every path during command line parsing, 
+// causing the makefiles that consume our output to fail
 // This function replaces c:/MinGW/msys/1.0/home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
 //                     by                  /home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
+// A "-r /" argument must be passed in by the Makefile, so that we know we are in 
+// MinGW and what is the prefix to remove
 static char *remove_mingw_prefix(char *str)
 {
-	if (root && substr_iseq(str, strlen(root), root))
+	if (root
+		&& strcmp(root, "/") != 0  	// if root is "/", it's not MinGW, don't remove root
+		&& substr_iseq(str, strlen(root), root)		// prefix to remove
+	)
 		str += strlen(root);
 	return str;
 }
