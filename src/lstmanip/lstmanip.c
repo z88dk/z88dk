@@ -22,7 +22,7 @@ static void usage(void);
 static void outp_filter(FILE *file, char *fmt, ...);
 
 static char *newlibpath = NULL;
-
+static char *root = NULL;
 
 static int    num_files = 0;
 static char **files = NULL;
@@ -35,6 +35,7 @@ static char  *prefix = "obj/${TYPE}";
  * -p path to newlib route
  * -c convert newlib to classic
  * -t convert to makefile targets
+ * -r pass in filesystem root to remove c:/MinGW/msys/1.0 that MinGW inserts before each path
  */
 int main(int argc, char **argv)
 {
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
     FILE *inp;
     FILE *outp = stdout;
 
-    while ((opt = getopt(argc, argv,"ctx:p:i:o:")) != -1 ) {
+    while ((opt = getopt(argc, argv,"ctx:p:i:o:r:")) != -1 ) {
         switch ( opt ) {
             case 'c':
                 convert = 1;
@@ -65,6 +66,9 @@ int main(int argc, char **argv)
                 break;
             case 'o':
                 output = optarg;
+                break;
+            case 'r':
+                root = optarg;	// in MinGW is c:/MinGW/msys/1.0 when passed in -r /
                 break;
             default:
                 usage();
@@ -136,11 +140,6 @@ static void read_list_file(char *filename)
     }
 }
 
-// <HACK>
-// MinGW inserts c:/MinGW/msys/1.0 before every path, causing the makefiles that consume
-// our output to fail
-// This function replaces c:/MinGW/msys/1.0/home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
-//                     by                  /home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
 static int substr_iseq(char *s1, int n, char *s2)
 {
 	char *s1_temp = strdup(s1);
@@ -150,22 +149,18 @@ static int substr_iseq(char *s1, int n, char *s2)
 	return ret;
 }
 
+// <HACK>
+// MinGW inserts c:/MinGW/msys/1.0 before every path, causing the makefiles that consume
+// our output to fail
+// This function replaces c:/MinGW/msys/1.0/home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
+//                     by                  /home/paulo/git/z88dk-msys/libsrc/_DEVELOPMENT/
 static char *remove_mingw_prefix(char *str)
 {
-	if (strlen(str) > 17 &&
-		isalpha(str[0]) &&
-		str[1] == ':' &&
-		(str[2] == '/' || str[2] == '\\') &&
-		substr_iseq(str+3, 5, "MinGW") &&
-		(str[8] == '/' || str[8] == '\\') &&
-		substr_iseq(str+9, 4, "msys") &&
-		(str[13] == '/' || str[13] == '\\') &&
-		substr_iseq(str+14, 3, "1.0") &&
-		(str[17] == '/' || str[17] == '\\'))
-		return str+17;
-	else
-		return str;
+	if (root && substr_iseq(str, strlen(root), root))
+		str += strlen(root);
+	return str;
 }
+// </HACK>
 
 static char *remove_double_slash(char *path)	// modifies in place
 {
@@ -188,4 +183,3 @@ static void outp_filter(FILE *file, char *fmt, ...)
 
 	fprintf(file, "%s", remove_double_slash(remove_mingw_prefix(buf)));
 }
-// </HACK>
