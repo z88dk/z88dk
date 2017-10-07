@@ -309,7 +309,8 @@ static void process_file( char *filename )
 
 	case '@':		/* file list */
 		filename++;						/* point to after '@' */
-		strip( filename );
+		strip(filename);
+		filename = expand_environment_variables(filename);
 
 		/* loop on file to read each line and recurse */
 		src_push();
