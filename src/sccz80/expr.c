@@ -632,6 +632,9 @@ int heirb(LVALUE* lval)
                     Zsp += 2; /* undo push */
                     if (lval->flags & FARPTR)
                         Zsp += 2;
+                    if ( val > lval->ltype->len ) {
+                        printf("Out of bounds %d > %d\n",val, lval->ltype->len);
+                    }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
                     printf("%d %d\n",val,lval->offset);
@@ -647,7 +650,7 @@ int heirb(LVALUE* lval)
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                        zadd_const(lval, val);
+                        zadd_const(lval, val  - lval->offset);
                         lval->offset = val;
                     }
                 } else {
