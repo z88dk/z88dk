@@ -1,0 +1,149 @@
+PRINTER
+------
+
+Looking at the port (female, i.e. holes instead of pins)
+
+13		12		11		10		9		8		7		6		5		4		3		2		1
+Sel.In	Pap.End	Busy	Ack		Data7	Data6	Data5	Data4	Data3	Data2	Data1	Data0	Strobe
+S4		S5		S7		S6		D7		D6		D5		D4		D3		D2		D1		D0		C0
+
+	25		24		23		22		21		20		19		18		17		16		15		14
+	GND		GND		GND		GND		GND		GND		GND		GND		Select	Init	Error	AutoFeed
+	GND		GND		GND		GND		GND		GND		GND		GND		C3		C2		S3		C1
+
+
+Write to printer port:
+	Sub-routine to check if port is ready:
+		; Wait for port 0x11 bit 5 to go low (with time out)
+		1c4f db11      in      a,(11h)
+		1c51 cb6f      bit     5,a	; Test if bit 0x05 is set
+		1c53 201f      jr      nz,1c74h	; If set: Return
+		1c55 10f8      djnz    1c4fh	; If not: retry 255 times
+
+
+	PrintChar(A):
+		1bf8 cd279c    call    9c27h	; Translate A using mini-table (which actually only swaps 0xe0 and 0xe1)
+		1bfb 47        ld      b,a
+		1bfc cd4c9c    call    9c4ch	; Wait for port 0x11 bit 5 to go low (with time out)
+		1bff c8            ret     z	; this is conditional! Continue else:
+		;              ;continues!
+		;Do pure port porn! :-D
+		; THIS LOOKS INTERESTING: Disabled interrupts, hard-coded nop-slides, port access - I love it!! This must be super important!
+		1c00 f3        di      
+		1c01 78        ld      a,b
+		1c02 2f        cpl     ; inverts A
+		1c03 d310      out     (10h),a	; Output the inverted byte
+		1c05 00        nop     
+		1c06 00        nop     
+		1c07 00        nop     
+		1c08 00        nop     
+		1c09 00        nop     
+		1c0a 3eff      ld      a,0ffh
+		1c0c d311      out     (11h),a	; Set port 0x11 all-high
+		1c0e 00        nop     
+		1c0f 00        nop     
+		1c10 00        nop     
+		
+		1c11 db12      in      a,(12h)	; Strobe start...
+		1c13 f604      or      04h
+		1c15 00        nop     
+		1c16 00        nop     
+		1c17 d312      out     (12h),a
+		1c19 00        nop     
+		1c1a 00        nop     
+		1c1b 00        nop     
+		1c1c 00        nop     
+		1c1d e6fb      and     0fbh
+		1c1f d312      out     (12h),a	; ...strobe stop
+		1c21 fb        ei      
+
+		1c22 3e01      ld      a,01h
+		1c24 a7        and     a
+		1c25 78        ld      a,b
+		1c26 c9        ret     
+
+
+	Also found here (lower memory of 4000):
+		; This is some port magic! I think this sends one byte to the parallel port!
+		2d9a f3        di      
+		2d9b 78        ld      a,b
+		2d9c 2f        cpl     
+		2d9d d310      out     (10h),a
+		2d9f cdbe2d    call    2dbeh
+		
+		2da2 3eff      ld      a,0ffh
+		2da4 d311      out     (11h),a
+		2da6 cdbe2d    call    2dbeh
+		
+		2da9 db12      in      a,(12h)
+		2dab f604      or      04h
+		2dad cdbe2d    call    2dbeh
+		2db0 d312      out     (12h),a
+		2db2 cdbe2d    call    2dbeh
+		2db5 e6fb      and     0fbh
+		2db7 d312      out     (12h),a
+		2db9 fb        ei      
+		
+		2dba 3e01      ld      a,01h
+		2dbc a7        and     a
+		2dbd 78        ld      a,b
+		2dbe c9        ret     
+
+
+Read from it:
+	; Printer port magic!
+	01a6 3eff      ld      a,0ffh
+	01a8 d311      out     (11h),a	; set all flags to high
+	
+	; Clear buffer
+	01aa 2107db    ld      hl,0db07h
+	01ad 0610      ld      b,10h
+	01af 36ff      ld      (hl),0ffh
+	01b1 23        inc     hl
+	01b2 10fb      djnz    01afh            ; (-05h)
+	
+	; Transmit "0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01" to port 0x10, read in between
+	01b4 2107db    ld      hl,0db07h
+	01b7 0e80      ld      c,80h
+	01b9 0608      ld      b,08h	; 8 bits to transmit?
+	
+	; Loop start:
+		01bb 79        ld      a,c
+		01bc d310      out     (10h),a	; Send a byte to port 0x10 (C shr i). Maybe only LSB is seen by other side?
+		
+		01be db11      in      a,(11h)	; Read byte from port 0x11
+		01c0 77        ld      (hl),a	; ...and store it
+		01c1 23        inc     hl
+		
+		01c2 db10      in      a,(10h)	; Read byte from port 0x10
+		01c4 77        ld      (hl),a	; ...and store it
+		01c5 23        inc     hl
+		
+		01c6 af        xor     a
+		01c7 d310      out     (10h),a	; Send 0x00 to port 0x10
+		
+		01c9 cb39      srl     c		; Next bit
+		01cb 10ee      djnz    01bbh            ; (-12h)
+	; Loop end
+	
+	01cd 2114db    ld      hl,0db14h
+	01d0 7e        ld      a,(hl)
+	01d1 cb47      bit     0,a
+	01d3 c20502    jp      nz,0205h
+	01d6 3a04db    ld      a,(0db04h)
+	01d9 fedd      cp      0ddh
+	01db cad202    jp      z,02d2h
+	01de 3edd      ld      a,0ddh
+	01e0 3204db    ld      (0db04h),a
+	01e3 3a05db    ld      a,(0db05h)
+	01e6 fe01      cp      01h
+	01e8 280e      jr      z,01f8h          ; (+0eh)
+
+	01ea db12      in      a,(12h)	; Clock or flags2 - Caps lock?!
+	01ec f620      or      20h
+	01ee d312      out     (12h),a
+	
+	01f0 3e01      ld      a,01h
+	01f2 3205db    ld      (0db05h),a
+	01f5 c3d202    jp      02d2h
+
