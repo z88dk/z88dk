@@ -19,15 +19,50 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\getopt\getopt.h" />
+    <ClCompile Include="..\..\UNIXem\src\atomic.c" />
+    <ClCompile Include="..\..\UNIXem\src\dirent.c" />
+    <ClCompile Include="..\..\UNIXem\src\dlfcn.c" />
+    <ClCompile Include="..\..\UNIXem\src\glob.c" />
+    <ClCompile Include="..\..\UNIXem\src\hostname.c" />
+    <ClCompile Include="..\..\UNIXem\src\internal\util.c" />
+    <ClCompile Include="..\..\UNIXem\src\mmap.c" />
+    <ClCompile Include="..\..\UNIXem\src\resource.c" />
+    <ClCompile Include="..\..\UNIXem\src\setenv.c" />
+    <ClCompile Include="..\..\UNIXem\src\time.c" />
+    <ClCompile Include="..\..\UNIXem\src\uio.c" />
+    <ClCompile Include="..\..\UNIXem\src\unistd.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\getopt\getopt.c" />
+    <ClInclude Include="..\..\UNIXem\include\arpa\inet.h" />
+    <ClInclude Include="..\..\UNIXem\include\asm\atomic.h" />
+    <ClInclude Include="..\..\UNIXem\include\dirent.h" />
+    <ClInclude Include="..\..\UNIXem\include\dlfcn.h" />
+    <ClInclude Include="..\..\UNIXem\include\glob.h" />
+    <ClInclude Include="..\..\UNIXem\include\netinet\in.h" />
+    <ClInclude Include="..\..\UNIXem\include\unistd.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\arpa\inet.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\asm\atomic.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\dirent.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\dlfcn.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\glob.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\implicit_link.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\internal\safestr.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\internal\util.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\internal\winsock.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\netinet\in.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\setenv.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\sys\mman.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\sys\resource.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\sys\socket.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\sys\time.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\sys\uio.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\unistd.h" />
+    <ClInclude Include="..\..\UNIXem\include\unixem\unixem.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0E6DEEBD-2979-4AB0-AB8A-5A51F6579AAF}</ProjectGuid>
+    <ProjectGuid>{7D0213A3-87FA-4F56-A5D6-CC23682ACAD8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>getopt</RootNamespace>
+    <RootNamespace>UNIXem</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -82,7 +117,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,7 +144,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

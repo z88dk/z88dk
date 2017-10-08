@@ -29,14 +29,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\z80asm\lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\z80asm\lib;$(ProjectDir)\..\..\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,7 +129,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\z80asm\lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\z80asm\lib;$(ProjectDir)\..\..\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -216,6 +216,8 @@
     <ClCompile Include="..\..\src\z80asm\z80pass.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\config.h" />
+    <ClInclude Include="..\..\src\portability.h" />
     <ClInclude Include="..\..\src\z80asm\codearea.h" />
     <ClInclude Include="..\..\src\z80asm\directives.h" />
     <ClInclude Include="..\..\src\z80asm\errors.h" />
@@ -270,6 +272,11 @@
     <None Include="..\..\src\z80asm\tt\error_func.yaml" />
     <None Include="..\..\src\z80asm\tt\tokens.h.tt" />
     <None Include="..\..\src\z80asm\tt\tokens.yaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
+      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -69,6 +69,24 @@ void error_illegal_src_filename(char *filename)
 	
 	STR_DELETE(msg);
 }
+void error_glob(char *filename, char *error)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "problem with '%s': %s", filename, error );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_glob_no_files(char *filename)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "pattern '%s' returned no files", filename );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void warn_symbol_different(char *name, char *used)
 {
 	STR_DEFINE(msg, STR_SIZE);

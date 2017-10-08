@@ -38,6 +38,11 @@ STD = -std=gnu11
 LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 
+ifeq ($(OS),Windows_NT)
+LOCAL_CFLAGS +=	-I../../UNIXem/include
+OBJS		+= ../../UNIXem/src/glob.o
+endif
+
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
