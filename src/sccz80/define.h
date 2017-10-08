@@ -183,7 +183,6 @@ enum symbol_flags {
 
 /*      Define symbol table entry format        */
 
-typedef struct type_s TAG_SYMBOL;
 typedef struct symbol_s SYMBOL;
 
 

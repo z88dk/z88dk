@@ -71,41 +71,7 @@ SYMBOL* findloc(char* sname)
     return 0;
 }
 
-/*
- * find symbol in structure tag symbol table, return 0 if not found
- */
 
-TAG_SYMBOL *findtag(const char* sname)
-{
-    TAG_SYMBOL* ptr;
-
-    ptr = STARTTAG;
-    while (ptr != tagptr) {
-        if (strcmp(ptr->name, sname) == 0)
-            return ptr;
-        ++ptr;
-    }
-    return 0;
-}
-
-/*
- * determine if 'sname' is a member of the struct with tag 'tag'
- * return pointer to member symbol if it is, else 0
- */
-
-SYMBOL* findmemb(TAG_SYMBOL* tag, char* sname)
-{
-    // SYMBOL* ptr;
-
-    // ptr = tag->ptr;
-
-    // while (ptr < tag->end) {
-    //     if (strcmp(ptr->name, sname) == 0)
-    //         return ptr;
-    //     ++ptr;
-    // }
-    return NULL;
-}
 
 SYMBOL* addglb(
     char* sname, enum ident_type id, char typ,
@@ -161,27 +127,7 @@ SYMBOL* addloc(
     return cptr;
 }
 
-/*
- * add new structure member to table
- */
-SYMBOL* addmemb(
-    char* sname,
-    enum ident_type id,
-    char typ,
-    int value,
-    enum storage_type storage,
-    int more,
-    int itag)
-{
-    if (membptr >= ENDMEMB) {
-        error(E_MEMOV);
-        return 0;
-    }
-    initialise_sym(membptr, sname, id, typ, storage, more, itag);
-    membptr->offset.i = value;
-    ++membptr;
-    return (membptr);
-}
+
 
 /*
  * insert values into symbol table

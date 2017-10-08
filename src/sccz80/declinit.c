@@ -108,7 +108,7 @@ int initials(Type *type)
 /*
  * initialise structure (also called by init())
  */
-int str_init(TAG_SYMBOL* tag)
+int str_init(Type *tag)
 {
     int dim, flag;
     int sz, usz, numelements = 0;

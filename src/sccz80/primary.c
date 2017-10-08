@@ -573,8 +573,6 @@ void rvaluest(LVALUE* lval)
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
         warning(W_UNINITIALISED_ID_VARIABLE, lval->symbol->name);
     }
-    if (lval->symbol && strncmp(lval->symbol->name, "0dptr", 5) == 0)
-        lval->symbol = lval->symbol->offset.p;
 
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);

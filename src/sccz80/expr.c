@@ -656,9 +656,9 @@ int heirb(LVALUE* lval)
                 } else {
                     /* non-constant subscript, calc at run time */
                     if (lval->symbol->more) {
-                        scale(lval->val_type, tagtab + ptr->tag_idx);
+                        scale(lval->val_type, lval->ltype->tag);
                     } else {
-                        scale(ptr->type, tagtab + ptr->tag_idx);
+                        scale(ptr->type, lval->ltype->tag);
                     }
                     /* If near, then pop other side back, otherwise
                        load high reg with de and do an add  */
@@ -711,14 +711,19 @@ int heirb(LVALUE* lval)
             /* Handle structures... come in here with lval holding tehe previous
              * pointer to the struct thing..*/
             else if ((direct = cmatch('.')) || match("->")) {
-                /* Check to see if we have a cast in operation, if so then change type
-                 * internally, but don't generate any code */
-                if (lval->ltype->tag == NULL ) {
+                Type *str = lval->ltype->tag;
+                Type *member_type;
+
+                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR) {
+                    str = lval->ltype->ptr->tag;
+                }
+
+                if (str == NULL ) {
                     error(E_MEMBER);
                     junk();
                     return 0;
                 }
-                if (symname(sname) == 0 || (ptr = findmemb(lval->ltype->tag, sname)) == 0) {
+                if (symname(sname) == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
                     error(E_UNMEMB, sname);
                     junk();
                     return 0;
@@ -731,26 +736,26 @@ int heirb(LVALUE* lval)
                     rvaluest(lval);
 
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
-                flags = ptr->flags;
+                flags = member_type->flags;
                 if (direct == 0) {
                     /* So, we're accessing via a pointer if we get here */
-                    flags = ptr->flags;
-                    if (lval->oflags & FARACC || (lval->flags & FARPTR))
-                        flags |= FARACC;
-                    if (flags & FARPTR || (lval->flags & FARPTR))
-                        lval->oflags |= FARACC;
+                    // flags = ptr->flags;
+                    // if (lval->oflags & FARACC || (lval->flags & FARPTR))
+                    //     flags |= FARACC;
+                    // if (flags & FARPTR || (lval->flags & FARPTR))
+                    //     lval->oflags |= FARACC;
                 }
                 lval->flags = flags;
 
-                zadd_const(lval, ptr->offset.i);
-                lval->symbol = ptr;
-                lval->ltype = ptr->ctype;
-                lval->indirect_kind = lval->val_type = ptr->type;
+                zadd_const(lval, member_type->offset);
+                //lval->symbol = ptr; // 201710108: Remove this
+                lval->ltype = member_type;
+                lval->indirect_kind = lval->val_type = member_type->kind;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
                 if (lval->ltype->kind == KIND_PTR) {
-                    lval->ptr_type = ptr->ctype->ptr->kind;
+                    lval->ptr_type = lval->ltype->ptr->kind;
                     /* djm */
                     if (ptr->flags & FARPTR) {
                         lval->indirect_kind = KIND_CPTR;

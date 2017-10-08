@@ -23,7 +23,7 @@
 #include <math.h>
 #include "lib/utlist.h"
 
-static SYMBOL *get_member(TAG_SYMBOL *ptr);;
+static Type *get_member(Type *tag);
 
 
 
@@ -432,31 +432,26 @@ void offset_of(LVALUE *lval)
     if ( symname(struct_name) ) {
         needchar(',');
         if ( symname(memb_name) ) {
-            TAG_SYMBOL* tag = findtag(struct_name);
+            Type* tag = find_tag(struct_name);
 
             /* Consider typedefs */
             if ( tag == NULL ) {
                 SYMBOL *ptr;
                 
                 if (((ptr = findloc(struct_name)) != NULL) || ((ptr = findstc(struct_name)) != NULL) || ((ptr = findglb(struct_name)) != NULL)) {
-                    if ( ptr->type == KIND_STRUCT ) {
-                        tag = tagtab + ptr->tag_idx;
+                    if ( ptr->ctype->kind == KIND_STRUCT ) {
+                        tag = ptr->ctype->tag;
                     } else {
                         printf("%d\n",ptr->type);
                     }
                 }
             }
             if ( tag != NULL ) {
-                int   i;
+                Type *member = find_tag_field(tag, memb_name);
 
-                for ( i = 0; i < array_len(tag->fields); i++ ) {
-                    Type *field = array_get_byindex(tag->fields, i);
-
-                    if ( strcmp(field->name, memb_name) == 0 ) {
-                        lval->const_val = field->offset;
-                        foundit = 1;
-                        break;
-                    }
+                if ( member != NULL ) {
+                    foundit = 1;
+                    lval->const_val = member->offset;
                 }
             }
         }
@@ -517,46 +512,51 @@ void size_of(LVALUE* lval)
         if ( deref ) 
             lval->const_val = 1;
     } else if (symname(sname)) { /* Size of an object */
+        Type *type;
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
-            int ptrtype = -1;  /* Type of the pointer */
+            Kind ptrtype = KIND_NONE;
             enum symbol_flags ptrflags;
-            TAG_SYMBOL *ptrotag = NULL;
+            Type       *ptrotag = NULL;
 
-            if (ptr->ctype->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
-                if (ptr->type != KIND_STRUCT) {
-                    if ( ptr->ident == POINTER && deref ) {
-                        ptrtype = ptr->type;
-                        ptrflags = ptr->flags;
-                        if ( ptr->type == KIND_STRUCT ) 
-                            ptrotag = tagtab + ptr->tag_idx;
+
+            type = ptr->ctype;
+
+            if (type->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
+                if (type->kind != KIND_STRUCT) {
+                    if ( (type->kind == KIND_PTR || type->kind == KIND_CPTR) && deref ) {
+                        ptrtype = type->ptr->kind;
+                       // ptrflags = ptr->flags;
+                        if ( type->ptr->kind == KIND_STRUCT ) 
+                            ptrotag = type->ptr->tag;
                     } else {
                         lval->const_val = ptr->size;
                     }
                 } else {
-                    SYMBOL *mptr;
+                    Type *mptr;
+
                     /* We're a member of a structure */
                     do {
-                        if ( (mptr = get_member(tagtab + ptr->tag_idx) ) != NULL ) {
+                        if ( (mptr = get_member(ptr->ctype->tag) ) != NULL ) {
                             ptr = mptr;
                             ptrtype = 0;
                             ptrotag = NULL;
-                            if ( ptr->ident == POINTER && deref ) {
-                                ptrtype = ptr->type;
-                                ptrflags = ptr->flags;
-                                if  (ptr->type == KIND_STRUCT) {
-                                    ptrotag = tagtab + ptr->tag_idx;
+                            if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
+                                ptrtype = mptr->ptr->kind;
+                                //ptrflags = ptr->flags;
+                                if  (mptr->ptr->kind == KIND_STRUCT) {
+                                    ptrotag = mptr->tag;
                                 }
                             } else {
                                 // tag_sym->size = numner of elements
-//                                lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+                                lval->const_val = mptr->size;
                             }
                         } else {
                             lval->const_val = ptr->size;
                         }
-                    } while ( ptr->type == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
+                    } while ( mptr->kind == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
-                if (ptr->ctype->kind == KIND_ARRAY ) {
+                if (type->kind == KIND_ARRAY ) {
                     if (rcmatch('[')) {
                         double val;
                         Kind valtype;
@@ -564,29 +564,30 @@ void size_of(LVALUE* lval)
                         constexpr(&val, &valtype,  1);
                         needchar(']');
                         deref++;
+                        lval->const_val = type->size / type->len;
 //                        lval->const_val = get_type_size(ptr->type, ID_VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
                     }
-                    if ( deref ) {
-                        if ( deref == 1 ) {
-                            ptrtype = ptr->type;
-                            ptrotag = tagtab + ptr->tag_idx;
-                        } else {
-                            ptrtype = dummy_sym[(int)ptr->more]->type;
-                            ptrotag = tagtab + dummy_sym[(int)ptr->more]->tag_idx;
-                        }
-                        ptrflags = ptr->flags;
-                    }
-                }
-                if ( deref > 0 ) {
-                    if ( ptrtype != -1 ) {
-//                        lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
-                    } else {
-                        // uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
-                        // char       got[256];
+//                     if ( deref ) {
+//                         if ( deref == 1 ) {
+//                             ptrtype = ptr->kind;
+//                             ptrotag = ptr-tagtab + ptr->tag_idx;
+//                         } else {
+//                             ptrtype = dummy_sym[(int)ptr->more]->type;
+//                             ptrotag = tagtab + dummy_sym[(int)ptr->more]->tag_idx;
+//                         }
+//                         ptrflags = ptr->flags;
+//                     }
+//                 }
+//                 if ( deref > 0 ) {
+//                     if ( ptrtype != -1 ) {
+// //                        lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
+//                     } else {
+//                         // uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
+//                         // char       got[256];
 
-                        // ExpandArgValue(argvalue, got, ptr->tag_idx);
-                        // error(E_SIZEOF,got);
-                    }
+//                         // ExpandArgValue(argvalue, got, ptr->tag_idx);
+//                         // error(E_SIZEOF,got);
+//                    }
                 }
             } else {
                 lval->const_val = 2;
@@ -601,16 +602,16 @@ void size_of(LVALUE* lval)
     vconst(lval->const_val);
 }
 
-static SYMBOL *get_member(TAG_SYMBOL* ptr)
+static Type *get_member(Type *tag)
 {
     char sname[NAMESIZE];
-    SYMBOL* ptr2;
+    Type *member;;
 
     if (cmatch('.') == NO && match("->") == NO)
         return NULL;
 
-    if (symname(sname) && (ptr2 = findmemb(ptr, sname))) {
-        return ptr2;
+    if (symname(sname) && (member = find_tag_field(tag, sname))) {
+        return member;
     }
     error(E_UNMEMB, sname);
     return NULL;

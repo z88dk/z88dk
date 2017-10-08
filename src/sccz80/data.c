@@ -38,12 +38,6 @@ int gltptr, litptr, dubptr; /* index of next entry */
 char macq[MACQSIZE]; /* macro string buffer */
 int macptr; /* and its index */
 
-TAG_SYMBOL *tagtab; /* start of structure tag table */
-TAG_SYMBOL *tagptr; /* ptr to next entry */
-
-SYMBOL *membtab; /* structure member table */
-SYMBOL *membptr; /* ptr to next member */
-
 char* stage; /* staging buffer */
 char* stagenext; /* next address in stage */
 char* stagelast; /* last address in stage */

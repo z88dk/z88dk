@@ -178,8 +178,6 @@ int main(int argc, char** argv)
     loctab = MALLOC(NUMLOC * sizeof(SYMBOL));
     wqueue = MALLOC(NUMWHILE * sizeof(WHILE_TAB));
     gotoq = MALLOC(NUMGOTO * sizeof(GOTO_TAB));
-    tagptr = tagtab =  MALLOC(NUMTAG * sizeof(TAG_SYMBOL));
-    membptr = membtab =  MALLOC(NUMMEMB * sizeof(SYMBOL));
 
     swnext = MALLOC(NUMCASE * sizeof(SW_TAB));
     swend = swnext + (NUMCASE - 1);
@@ -326,9 +324,9 @@ void errsummary()
     }
     if (c_verbose) {
         printf("Symbol table usage: %d\n", glbcnt);
-        printf("Structures defined: %ld\n", (long)(tagptr - tagtab));
-        printf("Members defined:    %ld\n", (long)(membptr - membtab));
-        printf("There %s %d %s in compilation.\n", (errcnt == 1 ? "was" : "were"), errcnt, (errcnt == 1 ? "error" : "errors"));
+        // printf("Structures defined: %ld\n", (long)(tagptr - tagtab));
+        // printf("Members defined:    %ld\n", (long)(membptr - membtab));
+        // printf("There %s %d %s in compilation.\n", (errcnt == 1 ? "was" : "were"), errcnt, (errcnt == 1 ? "error" : "errors"));
     }
 }
 
@@ -1044,8 +1042,6 @@ void atexit_deallocate()
     FREENULL(glbq);
     FREENULL(loctab);
     FREENULL(wqueue);
-    FREENULL(tagtab);
-    FREENULL(membtab);
     FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);

@@ -114,6 +114,18 @@ Type *find_tag(const char *name)
     return t;
 }
 
+Type *find_tag_field(Type *tag, const char *fieldname)
+{
+    int    i;
+    for ( i = 0; i < array_len(tag->fields) ; i++ ) {
+        Type *field = array_get_byindex(tag->fields, i);
+        if ( strcmp(field->name, fieldname) == 0 ) {
+            return field;
+        }
+    }
+    return NULL;
+}
+
 void add_global(Type *type)
 {
     // addglb()
@@ -264,6 +276,7 @@ Type *parse_struct(Type *type, int isstruct)
             str->size = -1;            
             str->fields = array_init(free_type);  
             str->isstruct = isstruct;
+            strcpy(str->name, sname);
             add_tag(str);                    
         }
         // It's a weak reference we should define it 
@@ -312,7 +325,7 @@ Type *parse_struct(Type *type, int isstruct)
         str->weak = 0;
     }
     // TODO: Only pointers to weak structures are valid
-    
+    type->kind = KIND_STRUCT;
     type->tag = str;
     type->size = str->size;
     return type;
@@ -395,6 +408,7 @@ Type *parse_parameter_list(Type *return_type)
     needchar('(');
 
     if ( rcmatch(')') ) {
+        cmatch(')');
         func = CALLOC(1,sizeof(*func));
         func->kind = KIND_FUNC;
         func->size = 0;
