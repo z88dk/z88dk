@@ -218,7 +218,7 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 
 /* Forces result, having type t2, to have type t1 */
 /* Must take account of sign in here somewhere, also there is a problem    possibly with longs.. */
-void force(int t1, int t2, char sign1, char sign2, int lconst)
+void force(Kind t1, Kind t2, char sign1, char sign2, int lconst)
 {
     if (t2 == KIND_CARRY) {
         zcarryconv();
@@ -718,83 +718,24 @@ void cscale(Type *type, int* val)
  */
 int docast(LVALUE* lval, LVALUE *dest_lval)
 {
-//     SYMBOL* ptr;
-//     char temp_type;
-//     int itag;
-//     char nam[20];
+    Kind   t1 = lval->cast_type->kind, t2 = dest_lval->ltype->kind;
+    
+    if ( t1 == KIND_ARRAY || t1 == KIND_PTR ) {
+        t1 = KIND_INT;
+    } else if ( t1 == KIND_CPTR ) {
+        t1 = KIND_LONG;
+    }
+    if ( t2 == KIND_ARRAY || t2 == KIND_PTR ) {
+        t2 = KIND_INT;
+    } else if ( t2 == KIND_CPTR ) {
+        t2 = KIND_LONG;
+    }
 
 
-//     if (lval->c_id == ID_VARIABLE) {
-//         /* Straight forward variable conversion now.. */
-//         if ( dest_lval->is_const == 0 ) {
-//             force(lval->c_vtype, dest_lval->val_type, lval->c_flags & UNSIGNED, dest_lval->flags & UNSIGNED, 0);
-//         }
-//         dest_lval->val_type = lval->c_vtype;
-//         dest_lval->ptr_type = KIND_NONE;
-//         dest_lval->ident = ID_VARIABLE;
-//         dest_lval->flags = ((dest_lval->flags & FARACC) | (lval->c_flags & UNSIGNED));
-//         dest_lval->c_id = 0;
-//         dest_lval->c_vtype = 0;
-//         dest_lval->c_flags = 0;
-//         return (0);
-//     }
+    force(t1, t2, lval->cast_type->isunsigned, dest_lval->ltype->isunsigned, 0); // TODO lconst
 
-//     if (lval->c_id == POINTER || lval->c_id == PTR_TO_FN) {
-//         switch (lval->c_vtype) {
-//         case KIND_STRUCT:
-//             /* Casting a structure - has to be a pointer... */
-//             dest_lval->tagsym = lval->c_tag; /* Copy tag symbol over */
-//             dest_lval->ptr_type = KIND_STRUCT;
-//             temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
-//             if ( dest_lval->const_val == 0 ) {
-//                 force(temp_type, dest_lval->val_type, 0, 0, 0);
-//             }
-//             dest_lval->val_type = temp_type;
-//             dest_lval->flags = ((lval->flags & FARACC) | lval->c_flags);
-//             dest_lval->c_id = 0;
-//             dest_lval->c_vtype = 0;
-//             dest_lval->c_flags = 0;
-//             return (1);
-
-//         /* All other simple pointers.. */
-//         default:
-//             debug(DBG_CAST2, "Converting %d to %d", dest_lval->ptr_type, lval->c_vtype);
-//             dest_lval->indirect_kind = dest_lval->ptr_type = lval->c_vtype;
-//             // Set the destination symbol type
-//             dest_lval->symbol = dummy_sym[(int)lval->c_vtype];
-//             temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
-//             if ( dest_lval->const_val == 0 ) {
-//                 force(temp_type, dest_lval->val_type, 0, 0, 0);
-//             }
-//             dest_lval->val_type = temp_type;
-//             dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
-//             dest_lval->ident = POINTER;
-//             dest_lval->c_id = 0;
-//             dest_lval->c_vtype = 0;
-//             dest_lval->c_flags = 0;
-//             return (1);
-//         }
-//     }
-//     /* Now we deal with pointers to pointers and pointers to functions 
-//  * returning pointers - to do this, we will define dummy symbols in
-//  * the local symbol table so that they do what we want them to do!
-//  */
-//     sprintf(nam, "0dptr%p", locptr);
-//     temp_type = ((lval->c_flags & FARPTR) ? KIND_CPTR : KIND_INT);
-//     itag = 0;
-//     if (lval->c_tag)
-//         itag = lval->c_tag - tagtab;
-//     ptr = lval->symbol;
-//     dest_lval->symbol = addloc(nam, POINTER, temp_type, dummy_idx(lval->c_vtype, lval->c_tag), itag);
-//     dest_lval->symbol->offset.p = ptr;
-//     if ( dest_lval->const_val == 0 ) {
-//         force(temp_type, dest_lval->val_type, 0, 0, 0);
-//     }
-//     dest_lval->val_type = temp_type;
-//     dest_lval->flags = ((dest_lval->flags & FARACC) | lval->c_flags);
-//     dest_lval->c_id = 0;
-//     dest_lval->c_vtype = 0;
-//     dest_lval->c_flags = 0;
+    dest_lval->ltype = lval->cast_type;
+    lval->cast_type = NULL;
     return (1);
 }
 

@@ -495,14 +495,17 @@ int heira(LVALUE *lval)
         lptr++;
         if ( (ctype = parse_expr_type()) != NULL ) {
             needchar(')');
+            cast_lval.cast_type = ctype;
             for ( j = 0; j < save_fps_num; j++ ) {
                  fprintf(buffer_fps[j],"%.*s",lptr-klptr,line+klptr);
             }
             buffer_fps_num = save_fps_num;
             k = heira(lval);
             if ( k == 1 ) { // If we need to fetch then we should cast what we get 
-                lval->ltype = cast_lval.cast_type;
+                printf("Set cast to %p\n",cast_lval.cast_type);
+                lval->cast_type = cast_lval.cast_type;
             } else {
+                printf("Doing cast %p\n",cast_lval.cast_type);
                 if (cast_lval.cast_type ) docast(&cast_lval, lval);
             }
             return k;

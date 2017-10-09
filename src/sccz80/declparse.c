@@ -547,7 +547,7 @@ Type *parse_decl(char name[], Type *base_type)
  */
 Type *parse_expr_type()
 {
-    return dodeclare2();
+    return dodeclare2(NULL);
 }
 
 /** \brief Declare a local variableif we need to

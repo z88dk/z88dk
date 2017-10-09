@@ -4,7 +4,7 @@ extern double calc(double left, void (*oper)(LVALUE *), double right, int is16bi
 extern double calcun(double left, void (*oper)(LVALUE *),double right);
 extern double CalcStand(double left, void (*oper)(LVALUE *), double right);
 extern int intcheck(LVALUE *lval, LVALUE *lval2);
-extern void force(int t1, int t2, char sign1, char sign2, int lconst);
+extern void force(Kind t1, Kind t2, char sign1, char sign2, int lconst);
 extern int widen(LVALUE *lval, LVALUE *lval2);
 extern void widenlong(LVALUE *lval, LVALUE *lval2);
 extern int dbltest(LVALUE *lval, LVALUE *lval2);

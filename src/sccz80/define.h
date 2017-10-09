@@ -439,8 +439,7 @@ struct lvalue_s {
  //       enum ident_type ident;          /* ident (from symbol table) */
      //   enum storage_type storage;	/* storage (from sym tab) */
         Type *cast_type;
-	int  level;		/* Parenth level (cast) */
-	int  castlevel;
+	//int  level;		/* Parenth level (cast) */
 	int  offset;
 } ;
 
