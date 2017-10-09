@@ -1,9 +1,21 @@
+;==============================================================================
+; Contents of this file are copyright Phillip Stevens
+;
+; You have permission to use this for NON COMMERCIAL USE ONLY
+; If you wish to use it elsewhere, please include an acknowledgement to myself.
+;
+; https://github.com/feilipu/
+;
+; https://feilipu.me/
+;
+;
+; This work was authored in Marrakech, Morocco during May/June 2017.
 
     INCLUDE "config_private.inc"
 
     SECTION code_driver
 
-    PUBLIC i2c_interrupt_attach
+    PUBLIC __i2c_interrupt_attach
     
     EXTERN z180_int_int1, z180_int_int2
 
@@ -11,15 +23,16 @@
     ;input HL = address of the interrupt service routine
     ;input A  = device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
 
-i2c_interrupt_attach:
-    tst __IO_I2C1_PORT_MSB|__IO_I2C2_PORT_MSB
-    ret z                   ;no device address match, so exit
+__i2c_interrupt_attach:
     cp __IO_I2C2_PORT_MSB
-    jr z, i2c_int_at2    
-    ld (z180_int_int1), hl  ;load the address of the APU INT1 routine
+    jr Z, i2c_int_at2
+    cp __IO_I2C1_PORT_MSB
+    ret NZ                  ;no device address match, so exit
+
+    ld (z180_int_int1), hl  ;load the address of the PCA9665 INT1 routine
     ret
     
 i2c_int_at2:
-    ld (z180_int_int2), hl  ;load the address of the APU INT2 routine
+    ld (z180_int_int2), hl  ;load the address of the PCA9665 INT2 routine
     ret
 
