@@ -2,6 +2,13 @@
 stdio/mtx/fputc_cons
 stdio/mtx/fgetc_cons
 stdio/mtx/getk
+@stdio/ansicore.lst
+stdio/ansi/msx/f_ansi_attr
+stdio/ansi/msx/f_ansi_bel
+stdio/ansi/msx/f_ansi_char
+stdio/ansi/msx/f_ansi_cls_nobios
+stdio/ansi/generic/f_ansi_dline
+stdio/ansi/msx/f_ansi_scrollup_nobios
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg

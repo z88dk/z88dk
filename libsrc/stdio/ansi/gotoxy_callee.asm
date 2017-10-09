@@ -21,10 +21,8 @@ EXTERN ansi_ROW
 
    ; c = x    e = y
    ld	a,c
-   dec	a
    ld	(ansi_COLUMN),a
    ld	a,e
-   dec	a
    ld	(ansi_ROW),a
 
    ret

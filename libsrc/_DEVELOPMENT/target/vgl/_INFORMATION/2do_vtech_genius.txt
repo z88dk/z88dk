@@ -1,0 +1,433 @@
+2017-01-06
+
+	V-Tech Genius Leader
+	====================
+
+Things I have found out while playing around and disassembling the V-Tech Genius Leader series of learning notebooks.
+
+Bernhard "HotKey" Slawik
+
+
+@TODO in Z88DK:
+	* Enable multi-model stdio by changing stdin/stdout to model-specific drivers at runtime?
+	
+--------------------
+
+ROM area:
+	0x8000 - 0xBfff
+	
+RAM area
+	0xC000 - 0xDFFF
+
+--------------------
+
+
+
+TODO V-Tech:
+
+* Bit-Bang the additional cartridge lines?
+	* ...because MODEL2000 does not have a parallel port and I want to connect to it anyway
+	* my EPROM is just 8192 bytes (0x2000), which means addresses 0x8000 - 0x9fff
+	* what if I can play with A14, A15, ...?
+
+OK * Bit-bang TTL-FTDI on printer port!
+	https://learn.sparkfun.com/tutorials/serial-communication
+
+OK	* Investigate more on the parallel port
+	ok	* Is it bi-directional?
+	OK	* ROM-injection via serial? (that would solve EEPROM burning forever)
+
+* Use it as MIDI IN/OUT!
+* 8-channel pulse wave generator
+* Bit-bang I2C / SPI / RS232 / ASK/FM
+
+;		* [dce7] can be read. Then something with port 0x12 can be done to it...
+;		! To refresh upper line: Set [dceb] to 1 after putting text to dca0
+;		! To refresh lower line: Set [dcec] to 1 after putting text to dcb4
+;		* [dced], [dcee], [dcef], [dcf0] are reset by writing 0x00 to them
+;		* [dd12] can be read
+;			* contains 0x3b when ???
+;			* 0x00 can be written to it (to clear?)
+;
+;		Is 0xdcf5 the current line number on LCD?
+;
+;
+; * What is port 0x12 ?	(turns CAPS LOCK on 0x20)
+;			0686 3e08      ld      a,08h
+;			0688 d312      out     (12h),a	; out 0x12, 0x08 or 0x28 depending on [0db05h]
+;			068a cda686    call    86a6h
+;			068d 3ae7dc    ld      a,(0dce7h)
+;			0690 fe01      cp      01h
+;			0692 2004      jr      nz,0698h
+;			0694 3e20      ld      a,20h
+;			0696 1802      jr      069ah
+;			0698 3e00      ld      a,00h
+;			069a d312      out     (12h),a	; out 0x12, 0x00 or 0x20 depending on [0db05h]
+;			069c cda686    call    86a6h
+;
+;
+; * What happens at 37f0h? --> Seems like OS handler (switch to different game)
+;		122a daf037    jp      c,37f0h	; Jump to 37f0h if C is set to ???
+;
+;		; What does that check do?
+;		0c4e 3ec0      ld      a,0c0h
+;		0c50 32e0dc    ld      (0dce0h),a
+;		0c53 3a12dd    ld      a,(0dd12h)
+;		0c56 fe3b      cp      3bh
+;
+; * What is at [d500]?
+;		108f 3a01d5    ld      a,(0d501h)
+;		1092 fe07      cp      07h
+;		1094 382e      jr      c,10c4h
+;		1096 3a00d5    ld      a,(0d500h)
+;		1099 fe07      cp      07h
+;
+
+
+
+
+-------------------- Here's the good parts --------------------
+
+CARTRIDGES
+----------
+
+	* Are mapped to 0x8000
+	* Need to have a signature (first 4 bytes):
+		* default ROM:
+			0x55 0xaa 0x47 0x41
+		
+		* auto-start ROM:
+			0x55 0xaa 0x59 0x45
+		
+		* data-only ROM (no code):
+			0x55 0xaa 0x11 0x02
+	* Can be switched on/off using port 0x03 and mapped to lower address space using port 0x01
+
+PORTS
+-----
+
+	0x01
+		Used to re-map memory regions. i.e. when you start BASIC, it is first re-located to 0x4000 and then called
+		* Send 0x0f to retrieve terminal type ("TEXT") at memory 0x7be8
+		* Send 0x81 to reset some things?
+		* Send 0x82 to reset some things?
+
+	0x03
+		Used to power up and down the cartridge port prior to reading from memory 0x8000
+		
+		* 0
+			reboot?
+		
+		* 4
+			Calls "Dein Punktestand:"
+		* 5
+			Make second line blink on 4000 then it goes crazy :-D
+		
+		* 6		00000110
+			activate A16
+		
+		* 80, 81, 82		100000xx
+			Set cartridge port A14,A15, A16,A17
+			80	00 00xxxxxx xxxxxxxx
+			81	00 01xxxxxx xxxxxxxx
+			82	00 10xxxxxx xxxxxxxx
+			83	00 11xxxxxx xxxxxxxx
+			84	01 00xxxxxx xxxxxxxx
+			85	01 01xxxxxx xxxxxxxx
+			86	01 10xxxxxx xxxxxxxx
+			87	01 11xxxxxx xxxxxxxx
+			
+			88 turns on A17!
+			88	10 00xxxxxx xxxxxxxx
+		
+		
+		! When BASIC formats the disk (3fa1e, 3fac7) it sends
+			* 0x06 to port 0x03
+			* 0x81 to port 0x03
+			* 0x80 to port 0x03
+			* write data (header, FAT and 0x1000 bytes of 0x00)
+			* 0x06 to port 0x03
+
+	0x06
+		Hmm...
+
+	0x0a
+		Very important. Used for controlling the LCD (and others?)
+		* Mostly used in conjunction with port 0x0b
+		* It is used *A LOT* but I am not quite sure how it works...
+		* Send 0x01 to clear the screen
+		? Send 0x0f, 0x0e, 0x0c to reset the keyboard?
+		? e.g. 0x38 is sent several times with delay
+		0x80+
+			Put char on screen?
+		0xc0+
+			???
+
+	0x0b
+		Used for display. You can put bytes there and they will get displayed on the LCD
+		* Mostly used in conjunction with port 0x0a
+		* non-local characters have to be translated/mapped
+
+	0x10
+		Used to output bytes to the parallel port
+
+	0x11
+		Used for communications.
+		* bit 5 (0x20) tells state of parallel pin 11 (BUSY). HIGH=0x00, LOW=0x20
+		* Send 0xff to it to transmit the value at port 0x10 to the parallel port (it will be pulsed serially)
+
+	0x12
+		Used for periphery:
+		* Toggle 0x04 to set/clear the STROBE pin (parallel port pin 1)
+		* Toggle 0x08 to let the piezo speaker buzz (2000)
+		* Toggle 0x20 to set the caps lock LED
+
+
+
+MEMORY
+------
+WHAT		PHY ADDR.			LOGICAL ADDR.
+ROM 256kb	0x00000 - 0x3ffff	0x0000 - 0x...., 0x4000 - 0x7fff
+CART 256kb	0x00000 - 0x3ffff	0x8000 - 0xbfff
+SRAM 8kb	 0x0000 -  0x1fff	0xc000 - 0xcfff
+
+
+Important addresses:
+	0x0000	Entry point
+
+	0x0038 - 0x0110 (MODEL4000 only)
+		"Sys hooks" - special functions that are used all over the place
+		* 0x0095: Scroll screen up by one line
+		* 0x0098: Play melody located in A
+		* 0x00bc: Delay 0x120 cycles (used for port 0x0a/0x0b)
+
+	0x4000
+		Other memory banks can be mounted here (e.g. used for BASIC on the model 4000)
+			0x18000 => 0x4000	for calling BASIC
+		Can be mapped using port 0x01 and toggled using port 0x03?
+
+	ROMs get loaded here:
+	0x8000	ROM 0x0000
+	0x9000	ROM 0x1000
+	0xa000	ROM 0x2000
+	0xb000	ROM 0x3000
+		16 kilobyte window in total
+	0xbfff	ROM 0x3fff
+
+	0xc000	Start of on-board SRAM (8 kilobyte, 0x2000 bytes)
+	0xd000	SRAM
+	0xdfff	End of on-board SRAM
+
+	0xd400
+	0xd401
+		?
+
+	0xdb00
+		MODEL 4000: Keyboard scan
+		Send 0xc0 there and watch it go to 0xd0 when key is pressed
+	0xdb01
+		MODEL 4000: Keyboard ASCII
+		Current key ASCII code
+
+	0xdca0
+		Video RAM1
+		First row of 20 characters
+	0xdcb4
+		Video RAM
+		Second row (and more if available)
+
+	0xdce0
+		MODEL 2000: Keyboard scan
+		Send 0xc0 there and watch it go to 0xd0 when key is pressed
+	0xdce4
+		MODEL 2000: Keyboard ASCII
+		Current key ASCII code
+
+	0xdceb
+	0xdcec
+		MODEL 2000: Screen refresh of row X
+		Send a 0x01 there to refresh the Video RAM
+
+	0xdcf0
+	0xdcf1
+	0xdcf2
+	0xdcf3
+		MODEL 4000: Screen refresh of row X
+		Send a 0x01 there to refresh the Video RAM
+	
+	0xe000
+	
+	0xf000
+
+
+SCREEN
+------
+	* Single characters can be displayed by putting bytes to port 0x0b (slow)
+	
+	* Sending 0x01 to port 0x0a will clear the screen
+	
+	* The fast way is to put bytes in the Video RAM and forcing a refresh of the corresponding row
+	
+	* Genius Leader 2000 displays text via frame buffers at 0dca0/0dcb4 (and then refreshing by writing 0x01 to dceb / dcec)
+	
+	* Genius Leader 4000 uses dcf0...dcf3 to refresh its 4 lines (same VRAM buffer is used)
+		-> Display memory seems to be shuffled around on MODEL4000:
+		Characters appear in this order:
+			012389abcdef........
+			....................
+			4567................
+			....................
+		So there are regions of 4/8 bytes:
+			000022222222........
+			4444................
+			111133333333........
+			5555................
+	
+	0xdca0
+		Video RAM1
+		First row of 20 characters
+	0xdcb4
+		Video RAM
+		Second row (and more if available)
+
+	0xdceb
+	0xdcec
+		MODEL 2000: Screen refresh of row X
+		Send a 0x01 there to refresh the Video RAM
+
+	0xdcf0
+	0xdcf1
+	0xdcf2
+	0xdcf3
+		MODEL 4000: Screen refresh of row X
+		Send a 0x01 there to refresh the Video RAM
+
+
+
+
+KEYBOARD
+--------
+	* Controlled via memory reads/writes
+
+	MODEL 2000:
+		0xdce0
+			MODEL 2000: Keyboard scan
+			Send 0xc0 there and watch it go to 0xd0 when key is pressed
+		0xdce4
+			MODEL 2000: Keyboard ASCII
+			Current key ASCII code
+
+	MODEL 4000:
+		0xdb00
+			MODEL 4000: Keyboard scan
+			Send 0xc0 there and watch it go to 0xd0 when key is pressed
+		0xdb01
+			MODEL 4000: Keyboard ASCII
+			Current key ASCII code
+
+	There are several special key codes:
+		* 0x00 - 0x1f: Function keys
+		* 0x20 - 0x7f: Normal keys
+		* 0x80 - 0xaf: Special keys
+		* 0xb0 - 0xcf: Function keys 2 (MODEL 4000)
+		* 0x60: Reset?
+
+
+
+
+PRINTER
+------
+
+	* Send a byte XX:
+		Port	0x10	0x11	0x12
+		Data	...		...		...
+				~XX >	...		...
+				...		FF >	...
+				...		...		<<<
+				...		...		+04 >
+				...		...		-04 >
+				...		...		...
+	* Get a byte X:
+		Port	0x10	0x11	0x12
+		Data	...		...		...
+				...		FF >	...
+				80 >	...		...
+				...		<<<		...
+				< XX	...		...
+				00 >	...		...
+				...		...		<<<
+				...		...		+20 >
+				...		...		...
+
+
+	Sub-routine to check if port is ready (port 0x11 bit 5 = parallel port pin 11 "BUSY"):
+		; Wait for port 0x11 bit 5 to go low (with time out)
+		1c4f db11      in      a,(11h)
+		1c51 cb6f      bit     5,a	; Test if bit 0x05 is set
+		1c53 201f      jr      nz,1c74h	; If set: Return
+		1c55 10f8      djnz    1c4fh	; If not: retry 255 times
+
+
+	PrintChar(A):
+		1bf8 cd279c    call    9c27h	; Translate A using mini-table (which actually only swaps 0xe0 and 0xe1)
+		1bfb 47        ld      b,a
+		1bfc cd4c9c    call    9c4ch	; Wait for port 0x11 bit 5 to go low (with time out)
+		1bff c8            ret     z	; this is conditional! Continue else:
+		;              ;continues!
+		;Do pure port porn! :-D
+		; THIS LOOKS INTERESTING: Disabled interrupts, hard-coded nop-slides, port access - I love it!! This must be super important!
+		1c00 f3        di      
+		1c01 78        ld      a,b
+		1c02 2f        cpl     ; inverts A
+		1c03 d310      out     (10h),a	; Output the inverted byte
+		1c05 00        nop     
+		1c06 00        nop     
+		1c07 00        nop     
+		1c08 00        nop     
+		1c09 00        nop     
+		1c0a 3eff      ld      a,0ffh
+		1c0c d311      out     (11h),a	; Set port 0x11 all-high
+		1c0e 00        nop     
+		1c0f 00        nop     
+		1c10 00        nop     
+		1c11 db12      in      a,(12h)	; Clock it down...
+		1c13 f604      or      04h
+		1c15 00        nop     
+		1c16 00        nop     
+		1c17 d312      out     (12h),a
+		1c19 00        nop     
+		1c1a 00        nop     
+		1c1b 00        nop     
+		1c1c 00        nop     
+		1c1d e6fb      and     0fbh
+		1c1f d312      out     (12h),a	; Clock it up again
+		1c21 fb        ei      
+		
+		1c22 3e01      ld      a,01h
+		1c24 a7        and     a
+		1c25 78        ld      a,b
+		1c26 c9        ret     
+
+
+	Also found here (lower memory of 4000):
+		; This is some port magic! I think this sends one byte to the parallel port!
+		2d9a f3        di      
+		2d9b 78        ld      a,b
+		2d9c 2f        cpl     
+		2d9d d310      out     (10h),a
+		2d9f cdbe2d    call    2dbeh
+		2da2 3eff      ld      a,0ffh
+		2da4 d311      out     (11h),a
+		2da6 cdbe2d    call    2dbeh
+		2da9 db12      in      a,(12h)
+		2dab f604      or      04h
+		2dad cdbe2d    call    2dbeh
+		2db0 d312      out     (12h),a
+		2db2 cdbe2d    call    2dbeh
+		2db5 e6fb      and     0fbh
+		2db7 d312      out     (12h),a
+		2db9 fb        ei      
+		2dba 3e01      ld      a,01h
+		2dbc a7        and     a
+		2dbd 78        ld      a,b
+		2dbe c9        ret     

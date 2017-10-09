@@ -1,0 +1,105 @@
+* 2000 has its keyboard at dce0 / dce4
+* 4000 has its keyboard at db00 / db01
+
+0xc0 to db00
+read db01
+
+1b49 3ec0      ld      a,0c0h
+1b4b 3200db    ld      (0db00h),a
+1b4e 1803      jr      1b53h
+1b50 cd689c    call    9c68h
+1b53 3a00db    ld      a,(0db00h)
+1b56 fed0      cp      0d0h
+1b58 20f9      jr      nz,1b53h
+1b5a cd49aa    call    0aa49h
+1b5d fe31      cp      31h
+
+
+
+2a49 3a01db    ld      a,(0db01h)
+2a4c fe20      cp      20h
+2a4e da3000    jp      c,0030h
+2a51 e6f0      and     0f0h
+2a53 feb0      cp      0b0h
+2a55 ca3000    jp      z,0030h
+2a58 3ec0      ld      a,0c0h
+2a5a 3200db    ld      (0db00h),a
+2a5d 3a01db    ld      a,(0db01h)
+2a60 fe60      cp      60h
+2a62 ca009a    jp      z,9a00h	; HALT!
+
+
+
+
+
+1b39 af        xor     a
+1b3a 3200d4    ld      (0d400h),a
+1b3d 3201d4    ld      (0d401h),a
+
+
+
+1b53 3a00db    ld      a,(0db00h)
+1b56 fed0      cp      0d0h
+1b58 20f9      jr      nz,1b53h
+
+
+2a58 3ec0      ld      a,0c0h
+2a5a 3200db    ld      (0db00h),a
+2a5d 3a01db    ld      a,(0db01h)
+2a60 fe60      cp      60h
+2a62 ca009a    jp      z,9a00h	; HALT!
+
+
+
+
+
+
+
+1c11 3a00d4    ld      a,(0d400h)
+1c14 cb27      sla     a
+1c16 cb27      sla     a
+1c18 cb27      sla     a
+1c1a cb27      sla     a
+1c1c 47        ld      b,a
+1c1d 3a01d4    ld      a,(0d401h)
+1c20 b0        or      b
+1c21 21df9c    ld      hl,9cdfh
+1c24 012200    ld      bc,0022h
+1c27 edb1      cpir    
+
+1c4b 2a02d4    ld      hl,(0d402h)
+1c4e 23        inc     hl
+1c4f 2202d4    ld      (0d402h),hl
+1c52 0106d4    ld      bc,0d406h
+1c55 cd88a9    call    0a988h
+
+
+1d11 2a14d4    ld      hl,(0d414h)
+1d14 23        inc     hl
+1d15 2214d4    ld      (0d414h),hl
+1d18 2119d4    ld      hl,0d419h
+1d1b 3e3a      ld      a,3ah
+1d1d 34        inc     (hl)
+1d1e be        cp      (hl)
+
+
+
+1be0 cdb000    call    00b0h
+1be3 3a00d4    ld      a,(0d400h)
+1be6 c630      add     a,30h
+1be8 11010f    ld      de,0f01h
+1beb cd7700    call    0077h
+1bee 21bf9c    ld      hl,9cbfh
+1bf1 cdb300    call    00b3h
+1bf4 3a01d4    ld      a,(0d401h)
+1bf7 c630      add     a,30h
+1bf9 11020f    ld      de,0f02h
+1bfc cd7700    call    0077h
+
+
+
+1bc3 210000    ld      hl,0000h
+1bc6 2214d4    ld      (0d414h),hl
+1bc9 2204d4    ld      (0d404h),hl
+1bcc 2202d4    ld      (0d402h),hl
+1bcf dd2106d4  ld      ix,0d406h

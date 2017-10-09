@@ -209,15 +209,15 @@ ENDIF
 .NOLFONT
 
 IF !ARX816
-IF G007
+ IF G007
   ld de,34	; next row
-ELSE
-IF MTHRG
+ ELSE
+  IF MTHRG
   ld de,33	; next row
-ELSE
+  ELSE
   ld de,32	; next row
-ENDIF
-ENDIF
+  ENDIF
+ ENDIF
 ENDIF
 
   ld c,8
@@ -241,19 +241,13 @@ ENDIF
   rl (ix+0)
   djnz L1
 .DTS
-  ld a,(hl)
-
-.BOLD
-  nop	;	rla
-  nop	;	or (hl)
-  
-IF ROMFONT
-	; nothing here !
-ELSE
 
   ld a,ansifont_is_packed
   and  a
   ld a,(hl)
+.BOLD
+  nop	;	rla
+  nop	;	or (hl)
   jr   z,INVRS
 
 .ROLL
@@ -262,7 +256,6 @@ ELSE
   rla
   rla
   rla
-ENDIF
 
 .INVRS
 ;  cpl           ; Set to NOP to disable INVERSE

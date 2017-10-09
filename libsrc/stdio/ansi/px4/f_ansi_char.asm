@@ -36,6 +36,7 @@
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
+	PUBLIC	BOLD
 
 
 ; -pragma-need=ansiterminal -pragma-define:ansipixels=240 -pragma-define:ansicolumns=xx
@@ -162,6 +163,9 @@
   ld a,ansifont_is_packed
   and  a
   ld a,(hl)
+.BOLD
+  nop	;	rla
+  nop	;	or (hl)
   jr   z,INVRS
 
 .ROLL

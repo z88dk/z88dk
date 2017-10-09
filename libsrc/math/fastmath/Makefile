@@ -13,9 +13,9 @@ CLASSIC_ASM = $(wildcard _*.asm)
 CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
 CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
 
-NEWLIBASM := $(shell z88dk-lstmanip -i $(NEWLIB_LSTFILE) -p $(NEWLIB_DIRECTORY) -t)
+NEWLIBASM := $(shell z88dk-lstmanip -r / -i $(NEWLIB_LSTFILE) -p $(NEWLIB_DIRECTORY) -t)
 NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy,$(NEWLIBOBJ))
+NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
 
 OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
@@ -68,7 +68,7 @@ obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $  $^
 
 fastmath.lst: $(OBJECTS)
-	@z88dk-lstmanip -i $(NEWLIB_LSTFILE)  -p $(NEWLIB_DIRECTORY) -x 'obj/$${TYPE}' -c -o fastmath.lst
+	@z88dk-lstmanip -r / -i $(NEWLIB_LSTFILE)  -p $(NEWLIB_DIRECTORY) -x 'obj/$${TYPE}' -c -o fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath.lib: fastmath.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath.lib @fastmath.lst
