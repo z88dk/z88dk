@@ -55,3 +55,8 @@ graphics/xorplot
 graphics/setxy
 graphics/zx81/swapgfxbk
 graphics/drawbox
+stdio/ansi/zx81/text/f_ansi_attr
+stdio/ansi/zx81/text/f_ansi_char
+stdio/ansi/zx81/text/f_ansi_cls
+stdio/ansi/zx81/text/f_ansi_dline
+stdio/ansi/zx81/text/f_ansi_scrollup
