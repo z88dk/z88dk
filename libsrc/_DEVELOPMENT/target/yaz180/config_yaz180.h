@@ -925,8 +925,7 @@
 #define __IO_I2C_CON_SI  0x08
 #define __IO_I2C_CON_MODE  0x01
 
-#define __IO_I2C_CON_ECHO_BUS_STOP  0x10
-#define __IO_I2C_CON_ECHO_SI  0x08
+#define __IO_I2C_CON_ECHO_BUS_STOPPED  0x10
 #define __IO_I2C_CON_ECHO_BUS_RESTART  0x04
 #define __IO_I2C_CON_ECHO_BUS_ILLEGAL  0x02
 
