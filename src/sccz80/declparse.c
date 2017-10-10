@@ -398,6 +398,58 @@ static Type *parse_type(void)
     return type;
 }
 
+static void parse_trailing_modifiers(Type *type)
+{
+    if ( c_use_r2l_calling_convention == NO ) {
+        type->flags |= SMALLC;
+    }
+    while (1) {
+        if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
+            type->flags |= FASTCALL;
+            type->flags &= ~FLOATINGDECL;
+        } else if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
+            type->flags |= CALLEE;
+            type->flags &= ~FLOATINGDECL;
+        } else if (amatch("__z88dk_saveframe") || amatch("__SAVEFRAME__")) {
+            type->flags |= SAVEFRAME;
+        } else if (amatch("__smallc")) {
+            type->flags |= SMALLC;
+            type->flags &= ~FLOATINGDECL;
+        } else if (amatch("__stdc")) {
+            type->flags &= ~(SMALLC|FLOATINGDECL);
+        } else if (amatch("__naked")) {
+            type->flags |= NAKED;
+            continue;
+        } else if ( amatch("__critical")) {
+            type->flags |= CRITICAL;
+            continue;
+        } else if (amatch("__preserves_regs")) {
+            int c;
+            needchar('(');
+            /* Consume what's inside, isalpha, comma, white space */
+            while ((c = ch())) {
+                if (isalpha(c) || isspace(c) || c == ',') {
+                    gch();
+                    continue;
+                }
+                break;
+            }
+
+            needchar(')');
+        } else {
+            break;
+        }
+    }
+
+    /* Main is always STDC */
+    if ( strcmp(type->name,"main") == 0 ) {
+        type->flags &= ~SMALLC;
+    }
+
+    if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
+        error(E_NAKED_CRITICAL, type->name);
+    }
+}
 
 
 Type *parse_parameter_list(Type *return_type)
@@ -416,6 +468,7 @@ Type *parse_parameter_list(Type *return_type)
         func->oldstyle = 1;  // i.e. arbitrary number of parameters
         func->return_type = return_type;
         func->parameters = array_init(free_type);
+        parse_trailing_modifiers(func);
         return func;
     }
 
@@ -460,7 +513,8 @@ Type *parse_parameter_list(Type *return_type)
             break;
         needchar(',');
     } while (1);
-    needchar(')');
+    needchar(')'); 
+    parse_trailing_modifiers(func);
     return func;
 }
 
@@ -547,7 +601,7 @@ Type *parse_decl(char name[], Type *base_type)
  */
 Type *parse_expr_type()
 {
-    return dodeclare2(NULL);
+    return dodeclare2();
 }
 
 /** \brief Declare a local variableif we need to
@@ -654,6 +708,25 @@ Type *dodeclare2(Kind *base_kind)
         if ( (type = parse_type()) == NULL ) {
             return NULL;
         }
+
+        // Parse for z88dk flags
+        while (blanks(), rcmatch('_')) {
+            if ( amatch("__LIB__") ) {
+                type->flags |= LIBRARY;
+            } else if ( amatch("__CALLEE__") ) {
+                type->flags |= CALLEE;
+            } else if ( amatch("__SHARED__") ) {
+                type->flags |= SHARED;
+            } else if ( amatch("__SHAREDC__") ) {
+                type->flags |= SHAREDC;
+            } else if ( amatch("__FASTCALL__") ) {
+                type->flags |= FASTCALL;
+            } else if ( amatch("__SAVEFRAME__") ) {
+                type->flags |= SAVEFRAME;
+            } else {
+                break;
+            }
+        }
     }
 
     // For port8/16 don't do much else beyond 
@@ -689,6 +762,20 @@ Type *dodeclare2(Kind *base_kind)
     return type;
 }
 
+Type *default_function(const char *name)
+{
+    Type *type = CALLOC(1,sizeof(*type));
+
+    strcpy(type->name, name);
+    type->kind = KIND_FUNC;
+    type->oldstyle = 1;
+    type->return_type = type_int;
+
+    if ( c_use_r2l_calling_convention == NO ) {
+        type->flags |= SMALLC;
+    }
+    return type;
+}
 
 static void declfunc(Type *type, enum storage_type storage)
 {

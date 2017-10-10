@@ -104,6 +104,7 @@ int primary(LVALUE* lval)
             /* NB value set to 0 */
             warning(W_IMPLICIT_DEFINITION, sname);
             ptr = addglb(sname, 0, KIND_INT, 0, STATIK, 0, 0);
+            ptr->ctype = default_function(sname);
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
 //            ptr->args[0] = CalcArgValue(KIND_INT, FUNCTION, 0);

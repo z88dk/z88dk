@@ -59,6 +59,7 @@ extern void      *array_get_byindex(array *arr, int index);
 extern Type      *find_tag(const char *name);
 extern Type      *find_tag_field(Type *tag, const char *fieldname);
 extern Type      *parse_expr_type();
+extern Type      *default_function(const char *name);
 
 #include "error.h"
 #include "expr.h"
