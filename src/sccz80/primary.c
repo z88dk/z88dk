@@ -106,7 +106,6 @@ int primary(LVALUE* lval)
             ptr = addglb(sname, 0, KIND_INT, 0, STATIK, 0, 0);
             ptr->ctype = default_function(sname);
             ptr->size = 0;
-            ptr->prototyped = 0; /* No parameters known */
 //            ptr->args[0] = CalcArgValue(KIND_INT, FUNCTION, 0);
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }

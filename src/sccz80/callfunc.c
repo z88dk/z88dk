@@ -14,7 +14,7 @@
 
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
-static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab);
+static void ForceArgs(Type *dest, Type *src);
 
 
 /*
@@ -33,7 +33,6 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     double val;
     int watcharg; /* For watching printf etc */
     int minifunc = 0; /* Call cut down version */
-    uint32_t protoarg;
     char preserve = NO; /* Preserve af when cleaningup */
     int   isconstarg[5];
     double constargval[5];
@@ -45,6 +44,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     int   savesp;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
+    Type   *functype = ptr ? ptr->ctype : fnptr->ctype;
        
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
@@ -171,28 +171,27 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
                 type = type_int;
             }
 
-            if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
-#if 0                
+            if ( functype->oldstyle == 0 && argnumber < array_len(functype->parameters)) {       
                 int proto_argnumber;
+                Type *prototype;
                 if ( (ptr->flags & SMALLC) == SMALLC)  {
-                    proto_argnumber = ptr->prototyped - argnumber + 1;
+                    proto_argnumber = array_len(functype->parameters) - argnumber + 1;
                 } else {
                     proto_argnumber = argnumber;
                 }
+                prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
-                protoarg = ptr->args[proto_argnumber];
-                if ((protoarg != PKIND_ELLIPSES) && ((protoarg != packedArgumentType) || ((protoarg & 7) == KIND_STRUCT)))
-                    expr = ForceArgs(protoarg, packedArgumentType, expr, ptr->tagarg[proto_argnumber]);
-
-                if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
-                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
+                if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
+                    ForceArgs(prototype, type);
                 }
-                if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
-                    warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
-                }
-#endif
+                // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
+                //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
+                // }
+                // if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
+                //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
+                // }
             }
-            if ( ((ptr->flags & FASTCALL) && ptr->prototyped == 1) || 
+            if ( functype->flags & FASTCALL || 
                 (tmpfiles[argnumber+1] == NULL && (builtin_flags & FASTCALL) == FASTCALL ) ) {
                 /* fastcall of single expression OR the last argument of a builtin */
 
@@ -253,17 +252,17 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     FREENULL(save_fps);
 
  
-    if (ptr && (ptr->prototyped != 0) && builtin_flags == 0 ) {
+  //  if (ptr && (ptr->prototyped != 0) && builtin_flags == 0 ) {
         // if ((ptr->prototyped > argnumber) && (ptr->args[1] != PKIND_VOID) && (ptr->args[1] != PKIND_ELLIPSES)) {
         //     warning(W_2FAFUNC);
         // } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PKIND_ELLIPSES)) {
         //     warning(W_2MAFUNC);
         // }
-    }
+  //  }
     if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
-        if ( ptr->ctype->hasva ) {
-            if ( (ptr->flags & SMALLC) == SMALLC ) {
+        if ( functype->hasva ) {
+            if ( (functype->flags & SMALLC) == SMALLC ) {
                 loadargc(nargs);
             }
         }
@@ -314,7 +313,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
      *        - c_compact_code isn't set and __CALLEE__ isn't set
      */
 
-    if ((ptr && ptr->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((ptr->flags & LIBRARY) == 0))) {
+    if ((functype->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((functype->flags & LIBRARY) == 0))) {
         Zsp += nargs;
     } else {
         /* If we have a frame pointer then ix holds it */
@@ -370,38 +369,28 @@ static int SetWatch(char* sym, int* type)
  *      djm routine to force arguments to switch type
  */
 
-static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
+static void ForceArgs(Type *dest, Type *src)
 {
-    int  dtype, stype;
-    enum ident_type dident, sident;
-    enum symbol_flags dflags, sflags;
-    char buffer[80];
-
-    dtype = dest &  0xff; /* Lower 3 bits */
-    dident = (dest & 0xff00) >> 8; /* Middle 3 bits */
-    dflags = (dest & 0xffff0000) >> 16;
-
-    stype = src &  0xff; /* Lower 3 bits */
-    sident = (src & 0xff00) >> 8; /* Middle 3 bits */
-    sflags = (src & 0xffff0000) >> 16;
-
-
-
-    if (dident == ID_VARIABLE) {
-        if (sident == ID_VARIABLE) {
-            force(dtype, stype, dflags & UNSIGNED, sflags & UNSIGNED, 0);
+    // TODO: ARRAYS
+    if ( dest->kind != KIND_PTR && dest->kind != KIND_CPTR) {
+        if ( src->kind != KIND_PTR && src->kind != KIND_CPTR ) {
+            // Variable to variable cast
+            force( dest->kind, src->kind, dest->isunsigned, src->isunsigned, 0);
         } else {
-            /* Converting pointer to integer/long */
+            /* Converting pointer to integer */
             warning(W_PTRINT);
-            /* Pointer is always unsigned */
-            force(dtype, ((sflags & FARPTR) ? KIND_CPTR : KIND_INT), dflags & UNSIGNED, 0, 0);
+            force( dest->kind, src->kind == KIND_PTR ? KIND_INT : KIND_LONG, dest->isunsigned, 1, 0);
         }
-        if (dtype == KIND_CHAR)
-            expr = KIND_INT;
-        else
-            expr = dtype;
-
     } else {
+        if ( src->kind != KIND_PTR && src->kind != KIND_CPTR ) {
+            // Converting number to pointer
+        } else {
+            // Pointer to pointer
+        }
+    }
+    return;
+}
+   
         /* Dealing with pointers.. a type mismatch!*/
         // if (((dtype != stype) && (dtype != KIND_VOID) && (stype != KIND_VOID) && (stype != KIND_CPTR)) || ((dtype == stype) && (margtag != functab))) {
         //     debug(DBG_ARG3, "dtype=%d stype=%d margtab=%d functag=%d", dtype, stype, margtag, functab);
@@ -415,24 +404,6 @@ static int ForceArgs(uint32_t dest, uint32_t src, int expr, char functab)
         //     warning(W_INTPTR);
         //     expr = KIND_INT;
         // }
-
-        if (dflags & FARPTR) {
-            if ((dflags & FARPTR) != (sflags & FARPTR)) {
-                /* Widening a pointer - next line unneeded - done elsewhere*/
-                /*                                const2(0); */
-                expr = KIND_CPTR;
-            }
-        } else {
-            /* destintation is near pointer */
-            if ((dflags & FARPTR) != (sflags & FARPTR)) {
-                warning(W_PRELIM, currfn->name, lineno - fnstart);
-                warning(W_FARNR);
-                expr = KIND_INT;
-            }
-        }
-    }
-    return (expr);
-}
 
 struct printf_format_s {
     char fmt;

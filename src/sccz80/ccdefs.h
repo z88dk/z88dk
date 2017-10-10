@@ -60,6 +60,9 @@ extern Type      *find_tag(const char *name);
 extern Type      *find_tag_field(Type *tag, const char *fieldname);
 extern Type      *parse_expr_type();
 extern Type      *default_function(const char *name);
+extern Type      *make_pointer(Type *base_type);
+extern Type      *dodeclare(enum storage_type storage);
+extern int        declare_local(int local_static);
 
 #include "error.h"
 #include "expr.h"

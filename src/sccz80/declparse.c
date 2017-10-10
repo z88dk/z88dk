@@ -87,7 +87,7 @@ void *array_get_byindex(array *arr, int index)
 
 
 
-Type *dodeclare2();
+Type *dodeclare2(Kind *kind);
 
 Type *global_hash = NULL;
 
@@ -298,7 +298,7 @@ Type *parse_struct(Type *type, int isstruct)
 
         do {
             // Read each field now */
-            elem = dodeclare2(0);
+            elem = dodeclare2(NULL);
             
             if ( elem != NULL ) {
                 elem->offset = offset;
@@ -481,7 +481,7 @@ Type *parse_parameter_list(Type *return_type)
         func->parameters = array_init(NULL);        
         
         // TODO: K&R
-        param = dodeclare2(); // STORAGE_AUTO);
+        param = dodeclare2(NULL); // STORAGE_AUTO);
         
         // A void type by itself, no parameters
         if ( param->kind == KIND_VOID ) {
@@ -601,7 +601,7 @@ Type *parse_decl(char name[], Type *base_type)
  */
 Type *parse_expr_type()
 {
-    return dodeclare2();
+    return dodeclare2(NULL);
 }
 
 /** \brief Declare a local variableif we need to

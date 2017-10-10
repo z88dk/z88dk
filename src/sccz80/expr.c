@@ -10,7 +10,7 @@
 #include "ccdefs.h"
 
 // TODO: Send back type
-int expression(int  *con, double *val, Type **type)
+Kind expression(int  *con, double *val, Type **type)
 {
     LVALUE lval={0};
 
@@ -20,7 +20,7 @@ int expression(int  *con, double *val, Type **type)
     *con = lval.is_const;
     *val = lval.const_val;
     *type = lval.ltype;
-    return lval.val_type;
+    return lval.ltype->kind;
 }
 
 int heir1(LVALUE* lval)

@@ -203,7 +203,6 @@ struct symbol_s {
         int  more ;          /* index of linked entry in dummy_sym */
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */
-        char prototyped;
         char isconst;        /* Set if const, affects the section the data goes into */
         char isassigned;     /* Set if we have assigned to it once */
         enum symbol_flags flags ;         /* djm, various flags:
