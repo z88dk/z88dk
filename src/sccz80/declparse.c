@@ -701,6 +701,7 @@ Type *dodeclare2(Kind *base_kind)
 {
     char namebuf[NAMESIZE];
     Type *type;
+    int   flags = 0;
 
     if ( base_kind != NULL && *base_kind != KIND_NONE) {
         type = make_type(*base_kind, NULL);
@@ -712,17 +713,17 @@ Type *dodeclare2(Kind *base_kind)
         // Parse for z88dk flags
         while (blanks(), rcmatch('_')) {
             if ( amatch("__LIB__") ) {
-                type->flags |= LIBRARY;
+                flags |= LIBRARY;
             } else if ( amatch("__CALLEE__") ) {
-                type->flags |= CALLEE;
+                flags |= CALLEE;
             } else if ( amatch("__SHARED__") ) {
-                type->flags |= SHARED;
+                flags |= SHARED;
             } else if ( amatch("__SHAREDC__") ) {
-                type->flags |= SHAREDC;
+                flags |= SHAREDC;
             } else if ( amatch("__FASTCALL__") ) {
-                type->flags |= FASTCALL;
+                flags |= FASTCALL;
             } else if ( amatch("__SAVEFRAME__") ) {
-                type->flags |= SAVEFRAME;
+                flags |= SAVEFRAME;
             } else {
                 break;
             }
@@ -752,6 +753,10 @@ Type *dodeclare2(Kind *base_kind)
 
     if ( type != NULL ) {
         strcpy(type->name, namebuf);
+    }
+
+    if ( type->kind == KIND_FUNC ) {
+        type->flags |= flags;
     }
 
     /* We can catch @ here */

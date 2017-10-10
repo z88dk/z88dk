@@ -772,7 +772,7 @@ void zcallop(void)
 
 char dopref(SYMBOL* sym)
 {
-    if (sym->flags & LIBRARY && (sym->ctype->kind == KIND_FUNC ) ) { // || sym->ident == FUNCTIONP)) {
+    if (sym->ctype->flags & LIBRARY && (sym->ctype->kind == KIND_FUNC ) ) { // || sym->ident == FUNCTIONP)) {
         return (0);
     }
     return (1);

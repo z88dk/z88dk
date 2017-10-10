@@ -68,7 +68,7 @@ typedef enum {
     KIND_ARRAY,
     KIND_PTR,
     KIND_CPTR,
-    KIND_STRUCT, // 10
+    KIND_STRUCT, // 12
     KIND_FUNC,
     KIND_ELLIPSES,
     KIND_PORT8,

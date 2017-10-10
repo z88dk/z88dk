@@ -409,54 +409,21 @@ static void dumpfns()
         return;
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != ID_GOTOLABEL && ptr->ctype ) {
+        if (ptr->name[0] != '0' && ptr->ctype ) {
             type = ptr->type;
             storage = ptr->storage;
             if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
-                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
-            } else if (ptr->ctype->kind == KIND_FUNC && ptr->size != 0) {
-                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
+            } else if (ptr->ctype->kind == KIND_FUNC && ptr->ctype->value != 0) {
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
-                if (ptr->ctype->kind == KIND_FUNC && storage != LSTATIC) {
-                    if (storage == EXTERNAL) {
-                        if (ptr->flags & LIBRARY) {
-                            GlobalPrefix(LIB);
-                            if ((ptr->flags & SHARED) && c_useshared) {
-                                outstr(ptr->name);
-                                outstr("_sl\n");
-                                GlobalPrefix(LIB);
-                            }
-                        } else {
-                            GlobalPrefix(XREF);
-                        }
-                    } else {
-                        if (ptr->offset.i == FUNCTION || ptr->storage == DECLEXTN) {
-                            if (ptr->flags & LIBRARY) {
-                                GlobalPrefix(XDEF);
-                                outname(ptr->name, 1);
-                                nl();
-                            }
-                            GlobalPrefix(XDEF);
-                        } else
-                            GlobalPrefix(XREF);
+                if ( storage == EXTERNP ) {
+                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("= %d\n", ptr->ctype->value);
+                } else if ( storage != LSTATIC ) {
+                    if ( ptr->ctype->flags & SHARED && c_useshared ) {
+                        outfmt("\tGLOBAL\t%s_sl\n",ptr->name);
                     }
-                    outname(ptr->name, dopref(ptr));
-                    nl();
-                } else {
-                    if (storage == EXTERNP) {
-                        outstr("\tdefc\t");
-                        outname(ptr->name, 1);
-                        ot("=\t");
-                        outdec(ptr->size);
-                        nl();
-                    } else { // if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
-                        if (storage == EXTERNAL)
-                            GlobalPrefix(XREF);
-                        else
-                            GlobalPrefix(XDEF);
-                        outname(ptr->name, 1);
-                        nl();
-                    }
+                    outfmt("\tGLOBAL\t"); outname(ptr->name, dopref(ptr)); nl();
                 }
             }
         }
