@@ -57,6 +57,11 @@ errors:
     args	: char *filename
     message	: "\"pattern '%s' returned no files\", filename"
 	
+  - type	: ErrError
+    func	: error_not_regular_file
+    args	: char *filename
+    message	: "\"file '%s' is not a regular file\", filename"
+	
   # Warnings
   - type	: ErrWarn
     func	: warn_symbol_different

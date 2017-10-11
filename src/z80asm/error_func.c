@@ -87,6 +87,15 @@ void error_glob_no_files(char *filename)
 	
 	STR_DELETE(msg);
 }
+void error_not_regular_file(char *filename)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "file '%s' is not a regular file", filename );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void warn_symbol_different(char *name, char *used)
 {
 	STR_DEFINE(msg, STR_SIZE);

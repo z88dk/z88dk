@@ -29,6 +29,7 @@ Parse command line options
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <sys/stat.h>
 
 /* default file name extensions */
 #define FILEEXT_ASM     ".asm"    
@@ -323,97 +324,162 @@ static void process_file( char *filename )
 	}
 }
 
-/*-----------------------------------------------------------------------------
-*   process globs
-*----------------------------------------------------------------------------*/
-static const int globerr(const char *path, int eerrno)
-{
-	// ignore glob errors, as user may pass in just the basename of the asm file
-	// and glob will not find the file
-	// error_glob((char *)path, strerror(eerrno));
-	return 0;	/* let glob() keep going */
-}
-
-static void expand_glob(char *filename, UT_array *files)
+//-----------------------------------------------------------------------------
+//	expand .../**/... into a list of all directories replacing **
+//	return just the input pattern if no ** is present
+//-----------------------------------------------------------------------------
+static void expand_star_star(char *filename, UT_array **plist)
 {
 	STR_DEFINE(path, STR_SIZE);
-	char *p;
+	char *tail;
 
-	if (strchr(filename, '*') == NULL && strchr(filename, '?') == NULL) {
-		// quick exit if no glob chars in filename
-		utarray_push_back(files, &filename);
-	}
-	else if ((p = strstr(filename, "**")) != NULL) {
-		// expand first ** into list of all sub-directories
-		UT_array *sub_files;
-		utarray_new(sub_files, &ut_str_icd);
-		char *leading = strdup(filename);		// alloc a copy to be modify
-
-		// cut from second '*' of "**" onwards and expand one '*'
-		leading[p - filename + 1] = '\0';
-		expand_glob(leading, sub_files);		// get my subdirs
-
-		// recurse for each directory (ends in /)
-		char **q = NULL;
-		while ((q = (char**)utarray_next(sub_files, q))) {
-			char *found = *q;
-			size_t len = strlen(found);
-
-			if (len > 0 && found[len - 1] == '/') {		// it's a directory, see GLOB_MARK
-				str_sprintf(path, "%s%s", found, p);	// reuse **/... from p to recurse
-
-				expand_glob(str_data(path), files);		// expand to parent list
-			}
-		}
-
-		// recurse with just the pattern
-		leading[p - filename] = '\0';				// remove '*'
-		str_sprintf(path, "%s%s", leading, p + 2);	// after ** from p
-		expand_glob(str_data(path), files);			// expand to parent list
-
-		free(leading);
-		utarray_free(sub_files);
+	if ((tail = strstr(filename, "**")) == NULL) {
+		utarray_push_back(*plist, &filename);
 	}
 	else {
-		// expand globs
-		glob_t results;
-		int ret = glob(filename, GLOB_MARK | GLOB_NOCHECK | GLOB_NOESCAPE,
-			globerr, &results);
-		if (ret != 0) {
+		// expand first ** into list of all sub-directories
+		char *head = strdup(filename);			// alloc a copy to be modified
+		head[tail - filename + 1] = '\0';		// cut from second '*' of "**" onwards and expand one '*'
+
+		glob_t glob_dirs;						// find all directories that match head
+		int ret = glob(head, GLOB_NOESCAPE | GLOB_ONLYDIR, NULL, &glob_dirs);
+		if (ret == GLOB_NOMATCH) {
+			;									// no-match is OK - this directory is skipped
+		}
+		else if (ret == 0) {					// read list
+			for (int i = 0; i < glob_dirs.gl_pathc; i++) {
+				char *found = glob_dirs.gl_pathv[i];
+				struct stat s;
+				ret = stat(found, &s);
+				if (ret == 0 && (s.st_mode & S_IFDIR)) {
+					str_sprintf(path, "%s/%s", 
+						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
+					char *pattern = str_data(path);
+					utarray_push_back(*plist, &pattern);
+
+					str_sprintf(path, "%s/%s",
+						found, tail[0] == '/' ? tail + 1 : tail);	// reuse **/... from tail to recurse
+					expand_star_star(str_data(path), plist);		// recurse
+				}
+			}
+		}
+		else {									// error
 			error_glob(filename,
 				(ret == GLOB_ABORTED ? "filesystem problem" :
 					ret == GLOB_NOMATCH ? "no match of pattern" :
 					ret == GLOB_NOSPACE ? "no dynamic memory" :
 					"unknown problem"));
 		}
-		else {
-			for (int i = 0; i < results.gl_pathc; i++) {
-				char *found = results.gl_pathv[i];
-				utarray_push_back(files, &found);
+		free(head);
+	}
+}
+
+static char *find_input_file(char *filename, Bool do_search_path)
+{
+	struct stat s;
+	int ret;
+#define CHECK_RETURN(f) \
+			ret = stat(f, &s); \
+			if (ret == 0) { \
+				if (s.st_mode & S_IFREG) { \
+					return strpool_add(f); \
+				} \
+				else { \
+					error_not_regular_file(f); \
+					return NULL; \
+				} \
+			};
+
+
+	// file exists
+	CHECK_RETURN(filename);
+
+	if (!do_search_path)
+		return NULL;
+
+	// file exists in search path
+	char *found = search_source(filename);
+	CHECK_RETURN(found);
+
+	// file.asm exists
+	char *asm_file = get_asm_filename(filename);
+	CHECK_RETURN(asm_file);
+
+	// file.o exists
+	char *obj_file = get_obj_filename(filename);
+	CHECK_RETURN(obj_file);
+
+	// file not found
+	return NULL;
+
+#undef CHECK_RETURN
+}
+
+static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
+{
+	int initial_len = utarray_len(*pfiles);
+	struct stat s;
+	int ret;
+
+	// expand ** into list of all possible paths
+	UT_array *patterns;
+	utarray_new(patterns, &ut_str_icd);
+
+	expand_star_star(filename, &patterns);		// expand **
+
+	char **p = NULL;
+	while ((p = (char**)utarray_next(patterns, p))) {
+		char *pattern = *p;
+
+		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
+			// optimize if no pattern chars
+			char *found = find_input_file(pattern, do_search_path);
+			if (found) {
+				utarray_push_back(*pfiles, &found);
 			}
 		}
-		globfree(&results);
+		else {
+			glob_t glob_files;
+			ret = glob(pattern, GLOB_NOESCAPE, NULL, &glob_files);
+			if (ret == GLOB_NOMATCH) {				// no match - try with .asm or .o
+				char *found = find_input_file(pattern, do_search_path);
+				if (found) {
+					utarray_push_back(*pfiles, &found);
+				}
+			}
+			else if (ret == 0) {
+				for (int i = 0; i < glob_files.gl_pathc; i++) {
+					char *found = glob_files.gl_pathv[i];
+					ret = stat(found, &s);
+					if (ret == 0 && (s.st_mode & S_IFREG))
+						utarray_push_back(*pfiles, &found);
+					else
+						error_not_regular_file(found);
+				}
+			}
+			else {
+				error_glob(filename,
+					(ret == GLOB_ABORTED ? "filesystem problem" :
+						ret == GLOB_NOMATCH ? "no match of pattern" :
+						ret == GLOB_NOSPACE ? "no dynamic memory" :
+						"unknown problem"));
+			}
+			globfree(&glob_files);
+		}
 	}
+
+	// error if pattern matched no file
+	if (strchr(filename, '*') || strchr(filename, '?')) {
+		if (initial_len == utarray_len(*pfiles))
+			error_glob_no_files(filename);
+	}
+
+	utarray_free(patterns);
 }
 
 void expand_source_glob(char *filename)
 {
-	UT_array *files;
-	utarray_new(files, &ut_str_icd);
-
-	expand_glob(filename, files);
-	if (utarray_len(files) == 0) {
-		error_glob_no_files(filename);
-	}
-	else {
-		char **p = NULL;
-		while ((p = (char**)utarray_next(files, p))) {
-			char *filename = *p;
-			filename = search_source(filename);
-			utarray_push_back(opts.files, &filename);
-		}
-	}
-	utarray_free(files);
+	expand_glob(filename, &opts.files, TRUE);
 }
 
 void expand_list_glob(char *filename)
@@ -421,32 +487,27 @@ void expand_list_glob(char *filename)
 	UT_array *files;
 	utarray_new(files, &ut_str_icd);
 
-	expand_glob(filename, files);
-	if (utarray_len(files) == 0) {
-		error_glob_no_files(filename);
-	}
-	else {
-		char **p = NULL;
-		while ((p = (char**)utarray_next(files, p))) {
-			char *filename = *p;
-			src_push();
-			{
-				char *line;
+	expand_glob(filename, &files, FALSE);
+	char **p = NULL;
+	while ((p = (char**)utarray_next(files, p))) {
+		char *filename = *p;
+		src_push();
+		{
+			char *line;
 
-				// append the directoy of the list file to the include path	and remove it at the end
-				char *lst_dirname = path_dirname(filename);
-				utarray_push_back(opts.inc_path, &lst_dirname);
+			// append the directoy of the list file to the include path	and remove it at the end
+			char *lst_dirname = path_dirname(filename);
+			utarray_push_back(opts.inc_path, &lst_dirname);
 
-				if (src_open(filename, NULL)) {
-					while ((line = src_getline()) != NULL)
-						process_file(line);
-				}
-
-				// finished assembly, remove dirname from include path
-				utarray_pop_back(opts.inc_path);
+			if (src_open(filename, NULL)) {
+				while ((line = src_getline()) != NULL)
+					process_file(line);
 			}
-			src_pop();
+
+			// finished assembly, remove dirname from include path
+			utarray_pop_back(opts.inc_path);
 		}
+		src_pop();
 	}
 	utarray_free(files);
 }

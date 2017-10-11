@@ -11,6 +11,7 @@ extern void error_illegal_option(char *option);
 extern void error_illegal_src_filename(char *filename);
 extern void error_glob(char *filename, char *error);
 extern void error_glob_no_files(char *filename);
+extern void error_not_regular_file(char *filename);
 extern void warn_symbol_different(char *name, char *used);
 extern void warn_expr_in_parens(void);
 extern void error_syntax(void);
