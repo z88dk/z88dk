@@ -5,6 +5,8 @@
 
 ;	** ROM font -DROMFONT, or uncomment the next line.
 ; defc ROMFONT=1
+; .. to use the ROM font rebuild the libraries and add in your compilation command line the extra parameters:
+;   -pragma-define:ansifont=0 -pragma-define:ansifont_is_packed=0 -pragma-define:ansicolumns=36
 
 ;
 ;	set it up with:
