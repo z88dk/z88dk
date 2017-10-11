@@ -692,22 +692,15 @@ int heirb(LVALUE* lval)
                 }
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
-                lval->ltype = lval->ltype->return_type;
+                lval->ltype = lval->ltype->kind == KIND_PTR ? lval->ltype->ptr->return_type : lval->ltype->return_type;
+                lval->ptr_type = KIND_NONE;
+                lval->val_type = lval->ltype->kind;
+                lval->symbol = NULL;
 
-                // TODO: We need to setup stuff
-
-                if (ptr && ptr->more == 0) {
-                    /* function returning variable */
-                    lval->ptr_type = KIND_NONE;
-                    lval->val_type = ptr->type;
-                    ptr = lval->symbol = NULL;
-                } else {
-                    /* function returning pointer */
-                    lval->flags = ptr->flags & ~(CALLEE|SMALLC|FASTCALL); /* djm */
-                    ptr = lval->symbol = dummy_sym[(int)ptr->more];
-                    lval->indirect_kind = lval->ptr_type = ptr->type;
-                    /* djm - 24/11/98 */
-                    lval->val_type = (lval->flags & FARPTR ? KIND_CPTR : KIND_INT);
+                // Function returing pointer
+                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR ) {
+                    lval->val_type = lval->ltype->kind;
+                    lval->indirect_kind = lval->ltype->kind;
                 }
             }
             /* Handle structures... come in here with lval holding tehe previous
