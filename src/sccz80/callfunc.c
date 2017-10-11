@@ -14,7 +14,7 @@
 
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
-static void ForceArgs(Type *dest, Type *src);
+static Kind ForceArgs(Type *dest, Type *src);
 
 
 /*
@@ -158,91 +158,79 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     memcpy(save_fps, buffer_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = 0;
     while ( tmpfiles[argnumber+1] ) {
+        Type *type;        
         argnumber++;
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
-        if (function_pointer_call == NO ) {
-            Type *type;
 
-            /* ordinary call */
-            expr = expression(&vconst, &val, &type);
-            if (expr == KIND_CARRY) {
-                zcarryconv();
-                expr = KIND_INT;
-                type = type_int;
-            }
-
-            if ( functype->oldstyle == 0 && argnumber < array_len(functype->parameters)) {       
-                int proto_argnumber;
-                Type *prototype;
-                if ( (ptr->flags & SMALLC) == SMALLC)  {
-                    proto_argnumber = array_len(functype->parameters) - argnumber + 1;
-                } else {
-                    proto_argnumber = argnumber;
-                }
-                prototype = array_get_byindex(functype->parameters, proto_argnumber);
-
-                if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                    ForceArgs(prototype, type);
-                }
-                // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
-                //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
-                // }
-                // if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
-                //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
-                // }
-            }
-            if ( functype->flags & FASTCALL || 
-                (tmpfiles[argnumber+1] == NULL && (builtin_flags & FASTCALL) == FASTCALL ) ) {
-                /* fastcall of single expression OR the last argument of a builtin */
-
+        if ( function_pointer_call ) zpush(); // Save function address
+        /* ordinary call */
+        expr = expression(&vconst, &val, &type);
+        if (expr == KIND_CARRY) {
+            zcarryconv();
+            expr = KIND_INT;
+            type = type_int;
+        }
+        if ( functype->oldstyle == 0 && argnumber <= array_len(functype->parameters)) {       
+            int proto_argnumber;
+            Type *prototype;
+            if ( (functype->flags & SMALLC) == SMALLC)  {
+                proto_argnumber = argnumber - 1;                
             } else {
-                if (argnumber == watcharg) {
-                    if (ptr)
-                        debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
-                    minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
-                }
+                proto_argnumber = array_len(functype->parameters) - argnumber;                
+            }
+            prototype = array_get_byindex(functype->parameters, proto_argnumber);
+
+            if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
+                expr = ForceArgs(prototype, type);
+            }
+            // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
+            //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
+            // }
+            // if ( (protoarg & ( CALLEE << 16)) !=  (packedArgumentType & (CALLEE << 16)) ) {
+            //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
+            // }
+        }
+        if ( (function_pointer_call == 0 && (functype->flags & FASTCALL)) || 
+            (tmpfiles[argnumber+1] == NULL && (builtin_flags & FASTCALL) == FASTCALL ) ) {
+            /* fastcall of single expression OR the last argument of a builtin */
+
+        } else {
+            if (argnumber == watcharg) {
+                if (ptr)
+                    debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
+                minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
+            }
+            if ( function_pointer_call == 0 ) {
                 if (expr == KIND_DOUBLE) {
                     dpush();
                     nargs += 6;
-                }
-                /* Longs and (ahem) long pointers! */
-                else if (expr == KIND_LONG || expr == KIND_CPTR) {
+                } else if (expr == KIND_LONG || expr == KIND_CPTR) {
                     if (!(fnflags & FARPTR) && expr != KIND_LONG)
                         const2(0);
                     lpush();
-
                     nargs += 4;
                 } else {
                     zpush();
                     nargs += 2;
                 }
-            }
-        } else { /* call to address in HL */
-            Type *type;
-
-            zpush(); /* Push address */
-            expr = expression(&vconst, &val, &type);
-            if (expr == KIND_CARRY) {
-                zcarryconv();
-                expr = KIND_INT;
-                type = type_int;
-            }
-            if (expr == KIND_LONG || expr == KIND_CPTR) {
-                swap(); /* MSW -> hl */
-                swapstk(); /* MSW -> stack, addr -> hl */
-                zpushde(); /* LSW -> stack, addr = hl */
-                nargs += 4;
-            } else if (expr == KIND_DOUBLE) {
-                dpush_under(KIND_INT);
-                nargs += 6;
-                mainpop();
             } else {
-                /* If we've only got one 2 byte argment, don't swap the stack */
-                if ( tmpfiles[argnumber+1] != NULL  || nargs != 0) {
-                    swapstk();
+                if (expr == KIND_LONG || expr == KIND_CPTR) {
+                    swap(); /* MSW -> hl */
+                    swapstk(); /* MSW -> stack, addr -> hl */
+                    zpushde(); /* LSW -> stack, addr = hl */
+                    nargs += 4;
+                } else if (expr == KIND_DOUBLE) {
+                    dpush_under(KIND_INT);
+                    nargs += 6;
+                    mainpop();
+                } else {
+                    /* If we've only got one 2 byte argment, don't swap the stack */
+                    if ( tmpfiles[argnumber+1] != NULL  || nargs != 0) {
+                        swapstk();
+                    }
+                    nargs += 2;
                 }
-                nargs += 2;
             }
         }
         restore_input();
@@ -370,7 +358,7 @@ static int SetWatch(char* sym, int* type)
  *      djm routine to force arguments to switch type
  */
 
-static void ForceArgs(Type *dest, Type *src)
+static Kind ForceArgs(Type *dest, Type *src)
 {
     // TODO: ARRAYS
     if ( dest->kind != KIND_PTR && dest->kind != KIND_CPTR) {
@@ -389,7 +377,7 @@ static void ForceArgs(Type *dest, Type *src)
             // Pointer to pointer
         }
     }
-    return;
+    return dest->kind;
 }
    
         /* Dealing with pointers.. a type mismatch!*/

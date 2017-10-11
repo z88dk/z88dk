@@ -486,14 +486,15 @@ Type *parse_parameter_list(Type *return_type)
         return func;
     }
 
+    func = CALLOC(1,sizeof(*func));
+    func->kind = KIND_FUNC;
+    func->size = 0;
+    func->len = 1;        
+    func->return_type = return_type;
+    func->parameters = array_init(NULL);        
+    
     do {
-        func = CALLOC(1,sizeof(*func));
-        func->kind = KIND_FUNC;
-        func->size = 0;
-        func->len = 1;        
-        func->return_type = return_type;
-        func->parameters = array_init(NULL);        
-        
+      
         // TODO: K&R
         param = dodeclare2(NULL); // STORAGE_AUTO);
         
