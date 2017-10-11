@@ -29,7 +29,6 @@ Parse command line options
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
-#include <sys/stat.h>
 
 /* default file name extensions */
 #define FILEEXT_ASM     ".asm"    
@@ -349,9 +348,7 @@ static void expand_star_star(char *filename, UT_array **plist)
 		else if (ret == 0) {					// read list
 			for (int i = 0; i < glob_dirs.gl_pathc; i++) {
 				char *found = glob_dirs.gl_pathv[i];
-				struct stat s;
-				ret = stat(found, &s);
-				if (ret == 0 && (s.st_mode & S_IFDIR)) {
+				if (dir_exists(found)) {
 					str_sprintf(path, "%s/%s", 
 						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
 					char *pattern = str_data(path);
@@ -374,51 +371,9 @@ static void expand_star_star(char *filename, UT_array **plist)
 	}
 }
 
-static char *find_input_file(char *filename, Bool do_search_path)
-{
-	struct stat s;
-	int ret;
-#define CHECK_RETURN(f) \
-			ret = stat(f, &s); \
-			if (ret == 0) { \
-				if (s.st_mode & S_IFREG) { \
-					return strpool_add(f); \
-				} \
-				else { \
-					error_not_regular_file(f); \
-					return NULL; \
-				} \
-			};
-
-
-	// file exists
-	CHECK_RETURN(filename);
-
-	if (!do_search_path)
-		return NULL;
-
-	// file exists in search path
-	char *found = search_source(filename);
-	CHECK_RETURN(found);
-
-	// file.asm exists
-	char *asm_file = get_asm_filename(filename);
-	CHECK_RETURN(asm_file);
-
-	// file.o exists
-	char *obj_file = get_obj_filename(filename);
-	CHECK_RETURN(obj_file);
-
-	// file not found
-	return NULL;
-
-#undef CHECK_RETURN
-}
-
 static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
 {
 	int initial_len = utarray_len(*pfiles);
-	struct stat s;
 	int ret;
 
 	// expand ** into list of all possible paths
@@ -433,25 +388,19 @@ static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
 
 		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
 			// optimize if no pattern chars
-			char *found = find_input_file(pattern, do_search_path);
-			if (found) {
-				utarray_push_back(*pfiles, &found);
-			}
+			char *found = search_source(pattern);
+			utarray_push_back(*pfiles, &found);
 		}
 		else {
 			glob_t glob_files;
 			ret = glob(pattern, GLOB_NOESCAPE, NULL, &glob_files);
-			if (ret == GLOB_NOMATCH) {				// no match - try with .asm or .o
-				char *found = find_input_file(pattern, do_search_path);
-				if (found) {
-					utarray_push_back(*pfiles, &found);
-				}
+			if (ret == GLOB_NOMATCH) {				// no match - ignore
+				;
 			}
 			else if (ret == 0) {
 				for (int i = 0; i < glob_files.gl_pathc; i++) {
 					char *found = glob_files.gl_pathv[i];
-					ret = stat(found, &s);
-					if (ret == 0 && (s.st_mode & S_IFREG))
+					if (file_exists(found))
 						utarray_push_back(*pfiles, &found);
 					else
 						error_not_regular_file(found);
