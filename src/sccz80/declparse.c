@@ -331,6 +331,30 @@ Type *parse_struct(Type *type, int isstruct)
     return type;
 }
 
+static int chase_typedef(Type *type)
+{
+    char   sname[NAMESIZE];
+    SYMBOL *ptr;
+
+    if ( symname(sname) == 0 ) {
+        return -1;
+    }
+
+    /* We have a valid identifier, lets find a typedef */
+    if ( (ptr = findglb(sname)) == NULL ) {
+        return -1;
+    }
+
+    if ( ptr->storage != TYPDEF ) {
+        printf("%s is not a valid identifier\n",sname);
+        return -1;
+    }
+
+    /* So we've identified it, we should copy it */
+    *type = *ptr->ctype;
+    return 0;
+}
+
 // Read the base type 
 static Type *parse_type(void)
 {
@@ -387,12 +411,10 @@ static Type *parse_type(void)
         return parse_struct(type, 1);
     } else if ( amatch("union")) {
         return parse_struct(type, 0);
-    } else {
+    } else if ( chase_typedef(type) < 0 ) {
         FREENULL(type);
         return type;
     }
-    // } else if ( chase_typedef(type) < 0 ) 
-    //     return NULL;
 
     // Successful
     return type;
@@ -802,7 +824,7 @@ static void declfunc(Type *type, enum storage_type storage)
     }
 
     // Setup local variables
-    output_section(c_code_section); // output_section("code");
+    output_section(c_code_section);
     
     nl();
     prefix();
