@@ -45,6 +45,16 @@
 ;
 ; If this message is implemented, the driver is complete.
 ;
+; * ITERM_MSG_REJECT
+;
+;   Indicate whether typed character should be rejected.
+;
+;   enter:  c = ascii code
+;    exit:  carry reset indicates the character should be rejected.
+; can use:  af, bc, de, hl
+;
+; Default is to return with carry set.
+;
 ; * ITERM_MSG_INTERRUPT
 ;
 ;   Indicate whether character should interrupt line editing.
