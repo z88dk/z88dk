@@ -723,8 +723,27 @@ char *search_file( char *filename, UT_array *dir_list )
 Bool file_exists(char *filename)
 {
 	struct stat  sb;
-	if ((stat(filename, &sb) == 0)  && !(sb.st_mode & S_IFDIR))
+	if ((stat(filename, &sb) == 0)  && (sb.st_mode & S_IFREG))
 		return TRUE;
 	else
 		return FALSE;
 }
+
+Bool dir_exists(char *dirname)
+{
+	struct stat  sb;
+	if ((stat(dirname, &sb) == 0) && (sb.st_mode & S_IFDIR))
+		return TRUE;
+	else
+		return FALSE;
+}
+
+int file_size(char *filename)	// file size, -1 if not regular file
+{
+	struct stat  sb;
+	if ((stat(filename, &sb) == 0) && (sb.st_mode & S_IFREG))
+		return sb.st_size;
+	else
+		return -1;
+}
+
