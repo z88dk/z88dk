@@ -44,8 +44,9 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     int   savesp;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
-    Type   *functype = ptr ? ptr->ctype : fnptr->ctype;
+    Type   *functype = ptr ? ptr->ctype : fnptr->ctype->ptr;
        
+
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
     argnumber = 0;
@@ -142,7 +143,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
         }
     }
 
-    if ( ( (ptr == NULL && c_use_r2l_calling_convention == YES ) || (ptr && (ptr->flags & SMALLC) == 0) ) && (builtin_flags & SMALLC) == 0)  {
+    if ( ( (ptr == NULL && c_use_r2l_calling_convention == YES ) || (ptr && (functype->flags & SMALLC) == 0) ) && (builtin_flags & SMALLC) == 0)  {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];

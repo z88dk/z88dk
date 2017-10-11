@@ -15,7 +15,6 @@ int primary(LVALUE* lval)
     char sname[NAMESIZE];
     SYMBOL* ptr;
     int k;
-    
     if (cmatch('(')) {
         do {
             k = heir1(lval);

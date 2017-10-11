@@ -51,8 +51,7 @@ int statement()
 
         if ( declare_local(locstatic) ) {
             return lastst;
-        }
-
+        }        
         /* not a definition */
         if (declared >= 0) {
             Zsp = modstk(Zsp - declared, NO, NO);

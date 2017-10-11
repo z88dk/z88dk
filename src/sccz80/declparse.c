@@ -333,26 +333,18 @@ Type *parse_struct(Type *type, int isstruct)
 
 static int chase_typedef(Type *type)
 {
-    char   sname[NAMESIZE];
     SYMBOL *ptr;
 
-    if ( symname(sname) == 0 ) {
-        return -1;
-    }
+    blanks();
 
-    /* We have a valid identifier, lets find a typedef */
-    if ( (ptr = findglb(sname)) == NULL ) {
-        return -1;
+    for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
+        if (ptr->storage == TYPDEF && amatch(ptr->name)) {
+            /* So we've identified it, we should copy it */
+            *type = *ptr->ctype;
+            return 0;
+        }
     }
-
-    if ( ptr->storage != TYPDEF ) {
-        printf("%s is not a valid identifier\n",sname);
-        return -1;
-    }
-
-    /* So we've identified it, we should copy it */
-    *type = *ptr->ctype;
-    return 0;
+    return -1;
 }
 
 // Read the base type 

@@ -20,7 +20,7 @@ Kind expression(int  *con, double *val, Type **type)
     *con = lval.is_const;
     *val = lval.const_val;
     *type = lval.ltype;
-    return lval.ltype->kind;
+    return lval.ltype ? lval.ltype->kind : KIND_NONE;
 }
 
 int heir1(LVALUE* lval)
@@ -640,7 +640,6 @@ int heirb(LVALUE* lval)
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
-                    printf("%d %d\n",val,lval->offset);
                     
                     if (ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY) {
                         /* constant offset to array on stack */
