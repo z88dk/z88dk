@@ -53,6 +53,7 @@ int constant(LVALUE* lval)
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
         load_double_into_fa(lval);
+        lval->ltype = type_double;
         lval->val_type = KIND_DOUBLE;
         lval->flags = FLAGS_NONE;
         return (1);
@@ -65,6 +66,7 @@ int constant(LVALUE* lval)
     } else if (tstr(&val)) {
         lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
+        lval->ltype = make_pointer(type_char);
         lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
         lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;
@@ -200,6 +202,17 @@ typecheck:
             lval->flags &= ~UNSIGNED;
         if (cmatch('f'))
             lval->val_type = KIND_DOUBLE;
+    }
+    if ( lval->val_type == KIND_LONG ) {
+        if ( lval->flags & UNSIGNED ) 
+            lval->ltype = type_ulong;
+        else
+            lval->ltype = type_long;
+    } else {
+        if ( lval->flags & UNSIGNED ) 
+            lval->ltype = type_uint;
+        else
+            lval->ltype = type_int;
     }
     return (1);
 }

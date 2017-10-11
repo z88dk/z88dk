@@ -487,6 +487,12 @@ Type *parse_parameter_list(Type *return_type)
         if ( param->kind == KIND_VOID ) {
             break;
         }
+        /* An array parameter becomes a pointer as function argument */
+        if ( param->kind == KIND_ARRAY ) {
+            Type *ptr = make_pointer(param->ptr);
+            strcpy(ptr->name, param->name);
+            param = ptr;
+        }
         if ( param != NULL ) {
             if ( param->kind == KIND_ELLIPSES) {
                 if ( array_len(func->parameters)  ) {
@@ -843,6 +849,7 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
             ptr->ctype = type;
             ptr->offset.i = where;
+            ptr->isassigned = 1;
             where += type->size;
         }
     } else {
@@ -854,6 +861,7 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
             ptr->ctype = type;            
             ptr->offset.i = where;
+            ptr->isassigned = 1;            
             where += type->size;
         }
     }
