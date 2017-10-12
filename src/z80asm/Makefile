@@ -1,9 +1,9 @@
 #------------------------------------------------------------------------------
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 PROJ		:= z80asm
 
@@ -37,6 +37,16 @@ OPT = -O3
 STD = -std=gnu11
 LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
+
+# Use these flags both in Windows_NT and in a MinGW build in Unix
+#ifeq ($(OS),Windows_NT)
+ifeq ($(EXE),.exe)
+LOCAL_CFLAGS	+= -I../../ext/UNIXem/include
+OBJS			+= ../../ext/UNIXem/src/glob.o
+endif
+
+# uthash
+LOCAL_CFLAGS	+= -I../../ext/uthash/src
 
 #------------------------------------------------------------------------------
 # main

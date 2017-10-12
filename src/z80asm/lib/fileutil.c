@@ -66,7 +66,7 @@ char *temp_filename( char *filename )
 	static int count;
 	char *ret;
 
-	str_sprintf( temp, "%s~$%d$%s", 
+	str_sprintf( temp, "%s/~$%d$%s", 
 				 path_dirname(filename), ++count, path_basename(filename) );
 	ret = add_temp_file(str_data(temp));
 
