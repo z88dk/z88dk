@@ -88,7 +88,7 @@ void *array_get_byindex(array *arr, int index)
 
 
 
-Type *dodeclare2(Kind *kind);
+Type *dodeclare2(Type **base_type);
 
 Type *global_hash = NULL;
 
@@ -292,13 +292,13 @@ Type *parse_struct(Type *type, int isstruct)
         str->isstruct = isstruct;        
         add_tag(str);        
     } 
-
     if ( rcmatch('{')) {
         Type *elem;
         needchar('{');
 
         do {
             // Read each field now */
+            blanks();
             elem = dodeclare2(NULL);
             
             if ( elem != NULL ) {
@@ -321,7 +321,6 @@ Type *parse_struct(Type *type, int isstruct)
             needchar(';');
         } while ( 1 );
         needchar('}');
-
         str->size = size;  // It's now defined
         str->weak = 0;
     }
@@ -664,11 +663,10 @@ Type *parse_expr_type()
 int declare_local(int local_static)
 {
     Type *type;
-    Kind base_kind = KIND_NONE;
+    Type *base_type = NULL;
 
     do {
-        type = dodeclare2(&base_kind);
-        
+        type = dodeclare2(&base_type);
         if ( type == NULL ) {
             return 0;
         }
@@ -691,8 +689,10 @@ int declare_local(int local_static)
 
 Type *dodeclare(enum storage_type storage)
 {
+    Type  *base_type = NULL;
+
     while ( 1 ) {
-        Type *type = dodeclare2(NULL);
+        Type *type = dodeclare2(&base_type);
         
         if ( type == NULL ) {
             break;
@@ -705,13 +705,19 @@ Type *dodeclare(enum storage_type storage)
                 SYMBOL *ptr = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
                 ptr->ctype = type;
             }
-            return NULL;
+            return type;
         } else if ( storage != STKLOC && rcmatch('{')) {   
             declfunc(type, storage);
-            break;
+            return type;
         } else if ( cmatch(',')) {
+            if ( storage == STKLOC ) {
+                SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+                ptr->ctype = type;
+            } else {
+                SYMBOL *ptr = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+                ptr->ctype = type;
+            }
             // We have another variable of same base type */
-
         } else {
             return type;
         }
@@ -752,19 +758,22 @@ Type *make_type(Kind kind, Type *tag)
 }
 
 // Parse a declaration
-Type *dodeclare2(Kind *base_kind)
+Type *dodeclare2(Type **base_type)
 {
     char namebuf[NAMESIZE];
     Type *type;
     int   flags = 0;
 
-    if ( base_kind != NULL && *base_kind != KIND_NONE) {
-        type = make_type(*base_kind, NULL);
+    if ( base_type != NULL && *base_type != NULL ) {
+        type = CALLOC(1,sizeof(*type));
+        *type = **base_type;
     } else {
         if ( (type = parse_type()) == NULL ) {
             return NULL;
         }
-
+        if ( base_type )
+            *base_type = type;
+            
         // Parse for z88dk flags
         while (blanks(), rcmatch('_')) {
             if ( amatch("__LIB__") ) {
@@ -804,6 +813,12 @@ Type *dodeclare2(Kind *base_kind)
         return type;
     }
 
+    if ( type->kind == KIND_STRUCT && rcmatch(';')) {
+        needchar(';');
+        
+        return type;
+    }
+
     type = parse_decl(namebuf, type);
 
     if ( type != NULL ) {
@@ -818,6 +833,7 @@ Type *dodeclare2(Kind *base_kind)
     if ( cmatch('@')) {
 
     }
+
 
     return type;
 }
@@ -880,11 +896,11 @@ void declare_func_kr()
 static void handle_kr_type_parameters(Type *func)
 {
     Type  *param;
-    Kind   base_kind = KIND_NONE;
+    Type  *base_type = NULL;
 
     while ( !rcmatch('{')) {
         int    i;
-        param = dodeclare2(&base_kind);
+        param = dodeclare2(&base_type);
         if ( param == NULL ) {
             break;
         }
@@ -899,10 +915,12 @@ static void handle_kr_type_parameters(Type *func)
         if ( i == array_len(func->parameters) ) {
             printf("Found declaration for unknown parameter");
         }
-        if ( cmatch(',')) 
-            base_kind = param->kind;
-        else
+        if ( cmatch(',')) {
+            // Nothing
+        } else {
             needchar(';');
+            base_type = NULL;
+        }
     }
 }
 
