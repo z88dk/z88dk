@@ -26,23 +26,4 @@ for i in t/test_* ; do
 		fi
 	fi
 done
-
-# run uthash tests
-pushd t/uthash
-	for i in test*; do
-		if test -f $i -a -x $i ; then
-			ans=`basename $i .exe`.ans
-			out=`basename $i .exe`.out
-			./$i > $out
-			if diff -w $out $ans ; then
-				echo $i PASSED
-			else
-				echo "ERROR in test $i"
-				echo "--------------------"
-				cat $out
-				exit 1
-			fi
-		fi
-	done
-popd
 echo ""

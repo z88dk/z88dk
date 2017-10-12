@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: svibasic.def,v 1.10 2017-01-09 10:20:47 stefano Exp $
+; $Id: svibasic.def $
 ;
 
 
@@ -145,7 +145,7 @@ defc PRMPRV = $F878  ; Pointer to previous parameter block
 defc PRMLN2 = $F87A  ; Size of parameter block
 defc PARM2  = $F87C  ; For parameter storage
 defc PRMFLG = $F8E0  ; Flag to indicate whether PARM1 was searching
-defc ARYTA2 = $F7F0  ; End point of search
+defc ARYTA2 = $F8E1  ; End point of search
 defc NOFUNS = $F8E3  ; 0 if no function active
 defc TEMP9  = $F8E4  ; Location of temporary storage for garbage collection
 defc FUNACT = $F8E6  ; Count of active functions
