@@ -3,6 +3,7 @@
 #include "define.h" 
 
 static void declfunc(Type *type, enum storage_type storage);
+static void handle_kr_type_parameters(Type *func);
 
 Type   *type_void = &(Type){ KIND_VOID, 1, 0, .len=1 };
 Type   *type_carry = &(Type){ KIND_CARRY, 1, 0, .len=1 };
@@ -465,11 +466,27 @@ static void parse_trailing_modifiers(Type *type)
     }
 }
 
+static int check_existing_parameter(Type *func, Type *param)
+{
+    int    i;
+
+    for ( i = 0; i < array_len(func->parameters); i++ ) {
+        Type *existing = array_get_byindex(func->parameters,i);
+
+        if ( strcmp(existing->name, param->name) == 0 ) {
+            printf("A parameter named %s has already been defined for function\n",param->name);
+            junk();
+            return -1;
+        }
+    }
+    return 0;
+}
 
 Type *parse_parameter_list(Type *return_type)
 {
     Type *func;
     Type *param;
+    int   iskr = 0;
 
     needchar('(');
 
@@ -497,6 +514,17 @@ Type *parse_parameter_list(Type *return_type)
       
         // TODO: K&R
         param = dodeclare2(NULL); // STORAGE_AUTO);
+
+        if ( param == NULL ) {
+            // KR Fake an argument
+            iskr = 1;            
+            param = CALLOC(1,sizeof(*param));
+            *param = *type_int;  // Implicitly int
+            if ( symname(param->name) == 0 ) {
+                error(E_ARGNAME);
+                junk();
+            }
+        }
         
         // A void type by itself, no parameters
         if ( param->kind == KIND_VOID ) {
@@ -528,7 +556,8 @@ Type *parse_parameter_list(Type *return_type)
                 snprintf(param->name, sizeof(param->name),"0__parameter_%lu",array_len(func->parameters));
                 param->name[0] = 0;
             }
-            array_add(func->parameters, param);
+            if ( check_existing_parameter(func, param) == 0 )            
+                array_add(func->parameters, param);
         }
         if ( !rcmatch(',')) 
             break;
@@ -536,6 +565,11 @@ Type *parse_parameter_list(Type *return_type)
     } while (1);
     needchar(')'); 
     parse_trailing_modifiers(func);
+
+    if ( iskr ) {
+        handle_kr_type_parameters(func);
+    }
+
     return func;
 }
 
@@ -803,6 +837,75 @@ Type *default_function(const char *name)
     return type;
 }
 
+
+void declare_func_kr()
+{
+    char   sname[NAMESIZE];
+    Type  *func;
+  
+    if ( symname(sname) == 0 ) {
+        return;
+    }
+    needchar('(');
+
+    func = CALLOC(1,sizeof(*func));    
+    func->kind = KIND_FUNC;
+    func->size = 0;
+    func->len = 1;        
+    func->return_type = type_int;
+    strcpy(func->name, sname);
+    func->parameters = array_init(NULL);       
+
+    while ( cmatch(')') == 0 ) {
+        Type *param = CALLOC(1,sizeof(*param));
+        *param = *type_int;  // Implicitly int
+        if ( symname(param->name) == 0 ) {
+            error(E_ARGNAME);
+            junk();
+        } else {
+            if ( check_existing_parameter(func, param) == 0 ) 
+                array_add(func->parameters, param);
+        }
+
+        if (ch() != ')' && cmatch(',') == 0) {
+            warning(W_EXPCOM);
+        }
+    }
+    parse_trailing_modifiers(func);
+    handle_kr_type_parameters(func);
+    // And start the function
+    declfunc(func, STATIK);
+}
+
+static void handle_kr_type_parameters(Type *func)
+{
+    Type  *param;
+    Kind   base_kind = KIND_NONE;
+
+    while ( !rcmatch('{')) {
+        int    i;
+        param = dodeclare2(&base_kind);
+        if ( param == NULL ) {
+            break;
+        }
+        for ( i = 0; i < array_len(func->parameters); i++ ) {
+            Type *existing = array_get_byindex(func->parameters,i);
+            if ( strcmp( existing->name, param->name) == 0 ) {
+                // Found the argument
+                *existing = *param;
+                break;
+            }
+        }
+        if ( i == array_len(func->parameters) ) {
+            printf("Found declaration for unknown parameter");
+        }
+        if ( cmatch(',')) 
+            base_kind = param->kind;
+        else
+            needchar(';');
+    }
+}
+
 static void declfunc(Type *type, enum storage_type storage)
 {
     int where;
@@ -833,7 +936,7 @@ static void declfunc(Type *type, enum storage_type storage)
 
     infunc = 1; /* In a function for sure! */
     
-    if (((currfn->flags & SHARED) && c_makeshare) || c_shared_file) {
+    if (((type->flags & SHARED) && c_makeshare) || c_shared_file) {
         /* Shared library definition, offset the stack */
         where = 2 + c_share_offset;
     } else
@@ -841,10 +944,10 @@ static void declfunc(Type *type, enum storage_type storage)
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function
         */
-    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
+    if (c_framepointer_is_ix != -1 || (type->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
         where += 2;
 
-    if ( (currfn->flags & (CRITICAL|NAKED)) == CRITICAL ) {
+    if ( (type->flags & (CRITICAL|NAKED)) == CRITICAL ) {
         where += zcriticaloffset();
     }
     
@@ -855,7 +958,7 @@ static void declfunc(Type *type, enum storage_type storage)
     
     
     /* For SMALLC we need to start counting from the last argument */
-    if ( (currfn->flags & SMALLC) == SMALLC ) {
+    if ( (type->flags & SMALLC) == SMALLC ) {
         int i;
         for ( i = array_len(currfn->ctype->parameters) - 1; i >= 0; i-- ) {
             SYMBOL *ptr;
@@ -882,11 +985,11 @@ static void declfunc(Type *type, enum storage_type storage)
     }
         
     
-    if ( (currfn->flags & CRITICAL) == CRITICAL ) {
+    if ( (type->flags & CRITICAL) == CRITICAL ) {
         zentercritical();
     }
     pushframe();
-    if (array_len(currfn->ctype->parameters) && (currfn->flags & (FASTCALL|NAKED)) == FASTCALL ) {
+    if (array_len(currfn->ctype->parameters) && (type->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         Type *type = array_get_byindex(currfn->ctype->parameters,0);
         int   adjust = 1;
 

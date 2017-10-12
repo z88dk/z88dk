@@ -306,7 +306,7 @@ void parse()
                 blanks();
             }
         } else {
-//            newfunc();
+            declare_func_kr();
         }
         blanks(); /* force eof if pending */
     }
