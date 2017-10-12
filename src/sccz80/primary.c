@@ -63,6 +63,8 @@ int primary(LVALUE* lval)
                     error(E_UNSYMB, sname);
                 if (ptr->ctype->kind == KIND_ENUM) {
                     lval->symbol = NULL;
+                    lval->ltype = type_int;
+                    lval->val_type = KIND_INT;
                     lval->indirect_kind = 0;
                     lval->is_const = 1;
                     lval->const_val = ptr->size;

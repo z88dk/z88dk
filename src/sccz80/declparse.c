@@ -90,13 +90,15 @@ void *array_get_byindex(array *arr, int index)
 
 Type *dodeclare2(Type **base_type);
 
-Type *global_hash = NULL;
 
 Type *find_enum(const char *name)
 {
-    Type *t;
-    HASH_FIND_STR(global_hash, name, t);
-    return t;
+    SYMBOL *ptr = findglb(name);
+
+    if ( ptr && ptr->ident == ID_ENUM ) {
+        return ptr->ctype;
+    }
+    return NULL;
 }
 
 static Type *tag_hash = NULL;
@@ -127,11 +129,7 @@ Type *find_tag_field(Type *tag, const char *fieldname)
     return NULL;
 }
 
-void add_global(Type *type)
-{
-    // addglb()
-    HASH_ADD_STR(global_hash, name, type);
-}
+
 
 
 
@@ -157,7 +155,7 @@ Type *make_constant(const char *name, int32_t value)
     Type *type = CALLOC(1,sizeof(*type));
 
     // TODO: We need to make constants long if necessary
-    type->kind = KIND_INT;
+    type->kind = KIND_ENUM;
     type->isconst = 1;
     strcpy(type->name, name);
     type->value = value;
@@ -165,6 +163,7 @@ Type *make_constant(const char *name, int32_t value)
     ptr = addglb(type->name, ID_VARIABLE, KIND_ENUM, 0, STATIK, 0, 0);
     ptr->ctype = type;
     ptr->size = value;
+    ptr->isassigned = 1;
 
     return type;
 }
@@ -217,6 +216,8 @@ static Type *parse_enum(Type *type)
     static int num_enums_defined = 0;
 
     type->kind = KIND_INT;
+    type->len = 1;
+    type->size = 2;
     type->isunsigned = c_default_unsigned;
     if ( symname(sname) == 0 )
         snprintf(sname, sizeof(sname),"0sc_i_enumb%d", num_enums_defined++);
@@ -224,10 +225,15 @@ static Type *parse_enum(Type *type)
     if ( (ptr = find_enum(sname)) == NULL ) {
         int32_t  value = 0;
 
-        add_global(ptr = make_enum(sname));
+        ptr = make_enum(sname);
+        SYMBOL *sym = addglb(sname, ID_ENUM, type->kind, 0,UNKNOWN , 0, 0);
+        sym->ctype = type;
+
         needchar('{');
         do {
             Type *elem;
+            SYMBOL *sym;
+
             if (symname(sname) == 0)
                 illname(sname);
             if (cmatch('=')) {
@@ -241,7 +247,7 @@ static Type *parse_enum(Type *type)
             }
             elem = make_constant(sname, value);
             array_add(ptr->fields, elem);  // Keep reference to the enum value so we validate switches..
-            add_global(elem);
+//            add_global(elem);
             
             value++;
         } while (cmatch(',') && !rcmatch('}'));
