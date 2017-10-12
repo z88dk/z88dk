@@ -19,7 +19,6 @@ Error handling.
 #include "types.h"
 #include "init.h"
 #include <stdio.h>
-#include <sys/stat.h>
 
 static void file_error( char *filename, Bool writing );
 
@@ -147,9 +146,6 @@ void open_error_file( char *src_filename )
 
 void close_error_file( void )
 {
-	struct stat st;
-	int stat_res;
-
     init_module();
 
     /* close current file if any */
@@ -158,12 +154,8 @@ void close_error_file( void )
 		myfclose(error_file.file);
 
 		/* delete file if no errors found */
-		if (error_file.filename != NULL)
-		{
-			stat_res = stat(error_file.filename, &st);
-			if (stat_res == 0 && st.st_size == 0)
-				remove(error_file.filename);
-		}
+		if (error_file.filename != NULL && file_size(error_file.filename) == 0)
+			remove(error_file.filename);
 	}
 
     /* reset */

@@ -47,6 +47,21 @@ errors:
     args	: char *filename
     message	: "\"illegal source filename '%s'\", filename"
 	
+  - type	: ErrError
+    func	: error_glob
+    args	: char *filename, char *error
+    message	: "\"problem with '%s': %s\", filename, error"
+	
+  - type	: ErrError
+    func	: error_glob_no_files
+    args	: char *filename
+    message	: "\"pattern '%s' returned no files\", filename"
+	
+  - type	: ErrError
+    func	: error_not_regular_file
+    args	: char *filename
+    message	: "\"file '%s' is not a regular file\", filename"
+	
   # Warnings
   - type	: ErrWarn
     func	: warn_symbol_different
