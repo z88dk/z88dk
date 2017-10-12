@@ -402,8 +402,6 @@ static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
 					char *found = glob_files.gl_pathv[i];
 					if (file_exists(found))
 						utarray_push_back(*pfiles, &found);
-					else
-						error_not_regular_file(found);
 				}
 			}
 			else {
