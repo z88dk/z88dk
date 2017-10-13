@@ -84,3 +84,8 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+psg/einstein/psg_init
+psg/einstein/get_psg
+psg/einstein/set_psg
+psg/einstein/set_psg_callee
+@psg/psg.lst
