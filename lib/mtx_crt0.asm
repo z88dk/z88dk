@@ -107,9 +107,6 @@ msxbios:
 
 	SECTION	bss_crt
 
-	PUBLIC	pixelbyte
-pixelbyte:      defb	0
-
 	PUBLIC	fputc_vdp_offs	;Current character pointer
 			
 	PUBLIC	aPLibMemory_bits;apLib support variable
