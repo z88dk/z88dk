@@ -33,6 +33,11 @@
 #define psgT(hz)		((int) (hz/0.0596))
 #endif
 
+#ifdef __EINSTEIN__
+// 2 Mhz clock (divided internally by 16)
+#define psgT(hz)		((int)(125000.0 / (hz)))
+#endif
+
 #ifdef __MSX__
 #include <msx.h>
 // src clock: 17897725.5 divided internally by 16
