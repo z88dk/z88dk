@@ -5,7 +5,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= z80 cpm m rc2014 sms yaz180 z180 zx zxn 
+set alltargets= z80 cpm m rc2014 sms vgl yaz180 z180 zx zxn 
 
 if "%1" == "" (
    echo.

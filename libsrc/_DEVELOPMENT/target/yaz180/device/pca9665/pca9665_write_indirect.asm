@@ -6,7 +6,7 @@
     PUBLIC pca9665_write_indirect
 
     ;Do a write to the indirect registers
-    ;input C  =  device addr | direct register address ($DR)
+    ;input C  =  device addr | direct register address (ddd000rr)
     ;input A  =  byte to write
     ;preserves device and register address in BC
 

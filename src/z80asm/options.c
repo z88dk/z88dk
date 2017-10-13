@@ -1,5 +1,5 @@
 /*
-Z88DK Z80 Macro Assembler
+Z88DK Z80 Module Assembler
 
 Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
@@ -9,6 +9,8 @@ Parse command line options
 */
 
 #include "../config.h"
+#include "../portability.h"
+
 #include "errors.h"
 #include "fileutil.h"
 #include "hist.h"
@@ -21,6 +23,7 @@ Parse command line options
 #include "symtab.h"
 #include "utarray.h"
 #include "z80asm.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -69,6 +72,8 @@ static char *search_z80asm_lib();
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
+static void expand_source_glob(char *filename);
+static void expand_list_glob(char *filename);
 
 static char *expand_environment_variables(char *arg);
 static char *replace_str(const char *str, const char *old, const char *new);
@@ -292,52 +297,166 @@ static char *search_source(char *filename)
 
 static void process_file( char *filename )
 {
-	char *line;
-	char *lst_dirname;
-
-    strip( filename );
-
-    switch ( filename[0] )
-    {
+	strip(filename);
+	switch (filename[0])
+	{
 	case '-':		/* Illegal source file name */
 	case '+':
-		error_illegal_src_filename( filename );
-        break;
+		error_illegal_src_filename(filename);
+		break;
 
-    case '\0':		/* no file */
-        break;
+	case '\0':		/* no file */
+		break;
 
 	case '@':		/* file list */
 		filename++;						/* point to after '@' */
-		strip( filename );
-
-		/* loop on file to read each line and recurse */
-		src_push();
-		{
-			/* append the directoy of the list file to the include path	and remove it at the end */
-			lst_dirname = path_dirname(filename);
-			utarray_push_back(opts.inc_path, &lst_dirname);
-
-			if (src_open(filename, NULL))
-			{
-				while ((line = src_getline()) != NULL)
-					process_file(line);
-			}
-
-			/* finished assembly, remove dirname from include path */
-			utarray_pop_back(opts.inc_path);
-
-		}
-		src_pop();
+		strip(filename);
+		filename = expand_environment_variables(filename);
+		expand_list_glob(filename);
 		break;
 	case ';':     /* comment */
 	case '#':
 		break;
 	default:
 		filename = expand_environment_variables(filename);
-		filename = search_source(filename);
-		utarray_push_back(opts.files, &filename);
-    }
+		expand_source_glob(filename);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//	expand .../**/... into a list of all directories replacing **
+//	return just the input pattern if no ** is present
+//-----------------------------------------------------------------------------
+static void expand_star_star(char *filename, UT_array **plist)
+{
+	STR_DEFINE(path, STR_SIZE);
+	char *tail;
+
+	if ((tail = strstr(filename, "**")) == NULL) {
+		utarray_push_back(*plist, &filename);
+	}
+	else {
+		// expand first ** into list of all sub-directories
+		char *head = strdup(filename);			// alloc a copy to be modified
+		head[tail - filename + 1] = '\0';		// cut from second '*' of "**" onwards and expand one '*'
+
+		glob_t glob_dirs;						// find all directories that match head
+		int ret = glob(head, GLOB_NOESCAPE | GLOB_ONLYDIR, NULL, &glob_dirs);
+		if (ret == GLOB_NOMATCH) {
+			;									// no-match is OK - this directory is skipped
+		}
+		else if (ret == 0) {					// read list
+			for (int i = 0; i < glob_dirs.gl_pathc; i++) {
+				char *found = glob_dirs.gl_pathv[i];
+				if (dir_exists(found)) {
+					str_sprintf(path, "%s/%s", 
+						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
+					char *pattern = str_data(path);
+					utarray_push_back(*plist, &pattern);
+
+					str_sprintf(path, "%s/%s",
+						found, tail[0] == '/' ? tail + 1 : tail);	// reuse **/... from tail to recurse
+					expand_star_star(str_data(path), plist);		// recurse
+				}
+			}
+		}
+		else {									// error
+			error_glob(filename,
+				(ret == GLOB_ABORTED ? "filesystem problem" :
+					ret == GLOB_NOMATCH ? "no match of pattern" :
+					ret == GLOB_NOSPACE ? "no dynamic memory" :
+					"unknown problem"));
+		}
+		free(head);
+	}
+}
+
+static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
+{
+	int initial_len = utarray_len(*pfiles);
+	int ret;
+
+	// expand ** into list of all possible paths
+	UT_array *patterns;
+	utarray_new(patterns, &ut_str_icd);
+
+	expand_star_star(filename, &patterns);		// expand **
+
+	char **p = NULL;
+	while ((p = (char**)utarray_next(patterns, p))) {
+		char *pattern = *p;
+
+		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
+			// optimize if no pattern chars
+			char *found = search_source(pattern);
+			utarray_push_back(*pfiles, &found);
+		}
+		else {
+			glob_t glob_files;
+			ret = glob(pattern, GLOB_NOESCAPE, NULL, &glob_files);
+			if (ret == GLOB_NOMATCH) {				// no match - ignore
+				;
+			}
+			else if (ret == 0) {
+				for (int i = 0; i < glob_files.gl_pathc; i++) {
+					char *found = glob_files.gl_pathv[i];
+					if (file_exists(found))
+						utarray_push_back(*pfiles, &found);
+				}
+			}
+			else {
+				error_glob(filename,
+					(ret == GLOB_ABORTED ? "filesystem problem" :
+						ret == GLOB_NOMATCH ? "no match of pattern" :
+						ret == GLOB_NOSPACE ? "no dynamic memory" :
+						"unknown problem"));
+			}
+			globfree(&glob_files);
+		}
+	}
+
+	// error if pattern matched no file
+	if (strchr(filename, '*') || strchr(filename, '?')) {
+		if (initial_len == utarray_len(*pfiles))
+			error_glob_no_files(filename);
+	}
+
+	utarray_free(patterns);
+}
+
+void expand_source_glob(char *filename)
+{
+	expand_glob(filename, &opts.files, TRUE);
+}
+
+void expand_list_glob(char *filename)
+{
+	UT_array *files;
+	utarray_new(files, &ut_str_icd);
+
+	expand_glob(filename, &files, FALSE);
+	char **p = NULL;
+	while ((p = (char**)utarray_next(files, p))) {
+		char *filename = *p;
+		src_push();
+		{
+			char *line;
+
+			// append the directoy of the list file to the include path	and remove it at the end
+			char *lst_dirname = path_dirname(filename);
+			utarray_push_back(opts.inc_path, &lst_dirname);
+
+			if (src_open(filename, NULL)) {
+				while ((line = src_getline()) != NULL)
+					process_file(line);
+			}
+
+			// finished assembly, remove dirname from include path
+			utarray_pop_back(opts.inc_path);
+		}
+		src_pop();
+	}
+	utarray_free(files);
 }
 
 /*-----------------------------------------------------------------------------

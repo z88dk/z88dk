@@ -16,7 +16,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -Wno-overflow -otest test.c fileutil.c str.c alloc.c class.c list.c strpool.c dbg.c";
+my $compile = "gcc -Wall -I../../../ext/uthash/src -Wno-overflow -otest test.c fileutil.c str.c alloc.c class.c list.c strpool.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -103,8 +103,8 @@ int main()
 	T_BASENAME("\\a\\b\\c\\abc","abc");
 	
 	/* path_dirname */
-	T_DIRNAME("abc",			"");
-	T_DIRNAME("abc.zz",			"");
+	T_DIRNAME("abc",			".");
+	T_DIRNAME("abc.zz",			".");
 	T_DIRNAME("./abc",			"./");
 	T_DIRNAME(".\\abc",			".\\");
 	T_DIRNAME("/a/b/c/abc",		"/a/b/c/");
@@ -482,10 +482,10 @@ int main(int argc, char *argv[])
 					fputs("hello", file);	\
 					myfclose(file);
 					
-		case 'G':	T_TEMP_FILENAME("test.1.c",		"~$1$test.1.c");
-					T_TEMP_FILENAME("test.1.c",		"~$2$test.1.c");
-					T_TEMP_FILENAME("test.2.c",		"~$3$test.2.c");
-					T_TEMP_FILENAME("test.x1\\x.c",	"test.x1\\~$4$x.c");
+		case 'G':	T_TEMP_FILENAME("test.1.c",		"./~$1$test.1.c");
+					T_TEMP_FILENAME("test.1.c",		"./~$2$test.1.c");
+					T_TEMP_FILENAME("test.2.c",		"./~$3$test.2.c");
+					T_TEMP_FILENAME("test.x1\\x.c",	"test.x1\\/~$4$x.c");
 					break;
 
 		case 'H':	/* without existing target file */

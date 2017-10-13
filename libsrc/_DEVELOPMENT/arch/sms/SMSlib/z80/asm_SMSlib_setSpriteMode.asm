@@ -34,18 +34,18 @@ test_tallmode:
 spritemode_tall_on:
 
    call asm_SMSlib_VDPturnOnFeature
-   ld a,16
+   ld hl,$0210                 ; spritesTileOffset = $02, spritesHeight = $10
    
    jr spritemode_set_height
 
 spritemode_tall_off:
 
    call asm_SMSlib_VDPturnOffFeature
-   ld a,8
+   ld hl,$0108                 ; spritesTileOffset = $01, spritesHeight = $08
 
 spritemode_set_height:
 
-   ld (__SMSlib_spritesHeight),a
+   ld (__SMSlib_spritesHeight),hl  ; sets spritesHeight & spritesTileOffset
 
 test_zoomed:
 

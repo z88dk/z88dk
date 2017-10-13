@@ -3,6 +3,8 @@ arch/sms/SMSlib/c/sccz80/SMS_addSprite
 arch/sms/SMSlib/c/sccz80/SMS_addSprite_callee
 arch/sms/SMSlib/c/sccz80/SMS_addSpriteClipping
 arch/sms/SMSlib/c/sccz80/SMS_addSpriteClipping_callee
+arch/sms/SMSlib/c/sccz80/SMS_addTwoAdjoiningSprites
+arch/sms/SMSlib/c/sccz80/SMS_addTwoAdjoiningSprites_callee
 arch/sms/SMSlib/c/sccz80/SMS_copySpritestoSAT
 arch/sms/SMSlib/c/sccz80/SMS_finalizeSprites
 arch/sms/SMSlib/c/sccz80/SMS_getHCount

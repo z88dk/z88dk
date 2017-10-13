@@ -1,0 +1,175 @@
+
+* Formatting:
+	From MODEL4000, 0xfa43
+
+; FORMAT procedure: Write stuff to the SRAM
+; Do the actual formatting!
+fa43 cd337d    call    7d33h	; out port 0x03, 0x06
+fa46 cd487c    call    7c48h	; Keyboard checking and switching to other things
+
+fa49 cd3d7d    call    7d3dh		; out port (0x03), 0x80
+fa4c 203a      jr      nz,0fa88h	; end of this block
+
+; Write signature:
+; 8000: 0x55...
+fa4e 210080    ld      hl,8000h
+fa51 3e55      ld      a,55h
+fa53 77        ld      (hl),a
+fa54 be        cp      (hl)
+fa55 c0        ret     nz
+
+; 8001: ...0xAA... (complementary of 0x55)...
+fa56 23        inc     hl
+fa57 2f        cpl     
+fa58 77        ld      (hl),a
+fa59 be        cp      (hl)
+fa5a c0        ret     nz
+
+; 8002: ...0xEE...
+fa5b 23        inc     hl
+fa5c 36ee      ld      (hl),0eeh
+
+; 8006: 0xBB
+fa5e 210680    ld      hl,8006h
+fa61 36bb      ld      (hl),0bbh
+
+; 8007: 0x46
+fa63 23        inc     hl
+fa64 3646      ld      (hl),46h
+
+; Write FAT
+; 8006...: 7 times in a row: BB 46 45 48 4C 45 52 BC 00 (found at 0xfabe)
+;                        ==  0xbb "FEHLER" 0xbc 0x00
+fa66 110680    ld      de,8006h		; Destination start
+fa69 3e07      ld      a,07h		; Number of repititions
+fa6b 21be7a    ld      hl,7abeh		; Source of header bytes
+fa6e 010900    ld      bc,0009h		; Number of bytes: 9
+fa71 edb0      ldir    				; Copy
+fa73 3d        dec     a
+fa74 20f5      jr      nz,0fa6bh	; Repeat it 7 times!
+fa76 215080    ld      hl,8050h
+
+; 8048: 0x70
+fa79 3e70      ld      a,70h
+fa7b 324880    ld      (8048h),a
+fa7e af        xor     a
+fa7f 010010    ld      bc,1000h
+
+; Fill main area with zeros
+; 8050: 0x00
+fa82 77        ld      (hl),a
+fa83 e5        push    hl
+fa84 d1        pop     de
+
+; 8050: 0x1000 bytes of 0x00 (hack: A 0x00 is written, then it is copied via ldir where dst=src+1)
+fa85 13        inc     de
+fa86 edb0      ldir    			; Fill it with 0x1000 zeros
+
+fa88 cdc77a    call    7ac7h	; Update SRAM header?
+fa8b cd337d    call    7d33h	; out (0x03), 0x06
+fa8e af        xor     a
+fa8f 3e01      ld      a,01h
+fa91 c9        ret     
+
+
+
+fa92 77        ld      (hl),a
+fa93 be        cp      (hl)
+fa94 28b8      jr      z,0fa4eh
+fa96 3e01      ld      a,01h
+fa98 c9        ret     
+
+; Strings "DATENFEHLER,DISK.FORMATIEREN (J/N)? ."
+	fa99 44        ld      b,h
+	fa9a 41        ld      b,c
+	fa9b 54        ld      d,h
+	fa9c 45        ld      b,l
+	fa9d 4e        ld      c,(hl)
+	fa9e 46        ld      b,(hl)
+	fa9f 45        ld      b,l
+	faa0 48        ld      c,b
+	faa1 4c        ld      c,h
+	faa2 45        ld      b,l
+	faa3 52        ld      d,d
+	faa4 2c        inc     l
+	faa5 44        ld      b,h
+	faa6 49        ld      c,c
+	faa7 53        ld      d,e
+	faa8 4b        ld      c,e
+	faa9 0d        dec     c
+	
+	faaa 46        ld      b,(hl)
+	faab 4f        ld      c,a
+	faac 52        ld      d,d
+	faad 4d        ld      c,l
+	faae 41        ld      b,c
+	faaf 54        ld      d,h
+	fab0 49        ld      c,c
+	fab1 45        ld      b,l
+	fab2 52        ld      d,d
+	fab3 45        ld      b,l
+	fab4 4e        ld      c,(hl)
+	fab5 2028      jr      nz,0fadfh
+	fab7 4a        ld      c,d
+	fab8 2f        cpl     
+	fab9 4e        ld      c,(hl)
+	faba 29        add     hl,hl
+	fabb 3f        ccf     
+	fabc 200d      jr      nz,0facbh
+
+; Signature to write to SRAM when formatting:
+	fabe bb        cp      e
+	fabf 46        ld      b,(hl)
+	fac0 45        ld      b,l
+	fac1 48        ld      c,b
+	fac2 4c        ld      c,h
+	fac3 45        ld      b,l
+	fac4 52        ld      d,d
+	fac5 bc        cp      h
+	fac6 00        nop     
+
+; Update SRAM header? Update FAT?
+fac7 3e81      ld      a,81h
+fac9 d303      out     (03h),a
+facb dd210080  ld      ix,8000h		; This is  ROM/SRAM cartridge address
+facf af        xor     a
+fad0 3200d7    ld      (0d700h),a
+fad3 01ff3f    ld      bc,3fffh
+fad6 210000    ld      hl,0000h
+fad9 1600      ld      d,00h
+fadb cd077b    call    7b07h		; Shuffle around some variables, inc ix, ...
+fade cd3d7d    call    7d3dh		; out port (0x03), 0x80
+
+fae1 dd210680  ld      ix,8006h
+fae5 01f03f    ld      bc,3ff0h
+fae8 cd077b    call    7b07h
+faeb eb        ex      de,hl
+faec 3a00d7    ld      a,(0d700h)
+faef 210380    ld      hl,8003h
+faf2 be        cp      (hl)
+faf3 77        ld      (hl),a
+faf4 200c      jr      nz,0fb02h
+faf6 2a0480    ld      hl,(8004h)
+faf9 d5        push    de
+fafa af        xor     a
+fafb ed52      sbc     hl,de
+fafd e1        pop     hl
+fafe 220480    ld      (8004h),hl
+fb01 c9        ret     
+
+fb02 ed530480  ld      (8004h),de
+fb06 c9        ret     
+
+; Called several times
+fb07 dd5e00    ld      e,(ix+00h)
+fb0a 19        add     hl,de
+fb0b dd23      inc     ix
+fb0d 3007      jr      nc,0fb16h
+fb0f 3a00d7    ld      a,(0d700h)
+fb12 3c        inc     a
+fb13 3200d7    ld      (0d700h),a
+fb16 0d        dec     c
+fb17 20ee      jr      nz,0fb07h
+fb19 05        dec     b
+fb1a 20eb      jr      nz,0fb07h
+fb1c c9        ret     

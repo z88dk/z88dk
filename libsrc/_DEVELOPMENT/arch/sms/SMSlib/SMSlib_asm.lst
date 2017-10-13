@@ -6,6 +6,7 @@ arch/sms/SMSlib/z80/_SMS_crt0_RST08
 arch/sms/SMSlib/z80/_SMS_crt0_RST18
 arch/sms/SMSlib/z80/asm_SMSlib_addSprite
 arch/sms/SMSlib/z80/asm_SMSlib_addSpriteClipping
+arch/sms/SMSlib/z80/asm_SMSlib_addTwoAdjoiningSprites
 arch/sms/SMSlib/z80/asm_SMSlib_copySpritestoSAT
 arch/sms/SMSlib/z80/asm_SMSlib_detect_VDP_type
 arch/sms/SMSlib/z80/asm_SMSlib_finalizeSprites

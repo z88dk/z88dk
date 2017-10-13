@@ -193,7 +193,7 @@ ENDIF
 
 
 HRG_outloop1:
-        call    (HRG_LineStart + $8000)
+        call    HRG_LineStart+$8000
         nop                     ; 159 t states so far (138 from 1st buffer) timing
         dec     c               ;
         jp      z,HRG_outloop2
@@ -210,7 +210,7 @@ HRG_outloop2:                   ; this route is taken if 8 scanlines have been c
         ld      a,i
         
 HRG_outloop3:                             ; start of the second inner loop
-        call    (HRG_LineStart2 + $8000)  ; fire the second "character row"
+        call    HRG_LineStart2+$8000      ; fire the second "character row"
         dec     c                         ; 159 t states (138 from 2nd buffer)
         jp      z,HRG_outloop4
         ld      a,i             ; this way if not 8 scanlines

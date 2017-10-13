@@ -301,15 +301,28 @@ skip_bs:
 
 escaped_char:
 
-   ; append char to edit buffer
-
    ; a = char
    ; stack = & FDSTRUCT.b_array
-   
-   pop hl
-   push hl
+
+   ; first check if char is rejected by driver
    
    ld c,a
+   push bc
+   
+   ld a,ITERM_MSG_REJECT
+   call l_jpix
+   
+   pop bc
+   jr nc, bell                 ; if terminal rejected the char
+
+   ; append char to edit buffer
+   
+   ; c = char
+   ; stack = & FDSTRUCT.b_array
+
+   pop hl
+   push hl
+
    call asm_b_array_push_back  ; append char to edit buffer
    
    jr c, bell                  ; if failed because buffer is full

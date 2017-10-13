@@ -73,8 +73,7 @@ define(`__IO_I2C_CON_MODE',  0x01)              # Mode, 1 = buffered, 0 = byte
 
 # Bits in I2C_CON Echo, for CPU control
 
-define(`__IO_I2C_CON_ECHO_BUS_STOP',  0x10)     # We are finished the sentence
-define(`__IO_I2C_CON_ECHO_SI',  0x08)           # Serial Interrupt Received
+define(`__IO_I2C_CON_ECHO_BUS_STOPPED',  0x10)  # We are finished the sentence
 define(`__IO_I2C_CON_ECHO_BUS_RESTART',  0x04)  # Bus Restart Requested
 define(`__IO_I2C_CON_ECHO_BUS_ILLEGAL',  0x02)  # Unexpected Bus Response
 
@@ -162,8 +161,7 @@ PUBLIC `__IO_I2C_CON_STO'
 PUBLIC `__IO_I2C_CON_SI'
 PUBLIC `__IO_I2C_CON_MODE'
 
-PUBLIC `__IO_I2C_CON_ECHO_BUS_STOP'
-PUBLIC `__IO_I2C_CON_ECHO_SI'
+PUBLIC `__IO_I2C_CON_ECHO_BUS_STOPPED'
 PUBLIC `__IO_I2C_CON_ECHO_BUS_RESTART'
 PUBLIC `__IO_I2C_CON_ECHO_BUS_ILLEGAL'
 
@@ -239,8 +237,7 @@ defc `__IO_I2C_CON_STO' = __IO_I2C_CON_STO
 defc `__IO_I2C_CON_SI' = __IO_I2C_CON_SI
 defc `__IO_I2C_CON_MODE' = __IO_I2C_CON_MODE
 
-defc `__IO_I2C_CON_ECHO_BUS_STOP' = __IO_I2C_CON_ECHO_BUS_STOP
-defc `__IO_I2C_CON_ECHO_SI' = __IO_I2C_CON_ECHO_SI
+defc `__IO_I2C_CON_ECHO_BUS_STOPPED' = __IO_I2C_CON_ECHO_BUS_STOPPED
 defc `__IO_I2C_CON_ECHO_BUS_RESTART' = __IO_I2C_CON_ECHO_BUS_RESTART
 defc `__IO_I2C_CON_ECHO_BUS_ILLEGAL' = __IO_I2C_CON_ECHO_BUS_ILLEGAL
 
@@ -365,8 +362,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_I2C_CON_SI'  __IO_I2C_CON_SI
 `#define' `__IO_I2C_CON_MODE'  __IO_I2C_CON_MODE
 
-`#define' `__IO_I2C_CON_ECHO_BUS_STOP'  __IO_I2C_CON_ECHO_BUS_STOP
-`#define' `__IO_I2C_CON_ECHO_SI'  __IO_I2C_CON_ECHO_SI
+`#define' `__IO_I2C_CON_ECHO_BUS_STOPPED'  __IO_I2C_CON_ECHO_BUS_STOPPED
 `#define' `__IO_I2C_CON_ECHO_BUS_RESTART'  __IO_I2C_CON_ECHO_BUS_RESTART
 `#define' `__IO_I2C_CON_ECHO_BUS_ILLEGAL'  __IO_I2C_CON_ECHO_BUS_ILLEGAL
 

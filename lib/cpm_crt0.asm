@@ -18,7 +18,7 @@
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
-;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on the TIKI-100 and Spectrum +3)
+;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on TIKI-100, Einstein, and Spectrum +3)
 ;
 ;	These can cut down the size of the resultant executable
 
@@ -160,6 +160,8 @@ l_dcal:	jp	(hl)		;Used for call by function ptr
 
 ; Memory banking for Spectrum +3
 IF (startup=3)
+		PUBLIC	pixelbyte
+pixelbyte:	defb	0		; temp byte storage for VDP driver
 
 p3_poke:
 		jp 0
@@ -244,11 +246,9 @@ _vdcDispMem:				; Label used by "c128cpm.lib" only
 end:		defb	0		; null file name
 IF !DEFINED_nogfxglobals
 		PUBLIC	RG0SAV
-		PUBLIC	pixelbyte
 RG0SAV:		defb	1*8		; VDP graphics driver (Einstein)
 							; Also used to remember the border color for the ZX Spectrum +3 
 							; in CP/M mode (Blue is default)
-pixelbyte:	defb	0		; temp byte storage for VDP driver
 ENDIF
 
 
