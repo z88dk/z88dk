@@ -197,7 +197,7 @@ PUBLIC console_01_input_terminal
 
 EXTERN STDIO_MSG_GETC, STDIO_MSG_EATC, STDIO_MSG_READ
 EXTERN STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_ICTL
-EXTERN STDIO_MSG_CLOS, ITERM_MSG_INTERRUPT
+EXTERN STDIO_MSG_CLOS, ITERM_MSG_INTERRUPT, ITERM_MSG_REJECT
 
 EXTERN console_01_input_stdio_msg_getc, console_01_input_stdio_msg_eatc
 EXTERN console_01_input_stdio_msg_read, console_01_input_stdio_msg_seek
@@ -208,7 +208,10 @@ console_01_input_terminal:
 
    cp STDIO_MSG_GETC
    jp z, console_01_input_stdio_msg_getc
-   
+
+   cp ITERM_MSG_REJECT
+   jp z, error_zc              ; typed characters are always accepted
+
    cp ITERM_MSG_INTERRUPT
    jp z, error_zc              ; line editing is not interrupted
    
