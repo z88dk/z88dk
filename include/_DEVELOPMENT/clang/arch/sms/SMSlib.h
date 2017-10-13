@@ -193,6 +193,9 @@ extern void _RST18_SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,
 extern void SMS_initSprites(void);
 
 
+extern void SMS_addTwoAdjoiningSprites(unsigned char x,unsigned char y,unsigned char tile);
+
+
 // returns -1 if no more sprites are available
 extern signed char SMS_addSprite(unsigned char x,unsigned char y,unsigned char tile);
 

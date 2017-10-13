@@ -161,6 +161,7 @@ extern void _RST18_SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,
 /** FUNCTIONS FOR SPRITE HANDLING */
 
 __OPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,SMS_initSprites,void)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,SMS_addTwoAdjoiningSprites,unsigned char x,unsigned char y,unsigned char tile)
 // returns -1 if no more sprites are available
 __DPROTO(`iyl,iyh',`iyl,iyh',signed char,,SMS_addSprite,unsigned char x,unsigned char y,unsigned char tile)
 __OPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',signed char,,SMS_reserveSprite,void)

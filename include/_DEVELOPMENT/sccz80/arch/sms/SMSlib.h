@@ -201,6 +201,11 @@ extern void _RST18_SMS_crt0_RST18(unsigned int addr) __preserves_regs(b,c,d,e,h,
 extern void __LIB__ SMS_initSprites(void) __smallc;
 
 
+extern void __LIB__ SMS_addTwoAdjoiningSprites(unsigned char x,unsigned char y,unsigned char tile) __smallc;
+extern void __LIB__ SMS_addTwoAdjoiningSprites_callee(unsigned char x,unsigned char y,unsigned char tile) __smallc __z88dk_callee;
+#define SMS_addTwoAdjoiningSprites(a,b,c) SMS_addTwoAdjoiningSprites_callee(a,b,c)
+
+
 // returns -1 if no more sprites are available
 extern signed char __LIB__ SMS_addSprite(unsigned char x,unsigned char y,unsigned char tile) __smallc;
 extern signed char __LIB__ SMS_addSprite_callee(unsigned char x,unsigned char y,unsigned char tile) __smallc __z88dk_callee;
