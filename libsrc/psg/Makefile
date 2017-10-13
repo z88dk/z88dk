@@ -43,6 +43,7 @@ clean:
 	$(RM) -f aquarius/*.o
 	$(RM) -f c128/*.o
 	$(RM) -f cpc/*.o
+	$(RM) -f einstein/*.o
 	$(RM) -f mc1000/*.o
 	$(RM) -f msx/*.o
 	$(RM) -f pc6001/*.o
