@@ -20,32 +20,32 @@
 	call	getk
 	ld	a,l
 	ld	l,0
-	cp	' '
+	cp	'm'
 	jr	nz,no_fire1_a
 	set	4,l
 	jr	j_done
 .no_fire1_a
-	cp	'1'
+	cp	'n'
 	jr	nz,no_fire2_a
 	set	5,l
 	jr	j_done
 .no_fire2_a
-	cp	9
+	cp	'q'
 	jr	nz,no_up_a
 	set	3,l
 	jr	j_done
 .no_up_a
-	cp	10
+	cp	'a'
 	jr	nz,no_down_a
 	set	2,l
 	jr	j_done
 .no_down_a
-	cp	8
+	cp	'o'
 	jr	nz,no_left_a
 	set	1,l
 	jr	j_done
 .no_left_a
-	cp	7
+	cp	'p'
 	jr	nz,no_right_a
 	set	0,l
 .no_right_a
