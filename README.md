@@ -45,7 +45,7 @@ There are three ways to install z88dk.
 2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and generate source packages for everyone else.  The same [installation instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
 3. Use Github.  Using github will keep you up-to-date with the developers and will allow you to contribute to the project.  We do not store the z80 libraries or the binaries in the github repository.  Instead you will either have to build those things yourself or acquire them from the nightly build to have a working install.
 
-The z88dk uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`
+The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`
 
 
    1. **Installing the Z88DK Binaries**   
