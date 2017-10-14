@@ -452,7 +452,9 @@ void offset_of(LVALUE *lval)
                 SYMBOL *ptr;
                 
                 if (((ptr = findloc(struct_name)) != NULL) || ((ptr = findstc(struct_name)) != NULL) || ((ptr = findglb(struct_name)) != NULL)) {
-                    if ( ptr->ctype->kind == KIND_STRUCT ) {
+                    if ( ispointer(ptr->ctype) && ptr->ctype->ptr->kind == KIND_STRUCT ) {
+                        tag = ptr->ctype->ptr->tag;
+                    } else if ( ptr->ctype->kind == KIND_STRUCT ) {
                         tag = ptr->ctype->tag;
                     } else {
                         printf("%d\n",ptr->type);
@@ -472,6 +474,7 @@ void offset_of(LVALUE *lval)
     needchar(')');
     if ( foundit ) {
         lval->is_const = 1;
+        lval->ltype = type_int;
         lval->val_type = KIND_INT;
         vconst(lval->const_val);
     } else {
