@@ -236,7 +236,6 @@ static Type *parse_enum(Type *type)
         needchar('{');
         do {
             Type *elem;
-            SYMBOL *sym;
 
             if (symname(sname) == 0)
                 illname(sname);
@@ -674,6 +673,7 @@ int declare_local(int local_static)
 {
     Type *type;
     Type *base_type = NULL;
+    SYMBOL *sym;
 
     do {
         type = dodeclare2(&base_type);
@@ -683,16 +683,55 @@ int declare_local(int local_static)
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
-            SYMBOL *ptr = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC, 0, 0);
-            ptr->ctype = type;
+            sym = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC, 0, 0);
+            sym->ctype = type;
             // TODO initialisation
         } else {
-            SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
-            ptr->ctype = type;
+            sym = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            sym->ctype = type;
             declared += type->size;
-            ptr->offset.i = Zsp - declared;
+            sym->offset.i = Zsp - declared;
             // TODO: Initialisation
         }
+
+        if ( cmatch('=')) {
+            if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
+                // Call static initialiser and copy onto stack
+            } else {
+                Kind expr;
+                Type *expr_type;
+                char *before, *start;
+                int   vconst;
+                double val;
+
+                Zsp = modstk(Zsp - (declared - type->size), NO, NO);
+                declared = 0;
+                setstage(&before, &start);
+                expr = expression(&vconst, &val, &expr_type);
+                
+                if ( vconst && expr != type->kind ) {
+                    // It's a constant that doesn't match the right type
+                    LVALUE  lval={0};
+                    clearstage(before, 0);
+                    if ( expr == KIND_DOUBLE ) {
+                        decrement_double_ref_direct(val);
+                    }
+                    lval.ltype = type;
+                    lval.val_type = type->kind;
+                    lval.const_val = val;
+                    load_constant(&lval);
+                } else {
+                    clearstage(before, start);
+                    //conv type
+                    force(type->kind, expr, 0, 0, 0);
+                }
+                sym->isassigned = YES;
+                StoreTOS(type->kind);
+            }
+        }
+
+
+
     } while ( cmatch(','));
     return 1;
 }
@@ -700,6 +739,7 @@ int declare_local(int local_static)
 Type *dodeclare(enum storage_type storage)
 {
     Type  *base_type = NULL;
+    SYMBOL *sym;
 
     while ( 1 ) {
         Type *type = dodeclare2(&base_type);
@@ -707,28 +747,26 @@ Type *dodeclare(enum storage_type storage)
         if ( type == NULL ) {
             break;
         }
-        if ( cmatch(';')) {
-            if ( storage == STKLOC ) {
-                SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
-                ptr->ctype = type;
-            } else {
-                SYMBOL *ptr = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
-                ptr->ctype = type;
-            }
-            return type;
-        } else if ( storage != STKLOC && rcmatch('{')) {   
+        blanks();
+
+        if ( storage == STKLOC ) {
+            sym = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            sym->ctype = type;
+        } else if ( type->kind != KIND_STRUCT ) {
+            sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+            sym->ctype = type;
+        }
+        blanks();
+
+        if ( storage != STKLOC && rcmatch('{')) {
             declfunc(type, storage);
             return type;
+        } else  if ( cmatch(';')) {
+            return type;
         } else if ( cmatch(',')) {
-            if ( storage == STKLOC ) {
-                SYMBOL *ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
-                ptr->ctype = type;
-            } else {
-                SYMBOL *ptr = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
-                ptr->ctype = type;
-            }
-            // We have another variable of same base type */
-        } else {
+            continue;
+        } else if ( cmatch('=')) {
+            
             return type;
         }
     }
@@ -823,9 +861,7 @@ Type *dodeclare2(Type **base_type)
         return type;
     }
 
-    if ( type->kind == KIND_STRUCT && rcmatch(';')) {
-        needchar(';');
-        
+    if ( type->kind == KIND_STRUCT && rcmatch(';')) {        
         return type;
     }
 
