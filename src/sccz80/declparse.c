@@ -692,41 +692,40 @@ int declare_local(int local_static)
             declared += type->size;
             sym->offset.i = Zsp - declared;
             // TODO: Initialisation
-        }
-
-        if ( cmatch('=')) {
-            if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
-                // Call static initialiser and copy onto stack
-            } else {
-                Kind expr;
-                Type *expr_type;
-                char *before, *start;
-                int   vconst;
-                double val;
-
-                Zsp = modstk(Zsp - (declared - type->size), NO, NO);
-                declared = 0;
-                setstage(&before, &start);
-                expr = expression(&vconst, &val, &expr_type);
-                
-                if ( vconst && expr != type->kind ) {
-                    // It's a constant that doesn't match the right type
-                    LVALUE  lval={0};
-                    clearstage(before, 0);
-                    if ( expr == KIND_DOUBLE ) {
-                        decrement_double_ref_direct(val);
-                    }
-                    lval.ltype = type;
-                    lval.val_type = type->kind;
-                    lval.const_val = val;
-                    load_constant(&lval);
+            if ( cmatch('=')) {
+                if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
+                    // Call static initialiser and copy onto stack
                 } else {
-                    clearstage(before, start);
-                    //conv type
-                    force(type->kind, expr, 0, 0, 0);
+                    Kind expr;
+                    Type *expr_type;
+                    char *before, *start;
+                    int   vconst;
+                    double val;
+
+                    Zsp = modstk(Zsp - (declared - type->size), NO, NO);
+                    declared = 0;
+                    setstage(&before, &start);
+                    expr = expression(&vconst, &val, &expr_type);
+                    
+                    if ( vconst && expr != type->kind ) {
+                        // It's a constant that doesn't match the right type
+                        LVALUE  lval={0};
+                        clearstage(before, 0);
+                        if ( expr == KIND_DOUBLE ) {
+                            decrement_double_ref_direct(val);
+                        }
+                        lval.ltype = type;
+                        lval.val_type = type->kind;
+                        lval.const_val = val;
+                        load_constant(&lval);
+                    } else {
+                        clearstage(before, start);
+                        //conv type
+                        force(type->kind, expr, 0, 0, 0);
+                    }
+                    sym->isassigned = YES;
+                    StoreTOS(type->kind);
                 }
-                sym->isassigned = YES;
-                StoreTOS(type->kind);
             }
         }
 
