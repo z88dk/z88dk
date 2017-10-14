@@ -207,6 +207,10 @@ Type *make_array(Type *base_type,int32_t len)
     return type;
 }
 
+int ispointer(Type *type)
+{
+    return type->kind == KIND_PTR || type->kind == KIND_CPTR;
+}
 
 
 static Type *parse_enum(Type *type)

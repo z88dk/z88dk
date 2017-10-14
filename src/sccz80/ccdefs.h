@@ -64,6 +64,7 @@ extern Type      *make_pointer(Type *base_type);
 extern Type      *dodeclare(enum storage_type storage);
 extern int        declare_local(int local_static);
 extern void       declare_func_kr();
+extern int        ispointer(Type *type);
 
 #include "error.h"
 #include "expr.h"
