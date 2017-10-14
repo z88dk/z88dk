@@ -498,6 +498,8 @@ void size_of(LVALUE* lval)
     while ( cmatch('*') ) {
         deref++;
     }
+    lval->ltype = type_int;
+
     if ( (type = parse_expr_type()) != NULL ) {
         if ( deref && type->kind != KIND_PTR ) {
             error(E_SIZEOF,"");
@@ -507,8 +509,7 @@ void size_of(LVALUE* lval)
         while ( deref && type ) {
             Type *next = type->ptr;
 
-            FREENULL(type);
-
+            free_type(type);
             type = next;
             deref--;
         }
@@ -536,17 +537,13 @@ void size_of(LVALUE* lval)
 
 
             type = ptr->ctype;
+            lval->const_val = type->size;
+
+            printf("Default size is %f kind %d\n",lval->const_val,type->kind);
 
             if (type->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
                 if (type->kind != KIND_STRUCT) {
-                    if ( (type->kind == KIND_PTR || type->kind == KIND_CPTR) && deref ) {
-                        ptrtype = type->ptr->kind;
-                       // ptrflags = ptr->flags;
-                        if ( type->ptr->kind == KIND_STRUCT ) 
-                            ptrotag = type->ptr->tag;
-                    } else {
-                        lval->const_val = ptr->size;
-                    }
+
                 } else {
                     Type *mptr;
 
@@ -567,7 +564,7 @@ void size_of(LVALUE* lval)
                                 lval->const_val = mptr->size;
                             }
                         } else {
-                            lval->const_val = ptr->size;
+                            lval->const_val = type->size;
                         }
                     } while ( mptr->kind == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
@@ -581,29 +578,13 @@ void size_of(LVALUE* lval)
                         needchar(']');
                         deref++;
                         lval->const_val = type->size / type->len;
-//                        lval->const_val = get_type_size(ptr->type, ID_VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
                     }
-//                     if ( deref ) {
-//                         if ( deref == 1 ) {
-//                             ptrtype = ptr->kind;
-//                             ptrotag = ptr-tagtab + ptr->tag_idx;
-//                         } else {
-//                             ptrtype = dummy_sym[(int)ptr->more]->type;
-//                             ptrotag = tagtab + dummy_sym[(int)ptr->more]->tag_idx;
-//                         }
-//                         ptrflags = ptr->flags;
-//                     }
-//                 }
-//                 if ( deref > 0 ) {
-//                     if ( ptrtype != -1 ) {
-// //                        lval->const_val = get_type_size(ptrtype, ID_VARIABLE, ptrflags, ptrotag);
-//                     } else {
-//                         // uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
-//                         // char       got[256];
-
-//                         // ExpandArgValue(argvalue, got, ptr->tag_idx);
-//                         // error(E_SIZEOF,got);
-//                    }
+                }
+                if ( deref ) {
+                    while ( deref && type ) {
+                        lval->const_val = type->size;
+                        type = type->ptr;                            
+                    }
                 }
             } else {
                 lval->const_val = 2;
