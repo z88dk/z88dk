@@ -193,7 +193,7 @@ void trailer(void)
 /* Print out a name such that it won't annoy the assembler
  *      (by matching anything reserved, like opcodes.)
  */
-void outname(char* sname, char pref)
+void outname(const char* sname, char pref)
 {
     if (pref) {
         outstr(Z80ASM_PREFIX);
@@ -2983,9 +2983,9 @@ void output_section(char* section_name)
         return;
     }
     if (ISASM(ASM_ASXX)) {
-        outfmt("\t.area\t%s\n\n", section_name);
+        outfmt("\t.area\t%s\n", section_name);
     } else if (ISASM(ASM_Z80ASM)) {
-        outfmt("\tSECTION\t%s\n\n", section_name);
+        outfmt("\tSECTION\t%s\n", section_name);
     } else if (ISASM(ASM_VASM)) {
         outfmt("\tSECTION\t%s\n", section_name);
     } else if (ISASM(ASM_GNU)) {

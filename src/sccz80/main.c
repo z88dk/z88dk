@@ -623,7 +623,6 @@ void dumplits(
         }
         //output_section(c_code_section); // output_section("code");
     }
-    nl();
 }
 
 /*

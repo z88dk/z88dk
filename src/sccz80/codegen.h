@@ -3,7 +3,7 @@ extern void comment(void);
 extern void header(void);
 extern void DoLibHeader(void);
 extern void trailer(void);
-extern void outname(char *sname, char pref);
+extern void outname(const char *sname, char pref);
 extern void getmem(SYMBOL *sym);
 extern void StoreTOS(char);
 extern int getloc(SYMBOL *sym, int off);

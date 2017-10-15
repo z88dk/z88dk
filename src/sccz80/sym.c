@@ -49,7 +49,7 @@ SYMBOL* findenum(char* sname)
 }
 
 
-SYMBOL* findglb(char* sname)
+SYMBOL* findglb(const char* sname)
 {
     SYMBOL *ptr;
 

@@ -685,16 +685,33 @@ int declare_local(int local_static)
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
             sym = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC, 0, 0);
             sym->ctype = type;
-            // TODO initialisation
+            if ( cmatch('=')) {
+                sym->isassigned = 1;
+                sym->storage = STATIC_INITIALISED;
+                initials(namebuf, type);                
+            }
         } else {
             sym = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
             sym->ctype = type;
             declared += type->size;
             sym->offset.i = Zsp - declared;
-            // TODO: Initialisation
             if ( cmatch('=')) {
+                sym->isassigned = 1;
                 if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
+                    char newname[NAMESIZE + 20];
+
+                    snprintf(newname, sizeof(newname),"auto_%s_%s",currfn->name, sym->name);
+                    int alloc_size = initials(newname, type);
+                    
+                    declared += (alloc_size - type->size);
+                    if ( type->kind == KIND_ARRAY ) {
+                        sym->offset.i -= (alloc_size - type->size);
+                        sym->size += (alloc_size - type->size);
+                    }
+                    Zsp = modstk(Zsp - declared, NO, NO);
+                    declared = 0;
+                    copy_to_stack(newname, 0, alloc_size);
                 } else {
                     Kind expr;
                     Type *expr_type;
@@ -723,15 +740,12 @@ int declare_local(int local_static)
                         //conv type
                         force(type->kind, expr, 0, 0, 0);
                     }
-                    sym->isassigned = YES;
                     StoreTOS(type->kind);
                 }
             }
         }
-
-
-
     } while ( cmatch(','));
+    printf("Return %s\n",line+lptr);
     return 1;
 }
 
@@ -765,7 +779,7 @@ Type *dodeclare(enum storage_type storage)
         } else if ( cmatch(',')) {
             continue;
         } else if ( cmatch('=')) {
-            
+            initials(type->name, type);
             return type;
         }
     }

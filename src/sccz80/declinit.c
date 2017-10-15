@@ -16,8 +16,8 @@
 #include "ccdefs.h"
 
 static void output_double_string_load(double value);
-static void init(Type *type, int dump);
-static void agg_init(Type *type);
+static int init(Type *type, int dump);
+static int agg_init(Type *type);
 
 
 
@@ -25,119 +25,102 @@ static void agg_init(Type *type);
 /*
  * initialise global object
  */
-int initials(Type *type)
-
-// char* sname,
-//     int type, enum ident_type ident, int dim, int more,
-//     TAG_SYMBOL* tag, char zfar, char isconst)
+int initials(const char *dropname, Type *type)
 {
-    int size, desize = 0;
-    if (cmatch('=')) {
-        /* initialiser present */
-        defstatic = 1; /* So no 2nd redefine djm */
-        gltptr = 0;
-        glblab = getlabel();
+    int desize = 0;
+    gltptr = 0;
+    glblab = getlabel();
 
 
-        // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
-        if ( type->isconst && !c_double_strings )  {
-            output_section(c_rodata_section);
-        } else {
-            output_section(c_data_section); // output_section("text");
-        }
-        prefix();
-        outname(type->name, YES);
-        col();
-        nl();
-
-        if (cmatch('{')) {
-            if ( type->kind == KIND_STRUCT || ( type->kind == KIND_PTR && type->ptr->kind == KIND_STRUCT)) {
-                if ( type->kind == KIND_PTR ) {
-                    point();
-                }
-                str_init(type->kind == KIND_STRUCT ? type : type->ptr);
-            } else {
-                // Aggregate initialiser
-                agg_init(type);
-            }
-            needchar('}');
-        } else {
-            // Initialise a single one
-            init(type, 1);
-        }
-
-        /* dump literal queue and fill tail of array with zeros */
-        // if ((ident == ID_ARRAY && more == KIND_CHAR) || type == KIND_STRUCT) {
-        //     if (type == KIND_STRUCT) {
-        //         dumpzero(tag->size, dim);
-        //         desize = dim < 0 ? abs(dim + 1) * tag->size : olddim * tag->size;
-        //     } else { /* Handles unsized arrays of chars */
-        //         dumpzero(size, dim);
-        //         dim = dim < 0 ? abs(dim + 1) : olddim;
-        //         cscale(type, tag, &dim);
-        //         desize = dim;
-        //     }
-        //     dumplits(0, YES, gltptr, glblab, glbq);
-        // } else {
-        //     if (!(ident == POINTER && type == KIND_CHAR)) {
-        //         dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
-        //         if (type != KIND_CHAR) /* Already dumped by init? */
-        //             desize = dumpzero(size, dim);
-        //         dim = dim < 0 ? abs(dim + 1) : olddim;
-        //         cscale(type, tag, &dim);
-        //         desize = dim;            
-        //     }
-        // }
-        output_section(c_code_section); 
+    // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
+    if ( type->isconst && !c_double_strings )  {
+        output_section(c_rodata_section);
     } else {
-        // char *dosign, *typ;
-        // dosign = "";
-        // if (ident == ID_ARRAY && (dim == 0)) {
-        //     typ = ExpandType(more, &dosign, (tag - tagtab));
-        //     warning(W_NULLARRAY, dosign, typ);
-        // }
-        // /* no initialiser present, let loader insert zero */
-        // if (ident == POINTER)
-        //     type = (zfar ? KIND_CPTR : KIND_INT);
-        // cscale(type, tag, &dim);
-        // desize = dim;
+        output_section(c_data_section); // output_section("text");
     }
+    prefix();
+    outname(dropname, YES);
+    col();
+    nl();
+
+    if (cmatch('{')) {
+        if ( type->kind == KIND_STRUCT || ( type->kind == KIND_PTR && type->ptr->kind == KIND_STRUCT)) {
+            if ( type->kind == KIND_PTR ) {
+                point();
+            }
+            desize = str_init(type->kind == KIND_STRUCT ? type->tag : type->ptr);
+        } else {
+            // Aggregate initialiser
+            desize = agg_init(type);
+        }
+        needchar('}');
+    } else {
+        // Initialise a single one
+        desize = init(type, 1);
+    }
+
+    /* dump literal queue and fill tail of array with zeros */
+    // if ((ident == ID_ARRAY && more == KIND_CHAR) || type == KIND_STRUCT) {
+    //     if (type == KIND_STRUCT) {
+    //         dumpzero(tag->size, dim);
+    //         desize = dim < 0 ? abs(dim + 1) * tag->size : olddim * tag->size;
+    //     } else { /* Handles unsized arrays of chars */
+    //         dumpzero(size, dim);
+    //         dim = dim < 0 ? abs(dim + 1) : olddim;
+    //         cscale(type, tag, &dim);
+    //         desize = dim;
+    //     }
+    //     dumplits(0, YES, gltptr, glblab, glbq);
+    // } else {
+    //     if (!(ident == POINTER && type == KIND_CHAR)) {
+    //         dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
+    //         if (type != KIND_CHAR) /* Already dumped by init? */
+    //             desize = dumpzero(size, dim);
+    //         dim = dim < 0 ? abs(dim + 1) : olddim;
+    //         cscale(type, tag, &dim);
+    //         desize = dim;            
+    //     }
+    // }
+    output_section(c_code_section); 
+
     return (desize);
 }
 
 /*
  * initialise structure (also called by init())
+ * 
+ * Pads out to the size of the structure
  */
 int str_init(Type *tag)
 {
-    int dim, flag;
-    int sz, usz, numelements = 0;
+    int sz = 0;
     Type   *ptr;
-    int nodata = NO;
     int     i;
 
     for ( i = 0; i < array_len(tag->fields); i++ ) {
+        if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
-
+        sz += tag->fields->size;
         init(ptr,1);
     }
     // Pad out the union
-    if ( tag->isstruct && sz < tag->size) {
+    if ( sz < tag->size) {
         defstorage();
-        outdec(usz - sz);
+        outdec(tag->size - sz);
         nl();
     }
+    return tag->size;
 }
 
 
 /*
  * initialise aggregate
  */
-void agg_init(Type *type)
-//int size, int type, enum ident_type ident, int* dim, int more, TAG_SYMBOL* tag, int zfar)
+int agg_init(Type *type)
 {
     int done = 0;
     int dim = type->len;
+    int size = 0;
 
     while (dim) {
         if ( type->kind == KIND_ARRAY && type->ptr->kind == KIND_STRUCT ) {
@@ -147,17 +130,18 @@ void agg_init(Type *type)
             } else if ( cmatch('{') == 0 ) {
                 break;
             }
-            str_init(type->tag);
+            size += str_init(type->ptr->tag);
             dim--;
             needchar('}');
         } else {
-            init(type,1);
+            size += init(type,1);
         }
         done++;
         if (cmatch(',') == 0)
             break;
         blanks();
     }
+    return size;
 }
 
 /*
@@ -168,10 +152,10 @@ void agg_init(Type *type)
  * this is used for structures and arrays of pointers to char, so that the
  * struct or array is built immediately and the char strings are dumped later
  */
-static void init(Type *type, int dump)
+static int init(Type *type, int dump)
 {
     double value;
-    int    valtype;
+    Kind   valtype;
     int sz; /* number of chars in queue */
 
     if ((sz = qstr(&value)) != -1) {
@@ -187,8 +171,10 @@ static void init(Type *type, int dump)
             }
             dumplits(type->ptr->kind == KIND_CHAR ? 0 : type->ptr->size, NO, gltptr, glblab, glbq);
             gltptr = 0;
-         //   dumpzero(size, type->len - sz);
-            return;
+            if ( type->len != -1 ) {
+                dumpzero(type->size/ type->len, type->len - sz);
+            }
+            return type->size;
         } else {
             int32_t ivalue = value;
             /* Store the literals in the queue! */
@@ -199,7 +185,7 @@ static void init(Type *type, int dump)
             outbyte('+');
             outdec(ivalue);
             nl();
-            return;
+            return 2;
         }
     } else {
         /* djm, catch label names in structures (for (*name)() initialisation */
@@ -220,9 +206,12 @@ static void init(Type *type, int dump)
                     goto constdecl;
                 } else {
                     error(E_DDECL);
+                    junk();
                 }
-            } else
+            } else {
                 error(E_UNSYMB, sname);
+                junk();
+            }
         } else if (rcmatch('}')) {
 #if 0
             dumpzero(size,*dim);
@@ -296,6 +285,7 @@ constdecl:
             }
         }
     }
+    return type->size;
 }
 
 
