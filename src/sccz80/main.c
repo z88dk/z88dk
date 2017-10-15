@@ -417,9 +417,10 @@ static void dumpfns()
             } else if (ptr->ctype->kind == KIND_FUNC && ptr->ctype->value != 0) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
+                printf("%s %d\n",ptr->name, ptr->storage);
                 if ( storage == EXTERNP ) {
                     outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("= %d\n", ptr->ctype->value);
-                } else if ( storage != LSTATIC ) {
+                } else if ( storage != LSTATIC && storage != LSTATIC_INITIALISED ) {
                     if ( ptr->ctype->flags & SHARED && c_useshared ) {
                         outfmt("\tGLOBAL\t%s_sl\n",ptr->name);
                     }
@@ -534,7 +535,8 @@ void dumpvars()
             type = ptr->type;
             storage = ptr->storage;
             if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && ident != FUNCTION && 
-                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP 
+                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != LSTATIC_INITIALISED &&
+                storage != EXTERNP 
                 && storage != LSTKEXT && storage != TYPDEF && 
                 type != KIND_PORT8 && type != KIND_PORT16) {
                 prefix();

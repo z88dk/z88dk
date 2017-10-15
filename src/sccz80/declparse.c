@@ -687,7 +687,7 @@ int declare_local(int local_static)
             sym->ctype = type;
             if ( cmatch('=')) {
                 sym->isassigned = 1;
-                sym->storage = STATIC_INITIALISED;
+                sym->storage = LSTATIC_INITIALISED;
                 initials(namebuf, type);                
             }
         } else {
@@ -699,7 +699,7 @@ int declare_local(int local_static)
                 sym->isassigned = 1;
                 if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
-                    char newname[NAMESIZE + 20];
+                    char newname[NAMESIZE * 2 + 20];
 
                     snprintf(newname, sizeof(newname),"auto_%s_%s",currfn->name, sym->name);
                     int alloc_size = initials(newname, type);
@@ -748,6 +748,7 @@ int declare_local(int local_static)
     return 1;
 }
 
+// Only called for globals
 Type *dodeclare(enum storage_type storage)
 {
     Type  *base_type = NULL;
@@ -760,17 +761,10 @@ Type *dodeclare(enum storage_type storage)
             break;
         }
         blanks();
+        sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+        sym->ctype = type;
 
-        if ( storage == STKLOC ) {
-            sym = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
-            sym->ctype = type;
-        } else if ( type->kind != KIND_STRUCT ) {
-            sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
-            sym->ctype = type;
-        }
-        blanks();
-
-        if ( storage != STKLOC && rcmatch('{')) {
+        if ( rcmatch('{')) {
             declfunc(type, storage);
             return type;
         } else  if ( cmatch(';')) {
