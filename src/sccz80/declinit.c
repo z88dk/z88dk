@@ -133,13 +133,20 @@ int agg_init(Type *type)
             size += str_init(type->ptr->tag);
             dim--;
             needchar('}');
+        } else if ( type->ptr->kind == KIND_ARRAY ) {
+            needchar('{');
+            size += agg_init(type->ptr);
+            needchar('}');
         } else {
-            size += init(type,1);
+            size += init(type->ptr,1);
         }
         done++;
         if (cmatch(',') == 0)
             break;
         blanks();
+    }
+    if ( type->len != -1 ) {
+        size += dumpzero(1, type->size - size);
     }
     return size;
 }

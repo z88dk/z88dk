@@ -745,7 +745,6 @@ int declare_local(int local_static)
             }
         }
     } while ( cmatch(','));
-    printf("Return %s\n",line+lptr);
     return 1;
 }
 
@@ -778,10 +777,13 @@ Type *dodeclare(enum storage_type storage)
             return type;
         } else if ( cmatch(',')) {
             continue;
-        } else if ( cmatch('=')) {
-            initials(type->name, type);
+        } 
+        needchar('=');
+        initials(type->name, type);
+        if ( cmatch(';')) {
             return type;
         }
+        needchar(',');
     }
     return NULL;
 }
