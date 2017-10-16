@@ -1,7 +1,7 @@
 
 SECTION data_driver
 
-PUBLIC ideBuffer, ideStatus
+PUBLIC ideBuffer, ideStatus, ideLock
 
 ; Space for the IDE Buffer
 ; used to respond to Drive ID requests, as sufficient buffer is not provided.
@@ -14,4 +14,5 @@ ideBuffer:  defs 512
 ; bit 2 : Flag 0 = slave not previously accessed
 
 ideStatus:  defb 0
+ideLock:    defb 0
 

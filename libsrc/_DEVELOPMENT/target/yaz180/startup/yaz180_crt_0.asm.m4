@@ -1,13 +1,13 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##      YAZ180_CRT_0.ASM.M4 - STANDALONE TARGET           ##
+dnl##         YAZ180_CRT_0.ASM.M4 - YABIOS TARGET            ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                yaz180 standalone target                   ;;
+;;                  yaz180 YABIOS  target                    ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
-;;                  flat 64k address space                   ;;
+;;                banked 64k address spaces                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

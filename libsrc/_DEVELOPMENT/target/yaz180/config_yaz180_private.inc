@@ -48,9 +48,6 @@ defc __IO_BREAK = 0x2000
 
 defc __IO_PIO_PORT_BASE = 0x4000
 
-defc __I2C_RX_SIZE = 0x100
-defc __I2C_TX_SIZE = 0x100
-
 defc __IO_PCA9665_1_PORT_BASE = 0xA000
 defc __IO_PCA9665_2_PORT_BASE = 0x8000
 
@@ -815,6 +812,9 @@ defc __IO_APU_OP_PUPI = 0x1A
 
 
 
+
+defc __IO_I2C_RX_SIZE = 68
+defc __IO_I2C_TX_SIZE = 68
 
 defc __IO_I2C1_PORT_MSB = 0xa0
 defc __IO_I2C2_PORT_MSB = 0x80

@@ -16,23 +16,23 @@ ENDIF
 IF __CRTCFG = 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; asci driver model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; yabios model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0
-   defc TAR__crt_org_data              = 0x2100
+   defc TAR__crt_org_data              = 0xE000
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 2
 
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = 0xFF00
    defc TAR__crt_stack_size            = 512
 
    defc TAR__crt_initialize_bss        = 1
 
    defc TAR__crt_include_preamble      = 1
 
-   defc TAR__crt_org_vector_table      = 0x2000
+   defc TAR__crt_org_vector_table      = 0xFF00
    defc TAR__crt_io_vector_base        = -1
    defc TAR__crt_interrupt_mode        = 1
 
@@ -117,7 +117,7 @@ IF __CRTCFG = 2
    ;; no drivers model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0x2900
+   defc TAR__crt_org_code              = 0x0100
    defc TAR__crt_org_data              = 0
    defc TAR__crt_org_bss               = -1
 
