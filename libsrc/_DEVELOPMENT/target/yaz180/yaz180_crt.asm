@@ -6,8 +6,40 @@
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 17
+	defc startup = 0
 	IFNDEF startup
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_PRINTF
+	defc	DEFINED_CLIB_OPT_PRINTF = 1
+	defc CLIB_OPT_PRINTF = 0x200
+	IFNDEF CLIB_OPT_PRINTF
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_PRINTF_2
+	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
+	defc CLIB_OPT_PRINTF_2 = 0
+	IFNDEF CLIB_OPT_PRINTF_2
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_SCANF
+	defc	DEFINED_CLIB_OPT_SCANF = 1
+	defc CLIB_OPT_SCANF = 0x200000
+	IFNDEF CLIB_OPT_SCANF
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_SCANF_2
+	defc	DEFINED_CLIB_OPT_SCANF_2 = 1
+	defc CLIB_OPT_SCANF_2 = 0
+	IFNDEF CLIB_OPT_SCANF_2
 	ENDIF
 ENDIF
 
@@ -20,7 +52,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
    
-   defc startup = 17
+   defc startup = 0
 
 ENDIF
 
@@ -32,23 +64,15 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; asci driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; yabios drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
-   ; basic drivers using installed on stdin, stdout, stderr
+   ; yabios asci0 drivers installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
-      defc __CRTCFG = 1
+      defc __CRTCFG = 0
    
    ENDIF
    
@@ -61,10 +85,10 @@ ENDIF
    
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                yaz180 standalone target                   ;;
-;; generated from target/yaz180/startup/yaz180_crt_17.asm.m4 ;;
+;;                  yaz180 YABIOS  target                    ;;
+;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
-;;                  flat 64k address space                   ;;
+;;                banked 64k address spaces                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -757,14 +781,12 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
-   ; driver: rc_01_input_basic_dcio
+   ; driver: rc_00_input_asci0
    ; fd    : 0
    ; mode  : read only
-   ; type  : 001 = input terminal
-   ; tie   : __i_fcntl_fdstruct_1
+   ; type  : 003 = character input
    ;
-   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
-   ; buffer size   : 64 bytes
+   ; ioctl_flags   : 0x0100
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -819,14 +841,14 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_01_input_basic_dcio
+   EXTERN rc_00_input_asci0
    
    __i_fcntl_heap_0:
    
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 98
+      defw 23
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -841,19 +863,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_01_input_basic_dcio
+      defw rc_00_input_asci0
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x01      ; stdio handles ungetc + type = input terminal
+      defb 0x03      ; stdio handles ungetc + type = character input
       defb 2
       defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw CRT_ITERM_TERMINAL_FLAGS
+      defw 0x0100
       
       ; mtx_plain
       
@@ -862,26 +884,6 @@ ENDIF
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
-
-      ; tied output terminal
-      ; pending_char
-      ; read_index
-      
-      defw __i_fcntl_fdstruct_1
-      defb 0
-      defw 0
-      
-      ; b_array_t edit_buffer
-      
-      defw __edit_buffer_0
-      defw 0
-      defw 64
-      
-            
-      ; reserve space for edit buffer
-      
-      __edit_buffer_0:   defs 64
-      
 
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -893,12 +895,12 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: rc_01_output_basic_dcio
+   ; driver: rc_00_output_asci0
    ; fd    : 1
    ; mode  : write only
-   ; type  : 002 = output terminal
+   ; type  : 004 = character output
    ;
-   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
+   ; ioctl_flags   : 0x0100
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -953,7 +955,7 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN rc_01_output_basic_dcio
+   EXTERN rc_00_output_asci0
    
    __i_fcntl_heap_1:
    
@@ -975,19 +977,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_01_output_basic_dcio
+      defw rc_00_output_asci0
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x02      ; type = output terminal
+      defb 0x04      ; type = character output
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw CRT_OTERM_TERMINAL_FLAGS
+      defw 0x0100
       
       ; mtx_plain
       
@@ -1001,7 +1003,8 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-      
+   
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
@@ -1073,6 +1076,7 @@ ENDIF
 
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 
 
@@ -1259,11 +1263,11 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 121  = byte size of static FDSTRUCTs
+   ; 46  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 121 > 0
+   IF 46 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1284,7 +1288,7 @@ ENDIF
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (121 + 14)
+      IF __clib_stdio_heap_size > (46 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1295,7 +1299,7 @@ ENDIF
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 121 - 14
+            defs __clib_stdio_heap_size - 46 - 14
          
          ; terminate stdio heap
          
@@ -1421,6 +1425,15 @@ __Restart_2:
 
 SECTION code_crt_init          ; user and library initialization
 
+   ; we do 256 ticks per second
+      ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
+      out0 (RLDR0L), l
+      out0 (RLDR0H), h
+
+   ; enable down counting and interrupts for PRT0
+      ld a, TCR_TIE0|TCR_TDE0
+      out0 (TCR), a
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1461,40 +1474,16 @@ SECTION code_crt_return
 
    ; terminate
    
-   IF (__crt_on_exit = 0x10002)
-   
-      ; returning to basic
-      
-      pop hl
-      
-      IF CRT_ABPASS > 0
-      
-         ld a,h
-         ld b,l
-         call CRT_ABPASS
+   include "../crt_exit_eidi.inc"
+   include "../crt_restore_sp.inc"
+   include "../crt_program_exit.inc"      
 
-      ENDIF
-      
-      ld sp,(__sp_or_ret)
-      
-      im 1
-      ei
-      ret
-   
-   ELSE
-   
-      include "../crt_exit_eidi.inc"
-      include "../crt_restore_sp.inc"
-      include "../crt_program_exit.inc"      
-
-   ENDIF
-   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_jump_vectors_z180.inc"
-include "crt_interrupt_vectors_basic.inc"
+include "crt_interrupt_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
@@ -1510,6 +1499,14 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 
 

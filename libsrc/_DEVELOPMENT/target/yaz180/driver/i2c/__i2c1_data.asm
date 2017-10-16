@@ -13,20 +13,12 @@
 
     INCLUDE "config_private.inc"
 
-    SECTION data_align_256
+    SECTION data_driver
 
     PUBLIC __i2c1RxBuffer, __i2c1TxBuffer
 
-    __i2c1RxBuffer:   DEFS    __I2C_RX_SIZE
-    __i2c1TxBuffer:   DEFS    __I2C_TX_SIZE    
-
-    ; pad to next 256 byte boundary
-
-    IF (ASMPC & 0xff)
-       defs 256 - (ASMPC & 0xff)
-    ENDIF
-
-    SECTION data_driver
+    __i2c1RxBuffer:   DEFS    __IO_I2C_RX_SIZE
+    __i2c1TxBuffer:   DEFS    __IO_I2C_TX_SIZE    
 
     PUBLIC __i2c1RxInPtr, __i2c1RxOutPtr, __i2c1RxBufUsed
     PUBLIC __i2c1TxInPtr, __i2c1TxOutPtr, __i2c1TxBufUsed

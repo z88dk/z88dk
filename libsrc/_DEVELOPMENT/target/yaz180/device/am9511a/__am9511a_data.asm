@@ -17,7 +17,7 @@
     SECTION data_driver
 
     PUBLIC APUCMDInPtr, APUCMDOutPtr, APUPTRInPtr, APUPTROutPtr
-    PUBLIC APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError
+    PUBLIC APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError, APULock
 
     APUCMDInPtr:    DEFW    APUCMDBuf
     APUCMDOutPtr:   DEFW    APUCMDBuf
@@ -27,3 +27,4 @@
     APUPTRBufUsed:  DEFB    0
     APUStatus:      DEFB    0
     APUError:       DEFB    0
+    APULock:        DEFB    0

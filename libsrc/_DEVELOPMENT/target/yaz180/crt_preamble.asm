@@ -29,16 +29,17 @@ EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
     OUT0    (DCNTL),A       ; 0 Memory Wait & 2 I/O Wait
 
                             ; Set Logical RAM Addresses
-                            ; $8000-$FFFF RAM CA1 -> 80H
-                            ; $4000-$7FFF RAM BANK -> 04H
-                            ; $2000-$3FFF RAM CA0
-                            ; $0000-$1FFF Flash CA0
-                            
-    LD      A,84H           ; Set New Common / Bank Areas for RAM
+                            ; $E000-$FFFF RAM   CA1  -> $E.
+                            ; $D000-$DFFF RAM   BANK
+                            ; $0000-$CFFF Flash BANK -> $.0
+
+    LD      A,$E0           ; Set New Common 1 / Bank Areas for RAM
     OUT0    (CBAR),A
-    LD      A,78H           ; Set Common 1 Area Physical $80000 -> 78H
+
+    LD      A,$00           ; Set Common 1 Base Physical $0D000 -> $00
     OUT0    (CBR),A
-    LD      A,3CH           ; Set Bank Area Physical $40000 -> 3CH
+
+    LD      A,$00           ; Set Bank Base Physical $00000 -> $00
     OUT0    (BBR),A
 
 ENDIF
