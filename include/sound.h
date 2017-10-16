@@ -100,6 +100,10 @@ extern void __LIB__ bit_play(unsigned char melody[]);
   #define BEEP_TSTATES 221750.0 /* 1.774 Mhz */
 #endif
 
+#ifdef VG5000
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#endif
+
 /* Clock timing is not perfect, here we have a slightly different 
    routine, with the inner loop differing for one cycle,and
    VZ300 has a CPU clock of 3,54 Mhz, VZ200 -> 3,58.. we stay in the middle */

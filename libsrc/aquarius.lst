@@ -11,6 +11,11 @@ stdio/ansi/aquarius/f_ansi_dline
 stdio/ansi/aquarius/f_ansi_scrollup
 @gfxbasetxt6.lst
 graphics/aquarius/textpixl6
+games/aquarius/joystick
+games/aquarius/bit_open
+games/aquarius/bit_open_di
+games/aquarius/bit_close
+games/aquarius/bit_close_ei
 @games/games.lst
 psg/aquarius/set_psg
 psg/aquarius/set_psg_callee
