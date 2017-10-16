@@ -10,6 +10,8 @@
         SECTION   code_clib
         PUBLIC    cpc_set_palette_callee
         PUBLIC    _cpc_set_palette_callee
+        PUBLIC    cpc_SetInk_callee
+        PUBLIC    _cpc_SetInk_callee
         PUBLIC    ASMDISP_CPC_SET_PALETTE_CALLEE
         EXTERN firmware
 
@@ -17,6 +19,8 @@
 
 .cpc_set_palette_callee
 ._cpc_set_palette_callee
+.cpc_SetInk_callee
+._cpc_SetInk_callee
 
 
    pop hl
