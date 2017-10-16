@@ -19,6 +19,10 @@
 #include <../../../libsrc/_DEVELOPMENT/target/sms/config_sms.h>
 #endif
 
+#ifdef __VGL
+#include <../../../libsrc/_DEVELOPMENT/target/vgl/config_vgl.h>
+#endif
+
 #ifdef __EMBEDDED_Z80
 #include <../../../libsrc/_DEVELOPMENT/target/z80/config_z80.h>
 #endif

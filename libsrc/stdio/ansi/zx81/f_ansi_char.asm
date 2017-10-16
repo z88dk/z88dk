@@ -1,13 +1,13 @@
 ;
-;       Spectrum C Library
+; 	ANSI Video handling for the ZX81
 ;
-; 	ANSI Video handling for ZX Spectrum
-;
-; 	Handles colors referring to current PAPER/INK/etc. settings
-;
-;	** alternate (smaller) 4bit font capability: 
-;	** use the -DPACKEDFONT flag
-;	** ROM font -DROMFONT
+;	** alternate (smaller) 4bit font option
+
+;	** ROM font -DROMFONT, or uncomment the next line.
+; defc ROMFONT=1
+; .. to use the ROM font rebuild the libraries and add in your compilation command line the extra parameters:
+;   -pragma-define:ansifont=0 -pragma-define:ansifont_is_packed=0 -pragma-define:ansicolumns=36
+
 ;
 ;	set it up with:
 ;	.text_cols	= max columns
@@ -31,19 +31,21 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.14 2016-08-01 14:25:55 stefano Exp $
+;	$Id: f_ansi_char.asm $
 ;
+
 
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 
 IF ROMFONT
 	EXTERN	asctozx81
+ELSE
+	EXTERN	ansifont
 ENDIF
 	
 	EXTERN	ansicharacter_pixelwidth
 	EXTERN	ansifont_is_packed
-	EXTERN	ansifont
 	
 	EXTERN	base_graphics
 
@@ -73,15 +75,46 @@ IF MTHRG
 ENDIF
 
 .ansi_CHAR
+	ld	hl,char+1
 ; --- TO USE ROM FONT WE NEED TO MAP TO THE ASCII CODES ---
 IF ROMFONT
-	ld	hl,char+1
+	ld	e,a
+
+	xor a
+    ld	(UCASE),a
+    ld	(UCASE+1),a
+	ld	(UCASE+2),a
+	ld	a,(BOLD)
+	xor $17	; rla
+	ld	(UCASE+3),a
+
+	
+;	ld	a,ansifont/256
+;	cp $1F	; ROM font ?
+	ld	a,e
+;	jr	nz,norom
 	ld	(hl),a
 	call	asctozx81
+	
+		ld	e,a
+		rla
+		ld	a,e
+		jr nc,noupr
+        ld	a,$23	; inc hl
+        ld	(UCASE),a
+        ld	a,$b6	; or (hl)
+        ld	(UCASE+1),a
+        ld	a,$2b	; dec hl
+        ld	(UCASE+2),a
+;	xor a
+;	ld	(UCASE+3),a
+		ld	a,e
+		and $7f
+.noupr
 ENDIF
 ; --- END OF ROM FONT ADAPTER ---
-
-  ld (char+1),a
+.norom
+  ld (hl),a
   ld a,(ansi_ROW)       ; Line text position
   
 IF G007
@@ -179,26 +212,26 @@ ENDIF
   ld b,'A'      ; Put here the character to be printed
 
 IF ROMFONT
-  ld hl,$1e00
+  ;ld hl,ansifont-256
+  ld hl,$1E00
   xor	a
   add	b
   jr	z,NOLFONT
 ELSE
 
-	  ld a,ansifont_is_packed
-	  ld	hl,ansifont	- 256
-	  and	a
-	  jr    z,got_font_location
+  ld a,ansifont_is_packed
+  ld	hl,ansifont	- 256
+  and	a
+  jr    z,got_font_location
 
-	  xor	a
-	  rr	b
-	  jr	c,even
-	  ld	a,4
-	.even
-	  ld	(ROLL+1),a
-	  ld hl,ansifont - 128
-
-	.got_font_location
+  xor	a
+  rr	b
+  jr	c,even
+  ld	a,4
+.even
+  ld	(ROLL+1),a
+  ld hl,ansifont - 128
+.got_font_location
 
 ENDIF
 
@@ -209,15 +242,15 @@ ENDIF
 .NOLFONT
 
 IF !ARX816
- IF G007
+IF G007
   ld de,34	; next row
- ELSE
-  IF MTHRG
+ELSE
+IF MTHRG
   ld de,33	; next row
-  ELSE
+ELSE
   ld de,32	; next row
-  ENDIF
- ENDIF
+ENDIF
+ENDIF
 ENDIF
 
   ld c,8
@@ -242,9 +275,22 @@ ENDIF
   djnz L1
 .DTS
 
+  
+  ld a,(hl)
+  ld b,a
   ld a,ansifont_is_packed
   and  a
-  ld a,(hl)
+  ld a,b
+
+IF ROMFONT
+
+.UCASE
+  nop
+  nop
+  nop
+  rla	; shift character left to squeeze it as much as possible (36..42 columns still usable)
+ENDIF
+  
 .BOLD
   nop	;	rla
   nop	;	or (hl)
@@ -265,7 +311,7 @@ ENDIF
   dec c
 ;  jr nz,UNDRL   ; Set to JR UNDRL to disable underlined text (loc. INVRS+2)
   jr UNDRL
-  ld a,255
+  ld a,255	; ..a possible variant is CPL
 .UNDRL
   inc c
 ; end of underlined text handling

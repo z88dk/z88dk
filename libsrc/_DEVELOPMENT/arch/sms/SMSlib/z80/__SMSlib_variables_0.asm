@@ -11,6 +11,7 @@ SECTION data_SMSlib
 PUBLIC __SMSlib_VDPReg
 PUBLIC __SMSlib_spritesHeight
 PUBLIC __SMSlib_spritesWidth
+PUBLIC __SMSlib_spritesTileOffset
 PUBLIC __SMSlib_theLineInterruptHandler
 
 EXTERN l_ret, _GLOBAL_SMS_VDP_R0R1
@@ -20,6 +21,10 @@ defc __SMSlib_VDPReg = _GLOBAL_SMS_VDP_R0R1  ; /* the VDP registers #0 and #1 's
 __SMSlib_spritesHeight:
 
    defb 8
+
+__SMSlib_spritesTileOffset:    ; /* MUST FOLLOW spritesHeight */
+
+   defb 1
 
 __SMSlib_spritesWidth:
 

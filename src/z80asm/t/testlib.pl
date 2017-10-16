@@ -18,6 +18,8 @@ use File::Path 'remove_tree';
 my $IS_WIN32 = $^O eq 'MSWin32';
 my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
 
+# run z80asm from .
+$ENV{PATH} = ".".($IS_WIN32 ? ";" : ":").$ENV{PATH};
 
 # add path to z80asm top directory
 _prepend_path(_root());

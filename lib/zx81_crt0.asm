@@ -327,23 +327,22 @@ ENDIF
 ; Now some variables
 ;-----------
 IF (startup>=3)
+ IF (startup>100)
+		; LAMBDA specific definitions (if any)
+ ELSE
 	PUBLIC text_rows
 	PUBLIC hr_rows
 	PUBLIC _hr_rows
 text_rows:
 hr_rows:
 _hr_rows:
- IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
+  IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17)|(startup=25)|(startup=26)|(startup=27))
 		defw	8	; Current number of text rows in graphics mode
- ELSE
+  ELSE
 		defw	24	; Current number of text rows in graphics mode
+  ENDIF
  ENDIF
 ENDIF
-
-
-
-
-
 
 
 ;                defm  "Small C+ ZX81"   ;Unnecessary file signature
@@ -358,7 +357,7 @@ a1save: 	defb    0
 ENDIF
 hl1save:	defw	0
 ;bc1save:	defw	0
-de1save:	defw	0
+;de1save:	defw	0
 
 
 

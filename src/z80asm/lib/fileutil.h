@@ -96,5 +96,7 @@ extern char *search_file(char *filename, UT_array *dir_list);	/* returned string
    all files with these names are deleted on exit */
 extern char *temp_filename( char *filename );
 
-/* check if file exists */
+/* check if file/directory exists */
 extern Bool file_exists(char *filename);
+extern Bool dir_exists(char *dirname);
+extern int file_size(char *filename);	// file size, -1 if not regular file

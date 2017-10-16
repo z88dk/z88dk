@@ -4,6 +4,13 @@ stdio/zx80/fgetc_cons
 stdio/zx80/getk
 stdio/zx80/zx80_decode_keys
 stdio/zx81/fputc_cons
+@stdio/ansicore.lst
+stdio/ansi/zx81/f_ansi_bel
+stdio/ansi/zx81/text/f_ansi_attr
+stdio/ansi/zx81/text/f_ansi_char
+stdio/ansi/zx81/text/f_ansi_cls
+stdio/ansi/zx81/text/f_ansi_dline
+stdio/ansi/zx81/text/f_ansi_scrollup
 time/zx81/clock
 @gfxbase.lst
 graphics/dcircle

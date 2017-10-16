@@ -19,7 +19,7 @@ asm_SMSlib_addSprite:
    ; int SMS_addSprite (unsigned char x, unsigned char y, unsigned char tile)
    ;
    ; enter :  c = unsigned char x
-	;          d = unsigned char y
+   ;          d = unsigned char y
    ;          b = unsigned char tile
    ; 
    ; exit  : success
@@ -46,7 +46,7 @@ asm_SMSlib_addSprite_0:
    ld a,d                      ; a = unsigned char y
    
    cp 0xd1
-   jp z, error_mc
+   jr z, invalid_y
    
    ld d,0                      ; de = _SpriteNextFree
    
@@ -69,4 +69,10 @@ asm_SMSlib_addSprite_0:
    ld (__SMSlib_SpriteNextFree),a
    
    ex de,hl
+   ret
+
+invalid_y:
+
+   ld hl,-2
+   scf
    ret

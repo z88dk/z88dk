@@ -37,6 +37,12 @@ extern char __LIB__    *cpc_rsx_strcpy_callee(char *, char *)  __smallc __z88dk_
 
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
 
+// Set CPC color for a specified pen (set color in a palette element)
+extern void __LIB__              cpc_set_palette(int pen, int color) __smallc ;
+void __LIB__    cpc_set_palette_callee(int pen, int color)  __smallc __z88dk_callee;
+
+#define cpc_set_palette(a,b) cpc_set_palette_callee(a,b)
+
 // Call RSX/Bar command
 extern int __LIB__ cpc_rsx(char *cmd,...);
 

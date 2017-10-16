@@ -47,7 +47,8 @@ IF __CLIB_OPT_SORT = 1
    
    EXTERN asm_shellsort
    defc asm_qsort = asm_shellsort
-ENDIF
+
+ENDIF
 
 IF __CLIB_OPT_SORT >= 2
 
@@ -55,4 +56,5 @@ IF __CLIB_OPT_SORT >= 2
    
    EXTERN asm_quicksort
    defc asm_qsort = asm_quicksort
-ENDIF
+
+ENDIF

@@ -240,7 +240,7 @@ HRG_outloop:
         ld      a,h             ; get HGR address MSB from HL
         ld      i,a             ; load MSB into I register which is RFSH address MSB
         ld      a,l             ; get HGR address LSB from HL
-        call    (HRG_LineStart + $8000)
+        call    HRG_LineStart+$8000
         add     hl,de           ; add 32 to HL to point to next hline
         dec     b               ; decrement line counter
         jp      nz,HRG_outloop  ; test for last line
