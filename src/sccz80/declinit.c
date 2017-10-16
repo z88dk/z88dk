@@ -82,7 +82,6 @@ int initials(const char *dropname, Type *type)
     //     }
     // }
     output_section(c_code_section); 
-    printf("return %s %d\n",type->name, desize);
     return (desize);
 }
 
@@ -147,8 +146,9 @@ int agg_init(Type *type)
     }
     if ( type->len != -1 ) {
         size += dumpzero(1, type->size - size);
+    } else {
+        type->size = size;
     }
-    printf("Aggregate %s to %d\n",type->name, size);
     return size;
 }
 
@@ -226,6 +226,7 @@ static int init(Type *type, int dump)
 #if 0
             dumpzero(size,*dim);
 #endif
+            return 0;
         } else if (constexpr(&value, &valtype, 1)) {
 constdecl:
             if (dump) {
@@ -293,8 +294,10 @@ constdecl:
                     stowlit(value, type->size);
                 }
             }
+        } else {
+            return 0; // Nothing parsed
         }
-    }
+    } 
     return type->size;
 }
 

@@ -508,8 +508,6 @@ void size_of(LVALUE* lval)
         }
         while ( deref && type ) {
             Type *next = type->ptr;
-
-            free_type(type);
             type = next;
             deref--;
         }
@@ -538,17 +536,16 @@ void size_of(LVALUE* lval)
 
             type = ptr->ctype;
             lval->const_val = type->size;
-
+            
             if (type->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
                 if (type->kind != KIND_STRUCT) {
-
                 } else {
                     Type *mptr;
 
                     /* We're a member of a structure */
                     do {
                         if ( (mptr = get_member(ptr->ctype->tag) ) != NULL ) {
-                            ptr = mptr;
+                            type = mptr;
                             ptrtype = 0;
                             ptrotag = NULL;
                             if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
@@ -564,7 +561,8 @@ void size_of(LVALUE* lval)
                         } else {
                             lval->const_val = type->size;
                         }
-                    } while ( mptr && mptr->kind == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
+                    } while ( mptr && ( (mptr->kind == KIND_STRUCT && rcmatch('.')) ||
+                                      ( ispointer(mptr) && mptr->ptr->kind == KIND_STRUCT && rmatch2("->"))) );
                 }
                 /* Check for index operator on array */
                 if (type->kind == KIND_ARRAY ) {
@@ -578,11 +576,13 @@ void size_of(LVALUE* lval)
                         lval->const_val = type->size / type->len;
                     }
                 }
-                if ( deref ) {
-                    while ( deref && type ) {
+                while ( deref && type ) {
+                    lval->const_val = type->size;
+                    type = type->ptr;  
+                    if ( type ) {
                         lval->const_val = type->size;
-                        type = type->ptr;                            
-                    }
+                    } 
+                    deref--;                         
                 }
             } else {
                 lval->const_val = 2;
