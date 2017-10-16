@@ -37,7 +37,7 @@ int primary(LVALUE* lval)
             lval->symbol = ptr;
             lval->ltype = ptr->ctype;
             lval->val_type = lval->indirect_kind = ptr->type;
-            lval->flags = ptr->flags;
+            lval->flags = ptr->flags | (lval->ltype->isunsigned ? UNSIGNED : 0);
             lval->ptr_type = KIND_NONE;
             if ( lval->ltype->kind == KIND_PTR ) {
                 lval->ptr_type = ptr->ctype->ptr->kind;
@@ -752,7 +752,7 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
 
 int utype(LVALUE* lval)
 {
-    if (lval->flags & UNSIGNED || lval->ptr_type)
+    if (lval->ltype->isunsigned || ispointer(lval->ltype)) 
         return (1);
     return (0);
 }

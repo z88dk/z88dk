@@ -2172,6 +2172,14 @@ void asl_const(LVALUE *lval, int32_t value)
     }
 }
 
+
+static void set_carry(LVALUE *lval)
+{
+    lval->val_type = KIND_ARRAY;
+    lval->ltype = type_carry;
+}
+
+
 /* Form logical negation of primary register */
 void lneg(LVALUE* lval)
 {
@@ -2183,13 +2191,13 @@ void lneg(LVALUE* lval)
         callrts("l_long_lneg");
         break;
     case KIND_CARRY:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         ol("ccf");
         break;
     case KIND_DOUBLE:
         convdoub2int();
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         callrts("l_lneg");
     }
 }
@@ -2395,6 +2403,7 @@ void ge0(LVALUE* lval, int label)
     opjump("m,", label);
 }
 
+
 /* Test for equal */
 void zeq(LVALUE* lval)
 {
@@ -2403,7 +2412,7 @@ void zeq(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         callrts("l_long_eq");
         Zsp += 4;
         break;
@@ -2413,7 +2422,7 @@ void zeq(LVALUE* lval)
         break;
     case KIND_CHAR:
         if (c_doinline) {
-            lval->val_type = KIND_CARRY;
+            set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
@@ -2426,7 +2435,7 @@ void zeq(LVALUE* lval)
             break;
         }
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         callrts("l_eq");
     }
 }
@@ -2439,7 +2448,7 @@ void zne(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         callrts("l_long_ne");
         Zsp += 4;
         break;
@@ -2449,7 +2458,7 @@ void zne(LVALUE* lval)
         break;
     case KIND_CHAR:
         if (c_doinline) {
-            lval->val_type = KIND_CARRY;
+            set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
@@ -2462,7 +2471,7 @@ void zne(LVALUE* lval)
             break;
         }
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         callrts("l_ne");
     }
 }
@@ -2475,7 +2484,7 @@ void zlt(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_long_ult");
         else
@@ -2499,11 +2508,11 @@ void zlt(LVALUE* lval)
                 ol("xor\tl");
                 ol("rlca");
             }
-            lval->val_type = KIND_CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_ult");
         else
@@ -2519,7 +2528,7 @@ void zle(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_long_ule");
         else
@@ -2553,11 +2562,11 @@ void zle(LVALUE* lval)
                 ol("rlca");
                 postlabel(label);
             }
-            lval->val_type = KIND_CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_ule");
         else
@@ -2573,7 +2582,7 @@ void zgt(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_long_ugt");
         else
@@ -2604,11 +2613,11 @@ void zgt(LVALUE* lval)
                 ol("rlca");
                 ol("ccf");
             }
-            lval->val_type = KIND_CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_ugt");
         else
@@ -2624,7 +2633,7 @@ void zge(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_long_uge");
         else
@@ -2659,11 +2668,11 @@ void zge(LVALUE* lval)
                 ol("ccf");
                 postlabel(label);
             }
-            lval->val_type = KIND_CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = KIND_CARRY;
+        set_carry(lval);
         if (utype(lval))
             callrts("l_uge");
         else
