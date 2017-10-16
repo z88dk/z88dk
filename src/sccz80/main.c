@@ -402,7 +402,7 @@ static void dumpfns()
             } else {
                 if ( storage == EXTERNP ) {
                     outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
-                } else if ( storage != LSTATIC ) {
+                } else if ( storage != LSTATIC && storage != TYPDEF ) {
                     if ( ptr->ctype->flags & SHARED && c_useshared ) {
                         outfmt("\tGLOBAL\t%s_sl\n",ptr->name);
                     }

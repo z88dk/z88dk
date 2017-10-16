@@ -487,7 +487,7 @@ void doreturn(char type)
             leave(KIND_INT, type, incritical);
         } else {
             /* return actual value */
-            force(currfn->ctype->kind, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
+            force(currfn->ctype->kind, doexpr(), currfn->ctype->return_type->isunsigned, c_default_unsigned, 0);
             leave(currfn->ctype->kind, type, incritical);
         }
     } else {

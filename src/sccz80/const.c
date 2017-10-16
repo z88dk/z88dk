@@ -48,7 +48,6 @@ int constant(LVALUE* lval)
 {
     int32_t val;
     lval->val_type = KIND_INT;
-    lval->flags &= ~UNSIGNED;
     lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {

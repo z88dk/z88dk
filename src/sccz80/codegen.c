@@ -209,7 +209,7 @@ void outname(const char* sname, char pref)
 void getmem(SYMBOL* sym)
 {
     if (sym->ctype->kind == KIND_CHAR) {
-        if (!(sym->flags & UNSIGNED)) {
+        if ( (sym->ctype->isunsigned) == 0 )  {
 #ifdef PREAPR00
             ot("ld\ta,(");
             outname(sym->name, dopref(sym));
@@ -234,7 +234,7 @@ void getmem(SYMBOL* sym)
         ot("ld\ta,(");
         outname(sym->name, dopref(sym));
         outstr(")\n");
-        if (!(sym->flags & UNSIGNED))
+        if (sym->ctype->isunsigned == 0 )
             callrts("l_sxt");
         else {
             ol("ld\tl,a");
@@ -530,8 +530,8 @@ void indirect(LVALUE* lval)
     typeobj = lval->indirect_kind;
     flags = lval->flags;
 
-    sign = flags & UNSIGNED;
-
+    sign = lval->ltype->isunsigned;
+    
     /* Fetch from far pointer */
     if (flags & FARACC) { /* Access via far method */
         switch (typeobj) {

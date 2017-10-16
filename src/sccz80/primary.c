@@ -37,7 +37,7 @@ int primary(LVALUE* lval)
             lval->symbol = ptr;
             lval->ltype = ptr->ctype;
             lval->val_type = lval->indirect_kind = ptr->type;
-            lval->flags = ptr->flags | (lval->ltype->isunsigned ? UNSIGNED : 0);
+            lval->flags = ptr->flags;
             lval->ptr_type = KIND_NONE;
             if ( lval->ltype->kind == KIND_PTR ) {
                 lval->ptr_type = ptr->ctype->ptr->kind;
@@ -288,7 +288,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
             mainpop();
             if (lval->val_type == KIND_LONG)
                 zpop();
-            convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
+            convert_int_to_double(lval->val_type, lval->ltype->isunsigned);
             DoubSwap();
             lval->val_type = KIND_DOUBLE; /* type of result */
             lval->ltype = type_double;
@@ -296,7 +296,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
         return (1);
     } else {
         if (lval->val_type == KIND_DOUBLE) {
-            convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
+            convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
             lval2->val_type = KIND_DOUBLE;
             lval2->ltype = type_double;
             return (1);
@@ -309,6 +309,7 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
 {
     if (lval2->val_type == KIND_CARRY) {
         zcarryconv();
+        lval2->ltype = type_int;
         lval2->val_type = KIND_INT;
     }
 
@@ -317,9 +318,14 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
         if (lval->val_type != KIND_LONG) {
             doexx(); /* Preserve other operator */
             mainpop();
-            force(KIND_LONG, lval->val_type, lval->flags & UNSIGNED, lval->flags & UNSIGNED, 0);
+            force(KIND_LONG, lval->val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
             lpush(); /* Put the new expansion on stk*/
             doexx(); /* Get it back again */
+            if ( lval->ltype->isunsigned ) {
+                lval->ltype = type_ulong;
+            } else {
+                lval->ltype = type_long;
+            }
             lval->val_type = KIND_LONG;
         }
         return;
@@ -327,26 +333,15 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
 
     if (lval->val_type == KIND_LONG) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
-           /*
-            * FIXED!! 23/4/99 djm, if any of them is unsigned then we extend out
-            * to an unsigned long.
-            *
-            * This is sort of in accordance with A6.5 except for the fact that
-            * we don't convert the signed integer to postive if it negative
-            *
-            * If neither are unsigned, then we extend the sign, let me know if this
-            * causes lots of problems!
-            */
-            if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
+            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
+                lval->ltype = type_ulong;
                 convUint2long();
-            else
+            } else {
                 convSint2long();
+                lval->ltype = type_long;
+            }
             lval->val_type = KIND_LONG;
         }
-    }
-    if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED)) {
-         lval->flags |= UNSIGNED;
-         lval2->flags |= UNSIGNED;
     }
 }
 
@@ -606,7 +601,7 @@ void rvalue(LVALUE* lval)
     }
     if (lval->cast_type ) docast(lval, lval);
 #if DEBUG_SIGN
-    if (lval->flags & UNSIGNED)
+    if (lval->ltype->isunsigned ) 
         ol("; unsigned");
     else
         ol("; signed");

@@ -133,7 +133,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
-                convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
+                convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
             }
             dpush();
@@ -145,7 +145,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             /* On stack we've got the double, load the constant as a double */
             dpush();
             vlongconst(lval->const_val);
-            if ( lval->flags & UNSIGNED ) {
+            if ( lval->ltype->isunsigned ) {
                 convUlong2doub();
             } else {
                 convSlong2doub();
@@ -235,7 +235,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
             if ( lhs_val_type == KIND_DOUBLE ) decrement_double_ref(lval);
             if ( rhs_val_type == KIND_DOUBLE ) decrement_double_ref(lval2);
-            if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
+            if (lval->ltype->isunsigned | lval2->ltype->isunsigned ) 
                 lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
             else
                 lval->const_val = calc(lval->const_val, oper, lval2->const_val, is16bit);
@@ -284,7 +284,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
         if ( lval->val_type == KIND_DOUBLE ) decrement_double_ref(lval);
         if ( lval2->val_type == KIND_DOUBLE ) decrement_double_ref(lval2);
-        if ((lval->flags & UNSIGNED) || (lval2->flags & UNSIGNED))
+        if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) 
             lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
         else
             lval->const_val = calc(lval->const_val, oper, lval2->const_val, is16bit);
@@ -293,20 +293,20 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     } else {
         /* one or both operands not constant */
 
-        /* djm, if we have a constant and a proper lvalue, then set the flags of
-         * const to equal the signedness of the lvalue. This *will* cause 
-         * problems if we allow specifiers after numbers
-         */
-        if (lval->is_const)
-            lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
-        if (lval2->is_const)
-            lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
+        // /* djm, if we have a constant and a proper lvalue, then set the flags of
+        //  * const to equal the signedness of the lvalue. This *will* cause 
+        //  * problems if we allow specifiers after numbers
+        //  */
+        // if (lval->is_const)
+        //     lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
+        // if (lval2->is_const)
+        //     lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
 
-        if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
+        if ( (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);
 
         // Remove any function type decorators
-        lval->flags &= (UNSIGNED|FAR);
+        lval->flags &= (FAR);
 
         /* Special case handling for operation by constant */
         if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || oper == zxor || lval2->is_const) ) {
@@ -317,14 +317,14 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 doconstoper = 1;
                 const_val = lval2->const_val;
                 clearstage(before, 0);
-                force(rhs_val_type, lhs_val_type, lval->flags & UNSIGNED ? YES : NO, lval->flags & UNSIGNED ? YES : NO, NO);
+                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR || lval2->val_type == KIND_LONG) ) {
                 doconstoper = 1;
                 const_val = lval->const_val;
                 clearstage(before_constlval, 0);
-                force(lhs_val_type, rhs_val_type, lval2->flags & UNSIGNED ? YES : NO, lval2->flags & UNSIGNED ? YES : NO, NO);
+                force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval2->ltype->isunsigned,0);
             }
             if ( doconstoper ) {
                 Zsp = savesp;                
@@ -364,7 +364,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
-                convert_int_to_double(lval2->val_type, lval2->flags & UNSIGNED);
+                convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
             }
             dpush();
@@ -377,7 +377,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else {
                 /* On stack we've got the double, load the constant as a double */
                 vlongconst(val);
-                if ( lval->flags & UNSIGNED ) {
+                if ( lval->ltype->isunsigned ) {
                     convUlong2doub();
                 } else {
                     convSlong2doub();
@@ -429,7 +429,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval2->val_type == KIND_DOUBLE ) { 
                 clearstage(before1, 0);
                 Zsp = savesp1;
-                force(KIND_DOUBLE, lval->val_type, NO, lval->flags & UNSIGNED, NO);
+                force(KIND_DOUBLE, lval->val_type, NO, lval->ltype->isunsigned, 0);
                 lval->val_type = KIND_DOUBLE;
                 dpush();
                 load_double_into_fa(lval2);
@@ -444,7 +444,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     load_double_into_fa(lval2);
                 } else {
                     vlongconst(val);
-                    if ( lval2->flags & UNSIGNED ) {
+                    if ( lval2->ltype->isunsigned ) {
                         convUlong2doub();
                     } else {
                         convSlong2doub();

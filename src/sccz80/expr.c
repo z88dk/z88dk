@@ -103,11 +103,7 @@ int heir1(LVALUE* lval)
         // }
 
 
-#ifdef SILLYWARNING
-        if (((lval->flags & UNSIGNED) != (lval2.flags & UNSIGNED)) && (!(lval2.is_const) && !(lval->ptr_type) && !(lval2.ptr_type)))
-            warning(W_EGSG);
-#endif
-        force(lval->val_type, lval2.val_type, lval->flags & UNSIGNED, lval2.flags & UNSIGNED, 0); /* 27.6.01 lval2.is_const); */
+        force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
     } else if (match("|=")) {
@@ -161,7 +157,7 @@ int heir1(LVALUE* lval)
     else
         plnge2a(heir1, lval, &lval2, oper, doper, constoper);
 
-    force(lval3.val_type, lval->val_type, lval3.flags & UNSIGNED, lval->flags & UNSIGNED, lval->is_const);
+    force(lval3.val_type, lval->val_type, lval3.ltype->isunsigned, lval->ltype->isunsigned, lval->is_const);
     smartstore(&lval3);
     return 0;
 }
@@ -184,7 +180,7 @@ int heir1a(LVALUE* lval)
         /* test condition, jump to false expression evaluation if necessary */
         if (check_lastop_was_testjump(lval)) {
             // Always evaluated as an integer, so fake it temporarily
-            force(KIND_INT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
+            force(KIND_INT, lval->val_type, c_default_unsigned, lval->ltype->isunsigned, 0);
             temptype = lval->val_type;
             lval->val_type = KIND_INT; /* Force to integer */
             testjump(lval, falselab = getlabel());
@@ -219,12 +215,12 @@ int heir1a(LVALUE* lval)
             rvalue(lval);
         /* check types of expressions and widen if necessary */
         if (lval2.val_type == KIND_DOUBLE && lval->val_type != KIND_DOUBLE) {
-            convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
+            convert_int_to_double(lval->val_type, lval->ltype->isunsigned);
             postlabel(endlab);
         } else if (lval2.val_type != KIND_DOUBLE && lval->val_type == KIND_DOUBLE) {
             jump(skiplab = getlabel());
             postlabel(endlab);
-            convert_int_to_double(lval2.val_type, lval2.flags & UNSIGNED);
+            convert_int_to_double(lval2.val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
         }
         /* 12/8/98 Mod by djm to convert long types - it's nice when someone
@@ -502,10 +498,8 @@ int heira(LVALUE *lval)
             buffer_fps_num = save_fps_num;
             k = heira(lval);
             if ( k == 1 ) { // If we need to fetch then we should cast what we get 
-                printf("Set cast to %p\n",cast_lval.cast_type);
                 lval->cast_type = cast_lval.cast_type;
             } else {
-                printf("Doing cast %p\n",cast_lval.cast_type);
                 if (cast_lval.cast_type ) docast(&cast_lval, lval);
             }
             return k;
