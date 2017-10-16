@@ -124,7 +124,7 @@ SYMBOL* addgotosym(char* sname)
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
-    return (addglb(sname2, ID_GOTOLABEL, 0, 0, 0, 0, 0));
+    return (addglb(sname2, ID_GOTOLABEL, 0, 0, 0));
 }
 
 SYMBOL* findgoto(char* sname)

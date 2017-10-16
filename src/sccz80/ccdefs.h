@@ -42,7 +42,7 @@
  *      Prototypes
  */
 
-extern void     callfunction(SYMBOL *ptr, SYMBOL *fnptr);
+extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 #include "codegen.h"
 extern void copy_to_stack(char *label, int stack_offset,  int size);

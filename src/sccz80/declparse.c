@@ -160,7 +160,7 @@ Type *make_constant(const char *name, int32_t value)
     strcpy(type->name, name);
     type->value = value;
 
-    ptr = addglb(type->name, ID_VARIABLE, KIND_ENUM, 0, STATIK, 0, 0);
+    ptr = addglb(type->name, ID_VARIABLE, KIND_ENUM, 0, STATIK);
     ptr->ctype = type;
     ptr->size = value;
     ptr->isassigned = 1;
@@ -230,7 +230,7 @@ static Type *parse_enum(Type *type)
         int32_t  value = 0;
 
         ptr = make_enum(sname);
-        SYMBOL *sym = addglb(sname, ID_ENUM, type->kind, 0,UNKNOWN , 0, 0);
+        SYMBOL *sym = addglb(sname, ID_ENUM, type->kind, 0, LSTATIC);
         sym->ctype = type;
 
         needchar('{');
@@ -481,7 +481,7 @@ static int check_existing_parameter(Type *func, Type *param)
     for ( i = 0; i < array_len(func->parameters); i++ ) {
         Type *existing = array_get_byindex(func->parameters,i);
 
-        if ( strcmp(existing->name, param->name) == 0 ) {
+        if ( strlen(param->name) && strcmp(existing->name, param->name) == 0 ) {
             printf("A parameter named %s has already been defined for function\n",param->name);
             junk();
             return -1;
@@ -519,8 +519,6 @@ Type *parse_parameter_list(Type *return_type)
     func->parameters = array_init(NULL);        
     
     do {
-      
-        // TODO: K&R
         param = dodeclare2(NULL); // STORAGE_AUTO);
 
         if ( param == NULL ) {
@@ -683,20 +681,25 @@ int declare_local(int local_static)
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
-            sym = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC, 0, 0);
+            sym = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC);
             sym->ctype = type;
             if ( cmatch('=')) {
                 sym->isassigned = 1;
-                sym->storage = LSTATIC_INITIALISED;
+                sym->initialised = 1;
                 initials(namebuf, type);                
             }
         } else {
-            sym = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            int size = type->size;
+
+            if  ( size < 0 ) size = 0;
+
+            sym = addloc(type->name, ID_VARIABLE, type->kind);
             sym->ctype = type;
-            declared += type->size;
+            declared += size;
             sym->offset.i = Zsp - declared;
             if ( cmatch('=')) {
                 sym->isassigned = 1;
+                sym->initialised = 1;
                 if ( type->kind == KIND_STRUCT || type->kind == KIND_ARRAY ) {
                     // Call static initialiser and copy onto stack
                     char newname[NAMESIZE * 2 + 20];
@@ -704,10 +707,10 @@ int declare_local(int local_static)
                     snprintf(newname, sizeof(newname),"auto_%s_%s",currfn->name, sym->name);
                     int alloc_size = initials(newname, type);
                     
-                    declared += (alloc_size - type->size);
+                    declared += (alloc_size - size);
                     if ( type->kind == KIND_ARRAY ) {
-                        sym->offset.i -= (alloc_size - type->size);
-                        sym->size += (alloc_size - type->size);
+                        sym->offset.i -= (alloc_size -size);
+                        sym->size += (alloc_size - size);
                     }
                     Zsp = modstk(Zsp - declared, NO, NO);
                     declared = 0;
@@ -760,9 +763,31 @@ Type *dodeclare(enum storage_type storage)
         if ( type == NULL ) {
             break;
         }
+
         blanks();
-        sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+        if ( strlen(type->name) == 0 ) {
+            // Struct defined
+            needchar(';');
+            return type;
+        }
+        sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         sym->ctype = type;
+        sym->isassigned = 1; // Assigned to 0
+
+        /* We can catch @ here? Need to flag sym somehow */
+        if ( cmatch('@')) {
+            Kind valtype;
+            double val;
+
+            constexpr(&val,&valtype, 1);
+
+            type->value = val;
+            sym->storage = EXTERNP;
+            sym->initialised = 1;
+        }
+
+
+ 
 
         if ( rcmatch('{')) {
             declfunc(type, storage);
@@ -773,6 +798,7 @@ Type *dodeclare(enum storage_type storage)
             continue;
         } 
         needchar('=');
+        sym->initialised = 1;
         initials(type->name, type);
         if ( cmatch(';')) {
             return type;
@@ -884,12 +910,6 @@ Type *dodeclare2(Type **base_type)
         type->flags |= flags;
     }
 
-    /* We can catch @ here */
-    if ( cmatch('@')) {
-
-    }
-
-
     return type;
 }
 
@@ -986,12 +1006,14 @@ static void declfunc(Type *type, enum storage_type storage)
     currfn = findglb(type->name);
     
     if ( currfn != NULL ) {
-        // TODO: Check that it matches
+        // TODO: Check that parameters match
     } else {
-        currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage, 0, 0);
+        currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         currfn->ctype = type;   
     }
 
+    // Reset all local variables
+    locptr = STARTLOC;
     // Setup local variables
     output_section(c_code_section);
     
@@ -1029,15 +1051,21 @@ static void declfunc(Type *type, enum storage_type storage)
         currfn->flags &= ~SMALLC;
     }
     
-    
+    // TODO: If any parameters don't have a name then error
+
     /* For SMALLC we need to start counting from the last argument */
     if ( (type->flags & SMALLC) == SMALLC ) {
         int i;
         for ( i = array_len(currfn->ctype->parameters) - 1; i >= 0; i-- ) {
             SYMBOL *ptr;
             Type *type = array_get_byindex(currfn->ctype->parameters, i);
+
+            if ( strlen(type->name) == 0 ) {
+                errorfmt("Function parameters (argument %d) must be named when defining a function\n",i);
+                return;
+            }
             // Create a local variable
-            ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            ptr = addloc(type->name, ID_VARIABLE, type->kind);
             ptr->ctype = type;
             ptr->offset.i = where;
             ptr->isassigned = 1;
@@ -1048,8 +1076,12 @@ static void declfunc(Type *type, enum storage_type storage)
         for ( i = 0; i < array_len(currfn->ctype->parameters); i++ ) {
             SYMBOL *ptr;
             Type *type = array_get_byindex(currfn->ctype->parameters, i);
+            if ( strlen(type->name) == 0 ) {
+                errorfmt("Function parameters (argument %d) must be named when defining a function\n",i);
+                return;
+            }
             // Create a local variable
-            ptr = addloc(type->name, ID_VARIABLE, type->kind, 0, 0);
+            ptr = addloc(type->name, ID_VARIABLE, type->kind);
             ptr->ctype = type;            
             ptr->offset.i = where;
             ptr->isassigned = 1;            

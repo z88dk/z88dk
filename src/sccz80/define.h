@@ -37,12 +37,8 @@
 #endif
 
 
-#define MAXARGS 20
-
 /*      Define the symbol table parameters      */
 
-/* Stefano  - doubled the global symbol table size */
-/* Aralbrec - doubled the global symbol table size again! */
 
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -86,15 +82,6 @@ typedef struct {
 
 typedef struct type_s Type;
 
-typedef enum {
-    STORAGE_TYPEDEF = 1,
-    STORAGE_EXTERN,
-    STORAGE_STATIC,
-    STORAGE_ENUM,
-    STORAGE_CONSTANT,
-    STORAGE_AUTO,
-    STORAGE_REGISTER
-} storage_type2;
 
 
 struct type_s {
@@ -130,24 +117,14 @@ extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_u
 
 
 enum ident_type {
-        NO_IDENT = 0,
         ID_VARIABLE = 1,
-        ID_ARRAY,
-        POINTER,
-        FUNCTION,
         ID_MACRO,
-        FUNCTIONP,
         ID_GOTOLABEL,
         ID_ENUM,
-        /* Only used is processing, not in symbol table */
-        PTR_TO_FN,
-        PTR_TO_PTR,
-        PTR_TO_FNP
     };
 
 
 enum storage_type {
-    UNKNOWN = 0,
     STATIK = 1,
     STKLOC = 2,
     EXTERNAL = 3,
@@ -155,10 +132,7 @@ enum storage_type {
     DECLEXTN = 5,
     LSTATIC = 6,
     FAR = 7 ,
-    LSTKEXT = 8,
     TYPDEF = 9,
-    STATIC_INITIALISED = 10,
-    LSTATIC_INITIALISED = 11
 };
 
 
@@ -206,6 +180,7 @@ struct symbol_s {
         int  size ;          /* djm, storage reqd! */
         char isconst;        /* Set if const, affects the section the data goes into */
         char isassigned;     /* Set if we have assigned to it once */
+        char initialised;    /* Initialised at compile time */
         enum symbol_flags flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer
@@ -217,46 +192,9 @@ struct symbol_s {
 
 
 
-/*
- *      Value of ellipses in prototypes
- */
-
-#define PKIND_ELLIPSES 255
-
-/*
- *      Mask of sign in prototype
- */
-
-#define PMASKSIGN (UNSIGNED << 16)
-
-/*
- *      What void comes out to in a prototype
- */
-
-#define PKIND_VOID 0x107
-
-/* number of types to which pointers to pointers can be defined */
-/* 15 is more than enough! we need some dummy symbols so casting of **
- * types will work..
- */
-
-#define NTYPE   15
 
 
 
-/*      Define the structure tag table parameters */
-
-#define NUMTAG          300
-#define STARTTAG        tagtab
-#define ENDTAG          tagtab+NUMTAG
-
-
-
-/*      Define the structure member table parameters */
-
-#define NUMMEMB         2000
-#define STARTMEMB       membtab
-#define ENDMEMB         (membtab+NUMMEMB)
 
 /* switch table */
 
@@ -355,10 +293,6 @@ struct gototab_s {
 
 #define MAX_LEVELS 100
 
-/* Extract from the packed argument value */
-#define GET_PACKED_TYPE(v)  (v & 0xff)
-#define GET_PACKED_IDENT(v) ((v >> 8) & 0xff)
-#define GET_PACKED_FLAGS(v) ((v >> 16) & 0xffff)
 
 
 

@@ -361,21 +361,6 @@ void setup_sym()
 {
     defmac("Z80");
     defmac("SMALL_C");
-    /* dummy symbols for pointers to char, int, double */
-    /* note that the symbol names are not valid C variables */
-    dummy_sym[0] = 0;
-    dummy_sym[KIND_CHAR] = addglb("0ch", POINTER, KIND_CHAR, 0, STATIK, 0, 0);
-    dummy_sym[KIND_CHAR]->isassigned = YES;
-    dummy_sym[KIND_INT] = addglb("0int", POINTER, KIND_INT, 0, STATIK, 0, 0);
-    dummy_sym[KIND_INT]->isassigned = YES;
-    dummy_sym[KIND_DOUBLE] = addglb("0dbl", POINTER, KIND_DOUBLE, 0, STATIK, 0, 0);
-    dummy_sym[KIND_DOUBLE]->isassigned = YES;
-    dummy_sym[KIND_LONG] = addglb("0lng", POINTER, KIND_LONG, 0, STATIK, 0, 0);
-    dummy_sym[KIND_LONG]->isassigned = YES;
-    dummy_sym[KIND_CPTR] = addglb("0cpt", POINTER, KIND_CPTR, 0, STATIK, 0, 0);
-    dummy_sym[KIND_CPTR]->isassigned = YES;
-    dummy_sym[KIND_VOID] = addglb("0vd", POINTER, KIND_VOID, 0, STATIK, 0, 0);
-    dummy_sym[KIND_VOID]->isassigned = YES;
 }
 
 void info()
@@ -414,13 +399,10 @@ static void dumpfns()
             storage = ptr->storage;
             if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
-            } else if (ptr->ctype->kind == KIND_FUNC && ptr->ctype->value != 0) {
-                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
-                printf("%s %d\n",ptr->name, ptr->storage);
                 if ( storage == EXTERNP ) {
-                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("= %d\n", ptr->ctype->value);
-                } else if ( storage != LSTATIC && storage != LSTATIC_INITIALISED ) {
+                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
+                } else if ( storage != LSTATIC ) {
                     if ( ptr->ctype->flags & SHARED && c_useshared ) {
                         outfmt("\tGLOBAL\t%s_sl\n",ptr->name);
                     }
@@ -530,22 +512,24 @@ void dumpvars()
     output_section(c_bss_section); // output_section("bss");
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != ID_GOTOLABEL) {
+        if (ptr->name[0] != '0' ) {
             ident = ptr->ident;
-            type = ptr->type;
+            type = ptr->ctype ? ptr->ctype->kind : KIND_NONE;
             storage = ptr->storage;
-            if (ident != ID_ENUM && type != KIND_ENUM && ident != ID_MACRO && ident != FUNCTION && 
-                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != LSTATIC_INITIALISED &&
-                storage != EXTERNP 
-                && storage != LSTKEXT && storage != TYPDEF && 
-                type != KIND_PORT8 && type != KIND_PORT16) {
-                prefix();
-                outname(ptr->name, 1);
-                col();
-                defstorage();
-                outdec(ptr->ctype->size);
-                nl();
-            }
+            if ( ptr->initialised )
+                continue;
+            if ( ident == ID_ENUM || ident == ID_MACRO || ident == ID_GOTOLABEL )
+                continue;
+            if ( type == KIND_FUNC || type == KIND_PORT8 || type == KIND_PORT16 )
+                continue;
+            if ( storage == TYPDEF || storage == DECLEXTN || storage == EXTERNAL ) 
+                continue;
+            prefix();
+            outname(ptr->name, 1);
+            col();
+            defstorage();
+            outdec(ptr->ctype->size);
+            nl();
         }
     }
 

@@ -23,7 +23,6 @@ SYMBOL *symtab, *loctab; /* global and local symbol tables */
 SYMBOL *locptr; /* ptrs to next entries */
 int glbcnt; /* number of globals used */
 
-SYMBOL *dummy_sym[NTYPE + NUMTAG + 1];
 
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */

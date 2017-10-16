@@ -539,8 +539,6 @@ void size_of(LVALUE* lval)
             type = ptr->ctype;
             lval->const_val = type->size;
 
-            printf("Default size is %f kind %d\n",lval->const_val,type->kind);
-
             if (type->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
                 if (type->kind != KIND_STRUCT) {
 
@@ -566,7 +564,7 @@ void size_of(LVALUE* lval)
                         } else {
                             lval->const_val = type->size;
                         }
-                    } while ( mptr->kind == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
+                    } while ( mptr && mptr->kind == KIND_STRUCT && (rmatch2("->") || rcmatch('.')));
                 }
                 /* Check for index operator on array */
                 if (type->kind == KIND_ARRAY ) {

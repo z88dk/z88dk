@@ -225,7 +225,7 @@ void addmac()
         clear();
         return;
     }
-    addglb(sname, ID_MACRO, 0, macptr, STATIK, 0, 0);
+    addglb(sname, ID_MACRO, 0, macptr, STATIK);
     while (ch() == ' ' || ch() == '\t')
         gch();
     while (putmac(gch()))

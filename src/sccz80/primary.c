@@ -90,7 +90,14 @@ int primary(LVALUE* lval)
                 lval->indirect_kind = lval->ptr_type = ptr->type;
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
-            } 
+            } else {
+                lval->symbol = ptr;
+                lval->ltype = ptr->ctype;
+                lval->val_type = KIND_INT;
+                lval->ptr_type = KIND_NONE;
+                lval->indirect_kind = 0;
+                return 1;
+            }
         } else {
             /* Check to see if we have a right bracket, if we don't assume
              * it's a function then we can break an awful lot of code, do it
@@ -104,10 +111,9 @@ int primary(LVALUE* lval)
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
             warning(W_IMPLICIT_DEFINITION, sname);
-            ptr = addglb(sname, 0, KIND_INT, 0, STATIK, 0, 0);
+            ptr = addglb(sname, 0, KIND_INT, 0, STATIK);
             ptr->ctype = default_function(sname);
             ptr->size = 0;
-//            ptr->args[0] = CalcArgValue(KIND_INT, FUNCTION, 0);
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
@@ -408,7 +414,7 @@ void prestep(
             zadd_const(lval, (n * 6));
             break;
         case KIND_STRUCT:
-            zadd_const(lval, n * lval->ltype->tag->size);
+            zadd_const(lval, n * lval->ltype->ptr->tag->size);
             break;
         case KIND_LONG:
             (*step)(lval);
@@ -450,7 +456,7 @@ void poststep(
             nstep(lval, n * 6, unstep);
             break;
         case KIND_STRUCT:
-            nstep(lval, n * lval->ltype->tag->size, unstep);
+            nstep(lval, n * lval->ltype->ptr->tag->size, unstep);
             break;
         case KIND_LONG:
             nstep(lval, n * 4, unstep);

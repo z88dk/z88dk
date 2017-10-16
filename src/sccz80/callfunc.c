@@ -25,7 +25,7 @@ static Kind ForceArgs(Type *dest, Type *src);
  *      zero, will call the contents of HL
  */
 
-void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
+void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
 {
     int isscanf = 0;
     uint32_t format_option = 0;
@@ -44,7 +44,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     int   savesp;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
-    Type   *functype = ptr ? ptr->ctype : fnptr->ctype->ptr;
+    Type   *functype = ptr ? ptr->ctype: fnptr_call_type;
        
 
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
@@ -93,7 +93,7 @@ void callfunction(SYMBOL* ptr, SYMBOL *fnptr)
     needchar(')'); 
     Zsp = savesp;
 
-    if ( ptr == NULL ) ptr = fnptr;
+  //  if ( ptr == NULL ) ptr = fnptr;
 
     if ( ptr != NULL ) {
         /* Check for some builtins */

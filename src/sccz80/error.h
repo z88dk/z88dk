@@ -8,6 +8,7 @@ extern void needlval(void);
 extern void warning(int num,...);
 extern void debug(int num,char *str,...);
 extern void error(int num,...);
+extern void errorfmt(const char *fmt, int fatal, ...);
 
 struct warnings {
         char *warn;

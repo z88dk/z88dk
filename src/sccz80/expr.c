@@ -9,7 +9,6 @@
 
 #include "ccdefs.h"
 
-// TODO: Send back type
 Kind expression(int  *con, double *val, Type **type)
 {
     LVALUE lval={0};
@@ -41,6 +40,7 @@ int heir1(LVALUE* lval)
     if (cmatch('=')) {
         char *start1, *before1;
         if (k == 0) {
+            printf("Stage 1\n");
             needlval();
             return 0;
         }
@@ -604,7 +604,7 @@ int heirb(LVALUE* lval)
     double dval;
     int val, con, direct, k, valtype;
     char flags;
-    SYMBOL* ptr;
+    SYMBOL* ptr = NULL;
 
     setstage(&before1, &start1);
     k = primary(lval);
@@ -636,7 +636,8 @@ int heirb(LVALUE* lval)
                     if (lval->flags & FARPTR)
                         Zsp += 2;
                     if ( val > lval->ltype->len ) {
-                        printf("Out of bounds %d > %d\n",val, lval->ltype->len);
+                        // TODO
+                        //printf("Out of bounds %d > %d\n",val, lval->ltype->len);
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
@@ -657,8 +658,13 @@ int heirb(LVALUE* lval)
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
-                    if (lval->symbol->more) {
-                        scale(lval->val_type, lval->ltype->tag);
+                    // TODO
+                    if (ispointer(lval->ltype) ) {
+                        scale(lval->val_type, lval->ltype->ptr->tag);
+                    } else if ( lval->ltype->kind == KIND_ARRAY ) {
+                        LVALUE tmp = {0};
+                        tmp.val_type = KIND_INT;
+                        mult_const(&tmp,lval->ltype->size / lval->ltype->len);
                     } else {
                         scale(ptr->type, lval->ltype->tag);
                     }
@@ -676,19 +682,16 @@ int heirb(LVALUE* lval)
                 ptr = deref(lval, YES);
                 k = 1;
             } else if (cmatch('(')) {
-                if (ptr == NULL) {
-                    callfunction(NULL,NULL);
-                    /* Bugger knows what ya doing..stop SEGV */
-                    ptr = dummy_sym[KIND_VOID];
-                    warning(W_INTERNAL);
-                } else if (ptr->ctype->kind != KIND_FUNC) {
-                    if (k && lval->const_val == 0)
+                 if ( ispointer(lval->ltype) ) {
+                     if (k && lval->const_val == 0)
                         rvalue(lval);
                     // Functino pointer call
-                    callfunction(NULL,ptr);
-                } else {
+                    callfunction(NULL,lval->ltype->ptr);
+                } else if ( lval->ltype->kind == KIND_FUNC ) {
                     // Normal function call
                     callfunction(ptr,NULL);
+                } else {
+                    // No idea what you are doing, calling a non pointer
                 }
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
@@ -772,9 +775,10 @@ int heirb(LVALUE* lval)
             } else
                 return k;
         }
-    if (ptr && ptr->ident == FUNCTION) {
+    if (ptr && ptr->ctype->kind == KIND_FUNC) {
         address(ptr);
         lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
+        lval->ltype = ptr->ctype;
         lval->flags = ptr->flags;
         return 0;
     }

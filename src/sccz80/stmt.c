@@ -480,14 +480,15 @@ void doreturn(char type)
 {
     /* if not end of statement, get an expression */
     if (endst() == 0) {
+        // TODO: Use ctype
         if (currfn->more) {
             /* return pointer to value */
             force(KIND_INT, doexpr(), YES, c_default_unsigned, 0);
             leave(KIND_INT, type, incritical);
         } else {
             /* return actual value */
-            force(currfn->type, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
-            leave(currfn->type, type, incritical);
+            force(currfn->ctype->kind, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
+            leave(currfn->ctype->kind, type, incritical);
         }
     } else {
         leave(NO, type, incritical);
@@ -503,7 +504,7 @@ void leave(int vartype, char type, int incritical)
 {
     int savesp;
     int save = vartype;
-    int callee_cleanup = (c_compact_code || currfn->flags & CALLEE) && (stackargs > 2);
+    int callee_cleanup = (c_compact_code || currfn->ctype->flags & CALLEE) && (stackargs > 2);
     int hlsaved;
 
     if ( (currfn->flags & NAKED) == NAKED ) {

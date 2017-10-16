@@ -82,7 +82,7 @@ int initials(const char *dropname, Type *type)
     //     }
     // }
     output_section(c_code_section); 
-
+    printf("return %s %d\n",type->name, desize);
     return (desize);
 }
 
@@ -100,7 +100,7 @@ int str_init(Type *tag)
     for ( i = 0; i < array_len(tag->fields); i++ ) {
         if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
-        sz += tag->fields->size;
+        sz += ptr->size;
         init(ptr,1);
     }
     // Pad out the union
@@ -148,6 +148,7 @@ int agg_init(Type *type)
     if ( type->len != -1 ) {
         size += dumpzero(1, type->size - size);
     }
+    printf("Aggregate %s to %d\n",type->name, size);
     return size;
 }
 
@@ -180,8 +181,9 @@ static int init(Type *type, int dump)
             gltptr = 0;
             if ( type->len != -1 ) {
                 dumpzero(type->size/ type->len, type->len - sz);
+                return type->size;
             }
-            return type->size;
+            return sz;
         } else {
             int32_t ivalue = value;
             /* Store the literals in the queue! */
@@ -195,6 +197,7 @@ static int init(Type *type, int dump)
             return 2;
         }
     } else {
+        // TODO....
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
