@@ -22,11 +22,48 @@ extern int  __LIB__ cpc_model(void);
 
 
 ///////////////////////////////////////////
+// KEYBOARD FUNCTIONS
+///////////////////////////////////////////
+
+extern char  __LIB__  cpc_AnyKeyPressed(void);
+extern char  __LIB__  cpc_TestKey(unsigned char key)  __z88dk_fastcall;
+extern char  __LIB__  cpc_TestKeyF(unsigned char key)  __z88dk_fastcall;
+
+///////////////////////////////////////////
+// VIDEO RELATED FUNCTIONS
+///////////////////////////////////////////
+
+// Set video mode via Firmware
+extern int __LIB__  cpc_setmode(int) __z88dk_fastcall;
+extern int __LIB__  cpc_SetModo(int) __z88dk_fastcall;
+
+// Switch video mode directly
+extern int __LIB__  cpc_SetMode(int) __z88dk_fastcall;
+
+// Set CPC color for a specified pen (set color in a palette element)
+extern void __LIB__              cpc_set_palette(int pen, int color) __smallc ;
+void __LIB__    cpc_set_palette_callee(int pen, int color)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_SetInk(int pen, int color) __smallc ;
+void __LIB__    cpc_SetInk_callee(int pen, int color)  __smallc __z88dk_callee;
+
+#define cpc_SetInk(a,b) cpc_SetInk_callee(a,b)
+#define cpc_set_palette(a,b) cpc_set_palette_callee(a,b)
+
+// Set CPC color
+extern void __LIB__              cpc_SetColour(int pos, int color) __smallc ;
+void __LIB__    cpc_SetColour_callee(int pos, int color)  __smallc __z88dk_callee;
+
+#define cpc_SetColour(a,b) cpc_cpc_SetColour(a,b)
+
+// Set Border Color
+extern void  __LIB__  cpc_SetBorder(int color) __z88dk_fastcall;
+
+
+
+///////////////////////////////////////////
 // MISC FUNCTIONS
 ///////////////////////////////////////////
 
-// Switch mode
-extern int __LIB__  cpc_setmode(int) __z88dk_fastcall;
 // Tiny ROM based console gets implementation
 extern int __LIB__ cpc_gets(char *s);
 
@@ -36,12 +73,6 @@ extern char __LIB__              *cpc_rsx_strcpy(char *, char *) __smallc ;
 extern char __LIB__    *cpc_rsx_strcpy_callee(char *, char *)  __smallc __z88dk_callee;
 
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
-
-// Set CPC color for a specified pen (set color in a palette element)
-extern void __LIB__              cpc_set_palette(int pen, int color) __smallc ;
-void __LIB__    cpc_set_palette_callee(int pen, int color)  __smallc __z88dk_callee;
-
-#define cpc_set_palette(a,b) cpc_set_palette_callee(a,b)
 
 // Call RSX/Bar command
 extern int __LIB__ cpc_rsx(char *cmd,...);
