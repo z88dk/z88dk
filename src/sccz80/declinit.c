@@ -100,7 +100,13 @@ int str_init(Type *tag)
         if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
         sz += ptr->size;
-        init(ptr,1);
+        if ( ptr->kind == KIND_STRUCT || ptr->kind == KIND_ARRAY ) {
+            needchar('{');
+            agg_init(ptr);
+            needchar('}');
+        } else {
+            init(ptr,1);
+        }
     }
     // Pad out the union
     if ( sz < tag->size) {

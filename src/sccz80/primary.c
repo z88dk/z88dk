@@ -57,7 +57,7 @@ int primary(LVALUE* lval)
         ptr = findstc(sname);
         if (!ptr)
             ptr = findglb(sname);
-        if (ptr) {
+        if (ptr && ptr->ctype ) {
             if (ptr->ctype->kind != KIND_FUNC && !(ptr->ctype->kind == KIND_PTR && ptr->ctype->ptr->kind == KIND_FUNC) ) {
                 if (ptr->ident == ID_ENUM)
                     error(E_UNSYMB, sname);
