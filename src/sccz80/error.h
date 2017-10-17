@@ -6,6 +6,7 @@ extern void needtoken(char *str);
 extern void needchar(char c);
 extern void needlval(void);
 extern void warning(int num,...);
+extern void warningfmt(const char *fmt, ...);
 extern void debug(int num,char *str,...);
 extern void error(int num,...);
 extern void errorfmt(const char *fmt, int fatal, ...);

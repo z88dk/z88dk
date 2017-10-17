@@ -245,17 +245,34 @@ void debug(int num, char* str, ...)
     fprintf(stderr, "\n");
 }
 
+void warningva(const char *fmt, va_list ap)
+{
+    fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+}
+
+
 void warning(int num, ...)
 {
     va_list ap;
     if (mywarn[num].suppress == 0) {
         fprintf(stderr, "sccz80:%s L:%d Warning:#%d:", Filename, lineno, num);
         va_start(ap, num);
-        vfprintf(stderr, mywarn[num].warn, ap);
+        warningva(mywarn[num].warn, ap);
         va_end(ap);
-        fprintf(stderr, "\n");
     }
 }
+
+void warningfmt(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    warningva(fmt, ap);
+    va_end(ap);
+}
+
 
 
 void errorva(int fatal, const char *fmt, va_list ap)
