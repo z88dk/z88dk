@@ -779,6 +779,12 @@ Type *dodeclare(enum storage_type storage)
             needchar(';');
             return type;
         }
+
+        if ( rcmatch('{')) {
+            declfunc(type, storage);
+            return type;
+        }
+
         sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         sym->ctype = type;
         sym->isassigned = 1; // Assigned to 0
@@ -796,12 +802,7 @@ Type *dodeclare(enum storage_type storage)
         }
 
 
- 
-
-        if ( rcmatch('{')) {
-            declfunc(type, storage);
-            return type;
-        } else  if ( cmatch(';')) {
+         if ( cmatch(';')) {
             return type;
         } else if ( cmatch(',')) {
             continue;
@@ -1008,6 +1009,76 @@ static void handle_kr_type_parameters(Type *func)
     }
 }
 
+/**
+ * Performs a rough match of types (ignoring array lengths)
+ * 
+ * t1 = prototype
+ * t2 = definition
+ */
+int type_matches(Type *t1, Type *t2)
+{
+    int i;
+
+    if ( t1->kind != t2->kind )
+        return 0;
+
+    if ( t1->isunsigned != t2->isunsigned )
+        return 0;
+
+    if ( t1->ptr && t2->ptr ) {
+         if (type_matches(t1->ptr,t2->ptr) == 0 ) 
+            return 0;
+    } else if ( t1->ptr || t2->ptr ) {
+        return 0;
+    }
+
+    if ( t1->return_type && t2->return_type ) {
+        if (type_matches(t1->return_type,t2->return_type) == 0 )
+            return 0;
+    } else if ( t1->return_type || t2->return_type ) {
+        return 0;
+    }
+
+    if ( t1->tag && t2->tag ) {
+        if (type_matches(t1->tag,t2->tag) == 0 ) 
+           return 0;
+    }  else if ( t1->tag || t2->tag ) {
+       return 0;
+    }
+
+    if ( t1->fields && t2->fields) {
+        if ( array_len(t1->fields) != array_len(t2->fields))
+            return 0;
+        for ( i = 0; i < array_len(t1->fields); i++ ) {
+            Type *t1f = array_get_byindex(t1->fields, i);
+            Type *t2f = array_get_byindex(t2->fields, i);
+            if ( type_matches(t1f,t2f) == 0 )
+                return 0;
+        }
+    } else if ( t1->fields || t2->fields ) {
+        return 0;
+    }
+
+    if ( t1->oldstyle == 0 ) {                
+        if ( t1->parameters && t2->parameters) {
+            if ( array_len(t1->parameters) != array_len(t2->parameters))
+                return 0;
+            for ( i = 0; i < array_len(t1->parameters); i++ ) {
+                Type *t1f = array_get_byindex(t1->parameters, i);
+                Type *t2f = array_get_byindex(t2->parameters, i);
+                if ( type_matches(t1f,t2f) == 0 )
+                    return 0;
+            }
+        } else if ( t1->parameters || t2->parameters ) {
+            return 0;
+        }
+    }
+
+    /* If we get here then it's a good enough match */
+    return 1;
+}
+
+
 static void declfunc(Type *type, enum storage_type storage)
 {
     int where;
@@ -1016,6 +1087,11 @@ static void declfunc(Type *type, enum storage_type storage)
     
     if ( currfn != NULL ) {
         // TODO: Check that parameters match
+        if ( type_matches(currfn->ctype, type) == 0 ) {
+            errorfmt("Definition of %s does not match declaration\n",0,currfn->name);
+        }
+        // Take the prototype flags
+        type->flags = currfn->ctype->flags;
     } else {
         currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         currfn->ctype = type;   
