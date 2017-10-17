@@ -610,8 +610,11 @@ int heirb(LVALUE* lval)
     SYMBOL* ptr = NULL;
 
     setstage(&before1, &start1);
+
+    
     k = primary(lval);
     ptr = lval->symbol;
+    printf("%s\n",lval->symbol->name);
     blanks();
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {

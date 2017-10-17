@@ -241,6 +241,7 @@ int pstr(LVALUE *lval)
     int k;
 
     lval->val_type = KIND_INT;
+    lval->ltype = type_int;
     lval->flags &= ~UNSIGNED;
     lval->flags |= c_default_unsigned ? UNSIGNED : 0;
     if (cmatch('\'')) {

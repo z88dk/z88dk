@@ -88,7 +88,6 @@ int primary(LVALUE* lval)
                 address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect_kind = lval->ptr_type = ptr->type;
-                lval->ltype = type_int; // TODO
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else {
@@ -380,6 +379,7 @@ void result(LVALUE* lval, LVALUE* lval2)
         lval->indirect_kind = 0;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
         lval->symbol = lval2->symbol;
+        lval->ltype = lval2->ltype;
         lval->indirect_kind = lval2->indirect_kind;
         lval->ptr_type = lval2->ptr_type;
     }

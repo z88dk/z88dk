@@ -100,7 +100,7 @@ int str_init(Type *tag)
         if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
         sz += ptr->size;
-        if ( ptr->kind == KIND_STRUCT || ptr->kind == KIND_ARRAY ) {
+        if ( ptr->kind == KIND_STRUCT || (ptr->kind == KIND_ARRAY && ptr->ptr->kind != KIND_CHAR) ) {
             needchar('{');
             agg_init(ptr);
             needchar('}');

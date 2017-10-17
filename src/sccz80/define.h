@@ -386,4 +386,12 @@ enum optimisation {
 };
 
 
+#define dump_type(type) do { \
+        UT_string *output; \
+        utstring_new(output); \
+        type_describe(type,output); \
+        printf("%s\n", utstring_body(output)); \
+        utstring_free(output); \
+    } while (0)
+
 #endif
