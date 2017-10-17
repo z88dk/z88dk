@@ -788,6 +788,13 @@ Type *dodeclare(enum storage_type storage)
         sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         sym->ctype = type;
         sym->isassigned = 1; // Assigned to 0
+        {
+            UT_string *output;
+            utstring_new(output);
+            type_describe(type, output);
+            printf("%s\n",utstring_body(output));
+            utstring_free(output);
+        }
 
         /* We can catch @ here? Need to flag sym somehow */
         if ( cmatch('@')) {
@@ -1009,6 +1016,66 @@ static void handle_kr_type_parameters(Type *func)
     }
 }
 
+
+void type_describe(Type *type, UT_string *output)
+{
+    int  i;
+
+    if ( type->ptr )
+        type_describe(type->ptr,output);
+
+    switch ( type->kind ) {
+    case KIND_NONE:
+        return;
+    case KIND_VOID:
+        utstring_printf(output, "void ");
+        break;
+    case KIND_CHAR:
+        utstring_printf(output,"%schar ",type->isunsigned ? "unsigned " : "");
+        break;
+    case KIND_SHORT:
+        utstring_printf(output,"%sshort ",type->isunsigned ? "unsigned " : "");
+        break;
+    case KIND_INT:
+        utstring_printf(output,"%sint ",type->isunsigned ? "unsigned " : "");
+        break;
+    case KIND_LONG:
+        utstring_printf(output,"%slong ",type->isunsigned ? "unsigned " : "");
+        break;
+    case KIND_FLOAT:
+    case KIND_DOUBLE:    
+        utstring_printf(output,"double ");
+        break;
+    case KIND_ARRAY:
+    case KIND_PTR:
+    case KIND_CPTR:
+        utstring_printf(output,"*");
+        break;
+    case KIND_STRUCT:
+        utstring_printf(output,"%s %s ",type->tag->isstruct ? "struct" : "union", type->tag->name);
+        break;
+    case KIND_FUNC:
+        type_describe(type->return_type, output);
+        utstring_printf(output,"%s(",type->name);
+        for ( i = 0; i < array_len(type->parameters) ; i++ ) {
+            if ( i ) utstring_printf(output,", ");
+            type_describe(array_get_byindex(type->parameters,i), output);
+        }
+        utstring_printf(output,")");
+        return;
+    case KIND_ELLIPSES:
+        utstring_printf(output,"...");
+        return;
+    case KIND_PORT8:
+    case KIND_PORT16:
+    case KIND_ENUM:
+    case KIND_CARRY:
+        break;
+    }
+    utstring_printf(output,"%s",type->name);
+    return;
+}
+
 /**
  * Performs a rough match of types (ignoring array lengths)
  * 
@@ -1095,6 +1162,14 @@ static void declfunc(Type *type, enum storage_type storage)
     } else {
         currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         currfn->ctype = type;   
+    }
+
+    {
+        UT_string *output;
+        utstring_new(output);
+        type_describe(type, output);
+        printf("%s\n",utstring_body(output));
+        utstring_free(output);
     }
 
     // Reset all local variables

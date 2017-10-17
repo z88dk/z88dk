@@ -8,7 +8,8 @@
  #define DEFINE_H
 
  #include "lib/uthash.h"
-
+ #include "lib/utstring.h"
+ 
 
 
 #define MALLOC(x)   malloc(x)
@@ -54,7 +55,6 @@
 typedef enum {
     KIND_NONE,
     KIND_VOID,
-    KIND_BOOL,
     KIND_CHAR,
     KIND_SHORT,
     KIND_INT,
@@ -64,7 +64,7 @@ typedef enum {
     KIND_ARRAY,
     KIND_PTR,
     KIND_CPTR,
-    KIND_STRUCT, // 12
+    KIND_STRUCT, // 11
     KIND_FUNC,
     KIND_ELLIPSES,
     KIND_PORT8,
