@@ -253,13 +253,13 @@ int outstage(char c)
     return c;
 }
 
-void outstr(char ptr[])
+void outstr(const char *ptr)
 {
     while (outbyte(*ptr++))
         ;
 }
 
-void outfmt(char* fmt, ...)
+void outfmt(const char* fmt, ...)
 {
     char buf[1024];
     va_list ap;

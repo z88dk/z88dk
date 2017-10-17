@@ -40,6 +40,7 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
             vconst(dropval);
             postlabel(endlab);
             lval->val_type = lval->oldval_kind = KIND_INT; /* stops the carry stuff coming in */
+            lval->ltype = type_int;
             lval->indirect_kind = lval->ptr_type = lval->is_const = lval->const_val = 0;
             lval->stage_add = NULL;
             lval->binop = dummy;
@@ -128,8 +129,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         setstage(&before_constlval, &start_constlval);
 
 
-        if (lval->const_val == 0)
+        if (lval->const_val == 0) {
             lval->stage_add = stagenext;
+            lval->stage_add_ltype = lval2->ltype;
+            printf("Set two 2 %p %s\n",lval2->ltype,lval2->ltype->name);
+        }
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
@@ -167,7 +171,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else {
             if ( lval2->val_type == KIND_LONG ) {
                 vlongconst_noalt(lval->const_val); 
-                lval->val_type = KIND_LONG;             
+                lval->val_type = KIND_LONG;  
+                lval->ltype = type_long; // TODO: Sign           
             } else {
                 const2(lval->const_val);
             }
@@ -191,8 +196,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right, primary loaded */
-            if (lval2->const_val == 0)
+            if (lval2->const_val == 0) {
                 lval->stage_add = start;
+                lval->stage_add_ltype = lval->ltype;   
+            }
 
             /* djm, load double reg for long operators */
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
@@ -397,7 +404,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else {
             if ( lval2->val_type == KIND_LONG ) {
                 vlongconst_noalt(lval->const_val); 
-                lval->val_type = KIND_LONG;             
+                lval->val_type = KIND_LONG;   
+                lval->ltype = type_long;          
             } else {
                 const2(lval->const_val);
             }

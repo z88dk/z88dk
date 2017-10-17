@@ -428,12 +428,20 @@ int heir9(LVALUE* lval)
 
 SYMBOL *deref(LVALUE* lval, char isaddr)
 {
+    Type *old_type = lval->ltype;
+
     lval->ltype = lval->ltype->ptr;
     if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
         lval->ptr_type = KIND_NONE;
     else
         lval->ptr_type = lval->ltype->ptr->kind;
     lval->val_type = lval->indirect_kind = lval->ltype->kind;
+
+    if ( old_type->kind == KIND_CPTR ) {
+        lval->flags |= FARACC;
+    } else {
+        lval->flags &= ~FARACC;
+    }
         
     // flags = lval->flags;
     // if (isaddr) {
@@ -552,7 +560,8 @@ int heira(LVALUE *lval)
         }
         lval->is_const = 0; /* flag as not constant */
         lval->const_val = 1; /* omit rvalue() on func call */
-        lval->stage_add = 0;
+        lval->stage_add = NULL;
+        lval->stage_add_ltype = NULL;
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {

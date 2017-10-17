@@ -189,6 +189,7 @@ Type *make_pointer(Type *base_type)
     type->ptr = base_type;
     type->size = base_type->isfar ? 3 : 2;
     type->len = 1;
+    type->isunsigned = 1;
     return type;
 }
 
@@ -360,6 +361,7 @@ static int chase_typedef(Type *type)
 static Type *parse_type(void)
 {
     Type *type = CALLOC(1,sizeof(*type));
+    int   typed = 0;
 
     type->len = 1;
     if ( swallow("const")) {
@@ -384,10 +386,17 @@ static Type *parse_type(void)
     else if ( amatch("near"))
         type->isfar = 0;
 
-    if ( amatch("signed"))
+    if ( amatch("signed")) {
         type->isunsigned = 0;
-    else if ( amatch("unsigned"))
+        type->kind = KIND_INT;
+        type->size = 2;
+        typed = 1;
+    } else if ( amatch("unsigned")) {
         type->isunsigned = 1;
+        type->kind = KIND_INT; 
+        type->size = 2;        
+        typed = 1;
+    }
     
     if ( amatch("char"))  {
         type->kind = KIND_CHAR;
@@ -412,9 +421,9 @@ static Type *parse_type(void)
         return parse_struct(type, 1);
     } else if ( amatch("union")) {
         return parse_struct(type, 0);
-    } else if ( chase_typedef(type) < 0 ) {
+    } else if ( chase_typedef(type) < 0 && typed == 0 ) {
         FREENULL(type);
-        return type;
+        return NULL;
     }
 
     // Successful
@@ -1017,17 +1026,7 @@ static void declfunc(Type *type, enum storage_type storage)
     // Setup local variables
     output_section(c_code_section);
     
-    nl();
-    prefix();
-    outname(currfn->name, dopref(currfn));
-    col(); /* print function name */
-    if (dopref(currfn) == NO) {
-        nl();
-        prefix();
-        outname(currfn->name, YES);
-        col();
-    }
-    nl();
+
 
     infunc = 1; /* In a function for sure! */
     
@@ -1053,6 +1052,8 @@ static void declfunc(Type *type, enum storage_type storage)
     
     // TODO: If any parameters don't have a name then error
 
+    nl();
+    outfmt("; Function %s flags 0x%08x\n",type->name,type->flags);
     /* For SMALLC we need to start counting from the last argument */
     if ( (type->flags & SMALLC) == SMALLC ) {
         int i;
@@ -1068,8 +1069,9 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr = addloc(type->name, ID_VARIABLE, type->kind);
             ptr->ctype = type;
             ptr->offset.i = where;
+            outfmt("; parameter %s at %d size(%d)\n",type->name, where, type->size);
             ptr->isassigned = 1;
-            where += type->size;
+            where += type->size != 1 ? type->size : 2; 
         }
     } else {
         int i;
@@ -1084,10 +1086,22 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr = addloc(type->name, ID_VARIABLE, type->kind);
             ptr->ctype = type;            
             ptr->offset.i = where;
+            outfmt("; parameter %s at %d\n",type->name, where);            
             ptr->isassigned = 1;            
-            where += type->size;
+            where += type->size != 1 ? type->size : 2;
         }
     }
+
+    prefix();
+    outname(currfn->name, dopref(currfn));
+    col(); /* print function name */
+    if (dopref(currfn) == NO) {
+        nl();
+        prefix();
+        outname(currfn->name, YES);
+        col();
+    }
+    nl();
         
     
     if ( (type->flags & CRITICAL) == CRITICAL ) {

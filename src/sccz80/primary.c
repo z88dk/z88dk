@@ -39,10 +39,10 @@ int primary(LVALUE* lval)
             lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
             lval->ptr_type = KIND_NONE;
-            if ( lval->ltype->kind == KIND_PTR ) {
+            if ( ispointer(lval->ltype) ) {
                 lval->ptr_type = ptr->ctype->ptr->kind;
                 /* djm long pointers */
-                lval->indirect_kind = lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
+                lval->indirect_kind = lval->val_type = lval->ltype->kind;
             }
             
             if ( lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
@@ -88,6 +88,7 @@ int primary(LVALUE* lval)
                 address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect_kind = lval->ptr_type = ptr->type;
+                lval->ltype = type_int; // TODO
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else {
@@ -124,6 +125,7 @@ int primary(LVALUE* lval)
         return (0);
     }
     if (constant(lval)) {
+        // lval->ltype is set by constant()
         lval->symbol = NULL;
         lval->indirect_kind = 0;
         return (0);
@@ -246,9 +248,9 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int lconst)
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
         if (t2 != KIND_LONG && (!lconst)) {
-            if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY)
+            if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY) {
                 convSint2long();
-            else
+            } else
                 convUint2long();
         }
         return;
@@ -513,7 +515,7 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
-    if (lval->indirect_kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
+    if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
             lpush();
@@ -544,7 +546,7 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->indirect_kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
+    if (lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
     } else {
         switch ((lval->symbol->offset.i + lval->offset) - Zsp) {
@@ -613,7 +615,7 @@ void test(int label, int parens)
     char *before, *start;
     LVALUE lval={0};
     void (*oper)(LVALUE *lva);
-
+    
     if (parens)
         needchar('(');
     while (1) {
@@ -639,15 +641,18 @@ void test(int label, int parens)
         return;
     }
     if (lval.stage_add) { /* stage address of "..oper 0" code */
+        lval.ltype= lval.stage_add_ltype;
+        
         oper = lval.binop; /* operator function pointer */
         lval.binop = 0; /* Reset binop to 0 so not picked up by comparison ops */
         if (oper == zeq || (oper == zle && utype(&lval)))
             zerojump(eq0, label, &lval);
         else if (oper == zne || (oper == zgt && utype(&lval)))
             zerojump(testjump, label, &lval);
-        else if (oper == zge && utype(&lval))
+        else if (oper == zge && utype(&lval)) {
             clearstage(lval.stage_add, 0);
-        else if (oper == zlt && utype(&lval)) {
+            lval.stage_add = NULL;
+        } else if (oper == zlt && utype(&lval)) {
             zerojump(jump0, label, &lval);
             warning(W_UNREACH);
         } else if (oper == zgt)

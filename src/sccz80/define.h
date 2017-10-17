@@ -365,6 +365,7 @@ struct lvalue_s {
         double const_val ;                        /* value of constant expression (& other uses) */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
+        Type *stage_add_ltype;          /* Type at stage_add being set */
         int val_type ;                  /* type of value calculated */
 	Kind oldval_kind;		/* What the valtype was */
         enum symbol_flags flags;        /* As per symbol */

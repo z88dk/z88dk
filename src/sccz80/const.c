@@ -231,11 +231,7 @@ void address(SYMBOL* ptr)
     immed();
     outname(ptr->name, dopref(ptr));
     nl();
-    /* djm if we're using int32_t pointers, use of e=0 means absolute address,
- * this covers up a bit of a problem in deref() which can't distinguish
- * between ptrtoptr and ptr
- */
-    if (ptr->flags & FARPTR) {
+    if ( ptr->ctype->kind == KIND_CPTR ) {
         const2(0);
     }
 }
@@ -490,7 +486,6 @@ void size_of(LVALUE* lval)
     int length;
     Type *type;
     SYMBOL *ptr;
-    enum ident_type ident;
     int          deref = 0;
 
     needchar('(');
@@ -529,7 +524,6 @@ void size_of(LVALUE* lval)
         Type *type;
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
             Kind ptrtype = KIND_NONE;
-            enum symbol_flags ptrflags;
             Type       *ptrotag = NULL;
 
 

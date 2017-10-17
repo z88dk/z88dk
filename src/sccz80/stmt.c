@@ -480,18 +480,10 @@ void doreturn(char type)
 {
     /* if not end of statement, get an expression */
     if (endst() == 0) {
-        // TODO: Use ctype
-        if (currfn->more) {
-            /* return pointer to value */
-            force(KIND_INT, doexpr(), YES, c_default_unsigned, 0);
-            leave(KIND_INT, type, incritical);
-        } else {
-            /* return actual value */
-            force(currfn->ctype->kind, doexpr(), currfn->ctype->return_type->isunsigned, c_default_unsigned, 0);
-            leave(currfn->ctype->kind, type, incritical);
-        }
+        force(currfn->ctype->return_type->kind, doexpr(), currfn->ctype->return_type->isunsigned, c_default_unsigned, 0);
+        leave(currfn->ctype->return_type->kind, type, incritical);
     } else {
-        leave(NO, type, incritical);
+        leave(KIND_INT, type, incritical);
     }
 }
 

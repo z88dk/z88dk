@@ -313,7 +313,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, ptr ? (ptr->ctype->return_type->kind != KIND_DOUBLE) : YES, preserve); /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE, preserve); /* clean up arguments - we know what type is MOOK */
     }
 }
 

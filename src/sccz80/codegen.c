@@ -907,6 +907,7 @@ void zerojump(
     LVALUE* lval)
 {
     clearstage(lval->stage_add, 0); /* purge conventional code */
+    lval->stage_add = NULL;
 #ifdef CHARCOMP0
     if (lval->oldval_kind == KIND_CHAR) {
         if (oper == testjump) { /* !=0 or >=0U */
@@ -2374,6 +2375,8 @@ void le0(LVALUE* lval, int label)
 /* test for greater than zero */
 void gt0(LVALUE* lval, int label)
 {
+    printf("kind %d %d\n",lval->ltype->kind, lval->ltype->isunsigned);
+    
     ge0(lval, label);
     if (lval->oldval_kind == KIND_LONG) {
         ol("or\th");
