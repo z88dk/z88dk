@@ -689,6 +689,34 @@ ENDIF
 ;; crt rules for yaz180 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   IFDEF CRT_PHASE_CODE_COMMMON1
+
+      defc __crt_phase_code_common1 = CRT_PHASE_CODE_COMMON1
+
+   ELSE
+
+      IFDEF TAR__crt_phase_code_common1
+
+         defc __crt_phase_code_common1 = TAR__crt_phase_code_common1
+
+      ENDIF
+
+   ENDIF
+
+   IFDEF CRT_ORG_DATA_COMMMON1
+
+      defc __crt_org_data_common1 = CRT_ORG_DATA_COMMON1
+
+   ELSE
+
+      IFDEF TAR__crt_org_data_common1
+
+         defc __crt_org_data_common1 = TAR__crt_org_data_common1
+
+      ENDIF
+
+   ENDIF
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -744,7 +772,7 @@ IF __MMAP = 0
    ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "../crt_memory_model_z180.inc"
+   INCLUDE "crt_yabios_memory_model_z180.inc"
 
 
 
@@ -1377,7 +1405,8 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "../crt_page_zero_z180.inc"
+   ; special YABIOS Page 0
+   include "crt_yabios_page_zero_z180.inc"
 
 ENDIF
 
@@ -1424,15 +1453,6 @@ __Restart_2:
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
-
-   ; we do 256 ticks per second
-      ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
-      out0 (RLDR0L), l
-      out0 (RLDR0H), h
-
-   ; enable down counting and interrupts for PRT0
-      ld a, TCR_TIE0|TCR_TDE0
-      out0 (TCR), a
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

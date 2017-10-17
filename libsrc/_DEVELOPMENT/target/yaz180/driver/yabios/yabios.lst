@@ -1,0 +1,5 @@
+target/yaz180/driver/yabios/asm_z180_trap
+target/yaz180/driver/yabios/asm_am9511a_rst
+target/yaz180/driver/yabios/asm_error_handler_rst
+target/yaz180/driver/yabios/asm_far_call_rst
+target/yaz180/driver/yabios/asm_system_rst
