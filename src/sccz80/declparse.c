@@ -788,13 +788,6 @@ Type *dodeclare(enum storage_type storage)
         sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         sym->ctype = type;
         sym->isassigned = 1; // Assigned to 0
-        {
-            UT_string *output;
-            utstring_new(output);
-            type_describe(type, output);
-            printf("%s\n",utstring_body(output));
-            utstring_free(output);
-        }
 
         /* We can catch @ here? Need to flag sym somehow */
         if ( cmatch('@')) {
@@ -1155,7 +1148,16 @@ static void declfunc(Type *type, enum storage_type storage)
     if ( currfn != NULL ) {
         // TODO: Check that parameters match
         if ( type_matches(currfn->ctype, type) == 0 ) {
-            errorfmt("Definition of %s does not match declaration\n",0,currfn->name);
+            UT_string *output;
+
+            utstring_new(output);
+
+            utstring_printf(output,"Definition of '%s': ", type->name);
+            type_describe(type, output);
+            utstring_printf(output," - does not match declaration at %s : ",currfn->declared_location);
+            type_describe(currfn->ctype, output);            
+            errorfmt("%s\n",0,utstring_body(output));
+            utstring_free(output);
         }
         // Take the prototype flags
         type->flags = currfn->ctype->flags;
@@ -1164,13 +1166,6 @@ static void declfunc(Type *type, enum storage_type storage)
         currfn->ctype = type;   
     }
 
-    {
-        UT_string *output;
-        utstring_new(output);
-        type_describe(type, output);
-        printf("%s\n",utstring_body(output));
-        utstring_free(output);
-    }
 
     // Reset all local variables
     locptr = STARTLOC;
