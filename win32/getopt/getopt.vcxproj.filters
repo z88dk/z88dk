@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\getopt\getopt.h">
+    <ClInclude Include="..\..\ext\getopt\getopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\getopt\getopt.c">
+    <ClCompile Include="..\..\ext\getopt\getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
