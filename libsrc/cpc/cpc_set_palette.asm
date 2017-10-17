@@ -13,8 +13,12 @@
         PUBLIC    cpc_set_palette
         PUBLIC    _cpc_set_palette
         EXTERN     cpc_set_palette_callee
+        EXTERN     cpc_SetInk
+        EXTERN     _cpc_SetInk
         EXTERN    ASMDISP_CPC_SET_PALETTE_CALLEE
 
+.cpc_SetInk
+._cpc_SetInk
 .cpc_set_palette
 ._cpc_set_palette
         pop     de
