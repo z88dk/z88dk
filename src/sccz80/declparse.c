@@ -491,7 +491,7 @@ static int check_existing_parameter(Type *func, Type *param)
         Type *existing = array_get_byindex(func->parameters,i);
 
         if ( strlen(param->name) && strcmp(existing->name, param->name) == 0 ) {
-            printf("A parameter named %s has already been defined for function\n",param->name);
+            errorfmt("A parameter named %s has already been defined for function\n",1, param->name);
             junk();
             return -1;
         }
@@ -557,7 +557,7 @@ Type *parse_parameter_list(Type *return_type)
                     array_add(func->parameters, param);    
                     func->hasva = 1;            
                 } else {                    
-                    printf("Ellipses must follow a parameter\n");
+                    errorfmt("Ellipses must follow a parameter\n",1);
                 }
                 break;
             } else if ( param->kind == KIND_VOID ) {
@@ -610,11 +610,11 @@ Type *parse_decl_array(Type *base_type)
 Type *parse_decl_func(Type *base_type)
 {
     if ( base_type->kind == KIND_FUNC ) {
-        printf("Can't define a function returning a function");
+        errorfmt("Can't define a function returning a function\n",1);
         return NULL;
     }
     if ( base_type->kind == KIND_ARRAY ) {
-        printf("Can't define a function returning an array");
+        errorfmt("Can't define a function returning an array\n",1);
         return NULL;
     }
     return parse_parameter_list(base_type);
@@ -654,7 +654,8 @@ Type *parse_decl(char name[], Type *base_type)
     if ( rcmatch('*')) {
         needchar('*');
         if ( base_type == NULL ) {
-            printf("Pointer to what exactly?");
+            errorfmt("Pointer to what exactly?\n",1);
+            junk();
             return NULL;
         }
         return parse_decl(name, make_pointer(base_type));
@@ -999,7 +1000,7 @@ static void handle_kr_type_parameters(Type *func)
             }
         }
         if ( i == array_len(func->parameters) ) {
-            printf("Found declaration for unknown parameter");
+            warningfmt("Found K&R declaration for unknown parameter '%s' for function '%s'\n",param->name, func->name);
         }
         if ( cmatch(',')) {
             // Nothing
