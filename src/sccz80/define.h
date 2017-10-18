@@ -375,7 +375,8 @@ struct lvalue_s {
      //   enum storage_type storage;	/* storage (from sym tab) */
         Type *cast_type;
 	//int  level;		/* Parenth level (cast) */
-	int  offset;
+        int  offset;
+        int  base_offset;               /* Where the variable is located on the stack */
 } ;
 
 /* Enable optimisations that are longer than the conventional sequence */ 

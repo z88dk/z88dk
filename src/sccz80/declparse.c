@@ -704,7 +704,7 @@ int declare_local(int local_static)
 
             sym = addloc(type->name, ID_VARIABLE, type->kind);
             sym->ctype = type;
-            declared += size;
+            declared += size;                        
             sym->offset.i = Zsp - declared;
             if ( cmatch('=')) {
                 sym->isassigned = 1;
@@ -757,6 +757,7 @@ int declare_local(int local_static)
             }
         }
     } while ( cmatch(','));
+    needchar(';');
     return 1;
 }
 

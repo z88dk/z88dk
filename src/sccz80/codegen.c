@@ -1110,7 +1110,7 @@ modstkcht:
 }
 
 /* Multiply the primary register by the length of some variable */
-void scale(int type, Type *tag)
+void scale(Kind type, Type *tag)
 {
     switch (type) {
     case KIND_INT:

@@ -40,7 +40,6 @@ int heir1(LVALUE* lval)
     if (cmatch('=')) {
         char *start1, *before1;
         if (k == 0) {
-            printf("Stage 1\n");
             needlval();
             return 0;
         }
@@ -148,6 +147,7 @@ int heir1(LVALUE* lval)
     lval3.flags = lval->flags;
     lval3.val_type = lval->val_type;
     lval3.offset = lval->offset;
+    lval3.base_offset = lval->base_offset;
     /* don't clear address calc we need it on rhs */
     if (lval->indirect_kind)
         smartpush(lval, 0);
@@ -614,7 +614,6 @@ int heirb(LVALUE* lval)
     
     k = primary(lval);
     ptr = lval->symbol;
-    printf("%s\n",lval->symbol->name);
     blanks();
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
@@ -652,21 +651,21 @@ int heirb(LVALUE* lval)
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
+                        lval->base_offset = getloc(ptr, val);
                         lval->offset = val;
-                        getloc(ptr, val);
                     } else {
                         /* add constant offset to address in primary */
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
                         zadd_const(lval, val  - lval->offset);
-                        lval->offset = val;
+                        lval->offset = 0;
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
                     // TODO
                     if (ispointer(lval->ltype) ) {
-                        scale(lval->val_type, lval->ltype->ptr->tag);
+                        scale(lval->ltype->ptr->kind, lval->ltype->ptr->tag);
                     } else if ( lval->ltype->kind == KIND_ARRAY ) {
                         LVALUE tmp = {0};
                         tmp.val_type = KIND_INT;

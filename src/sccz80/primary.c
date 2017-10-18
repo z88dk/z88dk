@@ -33,7 +33,8 @@ int primary(LVALUE* lval)
             offset_of(lval);
             return(0);
         } else if ((ptr = findloc(sname))) {
-            lval->offset = getloc(ptr, 0);
+            lval->base_offset = getloc(ptr, 0);
+            lval->offset = 0;
             lval->symbol = ptr;
             lval->ltype = ptr->ctype;
             lval->val_type = lval->indirect_kind = ptr->type;
@@ -515,6 +516,7 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
+
     if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
@@ -523,7 +525,7 @@ void smartpush(LVALUE* lval, char* before)
             zpush();
         }
     } else {
-        switch ((lval->symbol->offset.i + lval->offset) - Zsp) {
+        switch ((lval->symbol->offset.i) - Zsp) {
         case 0:
         case 2:
             if (before)
@@ -549,7 +551,7 @@ void smartstore(LVALUE* lval)
     if (lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
     } else {
-        switch ((lval->symbol->offset.i + lval->offset) - Zsp) {
+        switch ((lval->symbol->offset.i) - Zsp) {
         case 0:
             if ( lval->symbol->isconst && lval->symbol->isassigned ) {
                 error(E_CHANGING_CONST, lval->symbol);
