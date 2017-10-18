@@ -1,12 +1,11 @@
 
-SECTION data_align_256
+INCLUDE "config_private.inc"
+
+SECTION data_common1_align_256
 
 PUBLIC asci0TxBuffer
 
-EXTERN __ASCI0_TX_SIZE
-
-; asci0TxBuffer:   defs __ASCI0_TX_SIZE  ; Space for the Tx Buffer
-asci0TxBuffer:   defm __ASCI0_TX_SIZE  ; Space for the Tx Buffer
+asci0TxBuffer:   defs __ASCI0_TX_SIZE  ; Space for the Tx Buffer
 
 ; pad to next 256 byte boundary
 
@@ -14,7 +13,7 @@ IF (ASMPC & 0xff)
    defs 256 - (ASMPC & 0xff)
 ENDIF
 
-SECTION data_driver
+SECTION data_common1_driver
 
 PUBLIC asci0TxCount, asci0TxIn, asci0TxOut, asci0TxLock
 

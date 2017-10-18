@@ -10,8 +10,6 @@ EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
                             ; Clear Refresh Control Reg (RCR)
     OUT0    (RCR),A         ; DRAM Refresh Enable (0 Disabled)
 
-    OUT0    (TCR),A         ; Disable PRT downcounting
-
                             ; Clear INT/TRAP Control Register (ITC)             
     OUT0    (ITC),A         ; Disable all external interrupts.             
 
@@ -29,17 +27,26 @@ EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
     OUT0    (DCNTL),A       ; 0 Memory Wait & 2 I/O Wait
 
                             ; Set Logical RAM Addresses
-                            ; $E000-$FFFF RAM   CA1  -> $E.
-                            ; $D000-$DFFF RAM   BANK
+                            ; $F000-$FFFF RAM   CA1  -> $F.
+                            ; $D000-$EFFF RAM   BANK
                             ; $0000-$CFFF Flash BANK -> $.0
 
-    LD      A,$E0           ; Set New Common 1 / Bank Areas for RAM
+    LD      A,$F0           ; Set New Common 1 / Bank Areas for RAM
     OUT0    (CBAR),A
 
-    LD      A,$00           ; Set Common 1 Base Physical $0D000 -> $00
+    LD      A,$00           ; Set Common 1 Base Physical $0F000 -> $00
     OUT0    (CBR),A
 
     LD      A,$00           ; Set Bank Base Physical $00000 -> $00
     OUT0    (BBR),A
+
+                            ; we do 256 ticks per second
+    ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
+    out0 (RLDR0L), l
+    out0 (RLDR0H), h
+
+                            ; enable down counting and interrupts for PRT0
+    ld a, TCR_TIE0|TCR_TDE0
+    out0 (TCR), a
 
 ENDIF
