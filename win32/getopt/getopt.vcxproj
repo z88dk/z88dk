@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\getopt\getopt.h" />
+    <ClInclude Include="..\..\ext\getopt\getopt.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\getopt\getopt.c" />
+    <ClCompile Include="..\..\ext\getopt\getopt.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0E6DEEBD-2979-4AB0-AB8A-5A51F6579AAF}</ProjectGuid>
