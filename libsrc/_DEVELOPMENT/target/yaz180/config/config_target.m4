@@ -43,10 +43,6 @@ define(`__IO_PIO_PORT_BASE', 0x4000)        # Base Address for 82C55
 
 # PCA9665 I2C Definitions
 
-define(`__I2C_RX_SIZE', 0x100)    # Size of the Rx Buffer, 256 Bytes
-define(`__I2C_TX_SIZE', 0x100)    # Size of the Tx Buffer, 256 Bytes
-                                  # PCA9665 has 68 Byte Tx/Rx hardware buffer
-
 define(`__IO_PCA9665_1_PORT_BASE', 0xA000)  # Base Address for PCA9665 1 I/O
 define(`__IO_PCA9665_2_PORT_BASE', 0x8000)  # Base Address for PCA9665 2 I/O
 
@@ -85,9 +81,6 @@ PUBLIC `__IO_BREAK'
 
 PUBLIC `__IO_PIO_PORT_BASE'
 
-PUBLIC `__I2C_RX_SIZE'
-PUBLIC `__I2C_TX_SIZE'
-
 PUBLIC `__IO_PCA9665_1_PORT_BASE'
 PUBLIC `__IO_PCA9665_2_PORT_BASE'
 
@@ -118,9 +111,6 @@ defc `__ASCI1_TX_SIZE' = __ASCI1_TX_SIZE
 defc `__IO_BREAK' = __IO_BREAK
 
 defc `__IO_PIO_PORT_BASE' = __IO_PIO_PORT_BASE
-
-defc `__I2C_RX_SIZE' = __I2C_RX_SIZE
-defc `__I2C_TX_SIZE' = __I2C_TX_SIZE
 
 defc `__IO_PCA9665_1_PORT_BASE' = __IO_PCA9665_1_PORT_BASE
 defc `__IO_PCA9665_2_PORT_BASE' = __IO_PCA9665_2_PORT_BASE
@@ -153,9 +143,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_BREAK'  __IO_BREAK
 
 `#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
-
-`#define' `__I2C_RX_SIZE'  __I2C_RX_SIZE
-`#define' `__I2C_TX_SIZE'  __I2C_TX_SIZE
 
 `#define' `__IO_PCA9665_1_PORT_BASE'  __IO_PCA9665_1_PORT_BASE
 `#define' `__IO_PCA9665_2_PORT_BASE'  __IO_PCA9665_2_PORT_BASE

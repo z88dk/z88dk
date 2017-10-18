@@ -39,12 +39,12 @@ ifelse(__STARTUP, -1,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; asci driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; yabios drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 0,
 `
-   ; asci0 drivers installed on stdin, stdout, stderr
+   ; yabios asci0 drivers installed on stdin, stdout, stderr
 
    IFNDEF __CRTCFG
    
