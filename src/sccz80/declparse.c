@@ -491,7 +491,7 @@ static int check_existing_parameter(Type *func, Type *param)
         Type *existing = array_get_byindex(func->parameters,i);
 
         if ( strlen(param->name) && strcmp(existing->name, param->name) == 0 ) {
-            errorfmt("A parameter named %s has already been defined for function\n",1, param->name);
+            errorfmt("A parameter named %s has already been defined for function",1, param->name);
             junk();
             return -1;
         }
@@ -557,7 +557,7 @@ Type *parse_parameter_list(Type *return_type)
                     array_add(func->parameters, param);    
                     func->hasva = 1;            
                 } else {                    
-                    errorfmt("Ellipses must follow a parameter\n",1);
+                    errorfmt("Ellipses must follow a parameter",1);
                 }
                 break;
             } else if ( param->kind == KIND_VOID ) {
@@ -610,11 +610,11 @@ Type *parse_decl_array(Type *base_type)
 Type *parse_decl_func(Type *base_type)
 {
     if ( base_type->kind == KIND_FUNC ) {
-        errorfmt("Can't define a function returning a function\n",1);
+        errorfmt("Can't define a function returning a function",1);
         return NULL;
     }
     if ( base_type->kind == KIND_ARRAY ) {
-        errorfmt("Can't define a function returning an array\n",1);
+        errorfmt("Can't define a function returning an array",1);
         return NULL;
     }
     return parse_parameter_list(base_type);
@@ -654,7 +654,7 @@ Type *parse_decl(char name[], Type *base_type)
     if ( rcmatch('*')) {
         needchar('*');
         if ( base_type == NULL ) {
-            errorfmt("Pointer to what exactly?\n",1);
+            errorfmt("Pointer to what exactly?",1);
             junk();
             return NULL;
         }
@@ -947,6 +947,7 @@ void declare_func_kr()
     Type  *func;
   
     if ( symname(sname) == 0 ) {
+        junk();
         return;
     }
     needchar('(');
@@ -1000,7 +1001,7 @@ static void handle_kr_type_parameters(Type *func)
             }
         }
         if ( i == array_len(func->parameters) ) {
-            warningfmt("Found K&R declaration for unknown parameter '%s' for function '%s'\n",param->name, func->name);
+            warningfmt("Found K&R declaration for unknown parameter '%s' for function '%s'",param->name, func->name);
         }
         if ( cmatch(',')) {
             // Nothing
@@ -1158,7 +1159,7 @@ static void declfunc(Type *type, enum storage_type storage)
             type_describe(type, output);
             utstring_printf(output," - does not match declaration at %s : ",currfn->declared_location);
             type_describe(currfn->ctype, output);            
-            errorfmt("%s\n",0,utstring_body(output));
+            errorfmt("%s",0,utstring_body(output));
             utstring_free(output);
         }
         // Take the prototype flags
@@ -1209,10 +1210,10 @@ static void declfunc(Type *type, enum storage_type storage)
             SYMBOL *ptr;
             Type *type = array_get_byindex(currfn->ctype->parameters, i);
 
-            if ( strlen(type->name) == 0 ) {
-                errorfmt("Function parameters (argument %d) must be named when defining a function\n",i);
-                return;
-            }
+            if ( strlen(type->name) == 0 || type->name[0] == '0') {
+                errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
+                continue;
+            } 
             // Create a local variable
             ptr = addloc(type->name, ID_VARIABLE, type->kind);
             ptr->ctype = type;
@@ -1226,9 +1227,9 @@ static void declfunc(Type *type, enum storage_type storage)
         for ( i = 0; i < array_len(currfn->ctype->parameters); i++ ) {
             SYMBOL *ptr;
             Type *type = array_get_byindex(currfn->ctype->parameters, i);
-            if ( strlen(type->name) == 0 ) {
-                errorfmt("Function parameters (argument %d) must be named when defining a function\n",i);
-                return;
+            if ( strlen(type->name) == 0  || type->name[0] == '0') {
+                errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
+                continue;
             }
             // Create a local variable
             ptr = addloc(type->name, ID_VARIABLE, type->kind);
