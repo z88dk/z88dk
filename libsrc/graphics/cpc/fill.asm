@@ -23,7 +23,7 @@
 ;              Carry false
 ;
 ;
-;	$Id: fill.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
+;	$Id: fill.asm $
 ;
 
 
@@ -47,24 +47,16 @@
 		ld      e,(ix+2)
 		ld      d,(ix+3)
 
-		ld      hl,maxy
+		ld      hl,maxy-1
 		sbc     hl,de
 
 		ld      e,(ix+4)
 		ld      d,(ix+5)
 
-		and     a		; double size (?)
-		rl      l
-		rl      h
-
-		and     a
-		rl      e
-		rl      d
-
         call    firmware
         defw    gra_move_absolute
 
-        ld      a,fcolor
+        ld      a,1		; fore color
 
 		ld      hl,-3192	; create the buffer on stack
 		add     hl,sp
@@ -78,5 +70,6 @@
 		ld      hl,3192		; restore the stack pointer
 		add     hl,sp
 		ld      sp,hl
+		
 		pop	ix
 		ret
