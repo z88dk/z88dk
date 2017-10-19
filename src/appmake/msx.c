@@ -18,6 +18,7 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static int               origin       = -1;
 static char              fmsx         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
@@ -40,6 +41,7 @@ option_t msx_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  "fmsx",     "fMSX CAS format",  OPT_BOOL,  &fmsx },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
@@ -121,15 +123,24 @@ int msx_exec(char *target)
 	char       name[11];
     int        c;
     int        i;
+    int        pos;
     int        len;
 
 	
     if ( help )
         return -1;
 
-    if ( binname == NULL || (!dumb && ( crtfile == NULL )) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
+
+	if ( origin != -1 ) {
+		pos = origin;
+	} else {
+		if ( (pos = get_org_addr(crtfile)) == -1 ) {
+			myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+		}
+	}
 
 	if (loud) {
 		msx_h_lvl = 0xFd;
@@ -209,9 +220,9 @@ int msx_exec(char *target)
 		else
 			fputc(254,fpout);
 
-		writeword(40000,fpout);        /* Start Address */
-		writeword(40000+len+1,fpout); /* End Address */
-		writeword(40000,fpout);        /* Call Address */
+		writeword(pos,fpout);        /* Start Address */
+		writeword(pos+len+1,fpout); /* End Address */
+		writeword(pos,fpout);        /* Call Address */
 
 		
 	/* We append the binary file */
