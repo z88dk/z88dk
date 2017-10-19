@@ -29,6 +29,7 @@ extern char  __LIB__  cpc_AnyKeyPressed(void);
 extern char  __LIB__  cpc_TestKey(unsigned char key)  __z88dk_fastcall;
 extern char  __LIB__  cpc_TestKeyF(unsigned char key)  __z88dk_fastcall;
 extern void  __LIB__  cpc_DeleteKeys(void);
+extern char  __LIB__  cpc_RedefineKey(unsigned char key)  __z88dk_fastcall;
 
 extern void __LIB__              cpc_AssignKey(unsigned char key, int value) __smallc ;
 void __LIB__    cpc_AssignKey_callee(unsigned char key, int value)  __smallc __z88dk_callee;
@@ -83,6 +84,10 @@ void __LIB__    cpc_RRI_callee(unsigned int pos, unsigned char w, unsigned char 
 
 // Clear Screen
 extern void   __LIB__   	cpc_ClrScr(void);
+
+// Print String using firmware
+extern char  __LIB__  cpc_PrintStr(char *cadena)  __z88dk_fastcall;
+
 
 
 ///////////////////////////////////////////
