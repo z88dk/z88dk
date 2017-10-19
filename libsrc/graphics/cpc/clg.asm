@@ -22,16 +22,58 @@
 
 .clg
 ._clg
-        ld      a,bcolor
-        call    firmware
-        defw    gra_set_paper
-        ld      a,fcolor
-        call    firmware
-        defw    gra_set_pen
+;; mode 1
+ld a,2
+	call    firmware
+	defw scr_set_mode
+
+; set border
+ld bc,$1a1a	; white
+push bc
+call    firmware
+defw	scr_set_border
+pop bc
+
+; set pen 0
+	xor a
+	call    firmware
+	defw	scr_set_ink
+
+; set pen 1
+ld a,1
+;ld bc,$0101	; blue
+	ld bc,0
+	call    firmware
+	defw	scr_set_ink
+
+;; set pen 2
+;ld a,2
+;ld bc,$0b0b	; sky blue
+;	call    firmware
+;	defw	scr_set_ink
+
+;; set pen 3
+;ld a,3
+;ld bc,$0	; black
+;	call    firmware
+;	defw	scr_set_ink
+
+
+;        ld      a,bcolor
+;        call    firmware
+;        defw    gra_set_paper
+		
+;        ld      a,fcolor
+;        call    firmware
+;        defw    gra_set_pen
+
 
 	; gra_clear_window needs colors to be set, 
 	; scr_clear forces default (cyan on blue)
+
+        call    firmware
+        defw    scr_clear
 	
         call    firmware
-        defw    scr_clear	        
+		defw    gra_clear_window
         ret
