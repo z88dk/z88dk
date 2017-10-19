@@ -28,8 +28,11 @@ extern int  __LIB__ cpc_model(void);
 extern char  __LIB__  cpc_AnyKeyPressed(void);
 extern char  __LIB__  cpc_TestKey(unsigned char key)  __z88dk_fastcall;
 extern char  __LIB__  cpc_TestKeyF(unsigned char key)  __z88dk_fastcall;
-extern void  __LIB__  cpc_AssignKey(unsigned char key, int value)  __smallc __z88dk_callee;
 extern void  __LIB__  cpc_DeleteKeys(void);
+
+extern void __LIB__              cpc_AssignKey(unsigned char key, int value) __smallc ;
+void __LIB__    cpc_AssignKey_callee(unsigned char key, int value)  __smallc __z88dk_callee;
+#define cpc_AssignKey(a,b) cpc_AssignKey_callee(a,b)
 
 ///////////////////////////////////////////
 // VIDEO RELATED FUNCTIONS
@@ -59,8 +62,8 @@ void __LIB__    cpc_SetColour_callee(int pos, int color)  __smallc __z88dk_calle
 extern void  __LIB__  cpc_SetBorder(int color) __z88dk_fastcall;
 
 // Print to direct screen address
-extern void __LIB__              cpc_PrintGphStrStd(int pen, char *, int address) __smallc ;
-void __LIB__    cpc_PrintGphStrStd_callee(int pen, char *, int address)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_PrintGphStrStd(int pen, char *, unsigned int address) __smallc ;
+void __LIB__    cpc_PrintGphStrStd_callee(int pen, char *, unsigned int address)  __smallc __z88dk_callee;
 #define cpc_PrintGphStrStd(a,b,c) cpc_PrintGphStrStd_callee(a,b,c)
 
 // Print at x,y
@@ -68,6 +71,18 @@ extern void __LIB__              cpc_PrintGphStrStdXY(int pen, char *, int x, in
 void __LIB__    cpc_PrintGphStrStdXY_callee(int pen, char *, int x, int y)  __smallc __z88dk_callee;
 #define cpc_PrintGphStrStdXY(a,b,c,d) cpc_PrintGphStrStdXY_callee(a,b,c,d)
 
+// Rotate left region
+extern void __LIB__              cpc_RLI(unsigned int pos, unsigned char w, unsigned char h) __smallc ;
+void __LIB__    cpc_RLI_callee(unsigned int pos, unsigned char w, unsigned char h)  __smallc __z88dk_callee;
+#define cpc_RLI(a,b,c) cpc_RLI_callee(a,b,c)
+
+// Rotate left region
+extern void __LIB__              cpc_RRI(unsigned int pos, unsigned char w, unsigned char h) __smallc ;
+void __LIB__    cpc_RRI_callee(unsigned int pos, unsigned char w, unsigned char h)  __smallc __z88dk_callee;
+#define cpc_RRI(a,b,c) cpc_RRI_callee(a,b,c)
+
+// Clear Screen
+extern void   __LIB__   	cpc_ClrScr(void);
 
 
 ///////////////////////////////////////////
@@ -75,8 +90,8 @@ void __LIB__    cpc_PrintGphStrStdXY_callee(int pen, char *, int x, int y)  __sm
 ///////////////////////////////////////////
 
 // (old way) Enable/Disable firmware: forcefully modify interrupts to jump to nothing
-extern void  __CALLEE__ __LIB__   	cpc_DisableFirmware(void);
-extern void  __CALLEE__ __LIB__   	cpc_EnableFirmware(void);
+extern void   __LIB__   	cpc_DisableFirmware(void);
+extern void   __LIB__   	cpc_EnableFirmware(void);
 
 // Tiny ROM based console gets implementation
 extern int __LIB__ cpc_gets(char *s);
