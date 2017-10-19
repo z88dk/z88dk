@@ -54,12 +54,14 @@ cpc/cpc_TestKeyF
 cpc/cpc_TestKeyboard
 cpc/cpc_DeleteKeys
 cpc/cpc_KeysData
+cpc/cpc_RedefineKey
 cpc/cpc_EnableFirmware
 cpc/cpc_DisableFirmware
 cpc/cpc_ClrScr
 cpc/cpc_Chars
 cpc/cpc_Chars8
 cpc/cpc_GetScrAddress0
+cpc/cpc_PrintStr
 cpc/cpc_PrintGphStrStd0
 cpc/cpc_PrintGphStrStdXY
 cpc/cpc_PrintGphStrStdXY_callee
