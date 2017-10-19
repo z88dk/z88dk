@@ -28,6 +28,8 @@ extern int  __LIB__ cpc_model(void);
 extern char  __LIB__  cpc_AnyKeyPressed(void);
 extern char  __LIB__  cpc_TestKey(unsigned char key)  __z88dk_fastcall;
 extern char  __LIB__  cpc_TestKeyF(unsigned char key)  __z88dk_fastcall;
+extern void  __LIB__  cpc_AssignKey(unsigned char key, int value)  __smallc __z88dk_callee;
+extern void  __LIB__  cpc_DeleteKeys(void);
 
 ///////////////////////////////////////////
 // VIDEO RELATED FUNCTIONS
@@ -45,24 +47,36 @@ extern void __LIB__              cpc_set_palette(int pen, int color) __smallc ;
 void __LIB__    cpc_set_palette_callee(int pen, int color)  __smallc __z88dk_callee;
 extern void __LIB__              cpc_SetInk(int pen, int color) __smallc ;
 void __LIB__    cpc_SetInk_callee(int pen, int color)  __smallc __z88dk_callee;
-
 #define cpc_SetInk(a,b) cpc_SetInk_callee(a,b)
 #define cpc_set_palette(a,b) cpc_set_palette_callee(a,b)
 
 // Set CPC color
 extern void __LIB__              cpc_SetColour(int pos, int color) __smallc ;
 void __LIB__    cpc_SetColour_callee(int pos, int color)  __smallc __z88dk_callee;
-
-#define cpc_SetColour(a,b) cpc_cpc_SetColour(a,b)
+#define cpc_SetColour(a,b) cpc_cpc_SetColour_callee(a,b)
 
 // Set Border Color
 extern void  __LIB__  cpc_SetBorder(int color) __z88dk_fastcall;
+
+// Print to direct screen address
+extern void __LIB__              cpc_PrintGphStrStd(int pen, char *, int address) __smallc ;
+void __LIB__    cpc_PrintGphStrStd_callee(int pen, char *, int address)  __smallc __z88dk_callee;
+#define cpc_PrintGphStrStd(a,b,c) cpc_PrintGphStrStd_callee(a,b,c)
+
+// Print at x,y
+extern void __LIB__              cpc_PrintGphStrStdXY(int pen, char *, int x, int y) __smallc ;
+void __LIB__    cpc_PrintGphStrStdXY_callee(int pen, char *, int x, int y)  __smallc __z88dk_callee;
+#define cpc_PrintGphStrStdXY(a,b,c,d) cpc_PrintGphStrStdXY_callee(a,b,c,d)
 
 
 
 ///////////////////////////////////////////
 // MISC FUNCTIONS
 ///////////////////////////////////////////
+
+// (old way) Enable/Disable firmware: forcefully modify interrupts to jump to nothing
+extern void  __CALLEE__ __LIB__   	cpc_DisableFirmware(void);
+extern void  __CALLEE__ __LIB__   	cpc_EnableFirmware(void);
 
 // Tiny ROM based console gets implementation
 extern int __LIB__ cpc_gets(char *s);
@@ -85,7 +99,7 @@ extern int __LIB__ cpc_rsx(char *cmd,...);
 #define RSX_SOFT_EOF	0x1A	// soft end of file
 #define RSX_BAD_CMD	0x10	// bad command, usually wrong filename
 #define RSX_FILE_EXIST	0x11	// file already exists
-#define RSX_NOT_FOUND	0x12	// file doesn't exist
+#define RSX_FILE_NOT_FOUND	0x12	// file doesn't exist
 #define RSX_DIR_FULL	0x13	// directory is full
 #define RSX_DISK_FULL	0x14	// disc is full
 #define RSX_DISK_CHANGE	0x15	// disk has been changed with files open on it
