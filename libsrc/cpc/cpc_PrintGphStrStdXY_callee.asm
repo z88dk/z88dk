@@ -6,7 +6,7 @@
 ; **	   Raúl Simarro, 	  Artaburu 2009           **
 ; ******************************************************
 ;
-;       void  cpc_PrintGphStrStdXY(int *string, char *x, char *y);
+;       void  cpc_PrintGphStrStdXY(int pen, char *, int x, int y) __smallc ;
 ;
 ;       $Id: cpc_PrintGphStrStdXY_callee.asm $
 ;
@@ -26,21 +26,15 @@
 
 ;preparación datos impresión. El ancho y alto son fijos!
 	pop bc
-	pop hl		; l
-	pop de
-	ld	a,e		;palette
+	pop hl		; l=y
+	pop de		; e=x
+	ld	a,e
+	ld (color_uso+1),a
 	push bc	; ret addr
-
- 	ld L,(ix+0)	;Y
-	ld A,(ix+2)	;X
 	
 	call cpc_GetScrAddress0   ; hl= screen address
-	pop hl	; ret addr
+	pop bc	; ret addr
 	pop de	; text
-	ex (sp),hl
-	ld	a,l	; color
-
-	ld (color_uso+1),a
+	push bc
     
  JP cpc_PrintGphStrStd0
- 
