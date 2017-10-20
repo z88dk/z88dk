@@ -71,6 +71,13 @@ cpc/cpc_RLI
 cpc/cpc_RLI_callee
 cpc/cpc_RRI
 cpc/cpc_RRI_callee
+cpc/cpc_UpdScr
+cpc/cpc_SpUpdX
+cpc/cpc_SpUpdY
+cpc/cpc_SpUpdX_callee
+cpc/cpc_SpUpdY_callee
+cpc/cpc_Uncrunch
+cpc/cpc_Uncrunch_callee
 psg/cpc/set_psg
 psg/cpc/set_psg_callee
 psg/cpc/get_psg
