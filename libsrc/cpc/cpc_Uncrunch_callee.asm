@@ -303,9 +303,4 @@ exx            ; output the byte n times
 	jp cpc_EnableFirmware
 	
 	
-    SECTION   bss_data
-
-.datos_int
-defw 0
-
 DEFC ASMDISP_CPC_UNCRUNCH_CALLEE = # asmentry - cpc_Uncrunch_callee
