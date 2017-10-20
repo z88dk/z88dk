@@ -1,7 +1,7 @@
 /*
  * Headerfile for Amstrad CPC specific functions
  *
- * $Id: cpc.h,v 1.5 2016-05-20 20:24:52 dom Exp $
+ * $Id: cpc.h - fall 2107 - $
  */
 
 #ifndef __CPC_H__
@@ -99,6 +99,8 @@ void __LIB__    cpc_SpUpdY_callee(int sprite, char y)  __smallc __z88dk_callee;
 // Update Screen
 extern void  __LIB__		cpc_UpdScr(void);
 
+// Sprites
+extern char __LIB__  cpc_PutSpTileMap(int sprite) __z88dk_fastcall;
 
 
 ///////////////////////////////////////////
@@ -120,8 +122,8 @@ extern char __LIB__    *cpc_rsx_strcpy_callee(char *, char *)  __smallc __z88dk_
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
 
 // Data decompression, PUcrunch format
-extern char __LIB__              *cpc_Uncrunch(char *, char *) __smallc ;
-extern char __LIB__    *cpc_Uncrunch_callee(char *, char *)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_Uncrunch(char *, char *) __smallc ;
+extern void __LIB__    cpc_Uncrunch_callee(char *, char *)  __smallc __z88dk_callee;
 #define cpc_Uncrunch(a,b) cpc_Uncrunch_callee(a,b)
 
 // Call RSX/Bar command
