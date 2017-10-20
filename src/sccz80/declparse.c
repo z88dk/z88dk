@@ -88,7 +88,7 @@ void *array_get_byindex(array *arr, int index)
 
 
 
-Type *dodeclare2(Type **base_type);
+Type *dodeclare2(Type **base_type, decl_mode mode);
 
 
 Type *find_enum(const char *name)
@@ -288,7 +288,7 @@ Type *parse_struct(Type *type, int isstruct)
             str->fields = array_init(free_type);  
             str->isstruct = isstruct;
             strcpy(str->name, sname);
-            add_tag(str);                    
+            add_tag(str);    
         }
         // It's a weak reference we should define it 
     } else {
@@ -304,12 +304,12 @@ Type *parse_struct(Type *type, int isstruct)
     } 
     if ( rcmatch('{')) {
         Type *elem;
+        Type *base_type = NULL;        
         needchar('{');
-
         do {
             // Read each field now */
             blanks();
-            elem = dodeclare2(NULL);
+            elem = dodeclare2(&base_type, MODE_NONE);
             
             if ( elem != NULL ) {
                 elem->offset = offset;
@@ -328,7 +328,11 @@ Type *parse_struct(Type *type, int isstruct)
 
             if ( rcmatch('}')) 
                 break;
-            needchar(';');
+            if ( cmatch(';')) {
+                base_type = NULL;
+                continue;
+            }
+            needchar(',');
         } while ( 1 );
         needchar('}');
         str->size = size;  // It's now defined
@@ -402,9 +406,11 @@ static Type *parse_type(void)
         type->kind = KIND_CHAR;
         type->size = 1;
     } else if ( amatch("int") || amatch("short")) {
+        swallow("int");        
         type->kind = KIND_INT;
         type->size = 2;
     } else if ( amatch("long")) {
+        swallow("int");
         type->kind = KIND_LONG;
         type->size = 4;
     } else if ( amatch("float") || amatch("double")) {
@@ -528,7 +534,7 @@ Type *parse_parameter_list(Type *return_type)
     func->parameters = array_init(NULL);        
     
     do {
-        param = dodeclare2(NULL); // STORAGE_AUTO);
+        param = dodeclare2(NULL, MODE_NONE); // STORAGE_AUTO);
 
         if ( param == NULL ) {
             // KR Fake an argument
@@ -551,29 +557,34 @@ Type *parse_parameter_list(Type *return_type)
             strcpy(ptr->name, param->name);
             param = ptr;
         }
-        if ( param != NULL ) {
-            if ( param->kind == KIND_ELLIPSES) {
-                if ( array_len(func->parameters)  ) {
-                    array_add(func->parameters, param);    
-                    func->hasva = 1;            
-                } else {                    
-                    errorfmt("Ellipses must follow a parameter",1);
-                }
-                break;
-            } else if ( param->kind == KIND_VOID ) {
-                // Break out for a void parameter
-                break;
-            }
-            // It's a parameter that should have a name, if we didn't get one, then fake one.
-            // The caller will check if it needs to have a name i.e. we're in function definition context
-            // Function pointers set their name inside the call
-            if ( strlen(param->name) == 0  && symname(param->name) == 0 ) {
-                snprintf(param->name, sizeof(param->name),"0__parameter_%lu",array_len(func->parameters));
-                param->name[0] = 0;
-            }
-            if ( check_existing_parameter(func, param) == 0 )            
-                array_add(func->parameters, param);
+        if ( param->kind == KIND_STRUCT ) {
+            Type *ptr = make_pointer(param);            
+            warningfmt("Cannot pass a struct by value, converting to pointer to struct");
+            strcpy(ptr->name, param->name);
+            param = ptr;        
         }
+        if ( param->kind == KIND_ELLIPSES) {
+            if ( array_len(func->parameters)  ) {
+                array_add(func->parameters, param);    
+                func->hasva = 1;            
+            } else {                    
+                errorfmt("Ellipses must follow a parameter",1);
+            }
+            break;
+        } else if ( param->kind == KIND_VOID ) {
+            // Break out for a void parameter
+            break;
+        }
+        // It's a parameter that should have a name, if we didn't get one, then fake one.
+        // The caller will check if it needs to have a name i.e. we're in function definition context
+        // Function pointers set their name inside the call
+        if ( strlen(param->name) == 0  && symname(param->name) == 0 ) {
+            snprintf(param->name, sizeof(param->name),"0__parameter_%lu",array_len(func->parameters));
+            param->name[0] = 0;
+        }
+        if ( check_existing_parameter(func, param) == 0 )            
+            array_add(func->parameters, param);
+
         if ( !rcmatch(',')) 
             break;
         needchar(',');
@@ -617,6 +628,14 @@ Type *parse_decl_func(Type *base_type)
         errorfmt("Can't define a function returning an array",1);
         return NULL;
     }
+    if ( base_type->kind == KIND_STRUCT ) {
+        Type *ptr = make_pointer(base_type);
+        warningfmt("Can't define a function returning an struct, converting to a pointer");
+        strcpy(ptr->name, base_type->name);
+        base_type = ptr;
+    }
+
+
     return parse_parameter_list(base_type);
 }
 
@@ -672,7 +691,7 @@ Type *parse_decl(char name[], Type *base_type)
  */
 Type *parse_expr_type()
 {
-    return dodeclare2(NULL);
+    return dodeclare2(NULL, MODE_CAST);
 }
 
 /** \brief Declare a local variableif we need to
@@ -684,7 +703,7 @@ int declare_local(int local_static)
     SYMBOL *sym;
 
     do {
-        type = dodeclare2(&base_type);
+        type = dodeclare2(&base_type, MODE_NONE);
         if ( type == NULL ) {
             return 0;
         }
@@ -767,9 +786,13 @@ Type *dodeclare(enum storage_type storage)
 {
     Type  *base_type = NULL;
     SYMBOL *sym;
+    decl_mode mode = MODE_NONE;
+
+    if ( storage == TYPDEF ) mode = MODE_TYPEDEF;
+    else if ( storage == EXTERNAL ) mode = MODE_EXTERN;
 
     while ( 1 ) {
-        Type *type = dodeclare2(&base_type);
+        Type *type = dodeclare2(&base_type, mode);
         
         if ( type == NULL ) {
             break;
@@ -853,7 +876,10 @@ Type *make_type(Kind kind, Type *tag)
 }
 
 // Parse a declaration
-Type *dodeclare2(Type **base_type)
+// mode = 0 = normal
+// mode = 1 = typedef
+// mode = 2 = cast
+Type *dodeclare2(Type **base_type, decl_mode mode)
 {
     char namebuf[NAMESIZE];
     Type *type;
@@ -922,6 +948,16 @@ Type *dodeclare2(Type **base_type)
         type->flags |= flags;
     }
 
+    // Validate that structs are not weak if we have an instance
+    if ( type->kind == KIND_STRUCT ) {
+        if ( type->tag->weak && mode == MODE_NONE ) {
+            errorfmt("Cannot not declare an instance of incompletely defined struct '%s'",1,type->tag->name);
+        }
+        if ( type->size == -1 ) {
+            type->size = type->len * type->tag->size;
+        }
+    }
+
     return type;
 }
 
@@ -933,6 +969,9 @@ Type *default_function(const char *name)
     type->kind = KIND_FUNC;
     type->oldstyle = 1;
     type->return_type = type_int;
+    type->parameters = array_init(NULL);
+    type->size = 0;
+    type->len = 1;
 
     if ( c_use_r2l_calling_convention == NO ) {
         type->flags |= SMALLC;
@@ -961,16 +1000,21 @@ void declare_func_kr()
     func->parameters = array_init(NULL);       
 
     while ( cmatch(')') == 0 ) {
-        Type *param = CALLOC(1,sizeof(*param));
-        *param = *type_int;  // Implicitly int
-        if ( symname(param->name) == 0 ) {
-            error(E_ARGNAME);
-            junk();
-        } else {
-            if ( check_existing_parameter(func, param) == 0 ) 
-                array_add(func->parameters, param);
-        }
+        /* Check for a type, we may have an implicit int function return */
+        Type *param = parse_type();
 
+        if ( param != NULL ) {
+            param = dodeclare2(&param, MODE_NONE);
+        } else {
+            param = make_type(KIND_INT, NULL);
+            if ( symname(param->name) == 0 ) {
+                error(E_ARGNAME);
+                junk();
+            }
+        }
+        if ( check_existing_parameter(func, param) == 0 ) 
+            array_add(func->parameters, param);
+    
         if (ch() != ')' && cmatch(',') == 0) {
             warning(W_EXPCOM);
         }
@@ -988,9 +1032,20 @@ static void handle_kr_type_parameters(Type *func)
 
     while ( !rcmatch('{')) {
         int    i;
-        param = dodeclare2(&base_type);
+        param = dodeclare2(&base_type, MODE_NONE);
         if ( param == NULL ) {
             break;
+        }
+        if ( param->kind == KIND_ARRAY ) {
+            Type *ptr = make_pointer(param->ptr);
+            strcpy(ptr->name, param->name);
+            param = ptr;
+        }
+        if ( param->kind == KIND_STRUCT ) {
+            Type *ptr = make_pointer(param);            
+            warningfmt("Cannot pass a struct by value, converting to pointer to struct");
+            strcpy(ptr->name, param->name);
+            param = ptr;
         }
         for ( i = 0; i < array_len(func->parameters); i++ ) {
             Type *existing = array_get_byindex(func->parameters,i);
@@ -1149,7 +1204,6 @@ static void declfunc(Type *type, enum storage_type storage)
     currfn = findglb(type->name);
     
     if ( currfn != NULL ) {
-        // TODO: Check that parameters match
         if ( type_matches(currfn->ctype, type) == 0 ) {
             UT_string *output;
 
@@ -1199,45 +1253,43 @@ static void declfunc(Type *type, enum storage_type storage)
         currfn->flags &= ~SMALLC;
     }
     
-    // TODO: If any parameters don't have a name then error
-
     nl();
     outfmt("; Function %s flags 0x%08x\n",type->name,type->flags);
     /* For SMALLC we need to start counting from the last argument */
     if ( (type->flags & SMALLC) == SMALLC ) {
         int i;
-        for ( i = array_len(currfn->ctype->parameters) - 1; i >= 0; i-- ) {
+        for ( i = array_len(type->parameters) - 1; i >= 0; i-- ) {
             SYMBOL *ptr;
-            Type *type = array_get_byindex(currfn->ctype->parameters, i);
+            Type *ptype = array_get_byindex(type->parameters, i);
 
-            if ( strlen(type->name) == 0 || type->name[0] == '0') {
+            if ( strlen(ptype->name) == 0 || ptype->name[0] == '0') {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
             } 
             // Create a local variable
-            ptr = addloc(type->name, ID_VARIABLE, type->kind);
-            ptr->ctype = type;
+            ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
+            ptr->ctype = ptype;
             ptr->offset.i = where;
-            outfmt("; parameter %s at %d size(%d)\n",type->name, where, type->size);
+            outfmt("; parameter %s at %d size(%d)\n",ptype->name, where, ptype->size);
             ptr->isassigned = 1;
-            where += type->size != 1 ? type->size : 2; 
+            where += ptype->size != 1 ? ptype->size : 2; // TODO: far pointers go as long
         }
     } else {
         int i;
-        for ( i = 0; i < array_len(currfn->ctype->parameters); i++ ) {
+        for ( i = 0; i < array_len(type->parameters); i++ ) {
             SYMBOL *ptr;
-            Type *type = array_get_byindex(currfn->ctype->parameters, i);
-            if ( strlen(type->name) == 0  || type->name[0] == '0') {
+            Type *ptype = array_get_byindex(type->parameters, i);
+            if ( strlen(ptype->name) == 0  || ptype->name[0] == '0') {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
             }
             // Create a local variable
-            ptr = addloc(type->name, ID_VARIABLE, type->kind);
-            ptr->ctype = type;            
+            ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
+            ptr->ctype = ptype;            
             ptr->offset.i = where;
-            outfmt("; parameter %s at %d\n",type->name, where);            
+            outfmt("; parameter %s at %d\n",ptype->name, where);            
             ptr->isassigned = 1;            
-            where += type->size != 1 ? type->size : 2;
+            where += ptype->size != 1 ? ptype->size : 2;
         }
     }
 

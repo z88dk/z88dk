@@ -50,7 +50,12 @@
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
-
+typedef enum {
+    MODE_NONE,
+    MODE_TYPEDEF,
+    MODE_EXTERN,
+    MODE_CAST
+} decl_mode;
 
 typedef enum {
     KIND_NONE,

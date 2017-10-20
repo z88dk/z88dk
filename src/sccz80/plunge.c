@@ -4,12 +4,6 @@
  *      Plunging routines
  *
  *      $Id: plunge.c,v 1.12 2016-03-29 13:39:44 dom Exp $
- *
- *      Altogether now...arse! My cunning scheme to use c as an
- *      indicator flops badly due to logical conditions, I just
- *      wanna scream! So, during the if statement we use c to
- *      signal that we want to drop out, at the end we test for
- *      hl to maintain the logicalness...
  */
 
 #include "ccdefs.h"
@@ -132,7 +126,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (lval->const_val == 0) {
             lval->stage_add = stagenext;
             lval->stage_add_ltype = lval2->ltype;
-            printf("Set two 2 %p %s\n",lval2->ltype,lval2->ltype->name);
         }
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
@@ -533,7 +526,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
             zdiv_const(lval,6); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
-            zdiv_const(lval, lval->ltype->tag->size);
+            zdiv_const(lval, lval->ltype->ptr->tag->size);
         }
     }
     result(lval, lval2);

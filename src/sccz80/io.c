@@ -178,8 +178,9 @@ void setstage(char** before, char** start)
 
 /* flush or clear staging buffer */
 
-void clearstage(char* before, char* start)
+void clearstage_info(const char *file, int line, char* before, char* start)
 {
+   // printf("%s:%d Clearing stage %s\n",file, line,before);
     *stagenext = 0;
     if ((stagenext = before))
         return;

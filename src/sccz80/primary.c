@@ -516,8 +516,8 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
-
-    if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
+  //  printf("%s Indirect kind %d kind %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind);
+    if ( lval->ltype->kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
             lpush();
@@ -548,7 +548,7 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
+    if (lval->ltype->kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC ) {
         store(lval);
     } else {
         switch ((lval->symbol->offset.i) - Zsp) {
@@ -745,6 +745,11 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
 
     dest_lval->ltype = lval->cast_type;
     lval->cast_type = NULL;
+    if ( ispointer(dest_lval->ltype) ) {
+        dest_lval->ptr_type = dest_lval->ltype->ptr->kind;
+        /* djm long pointers */
+        dest_lval->indirect_kind = dest_lval->val_type = dest_lval->ltype->kind;
+    }
     return (1);
 }
 

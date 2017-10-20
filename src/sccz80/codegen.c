@@ -2374,9 +2374,7 @@ void le0(LVALUE* lval, int label)
 
 /* test for greater than zero */
 void gt0(LVALUE* lval, int label)
-{
-    printf("kind %d %d\n",lval->ltype->kind, lval->ltype->isunsigned);
-    
+{    
     ge0(lval, label);
     if (lval->oldval_kind == KIND_LONG) {
         ol("or\th");

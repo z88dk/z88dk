@@ -97,6 +97,9 @@ int str_init(Type *tag)
     int     i;
 
     for ( i = 0; i < array_len(tag->fields); i++ ) {
+        if ( rcmatch('}')) {
+            break;
+        }
         if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
         sz += ptr->size;

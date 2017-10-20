@@ -257,7 +257,6 @@ void warning(int num, ...)
 {
     va_list ap;
     if (mywarn[num].suppress == 0) {
-        fprintf(stderr, "sccz80:%s L:%d Warning:#%d:", Filename, lineno, num);
         va_start(ap, num);
         warningva(mywarn[num].warn, ap);
         va_end(ap);
