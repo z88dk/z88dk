@@ -8,9 +8,9 @@
 
 #include <net/resolv.h>
 
-i8_t *getprotobynumber(port,store)
-        tcpport_t port;
-        u8_t    *store;
+char *getprotobynumber(port,store)
+        int port;
+        char *store;
 {
         return_nc (getxxbyport(get_protocols(),port,store));
 }

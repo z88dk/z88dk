@@ -12,7 +12,7 @@
 
 char *getxxbyport(type, port, store_in )
 	struct data_entry *type;
-        tcpport_t port;
+        int port;
         char *store_in;
 {
         struct data_entry *search;

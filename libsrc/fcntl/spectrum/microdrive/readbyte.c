@@ -45,6 +45,6 @@ int __FASTCALL__ readbyte(int handle)
 	}
 	if ( ((int) (if1_file->position) % 512) >= if1_file->reclen ) return EOF;
 
-	return ( (unsigned char *) *(if1_file->data + ( (int)(if1_file->position++) % 512)) );
+	return ( *(unsigned char *) (if1_file->data + ( (int)(if1_file->position++) % 512)) );
 
 }

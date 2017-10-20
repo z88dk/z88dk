@@ -9,8 +9,8 @@
 #include <net/resolv.h>
 
 char  *getservbyport(port,store)
-        tcpport_t port;
-        u8_t    *store;
+        int port;
+        char *store;
 {
         return_nc (getxxbyport(get_services(),port,store));
 }
