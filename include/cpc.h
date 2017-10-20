@@ -88,6 +88,17 @@ extern void   __LIB__   	cpc_ClrScr(void);
 // Print String using firmware
 extern char  __LIB__  cpc_PrintStr(char *cadena)  __z88dk_fastcall;
 
+// Set Sprite position
+extern void __LIB__              cpc_SpUpdX(int sprite, char x) __smallc ;
+void __LIB__    cpc_SpUpdX_callee(int sprite, char x)  __smallc __z88dk_callee;
+#define cpc_SpUpdX(a,b,c) cpc_SpUpdX_callee(a,b,c)
+extern void __LIB__              cpc_SpUpdY(int sprite, char y) __smallc ;
+void __LIB__    cpc_SpUpdY_callee(int sprite, char y)  __smallc __z88dk_callee;
+#define cpc_SpUpdY(a,b,c) cpc_SpUpdY_callee(a,b,c)
+
+// Update Screen
+extern void  __LIB__		cpc_UpdScr(void);
+
 
 
 ///////////////////////////////////////////
@@ -103,10 +114,15 @@ extern int __LIB__ cpc_gets(char *s);
 
 // Copies a string to a CPC RSX compatible one
 extern char __LIB__  *cpc_rsx_str(char *str) __z88dk_fastcall;    // (malloc lib is required)
+
 extern char __LIB__              *cpc_rsx_strcpy(char *, char *) __smallc ;
 extern char __LIB__    *cpc_rsx_strcpy_callee(char *, char *)  __smallc __z88dk_callee;
-
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
+
+// Data decompression, PUcrunch format
+extern char __LIB__              *cpc_Uncrunch(char *, char *) __smallc ;
+extern char __LIB__    *cpc_Uncrunch_callee(char *, char *)  __smallc __z88dk_callee;
+#define cpc_Uncrunch(a,b) cpc_Uncrunch_callee(a,b)
 
 // Call RSX/Bar command
 extern int __LIB__ cpc_rsx(char *cmd,...);
