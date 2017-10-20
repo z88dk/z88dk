@@ -2,7 +2,7 @@
 	009 - Keyboard
 	CPCRSLIB demo
 	
-	zcc +cpc -lndos -create-app -Cz--audio -lm rs001.c
+	zcc +cpc -lndos -create-app -Cz--audio -lm rs009.c
  */
 
 #include <cpc.h>	// CPC Library
