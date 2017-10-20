@@ -16,7 +16,7 @@ graphics/w_undrawb
 graphics/w_xorborder
 graphics/cpc/clg
 graphics/clga
-graphics/cpc/w_pixladdr
+graphics/cpc/w_pixeladdress
 graphics/cpc/fill
 graphics/clrarea
 graphics/w_plotpixl
