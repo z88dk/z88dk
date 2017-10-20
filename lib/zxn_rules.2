@@ -11,6 +11,12 @@
 =
 	nextreg	%2,%3
 
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"5_%"[A-Fa-f0-9xX]+"6
+=
+%2:
+	call	_ZXN_NEXTREG_%5_%6
+	ret
+
 ;;
 ;; ZXN_READ_REG(reg)
 ;;
@@ -19,6 +25,12 @@
 
 %"[ \t]*"0jp%"[ \t]*"1_ZXN_READ_REG_fastcall
 =
+	call	_ZXN_READ_REG_fastcall
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_READ_REG_fastcall
+=
+%2:
 	call	_ZXN_READ_REG_fastcall
 	ret
 
@@ -33,6 +45,12 @@
 
 %"[ \t]*"0jp%"[ \t]*"1ZXN_READ_REG
 =
+	call	ZXN_READ_REG
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_READ_REG
+=
+%2:
 	call	ZXN_READ_REG
 	ret
 
@@ -81,6 +99,12 @@
 	call	_ZXN_READ_MMU%3
 	ret
 
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_READ_MMU%"[0-9]+"5
+=
+%2:
+	call	_ZXN_READ_MMU%5
+	ret
+
 %"[ \t]*"0call%"[ \t]*"1_ZXN_READ_MMU%"[0-9]+"3
 =
 	ld	bc,0x243b
@@ -94,6 +118,12 @@
 %"[ \t]*"0jp%"[ \t]*"1ZXN_READ_MMU%"[0-9]+"3
 =
 	call	ZXN_READ_MMU%3
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_READ_MMU%"[0-9]+"5
+=
+%2:
+	call	ZXN_READ_MMU%5
 	ret
 
 %"[ \t]*"0call%"[ \t]*"1ZXN_READ_MMU%"[0-9]+"3
@@ -116,6 +146,12 @@
 	call	_ZXN_WRITE_MMU%3_fastcall
 	ret
 
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_WRITE_MMU%"[0-9]+"5_fastcall
+=
+%2:
+	call	_ZXN_WRITE_MMU%5_fastcall
+	ret
+
 %"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
 =
 	ld	a,l
@@ -126,6 +162,12 @@
 %"[ \t]*"0jp%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
 =
 	call	ZXN_WRITE_MMU%3
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_WRITE_MMU%"[0-9]+"5
+=
+%2:
+	call	ZXN_WRITE_MMU%5
 	ret
 
 %"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3

@@ -1,6 +1,6 @@
 ;
 ;       Amstrad CPC library
-;       set color palette, flashing is useless so we forget the second color
+;
 ; ******************************************************
 ; **       Librería de rutinas para Amstrad CPC       **
 ; **	   Raúl Simarro, 	  Artaburu 2009           **
@@ -23,26 +23,21 @@
 ._cpc_AssignKey_callee
 
 
+   pop bc
    pop hl
    pop de
-   ex (sp),hl
+   push bc
    
-   ; enter : hl = value
-   ;         de = key
-
 .asmentry
 
+    ;HL = linea, byte
+	;DE = value
 
-	ex	de,hl
-
-	ld hl,2
-    add hl,sp	
-    
     ld a,l	;linea, byte
 	ld b,h
 	
 	; DE tiene el valor de la tecla a escribir en la tabla
-	; En A se tiene el valor de la tecla seleccionada a comprobar [0..11]
+	; En A se tiene "key", el valor de la tecla seleccionada a comprobar [0..11]
 	; A*2
 ;______________________________________________________________________________________________
 ;	;En A viene la tecla a redefinir (0..11)

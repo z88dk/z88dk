@@ -6,7 +6,7 @@
 ; **	   Raúl Simarro, 	  Artaburu 2009           **
 ; ******************************************************
 ;
-;       void  cpc_PrintGphStrStdXY(int *string, char *x, char *y);
+;       void  cpc_PrintGphStrStdXY(int pen, char *, int x, int y);
 ;
 ;       $Id: cpc_PrintGphStrStdXY.asm $
 ;
@@ -43,4 +43,3 @@
 	ld (color_uso+1),a
     
  JP cpc_PrintGphStrStd0
- 
