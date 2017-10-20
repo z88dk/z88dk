@@ -400,11 +400,12 @@ void PutFrame(char typeobj, int offset)
 /*      at the address on the top of the stack */
 void putstk(char typeobj)
 {
-    char flags;
+    char flags = 0;
     SYMBOL *ptr;
 
     /* Store via long pointer... */
     ptr = retrstk(&flags);
+    //outfmt(";Restore %p flags %02d\n",ptr, flags);
     if (flags & FARACC) {
         /* exx pop hl, pop de, exx */
         doexx();
@@ -529,6 +530,8 @@ void indirect(LVALUE* lval)
 
     typeobj = lval->indirect_kind;
     flags = lval->flags;
+
+    //outfmt(";%s flags %08x\n",lval->ltype->name, lval->flags);
 
     sign = lval->ltype->isunsigned;
     
@@ -2485,12 +2488,12 @@ void zlt(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_long_ult");
         else
             callrts("l_long_lt");
         Zsp += 4;
+        set_carry(lval);        
         break;
     case KIND_DOUBLE:
         callrts("dlt");
@@ -2513,11 +2516,11 @@ void zlt(LVALUE* lval)
             break;
         }
     default:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_ult");
         else
             callrts("l_lt");
+        set_carry(lval);            
     }
 }
 
@@ -2529,11 +2532,11 @@ void zle(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_long_ule");
         else
             callrts("l_long_le");
+        set_carry(lval);            
         Zsp += 4;
         break;
     case KIND_DOUBLE:
@@ -2567,11 +2570,11 @@ void zle(LVALUE* lval)
             break;
         }
     default:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_ule");
         else
             callrts("l_le");
+        set_carry(lval);            
     }
 }
 
@@ -2583,11 +2586,11 @@ void zgt(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_long_ugt");
         else
             callrts("l_long_gt");
+        set_carry(lval);            
         Zsp += 4;
         break;
     case KIND_DOUBLE:
@@ -2618,11 +2621,11 @@ void zgt(LVALUE* lval)
             break;
         }
     default:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_ugt");
         else
             callrts("l_gt");
+        set_carry(lval);            
     }
 }
 
@@ -2634,12 +2637,12 @@ void zge(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_long_uge");
         else
             callrts("l_long_ge");
         Zsp += 4;
+        set_carry(lval);        
         break;
     case KIND_DOUBLE:
         callrts("dge");
@@ -2673,11 +2676,11 @@ void zge(LVALUE* lval)
             break;
         }
     default:
-        set_carry(lval);
         if (utype(lval))
             callrts("l_uge");
         else
             callrts("l_ge");
+        set_carry(lval);            
     }
 }
 
@@ -3077,7 +3080,7 @@ void FrameP(void)
 
 void pushframe(void)
 {
-    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("push\t");
         FrameP();
         nl();
@@ -3086,7 +3089,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("pop\t");
         FrameP();
         nl();

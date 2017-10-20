@@ -144,7 +144,7 @@ enum storage_type {
 /* Symbol flags, | against each other */
 enum symbol_flags {
         FLAGS_NONE = 0,
-        UNSIGNED = 1,
+    //    UNSIGNED = 1,
         FARPTR = 2,
         FARACC = 4,
         FASTCALL = 8,     /* for certain lib calls only */

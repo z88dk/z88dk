@@ -48,7 +48,7 @@ int constant(LVALUE* lval)
 {
     int32_t val;
     lval->val_type = KIND_INT;
-    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
+    lval->ltype = type_int;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
         load_double_into_fa(lval);
@@ -139,6 +139,7 @@ int number(LVALUE *lval)
     char c;
     int minus;
     int32_t k;
+    int isunsigned = c_default_unsigned;
 
     k = minus = 1;
     while (k) {
@@ -194,21 +195,21 @@ typecheck:
         if (cmatch('L'))
             lval->val_type = KIND_LONG;
         if (cmatch('U')) {
-            lval->flags |= UNSIGNED;
+            isunsigned = 1;
             lval->const_val = (uint32_t)k;
         }
         if (cmatch('S'))
-            lval->flags &= ~UNSIGNED;
+            isunsigned = 0;
         if (cmatch('f'))
             lval->val_type = KIND_DOUBLE;
     }
     if ( lval->val_type == KIND_LONG ) {
-        if ( lval->flags & UNSIGNED ) 
+        if ( isunsigned )
             lval->ltype = type_ulong;
         else
             lval->ltype = type_long;
     } else {
-        if ( lval->flags & UNSIGNED ) 
+        if ( isunsigned ) 
             lval->ltype = type_uint;
         else
             lval->ltype = type_int;
@@ -241,9 +242,11 @@ int pstr(LVALUE *lval)
     int k;
 
     lval->val_type = KIND_INT;
-    lval->ltype = type_int;
-    lval->flags &= ~UNSIGNED;
-    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
+    if ( c_default_unsigned ) {
+        lval->ltype = type_uint;
+    } else {
+        lval->ltype = type_int;
+    }
     if (cmatch('\'')) {
         k = 0;
         while (ch() && ch() != '\'')

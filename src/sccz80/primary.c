@@ -516,8 +516,8 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
-  //  printf("%s Indirect kind %d kind %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind);
-    if ( lval->ltype->kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
+    outfmt(";%s Indirect kind %d kind %d flags %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind,lval->flags);
+    if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
             lpush();
@@ -525,6 +525,7 @@ void smartpush(LVALUE* lval, char* before)
             zpush();
         }
     } else {
+        ol(";doing smart");
         switch ((lval->symbol->offset.i) - Zsp) {
         case 0:
         case 2:
@@ -548,7 +549,7 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->ltype->kind != KIND_INT || lval->symbol == NULL || lval->symbol->storage != STKLOC ) {
+    if (lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC ) {
         store(lval);
     } else {
         switch ((lval->symbol->offset.i) - Zsp) {
