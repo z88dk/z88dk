@@ -7,8 +7,7 @@
 	INCLUDE "z80_crt0.hdr"
 
 
-	SECTION	rodata_compiler
-
+	SECTION	data_compiler
 ._rooms
 	defw	_room0_desc
 	defb	1
@@ -26,11 +25,8 @@
 	defb	0
 	defb	0
 	defb	0
-
 	SECTION	code_compiler
-
 	SECTION	data_compiler
-
 ._room0_desc
 	defm	"room0"
 	defb	10
@@ -38,12 +34,8 @@
 	defm	""
 	defb	0
 
-
-
 	SECTION	code_compiler
-
 	SECTION	data_compiler
-
 ._room1_desc
 	defm	"room1"
 	defb	10
@@ -51,12 +43,8 @@
 	defm	""
 	defb	0
 
-
-
 	SECTION	code_compiler
-
 	SECTION	data_compiler
-
 ._room2_desc
 	defm	"room2"
 	defb	10
@@ -64,12 +52,8 @@
 	defm	""
 	defb	0
 
-
-
 	SECTION	code_compiler
-
 	SECTION	data_compiler
-
 ._room3_desc
 	defm	"room3"
 	defb	10
@@ -77,25 +61,19 @@
 	defm	""
 	defb	0
 
-
-
 	SECTION	code_compiler
-
-
 
 
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_room0_desc
-	PUBLIC	_room1_desc
-	PUBLIC	_room2_desc
-	PUBLIC	_room3_desc
-	PUBLIC	_rooms
+	GLOBAL	_room0_desc
+	GLOBAL	_room1_desc
+	GLOBAL	_room2_desc
+	GLOBAL	_room3_desc
+	GLOBAL	_rooms
 
 
 

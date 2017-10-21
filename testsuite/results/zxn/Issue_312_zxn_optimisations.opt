@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._mult
 	push	bc
 	push	bc
@@ -163,25 +162,22 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_mult
-	PUBLIC	_addition
-	PUBLIC	_subtract
-	PUBLIC	_longops
-	PUBLIC	_longadd
-	PUBLIC	_longadd_negative
-	PUBLIC	_longsub
-	EXTERN	_longfunc
-	PUBLIC	_longcall
-	EXTERN	_anotherfunc
-	PUBLIC	_pushinstr
+	GLOBAL	_mult
+	GLOBAL	_addition
+	GLOBAL	_subtract
+	GLOBAL	_longops
+	GLOBAL	_longadd
+	GLOBAL	_longadd_negative
+	GLOBAL	_longsub
+	GLOBAL	_longfunc
+	GLOBAL	_longcall
+	GLOBAL	_anotherfunc
+	GLOBAL	_pushinstr
 
 
 

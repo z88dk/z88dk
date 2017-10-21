@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._double_post_increment
 	ld	hl,i_2+0
 	call	dldpsh
@@ -245,29 +244,25 @@
 	ret
 
 
-
 	SECTION	rodata_compiler
-
 .i_2
 	;3.000000
 	defb	0,0,0,0,64,130
 
 
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_double_post_increment
-	PUBLIC	_double_post_increment_assign
-	PUBLIC	_double_pre_increment
-	PUBLIC	_double_pre_increment_assign
-	PUBLIC	_double_post_decrement
-	PUBLIC	_double_post_decrement_assign
-	PUBLIC	_double_pre_decrement
-	PUBLIC	_double_pre_decrement_assign
+	GLOBAL	_double_post_increment
+	GLOBAL	_double_post_increment_assign
+	GLOBAL	_double_pre_increment
+	GLOBAL	_double_pre_increment_assign
+	GLOBAL	_double_post_decrement
+	GLOBAL	_double_post_decrement_assign
+	GLOBAL	_double_pre_decrement
+	GLOBAL	_double_pre_decrement_assign
 
 
 

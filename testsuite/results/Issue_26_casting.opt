@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._far_pointer_cast
 	ld	hl,0	;const
 	push	hl
@@ -124,21 +123,18 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_far_pointer_cast
-	PUBLIC	_far_pointer_cast2
-	PUBLIC	_far_pointer_cast3
-	PUBLIC	_struct_cast
-	EXTERN	_SMS_setTile
-	PUBLIC	_writetext
-	EXTERN	_SMS_setAddr
+	GLOBAL	_far_pointer_cast
+	GLOBAL	_far_pointer_cast2
+	GLOBAL	_far_pointer_cast3
+	GLOBAL	_struct_cast
+	GLOBAL	_SMS_setTile
+	GLOBAL	_writetext
+	GLOBAL	_SMS_setAddr
 
 
 
