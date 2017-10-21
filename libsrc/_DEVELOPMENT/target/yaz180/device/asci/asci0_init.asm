@@ -1,14 +1,12 @@
 
+    INCLUDE "config_private.inc"
+    
     SECTION code_driver
 
     PUBLIC _asci0_init
 
     EXTERN _asci0_reset
     EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
-
-    EXTERN CNTLA0, CNTLB0, STAT0
-    EXTERN CNTLA0_RE, CNTLA0_TE, CNTLA0_MODE_8N1
-    EXTERN STAT0_RIE
 
     _asci0_init:
     

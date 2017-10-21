@@ -14,7 +14,7 @@
 
     INCLUDE "config_private.inc"
 
-    SECTION code_driver
+    SECTION rodata_common1_driver
 
     PUBLIC asm_am9511a_isr
 

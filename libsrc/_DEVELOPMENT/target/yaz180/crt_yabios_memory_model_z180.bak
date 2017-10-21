@@ -9,7 +9,12 @@ SECTION CODE
 
 org __crt_org_code
 
+IF (__crt_org_vector_table = -0x80) || (__crt_org_vector_table = -0x100)
+
+section interrupt_vectors
 section code_crt_start
+
+ENDIF
 
 section code_crt_init
 section code_crt_main
@@ -31,8 +36,6 @@ section code_lib
 section code_compiler
 section code_user
 
-section code_common1
-
 section rodata_driver
 section rodata_font
 section rodata_clib
@@ -43,6 +46,10 @@ section rodata_clib
 section rodata_lib
 section rodata_compiler
 section rodata_user
+
+section rodata_page0
+section rodata_common1_data
+section rodata_common1_driver
 
 SECTION CODE_END
 
@@ -93,22 +100,6 @@ section data_clib
 section data_lib
 section data_compiler
 section data_user
-
-IF __crt_org_data_common1
-
-  org __crt_org_data_common1
-
-ENDIF
-
-section data_common1_align_256
-section data_common1_align_128
-section data_common1_align_64
-section data_common1_align_32
-section data_common1_align_16
-section data_common1_align_8
-section data_common1_align_4
-section data_common1_align_2
-section data_common1_driver
 
 SECTION DATA_END
 

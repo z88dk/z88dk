@@ -40,13 +40,14 @@ EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
     LD      A,$00           ; Set Bank Base Physical $00000 -> $00
     OUT0    (BBR),A
 
+                            ; FIXME set up COMMON1
+
                             ; we do 256 ticks per second
     ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
     out0 (RLDR0L), l
     out0 (RLDR0H), h
-
                             ; enable down counting and interrupts for PRT0
     ld a, TCR_TIE0|TCR_TDE0
-    out0 (TCR), a
+    out0 (TCR), a           ; using the driver/z180/system_tick.asm
 
 ENDIF

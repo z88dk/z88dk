@@ -19,7 +19,7 @@ PUBLIC z180_int_asci0, z180_int_asci1
 
 ; z180 internal interrupt vector base address = __crt_org_vector_table + __IO_VECTOR_BASE
 
-; very ugly to insert/skip 0x80 bytes. must be a better way to achieve this.
+; very ugly to insert/skip __IO_VECTOR_BASE bytes. must be a better way to achieve this.
 defs __IO_VECTOR_BASE - ASMPC
 
 defc z180_int_int1  = __crt_org_vector_table + __IO_VECTOR_BASE + 0x00

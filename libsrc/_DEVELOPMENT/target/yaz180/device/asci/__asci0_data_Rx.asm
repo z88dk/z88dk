@@ -1,7 +1,7 @@
 
 INCLUDE "config_private.inc"
     
-SECTION data_common1_align_256
+SECTION rodata_common1_data
 
 PUBLIC asci0RxBuffer
 
@@ -13,12 +13,12 @@ IF (ASMPC & 0xff)
    defs 256 - (ASMPC & 0xff)
 ENDIF
 
-SECTION data_common1_driver
+SECTION rodata_common1_data
 
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, asci0RxLock
  
 asci0RxCount:    defb 0                 ; Space for Rx Buffer Management 
 asci0RxIn:       defw asci0RxBuffer     ; non-zero item in bss since it's initialized anyway
 asci0RxOut:      defw asci0RxBuffer     ; non-zero item in bss since it's initialized anyway
-asci0RxLock:     defb 0                 ; lock flag for Rx exclusion
+asci0RxLock:     defb $FE               ; lock flag for Rx exclusion
 
