@@ -430,6 +430,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     Type *old_type = lval->ltype;
 
+    lval->symbol = NULL;
     lval->ltype = lval->ltype->ptr;
     if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
         lval->ptr_type = KIND_NONE;
@@ -647,7 +648,7 @@ int heirb(LVALUE* lval)
                     cscale(lval->ltype, &val);
                     val += lval->offset;
                     
-                    if (ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY) {
+                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);

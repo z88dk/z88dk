@@ -1249,8 +1249,6 @@ static void declfunc(Type *type, enum storage_type storage)
     }
 
     pushframe();
-
-    printf("%s %d\n",type->name, type->flags & SAVEFRAME);
     
     /* main is always __stdc */
     if ( strcmp(currfn->name,"main") == 0 ) {

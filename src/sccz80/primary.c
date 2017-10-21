@@ -419,6 +419,7 @@ void prestep(
         case KIND_CPTR:
             (*step)(lval);
         case KIND_INT:
+        case KIND_PTR:
             (*step)(lval);
         default:
             (*step)(lval);
@@ -463,13 +464,14 @@ void poststep(
             nstep(lval, n * 3, unstep);
             break;
         case KIND_INT:
+        case KIND_PTR:
             (*step)(lval);
         default:
             (*step)(lval);
             store(lval);
             if (unstep)
                 (*unstep)(lval);
-            if (lval->ptr_type == KIND_INT)
+            if (lval->ptr_type == KIND_INT||lval->ptr_type ==KIND_PTR)
                 if (unstep)
                     (*unstep)(lval);
             break;

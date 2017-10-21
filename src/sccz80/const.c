@@ -511,7 +511,7 @@ void size_of(LVALUE* lval)
         }
         if ( type == NULL ) {
             lval->const_val = 2;
-            printf("Cannot dereference far enough\n");
+            errorfmt("Cannot dereference far enough, assuming size of 2\n",1);
         } else {
             lval->const_val = type->size;
         }
