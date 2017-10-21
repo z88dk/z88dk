@@ -49,6 +49,7 @@ EXTERN _z180_int_asci0  ; FTDI interface on asci0
 defw _z180_int_asci0
 
 defc z180_int_asci1 = __crt_org_vector_table + __IO_VECTOR_BASE + 0x10
-defw l_ret
+EXTERN _z180_int_asci1  ; ESP-01 interface on asci1
+defw _z180_int_asci1
 
 ENDIF

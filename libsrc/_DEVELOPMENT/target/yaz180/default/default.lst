@@ -1,5 +1,6 @@
 target/yaz180/default/_am9511a_isr
 target/yaz180/default/_asci0_isr
+target/yaz180/default/_asci1_isr
 target/yaz180/default/_system_tick_isr
 
 target/yaz180/default/_z180_trap
