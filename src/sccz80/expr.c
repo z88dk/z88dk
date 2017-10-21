@@ -759,23 +759,26 @@ int heirb(LVALUE* lval)
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
-                if (lval->ltype->kind == KIND_PTR) {
+                if (ispointer(lval->ltype) ) {
                     lval->ptr_type = lval->ltype->ptr->kind;
                     /* djm */
-                    if (ptr->flags & FARPTR) {
+
+                    // TODO
+                  //  if (ptr->flags & FARPTR) {
                         lval->indirect_kind = KIND_CPTR;
                         lval->val_type = KIND_CPTR;
-                    } else {
-                        lval->indirect_kind = KIND_INT;
-                        lval->val_type = KIND_INT;
-                    }
+                    // } else {
+                    //     lval->indirect_kind = KIND_INT;
+                    //     lval->val_type = KIND_INT;
+                    // }
                 }
                 if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
                     /* array or struct */
-                    lval->ptr_type = ptr->type;
+                    // TODO
+                 //   lval->ptr_type = ptr->type;
                     /* djm Long pointers here? */
 
-                    lval->val_type = ((ptr->flags & FARPTR) ? KIND_CPTR : KIND_INT);
+                    //lval->val_type = ((ptr->flags & FARPTR) ? KIND_CPTR : KIND_INT);
                     k = 0;
                 } else
                     k = 1;
