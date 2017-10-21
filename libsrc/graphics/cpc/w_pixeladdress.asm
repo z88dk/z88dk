@@ -1,27 +1,23 @@
 
         SECTION   code_clib
-        PUBLIC	pixeladdress
+        PUBLIC	w_pixeladdress
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.9 2016-06-19 21:10:08 dom Exp $
+;	$Id: w_pixeladdress.asm $
 ;
 
 ; ******************************************************************
 ;
 ; Get absolute	pixel address in map of virtual (x,y) coordinate.
 ;
-; in:  hl	= (x,y) coordinate of pixel (h,l)
+; in:  hl,de    = (x,y) coordinate of pixel
 ;
 ; out: de	= address	of pixel byte
 ;	   a	= bit number of byte where pixel is to be placed
 ;	  fz	= 1 if bit number is 0 of pixel position
-;
-; registers changed	after return:
-;  ......hl/ixiy same
-;  afbcde../.... different
 ;
 
 
@@ -40,27 +36,23 @@
 	PUBLIC	grayaltpage
 
 
-.pixeladdress
-        push	bc
-        ld      a,maxy
-        sub     l	
-        ld      d,0
-        ld      e,h
-        ld      h,d
-        ld      l,a
+.w_pixeladdress
+
+		ld	a,l
+        and     07h             ;a = x mod 8
+		push af
+		
+		push hl
+        ld      hl,maxy-1
+        sbc		hl,de
+		pop		de
+		
         call    firmware
         defw    scr_dot_position
         ld      d,h
         ld      e,l
-        ld      a,c
-        ld      c,-1
-.loopa  inc     c
-        rra
-        jr      nc,loopa
-        ld      a,c
 
-.grayaltpage
-        nop
-        pop     bc
+		pop		af        
+        xor     7
         ret
 
