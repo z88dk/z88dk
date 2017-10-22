@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._func
 	pop	bc
 	pop	hl
@@ -22,16 +21,13 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_func
-	PUBLIC	_ZXN_NEXTREG_0x50
+	GLOBAL	_func
+	GLOBAL	_ZXN_NEXTREG_0x50
 
 
 
