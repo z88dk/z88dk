@@ -43,16 +43,7 @@ int statement()
         char regit = NO;
 
         if (amatch("extern")) {
-            SYMBOL *savetab = loctab;
-            SYMBOL *savloc = locptr;
-
-            SYMBOL *newlocs = CALLOC(NUMLOC, sizeof(SYMBOL));
-            locptr = loctab = newlocs;
-            // TODO: Save local variables so that function doesn't trash them
-            dodeclare(EXTERNAL, NULL, 0,1);
-            FREENULL(newlocs);
-            locptr = savloc;
-            loctab = savetab;
+            dodeclare(EXTERNAL);
         }
         /* Ignore the register and auto keywords! */
         regit = locstatic = ((swallow("register")) | swallow("auto"));
