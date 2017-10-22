@@ -52,3 +52,29 @@ int ptr_struct()
 
 	return ptr2 - ptr1;
 }
+
+static struct x array[10];
+
+int struct_offset1()
+{
+	struct x *ptr1;
+	int    c;
+
+	return ptr1 - array;
+}
+
+int struct_offset2()
+{
+	struct x *ptr1;
+	int    c;
+
+	return ptr1 - &array[0];
+}
+int struct_offset3()
+{
+	struct x *ptr1;
+	int    c;
+
+	return ptr1 - (char *)&array[0];
+}
+

@@ -401,6 +401,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     } else {
         lval->flags &= ~FARACC;
     }
+
         
     // flags = lval->flags;
     // if (isaddr) {
@@ -526,18 +527,13 @@ int heira(LVALUE *lval)
         if (heira(lval) == 0) {
             return 0;
         }
+        lval->ltype = make_pointer(lval->ltype);
+        lval->ptr_type = lval->ltype->ptr->kind;
+        lval->val_type = (lval->flags & FARACC ? KIND_CPTR : KIND_INT);
 
         if (lval->symbol) {
-            lval->ltype = make_pointer(lval->symbol->ctype);
-            lval->ptr_type = lval->symbol->type;
-            lval->val_type = (lval->flags & FARACC ? KIND_CPTR : KIND_INT);
             lval->symbol->isassigned = YES;
-        } else {
-            warning(W_BUG1);
-            warning(W_BUG2);
-            lval->ptr_type = KIND_NONE;
-            lval->val_type = (lval->flags & (FARACC | FARPTR)) ? KIND_CPTR : KIND_INT;
-        }
+        } 
         if (lval->indirect_kind)
             return 0;
         /* global & non-array */

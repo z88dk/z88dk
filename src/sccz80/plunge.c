@@ -471,7 +471,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else {
             /* non-constant on both sides  */
             if (dbltest(lval, lval2))
-                scale(lval->ptr_type, lval->ltype->tag);
+                scale(lval->ptr_type, lval->ltype->ptr->tag);
             if (widen(lval, lval2)) {
                 /* floating point operation */
                 (*oper)(lval);
@@ -484,7 +484,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     zpop();
                 if (dbltest(lval2, lval)) {
                     swap();
-                    scale(lval2->ptr_type, lval2->ltype->tag);
+                    scale(lval2->ptr_type, lval2->ltype->ptr->tag);
                     /* subtraction not commutative */
                     if (oper == zsub)
                         swap();

@@ -40,7 +40,7 @@ int primary(LVALUE* lval)
             lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
             lval->ptr_type = KIND_NONE;
-            if ( ispointer(lval->ltype) ) {
+            if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY ) {
                 lval->ptr_type = ptr->ctype->ptr->kind;
                 /* djm long pointers */
                 lval->indirect_kind = lval->val_type = lval->ltype->kind;
@@ -89,6 +89,8 @@ int primary(LVALUE* lval)
                 address(ptr);
                 /* djm sommat here about pointer types? */
                 lval->indirect_kind = lval->ptr_type = ptr->type;
+                if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY )
+                    lval->ptr_type = lval->ltype->ptr->kind;
                 lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else {
