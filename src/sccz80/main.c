@@ -397,6 +397,8 @@ static void dumpfns()
         if (ptr->name[0] != '0' && ptr->ctype ) {
             type = ptr->type;
             storage = ptr->storage;
+            if ( type == KIND_ENUM )
+                continue;
             if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
@@ -523,6 +525,8 @@ void dumpvars()
             if ( type == KIND_FUNC || type == KIND_PORT8 || type == KIND_PORT16 )
                 continue;
             if ( storage == TYPDEF || storage == DECLEXTN || storage == EXTERNAL ) 
+                continue;
+            if ( type == KIND_ENUM )
                 continue;
             prefix();
             outname(ptr->name, 1);
