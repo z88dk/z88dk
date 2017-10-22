@@ -691,7 +691,13 @@ Type *parse_decl(char name[], Type *base_type)
  */
 Type *parse_expr_type()
 {
-    return dodeclare2(NULL, MODE_CAST);
+    Type *type = dodeclare2(NULL, MODE_CAST);
+
+    if ( type && strlen(type->name)) {
+        warningfmt("We're not expecting name '%s' with cast expression",type->name);
+    }
+
+    return type;
 }
 
 /** \brief Declare a local variableif we need to
@@ -866,7 +872,7 @@ Type *make_type(Kind kind, Type *tag)
         type->size = 6;
         break;
     case KIND_STRUCT:
-        // TODO
+        type->size = tag->size;
         break;
     default:
         type->size = 2;
@@ -1197,6 +1203,20 @@ int type_matches(Type *t1, Type *t2)
 }
 
 
+static int get_parameter_size(Type *type)
+{
+    switch ( type->kind ) {
+        case KIND_CHAR:
+            return 2;
+        case KIND_CPTR:
+            return 4;
+        default:
+            return type->size;
+ }
+
+}
+
+
 static void declfunc(Type *type, enum storage_type storage)
 {
     int where;
@@ -1274,7 +1294,7 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr->offset.i = where;
             outfmt("; parameter %s at %d size(%d)\n",ptype->name, where, ptype->size);
             ptr->isassigned = 1;
-            where += ptype->size != 1 ? ptype->size : 2; // TODO: far pointers go as long
+            where += get_parameter_size(ptype);
         }
     } else {
         int i;
@@ -1291,7 +1311,7 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr->offset.i = where;
             outfmt("; parameter %s at %d\n",ptype->name, where);            
             ptr->isassigned = 1;            
-            where += ptype->size != 1 ? ptype->size : 2;
+            where += get_parameter_size(ptype);
         }
     }
 

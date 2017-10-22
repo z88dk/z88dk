@@ -60,48 +60,6 @@ int heir1(LVALUE* lval)
             lval2.val_type = lval->val_type;
             load_constant(&lval2);
         }
-
-
-        /* Now our type checking so we can give off lots of warnings about
-         * type mismatches etc..
-         */
-//         if (lval2.val_type == KIND_VOID && lval2.ptr_type == 0)
-//             warning(W_VOID);
-//         /* First operand is a pointer */
-//         if (lval->ptr_type) {
-//             if (lval2.ptr_type && lval->ptr_type != lval2.ptr_type && (lval2.ptr_type != KIND_VOID && lval->ptr_type != KIND_VOID)) {
-// #if 0
-//                 /*
-//                 * Here we have a pointer mismatch, however we don't take account of
-//                 * ptr2ptr, so anything involvind them will barf badly, I'm leaving
-//                 * this for now, since the code is fine, but commenting out the warning
-//                 * which is a bit of shame, but there you go...
-//                 */
-//                 warning(W_PTRTYP);
-// #endif
-//             } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
-//                 warning(W_INTPTR);
-//         } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const))) {
-//             warning(W_PTRINT);
-//         }
-
-        // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
-        // if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
-        //     if ( lval->symbol->flags & FLOATINGDECL) {
-        //         /* The function pointer was undecorated, it should take on whatever is on the RHS */
-        //         lval->symbol->flags &= ~(CALLEE|SMALLC);
-        //         lval->symbol->flags |= ( lval2.flags & (CALLEE|SMALLC));
-        //     } else {
-        //         if ( (lval->symbol->flags & CALLEE) != (lval2.flags & CALLEE)) {
-        //             warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "_z88dk_callee");
-        //         }
-        //         if ( (lval->symbol->flags & SMALLC) != (lval2.flags & SMALLC)) {
-        //             warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "__smallc/__stdc");
-        //         }
-        //     }
-        // }
-
-
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
