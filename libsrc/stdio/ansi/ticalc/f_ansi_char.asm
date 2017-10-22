@@ -63,6 +63,7 @@
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
+	PUBLIC	BOLD
 
 	EXTERN	ansicolumns
 .text_cols   defb ansicolumns
@@ -177,6 +178,9 @@
   ld a,ansifont_is_packed
   and  a
   ld a,(hl)
+.BOLD
+  nop	;	rla
+  nop	;	or (hl)
   jr   z,INVRS
 
 .ROLL

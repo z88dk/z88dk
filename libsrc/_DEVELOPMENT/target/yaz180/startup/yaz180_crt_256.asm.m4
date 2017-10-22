@@ -148,6 +148,15 @@ __Restart_2:
 
 SECTION code_crt_init          ; user and library initialization
 
+   ; we do 256 ticks per second
+      ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
+      out0 (RLDR0L), l
+      out0 (RLDR0H), h
+
+   ; enable down counting and interrupts for PRT0
+      ld a, TCR_TIE0|TCR_TDE0
+      out0 (TCR), a
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -197,6 +206,7 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_jump_vectors_z180.inc"
+include "crt_interrupt_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

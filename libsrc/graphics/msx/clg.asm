@@ -3,14 +3,16 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.10 2016-06-21 20:16:35 dom Exp $
+;	$Id: clg.asm $
 ;
 
 	SECTION	code_clib
         PUBLIC    clg
         PUBLIC    _clg
         EXTERN	msxbios
-        EXTERN	msx_color
+
+	EXTERN     swapgfxbk
+        EXTERN	__graphics_end
 
         INCLUDE	"graphics/grafix.inc"
 
@@ -27,6 +29,7 @@ ENDIF
 .clg
 ._clg
 	push	ix	;save callers
+	call	swapgfxbk
 	ld	ix,CHGMOD
 IF FORmsx
 	ld	a,2		; set graphics mode
@@ -35,7 +38,7 @@ ELSE
 ENDIF
 	ld	(SCRMOD),a
 	call	msxbios
-
+	
 	ld	a,15
 	ld	(BDRCLR),a	;border
 	ld	ix,CHGCLR
@@ -49,5 +52,5 @@ ENDIF
 
 	ld ix,FILVRM
 	call	msxbios
-	pop	ix	;restore callers
-	ret
+	
+	jp __graphics_end

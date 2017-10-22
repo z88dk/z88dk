@@ -139,11 +139,11 @@ static void query_assemble( char *src_filename )
 	char *obj_filename = get_obj_filename( src_filename );
 
     /* get time stamp of files, error if source not found */
-    src_stat_result = stat( src_filename, &src_stat );	/* BUG_0033 */
+    src_stat_result = stat( src_filename, &src_stat );		/* BUG_0033 */
     obj_stat_result = stat( obj_filename, &obj_stat );
 
-    if ( opts.date_stamp &&								/* -d option */
-            obj_stat_result >= 0 &&					/* object file exists */
+    if ( opts.date_stamp &&									/* -d option */
+            obj_stat_result >= 0 &&							/* object file exists */
             ( src_stat_result >= 0 ?						/* if source file exists, ... */
               src_stat.st_mtime <= obj_stat.st_mtime		/* ... source older than object */
               : TRUE										/* ... else source does not exist, but object exists

@@ -1,3 +1,10 @@
+@stdio/ansicore.lst
+stdio/ansi/msx/f_ansi_attr
+stdio/ansi/msx/f_ansi_bel
+stdio/ansi/msx/f_ansi_char
+stdio/ansi/msx/f_ansi_cls_nobios
+stdio/ansi/generic/f_ansi_dline
+stdio/ansi/msx/f_ansi_scrollup_nobios
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
@@ -77,3 +84,8 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+psg/einstein/psg_init
+psg/einstein/get_psg
+psg/einstein/set_psg
+psg/einstein/set_psg_callee
+@psg/psg.lst

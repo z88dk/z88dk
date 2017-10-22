@@ -164,11 +164,8 @@ ENDIF
 
 IF FORcpc
 	DEFINE gotgfx
-	defc maxx	= 256
-	defc maxy	= 192
-	; Possible colors: 0 (blue), 1 (yellow), 2 (cyan), 3 (red)
-	defc bcolor	= 0
-	defc fcolor	= 2
+	defc maxx	= 640
+	defc maxy	= 200
 	defc row_bytes  = 64
 ENDIF
 

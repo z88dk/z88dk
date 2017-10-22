@@ -100,6 +100,7 @@ tideps:
 #  short script to sort out ticalc dependencies
 msxdeps:
 	@$(RM) -f stdio/msx/*.o
+	@$(RM) -f stdio/ansi/msx/*.o
 	@$(RM) -f games/*.o
 	@$(RM) -f games/msx/*.o
 	@$(RM) -f graphics/*.o
@@ -111,6 +112,7 @@ msxdeps:
 zx81deps:
 	@$(RM) -f stdio/zx81/*.o
 	@$(RM) -f stdio/ansi/zx81/*.o
+	@$(RM) -f stdio/ansi/zx81/text/*.o
 	@$(RM) -f input/spectrum/*.o
 	@$(RM) -f input/zx81/*.o
 	@$(RM) -f games/zx81/*.o

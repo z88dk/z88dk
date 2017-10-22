@@ -17,14 +17,18 @@ static void usage(char *program)
 {
     printf("z88dk disassembler\n\n");
     printf("%s [options] [file]\n\n",program);
-    printf("  -o <addr>      Address to load code from\n");
+    printf("  -o <addr>      Address to load code to\n");
     printf("  -s <addr>      Address to start disassembling from\n");
-    printf("  -e <addr>      Address to disassemble to\n");
+    printf("  -e <addr>      Address to stop disassembling at\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
+    printf("  -mez80         Disassemble ez80 code (short mode)\n");
     printf("  -mz80-zxn      Disassemble z80 ZXN code\n");
     printf("  -mr2k          Disassemble Rabbit 2000 code\n");
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
+    printf("  -mr800         Disassemble R800 code\n");
+    printf("  -mgbz80        Disassemble Gameboy z80 code\n");
+    printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
     printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
@@ -76,8 +80,16 @@ int main(int argc, char **argv)
                     c_cpu = CPU_R2K;
                 } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
                     c_cpu = CPU_R3K;
+                } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {
+                    c_cpu = CPU_R800;
+                } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {
+                    c_cpu = CPU_GBZ80;
+                } else if ( strcmp(&argv[0][1],"m8080") == 0 ) {
+                    c_cpu = CPU_8080;
+                } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
+                    c_cpu = CPU_EZ80;
                 } else {
-                    printf("Unknown CPU: %s\n",&argv[0][1]);
+                    printf("Unknown CPU: %s\n",&argv[0][2]);
                 }
                 break;
             }

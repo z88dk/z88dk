@@ -53,9 +53,6 @@
 
 #define __IO_PIO_PORT_BASE  0x4000
 
-#define __I2C_RX_SIZE  0x100
-#define __I2C_TX_SIZE  0x100
-
 #define __IO_PCA9665_1_PORT_BASE  0xA000
 #define __IO_PCA9665_2_PORT_BASE  0x8000
 
@@ -572,18 +569,19 @@
 #define STDIO_MSG_CLOS  9
 
 #define ITERM_MSG_GETC  15
-#define ITERM_MSG_INTERRUPT  16
-#define ITERM_MSG_PUTC  17
-#define ITERM_MSG_PRINT_CURSOR  18
-#define ITERM_MSG_ERASE_CURSOR  19
-#define ITERM_MSG_ERASE_CURSOR_PWD  20
-#define ITERM_MSG_BS  21
-#define ITERM_MSG_BS_PWD  22
-#define ITERM_MSG_READLINE_BEGIN  23
-#define ITERM_MSG_READLINE_END  24
-#define ITERM_MSG_BELL  25
+#define ITERM_MSG_REJECT  16
+#define ITERM_MSG_INTERRUPT  17
+#define ITERM_MSG_PUTC  18
+#define ITERM_MSG_PRINT_CURSOR  19
+#define ITERM_MSG_ERASE_CURSOR  20
+#define ITERM_MSG_ERASE_CURSOR_PWD  21
+#define ITERM_MSG_BS  22
+#define ITERM_MSG_BS_PWD  23
+#define ITERM_MSG_READLINE_BEGIN  24
+#define ITERM_MSG_READLINE_END  25
+#define ITERM_MSG_BELL  26
       
-#define __MESSAGE_ITERM_NEXT__  26
+#define __MESSAGE_ITERM_NEXT__  27
 
 #define OTERM_MSG_PUTC  30
 #define OTERM_MSG_TTY  31
@@ -677,6 +675,20 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+#define __Z80_VECTOR_BASE_BASIC  0x2000
+#define __Z180_VECTOR_IL_BASIC  0x40
 
 
 
@@ -807,51 +819,8 @@
 
 
 
-
-#undef  __YAZ180
-#define __YAZ180  1
-
-#define __ASCI0_RX_SIZE  0x100
-#define __ASCI0_TX_SIZE  0x100
-
-#define __ASCI1_RX_SIZE  0x100
-#define __ASCI1_TX_SIZE  0x100
-
-#define __APU_CMD_SIZE  0x100
-#define __APU_PTR_SIZE  0x100
-
-#define __I2C_RX_SIZE  0x100
-#define __I2C_TX_SIZE  0x100
-
-#define __IO_BREAK  0x2000
-
-#define __IO_PIO_PORT_BASE  0x4000
-
-#define __IO_PIO_PORT_A  0x4000
-#define __IO_PIO_PORT_B  0x4001
-#define __IO_PIO_PORT_C  0x4002
-#define __IO_PIO_CONTROL  0x4003
-
-#define __IO_PIO_CNTL_00  0x80
-#define __IO_PIO_CNTL_01  0x81
-#define __IO_PIO_CNTL_02  0x82
-#define __IO_PIO_CNTL_03  0x83
-
-#define __IO_PIO_CNTL_04  0x88
-#define __IO_PIO_CNTL_05  0x89
-#define __IO_PIO_CNTL_06  0x8A
-#define __IO_PIO_CNTL_07  0x8B
-
-#define __IO_PIO_CNTL_08  0x90
-#define __IO_PIO_CNTL_09  0x91
-#define __IO_PIO_CNTL_10  0x92
-#define __IO_PIO_CNTL_11  0x83
-
-#define __IO_PIO_CNTL_12  0x98
-#define __IO_PIO_CNTL_13  0x99
-#define __IO_PIO_CNTL_14  0x9A
-#define __IO_PIO_CNTL_15  0x9B
-
+#define __IO_I2C_RX_SIZE  68
+#define __IO_I2C_TX_SIZE  68
 
 #define __IO_PCA9665_1_PORT_BASE  0xA000
 #define __IO_PCA9665_2_PORT_BASE  0x8000
@@ -911,8 +880,7 @@
 #define __IO_I2C_CON_SI  0x08
 #define __IO_I2C_CON_MODE  0x01
 
-#define __IO_I2C_CON_ECHO_BUS_STOP  0x10
-#define __IO_I2C_CON_ECHO_SI  0x08
+#define __IO_I2C_CON_ECHO_BUS_STOPPED  0x10
 #define __IO_I2C_CON_ECHO_BUS_RESTART  0x04
 #define __IO_I2C_CON_ECHO_BUS_ILLEGAL  0x02
 

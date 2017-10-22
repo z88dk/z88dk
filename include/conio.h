@@ -33,7 +33,7 @@
 #define clrscr() printf("\033E")
 #define clreol() printf("\033K")
 #endif
-*/
+
 
 #if __SC3000__
 extern unsigned char *sc_cursor_pos;
@@ -46,6 +46,7 @@ extern unsigned char *sc_cursor_pos;
 #define gotoxy(a,b)     sc_cursor_pos[1]=a-1; sc_cursor_pos[0]=b-1
 #define clrscr() printf("\014")
 #endif
+*/
 
 /* Fallback to ANSI VT escape sequences */
 #ifndef gotoxy
@@ -76,7 +77,7 @@ extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 // Useless, DL is not fully implemented in the VT-ansi engine
 //#define delline()	       printf("\033[M")
 
-#define clrscr()           vtrendition(40); vtrendition(37); fputc_cons(12)
+#define clrscr()           fputc_cons(12)
 #define clreol()           printf("\033[K")
 
 extern int     __LIB__     wherex (void);

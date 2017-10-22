@@ -1,10 +1,9 @@
 /*
-Z88DK Z80 Macro Assembler
+Z88DK Z80 Module Assembler
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Manage the code area in memory
 */
@@ -35,27 +34,28 @@ Manage the code area in memory
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 CLASS( Section )
-	char		*name;				/* name of section, kept in strpool */
-	int			 addr;				/* start address of this section,
-									*  computed by sections_alloc_addr() */
-    int			 origin;			/* ORG address of section, -1 if not defined */
-	Bool		 origin_found : 1;	/* ORG already found in code */
-	Bool		 origin_opts : 1;	/* ORG was defined from command line options,
-									*  override asm code */
-	Bool		 section_split : 1;	/* ORG -1 was given, signal that this section
-									*  should be output to a new binary file */
+	char		*name;				// name of section, kept in strpool
+	int			 addr;				// start address of this section,
+									// computed by sections_alloc_addr()
+    int			 origin;			// ORG address of section, -1 if not defined
+	Bool		 origin_found : 1;	// ORG already found in code
+	Bool		 origin_opts : 1;	// ORG was defined from command line options,
+									// override asm code
+	Bool		 section_split : 1;	// ORG -1 was given, signal that this section
+									// should be output to a new binary file
 	Bool		 max_codesize_issued : 1;
-									/* error_max_codesize issued, ignore next calls */
-	int			 asmpc;				/* address of current opcode relative to start
-									*  of the current module, reset to 0 at start
-									*  of each module */
-	int			 opcode_size;		/* number of bytes added after last 
-									*  set_PC() or next_PC() */
-	ByteArray	*bytes;				/* binary code of section, used to compute 
-									*  current size */
-	intArray	*reloc;				/* list of addresses in module containg relocable addreses */
-	intArray	*module_start;		/* at module_addr[ID] is the start offset from
-									*  addr of module ID */
+									// error_max_codesize issued, ignore next calls
+	int			 asmpc;				// address of current opcode relative to start
+									// of the current module, reset to 0 at start
+									// of each module
+	int			 asmpc_phase;		// asmpc within a PHASE/DEPHASE block, -1 otherwise
+	int			 opcode_size;		// number of bytes added after last
+									// set_PC() or next_PC()
+	ByteArray	*bytes;				// binary code of section, used to compute 
+									// current size
+	intArray	*reloc;				// list of addresses in module containg relocable addreses
+	intArray	*module_start;		// at module_addr[ID] is the start offset from
+									// addr of module ID
 END_CLASS;
 
 CLASS_HASH( Section );
@@ -118,7 +118,8 @@ extern int get_cur_module_size( void );
 *----------------------------------------------------------------------------*/
 extern void set_PC( int n );
 extern int next_PC( void );
-extern int get_PC( void );
+extern int get_PC(void);
+extern int get_phased_PC(void);
 
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
@@ -175,3 +176,7 @@ extern void set_origin_option(int origin);
    origin = -1 and section_split - origin not defined, but section split */
 extern void read_origin(FILE* file, Section *section);
 extern void write_origin(FILE* file, Section *section);
+
+// set/clear the new asmpc_phase
+extern void set_phase_directive(int address);
+extern void clear_phase_directive();

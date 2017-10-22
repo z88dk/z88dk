@@ -4,6 +4,12 @@ divert(-1)
 # PCA9665 CONFIGURATION
 #
 
+# PCA9665 I2C I/O Buffer Definitions
+
+define(`__IO_I2C_RX_SIZE', 68)          # Size of the Rx Buffer, 68 Bytes
+define(`__IO_I2C_TX_SIZE', 68)          # Size of the Tx Buffer, 68 Bytes
+                                        # PCA9665 has 68 Byte Tx/Rx hardware buffer
+
 # PCA9665 I2C I/O Register MSB addressing
 
 define(`__IO_I2C1_PORT_MSB', 0x`'eval((__IO_PCA9665_1_PORT_BASE/0x0100)&0xE0,16))   # distinguish the device address, with MSB
@@ -73,8 +79,7 @@ define(`__IO_I2C_CON_MODE',  0x01)              # Mode, 1 = buffered, 0 = byte
 
 # Bits in I2C_CON Echo, for CPU control
 
-define(`__IO_I2C_CON_ECHO_BUS_STOP',  0x10)     # We are finished the sentence
-define(`__IO_I2C_CON_ECHO_SI',  0x08)           # Serial Interrupt Received
+define(`__IO_I2C_CON_ECHO_BUS_STOPPED',  0x10)  # We are finished the sentence
 define(`__IO_I2C_CON_ECHO_BUS_RESTART',  0x04)  # Bus Restart Requested
 define(`__IO_I2C_CON_ECHO_BUS_ILLEGAL',  0x02)  # Unexpected Bus Response
 
@@ -107,6 +112,9 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
+PUBLIC `__IO_I2C_RX_SIZE'
+PUBLIC `__IO_I2C_TX_SIZE'
+
 PUBLIC `__IO_I2C1_PORT_MSB'
 PUBLIC `__IO_I2C2_PORT_MSB'
 
@@ -162,8 +170,7 @@ PUBLIC `__IO_I2C_CON_STO'
 PUBLIC `__IO_I2C_CON_SI'
 PUBLIC `__IO_I2C_CON_MODE'
 
-PUBLIC `__IO_I2C_CON_ECHO_BUS_STOP'
-PUBLIC `__IO_I2C_CON_ECHO_SI'
+PUBLIC `__IO_I2C_CON_ECHO_BUS_STOPPED'
 PUBLIC `__IO_I2C_CON_ECHO_BUS_RESTART'
 PUBLIC `__IO_I2C_CON_ECHO_BUS_ILLEGAL'
 
@@ -184,6 +191,9 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+defc `__IO_I2C_RX_SIZE' = __IO_I2C_RX_SIZE
+defc `__IO_I2C_TX_SIZE' = __IO_I2C_TX_SIZE
+
 defc `__IO_I2C1_PORT_MSB' = __IO_I2C1_PORT_MSB
 defc `__IO_I2C2_PORT_MSB' = __IO_I2C2_PORT_MSB
 
@@ -239,8 +249,7 @@ defc `__IO_I2C_CON_STO' = __IO_I2C_CON_STO
 defc `__IO_I2C_CON_SI' = __IO_I2C_CON_SI
 defc `__IO_I2C_CON_MODE' = __IO_I2C_CON_MODE
 
-defc `__IO_I2C_CON_ECHO_BUS_STOP' = __IO_I2C_CON_ECHO_BUS_STOP
-defc `__IO_I2C_CON_ECHO_SI' = __IO_I2C_CON_ECHO_SI
+defc `__IO_I2C_CON_ECHO_BUS_STOPPED' = __IO_I2C_CON_ECHO_BUS_STOPPED
 defc `__IO_I2C_CON_ECHO_BUS_RESTART' = __IO_I2C_CON_ECHO_BUS_RESTART
 defc `__IO_I2C_CON_ECHO_BUS_ILLEGAL' = __IO_I2C_CON_ECHO_BUS_ILLEGAL
 
@@ -261,51 +270,8 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-
-`#undef'  `__YAZ180'
-`#define' `__YAZ180'  __YAZ180
-
-`#define' `__ASCI0_RX_SIZE'  __ASCI0_RX_SIZE
-`#define' `__ASCI0_TX_SIZE'  __ASCI0_TX_SIZE
-
-`#define' `__ASCI1_RX_SIZE'  __ASCI1_RX_SIZE
-`#define' `__ASCI1_TX_SIZE'  __ASCI1_TX_SIZE
-
-`#define' `__APU_CMD_SIZE'  __APU_CMD_SIZE
-`#define' `__APU_PTR_SIZE'  __APU_PTR_SIZE
-
-`#define' `__I2C_RX_SIZE'  __I2C_RX_SIZE
-`#define' `__I2C_TX_SIZE'  __I2C_TX_SIZE
-
-`#define' `__IO_BREAK'  __IO_BREAK
-
-`#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
-
-`#define' `__IO_PIO_PORT_A'  __IO_PIO_PORT_A
-`#define' `__IO_PIO_PORT_B'  __IO_PIO_PORT_B
-`#define' `__IO_PIO_PORT_C'  __IO_PIO_PORT_C
-`#define' `__IO_PIO_CONTROL'  __IO_PIO_CONTROL
-
-`#define' `__IO_PIO_CNTL_00'  __IO_PIO_CNTL_00
-`#define' `__IO_PIO_CNTL_01'  __IO_PIO_CNTL_01
-`#define' `__IO_PIO_CNTL_02'  __IO_PIO_CNTL_02
-`#define' `__IO_PIO_CNTL_03'  __IO_PIO_CNTL_03
-
-`#define' `__IO_PIO_CNTL_04'  __IO_PIO_CNTL_04
-`#define' `__IO_PIO_CNTL_05'  __IO_PIO_CNTL_05
-`#define' `__IO_PIO_CNTL_06'  __IO_PIO_CNTL_06
-`#define' `__IO_PIO_CNTL_07'  __IO_PIO_CNTL_07
-
-`#define' `__IO_PIO_CNTL_08'  __IO_PIO_CNTL_08
-`#define' `__IO_PIO_CNTL_09'  __IO_PIO_CNTL_09
-`#define' `__IO_PIO_CNTL_10'  __IO_PIO_CNTL_10
-`#define' `__IO_PIO_CNTL_11'  __IO_PIO_CNTL_11
-
-`#define' `__IO_PIO_CNTL_12'  __IO_PIO_CNTL_12
-`#define' `__IO_PIO_CNTL_13'  __IO_PIO_CNTL_13
-`#define' `__IO_PIO_CNTL_14'  __IO_PIO_CNTL_14
-`#define' `__IO_PIO_CNTL_15'  __IO_PIO_CNTL_15
-
+`#define' `__IO_I2C_RX_SIZE'  __IO_I2C_RX_SIZE
+`#define' `__IO_I2C_TX_SIZE'  __IO_I2C_TX_SIZE
 
 `#define' `__IO_PCA9665_1_PORT_BASE'  __IO_PCA9665_1_PORT_BASE
 `#define' `__IO_PCA9665_2_PORT_BASE'  __IO_PCA9665_2_PORT_BASE
@@ -365,8 +331,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_I2C_CON_SI'  __IO_I2C_CON_SI
 `#define' `__IO_I2C_CON_MODE'  __IO_I2C_CON_MODE
 
-`#define' `__IO_I2C_CON_ECHO_BUS_STOP'  __IO_I2C_CON_ECHO_BUS_STOP
-`#define' `__IO_I2C_CON_ECHO_SI'  __IO_I2C_CON_ECHO_SI
+`#define' `__IO_I2C_CON_ECHO_BUS_STOPPED'  __IO_I2C_CON_ECHO_BUS_STOPPED
 `#define' `__IO_I2C_CON_ECHO_BUS_RESTART'  __IO_I2C_CON_ECHO_BUS_RESTART
 `#define' `__IO_I2C_CON_ECHO_BUS_ILLEGAL'  __IO_I2C_CON_ECHO_BUS_ILLEGAL
 

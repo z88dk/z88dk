@@ -19,7 +19,7 @@ define(`__IO_ACIA_PORT_BASE', 0x80)   # Port Address for 68C50
 
 # 82C55 PIO Port Definitions
 
-define(`__IO_PIO_PORT_BASE', 0x40)    # Port Address for 82C55 #FIXME
+define(`__IO_PIO_PORT_BASE', 0x20)    # Port Address for 82C55
 
 #
 # END OF USER CONFIGURATION

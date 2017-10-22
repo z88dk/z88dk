@@ -1,5 +1,13 @@
 SMSlib library from [devkitSMS](https://github.com/sverx/devkitSMS)
-synchronized May 15, 2017
+synchronized October 12, 2017
+
+still to add:
+
+const unsigned char devkitSMS_font__tiles__1bpp[768];
+void SMS_autoSetUpTextRenderer(void);
+void SMS_load1bppTiles(void *src, unsigned int tilefrom, unsigned int size, unsigned char color0, unsigned char color1);
+void SMS_configureTextRenderer(signed int ascii_to_tile_offset);
+void putchar(char c);
 
 SMSlib
 ======
@@ -57,6 +65,7 @@ void SMS_setTile (unsigned int tile);
 /* sprite handling */
 void SMS_initSprites (void);                /* we're going to start declaring sprites, in front-to-back order */
 signed char SMS_addSprite (unsigned char x, unsigned char y, unsigned char tile);  /* declare a sprite - returns handle or -1 if no more sprites are available */
+void SMS_addTwoAdjoiningSprites (unsigned char x, unsigned char y, unsigned char tile);   /* doesn't return anything */
 signed char SMS_reserveSprite (void);
 void SMS_updateSpritePosition (signed char sprite, unsigned char x, unsigned char y);
 void SMS_updateSpriteImage (signed char sprite, unsigned char image);
@@ -65,6 +74,10 @@ void SMS_setClippingWindow (unsigned char x0, unsigned char y0, unsigned char x1
 signed char SMS_addSpriteClipping (int x, int y, unsigned char tile);   /* declare a sprite inside the window - returns handle or -1 if no more sprites are available or sprite clipped */
 void SMS_finalizeSprites (void);            /* we're done declaring sprites */
 void SMS_copySpritestoSAT (void);           /* copy sprites to Sprites Attribute Table (do that during vBlank) */
+
+/* text renderer */
+void SMS_configureTextRenderer (signed int ascii_to_tile_offset);  /* set the value you should add to ASCII value to get the tile number */
+void SMS_autoSetUpTextRenderer (void);                             /* load a standard font character set into tiles 0-95, set BG palette to B/W and turn on the screen */
 
 /* input handling */
 unsigned int SMS_getKeysStatus (void);    /* the current status of the keys */
@@ -79,7 +92,7 @@ unsigned int SMS_getMDKeysHeld (void);    /* the extended keys that were down la
 unsigned int SMS_getMDKeysReleased (void); /* the extended keys that were down last frame and up now on a MD controller */
 
 /* pause handling (SMS only) */
-unsigned char SMS_queryPauseRequested (void);     /* the pause key has been pressed since previous check */
+_Bool SMS_queryPauseRequested (void);     /* the pause key has been pressed since previous check */
 void SMS_resetPauseRequest (void);        /* reset/acknowledge pause requests */
 
 /* line IRQ handling */

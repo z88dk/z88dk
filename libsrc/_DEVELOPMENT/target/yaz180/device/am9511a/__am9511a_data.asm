@@ -1,7 +1,7 @@
 
     INCLUDE "config_private.inc"
 
-    SECTION data_align_256
+    SECTION data_common1_align_256
 
     PUBLIC APUCMDBuf, APUPTRBuf
 
@@ -14,10 +14,10 @@
        defs 256 - (ASMPC & 0xff)
     ENDIF
 
-    SECTION data_driver
+    SECTION data_common1_driver
 
     PUBLIC APUCMDInPtr, APUCMDOutPtr, APUPTRInPtr, APUPTROutPtr
-    PUBLIC APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError
+    PUBLIC APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError, APULock
 
     APUCMDInPtr:    DEFW    APUCMDBuf
     APUCMDOutPtr:   DEFW    APUCMDBuf
@@ -27,3 +27,4 @@
     APUPTRBufUsed:  DEFB    0
     APUStatus:      DEFB    0
     APUError:       DEFB    0
+    APULock:        DEFB    0

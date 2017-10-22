@@ -42,7 +42,7 @@
 #define __CPU_CLOCK  7372800
 
 #define __IO_ACIA_PORT_BASE  0x80
-#define __IO_PIO_PORT_BASE  0x40
+#define __IO_PIO_PORT_BASE  0x20
 
 
 
@@ -321,18 +321,19 @@
 #define STDIO_MSG_CLOS  9
 
 #define ITERM_MSG_GETC  15
-#define ITERM_MSG_INTERRUPT  16
-#define ITERM_MSG_PUTC  17
-#define ITERM_MSG_PRINT_CURSOR  18
-#define ITERM_MSG_ERASE_CURSOR  19
-#define ITERM_MSG_ERASE_CURSOR_PWD  20
-#define ITERM_MSG_BS  21
-#define ITERM_MSG_BS_PWD  22
-#define ITERM_MSG_READLINE_BEGIN  23
-#define ITERM_MSG_READLINE_END  24
-#define ITERM_MSG_BELL  25
+#define ITERM_MSG_REJECT  16
+#define ITERM_MSG_INTERRUPT  17
+#define ITERM_MSG_PUTC  18
+#define ITERM_MSG_PRINT_CURSOR  19
+#define ITERM_MSG_ERASE_CURSOR  20
+#define ITERM_MSG_ERASE_CURSOR_PWD  21
+#define ITERM_MSG_BS  22
+#define ITERM_MSG_BS_PWD  23
+#define ITERM_MSG_READLINE_BEGIN  24
+#define ITERM_MSG_READLINE_END  25
+#define ITERM_MSG_BELL  26
       
-#define __MESSAGE_ITERM_NEXT__  26
+#define __MESSAGE_ITERM_NEXT__  27
 
 #define OTERM_MSG_PUTC  30
 #define OTERM_MSG_TTY  31
@@ -490,10 +491,10 @@
 
 
 
-#define __IO_PIO_PORT_A  0x40
-#define __IO_PIO_PORT_B  0x41
-#define __IO_PIO_PORT_C  0x42
-#define __IO_PIO_CONTROL  0x43
+#define __IO_PIO_PORT_A  0x20
+#define __IO_PIO_PORT_B  0x21
+#define __IO_PIO_PORT_C  0x22
+#define __IO_PIO_CONTROL  0x23
 
 #define __IO_PIO_CNTL_00  0x80
 #define __IO_PIO_CNTL_01  0x81
@@ -527,10 +528,10 @@
 
 
 
-#define __IO_PIO_IDE_LSB  0x40
-#define __IO_PIO_IDE_MSB  0x41
-#define __IO_PIO_IDE_CTL  0x42
-#define __IO_PIO_IDE_CONFIG  0x43
+#define __IO_PIO_IDE_LSB  0x20
+#define __IO_PIO_IDE_MSB  0x21
+#define __IO_PIO_IDE_CTL  0x22
+#define __IO_PIO_IDE_CONFIG  0x23
 #define __IO_PIO_IDE_RD  0x92
 #define __IO_PIO_IDE_WR  0x80
 

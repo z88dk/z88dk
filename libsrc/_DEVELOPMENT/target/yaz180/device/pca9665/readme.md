@@ -29,39 +29,39 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     DIRECT REGISTERS
 
     Register Name   Register function   A1  A0  Read/Write  Default
-    I2CSTA          status              0   0   R           F8h
-    INDPTR          indirect pointer    0   0   W           00h
-    I2CDAT          data                0   1   R/W         00h
-    INDIRECT        indirect data       1   0   R/W         00h
-    I2CCON          control             1   1   R/W         00h
+    STA             status              0   0   R           F8h
+    IPTR            indirect pointer    0   0   W           00h
+    DAT             data                0   1   R/W         00h
+    IDATA           indirect data       1   0   R/W         00h
+    CON             control             1   1   R/W         00h
 
 
     INDIRECT REGISTERS
 
     Register name   Register function   INDPTR  Read/Write  Default
-    I2CCOUNT        byte count          00h     R/W         01h
-    I2CADDR         own address         01h     R/W         E0h
-    I2CSCLL         SCL LOW period      02h     R/W         9Dh
-    I2CSCLH         SCL HIGH period     03h     R/W         86h
-    I2CTO           time-out            04h     R/W         FFh
-    I2CPRESET       parallel s/w reset  05h     W           00h [A5h 5Ah]
-    I2CMODE         I2C-bus mode        06h     R/W         00h
+    ICOUNT          byte count          00h     R/W         01h
+    IADDR           own address         01h     R/W         E0h
+    ISCLL           SCL LOW period      02h     R/W         9Dh
+    ISCLH           SCL HIGH period     03h     R/W         86h
+    ITO             time-out            04h     R/W         FFh
+    IPRESET         parallel s/w reset  05h     W           00h [A5h 5Ah]
+    IMODE           I2C-bus mode        06h     R/W         00h
 ```
 
 ### PCA9665 Register Bits
 
 ```
-    Bits in I2CSTA
+    Bits in STA
 
     Bit 7:2 = ST[5:0]   status code corresponding I2C states
     Bit 1:0             always reads zero
 
-    Bits in INDPTR
+    Bits in IPTR
 
     Bit 7:3             reserved, must always be written to zero
     Bit 2:0 = IP[2:0]   address of the indirect register
 
-    Bits in I2CCON
+    Bits in CON
 
     Bit 7   = AA        Assert Acknowledge Flag
     Bit 6   = ENSIO     Bus Controller Enable change only when I2C bus idle.
@@ -74,30 +74,30 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     Remark: Since none of the registers should be written to via
     the parallel interface once the Serial Interrupt line has been
     de-asserted, all the other registers that need to be modified
-    should be written to before the content of the I2CCON register
+    should be written to before the content of the CON register
     is modified.
 
-    Bits in I2CICOUNT
+    Bits in ICOUNT
 
     Bit 7   = LB        Last Byte control bit
                         LB bit is only used for Receiver Buffered modes
     Bit 6   = BC[6:0]   Number of bytes to be read or written (up to 68 bytes)
 
-    Bits in I2CADDR
+    Bits in IADDR
 
     Bit 7:1 = AD[7:1]   Own slave address
     Bit 0   = GC        General Call
 
-    Bits in I2CTO
+    Bits in ITO
 
     Bit 7   = TE        Time-Out Enable control bit
 
-    Bits in I2CMODE
+    Bits in IMODE
 
     Bit 7:2             reserved, must always be written to zero
     Bit 1:0 = AC[1:0]   Bus Mode 00b Std 01b Fast 10b Fast+ 11b Turbo
 
-    Bits in I2CSTA (Status Codes Returned)
+    Bit Defines in STA (Status Codes Returned)
 
     __IO_I2C_STA_ILLEGAL_START_STOP      $00
     __IO_I2C_STA_MASTER_START_TX         $08
@@ -130,22 +130,23 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     __IO_I2C_STA_IDLE                    $F8 _IDLE is unused, so
     __IO_I2C_STA_ILLEGAL_ICOUNT          $FC _ILLEGAL_ICOUNT can be $F8 case
 
-    Bits in I2CCON Echo (i2c1ControlEcho, i2c2ControlEcho), for CPU control
+    Bit Defines in CON Echo (i2c1ControlEcho, i2c2ControlEcho), for CPU control
+    Bit 2:1 in CON are reserved, and are therefore used for CPU control
 
     __IO_I2C_CON_ECHO_BUS_STOP           $10 We are finished the sentence
     __IO_I2C_CON_ECHO_SI                 $08 Serial Interrupt Received
     __IO_I2C_CON_ECHO_BUS_RESTART        $04 Bus Restart Requested
     __IO_I2C_CON_ECHO_BUS_ILLEGAL        $02 Unexpected Bus Response
 
-    Bits in I2CICOUNT
+    Bit Defines in ICOUNT
 
     __IO_I2C_ICOUNT_LB                   $80 Last Byte control bit is only used
                                              for Receiver Buffered modes
-    Bits in I2C_ITO
+    Bit Defines in ITO
 
     __IO_I2C_ITO_TE                      $80 Time-Out Enable control bit
 
-    Bits in I2C_IMODE
+    Bit Defines in IMODE
 
     __IO_I2C_IMODE_STD                   $00 Standard mode
     __IO_I2C_IMODE_FAST                  $01 Fast mode
@@ -154,3 +155,15 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
 
     __IO_I2C_IMODE_CR                    $07 Clock Rate (MASK)
 ```
+## Credits & Licence
+
+Contents of this file are copyright Phillip Stevens
+
+You have permission to use this for NON COMMERCIAL USE ONLY.
+If you wish to use it elsewhere, please include an acknowledgement to myself.
+
+[GitHub](https://github.com/feilipu/)
+[Web](https://feilipu.me/)
+
+This work was authored in Marrakech, Morocco during May/June 2017.
+
