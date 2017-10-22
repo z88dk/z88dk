@@ -286,7 +286,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
 {
     if (lval2->val_type == KIND_DOUBLE) {
         if (lval->val_type != KIND_DOUBLE) {
-            dpush_under(lval->val_type); /* push 2nd operand UNDER 1st */
+            dpush_under(lval->ltype->kind); /* push 2nd operand UNDER 1st */
             mainpop();
             if (lval->val_type == KIND_LONG)
                 zpop();
@@ -518,7 +518,7 @@ void store(LVALUE* lval)
  */
 void smartpush(LVALUE* lval, char* before)
 {
-    outfmt(";%s Indirect kind %d kind %d flags %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind,lval->flags);
+   // outfmt(";%s Indirect kind %d kind %d flags %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind,lval->flags);
     if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
         addstk(lval);
         if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
@@ -527,7 +527,6 @@ void smartpush(LVALUE* lval, char* before)
             zpush();
         }
     } else {
-        ol(";doing smart");
         switch ((lval->symbol->offset.i) - Zsp) {
         case 0:
         case 2:
@@ -747,6 +746,7 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     force(t1, t2, lval->cast_type->isunsigned, dest_lval->ltype->isunsigned, 0); // TODO lconst
 
     dest_lval->ltype = lval->cast_type;
+    dest_lval->val_type = dest_lval->ltype->kind;
     lval->cast_type = NULL;
     if ( ispointer(dest_lval->ltype) ) {
         dest_lval->ptr_type = dest_lval->ltype->ptr->kind;
