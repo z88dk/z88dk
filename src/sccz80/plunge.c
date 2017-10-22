@@ -425,8 +425,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (lval2->is_const) {
             /* constant on right */
             val = lval2->const_val;
-
-
+            
             if ( lval2->val_type == KIND_DOUBLE ) { 
                 clearstage(before1, 0);
                 Zsp = savesp1;
@@ -437,7 +436,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 (*oper)(lval);
                 return;
             }
-
 
             if ( lval->val_type == KIND_DOUBLE ) { 
                 /* On stack we've got the double, load the constant as a double */
@@ -456,7 +454,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if (dbltest(lval, lval2)) {
                     int ival = val;
                     /* are adding lval2 to pointer, adjust size */
-                    cscale(lval->ltype, &ival);
+                    cscale(lval->ltype->ptr, &ival);
                     val = ival;
                 }
                 if (oper == zsub) {
@@ -527,6 +525,17 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             zdiv_const(lval,6); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
             zdiv_const(lval, lval->ltype->ptr->tag->size);
+        } else if ( lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {
+        } else if ( (lval->ptr_type && lval2->is_const == 0 )  ||
+                (lval2->ptr_type && lval->is_const == 0 ) ) {
+            UT_string  *str;
+            utstring_new(str);
+            utstring_printf(str,"Pointer arithmetic with non-matching types: ");
+            type_describe(lval->ltype, str);
+            utstring_printf(str, "-");
+            type_describe(lval2->ltype, str);
+            warningfmt("%s", utstring_body(str));
+            utstring_free(str);
         }
     }
     result(lval, lval2);

@@ -535,7 +535,7 @@ int heira(LVALUE *lval)
         } else {
             warning(W_BUG1);
             warning(W_BUG2);
-            lval->ptr_type = KIND_VOID;
+            lval->ptr_type = KIND_NONE;
             lval->val_type = (lval->flags & (FARACC | FARPTR)) ? KIND_CPTR : KIND_INT;
         }
         if (lval->indirect_kind)
