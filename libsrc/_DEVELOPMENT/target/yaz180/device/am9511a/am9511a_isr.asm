@@ -74,7 +74,7 @@
         pop de
         pop bc
         pop af
-        retn
+        reti
 
     am9511a_isr_end:            ; we've finished a COMMAND sentence
         ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC

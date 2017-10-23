@@ -12,38 +12,6 @@ IF !DEFINED_startup
 ENDIF
 
 
-IF !DEFINED_CLIB_OPT_PRINTF
-	defc	DEFINED_CLIB_OPT_PRINTF = 1
-	defc CLIB_OPT_PRINTF = 0x200
-	IFNDEF CLIB_OPT_PRINTF
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_PRINTF_2
-	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
-	defc CLIB_OPT_PRINTF_2 = 0
-	IFNDEF CLIB_OPT_PRINTF_2
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_SCANF
-	defc	DEFINED_CLIB_OPT_SCANF = 1
-	defc CLIB_OPT_SCANF = 0x200000
-	IFNDEF CLIB_OPT_SCANF
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_SCANF_2
-	defc	DEFINED_CLIB_OPT_SCANF_2 = 1
-	defc CLIB_OPT_SCANF_2 = 0
-	IFNDEF CLIB_OPT_SCANF_2
-	ENDIF
-ENDIF
-
-
 
 
 
@@ -744,7 +712,7 @@ IF __MMAP = 0
    ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "crt_yabios_memory_model_z180.inc"
+   INCLUDE "../crt_memory_model_z180.inc"
 
 
 

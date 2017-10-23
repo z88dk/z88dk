@@ -5,7 +5,6 @@
 
     PUBLIC _asci1_init
 
-    EXTERN _asci1_reset
     EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
 
     _asci1_init:
@@ -33,6 +32,5 @@
         ld      a,STAT1_RIE         ; receive interrupt enabled
         out0    (STAT1),a           ; output to the ASCI1 status reg
 
-        call _asci1_reset           ; reset empties the Tx & Rx buffers
-
         jp asm_z180_pop_ei_jp       ; ei
+
