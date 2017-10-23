@@ -1,3 +1,4 @@
+arch/ts2068/misc/z80/asm_ts_vmod
 arch/ts2068/misc/z80/asm_tshc_cls
 arch/ts2068/misc/z80/asm_tshc_cls_attr
 arch/ts2068/misc/z80/asm_tshc_cls_pix

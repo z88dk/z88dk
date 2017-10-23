@@ -1,5 +1,7 @@
 @arch/zx/misc/misc_sdcc_iy.lst
 @arch/ts2068/misc/misc_asm.lst
+arch/ts2068/misc/c/sdcc_iy/ts_vmod
+arch/ts2068/misc/c/sdcc_iy/ts_vmod_fastcall
 arch/ts2068/misc/c/sdcc_iy/tshc_cls
 arch/ts2068/misc/c/sdcc_iy/tshc_cls_attr
 arch/ts2068/misc/c/sdcc_iy/tshc_cls_attr_fastcall

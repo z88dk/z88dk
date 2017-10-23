@@ -2,9 +2,9 @@
 ; 2017
 ; ===============================================================
 ; 
-; void tshr_cls(uchar ink)
+; void tshr_cls(uchar paper)
 ;
-; Clear screen using ink colour.
+; Clear screen using paper colour.
 ;
 ; ===============================================================
 

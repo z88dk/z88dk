@@ -1,5 +1,6 @@
 @arch/zx/misc/misc_sccz80.lst
 @arch/ts2068/misc/misc_asm.lst
+arch/ts2068/misc/c/sccz80/ts_vmod
 arch/ts2068/misc/c/sccz80/tshc_cls
 arch/ts2068/misc/c/sccz80/tshc_cls_attr
 arch/ts2068/misc/c/sccz80/tshc_cls_pix
