@@ -15,7 +15,7 @@ SECTION code_arch
 
 PUBLIC asm_zx_visit_wc_attr
 
-EXTERN l_jphl, asm_zx_cxy2aaddr
+EXTERN l_jpix, asm_zx_cxy2aaddr
 
 asm_zx_visit_wc_attr:
 
@@ -31,29 +31,35 @@ asm_zx_visit_wc_attr:
    
    ld c,(ix+3)                 ; c = rect.height
    ld b,(ix+1)                 ; b = rect.width
+
+loop_1:
+
+   push de                     ; save function
+   push de
+   ex (sp),ix                  ; save ix
    
-loop:
+loop_0:
 
    ; visit
    
    push ix
    push bc
-   push de
    push hl
    
    push hl
-   ex de,hl
-   call l_jphl                 ; de = unsigned char *aaddr
+   call l_jpix                 ; hl = unsigned char *aaddr
    pop hl
    
    pop hl
-   pop de
    pop bc
    pop ix
    
    inc l
-   djnz loop
-   
+   djnz loop_0
+
+   pop ix
+   pop de
+
    dec c
    ret z
    
@@ -68,4 +74,4 @@ loop:
    sub l
    ld h,a
    
-   jp loop
+   jp loop_1

@@ -1,4 +1,4 @@
-SECTION data_bss
+SECTION bss_arch
 
 PUBLIC _GLOBAL_ZXN_PORT_DFFD
 

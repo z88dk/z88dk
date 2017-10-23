@@ -8,6 +8,8 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_arch
 
@@ -23,7 +25,13 @@ asm_tshc_cy2aaddr:
 
    ld a,l
    and $18
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   or $e0
+ELSE
    or $60
+ENDIF
+
    ld h,a
    
    ld a,l
