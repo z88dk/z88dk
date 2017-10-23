@@ -6,7 +6,7 @@
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 16
+	defc startup = 20
 	IFNDEF startup
 	ENDIF
 ENDIF
@@ -44,7 +44,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
    
-   defc startup = 16
+   defc startup = 20
 
 ENDIF
 
@@ -71,10 +71,12 @@ ENDIF
 
 
 
-   ; standard 64 column timex hi-res display
+
+
+   ; standard 128 column timex hi-res display using 4x8 font
    ;
    ; stdin  = zx_01_input_kbd_inkey
-   ; stdout = tshr_01_output_char_64 full screen
+   ; stdout = tshr_01_output_char_128 full screen
    ; stderr = dup(stdout)
 
    IFNDEF __CRTCFG
@@ -2676,8 +2678,8 @@ ENDIF
    ; use pragam redirect to change font
    ;
    ; #pragam redirect CRT_OTERM_FONT_8X8 = _font_8x8_rom        ; 32-col font definition in rom
-   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font
-   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font
+   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font, timex hi-res 64-col font
+   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font, timex hi-res 128-col font
    ; #pragma redirect CRT_OTERM_FONT_FZX = _ff_ind_Termino      ; fzx proportional font
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -5466,11 +5468,11 @@ ENDIF
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifndef CRT_OTERM_FONT_8X8
+ifndef CRT_OTERM_FONT_4X8
 
-   PUBLIC CRT_OTERM_FONT_8X8
-   EXTERN _font_8x8_rom
-   defc CRT_OTERM_FONT_8X8 = _font_8x8_rom
+   PUBLIC CRT_OTERM_FONT_4X8
+   EXTERN _font_4x8_default
+   defc CRT_OTERM_FONT_4X8 = _font_4x8_default
 
 endif
 
@@ -5641,16 +5643,16 @@ endif
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: tshr_01_output_char_64
+   ; driver: tshr_01_output_char_128
    ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
    ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
    ; cursor coord  : (0,0)
-   ; window        : (CRT_OTERM_TSHR_WINDOW_X,CRT_OTERM_TSHR_WINDOW_WIDTH,CRT_OTERM_TSHR_WINDOW_Y,CRT_OTERM_TSHR_WINDOW_HEIGHT)
+   ; window        : (CRT_OTERM_TSHR_WINDOW_X*2,CRT_OTERM_TSHR_WINDOW_WIDTH*2,CRT_OTERM_TSHR_WINDOW_Y,CRT_OTERM_TSHR_WINDOW_HEIGHT)
    ; scroll limit  : 0
-   ; font address  : CRT_OTERM_FONT_8X8
+   ; font address  : CRT_OTERM_FONT_4X8
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -5705,7 +5707,7 @@ endif
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN tshr_01_output_char_64
+   EXTERN tshr_01_output_char_128
    
    __i_fcntl_heap_1:
    
@@ -5727,7 +5729,7 @@ endif
       ; jump to driver
       
       defb 195
-      defw tshr_01_output_char_64
+      defw tshr_01_output_char_128
       
       ; flags
       ; reference_count
@@ -5754,14 +5756,14 @@ endif
       ; scroll limit
 
       defb 0, 0
-      defb CRT_OTERM_TSHR_WINDOW_X, CRT_OTERM_TSHR_WINDOW_WIDTH, CRT_OTERM_TSHR_WINDOW_Y, CRT_OTERM_TSHR_WINDOW_HEIGHT
+      defb CRT_OTERM_TSHR_WINDOW_X*2, CRT_OTERM_TSHR_WINDOW_WIDTH*2, CRT_OTERM_TSHR_WINDOW_Y, CRT_OTERM_TSHR_WINDOW_HEIGHT
       defb 0
       
       ; font address
       
-      EXTERN CRT_OTERM_FONT_8X8
+      EXTERN CRT_OTERM_FONT_4X8
       
-      defw CRT_OTERM_FONT_8X8 - 256
+      defw CRT_OTERM_FONT_4X8 - 256
 
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

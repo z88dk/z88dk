@@ -45,7 +45,12 @@ tshr_01_output_char_64_stdio_msg_ictl_0:
    ld a,d
 
    cp $08
-   jp nz, error_einval_zc
+   jr z, _ioctl_font
+   
+   sub $10
+   jp c, console_01_output_char_stdio_msg_ictl_0
+   
+   jp error_einval_zc
 
 _ioctl_font:
 

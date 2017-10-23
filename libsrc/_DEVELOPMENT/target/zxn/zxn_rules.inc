@@ -192,8 +192,8 @@ Z88DK_FOR(`LOOP', `0', `31',
    ; use pragam redirect to change font
    ;
    ; #pragam redirect CRT_OTERM_FONT_8X8 = _font_8x8_rom        ; 32-col font definition in rom
-   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font
-   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font
+   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font, timex hi-res 64-col font
+   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font, timex hi-res 128-col font
    ; #pragma redirect CRT_OTERM_FONT_FZX = _ff_ind_Termino      ; fzx proportional font
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

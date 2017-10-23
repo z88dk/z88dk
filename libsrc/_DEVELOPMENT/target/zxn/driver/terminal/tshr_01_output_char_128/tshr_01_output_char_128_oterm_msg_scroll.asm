@@ -1,13 +1,12 @@
-
 SECTION code_driver
 SECTION code_driver_terminal_output
 
-PUBLIC zx_01_output_char_64_oterm_msg_scroll
+PUBLIC tshr_01_output_char_128_oterm_msg_scroll
 
-EXTERN asm_zx_scroll_wc_up_noexx
+EXTERN asm0_tshr_scroll_wc_up_pix
 EXTERN zx_01_output_char_64_proc_stack_window_32
 
-zx_01_output_char_64_oterm_msg_scroll:
+tshr_01_output_char_128_oterm_msg_scroll:
 
    ;   enter  :   c = number of rows to scroll
    ;   can use:  af, bc, de, hl
@@ -20,17 +19,19 @@ zx_01_output_char_64_oterm_msg_scroll:
    
    ; stack = window *
 
-   ld e,a
-   ld d,0                      ; de = number of rows to scroll
+   add a,a
+   add a,a
+   add a,a
    
-   ld l,(ix+25)                ; l = background colour
+   ld e,a                      ; e = number of rows to scroll
+   ld l,0
    
    push ix
    
    ld ix,2
    add ix,sp                   ; ix = window *
    
-   call asm_zx_scroll_wc_up_noexx
+   call asm0_tshr_scroll_wc_up_pix
    
    pop ix
    
