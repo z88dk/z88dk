@@ -28,7 +28,7 @@ OBJS =	callfunc.o     	\
 
 all: sccz80$(EXESUFFIX)
 
-CFLAGS +=  -Wall 
+CFLAGS +=  -Wall -I../../ext/uthash/src/
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm

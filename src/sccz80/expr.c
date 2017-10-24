@@ -189,12 +189,14 @@ int heir1a(LVALUE* lval)
  */
             widenlong(&lval2, lval);
             lval->val_type = KIND_LONG;
+            lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(endlab);
         } else if (lval2.val_type != KIND_LONG && lval->val_type == KIND_LONG) {
             jump(skiplab = getlabel());
             postlabel(endlab);
             widenlong(lval, &lval2);
             lval->val_type = KIND_LONG;
+            lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;            
             postlabel(skiplab);
         } else
             postlabel(endlab);

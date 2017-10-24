@@ -1132,6 +1132,9 @@ void scale(Kind type, Type *tag)
     case KIND_STRUCT:
         /* try to avoid multiplying if possible */
         quikmult(KIND_INT, tag->size, YES);
+        break;
+    default:
+        break;
     }
 }
 
@@ -2179,7 +2182,7 @@ void asl_const(LVALUE *lval, int32_t value)
 
 static void set_carry(LVALUE *lval)
 {
-    lval->val_type = KIND_ARRAY;
+    lval->val_type = KIND_CARRY;
     lval->ltype = type_carry;
 }
 
@@ -2192,6 +2195,7 @@ void lneg(LVALUE* lval)
     case KIND_LONG:
     case KIND_CPTR:
         lval->val_type = KIND_INT;
+        lval->ltype = type_int;
         callrts("l_long_lneg");
         break;
     case KIND_CARRY:

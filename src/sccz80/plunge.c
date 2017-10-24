@@ -70,6 +70,7 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
     if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
             lval->val_type = KIND_INT;
+            lval->ltype = type_int;
         }
         (*testfuncz)(lval, exit1); /* test zero jump */
     } else {
@@ -132,6 +133,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval2->val_type != KIND_DOUBLE ) {
                 convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
+                lval2->ltype = type_double;
             }
             dpush();
             load_double_into_fa(lval);
@@ -148,6 +150,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 convSlong2doub();
             }
             lval->val_type = KIND_DOUBLE;
+            lval->ltype = type_double;
             /* division isn't commutative so we need to swap over' */
             if ( oper == zdiv || oper == zmod ) {
                 callrts("dswap");
@@ -155,6 +158,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
             lval2->val_type = KIND_LONG; /* Kludge */
+            lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
             if ( oper == zdiv || oper == zmod ) {
                 vlongconst_tostack(lval->const_val);
             } else {
@@ -165,7 +169,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval2->val_type == KIND_LONG ) {
                 vlongconst_noalt(lval->const_val); 
                 lval->val_type = KIND_LONG;  
-                lval->ltype = type_long; // TODO: Sign           
+                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;        
             } else {
                 const2(lval->const_val);
             }
@@ -178,6 +182,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             force(KIND_INT, KIND_CARRY, 0, 0, 0);
             setstage(&before, &start);
             lval->val_type = KIND_INT;
+            lval->ltype = type_int;
             zpush();
         } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
              lpush();
@@ -198,9 +203,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
                  load_double_into_fa(lval2);
                  lval2->val_type = KIND_DOUBLE;
+                 lval2->ltype = type_double;
             } else if (lval->val_type == KIND_LONG || lval2->val_type == KIND_LONG) {
                 vlongconst(lval2->const_val);
                 lval2->val_type = KIND_LONG;
+                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;                
             } else {
                 vconst(lval2->const_val);
             }
@@ -243,6 +250,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             // Promote as necessary
             if ( lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE ) {
                 lval->val_type = KIND_DOUBLE;
+                lval->ltype = type_double;
                 // Load this constant so we can sort out the refcount for folding
                 load_double_into_fa(lval);
             }
@@ -253,8 +261,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (widen(lval, lval2)) {
             (*doper)(lval);
             /* result of comparison is int */
-            if (doper != mult && doper != zdiv)
+            if (doper != mult && doper != zdiv) {
                 lval->val_type = KIND_INT;
+                lval->ltype = type_int;
+            }
             return;
         }
     }
@@ -366,6 +376,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( lval2->val_type != KIND_DOUBLE ) {
                 convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
+                lval2->ltype = type_double;
             }
             dpush();
             load_double_into_fa(lval);
@@ -383,6 +394,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     convSlong2doub();
                 }
                 lval->val_type = KIND_DOUBLE;
+                lval->ltype = type_double;
             }
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zsub ) {
@@ -392,13 +404,14 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
             lval2->val_type = KIND_LONG; /* Kludge */
+            lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;            
             lpush();
             vlongconst(lval->const_val);
         } else {
             if ( lval2->val_type == KIND_LONG ) {
                 vlongconst_noalt(lval->const_val); 
                 lval->val_type = KIND_LONG;   
-                lval->ltype = type_long;          
+                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else {
                 const2(lval->const_val);
             }
@@ -416,6 +429,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if (lval->val_type == KIND_CARRY) {
                 zcarryconv();
                 lval->val_type = KIND_INT;
+                lval->ltype = type_int;
             }
             zpush();
         }
@@ -431,6 +445,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 Zsp = savesp1;
                 force(KIND_DOUBLE, lval->val_type, NO, lval->ltype->isunsigned, 0);
                 lval->val_type = KIND_DOUBLE;
+                lval->ltype = type_double;
                 dpush();
                 load_double_into_fa(lval2);
                 (*oper)(lval);
@@ -505,6 +520,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // Promote as necessary
         if ( lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE ) {
             lval->val_type = KIND_DOUBLE;
+            lval->ltype = type_double;
             load_double_into_fa(lval);
         }
         clearstage(before, 0);

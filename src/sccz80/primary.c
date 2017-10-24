@@ -799,6 +799,7 @@ int check_lastop_was_comparison(LVALUE* lval)
 
     if (fn == zeq || fn == zne || fn == zge || fn == zle || fn == zgt || fn == zlt || fn == zle) {
         lval->val_type = KIND_INT;
+        lval->ltype = type_int;
         return (0);
     }
     return (1);

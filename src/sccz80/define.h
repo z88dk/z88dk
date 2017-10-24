@@ -7,8 +7,8 @@
  #ifndef DEFINE_H
  #define DEFINE_H
 
- #include "lib/uthash.h"
- #include "lib/utstring.h"
+ #include "uthash.h"
+ #include "utstring.h"
  
 
 
