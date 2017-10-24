@@ -12,7 +12,7 @@ zx_01_output_char_64_oterm_msg_scroll:
    ;   enter  :   c = number of rows to scroll
    ;   can use:  af, bc, de, hl
    ;
-   ;   Scroll the window upward 'L' character rows.
+   ;   Scroll the window upward 'C' character rows.
 
    ld a,c                      ; a = number of rows to scroll
    

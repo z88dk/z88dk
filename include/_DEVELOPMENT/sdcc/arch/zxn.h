@@ -38,6 +38,7 @@
 extern unsigned char GLOBAL_ZX_PORT_FE;
 extern unsigned char GLOBAL_ZX_PORT_1FFD;
 extern unsigned char GLOBAL_ZX_PORT_7FFD;
+extern unsigned char GLOBAL_ZX_PORT_DFFD;
 
 // IO MAPPED REGISTERS
 
@@ -48,6 +49,7 @@ extern unsigned char GLOBAL_ZX_PORT_7FFD;
 extern unsigned char IO_FE;
 extern unsigned char IO_1FFD;
 extern unsigned char IO_7FFD;
+extern unsigned char IO_DFFD;
 
 // TBBLUE I/O Port system
 
@@ -95,6 +97,7 @@ __sfr __at 0xfe IO_FE;
 
 __sfr __banked __at 0x1ffd IO_1FFD;
 __sfr __banked __at 0x7ffd IO_7FFD;
+__sfr __banked __at 0xdffd IO_DFFD;
 
 // TBBLUE I/O Port system
 
@@ -248,6 +251,18 @@ extern unsigned char zx_tape_save_block_callee(void *src,unsigned int len,unsign
 extern unsigned char zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
 extern unsigned char zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define zx_tape_verify_block(a,b,c) zx_tape_verify_block_callee(a,b,c)
+
+
+
+// Timex Video Mode
+
+#define TVM_SPECTRUM   0       // 256x192 pix, 32x24 attr
+#define TVM_HICOLOR    2       // 256x192 pix, 32x192 attr
+#define TVM_HIRES      6       // 512x192 pix
+
+extern void ts_vmod(unsigned char mode) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void ts_vmod_fastcall(unsigned char mode) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define ts_vmod(a) ts_vmod_fastcall(a)
 
 
 
@@ -552,6 +567,15 @@ extern unsigned char *zx_saddrpright_callee(void *saddr,unsigned char bitmask) _
 extern unsigned char *zx_saddrpup(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
 extern unsigned char *zx_saddrpup_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
 #define zx_saddrpup(a) zx_saddrpup_fastcall(a)
+
+
+
+// display timex hi-color mode (256x192 pix, 32x192 attr)
+
+
+
+// display timex hi-res mode (512x192 pix)
+
 
 
 

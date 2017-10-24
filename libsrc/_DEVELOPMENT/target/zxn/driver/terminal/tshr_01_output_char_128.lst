@@ -1,0 +1,4 @@
+target/zxn/driver/terminal/tshr_01_output_char_128
+target/zxn/driver/terminal/tshr_01_output_char_128/tshr_01_output_char_128_oterm_msg_cls
+target/zxn/driver/terminal/tshr_01_output_char_128/tshr_01_output_char_128_oterm_msg_printc
+target/zxn/driver/terminal/tshr_01_output_char_128/tshr_01_output_char_128_oterm_msg_scroll

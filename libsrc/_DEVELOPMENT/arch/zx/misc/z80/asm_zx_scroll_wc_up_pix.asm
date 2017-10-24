@@ -15,6 +15,7 @@ SECTION code_arch
 
 PUBLIC asm_zx_scroll_wc_up_pix
 PUBLIC asm0_zx_scroll_wc_up_pix
+PUBLIC asm1_zx_scroll_wc_up_pix
 
 EXTERN asm_zx_cls_wc_pix, asm_zx_cxy2saddr
 EXTERN asm_zx_saddrpdown, asm_zx_py2saddr
@@ -25,7 +26,7 @@ asm_zx_scroll_wc_up_pix:
    ;          l = screen byte
    ;         ix = rect *
    ;
-   ; uses  : af bc, de, hl
+   ; uses  : af, bc, de, hl
    
    inc d
    dec d
@@ -38,9 +39,9 @@ asm0_zx_scroll_wc_up_pix:
    ret z
    
    ld a,(ix+3)                 ; a = rect.height
-	add a,a
-	add a,a
-	add a,a
+   add a,a
+   add a,a
+   add a,a
    dec a
    
    sub e
@@ -65,17 +66,19 @@ asm0_zx_scroll_wc_up_pix:
    ex de,hl                    ; de = destination screen address
    
    ld a,(ix+2)                 ; a = rect.y
-	add a,a
-	add a,a
-	add a,a
+   add a,a
+   add a,a
+   add a,a
    add a,l
    ld l,a                      ; l = absolute y coord of copy up area
-	
-	call asm_zx_py2saddr
-	
-	ld a,l
-	add a,(ix+0)                ; add rect.x
-	ld l,a                      ; hl = source screen address
+   
+   call asm_zx_py2saddr
+
+asm1_zx_scroll_wc_up_pix:
+
+   ld a,l
+   add a,(ix+0)                ; add rect.x
+   ld l,a                      ; hl = source screen address
 
 copy_up_loop_0:
 
@@ -84,18 +87,18 @@ copy_up_loop_0:
    ld b,0
    ld c,(ix+1)                 ; bc = rect.width
    
-   push de
    push hl
+   push de
    
    ldir
    
    pop hl
-   pop de
 
-   ex de,hl
    call asm_zx_saddrpdown
-   
    ex de,hl
+   
+   pop hl
+
    call asm_zx_saddrpdown
    
    pop bc
