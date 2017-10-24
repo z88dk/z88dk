@@ -31,12 +31,12 @@ int initials(const char *dropname, Type *type)
     gltptr = 0;
     glblab = getlabel();
 
-
     // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
-    if ( type->isconst && !c_double_strings )  {
+    if ( (type->isconst && !c_double_strings) ||
+        ( (ispointer(type) || type->kind == KIND_ARRAY) && type->ptr->isconst ) )  {
         output_section(c_rodata_section);
     } else {
-        output_section(c_data_section); // output_section("text");
+        output_section(c_data_section);
     }
     prefix();
     outname(dropname, YES);

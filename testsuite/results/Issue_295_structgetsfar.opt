@@ -7,7 +7,7 @@
 	INCLUDE "z80_crt0.hdr"
 
 
-	SECTION	data_compiler
+	SECTION	rodata_compiler
 ._rooms
 	defw	_room0_desc
 	defb	1
