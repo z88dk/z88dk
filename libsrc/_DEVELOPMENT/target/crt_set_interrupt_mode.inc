@@ -18,11 +18,11 @@
    
       IF (__crt_org_vector_table < 0)
       
-         ld a,-__crt_org_vector_table/256
+         ld a,-__crt_org_vector_table/$100
       
       ELSE
       
-         ld a,__crt_org_vector_table/256
+         ld a,__crt_org_vector_table/$100
          
       ENDIF
       
@@ -32,7 +32,7 @@
       
         ; Set the z180 internal interrupt vector low byte  
             
-        ld a,__IO_VECTOR_BASE
+        ld a,+(__crt_org_vector_table%$100+__IO_VECTOR_BASE)&$E0
         out0 (IL),a
         
       ENDIF

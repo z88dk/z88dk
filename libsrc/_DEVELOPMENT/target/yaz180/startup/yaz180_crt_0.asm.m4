@@ -110,8 +110,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   ; special YABIOS Page 0
-   include "crt_yabios_page_zero_z180.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 

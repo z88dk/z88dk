@@ -43,6 +43,9 @@
 
 #define __IO_BASE_ADDRESS 0x0
 
+#define __COMMON_AREA_1_PHASE_DATA  0xF000
+#define __COMMON_AREA_1_PHASE_DRIVER  0xF700
+
 #define __ASCI0_RX_SIZE  0x100
 #define __ASCI0_TX_SIZE  0x100
 
@@ -57,7 +60,7 @@
 #define __IO_PCA9665_2_PORT_BASE  0x8000
 
 #define __APU_CMD_SIZE  0x100
-#define __APU_PTR_SIZE  0x100
+#define __APU_DATA_SIZE  0x100
 
 #define __IO_APU_PORT_BASE  0xC000
 

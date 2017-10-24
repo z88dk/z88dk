@@ -3,8 +3,6 @@ IF (__crt_org_code = 0)
 
 SECTION code_crt_init
 
-EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
-
     XOR     A               ; Zero Accumulator
 
                             ; Clear Refresh Control Reg (RCR)
@@ -40,13 +38,45 @@ EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
     LD      A,$00           ; Set Bank Base Physical $00000 -> $00
     OUT0    (BBR),A
 
-                            ; we do 256 ticks per second
-    ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
-    out0 (RLDR0L), l
-    out0 (RLDR0H), h
+                            ; set up COMMON_AREA_1 Data
+    EXTERN __rodata_common1_data_head
+    EXTERN __rodata_common1_data_size
 
+    ld hl,__rodata_common1_data_head
+    ld de,__COMMON_AREA_1_PHASE_DATA
+    ld bc,__rodata_common1_data_size
+
+    EXTERN asm_memcpy
+    call   asm_memcpy
+
+                            ; set up COMMON_AREA_1 Drivers
+    EXTERN __rodata_common1_driver_head
+    EXTERN __rodata_common1_driver_size
+
+    ld hl,__rodata_common1_driver_head
+    ld de,__COMMON_AREA_1_PHASE_DRIVER
+    ld bc,__rodata_common1_driver_size
+
+    EXTERN asm_memcpy
+    call   asm_memcpy
+    
+                            ; now there's valid COMMON_AREA_1 prepared
+                            ; we can start the system_tick
+                            ; we do 256 ticks per second
+    ld      hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
+    out0    (RLDR0L), l
+    out0    (RLDR0H), h
                             ; enable down counting and interrupts for PRT0
-    ld a, TCR_TIE0|TCR_TDE0
-    out0 (TCR), a
+    ld      a, TCR_TIE0|TCR_TDE0
+    out0    (TCR), a        ; using the driver/z180/system_tick.asm
+
+    EXTERN bankPage0Template; FIXME - remove this once we create banked Page0
+    ld hl, bankPage0Template; create a reference to the bankPage0Template
+
+    EXTERN _asci0_init
+    call _asci0_init        ; initialise the asci0
+
+    EXTERN _asci1_init    
+    call _asci1_init        ; and the asci1 interfaces
 
 ENDIF

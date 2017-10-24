@@ -45,6 +45,11 @@ section rodata_clib
   ;;defb 0
 section rodata_lib
 section rodata_compiler
+
+section rodata_page0
+section rodata_common1_data
+section rodata_common1_driver
+
 section rodata_user
 
 SECTION CODE_END
