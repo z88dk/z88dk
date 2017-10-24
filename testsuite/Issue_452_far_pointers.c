@@ -40,3 +40,17 @@ int func6()
 	char   *ptr;
 	func5(ptr);
 }
+
+struct x {
+	int	y;
+	char	buf[10];
+	int	z;
+};
+
+void func7()
+{
+	far struct x *ptr;
+
+	ptr->z = 1;
+}
+

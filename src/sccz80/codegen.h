@@ -8,7 +8,7 @@ extern void getmem(SYMBOL *sym);
 extern void StoreTOS(char);
 extern int getloc(SYMBOL *sym, int off);
 extern void putmem(SYMBOL *sym);
-extern void putstk(char typeobj);
+extern void putstk(LVALUE *lval);
 extern void puttos(void);
 extern void put2tos(void);
 extern void loadargc(int n);

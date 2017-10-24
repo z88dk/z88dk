@@ -510,7 +510,7 @@ void store(LVALUE* lval)
     } else if (lval->indirect_kind == 0)
         putmem(lval->symbol);
     else
-        putstk(lval->indirect_kind);
+        putstk(lval);
 }
 
 /*

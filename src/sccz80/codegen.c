@@ -398,11 +398,14 @@ void PutFrame(char typeobj, int offset)
 
 /* Store the specified object type in the primary register */
 /*      at the address on the top of the stack */
-void putstk(char typeobj)
+void putstk(LVALUE *lval)
 {
     char flags = 0;
     SYMBOL *ptr;
+    Kind typeobj = lval->indirect_kind;
 
+
+    //outfmt("; %s type=%d val_type=%d indirect=%d\n", lval->ltype->name, lval->type, lval->val_type, lval->indirect_kind);
     /* Store via long pointer... */
     ptr = retrstk(&flags);
     //outfmt(";Restore %p flags %02d\n",ptr, flags);
@@ -530,8 +533,6 @@ void indirect(LVALUE* lval)
 
     typeobj = lval->indirect_kind;
     flags = lval->flags;
-
-    //outfmt(";%s flags %08x\n",lval->ltype->name, lval->flags);
 
     sign = lval->ltype->isunsigned;
     

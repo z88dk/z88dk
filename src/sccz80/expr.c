@@ -660,12 +660,9 @@ int heirb(LVALUE* lval)
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = member_type->flags;
                 if (direct == 0) {
-                    /* So, we're accessing via a pointer if we get here */
-                    // flags = ptr->flags;
-                    // if (lval->oflags & FARACC || (lval->flags & FARPTR))
-                    //     flags |= FARACC;
-                    // if (flags & FARPTR || (lval->flags & FARPTR))
-                    //     lval->oflags |= FARACC;
+                    if ( lval->ltype->kind == KIND_CPTR ) {
+                        flags |= FARACC;
+                    }
                 }
                 lval->flags = flags;
 
