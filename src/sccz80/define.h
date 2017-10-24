@@ -186,6 +186,7 @@ struct symbol_s {
         char isconst;        /* Set if const, affects the section the data goes into */
         char isassigned;     /* Set if we have assigned to it once */
         char initialised;    /* Initialised at compile time */
+        char func_defined;   /* The function has been defined */
         enum symbol_flags flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer

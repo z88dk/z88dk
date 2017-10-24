@@ -717,9 +717,10 @@ int constexpr(double *val, Kind *type, int flag)
  */
 void cscale(Type *type, int* val)
 {
-    if ( type->size == -1 ) { 
+    if ( type->size == -1 || ispointer(type)) { 
         // It's an array of unknown length
         *val *= type->ptr->size / type->ptr->len;
+        return;
     }
     *val *= type->size / type->len;
 }

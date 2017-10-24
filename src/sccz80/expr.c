@@ -404,44 +404,6 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
         lval->flags &= ~FARACC;
     }
 
-        
-    // flags = lval->flags;
-    // if (isaddr) {
-    //     if (flags & FARACC)
-    //         flags |= FARACC;
-    // } else {
-    //     if (flags & FARPTR)
-    //         flags |= FARACC;
-    //     else
-    //         flags &= ~FARACC;
-    // }
-    // if ( lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16 ) {
-    //     error(E_PORT_DEREF, lval->symbol->name);
-    // }
-    // /* NB it has already been determind that lval->symbol is non-zero */
-    // if (lval->symbol->more == 0) {
-    //     /* array of/pointer to variable */
-    //     if (flags & FARPTR && lval->val_type == KIND_CPTR)
-    //         flags |= FARACC;
-    //     // else flags &= ~FARACC;
-    //     lval->val_type = lval->indirect_kind = lval->symbol->type;
-    //     lval->flags = flags;
-    //     lval->symbol = NULL; /* forget symbol table entry */
-    //     lval->ptr_type = KIND_NONE; /* flag as not symbol or array */
-    //     lval->ident = ID_VARIABLE; /* We're now a variable! */
-    // } else {
-    //     /* array of/pointer to pointer */
-    //     lval->symbol = dummy_sym[(int)lval->symbol->more];
-    //     /* djm long pointers */
-    //     lval->ptr_type = lval->symbol->type;
-    //     /* 5/10/98 restored lval->val_type */
-    //     lval->indirect_kind = lval->val_type = (flags & FARPTR ? KIND_CPTR : KIND_INT);
-    //     if (flags & FARPTR)
-    //         flags |= FARACC;
-    //     lval->flags = flags;
-    //     if (lval->symbol->type == KIND_STRUCT)
-    //         lval->tagsym = tagtab + lval->symbol->tag_idx;
-    // }
     return lval->symbol;
 }
 
@@ -577,16 +539,16 @@ int heirb(LVALUE* lval)
             if (cmatch('[')) {
                 Type *type;
                 
-                if (k && lval->ltype->kind == KIND_PTR ) {
+                if (k && ispointer(lval->ltype)) {
                     rvalue(lval);
-                } else if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_ARRAY) {
+                } else if ( !ispointer(lval->ltype) && lval->ltype->kind != KIND_ARRAY) {
                     error(E_SUBSCRIPT);
                     junk();
                     needchar(']');
                     return 0;
                 }
                 setstage(&before, &start);
-                if (lval->flags & FARPTR)
+                if (lval->ltype->kind == KIND_CPTR)
                     zpushde();
                 zpush();
                 valtype = expression(&con, &dval, &type);
@@ -595,7 +557,7 @@ int heirb(LVALUE* lval)
                 needchar(']');
                 if (con) {
                     Zsp += 2; /* undo push */
-                    if (lval->flags & FARPTR)
+                    if (lval->ltype->kind == KIND_CPTR)
                         Zsp += 2;
                     if ( val > lval->ltype->len ) {
                         // TODO
@@ -632,7 +594,7 @@ int heirb(LVALUE* lval)
                     }
                     /* If near, then pop other side back, otherwise
                        load high reg with de and do an add  */
-                    if (lval->flags & FARPTR) {
+                    if (lval->ltype->kind == KIND_CPTR) {
                         const2(0);
                     } else {
                         zpop();

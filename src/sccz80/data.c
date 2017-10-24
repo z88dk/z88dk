@@ -59,7 +59,7 @@ int stackargs;
 
 int defstatic, filenum; /* next argument to be used */
 
-char c_default_unsigned, fnflags, c_mathz88, c_compact_code;
+char c_default_unsigned, c_mathz88, c_compact_code;
 
 int nxtlab, /* next avail label # */
     glblab, /* For initializing global literals */

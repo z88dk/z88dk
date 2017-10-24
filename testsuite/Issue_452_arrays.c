@@ -33,7 +33,7 @@ int multi1()
 	return A[1][1];
 }
 
-int multi1()
+int multi2()
 {
 	int	A[2][10];
 	int	i = 0, j = 0;

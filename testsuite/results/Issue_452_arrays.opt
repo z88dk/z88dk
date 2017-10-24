@@ -1,7 +1,7 @@
 
 
 
-	MODULE	Issue_342_arrays
+	MODULE	Issue_452_arrays
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -104,7 +104,7 @@
 
 
 
-._multi1
+._multi2
 	ld	hl,65496	;const
 	add	hl,sp
 	ld	sp,hl
@@ -149,6 +149,7 @@
 	GLOBAL	_func2
 	GLOBAL	_func3
 	GLOBAL	_multi1
+	GLOBAL	_multi2
 
 
 

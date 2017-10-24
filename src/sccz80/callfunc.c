@@ -206,8 +206,6 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
                     dpush();
                     nargs += 6;
                 } else if (expr == KIND_LONG || expr == KIND_CPTR) {
-                    if (!(fnflags & FARPTR) && expr != KIND_LONG)
-                        const2(0);
                     lpush();
                     nargs += 4;
                 } else {
@@ -373,6 +371,8 @@ static Kind ForceArgs(Type *dest, Type *src)
     } else {
         if ( src->kind != KIND_PTR && src->kind != KIND_CPTR ) {
             // Converting number to pointer
+        } else if ( src->kind == KIND_PTR && dest->kind == KIND_CPTR ) {
+            const2(0);
         } else {
             // Pointer to pointer
         }

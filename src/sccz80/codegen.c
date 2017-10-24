@@ -258,7 +258,7 @@ void getmem(SYMBOL* sym)
         outname(sym->name, dopref(sym));
         outstr(")\n");
         /* For long pointers...load de with name+2, then d,0 */
-        if (sym->ctype->kind == KIND_CPTR || (sym->ctype->kind == KIND_PTR && sym->flags & FARPTR)) {
+        if (sym->ctype->kind == KIND_CPTR) {
             ot("ld\tde,(");
             outname(sym->name, dopref(sym));
             outstr("+2)\n\tld\td,0\n");
@@ -297,7 +297,7 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("+2),de\n");
-        } else if (sym->ctype->kind == KIND_PTR && sym->flags & FARPTR) {
+        } else if (sym->ctype->kind == KIND_CPTR) {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");

@@ -1221,9 +1221,15 @@ static void declfunc(Type *type, enum storage_type storage)
 {
     int where;
 
+
     currfn = findglb(type->name);
     
     if ( currfn != NULL ) {
+        if ( currfn->func_defined ) {
+            errorfmt("Function '%s' was already defined at %s", 1, type->name, currfn->declared_location);
+            junk();
+            return;
+        }
         if ( type_matches(currfn->ctype, type) == 0 ) {
             UT_string *output;
 
@@ -1240,9 +1246,10 @@ static void declfunc(Type *type, enum storage_type storage)
         type->flags = currfn->ctype->flags;
     } else {
         currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
-        currfn->ctype = type;   
+        currfn->ctype = type;  
     }
-
+    currfn->func_defined = 1; 
+    
 
     // Reset all local variables
     locptr = STARTLOC;
