@@ -38,7 +38,7 @@ define(`__ASCI1_TX_SIZE', 0x100)  # Size of the Tx Buffer
 
 # BREAK for Single Step Mode
 
-define(`__IO_BREAK', 0x2000)  # Any value written $2000->$21FF, halts CPU
+define(`__IO_BREAK', 0x2000)      # Any value written $2000->$3FFF, halts CPU
 
 # 82C55 PIO Definitions
 

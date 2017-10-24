@@ -268,6 +268,20 @@
 
    // DMA REGISTER BIT FIELDS
 
+   #define __IO_DSTAT_DE1    0x80
+   #define __IO_DSTAT_DE0    0x40
+   #define __IO_DSTAT_DWE1   0x20
+   #define __IO_DSTAT_DWE0   0x10
+   #define __IO_DSTAT_DIE1   0x08
+   #define __IO_DSTAT_DIE0   0x04
+   #define __IO_DSTAT_DME    0x01
+
+   #define __IO_DMODE_DM1    0x20
+   #define __IO_DMODE_DM0    0x10
+   #define __IO_DMODE_SM1    0x08
+   #define __IO_DMODE_SM0    0x04
+   #define __IO_DMODE_MMOD   0x02
+
    #define __IO_DCNTL_MWI1   0x80
    #define __IO_DCNTL_MWI0   0x40
    #define __IO_DCNTL_IWI1   0x20
