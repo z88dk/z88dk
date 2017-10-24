@@ -802,26 +802,16 @@ void zret(void)
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
  */
-void callstk(int n)
+void callstk(Type *type, int n)
 {
     if (n == 2) {
         /* At this point, TOS = function, hl = argument */
-        int label = getlabel();
-        ol("pop\tde"); /* function */
-        outstr("\tld\tbc,"); /* ret address */
-        printlabel(label);
-        nl();
-        /* Argument in hl, on stack */
-        ol("push\thl");
-        ol("push\tbc"); /* Return address */
-        ol("push\tde");
-        loadargc(n);
-        ol("ret");
-        postlabel(label);
-    } else {
-        loadargc(n);
-        callrts("l_jphl");
+        swapstk();
     }
+    
+    if ( type->hasva )
+        loadargc(n);
+    callrts("l_jphl");
 }
 
 void jump0(LVALUE* lval, int label)

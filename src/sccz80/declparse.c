@@ -964,6 +964,14 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
         }
     }
 
+    if ( ispointer(type) && type->ptr->kind == KIND_FUNC ) {
+        /* Function pointers, fastcall isn't valid */
+        if ( type->ptr->flags & FASTCALL ) {
+            warningfmt("FASTCALL is not a valid modifier for function pointers");
+            type->ptr->flags &= ~FASTCALL;
+        }
+    }
+
     return type;
 }
 

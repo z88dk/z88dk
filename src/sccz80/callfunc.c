@@ -289,7 +289,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(nargs);
+        callstk(functype, nargs);
     }
     /*
      *        Modify the stack after a function call

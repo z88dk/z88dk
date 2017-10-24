@@ -65,7 +65,8 @@ extern Type      *dodeclare(enum storage_type storage);
 extern int        declare_local(int local_static);
 extern void       declare_func_kr();
 extern int        ispointer(Type *type);
-extern void type_describe(Type *type, UT_string *output);
+extern void       type_describe(Type *type, UT_string *output);
+extern int        type_matches(Type *t1, Type *t2);
 
 #include "error.h"
 #include "expr.h"

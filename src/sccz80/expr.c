@@ -60,6 +60,37 @@ int heir1(LVALUE* lval)
             lval2.val_type = lval->val_type;
             load_constant(&lval2);
         }
+
+        if ( ispointer(lval->ltype)) {
+            Type *rhs = lval2.ltype;
+
+            if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->kind == KIND_FUNC ) {
+                rhs = make_pointer(rhs);
+            }
+            
+            if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
+                    ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
+                UT_string *str;
+
+                utstring_new(str);
+                utstring_printf(str,"Assigning '%s', type: ", lval->ltype->name);
+                type_describe(lval->ltype,str);
+                utstring_printf(str," from ");
+                type_describe(rhs, str);
+                warningfmt("%s", utstring_body(str));
+                utstring_free(str);
+            } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
+                // Check flag assignment
+                if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
+                    warningfmt("Assigning CALLEE function pointer with non-CALLEE function");
+                }
+                if ( (lval->ltype->ptr->flags & SMALLC) && (rhs->ptr->flags & SMALLC) == 0 ) {
+                    warningfmt("Assigning SMALLC function pointer with non-SMALLC function");
+                }
+            }
+        }
+
+
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
