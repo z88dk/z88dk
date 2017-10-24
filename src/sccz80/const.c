@@ -21,7 +21,7 @@
 #include "ccdefs.h"
 
 #include <math.h>
-#include "lib/utlist.h"
+#include "utlist.h"
 
 static Type *get_member(Type *tag);
 
