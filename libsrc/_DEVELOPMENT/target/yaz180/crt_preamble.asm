@@ -42,25 +42,53 @@ SECTION code_crt_init
     EXTERN __rodata_common1_data_head
     EXTERN __rodata_common1_data_size
 
-    ld hl,__rodata_common1_data_head
-    ld de,__COMMON_AREA_1_PHASE_DATA
-    ld bc,__rodata_common1_data_size
+                            ; load the DMA engine registers with source, destination, and count
+    xor     a               ; using BANK0
+    ld      hl, __rodata_common1_data_head
+    out0    (SAR0L), l
+    out0    (SAR0H), h
+    out0    (SAR0B), a
 
-    EXTERN asm_memcpy
-    call   asm_memcpy
+    ld      hl, __COMMON_AREA_1_PHASE_DATA
+    out0    (DAR0L), l
+    out0    (DAR0H), h
+    out0    (DAR0B), a
+
+    ld      hl, __rodata_common1_data_size
+    out0    (BCR0L), l
+    out0    (BCR0H), h   
+
+    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
+    out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                            ; in burst mode the Z180 CPU stops until the DMA completes
 
                             ; set up COMMON_AREA_1 Drivers
     EXTERN __rodata_common1_driver_head
     EXTERN __rodata_common1_driver_size
 
-    ld hl,__rodata_common1_driver_head
-    ld de,__COMMON_AREA_1_PHASE_DRIVER
-    ld bc,__rodata_common1_driver_size
+                            ; load the DMA engine registers with source, destination, and count
+    xor     a               ; using BANK0
+    ld      hl, __rodata_common1_driver_head
+    out0    (SAR0L), l
+    out0    (SAR0H), h
+    out0    (SAR0B), a
 
-    EXTERN asm_memcpy
-    call   asm_memcpy
-    
-                            ; now there's valid COMMON_AREA_1 prepared
+    ld      hl, __COMMON_AREA_1_PHASE_DRIVER
+    out0    (DAR0L), l
+    out0    (DAR0H), h
+    out0    (DAR0B), a
+
+    ld      hl, __rodata_common1_driver_size
+    out0    (BCR0L), l
+    out0    (BCR0H), h   
+
+    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
+    out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                            ; in burst mode the Z180 CPU stops until the DMA completes
+
+                            ; now there's valid COMMON_AREA_1
                             ; we can start the system_tick
                             ; we do 256 ticks per second
     ld      hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
