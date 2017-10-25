@@ -406,9 +406,11 @@ static void dumpfns()
                     outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
                 } else if ( storage != LSTATIC && storage != TYPDEF ) {
                     if ( ptr->ctype->flags & SHARED && c_useshared ) {
-                        outfmt("\tGLOBAL\t%s_sl\n",ptr->name);
+                        GlobalPrefix();
+                        outfmt("%s_sl\n",ptr->name);
                     }
-                    outfmt("\tGLOBAL\t"); outname(ptr->name, dopref(ptr)); nl();
+                    GlobalPrefix();                    
+                    outname(ptr->name, dopref(ptr)); nl();
                 }
             }
         }
@@ -524,7 +526,7 @@ void dumpvars()
                 continue;
             if ( type == KIND_FUNC || type == KIND_PORT8 || type == KIND_PORT16 )
                 continue;
-            if ( storage == TYPDEF || storage == DECLEXTN || storage == EXTERNAL ) 
+            if ( storage == TYPDEF ||  storage == EXTERNAL ) 
                 continue;
             if ( type == KIND_ENUM )
                 continue;

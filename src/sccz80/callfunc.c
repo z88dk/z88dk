@@ -93,7 +93,15 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     needchar(')'); 
     Zsp = savesp;
 
-  //  if ( ptr == NULL ) ptr = fnptr;
+    //  if ( ptr == NULL ) ptr = fnptr;
+    if ( functype->oldstyle == 0 && functype->hasva == 0 && array_len(functype->parameters) < argnumber  ) {
+        warningfmt("Too many arguments to call to function '%s'", functype->name);
+    }
+
+    if ( functype->oldstyle == 0 && array_len(functype->parameters) > argnumber ) {
+        if ( !(functype->hasva && argnumber == array_len(functype->parameters) -1) ) 
+            warningfmt("Too few arguments to call to function '%s'", functype->name);
+    }
 
     if ( ptr != NULL ) {
         /* Check for some builtins */
@@ -238,14 +246,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     buffer_fps_num = save_fps_num ;
     FREENULL(save_fps);
 
- 
-  //  if (ptr && (ptr->prototyped != 0) && builtin_flags == 0 ) {
-        // if ((ptr->prototyped > argnumber) && (ptr->args[1] != PKIND_VOID) && (ptr->args[1] != PKIND_ELLIPSES)) {
-        //     warning(W_2FAFUNC);
-        // } else if ((ptr->prototyped < argnumber) && (ptr->args[1] != PKIND_ELLIPSES)) {
-        //     warning(W_2MAFUNC);
-        // }
-  //  }
+
+
     if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
         if ( functype->hasva ) {
@@ -359,24 +361,55 @@ static int SetWatch(char* sym, int* type)
 static Kind ForceArgs(Type *dest, Type *src)
 {
     // TODO: ARRAYS
-    if ( dest->kind != KIND_PTR && dest->kind != KIND_CPTR) {
-        if ( src->kind != KIND_PTR && src->kind != KIND_CPTR ) {
+    if ( !ispointer(dest) ) {
+        if ( !ispointer(src) ) {
             // Variable to variable cast
+            if ( dest->kind == KIND_LONG && src->kind != KIND_LONG ) {
+                UT_string *str;
+                
+                utstring_new(str);
+                utstring_printf(str,"Loss of precision, converting ");
+                type_describe(src,str);
+                utstring_printf(str," to ");
+                type_describe(dest, str);
+                warningfmt("%s", utstring_body(str));
+                utstring_free(str);
+            }
             force( dest->kind, src->kind, dest->isunsigned, src->isunsigned, 0);
         } else {
             /* Converting pointer to integer */
             warning(W_PTRINT);
             force( dest->kind, src->kind == KIND_PTR ? KIND_INT : KIND_LONG, dest->isunsigned, 1, 0);
         }
+    } else  if ( !ispointer(src) ) {
+        // Converting int/long to pointer
+        warningfmt("Converting int/long to pointer");
+        if ( dest->kind == KIND_CPTR && src->kind != KIND_LONG) {
+            const2(0);            
+        }
     } else {
-        if ( src->kind != KIND_PTR && src->kind != KIND_CPTR ) {
-            // Converting number to pointer
-        } else if ( src->kind == KIND_PTR && dest->kind == KIND_CPTR ) {
+        // Pointer to pointer
+        if ( src->kind == KIND_PTR && dest->kind == KIND_CPTR ) {
+            
             const2(0);
         } else {
             // Pointer to pointer
+            if ( dest->kind == KIND_PTR && src->kind == KIND_CPTR ) {
+                warningfmt("Narrowing pointer from far to near");
+            } else if ( type_matches(src, dest) == 0 && src->ptr->kind != KIND_VOID && dest->ptr->kind != KIND_VOID ) {
+                UT_string *str;
+                
+                utstring_new(str);
+                utstring_printf(str,"Converting type: ");
+                type_describe(src,str);
+                utstring_printf(str," to ");
+                type_describe(dest, str);
+                warningfmt("%s", utstring_body(str));
+                utstring_free(str);
+            }
         }
     }
+            
     return dest->kind;
 }
    

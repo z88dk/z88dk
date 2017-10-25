@@ -479,10 +479,7 @@ static void parse_trailing_modifiers(Type *type)
         }
     }
 
-    /* Main is always STDC */
-    if ( strcmp(type->name,"main") == 0 ) {
-        type->flags &= ~SMALLC;
-    }
+
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
         error(E_NAKED_CRITICAL, type->name);
@@ -811,6 +808,11 @@ Type *dodeclare(enum storage_type storage)
             return type;
         }
 
+        // Main is __stdc
+        if ( strcmp(type->name,"main") == 0 && type->kind == KIND_FUNC) {
+            type->flags &= ~(SMALLC|FLOATINGDECL|CALLEE|FASTCALL);
+        }
+
         if ( rcmatch('{')) {
             declfunc(type, storage);
             return type;
@@ -819,7 +821,7 @@ Type *dodeclare(enum storage_type storage)
         sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
         sym->ctype = type;
         sym->isassigned = 1; // Assigned to 0
-
+     
         /* We can catch @ here? Need to flag sym somehow */
         if ( cmatch('@')) {
             Kind valtype;
@@ -989,6 +991,7 @@ Type *default_function(const char *name)
 
     if ( c_use_r2l_calling_convention == NO ) {
         type->flags |= SMALLC;
+        type->flags &= ~FLOATINGDECL;
     }
     return type;
 }
@@ -1081,6 +1084,30 @@ static void handle_kr_type_parameters(Type *func)
     }
 }
 
+void flags_describe(int32_t flags, UT_string *output)
+{
+    if ( (flags & SMALLC) == SMALLC && (flags & FLOATINGDECL) == 0) {
+        utstring_printf(output,"__smallc ");
+    }
+    if ( (flags & SMALLC) == 0 && (flags & FLOATINGDECL) == 0) {
+        utstring_printf(output,"__stdc ");
+    }
+    if ( flags & FASTCALL ) {
+        utstring_printf(output,"__z88dk_fastcall ");
+    }
+    if ( flags & CALLEE ) {
+        utstring_printf(output,"__z88dk_callee ");
+    }  
+    if ( flags & SAVEFRAME ) {
+        utstring_printf(output,"__z88dk_saveframe ");
+    }  
+    if ( flags & NAKED ) {
+        utstring_printf(output,"__naked ");
+    }  
+    if ( flags & CRITICAL ) {
+        utstring_printf(output,"__critical ");
+    }  
+}
 
 void type_describe(Type *type, UT_string *output)
 {
@@ -1089,6 +1116,9 @@ void type_describe(Type *type, UT_string *output)
     if ( type->ptr )
         type_describe(type->ptr,output);
 
+
+    if ( type->isfar )
+        utstring_printf(output, "far ");    
     switch ( type->kind ) {
     case KIND_NONE:
         return;
@@ -1238,6 +1268,9 @@ static void declfunc(Type *type, enum storage_type storage)
             junk();
             return;
         }
+        if ( storage == LSTATIC && currfn->storage != LSTATIC) {
+            errorfmt("Static declaration of '%s' follows non-static declaration at %s",1,type->name, currfn->declared_location);
+        }
         if ( type_matches(currfn->ctype, type) == 0 ) {
             UT_string *output;
 
@@ -1285,19 +1318,30 @@ static void declfunc(Type *type, enum storage_type storage)
 
     pushframe();
     
-    /* main is always __stdc */
-    if ( strcmp(currfn->name,"main") == 0 ) {
-        currfn->flags &= ~SMALLC;
-    }
-    
+
     nl();
-    outfmt("; Function %s flags 0x%08x\n",type->name,type->flags);
+    {
+        UT_string *str;
+
+        utstring_new(str);
+        flags_describe(type->flags, str);
+        
+        outfmt("; Function %s flags 0x%08x %s\n",type->name,type->flags, utstring_body(str));
+        utstring_renew(str);
+        type_describe(type, str);        
+        outfmt("; %s\n", utstring_body(str));
+        utstring_free(str);
+    }
     /* For SMALLC we need to start counting from the last argument */
     if ( (type->flags & SMALLC) == SMALLC ) {
         int i;
+
         for ( i = array_len(type->parameters) - 1; i >= 0; i-- ) {
-            SYMBOL *ptr;
-            Type *ptype = array_get_byindex(type->parameters, i);
+            SYMBOL     *ptr;
+            UT_string  *str;            
+            Type       *ptype = array_get_byindex(type->parameters, i);
+
+            utstring_new(str);
 
             if ( strlen(ptype->name) == 0 || ptype->name[0] == '0') {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
@@ -1307,15 +1351,21 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
             ptr->ctype = ptype;
             ptr->offset.i = where;
-            outfmt("; parameter %s at %d size(%d)\n",ptype->name, where, ptype->size);
+            type_describe(ptype, str);
+            outfmt("; parameter '%s' at %d size(%d)\n",utstring_body(str),where, ptype->size);
+            utstring_free(str);
             ptr->isassigned = 1;
             where += get_parameter_size(ptype);
         }
     } else {
         int i;
         for ( i = 0; i < array_len(type->parameters); i++ ) {
-            SYMBOL *ptr;
-            Type *ptype = array_get_byindex(type->parameters, i);
+            SYMBOL    *ptr;
+            UT_string *str;            
+            Type      *ptype = array_get_byindex(type->parameters, i);
+
+            utstring_new(str);
+            
             if ( strlen(ptype->name) == 0  || ptype->name[0] == '0') {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
@@ -1324,7 +1374,10 @@ static void declfunc(Type *type, enum storage_type storage)
             ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
             ptr->ctype = ptype;            
             ptr->offset.i = where;
-            outfmt("; parameter %s at %d\n",ptype->name, where);            
+
+            type_describe(ptype, str);            
+            outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  
+            utstring_free(str);            
             ptr->isassigned = 1;            
             where += get_parameter_size(ptype);
         }
@@ -1370,6 +1423,9 @@ static void declfunc(Type *type, enum storage_type storage)
     
     stackargs = where;
     if (statement() != STRETURN) {
+        if ( type->return_type->kind != KIND_VOID ) {
+            warningfmt("Control reaches end of non-void function");
+        }
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
         leave(NO, NO, 0);

@@ -724,7 +724,7 @@ void zpopbc(void)
 
 /* Swap af & af' (preserve carry) */
 
-void doexaf(void)
+static void doexaf(void)
 {
     ol("ex\taf,af");
 }
@@ -2851,28 +2851,16 @@ void CpCharVal(int val)
  *      Print prefix for global defintion
  */
 
-void GlobalPrefix(char type)
+void GlobalPrefix(void)
 {
     if (ISASM(ASM_ASXX)) {
         ot(".globl\t");
-        return;
     } else if (ISASM(ASM_VASM)) {
         ot("GLOBAL\t");
-        return;
     } else if (ISASM(ASM_GNU)) {
         ot(".global\t");
-        return;
-    }
-    switch (type) {
-    case XDEF:
-        ot("PUBLIC\t");
-        break;
-    case XREF:
-        ot("EXTERN\t");
-        break;
-    case LIB:
-        ot("EXTERN\t");
-        break;
+    } else {
+        ot("GLOBAL\t");
     }
 }
 

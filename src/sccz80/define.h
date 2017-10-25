@@ -130,14 +130,12 @@ enum ident_type {
 
 
 enum storage_type {
-    STATIK = 1,
-    STKLOC = 2,
-    EXTERNAL = 3,
-    EXTERNP = 4,
-    DECLEXTN = 5,
-    LSTATIC = 6,
-    FAR = 7 ,
-    TYPDEF = 9,
+    STATIK,        /* Implemented in this file, export */
+    STKLOC,        /* On the stack */
+    EXTERNAL,      /* External to this file */
+    EXTERNP,       /* Extern @ */
+    LSTATIC,       /* Static to this file */
+    TYPDEF,
 };
 
 
@@ -145,18 +143,19 @@ enum storage_type {
 enum symbol_flags {
         FLAGS_NONE = 0,
     //    UNSIGNED = 1,
-        FARPTR = 2,
-        FARACC = 4,
-        FASTCALL = 8,     /* for certain lib calls only */
-        SHARED = 16,     /* Call via shared library method (append _s) */
-        SHAREDC = 32,     /* Call via rst (library is C code) */
-        CALLEE = 64,      /* Called function pops regs */
-        LIBRARY = 128,    /* Lib routine */
-        SAVEFRAME = 256,  /* Save framepointer */
-        SMALLC = 512,      /* L->R calling order */
-        FLOATINGDECL = 1024, /* For a function pointer, the calling convention is floating */
-        NAKED = 2048,      /* Function is naked - don't generate any code */
-        CRITICAL = 4096    /* Disable interrupts around the function */
+        FARPTR = 0x02,
+        FARACC = 0x04,
+        FASTCALL = 0x08,     /* for certain lib calls only */
+        SHARED = 0x10,     /* Call via shared library method (append _s) */
+        SHAREDC = 0x20,     /* Call via rst (library is C code) */
+        CALLEE = 0x40,      /* Called function pops regs */
+        LIBRARY = 0x80,    /* Lib routine */
+        SAVEFRAME = 0x100,  /* Save framepointer */
+        SMALLC = 0x200,      /* L->R calling order */
+        FLOATINGDECL = 0x400, /* For a function pointer, the calling convention is floating */
+        NAKED = 0x800,      /* Function is naked - don't generate any code */
+        CRITICAL = 0x1000,    /* Disable interrupts around the function */
+        SDCCDECL = 0x2000   /* Function uses sdcc convention for chars */
 };
 
 
@@ -291,22 +290,14 @@ struct gototab_s {
 #define STCRITICAL      14
 
 
-/* Maximum number of errors before we barf */
-
+/* Maximum number of (non fatal) errors before we quit */
 #define MAXERRORS 10
 
 /* Maximum number of nested levels */
-
 #define MAX_LEVELS 100
 
 
 
-
-/* defines for globalisation */
-
-#define XDEF 0
-#define XREF 1
-#define LIB  2
 
 /* Defines for debugging */
 

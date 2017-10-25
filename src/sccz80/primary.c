@@ -523,7 +523,7 @@ void smartpush(LVALUE* lval, char* before)
    // outfmt(";%s Indirect kind %d kind %d flags %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind,lval->flags);
     if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
         addstk(lval);
-        if ((lval->flags & FARACC) || (lval->symbol && lval->symbol->storage == FAR)) {
+        if ((lval->flags & FARACC) ) {
             lpush();
         } else {
             zpush();
@@ -537,7 +537,7 @@ void smartpush(LVALUE* lval, char* before)
             break;
         default:
             addstk(lval);
-            if (lval->symbol && lval->symbol->storage == FAR) {
+            if ((lval->flags & FARACC) ) {
                 lpush();
             } else {
                 zpush();

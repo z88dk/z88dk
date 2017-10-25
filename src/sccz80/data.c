@@ -27,8 +27,6 @@ int glbcnt; /* number of globals used */
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */
 
-/* djm 15/11/98 literal queue and double queue, unsigned for my sanity! */
-
 unsigned char *litq, *dubq; /* literal pool */
 unsigned char* glbq; /* global literal queue */
 unsigned char* tempq; /* Temp store string lits */

@@ -591,8 +591,7 @@ int heirb(LVALUE* lval)
                     if (lval->ltype->kind == KIND_CPTR)
                         Zsp += 2;
                     if ( val > lval->ltype->len ) {
-                        // TODO
-                        //printf("Out of bounds %d > %d\n",val, lval->ltype->len);
+                        warningfmt("Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;

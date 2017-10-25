@@ -316,7 +316,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             warning(W_OPSG);
 
         // Remove any function type decorators
-        lval->flags &= (FAR);
+        //lval->flags &= (FAR);
 
         /* Special case handling for operation by constant */
         if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || oper == zxor || lval2->is_const) ) {

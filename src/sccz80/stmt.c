@@ -667,12 +667,6 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    char label[NAMESIZE];
-    int k;
-    char lab = 0; /* Got an good asm label */
-    SYMBOL* myptr;
-    char* ptr;
-
     endasm = cmode = 0; /* mark mode as "asm" */
 
 #ifdef INBUILT_OPTIMIZER
@@ -684,72 +678,8 @@ void doasm()
         if (endasm || match("#endasm") || eof) {
             break;
         }
-        /*
-           * This is only relevent for z80asm since asxxx doesn't differentiate
-         * between different types of .globl and assemble time
-         *
-         * If the first column contains a "." then it's a lebel and we 
-         * should check for the magic prefix ("smc_" or "_") and compare
-         * to symbol table. If match then the symbol will be XDEF'd instead
-         * of XREF'd
-         */
-
-        lab = -1;
-        if (line[0] == '.') {
-            k = 1;
-            lab = 0;
-            while ((line[k] != ' ') && (line[k] != '\n') && (line[k] != '\0') && (line[k] != '\t')) {
-                label[k - 1] = line[k];
-                label[k++] = 0;
-            }
-        }
-
-        /* Now look for a normal label definition */
-        if ((ptr = strchr(line, ':')) != NULL) {
-            char* temp = line;
-
-            while (temp < ptr && !isspace(*temp)) {
-                temp++;
-            }
-
-            if (temp == ptr) {
-                strncpy(label, line, ptr - line);
-                label[ptr - line] = 0;
-                lab = 0;
-            }
-        }
-
-        if (lab == 0) {
-            /*
-             * Snagged a label, we check form smc_ or _ prefix if so remove
-             * it and check for symbol then switch to local defn
-             *
-             * Lab is where the actual label name starts from
-             */
-            if (label[0] == '_') {
-                memmove(label, label + 1, strlen(label + 1) + 1);
-                lab = 2;
-            } else if (strncmp(label, "smc_", 4) == 0) {
-                memmove(label, label + 4, strlen(label + 4) + 1);
-                lab = 5;
-            }
-
-            if (lab) {
-                /* ATP Got assembler label, now check to see if defined as extern.. */
-                if ((myptr = findglb(label))) {
-                    /* Have matched it to an extern, so now change type... */
-                    if (myptr->storage == EXTERNAL)
-                        myptr->storage = DECLEXTN;
-                }
-                if (lab != 2) {
-                    line[1] = '_';
-                    memmove(line + 2, &line[(int)lab], strlen(&line[(int)lab]) + 1);
-                }
-            }
-        }
-        ol(line);
+        outfmt("%s\n",line);
     }
-    /* Print the line out, with the appropriate prefix */
     clear(); /* invalidate line */
     if (eof)
         warning(W_UNTERM);
