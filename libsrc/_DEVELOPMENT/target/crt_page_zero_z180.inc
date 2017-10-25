@@ -694,7 +694,7 @@ ENDIF
 
 __Test_Trap:
 
-   out0 (0x3f),a
+   out0 (ICR),a
 
    in0 a,(ITC)
    

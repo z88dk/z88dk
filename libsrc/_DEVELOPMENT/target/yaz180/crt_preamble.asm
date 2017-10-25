@@ -98,9 +98,6 @@ SECTION code_crt_init
     ld      a, TCR_TIE0|TCR_TDE0
     out0    (TCR), a        ; using the driver/z180/system_tick.asm
 
-    EXTERN bankPage0Template; FIXME - remove this once we create banked Page0
-    ld hl, bankPage0Template; create a reference to the bankPage0Template
-
     EXTERN _asci0_init
     call _asci0_init        ; initialise the asci0
 
