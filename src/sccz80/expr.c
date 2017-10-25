@@ -616,13 +616,18 @@ int heirb(LVALUE* lval)
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
-                    // TODO
                     if (ispointer(lval->ltype) ) {
                         scale(lval->ltype->ptr->kind, lval->ltype->ptr->tag);
                     } else if ( lval->ltype->kind == KIND_ARRAY ) {
                         LVALUE tmp = {0};
+                        int    size;
                         tmp.val_type = KIND_INT;
-                        mult_const(&tmp,lval->ltype->size / lval->ltype->len);
+                        if ( lval->ltype->size != -1 ) {
+                            size = lval->ltype->size / lval->ltype->len;
+                        } else {
+                            size = lval->ltype->ptr->size;
+                        }
+                        mult_const(&tmp,size);
                     } else {
                         scale(ptr->type, lval->ltype->tag);
                     }
@@ -714,8 +719,8 @@ int heirb(LVALUE* lval)
 
                     // TODO
                   //  if (ptr->flags & FARPTR) {
-                        lval->indirect_kind = KIND_CPTR;
-                        lval->val_type = KIND_CPTR;
+                       // lval->indirect_kind = KIND_INT;
+                       // lval->val_type = KIND_INT;
                     // } else {
                     //     lval->indirect_kind = KIND_INT;
                     //     lval->val_type = KIND_INT;

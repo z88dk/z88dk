@@ -1108,6 +1108,7 @@ void scale(Kind type, Type *tag)
 {
     switch (type) {
     case KIND_INT:
+    case KIND_PTR:
         ol("add\thl,hl");;
         break;
     case KIND_CPTR:
