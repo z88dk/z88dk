@@ -65,7 +65,7 @@ console_01_output_fzx_oterm_msg_putc_raw:
    
    push hl
    ex (sp),ix
-   
+
    ; ix = struct fzx_state *
    ;  c = ascii code
    ; stack = FDSTRUCT.JP *
@@ -86,11 +86,17 @@ putchar_loop:
    ;  c = ascii code
    ; stack = FDSTRUCT.JP *
 
+   ex (sp),ix
+   pop hl
+   push hl                     ; hl = struct fzx_state *
    push bc
    
-   call asm_fzx_putc
+   ld a,OTERM_MSG_FZX_PUTC
+   call l_jpix
    
    pop bc                      ; c = ascii code
+   ex (sp),ix
+   
    jr nc, putchar_done         ; if successful
    
    ; char will not fit window

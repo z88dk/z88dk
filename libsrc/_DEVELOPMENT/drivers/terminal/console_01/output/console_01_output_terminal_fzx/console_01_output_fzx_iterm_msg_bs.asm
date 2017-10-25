@@ -6,7 +6,9 @@ PUBLIC console_01_output_fzx_iterm_msg_bs
 PUBLIC console_01_output_fzx_iterm_msg_bs_join
 PUBLIC console_01_output_fzx_iterm_msg_bs_join_pwd
 
-EXTERN asm_fzx_buffer_partition, asm_fzx_putc
+EXTERN OTERM_MSG_FZX_PUTC
+
+EXTERN asm_fzx_buffer_partition, asm_fzx_putc, l_jpix
 EXTERN l_offset_ix_de, console_01_output_fzx_proc_linefeed
 
 console_01_output_fzx_iterm_msg_bs:
@@ -252,6 +254,9 @@ console_01_output_fzx_iterm_msg_bs_join_pwd:
    ;  c = char erase
    ; stack = FDSTRUCT.JP *
    
+   pop de
+   push de                     ; de = FDSTRUCT.JP *
+   
    push hl                     ; save x coord
    
    ld l,(ix+7)
@@ -261,11 +266,24 @@ console_01_output_fzx_iterm_msg_bs_join_pwd:
 
 putchar_loop:
 
+   push de                     ; save FDSTRUCT.JP *
+
+   push de
+   ex (sp),ix                  ; ix = FDSTRUCT.JP *
+   
+   pop hl
+   push hl                     ; hl = struct fzx_state *
+   
    push bc                     ; save char
    
-   call asm_fzx_putc
+   ld a,OTERM_MSG_FZX_PUTC
+   call l_jpix
    
    pop bc                      ; c = char to erase
+   
+   pop ix                      ; ix = struct fzx_state *
+   pop de                      ; de = FDSTRUCT.JP *
+   
    jr nc, backspace_done
    
    ; can only fail if no fit horizontally
