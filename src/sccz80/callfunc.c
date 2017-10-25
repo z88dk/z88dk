@@ -383,7 +383,7 @@ static Kind ForceArgs(Type *dest, Type *src)
         }
     } else  if ( !ispointer(src) ) {
         // Converting int/long to pointer
-        warningfmt("Converting int/long to pointer");
+        //warningfmt("Converting int/long to pointer");
         if ( dest->kind == KIND_CPTR && src->kind != KIND_LONG) {
             const2(0);            
         }

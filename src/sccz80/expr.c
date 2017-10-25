@@ -67,6 +67,10 @@ int heir1(LVALUE* lval)
             if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->kind == KIND_FUNC ) {
                 rhs = make_pointer(rhs);
             }
+
+            if (  rhs->kind == KIND_ARRAY ) {
+                rhs = make_pointer(rhs->ptr);
+            }
             
             if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
                     ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
