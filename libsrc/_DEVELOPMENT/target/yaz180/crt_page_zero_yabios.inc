@@ -1,3 +1,4 @@
+
 SECTION code_crt_start
 
 ; address = 0x0000
@@ -263,8 +264,6 @@ ENDIF
 
 ; address = 0x0080
 
-section code_crt_start
-
    defs 0x0080 - ASMPC
 
 __Test_Trap:
@@ -325,21 +324,17 @@ IF (__crt_org_vector_table = 0)
 
 ENDIF
 
-;; now jump down to __Start
+; now jump down to __Start at 0x0100
 
    jp __Start
-
-section code_crt_start
 
 ; address = 0x0100
 
    defs 0x0100 - ASMPC
 
+   defc __page_zero_present = 1   
+
    PUBLIC bank_start_addr
 
    bank_start_addr:
-
-;; fall through to __Start
-
-   defc __page_zero_present = 1
 
