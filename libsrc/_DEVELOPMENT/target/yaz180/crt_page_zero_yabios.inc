@@ -271,7 +271,7 @@ __Test_Trap:
    push af
    ld a,__IO_BASE_ADDRESS
 
-   out0 (ICR),a
+   out0 (0x3f),a        ; out0 (ICR),a
 
    in0 a,(ITC)
    
