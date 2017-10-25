@@ -60,8 +60,3 @@ zx_00_output_rom_rst:
    jp z, zx_00_output_rom_rst_ochar_msg_putc_bin
 
    jp character_00_output      ; forward to library
-
-; perform channel initialization exactly once
-
-EXTERN zx_00_output_rom_rst_init
-defc   need = zx_00_output_rom_rst_init
