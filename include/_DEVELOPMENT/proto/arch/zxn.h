@@ -45,6 +45,7 @@ extern unsigned char GLOBAL_ZX_PORT_DFFD;
 // SPECTRUM
 
 extern unsigned char IO_FE;
+extern unsigned char IO_FF;
 extern unsigned char IO_1FFD;
 extern unsigned char IO_7FFD;
 extern unsigned char IO_DFFD;
@@ -92,6 +93,7 @@ extern unsigned char IO_BFFD;
 // SPECTRUM
 
 __sfr __at 0xfe IO_FE;
+__sfr __at 0xff IO_FF;
 
 __sfr __banked __at 0x1ffd IO_1FFD;
 __sfr __banked __at 0x7ffd IO_7FFD;
