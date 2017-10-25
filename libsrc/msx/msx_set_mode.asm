@@ -8,7 +8,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: msx_set_mode.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
+;	$Id: msx_set_mode.asm $
 ;
 
         SECTION code_clib
@@ -17,11 +17,19 @@
 	
 	EXTERN	msxbios
 
-        INCLUDE "msxbios.def"
-
+IF FORsvi
+    INCLUDE	"msx/vdp.inc"
+    INCLUDE "svibios.def"
+ENDIF
 
 msx_set_mode:
 _msx_set_mode:
+IF FORsvi
+	ld	a,h
+	or	l
+	jr	z,txt32
+ENDIF
+setmode:
 	push	ix
 	push	hl
 	pop	ix
@@ -29,4 +37,17 @@ _msx_set_mode:
 	pop	ix
 	ret
 
-	;_init_sprites();
+IF FORsvi
+txt32:
+	ld    hl,INIGRP		; (Graphics 2)
+	call  setmode
+	; Now bend the configuration to Graphics 1 (change reg#0)
+	xor   a
+	di
+	out  (VDP_CMD),a
+	xor   a
+	ei
+	out (VDP_CMD),a
+	ret
+ENDIF
+
