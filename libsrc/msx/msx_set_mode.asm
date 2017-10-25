@@ -24,12 +24,15 @@ ENDIF
 
 msx_set_mode:
 _msx_set_mode:
-IF FORsvi
+
+IF FORmsx
+	; MSX supports G1 natively
+ELSE
 	ld	a,h
 	or	l
 	jr	z,txt32
-ENDIF
 setmode:
+ENDIF
 	push	ix
 	push	hl
 	pop	ix
@@ -37,17 +40,19 @@ setmode:
 	pop	ix
 	ret
 
-IF FORsvi
+IF FORmsx
+	; MSX supports G1 natively
+ELSE
 txt32:
 	ld    hl,INIGRP		; (Graphics 2)
 	call  setmode
 	; Now bend the configuration to Graphics 1 (change reg#0)
 	xor   a
 	di
-	out  (VDP_CMD),a
+	out   (VDP_CMD),a
 	xor   a
+	or    $80
 	ei
-	out (VDP_CMD),a
+	out   (VDP_CMD),a
 	ret
 ENDIF
-
