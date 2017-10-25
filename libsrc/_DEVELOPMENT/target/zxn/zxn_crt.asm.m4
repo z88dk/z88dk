@@ -225,6 +225,29 @@ ifelse(__STARTUP, 20,
    include(`startup/zxn_crt_20.asm.m4')
 ')
 
+ifelse(__STARTUP, 24,
+`
+   ; fzx terminal using ff_ind_Termino font in timex hi-res mode
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 0
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/zxn_crt_24.asm.m4')
+')
+
 ifelse(__STARTUP, 30,
 `
    ; standard 32 column display using rst 0x10

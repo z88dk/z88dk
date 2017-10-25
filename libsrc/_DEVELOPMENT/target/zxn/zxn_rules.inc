@@ -160,6 +160,24 @@ Z88DK_FOR(`LOOP', `0', `31',
       defc CRT_OTERM_FZX_PAPER_HEIGHT = 192
    ENDIF
 
+   ; The terminal window for Timex Hi-Res
+   
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_X
+      defc CRT_OTERM_FZX_TSHR_PAPER_X = 0
+   ENDIF
+
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_WIDTH
+      defc CRT_OTERM_FZX_TSHR_PAPER_WIDTH = 512
+   ENDIF
+
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_Y
+      defc CRT_OTERM_FZX_TSHR_PAPER_Y = 0
+   ENDIF
+
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_HEIGHT
+      defc CRT_OTERM_FZX_TSHR_PAPER_HEIGHT = 192
+   ENDIF
+
    ; draw mode must be available to m4 (requires special case in zcc)
    ; 0 = OR, 1 = XOR, 2 = CLEAR
 
