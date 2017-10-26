@@ -35,9 +35,13 @@ ENDIF
 ; start of common area 1 - non aligned data
 ;------------------------------------------------------------------------------
 
-PUBLIC shadowLock
+PUBLIC shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
 
-shadowLock:     defb    $FE             ; lock flag for alternate register mutex
+shadowLock:     defb    $FE             ; mutex for alternate register mutex
+dmac0Lock:      defb    $FE             ; mutex for DMAC0
+dmac1Lock:      defb    $FE             ; mutex for DMAC1
+prt0Lock:       defb    $FE             ; mutex for PRT0 
+prt1Lock:       defb    $FE             ; mutex for PRT1
 
 PUBLIC __system_time_fraction, __system_time
 
@@ -62,27 +66,27 @@ PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, asci0RxLock
 asci0RxCount:   defb    0               ; Space for Rx Buffer Management 
 asci0RxIn:      defw    asci0RxBuffer   ; non-zero item since it's initialized anyway
 asci0RxOut:     defw    asci0RxBuffer   ; non-zero item since it's initialized anyway
-asci0RxLock:    defb    $FE             ; lock flag for Rx mutex
+asci0RxLock:    defb    $FE             ; mutex for Rx0
 
 PUBLIC asci0TxCount, asci0TxIn, asci0TxOut, asci0TxLock
 
 asci0TxCount:   defb    0               ; Space for Tx Buffer Management
 asci0TxIn:      defw    asci0TxBuffer   ; non-zero item since it's initialized anyway
 asci0TxOut:     defw    asci0TxBuffer   ; non-zero item since it's initialized anyway
-asci0TxLock:    defb    $FE             ; lock flag for Tx mutex
+asci0TxLock:    defb    $FE             ; mutex for Tx0
 
 PUBLIC asci1RxCount, asci1RxIn, asci1RxOut, asci1RxLock
  
 asci1RxCount:   defb    0               ; Space for Rx Buffer Management 
 asci1RxIn:      defw    asci1RxBuffer   ; non-zero item since it's initialized anyway
 asci1RxOut:     defw    asci1RxBuffer   ; non-zero item since it's initialized anyway
-asci1RxLock:    defb    $FE             ; lock flag for Rx mutex
+asci1RxLock:    defb    $FE             ; mutex for Rx1
 
 PUBLIC asci1TxCount, asci1TxIn, asci1TxOut, asci1TxLock
 
 asci1TxCount:   defb    0               ; Space for Tx Buffer Management
 asci1TxIn:      defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
 asci1TxOut:     defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
-asci1TxLock:    defb    $FE             ; lock flag for Tx mutex
+asci1TxLock:    defb    $FE             ; mutex for Tx1
 
 DEPHASE

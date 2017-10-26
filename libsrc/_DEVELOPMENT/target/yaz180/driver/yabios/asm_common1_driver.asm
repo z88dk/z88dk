@@ -41,6 +41,250 @@ asm_fuzix_rst:                  ; RST 30
 ; start of common area 1 - system functions
 ;------------------------------------------------------------------------------
 
+EXTERN shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
+
+; far_void *f_memcpy(far_void *str1, const far_void *str2, size_t n)
+;
+; str1 - This is a pointer to the destination array where the content is to be
+;       copied, type-cast to a pointer of type far_void*.
+; str2 - This is a pointer to the source of data to be copied,
+;       type-cast to a pointer of type far_void*.
+; n    - This is the number of bytes to be copied.
+; 
+; This function returns a relative far_void* to destination, which is str1, in EHL.
+
+; stack:
+;   n high
+;   n low
+;   str2 far
+;   str2 high
+;   str2 low
+;   str1 far
+;   str1 high
+;   str1 low
+;   ret high
+;   ret low
+
+
+PUBLIC _f_memcpy
+
+_f_memcpy:
+    ld hl, dmac0Lock
+    sra (hl)            ; take the DMAC0 lock
+    jr C, _f_memcpy
+
+    ld hl, 9
+    add hl, sp          ; pointing at nh bytes
+    ld b, (hl)          ; b = nh 
+    dec hl   
+    ld c, (hl)          ; c = nl
+
+    ld a, b             ; test for zero size, and exit
+    or a, c
+    ret Z               ; return on zero size
+
+    out0 (BCR0H), b     ; set up the transfer size   
+    out0 (BCR0L), c
+    push bc             ; save transfer size (again)
+
+    dec hl              ; pointing at str2 far
+
+    in0 b, (BBR)        ; get the current bank
+    srl b               ; move the current bank to low nibble
+    srl b
+    srl b
+    srl b               ; save current bank in address format
+    
+    ld a, b             ; and put it in a
+    add a, (hl)         ; create destination relative far address, from twos complement input
+;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
+    ld c, a             ; hold destination far address in c
+    out0 (DAR0B), c
+
+    dec hl
+    ld d, (hl)          ; get destination high address in d
+    dec hl
+    ld e, (hl)          ; get destination low address in e
+
+    dec hl              ; pointing at str1 far
+
+    ld a, b             ; get current bank in address format
+    add a, (hl)         ; create relative far source address, from twos complement input
+;   and a, $0F          ; convert it to 4 bit positive address
+    ld b, a             ; hold far source address in b
+    out0 (SAR0B), b
+
+    dec hl
+    ld a, (hl)          ; get source high address in a (h)
+    dec hl
+    ld l, (hl)          ; get source low address l
+    ld h, a             ; source high address in h
+
+    ld a, b
+    cp c                ; check for bank dest < src
+    jr C, f_memcpy_left_right   ; if destination is lower bank, we do left right
+                        ; otherwise we need to check further
+
+    or a                ; clear carry
+    sbc hl, de          ; check whether destination address < source address
+    jr C, f_memcpy_left_right   ; if so we can do left to right copy
+
+f_memcpy_right_left:
+    adc hl, de          ; recover the source address
+    pop bc              ; get the size back
+    add hl, bc          ; add in the size to the source address
+    call C, f_memcpy_right_left_src_bank_overflow
+    dec hl              ; subtract one from source address
+    ex de, hl           ; swap source to de
+    add hl, bc          ; add in the size to the destination address
+    call C, f_memcpy_right_left_dest_bank_overflow
+    dec hl              ; subtract one from destination address
+    
+    out0 (SAR0H), d
+    out0 (SAR0L), e
+    out0 (DAR0H), h
+    out0 (DAR0L), l
+
+    ld bc, +(DMODE_DM0|DMODE_SM0|DMODE_MMOD)*$100+DSTAT_DE0
+    out0 (DMODE), b     ; DMODE_MMOD - memory-- to memory--, burst mode
+    out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                        ; in burst mode the Z180 CPU stops until the DMA completes
+
+    in0 b, (BBR)        ; recreate the destination bank pointer
+    srl b
+    srl b
+    srl b
+    srl b
+    in0 a, (DAR0B)      ; right to left so destination is base address
+    sub a, b            ; subtract the current bank, creating a relative bank
+    ld e, a             ; put it in e
+    in0 h, (DAR0H)      ; and now the destination address, post memcpy
+    in0 l, (DAR0L)
+
+    ld a, $FE
+    ld (dmac0Lock), a   ; give DMAC0 free
+    ret
+
+f_memcpy_right_left_src_bank_overflow:
+    in0 a, (SAR0B)
+    inc a
+    out0 (SAR0B), a
+    ret
+
+f_memcpy_right_left_dest_bank_overflow:
+    in0 a, (DAR0B)
+    inc a
+    out0 (DAR0B), a
+    ret
+
+f_memcpy_left_right:
+    adc hl, de          ; recover the source address
+    pop bc              ; get the size back, although we don't need it    
+    out0 (SAR0H), h
+    out0 (SAR0L), l
+    out0 (DAR0H), d
+    out0 (DAR0L), e
+    
+    in0 b, (BBR)        ; recreate the destination bank pointer
+    srl b
+    srl b
+    srl b
+    srl b
+    in0 a, (DAR0B)      ; left to right so destination before memcpy is base address
+    sub a, b            ; subtract the current bank, creating a relative bank
+    ld e, a             ; put the relative bank in e
+    ex de, hl           ; and swap the destination address into hl to return
+
+    ld bc, DMODE_MMOD*$100+DSTAT_DE0
+    out0 (DMODE), b     ; DMODE_MMOD - memory++ to memory++, burst mode
+    out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                        ; in burst mode the Z180 CPU stops until the DMA completes
+    ld a, $FE
+    ld (dmac0Lock), a   ; give DMAC0 free
+    ret
+
+
+; far_void *memset(far_void *str, int c, size_t n)
+;
+; str − This is a pointer to the block of memory to fill,
+;       type-cast to a pointer of type far_void*.
+; c   − This is the value to be set. The value is passed as an int, but the
+;       function fills the block of memory using the unsigned char conversion.
+; n   − This is the number of bytes to be set to the value.
+;
+; This function returns a relative far_void* pointer to the memory area str in EHL.
+
+; stack:
+;   n high
+;   n low
+;   c high
+;   c low
+;   str far
+;   str high
+;   str low
+;   ret high
+;   ret low
+
+PUBLIC _f_memset
+
+_f_memset:
+    ld hl, dmac0Lock
+    sra (hl)            ; take the DMAC0 lock
+    jr C, _f_memset
+
+    ld hl, 8
+    add hl, sp          ; pointing at nh bytes
+    ld b, (hl)          ; b = nh 
+    dec hl   
+    ld c, (hl)          ; c = nl
+
+    ld a, b             ; test for zero size, and exit
+    or a, c
+    ret Z               ; return on zero size
+
+    out0 (BCR0H), b     ; set up the transfer size   
+    out0 (BCR0L), c
+    
+    dec hl
+    dec hl              ; pointing at c low byte
+ 
+    out0 (SAR0H), h     ; c low byte is source, address in hl
+    out0 (SAR0L), l
+    
+    dec hl              ; pointing at str far
+    ld b, (hl)          ; save the destination relative bank
+    
+    in0 a, (BBR)        ; get the current bank
+    srl a               ; move the current bank to low nibble
+    srl a
+    srl a
+    srl a               ; shift current bank to address format
+
+    out0 (SAR0B), a     ; use the current bank for the origin
+
+    add a, (hl)         ; create relative destination far address, from twos complement input
+;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
+    out0 (DAR0B), a
+
+    dec hl
+    ld d, (hl)          ; get destination high address in d
+    dec hl
+    ld e, (hl)          ; get destination low address in e
+
+    out0 (DAR0H), d
+    out0 (DAR0L), e
+
+    ld e, b             ; put the destination relative bank in e
+    ex de, hl           ; and swap the destination address into hl, to return
+
+    ld bc, +(DMODE_SM1|DMODE_MMOD)*$100+DSTAT_DE0
+    out0 (DMODE), b     ; DMODE_MMOD - memory00 to memory++, burst mode
+    out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                        ; in burst mode the Z180 CPU stops until the DMA completes
+    ld a, $FE
+    ld (dmac0Lock), a   ; give DMAC0 free
+    ret
+
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 driver - system_time functions
@@ -244,7 +488,6 @@ am9511a_isr_error:          ; we've an error to notify in A
 ;------------------------------------------------------------------------------  
 ;       Initialises the APU buffers
 ;
-;       HL = address of the jump table nmi address
 
 PUBLIC asm_am9511a_reset
 
@@ -1021,5 +1264,238 @@ asci1_clean_up_tx:
     out0 (STAT1), a             ; set the ASCI status register
 
     jp asm_z180_pop_ei_jp       ; critical section end
+
+;==============================================================================
+;       OTHER SUBROUTINES
+;
+
+; int16_t mult_l(int16_t x, int16_t y);
+
+PUBLIC _mult_l
+
+_mult_l:
+    ld  hl,2
+    add hl,sp
+    ld  e,(hl)  ; e = xl
+    inc hl
+    ld  d,(hl)  ; d = xh
+    inc hl
+    ld  a,(hl)  ; a = yl
+    inc hl
+    ld  h,(hl)  ; h = yh
+    ld  l,a     ; l = a = yl
+
+l_mult_l:
+    ld  a,d     ; a = xh        /  4
+    ld  d,h     ; d = yh        /  4
+    ld  h,a     ; h = xh        /  4
+    ld  c,e     ; c = xl        /  4
+    ld  b,l     ; b = yl        /  4
+    mlt de      ; yh * xl       / 17
+    mlt hl      ; xh * yl       / 17
+    add hl,de   ; add cross products            / 11
+    mlt bc      ; yl * xl                       / 17
+    ld  h,l     ; drop cross products MSB       /  4
+    ld  l,0     ;                               /  7
+    adc hl,bc   ; add in the LSB product        / 15
+    ret         ;                               / 10
+
+;==============================================================================
+;       DEBUGGING SUBROUTINES
+;
+
+PUBLIC delay
+PUBLIC rhexdwd, rhexwd, rhex
+PUBLIC phexdwd, phexwd, phex
+PUBLIC phexdwdreg, phexwdreg
+PUBLIC pstring, pnewline
+
+EXTERN _asci0_reset, _asci0_putchar, _asci0_putc, _asci0_getc
+
+;==============================================================================
+;       DELAY SUBROUTINES
+;
+
+delay:
+    push bc
+    ld b, $00
+delay_loop:
+    ex (sp), hl
+    ex (sp), hl
+    djnz delay_loop
+    pop bc
+    ret
+        
+;==============================================================================
+;       INPUT SUBROUTINES
+;
+
+rhexdwd:                        ; returns 4 bytes LE, to address in DE, with echo
+    push af
+    inc de
+    inc de
+    inc de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex     
+    pop af
+    ret
+
+rhexwd:                         ; returns 2 bytes LE, to address in DE, with echo
+    push af
+    inc de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex
+    pop af
+    ret
+
+rhex:                       ; Returns byte in a
+    push hl
+    call _asci0_getc        ; Rx byte in l
+    ld a, l
+    sub '0'
+    cp 10
+    jr C, rhexnbl2          ; if a<10 read the second nibble
+    sub 7                   ; else subtract 'A'-'0' (17) and add 10
+rhexnbl2:
+    rlca                    ; shift accumulator left by 4 bits
+    rlca
+    rlca
+    rlca
+    ld h, a                 ; temporarily store the first nibble in h
+    call _asci0_getc        ; Rx byte in l
+    ld a, l
+    sub '0'
+    cp 10
+    jr C, rhexend           ; if a<10 finalize
+    sub 7                   ; else subtract 'A' (17) and add 10
+rhexend:
+    or h                    ; assemble two nibbles into one byte in a
+    pop hl
+    ret                     ; return the byte read in a
+
+;==============================================================================
+;       OUTPUT SUBROUTINES
+;
+
+    ;print string
+pstring: 
+    ld a, (de)          ;Get character from DE address
+    or a                ;Is it $00 ?
+    ret Z               ;Then RETurn on terminator
+    ld l, a
+    call _asci0_putc    ;Print it
+    inc de              ;Point to next character 
+    jp pstring          ;Continue until $00
+
+    ;print CR/LF
+pnewline:
+    ld l, CHAR_CR
+    call _asci0_putc
+    ld l, CHAR_LF
+    call _asci0_putc
+    ret
+
+    ;print Double Word at address DE as 32 bit number in ASCII HEX
+phexdwd:
+    push af
+    inc de
+    inc de
+    inc de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    pop af
+    ret
+
+    ;print Word at address DE as 16 bit number in ASCII HEX
+phexwd:
+    push af
+    inc de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    pop af
+    ret
+
+    ;print contents of DEHL as 32 bit number in ASCII HEX
+phexdwdreg:
+    push af
+    ld a, d
+    call phex
+    ld a, e
+    call phex
+    ld a, h
+    call phex
+    ld a, l
+    call phex
+    pop af
+    ret
+
+    ;print contents of DE as 16 bit number in ASCII HEX
+phexwdreg:
+    push af
+    ld a, h
+    call phex
+    ld a, l
+    call phex
+    pop af
+    ret
+
+    ;print contents of A as 8 bit number in ASCII HEX
+phex:
+    push hl
+    push af             ;store the binary value
+    rlca                ;shift accumulator left by 4 bits
+    rlca
+    rlca
+    rlca
+    and $0F             ;now high nibble is low position
+    cp 10
+    jr C, phex_b        ;jump if high nibble < 10
+    add a, 7            ;otherwise add 7 before adding '0'
+phex_b:
+    add a, '0'          ;add ASCII 0 to make a character
+    ld l, a
+    call _asci0_putc    ;print high nibble
+    pop af              ;recover the binary value
+phex1:
+    and $0F
+    cp 10
+    jr C, phex_c        ;jump if low nibble < 10
+    add a, 7
+phex_c:
+    add a, '0'
+    ld l, a
+    call _asci0_putc    ;print low nibble
+    pop hl
+    ret
 
 DEPHASE
