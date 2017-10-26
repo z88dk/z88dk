@@ -43,7 +43,7 @@ asm_fuzix_rst:                  ; RST 30
 
 EXTERN shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
 
-; far_void *f_memcpy(far_void *str1, const far_void *str2, size_t n)
+; far void *far_memcpy(far void *str1, const far void *str2, size_t n)
 ;
 ; str1 - This is a pointer to the destination array where the content is to be
 ;       copied, type-cast to a pointer of type far_void*.
@@ -66,12 +66,12 @@ EXTERN shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
 ;   ret low
 
 
-PUBLIC _f_memcpy
+PUBLIC _far_memcpy
 
-_f_memcpy:
+_far_memcpy:
     ld hl, dmac0Lock
     sra (hl)            ; take the DMAC0 lock
-    jr C, _f_memcpy
+    jr C, _far_memcpy
 
     ld hl, 9
     add hl, sp          ; pointing at nh bytes
@@ -122,22 +122,22 @@ _f_memcpy:
 
     ld a, b
     cp c                ; check for bank dest < src
-    jr C, f_memcpy_left_right   ; if destination is lower bank, we do left right
+    jr C, far_memcpy_left_right   ; if destination is lower bank, we do left right
                         ; otherwise we need to check further
 
     or a                ; clear carry
     sbc hl, de          ; check whether destination address < source address
-    jr C, f_memcpy_left_right   ; if so we can do left to right copy
+    jr C, far_memcpy_left_right   ; if so we can do left to right copy
 
-f_memcpy_right_left:
+far_memcpy_right_left:
     adc hl, de          ; recover the source address
     pop bc              ; get the size back
     add hl, bc          ; add in the size to the source address
-    call C, f_memcpy_right_left_src_bank_overflow
+    call C, far_memcpy_right_left_src_bank_overflow
     dec hl              ; subtract one from source address
     ex de, hl           ; swap source to de
     add hl, bc          ; add in the size to the destination address
-    call C, f_memcpy_right_left_dest_bank_overflow
+    call C, far_memcpy_right_left_dest_bank_overflow
     dec hl              ; subtract one from destination address
     
     out0 (SAR0H), d
@@ -165,19 +165,19 @@ f_memcpy_right_left:
     ld (dmac0Lock), a   ; give DMAC0 free
     ret
 
-f_memcpy_right_left_src_bank_overflow:
+far_memcpy_right_left_src_bank_overflow:
     in0 a, (SAR0B)
     inc a
     out0 (SAR0B), a
     ret
 
-f_memcpy_right_left_dest_bank_overflow:
+far_memcpy_right_left_dest_bank_overflow:
     in0 a, (DAR0B)
     inc a
     out0 (DAR0B), a
     ret
 
-f_memcpy_left_right:
+far_memcpy_left_right:
     adc hl, de          ; recover the source address
     pop bc              ; get the size back, although we don't need it    
     out0 (SAR0H), h
@@ -204,7 +204,7 @@ f_memcpy_left_right:
     ret
 
 
-; far_void *memset(far_void *str, int c, size_t n)
+; far void *far_memset(far void *str, int c, size_t n)
 ;
 ; str − This is a pointer to the block of memory to fill,
 ;       type-cast to a pointer of type far_void*.
@@ -225,12 +225,12 @@ f_memcpy_left_right:
 ;   ret high
 ;   ret low
 
-PUBLIC _f_memset
+PUBLIC _far_memset
 
-_f_memset:
+_far_memset:
     ld hl, dmac0Lock
     sra (hl)            ; take the DMAC0 lock
-    jr C, _f_memset
+    jr C, _far_memset
 
     ld hl, 8
     add hl, sp          ; pointing at nh bytes
