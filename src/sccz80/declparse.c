@@ -1426,8 +1426,8 @@ static void declfunc(Type *type, enum storage_type storage)
     }
     
     stackargs = where;
-    if (statement() != STRETURN && lastst != STASM) {
-        if ( type->return_type->kind != KIND_VOID ) {
+    if (statement() != STRETURN ) {
+        if ( type->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("Control reaches end of non-void function");
         }
         /* do a statement, but if it's a return, skip */

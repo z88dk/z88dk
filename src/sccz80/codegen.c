@@ -369,6 +369,7 @@ void PutFrame(char typeobj, int offset)
         outstr(",l\n");
         break;
     case KIND_INT:
+    case KIND_PTR:
         ot("ld\t");
         OutIndex(offset);
         outstr(",l\n");
