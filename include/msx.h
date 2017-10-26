@@ -20,7 +20,7 @@
 
 // Video related functions
 
-// Set the screen mode
+// Set the screen mode via BIOS (only valid BIOS modes)
 extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
 
 // Get the screen mode
