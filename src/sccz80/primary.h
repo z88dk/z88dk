@@ -18,7 +18,7 @@ extern void smartstore(LVALUE *lval);
 extern void rvaluest(LVALUE *lval);
 extern void rvalload(LVALUE  *lval);
 extern void rvalue(LVALUE *lval);
-extern void test(int label, int parens);
+extern int test(int label, int parens);
 extern int constexpr(double *val, Kind *valtype, int flag);
 extern void cscale(Type *type, int *val);
 extern int  docast(LVALUE *lval,LVALUE *dest_lval);

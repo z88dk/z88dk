@@ -92,6 +92,9 @@ int heir1(LVALUE* lval)
                     warningfmt("Assigning SMALLC function pointer with non-SMALLC function");
                 }
             }
+        } 
+        if ( lval2.ltype->kind == KIND_VOID ) {
+            warningfmt("Assigning from a void expression");
         }
 
 
@@ -528,7 +531,8 @@ int heira(LVALUE *lval)
         }
         lval->ltype = make_pointer(lval->ltype);
         lval->ptr_type = lval->ltype->ptr->kind;
-        lval->val_type = (lval->flags & FARACC ? KIND_CPTR : KIND_INT);
+        lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
+ //       lval->flags &= ~FARACC;
 
         if (lval->symbol) {
             lval->symbol->isassigned = YES;

@@ -758,6 +758,10 @@ int declare_local(int local_static)
                     declared = 0;
                     setstage(&before, &start);
                     expr = expression(&vconst, &val, &expr_type);
+
+                    if ( expr_type->kind == KIND_VOID ) {
+                        warningfmt("Assigning from a void expression");
+                    }
                     
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
@@ -1422,7 +1426,7 @@ static void declfunc(Type *type, enum storage_type storage)
     }
     
     stackargs = where;
-    if (statement() != STRETURN) {
+    if (statement() != STRETURN && lastst != STASM) {
         if ( type->return_type->kind != KIND_VOID ) {
             warningfmt("Control reaches end of non-void function");
         }

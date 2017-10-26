@@ -49,7 +49,7 @@ int primary(LVALUE* lval)
             if ( lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
                 /* djm pointer? */
                 lval->ptr_type = ptr->type;
-                lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
+                lval->val_type = KIND_PTR;
                 return (0);
             } else
                 return (1);
@@ -616,7 +616,12 @@ void rvalue(LVALUE* lval)
 #endif
 }
 
-void test(int label, int parens)
+/** 
+ * \retval 1 - If constant true
+ * \retval 0 - If constant false
+ * \retval -1 - Not constant
+ */
+int test(int label, int parens)
 {
     char *before, *start;
     LVALUE lval={0};
@@ -640,11 +645,11 @@ void test(int label, int parens)
         clearstage(before, 0);
         if (lval.const_val) {
             /* true constant, perform body */
-            return;
+            return 1;
         }
         /* false constant, jump round body */
         jump(label);
-        return;
+        return 0;
     }
     if (lval.stage_add) { /* stage address of "..oper 0" code */
         lval.ltype= lval.stage_add_ltype;
@@ -683,6 +688,7 @@ void test(int label, int parens)
         }
     }
     clearstage(before, start);
+    return -1;
 }
 
 /*
