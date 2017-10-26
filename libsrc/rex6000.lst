@@ -44,6 +44,6 @@ rex/graphics/DsGetPixelAddr
 rex/graphics/DsSetPixel
 rex/graphics/DsDisplayCircle
 rex/graphics/DsDisplayEllipse
-setjmp/longjmp
-setjmp/setjmp
+setjmp/l_longjmp
+setjmp/l_setjmp
 

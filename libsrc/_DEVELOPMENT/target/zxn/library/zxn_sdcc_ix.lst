@@ -9,7 +9,7 @@
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_ix.lst
-@font/fzx/zx/zx_sdcc_ix.lst
+@font/fzx/zxn/zxn_sdcc_ix.lst
 @im2/im2_sdcc.lst
 @input/zx/input_sdcc_ix.lst
 @inttypes/inttypes_sdcc_ix.lst
@@ -24,7 +24,7 @@
 @stdio/stdio_sdcc_ix.lst
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst
-@target/zx/driver/driver.lst
+@target/zxn/driver/driver.lst
 @temp/sp1/zx/sp1_zx_sdcc_ix.lst
 @threads/threads_sdcc_ix.lst
 @z80/z80_sdcc.lst

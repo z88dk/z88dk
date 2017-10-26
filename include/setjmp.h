@@ -24,8 +24,10 @@ typedef struct {
 	int	pc;
 } jmp_buf;
 
+#define setjmp(env)         l_setjmp(&(env))
+#define longjmp(env, val)   l_longjmp(&(env), val)
 
-extern int __LIB__ setjmp(jmp_buf *env);
-extern void __LIB__ longjmp(jmp_buf *env, int val) __smallc;
+extern int __LIB__ l_setjmp(jmp_buf *env);
+extern void __LIB__ l_longjmp(jmp_buf *env, int val) __smallc;
 
 #endif /* _SETJMP_H */

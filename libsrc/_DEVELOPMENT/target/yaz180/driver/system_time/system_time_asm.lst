@@ -1,3 +1,7 @@
-target/yaz180/driver/system_time/z180/__system_time_data
-target/yaz180/driver/system_time/z180/system_tick
+# moved to driver/yabios/asm_common1_data
+# target/yaz180/driver/system_time/z180/__system_time_data
+
+# moved to driver/yabios/asm_common1_driver
+# target/yaz180/driver/system_time/z180/system_tick
+
 target/yaz180/driver/system_time/z180/system_tick_init

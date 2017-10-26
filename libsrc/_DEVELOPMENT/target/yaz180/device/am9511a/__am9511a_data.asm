@@ -1,7 +1,7 @@
 
     INCLUDE "config_private.inc"
 
-    SECTION data_common1_align_256
+    SECTION rodata_common1_data
 
     PUBLIC APUCMDBuf, APUPTRBuf
 
@@ -14,7 +14,7 @@
        defs 256 - (ASMPC & 0xff)
     ENDIF
 
-    SECTION data_common1_driver
+    SECTION rodata_common1_data
 
     PUBLIC APUCMDInPtr, APUCMDOutPtr, APUPTRInPtr, APUPTROutPtr
     PUBLIC APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError, APULock
@@ -27,4 +27,4 @@
     APUPTRBufUsed:  DEFB    0
     APUStatus:      DEFB    0
     APUError:       DEFB    0
-    APULock:        DEFB    0
+    APULock:        DEFB    $FE

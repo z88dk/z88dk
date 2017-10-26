@@ -16,6 +16,7 @@ SECTION code_arch
 
 PUBLIC asm_zx_scroll_up_pix
 PUBLIC asm0_zx_scroll_up_pix
+PUBLIC asm1_zx_scroll_up_pix
 
 EXTERN asm_zx_cls_pix
 EXTERN asm_zx_py2saddr, asm_zx_saddrpdown
@@ -62,7 +63,8 @@ IF __USE_SPECTRUM_128_SECOND_DFILE
 ELSE
    ld de,$4000                 ; de = destination address of first scroll row
 ENDIF
-   
+
+asm1_zx_scroll_up_pix:
 copy_up_loop_1:
 
    push bc

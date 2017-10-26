@@ -12,38 +12,6 @@ IF !DEFINED_startup
 ENDIF
 
 
-IF !DEFINED_CLIB_OPT_PRINTF
-	defc	DEFINED_CLIB_OPT_PRINTF = 1
-	defc CLIB_OPT_PRINTF = 0x200
-	IFNDEF CLIB_OPT_PRINTF
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_PRINTF_2
-	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
-	defc CLIB_OPT_PRINTF_2 = 0
-	IFNDEF CLIB_OPT_PRINTF_2
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_SCANF
-	defc	DEFINED_CLIB_OPT_SCANF = 1
-	defc CLIB_OPT_SCANF = 0x200000
-	IFNDEF CLIB_OPT_SCANF
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_SCANF_2
-	defc	DEFINED_CLIB_OPT_SCANF_2 = 1
-	defc CLIB_OPT_SCANF_2 = 0
-	IFNDEF CLIB_OPT_SCANF_2
-	ENDIF
-ENDIF
-
-
 
 
 
@@ -689,34 +657,6 @@ ENDIF
 ;; crt rules for yaz180 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFDEF CRT_PHASE_CODE_COMMMON1
-
-      defc __crt_phase_code_common1 = CRT_PHASE_CODE_COMMON1
-
-   ELSE
-
-      IFDEF TAR__crt_phase_code_common1
-
-         defc __crt_phase_code_common1 = TAR__crt_phase_code_common1
-
-      ENDIF
-
-   ENDIF
-
-   IFDEF CRT_ORG_DATA_COMMMON1
-
-      defc __crt_org_data_common1 = CRT_ORG_DATA_COMMON1
-
-   ELSE
-
-      IFDEF TAR__crt_org_data_common1
-
-         defc __crt_org_data_common1 = TAR__crt_org_data_common1
-
-      ENDIF
-
-   ENDIF
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -772,7 +712,7 @@ IF __MMAP = 0
    ;; standard CODE/DATA/BSS memory map ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "crt_yabios_memory_model_z180.inc"
+   INCLUDE "../crt_memory_model_z180.inc"
 
 
 
@@ -1405,8 +1345,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   ; special YABIOS Page 0
-   include "crt_yabios_page_zero_z180.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 

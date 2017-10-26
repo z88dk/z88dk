@@ -1,7 +1,0 @@
-SECTION bss_arch
-
-PUBLIC _GLOBAL_TS_PORT_FF
-
-_GLOBAL_TS_PORT_FF:
-
-   defb 0

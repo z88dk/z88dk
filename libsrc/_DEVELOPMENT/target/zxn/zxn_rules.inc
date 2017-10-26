@@ -14,23 +14,23 @@
 Z88DK_FOR(`LOOP', `0', `139',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
-	   defc CRT_ORG_BANK_`'LOOP = 0xc000
-	ENDIF
-	
-	IFNDEF CRT_ORG_BANK_`'LOOP`'_L
-	   defc CRT_ORG_BANK_`'LOOP`'_L = 0xc000
-	ENDIF
-	
-	IFNDEF CRT_ORG_BANK_`'LOOP`'_H
-	   defc CRT_ORG_BANK_`'LOOP`'_H = 0xe000
-	ENDIF
+      defc CRT_ORG_BANK_`'LOOP = 0xc000
+   ENDIF
+   
+   IFNDEF CRT_ORG_BANK_`'LOOP`'_L
+      defc CRT_ORG_BANK_`'LOOP`'_L = 0xc000
+   ENDIF
+   
+   IFNDEF CRT_ORG_BANK_`'LOOP`'_H
+      defc CRT_ORG_BANK_`'LOOP`'_H = 0xe000
+   ENDIF
 ')
 
 Z88DK_FOR(`LOOP', `0', `31',
 `
    IFNDEF CRT_ORG_DIV_`'LOOP
-	   defc CRT_ORG_DIV_`'LOOP = 0x2000
-	ENDIF
+      defc CRT_ORG_DIV_`'LOOP = 0x2000
+   ENDIF
 ')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -102,6 +102,26 @@ Z88DK_FOR(`LOOP', `0', `31',
    ENDIF
 
    ;
+   ; Terminal Window Dimensions in Characters for Timex Hi-Res
+   ;
+
+   IFNDEF CRT_OTERM_TSHR_WINDOW_X
+      defc CRT_OTERM_TSHR_WINDOW_X = 0           ; multiplied by two in 128 col terminals
+   ENDIF
+   
+   IFNDEF CRT_OTERM_TSHR_WINDOW_WIDTH
+      defc CRT_OTERM_TSHR_WINDOW_WIDTH = 64      ; multiplied by two in 128 col terminals
+   ENDIF
+   
+   IFNDEF CRT_OTERM_TSHR_WINDOW_Y
+      defc CRT_OTERM_TSHR_WINDOW_Y = 0
+   ENDIF
+   
+   IFNDEF CRT_OTERM_TSHR_WINDOW_HEIGHT
+      defc CRT_OTERM_TSHR_WINDOW_HEIGHT = 24
+   ENDIF
+
+   ;
    ; Terminal Text Colour
    ;
 
@@ -140,6 +160,24 @@ Z88DK_FOR(`LOOP', `0', `31',
       defc CRT_OTERM_FZX_PAPER_HEIGHT = 192
    ENDIF
 
+   ; The terminal window for Timex Hi-Res
+   
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_X
+      defc CRT_OTERM_FZX_TSHR_PAPER_X = 0
+   ENDIF
+
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_WIDTH
+      defc CRT_OTERM_FZX_TSHR_PAPER_WIDTH = 512
+   ENDIF
+
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_Y
+      defc CRT_OTERM_FZX_TSHR_PAPER_Y = 0
+   ENDIF
+
+   IFNDEF CRT_OTERM_FZX_TSHR_PAPER_HEIGHT
+      defc CRT_OTERM_FZX_TSHR_PAPER_HEIGHT = 192
+   ENDIF
+
    ; draw mode must be available to m4 (requires special case in zcc)
    ; 0 = OR, 1 = XOR, 2 = CLEAR
 
@@ -172,8 +210,8 @@ Z88DK_FOR(`LOOP', `0', `31',
    ; use pragam redirect to change font
    ;
    ; #pragam redirect CRT_OTERM_FONT_8X8 = _font_8x8_rom        ; 32-col font definition in rom
-   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font
-   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font
+   ; #pragma redirect CRT_OTERM_FONT_8X8 = _font_8x8_zx_system  ; 32-col font, timex hi-res 64-col font
+   ; #pragma redirect CRT_OTERM_FONT_4X8 = _font_4x8_default    ; 64-col font, timex hi-res 128-col font
    ; #pragma redirect CRT_OTERM_FONT_FZX = _ff_ind_Termino      ; fzx proportional font
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

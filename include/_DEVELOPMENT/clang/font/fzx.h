@@ -54,11 +54,36 @@ struct fzx_state
    #endif
 };
 
+#ifdef __ZXNEXT
+
+struct fzx_tshr_state
+{
+   uint8_t          jp;                // 195 = z80 jump instruction
+   void            *fzx_draw;          // address of fzx_draw function
+   struct fzx_font *font;              // selected font
+   uint16_t         x;                 // x coordinate in pixels
+   uint16_t         y;                 // y coordinate in pixels
+   struct r_Rect16  paper;             // display area units in pixels
+   uint16_t         left_margin;       // left margin in pixels
+   uint8_t          space_expand;      // additional width added to space characters
+   uint16_t         reserved;          // unused
+};
+
+#endif
+
 // FZX DRAW MODES
 
 extern void _fzx_draw_or(void);        // OR fzx pixels into display
 extern void _fzx_draw_reset(void);     // CLEAR display where fzx pixels are set
 extern void _fzx_draw_xor(void);       // XOR fzx pixels into display
+
+#ifdef __ZXNEXT
+
+extern void _fzx_tshr_draw_or(void);        // timex hi-res: OR fzx pixels into display
+extern void _fzx_tshr_draw_reset(void);     // timex hi-res: CLEAR display where fzx pixels are set
+extern void _fzx_tshr_draw_xor(void);       // timex hi-res: XOR fzx pixels into display
+
+#endif
 
 // FUNCTIONS
 
@@ -113,6 +138,14 @@ extern int fzx_write(struct fzx_state *fs,char *buf,uint16_t buflen);
 extern int fzx_write_justified(struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width);
 
 
+
+#ifdef __ZXNEXT
+
+extern int fzx_tshr_putc(struct fzx_tshr_state *fs,int c);
+
+
+
+#endif
 
 // FZX FONTS BY ANDREW OWEN, LATIN VARIANTS BY TK90X
 

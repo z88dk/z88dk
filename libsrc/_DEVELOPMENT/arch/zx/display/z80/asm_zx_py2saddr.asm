@@ -22,6 +22,7 @@ asm_zx_py2saddr:
    ; enter :  l = valid pixel y coordinate
    ;
    ; exit  : hl = screen address of byte containing pixel at x = 0, y.
+   ;         carry reset
    ;
    ; uses  : af, hl
 
