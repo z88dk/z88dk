@@ -5,8 +5,8 @@
 include ../Make.config
 
 CFILES = \
-	longjmp.c \
-	setjmp.c 
+	l_longjmp.c \
+	l_setjmp.c 
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
