@@ -731,7 +731,7 @@ int heirb(LVALUE* lval)
                     // }
                 }
                 if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
-                    lval->indirect_kind = lval->ltype->ptr->kind;
+                   // lval->indirect_kind = lval->ltype->ptr->kind;
                     /* array or struct */
                     // TODO
                  //   lval->ptr_type = ptr->type;

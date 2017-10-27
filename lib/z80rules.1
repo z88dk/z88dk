@@ -2659,3 +2659,20 @@
 	push	hl
 =
 	call	l_glong2sp_hlp
+
+	ld	b,h
+	ld	c,l
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_plong
+	ld	hl,%3
+=
+	ld	(hl),+(%1 %% 256)
+	inc	hl
+	ld	(hl),+(%1 / 256)
+	inc	hl
+	ld	(hl),+(%2 %% 256)
+	inc	hl
+	ld	(hl),+(%2 / 256)
+	ld	hl,%3
+
