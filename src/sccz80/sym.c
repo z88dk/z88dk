@@ -8,7 +8,7 @@
 
 #include "ccdefs.h"
 
-static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, char typ, enum storage_type storage);
+static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, Kind kind, enum storage_type storage);
 
 
 
@@ -74,7 +74,7 @@ SYMBOL* findloc(char* sname)
 
 
 SYMBOL* addglb(
-    char* sname, enum ident_type id, char typ,
+    char* sname, enum ident_type id, Kind kind,
     int value, enum storage_type storage)
 {
     SYMBOL* ptr;
@@ -98,7 +98,7 @@ SYMBOL* addglb(
         return (ptr);
     }
     ptr = CALLOC(1, sizeof(*ptr));
-    initialise_sym(ptr, sname, id, typ, storage);
+    initialise_sym(ptr, sname, id, kind, storage);
     ptr->offset.i = value;
     HASH_ADD_STR(symtab, name, ptr);   
     ++glbcnt;
@@ -108,7 +108,7 @@ SYMBOL* addglb(
 SYMBOL* addloc(
     char* sname,
     enum ident_type id,
-    char typ)
+    Kind kind)
 {
     SYMBOL* cptr;
 
@@ -121,7 +121,7 @@ SYMBOL* addloc(
         return 0;
     }
     cptr = locptr++;
-    initialise_sym(cptr, sname, id, typ, STKLOC);
+    initialise_sym(cptr, sname, id, kind, STKLOC);
     return cptr;
 }
 
@@ -135,12 +135,12 @@ static void initialise_sym(
     SYMBOL* ptr,
     char* sname,
     enum ident_type id,
-    char typ,
+    Kind kind,
     enum storage_type storage)
 {
     strcpy(ptr->name, sname);
     ptr->ident = id;
-    ptr->type = typ;
+    ptr->type = kind;
     ptr->storage = storage;
     ptr->flags = FLAGS_NONE;
     snprintf(ptr->declared_location, sizeof(ptr->declared_location),"%s:%d", Filename, lineno);

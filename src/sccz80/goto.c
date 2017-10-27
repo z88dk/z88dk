@@ -66,8 +66,10 @@ int dolabel()
                                  */
                 debug(DBG_GOTO, "Starting chase %s\n", sname);
                 ChaseGoto(ptr);
+                ptr->type = KIND_PTR;
             } else {
                 ptr = addgotosym(sname);
+                ptr->type = KIND_PTR;
             }
             debug(DBG_GOTO, "Adding label not called %s\n", sname);
             ptr->offset.i = Zsp; /* Save stack for label */
@@ -98,7 +100,7 @@ void dogoto()
     debug(DBG_GOTO, "goto is -->%s<--\n", sname);
     if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
         /* Label found, but is it actually defined? */
-        if (ptr->type == ID_GOTOLABEL) {
+        if (ptr->type == KIND_PTR) {
             label = ptr->size;
             stkmod = ptr->offset.i;
         } else {
