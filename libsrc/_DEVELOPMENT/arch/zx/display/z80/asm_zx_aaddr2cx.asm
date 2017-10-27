@@ -26,4 +26,8 @@ asm_zx_aaddr2cx:
    and $1f
    ld l,a
 
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ret

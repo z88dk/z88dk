@@ -29,4 +29,9 @@ asm_zx_aaddr2px:
    add a,a
    
    ld l,a
+
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ret

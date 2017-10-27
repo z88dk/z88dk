@@ -240,18 +240,18 @@ struct zxtapehdr
 #define ZXT_TYPE_HEADER  0
 #define ZXT_TYPE_DATA    0xff
 
-extern unsigned char zx_tape_load_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
-extern unsigned char zx_tape_load_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
+extern unsigned int zx_tape_load_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
+extern unsigned int zx_tape_load_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define zx_tape_load_block(a,b,c) zx_tape_load_block_callee(a,b,c)
 
 
-extern unsigned char zx_tape_save_block(void *src,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
-extern unsigned char zx_tape_save_block_callee(void *src,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
+extern unsigned int zx_tape_save_block(void *src,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
+extern unsigned int zx_tape_save_block_callee(void *src,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define zx_tape_save_block(a,b,c) zx_tape_save_block_callee(a,b,c)
 
 
-extern unsigned char zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
-extern unsigned char zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
+extern unsigned int zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh);
+extern unsigned int zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __preserves_regs(iyl,iyh) __z88dk_callee;
 #define zx_tape_verify_block(a,b,c) zx_tape_verify_block_callee(a,b,c)
 
 
@@ -260,7 +260,7 @@ extern unsigned char zx_tape_verify_block_callee(void *dst,unsigned int len,unsi
 
 #define TVM_SPECTRUM   0       // 256x192 pix, 32x24 attr
 #define TVM_HICOLOR    2       // 256x192 pix, 32x192 attr
-#define TVM_HIRES      6       // 512x192 pix
+#define TVM_HIRES      6       // 512x192 pix or with paper colour
 
 extern void ts_vmod(unsigned char mode) __preserves_regs(b,c,d,e,iyl,iyh);
 extern void ts_vmod_fastcall(unsigned char mode) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
@@ -268,7 +268,7 @@ extern void ts_vmod_fastcall(unsigned char mode) __preserves_regs(b,c,d,e,iyl,iy
 
 
 
-// miscellaneous
+// miscellaneous - spectrum display
 
 extern void zx_border(unsigned char colour) __preserves_regs(b,c,d,e,iyl,iyh);
 extern void zx_border_fastcall(unsigned char colour) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
@@ -376,6 +376,182 @@ extern void zx_visit_wc_attr_callee(struct r_Rect8 *r,void *visit) __z88dk_calle
 extern void zx_visit_wc_pix(struct r_Rect8 *r,void *visit);
 extern void zx_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __z88dk_callee;
 #define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+// miscellaneous - timex hi-colour display
+
+extern void tshc_cls(unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshc_cls_fastcall(unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define tshc_cls(a) tshc_cls_fastcall(a)
+
+
+extern void tshc_cls_attr(unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshc_cls_attr_fastcall(unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define tshc_cls_attr(a) tshc_cls_attr_fastcall(a)
+
+
+extern void tshc_cls_pix(unsigned char pix) __preserves_regs(iyl,iyh);
+extern void tshc_cls_pix_fastcall(unsigned char pix) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define tshc_cls_pix(a) tshc_cls_pix_fastcall(a)
+
+
+extern void tshc_cls_wc(struct r_Rect8 *r,unsigned char attr);
+extern void tshc_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __z88dk_callee;
+#define tshc_cls_wc(a,b) tshc_cls_wc_callee(a,b)
+
+
+extern void tshc_cls_wc_attr(struct r_Rect8 *r,unsigned char attr);
+extern void tshc_cls_wc_attr_callee(struct r_Rect8 *r,unsigned char attr) __z88dk_callee;
+#define tshc_cls_wc_attr(a,b) tshc_cls_wc_attr_callee(a,b)
+
+
+extern void tshc_cls_wc_pix(struct r_Rect8 *r,unsigned char pix);
+extern void tshc_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __z88dk_callee;
+#define tshc_cls_wc_pix(a,b) tshc_cls_wc_pix_callee(a,b)
+
+
+extern void tshc_scroll_up(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshc_scroll_up_callee(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define tshc_scroll_up(a,b) tshc_scroll_up_callee(a,b)
+
+
+extern void tshc_scroll_up_attr(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshc_scroll_up_attr_callee(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define tshc_scroll_up_attr(a,b) tshc_scroll_up_attr_callee(a,b)
+
+
+extern void tshc_scroll_up_pix(unsigned char rows,unsigned char pix) __preserves_regs(iyl,iyh);
+extern void tshc_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define tshc_scroll_up_pix(a,b) tshc_scroll_up_pix_callee(a,b)
+
+
+extern void tshc_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
+extern void tshc_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __z88dk_callee;
+#define tshc_scroll_wc_up(a,b,c) tshc_scroll_wc_up_callee(a,b,c)
+
+
+extern void tshc_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr);
+extern void tshc_scroll_wc_up_attr_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __z88dk_callee;
+#define tshc_scroll_wc_up_attr(a,b,c) tshc_scroll_wc_up_attr_callee(a,b,c)
+
+
+extern void tshc_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix);
+extern void tshc_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __z88dk_callee;
+#define tshc_scroll_wc_up_pix(a,b,c) tshc_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+#ifdef __CLANG
+
+extern void tshc_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void tshc_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define tshc_visit_wc_attr(a,b) tshc_visit_wc_attr_callee(a,b)
+
+
+extern void tshc_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void tshc_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define tshc_visit_wc_pix(a,b) tshc_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void tshc_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void tshc_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define tshc_visit_wc_attr(a,b) tshc_visit_wc_attr_callee(a,b)
+
+
+extern void tshc_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void tshc_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define tshc_visit_wc_pix(a,b) tshc_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void tshc_visit_wc_attr(struct r_Rect8 *r,void *visit);
+extern void tshc_visit_wc_attr_callee(struct r_Rect8 *r,void *visit) __z88dk_callee;
+#define tshc_visit_wc_attr(a,b) tshc_visit_wc_attr_callee(a,b)
+
+
+extern void tshc_visit_wc_pix(struct r_Rect8 *r,void *visit);
+extern void tshc_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __z88dk_callee;
+#define tshc_visit_wc_pix(a,b) tshc_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+// miscellaneous - timex hi-res display
+
+extern void tshr_cls(unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshr_cls_fastcall(unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define tshr_cls(a) tshr_cls_fastcall(a)
+
+
+extern void tshr_cls_attr(unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshr_cls_attr_fastcall(unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define tshr_cls_attr(a) tshr_cls_attr_fastcall(a)
+
+
+extern void tshr_cls_pix(unsigned char pix) __preserves_regs(iyl,iyh);
+extern void tshr_cls_pix_fastcall(unsigned char pix) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define tshr_cls_pix(a) tshr_cls_pix_fastcall(a)
+
+
+extern void tshr_cls_wc_pix(struct r_Rect8 *r,unsigned char pix);
+extern void tshr_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __z88dk_callee;
+#define tshr_cls_wc_pix(a,b) tshr_cls_wc_pix_callee(a,b)
+
+
+extern void tshr_scroll_up(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh);
+extern void tshr_scroll_up_callee(unsigned char rows,unsigned char attr) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define tshr_scroll_up(a,b) tshr_scroll_up_callee(a,b)
+
+
+extern void tshr_scroll_up_pix(unsigned char rows,unsigned char pix) __preserves_regs(iyl,iyh);
+extern void tshr_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define tshr_scroll_up_pix(a,b) tshr_scroll_up_pix_callee(a,b)
+
+
+extern void tshr_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix);
+extern void tshr_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __z88dk_callee;
+#define tshr_scroll_wc_up_pix(a,b,c) tshr_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+#ifdef __CLANG
+
+extern void tshr_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void tshr_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define tshr_visit_wc_pix(a,b) tshr_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void tshr_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *));
+extern void tshr_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __z88dk_callee;
+#define tshr_visit_wc_pix(a,b) tshr_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void tshr_visit_wc_pix(struct r_Rect8 *r,void *visit);
+extern void tshr_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __z88dk_callee;
+#define tshr_visit_wc_pix(a,b) tshr_visit_wc_pix_callee(a,b)
 
 
 
@@ -521,13 +697,13 @@ extern unsigned char zx_saddr2cy_fastcall(void *saddr) __preserves_regs(b,c,d,e,
 #define zx_saddr2cy(a) zx_saddr2cy_fastcall(a)
 
 
-extern unsigned int zx_saddr2px(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
-extern unsigned int zx_saddr2px_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+extern unsigned char zx_saddr2px(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char zx_saddr2px_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
 #define zx_saddr2px(a) zx_saddr2px_fastcall(a)
 
 
-extern unsigned int zx_saddr2py(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
-extern unsigned int zx_saddr2py_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+extern unsigned char zx_saddr2py(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char zx_saddr2py_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
 #define zx_saddr2py(a) zx_saddr2py_fastcall(a)
 
 
@@ -572,12 +748,279 @@ extern unsigned char *zx_saddrpup_fastcall(void *saddr) __preserves_regs(b,c,d,e
 
 
 
-// display timex hi-color mode (256x192 pix, 32x192 attr)
+// Timex Hi-Colour Display 256x192 pixel 32x192 colour
+
+extern unsigned char tshc_aaddr2cx(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_aaddr2cx_fastcall(void *aaddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddr2cx(a) tshc_aaddr2cx_fastcall(a)
+
+
+extern unsigned char tshc_aaddr2cy(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_aaddr2cy_fastcall(void *aaddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddr2cy(a) tshc_aaddr2cy_fastcall(a)
+
+
+extern unsigned char tshc_aaddr2px(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_aaddr2px_fastcall(void *aaddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddr2px(a) tshc_aaddr2px_fastcall(a)
+
+
+extern unsigned char tshc_aaddr2py(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_aaddr2py_fastcall(void *aaddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddr2py(a) tshc_aaddr2py_fastcall(a)
+
+
+extern unsigned char *tshc_aaddr2saddr(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddr2saddr_fastcall(void *aaddr) __preserves_regs(a,b,c,d,e,l,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddr2saddr(a) tshc_aaddr2saddr_fastcall(a)
+
+
+extern unsigned char *tshc_aaddrcdown(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddrcdown_fastcall(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddrcdown(a) tshc_aaddrcdown_fastcall(a)
+
+
+extern unsigned char *tshc_aaddrcleft(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddrcleft_fastcall(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddrcleft(a) tshc_aaddrcleft_fastcall(a)
+
+
+extern unsigned char *tshc_aaddrcright(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddrcright_fastcall(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddrcright(a) tshc_aaddrcright_fastcall(a)
+
+
+extern unsigned char *tshc_aaddrcup(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddrcup_fastcall(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddrcup(a) tshc_aaddrcup_fastcall(a)
+
+
+extern unsigned char *tshc_aaddrpdown(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddrpdown_fastcall(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddrpdown(a) tshc_aaddrpdown_fastcall(a)
+
+
+extern unsigned char *tshc_aaddrpleft(void *aaddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *tshc_aaddrpleft_callee(void *aaddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
+#define tshc_aaddrpleft(a,b) tshc_aaddrpleft_callee(a,b)
+
+
+extern unsigned char *tshc_aaddrpright(void *aaddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *tshc_aaddrpright_callee(void *aaddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
+#define tshc_aaddrpright(a,b) tshc_aaddrpright_callee(a,b)
+
+
+extern unsigned char *tshc_aaddrpup(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_aaddrpup_fastcall(void *aaddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_aaddrpup(a) tshc_aaddrpup_fastcall(a)
+
+
+extern unsigned char tshc_bitmask2px(unsigned char bitmask) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_bitmask2px_fastcall(unsigned char bitmask) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_bitmask2px(a) tshc_bitmask2px_fastcall(a)
+
+
+extern unsigned char *tshc_cxy2aaddr(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_cxy2aaddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+#define tshc_cxy2aaddr(a,b) tshc_cxy2aaddr_callee(a,b)
+
+
+extern unsigned char *tshc_cxy2saddr(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_cxy2saddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+#define tshc_cxy2saddr(a,b) tshc_cxy2saddr_callee(a,b)
+
+
+extern unsigned char *tshc_cy2aaddr(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_cy2aaddr_fastcall(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_cy2aaddr(a) tshc_cy2aaddr_fastcall(a)
+
+
+extern unsigned char *tshc_cy2saddr(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_cy2saddr_fastcall(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_cy2saddr(a) tshc_cy2saddr_fastcall(a)
+
+
+extern unsigned char tshc_px2bitmask(unsigned char x) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_px2bitmask_fastcall(unsigned char x) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_px2bitmask(a) tshc_px2bitmask_fastcall(a)
+
+
+extern unsigned char *tshc_pxy2aaddr(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_pxy2aaddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+#define tshc_pxy2aaddr(a,b) tshc_pxy2aaddr_callee(a,b)
+
+
+extern unsigned char *tshc_pxy2saddr(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_pxy2saddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+#define tshc_pxy2saddr(a,b) tshc_pxy2saddr_callee(a,b)
+
+
+extern unsigned char *tshc_py2aaddr(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_py2aaddr_fastcall(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_py2aaddr(a) tshc_py2aaddr_fastcall(a)
+
+
+extern unsigned char *tshc_py2saddr(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_py2saddr_fastcall(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_py2saddr(a) tshc_py2saddr_fastcall(a)
+
+
+extern unsigned char *tshc_saddr2aaddr(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddr2aaddr_fastcall(void *saddr) __preserves_regs(a,b,c,d,e,l,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddr2aaddr(a) tshc_saddr2aaddr_fastcall(a)
+
+
+extern unsigned char tshc_saddr2cx(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_saddr2cx_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddr2cx(a) tshc_saddr2cx_fastcall(a)
+
+
+extern unsigned char tshc_saddr2cy(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_saddr2cy_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddr2cy(a) tshc_saddr2cy_fastcall(a)
+
+
+extern unsigned char tshc_saddr2px(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_saddr2px_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddr2px(a) tshc_saddr2px_fastcall(a)
+
+
+extern unsigned char tshc_saddr2py(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshc_saddr2py_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddr2py(a) tshc_saddr2py_fastcall(a)
+
+
+extern unsigned char *tshc_saddrcdown(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddrcdown_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddrcdown(a) tshc_saddrcdown_fastcall(a)
+
+
+extern unsigned char *tshc_saddrcleft(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddrcleft_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddrcleft(a) tshc_saddrcleft_fastcall(a)
+
+
+extern unsigned char *tshc_saddrcright(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddrcright_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddrcright(a) tshc_saddrcright_fastcall(a)
+
+
+extern unsigned char *tshc_saddrcup(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddrcup_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddrcup(a) tshc_saddrcup_fastcall(a)
+
+
+extern unsigned char *tshc_saddrpdown(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddrpdown_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddrpdown(a) tshc_saddrpdown_fastcall(a)
+
+
+extern unsigned char *tshc_saddrpleft(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *tshc_saddrpleft_callee(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
+#define tshc_saddrpleft(a,b) tshc_saddrpleft_callee(a,b)
+
+
+extern unsigned char *tshc_saddrpright(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *tshc_saddrpright_callee(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
+#define tshc_saddrpright(a,b) tshc_saddrpright_callee(a,b)
+
+
+extern unsigned char *tshc_saddrpup(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshc_saddrpup_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshc_saddrpup(a) tshc_saddrpup_fastcall(a)
 
 
 
-// display timex hi-res mode (512x192 pix)
+// Timex Hi-Res Display, 512x192 monochrome
 
+extern unsigned char tshr_bitmask2px(unsigned char bitmask) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshr_bitmask2px_fastcall(unsigned char bitmask) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshr_bitmask2px(a) tshr_bitmask2px_fastcall(a)
+
+
+extern unsigned char *tshr_cxy2saddr(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_cxy2saddr_callee(unsigned char x,unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+#define tshr_cxy2saddr(a,b) tshr_cxy2saddr_callee(a,b)
+
+
+extern unsigned char *tshr_cy2saddr(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_cy2saddr_fastcall(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_cy2saddr(a) tshr_cy2saddr_fastcall(a)
+
+
+extern unsigned char tshr_px2bitmask(unsigned char x) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshr_px2bitmask_fastcall(unsigned char x) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_px2bitmask(a) tshr_px2bitmask_fastcall(a)
+
+
+extern unsigned char *tshr_pxy2saddr(unsigned int x,unsigned char y) __preserves_regs(iyl,iyh);
+extern unsigned char *tshr_pxy2saddr_callee(unsigned int x,unsigned char y) __preserves_regs(iyl,iyh) __z88dk_callee;
+#define tshr_pxy2saddr(a,b) tshr_pxy2saddr_callee(a,b)
+
+
+extern unsigned char *tshr_py2saddr(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_py2saddr_fastcall(unsigned char y) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_py2saddr(a) tshr_py2saddr_fastcall(a)
+
+
+extern unsigned char tshr_saddr2cx(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshr_saddr2cx_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddr2cx(a) tshr_saddr2cx_fastcall(a)
+
+
+extern unsigned char tshr_saddr2cy(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshr_saddr2cy_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddr2cy(a) tshr_saddr2cy_fastcall(a)
+
+
+extern unsigned int tshr_saddr2px(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned int tshr_saddr2px_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddr2px(a) tshr_saddr2px_fastcall(a)
+
+
+extern unsigned char tshr_saddr2py(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char tshr_saddr2py_fastcall(void *saddr) __preserves_regs(b,c,d,e,h,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddr2py(a) tshr_saddr2py_fastcall(a)
+
+
+extern unsigned char *tshr_saddrcdown(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_saddrcdown_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddrcdown(a) tshr_saddrcdown_fastcall(a)
+
+
+extern unsigned char *tshr_saddrcleft(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_saddrcleft_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddrcleft(a) tshr_saddrcleft_fastcall(a)
+
+
+extern unsigned char *tshr_saddrcright(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_saddrcright_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddrcright(a) tshr_saddrcright_fastcall(a)
+
+
+extern unsigned char *tshr_saddrcup(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_saddrcup_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddrcup(a) tshr_saddrcup_fastcall(a)
+
+
+extern unsigned char *tshr_saddrpdown(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_saddrpdown_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddrpdown(a) tshr_saddrpdown_fastcall(a)
+
+
+extern unsigned char *tshr_saddrpleft(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *tshr_saddrpleft_callee(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
+#define tshr_saddrpleft(a,b) tshr_saddrpleft_callee(a,b)
+
+
+extern unsigned char *tshr_saddrpright(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char *tshr_saddrpright_callee(void *saddr,unsigned char bitmask) __preserves_regs(b,c,iyl,iyh) __z88dk_callee;
+#define tshr_saddrpright(a,b) tshr_saddrpright_callee(a,b)
+
+
+extern unsigned char *tshr_saddrpup(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char *tshr_saddrpup_fastcall(void *saddr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define tshr_saddrpup(a) tshr_saddrpup_fastcall(a)
 
 
 
