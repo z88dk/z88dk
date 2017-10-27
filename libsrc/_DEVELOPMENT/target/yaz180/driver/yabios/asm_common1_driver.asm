@@ -51,7 +51,7 @@ EXTERN shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
 ;       type-cast to a pointer of type far_void*.
 ; n    - This is the number of bytes to be copied.
 ; 
-; This function returns a relative far_void* to destination, which is str1, in EHL.
+; This function returns a relative far void* to destination, which is str1, in EHL.
 
 ; stack:
 ;   n high
@@ -96,36 +96,37 @@ _far_memcpy:
     srl b               ; save current bank in address format
     
     ld a, b             ; and put it in a
-    add a, (hl)         ; create destination relative far address, from twos complement input
+    add a, (hl)         ; create source relative far address, from twos complement input
 ;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
-    ld c, a             ; hold destination far address in c
-    out0 (DAR0B), c
+    ld c, a             ; hold source far address in c
+    out0 (SAR0B), c
 
     dec hl
-    ld d, (hl)          ; get destination high address in d
+    ld d, (hl)          ; get source high address in d
     dec hl
-    ld e, (hl)          ; get destination low address in e
+    ld e, (hl)          ; get source low address in e
 
     dec hl              ; pointing at str1 far
 
     ld a, b             ; get current bank in address format
-    add a, (hl)         ; create relative far source address, from twos complement input
+    add a, (hl)         ; create relative far destination address, from twos complement input
 ;   and a, $0F          ; convert it to 4 bit positive address
-    ld b, a             ; hold far source address in b
-    out0 (SAR0B), b
+    ld b, a             ; hold far destination address in b
+    out0 (DAR0B), b
 
     dec hl
-    ld a, (hl)          ; get source high address in a (h)
+    ld a, (hl)          ; get destination high address in a (h)
     dec hl
-    ld l, (hl)          ; get source low address l
-    ld h, a             ; source high address in h
+    ld l, (hl)          ; get destination low address l
+    ld h, a             ; destination high address in h
 
-    ld a, b
-    cp c                ; check for bank dest < src
+    ld a, c
+    cp b                ; check for bank dest < src
     jr C, far_memcpy_left_right   ; if destination is lower bank, we do left right
                         ; otherwise we need to check further
 
     or a                ; clear carry
+    ex de, hl           ; now source in hl, destination in de
     sbc hl, de          ; check whether destination address < source address
     jr C, far_memcpy_left_right   ; if so we can do left to right copy
 
@@ -212,7 +213,7 @@ far_memcpy_left_right:
 ;       function fills the block of memory using the unsigned char conversion.
 ; n   − This is the number of bytes to be set to the value.
 ;
-; This function returns a relative far_void* pointer to the memory area str in EHL.
+; This function returns a relative far void* pointer to the memory area str in EHL.
 
 ; stack:
 ;   n high
@@ -1295,10 +1296,44 @@ l_mult_l:
     mlt hl      ; xh * yl       / 17
     add hl,de   ; add cross products            / 11
     mlt bc      ; yl * xl                       / 17
-    ld  h,l     ; drop cross products MSB       /  4
-    ld  l,0     ;                               /  7
-    adc hl,bc   ; add in the LSB product        / 15
-    ret         ;                               / 10
+    ld  a,l     ; cross products LSB            /  4
+    add a,b     ; add to low MSB final          /  4
+    ld  h,a     ; move final result to hl       /  4
+    ld  l,c     ;                               /  4
+    ret
+
+
+; int16_t mult_h(int16_t x, int16_t y);
+
+PUBLIC _mult_h
+
+_mult_h:
+    ld  hl,2
+    add hl,sp
+    ld  e,(hl)  ; e = xl
+    inc hl
+    ld  d,(hl)  ; d = xh
+    inc hl
+    ld  a,(hl)  ; a = yl
+    inc hl
+    ld  h,(hl)  ; h = yh
+    ld  l,a     ; l = a = yl
+
+l_mult_h:
+    ld  a,d     ; a = xh        /  4
+    ld  d,h     ; d = yh        /  4
+    ld  h,a     ; h = xh        /  4
+    ld  c,d     ; c = xh        /  4
+    ld  b,h     ; b = yh        /  4
+    mlt de      ; yh * xl       / 17
+    mlt hl      ; xh * yl       / 17
+    add hl,de   ; add cross products            / 11
+    mlt bc      ; yh * xh                       / 17
+    ld  l,h     ; drop cross products LSB       /  4
+    ld  h,0
+    add hl,bc   ; add in the MSB product        / 11
+    ret
+
 
 ;==============================================================================
 ;       DEBUGGING SUBROUTINES
