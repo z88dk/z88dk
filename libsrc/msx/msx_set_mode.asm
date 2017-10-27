@@ -96,15 +96,15 @@ txt32:
 	ld ix,FILVRM
 	call	msxbios
 
-;	ld	hl,font
-;	ld	de,0			; SCREEN 1 character pattern table
-;	ld	bc,768
-;	ld	ix,LDIRVM
-;	call	msxbios
+	ld	hl,font
+	ld	de,0			; SCREEN 1 character pattern table
+	ld	bc,768
+	ld	ix,LDIRVM
+	call	msxbios
 
 	ret
 	
-;.font
-;binary "../stdio/ansi/FONT8.BIN"
+.font
+binary "../stdio/ansi/FONT8.BIN"
 
 ENDIF
