@@ -1,0 +1,76 @@
+
+
+
+	MODULE	Issue_452_struct
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+	ld	hl,0	;const
+	push	hl
+	add	hl,sp
+	call	l_gint	;
+	ld	bc,4
+	add	hl,bc
+	ld	b,h
+	ld	c,l
+	ld	hl,1	;const
+	ld	de,0
+	call	l_plong
+	pop	bc
+	ret
+
+
+
+._func2
+	SECTION	data_compiler
+._st_func2_ctx
+	defw	0
+	SECTION	code_compiler
+	ld	hl,(_st_func2_ctx)
+	ld	bc,4
+	add	hl,bc
+	ld	b,h
+	ld	c,l
+	ld	hl,1	;const
+	ld	de,0
+	call	l_plong
+	ret
+
+
+
+._func3
+	ld	hl,65432	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,4	;const
+	add	hl,sp
+	ld	b,h
+	ld	c,l
+	ld	hl,1	;const
+	ld	de,0
+	call	l_plong
+	ld	hl,104	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func1
+	GLOBAL	_func2
+	GLOBAL	_func3
+
+
+
+

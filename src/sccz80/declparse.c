@@ -1347,7 +1347,7 @@ static void declfunc(Type *type, enum storage_type storage)
 
             utstring_new(str);
 
-            if ( strlen(ptype->name) == 0 || ptype->name[0] == '0') {
+            if ( (strlen(ptype->name) == 0 || ptype->name[0] == '0') && ptype->kind != KIND_ELLIPSES) {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
             } 
@@ -1370,7 +1370,7 @@ static void declfunc(Type *type, enum storage_type storage)
 
             utstring_new(str);
             
-            if ( strlen(ptype->name) == 0  || ptype->name[0] == '0') {
+            if ( (strlen(ptype->name) == 0  || ptype->name[0] == '0') && ptype->kind != KIND_ELLIPSES) {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
             }

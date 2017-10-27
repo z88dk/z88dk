@@ -604,7 +604,8 @@ int heirb(LVALUE* lval)
                     cscale(lval->ltype, &val);
                     val += lval->offset;
                     
-                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY) {
+
+                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY && ptr->ctype->kind != KIND_PTR) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
@@ -717,10 +718,9 @@ int heirb(LVALUE* lval)
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
-                if (ispointer(lval->ltype) ) {
+                if (ispointer(lval->ltype)) {
                     lval->ptr_type = lval->ltype->ptr->kind;
                     /* djm */
-
                     // TODO
                   //  if (ptr->flags & FARPTR) {
                        // lval->indirect_kind = KIND_INT;
@@ -731,11 +731,13 @@ int heirb(LVALUE* lval)
                     // }
                 }
                 if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
+                    lval->indirect_kind = lval->ltype->ptr->kind;
                     /* array or struct */
                     // TODO
                  //   lval->ptr_type = ptr->type;
                     /* djm Long pointers here? */
-
+                 //   lval->ptr_type = lval->ltype->kind;
+                 //   lval->val_type = KIND_PTR;
                     //lval->val_type = ((ptr->flags & FARPTR) ? KIND_CPTR : KIND_INT);
                     k = 0;
                 } else
