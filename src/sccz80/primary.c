@@ -346,6 +346,17 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
             }
             lval->val_type = KIND_LONG;
         }
+        return;
+    }
+
+    // Sign mismatch
+    if ( lval->ltype->isunsigned != lval2->ltype->isunsigned ) {
+        // Longs considered above
+        if ( lval->val_type == KIND_CHAR ) {
+            lval->ltype = type_uchar;
+        } else if ( lval->val_type == KIND_INT ) {
+            lval->ltype = type_uint;
+        }
     }
 }
 

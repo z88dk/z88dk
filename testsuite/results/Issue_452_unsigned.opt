@@ -1,0 +1,92 @@
+
+
+
+	MODULE	Issue_452_unsigned
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func_char
+	ld	hl,#(( (0 % 256) * 256) + (0 % 256))
+	push	hl
+	ld	hl,1	;const
+	call	l_gcharspsp	;
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gchar
+	pop	de
+	call	l_div
+	pop	bc
+	ret
+
+
+
+._func_char2
+	ld	hl,#(( (0 % 256) * 256) + (0 % 256))
+	push	hl
+	ld	hl,1	;const
+	call	l_gcharspsp	;
+	ld	hl,2	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	call	l_div_u
+	pop	bc
+	ret
+
+
+
+._func_int
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	pop	de
+	call	l_div
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func_int2
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	pop	de
+	call	l_div_u
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func_char
+	GLOBAL	_func_char2
+	GLOBAL	_func_int
+	GLOBAL	_func_int2
+
+
+
+
