@@ -1,14 +1,30 @@
 
 INCLUDE "config_private.inc"
 
-SECTION rodata_common1_data
+;------------------------------------------------------------------------------
+; start of definitions
+;------------------------------------------------------------------------------
 
-PHASE   __COMMON_AREA_1_PHASE_DATA
+EXTERN  __register_sp
+
+; start of the Transitory Program Area (TPA) Control Block for BANK1 through BANK12
+; this area is Flash (essentially ROM) for BANK0, BANK13, BANK14, & BANK15, and
+; can't be easily written
+;
+; TCB is from 0x003B through to 0x005B
+  
+PUBLIC  bios_sp, bank_sp
+
+defc    bios_sp     = __register_sp ; yabios SP here when other banks running
+defc    bank_sp     =   $003B       ; bank local SP storage, in Page0 TCB
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - page aligned data
 ;------------------------------------------------------------------------------
 
+SECTION rodata_common1_data
+
+PHASE   __COMMON_AREA_1_PHASE_DATA
 
 PUBLIC APUCMDBuf, APUDATABuf
 
@@ -17,13 +33,13 @@ APUDATABuf:     defs    __APU_DATA_SIZE
 
 PUBLIC asci0RxBuffer, asci0TxBuffer
 
-asci0RxBuffer:   defs   __ASCI0_RX_SIZE ; Space for the Rx0 Buffer
-asci0TxBuffer:   defs   __ASCI0_TX_SIZE ; Space for the Tx0 Buffer
+asci0RxBuffer:  defs    __ASCI0_RX_SIZE ; Space for the Rx0 Buffer
+asci0TxBuffer:  defs    __ASCI0_TX_SIZE ; Space for the Tx0 Buffer
 
 PUBLIC asci1RxBuffer, asci1TxBuffer
 
-asci1RxBuffer:   defs   __ASCI1_RX_SIZE ; Space for the Rx1 Buffer
-asci1TxBuffer:   defs   __ASCI1_TX_SIZE ; Space for the Tx1 Buffer
+asci1RxBuffer:  defs    __ASCI1_RX_SIZE ; Space for the Rx1 Buffer
+asci1TxBuffer:  defs    __ASCI1_TX_SIZE ; Space for the Tx1 Buffer
 
 ; optionally, pad to next 256 byte boundary
 
@@ -35,13 +51,21 @@ ENDIF
 ; start of common area 1 - non aligned data
 ;------------------------------------------------------------------------------
 
-PUBLIC shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
+PUBLIC shadowLock, prt0Lock, prt1Lock, dmac0Lock, dmac1Lock, csioLock
 
-shadowLock:     defb    $FE             ; mutex for alternate register mutex
-dmac0Lock:      defb    $FE             ; mutex for DMAC0
-dmac1Lock:      defb    $FE             ; mutex for DMAC1
+shadowLock:     defb    $FE             ; mutex for alternate registers
 prt0Lock:       defb    $FE             ; mutex for PRT0 
 prt1Lock:       defb    $FE             ; mutex for PRT1
+dmac0Lock:      defb    $FE             ; mutex for DMAC0
+dmac1Lock:      defb    $FE             ; mutex for DMAC1
+csioLock:       defb    $FE             ; mutex for CSI/O
+
+PUBLIC bankLockBase
+
+bankLockBase:   defs    $10, $00        ; base address for 16 BANK locks
+                                        ; $00 = BANK cold (uninitialised)
+                                        ; $FE = BANK available to be entered
+                                        ; $FF = BANK locked (active thread)
 
 PUBLIC __system_time_fraction, __system_time
 

@@ -39,8 +39,8 @@ SECTION code_crt_init
     OUT0    (BBR),A
 
                             ; set up COMMON_AREA_1 Data
-    EXTERN __rodata_common1_data_head
-    EXTERN __rodata_common1_data_size
+    EXTERN  __rodata_common1_data_head
+    EXTERN  __rodata_common1_data_size
 
                             ; load the DMA engine registers with source, destination, and count
     xor     a               ; using BANK0
@@ -64,8 +64,8 @@ SECTION code_crt_init
                             ; in burst mode the Z180 CPU stops until the DMA completes
 
                             ; set up COMMON_AREA_1 Drivers
-    EXTERN __rodata_common1_driver_head
-    EXTERN __rodata_common1_driver_size
+    EXTERN  __rodata_common1_driver_head
+    EXTERN  __rodata_common1_driver_size
 
                             ; load the DMA engine registers with source, destination, and count
     xor     a               ; using BANK0
@@ -101,10 +101,14 @@ SECTION code_crt_init
     ld      a, TCR_TIE0|TCR_TDE0
     out0    (TCR), a        ; using the driver/z180/system_tick.asm
 
-    EXTERN _asci0_init
-    call _asci0_init        ; initialise the asci0
+    EXTERN  _asci0_init
+    call    _asci0_init     ; initialise the asci0
 
-    EXTERN _asci1_init    
-    call _asci1_init        ; and the asci1 interfaces
+    EXTERN  _asci1_init    
+    call    _asci1_init     ; and the asci1 interfaces
+    
+    EXTERN  bankLockBase    ; lock BANK0 whilst the yabios CLI is running
+    ld      hl, bankLockBase
+    ld      (hl), $FF
 
 ENDIF

@@ -9,32 +9,305 @@ PHASE   __COMMON_AREA_1_PHASE_DRIVER
 ; start of common area 1 - RST functions
 ;------------------------------------------------------------------------------
 
+EXTERN shadowLock, bankLockBase
+EXTERN bios_sp, bank_sp
+
+;------------------------------------------------------------------------------
+
 PUBLIC asm_z180_trap
-asm_z180_trap:                  ; RST  0 - also handle an application restart
+asm_z180_trap:          ; RST  0 - also handle an application restart
     ret
+
+;------------------------------------------------------------------------------
 
 PUBLIC asm_error_handler_rst
-asm_error_handler_rst:          ; RST  8
+asm_error_handler_rst:  ; RST  8
     ret
+
+;------------------------------------------------------------------------------
 
 PUBLIC asm_far_call_rst
-asm_far_call_rst:               ; RST 10
+asm_far_call_rst:       ; RST 10
+    push hl
+    ld hl, shadowLock
+
+far_call_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, far_call_try_alt_lock ; just keep trying
+    pop hl
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    pop hl              ; get the return PC address
+    ld e, (hl)          ; get called address in DE
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld c, (hl)          ; get called bank in C
+    inc hl
+    push hl             ; push the post far_call ret address back on stack
+
+    in0 b, (BBR)        ; get the origin bank
+    srl b               ; move the origin bank to low nibble
+    srl b
+    srl b
+    srl b               ; save origin bank in address format in B
+    
+    ld a, b             ; and put absolute origin bank in A
+    add a, c            ; create destination far address, from twos complement relative input
+    and a, $0F          ; convert it to 4 bit address (not implicit here)
+    ld c, a             ; hold absolute destination bank in C
+
+    ld hl, bankLockBase ; get the BANK Lock Base
+    add a, l
+    ld l, a             ; make reference into BANKnn Lock
+
+    xor a
+    and (hl)            ; check bank is not cold
+    jr Z, far_call_exit
+    sra (hl)            ; now get the bank lock,
+    jr C, far_call_exit ; or exit if the bank is hot
+    
+                        ; OK we're going somewhere nice and warm,
+                        ; now make the bank switch
+    di
+    ld (bank_sp), sp    ; save the origin bank SP in Page0
+    out0 (BBR), c       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the new SP in new Page0
+    ei
+                        ; now prepare for our return
+    push bc             ; push on the origin, and destination bank
+    
+    ld hl, far_ret
+    push hl             ; push far_call return address
+
+    push de             ; push our destination address
+    
+far_call_exit:
+    exx
+    ex af,af            ; alt register are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
+    ret                 ; takes us out if there's error, or call onwards if success
+
+
+far_ret:                ; we land back here once the far_call function is done
+    push hl
+    ld hl, shadowLock
+
+far_ret_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, far_ret_try_alt_lock ; just keep trying
+    pop hl
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    pop bc              ; get return (origin) bank in B, and departing (destination) in C
+
+                        ; we left our origin bank locked
+    di                        
+    ld (bank_sp), sp    ; save the departing bank SP in Page0
+    out0 (BBR), b       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the originating SP in old Page0
+    ei
+
+    ld a, c
+    ld hl, bankLockBase ; get the BANK Lock Base
+    add a, l            ; make reference to BANKnn Lock
+    ld l, a
+    ld (hl), $FE        ; free the departing bank
+
+    exx
+    ex af,af            ; alt registers are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
     ret
 
-PUBLIC asm_am9511a_rst
-asm_am9511a_rst:                ; RST 18
-    ret
+;------------------------------------------------------------------------------
+
+PUBLIC asm_far_jp_rst
+asm_far_jp_rst:         ; RST 18
+    push hl
+    ld hl, shadowLock
+
+far_jp_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, far_jp_try_alt_lock ; just keep trying
+    pop hl
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    pop hl              ; get the return PC address
+    ld e, (hl)          ; get called address in DE
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld c, (hl)          ; get called bank in C
+    inc hl
+    push hl             ; push the post far_call ret address back on stack
+
+    in0 b, (BBR)        ; get the origin bank
+    srl b               ; move the origin bank to low nibble
+    srl b
+    srl b
+    srl b               ; save origin bank in address format in B
+    
+    ld a, b             ; and put absolute origin bank in A
+    add a, c            ; create destination far address, from twos complement relative input
+    and a, $0F          ; convert it to 4 bit address (not implicit here)
+    ld c, a             ; hold absolute destination bank in C
+
+    ld hl, bankLockBase ; get the BANK Lock Base
+    add a, l
+    ld l, a             ; make reference into BANKnn Lock
+
+    xor a
+    and (hl)            ; check bank is not cold
+    jr Z, far_jp_exit
+    sra (hl)            ; now get the bank lock,
+    jr C, far_jp_exit ; or exit if the bank is hot
+    
+                        ; OK we're going somewhere nice and warm,
+                        ; now make the bank switch
+    di
+    ld (bank_sp), sp    ; save the origin bank SP in Page0
+    out0 (BBR), c       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the destination bank SP in new Page0
+    ei
+
+    push de             ; push our destination address for ret jp
+
+    ld a, b
+    ld hl, bankLockBase ; get the BANK Lock Base
+    add a, l            ; make reference to BANKnn Lock
+    ld l, a
+    ld (hl), $FE        ; free the origin bank, we're not coming back
+
+far_jp_exit:
+    exx
+    ex af,af            ; alt register are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
+    ret                 ; takes us out if there's error, or jp onwards if success
+
+;------------------------------------------------------------------------------
 
 PUBLIC asm_system_rst
-asm_system_rst:                 ; RST 20
+asm_system_rst:         ; RST 20
+    push hl
+    ld hl, shadowLock
+
+system_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, system_try_alt_lock ; just keep trying
+    pop hl
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    pop hl              ; get the return PC address
+    ld e, (hl)          ; get called address in DE
+    inc hl
+    ld d, (hl)
+    inc hl
+    push hl             ; push the post far_call ret address back on stack
+
+    in0 b, (BBR)        ; get the origin bank
+    srl b               ; move the origin bank to low nibble
+    srl b
+    srl b
+    srl b               ; save origin bank in address format in B
+    
+    ld c, 0             ; hold absolute destination, BANK0, in C
+
+    ld hl, bankLockBase ; get the bank Lock Base, for BANK0
+
+system_try_bios_lock:
+    sra (hl)            ; now get the bios bank lock,
+    jr C, system_try_bios_lock   ; or keep trying if bios bank is hot
+
+                        ; now make the bank switch
+    di
+    ld (bank_sp), sp    ; save the origin bank SP in Page0
+    out0 (BBR), c       ; make the bank swap
+    ld sp, (bios_sp)    ; set up the bios SP
+    ei
+                        ; now prepare for our return
+    push bc             ; push on the origin bank in B
+    inc sp
+    
+    ld hl, system_ret
+    push hl             ; push system_ret return address
+
+    push de             ; push our destination address
+    
+system_exit:
+    exx
+    ex af,af            ; alt register are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
+    ret                 ; takes us out if there's error, or call to yabios if success
+
+
+system_ret:             ; we land back here once the yabios call is done
+    push hl
+    ld hl, shadowLock
+
+system_ret_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, system_ret_try_alt_lock ; just keep trying
+    pop hl
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    dec sp
+    pop bc              ; get return (origin) bank in B
+
+                        ; we left our origin bank locked
+    di                        
+    ld (bios_sp), sp    ; save the departing bios SP
+    out0 (BBR), b       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the originating SP in old Page0
+    ei
+
+    ld hl, bankLockBase ; get the bank Lock Base, for BANK0
+    ld (hl), $FE        ; free the departing bios bank
+
+    exx
+    ex af,af            ; alt registers are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
     ret
+
+;------------------------------------------------------------------------------
+
+PUBLIC asm_am9511a_rst
+asm_am9511a_rst:                ; RST 28
+    ret
+
+;------------------------------------------------------------------------------
 
 PUBLIC asm_user_rst
-asm_user_rst:                   ; RST 28
-    ret
-
-PUBLIC asm_fuzix_rst
-asm_fuzix_rst:                  ; RST 30
+asm_user_rst:                   ; RST 30
     ret
 
 ;------------------------------------------------------------------------------
@@ -43,6 +316,7 @@ asm_fuzix_rst:                  ; RST 30
 
 EXTERN shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
 
+;------------------------------------------------------------------------------
 ; far void *far_memcpy(far void *str1, const far void *str2, size_t n)
 ;
 ; str1 - This is a pointer to the destination array where the content is to be
@@ -204,7 +478,7 @@ far_memcpy_left_right:
     ld (dmac0Lock), a   ; give DMAC0 free
     ret
 
-
+;------------------------------------------------------------------------------
 ; far void *far_memset(far void *str, int c, size_t n)
 ;
 ; str − This is a pointer to the block of memory to fill,
@@ -1334,6 +1608,51 @@ l_mult_h:
     add hl,bc   ; add in the MSB product        / 11
     ret
 
+; int32_t mult(int16_t x, int16_t y);
+
+PUBLIC _mult
+
+_mult:
+    ld  hl,2
+    add hl,sp
+    ld  e,(hl)  ; e = xl
+    inc hl
+    ld  d,(hl)  ; d = xh
+    inc hl
+    ld  a,(hl)  ; a = yl
+    inc hl
+    ld  h,(hl)  ; h = yh
+    ld  l,a     ; l = a = yl
+
+l_mult:
+    ld  a,d     ; a = xh        /  4
+    ld  d,h     ; d = yh        /  4
+    ld  h,a     ; h = xh        /  4
+    ld  c,d     ; c = xh        /  4
+    ld  b,h     ; b = yh        /  4
+    push bc     ;               / 11
+    ld  c,e     ; c = xl        /  4
+    ld  b,l     ; b = yl        /  4
+
+    mlt de      ; yh * xl       / 17
+    mlt hl      ; xh * yl       / 17
+    add hl,de   ; add cross products            / 11
+
+    ld  e,h     ; MSB yh * xl + xh * yl         /  4
+    ld  h,l     ; LSB yh * xl + xh * yl         /  4
+    ld  l,0     ; 0 LSB                         /  7
+    ld  d,l     ; 0 MSB                         /  4
+
+    mlt bc      ; LSB product yl * xl           / 17
+    add hl,bc   ; add LSB X to LSB product      / 11
+    ex de, hl   ; move LSW to DE, MSB X to HL   /  4
+
+    pop bc      ;                               / 10    
+    mlt bc      ; MSB product yh * xh           / 17    
+
+    adc hl,bc   ; add MSB X to MSB product + C  / 15
+    ex de, hl   ; move MSW to DE, LSW to HL     /  4
+    ret
 
 ;==============================================================================
 ;       DEBUGGING SUBROUTINES

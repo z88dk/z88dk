@@ -12,10 +12,10 @@ SECTION code_crt_start
    bank_cpm_iobyte:        defb $00
    bank_cpm_default_drive: defb $00
 
-   PUBLIC bank_cpm_bdos
+   PUBLIC bank_cpm_bdos_jp
    PUBLIC bank_cpm_bdos_addr
 
-   bank_cpm_bdos:
+   bank_cpm_bdos_jp:
    jp __Start       ; main entry to the CP/M BDOS when in banked page0
 
    defc bank_cpm_bdos_addr = ASMPC - 2
@@ -334,7 +334,7 @@ ENDIF
 
    defc __page_zero_present = 1   
 
-   PUBLIC bank_start_addr
+   PUBLIC bank_tpa_start
 
-   bank_start_addr:
+   bank_tpa_start:
 
