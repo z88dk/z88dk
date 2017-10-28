@@ -1225,6 +1225,7 @@ void quikmult(int type, int32_t size, char preserve)
         return;
     }
 
+
     // KIND_INT here
     // ZXN: ld de,nnnn ; mul = 14T
     if ( c_cpu & CPU_Z80ZXN ) {
@@ -1460,6 +1461,12 @@ void mult(LVALUE* lval)
         callrts("dmul");
         Zsp += 6;
         break;
+    case KIND_CHAR:
+        if ( lval->ltype->isunsigned && c_cpu == CPU_Z180 ) {
+            ot("ld\th,e\n");
+            ot("mlt\thl\n");
+            break;
+        }
     default:
         if ( c_cpu == CPU_Z80ZXN ) {
             ol("mul");

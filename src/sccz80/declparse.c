@@ -1115,8 +1115,10 @@ void flags_describe(int32_t flags, UT_string *output)
 
 void type_describe(Type *type, UT_string *output)
 {
+    char tail[100];
     int  i;
 
+    tail[0] = 0;
     if ( type->ptr )
         type_describe(type->ptr,output);
 
@@ -1146,6 +1148,8 @@ void type_describe(Type *type, UT_string *output)
         utstring_printf(output,"double ");
         break;
     case KIND_ARRAY:
+        snprintf(tail, sizeof(tail),"[%d]",type->len);
+        break;
     case KIND_PTR:
     case KIND_CPTR:
         utstring_printf(output,"*");
@@ -1171,7 +1175,7 @@ void type_describe(Type *type, UT_string *output)
     case KIND_CARRY:
         break;
     }
-    utstring_printf(output,"%s",type->name);
+    utstring_printf(output,"%s%s",type->name,tail);
     return;
 }
 

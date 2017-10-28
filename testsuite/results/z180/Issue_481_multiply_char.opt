@@ -1,0 +1,91 @@
+
+
+
+	MODULE	z180_Issue_481_multiply_char
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func0
+	push	bc
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gchar
+	pop	de
+	ld	h,e
+	mlt	hl
+	pop	bc
+	ret
+
+
+
+._func1
+	push	bc
+	ld	hl,0	;const
+	call	l_gcharspsp	;
+	ld	hl,3	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	ld	h,e
+	mlt	hl
+	pop	bc
+	ret
+
+
+
+._func2
+	push	bc
+	dec	sp
+	ld	hl,2	;const
+	add	hl,sp
+	ld	e,(hl)
+	ld	d,0
+	pop	hl
+	push	hl
+	call	l_mult
+	inc	sp
+	pop	bc
+	ret
+
+
+
+._func3
+	push	bc
+	dec	sp
+	pop	de
+	push	de
+	ld	hl,+(4 - 2)	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	call	l_mult
+	inc	sp
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func0
+	GLOBAL	_func1
+	GLOBAL	_func2
+	GLOBAL	_func3
+
+
+
+
