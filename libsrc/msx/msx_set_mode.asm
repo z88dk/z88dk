@@ -98,7 +98,7 @@ txt32:
 
 	ld	hl,font
 	ld	de,0			; SCREEN 1 character pattern table
-	ld	bc,768
+	ld	bc,2048
 	ld	ix,LDIRVM
 	call	msxbios
 
