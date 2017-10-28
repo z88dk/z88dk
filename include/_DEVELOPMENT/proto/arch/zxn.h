@@ -190,19 +190,19 @@ struct zxtapehdr
 #define ZXT_TYPE_HEADER  0
 #define ZXT_TYPE_DATA    0xff
 
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_load_block,void *dst,unsigned int len,unsigned char type)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_save_block,void *src,unsigned int len,unsigned char type)
-__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,,zx_tape_verify_block,void *dst,unsigned int len,unsigned char type)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,zx_tape_load_block,void *dst,unsigned int len,unsigned char type)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,zx_tape_save_block,void *src,unsigned int len,unsigned char type)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,zx_tape_verify_block,void *dst,unsigned int len,unsigned char type)
 
 // Timex Video Mode
 
 #define TVM_SPECTRUM   0       // 256x192 pix, 32x24 attr
 #define TVM_HICOLOR    2       // 256x192 pix, 32x192 attr
-#define TVM_HIRES      6       // 512x192 pix
+#define TVM_HIRES      6       // 512x192 pix or with paper colour
 
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,ts_vmod,unsigned char mode)
 
-// miscellaneous
+// miscellaneous - spectrum display
 
 __DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',void,,zx_border,unsigned char colour)
 __DPROTO(`iyl,iyh',`iyl,iyh',void,,zx_cls,unsigned char attr)
@@ -236,6 +236,70 @@ __DPROTO(,,void,,zx_visit_wc_pix,struct r_Rect8 *r,`void (*visit)(unsigned char 
 
 __DPROTO(,,void,,zx_visit_wc_attr,struct r_Rect8 *r,void *visit)
 __DPROTO(,,void,,zx_visit_wc_pix,struct r_Rect8 *r,void *visit)
+
+#endif
+
+// miscellaneous - timex hi-colour display
+
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshc_cls,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshc_cls_attr,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshc_cls_pix,unsigned char pix)
+__DPROTO(,,void,,tshc_cls_wc,struct r_Rect8 *r,unsigned char attr)
+__DPROTO(,,void,,tshc_cls_wc_attr,struct r_Rect8 *r,unsigned char attr)
+__DPROTO(,,void,,tshc_cls_wc_pix,struct r_Rect8 *r,unsigned char pix)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshc_scroll_up,unsigned char rows,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshc_scroll_up_attr,unsigned char rows,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshc_scroll_up_pix,unsigned char rows,unsigned char pix)
+__DPROTO(,,void,,tshc_scroll_wc_up,struct r_Rect8 *r,unsigned char rows,unsigned char attr)
+__DPROTO(,,void,,tshc_scroll_wc_up_attr,struct r_Rect8 *r,unsigned char rows,unsigned char attr)
+__DPROTO(,,void,,tshc_scroll_wc_up_pix,struct r_Rect8 *r,unsigned char rows,unsigned char pix)
+
+#ifdef __CLANG
+
+__DPROTO(,,void,,tshc_visit_wc_attr,struct r_Rect8 *r,`void (*visit)(unsigned char *)')
+__DPROTO(,,void,,tshc_visit_wc_pix,struct r_Rect8 *r,`void (*visit)(unsigned char *)')
+
+#endif
+
+#ifdef __SDCC
+
+__DPROTO(,,void,,tshc_visit_wc_attr,struct r_Rect8 *r,`void (*visit)(unsigned char *)')
+__DPROTO(,,void,,tshc_visit_wc_pix,struct r_Rect8 *r,`void (*visit)(unsigned char *)')
+
+#endif
+
+#ifdef __SCCZ80
+
+__DPROTO(,,void,,tshc_visit_wc_attr,struct r_Rect8 *r,void *visit)
+__DPROTO(,,void,,tshc_visit_wc_pix,struct r_Rect8 *r,void *visit)
+
+#endif
+
+// miscellaneous - timex hi-res display
+
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshr_cls,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshr_cls_attr,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshr_cls_pix,unsigned char pix)
+__DPROTO(,,void,,tshr_cls_wc_pix,struct r_Rect8 *r,unsigned char pix)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshr_scroll_up,unsigned char rows,unsigned char attr)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,tshr_scroll_up_pix,unsigned char rows,unsigned char pix)
+__DPROTO(,,void,,tshr_scroll_wc_up_pix,struct r_Rect8 *r,unsigned char rows,unsigned char pix)
+
+#ifdef __CLANG
+
+__DPROTO(,,void,,tshr_visit_wc_pix,struct r_Rect8 *r,`void (*visit)(unsigned char *)')
+
+#endif
+
+#ifdef __SDCC
+
+__DPROTO(,,void,,tshr_visit_wc_pix,struct r_Rect8 *r,`void (*visit)(unsigned char *)')
+
+#endif
+
+#ifdef __SCCZ80
+
+__DPROTO(,,void,,tshr_visit_wc_pix,struct r_Rect8 *r,void *visit)
 
 #endif
 
@@ -291,8 +355,8 @@ __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_py2saddr,unsigne
 __DPROTO(`b,c,d,e,l,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddr2aaddr,void *saddr)
 __DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_saddr2cx,void *saddr)
 __DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_saddr2cy,void *saddr)
-__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zx_saddr2px,void *saddr)
-__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zx_saddr2py,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_saddr2px,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zx_saddr2py,void *saddr)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcdown,void *saddr)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcleft,void *saddr)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrcright,void *saddr)
@@ -302,14 +366,65 @@ __DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,zx_saddrpleft,void *saddr,u
 __DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,zx_saddrpright,void *saddr,unsigned char bitmask)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,zx_saddrpup,void *saddr)
 
-// display timex hi-color mode (256x192 pix, 32x192 attr)
+// Timex Hi-Colour Display 256x192 pixel 32x192 colour
 
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_aaddr2cx,void *aaddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_aaddr2cy,void *aaddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_aaddr2px,void *aaddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_aaddr2py,void *aaddr)
+__DPROTO(`a,b,c,d,e,l,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddr2saddr,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddrcdown,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddrcleft,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddrcright,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddrcup,void *aaddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddrpdown,void *aaddr)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,tshc_aaddrpleft,void *aaddr,unsigned char bitmask)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,tshc_aaddrpright,void *aaddr,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_aaddrpup,void *aaddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_bitmask2px,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_cxy2aaddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_cxy2saddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_cy2aaddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_cy2saddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_px2bitmask,unsigned char x)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_pxy2aaddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_pxy2saddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_py2aaddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_py2saddr,unsigned char y)
+__DPROTO(`a,b,c,d,e,l,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddr2aaddr,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_saddr2cx,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_saddr2cy,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_saddr2px,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshc_saddr2py,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddrcdown,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddrcleft,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddrcright,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddrcup,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddrpdown,void *saddr)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,tshc_saddrpleft,void *saddr,unsigned char bitmask)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,tshc_saddrpright,void *saddr,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshc_saddrpup,void *saddr)
 
+// Timex Hi-Res Display, 512x192 monochrome
 
-// display timex hi-res mode (512x192 pix)
-
-
-
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshr_bitmask2px,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_cxy2saddr,unsigned char x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_cy2saddr,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshr_px2bitmask,unsigned char x)
+__DPROTO(`iyl,iyh',`iyl,iyh',unsigned char,*,tshr_pxy2saddr,unsigned int x,unsigned char y)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_py2saddr,unsigned char y)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshr_saddr2cx,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshr_saddr2cy,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,tshr_saddr2px,void *saddr)
+__DPROTO(`b,c,d,e,h,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,tshr_saddr2py,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_saddrcdown,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_saddrcleft,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_saddrcright,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_saddrcup,void *saddr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_saddrpdown,void *saddr)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,tshr_saddrpleft,void *saddr,unsigned char bitmask)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned char,*,tshr_saddrpright,void *saddr,unsigned char bitmask)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,*,tshr_saddrpup,void *saddr)
 
 // graphics
 
