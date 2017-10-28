@@ -137,7 +137,6 @@ int agg_init(Type *type)
     int done = 0;
     int dim = type->len;
     int size = 0;
-    int lastsize = 0;
 
     while (dim) {
         if ( type->kind == KIND_ARRAY && type->ptr->kind == KIND_STRUCT ) {
@@ -147,15 +146,15 @@ int agg_init(Type *type)
             } else if ( cmatch('{') == 0 ) {
                 break;
             }
-            size += lastsize = str_init(type->ptr->tag);
+            size += str_init(type->ptr->tag);
             dim--;
             needchar('}');
         } else if ( type->ptr->kind == KIND_ARRAY ) {
             needchar('{');
-            size += lastsize = agg_init(type->ptr);
+            size += agg_init(type->ptr);
             needchar('}');
         } else {
-            size += lastsize = init(type->ptr,1);
+            size += init(type->ptr,1);
         }
         done++;
         if (cmatch(',') == 0)
@@ -166,8 +165,7 @@ int agg_init(Type *type)
         size += dumpzero(1, type->size - size);
     } else {
         type->size = size;
-        if ( lastsize != 0 )  
-            type->len = size / lastsize;
+        type->len = size / type->ptr->size;
     }
     return size;
 }
