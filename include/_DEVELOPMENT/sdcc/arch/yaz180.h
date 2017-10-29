@@ -7,6 +7,12 @@
 
 #include <arch.h>
 
+// provide the asci1 input and output stream instantiation
+// note that asci0 is attached to stdin and stdout
+
+extern FILE *linein;
+extern FILE *lineout;
+
 // Halt the YAZ180 with single step hardware.
 
 #define __BREAK  __BREAK_HELPER()

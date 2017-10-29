@@ -25,7 +25,7 @@ IF __CRTCFG = 0
 
    defc TAR__crt_model                 = 2
 
-   defc TAR__register_sp               = 0xFFC0
+   defc TAR__register_sp               = 0xFFDE
    defc TAR__crt_stack_size            = 512
 
    defc TAR__crt_initialize_bss        = 1
@@ -53,7 +53,7 @@ IF __CRTCFG = 0
    defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
 
-   defc TAR__clib_malloc_heap_size     = -1
+   defc TAR__clib_malloc_heap_size     = 4096
    defc TAR__clib_stdio_heap_size      = 128
 
    defc TAR__clib_balloc_table_size    = 0

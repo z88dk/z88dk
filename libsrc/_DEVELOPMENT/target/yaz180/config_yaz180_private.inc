@@ -262,6 +262,20 @@ defc __CPU_TIMER_SCALE = 20
 
    ; DMA REGISTER BIT FIELDS
 
+   defc DSTAT_DE1 = 0x80
+   defc DSTAT_DE0 = 0x40
+   defc DSTAT_DWE1 = 0x20
+   defc DSTAT_DWE0 = 0x10
+   defc DSTAT_DIE1 = 0x08
+   defc DSTAT_DIE0 = 0x04
+   defc DSTAT_DME = 0x01
+
+   defc DMODE_DM1 = 0x20
+   defc DMODE_DM0 = 0x10
+   defc DMODE_SM1 = 0x08
+   defc DMODE_SM0 = 0x04
+   defc DMODE_MMOD = 0x02
+
    defc DCNTL_MWI1 = 0x80
    defc DCNTL_MWI0 = 0x40
    defc DCNTL_IWI1 = 0x20
