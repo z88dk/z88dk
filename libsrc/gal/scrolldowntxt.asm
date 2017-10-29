@@ -1,5 +1,5 @@
 ;
-;	ZX81 libraries - Stefano
+;       Galaksija libraries
 ;
 ;----------------------------------------------------------------
 ;
@@ -12,27 +12,22 @@
         SECTION code_clib
     PUBLIC   scrolldowntxt
     PUBLIC   _scrolldowntxt
-    EXTERN    zx_topleft
 
 scrolldowntxt:
 _scrolldowntxt:
-IF FORlambda
-	ld	hl,16509
-ELSE
-	ld	hl,(16396)	; D_FILE
-ENDIF
-	ld	bc,33*24
+	ld	hl,$2800
+	ld	bc,32*16
 	add	hl,bc
-	ld	de,33
+	ld	de,32
 	push hl
 	add hl,de
 	pop de
 	ex de,hl
 	lddr
 	xor a
-	ld b,32
+	ld b,16
 blankline:
 	inc hl
 	ld (hl),a
 	djnz blankline
-	jp zx_topleft
+	ret

@@ -9,37 +9,527 @@ PHASE   __COMMON_AREA_1_PHASE_DRIVER
 ; start of common area 1 - RST functions
 ;------------------------------------------------------------------------------
 
-PUBLIC asm_z180_trap
-asm_z180_trap:                  ; RST  0 - also handle an application restart
+EXTERN shadowLock, bankLockBase
+EXTERN bios_sp, bank_sp
+
+;------------------------------------------------------------------------------
+
+PUBLIC _z180_trap_rst
+_z180_trap_rst:         ; RST  0 - also handle an application restart
     ret
 
-PUBLIC asm_error_handler_rst
-asm_error_handler_rst:          ; RST  8
+;------------------------------------------------------------------------------
+
+PUBLIC _error_handler_rst
+_error_handler_rst:     ; RST  8
+    pop de              ; pop originating address
+    call phexwdreg      ; and output it on serial port
+error_handler_loop:
+    call delay
+    jr error_handler_loop
+
+;------------------------------------------------------------------------------
+
+PUBLIC _far_call_rst
+_far_call_rst:          ; RST 10
+    push hl
+    ld hl, shadowLock
+far_call_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, far_call_try_alt_lock ; just keep trying
+    pop hl
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    pop hl              ; get the return PC address
+    ld e, (hl)          ; get called address in DE
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld c, (hl)          ; get called bank in C
+    inc hl
+    push hl             ; push the post far_call ret address back on stack
+
+    in0 b, (BBR)        ; get the origin bank
+    srl b               ; move the origin bank to low nibble
+    srl b
+    srl b
+    srl b               ; save origin bank in address format in B
+    
+    ld a, b             ; and put absolute origin bank in A
+    add a, c            ; create destination far address, from twos complement relative input
+    and a, $0F          ; convert it to 4 bit address (not implicit here)
+    ld c, a             ; hold absolute destination bank in C
+
+    ld hl, bankLockBase ; get the BANK Lock base address, page aligned
+    ld l, a             ; make the reference into BANKnn Lock
+
+    xor a
+    and (hl)            ; check bank is not cold
+    jr Z, far_call_exit
+    sra (hl)            ; now get the bank lock,
+    jr C, far_call_exit ; or exit if the bank is hot
+    
+                        ; OK we're going somewhere nice and warm,
+                        ; now make the bank switch
+    di
+    ld (bank_sp), sp    ; save the origin bank SP in Page0
+    out0 (BBR), c       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the new SP in new Page0
+    ei
+                        ; now prepare for our return
+    push bc             ; push on the origin and destination bank
+    
+    ld hl, far_ret
+    push hl             ; push far_ret function return address
+    push de             ; push our destination address
+    
+far_call_exit:
+    exx
+    ex af,af            ; alt register are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
+    ret                 ; takes us out if there's error, or call onwards if success
+
+
+far_ret:                ; we land back here once the far_call function returns
+    push hl
+    ld hl, shadowLock
+far_ret_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, far_ret_try_alt_lock ; just keep trying, can't give up
+    pop hl
+
+    exx
+
+    pop bc              ; get return (origin) bank in B, and departing (destination) in C
+
+                        ; we left our origin bank lock unchanged, so it is still locked
+    di                        
+    ld (bank_sp), sp    ; save the departing bank SP in Page0
+    out0 (BBR), b       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the originating SP in old Page0
+    ei
+
+    ld hl, bankLockBase ; get the BANK Lock Base, page aligned
+    ld l, c             ; make the reference to destination BANKnn Lock
+    ld (hl), $FE        ; free the bank we are now departing
+
+    exx                 ; alt registers are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
     ret
 
-PUBLIC asm_far_call_rst
-asm_far_call_rst:               ; RST 10
+;------------------------------------------------------------------------------
+
+PUBLIC _far_jp_rst
+_far_jp_rst:            ; RST 18
+    push de             ; save the jump destination from EHL    
+    push hl
+    
+    ld hl, shadowLock
+far_jp_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, far_jp_try_alt_lock ; just keep trying
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    pop de              ; get jump address in DE
+    pop bc              ; get relative jump bank in C  
+
+    in0 b, (BBR)        ; get the origin bank
+    srl b               ; move the origin bank to low nibble
+    srl b
+    srl b
+    srl b               ; save origin bank in address format in B
+    
+    ld a, b             ; and put absolute origin bank in A
+    add a, c            ; create destination far address, from twos complement relative input
+    and a, $0F          ; convert it to 4 bit address (not implicit here)
+    ld c, a             ; hold absolute destination bank in C
+
+    ld hl, bankLockBase ; get the BANK Lock base address, page aligned
+    ld l, c             ; make reference into BANKnn Lock
+
+    xor a
+    and (hl)            ; check bank is not cold
+    jr Z, far_jp_exit
+    sra (hl)            ; now get the bank lock,
+    jr C, far_jp_exit   ; or exit if the bank is hot
+    
+                        ; OK we're going somewhere nice and warm,
+                        ; now make the bank switch
+    di
+    ld (bank_sp), sp    ; save the origin bank SP in Page0
+    out0 (BBR), c       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the destination bank SP in new Page0
+    ei
+
+    push de             ; push our destination address for ret jp
+
+    ld hl, bankLockBase ; get the BANK Lock Base, page aligned
+    ld l, b             ; make reference to originating BANKnn Lock
+    ld (hl), $FE        ; free the origin bank, we're not coming back
+
+far_jp_exit:
+    exx
+    ex af,af            ; alt register are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
+    ret                 ; takes us out if there's error, or jp onwards if success
+
+;------------------------------------------------------------------------------
+
+PUBLIC _system_rst
+_system_rst:            ; RST 20
+    push hl
+    ld hl, shadowLock
+
+system_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, system_try_alt_lock ; just keep trying
+    pop hl
+
+    exx                 ; all your register are belong to us
+
+    pop hl              ; get the return PC address
+    ld e, (hl)          ; get called address in DE
+    inc hl
+    ld d, (hl)
+    inc hl
+    push hl             ; push the post system_rst return address back on stack
+
+    in0 b, (BBR)        ; get the origin bank
+    srl b               ; move the origin bank to low nibble
+    srl b
+    srl b
+    srl b               ; save origin bank in address format in B
+    
+    ld c, 0             ; hold absolute destination, BANK0, in C
+
+    ld hl, bankLockBase ; get the bank Lock Base, for BANK0
+
+system_try_bios_lock:
+    sra (hl)            ; now get the bios bank lock,
+    jr C, system_try_bios_lock   ; keep trying if bios bank is hot
+
+                        ; now make the bank switch
+    di
+    ld (bank_sp), sp    ; save the origin bank SP in Page0
+    out0 (BBR), c       ; make the bank swap, use C because out0 doesn't do immediate
+    ld sp, (bios_sp)    ; set up the bios SP
+    ei
+                        ; now prepare for our return
+    push bc             ; push on the origin bank in B
+    inc sp
+    
+    ld hl, system_ret
+    push hl             ; push system_ret return address
+
+    push de             ; push our destination address
+    
+system_exit:
+    exx                 ; alt register are returned
+                        ; we keep alt register mutex, as clib has to use alt registers
+
+    ret                 ; takes us out if there's error, or call into yabios if success
+
+
+system_ret:             ; we land back here once the yabios call is done
+    exx                 ; we still have alt register mutex
+
+    pop bc              ; get return (origin) bank in B
+    inc sp
+                        ; we left our origin bank locked
+    di                        
+    ld (bios_sp), sp    ; save the departing bios SP
+    out0 (BBR), b       ; make the bank swap
+    ld sp, (bank_sp)    ; set up the originating SP in old Page0
+    ei
+
+    ld hl, bankLockBase ; get the bank Lock Base, for BANK0
+    ld (hl), $FE        ; free the departing bios bank
+
+    exx                 ; alt registers are returned
+
+    push hl
+    ld hl, shadowLock   ; give alt register mutex
+    ld (hl), $FE
+    pop hl
     ret
 
-PUBLIC asm_am9511a_rst
-asm_am9511a_rst:                ; RST 18
+;------------------------------------------------------------------------------
+
+PUBLIC _am9511a_rst
+_am9511a_rst:           ; RST 28
     ret
 
-PUBLIC asm_system_rst
-asm_system_rst:                 ; RST 20
-    ret
+;------------------------------------------------------------------------------
 
-PUBLIC asm_user_rst
-asm_user_rst:                   ; RST 28
-    ret
-
-PUBLIC asm_fuzix_rst
-asm_fuzix_rst:                  ; RST 30
+PUBLIC _user_rst
+_user_rst:              ; RST 30
     ret
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - system functions
 ;------------------------------------------------------------------------------
+
+EXTERN shadowLock, dmac0Lock, dmac1Lock, prt0Lock, prt1Lock
+
+;------------------------------------------------------------------------------
+; far void *far_memcpy(far void *str1, const far void *str2, size_t n)
+;
+; str1 - This is a pointer to the destination array where the content is to be
+;       copied, type-cast to a pointer of type far_void*.
+; str2 - This is a pointer to the source of data to be copied,
+;       type-cast to a pointer of type far_void*.
+; n    - This is the number of bytes to be copied.
+; 
+; This function returns a relative far void* to destination, which is str1, in EHL.
+
+; stack:
+;   n high
+;   n low
+;   str2 far
+;   str2 high
+;   str2 low
+;   str1 far
+;   str1 high
+;   str1 low
+;   ret high
+;   ret low
+
+
+PUBLIC _far_memcpy
+
+_far_memcpy:
+    ld hl, dmac0Lock
+    sra (hl)            ; take the DMAC0 lock
+    jr C, _far_memcpy
+
+    ld hl, 9
+    add hl, sp          ; pointing at nh bytes
+    ld b, (hl)          ; b = nh 
+    dec hl   
+    ld c, (hl)          ; c = nl
+
+    ld a, b             ; test for zero size, and exit
+    or a, c
+    ret Z               ; return on zero size
+
+    out0 (BCR0H), b     ; set up the transfer size   
+    out0 (BCR0L), c
+    push bc             ; save transfer size (again)
+
+    dec hl              ; pointing at str2 far
+
+    in0 b, (BBR)        ; get the current bank
+    srl b               ; move the current bank to low nibble
+    srl b
+    srl b
+    srl b               ; save current bank in address format
+    
+    ld a, b             ; and put it in a
+    add a, (hl)         ; create source relative far address, from twos complement input
+;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
+    ld c, a             ; hold source far address in c
+    out0 (SAR0B), c
+
+    dec hl
+    ld d, (hl)          ; get source high address in d
+    dec hl
+    ld e, (hl)          ; get source low address in e
+
+    dec hl              ; pointing at str1 far
+
+    ld a, b             ; get current bank in address format
+    add a, (hl)         ; create relative far destination address, from twos complement input
+;   and a, $0F          ; convert it to 4 bit positive address
+    ld b, a             ; hold far destination address in b
+    out0 (DAR0B), b
+
+    dec hl
+    ld a, (hl)          ; get destination high address in a (h)
+    dec hl
+    ld l, (hl)          ; get destination low address l
+    ld h, a             ; destination high address in h
+
+    ld a, c
+    cp b                ; check for bank dest < src
+    jr C, far_memcpy_left_right   ; if destination is lower bank, we do left right
+                        ; otherwise we need to check further
+
+    or a                ; clear carry
+    ex de, hl           ; now source in hl, destination in de
+    sbc hl, de          ; check whether destination address < source address
+    jr C, far_memcpy_left_right   ; if so we can do left to right copy
+
+far_memcpy_right_left:
+    adc hl, de          ; recover the source address
+    pop bc              ; get the size back
+    add hl, bc          ; add in the size to the source address
+    call C, far_memcpy_right_left_src_bank_overflow
+    dec hl              ; subtract one from source address
+    ex de, hl           ; swap source to de
+    add hl, bc          ; add in the size to the destination address
+    call C, far_memcpy_right_left_dest_bank_overflow
+    dec hl              ; subtract one from destination address
+    
+    out0 (SAR0H), d
+    out0 (SAR0L), e
+    out0 (DAR0H), h
+    out0 (DAR0L), l
+
+    ld bc, +(DMODE_DM0|DMODE_SM0|DMODE_MMOD)*$100+DSTAT_DE0
+    out0 (DMODE), b     ; DMODE_MMOD - memory-- to memory--, burst mode
+    out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                        ; in burst mode the Z180 CPU stops until the DMA completes
+
+    in0 b, (BBR)        ; recreate the destination bank pointer
+    srl b
+    srl b
+    srl b
+    srl b
+    in0 a, (DAR0B)      ; right to left so destination is base address
+    sub a, b            ; subtract the current bank, creating a relative bank
+    ld e, a             ; put it in e
+    in0 h, (DAR0H)      ; and now the destination address, post memcpy
+    in0 l, (DAR0L)
+
+    ld a, $FE
+    ld (dmac0Lock), a   ; give DMAC0 free
+    ret
+
+far_memcpy_right_left_src_bank_overflow:
+    in0 a, (SAR0B)
+    inc a
+    out0 (SAR0B), a
+    ret
+
+far_memcpy_right_left_dest_bank_overflow:
+    in0 a, (DAR0B)
+    inc a
+    out0 (DAR0B), a
+    ret
+
+far_memcpy_left_right:
+    adc hl, de          ; recover the source address
+    pop bc              ; get the size back, although we don't need it    
+    out0 (SAR0H), h
+    out0 (SAR0L), l
+    out0 (DAR0H), d
+    out0 (DAR0L), e
+    
+    in0 b, (BBR)        ; recreate the destination bank pointer
+    srl b
+    srl b
+    srl b
+    srl b
+    in0 a, (DAR0B)      ; left to right so destination before memcpy is base address
+    sub a, b            ; subtract the current bank, creating a relative bank
+    ld e, a             ; put the relative bank in e
+    ex de, hl           ; and swap the destination address into hl to return
+
+    ld bc, DMODE_MMOD*$100+DSTAT_DE0
+    out0 (DMODE), b     ; DMODE_MMOD - memory++ to memory++, burst mode
+    out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                        ; in burst mode the Z180 CPU stops until the DMA completes
+    ld a, $FE
+    ld (dmac0Lock), a   ; give DMAC0 free
+    ret
+
+;------------------------------------------------------------------------------
+; far void *far_memset(far void *str, int c, size_t n)
+;
+; str − This is a pointer to the block of memory to fill,
+;       type-cast to a pointer of type far_void*.
+; c   − This is the value to be set. The value is passed as an int, but the
+;       function fills the block of memory using the unsigned char conversion.
+; n   − This is the number of bytes to be set to the value.
+;
+; This function returns a relative far void* pointer to the memory area str in EHL.
+
+; stack:
+;   n high
+;   n low
+;   c high
+;   c low
+;   str far
+;   str high
+;   str low
+;   ret high
+;   ret low
+
+PUBLIC _far_memset
+
+_far_memset:
+    ld hl, dmac0Lock
+    sra (hl)            ; take the DMAC0 lock
+    jr C, _far_memset
+
+    ld hl, 8
+    add hl, sp          ; pointing at nh bytes
+    ld b, (hl)          ; b = nh 
+    dec hl   
+    ld c, (hl)          ; c = nl
+
+    ld a, b             ; test for zero size, and exit
+    or a, c
+    ret Z               ; return on zero size
+
+    out0 (BCR0H), b     ; set up the transfer size   
+    out0 (BCR0L), c
+    
+    dec hl
+    dec hl              ; pointing at c low byte
+ 
+    out0 (SAR0H), h     ; c low byte is source, address in hl
+    out0 (SAR0L), l
+    
+    dec hl              ; pointing at str far
+    ld b, (hl)          ; save the destination relative bank
+    
+    in0 a, (BBR)        ; get the current bank
+    srl a               ; move the current bank to low nibble
+    srl a
+    srl a
+    srl a               ; shift current bank to address format
+
+    out0 (SAR0B), a     ; use the current bank for the origin
+
+    add a, (hl)         ; create relative destination far address, from twos complement input
+;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
+    out0 (DAR0B), a
+
+    dec hl
+    ld d, (hl)          ; get destination high address in d
+    dec hl
+    ld e, (hl)          ; get destination low address in e
+
+    out0 (DAR0H), d
+    out0 (DAR0L), e
+
+    ld e, b             ; put the destination relative bank in e
+    ex de, hl           ; and swap the destination address into hl, to return
+
+    ld bc, +(DMODE_SM1|DMODE_MMOD)*$100+DSTAT_DE0
+    out0 (DMODE), b     ; DMODE_MMOD - memory00 to memory++, burst mode
+    out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                        ; in burst mode the Z180 CPU stops until the DMA completes
+    ld a, $FE
+    ld (dmac0Lock), a   ; give DMAC0 free
+    ret
 
 
 ;------------------------------------------------------------------------------
@@ -244,7 +734,6 @@ am9511a_isr_error:          ; we've an error to notify in A
 ;------------------------------------------------------------------------------  
 ;       Initialises the APU buffers
 ;
-;       HL = address of the jump table nmi address
 
 PUBLIC asm_am9511a_reset
 
@@ -1021,5 +1510,317 @@ asci1_clean_up_tx:
     out0 (STAT1), a             ; set the ASCI status register
 
     jp asm_z180_pop_ei_jp       ; critical section end
+
+;==============================================================================
+;       OTHER SUBROUTINES
+;
+
+; int16_t mult_l(int16_t x, int16_t y);
+
+PUBLIC _mult_l
+
+_mult_l:
+    ld  hl,2
+    add hl,sp
+    ld  e,(hl)  ; e = xl
+    inc hl
+    ld  d,(hl)  ; d = xh
+    inc hl
+    ld  a,(hl)  ; a = yl
+    inc hl
+    ld  h,(hl)  ; h = yh
+    ld  l,a     ; l = a = yl
+
+l_mult_l:
+    ld  a,d     ; a = xh        /  4
+    ld  d,h     ; d = yh        /  4
+    ld  h,a     ; h = xh        /  4
+    ld  c,e     ; c = xl        /  4
+    ld  b,l     ; b = yl        /  4
+    mlt de      ; yh * xl       / 17
+    mlt hl      ; xh * yl       / 17
+    add hl,de   ; add cross products            / 11
+    mlt bc      ; yl * xl                       / 17
+    ld  a,l     ; cross products LSB            /  4
+    add a,b     ; add to low MSB final          /  4
+    ld  h,a     ; move final result to hl       /  4
+    ld  l,c     ;                               /  4
+    ret
+
+
+; int16_t mult_h(int16_t x, int16_t y);
+
+PUBLIC _mult_h
+
+_mult_h:
+    ld  hl,2
+    add hl,sp
+    ld  e,(hl)  ; e = xl
+    inc hl
+    ld  d,(hl)  ; d = xh
+    inc hl
+    ld  a,(hl)  ; a = yl
+    inc hl
+    ld  h,(hl)  ; h = yh
+    ld  l,a     ; l = a = yl
+
+l_mult_h:
+    ld  a,d     ; a = xh        /  4
+    ld  d,h     ; d = yh        /  4
+    ld  h,a     ; h = xh        /  4
+    ld  c,d     ; c = xh        /  4
+    ld  b,h     ; b = yh        /  4
+    mlt de      ; yh * xl       / 17
+    mlt hl      ; xh * yl       / 17
+    add hl,de   ; add cross products            / 11
+    mlt bc      ; yh * xh                       / 17
+    ld  l,h     ; drop cross products LSB       /  4
+    ld  h,0
+    add hl,bc   ; add in the MSB product        / 11
+    ret
+
+; int32_t mult(int16_t x, int16_t y);
+
+PUBLIC _mult
+
+_mult:
+    ld  hl,2
+    add hl,sp
+    ld  e,(hl)  ; e = xl
+    inc hl
+    ld  d,(hl)  ; d = xh
+    inc hl
+    ld  a,(hl)  ; a = yl
+    inc hl
+    ld  h,(hl)  ; h = yh
+    ld  l,a     ; l = a = yl
+
+l_mult:
+    ld  a,d     ; a = xh        /  4
+    ld  d,h     ; d = yh        /  4
+    ld  h,a     ; h = xh        /  4
+    ld  c,d     ; c = xh        /  4
+    ld  b,h     ; b = yh        /  4
+    push bc     ;               / 11
+    ld  c,e     ; c = xl        /  4
+    ld  b,l     ; b = yl        /  4
+
+    mlt de      ; yh * xl       / 17
+    mlt hl      ; xh * yl       / 17
+    add hl,de   ; add cross products            / 11
+
+    ld  e,h     ; MSB yh * xl + xh * yl         /  4
+    ld  h,l     ; LSB yh * xl + xh * yl         /  4
+    ld  l,0     ; 0 LSB                         /  7
+    ld  d,l     ; 0 MSB                         /  4
+
+    mlt bc      ; LSB product yl * xl           / 17
+    add hl,bc   ; add LSB X to LSB product      / 11
+    ex de, hl   ; move LSW to DE, MSB X to HL   /  4
+
+    pop bc      ;                               / 10    
+    mlt bc      ; MSB product yh * xh           / 17    
+
+    adc hl,bc   ; add MSB X to MSB product + C  / 15
+    ex de, hl   ; move MSW to DE, LSW to HL     /  4
+    ret
+
+;==============================================================================
+;       DEBUGGING SUBROUTINES
+;
+
+PUBLIC delay
+PUBLIC rhexdwd, rhexwd, rhex
+PUBLIC phexdwd, phexwd, phex
+PUBLIC phexdwdreg, phexwdreg
+PUBLIC pstring, pnewline
+
+EXTERN _asci0_reset, _asci0_putchar, _asci0_putc, _asci0_getc
+
+;==============================================================================
+;       DELAY SUBROUTINES
+;
+
+delay:
+    push bc
+    ld b, $00
+delay_loop:
+    ex (sp), hl
+    ex (sp), hl
+    djnz delay_loop
+    pop bc
+    ret
+        
+;==============================================================================
+;       INPUT SUBROUTINES
+;
+
+rhexdwd:                        ; returns 4 bytes LE, to address in DE, with echo
+    push af
+    inc de
+    inc de
+    inc de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex     
+    pop af
+    ret
+
+rhexwd:                         ; returns 2 bytes LE, to address in DE, with echo
+    push af
+    inc de
+    call rhex
+    ld (de), a
+    call phex
+    dec de
+    call rhex
+    ld (de), a
+    call phex
+    pop af
+    ret
+
+rhex:                       ; Returns byte in a
+    push hl
+    call _asci0_getc        ; Rx byte in l
+    ld a, l
+    sub '0'
+    cp 10
+    jr C, rhexnbl2          ; if a<10 read the second nibble
+    sub 7                   ; else subtract 'A'-'0' (17) and add 10
+rhexnbl2:
+    rlca                    ; shift accumulator left by 4 bits
+    rlca
+    rlca
+    rlca
+    ld h, a                 ; temporarily store the first nibble in h
+    call _asci0_getc        ; Rx byte in l
+    ld a, l
+    sub '0'
+    cp 10
+    jr C, rhexend           ; if a<10 finalize
+    sub 7                   ; else subtract 'A' (17) and add 10
+rhexend:
+    or h                    ; assemble two nibbles into one byte in a
+    pop hl
+    ret                     ; return the byte read in a
+
+;==============================================================================
+;       OUTPUT SUBROUTINES
+;
+
+    ;print string
+pstring: 
+    ld a, (de)          ;Get character from DE address
+    or a                ;Is it $00 ?
+    ret Z               ;Then RETurn on terminator
+    ld l, a
+    call _asci0_putc    ;Print it
+    inc de              ;Point to next character 
+    jp pstring          ;Continue until $00
+
+    ;print CR/LF
+pnewline:
+    ld l, CHAR_CR
+    call _asci0_putc
+    ld l, CHAR_LF
+    call _asci0_putc
+    ret
+
+    ;print Double Word at address DE as 32 bit number in ASCII HEX
+phexdwd:
+    push af
+    inc de
+    inc de
+    inc de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    pop af
+    ret
+
+    ;print Word at address DE as 16 bit number in ASCII HEX
+phexwd:
+    push af
+    inc de
+    ld a, (de)
+    call phex
+    dec de
+    ld a, (de)
+    call phex
+    pop af
+    ret
+
+    ;print contents of DEHL as 32 bit number in ASCII HEX
+phexdwdreg:
+    push af
+    ld a, d
+    call phex
+    ld a, e
+    call phex
+    ld a, h
+    call phex
+    ld a, l
+    call phex
+    pop af
+    ret
+
+    ;print contents of DE as 16 bit number in ASCII HEX
+phexwdreg:
+    push af
+    ld a, h
+    call phex
+    ld a, l
+    call phex
+    pop af
+    ret
+
+    ;print contents of A as 8 bit number in ASCII HEX
+phex:
+    push hl
+    push af             ;store the binary value
+    rlca                ;shift accumulator left by 4 bits
+    rlca
+    rlca
+    rlca
+    and $0F             ;now high nibble is low position
+    cp 10
+    jr C, phex_b        ;jump if high nibble < 10
+    add a, 7            ;otherwise add 7 before adding '0'
+phex_b:
+    add a, '0'          ;add ASCII 0 to make a character
+    ld l, a
+    call _asci0_putc    ;print high nibble
+    pop af              ;recover the binary value
+phex1:
+    and $0F
+    cp 10
+    jr C, phex_c        ;jump if low nibble < 10
+    add a, 7
+phex_c:
+    add a, '0'
+    ld l, a
+    call _asci0_putc    ;print low nibble
+    pop hl
+    ret
 
 DEPHASE

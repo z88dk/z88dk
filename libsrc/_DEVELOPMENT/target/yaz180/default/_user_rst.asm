@@ -1,4 +1,4 @@
-PUBLIC _z180_rst_28h
-EXTERN asm_user_rst
+PUBLIC _z180_rst_30h
+EXTERN _user_rst
 
-defc _z180_rst_28h = asm_user_rst
+defc _z180_rst_30h = _user_rst

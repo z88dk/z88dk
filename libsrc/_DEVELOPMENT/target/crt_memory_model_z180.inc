@@ -12,10 +12,10 @@ org __crt_org_code
 IF (__crt_org_vector_table = -0x80) || (__crt_org_vector_table = -0x100)
 
 section interrupt_vectors
-section code_crt_start
 
 ENDIF
 
+section code_crt_start
 section code_crt_init
 section code_crt_main
 section code_crt_exit
