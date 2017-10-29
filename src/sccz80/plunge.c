@@ -327,7 +327,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 doconstoper = 1;
                 const_val = lval2->const_val;
                 clearstage(before, 0);
-                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
+                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, 0);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR || lval2->val_type == KIND_LONG) ) {

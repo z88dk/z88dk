@@ -777,7 +777,7 @@ int declare_local(int local_static)
                     } else {
                         clearstage(before, start);
                         //conv type
-                        force(type->kind, expr, 0, 0, 0);
+                        force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                     }
                     StoreTOS(type->kind);
                 }

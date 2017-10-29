@@ -1,4 +1,4 @@
-	ld	a,#(0 % 256)
+	d	a,#(0 % 256)
 =
 	xor	a
 
@@ -2631,7 +2631,7 @@
 	ex	de,hl
 =
 	ld	e,%1
-	ld	h,%2
+	ld	d,%2
 	pop	hl
 
 	push	hl
@@ -2735,3 +2735,13 @@
 	ld	d,0
 	pop	hl
 	push	hl
+
+	push	de
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint
