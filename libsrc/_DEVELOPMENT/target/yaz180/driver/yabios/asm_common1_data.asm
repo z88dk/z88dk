@@ -12,11 +12,11 @@ EXTERN  __register_sp
 ; can't be easily written
 ;
 ; TCB is from 0x003B through to 0x005B
-  
+
 PUBLIC  bios_sp, bank_sp
 
-defc    bios_sp     = __register_sp ; yabios SP here when other banks running
-defc    bank_sp     =   $003B       ; bank local SP storage, in Page0 TCB
+defc    bios_sp     =   __register_sp   ; yabios SP here when other banks running
+defc    bank_sp     =   $003B           ; bank local SP storage, in Page0 TCB
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - page aligned data
@@ -51,6 +51,16 @@ ENDIF
 ; start of common area 1 - non aligned data
 ;------------------------------------------------------------------------------
 
+; immediately after page aligned area so that we don't have to worry about the
+; LSB when indexing, for far_call, far_jp, and system_rst
+
+PUBLIC bankLockBase
+
+bankLockBase:   defs    $10, $00        ; base address for 16 BANK locks
+                                        ; $00 = BANK cold (uninitialised)
+                                        ; $FE = BANK available to be entered
+                                        ; $FF = BANK locked (active thread)
+
 PUBLIC shadowLock, prt0Lock, prt1Lock, dmac0Lock, dmac1Lock, csioLock
 
 shadowLock:     defb    $FE             ; mutex for alternate registers
@@ -60,17 +70,10 @@ dmac0Lock:      defb    $FE             ; mutex for DMAC0
 dmac1Lock:      defb    $FE             ; mutex for DMAC1
 csioLock:       defb    $FE             ; mutex for CSI/O
 
-PUBLIC bankLockBase
-
-bankLockBase:   defs    $10, $00        ; base address for 16 BANK locks
-                                        ; $00 = BANK cold (uninitialised)
-                                        ; $FE = BANK available to be entered
-                                        ; $FF = BANK locked (active thread)
-
 PUBLIC __system_time_fraction, __system_time
 
-__system_time_fraction: defb    0   ; uint8_t (1/256) fractional time
-__system_time:          defs    4   ; uint32_t time_t
+__system_time_fraction: defb    0       ; uint8_t (1/256) fractional time
+__system_time:          defs    4       ; uint32_t time_t
 
 PUBLIC APUCMDInPtr, APUCMDOutPtr, APUDATAInPtr, APUDATAOutPtr
 PUBLIC APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError, APULock
@@ -86,7 +89,7 @@ APUError:       defb    0
 APULock:        defb    $FE             ; lock flag for APU mutex
 
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, asci0RxLock
- 
+
 asci0RxCount:   defb    0               ; Space for Rx Buffer Management 
 asci0RxIn:      defw    asci0RxBuffer   ; non-zero item since it's initialized anyway
 asci0RxOut:     defw    asci0RxBuffer   ; non-zero item since it's initialized anyway
