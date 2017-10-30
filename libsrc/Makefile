@@ -671,7 +671,8 @@ svi_clib.lib:
 	$(call buildgeneric,svi)
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=svi
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=svi
+	$(MAKE) -C psg
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
@@ -684,7 +685,8 @@ msx_clib.lib:
 	$(MAKE) -C fcntl/cpm
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=msx
+	$(MAKE) -C psg
 	TARGET=msx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
@@ -695,7 +697,7 @@ mtx_clib.lib:
 	$(MAKE) msxdeps
 	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=test
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
@@ -734,7 +736,7 @@ einstein.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C psg
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
@@ -745,7 +747,7 @@ m5_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,m5)
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=test
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
@@ -970,7 +972,7 @@ sms_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,sms)
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=test
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
@@ -980,7 +982,7 @@ sc3000_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,sc3000)
-	$(MAKE) -C msx
+	$(MAKE) -C msx TARGET=test
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
