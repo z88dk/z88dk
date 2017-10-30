@@ -29,9 +29,7 @@ static int lastline = 0;
  */
 int statement()
 {
-    TAG_SYMBOL* otag;
     int st;
-    struct varid var;
     char locstatic; /* have we had the static keyword */
 
     blanks();
@@ -45,16 +43,7 @@ int statement()
         char regit = NO;
 
         if (amatch("extern")) {
-            SYMBOL *savetab = loctab;
-            SYMBOL *savloc = locptr;
-
-            SYMBOL *newlocs = CALLOC(NUMLOC, sizeof(SYMBOL));
-            locptr = loctab = newlocs;
-            // TODO: Save local variables so that function doesn't trash them
-            dodeclare(EXTERNAL, NULL, 0,1);
-            FREENULL(newlocs);
-            locptr = savloc;
-            loctab = savetab;
+            dodeclare(EXTERNAL);
         }
         /* Ignore the register and auto keywords! */
         regit = locstatic = ((swallow("register")) | swallow("auto"));
@@ -69,23 +58,13 @@ int statement()
         } else
             locstatic = NO;
 
-        /* Now get the identity, STATIK is for struct definitions */
-        otag = GetVarID(&var, STATIK);
-
-        if (var.type == STRUCT) {
-            declloc(STRUCT, otag, locstatic, &var);
-            return (lastst);
-        } else if (var.type || regit) {
-            if (regit && var.type == NO)
-                var.type = CINT;
-            declloc(var.type, NULL, locstatic, &var);
-            return (lastst);
-        }
-
+        if ( declare_local(locstatic) ) {
+            return lastst;
+        }        
         /* not a definition */
         if (declared >= 0) {
             Zsp = modstk(Zsp - declared, NO, NO);
-            declared = -1;
+            declared = 0;
         }
         st = -1;
         switch (ch()) {
@@ -239,7 +218,7 @@ void compound()
     }
     Zsp = stkstor[ncmp];
     locptr = savloc; /* delete local symbols */
-    declared = -1;
+    declared = 0;
 }
 
 /*
@@ -308,11 +287,11 @@ int doexpr()
     char *before, *start;
     double val;
     int type, vconst;
-    uint32_t packedType;
-
+    Type   *type_ptr;
+    
     while (1) {
         setstage(&before, &start);
-        type = expression(&vconst, &val, &packedType);
+        type = expression(&vconst, &val, &type_ptr);
         clearstage(before, start);
         if (ch() != ',')
             return type;
@@ -409,7 +388,7 @@ void doswitch()
     WHILE_TAB wq;
     int endlab, swact, swdef;
     SW_TAB *swnex, *swptr;
-    char swtype; /* type of switch statement - CINT/LONG */
+    char swtype; /* type of switch statement - KIND_INT/LONG */
     t_buffer* buf;
 
     swact = swactive;
@@ -431,7 +410,7 @@ void doswitch()
     suspendbuffer();
 
     postlabel(endlab);
-    if (swtype == CCHAR) {
+    if (swtype == KIND_CHAR) {
         LoadAccum();
         while (swptr < swnext) {
             CpCharVal(swptr->value);
@@ -443,7 +422,7 @@ void doswitch()
         while (swptr < swnext) {
             defword();
             printlabel(swptr->label); /* case label */
-            if (swtype == LONG) {
+            if (swtype == KIND_LONG) {
                 outbyte('\n');
                 deflong();
             } else
@@ -476,7 +455,7 @@ void doswitch()
 void docase()
 {
     double value;
-    int    valtype;
+    Kind   valtype;
     if (swactive == 0)
         error(E_SWITCH);
     if (swnext > swend) {
@@ -485,7 +464,7 @@ void docase()
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
-    if ( valtype == DOUBLE ) 
+    if ( valtype == KIND_DOUBLE ) 
         warning(W_DOUBLE_UNEXPECTED);
     swnext->value = value;
     needchar(':');
@@ -510,17 +489,10 @@ void doreturn(char type)
 {
     /* if not end of statement, get an expression */
     if (endst() == 0) {
-        if (currfn->more) {
-            /* return pointer to value */
-            force(CINT, doexpr(), YES, c_default_unsigned, 0);
-            leave(CINT, type, incritical);
-        } else {
-            /* return actual value */
-            force(currfn->type, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
-            leave(currfn->type, type, incritical);
-        }
+        force(currfn->ctype->return_type->kind, doexpr(), currfn->ctype->return_type->isunsigned, c_default_unsigned, 0);
+        leave(currfn->ctype->return_type->kind, type, incritical);
     } else {
-        leave(NO, type, incritical);
+        leave(KIND_INT, type, incritical);
     }
 }
 
@@ -537,16 +509,16 @@ void leave(int vartype, char type, int incritical)
 {
     int savesp;
     int save = vartype;
-    int callee_cleanup = (c_compact_code || currfn->flags & CALLEE) && (stackargs > 2);
+    int callee_cleanup = (c_compact_code || currfn->ctype->flags & CALLEE) && (stackargs > 2);
     int hlsaved;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
         return;
     }
 
-    if (vartype == CPTR) /* they are the same in any case! */
-        vartype = LONG;
-    else if ( vartype == DOUBLE ) {
+    if (vartype == KIND_CPTR) /* they are the same in any case! */
+        vartype = KIND_LONG;
+    else if ( vartype == KIND_DOUBLE ) {
         vartype = NO;
         save = NO;
     }
@@ -566,7 +538,7 @@ void leave(int vartype, char type, int incritical)
         if ( vartype  ) {
             save = NO;
             if ( c_notaltreg ) {
-                if ( vartype == LONG )
+                if ( vartype == KIND_LONG )
                     savede();
                 if ( hlsaved == NO ) savehl();
             } else {
@@ -581,7 +553,7 @@ void leave(int vartype, char type, int incritical)
         Zsp = savesp;
         if ( vartype ) {
             if ( c_notaltreg ) {
-                if ( vartype == LONG )
+                if ( vartype == KIND_LONG )
                     restorede();
                 restorehl();
             } else {
@@ -695,12 +667,6 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    char label[NAMESIZE];
-    int k;
-    char lab = 0; /* Got an good asm label */
-    SYMBOL* myptr;
-    char* ptr;
-
     endasm = cmode = 0; /* mark mode as "asm" */
 
 #ifdef INBUILT_OPTIMIZER
@@ -712,72 +678,8 @@ void doasm()
         if (endasm || match("#endasm") || eof) {
             break;
         }
-        /*
-           * This is only relevent for z80asm since asxxx doesn't differentiate
-         * between different types of .globl and assemble time
-         *
-         * If the first column contains a "." then it's a lebel and we 
-         * should check for the magic prefix ("smc_" or "_") and compare
-         * to symbol table. If match then the symbol will be XDEF'd instead
-         * of XREF'd
-         */
-
-        lab = -1;
-        if (line[0] == '.') {
-            k = 1;
-            lab = 0;
-            while ((line[k] != ' ') && (line[k] != '\n') && (line[k] != '\0') && (line[k] != '\t')) {
-                label[k - 1] = line[k];
-                label[k++] = 0;
-            }
-        }
-
-        /* Now look for a normal label definition */
-        if ((ptr = strchr(line, ':')) != NULL) {
-            char* temp = line;
-
-            while (temp < ptr && !isspace(*temp)) {
-                temp++;
-            }
-
-            if (temp == ptr) {
-                strncpy(label, line, ptr - line);
-                label[ptr - line] = 0;
-                lab = 0;
-            }
-        }
-
-        if (lab == 0) {
-            /*
-             * Snagged a label, we check form smc_ or _ prefix if so remove
-             * it and check for symbol then switch to local defn
-             *
-             * Lab is where the actual label name starts from
-             */
-            if (label[0] == '_') {
-                memmove(label, label + 1, strlen(label + 1) + 1);
-                lab = 2;
-            } else if (strncmp(label, "smc_", 4) == 0) {
-                memmove(label, label + 4, strlen(label + 4) + 1);
-                lab = 5;
-            }
-
-            if (lab) {
-                /* ATP Got assembler label, now check to see if defined as extern.. */
-                if ((myptr = findglb(label))) {
-                    /* Have matched it to an extern, so now change type... */
-                    if (myptr->storage == EXTERNAL)
-                        myptr->storage = DECLEXTN;
-                }
-                if (lab != 2) {
-                    line[1] = '_';
-                    memmove(line + 2, &line[(int)lab], strlen(&line[(int)lab]) + 1);
-                }
-            }
-        }
-        ol(line);
+        outfmt("%s\n",line);
     }
-    /* Print the line out, with the appropriate prefix */
     clear(); /* invalidate line */
     if (eof)
         warning(W_UNTERM);

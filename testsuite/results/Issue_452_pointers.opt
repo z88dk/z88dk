@@ -1,0 +1,226 @@
+
+
+
+	MODULE	Issue_452_pointers
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._ptr_char
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	dec	hl
+	dec	hl
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._ptr_int
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	bc,-4
+	add	hl,bc
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	srl	h
+	rr	l
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._ptr_long
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	bc,-8
+	add	hl,bc
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	de,2
+	ex	de,hl
+	call	l_asr_u
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._ptr_double
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	bc,-12
+	add	hl,bc
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	de,6
+	ex	de,hl
+	call	l_div_u
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._ptr_struct
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	bc,-6
+	add	hl,bc
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	de,3
+	ex	de,hl
+	call	l_div_u
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._struct_offset1
+	push	bc
+	push	bc
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ex	de,hl
+	ld	hl,_array
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	de,3
+	ex	de,hl
+	call	l_div_u
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._struct_offset2
+	push	bc
+	push	bc
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ex	de,hl
+	ld	hl,_array
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ld	de,3
+	ex	de,hl
+	call	l_div_u
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._struct_offset3
+	push	bc
+	push	bc
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ex	de,hl
+	ld	hl,_array
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._array	defs	30
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_ptr_char
+	GLOBAL	_ptr_int
+	GLOBAL	_ptr_long
+	GLOBAL	_ptr_double
+	GLOBAL	_ptr_struct
+	GLOBAL	_struct_offset1
+	GLOBAL	_struct_offset2
+	GLOBAL	_struct_offset3
+
+
+
+

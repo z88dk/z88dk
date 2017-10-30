@@ -137,7 +137,7 @@ extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
 extern int __LIB__ dir_move_first();
 extern int __LIB__ dir_move_next();
 extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
-extern int __LIB__ dir_get_entry_name();
+extern char __LIB__ *dir_get_entry_name();
 extern unsigned long __LIB__ dir_get_entry_size();
 extern int __LIB__ get_dir_name();
 

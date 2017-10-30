@@ -60,16 +60,16 @@ int dolabel()
     savelptr = lptr;
     if (symname(sname)) {
         if (gch() == ':') {
-            if ((ptr = findgoto(sname)) && ptr->ident == GOTOLABEL) {
+            if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
                 /* Label already goto'd, find some others with
                                  * same stack
                                  */
-                ptr->type = GOTOLABEL;
                 debug(DBG_GOTO, "Starting chase %s\n", sname);
                 ChaseGoto(ptr);
+                ptr->type = KIND_PTR;
             } else {
                 ptr = addgotosym(sname);
-                ptr->type = GOTOLABEL;
+                ptr->type = KIND_PTR;
             }
             debug(DBG_GOTO, "Adding label not called %s\n", sname);
             ptr->offset.i = Zsp; /* Save stack for label */
@@ -98,9 +98,9 @@ void dogoto()
     if (symname(sname) == 0)
         illname(sname);
     debug(DBG_GOTO, "goto is -->%s<--\n", sname);
-    if ((ptr = findgoto(sname)) && ptr->ident == GOTOLABEL) {
+    if ((ptr = findgoto(sname)) && ptr->ident == ID_GOTOLABEL) {
         /* Label found, but is it actually defined? */
-        if (ptr->type == GOTOLABEL) {
+        if (ptr->type == KIND_PTR) {
             label = ptr->size;
             stkmod = ptr->offset.i;
         } else {
@@ -122,17 +122,17 @@ void dogoto()
 SYMBOL* addgotosym(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "goto_");
+    strcpy(sname2, "00goto_");
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
-    return (addglb(sname2, GOTOLABEL, 0, 0, 0, 0, 0));
+    return (addglb(sname2, ID_GOTOLABEL, 0, 0, 0));
 }
 
 SYMBOL* findgoto(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "goto_");
+    strcpy(sname2, "00goto_");
     strcat(sname2, currfn->name);
     strcat(sname2, "_");
     strcat(sname2, sname);
@@ -209,11 +209,8 @@ void goto_cleanup(void)
         if (gptr->sym) {
             debug(DBG_GOTO, "Cleaning %s #%d\n", gptr->sym->name, i);
             postlabel(gptr->label);
-            if (gptr->sym->type == GOTOLABEL) {
-                modstk((gptr->sym->offset.i) - (gptr->sp), NO, NO);
-                jump(gptr->sym->size); /* label label(!) */
-            } else
-                error(E_UNGOTO, gptr->sym->name, gptr->lineno);
+            modstk((gptr->sym->offset.i) - (gptr->sp), NO, NO);
+            jump(gptr->sym->size); /* label label(!) */
         }
         gptr++;
     }

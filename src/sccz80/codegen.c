@@ -193,7 +193,7 @@ void trailer(void)
 /* Print out a name such that it won't annoy the assembler
  *      (by matching anything reserved, like opcodes.)
  */
-void outname(char* sname, char pref)
+void outname(const char* sname, char pref)
 {
     if (pref) {
         outstr(Z80ASM_PREFIX);
@@ -208,8 +208,8 @@ void outname(char* sname, char pref)
  */
 void getmem(SYMBOL* sym)
 {
-    if (sym->ident != POINTER && sym->type == CCHAR) {
-        if (!(sym->flags & UNSIGNED)) {
+    if (sym->ctype->kind == KIND_CHAR) {
+        if ( (sym->ctype->isunsigned) == 0 )  {
 #ifdef PREAPR00
             ot("ld\ta,(");
             outname(sym->name, dopref(sym));
@@ -234,7 +234,7 @@ void getmem(SYMBOL* sym)
         ot("ld\ta,(");
         outname(sym->name, dopref(sym));
         outstr(")\n");
-        if (!(sym->flags & UNSIGNED))
+        if (sym->ctype->isunsigned == 0 )
             callrts("l_sxt");
         else {
             ol("ld\tl,a");
@@ -242,10 +242,10 @@ void getmem(SYMBOL* sym)
         }
 
 #endif
-    } else if (sym->ident != POINTER && sym->type == DOUBLE) {
+    } else if (sym->ctype->kind == KIND_DOUBLE) {
         address(sym);
         callrts("dload");
-    } else if (sym->ident != POINTER && sym->type == LONG) {
+    } else if (sym->ctype->kind == KIND_LONG) {
         ot("ld\thl,(");
         outname(sym->name, dopref(sym));
         outstr(")\n");
@@ -253,12 +253,12 @@ void getmem(SYMBOL* sym)
         outname(sym->name, dopref(sym));
         outstr("+2)\n");
     } else {
-        /* this is for CINT and get pointer..will need to change! */
+        /* this is for KIND_INT and get pointer..will need to change! */
         ot("ld\thl,(");
         outname(sym->name, dopref(sym));
         outstr(")\n");
         /* For long pointers...load de with name+2, then d,0 */
-        if (sym->type == CPTR || (sym->ident == POINTER && sym->flags & FARPTR)) {
+        if (sym->ctype->kind == KIND_CPTR) {
             ot("ld\tde,(");
             outname(sym->name, dopref(sym));
             outstr("+2)\n\tld\td,0\n");
@@ -281,23 +281,23 @@ int getloc(SYMBOL* sym, int off)
 /*      static memory cell */
 void putmem(SYMBOL* sym)
 {
-    if (sym->ident != POINTER && sym->type == DOUBLE) {
+    if (sym->ctype->kind == KIND_DOUBLE) {
         address(sym);
         callrts("dstore");
     } else {
-        if (sym->ident != POINTER && sym->type == CCHAR) {
+        if (sym->ctype->kind == KIND_CHAR) {
             LoadAccum();
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),a\n");
-        } else if (sym->ident != POINTER && sym->type == LONG) {
+        } else if (sym->ctype->kind == KIND_LONG) {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("+2),de\n");
-        } else if (sym->ident == POINTER && sym->flags & FARPTR) {
+        } else if (sym->ctype->kind == KIND_CPTR) {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
@@ -305,7 +305,6 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("+2),a\n");
-
         } else {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
@@ -321,10 +320,10 @@ void putmem(SYMBOL* sym)
 void StoreTOS(char typeobj)
 {
     switch (typeobj) {
-    case LONG:
+    case KIND_LONG:
         lpush();
         return;
-    case CCHAR:
+    case KIND_CHAR:
         ol("dec\tsp");
         LoadAccum();
         mainpop();
@@ -332,11 +331,11 @@ void StoreTOS(char typeobj)
         zpush();
         Zsp--;
         return;
-    case DOUBLE:
+    case KIND_DOUBLE:
         dpush();
         return;
-    /* CPTR..untested */
-    case CPTR:
+    /* KIND_CPTR..untested */
+    case KIND_CPTR:
         ol("dec\tsp");
         ol("ld\ta,e");
         zpop(); /* pop de */
@@ -364,12 +363,13 @@ void PutFrame(char typeobj, int offset)
     char flags;
     ptr = retrstk(&flags); /* Not needed but.. */
     switch (typeobj) {
-    case CCHAR:
+    case KIND_CHAR:
         ot("ld\t");
         OutIndex(offset);
         outstr(",l\n");
         break;
-    case CINT:
+    case KIND_INT:
+    case KIND_PTR:
         ot("ld\t");
         OutIndex(offset);
         outstr(",l\n");
@@ -377,8 +377,8 @@ void PutFrame(char typeobj, int offset)
         OutIndex(offset + 1);
         outstr(",h\n");
         break;
-    case CPTR:
-    case LONG:
+    case KIND_CPTR:
+    case KIND_LONG:
         ot("ld\t");
         OutIndex(offset);
         outstr(",l\n");
@@ -389,7 +389,7 @@ void PutFrame(char typeobj, int offset)
         OutIndex(offset + 2);
         outstr(",e\n");
         ot("ld\t");
-        if (typeobj == LONG) {
+        if (typeobj == KIND_LONG) {
             OutIndex(offset + 3);
             outstr(",d\n");
         }
@@ -399,13 +399,17 @@ void PutFrame(char typeobj, int offset)
 
 /* Store the specified object type in the primary register */
 /*      at the address on the top of the stack */
-void putstk(char typeobj)
+void putstk(LVALUE *lval)
 {
-    char flags;
+    char flags = 0;
     SYMBOL *ptr;
+    Kind typeobj = lval->indirect_kind;
 
+
+    //outfmt("; %s type=%d val_type=%d indirect=%d\n", lval->ltype->name, lval->type, lval->val_type, lval->indirect_kind);
     /* Store via long pointer... */
     ptr = retrstk(&flags);
+    //outfmt(";Restore %p flags %02d\n",ptr, flags);
     if (flags & FARACC) {
         /* exx pop hl, pop de, exx */
         doexx();
@@ -413,16 +417,16 @@ void putstk(char typeobj)
         zpop();
         doexx();
         switch (typeobj) {
-        case DOUBLE:
+        case KIND_DOUBLE:
             callrts("lp_pdoub");
             break;
-        case CPTR:
+        case KIND_CPTR:
             callrts("lp_pptr");
             break;
-        case LONG:
+        case KIND_LONG:
             callrts("lp_plong");
             break;
-        case CCHAR:
+        case KIND_CHAR:
             callrts("lp_pchar");
             break;
         default:
@@ -432,19 +436,19 @@ void putstk(char typeobj)
     }
 
     switch (typeobj) {
-    case DOUBLE:
+    case KIND_DOUBLE:
         mainpop();
         callrts("dstore");
         break;
-    case CPTR:
+    case KIND_CPTR:
         zpopbc();
         callrts("l_putptr");
         break;
-    case LONG:
+    case KIND_LONG:
         zpopbc();
         callrts("l_plong");
         break;
-    case CCHAR:
+    case KIND_CHAR:
         zpop();
         LoadAccum();
         ol("ld\t(de),a");
@@ -525,29 +529,30 @@ static void loada(int n)
 void indirect(LVALUE* lval)
 {
     char sign;
-    char typeobj, flags;
+    char flags;
+    Kind typeobj;
 
-    typeobj = lval->indirect;
+    typeobj = lval->indirect_kind;
     flags = lval->flags;
 
-    sign = flags & UNSIGNED;
-
+    sign = lval->ltype->isunsigned;
+    
     /* Fetch from far pointer */
     if (flags & FARACC) { /* Access via far method */
         switch (typeobj) {
-        case CCHAR:
+        case KIND_CHAR:
             callrts("lp_gchar");
             if (!sign)
                 callrts("l_sxt");
             /*                        else ol("ld\th,0"); */
             break;
-        case CPTR:
+        case KIND_CPTR:
             callrts("lp_gptr");
             break;
-        case LONG:
+        case KIND_LONG:
             callrts("lp_glong");
             break;
-        case DOUBLE:
+        case KIND_DOUBLE:
             callrts("lp_gdoub");
             break;
         default:
@@ -557,7 +562,7 @@ void indirect(LVALUE* lval)
     }
 
     switch (typeobj) {
-    case CCHAR:
+    case KIND_CHAR:
         if (!sign) {
 #ifdef PREAPR00
             ol("ld\ta,(hl)");
@@ -570,13 +575,13 @@ void indirect(LVALUE* lval)
             ol("ld\th,0");
         }
         break;
-    case CPTR:
+    case KIND_CPTR:
         callrts("l_getptr");
         break;
-    case LONG:
+    case KIND_LONG:
         callrts("l_glong");
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dload");
         break;
     default:
@@ -688,7 +693,7 @@ void dpush(void)
 
 void dpush_under(int val_type)
 {
-    if ( val_type == LONG ) {
+    if ( val_type == KIND_LONG ) {
         callrts("dpush3");
     } else {
         callrts("dpush2");
@@ -720,7 +725,7 @@ void zpopbc(void)
 
 /* Swap af & af' (preserve carry) */
 
-void doexaf(void)
+static void doexaf(void)
 {
     ol("ex\taf,af");
 }
@@ -741,7 +746,7 @@ void swapstk(void)
 /* process switch statement */
 void sw(char type)
 {
-    if (type == LONG || type == CPTR)
+    if (type == KIND_LONG || type == KIND_CPTR)
         callrts("l_long_case");
     else
         callrts("l_case");
@@ -772,7 +777,7 @@ void zcallop(void)
 
 char dopref(SYMBOL* sym)
 {
-    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) {
+    if (sym->ctype->flags & LIBRARY && (sym->ctype->kind == KIND_FUNC ) ) { // || sym->ident == FUNCTIONP)) {
         return (0);
     }
     return (1);
@@ -798,26 +803,16 @@ void zret(void)
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
  */
-void callstk(int n)
+void callstk(Type *type, int n)
 {
     if (n == 2) {
         /* At this point, TOS = function, hl = argument */
-        int label = getlabel();
-        ol("pop\tde"); /* function */
-        outstr("\tld\tbc,"); /* ret address */
-        printlabel(label);
-        nl();
-        /* Argument in hl, on stack */
-        ol("push\thl");
-        ol("push\tbc"); /* Return address */
-        ol("push\tde");
-        loadargc(n);
-        ol("ret");
-        postlabel(label);
-    } else {
-        loadargc(n);
-        callrts("l_jphl");
+        swapstk();
     }
+    
+    if ( type->hasva )
+        loadargc(n);
+    callrts("l_jphl");
 }
 
 void jump0(LVALUE* lval, int label)
@@ -881,19 +876,19 @@ void testjump(LVALUE* lval, int label)
     int type;
     ol("ld\ta,h");
     ol("or\tl");
-    if (lval->oldval_type == LONG) {
+    if (lval->oldval_kind == KIND_LONG) {
         ol("or\td");
         ol("or\te");
     }
-    type = lval->oldval_type;
+    type = lval->oldval_kind;
     if (lval->binop == NULL)
         type = lval->val_type;
 
-    if (type == LONG && check_lastop_was_comparison(lval)) {
+    if (type == KIND_LONG && check_lastop_was_comparison(lval)) {
         ol("or\td");
         ol("or\te");
     }
-    if (type == CPTR && check_lastop_was_comparison(lval)) {
+    if (type == KIND_CPTR && check_lastop_was_comparison(lval)) {
         ol("or\te");
     }
     opjump("z,", label);
@@ -907,8 +902,9 @@ void zerojump(
     LVALUE* lval)
 {
     clearstage(lval->stage_add, 0); /* purge conventional code */
+    lval->stage_add = NULL;
 #ifdef CHARCOMP0
-    if (lval->oldval_type == CCHAR) {
+    if (lval->oldval_kind == KIND_CHAR) {
         if (oper == testjump) { /* !=0 or >=0U */
             LoadAccum();
             ol("and\ta");
@@ -1109,25 +1105,29 @@ modstkcht:
 }
 
 /* Multiply the primary register by the length of some variable */
-void scale(int type, TAG_SYMBOL* tag)
+void scale(Kind type, Type *tag)
 {
     switch (type) {
-    case CINT:
+    case KIND_INT:
+    case KIND_PTR:
         ol("add\thl,hl");;
         break;
-    case CPTR:
+    case KIND_CPTR:
         threereg();
         break;
-    case LONG:
+    case KIND_LONG:
         ol("add\thl,hl");;
         ol("add\thl,hl");;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         sixreg();
         break;
-    case STRUCT:
+    case KIND_STRUCT:
         /* try to avoid multiplying if possible */
-        quikmult(CINT, tag->size, YES);
+        quikmult(KIND_INT, tag->size, YES);
+        break;
+    default:
+        break;
     }
 }
 
@@ -1136,7 +1136,7 @@ void scale(int type, TAG_SYMBOL* tag)
 
 void quikmult(int type, int32_t size, char preserve)
 {
-    if ( type == LONG ) {
+    if ( type == KIND_LONG ) {
         /* Normal long multiplication is:
            push, push, ld hl, ld de, call l_long_mult = 11 bytes
         */
@@ -1225,7 +1225,8 @@ void quikmult(int type, int32_t size, char preserve)
         return;
     }
 
-    // CINT here
+
+    // KIND_INT here
     // ZXN: ld de,nnnn ; mul = 14T
     if ( c_cpu & CPU_Z80ZXN ) {
         switch (size) {
@@ -1370,8 +1371,8 @@ static void sixreg(void)
 void zadd(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         if ( c_size_optimisation & OPT_ADD32 ) {
             ol("pop\tbc");        /* 7 bytes, 54T */
             ol("add\thl,bc");
@@ -1384,7 +1385,7 @@ void zadd(LVALUE* lval)
         }
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dadd");
         Zsp += 6;
         break;
@@ -1413,7 +1414,7 @@ void zadd_const(LVALUE *lval, int32_t value)
         inc(lval);
         break;
     default:
-        if ( lval->val_type == LONG || lval->val_type == CPTR ) {
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
             // 11 bytes, 54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
             constbc(((uint32_t)value) % 65536);   // 3, 10
             ol("add\thl,bc");                     // 1, 11
@@ -1432,12 +1433,12 @@ void zadd_const(LVALUE *lval, int32_t value)
 void zsub(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_sub");
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dsub");
         Zsp += 6;
         break;
@@ -1451,15 +1452,21 @@ void zsub(LVALUE* lval)
 void mult(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_mult");
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dmul");
         Zsp += 6;
         break;
+    case KIND_CHAR:
+        if ( lval->ltype->isunsigned && c_cpu == CPU_Z180 ) {
+            ot("ld\th,e\n");
+            ot("mlt\thl\n");
+            break;
+        }
     default:
         if ( c_cpu == CPU_Z80ZXN ) {
             ol("mul");
@@ -1481,15 +1488,15 @@ void mult_const(LVALUE *lval, int32_t value)
 void zdiv(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         if (utype(lval))
             callrts("l_long_div_u");
         else
             callrts("l_long_div");
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("ddiv");
         Zsp += 6;
         break;
@@ -1503,7 +1510,7 @@ void zdiv(LVALUE* lval)
 
 void zdiv_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG && utype(lval) ) {
+    if ( lval->val_type == KIND_LONG && utype(lval) ) {
         if ( value == 256 ) {
             ol("ld\tl,h");
             ol("ld\th,e");
@@ -1541,7 +1548,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
             asr_const(lval,3);
             break;
         default:
-            if ( lval->val_type == LONG || lval->val_type == CPTR ) {
+            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
                 lpush();
                 vlongconst(value);
             } else {
@@ -1558,11 +1565,11 @@ void zdiv_const(LVALUE *lval, int32_t value)
  */
 void zmod(LVALUE* lval)
 {
-    if (c_notaltreg && (lval->val_type == LONG || lval->val_type == CPTR)) {
+    if (c_notaltreg && (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)) {
         callrts("l_long_mod2");
     } else {
         zdiv(lval);
-        if (lval->val_type == LONG || lval->val_type == CPTR)
+        if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
             doexx();
         else
             swap();
@@ -1571,7 +1578,7 @@ void zmod(LVALUE* lval)
 
 void zmod_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG ) {
+    if ( lval->val_type == KIND_LONG ) {
         if ( value == 256 ) {
             ol("ld\th,0");
             const2(0);
@@ -1625,8 +1632,8 @@ void zmod_const(LVALUE *lval, int32_t value)
 void zor(LVALUE* lval )
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_or");
         Zsp += 4;
         break;
@@ -1721,7 +1728,7 @@ int zor_handle_pow2(int32_t value)
 
 void zor_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG || lval->val_type == CPTR) {
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( zor_handle_pow2(value) ) {
             return;
         } else if ( (value & 0xFFFFFF00) == 0 ) {
@@ -1768,8 +1775,8 @@ void zor_const(LVALUE *lval, int32_t value)
 void zxor(LVALUE *lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_xor");
         Zsp += 4;
         break;
@@ -1780,7 +1787,7 @@ void zxor(LVALUE *lval)
 
 void zxor_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG || lval->val_type == CPTR) {
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( (value & 0xFFFFFF00) == 0 ) {
             ol("ld\ta,l");
             ot("xor\t"); outdec(value % 256); nl();
@@ -1828,8 +1835,8 @@ void zxor_const(LVALUE *lval, int32_t value)
 void zand(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_and");
         Zsp += 4;
         break;
@@ -1840,7 +1847,7 @@ void zand(LVALUE* lval)
 
 void zand_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG || lval->val_type == CPTR) {
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             vlongconst(0);
         } else if ( value == 0xff ) {  // 5
@@ -1889,8 +1896,8 @@ void zand_const(LVALUE *lval, int32_t value)
 void asr(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         if (utype(lval))
             callrts("l_long_asr_u");
         else
@@ -1907,7 +1914,7 @@ void asr(LVALUE* lval)
 
 void asr_const(LVALUE *lval, int32_t value)
 {
-    if  (lval->val_type == LONG || lval->val_type == CPTR ) {
+    if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
         if ( value == 1 ) {
             if ( utype(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */
                 ol("srl\td");
@@ -2054,8 +2061,8 @@ void asr_const(LVALUE *lval, int32_t value)
 void asl(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_asl");
         Zsp += 4;
         break;
@@ -2115,7 +2122,7 @@ void asl_16bit_const(LVALUE *lval, int value)
 
 void asl_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == LONG  ) { 
+    if ( lval->val_type == KIND_LONG  ) { 
         switch ( value ) {
         case 0: 
             return;
@@ -2172,24 +2179,33 @@ void asl_const(LVALUE *lval, int32_t value)
     }
 }
 
+
+static void set_carry(LVALUE *lval)
+{
+    lval->val_type = KIND_CARRY;
+    lval->ltype = type_carry;
+}
+
+
 /* Form logical negation of primary register */
 void lneg(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
+    lval->oldval_kind = lval->val_type;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CINT;
+    case KIND_LONG:
+    case KIND_CPTR:
+        lval->val_type = KIND_INT;
+        lval->ltype = type_int;
         callrts("l_long_lneg");
         break;
-    case CARRY:
-        lval->val_type = CARRY;
+    case KIND_CARRY:
+        set_carry(lval);
         ol("ccf");
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         convdoub2int();
     default:
-        lval->val_type = CARRY;
+        set_carry(lval);
         callrts("l_lneg");
     }
 }
@@ -2198,11 +2214,11 @@ void lneg(LVALUE* lval)
 void neg(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_neg");
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("minusfa");
         break;
     default:
@@ -2214,8 +2230,8 @@ void neg(LVALUE* lval)
 void com(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         callrts("l_long_com");
         break;
     default:
@@ -2231,7 +2247,7 @@ void com(LVALUE* lval)
 void inc(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case DOUBLE:
+    case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
         vlongconst(1);
@@ -2239,8 +2255,8 @@ void inc(LVALUE* lval)
         callrts("dadd");
         Zsp += 6;
         break;
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         if ( c_cpu == CPU_Z80ZXN ) {
             ol("inc\tdehl");
         } else {
@@ -2259,7 +2275,7 @@ void inc(LVALUE* lval)
 void dec(LVALUE* lval)
 {
     switch (lval->val_type) {
-    case DOUBLE:
+    case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
         vlongconst(-1);
@@ -2267,8 +2283,8 @@ void dec(LVALUE* lval)
         callrts("dadd");
         Zsp += 6;
         break;
-    case LONG:
-    case CPTR:
+    case KIND_LONG:
+    case KIND_CPTR:
         if ( c_cpu == CPU_Z80ZXN ) {
             ol("dec\tdehl");
         } else {
@@ -2294,20 +2310,20 @@ void dummy(LVALUE *lval)
 void eq0(LVALUE* lval, int label)
 {
     check_lastop_was_comparison(lval);
-    switch (lval->oldval_type) {
+    switch (lval->oldval_kind) {
 #ifdef CHARCOMP0
-    case CCHAR:
+    case KIND_CHAR:
         ol("ld\ta,l");
         ol("and\ta");
         break;
 #endif
-    case LONG:
+    case KIND_LONG:
         ol("ld\ta,h");
         ol("or\tl");
         ol("or\td");
         ol("or\te");
         break;
-    case CPTR:
+    case KIND_CPTR:
         ol("ld\ta,e");
         ol("or\th");
         ol("or\tl");
@@ -2321,18 +2337,18 @@ void eq0(LVALUE* lval, int label)
 
 void lt0(LVALUE* lval, int label)
 {
-    switch (lval->oldval_type) {
+    switch (lval->oldval_kind) {
 #ifdef CHARCOMP0
-    case CCHAR:
+    case KIND_CHAR:
         ol("xor\ta");
         ol("or\tl");
         break;
 #endif
-    case LONG:
+    case KIND_LONG:
         ol("xor\ta");
         ol("or\td");
         break;
-    case CPTR:
+    case KIND_CPTR:
         ol("xor\ta");
         ol("or\te");
         break;
@@ -2348,11 +2364,11 @@ void le0(LVALUE* lval, int label)
 {
     ol("ld\ta,h");
     ol("or\tl");
-    if (lval->oldval_type == LONG) {
+    if (lval->oldval_kind == KIND_LONG) {
         ol("or\td");
         ol("or\te");
     }
-    if (lval->oldval_type == CPTR) {
+    if (lval->oldval_kind == KIND_CPTR) {
         ol("or\te");
     }
     if (ISASM(ASM_Z80ASM)) {
@@ -2365,13 +2381,13 @@ void le0(LVALUE* lval, int label)
 
 /* test for greater than zero */
 void gt0(LVALUE* lval, int label)
-{
+{    
     ge0(lval, label);
-    if (lval->oldval_type == LONG) {
+    if (lval->oldval_kind == KIND_LONG) {
         ol("or\th");
         ol("or\te");
     }
-    if (lval->oldval_type == CPTR) {
+    if (lval->oldval_kind == KIND_CPTR) {
         ol("or\th");
     }
     ol("or\tl");
@@ -2382,11 +2398,11 @@ void gt0(LVALUE* lval, int label)
 void ge0(LVALUE* lval, int label)
 {
     ol("xor\ta");
-    switch (lval->oldval_type) {
-    case LONG:
+    switch (lval->oldval_kind) {
+    case KIND_LONG:
         ol("or\td");
         break;
-    case CPTR:
+    case KIND_CPTR:
         ol("or\te");
         break;
     default:
@@ -2395,26 +2411,26 @@ void ge0(LVALUE* lval, int label)
     opjump("m,", label);
 }
 
+
 /* Test for equal */
 void zeq(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
-    lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->oldval_kind = lval->val_type;
+    lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CARRY;
+    case KIND_LONG:
+    case KIND_CPTR:
+        set_carry(lval);
         callrts("l_long_eq");
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("deq");
         Zsp += 6;
         break;
-    case CCHAR:
+    case KIND_CHAR:
         if (c_doinline) {
-            lval->val_type = CARRY;
+            set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
@@ -2427,7 +2443,7 @@ void zeq(LVALUE* lval)
             break;
         }
     default:
-        lval->val_type = CARRY;
+        set_carry(lval);
         callrts("l_eq");
     }
 }
@@ -2435,23 +2451,22 @@ void zeq(LVALUE* lval)
 /* Test for not equal */
 void zne(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
-    lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->oldval_kind = lval->val_type;
+    lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CARRY;
+    case KIND_LONG:
+    case KIND_CPTR:
+        set_carry(lval);
         callrts("l_long_ne");
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dne");
         Zsp += 6;
         break;
-    case CCHAR:
+    case KIND_CHAR:
         if (c_doinline) {
-            lval->val_type = CARRY;
+            set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
@@ -2464,7 +2479,7 @@ void zne(LVALUE* lval)
             break;
         }
     default:
-        lval->val_type = CARRY;
+        set_carry(lval);
         callrts("l_ne");
     }
 }
@@ -2472,24 +2487,23 @@ void zne(LVALUE* lval)
 /* Test for less than*/
 void zlt(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
-    lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->oldval_kind = lval->val_type;
+    lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CARRY;
+    case KIND_LONG:
+    case KIND_CPTR:
         if (utype(lval))
             callrts("l_long_ult");
         else
             callrts("l_long_lt");
         Zsp += 4;
+        set_carry(lval);        
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dlt");
         Zsp += 6;
         break;
-    case CCHAR:
+    case KIND_CHAR:
         if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,e");
@@ -2502,39 +2516,38 @@ void zlt(LVALUE* lval)
                 ol("xor\tl");
                 ol("rlca");
             }
-            lval->val_type = CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = CARRY;
         if (utype(lval))
             callrts("l_ult");
         else
             callrts("l_lt");
+        set_carry(lval);            
     }
 }
 
 /* Test for less than or equal to (signed/unsigned) */
 void zle(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
-    lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->oldval_kind = lval->val_type;
+    lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CARRY;
+    case KIND_LONG:
+    case KIND_CPTR:
         if (utype(lval))
             callrts("l_long_ule");
         else
             callrts("l_long_le");
+        set_carry(lval);            
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dleq");
         Zsp += 6;
         break;
-    case CCHAR:
+    case KIND_CHAR:
         if (c_doinline) {
             if (utype(lval)) { /* unsigned */
                 ol("ld\ta,e");
@@ -2557,39 +2570,38 @@ void zle(LVALUE* lval)
                 ol("rlca");
                 postlabel(label);
             }
-            lval->val_type = CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = CARRY;
         if (utype(lval))
             callrts("l_ule");
         else
             callrts("l_le");
+        set_carry(lval);            
     }
 }
 
 /* Test for greater than (signed/unsigned) */
 void zgt(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
-    lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->oldval_kind = lval->val_type;
+    lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CARRY;
+    case KIND_LONG:
+    case KIND_CPTR:
         if (utype(lval))
             callrts("l_long_ugt");
         else
             callrts("l_long_gt");
+        set_carry(lval);            
         Zsp += 4;
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dgt");
         Zsp += 6;
         break;
-    case CCHAR:
+    case KIND_CHAR:
         if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,e");
@@ -2609,39 +2621,38 @@ void zgt(LVALUE* lval)
                 ol("rlca");
                 ol("ccf");
             }
-            lval->val_type = CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = CARRY;
         if (utype(lval))
             callrts("l_ugt");
         else
             callrts("l_gt");
+        set_carry(lval);            
     }
 }
 
 /* Test for greater than or equal to */
 void zge(LVALUE* lval)
 {
-    lval->oldval_type = lval->val_type;
-    lval->ptr_type = 0;
-    lval->ident = VARIABLE;
+    lval->oldval_kind = lval->val_type;
+    lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
-    case LONG:
-    case CPTR:
-        lval->val_type = CARRY;
+    case KIND_LONG:
+    case KIND_CPTR:
         if (utype(lval))
             callrts("l_long_uge");
         else
             callrts("l_long_ge");
         Zsp += 4;
+        set_carry(lval);        
         break;
-    case DOUBLE:
+    case KIND_DOUBLE:
         callrts("dge");
         Zsp += 6;
         break;
-    case CCHAR:
+    case KIND_CHAR:
         if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,l");
@@ -2665,15 +2676,15 @@ void zge(LVALUE* lval)
                 ol("ccf");
                 postlabel(label);
             }
-            lval->val_type = CARRY;
+            set_carry(lval);
             break;
         }
     default:
-        lval->val_type = CARRY;
         if (utype(lval))
             callrts("l_uge");
         else
             callrts("l_ge");
+        set_carry(lval);            
     }
 }
 
@@ -2849,28 +2860,16 @@ void CpCharVal(int val)
  *      Print prefix for global defintion
  */
 
-void GlobalPrefix(char type)
+void GlobalPrefix(void)
 {
     if (ISASM(ASM_ASXX)) {
         ot(".globl\t");
-        return;
     } else if (ISASM(ASM_VASM)) {
         ot("GLOBAL\t");
-        return;
     } else if (ISASM(ASM_GNU)) {
         ot(".global\t");
-        return;
-    }
-    switch (type) {
-    case XDEF:
-        ot("PUBLIC\t");
-        break;
-    case XREF:
-        ot("EXTERN\t");
-        break;
-    case LIB:
-        ot("EXTERN\t");
-        break;
+    } else {
+        ot("GLOBAL\t");
     }
 }
 
@@ -2989,9 +2988,9 @@ void output_section(char* section_name)
         return;
     }
     if (ISASM(ASM_ASXX)) {
-        outfmt("\t.area\t%s\n\n", section_name);
+        outfmt("\t.area\t%s\n", section_name);
     } else if (ISASM(ASM_Z80ASM)) {
-        outfmt("\tSECTION\t%s\n\n", section_name);
+        outfmt("\tSECTION\t%s\n", section_name);
     } else if (ISASM(ASM_VASM)) {
         outfmt("\tSECTION\t%s\n", section_name);
     } else if (ISASM(ASM_GNU)) {
@@ -3073,7 +3072,7 @@ void FrameP(void)
 
 void pushframe(void)
 {
-    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("push\t");
         FrameP();
         nl();
@@ -3082,7 +3081,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (c_framepointer_is_ix != -1 || (currfn->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         ot("pop\t");
         FrameP();
         nl();
@@ -3226,7 +3225,7 @@ void intrinsic_in(SYMBOL *sym)
         }
         return;
     }
-    if (sym->type == PORT8 ) {
+    if (sym->type == KIND_PORT8 ) {
         if ( c_cpu == CPU_Z180 ) {
             outstr("\tin0\tl,("); outname(sym->name, 1); outstr(")"); nl();
         } else {
@@ -3253,7 +3252,7 @@ void intrinsic_out(SYMBOL *sym)
         }
         return;
     }
-    if (sym->type == PORT8 ) {
+    if (sym->type == KIND_PORT8 ) {
         if ( c_cpu == CPU_Z180 ) {
             outstr("\tout0\t("); outname(sym->name, 1); outstr("),l"); nl();
         } else {

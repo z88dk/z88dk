@@ -8,8 +8,8 @@
 
 #include <net/resolv.h>
 
-i8_t getservprotobyport(port )
-        tcpport_t port;
+char getservprotobyport(port )
+        int port;
 {
         struct data_entry *search=get_services();
 

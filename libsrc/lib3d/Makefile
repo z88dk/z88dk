@@ -6,9 +6,14 @@
 
 include ../Make.config
 
-all:	
-	zcc +test $(CFLAGS) *.c
+CFILES = $(wildcard *.c)
+OBJECTS = $(CFILES:.c=.o)
+
+all:	$(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/lib3d @lib3d.lst
+
+%.o: %.c
+	zcc +test $(CFLAGS) -o $@ $^
 
 clean:
 	$(RM) *.o* zcc_opt.def

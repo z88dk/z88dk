@@ -83,10 +83,10 @@ if (address == 0xFFFF)
 			fputc_cons(13);
 			hexword (x);
 		}
-		hexbyte (*x);
+		hexbyte (*(unsigned char *)x);
 		fputc_cons(' ');
 	}
-	fputc_cons(13);
+	fputc_cons('\n');
 	return (x);
 
 }

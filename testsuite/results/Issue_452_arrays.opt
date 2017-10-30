@@ -1,0 +1,156 @@
+
+
+
+	MODULE	Issue_452_arrays
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,0	;const
+	push	hl
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+	pop	bc
+	ret
+
+
+
+._func1
+	ld	hl,65516	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,0	;const
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	dec	hl
+	dec	hl
+	call	l_gint	;
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+	exx
+	ld	hl,22	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+
+
+._func2
+	SECTION	data_compiler
+._st_func2_A
+	defw	0
+	defs	18
+	SECTION	code_compiler
+	ld	de,0	;const
+	ld	hl,_st_func2_A
+	push	de
+	push	hl
+	ex	de,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+	pop	bc
+	ret
+
+
+
+._func3
+	ld	hl,65516	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	exx
+	ld	hl,20	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+
+
+._multi1
+	ld	hl,65496	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,20+1+1	;const
+	add	hl,sp
+	call	l_gint	;
+	exx
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+
+
+._multi2
+	ld	hl,65496	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,0	;const
+	push	hl
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	push	hl
+	dec	hl
+	dec	hl
+	call	l_gint	;
+	ld	de,20
+	call	l_mult
+	pop	de
+	add	hl,de
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+	exx
+	ld	hl,44	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func1
+	GLOBAL	_func2
+	GLOBAL	_func3
+	GLOBAL	_multi1
+	GLOBAL	_multi2
+
+
+
+

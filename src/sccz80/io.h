@@ -11,14 +11,15 @@ extern int numeric(char c);
 extern int an(char c);
 extern void pl(char *str);
 extern void setstage(char **before, char **start);
-extern void clearstage(char *before, char *start);
+#define clearstage(b,s) clearstage_info(__FILE__,__LINE__,b,s)
+extern void clearstage_info(const char *file, int line, char *before, char *start);
 extern void fabort(void);
 extern void toconsole(void);
 extern void tofile(void);
 extern int outbyte(char c);
 extern int outstage(char c);
-extern void outstr(char ptr[]);
-extern void outfmt(char *fmt,...);
+extern void outstr(const char *ptr);
+extern void outfmt(const char *fmt,...);;
 extern void nl(void);
 extern void tab(void);
 extern void col(void);

@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._getviapointer
 	ld	hl,(sp + 2)
 	ld	hl,(hl+0)
@@ -194,28 +193,25 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_getviapointer
-	PUBLIC	_mult
-	PUBLIC	_negate
-	PUBLIC	_or
-	PUBLIC	_and
-	PUBLIC	_rshift
-	PUBLIC	_lshift
-	PUBLIC	_lshift_long
-	PUBLIC	_addition
-	PUBLIC	_subtract
-	PUBLIC	_longops
-	PUBLIC	_longadd
-	EXTERN	_anotherfunc
-	PUBLIC	_pushinstr
+	GLOBAL	_getviapointer
+	GLOBAL	_mult
+	GLOBAL	_negate
+	GLOBAL	_or
+	GLOBAL	_and
+	GLOBAL	_rshift
+	GLOBAL	_lshift
+	GLOBAL	_lshift_long
+	GLOBAL	_addition
+	GLOBAL	_subtract
+	GLOBAL	_longops
+	GLOBAL	_longadd
+	GLOBAL	_anotherfunc
+	GLOBAL	_pushinstr
 
 
 

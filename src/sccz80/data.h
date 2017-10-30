@@ -20,10 +20,6 @@ extern int litptr;
 extern int dubptr;
 extern char macq[];
 extern int macptr;
-extern TAG_SYMBOL *tagtab;
-extern TAG_SYMBOL *tagptr;
-extern SYMBOL *membtab;
-extern SYMBOL *membptr;
 extern char *stage;
 extern char *stagenext;
 extern char *stagelast;
@@ -74,7 +70,6 @@ extern SYMBOL *currfn;
 
 extern char endasm;
 extern int ltype;
-extern char margtag;
 extern int c_share_offset;
 extern int debuglevel;
 extern int c_assembler_type;
