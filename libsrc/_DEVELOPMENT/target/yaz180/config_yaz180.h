@@ -602,18 +602,20 @@
 
 #define OTERM_MSG_PUTC  30
 #define OTERM_MSG_TTY  31
-#define OTERM_MSG_PRINTC  32
-#define OTERM_MSG_SCROLL  33
-#define OTERM_MSG_CLS  34
-#define OTERM_MSG_PAUSE  35
-#define OTERM_MSG_BELL  36
-#define OTERM_MSG_PSCROLL  37
+#define OTERM_MSG_FZX_PUTC  32
+#define OTERM_MSG_PRINTC  33
+#define OTERM_MSG_SCROLL  34
+#define OTERM_MSG_CLS  35
+#define OTERM_MSG_PAUSE  36
+#define OTERM_MSG_BELL  37
+#define OTERM_MSG_PSCROLL  38
+#define OTERM_MSG_FZX_GET_XOR_DRAW  39
       
-#define __MESSAGE_OTERM_NEXT__  38
+#define __MESSAGE_OTERM_NEXT__  40
 
 #define ICHAR_MSG_GETC  15
 #define OCHAR_MSG_PUTC_BIN  30
-#define OCHAR_MSG_PUTC  32
+#define OCHAR_MSG_PUTC  33
   
 #define __MESSAGE_NEXT__  45
 

@@ -28,4 +28,9 @@ asm_zx_saddr2cy:
    or l
    
    ld l,a
+
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ret

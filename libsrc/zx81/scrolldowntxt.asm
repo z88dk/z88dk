@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-; $Id: scrolldowntxt.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
+; $Id: scrolldowntxt.asm $
 ;
 ;----------------------------------------------------------------
 ; Text scrolldown.
@@ -17,12 +17,12 @@
 scrolldowntxt:
 _scrolldowntxt:
 IF FORlambda
-	ld	hl,16509 + (33*24)
+	ld	hl,16509
 ELSE
 	ld	hl,(16396)	; D_FILE
+ENDIF
 	ld	bc,33*24
 	add	hl,bc
-ENDIF
 	ld	de,33
 	push hl
 	add hl,de

@@ -32,6 +32,11 @@ asm_zx_px2bitmask:
    ld h,a
    
    ld l,(hl)
+
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ret
 
 mask_table:

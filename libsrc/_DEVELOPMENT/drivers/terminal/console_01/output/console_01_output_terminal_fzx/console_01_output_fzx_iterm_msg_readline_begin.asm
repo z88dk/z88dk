@@ -4,13 +4,18 @@ SECTION code_driver_terminal_output
 
 PUBLIC console_01_output_fzx_iterm_msg_readline_begin
 
-EXTERN l_offset_ix_de, __fzx_draw_xor
+EXTERN OTERM_MSG_FZX_GET_XOR_DRAW
+
+EXTERN l_offset_ix_de, l_jpix
 EXTERN console_01_output_char_iterm_msg_readline_begin
 
 console_01_output_fzx_iterm_msg_readline_begin:
 
    ; input terminal is starting a new edit line
    ; can use: af, bc, de, hl, ix
+   
+   ld a,OTERM_MSG_FZX_GET_XOR_DRAW
+   call l_jpix                 ; bc = & fzx xor draw function
    
    ; save fzx variables during editing
    
@@ -24,12 +29,12 @@ console_01_output_fzx_iterm_msg_readline_begin:
    
    ld a,(hl)                   ; save current fzx_draw_mode
    ld (de),a                   ; set new draw mode = __fzx_draw_xor
-   ld (hl),__fzx_draw_xor % 256
+   ld (hl),c
    inc de
    inc hl
    ld a,(hl)
    ld (de),a
-   ld (hl),__fzx_draw_xor / 256
+   ld (hl),b
    inc de
    inc hl
    

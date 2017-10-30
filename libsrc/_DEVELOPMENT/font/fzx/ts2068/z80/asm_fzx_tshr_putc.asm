@@ -1,12 +1,6 @@
+;; This version does not apply any colour.
 
-
-;; This version applies colour but tries to follow the
-;; contour of the text when applying it.
-;;
-;; This was voted undesirable at WOS.
-
-
-; int fzx_putc(struct fzx_state *fs, int c)
+; int fzx_tshr_putc(struct fzx_tshr_state *fs, int c)
 
 ; ===============================================================
 ; FZX driver - Copyright (c) 2013 Einar Saukas
@@ -18,17 +12,18 @@
 ; * added colour and rop modes
 ; * added window
 ; * made fields 16-bit for hi-res
+; * timex hi-res mode 512x192
 ; ===============================================================
 
 SECTION code_font
 SECTION code_font_fzx
 
-PUBLIC asm_fzx_putc
+PUBLIC asm_fzx_tshr_putc
 
 EXTERN l_jpix, error_zc
-EXTERN asm_zx_pxy2saddr, asm_zx_saddr2aaddr, asm_zx_saddrpdown
+EXTERN asm_tshr_pxy2saddr, asm_tshr_saddrpdown
 
-asm_fzx_putc:
+asm_fzx_tshr_putc:
 
    ; print fzx glyph to window on screen
    ;
@@ -176,54 +171,67 @@ no_padding:
    ; stack = tracking, & bitmap, shift
 
    ; check if glyph fits window horizontally
-   ; spectrum resolution 8-bits so ignore MSB in coordinates
+   ; timex hi-res is 0-511
    
-   ld a,(ix+6)
-   or a
-;;   jr nz, x_too_large          ; if x > 255
-   jp nz, x_too_large
-
-
-   ld a,(ix+5)                 ; a = x coord
-   ld d,(ix+17)                ; d = left_margin
+   ld l,(ix+5)
+   ld h,(ix+6)                 ; hl = x coord
    
-   cp d
+   ld a,h
+   cp 2
+   jp nc, x_too_large          ; if x > 511
+   
+   ld a,l
+   sub (ix+17)                 ; subtract left margin
+   ld a,h
+   sbc (ix+18)
    jr nc, exceeds_margin
-
-   ld a,d
+   
+   ld l,(ix+17)
+   ld h,(ix+18)                ; set x = left margin
 
 exceeds_margin:
 
-   sub e                       ; a = x - kern
+   xor a
+   ld d,a
+   
+   sbc hl,de                   ; hl = x - kern
    jr nc, x_ok
    
-   xor a
+   ld l,a
+   ld h,a
 
 x_ok:
 
-   ld (ix+5),a                 ; update possibly different x coord
-   ld e,a                      ; e = x coord
+   ld (ix+5),l
+   ld (ix+6),h                 ; update possibly different x coord
 
-   add a,c                     ; a = x + width - 1
-   jr c, x_too_large           ; if glyph exceeds right edge of window
+   ld a,c
+   add a,l
+   ld e,a
+   ld a,d
+   adc a,h                     ; ae = x + width - 1
    
-   cp (ix+11)
+   cp (ix+12)                  ; compare window.width MSB
    jr c, width_adequate
+   jr nz, x_too_large
    
-   ld a,(ix+12)
-   or a
-   jr z, x_too_large           ; if glyph exceeds right edge of window
+   ld a,e
+   cp (ix+11)                  ; compare window.width LSB
+   jr nc, x_too_large
 
 width_adequate:
 
-   ld a,(ix+9)                 ; a = window.x
-   add a,e
-   ld l,a                      ; l = absolute x coord
+   ld a,(ix+9)
+   add a,l
+   ld l,a
+   ld a,(ix+10)
+   adc a,h
+   ld h,a                      ; hl += window.x
 
    ; ix = struct fzx_state *
    ;  b = LSB of end of bitmap
    ;  c = width - 1
-   ;  l = absolute x coord
+   ; hl = absolute x coord
    ;  a'= font height
    ; stack = tracking, & bitmap, shift
    
@@ -233,70 +241,49 @@ width_adequate:
    or a
    jr nz, y_too_large          ; if y > 255
    
-   ld h,(ix+7)                 ; h = y coord
+   ld e,(ix+7)                 ; e = y coord
    ex af,af'                   ; a = font height
    
-   add a,h
-   jr c, y_too_large           ; if glyph exceeds bottom edge of window
-   
    dec a
+   add a,e
+   jr c, y_too_large           ; if glyph exceeds bottom edge of window
+
    cp (ix+15)
-   
-   jr c, height_adequate
-   
-   ld a,(ix+16)
-   or a
-   jr z, y_too_large           ; if glyph exceeds bottom edge of window 
+   jr nc, y_too_large          ; if glyph exceeds bottom edge of window 
 
 height_adequate:
    
    pop af                      ; a = vertical shift
    
-   add a,h                     ; + y coord
+   add a,e                     ; + y coord
    add a,(ix+13)               ; + window.y
-   
-   ld h,a                      ; h = absolute y coord
-   
+
    ; ix = struct fzx_state *
    ;  b = LSB of end of bitmap
    ;  c = width - 1
-   ;  l = absolute x coord
-   ;  h = absolute y coord
+   ;  a = absolute y coord
+   ; hl = absolute x coord
    ; stack = tracking, & bitmap
-
-   ld a,l
-   and $07
-   ld e,a
-   
-   ld a,c
-   add a,e
-   rra
-   rra
-   rra
-   inc a
-   and $1f                     ; a = width of font in bytes
 
    pop de
    push bc
-   push af
    push de
 
-   call asm_zx_pxy2saddr       ; hl = screen address, de = coords
+   push bc
+
+   ld c,a
+   call asm_tshr_pxy2saddr     ; hl = screen address, de = x coord
+   
+   pop bc
 
    ld a,e
    and $07                     ; a = rotate amount, z = zero rotate
 
    ex af,af'
+   ld e,b
 
    ex (sp),hl                  ; hl = & bitmap
-   ld e,b                      ; e = LSB of end of bitmap
-   
-   ld a,d
-   and $07
-   neg
-   add a,8
-   ld b,a                      ; b = number of rows until next attr
-   
+
    ld a,c                      ; a = width - 1
    cp 8
    jr nc, wide_char
@@ -311,99 +298,21 @@ wide_char:
    
    ; ix = struct fzx_state *
    ; hl = & bitmap
-   ;  b = number of rows until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = tracking, width - 1, width in bytes, screen address
+   ; stack = tracking, width - 1, screen address
 
    ld a,l
    cp e
-   jr nz, draw_attr          ; if bitmap is not zero length
+   jr z, draw_char_ret         ; if bitmap is zero length
 
-   ; glyph drawn, update x coordinate
-
-   ; ix = struct fzx_state *
-   ; stack = tracking, width - 1, width in bytes, screen address
-
-draw_attr_ret:
-
-   pop hl                      ; hl = screen address
-   pop bc
-   pop bc                      ; c = width - 1
-   pop af                      ; a = tracking
-
-   inc a
-   add a,c
-   add a,(ix+5)                ; a = new x coordinate
-   
-   ld (ix+5),a                 ; store new x coordinate
-   ret nc
-   ld (ix+6),1
-   
-   or a
-   ret
-
-x_too_large:
-
-   ; ix = struct fzx_state *
-   ; stack = tracking, & bitmap, shift
-
-   xor a
-   jp error_zc - 3
-
-y_too_large:
-
-   ; ix = struct fzx_state *
-   ; stack = tracking, & bitmap, shift
-
-   ld a,1
-   jp error_zc - 3
-
-draw_attr:
+draw_char:
 
    ; ix = struct fzx_state *
    ; hl = & bitmap
-   ;  b = row count until next attr
    ;  e = LSB of end of bitmap
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = width in bytes, screen address
-
-   ld d,b
-
-   pop af
-   pop bc                      ; b = width in bytes
-   push bc
-   push af
-
-   ex (sp),hl
-   push hl                     ; save screen address
-   
-   call asm_zx_saddr2aaddr     ; hl = attribute address
-
-attr_loop:
-
-   ld a,(ix+23)                ; a = foregound mask
-   and (hl)                    ; keep screen attribute bits
-   or (ix+22)                  ; mix foregound colour
-   
-   ld (hl),a                   ; new colour to screen
-   inc l
-   
-   djnz attr_loop
-   
-   ld b,d                      ; b = row count until next attr
-   
-   pop hl                      ; hl = screen address
-   ex (sp),hl
-
-draw_row:
-
-   ; ix = struct fzx_state *
-   ; hl = & bitmap
-   ;  b = row count until next attr
-   ;  e = LSB of end of bitmap
-   ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = width in bytes, screen address
+   ; stack = tracking, width - 1, screen address
    
    ; bitmap bytes
    
@@ -426,7 +335,6 @@ draw_row:
 rotate_bitmap:
 
    ex (sp),hl                  ; hl = screen address
-   push bc                     ; save row count until next attr
 
    jr z, no_rotate
 
@@ -450,23 +358,54 @@ no_rotate:
    
    ; ix = struct fzx_state *
    ; hl = screen address
-   ;  b = row count until next attr
    ;  e = LSB of end of bitmap
    ; dca= bitmap bytes
    ; af'= rotate 0-7, carry = narrow char, z = zero rotate
-   ; stack = width in bytes, & bitmap, row count until attr
+   ; stack = tracking, width - 1, & bitmap
 
    call l_jpix                 ; call fzx_draw
-   call asm_zx_saddrpdown      ; move screen address down one pixel
+   call asm_tshr_saddrpdown    ; move screen address down one pixel
    
-   pop bc                      ; b = row count until next attr
    ex (sp),hl                  ; hl = & bitmap
    
    ld a,l
    cp e
-   jr z, draw_attr_ret         ; if bitmap finished
+   jr nz, draw_char
+
+   ; glyph drawn, update x coordinate
+
+   ; ix = struct fzx_state *
+   ; stack = tracking, width - 1, screen address
+
+draw_char_ret:
+
+   pop hl                      ; hl = screen address
+   pop bc                      ; c = width - 1
+   pop af                      ; a = tracking
+
+   inc a
+   add a,c
+   add a,(ix+5)                ; a = new x coordinate
    
-   djnz draw_row               ; if not time for new attr
+   ld (ix+5),a                 ; store new x coordinate
+   ret nc
+   inc (ix+6)
    
-   ld b,8                      ; row count until next attr
-   jr draw_attr
+   or a
+   ret
+
+x_too_large:
+
+   ; ix = struct fzx_state *
+   ; stack = tracking, & bitmap, shift
+
+   xor a
+   jp error_zc - 3
+
+y_too_large:
+
+   ; ix = struct fzx_state *
+   ; stack = tracking, & bitmap, shift
+
+   ld a,1
+   jp error_zc - 3

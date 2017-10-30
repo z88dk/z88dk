@@ -121,6 +121,15 @@ define(`m4_zx_00_output_rom_rst',dnl
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
+      IFNDEF __ESXDOS_DOT_COMMAND
+
+      ; perform channel initialization exactly once
+
+      EXTERN zx_00_output_rom_rst_init
+      defc   __need`'__I_FCNTL_NUM_FD = zx_00_output_rom_rst_init
+
+      ENDIF
+
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
    `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + 23))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl

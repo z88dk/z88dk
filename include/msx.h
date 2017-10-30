@@ -20,7 +20,7 @@
 
 // Video related functions
 
-// Set the screen mode
+// Set the screen mode via BIOS (only valid BIOS modes)
 extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
 
 // Get the screen mode
@@ -34,20 +34,20 @@ extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
 #ifdef __SVI__
 #define vmode_defined 1
 enum video_mode {
-	mode_0 = 0x47,
-	mode_1 = 0x4A,
-	mode_2 = 0x4A,
-	mode_3 = 0x4D
+	mode_0 = 0x47,	// INITXT
+	mode_1 = 0,		// patched code for INIT32
+	mode_2 = 0x4A,	// INIGRP
+	mode_3 = 0x4D	// INIMLT
 };
 #endif
 
 #ifdef __MSX__
 #define vmode_defined 1
 enum video_mode {
-	mode_0 = 0x6C,
-	mode_1 = 0x6F,
-	mode_2 = 0x72,
-	mode_3 = 0x75
+	mode_0 = 0x6C,	// INITXT
+	mode_1 = 0x6F,	// INIT32
+	mode_2 = 0x72,	// INIGRP
+	mode_3 = 0x75	// INIMLT
 };
 #endif
 

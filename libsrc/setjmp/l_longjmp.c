@@ -9,7 +9,7 @@
 #include <setjmp.h>
 
 
-void longjmp(jmp_buf env, int val)
+void l_longjmp(jmp_buf env, int val)
 {
 #pragma asm
 	pop	de	;return address discarded

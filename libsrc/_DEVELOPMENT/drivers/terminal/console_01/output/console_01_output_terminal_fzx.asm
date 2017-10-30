@@ -69,6 +69,18 @@
 ;     The driver should call the tty emulation module.
 ;     If not implemented characters are output without processing.
 ;
+;   * OTERM_MSG_FZX_PUTC
+;
+;     enter  :  c = char to output
+;              hl = struct fzx_state *
+;     exit   : standard return value for asm_fzx_putc (a, carry)
+;     can use: af, bc, de, hl
+;
+;   * OTERM_MSG_FZX_GET_XOR_DRAW
+;
+;     exit   : bc = & fzx xor draw function
+;     can use: af, bc, de, hl
+;
 ;   * OTERM_MSG_BELL (optional)
 ;
 ;     can use:  af, bc, de, hl

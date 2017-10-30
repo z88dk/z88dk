@@ -21,7 +21,11 @@ asm_zx_bitmask2px:
    ; exit  :  l = x coordinate corresponding to leftmost set bit
    ;
    ; uses  : af, l
-   
+
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ld a,l
 
    or a

@@ -385,7 +385,7 @@ wide_char:
 
    ld a,l
    cp e
-   jr z, draw_char_ret         ; if bitmap is not zero length
+   jr z, draw_char_ret         ; if bitmap is zero length
 
 draw_char:
 
