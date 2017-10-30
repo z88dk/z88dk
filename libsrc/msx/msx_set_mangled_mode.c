@@ -15,8 +15,17 @@
 #include <msx.h>
 
 void msx_set_mangled_mode() {
+
 	msx_set_mode(mode_1);
+
+#ifdef __SVI__
+	// not yet working  :(
+	msx_set_mode(0x3629);
+#else
+	//_SETGRP
 	msx_set_mode(0x7E);
+#endif
+
 	msx_vwrite((void*)0x1BBF, 0x0800, 0x800);	
 	msx_vwrite((void*)0x1BBF, 0x1000, 0x800);	
 	msx_vfill(MODE2_ATTR, 0xF0, 0x17FF);
