@@ -1,3 +1,8 @@
+SECTION bss_user
+	; We use hardcoded addresses in this file so we need to ensure there's space available that isn't
+	; going to be used for data
+	defs	1024
+
 SECTION code_user
 
 ; public

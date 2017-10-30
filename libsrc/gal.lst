@@ -2,6 +2,17 @@
 stdio/gal/fgetc_cons
 stdio/gal/fputc_cons
 stdio/gal/getk
+gal/scrolluptxt
+gal/scrolldowntxt
+gal/invtxt
+gal/filltxt
+@stdio/ansicore.lst
+stdio/ansi/gal/f_ansi_attr
+stdio/ansi/gal/f_ansi_char
+stdio/ansi/gal/f_ansi_cls
+stdio/ansi/gal/f_ansi_bel
+stdio/ansi/gal/f_ansi_dline
+stdio/ansi/gal/f_ansi_scrollup
 @gfxbasetxt6.lst
 graphics/__gfx_coords
 graphics/gal/textpixl6

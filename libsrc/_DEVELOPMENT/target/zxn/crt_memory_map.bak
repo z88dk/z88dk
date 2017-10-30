@@ -24,7 +24,7 @@ IF __MMAP = 0
 
    INCLUDE "../crt_memory_model_z80.inc"
 
-Z88DK_FOR(`LOOP', `0', `139',
+Z88DK_FOR(`LOOP', `0', `111',
 `
    SECTION BANK_`'LOOP
    org CRT_ORG_BANK_`'LOOP
@@ -36,7 +36,7 @@ Z88DK_FOR(`LOOP', `0', `139',
    org CRT_ORG_BANK_`'LOOP`'_H
 ')
 
-Z88DK_FOR(`LOOP', `0', `31',
+Z88DK_FOR(`LOOP', `0', `15',
 `
    SECTION DIV_`'LOOP
    org CRT_ORG_DIV_`'LOOP
@@ -59,7 +59,7 @@ IF __MMAP = 1
 
    INCLUDE "crt_memory_model_dotx.inc"
 
-Z88DK_FOR(`LOOP', `0', `139',
+Z88DK_FOR(`LOOP', `0', `111',
 `
    SECTION BANK_`'LOOP
    org CRT_ORG_BANK_`'LOOP
@@ -71,7 +71,7 @@ Z88DK_FOR(`LOOP', `0', `139',
    org CRT_ORG_BANK_`'LOOP`'_H
 ')
 
-Z88DK_FOR(`LOOP', `0', `31',
+Z88DK_FOR(`LOOP', `0', `15',
 `
    SECTION DIV_`'LOOP
    org CRT_ORG_DIV_`'LOOP

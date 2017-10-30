@@ -22,6 +22,10 @@ asm_tshr_saddr2cx:
    ld a,l
    adc a,a
    and $3f
-   
    ld l,a
+
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ret

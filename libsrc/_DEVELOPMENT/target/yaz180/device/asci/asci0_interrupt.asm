@@ -1,16 +1,12 @@
-    SECTION code_driver
+
+    INCLUDE "config_private.inc"
+
+    SECTION rocode_common1_driver
 
     PUBLIC _asci0_interrupt
     
     EXTERN asci0RxCount, asci0RxIn
     EXTERN asci0TxCount, asci0TxOut
-
-    EXTERN __ASCI0_RX_SIZE
-   
-    EXTERN CNTLA0, STAT0, TDR0, RDR0
-    EXTERN CNTLA0_EFR
-    EXTERN STAT0_RDRF, STAT0_OVRN, STAT0_PE, STAT0_FE
-    EXTERN STAT0_TDRE, STAT0_TIE
 
     _asci0_interrupt:
 

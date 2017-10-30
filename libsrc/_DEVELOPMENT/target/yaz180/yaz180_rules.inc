@@ -2,33 +2,9 @@
 ;; crt rules for yaz180 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFDEF CRT_PHASE_CODE_COMMMON1
-
-      defc __crt_phase_code_common1 = CRT_PHASE_CODE_COMMON1
-
-   ELSE
-
-      IFDEF TAR__crt_phase_code_common1
-
-         defc __crt_phase_code_common1 = TAR__crt_phase_code_common1
-
-      ENDIF
-
-   ENDIF
-
-   IFDEF CRT_ORG_DATA_COMMMON1
-
-      defc __crt_org_data_common1 = CRT_ORG_DATA_COMMON1
-
-   ELSE
-
-      IFDEF TAR__crt_org_data_common1
-
-         defc __crt_org_data_common1 = TAR__crt_org_data_common1
-
-      ENDIF
-
-   ENDIF
+   ; make the default SP location public
+   
+   PUBLIC __register_sp
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings

@@ -1,3 +1,6 @@
+
+SECTION code_crt_start
+
 ; address = 0x0000
 ; must decide if this is a power on reset or a trap
 
@@ -694,7 +697,7 @@ ENDIF
 
 __Test_Trap:
 
-   out0 (0x3f),a
+   out0 (0x3f),a        ; out0 (ICR),a
 
    in0 a,(ITC)
    

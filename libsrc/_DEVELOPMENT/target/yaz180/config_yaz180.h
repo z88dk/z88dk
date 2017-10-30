@@ -43,6 +43,9 @@
 
 #define __IO_BASE_ADDRESS 0x0
 
+#define __COMMON_AREA_1_PHASE_DATA  0xF000
+#define __COMMON_AREA_1_PHASE_DRIVER  0xF700
+
 #define __ASCI0_RX_SIZE  0x100
 #define __ASCI0_TX_SIZE  0x100
 
@@ -57,7 +60,7 @@
 #define __IO_PCA9665_2_PORT_BASE  0x8000
 
 #define __APU_CMD_SIZE  0x100
-#define __APU_PTR_SIZE  0x100
+#define __APU_DATA_SIZE  0x100
 
 #define __IO_APU_PORT_BASE  0xC000
 
@@ -264,6 +267,20 @@
    #define __IO_TCR_TDE0    0x01
 
    // DMA REGISTER BIT FIELDS
+
+   #define __IO_DSTAT_DE1    0x80
+   #define __IO_DSTAT_DE0    0x40
+   #define __IO_DSTAT_DWE1   0x20
+   #define __IO_DSTAT_DWE0   0x10
+   #define __IO_DSTAT_DIE1   0x08
+   #define __IO_DSTAT_DIE0   0x04
+   #define __IO_DSTAT_DME    0x01
+
+   #define __IO_DMODE_DM1    0x20
+   #define __IO_DMODE_DM0    0x10
+   #define __IO_DMODE_SM1    0x08
+   #define __IO_DMODE_SM0    0x04
+   #define __IO_DMODE_MMOD   0x02
 
    #define __IO_DCNTL_MWI1   0x80
    #define __IO_DCNTL_MWI0   0x40
@@ -585,18 +602,20 @@
 
 #define OTERM_MSG_PUTC  30
 #define OTERM_MSG_TTY  31
-#define OTERM_MSG_PRINTC  32
-#define OTERM_MSG_SCROLL  33
-#define OTERM_MSG_CLS  34
-#define OTERM_MSG_PAUSE  35
-#define OTERM_MSG_BELL  36
-#define OTERM_MSG_PSCROLL  37
+#define OTERM_MSG_FZX_PUTC  32
+#define OTERM_MSG_PRINTC  33
+#define OTERM_MSG_SCROLL  34
+#define OTERM_MSG_CLS  35
+#define OTERM_MSG_PAUSE  36
+#define OTERM_MSG_BELL  37
+#define OTERM_MSG_PSCROLL  38
+#define OTERM_MSG_FZX_GET_XOR_DRAW  39
       
-#define __MESSAGE_OTERM_NEXT__  38
+#define __MESSAGE_OTERM_NEXT__  40
 
 #define ICHAR_MSG_GETC  15
 #define OCHAR_MSG_PUTC_BIN  30
-#define OCHAR_MSG_PUTC  32
+#define OCHAR_MSG_PUTC  33
   
 #define __MESSAGE_NEXT__  45
 

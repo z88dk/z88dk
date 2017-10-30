@@ -20,18 +20,6 @@ define(`__CPU_INFO_ENABLE_SLL', 0x01)
 
 define(`__CPU_TIMER_SCALE', 20)
 
-# INTERNAL INTERRUPT VECTOR BASE ID
-# moved to crt variable "CRT_IO_VECTOR_BASE"
-#
-#define(`__IO_VECTOR_BASE', 0x80)
-#define(`__IO_VECTOR_BASE', 0x`'eval(__IO_VECTOR_BASE & 0xe0,16))
-
-# I/O BASE ADDRESS OF INTERNAL PERIPHERALS
-# moved to config_target.m4
-
-#define(`__IO_BASE_ADDRESS', 0x00)
-#define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS & 0xc0,16))
-
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
    # Z80180 CLASS
@@ -312,6 +300,20 @@ define(`__IO_TCR_TDE0',       0x01)
 
 # DMA REGISTER BIT FIELDS
 
+define(`__IO_DSTAT_DE1',        0x80)
+define(`__IO_DSTAT_DE0',        0x40)
+define(`__IO_DSTAT_DWE1',       0x20)
+define(`__IO_DSTAT_DWE0',       0x10)
+define(`__IO_DSTAT_DIE1',       0x08)
+define(`__IO_DSTAT_DIE0',       0x04)
+define(`__IO_DSTAT_DME',        0x01)
+
+define(`__IO_DMODE_DM1',        0x20)
+define(`__IO_DMODE_DM0',        0x10)
+define(`__IO_DMODE_SM1',        0x08)
+define(`__IO_DMODE_SM0',        0x04)
+define(`__IO_DMODE_MMOD',       0x02)
+
 define(`__IO_DCNTL_MWI1',       0x80)
 define(`__IO_DCNTL_MWI0',       0x40)
 define(`__IO_DCNTL_IWI1',       0x20)
@@ -553,6 +555,20 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `TCR_TDE0'
 
    ; DMA REGISTER BIT FIELDS
+
+   PUBLIC `DSTAT_DE1'
+   PUBLIC `DSTAT_DE0'
+   PUBLIC `DSTAT_DWE1'
+   PUBLIC `DSTAT_DWE0'
+   PUBLIC `DSTAT_DIE1'
+   PUBLIC `DSTAT_DIE0'
+   PUBLIC `DSTAT_DME'
+
+   PUBLIC `DMODE_DM1'
+   PUBLIC `DMODE_DM0'
+   PUBLIC `DMODE_SM1'
+   PUBLIC `DMODE_SM0'
+   PUBLIC `DMODE_MMOD'
 
    PUBLIC `DCNTL_MWI1'
    PUBLIC `DCNTL_MWI0'
@@ -1002,6 +1018,20 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 
    ; DMA REGISTER BIT FIELDS
 
+   defc `DSTAT_DE1' = __IO_DSTAT_DE1
+   defc `DSTAT_DE0' = __IO_DSTAT_DE0
+   defc `DSTAT_DWE1' = __IO_DSTAT_DWE1
+   defc `DSTAT_DWE0' = __IO_DSTAT_DWE0
+   defc `DSTAT_DIE1' = __IO_DSTAT_DIE1
+   defc `DSTAT_DIE0' = __IO_DSTAT_DIE0
+   defc `DSTAT_DME' = __IO_DSTAT_DME
+
+   defc `DMODE_DM1' = __IO_DMODE_DM1
+   defc `DMODE_DM0' = __IO_DMODE_DM0
+   defc `DMODE_SM1' = __IO_DMODE_SM1
+   defc `DMODE_SM0' = __IO_DMODE_SM0
+   defc `DMODE_MMOD' = __IO_DMODE_MMOD
+
    defc `DCNTL_MWI1' = __IO_DCNTL_MWI1
    defc `DCNTL_MWI0' = __IO_DCNTL_MWI0
    defc `DCNTL_IWI1' = __IO_DCNTL_IWI1
@@ -1211,6 +1241,20 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `TCR_TDE0' = __IO_TCR_TDE0
 
    ; DMA REGISTER BIT FIELDS
+
+   defc `DSTAT_DE1' = __IO_DSTAT_DE1
+   defc `DSTAT_DE0' = __IO_DSTAT_DE0
+   defc `DSTAT_DWE1' = __IO_DSTAT_DWE1
+   defc `DSTAT_DWE0' = __IO_DSTAT_DWE0
+   defc `DSTAT_DIE1' = __IO_DSTAT_DIE1
+   defc `DSTAT_DIE0' = __IO_DSTAT_DIE0
+   defc `DSTAT_DME' = __IO_DSTAT_DME
+
+   defc `DMODE_DM1' = __IO_DMODE_DM1
+   defc `DMODE_DM0' = __IO_DMODE_DM0
+   defc `DMODE_SM1' = __IO_DMODE_SM1
+   defc `DMODE_SM0' = __IO_DMODE_SM0
+   defc `DMODE_MMOD' = __IO_DMODE_MMOD
 
    defc `DCNTL_MWI1' = __IO_DCNTL_MWI1
    defc `DCNTL_MWI0' = __IO_DCNTL_MWI0
@@ -1450,6 +1494,20 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `__IO_TCR_TDE0'    __IO_TCR_TDE0
 
    // DMA REGISTER BIT FIELDS
+   
+   `#define' `__IO_DSTAT_DE1'    __IO_DSTAT_DE1
+   `#define' `__IO_DSTAT_DE0'    __IO_DSTAT_DE0
+   `#define' `__IO_DSTAT_DWE1'   __IO_DSTAT_DWE1
+   `#define' `__IO_DSTAT_DWE0'   __IO_DSTAT_DWE0
+   `#define' `__IO_DSTAT_DIE1'   __IO_DSTAT_DIE1
+   `#define' `__IO_DSTAT_DIE0'   __IO_DSTAT_DIE0
+   `#define' `__IO_DSTAT_DME'    __IO_DSTAT_DME
+
+   `#define' `__IO_DMODE_DM1'    __IO_DMODE_DM1
+   `#define' `__IO_DMODE_DM0'    __IO_DMODE_DM0
+   `#define' `__IO_DMODE_SM1'    __IO_DMODE_SM1
+   `#define' `__IO_DMODE_SM0'    __IO_DMODE_SM0
+   `#define' `__IO_DMODE_MMOD'   __IO_DMODE_MMOD
 
    `#define' `__IO_DCNTL_MWI1'   __IO_DCNTL_MWI1
    `#define' `__IO_DCNTL_MWI0'   __IO_DCNTL_MWI0
@@ -1660,6 +1718,20 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `__IO_TCR_TDE0'    __IO_TCR_TDE0
 
    // DMA REGISTER BIT FIELDS
+
+   `#define' `__IO_DSTAT_DE1'    __IO_DSTAT_DE1
+   `#define' `__IO_DSTAT_DE0'    __IO_DSTAT_DE0
+   `#define' `__IO_DSTAT_DWE1'   __IO_DSTAT_DWE1
+   `#define' `__IO_DSTAT_DWE0'   __IO_DSTAT_DWE0
+   `#define' `__IO_DSTAT_DIE1'   __IO_DSTAT_DIE1
+   `#define' `__IO_DSTAT_DIE0'   __IO_DSTAT_DIE0
+   `#define' `__IO_DSTAT_DME'    __IO_DSTAT_DME
+
+   `#define' `__IO_DMODE_DM1'    __IO_DMODE_DM1
+   `#define' `__IO_DMODE_DM0'    __IO_DMODE_DM0
+   `#define' `__IO_DMODE_SM1'    __IO_DMODE_SM1
+   `#define' `__IO_DMODE_SM0'    __IO_DMODE_SM0
+   `#define' `__IO_DMODE_MMOD'   __IO_DMODE_MMOD
 
    `#define' `__IO_DCNTL_MWI1'   __IO_DCNTL_MWI1
    `#define' `__IO_DCNTL_MWI0'   __IO_DCNTL_MWI0

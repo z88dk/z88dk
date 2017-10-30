@@ -15,4 +15,4 @@ PUBLIC asm_tshc_aaddrcup
 
 EXTERN asm_zx_saddrcup
 
-asm_tshc_aaddrcup = asm_zx_saddrcup
+defc asm_tshc_aaddrcup = asm_zx_saddrcup

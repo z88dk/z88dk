@@ -14,6 +14,7 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static int               origin       = -1;
 static char              audio        = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
@@ -31,6 +32,7 @@ option_t svi_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
@@ -128,6 +130,7 @@ int svi_exec(char *target)
 	FILE	*fpin, *fpout;
 	int	c;
 	int	i;
+    int        pos;
 	int	len;
 	char gothdr;
 
@@ -135,9 +138,17 @@ int svi_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || (!dumb && ( crtfile == NULL )) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
+
+	if ( origin != -1 ) {
+		pos = origin;
+	} else {
+		if ( (pos = get_org_addr(crtfile)) == -1 ) {
+			myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+		}
+	}
 
 	if (loud) {
 		h_lvl = 0xFF;
@@ -208,9 +219,9 @@ int svi_exec(char *target)
 
 	/* Now, the body */
 		headtune (fpout);
-		writeword(34816,fpout);		/* Start Address */
-		writeword(34816+len+1,fpout);	/* End Address */
-		writeword(34816,fpout);		/* Call Address */
+		writeword(pos,fpout);        /* Start Address */
+		writeword(pos+len+1,fpout); /* End Address */
+		writeword(pos,fpout);        /* Call Address */
 
 	/* (58 bytes written so far...) */
 
@@ -321,7 +332,4 @@ int svi_exec(char *target)
     return 0;
 	
 }
-
-
-
 

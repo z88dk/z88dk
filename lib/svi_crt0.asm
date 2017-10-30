@@ -32,7 +32,11 @@
 ; Now, getting to the real stuff now!
 
 
-        org     34816
+IFNDEF CRT_ORG_CODE
+		defc CRT_ORG_CODE  = 34816
+ENDIF
+
+org CRT_ORG_CODE
 
 start:
         ld      hl,0

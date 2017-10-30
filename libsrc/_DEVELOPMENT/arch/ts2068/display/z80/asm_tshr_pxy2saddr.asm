@@ -8,10 +8,13 @@
 ;
 ; ===============================================================
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_tshr_pxy2saddr
+PUBLIC asm0_tshr_pxy2saddr
 
 asm_tshr_pxy2saddr:
 
@@ -26,7 +29,15 @@ asm_tshr_pxy2saddr:
    
    ld a,c
    and $07
+
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   or $c0
+ELSE
    or $40
+ENDIF
+
+asm0_tshr_pxy2saddr:
+
    ld d,a
    
    ld a,c

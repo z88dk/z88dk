@@ -6,15 +6,17 @@
 ; ******************************************************
 ;
 ;       $Id: cpc_Chars8.asm $
-;
+; 
 
         SECTION   bss_data
         PUBLIC    cpc_Chars8
+        PUBLIC    _cpc_Chars8
         PUBLIC    first_char8
 
 
 .first_char8 defb 32	;first defined char number (ASCII)
 
+._cpc_Chars8
 .cpc_Chars8   ;each bit of each byte is a pixel, same way as SYMBOL function of Locomotive BASIC.
 
 ;; KEY SET BY ANJUEL & NA_TH_AN FROM NANAKO CPC GAME.

@@ -57,8 +57,12 @@ asm0_tshc_scroll_up:
    ex de,hl
    call asm_tshc_py2saddr      ; hl = screen address corresponding to first scroll row L
 
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   ld de,$c000
+ELSE
    ld de,$4000                 ; de = destination address of first scroll row
-   
+ENDIF
+
 copy_up_loop_1:
 
    push bc

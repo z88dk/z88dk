@@ -3,8 +3,6 @@ IF (__crt_org_code = 0)
 
 SECTION code_crt_init
 
-EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
-
     XOR     A               ; Zero Accumulator
 
                             ; Clear Refresh Control Reg (RCR)
@@ -40,13 +38,77 @@ EXTERN OMCR_M1E, CMR_X2, DCNTL_IWI0
     LD      A,$00           ; Set Bank Base Physical $00000 -> $00
     OUT0    (BBR),A
 
-                            ; we do 256 ticks per second
-    ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
-    out0 (RLDR0L), l
-    out0 (RLDR0H), h
+                            ; set up COMMON_AREA_1 Data
+    EXTERN  __rodata_common1_data_head
+    EXTERN  __rodata_common1_data_size
 
+                            ; load the DMA engine registers with source, destination, and count
+    xor     a               ; using BANK0
+    ld      hl, __rodata_common1_data_head
+    out0    (SAR0L), l
+    out0    (SAR0H), h
+    out0    (SAR0B), a
+
+    ld      hl, __COMMON_AREA_1_PHASE_DATA
+    out0    (DAR0L), l
+    out0    (DAR0H), h
+    out0    (DAR0B), a
+
+    ld      hl, __rodata_common1_data_size
+    out0    (BCR0L), l
+    out0    (BCR0H), h   
+
+    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
+    out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                            ; in burst mode the Z180 CPU stops until the DMA completes
+
+                            ; set up COMMON_AREA_1 Drivers
+    EXTERN  __rodata_common1_driver_head
+    EXTERN  __rodata_common1_driver_size
+
+                            ; load the DMA engine registers with source, destination, and count
+    xor     a               ; using BANK0
+    ld      hl, __rodata_common1_driver_head
+    out0    (SAR0L), l
+    out0    (SAR0H), h
+    out0    (SAR0B), a
+
+    ld      hl, __COMMON_AREA_1_PHASE_DRIVER
+    out0    (DAR0L), l
+    out0    (DAR0H), h
+    out0    (DAR0B), a
+
+    ld      hl, __rodata_common1_driver_size
+    out0    (BCR0L), l
+    out0    (BCR0H), h   
+
+    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
+    out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
+                            ; in burst mode the Z180 CPU stops until the DMA completes
+
+    EXTERN  prt0Lock
+                            ; now there's valid COMMON_AREA_1
+                            ; we can start the system_tick
+    ld      hl, prt0Lock    ; take the PRT0 lock, forever basically
+    sra     (hl)
+                            ; we do 256 ticks per second
+    ld      hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
+    out0    (RLDR0L), l
+    out0    (RLDR0H), h
                             ; enable down counting and interrupts for PRT0
-    ld a, TCR_TIE0|TCR_TDE0
-    out0 (TCR), a
+    ld      a, TCR_TIE0|TCR_TDE0
+    out0    (TCR), a        ; using the driver/z180/system_tick.asm
+
+    EXTERN  _asci0_init
+    call    _asci0_init     ; initialise the asci0
+
+    EXTERN  _asci1_init    
+    call    _asci1_init     ; and the asci1 interfaces
+    
+    EXTERN  bankLockBase    ; lock BANK0 whilst the yabios CLI is running
+    ld      hl, bankLockBase
+    ld      (hl), $FF
 
 ENDIF

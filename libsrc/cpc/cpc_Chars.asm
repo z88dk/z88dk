@@ -10,12 +10,14 @@
 
         SECTION   bss_data
         PUBLIC    cpc_Chars
+        PUBLIC    _cpc_Chars
         PUBLIC    first_char
 
 
 .first_char defb 48	;first defined char number (ASCII)
 
 .cpc_Chars
+._cpc_Chars
    ; cpc_Chars encoding... every pixel is defined with 2 bits defining the colour.
 
 ;0

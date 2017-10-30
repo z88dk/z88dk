@@ -39,7 +39,7 @@
         LD D, H
         LD E, L
         INC DE
-        LD BC, __APU_CMD_SIZE
+        LD BC, __APU_CMD_SIZE-1
         LDIR
 
         LD (APUPTRBuf), A       ; clear OPERAND POINTER Buffer
@@ -47,7 +47,7 @@
         LD D, H
         LD E, L
         INC DE
-        LD BC, __APU_PTR_SIZE
+        LD BC, __APU_PTR_SIZE-1
         LDIR
 
         ld (APUStatus), a       ; set APU status to idle (NOP)

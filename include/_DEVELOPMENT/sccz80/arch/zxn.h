@@ -38,6 +38,7 @@
 extern unsigned char GLOBAL_ZX_PORT_FE;
 extern unsigned char GLOBAL_ZX_PORT_1FFD;
 extern unsigned char GLOBAL_ZX_PORT_7FFD;
+extern unsigned char GLOBAL_ZX_PORT_DFFD;
 
 // IO MAPPED REGISTERS
 
@@ -46,8 +47,10 @@ extern unsigned char GLOBAL_ZX_PORT_7FFD;
 // SPECTRUM
 
 extern unsigned char IO_FE;
+extern unsigned char IO_FF;
 extern unsigned char IO_1FFD;
 extern unsigned char IO_7FFD;
+extern unsigned char IO_DFFD;
 
 // TBBLUE I/O Port system
 
@@ -92,9 +95,11 @@ extern unsigned char IO_BFFD;
 // SPECTRUM
 
 __sfr __at 0xfe IO_FE;
+__sfr __at 0xff IO_FF;
 
 __sfr __banked __at 0x1ffd IO_1FFD;
 __sfr __banked __at 0x7ffd IO_7FFD;
+__sfr __banked __at 0xdffd IO_DFFD;
 
 // TBBLUE I/O Port system
 
@@ -225,23 +230,33 @@ struct zxtapehdr
 #define ZXT_TYPE_HEADER  0
 #define ZXT_TYPE_DATA    0xff
 
-extern unsigned char __LIB__ zx_tape_load_block(void *dst,unsigned int len,unsigned char type) __smallc;
-extern unsigned char __LIB__ zx_tape_load_block_callee(void *dst,unsigned int len,unsigned char type) __smallc __z88dk_callee;
+extern unsigned int __LIB__ zx_tape_load_block(void *dst,unsigned int len,unsigned char type) __smallc;
+extern unsigned int __LIB__ zx_tape_load_block_callee(void *dst,unsigned int len,unsigned char type) __smallc __z88dk_callee;
 #define zx_tape_load_block(a,b,c) zx_tape_load_block_callee(a,b,c)
 
 
-extern unsigned char __LIB__ zx_tape_save_block(void *src,unsigned int len,unsigned char type) __smallc;
-extern unsigned char __LIB__ zx_tape_save_block_callee(void *src,unsigned int len,unsigned char type) __smallc __z88dk_callee;
+extern unsigned int __LIB__ zx_tape_save_block(void *src,unsigned int len,unsigned char type) __smallc;
+extern unsigned int __LIB__ zx_tape_save_block_callee(void *src,unsigned int len,unsigned char type) __smallc __z88dk_callee;
 #define zx_tape_save_block(a,b,c) zx_tape_save_block_callee(a,b,c)
 
 
-extern unsigned char __LIB__ zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __smallc;
-extern unsigned char __LIB__ zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __smallc __z88dk_callee;
+extern unsigned int __LIB__ zx_tape_verify_block(void *dst,unsigned int len,unsigned char type) __smallc;
+extern unsigned int __LIB__ zx_tape_verify_block_callee(void *dst,unsigned int len,unsigned char type) __smallc __z88dk_callee;
 #define zx_tape_verify_block(a,b,c) zx_tape_verify_block_callee(a,b,c)
 
 
 
-// miscellaneous
+// Timex Video Mode
+
+#define TVM_SPECTRUM   0       // 256x192 pix, 32x24 attr
+#define TVM_HICOLOR    2       // 256x192 pix, 32x192 attr
+#define TVM_HIRES      6       // 512x192 pix or with paper colour
+
+extern void __LIB__ ts_vmod(unsigned char mode) __smallc __z88dk_fastcall;
+
+
+
+// miscellaneous - spectrum display
 
 extern void __LIB__ zx_border(unsigned char colour) __smallc __z88dk_fastcall;
 
@@ -341,6 +356,170 @@ extern void __LIB__ zx_visit_wc_attr_callee(struct r_Rect8 *r,void *visit) __sma
 extern void __LIB__ zx_visit_wc_pix(struct r_Rect8 *r,void *visit) __smallc;
 extern void __LIB__ zx_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __smallc __z88dk_callee;
 #define zx_visit_wc_pix(a,b) zx_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+// miscellaneous - timex hi-colour display
+
+extern void __LIB__ tshc_cls(unsigned char attr) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ tshc_cls_attr(unsigned char attr) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ tshc_cls_pix(unsigned char pix) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ tshc_cls_wc(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ tshc_cls_wc_callee(struct r_Rect8 *r,unsigned char attr) __smallc __z88dk_callee;
+#define tshc_cls_wc(a,b) tshc_cls_wc_callee(a,b)
+
+
+extern void __LIB__ tshc_cls_wc_attr(struct r_Rect8 *r,unsigned char attr) __smallc;
+extern void __LIB__ tshc_cls_wc_attr_callee(struct r_Rect8 *r,unsigned char attr) __smallc __z88dk_callee;
+#define tshc_cls_wc_attr(a,b) tshc_cls_wc_attr_callee(a,b)
+
+
+extern void __LIB__ tshc_cls_wc_pix(struct r_Rect8 *r,unsigned char pix) __smallc;
+extern void __LIB__ tshc_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __smallc __z88dk_callee;
+#define tshc_cls_wc_pix(a,b) tshc_cls_wc_pix_callee(a,b)
+
+
+extern void __LIB__ tshc_scroll_up(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ tshc_scroll_up_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define tshc_scroll_up(a,b) tshc_scroll_up_callee(a,b)
+
+
+extern void __LIB__ tshc_scroll_up_attr(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ tshc_scroll_up_attr_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define tshc_scroll_up_attr(a,b) tshc_scroll_up_attr_callee(a,b)
+
+
+extern void __LIB__ tshc_scroll_up_pix(unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ tshc_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define tshc_scroll_up_pix(a,b) tshc_scroll_up_pix_callee(a,b)
+
+
+extern void __LIB__ tshc_scroll_wc_up(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ tshc_scroll_wc_up_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define tshc_scroll_wc_up(a,b,c) tshc_scroll_wc_up_callee(a,b,c)
+
+
+extern void __LIB__ tshc_scroll_wc_up_attr(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ tshc_scroll_wc_up_attr_callee(struct r_Rect8 *r,unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define tshc_scroll_wc_up_attr(a,b,c) tshc_scroll_wc_up_attr_callee(a,b,c)
+
+
+extern void __LIB__ tshc_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ tshc_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define tshc_scroll_wc_up_pix(a,b,c) tshc_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+#ifdef __CLANG
+
+extern void __LIB__ tshc_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ tshc_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc __z88dk_callee;
+#define tshc_visit_wc_attr(a,b) tshc_visit_wc_attr_callee(a,b)
+
+
+extern void __LIB__ tshc_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ tshc_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc __z88dk_callee;
+#define tshc_visit_wc_pix(a,b) tshc_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void __LIB__ tshc_visit_wc_attr(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ tshc_visit_wc_attr_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc __z88dk_callee;
+#define tshc_visit_wc_attr(a,b) tshc_visit_wc_attr_callee(a,b)
+
+
+extern void __LIB__ tshc_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ tshc_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc __z88dk_callee;
+#define tshc_visit_wc_pix(a,b) tshc_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void __LIB__ tshc_visit_wc_attr(struct r_Rect8 *r,void *visit) __smallc;
+extern void __LIB__ tshc_visit_wc_attr_callee(struct r_Rect8 *r,void *visit) __smallc __z88dk_callee;
+#define tshc_visit_wc_attr(a,b) tshc_visit_wc_attr_callee(a,b)
+
+
+extern void __LIB__ tshc_visit_wc_pix(struct r_Rect8 *r,void *visit) __smallc;
+extern void __LIB__ tshc_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __smallc __z88dk_callee;
+#define tshc_visit_wc_pix(a,b) tshc_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+// miscellaneous - timex hi-res display
+
+extern void __LIB__ tshr_cls(unsigned char attr) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ tshr_cls_attr(unsigned char attr) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ tshr_cls_pix(unsigned char pix) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ tshr_cls_wc_pix(struct r_Rect8 *r,unsigned char pix) __smallc;
+extern void __LIB__ tshr_cls_wc_pix_callee(struct r_Rect8 *r,unsigned char pix) __smallc __z88dk_callee;
+#define tshr_cls_wc_pix(a,b) tshr_cls_wc_pix_callee(a,b)
+
+
+extern void __LIB__ tshr_scroll_up(unsigned char rows,unsigned char attr) __smallc;
+extern void __LIB__ tshr_scroll_up_callee(unsigned char rows,unsigned char attr) __smallc __z88dk_callee;
+#define tshr_scroll_up(a,b) tshr_scroll_up_callee(a,b)
+
+
+extern void __LIB__ tshr_scroll_up_pix(unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ tshr_scroll_up_pix_callee(unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define tshr_scroll_up_pix(a,b) tshr_scroll_up_pix_callee(a,b)
+
+
+extern void __LIB__ tshr_scroll_wc_up_pix(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc;
+extern void __LIB__ tshr_scroll_wc_up_pix_callee(struct r_Rect8 *r,unsigned char rows,unsigned char pix) __smallc __z88dk_callee;
+#define tshr_scroll_wc_up_pix(a,b,c) tshr_scroll_wc_up_pix_callee(a,b,c)
+
+
+
+#ifdef __CLANG
+
+extern void __LIB__ tshr_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ tshr_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc __z88dk_callee;
+#define tshr_visit_wc_pix(a,b) tshr_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SDCC
+
+extern void __LIB__ tshr_visit_wc_pix(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc;
+extern void __LIB__ tshr_visit_wc_pix_callee(struct r_Rect8 *r,void (*visit)(unsigned char *)) __smallc __z88dk_callee;
+#define tshr_visit_wc_pix(a,b) tshr_visit_wc_pix_callee(a,b)
+
+
+
+#endif
+
+#ifdef __SCCZ80
+
+extern void __LIB__ tshr_visit_wc_pix(struct r_Rect8 *r,void *visit) __smallc;
+extern void __LIB__ tshr_visit_wc_pix_callee(struct r_Rect8 *r,void *visit) __smallc __z88dk_callee;
+#define tshr_visit_wc_pix(a,b) tshr_visit_wc_pix_callee(a,b)
 
 
 
@@ -450,10 +629,10 @@ extern unsigned char __LIB__ zx_saddr2cx(void *saddr) __smallc __z88dk_fastcall;
 extern unsigned char __LIB__ zx_saddr2cy(void *saddr) __smallc __z88dk_fastcall;
 
 
-extern unsigned int __LIB__ zx_saddr2px(void *saddr) __smallc __z88dk_fastcall;
+extern unsigned char __LIB__ zx_saddr2px(void *saddr) __smallc __z88dk_fastcall;
 
 
-extern unsigned int __LIB__ zx_saddr2py(void *saddr) __smallc __z88dk_fastcall;
+extern unsigned char __LIB__ zx_saddr2py(void *saddr) __smallc __z88dk_fastcall;
 
 
 extern unsigned char __LIB__ *zx_saddrcdown(void *saddr) __smallc __z88dk_fastcall;
@@ -482,6 +661,198 @@ extern unsigned char __LIB__ *zx_saddrpright_callee(void *saddr,unsigned char bi
 
 
 extern unsigned char __LIB__ *zx_saddrpup(void *saddr) __smallc __z88dk_fastcall;
+
+
+
+// Timex Hi-Colour Display 256x192 pixel 32x192 colour
+
+extern unsigned char __LIB__ tshc_aaddr2cx(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_aaddr2cy(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_aaddr2px(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_aaddr2py(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddr2saddr(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddrcdown(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddrcleft(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddrcright(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddrcup(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddrpdown(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_aaddrpleft(void *aaddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ *tshc_aaddrpleft_callee(void *aaddr,unsigned char bitmask) __smallc __z88dk_callee;
+#define tshc_aaddrpleft(a,b) tshc_aaddrpleft_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_aaddrpright(void *aaddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ *tshc_aaddrpright_callee(void *aaddr,unsigned char bitmask) __smallc __z88dk_callee;
+#define tshc_aaddrpright(a,b) tshc_aaddrpright_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_aaddrpup(void *aaddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_bitmask2px(unsigned char bitmask) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_cxy2aaddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ *tshc_cxy2aaddr_callee(unsigned char x,unsigned char y) __smallc __z88dk_callee;
+#define tshc_cxy2aaddr(a,b) tshc_cxy2aaddr_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_cxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ *tshc_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc __z88dk_callee;
+#define tshc_cxy2saddr(a,b) tshc_cxy2saddr_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_cy2aaddr(unsigned char y) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_cy2saddr(unsigned char y) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_px2bitmask(unsigned char x) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_pxy2aaddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ *tshc_pxy2aaddr_callee(unsigned char x,unsigned char y) __smallc __z88dk_callee;
+#define tshc_pxy2aaddr(a,b) tshc_pxy2aaddr_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_pxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ *tshc_pxy2saddr_callee(unsigned char x,unsigned char y) __smallc __z88dk_callee;
+#define tshc_pxy2saddr(a,b) tshc_pxy2saddr_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_py2aaddr(unsigned char y) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_py2saddr(unsigned char y) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddr2aaddr(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_saddr2cx(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_saddr2cy(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_saddr2px(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshc_saddr2py(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddrcdown(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddrcleft(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddrcright(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddrcup(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddrpdown(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshc_saddrpleft(void *saddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ *tshc_saddrpleft_callee(void *saddr,unsigned char bitmask) __smallc __z88dk_callee;
+#define tshc_saddrpleft(a,b) tshc_saddrpleft_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_saddrpright(void *saddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ *tshc_saddrpright_callee(void *saddr,unsigned char bitmask) __smallc __z88dk_callee;
+#define tshc_saddrpright(a,b) tshc_saddrpright_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshc_saddrpup(void *saddr) __smallc __z88dk_fastcall;
+
+
+
+// Timex Hi-Res Display, 512x192 monochrome
+
+extern unsigned char __LIB__ tshr_bitmask2px(unsigned char bitmask) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_cxy2saddr(unsigned char x,unsigned char y) __smallc;
+extern unsigned char __LIB__ *tshr_cxy2saddr_callee(unsigned char x,unsigned char y) __smallc __z88dk_callee;
+#define tshr_cxy2saddr(a,b) tshr_cxy2saddr_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshr_cy2saddr(unsigned char y) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshr_px2bitmask(unsigned char x) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_pxy2saddr(unsigned int x,unsigned char y) __smallc;
+extern unsigned char __LIB__ *tshr_pxy2saddr_callee(unsigned int x,unsigned char y) __smallc __z88dk_callee;
+#define tshr_pxy2saddr(a,b) tshr_pxy2saddr_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshr_py2saddr(unsigned char y) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshr_saddr2cx(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshr_saddr2cy(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned int __LIB__ tshr_saddr2px(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ tshr_saddr2py(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_saddrcdown(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_saddrcleft(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_saddrcright(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_saddrcup(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_saddrpdown(void *saddr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ *tshr_saddrpleft(void *saddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ *tshr_saddrpleft_callee(void *saddr,unsigned char bitmask) __smallc __z88dk_callee;
+#define tshr_saddrpleft(a,b) tshr_saddrpleft_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshr_saddrpright(void *saddr,unsigned char bitmask) __smallc;
+extern unsigned char __LIB__ *tshr_saddrpright_callee(void *saddr,unsigned char bitmask) __smallc __z88dk_callee;
+#define tshr_saddrpright(a,b) tshr_saddrpright_callee(a,b)
+
+
+extern unsigned char __LIB__ *tshr_saddrpup(void *saddr) __smallc __z88dk_fastcall;
 
 
 

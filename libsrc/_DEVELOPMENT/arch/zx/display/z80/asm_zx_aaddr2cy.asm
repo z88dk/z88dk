@@ -28,6 +28,10 @@ asm_zx_aaddr2cy:
    
    ld a,h
    and $1f
-   
    ld l,a
+
+IF __SCCZ80
+   ld h,0
+ENDIF
+
    ret
