@@ -98,7 +98,7 @@
 	call	l_getptr
 	push	de
 	push	hl
-	ld	hl,1
+	ld	hl,1	;const
 	push	hl
 	call	_func5
 	pop	bc
@@ -115,7 +115,10 @@
 	ld	de,0
 	push	de
 	push	hl
+	ld	hl,1	;const
+	push	hl
 	call	_func5
+	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc

@@ -3293,6 +3293,14 @@ int zcriticaloffset(void)
     return 2;
 }
 
+void push_char_sdcc_style(void)
+{
+    ol("ld\tb,l");
+    ol("push\tbc");
+    ol("inc\tsp");
+    Zsp++;
+}
+
 
 /*
  * Local Variables:

@@ -1537,11 +1537,11 @@
 	jp	%1
 
 	push	hl
-	ld	hl,#%1
+	ld	hl,%1
 	pop	de
 =
 	ex	de,hl
-	ld	hl,#%1
+	ld	hl,%1
 
 	push	bc
 	ld	hl,%1	;const
@@ -2409,7 +2409,7 @@
 	ld	a,l
 	call	l_sxt
 =
-	ld	hl,%1
+	ld	hl,%1	;const
 
 	push	hl
 	ld	hl,%1

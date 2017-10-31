@@ -14,7 +14,7 @@
 
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
-static Kind ForceArgs(Type *dest, Type *src);
+static Kind ForceArgs(Type *dest, Type *src, int isconst);
 
 
 /*
@@ -190,7 +190,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                expr = ForceArgs(prototype, type);
+                expr = ForceArgs(prototype, type, vconst);
             }
             // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
@@ -216,6 +216,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
                 } else if (expr == KIND_LONG || expr == KIND_CPTR) {
                     lpush();
                     nargs += 4;
+                } else if ( expr == KIND_CHAR && functype->flags & SDCCDECL ) {
+                    push_char_sdcc_style();
+                    nargs += 1;
                 } else {
                     zpush();
                     nargs += 2;
@@ -358,7 +361,7 @@ static int SetWatch(char* sym, int* type)
  *      djm routine to force arguments to switch type
  */
 
-static Kind ForceArgs(Type *dest, Type *src)
+static Kind ForceArgs(Type *dest, Type *src, int isconst)
 {
     // TODO: ARRAYS
     if ( !ispointer(dest) ) {
@@ -375,11 +378,11 @@ static Kind ForceArgs(Type *dest, Type *src)
                 warningfmt("%s", utstring_body(str));
                 utstring_free(str);
             }
-            force( dest->kind, src->kind, dest->isunsigned, src->isunsigned, 0);
+            force( dest->kind, src->kind, dest->isunsigned, src->isunsigned, isconst);
         } else {
             /* Converting pointer to integer */
             warning(W_PTRINT);
-            force( dest->kind, src->kind == KIND_PTR ? KIND_INT : KIND_LONG, dest->isunsigned, 1, 0);
+            force( dest->kind, src->kind == KIND_PTR ? KIND_INT : KIND_LONG, dest->isunsigned, 1, isconst);
         }
     } else  if ( !ispointer(src) ) {
         // Converting int/long to pointer
