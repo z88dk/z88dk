@@ -1,0 +1,50 @@
+
+
+
+	MODULE	Issue_485_sdccdecl
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,3	;const
+	call	l_gcharspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gchar
+	pop	de
+	add	hl,de
+	ret
+
+
+
+._main
+	ld	hl,1	;const
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,2	;const
+	ld	b,l
+	push	bc
+	inc	sp
+	call	_func
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_main
+
+
+
+
