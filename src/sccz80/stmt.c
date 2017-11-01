@@ -344,15 +344,21 @@ void dofor()
 {
     WHILE_TAB wq;
     int l_condition;
+    int savedsp;
+    SYMBOL *savedloc;
     t_buffer *buf2, *buf3;
 
     addwhile(&wq);
     l_condition = getlabel();
+    savedsp = Zsp;
+    savedloc = locptr;
 
     needchar('(');
     if (cmatch(';') == 0) {
-        doexpr(); /*         initialization             */
-        ns();
+        if ( declare_local(0) == 0 ) {
+            doexpr(); /*         initialization             */
+            ns();
+        }
     }
 
     buf2 = startbuffer(1); /* save condition to buf2 */
@@ -377,7 +383,9 @@ void dofor()
     statement(); /*         statement                  */
     jump(wq.loop); /*         goto loop                  */
     postlabel(wq.exit); /* .exit                              */
-
+    modstk(savedsp, NO, NO);
+    Zsp = savedsp;
+    locptr = savedloc;
     delwhile();
 }
 
