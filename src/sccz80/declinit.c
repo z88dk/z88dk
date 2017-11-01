@@ -220,6 +220,7 @@ static int init(Type *type, int dump)
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
+        cmatch('&');
         if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
                 /* Actually found sommat..very good! */

@@ -598,7 +598,7 @@ int heirb(LVALUE* lval)
                     Zsp += 2; /* undo push */
                     if (lval->ltype->kind == KIND_CPTR)
                         Zsp += 2;
-                    if ( val > lval->ltype->len && lval->ltype->kind == KIND_ARRAY) {
+                    if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
                         warningfmt("Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
                     cscale(lval->ltype, &val);

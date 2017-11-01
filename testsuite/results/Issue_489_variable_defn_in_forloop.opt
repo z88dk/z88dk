@@ -1,0 +1,101 @@
+
+
+
+	MODULE	Issue_489_variable_defn_in_forloop
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	push	bc
+	ld	hl,0	;const
+	push	hl
+	jp	i_4
+.i_2
+	pop	hl
+	inc	hl
+	push	hl
+	dec	hl
+.i_4
+	pop	de
+	push	de
+	ld	hl,10	;const
+	call	l_lt
+	jp	nc,i_3
+	pop	hl
+	push	hl
+	push	hl
+	call	_func2
+	pop	bc
+	jp	i_2
+.i_3
+	pop	bc
+	ld	hl,100	;const
+	push	hl
+	call	_func2
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func3
+	push	bc
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	push	de
+	push	hl
+	jp	i_7
+.i_5
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+	call	l_declong
+.i_7
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,10	;const
+	ld	de,0
+	call	l_long_lt
+	jp	nc,i_6
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	push	hl
+	call	_func2
+	pop	bc
+	jp	i_5
+.i_6
+	pop	bc
+	pop	bc
+	ld	hl,100	;const
+	push	hl
+	call	_func2
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func2
+	GLOBAL	_func
+	GLOBAL	_func3
+
+
+
+

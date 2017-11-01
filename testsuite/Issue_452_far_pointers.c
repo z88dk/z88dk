@@ -38,7 +38,7 @@ int func5(far char *ptr, char val)
 int func6()
 {
 	char   *ptr;
-	func5(ptr);
+	func5(ptr,1);
 }
 
 struct x {

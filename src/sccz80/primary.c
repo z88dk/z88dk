@@ -229,7 +229,7 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 
 /* Forces result, having type t2, to have type t1 */
 /* Must take account of sign in here somewhere, also there is a problem    possibly with longs.. */
-void force(Kind t1, Kind t2, char sign1, char sign2, int lconst)
+void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
 {
     if (t2 == KIND_CARRY) {
         zcarryconv();
@@ -249,7 +249,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int lconst)
     /* int to long, if signed, do sign, if not ld de,0 */
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
-        if (t2 != KIND_LONG && (!lconst)) {
+        if (t2 != KIND_LONG && (!isconst)) {
             if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY) {
                 convSint2long();
             } else
@@ -265,12 +265,12 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int lconst)
         warning(W_FARNR);
 
     /* Char conversion */
-    if (t1 == KIND_CHAR && sign2 == NO && !lconst) {
+    if (t1 == KIND_CHAR && sign2 == NO && !isconst) {
         if (sign1 == NO)
             convSint2char();
         else
             convUint2char();
-    } else if (t1 == KIND_CHAR && sign2 == YES && !lconst) {
+    } else if (t1 == KIND_CHAR && sign2 == YES && !isconst) {
         if (sign1 == NO)
             convSint2char();
         else

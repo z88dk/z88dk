@@ -461,6 +461,9 @@ static void parse_trailing_modifiers(Type *type)
         } else if ( amatch("__critical")) {
             type->flags |= CRITICAL;
             continue;
+        } else if ( amatch("__z88dk_sdccdecl")) {
+            type->flags |= SDCCDECL;
+            continue;
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -479,6 +482,9 @@ static void parse_trailing_modifiers(Type *type)
         }
     }
 
+    if ( type->flags & SDCCDECL ) {
+        type->flags &= ~SMALLC;
+    }
 
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
@@ -1105,6 +1111,9 @@ void flags_describe(int32_t flags, UT_string *output)
     if ( flags & SAVEFRAME ) {
         utstring_printf(output,"__z88dk_saveframe ");
     }  
+    if ( flags & SDCCDECL ) {
+        utstring_printf(output,"__z88dk_sdccdecl ");
+    }
     if ( flags & NAKED ) {
         utstring_printf(output,"__naked ");
     }  
@@ -1249,11 +1258,11 @@ int type_matches(Type *t1, Type *t2)
 }
 
 
-static int get_parameter_size(Type *type)
+static int get_parameter_size(Type *functype, Type *type)
 {
     switch ( type->kind ) {
         case KIND_CHAR:
-            return 2;
+            return functype->flags & SDCCDECL ? 1 : 2;
         case KIND_CPTR:
             return 4;
         default:
@@ -1363,7 +1372,7 @@ static void declfunc(Type *type, enum storage_type storage)
             outfmt("; parameter '%s' at %d size(%d)\n",utstring_body(str),where, ptype->size);
             utstring_free(str);
             ptr->isassigned = 1;
-            where += get_parameter_size(ptype);
+            where += get_parameter_size(type,ptype);
         }
     } else {
         int i;
@@ -1387,7 +1396,7 @@ static void declfunc(Type *type, enum storage_type storage)
             outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  
             utstring_free(str);            
             ptr->isassigned = 1;            
-            where += get_parameter_size(ptype);
+            where += get_parameter_size(type, ptype);
         }
     }
 

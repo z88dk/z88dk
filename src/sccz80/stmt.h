@@ -4,7 +4,7 @@ extern void ns(void);
 extern void compound(void);
 extern void doiferror(void);
 extern void doif(void);
-extern int doexpr(void);
+extern Type *doexpr(void);
 extern void dowhile(void);
 extern void dodo(void);
 extern void dofor(void);
