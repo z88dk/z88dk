@@ -21,7 +21,7 @@
 
 
 
-._main
+._func2
 	ld	hl,2	;const
 	ld	b,l
 	push	bc
@@ -36,6 +36,23 @@
 
 
 
+._func3
+	call	_compute
+	ld	a,l
+	call	l_sxt
+	ld	(_a),hl
+	ret
+
+
+
+._func4
+	call	_compute2
+	ld	h,0
+	ld	(_a),hl
+	ret
+
+
+
 
 	SECTION	bss_compiler
 	SECTION	code_compiler
@@ -43,7 +60,12 @@
 
 
 	GLOBAL	_func
-	GLOBAL	_main
+	GLOBAL	_func2
+	GLOBAL	_a
+	GLOBAL	_compute
+	GLOBAL	_compute2
+	GLOBAL	_func3
+	GLOBAL	_func4
 
 
 

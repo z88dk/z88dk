@@ -97,7 +97,6 @@ int heir1(LVALUE* lval)
             warningfmt("Assigning from a void expression");
         }
 
-
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
@@ -650,24 +649,39 @@ int heirb(LVALUE* lval)
                 ptr = deref(lval, YES);
                 k = 1;
             } else if (cmatch('(')) {
-                 if ( ispointer(lval->ltype) ) {
+                Type *return_type = type_void;
+                int   flags = 0;
+                if ( ispointer(lval->ltype) ) {
                      if (k && lval->const_val == 0)
                         rvalue(lval);
                     // Functino pointer call
                     callfunction(NULL,lval->ltype->ptr);
+                    return_type = lval->ltype->ptr->return_type;
+                    flags = lval->ltype->ptr->flags;
                 } else if ( lval->ltype->kind == KIND_FUNC ) {
                     // Normal function call
                     callfunction(ptr,NULL);
+                    return_type = lval->ltype->return_type;      
+                    flags = lval->ltype->flags;                    
                 } else {
                     // No idea what you are doing, calling a non pointer
+                    errorfmt("Calling a non-pointer function?",1);
+                }
+                if ( return_type->kind == KIND_CHAR && flags & SDCCDECL) {
+                    // We just called an SDCC function, we need to extend out to 16 bits, these names are wrong, but
+                    // they do the right thing
+                    if ( return_type->isunsigned ) {
+                        convUint2char();
+                    } else {
+                        convSint2char();
+                    }
                 }
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
-                lval->ltype = lval->ltype->kind == KIND_PTR ? lval->ltype->ptr->return_type : lval->ltype->return_type;
+                lval->ltype = return_type;
                 lval->ptr_type = KIND_NONE;
                 lval->val_type = lval->ltype->kind;
                 lval->symbol = NULL;
-
                 // Function returing pointer
                 if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR ) {
                     lval->val_type = lval->ltype->kind;
