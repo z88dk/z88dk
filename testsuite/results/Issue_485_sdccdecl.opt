@@ -10,9 +10,9 @@
 	SECTION	code_compiler
 
 ._func
-	ld	hl,3	;const
+	ld	hl,2	;const
 	call	l_gcharspsp	;
-	ld	hl,4	;const
+	ld	hl,5	;const
 	add	hl,sp
 	call	l_gchar
 	pop	de
@@ -22,11 +22,11 @@
 
 
 ._main
-	ld	hl,1	;const
+	ld	hl,2	;const
 	ld	b,l
 	push	bc
 	inc	sp
-	ld	hl,2	;const
+	ld	hl,1	;const
 	ld	b,l
 	push	bc
 	inc	sp

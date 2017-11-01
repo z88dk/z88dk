@@ -482,6 +482,9 @@ static void parse_trailing_modifiers(Type *type)
         }
     }
 
+    if ( type->flags & SDCCDECL ) {
+        type->flags &= ~SMALLC;
+    }
 
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
@@ -1108,6 +1111,9 @@ void flags_describe(int32_t flags, UT_string *output)
     if ( flags & SAVEFRAME ) {
         utstring_printf(output,"__z88dk_saveframe ");
     }  
+    if ( flags & SDCCDECL ) {
+        utstring_printf(output,"__z88dk_sdccdecl ");
+    }
     if ( flags & NAKED ) {
         utstring_printf(output,"__naked ");
     }  

@@ -282,11 +282,12 @@ void doif()
 /*
  * perform expression (including commas)
  */
-int doexpr()
+Type *doexpr()
 {
     char *before, *start;
     double val;
-    int type, vconst;
+    int    vconst;
+    Kind    type;
     Type   *type_ptr;
     
     while (1) {
@@ -294,7 +295,7 @@ int doexpr()
         type = expression(&vconst, &val, &type_ptr);
         clearstage(before, start);
         if (ch() != ',')
-            return type;
+            return type_ptr;
         inbyte();
     }
 }
@@ -388,7 +389,7 @@ void doswitch()
     WHILE_TAB wq;
     int endlab, swact, swdef;
     SW_TAB *swnex, *swptr;
-    char swtype; /* type of switch statement - KIND_INT/LONG */
+    Type   *switch_type;
     t_buffer* buf;
 
     swact = swactive;
@@ -397,7 +398,7 @@ void doswitch()
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
     needchar('(');
-    swtype = doexpr(); /* evaluate switch expression */
+    switch_type = doexpr(); /* evaluate switch expression */
     needchar(')');
     swdefault = 0;
     swactive = 1;
@@ -410,7 +411,7 @@ void doswitch()
     suspendbuffer();
 
     postlabel(endlab);
-    if (swtype == KIND_CHAR) {
+    if (switch_type->kind == KIND_CHAR) {
         LoadAccum();
         while (swptr < swnext) {
             CpCharVal(swptr->value);
@@ -418,11 +419,11 @@ void doswitch()
             ++swptr;
         }
     } else {
-        sw(swtype); /* insert code to match cases */
+        sw(switch_type->kind); /* insert code to match cases */
         while (swptr < swnext) {
             defword();
             printlabel(swptr->label); /* case label */
-            if (swtype == KIND_LONG) {
+            if (switch_type->kind == KIND_LONG) {
                 outbyte('\n');
                 deflong();
             } else
@@ -489,7 +490,8 @@ void doreturn(char type)
 {
     /* if not end of statement, get an expression */
     if (endst() == 0) {
-        force(currfn->ctype->return_type->kind, doexpr(), currfn->ctype->return_type->isunsigned, c_default_unsigned, 0);
+        Type *expr = doexpr();
+        force(currfn->ctype->return_type->kind, expr->kind, currfn->ctype->return_type->isunsigned, expr->isunsigned, 0);
         leave(currfn->ctype->return_type->kind, type, incritical);
     } else {
         leave(KIND_INT, type, incritical);
