@@ -107,6 +107,7 @@ msxdeps:
 	@$(RM) -f graphics/msx/*.o
 	@$(RM) -f graphics/msx/surface/*.o
 	@$(RM) -f psg/msx/*.o
+	@$(RM) -f time/msx/*.o
 	@$(RM) -f msx/*.o
 
 zx81deps:
