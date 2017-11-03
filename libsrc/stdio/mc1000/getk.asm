@@ -6,12 +6,14 @@
 ;	Stefano Bodrato, 2013
 ;
 ;
-;	$Id: getk.asm,v 1.7 2016-06-12 17:07:44 dom Exp $
+;	$Id: getk.asm $
 ;
 
-; The code at entry $c009 checks if a key has been pressed in a 7ms interval.
-; If so, A and ($012E) are set to $FF and the key code is put in ($011C).
-; Otherwise, A and ($012E) are set to $00.
+
+; SKEY?: keyboard reading for games
+; A = #00 :   no key pressed
+; A = #FF :   key code is in #011B
+
 
         SECTION code_clib
 	PUBLIC	getk
@@ -20,11 +22,11 @@
 .getk
 ._getk
 	call	$C027
+	ld		hl,0
 	and		a
-	jr		z,key_got
+	ret		z
 	ld		a,($011B)
 
-.key_got
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
@@ -33,5 +35,4 @@ IF STANDARDESCAPECHARS
 ENDIF
 
 	ld	l,a
-	ld	h,0
 	ret
