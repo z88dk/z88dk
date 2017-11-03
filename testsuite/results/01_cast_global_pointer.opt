@@ -9,14 +9,11 @@
 
 	SECTION	code_compiler
 
-
 ._main
 	SECTION	data_compiler
-
 ._st_main_c
 	defw	0
 	SECTION	code_compiler
-
 	ld	hl,(_a)
 	push	hl
 	ld	hl,(_st_main_c)
@@ -37,18 +34,15 @@
 
 
 
-
 	SECTION	bss_compiler
-
 ._a	defs	2
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_a
-	PUBLIC	_main
-	PUBLIC	_test
+	GLOBAL	_a
+	GLOBAL	_main
+	GLOBAL	_test
 
 
 

@@ -1,0 +1,171 @@
+
+
+
+	MODULE	Issue_452_far_pointers
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	push	bc
+	dec	sp
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_getptr
+	call	lp_gchar
+	call	l_sxt
+	inc	sp
+	pop	bc
+	ret
+
+
+
+._func2
+	push	bc
+	dec	sp
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_getptr
+	call	l_inclong
+	pop	bc
+	call	l_putptr
+	call	l_declong
+	call	lp_gchar
+	call	l_sxt
+	inc	sp
+	pop	bc
+	ret
+
+
+
+._func3
+	push	bc
+	dec	sp
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_getptr
+	call	l_inclong
+	pop	bc
+	call	l_putptr
+	call	lp_gchar
+	call	l_sxt
+	inc	sp
+	pop	bc
+	ret
+
+
+
+._func4
+	push	bc
+	dec	sp
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_getptr
+	call	l_inclong
+	call	l_inclong
+	call	l_inclong
+	call	lp_gchar
+	call	l_sxt
+	inc	sp
+	pop	bc
+	ret
+
+
+
+._func5
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_getptr
+	push	de
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gchar
+	ld	a,l
+	call	l_sxt
+	exx
+	pop	hl
+	pop	de
+	exx
+	call	lp_pchar
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_getptr
+	push	de
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	call	_func5
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func6
+	push	bc
+	pop	hl
+	push	hl
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	call	_func5
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func7
+	push	bc
+	dec	sp
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_getptr
+	ld	bc,12
+	add	hl,bc
+	ex	de,hl
+	ld	bc,0
+	adc	hl,bc
+	ex	de,hl
+	push	de
+	push	hl
+	ld	hl,1	;const
+	exx
+	pop	hl
+	pop	de
+	exx
+	call	lp_pint
+	inc	sp
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_func3
+	GLOBAL	_func4
+	GLOBAL	_func5
+	GLOBAL	_func6
+	GLOBAL	_func7
+
+
+
+

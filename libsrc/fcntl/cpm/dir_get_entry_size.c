@@ -11,7 +11,7 @@
 
 unsigned char *szptr;
 
-long dir_get_entry_size()
+unsigned long dir_get_entry_size()
 {
 	bdos(CPM_CFS,fc_dirbuf + fc_dirpos * 32);
 	

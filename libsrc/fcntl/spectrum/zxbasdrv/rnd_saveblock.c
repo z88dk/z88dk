@@ -13,7 +13,7 @@
 
 
 
-int rnd_saveblock(char *name,unsigned int pos, unsigned int len) {
+int rnd_saveblock(char *name,void *pos, unsigned int len) {
 
 /*
 7650 - SAVE block
@@ -25,7 +25,7 @@ n$=file name
 
 	zxgetfname2(name);
 
-	zx_setint("A",pos);
+	zx_setint("A",(int)pos);
 	zx_setint("L",len);
 
 	if (zx_goto(7650)==9)

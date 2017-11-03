@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._add_int
 	ld	hl,i_2+0
 	call	dldpsh
@@ -553,7 +552,6 @@
 
 
 	SECTION	rodata_compiler
-
 .i_1
 	defm	"add_int %f"
 	defb	10
@@ -651,7 +649,6 @@
 	defm	""
 	defb	0
 
-
 .i_2
 	;1.000000
 	defb	0,0,0,0,0,129
@@ -661,96 +658,94 @@
 
 
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	EXTERN	open
-	EXTERN	creat
-	EXTERN	close
-	EXTERN	read
-	EXTERN	write
-	EXTERN	lseek
-	EXTERN	readbyte
-	EXTERN	writebyte
-	EXTERN	getcwd
-	EXTERN	rmdir
-	EXTERN	getwd
-	EXTERN	_RND_BLOCKSIZE
-	EXTERN	rnd_loadblock
-	EXTERN	rnd_saveblock
-	EXTERN	rnd_erase
-	EXTERN	__FOPEN_MAX
-	EXTERN	__sgoioblk
-	EXTERN	__sgoioblk_end
-	EXTERN	fopen_zsock
-	EXTERN	fopen
-	EXTERN	freopen
-	EXTERN	fdopen
-	EXTERN	fmemopen
-	EXTERN	funopen
-	EXTERN	fclose
-	EXTERN	fflush
-	EXTERN	closeall
-	EXTERN	fgets
-	EXTERN	fputs
-	EXTERN	fputc
-	EXTERN	fputs_callee
-	EXTERN	fputc_callee
-	EXTERN	fgetc
-	EXTERN	ungetc
-	EXTERN	feof
-	EXTERN	puts
-	EXTERN	ftell
-	EXTERN	fgetpos
-	EXTERN	fseek
-	EXTERN	fread
-	EXTERN	fwrite
-	EXTERN	gets
-	EXTERN	printf
-	EXTERN	fprintf
-	EXTERN	sprintf
-	EXTERN	snprintf
-	EXTERN	vfprintf
-	EXTERN	vsnprintf
-	EXTERN	printn
-	EXTERN	scanf
-	EXTERN	fscanf
-	EXTERN	sscanf
-	EXTERN	vfscanf
-	EXTERN	vsscanf
-	EXTERN	getarg
-	EXTERN	fchkstd
-	EXTERN	fgetc_cons
-	EXTERN	fputc_cons
-	EXTERN	fgets_cons
-	EXTERN	fabandon
-	EXTERN	fdtell
-	EXTERN	fdgetpos
-	EXTERN	rename
-	EXTERN	remove
-	EXTERN	getk
-	EXTERN	puts_cons
-	EXTERN	printk
-	PUBLIC	_add_int
-	PUBLIC	_add_int_longform
-	PUBLIC	_add_int_longform2
-	PUBLIC	_add_double
-	PUBLIC	_sub_int
-	PUBLIC	_sub_int_longform
-	PUBLIC	_sub_int_longform2
-	PUBLIC	_sub_double
-	PUBLIC	_mult_int
-	PUBLIC	_mult_double
-	PUBLIC	_mult_double_longform
-	PUBLIC	_mult_double_longform2
-	PUBLIC	_div_int
-	PUBLIC	_div_double
-	PUBLIC	_div_double_longform
-	PUBLIC	_div_double_longform2
-	PUBLIC	_main
+	GLOBAL	open
+	GLOBAL	creat
+	GLOBAL	close
+	GLOBAL	read
+	GLOBAL	write
+	GLOBAL	lseek
+	GLOBAL	readbyte
+	GLOBAL	writebyte
+	GLOBAL	getcwd
+	GLOBAL	rmdir
+	GLOBAL	getwd
+	GLOBAL	_RND_BLOCKSIZE
+	GLOBAL	rnd_loadblock
+	GLOBAL	rnd_saveblock
+	GLOBAL	rnd_erase
+	GLOBAL	__FOPEN_MAX
+	GLOBAL	__sgoioblk
+	GLOBAL	__sgoioblk_end
+	GLOBAL	fopen_zsock
+	GLOBAL	fopen
+	GLOBAL	freopen
+	GLOBAL	fdopen
+	GLOBAL	fmemopen
+	GLOBAL	funopen
+	GLOBAL	fclose
+	GLOBAL	fflush
+	GLOBAL	closeall
+	GLOBAL	fgets
+	GLOBAL	fputs
+	GLOBAL	fputc
+	GLOBAL	fputs_callee
+	GLOBAL	fputc_callee
+	GLOBAL	fgetc
+	GLOBAL	ungetc
+	GLOBAL	feof
+	GLOBAL	puts
+	GLOBAL	ftell
+	GLOBAL	fgetpos
+	GLOBAL	fseek
+	GLOBAL	fread
+	GLOBAL	fwrite
+	GLOBAL	gets
+	GLOBAL	printf
+	GLOBAL	fprintf
+	GLOBAL	sprintf
+	GLOBAL	snprintf
+	GLOBAL	vfprintf
+	GLOBAL	vsnprintf
+	GLOBAL	printn
+	GLOBAL	scanf
+	GLOBAL	fscanf
+	GLOBAL	sscanf
+	GLOBAL	vfscanf
+	GLOBAL	vsscanf
+	GLOBAL	getarg
+	GLOBAL	fchkstd
+	GLOBAL	fgetc_cons
+	GLOBAL	fputc_cons
+	GLOBAL	fgets_cons
+	GLOBAL	fabandon
+	GLOBAL	fdtell
+	GLOBAL	fdgetpos
+	GLOBAL	rename
+	GLOBAL	remove
+	GLOBAL	getk
+	GLOBAL	puts_cons
+	GLOBAL	printk
+	GLOBAL	_add_int
+	GLOBAL	_add_int_longform
+	GLOBAL	_add_int_longform2
+	GLOBAL	_add_double
+	GLOBAL	_sub_int
+	GLOBAL	_sub_int_longform
+	GLOBAL	_sub_int_longform2
+	GLOBAL	_sub_double
+	GLOBAL	_mult_int
+	GLOBAL	_mult_double
+	GLOBAL	_mult_double_longform
+	GLOBAL	_mult_double_longform2
+	GLOBAL	_div_int
+	GLOBAL	_div_double
+	GLOBAL	_div_double_longform
+	GLOBAL	_div_double_longform2
+	GLOBAL	_main
 
 
 

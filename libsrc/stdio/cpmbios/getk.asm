@@ -17,7 +17,7 @@
 .getk
 ._getk
 
-    call $f006          ; const: Check if a key is waiting (0=key, 0ffh=no key)
+    call $f006          ; const: Check if a key is waiting (0 = no key, 0ffh = key ready)
     and a
 	jr z,gkret
     call $f009        ; conin: Get a key if one is waiting

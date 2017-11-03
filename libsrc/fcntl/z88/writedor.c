@@ -12,7 +12,7 @@
 
 #include <z88.h>
 
-void writedor(int handle, int type, int len, void *buf)
+void writedor(int handle, int type, unsigned int len, void *buf)
 {
 #asm
 	INCLUDE	"dor.def"

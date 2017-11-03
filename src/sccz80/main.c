@@ -178,8 +178,6 @@ int main(int argc, char** argv)
     loctab = MALLOC(NUMLOC * sizeof(SYMBOL));
     wqueue = MALLOC(NUMWHILE * sizeof(WHILE_TAB));
     gotoq = MALLOC(NUMGOTO * sizeof(GOTO_TAB));
-    tagptr = tagtab =  MALLOC(NUMTAG * sizeof(TAG_SYMBOL));
-    membptr = membtab =  MALLOC(NUMMEMB * sizeof(SYMBOL));
 
     swnext = MALLOC(NUMCASE * sizeof(SW_TAB));
     swend = swnext + (NUMCASE - 1);
@@ -289,12 +287,12 @@ void parse()
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
-            dodeclare(EXTERNAL, NULL, 0,0);
+            dodeclare(EXTERNAL);
         } else if (amatch("static")) {
-            dodeclare(LSTATIC, NULL, 0,0);
+            dodeclare(LSTATIC);
         } else if (amatch("typedef")) {
-            dodeclare(TYPDEF, NULL, 0, 0);
-        } else if (dodeclare(STATIK, NULL, 0, 0)) {
+            dodeclare(TYPDEF);
+        } else if (dodeclare(STATIK)) {
             ;
         } else if (ch() == '#') {
             if (match("#asm")) {
@@ -308,7 +306,7 @@ void parse()
                 blanks();
             }
         } else {
-            newfunc();
+            declare_func_kr();
         }
         blanks(); /* force eof if pending */
     }
@@ -326,9 +324,9 @@ void errsummary()
     }
     if (c_verbose) {
         printf("Symbol table usage: %d\n", glbcnt);
-        printf("Structures defined: %ld\n", (long)(tagptr - tagtab));
-        printf("Members defined:    %ld\n", (long)(membptr - membtab));
-        printf("There %s %d %s in compilation.\n", (errcnt == 1 ? "was" : "were"), errcnt, (errcnt == 1 ? "error" : "errors"));
+        // printf("Structures defined: %ld\n", (long)(tagptr - tagtab));
+        // printf("Members defined:    %ld\n", (long)(membptr - membtab));
+        // printf("There %s %d %s in compilation.\n", (errcnt == 1 ? "was" : "were"), errcnt, (errcnt == 1 ? "error" : "errors"));
     }
 }
 
@@ -363,21 +361,6 @@ void setup_sym()
 {
     defmac("Z80");
     defmac("SMALL_C");
-    /* dummy symbols for pointers to char, int, double */
-    /* note that the symbol names are not valid C variables */
-    dummy_sym[0] = 0;
-    dummy_sym[CCHAR] = addglb("0ch", POINTER, CCHAR, 0, STATIK, 0, 0);
-    dummy_sym[CCHAR]->isassigned = YES;
-    dummy_sym[CINT] = addglb("0int", POINTER, CINT, 0, STATIK, 0, 0);
-    dummy_sym[CINT]->isassigned = YES;
-    dummy_sym[DOUBLE] = addglb("0dbl", POINTER, DOUBLE, 0, STATIK, 0, 0);
-    dummy_sym[DOUBLE]->isassigned = YES;
-    dummy_sym[LONG] = addglb("0lng", POINTER, LONG, 0, STATIK, 0, 0);
-    dummy_sym[LONG]->isassigned = YES;
-    dummy_sym[CPTR] = addglb("0cpt", POINTER, CPTR, 0, STATIK, 0, 0);
-    dummy_sym[CPTR]->isassigned = YES;
-    dummy_sym[VOID] = addglb("0vd", POINTER, VOID, 0, STATIK, 0, 0);
-    dummy_sym[VOID]->isassigned = YES;
 }
 
 void info()
@@ -401,7 +384,7 @@ void info()
 
 static void dumpfns()
 {
-    int ident, type, storage;
+    int type, storage;
     SYMBOL* ptr;
     FILE* fp;
 
@@ -411,57 +394,23 @@ static void dumpfns()
         return;
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != GOTOLABEL ) {
-            ident = ptr->ident;
-            if (ident == FUNCTIONP)
-                ident = FUNCTION;
+        if (ptr->name[0] != '0' && ptr->ctype ) {
             type = ptr->type;
             storage = ptr->storage;
-            if (type == PORT8 || type == PORT16 ) {
-                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
-            } else if (ident == FUNCTION && ptr->size != 0) {
-                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->size);
+            if ( type == KIND_ENUM )
+                continue;
+            if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
+                outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
-                if (ident == FUNCTION && storage != LSTATIC) {
-                    if (storage == EXTERNAL) {
-                        if (ptr->flags & LIBRARY) {
-                            GlobalPrefix(LIB);
-                            if ((ptr->flags & SHARED) && c_useshared) {
-                                outstr(ptr->name);
-                                outstr("_sl\n");
-                                GlobalPrefix(LIB);
-                            }
-                        } else {
-                            GlobalPrefix(XREF);
-                        }
-                    } else {
-                        if (ptr->offset.i == FUNCTION || ptr->storage == DECLEXTN) {
-                            if (ptr->flags & LIBRARY) {
-                                GlobalPrefix(XDEF);
-                                outname(ptr->name, 1);
-                                nl();
-                            }
-                            GlobalPrefix(XDEF);
-                        } else
-                            GlobalPrefix(XREF);
+                if ( storage == EXTERNP ) {
+                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
+                } else if ( storage != LSTATIC && storage != TYPDEF ) {
+                    if ( ptr->ctype->flags & SHARED && c_useshared ) {
+                        GlobalPrefix();
+                        outfmt("%s_sl\n",ptr->name);
                     }
-                    outname(ptr->name, dopref(ptr));
-                    nl();
-                } else {
-                    if (storage == EXTERNP) {
-                        outstr("\tdefc\t");
-                        outname(ptr->name, 1);
-                        ot("=\t");
-                        outdec(ptr->size);
-                        nl();
-                    } else if (ident != ENUM && type != ENUM && ident != MACRO && storage != LSTATIC && storage != LSTKEXT && storage != TYPDEF && storage != STATIC_INITIALISED ) {
-                        if (storage == EXTERNAL)
-                            GlobalPrefix(XREF);
-                        else
-                            GlobalPrefix(XDEF);
-                        outname(ptr->name, 1);
-                        nl();
-                    }
+                    GlobalPrefix();                    
+                    outname(ptr->name, dopref(ptr)); nl();
                 }
             }
         }
@@ -489,7 +438,7 @@ static void dumpfns()
      * is - this could be used for eg. to allocate space for file structures
      * etc
      */
-    if ((ptr = findglb("_FAR_PTR")) && ptr->ident == MACRO) {
+    if ((ptr = findglb("_FAR_PTR")) && ptr->ident == ID_MACRO) {
         fprintf(fp, "\nIF !NEED_farstartup\n");
         fprintf(fp, "\tDEFINE NEED_farstartup\n");
         fprintf(fp, "ENDIF\n\n");
@@ -567,20 +516,26 @@ void dumpvars()
     output_section(c_bss_section); // output_section("bss");
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
-        if (ptr->name[0] != '0' && ptr->ident != GOTOLABEL) {
+        if (ptr->name[0] != '0' ) {
             ident = ptr->ident;
-            type = ptr->type;
+            type = ptr->ctype ? ptr->ctype->kind : KIND_NONE;
             storage = ptr->storage;
-            if (ident != ENUM && type != ENUM && ident != MACRO && ident != FUNCTION && 
-                storage != EXTERNAL && storage != DECLEXTN && storage != STATIC_INITIALISED && storage != EXTERNP && storage != LSTKEXT && storage != TYPDEF && 
-                type != PORT8 && type != PORT16) {
-                prefix();
-                outname(ptr->name, 1);
-                col();
-                defstorage();
-                outdec(ptr->size);
-                nl();
-            }
+            if ( ptr->initialised )
+                continue;
+            if ( ident == ID_ENUM || ident == ID_MACRO || ident == ID_GOTOLABEL )
+                continue;
+            if ( type == KIND_FUNC || type == KIND_PORT8 || type == KIND_PORT16 )
+                continue;
+            if ( storage == TYPDEF ||  storage == EXTERNAL ) 
+                continue;
+            if ( type == KIND_ENUM )
+                continue;
+            prefix();
+            outname(ptr->name, 1);
+            col();
+            defstorage();
+            outdec(ptr->ctype->size);
+            nl();
         }
     }
 
@@ -660,7 +615,6 @@ void dumplits(
         }
         //output_section(c_code_section); // output_section("code");
     }
-    nl();
 }
 
 /*
@@ -1046,8 +1000,6 @@ void atexit_deallocate()
     FREENULL(glbq);
     FREENULL(loctab);
     FREENULL(wqueue);
-    FREENULL(tagtab);
-    FREENULL(membtab);
     FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);

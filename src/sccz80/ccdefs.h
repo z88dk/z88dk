@@ -42,16 +42,33 @@
  *      Prototypes
  */
 
-extern void     callfunction(SYMBOL *ptr, SYMBOL *fnptr);
+extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 #include "codegen.h"
 extern void copy_to_stack(char *label, int stack_offset,  int size);
+extern void push_char_sdcc_style(void);
 #include "const.h"
 extern void dofloat(double raw, unsigned char fa[]);
 #include "data.h"
-#include "declvar.h"
-#include "declfunc.h"
 #include "declinit.h"
+
+extern Type      *type_int;
+extern void       array_free(array *arr);
+extern size_t     array_len(array *arr);
+extern void       array_add(array *arr, void *elem);
+extern void      *array_get_byindex(array *arr, int index);
+extern Type      *find_tag(const char *name);
+extern Type      *find_tag_field(Type *tag, const char *fieldname);
+extern Type      *parse_expr_type();
+extern Type      *default_function(const char *name);
+extern Type      *make_pointer(Type *base_type);
+extern Type      *dodeclare(enum storage_type storage);
+extern int        declare_local(int local_static);
+extern void       declare_func_kr();
+extern int        ispointer(Type *type);
+extern void       type_describe(Type *type, UT_string *output);
+extern int        type_matches(Type *t1, Type *t2);
+
 #include "error.h"
 #include "expr.h"
 extern GOTO_TAB *gotoq; /* Pointer for gotoq */

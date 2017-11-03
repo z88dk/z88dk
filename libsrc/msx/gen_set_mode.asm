@@ -11,6 +11,7 @@
         SECTION code_clib
 	PUBLIC	msx_set_mode
 	PUBLIC	_msx_set_mode
+	PUBLIC  VDPreg_Write
 	
 	INCLUDE	"msx/vdp.inc"
 
@@ -24,8 +25,8 @@ _msx_set_mode:
 	jr	z,init32
 	dec	a
 	jr	z,inigrp
-	dec	a
-	jr	z,inimlt
+	;dec	a
+	;jr	z,inimlt
 
 
 ; Switch 2 Video Mode n. 0
@@ -61,7 +62,6 @@ ENDIF
     ld    a,$f5 ; (00 ?)
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
-    
     ld    c,$00
     xor a		; reg0  - TEXT MODE
     call    VDPreg_Write
@@ -78,8 +78,42 @@ ENDIF
 ; Switch 2 Video Mode n. 1
 
 init32:
-; MSX:  $00,$E0,$06,$80,$00,$36,$07,$04
-; SVI?:  $00,$E0,$06,$7F(00<>ff),$00,$36,$07,$04
+; MSX:  $00,$E0,$06,$80,        $00,$36,$07,$04
+; SVI?: $00,$E0,$06,$7F(00<>ff),$00,$36,$07,$04
+; MTX?: $00,$D0,$04,$80,        $00,$7E,$07
+
+    ld    c,$01
+IF FORsc3000
+	ld    a,$F0		; bit 7 must be reset on sc3000
+ELSE
+    ld    a,$D0
+ENDIF
+    call    VDPreg_Write    ; reg1  - text MODE
+    
+    ld    a,$04
+    call    VDPreg_Write    ; reg2  -  NAME TABLE
+    
+    ld	a,$80
+    call    VDPreg_Write    ; reg3  -  COLOUR TABLE
+    
+    xor		a
+    call    VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
+    
+    ld    a,$7E
+    call    VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
+    
+    ld    a,$07
+    call    VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
+    
+    ld    a,$f5 ; (00 ?)
+    call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
+    
+    
+    ld    c,$00
+    xor a		; reg0  - TEXT MODE
+    call    VDPreg_Write
+
+	
 
 ; Hint by Saverio Russo, a quick way to make things
 ; work quickly...  details will come afterwards.
@@ -186,6 +220,7 @@ VDPreg_Write:
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 
 	push    af
+	;ld		hl,RG0SAV  <-- do we need to keep track of the VDP registers ?
 	ld      a,i
 	jp      pe,irq_enabled
 

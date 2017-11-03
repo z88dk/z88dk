@@ -13,7 +13,7 @@
 /* decimal to (double) binary conversion */
 
 double atof(s)
-unsigned char s[];		/* s points to a character string */
+char s[];		/* s points to a character string */
 {
 	double sum,		/* the partial result */
 		scale;		/* scale factor for the next digit */

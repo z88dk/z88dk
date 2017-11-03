@@ -60,7 +60,7 @@ int open(char *name, int flags, mode_t mode)
 		setuid(uid);
 		fc->use = flags;
     }
-    fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
+    fd =  (fc - &_fcb[0]);
 	if (mode & O_APPEND)
 		lseek(fd,0L,SEEK_END);
 

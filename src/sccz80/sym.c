@@ -8,7 +8,7 @@
 
 #include "ccdefs.h"
 
-static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, char typ, enum storage_type storage, int more, int itag);
+static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, Kind kind, enum storage_type storage);
 
 
 
@@ -40,7 +40,7 @@ SYMBOL* findenum(char* sname)
     SYMBOL *ptr = findglb(sname);
 
     if ( ptr != NULL ) {
-        if ( ptr->ident == ENUM ) {
+        if ( ptr->ident == ID_ENUM ) {
             return ptr;
         }
         error(E_ENUMDEF);
@@ -48,7 +48,8 @@ SYMBOL* findenum(char* sname)
     return NULL;
 }
 
-SYMBOL* findglb(char* sname)
+
+SYMBOL* findglb(const char* sname)
 {
     SYMBOL *ptr;
 
@@ -70,45 +71,11 @@ SYMBOL* findloc(char* sname)
     return 0;
 }
 
-/*
- * find symbol in structure tag symbol table, return 0 if not found
- */
 
-TAG_SYMBOL* findtag(char* sname)
-{
-    TAG_SYMBOL* ptr;
-
-    ptr = STARTTAG;
-    while (ptr != tagptr) {
-        if (strcmp(ptr->name, sname) == 0)
-            return ptr;
-        ++ptr;
-    }
-    return 0;
-}
-
-/*
- * determine if 'sname' is a member of the struct with tag 'tag'
- * return pointer to member symbol if it is, else 0
- */
-
-SYMBOL* findmemb(TAG_SYMBOL* tag, char* sname)
-{
-    SYMBOL* ptr;
-
-    ptr = tag->ptr;
-
-    while (ptr < tag->end) {
-        if (strcmp(ptr->name, sname) == 0)
-            return ptr;
-        ++ptr;
-    }
-    return 0;
-}
 
 SYMBOL* addglb(
-    char* sname, enum ident_type id, char typ,
-    int value, enum storage_type storage, int more, int itag)
+    char* sname, enum ident_type id, Kind kind,
+    int value, enum storage_type storage)
 {
     SYMBOL* ptr;
     if ((ptr = findglb(sname))) {
@@ -119,11 +86,11 @@ SYMBOL* addglb(
          * Useful for those programs which extern everything in header files
          * 
          */
-        if ((ptr->storage == EXTERNAL && storage != EXTERNAL) && ptr->type == typ && ptr->ident == id && ptr->more == more && itag == ptr->tag_idx) {
+        if ((ptr->storage == EXTERNAL && storage != EXTERNAL) ) {
             ptr->storage = storage;
             return (ptr);
         }
-        if ((ptr->storage == EXTERNAL && storage == EXTERNAL) && ptr->type == typ && ptr->ident == id && ptr->more == more && itag == ptr->tag_idx) {
+        if ((ptr->storage == EXTERNAL && storage == EXTERNAL) ) {
             return (ptr);
         }
 
@@ -131,7 +98,7 @@ SYMBOL* addglb(
         return (ptr);
     }
     ptr = CALLOC(1, sizeof(*ptr));
-    initialise_sym(ptr, sname, id, typ, storage, more, itag);
+    initialise_sym(ptr, sname, id, kind, storage);
     ptr->offset.i = value;
     HASH_ADD_STR(symtab, name, ptr);   
     ++glbcnt;
@@ -141,9 +108,7 @@ SYMBOL* addglb(
 SYMBOL* addloc(
     char* sname,
     enum ident_type id,
-    char typ,
-    int more,
-    int itag)
+    Kind kind)
 {
     SYMBOL* cptr;
 
@@ -156,31 +121,11 @@ SYMBOL* addloc(
         return 0;
     }
     cptr = locptr++;
-    initialise_sym(cptr, sname, id, typ, STKLOC, more, itag);
+    initialise_sym(cptr, sname, id, kind, STKLOC);
     return cptr;
 }
 
-/*
- * add new structure member to table
- */
-SYMBOL* addmemb(
-    char* sname,
-    enum ident_type id,
-    char typ,
-    int value,
-    enum storage_type storage,
-    int more,
-    int itag)
-{
-    if (membptr >= ENDMEMB) {
-        error(E_MEMOV);
-        return 0;
-    }
-    initialise_sym(membptr, sname, id, typ, storage, more, itag);
-    membptr->offset.i = value;
-    ++membptr;
-    return (membptr);
-}
+
 
 /*
  * insert values into symbol table
@@ -190,17 +135,13 @@ static void initialise_sym(
     SYMBOL* ptr,
     char* sname,
     enum ident_type id,
-    char typ,
-    enum storage_type storage,
-    int more,
-    int itag)
+    Kind kind,
+    enum storage_type storage)
 {
     strcpy(ptr->name, sname);
     ptr->ident = id;
-    ptr->type = typ;
+    ptr->type = kind;
     ptr->storage = storage;
-    ptr->more = more;
-    ptr->tag_idx = itag;
     ptr->flags = FLAGS_NONE;
     snprintf(ptr->declared_location, sizeof(ptr->declared_location),"%s:%d", Filename, lineno);
 }

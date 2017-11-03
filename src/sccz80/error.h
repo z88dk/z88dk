@@ -6,8 +6,10 @@ extern void needtoken(char *str);
 extern void needchar(char c);
 extern void needlval(void);
 extern void warning(int num,...);
+extern void warningfmt(const char *fmt, ...);
 extern void debug(int num,char *str,...);
 extern void error(int num,...);
+extern void errorfmt(const char *fmt, int fatal, ...);
 
 struct warnings {
         char *warn;
@@ -42,7 +44,7 @@ enum warnct {
 
         W_FLTPRINTF, W_SIGNARG, W_AUTO, W_NULLARRAY, W_UNREACH,
 
-	W_ESCAPE, W_INTERNAL, W_HEXESCAPE_TOO_LONG, W_UNINITIALISED_VARIABLE,
+	W_ESCAPE, W_INTERNAL, W_HEXESCAPE_TOO_LONG, W_UNINITIALISED_ID_VARIABLE,
 
         W_CALLINGCONVENTION_MISMATCH, W_DOUBLE_UNEXPECTED, W_PARAM_CALLINGCONVENTION_MISMATCH, W_LEFTSHIFT_TOO_BIG,
 

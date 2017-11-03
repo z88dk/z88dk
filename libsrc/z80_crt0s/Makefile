@@ -4,12 +4,16 @@
 
 include ../Make.config
 
-all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib
+all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib
 
 
 $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 	$(MAKE) clean
 	$(LIBLINKER) -I.. -x$@ @crt0.lst
+
+$(OUTPUT_DIRECTORY)/z180_crt0.lib:
+	$(MAKE) clean
+	$(LIBLINKER) -I.. -x$@ --cpu=z180 @crt0_z180.lst
 
 $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
 	$(MAKE) clean

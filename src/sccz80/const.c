@@ -21,9 +21,9 @@
 #include "ccdefs.h"
 
 #include <math.h>
-#include "lib/utlist.h"
+#include "utlist.h"
 
-static SYMBOL *get_member(TAG_SYMBOL *ptr);;
+static Type *get_member(Type *tag);
 
 
 
@@ -47,17 +47,17 @@ static elem_t    *double_queue = NULL;
 int constant(LVALUE* lval)
 {
     int32_t val;
-    lval->val_type = CINT;
-    lval->flags &= ~UNSIGNED;
-    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
+    lval->val_type = KIND_INT;
+    lval->ltype = type_int;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
         load_double_into_fa(lval);
-        lval->val_type = DOUBLE;
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
         lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(lval) || pstr(lval)) {
-        if (lval->val_type == LONG)
+        if (lval->val_type == KIND_LONG)
             vlongconst(lval->const_val);
         else
             vconst(lval->const_val);
@@ -65,8 +65,9 @@ int constant(LVALUE* lval)
     } else if (tstr(&val)) {
         lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
-        lval->ptr_type = CCHAR; /* djm 9/3/99 */
-        lval->val_type = CINT;
+        lval->ltype = make_pointer(type_char);
+        lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
+        lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;
         immedlit(litlab);
         outdec(lval->const_val);
@@ -138,6 +139,7 @@ int number(LVALUE *lval)
     char c;
     int minus;
     int32_t k;
+    int isunsigned = c_default_unsigned;
 
     k = minus = 1;
     while (k) {
@@ -184,22 +186,33 @@ int number(LVALUE *lval)
         k = (-k);
     lval->const_val = k;
 typecheck:
-    lval->val_type = CINT;
+    lval->val_type = KIND_INT;
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
-        lval->val_type = LONG;
+        lval->val_type = KIND_LONG;
     }
     
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
         if (cmatch('L'))
-            lval->val_type = LONG;
+            lval->val_type = KIND_LONG;
         if (cmatch('U')) {
-            lval->flags |= UNSIGNED;
+            isunsigned = 1;
             lval->const_val = (uint32_t)k;
         }
         if (cmatch('S'))
-            lval->flags &= ~UNSIGNED;
+            isunsigned = 0;
         if (cmatch('f'))
-            lval->val_type = DOUBLE;
+            lval->val_type = KIND_DOUBLE;
+    }
+    if ( lval->val_type == KIND_LONG ) {
+        if ( isunsigned )
+            lval->ltype = type_ulong;
+        else
+            lval->ltype = type_long;
+    } else {
+        if ( isunsigned ) 
+            lval->ltype = type_uint;
+        else
+            lval->ltype = type_int;
     }
     return (1);
 }
@@ -219,11 +232,7 @@ void address(SYMBOL* ptr)
     immed();
     outname(ptr->name, dopref(ptr));
     nl();
-    /* djm if we're using int32_t pointers, use of e=0 means absolute address,
- * this covers up a bit of a problem in deref() which can't distinguish
- * between ptrtoptr and ptr
- */
-    if (ptr->flags & FARPTR) {
+    if ( ptr->ctype->kind == KIND_CPTR ) {
         const2(0);
     }
 }
@@ -232,9 +241,12 @@ int pstr(LVALUE *lval)
 {
     int k;
 
-    lval->val_type = CINT;
-    lval->flags &= ~UNSIGNED;
-    lval->flags |= c_default_unsigned ? UNSIGNED : 0;
+    lval->val_type = KIND_INT;
+    if ( c_default_unsigned ) {
+        lval->ltype = type_uint;
+    } else {
+        lval->ltype = type_int;
+    }
     if (cmatch('\'')) {
         k = 0;
         while (ch() && ch() != '\'')
@@ -432,29 +444,28 @@ void offset_of(LVALUE *lval)
     if ( symname(struct_name) ) {
         needchar(',');
         if ( symname(memb_name) ) {
-            TAG_SYMBOL* tag = findtag(struct_name);
+            Type* tag = find_tag(struct_name);
 
             /* Consider typedefs */
             if ( tag == NULL ) {
                 SYMBOL *ptr;
                 
                 if (((ptr = findloc(struct_name)) != NULL) || ((ptr = findstc(struct_name)) != NULL) || ((ptr = findglb(struct_name)) != NULL)) {
-                    if ( ptr->type == STRUCT ) {
-                        tag = tagtab + ptr->tag_idx;
+                    if ( ispointer(ptr->ctype) && ptr->ctype->ptr->kind == KIND_STRUCT ) {
+                        tag = ptr->ctype->ptr->tag;
+                    } else if ( ptr->ctype->kind == KIND_STRUCT ) {
+                        tag = ptr->ctype->tag;
                     } else {
                         printf("%d\n",ptr->type);
                     }
                 }
             }
             if ( tag != NULL ) {
-                SYMBOL *ptr = tag->ptr;
-                while ( ptr != tag->end ) {
-                    if ( strcmp(ptr->name, memb_name) == 0 ) {
-                        lval->const_val = ptr->offset.i;
-                        foundit = 1;
-                        break;
-                    }
-                    ptr++;
+                Type *member = find_tag_field(tag, memb_name);
+
+                if ( member != NULL ) {
+                    foundit = 1;
+                    lval->const_val = member->offset;
                 }
             }
         }
@@ -462,8 +473,8 @@ void offset_of(LVALUE *lval)
     needchar(')');
     if ( foundit ) {
         lval->is_const = 1;
-        lval->val_type = CINT;
-        lval->ident = VARIABLE;
+        lval->ltype = type_int;
+        lval->val_type = KIND_INT;
         vconst(lval->const_val);
     } else {
         error(E_OFFSETOF, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
@@ -477,43 +488,32 @@ void size_of(LVALUE* lval)
 {
     char sname[NAMESIZE];
     int length;
-    TAG_SYMBOL* otag;
+    Type *type;
     SYMBOL *ptr;
-    struct varid var;
-    enum ident_type ident;
     int          deref = 0;
 
     needchar('(');
     while ( cmatch('*') ) {
         deref++;
     }
-    otag = GetVarID(&var, NO);
-    if (var.type != NO) {
-        ident = var.ident;
-        if ( ident == POINTER && cmatch('*') ) {
+    lval->ltype = type_int;
 
-        } else {
-            if (match("**") || cmatch('*'))
-                ident = POINTER;
-            else
-                ident = VARIABLE;
-        }
-
-        if ( deref && ident !=  POINTER  ) {
-            uint32_t   argvalue = CalcArgValue(var.type, var.ident,((var.sign & UNSIGNED) | (var.zfar & FARPTR)));
-            char       got[256];
-
-            ExpandArgValue(argvalue, got, 0);
-            error(E_SIZEOF,got);
+    if ( (type = parse_expr_type()) != NULL ) {
+        if ( deref && type->kind != KIND_PTR ) {
+            error(E_SIZEOF,"");
             lval->const_val = 2;
             return;
         }
-        if (otag && ident == VARIABLE)
-            lval->const_val = otag->size;
-        if (ident == POINTER) {
-            lval->const_val = (var.zfar ? 3 : 2);
+        while ( deref && type ) {
+            Type *next = type->ptr;
+            type = next;
+            deref--;
+        }
+        if ( type == NULL ) {
+            lval->const_val = 2;
+            errorfmt("Cannot dereference far enough, assuming size of 2\n",1);
         } else {
-            lval->const_val = get_type_size(var.type, var.ident, (var.zfar & FARPTR), otag);
+            lval->const_val = type->size;
         }
     } else if (cmatch('"')) { /* Check size of string */
         length = 1; /* Always at least one */
@@ -525,76 +525,61 @@ void size_of(LVALUE* lval)
         if ( deref ) 
             lval->const_val = 1;
     } else if (symname(sname)) { /* Size of an object */
+        Type *type;
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
-            int ptrtype = -1;  /* Type of the pointer */
-            enum symbol_flags ptrflags;
-            TAG_SYMBOL *ptrotag = NULL;
+            Kind ptrtype = KIND_NONE;
+            Type       *ptrotag = NULL;
 
-            if (ptr->ident != FUNCTION && ptr->ident != MACRO) {
-                if (ptr->type != STRUCT) {
-                    if ( ptr->ident == POINTER && deref ) {
-                        ptrtype = ptr->type;
-                        ptrflags = ptr->flags;
-                        if ( ptr->type == STRUCT ) 
-                            ptrotag = tagtab + ptr->tag_idx;
-                    } else {
-                        lval->const_val = ptr->size;
-                    }
+
+            type = ptr->ctype;
+            lval->const_val = type->size;
+            
+            if (type->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
+                if (type->kind != KIND_STRUCT) {
                 } else {
-                    SYMBOL *mptr;
+                    Type *mptr;
+
                     /* We're a member of a structure */
                     do {
-                        if ( (mptr = get_member(tagtab + ptr->tag_idx) ) != NULL ) {
-                            ptr = mptr;
+                        if ( (mptr = get_member(ptr->ctype->tag) ) != NULL ) {
+                            type = mptr;
                             ptrtype = 0;
                             ptrotag = NULL;
-                            if ( ptr->ident == POINTER && deref ) {
-                                ptrtype = ptr->type;
-                                ptrflags = ptr->flags;
-                                if  (ptr->type == STRUCT) {
-                                    ptrotag = tagtab + ptr->tag_idx;
+                            if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
+                                ptrtype = mptr->ptr->kind;
+                                //ptrflags = ptr->flags;
+                                if  (mptr->ptr->kind == KIND_STRUCT) {
+                                    ptrotag = mptr->tag;
                                 }
                             } else {
                                 // tag_sym->size = numner of elements
-                                lval->const_val = ptr->size * get_type_size(ptr->type, ptr->ident, ptr->flags, tagtab + ptr->tag_idx);
+                                lval->const_val = mptr->size;
                             }
                         } else {
-                            lval->const_val = ptr->size;
+                            lval->const_val = type->size;
                         }
-                    } while ( ptr->type == STRUCT && (rmatch2("->") || rcmatch('.')));
+                    } while ( mptr && ( (mptr->kind == KIND_STRUCT && rcmatch('.')) ||
+                                      ( ispointer(mptr) && mptr->ptr->kind == KIND_STRUCT && rmatch2("->"))) );
                 }
                 /* Check for index operator on array */
-                if (ptr->ident == ARRAY ) {
+                if (type->kind == KIND_ARRAY ) {
                     if (rcmatch('[')) {
                         double val;
-                        int valtype;
+                        Kind valtype;
                         needchar('[');
                         constexpr(&val, &valtype,  1);
                         needchar(']');
                         deref++;
-                        lval->const_val = get_type_size(ptr->type, VARIABLE, ptr->flags, tagtab + ptr->tag_idx);
-                    }
-                    if ( deref ) {
-                        if ( deref == 1 ) {
-                            ptrtype = ptr->type;
-                            ptrotag = tagtab + ptr->tag_idx;
-                        } else {
-                            ptrtype = dummy_sym[(int)ptr->more]->type;
-                            ptrotag = tagtab + dummy_sym[(int)ptr->more]->tag_idx;
-                        }
-                        ptrflags = ptr->flags;
+                        lval->const_val = type->size / type->len;
                     }
                 }
-                if ( deref > 0 ) {
-                    if ( ptrtype != -1 ) {
-                        lval->const_val = get_type_size(ptrtype, VARIABLE, ptrflags, ptrotag);
-                    } else {
-                        uint32_t   argvalue = CalcArgValue(ptr->type, ptr->ident, ptr->flags);
-                        char       got[256];
-
-                        ExpandArgValue(argvalue, got, ptr->tag_idx);
-                        error(E_SIZEOF,got);
-                    }
+                while ( deref && type ) {
+                    lval->const_val = type->size;
+                    type = type->ptr;  
+                    if ( type ) {
+                        lval->const_val = type->size;
+                    } 
+                    deref--;                         
                 }
             } else {
                 lval->const_val = 2;
@@ -605,21 +590,20 @@ void size_of(LVALUE* lval)
     }
     needchar(')');
     lval->is_const = 1;
-    lval->val_type = CINT;
-    lval->ident = VARIABLE;
+    lval->val_type = KIND_INT;
     vconst(lval->const_val);
 }
 
-static SYMBOL *get_member(TAG_SYMBOL* ptr)
+static Type *get_member(Type *tag)
 {
     char sname[NAMESIZE];
-    SYMBOL* ptr2;
+    Type *member;;
 
     if (cmatch('.') == NO && match("->") == NO)
         return NULL;
 
-    if (symname(sname) && (ptr2 = findmemb(ptr, sname))) {
-        return ptr2;
+    if (symname(sname) && (member = find_tag_field(tag, sname))) {
+        return member;
     }
     error(E_UNMEMB, sname);
     return NULL;

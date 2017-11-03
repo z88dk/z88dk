@@ -277,23 +277,22 @@ ENDIF
 
   
   ld a,(hl)
-  ld b,a
-  ld a,ansifont_is_packed
-  and  a
-  ld a,b
 
 IF ROMFONT
-
 .UCASE
   nop
   nop
   nop
   rla	; shift character left to squeeze it as much as possible (36..42 columns still usable)
 ENDIF
-  
+
 .BOLD
   nop	;	rla
   nop	;	or (hl)
+  ld b,a
+  ld a,ansifont_is_packed
+  and  a
+  ld a,b
   jr   z,INVRS
 
 .ROLL

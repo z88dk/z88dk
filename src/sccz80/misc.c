@@ -57,7 +57,6 @@ int addstk(LVALUE* lval)
 {
     if ((stkcount + 1) >= 99)
         return (0);
-
     stkptr[stkcount] = lval->symbol;
     flgstk[stkcount] = lval->flags;
     return (stkcount++);

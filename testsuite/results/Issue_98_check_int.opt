@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._mul
 	pop	bc
 	pop	hl
@@ -173,30 +172,27 @@
 
 
 
-
 	SECTION	bss_compiler
-
 ._g	defs	2
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_g
-	PUBLIC	_mul
-	PUBLIC	_mul2
-	PUBLIC	_mul3
-	PUBLIC	_mul3_2
-	PUBLIC	_div
-	PUBLIC	_div2
-	PUBLIC	_div3
-	PUBLIC	_add
-	PUBLIC	_add2
-	PUBLIC	_sub
-	PUBLIC	_sub_1
-	PUBLIC	_sub2
-	PUBLIC	_sub2_1
-	PUBLIC	_sub3
+	GLOBAL	_g
+	GLOBAL	_mul
+	GLOBAL	_mul2
+	GLOBAL	_mul3
+	GLOBAL	_mul3_2
+	GLOBAL	_div
+	GLOBAL	_div2
+	GLOBAL	_div3
+	GLOBAL	_add
+	GLOBAL	_add2
+	GLOBAL	_sub
+	GLOBAL	_sub_1
+	GLOBAL	_sub2
+	GLOBAL	_sub2_1
+	GLOBAL	_sub3
 
 
 

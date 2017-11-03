@@ -15,24 +15,24 @@ typedef unsigned char byte;
 #define _OZ_BYTE
 #endif
 
-extern __LIB__ ozsnap(void);
+extern void __LIB__ ozsnap(void);
 extern byte __LIB__ ozgetrxhandshaking(void);
-extern __LIB__ ozsetrxhandshaking(int state);
-extern __LIB__ ozclearserialbuffer(void);
-extern __LIB__ ozdatabits(int databits);
+extern void __LIB__ ozsetrxhandshaking(int state);
+extern void __LIB__ ozclearserialbuffer(void);
+extern void __LIB__ ozdatabits(int databits);
 extern int __LIB__ ozserialgetc(void);
-extern __LIB__ ozsetbaud(unsigned baud);
+extern void __LIB__ ozsetbaud(unsigned baud);
 extern unsigned __LIB__ ozgetbaud(void);
-extern __LIB__ ozstopbits(int stopbits);
-extern __LIB__ ozparity(int parity);
+extern void __LIB__ ozstopbits(int stopbits);
+extern void __LIB__ ozparity(int parity);
 extern byte __LIB__ ozgetlcr(void);
-extern __LIB__ ozsetlcr(int lcr);
+extern void __LIB__ ozsetlcr(int lcr);
 extern int __LIB__ ozserialin(void);
-extern __LIB__ ozserialout(int c);
-extern __LIB__ ozserinton(void);
-//extern __LIB__ _ozserinton(void);
-extern __LIB__ ozserintoff(void);
-//extern __LIB__ _ozserintoff(void);
+extern void __LIB__ ozserialout(int c);
+extern void __LIB__ ozserinton(void);
+//extern void __LIB__ _ozserinton(void);
+extern void __LIB__ ozserintoff(void);
+//extern void __LIB__ _ozserintoff(void);
 /* for ozparity() */
 #define NO_PARITY 0
 #define ODD_PARITY 0x08

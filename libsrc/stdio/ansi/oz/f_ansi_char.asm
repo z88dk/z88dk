@@ -172,12 +172,14 @@
   djnz L1
 .DTS
 
-  ld a,ansifont_is_packed
-  and  a
   ld a,(hl)
 .BOLD
   nop	;	rla
   nop	;	or (hl)
+  ld b,a
+  ld a,ansifont_is_packed
+  and  a
+  ld a,b
   jr   z,INVRS
  
 .ROLL

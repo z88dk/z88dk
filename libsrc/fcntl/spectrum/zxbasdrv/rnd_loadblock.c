@@ -13,7 +13,7 @@
 
 
 
-int rnd_loadblock(char *name,unsigned int pos, unsigned int len) {
+int rnd_loadblock(char *name,void *pos, unsigned int len) {
 
 /*
 7600 - LOAD block
@@ -25,7 +25,7 @@ n$=file name
 
 	zxgetfname2(name);
 
-	zx_setint("A",pos);
+	zx_setint("A",(unsigned int)pos);
 	zx_setint("L",len);
 
 	if (zx_goto(7600)==9)

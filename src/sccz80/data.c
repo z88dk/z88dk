@@ -23,12 +23,9 @@ SYMBOL *symtab, *loctab; /* global and local symbol tables */
 SYMBOL *locptr; /* ptrs to next entries */
 int glbcnt; /* number of globals used */
 
-SYMBOL *dummy_sym[NTYPE + NUMTAG + 1];
 
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */
-
-/* djm 15/11/98 literal queue and double queue, unsigned for my sanity! */
 
 unsigned char *litq, *dubq; /* literal pool */
 unsigned char* glbq; /* global literal queue */
@@ -37,12 +34,6 @@ int gltptr, litptr, dubptr; /* index of next entry */
 
 char macq[MACQSIZE]; /* macro string buffer */
 int macptr; /* and its index */
-
-TAG_SYMBOL *tagtab; /* start of structure tag table */
-TAG_SYMBOL *tagptr; /* ptr to next entry */
-
-SYMBOL *membtab; /* structure member table */
-SYMBOL *membptr; /* ptr to next member */
 
 char* stage; /* staging buffer */
 char* stagenext; /* next address in stage */
@@ -66,7 +57,7 @@ int stackargs;
 
 int defstatic, filenum; /* next argument to be used */
 
-char c_default_unsigned, fnflags, c_mathz88, c_compact_code;
+char c_default_unsigned, c_mathz88, c_compact_code;
 
 int nxtlab, /* next avail label # */
     glblab, /* For initializing global literals */
@@ -105,7 +96,6 @@ SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
 
 char endasm;
 
-char margtag; /* Struct tag number for arg value */
 
 
 /*

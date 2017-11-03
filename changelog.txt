@@ -56,10 +56,20 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #188: sccz80 now provides builtin functions for memcpy, memset, strcpy, strchr
 - [sccz80] #220: sccz80 now supports __critical blocks and functions
 - [sccz80] #275: don't swallow white space before constant L,U,S modify 
-- [sccz80] ZX Next specific code can be generated
+- [sccz80] ZX Next specific code can now be generated
+- [sccz80] #419: Extern function declarations are now accepted with blocks
+- [sccz80] #452: Declaration parser rewritten
+- [sccz80] #452: Multi dimensional arrays are now supported
+- [sccz80] #452: Function pointers can now be defined with parameters
+- [sccz80] #481: z180 mlt instruction is now used
+- [sccz80] #485: Functions marked __z88dk_sdccdecl use sdcc calling spec for
+  chars (and become r->l)
+- [sccz80] #489: Loop variables can now be defined in the initialisation clause
+  of a for statement
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [ticks] [classiclib] File IO is now available
 - [ticks] A debugger is now available
+- [ticks] Now supports Rabbit, z180 and ZX Next cpus
 - [z80asm] Rabbit 2000 and 3000 are now fully supported
 - [z80asm] ZX Spectrum Next CPU extensions are supported
 - [z88dk-dis] A new standalone diassembler is available

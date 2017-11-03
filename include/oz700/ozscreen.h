@@ -8,12 +8,12 @@
 #ifndef _OZSCREEN_H
 #define _OZSCREEN_H
 
-extern __LIB__ oztogglelight(void);
-extern __LIB__ ozsetlight(int l);
+extern void __LIB__ oztogglelight(void);
+extern void __LIB__ ozsetlight(int l);
 //int ozgetlight(void);
-extern __LIB__ ozblankscreen(void);
-extern __LIB__ ozunblankscreen(void);
-extern __LIB__ ozsetcontrast(int c);
+extern void __LIB__ ozblankscreen(void);
+extern void __LIB__ ozunblankscreen(void);
+extern void __LIB__ ozsetcontrast(int c);
 extern int __LIB__ ozgetcontrast(void);
 #define MAX_CONTRAST 0x3F
 
