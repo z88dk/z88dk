@@ -148,7 +148,7 @@
 
 .INVRS
   cpl           ; Set to CPL to disable INVERSE
-  nop
+;  nop
 
 ; Underlined text handling
   dec c
@@ -170,14 +170,4 @@
   jr nz,PRE
   ret
 
-
-; The font
-; 9 dots: MAX 28 columns
-; 8 dots: MAX 32 columns
-; 7 dots: MAX 36 columns
-; 6 dots: MAX 42 columns
-; 5 dots: MAX 51 columns
-; 4 dots: MAX 64 columns
-; 3 dots: MAX 85 columns Just readable!
-; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
 
