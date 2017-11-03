@@ -55,18 +55,22 @@ far_call_try_alt_lock:
     push hl             ; push the post far_call ret address back on stack
 
     in0 a, (BBR)        ; get the origin bank
+    ld b, a             ; save origin BBR in B    
     rrca                ; move the origin bank to low nibble
     rrca                ; we know BBR lower nibble is 0
     rrca
-    rrca   
-    ld b, a             ; save origin bank in absolute address format in B
-
+    rrca
     add a, c            ; create destination far address, from twos complement relative input
     and a, $0F          ; convert it to 4 bit address (not implicit here)
-    ld c, a             ; hold absolute destination bank in C
 
     ld hl, _bankLockBase; get the BANK Lock base address, page aligned
     ld l, a             ; make the reference into BANKnn Lock
+
+    rrca                ; move the origin bank to high nibble
+    rrca                ; we know BBR lower nibble is 0
+    rrca
+    rrca
+    ld c, a             ; hold destination BBR in C
 
     xor a
     and (hl)            ; check bank is not cold
@@ -109,7 +113,7 @@ far_ret_try_alt_lock:
 
     exx
 
-    pop bc              ; get return (origin) bank in B, and departing (destination) in C
+    pop bc              ; get return (origin) BBR in B, and departing (destination) BBR in C
 
                         ; we left our origin bank lock unchanged, so it is still locked
     di                        
@@ -119,7 +123,12 @@ far_ret_try_alt_lock:
     ei
 
     ld hl, _bankLockBase; get the BANK Lock Base, page aligned
-    ld l, c             ; make the reference to destination BANKnn Lock
+    ld a, c             ; make the reference to destination BANKnn Lock
+    rrca                ; move the origin bank to low nibble
+    rrca                ; we know BBR lower nibble is 0
+    rrca
+    rrca
+    ld l, a
     ld (hl), $FE        ; free the bank we are now departing
 
     exx                 ; alt registers are returned
@@ -130,9 +139,30 @@ far_ret_try_alt_lock:
     pop hl
     ret
 
-;------------------------------------------------------------------------------
 
-PUBLIC _far_jp_rst
+;------------------------------------------------------------------------------
+; void far_jp(far *str, int8_t bank)
+;
+; str − This is a pointer to the destination array where the content is to be
+;       copied, type-cast to a pointer of type void*.
+; bank− This is the destination bank, relative to the current bank.
+;
+; This function returns a void.
+
+; stack:
+;   bank far
+;   str high
+;   str low
+;   ret high
+;   ret low
+
+PUBLIC _far_jp, _far_jp_rst
+
+_far_jp:
+    pop hl
+    pop de
+    push de
+    push hl
 
 _far_jp_rst:            ; RST 18
     push de             ; save the jump destination from EHL    
@@ -153,21 +183,26 @@ far_jp_try_alt_lock:
     rrca                ; move the origin bank to low nibble
     rrca                ; we know BBR lower nibble is 0
     rrca
-    rrca   
-    ld b, a             ; save origin bank in absolute address format in B
-    
+    rrca
+    ld b, a             ; save origin absolute bank in B       
     add a, c            ; create destination far address, from twos complement relative input
     and a, $0F          ; convert it to 4 bit address (not implicit here)
-    ld c, a             ; hold absolute destination bank in C
 
     ld hl, _bankLockBase; get the BANK Lock base address, page aligned
-    ld l, c             ; make reference into BANKnn Lock
+    ld l, a             ; make reference into BANKnn Lock
+
+    rrca                ; move the origin bank to high nibble
+    rrca                ; we know BBR lower nibble is 0
+    rrca
+    rrca
+    ld c, a             ; hold destination BBR in C
 
     xor a
     and (hl)            ; check bank is not cold
     jr Z, far_jp_exit
+far_jp_try_bank_lock:
     sra (hl)            ; now get the bank lock,
-    jr C, far_jp_exit   ; or exit if the bank is hot
+    jr C, far_jp_try_bank_lock  ; keep trying if the bank is hot, we can't go back
     
                         ; OK we're going somewhere nice and warm,
                         ; now make the bank switch
@@ -217,18 +252,11 @@ system_try_alt_lock:
     push hl             ; push the post system_rst return address back on stack
 
     in0 a, (CBAR)       ; get COMMON AREA 1 base address (know BANK base address is 0)
-    cp h                ; check whether the called function can be reached in CA1
+    cp d                ; check whether the called function can be reached in CA1
     jr C, system_local_exit ; success, so we stay local
 
-    in0 a, (BBR)        ; get the origin bank
-    rrca                ; move the origin bank to low nibble
-    rrca                ; we know BBR lower nibble is 0
-    rrca
-    rrca
-    ld b, a             ; save origin bank in address format in B
-
+    in0 b, (BBR)        ; get and save origin BBR in B 
     ld c, 0             ; hold absolute destination, BANK0, in C
-
     ld hl, _bankLockBase; get the bank Lock Base, for BANK0
 
 system_try_bios_lock:
@@ -242,7 +270,7 @@ system_try_bios_lock:
     ld sp, (_bios_sp)   ; set up the bios SP
     ei
                         ; now prepare for our return
-    push bc             ; push on the origin bank in B
+    push bc             ; push on the origin BBR in B
     inc sp
     
     ld hl, system_ret
@@ -313,7 +341,7 @@ _user_rst:              ; RST 30
 EXTERN _shadowLock, _dmac0Lock, _dmac1Lock, _prt0Lock, _prt1Lock
 
 ;------------------------------------------------------------------------------
-; far void *memcpy_far(far *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
+; void *memcpy_far(far *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
 ;
 ; str1 − This is a pointer to the destination array where the content is to be
 ;       copied, type-cast to a pointer of type void*.
@@ -328,10 +356,10 @@ EXTERN _shadowLock, _dmac0Lock, _dmac1Lock, _prt0Lock, _prt1Lock
 ; stack:
 ;   n high
 ;   n low
-;   str2 far
+;   bank2 far
 ;   str2 high
 ;   str2 low
-;   str1 far
+;   bank1 far
 ;   str1 high
 ;   str1 low
 ;   ret high
@@ -369,9 +397,9 @@ _memcpy_far:
     ld c, a             ; and put it in C
     
     add a, (hl)         ; create source relative far address, from twos complement input
-;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
+    and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
     ld b, a             ; hold source far address in B
-    out0 (SAR0B), b
+    out0 (SAR0B), b     ; (SAR0B has only 4 bits)
 
     dec hl
     ld d, (hl)          ; get source high address in D
@@ -382,9 +410,9 @@ _memcpy_far:
 
     ld a, c             ; get current bank in address format
     add a, (hl)         ; create relative far destination address, from twos complement input
-;   and a, $0F          ; convert it to 4 bit positive address
+    and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
     ld c, a             ; hold far destination address in C
-    out0 (DAR0B), c
+    out0 (DAR0B), c     ; (DAR0B has only 4 bits)
 
     dec hl
     ld a, (hl)          ; get destination high address in a (h)
@@ -409,7 +437,7 @@ memcpy_far_right_left:
     add hl, bc          ; add in the size to the source address
     jr NC, memcpy_far_right_left_src_bank_no_overflow
     in0 a, (SAR0B)
-    inc a
+    inc a               ; if copy origin flows into following bank
     out0 (SAR0B), a
     
 memcpy_far_right_left_src_bank_no_overflow:    
@@ -418,7 +446,7 @@ memcpy_far_right_left_src_bank_no_overflow:
     add hl, bc          ; add in the size to the destination address
     jr NC, memcpy_far_right_left_dest_bank_no_overflow
     in0 a, (DAR0B)
-    inc a
+    inc a               ; if copy originflows into following bank
     out0 (DAR0B), a
 
 memcpy_far_right_left_dest_bank_no_overflow:
@@ -443,25 +471,22 @@ memcpy_far_error_exit:
 
 memcpy_far_left_right:
     adc hl, de          ; recover the source address
-    pop bc              ; get the size back, to balance the stack   
+    pop bc              ; get the size back, just to balance the stack   
     out0 (SAR0H), h
     out0 (SAR0L), l
     out0 (DAR0H), d
     out0 (DAR0L), e
 
-    ld bc, DMODE_MMOD*$100+DSTAT_DE0
+    ld bc, +(DMODE_MMOD)*$100+DSTAT_DE0
     out0 (DMODE), b     ; DMODE_MMOD - memory++ to memory++, burst mode
     out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
                         ; in burst mode the Z180 CPU stops until the DMA completes
     
     ex de, hl           ; and swap the destination address into hl to return
-
-    ld a, $FE
-    ld (_dmac0Lock), a  ; give DMAC0 free
-    ret
+    jr memcpy_far_error_exit
 
 ;------------------------------------------------------------------------------
-; far void *memset_far(void *str, int8_t bank, const int16_t c, size_t n)
+; void *memset_far(void *str, int8_t bank, const int16_t c, size_t n)
 ;
 ; str  − This is a pointer to the block of memory to fill,
 ;       type-cast to a pointer of type void*.
@@ -477,7 +502,7 @@ memcpy_far_left_right:
 ;   n low
 ;   c high
 ;   c low
-;   str far
+;   bank far
 ;   str high
 ;   str low
 ;   ret high
@@ -520,8 +545,8 @@ _memset_far:
     out0 (SAR0B), a     ; use the current bank for the origin
 
     add a, (hl)         ; create relative destination far address, from twos complement input
-;   and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
-    out0 (DAR0B), a
+    and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
+    out0 (DAR0B), a     ; (DAR0B has only 4 bits)
 
     dec hl
     ld d, (hl)          ; get destination high address in d
@@ -545,40 +570,239 @@ memset_far_error_exit:
     ret
 
 ;------------------------------------------------------------------------------
-; void lockGet(uint8_t * mutex)
+; far void *load_hex(uint8_t bankAbs)
 ;
-; mutex − This is a pointer to a simple mutex semaphore
+; bankAbs − This is the absolute bank address (1 to 15), not BANK0.
+;
+; Type 2 Extended Segment Address (ESA), is equivalent to BBR data, and translates 1:1.
+; Therefore BANK changes can be done by inputting the correct ESA data as 0xn000.
 
-PUBLIC _lockGet, _lockGet_fastcall
+PUBLIC _load_hex, _load_hex_fastcall
 
-_lockGet:
+EXTERN initString, invalidTypeStr, badCheckSumStr, LoadOKStr
+
+_load_hex:
     pop hl
     push hl
 
-_lockGet_fastcall:
-    sra (hl)
-    jr C, _lockGet_fastcall
+_load_hex_fastcall:
+    ld de, initString
+    call pstring
+
+    in0 c, (BBR)                ; grab and store the current Bank Base Register in C
+    xor a    
+    and c                       ; check it is BANK0, so the user can't use this (currently)
+    ret NZ
+    
+    ld a, l                     ; get the destination BBR
+    rrca                        ; move the origin bank to high nibble
+    rrca                        ; we know BBR lower nibble is 0
+    rrca
+    rrca
+    and a, $F0                  ; be sure it is sane
+    ret Z                       ; and not trying to write to BANK0
+    out0 (BBR), a               ; set the BBR
+                                ; from BANK0, so no need for stack change (currently)
+
+load_hex_wait_lock:
+    ld hl, _asci0RxLock
+    sra (hl)                    ; take the ASCI0 Rx lock
+    jr C, load_hex_wait_lock
+
+load_hex_wait_colon:
+    call _asci0_getc            ; Rx byte (a = char received too)
+    cp ':'                      ; wait for ':'
+    jr NZ, load_hex_wait_colon
+    ld hl, 0                    ; reset hl to compute checksum
+    call load_hex_read_byte     ; read byte count
+    ld b, a                     ; store it in b
+    call load_hex_read_byte     ; read upper byte of address
+    ld d, a                     ; store in d
+    call load_hex_read_byte     ; read lower byte of address
+    ld e, a                     ; store in e
+    call load_hex_read_byte     ; read record type
+    cp 02                       ; check if record type is 02 (ESA)
+    jr Z, load_hex_esa_data
+    cp 01                       ; check if record type is 01 (end of file)
+    jr Z, load_hex_end_load
+    cp 00                       ; check if record type is 00 (data)
+    jr NZ, load_hex_inval_type  ; if not, error
+load_hex_read_data:
+;    ld l, '*'                   ; "*" per byte loaded  # DEBUG
+;    call _asci0_putc            ; Print it             # DEBUG
+    call load_hex_read_byte
+    ld (de), a                  ; write the byte at the RAM address
+    inc de
+    djnz load_hex_read_data     ; if b non zero, loop to get more data
+load_hex_read_chksum:
+    call load_hex_read_byte     ; read checksum, but we don't need to keep it
+    ld a, l                     ; lower byte of hl checksum should be 0
+    or a
+    jr NZ, load_hex_bad_chk     ; non zero, we have an issue
+    ld l, '#'                   ; "#" per line loaded
+    call _asci0_putc            ; Print it
+;    ld l, CHAR_CR               ; CHAR_CR              # DEBUG
+;    call _asci0_putc            ; Print it             # DEBUG
+;    ld l, CHAR_LF               ; CHAR_LF              # DEBUG
+;    call _asci0_putc            ; Print it             # DEBUG
+    jr load_hex_wait_colon
+
+load_hex_esa_data:
+    call load_hex_read_byte     ; get high byte of ESA
+    and a, $F0                  ; be sure it is sane
+    jr Z, load_hex_esa_data_bank0   ; and we're not trying to overwrite yabios RAM
+    out0 (BBR), a               ; write it to the BBR
+load_hex_esa_data_bank0:
+    call load_hex_read_byte     ; get low byte of ESA, abandon it, but calc checksum
+    jr load_hex_read_chksum     ; calculate checksum
+
+load_hex_end_load:
+    call load_hex_read_byte     ; read checksum, but we don't need to keep it
+    ld a, l                     ; lower byte of hl checksum should be 0
+    or a
+    jr NZ, load_hex_bad_chk     ; non zero, we have an issue
+    out0 (BBR), c               ; get our originating BBR back, write it to the BBR
+    ld de, LoadOKStr
+
+load_hex_exit:
+    call pstring
+    call delay
+    ld hl, _asci0RxLock         ; give up the ASCI0 Rx mutex
+    ld (hl), $FE
+    ret
+
+load_hex_inval_type:
+    out0 (BBR), c               ; get our originating BBR back, write it to the BBR
+    ld de, invalidTypeStr
+    jr load_hex_exit
+
+load_hex_bad_chk:
+    out0 (BBR), c               ; get our originating BBR back, write it to the BBR
+    ld de, badCheckSumStr
+    jr load_hex_exit
+
+load_hex_read_byte:             ; Returns byte in a, checksum in hl
+    push hl
+    call _asci0_getc            ; Rx byte in l (a = char received too)
+    sub '0'
+    cp 10
+    jr C, load_hex_read_nbl2    ; if a<10 read the second nibble
+    sub 7                       ; else subtract 'A'-'0' (17) and add 10
+load_hex_read_nbl2:
+    rlca                        ; shift accumulator left by 4 bits
+    rlca
+    rlca
+    rlca
+    ld h, a                     ; temporarily store the first nibble in H
+    call _asci0_getc            ; Rx byte in l (a = char received too)
+    sub '0'
+    cp 10
+    jr C, load_hex_read_end     ; if a<10 finalize
+    sub 7                       ; else subtract 'A' (17) and add 10
+load_hex_read_end:
+    or h                        ; assemble two nibbles into one byte in A
+    pop hl    
+    add a, l                    ; add the byte read to l (for checksum)
+    ld l, a
+    ret                         ; return the byte read in a        
+
+
+;------------------------------------------------------------------------------
+; int8_t bank_get_rel(uint8_t bankAbs)
+;
+; bankAbs − This is the absolute bank address
+;
+; Returns the relative bank address
+
+PUBLIC _bank_get_rel, _bank_get_rel_fastcall
+
+_bank_get_rel:
+    pop hl
+    push hl
+
+_bank_get_rel_fastcall:
+    push af
+    
+    ld a, l
+    and a, $0F          ; limit input to 0 to 15 bank
+    ld l, a
+
+    in0 a, (BBR)        ; get the current bank
+    rrca                ; move the current bank to low nibble
+    rrca
+    rrca
+    rrca
+    
+    sub a, l            ; create source relative far address, from absolute input
+    ld l, a
+
+    pop af
     ret
 
 ;------------------------------------------------------------------------------
-; uint8_t lockTry(uint8_t * mutex)
+; uint8_t bank_get_abs(int8_t bankRel)
+;
+; bankRel − This is the relative bank address (-128 to +127)
+;
+; Returns the capped absolute bank address (0 to 15)
+
+PUBLIC _bank_get_abs, _bank_get_abs_fastcall
+
+_bank_get_abs:
+    pop hl
+    push hl
+
+_bank_get_abs_fastcall:
+    push af
+
+    in0 a, (BBR)        ; get the current bank
+    rrca                ; move the current bank to low nibble
+    rrca
+    rrca
+    rrca
+    
+    add a, l            ; create source relative far address, from twos complement input
+    and a, $0F          ; convert it to 4 bit positive address
+    ld l, a
+
+    pop af
+    ret
+
+;------------------------------------------------------------------------------
+; void lock_get(uint8_t * mutex)
+;
+; mutex − This is a pointer to a simple mutex semaphore
+
+PUBLIC _lock_get, _lock_get_fastcall
+
+_lock_get:
+    pop hl
+    push hl
+
+_lock_get_fastcall:
+    sra (hl)
+    jr C, _lock_get_fastcall
+    ret
+
+;------------------------------------------------------------------------------
+; uint8_t lock_try(uint8_t * mutex)
 ;
 ; mutex − This is a pointer to a simple mutex semaphore
 ;
 ; This function returns 1 if it got the lock, 0 otherwise
 
-PUBLIC _lockTry, _lockTry_fastcall
+PUBLIC _lock_try, _lock_try_fastcall
 
-_lockTry:
+_lock_try:
     pop hl
     push hl
 
-_lockTry_fastcall:
+_lock_try_fastcall:
     sra (hl)
     ld l, 0
-    jr C, lockNotGot
+    jr C, lock_got_not
     inc l
-lockNotGot:
+lock_got_not:
     ret
 
 ;------------------------------------------------------------------------------
@@ -586,15 +810,17 @@ lockNotGot:
 ;
 ; mutex − This is a pointer to a simple mutex semaphore
 
-PUBLIC _lockGive, _lockGive_fastcall
+PUBLIC _lock_give, _lock_give_fastcall
 
-_lockGive:
+_lock_give:
     pop hl
     push hl
 
-_lockGive_fastcall:
+_lock_give_fastcall:
     ld (hl), $FE
     ret
+
+
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 driver - system_time functions
@@ -672,7 +898,7 @@ asm_am9511a_isr:
 am9511a_isr_entry:
     ld a, (APUCMDBufUsed)   ; check whether we have a command to do
     or a                    ; zero?
-    jr z, am9511a_isr_end   ; if so then clean up and END
+    jr Z, am9511a_isr_end   ; if so then clean up and END
 
     ld hl, APUStatus        ; set APUStatus to busy
     ld (hl), __IO_APU_STATUS_BUSY
@@ -680,7 +906,7 @@ am9511a_isr_entry:
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
     in a, (c)               ; read the APU
     and __IO_APU_STATUS_ERROR   ; any errors?
-    call nz, am9511a_isr_error  ; then capture error in APUError
+    call NZ, am9511a_isr_error  ; then capture error in APUError
 
     ld hl, (APUCMDOutPtr)   ; get the pointer to place where we pop the COMMAND
     ld a, (hl)              ; get the COMMAND byte
@@ -694,10 +920,10 @@ am9511a_isr_entry:
 
     and $F0                 ; mask only most significant nibble of COMMAND
     cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
-    jr z, am9511a_isr_op_ent    ; load an OPERAND
+    jr Z, am9511a_isr_op_ent    ; load an OPERAND
 
     cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
-    jr z, am9511a_isr_op_rem    ; remove an OPERAND
+    jr Z, am9511a_isr_op_rem    ; remove an OPERAND
 
     pop af                  ; recover the COMMAND 
     ld bc, __IO_APU_PORT_CONTROL    ; the address of the APU control port in BC
@@ -717,7 +943,7 @@ am9511a_isr_end:            ; we've finished a COMMAND sentence
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
     in a, (c)               ; read the APU
     tst __IO_APU_STATUS_BUSY    ; test the STATUS byte is valid (i.e. we're not busy)
-    jr nz, am9511a_isr_end
+    jr NZ, am9511a_isr_end
     ld (APUStatus), a       ; update status byte
     jr am9511a_isr_exit     ; we're done here
 
@@ -744,7 +970,7 @@ am9511a_isr_op_ent:
 
     pop af                  ; recover the COMMAND 
     cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND
-    jp z, am9511a_isr_entry ; yes? then go back to get another COMMAND
+    jp Z, am9511a_isr_entry ; yes? then go back to get another COMMAND
 
     ex (sp), hl             ; delay for 38 cycles (5us) TWI 1.280us
     ex (sp), hl
@@ -775,7 +1001,7 @@ am9511a_isr_op_rem:
 
     pop af                  ; recover the COMMAND 
     cp __IO_APU_OP_REM16    ; is it a 2 byte OPERAND
-    jr z, am9511a_isr_op_rem16  ; yes then skip over 32bit stuff
+    jr Z, am9511a_isr_op_rem16  ; yes then skip over 32bit stuff
 
     inc hl                  ; increment two more bytes for 32bit OPERAND
     inc hl
@@ -816,34 +1042,34 @@ am9511a_reset_lock_get:
     sra (hl)                ; get the lock
     jr C, am9511a_reset_lock_get    ; or not
 
-    LD  HL, APUCMDBuf       ; Initialise COMMAND Buffer
-    LD (APUCMDInPtr), HL
-    LD (APUCMDOutPtr), HL
+    ld  HL, APUCMDBuf       ; Initialise COMMAND Buffer
+    ld (APUCMDInPtr), HL
+    ld (APUCMDOutPtr), HL
 
-    LD HL, APUDATABuf       ; Initialise OPERAND POINTER Buffer
-    LD (APUDATAInPtr), HL
-    LD (APUDATAOutPtr), HL
+    ld HL, APUDATABuf       ; Initialise OPERAND POINTER Buffer
+    ld (APUDATAInPtr), HL
+    ld (APUDATAOutPtr), HL
 
-    XOR A                   ; clear A register to 0
+    xor A                   ; clear A register to 0
 
-    LD (APUCMDBufUsed), A   ; 0 both Buffer counts
-    LD (APUDATABufUsed), A
+    ld (APUCMDBufUsed), A   ; 0 both Buffer counts
+    ld (APUDATABufUsed), A
 
-    LD (APUCMDBuf), A       ; clear COMMAND Buffer
-    LD HL, APUCMDBuf
-    LD D, H
-    LD E, L
-    INC DE
-    LD BC, __APU_CMD_SIZE-1
-    LDIR
+    ld (APUCMDBuf), A       ; clear COMMAND Buffer
+    ld HL, APUCMDBuf
+    ld D, H
+    ld E, L
+    inc DE
+    ld BC, __APU_CMD_SIZE-1
+    ldir
 
-    LD (APUDATABuf), A      ; clear OPERAND Buffer
-    LD HL, APUDATABuf
-    LD D, H
-    LD E, L
-    INC DE
-    LD BC, __APU_DATA_SIZE-1
-    LDIR
+    ld (APUDATABuf), A      ; clear OPERAND Buffer
+    ld HL, APUDATABuf
+    ld D, H
+    ld E, L
+    inc DE
+    ld BC, __APU_DATA_SIZE-1
+    ldir
 
     ld (APUStatus), a       ; set APU status to idle (NOP)
     ld (APUError), a        ; clear APU errors
@@ -852,7 +1078,7 @@ am9511a_reset_loop:
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in bc
     in a, (c)                   ; read the APU
     and __IO_APU_STATUS_BUSY    ; busy?
-    jr nz, am9511a_reset_loop
+    jr NZ, am9511a_reset_loop
 
     ld hl, _APULock         ; load the mutex lock address
     ld (hl), $FE            ; give mutex lock
@@ -883,7 +1109,7 @@ EXTERN APUStatus, APUError
 asm_am9511a_chk_idle:
     ld a, (APUStatus)       ; get the status of the APU (but don't disturb APU)
     tst __IO_APU_STATUS_BUSY    ; check busy bit is set,
-    jr nz, asm_am9511a_chk_idle ; so we wait
+    jr NZ, asm_am9511a_chk_idle ; so we wait
 
     ld hl, APUError
     or (hl)                 ; collect the aggregated errors, with APUStatus
@@ -896,7 +1122,7 @@ asm_am9511a_chk_idle:
     ret                     ; return with (APUStatus || APUError) with carry set if no errors
 
 ;------------------------------------------------------------------------------
-;       APU_CMD_LD
+;       APU_CMD_ld
 ;
 ;       DE = POINTER to OPERAND, IF REQUIRED
 ;       A = APU COMMAND
@@ -917,10 +1143,10 @@ asm_am9511a_cmd_ld:
 
     ld a, (APUCMDBufUsed)   ; Get the number of bytes in the COMMAND buffer
     cp __APU_CMD_SIZE-1     ; check whether there is space in the buffer
-    jr nc, am9511a_command_exit ; COMMAND buffer full, so exit
+    jr NC, am9511a_command_exit ; COMMAND buffer full, so exit
     
     cp __APU_DATA_SIZE-4    ; check whether there is space for an OPERAND
-    jr nc, am9511a_command_exit ; OPERAND buffer full, so exit
+    jr NC, am9511a_command_exit ; OPERAND buffer full, so exit
 
     ld a, l                 ; recover the COMMAND
     ld hl, (APUCMDInPtr)    ; get the pointer to where we poke
@@ -934,9 +1160,9 @@ asm_am9511a_cmd_ld:
 
     and $F0                 ; mask only most significant nibble of COMMAND
     cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
-    jr z, am9511a_cmd_op    ; load an OPERAND pointer
+    jr Z, am9511a_cmd_op    ; load an OPERAND pointer
     cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
-    jr z, am9511a_cmd_op    ; load an OPERAND pointer
+    jr Z, am9511a_cmd_op    ; load an OPERAND pointer
 
 am9511a_command_exit:
     ld hl, _APULock         ; load the mutex lock address
@@ -976,17 +1202,17 @@ _asci0_interrupt:
                                 ; start doing the Rx stuff
     in0 a, (STAT0)              ; load the ASCI0 status register
     tst STAT0_RDRF              ; test whether we have received on ASCI0
-    jr z, ASCI0_TX_CHECK        ; if not, go check for bytes to transmit
+    jr Z, ASCI0_TX_CHECK        ; if not, go check for bytes to transmit
 
 ASCI0_RX_GET:
     in0 l, (RDR0)               ; move Rx byte from the ASCI0 RDR to l
     
     and STAT0_OVRN|STAT0_PE|STAT0_FE ; test whether we have error on ASCI0
-    jr nz, ASCI0_RX_ERROR       ; drop this byte, clear error, and get the next byte
+    jr NZ, ASCI0_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
     ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer      
     cp __ASCI0_RX_SIZE-1        ; check whether there is space in the buffer
-    jr nc, ASCI0_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
+    jr NC, ASCI0_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
 
     ld a, l                     ; get Rx byte from l
     ld hl, (asci0RxIn)          ; get the pointer to where we poke
@@ -1007,15 +1233,15 @@ ASCI0_RX_ERROR:
 ASCI0_RX_CHECK:                 ; Z8S180 has 4 byte Rx H/W FIFO
     in0 a, (STAT0)              ; load the ASCI0 status register
     tst STAT0_RDRF              ; test whether we have received on ASCI0
-    jr nz, ASCI0_RX_GET         ; if still more bytes in H/W FIFO, get them
+    jr NZ, ASCI0_RX_GET         ; if still more bytes in H/W FIFO, get them
 
 ASCI0_TX_CHECK:                 ; now start doing the Tx stuff
     and STAT0_TDRE              ; test whether we can transmit on ASCI0
-    jr z, ASCI0_TX_END          ; if not, then end
+    jr Z, ASCI0_TX_END          ; if not, then end
 
     ld a, (asci0TxCount)        ; get the number of bytes in the Tx buffer
     or a                        ; check whether it is zero
-    jr z, ASCI0_TX_TIE0_CLEAR   ; if the count is zero, then disable the Tx Interrupt
+    jr Z, ASCI0_TX_TIE0_CLEAR   ; if the count is zero, then disable the Tx Interrupt
 
     ld hl, (asci0TxOut)         ; get the pointer to place where we pop the Tx byte
     ld a, (hl)                  ; get the Tx byte
@@ -1027,7 +1253,7 @@ ASCI0_TX_CHECK:                 ; now start doing the Tx stuff
     ld hl, asci0TxCount
     dec (hl)                    ; atomically decrement current Tx count
 
-    jr nz, ASCI0_TX_END         ; if we've more Tx bytes to send, we're done for now
+    jr NZ, ASCI0_TX_END         ; if we've more Tx bytes to send, we're done for now
 
 ASCI0_TX_TIE0_CLEAR:
     in0 a, (STAT0)              ; get the ASCI0 status register
@@ -1152,14 +1378,16 @@ EXTERN asci0RxCount, asci0RxOut
 
 _asci0_getc:
 
-    ; exit     : l = char received
+    ; exit     : l = char received (a = char received too)
     ;            carry reset if Rx buffer is empty
     ;
-    ; modifies : af, hl
-    
+    ; modifies : af, l
+
     ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer
     or a                        ; see if there are zero bytes available
-    ret z                       ; if the count is zero, then return
+    ret Z                       ; if the count is zero, then return
+
+    push hl    
 
     ld hl, (asci0RxOut)         ; get the pointer to place where we pop the Rx byte
     ld a, (hl)                  ; get the Rx byte
@@ -1169,8 +1397,10 @@ _asci0_getc:
 
     ld hl, asci0RxCount
     dec (hl)                    ; atomically decrement Rx count
+    
+    pop hl
 
-    ld l, a                     ; put the byte in hl
+    ld l, a                     ; put the byte in l
     scf                         ; indicate char received
     ret
 
@@ -1181,13 +1411,18 @@ EXTERN asci0RxCount, asci0RxOut
 _asci0_peekc:
 
     ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer
-    ld l, a                     ; and put it in hl
+    ld l, a                     ; and put it in l
     or a                        ; see if there are zero bytes available
-    ret z                       ; if the count is zero, then return
+    ret Z                       ; if the count is zero, then return
+    
+    push hl
 
     ld hl, (asci0RxOut)         ; get the pointer to place where we pop the Rx byte
     ld a, (hl)                  ; get the Rx byte
-    ld l, a                     ; and put it in hl
+
+    pop hl
+
+    ld l, a                     ; and put it in l
     ret
 
 PUBLIC _asci0_pollc
@@ -1199,13 +1434,13 @@ _asci0_pollc:
     ; exit     : l = number of characters in Rx buffer
     ;            carry reset if Rx buffer is empty
     ;
-    ; modifies : af, hl
+    ; modifies : af, l
 
     ld a, (asci0RxCount)        ; load the Rx bytes in buffer
     ld l, a	                    ; load result
     
     or a                        ; check whether there are non-zero count
-    ret z                       ; return if zero count
+    ret Z                       ; return if zero count
     
     scf                         ; set carry to indicate char received
     ret
@@ -1224,11 +1459,11 @@ _asci0_putc:
 
     ld a, (asci0TxCount)        ; get the number of bytes in the Tx buffer
     or a                        ; check whether the buffer is empty
-    jr nz, asci0_put_buffer_tx  ; buffer not empty, so abandon immediate Tx
+    jr NZ, asci0_put_buffer_tx  ; buffer not empty, so abandon immediate Tx
 
     in0 a, (STAT0)              ; get the ASCI0 status register
     and STAT0_TDRE              ; test whether we can transmit on ASCI0
-    jr z, asci0_put_buffer_tx   ; if not, so abandon immediate Tx
+    jr Z, asci0_put_buffer_tx   ; if not, so abandon immediate Tx
 
     out0 (TDR0), l              ; output the Tx byte to the ASCI0
 
@@ -1241,7 +1476,7 @@ asci0_put_buffer_tx:
     ld a,l                      ; Tx byte
 
     ld l,1
-    jr nc, asci0_clean_up_tx    ; buffer full, so drop the Tx byte and clean up
+    jr NC, asci0_clean_up_tx    ; buffer full, so drop the Tx byte and clean up
 
     ld hl, (asci0TxIn)          ; get the pointer to where we poke
     ld (hl), a                  ; write the Tx byte to the asci0TxIn
@@ -1282,17 +1517,17 @@ _asci1_interrupt:
                                 ; start doing the Rx stuff
     in0 a, (STAT1)              ; load the ASCI1 status register
     tst STAT1_RDRF              ; test whether we have received on ASCI1
-    jr z, ASCI1_TX_CHECK        ; if not, go check for bytes to transmit
+    jr Z, ASCI1_TX_CHECK        ; if not, go check for bytes to transmit
 
 ASCI1_RX_GET:
     in0 l, (RDR1)               ; move Rx byte from the ASCI1 RDR to l
     
     and STAT1_OVRN|STAT1_PE|STAT1_FE ; test whether we have error on ASCI1
-    jr nz, ASCI1_RX_ERROR       ; drop this byte, clear error, and get the next byte
+    jr NZ, ASCI1_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
     ld a, (asci1RxCount)        ; get the number of bytes in the Rx buffer      
     cp __ASCI1_RX_SIZE-1        ; check whether there is space in the buffer
-    jr nc, ASCI1_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
+    jr NC, ASCI1_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
 
     ld a, l                     ; get Rx byte from l
     ld hl, (asci1RxIn)          ; get the pointer to where we poke
@@ -1313,15 +1548,15 @@ ASCI1_RX_ERROR:
 ASCI1_RX_CHECK:                 ; Z8S180 has 4 byte Rx H/W FIFO
     in0 a, (STAT1)              ; load the ASCI1 status register
     tst STAT1_RDRF              ; test whether we have received on ASCI1
-    jr nz, ASCI1_RX_GET         ; if still more bytes in H/W FIFO, get them
+    jr NZ, ASCI1_RX_GET         ; if still more bytes in H/W FIFO, get them
 
 ASCI1_TX_CHECK:                 ; now start doing the Tx stuff
     and STAT1_TDRE              ; test whether we can transmit on ASCI1
-    jr z, ASCI1_TX_END          ; if not, then end
+    jr Z, ASCI1_TX_END          ; if not, then end
 
     ld a, (asci1TxCount)        ; get the number of bytes in the Tx buffer
     or a                        ; check whether it is zero
-    jr z, ASCI1_TX_TIE1_CLEAR   ; if the count is zero, then disable the Tx Interrupt
+    jr Z, ASCI1_TX_TIE1_CLEAR   ; if the count is zero, then disable the Tx Interrupt
 
     ld hl, (asci1TxOut)         ; get the pointer to place where we pop the Tx byte
     ld a, (hl)                  ; get the Tx byte
@@ -1333,7 +1568,7 @@ ASCI1_TX_CHECK:                 ; now start doing the Tx stuff
     ld hl, asci1TxCount
     dec (hl)                    ; atomically decrement current Tx count
 
-    jr nz, ASCI1_TX_END         ; if we've more Tx bytes to send, we're done for now
+    jr NZ, ASCI1_TX_END         ; if we've more Tx bytes to send, we're done for now
 
 ASCI1_TX_TIE1_CLEAR:
     in0 a, (STAT1)              ; get the ASCI1 status register
@@ -1460,14 +1695,16 @@ EXTERN asci1RxCount, asci1RxOut
 
 _asci1_getc:
 
-    ; exit     : l = char received
+    ; exit     : l = char received (a = char received too)
     ;            carry reset if Rx buffer is empty
     ;
-    ; modifies : af, hl
+    ; modifies : af, l
     
     ld a, (asci1RxCount)        ; get the number of bytes in the Rx buffer
     or a                        ; see if there are zero bytes available
-    ret z                       ; if the count is zero, then return
+    ret Z                       ; if the count is zero, then return
+
+    push hl
 
     ld hl, (asci1RxOut)         ; get the pointer to place where we pop the Rx byte
     ld a, (hl)                  ; get the Rx byte
@@ -1478,7 +1715,9 @@ _asci1_getc:
     ld hl, asci1RxCount
     dec (hl)                    ; atomically decrement Rx count
 
-    ld l, a                     ; put the byte in hl
+    pop hl
+
+    ld l, a                     ; put the byte in l
     scf                         ; indicate char received
     ret
 
@@ -1489,13 +1728,18 @@ EXTERN asci1RxCount, asci1RxOut
 _asci1_peekc:
 
     ld a, (asci1RxCount)        ; get the number of bytes in the Rx buffer
-    ld l, a                     ; and put it in hl
+    ld l, a                     ; and put it in l
     or a                        ; see if there are zero bytes available
-    ret z                       ; if the count is zero, then return
+    ret Z                       ; if the count is zero, then return
+
+    push hl
 
     ld hl, (asci1RxOut)         ; get the pointer to place where we pop the Rx byte
     ld a, (hl)                  ; get the Rx byte
-    ld l, a                     ; and put it in hl
+
+    pop hl
+
+    ld l, a                     ; and put it in l
     ret
 
 PUBLIC _asci1_pollc
@@ -1507,13 +1751,13 @@ _asci1_pollc:
     ; exit     : l = number of characters in Rx buffer
     ;            carry reset if Rx buffer is empty
     ;
-    ; modifies : af, hl
+    ; modifies : af, l
 
     ld a, (asci1RxCount)        ; load the Rx bytes in buffer
     ld l, a	                    ; load result
     
     or a                        ; check whether there are non-zero count
-    ret z                       ; return if zero count
+    ret Z                       ; return if zero count
     
     scf                         ; set carry to indicate char received
     ret
@@ -1532,11 +1776,11 @@ _asci1_putc:
 
     ld a, (asci1TxCount)        ; get the number of bytes in the Tx buffer
     or a                        ; check whether the buffer is empty
-    jr nz, asci1_put_buffer_tx  ; buffer not empty, so abandon immediate Tx
+    jr NZ, asci1_put_buffer_tx  ; buffer not empty, so abandon immediate Tx
 
     in0 a, (STAT1)              ; get the ASCI1 status register
     and STAT1_TDRE              ; test whether we can transmit on ASCI1
-    jr z, asci1_put_buffer_tx   ; if not, so abandon immediate Tx
+    jr Z, asci1_put_buffer_tx   ; if not, so abandon immediate Tx
 
     out0 (TDR1), l              ; output the Tx byte to the ASCI1
 
@@ -1549,7 +1793,7 @@ asci1_put_buffer_tx:
     ld a,l                      ; Tx byte
 
     ld l,1
-    jr nc, asci1_clean_up_tx    ; buffer full, so drop the Tx byte and clean up
+    jr NC, asci1_clean_up_tx    ; buffer full, so drop the Tx byte and clean up
 
     ld hl, (asci1TxIn)          ; get the pointer to where we poke
     ld (hl), a                  ; write the Tx byte to the asci1TxIn
@@ -1574,119 +1818,6 @@ asci1_clean_up_tx:
 
     jp asm_z180_pop_ei_jp       ; critical section end
 
-;==============================================================================
-;       OTHER SUBROUTINES
-;
-
-; int16_t mult_l(int16_t x, int16_t y);
-
-PUBLIC _mult_l
-
-_mult_l:
-    ld  hl,2
-    add hl,sp
-    ld  e,(hl)  ; e = xl
-    inc hl
-    ld  d,(hl)  ; d = xh
-    inc hl
-    ld  a,(hl)  ; a = yl
-    inc hl
-    ld  h,(hl)  ; h = yh
-    ld  l,a     ; l = a = yl
-
-l_mult_l:
-    ld  a,d     ; a = xh        /  4
-    ld  d,h     ; d = yh        /  4
-    ld  h,a     ; h = xh        /  4
-    ld  c,e     ; c = xl        /  4
-    ld  b,l     ; b = yl        /  4
-    mlt de      ; yh * xl       / 17
-    mlt hl      ; xh * yl       / 17
-    add hl,de   ; add cross products            / 11
-    mlt bc      ; yl * xl                       / 17
-    ld  a,l     ; cross products LSB            /  4
-    add a,b     ; add to low MSB final          /  4
-    ld  h,a     ; move final result to hl       /  4
-    ld  l,c     ;                               /  4
-    ret
-
-
-; int16_t mult_h(int16_t x, int16_t y);
-
-PUBLIC _mult_h
-
-_mult_h:
-    ld  hl,2
-    add hl,sp
-    ld  e,(hl)  ; e = xl
-    inc hl
-    ld  d,(hl)  ; d = xh
-    inc hl
-    ld  a,(hl)  ; a = yl
-    inc hl
-    ld  h,(hl)  ; h = yh
-    ld  l,a     ; l = a = yl
-
-l_mult_h:
-    ld  a,d     ; a = xh        /  4
-    ld  d,h     ; d = yh        /  4
-    ld  h,a     ; h = xh        /  4
-    ld  c,d     ; c = xh        /  4
-    ld  b,h     ; b = yh        /  4
-    mlt de      ; yh * xl       / 17
-    mlt hl      ; xh * yl       / 17
-    add hl,de   ; add cross products            / 11
-    mlt bc      ; yh * xh                       / 17
-    ld  l,h     ; drop cross products LSB       /  4
-    ld  h,0
-    add hl,bc   ; add in the MSB product        / 11
-    ret
-
-; int32_t mult(int16_t x, int16_t y);
-
-PUBLIC _mult
-
-_mult:
-    ld  hl,2
-    add hl,sp
-    ld  e,(hl)  ; e = xl
-    inc hl
-    ld  d,(hl)  ; d = xh
-    inc hl
-    ld  a,(hl)  ; a = yl
-    inc hl
-    ld  h,(hl)  ; h = yh
-    ld  l,a     ; l = a = yl
-
-l_mult:
-    ld  a,d     ; a = xh        /  4
-    ld  d,h     ; d = yh        /  4
-    ld  h,a     ; h = xh        /  4
-    ld  c,d     ; c = xh        /  4
-    ld  b,h     ; b = yh        /  4
-    push bc     ;               / 11
-    ld  c,e     ; c = xl        /  4
-    ld  b,l     ; b = yl        /  4
-
-    mlt de      ; yh * xl       / 17
-    mlt hl      ; xh * yl       / 17
-    add hl,de   ; add cross products            / 11
-
-    ld  e,h     ; MSB yh * xl + xh * yl         /  4
-    ld  h,l     ; LSB yh * xl + xh * yl         /  4
-    ld  l,0     ; 0 LSB                         /  7
-    ld  d,l     ; 0 MSB                         /  4
-
-    mlt bc      ; LSB product yl * xl           / 17
-    add hl,bc   ; add LSB X to LSB product      / 11
-    ex de, hl   ; move LSW to DE, MSB X to HL   /  4
-
-    pop bc      ;                               / 10    
-    mlt bc      ; MSB product yh * xh           / 17    
-
-    adc hl,bc   ; add MSB X to MSB product + C  / 15
-    ex de, hl   ; move MSW to DE, LSW to HL     /  4
-    ret
 
 ;==============================================================================
 ;       DEBUGGING SUBROUTINES
@@ -1756,8 +1887,7 @@ rhexwd:                         ; returns 2 bytes LE, to address in DE, with ech
 
 rhex:                       ; Returns byte in a
     push hl
-    call _asci0_getc        ; Rx byte in l
-    ld a, l
+    call _asci0_getc        ; Rx byte in l (a = char received too)
     sub '0'
     cp 10
     jr C, rhexnbl2          ; if a<10 read the second nibble
@@ -1768,8 +1898,7 @@ rhexnbl2:
     rlca
     rlca
     ld h, a                 ; temporarily store the first nibble in h
-    call _asci0_getc        ; Rx byte in l
-    ld a, l
+    call _asci0_getc        ; Rx byte in l (a = char received too)
     sub '0'
     cp 10
     jr C, rhexend           ; if a<10 finalize
@@ -1791,7 +1920,7 @@ pstring:
     ld l, a
     call _asci0_putc    ;Print it
     inc de              ;Point to next character 
-    jp pstring          ;Continue until $00
+    jr pstring          ;Continue until $00
 
     ;print CR/LF
 pnewline:

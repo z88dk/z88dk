@@ -11,6 +11,17 @@ include(__link__.m4)
 extern FILE *linein;
 extern FILE *lineout;
 
+// provide the location for stack pointers to be stored
+
+extern uint16_t *bios_sp;      // yabios SP here when other banks running
+extern uint16_t *bank_sp;      // bank SP storage, in Page0 TCB 0x003B
+
+// provide the location for important Page 0 bank addresses
+
+extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
+extern uint8_t bank_cmp_default_drive;  // CP/M default drive
+extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
+
 // provide the simple mutex locks for hardware resources
 
 extern uint8_t shadowLock;      //  mutex for alternate registers
@@ -33,14 +44,24 @@ extern uint8_t bankLockBase[];  // base address for 16 BANK locks
 
 // provide methods to get, try, and give the simple mutex locks
 
-__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lockGet,uint8_t * mutex)
-__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',uint8_t,,lockTry,uint8_t * mutex)
-__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lockGive,uint8_t * mutex)
+__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lock_get,uint8_t * mutex)
+__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',uint8_t,,lock_try,uint8_t * mutex)
+__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lock_give,uint8_t * mutex)
 
-// memcpy_far & memset_far functions
+// provide bank relative address functions
+
+__DPROTO(`a,b,c,d,e,h,iyh,iyl',`a,b,c,d,e,h,iyh,iyl',int8_t,,bank_get_rel,uint8_t bankAbs)
+__DPROTO(`a,b,c,d,e,h,iyh,iyl',`a,b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t bankRel)
+__OPROTO(`a,b,c,iyh,iyl',`a,b,c,iyh,iyl',void,,far_jp,void *str, int8_t bank)
+
+// provide memcpy_far and memset_far functions
 
 __OPROTO(`iyh,iyl',`iyh,iyl',void,*,memcpy_far,void *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
 __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,*,memset_far,void *str, int8_t bank, const int16_t c, size_t n)
+
+// provide load_hex and load_bin functions
+
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,load_hex,uint8_t bankAbs)
 
 // halt the YAZ180 with single step hardware.
 

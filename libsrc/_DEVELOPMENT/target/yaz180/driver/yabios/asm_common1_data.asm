@@ -5,18 +5,20 @@ INCLUDE "config_private.inc"
 ; start of definitions
 ;------------------------------------------------------------------------------
 
+PUBLIC  _bios_sp
+
 EXTERN  __register_sp
 
-; start of the Transitory Program Area (TPA) Control Block for BANK1 through BANK12
-; this area is Flash (essentially ROM) for BANK0, BANK13, BANK14, & BANK15, and
-; can't be easily written
+defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here when other banks running
+
+; start of the Transitory Program Area (TPA) Control Block (TCB)
+; for BANK1 through BANK12
+; this area is Flash (essentially ROM) for BANK0, BANK13, BANK14, & BANK15,
+; and can't be easily written to
 ;
-; TCB is from 0x003B through to 0x005B
+; TCB is from 0x003B through to 0x005B (scratch space for CP/M)
 
-PUBLIC  _bios_sp, _bank_sp
-
-defc    _bios_sp    =   __register_sp   ; yabios SP here when other banks running
-defc    _bank_sp    =   $003B           ; bank local SP storage, in Page0 TCB
+EXTERN  _bank_sp                        ; DEFW at 0x003B in Page 0
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - page aligned data
@@ -115,5 +117,12 @@ asci1TxCount:   defb    0               ; Space for Tx Buffer Management
 asci1TxIn:      defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
 asci1TxOut:     defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
 _asci1TxLock:   defb    $FE             ; mutex for Tx1
+
+PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr
+
+initString:     defm    CHAR_CR,CHAR_LF,"HexLoadr: ",CHAR_CR,CHAR_LF,0
+invalidTypeStr: defm    CHAR_CR,CHAR_LF,"Invalid Type",CHAR_CR,CHAR_LF,0
+badCheckSumStr: defm    CHAR_CR,CHAR_LF,"Checksum Error",CHAR_CR,CHAR_LF,0
+LoadOKStr:      defm    CHAR_CR,CHAR_LF,"Done",CHAR_CR,CHAR_LF,0
 
 DEPHASE

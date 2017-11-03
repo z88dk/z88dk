@@ -58,7 +58,7 @@ SECTION code_crt_init
     out0    (BCR0L), l
     out0    (BCR0H), h   
 
-    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    ld      bc, +(DMODE_MMOD)*$100+DSTAT_DE0
     out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
     out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
                             ; in burst mode the Z180 CPU stops until the DMA completes
@@ -83,7 +83,7 @@ SECTION code_crt_init
     out0    (BCR0L), l
     out0    (BCR0H), h   
 
-    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    ld      bc, +(DMODE_MMOD)*$100+DSTAT_DE0
     out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
     out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
                             ; in burst mode the Z180 CPU stops until the DMA completes

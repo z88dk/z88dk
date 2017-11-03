@@ -23,8 +23,11 @@ define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS&0xc0,16))
 # All I/O drivers are passed through system buffers
 # This will help when user banking is used, as all I/O is via system RAM
 
-define(`__COMMON_AREA_1_PHASE_DATA', 0xF000)    # Origin of COMMON AREA 1 Data
-define(`__COMMON_AREA_1_PHASE_DRIVER', 0xF700)  # Origin of COMMON AREA 1 Drivers, after CA1 Data
+define(`__COMMON_AREA_1_BASE', 0xf000)              # Base address of COMMON AREA 1
+define(`__COMMON_AREA_1_PHASE_DATA_SIZE', 0x0700)   # Size allowance for of COMMON AREA 1 PHASE DATA
+
+define(`__COMMON_AREA_1_PHASE_DATA', 0x`'eval(__COMMON_AREA_1_BASE,16))    # Origin of COMMON AREA 1 Data
+define(`__COMMON_AREA_1_PHASE_DRIVER', 0x`'eval(__COMMON_AREA_1_BASE+__COMMON_AREA_1_PHASE_DATA_SIZE,16))  # Origin of COMMON AREA 1 Drivers, after CA1 Data
 
 # Z180 ASCI0 driver
 
@@ -74,6 +77,7 @@ PUBLIC `__CPU_CLOCK'
 
 PUBLIC `__IO_BASE_ADDRESS'
 
+PUBLIC `__COMMON_AREA_1_BASE'
 PUBLIC `__COMMON_AREA_1_PHASE_DATA'
 PUBLIC `__COMMON_AREA_1_PHASE_DRIVER'
 
@@ -108,6 +112,7 @@ defc `__CPU_CLOCK' = __CPU_CLOCK
 
 defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
+defc `__COMMON_AREA_1_BASE' = __COMMON_AREA_1_BASE
 defc `__COMMON_AREA_1_PHASE_DATA' = __COMMON_AREA_1_PHASE_DATA
 defc `__COMMON_AREA_1_PHASE_DRIVER' = __COMMON_AREA_1_PHASE_DRIVER
 
@@ -143,6 +148,7 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__IO_BASE_ADDRESS' __IO_BASE_ADDRESS
 
+`#define' `__COMMON_AREA_1_BASE'  __COMMON_AREA_1_BASE
 `#define' `__COMMON_AREA_1_PHASE_DATA'  __COMMON_AREA_1_PHASE_DATA
 `#define' `__COMMON_AREA_1_PHASE_DRIVER'  __COMMON_AREA_1_PHASE_DRIVER
 
