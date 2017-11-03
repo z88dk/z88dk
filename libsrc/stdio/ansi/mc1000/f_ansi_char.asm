@@ -24,6 +24,7 @@
 	EXTERN	pix_rl
 	EXTERN	pix_pre
 	EXTERN	pix_post
+	EXTERN	pix_return
 
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN
@@ -44,6 +45,47 @@
 
 .ansi_CHAR
 
+	ld	b,a		;save character
+	ld	a,ansicharacter_pixelwidth
+	cp	8
+	ld	a,b
+	jr	nz,ansi_CHAR_flexible
+
+	
+	
+; So we can fast path 32 column printing
+	ld	hl,ansifont	- 256
+	ld de,8
+	push de
+.LFONT2
+	add hl,de
+	djnz LFONT2
+	
+	ld a,(ansi_ROW)       ; Line text position
+	add	$80
+	ld d,a
+	ld a,(ansi_COLUMN)       ; Column text position
+	ld e,a
+
+	ld c,8
+.floop
+	ld	a,(hl)
+	call char_attribute
+	cpl
+	call	pix_return
+	inc hl
+	ld	a,32
+	add	e
+	ld	e,a
+	jr nc,nocy
+	inc d
+.nocy
+	dec c
+	jr nz,floop
+	ret
+	
+	
+.ansi_CHAR_flexible
   ld (char+1),a
   ld a,(ansi_ROW)       ; Line text position
   
@@ -130,6 +172,23 @@
   call pix_pre
 
   ld a,(hl)
+  ;cpl
+  call char_attribute
+
+
+.DOTS
+  ld b,ansicharacter_pixelwidth
+
+  call pix_rl
+
+  add ix,de
+  inc hl
+  dec c
+  jr nz,PRE
+  ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.char_attribute
 .BOLD
   nop	;	rla
   nop	;	or (hl)
@@ -154,20 +213,8 @@
   dec c
 ;  jr nz,UNDRL   ; Set to JR UNDRL to disable underlined text (loc. INVRS+2)
   jr UNDRL
-  ld a,255
+  cpl
 .UNDRL
   inc c
 ; end of underlined text handling
-
-.DOTS
-  ld b,ansicharacter_pixelwidth
-
-  call pix_rl
-
-  add ix,de
-  inc hl
-  dec c
-  jr nz,PRE
   ret
-
-
