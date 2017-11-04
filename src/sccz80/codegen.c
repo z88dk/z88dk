@@ -1443,7 +1443,13 @@ void zsub(LVALUE* lval)
         Zsp += 6;
         break;
     default:
-        callrts("l_sub");
+        if ( c_size_optimisation & OPT_SUB16 ) {
+            swap();
+            ol("and\ta");
+            ol("sbc\thl,de");
+        } else {
+            callrts("l_sub");
+        }
     }
 }
 
@@ -1578,53 +1584,65 @@ void zmod(LVALUE* lval)
 
 void zmod_const(LVALUE *lval, int32_t value)
 {
+    LVALUE  templval={0};
+
     if ( lval->val_type == KIND_LONG ) {
-        if ( value == 256 ) {
-            ol("ld\th,0");
-            const2(0);
-            return;
+        if ( value <= 256 && value > 0 ) {
+            // Fall through into int handling
         } else if ( value == 65536 ) {
             const2(0);
             return;
+        } else if ( value == 65536 * 256 ) {
+            ol("ld\td,0");
+            return;
+        } else {
+            lpush();
+            vlongconst(value);
+            zmod(lval);
+            return;
         }
-        lpush();
-        vlongconst(value);
-        zmod(lval);
-    } else {
-        switch ( value ) {
-            case 256:
-                ol("ld\th,0");
-                break;
-            case 1:
-                vconst(0);
-                break;
-            case 2:
-                zand_const(lval,1);
-                break;
-            case 4:
-                zand_const(lval, 3);
-                break;
-            case 8:
-                zand_const(lval,7);
-                break;
-            case 16:
-                zand_const(lval,15);
-                break;
-            case 32:
-                zand_const(lval, 31);
-                break;
-            case 64:
-                zand_const(lval,63);
-                break;
-            case 128:
-                zand_const(lval,127);
-                break;
-            default:
-                const2(value);
-                swap();
-                zmod(lval);
-        }
+    } 
+
+    templval.val_type = KIND_INT;
+    if ( utype(lval) ) 
+        templval.ltype = type_uint;
+    else
+        templval.ltype = type_int;
+    switch ( value ) {
+        case 256:
+            ol("ld\th,0");
+            break;
+        case 1:
+            vconst(0);
+            break;
+        case 2:
+            zand_const(&templval,1);
+            break;
+        case 4:
+            zand_const(&templval, 3);
+            break;
+        case 8:
+            zand_const(&templval,7);
+            break;
+        case 16:
+            zand_const(&templval,15);
+            break;
+        case 32:
+            zand_const(&templval, 31);
+            break;
+        case 64:
+            zand_const(&templval,63);
+            break;
+        case 128:
+            zand_const(&templval,127);
+            break;
+        default:
+            const2(value);
+            swap();
+            zmod(&templval);
     }
+    if ( lval->val_type == KIND_LONG ) 
+        const2(0);
 }
 
 /* Inclusive 'or' the primary and secondary */
@@ -2092,6 +2110,14 @@ void asl_16bit_const(LVALUE *lval, int value)
             ol("ld\tl,0");
         break;
         case 7:
+            if ( c_size_optimisation & OPT_LSHIFT32 ) {
+                ol("rr\th");  // 9 bytes, 8 + 4  + 8 + 7 + 8 = 35T
+                ol("ld\th,l");
+                ol("rr\th");
+                ol("ld\tl,0");
+                ol("rr\tl");
+                break;
+            }
             ol("add\thl,hl");  // 77T
         case 6:
             ol("add\thl,hl");  // 66T
@@ -2956,8 +2982,7 @@ void printlabel(int label)
         outdec(label);
         outstr("$");
     } else {
-        outstr("i_");
-        outdec(label);
+        outfmt("i_%d", label);            
     }
 }
 

@@ -86,7 +86,7 @@ static void SetNoWarn(option *arg, char* val);
 static void SetAllWarn(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
 static void set_math_z88_parameters(option *opt, char *arg);
-
+static void opt_code_size(option *arg, char* val);
 static void atexit_deallocate(void);
 
 
@@ -122,6 +122,7 @@ static option  sccz80_opts[] = {
     { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, 0 },
     { 0, "glabels", OPT_BOOL, "Generate line labels", &c_line_labels, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, 0 },
+    { 0, "opt-code-speed", OPT_FUNCTION, "Optimise for speed not size", opt_code_size, 0},
 #ifdef USEFRAME
     { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},
@@ -881,7 +882,10 @@ int parse_arguments(option *args, int argc, char **argv)
     return outargc;
 }
 
-
+static void opt_code_size(option *arg, char* val)
+{
+    c_size_optimisation = ~0;
+}
 
 
 static void set_math_z88_parameters(option *opt, char *arg)
