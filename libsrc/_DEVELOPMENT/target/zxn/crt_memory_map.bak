@@ -36,6 +36,12 @@ Z88DK_FOR(`LOOP', `0', `111',
    org CRT_ORG_BANK_`'LOOP`'_H
 ')
 
+Z88DK_FOR(`LOOP', `0', `223',
+`
+   SECTION PAGE_`'LOOP
+   org CRT_ORG_PAGE_`'LOOP
+')
+
 Z88DK_FOR(`LOOP', `0', `15',
 `
    SECTION DIV_`'LOOP
@@ -69,6 +75,12 @@ Z88DK_FOR(`LOOP', `0', `111',
    
    SECTION BANK_`'LOOP`'_H
    org CRT_ORG_BANK_`'LOOP`'_H
+')
+
+Z88DK_FOR(`LOOP', `0', `223',
+`
+   SECTION PAGE_`'LOOP
+   org CRT_ORG_PAGE_`'LOOP
 ')
 
 Z88DK_FOR(`LOOP', `0', `15',
