@@ -32,6 +32,21 @@ int primary(LVALUE* lval)
         } else if ( strcmp(sname, "__builtin_offsetof") == 0 ) {
             offset_of(lval);
             return(0);
+        } else if ( strcmp(sname, "__func__") == 0 ) {
+            int32_t litlab;
+            // Stuff currfn->name into input stream, call const
+            int len = strlen(currfn->name);
+            storeq(len + 1, (unsigned char *)currfn->name, &litlab);
+            lval->const_val = litlab;
+            lval->is_const = 0; /* string address not constant */
+            lval->ltype = make_pointer(type_char);
+            lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
+            lval->val_type = KIND_INT;
+            lval->flags = FLAGS_NONE;
+            immedlit(litlab);
+            outdec(lval->const_val);
+            nl();
+            return 0;
         } else if ((ptr = findloc(sname))) {
             lval->base_offset = getloc(ptr, 0);
             lval->offset = 0;
@@ -40,7 +55,7 @@ int primary(LVALUE* lval)
             lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
             lval->ptr_type = KIND_NONE;
-            if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY ) {
+            if ( ispointer(lval->ltype) ) {
                 lval->ptr_type = ptr->ctype->ptr->kind;
                 /* djm long pointers */
                 lval->indirect_kind = lval->val_type = lval->ltype->kind;
@@ -48,7 +63,7 @@ int primary(LVALUE* lval)
             
             if ( lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
                 /* djm pointer? */
-                lval->ptr_type = ptr->type;
+                lval->ptr_type = lval->ltype->kind == KIND_ARRAY ? lval->ltype->ptr->kind : ptr->type;
                 lval->val_type = KIND_PTR;
                 return (0);
             } else
@@ -114,8 +129,7 @@ int primary(LVALUE* lval)
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
             warning(W_IMPLICIT_DEFINITION, sname);
-            ptr = addglb(sname, 0, KIND_INT, 0, STATIK);
-            ptr->ctype = default_function(sname);
+            ptr = addglb(sname, default_function(sname), 0, KIND_INT, 0, STATIK);
             ptr->size = 0;
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
@@ -228,7 +242,6 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 }
 
 /* Forces result, having type t2, to have type t1 */
-/* Must take account of sign in here somewhere, also there is a problem    possibly with longs.. */
 void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
 {
     if (t2 == KIND_CARRY) {
@@ -249,7 +262,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
     /* int to long, if signed, do sign, if not ld de,0 */
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
-        if (t2 != KIND_LONG && (!isconst)) {
+        if (t2 != KIND_LONG ) {
             if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY) {
                 convSint2long();
             } else

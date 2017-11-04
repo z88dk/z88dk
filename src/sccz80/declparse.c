@@ -160,8 +160,7 @@ Type *make_constant(const char *name, int32_t value)
     strcpy(type->name, name);
     type->value = value;
 
-    ptr = addglb(type->name, ID_VARIABLE, KIND_ENUM, 0, STATIK);
-    ptr->ctype = type;
+    ptr = addglb(type->name, type, ID_VARIABLE, KIND_ENUM, 0, STATIK);
     ptr->size = value;
     ptr->isassigned = 1;
 
@@ -173,7 +172,7 @@ Type *make_enum(const char *name)
     Type *type = CALLOC(1,sizeof(*type));
 
     type->fields = array_init(NULL);    
-    type->kind = KIND_ENUM;
+    type->kind = KIND_INT; /// Erk
     type->size = 2;
     type->len = 1;
     type->isconst = 1;
@@ -225,15 +224,25 @@ static Type *parse_enum(Type *type)
     type->size = 2;
     type->isunsigned = c_default_unsigned;
     if ( symname(sname) == 0 )
-        snprintf(sname, sizeof(sname),"0sc_i_enumb%d", num_enums_defined++);
+        snprintf(sname, sizeof(sname),"0__anonenum_%d", num_enums_defined++);
     
     if ( (ptr = find_enum(sname)) == NULL ) {
-        int32_t  value = 0;
-
         ptr = make_enum(sname);
-        SYMBOL *sym = addglb(sname, ID_ENUM, type->kind, 0, LSTATIC);
-        sym->ctype = type;
+        addglb(sname, ptr,  ID_ENUM, type->kind, 0, LSTATIC);
 
+        // Forward definition
+        if ( rcmatch(';')) {
+            return ptr;
+        }
+    }
+
+    if ( array_len(ptr->fields) && rcmatch('{')) {
+        // Redefinition
+        SYMBOL *sym = findglb(sname);
+        errorfmt("Redefinition of enum '%s', previously defined at %s",1, sname, sym->declared_location);
+        junk();
+    } else if ( array_len(ptr->fields) == 0 && rcmatch('{')) {
+        int32_t  value = 0;        
         needchar('{');
         do {
             Type *elem;
@@ -250,9 +259,7 @@ static Type *parse_enum(Type *type)
                 value = dval;
             }
             elem = make_constant(sname, value);
-            array_add(ptr->fields, elem);  // Keep reference to the enum value so we validate switches..
-//            add_global(elem);
-            
+            array_add(ptr->fields, elem);  // Keep reference to the enum value so we validate switches..            
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
@@ -719,8 +726,7 @@ int declare_local(int local_static)
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
             snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, type->name);
-            sym = addglb(namebuf, ID_VARIABLE, type->kind, 0, LSTATIC);
-            sym->ctype = type;
+            sym = addglb(namebuf, type, ID_VARIABLE, type->kind, 0, LSTATIC);
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
@@ -828,8 +834,7 @@ Type *dodeclare(enum storage_type storage)
             return type;
         }
 
-        sym = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
-        sym->ctype = type;
+        sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
         sym->isassigned = 1; // Assigned to 0
      
         /* We can catch @ here? Need to flag sym somehow */
@@ -1198,7 +1203,7 @@ int type_matches(Type *t1, Type *t2)
 {
     int i;
 
-    if ( t1->kind != t2->kind )
+    if ( t1->kind != t2->kind && !(ispointer(t1) && t2->kind == KIND_ARRAY) && !(ispointer(t2) && t1->kind == KIND_ARRAY) )
         return 0;
 
     if ( t1->isunsigned != t2->isunsigned )
@@ -1303,8 +1308,7 @@ static void declfunc(Type *type, enum storage_type storage)
         // Take the prototype flags
         type->flags = currfn->ctype->flags;
     } else {
-        currfn = addglb(type->name, ID_VARIABLE, type->kind, 0, storage);
-        currfn->ctype = type;  
+        currfn = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
     }
     currfn->func_defined = 1; 
     

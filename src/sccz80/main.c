@@ -399,6 +399,8 @@ static void dumpfns()
             storage = ptr->storage;
             if ( type == KIND_ENUM )
                 continue;
+            if ( ptr->ident == ID_MACRO )
+                continue;
             if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {

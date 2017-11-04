@@ -526,12 +526,14 @@ int heira(LVALUE *lval)
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
+            lval->ltype = make_pointer(lval->ltype);
+            lval->ptr_type = lval->ltype->ptr->kind;
+            lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
             return 0;
         }
         lval->ltype = make_pointer(lval->ltype);
         lval->ptr_type = lval->ltype->ptr->kind;
         lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
- //       lval->flags &= ~FARACC;
 
         if (lval->symbol) {
             lval->symbol->isassigned = YES;
@@ -732,7 +734,7 @@ int heirb(LVALUE* lval)
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
-                if (ispointer(lval->ltype)) {
+                if (ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY) {
                     lval->ptr_type = lval->ltype->ptr->kind;
                     /* djm */
                     // TODO

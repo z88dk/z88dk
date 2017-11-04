@@ -81,7 +81,7 @@
 	push	hl
 	call	_func2
 	pop	bc
-	pop	bc
+	pop	hl
 	ret
 
 

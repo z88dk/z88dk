@@ -44,6 +44,7 @@ int statement()
 
         if (amatch("extern")) {
             dodeclare(EXTERNAL);
+            return lastst;
         }
         /* Ignore the register and auto keywords! */
         regit = locstatic = ((swallow("register")) | swallow("auto"));
