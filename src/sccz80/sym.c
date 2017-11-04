@@ -74,7 +74,7 @@ SYMBOL* findloc(char* sname)
 
 
 SYMBOL* addglb(
-    char* sname, enum ident_type id, Kind kind,
+    char* sname, Type *type, enum ident_type id, Kind kind,
     int value, enum storage_type storage)
 {
     SYMBOL* ptr;
@@ -88,10 +88,16 @@ SYMBOL* addglb(
          */
         if ((ptr->storage == EXTERNAL && storage != EXTERNAL) ) {
             ptr->storage = storage;
+            ptr->ctype = type;
             return (ptr);
         }
         if ((ptr->storage == EXTERNAL && storage == EXTERNAL) ) {
+            ptr->ctype = type;            
             return (ptr);
+        }
+
+        if ( type_matches(type, ptr->ctype) ) {
+            return ptr;
         }
 
         multidef(sname);
@@ -100,6 +106,7 @@ SYMBOL* addglb(
     ptr = CALLOC(1, sizeof(*ptr));
     initialise_sym(ptr, sname, id, kind, storage);
     ptr->offset.i = value;
+    ptr->ctype = type;
     HASH_ADD_STR(symtab, name, ptr);   
     ++glbcnt;
     return (ptr);

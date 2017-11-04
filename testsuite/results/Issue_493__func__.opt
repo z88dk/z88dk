@@ -1,0 +1,54 @@
+
+
+
+	MODULE	Issue_493__func__
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,i_0+0
+	push	hl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._main
+	ld	hl,i_5+5
+	push	hl
+	call	_func
+	pop	bc
+	ret
+
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"func"
+	defb	0
+
+	defm	"main"
+	defb	0
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_main
+
+
+
+
