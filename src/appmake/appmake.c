@@ -226,8 +226,8 @@ FILE *fopen_bin(char *fname, char *crtfile)
     char    name[FILENAME_MAX+1];
     char    tname[FILENAME_MAX+1];
     char    cmdline[FILENAME_MAX*2 + 128];
-    struct  stat st_file1;
-    struct  stat st_file2;
+    struct  stat st_file1={0};
+    struct  stat st_file2={0};
     int     crt_model;
     int     c;
 
