@@ -427,7 +427,13 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     Type *old_type = lval->ltype;
 
+
+
     lval->symbol = NULL;
+    if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_FUNC ) {
+        return lval->symbol;
+    }
+
     lval->ltype = lval->ltype->ptr;
     if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
         lval->ptr_type = KIND_NONE;

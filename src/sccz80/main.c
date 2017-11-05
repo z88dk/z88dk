@@ -533,6 +533,8 @@ void dumpvars()
                 continue;
             if ( type == KIND_ENUM )
                 continue;
+            if ( ptr->ctype->size == -1 )
+                continue;
             prefix();
             outname(ptr->name, 1);
             col();

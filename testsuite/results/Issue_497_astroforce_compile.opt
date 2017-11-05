@@ -1,0 +1,46 @@
+
+
+
+	MODULE	Issue_497_astroforce_compile
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	push	bc
+	pop	hl
+	push	hl
+	ld	bc,_updateintro3objectfunctions
+	push	bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,0	;const
+	ex	(sp),hl
+	call	l_jphl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_spawners
+	GLOBAL	_updateintro3objectfunctions
+	GLOBAL	_func
+
+
+
+
