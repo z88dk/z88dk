@@ -360,8 +360,10 @@ static int chase_typedef(Type *type)
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->storage == TYPDEF && amatch(ptr->name)) {
+            char wasconst = type->isconst;
             /* So we've identified it, we should copy it */
             *type = *ptr->ctype;
+            type->isconst |= wasconst;
             return 0;
         }
     }
@@ -829,7 +831,7 @@ Type *dodeclare(enum storage_type storage)
             type->flags &= ~(SMALLC|FLOATINGDECL|CALLEE|FASTCALL);
         }
 
-        if ( rcmatch('{')) {
+        if ( rcmatch('{') && type->kind == KIND_FUNC) {
             declfunc(type, storage);
             return type;
         }
