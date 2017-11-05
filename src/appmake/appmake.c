@@ -222,7 +222,7 @@ long get_org_addr(char *crtfile)
 
 FILE *fopen_bin(char *fname, char *crtfile)
 {
-    FILE   *fcode, *fdata, *fin;
+    FILE   *fcode = NULL, *fdata = NULL, *fin = NULL;
     char    name[FILENAME_MAX+1];
     char    tname[FILENAME_MAX+1];
     char    cmdline[FILENAME_MAX*2 + 128];
@@ -276,6 +276,9 @@ FILE *fopen_bin(char *fname, char *crtfile)
     if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime)) {
         /* classic library */
         fcode = fopen(fname, "rb");
+        if ( fcode == NULL ) {
+            exit_log(1, "ERROR: File %s not found\n", fname);            
+        }
 
         /* We may have a data section */
         strcpy(name, fname);
@@ -291,6 +294,9 @@ FILE *fopen_bin(char *fname, char *crtfile)
             fprintf(stderr, "WARNING: some code or data may not be assigned to sections.\n");
 
         fcode = fopen(name, "rb");
+        if ( fcode == NULL ) {
+            exit_log(1, "ERROR: File %s not found\n", name);            
+        }
     }
 
     if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__crt_model")) == -1))
