@@ -164,6 +164,7 @@
 	EXTERN	dldpsh		;(hl)->(stack)
 	EXTERN	dpush		;FA->(stack)
 	EXTERN	dpush2		;FA->(stack under)
+	EXTERN	dpush3		;FA->(stack under,long)
 
 	EXTERN	fa		;may not be needed in this file
 	EXTERN	extra		;dittot
