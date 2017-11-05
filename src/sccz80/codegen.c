@@ -1435,7 +1435,21 @@ void zsub(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        callrts("l_long_sub");
+        if ( c_size_optimisation & OPT_SUB32 ) {
+            ol("ld\tc,l");        /* 13 bytes: 4 + 4 + 10 + 4 + 15 + 4  + 4 + 4 + 10 + 15 + 4 = 78T */
+            ol("ld\tb,h");
+            ol("pop\thl");        
+            ol("and\ta");
+            ol("sbc\thl,bc");
+            ol("ex\tde,hl");
+            ol("ld\tc,l");
+            ol("ld\tb,h");
+            ol("pop\thl");
+            ol("sbc\thl,bc");
+            ol("ex\tde,hl");
+        } else {
+            callrts("l_long_sub"); /* 3 bytes: 100 + 17T = 117t */
+        }
         Zsp += 4;
         break;
     case KIND_DOUBLE:
