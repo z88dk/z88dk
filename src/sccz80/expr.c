@@ -74,15 +74,18 @@ int heir1(LVALUE* lval)
             
             if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
                     ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
-                UT_string *str;
+                if ( ispointer(lval->ltype) && lval2.is_const && lval2.const_val == 0 ) {
+                } else {
+                    UT_string *str;
 
-                utstring_new(str);
-                utstring_printf(str,"Assigning '%s', type: ", lval->ltype->name);
-                type_describe(lval->ltype,str);
-                utstring_printf(str," from ");
-                type_describe(rhs, str);
-                warningfmt("%s", utstring_body(str));
-                utstring_free(str);
+                    utstring_new(str);
+                    utstring_printf(str,"Assigning '%s', type: ", lval->ltype->name);
+                    type_describe(lval->ltype,str);
+                    utstring_printf(str," from ");
+                    type_describe(rhs, str);
+                    warningfmt("%s", utstring_body(str));
+                    utstring_free(str);
+                }
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
