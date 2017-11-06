@@ -28,6 +28,7 @@ math/float/math48/lm/c/sccz80/dmul
 math/float/math48/lm/c/sccz80/dne
 math/float/math48/lm/c/sccz80/dpush
 math/float/math48/lm/c/sccz80/dpush2
+math/float/math48/lm/c/sccz80/dpush3
 math/float/math48/lm/c/sccz80/dread
 math/float/math48/lm/c/sccz80/dstore
 math/float/math48/lm/c/sccz80/dsub
