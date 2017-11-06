@@ -8,6 +8,9 @@
 #include "appmake.h"
 #include "zx-util.h"
 
+#undef  min
+#define min(a,b) ((a) < (b) ? (a) : (b))
+
 static struct zx_common zxc = {
     0,          // help
     NULL,       // binname
@@ -120,6 +123,7 @@ int zxn_exec(char *target)
     FILE  *fmap;
     char  *p;
     int i, j, errors, ret;
+    int bsnum_bank, bsnum_div, bsnum_page;
     char k;
 
     ret = -1;
@@ -160,6 +164,7 @@ int zxn_exec(char *target)
     memset(&memory, 0, sizeof(memory));
     mb_create_bankspace(&memory, "BANK");   // bank space 0
     mb_create_bankspace(&memory, "DIV");    // bank space 1
+    mb_create_bankspace(&memory, "PAGE");   // bank space 2 - must be last because it is deleted later
 
     if (zxb.fullsize)
     {
@@ -241,51 +246,57 @@ int zxn_exec(char *target)
     // collapse zxn's relocatable 16k banks in bank space BANK
 
     errors = 0;
+    bsnum_bank = mb_find_bankspace(&memory, "BANK");
+    bsnum_div  = mb_find_bankspace(&memory, "DIV");
+    bsnum_page = mb_find_bankspace(&memory, "PAGE");
 
-    for (i = 0; i < MAXBANKS; ++i)
+    if (bsnum_bank >= 0)
     {
-        struct memory_bank *mb = &memory.bankspace[0].membank[i];
-
-        for (j = 0; j < mb->num; ++j)
+        for (i = 0; i < MAXBANKS; ++i)
         {
-            struct section_bin *sb = &mb->secbin[j];
+            struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
 
-            if ((p = strstr(sb->section_name, "BANK")) != NULL)
+            for (j = 0; j < mb->num; ++j)
             {
-                if ((sscanf(p, "BANK_%*d_%c", &k) == 1) && (k == 'L'))
+                struct section_bin *sb = &mb->secbin[j];
+
+                if ((p = strstr(sb->section_name, "BANK")) != NULL)
                 {
-                    // this is an 8k bank in the lower part of the 16k BANK_nnn
-
-                    sb->org = (sb->org & 0x1fff) + 0xc000;
-
-                    if ((sb->org + sb->size) > 0xe000)
+                    if ((sscanf(p, "BANK_%*d_%c", &k) == 1) && (k == 'L'))
                     {
-                        errors++;
-                        fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0xe000);
+                        // this is an 8k bank in the lower part of the 16k BANK_nnn
+
+                        sb->org = (sb->org & 0x1fff) + 0xc000;
+
+                        if ((sb->org + sb->size) > 0xe000)
+                        {
+                            errors++;
+                            fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0xe000);
+                        }
                     }
-                }
-                else if ((sscanf(p, "BANK_%*d_%c", &k) == 1) && (k == 'H'))
-                {
-                    // this is an 8k bank in the upper part of the 16k BANK_nnn
-
-                    sb->org = (sb->org & 0x1fff) + 0xe000;
-
-                    if ((sb->org + sb->size) > 0x10000)
+                    else if ((sscanf(p, "BANK_%*d_%c", &k) == 1) && (k == 'H'))
                     {
-                        errors++;
-                        fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                        // this is an 8k bank in the upper part of the 16k BANK_nnn
+
+                        sb->org = (sb->org & 0x1fff) + 0xe000;
+
+                        if ((sb->org + sb->size) > 0x10000)
+                        {
+                            errors++;
+                            fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                        }
                     }
-                }
-                else
-                {
-                    // this is destined for the full 16k
-
-                    sb->org = (sb->org & 0x3fff) + 0xc000;
-
-                    if ((sb->org + sb->size) > 0x10000)
+                    else
                     {
-                        errors++;
-                        fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                        // this is destined for the full 16k
+
+                        sb->org = (sb->org & 0x3fff) + 0xc000;
+
+                        if ((sb->org + sb->size) > 0x10000)
+                        {
+                            errors++;
+                            fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                        }
                     }
                 }
             }
@@ -294,26 +305,99 @@ int zxn_exec(char *target)
 
     // check divmmc banks for size violations
 
-    for (i = 0; i < MAXBANKS; ++i)
+    if (bsnum_div >= 0)
     {
-        struct memory_bank *mb = &memory.bankspace[1].membank[i];
-
-        for (j = 0; j < mb->num; ++j)
+        for (i = 0; i < MAXBANKS; ++i)
         {
-            struct section_bin *sb = &mb->secbin[j];
+            struct memory_bank *mb = &memory.bankspace[bsnum_div].membank[i];
 
-            if (sb->org < 0x2000)
+            for (j = 0; j < mb->num; ++j)
             {
-                errors++;
-                fprintf(stderr, "Error: Section %s has org less than 0x2000 (%#04x)\n", sb->section_name, sb->org);
-            }
-            else if ((sb->org + sb->size) > 0x4000)
-            {
-                errors++;
-                fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+                struct section_bin *sb = &mb->secbin[j];
+
+                if (sb->org < 0x2000)
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s has org less than 0x2000 (%#04x)\n", sb->section_name, sb->org);
+                }
+                else if ((sb->org + sb->size) > 0x4000)
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+                }
             }
         }
     }
+
+    // merge PAGE space into BANK space
+
+    if ((bsnum_page >= 0) && (bsnum_bank >= 0))
+    {
+        for (i = 0; i < MAXBANKS; ++i)
+        {
+            struct memory_bank *mb = &memory.bankspace[bsnum_page].membank[i];
+
+            for (j = 0; j < mb->num; ++j)
+            {
+                struct section_bin *sb = &mb->secbin[j];
+
+                int bank = i / 2;         // destination 16k bank
+                int org = (sb->org & 0x1fff) + ((i & 0x01) * 0x2000);   // offset into 16k bank
+                int size = sb->size;    // size of data in bytes
+                uint32_t offset = sb->offset;  // start offset of data in source file
+                int part = 0;           // track number of fragments  
+
+                // distribute page section into 16k banks
+
+                while (size > 0)
+                {
+                    struct section_bin newsec;
+                    char *buffer;
+                    int len;
+                    struct memory_bank *dst;
+
+                    // make a new section to contain this part
+
+                    memset(&newsec, 0, sizeof(newsec));
+
+                    newsec.filename = must_strdup(sb->filename);
+                    newsec.offset = offset;
+
+                    buffer = must_malloc((strlen(sb->section_name) + 6) * sizeof(*buffer));
+                    sprintf(buffer, "%s_f%03u", sb->section_name, part);
+                    newsec.section_name = buffer;
+
+                    newsec.org = (org & 0x3fff) + 0xc000;
+
+                    len = min(0x10000 - newsec.org, size);
+                    newsec.size = len;
+
+                    // put the new section into BANK space
+
+                    dst = &memory.bankspace[bsnum_bank].membank[bank];
+
+                    dst->num++;
+                    dst->secbin = must_realloc(dst->secbin, dst->num * sizeof(*dst->secbin));
+
+                    memcpy(&dst->secbin[dst->num - 1], &newsec, sizeof(*dst->secbin));
+
+                    // update pointers
+
+                    bank++;
+                    org += len;
+                    size -= len;
+                    offset += len;
+                    part++;
+                }
+            }
+        }
+
+        // remove the PAGE bankspace from the memory model
+
+        mb_remove_bankspace(&memory, "PAGE");
+    }
+
+    //
 
     if (errors)
         exit_log(1, "Aborting... errors in one or more memory banks\n");
@@ -349,8 +433,11 @@ int zxn_exec(char *target)
         memory.mainbank.num = 0;
         memory.mainbank.secbin = NULL;
 
-        for (i = 0; i < 8; ++i)
-            mb_remove_bank(&memory.bankspace[0], i, zxc.clean);
+        if (bsnum_bank >= 0)
+        {
+            for (i = 0; i < 8; ++i)
+                mb_remove_bank(&memory.bankspace[bsnum_bank], i, zxc.clean);
+        }
     }
 
     if (bin || sna)

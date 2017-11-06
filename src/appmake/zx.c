@@ -159,6 +159,7 @@ int zx_exec(char *target)
     char   crtname[LINELEN];
     FILE  *fmap;
     int    i, j, errors, ret;
+    int    bsnum_bank, bsnum_div;
 
     ret = -1;
 
@@ -279,50 +280,60 @@ int zx_exec(char *target)
     // check zx memory banks for org/size violations
 
     errors = 0;
+    bsnum_bank = mb_find_bankspace(&memory, "BANK");
+    bsnum_div  = mb_find_bankspace(&memory, "DIV");
 
-    for (i = 0; i < MAXBANKS; ++i)
+    if (bsnum_bank >= 0)
     {
-        struct memory_bank *mb = &memory.bankspace[0].membank[i];
-
-        for (j = 0; j < mb->num; ++j)
+        for (i = 0; i < MAXBANKS; ++i)
         {
-            struct section_bin *sb = &mb->secbin[j];
+            struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
 
-            if (sb->org < 0xc000)
+            for (j = 0; j < mb->num; ++j)
             {
-                errors++;
-                fprintf(stderr, "Error: Section %s has org less than 0xc000 (%#04x)\n", sb->section_name, sb->org);
-            }
-            else if ((sb->org + sb->size) > 0x10000)
-            {
-                errors++;
-                fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                struct section_bin *sb = &mb->secbin[j];
+
+                if (sb->org < 0xc000)
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s has org less than 0xc000 (%#04x)\n", sb->section_name, sb->org);
+                }
+                else if ((sb->org + sb->size) > 0x10000)
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                }
             }
         }
     }
 
     // check divmmc banks for org/size violations
 
-    for (i = 0; i < MAXBANKS; ++i)
+    if (bsnum_div >= 0)
     {
-        struct memory_bank *mb = &memory.bankspace[1].membank[i];
-
-        for (j = 0; j < mb->num; ++j)
+        for (i = 0; i < MAXBANKS; ++i)
         {
-            struct section_bin *sb = &mb->secbin[j];
+            struct memory_bank *mb = &memory.bankspace[bsnum_div].membank[i];
 
-            if (sb->org < 0x2000)
+            for (j = 0; j < mb->num; ++j)
             {
-                errors++;
-                fprintf(stderr, "Error: Section %s has org less than 0x2000 (%#04x)\n", sb->section_name, sb->org);
-            }
-            else if ((sb->org + sb->size) > 0x4000)
-            {
-                errors++;
-                fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+                struct section_bin *sb = &mb->secbin[j];
+
+                if (sb->org < 0x2000)
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s has org less than 0x2000 (%#04x)\n", sb->section_name, sb->org);
+                }
+                else if ((sb->org + sb->size) > 0x4000)
+                {
+                    errors++;
+                    fprintf(stderr, "Error: Section %s exceeds 8k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x4000);
+                }
             }
         }
     }
+
+    //
 
     if (errors)
         exit_log(1, "Aborting... errors in one or more memory banks\n");
@@ -336,7 +347,7 @@ int zx_exec(char *target)
 
     if (sna)
     {
-        if ((ret = zx_sna(&zxc, &zxs, &memory, 1)) != 0)
+        if ((ret = zx_sna(&zxc, &zxs, &memory, 0)) != 0)
             return ret;
 
         // sna snapshot is out but we need to process the rest of the binaries too
@@ -358,8 +369,11 @@ int zx_exec(char *target)
         memory.mainbank.num = 0;
         memory.mainbank.secbin = NULL;
 
-        for (i = 0; i < 8; ++i)
-            mb_remove_bank(&memory.bankspace[0], i, zxc.clean);
+        if (bsnum_bank >= 0)
+        {
+            for (i = 0; i < 8; ++i)
+                mb_remove_bank(&memory.bankspace[bsnum_bank], i, zxc.clean);
+        }
     }
 
     if (bin || sna)

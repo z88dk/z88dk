@@ -1,5 +1,6 @@
 #include "appmake.h"
 #include "zx-util.h"
+#include <inttypes.h>
 
 #define FILENAMELEN 1024
 
@@ -817,6 +818,11 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     char filename[FILENAME_MAX + 1];
     int i, j;
     int is_128 = 0;
+    int bsnum_bank;
+
+    // find bankspace BANK
+
+    bsnum_bank = mb_find_bankspace(memory, "BANK");
 
     // find code origin
 
@@ -843,43 +849,46 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
     // merge banks 5,2,0 into the main binary
 
-    for (i = 0; i < 8; ++i)
+    if (bsnum_bank >= 0)
     {
-        struct memory_bank *mb = &memory->bankspace[0].membank[i];
-
-        if (mb->num > 0)
+        for (i = 0; i < 8; ++i)
         {
-            // merge banks 5,2,0 into main bank
+            struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
 
-            if ((i == 0) || (i == 2) || (i == 5))
+            if (mb->num > 0)
             {
-                // adjust org appropriately
+                // merge banks 5,2,0 into main bank
 
-                for (j = 0; j < mb->num; ++j)
+                if ((i == 0) || (i == 2) || (i == 5))
                 {
-                    if (i == 0)
-                        mb->secbin[j].org += 0xc000 - 0xc000;
-                    else if (i == 2)
-                        mb->secbin[j].org += 0x8000 - 0xc000;
-                    else
-                        mb->secbin[j].org += 0x4000 - 0xc000;
+                    // adjust org appropriately
+
+                    for (j = 0; j < mb->num; ++j)
+                    {
+                        if (i == 0)
+                            mb->secbin[j].org += 0xc000 - 0xc000;
+                        else if (i == 2)
+                            mb->secbin[j].org += 0x8000 - 0xc000;
+                        else
+                            mb->secbin[j].org += 0x4000 - 0xc000;
+                    }
+
+                    // move sections to main bank
+
+                    memory->mainbank.secbin = must_realloc(memory->mainbank.secbin, (memory->mainbank.num + mb->num) * sizeof(*memory->mainbank.secbin));
+                    memcpy(&memory->mainbank.secbin[memory->mainbank.num], mb->secbin, mb->num * sizeof(*memory->mainbank.secbin));
+                    memory->mainbank.num += mb->num;
+
+                    free(mb->secbin);
+
+                    mb->num = 0;
+                    mb->secbin = NULL;
+
+                    printf("Notice: Merged BANK_%d into the main memory bank\n", i);
                 }
-
-                // move sections to main bank
-
-                memory->mainbank.secbin = must_realloc(memory->mainbank.secbin, (memory->mainbank.num + mb->num) * sizeof(*memory->mainbank.secbin));
-                memcpy(&memory->mainbank.secbin[memory->mainbank.num], mb->secbin, mb->num * sizeof(*memory->mainbank.secbin));
-                memory->mainbank.num += mb->num;
-
-                free(mb->secbin);
-
-                mb->num = 0;
-                mb->secbin = NULL;
-
-                printf("Notice: Merged BANK_%d into the main memory bank\n", i);
+                else
+                    is_128++;
             }
-            else
-                is_128++;
         }
     }
 
@@ -923,6 +932,9 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         if ((fin = fopen(sb->filename, "rb")) == NULL)
             exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
 
+        if (fseek(fin, sb->offset, SEEK_SET) != 0)
+            exit_log(1, "Error: Can't seek to %" PRIu32 " in file %s\n", sb->offset, sb->filename);
+
         if (fread(&mem128[sb->org - 0x4000], sb->size, 1, fin) < 1)
         {
             fclose(fin);
@@ -934,16 +946,19 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
     // write other memory banks into memory image
 
-    if (is_128)
+    if (is_128 && (bsnum_bank >= 0))
     {
         for (i = 0; i < 8; ++i)
         {
-            for (j = 0; j < memory->bankspace[0].membank[i].num; ++j)
+            for (j = 0; j < memory->bankspace[bsnum_bank].membank[i].num; ++j)
             {
-                struct section_bin *sb = &memory->bankspace[0].membank[i].secbin[j];
+                struct section_bin *sb = &memory->bankspace[bsnum_bank].membank[i].secbin[j];
 
                 if ((fin = fopen(sb->filename, "rb")) == NULL)
                     exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
+
+                if (fseek(fin, sb->offset, SEEK_SET) != 0)
+                    exit_log(1, "Error: Can't seek to %" PRIu32 " in file %s\n", sb->offset, sb->filename);
 
                 if (fread(&mem128[49152 + i * 16384 + sb->org - 0xc000], sb->size, 1, fin) < 1)
                 {
