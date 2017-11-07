@@ -387,6 +387,7 @@ void dofor()
     modstk(savedsp, NO, NO);
     Zsp = savedsp;
     locptr = savedloc;
+    declared = 0;
     delwhile();
 }
 

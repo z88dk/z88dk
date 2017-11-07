@@ -808,12 +808,26 @@ Type *dodeclare(enum storage_type storage)
     Type  *base_type = NULL;
     SYMBOL *sym;
     decl_mode mode = MODE_NONE;
+    int32_t    ataddress = -1;
 
     if ( storage == TYPDEF ) mode = MODE_TYPEDEF;
     else if ( storage == EXTERNAL ) mode = MODE_EXTERN;
 
+
+    if ( amatch("__at")) {
+        Kind valtype;
+        double val;
+
+        needchar('(');
+        constexpr(&val,&valtype, 1);
+        needchar(')');
+        ataddress = val;
+    }
+
     while ( 1 ) {
         Type *type = dodeclare2(&base_type, mode);
+        char  drop_name[NAMESIZE * 2];
+        int   alloc_size;
         
         if ( type == NULL ) {
             break;
@@ -839,6 +853,7 @@ Type *dodeclare(enum storage_type storage)
         sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
         sym->isassigned = 1; // Assigned to 0
      
+        snprintf(drop_name, sizeof(drop_name), "%s", type->name);
         /* We can catch @ here? Need to flag sym somehow */
         if ( cmatch('@')) {
             Kind valtype;
@@ -846,20 +861,39 @@ Type *dodeclare(enum storage_type storage)
 
             constexpr(&val,&valtype, 1);
 
+            // If initialised, the drop name should be something different
+            snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);            
             type->value = val;
             sym->storage = EXTERNP;
             sym->initialised = 1;
         }
 
+        // Handle the sdcc way of declaring variables at address
+        if ( ataddress != -1 ) {
+            type->value = ataddress;
+            sym->storage = EXTERNP;
+            sym->initialised = 1;
+            // If initialised, the drop name should be something different
+            snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);                        
+        }
 
          if ( cmatch(';')) {
             return type;
         } else if ( cmatch(',')) {
             continue;
         } 
+
         needchar('=');
         sym->initialised = 1;
-        initials(type->name, type);
+
+        alloc_size = initials(drop_name, type);
+
+        if ( sym->storage == EXTERNP ) {
+            // Copy from local to the supplied address
+            output_section(c_init_section);
+            copy_to_extern(drop_name, type->name, alloc_size);
+        }
+
         if ( cmatch(';')) {
             return type;
         }

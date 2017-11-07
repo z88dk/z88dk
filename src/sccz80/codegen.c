@@ -3253,6 +3253,22 @@ void copy_to_stack(char *label, int stack_offset,  int size)
     ol("ldir");
 }
 
+void copy_to_extern(const char *src, const char *dest, int size)
+{
+    if ( size == 1 ) {
+        outfmt("\tld\ta,(_%s)\n",src);  // 6 bytes
+        outfmt("\tld\t(_%s),a\n",dest);
+    } else if ( size == 2 ) {
+        outfmt("\tld\thl,(_%s)\n",src);  // 6 bytes
+        outfmt("\tld\t(_%s),hl\n",dest);
+    } else {
+        outfmt("\tld\thl,_%s\n",src);  // 11 bytes
+        outfmt("\tld\tde,_%s\n",dest);
+        outfmt("\tld\tbc,%d\n",size);
+        outfmt("\tldir\n",src);
+    }
+}
+
 
 void intrinsic_in(SYMBOL *sym)
 {

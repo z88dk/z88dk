@@ -53,7 +53,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     watcharg = minifunc = 0;
     blanks(); /* already saw open paren */
 
-    if (ptr && (strcmp(ptr->name, "asm") == 0)) {
+    if (ptr && (strcmp(ptr->name, "asm") == 0 || strcmp(ptr->name,"__asm__") == 0) ) {
         /* We're calling asm("code") */
         doasmfunc(NO);
         return;
