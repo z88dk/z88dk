@@ -216,7 +216,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
                 } else if (expr == KIND_LONG || expr == KIND_CPTR) {
                     lpush();
                     nargs += 4;
-                } else if ( expr == KIND_CHAR && functype->flags & SDCCDECL ) {
+                } else if ( expr == KIND_CHAR && functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters ) ) {
                     push_char_sdcc_style();
                     nargs += 1;
                 } else {

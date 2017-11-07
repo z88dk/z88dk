@@ -876,6 +876,7 @@ void testjump(LVALUE* lval, int label)
     int type;
     ol("ld\ta,h");
     ol("or\tl");
+
     if (lval->oldval_kind == KIND_LONG) {
         ol("or\td");
         ol("or\te");
@@ -1259,31 +1260,31 @@ void quikmult(int type, int32_t size, char preserve)
         vconst(0);
         break;
     case 2048:
-        ol("ld\th,l");
+        ol("ld\th,l"); /* 6 bytes, 44T */
         ol("ld\tl,0");
         ol("add\thl,hl");
         ol("add\thl,hl");
         ol("add\thl,hl");
         break;
     case 1024:
-        ol("ld\th,l");
+        ol("ld\th,l"); /* 5 bytes, 33T */
         ol("ld\tl,0");
         ol("add\thl,hl");
         ol("add\thl,hl");
         break;
     case 512:
-        ol("ld\th,l");
+        ol("ld\th,l");  /* 4 bytes, 22T */
         ol("ld\tl,0");
         ol("add\thl,hl");
         break;
     case 256:
-        ol("ld\th,l");
+        ol("ld\th,l"); /* 3 bytes, 11T */
         ol("ld\tl,0");
         break;
     case 1:
         break;
     case 64:
-        ol("add\thl,hl");
+        ol("add\thl,hl");  /* 6 bytes, 66T */
     case 32:
         ol("add\thl,hl");
     case 16:
@@ -2079,6 +2080,10 @@ void asr_const(LVALUE *lval, int32_t value)
         } else if ( value == 8 && utype(lval) ) { /* 3 bytes, 11T */
             ol("ld\tl,h");
             ol("ld\th,0");
+        } else if ( value == 15 && utype(lval) ) {
+            ol("rl\th");   /* 7 bytes, 26T */
+            vconst(0);
+            ol("rl\tl");
         } else if ( value != 0 ) {
             const2(value);
             swap();
@@ -2730,8 +2735,8 @@ void zge(LVALUE* lval)
 
 void zcarryconv(void)
 {
-    vconst(0);
-    ol("rl\tl");
+    // vconst(0);
+    // ol("rl\tl");
 }
 
 /*
