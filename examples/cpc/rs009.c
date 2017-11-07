@@ -5,34 +5,53 @@
 	zcc +cpc -lndos -create-app -Cz--audio -lm rs009.c
  */
 
-#include <cpc.h>	// CPC Library
+ #include <cpc.h>
 
 
-void main (void) {
-	unsigned char z;
+main()
+{
+	cpc_PrintStr("Press a Key to redefine as #1");
+	cpc_RedefineKey(0);		//redefine key. There are 12 available keys (0..1)
+	cpc_PrintStr("Done!");
+	
 
-	cpc_DisableFirmware();		//Now, I don't gonna use any firmware routine so I modify interrupts jump to nothing
-	cpc_ClrScr();				//fills scr with ink 0
-	cpc_SetMode(1);				//hardware call to set mode 1
+	cpc_PrintStr("Press any key");
+	while(!(cpc_AnyKeyPressed())){}
+	
+	cpc_PrintStr("fine! try again");
+	
+	cpc_PrintStr("Press any key to continue");
+	while(!(cpc_AnyKeyPressed())){}
 	
 	
-	cpc_PrintGphStrStd(1,"THIS IS A SMALL DEMO",0xc050);	//parameters: pen, text, adress
-	cpc_PrintGphStrStd(2,"OF MODE 1 TEXT WITH",0xc0a0);
-	cpc_PrintGphStrStd(3,"8x8 CHARS WITHOUT FIRMWARE",0xc0f0);
-	cpc_PrintGphStrStdXY(3,"AND A SMALL SOFT SCROLL DEMO",8,70);
-	cpc_PrintGphStrStdXY(2,"CPCRSLIB FOR YOU!",19,80);
-	cpc_PrintGphStrStdXY(1,"-- FONT BY ANJUEL  2009  --",2,160);
-	cpc_PrintGphStrStdXY(1,"ABCDEFGHIJKLMNOPQRSTUVWXYZ",2,174);
-	         
-	while (!cpc_AnyKeyPressed()) {			//Small scrolling effect
-	   z = !z;
-	   if (z) {
-	      cpc_RRI (0xe000, 40, 79);
-	      cpc_RRI (0xe4b0, 32, 79);
-	   }
-	   cpc_RRI (0xe5f0, 12, 79);         
-	   cpc_RLI (0xe5f0+0x50+0x50+79, 12, 79);  
+	cpc_PrintStr("Press a Key to redefine as #2");
+	cpc_RedefineKey(3);		//redefine key. There are 12 available keys (0..1)
+	cpc_PrintStr("Done!");
+	
+	#asm
+
+	._kkk
+	ld b,100
+	.llll
+	halt
+	djnz llll
+	#endasm
+
+
+	cpc_SetBorder(3);
+	
+	
+	cpc_PrintStr("Press a Key to test it..");
+	while (1) {
+		if (cpc_TestKey(0)) {	//test if the key has been pressed.
+			cpc_PrintStr("OK Key #1");
+			}
+		if (cpc_TestKey(3)) {	//test if the key has been pressed.
+			cpc_PrintStr("OK Key #2");
+			}			
+			//else cpc_PrintStr(no);
 	}
-	   
-	cpc_EnableFirmware();	//before exit, firmware jump is restored
+	
+	
 }
+
