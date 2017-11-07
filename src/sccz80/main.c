@@ -363,8 +363,8 @@ void setup_sym()
     defmac("Z80");
     defmac("SMALL_C");
 
-    addglb("asm", asm_function("asm"), 0, KIND_VOID, 0, STATIK);
-    addglb("__asm__", asm_function("__asm__"), 0, KIND_VOID, 0, STATIK);
+    addglb("asm", asm_function("asm"), 0, KIND_VOID, 0, LSTATIC);
+    addglb("__asm__", asm_function("__asm__"), 0, KIND_VOID, 0, LSTATIC);
 }
 
 void info()
