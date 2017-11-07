@@ -111,8 +111,9 @@
 	inc ix
 	inc ix
 	djnz bucle_bd_teclas
-scf
-ccf
+;scf
+;ccf
+	or a
 	
 	ret	; si vuelve después de comprobar, que sea NZ
 .comprobar_linea	;si el byte es el mismo, mira la linea
@@ -123,16 +124,16 @@ ccf
 	inc ix
 	inc ix
 	djnz bucle_bd_teclas
-
-scf
-ccf
+;scf
+;ccf
+	or a
 	ret ; si vuelve después de comprobar, que sea NZ
 .tecla_detectada
 	scf
 	ret
 
 	
-    SECTION   bss_data
+   SECTION bss_clib
 
 .linea defb 0
 .bte defb 0
