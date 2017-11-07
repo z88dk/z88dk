@@ -452,7 +452,7 @@ extern void         zx_rawbit(FILE *fpout, int period);
 extern void         zx_rawout (FILE *fpout, unsigned char b, char fast);
 
 /*  record size for bin2hex and other text encoding formats */
-extern int          bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec);
+extern int          bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, int eofrec);
 extern int          hexdigit(char digit);
 extern uint32_t     num2bcd(uint32_t num);
 
@@ -470,10 +470,11 @@ extern uint32_t     num2bcd(uint32_t num);
 
 struct section_bin
 {
-    char *filename;       // name of file holding binary data
-    char *section_name;   // section name corresponding to binary data
-    int   org;
-    int   size;
+    char    *filename;       // name of file holding binary data
+    uint32_t offset;         // offset into file to start of data
+    char    *section_name;   // section name corresponding to binary data
+    int      org;
+    int      size;
 };
 
 struct memory_bank

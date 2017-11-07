@@ -1,0 +1,38 @@
+
+
+
+	MODULE	Issue_499_typedef_initialisation
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	rodata_compiler
+._val
+	defw	1
+	SECTION	code_compiler
+	SECTION	rodata_compiler
+._updatestage4endbossfunctions
+	defw	0
+	defw	0
+	defw	0
+	SECTION	code_compiler
+	SECTION	rodata_compiler
+._array
+	defw	1
+	defw	2
+	defw	3
+	SECTION	code_compiler
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_updatestage4endbossfunctions
+	GLOBAL	_array
+
+
+
+

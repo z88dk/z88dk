@@ -1,0 +1,47 @@
+
+
+
+	MODULE	Issue_491_enums
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	rodata_compiler
+._g_noteEditMode
+	defw	0
+	SECTION	code_compiler
+
+._main
+	push	bc
+	ld	hl,3	;const
+	ld	(_g_noteEditMode),hl
+	ld	hl,(_editedNoteStep)
+	inc	hl
+	pop	bc
+	push	hl
+	ld	hl,(_editedNoteStep)
+	ld	bc,5
+	add	hl,bc
+	call	l_gint	;
+	pop	bc
+	push	hl
+	ld	hl,1	;const
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_g_noteEditMode
+	GLOBAL	_editedNoteStep
+	GLOBAL	_main
+
+
+
+

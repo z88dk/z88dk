@@ -11,7 +11,7 @@
       defc CRT_ORG_DTX     = 0x8000
    ENDIF
 
-Z88DK_FOR(`LOOP', `0', `139',
+Z88DK_FOR(`LOOP', `0', `111',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
       defc CRT_ORG_BANK_`'LOOP = 0xc000
@@ -26,7 +26,14 @@ Z88DK_FOR(`LOOP', `0', `139',
    ENDIF
 ')
 
-Z88DK_FOR(`LOOP', `0', `31',
+Z88DK_FOR(`LOOP', `0', `223',
+`
+   IFNDEF CRT_ORG_PAGE_`'LOOP
+      defc CRT_ORG_PAGE_`'LOOP = ifelse(eval(LOOP&0x01),0,0xc000,0xe000)
+   ENDIF
+')
+
+Z88DK_FOR(`LOOP', `0', `15',
 `
    IFNDEF CRT_ORG_DIV_`'LOOP
       defc CRT_ORG_DIV_`'LOOP = 0x2000

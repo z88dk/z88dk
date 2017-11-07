@@ -491,8 +491,12 @@ void size_of(LVALUE* lval)
     Type *type;
     SYMBOL *ptr;
     int          deref = 0;
+    int     brackets = 0;
 
-    needchar('(');
+    if ( rcmatch('(')) {
+        brackets = 1;
+        needchar('(');        
+    }
     while ( cmatch('*') ) {
         deref++;
     }
@@ -588,7 +592,8 @@ void size_of(LVALUE* lval)
             error(E_UNSYMB, sname);
         }
     }
-    needchar(')');
+    if ( brackets )
+        needchar(')');
     lval->is_const = 1;
     lval->val_type = KIND_INT;
     vconst(lval->const_val);

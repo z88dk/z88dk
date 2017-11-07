@@ -24,21 +24,39 @@ include(__link__.m4)
 #define ESXDOS_MODE_W   __ESXDOS_MODE_WRITE
 
 #define ESXDOS_MODE_OE  __ESXDOS_MODE_OPEN_EXIST       // open if file exists else error; fp = 0
+#define ESXDOS_MODE_OPEN_EXIST  __ESXDOS_MODE_OPEN_EXIST
+
 #define ESXDOS_MODE_OC  __ESXDOS_MODE_OPEN_CREAT       // open if file exists else create; fp = 0
+#define ESXDOS_MODE_OPEN_CREAT  __ESXDOS_MODE_OPEN_CREAT
 
 #define ESXDOS_MODE_CN  __ESXDOS_MODE_CREAT_NOEXIST    // if file exists error else create; fp = 0
+#define ESXDOS_MODE_CREAT_NOEXIST  __ESXDOS_MODE_CREAT_NOEXIST
+
 #define ESXDOS_MODE_CT  __ESXDOS_MODE_CREAT_TRUNC      // create or replace an existing file; fp = 0
+#define ESXDOS_MODE_CREAT_TRUNC  __ESXDOS_MODE_CREAT_TRUNC
 
 #define ESXDOS_MODE_P3  __ESXDOS_MODE_USE_HEADER
+#define ESXDOS_MODE_PLUS3  __ESXDOS_MODE_USE_HEADER
 
 // Esxdos File Attribute Masks
 
 #define ESXDOS_ATTR_RO   __ESXDOS_ATTR_READ_ONLY       // File is read-only
+#define ESXDOS_ATTR_READ_ONLY   __ESXDOS_ATTR_READ_ONLY
+
 #define ESXDOS_ATTR_HID  __ESXDOS_ATTR_HIDDEN          // File should be hidden in some listings
+#define ESXDOS_ATTR_HIDDEN  __ESXDOS_ATTR_HIDDEN
+
 #define ESXDOS_ATTR_SYS  __ESXDOS_ATTR_SYSTEM          // Ill-defined
+#define ESXDOS_ATTR_SYSTEM  __ESXDOS_ATTR_SYSTEM
+
 #define ESXDOS_ATTR_VOL  __ESXDOS_ATTR_VOLUME_LABEL    // File stores volume label
+#define ESXDOS_ATTR_VOLUME  __ESXDOS_ATTR_VOLUME_LABEL
+
 #define ESXDOS_ATTR_DIR  __ESXDOS_ATTR_DIRECTORY       // File is a directory
+#define ESXDOS_ATTR_DIRECTORY  __ESXDOS_ATTR_DIRECTORY
+
 #define ESXDOS_ATTR_AR   __ESXDOS_ATTR_ARCHIVE         // File has been modified so should be backed up
+#define ESXDOS_ATTR_ARCHIVE   __ESXDOS_ATTR_ARCHIVE
 
 // Esxdos Seek Whence
 

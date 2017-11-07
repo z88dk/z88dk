@@ -14,6 +14,7 @@
 #include "appmake.h"
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <time.h>
 #include "../config.h"
 
@@ -222,12 +223,12 @@ long get_org_addr(char *crtfile)
 
 FILE *fopen_bin(char *fname, char *crtfile)
 {
-    FILE   *fcode, *fdata, *fin;
+    FILE   *fcode = NULL, *fdata = NULL, *fin = NULL;
     char    name[FILENAME_MAX+1];
     char    tname[FILENAME_MAX+1];
     char    cmdline[FILENAME_MAX*2 + 128];
-    struct  stat st_file1;
-    struct  stat st_file2;
+    struct  stat st_file1={0};
+    struct  stat st_file2={0};
     int     crt_model;
     int     c;
 
@@ -276,6 +277,9 @@ FILE *fopen_bin(char *fname, char *crtfile)
     if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime)) {
         /* classic library */
         fcode = fopen(fname, "rb");
+        if ( fcode == NULL ) {
+            exit_log(1, "ERROR: File %s not found\n", fname);            
+        }
 
         /* We may have a data section */
         strcpy(name, fname);
@@ -291,6 +295,9 @@ FILE *fopen_bin(char *fname, char *crtfile)
             fprintf(stderr, "WARNING: some code or data may not be assigned to sections.\n");
 
         fcode = fopen(name, "rb");
+        if ( fcode == NULL ) {
+            exit_log(1, "ERROR: File %s not found\n", name);            
+        }
     }
 
     if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".map", "__crt_model")) == -1))
@@ -870,13 +877,16 @@ static int checksum(const unsigned char *data, int size)
 
 
 // if eofrec == 0 do not write end-of-file record
-int bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec)
+// len is the max number of bytes to read from input file
+int bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, int eofrec)
 {
     unsigned char *outbuf;
     unsigned char *inbuf;
     int byte;
     int size;   
     int i;
+
+    if (len == 0) return 0;
 
     if (recsize < 1)
         recsize = 16;
@@ -892,7 +902,7 @@ int bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec)
     do
     {    
         size = 0;
-        while (size < recsize)
+        while (len && (size < recsize))
         {
             byte = fgetc(input);
 
@@ -900,6 +910,7 @@ int bin2hex(FILE *input, FILE *output, int address, int recsize, int eofrec)
                 break;
 
             inbuf[size++] = byte;
+            len--;
         }
 
         if (size == 0 && !eofrec)
@@ -1104,8 +1115,10 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
                         // add new section information
 
                         struct section_bin *sb = &mb->secbin[mb->num - 1];
-////// modify org here
+                        memset(sb, 0, sizeof(*sb));
+
                         sb->filename = must_strdup(bfilename);
+                        sb->offset = 0;
                         sb->section_name = must_strdup(section_name);
                         sb->org = symbol_value;
                         sb->size = st.st_size;
@@ -1226,7 +1239,7 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
 
             for (i = 0; i < mb->num; ++i)
             {
-                // if (clean) remove(mb->secbin[i].filename);
+                if (clean) remove(mb->secbin[i].filename);
                 free(mb->secbin[i].filename);
                 free(mb->secbin[i].section_name);
             }
@@ -1473,7 +1486,7 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
     // irecsz is intel hex record size
 
     FILE *fin;
-    int   c, i, total;
+    int   c, i, total, size;
 
     // iterate over all sections in memory bank
 
@@ -1486,6 +1499,13 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
         if ((fin = fopen(mb->secbin[i].filename, "rb")) == NULL)
         {
             fprintf(stderr, "Error: Cannot read section binary %s\n", mb->secbin[i].filename);
+            return 1;
+        }
+
+        if (fseek(fin, mb->secbin[i].offset, SEEK_SET) != 0)
+        {
+            fprintf(stderr, "Error: Cannot seek to %" PRIu32 " in file %s\n", mb->secbin[i].offset, mb->secbin[i].filename);
+            fclose(fin);
             return 1;
         }
 
@@ -1506,18 +1526,25 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
 
         // add section binary to memory bank
 
-        while ((c = fgetc(fin)) != EOF)
+        for (size = mb->secbin[i].size; size && ((c = fgetc(fin)) != EOF); --size)
         {
             total++;
             fputc(c, fbin);
+        }
+
+        if (size != 0)
+        {
+            fprintf(stderr, "Error: Could not read %d bytes from offset %" PRIu32 " from file %s\n", mb->secbin[i].size, mb->secbin[i].offset, mb->secbin[i].filename);
+            fclose(fin);
+            return 1;
         }
 
         // generate into ihex file if padding is off
 
         if ((fhex != NULL) && !ipad)
         {
-            rewind(fin);
-            bin2hex(fin, fhex, mb->secbin[i].org, irecsz, 0);
+            fseek(fin, mb->secbin[i].offset, SEEK_SET);
+            bin2hex(fin, fhex, mb->secbin[i].org, mb->secbin[i].size, irecsz, 0);
         }
 
         // close section binary file
@@ -1541,7 +1568,7 @@ int mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int 
 
             fflush(fbin);
             rewind(fbin);
-            bin2hex(fbin, fhex, (bsize > 0) ? borg : mb->secbin[0].org, irecsz, 1);
+            bin2hex(fbin, fhex, (bsize > 0) ? borg : mb->secbin[0].org, -1, irecsz, 1);
         }
         else
             fprintf(fhex, ":00000001FF\n");

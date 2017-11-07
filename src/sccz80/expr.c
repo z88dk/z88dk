@@ -74,15 +74,18 @@ int heir1(LVALUE* lval)
             
             if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
                     ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
-                UT_string *str;
+                if ( ispointer(lval->ltype) && lval2.is_const && lval2.const_val == 0 ) {
+                } else {
+                    UT_string *str;
 
-                utstring_new(str);
-                utstring_printf(str,"Assigning '%s', type: ", lval->ltype->name);
-                type_describe(lval->ltype,str);
-                utstring_printf(str," from ");
-                type_describe(rhs, str);
-                warningfmt("%s", utstring_body(str));
-                utstring_free(str);
+                    utstring_new(str);
+                    utstring_printf(str,"Assigning '%s', type: ", lval->ltype->name);
+                    type_describe(lval->ltype,str);
+                    utstring_printf(str," from ");
+                    type_describe(rhs, str);
+                    warningfmt("%s", utstring_body(str));
+                    utstring_free(str);
+                }
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
@@ -427,7 +430,13 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     Type *old_type = lval->ltype;
 
+
+
     lval->symbol = NULL;
+    if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_FUNC ) {
+        return lval->symbol;
+    }
+
     lval->ltype = lval->ltype->ptr;
     if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
         lval->ptr_type = KIND_NONE;
@@ -526,12 +535,14 @@ int heira(LVALUE *lval)
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
+            lval->ltype = make_pointer(lval->ltype);
+            lval->ptr_type = lval->ltype->ptr->kind;
+            lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
             return 0;
         }
         lval->ltype = make_pointer(lval->ltype);
         lval->ptr_type = lval->ltype->ptr->kind;
         lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
- //       lval->flags &= ~FARACC;
 
         if (lval->symbol) {
             lval->symbol->isassigned = YES;
@@ -732,7 +743,7 @@ int heirb(LVALUE* lval)
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->stage_add = NULL;
                 lval->binop = NULL;
-                if (ispointer(lval->ltype)) {
+                if (ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY) {
                     lval->ptr_type = lval->ltype->ptr->kind;
                     /* djm */
                     // TODO

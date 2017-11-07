@@ -367,7 +367,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
     if ( !ispointer(dest) ) {
         if ( !ispointer(src) ) {
             // Variable to variable cast
-            if ( dest->kind == KIND_LONG && src->kind != KIND_LONG ) {
+            if ( src->kind == KIND_LONG && dest->kind != KIND_LONG ) {
                 UT_string *str;
                 
                 utstring_new(str);

@@ -9,11 +9,12 @@ void func()
 	func2(100);
 }
 
-void func3()
+int func3()
 {
 	int	k;
 	for ( long i = 0; i < 10; i++ ) {
 		func2(i);
 	}
 	func2(100);
+	return k;
 }
