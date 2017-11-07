@@ -52,7 +52,7 @@ __DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lock_give,uint8_t * mutex
 
 __DPROTO(`a,b,c,d,e,h,iyh,iyl',`a,b,c,d,e,h,iyh,iyl',int8_t,,bank_get_rel,uint8_t bankAbs)
 __DPROTO(`a,b,c,d,e,h,iyh,iyl',`a,b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t bankRel)
-__OPROTO(`a,b,c,iyh,iyl',`a,b,c,iyh,iyl',void,,far_jp,void *str, int8_t bank)
+__OPROTO(`a,b,c,iyh,iyl',`a,b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
 
 // provide memcpy_far and memset_far functions
 

@@ -230,15 +230,6 @@ IF ((__crt_enable_rst & $8080) != $8080)
       
 ENDIF
 
-; address = 0x003B
-; start of yabios TCB (TPA Control Block)
-
-   defs 0x003B - ASMPC
-   
-; bank individual SP storage, in Page0 TCB
-   PUBLIC _bank_sp
-
-   _bank_sp:               defw $0000
 
 ; address = 0x0066
 
