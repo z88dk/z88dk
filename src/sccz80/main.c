@@ -362,13 +362,16 @@ void setup_sym()
 {
     defmac("Z80");
     defmac("SMALL_C");
+
+    addglb("asm", asm_function("asm"), 0, KIND_VOID, 0, STATIK);
+    addglb("__asm__", asm_function("__asm__"), 0, KIND_VOID, 0, STATIK);
 }
 
 void info()
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
-    fputs("\n(C) 1980-2016 Cain, Van Zandt, Hendrix, Yorston, Morris\n", stderr);
+    fputs("\n(C) 1980-2017 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 

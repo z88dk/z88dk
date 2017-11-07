@@ -1047,6 +1047,22 @@ Type *default_function(const char *name)
     return type;
 }
 
+Type *asm_function(const char *name)
+{
+    Type *type = CALLOC(1,sizeof(*type));
+
+    strcpy(type->name, name);
+    type->kind = KIND_FUNC;
+    type->oldstyle = 1;
+    type->return_type = type_void;
+    type->parameters = array_init(NULL);
+    array_add(type->parameters, make_pointer(type_char));
+    type->size = 0;
+    type->len = 1;
+
+    return type;
+}
+
 
 void declare_func_kr()
 {
