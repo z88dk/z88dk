@@ -8,7 +8,7 @@
 ;       $Id: cpc_Chars.asm $
 ;
 
-        SECTION   bss_data
+        SECTION   data_clib
         PUBLIC    cpc_Chars
         PUBLIC    _cpc_Chars
         PUBLIC    first_char
