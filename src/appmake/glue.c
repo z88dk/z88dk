@@ -24,6 +24,7 @@ static char              ihex = 0;
 static char              ipad = 0;
 static int               recsize = 16;
 static char              clean = 0;
+static int               main_fence = -1;
 
 
 /* Options that are available for this module */
@@ -32,7 +33,8 @@ option_t glue_options[] = {
     { 'b', "binfile",   "Basename of binary output files",         OPT_STR,   &binname },
     { 'c', "crt0file",  "Basename of map file (default=binfile)",  OPT_STR,   &crtfile },
     {  0 , "bankspace", "Create custom bank spaces",               OPT_STR,   &banked_space },
-    {  0,  "exclude-banks", "Exclude memory banks from output",    OPT_STR,   &excluded_banks },
+    {  0 , "main-fence", "Main bin restricted below this address", OPT_INT,   &main_fence },
+    {  0 , "exclude-banks", "Exclude memory banks from output",    OPT_STR,   &excluded_banks },
     {  0 , "exclude-sections", "Exclude section names from output", OPT_STR,  &excluded_sections },
     { 'f', "filler",    "Filler byte (default: 0xFF)",             OPT_INT,   &romfill },
     {  0,  "ihex",      "Generate an iHEX file",                   OPT_BOOL,  &ihex },
@@ -145,6 +147,21 @@ int glue_exec(char *target)
 
     if (mb_sort_banks(&memory))
         exit_log(1, "Aborting... errors in one or more binaries\n");
+
+    // check if main binary extends past fence
+
+    if (main_fence > 0)
+    {
+        struct memory_bank *mb = &memory.mainbank;
+
+        if (mb->num > 0)
+        {
+            struct section_bin *last = &mb->secbin[mb->num - 1];
+
+            if ((last->org + last->size) > main_fence)
+                exit_log(1, "Error: Main bank has exceeded its maximum allowed size by %u bytes (last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - main_fence, last->org + last->size - 1, main_fence);
+        }
+    }
 
     // generate output binaries
 
