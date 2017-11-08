@@ -663,72 +663,135 @@
 
 
 	GLOBAL	open
+	GLOBAL	_open
 	GLOBAL	creat
+	GLOBAL	_creat
 	GLOBAL	close
+	GLOBAL	_close
 	GLOBAL	read
+	GLOBAL	_read
 	GLOBAL	write
+	GLOBAL	_write
 	GLOBAL	lseek
+	GLOBAL	_lseek
 	GLOBAL	readbyte
+	GLOBAL	_readbyte
 	GLOBAL	writebyte
+	GLOBAL	_writebyte
 	GLOBAL	getcwd
+	GLOBAL	_getcwd
 	GLOBAL	rmdir
+	GLOBAL	_rmdir
 	GLOBAL	getwd
+	GLOBAL	_getwd
 	GLOBAL	_RND_BLOCKSIZE
 	GLOBAL	rnd_loadblock
+	GLOBAL	_rnd_loadblock
 	GLOBAL	rnd_saveblock
+	GLOBAL	_rnd_saveblock
 	GLOBAL	rnd_erase
+	GLOBAL	_rnd_erase
 	GLOBAL	__FOPEN_MAX
 	GLOBAL	__sgoioblk
 	GLOBAL	__sgoioblk_end
 	GLOBAL	fopen_zsock
+	GLOBAL	_fopen_zsock
 	GLOBAL	fopen
+	GLOBAL	_fopen
 	GLOBAL	freopen
+	GLOBAL	_freopen
 	GLOBAL	fdopen
+	GLOBAL	_fdopen
 	GLOBAL	fmemopen
+	GLOBAL	_fmemopen
 	GLOBAL	funopen
+	GLOBAL	_funopen
 	GLOBAL	fclose
+	GLOBAL	_fclose
 	GLOBAL	fflush
+	GLOBAL	_fflush
 	GLOBAL	closeall
+	GLOBAL	_closeall
 	GLOBAL	fgets
+	GLOBAL	_fgets
 	GLOBAL	fputs
+	GLOBAL	_fputs
 	GLOBAL	fputc
+	GLOBAL	_fputc
 	GLOBAL	fputs_callee
+	GLOBAL	_fputs_callee
 	GLOBAL	fputc_callee
+	GLOBAL	_fputc_callee
 	GLOBAL	fgetc
+	GLOBAL	_fgetc
 	GLOBAL	ungetc
+	GLOBAL	_ungetc
 	GLOBAL	feof
+	GLOBAL	_feof
 	GLOBAL	puts
+	GLOBAL	_puts
 	GLOBAL	ftell
+	GLOBAL	_ftell
 	GLOBAL	fgetpos
+	GLOBAL	_fgetpos
 	GLOBAL	fseek
+	GLOBAL	_fseek
 	GLOBAL	fread
+	GLOBAL	_fread
 	GLOBAL	fwrite
+	GLOBAL	_fwrite
 	GLOBAL	gets
+	GLOBAL	_gets
 	GLOBAL	printf
+	GLOBAL	_printf
 	GLOBAL	fprintf
+	GLOBAL	_fprintf
 	GLOBAL	sprintf
+	GLOBAL	_sprintf
 	GLOBAL	snprintf
+	GLOBAL	_snprintf
 	GLOBAL	vfprintf
+	GLOBAL	_vfprintf
 	GLOBAL	vsnprintf
+	GLOBAL	_vsnprintf
 	GLOBAL	printn
+	GLOBAL	_printn
 	GLOBAL	scanf
+	GLOBAL	_scanf
 	GLOBAL	fscanf
+	GLOBAL	_fscanf
 	GLOBAL	sscanf
+	GLOBAL	_sscanf
 	GLOBAL	vfscanf
+	GLOBAL	_vfscanf
 	GLOBAL	vsscanf
+	GLOBAL	_vsscanf
 	GLOBAL	getarg
+	GLOBAL	_getarg
 	GLOBAL	fchkstd
+	GLOBAL	_fchkstd
 	GLOBAL	fgetc_cons
+	GLOBAL	_fgetc_cons
 	GLOBAL	fputc_cons
+	GLOBAL	_fputc_cons
 	GLOBAL	fgets_cons
+	GLOBAL	_fgets_cons
 	GLOBAL	fabandon
+	GLOBAL	_fabandon
 	GLOBAL	fdtell
+	GLOBAL	_fdtell
 	GLOBAL	fdgetpos
+	GLOBAL	_fdgetpos
 	GLOBAL	rename
+	GLOBAL	_rename
 	GLOBAL	remove
+	GLOBAL	_remove
 	GLOBAL	getk
+	GLOBAL	_getk
 	GLOBAL	puts_cons
+	GLOBAL	_puts_cons
 	GLOBAL	printk
+	GLOBAL	_printk
 	GLOBAL	_add_int
 	GLOBAL	_add_int_longform
 	GLOBAL	_add_int_longform2

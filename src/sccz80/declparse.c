@@ -1389,7 +1389,6 @@ static void declfunc(Type *type, enum storage_type storage)
         where += zcriticaloffset();
     }
 
-    pushframe();
     
 
     nl();

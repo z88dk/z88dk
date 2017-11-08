@@ -417,6 +417,11 @@ static void dumpfns()
                     }
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
+                    // Export for sdcc as well
+                    if ( dopref(ptr) == 0 ) {
+                        GlobalPrefix();                    
+                        outname(ptr->name, YES); nl();
+                    }
                 }
             }
         }
