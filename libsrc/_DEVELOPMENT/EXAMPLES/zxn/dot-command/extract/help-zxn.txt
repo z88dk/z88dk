@@ -1,0 +1,21 @@
+.extract file [+off][-off][len]
+ [-f] [-o file] [-a file]
+ [-m addr] [-ml linaddr]
+ [-mp pnum] [-mb bnum]
+
+input:
+  file = input file
+  +off = byte offset from start
+  -off = byte offset from end
+   len = length in bytes
+
+output:
+  -f  = overwrite permitted
+  -o  = write to out file
+  -a  = append to out file
+  -m  = copy to 64k addr
+  -ml = copy to linear addr
+
+no -o,-a,-m* generates hexdump
+
+extract v1.1 zx-next z88dk.org
