@@ -70,7 +70,7 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	ld	hl,4	;const
+	ld	hl,4-2	;const
 	add	hl,sp
 	call	l_gint
 	ex	de,hl
