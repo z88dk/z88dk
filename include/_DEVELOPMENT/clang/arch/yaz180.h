@@ -64,7 +64,7 @@ extern int8_t bank_get_rel(uint8_t bankAbs);
 extern uint8_t bank_get_abs(int8_t bankRel);
 
 
-extern void far_jp(void *str,int8_t bank);
+extern void jp_far(void *str,int8_t bank);
 
 
 

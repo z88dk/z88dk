@@ -32,7 +32,7 @@
       
         ; Set the z180 internal interrupt vector low byte  
             
-        ld a,+(__crt_org_vector_table%$100+__IO_VECTOR_BASE)&$E0
+        ld a,+(__crt_org_vector_table+__IO_VECTOR_BASE)&$E0
         out0 (IL),a
         
       ENDIF

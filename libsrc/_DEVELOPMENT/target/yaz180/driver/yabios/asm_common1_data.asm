@@ -18,7 +18,9 @@ defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here when other banks 
 ;
 ; TCB is from 0x003B through to 0x005B (scratch space for CP/M)
 
-EXTERN  _bank_sp                        ; DEFW at 0x003B in Page 0
+PUBLIC  _bank_sp                        ; DEFW at 0x003B in Page 0
+
+defc    _bank_sp    =   $003B
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - page aligned data
@@ -54,7 +56,7 @@ ENDIF
 ;------------------------------------------------------------------------------
 
 ; immediately after page aligned area so that we don't have to worry about the
-; LSB when indexing, for far_call, far_jp, and system_rst
+; LSB when indexing, for call_far, jp_far, and system_rst
 
 PUBLIC _bankLockBase
 

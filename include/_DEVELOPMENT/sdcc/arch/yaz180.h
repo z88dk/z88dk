@@ -74,7 +74,7 @@ extern uint8_t bank_get_abs_fastcall(int8_t bankRel) __preserves_regs(a,b,c,d,e,
 #define bank_get_abs(a) bank_get_abs_fastcall(a)
 
 
-extern void far_jp(void *str,int8_t bank) __preserves_regs(a,b,c,iyh,iyl);
+extern void jp_far(void *str,int8_t bank) __preserves_regs(a,b,c,iyh,iyl);
 
 
 // provide memcpy_far and memset_far functions

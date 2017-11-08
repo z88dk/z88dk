@@ -24,7 +24,7 @@ _z180_trap_rst:         ; RST  0 - also handle an application restart
 PUBLIC _error_handler_rst
 
 _error_handler_rst:     ; RST  8
-    pop de              ; pop originating address
+    pop hl              ; pop originating address
     call phexwdreg      ; and output it on serial port
 error_handler_loop:
     call delay
@@ -32,14 +32,14 @@ error_handler_loop:
 
 ;------------------------------------------------------------------------------
 
-PUBLIC _far_call_rst
+PUBLIC _call_far_rst
 
-_far_call_rst:          ; RST 10
+_call_far_rst:          ; RST 10
     push hl
     ld hl, _shadowLock
-far_call_try_alt_lock:
+call_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
-    jr C, far_call_try_alt_lock ; just keep trying
+    jr C, call_far_try_alt_lock ; just keep trying
     pop hl
 
     ex af,af            ; all your register are belong to us
@@ -52,7 +52,7 @@ far_call_try_alt_lock:
     inc hl
     ld c, (hl)          ; get called bank in C
     inc hl
-    push hl             ; push the post far_call ret address back on stack
+    push hl             ; push the post call_far ret address back on stack
 
     in0 a, (BBR)        ; get the origin bank
     ld b, a             ; save origin BBR in B    
@@ -63,20 +63,20 @@ far_call_try_alt_lock:
     add a, c            ; create destination far address, from twos complement relative input
     and a, $0F          ; convert it to 4 bit address (not implicit here)
 
-    ld hl, _bankLockBase; get the BANK Lock base address, page aligned
-    ld l, a             ; make the reference into BANKnn Lock
+    ld h, _bankLockBase/$100    ; get the BANK Lock base address, page aligned
+    ld l, a             ; make the reference into destination BANKnn Lock
 
-    rrca                ; move the origin bank to high nibble
-    rrca                ; we know BBR lower nibble is 0
-    rrca
-    rrca
+    rlca                ; move the origin bank to high nibble
+    rlca                ; we know BBR lower nibble is 0
+    rlca
+    rlca
     ld c, a             ; hold destination BBR in C
 
     xor a
-    and (hl)            ; check bank is not cold
-    jr Z, far_call_exit
+    or (hl)             ; check bank is not cold
+    jr Z, call_far_exit
     sra (hl)            ; now get the bank lock,
-    jr C, far_call_exit ; or exit if the bank is hot
+    jr C, call_far_exit ; or exit if the bank is hot
     
                         ; OK we're going somewhere nice and warm,
                         ; now make the bank switch
@@ -88,11 +88,11 @@ far_call_try_alt_lock:
                         ; now prepare for our return
     push bc             ; push on the origin and destination bank
     
-    ld hl, far_ret
-    push hl             ; push far_ret function return address
+    ld hl, ret_far
+    push hl             ; push ret_far function return address
     push de             ; push our destination address
     
-far_call_exit:
+call_far_exit:
     exx
     ex af,af            ; alt register are returned
 
@@ -103,12 +103,12 @@ far_call_exit:
     ret                 ; takes us out if there's error, or call onwards if success
 
 
-far_ret:                ; we land back here once the far_call function returns
+ret_far:                ; we land back here once the call_far function returns
     push hl
     ld hl, _shadowLock
-far_ret_try_alt_lock:
+ret_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
-    jr C, far_ret_try_alt_lock ; just keep trying, can't give up
+    jr C, ret_far_try_alt_lock ; just keep trying, can't give up
     pop hl
 
     exx
@@ -122,7 +122,7 @@ far_ret_try_alt_lock:
     ld sp, (_bank_sp)   ; set up the originating SP in old Page0
     ei
 
-    ld hl, _bankLockBase; get the BANK Lock Base, page aligned
+    ld h, _bankLockBase/$100    ; get the BANK Lock Base, page aligned
     ld a, c             ; make the reference to destination BANKnn Lock
     rrca                ; move the origin bank to low nibble
     rrca                ; we know BBR lower nibble is 0
@@ -141,7 +141,7 @@ far_ret_try_alt_lock:
 
 
 ;------------------------------------------------------------------------------
-; void far_jp(far *str, int8_t bank)
+; void jp_far(far *str, int8_t bank)
 ;
 ; str − This is a pointer to the destination array where the content is to be
 ;       copied, type-cast to a pointer of type void*.
@@ -156,22 +156,25 @@ far_ret_try_alt_lock:
 ;   ret high
 ;   ret low
 
-PUBLIC _far_jp, _far_jp_rst
+PUBLIC _jp_far, _jp_far_rst
 
-_far_jp:
-    pop hl
-    pop de
-    push de
-    push hl
+_jp_far:
+    pop af              ; collect ret address
+    pop hl              ; addr in HL
+    dec sp
+    pop de              ; bank in D
+    push af             ; put ret address back for posterity
+                        ; this is the future top of _bios_sp
+    ld e, d             ; put bank in E
 
-_far_jp_rst:            ; RST 18
-    push de             ; save the jump destination from EHL    
+_jp_far_rst:            ; RST 18
+    push de             ; save the jump destination from EHL
     push hl
     
     ld hl, _shadowLock
-far_jp_try_alt_lock:
+jp_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
-    jr C, far_jp_try_alt_lock ; just keep trying
+    jr C, jp_far_try_alt_lock ; just keep trying
 
     ex af,af            ; all your register are belong to us
     exx
@@ -188,37 +191,42 @@ far_jp_try_alt_lock:
     add a, c            ; create destination far address, from twos complement relative input
     and a, $0F          ; convert it to 4 bit address (not implicit here)
 
-    ld hl, _bankLockBase; get the BANK Lock base address, page aligned
-    ld l, a             ; make reference into BANKnn Lock
+    ld h, _bankLockBase/$100    ; get the BANK Lock base address, page aligned
+    ld l, a             ; make reference into destination BANKnn Lock
 
-    rrca                ; move the origin bank to high nibble
-    rrca                ; we know BBR lower nibble is 0
-    rrca
-    rrca
+    rlca                ; move the origin bank to high nibble
+    rlca                ; we know BBR lower nibble is 0
+    rlca
+    rlca
     ld c, a             ; hold destination BBR in C
 
     xor a
-    and (hl)            ; check bank is not cold
-    jr Z, far_jp_exit
-far_jp_try_bank_lock:
+    or (hl)            ; check bank is not cold
+    jr Z, jp_far_exit
+jp_far_try_bank_lock:
     sra (hl)            ; now get the bank lock,
-    jr C, far_jp_try_bank_lock  ; keep trying if the bank is hot, we can't go back
-    
+    jr C, jp_far_try_bank_lock  ; keep trying if the bank is hot, we can't go back
+
                         ; OK we're going somewhere nice and warm,
                         ; now make the bank switch
+    xor a
+    and b               ; check whether we're jumping from bios
+    jr Z, jp_far_from_bios
+
     di
     ld (_bank_sp), sp   ; save the origin bank SP in Page0
     out0 (BBR), c       ; make the bank swap
     ld sp, (_bank_sp)   ; set up the destination bank SP in new Page0
     ei
 
+jp_far_from_bios_ret:
     push de             ; push our destination address for ret jp
 
-    ld hl, _bankLockBase; get the BANK Lock Base, page aligned
+    ld h, _bankLockBase/$100    ; get the BANK Lock Base, page aligned
     ld l, b             ; make reference to originating BANKnn Lock
     ld (hl), $FE        ; free the origin bank, we're not coming back
 
-far_jp_exit:
+jp_far_exit:
     exx
     ex af,af            ; alt register are returned
 
@@ -226,7 +234,16 @@ far_jp_exit:
     ld hl, _shadowLock  ; give alt register mutex
     ld (hl), $FE
     pop hl
+
     ret                 ; takes us out if there's error, or jp onwards if success
+
+jp_far_from_bios:
+    di
+    ld (_bios_sp), sp   ; save the bios SP in COMMON AREA 1
+    out0 (BBR), c       ; make the bank swap
+    ld sp, (_bank_sp)   ; set up the destination bank SP in new Page0
+    ei
+    jr jp_far_from_bios_ret
 
 ;------------------------------------------------------------------------------
 
@@ -422,31 +439,31 @@ _memcpy_far:
 
     ld a, c
     cp b                ; check for bank dest < src
-    jr C, memcpy_far_left_right   ; if destination is lower bank, we do left right
+    ex de, hl           ; now source in hl, destination in de    
+    jr C, memcpy_far_left_right_early   ; if destination is lower bank, we do left right
                         ; otherwise we need to check further
 
     xor a               ; clear A and Carry
-    ex de, hl           ; now source in hl, destination in de
     sbc hl, de          ; check whether destination address < source address
     jr NC, memcpy_far_left_right  ; if so we can do left to right copy
 
 memcpy_far_right_left:
-    adc hl, de          ; recover the source address
-    dec hl              ; subtract one from source address      
-    pop bc              ; get the size of the copy back
-    add hl, bc          ; add in the size to the source address
+    add hl, de          ; recover the source address
+    pop bc              ; get the size of the copy
+    dec bc
+    add hl, bc          ; add in the copy size to the (source address -1)
+
     jr NC, memcpy_far_right_left_src_bank_no_overflow
     in0 a, (SAR0B)
     inc a               ; if copy origin flows into following bank
     out0 (SAR0B), a
     
-memcpy_far_right_left_src_bank_no_overflow:    
+memcpy_far_right_left_src_bank_no_overflow:
     ex de, hl           ; swap source to de
-    dec hl              ; subtract one from destination address       
-    add hl, bc          ; add in the size to the destination address
+    add hl, bc          ; add in the copy size to the (destination address -1)
     jr NC, memcpy_far_right_left_dest_bank_no_overflow
     in0 a, (DAR0B)
-    inc a               ; if copy originflows into following bank
+    inc a               ; if copy destination flows into following bank
     out0 (DAR0B), a
 
 memcpy_far_right_left_dest_bank_no_overflow:
@@ -468,9 +485,9 @@ memcpy_far_error_exit:
     ld (_dmac0Lock), a  ; give DMAC0 free
     ret
 
-
 memcpy_far_left_right:
-    adc hl, de          ; recover the source address
+    add hl, de          ; recover the source address, with no carry
+memcpy_far_left_right_early:
     pop bc              ; get the size back, just to balance the stack   
     out0 (SAR0H), h
     out0 (SAR0L), l
@@ -483,6 +500,7 @@ memcpy_far_left_right:
                         ; in burst mode the Z180 CPU stops until the DMA completes
     
     ex de, hl           ; and swap the destination address into hl to return
+    
     jr memcpy_far_error_exit
 
 ;------------------------------------------------------------------------------
@@ -570,12 +588,14 @@ memset_far_error_exit:
     ret
 
 ;------------------------------------------------------------------------------
-; far void *load_hex(uint8_t bankAbs)
+; void load_hex(uint8_t bankAbs)
 ;
 ; bankAbs − This is the absolute bank address (1 to 15), not BANK0.
 ;
 ; Type 2 Extended Segment Address (ESA), is equivalent to BBR data, and translates 1:1.
 ; Therefore BANK changes can be done by inputting the correct ESA data as 0xn000.
+;
+; This is a system function, and can only be called from BANK0.
 
 PUBLIC _load_hex, _load_hex_fastcall
 
@@ -586,12 +606,8 @@ _load_hex:
     push hl
 
 _load_hex_fastcall:
-    ld de, initString
-    call pstring
-
-    in0 c, (BBR)                ; grab and store the current Bank Base Register in C
-    xor a    
-    and c                       ; check it is BANK0, so the user can't use this (currently)
+    in0 a, (BBR)                ; grab and store the current Bank Base Register
+    and a                       ; check it is BANK0, so the user can't use this function
     ret NZ
     
     ld a, l                     ; get the destination BBR
@@ -602,7 +618,12 @@ _load_hex_fastcall:
     and a, $F0                  ; be sure it is sane
     ret Z                       ; and not trying to write to BANK0
     out0 (BBR), a               ; set the BBR
-                                ; from BANK0, so no need for stack change (currently)
+                                ; from BANK0, so no need for stack change
+
+    ld de, initString           ; pstring modifies AF, DE, & HL
+    call pstring
+    call delay
+    call delay
 
 load_hex_wait_lock:
     ld hl, _asci0RxLock
@@ -610,10 +631,10 @@ load_hex_wait_lock:
     jr C, load_hex_wait_lock
 
 load_hex_wait_colon:
-    call _asci0_getc            ; Rx byte (a = char received too)
+    call _asci0_getc            ; Rx byte in L (A = char received too)
     cp ':'                      ; wait for ':'
     jr NZ, load_hex_wait_colon
-    ld hl, 0                    ; reset hl to compute checksum
+    ld c, 0                     ; reset C to compute checksum
     call load_hex_read_byte     ; read byte count
     ld b, a                     ; store it in b
     call load_hex_read_byte     ; read upper byte of address
@@ -628,23 +649,17 @@ load_hex_wait_colon:
     cp 00                       ; check if record type is 00 (data)
     jr NZ, load_hex_inval_type  ; if not, error
 load_hex_read_data:
-;    ld l, '*'                   ; "*" per byte loaded  # DEBUG
-;    call _asci0_putc            ; Print it             # DEBUG
     call load_hex_read_byte
     ld (de), a                  ; write the byte at the RAM address
     inc de
     djnz load_hex_read_data     ; if b non zero, loop to get more data
 load_hex_read_chksum:
     call load_hex_read_byte     ; read checksum, but we don't need to keep it
-    ld a, l                     ; lower byte of hl checksum should be 0
+    ld a, c                     ; lower byte of c checksum should be 0
     or a
     jr NZ, load_hex_bad_chk     ; non zero, we have an issue
     ld l, '#'                   ; "#" per line loaded
     call _asci0_putc            ; Print it
-;    ld l, CHAR_CR               ; CHAR_CR              # DEBUG
-;    call _asci0_putc            ; Print it             # DEBUG
-;    ld l, CHAR_LF               ; CHAR_LF              # DEBUG
-;    call _asci0_putc            ; Print it             # DEBUG
     jr load_hex_wait_colon
 
 load_hex_esa_data:
@@ -658,53 +673,38 @@ load_hex_esa_data_bank0:
 
 load_hex_end_load:
     call load_hex_read_byte     ; read checksum, but we don't need to keep it
-    ld a, l                     ; lower byte of hl checksum should be 0
+    ld a, c                     ; lower byte of c checksum should be 0
     or a
     jr NZ, load_hex_bad_chk     ; non zero, we have an issue
-    out0 (BBR), c               ; get our originating BBR back, write it to the BBR
+
     ld de, LoadOKStr
 
-load_hex_exit:
+load_hex_exit:      
+    xor a
+    out0 (BBR), a               ; get our originating BANK0 BBR back, write it to the BBR
     call pstring
     call delay
+    call delay
+
     ld hl, _asci0RxLock         ; give up the ASCI0 Rx mutex
     ld (hl), $FE
     ret
 
 load_hex_inval_type:
-    out0 (BBR), c               ; get our originating BBR back, write it to the BBR
     ld de, invalidTypeStr
     jr load_hex_exit
 
 load_hex_bad_chk:
-    out0 (BBR), c               ; get our originating BBR back, write it to the BBR
     ld de, badCheckSumStr
     jr load_hex_exit
 
-load_hex_read_byte:             ; Returns byte in a, checksum in hl
-    push hl
-    call _asci0_getc            ; Rx byte in l (a = char received too)
-    sub '0'
-    cp 10
-    jr C, load_hex_read_nbl2    ; if a<10 read the second nibble
-    sub 7                       ; else subtract 'A'-'0' (17) and add 10
-load_hex_read_nbl2:
-    rlca                        ; shift accumulator left by 4 bits
-    rlca
-    rlca
-    rlca
-    ld h, a                     ; temporarily store the first nibble in H
-    call _asci0_getc            ; Rx byte in l (a = char received too)
-    sub '0'
-    cp 10
-    jr C, load_hex_read_end     ; if a<10 finalize
-    sub 7                       ; else subtract 'A' (17) and add 10
-load_hex_read_end:
-    or h                        ; assemble two nibbles into one byte in A
-    pop hl    
-    add a, l                    ; add the byte read to l (for checksum)
-    ld l, a
-    ret                         ; return the byte read in a        
+load_hex_read_byte:             ; returns byte in A, checksum in C
+    call rhex
+    ld l, a                     ; put assembled byte into L
+    add a, c                    ; add the byte read to C (for checksum)
+    ld c, a
+    ld a, l
+    ret                         ; return the byte read in L (A = char received too)  
 
 
 ;------------------------------------------------------------------------------
@@ -1269,8 +1269,6 @@ ASCI0_TX_END:
 
 PUBLIC _asci0_init
 
-EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
-
 _asci0_init:
     ; initialise the ASCI0
                                 ; load the default ASCI configuration
@@ -1298,18 +1296,17 @@ _asci0_init:
 PUBLIC _asci0_flush_Rx_di
 PUBLIC _asci0_flush_Rx
 
-EXTERN asm_z180_push_di, asm_z180_pop_ei
 EXTERN asci0RxCount, asci0RxIn, asci0RxOut, asci0RxBuffer, _asci0RxLock
 
 _asci0_flush_Rx_di:
     push af
     push hl
 
-    call asm_z180_push_di       ; di
+    di                          ; di
 
     call _asci0_flush_Rx
 
-    call asm_z180_pop_ei        ; ei
+    ei                          ; ei
 
     ld hl, _asci0RxLock         ; load the mutex lock address
     ld (hl), $FE                ; give mutex lock
@@ -1331,18 +1328,17 @@ _asci0_flush_Rx:
 PUBLIC _asci0_flush_Tx_di
 PUBLIC _asci0_flush_Tx
 
-EXTERN asm_z180_push_di, asm_z180_pop_ei
 EXTERN asci0TxCount, asci0TxIn, asci0TxOut, asci0TxBuffer, _asci0TxLock
 
 _asci0_flush_Tx_di:
     push af
     push hl
 
-    call asm_z180_push_di       ; di
+    di                          ; di
 
     call _asci0_flush_Tx
 
-    call asm_z180_pop_ei        ; ei
+    ei                          ; ei
 
     ld hl, _asci0TxLock         ; load the mutex lock address
     ld (hl), $FE                ; give mutex lock
@@ -1448,7 +1444,6 @@ _asci0_pollc:
 PUBLIC _asci0_putc
 
 EXTERN asci0TxCount, asci0TxIn
-EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
 
 _asci0_putc:
 
@@ -1494,12 +1489,14 @@ asci0_clean_up_tx:
     and STAT0_TIE               ; test whether ASCI0 interrupt is set
     ret nz                      ; if so then just return
 
-    call asm_z180_push_di       ; critical section begin
+    di                          ; critical section begin
+
     in0 a, (STAT0)              ; get the ASCI status register again
     or STAT0_TIE                ; mask in (enable) the Tx Interrupt
     out0 (STAT0), a             ; set the ASCI status register
     
-    jp asm_z180_pop_ei_jp       ; critical section end
+    ei                          ; critical section end
+    ret
 
 
 ;------------------------------------------------------------------------------
@@ -1584,8 +1581,6 @@ ASCI1_TX_END:
 
 PUBLIC _asci1_init
 
-EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
-
 _asci1_init:
     ; initialise the ASCI1
                                 ; load the default ASCI configuration
@@ -1613,18 +1608,17 @@ _asci1_init:
 PUBLIC _asci1_flush_Rx_di
 PUBLIC _asci1_flush_Rx
 
-EXTERN asm_z180_push_di, asm_z180_pop_ei
 EXTERN asci1RxCount, asci1RxIn, asci1RxOut, asci1RxBuffer, _asci1RxLock
 
 _asci1_flush_Rx_di:
     push af
     push hl
 
-    call asm_z180_push_di       ; di
+    di                          ; di
 
     call _asci1_flush_Rx
 
-    call asm_z180_pop_ei        ; ei
+    ei                          ; ei
 
     ld hl, _asci1RxLock         ; load the mutex lock address
     ld (hl), $FE                ; give mutex lock
@@ -1646,7 +1640,6 @@ _asci1_flush_Rx:
 PUBLIC _asci1_flush_Tx_di
 PUBLIC _asci1_flush_Tx
 
-EXTERN asm_z180_push_di, asm_z180_pop_ei
 EXTERN asci1TxCount, asci1TxIn, asci1TxOut, asci1TxBuffer, _asci1TxLock
 
 
@@ -1654,11 +1647,11 @@ _asci1_flush_Tx_di:
     push af
     push hl
 
-    call asm_z180_push_di       ; di
+    di                          ; di
 
     call _asci1_flush_Tx
 
-    call asm_z180_pop_ei        ; ei
+    ei                          ; ei
 
     ld hl, _asci1TxLock         ; load the mutex lock address
     ld (hl), $FE                ; give mutex lock
@@ -1765,7 +1758,6 @@ _asci1_pollc:
 PUBLIC _asci1_putc
 
 EXTERN asci1TxCount, asci1TxIn
-EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
 
 _asci1_putc:
 
@@ -1811,12 +1803,14 @@ asci1_clean_up_tx:
     and STAT1_TIE               ; test whether ASCI1 interrupt is set
     ret nz                      ; if so then just return
 
-    call asm_z180_push_di       ; critical section begin
+    di                          ; critical section begin
+
     in0 a, (STAT1)              ; get the ASCI status register again
     or STAT1_TIE                ; mask in (enable) the Tx Interrupt
     out0 (STAT1), a             ; set the ASCI status register
 
-    jp asm_z180_pop_ei_jp       ; critical section end
+    ei                          ; critical section end
+    ret
 
 
 ;==============================================================================
@@ -1849,80 +1843,78 @@ delay_loop:
 ;       INPUT SUBROUTINES
 ;
 
-rhexdwd:                        ; returns 4 bytes LE, to address in DE, with echo
+rhexdwd:                ; returns 4 bytes LE, to address in DE, modifies AF
     push af
-    inc de
-    inc de
-    inc de
-    call rhex
-    ld (de), a
-    call phex
-    dec de
-    call rhex
-    ld (de), a
-    call phex
-    dec de
-    call rhex
-    ld (de), a
-    call phex
-    dec de
-    call rhex
-    ld (de), a
-    call phex     
-    pop af
-    ret
-
-rhexwd:                         ; returns 2 bytes LE, to address in DE, with echo
-    push af
-    inc de
-    call rhex
-    ld (de), a
-    call phex
-    dec de
-    call rhex
-    ld (de), a
-    call phex
-    pop af
-    ret
-
-rhex:                       ; Returns byte in a
     push hl
-    call _asci0_getc        ; Rx byte in l (a = char received too)
-    sub '0'
-    cp 10
-    jr C, rhexnbl2          ; if a<10 read the second nibble
-    sub 7                   ; else subtract 'A'-'0' (17) and add 10
-rhexnbl2:
-    rlca                    ; shift accumulator left by 4 bits
-    rlca
-    rlca
-    rlca
-    ld h, a                 ; temporarily store the first nibble in h
-    call _asci0_getc        ; Rx byte in l (a = char received too)
-    sub '0'
-    cp 10
-    jr C, rhexend           ; if a<10 finalize
-    sub 7                   ; else subtract 'A' (17) and add 10
-rhexend:
-    or h                    ; assemble two nibbles into one byte in a
+    inc de
+    inc de
+    inc de
+    call rhex
+    ld (de), a
+    dec de
+    call rhex
+    ld (de), a
+    dec de
+    call rhex
+    ld (de), a
+    dec de
+    call rhex
+    ld (de), a
+    pop hl   
+    pop af
+    ret
+
+rhexwd:                 ; returns 2 bytes LE, to address in DE, modifies AF
+    push af
+    push hl
+    inc de
+    call rhex
+    ld (de), a
+    dec de
+    call rhex
+    ld (de), a
     pop hl
-    ret                     ; return the byte read in a
+    pop af
+    ret
+
+
+rhex:                   ; Returns byte in A, modifies HL
+    call rhex_nibble    ; read the first nibble
+    rlca                ; shift it left by 4 bits
+    rlca
+    rlca
+    rlca
+    ld h, a             ; temporarily store the first nibble in H
+    call rhex_nibble    ; get the second (low) nibble
+    or h                ; assemble two nibbles into one byte in A
+    ret                 ; return the byte read in A  
+
+
+rhex_nibble:
+    call _asci0_getc    ; Rx byte in L (A = byte Rx too) SCF if char read
+    jr NC, rhex_nibble  ; keep trying if no characters
+    sub '0'
+    cp 10
+    ret C               ; if A<10 just return
+    sub 7               ; else subtract 'A'-'0' (17) and add 10
+    ret
+
 
 ;==============================================================================
 ;       OUTPUT SUBROUTINES
 ;
 
-    ;print string
+    ; print string, modifies AF, DE, & HL
 pstring: 
-    ld a, (de)          ;Get character from DE address
-    or a                ;Is it $00 ?
-    ret Z               ;Then RETurn on terminator
+    ld a, (de)          ; Get character from DE address
+    or a                ; Is it $00 ?
+    ret Z               ; Then return on terminator
     ld l, a
-    call _asci0_putc    ;Print it
-    inc de              ;Point to next character 
-    jr pstring          ;Continue until $00
+    call _asci0_putc    ; Print it
+    inc de              ; Point to next character 
+    jr pstring          ; Continue until $00
 
-    ;print CR/LF
+    ; print CR/LF, modifies AF & HL
 pnewline:
     ld l, CHAR_CR
     call _asci0_putc
@@ -1930,89 +1922,67 @@ pnewline:
     call _asci0_putc
     ret
 
-    ;print Double Word at address DE as 32 bit number in ASCII HEX
+    ; print Double Word at address HL as 32 bit number in ASCII HEX, modifies AF
 phexdwd:
-    push af
-    inc de
-    inc de
-    inc de
-    ld a, (de)
-    call phex
-    dec de
-    ld a, (de)
-    call phex
-    dec de
-    ld a, (de)
-    call phex
-    dec de
-    ld a, (de)
-    call phex
-    pop af
+    inc hl
+    inc hl
+    call phexwd
+    dec hl
+    dec hl
+    call phexwd
     ret
 
-    ;print Word at address DE as 16 bit number in ASCII HEX
+    ; print Word at address HL as 16 bit number in ASCII HEX, modifies AF
 phexwd:
-    push af
-    inc de
-    ld a, (de)
-    call phex
-    dec de
-    ld a, (de)
-    call phex
-    pop af
-    ret
-
-    ;print contents of DEHL as 32 bit number in ASCII HEX
-phexdwdreg:
-    push af
-    ld a, d
-    call phex
-    ld a, e
-    call phex
-    ld a, h
-    call phex
-    ld a, l
-    call phex
-    pop af
-    ret
-
-    ;print contents of DE as 16 bit number in ASCII HEX
-phexwdreg:
-    push af
-    ld a, h
-    call phex
-    ld a, l
-    call phex
-    pop af
-    ret
-
-    ;print contents of A as 8 bit number in ASCII HEX
-phex:
     push hl
-    push af             ;store the binary value
-    rlca                ;shift accumulator left by 4 bits
-    rlca
-    rlca
-    rlca
-    and $0F             ;now high nibble is low position
-    cp 10
-    jr C, phex_b        ;jump if high nibble < 10
-    add a, 7            ;otherwise add 7 before adding '0'
-phex_b:
-    add a, '0'          ;add ASCII 0 to make a character
-    ld l, a
-    call _asci0_putc    ;print high nibble
-    pop af              ;recover the binary value
-phex1:
-    and $0F
-    cp 10
-    jr C, phex_c        ;jump if low nibble < 10
-    add a, 7
-phex_c:
-    add a, '0'
-    ld l, a
-    call _asci0_putc    ;print low nibble
+    inc hl
+    ld a, (hl)
+    dec hl
+    ld l, (hl)
+    ld h, a
+    call phexwdreg
     pop hl
+    ret
+
+    ; print contents of DEHL as 32 bit number in ASCII HEX, modifies AF
+phexdwdreg:
+    push de
+    push hl
+    ex de, hl
+    call phexwdreg  ; print DE
+    ex de, hl
+    call phexwdreg  ; print HL
+    pop hl
+    pop de
+    ret
+
+    ; print contents of HL as 16 bit number in ASCII HEX, modifies AF & HL
+phexwdreg:
+    push hl
+    ld l, h         ; high byte to L
+    call phex
+    pop hl          ; recover HL, for low byte in L  
+    call phex
+    ret
+
+    ; print contents of L as 8 bit number in ASCII HEX, modifies AF & HL
+phex:
+    ld a, l         ; _asci0_putc modifies AF, HL
+    push af
+    rrca
+    rrca
+    rrca
+    rrca
+    call  phex_conv
+    pop af
+phex_conv:
+    and  $0F
+    add  a,$90
+    daa
+    adc  a,$40
+    daa
+    ld l, a
+    call _asci0_putc
     ret
 
 DEPHASE

@@ -64,7 +64,7 @@ extern int8_t __LIB__ bank_get_rel(uint8_t bankAbs) __smallc __z88dk_fastcall;
 extern uint8_t __LIB__ bank_get_abs(int8_t bankRel) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ far_jp(void *str,int8_t bank) __smallc;
+extern void __LIB__ jp_far(void *str,int8_t bank) __smallc;
 
 
 
