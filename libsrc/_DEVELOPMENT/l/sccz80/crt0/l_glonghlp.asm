@@ -2,31 +2,20 @@
 ;       Long functions
 ;
 
-
 SECTION code_clib
 SECTION code_l_sccz80
-PUBLIC    l_glonghlp
 
-; 
-;  call_l_gint
-;  call l_glong
+PUBLIC l_glonghlp
 
+EXTERN l_long_load_mhl
 
-;Fetch long dehl from *(hl)
+; Fetch long dehl from *(hl)
 
-.l_glonghlp
+l_glonghlp:
+
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a
 
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   ex de,hl
-   ret
+   jp l_long_load_mhl

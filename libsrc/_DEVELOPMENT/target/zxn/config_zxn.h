@@ -51,194 +51,6 @@
 
 #define __USE_SPECTRUM_128_SECOND_DFILE  0
 
-#define __IO_REGISTRY_REG  0x243b
-#define __IO_REGISTRY_DAT  0x253b
-
-#define __IO_REGISTRY_REG_MACHINE_ID  0
-
-#define __IO_REGISTRY_REG_VERSION  1
-#define __IO_RRV_MAJOR  0xf0
-#define __IO_RRV_MINOR  0x0f
-
-#define __IO_REGISTRY_REG_RESET  2
-#define __IO_RRR_POWER_ON_RESET  0x04
-#define __IO_RRR_HARD_RESET  0x02
-#define __IO_RRR_SOFT_RESET  0x01
-
-#define __IO_REGISTRY_REG_MACHINE_TYPE  3
-#define __IO_RRMT_LOCK_TIMING  0x80
-#define __IO_RRMT_TIMING_48  0x10
-#define __IO_RRMT_TIMING_128  0x20
-#define __IO_RRMT_TIMING_P3E  0x30
-#define __IO_RRMT_TIMING_PENTAGON  0x40
-#define __IO_RRMT_CONFIG_MODE  0x00
-#define __IO_RRMT_48  0x01
-#define __IO_RRMT_128  0x02
-#define __IO_RRMT_P3E  0x03
-#define __IO_RRMT_PENTAGON  0x04
-
-#define __IO_REGISTRY_REG_PAGE_RAM  4
-#define __IO_RRPR_MASK  0x3f
-
-#define __IO_REGISTRY_REG_PERIPHERAL_1  5
-#define __IO_RRP1_JOY1_SINCLAIR  0x00
-#define __IO_RRP1_JOY1_KEMPSTON  0x40
-#define __IO_RRP1_JOY1_CURSOR  0x80
-#define __IO_RRP1_JOY2_SINCLAIR  0x00
-#define __IO_RRP1_JOY2_KEMPSTON  0x10
-#define __IO_RRP1_JOY2_CURSOR  0x20
-#define __IO_RRP1_RATE_50  0x00
-#define __IO_RRP1_RATE_60  0x04
-#define __IO_RRP1_ENABLE_SCANLINES  0x02
-#define __IO_RRP1_ENABLE_SCANDOUBLER  0x01
-
-#define __IO_REGISTRY_REG_PERIPHERAL_2  6
-#define __IO_RRP2_ENABLE_TURBO  0x80
-#define __IO_RRP2_DAC_I2S  0x00
-#define __IO_RRP2_DAC_JAP  0x40
-#define __IO_RRP2_ENABLE_LIGHTPEN  0x20
-#define __IO_RRP2_ENABLE_DIVMMC  0x10
-#define __IO_RRP2_ENABLE_MULTIFACE  0x08
-#define __IO_RRP2_PS2_KEYBOARD  0x00
-#define __IO_RRP2_PS2_MOUSE  0x04
-#define __IO_RRP2_PSGMODE_AY  0x03
-#define __IO_RRP2_PSGMODE_YM  0x02
-#define __IO_RRP2_PSGMODE_DISABLE  0x00
-
-#define __IO_REGISTRY_REG_TURBO_MODE  7
-#define __IO_RRTM_3MHZ  0x00
-#define __IO_RRTM_7MHZ  0x01
-#define __IO_RRTM_14MHZ  0x02
-#define __IO_RRTM_28MHZ  0x03
-
-#define __IO_REGISTRY_REG_PERIPHERAL_3  8
-#define __IO_RRP3_STEREO_ABC  0x00
-#define __IO_RRP3_STEREO_ACB  0x20
-#define __IO_RRP3_ENABLE_SPEAKER  0x10
-#define __IO_RRP3_ENABLE_SPECDRUM  0x08
-#define __IO_RRP3_ENABLE_COVOX  0x08
-#define __IO_RRP3_ENABLE_TIMEX  0x04
-#define __IO_RRP3_ENABLE_TURBOSOUND  0x02
-
-#define __IO_REGISTRY_REG_ANTI_BRICK  10
-#define __IO_RRAB_START_NORMAL_CORE  0x80
-#define __IO_RRAB_BUTTON_DIVMMC  0x02
-#define __IO_RRAB_BUTTON_MULTIFACE  0x01
-
-#define __IO_REGISTRY_REG_LAYER_2_RAM_PAGE  18
-#define __IO_RRL2RP_MASK  0x3f
-
-#define __IO_REGISTRY_REG_LAYER_2_SHADOW_RAM_PAGE  19
-#define __IO_RRL2SRP_MASK  0x3f
-
-#define __IO_REGISTRY_REG_LAYER_2_GLOBAL_TRANSPARENCY_COLOR  20
-
-#define __IO_REGISTRY_REG_SPRITE_LAYER_SYSTEM  21
-#define __IO_RRSLS_ENABLE_LORES  0x80
-#define __IO_RRSLS_LAYER_PRIORITY_SLU  0x00
-#define __IO_RRSLS_LAYER_PRIORITY_LSU  0x04
-#define __IO_RRSLS_LAYER_PRIORITY_SUL  0x08
-#define __IO_RRSLS_LAYER_PRIORITY_LUS  0x0c
-#define __IO_RRSLS_LAYER_PRIORITY_USL  0x10
-#define __IO_RRSLS_LAYER_PRIORITY_ULS  0x14
-#define __IO_RRSLS_SPRITES_OVER_BORDER  0x02
-#define __IO_RRSLS_SPRITES_VISIBLE  0x01
-
-#define __IO_REGISTRY_REG_LAYER_2_OFFSET_X  22
-
-#define __IO_REGISTRY_REG_LAYER_2_OFFSET_Y  23
-
-#define __IO_REGISTRY_REG_ACTIVE_VIDEO_LINE_MSB  30
-
-#define __IO_REGISTRY_REG_ACTIVE_VIDEO_LINE_LSB  31
-
-#define __IO_REGISTRY_REG_RASTER_LINE_INTERRUPT_CONTROL  34
-#define __IO_RRRLIC_INTERRUPT_FLAG  0x80
-#define __IO_RRRLIC_DISABLE_ULA_INTERRUPT  0x04
-#define __IO_RRRLIC_ENABLE_LINE_INTERRUPT  0x02
-#define __IO_RRRLIC_LINE_INTERRUPT_VALUE_MSB  0x01
-
-#define __IO_REGISTRY_REG_RASTER_LINE_INTERRUPT_VALUE_LSB  35
-
-#define __IO_REGISTRY_REG_KEYMAP_ADDRESS_MSB  40
-
-#define __IO_REGISTRY_REG_KEYMAP_ADDRESS_LSB  41
-
-#define __IO_REGISTRY_REG_KEYMAP_DATA_MSB  42
-
-#define __IO_REGISTRY_REG_KEYMAP_DATA_LSB  43
-
-#define __IO_REGISTRY_REG_LORES_OFFSET_X  50
-
-#define __IO_REGISTRY_REG_LORES_OFFSET_Y  51
-
-#define __IO_REGISTRY_REG_PALETTE_INDEX  64
-
-#define __IO_REGISTRY_REG_PALETTE_VALUE  65
-
-#define __IO_REGISTRY_REG_ULA_PALETTE_FORMAT  66
-
-#define __IO_REGISTRY_REG_PALETTE_CONTROL  67
-#define __IO_RRPC_SELECT_ULA_PRIMARY  0x00
-#define __IO_RRPC_SELECT_ULA_SECONDARY  0x40
-#define __IO_RRPC_SELECT_LAYER_2_PRIMARY  0x10
-#define __IO_RRPC_SELECT_LAYER_2_SECONDARY  0x50
-#define __IO_RRPC_SELECT_SPRITES_PRIMARY  0x20
-#define __IO_RRPC_SELECT_SPRITES_SECONDARY  0x60
-#define __IO_RRPC_ENABLE_PRIMARY_SPRITES_PALETTE  0x00
-#define __IO_RRPC_ENABLE_SECONDARY_SPRITES_PALETTE  0x08
-#define __IO_RRPC_ENABLE_PRIMARY_LAYER_2_PALETTE  0x00
-#define __IO_RRPC_ENABLE_SECONDARY_LAYER_2_PALETTE  0x04
-#define __IO_RRPC_ENABLE_PRIMARY_ULA_PALETTE  0x00
-#define __IO_RRPC_ENABLE_SECONDARY_ULA_PALETTE  0x02
-#define __IO_RRPC_ENABLE_ULANEXT  0x01
-
-#define __IO_REGISTRY_REG_PALETTE_B0  68
-
-#define __IO_REGISTRY_REG_MMU0  80
-#define __IO_REGISTRY_REG_MMU1  81
-#define __IO_REGISTRY_REG_MMU2  82
-#define __IO_REGISTRY_REG_MMU3  83
-#define __IO_REGISTRY_REG_MMU4  84
-#define __IO_REGISTRY_REG_MMU5  85
-#define __IO_REGISTRY_REG_MMU6  86
-#define __IO_REGISTRY_REG_MMU7  87
-
-#define __IO_REGISTRY_REG_DEBUG_LEDS  0xff
-
-#define __IO_LAYER_2_ACCESS  0x123b
-#define __IO_L2A_BANK_LOWER_16K  0x01
-#define __IO_L2A_ENABLE_LAYER_2  0x02
-#define __IO_L2A_BANK_SHADOW_BUFFER  0x08
-#define __IO_L2A_BANK_SELECT_MASK  0xc0
-#define __IO_L2A_BANK_SELECT_0  0x00
-#define __IO_L2A_BANK_SELECT_1  0x40
-#define __IO_L2A_BANK_SELECT_2  0x80
-
-#define __IO_SPRITE_SLOT  0x303b
-
-#define __IO_SPRITE_FLAGS  0x303b
-#define __IO_SF_MAX_SPRITES_PER_LINE  0x02
-#define __IO_SF_COLLISION  0x01
-
-#define __IO_SPRITE_PALETTE  0x53
-
-#define __IO_SPRITE_ATTRIBUTE  0x57
-
-#define __IO_SPRITE_PATTERN  0x5b
-
-#define __IO_AUDIO_SELECT  0xfffd
-#define __IO_AS_ENABLE  0xfc
-#define __IO_AS_LEFT_ENABLE  0xdc
-#define __IO_AS_RIGHT_ENABLE  0xbc
-#define __IO_AS_PSG_1  0x9f
-#define __IO_AS_PSG_2  0x9e
-#define __IO_AS_PSG_3  0x9d
-#define __IO_AS_SID  0x9c
-
-#define __IO_AUDIO_REG  0xfffd
-#define __IO_AUDIO_DAT  0xbffd
-
 
 
 
@@ -1202,6 +1014,385 @@
 #define __LAYER2_COLOR_HTML_LightYellow  0xff
 #define __LAYER2_COLOR_HTML_Ivory  0xff
 #define __LAYER2_COLOR_HTML_White  0xff
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_DAC_L0  0x0f
+#define __IO_DAC_L1  0x1f
+#define __IO_DAC_R0  0x4f
+#define __IO_DAC_R1  0x5f
+
+#define __IO_DAC_M0  0xffdf
+
+#define __IO_DAC_SPECDRUM  0xffdf
+
+#define __IO_DAC_PROFI_L  0x3f
+#define __IO_DAC_PROFI_R  0x5f
+
+#define __IO_DAC_COVOX_L  0x0f
+#define __IO_DAC_COVOX_R  0x4f
+
+#define __IO_SOUNDRIVE_L_A  0x0f
+#define __IO_SOUNDRIVE_L_B  0x1f
+#define __IO_SOUNDRIVE_R_C  0x4f
+#define __IO_SOUNDRIVE_R_D  0x5f
+
+#define __IO_SOUNDRIVE_L_A2  0xf1
+#define __IO_SOUNDRIVE_L_B2  0xf3
+#define __IO_SOUNDRIVE_R_C2  0xf9
+#define __IO_SOUNDRIVE_R_D2  0xfb
+
+#define __IO_TURBOSOUND  0xfffd
+#define __IT_ENABLE_L  0xd0
+#define __IT_ENABLE_R  0xb0
+#define __IT_ENABLE_LR  0xf0
+#define __IT_SELECT_PSG_0  0x0f
+#define __IT_SELECT_PSG_1  0x0e
+#define __IT_SELECT_PSG_2  0x0d
+
+#define __IO_AY_REG  0xfffd
+#define __IO_AY_DAT  0xbffd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_LAYER_2_CONFIG  0x123b
+#define __IL2C_ENABLE_LOWER_16K  0x01
+#define __IL2C_SHOW_LAYER_2  0x02
+#define __IL2C_SELECT_SHADOW_BUFFER  0x08
+#define __IL2C_BANK_SELECT_MASK  0xc0
+#define __IL2C_BANK_SELECT_0  0x00
+#define __IL2C_BANK_SELECT_1  0x40
+#define __IL2C_BANK_SELECT_2  0x80
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_7FFD  0x7ffd
+#define __IO_7FFD_LOCK  0x20
+#define __IO_7FFD_ROM0  0x10
+#define __IO_7FFD_ALT_DFILE  0x08
+#define __IO_7FFD_RAM_PAGE_MASK  0x07
+
+#define __IO_DFFD  0xdffd
+#define __IO_DFFD_RAM_PAGE_MASK  0x0f
+
+#define __IO_1FFD  0x1ffd
+#define __IO_1FFD_PAGING_MODE_NORMAL  0x00
+#define __IO_1FFD_PAGING_MODE_SPECIAL  0x01
+#define __IO_1FFD_PAGING_MODE_SPECIAL_3210  0x01
+#define __IO_1FFD_PAGING_MODE_SPECIAL_7654  0x03
+#define __IO_1FFD_PAGING_MODE_SPECIAL_3654  0x05
+#define __IO_1FFD_PAGING_MODE_SPECIAL_3674  0x07
+#define __IO_1FFD_ROM1  0x04
+#define __IO_1FFD_DISK_MOTOR  0x08
+#define __IO_1FFD_PRINTER_STROBE  0x10
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_NEXTREG_REG  0x243b
+#define __IO_NEXTREG_DAT  0x253b
+
+#define __REG_MACHINE_ID  0
+
+#define __REG_VERSION  1
+#define __RV_MAJOR  0xf0
+#define __RV_MINOR  0x0f
+
+#define __REG_RESET  2
+#define __RR_POWER_ON_RESET  0x04
+#define __RR_HARD_RESET  0x02
+#define __RR_SOFT_RESET  0x01
+
+#define __REG_MACHINE_TYPE  3
+#define __RMT_LOCK_TIMING  0x80
+#define __RMT_TIMING_48  0x10
+#define __RMT_TIMING_128  0x20
+#define __RMT_TIMING_P3E  0x30
+#define __RMT_TIMING_PENTAGON  0x40
+#define __RMT_CONFIG_MODE  0x00
+#define __RMT_48  0x01
+#define __RMT_128  0x02
+#define __RMT_P3E  0x03
+#define __RMT_PENTAGON  0x04
+
+#define __REG_PAGE_RAM  4
+#define __RPR_MASK  0x7f
+
+#define __REG_PERIPHERAL_1  5
+#define __RP1_JOY1_SINCLAIR  0x00
+#define __RP1_JOY1_KEMPSTON  0x40
+#define __RP1_JOY1_CURSOR  0x80
+#define __RP1_JOY2_SINCLAIR  0x00
+#define __RP1_JOY2_KEMPSTON  0x10
+#define __RP1_JOY2_CURSOR  0x20
+#define __RP1_RATE_50  0x00
+#define __RP1_RATE_60  0x04
+#define __RP1_ENABLE_SCANLINES  0x02
+#define __RP1_ENABLE_SCANDOUBLER  0x01
+
+#define __REG_PERIPHERAL_2  6
+#define __RP2_ENABLE_TURBO  0x80
+#define __RP2_DAC_I2S  0x00
+#define __RP2_DAC_JAP  0x40
+#define __RP2_ENABLE_LIGHTPEN  0x20
+#define __RP2_ENABLE_DIVMMC  0x10
+#define __RP2_ENABLE_MULTIFACE  0x08
+#define __RP2_PS2_KEYBOARD  0x00
+#define __RP2_PS2_MOUSE  0x04
+#define __RP2_PSGMODE_AY  0x03
+#define __RP2_PSGMODE_YM  0x02
+#define __RP2_PSGMODE_DISABLE  0x00
+
+#define __REG_TURBO_MODE  7
+#define __RTM_3MHZ  0x00
+#define __RTM_7MHZ  0x01
+#define __RTM_14MHZ  0x02
+#define __RTM_28MHZ  0x03
+
+#define __REG_PERIPHERAL_3  8
+#define __RP3_STEREO_ABC  0x00
+#define __RP3_STEREO_ACB  0x20
+#define __RP3_ENABLE_SPEAKER  0x10
+#define __RP3_ENABLE_SPECDRUM  0x08
+#define __RP3_ENABLE_COVOX  0x08
+#define __RP3_ENABLE_TIMEX  0x04
+#define __RP3_ENABLE_TURBOSOUND  0x02
+#define __RP3_UNLOCK_7FFD  0x80
+
+#define __REG_ANTI_BRICK  10
+#define __RAB_START_NORMAL_CORE  0x80
+#define __RAB_BUTTON_DIVMMC  0x02
+#define __RAB_BUTTON_MULTIFACE  0x01
+
+#define __REG_LAYER_2_RAM_PAGE  18
+#define __RL2RP_MASK  0x7f
+
+#define __REG_LAYER_2_SHADOW_RAM_PAGE  19
+#define __RL2SRP_MASK  0x7f
+
+#define __REG_GLOBAL_TRANSPARENCY_COLOR  20
+
+#define __REG_SPRITE_LAYER_SYSTEM  21
+#define __RSLS_ENABLE_LORES  0x80
+#define __RSLS_LAYER_PRIORITY_SLU  0x00
+#define __RSLS_LAYER_PRIORITY_LSU  0x04
+#define __RSLS_LAYER_PRIORITY_SUL  0x08
+#define __RSLS_LAYER_PRIORITY_LUS  0x0c
+#define __RSLS_LAYER_PRIORITY_USL  0x10
+#define __RSLS_LAYER_PRIORITY_ULS  0x14
+#define __RSLS_SPRITES_OVER_BORDER  0x02
+#define __RSLS_SPRITES_VISIBLE  0x01
+
+#define __REG_LAYER_2_OFFSET_X  22
+
+#define __REG_LAYER_2_OFFSET_Y  23
+
+#define __REG_CLIP_WINDOW_LAYER_2  24
+
+#define __REG_CLIP_WINDOW_SPRITES  25
+
+#define __REG_CLIP_WINDOW_ULA  26
+
+#define __REG_CLIP_WINDOW_CONTROL  28
+#define __RCWC_RESET_ULA_CLIP_INDEX  0x04
+#define __RCWC_RESET_SPRITE_CLIP_INDEX  0x02
+#define __RCWC_RESET_LAYER_2_CLIP_INDEX  0x01
+
+#define __REG_ACTIVE_VIDEO_LINE_MSB  30
+
+#define __REG_ACTIVE_VIDEO_LINE_LSB  31
+
+#define __REG_LINE_INTERRUPT_CONTROL  34
+#define __RLIC_INTERRUPT_FLAG  0x80
+#define __RLIC_DISABLE_ULA_INTERRUPT  0x04
+#define __RLIC_ENABLE_LINE_INTERRUPT  0x02
+#define __RLIC_LINE_INTERRUPT_VALUE_MSB  0x01
+
+#define __REG_LINE_INTERRUPT_VALUE_LSB  35
+
+#define __REG_KEYMAP_ADDRESS_MSB  40
+
+#define __REG_KEYMAP_ADDRESS_LSB  41
+
+#define __REG_KEYMAP_DATA_MSB  42
+
+#define __REG_KEYMAP_DATA_LSB  43
+
+#define __REG_LORES_OFFSET_X  50
+
+#define __REG_LORES_OFFSET_Y  51
+
+#define __REG_PALETTE_INDEX  64
+
+#define __REG_PALETTE_VALUE_8  65
+
+#define __REG_ULA_PALETTE_FORMAT  66
+
+#define __REG_PALETTE_CONTROL  67
+#define __RPC_SELECT_ULA_PALETTE_0  0x00
+#define __RPC_SELECT_ULA_PALETTE_1  0x40
+#define __RPC_SELECT_LAYER_2_PALETTE_0  0x10
+#define __RPC_SELECT_LAYER_2_PALETTE_1  0x50
+#define __RPC_SELECT_SPRITES_PALETTE_0  0x20
+#define __RPC_SELECT_SPRITES_PALETTE_1  0x60
+#define __RPC_ENABLE_SPRITES_PALETTE_0  0x00
+#define __RPC_ENABLE_SPRITES_PALETTE_1  0x08
+#define __RPC_ENABLE_LAYER_2_PALETTE_0  0x00
+#define __RPC_ENABLE_LAYER_2_PALETTE_1  0x04
+#define __RPC_ENABLE_ULA_PALETTE_0  0x00
+#define __RPC_ENABLE_ULA_PALETTE_1  0x02
+#define __RPC_ENABLE_ULANEXT  0x01
+
+#define __REG_PALETTE_VALUE_16  68
+
+#define __REG_MMU0  80
+#define __REG_MMU1  81
+#define __REG_MMU2  82
+#define __REG_MMU3  83
+#define __REG_MMU4  84
+#define __REG_MMU5  85
+#define __REG_MMU6  86
+#define __REG_MMU7  87
+
+#define __REG_COPPER_DATA  96
+
+#define __REG_COPPER_CONTROL_LO  97
+
+#define __REG_COPPER_CONTROL_HI  98
+#define __RCCH_COPPER_STOP  0x00
+#define __RCCH_COPPER_RUN_ONCE  0x40
+#define __RCCH_COPPER_RUN_LOOP  0x80
+#define __RCCH_COPPER_RUN_ON_INTERRUPT  0xc0
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_SPRITE_SLOT  0x303b
+
+#define __IO_SPRITE_FLAGS  0x303b
+#define __ISF_MAX_SPRITES_PER_LINE  0x02
+#define __ISF_COLLISION  0x01
+
+#define __IO_SPRITE_PALETTE  0x53
+
+#define __IO_SPRITE_ATTRIBUTE  0x57
+
+#define __IO_SPRITE_PATTERN  0x5b
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_UART_RX  0x143b
+
+#define __IO_UART_BAUD_RATE  0x143b
+#define __IUBR_115200  0
+#define __IUBR_57600  1
+#define __IUBR_38400  2
+#define __IUBR_31250  3
+#define __IUBR_19200  4
+#define __IUBR_9600  5
+#define __IUBR_4800  6
+#define __IUBR_2400  7
+
+#define __IO_UART_TX  0x133b
+
+#define __IO_UART_STATUS  0x133b
+#define __IUS_RX_AVAIL  0x01
+#define __IUS_TX_READY  0x02
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_FE  0xfe
+#define __IO_FE_EAR  0x10
+#define __IO_FE_MIC  0x08
+#define __IO_FE_BORDER_MASK  0x07
+
+#define __IO_TIMEX_VIDEO_MODE  0xff
+#define __IO_TVM_DISABLE_ULA_INTERRUPT  0x40
+#define __IO_TVM_DFILE_1  0x0
+#define __IO_TVM_DFILE_2  0x01
+#define __IO_TVM_HICOLOR  0x02
+#define __IO_TVM_HIRES  0x06
+#define __IO_TVM_HIRES_BLACK  0x06
+#define __IO_TVM_HIRES_BLUE  0x0e
+#define __IO_TVM_HIRES_RED  0x16
+#define __IO_TVM_HIRES_MAGENTA  0x1e
+#define __IO_TVM_HIRES_GREEN  0x26
+#define __IO_TVM_HIRES_CYAN  0x2e
+#define __IO_TVM_HIRES_YELLOW  0x36
+#define __IO_TVM_HIRES_WHITE  0x3e
 
 
 

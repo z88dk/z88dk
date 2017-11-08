@@ -39,7 +39,7 @@ int creat(char *nam, mode_t mode)
 	fc->use = U_WRITE;
     }
     
-    fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
+    fd =  (fc - &_fcb[0]);
     return fd;
 }
 

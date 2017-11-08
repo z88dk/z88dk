@@ -88,7 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\win32\sccz80</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\win32\sccz80;..\..\ext\uthash\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,7 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\win32\sccz80</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\win32\sccz80;..\..\ext\uthash\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,9 +166,8 @@
     <ClCompile Include="..\..\src\sccz80\codegen.c" />
     <ClCompile Include="..\..\src\sccz80\const.c" />
     <ClCompile Include="..\..\src\sccz80\data.c" />
-    <ClCompile Include="..\..\src\sccz80\declfunc.c" />
     <ClCompile Include="..\..\src\sccz80\declinit.c" />
-    <ClCompile Include="..\..\src\sccz80\declvar.c" />
+    <ClCompile Include="..\..\src\sccz80\declparse.c" />
     <ClCompile Include="..\..\src\sccz80\error.c" />
     <ClCompile Include="..\..\src\sccz80\expr.c" />
     <ClCompile Include="..\..\src\sccz80\goto.c" />
@@ -188,9 +187,7 @@
     <ClInclude Include="..\..\src\sccz80\codegen.h" />
     <ClInclude Include="..\..\src\sccz80\const.h" />
     <ClInclude Include="..\..\src\sccz80\data.h" />
-    <ClInclude Include="..\..\src\sccz80\declfunc.h" />
     <ClInclude Include="..\..\src\sccz80\declinit.h" />
-    <ClInclude Include="..\..\src\sccz80\declvar.h" />
     <ClInclude Include="..\..\src\sccz80\define.h" />
     <ClInclude Include="..\..\src\sccz80\error.h" />
     <ClInclude Include="..\..\src\sccz80\expr.h" />

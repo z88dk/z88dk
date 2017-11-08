@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._BottomUpTree
 	pop	bc
 	pop	hl
@@ -93,16 +92,13 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	EXTERN	_NewTreeNode
-	PUBLIC	_BottomUpTree
+	GLOBAL	_NewTreeNode
+	GLOBAL	_BottomUpTree
 
 
 

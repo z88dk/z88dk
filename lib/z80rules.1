@@ -1,4 +1,4 @@
-	ld	a,#(0 % 256)
+	d	a,#(0 % 256)
 =
 	xor	a
 
@@ -1537,11 +1537,11 @@
 	jp	%1
 
 	push	hl
-	ld	hl,#%1
+	ld	hl,%1
 	pop	de
 =
 	ex	de,hl
-	ld	hl,#%1
+	ld	hl,%1
 
 	push	bc
 	ld	hl,%1	;const
@@ -2409,7 +2409,7 @@
 	ld	a,l
 	call	l_sxt
 =
-	ld	hl,%1
+	ld	hl,%1	;const
 
 	push	hl
 	ld	hl,%1
@@ -2631,7 +2631,7 @@
 	ex	de,hl
 =
 	ld	e,%1
-	ld	h,%2
+	ld	d,%2
 	pop	hl
 
 	push	hl
@@ -2659,3 +2659,236 @@
 	push	hl
 =
 	call	l_glong2sp_hlp
+
+	ld	b,h
+	ld	c,l
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_plong
+	ld	hl,%3
+=
+	ld	(hl),+(%1 %% 256)
+	inc	hl
+	ld	(hl),+(%1 / 256)
+	inc	hl
+	ld	(hl),+(%2 %% 256)
+	inc	hl
+	ld	(hl),+(%2 / 256)
+	ld	hl,%3
+
+	ld	h,%1
+	ld	h,%2
+=
+	ld	h,%2
+
+	ld	l,h
+	ld	h,0
+	ex	de,hl
+	ld	hl,%1
+=
+	ld	e,h
+	ld	d,0
+	ld	hl,%1
+
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+	pop	de
+=
+	pop	de
+	push	de
+	ex	de,hl
+
+	call	l_gintspsp	;
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+=
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,+(%1 - 2)	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+
+	ld	hl,0	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+=
+	pop	de
+	push	de
+
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	push	de
+	ex	de,hl
+=
+	ld	e,(hl)
+	ld	d,0
+	pop	hl
+	push	hl
+
+	push	de
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	%1
+	ld	l,a
+=
+	ld	a,(hl)
+	and	%1
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	ld	h,0
+=
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%1
+=
+	ld	l,a
+	ld	h,0
+	and	a
+	jp	%1
+
+	ld	l,(hl)
+	ld	h,0
+	%3c	l
+.i%1
+	ld	hl,%2
+=
+.i%1
+	ld	hl,%2
+
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+=
+	sla	l
+	ld	h,l
+	ld	l,0
+
+	ld	h,0
+	srl	l
+	add	hl,hl
+	add	hl,hl
+=
+	ld	h,0
+	add	hl,hl
+
+	ld	h,0
+	srl	h
+	rr	l
+=
+	ld	h,0
+	srl	l
+
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+	dec	hl
+	ld	hl,(_%1)
+=
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+
+	and	%1
+	and	a
+=
+	and	%1
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,%1
+	add	hl,de
+	ld	h,0
+=
+	ld	a,(hl)
+	ld	de,%1
+	add	e
+	ld	l,a
+	ld	h,0
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,2
+	call	l_asr_u
+=
+	ld	a,(hl)
+	srl	a
+	srl	a
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	and	%1
+	ld	l,a
+	ld	h,0
+
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	h,0
+=
+	ld	a,(hl)
+	add	a
+	add	a
+	add	a
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	pop	de
+	call	l_or
+=
+	pop	de
+	ld	h,d
+	ld	a,l
+	or	e
+	ld	l,a
+
+	ld	l,0
+	ld	a,1
+	call	l_long_aslo
+=
+	ld	l,0
+	sla	h
+	rl	e
+	rl	d

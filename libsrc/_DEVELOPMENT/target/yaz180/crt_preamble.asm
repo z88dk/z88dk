@@ -58,7 +58,7 @@ SECTION code_crt_init
     out0    (BCR0L), l
     out0    (BCR0H), h   
 
-    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    ld      bc, +(DMODE_MMOD)*$100+DSTAT_DE0
     out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
     out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
                             ; in burst mode the Z180 CPU stops until the DMA completes
@@ -83,15 +83,15 @@ SECTION code_crt_init
     out0    (BCR0L), l
     out0    (BCR0H), h   
 
-    ld      bc, DMODE_MMOD*$100+DSTAT_DE0
+    ld      bc, +(DMODE_MMOD)*$100+DSTAT_DE0
     out0    (DMODE), b      ; DMODE_MMOD - memory++ to memory++, burst mode
     out0    (DSTAT), c      ; DSTAT_DE0 - enable DMA channel 0, no interrupt
                             ; in burst mode the Z180 CPU stops until the DMA completes
 
-    EXTERN  prt0Lock
+    EXTERN  _prt0Lock
                             ; now there's valid COMMON_AREA_1
                             ; we can start the system_tick
-    ld      hl, prt0Lock    ; take the PRT0 lock, forever basically
+    ld      hl, _prt0Lock   ; take the PRT0 lock, forever basically
     sra     (hl)
                             ; we do 256 ticks per second
     ld      hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
@@ -107,8 +107,8 @@ SECTION code_crt_init
     EXTERN  _asci1_init    
     call    _asci1_init     ; and the asci1 interfaces
     
-    EXTERN  bankLockBase    ; lock BANK0 whilst the yabios CLI is running
-    ld      hl, bankLockBase
+    EXTERN  _bankLockBase   ; lock BANK0 whilst the yabios CLI is running
+    ld      hl, _bankLockBase
     ld      (hl), $FF
 
 ENDIF

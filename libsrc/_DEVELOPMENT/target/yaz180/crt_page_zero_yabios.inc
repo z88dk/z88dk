@@ -6,19 +6,17 @@ SECTION code_crt_start
 
    jp __Test_Trap       ; jump to the start of the trap test at 0x0080
 
-   PUBLIC bank_cpm_iobyte
-   PUBLIC bank_cpm_default_drive
+   PUBLIC _bank_cpm_iobyte
+   PUBLIC _bank_cpm_default_drive
 
-   bank_cpm_iobyte:        defb $00
-   bank_cpm_default_drive: defb $00
+   _bank_cpm_iobyte:        defb $00
+   _bank_cpm_default_drive: defb $00
 
-   PUBLIC bank_cpm_bdos_jp
-   PUBLIC bank_cpm_bdos_addr
+   PUBLIC _bank_cpm_bdos_addr
 
-   bank_cpm_bdos_jp:
    jp __Start       ; main entry to the CP/M BDOS when in banked page0
 
-   defc bank_cpm_bdos_addr = ASMPC - 2
+   defc _bank_cpm_bdos_addr = ASMPC - 2
 
 ; address = 0x0008
 
@@ -232,6 +230,7 @@ IF ((__crt_enable_rst & $8080) != $8080)
       
 ENDIF
 
+
 ; address = 0x0066
 
    defs 0x0066 - ASMPC
@@ -333,8 +332,4 @@ ENDIF
    defs 0x0100 - ASMPC
 
    defc __page_zero_present = 1   
-
-   PUBLIC bank_tpa_start
-
-   bank_tpa_start:
 

@@ -153,7 +153,7 @@ int rom_exec(char *target)
             exit_log(1, "Can't create %s for hex conversion\n", outname);
         }
 
-        bin2hex(fpin, fpout, (romsize == 0) ? binorg : rombase, recsize, 1);
+        bin2hex(fpin, fpout, (romsize == 0) ? binorg : rombase, -1, recsize, 1);
 
         fclose(fpin);
         fclose(fpout);

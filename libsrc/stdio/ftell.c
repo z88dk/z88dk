@@ -22,7 +22,6 @@
 
 fpos_t ftell(FILE *fp)
 {
-/*
 #ifdef Z80
 #asm
 	pop	bc
@@ -55,7 +54,7 @@ fpos_t ftell(FILE *fp)
         pop     ix
 	ret
 
-.ftell_trampoline:
+.ftell_trampoline
 	; Call the seek function via the trampoline
 	dec	hl
 	dec	hl
@@ -79,12 +78,11 @@ ENDIF
 	call	l_jphl
 #endasm
 #else
-*/
 	if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
 		return (fdtell(fp->fd));
 	}
 	return -1L;
-//#endif
+#endif
 }
 
 

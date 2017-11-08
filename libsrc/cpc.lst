@@ -62,6 +62,9 @@ cpc/cpc_Chars
 cpc/cpc_Chars8
 cpc/cpc_GetScrAddress0
 cpc/cpc_PrintStr
+cpc/cpc_PrintGphStr0
+cpc/cpc_PrintGphStrXY
+cpc/cpc_PrintGphStrXY_callee
 cpc/cpc_PrintGphStrStd0
 cpc/cpc_PrintGphStrStdXY
 cpc/cpc_PrintGphStrStdXY_callee
@@ -71,11 +74,6 @@ cpc/cpc_RLI
 cpc/cpc_RLI_callee
 cpc/cpc_RRI
 cpc/cpc_RRI_callee
-cpc/cpc_UpdScr
-cpc/cpc_SpUpdX
-cpc/cpc_SpUpdY
-cpc/cpc_SpUpdX_callee
-cpc/cpc_SpUpdY_callee
 cpc/cpc_Uncrunch
 cpc/cpc_Uncrunch_callee
 psg/cpc/set_psg

@@ -24,23 +24,23 @@ extern int __LIB__ ozkeyhit2(void);
 extern unsigned __APPFUNC__ __LIB__ ozgetch2(void);
 extern unsigned __LIB__ ozngetch2(void);
 extern unsigned __LIB__ ngetch2(void);
-extern __LIB__ ozungetch2(unsigned key);
+extern void __LIB__ ozungetch2(unsigned key);
 #endif
 
-extern __LIB__ ozrestorekeysettings(void);
-extern __LIB__ ozsavekeysettings(void);
+extern void __LIB__ ozrestorekeysettings(void);
+extern void __LIB__ ozsavekeysettings(void);
 #define SETTINGS_LENGTH 14
-extern __LIB__ ozcopyfromcursettings(byte *p);
-extern __LIB__ ozcopytocursettings(byte *p);
+extern void __LIB__ ozcopyfromcursettings(byte *p);
+extern void __LIB__ ozcopytocursettings(byte *p);
 
 #define OZEDITLINE_ERROR  -2
 #define OZEDITLINE_CANCEL -1
 //extern int __LIB__ ozeditline(int x0,int y0,char *s,int slen,int xlen);
 extern int __LIB__ ozeditline(int x0,int y0,char *s,int slen,int xlen) __smallc;
 
-extern __LIB__ ozkbdon(void);
-extern __LIB__ ozkbdoff(void);
-extern __LIB__ ozkeyclear(void);
+extern void __LIB__ ozkbdon(void);
+extern void __LIB__ ozkbdoff(void);
+extern void __LIB__ ozkeyclear(void);
 extern byte __LIB__ ozkeyupper(int mask);
 extern byte __LIB__ ozkeylower(int mask);
 //extern unsigned __LIB__ getch(void);
@@ -48,9 +48,9 @@ extern byte __LIB__ ozkeylower(int mask);
 //extern int __LIB__ nkbhit(void);
 extern byte __LIB__ ozgetrepeatspeed(void);
 extern byte __LIB__ ozgetrepeatdelay(void);
-extern __LIB__ ozsetrepeatspeed(int val);
-extern __LIB__ ozsetrepeatdelay(int val);
-extern __LIB__ ozclick(int state);
+extern void __LIB__ ozsetrepeatspeed(int val);
+extern void __LIB__ ozsetrepeatdelay(int val);
+extern void __LIB__ ozclick(int state);
 extern byte __LIB__ ozgetclick(void);
 extern byte _ozkeyrepeatspeed;
 extern byte _ozkeyrepeatdelay;

@@ -1,0 +1,41 @@
+
+
+
+	MODULE	Issue_490_long_extension
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._main
+	ld	hl,_main
+	push	hl
+	ld	hl,1	;const
+	call	l_int2long_s
+	push	de
+	push	hl
+	ld	hl,3	;const
+	push	hl
+	call	_function
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_function
+	GLOBAL	_main
+
+
+
+

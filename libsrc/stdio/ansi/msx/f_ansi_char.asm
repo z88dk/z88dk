@@ -16,6 +16,18 @@
 	
 	PUBLIC	ansi_CHAR
 
+	EXTERN	msxbios
+	
+IF FORmsx
+        INCLUDE "msxbios.def"
+ELSE
+        INCLUDE "svibios.def"
+; svibios.def includes the following declarations, valid also elsewhere:
+;	EXTERN	FILVRM
+;	EXTERN	LDIRVM
+ENDIF
+
+
 	EXTERN	msx_attr
 	
 	EXTERN	ansicharacter_pixelwidth
@@ -37,6 +49,8 @@
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
+	EXTERN	ansicharacter_pixelwidth
+
 	EXTERN	ansicolumns
 .text_cols   defb ansicolumns
 
@@ -46,9 +60,38 @@
 .ansi_CHAR
 
 	push ix
-	ld ix,chline_buffer
 	call swapgfxbk
+	
+	ld	b,a		;save character
+	ld	a,ansicharacter_pixelwidth
+	cp	8
+	ld	a,b
+	jr	nz,ansi_CHAR_flexible
+	
+; So we can fast path 32 column printing
+	ld	hl,ansifont	- 256
+	ld de,8
+	push de
+.LFONT2
+	add hl,de
+	djnz LFONT2
+	pop bc		; 8
+	ld	a,(ansi_COLUMN)
+	add a
+	add a
+	add a
+	ld	e,a
+	ld	a,(ansi_ROW)
+	ld	d,a
+	ld (RIGA2+1),de	
+		ld ix,LDIRVM
+		call	msxbios
+	jp	RIGA2
+	
+	
 
+.ansi_CHAR_flexible
+	ld ix,chline_buffer
   ld (char+1),a
   
   ld a,(ansi_ROW)       ; Line text position
@@ -103,6 +146,7 @@
   add hl,hl
   add hl,de
   ld (RIGA+1),hl
+  ld (RIGA2+1),hl
 
 
 ;**************
@@ -165,12 +209,14 @@
   djnz L1
 .DTS
   
-  ld a,ansifont_is_packed
-  and  a
   ld a,(hl)
 .BOLD
   nop	;	rla
   nop	;	or (hl)
+  ld b,a
+  ld a,ansifont_is_packed
+  and  a
+  ld a,b
   jr   z,INVRS
 
 .ROLL
@@ -238,17 +284,18 @@
          ld       a,(chline_buffer+1)
          out      (VDP_DATA), a
 		 
-	ld de,8192-8	; next row
-	add hl,de
+;	ld de,8192-8	; attribute
+;	add hl,de
 		 
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         out      (VDP_CMD), a
-         ld       a,(msx_attr)
-         out      (VDP_DATA), a
+;         ld       a,l		; LSB of video memory ptr
+;         out      (VDP_CMD),a
+;         ld       a,h		; MSB of video mem ptr
+;         and      @00111111	; masked with "write command" bits
+;         or       @01000000
+;         out      (VDP_CMD), a
+;         ld       a,(msx_attr)
+;         out      (VDP_DATA), a
+
 ;**************
 	pop hl
 	inc hl
@@ -282,10 +329,19 @@
   inc hl
   dec c
   jp nz,PRE
+  
+.RIGA2
+  ld de,0
+  ld hl,8192
+  add hl,de
+  ld a,(msx_attr)
+  ld bc,8
+	ld ix,FILVRM
+	call	msxbios
   jp __graphics_end
 
 
-	SECTION bss_clib
+;	SECTION bss_clib
 	
 .chline_buffer
 	defs 2

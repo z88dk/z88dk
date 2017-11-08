@@ -1,0 +1,91 @@
+
+
+
+	MODULE	Issue_480_asmfunc
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._isr1
+		EXTERN	asm_im2_push_registers_8080
+
+		EXTERN	asm_im2_pop_registers_8080
+
+	
+
+		call	asm_im2_push_registers_8080
+
+		call	__im2_isr_8080_isr1
+
+		call	asm_im2_pop_registers_8080
+
+	
+
+		ei
+
+		reti
+
+	
+	ret
+
+
+
+.__im2_isr_8080_isr1
+	ld	hl,(_x)
+	inc	hl
+	ld	(_x),hl
+	ret
+
+
+
+._isr2
+		EXTERN	asm_im2_push_registers
+
+		EXTERN	asm_im2_pop_registers
+
+	
+
+		call	asm_im2_push_registers
+
+		call	__im2_isr_isr2
+
+		call	asm_im2_pop_registers
+
+	
+
+		ei
+
+		reti
+
+	
+	ret
+
+
+
+.__im2_isr_isr2
+	ld	hl,(_x)
+	inc	hl
+	ld	(_x),hl
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._x	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_x
+	GLOBAL	_isr1
+	GLOBAL	__im2_isr_8080_isr1
+	GLOBAL	_isr2
+	GLOBAL	__im2_isr_isr2
+
+
+
+

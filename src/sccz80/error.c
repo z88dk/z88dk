@@ -245,29 +245,40 @@ void debug(int num, char* str, ...)
     fprintf(stderr, "\n");
 }
 
+void warningva(const char *fmt, va_list ap)
+{
+    fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+}
+
+
 void warning(int num, ...)
 {
     va_list ap;
     if (mywarn[num].suppress == 0) {
-        fprintf(stderr, "sccz80:%s L:%d Warning:#%d:", Filename, lineno, num);
         va_start(ap, num);
-        vfprintf(stderr, mywarn[num].warn, ap);
+        warningva(mywarn[num].warn, ap);
         va_end(ap);
-        fprintf(stderr, "\n");
     }
 }
 
-void error(int num, ...)
+void warningfmt(const char *fmt, ...)
 {
     va_list ap;
 
-    fprintf(stderr, "sccz80:%s L:%d Error:#%d:", Filename, lineno, num);
-    va_start(ap, num);
-    vfprintf(stderr, myerrors[num].error, ap);
+    va_start(ap, fmt);
+    warningva(fmt, ap);
     va_end(ap);
+}
+
+
+
+void errorva(int fatal, const char *fmt, va_list ap)
+{
+    fprintf(stderr, "sccz80:%s L:%d Error:", Filename, lineno);
+    vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
-    if (myerrors[num].fatal != 0)
-        ccabort();
     ++errcnt;
     if (c_errstop) {
         fprintf(stderr, "Continue (Y\\N) ?\n");
@@ -279,3 +290,21 @@ void error(int num, ...)
         ccabort();
     }
 }
+
+void error(int num, ...)
+{
+    va_list ap;
+    va_start(ap, num);
+    errorva(myerrors[num].fatal , myerrors[num].error, ap);
+    va_end(ap);
+}
+
+void errorfmt(const char *fmt, int fatal, ...)
+{
+    va_list ap;
+
+    va_start(ap, fatal);
+    errorva(fatal, fmt, ap);
+    va_end(ap);
+}
+

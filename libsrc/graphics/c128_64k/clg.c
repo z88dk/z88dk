@@ -20,7 +20,7 @@ extern ushort    vdcAttrMem;
 
 /* Clear Graphics */
 
-int clg()
+void clg()
 {
   vdcBitMapMemSize = 49152;
   set64kvdc();          /* set 64k mode */

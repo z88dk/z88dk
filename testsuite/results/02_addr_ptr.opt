@@ -9,7 +9,6 @@
 
 	SECTION	code_compiler
 
-
 ._main
 	ld	hl,58056	;const
 	ld	(hl),#(100 % 256 % 256)
@@ -20,15 +19,12 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	PUBLIC	_main
+	GLOBAL	_main
 
 
 

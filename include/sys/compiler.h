@@ -13,6 +13,7 @@
 #define __Z88DK_R2L_CALLING_CONVENTION 1
 #define __stdc
 #define __z88dk_deprecated
+#define __z88dk_sdccdecl
 #else
 #define __vasmallc __smallc
 #define __z88dk_deprecated

@@ -184,8 +184,6 @@ jp bucle_texto0
 
 
 .cpc_PutSp0
-		;defb $fD
-   		;LD H,8		;ALTO, SE PUEDE TRABAJAR CON HX DIRECTAMENTE
 		ld iyh,8		; undocumented instruction
 		ld b,7
 		ld c,b
@@ -196,8 +194,6 @@ jp bucle_texto0
 		ldi
 		ldi
 		
-	   ;defb $fD
-	   ;dec H
 	   dec iyh		; undocumented instruction
 	   ret z	
 	   ex de,hl   	   
@@ -272,8 +268,7 @@ djnz bucle_alto
 ret
 
 
-
-	SECTION	data_clib
+	SECTION	bss_clib
 
 
 .elementos_cola
@@ -293,11 +288,5 @@ ret
 .direcc_destino
  defw 0
 
-.byte_tmp defs 2
-
-;defb @00000000,  @01010100, @00010000, @00000101  ;@00000001, @00000101, @00010101, @00000000
-
 .letra_decodificada
  defs 16	;uso este espacio para guardar la letra que se decodifica
-
-

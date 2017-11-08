@@ -7,11 +7,14 @@
  #ifndef DEFINE_H
  #define DEFINE_H
 
- #include "lib/uthash.h"
+ #include "uthash.h"
+ #include "utstring.h"
+ 
 
 
-#define MALLOC(x)   mymalloc(x)
-#define CALLOC(x,y) mymalloc(x * y)
+#define MALLOC(x)   malloc(x)
+#define CALLOC(x,y) calloc(x,y)
+#define REALLOC(x,y) realloc(x,y)
 #define FREENULL(x) do { if  (x != NULL ) { free(x); x = NULL; } } while (0)
 
 /*      Stand-alone definitions                 */
@@ -34,12 +37,9 @@
  #define NAMESIZE 127
 #endif
 
-#define MAXARGS 20
 
 /*      Define the symbol table parameters      */
 
-/* Stefano  - doubled the global symbol table size */
-/* Aralbrec - doubled the global symbol table size again! */
 
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -50,66 +50,126 @@
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
-enum ident_type {
-    NO_IDENT = 0,
-    VARIABLE = 1,
-    ARRAY,
-    POINTER,
-    FUNCTION,
-    MACRO,
-    FUNCTIONP,
-    GOTOLABEL,
-    /* Only used is processing, not in symbol table */
-    PTR_TO_FN,
-    PTR_TO_PTR,
-    PTR_TO_FNP
+typedef enum {
+    MODE_NONE,
+    MODE_TYPEDEF,
+    MODE_EXTERN,
+    MODE_CAST
+} decl_mode;
+
+typedef enum {
+    KIND_NONE,
+    KIND_VOID,
+    KIND_CHAR,
+    KIND_SHORT,
+    KIND_INT,
+    KIND_LONG,
+    KIND_FLOAT,
+    KIND_DOUBLE,
+    KIND_ARRAY,
+    KIND_PTR,
+    KIND_CPTR,
+    KIND_STRUCT, // 11
+    KIND_FUNC,
+    KIND_ELLIPSES,
+    KIND_PORT8,
+    KIND_PORT16,
+    KIND_ENUM,
+    KIND_CARRY
+} Kind;
+
+
+typedef struct {
+    size_t    size;
+    void    **elems;
+    void    (*destructor)(void *);
+} array;
+
+typedef struct type_s Type;
+
+
+
+struct type_s {
+    Kind      kind;
+    int       size;
+    char      isunsigned;
+    char      isconst;
+    char      isfar;  // Valid for pointers/array
+    char      name[NAMESIZE]; 
+    
+    Type     *ptr;   // For array, or pointer
+    int       len;   // Length of the array
+    
+    int32_t   value; // For enum, goto position
+    
+    // Structures
+    Type   *tag;     // Reference to the structure type
+    array    *fields; // Fields within the structure (Type)
+    size_t    offset;  // Offset to the member
+    char      weak;
+    char      isstruct;
+    
+    // Function
+    Type    *return_type;
+    array    *parameters; // (Type)
+    uint32_t  flags;        // Fast call etc
+    char      hasva;
+    char      oldstyle;
+    UT_hash_handle hh;
 };
 
+extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double;
+
+
+enum ident_type {
+        ID_VARIABLE = 1,
+        ID_MACRO,
+        ID_GOTOLABEL,
+        ID_ENUM,
+    };
+
+
 enum storage_type {
-    UNKNOWN = 0,
-    STATIK = 1,
-    STKLOC = 2,
-    EXTERNAL = 3,
-    EXTERNP = 4,
-    DECLEXTN = 5,
-    LSTATIC = 6,
-    FAR = 7 ,
-    LSTKEXT = 8,
-    TYPDEF = 9,
-    STATIC_INITIALISED = 10,
+    STATIK,        /* Implemented in this file, export */
+    STKLOC,        /* On the stack */
+    EXTERNAL,      /* External to this file */
+    EXTERNP,       /* Extern @ */
+    LSTATIC,       /* Static to this file */
+    TYPDEF,
 };
 
 
 /* Symbol flags, | against each other */
 enum symbol_flags {
         FLAGS_NONE = 0,
-        UNSIGNED = 1,
-        FARPTR = 2,
-        FARACC = 4,
-        FASTCALL = 8,     /* for certain lib calls only */
-        SHARED = 16,     /* Call via shared library method (append _s) */
-        SHAREDC = 32,     /* Call via rst (library is C code) */
-        CALLEE = 64,      /* Called function pops regs */
-        LIBRARY = 128,    /* Lib routine */
-        SAVEFRAME = 256,  /* Save framepointer */
-        SMALLC = 512,      /* L->R calling order */
-        FLOATINGDECL = 1024, /* For a function pointer, the calling convention is floating */
-        NAKED = 2048,      /* Function is naked - don't generate any code */
-        CRITICAL = 4096    /* Disable interrupts around the function */
+    //    UNSIGNED = 1,
+        FARPTR = 0x02,
+        FARACC = 0x04,
+        FASTCALL = 0x08,     /* for certain lib calls only */
+        SHARED = 0x10,     /* Call via shared library method (append _s) */
+        SHAREDC = 0x20,     /* Call via rst (library is C code) */
+        CALLEE = 0x40,      /* Called function pops regs */
+        LIBRARY = 0x80,    /* Lib routine */
+        SAVEFRAME = 0x100,  /* Save framepointer */
+        SMALLC = 0x200,      /* L->R calling order */
+        FLOATINGDECL = 0x400, /* For a function pointer, the calling convention is floating */
+        NAKED = 0x800,      /* Function is naked - don't generate any code */
+        CRITICAL = 0x1000,    /* Disable interrupts around the function */
+        SDCCDECL = 0x2000   /* Function uses sdcc convention for chars */
 };
 
 
 
 /*      Define symbol table entry format        */
 
-typedef struct tagsymbol_s TAG_SYMBOL;
 typedef struct symbol_s SYMBOL;
 
 
 struct symbol_s {
         char name[NAMESIZE] ;
         enum ident_type ident;
-        char type ;          /* DOUBLE, CINT, CCHAR, STRUCT */
+        Kind type;
+        Type *ctype;                     /* Type of this symbol */
         enum storage_type storage ;       /* STATIK, STKLOC, EXTERNAL */
         union xx  {          /* offset has a number of interpretations: */
                 int i ;      /* local symbol:  offset into stack */
@@ -122,11 +182,10 @@ struct symbol_s {
         int  more ;          /* index of linked entry in dummy_sym */
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */
-        char prototyped;
         char isconst;        /* Set if const, affects the section the data goes into */
         char isassigned;     /* Set if we have assigned to it once */
-        uint32_t  args[MAXARGS];       /* arguments */
-        unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
+        char initialised;    /* Initialised at compile time */
+        char func_defined;   /* The function has been defined */
         enum symbol_flags flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer
@@ -137,70 +196,10 @@ struct symbol_s {
 };
 
 
-/*      Define possible entries for "type"      */
-
-
-#define DOUBLE  1
-#define CINT    2
-#define CCHAR   3
-#define LONG    4       /* was 5 */
-#define CPTR    5       /* was 6  - 3 byte pointer */
-#define STRUCT  6       /* was 4 */
-#define VOID    7       /* This does actually do sommat now */
-#define ELLIPSES 8      /* Used for ANSI defs */
-#define ENUM    9       /* ONly used in symbol table */
-#define CARRY   10      /* Carry stuff */
-#define PORT8   11
-#define PORT16  12
-
-/*
- *      Value of ellipses in prototypes
- */
-
-#define PELLIPSES 255
-
-/*
- *      Mask of sign in prototype
- */
-
-#define PMASKSIGN (UNSIGNED << 16)
-
-/*
- *      What void comes out to in a prototype
- */
-
-#define PVOID 0x107
-
-/* number of types to which pointers to pointers can be defined */
-/* 15 is more than enough! we need some dummy symbols so casting of **
- * types will work..
- */
-
-#define NTYPE   15
 
 
 
-/*      Define the structure tag table parameters */
 
-#define NUMTAG          300
-#define STARTTAG        tagtab
-#define ENDTAG          tagtab+NUMTAG
-
-struct tagsymbol_s {
-        char name[NAMESIZE] ;     /* structure tag name */
-        int size ;                /* size of struct in bytes */
-	char weak; 		  /* Not fully defined */
-        SYMBOL *ptr ;             /* pointer to first member */
-        SYMBOL *end ;             /* pointer to beyond end of members */
-} ;
-
-
-
-/*      Define the structure member table parameters */
-
-#define NUMMEMB         2000
-#define STARTMEMB       membtab
-#define ENDMEMB         (membtab+NUMMEMB)
 
 /* switch table */
 
@@ -291,39 +290,14 @@ struct gototab_s {
 #define STCRITICAL      14
 
 
-/* Maximum number of errors before we barf */
-
+/* Maximum number of (non fatal) errors before we quit */
 #define MAXERRORS 10
 
 /* Maximum number of nested levels */
-
 #define MAX_LEVELS 100
 
-/* Extract from the packed argument value */
-#define GET_PACKED_TYPE(v)  (v & 0xff)
-#define GET_PACKED_IDENT(v) ((v >> 8) & 0xff)
-#define GET_PACKED_FLAGS(v) ((v >> 16) & 0xffff)
 
 
-/*
- * djm, function for variable definitions now
- */
-
-struct varid {
-        unsigned char type;
-        unsigned char zfar;
-        unsigned char sign;
-        unsigned char sflag;
-        unsigned char isconst;
-        enum ident_type ident;
-        int     more;
-};
-
-/* defines for globalisation */
-
-#define XDEF 0
-#define XREF 1
-#define LIB  2
 
 /* Defines for debugging */
 
@@ -381,35 +355,43 @@ typedef struct lvalue_s LVALUE;
 
 struct lvalue_s {
         SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
-        int indirect ;                  /* type of indirect object, 0 for static object */
+        Type   *ltype;
+        Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
         int ptr_type ;                  /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         double const_val ;                        /* value of constant expression (& other uses) */
-        TAG_SYMBOL *tagsym ;    /* tag symbol address, 0 if not struct */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
+        Type *stage_add_ltype;          /* Type at stage_add being set */
         int val_type ;                  /* type of value calculated */
-	int oldval_type;		/* What the valtype was */
+	Kind oldval_kind;		/* What the valtype was */
         enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
-        enum ident_type ident;          /* ident (from symbol table) */
-        enum storage_type storage;	/* storage (from sym tab) */
-        char c_id;                      /* ident of cast        */
-        char c_vtype;                   /* type of value calc if cast */
-        char c_flags;                   /* flags for casting */
-	int  level;		/* Parenth level (cast) */
-	int  castlevel;
-	int  offset;
-        TAG_SYMBOL *c_tag;               
+ //       enum ident_type ident;          /* ident (from symbol table) */
+     //   enum storage_type storage;	/* storage (from sym tab) */
+        Type *cast_type;
+	//int  level;		/* Parenth level (cast) */
+        int  offset;
+        int  base_offset;               /* Where the variable is located on the stack */
 } ;
 
 /* Enable optimisations that are longer than the conventional sequence */ 
 enum optimisation {
         OPT_LSHIFT32 = (1 << 0 ),
         OPT_RSHIFT32 = (1 << 1 ),
-        OPT_ADD32    = (1 << 2 )
+        OPT_ADD32    = (1 << 2 ),
+        OPT_SUB16    = (1 << 3 ),
+        OPT_SUB32    = (1 << 4 )
 };
 
+
+#define dump_type(type) do { \
+        UT_string *output; \
+        utstring_new(output); \
+        type_describe(type,output); \
+        printf("%s\n", utstring_body(output)); \
+        utstring_free(output); \
+    } while (0)
 
 #endif

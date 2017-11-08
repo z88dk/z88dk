@@ -56,7 +56,7 @@ int x_hr,y_hr;
 int i,j,k;
 int sz, long_sz, short_sz;
 int cx,cy;
-int tm;
+long tm;
 char hr[10],mn[10];
 
 main()

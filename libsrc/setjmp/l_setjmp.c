@@ -11,7 +11,7 @@
 #include <setjmp.h>
 
 
-int l_setjmp(jmp_buf env)
+int l_setjmp(jmp_buf *env)
 {
 #pragma asm
 	pop	bc	;return address

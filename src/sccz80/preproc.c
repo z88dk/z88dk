@@ -225,7 +225,7 @@ void addmac()
         clear();
         return;
     }
-    addglb(sname, MACRO, 0, macptr, STATIK, 0, 0);
+    addglb(sname, type_void, ID_MACRO, 0, macptr, STATIK);
     while (ch() == ' ' || ch() == '\t')
         gch();
     while (putmac(gch()))
@@ -259,7 +259,7 @@ char putmac(char c)
 int findmac(char* sname)
 {
     SYMBOL *ptr;
-    if ( ( ptr = findglb(sname)) != NULL && ptr->ident == MACRO) {
+    if ( ( ptr = findglb(sname)) != NULL && ptr->ident == ID_MACRO) {
         return (ptr->offset.i);
     }
     return (0);

@@ -9,18 +9,15 @@
 
 
 
-
 	SECTION	bss_compiler
-
 	SECTION	code_compiler
 
 
 
-
-	EXTERN	_func
-	EXTERN	_func2
-	EXTERN	_func3
-	EXTERN	_func4
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_func3
+	GLOBAL	_func4
 
 
 

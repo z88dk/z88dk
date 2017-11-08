@@ -19,26 +19,26 @@ byte ozgetautorun(void);
 
 byte ozgetmembyte(unsigned page, unsigned offset);
 
-extern __LIB__ ozfarmemcpy(unsigned dest_page,unsigned dest_offset,unsigned src_page,
+extern void __LIB__ ozfarmemcpy(unsigned dest_page,unsigned dest_offset,unsigned src_page,
   unsigned src_offset,unsigned length) __smallc;
 
-extern __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length) __smallc;
+extern void __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length) __smallc;
 
-extern __LIB__ ozexitto(unsigned key);
-extern __LIB__ ozfast(void);
+extern void __LIB__ ozexitto(unsigned key);
+extern void __LIB__ ozfast(void);
 //void ozslow(void);
 #define ozslow ozunblankscreen
 
-extern __LIB__ ozkeyclick(void);
+extern void __LIB__ ozkeyclick(void);
 
-extern __LIB__ ozdelay(unsigned d);
+extern void __LIB__ ozdelay(unsigned d);
 //void exit(int ignored_exit_code);
 extern byte __LIB__ ozportin(int port);
-extern __LIB__ ozportout(int port, int value) __smallc;
+extern void __LIB__ ozportout(int port, int value) __smallc;
 
-extern __LIB__ ozsound(unsigned value);
-extern __LIB__ ozquiet(void);
-extern __LIB__ ozinitsound(void);
+extern void __LIB__ ozsound(unsigned value);
+extern void __LIB__ ozquiet(void);
+extern void __LIB__ ozinitsound(void);
 
 
 
@@ -69,15 +69,15 @@ char __LIB__ *ozgetnextfilename(byte mode);
 
 
 byte __LIB__ ozgetpowerkeyhandling(void);
-extern __LIB__  ozsetpowerkeyhandling(int state);
+extern void __LIB__  ozsetpowerkeyhandling(int state);
 
 extern unsigned __LIB__ ozkeydelay64hz(unsigned len);
-extern __LIB__  ozdelay64hz(unsigned length);
+extern void __LIB__  ozdelay64hz(unsigned length);
 
-extern __LIB__  oz64hztimeron(void);
-extern __LIB__  oz64hztimeroff(void);
+extern void __LIB__  oz64hztimeron(void);
+extern void __LIB__  oz64hztimeroff(void);
 extern byte __LIB__ ozget64hztimerstate(void);
-extern __LIB__  ozinstallmemorywiper(void);
+extern void __LIB__  ozinstallmemorywiper(void);
 
 extern byte __LIB__  _ozprogoptions;
 extern byte __LIB__  _ozclick_setting;

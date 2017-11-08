@@ -27,6 +27,10 @@
 #define CLOCKS_PER_SEC 1
 #endif
 
+#ifdef __MTX__
+#define CLOCKS_PER_SEC 125
+#endif
+
 #ifdef __MC1000__
 #define CLOCKS_PER_SEC 368
 #endif

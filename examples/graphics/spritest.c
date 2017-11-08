@@ -58,13 +58,13 @@ extern char arrow_mask[];
 extern char arrow_bk[];
 
 #asm
-.smc_bullet
+._bullet
  defb	11,3
  defb	@11100000, @11100000
  defb	@10111111, @10100000
  defb	@11100000, @11100000
 
-.smc_arrow
+._arrow
  defb	8,8
  defb	@00000000
  defb	@01100000
@@ -75,7 +75,7 @@ extern char arrow_bk[];
  defb	@00001100
  defb	@00000000
  
-.smc_arrow_mask
+._arrow_mask
  defb	8,8
  defb	@11100000
  defb	@10010000
@@ -87,7 +87,7 @@ extern char arrow_bk[];
  defb	@00011110
 
 
-.smc_arrow_bk
+._arrow_bk
  defb	8,8
  defw	0
  defb	0,0,0,0,0,0,0,0

@@ -9,6 +9,7 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup
+time/msx/clock
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/clg
