@@ -9,10 +9,10 @@
 ;
 
         SECTION   bss_clib
-        PUBLIC    cpc_KeysData
+;        PUBLIC    cpc_KeysData
         PUBLIC    keymap
 
-.cpc_KeysData
+;.cpc_KeysData
 .keymap defs 10
 
 
