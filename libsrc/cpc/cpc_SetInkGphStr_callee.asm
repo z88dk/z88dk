@@ -12,7 +12,6 @@
         PUBLIC    ASMDISP_CPC_SET_INKGPHSTR_CALLEE
 		
         EXTERN colores_camb
-		EXTERN cpc_PrintGphStr0
 
         INCLUDE "cpcfirm.def"              
 
@@ -27,7 +26,7 @@
 
 .asmentry
 	
-ld hl,colores_camb+cpc_PrintGphStr0
+ld hl,colores_camb
 ld b,0
 add hl,bc
 ld (hl),a
