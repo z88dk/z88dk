@@ -16,7 +16,6 @@
         PUBLIC    _cpc_AssignKey_callee
         PUBLIC    ASMDISP_CPC_ASSIGNKEY_CALLEE
 		
-		EXTERN    cpc_KeysData
 		EXTERN    tabla_teclas
 
 .cpc_AssignKey_callee
@@ -45,7 +44,7 @@
 	sla e
 	;ld e,a
 	;ld d,0
-	ld hl,tabla_teclas+cpc_KeysData
+	ld hl,tabla_teclas
 
 ; gracias a Mochilote por detectar un error aquí:	
 	add hl,de ;Nos colocamos en la tecla a redefinir y la borramos
