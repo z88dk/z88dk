@@ -21,3 +21,10 @@ _divu_:
    push af
    
    jp asm__divu
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __divu_
+defc __divu_ = _divu_
+ENDIF
+

@@ -17,3 +17,10 @@ _div__callee:
    push af
    
    jp asm__div
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __div__callee
+defc __div__callee = _div__callee
+ENDIF
+
