@@ -2,8 +2,9 @@
 
 __at (0x4000) char c = 1;
 
-// This kind can't be initialised since it ends up as an expression
-extern int d @0x8000;
+extern char b @ 0x7000;
+
+extern int d @(0x8000) = 22;
 
 __at (0x3000) int e = 8192;
 

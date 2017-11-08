@@ -854,12 +854,24 @@ Type *dodeclare(enum storage_type storage)
         sym->isassigned = 1; // Assigned to 0
      
         snprintf(drop_name, sizeof(drop_name), "%s", type->name);
-        /* We can catch @ here? Need to flag sym somehow */
+
+
+        // Handle the @ syntax. If the address is wrapped in ( ) then we can assign something to it
         if ( cmatch('@')) {
             Kind valtype;
             double val;
+            char brackets = 0;
+
+            
+            if ( cmatch('(')) {
+                brackets = 1;
+            }
 
             constexpr(&val,&valtype, 1);
+
+            if ( brackets ) {
+                needchar(')');
+            }
 
             // If initialised, the drop name should be something different
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);            
@@ -882,6 +894,12 @@ Type *dodeclare(enum storage_type storage)
         } else if ( cmatch(',')) {
             continue;
         } 
+
+        if ( type->kind == KIND_FUNC ) {
+            errorfmt("Cannot initialise function '%s' to a constant", 1, type->name);
+            junk();
+            return type;
+        }
 
         needchar('=');
         sym->initialised = 1;
