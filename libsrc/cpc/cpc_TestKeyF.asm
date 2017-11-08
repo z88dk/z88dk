@@ -12,7 +12,7 @@
         PUBLIC    cpc_TestKeyF
         PUBLIC    _cpc_TestKeyF
         
-		EXTERN cpc_KeysData
+		;EXTERN cpc_KeysData
         EXTERN keymap
 		EXTERN tabla_teclas
 		
@@ -21,14 +21,14 @@
 	SLA L
 	inc l
 	ld h,0
-	ld de,cpc_KeysData+tabla_teclas
+	ld de,tabla_teclas
 	add hl,de
 	
 	ld a,(HL)
 	sub $40
 
 	ex de,hl
-	ld hl,cpc_KeysData+keymap	;; lee la línea buscada del keymap
+	ld hl,keymap	;; lee la línea buscada del keymap
 	ld c,a
 	ld b,0
 	add hl,bc

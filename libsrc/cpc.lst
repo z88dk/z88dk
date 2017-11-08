@@ -45,6 +45,9 @@ cpc/cpc_set_palette_callee
 cpc/cpc_SetBorder
 cpc/cpc_SetColour
 cpc/cpc_SetColour_callee
+cpc/cpc_SetInkGphStr
+cpc/cpc_SetInkGphStr_callee
+cpc/cpc_ScanKeyboard
 cpc/cpc_TestKeyboard
 cpc/cpc_AnyKeyPressed
 cpc/cpc_AssignKey
@@ -60,6 +63,8 @@ cpc/cpc_DisableFirmware
 cpc/cpc_ClrScr
 cpc/cpc_Chars
 cpc/cpc_Chars8
+cpc/cpc_GetScrAddress
+cpc/cpc_GetScrAddress_callee
 cpc/cpc_GetScrAddress0
 cpc/cpc_PrintStr
 cpc/cpc_PrintGphStr0
