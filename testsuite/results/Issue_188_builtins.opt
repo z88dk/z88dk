@@ -186,251 +186,128 @@
 
 
 	GLOBAL	bcmp
-	GLOBAL	_bcmp
 	GLOBAL	bcmp_callee
-	GLOBAL	_bcmp_callee
 	GLOBAL	bcopy
-	GLOBAL	_bcopy
 	GLOBAL	bcopy_callee
-	GLOBAL	_bcopy_callee
 	GLOBAL	bzero
-	GLOBAL	_bzero
 	GLOBAL	bzero_callee
-	GLOBAL	_bzero_callee
 	GLOBAL	index
-	GLOBAL	_index
 	GLOBAL	index_callee
-	GLOBAL	_index_callee
 	GLOBAL	rindex
-	GLOBAL	_rindex
 	GLOBAL	rindex_callee
-	GLOBAL	_rindex_callee
 	GLOBAL	strset
-	GLOBAL	_strset
 	GLOBAL	strset_callee
-	GLOBAL	_strset_callee
 	GLOBAL	strnset
-	GLOBAL	_strnset
 	GLOBAL	strnset_callee
-	GLOBAL	_strnset_callee
 	GLOBAL	rawmemchr
-	GLOBAL	_rawmemchr
 	GLOBAL	rawmemchr_callee
-	GLOBAL	_rawmemchr_callee
 	GLOBAL	_memlwr_
-	GLOBAL	__memlwr_
 	GLOBAL	_memlwr__callee
-	GLOBAL	__memlwr__callee
 	GLOBAL	_memstrcpy_
-	GLOBAL	__memstrcpy_
 	GLOBAL	_memstrcpy__callee
-	GLOBAL	__memstrcpy__callee
 	GLOBAL	_memupr_
-	GLOBAL	__memupr_
 	GLOBAL	_memupr__callee
-	GLOBAL	__memupr__callee
 	GLOBAL	_strrstrip_
-	GLOBAL	__strrstrip_
 	GLOBAL	ffs
-	GLOBAL	_ffs
 	GLOBAL	ffsl
-	GLOBAL	_ffsl
 	GLOBAL	memccpy
-	GLOBAL	_memccpy
 	GLOBAL	memccpy_callee
-	GLOBAL	_memccpy_callee
 	GLOBAL	memchr
-	GLOBAL	_memchr
 	GLOBAL	memchr_callee
-	GLOBAL	_memchr_callee
 	GLOBAL	memcmp
-	GLOBAL	_memcmp
 	GLOBAL	memcmp_callee
-	GLOBAL	_memcmp_callee
 	GLOBAL	memcpy
-	GLOBAL	_memcpy
 	GLOBAL	memcpy_callee
-	GLOBAL	_memcpy_callee
 	GLOBAL	memmem
-	GLOBAL	_memmem
 	GLOBAL	memmem_callee
-	GLOBAL	_memmem_callee
 	GLOBAL	memmove
-	GLOBAL	_memmove
 	GLOBAL	memmove_callee
-	GLOBAL	_memmove_callee
 	GLOBAL	memrchr
-	GLOBAL	_memrchr
 	GLOBAL	memrchr_callee
-	GLOBAL	_memrchr_callee
 	GLOBAL	memset
-	GLOBAL	_memset
 	GLOBAL	memset_callee
-	GLOBAL	_memset_callee
 	GLOBAL	memswap
-	GLOBAL	_memswap
 	GLOBAL	memswap_callee
-	GLOBAL	_memswap_callee
 	GLOBAL	stpcpy
-	GLOBAL	_stpcpy
 	GLOBAL	stpcpy_callee
-	GLOBAL	_stpcpy_callee
 	GLOBAL	stpncpy
-	GLOBAL	_stpncpy
 	GLOBAL	stpncpy_callee
-	GLOBAL	_stpncpy_callee
 	GLOBAL	strcasecmp
-	GLOBAL	_strcasecmp
 	GLOBAL	strcasecmp_callee
-	GLOBAL	_strcasecmp_callee
 	GLOBAL	strcat
-	GLOBAL	_strcat
 	GLOBAL	strcat_callee
-	GLOBAL	_strcat_callee
 	GLOBAL	strchr
-	GLOBAL	_strchr
 	GLOBAL	strchr_callee
-	GLOBAL	_strchr_callee
 	GLOBAL	strchrnul
-	GLOBAL	_strchrnul
 	GLOBAL	strchrnul_callee
-	GLOBAL	_strchrnul_callee
 	GLOBAL	strcmp
-	GLOBAL	_strcmp
 	GLOBAL	strcmp_callee
-	GLOBAL	_strcmp_callee
 	GLOBAL	strcoll
-	GLOBAL	_strcoll
 	GLOBAL	strcoll_callee
-	GLOBAL	_strcoll_callee
 	GLOBAL	strcpy
-	GLOBAL	_strcpy
 	GLOBAL	strcpy_callee
-	GLOBAL	_strcpy_callee
 	GLOBAL	strcspn
-	GLOBAL	_strcspn
 	GLOBAL	strcspn_callee
-	GLOBAL	_strcspn_callee
 	GLOBAL	strdup
-	GLOBAL	_strdup
 	GLOBAL	strerror
-	GLOBAL	_strerror
 	GLOBAL	stricmp
-	GLOBAL	_stricmp
 	GLOBAL	stricmp_callee
-	GLOBAL	_stricmp_callee
 	GLOBAL	strlcat
-	GLOBAL	_strlcat
 	GLOBAL	strlcat_callee
-	GLOBAL	_strlcat_callee
 	GLOBAL	strlcpy
-	GLOBAL	_strlcpy
 	GLOBAL	strlcpy_callee
-	GLOBAL	_strlcpy_callee
 	GLOBAL	strlen
-	GLOBAL	_strlen
 	GLOBAL	strlwr
-	GLOBAL	_strlwr
 	GLOBAL	strncasecmp
-	GLOBAL	_strncasecmp
 	GLOBAL	strncasecmp_callee
-	GLOBAL	_strncasecmp_callee
 	GLOBAL	strncat
-	GLOBAL	_strncat
 	GLOBAL	strncat_callee
-	GLOBAL	_strncat_callee
 	GLOBAL	strnchr
-	GLOBAL	_strnchr
 	GLOBAL	strnchr_callee
-	GLOBAL	_strnchr_callee
 	GLOBAL	strncmp
-	GLOBAL	_strncmp
 	GLOBAL	strncmp_callee
-	GLOBAL	_strncmp_callee
 	GLOBAL	strncpy
-	GLOBAL	_strncpy
 	GLOBAL	strncpy_callee
-	GLOBAL	_strncpy_callee
 	GLOBAL	strndup
-	GLOBAL	_strndup
 	GLOBAL	strndup_callee
-	GLOBAL	_strndup_callee
 	GLOBAL	strnicmp
-	GLOBAL	_strnicmp
 	GLOBAL	strnicmp_callee
-	GLOBAL	_strnicmp_callee
 	GLOBAL	strnlen
-	GLOBAL	_strnlen
 	GLOBAL	strnlen_callee
-	GLOBAL	_strnlen_callee
 	GLOBAL	strpbrk
-	GLOBAL	_strpbrk
 	GLOBAL	strpbrk_callee
-	GLOBAL	_strpbrk_callee
 	GLOBAL	strrchr
-	GLOBAL	_strrchr
 	GLOBAL	strrchr_callee
-	GLOBAL	_strrchr_callee
 	GLOBAL	strrcspn
-	GLOBAL	_strrcspn
 	GLOBAL	strrcspn_callee
-	GLOBAL	_strrcspn_callee
 	GLOBAL	strrev
-	GLOBAL	_strrev
 	GLOBAL	strrspn
-	GLOBAL	_strrspn
 	GLOBAL	strrspn_callee
-	GLOBAL	_strrspn_callee
 	GLOBAL	strrstrip
-	GLOBAL	_strrstrip
 	GLOBAL	strsep
-	GLOBAL	_strsep
 	GLOBAL	strsep_callee
-	GLOBAL	_strsep_callee
 	GLOBAL	strspn
-	GLOBAL	_strspn
 	GLOBAL	strspn_callee
-	GLOBAL	_strspn_callee
 	GLOBAL	strstr
-	GLOBAL	_strstr
 	GLOBAL	strstr_callee
-	GLOBAL	_strstr_callee
 	GLOBAL	strstrip
-	GLOBAL	_strstrip
 	GLOBAL	strtok
-	GLOBAL	_strtok
 	GLOBAL	strtok_callee
-	GLOBAL	_strtok_callee
 	GLOBAL	strtok_r
-	GLOBAL	_strtok_r
 	GLOBAL	strtok_r_callee
-	GLOBAL	_strtok_r_callee
 	GLOBAL	strupr
-	GLOBAL	_strupr
 	GLOBAL	strxfrm
-	GLOBAL	_strxfrm
 	GLOBAL	strxfrm_callee
-	GLOBAL	_strxfrm_callee
 	GLOBAL	strrstr
-	GLOBAL	_strrstr
 	GLOBAL	strrstr_callee
-	GLOBAL	_strrstr_callee
 	GLOBAL	memopi
-	GLOBAL	_memopi
 	GLOBAL	memopi_callee
-	GLOBAL	_memopi_callee
 	GLOBAL	memopd
-	GLOBAL	_memopd
 	GLOBAL	memopd_callee
-	GLOBAL	_memopd_callee
 	GLOBAL	__builtin_memset
-	GLOBAL	___builtin_memset
 	GLOBAL	__builtin_memcpy
-	GLOBAL	___builtin_memcpy
 	GLOBAL	__builtin_strcpy
-	GLOBAL	___builtin_strcpy
 	GLOBAL	__builtin_strchr
-	GLOBAL	___builtin_strchr
 	GLOBAL	_strchr1
 	GLOBAL	_strchr2
 	GLOBAL	_memset1

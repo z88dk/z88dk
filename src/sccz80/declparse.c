@@ -1478,6 +1478,7 @@ static void declfunc(Type *type, enum storage_type storage)
     col(); /* print function name */
     if (dopref(currfn) == NO) {
         nl();
+        GlobalPrefix(); outname(currfn->name, YES); nl();
         prefix();
         outname(currfn->name, YES);
         col();
