@@ -13,7 +13,7 @@
         PUBLIC    _cpc_RedefineKey
         
         EXTERN cpc_TestKeyboard
-        EXTERN cpc_KeysData
+        ;EXTERN cpc_KeysData
         EXTERN tabla_teclas
 
         INCLUDE "cpcfirm.def"              
@@ -36,7 +36,7 @@
 	
 	sla l
 	ld h,0
-	ld de,cpc_KeysData+tabla_teclas
+	ld de,tabla_teclas
 	;ld hl,cpc_TestKeyboard+tabla_teclas
 
 ; gracias a Mochilote por detectar un error aquí:	
@@ -100,7 +100,7 @@
 	;add $40
 	;ld (bte),A
 	ld b,12		;numero máximo de tecla redefinibles
-	ld ix,cpc_KeysData+tabla_teclas ;-2 ;tecla_0
+	ld ix,tabla_teclas ;-2 ;tecla_0
 	ld c,(ix+0)
 .bucle_bd_teclas
 ;comprobar byte	
