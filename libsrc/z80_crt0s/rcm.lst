@@ -4,5 +4,7 @@ crt0_rcm/l_long_asr_u.asm
 crt0_rcm/l_long_asr_uo.asm
 crt0_rcm/l_long_asl.asm
 crt0_rcm/l_long_aslo.asm
+crt0_rcm/l_long_or.asm
+crt0_rcm/l_long_and.asm
 @crt0.lst
 
