@@ -10,7 +10,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
-#include <sys/types.h>
+#include <stdint.h>
 
 
 /**********************************/
@@ -27,28 +27,34 @@
 extern int  __LIB__   atoi(const char *s) __z88dk_fastcall;
 extern long __LIB__   atol(const char *s) __z88dk_fastcall;
 
-extern int  __LIB__               itoa(int n, char *s, int radix) __smallc;
-extern int  __LIB__     itoa_callee(int n, char *s, int radix) __smallc __z88dk_callee;
-extern int  __LIB__               utoa(uint n, char *s, int radix) __smallc;
-extern int  __LIB__     utoa_callee(uint n, char *s, int radix) __smallc __z88dk_callee;
-extern int  __LIB__               ltoa(long n, char *s, int radix) __smallc;
-extern int  __LIB__     ltoa_callee(long n, char *s, int radix) __smallc __z88dk_callee;
-extern int  __LIB__               ultoa(unsigned long n, char *s, int radix) __smallc;
-extern int  __LIB__     ultoa_callee(unsigned long n, char *s, int radix) __smallc __z88dk_callee;
+extern char __LIB__ *itoa(int num,char *buf,int radix) __smallc;
+extern char __LIB__ *itoa_callee(int num,char *buf,int radix) __smallc __z88dk_callee;
+#define itoa(a,b,c) itoa_callee(a,b,c)
 
-#define itoa(a,b,c)  itoa_callee(a,b,c)
-#define utoa(a,b,c)  utoa_callee(a,b,c)
-#define ltoa(a,b,c)  ltoa_callee(a,b,c)
+extern char __LIB__ *ltoa(long num,char *buf,int radix) __smallc;
+extern char __LIB__ *ltoa_callee(long num,char *buf,int radix) __smallc __z88dk_callee;
+#define ltoa(a,b,c) ltoa_callee(a,b,c)
+
+extern long __LIB__ strtol(char *nptr,char **endptr,int base) __smallc;
+extern long __LIB__ strtol_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
+#define strtol(a,b,c) strtol_callee(a,b,c)
+
+
+extern uint32_t __LIB__ strtoul(char *nptr,char **endptr,int base) __smallc;
+extern uint32_t __LIB__ strtoul_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
+#define strtoul(a,b,c) strtoul_callee(a,b,c)
+
+extern char __LIB__ *ultoa(uint32_t num,char *buf,int radix) __smallc;
+extern char __LIB__ *ultoa_callee(uint32_t num,char *buf,int radix) __smallc __z88dk_callee;
 #define ultoa(a,b,c) ultoa_callee(a,b,c)
 
+
+extern char __LIB__ *utoa(uint16_t num,char *buf,int radix) __smallc;
+extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z88dk_callee;
+#define utoa(a,b,c) utoa_callee(a,b,c)
+
+
 // double strtod(char *s, char **endp);     /* check math library for availability */
-
-extern long          __LIB__               strtol(const char *s, char **endp, int base) __smallc;
-extern long          __LIB__     strtol_callee(const char *s, char **endp, int base) __smallc __z88dk_callee;
-extern unsigned long __LIB__               strtoul(const char *s, char **endp, int base) __smallc;
-
-#define strtol(a,b,c)  strtol_callee(a,b,c)
-#define strtoul(a,b,c) strtol_callee(a,b,c)
 
 #ifdef __SDCC
 /* 64 bit is only available with sdcc */
@@ -239,10 +245,7 @@ extern void __LIB__ _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long
 //////////////////////////
 
 extern int  __LIB__  abs(int n) __z88dk_fastcall;
-extern long __LIB__              labs(long n);
-extern long __LIB__    labs_callee(long n) __z88dk_callee;
-
-#define labs(a) labs_callee(a)
+extern long __LIB__  labs(long n) __z88dk_fastcall;
 
 extern uint __LIB__  isqrt(uint n) __z88dk_fastcall;
 

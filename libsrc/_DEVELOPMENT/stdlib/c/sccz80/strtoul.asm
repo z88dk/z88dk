@@ -21,3 +21,10 @@ strtoul:
    push af
 
    jp asm_strtoul
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtoul
+defc _strtoul = strtoul
+ENDIF
+

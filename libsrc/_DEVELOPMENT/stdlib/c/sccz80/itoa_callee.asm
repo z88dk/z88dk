@@ -16,3 +16,10 @@ itoa_callee:
    ex (sp),hl
    
    jp asm_itoa
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _itoa_callee
+defc _itoa_callee = itoa_callee
+ENDIF
+

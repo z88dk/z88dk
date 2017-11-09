@@ -21,3 +21,10 @@ _strtou_:
    push af
    
    jp asm__strtou
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __strtou_
+defc __strtou_ = _strtou_
+ENDIF
+

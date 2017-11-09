@@ -9,3 +9,10 @@ PUBLIC atol
 EXTERN asm_atol
 
 defc atol = asm_atol
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _atol
+defc _atol = atol
+ENDIF
+

@@ -18,3 +18,10 @@ ultoa_callee:
    push af
    
    jp asm_ultoa
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ultoa_callee
+defc _ultoa_callee = ultoa_callee
+ENDIF
+
