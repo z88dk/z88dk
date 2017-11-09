@@ -1,0 +1,35 @@
+
+
+
+	MODULE	Issue_507_unnamed_structs
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,1	;const
+	ld	(_foo+1+1),hl
+	ld	hl,2	;const
+	ld	(_bar+4),hl
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._foo	defs	10
+._bar	defs	6
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_foo
+	GLOBAL	_bar
+	GLOBAL	_func
+
+
+
+
