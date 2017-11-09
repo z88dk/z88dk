@@ -122,6 +122,21 @@ Type *find_tag_field(Type *tag, const char *fieldname)
     int    i;
     for ( i = 0; i < array_len(tag->fields) ; i++ ) {
         Type *field = array_get_byindex(tag->fields, i);
+
+        // Consider anonymous structs
+        if ( strlen(field->name) == 0 && field->kind == KIND_STRUCT ) {
+            size_t offset = field->offset;
+            field = find_tag_field(field->tag, fieldname);
+
+            // If we found it, return a copy of it and adjust the offset
+            if ( field ) {
+                Type *ret = CALLOC(1,sizeof(*ret));
+                *ret = *field;
+                ret->offset += offset;
+                return ret;
+            }
+            continue;
+        }
         if ( strcmp(field->name, fieldname) == 0 ) {
             return field;
         }
@@ -319,6 +334,9 @@ Type *parse_struct(Type *type, int isstruct)
             elem = dodeclare2(&base_type, MODE_NONE);
             
             if ( elem != NULL ) {
+                if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
+                    errorfmt("Member variables must be named",1);
+                }
                 elem->offset = offset;
                 if ( isstruct ) { 
                     offset += elem->size;
@@ -694,7 +712,7 @@ Type *parse_decl(char name[], Type *base_type)
 
     if ( symname(name) ) {
         // TODO, if we're casting then we shouldn't have a name
-    }
+    } 
     
     return parse_decl_tail(base_type);
 }
