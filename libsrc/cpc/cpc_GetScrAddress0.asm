@@ -13,7 +13,7 @@
 
 
 .cpc_GetScrAddress0
-; coordinates are in (L,A)
+; coordinates are in (A,L)
 	
 ;LD A,H
 LD (inc_ancho+1),A
