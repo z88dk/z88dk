@@ -27,3 +27,10 @@ _ldiv_:
    push af
    
    jp asm__ldiv
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __ldiv_
+defc __ldiv_ = _ldiv_
+ENDIF
+

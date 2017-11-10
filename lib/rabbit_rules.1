@@ -20,9 +20,11 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
+	ld	hl,%2
 =
 	ld	hl,(sp+%1)
 	ex	de,hl
+	ld	hl,%2
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const

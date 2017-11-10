@@ -16,3 +16,10 @@ strtol_callee:
    ex (sp),hl
    
    jp asm_strtol
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtol_callee
+defc _strtol_callee = strtol_callee
+ENDIF
+

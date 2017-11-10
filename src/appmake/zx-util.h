@@ -12,6 +12,7 @@ struct zx_common
     char          *excluded_banks;
     char          *excluded_sections;
     char           clean;
+    int            main_fence;
 };
 
 struct zx_tape

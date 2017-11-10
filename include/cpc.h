@@ -78,6 +78,11 @@ extern void __LIB__              cpc_PrintGphStrStdXY(int pen, char *text, int x
 extern void __LIB__    cpc_PrintGphStrStdXY_callee(int pen, char *text, int x, int y)  __smallc __z88dk_callee;
 #define cpc_PrintGphStrStdXY(a,b,c,d) cpc_PrintGphStrStdXY_callee(a,b,c,d)
 
+// Print at x,y at with a given pen color
+extern void __LIB__              cpc_PrintGphStrStdXY2X(int pen, char *text, int x, int y) __smallc ;
+extern void __LIB__    cpc_PrintGphStrStdXY2X_callee(int pen, char *text, int x, int y)  __smallc __z88dk_callee;
+#define cpc_PrintGphStrStdXY2X(a,b,c,d) cpc_PrintGphStrStdXY2X_callee(a,b,c,d)
+
 // Print at x,y  (fully coloured font)
 extern void __LIB__              cpc_PrintGphStrXY(char *text, int x, int y) __smallc ;
 extern void __LIB__    cpc_PrintGphStrXY_callee(char *text, int x, int y)  __smallc __z88dk_callee;

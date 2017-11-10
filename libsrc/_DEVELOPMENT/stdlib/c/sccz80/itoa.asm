@@ -21,3 +21,10 @@ itoa:
    push af
    
    jp asm_itoa
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _itoa
+defc _itoa = itoa
+ENDIF
+

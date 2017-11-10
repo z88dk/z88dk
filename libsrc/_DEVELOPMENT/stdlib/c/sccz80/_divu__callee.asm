@@ -17,3 +17,10 @@ _divu__callee:
    push af
    
    jp asm__divu
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __divu__callee
+defc __divu__callee = _divu__callee
+ENDIF
+

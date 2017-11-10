@@ -21,3 +21,10 @@ _div_:
    push af
    
    jp asm__div
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __div_
+defc __div_ = _div_
+ENDIF
+

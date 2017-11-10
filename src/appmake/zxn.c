@@ -20,7 +20,8 @@ static struct zx_common zxc = {
     NULL,       // banked_space
     NULL,       // excluded_banks
     NULL,       // excluded_sections
-    0           // clean
+    0,          // clean
+    -1          // main_fence applies to banked model compiles only
 };
 
 static struct zx_tape zxt = {
@@ -66,6 +67,7 @@ option_t zxn_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &zxc.crtfile },
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &zxc.binname },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &zxc.origin },
+    {  0 , "main-fence", "Main bin restricted below this address", OPT_INT, &zxc.main_fence },
     { 'o', "output",   "Name of output file\n",      OPT_STR,   &zxc.outfile },
 
     {  0,  "bin",      "Make .bin instead of .tap",  OPT_BOOL,  &bin },
@@ -145,6 +147,9 @@ int zxn_exec(char *target)
     // generate output
 
     tap = !dot && !sna && !zxn && !bin;
+
+    if ((tap || dot) && (zxc.main_fence > 0))
+        fprintf(stderr, "Warning: Main-fence is ignored for tap and dot compiles\n");
 
     if (tap)
         return zx_tape(&zxc, &zxt);
@@ -406,6 +411,21 @@ int zxn_exec(char *target)
 
     if (mb_sort_banks(&memory))
         exit_log(1, "Aborting... one or more binaries overlap\n");
+
+    // check if main binary extends past fence
+
+    if (zxc.main_fence > 0)
+    {
+        struct memory_bank *mb = &memory.mainbank;
+
+        if (mb->num > 0)
+        {
+            struct section_bin *last = &mb->secbin[mb->num - 1];
+
+            if ((last->org + last->size) > zxc.main_fence)
+                exit_log(1, "Error: Main bank has exceeded its maximum allowed size by %u bytes (last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - zxc.main_fence, last->org + last->size - 1, zxc.main_fence);
+        }
+    }
 
     // now the output formats
 

@@ -21,3 +21,10 @@ _ldivu__callee:
    push af
    
    jp asm__ldivu
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __ldivu__callee
+defc __ldivu__callee = _ldivu__callee
+ENDIF
+

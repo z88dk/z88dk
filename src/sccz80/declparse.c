@@ -122,6 +122,21 @@ Type *find_tag_field(Type *tag, const char *fieldname)
     int    i;
     for ( i = 0; i < array_len(tag->fields) ; i++ ) {
         Type *field = array_get_byindex(tag->fields, i);
+
+        // Consider anonymous structs
+        if ( strlen(field->name) == 0 && field->kind == KIND_STRUCT ) {
+            size_t offset = field->offset;
+            field = find_tag_field(field->tag, fieldname);
+
+            // If we found it, return a copy of it and adjust the offset
+            if ( field ) {
+                Type *ret = CALLOC(1,sizeof(*ret));
+                *ret = *field;
+                ret->offset += offset;
+                return ret;
+            }
+            continue;
+        }
         if ( strcmp(field->name, fieldname) == 0 ) {
             return field;
         }
@@ -319,6 +334,9 @@ Type *parse_struct(Type *type, int isstruct)
             elem = dodeclare2(&base_type, MODE_NONE);
             
             if ( elem != NULL ) {
+                if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
+                    errorfmt("Member variables must be named",1);
+                }
                 elem->offset = offset;
                 if ( isstruct ) { 
                     offset += elem->size;
@@ -694,7 +712,7 @@ Type *parse_decl(char name[], Type *base_type)
 
     if ( symname(name) ) {
         // TODO, if we're casting then we shouldn't have a name
-    }
+    } 
     
     return parse_decl_tail(base_type);
 }
@@ -854,12 +872,24 @@ Type *dodeclare(enum storage_type storage)
         sym->isassigned = 1; // Assigned to 0
      
         snprintf(drop_name, sizeof(drop_name), "%s", type->name);
-        /* We can catch @ here? Need to flag sym somehow */
+
+
+        // Handle the @ syntax. If the address is wrapped in ( ) then we can assign something to it
         if ( cmatch('@')) {
             Kind valtype;
             double val;
+            char brackets = 0;
+
+            
+            if ( cmatch('(')) {
+                brackets = 1;
+            }
 
             constexpr(&val,&valtype, 1);
+
+            if ( brackets ) {
+                needchar(')');
+            }
 
             // If initialised, the drop name should be something different
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);            
@@ -882,6 +912,12 @@ Type *dodeclare(enum storage_type storage)
         } else if ( cmatch(',')) {
             continue;
         } 
+
+        if ( type->kind == KIND_FUNC ) {
+            errorfmt("Cannot initialise function '%s' to a constant", 1, type->name);
+            junk();
+            return type;
+        }
 
         needchar('=');
         sym->initialised = 1;
@@ -1389,7 +1425,6 @@ static void declfunc(Type *type, enum storage_type storage)
         where += zcriticaloffset();
     }
 
-    pushframe();
     
 
     nl();
@@ -1461,6 +1496,7 @@ static void declfunc(Type *type, enum storage_type storage)
     col(); /* print function name */
     if (dopref(currfn) == NO) {
         nl();
+        GlobalPrefix(); outname(currfn->name, YES); nl();
         prefix();
         outname(currfn->name, YES);
         col();

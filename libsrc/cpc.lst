@@ -70,6 +70,8 @@ cpc/cpc_PrintStr
 cpc/cpc_PrintGphStr0
 cpc/cpc_PrintGphStrXY
 cpc/cpc_PrintGphStrXY_callee
+cpc/cpc_PrintGphStrXY2X
+cpc/cpc_PrintGphStrXY2X_callee
 cpc/cpc_PrintGphStrStd0
 cpc/cpc_PrintGphStrStdXY
 cpc/cpc_PrintGphStrStdXY_callee

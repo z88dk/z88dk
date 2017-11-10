@@ -15,6 +15,13 @@
 	ld	a,(___extern_c)
 	ld	(_c),a
 	SECTION	data_compiler
+.___extern_d
+	defw	22
+	SECTION	code_compiler
+	SECTION	code_crt_init
+	ld	hl,(___extern_d)
+	ld	(_d),hl
+	SECTION	data_compiler
 .___extern_e
 	defw	8192
 	SECTION	code_compiler
@@ -40,6 +47,7 @@
 
 
 	defc	_c	= 16384
+	defc	_b	= 28672
 	defc	_d	= 32768
 	defc	_e	= 12288
 	defc	_buf	= 1280
