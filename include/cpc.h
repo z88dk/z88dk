@@ -26,14 +26,14 @@ extern int  __LIB__ cpc_model(void);
 ///////////////////////////////////////////
 
 extern char  __LIB__  cpc_AnyKeyPressed(void);
-extern char  __LIB__  cpc_TestKey(unsigned char key)  __z88dk_fastcall;
-extern char  __LIB__  cpc_TestKeyF(unsigned char key)  __z88dk_fastcall;
+extern char  __LIB__  cpc_TestKey(int key)  __z88dk_fastcall;
+extern char  __LIB__  cpc_TestKeyF(int key)  __z88dk_fastcall;
 extern void  __LIB__  cpc_DeleteKeys(void);
-extern char  __LIB__  cpc_RedefineKey(unsigned char key)  __z88dk_fastcall;
+extern char  __LIB__  cpc_RedefineKey(int key)  __z88dk_fastcall;
 extern void  __LIB__  cpc_ScanKeyboard(void);
 
-extern void __LIB__              cpc_AssignKey(unsigned char key, int value) __smallc ;
-extern void __LIB__    cpc_AssignKey_callee(unsigned char key, int value)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_AssignKey(int key, int value) __smallc ;
+extern void __LIB__    cpc_AssignKey_callee(int key, int value)  __smallc __z88dk_callee;
 #define cpc_AssignKey(a,b) cpc_AssignKey_callee(a,b)
 
 ///////////////////////////////////////////
@@ -63,44 +63,48 @@ extern void __LIB__    cpc_SetColour_callee(int pos, int color)  __smallc __z88d
 // Set Border Color
 extern void  __LIB__  cpc_SetBorder(int color) __z88dk_fastcall;
 
-// Print to direct screen address
+// Print to direct screen address, specify pen color
 extern void __LIB__              cpc_PrintGphStrStd(int pen, char *text, unsigned int address) __smallc ;
 extern void __LIB__    cpc_PrintGphStrStd_callee(int pen, char *text, unsigned int address)  __smallc __z88dk_callee;
 #define cpc_PrintGphStrStd(a,b,c) cpc_PrintGphStrStd_callee(a,b,c)
 
-// Print to direct screen address
-extern void __LIB__              cpc_GetScrAddress(char *x, char *y) __smallc ;
-extern void __LIB__    cpc_GetScrAddress_callee(char *x, char *y)  __smallc __z88dk_callee;
+// Print to direct screen address  (fully coloured font)
+extern void __LIB__              cpc_PrintGphStr(char *text, unsigned int address) __smallc ;
+extern void __LIB__    cpc_PrintGphStr_callee(char *text, unsigned int address)  __smallc __z88dk_callee;
+#define cpc_PrintGphStr(a,b) cpc_PrintGphStr_callee(a,b)
+
+extern unsigned int __LIB__              cpc_GetScrAddress(int x, int y) __smallc ;
+extern unsigned int __LIB__    cpc_GetScrAddress_callee(int x, int y)  __smallc __z88dk_callee;
 #define cpc_GetScrAddress(a,b) cpc_GetScrAddress_callee(a,b)
 
-// Print at x,y at with a given pen color
+// Print at x,y with a given pen color
 extern void __LIB__              cpc_PrintGphStrStdXY(int pen, char *text, int x, int y) __smallc ;
 extern void __LIB__    cpc_PrintGphStrStdXY_callee(int pen, char *text, int x, int y)  __smallc __z88dk_callee;
 #define cpc_PrintGphStrStdXY(a,b,c,d) cpc_PrintGphStrStdXY_callee(a,b,c,d)
-
-// Print at x,y at with a given pen color
-extern void __LIB__              cpc_PrintGphStrStdXY2X(int pen, char *text, int x, int y) __smallc ;
-extern void __LIB__    cpc_PrintGphStrStdXY2X_callee(int pen, char *text, int x, int y)  __smallc __z88dk_callee;
-#define cpc_PrintGphStrStdXY2X(a,b,c,d) cpc_PrintGphStrStdXY2X_callee(a,b,c,d)
 
 // Print at x,y  (fully coloured font)
 extern void __LIB__              cpc_PrintGphStrXY(char *text, int x, int y) __smallc ;
 extern void __LIB__    cpc_PrintGphStrXY_callee(char *text, int x, int y)  __smallc __z88dk_callee;
 #define cpc_PrintGphStrXY(a,b,c) cpc_PrintGphStrXY_callee(a,b,c)
 
-// Set font colors
+// Print at x,y in double height (for fully coloured font)
+extern void __LIB__              cpc_PrintGphStrXY2X(char *text, int x, int y) __smallc ;
+extern void __LIB__    cpc_PrintGphStrXY2X_callee(char *text, int x, int y)  __smallc __z88dk_callee;
+#define cpc_PrintGphStrXY2X(a,b,c) cpc_PrintGphStrXY2X_callee(a,b,c)
+
+// Set font colors (for fully coloured font)
 extern void __LIB__              cpc_SetInkGphStr(int color, int valor) __smallc ;
 extern void __LIB__    cpc_SetInkGphStr_callee(int color, int valor)  __smallc __z88dk_callee;
 #define cpc_SetInkGphStr(a,b) cpc_SetInkGphStr_callee(a,b)
 
 // Rotate left region
-extern void __LIB__              cpc_RLI(unsigned int pos, unsigned char w, unsigned char h) __smallc ;
-extern void __LIB__    cpc_RLI_callee(unsigned int pos, unsigned char w, unsigned char h)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_RLI(unsigned int pos, int w, int h) __smallc ;
+extern void __LIB__    cpc_RLI_callee(unsigned int pos, int w, int h)  __smallc __z88dk_callee;
 #define cpc_RLI(a,b,c) cpc_RLI_callee(a,b,c)
 
 // Rotate left region
-extern void __LIB__              cpc_RRI(unsigned int pos, unsigned char w, unsigned char h) __smallc ;
-extern void __LIB__    cpc_RRI_callee(unsigned int pos, unsigned char w, unsigned char h)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_RRI(unsigned int pos, int w, int h) __smallc ;
+extern void __LIB__    cpc_RRI_callee(unsigned int pos, int w, int h)  __smallc __z88dk_callee;
 #define cpc_RRI(a,b,c) cpc_RRI_callee(a,b,c)
 
 // Clear Screen
@@ -113,6 +117,14 @@ extern char  __LIB__  cpc_PrintStr(char *text)  __z88dk_fastcall;
 ///////////////////////////////////////////
 // SPRITES
 ///////////////////////////////////////////
+
+extern void __LIB__              cpc_PutSp(char *sprite, int height, int width, unsigned int address) __smallc ;
+extern void __LIB__    cpc_PutSp_callee(char *sprite, int height, int width, unsigned int address)  __smallc __z88dk_callee;
+#define cpc_PutSp(a,b,c,d) cpc_PutSp_callee(a,b,c,d)
+
+extern void __LIB__              cpc_PutSpXOR(char *sprite, int height, int width, unsigned int address) __smallc ;
+extern void __LIB__    cpc_PutSpXOR_callee(char *sprite, int height, int width, unsigned int address)  __smallc __z88dk_callee;
+#define cpc_PutSpXOR(a,b,c,d) cpc_PutSpXOR_callee(a,b,c,d)
 
 /*
 // minimun sprite structure
@@ -128,11 +140,11 @@ struct sprite {
 };
 
 // Set Sprite position
-extern void __LIB__              cpc_SpUpdX(struct sprite *sprite, char x) __smallc ;
-extern void __LIB__    cpc_SpUpdX_callee(struct sprite *sprite, char x)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_SpUpdX(struct sprite *sprite, int x) __smallc ;
+extern void __LIB__    cpc_SpUpdX_callee(struct sprite *sprite, int x)  __smallc __z88dk_callee;
 #define cpc_SpUpdX(a,b) cpc_SpUpdX_callee(a,b)
-extern void __LIB__              cpc_SpUpdY(struct sprite *sprite, char y) __smallc ;
-extern void __LIB__    cpc_SpUpdY_callee(struct sprite *sprite, char y)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_SpUpdY(struct sprite *sprite, int y) __smallc ;
+extern void __LIB__    cpc_SpUpdY_callee(struct sprite *sprite, int y)  __smallc __z88dk_callee;
 #define cpc_SpUpdY(a,b) cpc_SpUpdY_callee(a,b)
 
 // Tiles
@@ -145,16 +157,16 @@ extern void  __LIB__   cpc_ShowTileMap2(void);
 extern void  __LIB__   cpc_ResetTouchedTiles(void);
 extern void  __LIB__   cpc_ShowTouchedTiles(void);
 
-extern void __LIB__              cpc_SetTile(unsigned char x, unsigned char y, unsigned char byte) __smallc ;
-extern void __LIB__    cpc_SetTile_callee(unsigned char x, unsigned char y, unsigned char byte)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_SetTile(int x, int y, int byte) __smallc ;
+extern void __LIB__    cpc_SetTile_callee(int x, int y, int byte)  __smallc __z88dk_callee;
 #define cpc_SetTile(a,b,c) cpc_SetTile_callee(a,b,c)
 
-extern void __LIB__              cpc_PutTiles(unsigned char x, unsigned char y, unsigned char w, unsigned char h, char *buffer) __smallc ;
-extern void __LIB__    cpc_PutTiles_callee(unsigned char x, unsigned char y, unsigned char w, unsigned char h, char *buffer)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_PutTiles(int x, int y, int w, int h, char *buffer) __smallc ;
+extern void __LIB__    cpc_PutTiles_callee(int x, int y, int w, int h, char *buffer)  __smallc __z88dk_callee;
 #define cpc_PutTiles(a,b,c,d,e) cpc_PutTiles_callee(a,b,c,d,e)
 
-extern void __LIB__              cpc_GetTiles(unsigned char x, unsigned char y, unsigned char w, unsigned char h, char *buffer) __smallc ;
-extern void __LIB__    cpc_GetTiles_callee(unsigned char x, unsigned char y, unsigned char w, unsigned char h, char *buffer)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_GetTiles(int x, int y, int w, int h, char *buffer) __smallc ;
+extern void __LIB__    cpc_GetTiles_callee(int x, int y, int w, int h, char *buffer)  __smallc __z88dk_callee;
 #define cpc_GetTiles(a,b,c,d,e) cpc_GetTiles_callee(a,b,c,d,e)
 
 extern void  __LIB__   cpc_SuperbufferAddress(struct sprite *sprite) __z88dk_fastcall;
