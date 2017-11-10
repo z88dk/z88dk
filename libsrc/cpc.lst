@@ -68,6 +68,8 @@ cpc/cpc_GetScrAddress_callee
 cpc/cpc_GetScrAddress0
 cpc/cpc_PrintStr
 cpc/cpc_PrintGphStr0
+cpc/cpc_PrintGphStr
+cpc/cpc_PrintGphStr_callee
 cpc/cpc_PrintGphStrXY
 cpc/cpc_PrintGphStrXY_callee
 cpc/cpc_PrintGphStrXY2X
@@ -87,5 +89,10 @@ psg/cpc/set_psg
 psg/cpc/set_psg_callee
 psg/cpc/get_psg
 psg/cpc/psg_init
+cpc/sprites/cpc_PutSp0
+cpc/sprites/cpc_PutSp
+cpc/sprites/cpc_PutSp_callee
+cpc/sprites/cpc_PutSpXOR
+cpc/sprites/cpc_PutSpXOR_callee
 @psg/psg.lst
 @z80.lst

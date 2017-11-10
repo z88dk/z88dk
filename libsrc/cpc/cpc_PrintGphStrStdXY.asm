@@ -17,7 +17,7 @@
 		
         EXTERN    cpc_GetScrAddress0
         EXTERN    cpc_PrintGphStrStd0
-		EXTERN    color_uso
+		;EXTERN    color_uso
 
 
 .cpc_PrintGphStrStdXY
@@ -40,6 +40,6 @@
 	ld d,(ix+5)	;texto origen
 	
 	ld a,(ix+6) ;color
-	ld (color_uso+1),a
+	;ld (color_uso+1),a
     
  JP cpc_PrintGphStrStd0

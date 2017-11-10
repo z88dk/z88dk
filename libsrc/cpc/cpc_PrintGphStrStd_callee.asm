@@ -16,7 +16,7 @@
         PUBLIC    _cpc_PrintGphStrStd_callee
 		
         EXTERN    cpc_PrintGphStrStd0
-		EXTERN    color_uso
+		;EXTERN    color_uso
 		
 
 .cpc_PrintGphStrStd_callee
@@ -32,4 +32,3 @@
 	ld	a,c
 	
  JP cpc_PrintGphStrStd0
- 
