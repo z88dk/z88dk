@@ -7,7 +7,7 @@
 ../_DEVELOPMENT/l/z80/l_compare_de_hl
 ../_DEVELOPMENT/l/z80/l_dec_bc
 ../_DEVELOPMENT/l/z80/l_dec_de
-../_DEVELOPMENT/l/z80/l_ei_reti
+#../_DEVELOPMENT/l/z80/l_ei_reti
 ../_DEVELOPMENT/l/z80/l_ex_bc_de
 ../_DEVELOPMENT/l/z80/l_ex_bc_hl
 ../_DEVELOPMENT/l/z80/l_inc_hl
@@ -21,12 +21,12 @@
 ../_DEVELOPMENT/l/z80/l_ldi_loop
 ../_DEVELOPMENT/l/z80/l_offset_ix_bc
 ../_DEVELOPMENT/l/z80/l_offset_ix_de
-../_DEVELOPMENT/l/z80/l_outi
-../_DEVELOPMENT/l/z80/l_outi_loop
+#../_DEVELOPMENT/l/z80/l_outi
+#../_DEVELOPMENT/l/z80/l_outi_loop
 ../_DEVELOPMENT/l/z80/l_readword_2_hl
 ../_DEVELOPMENT/l/z80/l_readword_hl
 ../_DEVELOPMENT/l/z80/l_ret
-../_DEVELOPMENT/l/z80/l_retn
+#../_DEVELOPMENT/l/z80/l_retn
 ../_DEVELOPMENT/l/z80/l_setmem_de
 ../_DEVELOPMENT/l/z80/l_setmem_hl
 ../_DEVELOPMENT/l/z80/l_testword_hl
