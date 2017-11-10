@@ -5,7 +5,7 @@
 ; **	   Raúl Simarro, 	  Artaburu 2009           **
 ; ******************************************************
 ;
-;	cpc_GetScrAddress(char *x, char *y) __smallc ;
+;	cpc_GetScrAddress(int x, int y) __smallc ;
 ;
 ;       $Id: cpc_GetScrAddress.asm $
 ;
@@ -17,14 +17,15 @@
 
 
 .cpc_GetScrAddress
-	ld hl,2	;10
-    add hl,sp	;11		
-    
-	ld e,(hl)	;7
-	inc hl		;6
-	inc hl		;6
-	ld a,(hl)	;7
-	;ex de,hl	;4
-	ld l,e		;4
-	;51
+
+; coordinates are in (A,L)
+
+	pop	af
+	pop	hl		; y
+	pop bc		; x
+	push bc
+	push hl
+	push af
+	ld	a,c
+	
 	jp cpc_GetScrAddress0
