@@ -65,7 +65,7 @@ ret
 
 ;; marcará el color con que se imprime
 .color_uso
-ld a,1
+;ld a,1
 or a ; cp 0
 jp z,color0
 cp 1
@@ -290,3 +290,5 @@ ret
 
 .letra_decodificada
  defs 16	;uso este espacio para guardar la letra que se decodifica
+
+
