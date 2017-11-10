@@ -3,6 +3,13 @@
  * aralbrec @ z88dk.org
 */
 
+// ZX SPECTRUM
+//
+// zcc +zx -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size extract.c help-zx.asm -o extract -subtype=dot -create-app
+// zcc +zx -vn -startup=30 -clib=new extract.c help-zx.asm -o extract -subtype=dot -create-app
+
+// ZX NEXT
+//
 // zcc +zxn -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size extract.c help-zxn.asm -o extract -subtype=dot -create-app
 // zcc +zxn -vn -startup=30 -clib=new extract.c help-zxn.asm -o extract -subtype=dot -create-app
 
@@ -21,31 +28,17 @@
 #include <input.h>
 #include <z80.h>
 
+#if __ZXNEXT
+
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 
-// generate custom esxdos error report
-
-int error(char *fmt, ...)
-{
-   unsigned char *p;
-   static unsigned char ebuf[65];
-   
-   va_list v;
-   va_start(v, fmt);
-
-#ifdef __SCCZ80
-   vsnprintf(ebuf, sizeof(ebuf), va_ptr(v,char *), v);
 #else
-   vsnprintf(ebuf, sizeof(ebuf), fmt, v);
-#endif
 
-   for (p = ebuf; p = strchr(p, '\n'); )
-      *p = '\r';
-   
-   ebuf[strlen(ebuf)-1] += 0x80;  
-   return (int)ebuf;
-}
+#include <arch/zx.h>
+#include <arch/zx/esxdos.h>
+
+#endif
 
 // command line parsing
 
@@ -76,6 +69,30 @@ unsigned char buffer[512];   // file buffer
 unsigned char mmu2_state;
 
 extern unsigned char help[]; // compressed help text
+
+// generate custom esxdos error report
+
+#define ebuf buffer
+
+int error(char *fmt, ...)
+{
+   unsigned char *p;
+   
+   va_list v;
+   va_start(v, fmt);
+
+#ifdef __SCCZ80
+   vsnprintf(ebuf, sizeof(ebuf), va_ptr(v,char *), v);
+#else
+   vsnprintf(ebuf, sizeof(ebuf), fmt, v);
+#endif
+
+   for (p = ebuf; p = strchr(p, '\n'); )
+      *p = '\r';
+   
+   ebuf[strlen(ebuf)-1] += 0x80;  
+   return (int)ebuf;
+}
 
 // hex dump
 
@@ -121,6 +138,8 @@ void cleanup_files(void)
       esxdos_f_close(fout);
 }
 
+#if __ZXNEXT
+
 // determine 8k page from linear address
 
 unsigned long page_number(unsigned long address)
@@ -156,6 +175,8 @@ unsigned char page_present(unsigned long address)
    return q == (unsigned char)(~p);
 }
 
+#endif
+
 // program starts
 
 int main(int argc, char **argv)
@@ -186,7 +207,11 @@ int main(int argc, char **argv)
          if (*options.outname == 0)
             return error("%s: Missing out file", p);
       }
+#if __ZXNEXT
       else if (!stricmp(p, "-m") || !stricmp(p, "-ml") || !stricmp(p, "-mb") || !stricmp(p, "-mp"))
+#else
+      else if (!stricmp(p, "-m"))
+#endif
       {
          unsigned char *end;
          
@@ -245,8 +270,8 @@ int main(int argc, char **argv)
       return 0;
    }
    
-   options.inname = strupr(argv[1]);
-   if (options.outname && (stricmp(strupr(options.outname), options.inname) == 0))
+   options.inname = argv[1];
+   if (options.outname && (stricmp(options.outname, options.inname) == 0))
       return error("In and out files are same");
    
    atexit(cleanup_files);
@@ -345,6 +370,8 @@ int main(int argc, char **argv)
          }
       }
 
+#if __ZXNEXT
+
       // write to zx next paged memory
       
       if (options.mem == 2)
@@ -381,6 +408,8 @@ int main(int argc, char **argv)
                break;
          }
       }
+
+#endif
 
       // hexdump
       
