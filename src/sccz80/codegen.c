@@ -455,14 +455,7 @@ void putstk(LVALUE *lval)
         break;
     default:
         zpop();
-        if (c_doinline & INLINE_PINT) {
-            LoadAccum();
-            ol("ld\t(de),a");
-            ol("inc\tde");
-            ol("ld\ta,h");
-            ol("ld\t(de),a");
-        } else
-            callrts("l_pint");
+        callrts("l_pint");
     }
 }
 
@@ -585,20 +578,13 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (c_doinline & INLINE_GINT) {
-            ol("ld\ta,(hl)");
-            ol("inc\thl");
-            ol("ld\th,(hl)");
-            ol("ld\tl,a");
-        } else {
-            ot("call\tl_gint\t;");
+        ot("call\tl_gint\t;");
 #ifdef USEFRAME
-            if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
-                OutIndex(lval->offset);
-            }
-#endif
-            nl();
+        if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
+            OutIndex(lval->offset);
         }
+#endif
+        nl();
     }
 }
 
