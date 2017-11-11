@@ -25,7 +25,7 @@ newlib-z80: $(NEWLIBASM)
 	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $^
 
 newlib-r2k: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=r2k -D__CLASSIC $^
+	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $^
 
 newlib-z80-zxn: $(NEWLIBASM)
 	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $^
