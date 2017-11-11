@@ -20,6 +20,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <assert.h>
 #include <stdarg.h>
 #include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#endif
 
 static void file_error_filename( char *filename, Bool is_writing );
 
@@ -654,21 +657,29 @@ char *path_basename( char *filename )
 /* make a copy of the file dirname */
 char *path_dirname( char *filename )
 {
-	STR_DEFINE(dest, FILENAME_MAX);
-	char *basename;
-	char *ret;
+	char path[FILENAME_MAX];
+	snprintf(path, sizeof(path), "%s", filename);
 
-    str_set( dest, filename );
-	basename = _start_basename( str_data(dest) );
-	*basename = '\0';					/* remove basename */
-	
-	if (str_data(dest)[0] == '\0')		/* dir is now empty */
-		str_set(dest, ".");
+	// remove last file component
+	char *p = path + strlen(path);
+	while (p > path && !(p[-1] == '/' || p[-1] == '\\')) p--;
+	while (p > path && (p[-1] == '/' || p[-1] == '\\')) p--;
+	*p = '\0';
 
-	ret = strpool_add(str_data(dest));
+	if (*path == '\0')		/* dir is now empty */
+		snprintf(path, sizeof(path), ".");
 
-	STR_DELETE(dest);
-	return ret;
+	return strpool_add(path);
+}
+
+char *path_remove_slashes(char *filename)
+{
+	char path[FILENAME_MAX];
+	snprintf(path, sizeof(path), "%s", filename);
+	char *p = path + strlen(path);
+	while (p > path && (p[-1] == '/' || p[-1] == '\\')) p--;
+	*p = '\0';
+	return strpool_add(path);
 }
 
 /* search for a file on the given directory list, return full path name */
@@ -747,3 +758,21 @@ int file_size(char *filename)	// file size, -1 if not regular file
 		return -1;
 }
 
+void mkdir_p(char *path)
+{
+	path = path_remove_slashes(path);
+	if (!dir_exists(path)) {
+		char *parent = path_dirname(path);
+		mkdir_p(parent);
+
+#ifdef _WIN32
+		int rv = _mkdir(path);
+#else
+		int rv = mkdir(path, 0777);
+#endif
+		if (rv != 0) {
+			perror(path);
+			exit(1);
+		}
+	}
+}

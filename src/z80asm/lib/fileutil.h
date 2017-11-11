@@ -88,6 +88,8 @@ extern char *path_replace_ext( char *filename, char *new_ext );
 extern char *path_basename( char *filename );
 extern char *path_dirname( char *filename );
 
+extern char *path_remove_slashes(char *filename);
+
 /* search for a file on the given directory list, return full path name */
 extern void path_search( Str *dest, char *filename, UT_array *dir_list );
 extern char *search_file(char *filename, UT_array *dir_list);	/* returned string in strpool */
@@ -100,3 +102,6 @@ extern char *temp_filename( char *filename );
 extern Bool file_exists(char *filename);
 extern Bool dir_exists(char *dirname);
 extern int file_size(char *filename);	// file size, -1 if not regular file
+
+/* create a directory and all parents above it */
+extern void mkdir_p(char *path);

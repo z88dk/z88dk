@@ -62,8 +62,11 @@ void assemble_file( char *filename )
 	Bool load_obj_only;
 	Module *module;
 
-	/* try to load object file */
+	/* create output directory*/
 	obj_filename = get_obj_filename(filename);
+	mkdir_p(path_dirname(obj_filename));
+
+	/* try to load object file */
 	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
 		file_exists(filename)							/* .o file exists */
 		) {
@@ -338,7 +341,7 @@ ReleaseLibraries( void )
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
-int main( int argc, char *argv[] )
+int z80asm_main( int argc, char *argv[] )
 {
 	char **pfile;
 
