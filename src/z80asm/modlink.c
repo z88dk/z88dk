@@ -701,12 +701,10 @@ static void link_libraries(StrHash *extern_syms)
 *----------------------------------------------------------------------------*/
 void link_modules( void )
 {
-    char fheader[9];
     Module *module, *first_obj_module;
 	ModuleListElem *iter;
     char *obj_filename;
 	ExprList *exprs = NULL;
-	FILE *file;
 	StrHash *extern_syms = OBJ_NEW(StrHash);
 
     opts.cur_list = FALSE;
@@ -745,25 +743,11 @@ void link_modules( void )
 		obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */
-		file = myfopen(obj_filename, "rb");
-		if (file)
-		{
-			/* read first 8 chars from file into array */
-			xfget_chars(file, fheader, 8);
-			fheader[8] = '\0';
+		if (!check_object_file(obj_filename))
+			break;
 
-			/* compare header of file */
-			if (strcmp(fheader, Z80objhdr) != 0)
-			{
-				error_not_obj_file(obj_filename);  /* not a object file */
-				myfclose(file);
-				break;
-			}
-
-			myfclose(file);
-
-			LinkModule(obj_filename, 0, extern_syms);       /* link code & read name definitions */
-		}
+		/* link code & read name definitions */
+		LinkModule(obj_filename, 0, extern_syms);       
 	}
 
 	/* link libraries */

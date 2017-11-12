@@ -15,7 +15,7 @@ void info_total_errors(void)
 	
 	STR_DELETE(msg);
 }
-void error_read_file(const char *filename)
+void error_read_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -24,7 +24,7 @@ void error_read_file(const char *filename)
 	
 	STR_DELETE(msg);
 }
-void error_write_file(const char *filename)
+void error_write_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -33,7 +33,7 @@ void error_write_file(const char *filename)
 	
 	STR_DELETE(msg);
 }
-void error_include_recursion(const char *filename)
+void error_include_recursion(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -51,7 +51,7 @@ void error_no_src_file(void)
 	
 	STR_DELETE(msg);
 }
-void error_illegal_option(const char *option)
+void error_illegal_option(char *option)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -60,7 +60,7 @@ void error_illegal_option(const char *option)
 	
 	STR_DELETE(msg);
 }
-void error_illegal_src_filename(const char *filename)
+void error_illegal_src_filename(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -69,7 +69,7 @@ void error_illegal_src_filename(const char *filename)
 	
 	STR_DELETE(msg);
 }
-void error_glob(const char *filename, const char *error)
+void error_glob(char *filename, char *error)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -78,7 +78,7 @@ void error_glob(const char *filename, const char *error)
 	
 	STR_DELETE(msg);
 }
-void error_glob_no_files(const char *filename)
+void error_glob_no_files(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -87,7 +87,7 @@ void error_glob_no_files(const char *filename)
 	
 	STR_DELETE(msg);
 }
-void error_not_regular_file(const char *filename)
+void error_not_regular_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -96,7 +96,7 @@ void error_not_regular_file(const char *filename)
 	
 	STR_DELETE(msg);
 }
-void warn_symbol_different(const char *name, const char *used)
+void warn_symbol_different(char *name, char *used)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -177,7 +177,7 @@ void error_missing_close_block(void)
 	
 	STR_DELETE(msg);
 }
-void error_unbalanced_struct_at(const char *filename, int line_nr)
+void error_unbalanced_struct_at(char *filename, int line_nr)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -195,7 +195,7 @@ void error_unbalanced_struct(void)
 	
 	STR_DELETE(msg);
 }
-void error_not_defined(const char *name)
+void error_not_defined(char *name)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -222,7 +222,7 @@ void error_jr_not_local(void)
 	
 	STR_DELETE(msg);
 }
-void error_symbol_redefined(const char *symbol)
+void error_symbol_redefined(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -231,7 +231,7 @@ void error_symbol_redefined(const char *symbol)
 	
 	STR_DELETE(msg);
 }
-void error_symbol_redefined_module(const char *symbol, const char *module)
+void error_symbol_redefined_module(char *symbol, char *module)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -240,7 +240,7 @@ void error_symbol_redefined_module(const char *symbol, const char *module)
 	
 	STR_DELETE(msg);
 }
-void error_symbol_decl_local(const char *symbol)
+void error_symbol_decl_local(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -249,7 +249,7 @@ void error_symbol_decl_local(const char *symbol)
 	
 	STR_DELETE(msg);
 }
-void error_symbol_redecl(const char *symbol)
+void error_symbol_redecl(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -276,7 +276,25 @@ void error_org_redefined(void)
 	
 	STR_DELETE(msg);
 }
-void error_invalid_org_option(const char *org_hex)
+void error_align_redefined(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "ALIGN redefined" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_org_not_aligned(int org, int align)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "ORG '0x%04X' not ALIGNed '%d'", org, align );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_invalid_org_option(char *org_hex)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -294,7 +312,7 @@ void error_invalid_org(int origin)
 	
 	STR_DELETE(msg);
 }
-void error_invalid_filler_option(const char *filler_hex)
+void error_invalid_filler_option(char *filler_hex)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -303,7 +321,7 @@ void error_invalid_filler_option(const char *filler_hex)
 	
 	STR_DELETE(msg);
 }
-void warn_org_ignored(const char *filename, const char *section_name)
+void warn_org_ignored(char *filename, char *section_name)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -312,7 +330,7 @@ void warn_org_ignored(const char *filename, const char *section_name)
 	
 	STR_DELETE(msg);
 }
-void error_not_obj_file(const char *filename)
+void error_not_obj_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
@@ -321,11 +339,29 @@ void error_not_obj_file(const char *filename)
 	
 	STR_DELETE(msg);
 }
-void error_not_lib_file(const char *filename)
+void error_obj_file_version(char *filename, int found_version, int expected_version)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "object file '%s' version %d, expected version %d", filename, found_version, expected_version );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_not_lib_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
 	str_append_sprintf( msg, "file '%s' not a library file", filename );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_lib_file_version(char *filename, int found_version, int expected_version)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "library file '%s' version %d, expected version %d", filename, found_version, expected_version );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -348,7 +384,7 @@ void error_int_range(long value)
 	
 	STR_DELETE(msg);
 }
-void error_cmd_failed(const char *cmd)
+void error_cmd_failed(char *cmd)
 {
 	STR_DEFINE(msg, STR_SIZE);
 

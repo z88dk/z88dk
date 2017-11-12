@@ -17,3 +17,6 @@ extern char Z80libhdr[];
 
 /* make library from list of files; convert each source to object file name */
 extern void make_library(char *lib_filename, UT_array *src_files);
+
+// check if the given filename exists and is a library file of the correct version
+extern Bool check_library_file(char *src_filename);

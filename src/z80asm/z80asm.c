@@ -118,8 +118,10 @@ void assemble_file( char *filename )
 	open_error_file(src_filename);
 
 	if (load_obj_only) {
-		if (!objmodule_loaded(src_filename))
-			error_not_obj_file(src_filename);	/* invalid object file */
+		if (check_object_file(obj_filename)) {
+			if (!objmodule_loaded(obj_filename))
+				error_not_obj_file(src_filename);	/* invalid object file */
+		}
 	}
 	else
 		query_assemble(src_filename);			/* try to assemble, check -d */
@@ -152,7 +154,7 @@ static void query_assemble( char *src_filename )
               : TRUE										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
-            objmodule_loaded( src_filename )	/* object file valid and size loaded */
+            objmodule_loaded(obj_filename)					/* object file valid and size loaded */
        )
     {
         /* OK - object file is up-to-date */
@@ -235,9 +237,7 @@ char *GetLibfile( char *filename )
 {
     struct libfile *newlib;
     char           *found_libfilename;
-    char fheader[9];
     int len;
-    FILE *file;
 
     newlib = NewLibrary();
 
@@ -253,31 +253,15 @@ char *GetLibfile( char *filename )
 
     newlib->libfilename = m_strdup( found_libfilename );		/* freed when newlib is freed */
 
-    file = myfopen( found_libfilename, "rb" );           
-	if (!file)
+	if (!check_library_file(found_libfilename))					/* not a library or wrong version */
 		return NULL;
-	else
-	{
-		/* read first 8 chars from file into array */
-		xfget_chars(file, fheader, 8);
-		fheader[8] = '\0';
 
-		if (strcmp(fheader, Z80libhdr) != 0)            /* compare header of file */
-		{
-			error_not_lib_file(found_libfilename);    /* not a library file */
-		}
-		else
-		{
-			opts.library = TRUE;
+	opts.library = TRUE;
 
-			if (opts.verbose)
-				printf("Reading library '%s'\n", found_libfilename);
-		}
+	if (opts.verbose)
+		printf("Reading library '%s'\n", found_libfilename);
 
-		myfclose(file);
-
-		return found_libfilename;
-	}
+	return found_libfilename;
 }
 
 
