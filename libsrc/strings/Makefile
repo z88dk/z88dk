@@ -7,35 +7,32 @@ include ../Make.config
 
 TARGET ?= test
 
-CLASSIC_ASM = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm strrstr.asm strrstr_callee.asm $(wildcard _*.asm)
+CLASSIC_ASM = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.asm $(wildcard _*.asm)
 CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
 CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
 
-NEWLIBASM := $(shell z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/string/string_sccz80.lst -p $(NEWLIB_DIRECTORY) -t)
-NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
+NEWLIBASM := $(wildcard $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm) $(wildcard $(NEWLIB_DIRECTORY)/string/z80/*.asm)
+NEWLIB_PHONY := newlib-z80 newlib-z80_zxn newlib-r2k newlib-ixiy
+
 
 OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
-.PHONY: dirs
+.PHONY: dirs $(NEWLIB_PHONY)
 
-all: dirs $(OBJECTS) string-newlib.lst
+all: dirs $(OBJECTS) $(NEWLIB_PHONY)
 
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+newlib-z80: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $^
 
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+newlib-r2k: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $^
 
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+newlib-z80-zxn: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $^
 
-obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+newlib-ixiy: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $^
+
 
 obj/z80/%.o: %.asm
 	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
@@ -65,12 +62,9 @@ obj/ixiy/%.o: %.c
 obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $  $^
 
-string-newlib.lst:
-	@z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/string/string_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'strings/obj/$${TYPE}' -c -o string-newlib.lst
-
 dirs:
-	@mkdir -p $(sort $(dir $(OBJECTS)))
+	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
 
 
 clean:
-	$(RM) -fr obj string-newlib.lst
+	$(RM) -fr obj
