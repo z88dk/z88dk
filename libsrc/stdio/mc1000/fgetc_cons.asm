@@ -26,11 +26,6 @@ IF STANDARDESCAPECHARS
 	ld	a,10
 .not_return
 ENDIF
-
-	cp	92
-	jr	nz,not_spc
-	ld	a,32
-.not_spc
 	ld l,a
 	ld h,0
 	ret
