@@ -13,6 +13,7 @@ Handle object file contruction, reading and writing
 #include "codearea.h"
 #include "errors.h"
 #include "fileutil.h"
+#include "libfile.h"
 #include "options.h"
 #include "model.h"
 #include "objfile.h"
@@ -27,6 +28,7 @@ Handle object file contruction, reading and writing
 char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
 
 #define Z80objhdr_size (sizeof(Z80objhdr)-1)
+#define Z80objhdr_version_pos 6
 
 /*-----------------------------------------------------------------------------
 *   Write module to object file
@@ -435,13 +437,13 @@ ByteArray *read_obj_file_data( char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static Bool objmodule_loaded_1( char *src_filename, Str *section_name )
+static Bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 {
 	int code_size;
 	OFile *ofile;
 	Section *section;
 
-	ofile = OFile_test_file( get_obj_filename( src_filename ) );
+	ofile = OFile_test_file(obj_filename);
     if ( ofile != NULL )
     {
         CURRENTMODULE->modname = ofile->modname;        
@@ -461,6 +463,8 @@ static Bool objmodule_loaded_1( char *src_filename, Str *section_name )
 				xfget_count_byte_Str(ofile->file, section_name);
 				section = new_section(str_data(section_name));
 				read_origin(ofile->file, section);
+				section->align = xfget_int32(ofile->file);
+
 				append_reserve( code_size );
 
 				/* advance past code block */
@@ -476,10 +480,69 @@ static Bool objmodule_loaded_1( char *src_filename, Str *section_name )
         return FALSE;
 }
 
-Bool objmodule_loaded(char *src_filename)
+Bool objmodule_loaded(char *obj_filename)
 {
 	STR_DEFINE(section_name, STR_SIZE);
-	Bool ret = objmodule_loaded_1(src_filename, section_name);
+	Bool ret = objmodule_loaded_1(obj_filename, section_name);
 	STR_DELETE(section_name);
 	return ret;
+}
+
+Bool check_object_file(char *obj_filename)
+{
+	return check_obj_lib_file(
+		obj_filename, 
+		Z80objhdr,
+		error_not_obj_file,
+		error_obj_file_version);
+}
+
+Bool check_obj_lib_file(char *filename,
+	char *signature,
+	void(*error_file)(char*),
+	void(*error_version)(char*, int, int))
+{
+	FILE *fp = NULL;
+
+	// can read file?
+	fp = fopen(filename, "rb");
+	if (fp == NULL) {
+		error_read_file(filename);
+		goto error;
+	}
+
+	// can read header?
+	char header[Z80objhdr_size + 1];
+	if (Z80objhdr_size != fread(header, 1, Z80objhdr_size, fp)) {
+		error_file(filename);
+		goto error;
+	}
+
+	// header has correct prefix?
+	if (strncmp(header, signature, Z80objhdr_version_pos) != 0) {
+		error_file(filename);
+		goto error;
+	}
+
+	// has right version?
+	header[Z80objhdr_size] = '\0';
+	int version, expected;
+	sscanf(OBJ_VERSION, "%d", &expected);
+	if (1 != sscanf(header + Z80objhdr_version_pos, "%d", &version)) {
+		error_file(filename);
+		goto error;
+	}
+	if (version != expected) {
+		error_version(filename, version, expected);
+		goto error;
+	}
+
+	// ok
+	fclose(fp);
+	return TRUE;
+
+error:
+	if (fp)
+		fclose(fp);
+	return FALSE;
 }

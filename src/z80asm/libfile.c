@@ -84,3 +84,12 @@ void make_library(char *lib_filename, UT_array *src_files)
 	/* close and write lib file */
 	myfclose( lib_file );
 }
+
+Bool check_library_file(char *src_filename)
+{
+	return check_obj_lib_file(
+		get_lib_filename(src_filename),
+		Z80libhdr,
+		error_not_lib_file,
+		error_lib_file_version);
+}

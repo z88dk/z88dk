@@ -17,7 +17,7 @@ use Test::Differences;
 use List::AllUtils 'uniq';
 use Data::HexDump;
 
-my $OBJ_FILE_VERSION = "09";
+my $OBJ_FILE_VERSION = "10";
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";
@@ -417,11 +417,11 @@ sub objfile {
 		ref($args{CODE}) eq 'ARRAY' or die;
 		store_ptr(\$o, $code_addr);
 		for (@{$args{CODE}}) {
-			@$_ == 3 or die;
-			my($section, $org, $code) = @$_;
+			@$_ == 4 or die;
+			my($section, $org, $align, $code) = @$_;
 			$o .= pack("V", length($code)) . 
 			        pack_string($section) . 
-					pack("V", $org) . 
+					pack("VV", $org, $align) . 
 					$code;
 		}
 		$o .= pack("V", -1);

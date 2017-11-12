@@ -84,3 +84,6 @@ extern void asm_DEFB_expr(struct Expr *expr);
 /* DEFW, DEFQ - add 2-byte and 4-byte expressions */
 extern void asm_DEFW(struct Expr *expr);
 extern void asm_DEFQ(struct Expr *expr);
+
+/* align directive */
+extern void asm_ALIGN(int align, int filler);

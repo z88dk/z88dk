@@ -250,6 +250,7 @@ tokens:
   - name    : DEHL
   
   # Assembly directives
+  - name    : ALIGN
   - name    : BINARY
   - name    : C_LINE
   - name    : DEFB
