@@ -403,6 +403,10 @@ tokens:
   - name    : MMU5
   - name    : MMU6
   - name    : MMU7
+  - name    : CU_WAIT
+  - name    : CU_MOVE
+  - name    : CU_STOP
+  - name    : CU_NOP
 
   # Z180 specific opcodes
   - name    : SLP 

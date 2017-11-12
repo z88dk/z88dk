@@ -133,6 +133,35 @@ for my $page (0..7) {
 # 
 # * Times are guesses based on other instruction times.  All of this subject to change.
 
+# COPPER UNIT
+# ======================================================================================
+# cu.wait VER,HOR   ->  16-bit encoding 0x8000 + (HOR << 9) + VER
+# (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
+add("cu.wait 0,1",		0x82, 0x00);
+add("cu.wait 0,2",		0x84, 0x00);
+add("cu.wait 0,55",		0xEE, 0x00);
+
+add("cu.wait 1,0",		0x80, 0x01);
+add("cu.wait 2,0",		0x80, 0x02);
+add("cu.wait 311,0",	0x81, 0x37);
+
+# cu.move REG,VAL  -> 16-bit encoding (REG << 8) + VAL
+# (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
+add("cu.move 0,0",		0x00, 0x00);
+add("cu.move 1,0",		0x01, 0x00);
+add("cu.move 127,0",	0x7F, 0x00);
+
+add("cu.move 0,1",		0x00, 0x01);
+add("cu.move 0,2",		0x00, 0x02);
+add("cu.move 0,255",	0x00, 0xFF);
+
+# cu.stop   -> 16-bit encoding 0xffff (impossible cu.wait)
+add("cu.stop", 			0xFF, 0xFF);
+
+# cu.nop  -> 16-bit encoding 0x0000 (do nothing cu.move)
+add("cu.nop", 			0x00, 0x00);
+
+
 
 z80asm(join('', @asm), "--cpu=z80-zxn -l -b", 0, "", "");
 check_bin_file("test.bin", join('', @bin));
