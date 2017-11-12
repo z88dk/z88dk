@@ -87,11 +87,6 @@
  add de, 32767                  ; ED 35 FF 7F
  add de, 65535                  ; ED 35 FF FF
  add de, a                      ; ED 32
- add dehl, -32768               ; ED 3B 00 80
- add dehl, 32767                ; ED 3B FF 7F
- add dehl, 65535                ; ED 3B FF FF
- add dehl, a                    ; ED 39
- add dehl, bc                   ; ED 3A
  add e                          ; 83
  add h                          ; 84
  add hl, -32768                 ; ED 34 00 80
@@ -398,7 +393,6 @@
  dec c                          ; 0D
  dec d                          ; 15
  dec de                         ; 1B
- dec dehl                       ; ED 38
  dec e                          ; 1D
  dec h                          ; 25
  dec hl                         ; 2B
@@ -417,13 +411,10 @@
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; FD E3
  ex (sp), iy                    ; DD E3
- ex a32, dehl                   ; ED 22
  ex af, af                      ; 08
  ex af, af'                     ; 08
  ex de, hl                      ; EB
  exx                            ; D9
- fill de                        ; ED B5
- fillde                         ; ED B5
  halt                           ; 76
  im 0                           ; ED 46
  im 1                           ; ED 56
@@ -453,7 +444,6 @@
  inc c                          ; 0C
  inc d                          ; 14
  inc de                         ; 13
- inc dehl                       ; ED 37
  inc e                          ; 1C
  inc h                          ; 24
  inc hl                         ; 23
@@ -631,7 +621,6 @@
  ld a, iyl                      ; DD 7D
  ld a, l                        ; 7D
  ld a, r                        ; ED 5F
- ld a32, dehl                   ; ED 20
  ld b, (hl)                     ; 46
  ld b, (ix)                     ; FD 46 00
  ld b, (ix+127)                 ; FD 46 7F
@@ -707,7 +696,6 @@
  ld de, -32768                  ; 11 00 80
  ld de, 32767                   ; 11 FF 7F
  ld de, 65535                   ; 11 FF FF
- ld dehl, a32                   ; ED 21
  ld e, (hl)                     ; 5E
  ld e, (ix)                     ; FD 5E 00
  ld e, (ix+127)                 ; FD 5E 7F
@@ -752,7 +740,6 @@
  ld hl, -32768                  ; 21 00 80
  ld hl, 32767                   ; 21 FF 7F
  ld hl, 65535                   ; 21 FF FF
- ld hl, sp                      ; ED 25
  ld i, a                        ; ED 47
  ld ix, (-32768)                ; FD 2A 00 80
  ld ix, (32767)                 ; FD 2A FF 7F
@@ -909,7 +896,7 @@
  mmu7 127                       ; ED 91 57 7F
  mmu7 255                       ; ED 91 57 FF
  mmu7 a                         ; ED 92 57
- mul                            ; ED 30
+ mul d, e                       ; ED 30
  neg                            ; ED 44
  neg a                          ; ED 44
  nextreg -128, -128             ; ED 91 80 80
@@ -985,7 +972,6 @@
  pop hl                         ; E1
  pop ix                         ; FD E1
  pop iy                         ; DD E1
- popx                           ; ED 8B
  push -32768                    ; ED 8A 00 80
  push 32767                     ; ED 8A FF 7F
  push 65535                     ; ED 8A FF FF
@@ -1941,8 +1927,6 @@
  sub b                          ; 90
  sub c                          ; 91
  sub d                          ; 92
- sub dehl, a                    ; ED 3C
- sub dehl, bc                   ; ED 3D
  sub e                          ; 93
  sub h                          ; 94
  sub ixh                        ; FD 94
@@ -1950,7 +1934,6 @@
  sub iyh                        ; DD 94
  sub iyl                        ; DD 95
  sub l                          ; 95
- swap                           ; ED 23
  swapnib                        ; ED 23
  test -128                      ; ED 27 80
  test 127                       ; ED 27 7F
