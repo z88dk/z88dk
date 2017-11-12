@@ -346,6 +346,17 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
+		| label? _TK_ALIGN const_expr _TK_NEWLINE @{ 
+		    DO_STMT_LABEL(); 
+			if (!expr_error) asm_ALIGN(expr_value, opts.filler); 
+		}
+		| label? _TK_ALIGN const_expr _TK_COMMA
+				@{ value1 = expr_error ? 0 : expr_value; }
+				const_expr _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+		    if (! expr_error) asm_ALIGN(value1, expr_value); 
+		}			     
+		
 		| _TK_ORG const_expr _TK_NEWLINE @{ 
 			if (!expr_error) asm_ORG(expr_value); 
 		}

@@ -845,6 +845,7 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 				xfget_count_byte_Str(file, section_name);
 				section = new_section(str_data(section_name));
 				read_origin(file, section);
+				section->align = xfget_int32(file);
 
 				/* if creating relocatable code, ignore origin */
 				if (opts.relocatable && section->origin >= 0) {

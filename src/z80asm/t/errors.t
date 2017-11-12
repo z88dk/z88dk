@@ -76,7 +76,7 @@ for (  ["-b",	 	err_file()],
 # error_expression 
 unlink_testfiles();
 write_binfile(o_file(), objfile( NAME => "test", 
-								   CODE => [["", -1, "\0\0"]], 
+								   CODE => [["", -1, 1, "\0\0"]], 
 								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
 t_z80asm_capture("-b -d ".o_file(),
 				 "",
@@ -421,6 +421,17 @@ t_z80asm_error("
 ", "Error at file 'test.asm' line 3: relative jump address must be local");
 
 #------------------------------------------------------------------------------
+# error_obj_file_version
+unlink_testfiles();
+my $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
+substr($obj,6,2)="99";		# change version
+write_file(o_file(), $obj);
+t_z80asm_capture("-b  ".o_file(), "", <<'END', 1);
+Error: object file 'test.o' version 99, expected version 10
+1 errors occurred during assembly
+END
+
+#------------------------------------------------------------------------------
 # error_not_obj_file
 unlink_testfiles();
 write_file(o_file(), "not an object");
@@ -428,7 +439,7 @@ sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-b -d ".asm_file(), "", "", 0);
 t_binary(read_binfile(o_file()), objfile(NAME => "test", 
-										   CODE => [["", -1, "\x00"]], 
+										   CODE => [["", -1, 1, "\x00"]], 
 										   ));
 t_binary(read_binfile(bin_file()), "\x00");
 
@@ -439,10 +450,10 @@ sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-x".lib_file()." -d ".asm_file(), "", "", 0);
 t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
-												   CODE => [["", -1, "\x00"]])));
+												   CODE => [["", -1, 1, "\x00"]])));
 unlink_testfiles();
 write_binfile(o_file(), objfile( NAME => "test", 
-								   CODE => [["", -1, "\0\0"]], 
+								   CODE => [["", -1, 1, "\0\0"]], 
 								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
 t_z80asm_capture("-b -d ".o_file(),
 				 "",
@@ -460,6 +471,18 @@ t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "",
 		"Error: file 'test.lib' not a library file\n".
 		"1 errors occurred during assembly\n",
 		1);
+
+#------------------------------------------------------------------------------
+# error_lib_file_version
+unlink_testfiles();
+$lib = libfile(objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] ));
+substr($lib,6,2)="99";		# change version
+write_file(asm_file(), "nop");
+write_file(lib_file(), $lib);
+t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "", <<'END', 1);
+Error: library file 'test.lib' version 99, expected version 10
+1 errors occurred during assembly
+END
 
 #------------------------------------------------------------------------------
 # warn_expr_in_parens

@@ -66,7 +66,7 @@ z80asm(
 
 z80nm("test.o test1.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Names:
     G A $0013 a1 test.asm:13
@@ -86,11 +86,11 @@ File test.o at $0000: Z80RMF09
     E Cw (test.asm:14) $0013 $0014: __head
     E Cw (test.asm:15) $0016 $0017: __tail
     E Cw (test.asm:16) $0019 $001A: __size
-  Code: 28 bytes, ORG at $1234
+  Code: 28 bytes, ORG $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Names:
     G A $0013 a2 test1.asm:11
@@ -110,7 +110,7 @@ File test1.o at $0000: Z80RMF09
     E Cw (test1.asm:12) $0013 $0014: __head
     E Cw (test1.asm:13) $0016 $0017: __tail
     E Cw (test1.asm:14) $0019 $001A: __size
-  Code: 28 bytes, ORG at $1234
+  Code: 28 bytes, ORG $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 END
@@ -220,7 +220,7 @@ z80asm(
 
 z80nm("test.o test1.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Names:
     L A $0000 mes1 (section data) test.asm:10
@@ -242,20 +242,20 @@ File test.o at $0000: Z80RMF09
     E Cw (test.asm:25) $0012 $0013: mes0 (section code)
     E Cw (test.asm:26) $0015 $0016: mes0end-mes0 (section code)
     E Cw (test.asm:27) $0018 $0019: prmes (section code)
-  Code: 0 bytes, ORG at $1234
+  Code: 0 bytes, ORG $1234
   Code: 28 bytes (section code)
     C $0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
     C $0010: 00 00 21 00 00 01 00 00 CD 00 00 C9
   Code: 11 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Names:
     G A $0000 prmes (section code) test1.asm:7
     G A $0000 mes0 (section data) test1.asm:3
     G A $0001 mes0end (section data) test1.asm:4
-  Code: 0 bytes, ORG at $1234
+  Code: 0 bytes, ORG $1234
   Code: 9 bytes (section code)
     C $0000: 78 B1 C8 7E 23 D7 0B 18 F7
   Code: 1 bytes (section data)
@@ -313,21 +313,21 @@ ASM2
 );
 z80nm("test.o test1.o test2.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.o at $0000: Z80RMF09
+File test2.o at $0000: Z80RMF10
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -342,21 +342,21 @@ z80asm(
 );
 z80nm("test.o test1.o test2.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.o at $0000: Z80RMF09
+File test2.o at $0000: Z80RMF10
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -388,7 +388,7 @@ z80asm(
 
 z80nm("test.o", <<'...');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Names:
     L A $0000 start test.asm:2
@@ -400,7 +400,7 @@ File test.o at $0000: Z80RMF09
     E Cw (test.asm:3) $0000 $0002: end1
     E Cw (test.asm:3) $0000 $0004: end2
     E Cw (test.asm:3) $0000 $0006: end3
-  Code: 8 bytes, ORG at $0100
+  Code: 8 bytes, ORG $0100
     C $0000: 00 00 00 00 00 00 00 00
 ...
 
@@ -467,7 +467,7 @@ z80asm(
 
 z80nm("test.o test1.o test2.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   External names:
     U         func1_alias
@@ -477,23 +477,23 @@ File test.o at $0000: Z80RMF09
     E Cw (test.asm:7) $0000 $0001: func1_alias (section code)
     E Cw (test.asm:8) $0003 $0004: func2_alias (section code)
     E Cw (test.asm:9) $0006 $0007: computed_end (section code)
-  Code: 0 bytes, ORG at $1000
+  Code: 0 bytes, ORG $1000
   Code: 9 bytes (section code)
     C $0000: CD 00 00 CD 00 00 C3 00 00
   Code: 0 bytes (section lib)
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Names:
     G A $0000 func1 (section lib) test1.asm:7
     G A $0000 func2 (section code) test1.asm:10
-  Code: 0 bytes, ORG at $1000
+  Code: 0 bytes, ORG $1000
   Code: 1 bytes (section code)
     C $0000: C8
   Code: 1 bytes (section lib)
     C $0000: C9
 
-File test2.o at $0000: Z80RMF09
+File test2.o at $0000: Z80RMF10
   Name: test2
   Names:
     L A $FFFFFFFF chain1 (section lib) test2.asm:11
@@ -507,7 +507,7 @@ File test2.o at $0000: Z80RMF09
   Expressions:
     E =  (test2.asm:7) $0000 $0000: func1_alias := func1 (section lib)
     E =  (test2.asm:8) $0000 $0000: func2_alias := func2 (section lib)
-  Code: 0 bytes, ORG at $1000
+  Code: 0 bytes, ORG $1000
   Code: 0 bytes (section code)
   Code: 0 bytes (section lib)
 END
@@ -565,7 +565,7 @@ z80asm(
 
 z80nm("test.o test1.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Names:
     G A $0000 func1 test.asm:1
@@ -573,10 +573,10 @@ File test.o at $0000: Z80RMF09
     U         func2
   Expressions:
     E Cw (test.asm:1) $0000 $0001: func2
-  Code: 4 bytes, ORG at $1000
+  Code: 4 bytes, ORG $1000
     C $0000: CD 00 00 C9
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Names:
     G A $0000 func2 test1.asm:1
@@ -584,7 +584,7 @@ File test1.o at $0000: Z80RMF09
     U         func1
   Expressions:
     E Cw (test1.asm:1) $0000 $0001: func1
-  Code: 4 bytes, ORG at $1000
+  Code: 4 bytes, ORG $1000
     C $0000: CD 00 00 C9
 END
 
@@ -638,7 +638,7 @@ z80asm(
 
 z80nm("test.o test1.o test2.o", <<'...');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Names:
     G = $0000 asm_b_vector_at test.asm:4
@@ -646,16 +646,16 @@ File test.o at $0000: Z80RMF09
     U         asm_b_array_at
   Expressions:
     E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
-  Code: 0 bytes, ORG at $1000
+  Code: 0 bytes, ORG $1000
 
-File test1.o at $0000: Z80RMF09
+File test1.o at $0000: Z80RMF10
   Name: test1
   Names:
     G A $0000 asm_b_array_at test1.asm:3
-  Code: 1 bytes, ORG at $1000
+  Code: 1 bytes, ORG $1000
     C $0000: C9
 
-File test2.o at $0000: Z80RMF09
+File test2.o at $0000: Z80RMF10
   Name: test2
   Names:
     L A $0000 start test2.asm:4
@@ -665,7 +665,7 @@ File test2.o at $0000: Z80RMF09
   Expressions:
     E Cw (test2.asm:5) $0000 $0001: asm_b_vector_at
     E Cw (test2.asm:6) $0003 $0004: asm_b_array_at
-  Code: 7 bytes, ORG at $1000
+  Code: 7 bytes, ORG $1000
     C $0000: CD 00 00 CD 00 00 C9
 ...
 
@@ -883,7 +883,7 @@ ok !!$return == !!0, "retval";
 
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF10
   Name: test
   Names:
     L A $0000 test1_mess (section data) test1.asm:12
@@ -1078,12 +1078,12 @@ test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 2, 0xC9));
 
 z80nm("test_plat1.lib", <<'END');
 
-File test_plat1.lib at $0000: Z80LMF09
+File test_plat1.lib at $0000: Z80LMF10
 
-File test_plat1.lib at $0010: Z80RMF09
+File test_plat1.lib at $0010: Z80RMF10
   Name: test_plat1
 
-File test_plat1.lib at $003F: Z80RMF09
+File test_plat1.lib at $003F: Z80RMF10
   Name: test_gen
   Names:
     G A $0000 putpixel test_gen.asm:3
@@ -1094,16 +1094,16 @@ END
 
 z80nm("test_plat2.lib", <<'END');
 
-File test_plat2.lib at $0000: Z80LMF09
+File test_plat2.lib at $0000: Z80LMF10
 
-File test_plat2.lib at $0010: Z80RMF09
+File test_plat2.lib at $0010: Z80RMF10
   Name: test_plat2
   Names:
     G A $0000 putpixel test_plat2.asm:3
   Code: 3 bytes
     C $0000: 3E 02 C9
 
-File test_plat2.lib at $0073: Z80RMF09
+File test_plat2.lib at $0077: Z80RMF10
   Name: test_gen
   Names:
     G A $0000 putpixel test_gen.asm:3

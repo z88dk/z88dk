@@ -22,6 +22,8 @@ Assembly directives.
 #include "z80asm.h"
 #include <assert.h>
 
+static void check_org_align();
+
 /*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
@@ -185,6 +187,7 @@ void asm_C_LINE(int line_nr, char *filename)
 void asm_ORG(int address)
 {
 	set_origin_directive(address);
+	check_org_align();
 }
 
 void asm_PHASE(int address)
@@ -350,4 +353,36 @@ void asm_DEFW(Expr *expr)
 void asm_DEFQ(Expr *expr)
 {
 	Pass2infoExpr(RANGE_DWORD, expr);
+}
+
+void asm_ALIGN(int align, int filler)
+{
+	if (align < 1 || align > 0xFFFF) {
+		error_int_range(align);
+	}
+	else {
+		if (CURRENTSECTION->asmpc == 0) {		// first ALIGN defines section alignment
+			if (CURRENTSECTION->align_found) {
+				error_align_redefined();
+			}
+			else {
+				CURRENTSECTION->align = align;
+				CURRENTSECTION->align_found = TRUE;
+				check_org_align();
+			}
+		}
+		else {									// other ALIGN reserves space with DEFS
+			int above = CURRENTSECTION->asmpc % align;
+			if (above > 0)
+				asm_DEFS(align - above, filler);
+		}
+	}
+}
+
+static void check_org_align()
+{
+	int org = CURRENTSECTION->origin;
+	int align = CURRENTSECTION->align;
+	if (org >= 0 && align > 1 && (org % align) != 0)
+		error_org_not_aligned(org, align);
 }

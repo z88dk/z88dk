@@ -72,7 +72,7 @@ END
 
 z80nm("test.o", <<'END');
 
-	File test.o at $0000: Z80RMF09
+	File test.o at $0000: Z80RMF10
 	  Name: test
 	  Names:
 		L A $0000 here test.asm:20
@@ -84,7 +84,7 @@ z80nm("test.o", <<'END');
 	  Expressions:
 		E =  (test.asm:9) $0000 $0000: asm_BIFROST2_start := 51625+ASMPC-ASMPC
 		E =  (test.asm:10) $0000 $0000: asm_BIFROST2_stop := 51634+here-there
-	  Code: 1 bytes, ORG at $FDE8
+	  Code: 1 bytes, ORG $FDE8
 		C $0000: C9
 END
 

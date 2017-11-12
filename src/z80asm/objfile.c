@@ -463,6 +463,8 @@ static Bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 				xfget_count_byte_Str(ofile->file, section_name);
 				section = new_section(str_data(section_name));
 				read_origin(ofile->file, section);
+				section->align = xfget_int32(ofile->file);
+
 				append_reserve( code_size );
 
 				/* advance past code block */
