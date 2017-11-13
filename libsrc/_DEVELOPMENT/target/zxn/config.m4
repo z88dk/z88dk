@@ -57,6 +57,7 @@ include(`target/zxn/config/config_zxn_memory.m4')
 include(`target/zxn/config/config_zxn_nextos.m4')
 include(`target/zxn/config/config_zxn_nextreg.m4')
 include(`target/zxn/config/config_zxn_sprites.m4')
+include(`target/zxn/config/config_zxn_sysvar.m4')
 include(`target/zxn/config/config_zxn_uart.m4')
 include(`target/zxn/config/config_zxn_ula.m4')
 

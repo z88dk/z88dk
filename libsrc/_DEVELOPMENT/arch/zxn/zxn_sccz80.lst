@@ -8,4 +8,5 @@
 @arch/zxn/misc/misc_sccz80.lst
 @arch/zx/nirvanam/nirvanam_sccz80.lst
 @arch/zx/nirvanap/nirvanap_sccz80.lst
+arch/zxn/sysvar/system_variables
 @arch/zx/tape/tape_sccz80.lst
