@@ -35,12 +35,18 @@ include(__link__.m4)
 
 ///////////////////////////////////////////////////////////////
 
-// global variables
+// global variables - same port numbers are aliases
 
 extern unsigned char GLOBAL_ZX_PORT_FE;
 extern unsigned char GLOBAL_ZX_PORT_1FFD;
 extern unsigned char GLOBAL_ZX_PORT_7FFD;
-extern unsigned char GLOBAL_ZX_PORT_DFFD;
+
+extern unsigned char GLOBAL_TS_PORT_FE;
+
+extern unsigned char GLOBAL_ZXN_PORT_FE;
+extern unsigned char GLOBAL_ZXN_PORT_1FFD;
+extern unsigned char GLOBAL_ZXN_PORT_7FFD;
+extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
 ///////////////////////////////////////////////////////////////
 
