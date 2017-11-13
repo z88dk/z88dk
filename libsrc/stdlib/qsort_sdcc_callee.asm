@@ -65,11 +65,7 @@ asm_qsort:
    ld (_base),bc
 
    ; t1 = nel * width;
-IF __CPU_Z80_ZXN__
-   mul
-ELSE
    call  l_mult
-ENDIF
    ld (_t1),hl
 
    ; for (ngap = nel / 2; ngap > 0; ngap /= 2) {
