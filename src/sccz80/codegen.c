@@ -1213,34 +1213,6 @@ void quikmult(int type, int32_t size, char preserve)
     }
 
 
-    // KIND_INT here
-    // ZXN: ld de,nnnn ; mul = 14T
-    if ( c_cpu & CPU_Z80ZXN ) {
-        switch (size) {
-        case 0: // 10T
-            vconst(0);
-            break;
-        case 1:
-            break;
-        case 2: // 11T
-            ol("add\thl,hl");
-            break;
-        case 256: // 11T
-            ol("ld\th,l");
-            ol("ld\tl,0");
-            break;
-        default:
-            if (preserve)
-                ol("push\tde");
-            const2(size);
-            ol("mul");
-            if (preserve)
-                ol("pop\tde");
-            break;
-        }
-        return;
-    }
-
     switch (size) {
     case 0:
         vconst(0);
@@ -1479,11 +1451,7 @@ void mult(LVALUE* lval)
             break;
         }
     default:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("mul");
-        } else {
-            callrts("l_mult"); 
-        }
+        callrts("l_mult"); 
     }
 }
 
@@ -2316,11 +2284,7 @@ void inc(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("inc\tdehl");
-        } else {
-            callrts("l_inclong");
-        }
+        callrts("l_inclong");
         break;
     default:
         ol("inc\thl");
@@ -2344,11 +2308,7 @@ void dec(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("dec\tdehl");
-        } else {
-            callrts("l_declong");
-        }
+        callrts("l_declong");
         break;
     default:
         ol("dec\thl");
