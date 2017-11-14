@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "define.h"
 
