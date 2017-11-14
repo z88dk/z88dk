@@ -9,6 +9,22 @@
 
 #include "ccdefs.h"
 
+static int        heir1a(LVALUE *lval);
+static int        heir2a(LVALUE *lval);
+static int        heir2b(LVALUE *lval);
+static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value));
+static int        heir2(LVALUE *lval);
+static int        heir3(LVALUE *lval);
+static int        heir4(LVALUE *lval);
+static int        heir5(LVALUE *lval);
+static int        heir6(LVALUE *lval);
+static int        heir7(LVALUE *lval);
+static int        heir8(LVALUE *lval);
+static int        heir9(LVALUE *lval);
+static int        heirb(LVALUE *lval);
+static SYMBOL    *deref(LVALUE *lval, char isaddr);
+
+
 Kind expression(int  *con, double *val, Type **type)
 {
     LVALUE lval={0};

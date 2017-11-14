@@ -10,6 +10,10 @@
 
 #include "ccdefs.h"
 
+static double   CalcStand(double left, void (*oper)(LVALUE *), double right);
+static void     nstep(LVALUE *lval, int n, void (*unstep)(LVALUE *lval));
+static void     store(LVALUE *lval);
+
 int primary(LVALUE* lval)
 {
     char sname[NAMESIZE];

@@ -535,10 +535,6 @@ void size_of(LVALUE* lval)
     } else if (symname(sname)) { /* Size of an object */
         Type *type;
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
-            Kind ptrtype = KIND_NONE;
-            Type       *ptrotag = NULL;
-
-
             type = ptr->ctype;
             lval->const_val = type->size;
             
@@ -551,14 +547,8 @@ void size_of(LVALUE* lval)
                     do {
                         if ( (mptr = get_member(ptr->ctype->tag) ) != NULL ) {
                             type = mptr;
-                            ptrtype = 0;
-                            ptrotag = NULL;
                             if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
-                                ptrtype = mptr->ptr->kind;
-                                //ptrflags = ptr->flags;
-                                if  (mptr->ptr->kind == KIND_STRUCT) {
-                                    ptrotag = mptr->tag;
-                                }
+                                // Do nothing
                             } else {
                                 // tag_sym->size = numner of elements
                                 lval->const_val = mptr->size;

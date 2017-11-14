@@ -48,7 +48,7 @@ extern void defmesg(void);
 extern void point(void);
 extern int modstk(int newsp, int save,int saveaf);
 extern void scale(Kind type, Type *tag);
-extern void zadd_const(LVALUE *lval, int32_t value);;
+extern void zadd_const(LVALUE *lval, int32_t value);
 extern void zadd(LVALUE *);
 extern void zsub(LVALUE *);
 extern void mult(LVALUE *);

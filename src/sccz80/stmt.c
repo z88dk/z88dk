@@ -9,6 +9,21 @@
 
 #include "ccdefs.h"
 
+static void     ns(void);
+static void     compound(void);
+static void     doiferror(void);
+static void     doif(void);
+static Type    *doexpr(void);
+static void     dowhile(void);
+static void     dodo(void);
+static void     dofor(void);
+static void     doswitch(void);
+static void     docase(void);
+static void     dodefault(void);
+static void     doreturn(char);
+static void     dobreak(void);
+static void     docont(void);
+
 /*
  *      Some variables for goto and cleaning up after compound 
  *      statements

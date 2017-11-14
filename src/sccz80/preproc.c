@@ -8,6 +8,10 @@
 
 #include "ccdefs.h"
 
+static void       ifline(void);
+static void       noiferr(void);
+static int        findmac(char *sname);
+
 void junk()
 {
     if (an(inbyte()))
