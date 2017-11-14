@@ -40,14 +40,14 @@ int statement()
     if (ch() == 0 && eof) {
         return (lastst = STEXP);
     } else {
-        char regit = NO;
 
         if (amatch("extern")) {
             dodeclare(EXTERNAL);
             return lastst;
         }
         /* Ignore the register and auto keywords! */
-        regit = locstatic = ((swallow("register")) | swallow("auto"));
+        swallow("register");
+        swallow("auto");
 
         /* Check to see if specified as static, and also for far and near */
         locstatic = amatch("static");
