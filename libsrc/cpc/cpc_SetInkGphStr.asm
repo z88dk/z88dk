@@ -19,7 +19,7 @@
 		add ix,sp
 		
 
-		ld a,(ix+0) ;valor
-		ld c,(ix+2)	;color
+		ld a,(ix+2) ;valor
+		ld c,(ix+0)	;color
 
         jp cpc_SetInkGphStr_callee + ASMDISP_CPC_SET_INKGPHSTR_CALLEE
