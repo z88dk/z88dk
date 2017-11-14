@@ -338,9 +338,16 @@ Type *parse_struct(Type *type, int isstruct)
                     errorfmt("Member variables must be named",1);
                 }
                 elem->offset = offset;
-                if ( isstruct ) { 
-                    offset += elem->size;
-                    size += elem->size;
+                if ( isstruct ) {
+                    // Accept arr[0] as a synonym for arr[] for flexible members
+                    if ( elem->size == 0 && elem->kind == KIND_ARRAY ) {
+                        elem->size = -1;
+                        elem->len = -1;
+                    }
+                    if ( elem->size != -1 ) {
+                        offset += elem->size;
+                        size += elem->size;
+                    }
                 } else { 
                     if ( elem->size > size ) size = elem->size;
                 }
@@ -350,6 +357,18 @@ Type *parse_struct(Type *type, int isstruct)
             }
             // Swallow bitfields
             swallow_bitfield();
+
+            // It was a flexible member, this needs to be last in the sturct
+            if ( elem->size <= 0 ) {
+                if ( rcmatch(';') == 0 ) {
+                    errorfmt("Flexible member needs to be last element of struct",1);
+                }
+                needchar(';');
+                if ( rcmatch('}') == 0 ) {
+                    errorfmt("Flexible member needs to be last element of struct",1);
+                }
+                break;
+            }
 
             if ( rcmatch('}')) 
                 break;
