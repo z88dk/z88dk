@@ -400,6 +400,47 @@ Define rules for a ragel-based parser.
 
 #include "dev/cpu/cpu_rules.h"
 
+		/*---------------------------------------------------------------------
+		*   ZXN Copper Unit
+		*--------------------------------------------------------------------*/
+		| label? _TK_CU_WAIT const_expr _TK_COMMA
+				@{ value1 = expr_error ? 0 : expr_value; }
+				const_expr _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			if (expr_error) 
+				;
+			else if (value1 < 0 || value1 > 311)
+				error_int_range(value1);
+			else if (expr_value < 0 || expr_value > 55)
+				error_int_range(expr_value);
+			else 
+				add_copper_unit_opcode(0x8000 + (expr_value << 9) + value1);
+		}
+		
+		| label? _TK_CU_MOVE const_expr _TK_COMMA
+				@{ value1 = expr_error ? 0 : expr_value; }
+				const_expr _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			if (expr_error) 
+				;
+			else if (value1 < 0 || value1 > 127)
+				error_int_range(value1);
+			else if (expr_value < 0 || expr_value > 255)
+				error_int_range(expr_value);
+			else 
+				add_copper_unit_opcode(0x0000 + (value1 << 8) + expr_value);
+		}
+		
+		| label? _TK_CU_STOP _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			add_copper_unit_opcode(0xFFFF);
+		}
+		
+		| label? _TK_CU_NOP _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			add_copper_unit_opcode(0x0000);
+		}
+		
 		;
 
 }%%

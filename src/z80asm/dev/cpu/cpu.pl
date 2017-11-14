@@ -314,7 +314,7 @@ for my $cpu (@CPUS) {
 		}
 	}
 	elsif ($z80_zxn) {
-		add_opc($cpu, "mul", 0xED, 0x30);
+		add_opc($cpu, "mul d, e", 0xED, 0x30);
 	}
 	elsif ($rabbit) {
 		add_opc($cpu, "mul", 0xF7);
@@ -544,16 +544,9 @@ for my $cpu (@CPUS) {
 	
 	# Z80-ZXN opcodes for ZX Next
 	if ($z80_zxn) {
-		add_opc($cpu, "ld a32, dehl", 	0xED, 0x20);
-		add_opc($cpu, "ld dehl, a32", 	0xED, 0x21);
-		add_opc($cpu, "ex a32, dehl", 	0xED, 0x22);
-		
 		add_opc($cpu, "swapnib", 		0xED, 0x23);
-		add_opc($cpu, "swap", 			0xED, 0x23);
 		add_opc($cpu, "mirror a", 		0xED, 0x24);
 		
-		add_opc($cpu, "ld hl, sp",		0xED, 0x25);
-
 		add_opc($cpu, "mirror de", 		0xED, 0x26);
 		
 		add_opc($cpu, "add hl, a",		0xED, 0x31);
@@ -563,16 +556,6 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "add hl, %m",		0xED, 0x34, '%m', '%m');
 		add_opc($cpu, "add de, %m",		0xED, 0x35, '%m', '%m');
 		add_opc($cpu, "add bc, %m",		0xED, 0x36, '%m', '%m');
-		
-		add_opc($cpu, "inc dehl",	 	0xED, 0x37);
-		add_opc($cpu, "dec dehl",	 	0xED, 0x38);
-
-		add_opc($cpu, "add dehl, a", 	0xED, 0x39);
-		add_opc($cpu, "add dehl, bc", 	0xED, 0x3A);
-		add_opc($cpu, "add dehl, %m", 	0xED, 0x3B, '%m', '%m');
-		
-		add_opc($cpu, "sub dehl, a", 	0xED, 0x3C);
-		add_opc($cpu, "sub dehl, bc", 	0xED, 0x3D);
 		
 		add_opc($cpu, "mmu %c, %n",		0xED, 0x91, '0x50+%c(0..7)', '%n');
 		for my $page (0..7) {
@@ -585,7 +568,6 @@ for my $cpu (@CPUS) {
 		}
 
 		add_opc($cpu, "push %m",	 	0xED, 0x8A, '%m', '%m');
-		add_opc($cpu, "popx",		 	0xED, 0x8B);
 
 		add_opc($cpu, "outinb",			0xED, 0x90);
 		
@@ -602,9 +584,6 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "lddrx",			0xED, 0xBC);
 		
 		add_opc($cpu, "ldirscale",		0xED, 0xB6);
-		
-		add_opc($cpu, "fill de",		0xED, 0xB5);
-		add_opc($cpu, "fillde",			0xED, 0xB5);
 		
 		add_opc($cpu, "ldpirx",			0xED, 0xB7);
 	}

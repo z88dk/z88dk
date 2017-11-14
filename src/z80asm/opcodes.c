@@ -166,3 +166,13 @@ void add_Z88_INVOKE(int argument)
 	else
 		error_int_range(argument);
 }
+
+void add_copper_unit_opcode(int opcode)
+{
+	if (opts.cpu != CPU_Z80_ZXN)
+		error_illegal_ident();
+
+	// copper unit is big-endiand
+	append_byte((opcode >> 8) & 0xFF);
+	append_byte((opcode     ) & 0xFF);
+}

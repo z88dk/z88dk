@@ -19,7 +19,7 @@
 	push	hl
 	push	bc
 	pop	de
-	mul
+	call	l_mult
 	pop	bc
 	pop	bc
 	ret
@@ -59,10 +59,10 @@
 	add	hl,sp
 	push	hl
 	call	l_glong
-	inc	dehl
+	call	l_inclong
 	pop	bc
 	call	l_plong
-	dec	dehl
+	call	l_declong
 	ret
 
 
