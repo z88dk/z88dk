@@ -13,15 +13,15 @@
 		
         EXTERN colores_camb
 
-        INCLUDE "cpcfirm.def"              
 
 .cpc_SetInkGphStr_callee
 ._cpc_SetInkGphStr_callee
 
    pop hl
-   pop bc	; color
+   pop bc	;valor
    ex (sp),hl	; valor
-   ld	a,l
+   ld	a,c
+   ld	c,l
    
 
 .asmentry

@@ -6,27 +6,27 @@
 ; **	   Raúl Simarro, 	  Artaburu 2009           **
 ; ******************************************************
 ;
-;       void  cpc_PrintGphStr(char *, unsigned int address) __smallc ;
+;       void  cpc_PrintGphStrM1(char *, unsigned int address) __smallc ;
 ;
-;       $Id: cpc_PrintGphStr_callee.asm $
+;       $Id: cpc_PrintGphStrM1_callee.asm $
 ;
 
         SECTION   code_clib
-        PUBLIC    cpc_PrintGphStr_callee
-        PUBLIC    _cpc_PrintGphStr_callee
+        PUBLIC    cpc_PrintGphStrM1_callee
+        PUBLIC    _cpc_PrintGphStrM1_callee
 		
-        EXTERN    cpc_GetScrAddress0
-        EXTERN    cpc_PrintGphStr0
+        EXTERN    cpc_PrintGphStr0M1
 		
 
-.cpc_PrintGphStr_callee
-._cpc_PrintGphStr_callee
+.cpc_PrintGphStrM1_callee
+._cpc_PrintGphStrM1_callee
 
 
 	pop bc
 	pop hl		; address
-	pop de		; text
+	pop de		; tesxt
 	push bc	; ret addr
 	xor a
     
- JP cpc_PrintGphStr0
+ JP cpc_PrintGphStr0M1
+ 

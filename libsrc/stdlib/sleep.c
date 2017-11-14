@@ -41,7 +41,7 @@ void sleep(int secs)
 	gen_tv_field_init(0);
 #endif
         
-        while ( (clock() - start) < per ) {
+        while ( ((clock() - start) < per) && (clock()>per) ) {
 #ifdef __ZX80__
 	    gen_tv_field();
             FRAMES++;
