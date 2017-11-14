@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef __NEXTOS_H__
-#define __NEXTOS_H__
+#ifndef __SYSVAR_H__
+#define __SYSVAR_H__
 
 #include <arch.h>
 
