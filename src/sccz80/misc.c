@@ -10,9 +10,9 @@
 
 /* Generic change suffix routine */
 
-void changesuffix(char* name, char* suffix)
+void changesuffix(char *name, char *suffix)
 {
-    int j;
+    size_t j;
     j = strlen(name) - 1;
     while (j && name[j - 1] != '.')
         j--;

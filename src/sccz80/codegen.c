@@ -2136,7 +2136,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             break;
         default: // 7 bytes
             if ( value >= 16 ) {
-                warning(W_LEFTSHIFT_TOO_BIG);
+                warningfmt("Left shifting by more than the size of the object");
                 vconst(0);
             } else {
                 const2(value);
@@ -2189,7 +2189,7 @@ void asl_const(LVALUE *lval, int32_t value)
             callrts("l_long_aslo");
             break;
         default: //  5 bytes
-            if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
+            if ( value >= 32 ) warningfmt("Left shifting by more than the size of the object");
             value &= 31;
             if (  value >= 16 ) {
                 asl_16bit_const(lval, value - 16);

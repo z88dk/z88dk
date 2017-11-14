@@ -30,7 +30,7 @@ static int lastline = 0;
 int statement()
 {
     int st;
-    char locstatic; /* have we had the static keyword */
+    int locstatic; /* have we had the static keyword */
 
     blanks();
     if (lineno != lastline) {
@@ -50,14 +50,7 @@ int statement()
         regit = locstatic = ((swallow("register")) | swallow("auto"));
 
         /* Check to see if specified as static, and also for far and near */
-        if (amatch("static")) {
-            if (locstatic) {
-                warning(W_BADSTC);
-                locstatic = NO;
-            } else
-                locstatic = YES;
-        } else
-            locstatic = NO;
+        locstatic = amatch("static");
 
         if ( declare_local(locstatic) ) {
             return lastst;
@@ -192,7 +185,7 @@ int statement()
 void ns()
 {
     if (cmatch(';') == 0)
-        warning(W_EXPSEMI);
+        warningfmt("Expected ';'");
 }
 
 /*
@@ -205,7 +198,7 @@ void compound()
     SYMBOL* savloc;
 
     if (ncmp == MAX_LEVELS)
-        error(E_MAXLEVELS, ncmp);
+        errorfmt("Maximum nesting level reached (%d)", 1, ncmp);
 
     stkstor[ncmp] = Zsp;
     savloc = locptr;
@@ -468,15 +461,15 @@ void docase()
     double value;
     Kind   valtype;
     if (swactive == 0)
-        error(E_SWITCH);
+        errorfmt("Not in switch", 0 );
     if (swnext > swend) {
-        error(E_CASE);
+        errorfmt("Too many cases", 0 );
         return;
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
     if ( valtype == KIND_DOUBLE ) 
-        warning(W_DOUBLE_UNEXPECTED);
+        warningfmt("Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');
     ++swnext;
@@ -486,9 +479,9 @@ void dodefault()
 {
     if (swactive) {
         if (swdefault)
-            error(E_DEFAULT);
+            errorfmt("Multiple defaults", 0);
     } else
-        error(E_SWITCH);
+        errorfmt("Not in switch", 0 );
     needchar(':');
     postlabel(swdefault = getlabel());
 }
@@ -621,7 +614,7 @@ void docont()
 static void docritical(void)
 {
     if ( incritical ) {
-        error(E_NESTED_CRITICAL);
+        errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
     zentercritical();
@@ -694,7 +687,7 @@ void doasm()
     }
     clear(); /* invalidate line */
     if (eof)
-        warning(W_UNTERM);
+        warningfmt("Unterminated assembler code");
     cmode = 1; /* then back to parse level */
 }
 
@@ -714,7 +707,7 @@ void dopragma()
     else if (amatch("endasm"))
         endasm = 1;
     else {
-        warning(W_PRAGMA);
+        warningfmt("Unknown #pragma directive");
         clear();
     }
 }

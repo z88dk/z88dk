@@ -54,7 +54,6 @@ extern void dofloat(double raw, unsigned char fa[]);
 #include "data.h"
 #include "declinit.h"
 
-extern Type      *type_int;
 extern void       array_free(array *arr);
 extern size_t     array_len(array *arr);
 extern void       array_add(array *arr, void *elem);

@@ -154,7 +154,7 @@ int AddGoto(SYMBOL* ptr)
     if ((gptr = SearchGoto(ptr)))
         return (gptr->label);
     if (++gotocnt > NUMGOTO)
-        error(E_MAXGOTO, NUMGOTO);
+        errorfmt("Maximum number of gotos reached (%d)", 1, NUMGOTO);
     gptr = gotoq + gotocnt; /* Ref for our label */
     gptr->next = gqptr; /* store next in chain */
     ptr->more = gotocnt; /* Make us first */

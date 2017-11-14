@@ -41,7 +41,7 @@ struct t_buffer_s {
 	char *next;
 };
 
-extern t_buffer * startbuffer(int blocks);
+extern t_buffer * startbuffer(size_t blocks);
 extern void clearbuffer(t_buffer *buf);
 extern void suspendbuffer(void);
 extern int outbuffer(char c);
