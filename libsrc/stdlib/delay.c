@@ -36,7 +36,7 @@ long x;
 	long start = clock();  
 	long per   = msecs * CLOCKS_PER_SEC / 1000;
 
-        while ( (clock() - start) < per ) {
+        while ( ((clock() - start) < per) && (clock()>per) ) {
 #ifdef __ZX80__
 	    gen_tv_field();
             FRAMES++;
