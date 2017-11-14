@@ -102,8 +102,6 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
     { 0, "do-inline", OPT_ASSIGN|OPT_INT, "Inlne some common functions", &c_doinline, ~0 },
-    { 0, "inline-gint", OPT_OR, "Inline the l_gint call", &c_doinline, INLINE_GINT },
-    { 0, "inline-pint", OPT_OR, "Inline the l_pint call", &c_doinline, INLINE_PINT },
     { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
     { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },

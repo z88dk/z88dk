@@ -22,12 +22,8 @@ EXTERN cleanup
 
 .randomize
 ._randomize
-IF __CPU_Z80_ZXN__
-   ld   hl,sp
-ELSE
    ld	hl,0
    add	hl,sp
-ENDIF
    call	agarble
    ld	e,a
    

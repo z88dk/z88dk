@@ -53,6 +53,9 @@ extern void add_Z88_CALL_PKG(int argument);
 extern void add_Z88_FPP(int argument);
 extern void add_Z88_INVOKE(int argument);
 
+/* add COPPER UNIT opcode (ZX Next) */
+extern void add_copper_unit_opcode(int opcode);
+
 /* assert we are on a Z80 */
 #define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80_ZXN)) ? \
 								(error_illegal_ident(), 0) : \

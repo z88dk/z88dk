@@ -16,8 +16,8 @@
 
 .getk
 ._getk
-        ;call    $cf5
-	ld a,($2bb4)
+        call    $cf5
+	;ld a,($2bb4)
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return

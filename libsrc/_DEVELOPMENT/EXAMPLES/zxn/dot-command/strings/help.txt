@@ -1,0 +1,16 @@
+.strings file [-n num]
+ [-s string] [-t {o,d,x}]
+ [-w] [-f] [-o file] [-a file]
+
+ -n = set min string len (4)
+ -s = print separator ("\n")
+ -t = file offset dec/oct/hex
+ -w = make \r\n part of string
+
+ -f = overwrite permitted
+ -o = output filename
+ -a = append filename
+
+no -o,-a prints to screen
+
+strings v1.0 spectrum z88dk.org

@@ -2,9 +2,9 @@
 
 To use, copy "DZX7" to the sd card's BIN directory.
 
-`ZX7` is an optimal lz77 compressor written by Einar Saukas with a decompressor counterpart in z88dk's z80 library.  It is frequently used to compress data for z80 machines.  The decompressor has an excellent balance of compression ratio, decompression speed and decompressor size (~80 bytes).
+`ZX7` is an optimal lz77 compressor written by Einar Saukas with a decompressor counterpart in z88dk's z80 library.  It is frequently used to compress data for z80 machines.  The decompressor has an excellent balance of compression ratio, decompression speed and decompressor size (~70 bytes).
 
-`.dzx7` is the decompressor counterpart for `ZX7`.  The difference between this dot command and the z80 library's decompressor is that this dot command can decompress files of any size, including many megabytes if you have the patience.  The intention is to use `zx7` to transmit compressed files over the internet and then decompress them on the zx-next itself.
+`.dzx7` is the decompressor counterpart for `ZX7`.  The difference between this dot command and the z80 library's decompressor is that this dot command can decompress files of any size, including many megabytes.  The intention is to use `zx7` to transmit compressed files over the internet and then to decompress them on the zx-next itself.
 
 `DZX7` is part of Einar's toolset for the PC and is written in C.  The program has been adapted to z88dk so that it can be compiled for the zx-next and esxdos.  The original source code along with comments by Einar can be found in the [z88dk source repository](https://github.com/z88dk/z88dk/tree/master/src/zx7).
 

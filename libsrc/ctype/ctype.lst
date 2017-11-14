@@ -1,1 +1,1 @@
-@ctype/ctype-newlib.lst
+ctype/obj/${TYPE}/**/*.o

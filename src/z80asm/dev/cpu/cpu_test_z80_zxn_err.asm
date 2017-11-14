@@ -4240,6 +4240,7 @@
  mmu 8, 255                     ; Error
  mmu 8, a                       ; Error
  mmu 8, a                       ; Error
+ mul                            ; Error
  neg a'                         ; Error
  or a', (hl)                    ; Error
  or a', (ix)                    ; Error

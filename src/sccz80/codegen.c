@@ -455,14 +455,7 @@ void putstk(LVALUE *lval)
         break;
     default:
         zpop();
-        if (c_doinline & INLINE_PINT) {
-            LoadAccum();
-            ol("ld\t(de),a");
-            ol("inc\tde");
-            ol("ld\ta,h");
-            ol("ld\t(de),a");
-        } else
-            callrts("l_pint");
+        callrts("l_pint");
     }
 }
 
@@ -585,20 +578,13 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (c_doinline & INLINE_GINT) {
-            ol("ld\ta,(hl)");
-            ol("inc\thl");
-            ol("ld\th,(hl)");
-            ol("ld\tl,a");
-        } else {
-            ot("call\tl_gint\t;");
+        ot("call\tl_gint\t;");
 #ifdef USEFRAME
-            if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
-                OutIndex(lval->offset);
-            }
-#endif
-            nl();
+        if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
+            OutIndex(lval->offset);
         }
+#endif
+        nl();
     }
 }
 
@@ -1227,34 +1213,6 @@ void quikmult(int type, int32_t size, char preserve)
     }
 
 
-    // KIND_INT here
-    // ZXN: ld de,nnnn ; mul = 14T
-    if ( c_cpu & CPU_Z80ZXN ) {
-        switch (size) {
-        case 0: // 10T
-            vconst(0);
-            break;
-        case 1:
-            break;
-        case 2: // 11T
-            ol("add\thl,hl");
-            break;
-        case 256: // 11T
-            ol("ld\th,l");
-            ol("ld\tl,0");
-            break;
-        default:
-            if (preserve)
-                ol("push\tde");
-            const2(size);
-            ol("mul");
-            if (preserve)
-                ol("pop\tde");
-            break;
-        }
-        return;
-    }
-
     switch (size) {
     case 0:
         vconst(0);
@@ -1284,7 +1242,7 @@ void quikmult(int type, int32_t size, char preserve)
     case 1:
         break;
     case 64:
-        ol("add\thl,hl");  /* 6 bytes, 66T */
+        ol("add\thl,hl");  /* 6 bytes, 66T, (RCM) 6 bytes, 12T */
     case 32:
         ol("add\thl,hl");
     case 16:
@@ -1320,6 +1278,10 @@ void quikmult(int type, int32_t size, char preserve)
     case 7:
         sixreg();
         ol("add\thl,bc");  /* BC contains original value */
+        break;
+    case 65535:
+    case -1:
+        callrts("l_neg");
         break;
     default:
         if (preserve)
@@ -1489,11 +1451,7 @@ void mult(LVALUE* lval)
             break;
         }
     default:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("mul");
-        } else {
-            callrts("l_mult"); 
-        }
+        callrts("l_mult"); 
     }
 }
 
@@ -1896,6 +1854,28 @@ void zand_const(LVALUE *lval, int32_t value)
             const2(0);
         } else if ( value == 0xffffff ) { // 2 bytes
             ol("ld\td,0");
+        } else if ( value == 0xffffffff ) {
+            // Do nothing
+        } else if ( (value & 0xffffff00) == 0xffffff00 ) {
+           // Only the bottom 8 bits
+           ol("ld\ta,l");
+           outfmt("\tand\t%d\n",(value & 0xff));
+           ol("ld\tl,a");
+        } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
+           // Only the bits 15-8
+           ol("ld\ta,h");
+           outfmt("\tand\t%d\n",(value & 0xff00)>>8);
+           ol("ld\th,a");
+        } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
+           // Only the bits 23-16
+           ol("ld\ta,e");
+           outfmt("\tand\t%d\n",(value & 0xff0000)>>16);
+           ol("ld\te,a");
+        } else if ( (value & 0x00ffffff) == 0x00ffffff ) {
+           // Only the bits 32-23
+           ol("ld\ta,d");
+           outfmt("\tand\t%d\n",(value & 0xff000000) >> 24);
+           ol("ld\td,a");
         } else { // 13 bytes
             lpush(); // 4
             vlongconst(value); // 6
@@ -1917,6 +1897,8 @@ void zand_const(LVALUE *lval, int32_t value)
             ot("and\t"); outdec( (value % 65536) / 256); nl();
             ol("ld\th,a");
             ol("ld\tl,0");            
+        } else if ( value == 0xffff ) {
+            // Do nothing
         } else {
             const2(value);
             zand(lval);
@@ -2302,11 +2284,7 @@ void inc(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("inc\tdehl");
-        } else {
-            callrts("l_inclong");
-        }
+        callrts("l_inclong");
         break;
     default:
         ol("inc\thl");
@@ -2330,11 +2308,7 @@ void dec(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("dec\tdehl");
-        } else {
-            callrts("l_declong");
-        }
+        callrts("l_declong");
         break;
     default:
         ol("dec\thl");

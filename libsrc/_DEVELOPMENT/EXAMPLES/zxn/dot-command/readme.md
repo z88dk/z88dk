@@ -17,3 +17,11 @@ A decompressor for ZX7-compressed files.
 ### .EXTRACT
 
 A utility that can extract all or a portion of a file and either save to another file or load into the zx-next's memory.
+
+### .STRINGS
+
+A utility for finding text in files.
+
+### TODO LIST
+
+.zx7, .inject, .run, .md5sum, .tsr, .ftp, .dc, .viewnxi, .bmp2nxi, .nxigrab, .zxnreset, .gunzip

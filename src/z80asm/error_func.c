@@ -276,6 +276,24 @@ void error_org_redefined(void)
 	
 	STR_DELETE(msg);
 }
+void error_align_redefined(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "ALIGN redefined" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_org_not_aligned(int org, int align)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "ORG '0x%04X' not ALIGNed '%d'", org, align );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_invalid_org_option(char *org_hex)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -321,11 +339,29 @@ void error_not_obj_file(char *filename)
 	
 	STR_DELETE(msg);
 }
+void error_obj_file_version(char *filename, int found_version, int expected_version)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "object file '%s' version %d, expected version %d", filename, found_version, expected_version );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_not_lib_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
 	str_append_sprintf( msg, "file '%s' not a library file", filename );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_lib_file_version(char *filename, int found_version, int expected_version)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "library file '%s' version %d, expected version %d", filename, found_version, expected_version );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);

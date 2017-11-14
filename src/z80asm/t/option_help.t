@@ -68,6 +68,7 @@ Libraries:
   -i, --use-lib=FILE     Link library file.lib
 
 Binary Output:
+  -O=DIR                 Output directory
   -o, --output=FILE      Output binary file
   -b, --make-bin         Assemble and link/relocate to file.bin
   --split-bin            Create one binary file per section

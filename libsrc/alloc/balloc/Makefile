@@ -1,3 +1,7 @@
+#
+# Wahey, a messed up makefile for building libraries!
+#
+# $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
 
 include ../../Make.config
 
@@ -7,31 +11,32 @@ CLASSIC_ASM = $(wildcard *.asm)
 CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
 CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
 
-NEWLIBASM := $(shell z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/alloc/balloc/balloc_sccz80.lst -p $(NEWLIB_DIRECTORY) -t)
-NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
+NEWLIBASM := $(wildcard $(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm) $(wildcard $(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm)
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80-zxn obj/newlib-r2k obj/newlib-ixiy
 
-OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
+
+OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS)
 
 .PHONY: dirs
 
-all: dirs $(OBJECTS) balloc-newlib.lst
+all: dirs $(OBJECTS) 
 
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-z80: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $^
+	@touch $@
 
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-r2k: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $^
+	@touch $@
 
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-z80-zxn: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $^
+	@touch $@
 
-obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-ixiy: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $^
+	@touch $@
+
 
 obj/z80/%.o: %.asm
 	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
@@ -61,12 +66,9 @@ obj/ixiy/%.o: %.c
 obj/r2k/%.o: %.c
 	zcc +rcmx000 $(CFLAGS) -o $  $^
 
-balloc-newlib.lst:
-	@z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/alloc/balloc/balloc_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'alloc/balloc/obj/$${TYPE}' -c -o balloc-newlib.lst
-
 dirs:
-	@mkdir -p $(sort $(dir $(OBJECTS)))
+	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
 
 
 clean:
-	$(RM) -fr obj balloc-newlib.lst
+	$(RM) -fr obj

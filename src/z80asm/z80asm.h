@@ -28,3 +28,4 @@ extern char *GetLibfile( char *filename );
 extern void assemble_file( char *filename );
 extern Bool Pass2info(range_t range);
 extern Bool Pass2infoExpr(range_t range, Expr *expr);
+extern int z80asm_main(int argc, char *argv[]);

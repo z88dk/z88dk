@@ -28,6 +28,13 @@
  * Program performs identically.
  */
 
+// ZX SPECTRUM
+//
+// zcc +zx -vn -subtype=dot -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size dzx7.c ram.asm -o dzx7 -create-app
+// zcc +zx -vn -subtype=dot -startup=30 -clib=new dzx7.c ram.asm -o dzx7 -create-app
+
+// ZX NEXT
+//
 // zcc +zxn -vn -subtype=dot -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size dzx7.c ram.asm -o dzx7 -create-app
 // zcc +zxn -vn -subtype=dot -startup=30 -clib=new dzx7.c ram.asm -o dzx7 -create-app
 
@@ -38,10 +45,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <arch/zxn/esxdos.h>
 #include <errno.h>
 #include <input.h>
 #include <z80.h>
+
+#if __ZXNEXT
+#include <arch/zxn/esxdos.h>
+#else
+#include <arch/zx/esxdos.h>
+#endif
 
 #define BUFFER_SIZE     16384   // must be > MAX_OFFSET, must remain consistent with dzx7.asm
 #define MAINBANK_ADDR  (65536 - BUFFER_SIZE*2)
@@ -70,10 +82,11 @@ unsigned char bit_value;
 
 // custom esxdos error report
 
+#define ebuf input_data
+
 int error(char *fmt, ...)
 {
    unsigned char *p;
-   static unsigned char ebuf[65];
    
    va_list v;
    va_start(v, fmt);
@@ -293,8 +306,6 @@ int main(int argc, char **argv)
              "-f Overwrite output file\n\n");
       return 0;
    }
-
-   strupr(output_name);
    
    if (!stricmp(output_name, input_name))
       return error("In and out files are same");

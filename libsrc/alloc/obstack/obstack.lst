@@ -1,1 +1,1 @@
-@alloc/obstack/obstack-newlib.lst
+alloc/obstack/obj/${TYPE}/**/*.o

@@ -1,10 +1,11 @@
 # .EXTRACT dot command
 
-This version is for the zx next.  To use, copy "EXTRACT" to the sd card's BIN directory.
+To use, copy "EXTRACT" to the sd card's BIN directory. \\
+This program can be compiled for either the zx spectrum or the zx next.  The zx next version includes options to use the full memory space.
 
 ## Compiling
 
-`zsdcc` compile (optimization is high so compile time will be long)
+`zsdcc` compile (optimization is high so compile time will be long).
 ~~~
 zcc +zxn -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size extract.c help-zxn.asm -o extract -subtype=dot -create-app
 ~~~
@@ -13,6 +14,17 @@ An `sccz80` compile produces code that is too large for esxdos.  Compile line ca
 ## Usage
 
 `.extract` entered on its own at the basic prompt will print help.
+
+This utility reads some portion of a file and either:
+
+* saves that portion to another file
+* appends that portion to another file
+* loads that portion into the zx-next's memory
+* prints that portion in a hexdump
+
+The data can be loaded anywhere in the zx-next's memory space.  The destination address can be specified as a 64k address within the current banking arrangement, as a linear address covering the entire zx-next memory space in [0x000000,0x1BFFFF], as a 16k bank number in [0,111], or as an 8k page number in [0,223].
+
+All numbers can be specified in decimal, hexadecimal (leading 0x) or octal (leading 0).
 
 The help text is reproduced here:
 
@@ -39,18 +51,6 @@ no -o,-a,-m* generates hexdump
 
 extract v1.1 zx-next z88dk.org
 ~~~
-
-This is a utility that can read some portion of a file and either:
-
-* save that portion to another file
-* append that portion to another file
-* load that portion into the zx-next's memory
-* view that portion in a hexdump
-
-The data can be loaded anywhere in the zx-next's memory space and the destination address can be specified as a 64k address within the current banking arrangement, as a linear address covering the entire zx-next memory space in [0x000000,0x1BFFFF], as a 16k bank number in [0,111], or as an 8k page number in [0,223].
-
-All numbers can be specified in decimal, hexadecimal (leading 0x) or octal (leading 0).
-
 
 ## Examples
 
@@ -85,4 +85,4 @@ Extract the entire file "knight.sna" and append it to the file "foo.bin".
 .extract knight.sna -ml 0x24000
 ~~~
 
-Load the entire file "knight.sna" to the zx next's memory.  All variations above load the file contents to the same place in memory.  The first command indicates the location using 8k page number.  The second command indicates the location using 16k bank number.  The last commond indicates the location using a linearized memory address.
+Load the entire file "knight.sna" to the zx next's memory.  All variations above load the file contents to the same place in memory.  The first command indicates the location using 8k page number.  The second command indicates the location using 16k bank number.  The last command indicates the location using a linearized memory address.
