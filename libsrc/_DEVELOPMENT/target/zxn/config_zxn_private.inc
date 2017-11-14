@@ -45,6 +45,8 @@ defc __SPECTRUM_PENTAGON = 32
 
 defc __USE_SPECTRUM_128_SECOND_DFILE = 0
 
+defc __USE_SYSVAR = 0
+
 
 
 

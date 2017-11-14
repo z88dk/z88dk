@@ -51,6 +51,8 @@
 
 #define __USE_SPECTRUM_128_SECOND_DFILE  0
 
+#define __USE_SYSVAR  0
+
 
 
 

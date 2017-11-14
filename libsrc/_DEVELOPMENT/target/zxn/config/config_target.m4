@@ -23,9 +23,15 @@ define(`__SPECTRUM_128_P2A', 8)
 define(`__SPECTRUM_128_P3', 16)
 define(`__SPECTRUM_PENTAGON', 32)
 
-# Second display file
+# Second Display File
+# Library functions will use display file base address 0xc000
 
 define(`__USE_SPECTRUM_128_SECOND_DFILE', 0)
+
+# Use System Variables
+# Some globals like GLOBAL_ZX_PORT_7FFD will map to existing system variable address
+
+define(`__USE_SYSVAR', 0)
 
 #
 # END OF USER CONFIGURATION
@@ -51,6 +57,8 @@ PUBLIC `__SPECTRUM_128_P3'
 PUBLIC `__SPECTRUM_PENTAGON'
 
 PUBLIC `__USE_SPECTRUM_128_SECOND_DFILE'
+
+PUBLIC `__USE_SYSVAR'
 ')
 
 dnl#
@@ -71,6 +79,8 @@ defc `__SPECTRUM_128_P3' = __SPECTRUM_128_P3
 defc `__SPECTRUM_PENTAGON' = __SPECTRUM_PENTAGON
 
 defc `__USE_SPECTRUM_128_SECOND_DFILE' = __USE_SPECTRUM_128_SECOND_DFILE
+
+defc `__USE_SYSVAR' = __USE_SYSVAR
 ')
 
 dnl#
@@ -93,4 +103,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__SPECTRUM_PENTAGON'  __SPECTRUM_PENTAGON
 
 `#define' `__USE_SPECTRUM_128_SECOND_DFILE'  __USE_SPECTRUM_128_SECOND_DFILE
+
+`#define' `__USE_SYSVAR'  __USE_SYSVAR
 ')
