@@ -25,7 +25,7 @@
 
 	pop bc
 	pop hl		; address
-	pop de		; tesxt
+	pop de		; text
 	push bc	; ret addr
 	xor a
     
