@@ -91,7 +91,7 @@ int alpha(char c)
 /* Test if given character is numeric */
 int numeric(char c)
 {
-    return isnumber(c);
+    return isdigit(c);
 }
 
 /* Test if given character is alphanumeric */
