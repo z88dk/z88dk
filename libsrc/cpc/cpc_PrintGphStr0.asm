@@ -138,15 +138,17 @@ cp 1
 ;alto  
 jr z,cont_doble
 ld de,letra_decodificada
-defb $fD
-LD H,8		;ALTO, SE PUEDE TRABAJAR CON HX DIRECTAMENTE
+ld	 ixh,8
+;defb $fD
+;LD H,8		;ALTO, SE PUEDE TRABAJAR CON HX DIRECTAMENTE
 jr cont_tot
 
 
 .cont_doble
 ld de,letra_decodificada_tmp
-defb $fD
-LD H,16		;ALTO, SE PUEDE TRABAJAR CON HX DIRECTAMENTE
+;defb $fD
+;LD H,16		;ALTO, SE PUEDE TRABAJAR CON HX DIRECTAMENTE
+ld	 ixh,16
 
 .cont_tot
 call cpc_PutSp0
@@ -175,8 +177,9 @@ jp bucle_texto0
 		ldi
 		ldi
 		
-	   defb $fD
-	   dec H
+	   ;defb $fD
+	   ;dec H
+	   dec ixh
 	   ret z	
 	   ex de,hl   	   
 .salto_linea
