@@ -85,27 +85,19 @@ void postlabel(int label)
 /* Test if given character is alpha */
 int alpha(char c)
 {
-    if (c >= 'a')
-        return (c <= 'z');
-    if (c <= 'Z')
-        return (c >= 'A');
-    return (c == '_');
+    return isalpha(c) || c == '_';
 }
 
 /* Test if given character is numeric */
 int numeric(char c)
 {
-    if (c <= '9')
-        return (c >= '0');
-    return 0;
+    return isnumber(c);
 }
 
 /* Test if given character is alphanumeric */
 int an(char c)
 {
-    if (alpha(c))
-        return 1;
-    return numeric(c);
+    return alpha(c) || numeric(c);
 }
 
 /* Print a carriage return and a string only to console */

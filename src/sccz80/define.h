@@ -334,8 +334,7 @@ struct gototab_s {
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
 
 
-#define INLINE_GINT  1
-#define INLINE_PINT  2
+
 #define INLINE_ALL   255
 
 struct parser_stack;
