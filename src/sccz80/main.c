@@ -114,7 +114,6 @@ static option  sccz80_opts[] = {
     { 0, "bssseg", OPT_STRING, "=<name> Set the bss section name", &c_bss_section, 0 },
     { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, 0 },
     { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, 0 },
-    { 0, "glabels", OPT_BOOL, "Generate line labels", &c_line_labels, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION, "Optimise for speed not size", opt_code_size, 0},
 #ifdef USEFRAME

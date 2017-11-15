@@ -2892,25 +2892,6 @@ void GlobalPrefix(void)
     }
 }
 
-static void mangle_filename(const char *input, char *buf, size_t len)
-{
-    char  hex[] = "0123456789ABCDEF";
-
-    while (*input && len > 3 ) {
-        unsigned char c = *input++;
-
-        if ( isalnum(c) ) {
-            *buf++ = c;
-            len--;
-        } else {
-            *buf++ = '_';
-            *buf++ = hex[(( c >> 4 ) & 0x0f)];
-            *buf++ = hex[(( c >> 0 ) & 0x0f)];
-            len -= 3;
-        }
-    }
-    *buf = 0;
-}
 
 /*
  *  Emit a LINE opcode for assembler
@@ -2929,11 +2910,6 @@ void EmitLine(int line)
 
     if (ISASM(ASM_Z80ASM) && (c_cline_directive || c_intermix_ccode)) {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
-    }
-    if ( c_line_labels ) {
-        char buf[FILENAME_MAX+1];
-        mangle_filename(filen, buf, sizeof(buf));
-        outfmt(".__CLINE__%s_3a%d\n", buf, line);
     }
 }
 
