@@ -47,6 +47,17 @@ Error at file 'test.asm' line 2: ORG '0x0001' not ALIGNed '16'
 1 errors occurred during assembly
 END
 
+# constant expression
+z80asm("extern SIXTEEN \n align SIXTEEN", "", 1, "", <<'END');
+Error at file 'test.asm' line 2: expected constant expression
+1 errors occurred during assembly
+END
+
+z80asm("extern SIXTEEN, FILL \n align SIXTEEN, FILL", "", 1, "", <<'END');
+Error at file 'test.asm' line 2: expected constant expression
+1 errors occurred during assembly
+END
+
 # align inside a section, check when address is already aligned
 unlink_testfiles();
 z80asm(<<'END', "-l -s -b -m", 0, "", "");

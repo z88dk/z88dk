@@ -134,6 +134,11 @@ errors:
     args	: void
     message	: '"relative jump address must be local"'
 	
+  - type	: ErrError
+    func	: error_expected_const_expr
+    args	: void
+    message	: '"expected constant expression"'
+	
   # Symbol errors
   - type	: ErrError
     func	: error_symbol_redefined

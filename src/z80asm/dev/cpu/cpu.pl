@@ -858,7 +858,7 @@ sub parse_code {
 	elsif ($asm =~ /^rst/) {
 		push @code, 
 			"DO_STMT_LABEL();",
-			"if (expr_error) return FALSE;",
+			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
 			"switch (expr_value) {",
 			"case 0x00: case 0x08: case 0x30:",
@@ -870,25 +870,25 @@ sub parse_code {
 			"case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:",
 			"  DO_stmt(0xC7 + expr_value); break;",
 			"default: error_int_range(expr_value);",
-			"}";
+			"}}";
 		my $code = join("\n", @code);
 		return $code;
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
 			"DO_STMT_LABEL();",
-			"if (expr_error) return FALSE;",
+			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt_n(0xED9150 + expr_value);";
+			"DO_stmt_n(0xED9150 + expr_value);}";
 		my $code = join("\n", @code);
 		return $code;
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
 			"DO_STMT_LABEL();",
-			"if (expr_error) return FALSE;",
+			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt(0xED9250 + expr_value);";
+			"DO_stmt(0xED9250 + expr_value);}";
 		my $code = join("\n", @code);
 		return $code;
 	}
@@ -929,11 +929,11 @@ sub parse_code {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
 		$bin =~ s/%c/expr_value/g;		# replace all other %c in bin
 		push @code,
-			"if (expr_error) return FALSE;",
+			"if (expr_error) { error_expected_const_expr(); } else {",
 			"switch (expr_value) {",
 			join(" ", map {"case $_:"} @values)." break;",
 			"default: error_int_range(expr_value);",
-			"}";
+			"}}";
 			
 		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
 			$stmt = "DO_stmt_idx";

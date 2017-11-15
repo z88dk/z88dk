@@ -2,7 +2,6 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
@@ -212,19 +211,6 @@ Error at file 'test.asm' line 3: {} block not closed
 END
 
 
-unlink_testfiles();
-spew("test.asm", "
-	defvars undefined					;; error: symbol 'undefined' not defined
-	{
-		df2	ds.q 1
-	}
-");
-run("z80asm -b test.asm", 1, "", <<END);
-Error at file 'test.asm' line 2: symbol 'undefined' not defined
-1 errors occurred during assembly
-END
-
-
 # BUG_0051: DEFC and DEFVARS constants do not appear in map file
 unlink_testfiles();
 z80asm(<<END, "-r4 -b -m -g -Dminus_d_var");
@@ -287,6 +273,63 @@ check_text_file("test.map", <<'END');
 	__code_tail                     = $0001 ; const, public, def, , ,
 	__code_size                     = $0001 ; const, public, def, , ,
 END
+
+
+# defvars with link-time constants
+unlink_testfiles();
+z80asm(<<'END', "", 1, "", <<'ERR');
+	extern START
+	defvars START {
+		df0 ds.b 1
+		df1 ds.b 1
+	}
+END
+Error at file 'test.asm' line 2: expected constant expression
+1 errors occurred during assembly
+ERR
+
+
+unlink_testfiles();
+z80asm(<<'END', "", 1, "", <<'ERR');
+	extern START
+	defvars START 
+	{
+		df0 ds.b 1
+		df1 ds.b 1
+	}
+END
+Error at file 'test.asm' line 2: expected constant expression
+1 errors occurred during assembly
+ERR
+
+
+unlink_testfiles();
+z80asm(<<'END', "", 1, "", <<'ERR');
+	defvars undefined					;; error: symbol 'undefined' not defined
+	{
+		df2	ds.q 1
+	}
+END
+Error at file 'test.asm' line 1: symbol 'undefined' not defined
+Error at file 'test.asm' line 1: expected constant expression
+2 errors occurred during assembly
+ERR
+
+
+unlink_testfiles();
+z80asm(<<'END', "", 1, "", <<'ERR');
+	extern LEN
+	defvars 0 {
+		df0 ds.b LEN
+		df1 ds.b undefined
+	}
+END
+Error at file 'test.asm' line 3: expected constant expression
+Error at file 'test.asm' line 4: symbol 'undefined' not defined
+Error at file 'test.asm' line 4: expected constant expression
+3 errors occurred during assembly
+ERR
+
 
 unlink_testfiles();
 done_testing();

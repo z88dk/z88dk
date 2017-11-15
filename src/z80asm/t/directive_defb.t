@@ -58,5 +58,5 @@ END
 		pack("C*", 0..16, 254, 255));
 }
 
-#unlink_testfiles();
+unlink_testfiles();
 done_testing();
