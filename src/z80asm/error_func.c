@@ -222,6 +222,15 @@ void error_jr_not_local(void)
 	
 	STR_DELETE(msg);
 }
+void error_expected_const_expr(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "expected constant expression" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_symbol_redefined(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);

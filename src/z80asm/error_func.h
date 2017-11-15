@@ -26,6 +26,7 @@ extern void error_unbalanced_struct(void);
 extern void error_not_defined(char *name);
 extern void error_illegal_ident(void);
 extern void error_jr_not_local(void);
+extern void error_expected_const_expr(void);
 extern void error_symbol_redefined(char *symbol);
 extern void error_symbol_redefined_module(char *symbol, char *module);
 extern void error_symbol_decl_local(char *symbol);

@@ -635,6 +635,37 @@ eq_or_diff_text scalar(read_file('test3.err')), <<'END';
 Error: syntax error
 END
 
+#------------------------------------------------------------------------------
+# error_expected_const_expr
+unlink_testfiles();
+write_file("test.asm", <<'END');
+	extern ZERO
+	bit ZERO,a
+	set ZERO,a
+	res ZERO,a
+	im 	ZERO
+	rst ZERO
+	bit undefined,a
+	set undefined,a
+	res undefined,a
+	im 	undefined
+	rst	undefined
+END
+t_z80asm_capture("-b test.asm", "", <<'ERR', 1);
+Error at file 'test.asm' line 2: expected constant expression
+Error at file 'test.asm' line 3: expected constant expression
+Error at file 'test.asm' line 4: expected constant expression
+Error at file 'test.asm' line 5: expected constant expression
+Error at file 'test.asm' line 6: expected constant expression
+Error at file 'test.asm' line 7: symbol 'undefined' not defined
+Error at file 'test.asm' line 8: symbol 'undefined' not defined
+Error at file 'test.asm' line 9: symbol 'undefined' not defined
+Error at file 'test.asm' line 10: symbol 'undefined' not defined
+Error at file 'test.asm' line 10: expected constant expression
+Error at file 'test.asm' line 11: symbol 'undefined' not defined
+Error at file 'test.asm' line 11: expected constant expression
+12 errors occurred during assembly
+ERR
 
 unlink_testfiles();
 done_testing();
