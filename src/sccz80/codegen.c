@@ -43,9 +43,8 @@ static void loada(int n);
  * Data for this module
  */
 
-int donelibheader;
-
-static char* current_section = ""; /**< Name of the current section */
+static int    donelibheader;
+static char  *current_section = ""; /**< Name of the current section */
 
 /* Begin a comment line for the assembler */
 
@@ -62,14 +61,10 @@ void header(void)
     char* timestr;
     char* assembler = "z80 Module Assembler";
 
-    comment();
-    outstr(Banner);
-    nl();
-    comment();
-    outstr(Version);
-    nl();
-    comment();
-    nl();
+    outfmt(";%s\n",Banner);
+    outfmt(";%s\n",Version);
+    outfmt(";\n");
+
     if (ISASM(ASM_ASXX)) {
         assembler = "asxx";
     } else if (ISASM(ASM_VASM)) {
@@ -83,12 +78,8 @@ void header(void)
     donelibheader = 0;
     if ((tim = time(NULL)) != -1) {
         timestr = ctime(&tim);
-        comment();
-        nl();
-        comment();
-        outstr("\tModule compile time: ");
-        outstr(timestr);
-        nl();
+        outfmt(";\n");
+        outfmt(";\tModule compile time: %s\n",timestr);
     }
     nl();
 }
@@ -186,8 +177,7 @@ void DoLibHeader(void)
 /* Print any assembler stuff needed after all code */
 void trailer(void)
 {
-    nl();
-    outstr("; --- End of Compilation ---\n");
+    outfmt("\n; --- End of Compilation ---\n");
 }
 
 /* Print out a name such that it won't annoy the assembler
