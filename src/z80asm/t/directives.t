@@ -211,7 +211,7 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF10
+File test.o at $0000: Z80RMF11
   Name: test
   Names:
     L A $0000 main test.asm:1
@@ -228,7 +228,7 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF10
+File test.o at $0000: Z80RMF11
   Name: lib
   Names:
     L A $0000 main test.asm:2
@@ -246,7 +246,7 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF10
+File test.o at $0000: Z80RMF11
   Name: lib2
   Names:
     L A $0000 main test.asm:3

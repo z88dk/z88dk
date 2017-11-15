@@ -72,7 +72,7 @@ END
 
 z80nm("test.o", <<'END');
 
-	File test.o at $0000: Z80RMF10
+	File test.o at $0000: Z80RMF11
 	  Name: test
 	  Names:
 		L A $0000 here test.asm:20
