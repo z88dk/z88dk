@@ -1191,6 +1191,7 @@
 #define __NEXTOS_IDE_BANK  0x01bd
 #define __NEXTOS_IDE_BASIC  0x01c0
 #define __NEXTOS_IDE_STREAM_LINEIN  0x01c3
+#define __NEXTOS_IDE_WINDOW_STRING  0x01c6
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -1496,8 +1497,8 @@
 
 
 
-#define __SYS_IY  0x5c3a
-#define __SYS_HLP  0x2758
+#define __SYS_IY  SYS_IY
+#define __SYS_HLP  SYS_HLP
 
 #define __SYSVAR_SWAP  0x5b00
 #define __SYSVAR_STOO  0x5b10
@@ -1519,19 +1520,37 @@
 #define __SYSVAR_TVPARS  0x5b65
 #define __SYSVAR_FLAGS3  0x5b66
 #define __SYSVAR_BANK678  0x5b67
-#define __SYSVAR_XLOC  0x5b68
-#define __SYSVAR_YLOC  0x5b69
+#define __SYSVAR_FLAGN  0x5b68
+#define __SYSVAR_MAXBNK  0x5b69
 #define __SYSVAR_OLDSP  0x5b6a
 #define __SYSVAR_SYNRET  0x5b6c
 #define __SYSVAR_LASTV  0x5b6e
-#define __SYSVAR_RCLINE  0x5b73
-#define __SYSVAR_RCSTART  0x5b75
-#define __SYSVAR_RCSTEP  0x5b77
+#define __SYSVAR_TILEBNKL  0x5b73
+#define __SYSVAR_TILEML  0x5b74
+#define __SYSVAR_TILEBNK2  0x5b75
+#define __SYSVAR_TILEM2  0x5b76
+#define __SYSVAR_NXTBNK  0x5b77
+#define __SYSVAR_DATABNK  0x5b78
 #define __SYSVAR_LODDRV  0x5b79
 #define __SYSVAR_SAVDRV  0x5b7a
-#define __SYSVAR_DUMPLF  0x5b7b
-#define __SYSVAR_STRIP1  0x5b7c
-#define __SYSVAR_STRIP2  0x5b84
+#define __SYSVAR_L2SOFT  0x5b7b
+#define __SYSVAR_TILEWL  0x5b7c
+#define __SYSVAR_TILEW2  0x5b7e
+#define __SYSVAR_TILEOFFL  0x5b80
+#define __SYSVAR_TILEOFF2  0x5b82
+#define __SYSVAR_COORDSL  0x5b84
+#define __SYSVAR_COORDS2  0x5b86
+#define __SYSVAR_COORDSULA  0x5b88
+#define __SYSVAR_COORDSHR  0x5b8a
+#define __SYSVAR_COORDSHC  0x5b8c
+#define __SYSVAR_INKL  0x5b8e
+#define __SYSVAR_INK2  0x5b8f
+#define __SYSVAR_ATTRULA  0x5b90
+#define __SYSVAR_ATTRHR  0x5b91
+#define __SYSVAR_ATTRHC  0x5b92
+#define __SYSVAR_INKMASK  0x5b93
+#define __SYSVAR_TMPVARS  0x5b94
+
 #define __SYSVAR_TSTACK  0x5bff
 
 #define __SYSVAR_KSTATE  0x5c00
@@ -1539,7 +1558,7 @@
 #define __SYSVAR_REPDEL  0x5c09
 #define __SYSVAR_REPPER  0x5c0a
 #define __SYSVAR_DEFADD  0x5c0b
-#define __SYSVAR_K_DATA  0x5c0d
+#define __SYSVAR_KDATA  0x5c0d
 #define __SYSVAR_TVDATA  0x5c0e
 #define __SYSVAR_STRMS  0x5c10
 #define __SYSVAR_CHARS  0x5c36
@@ -1556,7 +1575,7 @@
 #define __SYSVAR_PPC  0x5c45
 #define __SYSVAR_SUBPPC  0x5c47
 #define __SYSVAR_BORDCR  0x5c48
-#define __SYSVAR_E_PPC  0x5c49
+#define __SYSVAR_EPPC  0x5c49
 #define __SYSVAR_VARS  0x5c4b
 #define __SYSVAR_DEST  0x5c4d
 #define __SYSVAR_CHANS  0x5c4f
@@ -1564,44 +1583,44 @@
 #define __SYSVAR_PROG  0x5c53
 #define __SYSVAR_NXTLIN  0x5c55
 #define __SYSVAR_DATADD  0x5c57
-#define __SYSVAR_E_LINE  0x5c59
-#define __SYSVAR_K_CUR  0x5c5b
-#define __SYSVAR_CH_ADD  0x5c5d
-#define __SYSVAR_X_PTR  0x5c5f
+#define __SYSVAR_ELINE  0x5c59
+#define __SYSVAR_KCUR  0x5c5b
+#define __SYSVAR_CHADD  0x5c5d
+#define __SYSVAR_XPTR  0x5c5f
 #define __SYSVAR_WORKSP  0x5c61
 #define __SYSVAR_STKBOT  0x5c63
 #define __SYSVAR_STKEND  0x5c65
 #define __SYSVAR_BREG  0x5c67
 #define __SYSVAR_MEM  0x5c68
 #define __SYSVAR_FLAGS2  0x5c6a
-#define __SYSVAR_DF_SZ  0x5c6b
-#define __SYSVAR_S_TOP  0x5c6c
+#define __SYSVAR_DFSZ  0x5c6b
+#define __SYSVAR_STOP  0x5c6c
 #define __SYSVAR_OLDPPC  0x5c6e
 #define __SYSVAR_OSPPC  0x5c70
 #define __SYSVAR_FLAGX  0x5c71
 #define __SYSVAR_STRLEN  0x5c72
-#define __SYSVAR_T_ADDR  0x5c74
+#define __SYSVAR_TADDR  0x5c74
 #define __SYSVAR_SEED  0x5c76
 #define __SYSVAR_FRAMES  0x5c78
 #define __SYSVAR_UDG  0x5c7b
 #define __SYSVAR_COORDS  0x5c7d
-#define __SYSVAR_P_POSN  0x5c7f
+#define __SYSVAR_GMODE  0x5c7f
 #define __SYSVAR_PRCC  0x5c80
-#define __SYSVAR_ECHO_E  0x5c82
-#define __SYSVAR_DF_CC  0x5c84
-#define __SYSVAR_DF_CCL  0x5c86
-#define __SYSVAR_S_POSN  0x5c88
+#define __SYSVAR_ECHOE  0x5c82
+#define __SYSVAR_DFCC  0x5c84
+#define __SYSVAR_DFCCL  0x5c86
+#define __SYSVAR_SPOSN  0x5c88
 #define __SYSVAR_SPOSNL  0x5c8a
-#define __SYSVAR_SCR_CT  0x5c8c
-#define __SYSVAR_ATTR_P  0x5c8d
-#define __SYSVAR_MASK_P  0x5c8e
-#define __SYSVAR_ATTR_T  0x5c8f
-#define __SYSVAR_MASK_T  0x5c90
-#define __SYSVAR_P_FLAG  0x5c91
+#define __SYSVAR_SCRCT  0x5c8c
+#define __SYSVAR_ATTRP  0x5c8d
+#define __SYSVAR_MASKP  0x5c8e
+#define __SYSVAR_ATTRT  0x5c8f
+#define __SYSVAR_MASKT  0x5c90
+#define __SYSVAR_PFLAG  0x5c91
 #define __SYSVAR_MEMBOT  0x5c92
 #define __SYSVAR_NMIADD  0x5cb0
 #define __SYSVAR_RAMTOP  0x5cb2
-#define __SYSVAR_P_RAMT  0x5cb4
+#define __SYSVAR_PRAMT  0x5cb4
 
 
 
