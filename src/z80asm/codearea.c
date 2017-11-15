@@ -464,9 +464,13 @@ void patch_byte( int addr, Byte byte1 ) { patch_value( addr, byte1, 1 ); }
 void patch_word( int addr, int  word  ) { patch_value( addr, word,  2 ); }
 void patch_long( int addr, long dword ) { patch_value( addr, dword, 4 ); }
 
+void patch_word_be(int addr, int  word) { patch_value(addr, ((word & 0xFF00) >> 8) | ((word & 0x00FF) << 8), 2); }
+
 void append_byte( Byte byte1 ) { append_value( byte1, 1 ); }
 void append_word( int  word )  { append_value( word,  2 ); }
 void append_long( long dword ) { append_value( dword, 4 ); }
+
+void append_word_be(int  word) { append_value(((word & 0xFF00) >> 8) | ((word & 0x00FF) << 8), 2); }
 
 void append_2bytes( Byte byte1, Byte byte2 ) 
 {

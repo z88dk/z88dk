@@ -205,8 +205,9 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
             {
             case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
             case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
-            case 'C': expr->range = RANGE_WORD;			break;
-            case 'L': expr->range = RANGE_DWORD;		break;
+			case 'C': expr->range = RANGE_WORD;			break;
+			case 'B': expr->range = RANGE_WORD_BE;		break;
+			case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
 					  assert( str_len(target_name) > 0 );
 					  expr->target_name = strpool_add( str_data(target_name) );	/* define expression as EQU */
@@ -452,7 +453,14 @@ static void patch_exprs( ExprList *exprs )
 				}                
                 break;
 
-            case RANGE_DWORD:
+			case RANGE_WORD_BE:
+				if (value < -32768 || value > 65535)
+					warn_int_range(value);
+
+				patch_word_be(expr->code_pos, value);
+				break;
+
+			case RANGE_DWORD:
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 

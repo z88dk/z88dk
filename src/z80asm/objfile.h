@@ -18,7 +18,7 @@ Handle object file contruction, reading and writing
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"10"
+#define OBJ_VERSION	"11"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed

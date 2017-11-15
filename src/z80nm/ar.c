@@ -20,7 +20,7 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 10
+#define MAX_VERSION 11
 
 enum file_type { is_none, is_library, is_object };
 
@@ -278,7 +278,8 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 			   type, 
 			   type == '=' ? ' ' :
 			   type == 'L' ? 'l' : 
-			   type == 'C' ? 'w' : 'b' );
+			   type == 'C' ? 'w' :
+			   type == 'B' ? 'W' : 'b' );
 		if ( file_version >= 4 )
 		{
 			source_file = xfread_lstring( fp, filename );
