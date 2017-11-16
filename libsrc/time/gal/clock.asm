@@ -63,7 +63,7 @@ _clock:
         push    de
         push    hl
         ld      e,5
-        ld      hl,$7E40	; DEHL=3600*100=$57E40     ; seconds in hours (de=6)
+        ld      hl,$7E40	; DEHL=3600*100=$57E40     ; seconds in hours (de=5)
         call    l_long_mult
         call    l_long_add
         ret
@@ -78,10 +78,6 @@ isntnum:
 		ret
 
 
-        SECTION   data_clib
-iniclk:
-defm "HH:MM:SS:PP"
-
 unbcd:
 	ld a,(hl)
 	ld b,a
@@ -94,3 +90,8 @@ unbcd:
 	ld	l,a
 	ld	h,0
 	ret
+
+        SECTION   data_clib
+iniclk:
+defm "00:00:00:00"
+
