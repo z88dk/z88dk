@@ -28,26 +28,6 @@ SYMBOL *findstc(char* sname)
     return (findglb(sname2));
 }
 
-/*
- * find entry in global symbol table,
- * glbptr is set to relevant entry
- * return pointer if match is found,
- * else return zero and glbptr points to empty slot
- */
-
-SYMBOL* findenum(char* sname)
-{
-    SYMBOL *ptr = findglb(sname);
-
-    if ( ptr != NULL ) {
-        if ( ptr->ident == ID_ENUM ) {
-            return ptr;
-        }
-        error(E_ENUMDEF);
-    }
-    return NULL;
-}
-
 
 SYMBOL* findglb(const char* sname)
 {
@@ -124,7 +104,7 @@ SYMBOL* addloc(
         return cptr;
     }
     if (locptr >= ENDLOC) {
-        error(E_LOCOV);
+        errorfmt("Local symbol table overflow", 1);
         return 0;
     }
     cptr = locptr++;

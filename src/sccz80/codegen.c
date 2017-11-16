@@ -43,9 +43,8 @@ static void loada(int n);
  * Data for this module
  */
 
-int donelibheader;
-
-static char* current_section = ""; /**< Name of the current section */
+static int    donelibheader;
+static char  *current_section = ""; /**< Name of the current section */
 
 /* Begin a comment line for the assembler */
 
@@ -62,14 +61,10 @@ void header(void)
     char* timestr;
     char* assembler = "z80 Module Assembler";
 
-    comment();
-    outstr(Banner);
-    nl();
-    comment();
-    outstr(Version);
-    nl();
-    comment();
-    nl();
+    outfmt(";%s\n",Banner);
+    outfmt(";%s\n",Version);
+    outfmt(";\n");
+
     if (ISASM(ASM_ASXX)) {
         assembler = "asxx";
     } else if (ISASM(ASM_VASM)) {
@@ -83,12 +78,8 @@ void header(void)
     donelibheader = 0;
     if ((tim = time(NULL)) != -1) {
         timestr = ctime(&tim);
-        comment();
-        nl();
-        comment();
-        outstr("\tModule compile time: ");
-        outstr(timestr);
-        nl();
+        outfmt(";\n");
+        outfmt(";\tModule compile time: %s\n",timestr);
     }
     nl();
 }
@@ -186,8 +177,7 @@ void DoLibHeader(void)
 /* Print any assembler stuff needed after all code */
 void trailer(void)
 {
-    nl();
-    outstr("; --- End of Compilation ---\n");
+    outfmt("\n; --- End of Compilation ---\n");
 }
 
 /* Print out a name such that it won't annoy the assembler
@@ -2136,7 +2126,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             break;
         default: // 7 bytes
             if ( value >= 16 ) {
-                warning(W_LEFTSHIFT_TOO_BIG);
+                warningfmt("Left shifting by more than the size of the object");
                 vconst(0);
             } else {
                 const2(value);
@@ -2189,7 +2179,7 @@ void asl_const(LVALUE *lval, int32_t value)
             callrts("l_long_aslo");
             break;
         default: //  5 bytes
-            if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
+            if ( value >= 32 ) warningfmt("Left shifting by more than the size of the object");
             value &= 31;
             if (  value >= 16 ) {
                 asl_16bit_const(lval, value - 16);
@@ -2892,25 +2882,6 @@ void GlobalPrefix(void)
     }
 }
 
-static void mangle_filename(const char *input, char *buf, size_t len)
-{
-    char  hex[] = "0123456789ABCDEF";
-
-    while (*input && len > 3 ) {
-        unsigned char c = *input++;
-
-        if ( isalnum(c) ) {
-            *buf++ = c;
-            len--;
-        } else {
-            *buf++ = '_';
-            *buf++ = hex[(( c >> 4 ) & 0x0f)];
-            *buf++ = hex[(( c >> 0 ) & 0x0f)];
-            len -= 3;
-        }
-    }
-    *buf = 0;
-}
 
 /*
  *  Emit a LINE opcode for assembler
@@ -2929,11 +2900,6 @@ void EmitLine(int line)
 
     if (ISASM(ASM_Z80ASM) && (c_cline_directive || c_intermix_ccode)) {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
-    }
-    if ( c_line_labels ) {
-        char buf[FILENAME_MAX+1];
-        mangle_filename(filen, buf, sizeof(buf));
-        outfmt(".__CLINE__%s_3a%d\n", buf, line);
     }
 }
 

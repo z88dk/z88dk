@@ -59,28 +59,6 @@ int initials(const char *dropname, Type *type)
         desize = init(type, 1);
     }
 
-    /* dump literal queue and fill tail of array with zeros */
-    // if ((ident == ID_ARRAY && more == KIND_CHAR) || type == KIND_STRUCT) {
-    //     if (type == KIND_STRUCT) {
-    //         dumpzero(tag->size, dim);
-    //         desize = dim < 0 ? abs(dim + 1) * tag->size : olddim * tag->size;
-    //     } else { /* Handles unsized arrays of chars */
-    //         dumpzero(size, dim);
-    //         dim = dim < 0 ? abs(dim + 1) : olddim;
-    //         cscale(type, tag, &dim);
-    //         desize = dim;
-    //     }
-    //     dumplits(0, YES, gltptr, glblab, glbq);
-    // } else {
-    //     if (!(ident == POINTER && type == KIND_CHAR)) {
-    //         dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
-    //         if (type != KIND_CHAR) /* Already dumped by init? */
-    //             desize = dumpzero(size, dim);
-    //         dim = dim < 0 ? abs(dim + 1) : olddim;
-    //         cscale(type, tag, &dim);
-    //         desize = dim;            
-    //     }
-    // }
     output_section(c_code_section); 
     return (desize);
 }
@@ -190,7 +168,7 @@ static int init(Type *type, int dump)
             /* Dump the literals where they are, padding out as appropriate */
             if (type->len != -1 &&  sz > type->len) {
                 /* Ooops, initialised to long a string! */
-                warning(W_INIT2LONG);
+                warningfmt("Initialisation too long, truncating!");
                 sz = type->len;
                 gltptr = sz;
                 *(glbq + sz - 1) = '\0'; /* Terminate string */
@@ -221,7 +199,7 @@ static int init(Type *type, int dump)
         char sname[NAMESIZE];
         SYMBOL *ptr;
         cmatch('&');
-        if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
+        if (symname(sname) && strcmp(sname, "sizeof") != 0) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
                 /* Actually found sommat..very good! */
                 if ( type->kind == KIND_PTR || type->kind == KIND_ARRAY ) {
@@ -235,11 +213,11 @@ static int init(Type *type, int dump)
                     value = ptr->size;
                     goto constdecl;
                 } else {
-                    error(E_DDECL);
+                    errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();
                 }
             } else {
-                error(E_UNSYMB, sname);
+                errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
             }
         } else if (rcmatch('}')) {

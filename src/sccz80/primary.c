@@ -10,6 +10,10 @@
 
 #include "ccdefs.h"
 
+static double   CalcStand(double left, void (*oper)(LVALUE *), double right);
+static void     nstep(LVALUE *lval, int n, void (*unstep)(LVALUE *lval));
+static void     store(LVALUE *lval);
+
 int primary(LVALUE* lval)
 {
     char sname[NAMESIZE];
@@ -35,7 +39,7 @@ int primary(LVALUE* lval)
         } else if ( strcmp(sname, "__func__") == 0 ) {
             int32_t litlab;
             // Stuff currfn->name into input stream, call const
-            int len = strlen(currfn->name);
+            size_t len = strlen(currfn->name);
             storeq(len + 1, (unsigned char *)currfn->name, &litlab);
             lval->const_val = litlab;
             lval->is_const = 0; /* string address not constant */
@@ -76,12 +80,12 @@ int primary(LVALUE* lval)
         if (ptr && ptr->ctype ) {
             if (ptr->ctype->kind != KIND_FUNC && !(ptr->ctype->kind == KIND_PTR && ptr->ctype->ptr->kind == KIND_FUNC) ) {
                 if (ptr->ident == ID_ENUM)
-                    error(E_UNSYMB, sname);
+                    errorfmt("Unknown symbol: %s", 1, sname);
                 if (ptr->ctype->kind == KIND_ENUM) {
                     lval->symbol = NULL;
                     lval->ltype = type_int;
                     lval->val_type = KIND_INT;
-                    lval->indirect_kind = 0;
+                    lval->indirect_kind = KIND_NONE;
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
                     lval->flags = FLAGS_NONE;
@@ -89,7 +93,7 @@ int primary(LVALUE* lval)
                 }
                 lval->symbol = ptr;
                 lval->ltype = ptr->ctype;
-                lval->indirect_kind = 0;
+                lval->indirect_kind = KIND_NONE;
                 lval->val_type = ptr->ctype->kind;
                 lval->flags = ptr->flags;
                 lval->ptr_type = KIND_NONE;
@@ -113,7 +117,7 @@ int primary(LVALUE* lval)
                 lval->ltype = ptr->ctype;
                 lval->val_type = KIND_INT;
                 lval->ptr_type = KIND_NONE;
-                lval->indirect_kind = 0;
+                lval->indirect_kind = KIND_NONE;
                 return 1;
             }
         } else {
@@ -121,21 +125,19 @@ int primary(LVALUE* lval)
              * it's a function then we can break an awful lot of code, do it
              * this way and it's safer... we're not GNU after all!
              */
-            if (rcmatch('('))
-                warning(W_FUNC_NO_PROTO);
-            else {
-                error(E_UNSYMB, sname);
+            if (!rcmatch('(')) {
+                errorfmt("Unknown symbol: %s", 1, sname);
             }
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
-            warning(W_IMPLICIT_DEFINITION, sname);
+            warningfmt( "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
             ptr = addglb(sname, default_function(sname), 0, KIND_INT, 0, STATIK);
             ptr->size = 0;
             ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
         lval->ltype = ptr->ctype;
-        lval->indirect_kind = 0;
+        lval->indirect_kind = KIND_NONE;
         lval->val_type = ptr->type ; /* Null function, always int */
         lval->flags = ptr->flags;
         return (0);
@@ -143,10 +145,10 @@ int primary(LVALUE* lval)
     if (constant(lval)) {
         // lval->ltype is set by constant()
         lval->symbol = NULL;
-        lval->indirect_kind = 0;
+        lval->indirect_kind = KIND_NONE;
         return (0);
     } else {
-        error(E_EXPRESSION);
+        errorfmt("Invalid expression", 0);
         vconst(0);
         junk();
         return (0);
@@ -235,7 +237,7 @@ double CalcStand(
 int intcheck(LVALUE* lval, LVALUE* lval2)
 {
     if (lval->val_type == KIND_DOUBLE || lval2->val_type == KIND_DOUBLE) {
-        error(E_INTOPER);
+        errorfmt("Operands must be int", 0);
         return -1;
     }
     return 0;
@@ -275,7 +277,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
     if (t1 == KIND_CPTR && t2 == KIND_INT)
         convUint2long();
     else if (t2 == KIND_CPTR && t1 == KIND_INT)
-        warning(W_FARNR);
+        warningfmt("Converting far ptr to near ptr");
 
     /* Char conversion */
     if (t1 == KIND_CHAR && sign2 == NO && !isconst) {
@@ -413,7 +415,7 @@ void result(LVALUE* lval, LVALUE* lval2)
             lval->val_type = KIND_INT;
             lval->ltype = type_int;            
         }
-        lval->indirect_kind = 0;
+        lval->indirect_kind = KIND_NONE;
     } else if (lval2->ptr_type) { /* ptr +- int => ptr */
         lval->symbol = lval2->symbol;
         lval->ltype = lval2->ltype;
@@ -534,14 +536,14 @@ void nstep(
 void store(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isconst ) {
-        if ( lval->symbol->isassigned ) 
-            error(E_CHANGING_CONST, lval->symbol);
+        if ( lval->symbol->isassigned )
+            errorfmt("Attempt to modify const lvalue \'%s\'",0,lval->symbol->name);
     }
     if ( lval->symbol ) 
         lval->symbol->isassigned = YES;
     if (lval->symbol && (lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_out(lval->symbol);
-    } else if (lval->indirect_kind == 0)
+    } else if (lval->indirect_kind == KIND_NONE)
         putmem(lval->symbol);
     else
         putstk(lval);
@@ -592,7 +594,7 @@ void smartstore(LVALUE* lval)
         switch ((lval->symbol->offset.i) - Zsp) {
         case 0:
             if ( lval->symbol->isconst && lval->symbol->isassigned ) {
-                error(E_CHANGING_CONST, lval->symbol);
+                errorfmt("Attempt to modify const lvalue \'%s\'",0,lval->symbol->name);
             } else {
                 lval->symbol->isassigned = YES;
             }
@@ -600,7 +602,7 @@ void smartstore(LVALUE* lval)
             break;
         case 2:
             if ( lval->symbol->isconst && lval->symbol->isassigned ) {
-                error(E_CHANGING_CONST, lval->symbol);
+                errorfmt("Attempt to modify const lvalue \'%s\'",0,lval->symbol->name);
             } else {
                 lval->symbol->isassigned = YES;
             }
@@ -615,12 +617,12 @@ void smartstore(LVALUE* lval)
 void rvaluest(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warning(W_UNINITIALISED_ID_VARIABLE, lval->symbol->name);
+        warningfmt("Variable '%s' may be used before initialisation", lval->symbol->name);
     }
 
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
-    } else if (lval->symbol && lval->indirect_kind == 0) {
+    } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
        
         getmem(lval->symbol);
     } else {
@@ -632,11 +634,11 @@ void rvaluest(LVALUE* lval)
 void rvalue(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warning(W_UNINITIALISED_ID_VARIABLE, lval->symbol->name);
+        warningfmt("Variable '%s' may be used before initialisation", lval->symbol->name);
     }
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
-    } else if (lval->symbol && lval->indirect_kind == 0) { 
+    } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
         getmem(lval->symbol);
     } else {           
         indirect(lval);
@@ -699,7 +701,7 @@ int test(int label, int parens)
             lval.stage_add = NULL;
         } else if (oper == zlt && utype(&lval)) {
             zerojump(jump0, label, &lval);
-            warning(W_UNREACH);
+            warningfmt("Unreachable code follows");
         } else if (oper == zgt)
             zerojump(gt0, label, &lval);
         else if (oper == zge)
@@ -748,7 +750,7 @@ int constexpr(double *val, Kind *type, int flag)
     *type = valtype;
     Zsp = savesp;
     if (flag && con == 0)
-        error(E_CONSTANT);
+        errorfmt("Expecting constant expression", 0 );
     return con;
 }
 

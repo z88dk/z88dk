@@ -25,11 +25,11 @@ static int32_t needsub(void)
     if (constexpr(&val,&valtype, 1) == 0) {
         val = 1;
     } else if (val < 0) {
-        error(E_NEGATIVE);
+        errorfmt("Negative Size Illegal", 0);
         val = (-val);
     }
     if (valtype == KIND_DOUBLE)
-        warning(W_DOUBLE_UNEXPECTED);
+        warningfmt("Unexpected floating point encountered, taking int value");
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
 }
@@ -41,7 +41,7 @@ static void swallow_bitfield(void)
     Kind   valtype;
     if (cmatch(':')) {
         constexpr(&val, &valtype, 1);
-        warning(W_BITFIELD);
+        warningfmt("Bitfields not supported by compiler");
     }
 }
 
@@ -72,7 +72,7 @@ size_t array_len(array *arr)
 
 void array_add(array *arr, void *elem)
 {
-    int   i = arr->size++;
+    size_t   i = arr->size++;
     arr->elems = REALLOC(arr->elems, arr->size * sizeof(arr->elems[i]));
     arr->elems[i] = elem;
 }
@@ -119,7 +119,7 @@ Type *find_tag(const char *name)
 
 Type *find_tag_field(Type *tag, const char *fieldname)
 {
-    int    i;
+    size_t    i;
     for ( i = 0; i < array_len(tag->fields) ; i++ ) {
         Type *field = array_get_byindex(tag->fields, i);
 
@@ -270,7 +270,7 @@ static Type *parse_enum(Type *type)
 
                 constexpr(&dval, &valtype, 1);
                 if ( valtype == KIND_DOUBLE )
-                    warning(W_DOUBLE_UNEXPECTED);
+                    warningfmt("Unexpected floating point encountered, taking int value");
                 value = dval;
             }
             elem = make_constant(sname, value);
@@ -282,12 +282,12 @@ static Type *parse_enum(Type *type)
     return ptr;
 }
 
-Type *parse_struct(Type *type, int isstruct)
+Type *parse_struct(Type *type, char isstruct)
 {
     char    sname[NAMESIZE];
     Type   *str = NULL;
     size_t  offset = 0;
-    size_t  size = 0;
+    int     size = 0;
     static int num_structs;
 
     if ( symname(sname) ) {
@@ -417,7 +417,7 @@ static Type *parse_type(void)
     if ( swallow("const")) {
         type->isconst = 1;
     } else if (swallow("volatile")) {
-        warning(W_VOLATILE);
+        //warningfmt("Volatile type not supported by compiler");
     }
 
     if (amatch("__sfr")) {
@@ -534,7 +534,7 @@ static void parse_trailing_modifiers(Type *type)
 
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
-        error(E_NAKED_CRITICAL, type->name);
+        errorfmt("Function '%s' is both __naked and __critical, this is not permitted", 1, type->name);
     }
 }
 
@@ -591,7 +591,7 @@ Type *parse_parameter_list(Type *return_type)
             param = CALLOC(1,sizeof(*param));
             *param = *type_int;  // Implicitly int
             if ( symname(param->name) == 0 ) {
-                error(E_ARGNAME);
+                errorfmt("Illegal Argument Name: %s", 0, param->name);
                 junk();
             }
         }
@@ -1036,11 +1036,11 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
         constexpr(&dval, &valtype, 1);
         if (dval < 0) {
-            error(E_NEGATIVE);
+            errorfmt("Negative Size Illegal", 0);
             dval = (-dval);
         }
         if ( valtype == KIND_DOUBLE )
-            warning(W_DOUBLE_UNEXPECTED);
+            warningfmt("Unexpected floating point encountered, taking int value");
         type->value = dval;
 
         if ( symname(type->name) == 0 ) 
@@ -1147,7 +1147,7 @@ void declare_func_kr()
         } else {
             param = make_type(KIND_INT, NULL);
             if ( symname(param->name) == 0 ) {
-                error(E_ARGNAME);
+                errorfmt("Illegal Argument Name: %s", 0, param->name);
                 junk();
             }
         }
@@ -1155,7 +1155,7 @@ void declare_func_kr()
             array_add(func->parameters, param);
     
         if (ch() != ')' && cmatch(',') == 0) {
-            warning(W_EXPCOM);
+            warningfmt("Expected ','");
         }
     }
     parse_trailing_modifiers(func);

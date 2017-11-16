@@ -8,6 +8,10 @@
 
 #include "ccdefs.h"
 
+static void       ifline(void);
+static void       noiferr(void);
+static int        findmac(char *sname);
+
 void junk()
 {
     if (an(inbyte()))
@@ -199,7 +203,7 @@ void ifline()
 
 void noiferr()
 {
-    error(E_MISSIF);
+    errorfmt( "No matching #if", 0 );
 }
 
 void keepch(char c)
@@ -231,7 +235,7 @@ void addmac()
     while (putmac(gch()))
         ;
     if (macptr >= MACMAX)
-        error(E_MACOV);
+        errorfmt("Macro table full", 1 );
 }
 
 /* delete macro from symbol table, but leave entry so hashing still works */
