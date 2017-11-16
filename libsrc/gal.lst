@@ -14,9 +14,10 @@ stdio/ansi/gal/f_ansi_bel
 stdio/ansi/gal/f_ansi_dline
 stdio/ansi/gal/f_ansi_scrollup
 time/gal/clock
-@gfxbasetxt6.lst
+graphics/dcircle2
 graphics/__gfx_coords
 graphics/gal/textpixl6
+@gfxbasetxt6.lst
 games/gal/bit_open
 games/gal/bit_open_di
 games/gal/bit_close
