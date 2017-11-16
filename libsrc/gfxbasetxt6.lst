@@ -30,7 +30,7 @@ graphics/liner
 graphics/lscroll
 graphics/plot
 graphics/point
-graphics/putsprite2
+graphics/putsprite3
 graphics/dither_pattern
 graphics/multipoint
 graphics/rbitmask
