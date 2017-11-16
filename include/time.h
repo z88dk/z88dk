@@ -19,6 +19,10 @@
 #define CLOCKS_PER_SEC 100
 #endif
 
+#ifdef __GAL__
+#define CLOCKS_PER_SEC 100
+#endif
+
 #ifdef __X1__
 #define CLOCKS_PER_SEC 1
 #endif
