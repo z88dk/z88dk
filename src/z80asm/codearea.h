@@ -134,8 +134,11 @@ extern void  patch_byte( int addr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
 extern void append_2bytes( Byte byte1, Byte byte2 );
 
-extern void  patch_word( int addr, int word );			/* 2-byte word */
-extern void append_word( int word );
+extern void  patch_word(int addr, int word);			/* 2-byte word */
+extern void append_word(int word);
+
+extern void  patch_word_be(int addr, int word);			/* 2-byte word big endian*/
+extern void append_word_be(int word);
 
 extern void  patch_long( int addr, long dword );		/* 4-byte long */
 extern void append_long( long dword );

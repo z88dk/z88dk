@@ -484,7 +484,6 @@ IF !RABBIT
 	im	2 	
 	
 	im 	{-1 3}							;; error: integer '{1}' out of range
-	im 	undefined						;; error: symbol 'undefined' not defined
 ELSE
 	{di ei halt}						;; error: illegal identifier
 	im {0 1 2} 							;; error: illegal identifier
@@ -497,7 +496,6 @@ ENDIF
 	{bit res set} {0 1 2 3 4 5 6 7},{b c d e h l a (hl) (ix+DIS) (iy+DIS)}
 	
 	{bit res set} {-1 8},a				;; error: integer '{2}' out of range
-	{bit res set} undefined,a			;; error: symbol 'undefined' not defined
 	
 ;	{res set}     {0 1 2 3 4 5 6 7},(ix+DIS),{b c d e h l  a}	=} 0xDD 0xCB DIS {<0:6}+{<1:3}+{<3}
 ;	{res set}     {0 1 2 3 4 5 6 7},(iy+DIS),{b c d e h l  a}	=} 0xFD 0xCB DIS {<0:6}+{<1:3}+{<3}
@@ -507,7 +505,6 @@ ENDIF
 ;------------------------------------------------------------------------------
 	jp {NN (hl) (ix) (iy)}	
 	jp {nz z nc c po pe p m},NN
-
 										; max forward jump
 	jr	 jr2
 	jr	 jr2
@@ -580,7 +577,6 @@ ELSE
 	
 ENDIF
 
-	rst	undefined		   								;; error: symbol 'undefined' not defined
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
@@ -729,78 +725,6 @@ ENDIF
 	  defb 10							;;
 	endif								;;
 	
-;------------------------------------------------------------------------------
-; DEFGROUP
-;------------------------------------------------------------------------------
-	defgroup 							;;	
-	{ 									;;
-		f0, f1  						;;	
-		f2, f3,  						;;	
-		f10 = 10,  						;;	
-		f11,  							;;	
-		f20 = 20, f21					;;	
-		rl								;; ; opcode can be used as constant
-	} 									;;	
-	defb f0,f1,f2,f3,f10,f11,f20,f21,rl	;; defb 0,1,2,3,10,11,20,21,22
-
-	defgroup 							;;	
-	{ 									;;
-		dg1, dg2 = 3					;;	
-		dg3 = 7,						;;
-	}			  						;;	
-	defb dg1,dg2,dg3					;; defb 0,3,7
-
-	; check with conditional assembly
-	if 1								;;	
-		defgroup 						;;	
-		{ 								;;	
-			ff = 1						;;	
-		}								;;	
-	else								;;	
-		defgroup 						;;	
-		{								;;	
-			ff = 2						;;	
-		}								;;	
-	endif								;;	
-	if 0								;;	
-		defgroup 						;;	
-		{ 								;;	
-			fg = 1						;;	
-		}								;;	
-	else								;;	
-		defgroup 						;;	
-		{								;;	
-			fg = 2						;;	
-		}								;;	
-	endif								;;		
-	defb ff, fg							;; defb 1, 2
-
-;------------------------------------------------------------------------------
-; DEFS
-;------------------------------------------------------------------------------
-ds:	defs not_defined	; BUG_0007		;; error: symbol 'not_defined' not defined
-	defs -1								;; error: integer '-1' out of range
-	defs 0								;;
-	defs 1								;; defb 0
-	defs 2								;; defb 0,0
-	defs 3								;; defb 0,0,0
-	defs 4								;; defb 0,0,0,0
-	defs 65537							;; error: integer '65537' out of range
-	
-	defs 2,not_defined					;; error: symbol 'not_defined' not defined
-	defs 2,-129							;; error: integer '-129' out of range
-	defs 2,-128							;; defb 80h,80h
-	defs 2,-127							;; defb 81h,81h
-	defs 2,0							;; defb 0,0
-	defs 2,255							;; defb 0FFh,0FFh
-	defs 2,256							;; error: integer '256' out of range
-	
-	if 0								;;
-		defs 2,0						;;
-	else								;;
-		defs 2,2						;; defb 2,2
-	endif								;;
-
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------

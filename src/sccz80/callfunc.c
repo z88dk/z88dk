@@ -381,7 +381,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
             force( dest->kind, src->kind, dest->isunsigned, src->isunsigned, isconst);
         } else {
             /* Converting pointer to integer */
-            warning(W_PTRINT);
+            warningfmt("Converting pointer to integer without cast");
             force( dest->kind, src->kind == KIND_PTR ? KIND_INT : KIND_LONG, dest->isunsigned, 1, isconst);
         }
     } else  if ( !ispointer(src) ) {
@@ -411,24 +411,10 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
                 utstring_free(str);
             }
         }
-    }
-            
+    }         
     return dest->kind;
 }
    
-        /* Dealing with pointers.. a type mismatch!*/
-        // if (((dtype != stype) && (dtype != KIND_VOID) && (stype != KIND_VOID) && (stype != KIND_CPTR)) || ((dtype == stype) && (margtag != functab))) {
-        //     debug(DBG_ARG3, "dtype=%d stype=%d margtab=%d functag=%d", dtype, stype, margtag, functab);
-        //     warning(W_PRELIM, currfn->name, lineno - fnstart);
-        //     warning(W_PTRTYP);
-        //     ExpandArgValue(dest, buffer, functab);
-        //     warning(W_PTRTYP1, buffer);
-        //     ExpandArgValue(src, buffer, margtag);
-        //     warning(W_PTRTYP2, buffer);
-        // } else if (dtype == stype && dident != sident && sident != FUNCTION) {
-        //     warning(W_INTPTR);
-        //     expr = KIND_INT;
-        // }
 
 struct printf_format_s {
     char fmt;

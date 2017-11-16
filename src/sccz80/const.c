@@ -312,7 +312,7 @@ int storeq(int length, unsigned char* queue, int32_t* val)
     for (j = 0; j < k; j++) {
         /* Have to dump it in our special queue here for function literals */
         if ((litptr + 1) >= FNMAX) {
-            error(E_LITQOV);
+            errorfmt("Literal Queue Overflow", 1);
         }
         *(litq + litptr) = *(queue + j);
         litptr++;
@@ -346,7 +346,7 @@ int qstr(double *val)
 void stowlit(int value, int size)
 {
     if ((gltptr + size) >= LITMAX) {
-        error(E_LITQOV);
+        errorfmt("Literal Queue Overflow", 1);
     }
     putint(value, glbq + gltptr, size);
     gltptr += size;
@@ -402,7 +402,7 @@ unsigned char litchar()
     }
 
     if (ch() != 'x' && (ch() < '0' || ch() > '7')) {
-        warning(W_ESCAPE, ch());
+        warningfmt("Unknown escape sequence \\%c", ch());
         return (gch());
     }
     if (ch() == 'x') {
@@ -416,7 +416,7 @@ unsigned char litchar()
                 oct = (oct << 4) + ((gch() & 95) - '7');
         }
         if (isxdigit(ch())) {
-            warning(W_HEXESCAPE_TOO_LONG);
+            warningfmt("Hex escape sequence out of range");
         }
         return ((char)oct);
     }
@@ -477,7 +477,7 @@ void offset_of(LVALUE *lval)
         lval->val_type = KIND_INT;
         vconst(lval->const_val);
     } else {
-        error(E_OFFSETOF, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
+        errorfmt("Cannot evaluate __builtin_offsetof(%s,%s)", 1, strlen(struct_name) ? struct_name : "<unknown>", strlen(memb_name) ? memb_name : "<unknown>");
     }
 
 
@@ -504,7 +504,11 @@ void size_of(LVALUE* lval)
 
     if ( (type = parse_expr_type()) != NULL ) {
         if ( deref && type->kind != KIND_PTR ) {
-            error(E_SIZEOF,"");
+            UT_string *str;
+            utstring_new(str);
+            type_describe(type, str);
+            errorfmt("sizeof expects a pointer but got %s", 1, utstring_body(str) );
+            utstring_free(str);
             lval->const_val = 2;
             return;
         }
@@ -515,7 +519,7 @@ void size_of(LVALUE* lval)
         }
         if ( type == NULL ) {
             lval->const_val = 2;
-            errorfmt("Cannot dereference far enough, assuming size of 2\n",1);
+            errorfmt("Cannot dereference far enough, assuming size of 2",1);
         } else {
             lval->const_val = type->size;
         }
@@ -531,10 +535,6 @@ void size_of(LVALUE* lval)
     } else if (symname(sname)) { /* Size of an object */
         Type *type;
         if (((ptr = findloc(sname)) != NULL) || ((ptr = findstc(sname)) != NULL) || ((ptr = findglb(sname)) != NULL)) {
-            Kind ptrtype = KIND_NONE;
-            Type       *ptrotag = NULL;
-
-
             type = ptr->ctype;
             lval->const_val = type->size;
             
@@ -547,14 +547,8 @@ void size_of(LVALUE* lval)
                     do {
                         if ( (mptr = get_member(ptr->ctype->tag) ) != NULL ) {
                             type = mptr;
-                            ptrtype = 0;
-                            ptrotag = NULL;
                             if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
-                                ptrtype = mptr->ptr->kind;
-                                //ptrflags = ptr->flags;
-                                if  (mptr->ptr->kind == KIND_STRUCT) {
-                                    ptrotag = mptr->tag;
-                                }
+                                // Do nothing
                             } else {
                                 // tag_sym->size = numner of elements
                                 lval->const_val = mptr->size;
@@ -589,7 +583,7 @@ void size_of(LVALUE* lval)
                 lval->const_val = 2;
             }
         } else {
-            error(E_UNSYMB, sname);
+            errorfmt("Unknown symbol: %s", 1, sname);
         }
     }
     if ( brackets )
@@ -610,7 +604,7 @@ static Type *get_member(Type *tag)
     if (symname(sname) && (member = find_tag_field(tag, sname))) {
         return member;
     }
-    error(E_UNMEMB, sname);
+    errorfmt("Unknown member: %s", 1, sname);
     return NULL;
 }
 

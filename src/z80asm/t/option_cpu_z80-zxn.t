@@ -153,7 +153,10 @@ add("cu.move 127,0",	0x7F, 0x00);
 
 add("cu.move 0,1",		0x00, 0x01);
 add("cu.move 0,2",		0x00, 0x02);
+add("cu.move 0,127",	0x00, 0x7F);
 add("cu.move 0,255",	0x00, 0xFF);
+add("cu.move 0,-1",		0x00, 0xFF);
+add("cu.move 0,-128",	0x00, 0x80);
 
 # cu.stop   -> 16-bit encoding 0xffff (impossible cu.wait)
 add("cu.stop", 			0xFF, 0xFF);
@@ -161,10 +164,48 @@ add("cu.stop", 			0xFF, 0xFF);
 # cu.nop  -> 16-bit encoding 0x0000 (do nothing cu.move)
 add("cu.nop", 			0x00, 0x00);
 
-
-
 z80asm(join('', @asm), "--cpu=z80-zxn -l -b", 0, "", "");
 check_bin_file("test.bin", join('', @bin));
 
+#------------------------------------------------------------------------------
+# test list file
+z80asm(<<END, "--cpu=z80-zxn -l", 0, "", "");
+	cu.wait 0,1
+END
+check_text_file("test.lis", <<END);
+1     0000  82 00       cu.wait 0,1
+2     0002
+END
+
+#------------------------------------------------------------------------------
+# test error
+z80asm("cu.wait 0,1", "--cpu=z80", 1, "", <<'END');
+Error at file 'test.asm' line 1: illegal identifier
+1 errors occurred during assembly
+END
+
+#------------------------------------------------------------------------------
+# link-time constants
+my $HOR = 1; 
+my $VER = 2; 
+my $REG = 3; 
+my $VAL = 4;
+spew("test1.asm", <<"END");
+	public VER,HOR,REG,VAL
+	defc VER = $VER
+	defc HOR = $HOR
+	defc REG = $REG
+	defc VAL = $VAL
+END
+run("z80asm test1.asm", 0, "", "");
+
+z80asm(<<'END', "--cpu=z80-zxn -b -otest.bin test1.o", 0, "", "");
+	extern VER,HOR,REG,VAL
+	cu.wait VER,HOR
+	cu.move REG,VAL
+END
+check_bin_file("test.bin", pack("n*", 0x8000 + ($HOR << 9) + $VER, ($REG << 8) + $VAL));
+
+unlink_testfiles();
 unlink_testfiles();
 done_testing;

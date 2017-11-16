@@ -1908,7 +1908,6 @@ ENDIF
         jp   pe,NN                      ;; EA 30 00
         jp   p,NN                       ;; F2 30 00
         jp   m,NN                       ;; FA 30 00
-
                                         ; max forward jump
         jr   jr2                        ;; 18 7F
         jr   jr2                        ;; 18 7D
@@ -2183,73 +2182,6 @@ ENDIF
         endif
 
 ;------------------------------------------------------------------------------
-; DEFGROUP
-;------------------------------------------------------------------------------
-        defgroup
-        {
-          f0, f1
-          f2, f3,
-          f10  = 10,
-          f11,
-          f20  = 20, f21
-          rl
-        }
-        defb f0,f1,f2,f3,f10,f11,f20,f21,rl
-                                        ;; 00 01 02 03 0A 0B 14 15 16
-
-        defgroup
-        {
-          dg1, dg2  = 3
-          dg3  = 7,
-        }
-        defb dg1,dg2,dg3                ;; 00 03 07
-
-                                        ; check with conditional assembly
-        if   1
-          defgroup
-          {
-            ff   = 1
-          }
-        else
-          defgroup
-          {
-            ff   = 2
-          }
-        endif
-        if   0
-          defgroup
-          {
-            fg   = 1
-          }
-        else
-          defgroup
-          {
-            fg   = 2
-          }
-        endif
-        defb ff, fg                     ;; 01 02
-
-;------------------------------------------------------------------------------
-; DEFS
-;------------------------------------------------------------------------------
-        defs 0
-        defs 1                          ;; 00
-        defs 2                          ;; 00 00
-        defs 3                          ;; 00 00 00
-        defs 4                          ;; 00 00 00 00
-
-        defs 2,-128                     ;; 80 80
-        defs 2,-127                     ;; 81 81
-        defs 2,0                        ;; 00 00
-        defs 2,255                      ;; FF FF
-
-        if   0
-          defs 2,0
-        else
-          defs 2,2                      ;; 02 02
-        endif
-
-;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
@@ -2356,7 +2288,6 @@ ENDIF
 IF      !RABBIT
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
-        im   undefined                  ;; error: symbol 'undefined' not defined
 ELSE    
 ENDIF   
         bit  -1,a                       ;; error: integer '-1' out of range
@@ -2365,9 +2296,6 @@ ENDIF
         bit  8,a                        ;; error: integer '8' out of range
         res  8,a                        ;; error: integer '8' out of range
         set  8,a                        ;; error: integer '8' out of range
-        bit  undefined,a                ;; error: symbol 'undefined' not defined
-        res  undefined,a                ;; error: symbol 'undefined' not defined
-        set  undefined,a                ;; error: symbol 'undefined' not defined
         djnz ASMPC-0x7F                 ;; error 2: integer '-129' out of range
         djnz ASMPC+0x82                 ;; error 2: integer '128' out of range
         jr   ASMPC-0x7F                 ;; error 2: integer '-129' out of range
@@ -2383,17 +2311,9 @@ ENDIF
 IF      !RABBIT
 ELSE    
 ENDIF   
-        rst  undefined                  ;; error: symbol 'undefined' not defined
 IF      !RABBIT
 ELSE    
 ENDIF   
-ds:     defs not_defined                ;; error: symbol 'not_defined' not defined
-                                        ; BUG_0007
-        defs -1                         ;; error: integer '-1' out of range
-        defs 65537                      ;; error: integer '65537' out of range
-        defs 2,not_defined              ;; error: symbol 'not_defined' not defined
-        defs 2,-129                     ;; error: integer '-129' out of range
-        defs 2,256                      ;; error: integer '256' out of range
 IF      !RABBIT
 ENDIF   
 IF      !RABBIT
@@ -3687,7 +3607,6 @@ IF      !RABBIT
 
         im   -1
         im   3
-        im   undefined
 ELSE    
 ENDIF   
 
@@ -4177,7 +4096,6 @@ ENDIF
         jp   pe,NN                      ;; EA 30 00
         jp   p,NN                       ;; F2 30 00
         jp   m,NN                       ;; FA 30 00
-
                                         ; max forward jump
         jr   jr2                        ;; 18 7F
         jr   jr2                        ;; 18 7D
@@ -4424,73 +4342,6 @@ ENDIF
           defb 9                        ;; 09
         else
           defb 10
-        endif
-
-;------------------------------------------------------------------------------
-; DEFGROUP
-;------------------------------------------------------------------------------
-        defgroup
-        {
-          f0, f1
-          f2, f3,
-          f10  = 10,
-          f11,
-          f20  = 20, f21
-          rl
-        }
-        defb f0,f1,f2,f3,f10,f11,f20,f21,rl
-                                        ;; 00 01 02 03 0A 0B 14 15 16
-
-        defgroup
-        {
-          dg1, dg2  = 3
-          dg3  = 7,
-        }
-        defb dg1,dg2,dg3                ;; 00 03 07
-
-                                        ; check with conditional assembly
-        if   1
-          defgroup
-          {
-            ff   = 1
-          }
-        else
-          defgroup
-          {
-            ff   = 2
-          }
-        endif
-        if   0
-          defgroup
-          {
-            fg   = 1
-          }
-        else
-          defgroup
-          {
-            fg   = 2
-          }
-        endif
-        defb ff, fg                     ;; 01 02
-
-;------------------------------------------------------------------------------
-; DEFS
-;------------------------------------------------------------------------------
-        defs 0
-        defs 1                          ;; 00
-        defs 2                          ;; 00 00
-        defs 3                          ;; 00 00 00
-        defs 4                          ;; 00 00 00 00
-
-        defs 2,-128                     ;; 80 80
-        defs 2,-127                     ;; 81 81
-        defs 2,0                        ;; 00 00
-        defs 2,255                      ;; FF FF
-
-        if   0
-          defs 2,0
-        else
-          defs 2,2                      ;; 02 02
         endif
 
 ;------------------------------------------------------------------------------
@@ -4747,9 +4598,6 @@ ENDIF
         bit  8,a                        ;; error: integer '8' out of range
         res  8,a                        ;; error: integer '8' out of range
         set  8,a                        ;; error: integer '8' out of range
-        bit  undefined,a                ;; error: symbol 'undefined' not defined
-        res  undefined,a                ;; error: symbol 'undefined' not defined
-        set  undefined,a                ;; error: symbol 'undefined' not defined
         djnz ASMPC-0x7F                 ;; error 2: integer '-129' out of range
         djnz ASMPC+0x82                 ;; error 2: integer '128' out of range
         jr   ASMPC-0x7F                 ;; error 2: integer '-129' out of range
@@ -4766,7 +4614,6 @@ IF      !RABBIT
 ELSE    
         retn                            ;; error: illegal identifier
 ENDIF   
-        rst  undefined                  ;; error: symbol 'undefined' not defined
 IF      !RABBIT
 ELSE    
         in   a,(0)                      ;; error: illegal identifier
@@ -4794,13 +4641,6 @@ ELSE
         outd                            ;; error: illegal identifier
         otdr                            ;; error: illegal identifier
 ENDIF   
-ds:     defs not_defined                ;; error: symbol 'not_defined' not defined
-                                        ; BUG_0007
-        defs -1                         ;; error: integer '-1' out of range
-        defs 65537                      ;; error: integer '65537' out of range
-        defs 2,not_defined              ;; error: symbol 'not_defined' not defined
-        defs 2,-129                     ;; error: integer '-129' out of range
-        defs 2,256                      ;; error: integer '256' out of range
 IF      !RABBIT
 ENDIF   
 IF      !RABBIT

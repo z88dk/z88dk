@@ -96,6 +96,8 @@ cpc/cpc_RRI
 cpc/cpc_RRI_callee
 cpc/cpc_Uncrunch
 cpc/cpc_Uncrunch_callee
+cpc/cpc_UnExo
+cpc/cpc_UnExo_callee
 psg/cpc/set_psg
 psg/cpc/set_psg_callee
 psg/cpc/get_psg

@@ -14,7 +14,7 @@ void addwhile(WHILE_TAB* ptr)
     wqptr->loop = ptr->loop = getlabel(); /* and looping label */
     wqptr->exit = ptr->exit = getlabel(); /* and exit label */
     if (wqptr >= WQMAX) {
-        error(E_WHILE);
+        errorfmt("Too many active whiles", 1 );
         return;
     }
     ++wqptr;
@@ -30,7 +30,7 @@ void delwhile()
 WHILE_TAB *readwhile(WHILE_TAB *ptr)
 {
     if (ptr <= wqueue) {
-        error(E_CONTEXT);
+        errorfmt("Out of context", 0);
         return 0;
     } else
         return (ptr - 1);

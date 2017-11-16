@@ -167,12 +167,57 @@ void add_Z88_INVOKE(int argument)
 		error_int_range(argument);
 }
 
-void add_copper_unit_opcode(int opcode)
+// cu.wait VER, HOR   ->  16 - bit encoding 0x8000 + (HOR << 9) + VER
+// (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
+void add_copper_unit_wait(Expr *ver, Expr *hor)
+{ 
+	if (opts.cpu != CPU_Z80_ZXN)
+		error_illegal_ident();
+	else {
+		char expr_text[MAXLINE];
+		snprintf(expr_text, sizeof(expr_text),
+			"0x8000 + (((%s) & 0x3F) << 9) + ((%s) & 0x1FF)", str_data(hor->text), str_data(ver->text));
+		Expr *expr = parse_expr(expr_text);
+
+		Pass2infoExpr(RANGE_WORD_BE, expr);
+		OBJ_DELETE(ver);
+		OBJ_DELETE(hor);
+	}
+}
+
+// cu.move REG, VAL  -> 16 - bit encoding(REG << 8) + VAL
+// (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
+void add_copper_unit_move(Expr *reg, Expr *val)
 {
 	if (opts.cpu != CPU_Z80_ZXN)
 		error_illegal_ident();
+	else {
+		char expr_text[MAXLINE];
+		snprintf(expr_text, sizeof(expr_text),
+			"(((%s) & 0x7F) << 8) + ((%s) & 0xFF)", str_data(reg->text), str_data(val->text));
+		Expr *expr = parse_expr(expr_text);
 
-	// copper unit is big-endiand
-	append_byte((opcode >> 8) & 0xFF);
-	append_byte((opcode     ) & 0xFF);
+		Pass2infoExpr(RANGE_WORD_BE, expr);
+		OBJ_DELETE(reg);
+		OBJ_DELETE(val);
+	}
+
+}
+
+// cu.stop   -> 16 - bit encoding 0xffff (impossible cu.wait)
+void add_copper_unit_stop()
+{
+	if (opts.cpu != CPU_Z80_ZXN)
+		error_illegal_ident();
+	else
+		append_word_be(0xFFFF);
+}
+
+// cu.nop  -> 16 - bit encoding 0x0000 (do nothing cu.move)
+void add_copper_unit_nop()
+{
+	if (opts.cpu != CPU_Z80_ZXN)
+		error_illegal_ident();
+	else
+		append_word_be(0x0000);
 }

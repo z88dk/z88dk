@@ -256,6 +256,11 @@ extern void __LIB__              cpc_Uncrunch(char *, char *) __smallc ;
 extern void __LIB__    cpc_Uncrunch_callee(char *, char *)  __smallc __z88dk_callee;
 #define cpc_Uncrunch(a,b) cpc_Uncrunch_callee(a,b)
 
+// Data decompression, Exomizer 2 format
+extern void __LIB__              cpc_UnExo(char *, char *) __smallc ;
+extern void __LIB__    cpc_UnExo_callee(char *, char *)  __smallc __z88dk_callee;
+#define cpc_UnExo(a,b) cpc_UnExo_callee(a,b)
+
 // Call RSX/Bar command
 extern int __LIB__ cpc_rsx(char *cmd,...);
 

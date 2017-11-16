@@ -6,7 +6,7 @@ divert(-1)
 #
 
 # NEXTOS API
-# https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/nextos_api.odt
+# https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 
 # Filesystem Related
 
@@ -65,6 +65,7 @@ define(`__NEXTOS_IDE_STREAM_PTR', 0x0062)
 define(`__NEXTOS_IDE_BANK', 0x01bd)
 define(`__NEXTOS_IDE_BASIC', 0x01c0)
 define(`__NEXTOS_IDE_STREAM_LINEIN', 0x01c3)
+define(`__NEXTOS_IDE_WINDOW_STRING', 0x01c6)
 
 # Legacy - Floppy Drive
 
@@ -223,6 +224,7 @@ PUBLIC `__NEXTOS_IDE_STREAM_PTR'
 PUBLIC `__NEXTOS_IDE_BANK'
 PUBLIC `__NEXTOS_IDE_BASIC'
 PUBLIC `__NEXTOS_IDE_STREAM_LINEIN'
+PUBLIC `__NEXTOS_IDE_WINDOW_STRING'
 
 PUBLIC `__NEXTOS_DOS_REF_XDPB'
 PUBLIC `__NEXTOS_DOS_MAP_B'
@@ -368,6 +370,7 @@ defc `__NEXTOS_IDE_STREAM_PTR' = __NEXTOS_IDE_STREAM_PTR
 defc `__NEXTOS_IDE_BANK' = __NEXTOS_IDE_BANK
 defc `__NEXTOS_IDE_BASIC' = __NEXTOS_IDE_BASIC
 defc `__NEXTOS_IDE_STREAM_LINEIN' = __NEXTOS_IDE_STREAM_LINEIN
+defc `__NEXTOS_IDE_WINDOW_STRING' = __NEXTOS_IDE_WINDOW_STRING
 
 defc `__NEXTOS_DOS_REF_XDPB' = __NEXTOS_DOS_REF_XDPB
 defc `__NEXTOS_DOS_MAP_B' = __NEXTOS_DOS_MAP_B
@@ -513,6 +516,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_BANK'  __NEXTOS_IDE_BANK
 `#define' `__NEXTOS_IDE_BASIC'  __NEXTOS_IDE_BASIC
 `#define' `__NEXTOS_IDE_STREAM_LINEIN'  __NEXTOS_IDE_STREAM_LINEIN
+`#define' `__NEXTOS_IDE_WINDOW_STRING'  __NEXTOS_IDE_WINDOW_STRING
 
 `#define' `__NEXTOS_DOS_REF_XDPB'  __NEXTOS_DOS_REF_XDPB
 `#define' `__NEXTOS_DOS_MAP_B'  __NEXTOS_DOS_MAP_B

@@ -55,7 +55,7 @@ int need_floatpack, c_doinline, ncomp;
 
 int stackargs;
 
-int defstatic, filenum; /* next argument to be used */
+int filenum; /* next argument to be used */
 
 char c_default_unsigned, c_mathz88, c_compact_code;
 
@@ -64,7 +64,6 @@ int nxtlab, /* next avail label # */
 
     litlab, /* label # assigned to literal pool */
     Zsp, /* compiler relative stk ptr */
-    undeclared, /* # function arguments not yet declared */
     ncmp, /* # open compound statements */
     errcnt, /* # errors in compilation */
     c_errstop, /* stop on error */

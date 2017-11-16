@@ -8,9 +8,9 @@
 // copper instruction macros
 // all 16-bit
 
-#define CU_WAIT(ver,hor)  ((unsigned int)(0x8000 + ((hor & 0x3f) << 9) + (ver & 0x1ff)))
-#define CU_MOVE(reg,val)  ((unsigned int)(((reg & 0x7f) << 8) + (val & 0xff))) 
-#define CU_NOP            ((unsigned int)0xffff)
-#define CU_STOP           ((unsigned int)0x0000)
+#define CU_WAIT(ver,hor)  ((unsigned int)((((ver) & 0xff) << 8) + 0x80 + (((hor) & 0x3f) << 1) + (((ver) & 0x100) >> 8)))
+#define CU_MOVE(reg,val)  ((unsigned int)((((val) & 0xff) << 8) + ((reg) & 0x7f)))
+#define CU_NOP            ((unsigned int)0x0000)
+#define CU_STOP           ((unsigned int)0xffff)
 
 #endif
