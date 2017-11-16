@@ -13,6 +13,7 @@ stdio/ansi/gal/f_ansi_cls
 stdio/ansi/gal/f_ansi_bel
 stdio/ansi/gal/f_ansi_dline
 stdio/ansi/gal/f_ansi_scrollup
+time/gal/clock
 @gfxbasetxt6.lst
 graphics/__gfx_coords
 graphics/gal/textpixl6
@@ -20,5 +21,6 @@ games/gal/bit_open
 games/gal/bit_open_di
 games/gal/bit_close
 games/gal/bit_close_ei
+games/gal/joystick
 @games/games_mwr.lst
 @z80.lst
