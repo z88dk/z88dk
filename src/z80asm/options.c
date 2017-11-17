@@ -796,7 +796,12 @@ static char *path_prepend_output_dir(char *filename)
 {
 	char path[FILENAME_MAX];
 	if (opts.output_directory) {
-		snprintf(path, sizeof(path), "%s/%s", opts.output_directory, filename);
+		if (isalpha(filename[0]) && filename[1] == ':')	// it's a win32 absolute path
+			snprintf(path, sizeof(path), "%s/%c/%s", 
+				opts.output_directory, filename[0], filename + 2);
+		else
+			snprintf(path, sizeof(path), "%s/%s", 
+				opts.output_directory, filename);
 		return strpool_add(path);
 	}
 	else {
