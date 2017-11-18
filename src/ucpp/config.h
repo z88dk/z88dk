@@ -83,7 +83,7 @@
  * with files bigger than 4 GB), this option makes ucpp fail to operate
  * on those extremely large files.
  */
-#define UCPP_MMAP
+// #define UCPP_MMAP
 
 /*
  * Performance issues:
