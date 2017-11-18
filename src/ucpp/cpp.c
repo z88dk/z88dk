@@ -2468,10 +2468,21 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 			warning(-1, "unknown option '%s'", argv[i]);
 	} else {
 		if (filename != 0) {
-			error(-1, "spurious filename '%s'", argv[i]);
-			return 2;
+			if ( ls->output != NULL ) {
+				ls->output = fopen(argv[i], "w");
+				if (!ls->output) {
+					error(-1, "failed to open for "
+						"writing: %s", argv[i]);
+					return 2;
+				}
+				emit_output = ls->output;
+			} else {
+				error(-1, "spurious filename '%s'", argv[i]);
+				return 2;
+			}
+		} else {
+			filename = argv[i];
 		}
-		filename = argv[i];
 	}
 	init_tables(ls->flags & HANDLE_ASSERTIONS);
 	init_include_path(0);
