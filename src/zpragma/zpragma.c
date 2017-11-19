@@ -376,6 +376,12 @@ int main(int argc, char **argv)
             } else if ( sccz80_mode == 0 && strncmp(ptr, "endasm", 6) == 0 ) {
                 fputs("__endasm;\n",stdout);
                 ol = 0;
+            } else if ( sccz80_mode == 1 && strncmp(ptr, "asm", 3) == 0 ) {
+                fputs("#asm\n",stdout);
+                ol = 0;
+            } else if ( sccz80_mode == 1 && strncmp(ptr, "endasm", 6) == 0 ) {
+                fputs("#endasm\n",stdout);
+                ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
                 /* It's an option, this may tweak something */
                 write_defined("CRT_ORG_CODE", strtol(ptr+6, NULL, 0), 0);

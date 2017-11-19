@@ -150,7 +150,7 @@
 #if (spritesize == 14)
   #define spritemem 30
 #endif
-#if (spritesize == 15)|(spritesize == 16))
+#if (spritesize == 15)|(spritesize == 16)
   #define spritemem 34
 #endif
 #if (spritesize == 20)

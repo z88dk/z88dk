@@ -62,7 +62,6 @@ extern FILE *inpt2;
 extern FILE *saveout;
 extern SYMBOL *currfn;
 
-extern char endasm;
 extern int ltype;
 extern int c_share_offset;
 extern int debuglevel;

@@ -687,15 +687,14 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    endasm = cmode = 0; /* mark mode as "asm" */
+    cmode = 0; /* mark mode as "asm" */
 
 #ifdef INBUILT_OPTIMIZER
     generate(); /* Dump queued stuff to be opt'd */
 #endif
-
     while (1) {
         preprocess(); /* get and print lines */
-        if (endasm || match("#endasm") || eof) {
+        if (match("#endasm") || eof) {
             break;
         }
         outfmt("%s\n",line);
@@ -709,6 +708,7 @@ void doasm()
 /* #pragma statement */
 void dopragma()
 {
+    blanks();
     if (amatch("proto"))
         addmac();
     else if (amatch("set"))
@@ -717,10 +717,6 @@ void dopragma()
         delmac();
     else if (amatch("unset"))
         delmac();
-    else if (amatch("asm"))
-        doasm();
-    else if (amatch("endasm"))
-        endasm = 1;
     else {
         warningfmt("Unknown #pragma directive");
         clear();

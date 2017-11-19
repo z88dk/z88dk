@@ -114,10 +114,8 @@ void vinline()
 void ifline()
 {
     char sname[NAMESIZE];
-    endasm = 0;
 
     while (1) {
-
         vinline();
         if (eof)
             return;
@@ -126,8 +124,6 @@ void ifline()
 
             if (match("#pragma")) {
                 dopragma();
-                if (endasm)
-                    break;
                 continue;
             }
 

@@ -18,7 +18,7 @@ int writebyte(int myfile, int byte)
 {
 	struct flos_file *flosfile;
 
-	flosfile = (char *) myfile;
+	flosfile = (void *) myfile;
 	if (flosfile->name[0]==0)
 		return (-1);
 

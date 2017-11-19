@@ -17,7 +17,7 @@
         defb    (in_com_hlp1_1 - in_help) /256
         defb    (in_com_hlp1_1 - in_help) %256
 #else
-        defb    0,0               ;pointer to help - use \0
+        defb    0,0               ;pointer to help - use '0'
 #endif  /* TOPIC1_1HELP1) */
 #ifdef TOPIC1_1ATTR
         APPLBYTE(TOPIC1_1ATTR)
@@ -39,7 +39,7 @@
         defb    (in_com_hlp1_2 - in_help) /256
         defb    (in_com_hlp1_2 - in_help) %256
 #else
-        defb    0,0               ;pointer to help - use \0
+        defb    0,0               ;pointer to help - use '0'
 #endif  /* TOPIC1_2HELP1) */
 #ifdef TOPIC1_2ATTR
         APPLBYTE(TOPIC1_2ATTR)
@@ -61,7 +61,7 @@
         defb    (in_com_hlp1_3 - in_help) /256
         defb    (in_com_hlp1_3 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_3HELP1) */
 #ifdef TOPIC1_3ATTR
         APPLBYTE(TOPIC1_3ATTR)
@@ -83,7 +83,7 @@
         defb    (in_com_hlp1_4 - in_help) /256
         defb    (in_com_hlp1_4 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_4HELP1) */
 #ifdef TOPIC1_4ATTR
         APPLBYTE(TOPIC1_4ATTR)
@@ -105,7 +105,7 @@
         defb    (in_com_hlp1_5 - in_help) /256
         defb    (in_com_hlp1_5 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_5HELP1) */
 #ifdef TOPIC1_5ATTR
         APPLBYTE(TOPIC1_5ATTR)
@@ -127,7 +127,7 @@
         defb    (in_com_hlp1_6 - in_help) /256
         defb    (in_com_hlp1_6 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_6HELP1) */
 #ifdef TOPIC1_6ATTR
         APPLBYTE(TOPIC1_6ATTR)
@@ -149,7 +149,7 @@
         defb    (in_com_hlp1_7 - in_help) /256
         defb    (in_com_hlp1_7 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_7HELP1) */
 #ifdef TOPIC1_7ATTR
         APPLBYTE(TOPIC1_7ATTR)
@@ -171,7 +171,7 @@
         defb    (in_com_hlp1_8 - in_help) /256
         defb    (in_com_hlp1_8 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_8HELP1) */
 #ifdef TOPIC1_8ATTR
         APPLBYTE(TOPIC1_8ATTR)
@@ -193,7 +193,7 @@
         defb    (in_com_hlp1_9 - in_help) /256
         defb    (in_com_hlp1_9 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_9HELP1) */
 #ifdef TOPIC1_9ATTR
         APPLBYTE(TOPIC1_9ATTR)
@@ -215,7 +215,7 @@
         defb    (in_com_hlp1_10 - in_help) /256
         defb    (in_com_hlp1_10 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_10HELP1) */
 #ifdef TOPIC1_10ATTR
         APPLBYTE(TOPIC1_10ATTR)
@@ -237,7 +237,7 @@
         defb    (in_com_hlp1_11 - in_help) /256
         defb    (in_com_hlp1_11 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_11HELP1) */
 #ifdef TOPIC1_11ATTR
         APPLBYTE(TOPIC1_11ATTR)
@@ -259,7 +259,7 @@
         defb    (in_com_hlp1_12 - in_help) /256
         defb    (in_com_hlp1_12 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_12HELP1) */
 #ifdef TOPIC1_12ATTR
         APPLBYTE(TOPIC1_12ATTR)
@@ -281,7 +281,7 @@
         defb    (in_com_hlp1_13 - in_help) /256
         defb    (in_com_hlp1_13 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_13HELP1) */
 #ifdef TOPIC1_13ATTR
         APPLBYTE(TOPIC1_13ATTR)
@@ -303,7 +303,7 @@
         defb    (in_com_hlp1_14 - in_help) /256
         defb    (in_com_hlp1_14 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_14HELP1) */
 #ifdef TOPIC1_14ATTR
         APPLBYTE(TOPIC1_14ATTR)
@@ -325,7 +325,7 @@
         defb    (in_com_hlp1_15 - in_help) /256
         defb    (in_com_hlp1_15 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_15HELP1) */
 #ifdef TOPIC1_15ATTR
         APPLBYTE(TOPIC1_15ATTR)
@@ -347,7 +347,7 @@
         defb    (in_com_hlp1_16 - in_help) /256
         defb    (in_com_hlp1_16 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_16HELP1) */
 #ifdef TOPIC1_16ATTR
         APPLBYTE(TOPIC1_16ATTR)
@@ -369,7 +369,7 @@
         defb    (in_com_hlp1_17 - in_help) /256
         defb    (in_com_hlp1_17 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_17HELP1) */
 #ifdef TOPIC1_17ATTR
         APPLBYTE(TOPIC1_17ATTR)
@@ -391,7 +391,7 @@
         defb    (in_com_hlp1_18 - in_help) /256
         defb    (in_com_hlp1_18 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_18HELP1) */
 #ifdef TOPIC1_18ATTR
         APPLBYTE(TOPIC1_18ATTR)
@@ -413,7 +413,7 @@
         defb    (in_com_hlp1_19 - in_help) /256
         defb    (in_com_hlp1_19 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_19HELP1) */
 #ifdef TOPIC1_19ATTR
         APPLBYTE(TOPIC1_19ATTR)
@@ -435,7 +435,7 @@
         defb    (in_com_hlp1_20 - in_help) /256
         defb    (in_com_hlp1_20 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_20HELP1) */
 #ifdef TOPIC1_20ATTR
         APPLBYTE(TOPIC1_20ATTR)
@@ -457,7 +457,7 @@
         defb    (in_com_hlp1_21 - in_help) /256
         defb    (in_com_hlp1_21 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_21HELP1) */
 #ifdef TOPIC1_21ATTR
         APPLBYTE(TOPIC1_21ATTR)
@@ -479,7 +479,7 @@
         defb    (in_com_hlp1_22 - in_help) /256
         defb    (in_com_hlp1_22 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_22HELP1) */
 #ifdef TOPIC1_22ATTR
         APPLBYTE(TOPIC1_22ATTR)
@@ -501,7 +501,7 @@
         defb    (in_com_hlp1_23 - in_help) /256
         defb    (in_com_hlp1_23 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_23HELP1) */
 #ifdef TOPIC1_23ATTR
         APPLBYTE(TOPIC1_23ATTR)
@@ -523,7 +523,7 @@
         defb    (in_com_hlp1_24 - in_help) /256
         defb    (in_com_hlp1_24 - in_help) %256
 #else
-        defb    0               ;pointer to help - use \0
+        defb    0               ;pointer to help - use '0'
 #endif  /* TOPIC1_24HELP1) */
 #ifdef TOPIC1_24ATTR
         APPLBYTE(TOPIC1_24ATTR)
