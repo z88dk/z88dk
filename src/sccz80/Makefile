@@ -30,7 +30,7 @@ DEPENDS := $(OBJS:.o=.d)
 
 all: sccz80$(EXESUFFIX)
 
-CFLAGS += -MMD -Wall -I../../ext/uthash/src/
+CFLAGS += -MMD -Wall -I../../ext/uthash/src/ 
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm

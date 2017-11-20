@@ -12,6 +12,11 @@ static void       ifline(void);
 static void       noiferr(void);
 static int        findmac(char *sname);
 
+
+static int iflevel = 0; /* current #if nest level */
+static int skiplevel = 0; /* level at which #if skipping started */
+
+
 void junk()
 {
     if (an(inbyte()))

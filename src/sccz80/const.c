@@ -190,7 +190,8 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = KIND_LONG;
     }
-    
+    lval->is_const = 1;
+
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
         if (cmatch('L'))
             lval->val_type = KIND_LONG;
@@ -510,6 +511,7 @@ void size_of(LVALUE* lval)
             errorfmt("sizeof expects a pointer but got %s", 1, utstring_body(str) );
             utstring_free(str);
             lval->const_val = 2;
+            lval->is_const = 1;
             return;
         }
         while ( deref && type ) {
@@ -519,6 +521,7 @@ void size_of(LVALUE* lval)
         }
         if ( type == NULL ) {
             lval->const_val = 2;
+            lval->is_const = 1;            
             errorfmt("Cannot dereference far enough, assuming size of 2",1);
         } else {
             lval->const_val = type->size;

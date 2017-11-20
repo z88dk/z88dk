@@ -21,7 +21,7 @@ static char   **gargv;
 static SYMBOL  *savecurr;    /* copy of currfn for #include */
 static int      saveline;    /* copy of lineno  "    " */
 static int      saveinfn;    /* copy of infunc  "    " */
-static int      savestart;   /* copy of fnstart "    " */
+static int      filenum; /* next argument to be used */
 
 
 char Filenorig[FILENAME_LEN + 1];
@@ -38,6 +38,13 @@ int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
 int c_line_labels = 0;
 int c_cline_directive = 0;
+int c_cpu = CPU_Z80;
+
+/* Settings for genmath + math48 */
+int c_fp_mantissa_bytes = 5;
+int c_fp_exponent_bias = 128;
+
+
 uint32_t c_size_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 
 char *c_rodata_section = "rodata_compiler";
@@ -192,12 +199,8 @@ int main(int argc, char** argv)
         errcnt = /* no errors */
         c_errstop = /* keep going after an error */
         eof = /* not eof yet */
-        swactive = /* not in switch */
-        skiplevel = /* #if not encountered */
-        iflevel = /* #if nesting level = 0 */
         ncmp = /* no open compound states */
         lastst = /* not first file to asm */
-        fnstart = /* current "function" started at line 0 */
         lineno = /* no lines read from file */
         infunc = /* not in function now */
         0; /*  ...all set to zero.... */
@@ -211,7 +214,7 @@ int main(int argc, char** argv)
 
     currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = c_doinline = c_mathz88 = need_floatpack = c_compact_code = 0;
+    ncomp = c_doinline = need_floatpack = c_compact_code = 0;
     c_default_unsigned = NO;
     c_useshared = c_makeshare = c_shared_file = NO;
     nxtlab = 0;/* start numbers at lowest possible */
@@ -423,11 +426,6 @@ static void dumpfns()
     if (need_floatpack) {
         fprintf(fp, "\nIF !NEED_floatpack\n");
         fprintf(fp, "\tDEFINE\tNEED_floatpack\n");
-        fprintf(fp, "ENDIF\n\n");
-    }
-    if (c_mathz88) {
-        fprintf(fp, "\nIF !NEED_c_mathz88\n");
-        fprintf(fp, "\tDEFINE\tNEED_c_mathz88\n");
         fprintf(fp, "ENDIF\n\n");
     }
     /*
@@ -706,7 +704,6 @@ void openin()
 void newfile()
 {
     lineno = /* no lines read */
-        fnstart = /* no fn. start yet. */
         infunc = 0; /* therefore not in fn. */
     currfn = NULL; /* no fn. yet */
 }
@@ -744,7 +741,6 @@ void doinclude()
             saveline = lineno;
             savecurr = currfn;
             saveinfn = infunc;
-            savestart = fnstart;
             newfile();
         }
     }
@@ -768,7 +764,6 @@ void endinclude()
     lineno = saveline;
     currfn = savecurr;
     infunc = saveinfn;
-    fnstart = savestart;
 }
 
 /*
