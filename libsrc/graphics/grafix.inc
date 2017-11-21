@@ -166,7 +166,6 @@ IF FORcpc
 	DEFINE gotgfx
 	defc maxx	= 640
 	defc maxy	= 200
-	defc row_bytes  = 64
 ENDIF
 
 IF FOReinstein
