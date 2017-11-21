@@ -750,8 +750,8 @@ static int regtry(regexp *prog, char *string)	/* 0 failure, 1 success */
 		prog->startp[0] = string;
 		prog->endp[0] = reginput;
 		return(1);
-	} else
-		return(0);
+	}
+	return(0);
 }
 
 /*
@@ -1006,8 +1006,8 @@ static char *regnext( char *p)
 
 	if (OP(p) == BACK)
 		return(p-offset);
-	else
-		return(p+offset);
+	
+	return(p+offset);
 }
 
 #ifdef DEBUG
