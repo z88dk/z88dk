@@ -10,7 +10,6 @@ stdio/ansi/abc80/f_ansi_cls
 stdio/ansi/abc80/f_ansi_dline
 stdio/ansi/abc80/f_ansi_scrollup
 time/abc80/clock
-@gfxbase.lst
 graphics/clg
 graphics/clrarea
 graphics/abc80/clsgraph
@@ -29,6 +28,7 @@ graphics/liner
 graphics/draw_profile
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+@gfxbase.lst
 games/obj/${TARGET}/joystick
 abc80/abc_inv
 abc80/abc_cursor

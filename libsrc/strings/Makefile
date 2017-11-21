@@ -11,7 +11,7 @@ CLASSIC_ASM = memopd.asm memopd_callee.asm memopi.asm memopi_callee.asm memops.a
 CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
 CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
 
-NEWLIBASM := $(wildcard $(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm) $(wildcard $(NEWLIB_DIRECTORY)/string/z80/*.asm)
+NEWLIBGLOBS :=  "$(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/string/z80/*.asm"
 NEWLIB_PHONY := newlib-z80 newlib-z80_zxn newlib-r2k newlib-ixiy
 
 
@@ -21,17 +21,17 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
 all: dirs $(OBJECTS) $(NEWLIB_PHONY)
 
-newlib-z80: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $^
+newlib-z80: 
+	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
 
-newlib-r2k: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $^
+newlib-r2k: 
+	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
 
-newlib-z80-zxn: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $^
+newlib-z80-zxn: 
+	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
 
-newlib-ixiy: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $^
+newlib-ixiy: 
+	@$(ASSEMBLER) -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 
 obj/z80/%.o: %.asm

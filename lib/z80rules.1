@@ -314,6 +314,20 @@
 	or	l
 	jp	z,%1
 
+;;; Fixes up a bug in these rules
+	ld	(hl),#(%1 %% 256)
+	ld	l,(hl)
+	ld	h,0
+	inc	de
+	ld	a,h
+	ld	(de),a
+=
+	ld	(hl),#(%1 % 256)
+	inc	hl
+	ld	(hl),#(%1 / 256)
+	ld	hl,%1
+
+;;; This rule causes above bug, can't stop it from firing though
 	ld	de,%1	;const
 	ex	de,hl
 	ld	a,l
@@ -2892,3 +2906,12 @@
 	sla	h
 	rl	e
 	rl	d
+
+	ld	hl,0	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	push	hl
+	ld	h,0

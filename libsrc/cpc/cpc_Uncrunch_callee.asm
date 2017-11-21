@@ -11,7 +11,7 @@
 ;       $Id: cpc_Uncrunch_callee.asm $
 ;
 
-        SECTION   code_clib
+        SECTION   smc_clib
         PUBLIC    cpc_Uncrunch_callee
         PUBLIC    _cpc_Uncrunch_callee
         PUBLIC    ASMDISP_CPC_UNCRUNCH_CALLEE

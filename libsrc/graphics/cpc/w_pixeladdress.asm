@@ -1,8 +1,10 @@
 
         SECTION   code_clib
         PUBLIC	w_pixeladdress
+		
+		EXTERN	cpc_GetScrAddress0
 
-        INCLUDE "cpcfirm.def"
+        ;INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
@@ -33,7 +35,7 @@
 ;              pixels stored in a byte minus 1, AF and DE are corrupt,
 ;              and all others are preserved
 
-	PUBLIC	grayaltpage
+;	PUBLIC	grayaltpage
 
 
 .w_pixeladdress
@@ -42,13 +44,22 @@
         and     07h             ;a = x mod 8
 		push af
 		
-		push hl
-        ld      hl,maxy-1
-        sbc		hl,de
-		pop		de
+;		push hl
+;        ld      hl,maxy-1
+;        sbc		hl,de
+;		pop		de
 		
-        call    firmware
-        defw    scr_dot_position
+		srl h
+		rr l
+		srl h
+		rr l
+		srl h
+		rr l
+		ld	a,l
+		ld	l,e
+		call	cpc_GetScrAddress0
+;        call    firmware
+;        defw    scr_dot_position
         ld      d,h
         ld      e,l
 

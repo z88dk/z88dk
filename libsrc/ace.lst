@@ -11,7 +11,6 @@ stdio/ansi/ace/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/ace/f_ansi_scrollup
 time/ace/clock
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
 graphics/clrarea
@@ -30,6 +29,7 @@ graphics/liner
 graphics/draw_profile
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+@gfxbase.lst
 @games/games.lst
 @ace/ace.lst
 @z80.lst
