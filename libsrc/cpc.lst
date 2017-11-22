@@ -26,6 +26,7 @@ graphics/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
 @gfxbasew.lst
+time/cpc/clock
 games/cpc/joystick
 cpc/firmware
 cpc/bios_msg
