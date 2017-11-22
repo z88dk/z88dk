@@ -3,7 +3,7 @@
 ;
 ;	getk() Read key status
 ;
-;	Stefano Bodrato - 8/6/2001 (updated Nov. 2017)
+;	Stefano Bodrato - 8/6/2001
 ;
 ;
 ;	$Id: getk.asm $
@@ -17,17 +17,24 @@
 
 
 .getk
-._getk
+._getk		
         call    firmware
         defw    km_read_char
-        push	af
+		
+		push af
+
+	; clear buffer for next reading
         call    firmware
-        defw    km_reset	; clear buffer for next reading
-        pop	af
-        ld      hl,0
+        defw    km_initialise
+
+		pop af
+		
+		
+		ld		hl,0
         ret     nc
-        ld      l,a
-	cp	127
-	ret	nz
-	ld	l,12
+		ld		l,a
+		
+        cp	127
+		ret	nz
+        ld	l,12
         ret
