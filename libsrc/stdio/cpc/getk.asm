@@ -3,10 +3,10 @@
 ;
 ;	getk() Read key status
 ;
-;	Stefano Bodrato - 8/6/2001
+;	Stefano Bodrato - 8/6/2001 (updated Nov. 2017)
 ;
 ;
-;	$Id: getk.asm,v 1.9 2016-06-12 17:07:43 dom Exp $
+;	$Id: getk.asm $
 ;
 
         SECTION code_clib
@@ -22,7 +22,7 @@
         defw    km_read_char
         push	af
         call    firmware
-        defw    km_initialise	; clear buffer for next reading
+        defw    km_reset	; clear buffer for next reading
         pop	af
         ld      hl,0
         ret     nc
