@@ -9,7 +9,7 @@ graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
 graphics/cpc/clg
-graphics/w_clga
+graphics/cpc/clga2
 graphics/cpc/w_pixeladdress
 graphics/cpc/fill
 graphics/w_plotpixl
