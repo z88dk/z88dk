@@ -101,15 +101,7 @@
         ;@@@@@@@@@@
         ;Go to next byte
         ;@@@@@@@@@@
-         ex af,af
-         ld     a,h
-         xor    @00100000
-         cp     h
-         ld     h,a
-         jp     nc,gonehi
          inc	hl
-.gonehi
-         ex af,af
         ;@@@@@@@@@@
 
 ._notedge djnz     _iloop
