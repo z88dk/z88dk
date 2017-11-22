@@ -56,9 +56,10 @@
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
-        ld      (oldx),hl
-        ld      (cury),de
+;        ld      (oldx),hl
+;        ld      (cury),de
         call    w_pixeladdress
+        ld      (lineaddr),de
         ; ------
         ;ld		a,(hl)
         ; @@@@@@@@@@@@
@@ -101,32 +102,28 @@
         ;@@@@@@@@@@
         ;Go to next byte
         ;@@@@@@@@@@
-         ex af,af
-         ld     a,h
-         xor    @00100000
-         cp     h
-         ld     h,a
-         jp     nc,gonehi
          inc	hl
-.gonehi
-         ex af,af
         ;@@@@@@@@@@
 
 ._notedge djnz     _iloop
 
-        push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+        ld      hl,(lineaddr)
+		LD A,H
+		ADD 8
+		LD H,A
+		JR NC,nowrap
+		LD A,$50
+		ADD L
+		LD L,A
+		LD A,$C0
+		ADC H
+		LD H,A
+.nowrap
+        ld      (lineaddr),hl
         ;@@@@@@@@@@
-        pop     de
          pop      bc                ;Restore data
          djnz     _oloop
 	pop	ix	;restore callers
@@ -164,19 +161,23 @@
 
          djnz     wiloop
 
-        push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+        ld      hl,(lineaddr)
+		LD A,H
+		ADD 8
+		LD H,A
+		JR NC,nowrap2
+		LD A,$50
+		ADD L
+		LD L,A
+		LD A,$C0
+		ADC H
+		LD H,A
+.nowrap2
+        ld      (lineaddr),hl
         ;@@@@@@@@@@
-        pop     de
 
          pop      bc                ;Restore data
          djnz     woloop
@@ -189,19 +190,23 @@
          djnz     wiloop
          dec      ix
 
-        push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+        ld      hl,(lineaddr)
+		LD A,H
+		ADD 8
+		LD H,A
+		JR NC,nowrap3
+		LD A,$50
+		ADD L
+		LD L,A
+		LD A,$C0
+		ADC H
+		LD H,A
+.nowrap3
+        ld      (lineaddr),hl
         ;@@@@@@@@@@
-        pop     de
 
          pop      bc
          djnz     woloop
@@ -211,10 +216,8 @@
 	SECTION	rodata_clib
 .offsets_table
          defb   1,2,4,8,16,32,64,128
-	SECTION bss_clib
-.oldx
-         defw   0
-.cury
-         defw   0
 
+	SECTION bss_clib
+.lineaddr
+         defw   0
 
