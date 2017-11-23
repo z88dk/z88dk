@@ -148,8 +148,10 @@ hrg_off();
   p1.joystick=0;
   while ((p1.joystick<1) || (p1.joystick>GAME_DEVICES))
       p1.joystick=getk()-48;
- 
-  printf("%c\nLeft player controller:\n\n",12);
+
+  while(getk());
+
+  printf("%c\nRight player controller:\n\n",12);
 
   for (x=0 ; x!=GAME_DEVICES; x++)
       printf("%u - %s\n",x+1,joystick_type[x]);
