@@ -1,5 +1,7 @@
 graphics/__gfx_coords4
 graphics/__graphics_end
+graphics/w_bksave
+graphics/w_bkrestore
 graphics/w_circle
 graphics/w_dcircle
 graphics/w_draw
