@@ -22,16 +22,16 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 all: dirs $(OBJECTS) $(NEWLIB_PHONY)
 
 newlib-z80: 
-	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-r2k: 
-	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-z80-zxn: 
-	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-ixiy: 
-	@$(ASSEMBLER) -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 
 obj/z80/%.o: %.asm
