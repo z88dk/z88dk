@@ -23,7 +23,7 @@ CROSS ?= 0
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
 
-all: setup appmake copt ucpp sccz80 z80asm zcc zpragma zx7 z80nm lstmanip ticks z80svg testsuite z88dk-lib
+all: setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm lstmanip ticks z80svg testsuite z88dk-lib
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -52,6 +52,10 @@ copt:
 ucpp:
 	$(MAKE) -C src/ucpp
 	$(MAKE) -C src/ucpp PREFIX=`pwd` install
+
+zcpp:
+	$(MAKE) -C src/cpp
+	$(MAKE) -C src/cpp PREFIX=`pwd` install
 
 sccz80:
 	$(MAKE) -C src/sccz80
@@ -103,6 +107,7 @@ install: install-clean
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR)/$(prefix) install
+	$(MAKE) -C src/cpp PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR)/$(prefix) PREFIX_SHARE=$(DESTDIR)/$(prefix_share) install
 	$(MAKE) -C src/zcc PREFIX=$(DESTDIR)/$(prefix) install
@@ -143,6 +148,7 @@ clean-bins:
 	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/copt clean
 	$(MAKE) -C src/ucpp clean
+	$(MAKE) -C src/cpp clean
 	$(MAKE) -C src/sccz80 clean
 	$(MAKE) -C src/z80asm clean
 	$(MAKE) -C src/z80nm clean
