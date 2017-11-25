@@ -3,12 +3,23 @@ lstoff
 ; CPC Firmware Calculations
 ;
 ; September 2003
-; $Id: cpcfirm.def,v 1.6 2015-01-19 01:29:18 pauloscustodio Exp $
+; $Id: cpcfirm.def $
 ;
 
     EXTERN     firmware    ; Interposer for firmware routines
-
-    defc    kl_probe_rom    = $b915
+    defc    kl_u_rom_enable     = $b900
+    defc    kl_u_rom_disable    = $b903
+    defc    kl_l_rom_enable     = $b906
+    defc    kl_l_rom_disable    = $b909
+    defc    kl_rom_restore      = $b90c
+    defc    kl_rom_select       = $b90f
+    defc    kl_curr_selection   = $b912
+	defc    kl_probe_rom        = $b915
+	defc    kl_rom_deselect     = $b918
+	defc    kl_ldir             = $b91b
+	defc    kl_lddr             = $b91e
+	defc    kl_poll_synchronous = $b921
+	defc    kl_scan_needed      = $b92a
     defc    kl_choke_off    = $bcc8
     defc    kl_rom_walk     = $bccb
     defc    kl_init_back    = $bcce
@@ -21,19 +32,22 @@ lstoff
     defc    kl_add_fast_ticker = $bce3
     defc    kl_del_fast_ticker = $bce6
     defc    kl_add_ticker      = $bce9
-    defc    kl_del_ticker   = $bcec
-    defc    kl_init_event   = $bcef
-    defc    kl_event        = $bcf2
-    defc    kl_sync_reset   = $bcf5
+    defc    kl_del_ticker      = $bcec
+    defc    kl_init_event      = $bcef
+    defc    kl_event           = $bcf2
+    defc    kl_sync_reset      = $bcf5
     defc    kl_del_synchronous = $bcf8
-    defc    kl_next_sync    = $bcfb
-    defc    kl_do_sync      = $bcfe
-    defc    kl_done_sync    = $bd01
-    defc    kl_event_disable = $bd04
-    defc    kl_event_enable = $bd07
-    defc    kl_disarm_event = $bd0a
-    defc    kl_time_please  = $bd0d
-    defc    kl_time_set     = $bd10
+    defc    kl_next_sync       = $bcfb
+    defc    kl_do_sync         = $bcfe
+    defc    kl_done_sync       = $bd01
+    defc    kl_event_disable   = $bd04
+    defc    kl_event_enable    = $bd07
+    defc    kl_disarm_event    = $bd0a
+    defc    kl_time_please     = $bd0d
+    defc    kl_time_set        = $bd10
+	
+    defc    mc_wait_printer    = $bdf1
+    defc    km_scan_keys       = $bdf4
 
     defc    km_initialise   = $bb00
     defc    km_reset        = $bb03

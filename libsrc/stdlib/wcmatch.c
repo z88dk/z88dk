@@ -37,6 +37,5 @@ int wcmatch(char *wildnam, char *filnam)
 
    if (!*filnam)
 	return 1;		// TRUE
-   else
-	return 0;
+   return 0;
 }

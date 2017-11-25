@@ -35,6 +35,14 @@ static void docritical(void);
 static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
 static int lastline = 0;
 
+
+
+static int swactive = 0; /* true inside a switch */
+static int swdefault = 0; /* default label number, else 0 */
+
+static int incritical = 0;  /* Are we in a __critical block */
+
+
 /*
  *      Statement parser
  *

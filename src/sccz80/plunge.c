@@ -313,10 +313,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         //     lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
         // if (lval2->is_const)
         //     lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
-
-        if ( (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv)) {
+        if ( lval2->is_const == 0 && lval1_wasconst == 0 &&
+            (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv)) {
             warningfmt("Operation on different signedness!");
         }
+        
 
         // Remove any function type decorators
         //lval->flags &= (FAR);

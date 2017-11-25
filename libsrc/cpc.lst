@@ -9,16 +9,13 @@ stdio/ansi/cpc/f_ansi_char
 stdio/ansi/cpc/f_ansi_cls
 stdio/ansi/cpc/f_ansi_dline
 stdio/ansi/cpc/f_ansi_scrollup
-@cpcgray.lst
-@gfxbasew.lst
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
 graphics/cpc/clg
-graphics/clga
+graphics/cpc/clga2
 graphics/cpc/w_pixeladdress
 graphics/cpc/fill
-graphics/clrarea
 graphics/w_plotpixl
 graphics/w_respixl
 graphics/w_xorpixl
@@ -28,6 +25,8 @@ graphics/cpc/w_putsprite
 graphics/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
+@gfxbasew.lst
+time/cpc/clock
 games/cpc/joystick
 cpc/firmware
 cpc/bios_msg
@@ -98,10 +97,6 @@ cpc/cpc_Uncrunch
 cpc/cpc_Uncrunch_callee
 cpc/cpc_UnExo
 cpc/cpc_UnExo_callee
-psg/cpc/set_psg
-psg/cpc/set_psg_callee
-psg/cpc/get_psg
-psg/cpc/psg_init
 cpc/sprites/cpc_PutMaskSp0
 cpc/sprites/cpc_PutMaskSp
 cpc/sprites/cpc_PutMaskSp_callee
@@ -116,5 +111,9 @@ cpc/sprites/cpc_PutSpTr_callee
 cpc/sprites/cpc_GetSp0
 cpc/sprites/cpc_GetSp
 cpc/sprites/cpc_GetSp_callee
+psg/cpc/set_psg
+psg/cpc/set_psg_callee
+psg/cpc/get_psg
+psg/cpc/psg_init
 @psg/psg.lst
 @z80.lst

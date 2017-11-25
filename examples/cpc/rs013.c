@@ -191,7 +191,7 @@ main(){
 	while(!cpc_TestKey(5)){
 		cpc_ClrScr();	
 			
-		draw(172,0,172,40);	
+		draw(348,0,348,40);	
 		cpc_DisableFirmware();
 		cpc_SetColour(16,20); //background
 		cpc_SetColour(0,20); //border

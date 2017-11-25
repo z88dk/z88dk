@@ -162,6 +162,8 @@ int heir1(LVALUE* lval)
     lval3.val_type = lval->val_type;
     lval3.offset = lval->offset;
     lval3.base_offset = lval->base_offset;
+    lval3.const_val = lval->const_val;
+    lval3.is_const = lval->is_const;
     /* don't clear address calc we need it on rhs */
     if (lval->indirect_kind)
         smartpush(lval, 0);

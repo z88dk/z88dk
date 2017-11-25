@@ -55,9 +55,8 @@ int need_floatpack, c_doinline, ncomp;
 
 int stackargs;
 
-int filenum; /* next argument to be used */
 
-char c_default_unsigned, c_mathz88, c_compact_code;
+char c_default_unsigned,c_compact_code;
 
 int nxtlab, /* next avail label # */
     glblab, /* For initializing global literals */
@@ -73,13 +72,8 @@ int nxtlab, /* next avail label # */
     /* zero when passing assembly code */
     declared, /* number of local bytes declared, else -1 when done */
     lastst, /* last executed statement type */
-    iflevel, /* current #if nest level */
-    skiplevel, /* level at which #if skipping started */
-    fnstart, /* line# of start of current fn. */
     lineno, /* line# in current file */
     infunc, /* "inside function" flag */
-    swactive, /* true inside a switch */
-    swdefault, /* default label number, else 0 */
     c_verbose; /* Verbose to screen */
 
 FILE    *input; /* iob # for input file */
@@ -127,11 +121,8 @@ int c_framepointer_is_ix;
 
 int c_use_r2l_calling_convention;
 
-int c_cpu = CPU_Z80;
 
-/* Settings for genmath + math48 */
-int c_fp_mantissa_bytes = 5;
-int c_fp_exponent_bias = 128;
+
 
 /* scanf format requirements */
 uint32_t scanf_format_option;
@@ -142,5 +133,3 @@ int   buffer_fps_num = 0 ;
 
 struct parser_stack *pstack; /**< Stack of previous saved parsers */
 
-
-int incritical;

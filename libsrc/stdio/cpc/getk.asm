@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: getk.asm,v 1.9 2016-06-12 17:07:43 dom Exp $
+;	$Id: getk.asm $
 ;
 
         SECTION code_clib
@@ -17,17 +17,24 @@
 
 
 .getk
-._getk
+._getk		
         call    firmware
         defw    km_read_char
-        push	af
+		
+		push af
+
+	; clear buffer for next reading
         call    firmware
-        defw    km_initialise	; clear buffer for next reading
-        pop	af
-        ld      hl,0
+        defw    km_initialise
+
+		pop af
+		
+		
+		ld		hl,0
         ret     nc
-        ld      l,a
-	cp	127
-	ret	nz
-	ld	l,12
+		ld		l,a
+		
+        cp	127
+		ret	nz
+        ld	l,12
         ret

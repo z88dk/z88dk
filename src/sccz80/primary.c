@@ -127,13 +127,15 @@ int primary(LVALUE* lval)
              */
             if (!rcmatch('(')) {
                 errorfmt("Unknown symbol: %s", 1, sname);
-            }
+	        return(0);
+            } else {
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
-            warningfmt( "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
-            ptr = addglb(sname, default_function(sname), 0, KIND_INT, 0, STATIK);
-            ptr->size = 0;
-            ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
+                warningfmt( "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
+                ptr = addglb(sname, default_function(sname), 0, KIND_INT, 0, STATIK);
+                ptr->size = 0;
+                ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
+            }
         }
         lval->symbol = ptr;
         lval->ltype = ptr->ctype;

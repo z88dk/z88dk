@@ -227,6 +227,9 @@ zx_clib.lib:
 
 # Various RS232 libraries
 rs232libs:
+	@echo ''
+	@echo '---> Building RS232 libraries <---'
+	@echo ''
 	$(MAKE) -C rs232 
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
