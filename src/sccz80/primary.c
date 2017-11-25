@@ -127,6 +127,7 @@ int primary(LVALUE* lval)
              */
             if (!rcmatch('(')) {
                 errorfmt("Unknown symbol: %s", 1, sname);
+	        return(0);
             } else {
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
