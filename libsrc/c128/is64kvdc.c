@@ -17,7 +17,6 @@ uchar is64kvdc(void)
 {
   if((invdc(vdcChSetStAddr) & 0x10) == 0x10)
     return(1);
-  else
-    return(0);
+  return(0);
 }
 

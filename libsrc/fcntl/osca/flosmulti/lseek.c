@@ -21,7 +21,7 @@ long lseek(int myfile, long posn, int whence)
 	long	posit;
 	struct flos_file *flosfile;
 
-	flosfile = (char *) myfile;
+	flosfile = (void *) myfile;
 
 	if (flosfile->mode!=O_RDONLY)
 		return (-1);

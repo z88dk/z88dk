@@ -20,7 +20,7 @@ int __FASTCALL__ readbyte(int myfile)
 	unsigned char mybyte[2];
 	struct flos_file *flosfile;
 
-	flosfile = (char *) myfile;
+	flosfile = (void *) myfile;
 	if (flosfile->name[0]==0)
 		return (-1);
 

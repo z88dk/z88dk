@@ -21,7 +21,7 @@ Z88DK is a collection of software development tools that targets z80 machines.  
 These tools are not normally directly invoked by the user:
 
 * **M4** acts as z88dk's macro preprocessor and can optionally process files ahead of the c preprocessor or assembler.
-* **ZCPP** is the c preprocessor invoked for sccz80.
+* **UCPP** is the c preprocessor invoked for sccz80.
 * **ZSDCPP** is the c preprocessor invoked for zsdcc.
 * **ZPRAGMA** is used by the toolchain to process pragmas embedded in c source.
 * **COPT** is a regular expression engine that is used as peephole optimizer for sccz80 and as a post-processing tool for both sccz80 and zsdcc.
