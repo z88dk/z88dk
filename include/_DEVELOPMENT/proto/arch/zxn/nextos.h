@@ -59,7 +59,13 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #define NEXTOS_IDE_DOS_UNMAP  __NEXTOS_IDE_DOS_UNMAP
 #define NEXTOS_IDE_DOS_MAPPING  __NEXTOS_IDE_DOS_MAPPING
 #define NEXTOS_IDE_SNAPLOAD  __NEXTOS_IDE_SNAPLOAD
+
 #define NEXTOS_IDE_PATH  __NEXTOS_IDE_PATH
+#define nextos_rc_path_change  __nextos_rc_path_change
+#define nextos_rc_path_get  __nextos_rc_path_get
+#define nextos_rc_path_make  __nextos_rc_path_make
+#define nextos_rc_path_delete  __nextos_rc_path_delete
+
 #define NEXTOS_IDE_CAPACITY  __NEXTOS_IDE_CAPACITY
 #define NEXTOS_IDE_GET_LFN  __NEXTOS_IDE_GET_LFN
 #define NEXTOS_IDE_BROWSER  __NEXTOS_IDE_BROWSER
@@ -71,7 +77,15 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #define NEXTOS_IDE_STREAM_IN  __NEXTOS_IDE_STREAM_IN
 #define NEXTOS_IDE_STREAM_OUT  __NEXTOS_IDE_STREAM_OUT
 #define NEXTOS_IDE_STREAM_PTR  __NEXTOS_IDE_STREAM_PTR
+
 #define NEXTOS_IDE_BANK  __NEXTOS_IDE_BANK
+#define nextos_rc_banktype_zx  __nextos_rc_banktype_zx
+#define nextos_rc_banktype_mmc  __nextos_rc_banktype_mmc
+#define nextos_rc_bank_total  __nextos_rc_bank_total
+#define nextos_rc_bank_alloc  __nextos_rc_bank_alloc
+#define nextos_rc_bank_reserve  __nextos_rc_bank_reserve
+#define nextos_rc_bank_free  __nextos_rc_bank_free
+
 #define NEXTOS_IDE_BASIC  __NEXTOS_IDE_BASIC
 #define NEXTOS_IDE_STREAM_LINEIN  __NEXTOS_IDE_STREAM_LINEIN
 #define NEXTOS_IDE_WINDOW_STRING __NEXTOS_IDE_WINDOW_STRING

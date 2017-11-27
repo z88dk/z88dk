@@ -50,7 +50,13 @@ define(`__NEXTOS_IDE_DOS_MAP', 0x00f1)
 define(`__NEXTOS_IDE_DOS_UNMAP', 0x00f4)
 define(`__NEXTOS_IDE_DOS_MAPPING', 0x00f7)
 define(`__NEXTOS_IDE_SNAPLOAD', 0x00fd)
+
 define(`__NEXTOS_IDE_PATH', 0x01b1)
+define(`__nextos_rc_path_change', 0)
+define(`__nextos_rc_path_get', 1)
+define(`__nextos_rc_path_make', 2)
+define(`__nextos_rc_path_delete', 3)
+
 define(`__NEXTOS_IDE_CAPACITY', 0x01b4)
 define(`__NEXTOS_IDE_GET_LFN', 0x01b7)
 define(`__NEXTOS_IDE_BROWSER', 0x01ba)
@@ -62,7 +68,15 @@ define(`__NEXTOS_IDE_STREAM_CLOSE', 0x0059)
 define(`__NEXTOS_IDE_STREAM_IN', 0x005c)
 define(`__NEXTOS_IDE_STREAM_OUT', 0x005f)
 define(`__NEXTOS_IDE_STREAM_PTR', 0x0062)
+
 define(`__NEXTOS_IDE_BANK', 0x01bd)
+define(`__nextos_rc_banktype_zx', 0)
+define(`__nextos_rc_banktype_mmc', 1)
+define(`__nextos_rc_bank_total', 0)
+define(`__nextos_rc_bank_alloc', 1)
+define(`__nextos_rc_bank_reserve', 2)
+define(`__nextos_rc_bank_free', 3)
+
 define(`__NEXTOS_IDE_BASIC', 0x01c0)
 define(`__NEXTOS_IDE_STREAM_LINEIN', 0x01c3)
 define(`__NEXTOS_IDE_WINDOW_STRING', 0x01c6)
@@ -111,6 +125,10 @@ define(`__NEXTOS_IDE_PARTITION_READ', 0x00c4)
 define(`__NEXTOS_IDE_PARTITION_OPEN', 0x00cd)
 define(`__NEXTOS_IDE_PARTITION_CLOSE', 0x00d0)
 define(`__NEXTOS_IDE_PARTITIONS', 0x01a5)
+
+# NextOS DOTN Commands
+
+define(`__NEXTOS_DOTN_SP', 0x4000)  # default stack location in divmmc ram
 
 # Error Codes - Recoverable Disk Errors
 
@@ -211,7 +229,13 @@ PUBLIC `__NEXTOS_IDE_DOS_MAP'
 PUBLIC `__NEXTOS_IDE_DOS_UNMAP'
 PUBLIC `__NEXTOS_IDE_DOS_MAPPING'
 PUBLIC `__NEXTOS_IDE_SNAPLOAD'
+
 PUBLIC `__NEXTOS_IDE_PATH'
+PUBLIC `__nextos_rc_path_change'
+PUBLIC `__nextos_rc_path_get'
+PUBLIC `__nextos_rc_path_make'
+PUBLIC `__nextos_rc_path_delete'
+
 PUBLIC `__NEXTOS_IDE_CAPACITY'
 PUBLIC `__NEXTOS_IDE_GET_LFN'
 PUBLIC `__NEXTOS_IDE_BROWSER'
@@ -221,7 +245,15 @@ PUBLIC `__NEXTOS_IDE_STREAM_CLOSE'
 PUBLIC `__NEXTOS_IDE_STREAM_IN'
 PUBLIC `__NEXTOS_IDE_STREAM_OUT'
 PUBLIC `__NEXTOS_IDE_STREAM_PTR'
+
 PUBLIC `__NEXTOS_IDE_BANK'
+PUBLIC `__nextos_rc_banktype_zx'
+PUBLIC `__nextos_rc_banktype_mmc'
+PUBLIC `__nextos_rc_bank_total'
+PUBLIC `__nextos_rc_bank_alloc'
+PUBLIC `__nextos_rc_bank_reserve'
+PUBLIC `__nextos_rc_bank_free'
+
 PUBLIC `__NEXTOS_IDE_BASIC'
 PUBLIC `__NEXTOS_IDE_STREAM_LINEIN'
 PUBLIC `__NEXTOS_IDE_WINDOW_STRING'
@@ -266,6 +298,8 @@ PUBLIC `__NEXTOS_IDE_PARTITION_READ'
 PUBLIC `__NEXTOS_IDE_PARTITION_OPEN'
 PUBLIC `__NEXTOS_IDE_PARTITION_CLOSE'
 PUBLIC `__NEXTOS_IDE_PARTITIONS'
+
+PUBLIC `__NEXTOS_DOTN_SP'
 
 PUBLIC `__NEXTOS_RC_READY'
 PUBLIC `__NEXTOS_RC_WP'
@@ -357,7 +391,13 @@ defc `__NEXTOS_IDE_DOS_MAP' = __NEXTOS_IDE_DOS_MAP
 defc `__NEXTOS_IDE_DOS_UNMAP' = __NEXTOS_IDE_DOS_UNMAP
 defc `__NEXTOS_IDE_DOS_MAPPING' = __NEXTOS_IDE_DOS_MAPPING
 defc `__NEXTOS_IDE_SNAPLOAD' = __NEXTOS_IDE_SNAPLOAD
+
 defc `__NEXTOS_IDE_PATH' = __NEXTOS_IDE_PATH
+defc `__nextos_rc_path_change' = __nextos_rc_path_change
+defc `__nextos_rc_path_get' = __nextos_rc_path_get
+defc `__nextos_rc_path_make' = __nextos_rc_path_make
+defc `__nextos_rc_path_delete' = __nextos_rc_path_delete
+
 defc `__NEXTOS_IDE_CAPACITY' = __NEXTOS_IDE_CAPACITY
 defc `__NEXTOS_IDE_GET_LFN' = __NEXTOS_IDE_GET_LFN
 defc `__NEXTOS_IDE_BROWSER' = __NEXTOS_IDE_BROWSER
@@ -367,7 +407,15 @@ defc `__NEXTOS_IDE_STREAM_CLOSE' = __NEXTOS_IDE_STREAM_CLOSE
 defc `__NEXTOS_IDE_STREAM_IN' = __NEXTOS_IDE_STREAM_IN
 defc `__NEXTOS_IDE_STREAM_OUT' = __NEXTOS_IDE_STREAM_OUT
 defc `__NEXTOS_IDE_STREAM_PTR' = __NEXTOS_IDE_STREAM_PTR
+
 defc `__NEXTOS_IDE_BANK' = __NEXTOS_IDE_BANK
+defc `__nextos_rc_banktype_zx' = __nextos_rc_banktype_zx
+defc `__nextos_rc_banktype_mmc' = __nextos_rc_banktype_mmc
+defc `__nextos_rc_bank_total' = __nextos_rc_bank_total
+defc `__nextos_rc_bank_alloc' = __nextos_rc_bank_alloc
+defc `__nextos_rc_bank_reserve' = __nextos_rc_bank_reserve
+defc `__nextos_rc_bank_free' = __nextos_rc_bank_free
+
 defc `__NEXTOS_IDE_BASIC' = __NEXTOS_IDE_BASIC
 defc `__NEXTOS_IDE_STREAM_LINEIN' = __NEXTOS_IDE_STREAM_LINEIN
 defc `__NEXTOS_IDE_WINDOW_STRING' = __NEXTOS_IDE_WINDOW_STRING
@@ -412,6 +460,8 @@ defc `__NEXTOS_IDE_PARTITION_READ' = __NEXTOS_IDE_PARTITION_READ
 defc `__NEXTOS_IDE_PARTITION_OPEN' = __NEXTOS_IDE_PARTITION_OPEN
 defc `__NEXTOS_IDE_PARTITION_CLOSE' = __NEXTOS_IDE_PARTITION_CLOSE
 defc `__NEXTOS_IDE_PARTITIONS' = __NEXTOS_IDE_PARTITIONS
+
+defc `__NEXTOS_DOTN_SP' = __NEXTOS_DOTN_SP
 
 defc `__NEXTOS_RC_READY' = __NEXTOS_RC_READY
 defc `__NEXTOS_RC_WP' = __NEXTOS_RC_WP
@@ -503,7 +553,13 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_DOS_UNMAP'  __NEXTOS_IDE_DOS_UNMAP
 `#define' `__NEXTOS_IDE_DOS_MAPPING'  __NEXTOS_IDE_DOS_MAPPING
 `#define' `__NEXTOS_IDE_SNAPLOAD'  __NEXTOS_IDE_SNAPLOAD
+
 `#define' `__NEXTOS_IDE_PATH'  __NEXTOS_IDE_PATH
+`#define' `__nextos_rc_path_change'  __nextos_rc_path_change
+`#define' `__nextos_rc_path_get'  __nextos_rc_path_get
+`#define' `__nextos_rc_path_make'  __nextos_rc_path_make
+`#define' `__nextos_rc_path_delete'  __nextos_rc_path_delete
+
 `#define' `__NEXTOS_IDE_CAPACITY'  __NEXTOS_IDE_CAPACITY
 `#define' `__NEXTOS_IDE_GET_LFN'  __NEXTOS_IDE_GET_LFN
 `#define' `__NEXTOS_IDE_BROWSER'  __NEXTOS_IDE_BROWSER
@@ -513,7 +569,15 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_STREAM_IN'  __NEXTOS_IDE_STREAM_IN
 `#define' `__NEXTOS_IDE_STREAM_OUT'  __NEXTOS_IDE_STREAM_OUT
 `#define' `__NEXTOS_IDE_STREAM_PTR'  __NEXTOS_IDE_STREAM_PTR
+
 `#define' `__NEXTOS_IDE_BANK'  __NEXTOS_IDE_BANK
+`#define' `__nextos_rc_banktype_zx'  __nextos_rc_banktype_zx
+`#define' `__nextos_rc_banktype_mmc'  __nextos_rc_banktype_mmc
+`#define' `__nextos_rc_bank_total'  __nextos_rc_bank_total
+`#define' `__nextos_rc_bank_alloc'  __nextos_rc_bank_alloc
+`#define' `__nextos_rc_bank_reserve'  __nextos_rc_bank_reserve
+`#define' `__nextos_rc_bank_free'  __nextos_rc_bank_free
+
 `#define' `__NEXTOS_IDE_BASIC'  __NEXTOS_IDE_BASIC
 `#define' `__NEXTOS_IDE_STREAM_LINEIN'  __NEXTOS_IDE_STREAM_LINEIN
 `#define' `__NEXTOS_IDE_WINDOW_STRING'  __NEXTOS_IDE_WINDOW_STRING
@@ -558,6 +622,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_PARTITION_OPEN'  __NEXTOS_IDE_PARTITION_OPEN
 `#define' `__NEXTOS_IDE_PARTITION_CLOSE'  __NEXTOS_IDE_PARTITION_CLOSE
 `#define' `__NEXTOS_IDE_PARTITIONS'  __NEXTOS_IDE_PARTITIONS
+
+`#define' `__NEXTOS_DOTN_SP'  __NEXTOS_DOTN_SP
 
 `#define' `__NEXTOS_RC_READY'  __NEXTOS_RC_READY
 `#define' `__NEXTOS_RC_WP'  __NEXTOS_RC_WP
