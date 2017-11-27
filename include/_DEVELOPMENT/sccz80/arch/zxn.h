@@ -512,6 +512,45 @@ extern void __LIB__ ZXN_WRITE_MMU7(unsigned char page) __smallc __z88dk_fastcall
 
 
 
+// miscellaneous - paging and banking state
+
+extern unsigned int __LIB__ zxn_addr_from_mmu(unsigned char mmu) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ zxn_mmu_from_addr(unsigned int addr) __smallc __z88dk_fastcall;
+
+
+
+extern unsigned long __LIB__ zxn_addr_from_page(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned long __LIB__ zxn_addr_from_page_2mb(unsigned char page) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ zxn_page_from_addr(unsigned long addr) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ zxn_page_from_addr_2mb(unsigned long addr) __smallc __z88dk_fastcall;
+
+
+
+extern void __LIB__ zxn_read_mmu_state(void *dst) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ zxn_write_mmu_state(void *src) __smallc __z88dk_fastcall;
+
+
+
+extern void __LIB__ zxn_write_bank_state(unsigned int state) __smallc __z88dk_fastcall;
+
+
+extern unsigned int __LIB__ zxn_read_sysvar_bank_state(void) __smallc;
+
+
+extern void __LIB__ zxn_write_sysvar_bank_state(unsigned int state) __smallc __z88dk_fastcall;
+
+
+
 ///////////////////////////////////////////////////////////////
 
 // tape i/o

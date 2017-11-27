@@ -522,6 +522,64 @@ extern void ZXN_WRITE_MMU7_fastcall(unsigned char page) __preserves_regs(d,e,h,i
 
 
 
+// miscellaneous - paging and banking state
+
+extern unsigned int zxn_addr_from_mmu(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned int zxn_addr_from_mmu_fastcall(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define zxn_addr_from_mmu(a) zxn_addr_from_mmu_fastcall(a)
+
+
+extern unsigned char zxn_mmu_from_addr(unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char zxn_mmu_from_addr_fastcall(unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define zxn_mmu_from_addr(a) zxn_mmu_from_addr_fastcall(a)
+
+
+
+extern unsigned long zxn_addr_from_page(unsigned char page) __preserves_regs(b,c,iyl,iyh);
+extern unsigned long zxn_addr_from_page_fastcall(unsigned char page) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;
+#define zxn_addr_from_page(a) zxn_addr_from_page_fastcall(a)
+
+
+extern unsigned long zxn_addr_from_page_2mb(unsigned char page) __preserves_regs(b,c,iyl,iyh);
+extern unsigned long zxn_addr_from_page_2mb_fastcall(unsigned char page) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;
+#define zxn_addr_from_page_2mb(a) zxn_addr_from_page_2mb_fastcall(a)
+
+
+extern unsigned char zxn_page_from_addr(unsigned long addr) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char zxn_page_from_addr_fastcall(unsigned long addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define zxn_page_from_addr(a) zxn_page_from_addr_fastcall(a)
+
+
+extern unsigned char zxn_page_from_addr_2mb(unsigned long addr) __preserves_regs(b,c,iyl,iyh);
+extern unsigned char zxn_page_from_addr_2mb_fastcall(unsigned long addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define zxn_page_from_addr_2mb(a) zxn_page_from_addr_2mb_fastcall(a)
+
+
+
+extern void zxn_read_mmu_state(void *dst) __preserves_regs(iyl,iyh);
+extern void zxn_read_mmu_state_fastcall(void *dst) __preserves_regs(a,iyl,iyh) __z88dk_fastcall;
+#define zxn_read_mmu_state(a) zxn_read_mmu_state_fastcall(a)
+
+
+extern void zxn_write_mmu_state(void *src) __preserves_regs(iyl,iyh);
+extern void zxn_write_mmu_state_fastcall(void *src) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define zxn_write_mmu_state(a) zxn_write_mmu_state_fastcall(a)
+
+
+
+extern void zxn_write_bank_state(unsigned int state) __preserves_regs(d,e,iyl,iyh);
+extern void zxn_write_bank_state_fastcall(unsigned int state) __preserves_regs(d,e,iyl,iyh) __z88dk_fastcall;
+#define zxn_write_bank_state(a) zxn_write_bank_state_fastcall(a)
+
+
+extern unsigned int zxn_read_sysvar_bank_state(void) __preserves_regs(b,c,d,e,iyl,iyh);
+
+extern void zxn_write_sysvar_bank_state(unsigned int state) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void zxn_write_sysvar_bank_state_fastcall(unsigned int state) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
+#define zxn_write_sysvar_bank_state(a) zxn_write_sysvar_bank_state_fastcall(a)
+
+
+
 ///////////////////////////////////////////////////////////////
 
 // tape i/o

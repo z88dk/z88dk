@@ -472,6 +472,23 @@ __DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU5,unsigned char page
 __DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU6,unsigned char page)
 __DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU7,unsigned char page)
 
+// miscellaneous - paging and banking state
+
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_addr_from_mmu,unsigned char mmu)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zxn_mmu_from_addr,unsigned int addr)
+
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned long,,zxn_addr_from_page,unsigned char page)
+__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned long,,zxn_addr_from_page_2mb,unsigned char page)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr,unsigned long addr)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr_2mb,unsigned long addr)
+
+__DPROTO(`a,iyl,iyh',`iyl,iyh',void,,zxn_read_mmu_state,void *dst)
+__DPROTO(`iyl,iyh',`iyl,iyh',void,,zxn_write_mmu_state,void *src)
+
+__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,zxn_write_bank_state,unsigned int state)
+__OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_read_sysvar_bank_state,void)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,zxn_write_sysvar_bank_state,unsigned int state)
+
 ///////////////////////////////////////////////////////////////
 
 // tape i/o

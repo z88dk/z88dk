@@ -510,6 +510,45 @@ extern void ZXN_WRITE_MMU7(unsigned char page);
 
 
 
+// miscellaneous - paging and banking state
+
+extern unsigned int zxn_addr_from_mmu(unsigned char mmu);
+
+
+extern unsigned char zxn_mmu_from_addr(unsigned int addr);
+
+
+
+extern unsigned long zxn_addr_from_page(unsigned char page);
+
+
+extern unsigned long zxn_addr_from_page_2mb(unsigned char page);
+
+
+extern unsigned char zxn_page_from_addr(unsigned long addr);
+
+
+extern unsigned char zxn_page_from_addr_2mb(unsigned long addr);
+
+
+
+extern void zxn_read_mmu_state(void *dst);
+
+
+extern void zxn_write_mmu_state(void *src);
+
+
+
+extern void zxn_write_bank_state(unsigned int state);
+
+
+extern unsigned int zxn_read_sysvar_bank_state(void);
+
+
+extern void zxn_write_sysvar_bank_state(unsigned int state);
+
+
+
 ///////////////////////////////////////////////////////////////
 
 // tape i/o
