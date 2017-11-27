@@ -81,6 +81,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-map", "z88dk-map\z88d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UNIXem", "UNIXem\UNIXem.vcxproj", "{7D0213A3-87FA-4F56-A5D6-CC23682ACAD8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ucpp", "ucpp\ucpp.vcxproj", "{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -233,6 +238,14 @@ Global
 		{7D0213A3-87FA-4F56-A5D6-CC23682ACAD8}.Release|Win32.Build.0 = Release|Win32
 		{7D0213A3-87FA-4F56-A5D6-CC23682ACAD8}.Release|x64.ActiveCfg = Release|x64
 		{7D0213A3-87FA-4F56-A5D6-CC23682ACAD8}.Release|x64.Build.0 = Release|x64
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Debug|Win32.Build.0 = Debug|Win32
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Debug|x64.ActiveCfg = Debug|x64
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Debug|x64.Build.0 = Debug|x64
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|Win32.ActiveCfg = Release|Win32
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|Win32.Build.0 = Release|Win32
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|x64.ActiveCfg = Release|x64
+		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
