@@ -51,7 +51,7 @@ noappendb:
 	push	bc
 	push	hl					; file name ptr
 	push	de
-	ld	de,__sgoioblk+4		; file struct for stdout
+	ld	de,__sgoioblk+6		; file struct for stdout
 	push	de
 	call	freopen
 	pop	de
