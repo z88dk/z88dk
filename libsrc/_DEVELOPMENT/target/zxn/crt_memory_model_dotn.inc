@@ -67,8 +67,8 @@ SECTION CODE_END
 
 ;; Dot Extension Code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION DTX
-org CRT_ORG_DTX
+SECTION DTN
+org CRT_ORG_DTN
 
 section code_adt_b_array
 section code_adt_b_vector
@@ -135,11 +135,11 @@ section rodata_lib
 section rodata_compiler
 section rodata_user
 
-section code_dtx
-section rodata_dtx
-section smc_dtx
-section data_dtx
-section bss_dtx
+section code_dtn
+section rodata_dtn
+section smc_dtn
+section data_dtn
+section bss_dtn
 
 SECTION DATA
 
@@ -253,7 +253,7 @@ section bss_user
 
 section BSS_UNINITIALIZED
 SECTION BSS_END
-SECTION DTX_END
+SECTION DTN_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -61,6 +61,7 @@ section rodata_dot
 section smc_dot
 section data_dot
 section bss_dot
+section bss_dot_uninitialized
 
 SECTION CODE_END
 

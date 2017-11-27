@@ -43,7 +43,7 @@ define(`__IO_1FFD_PRINTER_STROBE', 0x10)
 # define(`__RP3_ENABLE_COVOX', 0x08)
 # define(`__RP3_ENABLE_TIMEX', 0x04)
 # define(`__RP3_ENABLE_TURBOSOUND', 0x02)
-# define(`__RP3_UNLOCK_7FFD', 0x80)       # unlock port 0x7ffd
+# define(`__RP3_UNLOCK_7FFD', 0x80)       # unlock port 0x7ffd (resets the lock bit)
 
 ## 8k Memory Banking (Spectrum Next)
 

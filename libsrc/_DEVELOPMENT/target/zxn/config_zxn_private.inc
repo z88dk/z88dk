@@ -47,6 +47,14 @@ defc __USE_SPECTRUM_128_SECOND_DFILE = 0
 
 defc __USE_SYSVAR = 0
 
+defc __USE_ZXN_OPCODES = 0
+
+defc __USE_ZXN_OPCODES_NEXTREG = 1
+defc __USE_ZXN_OPCODES_MLT = 2
+defc __USE_ZXN_OPCODES_LDIR = 4
+defc __USE_ZXN_OPCODES_DISPLAY = 8
+defc __USE_ZXN_OPCODES_OTHER = 16
+
 
 
 
@@ -1180,7 +1188,13 @@ defc __NEXTOS_IDE_DOS_MAP = 0x00f1
 defc __NEXTOS_IDE_DOS_UNMAP = 0x00f4
 defc __NEXTOS_IDE_DOS_MAPPING = 0x00f7
 defc __NEXTOS_IDE_SNAPLOAD = 0x00fd
+
 defc __NEXTOS_IDE_PATH = 0x01b1
+defc __nextos_rc_path_change = 0
+defc __nextos_rc_path_get = 1
+defc __nextos_rc_path_make = 2
+defc __nextos_rc_path_delete = 3
+
 defc __NEXTOS_IDE_CAPACITY = 0x01b4
 defc __NEXTOS_IDE_GET_LFN = 0x01b7
 defc __NEXTOS_IDE_BROWSER = 0x01ba
@@ -1190,7 +1204,15 @@ defc __NEXTOS_IDE_STREAM_CLOSE = 0x0059
 defc __NEXTOS_IDE_STREAM_IN = 0x005c
 defc __NEXTOS_IDE_STREAM_OUT = 0x005f
 defc __NEXTOS_IDE_STREAM_PTR = 0x0062
+
 defc __NEXTOS_IDE_BANK = 0x01bd
+defc __nextos_rc_banktype_zx = 0
+defc __nextos_rc_banktype_mmc = 1
+defc __nextos_rc_bank_total = 0
+defc __nextos_rc_bank_alloc = 1
+defc __nextos_rc_bank_reserve = 2
+defc __nextos_rc_bank_free = 3
+
 defc __NEXTOS_IDE_BASIC = 0x01c0
 defc __NEXTOS_IDE_STREAM_LINEIN = 0x01c3
 defc __NEXTOS_IDE_WINDOW_STRING = 0x01c6
@@ -1235,6 +1257,8 @@ defc __NEXTOS_IDE_PARTITION_READ = 0x00c4
 defc __NEXTOS_IDE_PARTITION_OPEN = 0x00cd
 defc __NEXTOS_IDE_PARTITION_CLOSE = 0x00d0
 defc __NEXTOS_IDE_PARTITIONS = 0x01a5
+
+defc __NEXTOS_DOTN_SP = 0x4000
 
 defc __NEXTOS_RC_READY = 0
 defc __NEXTOS_RC_WP = 1
