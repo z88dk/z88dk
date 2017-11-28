@@ -5,14 +5,16 @@
 ;       $Id: move.asm $
 ;
 
-                SECTION         code_clib
-                PUBLIC    move
-                PUBLIC    _move
-                EXTERN     swapgfxbk
-                EXTERN        __graphics_end
+		SECTION         code_clib
+			PUBLIC    move
+			PUBLIC    _move
+			EXTERN     swapgfxbk
+			EXTERN        __graphics_end
 
-                EXTERN     Line_r
-                EXTERN     setxy
+			EXTERN	__pen
+			EXTERN     Line_r
+			EXTERN     plotpixel
+			EXTERN     setxy
 
 
 .move
@@ -25,8 +27,15 @@
 		ld	l,(ix+4)	;px
 		ld	h,(ix+5)
 
-                call    swapgfxbk
-                ld      ix,setxy
-                call    Line_r
-                jp      __graphics_end
+		call    swapgfxbk
+				
+		ld	a,(__pen)
+		ld	ix,setxy
+		rla
+		jr	nc,pen_up
+		ld	ix,plotpixel
+.pen_up
+				
+		call    Line_r
+		jp      __graphics_end
 
