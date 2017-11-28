@@ -65,7 +65,11 @@ extern void __LIB__ drawr(int px, int py) __smallc;
 extern void __LIB__ xordrawr(int px, int py) __smallc;
 /* Remove a relative draw */
 extern void __LIB__ undrawr(int px, int py) __smallc;
-/* Relative move */
+/* Pen up for 'move' */
+extern void __LIB__ pen_up(void);
+/* Pen down for 'move' */
+extern void __LIB__ pen_down(void);
+/* Relative draw (keeping pen up or down) */
 extern void __LIB__ move(int px, int py) __smallc;
 /* Draw up to a sprcified point */
 extern void __LIB__ drawto(int x2, int y2) __smallc;
