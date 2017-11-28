@@ -15,7 +15,7 @@
 .pen_up
 ._pen_up
 	ld	hl,__pen
-	ld	a,254
+	ld	a,127
 	and	(hl)
 	ld	(hl),a
 	ret
