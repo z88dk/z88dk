@@ -65,6 +65,8 @@ extern void __LIB__ drawr(int px, int py) __smallc;
 extern void __LIB__ xordrawr(int px, int py) __smallc;
 /* Remove a relative draw */
 extern void __LIB__ undrawr(int px, int py) __smallc;
+/* Relative move */
+extern void __LIB__ move(int px, int py) __smallc;
 /* Draw up to a sprcified point */
 extern void __LIB__ drawto(int x2, int y2) __smallc;
 /* Draw up to a sprcified point in XOR mode*/
