@@ -55,5 +55,6 @@ graphics/setxy
 graphics/xorborder
 graphics/xorplot
 graphics/setxy
+graphics/move
 graphics/swapgfxbk_foo
 graphics/drawbox
