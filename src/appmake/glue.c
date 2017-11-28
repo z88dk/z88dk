@@ -131,7 +131,7 @@ int glue_exec(char *target)
         printf("Excluding sections from output\n");
         for (s = strtok(excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
         {
-            if (mb_remove_section(&memory, s))
+            if (mb_remove_section(&memory, s, 0))
                 printf("..removed section %s\n", s);
             else
                 printf("..section %s not found\n", s);

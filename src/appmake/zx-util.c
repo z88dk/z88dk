@@ -688,16 +688,31 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 
 /*
    ESXDOS Dot Command
-   July 2017 aralbrec
+
+   * dot
+   * dotx
+   * dotn
+
+   July/Nov 2017 aralbrec
 */
 
-int zx_dot_command(struct zx_common *zxc)
+int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 {
-    FILE *fin, *fout;
+    FILE *fout;
+
+    struct memory_bank *mb;
+    struct section_bin *sb;
+    int section_num;
+
     char outname[FILENAMELEN];
     char outnamex[FILENAMELEN];
-    int  fnamex;
+
+    int  __esxdos_dtx_fname;
+    int  __esxdos_dotx_len;
+    int  __dotn_num_pages;
+
     int c;
+    int dotx, dotn;
 
     // determine output filename
 
@@ -714,67 +729,111 @@ int zx_dot_command(struct zx_common *zxc)
     for (c = 0; outname[c]; ++c)
         outname[c] = toupper(outname[c]);
 
-    // create main binary
+    // collect parameters
 
-    if ((fin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL)
-        exit_log(1, "Can't open input file %s\n", zxc->binname);
+    __esxdos_dtx_fname = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
+    __esxdos_dotx_len  = parameter_search(zxc->crtfile, ".map", "__esxdos_dotx_len");
+    __dotn_num_pages   = parameter_search(zxc->crtfile, ".map", "__dotn_num_pages");
+
+    dotx = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_pages < 0);
+    dotn = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_pages >= 0);
+
+    // generate the main dot command from section CODE
+
+    if (mb_find_section(memory, "CODE", &mb, &section_num) == 0)
+        exit_log(1, "Error: Section CODE not found\n");
+
+    sb = &mb->secbin[section_num];
 
     if ((fout = fopen(outname, "wb")) == NULL)
+        exit_log(1, "Error: Couldn't create output file %s\n", outname);
+
+    if (mb_output_section_binary(fout, sb) != 0)
     {
-        fclose(fin);
-        exit_log(1, "Error: Could not create output file %s\n", outname);
-    }
-
-    while ((c = fgetc(fin)) != EOF)
-        fputc(c, fout);
-
-    fclose(fin);
-    fclose(fout);
-
-    // create optional extended dot binary
-
-    suffix_change(zxc->binname, "_DTX.bin");
-
-    strcpy(outnamex, outname);
-    strcat(outnamex, ".DTX");
-
-    if ((fin = fopen(zxc->binname, "rb")) == NULL)
-        return 0;
-
-    fnamex = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
-
-    if ((fnamex < 0) || ((fout = fopen(outnamex, "wb")) == NULL))
-    {
-        fclose(fin);
+        fclose(fout);
         remove(outname);
-
-        if (fnamex < 0)
-            exit_log(1, "Error: Could not locate FILENAME for extended dot command\n");
-
-        exit_log(1, "Error: Could not create output file %s\n", outnamex);
+        exit_log(1, "Error: Couldn't read section binary %s\n", sb->filename);
     }
 
-    while ((c = fgetc(fin)) != EOF)
-        fputc(c, fout);
-
-    fclose(fin);
     fclose(fout);
 
-    // insert dtx filename into main binary
+    if (dotn)
+    {
+        int space = 0x4000 - (sb->org + sb->size);
+
+        if (space < 0)
+        {
+            remove(outname);
+            exit_log(1, "Error: Main dot binary exceeds 0x4000 by %d bytes\n", -space);
+        }
+
+        fprintf(stderr, "Note: Available stack space in divmmc memory is %d bytes\n", space);
+    }
+
+    // stop if plain dot command
+
+    if (!dotx && !dotn) return 0;
+
+    // extended dot command filename
+
+    snprintf(outnamex, sizeof(outnamex), "/BIN/%s.%s", outname, dotx ? "DTX" : "DTN");
+
+    // generate the extended dot command from section DTX or DTN
+
+    if ((dotx && (mb_find_section(memory, "DTX", &mb, &section_num) == 0)) || (dotn && (mb_find_section(memory, "DTN", &mb, &section_num) == 0)))
+    {
+        remove(outname);
+        exit_log(1, "Error: Section %s not found\n", dotx ? "DTX" : "DTN");
+    }
+
+    sb = &mb->secbin[section_num];
+
+    if ((fout = fopen(outnamex + 5, "wb")) == NULL)
+    {
+        remove(outname);
+        exit_log(1, "Error: Couldn't create output file %s\n", outnamex);
+    }
+
+    if (mb_output_section_binary(fout, sb) != 0)
+    {
+        fclose(fout);
+        remove(outnamex);
+        remove(outname);
+        exit_log(1, "Error: Couldn't read section binary %s\n", sb->filename);
+    }
+
+    fclose(fout);
+
+    // insert variables into main dot binary
 
     if ((fout = fopen(outname, "rb+")) == NULL)
     {
         remove(outname);
         remove(outnamex);
-        exit_log(1, "Error: Could not write dtx filename into main binary\n");
+        exit_log(1, "Error: Couldn't write dot filename into main dot binary\n");
     }
 
-    memmove(outnamex + 5, outnamex, strlen(outnamex) + 1);
-    memcpy(outnamex, "/BIN/", 5);
-
-    fseek(fout, fnamex - 0x2000, SEEK_SET);
-
+    fseek(fout, __esxdos_dtx_fname - 0x2000, SEEK_SET);
     fprintf(fout, "%s", outnamex);
+
+    fseek(fout, __esxdos_dotx_len - 0x2000, SEEK_SET);
+    writeword(sb->size, fout);
+
+    if (dotn)
+    {
+        int num_pages = (sb->size - 1) / 0x2000 + 1;
+
+        if ((num_pages > 6) || (num_pages < 1))
+        {
+            fclose(fout);
+            remove(outname);
+            remove(outnamex);
+            exit_log(1, "Error: Number of pages required %d is out of range\n", num_pages);
+        }
+
+        fseek(fout, __dotn_num_pages - 0x2000, SEEK_SET);
+        writebyte((unsigned char)num_pages, fout);
+    }
 
     fclose(fout);
     return 0;

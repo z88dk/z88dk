@@ -517,11 +517,13 @@ extern void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *
 extern int  mb_find_bankspace(struct banked_memory *memory, char *bankspace_name);
 extern int  mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name);
 extern int  mb_remove_bank(struct bank_space *bs, unsigned int index, int clean);
+extern void mb_remove_mainbank(struct memory_bank *mb, int clean);
 extern int  mb_find_section(struct banked_memory *memory, char *section_name, struct memory_bank **mb_r, int *secnum_r);
-extern int  mb_remove_section(struct banked_memory *memory, char *section_name);
+extern int  mb_remove_section(struct banked_memory *memory, char *section_name, int clean);
 extern int  mb_user_remove_bank(struct banked_memory *memory, char *bankname);
 extern int  mb_check_alignment(struct aligned_data *aligned);
 extern int  mb_sort_banks(struct banked_memory *memory);
+extern int  mb_output_section_binary(FILE *fbout, struct section_bin *sb);
 extern int  mb_generate_output_binary(FILE *fbin, int filler, FILE *fhex, int ipad, int irecsz, struct memory_bank *mb, int borg, int bsize);
 extern void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int ipad, int irecsz, struct banked_memory *memory);
 extern void mb_delete_source_binaries(struct banked_memory *memory);

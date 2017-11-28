@@ -185,7 +185,7 @@ allocation_failed:
    
    ENDIF
    
-   jr error_exit
+   jp error_exit
    
    error_memory:
    
@@ -396,7 +396,7 @@ SECTION data_dot
 __dotn_num_pages        :  defb 0
 __dotn_mmu_state        :  defs 8,0xff
 __dotn_allocated_pages  :  defs 8,0xff
-__esxdos_dotn_fname     :  defs 18
+__esxdos_dtx_fname      :  defs 18
 
 include "../clib_variables.inc"
 

@@ -148,14 +148,11 @@ int zxn_exec(char *target)
 
     tap = !dot && !sna && !zxn && !bin;
 
-    if ((tap || dot) && (zxc.main_fence > 0))
-        fprintf(stderr, "Warning: Main-fence is ignored for tap and dot compiles\n");
+    if (tap && (zxc.main_fence > 0))
+        fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
 
     if (tap)
         return zx_tape(&zxc, &zxt);
-
-    if (dot)
-        return zx_dot_command(&zxc);
 
     // output formats below need banked memory model
 
@@ -236,7 +233,7 @@ int zxn_exec(char *target)
         printf("Excluding sections from output\n");
         for (s = strtok(zxc.excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
         {
-            if (mb_remove_section(&memory, s))
+            if (mb_remove_section(&memory, s, 0))
                 printf("..removed section %s\n", s);
             else
                 printf("..section %s not found\n", s);
@@ -429,6 +426,17 @@ int zxn_exec(char *target)
 
     // now the output formats
 
+    if (dot)
+    {
+        if ((ret = zx_dot_command(&zxc, &memory)) != 0)
+            return ret;
+
+        // dot command is out but we need to process binaries in other memory banks
+        // remove the mainbank so as not to process it again
+
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
+    }
+
     if (sna)
     {
         if ((ret = zx_sna(&zxc, &zxs, &memory, 1)) != 0)
@@ -437,21 +445,7 @@ int zxn_exec(char *target)
         // sna snapshot is out but we need to process the rest of the binaries too
         // so remove mainbank and banks 0-7 from memory model so as not to treat those again
 
-        for (i = 0; i < memory.mainbank.num; ++i)
-        {
-            struct section_bin *sb = &memory.mainbank.secbin[i];
-
-            if (zxc.clean)
-                remove(sb->filename);
-
-            free(sb->filename);
-            free(sb->section_name);
-        }
-
-        free(memory.mainbank.secbin);
-
-        memory.mainbank.num = 0;
-        memory.mainbank.secbin = NULL;
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
 
         if (bsnum_bank >= 0)
         {
@@ -460,7 +454,7 @@ int zxn_exec(char *target)
         }
     }
 
-    if (bin || sna)
+    if (bin || sna || dot)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
         ret = 0;
