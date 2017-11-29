@@ -1,7 +1,14 @@
 __allocate_pages_begin:
 
-PHASE __SYSVAR_TSTACK - (__allocate_pages_end - __allocate_pages_begin) + 1
-   
+;; PHASE __SYSVAR_TSTACK - (__allocate_pages_end - __allocate_pages_begin) + 1
+;;
+;; PHASE does not allow forward labels so this phase statement is illegal see issue #541
+;; Instead we rely on relocatable code here and compute the destination address
+
+defc abs_allocate_len    = __allocate_pages_end - __allocate_pages_begin
+defc abs_allocate_pages  = __SYSVAR_TSTACK - abs_allocate_len + 1
+defc abs_allocated_pages = allocated_pages - allocate_pages + abs_allocate_pages
+
 allocate_pages:
 
    push bc
@@ -17,7 +24,7 @@ allocate_pages:
    ccf
    ret nc                      ; if avail_pages < num_pages
 
-   ld hl,allocated_pages
+   ld hl,abs_allocated_pages
 
 allocate_pages_loop:
 
@@ -42,7 +49,7 @@ allocated_pages:
 
    defs 6,0xff
 
-DEPHASE
+;; DEPHASE
 
 __allocate_pages_end:
 
@@ -50,12 +57,19 @@ __allocate_pages_end:
 
 __deallocate_pages_begin:
 
-PHASE __SYSVAR_TSTACK - (__deallocate_pages_end - __deallocate_pages_begin) + 1
+;; PHASE __SYSVAR_TSTACK - (__deallocate_pages_end - __deallocate_pages_begin) + 1
+;;
+;; PHASE does not allow forward labels so this phase statement is illegal see issue #541
+;; Instead we rely on relocatable code here and compute the destination address
+
+defc abs_deallocate_len    = __deallocate_pages_end - __deallocate_pages_begin
+defc abs_deallocate_pages  = __SYSVAR_TSTACK - abs_deallocate_len + 1
+defc abs_deallocated_pages = deallocated_pages - deallocate_pages + abs_deallocate_pages
 
 deallocate_pages:
 
    ld b,6
-   ld hl,deallocated_pages
+   ld hl,abs_deallocated_pages
 
 deallocate_pages_loop:
 
@@ -84,6 +98,6 @@ deallocated_pages:
 
    defs 6,0xff
 
-DEPHASE
+;; DEPHASE
 
 __deallocate_pages_end:

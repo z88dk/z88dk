@@ -689,9 +689,9 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 /*
    ESXDOS Dot Command
 
-   * dot
-   * dotx
-   * dotn
+   * dot  : standard dot command resident in divmmc page at 0x2000 limited to ~7k+
+   * dotx : extended dot command with first part at 0x2000 and limited to 7k+ and a second part in main ram
+   * dotn : zx next only same as extended dot command except available ram pages are allocated so as not to overwrite main ram
 
    July/Nov 2017 aralbrec
 */
@@ -767,7 +767,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             exit_log(1, "Error: Main dot binary exceeds 0x4000 by %d bytes\n", -space);
         }
 
-        fprintf(stderr, "Note: Available stack space in divmmc memory is %d bytes\n", space);
+        printf("Note: Available stack space in divmmc memory is %d bytes\n", space);
     }
 
     // stop if plain dot command
@@ -830,6 +830,8 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             remove(outnamex);
             exit_log(1, "Error: Number of pages required %d is out of range\n", num_pages);
         }
+
+        printf("Note: Number of 8k pages required is %d\n", num_pages);
 
         fseek(fout, __dotn_num_pages - 0x2000, SEEK_SET);
         writebyte((unsigned char)num_pages, fout);

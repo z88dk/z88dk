@@ -131,7 +131,6 @@ __Start:
    ld (__dotn_sysvar_bank_state),hl
    
    ;; enable +3DOS banking arrangement
-   ;; divmmc has priority so OUT is safe
    
    EXTERN asm_zxn_write_bank_state
    
@@ -165,7 +164,7 @@ __Start:
    ld sp,hl                    ; move stack to bank 5
 
    rst __ESXDOS_ROMCALL
-   defw allocate_pages
+   defw abs_allocate_pages
    
    ld sp,(__dotn_sp)           ; move stack back to divmmc
    
@@ -207,7 +206,7 @@ allocation_successful:
    sub e
    ld d,a
 
-   ld hl,allocated_pages
+   ld hl,abs_allocated_pages
    
    ld c,b
    ld b,0
@@ -243,6 +242,10 @@ allocation_successful:
    
    include "../crt_set_interrupt_mode.inc"
 
+   ; save stack in case it is modified by user code
+
+   ld (__dotn_sp),sp
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -263,6 +266,7 @@ SECTION code_crt_main
 
 __Exit:
 
+   ld sp,(__dotn_sp)
    push hl                     ; save return status
 
 SECTION code_crt_exit          ; user and library cleanup
@@ -313,13 +317,13 @@ error_load:
    ld sp,hl                    ; move stack to bank 5
 
    ld hl,__dotn_allocated_pages + 2
-   ld de,deallocated_pages
+   ld de,abs_deallocated_pages
    ld bc,6
    
    ldir                        ; copy allocated pages to temp stack
    
    rst __ESXDOS_ROMCALL
-   defw deallocate_pages
+   defw abs_deallocate_pages
    
    ld sp,(__dotn_sp)           ; move stack back to divmmc
 
