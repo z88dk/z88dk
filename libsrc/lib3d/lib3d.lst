@@ -29,4 +29,7 @@ ozrotatepointy
 ozrotatepointz
 polygon
 set_direction
+get_direction
 fwd
+turn_left
+turn_right
