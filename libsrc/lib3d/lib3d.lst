@@ -28,3 +28,5 @@ ozrotatepointx
 ozrotatepointy
 ozrotatepointz
 polygon
+set_direction
+fwd
