@@ -788,6 +788,12 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
     sb = &mb->secbin[section_num];
 
+    if (sb->org < 0x4000)
+    {
+        remove(outname);
+        exit_log(1, "Error: Section %s org of %d is less than 0x4000\n", sb->section_name, sb->org);
+    }
+
     if ((fout = fopen(outnamex + 5, "wb")) == NULL)
     {
         remove(outname);
