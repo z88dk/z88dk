@@ -33,7 +33,17 @@ loop:
    inc hl
 
    inc a
-   jr z, skip
+   jr nz, write
+   
+   ld a,e
+   
+   cp __REG_MMU2
+   jr nc, skip
+   
+   xor a
+
+write:
+
    dec a
    
    out (c),e
