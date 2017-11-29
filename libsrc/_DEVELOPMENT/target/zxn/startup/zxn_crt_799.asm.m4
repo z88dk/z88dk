@@ -109,7 +109,7 @@ __Start:
 
    IF __USE_ZXN_OPCODES & __USE_ZXN_OPCODES_NEXTREG
    
-      nextreg __REG_MMU2,10
+      mmu2 10
       
    ELSE
    
@@ -245,6 +245,7 @@ allocation_successful:
    ; save stack in case it is modified by user code
 
    ld (__dotn_sp),sp
+   include "../crt_init_sp.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
@@ -286,7 +287,7 @@ error_load:
 
    IF __USE_ZXN_OPCODES & __USE_ZXN_OPCODES_NEXTREG
    
-      nextreg __REG_MMU2,10
+      mmu2 10
       
    ELSE
    
