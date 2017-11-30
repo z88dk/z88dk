@@ -7,9 +7,12 @@ INCLUDE "config_private.inc"
 
 PUBLIC  _bios_sp
 
+IF __register_sp
 EXTERN  __register_sp
-
-defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here when other banks running
+defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here, when other banks running
+ELSE
+defc    _bios_sp    =   $FFDE           ; or here if __register_sp is undefined
+ENDIF
 
 ; start of the Transitory Program Area (TPA) Control Block (TCB)
 ; for BANK1 through BANK12
@@ -30,10 +33,10 @@ SECTION rodata_common1_data
 
 PHASE   __COMMON_AREA_1_PHASE_DATA
 
-PUBLIC APUCMDBuf, APUDATABuf
+PUBLIC APUCMDBuf, APUDataBuf
 
 APUCMDBuf:      defs    __APU_CMD_SIZE
-APUDATABuf:     defs    __APU_DATA_SIZE
+APUDataBuf:     defs    __APU_DATA_SIZE
 
 PUBLIC asci0RxBuffer, asci0TxBuffer
 
@@ -79,18 +82,24 @@ PUBLIC __system_time_fraction, __system_time
 __system_time_fraction: defb    0       ; uint8_t (1/256) fractional time
 __system_time:          defs    4       ; uint32_t time_t
 
-PUBLIC APUCMDInPtr, APUCMDOutPtr, APUDATAInPtr, APUDATAOutPtr
-PUBLIC APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError, _APULock
+PUBLIC APUCMDInPtr, APUCMDOutPtr
+PUBLIC APUDataEntInPtr, APUDataEntOutPtr
+PUBLIC APUDataRemInPtr, APUDataRemOutPtr
+PUBLIC APUCMDBufUsed, APUDataEntBufUsed, APUDataRemBufUsed
+PUBLIC APUStatus, APUError, _APULock
 
-APUCMDInPtr:    defw    APUCMDBuf
-APUCMDOutPtr:   defw    APUCMDBuf
-APUDATAInPtr:   defw    APUDATABuf
-APUDATAOutPtr:  defw    APUDATABuf
-APUCMDBufUsed:  defb    0
-APUDATABufUsed: defb    0
-APUStatus:      defb    0
-APUError:       defb    0
-_APULock:       defb    $FE             ; mutex for APU
+APUCMDInPtr:            defw    APUCMDBuf
+APUCMDOutPtr:           defw    APUCMDBuf
+APUDataEntInPtr:        defw    APUDataBuf      ; even bytes are to load
+APUDataEntOutPtr:       defw    APUDataBuf
+APUDataRemInPtr:        defw    APUDataBuf+1    ; interleaved odd bytes to unload
+APUDataRemOutPtr:       defw    APUDataBuf+1
+APUCMDBufUsed:          defb    0
+APUDataEntBufUsed:      defb    0
+APUDataRemBufUsed:      defb    0
+APUStatus:              defb    0
+APUError:               defb    0
+_APULock:               defb    $FE             ; mutex for APU
 
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, _asci0RxLock
 

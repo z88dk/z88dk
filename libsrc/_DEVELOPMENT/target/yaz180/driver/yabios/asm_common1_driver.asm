@@ -26,21 +26,23 @@ PUBLIC _error_handler_rst
 _error_handler_rst:     ; RST  8
     pop hl              ; pop originating address
     call phexwdreg      ; and output it on serial port
-error_handler_loop:
     call delay
-    jr error_handler_loop
+    call delay
+    halt
 
 ;------------------------------------------------------------------------------
 
 PUBLIC _call_far_rst
 
 _call_far_rst:          ; RST 10
+    push af             ; save flags
     push hl
     ld hl, _shadowLock
 call_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
     jr C, call_far_try_alt_lock ; just keep trying
     pop hl
+    pop af
 
     ex af,af            ; all your register are belong to us
     exx
@@ -104,13 +106,16 @@ call_far_exit:
 
 
 ret_far:                ; we land back here once the call_far function returns
+    push af             ; save flags
     push hl
     ld hl, _shadowLock
 ret_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
     jr C, ret_far_try_alt_lock ; just keep trying, can't give up
     pop hl
+    pop af
 
+    ex af,af            ; all your register are belong to us
     exx
 
     pop bc              ; get return (origin) BBR in B, and departing (destination) BBR in C
@@ -132,13 +137,13 @@ ret_far_try_alt_lock:
     ld (hl), $FE        ; free the bank we are now departing
 
     exx                 ; alt registers are returned
+    ex af,af
 
     push hl
     ld hl, _shadowLock  ; give alt register mutex
     ld (hl), $FE
     pop hl
     ret
-
 
 ;------------------------------------------------------------------------------
 ; void jp_far(far *str, int8_t bank)
@@ -250,6 +255,7 @@ jp_far_from_bios:
 PUBLIC _system_rst
 
 _system_rst:            ; RST 20
+    push af             ; save flags
     push hl
     ld hl, _shadowLock
 
@@ -257,6 +263,7 @@ system_try_alt_lock:
     sra (hl)            ; get alt register mutex
     jr C, system_try_alt_lock ; just keep trying
     pop hl
+    pop af
 
     ex af,af            ; all your register are belong to us
     exx
@@ -342,7 +349,12 @@ system_ret:             ; we land back here once the yabios call is done
 PUBLIC _am9511a_rst
 
 _am9511a_rst:           ; RST 28
-    ret
+    pop bc              ; get the return address
+    inc bc
+    ld a, (bc)          ; get APU command in a
+    inc bc
+    push bc             ; push the post return address back on stack
+    jp asm_am9511a_cmd_ld
 
 ;------------------------------------------------------------------------------
 
@@ -355,7 +367,7 @@ _user_rst:              ; RST 30
 ; start of common area 1 - system functions
 ;------------------------------------------------------------------------------
 
-EXTERN _shadowLock, _dmac0Lock, _dmac1Lock, _prt0Lock, _prt1Lock
+EXTERN _shadowLock, _dmac0Lock
 
 ;------------------------------------------------------------------------------
 ; void *memcpy_far(far *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
@@ -602,8 +614,10 @@ PUBLIC _load_hex, _load_hex_fastcall
 EXTERN initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
 _load_hex:
+    pop af
     pop hl
     push hl
+    push af
 
 _load_hex_fastcall:
     in0 a, (BBR)                ; grab and store the current Bank Base Register
@@ -717,12 +731,12 @@ load_hex_read_byte:             ; returns byte in A, checksum in C
 PUBLIC _bank_get_rel, _bank_get_rel_fastcall
 
 _bank_get_rel:
+    pop af
     pop hl
     push hl
-
-_bank_get_rel_fastcall:
     push af
-    
+
+_bank_get_rel_fastcall:  
     ld a, l
     and a, $0F          ; limit input to 0 to 15 bank
     ld l, a
@@ -736,7 +750,6 @@ _bank_get_rel_fastcall:
     sub a, l            ; create source relative far address, from absolute input
     ld l, a
 
-    pop af
     ret
 
 ;------------------------------------------------------------------------------
@@ -749,8 +762,10 @@ _bank_get_rel_fastcall:
 PUBLIC _bank_get_abs, _bank_get_abs_fastcall
 
 _bank_get_abs:
+    pop af
     pop hl
     push hl
+    push af
 
 _bank_get_abs_fastcall:
     push af
@@ -776,8 +791,10 @@ _bank_get_abs_fastcall:
 PUBLIC _lock_get, _lock_get_fastcall
 
 _lock_get:
+    pop af
     pop hl
     push hl
+    push af
 
 _lock_get_fastcall:
     sra (hl)
@@ -794,8 +811,10 @@ _lock_get_fastcall:
 PUBLIC _lock_try, _lock_try_fastcall
 
 _lock_try:
+    pop af
     pop hl
     push hl
+    push af
 
 _lock_try_fastcall:
     sra (hl)
@@ -813,14 +832,14 @@ lock_got_not:
 PUBLIC _lock_give, _lock_give_fastcall
 
 _lock_give:
+    pop af
     pop hl
     push hl
+    push af
 
 _lock_give_fastcall:
     ld (hl), $FE
     ret
-
-
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 driver - system_time functions
@@ -865,29 +884,29 @@ system_tick_update:
 ; start of common area 1 driver - am9511a functions
 ;------------------------------------------------------------------------------
 
+;------------------------------------------------------------------------------
 ; Interrupt Service Routine for the Am9511A-1
 ; 
-; Initially called once the required operand pointers and commands are loaded
-; Following calls generated by END signal whenever a single APU command is completed
-; Sends a new command (with operands if needed) to the APU
+; Initially called once the required operand pointers and commands are loaded.
+;
+; Following calls generated by END signal whenever a single APU command is completed.
+; Sends a new command (with operands if needed) to the APU.
 ;
 ; On interrupt exit APUStatus contains either
 ; __IO_APU_STATUS_BUSY = 1, and rest of APUStatus bits are invalid
 ; __IO_APU_STATUS_BUSY = 0, idle, and the status bits resulting from the final COMMAND
 
-; FIXME - conversion to yabios model not complete.
-; the data pointer buffer becomes a data buffer.
-; Some things are done, but not all.
 
-PUBLIC asm_am9511a_isr
+PUBLIC _apu_init, asm_am9511a_isr
 
-EXTERN APUCMDOutPtr, APUDATAOutPtr
-EXTERN APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError
+EXTERN APUCMDOutPtr, APUDataEntOutPtr, APUDataRemInPtr
+EXTERN APUCMDBufUsed, APUDataEntBufUsed, APUDataRemBufUsed
+EXTERN APUStatus, APUError
 
+_apu_init:
 asm_am9511a_isr:
     push af                 ; store AF, etc, so we don't clobber them
     push bc
-    push de
     push hl
 
     xor a                   ; set internal clock = crystal x 1 = 18.432MHz
@@ -906,7 +925,7 @@ am9511a_isr_entry:
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
     in a, (c)               ; read the APU
     and __IO_APU_STATUS_ERROR   ; any errors?
-    call NZ, am9511a_isr_error  ; then capture error in APUError
+    call NZ, am9511a_isr_error  ; then capture the error in APUError
 
     ld hl, (APUCMDOutPtr)   ; get the pointer to place where we pop the COMMAND
     ld a, (hl)              ; get the COMMAND byte
@@ -934,10 +953,11 @@ am9511a_isr_exit:
     out0 (CMR), a           ; CPU Clock Multiplier Reg (CMR)
 
     pop hl                  ; recover HL, etc
-    pop de
     pop bc
     pop af
-    ret
+    
+    ei                      ; interrupts were enabled, or we wouldn't have been here
+    ret                     ; no Z80 interrupt chaining
 
 am9511a_isr_end:            ; we've finished a COMMAND sentence
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
@@ -948,112 +968,114 @@ am9511a_isr_end:            ; we've finished a COMMAND sentence
     jr am9511a_isr_exit     ; we're done here
 
 am9511a_isr_op_ent:
-    ld hl, (APUDATAOutPtr)  ; get the pointer to where we pop OPERAND
-    ld e, (hl)              ; read the OPERAND PTR low byte from the APUDATAOutPtr
-    inc l                   ; move the POINTER low byte along, 0xFF rollover
-    ld d, (hl)              ; read the OPERAND PTR high byte from the APUDATAOutPtr
-    inc l
-    ld (APUDATAOutPtr), hl  ; write where the next POINTER should be read
-
-    ld hl, APUDATABufUsed   ; decrement of POINTER count remaining
-    dec (hl)
-    dec (hl)
-
-    ld bc, __IO_APU_PORT_DATA+$0300 ; the address of the APU data port (+3) in BC
-    ex de, hl               ; move the base address of the OPERAND to HL
-
-    outi                    ; output 16 bit OPERAND
-
-    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
-    ex (sp), hl
-    outi
+    ld bc, __IO_APU_PORT_DATA   ; the address of the APU data port in BC
+    call am9511a_isr_op16_ent
 
     pop af                  ; recover the COMMAND 
     cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND
-    jp Z, am9511a_isr_entry ; yes? then go back to get another COMMAND
+    jr Z, am9511a_isr_entry ; yes? then go back to get another COMMAND
 
-    ex (sp), hl             ; delay for 38 cycles (5us) TWI 1.280us
-    ex (sp), hl
-    outi                    ; output last two bytes of 32 bit OPERAND
+    call am9511a_isr_op16_ent
+    jr am9511a_isr_entry    ; go back to get another COMMAND
 
-    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
-    ex (sp), hl
-    outi
-
-    jp am9511a_isr_entry    ; go back to get another COMMAND
-
-am9511a_isr_op_rem:
-    ld hl, (APUDATAOutPtr)   ; get the pointer to where we pop OPERAND PTR
-    ld e, (hl)              ; read the OPERAND PTR low byte from the APUDATAOutPtr
-    inc l                   ; move the POINTER low byte along, 0xFF rollover
-    ld d, (hl)              ; read the OPERAND PTR high byte from the APUDATAOutPtr
-    inc l
-    ld (APUDATAOutPtr), hl  ; write where the next POINTER should be read
-
-    ld hl, APUDATABufUsed   ; decrement of OPERAND POINTER count remaining
-    dec (hl)
-    dec (hl)
-
-    ld bc, __IO_APU_PORT_DATA+$0300 ; the address of the APU data port (+3) in BC
-    ex de, hl               ; move the base address of the OPERAND to HL
-
-    inc hl                  ; reverse the OPERAND bytes to load
+am9511a_isr_op_rem:         ; REMINDER operands removed BIG ENDIAN !!!
+    ld bc, __IO_APU_PORT_DATA   ; the address of the APU data port in BC
+    call am9511a_isr_op16_rem
 
     pop af                  ; recover the COMMAND 
     cp __IO_APU_OP_REM16    ; is it a 2 byte OPERAND
-    jr Z, am9511a_isr_op_rem16  ; yes then skip over 32bit stuff
+    jr Z, am9511a_isr_entry ; yes then skip over 32bit stuff, and get another COMMAND
 
-    inc hl                  ; increment two more bytes for 32bit OPERAND
-    inc hl
+    call am9511a_isr_op16_rem
+    jr am9511a_isr_entry    ; go back to get another COMMAND
 
-    ind                     ; get the higher two bytes of 32bit OPERAND
-    ind
+am9511a_isr_op16_ent:
+    ld hl, (APUDataEntOutPtr)  ; get the pointer to where we pop OPERAND
 
-am9511a_isr_op_rem16:
-    ind                     ; get 16 bit OPERAND
-    ind
+    ld a, (hl)              ; read the OPERAND low byte from the APUDataEntOutPtr
+    out (c), a              ; write to APU
+    inc l                   ; move the interleaved POINTER low byte along, 0xFF rollover
+    inc l
 
-    jp am9511a_isr_entry    ; go back to get another COMMAND
+    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
+    ex (sp), hl
+
+    ld a, (hl)              ; read the OPERAND high byte from the APUDataEntOutPtr
+    out (c), a              ; write to APU
+    inc l
+    inc l
+    ld (APUDataEntOutPtr), hl  ; write where the next OPERAND should be read
+
+    ld hl, APUDataEntBufUsed   ; decrement of OPERAND byte count
+    dec (hl)
+    dec (hl)
+
+    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
+    ex (sp), hl
+    ret
+
+am9511a_isr_op16_rem:
+    ld hl, (APUDataRemInPtr)   ; get the pointer to where we write OPERAND
+    
+    in a, (c)
+    ld (hl), a              ; write the OPERAND high byte
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    inc l
+
+    in a, (c)
+    ld (hl), a              ; write the OPERAND low byte
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    inc l
+
+    ld (APUDataRemInPtr), hl    ; write where the next POINTER should be read
+
+    ld hl, APUDataRemBufUsed    ; increment of OPERAND byte count 
+    inc (hl)
+    inc (hl)
+    ret
 
 am9511a_isr_error:          ; we've an error to notify in A
     ld hl, APUError         ; collect any previous errors
     or (hl)                 ; and we add any new error types
     ld (hl), a              ; set the APUError status
-    ret                     ; we're done here
+    ret
 
 ;------------------------------------------------------------------------------  
 ;       Initialises the APU buffers
 ;
 
-PUBLIC asm_am9511a_reset
+PUBLIC _apu_reset
 
-EXTERN APUCMDBuf, APUDATABuf
-EXTERN APUCMDInPtr, APUCMDOutPtr, APUDATAInPtr, APUDATAOutPtr
-EXTERN APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError, _APULock
+EXTERN APUCMDBuf, APUDataBuf
+EXTERN APUCMDInPtr, APUCMDOutPtr
+EXTERN APUDataEntInPtr, APUDataEntOutPtr
+EXTERN APUDataRemInPtr, APUDataRemOutPtr
+EXTERN APUCMDBufUsed, APUDataEntBufUsed, APUDataRemBufUsed
+EXTERN APUStatus, APUError, _APULock
 
-asm_am9511a_reset:
+_apu_reset:
     push af
     push bc
     push de
     push hl
 
-am9511a_reset_lock_get:
-    ld hl, _APULock         ; load the mutex lock address
-    sra (hl)                ; get the lock
-    jr C, am9511a_reset_lock_get    ; or not
-
     ld  HL, APUCMDBuf       ; Initialise COMMAND Buffer
     ld (APUCMDInPtr), HL
     ld (APUCMDOutPtr), HL
 
-    ld HL, APUDATABuf       ; Initialise OPERAND POINTER Buffer
-    ld (APUDATAInPtr), HL
-    ld (APUDATAOutPtr), HL
+    ld HL, APUDataBuf       ; Initialise OPERAND Load Buffer, point to even bytes
+    ld (APUDataEntInPtr), HL
+    ld (APUDataEntOutPtr), HL
 
+    ld HL, APUDataBuf+1     ; Initialise OPERAND Removal Buffer, point to odd bytes
+    ld (APUDataRemInPtr), HL
+    ld (APUDataRemOutPtr), HL
+    
     xor A                   ; clear A register to 0
 
-    ld (APUCMDBufUsed), A   ; 0 both Buffer counts
-    ld (APUDATABufUsed), A
+    ld (APUCMDBufUsed), A   ; 0 all Buffer counts
+    ld (APUDataEntBufUsed), A
+    ld (APUDataRemBufUsed), A
 
     ld (APUCMDBuf), A       ; clear COMMAND Buffer
     ld HL, APUCMDBuf
@@ -1063,8 +1085,8 @@ am9511a_reset_lock_get:
     ld BC, __APU_CMD_SIZE-1
     ldir
 
-    ld (APUDATABuf), A      ; clear OPERAND Buffer
-    ld HL, APUDATABuf
+    ld (APUDataBuf), A      ; clear both (interleaved) OPERAND Buffers
+    ld HL, APUDataBuf
     ld D, H
     ld E, L
     inc DE
@@ -1073,12 +1095,16 @@ am9511a_reset_lock_get:
 
     ld (APUStatus), a       ; set APU status to idle (NOP)
     ld (APUError), a        ; clear APU errors
-
+   
 am9511a_reset_loop:
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in bc
     in a, (c)                   ; read the APU
     and __IO_APU_STATUS_BUSY    ; busy?
     jr NZ, am9511a_reset_loop
+
+    in0 a,(ITC)
+    or a, ITC_ITE0          ; enable INT0 for APU
+    out0 (ITC),a
 
     ld hl, _APULock         ; load the mutex lock address
     ld (hl), $FE            ; give mutex lock
@@ -1090,11 +1116,11 @@ am9511a_reset_loop:
     ret
 
 ;------------------------------------------------------------------------------
-;       Confirms whether the APU is idle
-;       Loop until it returns ready
+;       Confirms whether the APU is idle.
+;       Loop until it returns ready.
 ;       Operand Entry and Removal takes little time,
 ;       and we'll be interrupted for Command entry.
-;       Use after the first APU_ISR call.
+;       Use after the first _apu_init call.
 ;
 ;       L = contents of (APUStatus || APUError)
 ;       SCF if no errors (aggregation of any errors found)
@@ -1102,14 +1128,14 @@ am9511a_reset_loop:
 ;       APUError is zeroed on return
 ;       Uses AF, HL
 
-PUBLIC asm_am9511a_chk_idle
+PUBLIC _apu_chk_idle_fastcall
 
 EXTERN APUStatus, APUError
 
-asm_am9511a_chk_idle:
+_apu_chk_idle_fastcall:
     ld a, (APUStatus)       ; get the status of the APU (but don't disturb APU)
     tst __IO_APU_STATUS_BUSY    ; check busy bit is set,
-    jr NZ, asm_am9511a_chk_idle ; so we wait
+    jr NZ, _apu_chk_idle_fastcall ; so we wait
 
     ld hl, APUError
     or (hl)                 ; collect the aggregated errors, with APUStatus
@@ -1122,31 +1148,41 @@ asm_am9511a_chk_idle:
     ret                     ; return with (APUStatus || APUError) with carry set if no errors
 
 ;------------------------------------------------------------------------------
-;       APU_CMD_ld
+;       APU_CMD_LD
 ;
-;       DE = POINTER to OPERAND, IF REQUIRED
+;       DEHL = OPERAND, IF REQUIRED
 ;       A = APU COMMAND
+;
+;       BC = USED
 
-PUBLIC asm_am9511a_cmd_ld    
+PUBLIC _apu_cmd_ld_callee, asm_am9511a_cmd_ld    
 
-EXTERN APUCMDInPtr, APUDATAInPtr
-EXTERN APUCMDBufUsed, APUDATABufUsed, _APULock
+EXTERN APUCMDInPtr, APUDataEntInPtr
+EXTERN APUCMDBufUsed, APUDataEntBufUsed
+EXTERN _APULock
+
+_apu_cmd_ld_callee:
+    pop bc
+    pop hl
+    pop de
+    dec sp      
+    pop af
+    push bc
 
 asm_am9511a_cmd_ld:
-    push hl                 ; store HL so we don't clobber it
-
-    ld hl, _APULock         ; load the mutex lock address
-    sra (hl)                ; get the lock
-    jr C, am9511a_command_locked_exit   ; or not
+    ex de, hl               ; put low word in DE
+    ld b, h                 ; store high word in BC so we don't clobber it
+    ld c, l
 
     ld l, a                 ; store COMMAND so we don't clobber it
 
     ld a, (APUCMDBufUsed)   ; Get the number of bytes in the COMMAND buffer
     cp __APU_CMD_SIZE-1     ; check whether there is space in the buffer
-    jr NC, am9511a_command_exit ; COMMAND buffer full, so exit
+    ret NC                  ; COMMAND buffer full, so exit
     
-    cp __APU_DATA_SIZE-4    ; check whether there is space for an OPERAND
-    jr NC, am9511a_command_exit ; OPERAND buffer full, so exit
+    ld a, (APUDataEntBufUsed)   ; Get the number of bytes in the OPERAND entry buffer
+    cp +(__APU_DATA_SIZE/2)-4   ; check whether there is space for an OPERAND
+    ret NC                  ; OPERAND Load buffer full, so exit
 
     ld a, l                 ; recover the COMMAND
     ld hl, (APUCMDInPtr)    ; get the pointer to where we poke
@@ -1158,34 +1194,98 @@ asm_am9511a_cmd_ld:
     ld hl, APUCMDBufUsed
     inc (hl)                ; atomic increment of COMMAND count
 
-    and $F0                 ; mask only most significant nibble of COMMAND
-    cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
-    jr Z, am9511a_cmd_op    ; load an OPERAND pointer
-    cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
-    jr Z, am9511a_cmd_op    ; load an OPERAND pointer
+    cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND entry
+    jr Z, am9511a_op_ent16  ; load an OPERAND    
 
-am9511a_command_exit:
-    ld hl, _APULock         ; load the mutex lock address
-    ld (hl), $FE            ; give mutex lock
+    cp __IO_APU_OP_ENT32    ; check whether COMMAND is 4 byte OPERAND entry 
+    jr Z, am9511a_op_ent32  ; load an OPERAND
 
-am9511a_command_locked_exit:
-    pop hl                  ; recover HL
+    ret                     ; just complete, and exit
+
+am9511a_op_ent32:
+    call am9511a_op_ent16   ; load the low word
+
+    ld d, b                 ; get the high word
+    ld e, c
+
+am9511a_op_ent16:           ; load the high (or low) word
+    ld hl, (APUDataEntInPtr)   ; get the pointer to where we poke
+    ld (hl), e              ; write the low byte of OPERAND to the APUDataEntInPtr   
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    inc l
+    ld (hl), d              ; write the high byte of OPERAND to the APUDataEntInPtr   
+    inc l
+    inc l
+    ld (APUDataEntInPtr), hl   ; write where the next DATA should be poked
+
+    ld hl, APUDataEntBufUsed
+    inc (hl)                ; increment of OPERAND byte count
+    inc (hl)
     ret
 
-am9511a_cmd_op:
-    ld hl, (APUDATAInPtr)   ; get the pointer to where we poke
-    ld (hl), e              ; write the low byte of OPERAND to the APUDATAInPtr   
-    inc l                   ; move the POINTER low byte along, 0xFF rollover
-    ld (hl), d              ; write the high byte of OPERAND to the APUDATAInPtr   
+;------------------------------------------------------------------------------
+;       APU_OP_REM
+;
+;       HL = OPERAND POINTER
+;
+;       returns number of bytes recovered in L
+;       seeks to recover ALL bytes in the buffer to operand pointer
+;
+;       uses AF, BC, DE
+
+
+PUBLIC _apu_op_rem_callee, asm_am9511a_op_rem  
+
+EXTERN APUDataRemOutPtr
+EXTERN APUDataRemBufUsed
+EXTERN _APULock
+
+_apu_op_rem_callee:
+    pop af
+    pop hl
+    push af
+
+asm_am9511a_op_rem:
+    ld d, h                 ; store destination pointer in DE
+    ld e, l
+
+    ld a, (APUDataRemBufUsed)   ; Get the number of bytes in the OPERAND entry buffer
+    or a
+    jr Z, am9511a_op_rem_exit ; OPERAND buffer empty, so exit
+
+    ld c, a                 ; store OPERAND bytes count in C
+    dec a                   ; create index, rather than count
+    ld b, a                 ; store unload interations in B
+
+    ld hl, (APUDataRemOutPtr)   ; get the pointer to where we pop OPERANDS (BIG ENDED)
+    add a                   ; create interleaved (doubled) reverse index
+    add a, l
+    ld l, a                 ; point to LSB BIG ENDED
+    
+    push hl                 ; save last location for later
+
+am9511a_op_rem:    
+    ld a, (hl)              ; read LSB of OPERAND
+    ld (de), a              ; store it at our destination
+    dec l                   ; move the OPERAND POINTER low byte along, 0xFF rollover
+    dec l
+    inc de
+    djnz am9511a_op_rem     ; repeat for number of bytes to unload
+    
+    pop hl
     inc l
-    ld (APUDATAInPtr), hl   ; write where the next DATA should be poked
+    inc l
+    ld (APUDataRemOutPtr), hl  ; write the pointer to where we next pop OPERANDS (BIG ENDED)
 
-    ld hl, APUDATABufUsed
-    inc (hl)                ; increment of OPERAND count
-    inc (hl)
+    xor a                   ; set buffer fullness to zero
+    ld  (APUDataRemBufUsed), a
+    
+    ld a, c                 ; store total bytes recovered in A
 
-    jr am9511a_command_exit
-
+am9511a_op_rem_exit:
+    ld h, 0
+    ld l, a                 ; exit with total bytes recovered in L (and A)
+    ret
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 driver - asci0 functions
@@ -1904,7 +2004,7 @@ rhex_nibble:
 ;       OUTPUT SUBROUTINES
 ;
 
-    ; print string, modifies AF, DE, & HL
+    ; print string from location in DE, modifies AF, DE, & HL
 pstring: 
     ld a, (de)          ; Get character from DE address
     or a                ; Is it $00 ?
