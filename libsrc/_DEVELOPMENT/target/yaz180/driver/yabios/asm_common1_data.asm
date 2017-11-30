@@ -38,15 +38,14 @@ PUBLIC APUCMDBuf, APUDataBuf
 APUCMDBuf:      defs    __APU_CMD_SIZE
 APUDataBuf:     defs    __APU_DATA_SIZE
 
-PUBLIC asci0RxBuffer, asci0TxBuffer
+PUBLIC asci0RxBuffer, asci1RxBuffer
 
 asci0RxBuffer:  defs    __ASCI0_RX_SIZE ; Space for the Rx0 Buffer
-asci0TxBuffer:  defs    __ASCI0_TX_SIZE ; Space for the Tx0 Buffer
-
-PUBLIC asci1RxBuffer, asci1TxBuffer
-
 asci1RxBuffer:  defs    __ASCI1_RX_SIZE ; Space for the Rx1 Buffer
-asci1TxBuffer:  defs    __ASCI1_TX_SIZE ; Space for the Tx1 Buffer
+
+PUBLIC asciTxBuffer
+
+asciTxBuffer:   defs    __ASCI0_TX_SIZE+__ASCI1_TX_SIZE ; Space for the Tx0 & Tx1 Buffer
 
 ; optionally, pad to next 256 byte boundary
 
@@ -111,8 +110,8 @@ _asci0RxLock:   defb    $FE             ; mutex for Rx0
 PUBLIC asci0TxCount, asci0TxIn, asci0TxOut, _asci0TxLock
 
 asci0TxCount:   defb    0               ; Space for Tx Buffer Management
-asci0TxIn:      defw    asci0TxBuffer   ; non-zero item since it's initialized anyway
-asci0TxOut:     defw    asci0TxBuffer   ; non-zero item since it's initialized anyway
+asci0TxIn:      defw    asciTxBuffer    ; non-zero item since it's initialized anyway
+asci0TxOut:     defw    asciTxBuffer    ; non-zero item since it's initialized anyway
 _asci0TxLock:   defb    $FE             ; mutex for Tx0
 
 PUBLIC asci1RxCount, asci1RxIn, asci1RxOut, _asci1RxLock
@@ -125,8 +124,8 @@ _asci1RxLock:   defb    $FE             ; mutex for Rx1
 PUBLIC asci1TxCount, asci1TxIn, asci1TxOut, _asci1TxLock
 
 asci1TxCount:   defb    0               ; Space for Tx Buffer Management
-asci1TxIn:      defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
-asci1TxOut:     defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
+asci1TxIn:      defw    asciTxBuffer+1  ; non-zero item since it's initialized anyway
+asci1TxOut:     defw    asciTxBuffer+1  ; non-zero item since it's initialized anyway
 _asci1TxLock:   defb    $FE             ; mutex for Tx1
 
 PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr

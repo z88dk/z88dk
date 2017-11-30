@@ -1348,6 +1348,7 @@ ASCI0_TX_CHECK:                 ; now start doing the Tx stuff
     out0 (TDR0), a              ; output the Tx byte to the ASCI0
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci0TxOut), hl         ; write where the next byte should be popped
 
     ld hl, asci0TxCount
@@ -1428,7 +1429,7 @@ _asci0_flush_Rx:
 PUBLIC _asci0_flush_Tx_di
 PUBLIC _asci0_flush_Tx
 
-EXTERN asci0TxCount, asci0TxIn, asci0TxOut, asci0TxBuffer, _asci0TxLock
+EXTERN asci0TxCount, asci0TxIn, asci0TxOut, asciTxBuffer, _asci0TxLock
 
 _asci0_flush_Tx_di:
     push af
@@ -1451,7 +1452,7 @@ _asci0_flush_Tx:
     xor a
     ld (asci0TxCount), a        ; reset the Tx counter (set 0)
 
-    ld hl, asci0TxBuffer        ; load Tx buffer pointer home
+    ld hl, asciTxBuffer         ; load Tx buffer pointer home
     ld (asci0TxIn), hl
     ld (asci0TxOut), hl
 
@@ -1577,6 +1578,7 @@ asci0_put_buffer_tx:
     ld (hl), a                  ; write the Tx byte to the asci0TxIn
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci0TxIn), hl          ; write where the next byte should be poked
 
     ld hl, asci0TxCount
@@ -1660,6 +1662,7 @@ ASCI1_TX_CHECK:                 ; now start doing the Tx stuff
     out0 (TDR1), a              ; output the Tx byte to the ASCI1
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci1TxOut), hl         ; write where the next byte should be popped
 
     ld hl, asci1TxCount
@@ -1740,7 +1743,7 @@ _asci1_flush_Rx:
 PUBLIC _asci1_flush_Tx_di
 PUBLIC _asci1_flush_Tx
 
-EXTERN asci1TxCount, asci1TxIn, asci1TxOut, asci1TxBuffer, _asci1TxLock
+EXTERN asci1TxCount, asci1TxIn, asci1TxOut, asciTxBuffer, _asci1TxLock
 
 
 _asci1_flush_Tx_di:
@@ -1765,7 +1768,7 @@ _asci1_flush_Tx:
     xor a
     ld (asci1TxCount), a        ; reset the Tx counter (set 0)
 
-    ld hl, asci1TxBuffer        ; load Tx buffer pointer home
+    ld hl, asciTxBuffer+1       ; load Tx buffer pointer home
     ld (asci1TxIn), hl
     ld (asci1TxOut), hl
 
@@ -1891,6 +1894,7 @@ asci1_put_buffer_tx:
     ld (hl), a                  ; write the Tx byte to the asci1TxIn
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci1TxIn), hl          ; write where the next byte should be poked
 
     ld hl, asci1TxCount
