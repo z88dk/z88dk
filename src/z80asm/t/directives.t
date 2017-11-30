@@ -17,47 +17,6 @@ BEGIN {
 };
 
 #------------------------------------------------------------------------------
-# DEFGROUP - simple use tested in opcodes.t
-# test error messages here
-#------------------------------------------------------------------------------
-z80asm(
-	asm 	=> <<END,
-	defgroup {
-		dg1 = 65535
-		dg2	= 65536					;; error: integer '65536' out of range
-		dg3 = -32768
-		dg4 = -32769				;; error: integer '-32769' out of range
-		dg5 = undefined				;; error: symbol 'undefined' not defined
-	}
-END
-);
-
-z80asm(
-	asm 	=> <<END,
-	defgroup 
-END
-	error	=> "Error at file 'test.asm' line 2: missing {} block",
-);
-
-z80asm(
-	asm 	=> <<END,
-	defgroup {
-END
-	error	=> "Error at file 'test.asm' line 2: {} block not closed",
-);
-
-# BUG_0032 : DEFGROUP ignores name after assignment
-z80asm(
-	asm 	=> <<END,
-		defgroup
-		{
-			f10 = 10, f11
-		}
-		defb f10, f11		;; 0A 0B
-END
-);
-
-#------------------------------------------------------------------------------
 # DEFINE / UNDEFINE
 #------------------------------------------------------------------------------
 z80asm(asm => "DEFINE 			;; error: syntax error");
@@ -211,7 +170,7 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF11
   Name: test
   Names:
     L A $0000 main test.asm:1
@@ -228,7 +187,7 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF11
   Name: lib
   Names:
     L A $0000 main test.asm:2
@@ -246,7 +205,7 @@ END
 );
 z80nm("test.o", <<'END');
 
-File test.o at $0000: Z80RMF09
+File test.o at $0000: Z80RMF11
   Name: lib2
   Names:
     L A $0000 main test.asm:3
@@ -254,141 +213,6 @@ File test.o at $0000: Z80RMF09
     C $0000: C9
 END
 
-
-#------------------------------------------------------------------------------
-# ORG
-#------------------------------------------------------------------------------
-
-# no ORG defined
-z80asm(
-	asm		=> "start: jp start ;; C3 00 00",
-);
-
-# ORG defined
-z80asm(
-	asm		=> "org 0x1234 \n start: jp start ;; C3 34 12",
-);
-z80asm(
-	asm		=> "defc org = 0x1234 \n org org \n start: jp start ;; C3 34 12",
-);
-
-# ORG defined and overridden by command line
-z80asm(
-	options	=> "-b -r0x1234",
-	asm		=> "org 0x1000 \n start: jp start ;; C3 34 12",
-);
-
-# no ORG
-z80asm(
-	asm		=> "org ;; error: syntax error",
-);
-
-# ORG redefined
-z80asm(
-	asm		=> "org 0x1234 \n org 0x5678 ;; error: ORG redefined",
-);
-
-# ORG OK
-z80asm(
-	asm		=> "org 0 \n jp ASMPC ;; C3 00 00",
-);
-z80asm(
-	asm		=> "org 65535 \n defb ASMPC & 0xFF ;; FF",
-);
-z80asm(
-	asm		=> "org 65535 \n defb ASMPC >> 8 ;; FF",
-);
-
-# ORG out of range
-z80asm(
-	asm		=> "org -2 		;; error: integer '-2' out of range",
-);
-z80asm(
-	asm		=> "org 65536 	;; error: integer '65536' out of range",
-);
-
-# ORG not constant
-z80asm(
-	asm		=> "org start ;; error: symbol 'start' not defined",
-);
-
-# -r, --origin -- tested in options.t
-
-# BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
-z80asm(
-	asm		=> "jr ASMPC+2-129 ;; error: integer '-129' out of range",
-);
-z80asm(
-	asm		=> "jr ASMPC+2+128 ;; error: integer '128' out of range",
-);
-
-# --split-bin, ORG -1
-z80asm(
-	asm 	=> <<END,
-	defw ASMPC
-	
-	section code
-	defw ASMPC
-	
-	section data
-	defw ASMPC
-	
-	section bss		; split file here
-	org 0x4000
-	defw ASMPC
-END
-	bin		=> pack("v*", 0, 2, 4),
-);
-ok   -f "test.bin";
-ok ! -f "test_code.bin";
-ok ! -f "test_data.bin";
-test_binfile("test_bss.bin", pack("v*", 0x4000));
-
-z80asm(
-	options	=> "-b --split-bin",
-	asm 	=> <<END,
-	defw ASMPC		; split file here
-	
-	section code	; split file here
-	defw ASMPC
-	
-	section data	; split file here
-	defw ASMPC
-	
-	section bss		; split file here
-	org 0x4000
-	defw ASMPC
-END
-	bin		=> pack("v*", 0),
-);
-ok   -f "test.bin";
-test_binfile("test_code.bin", 	pack("v*", 2));
-test_binfile("test_data.bin", 	pack("v*", 4));
-test_binfile("test_bss.bin", 	pack("v*", 0x4000));
-
-# ORG -1 to split
-z80asm(
-	options	=> "-b",
-	asm 	=> <<END,
-	defw ASMPC
-	
-	section code
-	defw ASMPC
-	
-	section data	; split file here
-	org 0x4000
-	defw ASMPC
-	
-	section bss		; split file here
-	org -1
-	defw ASMPC
-END
-	bin		=> pack("v*", 0, 2),
-);
-ok   -f "test.bin";
-ok ! -f "test_code.bin";
-test_binfile("test_data.bin", 	pack("v*", 0x4000));
-test_binfile("test_bss.bin", 	pack("v*", 0x4002));
 
 #------------------------------------------------------------------------------
 # EXTERN / PUBLIC

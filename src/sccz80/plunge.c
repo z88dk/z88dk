@@ -35,7 +35,9 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
             postlabel(endlab);
             lval->val_type = lval->oldval_kind = KIND_INT; /* stops the carry stuff coming in */
             lval->ltype = type_int;
-            lval->indirect_kind = lval->ptr_type = lval->is_const = lval->const_val = 0;
+            lval->indirect_kind = KIND_NONE;
+            lval->ptr_type = lval->is_const = 0;
+            lval->const_val = 0;
             lval->stage_add = NULL;
             lval->binop = dummy;
             return (0);
@@ -106,8 +108,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     char *before, *start;
     char *before_constlval, *start_constlval;
     int   savesp;
-    int   lhs_val_type = lval->val_type;
-    int   rhs_val_type;
+    Kind   lhs_val_type = lval->val_type;
+    Kind   rhs_val_type;
     int   lval1_wasconst = 0;
 
     savesp = Zsp;
@@ -225,7 +227,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 } else {
                     vconst(0);
                 }
-                warning(W_DIVZERO);
+                warningfmt("Division by zero, result set to be zero");
                 return;
             }
         }
@@ -311,9 +313,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         //     lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
         // if (lval2->is_const)
         //     lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
-
-        if ( (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv))
-            warning(W_OPSG);
+        if ( lval2->is_const == 0 && lval1_wasconst == 0 &&
+            (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv)) {
+            warningfmt("Operation on different signedness!");
+        }
+        
 
         // Remove any function type decorators
         //lval->flags &= (FAR);
@@ -323,16 +327,17 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             int doconstoper = 0;
             int32_t const_val;
 
+
             if ( lval2->is_const && (lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval->val_type == KIND_LONG) ) {
                 doconstoper = 1;
-                const_val = lval2->const_val;
+                const_val = (uint32_t)lval2->const_val;
                 clearstage(before, 0);
                 force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, 0);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR || lval2->val_type == KIND_LONG) ) {
                 doconstoper = 1;
-                const_val = lval->const_val;
+                const_val = (uint32_t)lval->const_val;
                 clearstage(before_constlval, 0);
                 force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval2->ltype->isunsigned,0);
             }

@@ -26,9 +26,11 @@ OBJS =	callfunc.o     	\
 	while.o 	\
 	declparse.o
 
+DEPENDS := $(OBJS:.o=.d)
+
 all: sccz80$(EXESUFFIX)
 
-CFLAGS +=  -Wall -I../../ext/uthash/src/
+CFLAGS += -MMD -Wall -I../../ext/uthash/src/ 
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm
@@ -39,6 +41,7 @@ install:
 clean :
 	$(RM) *.o *~ core sccz80$(EXESUFFIX)
 	$(RM) -rf Debug Release
+	$(RM) $(DEPENDS)
 
-# Dependencies (gcc -MM)
-%.c: ccdefs.h define.h
+
+-include $(DEPENDS)

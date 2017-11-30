@@ -61,6 +61,7 @@ section rodata_dot
 section smc_dot
 section data_dot
 section bss_dot
+section bss_dot_uninitialized
 
 SECTION CODE_END
 
@@ -252,6 +253,7 @@ section bss_user
 
 section BSS_UNINITIALIZED
 SECTION BSS_END
+SECTION DTX_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

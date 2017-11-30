@@ -21,7 +21,7 @@ static char   **gargv;
 static SYMBOL  *savecurr;    /* copy of currfn for #include */
 static int      saveline;    /* copy of lineno  "    " */
 static int      saveinfn;    /* copy of infunc  "    " */
-static int      savestart;   /* copy of fnstart "    " */
+static int      filenum; /* next argument to be used */
 
 
 char Filenorig[FILENAME_LEN + 1];
@@ -38,6 +38,13 @@ int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
 int c_line_labels = 0;
 int c_cline_directive = 0;
+int c_cpu = CPU_Z80;
+
+/* Settings for genmath + math48 */
+int c_fp_mantissa_bytes = 5;
+int c_fp_exponent_bias = 128;
+
+
 uint32_t c_size_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 
 char *c_rodata_section = "rodata_compiler";
@@ -80,10 +87,6 @@ static int parse_arguments(option *args, int argc, char **argv);
 static void SetAssembler(option *arg, char* val);
 static void SetDefine(option *arg, char *val);
 static void SetUndefine(option *arg, char *val);
-static void UnSetWarning(option *arg, char *val);
-static void SetWarning(option *arg, char *val);
-static void SetNoWarn(option *arg, char* val);
-static void SetAllWarn(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
 static void set_math_z88_parameters(option *opt, char *arg);
 static void opt_code_size(option *arg, char* val);
@@ -102,8 +105,6 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
     { 0, "do-inline", OPT_ASSIGN|OPT_INT, "Inlne some common functions", &c_doinline, ~0 },
-    { 0, "inline-gint", OPT_OR, "Inline the l_gint call", &c_doinline, INLINE_GINT },
-    { 0, "inline-pint", OPT_OR, "Inline the l_pint call", &c_doinline, INLINE_PINT },
     { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
     { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
@@ -120,7 +121,6 @@ static option  sccz80_opts[] = {
     { 0, "bssseg", OPT_STRING, "=<name> Set the bss section name", &c_bss_section, 0 },
     { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, 0 },
     { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, 0 },
-    { 0, "glabels", OPT_BOOL, "Generate line labels", &c_line_labels, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION, "Optimise for speed not size", opt_code_size, 0},
 #ifdef USEFRAME
@@ -137,11 +137,12 @@ static option  sccz80_opts[] = {
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },
     { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, 0 },
+#if 0
     { 0, "Wnone", OPT_FUNCTION|OPT_BOOL, "Disable all warnings", SetNoWarn, 0 },
     { 0, "Wall", OPT_FUNCTION|OPT_BOOL, "Enable all warnings", SetAllWarn, 0 },
     { 0, "Wn", OPT_FUNCTION, "<num> Disable a warning", UnSetWarning, 0},
     { 0, "W", OPT_FUNCTION, "<num> Enable a warning",  SetWarning, 0 },
-    
+#endif
     { 0, "", OPT_HEADER, "Debugging options", NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, 0 },
     { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, 0 },
@@ -190,7 +191,7 @@ int main(int argc, char** argv)
     glbcnt = 0; /* clear global symbols */
     locptr = STARTLOC; /* clear local symbols */
     wqptr = wqueue; /* clear while queue */
-    gltptr = dubptr = 0; /* clear literal pools */
+    gltptr = 0; /* clear literal pools */
     *litq = 0; /* First entry in literal queue is zero */
     litptr = 1; /* So miniprintf search works */
 
@@ -198,12 +199,8 @@ int main(int argc, char** argv)
         errcnt = /* no errors */
         c_errstop = /* keep going after an error */
         eof = /* not eof yet */
-        swactive = /* not in switch */
-        skiplevel = /* #if not encountered */
-        iflevel = /* #if nesting level = 0 */
         ncmp = /* no open compound states */
         lastst = /* not first file to asm */
-        fnstart = /* current "function" started at line 0 */
         lineno = /* no lines read from file */
         infunc = /* not in function now */
         0; /*  ...all set to zero.... */
@@ -217,7 +214,7 @@ int main(int argc, char** argv)
 
     currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = c_doinline = c_mathz88 = need_floatpack = c_compact_code = 0;
+    ncomp = c_doinline = need_floatpack = c_compact_code = 0;
     c_default_unsigned = NO;
     c_useshared = c_makeshare = c_shared_file = NO;
     nxtlab = 0;/* start numbers at lowest possible */
@@ -320,7 +317,7 @@ void errsummary()
 {
     /* see if anything left hanging... */
     if (ncmp) {
-        error(E_BRACKET);
+        errorfmt("Missing closing bracket", 0);
         nl();
     }
     if (c_verbose) {
@@ -362,13 +359,16 @@ void setup_sym()
 {
     defmac("Z80");
     defmac("SMALL_C");
+
+    addglb("asm", asm_function("asm"), 0, KIND_VOID, 0, LSTATIC);
+    addglb("__asm__", asm_function("__asm__"), 0, KIND_VOID, 0, LSTATIC);
 }
 
 void info()
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
-    fputs("\n(C) 1980-2016 Cain, Van Zandt, Hendrix, Yorston, Morris\n", stderr);
+    fputs("\n(C) 1980-2017 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
@@ -420,17 +420,12 @@ static void dumpfns()
     }
 
     if ((fp = fopen("zcc_opt.def", "a")) == NULL) {
-        error(E_ZCCOPT);
+        errorfmt("Can't open zcc_opt.def file", 1);
     }
 
     if (need_floatpack) {
         fprintf(fp, "\nIF !NEED_floatpack\n");
         fprintf(fp, "\tDEFINE\tNEED_floatpack\n");
-        fprintf(fp, "ENDIF\n\n");
-    }
-    if (c_mathz88) {
-        fprintf(fp, "\nIF !NEED_c_mathz88\n");
-        fprintf(fp, "\tDEFINE\tNEED_c_mathz88\n");
         fprintf(fp, "ENDIF\n\n");
     }
     /*
@@ -494,7 +489,7 @@ void WriteDefined(char* sname, int value)
     FILE* fp;
 
     if ((fp = fopen("zcc_opt.def", "a")) == NULL) {
-        error(E_ZCCOPT);
+        errorfmt("Can't open zcc_opt.def file", 1);
     }
     fprintf(fp, "\nIF !DEFINED_%s\n", sname);
     fprintf(fp, "\tdefc\tDEFINED_%s = 1\n", sname);
@@ -709,7 +704,6 @@ void openin()
 void newfile()
 {
     lineno = /* no lines read */
-        fnstart = /* no fn. start yet. */
         infunc = 0; /* therefore not in fn. */
     currfn = NULL; /* no fn. yet */
 }
@@ -730,7 +724,7 @@ void doinclude()
     }
 
     if (inpt2) {
-        error(E_NEST);
+        errorfmt("Can't nest include files", 1);
     } else {
         /* ignore quotes or angle brackets round file name */
         strcpy(name, line + lptr);
@@ -740,14 +734,13 @@ void doinclude()
             ++cp;
         }
         if ((inpt2 = fopen(cp, "r")) == NULL) {
-            error(E_INCLUDE);
+            errorfmt( "Can't open include file", 1 );
             closeout();
             exit(1);
         } else {
             saveline = lineno;
             savecurr = currfn;
             saveinfn = infunc;
-            savestart = fnstart;
             newfile();
         }
     }
@@ -771,7 +764,6 @@ void endinclude()
     lineno = saveline;
     currfn = savecurr;
     infunc = saveinfn;
-    fnstart = savestart;
 }
 
 /*
@@ -896,40 +888,6 @@ static void set_math_z88_parameters(option *opt, char *arg)
     c_fp_mantissa_bytes = 4;
 }
 
-
-void UnSetWarning(option *arg, char* val)
-{
-    int num;
-    num = 0;
-    sscanf(val, "%d", &num);
-    if (num < W_MAXIMUM)
-        mywarn[num].suppress = 1;
-}
-
-void SetWarning(option *arg, char* val)
-{
-    int num;
-    num = 0;
-    sscanf(val, "%d", &num);
-    if (num < W_MAXIMUM)
-        mywarn[num].suppress = 0;
-}
-
-
-
-void SetNoWarn(option *arg, char* val)
-{
-    int i;
-    for (i = 1; i < W_MAXIMUM; i++)
-        mywarn[i].suppress = 1;
-}
-
-void SetAllWarn(option *arg, char* val)
-{
-    int i;
-    for (i = 1; i < W_MAXIMUM; i++)
-        mywarn[i].suppress = 0;
-}
 
 
 

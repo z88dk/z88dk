@@ -12,7 +12,7 @@
         PUBLIC    cpc_DeleteKeys
         PUBLIC    _cpc_DeleteKeys
         
-        EXTERN cpc_KeysData
+;        EXTERN cpc_KeysData
 		EXTERN tabla_teclas
 
 		;borra la tabla de las teclas para poder redefinirlas todas
@@ -21,8 +21,8 @@
 .cpc_DeleteKeys
 ._cpc_DeleteKeys
 
-	LD HL,cpc_KeysData+tabla_teclas
-	LD DE,cpc_KeysData+tabla_teclas+1
+	LD HL,tabla_teclas
+	LD DE,tabla_teclas+1
 	LD BC, 24
 	LD (HL),$FF
 	LDIR

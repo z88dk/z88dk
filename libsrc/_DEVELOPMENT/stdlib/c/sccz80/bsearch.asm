@@ -32,3 +32,10 @@ bsearch:
    
    exx
    jp asm_bsearch
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _bsearch
+defc _bsearch = bsearch
+ENDIF
+

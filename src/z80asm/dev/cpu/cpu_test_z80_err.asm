@@ -44,11 +44,6 @@
  add de, 32767                  ; Error
  add de, 65535                  ; Error
  add de, a                      ; Error
- add dehl, -32768               ; Error
- add dehl, 32767                ; Error
- add dehl, 65535                ; Error
- add dehl, a                    ; Error
- add dehl, bc                   ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
@@ -1786,19 +1781,15 @@
  dec c'                         ; Error
  dec d'                         ; Error
  dec de'                        ; Error
- dec dehl                       ; Error
  dec e'                         ; Error
  dec h'                         ; Error
  dec hl'                        ; Error
  dec l'                         ; Error
  djnz b', ASMPC                 ; Error
  ex (sp), hl'                   ; Error
- ex a32, dehl                   ; Error
  ex de', hl                     ; Error
  ex de', hl'                    ; Error
  ex de, hl'                     ; Error
- fill de                        ; Error
- fillde                         ; Error
  idet                           ; Error
  im -1                          ; Error
  im -1                          ; Error
@@ -1837,7 +1828,6 @@
  inc c'                         ; Error
  inc d'                         ; Error
  inc de'                        ; Error
- inc dehl                       ; Error
  inc e'                         ; Error
  inc h'                         ; Error
  inc hl'                        ; Error
@@ -4047,7 +4037,6 @@
  ld a, eir                      ; Error
  ld a, iir                      ; Error
  ld a, xpc                      ; Error
- ld a32, dehl                   ; Error
  ld b', (hl)                    ; Error
  ld b', (ix)                    ; Error
  ld b', (ix+127)                ; Error
@@ -4115,7 +4104,6 @@
  ld de', 65535                  ; Error
  ld de', bc                     ; Error
  ld de', de                     ; Error
- ld dehl, a32                   ; Error
  ld e', (hl)                    ; Error
  ld e', (ix)                    ; Error
  ld e', (ix+127)                ; Error
@@ -4187,7 +4175,6 @@
  ld hl, (sp+255)                ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
- ld hl, sp                      ; Error
  ld iir, a                      ; Error
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
@@ -4338,6 +4325,7 @@
  mmu7 255                       ; Error
  mmu7 a                         ; Error
  mul                            ; Error
+ mul d, e                       ; Error
  neg a'                         ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error
@@ -4404,7 +4392,6 @@
  pop hl'                        ; Error
  pop ip                         ; Error
  pop su                         ; Error
- popx                           ; Error
  push -32768                    ; Error
  push 32767                     ; Error
  push 65535                     ; Error
@@ -4931,10 +4918,7 @@
  sub a', e                      ; Error
  sub a', h                      ; Error
  sub a', l                      ; Error
- sub dehl, a                    ; Error
- sub dehl, bc                   ; Error
  sures                          ; Error
- swap                           ; Error
  swapnib                        ; Error
  syscall                        ; Error
  test (hl)                      ; Error

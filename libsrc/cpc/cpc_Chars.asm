@@ -8,7 +8,7 @@
 ;       $Id: cpc_Chars.asm $
 ;
 
-        SECTION   bss_data
+        SECTION   data_clib
         PUBLIC    cpc_Chars
         PUBLIC    _cpc_Chars
         PUBLIC    first_char
@@ -29,7 +29,7 @@ defb @00110011
 defb @00110011
 defb @00111111
 defb @00000000
-;1      
+;1
 defb @00010100
 defb @00000100
 defb @00001000
@@ -38,7 +38,7 @@ defb @00001100
 defb @00001100
 defb @00111111
 defb @00000000
-;2      
+;2
 defb @00000101
 defb @00010001
 defb @00000010
@@ -47,7 +47,7 @@ defb @00110000
 defb @00110000
 defb @00111111
 defb @00000000
-;3      
+;3
 defb @00000101
 defb @00010001
 defb @00000010
@@ -56,7 +56,7 @@ defb @00000011
 defb @00110011
 defb @00001100
 defb @00000000
-;4      
+;4
 defb @00010001
 defb @00010001
 defb @00100010
@@ -65,7 +65,7 @@ defb @00000011
 defb @00000011
 defb @00000011
 defb @00000000
-;5      
+;5
 defb @00010101
 defb @00010000
 defb @00100000
@@ -74,7 +74,7 @@ defb @00000011
 defb @00000011
 defb @00111100
 defb @00000000
-;6      
+;6
 defb @00000101
 defb @00010000
 defb @00100000
@@ -83,7 +83,7 @@ defb @00110011
 defb @00110011
 defb @00001100
 defb @00000000
-;7      
+;7
 defb @00010101
 defb @00000001
 defb @00000010
@@ -92,7 +92,7 @@ defb @00001100
 defb @00110000
 defb @00110000
 defb @00000000
-;8      
+;8
 defb @00000100
 defb @00010001
 defb @00100010
@@ -101,7 +101,7 @@ defb @00110011
 defb @00110011
 defb @00001100
 defb @00000000
-;9      
+;9
 defb @00000100
 defb @00010001
 defb @00100010

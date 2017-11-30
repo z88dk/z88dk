@@ -38,6 +38,7 @@ CLASS( Section )
 	int			 addr;				// start address of this section,
 									// computed by sections_alloc_addr()
     int			 origin;			// ORG address of section, -1 if not defined
+	int			 align;				// if align>1, section is aligned at align-boundaries
 	Bool		 origin_found : 1;	// ORG already found in code
 	Bool		 origin_opts : 1;	// ORG was defined from command line options,
 									// override asm code
@@ -45,6 +46,7 @@ CLASS( Section )
 									// should be output to a new binary file
 	Bool		 max_codesize_issued : 1;
 									// error_max_codesize issued, ignore next calls
+	Bool		 align_found : 1;	// ALIGN already found in this section
 	int			 asmpc;				// address of current opcode relative to start
 									// of the current module, reset to 0 at start
 									// of each module
@@ -132,8 +134,11 @@ extern void  patch_byte( int addr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
 extern void append_2bytes( Byte byte1, Byte byte2 );
 
-extern void  patch_word( int addr, int word );			/* 2-byte word */
-extern void append_word( int word );
+extern void  patch_word(int addr, int word);			/* 2-byte word */
+extern void append_word(int word);
+
+extern void  patch_word_be(int addr, int word);			/* 2-byte word big endian*/
+extern void append_word_be(int word);
 
 extern void  patch_long( int addr, long dword );		/* 4-byte long */
 extern void append_long( long dword );

@@ -18,3 +18,10 @@ ltoa_callee:
    push af
    
    jp asm_ltoa
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ltoa_callee
+defc _ltoa_callee = ltoa_callee
+ENDIF
+

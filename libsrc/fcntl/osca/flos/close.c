@@ -19,7 +19,7 @@ int close(int myfile)
 {
 	struct flos_file *flosfile;
 
-	flosfile = (char *) myfile;
+	flosfile = (void *) myfile;
 	flosfile->name[0]=0;
 }
 

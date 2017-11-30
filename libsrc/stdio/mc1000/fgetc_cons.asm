@@ -26,7 +26,6 @@ IF STANDARDESCAPECHARS
 	ld	a,10
 .not_return
 ENDIF
-
 	ld l,a
 	ld h,0
 	ret

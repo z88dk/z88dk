@@ -58,7 +58,8 @@ static struct zx_common zxc = {
     NULL,       // banked_space
     NULL,       // excluded_banks
     NULL,       // excluded_sections
-    0           // clean
+    0,          // clean
+    -1          // main_fence applies to banked model compiles only
 };
 
 static struct zx_tape zxt = {
@@ -103,6 +104,7 @@ option_t zx_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &zxc.crtfile },
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &zxc.binname },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &zxc.origin },
+    { 0 , "main-fence", "Main bin restricted below this address", OPT_INT, &zxc.main_fence },
     { 'o', "output",   "Name of output file\n",      OPT_STR,   &zxc.outfile },
 
     { 0,  "bin",      "Make .bin instead of .tap",  OPT_BOOL,  &bin },
@@ -181,11 +183,11 @@ int zx_exec(char *target)
 
     tap = !dot && !sna && !bin;
 
+    if (tap && (zxc.main_fence > 0))
+        fprintf(stderr, "Warning: Main-fence is ignored for tap and dot compiles\n");
+
     if (tap)
         return zx_tape(&zxc, &zxt);
-
-    if (dot)
-        return zx_dot_command(&zxc);
 
     // output formats below need banked memory model
 
@@ -265,7 +267,7 @@ int zx_exec(char *target)
         printf("Excluding sections from output\n");
         for (s = strtok(zxc.excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
         {
-            if (mb_remove_section(&memory, s))
+            if (mb_remove_section(&memory, s, 0))
                 printf("..removed section %s\n", s);
             else
                 printf("..section %s not found\n", s);
@@ -343,7 +345,33 @@ int zx_exec(char *target)
     if (mb_sort_banks(&memory))
         exit_log(1, "Aborting... one or more binaries overlap\n");
 
+    // check if main binary extends past fence
+
+    if (zxc.main_fence > 0)
+    {
+        struct memory_bank *mb = &memory.mainbank;
+
+        if (mb->num > 0)
+        {
+            struct section_bin *last = &mb->secbin[mb->num - 1];
+
+            if ((last->org + last->size) > zxc.main_fence)
+                exit_log(1, "Error: Main bank has exceeded its maximum allowed size by %u bytes (last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - zxc.main_fence, last->org + last->size - 1, zxc.main_fence);
+        }
+    }
+
     // now the output formats
+
+    if (dot)
+    {
+        if ((ret = zx_dot_command(&zxc, &memory)) != 0)
+            return ret;
+
+        // dot command is out but we need to process binaries in other memory banks
+        // remove the mainbank so as not to process it again
+
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
+    }
 
     if (sna)
     {
@@ -353,21 +381,7 @@ int zx_exec(char *target)
         // sna snapshot is out but we need to process the rest of the binaries too
         // so remove mainbank and banks 0-7 from memory model so as not to treat those again
 
-        for (i = 0; i < memory.mainbank.num; ++i)
-        {
-            struct section_bin *sb = &memory.mainbank.secbin[i];
-
-            if (zxc.clean)
-                remove(sb->filename);
-
-            free(sb->filename);
-            free(sb->section_name);
-        }
-
-        free(memory.mainbank.secbin);
-
-        memory.mainbank.num = 0;
-        memory.mainbank.secbin = NULL;
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
 
         if (bsnum_bank >= 0)
         {
@@ -376,7 +390,7 @@ int zx_exec(char *target)
         }
     }
 
-    if (bin || sna)
+    if (bin || sna || dot)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
         ret = 0;

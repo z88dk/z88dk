@@ -51,6 +51,16 @@
 
 #define __USE_SPECTRUM_128_SECOND_DFILE  0
 
+#define __USE_SYSVAR  0
+
+#define __USE_ZXN_OPCODES  0
+
+#define __USE_ZXN_OPCODES_NEXTREG  1
+#define __USE_ZXN_OPCODES_MLT  2
+#define __USE_ZXN_OPCODES_LDIR  4
+#define __USE_ZXN_OPCODES_DISPLAY  8
+#define __USE_ZXN_OPCODES_OTHER  16
+
 
 
 
@@ -568,7 +578,7 @@
 #define __ESXDOS_SYS_F_RENAME  176
 #define __ESXDOS_SYS_F_GETFREE  177
 
-#define __ESXDOS_PATH_MAX  128
+#define __ESXDOS_PATH_MAX  256
 #define __ESXDOS_NAME_MAX  12
 
 #define __ESXDOS_MODE_READ  0x01
@@ -1136,6 +1146,172 @@
 
 
 
+#define __NEXTOS_DOS_VERSION  0x0103
+#define __NEXTOS_DOS_OPEN  0x0106
+#define __NEXTOS_DOS_CLOSE  0x0109
+#define __NEXTOS_DOS_ABANDON  0x010c
+#define __NEXTOS_DOS_REF_HEAD  0x010f
+#define __NEXTOS_DOS_READ  0x0112
+#define __NEXTOS_DOS_WRITE  0x0115
+#define __NEXTOS_DOS_BYTE_READ  0x0118
+#define __NEXTOS_DOS_BYTE_WRITE  0x011b
+#define __NEXTOS_DOS_CATALOG  0x011e
+#define __NEXTOS_DOS_FREE_SPACE  0x0121
+#define __NEXTOS_DOS_DELETE  0x0124
+#define __NEXTOS_DOS_RENAME  0x0127
+#define __NEXTOS_DOS_BOOT  0x012a
+#define __NEXTOS_DOS_SET_DRIVE  0x012d
+#define __NEXTOS_DOS_SET_USER  0x0130
+#define __NEXTOS_DOS_GET_POSITION  0x0133
+#define __NEXTOS_DOS_SET_POSITION  0x0136
+#define __NEXTOS_DOS_GET_EOF  0x0139
+#define __NEXTOS_DOS_GET_1346  0x013c
+#define __NEXTOS_DOS_SET_1346  0x013f
+#define __NEXTOS_DOS_FLUSH  0x0142
+#define __NEXTOS_DOS_SET_ACCESS  0x0145
+#define __NEXTOS_DOS_SET_ATTRIBUTES  0x0148
+#define __NEXTOS_DOS_SET_MESSAGE  0x014e
+
+#define __NEXTOS_IDE_VERSION  0x00a0
+#define __NEXTOS_IDE_SWAP_OPEN  0x00d9
+#define __NEXTOS_IDE_SWAP_CLOSE  0x00dc
+#define __NEXTOS_IDE_SWAP_OUT  0x00df
+#define __NEXTOS_IDE_SWAP_IN  0x00e2
+#define __NEXTOS_IDE_SWAP_EX  0x00e5
+#define __NEXTOS_IDE_SWAP_POS  0x00e8
+#define __NEXTOS_IDE_SWAP_MOVE  0x00eb
+#define __NEXTOS_IDE_SWAP_RESIZE  0x00ee
+#define __NEXTOS_IDE_PARTITION_FIND  0x00b5
+#define __NEXTOS_IDE_DOS_MAP  0x00f1
+#define __NEXTOS_IDE_DOS_UNMAP  0x00f4
+#define __NEXTOS_IDE_DOS_MAPPING  0x00f7
+#define __NEXTOS_IDE_SNAPLOAD  0x00fd
+
+#define __NEXTOS_IDE_PATH  0x01b1
+#define __nextos_rc_path_change  0
+#define __nextos_rc_path_get  1
+#define __nextos_rc_path_make  2
+#define __nextos_rc_path_delete  3
+
+#define __NEXTOS_IDE_CAPACITY  0x01b4
+#define __NEXTOS_IDE_GET_LFN  0x01b7
+#define __NEXTOS_IDE_BROWSER  0x01ba
+
+#define __NEXTOS_IDE_STREAM_OPEN  0x0056
+#define __NEXTOS_IDE_STREAM_CLOSE  0x0059
+#define __NEXTOS_IDE_STREAM_IN  0x005c
+#define __NEXTOS_IDE_STREAM_OUT  0x005f
+#define __NEXTOS_IDE_STREAM_PTR  0x0062
+
+#define __NEXTOS_IDE_BANK  0x01bd
+#define __nextos_rc_banktype_zx  0
+#define __nextos_rc_banktype_mmc  1
+#define __nextos_rc_bank_total  0
+#define __nextos_rc_bank_alloc  1
+#define __nextos_rc_bank_reserve  2
+#define __nextos_rc_bank_free  3
+
+#define __NEXTOS_IDE_BASIC  0x01c0
+#define __NEXTOS_IDE_STREAM_LINEIN  0x01c3
+#define __NEXTOS_IDE_WINDOW_STRING  0x01c6
+
+#define __NEXTOS_DOS_REF_XDPB  0x0151
+#define __NEXTOS_DOS_MAP_B  0x0154
+#define __NEXTOS_DD_INTERFACE  0x0157
+#define __NEXTOS_DD_INIT  0x015a
+#define __NEXTOS_DD_SETUP  0x015d
+#define __NEXTOS_DD_SET_RETRY  0x0160
+#define __NEXTOS_DD_READ_SECTOR  0x0163
+#define __NEXTOS_DD_WRITE_SECTOR  0x0166
+#define __NEXTOS_DD_CHECK_SECTOR  0x0169
+#define __NEXTOS_DD_FORMAT  0x016c
+#define __NEXTOS_DD_READ_ID  0x016f
+#define __NEXTOS_DD_TEST_UNSUITABLE  0x0172
+#define __NEXTOS_DD_LOGIN  0x0175
+#define __NEXTOS_DD_SEL_FORMAT  0x0178
+#define __NEXTOS_DD_ASK_1  0x017b
+#define __NEXTOS_DD_DRIVE_STATUS  0x017e
+#define __NEXTOS_DD_EQUIPMENT  0x0181
+#define __NEXTOS_DD_ENCODE  0x0184
+#define __NEXTOS_DD_L_XDPB  0x0187
+#define __NEXTOS_DD_L_DPB  0x018a
+#define __NEXTOS_DD_L_SEEK  0x018d
+#define __NEXTOS_DD_L_READ  0x0190
+#define __NEXTOS_DD_L_WRITE  0x0193
+#define __NEXTOS_DD_L_ON_MOTOR  0x0196
+#define __NEXTOS_DD_T_OFF_MOTOR  0x0199
+#define __NEXTOS_DD_L_OFF_MOTOR  0x019c
+
+#define __NEXTOS_DOS_INITIALISE  0x0100
+#define __NEXTOS_DOS_INITIALIZE  0x0100
+#define __NEXTOS_IDE_INTERFACE  0x00a3
+#define __NEXTOS_IDE_INIT  0x00a6
+#define __NEXTOS_IDE_DRIVE  0x00a9
+#define __NEXTOS_IDE_SECTOR_READ  0x00ac
+#define __NEXTOS_IDE_SECTOR_WRITE  0x00af
+#define __NEXTOS_IDE_PARTITION_NEW  0x00b8
+#define __NEXTOS_IDE_PARTITION_INIT  0x00bb
+#define __NEXTOS_IDE_PARTITION_READ  0x00c4
+#define __NEXTOS_IDE_PARTITION_OPEN  0x00cd
+#define __NEXTOS_IDE_PARTITION_CLOSE  0x00d0
+#define __NEXTOS_IDE_PARTITIONS  0x01a5
+
+#define __NEXTOS_DOTN_SP  0x4000
+
+#define __NEXTOS_RC_READY  0
+#define __NEXTOS_RC_WP  1
+#define __NEXTOS_RC_SEEK  2
+#define __NEXTOS_RC_CRC  3
+#define __NEXTOS_RC_NODATA  4
+#define __NEXTOS_RC_MARK  5
+#define __NEXTOS_RC_UNRECOG  6
+#define __NEXTOS_RC_UNKNOWN  7
+#define __NEXTOS_RC_DISKCHG  8
+#define __NEXTOS_RC_UNSUIT  9
+
+#define __NEXTOS_RC_BADNAME  20
+#define __NEXTOS_RC_BADPARAM  21
+#define __NEXTOS_RC_NODRIVE  22
+#define __NEXTOS_RC_NOFILE  23
+#define __NEXTOS_RC_EXISTS  24
+#define __NEXTOS_RC_EOF  25
+#define __NEXTOS_RC_DISKFULL  26
+#define __NEXTOS_RC_DIRFULL  27
+#define __NEXTOS_RC_RO  28
+#define __NEXTOS_RC_NUMBER  29
+#define __NEXTOS_RC_DENIED  30
+#define __NEXTOS_RC_NORENAME  31
+#define __NEXTOS_RC_EXTENT  32
+#define __NEXTOS_RC_UNCACHED  33
+#define __NEXTOS_RC_TOOBIG  34
+#define __NEXTOS_RC_NOTBOOT  35
+#define __NEXTOS_RC_INUSE  36
+
+#define __NEXTOS_RC_INVPARTITION  56
+#define __NEXTOS_RC_PARTEXIST  57
+#define __NEXTOS_RC_NOTIMP  58
+#define __NEXTOS_RC_PARTOPEN  59
+#define __NEXTOS_RC_NOHANDLE  60
+#define __NEXTOS_RC_NOTSWAP  61
+#define __NEXTOS_RC_MAPPED  62
+#define __NEXTOS_RC_NOXDPB  63
+#define __NEXTOS_RC_NOSWAP  64
+#define __NEXTOS_RC_INVDEVICE  65
+#define __NEXTOS_RC_CMDPHASE  67
+#define __NEXTOS_RC_DATAPHASE  68
+#define __NEXTOS_RC_NOTDIR  69
+
+
+
+
+
+
+
+
+
+
+
+
 #define __IO_NEXTREG_REG  0x243b
 #define __IO_NEXTREG_DAT  0x253b
 
@@ -1333,6 +1509,142 @@
 #define __IO_SPRITE_ATTRIBUTE  0x57
 
 #define __IO_SPRITE_PATTERN  0x5b
+
+
+
+
+
+
+
+
+
+
+
+
+#define __SYS_IY  SYS_IY
+#define __SYS_HLP  SYS_HLP
+
+#define __SYSVAR_SWAP  0x5b00
+#define __SYSVAR_STOO  0x5b10
+#define __SYSVAR_YOUNGER  0x5b21
+#define __SYSVAR_REGNUOY  0x5b2a
+#define __SYSVAR_ONERR  0x5b3a
+#define __SYSVAR_OLDHL  0x5b52
+#define __SYSVAR_OLDBC  0x5b54
+#define __SYSVAR_OLDAF  0x5b56
+#define __SYSVAR_TARGET  0x5b58
+#define __SYSVAR_RETADDR  0x5b5a
+#define __SYSVAR_BANKM  0x5b5c
+#define __SYSVAR_RAMRST  0x5b5d
+#define __SYSVAR_RAMERR  0x5b5e
+#define __SYSVAR_BAUD  0x5b5f
+#define __SYSVAR_SERFL  0x5b61
+#define __SYSVAR_COL  0x5b63
+#define __SYSVAR_WIDTH  0x5b64
+#define __SYSVAR_TVPARS  0x5b65
+#define __SYSVAR_FLAGS3  0x5b66
+#define __SYSVAR_BANK678  0x5b67
+#define __SYSVAR_FLAGN  0x5b68
+#define __SYSVAR_MAXBNK  0x5b69
+#define __SYSVAR_OLDSP  0x5b6a
+#define __SYSVAR_SYNRET  0x5b6c
+#define __SYSVAR_LASTV  0x5b6e
+#define __SYSVAR_TILEBNKL  0x5b73
+#define __SYSVAR_TILEML  0x5b74
+#define __SYSVAR_TILEBNK2  0x5b75
+#define __SYSVAR_TILEM2  0x5b76
+#define __SYSVAR_NXTBNK  0x5b77
+#define __SYSVAR_DATABNK  0x5b78
+#define __SYSVAR_LODDRV  0x5b79
+#define __SYSVAR_SAVDRV  0x5b7a
+#define __SYSVAR_L2SOFT  0x5b7b
+#define __SYSVAR_TILEWL  0x5b7c
+#define __SYSVAR_TILEW2  0x5b7e
+#define __SYSVAR_TILEOFFL  0x5b80
+#define __SYSVAR_TILEOFF2  0x5b82
+#define __SYSVAR_COORDSL  0x5b84
+#define __SYSVAR_COORDS2  0x5b86
+#define __SYSVAR_COORDSULA  0x5b88
+#define __SYSVAR_COORDSHR  0x5b8a
+#define __SYSVAR_COORDSHC  0x5b8c
+#define __SYSVAR_INKL  0x5b8e
+#define __SYSVAR_INK2  0x5b8f
+#define __SYSVAR_ATTRULA  0x5b90
+#define __SYSVAR_ATTRHR  0x5b91
+#define __SYSVAR_ATTRHC  0x5b92
+#define __SYSVAR_INKMASK  0x5b93
+#define __SYSVAR_TMPVARS  0x5b94
+
+#define __SYSVAR_TSTACK  0x5bff
+
+#define __SYSVAR_KSTATE  0x5c00
+#define __SYSVAR_LASTK  0x5c08
+#define __SYSVAR_REPDEL  0x5c09
+#define __SYSVAR_REPPER  0x5c0a
+#define __SYSVAR_DEFADD  0x5c0b
+#define __SYSVAR_KDATA  0x5c0d
+#define __SYSVAR_TVDATA  0x5c0e
+#define __SYSVAR_STRMS  0x5c10
+#define __SYSVAR_CHARS  0x5c36
+#define __SYSVAR_RASP  0x5c38
+#define __SYSVAR_PIP  0x5c39
+#define __SYSVAR_ERRNR  0x5c3a
+#define __SYSVAR_FLAGS  0x5c3b
+#define __SYSVAR_TVFLAG  0x5c3c
+#define __SYSVAR_ERRSP  0x5c3d
+#define __SYSVAR_LISTSP  0x5c3f
+#define __SYSVAR_MODE  0x5c41
+#define __SYSVAR_NEWPPC  0x5c42
+#define __SYSVAR_NSPPC  0x5c44
+#define __SYSVAR_PPC  0x5c45
+#define __SYSVAR_SUBPPC  0x5c47
+#define __SYSVAR_BORDCR  0x5c48
+#define __SYSVAR_EPPC  0x5c49
+#define __SYSVAR_VARS  0x5c4b
+#define __SYSVAR_DEST  0x5c4d
+#define __SYSVAR_CHANS  0x5c4f
+#define __SYSVAR_CURCHL  0x5c51
+#define __SYSVAR_PROG  0x5c53
+#define __SYSVAR_NXTLIN  0x5c55
+#define __SYSVAR_DATADD  0x5c57
+#define __SYSVAR_ELINE  0x5c59
+#define __SYSVAR_KCUR  0x5c5b
+#define __SYSVAR_CHADD  0x5c5d
+#define __SYSVAR_XPTR  0x5c5f
+#define __SYSVAR_WORKSP  0x5c61
+#define __SYSVAR_STKBOT  0x5c63
+#define __SYSVAR_STKEND  0x5c65
+#define __SYSVAR_BREG  0x5c67
+#define __SYSVAR_MEM  0x5c68
+#define __SYSVAR_FLAGS2  0x5c6a
+#define __SYSVAR_DFSZ  0x5c6b
+#define __SYSVAR_STOP  0x5c6c
+#define __SYSVAR_OLDPPC  0x5c6e
+#define __SYSVAR_OSPPC  0x5c70
+#define __SYSVAR_FLAGX  0x5c71
+#define __SYSVAR_STRLEN  0x5c72
+#define __SYSVAR_TADDR  0x5c74
+#define __SYSVAR_SEED  0x5c76
+#define __SYSVAR_FRAMES  0x5c78
+#define __SYSVAR_UDG  0x5c7b
+#define __SYSVAR_COORDS  0x5c7d
+#define __SYSVAR_GMODE  0x5c7f
+#define __SYSVAR_PRCC  0x5c80
+#define __SYSVAR_ECHOE  0x5c82
+#define __SYSVAR_DFCC  0x5c84
+#define __SYSVAR_DFCCL  0x5c86
+#define __SYSVAR_SPOSN  0x5c88
+#define __SYSVAR_SPOSNL  0x5c8a
+#define __SYSVAR_SCRCT  0x5c8c
+#define __SYSVAR_ATTRP  0x5c8d
+#define __SYSVAR_MASKP  0x5c8e
+#define __SYSVAR_ATTRT  0x5c8f
+#define __SYSVAR_MASKT  0x5c90
+#define __SYSVAR_PFLAG  0x5c91
+#define __SYSVAR_MEMBOT  0x5c92
+#define __SYSVAR_NMIADD  0x5cb0
+#define __SYSVAR_RAMTOP  0x5cb2
+#define __SYSVAR_PRAMT  0x5cb4
 
 
 

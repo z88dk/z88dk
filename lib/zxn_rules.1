@@ -1,24 +1,7 @@
-	call	l_mult
-=
-	mul
-
-	call	l_inclong
-=
-	inc	dehl
-
-	call	l_declong
-=
-	dec	dehl
-
 	ld	bc,%1	; Would be better if ZXN opcode affected carry
 	add	hl,bc
 =
 	add	hl,+(%1)
-
-	ld	hl,0	;const
-	add	hl,sp
-=
-	ld	hl,sp
 
 	ld	hl,%1	;const
 	push	hl
@@ -26,14 +9,6 @@
 =
 	push	%1	;const
 	ld	hl,%2
-
-	push	de
-	push	hl
-	ld	hl,%1	;const
-	ld	de,0
-	call	l_long_add
-=
-	add	dehl,%1	;const
 
 	ld	hl,%1	;const
 	ld	de,%2

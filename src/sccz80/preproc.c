@@ -8,6 +8,15 @@
 
 #include "ccdefs.h"
 
+static void       ifline(void);
+static void       noiferr(void);
+static int        findmac(char *sname);
+
+
+static int iflevel = 0; /* current #if nest level */
+static int skiplevel = 0; /* level at which #if skipping started */
+
+
 void junk()
 {
     if (an(inbyte()))
@@ -110,10 +119,8 @@ void vinline()
 void ifline()
 {
     char sname[NAMESIZE];
-    endasm = 0;
 
     while (1) {
-
         vinline();
         if (eof)
             return;
@@ -122,8 +129,6 @@ void ifline()
 
             if (match("#pragma")) {
                 dopragma();
-                if (endasm)
-                    break;
                 continue;
             }
 
@@ -199,7 +204,7 @@ void ifline()
 
 void noiferr()
 {
-    error(E_MISSIF);
+    errorfmt( "No matching #if", 0 );
 }
 
 void keepch(char c)
@@ -231,7 +236,7 @@ void addmac()
     while (putmac(gch()))
         ;
     if (macptr >= MACMAX)
-        error(E_MACOV);
+        errorfmt("Macro table full", 1 );
 }
 
 /* delete macro from symbol table, but leave entry so hashing still works */

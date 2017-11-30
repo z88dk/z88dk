@@ -53,6 +53,7 @@ void Section_init (Section *self)
 	self->name = "";		/* default: empty section */
 	self->addr	= 0;
 	self->origin = -1;
+	self->align = 1;
 	self->origin_found = FALSE;
 	self->origin_opts = FALSE;
 	self->section_split = FALSE;
@@ -284,7 +285,7 @@ int get_cur_module_size(  void ) { return section_module_size(  g_cur_section, g
 *----------------------------------------------------------------------------*/
 void sections_alloc_addr(void)
 {
-	Section *section;
+	Section *section, *next_section;
 	SectionHashElem *iter;
 	int addr;
 
@@ -292,14 +293,24 @@ void sections_alloc_addr(void)
 
 	/* allocate addr in sequence */
 	addr = 0;
-	for ( section = get_first_section( &iter ) ; section != NULL ; 
-		  section = get_next_section( &iter ) )
-	{
-		if ( section->origin >= 0 )		/* break in address space */
+	for (section = get_first_section(&iter); section != NULL; section = next_section) {
+		if (section->origin >= 0)		/* break in address space */
 			addr = section->origin;
 
 		section->addr = addr;
-		addr += get_section_size( section );
+		addr += get_section_size(section);
+
+		// check ALIGN of next section, extend this section if needed
+		next_section = get_next_section(&iter);
+		if (next_section != NULL && !(next_section->origin >= 0) && next_section->align > 1) {
+			int above = addr % next_section->align;
+			if (above > 0) {
+				for (int i = next_section->align - above; i > 0; i--) {
+					*(ByteArray_push(section->bytes)) = opts.filler;
+					addr++;
+				}
+			}
+		}
 	}
 }
 
@@ -453,9 +464,13 @@ void patch_byte( int addr, Byte byte1 ) { patch_value( addr, byte1, 1 ); }
 void patch_word( int addr, int  word  ) { patch_value( addr, word,  2 ); }
 void patch_long( int addr, long dword ) { patch_value( addr, dword, 4 ); }
 
+void patch_word_be(int addr, int  word) { patch_value(addr, ((word & 0xFF00) >> 8) | ((word & 0x00FF) << 8), 2); }
+
 void append_byte( Byte byte1 ) { append_value( byte1, 1 ); }
 void append_word( int  word )  { append_value( word,  2 ); }
 void append_long( long dword ) { append_value( dword, 4 ); }
+
+void append_word_be(int  word) { append_value(((word & 0xFF00) >> 8) | ((word & 0x00FF) << 8), 2); }
 
 void append_2bytes( Byte byte1, Byte byte2 ) 
 {
@@ -534,6 +549,7 @@ Bool fwrite_module_code(FILE *file, int* p_code_size)
 			xfput_int32(file, size);
 			xfput_count_byte_strz(file, section->name);
 			write_origin(file, section);
+			xfput_int32(file, section->align);
 
 			if (size > 0)		/* ByteArray_item(bytes,0) creates item[0]!! */
 				xfput_chars(file, (char *)ByteArray_item(section->bytes, addr), size);

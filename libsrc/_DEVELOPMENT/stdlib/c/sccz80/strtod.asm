@@ -16,3 +16,10 @@ strtod:
    push af
    
    jp asm_strtod
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtod
+defc _strtod = strtod
+ENDIF
+

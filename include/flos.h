@@ -247,7 +247,7 @@ extern int __LIB__ inc_bank();
 
 // Disk control
 extern int __LIB__  change_volume(int volume);
-extern struct flos_volume __LIB__ get_volume_list();
+extern struct flos_volume __LIB__ *get_volume_list();
 extern int __LIB__ get_volume_count();     // Total number of 'drives' (1..n)
 extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
 extern int __LIB__ check_volume_format();
@@ -273,9 +273,9 @@ extern int __LIB__ rename_file(char * filea, char * fileb);
 extern unsigned long __LIB__  get_file_size(char * filename);
 extern unsigned int  __LIB__  get_first_file_cluster(char * filename);
 // Loads a struct with the file properties, points to struct or zero on error
-extern int  __LIB__ find_file (char *filename, struct flos_file file);
+extern int  __LIB__ find_file (char *filename, struct flos_file *file);
 // Get sector number and increment cluster and sector counters in struct
-extern unsigned long __LIB__  file_sector_list (struct flos_file file);
+extern unsigned long __LIB__  file_sector_list (struct flos_file *file);
 // Moves the read point from the start of a file (use after find file)
 extern void __LIB__  set_file_pointer(unsigned long pointer);
 // Forces the read length of the file transfer to a certain value (use after find file)
@@ -286,8 +286,8 @@ extern int  __LIB__ force_load(char *address, int bank);
 extern int  __LIB__ write_bytes_to_file(char *filename, char *address, int bank, unsigned long len);
 
 // Drivers
-extern struct flos_device __LIB__ get_device_list();
-extern struct flos_driver_table __LIB__ get_driver_list();
+extern struct flos_device __LIB__ *get_device_list();
+extern struct flos_driver_table __LIB__ *get_driver_list();
 extern int __LIB__ get_device_info();
 extern int __LIB__ get_device_count();
 
@@ -295,7 +295,7 @@ extern int __LIB__ get_device_count();
 // And now a list of the same non-FASTCALL functions using CALLEE linkage
 
 extern int  __LIB__  rename_file_callee(char * filea, char * fileb);
-extern int  __LIB__  find_file_callee (char *filename, struct flos_file file);
+extern int  __LIB__  find_file_callee (char *filename, struct flos_file *file);
 extern int  __LIB__  force_load_callee(char *address, int bank);
 
 

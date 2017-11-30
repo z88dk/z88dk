@@ -16,3 +16,10 @@ strtoul_callee:
    ex (sp),hl
    
    jp asm_strtoul
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _strtoul_callee
+defc _strtoul_callee = strtoul_callee
+ENDIF
+

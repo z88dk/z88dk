@@ -20,7 +20,7 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 #define MIN_VERSION 1
-#define MAX_VERSION 9
+#define MAX_VERSION 11
 
 enum file_type { is_none, is_library, is_object };
 
@@ -278,7 +278,8 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 			   type, 
 			   type == '=' ? ' ' :
 			   type == 'L' ? 'l' : 
-			   type == 'C' ? 'w' : 'b' );
+			   type == 'C' ? 'w' :
+			   type == 'B' ? 'W' : 'b' );
 		if ( file_version >= 4 )
 		{
 			source_file = xfread_lstring( fp, filename );
@@ -364,7 +365,7 @@ void dump_bytes( FILE *fp, char *filename, int size )
 void dump_code( FILE *fp, char *filename, long fp_start )
 {
 	int code_size;
-	int org;
+	int org, align;
 	char *section_name; 
 
 	fseek( fp, fp_start, SEEK_SET );
@@ -383,15 +384,23 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 			else 
 				org = -1;
 
+			if (file_version >= 10)
+				align = (int)xfread_long(fp, filename);
+			else
+				align = -1;
+
 			printf("  Code: %d bytes", code_size );
 			if (org >= 0) {
-				printf(", ORG at $%04X", org );
+				printf(", ORG $%04X", org );
 			}
 			else if (org == -2) {
 				printf(", section split");
 			}
 			else {
 			}
+
+			if (align > 1)
+				printf(", ALIGN %d", align);
 
 			print_section_name( section_name );
 			printf("\n");

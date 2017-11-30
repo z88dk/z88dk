@@ -1,7 +1,7 @@
 reset_codearea(); (line 147)
 
 Number of sections = 1, total size = 0
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =
 
@@ -10,7 +10,7 @@ Number of modules = 0
 section_blank = new_section(""); (line 150)
 
 Number of sections = 1, total size = 0
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =
 
@@ -19,7 +19,7 @@ Number of modules = 0
 module_id = new_module_id(); (line 154)
 
 Number of sections = 1, total size = 0
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -30,7 +30,7 @@ Number of modules = 1
 p = append_reserve( 0 ); (line 159)
 
 Number of sections = 1, total size = 0
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -41,7 +41,7 @@ Number of modules = 1
 append_byte( 1 ); (line 163)
 
 Number of sections = 1, total size = 1
-*1. "", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*1. "", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $01
     start =   0
 
@@ -52,7 +52,7 @@ Number of modules = 1
 next_PC(); (line 164)
 
 Number of sections = 1, total size = 1
-*1. "", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*1. "", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0
 
@@ -63,7 +63,7 @@ Number of modules = 1
 append_word( 0x0302 ); (line 165)
 
 Number of sections = 1, total size = 3
-*1. "", size = 3, addr = 0, origin = -1, asmpc = 1, opcode_size = 2
+*1. "", size = 3, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 2
     bytes = $01 $02 $03
     start =   0
 
@@ -74,7 +74,7 @@ Number of modules = 1
 next_PC(); (line 166)
 
 Number of sections = 1, total size = 3
-*1. "", size = 3, addr = 0, origin = -1, asmpc = 3, opcode_size = 0
+*1. "", size = 3, addr = 0, origin = -1, align = 1, asmpc = 3, opcode_size = 0
     bytes = $01 $02 $03
     start =   0
 
@@ -85,7 +85,7 @@ Number of modules = 1
 append_long( 0x07060504 ); (line 167)
 
 Number of sections = 1, total size = 7
-*1. "", size = 7, addr = 0, origin = -1, asmpc = 3, opcode_size = 4
+*1. "", size = 7, addr = 0, origin = -1, align = 1, asmpc = 3, opcode_size = 4
     bytes = $01 $02 $03 $04 $05 $06 $07
     start =   0
 
@@ -96,7 +96,7 @@ Number of modules = 1
 next_PC(); (line 168)
 
 Number of sections = 1, total size = 7
-*1. "", size = 7, addr = 0, origin = -1, asmpc = 7, opcode_size = 0
+*1. "", size = 7, addr = 0, origin = -1, align = 1, asmpc = 7, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07
     start =   0
 
@@ -107,7 +107,7 @@ Number of modules = 1
 append_value( 0x0A0908, 3 ); (line 169)
 
 Number of sections = 1, total size = 10
-*1. "", size = 10, addr = 0, origin = -1, asmpc = 7, opcode_size = 3
+*1. "", size = 10, addr = 0, origin = -1, align = 1, asmpc = 7, opcode_size = 3
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A
     start =   0
 
@@ -118,7 +118,7 @@ Number of modules = 1
 next_PC(); (line 170)
 
 Number of sections = 1, total size = 10
-*1. "", size = 10, addr = 0, origin = -1, asmpc = 10, opcode_size = 0
+*1. "", size = 10, addr = 0, origin = -1, align = 1, asmpc = 10, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A
     start =   0
 
@@ -129,7 +129,7 @@ Number of modules = 1
 append_2bytes( 11, 12 ); (line 171)
 
 Number of sections = 1, total size = 12
-*1. "", size = 12, addr = 0, origin = -1, asmpc = 10, opcode_size = 2
+*1. "", size = 12, addr = 0, origin = -1, align = 1, asmpc = 10, opcode_size = 2
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C
     start =   0
 
@@ -140,7 +140,7 @@ Number of modules = 1
 next_PC(); (line 172)
 
 Number of sections = 1, total size = 12
-*1. "", size = 12, addr = 0, origin = -1, asmpc = 12, opcode_size = 0
+*1. "", size = 12, addr = 0, origin = -1, align = 1, asmpc = 12, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C
     start =   0
 
@@ -151,7 +151,7 @@ Number of modules = 1
 p = append_reserve( 5 ); (line 173)
 
 Number of sections = 1, total size = 17
-*1. "", size = 17, addr = 0, origin = -1, asmpc = 12, opcode_size = 5
+*1. "", size = 17, addr = 0, origin = -1, align = 1, asmpc = 12, opcode_size = 5
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $00 $00 $00 $00 $00
     start =   0
 
@@ -162,7 +162,7 @@ Number of modules = 1
 next_PC(); (line 174)
 
 Number of sections = 1, total size = 17
-*1. "", size = 17, addr = 0, origin = -1, asmpc = 17, opcode_size = 0
+*1. "", size = 17, addr = 0, origin = -1, align = 1, asmpc = 17, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $00 $00 $00 $00 $00
     start =   0
 
@@ -173,7 +173,7 @@ Number of modules = 1
 memcpy( p, "hello", 5 ); (line 183)
 
 Number of sections = 1, total size = 17
-*1. "", size = 17, addr = 0, origin = -1, asmpc = 17, opcode_size = 0
+*1. "", size = 17, addr = 0, origin = -1, align = 1, asmpc = 17, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
     start =   0
 
@@ -184,7 +184,7 @@ Number of modules = 1
 append_file_contents( file, -1 ); (line 192)
 
 Number of sections = 1, total size = 20
-*1. "", size = 20, addr = 0, origin = -1, asmpc = 17, opcode_size = 3
+*1. "", size = 20, addr = 0, origin = -1, align = 1, asmpc = 17, opcode_size = 3
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3
     start =   0
@@ -197,7 +197,7 @@ Number of modules = 1
 next_PC(); (line 193)
 
 Number of sections = 1, total size = 20
-*1. "", size = 20, addr = 0, origin = -1, asmpc = 20, opcode_size = 0
+*1. "", size = 20, addr = 0, origin = -1, align = 1, asmpc = 20, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3
     start =   0
@@ -210,7 +210,7 @@ Number of modules = 1
 append_file_contents( file, -1 ); (line 196)
 
 Number of sections = 1, total size = 20
-*1. "", size = 20, addr = 0, origin = -1, asmpc = 20, opcode_size = 0
+*1. "", size = 20, addr = 0, origin = -1, align = 1, asmpc = 20, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3
     start =   0
@@ -223,7 +223,7 @@ Number of modules = 1
 next_PC(); (line 197)
 
 Number of sections = 1, total size = 20
-*1. "", size = 20, addr = 0, origin = -1, asmpc = 20, opcode_size = 0
+*1. "", size = 20, addr = 0, origin = -1, align = 1, asmpc = 20, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3
     start =   0
@@ -236,7 +236,7 @@ Number of modules = 1
 append_file_contents( file, 1 ); (line 201)
 
 Number of sections = 1, total size = 21
-*1. "", size = 21, addr = 0, origin = -1, asmpc = 20, opcode_size = 1
+*1. "", size = 21, addr = 0, origin = -1, align = 1, asmpc = 20, opcode_size = 1
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1
     start =   0
@@ -249,7 +249,7 @@ Number of modules = 1
 next_PC(); (line 202)
 
 Number of sections = 1, total size = 21
-*1. "", size = 21, addr = 0, origin = -1, asmpc = 21, opcode_size = 0
+*1. "", size = 21, addr = 0, origin = -1, align = 1, asmpc = 21, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1
     start =   0
@@ -262,7 +262,7 @@ Number of modules = 1
 append_file_contents( file, 1 ); (line 206)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 21, opcode_size = 1
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 21, opcode_size = 1
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -275,7 +275,7 @@ Number of modules = 1
 next_PC(); (line 207)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -288,7 +288,7 @@ Number of modules = 1
 patch_byte( 0, 12 ); (line 210)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -301,7 +301,7 @@ Number of modules = 1
 patch_word( 1, 0x0A0B ); (line 211)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $0B $0A $04 $05 $06 $07 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -314,7 +314,7 @@ Number of modules = 1
 patch_long( 3, 0x06070809 ); (line 212)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $08 $09 $0A $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -327,7 +327,7 @@ Number of modules = 1
 patch_value( 7, 0x030405, 3 ); (line 213)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $0B $0C $68 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -340,7 +340,7 @@ Number of modules = 1
 patch_file_contents( file, 10, -1 ); (line 217)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $65 $6C $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -353,7 +353,7 @@ Number of modules = 1
 patch_file_contents( file, 13, -1 ); (line 221)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $6C $6F
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -366,7 +366,7 @@ Number of modules = 1
 patch_file_contents( file, 15, 2 ); (line 225)
 
 Number of sections = 1, total size = 22
-*1. "", size = 22, addr = 0, origin = -1, asmpc = 22, opcode_size = 0
+*1. "", size = 22, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F3
     start =   0
@@ -379,7 +379,7 @@ Number of modules = 1
 patch_file_contents( file, 21, -1 ); (line 229)
 
 Number of sections = 1, total size = 24
-*1. "", size = 24, addr = 0, origin = -1, asmpc = 22, opcode_size = 2
+*1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 22, opcode_size = 2
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0
@@ -392,7 +392,7 @@ Number of modules = 1
 next_PC(); (line 231)
 
 Number of sections = 1, total size = 24
-*1. "", size = 24, addr = 0, origin = -1, asmpc = 24, opcode_size = 0
+*1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 24, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0
@@ -405,7 +405,7 @@ Number of modules = 1
 module_id = new_module_id(); (line 237)
 
 Number of sections = 1, total size = 24
-*1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24
@@ -420,11 +420,11 @@ Number of modules = 2
 section_code = new_section("code"); (line 242)
 
 Number of sections = 2, total size = 24
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24
-*2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
 
@@ -442,11 +442,11 @@ Number of modules = 2
 append_long(0x78563412); (line 245)
 
 Number of sections = 2, total size = 28
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24
-*2. "code", size = 4, addr = 0, origin = -1, asmpc = 0, opcode_size = 4
+*2. "code", size = 4, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 4
     bytes = $12 $34 $56 $78
     start =   0   0
 
@@ -464,11 +464,11 @@ Number of modules = 2
 next_PC(); (line 246)
 
 Number of sections = 2, total size = 28
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24
-*2. "code", size = 4, addr = 0, origin = -1, asmpc = 4, opcode_size = 0
+*2. "code", size = 4, addr = 0, origin = -1, align = 1, asmpc = 4, opcode_size = 0
     bytes = $12 $34 $56 $78
     start =   0   0
 
@@ -486,11 +486,11 @@ Number of modules = 2
 append_long(0xF0DEBC9A); (line 248)
 
 Number of sections = 2, total size = 32
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24
-*2. "code", size = 8, addr = 0, origin = -1, asmpc = 4, opcode_size = 4
+*2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 4, opcode_size = 4
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0
 
@@ -508,11 +508,11 @@ Number of modules = 2
 next_PC(); (line 249)
 
 Number of sections = 2, total size = 32
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24
-*2. "code", size = 8, addr = 0, origin = -1, asmpc = 8, opcode_size = 0
+*2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 8, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0
 
@@ -530,11 +530,11 @@ Number of modules = 2
 module_id = new_module_id(); (line 252)
 
 Number of sections = 2, total size = 32
-*1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8
 
@@ -556,14 +556,14 @@ Number of modules = 3
 section_data = new_section("data"); (line 256)
 
 Number of sections = 3, total size = 32
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8
-*3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
 
@@ -591,14 +591,14 @@ Number of modules = 3
 memcpy( append_reserve( 11 ), "hello world", 11 ); (line 259)
 
 Number of sections = 3, total size = 43
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8
-*3. "data", size = 11, addr = 0, origin = -1, asmpc = 0, opcode_size = 11
+*3. "data", size = 11, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 11
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64
     start =   0   0   0
 
@@ -626,14 +626,14 @@ Number of modules = 3
 next_PC(); (line 260)
 
 Number of sections = 3, total size = 43
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8
-*3. "data", size = 11, addr = 0, origin = -1, asmpc = 11, opcode_size = 0
+*3. "data", size = 11, addr = 0, origin = -1, align = 1, asmpc = 11, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64
     start =   0   0   0
 
@@ -661,14 +661,14 @@ Number of modules = 3
 module_id = new_module_id(); (line 263)
 
 Number of sections = 3, total size = 43
-*1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8   8
- 3. "data", size = 11, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 11, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64
     start =   0   0   0  11
 
@@ -702,14 +702,14 @@ Number of modules = 4
 new_section("data"); (line 267)
 
 Number of sections = 3, total size = 43
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8   8
-*3. "data", size = 11, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 11, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64
     start =   0   0   0  11
 
@@ -743,14 +743,14 @@ Number of modules = 4
 append_byte(0xAA); (line 269)
 
 Number of sections = 3, total size = 44
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8   8
-*3. "data", size = 12, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -784,14 +784,14 @@ Number of modules = 4
 next_PC(); (line 270)
 
 Number of sections = 3, total size = 44
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
- 2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8   8
-*3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -825,14 +825,14 @@ Number of modules = 4
 new_section("code"); (line 272)
 
 Number of sections = 3, total size = 44
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
-*2. "code", size = 8, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*2. "code", size = 8, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0
     start =   0   0   8   8
- 3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -866,14 +866,14 @@ Number of modules = 4
 append_byte(0xAA); (line 274)
 
 Number of sections = 3, total size = 45
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
-*2. "code", size = 9, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*2. "code", size = 9, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -907,14 +907,14 @@ Number of modules = 4
 next_PC(); (line 275)
 
 Number of sections = 3, total size = 45
- 1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
-*2. "code", size = 9, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 9, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -948,14 +948,14 @@ Number of modules = 4
 new_section(""); (line 277)
 
 Number of sections = 3, total size = 45
-*1. "", size = 24, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 24, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3
     start =   0  24  24  24
- 2. "code", size = 9, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -989,14 +989,14 @@ Number of modules = 4
 append_byte(0xAA); (line 279)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*1. "", size = 25, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1030,14 +1030,14 @@ Number of modules = 4
 next_PC(); (line 280)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1071,14 +1071,14 @@ Number of modules = 4
 get_first_section(NULL)->origin = -1; sections_alloc_addr(); (line 283)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 25, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 25, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 34, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 34, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1112,14 +1112,14 @@ Number of modules = 4
 get_first_section(NULL)->origin = 100; sections_alloc_addr(); (line 284)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 100, origin = 100, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 100, origin = 100, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 125, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 125, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 134, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 134, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1153,14 +1153,14 @@ Number of modules = 4
 set_cur_module_id( 0 ); (line 295)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 100, origin = 100, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 100, origin = 100, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 125, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 125, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 134, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 134, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1193,22 +1193,23 @@ Number of modules = 4
 --------------------------------------------------------------------------------
 Dump file module 0
 
-test.bin = $18 $00 $00 $00 $00 $64 $00 $00 $00 $0C $0B $0A $09 $08 $07 $06
-           $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2 $F1 $F2 $F3 $F1 $F1 $F2
-           $F3 $00 $00 $00 $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $00 $00
-           $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $FF $FF $FF $FF
+test.bin = $18 $00 $00 $00 $00 $64 $00 $00 $00 $01 $00 $00 $00 $0C $0B $0A
+           $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2 $F1 $F2
+           $F3 $F1 $F1 $F2 $F3 $00 $00 $00 $00 $04 $63 $6F $64 $65 $FF $FF
+           $FF $FF $01 $00 $00 $00 $00 $00 $00 $00 $04 $64 $61 $74 $61 $FF
+           $FF $FF $FF $01 $00 $00 $00 $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 set_cur_module_id( 1 ); (line 296)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 100, origin = 100, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 100, origin = 100, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 125, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 125, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 134, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 134, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1241,21 +1242,22 @@ Number of modules = 4
 --------------------------------------------------------------------------------
 Dump file module 1
 
-test.bin = $00 $00 $00 $00 $00 $64 $00 $00 $00 $08 $00 $00 $00 $04 $63 $6F
-           $64 $65 $FF $FF $FF $FF $12 $34 $56 $78 $9A $BC $DE $F0 $00 $00
-           $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $FF $FF $FF $FF
+test.bin = $00 $00 $00 $00 $00 $64 $00 $00 $00 $01 $00 $00 $00 $08 $00 $00
+           $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $01 $00 $00 $00 $12 $34
+           $56 $78 $9A $BC $DE $F0 $00 $00 $00 $00 $04 $64 $61 $74 $61 $FF
+           $FF $FF $FF $01 $00 $00 $00 $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 set_cur_module_id( 2 ); (line 297)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 100, origin = 100, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 100, origin = 100, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 125, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 125, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 134, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 134, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1288,22 +1290,22 @@ Number of modules = 4
 --------------------------------------------------------------------------------
 Dump file module 2
 
-test.bin = $00 $00 $00 $00 $00 $64 $00 $00 $00 $00 $00 $00 $00 $04 $63 $6F
-           $64 $65 $FF $FF $FF $FF $0B $00 $00 $00 $04 $64 $61 $74 $61 $FF
-           $FF $FF $FF $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $FF $FF
-           $FF $FF
+test.bin = $00 $00 $00 $00 $00 $64 $00 $00 $00 $01 $00 $00 $00 $00 $00 $00
+           $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $01 $00 $00 $00 $0B $00
+           $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $01 $00 $00 $00 $68
+           $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 set_cur_module_id( 3 ); (line 298)
 
 Number of sections = 3, total size = 46
-*1. "", size = 25, addr = 100, origin = 100, asmpc = 1, opcode_size = 0
+*1. "", size = 25, addr = 100, origin = 100, align = 1, asmpc = 1, opcode_size = 0
     bytes = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1 $F2
             $F1 $F2 $F3 $F1 $F1 $F2 $F3 $AA
     start =   0  24  24  24
- 2. "code", size = 9, addr = 125, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 9, addr = 125, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $12 $34 $56 $78 $9A $BC $DE $F0 $AA
     start =   0   0   8   8
- 3. "data", size = 12, addr = 134, origin = -1, asmpc = 1, opcode_size = 0
+ 3. "data", size = 12, addr = 134, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $68 $65 $6C $6C $6F $20 $77 $6F $72 $6C $64 $AA
     start =   0   0   0  11
 
@@ -1336,9 +1338,10 @@ Number of modules = 4
 --------------------------------------------------------------------------------
 Dump file module 3
 
-test.bin = $01 $00 $00 $00 $00 $64 $00 $00 $00 $AA $01 $00 $00 $00 $04 $63
-           $6F $64 $65 $FF $FF $FF $FF $AA $01 $00 $00 $00 $04 $64 $61 $74
-           $61 $FF $FF $FF $FF $AA $FF $FF $FF $FF
+test.bin = $01 $00 $00 $00 $00 $64 $00 $00 $00 $01 $00 $00 $00 $AA $01 $00
+           $00 $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $01 $00 $00 $00 $AA
+           $01 $00 $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $01 $00 $00
+           $00 $AA $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 Dump file code area 
 
@@ -1349,7 +1352,7 @@ test.bin = $0C $0B $0A $09 $08 $07 $06 $05 $04 $03 $F1 $F2 $F3 $F2 $F3 $F1
 reset_codearea(); (line 308)
 
 Number of sections = 1, total size = 0
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =
 
@@ -1358,7 +1361,7 @@ Number of modules = 0
 module_id = new_module_id(); (line 311)
 
 Number of sections = 1, total size = 0
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -1369,10 +1372,10 @@ Number of modules = 1
 new_section("code"); (line 312)
 
 Number of sections = 2, total size = 0
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -1385,13 +1388,13 @@ Number of modules = 1
 new_section("data"); (line 312)
 
 Number of sections = 3, total size = 0
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -1406,16 +1409,16 @@ Number of modules = 1
 new_section("bss"); (line 312)
 
 Number of sections = 4, total size = 0
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*4. "bss", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -1432,16 +1435,16 @@ Number of modules = 1
 new_section("bss"); (line 313)
 
 Number of sections = 4, total size = 0
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*4. "bss", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
 
@@ -1458,16 +1461,16 @@ Number of modules = 1
 append_byte(3); (line 313)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $03
     start =   0
 
@@ -1484,16 +1487,16 @@ Number of modules = 1
 next_PC(); (line 313)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $03
     start =   0
 
@@ -1510,16 +1513,16 @@ Number of modules = 1
 fwrite_module_code( file, &code_size ); (line 315)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $03
     start =   0
 
@@ -1535,23 +1538,24 @@ Number of modules = 1
 --------------------------------------------------------------------------------
 Dump file code area 
 
-test.bin = $00 $00 $00 $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $00 $00 $00
-           $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $01 $00 $00 $00 $03 $62
-           $73 $73 $FF $FF $FF $FF $03 $FF $FF $FF $FF
+test.bin = $00 $00 $00 $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $01 $00 $00
+           $00 $00 $00 $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $01 $00
+           $00 $00 $01 $00 $00 $00 $03 $62 $73 $73 $FF $FF $FF $FF $01 $00
+           $00 $00 $03 $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 module_id = new_module_id(); (line 319)
 
 Number of sections = 4, total size = 1
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1576,16 +1580,16 @@ Number of modules = 2
 new_section("code"); (line 320)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1610,16 +1614,16 @@ Number of modules = 2
 new_section("data"); (line 320)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1644,16 +1648,16 @@ Number of modules = 2
 new_section("bss"); (line 320)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1678,16 +1682,16 @@ Number of modules = 2
 new_section("data"); (line 321)
 
 Number of sections = 4, total size = 1
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*3. "data", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1712,16 +1716,16 @@ Number of modules = 2
 append_byte(2); (line 321)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $02
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1746,16 +1750,16 @@ Number of modules = 2
 next_PC(); (line 321)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $02
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1780,16 +1784,16 @@ Number of modules = 2
 fwrite_module_code( file, &code_size ); (line 323)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $02
     start =   0   0
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1
 
@@ -1814,22 +1818,23 @@ Number of modules = 2
 Dump file code area 
 
 test.bin = $00 $00 $00 $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $01 $00 $00
-           $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $02 $00 $00 $00 $00 $03
-           $62 $73 $73 $FF $FF $FF $FF $FF $FF $FF $FF
+           $00 $01 $00 $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $01 $00
+           $00 $00 $02 $00 $00 $00 $00 $03 $62 $73 $73 $FF $FF $FF $FF $01
+           $00 $00 $00 $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 module_id = new_module_id(); (line 327)
 
 Number of sections = 4, total size = 2
-*1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -1862,16 +1867,16 @@ Number of modules = 3
 new_section("code"); (line 328)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -1904,16 +1909,16 @@ Number of modules = 3
 new_section("data"); (line 328)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -1946,16 +1951,16 @@ Number of modules = 3
 new_section("bss"); (line 328)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -1988,16 +1993,16 @@ Number of modules = 3
 new_section("code"); (line 329)
 
 Number of sections = 4, total size = 2
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*2. "code", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2030,16 +2035,16 @@ Number of modules = 3
 append_byte(1); (line 329)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 1
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 1
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2072,16 +2077,16 @@ Number of modules = 3
 next_PC(); (line 329)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2114,16 +2119,16 @@ Number of modules = 3
 fwrite_module_code( file, &code_size ); (line 331)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2156,22 +2161,23 @@ Number of modules = 3
 Dump file code area 
 
 test.bin = $01 $00 $00 $00 $04 $63 $6F $64 $65 $FF $FF $FF $FF $01 $00 $00
-           $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $00 $00 $00 $00 $03
-           $62 $73 $73 $FF $FF $FF $FF $FF $FF $FF $FF
+           $00 $01 $00 $00 $00 $00 $04 $64 $61 $74 $61 $FF $FF $FF $FF $01
+           $00 $00 $00 $00 $00 $00 $00 $03 $62 $73 $73 $FF $FF $FF $FF $01
+           $00 $00 $00 $FF $FF $FF $FF
 --------------------------------------------------------------------------------
 set_cur_module_id(0); (line 336)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2204,16 +2210,16 @@ Number of modules = 3
 new_section("bss"); (line 336)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2246,16 +2252,16 @@ Number of modules = 3
 patch_byte(0, 3); (line 336)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2288,16 +2294,16 @@ Number of modules = 3
 set_cur_module_id(1); (line 337)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
-*4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2330,16 +2336,16 @@ Number of modules = 3
 new_section("data"); (line 337)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2372,16 +2378,16 @@ Number of modules = 3
 patch_byte(0, 2); (line 337)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2414,16 +2420,16 @@ Number of modules = 3
 set_cur_module_id(2); (line 338)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
- 2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+ 2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
-*3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+*3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2456,16 +2462,16 @@ Number of modules = 3
 new_section("code"); (line 338)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2498,16 +2504,16 @@ Number of modules = 3
 patch_byte(0, 1); (line 338)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 
@@ -2540,16 +2546,16 @@ Number of modules = 3
 get_first_section(NULL)->origin = -1; sections_alloc_addr(); (line 340)
 
 Number of sections = 4, total size = 3
- 1. "", size = 0, addr = 0, origin = -1, asmpc = 0, opcode_size = 0
+ 1. "", size = 0, addr = 0, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes =
     start =   0   0   0
-*2. "code", size = 1, addr = 0, origin = -1, asmpc = 1, opcode_size = 0
+*2. "code", size = 1, addr = 0, origin = -1, align = 1, asmpc = 1, opcode_size = 0
     bytes = $01
     start =   0   0   0
- 3. "data", size = 1, addr = 1, origin = -1, asmpc = 0, opcode_size = 0
+ 3. "data", size = 1, addr = 1, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $02
     start =   0   0   1
- 4. "bss", size = 1, addr = 2, origin = -1, asmpc = 0, opcode_size = 0
+ 4. "bss", size = 1, addr = 2, origin = -1, align = 1, asmpc = 0, opcode_size = 0
     bytes = $03
     start =   0   1   1
 

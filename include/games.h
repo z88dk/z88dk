@@ -75,6 +75,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
+#ifdef __GAL__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"Arrows and SPACE", "5678-0"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
 #ifdef __PC6001__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Stick/Cursor"};

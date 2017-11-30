@@ -43,9 +43,8 @@ static void loada(int n);
  * Data for this module
  */
 
-int donelibheader;
-
-static char* current_section = ""; /**< Name of the current section */
+static int    donelibheader;
+static char  *current_section = ""; /**< Name of the current section */
 
 /* Begin a comment line for the assembler */
 
@@ -62,14 +61,10 @@ void header(void)
     char* timestr;
     char* assembler = "z80 Module Assembler";
 
-    comment();
-    outstr(Banner);
-    nl();
-    comment();
-    outstr(Version);
-    nl();
-    comment();
-    nl();
+    outfmt(";%s\n",Banner);
+    outfmt(";%s\n",Version);
+    outfmt(";\n");
+
     if (ISASM(ASM_ASXX)) {
         assembler = "asxx";
     } else if (ISASM(ASM_VASM)) {
@@ -83,12 +78,8 @@ void header(void)
     donelibheader = 0;
     if ((tim = time(NULL)) != -1) {
         timestr = ctime(&tim);
-        comment();
-        nl();
-        comment();
-        outstr("\tModule compile time: ");
-        outstr(timestr);
-        nl();
+        outfmt(";\n");
+        outfmt(";\tModule compile time: %s\n",timestr);
     }
     nl();
 }
@@ -186,8 +177,7 @@ void DoLibHeader(void)
 /* Print any assembler stuff needed after all code */
 void trailer(void)
 {
-    nl();
-    outstr("; --- End of Compilation ---\n");
+    outfmt("\n; --- End of Compilation ---\n");
 }
 
 /* Print out a name such that it won't annoy the assembler
@@ -455,14 +445,7 @@ void putstk(LVALUE *lval)
         break;
     default:
         zpop();
-        if (c_doinline & INLINE_PINT) {
-            LoadAccum();
-            ol("ld\t(de),a");
-            ol("inc\tde");
-            ol("ld\ta,h");
-            ol("ld\t(de),a");
-        } else
-            callrts("l_pint");
+        callrts("l_pint");
     }
 }
 
@@ -585,20 +568,13 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (c_doinline & INLINE_GINT) {
-            ol("ld\ta,(hl)");
-            ol("inc\thl");
-            ol("ld\th,(hl)");
-            ol("ld\tl,a");
-        } else {
-            ot("call\tl_gint\t;");
+        ot("call\tl_gint\t;");
 #ifdef USEFRAME
-            if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
-                OutIndex(lval->offset);
-            }
-#endif
-            nl();
+        if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
+            OutIndex(lval->offset);
         }
+#endif
+        nl();
     }
 }
 
@@ -876,6 +852,7 @@ void testjump(LVALUE* lval, int label)
     int type;
     ol("ld\ta,h");
     ol("or\tl");
+
     if (lval->oldval_kind == KIND_LONG) {
         ol("or\td");
         ol("or\te");
@@ -1226,64 +1203,36 @@ void quikmult(int type, int32_t size, char preserve)
     }
 
 
-    // KIND_INT here
-    // ZXN: ld de,nnnn ; mul = 14T
-    if ( c_cpu & CPU_Z80ZXN ) {
-        switch (size) {
-        case 0: // 10T
-            vconst(0);
-            break;
-        case 1:
-            break;
-        case 2: // 11T
-            ol("add\thl,hl");
-            break;
-        case 256: // 11T
-            ol("ld\th,l");
-            ol("ld\tl,0");
-            break;
-        default:
-            if (preserve)
-                ol("push\tde");
-            const2(size);
-            ol("mul");
-            if (preserve)
-                ol("pop\tde");
-            break;
-        }
-        return;
-    }
-
     switch (size) {
     case 0:
         vconst(0);
         break;
     case 2048:
-        ol("ld\th,l");
+        ol("ld\th,l"); /* 6 bytes, 44T */
         ol("ld\tl,0");
         ol("add\thl,hl");
         ol("add\thl,hl");
         ol("add\thl,hl");
         break;
     case 1024:
-        ol("ld\th,l");
+        ol("ld\th,l"); /* 5 bytes, 33T */
         ol("ld\tl,0");
         ol("add\thl,hl");
         ol("add\thl,hl");
         break;
     case 512:
-        ol("ld\th,l");
+        ol("ld\th,l");  /* 4 bytes, 22T */
         ol("ld\tl,0");
         ol("add\thl,hl");
         break;
     case 256:
-        ol("ld\th,l");
+        ol("ld\th,l"); /* 3 bytes, 11T */
         ol("ld\tl,0");
         break;
     case 1:
         break;
     case 64:
-        ol("add\thl,hl");
+        ol("add\thl,hl");  /* 6 bytes, 66T, (RCM) 6 bytes, 12T */
     case 32:
         ol("add\thl,hl");
     case 16:
@@ -1319,6 +1268,10 @@ void quikmult(int type, int32_t size, char preserve)
     case 7:
         sixreg();
         ol("add\thl,bc");  /* BC contains original value */
+        break;
+    case 65535:
+    case -1:
+        callrts("l_neg");
         break;
     default:
         if (preserve)
@@ -1488,11 +1441,7 @@ void mult(LVALUE* lval)
             break;
         }
     default:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("mul");
-        } else {
-            callrts("l_mult"); 
-        }
+        callrts("l_mult"); 
     }
 }
 
@@ -1895,6 +1844,28 @@ void zand_const(LVALUE *lval, int32_t value)
             const2(0);
         } else if ( value == 0xffffff ) { // 2 bytes
             ol("ld\td,0");
+        } else if ( value == 0xffffffff ) {
+            // Do nothing
+        } else if ( (value & 0xffffff00) == 0xffffff00 ) {
+           // Only the bottom 8 bits
+           ol("ld\ta,l");
+           outfmt("\tand\t%d\n",(value & 0xff));
+           ol("ld\tl,a");
+        } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
+           // Only the bits 15-8
+           ol("ld\ta,h");
+           outfmt("\tand\t%d\n",(value & 0xff00)>>8);
+           ol("ld\th,a");
+        } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
+           // Only the bits 23-16
+           ol("ld\ta,e");
+           outfmt("\tand\t%d\n",(value & 0xff0000)>>16);
+           ol("ld\te,a");
+        } else if ( (value & 0x00ffffff) == 0x00ffffff ) {
+           // Only the bits 32-23
+           ol("ld\ta,d");
+           outfmt("\tand\t%d\n",(value & 0xff000000) >> 24);
+           ol("ld\td,a");
         } else { // 13 bytes
             lpush(); // 4
             vlongconst(value); // 6
@@ -1916,6 +1887,8 @@ void zand_const(LVALUE *lval, int32_t value)
             ot("and\t"); outdec( (value % 65536) / 256); nl();
             ol("ld\th,a");
             ol("ld\tl,0");            
+        } else if ( value == 0xffff ) {
+            // Do nothing
         } else {
             const2(value);
             zand(lval);
@@ -2079,6 +2052,10 @@ void asr_const(LVALUE *lval, int32_t value)
         } else if ( value == 8 && utype(lval) ) { /* 3 bytes, 11T */
             ol("ld\tl,h");
             ol("ld\th,0");
+        } else if ( value == 15 && utype(lval) ) {
+            ol("rl\th");   /* 7 bytes, 26T */
+            vconst(0);
+            ol("rl\tl");
         } else if ( value != 0 ) {
             const2(value);
             swap();
@@ -2149,7 +2126,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             break;
         default: // 7 bytes
             if ( value >= 16 ) {
-                warning(W_LEFTSHIFT_TOO_BIG);
+                warningfmt("Left shifting by more than the size of the object");
                 vconst(0);
             } else {
                 const2(value);
@@ -2202,7 +2179,7 @@ void asl_const(LVALUE *lval, int32_t value)
             callrts("l_long_aslo");
             break;
         default: //  5 bytes
-            if ( value >= 32 ) warning(W_LEFTSHIFT_TOO_BIG);
+            if ( value >= 32 ) warningfmt("Left shifting by more than the size of the object");
             value &= 31;
             if (  value >= 16 ) {
                 asl_16bit_const(lval, value - 16);
@@ -2297,11 +2274,7 @@ void inc(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("inc\tdehl");
-        } else {
-            callrts("l_inclong");
-        }
+        callrts("l_inclong");
         break;
     default:
         ol("inc\thl");
@@ -2325,11 +2298,7 @@ void dec(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_cpu == CPU_Z80ZXN ) {
-            ol("dec\tdehl");
-        } else {
-            callrts("l_declong");
-        }
+        callrts("l_declong");
         break;
     default:
         ol("dec\thl");
@@ -2730,8 +2699,8 @@ void zge(LVALUE* lval)
 
 void zcarryconv(void)
 {
-    vconst(0);
-    ol("rl\tl");
+    // vconst(0);
+    // ol("rl\tl");
 }
 
 /*
@@ -2913,25 +2882,6 @@ void GlobalPrefix(void)
     }
 }
 
-static void mangle_filename(const char *input, char *buf, size_t len)
-{
-    char  hex[] = "0123456789ABCDEF";
-
-    while (*input && len > 3 ) {
-        unsigned char c = *input++;
-
-        if ( isalnum(c) ) {
-            *buf++ = c;
-            len--;
-        } else {
-            *buf++ = '_';
-            *buf++ = hex[(( c >> 4 ) & 0x0f)];
-            *buf++ = hex[(( c >> 0 ) & 0x0f)];
-            len -= 3;
-        }
-    }
-    *buf = 0;
-}
 
 /*
  *  Emit a LINE opcode for assembler
@@ -2950,11 +2900,6 @@ void EmitLine(int line)
 
     if (ISASM(ASM_Z80ASM) && (c_cline_directive || c_intermix_ccode)) {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
-    }
-    if ( c_line_labels ) {
-        char buf[FILENAME_MAX+1];
-        mangle_filename(filen, buf, sizeof(buf));
-        outfmt(".__CLINE__%s_3a%d\n", buf, line);
     }
 }
 
@@ -3251,6 +3196,22 @@ void copy_to_stack(char *label, int stack_offset,  int size)
     outstr("\tld\thl,"); outname(label, 1); nl();
     outfmt("\tld\tbc,%d\n",size);
     ol("ldir");
+}
+
+void copy_to_extern(const char *src, const char *dest, int size)
+{
+    if ( size == 1 ) {
+        outfmt("\tld\ta,(_%s)\n",src);  // 6 bytes
+        outfmt("\tld\t(_%s),a\n",dest);
+    } else if ( size == 2 ) {
+        outfmt("\tld\thl,(_%s)\n",src);  // 6 bytes
+        outfmt("\tld\t(_%s),hl\n",dest);
+    } else {
+        outfmt("\tld\thl,_%s\n",src);  // 11 bytes
+        outfmt("\tld\tde,_%s\n",dest);
+        outfmt("\tld\tbc,%d\n",size);
+        outfmt("\tldir\n",src);
+    }
 }
 
 

@@ -60,11 +60,11 @@ static void dump_sections(char *title, int line)
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
 	{
-		warn("%c%d. \"%s\", size = %ld, addr = %ld, origin = %ld, asmpc = %ld, opcode_size = %ld\n", 
+		warn("%c%d. \"%s\", size = %ld, addr = %ld, origin = %ld, align = %ld, asmpc = %ld, opcode_size = %ld\n", 
 				   section == get_cur_section() ? '*' : ' ',
 				   ++i, section->name,  
 				   (long) get_section_size( section ),
-				   (long) section->addr, (long) section->origin, (long) section->asmpc, 
+				   (long) section->addr, (long) section->origin, (long) section->align, (long) section->asmpc, 
 				   (long) section->opcode_size );
 		warn("    bytes =");
 		for ( j = 0; j < ByteArray_size( section->bytes ); j++ )

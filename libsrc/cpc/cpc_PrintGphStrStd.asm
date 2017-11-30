@@ -16,7 +16,7 @@
         PUBLIC    _cpc_PrintGphStrStd
 		
         EXTERN    cpc_PrintGphStrStd0
-		EXTERN    color_uso
+		;EXTERN    color_uso
 
 
 .cpc_PrintGphStrStd
@@ -34,7 +34,6 @@
 	ld d,(ix+3)	;texto origen
 
 	ld a,(ix+4) ;color
-	ld (color_uso+1),a
+	;ld (color_uso+1),a
 	
  JP cpc_PrintGphStrStd0
- 

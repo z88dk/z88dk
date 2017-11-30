@@ -3,10 +3,10 @@
 ;
 ;	getk() Read key status
 ;
-;	Stefano Bodrato - Apr. 2008
+;	Stefano Bodrato - Nov. 2017
 ;
 ;
-;	$Id: getk.asm,v 1.4 2016-06-12 17:07:44 dom Exp $
+;	$Id: getk.asm $
 ;
 
 
@@ -16,14 +16,50 @@
 
 .getk
 ._getk
-        call    $cf5
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
-.not_return
-ENDIF
+;	call    $cf5
+ 
+ ld de,02034h
+.kloop
+ ld	a,(de)
+ rrca
+ jr nc,kpressed
+ dec e
+ jr nz,kloop
+ 
+kpressed:
+	ld a,e
+	and a
+	jr z,gotk
+	
+	cp 31
+	jr nz,nospc
+	inc a
+	jr gotk
+nospc:
 
-        ld      l,a
-	ld	h,0
+	cp 48
+	jr nz,noent
+IF STANDARDESCAPECHARS
+	ld	a,10
+ELSE
+	ld	a,13
+ENDIF
+	jr gotk
+noent:
+
+	cp 27
+	jr nc,noalpha
+	add 64
+	jr gotk
+noalpha:
+
+ ; TBD: fix symbol codes 42..47:  ';', ':', ',', '=', '.', '/'
+
+	add 16	; number
+
+.gotk
+ 
+	ld  l,a
+	ld  h,0
 	ret
+

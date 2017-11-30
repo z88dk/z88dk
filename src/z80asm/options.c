@@ -69,6 +69,7 @@ static void option_debug_info();
 static void define_assembly_defines();
 static void include_z80asm_lib();
 static char *search_z80asm_lib();
+static void make_output_dir();
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
@@ -145,6 +146,7 @@ void parse_argv( int argc, char *argv[] )
 	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
 
+	make_output_dir();						/* create output directory if needed */
 	include_z80asm_lib();					/* search for z80asm-*.lib, append to library path */
 	define_assembly_defines();				/* defined options-dependent constants */
 }
@@ -790,53 +792,69 @@ static void define_assembly_defines()
 *	strpool
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
+static char *path_prepend_output_dir(char *filename)
+{
+	char path[FILENAME_MAX];
+	if (opts.output_directory) {
+		if (isalpha(filename[0]) && filename[1] == ':')	// it's a win32 absolute path
+			snprintf(path, sizeof(path), "%s/%c/%s", 
+				opts.output_directory, filename[0], filename + 2);
+		else
+			snprintf(path, sizeof(path), "%s/%s", 
+				opts.output_directory, filename);
+		return strpool_add(path);
+	}
+	else {
+		return filename;
+	}
+}
 
 char *get_list_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_LIST );
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_LIST));
 }
 
 char *get_def_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_DEF );
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_DEF));
 }
 
 char *get_err_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_ERR );
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_ERR));
 }
 
 char *get_bin_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_BIN );
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_BIN));
 }
 
 char *get_lib_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_LIB );
+	return path_replace_ext(filename, FILEEXT_LIB);
 }
 
 char *get_sym_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_SYM );
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_SYM));
 }
 
 char *get_map_filename(char *filename)
 {
 	init_module();
-	return path_replace_ext(filename, FILEEXT_MAP);
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_MAP));
 }
 
 char *get_reloc_filename(char *filename)
 {
 	init_module();
-	return path_replace_ext(filename, FILEEXT_RELOC);
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_RELOC));
 }
 
 char *get_asm_filename(char *filename)
@@ -846,7 +864,7 @@ char *get_asm_filename(char *filename)
 
 char *get_obj_filename( char *filename )
 {
-    return path_replace_ext( filename, FILEEXT_OBJ);
+	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_OBJ));
 }
 
 /*-----------------------------------------------------------------------------
@@ -966,4 +984,15 @@ static char *search_z80asm_lib()
 		return ret;
 
 	return NULL;		/* not found */
+}
+
+/*-----------------------------------------------------------------------------
+*   output directory
+*----------------------------------------------------------------------------*/
+static void make_output_dir()
+{
+	if (opts.output_directory) {
+		opts.output_directory = path_remove_slashes(opts.output_directory);
+		mkdir_p(opts.output_directory);
+	}
 }

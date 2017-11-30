@@ -49,10 +49,12 @@ graphics/undrawb
 graphics/undrawr
 graphics/unplot
 graphics/drawbox
-graphics/setxy
 graphics/xorborder
 graphics/xorplot
 graphics/setxy
+graphics/move
+graphics/pen_up
+graphics/pen_down
 graphics/zx81/swapgfxbk
 graphics/drawbox
 stdio/ansi/zx81/text/f_ansi_attr

@@ -16,7 +16,7 @@ int opt_outc(char c);
 /*
  * get integer of length len bytes from address addr
  */
-int getint(unsigned char* addr, int len)
+int getint(unsigned char *addr, int len)
 {
     int i;
 
@@ -30,7 +30,7 @@ int getint(unsigned char* addr, int len)
  * put integer of length len bytes into address addr
  * (low byte first)
  */
-void putint(int i, unsigned char* addr, int len)
+void putint(int i, unsigned char *addr, int len)
 {
     while (len--) {
         *addr++ = i;
@@ -85,27 +85,19 @@ void postlabel(int label)
 /* Test if given character is alpha */
 int alpha(char c)
 {
-    if (c >= 'a')
-        return (c <= 'z');
-    if (c <= 'Z')
-        return (c >= 'A');
-    return (c == '_');
+    return isalpha(c) || c == '_';
 }
 
 /* Test if given character is numeric */
 int numeric(char c)
 {
-    if (c <= '9')
-        return (c >= '0');
-    return 0;
+    return isdigit(c);
 }
 
 /* Test if given character is alphanumeric */
 int an(char c)
 {
-    if (alpha(c))
-        return 1;
-    return numeric(c);
+    return alpha(c) || numeric(c);
 }
 
 /* Print a carriage return and a string only to console */
@@ -120,10 +112,10 @@ void pl(char* str)
 
 t_buffer* currentbuffer = NULL;
 
-t_buffer* startbuffer(int blocks)
+t_buffer* startbuffer(size_t blocks)
 {
     t_buffer* buf = (t_buffer*)MALLOC(sizeof(t_buffer));
-    int size = blocks * STAGESIZE;
+    size_t  size = blocks * STAGESIZE;
     buf->size = size;
     buf->start = (char*)MALLOC(size);
     buf->end = buf->start + blocks * size - 1;
@@ -201,7 +193,7 @@ void clearstage_info(const char *file, int line, char* before, char* start)
 void fabort()
 {
     closeout();
-    error(E_OUTERR);
+    errorfmt("Output file error", 1);
 }
 
 /* direct output to console */
@@ -247,7 +239,7 @@ int outbyte(char c)
 int outstage(char c)
 {
     if (stagenext == stagelast) {
-        error(E_STGOV);
+        errorfmt("Staging buffer overflow", 1);
         return 0;
     }
     *stagenext++ = c;

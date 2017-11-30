@@ -16,3 +16,10 @@ _strtoi__callee:
    ex (sp),hl
    
    jp asm__strtoi
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __strtoi__callee
+defc __strtoi__callee = _strtoi__callee
+ENDIF
+

@@ -134,6 +134,11 @@ errors:
     args	: void
     message	: '"relative jump address must be local"'
 	
+  - type	: ErrError
+    func	: error_expected_const_expr
+    args	: void
+    message	: '"expected constant expression"'
+	
   # Symbol errors
   - type	: ErrError
     func	: error_symbol_redefined
@@ -167,6 +172,16 @@ errors:
     message	: '"ORG redefined"'
 	
   - type	: ErrError
+    func	: error_align_redefined
+    args	: void
+    message	: '"ALIGN redefined"'
+	
+  - type	: ErrError
+    func	: error_org_not_aligned
+    args	: int org, int align
+    message	: "\"ORG '0x%04X' not ALIGNed '%d'\", org, align"
+	
+  - type	: ErrError
     func	: error_invalid_org_option
     args	: char *org_hex
     message	: "\"invalid --origin option '%s'\", org_hex"
@@ -192,10 +207,20 @@ errors:
     message	: "\"file '%s' not an object file\", filename"
 	
   - type	: ErrError
+    func	: error_obj_file_version
+    args	: char *filename, int found_version, int expected_version
+    message	: "\"object file '%s' version %d, expected version %d\", filename, found_version, expected_version"
+
+  - type	: ErrError
     func	: error_not_lib_file
     args	: char *filename
     message	: "\"file '%s' not a library file\", filename"
 	
+  - type	: ErrError
+    func	: error_lib_file_version
+    args	: char *filename, int found_version, int expected_version
+    message	: "\"library file '%s' version %d, expected version %d\", filename, found_version, expected_version"
+
   # Range error or warning
   - type	: ErrWarn
     func	: warn_int_range

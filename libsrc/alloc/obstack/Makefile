@@ -1,72 +1,39 @@
+#
+# Wahey, a messed up makefile for building libraries!
+#
+# $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
 
 include ../../Make.config
 
 TARGET ?= test
 
-CLASSIC_ASM = $(wildcard *.asm)
-CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm"
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80-zxn obj/newlib-r2k obj/newlib-ixiy
 
-NEWLIBASM := $(shell z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/alloc/obstack/obstack_sccz80.lst -p $(NEWLIB_DIRECTORY) -t)
-NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
+space :=
+space +=
 
-OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
+OBJECTS = $(CLASSIC_OBJECTS) 
 
-.PHONY: dirs
+.PHONY: dirs  $(NEWLIB_TARGETS)
 
-all: dirs $(OBJECTS) obstack-newlib.lst
+all: dirs $(OBJECTS) $(NEWLIB_TARGETS)
 
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-z80:  
+	@$(ASSEMBLER) -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-r2k:  
+	@$(ASSEMBLER) -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-z80-zxn:  
+	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o   $^
-
-obj/z80-zxn/%.o: %.c
-	zcc +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
-
-obj/ixiy/%.o: %.c
-	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
-
-obj/r2k/%.o: %.c
-	zcc +rcmx000 $(CFLAGS) -o $  $^
-
-obstack-newlib.lst:
-	@z88dk-lstmanip -r / -i $(NEWLIB_DIRECTORY)/alloc/obstack/obstack_sccz80.lst -p $(NEWLIB_DIRECTORY) -x 'alloc/obstack/obj/$${TYPE}' -c -o obstack-newlib.lst
+obj/newlib-ixiy:  
+	@$(ASSEMBLER) -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
-	@mkdir -p $(sort $(dir $(OBJECTS)))
+	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
 
 
 clean:
-	$(RM) -fr obj obstack-newlib.lst
+	$(RM) -fr obj 

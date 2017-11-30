@@ -105,14 +105,21 @@ Z80pass2( void )
 				patch_byte(expr->code_pos, (Byte)value);
                 break;
 
-            case RANGE_WORD:
-                if ( value < -32768 || value > 65535 )
-                    warn_int_range( value );
+			case RANGE_WORD:
+				if (value < -32768 || value > 65535)
+					warn_int_range(value);
 
 				patch_word(expr->code_pos, (int)value);
-                break;
+				break;
 
-            case RANGE_DWORD:
+			case RANGE_WORD_BE:
+				if (value < -32768 || value > 65535)
+					warn_int_range(value);
+
+				patch_word_be(expr->code_pos, (int)value);
+				break;
+
+			case RANGE_DWORD:
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 
@@ -124,8 +131,15 @@ Z80pass2( void )
             }
         }
 
-		if ( opts.list )
-			list_patch_data( expr->listpos, value, range_size( expr->range ) );
+		if (opts.list) {
+			if (expr->range == RANGE_WORD_BE) {
+				int swapped = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
+				list_patch_data(expr->listpos, swapped, range_size(expr->range));
+			}
+			else {
+				list_patch_data(expr->listpos, value, range_size(expr->range));
+			}
+		}
 			
 		/* continue loop - delete expression unless needs to be stored in object file */
 		if ( do_store )

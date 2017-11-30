@@ -314,6 +314,20 @@
 	or	l
 	jp	z,%1
 
+;;; Fixes up a bug in these rules
+	ld	(hl),#(%1 %% 256)
+	ld	l,(hl)
+	ld	h,0
+	inc	de
+	ld	a,h
+	ld	(de),a
+=
+	ld	(hl),#(%1 % 256)
+	inc	hl
+	ld	(hl),#(%1 / 256)
+	ld	hl,%1
+
+;;; This rule causes above bug, can't stop it from firing though
 	ld	de,%1	;const
 	ex	de,hl
 	ld	a,l
@@ -2742,6 +2756,162 @@
 	call	l_gint	;
 	pop	de
 =
-	ld	hl,%1	;const
+	ld	hl,%1-2	;const
 	add	hl,sp
 	call	l_gint
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	%1
+	ld	l,a
+=
+	ld	a,(hl)
+	and	%1
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	ld	h,0
+=
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%1
+=
+	ld	l,a
+	ld	h,0
+	and	a
+	jp	%1
+
+	ld	l,(hl)
+	ld	h,0
+	%3c	l
+.i%1
+	ld	hl,%2
+=
+.i%1
+	ld	hl,%2
+
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+=
+	sla	l
+	ld	h,l
+	ld	l,0
+
+	ld	h,0
+	srl	l
+	add	hl,hl
+	add	hl,hl
+=
+	ld	h,0
+	add	hl,hl
+
+	ld	h,0
+	srl	h
+	rr	l
+=
+	ld	h,0
+	srl	l
+
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+	dec	hl
+	ld	hl,(_%1)
+=
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+
+	and	%1
+	and	a
+=
+	and	%1
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,%1
+	add	hl,de
+	ld	h,0
+=
+	ld	a,(hl)
+	ld	de,%1
+	add	e
+	ld	l,a
+	ld	h,0
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,2
+	call	l_asr_u
+=
+	ld	a,(hl)
+	srl	a
+	srl	a
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+=
+	and	%1
+	ld	l,a
+	ld	h,0
+
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	h,0
+=
+	ld	a,(hl)
+	add	a
+	add	a
+	add	a
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	pop	de
+	call	l_or
+=
+	pop	de
+	ld	h,d
+	ld	a,l
+	or	e
+	ld	l,a
+
+	ld	l,0
+	ld	a,1
+	call	l_long_aslo
+=
+	ld	l,0
+	sla	h
+	rl	e
+	rl	d
+
+	ld	hl,0	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	push	hl
+	ld	h,0

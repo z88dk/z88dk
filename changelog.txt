@@ -30,6 +30,9 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] imported obstack, balloc and adt libraries from newlib. balloc can now
   be configured in the same was as newlib (-pragma-define:CLIB_BALLOC_TABLE_SIZE=n)
 - [classiclib] Marked adt and balloc classic apis as deprecated
+- [classiclib] cpcrslib has been imported
+- [classiclib] CPC, MSX, SVI, ZX81, Galaksija port improvements
+- [classiclib] SMS stability improvements
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -65,13 +68,20 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #485: Functions marked __z88dk_sdccdecl use sdcc calling spec for
   chars (and become r->l)
 - [sccz80] #489: Loop variables can now be defined in the initialisation clause
-  of a for statement
+  of a for statement. Additionally, variables can be defined anywhere, not just at
+  the start of a block.
+- [sccz80] #493: The __func__ directive is now supported
+- [sccz80] #501: sccz80 now supports the sdcc __at (0xnnnn) syntax for variable and
+  function placement
+- [sccz80] #514: sccz80 now supports flexible members at the end of struct definition
+- [sccz80] #519: The preprocessor has been switched over to ucpp which is C99 compatible
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [ticks] [classiclib] File IO is now available
 - [ticks] A debugger is now available
 - [ticks] Now supports Rabbit, z180 and ZX Next cpus
 - [z80asm] Rabbit 2000 and 3000 are now fully supported
 - [z80asm] ZX Spectrum Next CPU extensions are supported
+- [z80asm] #442: Globs are now supported in filenames and .lst files
 - [z88dk-dis] A new standalone diassembler is available
 - [z88dk-install] A new program to install 3rd party libraries is now available
 - [zcc] Spaces in filenames (and paths) are now supported.

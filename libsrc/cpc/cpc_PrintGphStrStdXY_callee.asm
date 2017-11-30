@@ -17,7 +17,7 @@
 		
         EXTERN    cpc_GetScrAddress0
         EXTERN    cpc_PrintGphStrStd0
-		EXTERN    color_uso
+		;EXTERN    color_uso
 		
 
 .cpc_PrintGphStrStdXY_callee
@@ -29,12 +29,15 @@
 	pop hl		; l=y
 	pop de		; e=x
 	ld	a,e
-	ld (color_uso+1),a
 	push bc	; ret addr
 	
 	call cpc_GetScrAddress0   ; hl= screen address
 	pop bc	; ret addr
 	pop de	; text
+	ex	(sp),hl
+	ld	a,l
+	;ld (color_uso+1),a
+	pop	hl		; hl= screen address
 	push bc
     
  JP cpc_PrintGphStrStd0

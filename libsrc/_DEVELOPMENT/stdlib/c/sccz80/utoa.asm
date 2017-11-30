@@ -21,3 +21,10 @@ utoa:
    push af
    
    jp asm_utoa
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _utoa
+defc _utoa = utoa
+ENDIF
+

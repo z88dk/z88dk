@@ -9,6 +9,21 @@
 
 #include "ccdefs.h"
 
+static void     ns(void);
+static void     compound(void);
+static void     doiferror(void);
+static void     doif(void);
+static Type    *doexpr(void);
+static void     dowhile(void);
+static void     dodo(void);
+static void     dofor(void);
+static void     doswitch(void);
+static void     docase(void);
+static void     dodefault(void);
+static void     doreturn(char);
+static void     dobreak(void);
+static void     docont(void);
+
 /*
  *      Some variables for goto and cleaning up after compound 
  *      statements
@@ -20,6 +35,14 @@ static void docritical(void);
 static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
 static int lastline = 0;
 
+
+
+static int swactive = 0; /* true inside a switch */
+static int swdefault = 0; /* default label number, else 0 */
+
+static int incritical = 0;  /* Are we in a __critical block */
+
+
 /*
  *      Statement parser
  *
@@ -30,7 +53,7 @@ static int lastline = 0;
 int statement()
 {
     int st;
-    char locstatic; /* have we had the static keyword */
+    int locstatic; /* have we had the static keyword */
 
     blanks();
     if (lineno != lastline) {
@@ -40,24 +63,17 @@ int statement()
     if (ch() == 0 && eof) {
         return (lastst = STEXP);
     } else {
-        char regit = NO;
 
         if (amatch("extern")) {
             dodeclare(EXTERNAL);
             return lastst;
         }
         /* Ignore the register and auto keywords! */
-        regit = locstatic = ((swallow("register")) | swallow("auto"));
+        swallow("register");
+        swallow("auto");
 
         /* Check to see if specified as static, and also for far and near */
-        if (amatch("static")) {
-            if (locstatic) {
-                warning(W_BADSTC);
-                locstatic = NO;
-            } else
-                locstatic = YES;
-        } else
-            locstatic = NO;
+        locstatic = amatch("static");
 
         if ( declare_local(locstatic) ) {
             return lastst;
@@ -192,7 +208,7 @@ int statement()
 void ns()
 {
     if (cmatch(';') == 0)
-        warning(W_EXPSEMI);
+        warningfmt("Expected ';'");
 }
 
 /*
@@ -205,7 +221,7 @@ void compound()
     SYMBOL* savloc;
 
     if (ncmp == MAX_LEVELS)
-        error(E_MAXLEVELS, ncmp);
+        errorfmt("Maximum nesting level reached (%d)", 1, ncmp);
 
     stkstor[ncmp] = Zsp;
     savloc = locptr;
@@ -387,6 +403,7 @@ void dofor()
     modstk(savedsp, NO, NO);
     Zsp = savedsp;
     locptr = savedloc;
+    declared = 0;
     delwhile();
 }
 
@@ -467,15 +484,15 @@ void docase()
     double value;
     Kind   valtype;
     if (swactive == 0)
-        error(E_SWITCH);
+        errorfmt("Not in switch", 0 );
     if (swnext > swend) {
-        error(E_CASE);
+        errorfmt("Too many cases", 0 );
         return;
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
     if ( valtype == KIND_DOUBLE ) 
-        warning(W_DOUBLE_UNEXPECTED);
+        warningfmt("Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');
     ++swnext;
@@ -485,9 +502,9 @@ void dodefault()
 {
     if (swactive) {
         if (swdefault)
-            error(E_DEFAULT);
+            errorfmt("Multiple defaults", 0);
     } else
-        error(E_SWITCH);
+        errorfmt("Not in switch", 0 );
     needchar(':');
     postlabel(swdefault = getlabel());
 }
@@ -620,7 +637,7 @@ void docont()
 static void docritical(void)
 {
     if ( incritical ) {
-        error(E_NESTED_CRITICAL);
+        errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
     zentercritical();
@@ -678,28 +695,28 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    endasm = cmode = 0; /* mark mode as "asm" */
+    cmode = 0; /* mark mode as "asm" */
 
 #ifdef INBUILT_OPTIMIZER
     generate(); /* Dump queued stuff to be opt'd */
 #endif
-
     while (1) {
         preprocess(); /* get and print lines */
-        if (endasm || match("#endasm") || eof) {
+        if (match("#endasm") || eof) {
             break;
         }
         outfmt("%s\n",line);
     }
     clear(); /* invalidate line */
     if (eof)
-        warning(W_UNTERM);
+        warningfmt("Unterminated assembler code");
     cmode = 1; /* then back to parse level */
 }
 
 /* #pragma statement */
 void dopragma()
 {
+    blanks();
     if (amatch("proto"))
         addmac();
     else if (amatch("set"))
@@ -708,12 +725,8 @@ void dopragma()
         delmac();
     else if (amatch("unset"))
         delmac();
-    else if (amatch("asm"))
-        doasm();
-    else if (amatch("endasm"))
-        endasm = 1;
     else {
-        warning(W_PRAGMA);
+        warningfmt("Unknown #pragma directive");
         clear();
     }
 }

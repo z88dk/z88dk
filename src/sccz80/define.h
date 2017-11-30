@@ -334,15 +334,13 @@ struct gototab_s {
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
 
 
-#define INLINE_GINT  1
-#define INLINE_PINT  2
+
 #define INLINE_ALL   255
 
 struct parser_stack;
 
 struct parser_stack {
     FILE *sinput;
-    FILE *buffer_fp;
     char sline[LINESIZE]; /* copy of line when swapping out */
     int  slptr;           /* copy of the save line pointer when swapping out */
     int  slineno;
@@ -363,15 +361,12 @@ struct lvalue_s {
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */
-        int val_type ;                  /* type of value calculated */
-	Kind oldval_kind;		/* What the valtype was */
+        Kind val_type ;                  /* type of value calculated */
+	    Kind oldval_kind;		/* What the valtype was */
         enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
- //       enum ident_type ident;          /* ident (from symbol table) */
-     //   enum storage_type storage;	/* storage (from sym tab) */
         Type *cast_type;
-	//int  level;		/* Parenth level (cast) */
         int  offset;
         int  base_offset;               /* Where the variable is located on the stack */
 } ;

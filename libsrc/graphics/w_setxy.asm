@@ -1,13 +1,12 @@
 	INCLUDE	"graphics/grafix.inc"
 	SECTION code_clib
-	PUBLIC	setxy
-	PUBLIC	_setxy
+	PUBLIC	w_setxy
 	EXTERN	l_cmp
 
 	EXTERN	__gfx_coords
 
 ;
-;	$Id: w_setxy.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
+;	$Id: w_setxy.asm $
 ;
 
 ; ******************************************************************
@@ -27,29 +26,21 @@
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
-.setxy
-._setxy
+.w_setxy
 
-		pop	bc
-		pop	de
-		pop	hl
-		push	hl
-		push	de
-		push	bc
+		push    hl
+		ld      hl,maxy
+		call    l_cmp
+		pop     hl
+		ret     nc               ; Return if Y overflows
 
-                        push    hl
-                        ld      hl,maxy
-                        call    l_cmp
-                        pop     hl
-                        ret     nc               ; Return if Y overflows
-
-                        push    de
-                        ld      de,maxx
-                        call    l_cmp
-                        pop     de
-                        ret     c               ; Return if X overflows
-                        
-                        ld      (__gfx_coords),hl	; store X
-                        ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
+		push    de
+		ld      de,maxx
+		call    l_cmp
+		pop     de
+		ret     c               ; Return if X overflows
+		
+		ld      (__gfx_coords),hl	; store X
+		ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
 
 		ret

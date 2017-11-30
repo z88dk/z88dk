@@ -15,7 +15,7 @@ long fdtell(int myfile)
 {
 	struct flos_file *flosfile;
 
-	flosfile = (char *) myfile;
+	flosfile = (void *) myfile;
 
 	return ((flosfile)->position);
 }

@@ -25,11 +25,10 @@ sub add {
 # New Z80 opcodes on the NEXT (more to come)
 # ======================================================================================
 # 4T*    swapnib           ED 23           A bits 7-4 swap with A bits 3-0
-add("swap",				0xED, 0x23);
 add("swapnib",			0xED, 0x23);
 
-# 4T     mul               ED 30           multiply DE*HL = DEHL (no flags set)
-add("mul",				0xED, 0x30);
+# 4T     mul d,e           ED 30           multiply DE = D*E (no flags set)
+add("mul d,e",			0xED, 0x30);
 
 # 4T     add  hl,a         ED 31           Add A to HL (no flags set) not sign extended
 add("add hl,a",			0xED, 0x31);
@@ -64,48 +63,11 @@ add("lddx",				0xED, 0xAC);
 # 21T*   lddrx             ED BC           As LDDR,  but if byte==A does not copy
 add("lddrx",			0xED, 0xBC);
 
-# 21T*   fillde            ED B5           Using A fill from DE for BC bytes
-add("fillde",			0xED, 0xB5);
-add("fill de",			0xED, 0xB5);
-
 # 21T*   ldirscale         ED B6           As LDIRX,  if(hl)!=A then (de)=(hl); HL_A'+=BC'; DE+=DE'; dec BC; Loop.
 add("ldirscale",		0xED, 0xB6);
 
 # 14T*   ldpirx            ED B7           (de) = ( (hl&$fff8)+(E&7) ) when != A
 add("ldpirx",			0xED, 0xB7);
-
-# 4T*    ld  hl,sp         ED 25           transfer SP to HL
-add("ld hl,sp",			0xED, 0x25);
-
-# 4T*    ld  a32,dehl    ED 20           transfer dehl into A32
-add("ld a32,dehl",		0xED, 0x20);
-
-# 4T*    ld  dehl,a32    ED 21           transfer A32 into dehl
-add("ld dehl,a32",		0xED, 0x21);
-
-# 4T*    ex  a32,dehl    ED 22           swap A32 with dehl
-add("ex a32,dehl",		0xED, 0x22);
-
-# 4T     inc dehl          ED 37           increment 32bit dehl
-add("inc dehl",			0xED, 0x37);
-
-# 4T*    dec dehl          ED 38           decrement 32bit dehl
-add("dec dehl",			0xED, 0x38);
-
-# 4T*    add dehl,a        ED 39           Add A to 32bit dehl not sign extended
-add("add dehl,a",		0xED, 0x39);
-
-# 4T     add dehl,bc       ED 3A           Add BC to 32bit dehl not sign extended
-add("add dehl,bc",		0xED, 0x3A);
-
-# 12T    add dehl,NNNN    ED 3B LO HI     Add NNNN to 32bit dehl
-add("add dehl,32767",	0xED, 0x3B, 0xFF, 0x7F);
-
-# 4T*    sub dehl,a        ED 3C           Subtract A from 32bit dehl not sign extended
-add("sub dehl,a",		0xED, 0x3C);
-
-# 4T*    sub dehl,bc       ED 3D           Subtract BC from 32bit dehl not sign extended
-add("sub dehl,bc",		0xED, 0x3D);
 
 # 4T     mirror a          ED 24           mirror the bits in A     
 add("mirror a",			0xED, 0x24);
@@ -115,9 +77,6 @@ add("mirror de",		0xED, 0x26);
 
 # 12T*   push NNNN        ED 8A LO HI     push 16bit immediate value
 add("push 32767",		0xED, 0x8A, 0xFF, 0x7F);
-
-# 4T*    popx              ED 8B           pop value and discard
-add("popx",				0xED, 0x8B);
 
 # ** reg,val are both 8-bit numbers
 # 12T*   nextreg reg,val   ED 91 reg,val   Set a NEXT register (like doing out($243b),reg then out($253b),val
@@ -174,9 +133,79 @@ for my $page (0..7) {
 # 
 # * Times are guesses based on other instruction times.  All of this subject to change.
 
+# COPPER UNIT
+# ======================================================================================
+# cu.wait VER,HOR   ->  16-bit encoding 0x8000 + (HOR << 9) + VER
+# (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
+add("cu.wait 0,1",		0x82, 0x00);
+add("cu.wait 0,2",		0x84, 0x00);
+add("cu.wait 0,55",		0xEE, 0x00);
+
+add("cu.wait 1,0",		0x80, 0x01);
+add("cu.wait 2,0",		0x80, 0x02);
+add("cu.wait 311,0",	0x81, 0x37);
+
+# cu.move REG,VAL  -> 16-bit encoding (REG << 8) + VAL
+# (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
+add("cu.move 0,0",		0x00, 0x00);
+add("cu.move 1,0",		0x01, 0x00);
+add("cu.move 127,0",	0x7F, 0x00);
+
+add("cu.move 0,1",		0x00, 0x01);
+add("cu.move 0,2",		0x00, 0x02);
+add("cu.move 0,127",	0x00, 0x7F);
+add("cu.move 0,255",	0x00, 0xFF);
+add("cu.move 0,-1",		0x00, 0xFF);
+add("cu.move 0,-128",	0x00, 0x80);
+
+# cu.stop   -> 16-bit encoding 0xffff (impossible cu.wait)
+add("cu.stop", 			0xFF, 0xFF);
+
+# cu.nop  -> 16-bit encoding 0x0000 (do nothing cu.move)
+add("cu.nop", 			0x00, 0x00);
 
 z80asm(join('', @asm), "--cpu=z80-zxn -l -b", 0, "", "");
 check_bin_file("test.bin", join('', @bin));
 
+#------------------------------------------------------------------------------
+# test list file
+z80asm(<<END, "--cpu=z80-zxn -l", 0, "", "");
+	cu.wait 0,1
+END
+check_text_file("test.lis", <<END);
+1     0000  82 00       cu.wait 0,1
+2     0002
+END
+
+#------------------------------------------------------------------------------
+# test error
+z80asm("cu.wait 0,1", "--cpu=z80", 1, "", <<'END');
+Error at file 'test.asm' line 1: illegal identifier
+1 errors occurred during assembly
+END
+
+#------------------------------------------------------------------------------
+# link-time constants
+my $HOR = 1; 
+my $VER = 2; 
+my $REG = 3; 
+my $VAL = 4;
+spew("test1.asm", <<"END");
+	public VER,HOR,REG,VAL
+	defc VER = $VER
+	defc HOR = $HOR
+	defc REG = $REG
+	defc VAL = $VAL
+END
+run("z80asm test1.asm", 0, "", "");
+
+z80asm(<<'END', "--cpu=z80-zxn -b -otest.bin test1.o", 0, "", "");
+	extern VER,HOR,REG,VAL
+	cu.wait VER,HOR
+	cu.move REG,VAL
+END
+check_bin_file("test.bin", pack("n*", 0x8000 + ($HOR << 9) + $VER, ($REG << 8) + $VAL));
+
+unlink_testfiles();
 unlink_testfiles();
 done_testing;

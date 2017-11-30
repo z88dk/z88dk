@@ -8,15 +8,16 @@
 ;       $Id: cpc_KeysData.asm $
 ;
 
-        SECTION   bss_data
-        PUBLIC    cpc_KeysData
-        PUBLIC    tabla_teclas
+        SECTION   bss_clib
+;        PUBLIC    cpc_KeysData
         PUBLIC    keymap
-        
 
-
-.cpc_KeysData
+;.cpc_KeysData
 .keymap defs 10
+
+
+        SECTION   data_clib
+        PUBLIC    tabla_teclas
 
 ;.teclado defb 0		;Este byte indicará qué teclas han sido pulsadas 
 			;después de un ciclo de exploración

@@ -657,3 +657,49 @@ ifelse(__STARTUP, 543,
 
    include(`startup/zxn_crt_543.asm.m4')
 ')
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; nextos extended dot command ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 798,
+`
+   ; standard 32 column display using rst 0x10
+   ;
+   ; stdin  = none
+   ; stdout = zx_01_output_rom_rst full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_798.asm.m4')
+')
+
+ifelse(__STARTUP, 799,
+`
+   ; no instantiated FILEs
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_799.asm.m4')
+')

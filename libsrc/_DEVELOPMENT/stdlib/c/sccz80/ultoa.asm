@@ -23,3 +23,10 @@ ultoa:
    push af
    
    jp asm_ultoa
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ultoa
+defc _ultoa = ultoa
+ENDIF
+

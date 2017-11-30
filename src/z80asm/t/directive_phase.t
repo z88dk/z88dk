@@ -27,6 +27,12 @@ END
 
 z80asm("phase x", "", 1, "", <<'END');
 Error at file 'test.asm' line 1: symbol 'x' not defined
+Error at file 'test.asm' line 1: expected constant expression
+2 errors occurred during assembly
+END
+
+z80asm("extern x \n phase x", "", 1, "", <<'END');
+Error at file 'test.asm' line 2: expected constant expression
 1 errors occurred during assembly
 END
 

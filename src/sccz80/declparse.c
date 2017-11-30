@@ -25,11 +25,11 @@ static int32_t needsub(void)
     if (constexpr(&val,&valtype, 1) == 0) {
         val = 1;
     } else if (val < 0) {
-        error(E_NEGATIVE);
+        errorfmt("Negative Size Illegal", 0);
         val = (-val);
     }
     if (valtype == KIND_DOUBLE)
-        warning(W_DOUBLE_UNEXPECTED);
+        warningfmt("Unexpected floating point encountered, taking int value");
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
 }
@@ -41,7 +41,7 @@ static void swallow_bitfield(void)
     Kind   valtype;
     if (cmatch(':')) {
         constexpr(&val, &valtype, 1);
-        warning(W_BITFIELD);
+        warningfmt("Bitfields not supported by compiler");
     }
 }
 
@@ -72,7 +72,7 @@ size_t array_len(array *arr)
 
 void array_add(array *arr, void *elem)
 {
-    int   i = arr->size++;
+    size_t   i = arr->size++;
     arr->elems = REALLOC(arr->elems, arr->size * sizeof(arr->elems[i]));
     arr->elems[i] = elem;
 }
@@ -119,9 +119,24 @@ Type *find_tag(const char *name)
 
 Type *find_tag_field(Type *tag, const char *fieldname)
 {
-    int    i;
+    size_t    i;
     for ( i = 0; i < array_len(tag->fields) ; i++ ) {
         Type *field = array_get_byindex(tag->fields, i);
+
+        // Consider anonymous structs
+        if ( strlen(field->name) == 0 && field->kind == KIND_STRUCT ) {
+            size_t offset = field->offset;
+            field = find_tag_field(field->tag, fieldname);
+
+            // If we found it, return a copy of it and adjust the offset
+            if ( field ) {
+                Type *ret = CALLOC(1,sizeof(*ret));
+                *ret = *field;
+                ret->offset += offset;
+                return ret;
+            }
+            continue;
+        }
         if ( strcmp(field->name, fieldname) == 0 ) {
             return field;
         }
@@ -255,7 +270,7 @@ static Type *parse_enum(Type *type)
 
                 constexpr(&dval, &valtype, 1);
                 if ( valtype == KIND_DOUBLE )
-                    warning(W_DOUBLE_UNEXPECTED);
+                    warningfmt("Unexpected floating point encountered, taking int value");
                 value = dval;
             }
             elem = make_constant(sname, value);
@@ -267,12 +282,12 @@ static Type *parse_enum(Type *type)
     return ptr;
 }
 
-Type *parse_struct(Type *type, int isstruct)
+Type *parse_struct(Type *type, char isstruct)
 {
     char    sname[NAMESIZE];
     Type   *str = NULL;
     size_t  offset = 0;
-    size_t  size = 0;
+    int     size = 0;
     static int num_structs;
 
     if ( symname(sname) ) {
@@ -319,10 +334,20 @@ Type *parse_struct(Type *type, int isstruct)
             elem = dodeclare2(&base_type, MODE_NONE);
             
             if ( elem != NULL ) {
+                if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
+                    errorfmt("Member variables must be named",1);
+                }
                 elem->offset = offset;
-                if ( isstruct ) { 
-                    offset += elem->size;
-                    size += elem->size;
+                if ( isstruct ) {
+                    // Accept arr[0] as a synonym for arr[] for flexible members
+                    if ( elem->size == 0 && elem->kind == KIND_ARRAY ) {
+                        elem->size = -1;
+                        elem->len = -1;
+                    }
+                    if ( elem->size != -1 ) {
+                        offset += elem->size;
+                        size += elem->size;
+                    }
                 } else { 
                     if ( elem->size > size ) size = elem->size;
                 }
@@ -332,6 +357,18 @@ Type *parse_struct(Type *type, int isstruct)
             }
             // Swallow bitfields
             swallow_bitfield();
+
+            // It was a flexible member, this needs to be last in the sturct
+            if ( elem->size <= 0 ) {
+                if ( rcmatch(';') == 0 ) {
+                    errorfmt("Flexible member needs to be last element of struct",1);
+                }
+                needchar(';');
+                if ( rcmatch('}') == 0 ) {
+                    errorfmt("Flexible member needs to be last element of struct",1);
+                }
+                break;
+            }
 
             if ( rcmatch('}')) 
                 break;
@@ -380,7 +417,7 @@ static Type *parse_type(void)
     if ( swallow("const")) {
         type->isconst = 1;
     } else if (swallow("volatile")) {
-        warning(W_VOLATILE);
+        //warningfmt("Volatile type not supported by compiler");
     }
 
     if (amatch("__sfr")) {
@@ -497,7 +534,7 @@ static void parse_trailing_modifiers(Type *type)
 
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
-        error(E_NAKED_CRITICAL, type->name);
+        errorfmt("Function '%s' is both __naked and __critical, this is not permitted", 1, type->name);
     }
 }
 
@@ -554,7 +591,7 @@ Type *parse_parameter_list(Type *return_type)
             param = CALLOC(1,sizeof(*param));
             *param = *type_int;  // Implicitly int
             if ( symname(param->name) == 0 ) {
-                error(E_ARGNAME);
+                errorfmt("Illegal Argument Name: %s", 0, param->name);
                 junk();
             }
         }
@@ -694,7 +731,7 @@ Type *parse_decl(char name[], Type *base_type)
 
     if ( symname(name) ) {
         // TODO, if we're casting then we shouldn't have a name
-    }
+    } 
     
     return parse_decl_tail(base_type);
 }
@@ -808,12 +845,26 @@ Type *dodeclare(enum storage_type storage)
     Type  *base_type = NULL;
     SYMBOL *sym;
     decl_mode mode = MODE_NONE;
+    int32_t    ataddress = -1;
 
     if ( storage == TYPDEF ) mode = MODE_TYPEDEF;
     else if ( storage == EXTERNAL ) mode = MODE_EXTERN;
 
+
+    if ( amatch("__at")) {
+        Kind valtype;
+        double val;
+
+        needchar('(');
+        constexpr(&val,&valtype, 1);
+        needchar(')');
+        ataddress = val;
+    }
+
     while ( 1 ) {
         Type *type = dodeclare2(&base_type, mode);
+        char  drop_name[NAMESIZE * 2];
+        int   alloc_size;
         
         if ( type == NULL ) {
             break;
@@ -839,27 +890,65 @@ Type *dodeclare(enum storage_type storage)
         sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
         sym->isassigned = 1; // Assigned to 0
      
-        /* We can catch @ here? Need to flag sym somehow */
+        snprintf(drop_name, sizeof(drop_name), "%s", type->name);
+
+
+        // Handle the @ syntax. If the address is wrapped in ( ) then we can assign something to it
         if ( cmatch('@')) {
             Kind valtype;
             double val;
+            char brackets = 0;
+
+            
+            if ( cmatch('(')) {
+                brackets = 1;
+            }
 
             constexpr(&val,&valtype, 1);
 
+            if ( brackets ) {
+                needchar(')');
+            }
+
+            // If initialised, the drop name should be something different
+            snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);            
             type->value = val;
             sym->storage = EXTERNP;
             sym->initialised = 1;
         }
 
+        // Handle the sdcc way of declaring variables at address
+        if ( ataddress != -1 ) {
+            type->value = ataddress;
+            sym->storage = EXTERNP;
+            sym->initialised = 1;
+            // If initialised, the drop name should be something different
+            snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);                        
+        }
 
          if ( cmatch(';')) {
             return type;
         } else if ( cmatch(',')) {
             continue;
         } 
+
+        if ( type->kind == KIND_FUNC ) {
+            errorfmt("Cannot initialise function '%s' to a constant", 1, type->name);
+            junk();
+            return type;
+        }
+
         needchar('=');
         sym->initialised = 1;
-        initials(type->name, type);
+
+        alloc_size = initials(drop_name, type);
+
+        if ( sym->storage == EXTERNP ) {
+            // Copy from local to the supplied address
+            output_section(c_init_section);
+            copy_to_extern(drop_name, type->name, alloc_size);
+        }
+
         if ( cmatch(';')) {
             return type;
         }
@@ -947,11 +1036,11 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
         constexpr(&dval, &valtype, 1);
         if (dval < 0) {
-            error(E_NEGATIVE);
+            errorfmt("Negative Size Illegal", 0);
             dval = (-dval);
         }
         if ( valtype == KIND_DOUBLE )
-            warning(W_DOUBLE_UNEXPECTED);
+            warningfmt("Unexpected floating point encountered, taking int value");
         type->value = dval;
 
         if ( symname(type->name) == 0 ) 
@@ -1013,6 +1102,22 @@ Type *default_function(const char *name)
     return type;
 }
 
+Type *asm_function(const char *name)
+{
+    Type *type = CALLOC(1,sizeof(*type));
+
+    strcpy(type->name, name);
+    type->kind = KIND_FUNC;
+    type->oldstyle = 1;
+    type->return_type = type_void;
+    type->parameters = array_init(NULL);
+    array_add(type->parameters, make_pointer(type_char));
+    type->size = 0;
+    type->len = 1;
+
+    return type;
+}
+
 
 void declare_func_kr()
 {
@@ -1042,7 +1147,7 @@ void declare_func_kr()
         } else {
             param = make_type(KIND_INT, NULL);
             if ( symname(param->name) == 0 ) {
-                error(E_ARGNAME);
+                errorfmt("Illegal Argument Name: %s", 0, param->name);
                 junk();
             }
         }
@@ -1050,7 +1155,7 @@ void declare_func_kr()
             array_add(func->parameters, param);
     
         if (ch() != ')' && cmatch(',') == 0) {
-            warning(W_EXPCOM);
+            warningfmt("Expected ','");
         }
     }
     parse_trailing_modifiers(func);
@@ -1339,7 +1444,6 @@ static void declfunc(Type *type, enum storage_type storage)
         where += zcriticaloffset();
     }
 
-    pushframe();
     
 
     nl();
@@ -1411,6 +1515,7 @@ static void declfunc(Type *type, enum storage_type storage)
     col(); /* print function name */
     if (dopref(currfn) == NO) {
         nl();
+        GlobalPrefix(); outname(currfn->name, YES); nl();
         prefix();
         outname(currfn->name, YES);
         col();

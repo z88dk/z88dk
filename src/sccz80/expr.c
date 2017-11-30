@@ -9,6 +9,22 @@
 
 #include "ccdefs.h"
 
+static int        heir1a(LVALUE *lval);
+static int        heir2a(LVALUE *lval);
+static int        heir2b(LVALUE *lval);
+static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value));
+static int        heir2(LVALUE *lval);
+static int        heir3(LVALUE *lval);
+static int        heir4(LVALUE *lval);
+static int        heir5(LVALUE *lval);
+static int        heir6(LVALUE *lval);
+static int        heir7(LVALUE *lval);
+static int        heir8(LVALUE *lval);
+static int        heir9(LVALUE *lval);
+static int        heirb(LVALUE *lval);
+static SYMBOL    *deref(LVALUE *lval, char isaddr);
+
+
 Kind expression(int  *con, double *val, Type **type)
 {
     LVALUE lval={0};
@@ -26,7 +42,7 @@ int heir1(LVALUE* lval)
 {
     char *before, *start;
     LVALUE lval2={0}, lval3={0};
-    void (*oper)(LVALUE *lval) = NULL;
+    void (*oper)(LVALUE *) = NULL;
     void  (*doper)(LVALUE *lval) = NULL;
     void (*constoper)(LVALUE *lval, int32_t constvalue) = NULL;
     int k;
@@ -146,6 +162,8 @@ int heir1(LVALUE* lval)
     lval3.val_type = lval->val_type;
     lval3.offset = lval->offset;
     lval3.base_offset = lval->base_offset;
+    lval3.const_val = lval->const_val;
+    lval3.is_const = lval->is_const;
     /* don't clear address calc we need it on rhs */
     if (lval->indirect_kind)
         smartpush(lval, 0);
@@ -168,7 +186,7 @@ int heir1a(LVALUE* lval)
     int falselab, endlab, skiplab;
     LVALUE lval2={0};
     int k;
-    int temptype;
+    Kind temptype;
 
     k = heir2a(lval);
     if (cmatch('?')) {
@@ -522,7 +540,7 @@ int heira(LVALUE *lval)
         if (heira(lval))
             rvalue(lval);
         if (lval->ltype->ptr == NULL ) {
-            error(E_DEREF);
+            errorfmt("Can't dereference", 0);
             junk();
             return 0;
         } else {
@@ -591,7 +609,7 @@ int heirb(LVALUE* lval)
                 if (k && ispointer(lval->ltype)) {
                     rvalue(lval);
                 } else if ( !ispointer(lval->ltype) && lval->ltype->kind != KIND_ARRAY) {
-                    error(E_SUBSCRIPT);
+                    errorfmt("Can't subscript", 0);
                     junk();
                     needchar(']');
                     return 0;
@@ -710,12 +728,12 @@ int heirb(LVALUE* lval)
                 }
 
                 if (str == NULL ) {
-                    error(E_MEMBER);
+                    errorfmt("Can't take member", 1);
                     junk();
                     return 0;
                 }
                 if (symname(sname) == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
-                    error(E_UNMEMB, sname);
+                    errorfmt("Unknown member: %s", 1, sname);
                     junk();
                     return 0;
                 }

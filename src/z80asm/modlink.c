@@ -205,8 +205,9 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
             {
             case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
             case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
-            case 'C': expr->range = RANGE_WORD;			break;
-            case 'L': expr->range = RANGE_DWORD;		break;
+			case 'C': expr->range = RANGE_WORD;			break;
+			case 'B': expr->range = RANGE_WORD_BE;		break;
+			case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
 					  assert( str_len(target_name) > 0 );
 					  expr->target_name = strpool_add( str_data(target_name) );	/* define expression as EQU */
@@ -452,7 +453,14 @@ static void patch_exprs( ExprList *exprs )
 				}                
                 break;
 
-            case RANGE_DWORD:
+			case RANGE_WORD_BE:
+				if (value < -32768 || value > 65535)
+					warn_int_range(value);
+
+				patch_word_be(expr->code_pos, value);
+				break;
+
+			case RANGE_DWORD:
                 if ( value < LONG_MIN || value > LONG_MAX )
                     warn_int_range( value );
 
@@ -701,12 +709,10 @@ static void link_libraries(StrHash *extern_syms)
 *----------------------------------------------------------------------------*/
 void link_modules( void )
 {
-    char fheader[9];
     Module *module, *first_obj_module;
 	ModuleListElem *iter;
     char *obj_filename;
 	ExprList *exprs = NULL;
-	FILE *file;
 	StrHash *extern_syms = OBJ_NEW(StrHash);
 
     opts.cur_list = FALSE;
@@ -745,25 +751,11 @@ void link_modules( void )
 		obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */
-		file = myfopen(obj_filename, "rb");
-		if (file)
-		{
-			/* read first 8 chars from file into array */
-			xfget_chars(file, fheader, 8);
-			fheader[8] = '\0';
+		if (!check_object_file(obj_filename))
+			break;
 
-			/* compare header of file */
-			if (strcmp(fheader, Z80objhdr) != 0)
-			{
-				error_not_obj_file(obj_filename);  /* not a object file */
-				myfclose(file);
-				break;
-			}
-
-			myfclose(file);
-
-			LinkModule(obj_filename, 0, extern_syms);       /* link code & read name definitions */
-		}
+		/* link code & read name definitions */
+		LinkModule(obj_filename, 0, extern_syms);       
 	}
 
 	/* link libraries */
@@ -861,6 +853,7 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 				xfget_count_byte_Str(file, section_name);
 				section = new_section(str_data(section_name));
 				read_origin(file, section);
+				section->align = xfget_int32(file);
 
 				/* if creating relocatable code, ignore origin */
 				if (opts.relocatable && section->origin >= 0) {

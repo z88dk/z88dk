@@ -48,5 +48,5 @@ wall.exe: ../wall.c
 	zcc +osca -vn -lndos -create-app -DJOYSTICK -DBANNERS -Dspritesize=8 -O3 -I.. ../wall.c -owall.bin
 
 clean:
-	$(RM) *.bin *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.exe
+	$(RM) *.bin *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.exe *.EXE
 

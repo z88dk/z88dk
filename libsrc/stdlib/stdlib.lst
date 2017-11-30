@@ -1,7 +1,4 @@
-stdlib/obj/${TYPE}/abs
 stdlib/obj/${TYPE}/atexit
-stdlib/obj/${TYPE}/atoi
-stdlib/obj/${TYPE}/atol
 stdlib/obj/${TYPE}/bpeek
 stdlib/obj/${TYPE}/bpoke
 stdlib/obj/${TYPE}/bpoke_callee
@@ -11,19 +8,12 @@ stdlib/obj/${TYPE}/extract_bits_callee
 stdlib/obj/${TYPE}/extract_bits_sub
 stdlib/obj/${TYPE}/inp
 stdlib/obj/${TYPE}/isqrt
-stdlib/obj/${TYPE}/itoa
-stdlib/obj/${TYPE}/itoa_callee
-stdlib/obj/${TYPE}/itox_basechar
 stdlib/obj/${TYPE}/l_bsearch
 stdlib/obj/${TYPE}/l_bsearch_callee
 stdlib/obj/${TYPE}/l_qsort
 stdlib/obj/${TYPE}/l_qsort_callee
-stdlib/obj/${TYPE}/labs
-stdlib/obj/${TYPE}/labs_callee
 stdlib/obj/${TYPE}/Lbsearch
 stdlib/obj/${TYPE}/Lqsort
-stdlib/obj/${TYPE}/ltoa
-stdlib/obj/${TYPE}/ltoa_callee
 stdlib/obj/${TYPE}/outp
 stdlib/obj/${TYPE}/outp_callee
 stdlib/obj/${TYPE}/qsort_sccz80
@@ -32,14 +22,7 @@ stdlib/obj/${TYPE}/qsort_sdcc
 stdlib/obj/${TYPE}/qsort_sdcc_callee
 stdlib/obj/${TYPE}/rand
 stdlib/obj/${TYPE}/randomize
-stdlib/obj/${TYPE}/strtol
-stdlib/obj/${TYPE}/strtol_callee
-stdlib/obj/${TYPE}/strtoul
 stdlib/obj/${TYPE}/swapendian
-stdlib/obj/${TYPE}/ultoa
-stdlib/obj/${TYPE}/ultoa_callee
-stdlib/obj/${TYPE}/utoa
-stdlib/obj/${TYPE}/utoa_callee
 stdlib/obj/${TYPE}/wpeek
 stdlib/obj/${TYPE}/wpoke
 stdlib/obj/${TYPE}/wpoke_callee
@@ -50,3 +33,4 @@ stdlib/obj/${TARGET}/sleep
 stdlib/obj/${TARGET}/csleep
 stdlib/obj/${TYPE}/wcmatch
 stdlib/obj/${TYPE}/unbcd
+@stdlib/stdlib-newlib.lst

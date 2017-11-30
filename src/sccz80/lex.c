@@ -8,8 +8,6 @@
 
 #include "ccdefs.h"
 
-extern char line[];
-
 int streq(char str1[], char str2[])
 {
     int k;
@@ -64,7 +62,7 @@ int cmatch(char lit)
     int  i;
     blanks();
     if (eof)
-        error(E_EOF);
+        errorfmt("Unexpected end of file", 1);
     if (line[lptr] == lit) {
         for ( i = 0; i < buffer_fps_num; i++ ) {
              fprintf(buffer_fps[i],"%c",line[lptr]);
@@ -80,7 +78,7 @@ int acmatch(char lit)
 {
     int  i;
     if (eof)
-        error(E_EOF);
+        errorfmt("Unexpected end of file", 1);
     if (line[lptr] == lit) {
         for ( i = 0; i < buffer_fps_num; i++ )
              fprintf(buffer_fps[i],"%c",line[lptr]);
@@ -90,46 +88,12 @@ int acmatch(char lit)
     return 0;
 }
 
-/*
- * djm get symbol name into string...and check for typedef
- */
-
-int CheckTypDef(void)
-{
-    char sname[NAMESIZE];
-    char* ptr;
-    SYMBOL* sym;
-    int i = 0;
-
-    blanks(); /* Skip white space */
-    ptr = line + lptr; /* Where label starts */
-
-    while (an(*ptr) && i < (NAMESIZE -1))
-        sname[i++] = *ptr++;
-    sname[i] = 0;
-    sym = findglb(sname);
-    if (sym && sym->storage == TYPDEF)
-        return 1;
-    return 0;
-}
 
 int checkws()
 {
     return isspace( *(line+lptr));
 }
 
-/* djm, reversible match thing, used to scan for ascii fn defs.. 
- * this doesn't affect the line permanently! 
- */
-
-int rmatch(char* lit)
-{
-    int k;
-    blanks();
-    if ((k = astreq(line + lptr, lit)))
-        return 1;
-    return 0;
-}
 
 int rmatch2(char* lit)
 {
@@ -148,7 +112,7 @@ int rcmatch(char lit)
 {
     blanks();
     if (eof)
-        error(E_EOF);
+        errorfmt("Unexpected end of file", 1);
     if (line[lptr] == lit) {
         return 1;
     }

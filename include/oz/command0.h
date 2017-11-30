@@ -13,7 +13,7 @@
                 defb    ( in_topic1_hlp - in_help) / 256
                 defb    ( in_topic1_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC1
+                defb    0,0             ;ptr to help - use '0' of TOPIC1
 #endif
 #ifdef TOPIC1ATTR
                 APPLBYTE(TOPIC1ATTR)
@@ -33,7 +33,7 @@
                 defb    ( in_topic2_hlp - in_help) / 256
                 defb    ( in_topic2_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC2
+                defb    0,0             ;ptr to help - use '0' of TOPIC2
 #endif
 #ifdef TOPIC2ATTR
                 APPLBYTE(TOPIC2ATTR)
@@ -53,7 +53,7 @@
                 defb    ( in_topic3_hlp - in_help) / 256
                 defb    ( in_topic3_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC3
+                defb    0,0             ;ptr to help - use '0' of TOPIC3
 #endif
 #ifdef TOPIC3ATTR
                 APPLBYTE(TOPIC3ATTR)
@@ -73,7 +73,7 @@
                 defb    ( in_topic4_hlp - in_help) / 256
                 defb    ( in_topic4_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC4
+                defb    0,0             ;ptr to help - use '0' of TOPIC4
 #endif
 #ifdef TOPIC4ATTR
                 APPLBYTE(TOPIC4ATTR)
@@ -93,7 +93,7 @@
                 defb    ( in_topic5_hlp - in_help) / 256
                 defb    ( in_topic5_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC5
+                defb    0,0             ;ptr to help - use '0' of TOPIC5
 #endif
 #ifdef TOPIC5ATTR
                 APPLBYTE(TOPIC5ATTR)
@@ -113,7 +113,7 @@
                 defb    ( in_topic6_hlp - in_help) / 256
                 defb    ( in_topic6_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC6
+                defb    0,0             ;ptr to help - use '0' of TOPIC6
 #endif
 #ifdef TOPIC6ATTR
                 APPLBYTE(TOPIC6ATTR)
@@ -133,7 +133,7 @@
                 defb    ( in_topic7_hlp - in_help) / 256
                 defb    ( in_topic7_hlp - in_help) % 256
 #else
-                defb    0,0             ;ptr to help - use \0 of TOPIC7
+                defb    0,0             ;ptr to help - use '0' of TOPIC7
 #endif
 #ifdef TOPIC7ATTR
                 APPLBYTE(TOPIC7ATTR)

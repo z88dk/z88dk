@@ -17,19 +17,24 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	cp	12
-	jr	nz,nocls
 
-.nocls
-
-	; Some undercase text?  Transform in UPPER !
+	; Some undercase text? Transform to UPPER because Galaksija doesn't
+	; have lower case characters.
 	cp	97
 	jr	c,nounder
 	sub	32
 	jr	setout
 .nounder
-	; Some more char remapping can stay here...
+	; Galaksija's ROM uses some non-standard codes for special functions
+	; https://www.tablix.org/~avian/galaksija/rom/rom1.html#l0a04h
 IF STANDARDESCAPECHARS
+	; ASCII backspace
+	cp	8
+	jr	nz,nobs
+	ld	a,29
+	jr	setout
+.nobs
+	; ASCII line feed
 	cp	10
 	jr	nz,setout
 	ld	a,13

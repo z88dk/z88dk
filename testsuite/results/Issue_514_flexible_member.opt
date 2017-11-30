@@ -1,0 +1,59 @@
+
+
+
+	MODULE	Issue_514_flexible_member
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+	ld	hl,0	;const
+	push	hl
+	add	hl,sp
+	call	l_gint	;
+	inc	hl
+	inc	hl
+	ld	bc,6
+	add	hl,bc
+	ld	(hl),#(17 % 256)
+	inc	hl
+	ld	(hl),#(17 / 256)
+	ld	hl,2	;const
+	pop	bc
+	ret
+
+
+
+._func2
+	ld	hl,0	;const
+	push	hl
+	add	hl,sp
+	call	l_gint	;
+	inc	hl
+	inc	hl
+	ld	bc,6
+	add	hl,bc
+	ld	(hl),#(17 % 256)
+	inc	hl
+	ld	(hl),#(17 / 256)
+	ld	hl,2	;const
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func1
+	GLOBAL	_func2
+
+
+
+

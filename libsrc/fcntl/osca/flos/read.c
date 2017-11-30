@@ -19,7 +19,7 @@ ssize_t read(int myfile, void *ptr, size_t len)
 {
 	struct flos_file *flosfile;
 
-	flosfile = (char *) myfile;
+	flosfile = (void *) myfile;
 	if (flosfile->name[0]==0)
 		return (-1);
 

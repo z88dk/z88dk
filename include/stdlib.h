@@ -10,7 +10,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
-#include <sys/types.h>
+#include <stdint.h>
 
 
 /**********************************/
@@ -27,28 +27,34 @@
 extern int  __LIB__   atoi(const char *s) __z88dk_fastcall;
 extern long __LIB__   atol(const char *s) __z88dk_fastcall;
 
-extern int  __LIB__               itoa(int n, char *s, int radix) __smallc;
-extern int  __LIB__     itoa_callee(int n, char *s, int radix) __smallc __z88dk_callee;
-extern int  __LIB__               utoa(uint n, char *s, int radix) __smallc;
-extern int  __LIB__     utoa_callee(uint n, char *s, int radix) __smallc __z88dk_callee;
-extern int  __LIB__               ltoa(long n, char *s, int radix) __smallc;
-extern int  __LIB__     ltoa_callee(long n, char *s, int radix) __smallc __z88dk_callee;
-extern int  __LIB__               ultoa(unsigned long n, char *s, int radix) __smallc;
-extern int  __LIB__     ultoa_callee(unsigned long n, char *s, int radix) __smallc __z88dk_callee;
+extern char __LIB__ *itoa(int num,char *buf,int radix) __smallc;
+extern char __LIB__ *itoa_callee(int num,char *buf,int radix) __smallc __z88dk_callee;
+#define itoa(a,b,c) itoa_callee(a,b,c)
 
-#define itoa(a,b,c)  itoa_callee(a,b,c)
-#define utoa(a,b,c)  utoa_callee(a,b,c)
-#define ltoa(a,b,c)  ltoa_callee(a,b,c)
+extern char __LIB__ *ltoa(long num,char *buf,int radix) __smallc;
+extern char __LIB__ *ltoa_callee(long num,char *buf,int radix) __smallc __z88dk_callee;
+#define ltoa(a,b,c) ltoa_callee(a,b,c)
+
+extern long __LIB__ strtol(char *nptr,char **endptr,int base) __smallc;
+extern long __LIB__ strtol_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
+#define strtol(a,b,c) strtol_callee(a,b,c)
+
+
+extern uint32_t __LIB__ strtoul(char *nptr,char **endptr,int base) __smallc;
+extern uint32_t __LIB__ strtoul_callee(char *nptr,char **endptr,int base) __smallc __z88dk_callee;
+#define strtoul(a,b,c) strtoul_callee(a,b,c)
+
+extern char __LIB__ *ultoa(uint32_t num,char *buf,int radix) __smallc;
+extern char __LIB__ *ultoa_callee(uint32_t num,char *buf,int radix) __smallc __z88dk_callee;
 #define ultoa(a,b,c) ultoa_callee(a,b,c)
 
+
+extern char __LIB__ *utoa(uint16_t num,char *buf,int radix) __smallc;
+extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z88dk_callee;
+#define utoa(a,b,c) utoa_callee(a,b,c)
+
+
 // double strtod(char *s, char **endp);     /* check math library for availability */
-
-extern long          __LIB__               strtol(const char *s, char **endp, int base) __smallc;
-extern long          __LIB__     strtol_callee(const char *s, char **endp, int base) __smallc __z88dk_callee;
-extern unsigned long __LIB__               strtoul(const char *s, char **endp, int base) __smallc;
-
-#define strtol(a,b,c)  strtol_callee(a,b,c)
-#define strtoul(a,b,c) strtol_callee(a,b,c)
 
 #ifdef __SDCC
 /* 64 bit is only available with sdcc */
@@ -177,16 +183,69 @@ extern void __LIB__  qsort_sdcc_callee(void *base, unsigned int nel, unsigned in
 #endif
 
 
+//////////////////////////
+//// Division routines
+//////////////////////////
+
+typedef struct
+{
+
+   int rem;
+   int quot;
+
+} div_t;
+
+typedef struct
+{
+
+   unsigned int rem;
+   unsigned int quot;
+
+} divu_t;
+
+typedef struct
+{
+
+   long quot;
+   long rem;
+
+} ldiv_t;
+
+typedef struct
+{
+
+   unsigned long quot;
+   unsigned long rem;
+
+} ldivu_t;
+
+extern void __LIB__ _div_(div_t *d,int numer,int denom) __smallc;
+extern void __LIB__ _div__callee(div_t *d,int numer,int denom) __smallc __z88dk_callee;
+#define _div_(a,b,c) _div__callee(a,b,c)
+
+
+extern void __LIB__ _divu_(divu_t *d,unsigned int numer,unsigned int denom) __smallc;
+extern void __LIB__ _divu__callee(divu_t *d,unsigned int numer,unsigned int denom) __smallc __z88dk_callee;
+#define _divu_(a,b,c) _divu__callee(a,b,c)
+
+
+extern void __LIB__ _ldiv_(ldiv_t *ld,long numer,long denom) __smallc;
+extern void __LIB__ _ldiv__callee(ldiv_t *ld,long numer,long denom) __smallc __z88dk_callee;
+#define _ldiv_(a,b,c) _ldiv__callee(a,b,c)
+
+
+extern void __LIB__ _ldivu_(ldivu_t *ld,unsigned long numer,unsigned long denom) __smallc;
+extern void __LIB__ _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long denom) __smallc __z88dk_callee;
+#define _ldivu_(a,b,c) _ldivu__callee(a,b,c)
+
+
 
 //////////////////////////
 //// Misc Number Functions
 //////////////////////////
 
 extern int  __LIB__  abs(int n) __z88dk_fastcall;
-extern long __LIB__              labs(long n);
-extern long __LIB__    labs_callee(long n) __z88dk_callee;
-
-#define labs(a) labs_callee(a)
+extern long __LIB__  labs(long n) __z88dk_fastcall;
 
 extern uint __LIB__  isqrt(uint n) __z88dk_fastcall;
 

@@ -1,0 +1,57 @@
+
+
+
+	MODULE	Issue_501_extern_at
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+.___extern_c
+	defb	1
+	SECTION	code_compiler
+	SECTION	code_crt_init
+	ld	a,(___extern_c)
+	ld	(_c),a
+	SECTION	data_compiler
+.___extern_d
+	defw	22
+	SECTION	code_compiler
+	SECTION	code_crt_init
+	ld	hl,(___extern_d)
+	ld	(_d),hl
+	SECTION	data_compiler
+.___extern_e
+	defw	8192
+	SECTION	code_compiler
+	SECTION	code_crt_init
+	ld	hl,(___extern_e)
+	ld	(_e),hl
+	SECTION	data_compiler
+.___extern_buf
+	defm	"Hello there"
+	defb	0
+
+	SECTION	code_compiler
+	SECTION	code_crt_init
+	ld	hl,___extern_buf
+	ld	de,_buf
+	ld	bc,12
+	ldir
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	defc	_c	= 16384
+	defc	_b	= 28672
+	defc	_d	= 32768
+	defc	_e	= 12288
+	defc	_buf	= 1280
+
+
+
+

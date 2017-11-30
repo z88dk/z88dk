@@ -31,7 +31,8 @@ ENDIF
 	inc	hl
 	ld	a,(hl)
 	and	_IOUSE|_IOEXTRA
-	jr	z,fflush_error 	;not used
+	cp	_IOUSE|_IOEXTRA
+	jr	nz,fflush_error 	;not used
 	push	ix	;save callers ix
 	dec	hl
 	dec	hl	;hl = fp

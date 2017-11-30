@@ -18,7 +18,7 @@ Handle object file contruction, reading and writing
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OBJ_VERSION	"09"
+#define OBJ_VERSION	"11"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed
@@ -80,4 +80,13 @@ extern ByteArray *read_obj_file_data( char *filename );
 
 /* Updates current module name and size, if object file of given source is valid
    load module name and size, when assembling with -d and up-to-date */
-extern Bool objmodule_loaded( char *src_filename );
+extern Bool objmodule_loaded( char *obj_filename);
+
+// check if the given filename exists and is an object file of the correct version
+extern Bool check_object_file(char *obj_filename);
+
+// worker
+extern Bool check_obj_lib_file(char *filename,
+	char *signature,
+	void(*error_file)(char*), 
+	void(*error_version)(char*,int,int));	

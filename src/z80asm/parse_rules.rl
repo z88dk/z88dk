@@ -152,9 +152,12 @@ Define rules for a ragel-based parser.
 
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr	
-		  %{ if (! expr_error) 
+		  %{ if (expr_error)
+				error_expected_const_expr();
+			else {
 				asm_DEFGROUP_start(expr_value);
-			 asm_DEFGROUP_define_const(str_data(name));
+				asm_DEFGROUP_define_const(str_data(name));
+			}
 		  };
 	
 	defgroup_var_next =
@@ -182,12 +185,16 @@ Define rules for a ragel-based parser.
 	*--------------------------------------------------------------------*/
 	asm_DEFVARS = 
 		  _TK_DEFVARS const_expr _TK_NEWLINE
-		  @{ if (! expr_error) 
+		  @{ if (expr_error)
+				error_expected_const_expr();
+			 else 
 				asm_DEFVARS_start(expr_value);
-			 ctx->current_sm = SM_DEFVARS_OPEN;
+		     ctx->current_sm = SM_DEFVARS_OPEN; 
 		  }
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
-		  @{ if (! expr_error) 
+		  @{ if (expr_error)
+				error_expected_const_expr();
+			 else 
 				asm_DEFVARS_start(expr_value);
 			 ctx->current_sm = SM_DEFVARS_LINE;
 		  }
@@ -207,7 +214,9 @@ Define rules for a ragel-based parser.
 		  @{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
 #foreach <S> in B, W, P, Q
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
-		  @{ if (! expr_error) 
+		  @{ if (expr_error)
+				error_expected_const_expr();
+			 else
 				asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_<S>, expr_value ); 
 		  }
 #endfor  <S>
@@ -219,13 +228,23 @@ Define rules for a ragel-based parser.
 	asm_DEFS = 
 		  label? _TK_DEFS const_expr _TK_NEWLINE 
 		  @{ DO_STMT_LABEL(); 
-		     if (! expr_error) asm_DEFS(expr_value, opts.filler); }
+		     if (expr_error)
+				error_expected_const_expr();
+			 else
+				asm_DEFS(expr_value, opts.filler); }
 		| label? _TK_DEFS 
 				const_expr _TK_COMMA
-				@{ value1 = expr_error ? 0 : expr_value; }
+				@{ if (expr_error)
+					  error_expected_const_expr();
+			       value1 = expr_error ? 0 : expr_value;
+				   expr_error = FALSE;
+				}
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
-		     if (! expr_error) asm_DEFS(value1, expr_value); }
+		     if (expr_error)
+				error_expected_const_expr();
+			 else
+				asm_DEFS(value1, expr_value); }
 		;			     
 		
 	/*---------------------------------------------------------------------
@@ -322,10 +341,11 @@ Define rules for a ragel-based parser.
 	*--------------------------------------------------------------------*/
 #foreach <OP> in CALL_OZ, CALL_PKG, FPP, INVOKE
 	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
-			@{	if (! expr_error) {
-					DO_STMT_LABEL();
+			@{	DO_STMT_LABEL();
+			    if (expr_error)
+				    error_expected_const_expr();
+			    else
 					add_Z88_<OP>(expr_value);
-				}
 			};
 #endfor  <OP>
 	asm_Z88DK = asm_CALL_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
@@ -346,40 +366,79 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
+		| label? _TK_ALIGN const_expr _TK_NEWLINE @{ 
+		    DO_STMT_LABEL(); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_ALIGN(expr_value, opts.filler); 
+		}
+		| label? _TK_ALIGN const_expr _TK_COMMA
+				@{ if (expr_error)
+					   error_expected_const_expr();
+				   value1 = expr_error ? 0 : expr_value; 
+				   expr_error = FALSE;
+				}
+				const_expr _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+		    if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_ALIGN(value1, expr_value); 
+		}			     
+		
 		| _TK_ORG const_expr _TK_NEWLINE @{ 
-			if (!expr_error) asm_ORG(expr_value); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_ORG(expr_value); 
 		}
 		  
 		| _TK_LINE const_expr _TK_NEWLINE @{ 
-			if (!expr_error) asm_LINE(expr_value, get_error_file()); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_LINE(expr_value, get_error_file()); 
 		}
 		
 		| _TK_LINE const_expr _TK_COMMA string _TK_NEWLINE @{ 
-			if (!expr_error) asm_LINE(expr_value, str_data(name)); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_LINE(expr_value, str_data(name)); 
 		}
 		
 		| _TK_C_LINE const_expr _TK_NEWLINE @{ 
-			if (!expr_error) asm_C_LINE(expr_value, get_error_file()); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_C_LINE(expr_value, get_error_file()); 
 		}
 		
 		| _TK_C_LINE const_expr _TK_COMMA string _TK_NEWLINE @{ 
-			if (!expr_error) asm_C_LINE(expr_value, str_data(name)); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_C_LINE(expr_value, str_data(name)); 
 		}
 		
 		| _TK_INCLUDE string _TK_NEWLINE @{ 
-			if (!expr_error) asm_INCLUDE(str_data(name)); 
+			asm_INCLUDE(str_data(name)); 
 		}
 		
 		| _TK_BINARY string _TK_NEWLINE @{ 
-			if (!expr_error) asm_BINARY(str_data(name)); 
+			asm_BINARY(str_data(name)); 
 		}
 		
 		| _TK_PHASE const_expr _TK_NEWLINE @{ 
-			if (!expr_error) asm_PHASE(expr_value); 
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_PHASE(expr_value); 
 		}
 		
 		| _TK_DEPHASE _TK_NEWLINE @{ 
-			if (!expr_error) asm_DEPHASE(); 
+			asm_DEPHASE(); 
 		}
 		
 		/*---------------------------------------------------------------------
@@ -389,6 +448,33 @@ Define rules for a ragel-based parser.
 
 #include "dev/cpu/cpu_rules.h"
 
+		/*---------------------------------------------------------------------
+		*   ZXN Copper Unit
+		*--------------------------------------------------------------------*/
+		| label? _TK_CU_WAIT expr _TK_COMMA	expr _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			Expr *hor = pop_expr(ctx);
+			Expr *ver = pop_expr(ctx);
+			add_copper_unit_wait(ver, hor);
+		}
+		
+		| label? _TK_CU_MOVE expr _TK_COMMA expr _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			Expr *val = pop_expr(ctx);
+			Expr *reg = pop_expr(ctx);
+			add_copper_unit_move(reg, val);
+		}
+		
+		| label? _TK_CU_STOP _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			add_copper_unit_stop();
+		}
+		
+		| label? _TK_CU_NOP _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
+			add_copper_unit_nop();
+		}
+		
 		;
 
 }%%

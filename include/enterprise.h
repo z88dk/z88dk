@@ -235,7 +235,7 @@ struct EXOS_INFO {
 };
 
 // Updates status struct and returns the EXOS version number
-extern int __LIB__   exos_system_status(struct EXOS_INFO info) __z88dk_fastcall;
+extern int __LIB__   exos_system_status(struct EXOS_INFO *info) __z88dk_fastcall;
 
 
 // Sound functions
