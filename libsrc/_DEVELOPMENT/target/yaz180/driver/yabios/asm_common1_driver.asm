@@ -29,7 +29,7 @@ _error_handler_rst:     ; RST  8
     dec hl
     call phexwdreg      ; output originating RST address on serial port
     ex de, hl           ; get error code in L
-    call phexreg        ; output error code on serial port
+    call phex           ; output error code on serial port
     call delay
     call delay
     halt
