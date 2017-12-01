@@ -44,15 +44,15 @@ extern uint8_t bankLockBase[];  // base address for 16 BANK locks
 
 // provide methods to get, try, and give the simple mutex locks
 
-__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lock_get,uint8_t * mutex)
-__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',uint8_t,,lock_try,uint8_t * mutex)
-__DPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,lock_give,uint8_t * mutex)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,lock_get,uint8_t * mutex)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,lock_try,uint8_t * mutex)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,lock_give,uint8_t * mutex)
 
 // provide bank relative address functions
 
-__DPROTO(`a,b,c,d,e,h,iyh,iyl',`a,b,c,d,e,h,iyh,iyl',int8_t,,bank_get_rel,uint8_t bankAbs)
-__DPROTO(`a,b,c,d,e,h,iyh,iyl',`a,b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t bankRel)
-__OPROTO(`a,b,c,iyh,iyl',`a,b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
+__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',int8_t,,bank_get_rel,uint8_t bankAbs)
+__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t bankRel)
+__OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
 
 // provide memcpy_far and memset_far functions
 
