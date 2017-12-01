@@ -9,40 +9,36 @@
 
 #include "ccdefs.h"
 
-static int        heir1a(LVALUE *lval);
-static int        heir2a(LVALUE *lval);
-static int        heir2b(LVALUE *lval);
-static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value));
-static int        heir2(LVALUE *lval);
-static int        heir3(LVALUE *lval);
-static int        heir4(LVALUE *lval);
-static int        heir5(LVALUE *lval);
-static int        heir6(LVALUE *lval);
-static int        heir7(LVALUE *lval);
-static int        heir8(LVALUE *lval);
-static int        heir9(LVALUE *lval);
-static int        heirb(LVALUE *lval);
-static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
-
-Kind expression(int  *con, double *val, Type **type)
+int expression(int  *con, double *val, uint32_t *packedArgumentType)
 {
     LVALUE lval={0};
+    char type;
 
     if (heir1(&lval)) {
         rvalue(&lval);
     }
+    fnflags = lval.flags;
+    if (lval.ptr_type) {
+        type = lval.ptr_type;
+        lval.ident = POINTER;
+    } else {
+        type = lval.val_type;
+    }
+    *packedArgumentType = CalcArgValue(type, lval.ident, lval.flags);
+    margtag = 0;
+    if (lval.tagsym)
+        margtag = (lval.tagsym - tagtab);
     *con = lval.is_const;
     *val = lval.const_val;
-    *type = lval.ltype;
-    return lval.ltype ? lval.ltype->kind : KIND_NONE;
+    return lval.val_type;
 }
 
 int heir1(LVALUE* lval)
 {
     char *before, *start;
     LVALUE lval2={0}, lval3={0};
-    void (*oper)(LVALUE *) = NULL;
+    void (*oper)(LVALUE *lval) = NULL;
     void  (*doper)(LVALUE *lval) = NULL;
     void (*constoper)(LVALUE *lval, int32_t constvalue) = NULL;
     int k;
@@ -59,7 +55,7 @@ int heir1(LVALUE* lval)
             needlval();
             return 0;
         }
-        if (lval->indirect_kind)
+        if (lval->indirect)
             smartpush(lval, before);
         setstage(&before1, &start1);
         if (heir1(&lval2))
@@ -68,7 +64,7 @@ int heir1(LVALUE* lval)
         /* If it's a const, then load it with the right type */
         if ( lval2.is_const ) {
             /* This leaves the double with a count of 2 */
-            if ( lval2.val_type == KIND_DOUBLE ) {
+            if ( lval2.val_type == DOUBLE ) {
                 decrement_double_ref(&lval2);
                 decrement_double_ref(&lval2);
             }
@@ -77,46 +73,52 @@ int heir1(LVALUE* lval)
             load_constant(&lval2);
         }
 
-        if ( ispointer(lval->ltype)) {
-            Type *rhs = lval2.ltype;
 
-            if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->kind == KIND_FUNC ) {
-                rhs = make_pointer(rhs);
-            }
-
-            if (  rhs->kind == KIND_ARRAY ) {
-                rhs = make_pointer(rhs->ptr);
-            }
-            
-            if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
-                    ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
-                if ( ispointer(lval->ltype) && lval2.is_const && lval2.const_val == 0 ) {
-                } else {
-                    UT_string *str;
-
-                    utstring_new(str);
-                    utstring_printf(str,"Assigning '%s', type: ", lval->ltype->name);
-                    type_describe(lval->ltype,str);
-                    utstring_printf(str," from ");
-                    type_describe(rhs, str);
-                    warningfmt("%s", utstring_body(str));
-                    utstring_free(str);
-                }
-            } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
-                // Check flag assignment
-                if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
-                    warningfmt("Assigning CALLEE function pointer with non-CALLEE function");
-                }
-                if ( (lval->ltype->ptr->flags & SMALLC) && (rhs->ptr->flags & SMALLC) == 0 ) {
-                    warningfmt("Assigning SMALLC function pointer with non-SMALLC function");
-                }
-            }
-        } 
-        if ( lval2.ltype->kind == KIND_VOID ) {
-            warningfmt("Assigning from a void expression");
+        /* Now our type checking so we can give off lots of warnings about
+         * type mismatches etc..
+         */
+        if (lval2.val_type == VOID && lval2.ptr_type == 0)
+            warning(W_VOID);
+        /* First operand is a pointer */
+        if (lval->ptr_type) {
+            if (lval2.ptr_type && lval->ptr_type != lval2.ptr_type && (lval2.ptr_type != VOID && lval->ptr_type != VOID)) {
+#if 0
+                /*
+                * Here we have a pointer mismatch, however we don't take account of
+                * ptr2ptr, so anything involvind them will barf badly, I'm leaving
+                * this for now, since the code is fine, but commenting out the warning
+                * which is a bit of shame, but there you go...
+                */
+                warning(W_PTRTYP);
+#endif
+            } else if (!(lval2.ptr_type) && !(lval2.is_const) && lval2.ident != FUNCTION)
+                warning(W_INTPTR);
+        } else if (lval2.ptr_type && (!(lval->ptr_type) && !(lval->is_const))) {
+            warning(W_PTRINT);
         }
 
-        force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
+        // Check that function pointers are assigned correctly + copy the calling convention from RHS as necessary
+        if ( lval->symbol && lval->ident == POINTER && lval2.ident == FUNCTION ) {
+            if ( lval->symbol->flags & FLOATINGDECL) {
+                /* The function pointer was undecorated, it should take on whatever is on the RHS */
+                lval->symbol->flags &= ~(CALLEE|SMALLC);
+                lval->symbol->flags |= ( lval2.flags & (CALLEE|SMALLC));
+            } else {
+                if ( (lval->symbol->flags & CALLEE) != (lval2.flags & CALLEE)) {
+                    warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "_z88dk_callee");
+                }
+                if ( (lval->symbol->flags & SMALLC) != (lval2.flags & SMALLC)) {
+                    warning(W_CALLINGCONVENTION_MISMATCH, lval->symbol->name, "__smallc/__stdc");
+                }
+            }
+        }
+
+
+#ifdef SILLYWARNING
+        if (((lval->flags & UNSIGNED) != (lval2.flags & UNSIGNED)) && (!(lval2.is_const) && !(lval->ptr_type) && !(lval2.ptr_type)))
+            warning(W_EGSG);
+#endif
+        force(lval->val_type, lval2.val_type, lval->flags & UNSIGNED, lval2.flags & UNSIGNED, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
     } else if (match("|=")) {
@@ -156,16 +158,13 @@ int heir1(LVALUE* lval)
         return 0;
     }
     lval3.symbol = lval->symbol;
-    lval3.ltype = lval->ltype;
-    lval3.indirect_kind = lval->indirect_kind;
+    lval3.indirect = lval->indirect;
     lval3.flags = lval->flags;
     lval3.val_type = lval->val_type;
     lval3.offset = lval->offset;
-    lval3.base_offset = lval->base_offset;
-    lval3.const_val = lval->const_val;
-    lval3.is_const = lval->is_const;
+    lval3.storage = lval->storage;
     /* don't clear address calc we need it on rhs */
-    if (lval->indirect_kind)
+    if (lval->indirect)
         smartpush(lval, 0);
     rvalue(lval);
     if (oper == zadd || oper == zsub)
@@ -173,7 +172,7 @@ int heir1(LVALUE* lval)
     else
         plnge2a(heir1, lval, &lval2, oper, doper, constoper);
 
-    force(lval3.val_type, lval->val_type, lval3.ltype->isunsigned, lval->ltype->isunsigned, lval->is_const);
+    force(lval3.val_type, lval->val_type, lval3.flags & UNSIGNED, lval->flags & UNSIGNED, lval->is_const);
     smartstore(&lval3);
     return 0;
 }
@@ -186,7 +185,7 @@ int heir1a(LVALUE* lval)
     int falselab, endlab, skiplab;
     LVALUE lval2={0};
     int k;
-    Kind temptype;
+    int temptype;
 
     k = heir2a(lval);
     if (cmatch('?')) {
@@ -196,9 +195,9 @@ int heir1a(LVALUE* lval)
         /* test condition, jump to false expression evaluation if necessary */
         if (check_lastop_was_testjump(lval)) {
             // Always evaluated as an integer, so fake it temporarily
-            force(KIND_INT, lval->val_type, c_default_unsigned, lval->ltype->isunsigned, 0);
+            force(CINT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
             temptype = lval->val_type;
-            lval->val_type = KIND_INT; /* Force to integer */
+            lval->val_type = CINT; /* Force to integer */
             testjump(lval, falselab = getlabel());
             lval->val_type = temptype;
             /* evaluate 'true' expression */
@@ -230,31 +229,29 @@ int heir1a(LVALUE* lval)
         if (heir1(lval))
             rvalue(lval);
         /* check types of expressions and widen if necessary */
-        if (lval2.val_type == KIND_DOUBLE && lval->val_type != KIND_DOUBLE) {
-            convert_int_to_double(lval->val_type, lval->ltype->isunsigned);
+        if (lval2.val_type == DOUBLE && lval->val_type != DOUBLE) {
+            convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
             postlabel(endlab);
-        } else if (lval2.val_type != KIND_DOUBLE && lval->val_type == KIND_DOUBLE) {
+        } else if (lval2.val_type != DOUBLE && lval->val_type == DOUBLE) {
             jump(skiplab = getlabel());
             postlabel(endlab);
-            convert_int_to_double(lval2.val_type, lval2.ltype->isunsigned);
+            convert_int_to_double(lval2.val_type, lval2.flags & UNSIGNED);
             postlabel(skiplab);
         }
         /* 12/8/98 Mod by djm to convert long types - it's nice when someone
  * else has had to do it before! */
-        else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
+        else if (lval2.val_type == LONG && lval->val_type != LONG) {
             /* Check for signed, if both signed convert properly, if one/neither signed
  * then we have dodgy equating in anycase, so treat as unsigned
  */
             widenlong(&lval2, lval);
-            lval->val_type = KIND_LONG;
-            lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+            lval->val_type = LONG;
             postlabel(endlab);
-        } else if (lval2.val_type != KIND_LONG && lval->val_type == KIND_LONG) {
+        } else if (lval2.val_type != LONG && lval->val_type == LONG) {
             jump(skiplab = getlabel());
             postlabel(endlab);
             widenlong(lval, &lval2);
-            lval->val_type = KIND_LONG;
-            lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;            
+            lval->val_type = LONG;
             postlabel(skiplab);
         } else
             postlabel(endlab);
@@ -444,30 +441,49 @@ int heir9(LVALUE* lval)
  * perform lval manipulation for pointer dereferencing/array subscripting
  */
 
+/* djm, I can't make this routine distinguish between ptr->ptr and ptr
+ * so if address loads dummy de,0 to ensure everything works out
+ */
 SYMBOL *deref(LVALUE* lval, char isaddr)
 {
-    Type *old_type = lval->ltype;
-
-
-
-    lval->symbol = NULL;
-    if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_FUNC ) {
-        return lval->symbol;
-    }
-
-    lval->ltype = lval->ltype->ptr;
-    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
-        lval->ptr_type = KIND_NONE;
-    else
-        lval->ptr_type = lval->ltype->ptr->kind;
-    lval->val_type = lval->indirect_kind = lval->ltype->kind;
-
-    if ( old_type->kind == KIND_CPTR ) {
-        lval->flags |= FARACC;
+    char flags;
+    flags = lval->flags;
+    if (isaddr) {
+        if (flags & FARACC)
+            flags |= FARACC;
     } else {
-        lval->flags &= ~FARACC;
+        if (flags & FARPTR)
+            flags |= FARACC;
+        else
+            flags &= ~FARACC;
     }
-
+    if ( lval->symbol->type == PORT8 || lval->symbol->type == PORT16 ) {
+        error(E_PORT_DEREF, lval->symbol->name);
+    }
+    /* NB it has already been determind that lval->symbol is non-zero */
+    if (lval->symbol->more == 0) {
+        /* array of/pointer to variable */
+        if (flags & FARPTR && lval->val_type == CPTR)
+            flags |= FARACC;
+        // else flags &= ~FARACC;
+        lval->val_type = lval->indirect = lval->symbol->type;
+        lval->flags = flags;
+        lval->symbol = NULL; /* forget symbol table entry */
+        lval->ptr_type = 0; /* flag as not symbol or array */
+        lval->ident = VARIABLE; /* We're now a variable! */
+    } else {
+        /* array of/pointer to pointer */
+        lval->symbol = dummy_sym[(int)lval->symbol->more];
+        /* djm long pointers */
+        lval->ptr_type = lval->symbol->type;
+        /* 5/10/98 restored lval->val_type */
+        lval->indirect = lval->val_type = (flags & FARPTR ? CPTR : CINT);
+        if (flags & FARPTR)
+            flags |= FARACC;
+        lval->flags = flags;
+        if (lval->symbol->type == STRUCT)
+            lval->tagsym = tagtab + lval->symbol->tag_idx;
+    }
     return lval->symbol;
 }
 
@@ -475,6 +491,9 @@ int heira(LVALUE *lval)
 {
     int k, j;
     LVALUE  cast_lval={0};
+    TAG_SYMBOL* otag;
+    struct varid var;
+    char ident;
     int klptr;
     int save_fps_num;
 
@@ -482,21 +501,34 @@ int heira(LVALUE *lval)
     save_fps_num = buffer_fps_num;
     buffer_fps_num = 0;
     if (rcmatch('(')) {
-        Type  *ctype;
         klptr = lptr;
         lptr++;
-        if ( (ctype = parse_expr_type()) != NULL ) {
+        otag = GetVarID(&var, NO);
+        var.sflag = ((var.sign & UNSIGNED) | (var.zfar & FARPTR));
+        if (var.type != NO) {
+            ident = get_ident(var.ident);
+            if (ident == PTR_TO_FN || ident == FUNCTIONP)
+                needtoken(")()");
+            /*
+ * Scrunch everything together, replace c_ptype with c_id
+ */
+            cast_lval.c_vtype = var.type;
+            cast_lval.c_id = ident;
+            cast_lval.c_tag = otag;
+            cast_lval.c_flags = var.sflag;
             needchar(')');
-            cast_lval.cast_type = ctype;
             for ( j = 0; j < save_fps_num; j++ ) {
                  fprintf(buffer_fps[j],"%.*s",lptr-klptr,line+klptr);
             }
             buffer_fps_num = save_fps_num;
             k = heira(lval);
             if ( k == 1 ) { // If we need to fetch then we should cast what we get 
-                lval->cast_type = cast_lval.cast_type;
+                lval->c_vtype = cast_lval.c_vtype;
+                lval->c_id = cast_lval.c_id;
+                lval->c_tag = cast_lval.c_tag;
+                lval->c_flags = cast_lval.c_flags;
             } else {
-                if (cast_lval.cast_type ) docast(&cast_lval, lval);
+                if (cast_lval.c_vtype ) docast(&cast_lval, lval);
             }
             return k;
         } else {
@@ -516,7 +548,7 @@ int heira(LVALUE *lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
-        lval->const_val = ~(int32_t)lval->const_val;
+        lval->const_val = ~(uint32_t)lval->const_val;        
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
@@ -531,16 +563,16 @@ int heira(LVALUE *lval)
         if (heira(lval))
             rvalue(lval);
         neg(lval);
-        if ( lval->val_type == KIND_DOUBLE ) decrement_double_ref(lval);
+        if ( lval->val_type == DOUBLE ) decrement_double_ref(lval);
         lval->const_val = -lval->const_val;
-        if ( lval->val_type == KIND_DOUBLE ) increment_double_ref(lval);
+        if ( lval->val_type == DOUBLE ) increment_double_ref(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */
         if (heira(lval))
             rvalue(lval);
-        if (lval->ltype->ptr == NULL ) {
-            errorfmt("Can't dereference", 0);
+        if (lval->symbol == 0) {
+            error(E_DEREF);
             junk();
             return 0;
         } else {
@@ -548,28 +580,28 @@ int heira(LVALUE *lval)
         }
         lval->is_const = 0; /* flag as not constant */
         lval->const_val = 1; /* omit rvalue() on func call */
-        lval->stage_add = NULL;
-        lval->stage_add_ltype = NULL;
+        lval->stage_add = 0;
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
-            lval->ltype = make_pointer(lval->ltype);
-            lval->ptr_type = lval->ltype->ptr->kind;
-            lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
             return 0;
         }
-        lval->ltype = make_pointer(lval->ltype);
-        lval->ptr_type = lval->ltype->ptr->kind;
-        lval->val_type = lval->flags & FARACC ? KIND_CPTR : KIND_PTR;
 
         if (lval->symbol) {
+            lval->ptr_type = lval->symbol->type;
+            lval->val_type = (lval->flags & FARACC ? CPTR : CINT);
             lval->symbol->isassigned = YES;
-        } 
-        if (lval->indirect_kind)
+        } else {
+            warning(W_BUG1);
+            warning(W_BUG2);
+            lval->ptr_type = VOID;
+            lval->val_type = (lval->flags & (FARACC | FARPTR)) ? CPTR : CINT;
+        }
+        if (lval->indirect)
             return 0;
         /* global & non-array */
         address(lval->symbol);
-        lval->indirect_kind = lval->symbol->ctype->kind;
+        lval->indirect = lval->symbol->type;
         return 0;
     }
 
@@ -593,80 +625,67 @@ int heirb(LVALUE* lval)
     double dval;
     int val, con, direct, k, valtype;
     char flags;
-    SYMBOL* ptr = NULL;
+    SYMBOL* ptr;
 
     setstage(&before1, &start1);
-
-    
     k = primary(lval);
     ptr = lval->symbol;
     blanks();
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
             if (cmatch('[')) {
-                Type *type;
-                
-                if (k && ispointer(lval->ltype)) {
-                    rvalue(lval);
-                } else if ( !ispointer(lval->ltype) && lval->ltype->kind != KIND_ARRAY) {
-                    errorfmt("Can't subscript", 0);
+                uint32_t packedType;
+
+                if (ptr == 0) {
+                    error(E_SUBSCRIPT);
                     junk();
                     needchar(']');
                     return 0;
+                } else if (k && ptr->ident == POINTER)
+                    rvalue(lval);
+                else if (ptr->ident != POINTER && ptr->ident != ARRAY) {
+                    error(E_SUBSCRIPT);
+                    k = 0;
                 }
                 setstage(&before, &start);
-                if (lval->ltype->kind == KIND_CPTR)
+                if (lval->flags & FARPTR)
                     zpushde();
+                lval->ident = VARIABLE;
                 zpush();
-                valtype = expression(&con, &dval, &type);
+                valtype = expression(&con, &dval, &packedType);
                 // TODO: Check valtype
                 val = dval;
                 needchar(']');
                 if (con) {
                     Zsp += 2; /* undo push */
-                    if (lval->ltype->kind == KIND_CPTR)
+                    if (lval->flags & FARPTR)
                         Zsp += 2;
-                    if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
-                        warningfmt("Access of array at index %d is greater than size %d", val, lval->ltype->len);
-                    }
-                    cscale(lval->ltype, &val);
-                    val += lval->offset;
-                    
-
-                    if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY && ptr->ctype->kind != KIND_PTR) {
+                    if (lval->symbol->more)
+                        cscale(lval->val_type, tagtab + ptr->tag_idx, &val);
+                    else
+                        cscale(ptr->type, tagtab + ptr->tag_idx, &val);
+                    if (ptr->storage == STKLOC && ptr->ident == ARRAY) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
-                        lval->base_offset = getloc(ptr, val);
-                        lval->offset = val;
+                        lval->offset = getloc(ptr, val);
                     } else {
                         /* add constant offset to address in primary */
                         clearstage(before, 0);
                         //        if (lval->symbol->more)
                         //                cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                        zadd_const(lval, val  - lval->offset);
-                        lval->offset = 0;
+                        zadd_const(lval, val);
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
-                    if (ispointer(lval->ltype) ) {
-                        scale(lval->ltype->ptr->kind, lval->ltype->ptr->tag);
-                    } else if ( lval->ltype->kind == KIND_ARRAY ) {
-                        LVALUE tmp = {0};
-                        int    size;
-                        tmp.val_type = KIND_INT;
-                        if ( lval->ltype->size != -1 ) {
-                            size = lval->ltype->size / lval->ltype->len;
-                        } else {
-                            size = lval->ltype->ptr->size;
-                        }
-                        mult_const(&tmp,size);
+                    if (lval->symbol->more) {
+                        scale(lval->val_type, tagtab + ptr->tag_idx);
                     } else {
-                        scale(ptr->type, lval->ltype->tag);
+                        scale(ptr->type, tagtab + ptr->tag_idx);
                     }
                     /* If near, then pop other side back, otherwise
                        load high reg with de and do an add  */
-                    if (lval->ltype->kind == KIND_CPTR) {
+                    if (lval->flags & FARPTR) {
                         const2(0);
                     } else {
                         zpop();
@@ -678,62 +697,50 @@ int heirb(LVALUE* lval)
                 ptr = deref(lval, YES);
                 k = 1;
             } else if (cmatch('(')) {
-                Type *return_type = type_void;
-                int   flags = 0;
-                if ( ispointer(lval->ltype) ) {
-                     if (k && lval->const_val == 0)
+                if (ptr == NULL) {
+                    callfunction(NULL,NULL);
+                    /* Bugger knows what ya doing..stop SEGV */
+                    ptr = dummy_sym[VOID];
+                    warning(W_INTERNAL);
+                } else if (ptr->ident != FUNCTION) {
+                    if (k && lval->const_val == 0)
                         rvalue(lval);
-                    // Functino pointer call
-                    callfunction(NULL,lval->ltype->ptr);
-                    return_type = lval->ltype->ptr->return_type;
-                    flags = lval->ltype->ptr->flags;
-                } else if ( lval->ltype->kind == KIND_FUNC ) {
-                    // Normal function call
+                    callfunction(NULL,ptr);
+                } else
                     callfunction(ptr,NULL);
-                    return_type = lval->ltype->return_type;      
-                    flags = lval->ltype->flags;                    
-                } else {
-                    // No idea what you are doing, calling a non pointer
-                    errorfmt("Calling a non-pointer function?",1);
-                }
-                if ( return_type->kind == KIND_CHAR && flags & SDCCDECL) {
-                    // We just called an SDCC function, we need to extend out to 16 bits, these names are wrong, but
-                    // they do the right thing
-                    if ( return_type->isunsigned ) {
-                        convUint2char();
-                    } else {
-                        convSint2char();
-                    }
-                }
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
                 k = lval->is_const = lval->const_val = 0;
-                lval->ltype = return_type;
-                lval->ptr_type = KIND_NONE;
-                lval->val_type = lval->ltype->kind;
-                lval->symbol = NULL;
-                // Function returing pointer
-                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR ) {
-                    lval->val_type = lval->ltype->kind;
-                    lval->indirect_kind = lval->ltype->kind;
+                if (ptr && ptr->more == 0) {
+                    /* function returning variable */
+                    lval->ptr_type = 0;
+                    lval->val_type = ptr->type;
+                    lval->ident = VARIABLE;
+                    ptr = lval->symbol = NULL;
+                } else {
+                    /* function returning pointer */
+                    lval->flags = ptr->flags & ~(CALLEE|SMALLC|FASTCALL); /* djm */
+                    ptr = lval->symbol = dummy_sym[(int)ptr->more];
+                    lval->ident = POINTER;
+                    lval->indirect = lval->ptr_type = ptr->type;
+                    /* djm - 24/11/98 */
+                    lval->val_type = (lval->flags & FARPTR ? CPTR : CINT);
+                    if (ptr->type == STRUCT) {
+                        lval->tagsym = tagtab + ptr->tag_idx;
+                    }
                 }
             }
             /* Handle structures... come in here with lval holding tehe previous
              * pointer to the struct thing..*/
             else if ((direct = cmatch('.')) || match("->")) {
-                Type *str = lval->ltype->tag;
-                Type *member_type;
-
-                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR) {
-                    str = lval->ltype->ptr->tag;
-                }
-
-                if (str == NULL ) {
-                    errorfmt("Can't take member", 1);
+                /* Check to see if we have a cast in operation, if so then change type
+                 * internally, but don't generate any code */
+                if (lval->tagsym == 0) {
+                    error(E_MEMBER);
                     junk();
                     return 0;
                 }
-                if (symname(sname) == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
-                    errorfmt("Unknown member: %s", 1, sname);
+                if (symname(sname) == 0 || (ptr = findmemb(lval->tagsym, sname)) == 0) {
+                    error(E_UNMEMB, sname);
                     junk();
                     return 0;
                 }
@@ -745,54 +752,57 @@ int heirb(LVALUE* lval)
                     rvaluest(lval);
 
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
-                flags = member_type->flags;
+                flags = ptr->flags;
                 if (direct == 0) {
-                    if ( lval->ltype->kind == KIND_CPTR ) {
+                    /* So, we're accessing via a pointer if we get here */
+                    flags = ptr->flags;
+                    if (lval->oflags & FARACC || (lval->flags & FARPTR))
                         flags |= FARACC;
-                    }
+                    if (flags & FARPTR || (lval->flags & FARPTR))
+                        lval->oflags |= FARACC;
                 }
                 lval->flags = flags;
 
-                zadd_const(lval, member_type->offset);
-//                lval->symbol = ptr; // 201710108: Remove this
-                lval->symbol = NULL;
-                lval->ltype = member_type;
-                lval->indirect_kind = lval->val_type = member_type->kind;
+                zadd_const(lval, ptr->offset.i);
+                lval->symbol = ptr;
+                lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
+                lval->ident = VARIABLE;
                 lval->stage_add = NULL;
+                lval->tagsym = NULL;
                 lval->binop = NULL;
-                if (ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY) {
-                    lval->ptr_type = lval->ltype->ptr->kind;
+                if (ptr->type == STRUCT)
+                    lval->tagsym = tagtab + ptr->tag_idx;
+                if (ptr->ident == POINTER) {
+                    lval->ptr_type = ptr->type;
+                    lval->ident = POINTER;
                     /* djm */
-                    // TODO
-                  //  if (ptr->flags & FARPTR) {
-                       // lval->indirect_kind = KIND_INT;
-                       // lval->val_type = KIND_INT;
-                    // } else {
-                    //     lval->indirect_kind = KIND_INT;
-                    //     lval->val_type = KIND_INT;
-                    // }
+                    if (ptr->flags & FARPTR) {
+                        lval->indirect = CPTR;
+                        lval->val_type = CPTR;
+                    } else {
+                        lval->indirect = CINT;
+                        lval->val_type = CINT;
+                    }
                 }
-                if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
-                   // lval->indirect_kind = lval->ltype->ptr->kind;
+                if (ptr->ident == ARRAY || (ptr->type == STRUCT && ptr->ident == VARIABLE)) {
                     /* array or struct */
-                    // TODO
-                 //   lval->ptr_type = ptr->type;
+                    lval->ptr_type = ptr->type;
+                    lval->ident = POINTER;
                     /* djm Long pointers here? */
-                 //   lval->ptr_type = lval->ltype->kind;
-                 //   lval->val_type = KIND_PTR;
-                    //lval->val_type = ((ptr->flags & FARPTR) ? KIND_CPTR : KIND_INT);
+
+                    lval->val_type = ((ptr->flags & FARPTR) ? CPTR : CINT);
                     k = 0;
                 } else
                     k = 1;
             } else
                 return k;
         }
-    if (ptr && ptr->ctype->kind == KIND_FUNC) {
+    if (ptr && ptr->ident == FUNCTION) {
         address(ptr);
         lval->symbol = NULL;  // TODO: Can we actually set it correctly here? - Needed for verification of func ptr arguments
-        lval->ltype = ptr->ctype;
         lval->flags = ptr->flags;
+        lval->ident = FUNCTION;
         return 0;
     }
     return k;
