@@ -64,9 +64,6 @@ extern int8_t __LIB__ bank_get_rel(uint8_t bankAbs) __smallc __z88dk_fastcall;
 extern uint8_t __LIB__ bank_get_abs(int8_t bankRel) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ jp_far(void *str,int8_t bank) __smallc;
-
-
 
 // provide memcpy_far and memset_far functions
 
@@ -82,6 +79,45 @@ extern void __LIB__ *memset_far(void *str,int8_t bank,const int16_t c,size_t n) 
 extern void __LIB__ load_hex(uint8_t bankAbs) __smallc __z88dk_fastcall;
 
 
+
+// provide far jp, call, & sys functions
+
+extern void __LIB__ jp_far(void *str,int8_t bank) __smallc;
+
+
+
+#define call_error(code)        \
+    do{                         \
+        __asm                   \
+        rst 8H                  \
+        defb code               \
+        __endasm;               \
+    }while(0)
+
+#define call_far(addr, bank)    \
+    do{                         \
+        __asm                   \
+        rst 10H                 \
+        defw addr               \
+        defb bank               \
+        __endasm;               \
+    }while(0)
+
+#define call_sys(addr)          \
+    do{                         \
+        __asm                   \
+        rst 20H                 \
+        defw addr               \
+        __endasm;               \
+    }while(0)
+
+#define call_apu(cmd)           \
+    do{                         \
+        __asm                   \
+        rst 28H                 \
+        defb cmd                \
+        __endasm;               \
+    }while(0)
 
 // halt the YAZ180 with single step hardware.
 
