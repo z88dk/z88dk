@@ -52,7 +52,6 @@ __DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,lock_give,uint8_t * mutex)
 
 __DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',int8_t,,bank_get_rel,uint8_t bankAbs)
 __DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t bankRel)
-__OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
 
 // provide memcpy_far and memset_far functions
 
@@ -62,6 +61,43 @@ __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,*,memset_far,void *str, int8_t bank, c
 // provide load_hex and load_bin functions
 
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,load_hex,uint8_t bankAbs)
+
+// provide far jp, call, & sys functions
+
+__OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
+
+#define call_error(code)        \
+    do{                         \
+        __asm                   \
+        rst 8H                  \
+        defb code               \
+        __endasm;               \
+    }while(0)
+
+#define call_far(addr, bank)    \
+    do{                         \
+        __asm                   \
+        rst 10H                 \
+        defw addr               \
+        defb bank               \
+        __endasm;               \
+    }while(0)
+
+#define call_sys(addr)          \
+    do{                         \
+        __asm                   \
+        rst 20H                 \
+        defw addr               \
+        __endasm;               \
+    }while(0)
+
+#define call_apu(cmd)           \
+    do{                         \
+        __asm                   \
+        rst 28H                 \
+        defb cmd                \
+        __endasm;               \
+    }while(0)
 
 // halt the YAZ180 with single step hardware.
 

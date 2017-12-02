@@ -24,8 +24,12 @@ _z180_trap_rst:         ; RST  0 - also handle an application restart
 PUBLIC _error_handler_rst
 
 _error_handler_rst:     ; RST  8
-    pop hl              ; pop originating address
-    call phexwdreg      ; and output it on serial port
+    pop hl              ; get the originating PC address
+    ld e, (hl)          ; get error code in E
+    dec hl
+    call phexwdreg      ; output originating RST address on serial port
+    ex de, hl           ; get error code in L
+    call phex           ; output error code on serial port
     call delay
     call delay
     halt
@@ -168,7 +172,7 @@ _jp_far:
     pop hl              ; addr in HL
     dec sp
     pop de              ; bank in D
-    push af             ; put ret address back for posterity
+    push af             ; put ret address back for posterity, but we're not coming back
                         ; this is the future top of _bios_sp
     ld e, d             ; put bank in E
 
@@ -2039,11 +2043,10 @@ phexdwd:
     ; print Word at address HL as 16 bit number in ASCII HEX, modifies AF
 phexwd:
     push hl
-    inc hl
     ld a, (hl)
-    dec hl
-    ld l, (hl)
-    ld h, a
+    inc hl
+    ld h, (hl)
+    ld l, a
     call phexwdreg
     pop hl
     ret
