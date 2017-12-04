@@ -3057,7 +3057,7 @@ replace restart {
 	add	hl,sp
 	call	____sdcc_4_ldi_nosave_bc
 	; peephole z88dk-code-reduction-309f3
-}
+} if notUsed('bc')
 
 replace restart {
 	push	bc
