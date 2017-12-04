@@ -2100,7 +2100,16 @@ PUBLIC __nextos_rc_path_delete
 
 PUBLIC __NEXTOS_IDE_CAPACITY
 PUBLIC __NEXTOS_IDE_GET_LFN
+
 PUBLIC __NEXTOS_IDE_BROWSER
+PUBLIC __nextos_browsercaps_none
+PUBLIC __nextos_browsercaps_copy
+PUBLIC __nextos_browsercaps_rename
+PUBLIC __nextos_browsercaps_mkdir
+PUBLIC __nextos_browsercaps_erase
+PUBLIC __nextos_browsercaps_remount
+PUBLIC __nextos_browsercaps_syscfg
+PUBLIC __nextos_browsercaps_all
 
 PUBLIC __NEXTOS_IDE_STREAM_OPEN
 PUBLIC __NEXTOS_IDE_STREAM_CLOSE
@@ -2119,6 +2128,7 @@ PUBLIC __nextos_rc_bank_free
 PUBLIC __NEXTOS_IDE_BASIC
 PUBLIC __NEXTOS_IDE_STREAM_LINEIN
 PUBLIC __NEXTOS_IDE_WINDOW_STRING
+PUBLIC __NEXTOS_IDE_INTEGER_VAR
 
 PUBLIC __NEXTOS_DOS_REF_XDPB
 PUBLIC __NEXTOS_DOS_MAP_B
@@ -2161,7 +2171,7 @@ PUBLIC __NEXTOS_IDE_PARTITION_OPEN
 PUBLIC __NEXTOS_IDE_PARTITION_CLOSE
 PUBLIC __NEXTOS_IDE_PARTITIONS
 
-PUBLIC __NEXTOS_DOTN_SP
+PUBLIC __NEXTOS_DOTN_SP_DIVMMC
 
 PUBLIC __NEXTOS_RC_READY
 PUBLIC __NEXTOS_RC_WP
@@ -2258,7 +2268,16 @@ defc __nextos_rc_path_delete = 3
 
 defc __NEXTOS_IDE_CAPACITY = 0x01b4
 defc __NEXTOS_IDE_GET_LFN = 0x01b7
+
 defc __NEXTOS_IDE_BROWSER = 0x01ba
+defc __nextos_browsercaps_none = 0
+defc __nextos_browsercaps_copy = 0x01
+defc __nextos_browsercaps_rename = 0x02
+defc __nextos_browsercaps_mkdir = 0x04
+defc __nextos_browsercaps_erase = 0x08
+defc __nextos_browsercaps_remount = 0x10
+defc __nextos_browsercaps_syscfg = 0x80
+defc __nextos_browsercaps_all = 0x1f
 
 defc __NEXTOS_IDE_STREAM_OPEN = 0x0056
 defc __NEXTOS_IDE_STREAM_CLOSE = 0x0059
@@ -2277,6 +2296,7 @@ defc __nextos_rc_bank_free = 3
 defc __NEXTOS_IDE_BASIC = 0x01c0
 defc __NEXTOS_IDE_STREAM_LINEIN = 0x01c3
 defc __NEXTOS_IDE_WINDOW_STRING = 0x01c6
+defc __NEXTOS_IDE_INTEGER_VAR = 0x01c9
 
 defc __NEXTOS_DOS_REF_XDPB = 0x0151
 defc __NEXTOS_DOS_MAP_B = 0x0154
@@ -2319,7 +2339,7 @@ defc __NEXTOS_IDE_PARTITION_OPEN = 0x00cd
 defc __NEXTOS_IDE_PARTITION_CLOSE = 0x00d0
 defc __NEXTOS_IDE_PARTITIONS = 0x01a5
 
-defc __NEXTOS_DOTN_SP = 0x4000
+defc __NEXTOS_DOTN_SP_DIVMMC = 0x4000
 
 defc __NEXTOS_RC_READY = 0
 defc __NEXTOS_RC_WP = 1

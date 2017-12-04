@@ -14,7 +14,7 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
-// NEXTOS API
+// NEXTOS API 1.89
 // https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/nextos_api.odt
 
 // Filesystem Related
@@ -68,7 +68,16 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
 #define NEXTOS_IDE_CAPACITY  __NEXTOS_IDE_CAPACITY
 #define NEXTOS_IDE_GET_LFN  __NEXTOS_IDE_GET_LFN
+
 #define NEXTOS_IDE_BROWSER  __NEXTOS_IDE_BROWSER
+#define nextos_browsercaps_none  __nextos_browsercaps_none
+#define nextos_browsercaps_copy  __nextos_browsercaps_copy
+#define nextos_browsercaps_rename  __nextos_browsercaps_rename
+#define nextos_browsercaps_mkdir  __nextos_browsercaps_mkdir
+#define nextos_browsercaps_erase  __nextos_browsercaps_erase
+#define nextos_browsercaps_remount  __nextos_browsercaps_remount
+#define nextos_browsercaps_syscfg  __nextos_browsercaps_syscfg
+#define nextos_browsercaps_all  __nextos_browsercaps_all
 
 // Not Filesystem Related
 
@@ -88,7 +97,8 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
 #define NEXTOS_IDE_BASIC  __NEXTOS_IDE_BASIC
 #define NEXTOS_IDE_STREAM_LINEIN  __NEXTOS_IDE_STREAM_LINEIN
-#define NEXTOS_IDE_WINDOW_STRING __NEXTOS_IDE_WINDOW_STRING
+#define NEXTOS_IDE_WINDOW_STRING  __NEXTOS_IDE_WINDOW_STRING
+#define NEXTOS_IDE_INTEGER_VAR  __NEXTOS_IDE_INTEGER_VAR
 
 // Legacy - Floppy Drive
 

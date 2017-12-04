@@ -1195,7 +1195,16 @@
 
 #define __NEXTOS_IDE_CAPACITY  0x01b4
 #define __NEXTOS_IDE_GET_LFN  0x01b7
+
 #define __NEXTOS_IDE_BROWSER  0x01ba
+#define __nextos_browsercaps_none  0
+#define __nextos_browsercaps_copy  0x01
+#define __nextos_browsercaps_rename  0x02
+#define __nextos_browsercaps_mkdir  0x04
+#define __nextos_browsercaps_erase  0x08
+#define __nextos_browsercaps_remount  0x10
+#define __nextos_browsercaps_syscfg  0x80
+#define __nextos_browsercaps_all  0x1f
 
 #define __NEXTOS_IDE_STREAM_OPEN  0x0056
 #define __NEXTOS_IDE_STREAM_CLOSE  0x0059
@@ -1214,6 +1223,7 @@
 #define __NEXTOS_IDE_BASIC  0x01c0
 #define __NEXTOS_IDE_STREAM_LINEIN  0x01c3
 #define __NEXTOS_IDE_WINDOW_STRING  0x01c6
+#define __NEXTOS_IDE_INTEGER_VAR  0x01c9
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -1256,7 +1266,7 @@
 #define __NEXTOS_IDE_PARTITION_CLOSE  0x00d0
 #define __NEXTOS_IDE_PARTITIONS  0x01a5
 
-#define __NEXTOS_DOTN_SP  0x4000
+#define __NEXTOS_DOTN_SP_DIVMMC  0x4000
 
 #define __NEXTOS_RC_READY  0
 #define __NEXTOS_RC_WP  1
