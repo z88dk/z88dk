@@ -367,7 +367,7 @@ long D_GET_DATA(long s) {
 #ifdef Z80
 
 #ifdef ZX81
-char buf[] @43440   /* 43400+(STACK_SIZE*4); */
+char buf[] @43440;   /* 43400+(STACK_SIZE*4); */
 #else
 char buf[180];
 #endif
