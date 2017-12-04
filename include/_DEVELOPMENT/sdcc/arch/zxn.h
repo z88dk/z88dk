@@ -50,6 +50,19 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
+#ifdef __ESXDOS_DOT_COMMAND
+
+// DOTX and DOTN commands only
+
+extern unsigned char DOT_FILENAME[18];
+
+// DOTN commands only
+
+extern unsigned char DOTN_PAGE[];
+extern unsigned char DOTN_PAGE_NUM;
+
+#endif
+
 ///////////////////////////////////////////////////////////////
 
 #ifdef __CLANG
@@ -568,7 +581,7 @@ extern void zxn_write_mmu_state_fastcall(void *src) __preserves_regs(iyl,iyh) __
 
 
 extern void zxn_write_bank_state(unsigned int state) __preserves_regs(d,e,iyl,iyh);
-extern void zxn_write_bank_state_fastcall(unsigned int state) __preserves_regs(d,e,iyl,iyh) __z88dk_fastcall;
+extern void zxn_write_bank_state_fastcall(unsigned int state) __preserves_regs(d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define zxn_write_bank_state(a) zxn_write_bank_state_fastcall(a)
 
 
@@ -577,6 +590,11 @@ extern unsigned int zxn_read_sysvar_bank_state(void) __preserves_regs(b,c,d,e,iy
 extern void zxn_write_sysvar_bank_state(unsigned int state) __preserves_regs(b,c,d,e,iyl,iyh);
 extern void zxn_write_sysvar_bank_state_fastcall(unsigned int state) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define zxn_write_sysvar_bank_state(a) zxn_write_sysvar_bank_state_fastcall(a)
+
+
+extern unsigned int zxn_mangle_bank_state(unsigned int state) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned int zxn_mangle_bank_state_fastcall(unsigned int state) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+#define zxn_mangle_bank_state(a) zxn_mangle_bank_state_fastcall(a)
 
 
 

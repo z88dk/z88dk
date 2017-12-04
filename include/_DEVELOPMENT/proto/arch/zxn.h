@@ -48,6 +48,19 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
+#ifdef __ESXDOS_DOT_COMMAND
+
+// DOTX and DOTN commands only
+
+extern unsigned char DOT_FILENAME[18];
+
+// DOTN commands only
+
+extern unsigned char DOTN_PAGE[];
+extern unsigned char DOTN_PAGE_NUM;
+
+#endif
+
 ///////////////////////////////////////////////////////////////
 
 #ifdef __CLANG
@@ -485,9 +498,10 @@ __DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr_2mb,u
 __DPROTO(`a,iyl,iyh',`iyl,iyh',void,,zxn_read_mmu_state,void *dst)
 __DPROTO(`iyl,iyh',`iyl,iyh',void,,zxn_write_mmu_state,void *src)
 
-__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,zxn_write_bank_state,unsigned int state)
+__DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',void,,zxn_write_bank_state,unsigned int state)
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_read_sysvar_bank_state,void)
 __DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,zxn_write_sysvar_bank_state,unsigned int state)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_mangle_bank_state,unsigned int state)
 
 ///////////////////////////////////////////////////////////////
 

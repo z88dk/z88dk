@@ -7,10 +7,6 @@
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFNDEF CRT_ORG_DTX
-      defc CRT_ORG_DTX     = 0x8000
-   ENDIF
-
 Z88DK_FOR(`LOOP', `0', `7',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
@@ -24,6 +20,14 @@ Z88DK_FOR(`LOOP', `0', `63',
 	   defc CRT_ORG_DIV_`'LOOP = 0x2000
 	ENDIF
 ')
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; ESXDOS dotx commands
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IFNDEF CRT_ORG_DTX
+      defc CRT_ORG_DTX  = 0x8000
+   ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings

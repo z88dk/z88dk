@@ -62,6 +62,7 @@ section smc_dot
 section data_dot
 section bss_dot
 section bss_dot_uninitialized
+section dtn_allocated_pages
 
 SECTION CODE_END
 
@@ -252,6 +253,9 @@ section bss_compiler
 section bss_user
 
 section BSS_UNINITIALIZED
+SECTION BSS_STACK_BOT
+   defs __crt_stack_size
+SECTION BSS_STACK_TOP
 SECTION BSS_END
 SECTION DTN_END
 

@@ -50,6 +50,19 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
+#ifdef __ESXDOS_DOT_COMMAND
+
+// DOTX and DOTN commands only
+
+extern unsigned char DOT_FILENAME[18];
+
+// DOTN commands only
+
+extern unsigned char DOTN_PAGE[];
+extern unsigned char DOTN_PAGE_NUM;
+
+#endif
+
 ///////////////////////////////////////////////////////////////
 
 #ifdef __CLANG
@@ -546,6 +559,9 @@ extern unsigned int zxn_read_sysvar_bank_state(void);
 
 
 extern void zxn_write_sysvar_bank_state(unsigned int state);
+
+
+extern unsigned int zxn_mangle_bank_state(unsigned int state);
 
 
 

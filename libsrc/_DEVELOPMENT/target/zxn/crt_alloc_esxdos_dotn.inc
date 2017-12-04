@@ -11,18 +11,13 @@ defc abs_allocated_pages = allocated_pages - allocate_pages + abs_allocate_pages
 
 allocate_pages:
 
-   push bc
+   ; hl = mangled 1ffd/7ffd restore state
+   ;  b = num pages needed
    
-   ld hl,__nextos_rc_banktype_zx * 256 + __nextos_rc_bank_total
-   call __NEXTOS_IDE_BANK
+   push hl
    
-   pop bc                      ; b = num_pages
-   ret nc                      ; if error
-   
-   ld a,e
-   cp b
-   ccf
-   ret nc                      ; if avail_pages < num_pages
+   call __SYSVAR_SWAP          ; bank in NextOS
+   di
 
    ld hl,abs_allocated_pages
 
@@ -35,19 +30,32 @@ allocate_pages_loop:
    call __NEXTOS_IDE_BANK
    
    pop hl
+   pop bc
+   
+   jr nc, allocate_exit        ; if allocation error
    
    ld (hl),e
    inc hl
-   
-   pop bc
+
    djnz allocate_pages_loop
    
    scf
-   ret
+
+allocate_exit:
+
+   pop hl                      ; h = mangled BANK678, l = mangled BANKM
+   
+   ld a,h
+   ld (__SYSVAR_BANK678),a
+   
+   ld a,l
+   ld (__SYSVAR_BANKM),a
+   
+   jp __SYSVAR_SWAP
 
 allocated_pages:
 
-   defs 6,0xff
+   defs DOTN_EXTRA_PAGES + 6,0xff
 
 ;; DEPHASE
 
@@ -68,7 +76,14 @@ defc abs_deallocated_pages = deallocated_pages - deallocate_pages + abs_dealloca
 
 deallocate_pages:
 
-   ld b,6
+   ; hl = mangled 1ffd/7ffd restore state
+   
+   push hl
+   
+   call __SYSVAR_SWAP          ; bank in NextOS
+   di
+   
+   ld b,DOTN_EXTRA_PAGES + 6
    ld hl,abs_deallocated_pages
 
 deallocate_pages_loop:
@@ -92,11 +107,22 @@ deallocate_pages_loop:
 deallocate_skip:
 
    djnz deallocate_pages_loop
-   ret
+
+deallocate_exit:
+
+   pop hl                      ; h = mangled BANK678, l = mangled BANKM
+   
+   ld a,h
+   ld (__SYSVAR_BANK678),a
+   
+   ld a,l
+   ld (__SYSVAR_BANKM),a
+   
+   jp __SYSVAR_SWAP
 
 deallocated_pages:
 
-   defs 6,0xff
+   defs DOTN_EXTRA_PAGES + 6,0xff
 
 ;; DEPHASE
 

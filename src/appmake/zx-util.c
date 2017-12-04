@@ -691,7 +691,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 
    * dot  : standard dot command resident in divmmc page at 0x2000 limited to ~7k+
    * dotx : extended dot command with first part at 0x2000 and limited to 7k+ and a second part in main ram
-   * dotn : zx next only same as extended dot command except available ram pages are allocated so as not to overwrite main ram
+   * dotn : zx next only same as dotx except ram pages are allocated from NextOS so as not to overwrite main ram
 
    July/Nov 2017 aralbrec
 */
@@ -709,7 +709,9 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
     int  __esxdos_dtx_fname;
     int  __esxdos_dotx_len;
-    int  __dotn_num_pages;
+    int  __dotn_num_main_pages;
+    int  DOTN_REGISTER_SP;
+    int  DOTN_EXTRA_PAGES;
 
     int c;
     int dotx, dotn;
@@ -731,12 +733,14 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
     // collect parameters
 
-    __esxdos_dtx_fname = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
-    __esxdos_dotx_len  = parameter_search(zxc->crtfile, ".map", "__esxdos_dotx_len");
-    __dotn_num_pages   = parameter_search(zxc->crtfile, ".map", "__dotn_num_pages");
+    __esxdos_dtx_fname    = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
+    __esxdos_dotx_len     = parameter_search(zxc->crtfile, ".map", "__esxdos_dotx_len");
+    __dotn_num_main_pages = parameter_search(zxc->crtfile, ".map", "__dotn_num_main_pages");
+    DOTN_REGISTER_SP      = parameter_search(zxc->crtfile, ".map", "DOTN_REGISTER_SP");
+    DOTN_EXTRA_PAGES = parameter_search(zxc->crtfile, ".map", "DOTN_EXTRA_PAGES");
 
-    dotx = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_pages < 0);
-    dotn = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_pages >= 0);
+    dotx = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_main_pages < 0);
+    dotn = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_main_pages >= 0);
 
     // generate the main dot command from section CODE
 
@@ -767,7 +771,8 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             exit_log(1, "Error: Main dot binary exceeds 0x4000 by %d bytes\n", -space);
         }
 
-        printf("Note: Available stack space in divmmc memory is %d bytes\n", space);
+        if (DOTN_REGISTER_SP >= 0)
+            printf("Note: Available space for command line in divmmc memory is %d bytes\n", DOTN_REGISTER_SP - (sb->org + sb->size));
     }
 
     // stop if plain dot command
@@ -816,7 +821,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     {
         remove(outname);
         remove(outnamex);
-        exit_log(1, "Error: Couldn't write dot filename into main dot binary\n");
+        exit_log(1, "Error: Couldn't write variables into main dot binary\n");
     }
 
     fseek(fout, __esxdos_dtx_fname - 0x2000, SEEK_SET);
@@ -834,13 +839,16 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             fclose(fout);
             remove(outname);
             remove(outnamex);
-            exit_log(1, "Error: Number of pages required %d is out of range\n", num_pages);
+            exit_log(1, "Error: Number of pages required for main (%d) is out of range\n", num_pages);
         }
 
-        printf("Note: Number of 8k pages required is %d\n", num_pages);
+        printf("Note: Number of 8k pages required for main is %d\n", num_pages);
 
-        fseek(fout, __dotn_num_pages - 0x2000, SEEK_SET);
+        fseek(fout, __dotn_num_main_pages - 0x2000, SEEK_SET);
         writebyte((unsigned char)num_pages, fout);
+
+        if (DOTN_EXTRA_PAGES > 0)
+            printf("Note: Total number of 8k pages allocated at runtime is %s\n", num_pages + DOTN_EXTRA_PAGES);
     }
 
     fclose(fout);
