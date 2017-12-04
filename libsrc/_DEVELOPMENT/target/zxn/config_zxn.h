@@ -1041,7 +1041,7 @@
 #define __IO_DAC_R0  0x4f
 #define __IO_DAC_R1  0x5f
 
-#define __IO_DAC_M0  0xffdf
+#define __IO_DAC_M0  0x2d
 
 #define __IO_DAC_SPECDRUM  0xffdf
 

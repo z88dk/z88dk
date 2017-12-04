@@ -79,7 +79,7 @@ extern unsigned char IO_4F;
 extern unsigned char IO_DAC_R0;
 extern unsigned char IO_5F;
 extern unsigned char IO_DAC_R1;
-extern unsigned char IO_FFDF;
+extern unsigned char IO_2D;
 extern unsigned char IO_DAC_M0;
 extern unsigned char IO_FFFD;
 extern unsigned char IO_TURBOSOUND;
@@ -131,8 +131,8 @@ __sfr __at __IO_DAC_R0 IO_DAC_R0;
 __sfr __at 0x5f IO_5F;
 __sfr __at __IO_DAC_R1 IO_DAC_R1;
 
-__sfr __banked __at 0xffdf IO_FFDF;
-__sfr __banked __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
+__sfr __at 0x2d IO_2D;
+__sfr __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
 
 // io ports - ay-3-8912
 
