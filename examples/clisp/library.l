@@ -71,6 +71,10 @@
 (defun negativep (n)
   (> 0 n))
 
+; negative?
+(defun minusp (n)
+  (> 0 n))
+
 ; iseven
 (defun evenp (x)
   (if (zerop x) t
