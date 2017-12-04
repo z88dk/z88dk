@@ -164,6 +164,10 @@ extern void __LIB__ stencil_add_ellipse(int cx, int cy, int sa, int ea, int xrad
 
 
 /* Turtle Graphics */
+#define T_NORTH 270
+#define T_SOUTH 90
+#define T_WEST 180
+#define T_EAST 0
 extern int __LIB__  set_direction(int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
 extern int __LIB__  fwd(int length) __z88dk_fastcall;
 extern int __LIB__  turn_left(int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
