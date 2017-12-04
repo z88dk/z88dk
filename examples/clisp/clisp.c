@@ -25,6 +25,11 @@ zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
 #include <time.h>
 #endif
 
+#ifdef GRAPHICS
+#include <graphics.h>
+#include <lib3d.h>
+#endif
+
 #ifdef ZX81
 #pragma output STACKPTR=49152
 //#pragma output STACKPTR=65535
@@ -182,6 +187,10 @@ enum keywords {
     KW_ZEROP,   KW_ATOM,    KW_RAND,    KW_REM,
     KW_INCR,    KW_DECR,    KW_EQUAL,   KW_EQMATH
 #endif
+#ifdef GRAPHICS
+   ,KW_CLS,      KW_PENU,     KW_PEND,
+    KW_LEFT,   KW_RIGHT,     KW_FWD
+#endif
 };
 struct s_keywords {
   char  *key;
@@ -202,7 +211,11 @@ struct s_keywords funcs[] = {
 #ifdef SCHEME
   { "define",   FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
 #else
+#ifdef SPECLISP
+  { "de",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
+#else
   { "defun",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
+#endif
 #endif
   { "quote",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_QUOTE    },
 #ifdef SCHEME
@@ -242,13 +255,25 @@ struct s_keywords funcs[] = {
   { "not",      FTYPE(FTYPE_SYS,     1),               KW_NOT      },
   { "if",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_IF       },
   { "list",     FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LIST     },
+#ifdef SPECLISP
+  { "plus",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_ADD      },
+  { "diff",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_SUB      },
+  { "times",       FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_TIMES    },
+  { "div",         FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_QUOTIENT },
+  { "greaterp",    FTYPE(FTYPE_SYS,     2),               KW_GT       },
+#else
   { "+",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_ADD      },
   { "-",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_SUB      },
   { "*",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_TIMES    },
   { "/",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_QUOTIENT },
   { ">",        FTYPE(FTYPE_SYS,     2),               KW_GT       },
+#endif
 #ifndef MINIMALISTIC
+#ifdef SPECLISP
+  { "lessp",    FTYPE(FTYPE_SYS,     2),               KW_LT       },
+#else
   { "<",        FTYPE(FTYPE_SYS,     2),               KW_LT       },
+#endif
   { "and",      FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_AND      },
   { "divide",   FTYPE(FTYPE_SYS,     2),               KW_DIVIDE   },
   { "lambda",   FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LAMBDA   },
@@ -266,15 +291,30 @@ struct s_keywords funcs[] = {
 #endif
   { "random",   FTYPE(FTYPE_SYS,     1),               KW_RAND     },
   { "rem",      FTYPE(FTYPE_SYS,     2),               KW_REM      },
+#ifdef SPECLISP
+  { "add1",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
+  { "sub1",       FTYPE(FTYPE_SYS,     1),               KW_DECR     },
+#else
   { "1+",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
   { "1-",       FTYPE(FTYPE_SYS,     1),               KW_DECR     },
+#endif
 #ifdef SCHEME
   { "equal?",   FTYPE(FTYPE_SYS,     2),               KW_EQUAL    },
 #else
   { "equal",    FTYPE(FTYPE_SYS,     2),               KW_EQUAL    },
 #endif
   { "=",        FTYPE(FTYPE_SYS,     2),               KW_EQMATH   },
+#endif	// (non MINIMALISTIC)
+
+#ifdef GRAPHICS
+  { "cls",      FTYPE(FTYPE_SYS,     0),               KW_CLS      },
+  { "penu",     FTYPE(FTYPE_SYS,     0),               KW_PENU     },
+  { "pend",     FTYPE(FTYPE_SYS,     0),               KW_PEND     },
+  { "left",     FTYPE(FTYPE_SYS,     1),               KW_LEFT     },
+  { "right",    FTYPE(FTYPE_SYS,     1),               KW_RIGHT    },
+  { "fwd",      FTYPE(FTYPE_SYS,     1),               KW_FWD      },
 #endif
+
   { NULL,       -1,                                    -1          }
 };
 #endif
@@ -372,7 +412,11 @@ main(void)
 #ifdef SCHEME
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk SCHEME variant\n",12);
 #else
+#ifdef SPECLISP
+  printf("%cCAMPUS LIsP\nLemon version,\nz88dk SpecLisp variant\n",12);
+#else
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk variant\n",12);
+#endif
 #endif
   toplevel();
   quit();
@@ -576,18 +620,17 @@ l_equal(long s1, long s2)
 {
   int  d1 = s1 & D_MASK_DATA;
   int  d2 = s2 & D_MASK_DATA;
-  int  i;
 
   if (D_GET_TAG(s1) != D_GET_TAG(s2))
     return TAG_NIL;
-  switch (D_GET_TAG(s1)){
-  case TAG_CONS:
+
+  if (D_GET_TAG(s1) == TAG_CONS)
     if (l_equal(l_car(s1), l_car(s1)) == TAG_NIL)
       return TAG_NIL;
-    return l_equal(l_car(s2), l_car(s2));
-  default:
-    return (s1 == s2) ? TAG_T : TAG_NIL;
-  }
+    else
+      return l_equal(l_car(s2), l_car(s2));
+
+  return (s1 == s2) ? TAG_T : TAG_NIL;
 }
 #endif
 
@@ -1138,6 +1181,31 @@ fcall(long f, long av[2])  /*, int n*/
 
 #endif
 
+#ifdef GRAPHICS
+  case KW_CLS:
+	plot(0,getmaxy());
+	printf("\014");
+    clg();
+	pen_up();
+	set_direction (T_NORTH);
+    break;
+  case KW_PENU:
+	pen_up();
+    break;
+  case KW_PEND:
+	pen_down();
+    break;
+  case KW_RIGHT:
+	turn_right(int_get_c(av[0]));
+    break;
+  case KW_LEFT:
+	turn_left(int_get_c(av[0]));
+    break;
+  case KW_FWD:
+	fwd(int_get_c(av[0]));
+    break;
+#endif
+
   }
 
   return v;
@@ -1308,6 +1376,7 @@ gcollect(void)
     gc_mark(t_stack[i]);
 
   /* sweep */
+  p=0;
   t_cons_free = -1;
   for (i = 0, n = 0; i != NCONS; i++){
     if ((t_cons_car[i] & D_GC_MARK) == 0){  /* collect */
@@ -1315,9 +1384,9 @@ gcollect(void)
       if (t_cons_free == -1){
         t_cons_free = i;
       } else {
-        t_cons_car[p] = i; 
+        t_cons_car[p] = i;
       }
-      t_cons_car[i] = i; 
+      t_cons_car[i] = i;
       p = i;
     }
     t_cons_car[i] &= ~D_GC_MARK;   /* clear mark */
