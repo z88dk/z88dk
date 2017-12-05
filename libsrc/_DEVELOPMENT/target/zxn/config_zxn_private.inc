@@ -1352,6 +1352,8 @@ defc __RMT_PENTAGON = 0x04
 
 defc __REG_PAGE_RAM = 4
 defc __RPR_MASK = 0x7f
+defc __REG_BANK_RAM = 4
+defc __RBR_MASK = 0x7f
 
 defc __REG_PERIPHERAL_1 = 5
 defc __RP1_JOY1_SINCLAIR = 0x00
@@ -1401,9 +1403,13 @@ defc __RAB_BUTTON_MULTIFACE = 0x01
 
 defc __REG_LAYER_2_RAM_PAGE = 18
 defc __RL2RP_MASK = 0x7f
+defc __REG_LAYER_2_RAM_BANK = 18
+defc __RL2RB_MASK = 0x7f
 
 defc __REG_LAYER_2_SHADOW_RAM_PAGE = 19
 defc __RL2SRP_MASK = 0x7f
+defc __REG_LAYER_2_SHADOW_RAM_BANK = 19
+defc __RL2SRB_MASK = 0x7f
 
 defc __REG_GLOBAL_TRANSPARENCY_COLOR = 20
 

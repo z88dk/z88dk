@@ -1350,6 +1350,8 @@
 
 #define __REG_PAGE_RAM  4
 #define __RPR_MASK  0x7f
+#define __REG_BANK_RAM  4
+#define __RBR_MASK  0x7f
 
 #define __REG_PERIPHERAL_1  5
 #define __RP1_JOY1_SINCLAIR  0x00
@@ -1399,9 +1401,13 @@
 
 #define __REG_LAYER_2_RAM_PAGE  18
 #define __RL2RP_MASK  0x7f
+#define __REG_LAYER_2_RAM_BANK  18
+#define __RL2RB_MASK  0x7f
 
 #define __REG_LAYER_2_SHADOW_RAM_PAGE  19
 #define __RL2SRP_MASK  0x7f
+#define __REG_LAYER_2_SHADOW_RAM_BANK  19
+#define __RL2SRB_MASK  0x7f
 
 #define __REG_GLOBAL_TRANSPARENCY_COLOR  20
 
