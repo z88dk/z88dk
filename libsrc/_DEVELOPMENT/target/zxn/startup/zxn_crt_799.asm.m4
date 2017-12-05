@@ -626,11 +626,13 @@ PUBLIC _DOTN_PAGE_NUM
 defc _DOTN_PAGE = __dotn_extra_pages
 defc _DOTN_PAGE_NUM = __dotn_num_extra_pages
 
-; C/asm interface to dot command filename
+; C/asm interface to second binary file details
 
 PUBLIC _DOT_FILENAME
+PUBLIC _DOT_BINLEN
 
 defc _DOT_FILENAME = __esxdos_dtx_fname
+defc _DOT_BINLEN   = __esxdos_dotx_len
 
 include "../clib_variables.inc"
 

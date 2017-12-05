@@ -51,10 +51,13 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #ifdef __ESXDOS_DOT_COMMAND
 
 // DOTX and DOTN commands only
+// details about the second binary file
 
 extern unsigned char DOT_FILENAME[18];
+extern unsigned int  DOT_BINLEN;
 
 // DOTN commands only
+// always DOTN[DOTN_PAGE_NUM] = 255
 
 extern unsigned char DOTN_PAGE[];
 extern unsigned char DOTN_PAGE_NUM;
@@ -299,6 +302,9 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 
 #define REG_PAGE_RAM  __REG_PAGE_RAM
 #define RPR_MASK  __RPR_MASK
+// preferred name is bank for 16k banks
+#define REG_BANK_RAM  __REG_BANK_RAM
+#define RBR_MASK  __RBR_MASK
 
 #define REG_PERIPHERAL_1  __REG_PERIPHERAL_1
 #define RP1_JOY1_SINCLAIR  __RP1_JOY1_SINCLAIR
@@ -348,9 +354,15 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 
 #define REG_LAYER_2_RAM_PAGE  __REG_LAYER_2_RAM_PAGE
 #define RL2RP_MASK  __RL2RP_MASK
+// preferred name is bank for 16k banks
+#define REG_LAYER_2_RAM_BANK  __REG_LAYER_2_RAM_BANK
+#define RL2RB_MASK  __RL2RB_MASK
 
 #define REG_LAYER_2_SHADOW_RAM_PAGE  __REG_LAYER_2_SHADOW_RAM_PAGE
 #define RL2SRP_MASK  __RL2SRP_MASK
+// preferred name is bank for 16k banks
+#define REG_LAYER_2_SHADOW_RAM_BANK  __REG_LAYER_2_SHADOW_RAM_BANK
+#define RL2SRB_MASK  __RL2SRB_MASK
 
 #define REG_GLOBAL_TRANSPARENCY_COLOR  __REG_GLOBAL_TRANSPARENCY_COLOR
 
