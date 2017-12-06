@@ -3,16 +3,43 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.8 2015/07/08 05:57:53 stefano Exp $  */
+/*  $Id: clisp.c */
 
 /*
-z88dk build hints
+
+OPTIONS:
+--------
+
+	-DSHORT          Reduce the 'lisp atom' size to 16 bit to save memory.
+	                 Be aware that the valid numeric range will be only between -2047 and 2048 !
+	                 (untested: the structure tags may interfere with values, use it only as a last resort)
+
+	-DSPECLISP       Lisp dialect syntax used in "Spec Lisp" by Serious Software  ('de' in place of 'defun', etc..)
+
+	-DGRAPHICS       Add turtle graphics functions.
+
+	-DMINIMALISTIC   Remove many hardcoded functions.
+	                 'minimalistic.l' includes alternative native Lisp implementations.
+
+	-DNOINIT         Remove the stucture initialization, it requires a previous dump of a memory image
+	                 created by running the full clisp version.
+					 
+	-DTINYMEM        Shorten the memory structures to a minimal number of objects to save memory 
+
+
+
+z88dk build hints:
+------------------
 
 Spectrum 
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
+zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP clisp.c
 
 zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
-  zcc +zx81 -O3 -create-app -DLARGEMEM=900 clisp.c
+  zcc +zx81 -O3 -create-app -DLARGEMEM=900 -DZX81_32K clisp.c
+zx81 16K, minimalistic version, graphics support
+  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d clisp.c
+
 */
 
 
@@ -30,26 +57,39 @@ zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
 #include <lib3d.h>
 #endif
 
-#ifdef ZX81
+#ifdef ZX81_32K
 #pragma output STACKPTR=49152
 //#pragma output STACKPTR=65535
 unsigned int _sp;
 #endif
 
-/* Data Representation ('int' must be at least 32 bits) */
-/*
-#typedef long    long;
-#typedef int    long;
-*/
+#ifdef SHORT
+
+#define D_MASK_DATA     0x0fff
+#define D_MASK_TAG      0x7000
+#define D_GC_MARK       0x8000
+#define D_TAG_BIT_POS   12
+#define D_INT_SIGN_BIT  0x0800
+
+/* Data Tags */
+#define TAG_NIL     (0 << D_TAG_BIT_POS)
+#define TAG_T       (1 << D_TAG_BIT_POS)
+#define TAG_INT     (2 << D_TAG_BIT_POS)
+#define TAG_SYMB    (3 << D_TAG_BIT_POS)
+#define TAG_CONS    (4 << D_TAG_BIT_POS)
+#define TAG_EOF     (5 << D_TAG_BIT_POS)
+#define TAG_UNDEF   (6 << D_TAG_BIT_POS)
+
+#define long int
+
+#else
+	
+/* Data Representation ('int' must be at least 32 bits) */	
 #define D_MASK_DATA     0x0fffffffUL
 #define D_MASK_TAG      0x70000000UL
 #define D_GC_MARK       0x80000000UL
 #define D_TAG_BIT_POS   28UL
 #define D_INT_SIGN_BIT  0x08000000UL
-/*
-#define D_GET_TAG(s)    (s & ~(D_GC_MARK | D_MASK_DATA))
-#define D_GET_DATA(s)   (s & D_MASK_DATA)
-*/
 
 /* Data Tags */
 #define TAG_NIL     (0UL << D_TAG_BIT_POS)
@@ -59,15 +99,8 @@ unsigned int _sp;
 #define TAG_CONS    (4UL << D_TAG_BIT_POS)
 #define TAG_EOF     (5UL << D_TAG_BIT_POS)
 #define TAG_UNDEF   (6UL << D_TAG_BIT_POS)
-/*
-#define TAG_NIL     0x00000000UL
-#define TAG_T       0x10000000UL
-#define TAG_INT     0x20000000UL
-#define TAG_SYMB    0x30000000UL
-#define TAG_CONS    0x40000000UL
-#define TAG_EOF     0x50000000UL
-#define TAG_UNDEF   0x60000000UL
-*/
+
+#endif
 
 /* Cells */
 #ifdef TINYMEM
@@ -79,7 +112,7 @@ unsigned int _sp;
 #define NCONS   1024
 #endif
 #endif
-#ifndef ZX81
+#ifndef ZX81_32K
 int t_cons_free;           /* free list */
 long t_cons_car[NCONS];     /* "car" part of cell */
 long t_cons_cdr[NCONS];     /* "cdr" part of cell */
@@ -100,7 +133,7 @@ long t_cons_cdr[] @36380;  /* 3600 bytes */
 #endif
 #endif
 
-#ifndef ZX81
+#ifndef ZX81_32K
 int t_symb_free;           /* free slot */
 char *t_symb_pname[NSYMBS];  /* pointer to printable name */
 /* #define t_symb_val        ((long *)0x7e00) */        /*long t_symb_val[NSYMBS];*/    /* symbol value */
@@ -127,7 +160,7 @@ int t_symb_ftype[] @41780;    /* 360 bytes */
 #endif
 #endif
 
-#ifndef ZX81
+#ifndef ZX81_32K
 int t_pnames_free;         /* free pointer */
 char  t_pnames[PNAME_SIZE];  /* names */ 
 #else
@@ -151,7 +184,7 @@ char  t_pnames[] @42140; /* 900 bytes */
 #endif
 #endif
 
-#ifndef ZX81
+#ifndef ZX81_32K
 long t_stack[STACK_SIZE];   /* the stack */
 unsigned int t_stack_ptr;           /* stack pointer */
 #else
@@ -212,7 +245,7 @@ struct s_keywords funcs[] = {
   { "define",   FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
 #else
 #ifdef SPECLISP
-  { "de",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
+  { "de",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
 #else
   { "defun",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
 #endif
@@ -366,7 +399,7 @@ long D_GET_DATA(long s) {
 
 #ifdef Z80
 
-#ifdef ZX81
+#ifdef ZX81_32K
 char buf[] @43440;   /* 43400+(STACK_SIZE*4); */
 #else
 char buf[180];
@@ -376,14 +409,14 @@ int cpt;
 char ug=13;
 
 char gchar() {
-#ifdef ZX81
+#ifdef ZX81_32K
 	zx_slow();
 #endif
     if (ug==13) {
       while (!gets(buf)) {};
       cpt=0;
     }
-#ifdef ZX81
+#ifdef ZX81_32K
 	zx_fast();
 #endif
     if ((ug=buf[cpt++]) == 0)  ug=13;
@@ -542,7 +575,11 @@ l_read(void)
 /*        if (isdigit((char)token[0]) */
             || ((token[0] == '-') && isdigit((char)token[1]))
             || ((token[0] == '+') && isdigit((char)token[1]))){   /* integer */
+#ifdef SHORT
+          s = int_make_l(atoi(token));
+#else
           s = int_make_l(atol(token));
+#endif
 #ifdef SCHEME
         } else if (strcmp(token, "#f") == 0){                   /* nil */ 
           s = TAG_NIL;
@@ -663,7 +700,11 @@ l_print(long s)
 #endif
   case TAG_INT:
     v = int_get_c(s);
+#ifdef SHORT
+    printf("%d", v);
+#else
     printf("%ld", v);
+#endif
     break;
 
   case TAG_SYMB:
@@ -1219,7 +1260,7 @@ apply(long func, long aparams, int n)
   long   fdef, fbody, f, sym, a, v;
   int  i;
 
-#ifdef ZX81
+#ifdef ZX81_32K
 /*
 ..almost  useless, let's save space
 #asm
@@ -1414,7 +1455,7 @@ gc_mark(long s)
 char
 gc_protect(long s)
 {
-#ifdef ZX81
+#ifdef ZX81_32K
 #asm
     ld hl,0
     add hl,sp
