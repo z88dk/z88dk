@@ -1053,7 +1053,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         if (zxs->stackloc > -0x4000)
             zxs->stackloc = -1;
         else
-            zxs->stackloc = mem128[abs(zxs->stackloc) - 0x4000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) & 0xbfff];
+            zxs->stackloc = mem128[(abs(zxs->stackloc) - 0x4000) % 0xc000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) % 0xc000];
     }
 
     if (zxs->stackloc < 0)
@@ -1062,8 +1062,8 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if (!is_128)
     {
         zxs->stackloc = (zxs->stackloc - 2) & 0xffff;
-        mem128[(zxs->stackloc - 0x4000) & 0xbfff] = zxc->origin & 0xff;
-        mem128[(zxs->stackloc - 0x4000 + 1) & 0xbfff] = zxc->origin / 256;
+        mem128[(zxs->stackloc - 0x4000) % 0xc000] = zxc->origin & 0xff;
+        mem128[(zxs->stackloc - 0x4000 + 1) % 0xc000] = zxc->origin / 256;
     }
 
     sna_state[SNA_REG_SP] = zxs->stackloc & 0xff;
