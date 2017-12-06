@@ -441,6 +441,13 @@ extra_pages_none:
    
    ENDIF
    
+   ; register basic error intercept to release memory and close files
+   
+   ld hl,_dotn_basic_error_hook
+   
+   rst  __ESXDOS_SYSCALL
+   defb __NEXTOS_ROMCALL_DOT_ERROR_HOOK
+   
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -449,6 +456,8 @@ SECTION code_crt_main
    ; call user program
    
    call _main                  ; hl = return status
+
+error_basic:
 
    ; run exit stack
 
@@ -582,6 +591,33 @@ error_model:
       
    ld a,0                      ; status = & custom error message
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; BASIC ERROR ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PUBLIC _dotn_basic_error_hook
+
+_dotn_basic_error_hook:
+
+   ; basic error has occurred during a rst $10 or rst $18
+   ; must free allocated pages and close open files
+   
+   ; enter :  a = basic error code - 1
+   ;         de = return address after restart with stack properly adjusted
+   ;         (you can resume the program if you jump to this address)
+
+   ld hl,error_dbreak_s
+   
+   cp __ERRB_D_BREAK_CONT_REPEATS - 1
+   jp z, error_basic
+   
+   ld hl,__ESXDOS_ENONSENSE
+   jp error_basic
+
+error_dbreak_s:
+
+   defm "D BREAK - no repea", 't'+0x80
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; NEXTOS PAGE ALLOCATION & DEALLOCATION ;;;;;;;;;;;;;;;;;;;;;;
