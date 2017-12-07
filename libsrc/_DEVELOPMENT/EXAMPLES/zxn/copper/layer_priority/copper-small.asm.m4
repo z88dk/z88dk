@@ -31,7 +31,7 @@ _copper:
    ; we'll make use of the nextreg layer priorities register 0x15 (__REG_SPRITE_LAYER_SYSTEM)
    ; and have layer 2 on top by default and then ula on top for the hi-res terminals.
    
-   cu.wait 311,0
+   cu.wait 260,0                                                    ; wait a short time after vsync in either 50 or 60 Hz modes
    cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU
    
    Z88DK_FOR(`LOOP', eval(3*8), eval(5*8-1),
