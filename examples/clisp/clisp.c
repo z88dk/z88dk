@@ -26,6 +26,7 @@ OPTIONS:
 					 
 	-DTINYMEM        Shorten the memory structures to a minimal number of objects to save memory 
 
+	-DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
 
 
 z88dk build hints:
@@ -40,6 +41,9 @@ zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
 zx81 16K, minimalistic version, graphics support
   zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d clisp.c
 
+MicroBee  
+  zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
+
 */
 
 
@@ -49,7 +53,9 @@ zx81 16K, minimalistic version, graphics support
 #include <string.h>
 
 #ifndef MINIMALISTIC
+#ifndef NOTIMER
 #include <time.h>
+#endif
 #endif
 
 #ifdef GRAPHICS
@@ -465,8 +471,10 @@ init(void)
   int  i;
 
 #ifndef MINIMALISTIC
+#ifndef NOTIMER
   /* Randomize */
   srand(time(NULL));
+#endif
 #endif
 
   /* stack */
