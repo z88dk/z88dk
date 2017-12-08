@@ -124,29 +124,6 @@ __Start:
    
    ldir
 
-   ;; ensure dffd is zero
-   
-   ld bc,$dffd
-   xor a
-   out (c),a
-   
-   ;; page in system variables
-
-   IF __USE_ZXN_OPCODES & __USE_ZXN_OPCODES_NEXTREG
-   
-      mmu2 10
-      
-   ELSE
-   
-      ld bc,__IO_NEXTREG_REG
-      ld a,__REG_MMU2
-      out (c),a
-      inc b
-      ld a,10
-      out (c),a
-      
-   ENDIF
-
    ;; verify that this is 128k NextOS mode
    ;; method provided by Garry Lancaster
    
