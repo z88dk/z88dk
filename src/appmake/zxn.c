@@ -55,11 +55,12 @@ static struct zx_bin zxb = {
     16          // recsize
 };
 
-static char tap = 0;   // .tap tape
-static char sna = 0;   // .sna 48k/128k snapshot
-static char dot = 0;   //  esxdos dot command
-static char zxn = 0;   // .zxn full size memory executable
-static char bin = 0;   // .bin output binaries with banks correctly merged
+static char tap = 0;            // .tap tape
+static char sna = 0;            // .sna 48k/128k snapshot
+static char dot = 0;            //  esxdos dot command
+static char universal_dot = 0;  // nextos universal dot command
+static char zxn = 0;            // .zxn full size memory executable
+static char bin = 0;            // .bin output binaries with banks correctly merged
 
 /* Options that are available for this module */
 option_t zxn_options[] = {
@@ -91,7 +92,8 @@ option_t zxn_options[] = {
     {  0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
-    {  0,  "dot",      "Make esxdos dot command instead of .tap\n", OPT_BOOL, &dot },
+    {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
+    {  0,  "universal-dot", "Make universal dot command instead of .tap\n", OPT_BOOL, &universal_dot },
 
     {  0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
     {  0,  "ts2068",    "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &zxt.ts2068 },
@@ -132,6 +134,11 @@ int zxn_exec(char *target)
 
     if (zxc.help)
         return ret;
+
+    // universal dot command
+
+    if (universal_dot)
+        return zxn_universal_dot(&zxc);
 
     // filenames
 
