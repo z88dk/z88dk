@@ -11,12 +11,12 @@ divert(-1)
 # taking the same amount of time as the movement of the raster by
 # one horizontal pixel.
 #
-# Vertically the display consists of 262 lines in 60Hz mode and
+# Vertically the display consists of 264 lines in 60Hz mode and
 # 312 lines in 50Hz mode.  Lines 0-191 always correspond to the
-# area containing the active display.  In 60Hz mode, the next 22
-# lines are bottom border, 33 lines for VBI and 15 lines for top
+# area containing the active display.  In 60Hz mode, the next 32
+# lines are bottom border, 8 lines for Vsync, and 32 lines for top
 # border.  In 50Hz mode, the next 56 lines are bottom border, 8
-# lines for VBI and 56 lines for top border.
+# lines for Vsync and 56 lines for top border.
 #
 # Horizontally the display is the same in 50 or 60Hz mode.  It
 # consists of 448 pixels (0-447) or, grouped eight pixels at

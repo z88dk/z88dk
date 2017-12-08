@@ -16,6 +16,10 @@
 
 #define ZX_SNA_PROTOTYPE  "src/appmake/data/zx_48.sna"
 
+// ZXN UNIVERSAL DOT
+
+#define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/_DEVELOPMENT/target/zxn/zxn_universal_dot.bin"
+
 
 /*
    TAPE
@@ -848,10 +852,104 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
         writebyte((unsigned char)num_pages, fout);
 
         if (DOTN_EXTRA_PAGES > 0)
-            printf("Note: Total number of 8k pages allocated at runtime is %s\n", num_pages + DOTN_EXTRA_PAGES);
+            printf("Note: Total number of 8k pages allocated at runtime is %d\n", num_pages + DOTN_EXTRA_PAGES);
     }
 
     fclose(fout);
+    return 0;
+}
+
+/*
+ZX NEXT Universal Dot Command
+
+Creates a root dot command that determines whether the machine is in 48k more or 128k mode and
+loads a dot/dotx command if in 48 mode or a dotn command if in 128k mode.
+
+Dec 2017 aralbrec
+*/
+
+int zxn_universal_dot(struct zx_common *zxc)
+{
+    FILE *fin, *fout;
+    char *p;
+    int   c;
+
+    char scratch[13];
+
+    char rootname[FILENAME_MAX + 1];
+    char dotxname[FILENAME_MAX + 1];
+    char dotnname[FILENAME_MAX + 1];
+
+    char filename[FILENAME_MAX + 1];
+
+    // root output name
+
+    if (zxc->outfile == NULL)
+        exit_log(1, "Error: Missing output filename\n");
+
+    strcpy(rootname, zxc->outfile);
+
+    rootname[8] = 0;
+    for (c = 0; rootname[c]; ++c)
+        rootname[c] = toupper(rootname[c]);
+
+    if ((p = strchr(rootname, '.')) != NULL)
+        *p = 0;
+
+    if (rootname[0] == 0)
+        exit_log(1, "Error: Invalid output filename %s\n", zxc->outfile);
+
+    strcpy(dotxname, rootname);
+    strcat(dotxname, ".X");
+
+    strcpy(dotnname, rootname);
+    strcat(dotnname, ".N");
+
+    // create output file
+
+    if ((fout = fopen(rootname, "wb")) == NULL)
+        exit_log(1, "Error: Cannot create output file %s\n", rootname);
+
+    // copy universal dot binary to output file
+
+    snprintf(filename, sizeof(filename), "%s" ZXN_UNIVERSAL_DOT_BINARY, c_install_dir);
+
+    if ((fin = fopen(filename, "rb")) == NULL)
+    {
+        fclose(fout);
+        remove(rootname);
+        exit_log(1, "Error: Could not open prototype %s\n", filename);
+    }
+
+    c = fgetc(fin);                 // jr instruction
+    fputc(c, fout);
+
+    c = fgetc(fin);
+    fputc(c, fout);
+
+    fread(scratch, 13, 1, fin);     // zeroes
+    strcpy(scratch, dotxname);
+    fwrite(scratch, 13, 1, fout);   // dotx filename
+
+    fread(scratch, 13, 1, fin);     // zeroes
+    strcpy(scratch, dotnname);
+    fwrite(scratch, 13, 1, fout);   // dotn filename
+
+    while ((c = fgetc(fin)) != EOF)
+        fputc(c, fout);
+
+    fclose(fin);
+    fclose(fout);
+
+    // instructions
+
+    printf("\nRename the first part of the original dot commands:\n\n");
+
+    printf("DOT/DOTX Command name changes from %s to %s\n", rootname, dotxname);
+    printf("    DOTN Command name changes from %s to %s\n", rootname, dotnname);
+
+    printf("\nPlace all dot command files into /BIN\n\n");
+
     return 0;
 }
 
@@ -1053,7 +1151,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         if (zxs->stackloc > -0x4000)
             zxs->stackloc = -1;
         else
-            zxs->stackloc = mem128[abs(zxs->stackloc) - 0x4000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) & 0xbfff];
+            zxs->stackloc = mem128[(abs(zxs->stackloc) - 0x4000) % 0xc000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) % 0xc000];
     }
 
     if (zxs->stackloc < 0)
@@ -1062,8 +1160,8 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if (!is_128)
     {
         zxs->stackloc = (zxs->stackloc - 2) & 0xffff;
-        mem128[(zxs->stackloc - 0x4000) & 0xbfff] = zxc->origin & 0xff;
-        mem128[(zxs->stackloc - 0x4000 + 1) & 0xbfff] = zxc->origin / 256;
+        mem128[(zxs->stackloc - 0x4000) % 0xc000] = zxc->origin & 0xff;
+        mem128[(zxs->stackloc - 0x4000 + 1) % 0xc000] = zxc->origin / 256;
     }
 
     sna_state[SNA_REG_SP] = zxs->stackloc & 0xff;
