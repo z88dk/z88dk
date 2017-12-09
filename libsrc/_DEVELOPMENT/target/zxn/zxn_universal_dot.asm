@@ -55,23 +55,19 @@ start:
    cp 0x40
    
    ld hl,__filename_dotn
-   ld bc,(__filename_dotn_len)
    
    jr nc, mode_128k
 
 mode_48k:
 
    ld hl,__filename_dotx
-   ld bc,(__filename_dotx_len)
 
 mode_128k:
 
    ; hl = filename
-   ; bc = length
 
    ;; load dot binary
    
-   push bc
    push hl
    
    ld a,'$'
@@ -79,11 +75,23 @@ mode_128k:
    
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_OPEN
+
+   jr c, error_load_0
+   
+   push af                     ; save file handle
+   
+   ld hl,stat_s
+   
+   rst  __ESXDOS_SYSCALL
+   defb __ESXDOS_SYS_F_FSTAT
+   
+   pop hl
+   ld a,h                      ; file handle
+   
+   jr c, error_load_c
    
    pop de                      ; de = filename
-   pop bc                      ; bc = len
-   
-   jr c, error_load_0
+   ld bc,(stat_s + stat_size)  ; bc = file size
    
    ld hl,error_load_1
    ex (sp),hl                  ; return address = error_load_1
@@ -95,8 +103,14 @@ mode_128k:
    ld hl,0x2000
    ret                         ; jump trampoline
 
+error_load_c:
+
+   rst  __ESXDOS_SYSCALL
+   defb __ESXDOS_SYS_F_CLOSE
+
 error_load_0:
    
+   pop de                      ; filename
    pop bc                      ; trash &trampoline
    
 error_load_1:
@@ -140,6 +154,18 @@ error_load_1:
 
 error_load_s:          defm "Can't load "
 error_load_s_name:     defs 13
+
+defvars 0
+{
+   stat_drive  ds.b 1
+   stat_device ds.b 1
+   stat_attr   ds.b 1
+   stat_date   ds.w 2
+   stat_size   ds.w 2
+   SIZEOF_STAT
+}
+
+stat_s:                defs SIZEOF_STAT
 
 
 ;; TRAMPOLINE IN STACK
