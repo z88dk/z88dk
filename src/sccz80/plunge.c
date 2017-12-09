@@ -418,6 +418,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval->val_type = KIND_LONG;   
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else {
+                lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;                
                 const2(lval->const_val);
             }
         }
