@@ -35,18 +35,19 @@ void sleep(int secs)
 
 #else
   
-	long start = clock();  
-	long per   = secs * CLOCKS_PER_SEC;
+	clock_t start = clock();  
+	clock_t per   = secs * CLOCKS_PER_SEC;
 #ifdef __ZX80__
 	gen_tv_field_init(0);
 #endif
-        
-        while ( ((clock() - start) < per) && (clock()>per) ) {
+
+    while ((clock() - start) < per) {        
 #ifdef __ZX80__
 	    gen_tv_field();
             FRAMES++;
 #else
-	    ;
+		// timer overrun protection
+		if (clock() < CLOCKS_PER_SEC) return (0);
 #endif
 	}
 
