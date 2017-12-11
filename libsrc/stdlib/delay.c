@@ -36,12 +36,13 @@ clock_t x;
 	clock_t start = clock();  
 	clock_t per   = msecs * CLOCKS_PER_SEC / 1000;
 
+    while ((clock() - start) < per) {        
 #ifdef __ZX80__
-        while ((clock() - start) < per) {
 	    gen_tv_field();
             FRAMES++;
 #else
-        while ( ((clock() - start) < per) && (clock() > CLOCKS_PER_SEC) ) {
+		// timer overrun protection
+		if (clock() < CLOCKS_PER_SEC) return (0);
 #endif
 	}
 
