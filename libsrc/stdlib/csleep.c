@@ -22,7 +22,7 @@
 void  csleep(unsigned int centiseconds)
 {
 #ifdef __C128__
-long x;
+unsigned int x;
 
   setintctrlcia(cia2,ciaClearIcr); /* disable all cia 2 interrupts */
   settimerbcia(cia2,timervalcia(1000),ciaCountA);  /* timer b counts timer a underflows */
@@ -32,19 +32,20 @@ long x;
 
 #else
 
-	long start = clock();  
-	long per   = ((long) centiseconds * (long) CLOCKS_PER_SEC) / 100L;
+	clock_t start = clock();  
+	clock_t per   = ((clock_t) centiseconds * (clock_t) CLOCKS_PER_SEC) / 100L;
 	
 #ifdef __ZX80__
 	gen_tv_field_init(0);
 #endif
-        
-        while ( ((clock() - start) < per) && (clock()>per) ) {
+
+    while ((clock() - start) < per) {        
 #ifdef __ZX80__
 	    gen_tv_field();
             FRAMES++;
 #else
-	    ;
+		// timer overrun protection
+		if (clock() < CLOCKS_PER_SEC) return (0);
 #endif
 	}
 
