@@ -36,7 +36,7 @@ void sleep(int secs)
 #else
   
 	clock_t start = clock();  
-	clock_t per   = secs * CLOCKS_PER_SEC;
+	clock_t per   = (clock_t) secs * CLOCKS_PER_SEC;
 #ifdef __ZX80__
 	gen_tv_field_init(0);
 #endif
