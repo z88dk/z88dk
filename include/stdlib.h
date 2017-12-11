@@ -306,7 +306,7 @@ extern void   __LIB__    t_delay(unsigned int tstates) __z88dk_fastcall;   // at
 extern void   __LIB__ __SAVEFRAME__     sleep (int secs) __z88dk_fastcall;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
 extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
-extern void   __LIB__     delay (long milliseconds) __z88dk_fastcall;
+extern void   __LIB__     delay (unsigned long milliseconds) __z88dk_fastcall;
 
 
 
