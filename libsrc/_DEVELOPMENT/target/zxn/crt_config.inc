@@ -120,7 +120,7 @@ IF __CRTCFG = 3
    defc TAR__crt_model                 = 0        ;; ram model only
    
    defc TAR__register_sp               = -1       ;; SP will point at stack in BSS
-   defc TAR__crt_stack_size            = 512      ;; stack of this size is created in BSS
+   defc TAR__crt_stack_size            = 384      ;; stack of this size is created in BSS
    
    defc TAR__crt_initialize_bss        = 0
    

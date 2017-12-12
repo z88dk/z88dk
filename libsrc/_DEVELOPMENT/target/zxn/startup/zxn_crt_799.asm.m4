@@ -317,7 +317,7 @@ extra_pages_none:
 
    ENDIF
    
-   IF (__register_sp = -1) || (__crt_stack_size > 0)
+   IF (__crt_stack_size > 0)
    
       EXTERN __BSS_STACK_TOP_head
       ld sp,__BSS_STACK_TOP_head
