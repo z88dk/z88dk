@@ -12,6 +12,11 @@ define(`__ZXNEXT_2MB', 2)
 
 # ZX Next Runtime Configuration
 
+# Static Environment
+
+define(`__ENVIRONMENT_FILENAME', `"/sys/env"')
+define(`__TEMP_DIRECTORY', `"/tmp"')
+
 # Compatible Spectrum model
 
 define(`__SPECTRUM', 2)
@@ -87,6 +92,9 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 defc `__ZXNEXT' = __ZXNEXT
+
+; `define(`__ENVIRONMENT_FILENAME',' __ENVIRONMENT_FILENAME)
+; `define(`__TEMP_DIRECTORY',' __TEMP_DIRECTORY)
 
 defc `__SPECTRUM' = __SPECTRUM
 

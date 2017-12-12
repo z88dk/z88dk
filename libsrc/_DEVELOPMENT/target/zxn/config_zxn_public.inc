@@ -59,6 +59,9 @@ PUBLIC __USE_ZXN_OPCODES_OTHER
 
 defc __ZXNEXT = 1
 
+; define(`__ENVIRONMENT_FILENAME', "/sys/env")
+; define(`__TEMP_DIRECTORY', "/tmp")
+
 defc __SPECTRUM = 2
 
 defc __SPECTRUM_48 = 1
