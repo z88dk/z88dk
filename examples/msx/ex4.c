@@ -46,7 +46,7 @@ main() {
 		p[c].y = ((int)(80.0 * sin(a))) + (96 - 8);
 
 		if (c & 8)
-			putch('.');
+			putchar('.');
 	}
 	printf("done!\n");
 	
