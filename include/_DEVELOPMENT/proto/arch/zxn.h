@@ -48,6 +48,22 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
+#ifdef __ESXDOS_DOT_COMMAND
+
+// DOTX and DOTN commands only
+// details about the second binary file
+
+extern unsigned char DOT_FILENAME[18];
+extern unsigned int  DOT_BINLEN;
+
+// DOTN commands only
+// always DOTN[DOTN_PAGE_NUM] = 255
+
+extern unsigned char DOTN_PAGE[];
+extern unsigned char DOTN_PAGE_NUM;
+
+#endif
+
 ///////////////////////////////////////////////////////////////
 
 #ifdef __CLANG
@@ -66,7 +82,7 @@ extern unsigned char IO_4F;
 extern unsigned char IO_DAC_R0;
 extern unsigned char IO_5F;
 extern unsigned char IO_DAC_R1;
-extern unsigned char IO_FFDF;
+extern unsigned char IO_2D;
 extern unsigned char IO_DAC_M0;
 extern unsigned char IO_FFFD;
 extern unsigned char IO_TURBOSOUND;
@@ -118,8 +134,8 @@ __sfr __at __IO_DAC_R0 IO_DAC_R0;
 __sfr __at 0x5f IO_5F;
 __sfr __at __IO_DAC_R1 IO_DAC_R1;
 
-__sfr __banked __at 0xffdf IO_FFDF;
-__sfr __banked __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
+__sfr __at 0x2d IO_2D;
+__sfr __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
 
 // io ports - ay-3-8912
 
@@ -286,6 +302,9 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 
 #define REG_PAGE_RAM  __REG_PAGE_RAM
 #define RPR_MASK  __RPR_MASK
+// preferred name is bank for 16k banks
+#define REG_BANK_RAM  __REG_BANK_RAM
+#define RBR_MASK  __RBR_MASK
 
 #define REG_PERIPHERAL_1  __REG_PERIPHERAL_1
 #define RP1_JOY1_SINCLAIR  __RP1_JOY1_SINCLAIR
@@ -335,9 +354,15 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 
 #define REG_LAYER_2_RAM_PAGE  __REG_LAYER_2_RAM_PAGE
 #define RL2RP_MASK  __RL2RP_MASK
+// preferred name is bank for 16k banks
+#define REG_LAYER_2_RAM_BANK  __REG_LAYER_2_RAM_BANK
+#define RL2RB_MASK  __RL2RB_MASK
 
 #define REG_LAYER_2_SHADOW_RAM_PAGE  __REG_LAYER_2_SHADOW_RAM_PAGE
 #define RL2SRP_MASK  __RL2SRP_MASK
+// preferred name is bank for 16k banks
+#define REG_LAYER_2_SHADOW_RAM_BANK  __REG_LAYER_2_SHADOW_RAM_BANK
+#define RL2SRB_MASK  __RL2SRB_MASK
 
 #define REG_GLOBAL_TRANSPARENCY_COLOR  __REG_GLOBAL_TRANSPARENCY_COLOR
 
@@ -485,9 +510,10 @@ __DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr_2mb,u
 __DPROTO(`a,iyl,iyh',`iyl,iyh',void,,zxn_read_mmu_state,void *dst)
 __DPROTO(`iyl,iyh',`iyl,iyh',void,,zxn_write_mmu_state,void *src)
 
-__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,,zxn_write_bank_state,unsigned int state)
+__DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',void,,zxn_write_bank_state,unsigned int state)
 __OPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_read_sysvar_bank_state,void)
 __DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,iyl,iyh',void,,zxn_write_sysvar_bank_state,unsigned int state)
+__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_mangle_bank_state,unsigned int state)
 
 ///////////////////////////////////////////////////////////////
 

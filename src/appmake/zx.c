@@ -184,7 +184,7 @@ int zx_exec(char *target)
     tap = !dot && !sna && !bin;
 
     if (tap && (zxc.main_fence > 0))
-        fprintf(stderr, "Warning: Main-fence is ignored for tap and dot compiles\n");
+        fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
 
     if (tap)
         return zx_tape(&zxc, &zxt);

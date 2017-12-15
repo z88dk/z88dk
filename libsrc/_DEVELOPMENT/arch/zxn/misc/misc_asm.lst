@@ -1,5 +1,6 @@
 arch/zxn/misc/z80/asm_zxn_addr_from_mmu
 arch/zxn/misc/z80/asm_zxn_addr_from_page
+arch/zxn/misc/z80/asm_zxn_mangle_bank_state
 arch/zxn/misc/z80/asm_zxn_mmu_from_addr
 arch/zxn/misc/z80/asm_zxn_page_from_addr
 arch/zxn/misc/z80/asm_zxn_read_mmu_state

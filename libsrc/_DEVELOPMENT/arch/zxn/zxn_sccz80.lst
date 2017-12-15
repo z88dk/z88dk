@@ -2,7 +2,7 @@
 @arch/zx/bifrost_l/bifrost_l_sccz80.lst
 @arch/zx/bifrost2/bifrost2_sccz80.lst
 @arch/zxn/display/display_sccz80.lst
-@arch/zx/esxdos/esxdos_sccz80.lst
+@arch/zxn/esxdos/esxdos_sccz80.lst
 @arch/zxn/globals/globals_asm.lst
 @arch/zx/graphics/graphics_sccz80.lst
 @arch/zxn/misc/misc_sccz80.lst

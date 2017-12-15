@@ -24,7 +24,7 @@ asm_zxn_write_bank_state:
    ; exit  : bc = $dffd
    ;          a = 0
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, bc
    
    ld bc,__IO_1FFD
    out (c),h

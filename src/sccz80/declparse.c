@@ -1331,7 +1331,7 @@ int type_matches(Type *t1, Type *t2)
     }
 
     if ( t1->tag && t2->tag ) {
-        if (type_matches(t1->tag,t2->tag) == 0 ) 
+        if ( t1->tag != t2->tag ) 
            return 0;
     }  else if ( t1->tag || t2->tag ) {
        return 0;

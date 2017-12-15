@@ -5,7 +5,7 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-# NEXTOS API
+# NEXTOS API 1.89
 # https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 
 # Filesystem Related
@@ -59,7 +59,16 @@ define(`__nextos_rc_path_delete', 3)
 
 define(`__NEXTOS_IDE_CAPACITY', 0x01b4)
 define(`__NEXTOS_IDE_GET_LFN', 0x01b7)
+
 define(`__NEXTOS_IDE_BROWSER', 0x01ba)
+define(`__nextos_browsercaps_none', 0)
+define(`__nextos_browsercaps_copy', 0x01)
+define(`__nextos_browsercaps_rename', 0x02)
+define(`__nextos_browsercaps_mkdir', 0x04)
+define(`__nextos_browsercaps_erase', 0x08)
+define(`__nextos_browsercaps_remount', 0x10)
+define(`__nextos_browsercaps_syscfg', 0x80)
+define(`__nextos_browsercaps_all', 0x1f)
 
 # Not Filesystem Related
 
@@ -80,6 +89,7 @@ define(`__nextos_rc_bank_free', 3)
 define(`__NEXTOS_IDE_BASIC', 0x01c0)
 define(`__NEXTOS_IDE_STREAM_LINEIN', 0x01c3)
 define(`__NEXTOS_IDE_WINDOW_STRING', 0x01c6)
+define(`__NEXTOS_IDE_INTEGER_VAR', 0x01c9)
 
 # Legacy - Floppy Drive
 
@@ -127,8 +137,9 @@ define(`__NEXTOS_IDE_PARTITION_CLOSE', 0x00d0)
 define(`__NEXTOS_IDE_PARTITIONS', 0x01a5)
 
 # NextOS DOTN Commands
+# stack location in divmmc ram
 
-define(`__NEXTOS_DOTN_SP', 0x4000)  # default stack location in divmmc ram
+define(`__NEXTOS_DOTN_SP_DIVMMC', 0x4000)
 
 # Error Codes - Recoverable Disk Errors
 
@@ -238,7 +249,16 @@ PUBLIC `__nextos_rc_path_delete'
 
 PUBLIC `__NEXTOS_IDE_CAPACITY'
 PUBLIC `__NEXTOS_IDE_GET_LFN'
+
 PUBLIC `__NEXTOS_IDE_BROWSER'
+PUBLIC `__nextos_browsercaps_none'
+PUBLIC `__nextos_browsercaps_copy'
+PUBLIC `__nextos_browsercaps_rename'
+PUBLIC `__nextos_browsercaps_mkdir'
+PUBLIC `__nextos_browsercaps_erase'
+PUBLIC `__nextos_browsercaps_remount'
+PUBLIC `__nextos_browsercaps_syscfg'
+PUBLIC `__nextos_browsercaps_all'
 
 PUBLIC `__NEXTOS_IDE_STREAM_OPEN'
 PUBLIC `__NEXTOS_IDE_STREAM_CLOSE'
@@ -257,6 +277,7 @@ PUBLIC `__nextos_rc_bank_free'
 PUBLIC `__NEXTOS_IDE_BASIC'
 PUBLIC `__NEXTOS_IDE_STREAM_LINEIN'
 PUBLIC `__NEXTOS_IDE_WINDOW_STRING'
+PUBLIC `__NEXTOS_IDE_INTEGER_VAR'
 
 PUBLIC `__NEXTOS_DOS_REF_XDPB'
 PUBLIC `__NEXTOS_DOS_MAP_B'
@@ -299,7 +320,7 @@ PUBLIC `__NEXTOS_IDE_PARTITION_OPEN'
 PUBLIC `__NEXTOS_IDE_PARTITION_CLOSE'
 PUBLIC `__NEXTOS_IDE_PARTITIONS'
 
-PUBLIC `__NEXTOS_DOTN_SP'
+PUBLIC `__NEXTOS_DOTN_SP_DIVMMC'
 
 PUBLIC `__NEXTOS_RC_READY'
 PUBLIC `__NEXTOS_RC_WP'
@@ -400,7 +421,16 @@ defc `__nextos_rc_path_delete' = __nextos_rc_path_delete
 
 defc `__NEXTOS_IDE_CAPACITY' = __NEXTOS_IDE_CAPACITY
 defc `__NEXTOS_IDE_GET_LFN' = __NEXTOS_IDE_GET_LFN
+
 defc `__NEXTOS_IDE_BROWSER' = __NEXTOS_IDE_BROWSER
+defc `__nextos_browsercaps_none' = __nextos_browsercaps_none
+defc `__nextos_browsercaps_copy' = __nextos_browsercaps_copy
+defc `__nextos_browsercaps_rename' = __nextos_browsercaps_rename
+defc `__nextos_browsercaps_mkdir' = __nextos_browsercaps_mkdir
+defc `__nextos_browsercaps_erase' = __nextos_browsercaps_erase
+defc `__nextos_browsercaps_remount' = __nextos_browsercaps_remount
+defc `__nextos_browsercaps_syscfg' = __nextos_browsercaps_syscfg
+defc `__nextos_browsercaps_all' = __nextos_browsercaps_all
 
 defc `__NEXTOS_IDE_STREAM_OPEN' = __NEXTOS_IDE_STREAM_OPEN
 defc `__NEXTOS_IDE_STREAM_CLOSE' = __NEXTOS_IDE_STREAM_CLOSE
@@ -419,6 +449,7 @@ defc `__nextos_rc_bank_free' = __nextos_rc_bank_free
 defc `__NEXTOS_IDE_BASIC' = __NEXTOS_IDE_BASIC
 defc `__NEXTOS_IDE_STREAM_LINEIN' = __NEXTOS_IDE_STREAM_LINEIN
 defc `__NEXTOS_IDE_WINDOW_STRING' = __NEXTOS_IDE_WINDOW_STRING
+defc `__NEXTOS_IDE_INTEGER_VAR' = __NEXTOS_IDE_INTEGER_VAR
 
 defc `__NEXTOS_DOS_REF_XDPB' = __NEXTOS_DOS_REF_XDPB
 defc `__NEXTOS_DOS_MAP_B' = __NEXTOS_DOS_MAP_B
@@ -461,7 +492,7 @@ defc `__NEXTOS_IDE_PARTITION_OPEN' = __NEXTOS_IDE_PARTITION_OPEN
 defc `__NEXTOS_IDE_PARTITION_CLOSE' = __NEXTOS_IDE_PARTITION_CLOSE
 defc `__NEXTOS_IDE_PARTITIONS' = __NEXTOS_IDE_PARTITIONS
 
-defc `__NEXTOS_DOTN_SP' = __NEXTOS_DOTN_SP
+defc `__NEXTOS_DOTN_SP_DIVMMC' = __NEXTOS_DOTN_SP_DIVMMC
 
 defc `__NEXTOS_RC_READY' = __NEXTOS_RC_READY
 defc `__NEXTOS_RC_WP' = __NEXTOS_RC_WP
@@ -562,7 +593,16 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__NEXTOS_IDE_CAPACITY'  __NEXTOS_IDE_CAPACITY
 `#define' `__NEXTOS_IDE_GET_LFN'  __NEXTOS_IDE_GET_LFN
+
 `#define' `__NEXTOS_IDE_BROWSER'  __NEXTOS_IDE_BROWSER
+`#define' `__nextos_browsercaps_none'  __nextos_browsercaps_none
+`#define' `__nextos_browsercaps_copy'  __nextos_browsercaps_copy
+`#define' `__nextos_browsercaps_rename'  __nextos_browsercaps_rename
+`#define' `__nextos_browsercaps_mkdir'  __nextos_browsercaps_mkdir
+`#define' `__nextos_browsercaps_erase'  __nextos_browsercaps_erase
+`#define' `__nextos_browsercaps_remount'  __nextos_browsercaps_remount
+`#define' `__nextos_browsercaps_syscfg'  __nextos_browsercaps_syscfg
+`#define' `__nextos_browsercaps_all'  __nextos_browsercaps_all
 
 `#define' `__NEXTOS_IDE_STREAM_OPEN'  __NEXTOS_IDE_STREAM_OPEN
 `#define' `__NEXTOS_IDE_STREAM_CLOSE'  __NEXTOS_IDE_STREAM_CLOSE
@@ -581,6 +621,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_BASIC'  __NEXTOS_IDE_BASIC
 `#define' `__NEXTOS_IDE_STREAM_LINEIN'  __NEXTOS_IDE_STREAM_LINEIN
 `#define' `__NEXTOS_IDE_WINDOW_STRING'  __NEXTOS_IDE_WINDOW_STRING
+`#define' `__NEXTOS_IDE_INTEGER_VAR'  __NEXTOS_IDE_INTEGER_VAR
 
 `#define' `__NEXTOS_DOS_REF_XDPB'  __NEXTOS_DOS_REF_XDPB
 `#define' `__NEXTOS_DOS_MAP_B'  __NEXTOS_DOS_MAP_B
@@ -623,7 +664,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_PARTITION_CLOSE'  __NEXTOS_IDE_PARTITION_CLOSE
 `#define' `__NEXTOS_IDE_PARTITIONS'  __NEXTOS_IDE_PARTITIONS
 
-`#define' `__NEXTOS_DOTN_SP'  __NEXTOS_DOTN_SP
+`#define' `__NEXTOS_DOTN_SP_DIVMMC'  __NEXTOS_DOTN_SP_DIVMMC
 
 `#define' `__NEXTOS_RC_READY'  __NEXTOS_RC_READY
 `#define' `__NEXTOS_RC_WP'  __NEXTOS_RC_WP

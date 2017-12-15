@@ -1,14 +1,14 @@
 ;;;; These functions need to be declared only 
 ;;;; if clisp is compiled in 'MINIMALISTIC' mode
 ;;;; 
-;;;; memory cost:  'zerop' takes 78 bytes if implemented in C
+;;;; memory cost comparison:  'zerop' takes 78 bytes if implemented in C
 ;;;; 
-;;;; $Id: minimalistic.l,v 1.1 2015-03-31 13:50:44 stefano Exp $
+;;;; $Id: minimalistic.l $
 
 
 ; factorial, minimalistic mode example
 (defun fact (n)
-  (cond ((< n 1)
+  (cond ((> 1 n)
 	 1)
 	(t
 	 (* n (fact (- n 1))))))
@@ -21,13 +21,17 @@
 (defun zerop (n)
   (eq n 0))
 
+; less than?
+(defun < (n1 n2)
+  (> n2 n1))
+
 ; greater than or equal to?
 (defun >= (n1 n2)
   (or (> n1 n2) (= n1 n2)))
 
 ; less than or equal to?
 (defun <= (n1 n2)
-  (or (< n1 n2) (= n1 n2)))
+  (or (> n2 n1) (= n1 n2)))
 
 ; eq?
 (defun = (n1 n2)
@@ -46,14 +50,14 @@
 
 ; sum
 (defun sum (n)
-  (cond ((< n 1)
+  (cond ((> 1 n)
 	 0)
 	(t
 	 (+ n (sum (- n 1))))))
 
 ; power
 (defun power (x n)
-  (cond ((< n 1)
+  (cond ((> 1 n)
 	 1)
 	(t
 	 (* x (power x (- n 1))))))

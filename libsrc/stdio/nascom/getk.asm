@@ -5,7 +5,7 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.4 2016-04-03 13:10:24 dom Exp $
+;	$Id: getk.asm $
 ;
 
 		SECTION code_clib
@@ -17,14 +17,19 @@
 	jr	nz,nassys
 
 ; T monitor
-	call	0c4dh
-	jr	gkret
+	;call	0c4dh
+	call $69
+	defb 33 ; ld hl,NN to skip the next 2 bytes
 
 ; NASSYS monitor
 .nassys
-	defw	62dfh
-	
+	;defw	62dfh
+	rst $18
+	defb $62		;  an INKEY$ example suggests $61
 .gkret
+	jr c,gkdone
+	xor a
+.gkdone
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return

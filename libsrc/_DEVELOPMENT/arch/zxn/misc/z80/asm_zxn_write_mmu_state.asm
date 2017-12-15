@@ -16,7 +16,7 @@ PUBLIC asm_zxn_write_mmu_state
 asm_zxn_write_mmu_state:
 
    ; copy memory configuration from array to mmu
-   ; mmu values of 255 are skipped
+   ; mmu values of 255 are skipped except mmu0,1
    ;
    ; enter : hl = uint8_t src[8]
    ;

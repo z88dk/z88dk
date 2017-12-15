@@ -6,6 +6,8 @@ arch/zxn/misc/c/sdcc/zxn_addr_from_page
 arch/zxn/misc/c/sdcc/zxn_addr_from_page_fastcall
 arch/zxn/misc/c/sdcc/zxn_addr_from_page_2mb
 arch/zxn/misc/c/sdcc/zxn_addr_from_page_2mb_fastcall
+arch/zxn/misc/c/sdcc/zxn_mangle_bank_state
+arch/zxn/misc/c/sdcc/zxn_mangle_bank_state_fastcall
 arch/zxn/misc/c/sdcc/zxn_mmu_from_addr
 arch/zxn/misc/c/sdcc/zxn_mmu_from_addr_fastcall
 arch/zxn/misc/c/sdcc/zxn_page_from_addr

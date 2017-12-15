@@ -662,6 +662,29 @@ ifelse(__STARTUP, 543,
 ;; nextos extended dot command ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ifelse(__STARTUP, 776,
+`
+   ; fzx terminal using ff_ind_Termino font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_776.asm.m4')
+')
+
 ifelse(__STARTUP, 798,
 `
    ; standard 32 column display using rst 0x10

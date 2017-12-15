@@ -537,6 +537,8 @@
 #define __ESXDOS_ROMCALL  0x18
 #define __ESXDOS_AUXCALL  0x30
 
+#define __NEXTOS_ROMCALL_DOT_ERROR_HOOK  0x95
+
 #define __ESXDOS_SYS_DISK_STATUS  128
 #define __ESXDOS_SYS_DISK_READ  129
 #define __ESXDOS_SYS_DISK_WRITE  130
@@ -1041,7 +1043,7 @@
 #define __IO_DAC_R0  0x4f
 #define __IO_DAC_R1  0x5f
 
-#define __IO_DAC_M0  0xffdf
+#define __IO_DAC_M0  0x2d
 
 #define __IO_DAC_SPECDRUM  0xffdf
 
@@ -1195,7 +1197,16 @@
 
 #define __NEXTOS_IDE_CAPACITY  0x01b4
 #define __NEXTOS_IDE_GET_LFN  0x01b7
+
 #define __NEXTOS_IDE_BROWSER  0x01ba
+#define __nextos_browsercaps_none  0
+#define __nextos_browsercaps_copy  0x01
+#define __nextos_browsercaps_rename  0x02
+#define __nextos_browsercaps_mkdir  0x04
+#define __nextos_browsercaps_erase  0x08
+#define __nextos_browsercaps_remount  0x10
+#define __nextos_browsercaps_syscfg  0x80
+#define __nextos_browsercaps_all  0x1f
 
 #define __NEXTOS_IDE_STREAM_OPEN  0x0056
 #define __NEXTOS_IDE_STREAM_CLOSE  0x0059
@@ -1214,6 +1225,7 @@
 #define __NEXTOS_IDE_BASIC  0x01c0
 #define __NEXTOS_IDE_STREAM_LINEIN  0x01c3
 #define __NEXTOS_IDE_WINDOW_STRING  0x01c6
+#define __NEXTOS_IDE_INTEGER_VAR  0x01c9
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -1256,7 +1268,7 @@
 #define __NEXTOS_IDE_PARTITION_CLOSE  0x00d0
 #define __NEXTOS_IDE_PARTITIONS  0x01a5
 
-#define __NEXTOS_DOTN_SP  0x4000
+#define __NEXTOS_DOTN_SP_DIVMMC  0x4000
 
 #define __NEXTOS_RC_READY  0
 #define __NEXTOS_RC_WP  1
@@ -1340,6 +1352,8 @@
 
 #define __REG_PAGE_RAM  4
 #define __RPR_MASK  0x7f
+#define __REG_BANK_RAM  4
+#define __RBR_MASK  0x7f
 
 #define __REG_PERIPHERAL_1  5
 #define __RP1_JOY1_SINCLAIR  0x00
@@ -1389,9 +1403,13 @@
 
 #define __REG_LAYER_2_RAM_PAGE  18
 #define __RL2RP_MASK  0x7f
+#define __REG_LAYER_2_RAM_BANK  18
+#define __RL2RB_MASK  0x7f
 
 #define __REG_LAYER_2_SHADOW_RAM_PAGE  19
 #define __RL2SRP_MASK  0x7f
+#define __REG_LAYER_2_SHADOW_RAM_BANK  19
+#define __RL2SRB_MASK  0x7f
 
 #define __REG_GLOBAL_TRANSPARENCY_COLOR  20
 
@@ -1645,6 +1663,36 @@
 #define __SYSVAR_NMIADD  0x5cb0
 #define __SYSVAR_RAMTOP  0x5cb2
 #define __SYSVAR_PRAMT  0x5cb4
+
+#define __ERRB_0_OK  0
+#define __ERRB_1_NEXT_WITHOUT_FOR  1
+#define __ERRB_2_VARIABLE_NOT_FOUND  2
+#define __ERRB_3_SUBSCRIPT_WRONG  3
+#define __ERRB_4_OUT_OF_MEMORY  4
+#define __ERRB_5_OUT_OF_SCREEN  5
+#define __ERRB_6_NUMBER_TOO_BIG  6
+#define __ERRB_7_RETURN_WITHOUT_GOSUB  7
+#define __ERRB_8_END_OF_FILE  8
+#define __ERRB_9_STOP_STATEMENT  9
+#define __ERRB_A_INVALID_ARGUMENT  10
+#define __ERRB_B_INTEGER_OUT_OF_RANGE  11
+#define __ERRB_C_NONSENSE_IN_BASIC  12
+#define __ERRB_D_BREAK_CONT_REPEATS  13
+#define __ERRB_E_OUT_OF_DATA  14
+#define __ERRB_F_INVALID_FILENAME  15
+#define __ERRB_G_NO_ROOM_FOR_LINE  16
+#define __ERRB_H_STOP_IN_INPUT  17
+#define __ERRB_I_FOR_WITHOUT_NEXT  18
+#define __ERRB_J_INVALID_IO_DEVICE  19
+#define __ERRB_K_INVALID_COLOUR  20
+#define __ERRB_K_INVALID_COLOR  20
+#define __ERRB_L_BREAK_INTO_PROGRAM  21
+#define __ERRB_M_RAMTOP_NO_GOOD  22
+#define __ERRB_N_STATEMENT_LOST  23
+#define __ERRB_O_INVALID_STREAM  24
+#define __ERRB_P_FN_WITHOUT_DEF  25
+#define __ERRB_Q_PARAMETER_ERROR  26
+#define __ERRB_R_TAPE_LOADING_ERROR  27
 
 
 

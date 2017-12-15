@@ -16,6 +16,10 @@
 
 #define ZX_SNA_PROTOTYPE  "src/appmake/data/zx_48.sna"
 
+// ZXN UNIVERSAL DOT
+
+#define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/_DEVELOPMENT/target/zxn/zxn_universal_dot.bin"
+
 
 /*
    TAPE
@@ -691,7 +695,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 
    * dot  : standard dot command resident in divmmc page at 0x2000 limited to ~7k+
    * dotx : extended dot command with first part at 0x2000 and limited to 7k+ and a second part in main ram
-   * dotn : zx next only same as extended dot command except available ram pages are allocated so as not to overwrite main ram
+   * dotn : zx next only same as dotx except ram pages are allocated from NextOS so as not to overwrite main ram
 
    July/Nov 2017 aralbrec
 */
@@ -709,7 +713,9 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
     int  __esxdos_dtx_fname;
     int  __esxdos_dotx_len;
-    int  __dotn_num_pages;
+    int  __dotn_num_main_pages;
+    int  DOTN_REGISTER_SP;
+    int  DOTN_EXTRA_PAGES;
 
     int c;
     int dotx, dotn;
@@ -731,12 +737,14 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
     // collect parameters
 
-    __esxdos_dtx_fname = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
-    __esxdos_dotx_len  = parameter_search(zxc->crtfile, ".map", "__esxdos_dotx_len");
-    __dotn_num_pages   = parameter_search(zxc->crtfile, ".map", "__dotn_num_pages");
+    __esxdos_dtx_fname    = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
+    __esxdos_dotx_len     = parameter_search(zxc->crtfile, ".map", "__esxdos_dotx_len");
+    __dotn_num_main_pages = parameter_search(zxc->crtfile, ".map", "__dotn_num_main_pages");
+    DOTN_REGISTER_SP      = parameter_search(zxc->crtfile, ".map", "DOTN_REGISTER_SP");
+    DOTN_EXTRA_PAGES = parameter_search(zxc->crtfile, ".map", "DOTN_EXTRA_PAGES");
 
-    dotx = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_pages < 0);
-    dotn = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_pages >= 0);
+    dotx = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_main_pages < 0);
+    dotn = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_main_pages >= 0);
 
     // generate the main dot command from section CODE
 
@@ -767,7 +775,8 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             exit_log(1, "Error: Main dot binary exceeds 0x4000 by %d bytes\n", -space);
         }
 
-        printf("Note: Available stack space in divmmc memory is %d bytes\n", space);
+        if (DOTN_REGISTER_SP >= 0)
+            printf("Note: Available space for command line in divmmc memory is %d bytes\n", DOTN_REGISTER_SP - (sb->org + sb->size));
     }
 
     // stop if plain dot command
@@ -816,7 +825,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     {
         remove(outname);
         remove(outnamex);
-        exit_log(1, "Error: Couldn't write dot filename into main dot binary\n");
+        exit_log(1, "Error: Couldn't write variables into main dot binary\n");
     }
 
     fseek(fout, __esxdos_dtx_fname - 0x2000, SEEK_SET);
@@ -834,16 +843,113 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             fclose(fout);
             remove(outname);
             remove(outnamex);
-            exit_log(1, "Error: Number of pages required %d is out of range\n", num_pages);
+            exit_log(1, "Error: Number of pages required for main (%d) is out of range\n", num_pages);
         }
 
-        printf("Note: Number of 8k pages required is %d\n", num_pages);
+        printf("Note: Number of 8k pages required for main is %d\n", num_pages);
 
-        fseek(fout, __dotn_num_pages - 0x2000, SEEK_SET);
+        fseek(fout, __dotn_num_main_pages - 0x2000, SEEK_SET);
         writebyte((unsigned char)num_pages, fout);
+
+        if (DOTN_EXTRA_PAGES > 0)
+            printf("Note: Total number of 8k pages allocated at runtime is %d\n", num_pages + DOTN_EXTRA_PAGES);
     }
 
     fclose(fout);
+    return 0;
+}
+
+/*
+ZX NEXT Universal Dot Command
+
+Creates a root dot command that determines whether the machine is in 48k more or 128k mode and
+loads a dot/dotx command if in 48 mode or a dotn command if in 128k mode.
+
+Dec 2017 aralbrec
+*/
+
+int zxn_universal_dot(struct zx_common *zxc)
+{
+    FILE *fin, *fout;
+    char *p;
+    int   c;
+
+    char scratch[13];
+
+    char rootname[FILENAME_MAX + 1];
+    char dotxname[FILENAME_MAX + 1];
+    char dotnname[FILENAME_MAX + 1];
+
+    char filename[FILENAME_MAX + 1];
+
+    // root output name
+
+    if (zxc->outfile == NULL)
+        exit_log(1, "Error: Missing output filename\n");
+
+    strcpy(rootname, zxc->outfile);
+
+    rootname[8] = 0;
+    for (c = 0; rootname[c]; ++c)
+        rootname[c] = toupper(rootname[c]);
+
+    if ((p = strchr(rootname, '.')) != NULL)
+        *p = 0;
+
+    if (rootname[0] == 0)
+        exit_log(1, "Error: Invalid output filename %s\n", zxc->outfile);
+
+    strcpy(dotxname, rootname);
+    strcat(dotxname, ".X");
+
+    strcpy(dotnname, rootname);
+    strcat(dotnname, ".N");
+
+    // create output file
+
+    if ((fout = fopen(rootname, "wb")) == NULL)
+        exit_log(1, "Error: Cannot create output file %s\n", rootname);
+
+    // copy universal dot binary to output file
+
+    snprintf(filename, sizeof(filename), "%s" ZXN_UNIVERSAL_DOT_BINARY, c_install_dir);
+
+    if ((fin = fopen(filename, "rb")) == NULL)
+    {
+        fclose(fout);
+        remove(rootname);
+        exit_log(1, "Error: Could not open prototype %s\n", filename);
+    }
+
+    c = fgetc(fin);                 // jr instruction
+    fputc(c, fout);
+
+    c = fgetc(fin);
+    fputc(c, fout);
+
+    fread(scratch, 13, 1, fin);     // zeroes
+    strcpy(scratch, dotxname);
+    fwrite(scratch, 13, 1, fout);   // dotx filename
+
+    fread(scratch, 13, 1, fin);     // zeroes
+    strcpy(scratch, dotnname);
+    fwrite(scratch, 13, 1, fout);   // dotn filename
+
+    while ((c = fgetc(fin)) != EOF)
+        fputc(c, fout);
+
+    fclose(fin);
+    fclose(fout);
+
+    // instructions
+
+    printf("\nRename the first part of the original dot commands:\n\n");
+
+    printf("DOT/DOTX Command name changes from %s to %s\n", rootname, dotxname);
+    printf("    DOTN Command name changes from %s to %s\n", rootname, dotnname);
+
+    printf("\nPlace all dot command files into /BIN\n\n");
+
     return 0;
 }
 
@@ -1045,7 +1151,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         if (zxs->stackloc > -0x4000)
             zxs->stackloc = -1;
         else
-            zxs->stackloc = mem128[abs(zxs->stackloc) - 0x4000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) & 0xbfff];
+            zxs->stackloc = mem128[(abs(zxs->stackloc) - 0x4000) % 0xc000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) % 0xc000];
     }
 
     if (zxs->stackloc < 0)
@@ -1054,8 +1160,8 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if (!is_128)
     {
         zxs->stackloc = (zxs->stackloc - 2) & 0xffff;
-        mem128[(zxs->stackloc - 0x4000) & 0xbfff] = zxc->origin & 0xff;
-        mem128[(zxs->stackloc - 0x4000 + 1) & 0xbfff] = zxc->origin / 256;
+        mem128[(zxs->stackloc - 0x4000) % 0xc000] = zxc->origin & 0xff;
+        mem128[(zxs->stackloc - 0x4000 + 1) % 0xc000] = zxc->origin / 256;
     }
 
     sna_state[SNA_REG_SP] = zxs->stackloc & 0xff;

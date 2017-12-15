@@ -34,6 +34,9 @@ defc __Z88DK = 1992
 
 defc __ZXNEXT = 1
 
+; define(`__ENVIRONMENT_FILENAME', "/sys/env")
+; define(`__TEMP_DIRECTORY', "/tmp")
+
 defc __SPECTRUM = 2
 
 defc __SPECTRUM_48 = 1
@@ -532,6 +535,8 @@ defc __ESXDOS_BASE_FSYS = 152
 defc __ESXDOS_SYSCALL = 0x08
 defc __ESXDOS_ROMCALL = 0x18
 defc __ESXDOS_AUXCALL = 0x30
+
+defc __NEXTOS_ROMCALL_DOT_ERROR_HOOK = 0x95
 
 defc __ESXDOS_SYS_DISK_STATUS = 128
 defc __ESXDOS_SYS_DISK_READ = 129
@@ -1043,7 +1048,7 @@ defc __IO_DAC_L1 = 0x1f
 defc __IO_DAC_R0 = 0x4f
 defc __IO_DAC_R1 = 0x5f
 
-defc __IO_DAC_M0 = 0xffdf
+defc __IO_DAC_M0 = 0x2d
 
 defc __IO_DAC_SPECDRUM = 0xffdf
 
@@ -1197,7 +1202,16 @@ defc __nextos_rc_path_delete = 3
 
 defc __NEXTOS_IDE_CAPACITY = 0x01b4
 defc __NEXTOS_IDE_GET_LFN = 0x01b7
+
 defc __NEXTOS_IDE_BROWSER = 0x01ba
+defc __nextos_browsercaps_none = 0
+defc __nextos_browsercaps_copy = 0x01
+defc __nextos_browsercaps_rename = 0x02
+defc __nextos_browsercaps_mkdir = 0x04
+defc __nextos_browsercaps_erase = 0x08
+defc __nextos_browsercaps_remount = 0x10
+defc __nextos_browsercaps_syscfg = 0x80
+defc __nextos_browsercaps_all = 0x1f
 
 defc __NEXTOS_IDE_STREAM_OPEN = 0x0056
 defc __NEXTOS_IDE_STREAM_CLOSE = 0x0059
@@ -1216,6 +1230,7 @@ defc __nextos_rc_bank_free = 3
 defc __NEXTOS_IDE_BASIC = 0x01c0
 defc __NEXTOS_IDE_STREAM_LINEIN = 0x01c3
 defc __NEXTOS_IDE_WINDOW_STRING = 0x01c6
+defc __NEXTOS_IDE_INTEGER_VAR = 0x01c9
 
 defc __NEXTOS_DOS_REF_XDPB = 0x0151
 defc __NEXTOS_DOS_MAP_B = 0x0154
@@ -1258,7 +1273,7 @@ defc __NEXTOS_IDE_PARTITION_OPEN = 0x00cd
 defc __NEXTOS_IDE_PARTITION_CLOSE = 0x00d0
 defc __NEXTOS_IDE_PARTITIONS = 0x01a5
 
-defc __NEXTOS_DOTN_SP = 0x4000
+defc __NEXTOS_DOTN_SP_DIVMMC = 0x4000
 
 defc __NEXTOS_RC_READY = 0
 defc __NEXTOS_RC_WP = 1
@@ -1342,6 +1357,8 @@ defc __RMT_PENTAGON = 0x04
 
 defc __REG_PAGE_RAM = 4
 defc __RPR_MASK = 0x7f
+defc __REG_BANK_RAM = 4
+defc __RBR_MASK = 0x7f
 
 defc __REG_PERIPHERAL_1 = 5
 defc __RP1_JOY1_SINCLAIR = 0x00
@@ -1391,9 +1408,13 @@ defc __RAB_BUTTON_MULTIFACE = 0x01
 
 defc __REG_LAYER_2_RAM_PAGE = 18
 defc __RL2RP_MASK = 0x7f
+defc __REG_LAYER_2_RAM_BANK = 18
+defc __RL2RB_MASK = 0x7f
 
 defc __REG_LAYER_2_SHADOW_RAM_PAGE = 19
 defc __RL2SRP_MASK = 0x7f
+defc __REG_LAYER_2_SHADOW_RAM_BANK = 19
+defc __RL2SRB_MASK = 0x7f
 
 defc __REG_GLOBAL_TRANSPARENCY_COLOR = 20
 
@@ -1647,6 +1668,36 @@ defc __SYSVAR_MEMBOT = 0x5c92
 defc __SYSVAR_NMIADD = 0x5cb0
 defc __SYSVAR_RAMTOP = 0x5cb2
 defc __SYSVAR_PRAMT = 0x5cb4
+
+defc __ERRB_0_OK = 0
+defc __ERRB_1_NEXT_WITHOUT_FOR = 1
+defc __ERRB_2_VARIABLE_NOT_FOUND = 2
+defc __ERRB_3_SUBSCRIPT_WRONG = 3
+defc __ERRB_4_OUT_OF_MEMORY = 4
+defc __ERRB_5_OUT_OF_SCREEN = 5
+defc __ERRB_6_NUMBER_TOO_BIG = 6
+defc __ERRB_7_RETURN_WITHOUT_GOSUB = 7
+defc __ERRB_8_END_OF_FILE = 8
+defc __ERRB_9_STOP_STATEMENT = 9
+defc __ERRB_A_INVALID_ARGUMENT = 10
+defc __ERRB_B_INTEGER_OUT_OF_RANGE = 11
+defc __ERRB_C_NONSENSE_IN_BASIC = 12
+defc __ERRB_D_BREAK_CONT_REPEATS = 13
+defc __ERRB_E_OUT_OF_DATA = 14
+defc __ERRB_F_INVALID_FILENAME = 15
+defc __ERRB_G_NO_ROOM_FOR_LINE = 16
+defc __ERRB_H_STOP_IN_INPUT = 17
+defc __ERRB_I_FOR_WITHOUT_NEXT = 18
+defc __ERRB_J_INVALID_IO_DEVICE = 19
+defc __ERRB_K_INVALID_COLOUR = 20
+defc __ERRB_K_INVALID_COLOR = 20
+defc __ERRB_L_BREAK_INTO_PROGRAM = 21
+defc __ERRB_M_RAMTOP_NO_GOOD = 22
+defc __ERRB_N_STATEMENT_LOST = 23
+defc __ERRB_O_INVALID_STREAM = 24
+defc __ERRB_P_FN_WITHOUT_DEF = 25
+defc __ERRB_Q_PARAMETER_ERROR = 26
+defc __ERRB_R_TAPE_LOADING_ERROR = 27
 
 
 

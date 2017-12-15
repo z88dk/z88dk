@@ -51,6 +51,7 @@ struct zx_bin
 
 extern int zx_tape(struct zx_common *zxc, struct zx_tape *zxt);
 extern int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory);
+extern int zxn_universal_dot(struct zx_common *zxc);
 extern int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memory, int is_zxn);
 
 

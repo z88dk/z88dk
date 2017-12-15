@@ -3,16 +3,47 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.8 2015/07/08 05:57:53 stefano Exp $  */
+/*  $Id: clisp.c */
 
 /*
-z88dk build hints
+
+OPTIONS:
+--------
+
+	-DSHORT          Reduce the 'lisp atom' size to 16 bit to save memory.
+	                 Be aware that the valid numeric range will be only between -2047 and 2048 !
+	                 (untested: the structure tags may interfere with values, use it only as a last resort)
+
+	-DSPECLISP       Lisp dialect syntax used in "Spec Lisp" by Serious Software  ('de' in place of 'defun', etc..)
+
+	-DGRAPHICS       Add turtle graphics functions.
+
+	-DMINIMALISTIC   Remove many hardcoded functions.
+	                 'minimalistic.l' includes alternative native Lisp implementations.
+
+	-DNOINIT         Remove the stucture initialization, it requires a previous dump of a memory image
+	                 created by running the full clisp version.
+					 
+	-DTINYMEM        Shorten the memory structures to a minimal number of objects to save memory 
+
+	-DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
+
+
+z88dk build hints:
+------------------
 
 Spectrum 
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
+zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP clisp.c
 
 zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
-  zcc +zx81 -O3 -create-app -DLARGEMEM=900 clisp.c
+  zcc +zx81 -O3 -create-app -DLARGEMEM=900 -DZX81_32K clisp.c
+zx81 16K, minimalistic version, graphics support
+  zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d clisp.c
+
+MicroBee  
+  zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
+
 */
 
 
@@ -22,29 +53,49 @@ zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
 #include <string.h>
 
 #ifndef MINIMALISTIC
+#ifndef NOTIMER
 #include <time.h>
 #endif
+#endif
 
-#ifdef ZX81
+#ifdef GRAPHICS
+#include <graphics.h>
+#include <lib3d.h>
+#endif
+
+#ifdef ZX81_32K
 #pragma output STACKPTR=49152
 //#pragma output STACKPTR=65535
 unsigned int _sp;
 #endif
 
-/* Data Representation ('int' must be at least 32 bits) */
-/*
-#typedef long    long;
-#typedef int    long;
-*/
+#ifdef SHORT
+
+#define D_MASK_DATA     0x0fff
+#define D_MASK_TAG      0x7000
+#define D_GC_MARK       0x8000
+#define D_TAG_BIT_POS   12
+#define D_INT_SIGN_BIT  0x0800
+
+/* Data Tags */
+#define TAG_NIL     (0 << D_TAG_BIT_POS)
+#define TAG_T       (1 << D_TAG_BIT_POS)
+#define TAG_INT     (2 << D_TAG_BIT_POS)
+#define TAG_SYMB    (3 << D_TAG_BIT_POS)
+#define TAG_CONS    (4 << D_TAG_BIT_POS)
+#define TAG_EOF     (5 << D_TAG_BIT_POS)
+#define TAG_UNDEF   (6 << D_TAG_BIT_POS)
+
+#define long int
+
+#else
+	
+/* Data Representation ('int' must be at least 32 bits) */	
 #define D_MASK_DATA     0x0fffffffUL
 #define D_MASK_TAG      0x70000000UL
 #define D_GC_MARK       0x80000000UL
 #define D_TAG_BIT_POS   28UL
 #define D_INT_SIGN_BIT  0x08000000UL
-/*
-#define D_GET_TAG(s)    (s & ~(D_GC_MARK | D_MASK_DATA))
-#define D_GET_DATA(s)   (s & D_MASK_DATA)
-*/
 
 /* Data Tags */
 #define TAG_NIL     (0UL << D_TAG_BIT_POS)
@@ -54,15 +105,8 @@ unsigned int _sp;
 #define TAG_CONS    (4UL << D_TAG_BIT_POS)
 #define TAG_EOF     (5UL << D_TAG_BIT_POS)
 #define TAG_UNDEF   (6UL << D_TAG_BIT_POS)
-/*
-#define TAG_NIL     0x00000000UL
-#define TAG_T       0x10000000UL
-#define TAG_INT     0x20000000UL
-#define TAG_SYMB    0x30000000UL
-#define TAG_CONS    0x40000000UL
-#define TAG_EOF     0x50000000UL
-#define TAG_UNDEF   0x60000000UL
-*/
+
+#endif
 
 /* Cells */
 #ifdef TINYMEM
@@ -74,7 +118,7 @@ unsigned int _sp;
 #define NCONS   1024
 #endif
 #endif
-#ifndef ZX81
+#ifndef ZX81_32K
 int t_cons_free;           /* free list */
 long t_cons_car[NCONS];     /* "car" part of cell */
 long t_cons_cdr[NCONS];     /* "cdr" part of cell */
@@ -95,7 +139,7 @@ long t_cons_cdr[] @36380;  /* 3600 bytes */
 #endif
 #endif
 
-#ifndef ZX81
+#ifndef ZX81_32K
 int t_symb_free;           /* free slot */
 char *t_symb_pname[NSYMBS];  /* pointer to printable name */
 /* #define t_symb_val        ((long *)0x7e00) */        /*long t_symb_val[NSYMBS];*/    /* symbol value */
@@ -122,7 +166,7 @@ int t_symb_ftype[] @41780;    /* 360 bytes */
 #endif
 #endif
 
-#ifndef ZX81
+#ifndef ZX81_32K
 int t_pnames_free;         /* free pointer */
 char  t_pnames[PNAME_SIZE];  /* names */ 
 #else
@@ -146,7 +190,7 @@ char  t_pnames[] @42140; /* 900 bytes */
 #endif
 #endif
 
-#ifndef ZX81
+#ifndef ZX81_32K
 long t_stack[STACK_SIZE];   /* the stack */
 unsigned int t_stack_ptr;           /* stack pointer */
 #else
@@ -182,6 +226,10 @@ enum keywords {
     KW_ZEROP,   KW_ATOM,    KW_RAND,    KW_REM,
     KW_INCR,    KW_DECR,    KW_EQUAL,   KW_EQMATH
 #endif
+#ifdef GRAPHICS
+   ,KW_CLS,      KW_PENU,     KW_PEND,
+    KW_LEFT,   KW_RIGHT,     KW_FWD
+#endif
 };
 struct s_keywords {
   char  *key;
@@ -202,7 +250,11 @@ struct s_keywords funcs[] = {
 #ifdef SCHEME
   { "define",   FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
 #else
+#ifdef SPECLISP
+  { "de",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
+#else
   { "defun",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
+#endif
 #endif
   { "quote",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_QUOTE    },
 #ifdef SCHEME
@@ -242,13 +294,25 @@ struct s_keywords funcs[] = {
   { "not",      FTYPE(FTYPE_SYS,     1),               KW_NOT      },
   { "if",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_IF       },
   { "list",     FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LIST     },
+#ifdef SPECLISP
+  { "plus",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_ADD      },
+  { "diff",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_SUB      },
+  { "times",       FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_TIMES    },
+  { "div",         FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_QUOTIENT },
+  { "greaterp",    FTYPE(FTYPE_SYS,     2),               KW_GT       },
+#else
   { "+",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_ADD      },
   { "-",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_SUB      },
   { "*",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_TIMES    },
   { "/",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_QUOTIENT },
   { ">",        FTYPE(FTYPE_SYS,     2),               KW_GT       },
+#endif
 #ifndef MINIMALISTIC
+#ifdef SPECLISP
+  { "lessp",    FTYPE(FTYPE_SYS,     2),               KW_LT       },
+#else
   { "<",        FTYPE(FTYPE_SYS,     2),               KW_LT       },
+#endif
   { "and",      FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_AND      },
   { "divide",   FTYPE(FTYPE_SYS,     2),               KW_DIVIDE   },
   { "lambda",   FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LAMBDA   },
@@ -266,15 +330,30 @@ struct s_keywords funcs[] = {
 #endif
   { "random",   FTYPE(FTYPE_SYS,     1),               KW_RAND     },
   { "rem",      FTYPE(FTYPE_SYS,     2),               KW_REM      },
+#ifdef SPECLISP
+  { "add1",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
+  { "sub1",       FTYPE(FTYPE_SYS,     1),               KW_DECR     },
+#else
   { "1+",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
   { "1-",       FTYPE(FTYPE_SYS,     1),               KW_DECR     },
+#endif
 #ifdef SCHEME
   { "equal?",   FTYPE(FTYPE_SYS,     2),               KW_EQUAL    },
 #else
   { "equal",    FTYPE(FTYPE_SYS,     2),               KW_EQUAL    },
 #endif
   { "=",        FTYPE(FTYPE_SYS,     2),               KW_EQMATH   },
+#endif	// (non MINIMALISTIC)
+
+#ifdef GRAPHICS
+  { "cls",      FTYPE(FTYPE_SYS,     0),               KW_CLS      },
+  { "penu",     FTYPE(FTYPE_SYS,     0),               KW_PENU     },
+  { "pend",     FTYPE(FTYPE_SYS,     0),               KW_PEND     },
+  { "left",     FTYPE(FTYPE_SYS,     1),               KW_LEFT     },
+  { "right",    FTYPE(FTYPE_SYS,     1),               KW_RIGHT    },
+  { "fwd",      FTYPE(FTYPE_SYS,     1),               KW_FWD      },
 #endif
+
   { NULL,       -1,                                    -1          }
 };
 #endif
@@ -326,8 +405,8 @@ long D_GET_DATA(long s) {
 
 #ifdef Z80
 
-#ifdef ZX81
-char buf[] @43440   /* 43400+(STACK_SIZE*4); */
+#ifdef ZX81_32K
+char buf[] @43440;   /* 43400+(STACK_SIZE*4); */
 #else
 char buf[180];
 #endif
@@ -336,14 +415,14 @@ int cpt;
 char ug=13;
 
 char gchar() {
-#ifdef ZX81
+#ifdef ZX81_32K
 	zx_slow();
 #endif
     if (ug==13) {
       while (!gets(buf)) {};
       cpt=0;
     }
-#ifdef ZX81
+#ifdef ZX81_32K
 	zx_fast();
 #endif
     if ((ug=buf[cpt++]) == 0)  ug=13;
@@ -372,7 +451,11 @@ main(void)
 #ifdef SCHEME
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk SCHEME variant\n",12);
 #else
+#ifdef SPECLISP
+  printf("%cCAMPUS LIsP\nLemon version,\nz88dk SpecLisp variant\n",12);
+#else
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk variant\n",12);
+#endif
 #endif
   toplevel();
   quit();
@@ -388,8 +471,10 @@ init(void)
   int  i;
 
 #ifndef MINIMALISTIC
+#ifndef NOTIMER
   /* Randomize */
   srand(time(NULL));
+#endif
 #endif
 
   /* stack */
@@ -498,7 +583,11 @@ l_read(void)
 /*        if (isdigit((char)token[0]) */
             || ((token[0] == '-') && isdigit((char)token[1]))
             || ((token[0] == '+') && isdigit((char)token[1]))){   /* integer */
+#ifdef SHORT
+          s = int_make_l(atoi(token));
+#else
           s = int_make_l(atol(token));
+#endif
 #ifdef SCHEME
         } else if (strcmp(token, "#f") == 0){                   /* nil */ 
           s = TAG_NIL;
@@ -576,18 +665,17 @@ l_equal(long s1, long s2)
 {
   int  d1 = s1 & D_MASK_DATA;
   int  d2 = s2 & D_MASK_DATA;
-  int  i;
 
   if (D_GET_TAG(s1) != D_GET_TAG(s2))
     return TAG_NIL;
-  switch (D_GET_TAG(s1)){
-  case TAG_CONS:
+
+  if (D_GET_TAG(s1) == TAG_CONS)
     if (l_equal(l_car(s1), l_car(s1)) == TAG_NIL)
       return TAG_NIL;
-    return l_equal(l_car(s2), l_car(s2));
-  default:
-    return (s1 == s2) ? TAG_T : TAG_NIL;
-  }
+    else
+      return l_equal(l_car(s2), l_car(s2));
+
+  return (s1 == s2) ? TAG_T : TAG_NIL;
 }
 #endif
 
@@ -620,7 +708,11 @@ l_print(long s)
 #endif
   case TAG_INT:
     v = int_get_c(s);
+#ifdef SHORT
+    printf("%d", v);
+#else
     printf("%ld", v);
+#endif
     break;
 
   case TAG_SYMB:
@@ -1138,6 +1230,31 @@ fcall(long f, long av[2])  /*, int n*/
 
 #endif
 
+#ifdef GRAPHICS
+  case KW_CLS:
+	plot(0,getmaxy());
+	printf("\014");
+    clg();
+	pen_up();
+	set_direction (T_NORTH);
+    break;
+  case KW_PENU:
+	pen_up();
+    break;
+  case KW_PEND:
+	pen_down();
+    break;
+  case KW_RIGHT:
+	turn_right(int_get_c(av[0]));
+    break;
+  case KW_LEFT:
+	turn_left(int_get_c(av[0]));
+    break;
+  case KW_FWD:
+	fwd(int_get_c(av[0]));
+    break;
+#endif
+
   }
 
   return v;
@@ -1151,7 +1268,7 @@ apply(long func, long aparams, int n)
   long   fdef, fbody, f, sym, a, v;
   int  i;
 
-#ifdef ZX81
+#ifdef ZX81_32K
 /*
 ..almost  useless, let's save space
 #asm
@@ -1308,6 +1425,7 @@ gcollect(void)
     gc_mark(t_stack[i]);
 
   /* sweep */
+  p=0;
   t_cons_free = -1;
   for (i = 0, n = 0; i != NCONS; i++){
     if ((t_cons_car[i] & D_GC_MARK) == 0){  /* collect */
@@ -1315,9 +1433,9 @@ gcollect(void)
       if (t_cons_free == -1){
         t_cons_free = i;
       } else {
-        t_cons_car[p] = i; 
+        t_cons_car[p] = i;
       }
-      t_cons_car[i] = i; 
+      t_cons_car[i] = i;
       p = i;
     }
     t_cons_car[i] &= ~D_GC_MARK;   /* clear mark */
@@ -1345,7 +1463,7 @@ gc_mark(long s)
 char
 gc_protect(long s)
 {
-#ifdef ZX81
+#ifdef ZX81_32K
 #asm
     ld hl,0
     add hl,sp

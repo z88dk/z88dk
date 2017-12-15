@@ -7,14 +7,6 @@
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFNDEF CRT_ORG_DTX
-      defc CRT_ORG_DTX  = 0x8000
-   ENDIF
-
-   IFNDEF CRT_ORG_DTN
-      defc CRT_ORG_DTN  = 0x8000
-   ENDIF
-
 Z88DK_FOR(`LOOP', `0', `111',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
@@ -45,11 +37,27 @@ Z88DK_FOR(`LOOP', `0', `15',
 ')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; ESXDOS dotx commands
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IFNDEF CRT_ORG_DTX
+      defc CRT_ORG_DTX  = 0x8000
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; NextOS dotn commands
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   IFNDEF CRT_ORG_DTN
+      defc CRT_ORG_DTN  = 0x8000
+   ENDIF
+
    IFNDEF DOTN_REGISTER_SP
-      defc DOTN_REGISTER_SP = __NEXTOS_DOTN_SP
+      defc DOTN_REGISTER_SP = __NEXTOS_DOTN_SP_DIVMMC
+   ENDIF
+   
+   IFNDEF DOTN_EXTRA_PAGES
+      defc DOTN_EXTRA_PAGES = 0
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

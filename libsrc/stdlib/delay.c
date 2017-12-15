@@ -19,11 +19,11 @@
 #endif
 
 
-void   delay (long msecs)
+void   delay (clock_t msecs)
 {
 
 #ifdef __C128__
-long x;
+clock_t x;
 
   setintctrlcia(cia2,ciaClearIcr); /* disable all cia 2 interrupts */
   settimerbcia(cia2,timervalcia(1000),ciaCountA);  /* timer b counts timer a underflows */
@@ -33,15 +33,16 @@ long x;
 
 #else
 
-	long start = clock();  
-	long per   = msecs * CLOCKS_PER_SEC / 1000;
+	clock_t start = clock();  
+	clock_t per   = msecs * CLOCKS_PER_SEC / 1000;
 
-        while ( ((clock() - start) < per) && (clock()>per) ) {
+    while ((clock() - start) < per) {        
 #ifdef __ZX80__
 	    gen_tv_field();
             FRAMES++;
 #else
-	    ;
+		// timer overrun protection
+		if (clock() < CLOCKS_PER_SEC) return (0);
 #endif
 	}
 
