@@ -60,3 +60,4 @@ error:
     pop bc
     pop af
     jp ide_test_error       ;carry = 0 on return = operation failed
+
