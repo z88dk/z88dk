@@ -128,6 +128,15 @@ asci1TxIn:      defw    asciTxBuffer+1  ; non-zero item since it's initialized a
 asci1TxOut:     defw    asciTxBuffer+1  ; non-zero item since it's initialized anyway
 _asci1TxLock:   defb    $FE             ; mutex for Tx1
 
+PUBLIC ideStatus, _ideLock
+
+; IDE Status byte
+; set bit 0 : User selects master (0) or slave (1) drive
+; bit 1 : Flag 0 = master not previously accessed 
+; bit 2 : Flag 0 = slave not previously accessed
+ideStatus:      defb    0
+_ideLock:       defb    $FE             ; mutex for IDE drive
+
 PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
 initString:     defm    CHAR_CR,CHAR_LF,"HexLoadr: ",CHAR_CR,CHAR_LF,0
