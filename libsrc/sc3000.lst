@@ -10,6 +10,7 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls_nobios
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
+time/sc3000/clock
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
