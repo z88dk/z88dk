@@ -31,13 +31,13 @@ extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
 
 // Video modes for set_mode
 
-#ifdef __SVI__
+#ifdef __M5__
 #define vmode_defined 1
 enum video_mode {
-	mode_0 = 0x47,	// INITXT
-	mode_1 = 0,		// patched code for INIT32
-	mode_2 = 0x4A,	// INIGRP
-	mode_3 = 0x4D	// INIMLT
+	mode_0 = 0x0D04,	// INITXT (TMODE)
+	mode_1 = 0x0DD8,	// INIT32 (CMODE)
+	mode_2 = 0x0B1F,	// INIGRP (GMODE)
+	mode_3 = 0x0C44 	// INIMLT (MMODE)
 };
 #endif
 
@@ -48,6 +48,26 @@ enum video_mode {
 	mode_1 = 0x6F,	// INIT32
 	mode_2 = 0x72,	// INIGRP
 	mode_3 = 0x75	// INIMLT
+};
+#endif
+
+#ifdef __SC3000__
+#define vmode_defined 1
+enum video_mode {
+	mode_0 = 0x39E5,    // INITXT
+	mode_1 = 0,         // patched code for INIT32
+	mode_2 = 0x39E2,   // INIGRP
+	mode_3 = 0x39E2    // INIMLT?
+};
+#endif
+
+#ifdef __SVI__
+#define vmode_defined 1
+enum video_mode {
+	mode_0 = 0x47,	// INITXT
+	mode_1 = 0,		// patched code for INIT32
+	mode_2 = 0x4A,	// INIGRP
+	mode_3 = 0x4D	// INIMLT
 };
 #endif
 
