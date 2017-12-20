@@ -68,7 +68,11 @@ define(`__IO_DAC_R1', 0x5f)
 
 # PORT 0x2D: Mono DAC
 
-define(`__IO_DAC_M0', 0x2d)          # writes L0 and R0
+define(`__IO_DAC_M0', 0xffdf)        # writes L0 and R0
+
+# NEXTREG 45: Mono DAC
+#
+# define(`__REG_AUDIO_MONO_DAC', 45) # writes to L0 and R0 (for copper)
 
 # The following port names for specific peripherals are present
 # only to allow software for other targets to compile for the
