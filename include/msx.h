@@ -57,7 +57,7 @@ enum video_mode {
 	mode_0 = 0x39E5,    // INITXT
 	mode_1 = 0,         // patched code for INIT32
 	mode_2 = 0x39E2,   // INIGRP
-	mode_3 = 0x39E2    // INIMLT?
+	mode_3 = 0x39E2    // INIMLT
 };
 #endif
 
@@ -192,8 +192,7 @@ extern int __LIB__ msx_color(int foreground, int background, int border) __small
 #define INK_MAGENTA        0x0D
 #define INK_GRAY           0x0E
 #undef INK_WHITE
-#define INK_WHITE          0x0F
-
+#define INK_WHITE 0x0F
 
 /************************************************************************/
 /**********  Moved here from its original location in 'defs.h' **********/
