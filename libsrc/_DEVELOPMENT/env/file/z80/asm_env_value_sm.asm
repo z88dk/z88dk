@@ -15,6 +15,7 @@ asm_env_value_sm:
    ; exit  : when done
    ;
    ;            de = length of value string
+   ;            hl = offset of next line
    ;            carry set
    ;
    ;         keep calling asm_env_value_sm_count
@@ -29,12 +30,12 @@ asm_env_value_sm:
    
 asm_env_value_sm_count:
 
+   inc hl
+   
    cp '\n'
    scf
    ret z
-   
-   inc hl
-   
+
    call asm_isspace
    ret nc
    

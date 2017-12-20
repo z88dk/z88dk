@@ -10,7 +10,7 @@ asm_env_name_sm:
 ;
 ; enter :  a = char to examine
 ;         de = char *name (qualified - no whitespace, no equals, not empty)
-;         (ix is used to hold current state, do not modify between calls)
+;         (iy is used to hold current state, do not modify between calls)
 ;
 ; exit  : if success
 ;
@@ -21,11 +21,11 @@ asm_env_name_sm:
 ;
 ;            carry reset
 ;
-; uses  : af, de, hl, ix
+; uses  : af, de, hl, iy
 
 asm_env_name_sm_leading_ws_enter:
 
-   ld ix,asm_env_name_sm_leading_ws
+   ld iy,asm_env_name_sm_leading_ws
 
 asm_env_name_sm_leading_ws:
 
@@ -36,7 +36,7 @@ asm_env_name_sm_leading_ws:
 
 asm_env_name_sm_match_enter:
 
-   ld ix,asm_env_name_sm_match
+   ld iy,asm_env_name_sm_match
    
    ld l,e
    ld h,d
@@ -56,7 +56,7 @@ asm_env_name_sm_match:
    
 asm_env_name_sm_equal_enter:
 
-   ld ix,asm_env_name_sm_equal
+   ld iy,asm_env_name_sm_equal
    ret                         ; carry is reset
 
 asm_env_name_sm_equal:
@@ -74,7 +74,7 @@ asm_env_name_sm_equal:
    
 asm_env_name_sm_trailing_ws_enter:
 
-   ld ix,asm_env_name_sm_trailing_ws
+   ld iy,asm_env_name_sm_trailing_ws
    
    or a
    ret
@@ -98,7 +98,7 @@ asm_env_name_sm_accept:
 
 asm_env_sm_name_purge_enter:
 
-   ld ix,asm_env_sm_name_purge
+   ld iy,asm_env_sm_name_purge
 
 asm_env_sm_name_purge:
 

@@ -14,8 +14,12 @@ define(`__ZXNEXT_2MB', 2)
 
 # Static Environment
 
-define(`__ENVIRONMENT_FILENAME', `"/sys/env"')
-define(`__TEMP_DIRECTORY', `"/tmp"')
+define(`__ENV_FILENAME', `"/sys/env"')
+define(`__ENV_GETENV_BUFSZ', 64)
+
+define(`__ENV_TMPDIR', `"/tmp/"')  # trailing dir separator required
+define(`__ENV_LTMPNAM', 12)        # TMPDIR/tmpXXXX
+define(`__ENV_TMPMAX', 0xffff)
 
 # Compatible Spectrum model
 
@@ -63,6 +67,11 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__ZXNEXT'
 
+PUBLIC `__ENV_GETENV_BUFSZ'
+
+PUBLIC `__ENV_LTMPNAM'
+PUBLIC `__ENV_TMPMAX'
+
 PUBLIC `__SPECTRUM'
 
 PUBLIC `__SPECTRUM_48'
@@ -93,8 +102,14 @@ ifdef(`CFG_ASM_DEF',
 `
 defc `__ZXNEXT' = __ZXNEXT
 
-; `define(`__ENVIRONMENT_FILENAME',' __ENVIRONMENT_FILENAME)
-; `define(`__TEMP_DIRECTORY',' __TEMP_DIRECTORY)
+; `define(`__ENV_FILENAME',' __ENV_FILENAME)
+
+defc `__ENV_GETENV_BUFSZ' = __ENV_GETENV_BUFSZ
+
+; `define(`__ENV_TMPDIR',' __ENV_TMPDIR)
+
+defc `__ENV_LTMPNAM' = __ENV_LTMPNAM
+defc `__ENV_TMPMAX' = __ENV_TMPMAX
 
 defc `__SPECTRUM' = __SPECTRUM
 
@@ -126,6 +141,11 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__ZXNEXT'
 `#define' `__ZXNEXT'    __ZXNEXT
+
+`#define' `__ENV_GETENV_BUFSZ'  __ENV_GETENV_BUFSZ
+
+`#define' `__ENV_LTMPNAM'  __ENV_LTMPNAM
+`#define' `__ENV_TMPMAX'  __ENV_TMPMAX
 
 `#undef'  `__SPECTRUM'
 `#define' `__SPECTRUM'  __SPECTRUM

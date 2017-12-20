@@ -13,7 +13,9 @@ IF __CLIB_OPT_ERROR
    PUBLIC error_ebadf_zc
    
    EXTERN error_ebadf_mc
-   
+
+      pop hl
+      pop hl
       pop hl
    
    error_ebadf_zc:

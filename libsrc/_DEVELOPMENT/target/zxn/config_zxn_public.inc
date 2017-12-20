@@ -33,6 +33,11 @@ defc __Z88DK = 1992
 
 PUBLIC __ZXNEXT
 
+PUBLIC __ENV_GETENV_BUFSZ
+
+PUBLIC __ENV_LTMPNAM
+PUBLIC __ENV_TMPMAX
+
 PUBLIC __SPECTRUM
 
 PUBLIC __SPECTRUM_48
@@ -59,8 +64,14 @@ PUBLIC __USE_ZXN_OPCODES_OTHER
 
 defc __ZXNEXT = 1
 
-; define(`__ENVIRONMENT_FILENAME', "/sys/env")
-; define(`__TEMP_DIRECTORY', "/tmp")
+; define(`__ENV_FILENAME', "/sys/env")
+
+defc __ENV_GETENV_BUFSZ = 64
+
+; define(`__ENV_TMPDIR', "/tmp/")
+
+defc __ENV_LTMPNAM = 12
+defc __ENV_TMPMAX = 0xffff
 
 defc __SPECTRUM = 2
 
@@ -1926,7 +1937,7 @@ defc __IO_DAC_L1 = 0x1f
 defc __IO_DAC_R0 = 0x4f
 defc __IO_DAC_R1 = 0x5f
 
-defc __IO_DAC_M0 = 0x2d
+defc __IO_DAC_M0 = 0xffdf
 
 defc __IO_DAC_SPECDRUM = 0xffdf
 
@@ -2534,6 +2545,8 @@ PUBLIC __REG_KEYMAP_DATA_MSB
 
 PUBLIC __REG_KEYMAP_DATA_LSB
 
+PUBLIC __REG_AUDIO_MONO_DAC
+
 PUBLIC __REG_LORES_OFFSET_X
 
 PUBLIC __REG_LORES_OFFSET_Y
@@ -2717,6 +2730,8 @@ defc __REG_KEYMAP_ADDRESS_LSB = 41
 defc __REG_KEYMAP_DATA_MSB = 42
 
 defc __REG_KEYMAP_DATA_LSB = 43
+
+defc __REG_AUDIO_MONO_DAC = 45
 
 defc __REG_LORES_OFFSET_X = 50
 

@@ -2,26 +2,28 @@ SECTION code_env
 
 PUBLIC asm_env_find_name_value
 
-EXTERN error_znc, error_mnc, l_inc_sp, l_jpix, l_jpiy
+EXTERN error_znc, error_mnc, l_inc_sp, l_jpix_12, l_jpiy
 EXTERN asm_env_name_sm, asm_env_value_sm, asm_env_value_sm_count
 EXTERN asm_im2_push_registers, asm_im2_pop_registers
 
 asm_env_find_name_value:
 
-   ; Using the provided buffer space, load a window of the environment
-   ; file and locate the name-value pair in the file
+   ; Using the provided buffer space as a window into the env file,
+   ; locate the name-value pair in the file
    ;
-   ; enter : ix = char *name (valid)
-   ;         de = &buffer
-   ;         bc = bufsize
-   ;         hl = env file size (max 65535)
-   ;         iy = function that loads bc bytes to address hl, carry set if error
+   ; enter : de = buf
+   ;         bc = bufsz
+   ;         hl = env file size (max 65534)
+   ;         de'= char *name (validated)
+   ;
+   ;         ix+12 = jp read : hl=address, bc>0=length, carry set if fail
    ;
    ; exit  : if name-value found
    ;
    ;           hl = file offset to start of line
    ;           bc = file offset to start of value string
    ;           de = length of value string
+   ;           iy = file offset to next line
    ;
    ;           carry set
    ;
@@ -37,12 +39,8 @@ asm_env_find_name_value:
    ;
    ; uses  : all
 
-   push ix
-   
    exx
-   
-   pop de                      ; de' = char *name
-   
+
    ld bc,0
    push bc                     ; stack = offset of current line
    
@@ -50,7 +48,7 @@ asm_env_find_name_value:
    
    exx
 
-   ld ix,asm_env_name_sm       ; start of name state machine
+   ld iy,asm_env_name_sm       ; start of name state machine
    
 locate_name:
 
@@ -59,18 +57,14 @@ locate_name:
    ; hl = remaining bytes in file
    ; bc = bufsize
    ; de = &buffer
-   
    ; stack = offset of current line
 
    ld a,h
    or l
    jp z, error_znc - 1         ; if end of file
    
-   xor a
    sbc hl,bc
-
    jr nc, load_it
-
    add hl,bc
 
    ld c,l
@@ -92,7 +86,7 @@ load_it:
    call asm_im2_push_registers  ; save all registers
    
    ex de,hl                    ; hl = &buffer
-   call l_jpiy                 ; fill buffer from disk
+   call l_jpix_12              ; read bc>0 bytes from disk
    
    jr c, disk_error
    
@@ -109,7 +103,7 @@ locate_name_loop:
    
    exx
    
-   call l_jpix                 ; name match state machine
+   call l_jpiy                 ; name match state machine
    inc bc                      ; increase file offset to current char
    
    exx
@@ -201,11 +195,15 @@ name_value_found:
    
    ; bc' = offset to start of value string
    ; de' = length of value string
+   ; hl' = offset from start of value string to next line
    ; stack = &buffer, buflen, remaining, offset of current line
    
    exx
    
-   pop hl
+   add hl,bc
+   ex (sp),hl
+   
+   pop iy
    
    scf
    jp l_inc_sp - 6
@@ -229,11 +227,8 @@ load_it_2:
    or l
    jr z, name_value_found_2
 
-   xor a
    sbc hl,bc
-
    jr nc, load_it_3
-
    add hl,bc
 
    ld c,l
@@ -255,7 +250,7 @@ load_it_3:
    call asm_im2_push_registers  ; save all registers
    
    ex de,hl                    ; hl = &buffer
-   call l_jpiy                 ; fill buffer from disk
+   call l_jpix_12              ; read bc>0 bytes from disk
    
    jr c, disk_error
    
@@ -270,11 +265,15 @@ name_value_found_2:
    
    ; bc' = offset to start of value string
    ; de' = length of value string
+   ; hl' = offset from start of value string to next line
    ; stack = offset of current line
    
    exx
    
-   pop hl
+   add hl,bc
+   ex (sp),hl
+   
+   pop iy
    
    scf
    ret

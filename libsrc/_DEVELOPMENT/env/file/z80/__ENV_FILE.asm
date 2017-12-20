@@ -35,7 +35,13 @@ defc __Z88DK = 1992
 defc __ZXNEXT = 1
 
 ; 
+
+defc __ENV_GETENV_BUFSZ = 64
+
 ; 
+
+defc __ENV_LTMPNAM = 12
+defc __ENV_TMPMAX = 0xffff
 
 defc __SPECTRUM = 2
 
@@ -1048,7 +1054,7 @@ defc __IO_DAC_L1 = 0x1f
 defc __IO_DAC_R0 = 0x4f
 defc __IO_DAC_R1 = 0x5f
 
-defc __IO_DAC_M0 = 0x2d
+defc __IO_DAC_M0 = 0xffdf
 
 defc __IO_DAC_SPECDRUM = 0xffdf
 
@@ -1464,6 +1470,8 @@ defc __REG_KEYMAP_DATA_MSB = 42
 
 defc __REG_KEYMAP_DATA_LSB = 43
 
+defc __REG_AUDIO_MONO_DAC = 45
+
 defc __REG_LORES_OFFSET_X = 50
 
 defc __REG_LORES_OFFSET_Y = 51
@@ -1772,13 +1780,10 @@ ENDIF
 
 
 
-; Default TMP Directory Name
-; the environment may override in TMP variable
-
 SECTION rodata_env
 
-PUBLIC __TMP_DIRECTORY
+PUBLIC __ENV_FILE
 
-__TMP_DIRECTORY:
+__ENV_FILE:
 
-   defm "/tmp", 0
+   defm "/sys/env", 0

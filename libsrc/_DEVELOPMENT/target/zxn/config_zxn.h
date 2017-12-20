@@ -39,6 +39,11 @@
 #undef  __ZXNEXT
 #define __ZXNEXT    1
 
+#define __ENV_GETENV_BUFSZ  64
+
+#define __ENV_LTMPNAM  12
+#define __ENV_TMPMAX  0xffff
+
 #undef  __SPECTRUM
 #define __SPECTRUM  2
 
@@ -1043,7 +1048,7 @@
 #define __IO_DAC_R0  0x4f
 #define __IO_DAC_R1  0x5f
 
-#define __IO_DAC_M0  0x2d
+#define __IO_DAC_M0  0xffdf
 
 #define __IO_DAC_SPECDRUM  0xffdf
 
@@ -1458,6 +1463,8 @@
 #define __REG_KEYMAP_DATA_MSB  42
 
 #define __REG_KEYMAP_DATA_LSB  43
+
+#define __REG_AUDIO_MONO_DAC  45
 
 #define __REG_LORES_OFFSET_X  50
 
