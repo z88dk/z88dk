@@ -31,16 +31,6 @@ extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
 
 // Video modes for set_mode
 
-#ifdef __M5__
-#define vmode_defined 1
-enum video_mode {
-	mode_0 = 0x0D04,	// INITXT (TMODE)
-	mode_1 = 0x0DD8,	// INIT32 (CMODE)
-	mode_2 = 0x0B1F,	// INIGRP (GMODE)
-	mode_3 = 0x0C44 	// INIMLT (MMODE)
-};
-#endif
-
 #ifdef __MSX__
 #define vmode_defined 1
 enum video_mode {
@@ -192,7 +182,7 @@ extern int __LIB__ msx_color(int foreground, int background, int border) __small
 #define INK_MAGENTA        0x0D
 #define INK_GRAY           0x0E
 #undef INK_WHITE
-#define INK_WHITE 0x0F
+#define INK_WHITE          0x0F
 
 /************************************************************************/
 /**********  Moved here from its original location in 'defs.h' **********/
