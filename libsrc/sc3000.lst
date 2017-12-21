@@ -46,7 +46,7 @@ msx/gen_get_trigger
 msx/msx_map_m2_block
 msx/msx_map_m2_pixel
 msx/msx_map_m2_subpixel
-msx/gen_set_mode
+msx/msx_set_mode
 msx/gen_vfill
 msx/msx_vmerge
 msx/msx_vpeek
