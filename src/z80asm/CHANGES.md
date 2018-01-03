@@ -1,6 +1,10 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2018
+----
+- 2018-01-03 Fix #563 consolidated object file erroneously eliminates globally exported defc
+
 2017
 ----
 
@@ -27,7 +31,6 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-08-21 Fix #320 Define macro naming the CPU used in the --cpu option
 - 2017-08-24 Fix #326 Add directory of list file to include path during assembly
 - 2017-08-26 Create a z80asm.lib file with routines that might be called by the assembler
-- 2017-08-28 Fix #312 ZX Next (--cpu=z80-zxn) opcodes in z80asm
 - 2017-09-03 Fix #331 Implement Rabbit opcodes in z80asm
 - 2017-09-03 Change z80asm to use C-11
 - 2017-09-04 Fix #343 Generate different z80asm*.lib libraries for different CPUs
@@ -35,6 +38,9 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-09-11 Fix #359 Remove functions that now are part of z80asm*.lib
 - 2017-09-11 Fix #350 Fix the clean and install-clean targets
 - 2017-09-13 Fix #340 Emulation library for DAA on a Rabbit
+- 2017-09-25 Fix #341 Produce a debugger-friendly map file
+- 2017-09-25 Fix #312 ZX Next (--cpu=z80-zxn) opcodes in z80asm
+
 
 2016
 ----
