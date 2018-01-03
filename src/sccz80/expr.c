@@ -720,12 +720,20 @@ int heirb(LVALUE* lval)
             /* Handle structures... come in here with lval holding tehe previous
              * pointer to the struct thing..*/
             else if ((direct = cmatch('.')) || match("->")) {
-                Type *str = lval->ltype->tag;
+                Type *str = lval->ltype;
                 Type *member_type;
 
-                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR) {
-                    str = lval->ltype->ptr->tag;
+                // If there's a cast active, then use the cast type
+                if ( lval->cast_type ) {
+                    str = lval->cast_type;
                 }
+
+                if ( str->kind == KIND_PTR || str->kind == KIND_CPTR) {
+                    str = str->ptr->tag;
+                } else {
+                    str = str->tag;
+                }
+            
 
                 if (str == NULL ) {
                     errorfmt("Can't take member", 1);
@@ -733,7 +741,7 @@ int heirb(LVALUE* lval)
                     return 0;
                 }
                 if (symname(sname) == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
-                    errorfmt("Unknown member: %s", 1, sname);
+                    errorfmt("Unknown member: '%s' of struct '%s'", 1, sname, str->name);
                     junk();
                     return 0;
                 }
