@@ -11,7 +11,8 @@ typedef struct {
 
 void value(int v);
 
-void func3(Item *item)
+
+long func3(Item *item)
 {
    return (long)item->_character->_x;
 
@@ -24,4 +25,17 @@ void func2(int val)
 void func(Item *itemptr)
 {
 	value( ( (Character *) itemptr )->_y);
+}
+
+
+Item item;
+
+void func4()
+{
+    value( (((Character *) &item))->_y);
+}
+
+long func5()
+{
+   return (long)item._character->_x;
 }
