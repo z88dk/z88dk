@@ -134,8 +134,8 @@ __sfr __at __IO_DAC_R0 IO_DAC_R0;
 __sfr __at 0x5f IO_5F;
 __sfr __at __IO_DAC_R1 IO_DAC_R1;
 
-__sfr __banked __at 0xffdf IO_FFDF;
-__sfr __banked __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
+__sfr __at 0xdf IO_DF;
+__sfr __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
 
 // io ports - ay-3-8912
 

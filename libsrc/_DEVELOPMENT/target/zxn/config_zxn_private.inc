@@ -1054,9 +1054,9 @@ defc __IO_DAC_L1 = 0x1f
 defc __IO_DAC_R0 = 0x4f
 defc __IO_DAC_R1 = 0x5f
 
-defc __IO_DAC_M0 = 0xffdf
+defc __IO_DAC_M0 = 0xdf
 
-defc __IO_DAC_SPECDRUM = 0xffdf
+defc __IO_DAC_SPECDRUM = 0xdf
 
 defc __IO_DAC_PROFI_L = 0x3f
 defc __IO_DAC_PROFI_R = 0x5f
