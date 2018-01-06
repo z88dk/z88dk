@@ -231,7 +231,9 @@ SECTION code_crt_return
       exx
       pop iy
       
-      im 1
+      IFNDEF CRT_KEEP_IM
+         im 1
+      ENDIF
       ei
       ret
 

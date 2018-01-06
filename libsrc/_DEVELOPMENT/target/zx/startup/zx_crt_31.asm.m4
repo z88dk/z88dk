@@ -219,8 +219,10 @@ SECTION code_crt_return
       pop hl
       exx
       pop iy
-      
+
+   IFNDEF CRT_KEEP_IM
       im 1
+   ENDIF
       ei
       ret
 
