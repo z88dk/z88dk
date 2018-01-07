@@ -1,0 +1,108 @@
+
+
+
+	MODULE	Issue_569_jagged_array
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._starField
+	defw	__starField + 0
+	defw	__starField + 64
+	defw	__starField + 128
+	defw	__starField + 192
+	defw	__starField + 256
+	defw	__starField + 320
+	defw	__starField + 384
+	defw	__starField + 448
+	defw	__starField + 512
+	defw	__starField + 576
+	defw	__starField + 640
+	defw	__starField + 704
+	SECTION	code_compiler
+
+._main
+	push	bc
+	ld	hl,(_starField+4)
+	ld	bc,20
+	add	hl,bc
+	ld	(hl),#(10 % 256 % 256)
+	ld	hl,1	;const
+	add	hl,sp
+	ld	(hl),#(0 % 256 % 256)
+	ld	l,(hl)
+	ld	h,0
+	jp	i_5
+.i_3
+	ld	hl,1	;const
+	add	hl,sp
+	inc	(hl)
+.i_5
+	ld	hl,1	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(12 % 256)
+	jp	z,i_4
+	ld	hl,0	;const
+	add	hl,sp
+	ld	(hl),#(0 % 256 % 256)
+	ld	l,(hl)
+	ld	h,0
+	jp	i_8
+.i_6
+	ld	hl,0	;const
+	add	hl,sp
+	inc	(hl)
+.i_8
+	ld	hl,0	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(64 % 256)
+	jp	z,i_7
+	ld	hl,_starField
+	push	hl
+	ld	hl,3	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	pop	de
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,2	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	add	hl,de
+	ld	(hl),#(12 % 256 % 256)
+	ld	l,(hl)
+	ld	h,0
+	jp	i_6
+.i_7
+	jp	i_3
+.i_4
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+.__starField	defs	768
+	SECTION	code_compiler
+
+
+
+	GLOBAL	__starField
+	GLOBAL	_starField
+	GLOBAL	_main
+
+
+
+
