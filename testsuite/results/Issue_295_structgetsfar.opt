@@ -9,19 +9,19 @@
 
 	SECTION	rodata_compiler
 ._rooms
-	defw	_room0_desc
+	defw	_room0_desc + 0
 	defb	1
 	defb	2
 	defb	3
-	defw	_room1_desc
+	defw	_room1_desc + 0
 	defb	1
 	defb	2
 	defb	3
-	defw	_room2_desc
+	defw	_room2_desc + 0
 	defb	1
 	defb	2
 	defb	3
-	defw	_room3_desc
+	defw	_room3_desc + 0
 	defb	0
 	defb	0
 	defb	0
