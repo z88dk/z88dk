@@ -336,16 +336,17 @@ defc __EBDFD = 3
 defc __EDOM = 4
 defc __EFBIG = 5
 defc __EINVAL = 6
-defc __EMFILE = 7
-defc __ENFILE = 8
-defc __ENOLCK = 9
-defc __ENOMEM = 10
-defc __ENOTSUP = 11
-defc __EOVERFLOW = 12
-defc __ERANGE = 13
-defc __ESTAT = 14
-defc __EAGAIN = 15
-defc __EWOULDBLOCK = 15
+defc __EIO = 7
+defc __EMFILE = 8
+defc __ENFILE = 9
+defc __ENOLCK = 10
+defc __ENOMEM = 11
+defc __ENOTSUP = 12
+defc __EOVERFLOW = 13
+defc __ERANGE = 14
+defc __ESTAT = 15
+defc __EAGAIN = 16
+defc __EWOULDBLOCK = 16
 
 defc __ERROR_NEXT = 50
 
