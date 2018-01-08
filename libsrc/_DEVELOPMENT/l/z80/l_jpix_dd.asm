@@ -4,6 +4,7 @@
 SECTION code_clib
 SECTION code_l
 
+PUBLIC l_jpix_18
 PUBLIC l_jpix_15
 PUBLIC l_jpix_12
 PUBLIC l_jpix_09
@@ -11,6 +12,14 @@ PUBLIC l_jpix_06
 PUBLIC l_jpix_03
 
 ; implement jump table pointed at by ix
+
+l_jpix_18:
+
+   push ix
+   push bc
+   
+   ld bc,18
+   jr l_jpix_go
 
 l_jpix_15:
 

@@ -4,6 +4,7 @@
 SECTION code_clib
 SECTION code_l
 
+PUBLIC l_call_ix_18
 PUBLIC l_call_ix_15
 PUBLIC l_call_ix_12
 PUBLIC l_call_ix_09
@@ -13,6 +14,14 @@ PUBLIC l_call_ix_03
 ; implement jump table pointed at by ix
 
 IF __SDCC_IY
+
+l_call_ix_18:
+
+   push iy
+   push bc
+   
+   ld bc,18
+   jr l_call_ix_go
 
 l_call_ix_15:
 
@@ -64,6 +73,14 @@ l_call_ix_go:
    ret
 
 ELSE
+
+l_call_ix_18:
+
+   push ix
+   push bc
+   
+   ld bc,18
+   jr l_call_ix_go
 
 l_call_ix_15:
 
