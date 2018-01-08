@@ -13,7 +13,8 @@ IF __CLIB_OPT_ERROR
    PUBLIC error_ebadf_mc
    
    EXTERN __EBADF, errno_mc
-   
+
+      pop hl
       pop hl
    
    error_ebadf_mc:
