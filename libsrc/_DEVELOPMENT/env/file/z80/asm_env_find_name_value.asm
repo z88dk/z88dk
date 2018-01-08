@@ -2,9 +2,8 @@ SECTION code_env
 
 PUBLIC asm_env_find_name_value
 
-EXTERN error_znc, error_mnc, l_inc_sp, l_jpix_12, l_jpiy
-EXTERN asm_env_name_sm, asm_env_value_sm, asm_env_value_sm_count
-EXTERN asm_im2_push_registers, asm_im2_pop_registers
+EXTERN error_znc, error_mnc, l_jpix_12, l_jpiy
+EXTERN asm_env_name_sm, asm_env_value_sm
 
 asm_env_find_name_value:
 
@@ -37,7 +36,7 @@ asm_env_find_name_value:
    ;           hl = -1
    ;           carry reset
    ;
-   ; uses  : all
+   ; uses  : af, bc, de, hl, bc', de', hl', iy
 
    exx
 
@@ -54,9 +53,9 @@ locate_name:
 
    ; fill buffer from disk
 
+   ; de = buf
+   ; bc = bufsz
    ; hl = remaining bytes in file
-   ; bc = bufsize
-   ; de = &buffer
    ; stack = offset of current line
 
    ld a,h
@@ -74,30 +73,27 @@ locate_name:
 
 load_it:
 
+   ; de = buf
+   ; bc = bufsz
+   ; hl = remaining bytes in file
+   ; stack = offset of current line
+   
+   ex de,hl                    ; hl = buf
+   call l_jpix_12              ; read bc>0 bytes from disk into buf hl
+
+   jp c, error_mnc - 1         ; if disk error
+
    pop af
-   push de                     ; &buffer
-   push bc                     ; buflen
-   push hl                     ; remaining
-   push af                     ; offset of current line
-   
-   ; de = &buffer
-   ; bc = num bytes
-   
-   call asm_im2_push_registers  ; save all registers
-   
-   ex de,hl                    ; hl = &buffer
-   call l_jpix_12              ; read bc>0 bytes from disk
-   
-   jr c, disk_error
-   
-   call asm_im2_pop_registers  ; pop all registers
-   
-   ex de,hl
+   push hl
+   push bc
+   push de
+   push af
 
 locate_name_loop:
 
-   ; hl = &buffer
-   ; bc = len remaining
+   ; hl = buf ptr
+   ; bc = buf remain
+   ; stack = buf, bufsz, remaining bytes, offset of current line
    
    ld a,(hl)
    
@@ -140,76 +136,37 @@ loop:
    
    jr locate_name              ; re-load buffer
 
-disk_error:
-   
-   call asm_im2_pop_registers  ; pop all registers
-   
-   ; stack = &buffer, buflen, remaining, offset of current line
-   
-   pop hl
-   jp error_mnc - 3
-
 locate_value:
 
    ; name found, examine value
    
-   ; hl = &buffer
-   ; bc = len remaining
+   ; hl = buf ptr
+   ; bc = buf remain
+   ; bc'= offset of start of value string
+   ; stack = buf, bufsz, remaining bytes, offset of current line
    
-   ; bc' = offset of start of value string
-   ; stack = &buffer, buflen, remaining, offset of current line
+   ld iy,asm_env_value_sm
+
+locate_value_loop:
+
+   ; hl = buf ptr
+   ; bc = buf remain
+   ; bc'= offset of start of value string
+   ; stack = buf, bufsz, remaining bytes, offset of current line
    
    ld a,(hl)
    
    exx
    
-   call asm_env_value_sm
+   call l_jpiy                 ; value state machine
    
    exx
    
    jr c, name_value_found
    
-locate_value_loop:
-
-   ; hl = &buffer
-   ; bc = len remaining
-   
    cpi                         ; hl++, bc--
-   jp po, load_it_2
-
-locate_value_loop_enter:
-
-   ld a,(hl)
+   jp pe, locate_value_loop
    
-   exx
-   
-   call asm_env_value_sm_count
-   
-   exx
-   
-   jr nc, locate_value_loop
-
-name_value_found:
-
-   ; name-value pair found
-   
-   ; bc' = offset to start of value string
-   ; de' = length of value string
-   ; hl' = offset from start of value string to next line
-   ; stack = &buffer, buflen, remaining, offset of current line
-   
-   exx
-   
-   add hl,bc
-   ex (sp),hl
-   
-   pop iy
-   
-   scf
-   jp l_inc_sp - 6
-
-load_it_2:
-
    ; re-load buffer from disk
    
    pop af
@@ -218,9 +175,9 @@ load_it_2:
    pop de
    push af
    
-   ; hl = remaining
-   ; bc = buflen
-   ; de = &buffer
+   ; de = buf
+   ; bc = bufsz
+   ; hl = remaining bytes in file
    ; stack = offset of current line
    
    ld a,h
@@ -228,7 +185,7 @@ load_it_2:
    jr z, name_value_found_2
 
    sbc hl,bc
-   jr nc, load_it_3
+   jr nc, load_it_2
    add hl,bc
 
    ld c,l
@@ -236,34 +193,46 @@ load_it_2:
    
    ld hl,0                     ; no more bytes left
 
-load_it_3:
+load_it_2:
+
+   ; de = buf
+   ; bc = bufsz
+   ; hl = remaining bytes in file
+   ; stack = offset of current line
+   
+   ex de,hl                    ; hl = buf
+   call l_jpix_12              ; read bc>0 bytes from disk into buf hl
+
+   jp c, error_mnc - 1         ; if disk error
 
    pop af
-   push de                     ; &buffer
-   push bc                     ; buflen
-   push hl                     ; remaining
-   push af                     ; offset of current line
+   push hl
+   push bc
+   push de
+   push af
    
-   ; de = &buffer
-   ; bc = num bytes
+   jr locate_value_loop
+
+name_value_found:
+
+   ; name-value pair found
+
+   ; bc'= offset of start of value string
+   ; de' = length of value string
+   ; hl' = offset from start of value string to next line
+   ; stack = buf, bufsz, remaining bytes, offset of current line
    
-   call asm_im2_push_registers  ; save all registers
-   
-   ex de,hl                    ; hl = &buffer
-   call l_jpix_12              ; read bc>0 bytes from disk
-   
-   jr c, disk_error
-   
-   call asm_im2_pop_registers  ; pop all registers
-   
-   ex de,hl
-   jr locate_value_loop_enter
+   pop af
+   pop hl
+   pop hl
+   pop hl
+   push af
 
 name_value_found_2:
 
    ; name-value pair found
    
-   ; bc' = offset to start of value string
+   ; bc'= offset of start of value string
    ; de' = length of value string
    ; hl' = offset from start of value string to next line
    ; stack = offset of current line

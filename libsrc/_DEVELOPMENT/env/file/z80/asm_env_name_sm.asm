@@ -21,7 +21,7 @@ asm_env_name_sm:
 ;
 ;            carry reset
 ;
-; uses  : af, de, hl, iy
+; uses  : af, hl, iy
 
 asm_env_name_sm_leading_ws_enter:
 

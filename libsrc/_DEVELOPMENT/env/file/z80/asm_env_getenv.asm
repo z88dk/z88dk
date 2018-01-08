@@ -1,10 +1,11 @@
 ; char *getenv(const char *name)
 
+INCLUDE "config_private.inc"
+
 SECTION code_env
 
 PUBLIC asm_env_getenv
 
-EXTERN __ENV_GETENV_BUFSZ, __ENV_GETENV_BUF
 EXTERN asm_env_getenv_ex
 
 asm_env_getenv:
@@ -19,20 +20,15 @@ asm_env_getenv:
    ;
    ;         disk io block
    ;
-   ;         ix+12 = jp read (read bc>0 bytes to address hl, carry if error)
-   ;         ix+ 9 = jp size (return dehl = file size, carry if error)
-   ;         ix+ 6 = jp seek (seek to position bc, carry if error)
-   ;         ix+ 3 = jp close (close file)
-   ;         ix+ 0 = jp open (open file, hl = char *filename, CREAT|READ|WRITE|EXCL, carry if error)
+   ;         ix+12 = jp read
+   ;         ix+ 9 = jp size
+   ;         ix+ 6 = jp seek
+   ;         ix+ 3 = jp close
+   ;         ix+ 0 = jp open
    ;
-   ; exit  : if successful value_buf != 0
+   ; exit  : if successful
    ;
    ;            hl = char *value (value string truncated to size)
-   ;            carry reset
-   ;
-   ;         if successful value_buf == 0
-   ;
-   ;            hl = length of value string not including terminating 0
    ;            carry reset
    ;
    ;         if unsuccessful
@@ -40,7 +36,7 @@ asm_env_getenv:
    ;            hl = 0
    ;            carry set, errno = EBADF if disk error EINVAL if bad name
    ;
-   ; uses  : all except ix
+   ; uses  : af, bc, de, hl, bc', de', hl'
 
    exx
    

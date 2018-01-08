@@ -1,20 +1,22 @@
-; int unsetenv(char *name)
+; int setenv(char *envfile, char *name, char *val, int overwrite)
 
 SECTION code_env
 
-PUBLIC asm_env_unsetenv
+PUBLIC asm_env_setenv
 
-EXTERN asm_env_unsetenv_ex
+EXTERN asm_env_setenv_ex
 
-asm_env_unsetenv:
+asm_env_setenv:
 
-   ; Remove name=value pair from environment file.
+   ; Replace name=value pair in environment file.
    ; Must hold exclusive access to environment file while searching it.
    ; Use supplied buffer to hold file window.
    ;
-   ; enter : hl = char *name
+   ; enter :  a = overwrite (non-zero = yes)
    ;         de = buf
    ;         bc = bufsz > 0
+   ;         hl = char *name
+   ;         bc'= char *val
    ;
    ;         disk io block for env file
    ;
@@ -35,7 +37,7 @@ asm_env_unsetenv:
    ;         iy+ 3 = jp close
    ;         iy+ 0 = jp open
    ;
-   ; exit  : if successful (removed or not present)
+   ; exit  : if successful
    ;
    ;            hl = 0
    ;            carry reset
@@ -58,4 +60,4 @@ asm_env_unsetenv:
    
    exx
    
-   jp asm_env_unsetenv_ex
+   jp asm_env_setenv_ex

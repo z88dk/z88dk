@@ -1,6 +1,7 @@
 ; char *tmpnam(char *s)
 
 INCLUDE "config_private.inc"
+INCLUDE "__ENV_DEFINES.inc"
 
 SECTION code_env
 
@@ -9,7 +10,6 @@ PUBLIC asm_env_tmpnam
 EXTERN __ENV_TMPNAM, __TMP_DIR
 EXTERN error_zc, l_small_utoh, l_jpix_00, l_jpix_03
 EXTERN asm_strcpy, asm_random_uniform_xor_32
-EXTERN asm_im2_push_registers, asm_im2_pop_registers
 
 asm_env_tmpnam:
 
@@ -21,7 +21,7 @@ asm_env_tmpnam:
    ;         disk io block
    ;
    ;         ix+3 = jp close
-   ;         ix+0 = jp open  (carry if fail, NOEXIST|READ|WRITE)
+   ;         ix+0 = jp open
    ;
    ; exit  : if successful
    ;
@@ -55,12 +55,22 @@ randomize:
    ; randomize tmp filenames
    
    exx
-   
+
+IF __ZX || __ZXNEXT
+
    ld hl,(__SYSVAR_FRAMES)
    ld a,r
    ld e,a                      ; dehl'= 32-bit seed
+
+ELSE
+
+   ld a,r                      ; ensure d and h are somewhat random
+   ld d,a                      ; use e and l as set by caller
+   ld h,a                      ; dehl'= 32-bit seed
+
+ENDIF
    
-   ld bc,0xffff                ; max number of attempts
+   ld bc,__ENV_TMPMAX          ; max number of attempts
    
    exx
    
@@ -116,13 +126,11 @@ tmpnam_loop:
    ld (de),a
    
    ; attempt to create file
-    
-   call asm_im2_push_registers
-   
-   call l_jpix_00              ; create file, NO_EXIST, WRITE
+
+	ld a,ENV_OPEN_NOEXIST | ENV_OPEN_R | ENV_OPEN_W
+   call l_jpix_00
+
    jr nc, successful
-   
-   call asm_im2_pop_registers
    
    pop de
    jr tmpnam_loop
@@ -132,8 +140,7 @@ successful:
    ; close file and return filename
    
    call l_jpix_03              ; close file
-
-   call asm_im2_pop_registers 
+   
    pop hl                      ; hl = char *filename
 
    or a

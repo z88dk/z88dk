@@ -1,27 +1,30 @@
-; int unsetenv(char *envfile, char *name)
+; int setenv(char *envfile, char *name, char *val, int overwrite)
 
 INCLUDE "config_private.inc"
 INCLUDE "__ENV_DEFINES.inc"
 
 SECTION code_env
 
-PUBLIC asm_env_unsetenv_ex
+PUBLIC asm_env_setenv_ex
 
 EXTERN error_einval_mc, error_ebadf_mc, error_eio_mc, error_znc
+EXTERN l_jpix_00, l_jpix_03, l_jpix_06, l_jpix_09, l_jpix_15, l_jpix_18
+EXTERN asm_strlen, l_swap_ixiy
 EXTERN asm_env_qualify_name, asm_env_find_name_value, asm_env_tmpnam, asm_env_copy_file
-EXTERN l_jpix_00, l_jpix_03, l_jpix_06, l_jpix_09, l_jpix_18, l_swap_ixiy
 
-asm_env_unsetenv_ex:
+asm_env_setenv_ex:
 
-   ; Remove name=value pair from environment file.
+   ; Replace name=value pair in environment file.
    ; Must hold exclusive access to environment file while searching it.
    ; Use supplied buffer to hold file window.
    ;
-   ; enter : hl = char *name
+   ; enter :  a = overwrite (non-zero = yes)
    ;         de = buf
    ;         bc = bufsz > 0
+   ;         hl = char *name
    ;
    ;         hl'= char *env_filename (0 to use system environment)
+   ;         bc'= char *val
    ;
    ;         disk io block for env file
    ;
@@ -42,7 +45,7 @@ asm_env_unsetenv_ex:
    ;         iy+ 3 = jp close
    ;         iy+ 0 = jp open
    ;
-   ; exit  : if successful (removed or not present)
+   ; exit  : if successful
    ;
    ;            hl = 0
    ;            carry reset
@@ -59,6 +62,17 @@ asm_env_unsetenv_ex:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
+   ; store overwrite flag
+   
+   or a
+   jr z, set_flags
+   ld a,$80
+
+set_flags:
+
+   ld (ix-4),a                 ; bit 7 set indicates overwrite, other bits no files need closing
+   ld (iy-4),1                 ; identify iy disk io block
+   
    ; qualify name string
    
    push hl
@@ -71,9 +85,6 @@ asm_env_unsetenv_ex:
    jp nc, error_einval_mc      ; if name disqualified
 
    ; close files on exit
-   
-   ld (ix-4),0                 ; no files need closing
-   ld (iy-4),1                 ; identify iy disk io block
    
    call unsetenv
 
@@ -105,6 +116,16 @@ asm_env_unsetenv_ex:
 
 unsetenv:
 
+   ; de'= buf
+   ; bc'= bufsz
+   ;
+   ; hl = char *env_filename (0 to use system environment)
+   ; de = char *name
+   ; bc = char *val
+   ;
+   ; ix = disk io block env file
+   ; iy = disk io block tmp file
+
    ; open env file
    
    ld a,h
@@ -118,7 +139,7 @@ open_env_file:
    ld (ix-1),h
    ld (ix-2),l                 ; store env filename in disk io block
    
-   ld a,ENV_OPEN_EXIST | ENV_OPEN_R
+   ld a,ENV_OPEN_EXIST | ENV_OPEN_R | ENV_OPEN_W
    call l_jpix_00              ; jp open
    
    jp c, error_ebadf_mc        ; if open failed
@@ -138,11 +159,14 @@ env_find_name:
 
    ; hl = env filesize
    ; de = char *name
+   ; bc = char *val
    ; de'= buf
    ; bc'= bufsz
    ; ix = disk io env file
    ; iy = disk io tmp file
    
+   push bc
+   push de
    push hl
    exx
    pop hl
@@ -153,13 +177,14 @@ env_find_name:
    ; de'= char *name
    ; ix = disk io env file
    ; iy = disk io tmp file
+   ; stack = char *val, char *name
    
    push bc
    push de
    push hl
    push iy
    
-   ; stack = bufsz, buf, env filesize, disk io tmp
+   ; stack = val, name, bufsz, buf, env filesize, disk io tmp
 
    call asm_env_find_name_value
 
@@ -167,17 +192,23 @@ env_find_name:
    pop bc                      ; bc = file offset next line
    pop de                      ; de = env filesize
    
-   jp nc, error_znc - 2        ; if not found
-
    ; hl = file offset to start of line
    ; bc = file offset next line
    ; de = env filesize
    ; iy = disk io tmp file
    ; ix = disk io env file
-   ; stack = bufsz, buf
+   ; stack = val, name, bufsz, buf
 
+   jp nc, append_name_value    ; if not found, append new name=value pair to end of env file 
+   
    call l_swap_ixiy
+   
+   bit 7,(iy-4)                ; overwrite flag set?
+   jr nz, create_tmpfile
 
+   pop hl
+   jp error_znc - 3            ; return success, existing name=value pair is unchanged
+   
    ; create tmp file
 
 create_tmpfile:
@@ -187,7 +218,7 @@ create_tmpfile:
    ; de = env filesize
    ; ix = disk io tmp file
    ; iy = disk io env file
-   ; stack = bufsz, buf
+   ; stack = val, name, bufsz, buf
 
    push de
    push bc
@@ -209,7 +240,7 @@ create_tmpfile:
    pop bc                      ; bc'= bufsz
    
    exx
-   jp c, error_ebadf_mc
+   jp c, error_ebadf_mc - 2
 
    set 3,(iy-4)                ; remove tmp file on exit (flags in env disk io block)
 
@@ -220,7 +251,7 @@ open_tmp_file:
    ld a,ENV_OPEN_EXIST | ENV_OPEN_R | ENV_OPEN_W
    call l_jpix_00              ; jp open
    
-   jp c, error_ebadf_mc
+   jp c, error_ebadf_mc - 2
 
    call l_swap_ixiy
    set 2,(ix-4)                ; close tmp file on exit
@@ -236,6 +267,7 @@ copy_before_line:
    ; hl = env filesize
    ; de'= buf
    ; bc'= bufsz
+   ; stack = val, name
 
    sbc hl,de                   ; carry is reset
 
@@ -246,7 +278,8 @@ copy_before_line:
    ; hl = num bytes after next line
    ; de'= buf
    ; bc'= bufsz
-   
+   ; stack = val, name
+
    ld a,b
    or c
    jr z, copy_complete_0
@@ -263,9 +296,45 @@ copy_before_line:
    pop bc                      ; bc'= bufsz
    
    exx
-   jp c, error_ebadf_mc        ; if copy error
+   jp c, error_ebadf_mc - 2    ; if copy error
 
 copy_complete_0:
+
+   ; write new name=value pair 
+   
+   ; ix = disk io env file
+   ; iy = disk io tmp file
+   ; de = offset to next line
+   ; hl = num bytes after next line
+   ; de'= buf
+   ; bc'= bufsz
+   ; stack = val, name
+
+   call l_swap_ixiy
+   
+   ex (sp),hl
+   ex de,hl
+   pop af
+   ex (sp),hl
+   ex de,hl
+   push af
+   
+   ; iy = disk io env file
+   ; ix = disk io tmp file
+   ; hl = name
+   ; de = val
+   ; de'= buf
+   ; bc'= bufsz
+   ; stack = offset to next line, num bytes after next line
+
+   call write_name_value_pair
+   
+   pop hl
+   pop de
+   
+   jp c, error_ebadf_mc        ; if error writing pair
+   
+   call l_swap_ixiy
 
    ; copy second part of env file to tmp file
 
@@ -363,3 +432,85 @@ rewind_tmp_file:
    
    set 3,(iy-4)                ; remove tmp file on exit
    jp error_znc
+
+;
+
+append_name_value:
+
+   ; name=value pair not found so append to env file
+
+   pop hl
+   pop hl
+   
+   ; de = env filesize
+   ; iy = disk io tmp file
+   ; ix = disk io env file
+   ; stack = val, name
+
+   ld c,e
+   ld b,d
+   
+   call l_jpix_06              ; seek to end of env file
+   jp c, error_ebadf_mc - 2    ; if seek error
+   
+   pop hl
+   pop de
+
+   ; hl = name
+   ; de = val
+   ; iy = disk io tmp file
+   ; ix = disk io env file
+
+write_name_value_pair:
+
+   push hl
+   
+   call asm_strlen
+   
+   ld c,l
+   ld b,h                      ; bc = strlen(name)
+   
+   pop hl
+   
+   call l_jpix_15              ; write name to file
+   jp c, error_ebadf_mc        ; if write error
+   
+   ld hl,equals_s
+   ld bc,equals_s_len
+   
+   call l_jpix_15              ; write name to file
+   jp c, error_eio_mc          ; if write error file is corrupt
+   
+   ld a,d
+   or e
+   jp z, error_znc             ; if val is NULL
+   
+   ld l,e
+   ld h,d
+   
+   call asm_strlen
+   
+   ld c,l
+   ld b,h                      ; bc = strlen(val)
+   
+   ex de,hl
+   
+   ld a,b
+   or c
+   call nz, l_jpix_15          ; write val to file
+   
+   jp c, error_eio_mc          ; if write error file is corrupt
+   
+   ld hl,terminator_s
+   ld bc,1
+   
+   call l_jpix_15              ; write line terminator
+   
+   jp nc, error_znc
+   jp error_eio_mc
+
+; strings
+
+terminator_s     : defb '\n'
+equals_s         : defm " = "
+defc equal_s_len = 3
