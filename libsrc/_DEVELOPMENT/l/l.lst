@@ -33,6 +33,7 @@ l/z80/l_ret
 l/z80/l_retn
 l/z80/l_setmem_de
 l/z80/l_setmem_hl
+l/z80/l_swap_ixiy
 l/z80/l_testword_hl
 l/z80/l_zeroword_hl
 l/z80/ascii/l_char2num
