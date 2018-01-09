@@ -40,6 +40,9 @@
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
 
 IF (startup=2)
         org     32768
@@ -87,12 +90,13 @@ ENDIF
         call    crt0_init_bss   ;Initialise any data setup by sdcc
 	ld      (start1+1),sp	;Save entry stack
 IF (startup=3)
-	ld      hl,-64-18-18	;Add on space for atexit() stack and +3 MEM banking
-ELSE
-	ld      hl,-64		;Add on space for atexit() stack
+	; Increase to cover +3 MEM banking
+	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
+	UNDEFINE __clib_exit_stack_size
+	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
-	add     hl,sp
-	ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	ld      (exitsp),sp
 
 ; Memory banking for Spectrum +3

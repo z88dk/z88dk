@@ -347,6 +347,10 @@ int main(int argc, char **argv)
                     *offs = 0;
                 }
                 write_defined(ptr,value,exp);
+
+                if ( strcmp(ptr, "STACKPTR")) {
+                    write_defined(ptr,"REGISTER_SP",exp);                    
+                }
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;
                 char *value = "0";

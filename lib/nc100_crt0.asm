@@ -32,31 +32,33 @@
 		PUBLIC    cleanup		;jp'd to by exit()
 		PUBLIC    l_dcal		;jp(hl)
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
 
 
 IF (startup=2)
-
-		defc    CRT_ORG_CODE  = $8C00
-		org     CRT_ORG_CODE
-		jp	start
+	defc    CRT_ORG_CODE  = $8C00
+	org     CRT_ORG_CODE
+	jp	start
 
 ELSE
 
-		defc    CRT_ORG_CODE  = $C000
-		org     CRT_ORG_CODE
-		jp	start
+	defc    CRT_ORG_CODE  = $C000
+	org     CRT_ORG_CODE
+	jp	start
 
 IF DEFINED_USING_amalloc
 ;EXTERN ASMTAIL
 PUBLIC _heap
 ; We have 509 bytes we can use here..
 _heap:
-		defw 0
-		defw 0
+	defw 0
+	defw 0
 _mblock:
-		defs	505		; Few bytes for malloc() stuff
+	defs	505		; Few bytes for malloc() stuff
 ELSE
-		defs	509		; Waste 509 bytes of space
+	defs	509		; Waste 509 bytes of space
 ENDIF
 
 ;--------
@@ -74,9 +76,8 @@ ENDIF
 start:
 		;Entry point at $c2220
         ld      (start1+1),sp   ;Save entry stack
-        ld      hl,-64		;Create the atexit stack
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

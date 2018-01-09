@@ -39,7 +39,9 @@
                 defc    CRT_ORG_CODE  = $7000
         ENDIF
 
-
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
         org     CRT_ORG_CODE
 
 start:
@@ -47,10 +49,8 @@ start:
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
-
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

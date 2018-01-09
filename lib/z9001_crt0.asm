@@ -29,35 +29,28 @@
 	PUBLIC    l_dcal          ;jp(hl)
 
 
-	IF      !DEFINED_CRT_ORG_CODE
-			defc    CRT_ORG_CODE  = 1000h
-	ENDIF
+IF      !DEFINED_CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = 1000h
+ENDIF
+
+	defc	TAR__register_sp = CRT_ORG_CODE - 2
+        defc    DEF__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
 
 	org     CRT_ORG_CODE
 
 start:
 	ld	(start1+1),sp	;Save entry stack
-	
-;	ld      hl,-64
-;	add     hl,sp
-;	ld      sp,hl
-IF      STACKPTR
-	ld  sp,STACKPTR
-ELSE
-	ld	sp,CRT_ORG_CODE-2
-ENDIF
-	
+
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
-
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 
 	call    _main	;Call user program
 

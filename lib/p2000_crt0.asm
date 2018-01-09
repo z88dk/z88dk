@@ -29,6 +29,9 @@
                 defc    CRT_ORG_CODE  = $6547
         ENDIF
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -62,18 +65,14 @@ basic_end:
 
 start:
         ld      (start1+1),sp	;Save entry stack
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 
 
         call    _main

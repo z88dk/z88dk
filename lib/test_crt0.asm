@@ -26,6 +26,10 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = 65280
+        INCLUDE "crt/crt_rules.inc"
+
 
 if (ASMPC<>$0000)
         defs    CODE_ALIGNMENT_ERROR
@@ -92,10 +96,8 @@ restart30:
 	ret
 
 program:
-	ld	sp,65280
-	ld	hl,-64
-	add	hl,sp
-	ld	sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call    crt0_init_bss
 	ld	(exitsp),sp
 IF !__CPU_R2K__

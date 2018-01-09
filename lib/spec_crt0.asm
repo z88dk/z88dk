@@ -38,25 +38,28 @@
 
 
         IF DEFINED_ZXVGS
-        IF !DEFINED_CRT_ORG_CODE
+            IF !DEFINED_CRT_ORG_CODE
                 DEFC    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
 		defc	DEFINED_CRT_ORG_CODE = 1
-        ENDIF
-        IF !STACKPTR
-                DEFC    STACKPTR = $FF57   ; below UDG, keep eye when using banks
-        ENDIF
+            ENDIF
+
+	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
         ENDIF
 
         
         IF      !DEFINED_CRT_ORG_CODE
             IF (startup=2)                 ; ROM ?
                 defc    CRT_ORG_CODE  = 0
-                defc    STACKPTR = 32767
+		defc	TAR__register_sp = 32767	
             ELSE
                 defc    CRT_ORG_CODE  = 32768
             ENDIF
         ENDIF
 
+
+	defc	DEF__register_sp = -1
+        defc    DEF__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -85,7 +88,8 @@ endif
 
 init:
         im      1
-        ld      sp,STACKPTR-64
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
         ld      a,@111000       ; White PAPER, black INK
         call    zx_internal_cls
         ld      (hl),0
@@ -101,12 +105,8 @@ ELSE
   IF !DEFINED_ZXVGS
         ld      (start1+1),sp   ; Save entry stack
   ENDIF
-  IF      STACKPTR
-        ld      sp,STACKPTR
-  ENDIF
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 ; Optional definition for auto MALLOC init; it takes

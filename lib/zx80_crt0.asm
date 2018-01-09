@@ -49,7 +49,9 @@
                 defc    CRT_ORG_CODE  = 16525
         ENDIF
 
-
+        defc    DEF__clib_exit_stack_size = 0
+        defc    DEF__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
         org     CRT_ORG_CODE
 
 start:
@@ -70,10 +72,8 @@ start:
 	; for high-resolution graphics.
 	
         ld      (start1+1),sp   ;Save entry stack
-        ;ld      hl,-64          ;Create an atexit() stack
-        ld      hl,0            ;Create an atexit() stack
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

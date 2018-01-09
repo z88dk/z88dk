@@ -37,16 +37,16 @@ IF      !DEFINED_CRT_ORG_CODE
 	ENDIF
 ENDIF
 
+	defc	DEF__register_sp = -1
+        defc    DEF__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
+
 	org     CRT_ORG_CODE
 
 start:
         ld      (start1+1),sp   ;Save entry stack
-IF      STACKPTR
-        ld      sp,STACKPTR
-ENDIF
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

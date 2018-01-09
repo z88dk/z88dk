@@ -4,7 +4,7 @@
 ;
 
 
-                MODULE  ts2068_crt0
+        MODULE  ts2068_crt0
 
 
 ;--------
@@ -36,27 +36,25 @@
 ;--------
 
         IF DEFINED_ZXVGS
-        IF !DEFINED_CRT_ORG_CODE
-                DEFC    CRT_ORG_CODE = $5CCB    ;repleaces BASIC program
+	    IF !DEFINED_CRT_ORG_CODE
+		DEFC    CRT_ORG_CODE = $5CCB    ;repleaces BASIC program
 		defc	DEFINED_CRT_ORG_CODE = 1
-        ENDIF
-        IF !STACKPTR
-                DEFC    STACKPTR = $FF57  ;below UDG, keep eye when using banks
-        ENDIF
-        ENDIF
-
+	    ENDIF
+	    defc	TAR__register_sp = 0xff57
+	ENDIF
         
         IF      !DEFINED_CRT_ORG_CODE
-        IF (startup=2)
+            IF (startup=2)
                 defc    CRT_ORG_CODE  = 40000
-        ELSE
+            ELSE
                 defc    CRT_ORG_CODE  = 32768
+            ENDIF
         ENDIF
-        ENDIF
-        IF !STACKPTR
-                DEFC    STACKPTR = CRT_ORG_CODE-1  ;below UDG, keep eye when using banks
-        ENDIF
-                org     CRT_ORG_CODE
+
+	defc	DEF__register_sp = CRT_ORG_CODE - 1
+        defc    DEF__clib_exit_stack_size = 32
+	INCLUDE "crt/crt_rules.inc"
+        org     CRT_ORG_CODE
 
 
 start:
@@ -64,52 +62,47 @@ start:
 IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
 ENDIF
-IF 	STACKPTR
-        ld	sp,STACKPTR
-ENDIF
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
         exx
         ld	(hl1save + 1),hl
-
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
 	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and UDG
 IF DEFINED_USING_amalloc
-		ld	hl,_heap
-		ld	c,(hl)
-		inc	hl
-		ld	b,(hl)
-		inc bc
-		; compact way to do "mallinit()"
-		xor	a
-		ld	(hl),a
-		dec hl
-		ld	(hl),a
+	ld	hl,_heap
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc bc
+	; compact way to do "mallinit()"
+	xor	a
+	ld	(hl),a
+	dec hl
+	ld	(hl),a
 
-		;  Stack is somewhere else, no need to reduce the size for malloc
-		ld	hl,65535-168 ; Preserve UDG
-		sbc hl,bc	; hl = total free memory
+	;  Stack is somewhere else, no need to reduce the size for malloc
+	ld	hl,65535-168 ; Preserve UDG
+	sbc hl,bc	; hl = total free memory
 
-		push bc ; main address for malloc area
-		push hl	; area size
-		EXTERN sbrk_callee
-		call	sbrk_callee
+	push bc ; main address for malloc area
+	push hl	; area size
+	EXTERN sbrk_callee
+	call	sbrk_callee
 ENDIF
 
        
 IF (startup=2)
-		ld		hl,$6000
-		ld		de,$6001
-		ld		(hl),0
-		ld		bc,6143
-		ldir
-		;ld      a,@01000110	; disable interrupts
-		ld      a,@00000110
-		out     (255),a
+	ld	hl,$6000
+	ld	de,$6001
+	ld	(hl),0
+	ld	bc,6143
+	ldir
+	;ld      a,@01000110	; disable interrupts
+	ld      a,@00000110
+	out     (255),a
 ENDIF
         
         
@@ -321,31 +314,31 @@ ENDIF
         ret
 
 call_extrom:
-		di
-		push af
-		in	a,($ff)
-		set	7,a
-		out	($ff),a
-		in	a,($f4)
-		ld	(hssave),a
-		ld	a,1
-		out ($f4),a
-		pop	af
-		push	hl
-		ld	hl,call_extrom_exit
-		ex	(sp),hl
-		jp	(hl)
+	di
+	push af
+	in	a,($ff)
+	set	7,a
+	out	($ff),a
+	in	a,($f4)
+	ld	(hssave),a
+	ld	a,1
+	out ($f4),a
+	pop	af
+	push	hl
+	ld	hl,call_extrom_exit
+	ex	(sp),hl
+	jp	(hl)
 
 hssave:	defb 0
 
 call_extrom_exit:
-		ld	a,(hssave)
-		out	($f4),a
-		in	a,($ff)
-		res	7,a
-		out	($ff),a
-		ei
-		ret
+	ld	a,(hssave)
+	out	($f4),a
+	in	a,($ff)
+	res	7,a
+	out	($ff),a
+	ei
+	ret
 
 	defm	"Small C+ ZX"	;Unnecessary file signature
 	defb	0

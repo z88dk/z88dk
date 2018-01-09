@@ -32,9 +32,12 @@
 	PUBLIC    montest         ;NASCOM: check the monitor type
 
 	IF      !DEFINED_CRT_ORG_CODE
-			defc    CRT_ORG_CODE  = 1000h
+		defc    CRT_ORG_CODE  = 1000h
 	ENDIF
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = 0xe000
+        INCLUDE "crt/crt_rules.inc"
 	org     CRT_ORG_CODE
 
 ; NASSYS1..NASSYS3
@@ -46,9 +49,8 @@
 start:
 
 	ld	(start1+1),sp	;Save entry stack
-
-	ld	hl,0xe000
-	ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld      (exitsp),sp
 

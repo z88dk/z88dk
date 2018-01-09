@@ -37,6 +37,9 @@
                 defc    CRT_ORG_CODE  = $3000
         ENDIF
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = -0x1f6a	;;Upper limit of the user area
+        INCLUDE "crt/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -51,12 +54,9 @@
 ;----------------------
 start:
 	ld      (start1+1),sp	;Save entry stack
-
-        ld      sp,($1f6a)	;Upper limit of the user area
-
-        ld      hl,-65
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
+	dec	sp	
 	call	crt0_init_bss
         ld      (exitsp),sp
 

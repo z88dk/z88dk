@@ -32,6 +32,10 @@
                 defc    CRT_ORG_CODE  = 20480
         ENDIF   
 
+        defc    DEF__clib_exit_stack_size = 32
+        defc    DEF__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
+
         org     CRT_ORG_CODE
 
 
@@ -41,10 +45,9 @@ start:
 
 	ex		de,hl ; preserve HL
         ld      (start1+1),sp	;Save entry stack
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
-	call	crt0_init_bss
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
+        call    crt0_init_bss
         ld      (exitsp),sp
 		
 	push    de ; save HL

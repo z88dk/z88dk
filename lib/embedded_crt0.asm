@@ -9,7 +9,6 @@
 
 	DEFC	ROM_Start  = $0000
 	DEFC	RAM_Start  = $8000
-	DEFC	RAM_Length = $100
 	DEFC	Stack_Top  = $ffff
 
 	MODULE  embedded_crt0
@@ -29,21 +28,27 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+IF DEFINED_CRT_ORG_BSS
+        defc    __crt_org_bss = CRT_ORG_BSS
+ELSE
+	defc	__crt_org_bss = RAM_Start
+ENDIF
 
+IF      !CRT_ORG_CODE
+	defc	CRT_ORG_CODE = ROM_Start
+ENDIF
+	
+	defc	DEF__register_sp = Stack_Top
+        defc    DEF__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
 
-	org    ROM_Start
+	org    	CRT_ORG_CODE
 
 	jp	start
 start:
 ; Make room for the atexit() stack
-	ld	hl,Stack_Top-64
-	ld	sp,hl
-; Clear static memory
-	ld	hl,RAM_Start
-	ld	de,RAM_Start+1
-	ld	bc,RAM_Length-1
-	ld	(hl),0
-	ldir
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
@@ -68,7 +73,6 @@ l_dcal:
 
         INCLUDE "crt0_runtime_selection.asm"
 
-	defc	__crt_org_bss = RAM_Start
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
             defc __crt_model = CRT_MODEL
