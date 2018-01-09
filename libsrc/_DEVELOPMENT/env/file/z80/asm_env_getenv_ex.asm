@@ -7,6 +7,7 @@ SECTION code_env
 
 PUBLIC asm_env_getenv_ex
 
+EXTERN __ENV_FILE
 EXTERN error_einval_zc, error_ebadf_zc, error_zc
 EXTERN l_jpix_00, l_jpix_03, l_jpix_06, l_jpix_09, l_jpix_12, l_minu_bc_hl
 EXTERN asm_env_qualify_name, asm_env_find_name_value

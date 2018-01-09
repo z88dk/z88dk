@@ -1,4 +1,4 @@
-; int setenv(char *envfile, char *name, char *val, int overwrite)
+; int setenv_ex(char *envfile, char *name, char *val, int overwrite)
 
 INCLUDE "config_private.inc"
 INCLUDE "__ENV_DEFINES.inc"
@@ -7,6 +7,7 @@ SECTION code_env
 
 PUBLIC asm_env_setenv_ex
 
+EXTERN __ENV_FILE
 EXTERN error_einval_mc, error_ebadf_mc, error_eio_mc, error_znc
 EXTERN l_jpix_00, l_jpix_03, l_jpix_06, l_jpix_09, l_jpix_15, l_jpix_18
 EXTERN asm_strlen, l_swap_ixiy
@@ -410,8 +411,8 @@ rewind_tmp_file:
    ; bc'= bufsz
    
    ld bc,0
+   call l_jpix_06              ; seek offset 0 in tmp file
 
-   call l_jpix_06              ; seek offset 0 in tmp file  
    jp c, error_eio_mc          ; if error env file is corrupted
    
    ; find length of tmp file
@@ -483,7 +484,7 @@ write_name_value_pair:
    
    ld a,d
    or e
-   jp z, error_znc             ; if val is NULL
+   jr z, terminate             ; if val is NULL
    
    ld l,e
    ld h,d
@@ -500,7 +501,9 @@ write_name_value_pair:
    call nz, l_jpix_15          ; write val to file
    
    jp c, error_eio_mc          ; if write error file is corrupt
-   
+
+terminate:
+
    ld hl,terminator_s
    ld bc,1
    
@@ -511,6 +514,6 @@ write_name_value_pair:
 
 ; strings
 
-terminator_s     : defb '\n'
-equals_s         : defm " = "
-defc equal_s_len = 3
+terminator_s      : defb '\n'
+equals_s          : defm " = "
+defc equals_s_len = 3

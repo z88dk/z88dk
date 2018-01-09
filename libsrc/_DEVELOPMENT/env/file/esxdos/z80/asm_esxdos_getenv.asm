@@ -1,15 +1,13 @@
 ; char *getenv(const char *name)
 
-INCLUDE "config_private.inc"
-
 SECTION code_env
 
-PUBLIC asm_env_getenv
+PUBLIC asm_esxdos_getenv
 
-EXTERN __ENV_GETENV_BUF
-EXTERN asm_env_getenv_ex
+EXTERN asm_env_getenv
+EXTERN __ef_esxdos_disk_block_push, __ef_esxdos_disk_block_pop
 
-asm_env_getenv:
+asm_esxdos_getenv:
 
    ; Search for name among environment variables and return value if found.
    ; Must hold exclusive access to environment file while searching it.
@@ -18,14 +16,6 @@ asm_env_getenv:
    ; enter : hl = char *name
    ;         de = buf
    ;         bc = bufsz > 0
-   ;
-   ;         disk io block
-   ;
-   ;         ix+12 = jp read
-   ;         ix+ 9 = jp size
-   ;         ix+ 6 = jp seek
-   ;         ix+ 3 = jp close
-   ;         ix+ 0 = jp open
    ;
    ; exit  : if successful
    ;
@@ -37,14 +27,11 @@ asm_env_getenv:
    ;            hl = 0
    ;            carry set, errno = EBADF if disk error EINVAL if bad name
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+   ; uses  : af, bc, de, hl, f', bc', de', hl', ix
 
-   exx
+   call __ef_esxdos_disk_block_push  ; ix = & disk io block on stack
    
-   ld hl,0                     ; use global env file
-   ld de,__ENV_GETENV_BUF      ; use static buffer for value string
-   ld bc,__ENV_GETENV_BUFSZ
-
-   exx
+   call asm_env_getenv
    
-   jp asm_env_getenv_ex
+   call __ef_esxdos_disk_block_pop   ; pop disk io block from stack
+   ret

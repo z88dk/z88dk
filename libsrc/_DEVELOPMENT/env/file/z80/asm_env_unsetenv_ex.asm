@@ -1,4 +1,4 @@
-; int unsetenv(char *envfile, char *name)
+; int unsetenv_ex(char *envfile, char *name)
 
 INCLUDE "config_private.inc"
 INCLUDE "__ENV_DEFINES.inc"
@@ -7,6 +7,7 @@ SECTION code_env
 
 PUBLIC asm_env_unsetenv_ex
 
+EXTERN __ENV_FILE
 EXTERN error_einval_mc, error_ebadf_mc, error_eio_mc, error_znc
 EXTERN asm_env_qualify_name, asm_env_find_name_value, asm_env_tmpnam, asm_env_copy_file
 EXTERN l_jpix_00, l_jpix_03, l_jpix_06, l_jpix_09, l_jpix_18, l_swap_ixiy
