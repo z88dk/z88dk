@@ -58,7 +58,7 @@ IF      !CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $c437  ; PC6001 - 16K
 ENDIF
 
-        defc    DEF__clib_exit_stack_size = 32
+        defc    TAR__clib_exit_stack_size = 32
 	defc	DEF__register_sp = -1
 	INCLUDE	"crt/crt_rules.inc"
 

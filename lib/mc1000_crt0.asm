@@ -58,8 +58,8 @@
         ENDIF
 
 
-        defc    DEF__clib_exit_stack_size = 32
-        defc    DEF__register_sp = 0	; 0 = autodetect
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 0	; 0 = autodetect
         INCLUDE "crt/crt_rules.inc"
 
 	org     CRT_ORG_CODE

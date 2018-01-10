@@ -34,7 +34,7 @@ IF      !DEFINED_CRT_ORG_CODE
 ENDIF
 
 	defc	TAR__register_sp = CRT_ORG_CODE - 2
-        defc    DEF__clib_exit_stack_size = 32
+        defc    TAR__clib_exit_stack_size = 32
 	INCLUDE	"crt/crt_rules.inc"
 
 	org     CRT_ORG_CODE

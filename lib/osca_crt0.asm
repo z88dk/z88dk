@@ -94,8 +94,8 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $5000
 ENDIF
 
-        defc    DEF__clib_exit_stack_size = 32
-        defc    DEF__register_sp = 65536 - 6
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 65536 - 6
         INCLUDE "crt/crt_rules.inc"
 
 

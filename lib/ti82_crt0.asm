@@ -29,8 +29,8 @@
 	INCLUDE "Ti82.def"	; ROM / RAM adresses on Ti82
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
-        defc    DEF__clib_exit_stack_size = 3
-        defc    DEF__register_sp = -1
+        defc    TAR__clib_exit_stack_size = 3
+        defc    TAR__register_sp = -1
         INCLUDE "crt/crt_rules.inc"
 	
 ;OS82Head:

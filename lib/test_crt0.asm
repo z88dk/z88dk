@@ -26,8 +26,8 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        defc    DEF__clib_exit_stack_size = 32
-        defc    DEF__register_sp = 65280
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 65280
         INCLUDE "crt/crt_rules.inc"
 
 

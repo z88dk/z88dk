@@ -87,6 +87,9 @@
 		PUBLIC    _esccmd_cr
 		PUBLIC    _esccmd_pd
 
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 0x7f00
+        INCLUDE "crt/crt_rules.inc"
 
 IF      !DEFINED_CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = 100h
@@ -120,9 +123,10 @@ ENDIF
 
 ; Inspired by the DizzyLord loader by ORKSOFT
         ;di
+        ld      (start1+1),sp
         ld    a, 004h
         out   (0bfh), a
-        ld    sp, 07F00h
+	INCLUDE "crt/crt_init_sp.asm"
         ld    a, 0ffh
         out   (0b2h), a
 
@@ -157,14 +161,9 @@ ENDIF
         rst   30h
         defb  11						; set 40x25 characters window
 
-	call	crt0_init_bss
 
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),sp
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+	INCLUDE	"crt/crt_init_atexit.asm"
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init

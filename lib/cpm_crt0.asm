@@ -40,8 +40,8 @@
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
 
-        defc    DEF__clib_exit_stack_size = 32
-        defc    DEF__register_sp = -1
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
         INCLUDE "crt/crt_rules.inc"
 
 IF (startup=2)
@@ -87,7 +87,6 @@ ENDIF
 	nop	 ;   Those extra bytes fix the Amstrad NC's ZCN support !!?!
 	nop
 
-        call    crt0_init_bss   ;Initialise any data setup by sdcc
 	ld      (start1+1),sp	;Save entry stack
 IF (startup=3)
 	; Increase to cover +3 MEM banking
@@ -97,6 +96,7 @@ IF (startup=3)
 ENDIF
         INCLUDE "crt/crt_init_sp.asm"
         INCLUDE "crt/crt_init_atexit.asm"
+        call    crt0_init_bss   ;Initialise any data setup by sdcc
 	ld      (exitsp),sp
 
 ; Memory banking for Spectrum +3

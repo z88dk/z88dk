@@ -22,8 +22,8 @@
         defc    z88_map_segment = 192
 
 
-        defc    DEF__clib_exit_stack_size = 32
-        defc    DEF__register_sp = -0x1ffe	; oz safe place
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -0x1ffe	; oz safe place
         INCLUDE "crt/crt_rules.inc"
 
 

@@ -38,8 +38,8 @@ IF      !CRT_ORG_CODE
 	defc	CRT_ORG_CODE = ROM_Start
 ENDIF
 	
-	defc	DEF__register_sp = Stack_Top
-        defc    DEF__clib_exit_stack_size = 32
+	defc	TAR__register_sp = Stack_Top
+        defc    TAR__clib_exit_stack_size = 32
 	INCLUDE	"crt/crt_rules.inc"
 
 	org    	CRT_ORG_CODE

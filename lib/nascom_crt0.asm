@@ -35,8 +35,8 @@
 		defc    CRT_ORG_CODE  = 1000h
 	ENDIF
 
-        defc    DEF__clib_exit_stack_size = 32
-        defc    DEF__register_sp = 0xe000
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 0xe000
         INCLUDE "crt/crt_rules.inc"
 	org     CRT_ORG_CODE
 
