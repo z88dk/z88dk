@@ -3,6 +3,7 @@ SECTION code_env
 PUBLIC asm_env_copy_file
 
 EXTERN error_mc
+EXTERN l_jpix_12, l_jpix_15
 
 asm_env_copy_file:
 
@@ -35,7 +36,7 @@ asm_env_copy_file:
    ;             a = 1, hl = -1
    ;             carry set
    ;
-   ; unchanged : de, ix, iy
+   ; uses   : af, bc, hl
 
 copy_loop:
 
@@ -60,36 +61,31 @@ copy_loop:
    
 copy_it:
 
-   push hl
-   push de
-   push bc
-   push iy
-   push de
-   push bc
-   
    ; de = buf
-   ; bc = num bytes
+   ; bc = num bytes to copy
+   ; hl = num bytes left
 
    ex de,hl
-   call l_jpix_12              ; read bc bytes into buffer
+   call l_jpix_12              ; read bc bytes into buffer hl
    
-   pop bc                      ; bc = num bytes to copy
-   pop hl                      ; hl = buf
+   ; hl = buf
+   ; bc = num bytes to copy
+   ; de = num bytes left
+
+   push iy
    ex (sp),ix                  ; ix = disk io block for write
+   
+   ; stack = disk io block for read
    
    jr c, disk_error_rd
 
-   call l_jpix_15              ; write bc bytes from buffer
+   call l_jpix_15              ; write bc bytes from buffer hl
    
    jr c, disk_error_wr
    
-   ex (sp),ix                  ; ix = disk io block for read
-   pop iy                      ; iy = disk io block for write
+   pop ix                      ; ix = disk io block for read
    
-   pop bc
-   pop de
-   pop hl
-   
+   ex de,hl
    jr copy_loop
 
 disk_error_rd:
@@ -103,11 +99,7 @@ disk_error_wr:
 
 disk_error:
 
-   ex (sp),ix
-   pop iy
+   pop ix
    
-   pop bc
-   pop de
-   pop bc
-   
+   ex de,hl
    jp error_mc

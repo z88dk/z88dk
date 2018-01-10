@@ -318,16 +318,17 @@
 #define __EDOM  4
 #define __EFBIG  5
 #define __EINVAL  6
-#define __EMFILE  7
-#define __ENFILE  8
-#define __ENOLCK  9
-#define __ENOMEM  10
-#define __ENOTSUP  11
-#define __EOVERFLOW  12
-#define __ERANGE  13
-#define __ESTAT  14
-#define __EAGAIN  15
-#define __EWOULDBLOCK  15
+#define __EIO  7
+#define __EMFILE  8
+#define __ENFILE  9
+#define __ENOLCK  10
+#define __ENOMEM  11
+#define __ENOTSUP  12
+#define __EOVERFLOW  13
+#define __ERANGE  14
+#define __ESTAT  15
+#define __EAGAIN  16
+#define __EWOULDBLOCK  16
 
 #define __ERROR_NEXT  50
 
@@ -1048,9 +1049,9 @@
 #define __IO_DAC_R0  0x4f
 #define __IO_DAC_R1  0x5f
 
-#define __IO_DAC_M0  0xffdf
+#define __IO_DAC_M0  0xdf
 
-#define __IO_DAC_SPECDRUM  0xffdf
+#define __IO_DAC_SPECDRUM  0xdf
 
 #define __IO_DAC_PROFI_L  0x3f
 #define __IO_DAC_PROFI_R  0x5f

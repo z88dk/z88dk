@@ -40,7 +40,7 @@ table:
    defb $ff          ; __ESXDOS_ESTEND
    defb $ff          ; __ESXDOS_EWRTYPE
    defb $ff          ; __ESXDOS_ENOENT
-   defb $ff          ; __ESXDOS_EIO
+   defb __EIO        ; __ESXDOS_EIO
    defb __EINVAL     ; __ESXDOS_EINVAL
    defb __EACCES     ; __ESXDOS_EACCES
    defb $ff          ; __ESXDOS_ENOSPC
