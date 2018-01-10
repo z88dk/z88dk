@@ -66,11 +66,16 @@
 
 IF (startup=2)
 	defc    CRT_ORG_CODE  = ROM_Start
+        defc    TAR__register_sp = Stack_Top
 ELSE
 	IF      !CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = $9817
 	ENDIF
+        defc    TAR__register_sp = -1
 ENDIF
+
+        defc    TAR__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
         org     CRT_ORG_CODE
 
 IF (startup=2)
@@ -161,8 +166,8 @@ filler3:
 
 start:
 ; Make room for the atexit() stack
-	ld	hl,Stack_Top-64
-	ld	sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 ; Clear static memory
 	ld	hl,RAM_Start
 	ld	de,RAM_Start+1
@@ -177,10 +182,9 @@ ELSE
 start:
         ld      hl,0
         add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+        ld      (start1+1),sp
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 ENDIF
 
 ;  ******************** ********************

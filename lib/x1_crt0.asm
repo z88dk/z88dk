@@ -34,13 +34,14 @@
         IF      !DEFINED_CRT_ORG_CODE
  	    IF (startup=2)
                 defc    CRT_ORG_CODE  = 32768
+        	defc    TAR__register_sp = 0xFDFF
             ELSE
                 defc    CRT_ORG_CODE  = 0
+        	defc    TAR__register_sp = 65535
             ENDIF
         ENDIF
 
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
         INCLUDE "crt/crt_rules.inc"
 
         org     CRT_ORG_CODE
@@ -57,8 +58,7 @@ IF (!DEFINED_startup | (startup=1))
 if (CRT_ORG_CODE > 0)
         defs    ZORG_NOT_ZERO
 endif
-
-        ld      sp,$FFFF
+	INCLUDE	"crt/crt_init_sp.asm"
 	im 1
 	ei
 ENDIF
@@ -70,7 +70,7 @@ if (CRT_ORG_CODE < 32768)
         defs    ZORG_TOO_LOW
 endif
 
-	ld      sp,$FDFF
+	INCLUDE	"crt/crt_init_sp.asm"
 
 	; re-activate IPL
 	ld bc,$1D00
@@ -112,7 +112,7 @@ ENDIF
 ;	EXTERN _x1_cls
 ;	call _x1_cls
 ;ENDIF
-
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
 
 ; INIT math identify platform
