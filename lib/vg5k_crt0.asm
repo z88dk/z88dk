@@ -29,7 +29,7 @@
 ; Now, getting to the real stuff now!
 
         IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = 20480
+                defc    CRT_ORG_CODE  = 18950
         ENDIF   
 
         org     CRT_ORG_CODE
