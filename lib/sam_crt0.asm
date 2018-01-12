@@ -30,15 +30,17 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
 
         org     32768
 
 
 start:
         ld      (start1+1),sp   ;Save entry stack
-        ld      hl,-64		;Create the atexit stack
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

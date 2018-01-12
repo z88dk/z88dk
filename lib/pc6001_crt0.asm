@@ -39,13 +39,13 @@ ENDIF
 
 IF (startup=4)
 	defc    CRT_ORG_CODE  = $4000	 ; ROM
-IF !DEFINED_CRT_ORG_BSS
+  IF !DEFINED_CRT_ORG_BSS
 	defc CRT_ORG_BSS =  $c500   ; Static variables are kept in RAM
 	defc DEFINED_CRT_ORG_BSS = 1
-ENDIF
+    ENDIF
 	defc	__crt_org_bss = CRT_ORG_BSS
 	; In ROM mode we MUST setup the stack
-	defc	STACKPTR = $ffff
+	defc	TAR__register_sp = 0xffff
 	; If we were given a model then use it
 	IF DEFINED_CRT_MODEL
 		defc __crt_model = CRT_MODEL
@@ -58,11 +58,12 @@ IF      !CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $c437  ; PC6001 - 16K
 ENDIF
 
+        defc    TAR__clib_exit_stack_size = 32
+	defc	DEF__register_sp = -1
+	INCLUDE	"crt/crt_rules.inc"
 
-; Now, getting to the real stuff now!
 
-
-		org     CRT_ORG_CODE
+	org     CRT_ORG_CODE
 
 IF (startup=4)
 	defb $41
@@ -93,31 +94,17 @@ start:
 
 		
         ld      (start1+1),sp   ;Save entry stack
-
-IF      STACKPTR
-        ld      sp,STACKPTR
-ENDIF
-;ELSE
-;        ld      sp,$FFFF
-;ENDIF
-        ;ld      hl,-64
-        ;add     hl,sp
-        ;ld		sp,hl
-        ;ld      sp,$F000
-	
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
-
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 		
         call    _main
 cleanup:

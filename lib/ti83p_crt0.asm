@@ -40,6 +40,10 @@
 	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
         defc    crt0 = 1
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
+
+        defc    TAR__clib_exit_stack_size = 3
+        defc    TAR__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
 	
 ;-----------------------------
 ;2 - MirageOS without quit key
@@ -152,29 +156,15 @@ IF DEFINED_GimmeSpeed
 	rst	28		; bcall(SetExSpeed)
 	defw	SetExSpeed	;
 ENDIF				;
-	ld	hl,0		;
-	add	hl,sp		;
-	ld	(start1+1),hl	;
-IF !DEFINED_atexit		; Less stack use
-	ld	hl,-6		; 3 pointers (more likely value)
-	add	hl,sp		;
-	ld	sp,hl		;
-	call	crt0_init_bss
-	ld	(exitsp),sp	;
-ELSE				;
-	ld	hl,-64		; 32 pointers (ANSI standard)
-	add	hl,sp		;
-	ld	sp,hl		;
-	call	crt0_init_bss
-	ld	(exitsp),sp	;
-ENDIF
+	ld	(start1+1),sp	;
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
+        call    crt0_init_bss
+        ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 
 
 	EXTERN	fputc_cons

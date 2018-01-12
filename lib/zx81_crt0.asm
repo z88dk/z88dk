@@ -78,6 +78,9 @@ ENDIF
 	    ENDIF
         ENDIF
 
+	defc	TAR__register_sp = -1
+        defc    TAR__clib_exit_stack_size = 4
+	INCLUDE	"crt/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -184,12 +187,9 @@ ENDIF
 	; for high-resolution graphics.
 	
         ld      (start1+1),sp   ;Save entry stack
-IF      STACKPTR
-        ld      sp,STACKPTR
-ENDIF
-	ld      hl,-8        ;Create an atexit() stack
-        add     hl,sp
-        ld      sp,hl
+
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

@@ -5,7 +5,7 @@
 ;       $Id: newbrain_crt0.asm,v 1.20 2016-07-15 21:03:25 dom Exp $
 ;
 
-                MODULE  newbrain_crt0
+	MODULE  newbrain_crt0
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
@@ -30,27 +30,28 @@ IF (startup=2)
 ENDIF
 
 
-        IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = 10000
-        ENDIF
-                org     CRT_ORG_CODE
+IF      !DEFINED_CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = 10000
+ENDIF
+
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
+
+        org     CRT_ORG_CODE
 
 
 start:
         ld      (start1+1),sp   ;Save entry stack
-        ld      hl,-64		;Create the atexit stack
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
         
 IF (startup=2)
 	ld	hl,(57)
@@ -58,8 +59,6 @@ IF (startup=2)
 	ld	hl,nbckcount
 	ld	(57),hl
 ENDIF
-
-
 
         call    _main		;Call user program
 

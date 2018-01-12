@@ -27,58 +27,55 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-; Now, getting to the real stuff now!
-
         IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 35055
         ENDIF   
+
+
+	defc	TAR__clib_exit_stack_size = 32
+	defc	TAR__register_sp = -1
+	INCLUDE	"crt/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
 
 start:
         ld      (start1+1),sp	;Save entry stack
-        IF !STACKPTR
-        ;ld      hl,-64
-        ;add     hl,sp
-        ;ld      sp,hl
-		ELSE
-        ld      sp,STACKPTR-64
-		ENDIF
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 
-		call    crt0_init_bss
+	call    crt0_init_bss
         ld      (exitsp),sp
 		
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 
-		call    _main
+	call    _main
 cleanup:
-		push	hl
+	push	hl
 ;
 ;       Deallocate memory which has been allocated here!
 ;
 
 IF !DEFINED_nostreams
-		EXTERN	closeall
-		call	closeall
+	EXTERN	closeall
+	call	closeall
 ENDIF
-
-		pop	hl
+	pop	hl
 start1:
-		ld  sp,0
-		ld	a,l
-		jp	$19f9	; $1994 for french version ??
-				; perhaps we should first spot the right location,
-				; looking around for the 47h, AFh sequence
+	ld 	sp,0
+	ld	a,l
+	jp	$19f9	; $1994 for french version ??
+			; perhaps we should first spot the right location,
+			; looking around for the 47h, AFh sequence
 
 
 l_dcal:
-		jp	(hl)	; Used for function pointer calls
+	jp	(hl)	; Used for function pointer calls
 
 
 
