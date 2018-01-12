@@ -736,7 +736,7 @@ int heirb(LVALUE* lval)
             
 
                 if (str == NULL ) {
-                    errorfmt("Can't take member", 1);
+                    errorfmt("Non struct type can't take member", 1);
                     junk();
                     return 0;
                 }
