@@ -1564,5 +1564,6 @@ static void declfunc(Type *type, enum storage_type storage)
 #ifdef INBUILT_OPTIMIZER
     generate();
 #endif
+    Zsp = 0;
     infunc = 0; /* not in fn. any more */
 }

@@ -1,0 +1,45 @@
+
+
+
+	MODULE	Issue_574_fastcall_offset
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	push	de
+	push	hl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._WaitForBOF
+WaitForBOF:
+	ld	bc,0x243B
+	ld	a,0x1f
+	out	(c),a
+	ld	bc,0x253B
+	in	a,(c)
+	cp	192
+	jr	nz,WaitForBOF
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_WaitForBOF
+
+
+
+
