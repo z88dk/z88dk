@@ -21,6 +21,12 @@
         defc    z88_map_bank = $4D3
         defc    z88_map_segment = 192
 
+
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -0x1ffe	; oz safe place
+        INCLUDE "crt/crt_rules.inc"
+
+
         org $2300
 
 ;-----------
@@ -42,11 +48,9 @@ bas_last:
 ;-----------
 start:
 	ld	(start1+1),sp	;Save starting stack
-        ld      sp,($1ffe)	;Pick up stack from OZ safe place
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
         call    crt0_init_bss
-        ld      hl,-64		;Make room for the atexit() table
-        add     hl,sp
-        ld      sp,hl
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init

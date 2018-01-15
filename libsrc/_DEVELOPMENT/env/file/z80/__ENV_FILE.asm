@@ -35,7 +35,13 @@ defc __Z88DK = 1992
 defc __ZXNEXT = 1
 
 ; 
+
+defc __ENV_GETENV_BUFSZ = 64
+
 ; 
+
+defc __ENV_LTMPNAM = 12
+defc __ENV_TMPMAX = 0xffff
 
 defc __SPECTRUM = 2
 
@@ -309,16 +315,17 @@ defc __EBDFD = 3
 defc __EDOM = 4
 defc __EFBIG = 5
 defc __EINVAL = 6
-defc __EMFILE = 7
-defc __ENFILE = 8
-defc __ENOLCK = 9
-defc __ENOMEM = 10
-defc __ENOTSUP = 11
-defc __EOVERFLOW = 12
-defc __ERANGE = 13
-defc __ESTAT = 14
-defc __EAGAIN = 15
-defc __EWOULDBLOCK = 15
+defc __EIO = 7
+defc __EMFILE = 8
+defc __ENFILE = 9
+defc __ENOLCK = 10
+defc __ENOMEM = 11
+defc __ENOTSUP = 12
+defc __EOVERFLOW = 13
+defc __ERANGE = 14
+defc __ESTAT = 15
+defc __EAGAIN = 16
+defc __EWOULDBLOCK = 16
 
 defc __ERROR_NEXT = 50
 
@@ -1048,9 +1055,9 @@ defc __IO_DAC_L1 = 0x1f
 defc __IO_DAC_R0 = 0x4f
 defc __IO_DAC_R1 = 0x5f
 
-defc __IO_DAC_M0 = 0x2d
+defc __IO_DAC_M0 = 0xdf
 
-defc __IO_DAC_SPECDRUM = 0xffdf
+defc __IO_DAC_SPECDRUM = 0xdf
 
 defc __IO_DAC_PROFI_L = 0x3f
 defc __IO_DAC_PROFI_R = 0x5f
@@ -1464,6 +1471,8 @@ defc __REG_KEYMAP_DATA_MSB = 42
 
 defc __REG_KEYMAP_DATA_LSB = 43
 
+defc __REG_AUDIO_MONO_DAC = 45
+
 defc __REG_LORES_OFFSET_X = 50
 
 defc __REG_LORES_OFFSET_Y = 51
@@ -1774,8 +1783,8 @@ ENDIF
 
 SECTION rodata_env
 
-PUBLIC __ENV_FILENAME
+PUBLIC __ENV_FILE
 
-__ENV_FILENAME:
+__ENV_FILE:
 
    defm "/sys/env", 0

@@ -14,6 +14,7 @@ extern int errno;
 #define EDOM           __EDOM
 #define EFBIG          __EFBIG
 #define EINVAL         __EINVAL
+#define EIO            __EIO
 #define EMFILE         __EMFILE
 #define ENFILE         __ENFILE
 #define ENOLCK         __ENOLCK

@@ -1,6 +1,8 @@
 l/z80/l_bitset_locate
 l/z80/l_call_hl
 l/z80/l_call_ix
+l/z80/l_call_ix_00
+l/z80/l_call_ix_dd
 l/z80/l_call_iy
 l/z80/l_command_line_parse
 l/z80/l_command_line_parse_in_place
@@ -14,6 +16,8 @@ l/z80/l_inc_hl
 l/z80/l_inc_sp
 l/z80/l_jphl
 l/z80/l_jpix
+l/z80/l_jpix_00
+l/z80/l_jpix_dd
 l/z80/l_jpiy
 l/z80/l_ldd
 l/z80/l_ldd_loop
@@ -29,6 +33,7 @@ l/z80/l_ret
 l/z80/l_retn
 l/z80/l_setmem_de
 l/z80/l_setmem_hl
+l/z80/l_swap_ixiy
 l/z80/l_testword_hl
 l/z80/l_zeroword_hl
 l/z80/ascii/l_char2num

@@ -35,19 +35,20 @@
         ENDIF
 
 
-; Now, getting to the real stuff now!
 
+	defc	TAR__clib_exit_stack_size = 32
+	defc	TAR__register_sp = -1
+	INCLUDE	"crt/crt_rules.inc"
 
-		org     CRT_ORG_CODE
+	org     CRT_ORG_CODE
 
 
 
 
 start:
-
-	ld	hl,-64		; 32 pointers (ANSI standard)
-	add	hl,sp
-	ld	sp,hl
+	ld	(start1+1),sp
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld	(exitsp),sp
 

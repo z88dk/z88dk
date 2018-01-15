@@ -169,11 +169,19 @@ int zxn_exec(char *target)
         fprintf(stderr, "Warning: the DATA binary should be manually attached to CODE for rom model compiles\n");
 
     // initialize banked memory representation
+    
+    // pre-defined banks:
+
+    // BANK = ZXN Ram Enumerated as 16K banks compatible with 128k Spectrum banking scheme with org 0xc000
+    // PAGE = ZXN Ram Enumerated as 8k pages compatible with ZXN MMU paging
+    // DIV  = DIVMMC Memory organized as 32 8k pages with org 0x2000
+    // RES  = Separate bankspace to hold resources stored in disk file but not initially loaded at runtime
 
     memset(&memory, 0, sizeof(memory));
     mb_create_bankspace(&memory, "BANK");   // bank space 0
     mb_create_bankspace(&memory, "DIV");    // bank space 1
-    mb_create_bankspace(&memory, "PAGE");   // bank space 2 - must be last because it is deleted later
+    mb_create_bankspace(&memory, "PAGE");   // bank space 2 - must be last of first three because it is deleted later
+    mb_create_bankspace(&memory, "RES");
 
     if (zxb.fullsize)
     {

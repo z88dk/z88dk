@@ -90,6 +90,6 @@ main() {
 			vmerge(st->addr, st->sub);
 	}
 
-	//set_mode(mode_0);
-	msx_screen(0);
+	set_mode(mode_0);
+	//msx_screen(0);
 }

@@ -45,15 +45,15 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $7300
 ENDIF
 
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
+        INCLUDE "crt/crt_rules.inc
         org     CRT_ORG_CODE
 
 start:
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+        ld      (start1+1),sp
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

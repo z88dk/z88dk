@@ -136,7 +136,7 @@ __sfr __at __IO_DAC_R0 IO_DAC_R0;
 __sfr __at 0x5f IO_5F;
 __sfr __at __IO_DAC_R1 IO_DAC_R1;
 
-__sfr __at 0x2d IO_2D;
+__sfr __at 0xdf IO_DF;
 __sfr __at __IO_DAC_M0 IO_DAC_M0;  // writes to L0 and R0
 
 // io ports - ay-3-8912
@@ -413,6 +413,8 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define REG_KEYMAP_DATA_MSB  __REG_KEYMAP_DATA_MSB
 
 #define REG_KEYMAP_DATA_LSB  __REG_KEYMAP_DATA_LSB
+
+#define REG_AUDIO_MONO_DAC  __REG_AUDIO_MONO_DAC
 
 #define REG_LORES_OFFSET_X  __REG_LORES_OFFSET_X
 

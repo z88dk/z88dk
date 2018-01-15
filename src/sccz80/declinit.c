@@ -198,13 +198,37 @@ static int init(Type *type, int dump)
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
-        cmatch('&');
+        int gotref = cmatch('&');
         if (symname(sname) && strcmp(sname, "sizeof") != 0) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
+                Type *ptype = ptr->ctype;
+
                 /* Actually found sommat..very good! */
-                if ( type->kind == KIND_PTR || type->kind == KIND_ARRAY ) {
+                if ( ispointer(type)|| type->kind == KIND_ARRAY ) {
+                    int offset = 0;
+
+                    if ( rcmatch('[')) {
+                        if ( gotref == 0 ) {
+                            errorfmt("Initialiser element is not a compile-time constant",1);
+                        }
+                        while ( rcmatch('[')) {
+                            if ( ispointer(ptype) || ptype->kind == KIND_ARRAY) {
+                                double val;
+                                Kind valtype;
+                                needchar('[');
+                                constexpr(&val, &valtype,  1);
+                                needchar(']');
+                                offset += ( ptype->size / ptype->len) * val;
+                                ptype = ptype->ptr;
+                            } else {
+                                errorfmt("Cannot subscript a non-pointer", 1);
+                                break;                                
+                            }
+                        }
+                    }
                     defword();
                     outname(ptr->name, dopref(ptr));
+                    outfmt(" + %d",offset);
                     nl();
                     if ( type->isfar ) {
                         defbyte(); outdec(0); nl();
@@ -220,7 +244,7 @@ static int init(Type *type, int dump)
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
             }
-        } else if (rcmatch('}')) {
+        } else if (rcmatch('}')) {        
 #if 0
             dumpzero(size,*dim);
 #endif

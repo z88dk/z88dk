@@ -2,6 +2,8 @@ SECTION code_env
 
 PUBLIC asm_env_qualify_name
 
+EXTERN asm_isspace
+
 asm_env_qualify_name:
 
    ; Qualify NAME for NAME=VALUE pairs

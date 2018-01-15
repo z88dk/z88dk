@@ -28,14 +28,18 @@
 		
 	GLOBAL    __interposer_isr__
 
+	defc	TAR__register_sp = -0xae60
+        defc	TAR__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
+
 ;--------
 ; Set an origin for the application (-zorg=) default to $1200
 ;--------
 
 IF      !DEFINED_CRT_ORG_CODE
-		defc    CRT_ORG_CODE  = $1200
+	defc    CRT_ORG_CODE  = $1200
 ENDIF   
-                org     CRT_ORG_CODE
+	org     CRT_ORG_CODE
 
 
 ;--------
@@ -46,18 +50,8 @@ start:
 
         di
         ld      (start1+1),sp
-IFNDEF STACKPTR
-	ld sp,(0xae60)               ; set stack location to last byte of udg area
-ELSE
-    IF STACKPTR > -1
-	ld sp,STACKPTR          ; user supplied stack location
-    ENDIF
-ENDIF
-		
-	; make room for exit stack
-	ld      hl,-64                  ; reserve space for 32 entries on the exit stack
-	add     hl,sp
-        ld      sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

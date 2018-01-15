@@ -37,11 +37,10 @@ initxt:
 ; MTX:  $00,$D0,$07,$00,$03,$7E,$07
 
     ld    c,$01
-IF FORsc3000
-	ld    a,$F0		; bit 7 must be reset on sc3000
-ELSE
+;IF FORsc3000
+;	jp	$39E5
+;ELSE
     ld    a,$D0
-ENDIF
     call    VDPreg_Write    ; reg1  - text MODE
     
     ld    a,$07
@@ -62,18 +61,20 @@ ENDIF
     ld    a,$f5 ; (00 ?)
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
+		; reg0  - TEXT MODE
     ld    c,$00
-    xor a		; reg0  - TEXT MODE
+IF FORm5
+    ld    a,$01		; bit 1 (external video flag) must be set on Sord M5
+ELSE
+    xor a		; .. and reset on the other targets
+ENDIF
     call    VDPreg_Write
 
 	; reg1
-IF FORsc3000
-	ld    a,$F0		; bit 7 must be reset on sc3000
-ELSE
     ld    a,$D0   ; ($C0 for MTX ?)  ; reg1 - TEXT MODE
-ENDIF
     call    VDPreg_Write
     ret
+;ENDIF
 
 ; Switch 2 Video Mode n. 1
 
@@ -83,11 +84,7 @@ init32:
 ; MTX?: $00,$D0,$04,$80,        $00,$7E,$07
 
     ld    c,$01
-IF FORsc3000
-	ld    a,$F0		; bit 7 must be reset on sc3000
-ELSE
     ld    a,$D0
-ENDIF
     call    VDPreg_Write    ; reg1  - text MODE
     
     ld    a,$04
@@ -109,14 +106,17 @@ ENDIF
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
     
+		; reg0  - TEXT MODE
     ld    c,$00
-    xor a		; reg0  - TEXT MODE
+IF FORm5
+    ld    a,$01		; bit 1 (external video flag) must be set on Sord M5
+ELSE
+    xor a		; .. and reset on the other targets
+ENDIF
     call    VDPreg_Write
-
 	
-
-; Hint by Saverio Russo, a quick way to make things
-; work quickly...  details will come afterwards.
+;
+; -- Thanks to Saverio Russo his initial hints --
 ;
 ; Switch 2 Video Mode n. 2
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
@@ -125,35 +125,31 @@ inigrp:
 ; SVI:  $02,$E0,$06,$FF,$03,$36,$07,$07
 ; MSX:  $02,$E0,$06,$FF,$03,$36,$07,$04
 ; SC3:  $02,$E0,$0E,$FF,$03,$76,$03,$05
+; SC3B: $02,$E2,$0E,$FF,$03,$76,$03,$00
 ; EINS: $02,$C0,$0E,$FF,$03,$76,$03,$F4   $0F for backdrop color = WHITE 
 ; MTX:  $02,$C0,$0F,$FF,$03,$7E,$07
 ; MTXb:	$02,$C2,$0F,$FF,$03,$73,$07,$F3
 ; MTXc:	$02,$E2,$06,$FF,$03,$38,$07,$01	; astropac
 ; MTXd: $02,$C2,$06,$FF,$03,$38,$07,$01	; kilopede
- 
-;IF FOReinstein
-  ; While waiting for a fix, let's skip the setmode
-;ELSE
 
 
-    ; reg1  - GRAPH MODE
-    ld    c,$01
 ;IF FORsc3000
-	xor a		; bit 7 must be reset on sc3000
+;	jp	$39E2	; set screen 1
 ;ELSE
-;    ld    a,$80
-;ENDIF
+    ; reg1  - GRAPH MODE, first reset bit #6 to blank the screen
+    ld    c,$01
+IF FORm5
+	ld a,$80	; bit 7 must be set on Sord M5
+ELSE
+	xor a		; bit 7 must be reset on sc3000
+ENDIF
     call    VDPreg_Write
 	
     ; reg2  -  NAME TABLE
 IF FORmtx
     ld    a,$0f
 ELSE
-IF FORsC3000
-	ld    a,$0E
-ELSE
     ld    a,$0C
-ENDIF
 ENDIF
     call    VDPreg_Write
 
@@ -176,26 +172,23 @@ ENDIF
     ; reg7  -  INK & PAPER-/BACKDROPCOL.
     xor   a
     call    VDPreg_Write
-    
+
 	; reg0  - GRAPH MODE
     ld    c,$00
 IF FORm5
-    ld    a,$03		
+    ld    a,$03		; bit 1 (external video flag) must be set on Sord M5
 ELSE
-    ld    a,$02
+    ld    a,$02		; .. and reset on the other targets
 ENDIF
     call    VDPreg_Write
 
 	; reg1 - GRAPH MODE
 	; (it was first set to $80)
-IF FORsc3000
-    ld    a,$E0
-ELSE
     ld    a,$E2   ; (MTX ..or better C0 or C2?)
-ENDIF
     call    VDPreg_Write
 
     ret
+;ENDIF
 
 ; Switch 2 Video Mode n. 3
 inimlt:
@@ -219,32 +212,41 @@ inimlt:
 VDPreg_Write:  
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 
-	push    af
-	;ld		hl,RG0SAV  <-- do we need to keep track of the VDP registers ?
-	ld      a,i
-	jp      pe,irq_enabled
+;IF FORsc3000
+;	call $2BBF
+;	inc c
+;	ret
+;ELSE
 
-	pop     af
-	push    af
+	ld	b,a
+	
+	ld a,i		; get the current status of the irq line
+	di
+	push af        
+	ex (sp),hl
+	ld (bit_irqstatus),hl
+	pop hl
+
+	ld	a,b
 	out     (VDP_CMD),a
 	ld      a,c
 	and     $07
-	or      $80		; is this valid for all targets ?
+	or      $80		; enable bit for "set register" command
 	out     (VDP_CMD),a
 	inc     c
-	pop     af
+	
+	push hl
+	ld	hl,(bit_irqstatus)
+	ex	(sp),hl
+	pop af
+	ret po
+	ei
+	
 	ret
 	
-irq_enabled:
-	di
-	pop     af
-	push    af
-	out     (VDP_CMD),a
-	ld      a,c
-	and     $07
-	or      $80		; is this valid for all targets ?
-	ei
-	out     (VDP_CMD),a
-	inc     c
-	pop     af
-	ret
+;ENDIF
+
+
+	SECTION		bss_clib
+	
+bit_irqstatus:		defb 0

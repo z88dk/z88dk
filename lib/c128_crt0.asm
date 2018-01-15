@@ -33,6 +33,9 @@
                 defc    CRT_ORG_CODE  = $3000	; no, use a fixed entry location at $3000, 'appmake' is not ready for different values!
         ENDIF
 
+	defc	TAR__clib_exit_stack_size = 32
+	defc	TAR__register_sp = -1
+	INCLUDE	"crt/crt_rules.inc"
         org     CRT_ORG_CODE
 
 
@@ -100,9 +103,8 @@ z80start:
 ;        ld      hl,0
 ;        add     hl,sp
         ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 

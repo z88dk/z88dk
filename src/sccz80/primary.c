@@ -127,6 +127,10 @@ int primary(LVALUE* lval)
              */
             if (!rcmatch('(')) {
                 errorfmt("Unknown symbol: %s", 1, sname);
+                lval->ltype = type_int;
+                lval->val_type = KIND_INT;
+                lval->ptr_type = KIND_NONE;
+                lval->indirect_kind = KIND_NONE;
 	        return(0);
             } else {
             /* assume it's a function we haven't seen yet */

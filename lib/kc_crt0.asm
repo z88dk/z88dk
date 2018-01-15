@@ -33,9 +33,13 @@
 	PUBLIC    l_dcal          ;jp(hl)
 
 
-	IF      !DEFINED_CRT_ORG_CODE
-			defc    CRT_ORG_CODE  = $1000
-	ENDIF
+IF      !DEFINED_CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = $1000
+ENDIF
+
+	defc	TAR__register_sp = CRT_ORG_CODE-2
+        defc    TAR__clib_exit_stack_size = 32
+	INCLUDE	"crt/crt_rules.inc"
 
 	org     CRT_ORG_CODE
 
@@ -72,18 +76,8 @@ IF !DEFINED_nosound
 ENDIF
 	
 	ld	(start1+1),sp	;Save entry stack
-	
-IF      STACKPTR
-	ld  sp,STACKPTR
-ELSE
-	ld	sp,CRT_ORG_CODE-2
-ENDIF
-	
-;	ld      hl,-64
-;	add     hl,sp
-;	ld      sp,hl
-;	ld		sp,CRT_ORG_CODE
-	
+	INCLUDE	"crt/crt_init_sp.asm"	
+	INCLUDE	"crt/crt_init_atexit.asm"	
 	call	crt0_init_bss
 	ld      (exitsp),sp
 

@@ -10,6 +10,7 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls_nobios
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
+time/sc3000/clock
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
@@ -45,7 +46,7 @@ msx/gen_get_trigger
 msx/msx_map_m2_block
 msx/msx_map_m2_pixel
 msx/msx_map_m2_subpixel
-msx/gen_set_mode
+msx/msx_set_mode
 msx/gen_vfill
 msx/msx_vmerge
 msx/msx_vpeek

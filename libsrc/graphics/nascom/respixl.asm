@@ -45,7 +45,7 @@
 			ld	d,0
 			ld	e,c
 			inc	e
-			adc	hl,de
+			add	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
 			

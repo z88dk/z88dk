@@ -7,7 +7,7 @@
 ;
 ;		At C source level:
 ;       #pragma output osca_bank=(0..14) set the memory bank for locations > 32768 before loading program
-;		#pragma output osca_stack=<value> put the stack in a differen place, i.e. 32767
+;		#pragma output REGISTER_SP=<value> put the stack in a differen place, i.e. 32767
 ;		#pragma output nostreams       - No stdio disc files
 ;		#pragma output noredir         - do not insert the file redirection option while parsing the
 ;		                                 command line arguments (useless if "nostreams" is set)
@@ -94,6 +94,10 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $5000
 ENDIF
 
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 65536 - 6
+        INCLUDE "crt/crt_rules.inc"
+
 
 IF ((CRT_ORG_CODE = $5000) | (!DEFINED_osca_bank))
        org	CRT_ORG_CODE
@@ -119,15 +123,9 @@ start:
 	ld	b,h
 	ld	c,l
 
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-IF (!DEFINED_osca_stack)
-        ld      sp,-64
-ELSE
-        ld      sp,osca_stack
-ENDIF
-        ;ld      sp,$7FFF
+        ld      (start1+1),sp
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	push	bc		
 	call	crt0_init_bss
 	pop	bc

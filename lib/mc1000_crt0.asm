@@ -50,17 +50,19 @@
 
 
         IF      !DEFINED_CRT_ORG_CODE
-			IF (startup=2)
-				defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
-			ELSE
-				defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
-			ENDIF
+	   IF (startup=2)
+		defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
+ 	   ELSE
+		defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
+	   ENDIF
         ENDIF
 
 
-; Now, getting to the real stuff now!
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 0	; 0 = autodetect
+        INCLUDE "crt/crt_rules.inc"
 
-		org     CRT_ORG_CODE
+	org     CRT_ORG_CODE
 
 
 IF (startup=2)
@@ -270,9 +272,8 @@ start:
 	;LD ($106),a
 		;ld		hl,$106
 		;ld		(hl),255	; disable gaming mode (shouldn't this work by putting 255??)
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
+        ld      (start1+1),sp
+IF __register_sp == 0
         ld      hl,$bfff	; 48K ?
         ld      (hl),$55
         ld      a,$AA
@@ -282,21 +283,23 @@ start:
         ld      hl,$3fff	; 48K.
 has48k:
         ld      sp,hl
+	UNDEFINE  __register_sp
+	defc	__register_sp = -1
+ENDIF
         
         ;ei
         ;xor     a
         ;out     ($80),a
         ;call    $c021      ; setup text page (ptr in HL)
-        
+       
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm" 
 	call	crt0_init_bss
-	ld		(exitsp),sp
+	ld	(exitsp),sp
 		
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 		
 
         call    _main

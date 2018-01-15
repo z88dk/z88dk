@@ -17,6 +17,7 @@ error/z80/error_efbig_zc
 error/z80/error_einval_mc
 error/z80/error_einval_zc
 error/z80/error_einval_znc
+error/z80/error_eio_mc
 error/z80/error_emfile_zc
 error/z80/error_enfile_mc
 error/z80/error_enolck_mc

@@ -54,6 +54,10 @@
 	PUBLIC	RG6SAV
 	PUBLIC	RG7SAV
 
+
+        defc    TAR__register_sp = Stack_Top
+        defc    TAR__clib_exit_stack_size = 32
+        INCLUDE "crt/crt_rules.inc"
 	org    ROM_Start
 
 	jp	start
@@ -146,8 +150,8 @@ filler3:
 
 start:
 ; Make room for the atexit() stack
-	ld	hl,Stack_Top-64
-	ld	sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 ; Clear static memory
 	ld	hl,RAM_Start
 	ld	de,RAM_Start+1

@@ -12,6 +12,10 @@
 
 	INCLUDE	"shellapi.def"
 
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
+
 	org	shell_loadaddr-shell_headerlen
 
 header_start:
@@ -38,9 +42,9 @@ start:
 	ld	de,(shell_cmdaddr)
 	add	hl,de
 	ld	(hl),0		; terminate command line
-	ld	hl,-100		; atexit stack (64) + argv space
-	add	hl,sp
-	ld      sp,hl
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
+	call	crt0_init_bss
 	ld      (exitsp),sp	
 
 ; Optional definition for auto MALLOC init

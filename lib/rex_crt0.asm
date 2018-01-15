@@ -35,6 +35,10 @@ ENDIF
 ; Main code starts here
 ;--------
 
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = 65535
+        INCLUDE "crt/crt_rules.inc"
+
         org    $8000
 
 		
@@ -51,14 +55,8 @@ lib:
 	push	hl
 	jp	_LibMain
 start:
-; Make room for the atexit() stack
-	ld	hl,65535-64	;Initialise sp
-	ld	sp,hl
-	ld	hl,$f033	;Clear static memory
-	ld	de,$f034
-	ld	bc,$ffff-$f033
-	ld	(hl),0
-	ldir
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp	;Store atexit() stack
 ; Entry to the user code
@@ -78,16 +76,10 @@ farret:				;Used for farcall logic
 ELSE
 
 start:
-; Make room for the atexit() stack
-	ld	hl,65535-64	;Initialise sp
-	ld	sp,hl
-	ld	hl,$f033	;Clear static memory
-	ld	de,$f034
-	ld	bc,$ffff-$f033
-	ld	(hl),0
-	ldir
-        ld      (exitsp),sp	;Store atexit() stack
+        INCLUDE "crt/crt_init_sp.asm"
+        INCLUDE "crt/crt_init_atexit.asm"
 	call	crt0_init_bss
+        ld      (exitsp),sp	;Store atexit() stack
 ; Entry to the user code
         call    _main		;Call the users code
 cleanup:

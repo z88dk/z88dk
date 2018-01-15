@@ -59,7 +59,11 @@ ELSE
         ENDIF
 ENDIF
 
-org CRT_ORG_CODE
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
+        INCLUDE "crt/crt_rules.inc"
+
+	org CRT_ORG_CODE
 
 ;----------------------
 ; Execution starts here
@@ -86,12 +90,9 @@ begin:
 ENDIF
 ENDIF
 
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+        ld      (start1+1),sp
+	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
@@ -181,6 +182,10 @@ ELSE
 	PUBLIC	l_dcal	; jp(hl) instruction
 	PUBLIC cleanup
 
+        defc    TAR__clib_exit_stack_size = 0
+        defc    TAR__register_sp = -0xfc4a
+        INCLUDE "crt/crt_rules.inc"
+
 ;
 ;  Main Code Entrance Point
 ;
@@ -198,7 +203,7 @@ ENDIF
 
 start:
 	di
-	ld sp, ($FC4A)
+	INCLUDE	"crt/crt_init_sp.asm"
 	ei
 
 ; port fixing; required for ROMs
@@ -214,6 +219,7 @@ start:
 	or d
 	out ($A8),a
 
+	INCLUDE	"crt/crt_init_atexit.asm"
 	call	crt0_init_bss
         
 IF (HEAPSIZE > 4)
