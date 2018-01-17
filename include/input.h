@@ -74,19 +74,12 @@
  *   Reserved variable (don't alter, only declare).
  *
  * A tick in this context is the rate at which in_GetKey() is called.
- *
- * Declaring these C variables statically will cause them to
- * be compiled as part of the final binary.  Alternatively (required
- * if the final binary is to be ROMable) the locations of these
- * variables in RAM can be specified using special extern syntax.
- *
- *  Example:
- *
- *  extern char in_KeyDebounce(50000);
- *  extern char in_KeyStartRepeat(50001);
- *  extern char in_KeyRepeatPeriod(50002);
- *  extern int  in_KbdState(50003);
  */
+
+extern char in_KeyDebounce;
+extern char in_KeyStartRepeat;
+extern char in_KeyRepeatPeriod;
+extern int  in_KbdState;
 
 extern uint __LIB__ in_GetKey(void);
 extern void __LIB__ in_GetKeyReset(void);
