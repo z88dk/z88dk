@@ -143,7 +143,7 @@ init_continue:			;We had enough memory
 IF DEFINED_USING_amalloc
 crt0_reqpag_check1:
 	ld	hl,0		; reqpag  address
-	INCLUDE "amalloc.def"
+	INCLUDE "crt/crt_init_amalloc.asm"
 ENDIF
 IF DEFINED_farheapsz
 	call	init_far	;Initialise far memory if required

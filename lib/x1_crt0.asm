@@ -123,7 +123,7 @@ ENDIF
 IF DEFINED_USING_amalloc
 	ld	hl,0
 	add	hl,sp
-	INCLUDE "amalloc.def"
+	INCLUDE "crt/crt_init_amalloc.asm"
 ENDIF
 
         call    _main

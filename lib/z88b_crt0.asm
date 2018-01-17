@@ -58,7 +58,7 @@ start:
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
 	ld	hl,(start1+1)
-	INCLUDE "amalloc.def"
+	INCLUDE "crt/crt_init_amalloc.asm"
 ENDIF
 
         call    doerrhan	;Initialise a laughable error handler

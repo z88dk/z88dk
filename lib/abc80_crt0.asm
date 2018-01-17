@@ -48,7 +48,7 @@ start:
 
 
 IF DEFINED_USING_amalloc
-	INCLUDE "amalloc.def"
+	INCLUDE "crt/crt_init_amalloc.asm"
 ENDIF
 
         call    _main

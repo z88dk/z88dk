@@ -107,7 +107,7 @@ ENDIF
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-    INCLUDE "amalloc.def"
+    INCLUDE "crt/crt_init_amalloc.asm"
 ENDIF
 	ld	a,(argv_length)
 	and	a

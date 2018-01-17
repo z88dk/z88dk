@@ -52,7 +52,7 @@ start:
 
 
 IF DEFINED_USING_amalloc
-	INCLUDE "amalloc.def"
+	INCLUDE "crt/crt_init_amalloc.asm"
 ENDIF
 
 	;ld a,65	; (Debugging:  print 'A' char)
