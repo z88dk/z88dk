@@ -21,7 +21,7 @@ IF FORmsx
         INCLUDE "msxbasic.def"
 		EXTERN	msxbasic
 ELSE
-        INCLUDE "svibasic.def"
+        INCLUDE "arch/svi/def/svibasic.def"
 		EXTERN	msxbios
 ENDIF
 

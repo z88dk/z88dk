@@ -17,7 +17,7 @@
 IF FORmsx
         INCLUDE "msxbasic.def"
 ELSE
-        INCLUDE "svibasic.def"
+        INCLUDE "arch/svi/def/svibasic.def"
 ENDIF
 
 msx_screenmode:

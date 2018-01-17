@@ -18,7 +18,7 @@
 IF FORmsx
         INCLUDE "msxbios.def"
 ELSE
-        INCLUDE "svibios.def"
+        INCLUDE "arch/svi/def/svibios.def"
 ENDIF
 
 

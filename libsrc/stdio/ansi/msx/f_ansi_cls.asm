@@ -23,8 +23,8 @@ IF FORmsx
         INCLUDE "msxbios.def"
         INCLUDE "msxbasic.def"
 ELSE
-        INCLUDE "svibios.def"
-        INCLUDE "svibasic.def"
+        INCLUDE "arch/svi/def/svibios.def"
+        INCLUDE "arch/svi/def/svibasic.def"
 ENDIF
 
 EXTERN	clg

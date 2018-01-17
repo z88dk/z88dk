@@ -13,7 +13,7 @@
 	PUBLIC	LDIRVM
 	PUBLIC	_LDIRVM
 	
-        INCLUDE "svi.def"
+        INCLUDE "arch/svi/def/svi.def"
 	
 LDIRVM:
 _LDIRVM:

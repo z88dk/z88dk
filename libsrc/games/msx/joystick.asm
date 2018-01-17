@@ -13,8 +13,8 @@
 IF FORmsx
         INCLUDE "msx.def"
 ELSE
-        INCLUDE "svi.def"
-        INCLUDE "svibios.def"
+        INCLUDE "arch/svi/def/svi.def"
+        INCLUDE "arch/svi/def/svibios.def"
         EXTERN	svi_kbdstick
 ENDIF
 
