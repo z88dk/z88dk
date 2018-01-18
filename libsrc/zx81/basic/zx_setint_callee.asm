@@ -17,9 +17,9 @@ PUBLIC 	ASMDISP_ZX_SETINT_CALLEE
 EXTERN	zx_locatenum
 
 IF FORlambda
-	INCLUDE  "lambdafp.def"
+	INCLUDE  "arch/lambda/def/lambdafp.def"
 ELSE
-	INCLUDE  "81fp.def"
+	INCLUDE  "arch/zx81/def/81fp.def"
 ENDIF
 
 zx_setint_callee:

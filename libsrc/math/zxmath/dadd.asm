@@ -12,10 +12,10 @@ IF FORzx
 		INCLUDE  "arch/zx/def/zxfp.def"
 ENDIF
 IF FORzx81
-		INCLUDE  "81fp.def"
+		INCLUDE  "arch/zx81/def/81fp.def"
 ENDIF
 IF FORlambda
-		INCLUDE  "lambdafp.def"
+		INCLUDE  "arch/lambda/def/lambdafp.def"
 ENDIF
 
                 SECTION  code_fp

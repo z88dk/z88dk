@@ -17,9 +17,9 @@ EXTERN	zx_locatenum
 EXTERN	fa
 
 IF FORlambda
-	INCLUDE  "lambdafp.def"
+	INCLUDE  "arch/lambda/def/lambdafp.def"
 ELSE
-	INCLUDE  "81fp.def"
+	INCLUDE  "arch/zx81/def/81fp.def"
 ENDIF
 
 ; hl = char *variable
