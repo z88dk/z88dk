@@ -19,8 +19,8 @@
 	
 
 IF FORmsx
-        INCLUDE "msxbios.def"
-        INCLUDE "msx.def"
+        INCLUDE "arch/msx/def/msxbios.def"
+        INCLUDE "arch/msx/def/msx.def"
 ELSE
         INCLUDE "arch/svi/def/svibios.def"
         INCLUDE "arch/svi/def/svi.def"

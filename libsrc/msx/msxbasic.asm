@@ -13,7 +13,7 @@
 	PUBLIC	_msxbasic
 	EXTERN	msxrompage
 
-	INCLUDE "msxbios.def"
+	INCLUDE "arch/msx/def/msxbios.def"
 
 msxbasic:
 _msxbasic:

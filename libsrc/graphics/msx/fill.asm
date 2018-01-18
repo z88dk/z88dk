@@ -18,7 +18,7 @@
 	EXTERN	msxextrom
 
 IF FORmsx
-        INCLUDE "msxbasic.def"
+        INCLUDE "arch/msx/def/msxbasic.def"
 		EXTERN	msxbasic
 ELSE
         INCLUDE "arch/svi/def/svibasic.def"

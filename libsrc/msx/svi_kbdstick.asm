@@ -14,7 +14,7 @@
 	PUBLIC _svi_kbdstick
 	
 IF FORmsx
-        INCLUDE "msx.def"
+        INCLUDE "arch/msx/def/msx.def"
 ELSE
         INCLUDE "arch/svi/def/svi.def"
 ENDIF

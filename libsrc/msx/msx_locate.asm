@@ -20,7 +20,7 @@
 	EXTERN	msxbios
 
 IF FORmsx
-        INCLUDE "msxbios.def"
+        INCLUDE "arch/msx/def/msxbios.def"
 ELSE
         INCLUDE "arch/svi/def/svibios.def"
 ENDIF

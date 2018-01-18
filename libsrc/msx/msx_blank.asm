@@ -14,7 +14,7 @@
 	PUBLIC	_msx_blank
 	EXTERN	msxbios
 	
-        INCLUDE "msxbios.def"
+        INCLUDE "arch/msx/def/msxbios.def"
 
 msx_blank:
 _msx_blank:

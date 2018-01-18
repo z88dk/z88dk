@@ -16,7 +16,7 @@
 	
 IF FORmsx
 		EXTERN     msxbios
-        INCLUDE "msxbios.def"
+        INCLUDE "arch/msx/def/msxbios.def"
 ELSE
 IF FORsvi
 		EXTERN     msxbios

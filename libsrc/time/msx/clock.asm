@@ -12,8 +12,8 @@
 	PUBLIC	_clock
 
 IF FORmsx
-        INCLUDE "msxbios.def"
-        INCLUDE "msxbasic.def"
+        INCLUDE "arch/msx/def/msxbios.def"
+        INCLUDE "arch/msx/def/msxbasic.def"
 ELSE
         INCLUDE "arch/svi/def/svibios.def"
         INCLUDE "arch/svi/def/svibasic.def"

@@ -18,7 +18,7 @@
 
 
 IF FORmsx
-        INCLUDE "msxbasic.def"
+        INCLUDE "arch/msx/def/msxbasic.def"
 ELSE
         INCLUDE "arch/svi/def/svibasic.def"
 ENDIF
