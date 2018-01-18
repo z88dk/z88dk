@@ -10,7 +10,7 @@
 	PUBLIC	fputc_cons_native
 	EXTERN	msxbios
 
-	INCLUDE "m5bios.def"
+	INCLUDE "arch/m5/def/m5bios.def"
 
 .fputc_cons_native
 	ld	hl,2

@@ -14,7 +14,7 @@
 	PUBLIC	_fgetc_cons
 	EXTERN	msxbios
 
-	INCLUDE "m5bios.def"
+	INCLUDE "arch/m5/def/m5bios.def"
 
 .fgetc_cons
 ._fgetc_cons
