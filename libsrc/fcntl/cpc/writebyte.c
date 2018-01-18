@@ -19,7 +19,7 @@ int writebyte(int fd, int byte)
 	if ( fd != 1 )		/* Check to see if this is the write file */
 		return EOF;
 #asm
-        INCLUDE "cpcfirm.def"
+        INCLUDE "arch/cpc/def/cpcfirm.def"
 	pop	    bc
 	pop	    hl	;byte
 	pop	    de	;file handle (ignore it)

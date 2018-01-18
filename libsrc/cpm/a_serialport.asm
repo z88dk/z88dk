@@ -15,7 +15,7 @@
    PUBLIC   _a_serialport
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"arch/cpc/def/amstrad_userf.def"
 
 a_serialport:
 _a_serialport:

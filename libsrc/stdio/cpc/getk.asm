@@ -13,7 +13,7 @@
         PUBLIC	getk
         PUBLIC	_getk
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "arch/cpc/def/cpcfirm.def"
 
 
 .getk

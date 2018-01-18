@@ -12,7 +12,7 @@
         SECTION code_clib
         PUBLIC	ansi_cls
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "arch/cpc/def/cpcfirm.def"
 
  .ansi_cls	
 	;ld	a,0	; 20x25x16 text mode

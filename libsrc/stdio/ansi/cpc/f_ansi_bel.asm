@@ -13,7 +13,7 @@
         SECTION code_clib
         PUBLIC	ansi_BEL
 
-    INCLUDE "cpcfirm.def"
+    INCLUDE "arch/cpc/def/cpcfirm.def"
 
         EXTERN    firmware
 

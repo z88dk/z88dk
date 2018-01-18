@@ -12,7 +12,7 @@
 int cpc_openin(char *name, int len, char *buf)
 {
 #asm
-	INCLUDE		"cpcfirm.def"
+	INCLUDE		"arch/cpc/def/cpcfirm.def"
 	EXTERN	cpc_setup_open
 	call	cpc_setup_open
     call	firmware

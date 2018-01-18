@@ -15,7 +15,7 @@
         
         EXTERN firmware
 
-        INCLUDE "cpcfirm.def"              
+        INCLUDE "arch/cpc/def/cpcfirm.def"              
 
 
 .cpc_SetMode

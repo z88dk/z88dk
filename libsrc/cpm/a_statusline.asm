@@ -15,7 +15,7 @@
    PUBLIC    _a_statusline
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"arch/cpc/def/amstrad_userf.def"
 
 a_statusline:
 _a_statusline:

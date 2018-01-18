@@ -10,7 +10,7 @@
         PUBLIC    joystick
         PUBLIC    _joystick
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "arch/cpc/def/cpcfirm.def"
 
 .joystick
 ._joystick

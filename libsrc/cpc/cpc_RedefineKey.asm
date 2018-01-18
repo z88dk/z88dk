@@ -16,7 +16,7 @@
         ;EXTERN cpc_KeysData
         EXTERN tabla_teclas
 
-        INCLUDE "cpcfirm.def"              
+        INCLUDE "arch/cpc/def/cpcfirm.def"              
 
 
 .cpc_RedefineKey

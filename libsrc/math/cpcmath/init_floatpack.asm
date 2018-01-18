@@ -7,7 +7,7 @@
 ;
 
                 SECTION         code_fp
-		INCLUDE		"cpcfp.def"
+		INCLUDE		"arch/cpc/def/cpcfp.def"
 
 		PUBLIC		init_floatpack
 

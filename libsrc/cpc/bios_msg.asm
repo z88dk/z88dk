@@ -11,7 +11,7 @@
         PUBLIC    bios_msg
         PUBLIC    _bios_msg
 
-        INCLUDE "cpcfirm.def"              
+        INCLUDE "arch/cpc/def/cpcfirm.def"              
 
 
 .bios_msg

@@ -13,7 +13,7 @@
 	SECTION	code_clib
         PUBLIC	fputc_cons_native
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "arch/cpc/def/cpcfirm.def"
         
 
 .fputc_cons_native
