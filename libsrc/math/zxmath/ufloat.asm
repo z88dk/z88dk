@@ -14,7 +14,7 @@
 ;
 
 IF FORzx
-		INCLUDE  "zxfp.def"
+		INCLUDE  "arch/zx/def/zxfp.def"
 ENDIF
 IF FORzx81
 		INCLUDE  "81fp.def"

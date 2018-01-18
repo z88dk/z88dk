@@ -14,7 +14,7 @@
 	PUBLIC	mmc_fastpage
 	PUBLIC	_mmc_fastpage
 	
-	INCLUDE "zxmmc.def"
+	INCLUDE "arch/zx/def/zxmmc.def"
 
 	
 mmc_fastpage:

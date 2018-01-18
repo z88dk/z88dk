@@ -14,7 +14,7 @@
 	SECTION code_clib
 	PUBLIC	zx_zxmmc
 	PUBLIC	_zx_zxmmc
-	INCLUDE "zxmmc.def"
+	INCLUDE "arch/zx/def/zxmmc.def"
 
 fast_save:	defb	0
 	

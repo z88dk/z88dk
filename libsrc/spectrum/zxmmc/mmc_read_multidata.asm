@@ -39,7 +39,7 @@
 
 	EXTERN   __mmc_card_select
 
-	INCLUDE "zxmmc.def"
+	INCLUDE "arch/zx/def/zxmmc.def"
 
 	defc USE_INI = 1	; 1 = code unrolling for maximum SD-CARD SPI port throughput
 						; 0 = slower but a little smaller
