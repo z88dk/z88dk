@@ -12,7 +12,7 @@
 		PUBLIC	fdgetpos
       PUBLIC   _fdgetpos
 
-		INCLUDE "p3dos.def"
+		INCLUDE "arch/zx/def/p3dos.def"
 
 		EXTERN	l_plong
 

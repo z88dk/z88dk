@@ -14,7 +14,7 @@
 		PUBLIC	remove
       PUBLIC   _remove
 		EXTERN	dodos
-		INCLUDE	"p3dos.def"
+		INCLUDE	"arch/zx/def/p3dos.def"
 
 
 .remove

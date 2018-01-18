@@ -11,7 +11,7 @@
 		PUBLIC	fdtell
       PUBLIC   _fdtell
 
-	        INCLUDE "p3dos.def"
+	        INCLUDE "arch/zx/def/p3dos.def"
 
 		EXTERN	dodos
 

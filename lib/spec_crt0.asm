@@ -224,7 +224,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ; Some +3 stuff - this needs to be below 49152
 ;---------------------------------------------
 IF DEFINED_NEEDresidos
-        INCLUDE "idedos.def"
+        INCLUDE "arch/zx/def/idedos.def"
 
         defc    ERR_NR=$5c3a            ; BASIC system variables
         defc    ERR_SP=$5c3d
