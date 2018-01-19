@@ -7,7 +7,7 @@
 	module test_crt0
 	org	  0x0000
 
-	INCLUDE	"test_cmds.def"
+	INCLUDE	"arch/test/def/test_cmds.def"
 
 ;--------
 ; Include zcc_opt.def to find out some info

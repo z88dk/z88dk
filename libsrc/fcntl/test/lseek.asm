@@ -3,7 +3,7 @@
         SECTION code_clib
 
 
-	INCLUDE "test_cmds.def"
+	INCLUDE "arch/test/def/test_cmds.def"
 
 	PUBLIC	lseek
 	PUBLIC	_lseek

@@ -7,7 +7,7 @@
 		PUBLIC	time
 		PUBLIC	_time
 
-		INCLUDE	"test_cmds.def"
+		INCLUDE	"arch/test/def/test_cmds.def"
 
 .time
 ._time

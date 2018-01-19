@@ -4,7 +4,7 @@
 ;
 
                 SECTION code_clib
-		INCLUDE	"test_cmds.def"
+		INCLUDE	"arch/test/def/test_cmds.def"
 
 		PUBLIC	read
 		PUBLIC	_read

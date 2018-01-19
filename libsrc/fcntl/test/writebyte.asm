@@ -5,7 +5,7 @@
 
                 SECTION code_clib
 
-		INCLUDE	"test_cmds.def"
+		INCLUDE	"arch/test/def/test_cmds.def"
 		PUBLIC	writebyte
 		PUBLIC	_writebyte
 
