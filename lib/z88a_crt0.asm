@@ -50,7 +50,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -135,15 +135,15 @@ init_continue:			;We had enough memory
         ld      hl,clrscr2
         call_oz(gn_sop)
 	
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
 IF DEFINED_USING_amalloc
 crt0_reqpag_check1:
 	ld	hl,0		; reqpag  address
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 IF DEFINED_farheapsz
 	call	init_far	;Initialise far memory if required
@@ -255,7 +255,7 @@ ENDIF
 ;--------
 ; Which printf core routine do we need?
 ;--------
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 ;-------
 ; Text to define the BASIC style window
@@ -311,7 +311,7 @@ ENDIF
 IF CRT_Z88_SAFEDATA = 0
         defc __crt_org_bss_fardata_start = 8192
 ENDIF
-        INCLUDE "crt0_section.asm"
+        INCLUDE "crt/classic/crt_section.asm"
 
 	SECTION bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

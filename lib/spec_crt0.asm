@@ -59,7 +59,7 @@
 
 	defc	DEF__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
-	INCLUDE	"crt/crt_rules.inc"
+	INCLUDE	"crt/classic/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -88,8 +88,8 @@ endif
 
 init:
         im      1
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
         ld      a,@111000       ; White PAPER, black INK
         call    zx_internal_cls
         ld      (hl),0
@@ -105,8 +105,8 @@ ELSE
   IF !DEFINED_ZXVGS
         ld      (start1+1),sp   ; Save entry stack
   ENDIF
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 ; Optional definition for auto MALLOC init; it takes
@@ -218,7 +218,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 ; Runtime selection
 
-	INCLUDE	"crt0_runtime_selection.asm"
+	INCLUDE	"crt/classic/crt_runtime_selection.asm"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
@@ -379,7 +379,7 @@ IF DEFINED_CRT_ORG_BSS
 	defc	__crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-	INCLUDE	"crt0_section.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 	SECTION	code_crt_init
         ld      a,@111000       ; White PAPER, black INK

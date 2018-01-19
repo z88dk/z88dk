@@ -34,7 +34,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 
 IF (startup=2)
@@ -76,8 +76,8 @@ ENDIF
 start:
 		;Entry point at $c2220
         ld      (start1+1),sp   ;Save entry stack
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
@@ -119,6 +119,6 @@ start1:
 
 l_dcal:	jp	(hl)
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 	UNDEFINE DEFINED_USING_amalloc
-        INCLUDE "crt0_section.asm"
+        INCLUDE "crt/classic/crt_section.asm"

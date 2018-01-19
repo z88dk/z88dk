@@ -24,7 +24,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -0x1ffe	; oz safe place
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 
         org $2300
@@ -48,8 +48,8 @@ bas_last:
 ;-----------
 start:
 	ld	(start1+1),sp	;Save starting stack
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss
         ld      (exitsp),sp
 
@@ -58,7 +58,7 @@ start:
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
 	ld	hl,(start1+1)
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
         call    doerrhan	;Initialise a laughable error handler
@@ -117,7 +117,7 @@ errescpressed:
 
 
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 ; We can't use far stuff with BASIC cos of paging issues so
 ; We assume all data is in fact near, so this is a dummy fn
@@ -136,7 +136,7 @@ _cpfar2near:
 	ret
 
 
-        INCLUDE "crt0_section.asm"
+        INCLUDE "crt/classic/crt_section.asm"
 
         SECTION  bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...

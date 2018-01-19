@@ -141,8 +141,8 @@ l_dcal:
 	  defc __crt_model = 1
 	ENDIF
 
-	INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE "crt0_section.asm"
+	INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 
 
 SECTION bss_crt

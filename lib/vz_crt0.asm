@@ -45,7 +45,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 
 	org     CRT_ORG_CODE-24
@@ -96,8 +96,8 @@ ENDIF
 
 start:
 	ld	(start1+1),sp
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld	(exitsp),sp
 
@@ -105,7 +105,7 @@ start:
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 	IF DEFINED_USING_amalloc
-		INCLUDE "crt/crt_init_amalloc.asm"
+		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
 
         call    _main
@@ -131,9 +131,9 @@ l_dcal:
 	defm  "Small C+ VZ"
 	defb   0
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	INCLUDE "crt0_section.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 
 
 	SECTION	code_crt_init

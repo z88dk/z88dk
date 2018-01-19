@@ -60,7 +60,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 0	; 0 = autodetect
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 	org     CRT_ORG_CODE
 
@@ -292,13 +292,13 @@ ENDIF
         ;out     ($80),a
         ;call    $c021      ; setup text page (ptr in HL)
        
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm" 
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm" 
 	call	crt0_init_bss
 	ld	(exitsp),sp
 		
 IF DEFINED_USING_amalloc
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 		
 
@@ -536,8 +536,8 @@ IF DEFINED_CRT_ORG_BSS
 ENDIF
 
 
-	INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE	"crt0_section.asm"
+	INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 	
 	SECTION	bss_crt

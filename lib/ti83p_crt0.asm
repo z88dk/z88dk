@@ -43,7 +43,7 @@
 
         defc    TAR__clib_exit_stack_size = 3
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 	
 ;-----------------------------
 ;2 - MirageOS without quit key
@@ -157,13 +157,13 @@ IF DEFINED_GimmeSpeed
 	defw	SetExSpeed	;
 ENDIF				;
 	ld	(start1+1),sp	;
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss
         ld      (exitsp),sp
 
 IF DEFINED_USING_amalloc
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
 
@@ -271,8 +271,8 @@ ENDIF
 			 defc ansicolumns = 32
 		ENDIF
 		
-        INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE	"crt0_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 	SECTION	code_crt_init
 	ld	hl,plotSScreen

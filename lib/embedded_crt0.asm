@@ -40,15 +40,15 @@ ENDIF
 	
 	defc	TAR__register_sp = Stack_Top
         defc    TAR__clib_exit_stack_size = 32
-	INCLUDE	"crt/crt_rules.inc"
+	INCLUDE	"crt/classic/crt_rules.inc"
 
 	org    	CRT_ORG_CODE
 
 	jp	start
 start:
 ; Make room for the atexit() stack
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
@@ -71,7 +71,7 @@ l_dcal:
 	jp      (hl)
 
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
@@ -79,4 +79,4 @@ l_dcal:
         ELSE
             defc __crt_model = 1
         ENDIF
-	INCLUDE	"crt0_section.asm"
+	INCLUDE	"crt/classic/crt_section.asm"

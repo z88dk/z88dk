@@ -57,7 +57,7 @@
 
         defc    TAR__register_sp = Stack_Top
         defc    TAR__clib_exit_stack_size = 32
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 	org    ROM_Start
 
 	jp	start
@@ -150,8 +150,8 @@ filler3:
 
 start:
 ; Make room for the atexit() stack
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 ; Clear static memory
 	ld	hl,RAM_Start
 	ld	de,RAM_Start+1
@@ -236,7 +236,7 @@ _Data:
 _End:
 	
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 	defc __crt_org_bss = RAM_Start
         ; If we were given a model then use it
@@ -245,7 +245,7 @@ _End:
         ELSE
             defc __crt_model = 1
         ENDIF
-	INCLUDE	"crt0_section.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 
 

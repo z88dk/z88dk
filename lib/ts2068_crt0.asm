@@ -53,7 +53,7 @@
 
 	defc	DEF__register_sp = CRT_ORG_CODE - 1
         defc    TAR__clib_exit_stack_size = 32
-	INCLUDE "crt/crt_rules.inc"
+	INCLUDE "crt/classic/crt_rules.inc"
         org     CRT_ORG_CODE
 
 
@@ -62,8 +62,8 @@ start:
 IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
 ENDIF
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
         exx
         ld	(hl1save + 1),hl
 	call	crt0_init_bss
@@ -343,8 +343,8 @@ call_extrom_exit:
 	defm	"Small C+ ZX"	;Unnecessary file signature
 	defb	0
 
-	INCLUDE	"crt0_runtime_selection.asm"
-        INCLUDE "crt0_section.asm"
+	INCLUDE	"crt/classic/crt_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_section.asm"
 
         SECTION bss_crt
 

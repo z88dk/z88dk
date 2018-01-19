@@ -96,7 +96,7 @@ ENDIF
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65536 - 6
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 
 IF ((CRT_ORG_CODE = $5000) | (!DEFINED_osca_bank))
@@ -124,8 +124,8 @@ start:
 	ld	c,l
 
         ld      (start1+1),sp
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	push	bc		
 	call	crt0_init_bss
 	pop	bc
@@ -136,7 +136,7 @@ start:
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
 IF (!DEFINED_osca_notimer)
@@ -182,7 +182,7 @@ find_end:
 	jr	nz,find_end
 	dec	hl
 
-	INCLUDE "crt0_command_line.asm"
+	INCLUDE "crt/classic/crt_command_line.asm"
 
         push    hl      ;argv
         push    bc      ;argc
@@ -345,8 +345,8 @@ current_asciicode	ds.b 1
 
 ;--------------------------------------------------------------------------------------------
 
-        INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE "crt0_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 
 	SECTION  code_crt_init
 	ld	hl,$2000

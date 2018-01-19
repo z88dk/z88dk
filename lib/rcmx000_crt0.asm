@@ -78,7 +78,7 @@ acme:	defw 4711 			; useless arbitrarily choosen number
 	defm  "Small C+ RCM2/3000",0	;Unnecessary file signature
 
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	INCLUDE "crt0_section.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 

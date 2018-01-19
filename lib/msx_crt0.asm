@@ -61,7 +61,7 @@ ENDIF
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 	org CRT_ORG_CODE
 
@@ -91,8 +91,8 @@ ENDIF
 ENDIF
 
         ld      (start1+1),sp
-	INCLUDE	"crt/crt_init_sp.asm"
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
@@ -100,7 +100,7 @@ ENDIF
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 	IF DEFINED_USING_amalloc
-		INCLUDE "crt/crt_init_amalloc.asm"
+		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
 
 ; ** IF MSXDOS mode, handle argv, argc... **
@@ -117,7 +117,7 @@ IF (startup=2)
         jr      z,argv_done
         ld      c,a
         add     hl,bc   ;now points to the end of the command line
-	INCLUDE	"crt0_command_line.asm"
+	INCLUDE	"crt/classic/crt_command_line.asm"
 
         push    hl      ;argv
         push    bc      ;argc
@@ -184,7 +184,7 @@ ELSE
 
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -0xfc4a
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 ;
 ;  Main Code Entrance Point
@@ -203,7 +203,7 @@ ENDIF
 
 start:
 	di
-	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
 	ei
 
 ; port fixing; required for ROMs
@@ -219,7 +219,7 @@ start:
 	or d
 	out ($A8),a
 
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         
 IF (HEAPSIZE > 4)
@@ -281,8 +281,8 @@ msxbios:
 	defm	"Small C+ MSX"
 end:	defb	0
 
-	INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE "crt0_section.asm"
+	INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 
 ; ---------------
 ; MSX specific stuff

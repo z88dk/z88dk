@@ -36,21 +36,21 @@ ENDIF
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
 
 start:
         ld      (start1+1),sp   ;Save entry stack
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
 
 IF DEFINED_USING_amalloc
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
         
 IF (startup=2)
@@ -128,6 +128,6 @@ nbclockptr:	defb	$52	; paged system clock counter
 ENDIF
 
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-        INCLUDE "crt0_section.asm"
+        INCLUDE "crt/classic/crt_section.asm"

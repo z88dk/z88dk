@@ -28,7 +28,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65280
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 
 if (ASMPC<>$0000)
@@ -96,8 +96,8 @@ restart30:
 	ret
 
 program:
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss
 	ld	(exitsp),sp
 IF !__CPU_R2K__
@@ -107,7 +107,7 @@ ENDIF
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-    INCLUDE "crt/crt_init_amalloc.asm"
+    INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 	ld	a,(argv_length)
 	and	a
@@ -117,7 +117,7 @@ ENDIF
 	ld	hl,argv_start
 	add	hl,bc	; now points to end of the command line
 	defc DEFINED_noredir = 1
-	INCLUDE "crt0_command_line.asm"
+	INCLUDE "crt/classic/crt_command_line.asm"
 	push	hl	;argv
 	push	bc	;argc
 	call	_main
@@ -132,9 +132,9 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-	INCLUDE "crt0_runtime_selection.asm" 
+	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
-	INCLUDE	"crt0_section.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 	SECTION rodata_clib
 end:            defb    0               ; null file name

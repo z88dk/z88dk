@@ -37,7 +37,7 @@ ENDIF
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65535
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
         org    $8000
 
@@ -55,8 +55,8 @@ lib:
 	push	hl
 	jp	_LibMain
 start:
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp	;Store atexit() stack
 ; Entry to the user code
@@ -76,8 +76,8 @@ farret:				;Used for farcall logic
 ELSE
 
 start:
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp	;Store atexit() stack
 ; Entry to the user code
@@ -93,8 +93,8 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 ENDIF
 
 
-;	INCLUDE	"crt0_runtime_selection.asm"
+;	INCLUDE	"crt/classic/crt_runtime_selection.asm"
 	defc	__crt_org_bss = $f033
-	INCLUDE	"crt0_section.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 

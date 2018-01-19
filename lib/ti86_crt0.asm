@@ -42,7 +42,7 @@
 
         defc    TAR__clib_exit_stack_size = 3
         defc    TAR__register_sp = -1
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
 ;-----------------------------
 ;2 - ASE, Rascal, emanon, etc.
@@ -207,8 +207,8 @@ ENDIF
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
-        INCLUDE "crt/crt_init_sp.asm"
-        INCLUDE "crt/crt_init_atexit.asm"
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss
         ld      (exitsp),sp
 
@@ -216,7 +216,7 @@ ENDIF
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 	IF DEFINED_USING_amalloc
-		INCLUDE "crt/crt_init_amalloc.asm"
+		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
 
 
@@ -292,8 +292,8 @@ l_dcal:
 			 defc ansicolumns = 32
 		ENDIF
 
-        INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE "crt0_section.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 
 	SECTION bss_crt
 hl1save: defw	0

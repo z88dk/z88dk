@@ -42,7 +42,7 @@
         ENDIF
 
         defc    TAR__clib_exit_stack_size = 32
-        INCLUDE "crt/crt_rules.inc"
+        INCLUDE "crt/classic/crt_rules.inc"
 
         org     CRT_ORG_CODE
 
@@ -58,7 +58,7 @@ IF (!DEFINED_startup | (startup=1))
 if (CRT_ORG_CODE > 0)
         defs    ZORG_NOT_ZERO
 endif
-	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
 	im 1
 	ei
 ENDIF
@@ -70,7 +70,7 @@ if (CRT_ORG_CODE < 32768)
         defs    ZORG_TOO_LOW
 endif
 
-	INCLUDE	"crt/crt_init_sp.asm"
+	INCLUDE	"crt/classic/crt_init_sp.asm"
 
 	; re-activate IPL
 	ld bc,$1D00
@@ -112,7 +112,7 @@ ENDIF
 ;	EXTERN _x1_cls
 ;	call _x1_cls
 ;ENDIF
-	INCLUDE	"crt/crt_init_atexit.asm"
+	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
 
 ; INIT math identify platform
@@ -123,7 +123,7 @@ ENDIF
 IF DEFINED_USING_amalloc
 	ld	hl,0
 	add	hl,sp
-	INCLUDE "crt/crt_init_amalloc.asm"
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
         call    _main
@@ -205,9 +205,9 @@ _wait_sub_cpu:
 		 defc ansicolumns = 40
 	ENDIF
 
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	INCLUDE	"crt0_section.asm"
+	INCLUDE	"crt/classic/crt_section.asm"
 
 
 	SECTION	code_crt_init
