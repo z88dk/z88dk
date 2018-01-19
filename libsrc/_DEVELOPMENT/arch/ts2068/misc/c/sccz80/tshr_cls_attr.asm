@@ -3,8 +3,8 @@
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC tshr_cls_attr_fastcall
+PUBLIC tshr_cls_attr
 
 EXTERN asm_tshr_cls_attr
 
-defc tshr_cls_attr_fastcall = asm_tshr_cls_attr
+defc tshr_cls_attr = asm_tshr_cls_attr
