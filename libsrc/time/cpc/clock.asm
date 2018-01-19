@@ -17,7 +17,7 @@
 	PUBLIC	clock
 	PUBLIC	_clock
 
-	INCLUDE "cpcfirm.def"
+	INCLUDE "arch/cpc/def/cpcfirm.def"
 	
 	
 .clock
