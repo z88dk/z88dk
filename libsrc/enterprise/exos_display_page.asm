@@ -12,7 +12,7 @@
 	PUBLIC	exos_display_page
 	PUBLIC	_exos_display_page
 
-	INCLUDE "enterprise.def"
+	INCLUDE "arch/enterprise/def/enterprise.def"
 
 
 exos_display_page:

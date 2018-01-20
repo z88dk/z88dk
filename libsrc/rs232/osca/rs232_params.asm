@@ -13,7 +13,7 @@
 		PUBLIC   rs232_params
 		PUBLIC   _rs232_params
 
-		INCLUDE "osca.def"
+		INCLUDE "arch/osca/def/osca.def"
 
 rs232_params:
 _rs232_params:

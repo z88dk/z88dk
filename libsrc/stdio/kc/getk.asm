@@ -13,7 +13,7 @@
 	PUBLIC	getk
 	PUBLIC	_getk
 	
-	INCLUDE  "caos.def"
+	INCLUDE  "arch/kc/def/caos.def"
 
 .getk
 ._getk

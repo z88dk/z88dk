@@ -36,7 +36,7 @@
 ;
 ;
 
-    INCLUDE "flos.def"
+    INCLUDE "arch/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC  file_sector_list

@@ -9,7 +9,7 @@
 ;
 
 
-    INCLUDE "flos.def"
+    INCLUDE "arch/osca/def/flos.def"
 	SECTION code_clib
 	PUBLIC  fputc_cons_native
 	EXTERN  cursor_x

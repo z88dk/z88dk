@@ -16,7 +16,7 @@
 	EXTERN		sd_send_eight_clocks
 	EXTERN	sd_waitserend
 	
-    INCLUDE "osca.def"
+    INCLUDE "arch/osca/def/osca.def"
 
 
 sd_get_byte:

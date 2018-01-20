@@ -11,7 +11,7 @@
 
 
 	PUBLIC	sd_spi_port_fast
-    INCLUDE "osca.def"
+    INCLUDE "arch/osca/def/osca.def"
 
 
 sd_spi_port_fast:

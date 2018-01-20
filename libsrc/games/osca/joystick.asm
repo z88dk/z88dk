@@ -11,8 +11,8 @@
         PUBLIC    joystick
         PUBLIC    _joystick
 
-        INCLUDE "flos.def"
-        INCLUDE "osca.def"
+        INCLUDE "arch/osca/def/flos.def"
+        INCLUDE "arch/osca/def/osca.def"
 
 .joystick
 ._joystick

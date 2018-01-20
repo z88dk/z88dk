@@ -9,7 +9,7 @@
         PUBLIC    joystick
         PUBLIC    _joystick
 
-        INCLUDE "enterprise.def"
+        INCLUDE "arch/enterprise/def/enterprise.def"
 
 .joystick
 ._joystick

@@ -12,7 +12,7 @@
 
 
     INCLUDE "sdcard.def"
-    INCLUDE "osca.def"
+    INCLUDE "arch/osca/def/osca.def"
 
 
 ;--------------------------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 	PUBLIC	exos_reset_font
 	PUBLIC	_exos_reset_font
 
-	INCLUDE "enterprise.def"
+	INCLUDE "arch/enterprise/def/enterprise.def"
 
 exos_reset_font:
 _exos_reset_font:

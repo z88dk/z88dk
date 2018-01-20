@@ -13,7 +13,7 @@
 	PUBLIC	fgetc_cons
 	PUBLIC	_fgetc_cons
 	
-	INCLUDE  "caos.def"
+	INCLUDE  "arch/kc/def/caos.def"
 
 .fgetc_cons
 ._fgetc_cons

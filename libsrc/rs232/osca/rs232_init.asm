@@ -11,7 +11,7 @@
 		PUBLIC   rs232_init
 		PUBLIC   _rs232_init
                 
-		INCLUDE "osca.def"
+		INCLUDE "arch/osca/def/osca.def"
 
 rs232_init:
 _rs232_init:

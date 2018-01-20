@@ -7,7 +7,7 @@
 ;	$Id: change_volume.asm,v 1.3 2016-06-22 22:13:09 dom Exp $
 ;
 
-    INCLUDE "flos.def"
+    INCLUDE "arch/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC  change_volume

@@ -7,7 +7,7 @@
 ;	$Id: parent_dir.asm,v 1.4 2017-01-02 23:35:59 aralbrec Exp $
 ;
 
-    INCLUDE "flos.def"
+    INCLUDE "arch/osca/def/flos.def"
 
 	SECTION code_clib
 	PUBLIC  parent_dir

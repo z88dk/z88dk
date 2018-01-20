@@ -11,7 +11,7 @@
 
 
 	PUBLIC	sd_power_on
-    INCLUDE "osca.def"
+    INCLUDE "arch/osca/def/osca.def"
 
 
 sd_power_on:
