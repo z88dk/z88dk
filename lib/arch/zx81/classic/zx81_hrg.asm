@@ -163,7 +163,7 @@ ELSE
         ld      i,a
         ret
 
-        INCLUDE "zx81_altint_core.def"
+        INCLUDE "arch/zx81/classic/zx81_altint_core.asm"
 ENDIF
 
 ;----------------------------------------------------------------

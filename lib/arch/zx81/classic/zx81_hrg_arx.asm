@@ -140,7 +140,7 @@ nosync:
 
 
 IF !DEFINED_noslowfix
-        INCLUDE "zx81_altint_core.def"
+        INCLUDE "zx81_altint_core.asm"
 ENDIF
         
 

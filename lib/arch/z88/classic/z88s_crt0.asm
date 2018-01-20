@@ -187,7 +187,6 @@ IF DEFINED_farheapsz
         PUBLIC    malloc_table
         PUBLIC    farmemspec
         PUBLIC    pool_table
-        INCLUDE "init_far.asm"
 
 
 ;--------
@@ -297,7 +296,7 @@ ENDIF
 
 IF DEFINED_farheapsz
 	SECTION	crt0_init_bss
-	INCLUDE	"init_far.asm"
+	INCLUDE	"arch/z88/classic/init_far.asm"
 
         SECTION bss_fardata
 	PUBLIC		pool_table
