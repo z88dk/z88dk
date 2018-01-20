@@ -543,8 +543,6 @@ defc __ESXDOS_SYSCALL = 0x08
 defc __ESXDOS_ROMCALL = 0x18
 defc __ESXDOS_AUXCALL = 0x30
 
-defc __NEXTOS_ROMCALL_DOT_ERROR_HOOK = 0x95
-
 defc __ESXDOS_SYS_DISK_STATUS = 128
 defc __ESXDOS_SYS_DISK_READ = 129
 defc __ESXDOS_SYS_DISK_WRITE = 130
@@ -1238,6 +1236,7 @@ defc __NEXTOS_IDE_BASIC = 0x01c0
 defc __NEXTOS_IDE_STREAM_LINEIN = 0x01c3
 defc __NEXTOS_IDE_WINDOW_STRING = 0x01c6
 defc __NEXTOS_IDE_INTEGER_VAR = 0x01c9
+defc __NEXTOS_IDE_RTC = 0x01cc
 
 defc __NEXTOS_DOS_REF_XDPB = 0x0151
 defc __NEXTOS_DOS_MAP_B = 0x0154
@@ -1281,6 +1280,46 @@ defc __NEXTOS_IDE_PARTITION_CLOSE = 0x00d0
 defc __NEXTOS_IDE_PARTITIONS = 0x01a5
 
 defc __NEXTOS_DOTN_SP_DIVMMC = 0x4000
+
+defc __ESX_DISK_FILEMAP = 0x85
+defc __ESX_DISK_STRMSTART = 0x86
+defc __ESX_DISK_STRMEND = 0x87
+
+defc __ESX_M_DOSVERSION = 0x88
+defc __ESX_M_GETSETDRV = 0x89
+defc __ESX_M_TAPEIN = 0x8b
+defc __ESX_M_TAPEOUT = 0x8c
+defc __ESX_M_GETHANDLE = 0x8d
+defc __ESX_M_GETDATE = 0x8e
+defc __ESX_M_EXECCMD = 0x8f
+defc __ESX_M_GETERR = 0x93
+defc __ESX_M_P3DOS = 0x94
+defc __ESX_M_ERRH = 0x95
+
+defc __ESX_F_OPEN = 0x9a
+defc __ESX_F_CLOSE = 0x9b
+defc __ESX_F_SYNC = 0x9c
+defc __ESX_F_READ = 0x9d
+defc __ESX_F_WRITE = 0x9e
+defc __ESX_F_SEEK = 0x9f
+defc __ESX_F_FGETPOS = 0xa0
+defc __ESX_F_FSTAT = 0xa1
+defc __ESX_F_FTRUNCATE = 0xa2
+defc __ESX_F_OPENDIR = 0xa3
+defc __ESX_F_READDIR = 0xa4
+defc __ESX_F_TELLDIR = 0xa5
+defc __ESX_F_SEEKDIR = 0xa6
+defc __ESX_F_REWINDDIR = 0xa7
+defc __ESX_F_GETCWD = 0xa8
+defc __ESX_F_CHDIR = 0xa9
+defc __ESX_F_MKDIR = 0xaa
+defc __ESX_F_RMDIR = 0xab
+defc __ESX_F_STAT = 0xac
+defc __ESX_F_UNLINK = 0xad
+defc __ESX_F_TRUNCATE = 0xae
+defc __ESX_F_CHMOD = 0xaf
+defc __ESX_F_RENAME = 0xb0
+defc __ESX_F_GETFREE = 0xb1
 
 defc __NEXTOS_RC_READY = 0
 defc __NEXTOS_RC_WP = 1

@@ -3,7 +3,7 @@ divert(-1)
 ###############################################################
 # ESXDOS 0.8.5 CONFIGURATION
 # rebuild the library if changes are made
-#
+# see NextOS config for ESXDOS compatible API under NextOS
 
 # Code Separation
 
@@ -16,10 +16,6 @@ define(`__ESXDOS_BASE_FSYS', eval(__ESXDOS_BASE_MISC + 16))
 define(`__ESXDOS_SYSCALL', 0x08)   # system call, single byte function number follows rst
 define(`__ESXDOS_ROMCALL', 0x18)   # zx rom call, address follows rst
 define(`__ESXDOS_AUXCALL', 0x30)   # auxilliary for internal use
-
-# NextOS Only Error Hook for RST $18 and RST $10 inside a dot command
-
-define(`__NEXTOS_ROMCALL_DOT_ERROR_HOOK', 0x95)
 
 # System Calls
 
@@ -163,8 +159,6 @@ PUBLIC `__ESXDOS_SYSCALL'
 PUBLIC `__ESXDOS_ROMCALL'
 PUBLIC `__ESXDOS_AUXCALL'
 
-PUBLIC `__NEXTOS_ROMCALL_DOT_ERROR_HOOK'
-
 PUBLIC `__ESXDOS_SYS_DISK_STATUS'
 PUBLIC `__ESXDOS_SYS_DISK_READ'
 PUBLIC `__ESXDOS_SYS_DISK_WRITE'
@@ -280,8 +274,6 @@ defc `__ESXDOS_SYSCALL' = __ESXDOS_SYSCALL
 defc `__ESXDOS_ROMCALL' = __ESXDOS_ROMCALL
 defc `__ESXDOS_AUXCALL' = __ESXDOS_AUXCALL
 
-defc `__NEXTOS_ROMCALL_DOT_ERROR_HOOK' = __NEXTOS_ROMCALL_DOT_ERROR_HOOK
-
 defc `__ESXDOS_SYS_DISK_STATUS' = __ESXDOS_SYS_DISK_STATUS
 defc `__ESXDOS_SYS_DISK_READ' = __ESXDOS_SYS_DISK_READ
 defc `__ESXDOS_SYS_DISK_WRITE' = __ESXDOS_SYS_DISK_WRITE
@@ -396,8 +388,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESXDOS_SYSCALL'  __ESXDOS_SYSCALL
 `#define' `__ESXDOS_ROMCALL'  __ESXDOS_ROMCALL
 `#define' `__ESXDOS_AUXCALL'  __ESXDOS_AUXCALL
-
-`#define' `__NEXTOS_ROMCALL_DOT_ERROR_HOOK'  __NEXTOS_ROMCALL_DOT_ERROR_HOOK
 
 `#define' `__ESXDOS_SYS_DISK_STATUS'  __ESXDOS_SYS_DISK_STATUS
 `#define' `__ESXDOS_SYS_DISK_READ'  __ESXDOS_SYS_DISK_READ

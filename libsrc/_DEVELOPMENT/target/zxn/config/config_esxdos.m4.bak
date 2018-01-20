@@ -3,7 +3,7 @@ divert(-1)
 ###############################################################
 # ESXDOS 0.8.5 CONFIGURATION
 # rebuild the library if changes are made
-#
+# see NextOS config for ESXDOS compatible API under NextOS
 
 # Code Separation
 
@@ -16,10 +16,6 @@ define(`__ESXDOS_BASE_FSYS', eval(__ESXDOS_BASE_MISC + 16))
 define(`__ESXDOS_SYSCALL', 0x08)   # system call, single byte function number follows rst
 define(`__ESXDOS_ROMCALL', 0x18)   # zx rom call, address follows rst
 define(`__ESXDOS_AUXCALL', 0x30)   # auxilliary for internal use
-
-# NextOS Only Error Hook for RST $18 and RST $10 inside a dot command
-
-define(`__NEXTOS_ROMCALL_DOT_ERROR_HOOK', 0x95)
 
 # System Calls
 

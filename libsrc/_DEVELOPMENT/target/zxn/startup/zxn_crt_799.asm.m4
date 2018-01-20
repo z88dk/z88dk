@@ -423,7 +423,7 @@ extra_pages_none:
    ld hl,_dotn_basic_error_hook
    
    rst  __ESXDOS_SYSCALL
-   defb __NEXTOS_ROMCALL_DOT_ERROR_HOOK
+   defb __ESX_M_ERRH
    
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main

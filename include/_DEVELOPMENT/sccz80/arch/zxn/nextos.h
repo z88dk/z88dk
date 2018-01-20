@@ -16,8 +16,8 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
-// NEXTOS API 1.89
-// https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/nextos_api.odt
+// NEXTOS API 1.94B
+// https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 
 // Filesystem Related
 
@@ -101,6 +101,7 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #define NEXTOS_IDE_STREAM_LINEIN  __NEXTOS_IDE_STREAM_LINEIN
 #define NEXTOS_IDE_WINDOW_STRING  __NEXTOS_IDE_WINDOW_STRING
 #define NEXTOS_IDE_INTEGER_VAR  __NEXTOS_IDE_INTEGER_VAR
+#define NEXTOS_IDE_RTC  __NEXTOS_IDE_RTC
 
 // Legacy - Floppy Drive
 
@@ -146,6 +147,48 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #define NEXTOS_IDE_PARTITION_OPEN  __NEXTOS_IDE_PARTITION_OPEN
 #define NEXTOS_IDE_PARTITION_CLOSE  __NEXTOS_IDE_PARTITION_CLOSE
 #define NEXTOS_IDE_PARTITIONS  __NEXTOS_IDE_PARTITIONS
+
+// NextOS ESXDOS API
+
+#define ESX_DISK_FILEMAP  __ESX_DISK_FILEMAP
+#define ESX_DISK_STRMSTART  __ESX_DISK_STRMSTART
+#define ESX_DISK_STRMEND  __ESX_DISK_STRMEND
+
+#define ESX_M_DOSVERSION  __ESX_M_DOSVERSION
+#define ESX_M_GETSETDRV  __ESX_M_GETSETDRV
+#define ESX_M_TAPEIN  __ESX_M_TAPEIN
+#define ESX_M_TAPEOUT  __ESX_M_TAPEOUT
+#define ESX_M_GETHANDLE  __ESX_M_GETHANDLE
+#define ESX_M_GETDATE  __ESX_M_GETDATE
+#define ESX_M_EXECCMD  __ESX_M_EXECCMD
+#define ESX_M_GETERR  __ESX_M_GETERR
+#define ESX_M_P3DOS  __ESX_M_P3DOS
+#define ESX_M_ERRH  __ESX_M_ERRH
+
+#define ESX_F_OPEN  __ESX_F_OPEN
+#define ESX_F_CLOSE  __ESX_F_CLOSE
+#define ESX_F_SYNC  __ESX_F_SYNC
+#define ESX_F_READ  __ESX_F_READ
+#define ESX_F_WRITE  __ESX_F_WRITE
+#define ESX_F_SEEK  __ESX_F_SEEK
+#define ESX_F_FGETPOS  __ESX_F_FGETPOS
+#define ESX_F_FSTAT  __ESX_F_FSTAT
+#define ESX_F_FTRUNCATE  __ESX_F_FTRUNCATE
+#define ESX_F_OPENDIR  __ESX_F_OPENDIR
+#define ESX_F_READDIR  __ESX_F_READDIR
+#define ESX_F_TELLDIR  __ESX_F_TELLDIR
+#define ESX_F_SEEKDIR  __ESX_F_SEEKDIR
+#define ESX_F_REWINDDIR  __ESX_F_REWINDDIR
+#define ESX_F_GETCWD  __ESX_F_GETCWD
+#define ESX_F_CHDIR  __ESX_F_CHDIR
+#define ESX_F_MKDIR  __ESX_F_MKDIR
+#define ESX_F_RMDIR  __ESX_F_RMDIR
+#define ESX_F_STAT  __ESX_F_STAT
+#define ESX_F_UNLINK  __ESX_F_UNLINK
+#define ESX_F_TRUNCATE  __ESX_F_TRUNCATE
+#define ESX_F_CHMOD  __ESX_F_CHMOD
+#define ESX_F_RENAME  __ESX_F_RENAME
+#define ESX_F_GETFREE  __ESX_F_GETFREE
 
 // Error Codes - Recoverable Disk Errors
 
