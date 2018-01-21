@@ -286,7 +286,7 @@ IF (startup>100)
 	; LAMBDA modes
 	
      IF (startup=102)
-        INCLUDE "lambda_altint.def"
+        INCLUDE "target/lambda/classic/lambda_altint.asm"
      ENDIF
 ELSE
 

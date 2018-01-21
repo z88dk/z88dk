@@ -174,7 +174,7 @@ endif
 
 ; ######## IM 1 MODE INTERRUPT ENTRY ########
 
-      INCLUDE "spec_crt0_rom_isr.as1"
+      INCLUDE "target/zx/classic/spec_crt0_rom_isr.asm"
 
 ; ########  END OF ROM INTERRUPT HANDLER ######## 
 

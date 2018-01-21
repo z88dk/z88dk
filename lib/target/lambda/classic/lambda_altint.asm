@@ -67,5 +67,5 @@ altint_off:
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 
-        INCLUDE "lambda_altint_core.def"
+        INCLUDE "target/lambda/classic/lambda_altint_core.asm"
 
