@@ -9,7 +9,7 @@
 ; $Id: gray83p.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 
-	INCLUDE "int83p.asm"		; Put interrupt loader here
+	INCLUDE "target/ti83p/classic/int83p.asm"		; Put interrupt loader here
 IF TI83PLUSAPP
 					; Statvars is already zeroed
 ELSE

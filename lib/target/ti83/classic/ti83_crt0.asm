@@ -292,9 +292,9 @@ IF ZASMLOAD
 ENDIF
 
 IF DEFINED_GRAYlib
-	INCLUDE	"gray83.asm"
+	INCLUDE	"target/ti83/classic/gray83.asm"
 ELSE
-	INCLUDE "intwrap83.asm"
+	INCLUDE "target/ti83/classic/intwrap83.asm"
 ENDIF
 
 	im	2

@@ -183,7 +183,7 @@ ENDIF
 	pop	hl
 
 IF DEFINED_GRAYlib
-	INCLUDE	"gray85.asm"
+	INCLUDE	"target/ti85/classic/gray85.asm"
 	;im	2
 ENDIF
 

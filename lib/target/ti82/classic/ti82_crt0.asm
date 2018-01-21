@@ -80,9 +80,9 @@ ENDIF
 
 
 IF DEFINED_GRAYlib
-	INCLUDE	"gray82.asm"
+	INCLUDE	"target/ti82/classic/gray82.asm"
 ELSE
-	INCLUDE "intwrap82.asm"
+	INCLUDE "target/ti82/classic/intwrap82.asm"
 ENDIF
 
 	im	2

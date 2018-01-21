@@ -20,7 +20,7 @@
 defc LCD_BUSY_QUICK  = $000B		; Faster entry then BCALLing
 defc LCDBusy         = LCD_BUSY_QUICK	;
 
-	INCLUDE "int83p.asm"		; Put interrupt loader here
+	INCLUDE "target/ti83/classic/int83p.asm"		; Put interrupt loader here
 IF TI83PLUSAPP
 					; Statvars is already zeroed
 ELSE

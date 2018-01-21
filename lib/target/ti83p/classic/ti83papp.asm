@@ -174,9 +174,9 @@ ENDIF				;
 
 IF DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed
-	INCLUDE "gray83pSE.asm"	; 15MHz grayscale interrupt
+	INCLUDE "target/ti83p/classic/gray83pSE.asm"	; 15MHz grayscale interrupt
  ELSE
-	INCLUDE	"gray83p.asm"		;  6MHz grayscale interrupt
+	INCLUDE	"target/ti83p/classic/gray83p.asm"		;  6MHz grayscale interrupt
  ENDIF
 ENDIF
 
