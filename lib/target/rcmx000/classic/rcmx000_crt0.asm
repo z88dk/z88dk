@@ -48,7 +48,7 @@ start:
 	; On this platform we are king of the road and may use
 	; any register for any purpose Wheee!!
 
-	include "rcmx000_boot.asm"
+	include "target/rcmx000/classic/rcmx000_boot.asm"
 
 	call	crt0_init_bss
 

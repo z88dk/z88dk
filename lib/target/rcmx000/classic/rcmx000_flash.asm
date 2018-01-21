@@ -246,5 +246,5 @@ _OUTSTR:
 	inc hl
 	jr _OUTSTR
 
-	include "rcmx000_flutil.asm"
+	include "target/rcmx000/classic/rcmx000_flutil.asm"
 start_user_prog:

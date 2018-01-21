@@ -220,5 +220,5 @@ __END_PROG:
 
 	;; 
 IF !DEFINED_NOFLASH
-	INCLUDE	"rcmx000_flash.asm"
+	INCLUDE	"target/rcmx000/classic/rcmx000_flash.asm"
 ENDIF

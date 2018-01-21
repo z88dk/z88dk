@@ -429,7 +429,7 @@ s_ozlcdstatus:
 
 ; Keyboard and interrupts
 
-INCLUDE "oz_customisr.def"
+INCLUDE "target/oz/classic/oz_customisr.def"
 
 IF DEFINED_ozgetch2
 KeyBufGetPos:   defb 0
