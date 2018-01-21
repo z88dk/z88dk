@@ -29,7 +29,7 @@
 	PUBLIC	mmc_wait_response
 	PUBLIC	_mmc_wait_response
 
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 	
 
 

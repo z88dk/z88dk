@@ -18,10 +18,10 @@
 	EXTERN	msxextrom
 
 IF FORmsx
-        INCLUDE "arch/msx/def/msxbasic.def"
+        INCLUDE "target/msx/def/msxbasic.def"
 		EXTERN	msxbasic
 ELSE
-        INCLUDE "arch/svi/def/svibasic.def"
+        INCLUDE "target/svi/def/svibasic.def"
 		EXTERN	msxbios
 ENDIF
 

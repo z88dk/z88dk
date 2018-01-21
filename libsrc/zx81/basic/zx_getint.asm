@@ -17,9 +17,9 @@ PUBLIC	_zx_getint
 EXTERN	zx_locatenum
 
 IF FORlambda
-	INCLUDE  "arch/lambda/def/lambdafp.def"
+	INCLUDE  "target/lambda/def/lambdafp.def"
 ELSE
-	INCLUDE  "arch/zx81/def/81fp.def"
+	INCLUDE  "target/zx81/def/81fp.def"
 ENDIF
 
 ; hl = char *variable

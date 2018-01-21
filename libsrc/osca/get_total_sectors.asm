@@ -7,7 +7,7 @@
 ;	$Id: get_total_sectors.asm,v 1.6 2016-06-22 22:13:09 dom Exp $
 ;
 
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC  get_total_sectors

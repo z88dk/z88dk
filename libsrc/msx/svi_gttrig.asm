@@ -15,7 +15,7 @@
 	EXTERN	svi_slstick
 
 
-        INCLUDE "arch/svi/def/svi.def"
+        INCLUDE "target/svi/def/svi.def"
 
 	
 GTTRIG:

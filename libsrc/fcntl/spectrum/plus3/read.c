@@ -11,7 +11,7 @@
 ssize_t read(int handle, void *buf, size_t len)
 {
 #asm
-	INCLUDE	"arch/zx/def/p3dos.def"
+	INCLUDE	"target/zx/def/p3dos.def"
 	EXTERN	dodos
 	push	ix		;save callers
 	ld	ix,2

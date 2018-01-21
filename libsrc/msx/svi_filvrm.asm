@@ -12,7 +12,7 @@
         SECTION code_clib
 	PUBLIC	FILVRM
 	
-        INCLUDE "arch/svi/def/svi.def"
+        INCLUDE "target/svi/def/svi.def"
 	
 FILVRM:
 	push	af

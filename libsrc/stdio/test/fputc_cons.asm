@@ -11,7 +11,7 @@
 		PUBLIC	fputc_cons_native
 		PUBLIC	_fputc_cons
 
-		INCLUDE	"arch/test/def/test_cmds.def"
+		INCLUDE	"target/test/def/test_cmds.def"
 
 .fputc_cons_native
 	ld	hl,2

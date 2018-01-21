@@ -36,7 +36,7 @@
 
 	EXTERN   __mmc_card_select
 
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 
 mmc_read_block:

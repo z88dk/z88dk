@@ -18,11 +18,11 @@
 	EXTERN     msxbios
 	
 IF FORmsx
-        INCLUDE "arch/msx/def/msxbios.def"
-        INCLUDE "arch/msx/def/msx.def"
+        INCLUDE "target/msx/def/msxbios.def"
+        INCLUDE "target/msx/def/msx.def"
 ELSE
-        INCLUDE "arch/svi/def/svibios.def"
-        INCLUDE "arch/svi/def/svi.def"
+        INCLUDE "target/svi/def/svibios.def"
+        INCLUDE "target/svi/def/svi.def"
 ENDIF
 
 

@@ -31,7 +31,7 @@
 	EXTERN		mmc_wait_response
 	EXTERN		mmc_write_command
 
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 
 mmc_init:

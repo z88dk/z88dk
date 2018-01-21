@@ -10,7 +10,7 @@
 ; $Id: cpc_model.asm,v 1.7 2016-06-10 21:12:36 dom Exp $
 
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"              
+        INCLUDE "target/cpc/def/cpcfirm.def"              
 
         SECTION   code_clib
         PUBLIC cpc_model

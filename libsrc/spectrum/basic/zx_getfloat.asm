@@ -17,7 +17,7 @@ EXTERN	zx_locatenum
 EXTERN	fa
 EXTERN	call_rom3
 
-INCLUDE  "arch/zx/def/zxfp.def"
+INCLUDE  "target/zx/def/zxfp.def"
 
 ; hl = char *variable
 

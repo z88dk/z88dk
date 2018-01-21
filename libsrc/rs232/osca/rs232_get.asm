@@ -13,7 +13,7 @@
 			PUBLIC   rs232_get
 			PUBLIC   _rs232_get
 			
-			INCLUDE "arch/osca/def/osca.def"
+			INCLUDE "target/osca/def/osca.def"
 
 rs232_get:
 _rs232_get:

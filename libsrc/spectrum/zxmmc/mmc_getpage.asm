@@ -13,7 +13,7 @@
 	PUBLIC	mmc_getpage
 	PUBLIC	_mmc_getpage
 	
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 mmc_getpage:
 _mmc_getpage:

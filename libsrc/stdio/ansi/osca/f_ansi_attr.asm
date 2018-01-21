@@ -16,7 +16,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_attr
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
 	;PUBLIC	INVRS
 	;PUBLIC	UNDRL

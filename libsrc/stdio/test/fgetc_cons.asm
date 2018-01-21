@@ -11,7 +11,7 @@
 		PUBLIC	fgetc_cons
 		PUBLIC	_fgetc_cons
 
-		INCLUDE	"arch/test/def/test_cmds.def"
+		INCLUDE	"target/test/def/test_cmds.def"
 
 .fgetc_cons
 ._fgetc_cons

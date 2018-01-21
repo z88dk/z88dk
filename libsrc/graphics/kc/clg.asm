@@ -10,7 +10,7 @@
                 PUBLIC    clg
                 PUBLIC    _clg
 
-		INCLUDE  "arch/kc/def/caos.def"
+		INCLUDE  "target/kc/def/caos.def"
 
 .clg
 ._clg

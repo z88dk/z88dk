@@ -10,13 +10,13 @@
 ;double atof(char *)     - convert string to number, leave in fa
 
 IF FORzx
-		INCLUDE  "arch/zx/def/zxfp.def"
+		INCLUDE  "target/zx/def/zxfp.def"
 ENDIF
 IF FORzx81
-		INCLUDE  "arch/zx81/def/81fp.def"
+		INCLUDE  "target/zx81/def/81fp.def"
 ENDIF
 IF FORlambda
-		INCLUDE  "arch/lambda/def/lambdafp.def"
+		INCLUDE  "target/lambda/def/lambdafp.def"
 ENDIF
 
                 SECTION  code_fp

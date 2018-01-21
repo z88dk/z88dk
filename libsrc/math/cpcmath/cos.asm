@@ -7,9 +7,9 @@
 ;
 
                 SECTION         code_fp
-	        INCLUDE		"arch/cpc/def/cpcfirm.def"
+	        INCLUDE		"target/cpc/def/cpcfirm.def"
 
-		INCLUDE		"arch/cpc/def/cpcfp.def"
+		INCLUDE		"target/cpc/def/cpcfp.def"
 
 		PUBLIC		cos
 		PUBLIC		cosc

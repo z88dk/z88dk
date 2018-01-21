@@ -15,7 +15,7 @@
    PUBLIC   _a_curx
 	
 	EXTERN	subuserf
-	INCLUDE	"arch/cpc/def/amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_curx:
 _a_curx:

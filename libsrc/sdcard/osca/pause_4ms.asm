@@ -12,7 +12,7 @@
 
 	PUBLIC	pause_4ms
 	
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
 pause_4ms:
 	xor a

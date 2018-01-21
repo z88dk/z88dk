@@ -16,7 +16,7 @@
 	PUBLIC	_mmc_waitdata_token
 	EXTERN		mmc_wait_response
 
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 	
 
 mmc_waitdata_token:

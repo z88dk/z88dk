@@ -19,7 +19,7 @@ int __FASTCALL__ readbyte(int fd)
 	if ( fd != 0 )		/* Check to see if this is the read file */
 		return EOF;
 #asm
-        INCLUDE "arch/cpc/def/cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
     call    firmware
 	defw	cas_in_char
 	ccf

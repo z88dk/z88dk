@@ -14,7 +14,7 @@
 	EXTERN     swapgfxbk
 	EXTERN    swapgfxbk1
 	
-    INCLUDE "arch/osca/def/osca.def"
+    INCLUDE "target/osca/def/osca.def"
 
 
 osca_set_palette:

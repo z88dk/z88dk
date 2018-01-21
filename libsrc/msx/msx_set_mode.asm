@@ -19,8 +19,8 @@
 
 IF FORsvi
     INCLUDE	"msx/vdp.inc"
-    INCLUDE "arch/svi/def/svibios.def"
-    INCLUDE "arch/svi/def/svibasic.def"
+    INCLUDE "target/svi/def/svibios.def"
+    INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
 IF FORsc3000

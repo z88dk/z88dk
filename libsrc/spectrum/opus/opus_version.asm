@@ -15,7 +15,7 @@
 		EXTERN	zx_opus
 		EXTERN	fa
 
-		INCLUDE  "arch/zx/def/zxfp.def"
+		INCLUDE  "target/zx/def/zxfp.def"
 
 .opus_version
 ._opus_version

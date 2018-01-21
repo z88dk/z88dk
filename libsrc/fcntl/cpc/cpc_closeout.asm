@@ -10,7 +10,7 @@
 		PUBLIC		cpc_closeout
       PUBLIC      _cpc_closeout
 
-		INCLUDE		"arch/cpc/def/cpcfirm.def"
+		INCLUDE		"target/cpc/def/cpcfirm.def"
 
 
 .cpc_closeout

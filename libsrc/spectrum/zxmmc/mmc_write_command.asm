@@ -15,7 +15,7 @@
 	PUBLIC	mmc_write_command
 	PUBLIC	_mmc_write_command
 	
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 
 mmc_write_command:

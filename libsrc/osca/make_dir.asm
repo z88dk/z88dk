@@ -7,7 +7,7 @@
 ;	$Id: make_dir.asm,v 1.3 2016-06-22 22:13:09 dom Exp $
 ;
 
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC  make_dir

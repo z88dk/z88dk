@@ -12,7 +12,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_SCROLLUP
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
 .ansi_SCROLLUP
 	jp kjt_scroll_up

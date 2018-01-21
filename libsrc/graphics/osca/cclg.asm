@@ -6,8 +6,8 @@
 ;	$Id: cclg.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
-    INCLUDE "arch/osca/def/flos.def"
-    INCLUDE "arch/osca/def/osca.def"
+    INCLUDE "target/osca/def/flos.def"
+    INCLUDE "target/osca/def/osca.def"
 
 		SECTION   code_clib
                 PUBLIC    cclg

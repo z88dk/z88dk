@@ -8,7 +8,7 @@
 		PUBLIC	write
 		PUBLIC	_write
 
-		INCLUDE	"arch/test/def/test_cmds.def"
+		INCLUDE	"target/test/def/test_cmds.def"
 
 .write
 ._write

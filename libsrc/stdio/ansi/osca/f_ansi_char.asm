@@ -24,7 +24,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_CHAR
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 	
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN

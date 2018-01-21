@@ -15,7 +15,7 @@
         SECTION code_clib
         PUBLIC	ansi_del_line
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
 
 .ansi_del_line
         ld      a,$11

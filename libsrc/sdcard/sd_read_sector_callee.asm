@@ -27,7 +27,7 @@
 	EXTERN		sd_deselect_card
 
     INCLUDE "sdcard.def"
-    INCLUDE "arch/osca/def/osca.def"
+    INCLUDE "target/osca/def/osca.def"
 
 sd_read_sector_callee:
 _sd_read_sector_callee:

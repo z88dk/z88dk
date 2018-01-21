@@ -13,7 +13,7 @@
 	PUBLIC	sd_select_card	
 	
 	
-    INCLUDE "arch/osca/def/osca.def"
+    INCLUDE "target/osca/def/osca.def"
 
 
 sd_select_card:

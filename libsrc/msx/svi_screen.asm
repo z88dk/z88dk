@@ -15,8 +15,8 @@
 	PUBLIC	_msx_screen
 	EXTERN	msxbios
 	
-        INCLUDE "arch/svi/def/svibios.def"
-        INCLUDE "arch/svi/def/svibasic.def"
+        INCLUDE "target/svi/def/svibios.def"
+        INCLUDE "target/svi/def/svibasic.def"
 
 msx_screen:
 _msx_screen:

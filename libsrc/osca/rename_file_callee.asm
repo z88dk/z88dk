@@ -7,7 +7,7 @@
 ;	$Id: rename_file_callee.asm,v 1.4 2016-06-22 22:13:09 dom Exp $
 ;
 
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC  rename_file_callee

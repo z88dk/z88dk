@@ -13,7 +13,7 @@
         PUBLIC	fgetc_cons
         PUBLIC	_fgetc_cons
         
-        INCLUDE "arch/cpc/def/cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
         
         
 .fgetc_cons

@@ -20,7 +20,7 @@
         EXTERN cpc_EnableFirmware
 		
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
 		
 
 .cpc_Uncrunch_callee

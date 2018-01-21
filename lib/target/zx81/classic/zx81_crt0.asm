@@ -293,7 +293,7 @@ ELSE
 ; +++++ non-LAMBDA section begin +++++
 
     IF (startup=2)
-        INCLUDE "arch/zx81/classic/zx81_altint.asm"
+        INCLUDE "target/zx81/classic/zx81_altint.asm"
     ENDIF
 
 ;-------------------------------------------------
@@ -303,7 +303,7 @@ ELSE
 
     IF (startup>=3)
 	IF ((startup<=7)|(startup>=23))
-            INCLUDE "arch/zx81/classic/zx81_hrg.asm"
+            INCLUDE "target/zx81/classic/zx81_hrg.asm"
         ENDIF
     ENDIF
 
@@ -316,7 +316,7 @@ ELSE
 	;
 	ELSE
 	    IF (startup<=17)
-		INCLUDE "arch/zx81/classic/zx81_hrg_arx.asm"
+		INCLUDE "target/zx81/classic/zx81_hrg_arx.asm"
 	    ENDIF
 	ENDIF
     ENDIF

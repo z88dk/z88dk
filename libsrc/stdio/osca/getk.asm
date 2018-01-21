@@ -9,7 +9,7 @@
 ;
 
 
-    INCLUDE "arch/osca/def/flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC	getk

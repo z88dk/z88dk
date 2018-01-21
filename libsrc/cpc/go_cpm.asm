@@ -11,7 +11,7 @@
         PUBLIC	go_cpm
         PUBLIC	_go_cpm
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"              
+        INCLUDE "target/cpc/def/cpcfirm.def"              
 
 .go_cpm
 ._go_cpm

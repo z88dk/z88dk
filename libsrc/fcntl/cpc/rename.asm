@@ -18,7 +18,7 @@
         EXTERN	cpc_rsx
         EXTERN	bios_msg
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"              
+        INCLUDE "target/cpc/def/cpcfirm.def"              
 
 .rename
 ._rename

@@ -14,7 +14,7 @@
         PUBLIC    cpc_rsx
         PUBLIC    _cpc_rsx
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"              
+        INCLUDE "target/cpc/def/cpcfirm.def"              
 
 
 

@@ -322,7 +322,7 @@ l_errlevel:      defb    0
 IF DEFINED_farheapsz
     IF !CRT_Z88_SAFEDATA
         SECTION code_crt_init
-        INCLUDE "arch/z88/classic/init_far.asm"
+        INCLUDE "target/z88/classic/init_far.asm"
 
         SECTION bss_fardata
 ; If we use CRT_Z88_SAFEDATA then we can't have far memory

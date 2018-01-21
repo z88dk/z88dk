@@ -15,7 +15,7 @@
         PUBLIC    ASMDISP_CPC_SET_PALETTE_CALLEE
         EXTERN firmware
 
-        INCLUDE "arch/cpc/def/cpcfirm.def"              
+        INCLUDE "target/cpc/def/cpcfirm.def"              
 
 .cpc_set_palette_callee
 ._cpc_set_palette_callee

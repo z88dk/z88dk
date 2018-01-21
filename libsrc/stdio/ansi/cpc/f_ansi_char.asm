@@ -17,7 +17,7 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 
-    INCLUDE "arch/cpc/def/cpcfirm.def"
+    INCLUDE "target/cpc/def/cpcfirm.def"
                
 	
 	EXTERN	ansi_ROW

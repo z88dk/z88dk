@@ -68,5 +68,5 @@ altint_off:
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 
-        INCLUDE "arch/zx81/classic/zx81_altint_core.asm"
+        INCLUDE "target/zx81/classic/zx81_altint_core.asm"
 

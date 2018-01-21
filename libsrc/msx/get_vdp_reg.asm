@@ -18,9 +18,9 @@
 
 
 IF FORmsx
-        INCLUDE "arch/msx/def/msxbasic.def"
+        INCLUDE "target/msx/def/msxbasic.def"
 ELSE
-        INCLUDE "arch/svi/def/svibasic.def"
+        INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
 get_vdp_reg:

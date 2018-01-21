@@ -29,7 +29,7 @@
 	EXTERN		cs_low
 	EXTERN		clock32
 
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 	
 mmc_send_command:

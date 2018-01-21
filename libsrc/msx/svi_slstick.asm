@@ -15,9 +15,9 @@
 	
 
 IF FORmsx
-        INCLUDE "arch/msx/def/msx.def"
+        INCLUDE "target/msx/def/msx.def"
 ELSE
-        INCLUDE "arch/svi/def/svi.def"
+        INCLUDE "target/svi/def/svi.def"
 ENDIF
 
 

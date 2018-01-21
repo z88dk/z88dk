@@ -16,7 +16,7 @@
         SECTION code_clib
 	PUBLIC	ansi_attr
 
-    INCLUDE "arch/cpc/def/cpcfirm.def"
+    INCLUDE "target/cpc/def/cpcfirm.def"
 
         SECTION bss_clib
 	PUBLIC	UNDRL

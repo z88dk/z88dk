@@ -14,7 +14,7 @@
    PUBLIC   _a_border
 	
 	EXTERN	subuserf
-	INCLUDE	"arch/cpc/def/amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_border:
 _a_border:

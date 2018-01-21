@@ -14,7 +14,7 @@
 	PUBLIC	_msx_lpt
 	EXTERN     msxbios
 	
-        INCLUDE "arch/msx/def/msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 
 msx_lpt:
 _msx_lpt:

@@ -12,7 +12,7 @@
 		PUBLIC	cpc_SetModo
 		PUBLIC	_cpc_SetModo
 
-		INCLUDE "arch/cpc/def/cpcfirm.def"
+		INCLUDE "target/cpc/def/cpcfirm.def"
 		EXTERN	firmware
 
 

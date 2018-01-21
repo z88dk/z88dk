@@ -12,7 +12,7 @@
 	SECTION	code_clib
 	PUBLIC	clock32
 
-	INCLUDE "arch/zx/def/zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 	
 clock32:
 	push bc
