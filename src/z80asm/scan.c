@@ -373,7 +373,7 @@ tokid_t GetSym( void )
 
 		/* run the state machine */
 		sym.tok = _scan_get();
-
+		
 	} while ( sym.tok == TK_END );
 
 	sym.tstart = ts; sym.tlen = te - ts;			/* remember token position */
