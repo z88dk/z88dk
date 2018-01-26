@@ -19,10 +19,10 @@
 	EXTERN	msxbios
 	
 IF FORmsx
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 ELSE
-        INCLUDE "svibios.def"
-; svibios.def includes the following declarations, valid also elsewhere:
+        INCLUDE "target/svi/def/svibios.def"
+; target/svi/def/svibios.def includes the following declarations, valid also elsewhere:
 ;	EXTERN	FILVRM
 ;	EXTERN	LDIRVM
 ENDIF

@@ -422,11 +422,13 @@ Define rules for a ragel-based parser.
 				asm_C_LINE(expr_value, str_data(name)); 
 		}
 		
-		| _TK_INCLUDE string _TK_NEWLINE @{ 
+		| label? _TK_INCLUDE string _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
 			asm_INCLUDE(str_data(name)); 
 		}
 		
-		| _TK_BINARY string _TK_NEWLINE @{ 
+		| label? _TK_BINARY string _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
 			asm_BINARY(str_data(name)); 
 		}
 		

@@ -19,9 +19,9 @@
 
 	
 IF FORmsx
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 ELSE
-        INCLUDE "svibios.def"
+        INCLUDE "target/svi/def/svibios.def"
 ENDIF
 
 set_psg_callee:

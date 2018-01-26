@@ -41,6 +41,21 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_OPCODE(opcode)	 \
 	TOKEN_OPCODE1(opcode, #opcode)
 
+#define TOKEN_RABBIT1(opcode, string)	 \
+	string <CAT> i										<NL> \
+	{													<NL> \
+		<TAB>		if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {	<NL> \
+		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
+		<TAB>		}									<NL> \
+		<TAB>		else {								<NL> \
+		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
+		<TAB>		}									<NL> \
+		<TAB>		fbreak; 							<NL> \
+	};													<NL>
+
+#define TOKEN_RABBIT(opcode)	 \
+	TOKEN_RABBIT1(opcode, #opcode)
+
 %%{
 machine lexer;
 

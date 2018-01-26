@@ -23,7 +23,7 @@ void fabandon(FILE *fp)
 static int fabandon1(int fd)
 {
 #asm
-	INCLUDE	"p3dos.def"
+	INCLUDE	"target/zx/def/p3dos.def"
 	EXTERN	dodos
 	pop	bc
 	pop	hl

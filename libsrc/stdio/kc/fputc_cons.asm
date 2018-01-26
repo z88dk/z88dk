@@ -9,7 +9,7 @@
 	SECTION	code_clib
 	PUBLIC	fputc_cons_native
 	
-	INCLUDE  "caos.def"
+	INCLUDE  "target/kc/def/caos.def"
 
 .fputc_cons_native
 	ld	ix,$1f0

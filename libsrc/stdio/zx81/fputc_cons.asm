@@ -42,7 +42,7 @@ ENDIF
 	ld	(charpos+1),hl
 	ld	a,(hl)
 
-	ld	l,0
+	ld	l,0		; character to fill with
 	cp	12		; CLS
 	jp	z,filltxt
 
@@ -78,13 +78,9 @@ ENDIF
 	jr	nz,NoBS
 
 	ld	hl,COLUMN
-	push	hl
-	call zx_dfile_addr
-	xor	a		; blank
-	;ld	(hl),a
-	pop	hl
-	cp	(hl)
-	jr	z,firstc ; are we in the first column?
+        ld	a,(hl)
+	and	a
+	jr	z,firstc
 	dec	(hl)
 	ret
 
@@ -99,17 +95,10 @@ ENDIF
  	ret
 
 .NoBS
-
 ; ----  output character ----
-	push af
-	ld a,(ROW)
-	cp ROWS		; Out of screen?
-	jr nz, noscroll
-	ld a,ROWS-1
-	ld (ROW),a
-	call  scrolluptxt
-.noscroll
-	pop af
+	ld	a,(COLUMN)
+	cp	COLUMNS
+	call	z,isLF
 	
 .charpos
 	ld	 hl,0
@@ -117,18 +106,10 @@ ENDIF
 	bit	 6,a		; filter the dangerous codes
 	ret	 nz
 
-	push af
-	ld	 a,(COLUMN)
-	cp	 COLUMNS    ; top-right column ?   In this way we wait..
-	call z,isLF     ; .. to have a char to print before issuing a CR
-	pop  af
 	call zx_dfile_addr
 	ld	 (hl),a
 
-	ld	 a,(COLUMN)
-	inc	 a
-	ld	 (COLUMN),a
-	cp	 COLUMNS		; last column ?
-	ret	 nz		; no, return
- 	jp	 isLF
+	ld	hl,COLUMN
+	inc	(hl)
+	ret
 

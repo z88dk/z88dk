@@ -16,7 +16,7 @@
 int writebyte(int handle, int byte)
 {
 #asm
-	INCLUDE "p3dos.def"
+	INCLUDE "target/zx/def/p3dos.def"
 	EXTERN	dodos
 	pop	bc
 	pop	hl	;byte

@@ -12,7 +12,7 @@
         SECTION code_clib
         PUBLIC	ansi_SCROLLUP
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
         EXTERN	text_rows
 
 

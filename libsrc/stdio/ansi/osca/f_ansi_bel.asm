@@ -14,8 +14,8 @@
 
         SECTION code_clib
 	PUBLIC	ansi_BEL
-    INCLUDE "osca.def"
-    INCLUDE "flos.def"
+    INCLUDE "target/osca/def/osca.def"
+    INCLUDE "target/osca/def/flos.def"
 
 .ansi_BEL
 	di

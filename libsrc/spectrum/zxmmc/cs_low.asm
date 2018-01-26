@@ -16,7 +16,7 @@
 	PUBLIC	cs_low
 	EXTERN	__mmc_card_select
 	
-	INCLUDE "zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 
 cs_low:

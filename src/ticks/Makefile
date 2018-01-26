@@ -5,7 +5,7 @@ DISOBJS = disassembler_main.o disassembler.o syms.o disassembler_alg.o
 
 INSTALL ?= install
 
-CFLAGS += 
+CFLAGS += -I../../ext/uthash/src/
 
 all: ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX)
 

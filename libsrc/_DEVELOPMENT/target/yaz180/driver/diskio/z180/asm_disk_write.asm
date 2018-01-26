@@ -24,28 +24,28 @@ EXTERN ide_write_sector
 
 asm_disk_write:
     or a                    ; check sectors != 0
-    jr z, dresult_error
+    jr z, _disk_write_dresult_error
 
-loop:
+_disk_write_loop:
     call ide_write_sector   ; with the logical block address in bcde, write one sector
-    jr nc, dresult_error
+    jr nc, _disk_write_dresult_error
     dec a
-    jr z, dresult_ok
+    jr z, _disk_write_dresult_ok
     push af                 ; free a for LBA increment testing
     inc de                  ; increment the LBA lower word
     ld a, e
     or a, d                 ; lower de word non-zero, therefore no carry to bc
     pop af                  ; recover a value
-    jr nz, loop
+    jr nz, _disk_write_loop
     inc bc                  ; otherwise increment LBA upper word
-    jr loop
-    
-dresult_ok:
+    jr _disk_write_loop
+
+_disk_write_dresult_ok:
     ld hl, 0                ; set DRESULT RES_OK
     scf
     ret
-
-dresult_error:
+    
+_disk_write_dresult_error:
     ld hl, 1                ; set DRESULT RES_ERROR
     or a
     ret

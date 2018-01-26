@@ -7,8 +7,8 @@
 ;
 
                 SECTION         code_fp
-		INCLUDE		"cpcfirm.def"
-		INCLUDE		"cpcfp.def"
+		INCLUDE		"target/cpc/def/cpcfirm.def"
+		INCLUDE		"target/cpc/def/cpcfp.def"
 
 		PUBLIC		log
 		PUBLIC		logc

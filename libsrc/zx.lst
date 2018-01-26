@@ -2,6 +2,7 @@
 @stdio/stdio.lst
 stdio/spectrum/fputc_cons_rom_rst
 stdio/spectrum/fgetc_cons
+stdio/spectrum/fgetc_cons_inkey
 stdio/spectrum/fputc_cons
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT

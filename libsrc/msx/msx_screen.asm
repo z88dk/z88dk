@@ -15,7 +15,7 @@
 	EXTERN	msxbios
 	EXTERN	msxextrom
 	
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 
 msx_screen:
 _msx_screen:

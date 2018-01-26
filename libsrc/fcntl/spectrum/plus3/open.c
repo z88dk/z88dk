@@ -23,7 +23,7 @@
 int open(char *name, int flags, mode_t mode)
 {                                      
 #asm
-	INCLUDE	"p3dos.def"
+	INCLUDE	"target/zx/def/p3dos.def"
 	EXTERN	dodos
 	push	ix
 	ld	ix,4

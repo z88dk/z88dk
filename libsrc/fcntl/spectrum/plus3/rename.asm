@@ -14,7 +14,7 @@
       PUBLIC   _rename
 		EXTERN	dodos
 
-		INCLUDE "p3dos.def"
+		INCLUDE "target/zx/def/p3dos.def"
 
 
 .rename

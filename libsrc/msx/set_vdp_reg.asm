@@ -16,7 +16,7 @@
 	PUBLIC	_set_vdp_reg
 	EXTERN	msxbios
 	
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 
 set_vdp_reg:
 _set_vdp_reg:

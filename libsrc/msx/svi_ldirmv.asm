@@ -13,7 +13,7 @@
 	PUBLIC	LDIRMV
 	PUBLIC	_LDIRMV
 	
-        INCLUDE "svi.def"
+        INCLUDE "target/svi/def/svi.def"
 	
 LDIRMV:
 _LDIRMV:

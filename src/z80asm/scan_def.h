@@ -130,10 +130,10 @@ TOKEN_KW(PO, )
 TOKEN_KW(PE, )
 TOKEN_KW(P,  )
 TOKEN_KW(M,  )
-TOKEN_KW(LZ, )
-TOKEN_KW(LO, )
+TOKEN_RABBIT(LZ)		// issue #577
+TOKEN_RABBIT(LO)		// issue #577
 TOKEN_KW(NV, )
-TOKEN_KW(V,  )
+TOKEN_KW(V, )
 
 /* 8-bit registers */
 TOKEN_KW(B, )

@@ -11,13 +11,13 @@
 ; Support for boolean - save some byte
 
 IF FORzx
-		INCLUDE  "zxfp.def"
+		INCLUDE  "target/zx/def/zxfp.def"
 ENDIF
 IF FORzx81
-		INCLUDE  "81fp.def"
+		INCLUDE  "target/zx81/def/81fp.def"
 ENDIF
 IF FORlambda
-		INCLUDE  "lambdafp.def"
+		INCLUDE  "target/lambda/def/lambdafp.def"
 ENDIF
 
                 SECTION  code_fp
