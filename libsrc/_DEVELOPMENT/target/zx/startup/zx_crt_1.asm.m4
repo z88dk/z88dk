@@ -222,21 +222,8 @@ SECTION code_crt_return
    IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x20000) && (!(__crt_on_exit & 0x8)) && (__crt_on_exit & 0x2)
 
       ; returning to basic
-      
-      pop bc
-      
-      ld sp,(__sp_or_ret)
-      
-      exx
-      pop hl
-      exx
-      pop iy
-      
-      IFNDEF CRT_KEEP_IM
-         im 1
-      ENDIF
-      ei
-      ret
+            
+      include "crt_exit_basic.inc"
 
    ELSE
    

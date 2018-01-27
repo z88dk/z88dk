@@ -542,10 +542,10 @@ error_model:
    exx
    pop iy
 
-   IF (__crt_interrupt_mode = 0) || (__crt_interrupt_mode = 2)
-   
-      im 1
-   
+   IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
+
+      im __crt_interrupt_mode_exit
+
    ENDIF
 
    ei
