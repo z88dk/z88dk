@@ -1,33 +1,42 @@
+#
+# Wahey, a messed up makefile for building libraries!
+#
+# $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
 
 include ../Make.config
 
 TARGET ?= test
+
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 CUSTOBJECTS = sleep.o csleep.o delay.o
 ASMFILES = $(wildcard *.asm)
 
-NEWLIB_FILES =  \
-	abs.asm atoi.asm atol.asm  \
-	itoa.asm itoa_callee.asm labs.asm ltoa.asm ltoa_callee.asm  \
-	strtol.asm strtol_callee.asm strtoul.asm strtoul_callee.asm  \
-	ultoa.asm ultoa_callee.asm utoa.asm utoa_callee.asm  \
-	_div_.asm _div__callee.asm _divu_.asm _divu__callee.asm  \
-	_ldiv_.asm _ldiv__callee.asm _ldivu_.asm _ldivu__callee.asm  \
-	_strtoi_.asm _strtoi__callee.asm _strtou_.asm _strtou__callee.asm  \
-	asm_abs.asm asm_atoi.asm asm_atol.asm asm_atoll.asm asm_itoa.asm  \
-	asm_labs.asm asm_llabs.asm asm_lltoa.asm asm_ltoa.asm  \
-	asm_strtol.asm asm_strtoll.asm asm_strtoul.asm asm_strtoull.asm  \
-	asm_ulltoa.asm asm_ultoa.asm asm_utoa.asm asm__div.asm asm__divu.asm  \
-	asm__ldiv.asm asm__ldivu.asm asm__lldiv.asm asm__lldivu.asm asm__strtoi.asm  \
-	asm__strtou.asm __div_store.asm __ldiv_store.asm __lldiv_store.asm  \
-	__strtou__.asm __strtoul__.asm __strtoull__.asm 
 
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80-zxn obj/newlib-r2k obj/newlib-ixiy
 
-ASMFILES += $(NEWLIB_FILES)
+space :=
+space +=
 
 OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS))
 
-all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS))
+
+.PHONY: dirs  $(NEWLIB_TARGETS)
+
+all: dirs $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS)
+
+obj/newlib-z80:  
+	@$(ASSEMBLER) -d -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-r2k:  
+	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-z80-zxn:  
+	@$(ASSEMBLER) -d -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-ixiy:  
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/$(TARGET)/%.o: %.c
 	zcc +$(TARGET) $(CFLAGS) -o $@  $^
@@ -35,41 +44,10 @@ obj/$(TARGET)/%.o: %.c
 obj/$(TARGET)/%.o: %.asm
 	zcc +$(TARGET) $(CFLAGS) -o $@  $^
 
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/stdlib/z80/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/stdlib/z80/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/stdlib/z80/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/stdlib/z80/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/stdlib/c/sccz80/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
 
 dirs:
-	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/z80-zxn obj/$(TARGET)
+	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k -p obj/$(TARGET)
+
 
 clean:
-	$(RM) -fr obj zcc_opt.def *.c.asm
-	$(MAKE) -C z88 clean
+	$(RM) -fr obj 

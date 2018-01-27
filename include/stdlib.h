@@ -87,20 +87,9 @@ extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_c
 //// Random Numbers
 ///////////////////
 
-// The pseudo-random number generator requires a 16-bit seed.
-// The seed is present in the crt0 for a given platform, but if
-// you wish to define your own then do it in whatever way you wish
-// and add the following pragma to your source code:
-// #pragma output HAVESEED
-
-extern int std_seed;
-
-
 #define RAND_MAX    32767
-#define M_SRAND(a)  asm("ld\thl,"#a"\nld\t(_std_seed),hl\n");
 
 extern int  __LIB__              rand(void);
-extern void __LIB__              randomize(void);
 extern void __LIB__  srand(unsigned int seed) __z88dk_fastcall;
 
 // Not sure why Rex has it's own rand() routine using different seed?
