@@ -11,7 +11,7 @@
 #include <psg.h>
 #include <c128/sid.h>
 
-void psg_noise(unsigned char period) {
+void psg_noise(unsigned int period) {
 
 	envelopesid(sidVoice3,0,3,0,0);
 	freqsid(sidVoice3,period);
