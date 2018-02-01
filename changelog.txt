@@ -83,8 +83,16 @@ z88dk vX.XX  - XX.XX.XXXX
 - [ticks] A debugger is now available
 - [ticks] Now supports Rabbit, z180 and ZX Next cpus
 - [z80asm] Rabbit 2000 and 3000 are now fully supported
-- [z80asm] ZX Spectrum Next CPU extensions are supported
+- [z80asm] Z180 is now fully supported
+- [z80asm] ZX Spectrum Next CPU extensions and Copper Unit are supported
 - [z80asm] #442: Globs are now supported in filenames and .lst files
+- [z80asm] #159: Environment variables ${VAR} in filenames and .lst files
+- [z80asm] #222: +zx and +zx81 options to z80asm to generate .tap and .P files
+- [z80asm] #248: Filler byte for DEFS and ALIGN can be given in command line
+- [z80asm] #341: Produce debugger-friendly map files with symbols of C and ASM lines 
+- [z80asm] #429: Add PHASE and DEPHASE directives 
+- [z80asm] #436: Add ALIGN directive
+- [z80asm] #524: Allow the target directory for object files to be given in the command line
 - [z88dk-dis] A new standalone diassembler is available
 - [z88dk-install] A new program to install 3rd party libraries is now available
 - [zcc] Spaces in filenames (and paths) are now supported.
