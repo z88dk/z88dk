@@ -23,5 +23,8 @@ ENDIF
 
 psg_init:
 _psg_init:
+	push	ix
 	ld	ix,GICINI
-	jp	msxbios
+	call	msxbios
+	pop	ix	
+	ret

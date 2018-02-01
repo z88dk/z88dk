@@ -25,7 +25,9 @@ ENDIF
 
 .getk
 ._getk
+	push	ix
 	ld	ix,CHSNS
 	call	msxbios
+	pop	ix
 	ret	z		; exit if no key in buffer
 	jp	fgetc_cons
