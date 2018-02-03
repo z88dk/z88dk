@@ -7,8 +7,8 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
-# Test https://github.com/z88dk/z88dk/issues/557
-# z80asm: consolidated object file erroneously eliminates globally exported defc
+# Test https://github.com/z88dk/z88dk/issues/577
+# z80asm: Ti83 and Ti83 apps can't be compiled
 
 use strict;
 use warnings;

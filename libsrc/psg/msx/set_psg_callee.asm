@@ -34,8 +34,10 @@ _set_psg_callee:
 .asmentry
 
 	ld	a,l
-	
+	push	ix	
 	ld	ix, WRTPSG
-	jp	msxbios
+	call	msxbios
+	pop	ix
+	ret
 
 DEFC ASMDISP_SET_PSG_CALLEE = # asmentry - set_psg_callee

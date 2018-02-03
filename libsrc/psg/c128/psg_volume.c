@@ -13,6 +13,6 @@
 #include <psg.h>
 #include <c128/sid.h>
 
-void psg_volume(unsigned char channel, unsigned char volume) {
+void psg_volume(unsigned int channel, unsigned int volume) {
 	volumesid(volume*15/10,0);
 }

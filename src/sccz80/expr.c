@@ -686,6 +686,9 @@ int heirb(LVALUE* lval)
                     // Functino pointer call
                     callfunction(NULL,lval->ltype->ptr);
                     return_type = lval->ltype->ptr->return_type;
+                    if ( return_type == NULL ) {
+                        return_type = lval->ltype->ptr;
+                    }
                     flags = lval->ltype->ptr->flags;
                 } else if ( lval->ltype->kind == KIND_FUNC ) {
                     // Normal function call

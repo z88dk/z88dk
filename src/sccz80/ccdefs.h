@@ -85,6 +85,7 @@ extern Type      *find_tag(const char *name);
 extern Type      *find_tag_field(Type *tag, const char *fieldname);
 extern Type      *parse_expr_type();
 extern Type      *default_function(const char *name);
+extern Type      *default_function_with_type(const char *name, Type *return_type);
 extern Type     *asm_function(const char *name);
 extern Type      *make_pointer(Type *base_type);
 extern Type      *dodeclare(enum storage_type storage);

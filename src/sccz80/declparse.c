@@ -1085,12 +1085,17 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
 Type *default_function(const char *name)
 {
+    return default_function_with_type(name, type_int);
+}
+
+Type *default_function_with_type(const char *name, Type *return_type)
+{
     Type *type = CALLOC(1,sizeof(*type));
 
     strcpy(type->name, name);
     type->kind = KIND_FUNC;
     type->oldstyle = 1;
-    type->return_type = type_int;
+    type->return_type = return_type;
     type->parameters = array_init(NULL);
     type->size = 0;
     type->len = 1;

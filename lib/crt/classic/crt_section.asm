@@ -109,6 +109,7 @@ IF !__crt_model
 		SECTION smc_clib
 		SECTION smc_user
 		SECTION data_clib
+		SECTION data_stdlib
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
