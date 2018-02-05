@@ -99,7 +99,7 @@ char *install(char *str)
 	s = str;
 	for (i = 0; *s; i += *s++)
 		;
-	i %= HSIZE;
+	i = abs(i) % HSIZE;
 
 	for (p = htab[i]; p; p = p->h_ptr)
 		for (p1=str, p2=p->h_str; *p1++ == *p2++; )
