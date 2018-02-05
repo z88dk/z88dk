@@ -41,9 +41,13 @@ not_lf:
 	cp	12	; CLS ?
 	jr	nz,direct
 	xor	a
-	jp	$014E
+	call	$014E
+	ld	a,0xfe	;screen
+	jp	$0112
 direct:
 	rst	16
+	ld	a,255
+	ld	(0x5C8C),a
 	ret
 
 	SECTION	bss_clib
