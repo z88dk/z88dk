@@ -12,7 +12,7 @@
         PUBLIC    clg
         PUBLIC    _clg
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
         
         INCLUDE	"graphics/grafix.inc"
 

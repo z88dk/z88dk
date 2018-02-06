@@ -543,8 +543,6 @@
 #define __ESXDOS_ROMCALL  0x18
 #define __ESXDOS_AUXCALL  0x30
 
-#define __NEXTOS_ROMCALL_DOT_ERROR_HOOK  0x95
-
 #define __ESXDOS_SYS_DISK_STATUS  128
 #define __ESXDOS_SYS_DISK_READ  129
 #define __ESXDOS_SYS_DISK_WRITE  130
@@ -1232,6 +1230,7 @@
 #define __NEXTOS_IDE_STREAM_LINEIN  0x01c3
 #define __NEXTOS_IDE_WINDOW_STRING  0x01c6
 #define __NEXTOS_IDE_INTEGER_VAR  0x01c9
+#define __NEXTOS_IDE_RTC  0x01cc
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -1275,6 +1274,46 @@
 #define __NEXTOS_IDE_PARTITIONS  0x01a5
 
 #define __NEXTOS_DOTN_SP_DIVMMC  0x4000
+
+#define __ESX_DISK_FILEMAP  0x85
+#define __ESX_DISK_STRMSTART  0x86
+#define __ESX_DISK_STRMEND  0x87
+
+#define __ESX_M_DOSVERSION  0x88
+#define __ESX_M_GETSETDRV  0x89
+#define __ESX_M_TAPEIN  0x8b
+#define __ESX_M_TAPEOUT  0x8c
+#define __ESX_M_GETHANDLE  0x8d
+#define __ESX_M_GETDATE  0x8e
+#define __ESX_M_EXECCMD  0x8f
+#define __ESX_M_GETERR  0x93
+#define __ESX_M_P3DOS  0x94
+#define __ESX_M_ERRH  0x95
+
+#define __ESX_F_OPEN  0x9a
+#define __ESX_F_CLOSE  0x9b
+#define __ESX_F_SYNC  0x9c
+#define __ESX_F_READ  0x9d
+#define __ESX_F_WRITE  0x9e
+#define __ESX_F_SEEK  0x9f
+#define __ESX_F_FGETPOS  0xa0
+#define __ESX_F_FSTAT  0xa1
+#define __ESX_F_FTRUNCATE  0xa2
+#define __ESX_F_OPENDIR  0xa3
+#define __ESX_F_READDIR  0xa4
+#define __ESX_F_TELLDIR  0xa5
+#define __ESX_F_SEEKDIR  0xa6
+#define __ESX_F_REWINDDIR  0xa7
+#define __ESX_F_GETCWD  0xa8
+#define __ESX_F_CHDIR  0xa9
+#define __ESX_F_MKDIR  0xaa
+#define __ESX_F_RMDIR  0xab
+#define __ESX_F_STAT  0xac
+#define __ESX_F_UNLINK  0xad
+#define __ESX_F_TRUNCATE  0xae
+#define __ESX_F_CHMOD  0xaf
+#define __ESX_F_RENAME  0xb0
+#define __ESX_F_GETFREE  0xb1
 
 #define __NEXTOS_RC_READY  0
 #define __NEXTOS_RC_WP  1

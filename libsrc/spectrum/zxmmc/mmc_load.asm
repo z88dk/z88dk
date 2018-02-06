@@ -23,7 +23,7 @@
 	EXTERN		mmc_init
 
 	
-	INCLUDE "zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 
 mmc_load:

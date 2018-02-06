@@ -132,9 +132,9 @@ ENDIF
 
 	defm    "Small C+ ZXR"   ;Unnecessary file signature
 	defb    0
-        INCLUDE "crt0_runtime_selection.asm"
+        INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	INCLUDE "crt0_section.asm"
+	INCLUDE "crt/classic/crt_section.asm"
 
 
 

@@ -11,6 +11,6 @@
 */
 
 #include <psg.h>
-void psg_channels(unsigned char tone_channels, unsigned char noise_channels) {
+void psg_channels(unsigned int tone_channels, unsigned int noise_channels) {
 	set_psg(7, (tone_channels << 3) | noise_channels);
 }

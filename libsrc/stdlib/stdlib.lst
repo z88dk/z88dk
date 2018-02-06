@@ -20,8 +20,6 @@ stdlib/obj/${TYPE}/qsort_sccz80
 stdlib/obj/${TYPE}/qsort_sccz80_callee
 stdlib/obj/${TYPE}/qsort_sdcc
 stdlib/obj/${TYPE}/qsort_sdcc_callee
-stdlib/obj/${TYPE}/rand
-stdlib/obj/${TYPE}/randomize
 stdlib/obj/${TYPE}/swapendian
 stdlib/obj/${TYPE}/wpeek
 stdlib/obj/${TYPE}/wpoke
@@ -33,4 +31,4 @@ stdlib/obj/${TARGET}/sleep
 stdlib/obj/${TARGET}/csleep
 stdlib/obj/${TYPE}/wcmatch
 stdlib/obj/${TYPE}/unbcd
-@stdlib/stdlib-newlib.lst
+stdlib/obj/${TYPE}/x/**/*.o

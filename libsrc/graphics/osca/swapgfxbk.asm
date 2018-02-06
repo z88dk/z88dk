@@ -16,8 +16,8 @@
 ;	$Id: swapgfxbk.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
-;    INCLUDE "flos.def"
-    INCLUDE "osca.def"
+;    INCLUDE "target/osca/def/flos.def"
+    INCLUDE "target/osca/def/osca.def"
 
 		SECTION code_clib
 		PUBLIC    swapgfxbk

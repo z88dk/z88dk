@@ -13,7 +13,7 @@
 	SECTION	code_clib
 	PUBLIC	cs_high
 
-	INCLUDE "zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 	
 
 cs_high:

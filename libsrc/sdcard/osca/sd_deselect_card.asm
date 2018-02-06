@@ -15,7 +15,7 @@
 	
 	EXTERN		sd_send_eight_clocks
 	
-    INCLUDE "osca.def"
+    INCLUDE "target/osca/def/osca.def"
 
 
 sd_deselect_card:

@@ -17,7 +17,7 @@ PUBLIC	_zx_getint
 EXTERN	zx_locatenum
 EXTERN	call_rom3
 
-INCLUDE  "zxfp.def"
+INCLUDE  "target/zx/def/zxfp.def"
 
 ; hl = char *variable
 

@@ -12,7 +12,7 @@
         PUBLIC    w_pixeladdress
 
         INCLUDE "graphics/grafix.inc"
-		INCLUDE  "caos.def"
+		INCLUDE  "target/kc/def/caos.def"
 
 ;
 ;       $Id: w_pixladdr.asm,v 1.1 2016-10-10 07:09:14 stefano Exp $

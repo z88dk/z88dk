@@ -15,7 +15,7 @@
    PUBLIC   _a_memsize
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_memsize:
 _a_memsize:

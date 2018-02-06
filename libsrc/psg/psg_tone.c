@@ -12,7 +12,7 @@
 
 #include <psg.h>
 
-void psg_tone(unsigned char channel, int period) {
+void psg_tone(unsigned int channel, int period) {
 	channel <<= 1;
 	set_psg(channel, period & 255);
 	set_psg(channel + 1, period >> 8);

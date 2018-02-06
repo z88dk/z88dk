@@ -45,7 +45,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_call_type;
-       
+    
+    if ( functype->kind != KIND_FUNC ) {
+        warningfmt("Calling via non-function pointer");
+        functype = default_function_with_type("(funcpointer)", functype);
+    }   
 
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;

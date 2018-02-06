@@ -33,6 +33,6 @@ ELSE
 ENDIF
 
    rst  __ESXDOS_SYSCALL
-   defb __NEXTOS_ROMCALL_DOT_ERROR_HOOK
+   defb __ESX_M_ERRH
    
    ret

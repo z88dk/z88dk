@@ -38,6 +38,10 @@
 	
 .ansi_CHAR
 	ld	b,a		; Save char to print
+
+        ld      a,255		;stop scroll
+        ld      (0x5C8C),a
+
 	ld	a,22		; AT
 	rst	16
 	ld	a,(ansi_ROW)

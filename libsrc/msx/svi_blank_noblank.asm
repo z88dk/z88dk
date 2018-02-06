@@ -13,7 +13,7 @@
 	PUBLIC	_msx_blank
 	PUBLIC	msx_noblank
 	
-        INCLUDE "svi.def"
+        INCLUDE "target/svi/def/svi.def"
 
 
 msx_noblank:

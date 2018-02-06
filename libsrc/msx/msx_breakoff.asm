@@ -15,7 +15,7 @@
 	PUBLIC	_msx_breakoff
 	EXTERN	brksave
 	
-        INCLUDE "msxbasic.def"
+        INCLUDE "target/msx/def/msxbasic.def"
 
 msx_breakoff:
 _msx_breakoff:

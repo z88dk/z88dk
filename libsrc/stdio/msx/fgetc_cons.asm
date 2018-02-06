@@ -16,16 +16,18 @@
 
 
 IF FORmsx
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 ELSE
-        INCLUDE "svibios.def"
+        INCLUDE "target/svi/def/svibios.def"
 ENDIF
 
 
 .fgetc_cons
 ._fgetc_cons
+	push	ix
 	ld	ix,CHGET
 	call	msxbios
+	pop	ix
 
 IF STANDARDESCAPECHARS
 	cp	13

@@ -15,7 +15,7 @@
    PUBLIC   _a_driveb
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_driveb:
 _a_driveb:

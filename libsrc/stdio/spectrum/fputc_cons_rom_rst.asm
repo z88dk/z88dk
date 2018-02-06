@@ -7,11 +7,24 @@
 fputc_cons_rom_rst:
         ld      hl,2
         add     hl,sp
-        ld      a,(hl)
+	ld	b,(hl)
+	ld	hl,skip_count
+	ld	a,(hl)
+	and	a
+	ld	a,b
+	jr	z,continue
+	dec	(hl)
+	jr	direct
+continue:
+	cp	22		;move to
+	jr	nz,not_posn
+	ld	(hl),2
+not_posn:
 	cp	10
 	jr	nz,not_lf
 	ld	a,13
 not_lf:
+direct:
 	ld	hl,23692	;disable the scroll? prompt
 	ld	(hl),255
 	push	iy		;save callers iy
@@ -20,3 +33,7 @@ not_lf:
 	defw	16
 	pop	iy
 	ret
+
+	SECTION	bss_clib
+
+skip_count:	defb	0

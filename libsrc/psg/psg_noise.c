@@ -12,6 +12,6 @@
 
 #include <psg.h>
 
-void psg_noise(unsigned char period) {
+void psg_noise(unsigned int period) {
 	set_psg(6, period & 31);
 }

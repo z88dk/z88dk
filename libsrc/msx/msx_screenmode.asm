@@ -15,9 +15,9 @@
 	PUBLIC	_msx_screenmode
 	
 IF FORmsx
-        INCLUDE "msxbasic.def"
+        INCLUDE "target/msx/def/msxbasic.def"
 ELSE
-        INCLUDE "svibasic.def"
+        INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
 msx_screenmode:

@@ -26,7 +26,7 @@
 	EXTERN		cs_high
 
 	
-	INCLUDE "zxmmc.def"
+	INCLUDE "target/zx/def/zxmmc.def"
 
 	
 mmc_get_cid_csd:

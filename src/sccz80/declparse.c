@@ -509,6 +509,7 @@ static void parse_trailing_modifiers(Type *type)
             continue;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
+            type->flags &= ~SMALLC;
             continue;
         } else if (amatch("__preserves_regs")) {
             int c;
@@ -527,11 +528,6 @@ static void parse_trailing_modifiers(Type *type)
             break;
         }
     }
-
-    if ( type->flags & SDCCDECL ) {
-        type->flags &= ~SMALLC;
-    }
-
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
         errorfmt("Function '%s' is both __naked and __critical, this is not permitted", 1, type->name);
@@ -1085,12 +1081,17 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
 Type *default_function(const char *name)
 {
+    return default_function_with_type(name, type_int);
+}
+
+Type *default_function_with_type(const char *name, Type *return_type)
+{
     Type *type = CALLOC(1,sizeof(*type));
 
     strcpy(type->name, name);
     type->kind = KIND_FUNC;
     type->oldstyle = 1;
-    type->return_type = type_int;
+    type->return_type = return_type;
     type->parameters = array_init(NULL);
     type->size = 0;
     type->len = 1;
@@ -1208,6 +1209,9 @@ static void handle_kr_type_parameters(Type *func)
 
 void flags_describe(int32_t flags, UT_string *output)
 {
+    if ( flags & SDCCDECL ) {
+        utstring_printf(output,"__z88dk_sdccdecl ");
+    }
     if ( (flags & SMALLC) == SMALLC && (flags & FLOATINGDECL) == 0) {
         utstring_printf(output,"__smallc ");
     }
@@ -1223,9 +1227,6 @@ void flags_describe(int32_t flags, UT_string *output)
     if ( flags & SAVEFRAME ) {
         utstring_printf(output,"__z88dk_saveframe ");
     }  
-    if ( flags & SDCCDECL ) {
-        utstring_printf(output,"__z88dk_sdccdecl ");
-    }
     if ( flags & NAKED ) {
         utstring_printf(output,"__naked ");
     }  

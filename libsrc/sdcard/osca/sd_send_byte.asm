@@ -15,7 +15,7 @@
 	PUBLIC	sd_send_byte
 	PUBLIC	sd_waitserend
 	
-    INCLUDE "osca.def"
+    INCLUDE "target/osca/def/osca.def"
 
 
 sd_send_byte:
