@@ -1,3 +1,6 @@
+
+SECTION code_crt_start
+
 ; address = 0x0000
 
    di
