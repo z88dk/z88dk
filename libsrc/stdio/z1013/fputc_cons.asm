@@ -12,7 +12,10 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	
+        cp      10
+        jr      nz,not_lf
+        ld      a,13
+not_lf:	
 	rst $20
 	defb 0		; 'OUTCH' function
 
