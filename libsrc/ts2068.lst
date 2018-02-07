@@ -1,8 +1,12 @@
 @input/spectrum.lst
 @stdio/stdio.lst
 stdio/spectrum/fgetc_cons
+stdio/spectrum/fgetc_cons_inkey
+stdio/spectrum/fputc_cons_rom_rst
 stdio/ts2068/fputc_cons
 stdio/spectrum/getk
+stdio/spectrum/CRT_FONT
+stdio/spectrum/CRT_FONT_64
 @stdio/ansicore.lst
 stdio/ansi/ts2068/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel

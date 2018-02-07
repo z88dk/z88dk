@@ -401,7 +401,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 z = 6;
                             }
                             if ( !cancbundoc() && state->index && z != 6 ) BUF_PRINTF("nop");
-                            else BUF_PRINTF("%-8s%d,%s", "bit", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                            else BUF_PRINTF("%-8s%d,%s", "bit", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         } else if ( x == 2 ) {
                             if ( state->index && z != 6 ) {
                                 handle_register8(state, z, opbuf1, sizeof(opbuf1));
