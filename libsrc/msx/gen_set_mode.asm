@@ -18,6 +18,13 @@
 
 msx_set_mode:
 _msx_set_mode:
+
+IF FOReinstein
+; The Tatung Einstein should be already in graphics mode, correct memory settings ;)
+; "The Brain", January-February 1986 describes the VDP registers in detail 
+; and in the future we can use it to implement all the "set mode" stuff.
+
+ELSE
 	ld	a,l
 	and	a
 	jr	z,initxt
@@ -250,3 +257,4 @@ VDPreg_Write:
 	SECTION		bss_clib
 	
 bit_irqstatus:		defb 0
+ENDIF
