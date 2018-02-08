@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *      Access is either
+ *      Flags is either
  *
  *      O_RDONLY = 0
  *      O_WRONLY = 1    Starts afresh?!?!?
@@ -39,8 +39,7 @@ int open(char *name, int flags, mode_t mode)
 			fc->name[5] |= 0x80;    /* read only mode */
 		uid = getuid();
 		setuid(fc->uid);
-
-		if ( (mode & O_WRONLY) == O_WRONLY  )
+		if ( (flags & U_WRITE) == U_WRITE)
 			remove(name);
 
 		if ( bdos(CPM_OPN,fc) == -1 ) {
@@ -61,8 +60,7 @@ int open(char *name, int flags, mode_t mode)
 		fc->use = flags;
     }
     fd =  (fc - &_fcb[0]);
-	if (mode & O_APPEND)
+	if (flags & O_APPEND)
 		lseek(fd,0L,SEEK_END);
-
     return fd;
 }
