@@ -1544,7 +1544,7 @@ static void declfunc(Type *type, enum storage_type storage)
         if ( adjust ) {
             SYMBOL *ptr = findloc(type->name);
             if ( ptr ) {
-                ptr->offset.i -= type->size;
+                ptr->offset.i -= ( 2 + type->size);
                 where = 2;
             }
         }
