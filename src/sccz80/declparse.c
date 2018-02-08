@@ -1529,7 +1529,7 @@ static void declfunc(Type *type, enum storage_type storage)
     }
     pushframe();
     if (array_len(currfn->ctype->parameters) && (type->flags & (FASTCALL|NAKED)) == FASTCALL ) {
-        Type *type = array_get_byindex(currfn->ctype->parameters,0);
+        Type *type = array_get_byindex(currfn->ctype->parameters,array_len(currfn->ctype->parameters) - 1);
         int   adjust = 1;
 
         if ( type->size == 2 ) 
@@ -1543,9 +1543,21 @@ static void declfunc(Type *type, enum storage_type storage)
 
         if ( adjust ) {
             SYMBOL *ptr = findloc(type->name);
+            int     i;
+
             if ( ptr ) {
-                ptr->offset.i -= ( 2 + type->size);
+                ptr->offset.i -= (type->size + 2);
                 where = 2;
+            }
+
+            if ( currfn->ctype->flags & SMALLC ) {
+                for ( i = 0; i < array_len(currfn->ctype->parameters) - 1; i++ ) {
+                    Type *arg = array_get_byindex(currfn->ctype->parameters, i);
+                    ptr = findloc(arg->name);
+                    if ( ptr ) {
+                        ptr->offset.i -= type->size;
+                    }
+                }
             }
         }
     }
