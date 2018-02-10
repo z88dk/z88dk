@@ -72,6 +72,26 @@ void _im2_isr_8080_##name(void)
 } \
 void _im2_isr_##name(void)
 
+#define IM2_DEFINE_ISR_WITH_BASIC(name)  void name(void) __naked \
+{ \
+	__asm \
+	EXTERN	asm_im2_push_registers \
+        EXTERN	asm_im2_pop_registers \
+	\
+	call	asm_im2_push_registers \
+	call   __im2_isr_##name \
+	call   asm_im2_pop_registers \
+	\
+	push iy \
+	ld iy,0x5c3a \
+	call 0x0038 \
+	pop iy \
+	ret \
+	__endasm; \
+} \
+void _im2_isr_##name(void)
+
+
 #define IM2_DEFINE_ISR_8080(name)  void name(void) __critical __interrupt(0)
 
 #endif

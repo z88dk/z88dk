@@ -214,7 +214,11 @@ SECTION code_crt_return
       
       ld sp,(__sp_or_ret)
       
-      im 1
+      IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
+
+         im __crt_interrupt_mode_exit
+
+      ENDIF
       ei
       ret
    

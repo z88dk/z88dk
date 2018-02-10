@@ -222,18 +222,7 @@ SECTION code_crt_return
 
       ; returning to basic
       
-      pop bc
-      
-      ld sp,(__sp_or_ret)
-      
-      exx
-      pop hl
-      exx
-      pop iy
-      
-      im 1
-      ei
-      ret
+      include "crt_exit_basic.inc"
 
    ELSE
    
