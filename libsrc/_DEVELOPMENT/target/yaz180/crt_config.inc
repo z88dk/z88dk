@@ -85,6 +85,7 @@ IF __CRTCFG = 1
 
    defc TAR__crt_org_vector_table      = 0
    defc TAR__crt_io_vector_base        = -1
+
    defc TAR__crt_interrupt_mode        = -1
    defc TAR__crt_interrupt_mode_exit   = 1
 
@@ -135,6 +136,7 @@ IF __CRTCFG = 2
 
    defc TAR__crt_org_vector_table      = 0
    defc TAR__crt_io_vector_base        = -1
+
    defc TAR__crt_interrupt_mode        = -1
    defc TAR__crt_interrupt_mode_exit   = -1
 
