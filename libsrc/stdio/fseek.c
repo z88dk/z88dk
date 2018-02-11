@@ -44,7 +44,7 @@ _fseek1:
 
 	ld	a,(ix+fp_flags)
 	and	_IOEXTRA
-	jr	z, call_trampoline
+	jr	nz, call_trampoline
 ; Normal file descriptor, just call lseek
 	ld	a,c		;save whence
 	ld	c,(ix+fp_desc)
