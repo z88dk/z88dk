@@ -219,6 +219,25 @@ ENDIF
       
    ENDIF
 
+
+   IFDEF CRT_INTERRUPT_MODE_EXIT
+   
+      defc __crt_interrupt_mode_exit = CRT_INTERRUPT_MODE_EXIT
+   
+   ELSE
+   
+      IFDEF TAR__crt_interrupt_mode_exit
+      
+         defc __crt_interrupt_mode_exit = TAR__crt_interrupt_mode_exit
+      
+      ELSE
+      
+         defc __crt_interrupt_mode_exit = DEF__crt_interrupt_mode_exit
+      
+      ENDIF
+      
+   ENDIF
+
    
    IFDEF CRT_ENABLE_COMMANDLINE
    
