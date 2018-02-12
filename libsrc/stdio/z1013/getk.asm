@@ -16,7 +16,7 @@
 ._getk
 
 	rst $20
-	defb 1		; 'INCH' function
+	defb 4		; 'INKEY' function
 
 .gkret
 
