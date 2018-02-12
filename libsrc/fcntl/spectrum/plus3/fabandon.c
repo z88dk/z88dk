@@ -32,7 +32,9 @@ static int fabandon1(int fd)
 	ld	b,l
 	push	bc
 	ld	iy,DOS_ABANDON
+	push	ix
 	call	dodos
+	pop	ix
 	pop	de
 	ld	hl,-1	;error!
 	ret	nc	;error

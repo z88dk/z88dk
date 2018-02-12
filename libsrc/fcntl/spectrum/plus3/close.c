@@ -23,7 +23,9 @@ int close(int handle)
 	ld	b,l
 	push	hl
 	ld	iy,DOS_CLOSE	;corrupts ix
+	push	ix
 	call	dodos
+	pop	ix
 	pop	de
 	ld	hl,-1	;error!
 	ret	nc	;error

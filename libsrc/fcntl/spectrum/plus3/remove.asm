@@ -24,7 +24,9 @@
 	push	hl
 	push	bc
 	ld	iy,DOS_DELETE
+	push	ix
 	call	dodos
+	pop	ix
 	ld	hl,0
 	ret	c	;OK
 	dec	hl
