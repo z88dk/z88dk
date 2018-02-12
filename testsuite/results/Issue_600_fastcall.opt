@@ -94,6 +94,21 @@
 
 
 
+._callfunc4
+	ld	hl,10	;const
+	push	hl
+	ld	hl,1000	;const
+	ld	de,0
+	push	de
+	push	hl
+	call	_func4
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
 
 	SECTION	bss_compiler
 	SECTION	code_compiler
@@ -108,6 +123,7 @@
 	GLOBAL	_callfunc1
 	GLOBAL	_callfunc2
 	GLOBAL	_callfunc3
+	GLOBAL	_callfunc4
 
 
 
