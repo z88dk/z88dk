@@ -229,20 +229,10 @@ IF DEFINED_NEEDresidos
         defc    ERR_NR=$5c3a            ; BASIC system variables
         defc    ERR_SP=$5c3d
 
+	
         PUBLIC    dodos
-;
-; This is support for residos, we use the normal
-; +3 -lplus3 library and rewrite the values so
-; that they suit us somewhat
-dodos:
-        exx
-        push    iy
-        pop     hl
-        ld      b,PKG_IDEDOS
-        rst     RST_HOOK
-        defb    HOOK_PACKAGE
-        ld      iy,23610
-        ret
+	EXTERN	dodos_residos
+	defc	dodos = dodos_residos
 
 ; Detect an installed version of ResiDOS.
 ;
@@ -292,46 +282,6 @@ noresidos:
 
 ENDIF
 
-
-;---------------------------------------------
-; Some +3 stuff - this needs to be below 49152
-;---------------------------------------------
-IF DEFINED_NEEDplus3dodos
-;       Routine to call +3DOS Routines. Located in startup
-;       code to ensure we don't get paged out
-;       (These routines have to be below 49152)
-;       djm 17/3/2000 (after the manual!)
-        PUBLIC    dodos
-dodos:
-        call    dodos2          ;dummy routine to restore iy afterwards
-        ld      iy,23610
-        ret
-dodos2:
-        push    af
-        push    bc
-        ld      a,7
-        ld      bc,32765
-        di
-        ld      (23388),a
-        out     (c),a
-        ei
-        pop     bc
-        pop     af
-        call    cjumpiy
-        push    af
-        push    bc
-        ld      a,16
-        ld      bc,32765
-        di
-        ld      (23388),a
-        out     (c),a
-        ei
-        pop     bc
-        pop     af
-        ret
-cjumpiy:
-        jp      (iy)
-ENDIF
 
 
 ; Call a routine in the spectrum ROM

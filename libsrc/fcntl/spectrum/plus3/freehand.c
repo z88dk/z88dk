@@ -13,6 +13,8 @@
 
 #include <spectrum.h>
 
+extern void __LIB__ freehand(int);
+
 /* One bit per file */
 
 extern int hand_status;

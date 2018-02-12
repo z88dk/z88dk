@@ -10,8 +10,8 @@ OBJECTS = close.o fabandon.o findhand.o freehand.o open.o \
 
 all: $(OUTPUT_DIRECTORY)/p3.lib
 
-$(OUTPUT_DIRECTORY)/p3.lib: $(OBJECTS) p3list $(wildcard *.asm)
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/p3 @p3list
+$(OUTPUT_DIRECTORY)/p3.lib: $(OBJECTS) plus3.lst $(wildcard *.asm)
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/p3 @plus3.lst
 
 .c.o:
 	zcc +zx $(CFLAGS) -DPLUS3 $*.c

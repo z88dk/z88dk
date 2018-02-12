@@ -36,19 +36,21 @@ defgroup
 
 
 ; Partition entry structure
-defvars 0 {	part_name	ds.b	16
+defvars 0 {	
+		part_name	ds.b	16
 		part_sysinfo	ds.b	16
 		part_info	ds.b	32
 	}
 
 ; Partition handle structure
 
-defvars 0 {	ph_type	ds.b	1
+defvars 0 {	
+		ph_type	ds.b	1
 		ph_scyl	ds.w	1
 		ph_shd	ds.b	1
 		ph_ecyl	ds.w	1
 		ph_ehd	ds.b	1
-                ph_secs ds.l    1       ; highest logical sector number
+                ph_secs ds.q    1       ; highest logical sector number
                 ph_rsvd ds.b    5
 		ph_unit	ds.b	1
 		ph_num	ds.w	1
@@ -86,7 +88,8 @@ defvars 0 {
 
 ; Partition types
 
-defgroup {	ptype_unused,
+defgroup {	
+		ptype_unused,
 		ptype_system,
 		ptype_swap,
 		ptype_p3dos,
@@ -97,14 +100,16 @@ defgroup {	ptype_unused,
 
 ; Calls
 
-defvars $0056 { ide_stream_open		ds.p	1
+defvars $0056 { 
+		ide_stream_open		ds.p	1
 		ide_stream_close	ds.p	1
 		ide_stream_in		ds.p	1
 		ide_stream_out		ds.p	1
 		ide_stream_ptr		ds.p	1
 	}
 
-defvars $00a0 { ide_version		ds.p	1
+defvars $00a0 { 
+		ide_version		ds.p	1
                 ide_interface		ds.p	1
                 ide_init		ds.p	1
                 ide_drive		ds.p	1
@@ -138,14 +143,16 @@ defvars $00a0 { ide_version		ds.p	1
 		ide_snapload		ds.p	1
         }
 
-defvars $019f {	ide_access_data		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
+defvars $019f {	
+		ide_access_data		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
 		ide_identify		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
 		ide_partitions		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
 	}
 
 ; Error codes
 
-defgroup {      rc_invpartition=56,
+defgroup { 
+		rc_invpartition=56,
 		rc_partexist,
 		rc_notimp,
 		rc_partopen,

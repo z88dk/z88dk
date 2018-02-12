@@ -234,23 +234,10 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 // DISK AND OTHER MASS STORAGE I/O
 ///////////////////////////////////
 
-// +3 Disk
-
-#ifdef PLUS3                   // if it's a +3 we want the dodos routine
-#pragma output NEEDplus3dodos
-
-extern int  __LIB__ findhand(void);
-extern void __LIB__ freehand(int);
-
-#endif
-
 // RESIDOS
 
 #ifdef RESIDOS                 // if it's residos then we want dodos routines
 #pragma output NEEDresidos
-
-extern int  __LIB__ findhand(void);
-extern void __LIB__ freehand(int);
 
 #endif
 

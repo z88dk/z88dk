@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <spectrum.h>
 
+extern void __LIB__ freehand(int);
 
 static int fabandon1(int fd);
 
