@@ -29,3 +29,6 @@ void callfunc2() {
 void callfunc3() {
     func3(10);
 }
+void callfunc4() {
+    func4(1000L,10);
+}
