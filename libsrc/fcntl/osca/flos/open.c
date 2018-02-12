@@ -31,7 +31,7 @@ if (flosfile->name[0]!=0)
 	return (-1);
 	
 
-switch (mode) {
+switch (flags & 0xff) {
 	case O_RDONLY:
 		if (find_file(name, flosfile) == 0) {
 			flosfile->name[0]=0;
@@ -42,27 +42,17 @@ switch (mode) {
 		break;
 
 	case O_WRONLY:
-		if (find_file(name, flosfile) != 0)
-			erase_file(name);
-		create_file(name);
-		
-		if (find_file(name, flosfile) == 0) {
-			flosfile->name[0]=0;
-			return (-1);
-		}
-		flosfile->position=0;
-		break;
-
-	case O_APPEND:
-		if (find_file(name, flosfile) != 0) {
-			flosfile->position=flosfile->size-1;
-		} else {
-			erase_file(name);
-			create_file(name);
-			flosfile->position=0;
-		}
-		break;
-
+		if (flags & O_APPEND && find_file(name, flosfile) != 0)
+		    flosfile->position=flosfile->size-1;
+                } else {
+		    erase_file(name);
+	            create_file(name);
+		    flosfile->position=0;
+                    if (find_file(name, flosfile) == 0) {
+                        flosfile->name[0]=0;
+                        return (-1);
+                    }
+                }
 	default:
  		return(-1);
 		break;

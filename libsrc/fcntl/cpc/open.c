@@ -24,7 +24,7 @@
 
 int open(char *name, int flags, mode_t mode)
 {
-	switch ( flags ) {
+	switch ( flags & 0xff ) {
 	case O_RDONLY:
 		if ( cpcfile.in_used )
 			return -1;

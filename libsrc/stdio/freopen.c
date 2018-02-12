@@ -14,41 +14,52 @@
 
 FILE *freopen(const char *name, const char *mode, FILE *fp)
 {
-	int	access;
-	int	flags;
-	int fd;
-	FILE *fp2;
-	switch (*(unsigned char *)mode) {
-		case 'r':
-			access=O_RDONLY;
-			flags=_IOREAD | _IOUSE| _IOTEXT;
-			break;
-		case 'w':
-			access=O_WRONLY;
-                	flags = _IOWRITE | _IOUSE | _IOTEXT;
-			break;
-		case 'a':
-			access=O_APPEND;
-                	flags = _IOWRITE | _IOUSE | _IOTEXT;
-			break;
-		default:
-			return (FILE *)NULL;
-	}
+    int    access;
+    int    flags;
+    int fd;
+    FILE *fp2;
+    while (*mode) {
+        switch (*(unsigned char *)mode) {
+            case 'r':
+                access=O_RDONLY;
+                flags=_IOREAD | _IOUSE| _IOTEXT;
+                break;
+            case 'w':
+                access=O_WRONLY|O_TRUNC;
+                flags = _IOWRITE | _IOUSE | _IOTEXT;
+                break;
+            case 'a':
+                access=O_APPEND|O_WRONLY;
+                flags = _IOWRITE | _IOUSE | _IOTEXT;
+                break;
+            case '+':
+                if (access == O_RDONLY ) {
+                    access=O_RDWR;
+                } else if ( access & O_WRONLY ) {
+                    access=O_RDWR|O_TRUNC;
+                }
+                break;
+            case 'b':
 #ifdef __STDIO_BINARY
-	if ( *(unsigned char *) (mode+1) == 'b' )
-	    flags ^= _IOTEXT;
+                flags ^= _IOTEXT;
 #endif
+                break;
+            default:
+                return (FILE *)NULL;
+        }
+        mode++;
+    }
 
-	{
+    {
 
-		// Others, pass int mode
-		fd=open(name,access,flags);
+        // Others, pass int mode
+        fd=open(name,access,flags);
 
-		fp2=fp;
-		if (fd == - 1 ) return (FILE *)NULL;
-        	fp2->desc.fd=fd;
-        	fp2->ungetc=0; 
-        	fp2->flags=flags;
-		return fp2;
-	}
+        fp2=fp;
+        if (fd == - 1 ) return (FILE *)NULL;
+            fp2->desc.fd=fd;
+            fp2->ungetc=0; 
+            fp2->flags=flags;
+        return fp2;
+    }
 }

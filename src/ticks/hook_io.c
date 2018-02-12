@@ -15,7 +15,7 @@
 #endif
 
 #define CHECK_FD() do {                 \
-        if ( slots[b] == - 1 ) { \
+        if ( slots[b] == -1 ) { \
             SET_ERROR(Z88DK_EBADF);   \
             l = h = 255;                 \
         } \
@@ -52,7 +52,7 @@ int find_slot()
     int  i;
 
     for ( i = 0; i < NUM_SLOTS; i++ ) {
-        if ( slots[i] == 0 ) {
+        if ( slots[i] == -1 ) {
             return i;
         }
     }
@@ -62,9 +62,15 @@ int find_slot()
 static void cmd_openfile(void)
 {
     char *filename = (char *)mem + ( l | h <<8);
-    int   flags = e | d << 8;
+    int   z88dk_flags = e | d << 8;
+    int   flags = O_RDONLY;
     int   mode = c | b << 8;
     int   slot = find_slot();
+
+    if ( z88dk_flags & Z88DK_O_WRONLY ) flags = O_WRONLY;
+    if ( z88dk_flags & Z88DK_O_RDWR ) flags = O_RDWR;
+    if ( z88dk_flags & Z88DK_O_TRUNC ) flags |= O_TRUNC;
+    if ( z88dk_flags & Z88DK_O_APPEND ) flags |= O_APPEND;
 
     l = h = 255; 
     if ( slot != -1 ) {
@@ -76,6 +82,7 @@ static void cmd_openfile(void)
             h = slot / 256;
             SET_ERROR(Z88DK_ENONE);
         } else {
+            SET_ERROR(Z88DK_ENFILE);
             /* Do something */
         }
     } else {
@@ -86,7 +93,6 @@ static void cmd_openfile(void)
 static void cmd_closefile(void)
 {
     CHECK_FD();
-
     close(slots[b]);
     slots[b] = -1;
     l = h = 0;
