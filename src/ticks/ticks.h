@@ -92,6 +92,12 @@ extern int f_(void);
 #define CPU_8080     128
 #define CPU_EZ80     256
 
+#define Z88DK_O_RDONLY 0
+#define Z88DK_O_WRONLY 1
+#define Z88DK_O_RDWR   2
+#define Z88DK_O_TRUNC  512
+#define Z88DK_O_APPEND 256
+
 #define Z88DK_SEEK_SET 0
 #define Z88DK_SEEK_END 1
 #define Z88DK_SEEK_CUR 2
