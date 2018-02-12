@@ -22,7 +22,7 @@
 
 static long fseek1(FILE *fp, fpos_t posn, int whence) __z88dk_callee;
 
-int fseek(FILE *fp, fpos_t posn, int whence)
+int fseek(FILE *fp, fpos_t posn, int whence) __z88dk_saveframe
 {
 	if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
 		if (fseek1(fp,posn,whence) != -1L ) {
