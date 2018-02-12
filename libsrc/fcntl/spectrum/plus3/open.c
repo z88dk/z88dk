@@ -5,12 +5,9 @@
  *
  *      Access is either
  *
- *      O_RDONLY = 0
- *      O_WRONLY = 1    Starts afresh?!?!?
- *      O_APPEND = 256
  *
  *	+3 notes:
- *	Open a file for reading - e=1 d=0
+ *	Open a file for reading - e=2 d=0
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
@@ -32,11 +29,14 @@ int open(char *name, int flags, mode_t mode)
 	and	a
 	jr	nz,ck_append
 	ld	a,(ix+2)
-	and	a
-	ld	de,$0001	;read mode
+	and	a		; O_RDONLY
+	ld	de,$0002	; error, open, ignore header
 	jr	z,open_it
-	ld	de,$0204	;write mode
-	dec	a
+	ld	de,$0204	; new file without header, erase existing
+	dec	a		; O_WRONLY
+	jr	z,open_it
+	ld	de,$0202	; new file without header, open file ignoring header
+	dec	a		; O_RDWR
 	jr	z,open_it
 .open_abort
 	pop	ix
@@ -44,12 +44,14 @@ int open(char *name, int flags, mode_t mode)
 	scf
 	ret
 .ck_append
-	dec	a
-	jr	nz,open_abort
-	ld	a,(ix+2)
-	and	a
-	jr	nz,open_abort	;cant have low byte set
+	dec	a		;O_APPEND = 256
+	jr	nz,ck_trunc
 	ld	de,$0202	;append mode
+	jr 	open_it
+.ck_trunc
+	dec	a		;O_TRUNC = 512
+	jr	z,open_abort
+	ld	de,$0204	;create without header, erase existing
 .open_it
 	push	de
 	call	findhand

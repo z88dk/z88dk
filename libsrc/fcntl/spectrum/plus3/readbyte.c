@@ -21,7 +21,9 @@ int __FASTCALL__ readbyte(int handle)
 	push	bc
 	ld	b,c	;file handle
 	ld	iy,DOS_BYTE_READ	
+	push	ix
 	call	dodos
+	pop	ix
 	ld	hl,-1	;EOF
 	ccf
 	jr	c,end	;error
