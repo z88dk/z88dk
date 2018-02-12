@@ -42,7 +42,7 @@ switch (flags & 0xff) {
 		break;
 
 	case O_WRONLY:
-		if (flags & O_APPEND && find_file(name, flosfile) != 0)
+		if (flags & O_APPEND && find_file(name, flosfile) != 0) {
 		    flosfile->position=flosfile->size-1;
                 } else {
 		    erase_file(name);
