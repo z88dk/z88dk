@@ -28,8 +28,8 @@
 		
 	GLOBAL    __interposer_isr__
 
-	defc	TAR__register_sp = -0xae60
-        defc	TAR__clib_exit_stack_size = 32
+	defc	TAR__register_sp = -1
+        defc	TAR__clib_exit_stack_size = 8
 	INCLUDE	"crt/classic/crt_rules.inc"
 
 ;--------
