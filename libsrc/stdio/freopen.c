@@ -18,37 +18,35 @@ FILE *freopen(const char *name, const char *mode, FILE *fp)
     int    flags;
     int fd;
     FILE *fp2;
-    while (*mode) {
-        switch (*(unsigned char *)mode) {
-            case 'r':
-                access=O_RDONLY;
-                flags=_IOREAD | _IOUSE| _IOTEXT;
-                break;
-            case 'w':
-                access=O_WRONLY|O_TRUNC;
-                flags = _IOWRITE | _IOUSE | _IOTEXT;
-                break;
-            case 'a':
-                access=O_APPEND|O_WRONLY;
-                flags = _IOWRITE | _IOUSE | _IOTEXT;
-                break;
-            case '+':
-                if (access == O_RDONLY ) {
-                    access=O_RDWR;
-                } else if ( access & O_WRONLY ) {
-                    access=O_RDWR|O_TRUNC;
-                }
-                break;
-            case 'b':
-#ifdef __STDIO_BINARY
-                flags ^= _IOTEXT;
-#endif
-                break;
-            default:
-                return (FILE *)NULL;
-        }
-        mode++;
+    switch (*(unsigned char *)mode++) {
+        case 'r':
+            access=O_RDONLY;
+            flags=_IOREAD | _IOUSE| _IOTEXT;
+            break;
+        case 'w':
+            access=O_WRONLY|O_TRUNC;
+            flags = _IOWRITE | _IOUSE | _IOTEXT;
+            break;
+        case 'a':
+            access=O_APPEND|O_WRONLY;
+            flags = _IOWRITE | _IOUSE | _IOTEXT;
+            break;
+        default:
+            return NULL;
     }
+
+    if ( *(unsigned char *)mode++ == '+' ) {
+        if (access == O_RDONLY ) {
+            access=O_RDWR;
+        } else if ( access & O_WRONLY ) {
+            access=O_RDWR|O_TRUNC;
+        }
+    }
+#ifdef __STDIO_BINARY
+    if (*(unsigned char *)mode == 'b') {
+        flags ^= _IOTEXT;
+    }
+#endif
 
     {
 
