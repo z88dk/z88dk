@@ -878,6 +878,11 @@ Type *dodeclare(enum storage_type storage)
             type->flags &= ~(SMALLC|FLOATINGDECL|CALLEE|FASTCALL);
         }
 
+        if ( type->kind == KIND_FUNC && (type->flags & (FASTCALL|SMALLC)) == FASTCALL && array_len(type->parameters) > 1) {
+            warningfmt("Cannot define function '%s' as __z88dk_fastcall __stdc when it has more than 1 argument",type->name);
+            type->flags ^= FASTCALL;
+        }
+
         if ( rcmatch('{') && type->kind == KIND_FUNC) {
             declfunc(type, storage);
             return type;

@@ -1,0 +1,114 @@
+
+
+
+	MODULE	Issue_600_fastcall
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	push	de
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func2
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func3
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	push	de
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._callfunc1
+	ld	hl,10	;const
+	call	_func1
+	ret
+
+
+
+._callfunc2
+	ld	hl,1000	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,10	;const
+	call	_func2
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._callfunc3
+	ld	hl,10	;const
+	call	_func3
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func1
+	GLOBAL	_func2
+	GLOBAL	_func3
+	GLOBAL	_func4
+	GLOBAL	_callfunc1
+	GLOBAL	_callfunc2
+	GLOBAL	_callfunc3
+
+
+
+

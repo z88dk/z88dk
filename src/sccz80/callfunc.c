@@ -203,10 +203,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
             // }
         }
-        if ( (function_pointer_call == 0 && (functype->flags & FASTCALL)) || 
-            (tmpfiles[argnumber+1] == NULL && (builtin_flags & FASTCALL) == FASTCALL ) ) {
-            /* fastcall of single expression OR the last argument of a builtin */
-
+        if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
+            ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
+                 /* fastcall of single expression OR the last argument of a builtin */
         } else {
             if (argnumber == watcharg) {
                 if (ptr)
