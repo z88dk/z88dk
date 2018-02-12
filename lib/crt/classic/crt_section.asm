@@ -8,6 +8,7 @@
 ; crt_model = 2		; ROM model, data section compressed
 
 		SECTION CODE
+
 		SECTION code_crt_init
 crt0_init_bss:
         EXTERN  __BSS_head
@@ -60,6 +61,7 @@ ENDIF
 		SECTION code_crt_exit
 
 	ret
+		SECTION code_driver
 		SECTION code_compiler
 		SECTION code_clib
 		SECTION code_crt0_sccz80

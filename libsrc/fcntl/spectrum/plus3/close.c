@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <spectrum.h>
 
-
+extern void __LIB__ freehand(int);
 
 int close(int handle)
 {

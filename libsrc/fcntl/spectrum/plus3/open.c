@@ -17,6 +17,8 @@
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 #include <spectrum.h>
 
+extern int  __LIB__ findhand(void);
+
 int open(char *name, int flags, mode_t mode)
 {                                      
 #asm
