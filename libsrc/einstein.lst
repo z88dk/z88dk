@@ -30,6 +30,7 @@ graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
 @msx/genmsx.lst
+msx/gen_msxbios
 msx/gen_filvrm
 msx/gen_ldirmv
 msx/gen_ldirvm
