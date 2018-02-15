@@ -719,3 +719,7 @@ forward. With resources so limited every byte matters in Spectrum programs, and
 it's an unforgiving environment. Get anything wrong and the program will
 crash. The programmer needs to adopt a mindset where he or she sees the complete
 picture.
+
+The next part of this getting started guide looks at using the Spectrum's
+interrupt with Z88DK.
+Part 8 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
