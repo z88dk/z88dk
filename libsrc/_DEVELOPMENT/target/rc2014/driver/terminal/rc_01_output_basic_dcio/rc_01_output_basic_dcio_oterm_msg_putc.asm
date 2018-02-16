@@ -39,29 +39,22 @@ cooked:
 rc_01_output_basic_dcio_oterm_msg_putc_raw:
 
    ; c = ascii code
-   
-   bit 4,(ix+6)
-   jr z, crlf_done             ; if not processing crlf
 
    ld a,c
-   
+
+   bit 4,(ix+6)
+   jp z, 0x08                  ; if not processing crlf
+
    cp CHAR_CR
    ret z                       ; ignore cr
 
    cp CHAR_LF
-   jr nz, crlf_done
+   jp nz, 0x08
 
    ; send cr+lf
    
-   ld c,13
-   call crlf_done              ; send cr
+   ld a,13
+   call 0x08                   ; send cr
    
-   ld c,10
-
-crlf_done:
-
-   ; c = ascii code
-
-   ld a,c
-   rst 0x08
-   ret
+   ld a,10
+   jp 0x08

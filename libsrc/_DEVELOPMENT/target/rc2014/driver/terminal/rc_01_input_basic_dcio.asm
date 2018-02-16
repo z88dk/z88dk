@@ -39,6 +39,7 @@
 ;
 ; * ITERM_MSG_GETC
 ; * ITERM_MSG_INTERRUPT
+; * ITERM_MSG_REJECT
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MESSAGES GENERATED FOR CONSOLE_01_OUTPUT_TERMINAL
@@ -106,11 +107,12 @@ SECTION code_driver_terminal_input
 
 PUBLIC rc_01_input_basic_dcio
 
-EXTERN ITERM_MSG_GETC, ITERM_MSG_INTERRUPT, STDIO_MSG_FLSH
+EXTERN ITERM_MSG_GETC, ITERM_MSG_INTERRUPT, ITERM_MSG_REJECT, STDIO_MSG_FLSH
 
 EXTERN console_01_input_terminal
 EXTERN rc_01_input_basic_dcio_iterm_msg_getc
 EXTERN rc_01_input_basic_dcio_iterm_msg_interrupt
+EXTERN rc_01_input_basic_dcio_iterm_msg_reject
 EXTERN rc_01_input_basic_dcio_stdio_msg_flsh
 
 rc_01_input_basic_dcio:
@@ -120,6 +122,9 @@ rc_01_input_basic_dcio:
    
    cp ITERM_MSG_INTERRUPT
    jp z, rc_01_input_basic_dcio_iterm_msg_interrupt
+
+   cp ITERM_MSG_REJECT
+   jp z, rc_01_input_basic_dcio_iterm_msg_reject
    
    cp STDIO_MSG_FLSH
    jp z, rc_01_input_basic_dcio_stdio_msg_flsh

@@ -16,5 +16,4 @@ rc_01_output_basic_dcio_oterm_msg_bell:
 rc_01_output_basic_dcio_oterm_msg_bell_0:
 
    ld a,CHAR_BELL
-   rst 0x08
-   ret
+   jp 0x08
