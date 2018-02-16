@@ -13,8 +13,17 @@
 
 getk:
 _getk:
-        ld hl, _x1_keyboard_io
+        ld hl, _x1_keyboard_io+1
         ld a, (hl)
+        and $40
+		ld	a,0
+		jr	z,nokey_entry
+        dec hl
+        ld a, (hl)
+        and a
+		jr	z,nokey_entry
+		
+        ld (hl), 0		; I'm not sure about this
 
 IF STANDARDESCAPECHARS
 	cp	13
@@ -23,6 +32,7 @@ IF STANDARDESCAPECHARS
 .not_return
 ENDIF
 
-        ld h, 0
-        ld l, a
-	ret
+.nokey_entry
+        ld h,0
+        ld l,a
+        ret
