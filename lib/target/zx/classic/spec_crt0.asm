@@ -219,6 +219,20 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 ; Runtime selection
 
+IF NEED_fzxterminal
+        PUBLIC          fputc_cons
+        PUBLIC          _fputc_cons
+	PUBLIC		_fgets_cons_erase_character
+	PUBLIC		fgets_cons_erase_character
+        EXTERN          fputc_cons_fzx
+        EXTERN          fgets_cons_erase_character_fzx
+        defc DEFINED_fputc_cons = 1
+        defc fputc_cons = fputc_cons_fzx
+        defc _fputc_cons = fputc_cons_fzx
+        defc fgets_cons_erase_character = fgets_cons_erase_character_fzx
+        defc _fgets_cons_erase_character = fgets_cons_erase_character_fzx
+ENDIF
+
 	INCLUDE	"crt/classic/crt_runtime_selection.asm"
 
 ;---------------------------------------------

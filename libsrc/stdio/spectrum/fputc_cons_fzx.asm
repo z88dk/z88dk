@@ -2,15 +2,44 @@
 		SECTION code_clib
 		PUBLIC	fputc_cons_fzx
 		PUBLIC	_fputc_cons_fzx
+		PUBLIC	fgets_cons_erase_character_fzx
 
 
 		EXTERN	asm_fzx_putc
 		EXTERN	asm_fzx_state_init
+		EXTERN	asm_fzx_glyph_width
 		EXTERN	__fzx_puts_newline
 		EXTERN	call_rom3
 		EXTERN	CRT_FONT_FZX
 
-
+; Erase the previous character (used by fgets_cons)
+fgets_cons_erase_character_fzx:
+	push	ix
+	ld	a,l		;character to erase
+	push	hl		;save it, we'll probably need it later
+	ld	ix,fzx_state
+	ld	l,(ix+3)	;fzx_font
+	ld	h,(ix+4)
+	push	hl
+	call	asm_fzx_glyph_width
+	pop	hl		;fzx_font
+	inc	hl		;now on tracking
+	; TODO: Handle going up a line
+	; a = width -1
+	inc	a
+	add	(hl)		;+tracking
+	ld	e,a
+	ld	a,(ix+5)	;x position
+	sub	e
+	ld	(ix+5),a
+	pop	hl		;get glyph back
+	push	af		;save x
+        ld      c,l		;glyph
+        call    asm_fzx_putc
+	pop	af
+	ld	(ix+5),a	;back to where we were
+	pop	ix
+	ret
 
 
 ; (char to print)
