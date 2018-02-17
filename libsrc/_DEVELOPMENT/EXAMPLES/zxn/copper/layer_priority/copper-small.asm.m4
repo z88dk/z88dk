@@ -9,13 +9,21 @@
 
 include(`z88dk.m4')                ; useful m4 macros
 
+INCLUDE "config_zxn_private.inc"
+
 SECTION rodata_user
 
 PUBLIC _copper
 PUBLIC _copper_end
 
-EXTERN __REG_SPRITE_LAYER_SYSTEM
-EXTERN __RSLS_LAYER_PRIORITY_SUL, __RSLS_LAYER_PRIORITY_SLU
+; Instead of EXTERN use the INCLUDE above to get hold of these
+; constants.  There will be a large defc block at the head of the
+; output asm but the asm list file will have all the assembled
+; bytes all filled in for debugging.  Will return to EXTERN
+; once things work on the real Next.
+
+;EXTERN __REG_SPRITE_LAYER_SYSTEM
+;EXTERN __RSLS_LAYER_PRIORITY_SUL, __RSLS_LAYER_PRIORITY_SLU
 
 defc _copper_size = _copper_end - _copper
 
