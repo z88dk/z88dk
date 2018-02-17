@@ -23,7 +23,7 @@ _getk:
         and a
 		jr	z,nokey_entry
 		
-        ld (hl), 0		; I'm not sure about this
+    ;    ld (hl), 0		; I'm not sure about this
 
 IF STANDARDESCAPECHARS
 	cp	13
