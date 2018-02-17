@@ -60,6 +60,7 @@ define buildgeneric
 	$(MAKE) -C time
 	$(MAKE) -C debug
 	$(MAKE) -C assert
+	$(MAKE) -C font/fzx
 	$(MAKE) -C stdlib TARGET=$(1)
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C psg
