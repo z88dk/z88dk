@@ -96,6 +96,9 @@ ENDIF
 		SECTION	code_adt_wv_stack
 		SECTION code_alloc_balloc
 		SECTION code_alloc_obstack
+		SECTION	code_arch
+		SECTION	code_font
+		SECTION	code_font_fzx
 
 		SECTION code_user
 		SECTION rodata_fp
@@ -103,6 +106,7 @@ ENDIF
 		SECTION rodata_clib
 		SECTION rodata_user
 		SECTION rodata_font
+		SECTION rodata_font_fzx
 		SECTION rodata_font_4x8
 		SECTION rodata_font_8x8
 		SECTION ROMABLE_END
