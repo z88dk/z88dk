@@ -1,5 +1,4 @@
 @input/spectrum.lst
-@stdio/stdio.lst
 stdio/spectrum/fputc_cons_fzx
 stdio/spectrum/fputc_cons_rom_rst
 stdio/spectrum/fgetc_cons
@@ -9,6 +8,7 @@ stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64
 stdio/spectrum/CRT_FONT_FZX
+@stdio/stdio.lst
 @stdio/ansicore.lst
 stdio/ansi/spectrum/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel

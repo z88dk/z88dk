@@ -22,3 +22,18 @@
          defc __clib_exit_stack_size = DEF__clib_exit_stack_size
       ENDIF
    ENDIF
+
+
+   PUBLIC __CRT_KEY_DEL
+   IFDEF CRT_KEY_DEL
+     defc __CRT_KEY_DEL = CRT_KEY_DEL
+   ELSE
+     defc __CRT_KEY_DEL = 8
+   ENDIF
+
+   PUBLIC __CRT_KEY_CAPS_LOCK
+   IFDEF CRT_KEY_CAPS_LOCK
+     defc __CRT_KEY_CAPS_LOCK  = CRT_KEY_CAPS_LOCK
+   ELSE
+     defc __CRT_KEY_CAPS_LOCK = 6
+   ENDIF

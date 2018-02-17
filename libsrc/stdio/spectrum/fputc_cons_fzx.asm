@@ -1,5 +1,8 @@
 
+		SECTION code_clib
 		PUBLIC	fputc_cons_fzx
+		PUBLIC	_fputc_cons_fzx
+
 
 		EXTERN	asm_fzx_putc
 		EXTERN	asm_fzx_state_init
@@ -7,13 +10,47 @@
 		EXTERN	call_rom3
 		EXTERN	CRT_FONT_FZX
 
+
+
+
 ; (char to print)
 fputc_cons_fzx:
+_fputc_cons_fzx:
         ld      hl,2
         add     hl,sp
 	ld	a,(hl)
 	push	ix
 	ld	ix,fzx_state
+	ld	hl,pending_flags
+	bit	0,(hl)
+	jr	z,notsetink
+	and	7
+	ld	(ix+22),a
+	res	0,(hl)
+	ret
+
+notsetink:
+	bit	1,(hl)
+	jr	z,notsetpaper
+	res	1,(hl)
+	and	7
+	add	a
+	add	a
+	add	a
+	ld	(ix+23),a
+	ret
+
+notsetpaper:
+	cp	16
+	jr	nz,ck_paper
+	set	0,(hl)
+	ret
+ck_paper:
+	cp	17
+	jr	nz,loop
+	set	1,(hl)
+	ret
+
 loop:
 	cp	10
 	jr	nz,continue
@@ -53,9 +90,11 @@ finish2:
 	pop	ix
 	ret
 
-	SECTION	data_clib
+	SECTION	bss_clib
 
-fzx_state:	defs	24,3		;at the moment
+fzx_state:	defs	24,0
+
+pending_flags:	defb	0
 
 	SECTION	data_clib
 

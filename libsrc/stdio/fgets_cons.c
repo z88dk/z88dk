@@ -16,29 +16,33 @@
 
 extern unsigned char _cons_state;
 
+// Pick up the delete key as defined by the crt
+extern void *_CRT_KEY_DEL;
+#define KEY_DEL &_CRT_KEY_DEL
+extern void *_CRT_KEY_CAPS_LOCK;
+#define KEY_CAPS_LOCK &_CRT_KEY_CAPS_LOCK
+
+extern void fgets_cons_erase_character(unsigned char toerase) __z88dk_fastcall;
+
 char *fgets_cons(char *str, size_t max)
 {   
    int c;
    int ptr;
    ptr=0;
 
-   while (1) {
+   while (ptr < max - 1) {
       c = fgetc_cons();
 
-      if (ptr == max-1) return str;
-      
-      if (c == 6)
+      if (c == KEY_CAPS_LOCK)
       {
-         _cons_state = ! _cons_state;   // toggle CAPS LOCK
+         _cons_state ^= 1; // Toggle caps lock
       }
-      else if (c == 12 || c == 8 )
+      else if ( c == KEY_DEL)
       {
 	if ( ptr > 0 )
 	{
-           str[--ptr] = 0;
-	   fputc_cons(8);
-	   fputc_cons(32);
-	   fputc_cons(8);
+           fgets_cons_erase_character(str[--ptr]);
+           str[ptr] = 0;
         }
       }
       else
@@ -49,8 +53,9 @@ char *fgets_cons(char *str, size_t max)
          str[ptr++] = c;
          str[ptr] = 0;
 	 fputc_cons(c);
-         if (c == '\n' || c == '\r') return str;
+         if (c == '\n' || c == '\r') break;
       }
    }
+   return str;
 }
 

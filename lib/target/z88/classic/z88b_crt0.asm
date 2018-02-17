@@ -24,6 +24,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -0x1ffe	; oz safe place
+	defc	CRT_KEY_DEL = 127
         INCLUDE "crt/classic/crt_rules.inc"
 
 
