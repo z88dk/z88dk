@@ -3406,8 +3406,8 @@ int main (int argc, char **argv){
             break;
           case 0x8a:                                         // (ZXN) push $xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t lsb = get_memory(pc++);
               uint8_t msb = get_memory(pc++);
+              uint8_t lsb = get_memory(pc++);
               PUSH(msb,lsb);
               st += 1;
             } else {
