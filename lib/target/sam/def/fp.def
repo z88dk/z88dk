@@ -1,0 +1,126 @@
+; Sam Coupe floating pont calculate operators
+
+
+JGETINT Unstack number from calculator stack into HL. BC holds (0121H) acopyofHL,andAholdsacopyofL.Anerroris
+           generated if the rounded number is not in the range 0-
+           65535.
+
+
+	; Unstack from calculator -> hl, error if not in range
+	defc	JGETINT = $0121
+
+	; Unstack last value from calculator stack to AEDCB.
+	defc	JSTKFETCH = $0124
+
+	; Stack AEDCB registers on the calculator stack.
+	defc	JSTKSTORE = $0127
+	
+	; ASCII version of stack number -> 5BA0H. Exit: de = 5BA0H, bc=length
+	defc	JSTRS = $017E
+
+	defc	SAMFP_MULT = $00
+	defc	SAMFP_ADDN = $01
+	defc	SAMFP_CONCAT = $02
+	defc	SAMFP_SUBN = $03
+	defc	SAMFP_POWER = $04
+	defc	SAMFP_DIVN = $05
+	defc	SAMFP_SWOP = $06
+	defc	SAMFP_DROP = $07
+	defc	SAMFP_MOD = $08
+	defc	SAMFP_IDIV = $09
+	defc	SAMFP_BOR = $0A
+	defc	SAMFP_BAND = $0C
+	defc	SAMFP_NUOR = $0D
+	defc	SAMFP_NUAND = $0E
+	defc	SAMFP_NOTE = $0F
+	defc	SAMFP_NLESE = $10
+	defc	SAMFP_NGRTE = $11
+	defc	SAMFP_NLESS = $12
+	defc	SAMFP_NEQUAL = $13
+	defc	SAMFP_NGRTR = $14
+	defc	SAMFP_SAND = $15
+	defc	SAMFP_SNOTE = $16
+	defc	SAMFP_SLESE = $17
+	defc	SAMFP_SGRTE = $18
+	defc	SAMFP_SLESS = $19
+	defc	SAMFP_SEQUAL = $1A
+	defc	SAMFP_SGRTR = $1B
+	defc	SAMFP_SWOp13 = $1C
+	defc	SAMFP_SWOp23 = $1D
+	defc	SAMFP_JPTRUE = $1E
+	defc	SAMFP_JFFALSE = $1F
+	defc	SAMFP_JUMP = $20
+	defc	SAMFP_LDBREG = $21
+	defc	SAMFP_DECB = $22
+	defc	SAMFP_STKBREG = $23
+	defc	SAMFP_USEB = $24
+	defc	SAMFP_DUP = $25
+	defc	SAMFP_ONELIT = $26
+	defc	SAMFP_FIVELIT = $27
+	defc	SAMFP_SOMELIT = $28
+	defc	SAMFP_LKADDRB = $29
+	defc	SAMFP_LKADDRW = $2A
+	defc	SAMFP_REDARG = $2B
+	defc	SAMFP_LESS0 = $2C
+	defc	SAMFP_LESE0 = $2D
+	defc	SAMFP_GRTR0 = $2E
+	defc	SAMFP_GRTE0 = $2F
+	defc	SAMFP_TRUNC = $30
+	defc	SAMFP_RESTACK = $31
+	defc	SAMFP_POWR2 = $32
+	defc	SAMFP_EXIT = $33
+	defc	SAMFP_EXIT2 = $34
+	defc	SAMFP_SIN = $39
+	defc	SAMFP_COS = $3A
+	defc	SAMFP_TAN = $3B
+	defc	SAMFP_ASN = $3C
+	defc	SAMFP_ACS = $3D
+	defc	SAMFP_ATN = $3E
+	defc	SAMFP_LOGN = $3F
+	defc	SAMFP_EXP = $40
+	defc	SAMFP_ABS = $41
+	defc	SAMFP_SQN = $42
+	defc	SAMFP_SOR = $43
+	defc	SAMFP_INT = $44
+	defc	SAMFP_USR = $45
+	defc	SAMFP_IN = $46
+	defc	SAMFP_PEEK = $47
+	defc	SAMFP_DPEEK = $48
+	defc	SAMFP_DVAR = $49
+	defc	SAMFP_SVAR = $4A
+	defc	SAMFP_BUTTON = $4B
+	defc	SAMFP_EOF = $4C
+	defc	SAMFP_PTR = $4D
+	defc	SAMFP_UDG = $4F
+	defc	SAMFP_NUMBER = $50
+	defc	SAMFP_LEN = $51
+	defc	SAMFP_CODE = $52
+	defc	SAMFP_VALDOLLAR = $53
+	defc	SAMFP_VAL = $54
+	defc	SAMFP_TRUNCDOLLAR = $55
+	defc	SAMFP_CHR = $56
+	defc	SAMFP_STR = $57
+	defc	SAMFP_BIN = $58
+	defc	SAMFP_HEX = $59
+	defc	SAMFP_USRDOLLAR = $5A
+	defc	SAMFP_INKEY = $5B
+	defc	SAMFP_NOT = $5C
+	defc	SAMFP_NEGATE = $5D
+	defc	SAMFP_STOD0 = $C8
+	defc	SAMFP_STOD1 = $C9
+	defc	SAMFP_STOD2 = $CA
+	defc	SAMFP_STOD3 = $CB
+	defc	SAMFP_STOD4 = $CC
+	defc	SAMFP_STOD5 = $CD
+	defc	SAMFP_STO0 = $D0
+	defc	SAMFP_STOl = $D1
+	defc	SAMFP_STO2 = $D2
+	defc	SAMFP_STO3 = $D3
+	defc	SAMFP_STO4 = $D4
+	defc	SAMFP_STO5 = $D5
+	defc	SAMFP_RCL0 = $DB
+	defc	SAMFP_RCLl = $D9
+	defc	SAMFP_RCL2 = $DA
+	defc	SAMFP_RCL3 = $DB
+	defc	SAMFP_RCL4 = $DC
+	defc	SAMFP_RCL5 = $DD
