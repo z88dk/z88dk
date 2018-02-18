@@ -69,6 +69,13 @@ void add_opcode_nn(int opcode, Expr *expr)
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
+/* add opcode followed by big-endian 16-bit expression */
+void add_opcode_NN(int opcode, struct Expr *expr)
+{
+	add_opcode(opcode);
+	Pass2infoExpr(RANGE_WORD_BE, expr);
+}
+
 /* add opcode followed by IX/IY offset expression */
 void add_opcode_idx(int opcode, Expr *expr)
 {
