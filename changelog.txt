@@ -26,14 +26,16 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +nc100 graphics support has been added
 - [classiclib] +msx fixed an initialisation error that prevented ROMs from
   working correctly
+- [classiclib] +ts2068 screen printer doesn't force hires screen
 - [classiclib] +zx ROM screen printer now available
 - [classiclib] +zx Non ROM based stdin is now available
 - [classiclib] +zx Default console font can be changed at compile time (CRT_FONT)
+- [classiclib] +zx FZX based screen printer is now available
 - [classiclib] imported obstack, balloc and adt libraries from newlib. balloc can now
   be configured in the same was as newlib (-pragma-define:CLIB_BALLOC_TABLE_SIZE=n)
 - [classiclib] Marked adt and balloc classic apis as deprecated
 - [classiclib] cpcrslib has been imported
-- [classiclib] CPC, MSX, SVI, ZX81, Galaksija port improvements
+- [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam port improvements
 - [classiclib] SMS stability improvements
 - [classiclib] Now shares ctype, string and most of stdlib with newlib
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
