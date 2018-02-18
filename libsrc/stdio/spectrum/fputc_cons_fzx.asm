@@ -52,33 +52,56 @@ _fputc_cons_fzx:
 	ld	ix,fzx_state
 	ld	hl,pending_flags
 	bit	0,(hl)
-	jr	z,notsetink
+	jr	z,notset_ink
 	and	7
 	ld	(ix+22),a
 	res	0,(hl)
-	ret
+	jr	finish2
 
-notsetink:
+notset_ink:
 	bit	1,(hl)
-	jr	z,notsetpaper
+	jr	z,notset_paper
 	res	1,(hl)
 	and	7
 	add	a
 	add	a
 	add	a
 	ld	(ix+23),a
-	ret
+	jr	finish2
 
-notsetpaper:
+notset_paper:
+	bit	3,(hl)
+	jr	z,notset_y
+	and	191
+	ld	(ix+7),a
+	res	3,(hl)
+	jr	finish2
+
+
+notset_y:
+	bit	2,(hl)
+	jr	z,notset_x
+	ld	(ix+5),a
+	res	2,(hl)
+	jr	finish2
+
+notset_x:
 	cp	16
 	jr	nz,ck_paper
 	set	0,(hl)
-	ret
+	jr	finish2
 ck_paper:
 	cp	17
-	jr	nz,loop
+	jr	nz,ck_at
 	set	1,(hl)
-	ret
+	jr	finish2
+
+ck_at:
+	cp	22
+	jr	nz,loop
+	set	3,(hl)
+	set	2,(hl)
+	jr	finish2
 
 loop:
 	cp	10
@@ -96,6 +119,12 @@ continue:
 	pop	af
 	jr	loop
 
+finish:
+	pop	af
+finish2:
+	pop	ix
+	ret
+
 scroll:
 	;7,8 = y position, 5,6 = x
 	ld	l,(ix+3)	;font
@@ -110,14 +139,6 @@ scroll:
 	defw	3582
 	pop	af
 	jr	loop
-
-
-
-finish:
-	pop	af
-finish2:
-	pop	ix
-	ret
 
 	SECTION	bss_clib
 
