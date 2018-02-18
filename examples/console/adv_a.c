@@ -2830,20 +2830,7 @@ LCASS_1	ld      hl,LCASS_M
 
 char i_GetCh()
 {
-	int ch;
-	
-	do
-	{
-		ch = getkey();
-	} while ((ch != '\n') && (ch != '\r') && (ch != KEY_DEL ) && !(ch >= ' ' && ch <= '~'));
-
-	if (ch == '\r')
-		ch = '\n';
-
-	if (ch >= 'a' && ch <= 'z')
-		ch ^= 0x20;
-	
-	return (char) ch;
+        return toupper(fgetc(stdin));
 }
 
 /***
