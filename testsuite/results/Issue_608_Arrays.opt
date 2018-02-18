@@ -1,0 +1,116 @@
+
+
+
+	MODULE	Issue_608_Arrays
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._carray
+	defm	"HelloThere"
+	defb	0
+
+	SECTION	code_compiler
+	SECTION	data_compiler
+._larray
+	defb	1,0,0,0
+	defb	2,0,0,0
+	defb	3,0,0,0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._larrays
+	defb	1,0,0,0
+	defb	2,0,0,0
+	defs	4
+	SECTION	code_compiler
+	SECTION	data_compiler
+._narray
+	defw	1
+	defw	2
+	defs	2
+	defw	3
+	defw	4
+	defs	2
+	SECTION	code_compiler
+
+._func
+	ld	de,_carray
+	ld	hl,4-2	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,de
+	call	l_gchar
+	ret
+
+
+
+._func2
+	ld	hl,_larray
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_glong
+	ret
+
+
+
+._func2_b
+	ld	hl,_larrays
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_glong
+	ret
+
+
+
+._func3
+	ld	hl,_narray
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	b,h
+	ld	c,l
+	add	hl,bc
+	add	hl,bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+	inc	hl
+	inc	hl
+	call	l_gint	;
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_carray
+	GLOBAL	_larray
+	GLOBAL	_larrays
+	GLOBAL	_narray
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_func2_b
+	GLOBAL	_func3
+
+
+
+

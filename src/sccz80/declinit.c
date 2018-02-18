@@ -180,6 +180,7 @@ static int init(Type *type, int dump)
                 return type->size;
             }
             type->size = sz;
+            type->len = sz;
             return sz;
         } else {
             int32_t ivalue = value;
