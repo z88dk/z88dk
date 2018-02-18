@@ -2,7 +2,7 @@
 #include <zxvgs.h>
 #include <stdio.h>
 
-#define APP_NAME="INFO"
+#define APP_NAME "INFO"
 
 int video()
 {
@@ -17,7 +17,7 @@ int video()
 #pragma endasm
 }
 
-main()
+void main()
 {
  int ok1, ok2;
  printf("ZXVGS Info 0.30\n");

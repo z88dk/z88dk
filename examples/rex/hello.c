@@ -8,7 +8,7 @@
 
 #include <rex/rex.h>
 
-int main()
+void main()
 {
 	MSG msg;
 	int flag=1;

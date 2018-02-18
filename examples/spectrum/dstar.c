@@ -152,7 +152,7 @@ static void setupgame(void)
 
 static void gamekeys(void)
 {
-        char *charptr;
+        unsigned char *charptr;
 
 /* Set up a pointer to the variable we want to change (either for
  * box or for ball
@@ -191,7 +191,7 @@ static void gamekeys(void)
 
 static void left(char *ptr)
 {
-        char *locn;
+        unsigned char *locn;
 
         while(1) {
                 locn=*(ptr)+board;
@@ -206,7 +206,7 @@ static void left(char *ptr)
 
 static void right(char *ptr)
 {
-        char *locn;
+        unsigned char *locn;
 
         while(1) {
                 locn=*(ptr)+board;
@@ -220,7 +220,7 @@ static void right(char *ptr)
 
 static void down(char *ptr)
 {
-        char *locn;
+        unsigned char *locn;
 
         while(1) {
                 locn=*(ptr)+board;
@@ -234,7 +234,7 @@ static void down(char *ptr)
 
 static void up(char *ptr)
 {
-        char *locn;
+        unsigned char *locn;
 
         while(1) {
                 locn=*(ptr)+board;
@@ -270,7 +270,7 @@ static void standardmiddle(char nextpos)
 
 static int checkfinish(void)
 {
-        char *ptr;
+        unsigned char *ptr;
         int i;
         ptr=board;
         for (i=1; i!=144; i++) {
@@ -294,7 +294,8 @@ static int checkfinish(void)
 static void setuplevel(void)
 {
         int y,x;
-        char *ptr,*ptr2;
+        char *ptr;
+        unsigned char *ptr2;
         ptr2=board;
         ptr=levels+(level*38);
 /* ptr points to start of level now */
@@ -356,7 +357,7 @@ void redrawscreen(void)
 static void drawboard(void)
 {
         int x,y;
-        char *ptr;
+        unsigned char *ptr;
 
         ptr=board;
 
@@ -382,7 +383,8 @@ static void drawboard(void)
 
 static void puttiblock(unsigned char spr,int x, int y)
 {
-        char *ptr2,*ptr;
+        char *ptr2;
+        unsigned char *ptr;
         int i;
 
 /* We use this method instead of y*=112 because the compiler has special

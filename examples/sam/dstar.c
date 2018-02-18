@@ -98,10 +98,25 @@ char tiscr[1024];       /* Our very own TI86 screen! */
 
 
 /* prototype to stop barfing */
-
 void redrawscreen(void);
+void myexit();
+void playgame();
+void setupgame();
+void gamekeys();
+void left(char *ptr);
+void right(char *ptr);
+void down(char *ptr);
+void up(char *ptr);
+void setuplevel();
+void redrawscreen(void);
+void drawboard();
+void puttiblock(char spr,int x, int y);
+void dozxcopyasm();
+void redrawscreen(void);
+int checkfinish();
+int standardmiddle(char nextpos);
 
-main()
+void main()
 {
         redrawscreen();         /* Define the windows */
 	playgame();     /* Play the game */
@@ -109,13 +124,13 @@ main()
 
 }
 
-myexit()
+void myexit()
 {
         exit(0);                /* Get outta here! */
 }
 
 
-playgame()
+void playgame()
 {
         setupgame();            /* Set level to 1, get level etc */
 /* Loop while checkfinish() says we haven't finished! */
@@ -128,7 +143,7 @@ playgame()
 
 /* Set some variables up at the start.. */
 
-setupgame()
+void setupgame()
 {
         ballorbox=NO;
         level=STARTLEV;
@@ -136,7 +151,7 @@ setupgame()
 }
 
 
-gamekeys()
+void gamekeys()
 {
         char *charptr;
 
@@ -175,7 +190,7 @@ gamekeys()
  * happening though
  */
 
-left(char *ptr)
+void left(char *ptr)
 {
         char *locn;
 
@@ -190,7 +205,7 @@ left(char *ptr)
 }
 
 
-right(char *ptr)
+void right(char *ptr)
 {
         char *locn;
 
@@ -204,7 +219,7 @@ right(char *ptr)
         }
 }
 
-down(char *ptr)
+void down(char *ptr)
 {
         char *locn;
 
@@ -218,7 +233,7 @@ down(char *ptr)
         }
 }
 
-up(char *ptr)
+void up(char *ptr)
 {
         char *locn;
 
@@ -238,7 +253,7 @@ up(char *ptr)
  * hit anything except for bubble we wanna stop
  */
 
-standardmiddle(char nextpos)
+int standardmiddle(char nextpos)
 {
         if (ballorbox)
                 return (nextpos);       /* For box */
@@ -254,7 +269,7 @@ standardmiddle(char nextpos)
  * </<= - this is quicker to execute on the Z80!
  */
 
-checkfinish()
+int checkfinish()
 {
         char *ptr;
         int i;
@@ -277,7 +292,7 @@ checkfinish()
  * picked up byte round to get it
  */
 
-setuplevel()
+void setuplevel()
 {
         int y,x;
         char *ptr,*ptr2;
@@ -341,7 +356,7 @@ void redrawscreen(void)
  * of a performance hit when it was converted over from asm
  */
 
-drawboard()
+void drawboard()
 {
         int x,y;
         char *ptr;
@@ -368,7 +383,7 @@ drawboard()
  
 
 
-puttiblock(char spr,int x, int y)
+void puttiblock(char spr,int x, int y)
 {
         char *ptr2,*ptr;
         int i;
@@ -398,7 +413,7 @@ puttiblock(char spr,int x, int y)
  */
 
 
-dozxcopyasm()
+void dozxcopyasm()
 {
 #asm
 
