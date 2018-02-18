@@ -39,55 +39,36 @@ _copper:
    ; we'll make use of the nextreg layer priorities register 0x15 (__REG_SPRITE_LAYER_SYSTEM)
    ; and have layer 2 on top by default and then ula on top for the hi-res terminals.
    
-   cu.wait 260,0                                                    ; wait a short time after vsync in either 50 or 60 Hz modes
-   cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU
+   ; Layer 2 is on top at start of frame
    
-   Z88DK_FOR(`LOOP', eval(3*8), eval(5*8-1),
+   Z88DK_FOR(`LOOP', eval(2*8), eval(5*8-1),
    `
       ; LINE LOOP
 
-      cu.wait LOOP, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-      cu.nop
-      cu.nop
-      cu.nop
+      cu.wait LOOP, 2/2                                             ; wait for x = 2/2 column start of first window
       cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
 
-      cu.wait LOOP, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-      cu.nop
-      cu.nop
-      cu.nop
+      cu.wait LOOP, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
       cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
    ')
    
    ; two windows appear on the same scan line for y char coord in [5,18)
    ; change to ula on top while beam is over either window
 
-   Z88DK_FOR(`LOOP', eval(5*8), eval(7*8-1),
+   Z88DK_FOR(`LOOP', eval(5*8), eval(11*8-1),
    `
       ; LINE LOOP
 
-      cu.wait LOOP, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-      cu.nop
-      cu.nop
-      cu.nop
+      cu.wait LOOP, 2/2                                             ; wait for x = 2/2 column start of first window
       cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
       
-      cu.wait LOOP, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-      cu.nop
-      cu.nop
-      cu.nop
+      cu.wait LOOP, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
       cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
       
-      cu.wait LOOP, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-      cu.nop
-      cu.nop
-      cu.nop
+      cu.wait LOOP, 32/2                                            ; wait for x = 32/2 column start of second window
       cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
       
-      cu.wait LOOP, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-      cu.nop
-      cu.nop
-      cu.nop
+      cu.wait LOOP, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
       cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
    ')
 

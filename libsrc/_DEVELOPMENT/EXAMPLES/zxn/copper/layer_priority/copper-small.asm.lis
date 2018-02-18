@@ -1864,657 +1864,880 @@
 39    0000                 ; we'll make use of the nextreg layer priorities register 0x15 (__REG_SPRITE_LAYER_SYSTEM)
 40    0000                 ; and have layer 2 on top by default and then ula on top for the hi-res terminals.
 41    0000              
-42    0000  81 04          cu.wait 260,0                                                    ; wait a short time after vsync in either 50 or 60 Hz modes
-43    0002  15 00          cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU
-44    0004              
-45    0004              
-46    0004                    ; LINE 24
-47    0004              
-48    0004  80 18             cu.wait 24, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-49    0006  00 00             cu.nop
-50    0008  00 00             cu.nop
-51    000A  00 00             cu.nop
-52    000C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-53    000E              
-54    000E  9E 18             cu.wait 24, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-55    0010  00 00             cu.nop
-56    0012  00 00             cu.nop
-57    0014  00 00             cu.nop
-58    0016  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-59    0018              
-60    0018                    ; LINE 25
-61    0018              
-62    0018  80 19             cu.wait 25, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-63    001A  00 00             cu.nop
-64    001C  00 00             cu.nop
-65    001E  00 00             cu.nop
-66    0020  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-67    0022              
-68    0022  9E 19             cu.wait 25, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-69    0024  00 00             cu.nop
-70    0026  00 00             cu.nop
-71    0028  00 00             cu.nop
-72    002A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-73    002C              
-74    002C                    ; LINE 26
-75    002C              
-76    002C  80 1A             cu.wait 26, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-77    002E  00 00             cu.nop
-78    0030  00 00             cu.nop
-79    0032  00 00             cu.nop
-80    0034  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-81    0036              
-82    0036  9E 1A             cu.wait 26, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-83    0038  00 00             cu.nop
-84    003A  00 00             cu.nop
-85    003C  00 00             cu.nop
-86    003E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-87    0040              
-88    0040                    ; LINE 27
-89    0040              
-90    0040  80 1B             cu.wait 27, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-91    0042  00 00             cu.nop
-92    0044  00 00             cu.nop
-93    0046  00 00             cu.nop
-94    0048  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-95    004A              
-96    004A  9E 1B             cu.wait 27, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-97    004C  00 00             cu.nop
-98    004E  00 00             cu.nop
-99    0050  00 00             cu.nop
-100   0052  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-101   0054              
-102   0054                    ; LINE 28
-103   0054              
-104   0054  80 1C             cu.wait 28, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-105   0056  00 00             cu.nop
-106   0058  00 00             cu.nop
-107   005A  00 00             cu.nop
-108   005C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-109   005E              
-110   005E  9E 1C             cu.wait 28, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-111   0060  00 00             cu.nop
-112   0062  00 00             cu.nop
-113   0064  00 00             cu.nop
-114   0066  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-115   0068              
-116   0068                    ; LINE 29
-117   0068              
-118   0068  80 1D             cu.wait 29, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-119   006A  00 00             cu.nop
-120   006C  00 00             cu.nop
-121   006E  00 00             cu.nop
-122   0070  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-123   0072              
-124   0072  9E 1D             cu.wait 29, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-125   0074  00 00             cu.nop
-126   0076  00 00             cu.nop
-127   0078  00 00             cu.nop
-128   007A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-129   007C              
-130   007C                    ; LINE 30
-131   007C              
-132   007C  80 1E             cu.wait 30, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-133   007E  00 00             cu.nop
-134   0080  00 00             cu.nop
-135   0082  00 00             cu.nop
-136   0084  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-137   0086              
-138   0086  9E 1E             cu.wait 30, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-139   0088  00 00             cu.nop
-140   008A  00 00             cu.nop
-141   008C  00 00             cu.nop
-142   008E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-143   0090              
-144   0090                    ; LINE 31
-145   0090              
-146   0090  80 1F             cu.wait 31, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-147   0092  00 00             cu.nop
-148   0094  00 00             cu.nop
-149   0096  00 00             cu.nop
-150   0098  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-151   009A              
-152   009A  9E 1F             cu.wait 31, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-153   009C  00 00             cu.nop
-154   009E  00 00             cu.nop
-155   00A0  00 00             cu.nop
-156   00A2  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-157   00A4              
-158   00A4                    ; LINE 32
-159   00A4              
-160   00A4  80 20             cu.wait 32, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-161   00A6  00 00             cu.nop
-162   00A8  00 00             cu.nop
-163   00AA  00 00             cu.nop
-164   00AC  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-165   00AE              
-166   00AE  9E 20             cu.wait 32, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-167   00B0  00 00             cu.nop
-168   00B2  00 00             cu.nop
-169   00B4  00 00             cu.nop
-170   00B6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-171   00B8              
-172   00B8                    ; LINE 33
-173   00B8              
-174   00B8  80 21             cu.wait 33, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-175   00BA  00 00             cu.nop
-176   00BC  00 00             cu.nop
-177   00BE  00 00             cu.nop
-178   00C0  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-179   00C2              
-180   00C2  9E 21             cu.wait 33, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-181   00C4  00 00             cu.nop
-182   00C6  00 00             cu.nop
-183   00C8  00 00             cu.nop
-184   00CA  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-185   00CC              
-186   00CC                    ; LINE 34
-187   00CC              
-188   00CC  80 22             cu.wait 34, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-189   00CE  00 00             cu.nop
-190   00D0  00 00             cu.nop
-191   00D2  00 00             cu.nop
-192   00D4  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-193   00D6              
-194   00D6  9E 22             cu.wait 34, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-195   00D8  00 00             cu.nop
-196   00DA  00 00             cu.nop
-197   00DC  00 00             cu.nop
-198   00DE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-199   00E0              
-200   00E0                    ; LINE 35
-201   00E0              
-202   00E0  80 23             cu.wait 35, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-203   00E2  00 00             cu.nop
-204   00E4  00 00             cu.nop
-205   00E6  00 00             cu.nop
-206   00E8  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-207   00EA              
-208   00EA  9E 23             cu.wait 35, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-209   00EC  00 00             cu.nop
-210   00EE  00 00             cu.nop
-211   00F0  00 00             cu.nop
-212   00F2  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-213   00F4              
-214   00F4                    ; LINE 36
-215   00F4              
-216   00F4  80 24             cu.wait 36, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-217   00F6  00 00             cu.nop
-218   00F8  00 00             cu.nop
-219   00FA  00 00             cu.nop
-220   00FC  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-221   00FE              
-222   00FE  9E 24             cu.wait 36, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-223   0100  00 00             cu.nop
-224   0102  00 00             cu.nop
-225   0104  00 00             cu.nop
-226   0106  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-227   0108              
-228   0108                    ; LINE 37
-229   0108              
-230   0108  80 25             cu.wait 37, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-231   010A  00 00             cu.nop
-232   010C  00 00             cu.nop
-233   010E  00 00             cu.nop
-234   0110  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-235   0112              
-236   0112  9E 25             cu.wait 37, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-237   0114  00 00             cu.nop
-238   0116  00 00             cu.nop
-239   0118  00 00             cu.nop
-240   011A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-241   011C              
-242   011C                    ; LINE 38
-243   011C              
-244   011C  80 26             cu.wait 38, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-245   011E  00 00             cu.nop
-246   0120  00 00             cu.nop
-247   0122  00 00             cu.nop
-248   0124  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-249   0126              
-250   0126  9E 26             cu.wait 38, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-251   0128  00 00             cu.nop
-252   012A  00 00             cu.nop
-253   012C  00 00             cu.nop
-254   012E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-255   0130              
-256   0130                    ; LINE 39
-257   0130              
-258   0130  80 27             cu.wait 39, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-259   0132  00 00             cu.nop
-260   0134  00 00             cu.nop
-261   0136  00 00             cu.nop
-262   0138  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-263   013A              
-264   013A  9E 27             cu.wait 39, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-265   013C  00 00             cu.nop
-266   013E  00 00             cu.nop
-267   0140  00 00             cu.nop
-268   0142  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-269   0144              
-270   0144              
-271   0144                 ; two windows appear on the same scan line for y char coord in [5,18)
-272   0144                 ; change to ula on top while beam is over either window
-273   0144              
-274   0144              
-275   0144                    ; LINE 40
-276   0144              
-277   0144  80 28             cu.wait 40, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-278   0146  00 00             cu.nop
-279   0148  00 00             cu.nop
-280   014A  00 00             cu.nop
-281   014C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-282   014E              
-283   014E  9E 28             cu.wait 40, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-284   0150  00 00             cu.nop
-285   0152  00 00             cu.nop
-286   0154  00 00             cu.nop
-287   0156  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-288   0158              
-289   0158  9E 28             cu.wait 40, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-290   015A  00 00             cu.nop
-291   015C  00 00             cu.nop
-292   015E  00 00             cu.nop
-293   0160  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-294   0162              
-295   0162  BC 28             cu.wait 40, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-296   0164  00 00             cu.nop
-297   0166  00 00             cu.nop
-298   0168  00 00             cu.nop
-299   016A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-300   016C              
-301   016C                    ; LINE 41
-302   016C              
-303   016C  80 29             cu.wait 41, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-304   016E  00 00             cu.nop
-305   0170  00 00             cu.nop
-306   0172  00 00             cu.nop
-307   0174  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-308   0176              
-309   0176  9E 29             cu.wait 41, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-310   0178  00 00             cu.nop
-311   017A  00 00             cu.nop
-312   017C  00 00             cu.nop
-313   017E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-314   0180              
-315   0180  9E 29             cu.wait 41, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-316   0182  00 00             cu.nop
-317   0184  00 00             cu.nop
-318   0186  00 00             cu.nop
-319   0188  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-320   018A              
-321   018A  BC 29             cu.wait 41, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-322   018C  00 00             cu.nop
-323   018E  00 00             cu.nop
-324   0190  00 00             cu.nop
-325   0192  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-326   0194              
-327   0194                    ; LINE 42
-328   0194              
-329   0194  80 2A             cu.wait 42, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-330   0196  00 00             cu.nop
-331   0198  00 00             cu.nop
-332   019A  00 00             cu.nop
-333   019C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-334   019E              
-335   019E  9E 2A             cu.wait 42, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-336   01A0  00 00             cu.nop
-337   01A2  00 00             cu.nop
-338   01A4  00 00             cu.nop
-339   01A6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-340   01A8              
-341   01A8  9E 2A             cu.wait 42, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-342   01AA  00 00             cu.nop
-343   01AC  00 00             cu.nop
-344   01AE  00 00             cu.nop
-345   01B0  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-346   01B2              
-347   01B2  BC 2A             cu.wait 42, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-348   01B4  00 00             cu.nop
-349   01B6  00 00             cu.nop
-350   01B8  00 00             cu.nop
-351   01BA  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-352   01BC              
-353   01BC                    ; LINE 43
-354   01BC              
-355   01BC  80 2B             cu.wait 43, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-356   01BE  00 00             cu.nop
-357   01C0  00 00             cu.nop
-358   01C2  00 00             cu.nop
-359   01C4  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-360   01C6              
-361   01C6  9E 2B             cu.wait 43, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-362   01C8  00 00             cu.nop
-363   01CA  00 00             cu.nop
-364   01CC  00 00             cu.nop
-365   01CE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-366   01D0              
-367   01D0  9E 2B             cu.wait 43, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-368   01D2  00 00             cu.nop
-369   01D4  00 00             cu.nop
-370   01D6  00 00             cu.nop
-371   01D8  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-372   01DA              
-373   01DA  BC 2B             cu.wait 43, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-374   01DC  00 00             cu.nop
-375   01DE  00 00             cu.nop
-376   01E0  00 00             cu.nop
-377   01E2  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-378   01E4              
-379   01E4                    ; LINE 44
-380   01E4              
-381   01E4  80 2C             cu.wait 44, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-382   01E6  00 00             cu.nop
-383   01E8  00 00             cu.nop
-384   01EA  00 00             cu.nop
-385   01EC  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-386   01EE              
-387   01EE  9E 2C             cu.wait 44, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-388   01F0  00 00             cu.nop
-389   01F2  00 00             cu.nop
-390   01F4  00 00             cu.nop
-391   01F6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-392   01F8              
-393   01F8  9E 2C             cu.wait 44, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-394   01FA  00 00             cu.nop
-395   01FC  00 00             cu.nop
-396   01FE  00 00             cu.nop
-397   0200  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-398   0202              
-399   0202  BC 2C             cu.wait 44, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-400   0204  00 00             cu.nop
-401   0206  00 00             cu.nop
-402   0208  00 00             cu.nop
-403   020A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-404   020C              
-405   020C                    ; LINE 45
-406   020C              
-407   020C  80 2D             cu.wait 45, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-408   020E  00 00             cu.nop
-409   0210  00 00             cu.nop
-410   0212  00 00             cu.nop
-411   0214  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-412   0216              
-413   0216  9E 2D             cu.wait 45, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-414   0218  00 00             cu.nop
-415   021A  00 00             cu.nop
-416   021C  00 00             cu.nop
-417   021E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-418   0220              
-419   0220  9E 2D             cu.wait 45, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-420   0222  00 00             cu.nop
-421   0224  00 00             cu.nop
-422   0226  00 00             cu.nop
-423   0228  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-424   022A              
-425   022A  BC 2D             cu.wait 45, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-426   022C  00 00             cu.nop
-427   022E  00 00             cu.nop
-428   0230  00 00             cu.nop
-429   0232  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-430   0234              
-431   0234                    ; LINE 46
-432   0234              
-433   0234  80 2E             cu.wait 46, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-434   0236  00 00             cu.nop
-435   0238  00 00             cu.nop
-436   023A  00 00             cu.nop
-437   023C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-438   023E              
-439   023E  9E 2E             cu.wait 46, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-440   0240  00 00             cu.nop
-441   0242  00 00             cu.nop
-442   0244  00 00             cu.nop
-443   0246  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-444   0248              
-445   0248  9E 2E             cu.wait 46, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-446   024A  00 00             cu.nop
-447   024C  00 00             cu.nop
-448   024E  00 00             cu.nop
-449   0250  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-450   0252              
-451   0252  BC 2E             cu.wait 46, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-452   0254  00 00             cu.nop
-453   0256  00 00             cu.nop
-454   0258  00 00             cu.nop
-455   025A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-456   025C              
-457   025C                    ; LINE 47
-458   025C              
-459   025C  80 2F             cu.wait 47, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-460   025E  00 00             cu.nop
-461   0260  00 00             cu.nop
-462   0262  00 00             cu.nop
-463   0264  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-464   0266              
-465   0266  9E 2F             cu.wait 47, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-466   0268  00 00             cu.nop
-467   026A  00 00             cu.nop
-468   026C  00 00             cu.nop
-469   026E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-470   0270              
-471   0270  9E 2F             cu.wait 47, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-472   0272  00 00             cu.nop
-473   0274  00 00             cu.nop
-474   0276  00 00             cu.nop
-475   0278  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-476   027A              
-477   027A  BC 2F             cu.wait 47, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-478   027C  00 00             cu.nop
-479   027E  00 00             cu.nop
-480   0280  00 00             cu.nop
-481   0282  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-482   0284              
-483   0284                    ; LINE 48
-484   0284              
-485   0284  80 30             cu.wait 48, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-486   0286  00 00             cu.nop
-487   0288  00 00             cu.nop
-488   028A  00 00             cu.nop
-489   028C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-490   028E              
-491   028E  9E 30             cu.wait 48, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-492   0290  00 00             cu.nop
-493   0292  00 00             cu.nop
-494   0294  00 00             cu.nop
-495   0296  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-496   0298              
-497   0298  9E 30             cu.wait 48, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-498   029A  00 00             cu.nop
-499   029C  00 00             cu.nop
-500   029E  00 00             cu.nop
-501   02A0  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-502   02A2              
-503   02A2  BC 30             cu.wait 48, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-504   02A4  00 00             cu.nop
-505   02A6  00 00             cu.nop
-506   02A8  00 00             cu.nop
-507   02AA  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-508   02AC              
-509   02AC                    ; LINE 49
-510   02AC              
-511   02AC  80 31             cu.wait 49, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-512   02AE  00 00             cu.nop
-513   02B0  00 00             cu.nop
-514   02B2  00 00             cu.nop
-515   02B4  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-516   02B6              
-517   02B6  9E 31             cu.wait 49, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-518   02B8  00 00             cu.nop
-519   02BA  00 00             cu.nop
-520   02BC  00 00             cu.nop
-521   02BE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-522   02C0              
-523   02C0  9E 31             cu.wait 49, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-524   02C2  00 00             cu.nop
-525   02C4  00 00             cu.nop
-526   02C6  00 00             cu.nop
-527   02C8  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-528   02CA              
-529   02CA  BC 31             cu.wait 49, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-530   02CC  00 00             cu.nop
-531   02CE  00 00             cu.nop
-532   02D0  00 00             cu.nop
-533   02D2  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-534   02D4              
-535   02D4                    ; LINE 50
-536   02D4              
-537   02D4  80 32             cu.wait 50, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-538   02D6  00 00             cu.nop
-539   02D8  00 00             cu.nop
-540   02DA  00 00             cu.nop
-541   02DC  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-542   02DE              
-543   02DE  9E 32             cu.wait 50, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-544   02E0  00 00             cu.nop
-545   02E2  00 00             cu.nop
-546   02E4  00 00             cu.nop
-547   02E6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-548   02E8              
-549   02E8  9E 32             cu.wait 50, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-550   02EA  00 00             cu.nop
-551   02EC  00 00             cu.nop
-552   02EE  00 00             cu.nop
-553   02F0  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-554   02F2              
-555   02F2  BC 32             cu.wait 50, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-556   02F4  00 00             cu.nop
-557   02F6  00 00             cu.nop
-558   02F8  00 00             cu.nop
-559   02FA  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-560   02FC              
-561   02FC                    ; LINE 51
-562   02FC              
-563   02FC  80 33             cu.wait 51, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-564   02FE  00 00             cu.nop
-565   0300  00 00             cu.nop
-566   0302  00 00             cu.nop
-567   0304  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-568   0306              
-569   0306  9E 33             cu.wait 51, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-570   0308  00 00             cu.nop
-571   030A  00 00             cu.nop
-572   030C  00 00             cu.nop
-573   030E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-574   0310              
-575   0310  9E 33             cu.wait 51, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-576   0312  00 00             cu.nop
-577   0314  00 00             cu.nop
-578   0316  00 00             cu.nop
-579   0318  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-580   031A              
-581   031A  BC 33             cu.wait 51, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-582   031C  00 00             cu.nop
-583   031E  00 00             cu.nop
-584   0320  00 00             cu.nop
-585   0322  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-586   0324              
-587   0324                    ; LINE 52
-588   0324              
-589   0324  80 34             cu.wait 52, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-590   0326  00 00             cu.nop
-591   0328  00 00             cu.nop
-592   032A  00 00             cu.nop
-593   032C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-594   032E              
-595   032E  9E 34             cu.wait 52, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-596   0330  00 00             cu.nop
-597   0332  00 00             cu.nop
-598   0334  00 00             cu.nop
-599   0336  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-600   0338              
-601   0338  9E 34             cu.wait 52, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-602   033A  00 00             cu.nop
-603   033C  00 00             cu.nop
-604   033E  00 00             cu.nop
-605   0340  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-606   0342              
-607   0342  BC 34             cu.wait 52, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-608   0344  00 00             cu.nop
-609   0346  00 00             cu.nop
-610   0348  00 00             cu.nop
-611   034A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-612   034C              
-613   034C                    ; LINE 53
-614   034C              
-615   034C  80 35             cu.wait 53, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-616   034E  00 00             cu.nop
-617   0350  00 00             cu.nop
-618   0352  00 00             cu.nop
-619   0354  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-620   0356              
-621   0356  9E 35             cu.wait 53, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-622   0358  00 00             cu.nop
-623   035A  00 00             cu.nop
-624   035C  00 00             cu.nop
-625   035E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-626   0360              
-627   0360  9E 35             cu.wait 53, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-628   0362  00 00             cu.nop
-629   0364  00 00             cu.nop
-630   0366  00 00             cu.nop
-631   0368  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-632   036A              
-633   036A  BC 35             cu.wait 53, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-634   036C  00 00             cu.nop
-635   036E  00 00             cu.nop
-636   0370  00 00             cu.nop
-637   0372  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-638   0374              
-639   0374                    ; LINE 54
-640   0374              
-641   0374  80 36             cu.wait 54, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-642   0376  00 00             cu.nop
-643   0378  00 00             cu.nop
-644   037A  00 00             cu.nop
-645   037C  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-646   037E              
-647   037E  9E 36             cu.wait 54, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-648   0380  00 00             cu.nop
-649   0382  00 00             cu.nop
-650   0384  00 00             cu.nop
-651   0386  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-652   0388              
-653   0388  9E 36             cu.wait 54, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-654   038A  00 00             cu.nop
-655   038C  00 00             cu.nop
-656   038E  00 00             cu.nop
-657   0390  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-658   0392              
-659   0392  BC 36             cu.wait 54, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-660   0394  00 00             cu.nop
-661   0396  00 00             cu.nop
-662   0398  00 00             cu.nop
-663   039A  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-664   039C              
-665   039C                    ; LINE 55
-666   039C              
-667   039C  80 37             cu.wait 55, 2/2 - 1                                         ; wait for x = 2/2 - 1 start first window
-668   039E  00 00             cu.nop
-669   03A0  00 00             cu.nop
-670   03A2  00 00             cu.nop
-671   03A4  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-672   03A6              
-673   03A6  9E 37             cu.wait 55, (2+28)/2                                        ; wait for x=(2+28)/2 end first window
-674   03A8  00 00             cu.nop
-675   03AA  00 00             cu.nop
-676   03AC  00 00             cu.nop
-677   03AE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-678   03B0              
-679   03B0  9E 37             cu.wait 55, 32/2 - 1                                        ; wait for x = 32/2 - 1 start first window
-680   03B2  00 00             cu.nop
-681   03B4  00 00             cu.nop
-682   03B6  00 00             cu.nop
-683   03B8  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
-684   03BA              
-685   03BA  BC 37             cu.wait 55, (32+28)/2                                       ; wait for x=(32+28)/2 end first window
-686   03BC  00 00             cu.nop
-687   03BE  00 00             cu.nop
-688   03C0  00 00             cu.nop
-689   03C2  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
-690   03C4              
-691   03C4              
-692   03C4  FF FF          cu.stop
-693   03C6              
-694   03C6              _copper_end:
-695   03C6              
+42    0000                 ; Layer 2 is on top at start of frame
+43    0000              
+44    0000              
+45    0000                    ; LINE 16
+46    0000              
+47    0000  82 10             cu.wait 16, 2/2                                             ; wait for x = 2/2 column start of first window
+48    0002  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+49    0004              
+50    0004  9E 10             cu.wait 16, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+51    0006  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+52    0008              
+53    0008                    ; LINE 17
+54    0008              
+55    0008  82 11             cu.wait 17, 2/2                                             ; wait for x = 2/2 column start of first window
+56    000A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+57    000C              
+58    000C  9E 11             cu.wait 17, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+59    000E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+60    0010              
+61    0010                    ; LINE 18
+62    0010              
+63    0010  82 12             cu.wait 18, 2/2                                             ; wait for x = 2/2 column start of first window
+64    0012  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+65    0014              
+66    0014  9E 12             cu.wait 18, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+67    0016  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+68    0018              
+69    0018                    ; LINE 19
+70    0018              
+71    0018  82 13             cu.wait 19, 2/2                                             ; wait for x = 2/2 column start of first window
+72    001A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+73    001C              
+74    001C  9E 13             cu.wait 19, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+75    001E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+76    0020              
+77    0020                    ; LINE 20
+78    0020              
+79    0020  82 14             cu.wait 20, 2/2                                             ; wait for x = 2/2 column start of first window
+80    0022  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+81    0024              
+82    0024  9E 14             cu.wait 20, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+83    0026  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+84    0028              
+85    0028                    ; LINE 21
+86    0028              
+87    0028  82 15             cu.wait 21, 2/2                                             ; wait for x = 2/2 column start of first window
+88    002A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+89    002C              
+90    002C  9E 15             cu.wait 21, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+91    002E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+92    0030              
+93    0030                    ; LINE 22
+94    0030              
+95    0030  82 16             cu.wait 22, 2/2                                             ; wait for x = 2/2 column start of first window
+96    0032  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+97    0034              
+98    0034  9E 16             cu.wait 22, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+99    0036  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+100   0038              
+101   0038                    ; LINE 23
+102   0038              
+103   0038  82 17             cu.wait 23, 2/2                                             ; wait for x = 2/2 column start of first window
+104   003A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+105   003C              
+106   003C  9E 17             cu.wait 23, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+107   003E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+108   0040              
+109   0040                    ; LINE 24
+110   0040              
+111   0040  82 18             cu.wait 24, 2/2                                             ; wait for x = 2/2 column start of first window
+112   0042  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+113   0044              
+114   0044  9E 18             cu.wait 24, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+115   0046  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+116   0048              
+117   0048                    ; LINE 25
+118   0048              
+119   0048  82 19             cu.wait 25, 2/2                                             ; wait for x = 2/2 column start of first window
+120   004A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+121   004C              
+122   004C  9E 19             cu.wait 25, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+123   004E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+124   0050              
+125   0050                    ; LINE 26
+126   0050              
+127   0050  82 1A             cu.wait 26, 2/2                                             ; wait for x = 2/2 column start of first window
+128   0052  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+129   0054              
+130   0054  9E 1A             cu.wait 26, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+131   0056  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+132   0058              
+133   0058                    ; LINE 27
+134   0058              
+135   0058  82 1B             cu.wait 27, 2/2                                             ; wait for x = 2/2 column start of first window
+136   005A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+137   005C              
+138   005C  9E 1B             cu.wait 27, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+139   005E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+140   0060              
+141   0060                    ; LINE 28
+142   0060              
+143   0060  82 1C             cu.wait 28, 2/2                                             ; wait for x = 2/2 column start of first window
+144   0062  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+145   0064              
+146   0064  9E 1C             cu.wait 28, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+147   0066  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+148   0068              
+149   0068                    ; LINE 29
+150   0068              
+151   0068  82 1D             cu.wait 29, 2/2                                             ; wait for x = 2/2 column start of first window
+152   006A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+153   006C              
+154   006C  9E 1D             cu.wait 29, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+155   006E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+156   0070              
+157   0070                    ; LINE 30
+158   0070              
+159   0070  82 1E             cu.wait 30, 2/2                                             ; wait for x = 2/2 column start of first window
+160   0072  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+161   0074              
+162   0074  9E 1E             cu.wait 30, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+163   0076  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+164   0078              
+165   0078                    ; LINE 31
+166   0078              
+167   0078  82 1F             cu.wait 31, 2/2                                             ; wait for x = 2/2 column start of first window
+168   007A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+169   007C              
+170   007C  9E 1F             cu.wait 31, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+171   007E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+172   0080              
+173   0080                    ; LINE 32
+174   0080              
+175   0080  82 20             cu.wait 32, 2/2                                             ; wait for x = 2/2 column start of first window
+176   0082  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+177   0084              
+178   0084  9E 20             cu.wait 32, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+179   0086  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+180   0088              
+181   0088                    ; LINE 33
+182   0088              
+183   0088  82 21             cu.wait 33, 2/2                                             ; wait for x = 2/2 column start of first window
+184   008A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+185   008C              
+186   008C  9E 21             cu.wait 33, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+187   008E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+188   0090              
+189   0090                    ; LINE 34
+190   0090              
+191   0090  82 22             cu.wait 34, 2/2                                             ; wait for x = 2/2 column start of first window
+192   0092  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+193   0094              
+194   0094  9E 22             cu.wait 34, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+195   0096  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+196   0098              
+197   0098                    ; LINE 35
+198   0098              
+199   0098  82 23             cu.wait 35, 2/2                                             ; wait for x = 2/2 column start of first window
+200   009A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+201   009C              
+202   009C  9E 23             cu.wait 35, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+203   009E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+204   00A0              
+205   00A0                    ; LINE 36
+206   00A0              
+207   00A0  82 24             cu.wait 36, 2/2                                             ; wait for x = 2/2 column start of first window
+208   00A2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+209   00A4              
+210   00A4  9E 24             cu.wait 36, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+211   00A6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+212   00A8              
+213   00A8                    ; LINE 37
+214   00A8              
+215   00A8  82 25             cu.wait 37, 2/2                                             ; wait for x = 2/2 column start of first window
+216   00AA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+217   00AC              
+218   00AC  9E 25             cu.wait 37, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+219   00AE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+220   00B0              
+221   00B0                    ; LINE 38
+222   00B0              
+223   00B0  82 26             cu.wait 38, 2/2                                             ; wait for x = 2/2 column start of first window
+224   00B2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+225   00B4              
+226   00B4  9E 26             cu.wait 38, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+227   00B6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+228   00B8              
+229   00B8                    ; LINE 39
+230   00B8              
+231   00B8  82 27             cu.wait 39, 2/2                                             ; wait for x = 2/2 column start of first window
+232   00BA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+233   00BC              
+234   00BC  9E 27             cu.wait 39, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+235   00BE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+236   00C0              
+237   00C0              
+238   00C0                 ; two windows appear on the same scan line for y char coord in [5,18)
+239   00C0                 ; change to ula on top while beam is over either window
+240   00C0              
+241   00C0              
+242   00C0                    ; LINE 40
+243   00C0              
+244   00C0  82 28             cu.wait 40, 2/2                                             ; wait for x = 2/2 column start of first window
+245   00C2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+246   00C4              
+247   00C4  9E 28             cu.wait 40, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+248   00C6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+249   00C8              
+250   00C8  A0 28             cu.wait 40, 32/2                                            ; wait for x = 32/2 column start of second window
+251   00CA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+252   00CC              
+253   00CC  BC 28             cu.wait 40, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+254   00CE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+255   00D0              
+256   00D0                    ; LINE 41
+257   00D0              
+258   00D0  82 29             cu.wait 41, 2/2                                             ; wait for x = 2/2 column start of first window
+259   00D2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+260   00D4              
+261   00D4  9E 29             cu.wait 41, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+262   00D6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+263   00D8              
+264   00D8  A0 29             cu.wait 41, 32/2                                            ; wait for x = 32/2 column start of second window
+265   00DA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+266   00DC              
+267   00DC  BC 29             cu.wait 41, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+268   00DE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+269   00E0              
+270   00E0                    ; LINE 42
+271   00E0              
+272   00E0  82 2A             cu.wait 42, 2/2                                             ; wait for x = 2/2 column start of first window
+273   00E2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+274   00E4              
+275   00E4  9E 2A             cu.wait 42, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+276   00E6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+277   00E8              
+278   00E8  A0 2A             cu.wait 42, 32/2                                            ; wait for x = 32/2 column start of second window
+279   00EA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+280   00EC              
+281   00EC  BC 2A             cu.wait 42, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+282   00EE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+283   00F0              
+284   00F0                    ; LINE 43
+285   00F0              
+286   00F0  82 2B             cu.wait 43, 2/2                                             ; wait for x = 2/2 column start of first window
+287   00F2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+288   00F4              
+289   00F4  9E 2B             cu.wait 43, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+290   00F6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+291   00F8              
+292   00F8  A0 2B             cu.wait 43, 32/2                                            ; wait for x = 32/2 column start of second window
+293   00FA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+294   00FC              
+295   00FC  BC 2B             cu.wait 43, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+296   00FE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+297   0100              
+298   0100                    ; LINE 44
+299   0100              
+300   0100  82 2C             cu.wait 44, 2/2                                             ; wait for x = 2/2 column start of first window
+301   0102  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+302   0104              
+303   0104  9E 2C             cu.wait 44, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+304   0106  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+305   0108              
+306   0108  A0 2C             cu.wait 44, 32/2                                            ; wait for x = 32/2 column start of second window
+307   010A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+308   010C              
+309   010C  BC 2C             cu.wait 44, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+310   010E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+311   0110              
+312   0110                    ; LINE 45
+313   0110              
+314   0110  82 2D             cu.wait 45, 2/2                                             ; wait for x = 2/2 column start of first window
+315   0112  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+316   0114              
+317   0114  9E 2D             cu.wait 45, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+318   0116  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+319   0118              
+320   0118  A0 2D             cu.wait 45, 32/2                                            ; wait for x = 32/2 column start of second window
+321   011A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+322   011C              
+323   011C  BC 2D             cu.wait 45, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+324   011E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+325   0120              
+326   0120                    ; LINE 46
+327   0120              
+328   0120  82 2E             cu.wait 46, 2/2                                             ; wait for x = 2/2 column start of first window
+329   0122  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+330   0124              
+331   0124  9E 2E             cu.wait 46, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+332   0126  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+333   0128              
+334   0128  A0 2E             cu.wait 46, 32/2                                            ; wait for x = 32/2 column start of second window
+335   012A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+336   012C              
+337   012C  BC 2E             cu.wait 46, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+338   012E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+339   0130              
+340   0130                    ; LINE 47
+341   0130              
+342   0130  82 2F             cu.wait 47, 2/2                                             ; wait for x = 2/2 column start of first window
+343   0132  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+344   0134              
+345   0134  9E 2F             cu.wait 47, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+346   0136  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+347   0138              
+348   0138  A0 2F             cu.wait 47, 32/2                                            ; wait for x = 32/2 column start of second window
+349   013A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+350   013C              
+351   013C  BC 2F             cu.wait 47, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+352   013E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+353   0140              
+354   0140                    ; LINE 48
+355   0140              
+356   0140  82 30             cu.wait 48, 2/2                                             ; wait for x = 2/2 column start of first window
+357   0142  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+358   0144              
+359   0144  9E 30             cu.wait 48, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+360   0146  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+361   0148              
+362   0148  A0 30             cu.wait 48, 32/2                                            ; wait for x = 32/2 column start of second window
+363   014A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+364   014C              
+365   014C  BC 30             cu.wait 48, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+366   014E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+367   0150              
+368   0150                    ; LINE 49
+369   0150              
+370   0150  82 31             cu.wait 49, 2/2                                             ; wait for x = 2/2 column start of first window
+371   0152  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+372   0154              
+373   0154  9E 31             cu.wait 49, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+374   0156  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+375   0158              
+376   0158  A0 31             cu.wait 49, 32/2                                            ; wait for x = 32/2 column start of second window
+377   015A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+378   015C              
+379   015C  BC 31             cu.wait 49, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+380   015E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+381   0160              
+382   0160                    ; LINE 50
+383   0160              
+384   0160  82 32             cu.wait 50, 2/2                                             ; wait for x = 2/2 column start of first window
+385   0162  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+386   0164              
+387   0164  9E 32             cu.wait 50, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+388   0166  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+389   0168              
+390   0168  A0 32             cu.wait 50, 32/2                                            ; wait for x = 32/2 column start of second window
+391   016A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+392   016C              
+393   016C  BC 32             cu.wait 50, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+394   016E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+395   0170              
+396   0170                    ; LINE 51
+397   0170              
+398   0170  82 33             cu.wait 51, 2/2                                             ; wait for x = 2/2 column start of first window
+399   0172  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+400   0174              
+401   0174  9E 33             cu.wait 51, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+402   0176  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+403   0178              
+404   0178  A0 33             cu.wait 51, 32/2                                            ; wait for x = 32/2 column start of second window
+405   017A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+406   017C              
+407   017C  BC 33             cu.wait 51, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+408   017E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+409   0180              
+410   0180                    ; LINE 52
+411   0180              
+412   0180  82 34             cu.wait 52, 2/2                                             ; wait for x = 2/2 column start of first window
+413   0182  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+414   0184              
+415   0184  9E 34             cu.wait 52, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+416   0186  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+417   0188              
+418   0188  A0 34             cu.wait 52, 32/2                                            ; wait for x = 32/2 column start of second window
+419   018A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+420   018C              
+421   018C  BC 34             cu.wait 52, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+422   018E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+423   0190              
+424   0190                    ; LINE 53
+425   0190              
+426   0190  82 35             cu.wait 53, 2/2                                             ; wait for x = 2/2 column start of first window
+427   0192  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+428   0194              
+429   0194  9E 35             cu.wait 53, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+430   0196  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+431   0198              
+432   0198  A0 35             cu.wait 53, 32/2                                            ; wait for x = 32/2 column start of second window
+433   019A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+434   019C              
+435   019C  BC 35             cu.wait 53, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+436   019E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+437   01A0              
+438   01A0                    ; LINE 54
+439   01A0              
+440   01A0  82 36             cu.wait 54, 2/2                                             ; wait for x = 2/2 column start of first window
+441   01A2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+442   01A4              
+443   01A4  9E 36             cu.wait 54, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+444   01A6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+445   01A8              
+446   01A8  A0 36             cu.wait 54, 32/2                                            ; wait for x = 32/2 column start of second window
+447   01AA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+448   01AC              
+449   01AC  BC 36             cu.wait 54, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+450   01AE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+451   01B0              
+452   01B0                    ; LINE 55
+453   01B0              
+454   01B0  82 37             cu.wait 55, 2/2                                             ; wait for x = 2/2 column start of first window
+455   01B2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+456   01B4              
+457   01B4  9E 37             cu.wait 55, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+458   01B6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+459   01B8              
+460   01B8  A0 37             cu.wait 55, 32/2                                            ; wait for x = 32/2 column start of second window
+461   01BA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+462   01BC              
+463   01BC  BC 37             cu.wait 55, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+464   01BE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+465   01C0              
+466   01C0                    ; LINE 56
+467   01C0              
+468   01C0  82 38             cu.wait 56, 2/2                                             ; wait for x = 2/2 column start of first window
+469   01C2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+470   01C4              
+471   01C4  9E 38             cu.wait 56, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+472   01C6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+473   01C8              
+474   01C8  A0 38             cu.wait 56, 32/2                                            ; wait for x = 32/2 column start of second window
+475   01CA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+476   01CC              
+477   01CC  BC 38             cu.wait 56, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+478   01CE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+479   01D0              
+480   01D0                    ; LINE 57
+481   01D0              
+482   01D0  82 39             cu.wait 57, 2/2                                             ; wait for x = 2/2 column start of first window
+483   01D2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+484   01D4              
+485   01D4  9E 39             cu.wait 57, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+486   01D6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+487   01D8              
+488   01D8  A0 39             cu.wait 57, 32/2                                            ; wait for x = 32/2 column start of second window
+489   01DA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+490   01DC              
+491   01DC  BC 39             cu.wait 57, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+492   01DE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+493   01E0              
+494   01E0                    ; LINE 58
+495   01E0              
+496   01E0  82 3A             cu.wait 58, 2/2                                             ; wait for x = 2/2 column start of first window
+497   01E2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+498   01E4              
+499   01E4  9E 3A             cu.wait 58, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+500   01E6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+501   01E8              
+502   01E8  A0 3A             cu.wait 58, 32/2                                            ; wait for x = 32/2 column start of second window
+503   01EA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+504   01EC              
+505   01EC  BC 3A             cu.wait 58, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+506   01EE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+507   01F0              
+508   01F0                    ; LINE 59
+509   01F0              
+510   01F0  82 3B             cu.wait 59, 2/2                                             ; wait for x = 2/2 column start of first window
+511   01F2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+512   01F4              
+513   01F4  9E 3B             cu.wait 59, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+514   01F6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+515   01F8              
+516   01F8  A0 3B             cu.wait 59, 32/2                                            ; wait for x = 32/2 column start of second window
+517   01FA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+518   01FC              
+519   01FC  BC 3B             cu.wait 59, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+520   01FE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+521   0200              
+522   0200                    ; LINE 60
+523   0200              
+524   0200  82 3C             cu.wait 60, 2/2                                             ; wait for x = 2/2 column start of first window
+525   0202  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+526   0204              
+527   0204  9E 3C             cu.wait 60, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+528   0206  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+529   0208              
+530   0208  A0 3C             cu.wait 60, 32/2                                            ; wait for x = 32/2 column start of second window
+531   020A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+532   020C              
+533   020C  BC 3C             cu.wait 60, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+534   020E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+535   0210              
+536   0210                    ; LINE 61
+537   0210              
+538   0210  82 3D             cu.wait 61, 2/2                                             ; wait for x = 2/2 column start of first window
+539   0212  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+540   0214              
+541   0214  9E 3D             cu.wait 61, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+542   0216  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+543   0218              
+544   0218  A0 3D             cu.wait 61, 32/2                                            ; wait for x = 32/2 column start of second window
+545   021A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+546   021C              
+547   021C  BC 3D             cu.wait 61, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+548   021E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+549   0220              
+550   0220                    ; LINE 62
+551   0220              
+552   0220  82 3E             cu.wait 62, 2/2                                             ; wait for x = 2/2 column start of first window
+553   0222  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+554   0224              
+555   0224  9E 3E             cu.wait 62, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+556   0226  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+557   0228              
+558   0228  A0 3E             cu.wait 62, 32/2                                            ; wait for x = 32/2 column start of second window
+559   022A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+560   022C              
+561   022C  BC 3E             cu.wait 62, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+562   022E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+563   0230              
+564   0230                    ; LINE 63
+565   0230              
+566   0230  82 3F             cu.wait 63, 2/2                                             ; wait for x = 2/2 column start of first window
+567   0232  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+568   0234              
+569   0234  9E 3F             cu.wait 63, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+570   0236  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+571   0238              
+572   0238  A0 3F             cu.wait 63, 32/2                                            ; wait for x = 32/2 column start of second window
+573   023A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+574   023C              
+575   023C  BC 3F             cu.wait 63, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+576   023E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+577   0240              
+578   0240                    ; LINE 64
+579   0240              
+580   0240  82 40             cu.wait 64, 2/2                                             ; wait for x = 2/2 column start of first window
+581   0242  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+582   0244              
+583   0244  9E 40             cu.wait 64, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+584   0246  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+585   0248              
+586   0248  A0 40             cu.wait 64, 32/2                                            ; wait for x = 32/2 column start of second window
+587   024A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+588   024C              
+589   024C  BC 40             cu.wait 64, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+590   024E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+591   0250              
+592   0250                    ; LINE 65
+593   0250              
+594   0250  82 41             cu.wait 65, 2/2                                             ; wait for x = 2/2 column start of first window
+595   0252  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+596   0254              
+597   0254  9E 41             cu.wait 65, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+598   0256  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+599   0258              
+600   0258  A0 41             cu.wait 65, 32/2                                            ; wait for x = 32/2 column start of second window
+601   025A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+602   025C              
+603   025C  BC 41             cu.wait 65, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+604   025E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+605   0260              
+606   0260                    ; LINE 66
+607   0260              
+608   0260  82 42             cu.wait 66, 2/2                                             ; wait for x = 2/2 column start of first window
+609   0262  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+610   0264              
+611   0264  9E 42             cu.wait 66, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+612   0266  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+613   0268              
+614   0268  A0 42             cu.wait 66, 32/2                                            ; wait for x = 32/2 column start of second window
+615   026A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+616   026C              
+617   026C  BC 42             cu.wait 66, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+618   026E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+619   0270              
+620   0270                    ; LINE 67
+621   0270              
+622   0270  82 43             cu.wait 67, 2/2                                             ; wait for x = 2/2 column start of first window
+623   0272  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+624   0274              
+625   0274  9E 43             cu.wait 67, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+626   0276  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+627   0278              
+628   0278  A0 43             cu.wait 67, 32/2                                            ; wait for x = 32/2 column start of second window
+629   027A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+630   027C              
+631   027C  BC 43             cu.wait 67, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+632   027E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+633   0280              
+634   0280                    ; LINE 68
+635   0280              
+636   0280  82 44             cu.wait 68, 2/2                                             ; wait for x = 2/2 column start of first window
+637   0282  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+638   0284              
+639   0284  9E 44             cu.wait 68, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+640   0286  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+641   0288              
+642   0288  A0 44             cu.wait 68, 32/2                                            ; wait for x = 32/2 column start of second window
+643   028A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+644   028C              
+645   028C  BC 44             cu.wait 68, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+646   028E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+647   0290              
+648   0290                    ; LINE 69
+649   0290              
+650   0290  82 45             cu.wait 69, 2/2                                             ; wait for x = 2/2 column start of first window
+651   0292  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+652   0294              
+653   0294  9E 45             cu.wait 69, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+654   0296  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+655   0298              
+656   0298  A0 45             cu.wait 69, 32/2                                            ; wait for x = 32/2 column start of second window
+657   029A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+658   029C              
+659   029C  BC 45             cu.wait 69, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+660   029E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+661   02A0              
+662   02A0                    ; LINE 70
+663   02A0              
+664   02A0  82 46             cu.wait 70, 2/2                                             ; wait for x = 2/2 column start of first window
+665   02A2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+666   02A4              
+667   02A4  9E 46             cu.wait 70, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+668   02A6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+669   02A8              
+670   02A8  A0 46             cu.wait 70, 32/2                                            ; wait for x = 32/2 column start of second window
+671   02AA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+672   02AC              
+673   02AC  BC 46             cu.wait 70, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+674   02AE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+675   02B0              
+676   02B0                    ; LINE 71
+677   02B0              
+678   02B0  82 47             cu.wait 71, 2/2                                             ; wait for x = 2/2 column start of first window
+679   02B2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+680   02B4              
+681   02B4  9E 47             cu.wait 71, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+682   02B6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+683   02B8              
+684   02B8  A0 47             cu.wait 71, 32/2                                            ; wait for x = 32/2 column start of second window
+685   02BA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+686   02BC              
+687   02BC  BC 47             cu.wait 71, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+688   02BE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+689   02C0              
+690   02C0                    ; LINE 72
+691   02C0              
+692   02C0  82 48             cu.wait 72, 2/2                                             ; wait for x = 2/2 column start of first window
+693   02C2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+694   02C4              
+695   02C4  9E 48             cu.wait 72, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+696   02C6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+697   02C8              
+698   02C8  A0 48             cu.wait 72, 32/2                                            ; wait for x = 32/2 column start of second window
+699   02CA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+700   02CC              
+701   02CC  BC 48             cu.wait 72, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+702   02CE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+703   02D0              
+704   02D0                    ; LINE 73
+705   02D0              
+706   02D0  82 49             cu.wait 73, 2/2                                             ; wait for x = 2/2 column start of first window
+707   02D2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+708   02D4              
+709   02D4  9E 49             cu.wait 73, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+710   02D6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+711   02D8              
+712   02D8  A0 49             cu.wait 73, 32/2                                            ; wait for x = 32/2 column start of second window
+713   02DA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+714   02DC              
+715   02DC  BC 49             cu.wait 73, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+716   02DE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+717   02E0              
+718   02E0                    ; LINE 74
+719   02E0              
+720   02E0  82 4A             cu.wait 74, 2/2                                             ; wait for x = 2/2 column start of first window
+721   02E2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+722   02E4              
+723   02E4  9E 4A             cu.wait 74, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+724   02E6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+725   02E8              
+726   02E8  A0 4A             cu.wait 74, 32/2                                            ; wait for x = 32/2 column start of second window
+727   02EA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+728   02EC              
+729   02EC  BC 4A             cu.wait 74, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+730   02EE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+731   02F0              
+732   02F0                    ; LINE 75
+733   02F0              
+734   02F0  82 4B             cu.wait 75, 2/2                                             ; wait for x = 2/2 column start of first window
+735   02F2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+736   02F4              
+737   02F4  9E 4B             cu.wait 75, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+738   02F6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+739   02F8              
+740   02F8  A0 4B             cu.wait 75, 32/2                                            ; wait for x = 32/2 column start of second window
+741   02FA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+742   02FC              
+743   02FC  BC 4B             cu.wait 75, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+744   02FE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+745   0300              
+746   0300                    ; LINE 76
+747   0300              
+748   0300  82 4C             cu.wait 76, 2/2                                             ; wait for x = 2/2 column start of first window
+749   0302  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+750   0304              
+751   0304  9E 4C             cu.wait 76, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+752   0306  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+753   0308              
+754   0308  A0 4C             cu.wait 76, 32/2                                            ; wait for x = 32/2 column start of second window
+755   030A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+756   030C              
+757   030C  BC 4C             cu.wait 76, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+758   030E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+759   0310              
+760   0310                    ; LINE 77
+761   0310              
+762   0310  82 4D             cu.wait 77, 2/2                                             ; wait for x = 2/2 column start of first window
+763   0312  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+764   0314              
+765   0314  9E 4D             cu.wait 77, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+766   0316  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+767   0318              
+768   0318  A0 4D             cu.wait 77, 32/2                                            ; wait for x = 32/2 column start of second window
+769   031A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+770   031C              
+771   031C  BC 4D             cu.wait 77, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+772   031E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+773   0320              
+774   0320                    ; LINE 78
+775   0320              
+776   0320  82 4E             cu.wait 78, 2/2                                             ; wait for x = 2/2 column start of first window
+777   0322  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+778   0324              
+779   0324  9E 4E             cu.wait 78, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+780   0326  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+781   0328              
+782   0328  A0 4E             cu.wait 78, 32/2                                            ; wait for x = 32/2 column start of second window
+783   032A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+784   032C              
+785   032C  BC 4E             cu.wait 78, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+786   032E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+787   0330              
+788   0330                    ; LINE 79
+789   0330              
+790   0330  82 4F             cu.wait 79, 2/2                                             ; wait for x = 2/2 column start of first window
+791   0332  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+792   0334              
+793   0334  9E 4F             cu.wait 79, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+794   0336  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+795   0338              
+796   0338  A0 4F             cu.wait 79, 32/2                                            ; wait for x = 32/2 column start of second window
+797   033A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+798   033C              
+799   033C  BC 4F             cu.wait 79, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+800   033E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+801   0340              
+802   0340                    ; LINE 80
+803   0340              
+804   0340  82 50             cu.wait 80, 2/2                                             ; wait for x = 2/2 column start of first window
+805   0342  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+806   0344              
+807   0344  9E 50             cu.wait 80, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+808   0346  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+809   0348              
+810   0348  A0 50             cu.wait 80, 32/2                                            ; wait for x = 32/2 column start of second window
+811   034A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+812   034C              
+813   034C  BC 50             cu.wait 80, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+814   034E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+815   0350              
+816   0350                    ; LINE 81
+817   0350              
+818   0350  82 51             cu.wait 81, 2/2                                             ; wait for x = 2/2 column start of first window
+819   0352  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+820   0354              
+821   0354  9E 51             cu.wait 81, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+822   0356  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+823   0358              
+824   0358  A0 51             cu.wait 81, 32/2                                            ; wait for x = 32/2 column start of second window
+825   035A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+826   035C              
+827   035C  BC 51             cu.wait 81, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+828   035E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+829   0360              
+830   0360                    ; LINE 82
+831   0360              
+832   0360  82 52             cu.wait 82, 2/2                                             ; wait for x = 2/2 column start of first window
+833   0362  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+834   0364              
+835   0364  9E 52             cu.wait 82, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+836   0366  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+837   0368              
+838   0368  A0 52             cu.wait 82, 32/2                                            ; wait for x = 32/2 column start of second window
+839   036A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+840   036C              
+841   036C  BC 52             cu.wait 82, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+842   036E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+843   0370              
+844   0370                    ; LINE 83
+845   0370              
+846   0370  82 53             cu.wait 83, 2/2                                             ; wait for x = 2/2 column start of first window
+847   0372  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+848   0374              
+849   0374  9E 53             cu.wait 83, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+850   0376  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+851   0378              
+852   0378  A0 53             cu.wait 83, 32/2                                            ; wait for x = 32/2 column start of second window
+853   037A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+854   037C              
+855   037C  BC 53             cu.wait 83, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+856   037E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+857   0380              
+858   0380                    ; LINE 84
+859   0380              
+860   0380  82 54             cu.wait 84, 2/2                                             ; wait for x = 2/2 column start of first window
+861   0382  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+862   0384              
+863   0384  9E 54             cu.wait 84, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+864   0386  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+865   0388              
+866   0388  A0 54             cu.wait 84, 32/2                                            ; wait for x = 32/2 column start of second window
+867   038A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+868   038C              
+869   038C  BC 54             cu.wait 84, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+870   038E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+871   0390              
+872   0390                    ; LINE 85
+873   0390              
+874   0390  82 55             cu.wait 85, 2/2                                             ; wait for x = 2/2 column start of first window
+875   0392  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+876   0394              
+877   0394  9E 55             cu.wait 85, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+878   0396  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+879   0398              
+880   0398  A0 55             cu.wait 85, 32/2                                            ; wait for x = 32/2 column start of second window
+881   039A  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+882   039C              
+883   039C  BC 55             cu.wait 85, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+884   039E  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+885   03A0              
+886   03A0                    ; LINE 86
+887   03A0              
+888   03A0  82 56             cu.wait 86, 2/2                                             ; wait for x = 2/2 column start of first window
+889   03A2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+890   03A4              
+891   03A4  9E 56             cu.wait 86, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+892   03A6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+893   03A8              
+894   03A8  A0 56             cu.wait 86, 32/2                                            ; wait for x = 32/2 column start of second window
+895   03AA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+896   03AC              
+897   03AC  BC 56             cu.wait 86, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+898   03AE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+899   03B0              
+900   03B0                    ; LINE 87
+901   03B0              
+902   03B0  82 57             cu.wait 87, 2/2                                             ; wait for x = 2/2 column start of first window
+903   03B2  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+904   03B4              
+905   03B4  9E 57             cu.wait 87, (2+28)/2                                        ; wait for x=(2+28)/2 column after end of first window
+906   03B6  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+907   03B8              
+908   03B8  A0 57             cu.wait 87, 32/2                                            ; wait for x = 32/2 column start of second window
+909   03BA  15 08             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SUL  ; ula on top
+910   03BC              
+911   03BC  BC 57             cu.wait 87, (32+28)/2                                       ; wait for x=(32+28)/2 column after end of second window
+912   03BE  15 00             cu.move __REG_SPRITE_LAYER_SYSTEM, __RSLS_LAYER_PRIORITY_SLU  ; layer 2 on top
+913   03C0              
+914   03C0              
+915   03C0  FF FF          cu.stop
+916   03C2              
+917   03C2              _copper_end:
+918   03C2              

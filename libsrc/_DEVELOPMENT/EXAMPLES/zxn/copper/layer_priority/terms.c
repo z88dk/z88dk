@@ -89,7 +89,9 @@ IM2_DEFINE_ISR_8080(isr)
    // simple update of layer 2 scroll
    
    ZXN_WRITE_REG(REG_LAYER_2_OFFSET_X, ++dx);
-   ZXN_WRITE_REG(REG_LAYER_2_OFFSET_Y, ++dy);
+   
+   if (++dy > 191) dy = 0;
+   ZXN_WRITE_REG(REG_LAYER_2_OFFSET_Y, dy);
    
    // restore nextreg register
    
