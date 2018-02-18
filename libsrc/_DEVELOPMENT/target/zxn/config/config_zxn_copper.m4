@@ -11,24 +11,38 @@ divert(-1)
 # taking the same amount of time as the movement of the raster by
 # one horizontal pixel.
 #
-# Vertically the display consists of 264 lines in 60Hz mode and
-# 312 lines in 50Hz mode.  Lines 0-191 always correspond to the
+# Vertically the display consists of 262 lines in 60Hz mode and
+# 311 lines in 50Hz mode.  Lines 0-191 always correspond to the
 # area containing the active display.  In 60Hz mode, the next 32
 # lines are bottom border, 8 lines for Vsync, and 32 lines for top
 # border.  In 50Hz mode, the next 56 lines are bottom border, 8
 # lines for Vsync and 56 lines for top border.
 #
-# Horizontally the display is the same in 50 or 60Hz mode.  It
-# consists of 448 pixels (0-447) or, grouped eight pixels at
-# a time, as 56 characters (0-55).  The first 256 pixels (0-255)
-# or 32 characters (0-31) contain the active display.  The next
-# 64 pixels are the right border, then 96 pixels for horizontal
-# blanking and 32 pixels for the left border.
-
+# 50Hz                          60Hz
+# Lines                         Lines
+#
+#   0-191  Display                0-191  Display
+# 192-247  Bottom Border        192-223  Bottom Border
+# 248-255  Vsync (interrupt)    224-231  Vsync (interrupt)
+# 256-311  Top Border           232-261  Top Border
+#
+# Horizontally the display is the same in 50 or 60Hz mode but it
+# varies by model.  It consists of 448 pixels (0-447) in 48k mode
+# and 456 pixels (0-455) in 128k mode.  Grouped in eight pixels
+# that's screen bytes 0-55 in 48k mode and 0-56 in 128k mode.
+#
+# 48k mode                      128k mode
+# Bytes  Pixels                 Bytes  Pixels
+#
+#  0-31    0-255  Display        0-31    0-255  Display
+# 32-39  256-319  Right Border  32-39  256-319  Right Border
+# 40-51  320-415  HBlank        40-51  320-415  HBlank
+# 52-55  416-447  Left Border   52-56  416-455  Left Border
+#
 # The ZXN Copper understands two operations:
 #
 # (1) Wait for a particular line (0-311 @ 50Hz or 0-261 @ 60Hz)
-#     and a horizontal character position (0-55)
+#     and a horizontal character position (0-55 or 0-56)
 #
 # (2) Write a value to a nextreg.
 #
