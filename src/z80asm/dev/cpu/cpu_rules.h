@@ -27086,8 +27086,7 @@ default: error_illegal_ident(); }
 | label? _TK_PUSH expr _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0xED8A);
+DO_stmt_NN(0xED8A);
 break;
 default: error_illegal_ident(); }
 }

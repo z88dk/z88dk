@@ -69493,8 +69493,7 @@ default: error_illegal_ident(); }
 	{
 switch (opts.cpu) {
 case CPU_Z80_ZXN:
-if (expr_in_parens) warn_expr_in_parens();
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED8A), expr); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_NN((0xED8A), expr); } while(0);
 break;
 default: error_illegal_ident(); }
 }

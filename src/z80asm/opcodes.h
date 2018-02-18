@@ -33,6 +33,9 @@ extern void add_opcode_d(int opcode, struct Expr *expr);
 /* add opcode followed by 16-bit expression */
 extern void add_opcode_nn(int opcode, struct Expr *expr);
 
+/* add opcode followed by big-endian 16-bit expression */
+extern void add_opcode_NN(int opcode, struct Expr *expr);
+
 /* add opcode followed by IX/IY offset expression */
 extern void add_opcode_idx(int opcode, struct Expr *expr);
 

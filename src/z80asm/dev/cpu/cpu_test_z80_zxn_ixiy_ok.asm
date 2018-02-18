@@ -972,8 +972,8 @@
  pop hl                         ; E1
  pop ix                         ; FD E1
  pop iy                         ; DD E1
- push -32768                    ; ED 8A 00 80
- push 32767                     ; ED 8A FF 7F
+ push -32768                    ; ED 8A 80 00
+ push 32767                     ; ED 8A 7F FF
  push 65535                     ; ED 8A FF FF
  push af                        ; F5
  push bc                        ; C5
