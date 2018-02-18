@@ -75,7 +75,6 @@ in this Software without prior written authorization from The Open Group.
 
 
 #include <X11/X.h>
-#include <X11/Xz88dk.h>
 
 
 // ===============  DISPLAY  ================
@@ -689,5 +688,6 @@ typedef struct {
     //Screen *screen;		/* back pointer to correct screen */
 } XWindowAttributes;
 
+#include <X11/Xz88dk.h>
 
 #endif /* _XLIB_H_ */

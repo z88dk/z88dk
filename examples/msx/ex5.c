@@ -39,7 +39,7 @@ typedef struct {
 u_char* buf[MODE2_MAX];
 
 
-main() {
+void main() {
 	
 	//u_char* buf = (u_char*)malloc(MODE2_MAX);
 

@@ -10,4 +10,5 @@
 
 
 Bool XCheckWindowEvent(Display *display, Window win, int event_mask, int event) {
+    return 0;
 }

@@ -317,14 +317,14 @@ extern char pieces[];
 
 #endasm
 
-PutPiece (int x, int y, int piece,int b_w)
+void PutPiece (int x, int y, int piece,int b_w)
 {
   putsprite(spr_and,6+10*x+5*y,5+5*y,pieces+264*b_w+piece*44 + 22);
   putsprite(spr_or,6+10*x+5*y,5+5*y,pieces+264*b_w+piece*44);
 }
 
 
-DrawBoard()
+void DrawBoard()
 {
 
   int     x,y,z,a,b;

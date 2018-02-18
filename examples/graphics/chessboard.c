@@ -23,7 +23,7 @@
    #endif
 #endif
 
-main()
+void main()
 {
 
   int     x;

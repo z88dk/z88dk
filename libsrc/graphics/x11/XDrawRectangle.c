@@ -9,9 +9,9 @@
 #include <X11/Xlib.h>
 #include <graphics.h>
 
-void XDrawRectangle(Display *display, Drawable win, GC gc, int x, int y, int width, int height) {
+void XDrawRectangle(Display *display, Drawable win, GC *gc, int x, int y, int width, int height) {
 	struct _XWIN *mywin;
-	mywin = (char *) win;
+	mywin = (void *) win;
 
 	drawb(mywin->a_x+x,mywin->a_y+y,width,height);
 }

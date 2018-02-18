@@ -59,7 +59,7 @@ int cx,cy;
 long tm;
 char hr[10],mn[10];
 
-main()
+void main()
 {
 #ifdef DETAILED
 	sz=getmaxy()/2-5;

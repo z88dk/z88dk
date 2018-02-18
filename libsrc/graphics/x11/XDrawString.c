@@ -18,10 +18,10 @@
 void XDrawString(Display *display, Drawable win, GC *gc, int x, int y, char *text, int textlen) {
 
 	struct _XWIN *mywin;
-	mywin = (char *) win;
+	mywin = (void *) win;
 
 // ======= I have absolutely no idea on why this is necessary ! =======
-	gc = *gc;
+	//gc = *gc;
 // ====================================================================
 
 #ifdef _DEBUG_

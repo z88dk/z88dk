@@ -29,7 +29,7 @@ typedef struct {
 
 #define MAX_POINT	256
 
-main() {
+void main() {
 	double	m_pi;
 	double	a;
 	int	c, i, l;

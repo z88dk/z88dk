@@ -12,7 +12,7 @@
 #define _BUILDING_X
 #include <X11/Xlib.h>
 
-void XSetFont(Display *display, GC mygc, Font font) {
+void XSetFont(Display *display, GC *mygc, Font font) {
 	//GC mygc;
 	//*mygc=*gc;
 	mygc->values.font = font;

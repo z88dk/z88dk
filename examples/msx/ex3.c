@@ -21,7 +21,7 @@ Contact the author:
 #include <stdlib.h>
 #include <msx/gfx.h>
 
-main() {
+void main() {
 	u_int addr;
 	int c, l;
 

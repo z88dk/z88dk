@@ -35,7 +35,7 @@ void thread2()
     /* A thread mustn't exit! or thread_exit() must be called beforehand */
 }
 
-int main()
+void main()
 {
 
     /* Disable interrupts to start off with */

@@ -473,7 +473,7 @@ init(void)
 #ifndef MINIMALISTIC
 #ifndef NOTIMER
   /* Randomize */
-  srand(time(NULL));
+  srand((int)time(NULL));
 #endif
 #endif
 

@@ -9,5 +9,5 @@
 #include <X11/Xlib.h>
 
 
-void XSetLineAttributes(Display *display, GC gc, int line_width, int line_style, int cap_style, int join_style) {
+void XSetLineAttributes(Display *display, GC *gc, int line_width, int line_style, int cap_style, int join_style) {
 }

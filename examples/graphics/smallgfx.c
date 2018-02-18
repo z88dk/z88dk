@@ -2,7 +2,7 @@
 #include <graphics.h>
 
 
-main()
+void main()
 {
 	clg();
 	draw(0,0,95,63);

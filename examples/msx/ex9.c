@@ -57,7 +57,7 @@ void star_move(star_t* st) {
 
 #define MAX_STARS 16
 
-main() {
+void main() {
 	u_char c;
 	star_t *st, stars[MAX_STARS];
 

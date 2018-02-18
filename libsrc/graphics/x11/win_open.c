@@ -78,7 +78,7 @@
 #endif
 
 
-void win_open(struct gui_win win)
+void win_open(struct gui_win *win)
 {
 int x;
 

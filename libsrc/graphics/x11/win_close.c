@@ -9,7 +9,7 @@
 #include <gui.h>
 
 
-void win_close(struct gui_win win)
+void win_close(struct gui_win *win)
 {
   bkrestore(win->back);
   free(win->back);

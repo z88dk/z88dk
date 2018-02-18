@@ -53,7 +53,7 @@ extern char diamond_attr[];
 #endasm
 
 
-main() {
+void main() {
 	int d;
 	int x, y;
 

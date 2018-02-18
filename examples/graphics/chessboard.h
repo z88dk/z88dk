@@ -218,14 +218,14 @@ char pieces[] = {
 };
 
 
-PutPiece (int x, int y, int piece,int b_w)
+void PutPiece (int x, int y, int piece,int b_w)
 {
   putsprite(spr_and,9+21*x+10*y,15+10*y,pieces+852*b_w+piece*142 + 71);
   putsprite(spr_or,9+21*x+10*y,15+10*y,pieces+852*b_w+piece*142);
 }
 
 
-DrawBoard()
+void DrawBoard()
 {
 
   int     x,y,z,a,b;

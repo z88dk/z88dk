@@ -8,7 +8,7 @@
 //#include <float.h>
 
 
-main()
+void main()
 {
 
 /*

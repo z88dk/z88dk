@@ -776,7 +776,7 @@ void move_ghost()
   *************************
   *************************/
 
-int main ()
+void main ()
 {
 
  /****  JOYSTICK CHOICE  ****/
