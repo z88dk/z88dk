@@ -18,6 +18,7 @@ time/spectrum/clock
 games/spectrum/joystick
 @games/games.lst
 @spectrum/spectrum.lst
+@font/font_4x8/font_4x8.lst
 ts2068/ts_vmod
 psg/ts2068/set_psg
 psg/ts2068/set_psg_callee

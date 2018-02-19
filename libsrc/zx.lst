@@ -19,6 +19,7 @@ stdio/ansi/spectrum/f_ansi_scrollup
 time/spectrum/clock
 @gfxspectrum.lst
 @font/fzx/fzx.lst
+@font/font_4x8/font_4x8.lst
 games/spectrum/joystick
 games/spectrum/bit_open
 games/spectrum/bit_open_di
