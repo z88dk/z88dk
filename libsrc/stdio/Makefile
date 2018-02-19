@@ -54,5 +54,5 @@ ansi-clean:
 clean:  ansi-clean
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i */*.o
 	$(RM) -fr obj zcc_opt.def
-	cd zsock ; $(MAKE) clean ; cd ..
-	cd 8080 ; $(MAKE) clean ; cd ..
+	$(MAKE) -C zsock clean
+	$(MAKE) -C 8080 clean

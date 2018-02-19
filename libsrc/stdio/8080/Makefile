@@ -23,7 +23,7 @@ generic: gen
 gen:    $(STDOBJECTS)
 
 z88_x:
-	cd z88 ; $(MAKE) ; cd ..
+	$(MAKE) -C z88 
 
 .c.o:
 	$(ZCC) +test -DSIMPLIFIED_STDIO $(CFLAGS) $*.c

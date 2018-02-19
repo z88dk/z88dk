@@ -1,20 +1,28 @@
-# $Id: Makefile,v 1.6 2012-06-26 06:09:52 stefano Exp $
+include ../Make.config
 
-SUBDIRS = osca	z88 cpc	spectrum
+
+SUBDIRS = osca  z88 cpc spectrum
+CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all
 
-subdirs-all:	$(SUBDIRS)
+
+subdirs-all: $(SUBDIRS)
+
+subdirs-clean: $(SUBDIRS_CLEAN)
+
+
+clean: subdirs-clean
+
+subdirs-clean: $(CLEANDIRS)
+
+
+.PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
+
 
 
 $(SUBDIRS):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ all
 
-clean:
-	@for s in $(SUBDIRS); \
-	do \
-		$(MAKE) -C $$s clean; \
-	done
-
-.PHONY: $(SUBDIRS) subdirs-all
-
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean

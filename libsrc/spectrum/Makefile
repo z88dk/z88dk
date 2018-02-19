@@ -13,14 +13,6 @@ all:
 
 clean:
 	$(MAKE) -C fzx clean
+	$(MAKE) -C tape clean
 	$(RM) *.o* zcc_opt.def
-	cd basic ; $(RM) *.o* ; cd ..
-	cd cpm ; $(RM) *.o* ; cd ..
-	cd diagnostic ; $(RM) *.o* ; cd ..
-	cd display ; $(RM) *.o* ; cd ..
-	cd if1 ; $(RM) *.o* ; cd ..
-	cd opus ; $(RM) *.o* ; cd ..
-	cd tape ; $(MAKE) clean ; cd ..
-	cd uspeech ; $(RM) *.o* ; cd ..
-	cd zxmmc ; $(RM) *.o* ; cd ..
-	cd ulaplus ; $(RM) *.o* ; cd ..
+	$(RM) */*.o
