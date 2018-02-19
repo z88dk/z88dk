@@ -33,7 +33,7 @@ all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECT
 
 
 obj/c128/%.o: c128/%.c
-	zcc +c128 -mz80 $(CFLAGS) -o $@  $^
+	$(ZCC) +c128 -mz80 $(CFLAGS) -o $@  $^
 
 
 dirs:

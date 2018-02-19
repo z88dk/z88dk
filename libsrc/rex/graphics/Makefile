@@ -9,7 +9,7 @@ include ../../Make.config
 all: 	DsDisplayEllipse.o
 
 .c.o:  
-	zcc +rex $(CFLAGS) $*.c
+	$(ZCC) +rex $(CFLAGS) $*.c
 
 
 clean:

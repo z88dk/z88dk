@@ -12,7 +12,7 @@ $(OUTPUT_DIRECTORY)/nbdrv.lib: $(OBJECTS) $(wildcard *.asm) nbflst
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/nbdrv @nbflst
 
 .c.o:
-	zcc +newbrain $(CFLAGS) $*.c
+	$(ZCC) +newbrain $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* $(OUTPUT_DIRECTORY)/nbdrv.lib

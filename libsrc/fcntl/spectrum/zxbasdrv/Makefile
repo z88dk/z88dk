@@ -20,7 +20,7 @@ $(OUTPUT_DIRECTORY)/zxbasdrv.lib: $(OBJECTS) zxbdlst $(wildcard *.asm)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zxbasdrv @zxbdlst
 
 .c.o:
-	zcc +zx $(CFLAGS) $*.c
+	$(ZCC) +zx $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* $(OUTPUT_DIRECTORY)/zxbasdrv.lib $(OUTPUT_DIRECTORY)/zxbasdos.lib

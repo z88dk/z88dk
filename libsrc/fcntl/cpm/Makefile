@@ -40,7 +40,7 @@ all: $(OBJECTS)
 # It can't be +cpm, otherwise the bin output filename
 # will be forced to 'a.com' !!
 .c.o:
-	zcc +cpm $(CFLAGS) $*.c
+	$(ZCC) +cpm $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.i $(AFILES)

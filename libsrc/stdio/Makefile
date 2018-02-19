@@ -16,28 +16,28 @@ OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES))
 
 obj/net/%.o: %.asm
-	@zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	$(ZCC) +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/net/%.o: %.c
-	@zcc +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
+	$(ZCC) +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
 obj/binary/%.o: %.asm
-	@zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	$(ZCC) +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/binary/%.o: %.c
-	@zcc +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
+	$(ZCC) +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
 obj/%.o: %.asm
-	@zcc +test $(CFLAGS) -Ca-I../ -c -o $@ $^
+	$(ZCC) +test $(CFLAGS) -Ca-I../ -c -o $@ $^
 
 obj/%.o: %.c
-	@zcc +test $(CFLAGS) -c -o $@ $^
+	$(ZCC) +test $(CFLAGS) -c -o $@ $^
 
 obj/stdesc/%.o: %.asm
-	@zcc +test $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Ca-I../ -Cc-standard-escape-chars -c -o $@ $^
+	$(ZCC) +test $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Ca-I../ -Cc-standard-escape-chars -c -o $@ $^
 
 obj/stdesc/%.o: %.c
-	@zcc +test $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
+	$(ZCC) +test $(CFLAGS) -Cc-standard-escape-chars -c -o $@ $^
 
 
 

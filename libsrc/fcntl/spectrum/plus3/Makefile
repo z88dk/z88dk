@@ -14,7 +14,7 @@ $(OUTPUT_DIRECTORY)/p3.lib: $(OBJECTS) plus3.lst $(wildcard *.asm)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/p3 @plus3.lst
 
 .c.o:
-	zcc +zx $(CFLAGS) -DPLUS3 $*.c
+	$(ZCC) +zx $(CFLAGS) -DPLUS3 $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def $(OUTPUT_DIRECTORY)/p3.lib

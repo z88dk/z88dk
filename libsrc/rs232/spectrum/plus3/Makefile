@@ -18,7 +18,7 @@ $(OUTPUT_DIRECTORY)/rs232plus.lib: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232plus @p3list
 
 %.o: %.c
-	zcc +zx $(CFLAGS) $*.c -o $@
+	$(ZCC) +zx $(CFLAGS) $*.c -o $@
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)

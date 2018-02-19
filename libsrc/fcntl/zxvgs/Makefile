@@ -9,7 +9,7 @@ include ../../Make.config
 all:	
 
 .c.o:
-	zcc +zx $(CFLAGS) -DZXVGS $*.c
+	$(ZCC) +zx $(CFLAGS) -DZXVGS $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def

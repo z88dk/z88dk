@@ -17,7 +17,7 @@ all:    $(AOBJECTS)
 
 
 .c.o:
-	zcc +enterprise $(CFLAGS) $*.c
+	$(ZCC) +enterprise $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i

@@ -13,7 +13,7 @@ all:	$(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/lib3d @lib3d.lst
 
 %.o: %.c
-	zcc +test $(CFLAGS) -o $@ $^
+	$(ZCC) +test $(CFLAGS) -o $@ $^
 
 clean:
 	$(RM) *.o* zcc_opt.def

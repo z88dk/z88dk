@@ -27,7 +27,7 @@ $(OUTPUT_DIRECTORY)/cpcfs.lib: $(OBJECTS) $(wildcard *.asm) cpcfs.lst
 
 
 .c.o:
-	zcc +cpc $(CFLAGS)  -D__CPC__  $*.c
+	$(ZCC) +cpc $(CFLAGS)  -D__CPC__  $*.c
 
 
 clean:

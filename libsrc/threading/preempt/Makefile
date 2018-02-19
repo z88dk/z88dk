@@ -12,7 +12,7 @@ DESTDIR=$(OUTPUT_DIRECTORY)/
 all: $(DESTDIR)preempt.lib
 
 .c.o:
-	zcc +test $(CFLAGS) $*.c
+	$(ZCC) +test $(CFLAGS) $*.c
 
 
 $(DESTDIR)preempt.lib: $(OBJECTS)

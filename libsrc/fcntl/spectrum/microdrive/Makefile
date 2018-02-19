@@ -15,7 +15,7 @@ $(OUTPUT_DIRECTORY)/zxmdv.lib: $(OBJECTS) mdvlist
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zxmdv @mdvlist
 
 .c.o:
-	zcc +zx $(CFLAGS) $*.c
+	$(ZCC) +zx $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def

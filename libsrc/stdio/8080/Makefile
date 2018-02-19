@@ -26,7 +26,7 @@ z88_x:
 	cd z88 ; $(MAKE) ; cd ..
 
 .c.o:
-	zcc +test -DSIMPLIFIED_STDIO $(CFLAGS) $*.c
+	$(ZCC) +test -DSIMPLIFIED_STDIO $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

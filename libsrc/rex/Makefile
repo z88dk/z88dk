@@ -5,7 +5,7 @@ all:
 	cd graphics ; $(MAKE) ; cd ..
 
 .c.o:
-	zcc +rex $(CFLAGS) $*.c
+	$(ZCC) +rex $(CFLAGS) $*.c
 
 
 clean:

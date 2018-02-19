@@ -29,7 +29,7 @@ net: $(OBJECTS)
 	$(LIBLINKER) -I$(Z88DK_LIB)/arch/z88/def -x$(OUTPUT_DIRECTORY)/netdev @zsockdev_list
 
 .c.o:
-	zcc +z88 $(CFLAGS) $*.c 
+	$(ZCC) +z88 $(CFLAGS) $*.c 
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.i zcc_opt.def $(AFILES)

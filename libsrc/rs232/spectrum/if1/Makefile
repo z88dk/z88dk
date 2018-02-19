@@ -16,7 +16,7 @@ $(OUTPUT_DIRECTORY)/rs232if1.lib: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232if1 @if1list
 
 %.o: %.c
-	zcc +zx $(CFLAGS) $*.c -o $@
+	$(ZCC) +zx $(CFLAGS) $*.c -o $@
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)

@@ -39,10 +39,10 @@ obj/newlib-ixiy:
 	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/$(TARGET)/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(TARGET)/%.o: %.asm
-	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 
 dirs:

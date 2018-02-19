@@ -38,7 +38,7 @@ OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
 
 obj/$(OBJSUBDIR)/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o $@  $^
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
 	@$(ASSEMBLER) -DFOR$(TARGET) -I..  $^
