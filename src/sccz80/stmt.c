@@ -208,7 +208,7 @@ int statement()
 void ns()
 {
     if (cmatch(';') == 0)
-        warningfmt("Expected ';'");
+        errorfmt("Expected ';'",1);
 }
 
 /*
@@ -492,7 +492,7 @@ void docase()
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
     if ( valtype == KIND_DOUBLE ) 
-        warningfmt("Unexpected floating point encountered, taking int value");
+        warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');
     ++swnext;
@@ -709,7 +709,7 @@ void doasm()
     }
     clear(); /* invalidate line */
     if (eof)
-        warningfmt("Unterminated assembler code");
+        errorfmt("Unterminated assembler code",1);
     cmode = 1; /* then back to parse level */
 }
 
@@ -726,7 +726,7 @@ void dopragma()
     else if (amatch("unset"))
         delmac();
     else {
-        warningfmt("Unknown #pragma directive");
+        warningfmt("unknown-pragmas","Unknown #pragma directive");
         clear();
     }
 }

@@ -168,7 +168,7 @@ static int init(Type *type, int dump)
             /* Dump the literals where they are, padding out as appropriate */
             if (type->len != -1 &&  sz > type->len) {
                 /* Ooops, initialised to long a string! */
-                warningfmt("Initialisation too long, truncating!");
+                warningfmt("overlong-initialization","Initialisation too long, truncating!");
                 sz = type->len;
                 gltptr = sz;
                 *(glbq + sz - 1) = '\0'; /* Terminate string */

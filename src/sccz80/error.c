@@ -10,6 +10,33 @@
 #include <stdarg.h>
 
 
+static int     c_warning_all = 0;
+static int     c_warning_categories_num = 0;
+static char  **c_warning_categories = NULL;
+
+static char   *c_default_categories[] = { 
+    "incompatible-function-types",
+    "incompatible-pointer-types",
+    "conversion",
+    "void",
+    "unreachable",
+    "parser",
+    "overlong-initialization",
+    "incorrect-function-declspec",
+    "invalid-value",
+    "invalid-function-definition"
+};
+static int     c_default_categories_num = sizeof(c_default_categories) / sizeof(c_default_categories[0]);
+
+void parse_warning_option(const char *value) {
+    if ( strcmp(value, "all") == 0 ) {
+        c_warning_all = 1;
+    } else {
+        int i = c_warning_categories_num++;
+        c_warning_categories = REALLOC(c_warning_categories, c_warning_categories_num * sizeof(c_warning_categories[0]));
+        c_warning_categories[i] = STRDUP(value);
+    }
+} 
 
 /*
  *      Now some code!
@@ -64,20 +91,43 @@ void debug(int num, char* str, ...)
     fprintf(stderr, "\n");
 }
 
-void warningva(const char *fmt, va_list ap)
+static void warningva(const char *category, const char *fmt, va_list ap)
 {
     fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
     vfprintf(stderr, fmt, ap);
-    fprintf(stderr, "\n");
+    fprintf(stderr, " [-W%s]\n", category);
 }
 
-void warningfmt(const char *fmt, ...)
-{
-    va_list ap;
 
-    va_start(ap, fmt);
-    warningva(fmt, ap);
-    va_end(ap);
+void warningfmt(const char *category, const char *fmt, ...)
+{
+    int pass = 0;
+
+    if ( c_warning_all ) {
+        pass = 1;
+    } else {
+        int i;
+        for ( i = 0; i < c_warning_categories_num; i++ ) {
+            if ( strcmp(c_warning_categories[i],category) == 0 ) {
+                pass = 1;
+                break;
+            }
+        }
+        for ( i = 0; i < c_default_categories_num; i++ ) {
+            if ( strcmp(c_default_categories[i],category) == 0 ) {
+                pass = 1;
+                break;
+            }
+        }
+    }
+
+    if ( pass ) {
+        va_list ap;
+
+        va_start(ap, fmt);
+        warningva(category, fmt, ap);
+        va_end(ap);
+    }
 }
 
 

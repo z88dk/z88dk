@@ -99,21 +99,21 @@ int heir1(LVALUE* lval)
                     type_describe(lval->ltype,str);
                     utstring_printf(str," from ");
                     type_describe(rhs, str);
-                    warningfmt("%s", utstring_body(str));
+                    warningfmt("incompatible-pointer-types","%s", utstring_body(str));
                     utstring_free(str);
                 }
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
-                    warningfmt("Assigning CALLEE function pointer with non-CALLEE function");
+                    warningfmt("incompatible-function-types","Assigning CALLEE function pointer with non-CALLEE function");
                 }
                 if ( (lval->ltype->ptr->flags & SMALLC) && (rhs->ptr->flags & SMALLC) == 0 ) {
-                    warningfmt("Assigning SMALLC function pointer with non-SMALLC function");
+                    warningfmt("incompatible-function-types","Assigning SMALLC function pointer with non-SMALLC function");
                 }
             }
         } 
         if ( lval2.ltype->kind == KIND_VOID ) {
-            warningfmt("Assigning from a void expression");
+            warningfmt("void","Assigning from a void expression");
         }
 
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
@@ -627,7 +627,7 @@ int heirb(LVALUE* lval)
                     if (lval->ltype->kind == KIND_CPTR)
                         Zsp += 2;
                     if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
-                        warningfmt("Access of array at index %d is greater than size %d", val, lval->ltype->len);
+                        warningfmt("unknown","Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;

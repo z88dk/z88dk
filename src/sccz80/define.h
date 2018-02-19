@@ -15,6 +15,7 @@
 #define MALLOC(x)   malloc(x)
 #define CALLOC(x,y) calloc(x,y)
 #define REALLOC(x,y) realloc(x,y)
+#define STRDUP(x) strdup(x)
 #define FREENULL(x) do { if  (x != NULL ) { free(x); x = NULL; } } while (0)
 
 /*      Stand-alone definitions                 */

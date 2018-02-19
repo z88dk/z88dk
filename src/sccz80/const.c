@@ -403,7 +403,7 @@ unsigned char litchar()
     }
 
     if (ch() != 'x' && (ch() < '0' || ch() > '7')) {
-        warningfmt("Unknown escape sequence \\%c", ch());
+        warningfmt("parser","Unknown escape sequence \\%c", ch());
         return (gch());
     }
     if (ch() == 'x') {
@@ -417,7 +417,7 @@ unsigned char litchar()
                 oct = (oct << 4) + ((gch() & 95) - '7');
         }
         if (isxdigit(ch())) {
-            warningfmt("Hex escape sequence out of range");
+            warningfmt("parser","Hex escape sequence out of range");
         }
         return ((char)oct);
     }

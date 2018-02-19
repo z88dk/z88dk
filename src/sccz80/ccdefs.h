@@ -102,9 +102,10 @@ extern void       multidef(const char *sname);
 extern void       needtoken(char *str);
 extern void       needchar(char c);
 extern void       needlval(void);
-extern void       warningfmt(const char *fmt, ...);
+extern void       warningfmt(const char *category,const char *fmt, ...);
 extern void       debug(int num,char *str,...);
 extern void       errorfmt(const char *fmt, int fatal, ...);
+extern void       parse_warning_option(const char *value);
 
 /* expr.c */
 extern Kind       expression(int *con, double *val, Type **type);

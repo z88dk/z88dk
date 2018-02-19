@@ -29,7 +29,7 @@ static int32_t needsub(void)
         val = (-val);
     }
     if (valtype == KIND_DOUBLE)
-        warningfmt("Unexpected floating point encountered, taking int value");
+        warningfmt("unknown","Unexpected floating point encountered, taking int value");
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
 }
@@ -41,7 +41,7 @@ static void swallow_bitfield(void)
     Kind   valtype;
     if (cmatch(':')) {
         constexpr(&val, &valtype, 1);
-        warningfmt("Bitfields not supported by compiler");
+        warningfmt("unsupported-feature","Bitfields not supported by compiler");
     }
 }
 
@@ -270,7 +270,7 @@ static Type *parse_enum(Type *type)
 
                 constexpr(&dval, &valtype, 1);
                 if ( valtype == KIND_DOUBLE )
-                    warningfmt("Unexpected floating point encountered, taking int value");
+                    warningfmt("unknown","Unexpected floating point encountered, taking int value");
                 value = dval;
             }
             elem = make_constant(sname, value);
@@ -417,7 +417,7 @@ static Type *parse_type(void)
     if ( swallow("const")) {
         type->isconst = 1;
     } else if (swallow("volatile")) {
-        //warningfmt("Volatile type not supported by compiler");
+        //warningfmt("unsupported-feature","Volatile type not supported by compiler");
     }
 
     if (amatch("__sfr")) {
@@ -604,7 +604,7 @@ Type *parse_parameter_list(Type *return_type)
         }
         if ( param->kind == KIND_STRUCT ) {
             Type *ptr = make_pointer(param);            
-            warningfmt("Cannot pass a struct by value, converting to pointer to struct");
+            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
             strcpy(ptr->name, param->name);
             param = ptr;        
         }
@@ -675,7 +675,7 @@ Type *parse_decl_func(Type *base_type)
     }
     if ( base_type->kind == KIND_STRUCT ) {
         Type *ptr = make_pointer(base_type);
-        warningfmt("Can't define a function returning an struct, converting to a pointer");
+        warningfmt("conversion","Can't define a function returning an struct, converting to a pointer");
         strcpy(ptr->name, base_type->name);
         base_type = ptr;
     }
@@ -739,7 +739,7 @@ Type *parse_expr_type()
     Type *type = dodeclare2(NULL, MODE_CAST);
 
     if ( type && strlen(type->name)) {
-        warningfmt("We're not expecting name '%s' with cast expression",type->name);
+        warningfmt("invalid-cast-syntax","We're not expecting name '%s' with cast expression",type->name);
     }
 
     return type;
@@ -807,7 +807,7 @@ int declare_local(int local_static)
                     expr = expression(&vconst, &val, &expr_type);
 
                     if ( expr_type->kind == KIND_VOID ) {
-                        warningfmt("Assigning from a void expression");
+                        warningfmt("void","Assigning from a void expression");
                     }
                     
                     if ( vconst && expr != type->kind ) {
@@ -879,7 +879,7 @@ Type *dodeclare(enum storage_type storage)
         }
 
         if ( type->kind == KIND_FUNC && (type->flags & (FASTCALL|SMALLC)) == FASTCALL && array_len(type->parameters) > 1) {
-            warningfmt("Cannot define function '%s' as __z88dk_fastcall __stdc when it has more than 1 argument",type->name);
+            warningfmt("incorrect-function-declspec","Cannot define function '%s' as __z88dk_fastcall __stdc when it has more than 1 argument",type->name);
             type->flags ^= FASTCALL;
         }
 
@@ -1041,7 +1041,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
             dval = (-dval);
         }
         if ( valtype == KIND_DOUBLE )
-            warningfmt("Unexpected floating point encountered, taking int value");
+            warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
         type->value = dval;
 
         if ( symname(type->name) == 0 ) 
@@ -1076,7 +1076,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
     if ( ispointer(type) && type->ptr->kind == KIND_FUNC ) {
         /* Function pointers, fastcall isn't valid */
         if ( type->ptr->flags & FASTCALL ) {
-            warningfmt("FASTCALL is not a valid modifier for function pointers");
+            warningfmt("invalid-function-declspec","FASTCALL is not a valid modifier for function pointers");
             type->ptr->flags &= ~FASTCALL;
         }
     }
@@ -1161,7 +1161,7 @@ void declare_func_kr()
             array_add(func->parameters, param);
     
         if (ch() != ')' && cmatch(',') == 0) {
-            warningfmt("Expected ','");
+            warningfmt("syntax","Expected ','");
         }
     }
     parse_trailing_modifiers(func);
@@ -1188,7 +1188,7 @@ static void handle_kr_type_parameters(Type *func)
         }
         if ( param->kind == KIND_STRUCT ) {
             Type *ptr = make_pointer(param);            
-            warningfmt("Cannot pass a struct by value, converting to pointer to struct");
+            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
             strcpy(ptr->name, param->name);
             param = ptr;
         }
@@ -1201,7 +1201,7 @@ static void handle_kr_type_parameters(Type *func)
             }
         }
         if ( i == array_len(func->parameters) ) {
-            warningfmt("Found K&R declaration for unknown parameter '%s' for function '%s'",param->name, func->name);
+            warningfmt("invalid-function-definition","Found K&R declaration for unknown parameter '%s' for function '%s'",param->name, func->name);
         }
         if ( cmatch(',')) {
             // Nothing
@@ -1570,7 +1570,7 @@ static void declfunc(Type *type, enum storage_type storage)
     stackargs = where;
     if (statement() != STRETURN ) {
         if ( type->return_type->kind != KIND_VOID && lastst != STASM) {
-            warningfmt("Control reaches end of non-void function");
+            warningfmt("return-type","Control reaches end of non-void function");
         }
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */

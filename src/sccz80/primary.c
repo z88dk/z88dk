@@ -24,6 +24,7 @@ int primary(LVALUE* lval)
             k = heir1(lval);
         } while (cmatch(','));
         needchar(')');
+        //if ( k == 1 && lval->cast_type) docast(lval, lval);
         return k;
     }
 
@@ -127,15 +128,11 @@ int primary(LVALUE* lval)
              */
             if (!rcmatch('(')) {
                 errorfmt("Unknown symbol: %s", 1, sname);
-                lval->ltype = type_int;
-                lval->val_type = KIND_INT;
-                lval->ptr_type = KIND_NONE;
-                lval->indirect_kind = KIND_NONE;
-	        return(0);
+	            return(0);
             } else {
-            /* assume it's a function we haven't seen yet */
-            /* NB value set to 0 */
-                warningfmt( "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
+                /* assume it's a function we haven't seen yet */
+                /* NB value set to 0 */
+                warningfmt("implicit-definition", "Implicit definition of function '%s' it will return an int. Prototype it explicitly if this is not what you want.", sname);
                 ptr = addglb(sname, default_function(sname), 0, KIND_INT, 0, STATIK);
                 ptr->size = 0;
                 ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
@@ -283,7 +280,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
     if (t1 == KIND_CPTR && t2 == KIND_INT)
         convUint2long();
     else if (t2 == KIND_CPTR && t1 == KIND_INT)
-        warningfmt("Converting far ptr to near ptr");
+        warningfmt("incompatible-pointer-types","Converting far ptr to near ptr");
 
     /* Char conversion */
     if (t1 == KIND_CHAR && sign2 == NO && !isconst) {
@@ -623,7 +620,7 @@ void smartstore(LVALUE* lval)
 void rvaluest(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warningfmt("Variable '%s' may be used before initialisation", lval->symbol->name);
+        warningfmt("initialized", "unknown","Variable '%s' may be used before initialisation", lval->symbol->name);
     }
 
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
@@ -640,7 +637,7 @@ void rvaluest(LVALUE* lval)
 void rvalue(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warningfmt("Variable '%s' may be used before initialisation", lval->symbol->name);
+        warningfmt("initialized","Variable '%s' may be used before initialisation", lval->symbol->name);
     }
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         intrinsic_in(lval->symbol);
@@ -707,7 +704,7 @@ int test(int label, int parens)
             lval.stage_add = NULL;
         } else if (oper == zlt && utype(&lval)) {
             zerojump(jump0, label, &lval);
-            warningfmt("Unreachable code follows");
+            warningfmt("unreachable","Unreachable code follows");
         } else if (oper == zgt)
             zerojump(gt0, label, &lval);
         else if (oper == zge)
