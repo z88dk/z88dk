@@ -27,6 +27,7 @@ stdio/obj/binary/fputs
 stdio/obj/binary/fputs_callee
 stdio/obj/binary/fread
 stdio/obj/binary/freopen
+stdio/obj/binary/_freopen1
 stdio/obj/binary/fseek
 stdio/obj/binary/ftell
 stdio/obj/binary/fwrite

@@ -21,7 +21,7 @@ int __FASTCALL__ readbyte(int handle)
 	struct RND_FILE *myfile;
 	unsigned char mybyte;
 	
-	myfile = (char *) handle;
+	myfile = (void *) handle;
 
 	if ( (myfile)->position > (myfile)->size )
 			return (EOF);

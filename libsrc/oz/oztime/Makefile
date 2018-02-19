@@ -5,8 +5,13 @@
 
 include ../../Make.config
 
-all:	
-	zcc +test -DOZ -D__OZ__ $(CFLAGS) *.c
+CFILES = $(wildcard *.c)
+OFILES = $(CFILES:.c=.o)
+
+all: $(OFILES)
+
+%.o: %.c
+	zcc +test -DOZ -D__OZ__ $(CFLAGS) $^
 
 clean:
 	$(RM) *.o* zcc_opt.def

@@ -12,7 +12,6 @@
 
 FILE *fdopen(int fildes, const char *mode)
 {
-	int	flags;
         FILE    *fp;
 
         for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp)
@@ -21,21 +20,5 @@ FILE *fdopen(int fildes, const char *mode)
 
         if (fp >= _sgoioblk_end) return NULL; /* No free slots */
 
-	switch ((unsigned char )*mode) {
-		case 'r':
-			flags=_IOREAD | _IOUSE;
-			break;
-		case 'w':
-                	flags = _IOWRITE | _IOUSE;
-			break;
-		case 'a':
-                	flags = _IOWRITE | _IOUSE;
-			break;
-		default:
-			return (FILE *)NULL;
-	}
-       	fp->desc.fd=fildes;
-       	fp->ungetc=0; 
-       	fp->flags=flags;
-	return (FILE *)fp;
+        return _freopen1(NULL, fildes, mode, fp);
 }

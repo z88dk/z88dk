@@ -13,6 +13,6 @@
 long fdtell(int handle)
 {
 	struct M_CHAN *if1_file;
-	if1_file = (char *) handle;
+	if1_file = (void *) handle;
 	return (if1_file->position);
 }

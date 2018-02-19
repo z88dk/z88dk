@@ -27,6 +27,7 @@ stdio/obj/fputs
 stdio/obj/fputs_callee
 stdio/obj/fread
 stdio/obj/freopen
+stdio/obj/_freopen1
 stdio/obj/fseek
 stdio/obj/ftell
 stdio/obj/fwrite

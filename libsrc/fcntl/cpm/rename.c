@@ -24,8 +24,8 @@ int rename(char *old, char *new)
 	struct fcb *fc1;
 	struct fcb *fc2;
 	
-	fc1=buff;
-	fc2=(buff+16);
+	fc1=(void *)buff;
+	fc2=(void *)(buff+16);
 
 	uid = getuid();
 

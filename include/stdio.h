@@ -91,7 +91,11 @@ struct filestr {
         } desc;
         uint8_t  flags;
         uint8_t   ungetc;
-        intptr_t extra;
+        intptr_t  extra;
+        uint8_t   flags2;
+        uint8_t   reserved;
+        uint8_t   reserved1;
+        uint8_t   reserved2;
 };
 
 /* extra may point to an asm label that can be used to add extra stdio functionality
@@ -121,6 +125,10 @@ DEFVARS 0 {
 	fp_flags	ds.b	1
 	fp_ungetc	ds.b	1
 	fp_extra        ds.w	1
+        fp_flags2       ds.b    1
+        reserved        ds.b    1
+        reserved2       ds.b    1
+        reserved3       ds.b    1
 }
 #endasm
 #endif
@@ -166,6 +174,7 @@ extern FILE __LIB__ *fopen_zsock(char *name);
 extern FILE __LIB__ *fopen(const char *name, const char *mode) __smallc;
 extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
+extern FILE __LIB__ *_freopen1(const char *name, int fd, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
 #ifdef __SCCZ80
 extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(), int (*writefn)(), fpos_t (*seekfn)(), int (*closefn)());

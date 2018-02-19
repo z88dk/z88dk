@@ -30,7 +30,5 @@ n$=file name
 
 	if (zx_goto(7600)==9)
 		return (0);
-	else
-		return(-1);
-
+	return(-1);
 }

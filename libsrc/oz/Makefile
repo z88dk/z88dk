@@ -6,9 +6,9 @@
 include ../Make.config
 
 all:	
-	$(RM) emu/ozgfx/*.o*
-	cd oztime ; $(MAKE) ; cd ..
-	cd ozinput ; $(MAKE) ; cd ..
+	@$(RM) emu/ozgfx/*.o*
+	$(MAKE) -C oztime
+	$(MAKE) -C ozinput
 
 clean:
 	$(RM) *.o* zcc_opt.def

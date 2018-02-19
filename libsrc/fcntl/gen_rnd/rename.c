@@ -46,5 +46,5 @@ int blockcount;
 		if ((myfile)->name_prefix=='9') (myfile)->name_prefix='A';
 		else (myfile)->name_prefix++;
 	}
-
+        return 0;
 }
