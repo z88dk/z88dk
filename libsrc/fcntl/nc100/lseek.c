@@ -16,6 +16,6 @@ long lseek(int fd, long posn, int whence)
   }
   if (posn < 0 || posn > 0xFFFF)
     return -1L;
-  return nc_lseek(fd, posn & 0xFFFF);
+  return nc_lseek(fd, (int)posn);
 }
 

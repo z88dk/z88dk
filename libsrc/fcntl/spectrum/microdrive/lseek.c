@@ -27,7 +27,7 @@ long lseek(int handle, long posn, int whence)
 
 	switch (whence) {
 		case SEEK_SET:
-			if1_load_record(if1_file->drive, if1_file->name, posn / 512, if1_file);
+			if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512), if1_file);
 			if1_file->position=posn;
 			break;
 		
