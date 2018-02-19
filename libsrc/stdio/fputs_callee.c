@@ -26,39 +26,34 @@ int fputs_callee(const char *s,FILE *fp)
 
 	push 	bc	;ret address
 	push	ix	;save callers ix
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	ix,hl
+ELSE
 	push	hl
 	pop	ix
-	call	asmentry
+ENDIF
+	call	asm_fputs_callee
 	pop	ix
 	ret
 
-.asmentry
+	EXTERN	asm_fputc_callee
+	PUBLIC	asm_fputs_callee
+; Entry:	ix = fp
+;		de = s
+; Exit: 	hl != 0 (success)
+;		hl = -1 (failure)
+.asm_fputs_callee
 
-DEFC ASMDISP_FPUTS_CALLEE = # asmentry - fputs_callee
-PUBLIC ASMDISP_FPUTS_CALLEE
-
-;	pop	hl	;ret
-;	pop	ix	;fp
-;	pop	de	;s
-;	push	de
-;	push	ix
-;	push	hl
 .loop
 	ld	hl,1	;non -ve number
 	ld	a,(de)	;*s
 	and	a
 	ret	z	;end of string
-	ld	l,a
-	ld	h,0
+	ld	c,a
+	ld	b,0
 	inc	de	;s++
 	push	de	;keep s
-	push	hl	;send *s++
-	push	ix	;send fp
-
-	call	fputc_callee
-
-	;pop	ix	;get fp back
-	;pop	bc	;discard hl
+	call	asm_fputc_callee
 	pop	de	;get s back
 	ld	a,l	;test for EOF returned
 	and	h

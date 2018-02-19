@@ -37,23 +37,17 @@ ELSE
 	push	hl
 	pop	ix
 ENDIF
-	call	asmentry
+	call	asm_fputc_callee
 
 	pop	ix	
 	ret
 
-.asmentry
+	PUBLIC	asm_fputc_callee
 
-DEFC ASMDISP_FPUTC_CALLEE = # asmentry - fputc_callee
-PUBLIC ASMDISP_FPUTC_CALLEE
-
-;	pop	de
-;	pop	ix	;fp
-;	pop	bc	;c
-;	push	bc
-;	push	ix
-;	push	de
-
+; Entry:	ix = fp
+; 		bc = character to print
+; Exit:		hl = byte written
+asm_fputc_callee:
 	ld	hl,-1	;EOF
 	ld	a,(ix+fp_flags)
 	and	a	;no thing

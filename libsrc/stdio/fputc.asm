@@ -4,8 +4,7 @@ MODULE fputc
 SECTION code_clib
 PUBLIC fputc
 PUBLIC _fputc
-EXTERN _fputc_callee
-EXTERN ASMDISP_FPUTC_CALLEE
+EXTERN asm_fputc_callee
 
 .fputc
 ._fputc
@@ -19,7 +18,7 @@ EXTERN ASMDISP_FPUTC_CALLEE
         push    ix        ;callers ix
         push    hl
         pop     ix
-   	call    _fputc_callee + ASMDISP_FPUTC_CALLEE
+   	call    asm_fputc_callee 
         pop     ix
         ret
    
