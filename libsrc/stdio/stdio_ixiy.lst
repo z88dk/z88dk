@@ -26,8 +26,8 @@ stdio/obj/ixiy/fputc_callee
 stdio/obj/ixiy/fputs
 stdio/obj/ixiy/fputs_callee
 stdio/obj/ixiy/fread
+stdio/obj/ixiy/_freopen1
 stdio/obj/ixiy/freopen
-stdio/obj/ixiy/_freopen
 stdio/obj/ixiy/fseek
 stdio/obj/ixiy/ftell
 stdio/obj/ixiy/fwrite
