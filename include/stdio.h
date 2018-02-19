@@ -176,13 +176,9 @@ extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __sma
 extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
 extern FILE __LIB__ *_freopen1(const char *name, int fd, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
-#ifdef __SCCZ80
-extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(), int (*writefn)(), fpos_t (*seekfn)(), int (*closefn)());
-#else
 extern FILE  *funopen(const void     *cookie, int (*readfn)(void *, char *, int),
 			int (*writefn)(void *, const char *, int),
 			fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
-#endif
 
 extern int __LIB__ fclose(FILE *fp);
 extern int __LIB__ fflush(FILE *);
