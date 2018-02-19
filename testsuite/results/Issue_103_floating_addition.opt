@@ -686,7 +686,7 @@
 	GLOBAL	fdopen
 	GLOBAL	_freopen1
 	GLOBAL	fmemopen
-	GLOBAL	_funopen
+	GLOBAL	funopen
 	GLOBAL	fclose
 	GLOBAL	fflush
 	GLOBAL	closeall
