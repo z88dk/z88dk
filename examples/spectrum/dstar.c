@@ -108,7 +108,7 @@ static void left(char *ptr);
 static void right(char *ptr);
 static void down(char *ptr);
 static void up(char *ptr);
-static void standardmiddle(char nextpos);
+static int standardmiddle(char nextpos);
 static int checkfinish(void);
 static void setuplevel(void);
 static void drawboard(void);
@@ -252,7 +252,7 @@ static void up(char *ptr)
  * hit anything except for bubble we wanna stop
  */
 
-static void standardmiddle(char nextpos)
+static int standardmiddle(char nextpos)
 {
         if (ballorbox)
                 return (nextpos);       /* For box */
