@@ -60,7 +60,7 @@ define buildgeneric
 	$(MAKE) -C time
 	$(MAKE) -C debug
 	$(MAKE) -C assert
-	$(MAKE) -C font/fzx
+	$(MAKE) -C font
 	$(MAKE) -C stdlib TARGET=$(1)
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C psg
@@ -1172,6 +1172,7 @@ classic-clean:
 	$(MAKE) -C math clean
 	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
+	$(MAKE) -C font clean
 	$(RM) *.lib
 
 new-clean:
