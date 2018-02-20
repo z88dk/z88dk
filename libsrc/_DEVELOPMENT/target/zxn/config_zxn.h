@@ -45,7 +45,7 @@
 #define __ENV_TMPMAX  0xffff
 
 #undef  __SPECTRUM
-#define __SPECTRUM  2
+#define __SPECTRUM  16
 
 #define __SPECTRUM_48  1
 #define __SPECTRUM_128  2
@@ -1068,12 +1068,20 @@
 #define __IO_SOUNDRIVE_R_D2  0xfb
 
 #define __IO_TURBOSOUND  0xfffd
+
 #define __IT_ENABLE_L  0xd0
 #define __IT_ENABLE_R  0xb0
 #define __IT_ENABLE_LR  0xf0
 #define __IT_SELECT_PSG_0  0x0f
 #define __IT_SELECT_PSG_1  0x0e
 #define __IT_SELECT_PSG_2  0x0d
+
+#define __IO_FFFD_ENABLE_L  0xd0
+#define __IO_FFFD_ENABLE_R  0xb0
+#define __IO_FFFD_ENABLE_LR  0xf0
+#define __IO_FFFD_SELECT_PSG_0  0x0f
+#define __IO_FFFD_SELECT_PSG_1  0x0e
+#define __IO_FFFD_SELECT_PSG_2  0x0d
 
 #define __IO_AY_REG  0xfffd
 #define __IO_AY_DAT  0xbffd
@@ -1102,6 +1110,7 @@
 
 
 #define __IO_LAYER_2_CONFIG  0x123b
+
 #define __IL2C_ENABLE_LOWER_16K  0x01
 #define __IL2C_SHOW_LAYER_2  0x02
 #define __IL2C_SELECT_SHADOW_BUFFER  0x08
@@ -1109,6 +1118,14 @@
 #define __IL2C_BANK_SELECT_0  0x00
 #define __IL2C_BANK_SELECT_1  0x40
 #define __IL2C_BANK_SELECT_2  0x80
+
+#define __IO_123B_ENABLE_LOWER_16K  0x01
+#define __IO_123B_SHOW_LAYER_2  0x02
+#define __IO_123B_SELECT_SHADOW_BUFFER  0x08
+#define __IO_123B_BANK_SELECT_MASK  0xc0
+#define __IO_123B_BANK_SELECT_0  0x00
+#define __IO_123B_BANK_SELECT_1  0x40
+#define __IO_123B_BANK_SELECT_2  0x80
 
 
 
@@ -1566,8 +1583,12 @@
 #define __IO_SPRITE_SLOT  0x303b
 
 #define __IO_SPRITE_FLAGS  0x303b
+
 #define __ISF_MAX_SPRITES_PER_LINE  0x02
 #define __ISF_COLLISION  0x01
+
+#define __IO_303B_MAX_SPRITES_PER_LINE  0x02
+#define __IO_303B_COLLISION  0x01
 
 #define __IO_SPRITE_PALETTE  0x53
 
@@ -1755,6 +1776,7 @@
 #define __IO_UART_RX  0x143b
 
 #define __IO_UART_BAUD_RATE  0x143b
+
 #define __IUBR_115200  0
 #define __IUBR_57600  1
 #define __IUBR_38400  2
@@ -1764,11 +1786,24 @@
 #define __IUBR_4800  6
 #define __IUBR_2400  7
 
+#define __IO_143B_115200  0
+#define __IO_143B_57600  1
+#define __IO_143B_38400  2
+#define __IO_143B_31250  3
+#define __IO_143B_19200  4
+#define __IO_143B_9600  5
+#define __IO_143B_4800  6
+#define __IO_143B_2400  7
+
 #define __IO_UART_TX  0x133b
 
 #define __IO_UART_STATUS  0x133b
+
 #define __IUS_RX_AVAIL  0x01
 #define __IUS_TX_READY  0x02
+
+#define __IO_133B_RX_AVAIL  0x01
+#define __IO_133B_TX_READY  0x02
 
 
 
@@ -1787,6 +1822,7 @@
 #define __IO_FE_BORDER_MASK  0x07
 
 #define __IO_TIMEX_VIDEO_MODE  0xff
+
 #define __IO_TVM_DISABLE_ULA_INTERRUPT  0x40
 #define __IO_TVM_DFILE_1  0x0
 #define __IO_TVM_DFILE_2  0x01
@@ -1800,6 +1836,20 @@
 #define __IO_TVM_HIRES_CYAN  0x2e
 #define __IO_TVM_HIRES_YELLOW  0x36
 #define __IO_TVM_HIRES_WHITE  0x3e
+
+#define __IO_FF_DISABLE_ULA_INTERRUPT  0x40
+#define __IO_FF_DFILE_1  0x0
+#define __IO_FF_DFILE_2  0x01
+#define __IO_FF_HICOLOR  0x02
+#define __IO_FF_HIRES  0x06
+#define __IO_FF_HIRES_BLACK  0x06
+#define __IO_FF_HIRES_BLUE  0x0e
+#define __IO_FF_HIRES_RED  0x16
+#define __IO_FF_HIRES_MAGENTA  0x1e
+#define __IO_FF_HIRES_GREEN  0x26
+#define __IO_FF_HIRES_CYAN  0x2e
+#define __IO_FF_HIRES_YELLOW  0x36
+#define __IO_FF_HIRES_WHITE  0x3e
 
 
 

@@ -23,7 +23,7 @@ define(`__ENV_TMPMAX', 0xffff)
 
 # Compatible Spectrum model
 
-define(`__SPECTRUM', 2)
+define(`__SPECTRUM', 16)
 
 define(`__SPECTRUM_48', 1)
 define(`__SPECTRUM_128', 2)

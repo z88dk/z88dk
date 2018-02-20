@@ -5,6 +5,10 @@ divert(-1)
 # rebuild the library if changes are made
 # see NextOS config for ESXDOS compatible API under NextOS
 
+# NOTE:  When esxdos functions are called the lower 16k must
+# be occupied by the 48k rom (ROM3) and layer 2 write-only
+# to the lower 16k must be disabled (port 0x123b, IO_LAYER_2_CONFIG)
+
 # Code Separation
 
 define(`__ESXDOS_BASE_HOOK', 128)

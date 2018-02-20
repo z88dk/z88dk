@@ -47,6 +47,7 @@ define(`__IO_UART_RX', 0x143b)
 # PORT 0x143B: UART Baud Rate (write only)
 
 define(`__IO_UART_BAUD_RATE', 0x143b)
+
 define(`__IUBR_115200', 0)
 define(`__IUBR_57600', 1)
 define(`__IUBR_38400', 2)
@@ -56,6 +57,15 @@ define(`__IUBR_9600', 5)
 define(`__IUBR_4800', 6)
 define(`__IUBR_2400', 7)
 
+define(`__IO_143B_115200', __IUBR_115200)
+define(`__IO_143B_57600', __IUBR_57600)
+define(`__IO_143B_38400', __IUBR_38400)
+define(`__IO_143B_31250', __IUBR_31250)
+define(`__IO_143B_19200', __IUBR_19200)
+define(`__IO_143B_9600', __IUBR_9600)
+define(`__IO_143B_4800', __IUBR_4800)
+define(`__IO_143B_2400', __IUBR_2400)
+
 # PORT 0x133B: UART Tx (write only)
 
 define(`__IO_UART_TX', 0x133b)
@@ -63,8 +73,12 @@ define(`__IO_UART_TX', 0x133b)
 # PORT 0x133B: UART Status (read only)
 
 define(`__IO_UART_STATUS', 0x133b)
+
 define(`__IUS_RX_AVAIL', 0x01)   # active high
 define(`__IUS_TX_READY', 0x02)   # active low
+
+define(`__IO_133B_RX_AVAIL', __IUS_RX_AVAIL)
+define(`__IO_133B_TX_READY', __IUS_TX_READY)
 
 #
 # END OF USER CONFIGURATION
@@ -81,6 +95,7 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__IO_UART_RX'
 
 PUBLIC `__IO_UART_BAUD_RATE'
+
 PUBLIC `__IUBR_115200'
 PUBLIC `__IUBR_57600'
 PUBLIC `__IUBR_38400'
@@ -90,11 +105,24 @@ PUBLIC `__IUBR_9600'
 PUBLIC `__IUBR_4800'
 PUBLIC `__IUBR_2400'
 
+PUBLIC `__IO_143B_115200'
+PUBLIC `__IO_143B_57600'
+PUBLIC `__IO_143B_38400'
+PUBLIC `__IO_143B_31250'
+PUBLIC `__IO_143B_19200'
+PUBLIC `__IO_143B_9600'
+PUBLIC `__IO_143B_4800'
+PUBLIC `__IO_143B_2400'
+
 PUBLIC `__IO_UART_TX'
 
 PUBLIC `__IO_UART_STATUS'
+
 PUBLIC `__IUS_RX_AVAIL'
 PUBLIC `__IUS_TX_READY'
+
+PUBLIC `__IO_133B_RX_AVAIL'
+PUBLIC `__IO_133B_TX_READY'
 ')
 
 dnl#
@@ -106,6 +134,7 @@ ifdef(`CFG_ASM_DEF',
 defc `__IO_UART_RX' = __IO_UART_RX
 
 defc `__IO_UART_BAUD_RATE' = __IO_UART_BAUD_RATE
+
 defc `__IUBR_115200' = __IUBR_115200
 defc `__IUBR_57600' = __IUBR_57600
 defc `__IUBR_38400' = __IUBR_38400
@@ -115,11 +144,24 @@ defc `__IUBR_9600' = __IUBR_9600
 defc `__IUBR_4800' = __IUBR_4800
 defc `__IUBR_2400' = __IUBR_2400
 
+defc `__IO_143B_115200' = __IUBR_115200
+defc `__IO_143B_57600' = __IUBR_57600
+defc `__IO_143B_38400' = __IUBR_38400
+defc `__IO_143B_31250' = __IUBR_31250
+defc `__IO_143B_19200' = __IUBR_19200
+defc `__IO_143B_9600' = __IUBR_9600
+defc `__IO_143B_4800' = __IUBR_4800
+defc `__IO_143B_2400' = __IUBR_2400
+
 defc `__IO_UART_TX' = __IO_UART_TX
 
 defc `__IO_UART_STATUS' = __IO_UART_STATUS
+
 defc `__IUS_RX_AVAIL' = __IUS_RX_AVAIL
 defc `__IUS_TX_READY' = __IUS_TX_READY
+
+defc `__IO_133B_RX_AVAIL' = __IUS_RX_AVAIL
+defc `__IO_133B_TX_READY' = __IUS_TX_READY
 ')
 
 dnl#
@@ -131,6 +173,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_UART_RX'  __IO_UART_RX
 
 `#define' `__IO_UART_BAUD_RATE'  __IO_UART_BAUD_RATE
+
 `#define' `__IUBR_115200'  __IUBR_115200
 `#define' `__IUBR_57600'  __IUBR_57600
 `#define' `__IUBR_38400'  __IUBR_38400
@@ -140,9 +183,22 @@ ifdef(`CFG_C_DEF',
 `#define' `__IUBR_4800'  __IUBR_4800
 `#define' `__IUBR_2400'  __IUBR_2400
 
+`#define' `__IO_143B_115200'  __IUBR_115200
+`#define' `__IO_143B_57600'  __IUBR_57600
+`#define' `__IO_143B_38400'  __IUBR_38400
+`#define' `__IO_143B_31250'  __IUBR_31250
+`#define' `__IO_143B_19200'  __IUBR_19200
+`#define' `__IO_143B_9600'  __IUBR_9600
+`#define' `__IO_143B_4800'  __IUBR_4800
+`#define' `__IO_143B_2400'  __IUBR_2400
+
 `#define' `__IO_UART_TX'  __IO_UART_TX
 
 `#define' `__IO_UART_STATUS'  __IO_UART_STATUS
+
 `#define' `__IUS_RX_AVAIL'  __IUS_RX_AVAIL
 `#define' `__IUS_TX_READY'  __IUS_TX_READY
+
+`#define' `__IO_133B_RX_AVAIL'  __IUS_RX_AVAIL
+`#define' `__IO_133B_TX_READY'  __IUS_TX_READY
 ')
