@@ -1,6 +1,7 @@
 SUBDIRS = microdrive plus3 zxbasdrv esxdos
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
+include ../../Make.config
      
 .PHONY: subdirs $(SUBDIRS) $(CLEANDIRS)
      

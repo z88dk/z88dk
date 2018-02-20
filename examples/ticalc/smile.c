@@ -29,7 +29,7 @@ char smile[] =
 	0x3C  /* defb @00111100 ;  oooo   */
 };
 
-main()
+void main()
 {
 	char x, y, temp;
 

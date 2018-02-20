@@ -17,6 +17,7 @@ stdio/obj/r2k/fgetc
 stdio/obj/r2k/fgetpos
 stdio/obj/r2k/fgets
 stdio/obj/r2k/fgets_cons
+stdio/obj/r2k/fgets_cons_erase_character
 stdio/obj/r2k/fmemopen
 stdio/obj/r2k/fopen
 stdio/obj/r2k/fprintf
@@ -26,6 +27,7 @@ stdio/obj/r2k/fputs
 stdio/obj/r2k/fputs_callee
 stdio/obj/r2k/fread
 stdio/obj/r2k/freopen
+stdio/obj/r2k/_freopen1
 stdio/obj/r2k/fseek
 stdio/obj/r2k/ftell
 stdio/obj/r2k/fwrite

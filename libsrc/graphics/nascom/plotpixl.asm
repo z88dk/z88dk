@@ -70,7 +70,7 @@
 			dec	a
 			jr	nz,r_loop
 		
-.r_zero			ld	d,0
+.r_zero
 			ld	e,c
 			add	hl,de
 

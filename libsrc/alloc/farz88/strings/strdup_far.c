@@ -10,6 +10,7 @@
  */
 
 #define FARDATA 1
+#define __DISABLE_BUILTIN
 
 #include <string.h>
 #include <stdlib.h>

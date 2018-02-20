@@ -43,6 +43,9 @@ graphics/undrawto
 graphics/unplot
 graphics/drawbox
 graphics/setxy
+graphics/move
+graphics/pen_up
+graphics/pen_down
 graphics/xorborder
 graphics/xorplot
 graphics/text6/plotpixl

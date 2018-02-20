@@ -7,7 +7,7 @@
 ;
 
                 SECTION         code_fp
-		INCLUDE		"cpcfp.def"
+		INCLUDE		"target/cpc/def/cpcfp.def"
 
 		PUBLIC		cmpfin
 

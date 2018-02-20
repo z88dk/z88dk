@@ -29,6 +29,16 @@
 ;
 
 .fputc_cons_native
+IF FORts2068
+	in	a,(255)
+	ld	hl,hrgmode
+	ld	(hl),0
+	and	7
+	cp	6
+	jr	nz,normal
+	dec	(hl)
+.normal
+ENDIF
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
@@ -132,6 +142,12 @@
 	inc	de
 	djnz	print64_loop
 	dec	h
+IF FORts2068
+	; No attribute setting for hires mode
+	ld	a,(hrgmode)
+	and	a
+	jr	nz,cbak
+ENDIF
 	ld	a,h  
 	rrca  
 	rrca  
@@ -147,6 +163,13 @@
 .posncheck
 	bit	6,l  
 	jr	z,char4
+IF FORts2068
+	ld	a,(hrgmode)
+	and	a
+	jr	z,cbak1
+	bit	7,l
+	jr	z,char4
+ENDIF
 .cbak1	ld	l,0  
 	inc	h  
 ;	ld	a,h
@@ -187,6 +210,12 @@
 	inc	hl
 	djnz	loop32
 	dec	d
+	ld	hl,(chrloc)
+IF FORts2068
+	ld	a,(hrgmode)
+	and	a
+	jr	nz,increment
+ENDIF
 	ld	a,d  
 	rrca  
 	rrca  
@@ -196,7 +225,7 @@
 	ld	d,a
 	ld	a,(attr)
 	ld	(de),a
-	ld	hl,(chrloc)
+.increment
 	inc	l
 	inc	l
 	jp	posncheck
@@ -217,11 +246,23 @@ calc_screen_address:
 	ld	hl,23*256
 	ld	(chrloc),hl
 noscroll:
+IF FORts2068
+	bit	1,l		;if set then we need to use alt screen
+	push	af
+ENDIF
 	srl	l		;divide column by 2
 	ld	b,0x0f		;mask
 	jr	c,just_calculate
 	ld	b,0xf0
 just_calculate:
+IF FORts2068
+	; In highres mode, we've got to divide again
+	ld	a,(hrgmode)
+	and	a
+	jr	z,not_hrg_calc
+	srl	l
+.not_hrg_calc
+ENDIF
 	ld	a,h
 	rrca
 	rrca
@@ -233,6 +274,15 @@ just_calculate:
 	and	0x18
 	or	0x40
 	ld	h,a
+IF FORts2068
+	pop	af
+	ret	z
+	ld	a,(hrgmode)
+	and	$20
+	add	h
+	ld	h,a
+not_second_screen:
+ENDIF
 	ret
 
 
@@ -241,6 +291,11 @@ just_calculate:
 ; Blanking the bottom row..
 .scrollup
  	push	hl
+IF FORts2068
+	ld	a,(hrgmode)
+	and	a
+	jr	nz,hrgscroll
+ENDIF
 	ld	a,($dff)
 	cp	$17
 	jr	nz,ts2068_rom
@@ -253,6 +308,74 @@ just_calculate:
 	defw	$939	; TS2068 scrollup
 	pop	hl
 	ret
+
+IF FORts2068
+	EXTERN	zx_rowtab
+.hrgscroll
+	push	ix
+        ld      ix,zx_rowtab
+        ld      a,8
+.outer_loop
+        push    af
+        push    ix
+        ld      a,23
+.inner_loop
+        ld      e,(ix+16)
+        ld      d,(ix+17)
+        ex      de,hl
+        ld      e,(ix+0)
+        ld      d,(ix+1)
+        ld      bc,32
+        ldir
+; second display
+        dec     de
+        dec     hl
+        set     5,d
+        set     5,h
+        ld      bc,32
+        lddr
+        ld      bc,16
+        add     ix,bc
+        dec     a
+        jr      nz,inner_loop
+        pop     ix
+        pop     af
+        inc     ix
+        inc     ix
+        dec     a
+        jr      nz,outer_loop
+; clear
+        ld      ix,zx_rowtab + (192 - 8) * 2
+        ld      a,8
+.clear_loop
+        push    ix
+        ld      e,(ix+0)
+        ld      d,(ix+1)
+        ld      h,d
+        ld      l,e
+        ld      (hl),0
+        inc     de
+        ld      bc,31
+        ldir
+; second display
+        dec hl
+        dec de
+        set     5,d
+        set     5,h
+        ex      de,hl
+        ld      (hl),0
+        ld      bc,31
+        lddr
+        pop     ix
+        inc     ix
+        inc     ix
+        dec     a
+        jr      nz,clear_loop
+	pop	ix
+        pop     hl
+        ret
+
+ENDIF
 
 ; This nastily inefficient table is the code table for the routines
 ; Done this way for future! Expansion
@@ -353,18 +476,32 @@ ENDIF
 ; Clear screen and move to home
 
 .cls
+	ld      hl,0
+	ld      (chrloc),hl
 	ld      hl,16384
 	ld      de,16385
 	ld      bc,6144
 	ld      (hl),l
 	ldir
+IF FORts2068
+	ld	a,(hrgmode)
+	and	a
+	jr	nz,cls_hrg
+ENDIF
 	ld	a,(attr)
 	ld	(hl),a
 	ld	bc,767
 	ldir
-	ld      hl,0
-	ld      (chrloc),hl
 	ret
+IF FORts2068
+cls_hrg:
+	ld      hl,$6000
+        ld      de,$6001
+        ld      bc,6144
+        ld      (hl),l
+        ldir
+	ret
+ENDIF
 
 ;Move to new line
 
@@ -565,6 +702,10 @@ ENDIF
 ; Bit 0 = inverse
 ; Bit 1 = scroll disabled
 .control_flags	defb	0
+
+IF FORts2068
+.hrgmode	defb	0
+ENDIF
 
 	SECTION data_clib
 

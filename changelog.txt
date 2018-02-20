@@ -5,6 +5,7 @@ z88dk vX.XX  - XX.XX.XXXX
 
 - [classiclib] The value of FOPEN_MAX can now be controlled at link time with
   -pragma-define=CLIB_FOPEN_MAX=YY. The default for YY is 10.
+- [classiclib] #571: The atexit stack size can be configured with CLIB_EXIT_STACK_SIZE
 - [classiclib] A new port to the Pacman arcade hardware is availble
 - [classiclib] Bug fixes for memrchr() and gets()
 - [classiclib] Compiler intrinsics are now available
@@ -25,11 +26,18 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +nc100 graphics support has been added
 - [classiclib] +msx fixed an initialisation error that prevented ROMs from
   working correctly
+- [classiclib] +ts2068 screen printer doesn't force hires screen
 - [classiclib] +zx ROM screen printer now available
+- [classiclib] +zx Non ROM based stdin is now available
 - [classiclib] +zx Default console font can be changed at compile time (CRT_FONT)
+- [classiclib] +zx FZX based screen printer is now available
 - [classiclib] imported obstack, balloc and adt libraries from newlib. balloc can now
   be configured in the same was as newlib (-pragma-define:CLIB_BALLOC_TABLE_SIZE=n)
 - [classiclib] Marked adt and balloc classic apis as deprecated
+- [classiclib] cpcrslib has been imported
+- [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam port improvements
+- [classiclib] SMS stability improvements
+- [classiclib] Now shares ctype, string and most of stdlib with newlib
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -65,13 +73,28 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #485: Functions marked __z88dk_sdccdecl use sdcc calling spec for
   chars (and become r->l)
 - [sccz80] #489: Loop variables can now be defined in the initialisation clause
-  of a for statement
+  of a for statement. Additionally, variables can be defined anywhere, not just at
+  the start of a block.
+- [sccz80] #493: The __func__ directive is now supported
+- [sccz80] #501: sccz80 now supports the sdcc __at (0xnnnn) syntax for variable and
+  function placement
+- [sccz80] #514: sccz80 now supports flexible members at the end of struct definition
+- [sccz80] #519: The preprocessor has been switched over to ucpp which is C99 compatible
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [ticks] [classiclib] File IO is now available
 - [ticks] A debugger is now available
 - [ticks] Now supports Rabbit, z180 and ZX Next cpus
 - [z80asm] Rabbit 2000 and 3000 are now fully supported
-- [z80asm] ZX Spectrum Next CPU extensions are supported
+- [z80asm] Z180 is now fully supported
+- [z80asm] ZX Spectrum Next CPU extensions and Copper Unit are supported
+- [z80asm] #442: Globs are now supported in filenames and .lst files
+- [z80asm] #159: Environment variables ${VAR} in filenames and .lst files
+- [z80asm] #222: +zx and +zx81 options to z80asm to generate .tap and .P files
+- [z80asm] #248: Filler byte for DEFS and ALIGN can be given in command line
+- [z80asm] #341: Produce debugger-friendly map files with symbols of C and ASM lines 
+- [z80asm] #429: Add PHASE and DEPHASE directives 
+- [z80asm] #436: Add ALIGN directive
+- [z80asm] #524: Allow the target directory for object files to be given in the command line
 - [z88dk-dis] A new standalone diassembler is available
 - [z88dk-install] A new program to install 3rd party libraries is now available
 - [zcc] Spaces in filenames (and paths) are now supported.
@@ -83,6 +106,11 @@ z88dk vX.XX  - XX.XX.XXXX
   argument and configure the appropriate printf converters.
 - [zpragma] has now been completely renamed, scanner is no more
 - [newlib] +sms devKit SMS has been incorporated
+- [newlib] +zxn Support for the ZX Spectrum Next
+- [newlib] +rc2014 Many enhancements for the RC2014
+- [newlib] +vgl Support for the V-Tech Genius Leader
+- [newlib] +z180 Support for bare-bone z180 boards
+- [newlib] +yaz180 Support for YAZ180
 - [all] #105: main() always takes its parameters in r->l format regardless of compiler
 
 z88dk v1.99B - 10.01.2017

@@ -15,13 +15,15 @@
 int __FASTCALL__ readbyte(int handle)
 {
 #asm
-	INCLUDE	"p3dos.def"
+	INCLUDE	"target/zx/def/p3dos.def"
 	EXTERN	dodos
 	pop	bc	;for FASTCALL parameter is pushed on entry
 	push	bc
 	ld	b,c	;file handle
 	ld	iy,DOS_BYTE_READ	
+	push	ix
 	call	dodos
+	pop	ix
 	ld	hl,-1	;EOF
 	ccf
 	jr	c,end	;error

@@ -77,7 +77,7 @@
  *     LOAD WALL
  *
  *  MSX, Spectravideo SVI
- *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS wall.c
+ *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS  -lndos wall.c
  *     BLOAD “CAS:”,R
  *
  *  SEGA SC-3000
@@ -89,7 +89,7 @@
  *     LOAD "A"
  *
  *  Tatung Einstein
- *     zcc +cpm -DEINSTEIN -leinstein -oWALL -create-app -Dspritesize=8 -DJOYSTICK -DBANNERS wall.c
+ *     zcc +cpm -DEINSTEIN -leinstein -oWALL -create-app -Dspritesize=8 -DBANNERS wall.c
  *     (transfer WALL.COM on a disk image, i.e. using 'EDIP')
  *
  *  Amstrad CPC
@@ -205,7 +205,7 @@ zx_border (INK_CYAN);
 
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX)
 #if (spritesize == 8)
-msx_color(WHITE, BLACK, CYAN);
+msx_color(INK_WHITE, INK_BLACK, INK_CYAN);
 #endif
 #endif
 
@@ -504,7 +504,7 @@ restart:
 #ifdef JOYSTICK
 	hit_border();
 #ifndef LOMEM
-#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(EINSTEIN)
+#if defined(MSX) || defined(SVI)
 	msx_text();
 #endif
 
@@ -632,8 +632,8 @@ start_level:
 	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 	#if (spritesize == 8)
-		set_attr(m+3,n,LIGHT_YELLOW|0x10);
-		set_attr(m+3,n+1,LIGHT_YELLOW|0x10);
+		set_attr(m+3,n,INK_LIGHT_YELLOW|0x10);
+		set_attr(m+3,n+1,INK_LIGHT_YELLOW|0x10);
 	#endif
 	#endif
 	}

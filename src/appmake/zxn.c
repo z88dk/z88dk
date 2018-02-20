@@ -55,11 +55,12 @@ static struct zx_bin zxb = {
     16          // recsize
 };
 
-static char tap = 0;   // .tap tape
-static char sna = 0;   // .sna 48k/128k snapshot
-static char dot = 0;   //  esxdos dot command
-static char zxn = 0;   // .zxn full size memory executable
-static char bin = 0;   // .bin output binaries with banks correctly merged
+static char tap = 0;            // .tap tape
+static char sna = 0;            // .sna 48k/128k snapshot
+static char dot = 0;            //  esxdos dot command
+static char universal_dot = 0;  // nextos universal dot command
+static char zxn = 0;            // .zxn full size memory executable
+static char bin = 0;            // .bin output binaries with banks correctly merged
 
 /* Options that are available for this module */
 option_t zxn_options[] = {
@@ -91,7 +92,8 @@ option_t zxn_options[] = {
     {  0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
-    {  0,  "dot",      "Make esxdos dot command instead of .tap\n", OPT_BOOL, &dot },
+    {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
+    {  0,  "universal-dot", "Make universal dot command instead of .tap\n", OPT_BOOL, &universal_dot },
 
     {  0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
     {  0,  "ts2068",    "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &zxt.ts2068 },
@@ -133,6 +135,11 @@ int zxn_exec(char *target)
     if (zxc.help)
         return ret;
 
+    // universal dot command
+
+    if (universal_dot)
+        return zxn_universal_dot(&zxc);
+
     // filenames
 
     if (zxc.binname == NULL) return ret;
@@ -148,14 +155,11 @@ int zxn_exec(char *target)
 
     tap = !dot && !sna && !zxn && !bin;
 
-    if ((tap || dot) && (zxc.main_fence > 0))
-        fprintf(stderr, "Warning: Main-fence is ignored for tap and dot compiles\n");
+    if (tap && (zxc.main_fence > 0))
+        fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
 
     if (tap)
         return zx_tape(&zxc, &zxt);
-
-    if (dot)
-        return zx_dot_command(&zxc);
 
     // output formats below need banked memory model
 
@@ -165,11 +169,19 @@ int zxn_exec(char *target)
         fprintf(stderr, "Warning: the DATA binary should be manually attached to CODE for rom model compiles\n");
 
     // initialize banked memory representation
+    
+    // pre-defined banks:
+
+    // BANK = ZXN Ram Enumerated as 16K banks compatible with 128k Spectrum banking scheme with org 0xc000
+    // PAGE = ZXN Ram Enumerated as 8k pages compatible with ZXN MMU paging
+    // DIV  = DIVMMC Memory organized as 32 8k pages with org 0x2000
+    // RES  = Separate bankspace to hold resources stored in disk file but not initially loaded at runtime
 
     memset(&memory, 0, sizeof(memory));
     mb_create_bankspace(&memory, "BANK");   // bank space 0
     mb_create_bankspace(&memory, "DIV");    // bank space 1
-    mb_create_bankspace(&memory, "PAGE");   // bank space 2 - must be last because it is deleted later
+    mb_create_bankspace(&memory, "PAGE");   // bank space 2 - must be last of first three because it is deleted later
+    mb_create_bankspace(&memory, "RES");
 
     if (zxb.fullsize)
     {
@@ -236,7 +248,7 @@ int zxn_exec(char *target)
         printf("Excluding sections from output\n");
         for (s = strtok(zxc.excluded_sections, " \t\n"); s != NULL; s = strtok(NULL, " \t\n"))
         {
-            if (mb_remove_section(&memory, s))
+            if (mb_remove_section(&memory, s, 0))
                 printf("..removed section %s\n", s);
             else
                 printf("..section %s not found\n", s);
@@ -429,6 +441,17 @@ int zxn_exec(char *target)
 
     // now the output formats
 
+    if (dot)
+    {
+        if ((ret = zx_dot_command(&zxc, &memory)) != 0)
+            return ret;
+
+        // dot command is out but we need to process binaries in other memory banks
+        // remove the mainbank so as not to process it again
+
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
+    }
+
     if (sna)
     {
         if ((ret = zx_sna(&zxc, &zxs, &memory, 1)) != 0)
@@ -437,21 +460,7 @@ int zxn_exec(char *target)
         // sna snapshot is out but we need to process the rest of the binaries too
         // so remove mainbank and banks 0-7 from memory model so as not to treat those again
 
-        for (i = 0; i < memory.mainbank.num; ++i)
-        {
-            struct section_bin *sb = &memory.mainbank.secbin[i];
-
-            if (zxc.clean)
-                remove(sb->filename);
-
-            free(sb->filename);
-            free(sb->section_name);
-        }
-
-        free(memory.mainbank.secbin);
-
-        memory.mainbank.num = 0;
-        memory.mainbank.secbin = NULL;
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
 
         if (bsnum_bank >= 0)
         {
@@ -460,7 +469,7 @@ int zxn_exec(char *target)
         }
     }
 
-    if (bin || sna)
+    if (bin || sna || dot)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
         ret = 0;

@@ -15,7 +15,7 @@
    PUBLIC   _a_biosver
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_biosver:
 _a_biosver:

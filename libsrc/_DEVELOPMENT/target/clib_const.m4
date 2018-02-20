@@ -16,6 +16,7 @@ define(`__EBDFD',       __ECOUNT__)
 define(`__EDOM',        __ECOUNT__)
 define(`__EFBIG',       __ECOUNT__)
 define(`__EINVAL',      __ECOUNT__)
+define(`__EIO',         __ECOUNT__)
 define(`__EMFILE',      __ECOUNT__)
 define(`__ENFILE',      __ECOUNT__)
 define(`__ENOLCK',      __ECOUNT__)
@@ -186,6 +187,7 @@ PUBLIC `__EBDFD'
 PUBLIC `__EDOM'
 PUBLIC `__EFBIG'
 PUBLIC `__EINVAL'
+PUBLIC `__EIO'
 PUBLIC `__EMFILE'
 PUBLIC `__ENFILE'
 PUBLIC `__ENOLCK'
@@ -319,6 +321,7 @@ defc `__EBDFD' = __EBDFD
 defc `__EDOM' = __EDOM
 defc `__EFBIG' = __EFBIG
 defc `__EINVAL' = __EINVAL
+defc `__EIO' = __EIO
 defc `__EMFILE' = __EMFILE
 defc `__ENFILE' = __ENFILE
 defc `__ENOLCK' = __ENOLCK
@@ -452,6 +455,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__EDOM'  __EDOM
 `#define' `__EFBIG'  __EFBIG
 `#define' `__EINVAL'  __EINVAL
+`#define' `__EIO'  __EIO
 `#define' `__EMFILE'  __EMFILE
 `#define' `__ENFILE'  __ENFILE
 `#define' `__ENOLCK'  __ENOLCK

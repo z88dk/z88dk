@@ -12,11 +12,11 @@
 	PUBLIC	_clock
 
 IF FORmsx
-        INCLUDE "msxbios.def"
-        INCLUDE "msxbasic.def"
+        INCLUDE "target/msx/def/msxbios.def"
+        INCLUDE "target/msx/def/msxbasic.def"
 ELSE
-        INCLUDE "svibios.def"
-        INCLUDE "svibasic.def"
+        INCLUDE "target/svi/def/svibios.def"
+        INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
 .clock

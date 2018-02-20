@@ -31,7 +31,7 @@
 ._getsprite
 	push	ix
 
-        ld      hl,2   
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl

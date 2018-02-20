@@ -24,23 +24,29 @@ _z180_trap_rst:         ; RST  0 - also handle an application restart
 PUBLIC _error_handler_rst
 
 _error_handler_rst:     ; RST  8
-    pop hl              ; pop originating address
-    call phexwdreg      ; and output it on serial port
-error_handler_loop:
+    pop hl              ; get the originating PC address
+    ld e, (hl)          ; get error code in E
+    dec hl
+    call phexwdreg      ; output originating RST address on serial port
+    ex de, hl           ; get error code in L
+    call phex           ; output error code on serial port
     call delay
-    jr error_handler_loop
+    call delay
+    halt
 
 ;------------------------------------------------------------------------------
 
 PUBLIC _call_far_rst
 
 _call_far_rst:          ; RST 10
+    push af             ; save flags
     push hl
     ld hl, _shadowLock
 call_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
     jr C, call_far_try_alt_lock ; just keep trying
     pop hl
+    pop af
 
     ex af,af            ; all your register are belong to us
     exx
@@ -55,7 +61,7 @@ call_far_try_alt_lock:
     push hl             ; push the post call_far ret address back on stack
 
     in0 a, (BBR)        ; get the origin bank
-    ld b, a             ; save origin BBR in B    
+    ld b, a             ; save origin BBR in B
     rrca                ; move the origin bank to low nibble
     rrca                ; we know BBR lower nibble is 0
     rrca
@@ -77,7 +83,7 @@ call_far_try_alt_lock:
     jr Z, call_far_exit
     sra (hl)            ; now get the bank lock,
     jr C, call_far_exit ; or exit if the bank is hot
-    
+
                         ; OK we're going somewhere nice and warm,
                         ; now make the bank switch
     di
@@ -87,11 +93,11 @@ call_far_try_alt_lock:
     ei
                         ; now prepare for our return
     push bc             ; push on the origin and destination bank
-    
+
     ld hl, ret_far
     push hl             ; push ret_far function return address
     push de             ; push our destination address
-    
+
 call_far_exit:
     exx
     ex af,af            ; alt register are returned
@@ -104,19 +110,22 @@ call_far_exit:
 
 
 ret_far:                ; we land back here once the call_far function returns
+    push af             ; save flags
     push hl
     ld hl, _shadowLock
 ret_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
     jr C, ret_far_try_alt_lock ; just keep trying, can't give up
     pop hl
+    pop af
 
+    ex af,af            ; all your register are belong to us
     exx
 
     pop bc              ; get return (origin) BBR in B, and departing (destination) BBR in C
 
                         ; we left our origin bank lock unchanged, so it is still locked
-    di                        
+    di
     ld (_bank_sp), sp   ; save the departing bank SP in Page0
     out0 (BBR), b       ; make the bank swap
     ld sp, (_bank_sp)   ; set up the originating SP in old Page0
@@ -132,13 +141,13 @@ ret_far_try_alt_lock:
     ld (hl), $FE        ; free the bank we are now departing
 
     exx                 ; alt registers are returned
+    ex af,af
 
     push hl
     ld hl, _shadowLock  ; give alt register mutex
     ld (hl), $FE
     pop hl
     ret
-
 
 ;------------------------------------------------------------------------------
 ; void jp_far(far *str, int8_t bank)
@@ -163,14 +172,14 @@ _jp_far:
     pop hl              ; addr in HL
     dec sp
     pop de              ; bank in D
-    push af             ; put ret address back for posterity
+    push af             ; put ret address back for posterity, but we're not coming back
                         ; this is the future top of _bios_sp
     ld e, d             ; put bank in E
 
 _jp_far_rst:            ; RST 18
     push de             ; save the jump destination from EHL
     push hl
-    
+
     ld hl, _shadowLock
 jp_far_try_alt_lock:
     sra (hl)            ; get alt register mutex
@@ -187,7 +196,7 @@ jp_far_try_alt_lock:
     rrca                ; we know BBR lower nibble is 0
     rrca
     rrca
-    ld b, a             ; save origin absolute bank in B       
+    ld b, a             ; save origin absolute bank in B
     add a, c            ; create destination far address, from twos complement relative input
     and a, $0F          ; convert it to 4 bit address (not implicit here)
 
@@ -250,6 +259,7 @@ jp_far_from_bios:
 PUBLIC _system_rst
 
 _system_rst:            ; RST 20
+    push af             ; save flags
     push hl
     ld hl, _shadowLock
 
@@ -257,6 +267,7 @@ system_try_alt_lock:
     sra (hl)            ; get alt register mutex
     jr C, system_try_alt_lock ; just keep trying
     pop hl
+    pop af
 
     ex af,af            ; all your register are belong to us
     exx
@@ -289,12 +300,12 @@ system_try_bios_lock:
                         ; now prepare for our return
     push bc             ; push on the origin BBR in B
     inc sp
-    
+
     ld hl, system_ret
     push hl             ; push system_ret return address
 
     push de             ; push our destination address
-    
+
 system_exit:
     exx                 ; alt register are returned
     ex af,af
@@ -320,7 +331,7 @@ system_ret:             ; we land back here once the yabios call is done
     pop bc              ; get return (origin) bank in B
     inc sp
                         ; we left our origin bank locked
-    di                        
+    di
     ld (_bios_sp), sp   ; save the departing bios SP
     out0 (BBR), b       ; make the bank swap
     ld sp, (_bank_sp)   ; set up the originating SP in old Page0
@@ -342,7 +353,12 @@ system_ret:             ; we land back here once the yabios call is done
 PUBLIC _am9511a_rst
 
 _am9511a_rst:           ; RST 28
-    ret
+    pop bc              ; get the return address
+    inc bc
+    ld a, (bc)          ; get APU command in a
+    inc bc
+    push bc             ; push the post return address back on stack
+    jp asm_am9511a_cmd_ld
 
 ;------------------------------------------------------------------------------
 
@@ -355,7 +371,7 @@ _user_rst:              ; RST 30
 ; start of common area 1 - system functions
 ;------------------------------------------------------------------------------
 
-EXTERN _shadowLock, _dmac0Lock, _dmac1Lock, _prt0Lock, _prt1Lock
+EXTERN _shadowLock, _dmac0Lock
 
 ;------------------------------------------------------------------------------
 ; void *memcpy_far(far *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
@@ -412,7 +428,7 @@ _memcpy_far:
     rrca
     rrca                ; save current bank in address format
     ld c, a             ; and put it in C
-    
+
     add a, (hl)         ; create source relative far address, from twos complement input
     and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
     ld b, a             ; hold source far address in B
@@ -439,7 +455,7 @@ _memcpy_far:
 
     ld a, c
     cp b                ; check for bank dest < src
-    ex de, hl           ; now source in hl, destination in de    
+    ex de, hl           ; now source in hl, destination in de
     jr C, memcpy_far_left_right_early   ; if destination is lower bank, we do left right
                         ; otherwise we need to check further
 
@@ -457,7 +473,7 @@ memcpy_far_right_left:
     in0 a, (SAR0B)
     inc a               ; if copy origin flows into following bank
     out0 (SAR0B), a
-    
+
 memcpy_far_right_left_src_bank_no_overflow:
     ex de, hl           ; swap source to de
     add hl, bc          ; add in the copy size to the (destination address -1)
@@ -498,9 +514,9 @@ memcpy_far_left_right_early:
     out0 (DMODE), b     ; DMODE_MMOD - memory++ to memory++, burst mode
     out0 (DSTAT), c     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
                         ; in burst mode the Z180 CPU stops until the DMA completes
-    
+
     ex de, hl           ; and swap the destination address into hl to return
-    
+
     jr memcpy_far_error_exit
 
 ;------------------------------------------------------------------------------
@@ -545,15 +561,15 @@ _memset_far:
 
     out0 (BCR0H), d     ; set up the transfer size   
     out0 (BCR0L), e
-    
+
     dec hl
     dec hl              ; pointing at c low byte
- 
+
     out0 (SAR0H), h     ; c low byte is source, address in hl
     out0 (SAR0L), l
-    
+
     dec hl              ; pointing at str far
-    
+
     in0 a, (BBR)        ; get the current bank
     rrca                ; move the current bank to low nibble
     rrca
@@ -602,14 +618,16 @@ PUBLIC _load_hex, _load_hex_fastcall
 EXTERN initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
 _load_hex:
+    pop af
     pop hl
     push hl
+    push af
 
 _load_hex_fastcall:
     in0 a, (BBR)                ; grab and store the current Bank Base Register
     and a                       ; check it is BANK0, so the user can't use this function
     ret NZ
-    
+
     ld a, l                     ; get the destination BBR
     rrca                        ; move the origin bank to high nibble
     rrca                        ; we know BBR lower nibble is 0
@@ -623,12 +641,13 @@ _load_hex_fastcall:
     ld de, initString           ; pstring modifies AF, DE, & HL
     call pstring
     call delay
-    call delay
 
 load_hex_wait_lock:
     ld hl, _asci0RxLock
     sra (hl)                    ; take the ASCI0 Rx lock
     jr C, load_hex_wait_lock
+
+    call _asci0_flush_Rx_di     ; flush the ASCI0 Rx buffer
 
 load_hex_wait_colon:
     call _asci0_getc            ; Rx byte in L (A = char received too)
@@ -679,9 +698,10 @@ load_hex_end_load:
 
     ld de, LoadOKStr
 
-load_hex_exit:      
+load_hex_exit:
     xor a
     out0 (BBR), a               ; get our originating BANK0 BBR back, write it to the BBR
+
     call pstring
     call delay
     call delay
@@ -717,12 +737,12 @@ load_hex_read_byte:             ; returns byte in A, checksum in C
 PUBLIC _bank_get_rel, _bank_get_rel_fastcall
 
 _bank_get_rel:
+    pop af
     pop hl
     push hl
-
-_bank_get_rel_fastcall:
     push af
-    
+
+_bank_get_rel_fastcall:  
     ld a, l
     and a, $0F          ; limit input to 0 to 15 bank
     ld l, a
@@ -732,11 +752,10 @@ _bank_get_rel_fastcall:
     rrca
     rrca
     rrca
-    
+
     sub a, l            ; create source relative far address, from absolute input
     ld l, a
 
-    pop af
     ret
 
 ;------------------------------------------------------------------------------
@@ -749,8 +768,10 @@ _bank_get_rel_fastcall:
 PUBLIC _bank_get_abs, _bank_get_abs_fastcall
 
 _bank_get_abs:
+    pop af
     pop hl
     push hl
+    push af
 
 _bank_get_abs_fastcall:
     push af
@@ -760,7 +781,7 @@ _bank_get_abs_fastcall:
     rrca
     rrca
     rrca
-    
+
     add a, l            ; create source relative far address, from twos complement input
     and a, $0F          ; convert it to 4 bit positive address
     ld l, a
@@ -776,8 +797,10 @@ _bank_get_abs_fastcall:
 PUBLIC _lock_get, _lock_get_fastcall
 
 _lock_get:
+    pop af
     pop hl
     push hl
+    push af
 
 _lock_get_fastcall:
     sra (hl)
@@ -794,8 +817,10 @@ _lock_get_fastcall:
 PUBLIC _lock_try, _lock_try_fastcall
 
 _lock_try:
+    pop af
     pop hl
     push hl
+    push af
 
 _lock_try_fastcall:
     sra (hl)
@@ -813,14 +838,14 @@ lock_got_not:
 PUBLIC _lock_give, _lock_give_fastcall
 
 _lock_give:
+    pop af
     pop hl
     push hl
+    push af
 
 _lock_give_fastcall:
     ld (hl), $FE
     ret
-
-
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 driver - system_time functions
@@ -865,29 +890,29 @@ system_tick_update:
 ; start of common area 1 driver - am9511a functions
 ;------------------------------------------------------------------------------
 
+;------------------------------------------------------------------------------
 ; Interrupt Service Routine for the Am9511A-1
 ; 
-; Initially called once the required operand pointers and commands are loaded
-; Following calls generated by END signal whenever a single APU command is completed
-; Sends a new command (with operands if needed) to the APU
+; Initially called once the required operand pointers and commands are loaded.
+;
+; Following calls generated by END signal whenever a single APU command is completed.
+; Sends a new command (with operands if needed) to the APU.
 ;
 ; On interrupt exit APUStatus contains either
 ; __IO_APU_STATUS_BUSY = 1, and rest of APUStatus bits are invalid
 ; __IO_APU_STATUS_BUSY = 0, idle, and the status bits resulting from the final COMMAND
 
-; FIXME - conversion to yabios model not complete.
-; the data pointer buffer becomes a data buffer.
-; Some things are done, but not all.
 
-PUBLIC asm_am9511a_isr
+PUBLIC _apu_init, asm_am9511a_isr
 
-EXTERN APUCMDOutPtr, APUDATAOutPtr
-EXTERN APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError
+EXTERN APUCMDOutPtr, APUDataEntOutPtr, APUDataRemInPtr
+EXTERN APUCMDBufUsed, APUDataEntBufUsed, APUDataRemBufUsed
+EXTERN APUStatus, APUError
 
+_apu_init:
 asm_am9511a_isr:
     push af                 ; store AF, etc, so we don't clobber them
     push bc
-    push de
     push hl
 
     xor a                   ; set internal clock = crystal x 1 = 18.432MHz
@@ -906,7 +931,7 @@ am9511a_isr_entry:
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
     in a, (c)               ; read the APU
     and __IO_APU_STATUS_ERROR   ; any errors?
-    call NZ, am9511a_isr_error  ; then capture error in APUError
+    call NZ, am9511a_isr_error  ; then capture the error in APUError
 
     ld hl, (APUCMDOutPtr)   ; get the pointer to place where we pop the COMMAND
     ld a, (hl)              ; get the COMMAND byte
@@ -934,10 +959,11 @@ am9511a_isr_exit:
     out0 (CMR), a           ; CPU Clock Multiplier Reg (CMR)
 
     pop hl                  ; recover HL, etc
-    pop de
     pop bc
     pop af
-    ret
+
+    ei                      ; interrupts were enabled, or we wouldn't have been here
+    ret                     ; no Z80 interrupt chaining
 
 am9511a_isr_end:            ; we've finished a COMMAND sentence
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
@@ -948,112 +974,114 @@ am9511a_isr_end:            ; we've finished a COMMAND sentence
     jr am9511a_isr_exit     ; we're done here
 
 am9511a_isr_op_ent:
-    ld hl, (APUDATAOutPtr)  ; get the pointer to where we pop OPERAND
-    ld e, (hl)              ; read the OPERAND PTR low byte from the APUDATAOutPtr
-    inc l                   ; move the POINTER low byte along, 0xFF rollover
-    ld d, (hl)              ; read the OPERAND PTR high byte from the APUDATAOutPtr
-    inc l
-    ld (APUDATAOutPtr), hl  ; write where the next POINTER should be read
-
-    ld hl, APUDATABufUsed   ; decrement of POINTER count remaining
-    dec (hl)
-    dec (hl)
-
-    ld bc, __IO_APU_PORT_DATA+$0300 ; the address of the APU data port (+3) in BC
-    ex de, hl               ; move the base address of the OPERAND to HL
-
-    outi                    ; output 16 bit OPERAND
-
-    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
-    ex (sp), hl
-    outi
+    ld bc, __IO_APU_PORT_DATA   ; the address of the APU data port in BC
+    call am9511a_isr_op16_ent
 
     pop af                  ; recover the COMMAND 
     cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND
-    jp Z, am9511a_isr_entry ; yes? then go back to get another COMMAND
+    jr Z, am9511a_isr_entry ; yes? then go back to get another COMMAND
 
-    ex (sp), hl             ; delay for 38 cycles (5us) TWI 1.280us
-    ex (sp), hl
-    outi                    ; output last two bytes of 32 bit OPERAND
+    call am9511a_isr_op16_ent
+    jr am9511a_isr_entry    ; go back to get another COMMAND
 
-    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
-    ex (sp), hl
-    outi
-
-    jp am9511a_isr_entry    ; go back to get another COMMAND
-
-am9511a_isr_op_rem:
-    ld hl, (APUDATAOutPtr)   ; get the pointer to where we pop OPERAND PTR
-    ld e, (hl)              ; read the OPERAND PTR low byte from the APUDATAOutPtr
-    inc l                   ; move the POINTER low byte along, 0xFF rollover
-    ld d, (hl)              ; read the OPERAND PTR high byte from the APUDATAOutPtr
-    inc l
-    ld (APUDATAOutPtr), hl  ; write where the next POINTER should be read
-
-    ld hl, APUDATABufUsed   ; decrement of OPERAND POINTER count remaining
-    dec (hl)
-    dec (hl)
-
-    ld bc, __IO_APU_PORT_DATA+$0300 ; the address of the APU data port (+3) in BC
-    ex de, hl               ; move the base address of the OPERAND to HL
-
-    inc hl                  ; reverse the OPERAND bytes to load
+am9511a_isr_op_rem:         ; REMINDER operands removed BIG ENDIAN !!!
+    ld bc, __IO_APU_PORT_DATA   ; the address of the APU data port in BC
+    call am9511a_isr_op16_rem
 
     pop af                  ; recover the COMMAND 
     cp __IO_APU_OP_REM16    ; is it a 2 byte OPERAND
-    jr Z, am9511a_isr_op_rem16  ; yes then skip over 32bit stuff
+    jr Z, am9511a_isr_entry ; yes then skip over 32bit stuff, and get another COMMAND
 
-    inc hl                  ; increment two more bytes for 32bit OPERAND
-    inc hl
+    call am9511a_isr_op16_rem
+    jr am9511a_isr_entry    ; go back to get another COMMAND
 
-    ind                     ; get the higher two bytes of 32bit OPERAND
-    ind
+am9511a_isr_op16_ent:
+    ld hl, (APUDataEntOutPtr)  ; get the pointer to where we pop OPERAND
 
-am9511a_isr_op_rem16:
-    ind                     ; get 16 bit OPERAND
-    ind
+    ld a, (hl)              ; read the OPERAND low byte from the APUDataEntOutPtr
+    out (c), a              ; write to APU
+    inc l                   ; move the interleaved POINTER low byte along, 0xFF rollover
+    inc l
 
-    jp am9511a_isr_entry    ; go back to get another COMMAND
+    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
+    ex (sp), hl
+
+    ld a, (hl)              ; read the OPERAND high byte from the APUDataEntOutPtr
+    out (c), a              ; write to APU
+    inc l
+    inc l
+    ld (APUDataEntOutPtr), hl  ; write where the next OPERAND should be read
+
+    ld hl, APUDataEntBufUsed   ; decrement of OPERAND byte count
+    dec (hl)
+    dec (hl)
+
+    ex (sp), hl             ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
+    ex (sp), hl
+    ret
+
+am9511a_isr_op16_rem:
+    ld hl, (APUDataRemInPtr)   ; get the pointer to where we write OPERAND
+
+    in a, (c)
+    ld (hl), a              ; write the OPERAND high byte
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    inc l
+
+    in a, (c)
+    ld (hl), a              ; write the OPERAND low byte
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    inc l
+
+    ld (APUDataRemInPtr), hl    ; write where the next POINTER should be read
+
+    ld hl, APUDataRemBufUsed    ; increment of OPERAND byte count 
+    inc (hl)
+    inc (hl)
+    ret
 
 am9511a_isr_error:          ; we've an error to notify in A
     ld hl, APUError         ; collect any previous errors
     or (hl)                 ; and we add any new error types
     ld (hl), a              ; set the APUError status
-    ret                     ; we're done here
+    ret
 
 ;------------------------------------------------------------------------------  
 ;       Initialises the APU buffers
 ;
 
-PUBLIC asm_am9511a_reset
+PUBLIC _apu_reset
 
-EXTERN APUCMDBuf, APUDATABuf
-EXTERN APUCMDInPtr, APUCMDOutPtr, APUDATAInPtr, APUDATAOutPtr
-EXTERN APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError, _APULock
+EXTERN APUCMDBuf, APUDataBuf
+EXTERN APUCMDInPtr, APUCMDOutPtr
+EXTERN APUDataEntInPtr, APUDataEntOutPtr
+EXTERN APUDataRemInPtr, APUDataRemOutPtr
+EXTERN APUCMDBufUsed, APUDataEntBufUsed, APUDataRemBufUsed
+EXTERN APUStatus, APUError, _APULock
 
-asm_am9511a_reset:
+_apu_reset:
     push af
     push bc
     push de
     push hl
 
-am9511a_reset_lock_get:
-    ld hl, _APULock         ; load the mutex lock address
-    sra (hl)                ; get the lock
-    jr C, am9511a_reset_lock_get    ; or not
-
     ld  HL, APUCMDBuf       ; Initialise COMMAND Buffer
     ld (APUCMDInPtr), HL
     ld (APUCMDOutPtr), HL
 
-    ld HL, APUDATABuf       ; Initialise OPERAND POINTER Buffer
-    ld (APUDATAInPtr), HL
-    ld (APUDATAOutPtr), HL
+    ld HL, APUDataBuf       ; Initialise OPERAND Load Buffer, point to even bytes
+    ld (APUDataEntInPtr), HL
+    ld (APUDataEntOutPtr), HL
+
+    ld HL, APUDataBuf+1     ; Initialise OPERAND Removal Buffer, point to odd bytes
+    ld (APUDataRemInPtr), HL
+    ld (APUDataRemOutPtr), HL
 
     xor A                   ; clear A register to 0
 
-    ld (APUCMDBufUsed), A   ; 0 both Buffer counts
-    ld (APUDATABufUsed), A
+    ld (APUCMDBufUsed), A   ; 0 all Buffer counts
+    ld (APUDataEntBufUsed), A
+    ld (APUDataRemBufUsed), A
 
     ld (APUCMDBuf), A       ; clear COMMAND Buffer
     ld HL, APUCMDBuf
@@ -1063,8 +1091,8 @@ am9511a_reset_lock_get:
     ld BC, __APU_CMD_SIZE-1
     ldir
 
-    ld (APUDATABuf), A      ; clear OPERAND Buffer
-    ld HL, APUDATABuf
+    ld (APUDataBuf), A      ; clear both (interleaved) OPERAND Buffers
+    ld HL, APUDataBuf
     ld D, H
     ld E, L
     inc DE
@@ -1073,16 +1101,20 @@ am9511a_reset_lock_get:
 
     ld (APUStatus), a       ; set APU status to idle (NOP)
     ld (APUError), a        ; clear APU errors
-
+   
 am9511a_reset_loop:
     ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in bc
     in a, (c)                   ; read the APU
     and __IO_APU_STATUS_BUSY    ; busy?
     jr NZ, am9511a_reset_loop
 
+    in0 a,(ITC)
+    or a, ITC_ITE0          ; enable INT0 for APU
+    out0 (ITC),a
+
     ld hl, _APULock         ; load the mutex lock address
     ld (hl), $FE            ; give mutex lock
-    
+
     pop hl
     pop de
     pop bc
@@ -1090,11 +1122,11 @@ am9511a_reset_loop:
     ret
 
 ;------------------------------------------------------------------------------
-;       Confirms whether the APU is idle
-;       Loop until it returns ready
+;       Confirms whether the APU is idle.
+;       Loop until it returns ready.
 ;       Operand Entry and Removal takes little time,
 ;       and we'll be interrupted for Command entry.
-;       Use after the first APU_ISR call.
+;       Use after the first _apu_init call.
 ;
 ;       L = contents of (APUStatus || APUError)
 ;       SCF if no errors (aggregation of any errors found)
@@ -1102,14 +1134,14 @@ am9511a_reset_loop:
 ;       APUError is zeroed on return
 ;       Uses AF, HL
 
-PUBLIC asm_am9511a_chk_idle
+PUBLIC _apu_chk_idle_fastcall
 
 EXTERN APUStatus, APUError
 
-asm_am9511a_chk_idle:
+_apu_chk_idle_fastcall:
     ld a, (APUStatus)       ; get the status of the APU (but don't disturb APU)
     tst __IO_APU_STATUS_BUSY    ; check busy bit is set,
-    jr NZ, asm_am9511a_chk_idle ; so we wait
+    jr NZ, _apu_chk_idle_fastcall ; so we wait
 
     ld hl, APUError
     or (hl)                 ; collect the aggregated errors, with APUStatus
@@ -1122,31 +1154,41 @@ asm_am9511a_chk_idle:
     ret                     ; return with (APUStatus || APUError) with carry set if no errors
 
 ;------------------------------------------------------------------------------
-;       APU_CMD_ld
+;       APU_CMD_LD
 ;
-;       DE = POINTER to OPERAND, IF REQUIRED
+;       DEHL = OPERAND, IF REQUIRED
 ;       A = APU COMMAND
+;
+;       BC = USED
 
-PUBLIC asm_am9511a_cmd_ld    
+PUBLIC _apu_cmd_ld_callee, asm_am9511a_cmd_ld
 
-EXTERN APUCMDInPtr, APUDATAInPtr
-EXTERN APUCMDBufUsed, APUDATABufUsed, _APULock
+EXTERN APUCMDInPtr, APUDataEntInPtr
+EXTERN APUCMDBufUsed, APUDataEntBufUsed
+EXTERN _APULock
+
+_apu_cmd_ld_callee:
+    pop bc
+    pop hl
+    pop de
+    dec sp
+    pop af
+    push bc
 
 asm_am9511a_cmd_ld:
-    push hl                 ; store HL so we don't clobber it
-
-    ld hl, _APULock         ; load the mutex lock address
-    sra (hl)                ; get the lock
-    jr C, am9511a_command_locked_exit   ; or not
+    ex de, hl               ; put low word in DE
+    ld b, h                 ; store high word in BC so we don't clobber it
+    ld c, l
 
     ld l, a                 ; store COMMAND so we don't clobber it
 
     ld a, (APUCMDBufUsed)   ; Get the number of bytes in the COMMAND buffer
     cp __APU_CMD_SIZE-1     ; check whether there is space in the buffer
-    jr NC, am9511a_command_exit ; COMMAND buffer full, so exit
-    
-    cp __APU_DATA_SIZE-4    ; check whether there is space for an OPERAND
-    jr NC, am9511a_command_exit ; OPERAND buffer full, so exit
+    ret NC                  ; COMMAND buffer full, so exit
+
+    ld a, (APUDataEntBufUsed)   ; Get the number of bytes in the OPERAND entry buffer
+    cp +(__APU_DATA_SIZE/2)-4   ; check whether there is space for an OPERAND
+    ret NC                  ; OPERAND Load buffer full, so exit
 
     ld a, l                 ; recover the COMMAND
     ld hl, (APUCMDInPtr)    ; get the pointer to where we poke
@@ -1158,34 +1200,98 @@ asm_am9511a_cmd_ld:
     ld hl, APUCMDBufUsed
     inc (hl)                ; atomic increment of COMMAND count
 
-    and $F0                 ; mask only most significant nibble of COMMAND
-    cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
-    jr Z, am9511a_cmd_op    ; load an OPERAND pointer
-    cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
-    jr Z, am9511a_cmd_op    ; load an OPERAND pointer
+    cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND entry
+    jr Z, am9511a_op_ent16  ; load an OPERAND
 
-am9511a_command_exit:
-    ld hl, _APULock         ; load the mutex lock address
-    ld (hl), $FE            ; give mutex lock
+    cp __IO_APU_OP_ENT32    ; check whether COMMAND is 4 byte OPERAND entry 
+    jr Z, am9511a_op_ent32  ; load an OPERAND
 
-am9511a_command_locked_exit:
-    pop hl                  ; recover HL
+    ret                     ; just complete, and exit
+
+am9511a_op_ent32:
+    call am9511a_op_ent16   ; load the low word
+
+    ld d, b                 ; get the high word
+    ld e, c
+
+am9511a_op_ent16:           ; load the high (or low) word
+    ld hl, (APUDataEntInPtr)   ; get the pointer to where we poke
+    ld (hl), e              ; write the low byte of OPERAND to the APUDataEntInPtr   
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    inc l
+    ld (hl), d              ; write the high byte of OPERAND to the APUDataEntInPtr   
+    inc l
+    inc l
+    ld (APUDataEntInPtr), hl   ; write where the next DATA should be poked
+
+    ld hl, APUDataEntBufUsed
+    inc (hl)                ; increment of OPERAND byte count
+    inc (hl)
     ret
 
-am9511a_cmd_op:
-    ld hl, (APUDATAInPtr)   ; get the pointer to where we poke
-    ld (hl), e              ; write the low byte of OPERAND to the APUDATAInPtr   
-    inc l                   ; move the POINTER low byte along, 0xFF rollover
-    ld (hl), d              ; write the high byte of OPERAND to the APUDATAInPtr   
+;------------------------------------------------------------------------------
+;       APU_OP_REM
+;
+;       HL = OPERAND POINTER
+;
+;       returns number of bytes recovered in L
+;       seeks to recover ALL bytes in the buffer to operand pointer
+;
+;       uses AF, BC, DE
+
+
+PUBLIC _apu_op_rem_callee, asm_am9511a_op_rem  
+
+EXTERN APUDataRemOutPtr
+EXTERN APUDataRemBufUsed
+EXTERN _APULock
+
+_apu_op_rem_callee:
+    pop af
+    pop hl
+    push af
+
+asm_am9511a_op_rem:
+    ld d, h                 ; store destination pointer in DE
+    ld e, l
+
+    ld a, (APUDataRemBufUsed)   ; Get the number of bytes in the OPERAND entry buffer
+    or a
+    jr Z, am9511a_op_rem_exit ; OPERAND buffer empty, so exit
+
+    ld c, a                 ; store OPERAND bytes count in C
+    dec a                   ; create index, rather than count
+    ld b, a                 ; store unload interations in B
+
+    ld hl, (APUDataRemOutPtr)   ; get the pointer to where we pop OPERANDS (BIG ENDED)
+    add a                   ; create interleaved (doubled) reverse index
+    add a, l
+    ld l, a                 ; point to LSB BIG ENDED
+
+    push hl                 ; save last location for later
+
+am9511a_op_rem:
+    ld a, (hl)              ; read LSB of OPERAND
+    ld (de), a              ; store it at our destination
+    dec l                   ; move the OPERAND POINTER low byte along, 0xFF rollover
+    dec l
+    inc de
+    djnz am9511a_op_rem     ; repeat for number of bytes to unload
+
+    pop hl
     inc l
-    ld (APUDATAInPtr), hl   ; write where the next DATA should be poked
+    inc l
+    ld (APUDataRemOutPtr), hl  ; write the pointer to where we next pop OPERANDS (BIG ENDED)
 
-    ld hl, APUDATABufUsed
-    inc (hl)                ; increment of OPERAND count
-    inc (hl)
+    xor a                   ; set buffer fullness to zero
+    ld  (APUDataRemBufUsed), a
 
-    jr am9511a_command_exit
+    ld a, c                 ; store total bytes recovered in A
 
+am9511a_op_rem_exit:
+    ld h, 0
+    ld l, a                 ; exit with total bytes recovered in L (and A)
+    ret
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 driver - asci0 functions
@@ -1206,11 +1312,11 @@ _asci0_interrupt:
 
 ASCI0_RX_GET:
     in0 l, (RDR0)               ; move Rx byte from the ASCI0 RDR to l
-    
+
     and STAT0_OVRN|STAT0_PE|STAT0_FE ; test whether we have error on ASCI0
     jr NZ, ASCI0_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
-    ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer      
+    ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer
     cp __ASCI0_RX_SIZE-1        ; check whether there is space in the buffer
     jr NC, ASCI0_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
 
@@ -1248,6 +1354,7 @@ ASCI0_TX_CHECK:                 ; now start doing the Tx stuff
     out0 (TDR0), a              ; output the Tx byte to the ASCI0
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci0TxOut), hl         ; write where the next byte should be popped
 
     ld hl, asci0TxCount
@@ -1284,17 +1391,17 @@ _asci0_init:
                                 ; PHI / PS / SS / DR = BAUD Rate
                                 ; PHI = 18.432MHz
                                 ; BAUD = 115200 = 18432000 / 10 / 1 / 16 
-                                ; PS 0, SS_DIV_1 0, DR 0           
+                                ; PS 0, SS_DIV_1 0, DR 0
     xor     a                   ; BAUD = 115200
     out0    (CNTLB0),a          ; output to the ASCI0 control B reg
 
     ld      a,STAT0_RIE         ; receive interrupt enabled
     out0    (STAT0),a           ; output to the ASCI0 status reg
-    
+
     ret
 
 PUBLIC _asci0_flush_Rx_di
-PUBLIC _asci0_flush_Rx
+;PUBLIC _asci0_flush_Rx
 
 EXTERN asci0RxCount, asci0RxIn, asci0RxOut, asci0RxBuffer, _asci0RxLock
 
@@ -1310,7 +1417,7 @@ _asci0_flush_Rx_di:
 
     ld hl, _asci0RxLock         ; load the mutex lock address
     ld (hl), $FE                ; give mutex lock
-    
+
     pop hl
     pop af
     ret
@@ -1326,9 +1433,9 @@ _asci0_flush_Rx:
     ret
 
 PUBLIC _asci0_flush_Tx_di
-PUBLIC _asci0_flush_Tx
+;PUBLIC _asci0_flush_Tx
 
-EXTERN asci0TxCount, asci0TxIn, asci0TxOut, asci0TxBuffer, _asci0TxLock
+EXTERN asci0TxCount, asci0TxIn, asci0TxOut, asciTxBuffer, _asci0TxLock
 
 _asci0_flush_Tx_di:
     push af
@@ -1351,15 +1458,13 @@ _asci0_flush_Tx:
     xor a
     ld (asci0TxCount), a        ; reset the Tx counter (set 0)
 
-    ld hl, asci0TxBuffer        ; load Tx buffer pointer home
+    ld hl, asciTxBuffer         ; load Tx buffer pointer home
     ld (asci0TxIn), hl
     ld (asci0TxOut), hl
 
     ret
 
 PUBLIC _asci0_reset
-
-EXTERN _asci0_flush_Rx, _asci0_flush_Tx
 
 _asci0_reset:
     ; interrupts should be disabled
@@ -1383,7 +1488,7 @@ _asci0_getc:
     or a                        ; see if there are zero bytes available
     ret Z                       ; if the count is zero, then return
 
-    push hl    
+    push hl
 
     ld hl, (asci0RxOut)         ; get the pointer to place where we pop the Rx byte
     ld a, (hl)                  ; get the Rx byte
@@ -1393,7 +1498,7 @@ _asci0_getc:
 
     ld hl, asci0RxCount
     dec (hl)                    ; atomically decrement Rx count
-    
+
     pop hl
 
     ld l, a                     ; put the byte in l
@@ -1410,7 +1515,7 @@ _asci0_peekc:
     ld l, a                     ; and put it in l
     or a                        ; see if there are zero bytes available
     ret Z                       ; if the count is zero, then return
-    
+
     push hl
 
     ld hl, (asci0RxOut)         ; get the pointer to place where we pop the Rx byte
@@ -1434,10 +1539,10 @@ _asci0_pollc:
 
     ld a, (asci0RxCount)        ; load the Rx bytes in buffer
     ld l, a	                    ; load result
-    
+
     or a                        ; check whether there are non-zero count
     ret Z                       ; return if zero count
-    
+
     scf                         ; set carry to indicate char received
     ret
 
@@ -1477,6 +1582,7 @@ asci0_put_buffer_tx:
     ld (hl), a                  ; write the Tx byte to the asci0TxIn
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci0TxIn), hl          ; write where the next byte should be poked
 
     ld hl, asci0TxCount
@@ -1494,7 +1600,7 @@ asci0_clean_up_tx:
     in0 a, (STAT0)              ; get the ASCI status register again
     or STAT0_TIE                ; mask in (enable) the Tx Interrupt
     out0 (STAT0), a             ; set the ASCI status register
-    
+
     ei                          ; critical section end
     ret
 
@@ -1518,11 +1624,11 @@ _asci1_interrupt:
 
 ASCI1_RX_GET:
     in0 l, (RDR1)               ; move Rx byte from the ASCI1 RDR to l
-    
+
     and STAT1_OVRN|STAT1_PE|STAT1_FE ; test whether we have error on ASCI1
     jr NZ, ASCI1_RX_ERROR       ; drop this byte, clear error, and get the next byte
 
-    ld a, (asci1RxCount)        ; get the number of bytes in the Rx buffer      
+    ld a, (asci1RxCount)        ; get the number of bytes in the Rx buffer
     cp __ASCI1_RX_SIZE-1        ; check whether there is space in the buffer
     jr NC, ASCI1_RX_CHECK       ; buffer full, check whether we need to drain H/W FIFO
 
@@ -1560,6 +1666,7 @@ ASCI1_TX_CHECK:                 ; now start doing the Tx stuff
     out0 (TDR1), a              ; output the Tx byte to the ASCI1
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci1TxOut), hl         ; write where the next byte should be popped
 
     ld hl, asci1TxCount
@@ -1596,17 +1703,17 @@ _asci1_init:
                                 ; PHI / PS / SS / DR = BAUD Rate
                                 ; PHI = 18.432MHz
                                 ; BAUD = 115200 = 18432000 / 10 / 1 / 16 
-                                ; PS 0, SS_DIV_1 0, DR 0           
+                                ; PS 0, SS_DIV_1 0, DR 0
     xor     a                   ; BAUD = 115200
     out0    (CNTLB1),a          ; output to the ASCI1 control B reg
 
     ld      a,STAT1_RIE         ; receive interrupt enabled
     out0    (STAT1),a           ; output to the ASCI1 status reg
-    
+
     ret
 
 PUBLIC _asci1_flush_Rx_di
-PUBLIC _asci1_flush_Rx
+;PUBLIC _asci1_flush_Rx
 
 EXTERN asci1RxCount, asci1RxIn, asci1RxOut, asci1RxBuffer, _asci1RxLock
 
@@ -1638,10 +1745,9 @@ _asci1_flush_Rx:
     ret
 
 PUBLIC _asci1_flush_Tx_di
-PUBLIC _asci1_flush_Tx
+;PUBLIC _asci1_flush_Tx
 
-EXTERN asci1TxCount, asci1TxIn, asci1TxOut, asci1TxBuffer, _asci1TxLock
-
+EXTERN asci1TxCount, asci1TxIn, asci1TxOut, asciTxBuffer, _asci1TxLock
 
 _asci1_flush_Tx_di:
     push af
@@ -1665,15 +1771,13 @@ _asci1_flush_Tx:
     xor a
     ld (asci1TxCount), a        ; reset the Tx counter (set 0)
 
-    ld hl, asci1TxBuffer        ; load Tx buffer pointer home
+    ld hl, asciTxBuffer+1       ; load Tx buffer pointer home
     ld (asci1TxIn), hl
     ld (asci1TxOut), hl
 
     ret
 
 PUBLIC _asci1_reset
-
-EXTERN _asci1_flush_Rx, _asci1_flush_Tx
 
 _asci1_reset:
     ; interrupts should be disabled
@@ -1692,7 +1796,7 @@ _asci1_getc:
     ;            carry reset if Rx buffer is empty
     ;
     ; modifies : af, l
-    
+
     ld a, (asci1RxCount)        ; get the number of bytes in the Rx buffer
     or a                        ; see if there are zero bytes available
     ret Z                       ; if the count is zero, then return
@@ -1748,10 +1852,10 @@ _asci1_pollc:
 
     ld a, (asci1RxCount)        ; load the Rx bytes in buffer
     ld l, a	                    ; load result
-    
+
     or a                        ; check whether there are non-zero count
     ret Z                       ; return if zero count
-    
+
     scf                         ; set carry to indicate char received
     ret
 
@@ -1791,6 +1895,7 @@ asci1_put_buffer_tx:
     ld (hl), a                  ; write the Tx byte to the asci1TxIn
 
     inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+    inc l
     ld (asci1TxIn), hl          ; write where the next byte should be poked
 
     ld hl, asci1TxCount
@@ -1812,6 +1917,364 @@ asci1_clean_up_tx:
     ei                          ; critical section end
     ret
 
+;------------------------------------------------------------------------------
+; start of common area 1 driver - 8255 functions
+;------------------------------------------------------------------------------
+
+PUBLIC ide_read_byte,  ide_write_byte
+PUBLIC ide_read_block, ide_write_block
+
+    ;Do a read bus cycle to the drive, using the 8255.
+    ;input A = ide register address
+    ;output A = lower byte read from IDE drive
+
+ide_read_byte:
+    push bc
+    push de
+    ld d, a                 ;copy address to D
+    ld bc, __IO_PIO_IDE_CTL
+    out (c), a              ;drive address onto control lines
+    or __IO_IDE_RD_LINE
+    out (c), a              ;and assert read pin
+    ld bc, __IO_PIO_IDE_LSB
+    in e, (c)               ;read the lower byte
+    ld bc, __IO_PIO_IDE_CTL
+    out (c), d              ;deassert read pin
+    xor a
+    out (c), a              ;deassert all control pins
+    ld a, e
+    pop de
+    pop bc
+    ret
+
+    ;Read a block of 512 bytes (one sector) from the drive
+    ;16 bit data register and store it in memory at (HL++)
+ide_read_block:
+    push bc
+    push de
+    ld bc, __IO_PIO_IDE_CTL
+    ld d, __IO_IDE_DATA
+    out (c), d              ;drive address onto control lines
+    ld e, $0                ;keep iterative count in e
+
+IF (__IO_PIO_IDE_CTL = __IO_PIO_IDE_MSB+1) & (__IO_PIO_IDE_MSB = __IO_PIO_IDE_LSB+1)
+ide_rdblk2:
+    ld d, __IO_IDE_DATA|__IO_IDE_RD_LINE
+    out (c), d              ;and assert read pin
+    ld bc, __IO_PIO_IDE_LSB+$0200 ;drive lower lines with lsb, plus ini b offset
+    ini                     ;read the lower byte (HL++)
+    inc c                   ;drive upper lines with msb
+    ini                     ;read the upper byte (HL++)
+    inc c                   ;drive control port
+    ld d, __IO_IDE_DATA
+    out (c), d              ;deassert read pin
+    dec e                   ;keep iterative count in e
+    jr nz, ide_rdblk2
+
+ELSE
+ide_rdblk2:
+    ld d, __IO_IDE_DATA|__IO_IDE_RD_LINE
+    out (c), d              ;and assert read pin
+    ld bc, __IO_PIO_IDE_LSB ;drive lower lines with lsb
+    ini                     ;read the lower byte (HL++)
+    ld bc, __IO_PIO_IDE_MSB ;drive upper lines with msb
+    ini                     ;read the upper byte (HL++)
+    ld bc, __IO_PIO_IDE_CTL
+    ld d, __IO_IDE_DATA
+    out (c), d              ;deassert read pin
+    dec e                   ;keep iterative count in e
+    jr nz, ide_rdblk2
+
+ENDIF
+;   ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
+    ld d, $0
+    out (c), d              ;deassert all control pins
+    pop de
+    pop bc
+    ret
+
+    ;Do a write bus cycle to the drive, via the 8255
+    ;input A = ide register address
+    ;input E = lsb to write to IDE drive
+ide_write_byte:
+    push bc
+    push de
+    ld d, a                 ;copy address to D
+    ld bc, __IO_PIO_IDE_CONFIG
+    ld a, __IO_PIO_IDE_WR
+    out (c), a              ;config 8255 chip, write mode
+    ld bc, __IO_PIO_IDE_CTL
+    ld a, d
+    out (c), a              ;drive address onto control lines
+    or __IO_IDE_WR_LINE
+    out (c), a              ;and assert write pin
+    ld bc, __IO_PIO_IDE_LSB
+    out (c), e              ;drive lower lines with lsb
+    ld bc, __IO_PIO_IDE_CTL
+    out (c), d              ;deassert write pin
+    xor a
+    out (c), a              ;deassert all control pins
+    ld bc, __IO_PIO_IDE_CONFIG
+    ld a, __IO_PIO_IDE_RD
+    out (c), a              ;config 8255 chip, read mode
+    pop de
+    pop bc
+    ret
+
+    ;Write a block of 512 bytes (one sector) from (HL++) to
+    ;the drive 16 bit data register
+ide_write_block:
+    push bc
+    push de
+    ld bc, __IO_PIO_IDE_CONFIG
+    ld d, __IO_PIO_IDE_WR
+    out (c), d              ;config 8255 chip, write mode
+    ld bc, __IO_PIO_IDE_CTL
+    ld d, __IO_IDE_DATA
+    out (c), d              ;drive address onto control lines
+    ld e, $0                ;keep iterative count in e
+
+IF (__IO_PIO_IDE_CTL = __IO_PIO_IDE_MSB+1) & (__IO_PIO_IDE_MSB = __IO_PIO_IDE_LSB+1)
+ide_wrblk2: 
+    ld d, __IO_IDE_DATA|__IO_IDE_WR_LINE
+    out (c), d              ;and assert write pin
+    ld bc, __IO_PIO_IDE_LSB+$0200 ;drive lower lines with lsb, plus outi b offset
+    outi                    ;write the lower byte (HL++)
+    inc c                   ;drive upper lines with msb
+    outi                    ;write the upper byte (HL++)
+    inc c                   ;drive control port
+    ld d, __IO_IDE_DATA
+    out (c), d              ;deassert write pin
+    dec e                   ;keep iterative count in e
+    jr nz, ide_wrblk2
+
+ELSE
+ide_wrblk2: 
+    ld d, __IO_IDE_DATA|__IO_IDE_WR_LINE
+    out (c), d              ;and assert write pin
+    ld bc, __IO_PIO_IDE_LSB ;drive lower lines with lsb
+    outi                    ;write the lower byte (HL++)
+    ld bc, __IO_PIO_IDE_MSB ;drive upper lines with msb
+    outi                    ;write the upper byte (HL++)
+    ld bc, __IO_PIO_IDE_CTL
+    ld d, __IO_IDE_DATA
+    out (c), d              ;deassert write pin
+    dec e                   ;keep iterative count in e
+    jr nz, ide_wrblk2
+
+ENDIF
+;   ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
+    ld d, $0
+    out (c), d              ;deassert all control pins
+    ld bc, __IO_PIO_IDE_CONFIG
+    ld d, __IO_PIO_IDE_RD
+    out (c), d              ;config 8255 chip, read mode
+    pop de
+    pop bc
+    ret
+
+;------------------------------------------------------------------------------
+; start of common area 1 driver - IDE functions
+;------------------------------------------------------------------------------
+
+;------------------------------------------------------------------------------
+; IDE internal subroutines 
+;
+; These routines talk to the drive, using the low level I/O.
+; Normally a program should not call these directly.
+;------------------------------------------------------------------------------
+
+EXTERN ideStatus
+
+PUBLIC ide_setup_lba
+PUBLIC ide_wait_ready, ide_wait_drq, ide_test_error
+
+; set up the drive LBA registers
+; LBA is contained in BCDE registers
+
+ide_setup_lba:
+    push hl
+    ld a, __IO_IDE_LBA0
+    call ide_write_byte     ;set LBA0 0:7
+    ld e, d
+    ld a, __IO_IDE_LBA1
+    call ide_write_byte     ;set LBA1 8:15
+    ld e, c
+    ld a, __IO_IDE_LBA2
+    call ide_write_byte     ;set LBA2 16:23
+    ld a, b
+    and 00001111b           ;lowest 4 bits used only
+    or  11100000b           ;to enable LBA address mode
+    ld hl, ideStatus        ;set bit 4 accordingly
+    bit 0, (hl)
+    jr z, ide_setup_master
+    or $10                  ;if it is a slave, set that bit
+ide_setup_master:
+    ld e, a
+    ld a, __IO_IDE_LBA3
+    call ide_write_byte     ;set LBA3 24:27 + bits 5:7=111
+    pop hl
+    ret
+
+; How to poll (waiting for the drive to be ready to transfer data):
+; Read the Regular Status port until bit 7 (BSY, value = 0x80) clears,
+; and bit 3 (DRQ, value = 0x08) sets.
+; Or until bit 0 (ERR, value = 0x01) or bit 5 (DFE, value = 0x20) sets.
+; If neither error bit is set, the device is ready right then.
+
+; Carry is set on wait success.
+
+ide_wait_ready:
+    push af
+ide_wait_ready2:
+    ld a, __IO_IDE_ALT_STATUS    ;get IDE alt status register
+    call ide_read_byte
+    tst 00100001b           ;test for ERR or DFE
+    jr nz, ide_wait_error
+    and 11000000b           ;mask off BuSY and RDY bits
+    xor 01000000b           ;wait for RDY to be set and BuSY to be clear
+    jr nz, ide_wait_ready2
+    pop af
+    scf                     ;set carry flag on success
+    ret
+
+ide_wait_error:
+    pop af
+    or a                    ;clear carry flag on failure
+    ret
+
+; Wait for the drive to be ready to transfer data.
+; Returns the drive's status in A
+
+; Carry is set on wait success.
+
+ide_wait_drq:
+    push af
+ide_wait_drq2:
+    ld a, __IO_IDE_ALT_STATUS    ;get IDE alt status register
+    call ide_read_byte
+    tst 00100001b           ;test for ERR or DFE
+    jr nz, ide_wait_error
+    and 10001000b           ;mask off BuSY and DRQ bits
+    xor 00001000b           ;wait for DRQ to be set and BuSY to be clear
+    jr nz, ide_wait_drq2
+    pop af
+    scf                     ;set carry flag on success
+    ret
+
+
+; load the IDE status register and if there is an error noted,
+; then load the IDE error register to provide details.
+
+; Carry is set on no error.
+
+ide_test_error:
+    push af
+    ld a, __IO_IDE_ALT_STATUS    ;select status register
+    call ide_read_byte      ;get status in A
+    bit 0, a                ;test ERR bit
+    jr z, ide_test_success
+    bit 5, a
+    jr nz, ide_test2        ;test write error bit
+
+    ld a, __IO_IDE_ERROR    ;select error register
+    call ide_read_byte      ;get error register in a
+ide_test2:
+    inc sp                  ;pop old af
+    inc sp
+    or a                    ;make carry flag zero = error!
+    ret                     ;if a = 0, ide write busy timed out
+
+ide_test_success:
+    pop af
+    scf                     ;set carry flag on success
+    ret
+
+;------------------------------------------------------------------------------
+; Routines that talk with the IDE drive, these should not be called by
+; the main program.
+
+; read a sector
+; LBA specified by the 4 bytes in BCDE
+; the address of the buffer to fill is in HL
+; HL is left incremented by 512 bytes
+
+; return carry on success, no carry for an error
+
+PUBLIC ide_read_sector
+
+ide_read_sector:
+    push af
+    push bc
+    push de
+    call ide_wait_ready     ;make sure drive is ready
+    jr nc, _disk_x_sector_error
+    call ide_setup_lba      ;tell it which sector we want in BCDE
+    ld e, $1
+    ld a, __IO_IDE_SEC_CNT
+    call ide_write_byte     ;set sector count to 1
+    ld e, __IDE_CMD_READ
+    ld a, __IO_IDE_COMMAND
+    call ide_write_byte     ;ask the drive to read it
+    call ide_wait_ready     ;make sure drive is ready to proceed
+    jr nc, _disk_x_sector_error
+    call ide_wait_drq       ;wait until it's got the data
+    jr nc, _disk_x_sector_error
+    call ide_read_block     ;grab the data into (HL++)
+
+_ide_x_sector_ok:
+    pop de
+    pop bc
+    pop af
+    scf                     ;carry = 1 on return = operation ok
+    ret
+
+_disk_x_sector_error:
+    pop de
+    pop bc
+    pop af
+    jr ide_test_error       ;carry = 0 on return = operation failed
+
+
+;------------------------------------------------------------------------------
+; Routines that talk with the IDE drive, these should not be called by
+; the main program.
+
+; write a sector
+; specified by the 4 bytes in BCDE
+; the address of the origin buffer is in HL
+; HL is left incremented by 512 bytes
+
+; return carry on success, no carry for an error
+
+PUBLIC ide_write_sector
+
+ide_write_sector:
+    push af
+    push bc
+    push de
+    call ide_wait_ready     ;make sure drive is ready
+    jr nc, _disk_x_sector_error
+    call ide_setup_lba      ;tell it which sector we want in BCDE
+    ld e, $1
+    ld a, __IO_IDE_SEC_CNT
+    call ide_write_byte     ;set sector count to 1
+    ld e, __IDE_CMD_WRITE
+    ld a, __IO_IDE_COMMAND
+    call ide_write_byte     ;instruct drive to write a sector
+    call ide_wait_ready     ;make sure drive is ready to proceed
+    jr nc, _disk_x_sector_error
+    call ide_wait_drq       ;wait until it wants the data
+    jr nc, _disk_x_sector_error
+    call ide_write_block    ;send the data to the drive from (HL++)
+    call ide_wait_ready
+    jr nc, _disk_x_sector_error
+;   ld e, __IDE_CMD_CACHE_FLUSH
+;   ld a, __IO_IDE_COMMAND
+;   call ide_write_byte     ;tell drive to flush its hardware cache
+;   call ide_wait_ready     ;wait until the write is complete
+;   jr nc, _disk_x_sector_error
+    jr _ide_x_sector_ok     ;carry = 1 on return = operation ok
 
 ;==============================================================================
 ;       DEBUGGING SUBROUTINES
@@ -1832,13 +2295,13 @@ EXTERN _asci0_reset, _asci0_putchar, _asci0_putc, _asci0_getc
 delay:
     push bc
     ld b, $00
-delay_loop:
+_delay_loop:
     ex (sp), hl
     ex (sp), hl
-    djnz delay_loop
+    djnz _delay_loop
     pop bc
     ret
-        
+
 ;==============================================================================
 ;       INPUT SUBROUTINES
 ;
@@ -1877,7 +2340,6 @@ rhexwd:                 ; returns 2 bytes LE, to address in DE, modifies AF
     pop af
     ret
 
-
 rhex:                   ; Returns byte in A, modifies HL
     call rhex_nibble    ; read the first nibble
     rlca                ; shift it left by 4 bits
@@ -1899,12 +2361,11 @@ rhex_nibble:
     sub 7               ; else subtract 'A'-'0' (17) and add 10
     ret
 
-
 ;==============================================================================
 ;       OUTPUT SUBROUTINES
 ;
 
-    ; print string, modifies AF, DE, & HL
+    ; print string from location in DE, modifies AF, DE, & HL
 pstring: 
     ld a, (de)          ; Get character from DE address
     or a                ; Is it $00 ?
@@ -1935,11 +2396,10 @@ phexdwd:
     ; print Word at address HL as 16 bit number in ASCII HEX, modifies AF
 phexwd:
     push hl
-    inc hl
     ld a, (hl)
-    dec hl
-    ld l, (hl)
-    ld h, a
+    inc hl
+    ld h, (hl)
+    ld l, a
     call phexwdreg
     pop hl
     ret
@@ -1985,4 +2445,8 @@ phex_conv:
     call _asci0_putc
     ret
 
+PUBLIC _common1_phase_end
+_common1_phase_end:     ; just to make sure there's enough space
+
 DEPHASE
+

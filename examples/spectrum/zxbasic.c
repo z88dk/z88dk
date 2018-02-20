@@ -29,7 +29,7 @@
 char	value[100];
 
 
-int main()
+void main()
 {
 
 #ifdef SPECTRUM

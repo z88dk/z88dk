@@ -83,16 +83,24 @@
 
 // Functions
 
-extern void apu_reset(void *int_addr) __preserves_regs(a,b,c,d,e,iyh,iyl);
+extern void apu_reset(void) __preserves_regs(a,b,c,d,e,iyh,iyl);
 
-extern void apu_cmd_ld(void *op_addr,uint8_t command) __preserves_regs(b,c,d,e,iyh,iyl);
-extern void apu_cmd_ld_callee(void *op_addr,uint8_t command) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_callee;
+extern void apu_init(void) __preserves_regs(a,b,c,d,e,iyh,iyl);
+
+extern uint8_t apu_chk_idle(void) __preserves_regs(b,c,d,e,iyh,iyl);
+extern uint8_t apu_chk_idle_fastcall(void) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+#define apu_chk_idle(a) apu_chk_idle_fastcall(a)
+
+
+extern void apu_cmd_ld(uint32_t operand,uint8_t command) __preserves_regs(iyh,iyl);
+extern void apu_cmd_ld_callee(uint32_t operand,uint8_t command) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define apu_cmd_ld(a,b) apu_cmd_ld_callee(a,b)
 
 
-extern uint8_t apu_chk_idle(void) __preserves_regs(b,c,d,e,iyh,iyl);
+extern uint8_t apu_op_rem(void * operand) __preserves_regs(iyh,iyl);
+extern uint8_t apu_op_rem_fastcall(void * operand) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define apu_op_rem(a) apu_op_rem_fastcall(a)
 
-extern void apu_isr(void) __preserves_regs(a,b,c,d,e,h,l,iyh,iyl);
 
 
 #endif

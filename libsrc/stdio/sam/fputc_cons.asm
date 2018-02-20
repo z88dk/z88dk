@@ -19,19 +19,37 @@
 ;
 
 .fputc_cons_native
+        ld      hl,2
+        add     hl,sp
+	ld	b,(hl)
+	ld	hl,skip_count
+	ld	a,(hl)
+	and	a
+	ld	a,b
+	jr	z,continue
+	dec	(hl)
+	jr	direct
+continue:
+	cp	22		;move to
+	jr	nz,not_posn
+	ld	(hl),2
+not_posn:
+	cp	10
+	jr	nz,not_lf
+	ld	a,13
+not_lf:
+	cp	12	; CLS ?
+	jr	nz,direct
+	xor	a
+	call	$014E
+	ld	a,0xfe	;screen
+	jp	$0112
+direct:
+	rst	16
+	ld	a,255
+	ld	(0x5C8C),a
+	ret
 
-		ld	hl,2
-		add	hl,sp
-		ld	a,(hl)
-IF STANDARDESCAPECHARS
-		cp	10
-		jr	nz,nocr
-		ld	a,13
-ENDIF
-.nocr	
-		cp	12	; CLS ?
-		jr	nz,nocls
-		xor	a
-		jp	$014E
-.nocls
-		jp	$10
+	SECTION	bss_clib
+
+skip_count:	defb	0

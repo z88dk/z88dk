@@ -83,16 +83,19 @@
 
 // Functions
 
-extern void apu_reset(void *int_addr);
+extern void apu_reset(void);
 
 
-extern void apu_cmd_ld(void *op_addr,uint8_t command);
+extern void apu_init(void);
 
 
 extern uint8_t apu_chk_idle(void);
 
 
-extern void apu_isr(void);
+extern void apu_cmd_ld(uint32_t operand,uint8_t command);
+
+
+extern uint8_t apu_op_rem(void * operand);
 
 
 

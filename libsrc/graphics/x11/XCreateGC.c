@@ -14,7 +14,7 @@
 
 GC Xcommon_mygc;
 
-struct GC *XCreateGC(Display *display, Drawable win, int valuemask, int values) {
+struct GC *XCreateGC(Display *display, Drawable win, int valuemask, XGCValues *values) {
 
 #ifdef _DEBUG_
 	printf ("  CreateGC: %u   ", Xcommon_mygc);

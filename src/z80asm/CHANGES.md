@@ -1,6 +1,12 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2018
+----
+- 2018-01-03 Fix #563 consolidated object file erroneously eliminates globally exported defc
+- 2018-01-21 Fix #577: lz and lo not accepted as symbols
+- 2018-01-25 Fix #578: allow a label in INCLUDE and BINARY
+
 2017
 ----
 
@@ -16,6 +22,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-04-30 Fix #216 replace --RCMX000 by --cpu=r2k and --cpu=r3k
 - 2017-05-03 Fix #222 z80asm: add +zx and +zx81 options to z80asm to generate .tap and .P files
 - 2017-05-21 Fix #233 force the name of the output file to use section names with defined ORG
+- 2017-05-23 Fix #235 raise warning if (N) is used where N is expected
 - 2017-06-18 Fix #239 z80asm: empty sections with org are causing empty binaries to be produced 
              (thank you @aralbrec)
 - 2017-06-21 Fix #252 z80asm ignores _map file if 0 bytes
@@ -27,7 +34,6 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-08-21 Fix #320 Define macro naming the CPU used in the --cpu option
 - 2017-08-24 Fix #326 Add directory of list file to include path during assembly
 - 2017-08-26 Create a z80asm.lib file with routines that might be called by the assembler
-- 2017-08-28 Fix #312 ZX Next (--cpu=z80-zxn) opcodes in z80asm
 - 2017-09-03 Fix #331 Implement Rabbit opcodes in z80asm
 - 2017-09-03 Change z80asm to use C-11
 - 2017-09-04 Fix #343 Generate different z80asm*.lib libraries for different CPUs
@@ -35,6 +41,28 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-09-11 Fix #359 Remove functions that now are part of z80asm*.lib
 - 2017-09-11 Fix #350 Fix the clean and install-clean targets
 - 2017-09-13 Fix #340 Emulation library for DAA on a Rabbit
+- 2017-09-14 Fix #320 show predefined constants with -v
+- 2017-09-19 Fix #341 add --debug option to z80asm
+- 2017-09-23 Fix #341 Add new directive C_LINE to pass debug information from the C compiler to z80asm
+- 2017-09-23 Fix #222 add a map file if +zx or +zx81 are given
+- 2017-09-23 Fix #17 bug with filenames interpreting escape sequences
+- 2017-09-23 Fix #222 map file is not required for +zx or +zx81
+- 2017-09-25 Fix #341 Produce a debugger-friendly map file
+- 2017-09-25 Fix #312 ZX Next (--cpu=z80-zxn) opcodes in z80asm
+- 2017-09-28 Fix #422 add back deprecated XDEF, XLIB, XREF and XLIB
+- 2017-09-29 Fix #411 Searches PREFIX and -L library path for its support libraries
+- 2017-09-30 Fix #429 add phase and dephase directives
+- 2017-10-08 Fix #440 expand environment variables in @ lines in .lst files
+- 2017-10-08 Fix #442 support globbing in file names and in list files
+- 2017-11-11 Fix #441 add command line option for specifying the output directory
+- 2017-11-12 Fix #436 add ALIGN directive
+- 2017-11-12 Fix #312 update list of zxn opcodes
+- 2017-11-12 Fix #312 Add ZX-Next copper unit macros
+- 2017-11-15 Fix #520 Constant expressions are silently ignored when not constant
+- 2017-11-15 Fix #312 Compute ZX-Next copper unit expressions at link time
+- 2017-11-17 Fix #524 Remove colon from windows absolute path when appending to -O
+- 2017-11-18 Fix #52: Needs double-star to expand directories
+
 
 2016
 ----

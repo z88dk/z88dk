@@ -111,6 +111,21 @@ static char *handle_immed16(dcontext *state, char *buf, size_t buflen)
     return buf;
 }
 
+static char *handle_immed16_be(dcontext *state, char *buf, size_t buflen)
+{
+    size_t offs = 0;
+    uint8_t lsb;
+    uint8_t msb;
+    
+    READ_BYTE(state, msb);
+    READ_BYTE(state, lsb);
+    
+    BUF_PRINTF("$%02x%02x", msb, lsb);
+    
+    return buf;
+}
+
+
 static char *handle_hl(int index)
 {
     char *table[] = { "hl", "ix", "iy"};
@@ -320,9 +335,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                 if ( z == 6 && y == 6 ) {
                     if ( israbbit() ) BUF_PRINTF("%-8s","altd");
                     else BUF_PRINTF("%-8s","halt");
-                } else if ( israbbit() && z == 4 && y == 7 ) {
+                } else if ( israbbit() && z == 4 && y == 7 && state->index ) {
                     BUF_PRINTF("%-8shl,%s", "ld", handle_register16(state,2, state->index));
-                } else if ( israbbit() && z == 5 && y == 7 ) {
+                } else if ( israbbit() && z == 5 && y == 7 && state->index ) {
                     BUF_PRINTF("%-8s%s,hl", "ld", handle_register16(state,2, state->index)); 
                 } else if ( israbbit() && z == 4 && y == 4 && state->index ) {
                     BUF_PRINTF("%-8s(%s),hl", "ldp", handle_register16(state,2, state->index)); 
@@ -401,7 +416,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 z = 6;
                             }
                             if ( !cancbundoc() && state->index && z != 6 ) BUF_PRINTF("nop");
-                            else BUF_PRINTF("%-8s%d,%s", "bit", z, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
+                            else BUF_PRINTF("%-8s%d,%s", "bit", y, handle_register8(state, z, opbuf1, sizeof(opbuf1)));                 // TODO: Undocumented
                         } else if ( x == 2 ) {
                             if ( state->index && z != 6 ) {
                                 handle_register8(state, z, opbuf1, sizeof(opbuf1));
@@ -584,7 +599,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                     char *instr[] = { "otim", "otdm", "otimr", "otdmr"};
                                     BUF_PRINTF("%s", instr[y]);
                                 } else if ( c_cpu & CPU_Z80_ZXN ) {
-                                    if ( b == 0x8a ) BUF_PRINTF("push    %s", handle_immed16(state, opbuf1, sizeof(opbuf1)));
+                                    if ( b == 0x8a ) BUF_PRINTF("push    %s", handle_immed16_be(state, opbuf1, sizeof(opbuf1)));
                                     else if ( b == 0x8b ) BUF_PRINTF("popx    ");
                                     else if ( b == 0x90 ) BUF_PRINTF("outinb  ");
                                     else if ( b == 0x91 ) BUF_PRINTF("nextreg %s,%s",handle_immed8(state, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));

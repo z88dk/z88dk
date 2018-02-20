@@ -55,7 +55,6 @@ extern FILE *inpt2;
 extern FILE *saveout;
 extern SYMBOL *currfn;
 
-extern char endasm;
 extern int c_share_offset;
 extern int debuglevel;
 extern int c_assembler_type;

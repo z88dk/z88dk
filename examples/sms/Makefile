@@ -1,6 +1,6 @@
 
 COMPILER ?= sccz80
-CFLAGS = 
+CFLAGS = -vn
 
 ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 

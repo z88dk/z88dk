@@ -75,8 +75,10 @@ add("mirror a",			0xED, 0x24);
 # 4T     mirror de         ED 26           mirror the bits in DE     
 add("mirror de",		0xED, 0x26);
 
-# 12T*   push NNNN        ED 8A LO HI     push 16bit immediate value
-add("push 32767",		0xED, 0x8A, 0xFF, 0x7F);
+# 16T*   push NNNN         ED 8A HI LO     push 16bit immediate value, big endian
+add("push 1",			0xED, 0x8A, 0x00, 0x01);
+add("push 256",			0xED, 0x8A, 0x01, 0x00);
+add("push 32767",		0xED, 0x8A, 0x7F, 0xFF);
 
 # ** reg,val are both 8-bit numbers
 # 12T*   nextreg reg,val   ED 91 reg,val   Set a NEXT register (like doing out($243b),reg then out($253b),val

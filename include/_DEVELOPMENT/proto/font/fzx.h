@@ -308,4 +308,39 @@ extern struct fzx_font ff_utz_TinyTexanS;
 extern struct fzx_font ff_utz_TinyTexanXS;
 extern struct fzx_font ff_utz_TinyTexanXXS;
 
+
+// FZX FONTS BY SEVEN.FFF
+// https://github.com/Threetwosevensixseven/FZXFonts
+
+extern struct fzx_font ff_sfff_koi8b;
+
+
+// FZX FONTS BY KREATIVE KORP
+// https://github.com/kreativekorp/bitsnpicas
+
+extern struct fzx_font ff_kk_Fairfax;
+extern struct fzx_font ff_kk_FairfaxLatin1;
+extern struct fzx_font ff_kk_FairfaxB;
+extern struct fzx_font ff_kk_FairfaxBLatin1;
+extern struct fzx_font ff_kk_FairfaxI;
+extern struct fzx_font ff_kk_FairfaxILatin1;
+extern struct fzx_font ff_kk_FairfaxS;
+extern struct fzx_font ff_kk_FairfaxSLatin1;
+extern struct fzx_font ff_kk_Magdalena;
+extern struct fzx_font ff_kk_MagdalenaLatin1;
+extern struct fzx_font ff_kk_MagdalenaB;
+extern struct fzx_font ff_kk_MagdalenaBLatin1;
+extern struct fzx_font ff_kk_McMillen;
+extern struct fzx_font ff_kk_McMillenLatin1;
+extern struct fzx_font ff_kk_McMillenB;
+extern struct fzx_font ff_kk_McMillenBLatin1;
+extern struct fzx_font ff_kk_Mischke;
+extern struct fzx_font ff_kk_MischkeLatin1;
+extern struct fzx_font ff_kk_MischkeB;
+extern struct fzx_font ff_kk_MischkeBLatin1;
+extern struct fzx_font ff_kk_Monterey;
+extern struct fzx_font ff_kk_MontereyLatin1;
+extern struct fzx_font ff_kk_MontereyB;
+extern struct fzx_font ff_kk_MontereyBLatin1;
+
 #endif

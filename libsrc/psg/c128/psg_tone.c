@@ -11,7 +11,7 @@
 #include <psg.h>
 #include <c128/sid.h>
 
-void psg_tone(unsigned char channels, int period) {
+void psg_tone(unsigned int channels, int period) {
 
 	if (channels & 1) {
 		freqsid(sidVoice1,period);

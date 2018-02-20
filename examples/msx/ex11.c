@@ -92,7 +92,7 @@ mesh_t* build_mesh() {
 	return mesh;	// done! :)
 }
 
-main() {
+void main() {
 	bool flat = false;
 	//int *low, *high;
 	vector_t light;

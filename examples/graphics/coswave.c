@@ -20,7 +20,7 @@
 #include <math.h>
 #include <lib3d.h>
 
-main()
+void main()
 {
 
 float x,y,incr,yenlarge;

@@ -39,11 +39,8 @@ divert(-1)
 # used by existing peripherals.
 
 # Specdrum is a single 8-bit DAC listening on port 0xdf;
-# OUTs to port 0xffdf write to DACs A,C so that the output
+# OUTs to port 0xdf write to DACs A,C so that the output
 # is mono and is heard on both the left and right channels.
-# The current 16-bit port decode differs from the original
-# peripheral and is done because esxdos is spuriously writing
-# to port 0xdf, causing crackles to be heard.
 
 # PROFI Covox has an 8-bit left channel on port 0x3f and
 # an 8-bit right channel on port 0x5f.  It is assigned to
@@ -66,15 +63,19 @@ define(`__IO_DAC_L1', 0x1f)
 define(`__IO_DAC_R0', 0x4f)
 define(`__IO_DAC_R1', 0x5f)
 
-# PORT 0xFFDF: Mono DAC
+# PORT 0x2D: Mono DAC
 
-define(`__IO_DAC_M0', 0xffdf)        # writes L0 and R0
+define(`__IO_DAC_M0', 0xdf)          # writes L0 and R0
+
+# NEXTREG 45: Mono DAC
+#
+# define(`__REG_AUDIO_MONO_DAC', 45) # writes to L0 and R0 (for copper)
 
 # The following port names for specific peripherals are present
 # only to allow software for other targets to compile for the
 # zx next.  The ports are duplicates of the above.
 
-define(`__IO_DAC_SPECDRUM', 0xffdf)  # writes L0 and R0
+define(`__IO_DAC_SPECDRUM', 0xdf)    # writes L0 and R0
 
 define(`__IO_DAC_PROFI_L', 0x3f)     # writes L0
 define(`__IO_DAC_PROFI_R', 0x5f)     # writes R1

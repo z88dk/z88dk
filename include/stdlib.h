@@ -87,20 +87,9 @@ extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_c
 //// Random Numbers
 ///////////////////
 
-// The pseudo-random number generator requires a 16-bit seed.
-// The seed is present in the crt0 for a given platform, but if
-// you wish to define your own then do it in whatever way you wish
-// and add the following pragma to your source code:
-// #pragma output HAVESEED
-
-extern int std_seed;
-
-
 #define RAND_MAX    32767
-#define M_SRAND(a)  asm("ld\thl,"#a"\nld\t(_std_seed),hl\n");
 
 extern int  __LIB__              rand(void);
-extern void __LIB__              randomize(void);
 extern void __LIB__  srand(unsigned int seed) __z88dk_fastcall;
 
 // Not sure why Rex has it's own rand() routine using different seed?
@@ -303,11 +292,17 @@ extern unsigned int  __LIB__  wpeek(const void *addr) __z88dk_fastcall;
 // ACCURATE T-STATE DELAY
 extern void   __LIB__    t_delay(unsigned int tstates) __z88dk_fastcall;   // at least 141 T
 
+#ifdef __Z88__
 extern void   __LIB__ __SAVEFRAME__     sleep (int secs) __z88dk_fastcall;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
 extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
-extern void   __LIB__     delay (long milliseconds) __z88dk_fastcall;
+#else
+extern void   __LIB__ __SAVEFRAME__     sleep (int secs);
+/* Very non standard! sleep for centisecs! (z88 and others)*/
+extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds);
+#endif
 
+extern void __LIB__ delay (unsigned long milliseconds);
 
 
 /*********/

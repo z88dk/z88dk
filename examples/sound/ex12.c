@@ -21,7 +21,7 @@ Contact the author:
 #include <stdio.h>
 #include <msx/gfx.h>
 
-main() {
+void main() {
 	// prepare for the lamest example ever :)
 	// at least is very simple and self-explained
 

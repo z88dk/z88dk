@@ -22,7 +22,7 @@ OBJECTS = $(CFILES:.c=.o)
 z88_fcntl: $(OBJECTS)
 
 .c.o:
-	zcc +pps $(CFLAGS) $*.c
+	$(ZCC) +pps $(CFLAGS) $*.c
 
 
 clean:

@@ -14,7 +14,7 @@
       PUBLIC   _rename
 		EXTERN	dodos
 
-		INCLUDE "p3dos.def"
+		INCLUDE "target/zx/def/p3dos.def"
 
 
 .rename
@@ -26,7 +26,9 @@
 	push	de
 	push	bc
 	ld	iy,DOS_RENAME
+	push	ix
 	call	dodos
+	pop	ix
 	ld	hl,0
 	ret	c	;OK
 	dec	hl

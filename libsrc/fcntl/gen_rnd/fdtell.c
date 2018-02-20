@@ -13,6 +13,6 @@ long fdtell(int handle)
 {
 	struct RND_FILE *myfile;
 
-	myfile = (char *) handle;
+	myfile = (void *) handle;
 	return (myfile->position);
 }

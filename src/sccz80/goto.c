@@ -179,8 +179,8 @@ void ChaseGoto(SYMBOL* ptr)
     if (gotocnt == 0)
         return; /* No gotos */
 
-    gptr = gotoq;
-    for (i = 0; i <= gotocnt; i++) {
+    gptr = gotoq + 1;
+    for (i = 0; i < gotocnt; i++) {
         debug(DBG_GOTO, "Chasing %s # %d\n", ptr->name, i);
         if (gptr->sym == ptr && gptr->sp == Zsp) {
             debug(DBG_GOTO, "Matched #%d \n", i);
@@ -204,8 +204,8 @@ void goto_cleanup(void)
     if (gotocnt == 0)
         return;
 
-    gptr = gotoq;
-    for (i = 0; i <= gotocnt; i++) {
+    gptr = gotoq + 1;
+    for (i = 0; i < gotocnt; i++) {
         if (gptr->sym) {
             debug(DBG_GOTO, "Cleaning %s #%d\n", gptr->sym->name, i);
             postlabel(gptr->label);
@@ -232,8 +232,8 @@ GOTO_TAB* SearchGoto(SYMBOL* ptr)
     if (gotocnt == 0)
         return (0);
 
-    gptr = gotoq;
-    for (i = 0; i <= gotocnt; i++) {
+    gptr = gotoq + 1;
+    for (i = 0; i <  gotocnt; i++) {
         if (gptr->sym == ptr && gptr->sp == Zsp)
             return (gptr);
         gptr++;

@@ -9,9 +9,9 @@
 #include <X11/Xlib.h>
 #include <graphics.h>
 
-void XDrawLine(Display *display, Drawable win, GC gc, int x1, int y1, int x2, int y2) {
+void XDrawLine(Display *display, Drawable win, GC *gc, int x1, int y1, int x2, int y2) {
 	struct _XWIN *mywin;
-	mywin = (char *) win;
+	mywin = (void *) win;
 
 	draw(mywin->a_x+x1,mywin->a_y+y1,mywin->a_x+x2,mywin->a_y+y2);
 }

@@ -30,7 +30,7 @@ Contact the author:
 
 	unsigned char buf[MODE2_MAX];
 
-main() {
+void main() {
 	int c, l;
 	unsigned char i;
 	surface_t surf;

@@ -20,7 +20,7 @@ Stefano Bodrato - 23/5/2006
 #include <sound.h>
 #include <stdio.h>
 
-int main()
+void main()
 {
 	printf("\n\nLow tones \n");
 	printf("1st theme \n");

@@ -12,6 +12,15 @@ define(`__ZXNEXT_2MB', 2)
 
 # ZX Next Runtime Configuration
 
+# Static Environment
+
+define(`__ENV_FILENAME', `"/sys/env"')
+define(`__ENV_GETENV_BUFSZ', 64)
+
+define(`__ENV_TMPDIR', `"/tmp/"')  # trailing dir separator required
+define(`__ENV_LTMPNAM', 12)        # TMPDIR/tmpXXXX
+define(`__ENV_TMPMAX', 0xffff)
+
 # Compatible Spectrum model
 
 define(`__SPECTRUM', 2)
@@ -33,6 +42,17 @@ define(`__USE_SPECTRUM_128_SECOND_DFILE', 0)
 
 define(`__USE_SYSVAR', 0)
 
+# Use Extended Opcodes
+# (not applied yet)
+
+define(`__USE_ZXN_OPCODES', 0)
+
+define(`__USE_ZXN_OPCODES_NEXTREG', 1)
+define(`__USE_ZXN_OPCODES_MLT', 2)
+define(`__USE_ZXN_OPCODES_LDIR', 4)
+define(`__USE_ZXN_OPCODES_DISPLAY', 8)
+define(`__USE_ZXN_OPCODES_OTHER', 16)
+
 #
 # END OF USER CONFIGURATION
 ###############################################################
@@ -47,6 +67,11 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__ZXNEXT'
 
+PUBLIC `__ENV_GETENV_BUFSZ'
+
+PUBLIC `__ENV_LTMPNAM'
+PUBLIC `__ENV_TMPMAX'
+
 PUBLIC `__SPECTRUM'
 
 PUBLIC `__SPECTRUM_48'
@@ -59,6 +84,14 @@ PUBLIC `__SPECTRUM_PENTAGON'
 PUBLIC `__USE_SPECTRUM_128_SECOND_DFILE'
 
 PUBLIC `__USE_SYSVAR'
+
+PUBLIC `__USE_ZXN_OPCODES'
+
+PUBLIC `__USE_ZXN_OPCODES_NEXTREG'
+PUBLIC `__USE_ZXN_OPCODES_MLT'
+PUBLIC `__USE_ZXN_OPCODES_LDIR'
+PUBLIC `__USE_ZXN_OPCODES_DISPLAY'
+PUBLIC `__USE_ZXN_OPCODES_OTHER'
 ')
 
 dnl#
@@ -68,6 +101,15 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 defc `__ZXNEXT' = __ZXNEXT
+
+; `define(`__ENV_FILENAME',' __ENV_FILENAME)
+
+defc `__ENV_GETENV_BUFSZ' = __ENV_GETENV_BUFSZ
+
+; `define(`__ENV_TMPDIR',' __ENV_TMPDIR)
+
+defc `__ENV_LTMPNAM' = __ENV_LTMPNAM
+defc `__ENV_TMPMAX' = __ENV_TMPMAX
 
 defc `__SPECTRUM' = __SPECTRUM
 
@@ -81,6 +123,14 @@ defc `__SPECTRUM_PENTAGON' = __SPECTRUM_PENTAGON
 defc `__USE_SPECTRUM_128_SECOND_DFILE' = __USE_SPECTRUM_128_SECOND_DFILE
 
 defc `__USE_SYSVAR' = __USE_SYSVAR
+
+defc `__USE_ZXN_OPCODES' = __USE_ZXN_OPCODES
+
+defc `__USE_ZXN_OPCODES_NEXTREG' = __USE_ZXN_OPCODES_NEXTREG
+defc `__USE_ZXN_OPCODES_MLT' = __USE_ZXN_OPCODES_MLT
+defc `__USE_ZXN_OPCODES_LDIR' = __USE_ZXN_OPCODES_LDIR
+defc `__USE_ZXN_OPCODES_DISPLAY' = __USE_ZXN_OPCODES_DISPLAY
+defc `__USE_ZXN_OPCODES_OTHER' = __USE_ZXN_OPCODES_OTHER
 ')
 
 dnl#
@@ -91,6 +141,11 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__ZXNEXT'
 `#define' `__ZXNEXT'    __ZXNEXT
+
+`#define' `__ENV_GETENV_BUFSZ'  __ENV_GETENV_BUFSZ
+
+`#define' `__ENV_LTMPNAM'  __ENV_LTMPNAM
+`#define' `__ENV_TMPMAX'  __ENV_TMPMAX
 
 `#undef'  `__SPECTRUM'
 `#define' `__SPECTRUM'  __SPECTRUM
@@ -105,4 +160,12 @@ ifdef(`CFG_C_DEF',
 `#define' `__USE_SPECTRUM_128_SECOND_DFILE'  __USE_SPECTRUM_128_SECOND_DFILE
 
 `#define' `__USE_SYSVAR'  __USE_SYSVAR
+
+`#define' `__USE_ZXN_OPCODES'  __USE_ZXN_OPCODES
+
+`#define' `__USE_ZXN_OPCODES_NEXTREG'  __USE_ZXN_OPCODES_NEXTREG
+`#define' `__USE_ZXN_OPCODES_MLT'  __USE_ZXN_OPCODES_MLT
+`#define' `__USE_ZXN_OPCODES_LDIR'  __USE_ZXN_OPCODES_LDIR
+`#define' `__USE_ZXN_OPCODES_DISPLAY'  __USE_ZXN_OPCODES_DISPLAY
+`#define' `__USE_ZXN_OPCODES_OTHER'  __USE_ZXN_OPCODES_OTHER
 ')

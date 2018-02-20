@@ -2,13 +2,13 @@
 include ../Make.config
 
 all:
-	cd graphics ; $(MAKE) ; cd ..
+	$(MAKE) -C graphics
 
 .c.o:
-	zcc +rex $(CFLAGS) $*.c
+	$(ZCC) +rex $(CFLAGS) $*.c
 
 
 clean:
 	$(RM) *.o*  *~  zcc_opt.def
-	cd graphics ; $(MAKE) clean ; cd ..
-	cd farcall ; $(MAKE) clean ; cd ..
+	$(MAKE) -C graphics clean
+	$(MAKE) -C farcall clean

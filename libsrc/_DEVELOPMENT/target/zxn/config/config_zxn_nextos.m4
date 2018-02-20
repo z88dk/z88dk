@@ -5,7 +5,7 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-# NEXTOS API
+# NEXTOS API 1.94B
 # https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 
 # Filesystem Related
@@ -50,10 +50,25 @@ define(`__NEXTOS_IDE_DOS_MAP', 0x00f1)
 define(`__NEXTOS_IDE_DOS_UNMAP', 0x00f4)
 define(`__NEXTOS_IDE_DOS_MAPPING', 0x00f7)
 define(`__NEXTOS_IDE_SNAPLOAD', 0x00fd)
+
 define(`__NEXTOS_IDE_PATH', 0x01b1)
+define(`__nextos_rc_path_change', 0)
+define(`__nextos_rc_path_get', 1)
+define(`__nextos_rc_path_make', 2)
+define(`__nextos_rc_path_delete', 3)
+
 define(`__NEXTOS_IDE_CAPACITY', 0x01b4)
 define(`__NEXTOS_IDE_GET_LFN', 0x01b7)
+
 define(`__NEXTOS_IDE_BROWSER', 0x01ba)
+define(`__nextos_browsercaps_none', 0)
+define(`__nextos_browsercaps_copy', 0x01)
+define(`__nextos_browsercaps_rename', 0x02)
+define(`__nextos_browsercaps_mkdir', 0x04)
+define(`__nextos_browsercaps_erase', 0x08)
+define(`__nextos_browsercaps_remount', 0x10)
+define(`__nextos_browsercaps_syscfg', 0x80)
+define(`__nextos_browsercaps_all', 0x1f)
 
 # Not Filesystem Related
 
@@ -62,10 +77,20 @@ define(`__NEXTOS_IDE_STREAM_CLOSE', 0x0059)
 define(`__NEXTOS_IDE_STREAM_IN', 0x005c)
 define(`__NEXTOS_IDE_STREAM_OUT', 0x005f)
 define(`__NEXTOS_IDE_STREAM_PTR', 0x0062)
+
 define(`__NEXTOS_IDE_BANK', 0x01bd)
+define(`__nextos_rc_banktype_zx', 0)
+define(`__nextos_rc_banktype_mmc', 1)
+define(`__nextos_rc_bank_total', 0)
+define(`__nextos_rc_bank_alloc', 1)
+define(`__nextos_rc_bank_reserve', 2)
+define(`__nextos_rc_bank_free', 3)
+
 define(`__NEXTOS_IDE_BASIC', 0x01c0)
 define(`__NEXTOS_IDE_STREAM_LINEIN', 0x01c3)
 define(`__NEXTOS_IDE_WINDOW_STRING', 0x01c6)
+define(`__NEXTOS_IDE_INTEGER_VAR', 0x01c9)
+define(`__NEXTOS_IDE_RTC', 0x01cc)
 
 # Legacy - Floppy Drive
 
@@ -111,6 +136,53 @@ define(`__NEXTOS_IDE_PARTITION_READ', 0x00c4)
 define(`__NEXTOS_IDE_PARTITION_OPEN', 0x00cd)
 define(`__NEXTOS_IDE_PARTITION_CLOSE', 0x00d0)
 define(`__NEXTOS_IDE_PARTITIONS', 0x01a5)
+
+# NextOS DOTN Commands
+# stack location in divmmc ram
+
+define(`__NEXTOS_DOTN_SP_DIVMMC', 0x4000)
+
+# NextOS ESXDOS API
+
+define(`__ESX_DISK_FILEMAP', 0x85)
+define(`__ESX_DISK_STRMSTART', 0x86)
+define(`__ESX_DISK_STRMEND', 0x87)
+
+define(`__ESX_M_DOSVERSION', 0x88)
+define(`__ESX_M_GETSETDRV', 0x89)
+define(`__ESX_M_TAPEIN', 0x8b)
+define(`__ESX_M_TAPEOUT', 0x8c)
+define(`__ESX_M_GETHANDLE', 0x8d)
+define(`__ESX_M_GETDATE', 0x8e)
+define(`__ESX_M_EXECCMD', 0x8f)
+define(`__ESX_M_GETERR', 0x93)
+define(`__ESX_M_P3DOS', 0x94)
+define(`__ESX_M_ERRH', 0x95)
+
+define(`__ESX_F_OPEN', 0x9a)
+define(`__ESX_F_CLOSE', 0x9b)
+define(`__ESX_F_SYNC', 0x9c)
+define(`__ESX_F_READ', 0x9d)
+define(`__ESX_F_WRITE', 0x9e)
+define(`__ESX_F_SEEK', 0x9f)
+define(`__ESX_F_FGETPOS', 0xa0)
+define(`__ESX_F_FSTAT', 0xa1)
+define(`__ESX_F_FTRUNCATE', 0xa2)
+define(`__ESX_F_OPENDIR', 0xa3)
+define(`__ESX_F_READDIR', 0xa4)
+define(`__ESX_F_TELLDIR', 0xa5)
+define(`__ESX_F_SEEKDIR', 0xa6)
+define(`__ESX_F_REWINDDIR', 0xa7)
+define(`__ESX_F_GETCWD', 0xa8)
+define(`__ESX_F_CHDIR', 0xa9)
+define(`__ESX_F_MKDIR', 0xaa)
+define(`__ESX_F_RMDIR', 0xab)
+define(`__ESX_F_STAT', 0xac)
+define(`__ESX_F_UNLINK', 0xad)
+define(`__ESX_F_TRUNCATE', 0xae)
+define(`__ESX_F_CHMOD', 0xaf)
+define(`__ESX_F_RENAME', 0xb0)
+define(`__ESX_F_GETFREE', 0xb1)
 
 # Error Codes - Recoverable Disk Errors
 
@@ -211,20 +283,45 @@ PUBLIC `__NEXTOS_IDE_DOS_MAP'
 PUBLIC `__NEXTOS_IDE_DOS_UNMAP'
 PUBLIC `__NEXTOS_IDE_DOS_MAPPING'
 PUBLIC `__NEXTOS_IDE_SNAPLOAD'
+
 PUBLIC `__NEXTOS_IDE_PATH'
+PUBLIC `__nextos_rc_path_change'
+PUBLIC `__nextos_rc_path_get'
+PUBLIC `__nextos_rc_path_make'
+PUBLIC `__nextos_rc_path_delete'
+
 PUBLIC `__NEXTOS_IDE_CAPACITY'
 PUBLIC `__NEXTOS_IDE_GET_LFN'
+
 PUBLIC `__NEXTOS_IDE_BROWSER'
+PUBLIC `__nextos_browsercaps_none'
+PUBLIC `__nextos_browsercaps_copy'
+PUBLIC `__nextos_browsercaps_rename'
+PUBLIC `__nextos_browsercaps_mkdir'
+PUBLIC `__nextos_browsercaps_erase'
+PUBLIC `__nextos_browsercaps_remount'
+PUBLIC `__nextos_browsercaps_syscfg'
+PUBLIC `__nextos_browsercaps_all'
 
 PUBLIC `__NEXTOS_IDE_STREAM_OPEN'
 PUBLIC `__NEXTOS_IDE_STREAM_CLOSE'
 PUBLIC `__NEXTOS_IDE_STREAM_IN'
 PUBLIC `__NEXTOS_IDE_STREAM_OUT'
 PUBLIC `__NEXTOS_IDE_STREAM_PTR'
+
 PUBLIC `__NEXTOS_IDE_BANK'
+PUBLIC `__nextos_rc_banktype_zx'
+PUBLIC `__nextos_rc_banktype_mmc'
+PUBLIC `__nextos_rc_bank_total'
+PUBLIC `__nextos_rc_bank_alloc'
+PUBLIC `__nextos_rc_bank_reserve'
+PUBLIC `__nextos_rc_bank_free'
+
 PUBLIC `__NEXTOS_IDE_BASIC'
 PUBLIC `__NEXTOS_IDE_STREAM_LINEIN'
 PUBLIC `__NEXTOS_IDE_WINDOW_STRING'
+PUBLIC `__NEXTOS_IDE_INTEGER_VAR'
+PUBLIC `__NEXTOS_IDE_RTC'
 
 PUBLIC `__NEXTOS_DOS_REF_XDPB'
 PUBLIC `__NEXTOS_DOS_MAP_B'
@@ -266,6 +363,48 @@ PUBLIC `__NEXTOS_IDE_PARTITION_READ'
 PUBLIC `__NEXTOS_IDE_PARTITION_OPEN'
 PUBLIC `__NEXTOS_IDE_PARTITION_CLOSE'
 PUBLIC `__NEXTOS_IDE_PARTITIONS'
+
+PUBLIC `__NEXTOS_DOTN_SP_DIVMMC'
+
+PUBLIC `__ESX_DISK_FILEMAP'
+PUBLIC `__ESX_DISK_STRMSTART'
+PUBLIC `__ESX_DISK_STRMEND'
+
+PUBLIC `__ESX_M_DOSVERSION'
+PUBLIC `__ESX_M_GETSETDRV'
+PUBLIC `__ESX_M_TAPEIN'
+PUBLIC `__ESX_M_TAPEOUT'
+PUBLIC `__ESX_M_GETHANDLE'
+PUBLIC `__ESX_M_GETDATE'
+PUBLIC `__ESX_M_EXECCMD'
+PUBLIC `__ESX_M_GETERR'
+PUBLIC `__ESX_M_P3DOS'
+PUBLIC `__ESX_M_ERRH'
+
+PUBLIC `__ESX_F_OPEN'
+PUBLIC `__ESX_F_CLOSE'
+PUBLIC `__ESX_F_SYNC'
+PUBLIC `__ESX_F_READ'
+PUBLIC `__ESX_F_WRITE'
+PUBLIC `__ESX_F_SEEK'
+PUBLIC `__ESX_F_FGETPOS'
+PUBLIC `__ESX_F_FSTAT'
+PUBLIC `__ESX_F_FTRUNCATE'
+PUBLIC `__ESX_F_OPENDIR'
+PUBLIC `__ESX_F_READDIR'
+PUBLIC `__ESX_F_TELLDIR'
+PUBLIC `__ESX_F_SEEKDIR'
+PUBLIC `__ESX_F_REWINDDIR'
+PUBLIC `__ESX_F_GETCWD'
+PUBLIC `__ESX_F_CHDIR'
+PUBLIC `__ESX_F_MKDIR'
+PUBLIC `__ESX_F_RMDIR'
+PUBLIC `__ESX_F_STAT'
+PUBLIC `__ESX_F_UNLINK'
+PUBLIC `__ESX_F_TRUNCATE'
+PUBLIC `__ESX_F_CHMOD'
+PUBLIC `__ESX_F_RENAME'
+PUBLIC `__ESX_F_GETFREE'
 
 PUBLIC `__NEXTOS_RC_READY'
 PUBLIC `__NEXTOS_RC_WP'
@@ -357,20 +496,45 @@ defc `__NEXTOS_IDE_DOS_MAP' = __NEXTOS_IDE_DOS_MAP
 defc `__NEXTOS_IDE_DOS_UNMAP' = __NEXTOS_IDE_DOS_UNMAP
 defc `__NEXTOS_IDE_DOS_MAPPING' = __NEXTOS_IDE_DOS_MAPPING
 defc `__NEXTOS_IDE_SNAPLOAD' = __NEXTOS_IDE_SNAPLOAD
+
 defc `__NEXTOS_IDE_PATH' = __NEXTOS_IDE_PATH
+defc `__nextos_rc_path_change' = __nextos_rc_path_change
+defc `__nextos_rc_path_get' = __nextos_rc_path_get
+defc `__nextos_rc_path_make' = __nextos_rc_path_make
+defc `__nextos_rc_path_delete' = __nextos_rc_path_delete
+
 defc `__NEXTOS_IDE_CAPACITY' = __NEXTOS_IDE_CAPACITY
 defc `__NEXTOS_IDE_GET_LFN' = __NEXTOS_IDE_GET_LFN
+
 defc `__NEXTOS_IDE_BROWSER' = __NEXTOS_IDE_BROWSER
+defc `__nextos_browsercaps_none' = __nextos_browsercaps_none
+defc `__nextos_browsercaps_copy' = __nextos_browsercaps_copy
+defc `__nextos_browsercaps_rename' = __nextos_browsercaps_rename
+defc `__nextos_browsercaps_mkdir' = __nextos_browsercaps_mkdir
+defc `__nextos_browsercaps_erase' = __nextos_browsercaps_erase
+defc `__nextos_browsercaps_remount' = __nextos_browsercaps_remount
+defc `__nextos_browsercaps_syscfg' = __nextos_browsercaps_syscfg
+defc `__nextos_browsercaps_all' = __nextos_browsercaps_all
 
 defc `__NEXTOS_IDE_STREAM_OPEN' = __NEXTOS_IDE_STREAM_OPEN
 defc `__NEXTOS_IDE_STREAM_CLOSE' = __NEXTOS_IDE_STREAM_CLOSE
 defc `__NEXTOS_IDE_STREAM_IN' = __NEXTOS_IDE_STREAM_IN
 defc `__NEXTOS_IDE_STREAM_OUT' = __NEXTOS_IDE_STREAM_OUT
 defc `__NEXTOS_IDE_STREAM_PTR' = __NEXTOS_IDE_STREAM_PTR
+
 defc `__NEXTOS_IDE_BANK' = __NEXTOS_IDE_BANK
+defc `__nextos_rc_banktype_zx' = __nextos_rc_banktype_zx
+defc `__nextos_rc_banktype_mmc' = __nextos_rc_banktype_mmc
+defc `__nextos_rc_bank_total' = __nextos_rc_bank_total
+defc `__nextos_rc_bank_alloc' = __nextos_rc_bank_alloc
+defc `__nextos_rc_bank_reserve' = __nextos_rc_bank_reserve
+defc `__nextos_rc_bank_free' = __nextos_rc_bank_free
+
 defc `__NEXTOS_IDE_BASIC' = __NEXTOS_IDE_BASIC
 defc `__NEXTOS_IDE_STREAM_LINEIN' = __NEXTOS_IDE_STREAM_LINEIN
 defc `__NEXTOS_IDE_WINDOW_STRING' = __NEXTOS_IDE_WINDOW_STRING
+defc `__NEXTOS_IDE_INTEGER_VAR' = __NEXTOS_IDE_INTEGER_VAR
+defc `__NEXTOS_IDE_RTC' = __NEXTOS_IDE_RTC
 
 defc `__NEXTOS_DOS_REF_XDPB' = __NEXTOS_DOS_REF_XDPB
 defc `__NEXTOS_DOS_MAP_B' = __NEXTOS_DOS_MAP_B
@@ -412,6 +576,48 @@ defc `__NEXTOS_IDE_PARTITION_READ' = __NEXTOS_IDE_PARTITION_READ
 defc `__NEXTOS_IDE_PARTITION_OPEN' = __NEXTOS_IDE_PARTITION_OPEN
 defc `__NEXTOS_IDE_PARTITION_CLOSE' = __NEXTOS_IDE_PARTITION_CLOSE
 defc `__NEXTOS_IDE_PARTITIONS' = __NEXTOS_IDE_PARTITIONS
+
+defc `__NEXTOS_DOTN_SP_DIVMMC' = __NEXTOS_DOTN_SP_DIVMMC
+
+defc `__ESX_DISK_FILEMAP' = __ESX_DISK_FILEMAP
+defc `__ESX_DISK_STRMSTART' = __ESX_DISK_STRMSTART
+defc `__ESX_DISK_STRMEND' = __ESX_DISK_STRMEND
+
+defc `__ESX_M_DOSVERSION' = __ESX_M_DOSVERSION
+defc `__ESX_M_GETSETDRV' = __ESX_M_GETSETDRV
+defc `__ESX_M_TAPEIN' = __ESX_M_TAPEIN
+defc `__ESX_M_TAPEOUT' = __ESX_M_TAPEOUT
+defc `__ESX_M_GETHANDLE' = __ESX_M_GETHANDLE
+defc `__ESX_M_GETDATE' = __ESX_M_GETDATE
+defc `__ESX_M_EXECCMD' = __ESX_M_EXECCMD
+defc `__ESX_M_GETERR' = __ESX_M_GETERR
+defc `__ESX_M_P3DOS' = __ESX_M_P3DOS
+defc `__ESX_M_ERRH' = __ESX_M_ERRH
+
+defc `__ESX_F_OPEN' = __ESX_F_OPEN
+defc `__ESX_F_CLOSE' = __ESX_F_CLOSE
+defc `__ESX_F_SYNC' = __ESX_F_SYNC
+defc `__ESX_F_READ' = __ESX_F_READ
+defc `__ESX_F_WRITE' = __ESX_F_WRITE
+defc `__ESX_F_SEEK' = __ESX_F_SEEK
+defc `__ESX_F_FGETPOS' = __ESX_F_FGETPOS
+defc `__ESX_F_FSTAT' = __ESX_F_FSTAT
+defc `__ESX_F_FTRUNCATE' = __ESX_F_FTRUNCATE
+defc `__ESX_F_OPENDIR' = __ESX_F_OPENDIR
+defc `__ESX_F_READDIR' = __ESX_F_READDIR
+defc `__ESX_F_TELLDIR' = __ESX_F_TELLDIR
+defc `__ESX_F_SEEKDIR' = __ESX_F_SEEKDIR
+defc `__ESX_F_REWINDDIR' = __ESX_F_REWINDDIR
+defc `__ESX_F_GETCWD' = __ESX_F_GETCWD
+defc `__ESX_F_CHDIR' = __ESX_F_CHDIR
+defc `__ESX_F_MKDIR' = __ESX_F_MKDIR
+defc `__ESX_F_RMDIR' = __ESX_F_RMDIR
+defc `__ESX_F_STAT' = __ESX_F_STAT
+defc `__ESX_F_UNLINK' = __ESX_F_UNLINK
+defc `__ESX_F_TRUNCATE' = __ESX_F_TRUNCATE
+defc `__ESX_F_CHMOD' = __ESX_F_CHMOD
+defc `__ESX_F_RENAME' = __ESX_F_RENAME
+defc `__ESX_F_GETFREE' = __ESX_F_GETFREE
 
 defc `__NEXTOS_RC_READY' = __NEXTOS_RC_READY
 defc `__NEXTOS_RC_WP' = __NEXTOS_RC_WP
@@ -503,20 +709,45 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_DOS_UNMAP'  __NEXTOS_IDE_DOS_UNMAP
 `#define' `__NEXTOS_IDE_DOS_MAPPING'  __NEXTOS_IDE_DOS_MAPPING
 `#define' `__NEXTOS_IDE_SNAPLOAD'  __NEXTOS_IDE_SNAPLOAD
+
 `#define' `__NEXTOS_IDE_PATH'  __NEXTOS_IDE_PATH
+`#define' `__nextos_rc_path_change'  __nextos_rc_path_change
+`#define' `__nextos_rc_path_get'  __nextos_rc_path_get
+`#define' `__nextos_rc_path_make'  __nextos_rc_path_make
+`#define' `__nextos_rc_path_delete'  __nextos_rc_path_delete
+
 `#define' `__NEXTOS_IDE_CAPACITY'  __NEXTOS_IDE_CAPACITY
 `#define' `__NEXTOS_IDE_GET_LFN'  __NEXTOS_IDE_GET_LFN
+
 `#define' `__NEXTOS_IDE_BROWSER'  __NEXTOS_IDE_BROWSER
+`#define' `__nextos_browsercaps_none'  __nextos_browsercaps_none
+`#define' `__nextos_browsercaps_copy'  __nextos_browsercaps_copy
+`#define' `__nextos_browsercaps_rename'  __nextos_browsercaps_rename
+`#define' `__nextos_browsercaps_mkdir'  __nextos_browsercaps_mkdir
+`#define' `__nextos_browsercaps_erase'  __nextos_browsercaps_erase
+`#define' `__nextos_browsercaps_remount'  __nextos_browsercaps_remount
+`#define' `__nextos_browsercaps_syscfg'  __nextos_browsercaps_syscfg
+`#define' `__nextos_browsercaps_all'  __nextos_browsercaps_all
 
 `#define' `__NEXTOS_IDE_STREAM_OPEN'  __NEXTOS_IDE_STREAM_OPEN
 `#define' `__NEXTOS_IDE_STREAM_CLOSE'  __NEXTOS_IDE_STREAM_CLOSE
 `#define' `__NEXTOS_IDE_STREAM_IN'  __NEXTOS_IDE_STREAM_IN
 `#define' `__NEXTOS_IDE_STREAM_OUT'  __NEXTOS_IDE_STREAM_OUT
 `#define' `__NEXTOS_IDE_STREAM_PTR'  __NEXTOS_IDE_STREAM_PTR
+
 `#define' `__NEXTOS_IDE_BANK'  __NEXTOS_IDE_BANK
+`#define' `__nextos_rc_banktype_zx'  __nextos_rc_banktype_zx
+`#define' `__nextos_rc_banktype_mmc'  __nextos_rc_banktype_mmc
+`#define' `__nextos_rc_bank_total'  __nextos_rc_bank_total
+`#define' `__nextos_rc_bank_alloc'  __nextos_rc_bank_alloc
+`#define' `__nextos_rc_bank_reserve'  __nextos_rc_bank_reserve
+`#define' `__nextos_rc_bank_free'  __nextos_rc_bank_free
+
 `#define' `__NEXTOS_IDE_BASIC'  __NEXTOS_IDE_BASIC
 `#define' `__NEXTOS_IDE_STREAM_LINEIN'  __NEXTOS_IDE_STREAM_LINEIN
 `#define' `__NEXTOS_IDE_WINDOW_STRING'  __NEXTOS_IDE_WINDOW_STRING
+`#define' `__NEXTOS_IDE_INTEGER_VAR'  __NEXTOS_IDE_INTEGER_VAR
+`#define' `__NEXTOS_IDE_RTC'  __NEXTOS_IDE_RTC
 
 `#define' `__NEXTOS_DOS_REF_XDPB'  __NEXTOS_DOS_REF_XDPB
 `#define' `__NEXTOS_DOS_MAP_B'  __NEXTOS_DOS_MAP_B
@@ -558,6 +789,48 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_PARTITION_OPEN'  __NEXTOS_IDE_PARTITION_OPEN
 `#define' `__NEXTOS_IDE_PARTITION_CLOSE'  __NEXTOS_IDE_PARTITION_CLOSE
 `#define' `__NEXTOS_IDE_PARTITIONS'  __NEXTOS_IDE_PARTITIONS
+
+`#define' `__NEXTOS_DOTN_SP_DIVMMC'  __NEXTOS_DOTN_SP_DIVMMC
+
+`#define' `__ESX_DISK_FILEMAP'  __ESX_DISK_FILEMAP
+`#define' `__ESX_DISK_STRMSTART'  __ESX_DISK_STRMSTART
+`#define' `__ESX_DISK_STRMEND'  __ESX_DISK_STRMEND
+
+`#define' `__ESX_M_DOSVERSION'  __ESX_M_DOSVERSION
+`#define' `__ESX_M_GETSETDRV'  __ESX_M_GETSETDRV
+`#define' `__ESX_M_TAPEIN'  __ESX_M_TAPEIN
+`#define' `__ESX_M_TAPEOUT'  __ESX_M_TAPEOUT
+`#define' `__ESX_M_GETHANDLE'  __ESX_M_GETHANDLE
+`#define' `__ESX_M_GETDATE'  __ESX_M_GETDATE
+`#define' `__ESX_M_EXECCMD'  __ESX_M_EXECCMD
+`#define' `__ESX_M_GETERR'  __ESX_M_GETERR
+`#define' `__ESX_M_P3DOS'  __ESX_M_P3DOS
+`#define' `__ESX_M_ERRH'  __ESX_M_ERRH
+
+`#define' `__ESX_F_OPEN'  __ESX_F_OPEN
+`#define' `__ESX_F_CLOSE'  __ESX_F_CLOSE
+`#define' `__ESX_F_SYNC'  __ESX_F_SYNC
+`#define' `__ESX_F_READ'  __ESX_F_READ
+`#define' `__ESX_F_WRITE'  __ESX_F_WRITE
+`#define' `__ESX_F_SEEK'  __ESX_F_SEEK
+`#define' `__ESX_F_FGETPOS'  __ESX_F_FGETPOS
+`#define' `__ESX_F_FSTAT'  __ESX_F_FSTAT
+`#define' `__ESX_F_FTRUNCATE'  __ESX_F_FTRUNCATE
+`#define' `__ESX_F_OPENDIR'  __ESX_F_OPENDIR
+`#define' `__ESX_F_READDIR'  __ESX_F_READDIR
+`#define' `__ESX_F_TELLDIR'  __ESX_F_TELLDIR
+`#define' `__ESX_F_SEEKDIR'  __ESX_F_SEEKDIR
+`#define' `__ESX_F_REWINDDIR'  __ESX_F_REWINDDIR
+`#define' `__ESX_F_GETCWD'  __ESX_F_GETCWD
+`#define' `__ESX_F_CHDIR'  __ESX_F_CHDIR
+`#define' `__ESX_F_MKDIR'  __ESX_F_MKDIR
+`#define' `__ESX_F_RMDIR'  __ESX_F_RMDIR
+`#define' `__ESX_F_STAT'  __ESX_F_STAT
+`#define' `__ESX_F_UNLINK'  __ESX_F_UNLINK
+`#define' `__ESX_F_TRUNCATE'  __ESX_F_TRUNCATE
+`#define' `__ESX_F_CHMOD'  __ESX_F_CHMOD
+`#define' `__ESX_F_RENAME'  __ESX_F_RENAME
+`#define' `__ESX_F_GETFREE'  __ESX_F_GETFREE
 
 `#define' `__NEXTOS_RC_READY'  __NEXTOS_RC_READY
 `#define' `__NEXTOS_RC_WP'  __NEXTOS_RC_WP

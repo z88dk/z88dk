@@ -14,7 +14,7 @@ $(OUTPUT_DIRECTORY)/flosdos.lib: $(OBJECTS) floslist
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/flosdos @floslist
 
 %.o: %.c
-	zcc +osca $(CFLAGS) $*.c
+	$(ZCC) +osca $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def

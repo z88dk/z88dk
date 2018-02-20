@@ -24,7 +24,7 @@ int writebyte(int handle, int byte)
 {
 	struct RND_FILE *myfile;
 	
-	myfile = (char *) handle;
+	myfile = (void *) handle;
 
 	if ( (myfile)->mode == O_RDONLY)
 			return (EOF);

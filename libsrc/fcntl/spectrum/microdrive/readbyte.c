@@ -24,7 +24,7 @@ int __FASTCALL__ readbyte(int handle)
 	int 	if1_filestatus;
 	//unsigned char	mychar;
 	
-	if1_file = (char *) handle;
+	if1_file = (void *) handle;
 	//printf ("-- reading '%s' - %u --",if1_getname( (char *) if1_file->hdname ), handle);
 
 	if ( (int) (if1_file->position / 512) > if1_file->record )

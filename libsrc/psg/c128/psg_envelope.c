@@ -11,7 +11,7 @@
 #include <psg.h>
 #include <c128/sid.h>
 
-void psg_envelope(unsigned char waveform, int period, unsigned char channels)
+void psg_envelope(unsigned int waveform, int period, unsigned int channels)
 {
 	// Voice, Attack, Decay, Sustain, Release
 	switch (waveform) {

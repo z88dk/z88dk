@@ -36,4 +36,7 @@ graphics/w_undrawto
 graphics/w_undrawr
 graphics/w_unplot
 graphics/w_setxy
+graphics/w_move
+graphics/pen_up
+graphics/pen_down
 graphics/w_xorplot

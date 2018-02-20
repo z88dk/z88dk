@@ -19,15 +19,19 @@
 
 .fgetc_cons
 ._fgetc_cons
-		call	$016C
-		
+	xor	a
+	call	$0166	;flush keyboard buffer
+loop:
+	call	$016C
+	and	a
+	jr	z,loop
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
 	ld	a,10
 .not_return
 ENDIF
-		ld	h,0
-		ld	l,a
+	ld	h,0
+	ld	l,a
 
-		ret
+	ret

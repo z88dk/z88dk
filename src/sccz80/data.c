@@ -87,10 +87,6 @@ SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
 
 
 
-char endasm;
-
-
-
 /*
  * Variable for the offset to a shared library routine
  */

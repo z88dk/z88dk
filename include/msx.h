@@ -31,16 +31,6 @@ extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
 
 // Video modes for set_mode
 
-#ifdef __SVI__
-#define vmode_defined 1
-enum video_mode {
-	mode_0 = 0x47,	// INITXT
-	mode_1 = 0,		// patched code for INIT32
-	mode_2 = 0x4A,	// INIGRP
-	mode_3 = 0x4D	// INIMLT
-};
-#endif
-
 #ifdef __MSX__
 #define vmode_defined 1
 enum video_mode {
@@ -48,6 +38,26 @@ enum video_mode {
 	mode_1 = 0x6F,	// INIT32
 	mode_2 = 0x72,	// INIGRP
 	mode_3 = 0x75	// INIMLT
+};
+#endif
+
+#ifdef __SC3000__
+#define vmode_defined 1
+enum video_mode {
+	mode_0 = 0x39E5,    // INITXT
+	mode_1 = 0,         // patched code for INIT32
+	mode_2 = 0x39E2,   // INIGRP
+	mode_3 = 0x39E2    // INIMLT
+};
+#endif
+
+#ifdef __SVI__
+#define vmode_defined 1
+enum video_mode {
+	mode_0 = 0x47,	// INITXT
+	mode_1 = 0,		// patched code for INIT32
+	mode_2 = 0x4A,	// INIGRP
+	mode_3 = 0x4D	// INIMLT
 };
 #endif
 
@@ -154,22 +164,25 @@ extern void __LIB__ msx_noblank();
 extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
 
 #define INK_TRANSPARENT    0x00
+#undef INK_BLACK
 #define INK_BLACK          0x01
 #define INK_MEDIUM_GREEN   0x02
 #define INK_LIGHT_GREEN    0x03
 #define INK_DARK_BLUE      0x04
 #define INK_LIGHT_BLUE     0x05
 #define INK_DARK_RED       0x06
+#undef INK_CYAN
 #define INK_CYAN           0x07
 #define INK_MEDIUM_RED     0x08
 #define INK_LIGHT_RED      0x09
 #define INK_DARK_YELLOW    0x0A
 #define INK_LIGHT_YELLOW   0x0B
 #define INK_DARK_GREEN     0x0C
+#undef INK_MAGENTA
 #define INK_MAGENTA        0x0D
 #define INK_GRAY           0x0E
+#undef INK_WHITE
 #define INK_WHITE          0x0F
-
 
 /************************************************************************/
 /**********  Moved here from its original location in 'defs.h' **********/

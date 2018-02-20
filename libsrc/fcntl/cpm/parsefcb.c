@@ -125,7 +125,7 @@ setfc0:
 	;;LD 	c,gsuser  ;else get current effective user number
 	ld	c,32
 	LD 	e,0ffh
-	call	bdos	;get current user area if implemented
+	call	5	;get current user area if implemented
 
 
 	pop	DE	;restore text pointer

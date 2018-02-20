@@ -18,6 +18,7 @@ use v5.10;
 #	%s	signed byte
 #	%n	unsigned byte
 #	%m	unsigned word
+#	%M	unsigned word, big-endian
 #	%j	jr offset
 #	%c	constant (im, bit, rst, ...)
 #	%d	signed register indirect offset
@@ -567,7 +568,7 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "mmu$page a",	0xED, 0x92, 0x50+$page);
 		}
 
-		add_opc($cpu, "push %m",	 	0xED, 0x8A, '%m', '%m');
+		add_opc($cpu, "push %M",	 	0xED, 0x8A, '%M', '%M');
 
 		add_opc($cpu, "outinb",			0xED, 0x90);
 		
@@ -822,7 +823,7 @@ sub parser_tokens {
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nm] \)	/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[du]		/gcx) { push @tokens, "expr"; }
-		elsif (/\G    %[snmj]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G    %[snmMj]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
 		elsif (/\G    (\w+)		/gcx) { push @tokens, "_TK_".uc($1); }
@@ -921,6 +922,9 @@ sub parse_code {
 	}
 	elsif ($bin =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
+	}
+	elsif ($bin =~ s/ %M %M$//) {
+		$stmt = "DO_stmt_NN";
 	}
 	elsif ($bin =~ s/ %j$//) {
 		$stmt = "DO_stmt_jr";
@@ -1100,6 +1104,11 @@ sub add_tests {
 		add_tests($cpu, replace($asm, '%m', 65535), replace($bin, '%m %m', 0xFF." ".0xFF));
 		add_tests($cpu, replace($asm, '%m', 32767), replace($bin, '%m %m', 0xFF." ".0x7F));
 		add_tests($cpu, replace($asm, '%m',-32768), replace($bin, '%m %m', 0x00." ".0x80));
+	}
+	elsif ($asm =~ /%M/) {
+		add_tests($cpu, replace($asm, '%M', 65535), replace($bin, '%M %M', 0xFF." ".0xFF));
+		add_tests($cpu, replace($asm, '%M', 32767), replace($bin, '%M %M', 0x7F." ".0xFF));
+		add_tests($cpu, replace($asm, '%M',-32768), replace($bin, '%M %M', 0x80." ".0x00));
 	}
 	elsif ($asm =~ /%j/) {
 		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));

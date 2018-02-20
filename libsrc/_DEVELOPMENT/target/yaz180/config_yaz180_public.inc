@@ -70,13 +70,13 @@ defc __IO_BASE_ADDRESS = 0x0
 
 defc __COMMON_AREA_1_BASE = 0xf000
 defc __COMMON_AREA_1_PHASE_DATA = 0xf000
-defc __COMMON_AREA_1_PHASE_DRIVER = 0xf700
+defc __COMMON_AREA_1_PHASE_DRIVER = 0xf600
 
 defc __ASCI0_RX_SIZE = 0x100
-defc __ASCI0_TX_SIZE = 0x100
+defc __ASCI0_TX_SIZE = 0x080
 
 defc __ASCI1_RX_SIZE = 0x100
-defc __ASCI1_TX_SIZE = 0x100
+defc __ASCI1_TX_SIZE = 0x080
 
 defc __IO_BREAK = 0x2000
 
@@ -1015,6 +1015,7 @@ PUBLIC __EBDFD
 PUBLIC __EDOM
 PUBLIC __EFBIG
 PUBLIC __EINVAL
+PUBLIC __EIO
 PUBLIC __EMFILE
 PUBLIC __ENFILE
 PUBLIC __ENOLCK
@@ -1144,16 +1145,17 @@ defc __EBDFD = 3
 defc __EDOM = 4
 defc __EFBIG = 5
 defc __EINVAL = 6
-defc __EMFILE = 7
-defc __ENFILE = 8
-defc __ENOLCK = 9
-defc __ENOMEM = 10
-defc __ENOTSUP = 11
-defc __EOVERFLOW = 12
-defc __ERANGE = 13
-defc __ESTAT = 14
-defc __EAGAIN = 15
-defc __EWOULDBLOCK = 15
+defc __EIO = 7
+defc __EMFILE = 8
+defc __ENFILE = 9
+defc __ENOLCK = 10
+defc __ENOMEM = 11
+defc __ENOTSUP = 12
+defc __EOVERFLOW = 13
+defc __ERANGE = 14
+defc __ESTAT = 15
+defc __EAGAIN = 16
+defc __EWOULDBLOCK = 16
 
 defc __ERROR_NEXT = 50
 

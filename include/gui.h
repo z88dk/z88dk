@@ -28,9 +28,9 @@ struct gui_win {
 };
 
 
-extern void __LIB__ win_open(struct gui_win win);
-extern void __LIB__ win_close(struct gui_win win);
-extern void __LIB__ win_move(int x, int y, struct gui_win win);
+extern void __LIB__ win_open(struct gui_win *win);
+extern void __LIB__ win_close(struct gui_win *win);
+extern void __LIB__ win_move(int x, int y, struct gui_win *win);
 
 
 #endif

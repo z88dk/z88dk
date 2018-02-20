@@ -9,9 +9,9 @@
 #include <X11/Xlib.h>
 #include <graphics.h>
 
-void XClearWindow(Display *display, Drawable win, GC gc, int x, int y, int width, int height, Bool exposures) {
+void XClearWindow(Display *display, Drawable win, GC *gc, int x, int y, int width, int height, Bool exposures) {
 	struct _XWIN *mywin;
-	mywin = (char *) win;
+	mywin = (void *) win;
 
 // If "exposures" is set, an Expose event should be generated
 	clga(mywin->a_x+x,mywin->a_y+y,width,height);

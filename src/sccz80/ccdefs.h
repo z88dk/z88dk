@@ -85,6 +85,7 @@ extern Type      *find_tag(const char *name);
 extern Type      *find_tag_field(Type *tag, const char *fieldname);
 extern Type      *parse_expr_type();
 extern Type      *default_function(const char *name);
+extern Type      *default_function_with_type(const char *name, Type *return_type);
 extern Type     *asm_function(const char *name);
 extern Type      *make_pointer(Type *base_type);
 extern Type      *dodeclare(enum storage_type storage);
@@ -101,9 +102,10 @@ extern void       multidef(const char *sname);
 extern void       needtoken(char *str);
 extern void       needchar(char c);
 extern void       needlval(void);
-extern void       warningfmt(const char *fmt, ...);
+extern void       warningfmt(const char *category,const char *fmt, ...);
 extern void       debug(int num,char *str,...);
 extern void       errorfmt(const char *fmt, int fatal, ...);
+extern void       parse_warning_option(const char *value);
 
 /* expr.c */
 extern Kind       expression(int *con, double *val, Type **type);

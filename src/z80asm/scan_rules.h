@@ -5901,15 +5901,23 @@ _eof_trans:
 	break;
 	case 45:
 	{{p = ((te))-1;}
-	sym.tok = TK_LZ;
-	;
+	if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {
+		sym.tok = TK_LZ;
+	}
+	else {
+		sym.tok = TK_NAME;
+	}
 	{p++; goto _out; }
 }
 	break;
 	case 46:
 	{{p = ((te))-1;}
-	sym.tok = TK_LO;
-	;
+	if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {
+		sym.tok = TK_LO;
+	}
+	else {
+		sym.tok = TK_NAME;
+	}
 	{p++; goto _out; }
 }
 	break;

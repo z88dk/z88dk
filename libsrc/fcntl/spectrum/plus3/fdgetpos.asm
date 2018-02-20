@@ -12,7 +12,7 @@
 		PUBLIC	fdgetpos
       PUBLIC   _fdgetpos
 
-		INCLUDE "p3dos.def"
+		INCLUDE "target/zx/def/p3dos.def"
 
 		EXTERN	l_plong
 
@@ -30,13 +30,17 @@
 	ld	b,c
 	push	de	;save store location
 	ld	iy,DOS_GET_POSITION
+	push	ix
 	call	dodos
+	pop	ix
 	pop	bc	;get store location back
 	jr	nc,fdgetpos_store
 	ld	hl,-1
 	ret
 .fdgetpos_store
+IF !idedos
 	ld	d,0	;clear upper byte
+ENDIF
 	call	l_plong
 	ld	hl,0
 	ret

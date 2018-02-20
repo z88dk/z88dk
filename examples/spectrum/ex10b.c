@@ -27,7 +27,7 @@ Contact the author:
 
 	unsigned char stencil[192*2];
 
-main() {
+void main() {
 	int c, l;
 	unsigned char i;
 	unsigned int dly;

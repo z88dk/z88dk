@@ -9,5 +9,5 @@
 #include <X11/Xlib.h>
 
 
-void XSetForeground(Display *display, GC gc, int color) {
+void XSetForeground(Display *display, GC *gc, int color) {
 }

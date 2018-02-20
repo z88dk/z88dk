@@ -42,21 +42,6 @@
 #include <ace.h>
 #endif
 
-#ifdef SPECTRUM
-#define KEY_DEL 12
-#endif
-
-#ifdef CPC
-#define KEY_DEL 12
-#endif
-
-#ifdef Z88
-#define KEY_DEL 127
-#endif
-
-#ifndef KEY_DEL
-#define KEY_DEL '\b'
-#endif
 
 #ifndef getkey
 #include <conio.h>
@@ -2845,20 +2830,7 @@ LCASS_1	ld      hl,LCASS_M
 
 char i_GetCh()
 {
-	int ch;
-	
-	do
-	{
-		ch = getkey();
-	} while ((ch != '\n') && (ch != '\r') && (ch != KEY_DEL ) && !(ch >= ' ' && ch <= '~'));
-
-	if (ch == '\r')
-		ch = '\n';
-
-	if (ch >= 'a' && ch <= 'z')
-		ch ^= 0x20;
-	
-	return (char) ch;
+        return toupper(fgetc(stdin));
 }
 
 /***
@@ -2897,40 +2869,8 @@ ZX_END2	xor     a
 
 void GetLine()
 {
-	int nPos = 0;
-	char ch = 0;
-
-	while (ch != '\n')
-	{
-		chaEditLine[nPos] = 0;
-		ch = i_GetCh();
-
-		if (ch == KEY_DEL )		/* delete */
-		{
-			if (nPos != 0)
-			{
-				--nPos;
-				i_PutCh(8);
-				i_PutCh(' ');
-				i_PutCh(8);
-			}
-		}
-		else if (ch != '\n')
-		{
-			if (nPos == MAX_COL)
-			{
-				i_PutCh(' ');
-				i_PutCh(8);
-			}
-			else
-			{
-				i_PutCh(ch);
-				chaEditLine[nPos++] = ch;
-			}
-		}
-	}
-
-	i_PutCh('\n');
+        fgets(chaEditLine, MAX_COL, stdin);
+        strupr(chaEditLine);
 }
 
 	

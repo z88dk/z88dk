@@ -15,7 +15,7 @@ int close(int handle)
 {
 	struct RND_FILE *myfile;
 
-	myfile = (char *) handle;
+	myfile = (void *) handle;
 	//if (!(myfile)->blockptr) return -1;
 
 	if ((myfile)->mode!=O_RDONLY) {

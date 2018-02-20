@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-//#include <oz.h>
+#include <oz.h>
 
 #define isleap(yr) ( yr % 400 == 0 || (yr % 4 == 0 && yr % 100 != 0) )
 
@@ -38,12 +38,12 @@ static unsigned long time0(void)
 
 
 
-long oztime(void)
+unsigned long oztime(void)
 {
     static unsigned long t0;
     t0=time0(); 
     if(t0!=time0()) return time0();
         // watch out for carry problems on tc8521
-    else return t0;
+    return t0;
 }
 

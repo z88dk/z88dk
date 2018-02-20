@@ -20,10 +20,10 @@ $(OUTPUT_DIRECTORY)/z88_math.lib: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88_math @z88list
 
 %.o: %.c
-	zcc +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
+	$(ZCC) +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
 
 %.o: %.asm
-	zcc +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
+	$(ZCC) +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
 
 
 clean:

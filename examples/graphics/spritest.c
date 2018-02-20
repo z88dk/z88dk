@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <games.h>
 #include <ctype.h>
+//#include <graphics.h>
 
 char bullet[] = 
 	{ 11,3,
@@ -90,6 +91,7 @@ extern char arrow_bk[];
 ._arrow_bk
  defb	8,8
  defw	0
+ defw	0   ; <- extra word used to store coordinates in "wide rez" mode
  defb	0,0,0,0,0,0,0,0
  defb	0,0,0,0,0,0,0,0
 
@@ -103,6 +105,7 @@ int flag=1;
 int speed=1;
 char *ptr;
 
+  //clg();
   //printf("%c",12);		//clear screen
   for (x=10; x<39; x=x+3)	//put some trash on screen
   {

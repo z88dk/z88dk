@@ -33,7 +33,9 @@ IF __CRTCFG = 0
    defc TAR__crt_include_preamble      = 0
 
    defc TAR__crt_org_vector_table      = 0
+
    defc TAR__crt_interrupt_mode        = -1
+   defc TAR__crt_interrupt_mode_exit   = 1
    
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
@@ -80,7 +82,9 @@ IF __CRTCFG = 2
    defc TAR__crt_include_preamble      = 0
 
    defc TAR__crt_org_vector_table      = 0
+
    defc TAR__crt_interrupt_mode        = -1
+   defc TAR__crt_interrupt_mode_exit   = -1
    
    defc TAR__crt_enable_commandline    = 3
    defc TAR__crt_enable_restart        = 0
@@ -98,6 +102,55 @@ IF __CRTCFG = 2
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = 0
+   defc TAR__clib_stdio_heap_size      = 0
+   
+   defc TAR__clib_balloc_table_size    = 0
+   
+   defc TAR__clib_fopen_max            = 0
+   defc TAR__clib_open_max             = 0
+
+ENDIF
+
+IF __CRTCFG = 3
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; nextos dot command ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   defc TAR__crt_org_code              = 0x2000   ;; must be 0x2000
+   defc TAR__crt_org_data              = 0
+   defc TAR__crt_org_bss               = 0
+
+   defc TAR__crt_model                 = 0        ;; ram model only
+   
+   defc TAR__register_sp               = -1       ;; SP will point at stack in BSS
+   defc TAR__crt_stack_size            = 384      ;; stack of this size is created in BSS
+   
+   defc TAR__crt_initialize_bss        = 0
+   
+   defc TAR__crt_include_preamble      = 0
+
+   defc TAR__crt_org_vector_table      = 0
+
+   defc TAR__crt_interrupt_mode        = -1
+   defc TAR__crt_interrupt_mode_exit   = 1
+   
+   defc TAR__crt_enable_commandline    = 3
+   defc TAR__crt_enable_restart        = 0        ;; ignored, always returns to basic
+   defc TAR__crt_enable_close          = 1
+   
+   defc TAR__crt_enable_eidi           = 0        ;; only enable on start has effect
+   defc TAR__crt_on_exit               = 0x30002  ;; ignored, always returns to basic
+   
+   defc TAR__crt_enable_rst            = 0        ;; N/A
+   defc TAR__crt_enable_nmi            = 0        ;; N/A
+   
+   ; clib defaults
+   
+   defc TAR__clib_exit_stack_size      = 0
+   defc TAR__clib_quickexit_stack_size = 0
+   
+   defc TAR__clib_malloc_heap_size     = 0        ;; -1 cannot be used
    defc TAR__clib_stdio_heap_size      = 0
    
    defc TAR__clib_balloc_table_size    = 0

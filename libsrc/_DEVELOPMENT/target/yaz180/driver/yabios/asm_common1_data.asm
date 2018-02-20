@@ -7,9 +7,12 @@ INCLUDE "config_private.inc"
 
 PUBLIC  _bios_sp
 
+IF __register_sp
 EXTERN  __register_sp
-
-defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here when other banks running
+defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here, when other banks running
+ELSE
+defc    _bios_sp    =   $FFDE           ; or here if __register_sp is undefined
+ENDIF
 
 ; start of the Transitory Program Area (TPA) Control Block (TCB)
 ; for BANK1 through BANK12
@@ -30,20 +33,19 @@ SECTION rodata_common1_data
 
 PHASE   __COMMON_AREA_1_PHASE_DATA
 
-PUBLIC APUCMDBuf, APUDATABuf
+PUBLIC APUCMDBuf, APUDataBuf
 
 APUCMDBuf:      defs    __APU_CMD_SIZE
-APUDATABuf:     defs    __APU_DATA_SIZE
+APUDataBuf:     defs    __APU_DATA_SIZE
 
-PUBLIC asci0RxBuffer, asci0TxBuffer
+PUBLIC asci0RxBuffer, asci1RxBuffer
 
 asci0RxBuffer:  defs    __ASCI0_RX_SIZE ; Space for the Rx0 Buffer
-asci0TxBuffer:  defs    __ASCI0_TX_SIZE ; Space for the Tx0 Buffer
-
-PUBLIC asci1RxBuffer, asci1TxBuffer
-
 asci1RxBuffer:  defs    __ASCI1_RX_SIZE ; Space for the Rx1 Buffer
-asci1TxBuffer:  defs    __ASCI1_TX_SIZE ; Space for the Tx1 Buffer
+
+PUBLIC asciTxBuffer
+
+asciTxBuffer:   defs    __ASCI0_TX_SIZE+__ASCI1_TX_SIZE ; Space for the Tx0 & Tx1 Buffer
 
 ; optionally, pad to next 256 byte boundary
 
@@ -79,18 +81,24 @@ PUBLIC __system_time_fraction, __system_time
 __system_time_fraction: defb    0       ; uint8_t (1/256) fractional time
 __system_time:          defs    4       ; uint32_t time_t
 
-PUBLIC APUCMDInPtr, APUCMDOutPtr, APUDATAInPtr, APUDATAOutPtr
-PUBLIC APUCMDBufUsed, APUDATABufUsed, APUStatus, APUError, _APULock
+PUBLIC APUCMDInPtr, APUCMDOutPtr
+PUBLIC APUDataEntInPtr, APUDataEntOutPtr
+PUBLIC APUDataRemInPtr, APUDataRemOutPtr
+PUBLIC APUCMDBufUsed, APUDataEntBufUsed, APUDataRemBufUsed
+PUBLIC APUStatus, APUError, _APULock
 
-APUCMDInPtr:    defw    APUCMDBuf
-APUCMDOutPtr:   defw    APUCMDBuf
-APUDATAInPtr:   defw    APUDATABuf
-APUDATAOutPtr:  defw    APUDATABuf
-APUCMDBufUsed:  defb    0
-APUDATABufUsed: defb    0
-APUStatus:      defb    0
-APUError:       defb    0
-_APULock:       defb    $FE             ; mutex for APU
+APUCMDInPtr:            defw    APUCMDBuf
+APUCMDOutPtr:           defw    APUCMDBuf
+APUDataEntInPtr:        defw    APUDataBuf      ; even bytes are to load
+APUDataEntOutPtr:       defw    APUDataBuf
+APUDataRemInPtr:        defw    APUDataBuf+1    ; interleaved odd bytes to unload
+APUDataRemOutPtr:       defw    APUDataBuf+1
+APUCMDBufUsed:          defb    0
+APUDataEntBufUsed:      defb    0
+APUDataRemBufUsed:      defb    0
+APUStatus:              defb    0
+APUError:               defb    0
+_APULock:               defb    $FE             ; mutex for APU
 
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, _asci0RxLock
 
@@ -102,8 +110,8 @@ _asci0RxLock:   defb    $FE             ; mutex for Rx0
 PUBLIC asci0TxCount, asci0TxIn, asci0TxOut, _asci0TxLock
 
 asci0TxCount:   defb    0               ; Space for Tx Buffer Management
-asci0TxIn:      defw    asci0TxBuffer   ; non-zero item since it's initialized anyway
-asci0TxOut:     defw    asci0TxBuffer   ; non-zero item since it's initialized anyway
+asci0TxIn:      defw    asciTxBuffer    ; non-zero item since it's initialized anyway
+asci0TxOut:     defw    asciTxBuffer    ; non-zero item since it's initialized anyway
 _asci0TxLock:   defb    $FE             ; mutex for Tx0
 
 PUBLIC asci1RxCount, asci1RxIn, asci1RxOut, _asci1RxLock
@@ -116,13 +124,22 @@ _asci1RxLock:   defb    $FE             ; mutex for Rx1
 PUBLIC asci1TxCount, asci1TxIn, asci1TxOut, _asci1TxLock
 
 asci1TxCount:   defb    0               ; Space for Tx Buffer Management
-asci1TxIn:      defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
-asci1TxOut:     defw    asci1TxBuffer   ; non-zero item since it's initialized anyway
+asci1TxIn:      defw    asciTxBuffer+1  ; non-zero item since it's initialized anyway
+asci1TxOut:     defw    asciTxBuffer+1  ; non-zero item since it's initialized anyway
 _asci1TxLock:   defb    $FE             ; mutex for Tx1
+
+PUBLIC ideStatus, _ideLock
+
+; IDE Status byte
+; set bit 0 : User selects master (0) or slave (1) drive
+; bit 1 : Flag 0 = master not previously accessed 
+; bit 2 : Flag 0 = slave not previously accessed
+ideStatus:      defb    0
+_ideLock:       defb    $FE             ; mutex for IDE drive
 
 PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
-initString:     defm    CHAR_CR,CHAR_LF,"HexLoadr: ",CHAR_CR,CHAR_LF,0
+initString:     defm    CHAR_CR,CHAR_LF,"LoadHex: ",0
 invalidTypeStr: defm    CHAR_CR,CHAR_LF,"Invalid Type",CHAR_CR,CHAR_LF,0
 badCheckSumStr: defm    CHAR_CR,CHAR_LF,"Checksum Error",CHAR_CR,CHAR_LF,0
 LoadOKStr:      defm    CHAR_CR,CHAR_LF,"Done",CHAR_CR,CHAR_LF,0

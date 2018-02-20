@@ -10,7 +10,7 @@ OBJECTS = $(CFILES:.c=.o)
 nc_fcntl: $(OBJECTS)
 
 .c.o:
-	zcc +nc $(CFLAGS) $*.c
+	$(ZCC) +nc $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.i $(AFILES)

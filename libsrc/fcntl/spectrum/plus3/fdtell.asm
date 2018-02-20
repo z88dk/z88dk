@@ -11,7 +11,7 @@
 		PUBLIC	fdtell
       PUBLIC   _fdtell
 
-	        INCLUDE "p3dos.def"
+	        INCLUDE "target/zx/def/p3dos.def"
 
 		EXTERN	dodos
 
@@ -26,7 +26,9 @@
 	ld	iy,DOS_GET_POSITION	;corrupts ix
 	call	dodos
 	pop	ix
+IF !idedos
 	ld	d,0
+ENDIF
 	ret	c
 	ld	hl,-1
 	ld	d,h

@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <flos.h>
 
+#undef mkdir
 
 extern int __FASTCALL__ mkdir(char *dirname)
 {

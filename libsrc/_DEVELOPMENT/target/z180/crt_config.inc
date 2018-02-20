@@ -34,7 +34,9 @@ IF __CRTCFG = 0
 
    defc TAR__crt_org_vector_table      = -0x80
    defc TAR__crt_io_vector_base        = -1
+
    defc TAR__crt_interrupt_mode        = 1
+   defc TAR__crt_interrupt_mode_exit   = -1
    
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
@@ -83,7 +85,9 @@ IF __CRTCFG = 1
 
    defc TAR__crt_org_vector_table      = -0x80
    defc TAR__crt_io_vector_base        = -1
+
    defc TAR__crt_interrupt_mode        = 1
+   defc TAR__crt_interrupt_mode_exit   = -1
    
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
@@ -132,7 +136,9 @@ IF __CRTCFG = 2
 
    defc TAR__crt_org_vector_table      = -0x80
    defc TAR__crt_io_vector_base        = -1
+
    defc TAR__crt_interrupt_mode        = 1
+   defc TAR__crt_interrupt_mode_exit   = -1
    
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0

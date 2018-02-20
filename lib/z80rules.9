@@ -95,6 +95,10 @@
 =
 	halt
 
+	call	_intrinsic_label_%1
+=
+%1:
+
 	call	_intrinsic_load16_%1
 =
 	ld	hl,(%1)

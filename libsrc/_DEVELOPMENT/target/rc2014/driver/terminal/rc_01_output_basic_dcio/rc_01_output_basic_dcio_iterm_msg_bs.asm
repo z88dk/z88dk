@@ -18,5 +18,4 @@ rc_01_output_basic_dcio_iterm_msg_bs:
 backspace:
 
    ld a,CHAR_BS
-   rst 0x08
-   ret
+   jp 0x08

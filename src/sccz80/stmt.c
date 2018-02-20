@@ -208,7 +208,7 @@ int statement()
 void ns()
 {
     if (cmatch(';') == 0)
-        warningfmt("Expected ';'");
+        errorfmt("Expected ';'",1);
 }
 
 /*
@@ -492,7 +492,7 @@ void docase()
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
     if ( valtype == KIND_DOUBLE ) 
-        warningfmt("Unexpected floating point encountered, taking int value");
+        warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');
     ++swnext;
@@ -695,28 +695,28 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    endasm = cmode = 0; /* mark mode as "asm" */
+    cmode = 0; /* mark mode as "asm" */
 
 #ifdef INBUILT_OPTIMIZER
     generate(); /* Dump queued stuff to be opt'd */
 #endif
-
     while (1) {
         preprocess(); /* get and print lines */
-        if (endasm || match("#endasm") || eof) {
+        if (match("#endasm") || eof) {
             break;
         }
         outfmt("%s\n",line);
     }
     clear(); /* invalidate line */
     if (eof)
-        warningfmt("Unterminated assembler code");
+        errorfmt("Unterminated assembler code",1);
     cmode = 1; /* then back to parse level */
 }
 
 /* #pragma statement */
 void dopragma()
 {
+    blanks();
     if (amatch("proto"))
         addmac();
     else if (amatch("set"))
@@ -725,12 +725,8 @@ void dopragma()
         delmac();
     else if (amatch("unset"))
         delmac();
-    else if (amatch("asm"))
-        doasm();
-    else if (amatch("endasm"))
-        endasm = 1;
     else {
-        warningfmt("Unknown #pragma directive");
+        warningfmt("unknown-pragmas","Unknown #pragma directive");
         clear();
     }
 }

@@ -1,6 +1,7 @@
 SUBDIRS = flos flosmulti
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
+include ../../Make.config
      
 .PHONY: subdirs $(SUBDIRS) $(CLEANDIRS)
      

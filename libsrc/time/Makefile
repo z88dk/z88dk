@@ -12,17 +12,17 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 z88/%.o: z88/%.c
-	cd $(<D) ; zcc +z88 $(CFLAGS) $(<F) -o $(@F)
+	@$(ZCC) +z88 $(CFLAGS) $^ -o $@
 
 sprinter/%.o: sprinter/%.c
-	cd $(<D) ; zcc +test $(CFLAGS) $(<F) -o $(@F)
+	@$(ZCC) +pps $(CFLAGS) $^ -o $@
 
 x1/%.o: x1/%.c
-	cd $(<D) ; zcc +test $(CFLAGS) $(<F) -o $(@F)
+	@$(ZCC) +x1 $(CFLAGS) $^ -o $@
 
 %.o: %.c
-	zcc +test $(CFLAGS) $^ -o $@
+	$(ZCC) +test $(CFLAGS) $^ -o $@
 
 clean:
-	$(RM) *.o zcc_opt.def
-	$(RM) */*.o */zcc_opt.def
+	@$(RM) *.o zcc_opt.def
+	@$(RM) */*.o */zcc_opt.def

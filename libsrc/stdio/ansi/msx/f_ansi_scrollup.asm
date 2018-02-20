@@ -16,11 +16,11 @@
 	
 IF FORmsx
 		EXTERN     msxbios
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 ELSE
 IF FORsvi
 		EXTERN     msxbios
-        INCLUDE "svibios.def"
+        INCLUDE "target/svi/def/svibios.def"
 ENDIF
 ENDIF
 

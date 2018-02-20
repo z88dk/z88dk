@@ -1176,7 +1176,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
 
     // Remove the UNASSIGNED section
 
-    if (mb_remove_section(memory, "UNASSIGNED"))
+    if (mb_remove_section(memory, "UNASSIGNED", 0))
         printf("Warning: Non-empty UNASSIGNED section ignored -\n  this indicates that some code/data is not part of the memory map\n");
 }
 
@@ -1256,6 +1256,27 @@ int mb_remove_bank(struct bank_space *bs, unsigned int index, int clean)
     return 0;
 }
 
+void mb_remove_mainbank(struct memory_bank *mb, int clean)
+{
+    int i;
+
+    for (i = 0; i < mb->num; ++i)
+    {
+        struct section_bin *sb = &mb->secbin[i];
+
+        if (clean)
+            remove(sb->filename);
+
+        free(sb->filename);
+        free(sb->section_name);
+    }
+
+    free(mb->secbin);
+
+    mb->num = 0;
+    mb->secbin = NULL;
+}
+
 int mb_find_section(struct banked_memory *memory, char *section_name, struct memory_bank **mb_r, int *secnum_r)
 {
     // find the given section, return in mb_r & secnum_r
@@ -1308,7 +1329,7 @@ int mb_find_section(struct banked_memory *memory, char *section_name, struct mem
     return 0;
 }
 
-int mb_remove_section(struct banked_memory *memory, char *section_name)
+int mb_remove_section(struct banked_memory *memory, char *section_name, int clean)
 {
     // remove a particular section from the bank enumeration
 
@@ -1319,6 +1340,8 @@ int mb_remove_section(struct banked_memory *memory, char *section_name)
     {
         // section has been found
         // free allocated memory, remove it from the section array
+
+        if (clean) remove(mb->secbin[secnum].filename);
 
         free(mb->secbin[secnum].filename);
         free(mb->secbin[secnum].section_name);
@@ -1649,6 +1672,32 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
             }
         }
     }
+}
+
+int mb_output_section_binary(FILE *fbout, struct section_bin *sb)
+{
+    FILE *fin;
+    int   c;
+    int   size;
+
+    // open section binary file
+
+    if ((fin = fopen(sb->filename, "rb")) == NULL)
+        return -1;
+
+    if (fseek(fin, sb->offset, SEEK_SET) != 0)
+    {
+        fclose(fin);
+        return -2;
+    }
+
+    // add section binary to output file
+
+    for (size = sb->size; size && ((c = fgetc(fin)) != EOF); --size)
+        fputc(c, fbout);
+
+    fclose(fin);
+    return size;
 }
 
 void mb_delete_source_binaries(struct banked_memory *memory)

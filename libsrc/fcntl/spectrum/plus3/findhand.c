@@ -11,6 +11,8 @@
 
 #include <spectrum.h>
 
+extern int  __LIB__ findhand(void);
+
 /* One bit per file */
 
 int hand_status = 3;

@@ -22,7 +22,6 @@ use keys 1 and 2 to enlarge/reduce the cube
 
 //#define TIMING
 
-int main(void);
 
 /*
 #define MX	238/2
@@ -42,7 +41,7 @@ Vector_t cube[8]
 	{  20 , -20,  -20 },
 	{ -20 , -20,  -20 } };
 
-int main(void)
+void main(void)
 {
 	static Vector_t rot;
 	static Vector_t t;

@@ -51,9 +51,11 @@ graphics/undrawb
 graphics/undrawr
 graphics/unplot
 graphics/drawbox
-graphics/setxy
 graphics/xorborder
 graphics/xorplot
 graphics/setxy
+graphics/move
+graphics/pen_up
+graphics/pen_down
 graphics/swapgfxbk_foo
 graphics/drawbox

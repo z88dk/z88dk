@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2018
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -36,6 +36,7 @@ Define rules for a ragel-based parser.
 #define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
 #define DO_stmt_d(  opcode)	_DO_stmt_(d,   opcode)
 #define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
+#define DO_stmt_NN( opcode)	_DO_stmt_(NN,  opcode)
 #define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
 
 #define DO_stmt_idx_n(opcode) \
@@ -141,15 +142,6 @@ Define rules for a ragel-based parser.
 	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
-	asm_DEFGROUP =
-		  _TK_DEFGROUP _TK_NEWLINE
-		  @{ asm_DEFGROUP_start(0);
-		     ctx->current_sm = SM_DEFGROUP_OPEN; }
-		| _TK_DEFGROUP _TK_LCURLY _TK_NEWLINE
-		  @{ asm_DEFGROUP_start(0);
-		     ctx->current_sm = SM_DEFGROUP_LINE; }
-		;
-
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr	
 		  %{ if (expr_error)
@@ -165,61 +157,114 @@ Define rules for a ragel-based parser.
 		  %{ asm_DEFGROUP_define_const(str_data(name)); }
 		;
 
-	defgroup_var = defgroup_var_value | defgroup_var_next;
+	defgroup_var = defgroup_var_value | defgroup_var_next ;
 	
+	defgroup_vars = defgroup_var (_TK_COMMA defgroup_var)* _TK_COMMA? ;
+	
+	asm_DEFGROUP =
+		  _TK_DEFGROUP _TK_NEWLINE		  		@{ asm_DEFGROUP_start(0);
+												   ctx->current_sm = SM_DEFGROUP_OPEN; }
+		| _TK_DEFGROUP _TK_LCURLY _TK_NEWLINE	@{ asm_DEFGROUP_start(0);
+												   ctx->current_sm = SM_DEFGROUP_LINE; }
+		| _TK_DEFGROUP _TK_LCURLY 
+												@{ asm_DEFGROUP_start(0);
+												   ctx->current_sm = SM_DEFGROUP_LINE; }
+		  defgroup_vars _TK_NEWLINE
+		| _TK_DEFGROUP _TK_LCURLY 
+												@{ asm_DEFGROUP_start(0);
+												   ctx->current_sm = SM_DEFGROUP_LINE; }
+		  defgroup_vars  
+		  _TK_RCURLY _TK_NEWLINE			    @{ ctx->current_sm = SM_MAIN; }
+		;
+
 	defgroup_open :=
 		  _TK_NEWLINE
-		| _TK_END 					@{ error_missing_block(); }
-		| _TK_LCURLY _TK_NEWLINE 	@{ ctx->current_sm = SM_DEFGROUP_LINE; }
+		| _TK_END 								@{ error_missing_block(); }
+		| _TK_LCURLY _TK_NEWLINE 				@{ ctx->current_sm = SM_DEFGROUP_LINE; }
+		| _TK_LCURLY 			 				@{ ctx->current_sm = SM_DEFGROUP_LINE; }
+		  defgroup_vars _TK_NEWLINE
+		| _TK_LCURLY 			 				@{ ctx->current_sm = SM_DEFGROUP_LINE; }
+		  defgroup_vars 
+		  _TK_RCURLY _TK_NEWLINE				@{ ctx->current_sm = SM_MAIN; }
 		;
 	
 	defgroup_line := 
 		  _TK_NEWLINE
-		| _TK_END 					@{ error_missing_close_block(); }
-		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
-		| defgroup_var (_TK_COMMA defgroup_var)* _TK_COMMA? _TK_NEWLINE
+		| _TK_END 								@{ error_missing_close_block(); }
+		| _TK_RCURLY _TK_NEWLINE				@{ ctx->current_sm = SM_MAIN; }
+		| defgroup_vars _TK_NEWLINE
+		| defgroup_vars 
+		  _TK_RCURLY _TK_NEWLINE				@{ ctx->current_sm = SM_MAIN; }
 		;
 	
 	/*---------------------------------------------------------------------
 	*   DEFVARS
 	*--------------------------------------------------------------------*/
+	defvars_define = 
+			name _TK_NEWLINE				@{ 	asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
+		|	name _TK_RCURLY _TK_NEWLINE		@{ 	asm_DEFVARS_define_const( str_data(name), 0, 0 ); 
+												ctx->current_sm = SM_MAIN; }
+#foreach <S> in B, W, P, Q
+		|	name _TK_DS_<S> const_expr _TK_NEWLINE
+											@{ 	if (expr_error)
+													error_expected_const_expr();
+												else
+													asm_DEFVARS_define_const( str_data(name), 
+																			  DEFVARS_SIZE_<S>, 
+																			  expr_value ); 
+											}
+#endfor  <S>
+#foreach <S> in B, W, P, Q
+		|	name _TK_DS_<S> const_expr _TK_RCURLY _TK_NEWLINE
+											@{ 	if (expr_error)
+													error_expected_const_expr();
+												else
+													asm_DEFVARS_define_const( str_data(name), 
+																			  DEFVARS_SIZE_<S>, 
+																			  expr_value ); 
+												ctx->current_sm = SM_MAIN;
+											}
+#endfor  <S>
+		;
+
 	asm_DEFVARS = 
 		  _TK_DEFVARS const_expr _TK_NEWLINE
-		  @{ if (expr_error)
-				error_expected_const_expr();
-			 else 
-				asm_DEFVARS_start(expr_value);
-		     ctx->current_sm = SM_DEFVARS_OPEN; 
-		  }
+											@{ 	if (expr_error)
+													error_expected_const_expr();
+												else 
+													asm_DEFVARS_start(expr_value);
+												ctx->current_sm = SM_DEFVARS_OPEN; 
+											}
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
-		  @{ if (expr_error)
-				error_expected_const_expr();
-			 else 
-				asm_DEFVARS_start(expr_value);
-			 ctx->current_sm = SM_DEFVARS_LINE;
-		  }
+											@{ 	if (expr_error)
+													error_expected_const_expr();
+												else 
+													asm_DEFVARS_start(expr_value);
+												ctx->current_sm = SM_DEFVARS_LINE;
+											}
+		| _TK_DEFVARS const_expr _TK_LCURLY 
+											@{ 	if (expr_error)
+													error_expected_const_expr();
+												else 
+													asm_DEFVARS_start(expr_value);
+												ctx->current_sm = SM_DEFVARS_LINE;
+											}
+		  defvars_define
 		;
 		
 	defvars_open :=
 		  _TK_NEWLINE
-		| _TK_END 					@{ error_missing_block(); }
-		| _TK_LCURLY _TK_NEWLINE 	@{ ctx->current_sm = SM_DEFVARS_LINE; }
+		| _TK_END 							@{ error_missing_block(); }
+		| _TK_LCURLY _TK_NEWLINE 			@{ ctx->current_sm = SM_DEFVARS_LINE; }
+		| _TK_LCURLY 			 			@{ ctx->current_sm = SM_DEFVARS_LINE; }
+		  defvars_define
 		;
 		
 	defvars_line := 
 		  _TK_NEWLINE
-		| _TK_END 					@{ error_missing_close_block(); }
-		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
-		| name _TK_NEWLINE
-		  @{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
-#foreach <S> in B, W, P, Q
-		| name _TK_DS_<S> const_expr _TK_NEWLINE
-		  @{ if (expr_error)
-				error_expected_const_expr();
-			 else
-				asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_<S>, expr_value ); 
-		  }
-#endfor  <S>
+		| _TK_END 							@{ error_missing_close_block(); }
+		| _TK_RCURLY _TK_NEWLINE			@{ ctx->current_sm = SM_MAIN; }
+		| defvars_define
 		;
 
 	/*---------------------------------------------------------------------
@@ -422,11 +467,13 @@ Define rules for a ragel-based parser.
 				asm_C_LINE(expr_value, str_data(name)); 
 		}
 		
-		| _TK_INCLUDE string _TK_NEWLINE @{ 
+		| label? _TK_INCLUDE string _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
 			asm_INCLUDE(str_data(name)); 
 		}
 		
-		| _TK_BINARY string _TK_NEWLINE @{ 
+		| label? _TK_BINARY string _TK_NEWLINE @{ 
+			DO_STMT_LABEL(); 
 			asm_BINARY(str_data(name)); 
 		}
 		

@@ -1208,7 +1208,7 @@ static void touch_symtab_symbols(SymbolHash *symtab)
 
 	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter)) {
 		sym = (Symbol *)iter->value;
-		if (sym->type == TYPE_ADDRESS || sym->scope == SCOPE_EXTERN)
+		//Bug 563 -- if (sym->type == TYPE_ADDRESS || sym->scope == SCOPE_EXTERN)
 			sym->is_touched = TRUE;
 	}
 }

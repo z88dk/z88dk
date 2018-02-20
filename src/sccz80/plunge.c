@@ -227,7 +227,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 } else {
                     vconst(0);
                 }
-                warningfmt("Division by zero, result set to be zero");
+                warningfmt("division-by-zero","Division by zero, result set to be zero");
                 return;
             }
         }
@@ -315,7 +315,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         //     lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
         if ( lval2->is_const == 0 && lval1_wasconst == 0 &&
             (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv)) {
-            warningfmt("Operation on different signedness!");
+            warningfmt("signedness","Operation on different signedness!");
         }
         
 
@@ -418,6 +418,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval->val_type = KIND_LONG;   
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else {
+                lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;                
                 const2(lval->const_val);
             }
         }
@@ -555,7 +556,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             type_describe(lval->ltype, str);
             utstring_printf(str, "-");
             type_describe(lval2->ltype, str);
-            warningfmt("%s", utstring_body(str));
+            warningfmt("incompatible-pointer-types","%s", utstring_body(str));
             utstring_free(str);
         }
     }

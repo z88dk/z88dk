@@ -9,12 +9,12 @@
 #include <fcntl.h>
 #include <spectrum.h>
 
-
+extern void __LIB__ freehand(int);
 
 int close(int handle)
 {
 #asm
-        INCLUDE "p3dos.def"
+        INCLUDE "target/zx/def/p3dos.def"
 	EXTERN	dodos
 	pop	bc
 	pop	hl
@@ -23,7 +23,9 @@ int close(int handle)
 	ld	b,l
 	push	hl
 	ld	iy,DOS_CLOSE	;corrupts ix
+	push	ix
 	call	dodos
+	pop	ix
 	pop	de
 	ld	hl,-1	;error!
 	ret	nc	;error

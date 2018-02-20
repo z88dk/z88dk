@@ -16,7 +16,7 @@
 	PUBLIC	msxrompage
 	EXTERN	msxbios
 
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 
 	defc H_NMI  = $fdd6
 

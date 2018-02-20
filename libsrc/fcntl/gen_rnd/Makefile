@@ -15,7 +15,7 @@ $(OUTPUT_DIRECTORY)/gendos.lib: $(OBJECTS) genlist
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gendos @genlist
 
 .c.o:
-	zcc +test $(CFLAGS) $*.c
+	$(ZCC) +test $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def $(OUTPUT_DIRECTORY)/gendos.lib

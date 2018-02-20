@@ -3,8 +3,7 @@
 MODULE fputs
 SECTION code_clib
 PUBLIC fputs
-EXTERN fputs_callee
-EXTERN ASMDISP_FPUTS_CALLEE
+EXTERN asm_fputs_callee
 
 .fputs
 
@@ -18,7 +17,7 @@ EXTERN ASMDISP_FPUTS_CALLEE
         push    ix  ; callers ix
         push    hl
         pop     ix
-   	call	fputs_callee + ASMDISP_FPUTS_CALLEE
+   	call	asm_fputs_callee
 	pop	ix	
 	ret
 

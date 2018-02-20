@@ -28,7 +28,7 @@ unsigned char rings[3]={ 'W','X','T' };
 unsigned char pos[3]={ 'A','W','E' };
 unsigned char plug[]="AMTE";
 
-main()
+void main()
 {
      unsigned int i,j,n;
      unsigned int  ch;

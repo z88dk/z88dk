@@ -63,8 +63,8 @@ define(`__IO_UART_TX', 0x133b)
 # PORT 0x133B: UART Status (read only)
 
 define(`__IO_UART_STATUS', 0x133b)
-define(`__IUS_RX_AVAIL', 0x01)
-define(`__IUS_TX_READY', 0x02)
+define(`__IUS_RX_AVAIL', 0x01)   # active high
+define(`__IUS_TX_READY', 0x02)   # active low
 
 #
 # END OF USER CONFIGURATION

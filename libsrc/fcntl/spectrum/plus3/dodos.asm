@@ -9,57 +9,37 @@
 ;
 ;	$Id: dodos.asm,v 1.3 2016-03-07 13:44:48 dom Exp $
 
-	SECTION	code_clib
+	SECTION	code_driver
 	PUBLIC	dodos
 
-.dodos
-	push	af
-	push	bc
-	ld	a,7
-	ld	bc,32765
-	di
-	ld	(23388),a
-	out	(c),a
-	ei
-	pop	bc
-	pop	af
-	push	ix		;save ix
-	call	cjumpiy
-	pop	ix
-	push	af
-	push	bc
-	ld	a,16
-	ld	bc,32765
-	di
-	ld	(23388),a
-	out	(c),a
-	ei
-	pop	bc
-	pop	af
-	ret
-.cjumpiy
-	jp	(iy)
+        EXTERN  l_push_di
+        EXTERN  l_pop_ei
+        EXTERN  l_jpiy
 
-;
-;	Short routine to set up a +3 DOS header so files
-;	Can be accessed from BASIC, we set to type code
-;	load address 0 and length supplied
-;
-;	Entry:	b = file handle
-;	       hl = file length
-
-.setheader
-	ld	iy,setheader_r
-	call	dodos
-	ret
-
-.setheader_r
-	push	hl
-	call	271	;DOS_RED_HEAD
-	pop	hl
-	ld	(ix+0),3	;COODE
-	ld	(ix+1),l	;Length
-	ld	(ix+2),h
-	ld	(ix+3),0	;Load address
-	ld	(ix+4),0
-	ret
+dodos:
+        call    dodos2          ;dummy routine to restore iy afterwards
+        ld      iy,23610
+        ret
+dodos2:
+        push    af
+        push    bc
+        ld      a,7
+        ld      bc,32765
+        call    l_push_di
+        ld      (23388),a
+        out     (c),a
+        call    l_pop_ei
+        pop     bc
+        pop     af
+        call    l_jpiy
+        push    af
+        push    bc
+        ld      a,16
+        ld      bc,32765
+        call    l_push_di
+        ld      (23388),a
+        out     (c),a
+        call    l_pop_ei
+        pop     bc
+        pop     af
+        ret

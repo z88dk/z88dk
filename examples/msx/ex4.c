@@ -29,7 +29,7 @@ typedef struct {
 
 #define MAX_POINT	256
 
-main() {
+void main() {
 	double	m_pi;
 	double	a;
 	int	c, i, l;
@@ -46,7 +46,7 @@ main() {
 		p[c].y = ((int)(80.0 * sin(a))) + (96 - 8);
 
 		if (c & 8)
-			putch('.');
+			putchar('.');
 	}
 	printf("done!\n");
 	

@@ -9,5 +9,5 @@
 #include <X11/Xlib.h>
 
 
-void XFreeGC(Display *display, GC gc) {
+void XFreeGC(Display *display, GC *gc) {
 }

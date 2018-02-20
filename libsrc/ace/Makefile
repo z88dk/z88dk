@@ -7,8 +7,8 @@ include ../Make.config
 
 
 all:	
-	cd tape ; $(MAKE) ; cd ..
+	$(MAKE) -C tape
 
 clean:
 	$(RM) *.o* zcc_opt.def
-	cd tape ; $(MAKE) clean ; cd ..
+	$(MAKE) -C tape clean

@@ -5,17 +5,35 @@
 
 include ../../../Make.config
 
-OBJECTS = close.o open.o read.o readbyte.o write.o writebyte.o lseek.o
+CFILES = $(wildcard *.c)
+AFILES = $(wildcard *.asm)
 
-all: $(OUTPUT_DIRECTORY)/esxdos.lib
+CLASSIC_OBJECTS = $(addprefix obj/,$(CFILES:.c=.o)) $(addprefix obj/,$(AFILES:.asm=.o))
 
-$(OUTPUT_DIRECTORY)/esxdos.lib: $(OBJECTS) esxdos.lst
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/arch/zx/esxdos/z80/*.asm"
+NEWLIB_TARGETS := obj/newlib-z80
+
+all: dirs $(OUTPUT_DIRECTORY)/esxdos.lib
+
+.PHONY: dirs $(NEWLIB_TARGETS)
+
+$(OUTPUT_DIRECTORY)/esxdos.lib: $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS) esxdos.lst
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/esxdos @esxdos.lst
 
-.c.o:
-	zcc +zx $(CFLAGS) -DESXDOS $*.c
+obj/%.o: %.c
+	$(ZCC) +zx $(CFLAGS) -DESXDOS -o $@ $^
+
+obj/%.o: %.asm
+	$(ZCC) +zx $(CFLAGS) -DESXDOS -o $@ $^
+
+obj/newlib-z80:
+	@$(ASSEMBLER) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
+
+dirs:
+	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
 
 clean:
 	$(RM) *.o* zcc_opt.def $(OUTPUT_DIRECTORY)/esxdos.lib
+	$(RM) -fr obj
 	
 

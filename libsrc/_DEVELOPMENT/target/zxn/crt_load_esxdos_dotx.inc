@@ -85,10 +85,14 @@ ENDIF
 
    push af                     ; save file handle
 
-   EXTERN __BSS_END_tail
-   
-   ld bc,__BSS_END_tail - __DTX_head
+   EXTERN __DTX_END_tail
+
+esxdos_dotx_len:
+
+   ld bc,__DTX_END_tail - __DTX_head
    ld hl,__DTX_head
+
+defc __esxdos_dotx_len = esxdos_dotx_len + 1
    
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_READ

@@ -1,0 +1,254 @@
+lstoff
+
+; CPC Firmware Calculations
+;
+; September 2003
+; $Id: cpcfirm.def $
+;
+
+    EXTERN     firmware    ; Interposer for firmware routines
+    defc    kl_u_rom_enable     = $b900
+    defc    kl_u_rom_disable    = $b903
+    defc    kl_l_rom_enable     = $b906
+    defc    kl_l_rom_disable    = $b909
+    defc    kl_rom_restore      = $b90c
+    defc    kl_rom_select       = $b90f
+    defc    kl_curr_selection   = $b912
+	defc    kl_probe_rom        = $b915
+	defc    kl_rom_deselect     = $b918
+	defc    kl_ldir             = $b91b
+	defc    kl_lddr             = $b91e
+	defc    kl_poll_synchronous = $b921
+	defc    kl_scan_needed      = $b92a
+    defc    kl_choke_off    = $bcc8
+    defc    kl_rom_walk     = $bccb
+    defc    kl_init_back    = $bcce
+    defc    kl_log_ext      = $bcd1
+    defc    kl_find_command = $bcd4
+    defc    kl_new_framefly = $bcd7
+    defc    kl_add_framefly = $bcda
+    defc    kl_del_framefly = $bcdd
+    defc    kl_new_fast_ticker = $bce0
+    defc    kl_add_fast_ticker = $bce3
+    defc    kl_del_fast_ticker = $bce6
+    defc    kl_add_ticker      = $bce9
+    defc    kl_del_ticker      = $bcec
+    defc    kl_init_event      = $bcef
+    defc    kl_event           = $bcf2
+    defc    kl_sync_reset      = $bcf5
+    defc    kl_del_synchronous = $bcf8
+    defc    kl_next_sync       = $bcfb
+    defc    kl_do_sync         = $bcfe
+    defc    kl_done_sync       = $bd01
+    defc    kl_event_disable   = $bd04
+    defc    kl_event_enable    = $bd07
+    defc    kl_disarm_event    = $bd0a
+    defc    kl_time_please     = $bd0d
+    defc    kl_time_set        = $bd10
+	
+    defc    mc_wait_printer    = $bdf1
+    defc    km_scan_keys       = $bdf4
+
+    defc    km_initialise   = $bb00
+    defc    km_reset        = $bb03
+    defc    km_wait_char    = $bb06
+    defc    km_read_char    = $bb09
+    defc    km_char_return  = $bb0c
+    defc    km_set_expand   = $bb0f
+    defc    km_get_expand   = $bb12
+    defc    km_exp_buffer   = $bb15
+    defc    km_wait_key     = $bb18
+    defc    km_read_key     = $bb1b
+    defc    km_test_key     = $bb1e
+    defc    km_get_state    = $bb21
+    defc    km_get_joystick = $bb24
+    defc    km_set_translate = $bb27
+    defc    km_get_translate = $bb2a
+    defc    km_set_shift    = $bb2d
+    defc    km_get_shift    = $bb30
+    defc    km_set_control  = $bb33
+    defc    km_get_control  = $bb36
+    defc    km_set_repeat   = $bb39
+    defc    km_get_repeat   = $bb3c
+    defc    km_set_delay    = $bb3f
+    defc    km_get_delay    = $bb42
+    defc    km_arm_break    = $bb45
+    defc    km_disarm_break = $bb48
+    defc    km_break_event  = $bb4b
+
+    defc    txt_initialise  = $bb4e
+    defc    txt_reset       = $bb51
+    defc    txt_vdu_enable  = $bb54
+    defc    txt_vdu_disable = $bb57
+    defc    txt_output      = $bb5a
+    defc    txt_wr_char     = $bb5d
+    defc    txt_rd_char     = $bb60
+    defc    txt_set_graphic = $bb63
+    defc    txt_win_enable  = $bb66
+    defc    txt_get_window  = $bb69
+    defc    txt_clear_window = $bb6c
+    defc    txt_set_column  = $bb6f
+    defc    txt_set_row     = $bb72
+    defc    txt_set_cursor  = $bb75
+    defc    txt_get_cursor  = $bb78
+    defc    txt_cur_enable  = $bb7b
+    defc    txt_cur_disable = $bb7e
+    defc    txt_cur_on      = $bb81
+    defc    txt_cur_off     = $bb84
+    defc    txt_validate    = $bb87
+    defc    txt_place_cursor = $bb8a
+    defc    txt_remove_cursor = $bb8d
+    defc    txt_set_pen     = $bb90
+    defc    txt_get_pen     = $bb93
+    defc    txt_set_paper   = $bb96
+    defc    txt_get_paper   = $bb99
+    defc    txt_inverse     = $bb9c
+    defc    txt_set_back    = $bb9f
+    defc    txt_get_back    = $bba2
+    defc    txt_get_matrix  = $bba5
+    defc    txt_set_matrix  = $bba8
+    defc    txt_set_m_table = $bbab
+    defc    txt_get_m_table = $bbae
+    defc    txt_get_controls = $bbb1
+    defc    txt_str_select  = $bbb4
+    defc    txt_swap_streams = $bbb7
+
+    defc    gra_initialise  = $bbba
+    defc    gra_reset       = $bbbd
+    defc    gra_move_absolute = $bbc0
+    defc    gra_move_relative = $bbc3
+    defc    gra_ask_cursor  = $bbc6
+    defc    gra_set_origin  = $bbc9
+    defc    gra_get_origin  = $bbcc
+    defc    gra_win_width   = $bbcf
+    defc    gra_win_height  = $bbd2
+    defc    gra_get_w_width = $bbd5
+    defc    gra_get_w_height = $bbd8
+    defc    gra_clear_window = $bbdb
+    defc    gra_set_pen     = $bbde
+    defc    gra_get_pen     = $bbe1
+    defc    gra_set_paper   = $bbe4
+    defc    gra_get_paper   = $bbe7
+    defc    gra_plot_absolute = $bbea
+    defc    gra_plot_relative = $bbed
+    defc    gra_test_absolute = $bbf0
+    defc    gra_test_relative = $bbf3
+    defc    gra_line_absolute = $bbf6
+    defc    gra_line_relative = $bbf9
+    defc    gra_wr_char     = $bbfc
+
+
+    defc    scr_initialise  = $bbff
+    defc    scr_reset       = $bc02
+    defc    scr_set_offset  = $bc05
+    defc    scr_set_base    = $bc08
+    defc    scr_get_location = $bc0b
+    defc    scr_set_mode    = $bc0e
+    defc    scr_get_mode    = $bc11
+    defc    scr_clear       = $bc14
+    defc    scr_char_limits = $bc17
+    defc    scr_char_position = $bc1a
+    defc    scr_dot_position = $bc1d
+    defc    scr_next_byte   = $bc20
+    defc    scr_prev_byte   = $bc23
+    defc    scr_next_line   = $bc26
+    defc    scr_prev_line   = $bc29
+    defc    scr_ink_encode  = $bc2c
+    defc    scr_ink_decode  = $bc2f
+    defc    scr_set_ink     = $bc32
+    defc    scr_get_ink     = $bc35
+    defc    scr_set_border  = $bc38
+    defc    scr_get_border  = $bc3b
+    defc    scr_set_flashing = $bc3e
+    defc    scr_get_flashing = $bc41
+    defc    scr_fill_box    = $bc44
+    defc    scr_flood_box   = $bc17
+    defc    scr_char_invert = $bc4a
+    defc    scr_hw_roll     = $bc4d
+    defc    scr_sw_roll     = $bc50
+    defc    scr_unpack      = $bc53
+    defc    scr_repack      = $bc56
+    defc    scr_access      = $bc59
+    defc    scr_pixels      = $bc5c
+    defc    scr_horizontal  = $bc5f
+    defc    scr_vertical    = $bc62
+
+
+    defc    cas_initialise  = $bc65
+    defc    cas_set_speed   = $bc68
+    defc    cas_noisy       = $bc6b
+    defc    cas_start_motor = $bc6e
+    defc    cas_stop_motor  = $bc71
+    defc    cas_restore_motor = $bc74
+	defc	cas_in_open	    = $bc77
+	defc	cas_in_close	= $bc7a
+    defc    cas_in_abandon  = $bc7d
+	defc	cas_in_char	    = $bc80
+    defc    cas_in_direct   = $bc83
+    defc    cas_return      = $bc86
+    defc    cas_test_eof    = $bc89
+	defc	cas_out_open	= $bc8c
+	defc	cas_out_close	= $bc8f
+    defc    cas_out_abandon = $bc92
+	defc	cas_out_char	= $bc95
+    defc    cas_out_direct  = $bc98
+    defc    cas_catalog     = $bc9b
+    defc    cas_write       = $bc9e
+    defc    cas_read        = $bca1
+    defc    cas_check       = $bca4
+
+    defc    sound_reset     = $bca7
+    defc    sound_queue     = $bcaa
+    defc    sound_check     = $bcad
+    defc    sound_arm_event = $bcb0
+    defc    sound_release   = $bcb3
+    defc    sound_hold      = $bcb6
+    defc    sound_continue  = $bcb9
+    defc    sound_ampl_envelope = $bcbc
+    defc    sound_tone_envelope = $bcbf
+    defc    sound_a_address = $bcc2
+    defc    sound_t_address = $bcc5
+
+
+    defc    mc_boot_program = $bd13
+    defc    mc_start_program = $bd16
+    defc    mc_wait_flyback = $bd19
+    defc    mc_set_mode     = $bd1c
+    defc    mc_screen_offset = $bd1f
+    defc    mc_clear_inks   = $bd22
+    defc    mc_set_inks     = $bd25
+    defc    mc_reset_printer = $bd28
+    defc    mc_print_char   = $bd2b
+    defc    mc_busy_printer = $bd2e
+    defc    mc_send_printer = $bd31
+    defc    mc_sound_register = $bd34
+    defc    mc_jump_restore = $bd37
+ 
+    defc    bios_set_message = $c033
+    defc    bios_setup_disc = $c036
+    defc    bios_select_format = $c039
+    defc    bios_read_sector = $c03c
+    defc    bios_write_sector = $c03f
+    defc    bios_format_track = $c042
+    defc    bios_move_track = $c045
+    defc    bios_get_status = $c048
+    defc    bios_set_retry_count = $c04b
+    defc    bios_get_sector_data = $c56c
+
+    ; 664 + 6128 only
+    defc    km_set_locks    = $bd3a
+    defc    km_flush        = $bd3d
+    defc    txt_ask_state   = $bd40
+    defc    gra_default     = $bd43
+    defc    gra_set_back    = $bd46
+    defc    gra_set_first   = $bd49
+    defc    gra_set_line_mask = $bd4c
+    defc    gra_from_user   = $bd4f
+    defc    gra_fill        = $bd52
+    defc    scr_set_position = $bd55
+    defc    mc_print_translation = $bd58
+    defc    kl_bank_switch  = $bd5b ; 6128 only
+
+
+
+lston

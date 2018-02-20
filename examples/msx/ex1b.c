@@ -54,7 +54,7 @@ void star_move(star_t* st) {
 
 #define MAX_STARS 16
 
-main() {
+void main() {
 	unsigned char c;
 	star_t *st, stars[MAX_STARS];
 
@@ -90,6 +90,6 @@ main() {
 			vmerge(st->addr, st->sub);
 	}
 
-	//set_mode(mode_0);
-	msx_screen(0);
+	set_mode(mode_0);
+	//msx_screen(0);
 }

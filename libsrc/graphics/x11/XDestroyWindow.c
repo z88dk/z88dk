@@ -9,4 +9,5 @@
 #include <X11/Xlib.h>
 
 int XDestroyWindow(Display *display, Window win) {
+    return 0;
 }

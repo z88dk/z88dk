@@ -1,29 +1,28 @@
 #
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile,v 1.46 2016-11-21 11:18:37 stefano Exp $
 
+include ../Make.config
 
 lx11:
-	cd x11 ; $(MAKE) ; cd ..
+	$(MAKE) -C x11
 
 lc128:
-	cd c128 ; $(MAKE) ; cd ..
-	cd c128_64k ; $(MAKE) ; cd ..
+	$(MAKE) -C c128
+	$(MAKE) -C c128_64k
 
 lenterprise:
-	cd enterprise ; $(MAKE) ; cd ..
+	$(MAKE) -C enterprise
 
 lenterprisehr:
-	cd enterprise_hr ; $(MAKE) ; cd ..
+	$(MAKE) -C enterprise_hr
 
 clean:
 	$(RM) *.o
 	$(RM) */*.o
-	cd c128 ; $(MAKE) clean ; cd ..
-	cd c128_64k ; $(MAKE) clean ; cd ..
-	cd enterprise ; $(MAKE) clean ; cd ..
-	cd enterprise_hr ; $(MAKE) clean ; cd ..
+	$(MAKE) -C c128 clean
+	$(MAKE) -C c128_64k clean
+	$(MAKE) -C enterprise clean
+	$(MAKE) -C enterprise_hr clean
+	$(MAKE) -C x11 clean
 	$(RM) gray/ticalc/*.o
 	$(RM) gray/cpc/*.o
 	$(RM) gray/zx81/*.o
@@ -31,4 +30,3 @@ clean:
 	$(RM) spectrum/cpm/*.o
 	$(RM) zx81/hr/*.o
 	$(RM) zx81/udg/*.o
-	cd x11 ; $(MAKE) clean ; cd ..

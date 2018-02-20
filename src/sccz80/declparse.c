@@ -29,7 +29,7 @@ static int32_t needsub(void)
         val = (-val);
     }
     if (valtype == KIND_DOUBLE)
-        warningfmt("Unexpected floating point encountered, taking int value");
+        warningfmt("unknown","Unexpected floating point encountered, taking int value");
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
 }
@@ -41,7 +41,7 @@ static void swallow_bitfield(void)
     Kind   valtype;
     if (cmatch(':')) {
         constexpr(&val, &valtype, 1);
-        warningfmt("Bitfields not supported by compiler");
+        warningfmt("unsupported-feature","Bitfields not supported by compiler");
     }
 }
 
@@ -270,7 +270,7 @@ static Type *parse_enum(Type *type)
 
                 constexpr(&dval, &valtype, 1);
                 if ( valtype == KIND_DOUBLE )
-                    warningfmt("Unexpected floating point encountered, taking int value");
+                    warningfmt("unknown","Unexpected floating point encountered, taking int value");
                 value = dval;
             }
             elem = make_constant(sname, value);
@@ -417,7 +417,7 @@ static Type *parse_type(void)
     if ( swallow("const")) {
         type->isconst = 1;
     } else if (swallow("volatile")) {
-        //warningfmt("Volatile type not supported by compiler");
+        //warningfmt("unsupported-feature","Volatile type not supported by compiler");
     }
 
     if (amatch("__sfr")) {
@@ -509,6 +509,7 @@ static void parse_trailing_modifiers(Type *type)
             continue;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
+            type->flags &= ~SMALLC;
             continue;
         } else if (amatch("__preserves_regs")) {
             int c;
@@ -527,11 +528,6 @@ static void parse_trailing_modifiers(Type *type)
             break;
         }
     }
-
-    if ( type->flags & SDCCDECL ) {
-        type->flags &= ~SMALLC;
-    }
-
 
     if ( (type->flags & (NAKED|CRITICAL) ) == (NAKED|CRITICAL) ) {
         errorfmt("Function '%s' is both __naked and __critical, this is not permitted", 1, type->name);
@@ -608,7 +604,7 @@ Type *parse_parameter_list(Type *return_type)
         }
         if ( param->kind == KIND_STRUCT ) {
             Type *ptr = make_pointer(param);            
-            warningfmt("Cannot pass a struct by value, converting to pointer to struct");
+            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
             strcpy(ptr->name, param->name);
             param = ptr;        
         }
@@ -679,7 +675,7 @@ Type *parse_decl_func(Type *base_type)
     }
     if ( base_type->kind == KIND_STRUCT ) {
         Type *ptr = make_pointer(base_type);
-        warningfmt("Can't define a function returning an struct, converting to a pointer");
+        warningfmt("conversion","Can't define a function returning an struct, converting to a pointer");
         strcpy(ptr->name, base_type->name);
         base_type = ptr;
     }
@@ -743,7 +739,7 @@ Type *parse_expr_type()
     Type *type = dodeclare2(NULL, MODE_CAST);
 
     if ( type && strlen(type->name)) {
-        warningfmt("We're not expecting name '%s' with cast expression",type->name);
+        warningfmt("invalid-cast-syntax","We're not expecting name '%s' with cast expression",type->name);
     }
 
     return type;
@@ -811,7 +807,7 @@ int declare_local(int local_static)
                     expr = expression(&vconst, &val, &expr_type);
 
                     if ( expr_type->kind == KIND_VOID ) {
-                        warningfmt("Assigning from a void expression");
+                        warningfmt("void","Assigning from a void expression");
                     }
                     
                     if ( vconst && expr != type->kind ) {
@@ -880,6 +876,11 @@ Type *dodeclare(enum storage_type storage)
         // Main is __stdc
         if ( strcmp(type->name,"main") == 0 && type->kind == KIND_FUNC) {
             type->flags &= ~(SMALLC|FLOATINGDECL|CALLEE|FASTCALL);
+        }
+
+        if ( type->kind == KIND_FUNC && (type->flags & (FASTCALL|SMALLC)) == FASTCALL && array_len(type->parameters) > 1) {
+            warningfmt("incorrect-function-declspec","Cannot define function '%s' as __z88dk_fastcall __stdc when it has more than 1 argument",type->name);
+            type->flags ^= FASTCALL;
         }
 
         if ( rcmatch('{') && type->kind == KIND_FUNC) {
@@ -1040,7 +1041,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
             dval = (-dval);
         }
         if ( valtype == KIND_DOUBLE )
-            warningfmt("Unexpected floating point encountered, taking int value");
+            warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
         type->value = dval;
 
         if ( symname(type->name) == 0 ) 
@@ -1075,7 +1076,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
     if ( ispointer(type) && type->ptr->kind == KIND_FUNC ) {
         /* Function pointers, fastcall isn't valid */
         if ( type->ptr->flags & FASTCALL ) {
-            warningfmt("FASTCALL is not a valid modifier for function pointers");
+            warningfmt("invalid-function-declspec","FASTCALL is not a valid modifier for function pointers");
             type->ptr->flags &= ~FASTCALL;
         }
     }
@@ -1085,12 +1086,17 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
 
 Type *default_function(const char *name)
 {
+    return default_function_with_type(name, type_int);
+}
+
+Type *default_function_with_type(const char *name, Type *return_type)
+{
     Type *type = CALLOC(1,sizeof(*type));
 
     strcpy(type->name, name);
     type->kind = KIND_FUNC;
     type->oldstyle = 1;
-    type->return_type = type_int;
+    type->return_type = return_type;
     type->parameters = array_init(NULL);
     type->size = 0;
     type->len = 1;
@@ -1155,7 +1161,7 @@ void declare_func_kr()
             array_add(func->parameters, param);
     
         if (ch() != ')' && cmatch(',') == 0) {
-            warningfmt("Expected ','");
+            warningfmt("syntax","Expected ','");
         }
     }
     parse_trailing_modifiers(func);
@@ -1182,7 +1188,7 @@ static void handle_kr_type_parameters(Type *func)
         }
         if ( param->kind == KIND_STRUCT ) {
             Type *ptr = make_pointer(param);            
-            warningfmt("Cannot pass a struct by value, converting to pointer to struct");
+            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
             strcpy(ptr->name, param->name);
             param = ptr;
         }
@@ -1195,7 +1201,7 @@ static void handle_kr_type_parameters(Type *func)
             }
         }
         if ( i == array_len(func->parameters) ) {
-            warningfmt("Found K&R declaration for unknown parameter '%s' for function '%s'",param->name, func->name);
+            warningfmt("invalid-function-definition","Found K&R declaration for unknown parameter '%s' for function '%s'",param->name, func->name);
         }
         if ( cmatch(',')) {
             // Nothing
@@ -1208,6 +1214,9 @@ static void handle_kr_type_parameters(Type *func)
 
 void flags_describe(int32_t flags, UT_string *output)
 {
+    if ( flags & SDCCDECL ) {
+        utstring_printf(output,"__z88dk_sdccdecl ");
+    }
     if ( (flags & SMALLC) == SMALLC && (flags & FLOATINGDECL) == 0) {
         utstring_printf(output,"__smallc ");
     }
@@ -1223,9 +1232,6 @@ void flags_describe(int32_t flags, UT_string *output)
     if ( flags & SAVEFRAME ) {
         utstring_printf(output,"__z88dk_saveframe ");
     }  
-    if ( flags & SDCCDECL ) {
-        utstring_printf(output,"__z88dk_sdccdecl ");
-    }
     if ( flags & NAKED ) {
         utstring_printf(output,"__naked ");
     }  
@@ -1331,7 +1337,7 @@ int type_matches(Type *t1, Type *t2)
     }
 
     if ( t1->tag && t2->tag ) {
-        if (type_matches(t1->tag,t2->tag) == 0 ) 
+        if ( t1->tag != t2->tag ) 
            return 0;
     }  else if ( t1->tag || t2->tag ) {
        return 0;
@@ -1528,7 +1534,7 @@ static void declfunc(Type *type, enum storage_type storage)
     }
     pushframe();
     if (array_len(currfn->ctype->parameters) && (type->flags & (FASTCALL|NAKED)) == FASTCALL ) {
-        Type *type = array_get_byindex(currfn->ctype->parameters,0);
+        Type *type = array_get_byindex(currfn->ctype->parameters,array_len(currfn->ctype->parameters) - 1);
         int   adjust = 1;
 
         if ( type->size == 2 ) 
@@ -1542,9 +1548,21 @@ static void declfunc(Type *type, enum storage_type storage)
 
         if ( adjust ) {
             SYMBOL *ptr = findloc(type->name);
+            int     i;
+
             if ( ptr ) {
-                ptr->offset.i -= type->size;
+                ptr->offset.i -= (type->size + 2);
                 where = 2;
+            }
+
+            if ( currfn->ctype->flags & SMALLC ) {
+                for ( i = 0; i < array_len(currfn->ctype->parameters) - 1; i++ ) {
+                    Type *arg = array_get_byindex(currfn->ctype->parameters, i);
+                    ptr = findloc(arg->name);
+                    if ( ptr ) {
+                        ptr->offset.i -= type->size;
+                    }
+                }
             }
         }
     }
@@ -1552,7 +1570,7 @@ static void declfunc(Type *type, enum storage_type storage)
     stackargs = where;
     if (statement() != STRETURN ) {
         if ( type->return_type->kind != KIND_VOID && lastst != STASM) {
-            warningfmt("Control reaches end of non-void function");
+            warningfmt("return-type","Control reaches end of non-void function");
         }
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
@@ -1564,5 +1582,6 @@ static void declfunc(Type *type, enum storage_type storage)
 #ifdef INBUILT_OPTIMIZER
     generate();
 #endif
+    Zsp = 0;
     infunc = 0; /* not in fn. any more */
 }

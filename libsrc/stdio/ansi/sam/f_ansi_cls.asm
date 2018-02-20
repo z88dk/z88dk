@@ -17,4 +17,6 @@
 
 .ansi_cls
  	xor	a
-	jp	$014E
+	call	$014E
+	ld	a,0xfe	;screen
+	jp	$0112

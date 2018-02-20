@@ -186,7 +186,7 @@ void move_player(player_t *player) {
 
 // main :)
 
-main() {
+void main() {
 	// allocating stuff
 
 	int c, river_width, river_offs;

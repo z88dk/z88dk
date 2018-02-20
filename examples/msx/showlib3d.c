@@ -49,7 +49,7 @@ static int zf = 0;
 unsigned char sbuffer[MODE2_MAX];
 
 
-int main(void)
+void main(void)
 {
 
 	surface_t surf;

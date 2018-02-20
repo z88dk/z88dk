@@ -14,17 +14,17 @@ SUPPORT=/usr/local/lib/z88dk/support/rcmx000
 
 
 example.bin: example.c
-	zcc +rcmx000 -oexample.bin example.c
+	zcc +rcmx000 -vn -oexample.bin example.c
 
 
 twinkle2000.bin:
-	zcc +rcmx000 -otwinkle2000.bin twinkle2000.c
+	zcc +rcmx000 -vn -otwinkle2000.bin twinkle2000.c
 
 twinkle3000.bin:
-	zcc +rcmx000 -otwinkle3000.bin twinkle3000.c
+	zcc +rcmx000 -vn -otwinkle3000.bin twinkle3000.c
 
 iolib_twinkle3000.bin:
-	zcc +rcmx000 -oiolib_twinkle3000.bin iolib.c iolib_twinkle3000.c
+	zcc +rcmx000 -vn -oiolib_twinkle3000.bin iolib.c iolib_twinkle3000.c
 
 run_example:
 	$(SUPPORT)/boot -b $(SERDEVICE) $(BAUD_DIV) example.bin

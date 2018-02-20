@@ -15,7 +15,7 @@
         
         EXTERN firmware
 
-        INCLUDE "cpcfirm.def"              
+        INCLUDE "target/cpc/def/cpcfirm.def"              
 
 
 .cpc_SetBorder

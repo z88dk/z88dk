@@ -60,6 +60,7 @@ define buildgeneric
 	$(MAKE) -C time
 	$(MAKE) -C debug
 	$(MAKE) -C assert
+	$(MAKE) -C font/fzx
 	$(MAKE) -C stdlib TARGET=$(1)
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C psg
@@ -201,7 +202,7 @@ z88_clib.lib:
 	$(MAKE) -C fcntl/z88
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C z88 
-	TARGET=z88 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
+	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # ZX Spectrum fcntl - dom/stefano
 zxfcntl:
@@ -663,6 +664,7 @@ sam_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,sam)
 	$(MAKE) -C games TARGET=sam
+	$(MAKE) -C spectrum
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano

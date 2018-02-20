@@ -20,7 +20,7 @@
 #define MAX_X2  128.0
 #define MAX_Y2   32.0
 
-main()
+void main()
 {
         double x[NODES], y[NODES], z[NODES];
         double vx, vy, vz;

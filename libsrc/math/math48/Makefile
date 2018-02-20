@@ -17,7 +17,7 @@ all: ../../math48.lib
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48 @math48.lst
 
 .c.o:
-	zcc +test $(CFLAGS) -c  $*.c
+	$(ZCC) +test $(CFLAGS) -c  $*.c
 
 
 clean:

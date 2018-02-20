@@ -11,10 +11,10 @@
         EXTERN	msxbios
 
 IF FORmsx
-        INCLUDE "msx.def"
+        INCLUDE "target/msx/def/msx.def"
 ELSE
-        INCLUDE "svi.def"
-        INCLUDE "svibios.def"
+        INCLUDE "target/svi/def/svi.def"
+        INCLUDE "target/svi/def/svibios.def"
         EXTERN	svi_kbdstick
 ENDIF
 

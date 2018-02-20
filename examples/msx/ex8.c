@@ -97,7 +97,7 @@ void do_preview(u_char* buf) {
 	}	
 }
 
-main(int argc, char *argv[]) {
+void main(int argc, char *argv[]) {
 	FILE* f;
 	bool preview;
 	u_char buf[MAX_BUF];

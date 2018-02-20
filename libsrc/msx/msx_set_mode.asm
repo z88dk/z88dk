@@ -19,8 +19,14 @@
 
 IF FORsvi
     INCLUDE	"msx/vdp.inc"
-    INCLUDE "svibios.def"
-    INCLUDE "svibasic.def"
+    INCLUDE "target/svi/def/svibios.def"
+    INCLUDE "target/svi/def/svibasic.def"
+ENDIF
+
+IF FORsc3000
+    INCLUDE	"msx/vdp.inc"
+	EXTERN     LDIRVM
+	EXTERN     FILVRM
 ENDIF
 
 msx_set_mode:
@@ -45,18 +51,40 @@ IF FORmsx
 	; MSX supports G1 natively
 ELSE
 txt32:
+IF FORsc3000
+	call  $39E2
+	ld		a,64	; change reg#1 on SC3000, keep bit 6 enabled to avoid screen blanking
+ELSE
 	ld    hl,INIGRP		; (Graphics 2)
 	call  setmode
-
-	; Now bend the configuration to Graphics 1 (change reg#0)
-	xor   a
+	xor   a			; change reg#0 on SVI
+ENDIF
+	; Now bend the configuration to Graphics mode 1
+IF FORsvi	
 	ld    (RG0SAV),a
+ENDIF
 	di
 	out   (VDP_CMD),a
+IF FORsc3000
+	ld	a,1		; change reg#1 on SC3000
+ELSE
+	;change reg#0
 	nop     ; ..do we have timing constraints ?
+ENDIF
 	or    $80
 	ei
 	out   (VDP_CMD),a
+
+IF FORsc3000
+	; Bend register #2
+	ld	a,$06
+	di
+	out   (VDP_CMD),a
+	ld    a,2  ; reg2
+	or    $80
+	ei
+	out   (VDP_CMD),a
+ENDIF
 
 	; Bend register #3
 	ld	a,$80
@@ -82,7 +110,8 @@ txt32:
 	ld	a,c	; ' '
 	ld ix,FILVRM
 	call	msxbios
-	
+
+IF FORsvi
 	LD A,(FORCLR)
 	ADD A,A
 	ADD A,A
@@ -90,13 +119,19 @@ txt32:
 	ADD A,A
 	LD HL,BAKCLR
 	OR (HL)
+ELSE
+	ld a,$1F
+ENDIF
 	ld	hl,$2000		; SCREEN 1 color table
 	ld	bc,32
-;	ld a,$1F
 	ld ix,FILVRM
 	call	msxbios
 
+IF FORsc3000
+	ld	hl,0x10C0		; point to the font in ROM
+ELSE
 	ld	hl,font
+ENDIF
 	ld	de,0			; SCREEN 1 character pattern table
 	ld	bc,2048
 	ld	ix,LDIRVM
@@ -104,7 +139,11 @@ txt32:
 
 	ret
 	
+IF FORsc3000
+	; using the ROM font
+ELSE
 .font
 binary "../stdio/ansi/FONT8.BIN"
+ENDIF
 
 ENDIF

@@ -20,3 +20,4 @@
 *.yaml  text eol=lf
 Makefile text eol=lf
 README* text eol=lf
+readme* text eol=lf

@@ -10,7 +10,7 @@
 
 
 // This is still broken
-void win_move(int x, int y, struct gui_win win)
+void win_move(int x, int y, struct gui_win *win)
 {
 	char *winsave;
 	

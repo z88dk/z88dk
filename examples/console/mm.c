@@ -135,6 +135,7 @@ Game:
 	for (i=0; i<NPeg; i++) putchar('A' + Secret[i]);
 	printf("\n");
 	goto Game;
+	return 0;
  }
 
 int match(char *aa, char *bb)

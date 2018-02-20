@@ -22,7 +22,7 @@ long lseek(int handle, long posn, int whence)
 	struct RND_FILE *myfile;
 	int blockno;
 
-	myfile = (char *) handle;
+	myfile = (void *) handle;
 	
 
 	if ((myfile)->mode!=O_RDONLY)

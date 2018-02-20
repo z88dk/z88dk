@@ -15,7 +15,7 @@
    PUBLIC   _a_machinever
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_machinever:
 _a_machinever:

@@ -15,9 +15,9 @@
 
 
 IF FORmsx
-        INCLUDE "msxbios.def"
+        INCLUDE "target/msx/def/msxbios.def"
 ELSE
-        INCLUDE "svibios.def"
+        INCLUDE "target/svi/def/svibios.def"
 ENDIF
 
 
@@ -28,6 +28,7 @@ ENDIF
 	ld      hl,2
 	add     hl,sp
 	ld	a,(hl)
+	push	ix		;save callers
 
 	ld	ix,CHPUT	; Print char
 IF STANDARDESCAPECHARS
@@ -49,4 +50,6 @@ ENDIF
 	jr	nz,nocls
 	ld	ix,CLS
 .nocls
-	jp	msxbios
+	call	msxbios
+	pop	ix		;restore callers
+	ret

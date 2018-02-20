@@ -14,6 +14,7 @@
 SECTION code_clib
 PUBLIC atexit
 PUBLIC _atexit
+EXTERN __clib_exit_stack_size
 EXTERN exitsp, exitcount
 
 ; enter : hl = atexit function
@@ -27,7 +28,7 @@ EXTERN exitsp, exitcount
 
    ld hl,exitcount
    ld a,(hl)
-   cp 32                     ; can only hold 32 levels..
+   cp __clib_exit_stack_size  ; can only hold 32 levels..
    ret nc                    ; if full returns with hl!=0
    inc (hl)                  ; increment number of levels
 

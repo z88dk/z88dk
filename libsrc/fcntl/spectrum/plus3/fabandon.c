@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <spectrum.h>
 
+extern void __LIB__ freehand(int);
 
 static int fabandon1(int fd);
 
@@ -23,7 +24,7 @@ void fabandon(FILE *fp)
 static int fabandon1(int fd)
 {
 #asm
-	INCLUDE	"p3dos.def"
+	INCLUDE	"target/zx/def/p3dos.def"
 	EXTERN	dodos
 	pop	bc
 	pop	hl
@@ -32,7 +33,9 @@ static int fabandon1(int fd)
 	ld	b,l
 	push	bc
 	ld	iy,DOS_ABANDON
+	push	ix
 	call	dodos
+	pop	ix
 	pop	de
 	ld	hl,-1	;error!
 	ret	nc	;error

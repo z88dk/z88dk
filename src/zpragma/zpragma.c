@@ -347,6 +347,10 @@ int main(int argc, char **argv)
                     *offs = 0;
                 }
                 write_defined(ptr,value,exp);
+
+                if ( strcmp(ptr, "STACKPTR")) {
+                    write_defined(ptr,"REGISTER_SP",exp);                    
+                }
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;
                 char *value = "0";
@@ -375,6 +379,12 @@ int main(int argc, char **argv)
                 ol = 0;
             } else if ( sccz80_mode == 0 && strncmp(ptr, "endasm", 6) == 0 ) {
                 fputs("__endasm;\n",stdout);
+                ol = 0;
+            } else if ( sccz80_mode == 1 && strncmp(ptr, "asm", 3) == 0 ) {
+                fputs("#asm\n",stdout);
+                ol = 0;
+            } else if ( sccz80_mode == 1 && strncmp(ptr, "endasm", 6) == 0 ) {
+                fputs("#endasm\n",stdout);
                 ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
                 /* It's an option, this may tweak something */

@@ -17,6 +17,7 @@ stdio/obj/stdesc/fgetc
 stdio/obj/stdesc/fgetpos
 stdio/obj/stdesc/fgets
 stdio/obj/stdesc/fgets_cons
+stdio/obj/stdesc/fgets_cons_erase_character
 stdio/obj/stdesc/fmemopen
 stdio/obj/stdesc/fopen
 stdio/obj/stdesc/fprintf
@@ -26,6 +27,7 @@ stdio/obj/stdesc/fputs
 stdio/obj/stdesc/fputs_callee
 stdio/obj/stdesc/fread
 stdio/obj/stdesc/freopen
+stdio/obj/stdesc/_freopen1
 stdio/obj/stdesc/fseek
 stdio/obj/stdesc/ftell
 stdio/obj/stdesc/fwrite

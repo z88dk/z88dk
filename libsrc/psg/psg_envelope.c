@@ -12,7 +12,7 @@
 
 #include <psg.h>
 
-void psg_envelope(unsigned char waveform, int period, unsigned char channels) {
+void psg_envelope(unsigned int waveform, int period, unsigned int channels) {
 	set_psg(13, waveform);
 	set_psg(11, period & 255);
 	set_psg(12, period >> 8);

@@ -736,18 +736,20 @@ is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9"
 #------------------------------------------------------------------------------
 # Test consolidated object file
 write_file("test1.asm", <<'...');
-		global main, print, lib_start, lib_end
-
+		global main, main1, print, lib_start, lib_end
+		
 		section code
 	main:
 		call lib_start
-		ld hl,mess+main-main		; force main to appear in .o file
+		ld hl,mess
 		call print
 		call lib_end
 		ret
 		
 		section data
 	mess: defb "hello "	
+	
+		defc main1 = main
 ...
 
 write_file("test2.asm", <<'...');
@@ -894,6 +896,7 @@ File test.o at $0000: Z80RMF11
     L A $000B test3_mess (section data) test3.asm:11
     L A $000D test3_dollar (section data) test3.asm:12
     G A $0000 main (section code) test1.asm:4
+    G = $0000 main1 (section data) test1.asm:14
     G = $0000 print test2.asm:3
     G A $000D printa (section code) test2.asm:7
     G A $001F print1 (section code) test3.asm:4
@@ -903,9 +906,10 @@ File test.o at $0000: Z80RMF11
     U         lib_end
   Expressions:
     E Cw (test1.asm:5) $0000 $0001: lib_start (section code)
-    E Cw (test1.asm:6) $0003 $0004: test1_mess+main-main (section code)
+    E Cw (test1.asm:6) $0003 $0004: test1_mess (section code)
     E Cw (test1.asm:7) $0006 $0007: print (section code)
     E Cw (test1.asm:8) $0009 $000A: lib_end (section code)
+    E =  (test1.asm:14) $0006 $0006: main1 := main (section data)
     E Cw (test2.asm:20) $001B $001C: test2__delay_1 (section code)
     E Cw (test2.asm:14) $0015 $0016: test2_printa1 (section code)
     E Cw (test2.asm:13) $0012 $0013: test2__delay (section code)
@@ -930,6 +934,7 @@ test2_mess                      = $0006 ; addr, local, , , data, test2.asm:24
 test3_mess                      = $000B ; addr, local, , , data, test3.asm:11
 test3_dollar                    = $000D ; addr, local, , , data, test3.asm:12
 main                            = $0000 ; addr, public, , , code, test1.asm:4
+main1                           = $0000 ; comput, public, , , data, test1.asm:14
 print                           = $0000 ; comput, public, , , , test2.asm:3
 printa                          = $000D ; addr, public, , , code, test2.asm:7
 print1                          = $001F ; addr, public, , , code, test3.asm:4
@@ -956,6 +961,7 @@ test2_mess                      = $002B ; addr, local, , test, data, test2.asm:2
 test3_mess                      = $0030 ; addr, local, , test, data, test3.asm:11
 test3_dollar                    = $0032 ; addr, local, , test, data, test3.asm:12
 main                            = $0000 ; addr, public, , test, code, test1.asm:4
+main1                           = $0000 ; addr, public, , test, data, test1.asm:14
 print                           = $001F ; addr, public, , test, , test2.asm:3
 printa                          = $000D ; addr, public, , test, code, test2.asm:7
 print1                          = $001F ; addr, public, , test, code, test3.asm:4
@@ -993,6 +999,7 @@ test2_mess                      = $125F ; addr, local, , test, data, test2.asm:2
 test3_mess                      = $1264 ; addr, local, , test, data, test3.asm:11
 test3_dollar                    = $1266 ; addr, local, , test, data, test3.asm:12
 main                            = $1234 ; addr, public, , test, code, test1.asm:4
+main1                           = $1234 ; addr, public, , test, data, test1.asm:14
 print                           = $1253 ; addr, public, , test, , test2.asm:3
 printa                          = $1241 ; addr, public, , test, code, test2.asm:7
 print1                          = $1253 ; addr, public, , test, code, test3.asm:4

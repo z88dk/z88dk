@@ -7,8 +7,8 @@
 ;
 
                 SECTION         code_fp
-		INCLUDE		"cpcfp.def"
-		INCLUDE		"cpcfirm.def"
+		INCLUDE		"target/cpc/def/cpcfp.def"
+		INCLUDE		"target/cpc/def/cpcfirm.def"
 
 		PUBLIC		float
 		EXTERN        int_inv_sgn

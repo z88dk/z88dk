@@ -9,10 +9,12 @@
         SECTION code_clib
         PUBLIC getk
         PUBLIC _getk
-        EXTERN _x1_keyboard_io
+		
+		EXTERN _x1_keyboard_io
 
 getk:
 _getk:
+
         ld hl, _x1_keyboard_io
         ld a, (hl)
 
@@ -23,6 +25,6 @@ IF STANDARDESCAPECHARS
 .not_return
 ENDIF
 
-        ld h, 0
-        ld l, a
-	ret
+        ld h,0
+        ld l,a
+		ret

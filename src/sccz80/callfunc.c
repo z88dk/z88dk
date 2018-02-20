@@ -45,7 +45,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_call_type;
-       
+    
+    if ( functype->kind != KIND_FUNC ) {
+        warningfmt("incompatible-pointer-types","Calling via non-function pointer");
+        functype = default_function_with_type("(funcpointer)", functype);
+    }   
 
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
@@ -95,12 +99,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
 
     //  if ( ptr == NULL ) ptr = fnptr;
     if ( functype->oldstyle == 0 && functype->hasva == 0 && array_len(functype->parameters) < argnumber  ) {
-        warningfmt("Too many arguments to call to function '%s'", functype->name);
+        errorfmt("Too many arguments to call to function '%s'", 1, functype->name);
     }
 
     if ( functype->oldstyle == 0 && array_len(functype->parameters) > argnumber ) {
         if ( !(functype->hasva && argnumber == array_len(functype->parameters) -1) ) 
-            warningfmt("Too few arguments to call to function '%s'", functype->name);
+            errorfmt("Too few arguments to call to function '%s'", 1, functype->name);
     }
 
     if ( ptr != NULL ) {
@@ -199,10 +203,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
             // }
         }
-        if ( (function_pointer_call == 0 && (functype->flags & FASTCALL)) || 
-            (tmpfiles[argnumber+1] == NULL && (builtin_flags & FASTCALL) == FASTCALL ) ) {
-            /* fastcall of single expression OR the last argument of a builtin */
-
+        if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
+            ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
+                 /* fastcall of single expression OR the last argument of a builtin */
         } else {
             if (argnumber == watcharg) {
                 if (ptr)
@@ -375,18 +378,18 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
                 type_describe(src,str);
                 utstring_printf(str," to ");
                 type_describe(dest, str);
-                warningfmt("%s", utstring_body(str));
+                warningfmt("conversion","%s", utstring_body(str));
                 utstring_free(str);
             }
             force( dest->kind, src->kind, dest->isunsigned, src->isunsigned, isconst);
         } else {
             /* Converting pointer to integer */
-            warningfmt("Converting pointer to integer without cast");
+            warningfmt("int-conversion","Converting pointer to integer without cast");
             force( dest->kind, src->kind == KIND_PTR ? KIND_INT : KIND_LONG, dest->isunsigned, 1, isconst);
         }
     } else  if ( !ispointer(src) ) {
         // Converting int/long to pointer
-        //warningfmt("Converting int/long to pointer");
+        //warningfmt("unknown","Converting int/long to pointer");
         if ( dest->kind == KIND_CPTR && src->kind != KIND_LONG) {
             const2(0);            
         }
@@ -398,7 +401,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
         } else {
             // Pointer to pointer
             if ( dest->kind == KIND_PTR && src->kind == KIND_CPTR ) {
-                warningfmt("Narrowing pointer from far to near");
+                warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
             } else if ( type_matches(src, dest) == 0 && src->ptr->kind != KIND_VOID && dest->ptr->kind != KIND_VOID ) {
                 UT_string *str;
                 
@@ -407,7 +410,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
                 type_describe(src,str);
                 utstring_printf(str," to ");
                 type_describe(dest, str);
-                warningfmt("%s", utstring_body(str));
+                warningfmt("incompatible-pointer-types","%s", utstring_body(str));
                 utstring_free(str);
             }
         }

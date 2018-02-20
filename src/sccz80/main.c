@@ -85,6 +85,7 @@ static void openout(void);
 
 static int parse_arguments(option *args, int argc, char **argv);
 static void SetAssembler(option *arg, char* val);
+static void SetWarning(option *arg, char* val);
 static void SetDefine(option *arg, char *val);
 static void SetUndefine(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
@@ -141,8 +142,8 @@ static option  sccz80_opts[] = {
     { 0, "Wnone", OPT_FUNCTION|OPT_BOOL, "Disable all warnings", SetNoWarn, 0 },
     { 0, "Wall", OPT_FUNCTION|OPT_BOOL, "Enable all warnings", SetAllWarn, 0 },
     { 0, "Wn", OPT_FUNCTION, "<num> Disable a warning", UnSetWarning, 0},
-    { 0, "W", OPT_FUNCTION, "<num> Enable a warning",  SetWarning, 0 },
 #endif
+    { 0, "W", OPT_FUNCTION, "<type> Enable a class of warnings",  SetWarning, 0 },
     { 0, "", OPT_HEADER, "Debugging options", NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, 0 },
     { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, 0 },
@@ -915,6 +916,11 @@ void SetAssembler(option *arg, char *assembler)
     } else if (strcmp(assembler, "gnu") == 0) {
         c_assembler_type = ASM_GNU;
     }
+}
+
+void SetWarning(option *arg, char *value) 
+{
+    parse_warning_option(value);
 }
 
 

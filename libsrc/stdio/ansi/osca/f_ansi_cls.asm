@@ -14,7 +14,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_cls
-    INCLUDE "flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
 .ansi_cls
 	jp kjt_clear_screen

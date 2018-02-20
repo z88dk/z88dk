@@ -22,6 +22,7 @@
    defc DEF__crt_org_vector_table      = 0       ;; if negative and Z88DK supplies page zero code, creates a section "code_vector" aligned to a page boundary to hold int vectors
    defc DEF__crt_io_vector_base        = 0       ;; io vector base address for z180 internal peripherals
    defc DEF__crt_interrupt_mode        = -1      ;; if 0-2 crt inserts appropriate im x instruction
+   defc DEF__crt_interrupt_mode_exit   = -1      ;; if 0-2 crt inserts appropriate im x instruction on exit
 
    defc DEF__crt_enable_commandline    = 2       ;; generate argc and argv from command line (targets without command line will get argc=1, argv[0]="", argv[1]=NULL)
    defc DEF__crt_enable_restart        = 0       ;; if non-zero, restart the program on exit (correct initialization of static variables with rom models only)

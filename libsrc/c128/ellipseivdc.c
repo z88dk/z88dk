@@ -30,10 +30,10 @@ void ellipseivdc(int XC, int YC, int A, int B)
 
     while (XBB2 <= YAA2) /* draw octant from top to top right */
     {
-      setpixivdc(XC+X,YC+Y);
-      setpixivdc(XC+X,YC-Y);
-      setpixivdc(XC-X,YC+Y);
-      setpixivdc(XC-X,YC-Y);
+      setpixivdc((int)(XC+X),(int)(YC+Y));
+      setpixivdc((int)(XC+X),(int)(YC-Y));
+      setpixivdc((int)(XC-X),(int)(YC+Y));
+      setpixivdc((int)(XC-X),(int)(YC-Y));
       X += 1;
       XBB2 += BB2;
       ErrVal += XBB2-BB;
@@ -54,10 +54,10 @@ void ellipseivdc(int XC, int YC, int A, int B)
 
     while (XBB2 > YAA2)  /* draw octant from right to top right */
     {
-      setpixivdc(XC+X,YC+Y);
-      setpixivdc(XC+X,YC-Y);
-      setpixivdc(XC-X,YC+Y);
-      setpixivdc(XC-X,YC-Y);
+      setpixivdc((int)(XC+X),(int)(YC+Y));
+      setpixivdc((int)(XC+X),(int)(YC-Y));
+      setpixivdc((int)(XC-X),(int)(YC+Y));
+      setpixivdc((int)(XC-X),(int)(YC-Y));
       Y += 1;
       YAA2 += AA2;
       ErrVal += YAA2-AA;

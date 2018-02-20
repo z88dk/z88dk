@@ -12,7 +12,7 @@
 	
 	EXTERN    l_cmp
 
-    INCLUDE "osca.def"
+    INCLUDE "target/osca/def/osca.def"
     
 ;x_coord: defw 0
 ;y_coord: defw 0

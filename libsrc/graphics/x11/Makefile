@@ -12,10 +12,10 @@ all:	$(OFILES)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x11 @x11.lst
 
 %.o: %.c
-	zcc +test -DMAKE_LIB $(CFLAGS) $^ -o $@
+	$(ZCC) +test -DMAKE_LIB $(CFLAGS) $^ -o $@
 
 debug:	
-	zcc +test -DMAKE_LIB -D_DEBUG_ $(CFLAGS) *.c
+	$(ZCC) +test -DMAKE_LIB -D_DEBUG_ $(CFLAGS) *.c
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x11 @x11.lst
 
 clean:

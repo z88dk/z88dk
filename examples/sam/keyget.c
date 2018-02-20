@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-main() {
+void main() {
   unsigned char a;
   while (1) {
     a = getk();

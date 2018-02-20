@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: defs.h,v 1.4 2009-04-15 21:00:57 stefano Exp $
+$Id: defs.h,v $
 
 
 =========================================================================*/
@@ -30,11 +30,6 @@ $Id: defs.h,v 1.4 2009-04-15 21:00:57 stefano Exp $
 
 #include <math.h>
 #include <malloc.h>
-
-
-// HTC compatibility
-
-#define putch(chr)	fputc_cons(chr)
 
 
 // trivial stuff

@@ -1,7 +1,7 @@
 #include <sound.h>
 #include <stdio.h>
 
-int main()
+void main()
 {
 	int i;
 

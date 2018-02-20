@@ -33,7 +33,7 @@
         PUBLIC    fill
         PUBLIC    _fill
 
-        INCLUDE "cpcfirm.def"
+        INCLUDE "target/cpc/def/cpcfirm.def"
         
         INCLUDE	"graphics/grafix.inc"
 

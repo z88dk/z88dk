@@ -21,7 +21,7 @@ AFILES  = $(CIAFILES:.c=.asm)
 all:    $(CIAOBJECTS)
 
 .c.o:
-	zcc +test -DBUILDING_SOSLIB $(CFLAGS) $*.c
+	$(ZCC) +test -DBUILDING_SOSLIB $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

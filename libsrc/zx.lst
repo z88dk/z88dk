@@ -1,11 +1,14 @@
 @input/spectrum.lst
-@stdio/stdio.lst
+stdio/spectrum/fputc_cons_fzx
 stdio/spectrum/fputc_cons_rom_rst
 stdio/spectrum/fgetc_cons
+stdio/spectrum/fgetc_cons_inkey
 stdio/spectrum/fputc_cons
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64
+stdio/spectrum/CRT_FONT_FZX
+@stdio/stdio.lst
 @stdio/ansicore.lst
 stdio/ansi/spectrum/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel
@@ -15,6 +18,9 @@ stdio/ansi/spectrum/f_ansi_dline
 stdio/ansi/spectrum/f_ansi_scrollup
 time/spectrum/clock
 @gfxspectrum.lst
+@font/fzx/fzx.lst
+@font/font_4x8/font_4x8.lst
+@font/font_8x8/font_8x8.lst
 games/spectrum/joystick
 games/spectrum/bit_open
 games/spectrum/bit_open_di
@@ -22,6 +28,7 @@ games/spectrum/bit_close
 games/spectrum/bit_close_ei
 @games/games.lst
 @spectrum/spectrum.lst
+@spectrum/fzx/fzx.lst
 psg/spectrum/set_psg
 psg/spectrum/set_psg_callee
 psg/spectrum/get_psg

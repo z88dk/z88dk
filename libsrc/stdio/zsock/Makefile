@@ -14,7 +14,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 .c.o:
-	zcc +z88 $(CFLAGS) $*.c
+	$(ZCC) +z88 $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def *.sym *.map *.i $(AFILES)

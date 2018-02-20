@@ -99,21 +99,21 @@ int heir1(LVALUE* lval)
                     type_describe(lval->ltype,str);
                     utstring_printf(str," from ");
                     type_describe(rhs, str);
-                    warningfmt("%s", utstring_body(str));
+                    warningfmt("incompatible-pointer-types","%s", utstring_body(str));
                     utstring_free(str);
                 }
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
-                    warningfmt("Assigning CALLEE function pointer with non-CALLEE function");
+                    warningfmt("incompatible-function-types","Assigning CALLEE function pointer with non-CALLEE function");
                 }
                 if ( (lval->ltype->ptr->flags & SMALLC) && (rhs->ptr->flags & SMALLC) == 0 ) {
-                    warningfmt("Assigning SMALLC function pointer with non-SMALLC function");
+                    warningfmt("incompatible-function-types","Assigning SMALLC function pointer with non-SMALLC function");
                 }
             }
         } 
         if ( lval2.ltype->kind == KIND_VOID ) {
-            warningfmt("Assigning from a void expression");
+            warningfmt("void","Assigning from a void expression");
         }
 
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
@@ -516,7 +516,7 @@ int heira(LVALUE *lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
-        lval->const_val = ~(int32_t)lval->const_val;
+        lval->const_val = ~(uint32_t)lval->const_val;
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
@@ -627,7 +627,7 @@ int heirb(LVALUE* lval)
                     if (lval->ltype->kind == KIND_CPTR)
                         Zsp += 2;
                     if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
-                        warningfmt("Access of array at index %d is greater than size %d", val, lval->ltype->len);
+                        warningfmt("unknown","Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
@@ -686,6 +686,9 @@ int heirb(LVALUE* lval)
                     // Functino pointer call
                     callfunction(NULL,lval->ltype->ptr);
                     return_type = lval->ltype->ptr->return_type;
+                    if ( return_type == NULL ) {
+                        return_type = lval->ltype->ptr;
+                    }
                     flags = lval->ltype->ptr->flags;
                 } else if ( lval->ltype->kind == KIND_FUNC ) {
                     // Normal function call
@@ -720,20 +723,28 @@ int heirb(LVALUE* lval)
             /* Handle structures... come in here with lval holding tehe previous
              * pointer to the struct thing..*/
             else if ((direct = cmatch('.')) || match("->")) {
-                Type *str = lval->ltype->tag;
+                Type *str = lval->ltype;
                 Type *member_type;
 
-                if ( lval->ltype->kind == KIND_PTR || lval->ltype->kind == KIND_CPTR) {
-                    str = lval->ltype->ptr->tag;
+                // If there's a cast active, then use the cast type
+                if ( lval->cast_type ) {
+                    str = lval->cast_type;
                 }
 
+                if ( str->kind == KIND_PTR || str->kind == KIND_CPTR) {
+                    str = str->ptr->tag;
+                } else {
+                    str = str->tag;
+                }
+            
+
                 if (str == NULL ) {
-                    errorfmt("Can't take member", 1);
+                    errorfmt("Non struct type can't take member", 1);
                     junk();
                     return 0;
                 }
                 if (symname(sname) == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
-                    errorfmt("Unknown member: %s", 1, sname);
+                    errorfmt("Unknown member: '%s' of struct '%s'", 1, sname, str->name);
                     junk();
                     return 0;
                 }

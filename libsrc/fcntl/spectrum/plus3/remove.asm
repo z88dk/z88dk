@@ -14,7 +14,7 @@
 		PUBLIC	remove
       PUBLIC   _remove
 		EXTERN	dodos
-		INCLUDE	"p3dos.def"
+		INCLUDE	"target/zx/def/p3dos.def"
 
 
 .remove
@@ -24,7 +24,9 @@
 	push	hl
 	push	bc
 	ld	iy,DOS_DELETE
+	push	ix
 	call	dodos
+	pop	ix
 	ld	hl,0
 	ret	c	;OK
 	dec	hl

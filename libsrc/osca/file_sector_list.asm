@@ -36,7 +36,7 @@
 ;
 ;
 
-    INCLUDE "flos.def"
+    INCLUDE "target/osca/def/flos.def"
 
         SECTION code_clib
 	PUBLIC  file_sector_list

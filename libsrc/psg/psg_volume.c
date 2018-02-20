@@ -12,6 +12,6 @@
 
 #include <psg.h>
 
-void psg_volume(unsigned char channel, unsigned char volume) {
+void psg_volume(unsigned int channel, unsigned int volume) {
 	set_psg(channel + 8, volume & 15);
 }

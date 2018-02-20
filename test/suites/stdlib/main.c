@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     res += test_isqrt();
     res += test_isqrt2();
     res += test_strtol();
+    res += test_unbcd();
 
     return res;
 }

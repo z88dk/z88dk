@@ -38,6 +38,14 @@
 	ld	h,a
 	CALL 11CDh      ; L2A - convert location to screen address
 	pop	af
+	
+	cp	97	; Between a and z ?
+	jr	c,isntlower
+	cp	123
+	jr	nc,isntlower
+	add	a,32
+
+.isntlower
 	ld	(hl),a
 	
 	ld	a,$E0

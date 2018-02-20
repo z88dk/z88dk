@@ -4,7 +4,7 @@
 		
 		EXTERN	cpc_GetScrAddress0
 
-        ;INCLUDE "cpcfirm.def"
+        ;INCLUDE "target/cpc/def/cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;

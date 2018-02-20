@@ -3,7 +3,7 @@ divert(-1)
 ###############################################################
 # ESXDOS 0.8.5 CONFIGURATION
 # rebuild the library if changes are made
-#
+# see NextOS config for ESXDOS compatible API under NextOS
 
 # Code Separation
 

@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <math.h>
 
-main()
+void main()
 {
 
 float x,y,incr,yenlarge;

@@ -22,7 +22,7 @@
 
 struct window win;    /* Window structure */
 
-main()
+void main()
 {
         double x[NODES], y[NODES], z[NODES];
         double vx, vy, vz;

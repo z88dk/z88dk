@@ -9,4 +9,5 @@
 #include <X11/Xlib.h>
 
 int XFlush(Display *display) {
+    return 0;
 }

@@ -15,7 +15,7 @@
    PUBLIC   _a_cury
 	
 	EXTERN	subuserf
-	INCLUDE	"amstrad_userf.def"
+	INCLUDE	"target/cpc/def/amstrad_userf.def"
 
 a_cury:
 _a_cury:

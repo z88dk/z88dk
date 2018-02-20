@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     char  *filename;
     char  *endp;
     uint16_t    org = 0;
-    uint16_t    start = 0;
+    int         start = -1;
     uint16_t    end = 65535;
     int    loaded = 0;
 
@@ -55,6 +55,9 @@ int main(int argc, char **argv)
             switch (argc--, argv++[1][1]){
             case 'o':
                 org = strtol(argv[1], &endp, 0);
+                if ( start == -1 ) {
+                    start = org;
+                }
                 argc--; argv++;
                 break;
             case 's':
@@ -109,8 +112,11 @@ int main(int argc, char **argv)
             argc--; argv++;
         }
     }
+    if ( start < 0 ) {
+        start = 0;
+    }
     if ( loaded ) {
-        disassemble_loop(start,end);
+        disassemble_loop(start % 65536,end);
     } else {
         usage(program);
     }

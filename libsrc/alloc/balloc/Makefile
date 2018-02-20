@@ -55,16 +55,16 @@ obj/z80-zxn/%.o: %.asm
 	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.c
-	zcc +$(TARGET) $(CFLAGS) -o   $^
+	$(ZCC) +$(TARGET) $(CFLAGS) -o   $^
 
 obj/z80-zxn/%.o: %.c
-	zcc +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
+	$(ZCC) +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
 
 obj/ixiy/%.o: %.c
-	zcc +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
+	$(ZCC) +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
 
 obj/r2k/%.o: %.c
-	zcc +rcmx000 $(CFLAGS) -o $  $^
+	$(ZCC) +rcmx000 $(CFLAGS) -o $  $^
 
 dirs:
 	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k

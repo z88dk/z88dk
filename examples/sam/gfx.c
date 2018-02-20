@@ -5,7 +5,7 @@
 
 struct window mine;     /* Window structure */
 
-main()
+void main()
 {
         int     j,i;
 
