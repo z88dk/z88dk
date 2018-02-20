@@ -23043,13 +23043,14 @@ replace restart {
 	; peephole z88dk-485e4
 } if notUsed('a')
 
-replace restart {
-	add	a,#%1
-	add	a,#%2
-} by {
-	add	a,#%1+%2
-	; peephole z88dk-485e5
-}
+//replace restart {
+//	add	a,#%1
+//	add	a,#%2
+//} by {
+//	add	a,#%1+#%2
+//	; peephole z88dk-485e5
+//}
+// carry flag state not preserved
 
 replace restart {
 	ld	hl,#%1
