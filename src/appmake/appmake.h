@@ -158,6 +158,9 @@ extern option_t  vz_options;
 extern int       x07_exec(char *target);
 extern option_t  x07_options;
 
+extern int       x1_exec(char *target);
+extern option_t  x1_options;
+
 extern int       z1013_exec(char *target);
 extern option_t  z1013_options;
 
@@ -364,27 +367,31 @@ struct {
       "Convert to Philips VG-5000 .k7 format, optionally to WAV",
       NULL,
       vg5k_exec,    &vg5k_options },
-    { "appz88",   "z88",      "(C) 2000,2003 Dominic Morris & Dennis Groning",
+    { "appz88",     "z88",      "(C) 2000,2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       NULL,
       z88_exec,     &z88_options },
-    { "x07cas",    "x07",     "(C) 2011 Stefano Bodrato",
+    { "x07cas",     "x07",     "(C) 2011 Stefano Bodrato",
       "Prapares a .cas file for the Canon X-07, optional WAV format",
       NULL,
       x07_exec,    &x07_options },
-    { "z1013",    "z1013",     "(C) 2016 Stefano Bodrato",
+    { "x1-2d",       "x1",     "(C) 2018 Stefano Bodrato",
+      "Prapares a .2d disk image file for the Sharp X1",
+      NULL,
+      x1_exec,    &x1_options },
+    { "z1013",      "z1013",     "(C) 2016 Stefano Bodrato",
       "Prapares a .z80 file for the Robotron Z1013, optional WAV format",
       NULL,
       z1013_exec,    &z1013_options },
-    { "kctape",   "z9001",      "(C) 2016 Stefano Bodrato",
+    { "kctape",     "z9001",      "(C) 2016 Stefano Bodrato",
       "Prapares a .TAP file for the Robotron Z9001, KC85/1, KC87",
       NULL,
       z9001_exec,     &z9001_options },
-    { "shellmak", "z88shell", "(C) 2002,2003 Dominic Morris",   
+    { "shellmak",   "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       NULL,
       z88shell_exec,&z88shell_options },
-    { "appzxvgs", "zxvgs",    "(C) 2003 Yarek",
+    { "appzxvgs",   "zxvgs",    "(C) 2003 Yarek",
       "Creates a zxvgs application file",
       NULL,
       zxvgs_exec,   &zxvgs_options},
