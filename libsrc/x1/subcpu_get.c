@@ -13,9 +13,14 @@
 
 extern int subcpu_get() {
 	#asm
-	ld bc, $1900
-	in	a,(c)
-	ld	h,0
-	ld	l,a
+OBCK:
+	LD	A,1AH
+	IN	A,(1)
+	AND	20H
+	JR	NZ,OBCK
+	LD	BC,1900H
+	IN	A,(C)
+	LD	H,C
+	LD	L,A	
 	#endasm
 }
