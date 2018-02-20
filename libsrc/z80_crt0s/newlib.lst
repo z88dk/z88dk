@@ -288,3 +288,5 @@
 ../_DEVELOPMENT/math/integer/l_mulu_64_32x32
 ../_DEVELOPMENT/math/integer/l_mulu_64_64x64
 ../_DEVELOPMENT/math/integer/l_mulu_72_64x8
+../_DEVELOPMENT/z80/z80/asm_z80_delay_ms
+../_DEVELOPMENT/z80/z80/asm_z80_delay_tstate.asm

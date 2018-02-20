@@ -38,6 +38,7 @@
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 0xe000
         INCLUDE "crt/classic/crt_rules.inc"
+	defc	__CPU_CLOCK = 2000000
 	org     CRT_ORG_CODE
 
 ; NASSYS1..NASSYS3

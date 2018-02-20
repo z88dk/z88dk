@@ -47,6 +47,8 @@
 
 
 
+	defc	__CPU_CLOCK = 3276800
+
 ;-------
 ; Select which particular startup we want
 ;-------

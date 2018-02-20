@@ -51,6 +51,7 @@
 
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -1
+	defc	__CPU_CLOCK = 3250000
         INCLUDE "crt/classic/crt_rules.inc"
         org     CRT_ORG_CODE
 

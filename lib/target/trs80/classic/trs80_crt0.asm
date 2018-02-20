@@ -39,6 +39,7 @@ ENDIF
 
 	defc	TAR__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
+	defc	__CPU_CLOCK = 1774000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
 	org     CRT_ORG_CODE

@@ -298,6 +298,8 @@ extern void   __LIB__ __SAVEFRAME__     sleep (int secs) __z88dk_fastcall;
 extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
 #else
 extern void   __LIB__ __SAVEFRAME__     sleep (int secs);
+/* Sleep for a number of milliseconds - busy loop */
+extern void __LIB__ msleep(unsigned int milliseconds) __z88dk_fastcall;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
 extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds);
 #endif

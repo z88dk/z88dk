@@ -116,3 +116,4 @@ crt0/l_pop_ei
 ../_DEVELOPMENT/z80/z80/asm_z80_pop_ei
 @sdcc.lst
 @newlib.lst
+@newlib-z80.lst

@@ -11,7 +11,7 @@ defc __Z80 = 0x01
 defc __Z80_NMOS = 0x01
 defc __Z80_CMOS = 0x02
 
-defc __CPU_CLOCK = 4000000
+EXTERN __CPU_CLOCK
 
 defc __CPU_INFO = 0x00
 defc __CPU_INFO_ENABLE_SLL = 0x01

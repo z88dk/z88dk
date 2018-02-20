@@ -37,3 +37,8 @@
    ELSE
      defc __CRT_KEY_CAPS_LOCK = 6
    ENDIF
+
+   PUBLIC __CPU_CLOCK
+   IFNDEF __CPU_CLOCK
+     defc __CPU_CLOCK = 3500000
+   ENDIF

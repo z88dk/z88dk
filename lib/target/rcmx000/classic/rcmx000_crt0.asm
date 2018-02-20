@@ -42,6 +42,7 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	defc	__CPU_CLOCK = 6000000
 
 	org 0
 start:

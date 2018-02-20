@@ -99,6 +99,7 @@ ENDIF
 		SECTION	code_arch
 		SECTION	code_font
 		SECTION	code_font_fzx
+		SECTION	code_z80
 
 		SECTION code_user
 		SECTION rodata_fp
