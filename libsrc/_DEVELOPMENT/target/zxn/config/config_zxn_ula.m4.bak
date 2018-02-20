@@ -10,10 +10,15 @@ divert(-1)
 # which adds several video modes and adds a new lo-res mode
 # exclusive to the next.
 #
-# Default ula mode:
+# Default ula mode (Timex DFILE_1):
 #
 # 256x192 pixel, 32x24 attributes
 # display file @ 0x4000, 6912 bytes
+#
+# Timex DFILE_2:
+#
+# 256x192 pixel, 32x24 attributes
+# display file @ 0x6000, 6912 bytes
 #
 # Timex hi-colour mode:
 #
@@ -48,7 +53,11 @@ divert(-1)
 # has to do with the original spectrum only being capable of
 # mapping bank 7 to address 0xc000 in memory but the Next is
 # capable of mapping this bank at multiple places in the z80's
-# address space.
+# address space.  However it is important to note that when
+# bank 7 is used for the ula, layer 2 cannot be mixed into the
+# display.  If a second buffer ula screen is needed along with
+# layer 2, it is recommended the second timex display file
+# is used for double buffering instead of the 128k's in bank 7.
 #
 # The Next also adds a viewport for all ula modes and hardware
 # scrolling for the Lo-Res mode only.
@@ -75,6 +84,7 @@ define(`__IO_FE_BORDER_MASK', 0x07)   # border colour in bottom three bits
 # PORT 0xFF: Timex Video Modes
 
 define(`__IO_TIMEX_VIDEO_MODE', 0xff)
+
 define(`__IO_TVM_DISABLE_ULA_INTERRUPT', 0x40)
 define(`__IO_TVM_DFILE_1', 0x0)         # spectrum display
 define(`__IO_TVM_DFILE_2', 0x01)        # spectrum display @ 0x6000
@@ -88,6 +98,20 @@ define(`__IO_TVM_HIRES_GREEN', 0x26)    # timex hi-res green ink
 define(`__IO_TVM_HIRES_CYAN', 0x2e)     # timex hi-res cyan ink
 define(`__IO_TVM_HIRES_YELLOW', 0x36)   # timex hi-res yellow ink
 define(`__IO_TVM_HIRES_WHITE', 0x3e)    # timex hi-res white ink
+
+define(`__IO_FF_DISABLE_ULA_INTERRUPT', __IO_TVM_DISABLE_ULA_INTERRUPT)
+define(`__IO_FF_DFILE_1', __IO_TVM_DFILE_1)
+define(`__IO_FF_DFILE_2', __IO_TVM_DFILE_2)
+define(`__IO_FF_HICOLOR', __IO_TVM_HICOLOR)
+define(`__IO_FF_HIRES', __IO_TVM_HIRES)
+define(`__IO_FF_HIRES_BLACK', __IO_TVM_HIRES_BLACK)
+define(`__IO_FF_HIRES_BLUE', __IO_TVM_HIRES_BLUE)
+define(`__IO_FF_HIRES_RED', __IO_TVM_HIRES_RED)
+define(`__IO_FF_HIRES_MAGENTA', __IO_TVM_HIRES_MAGENTA)
+define(`__IO_FF_HIRES_GREEN', __IO_TVM_HIRES_GREEN)
+define(`__IO_FF_HIRES_CYAN', __IO_TVM_HIRES_CYAN)
+define(`__IO_FF_HIRES_YELLOW', __IO_TVM_HIRES_YELLOW)
+define(`__IO_FF_HIRES_WHITE', __IO_TVM_HIRES_WHITE)
 
 # PORT 0x7FFD: 128k Memory Mapping 1
 #
@@ -157,6 +181,7 @@ PUBLIC `__IO_FE_MIC'
 PUBLIC `__IO_FE_BORDER_MASK'
 
 PUBLIC `__IO_TIMEX_VIDEO_MODE'
+
 PUBLIC `__IO_TVM_DISABLE_ULA_INTERRUPT'
 PUBLIC `__IO_TVM_DFILE_1'
 PUBLIC `__IO_TVM_DFILE_2'
@@ -170,6 +195,20 @@ PUBLIC `__IO_TVM_HIRES_GREEN'
 PUBLIC `__IO_TVM_HIRES_CYAN'
 PUBLIC `__IO_TVM_HIRES_YELLOW'
 PUBLIC `__IO_TVM_HIRES_WHITE'
+
+PUBLIC `__IO_FF_DISABLE_ULA_INTERRUPT'
+PUBLIC `__IO_FF_DFILE_1'
+PUBLIC `__IO_FF_DFILE_2'
+PUBLIC `__IO_FF_HICOLOR'
+PUBLIC `__IO_FF_HIRES'
+PUBLIC `__IO_FF_HIRES_BLACK'
+PUBLIC `__IO_FF_HIRES_BLUE'
+PUBLIC `__IO_FF_HIRES_RED'
+PUBLIC `__IO_FF_HIRES_MAGENTA'
+PUBLIC `__IO_FF_HIRES_GREEN'
+PUBLIC `__IO_FF_HIRES_CYAN'
+PUBLIC `__IO_FF_HIRES_YELLOW'
+PUBLIC `__IO_FF_HIRES_WHITE'
 ')
 
 dnl#
@@ -184,6 +223,7 @@ defc `__IO_FE_MIC' = __IO_FE_MIC
 defc `__IO_FE_BORDER_MASK' = __IO_FE_BORDER_MASK
 
 defc `__IO_TIMEX_VIDEO_MODE' = __IO_TIMEX_VIDEO_MODE
+
 defc `__IO_TVM_DISABLE_ULA_INTERRUPT' = __IO_TVM_DISABLE_ULA_INTERRUPT
 defc `__IO_TVM_DFILE_1' = __IO_TVM_DFILE_1
 defc `__IO_TVM_DFILE_2' = __IO_TVM_DFILE_2
@@ -197,6 +237,20 @@ defc `__IO_TVM_HIRES_GREEN' = __IO_TVM_HIRES_GREEN
 defc `__IO_TVM_HIRES_CYAN' = __IO_TVM_HIRES_CYAN
 defc `__IO_TVM_HIRES_YELLOW' = __IO_TVM_HIRES_YELLOW
 defc `__IO_TVM_HIRES_WHITE' = __IO_TVM_HIRES_WHITE
+
+defc `__IO_FF_DISABLE_ULA_INTERRUPT' = __IO_TVM_DISABLE_ULA_INTERRUPT
+defc `__IO_FF_DFILE_1' = __IO_TVM_DFILE_1
+defc `__IO_FF_DFILE_2' = __IO_TVM_DFILE_2
+defc `__IO_FF_HICOLOR' = __IO_TVM_HICOLOR
+defc `__IO_FF_HIRES' = __IO_TVM_HIRES
+defc `__IO_FF_HIRES_BLACK' = __IO_TVM_HIRES_BLACK
+defc `__IO_FF_HIRES_BLUE' = __IO_TVM_HIRES_BLUE
+defc `__IO_FF_HIRES_RED' = __IO_TVM_HIRES_RED
+defc `__IO_FF_HIRES_MAGENTA' = __IO_TVM_HIRES_MAGENTA
+defc `__IO_FF_HIRES_GREEN' = __IO_TVM_HIRES_GREEN
+defc `__IO_FF_HIRES_CYAN' = __IO_TVM_HIRES_CYAN
+defc `__IO_FF_HIRES_YELLOW' = __IO_TVM_HIRES_YELLOW
+defc `__IO_FF_HIRES_WHITE' = __IO_TVM_HIRES_WHITE
 ')
 
 dnl#
@@ -211,6 +265,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_FE_BORDER_MASK'  __IO_FE_BORDER_MASK
 
 `#define' `__IO_TIMEX_VIDEO_MODE'  __IO_TIMEX_VIDEO_MODE
+
 `#define' `__IO_TVM_DISABLE_ULA_INTERRUPT'  __IO_TVM_DISABLE_ULA_INTERRUPT
 `#define' `__IO_TVM_DFILE_1'  __IO_TVM_DFILE_1
 `#define' `__IO_TVM_DFILE_2'  __IO_TVM_DFILE_2
@@ -224,4 +279,18 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_TVM_HIRES_CYAN'  __IO_TVM_HIRES_CYAN
 `#define' `__IO_TVM_HIRES_YELLOW'  __IO_TVM_HIRES_YELLOW
 `#define' `__IO_TVM_HIRES_WHITE'  __IO_TVM_HIRES_WHITE
+
+`#define' `__IO_FF_DISABLE_ULA_INTERRUPT'  __IO_TVM_DISABLE_ULA_INTERRUPT
+`#define' `__IO_FF_DFILE_1'  __IO_TVM_DFILE_1
+`#define' `__IO_FF_DFILE_2'  __IO_TVM_DFILE_2
+`#define' `__IO_FF_HICOLOR'  __IO_TVM_HICOLOR
+`#define' `__IO_FF_HIRES'  __IO_TVM_HIRES
+`#define' `__IO_FF_HIRES_BLACK'  __IO_TVM_HIRES_BLACK
+`#define' `__IO_FF_HIRES_BLUE'  __IO_TVM_HIRES_BLUE
+`#define' `__IO_FF_HIRES_RED'  __IO_TVM_HIRES_RED
+`#define' `__IO_FF_HIRES_MAGENTA'  __IO_TVM_HIRES_MAGENTA
+`#define' `__IO_FF_HIRES_GREEN'  __IO_TVM_HIRES_GREEN
+`#define' `__IO_FF_HIRES_CYAN'  __IO_TVM_HIRES_CYAN
+`#define' `__IO_FF_HIRES_YELLOW'  __IO_TVM_HIRES_YELLOW
+`#define' `__IO_FF_HIRES_WHITE'  __IO_TVM_HIRES_WHITE
 ')

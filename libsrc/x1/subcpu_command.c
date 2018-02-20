@@ -12,12 +12,13 @@
 
 extern void __FASTCALL__ subcpu_command(int command) {
 	#asm
-	ld	a,l
-	push af
-	call _wait_sub_cpu
-	ld bc, $1900
-	pop af
-	out	(c),a
-	call _wait_sub_cpu
+IBCK:
+	LD	A,1AH
+	IN	A,(1)
+	AND	40H
+	JR	NZ,IBCK
+	LD	BC,1900H
+	LD	A,L
+	OUT	(C),A
 	#endasm
 }

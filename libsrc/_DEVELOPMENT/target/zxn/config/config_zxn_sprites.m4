@@ -96,8 +96,12 @@ define(`__IO_SPRITE_SLOT', 0x303b)
 # Reading from the port resets the bits
 
 define(`__IO_SPRITE_FLAGS', 0x303b)
+
 define(`__ISF_MAX_SPRITES_PER_LINE', 0x02)  # set if more than 12 sprites appear on any scanline
 define(`__ISF_COLLISION', 0x01)             # set if non-transparent pixels of any two sprites overlap
+
+define(`__IO_303B_MAX_SPRITES_PER_LINE', __ISF_MAX_SPRITES_PER_LINE)
+define(`__IO_303B_COLLISION', __ISF_COLLISION)
 
 # PORT 0x53: Sprite Palette (write only)
 #
@@ -145,8 +149,12 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__IO_SPRITE_SLOT'
 
 PUBLIC `__IO_SPRITE_FLAGS'
+
 PUBLIC `__ISF_MAX_SPRITES_PER_LINE'
 PUBLIC `__ISF_COLLISION'
+
+PUBLIC `__IO_303B_MAX_SPRITES_PER_LINE'
+PUBLIC `__IO_303B_COLLISION'
 
 PUBLIC `__IO_SPRITE_PALETTE'
 
@@ -164,8 +172,12 @@ ifdef(`CFG_ASM_DEF',
 defc `__IO_SPRITE_SLOT' = __IO_SPRITE_SLOT
 
 defc `__IO_SPRITE_FLAGS' = __IO_SPRITE_FLAGS
+
 defc `__ISF_MAX_SPRITES_PER_LINE' = __ISF_MAX_SPRITES_PER_LINE
 defc `__ISF_COLLISION' = __ISF_COLLISION
+
+defc `__IO_303B_MAX_SPRITES_PER_LINE' = __ISF_MAX_SPRITES_PER_LINE
+defc `__IO_303B_COLLISION' = __ISF_COLLISION
 
 defc `__IO_SPRITE_PALETTE' = __IO_SPRITE_PALETTE
 
@@ -183,8 +195,12 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_SPRITE_SLOT'  __IO_SPRITE_SLOT
 
 `#define' `__IO_SPRITE_FLAGS'  __IO_SPRITE_FLAGS
+
 `#define' `__ISF_MAX_SPRITES_PER_LINE'  __ISF_MAX_SPRITES_PER_LINE
 `#define' `__ISF_COLLISION'  __ISF_COLLISION
+
+`#define' `__IO_303B_MAX_SPRITES_PER_LINE'  __ISF_MAX_SPRITES_PER_LINE
+`#define' `__IO_303B_COLLISION'  __ISF_COLLISION
 
 `#define' `__IO_SPRITE_PALETTE'  __IO_SPRITE_PALETTE
 

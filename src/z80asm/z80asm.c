@@ -115,6 +115,7 @@ void assemble_file( char *filename )
 	module->filename = strpool_add( src_filename );
 
 	/* Create error file */
+	remove(get_err_filename(src_filename));
 	open_error_file(src_filename);
 
 	if (load_obj_only) {
@@ -173,15 +174,6 @@ static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
 	char *obj_filename = get_obj_filename(src_filename);
-
-	/* we are going to create new output files; delete old ones */
-	remove(obj_filename);
-	remove(get_list_filename(src_filename));
-	remove(get_bin_filename(src_filename));
-	remove(get_sym_filename(src_filename));
-	remove(get_map_filename(src_filename));
-	remove(get_reloc_filename(src_filename));
-	remove(get_def_filename(src_filename));
 
 	/* create list file */
 	if (opts.list)

@@ -8,6 +8,17 @@ divert(-1)
 # NEXTOS API 1.94B
 # https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 
+# NOTE:
+#
+# For most NextOS functions, the memory map must be set up
+# as ROM2 in the bottom 16k, BANK 7 in the top 16k and page 10 in
+# mmu2.  This latter setting puts the system variables from BANK 5
+# into the 16k-24k area.  System variables BANKM an BANK678 must
+# accurately reflect the current banking arrangement.
+#
+# In addition, layer 2 write-only into
+# the lower 16k must be disabled (port 0x123b, IO_LAYER_2_CONFIG)
+
 # Filesystem Related
 
 define(`__NEXTOS_DOS_VERSION', 0x0103)
