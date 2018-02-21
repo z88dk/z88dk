@@ -198,6 +198,7 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #   1   ?   ?   ?   ?   ?   1   1
 #       |   |   |   |   |
 #       1   0   0   1   1 = 0xCF = Load
+#       1   0   1   0   0 = 0xD3 = Continue
 #       0   0   0   0   1 = 0x87 = Enable DMA
 #       0   0   0   0   0 = 0x83 = Disable DMA
 #   +-- 0   1   1   1   0 = 0xBB = Read Mask Follows
@@ -227,6 +228,14 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #
 # There are far fewer commands implemented than on the Z80 DMA.  This means DMA
 # programs can be shorter and simpler.
+#
+# Prior to starting the DMA, a LOAD command must be issued to copy the Port A and
+# Port B addresses into the DMA's internal pointers.  Then an "Enable DMA" command
+# is issued to start the DMA.
+#
+# The "Continue" command resets the DMA's byte counter so that a following "Enable DMA"
+# allows the DMA to repeat the last transfer but using the current internal address
+# pointers.  Ie it continues where the last copy operation left off.
 #
 # Registers can be read via an io read from the dma port after setting the read mask.
 # Register values are the current internal dma counter values.  So "Port Address A Low"
