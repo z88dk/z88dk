@@ -8,7 +8,7 @@ include ../Make.config
 TARGET ?= test
 
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
-CUSTOBJECTS = sleep.o csleep.o delay.o
+CUSTOBJECTS = sleep.o 
 ASMFILES = $(wildcard *.asm)
 
 

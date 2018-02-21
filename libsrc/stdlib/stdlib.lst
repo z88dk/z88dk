@@ -26,7 +26,6 @@ stdlib/obj/${TYPE}/wpeek
 stdlib/obj/${TYPE}/wpoke
 stdlib/obj/${TYPE}/wpoke_callee
 stdlib/obj/${TYPE}/getopt
-stdlib/obj/${TARGET}/delay
 stdlib/obj/${TYPE}/t_delay
 stdlib/obj/${TARGET}/sleep
 stdlib/obj/${TARGET}/csleep
