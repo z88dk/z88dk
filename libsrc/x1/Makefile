@@ -9,6 +9,7 @@ include ../Make.config
 
 AFILES = \
 	subcpu_command.c \
+	subcpu_reset.c \
 	subcpu_set.c \
 	subcpu_get.c
 

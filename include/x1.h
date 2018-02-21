@@ -46,6 +46,9 @@ extern void  __LIB__ subcpu_command(int command) __z88dk_fastcall;
 // Send a byte parameter to the SUB-CPU
 extern void  __LIB__ subcpu_set(int command) __z88dk_fastcall;
 
+// Reset the SUB-CPU
+extern void  __LIB__ subcpu_reset() __z88dk_fastcall;
+
 // Get a byte from the SUB-CPU
 extern int __LIB__ subcpu_get();
 

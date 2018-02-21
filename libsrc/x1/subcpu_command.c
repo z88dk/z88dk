@@ -12,13 +12,14 @@
 
 extern void __FASTCALL__ subcpu_command(int command) {
 	#asm
+	CALL IBCK
+	LD	BC,1900H
+	LD	A,L
+	OUT	(C),A
 IBCK:
 	LD	A,1AH
 	IN	A,(1)
 	AND	40H
 	JR	NZ,IBCK
-	LD	BC,1900H
-	LD	A,L
-	OUT	(C),A
 	#endasm
 }
