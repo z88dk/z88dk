@@ -1866,5 +1866,21 @@ defc __IO_FF_HIRES_WHITE = 0x3e
 
 
 
+
+
+defc __IO_DMA = 0x6b
+
+defc __IO_DMA_MB02 = 0x0b
+defc __IO_DMA_DATAGEAR = 0x6b
+
+
+
+
+
+
+
+
+
+
 ENDIF
 

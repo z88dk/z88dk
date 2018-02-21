@@ -106,6 +106,8 @@ extern unsigned char IO_UART_BAUD_RATE;
 extern unsigned char IO_133B;
 extern unsigned char IO_UART_TX;
 extern unsigned char IO_UART_STATUS;
+extern unsigned char IO_6B;
+extern unsigned char IO_DMA;
 
 #else
 
@@ -175,6 +177,11 @@ __sfr __banked __at __IO_UART_BAUD_RATE IO_UART_BAUD_RATE;
 __sfr __banked __at 0x133b IO_133B;
 __sfr __banked __at __IO_UART_TX IO_UART_TX;
 __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
+
+// io ports - dma
+
+__sfr __at 0x6b IO_6B;
+__sfr __at __IO_DMA IO_DMA;
 
 #endif
 

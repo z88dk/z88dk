@@ -1855,6 +1855,22 @@
 
 
 
+
+
+
+
+
+
+
+#define __IO_DMA  0x6b
+
+#define __IO_DMA_MB02  0x0b
+#define __IO_DMA_DATAGEAR  0x6b
+
+
+
+
+
 #endif
 
 
