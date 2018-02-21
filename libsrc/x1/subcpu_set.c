@@ -12,8 +12,13 @@
 
 extern void __FASTCALL__ subcpu_set(int command) {
 	#asm
-	ld	a,l
-	ld bc, $1900
-	out (c),a
+IBCK:
+	LD	A,1AH
+	IN	A,(1)
+	AND	40H
+	JR	NZ,IBCK
+	LD	BC,1900H
+	LD	A,L
+	OUT	(C),A
 	#endasm
 }
