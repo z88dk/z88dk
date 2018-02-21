@@ -53,6 +53,7 @@ IF !DEFINED_CRT_ORG_BSS
 	defc DEFINED_CRT_ORG_BSS = 1
 ENDIF
 	defc	__crt_org_bss = CRT_ORG_BSS
+	defc	__CPU_CLOCK = 2000000
 
 
 	org    ROM_Start

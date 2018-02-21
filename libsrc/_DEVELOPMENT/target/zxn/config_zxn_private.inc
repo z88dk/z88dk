@@ -43,7 +43,7 @@ defc __ENV_GETENV_BUFSZ = 64
 defc __ENV_LTMPNAM = 12
 defc __ENV_TMPMAX = 0xffff
 
-defc __SPECTRUM = 2
+defc __SPECTRUM = 16
 
 defc __SPECTRUM_48 = 1
 defc __SPECTRUM_128 = 2
@@ -1074,12 +1074,20 @@ defc __IO_SOUNDRIVE_R_C2 = 0xf9
 defc __IO_SOUNDRIVE_R_D2 = 0xfb
 
 defc __IO_TURBOSOUND = 0xfffd
+
 defc __IT_ENABLE_L = 0xd0
 defc __IT_ENABLE_R = 0xb0
 defc __IT_ENABLE_LR = 0xf0
 defc __IT_SELECT_PSG_0 = 0x0f
 defc __IT_SELECT_PSG_1 = 0x0e
 defc __IT_SELECT_PSG_2 = 0x0d
+
+defc __IO_FFFD_ENABLE_L = 0xd0
+defc __IO_FFFD_ENABLE_R = 0xb0
+defc __IO_FFFD_ENABLE_LR = 0xf0
+defc __IO_FFFD_SELECT_PSG_0 = 0x0f
+defc __IO_FFFD_SELECT_PSG_1 = 0x0e
+defc __IO_FFFD_SELECT_PSG_2 = 0x0d
 
 defc __IO_AY_REG = 0xfffd
 defc __IO_AY_DAT = 0xbffd
@@ -1108,6 +1116,7 @@ defc __IO_AY_DAT = 0xbffd
 
 
 defc __IO_LAYER_2_CONFIG = 0x123b
+
 defc __IL2C_ENABLE_LOWER_16K = 0x01
 defc __IL2C_SHOW_LAYER_2 = 0x02
 defc __IL2C_SELECT_SHADOW_BUFFER = 0x08
@@ -1115,6 +1124,14 @@ defc __IL2C_BANK_SELECT_MASK = 0xc0
 defc __IL2C_BANK_SELECT_0 = 0x00
 defc __IL2C_BANK_SELECT_1 = 0x40
 defc __IL2C_BANK_SELECT_2 = 0x80
+
+defc __IO_123B_ENABLE_LOWER_16K = 0x01
+defc __IO_123B_SHOW_LAYER_2 = 0x02
+defc __IO_123B_SELECT_SHADOW_BUFFER = 0x08
+defc __IO_123B_BANK_SELECT_MASK = 0xc0
+defc __IO_123B_BANK_SELECT_0 = 0x00
+defc __IO_123B_BANK_SELECT_1 = 0x40
+defc __IO_123B_BANK_SELECT_2 = 0x80
 
 
 
@@ -1572,8 +1589,12 @@ defc __RCCH_COPPER_RUN_ON_INTERRUPT = 0xc0
 defc __IO_SPRITE_SLOT = 0x303b
 
 defc __IO_SPRITE_FLAGS = 0x303b
+
 defc __ISF_MAX_SPRITES_PER_LINE = 0x02
 defc __ISF_COLLISION = 0x01
+
+defc __IO_303B_MAX_SPRITES_PER_LINE = 0x02
+defc __IO_303B_COLLISION = 0x01
 
 defc __IO_SPRITE_PALETTE = 0x53
 
@@ -1761,6 +1782,7 @@ defc __ERRB_R_TAPE_LOADING_ERROR = 27
 defc __IO_UART_RX = 0x143b
 
 defc __IO_UART_BAUD_RATE = 0x143b
+
 defc __IUBR_115200 = 0
 defc __IUBR_57600 = 1
 defc __IUBR_38400 = 2
@@ -1770,11 +1792,24 @@ defc __IUBR_9600 = 5
 defc __IUBR_4800 = 6
 defc __IUBR_2400 = 7
 
+defc __IO_143B_115200 = 0
+defc __IO_143B_57600 = 1
+defc __IO_143B_38400 = 2
+defc __IO_143B_31250 = 3
+defc __IO_143B_19200 = 4
+defc __IO_143B_9600 = 5
+defc __IO_143B_4800 = 6
+defc __IO_143B_2400 = 7
+
 defc __IO_UART_TX = 0x133b
 
 defc __IO_UART_STATUS = 0x133b
+
 defc __IUS_RX_AVAIL = 0x01
 defc __IUS_TX_READY = 0x02
+
+defc __IO_133B_RX_AVAIL = 0x01
+defc __IO_133B_TX_READY = 0x02
 
 
 
@@ -1793,6 +1828,7 @@ defc __IO_FE_MIC = 0x08
 defc __IO_FE_BORDER_MASK = 0x07
 
 defc __IO_TIMEX_VIDEO_MODE = 0xff
+
 defc __IO_TVM_DISABLE_ULA_INTERRUPT = 0x40
 defc __IO_TVM_DFILE_1 = 0x0
 defc __IO_TVM_DFILE_2 = 0x01
@@ -1806,6 +1842,36 @@ defc __IO_TVM_HIRES_GREEN = 0x26
 defc __IO_TVM_HIRES_CYAN = 0x2e
 defc __IO_TVM_HIRES_YELLOW = 0x36
 defc __IO_TVM_HIRES_WHITE = 0x3e
+
+defc __IO_FF_DISABLE_ULA_INTERRUPT = 0x40
+defc __IO_FF_DFILE_1 = 0x0
+defc __IO_FF_DFILE_2 = 0x01
+defc __IO_FF_HICOLOR = 0x02
+defc __IO_FF_HIRES = 0x06
+defc __IO_FF_HIRES_BLACK = 0x06
+defc __IO_FF_HIRES_BLUE = 0x0e
+defc __IO_FF_HIRES_RED = 0x16
+defc __IO_FF_HIRES_MAGENTA = 0x1e
+defc __IO_FF_HIRES_GREEN = 0x26
+defc __IO_FF_HIRES_CYAN = 0x2e
+defc __IO_FF_HIRES_YELLOW = 0x36
+defc __IO_FF_HIRES_WHITE = 0x3e
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_DMA = 0x6b
+
+defc __IO_DMA_MB02 = 0x0b
+defc __IO_DMA_DATAGEAR = 0x6b
 
 
 

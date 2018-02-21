@@ -106,6 +106,8 @@ extern unsigned char IO_UART_BAUD_RATE;
 extern unsigned char IO_133B;
 extern unsigned char IO_UART_TX;
 extern unsigned char IO_UART_STATUS;
+extern unsigned char IO_6B;
+extern unsigned char IO_DMA;
 
 #else
 
@@ -176,6 +178,11 @@ __sfr __banked __at 0x133b IO_133B;
 __sfr __banked __at __IO_UART_TX IO_UART_TX;
 __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 
+// io ports - dma
+
+__sfr __at 0x6b IO_6B;
+__sfr __at __IO_DMA IO_DMA;
+
 #endif
 
 // io port bits
@@ -201,6 +208,20 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 #define IO_TVM_HIRES_CYAN  __IO_TVM_HIRES_CYAN
 #define IO_TVM_HIRES_YELLOW  __IO_TVM_HIRES_YELLOW
 #define IO_TVM_HIRES_WHITE  __IO_TVM_HIRES_WHITE
+
+#define IO_FF_DISABLE_ULA_INTERRUPT  __IO_FF_DISABLE_ULA_INTERRUPT
+#define IO_FF_DFILE_1  __IO_FF_DFILE_1
+#define IO_FF_DFILE_2  __IO_FF_DFILE_2
+#define IO_FF_HICOLOR  __IO_FF_HICOLOR
+#define IO_FF_HIRES  __IO_FF_HIRES
+#define IO_FF_HIRES_BLACK  __IO_FF_HIRES_BLACK
+#define IO_FF_HIRES_BLUE  __IO_FF_HIRES_BLUE
+#define IO_FF_HIRES_RED  __IO_FF_HIRES_RED
+#define IO_FF_HIRES_MAGENTA  __IO_FF_HIRES_MAGENTA
+#define IO_FF_HIRES_GREEN  __IO_FF_HIRES_GREEN
+#define IO_FF_HIRES_CYAN  __IO_FF_HIRES_CYAN
+#define IO_FF_HIRES_YELLOW  __IO_FF_HIRES_YELLOW
+#define IO_FF_HIRES_WHITE  __IO_FF_HIRES_WHITE
 
 // 0x7ffd, IO_7FFD
 
@@ -234,6 +255,13 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 #define IT_SELECT_PSG_1  __IT_SELECT_PSG_1
 #define IT_SELECT_PSG_2  __IT_SELECT_PSG_2
 
+#define IO_FFFD_ENABLE_L  __IO_FFFD_ENABLE_L
+#define IO_FFFD_ENABLE_R  __IO_FFFD_ENABLE_R
+#define IO_FFFD_ENABLE_LR  __IO_FFFD_ENABLE_LR
+#define IO_FFFD_SELECT_PSG_0  __IO_FFFD_SELECT_PSG_0
+#define IO_FFFD_SELECT_PSG_1  __IO_FFFD_SELECT_PSG_1
+#define IO_FFFD_SELECT_PSG_2  __IO_FFFD_SELECT_PSG_2
+
 // 0x123b, IO_LAYER_2_CONFIG
 
 #define IL2C_ENABLE_LOWER_16K  __IL2C_ENABLE_LOWER_16K
@@ -244,10 +272,21 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 #define IL2C_BANK_SELECT_1  __IL2C_BANK_SELECT_1
 #define IL2C_BANK_SELECT_2  __IL2C_BANK_SELECT_2
 
+#define IO_123B_ENABLE_LOWER_16K  __IO_123B_ENABLE_LOWER_16K
+#define IO_123B_SHOW_LAYER_2  __IO_123B_SHOW_LAYER_2
+#define IO_123B_SELECT_SHADOW_BUFFER  __IO_123B_SELECT_SHADOW_BUFFER
+#define IO_123B_BANK_SELECT_MASK  __IO_123B_BANK_SELECT_MASK
+#define IO_123B_BANK_SELECT_0  __IO_123B_BANK_SELECT_0
+#define IO_123B_BANK_SELECT_1  __IO_123B_BANK_SELECT_1
+#define IO_123B_BANK_SELECT_2  __IO_123B_BANK_SELECT_2
+
 // 0x303b, IO_SPRITE_FLAGS
 
 #define ISF_MAX_SPRITES_PER_LINE  __ISF_MAX_SPRITES_PER_LINE
 #define ISF_COLLISION  __ISF_COLLISION
+
+#define IO_303B_MAX_SPRITES_PER_LINE  __IO_303B_MAX_SPRITES_PER_LINE
+#define IO_303B_COLLISION  __IO_303B_COLLISION
 
 // 0x143b, IO_UART_BAUD_RATE
 
@@ -260,10 +299,22 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 #define IUBR_4800  __IUBR_4800
 #define IUBR_2400  __IUBR_2400
 
+#define IO_143B_115200  __IO_143B_115200
+#define IO_143B_57600  __IO_143B_57600
+#define IO_143B_38400  __IO_143B_38400
+#define IO_143B_31250  __IO_143B_31250
+#define IO_143B_19200  __IO_143B_19200
+#define IO_143B_9600  __IO_143B_9600
+#define IO_143B_4800  __IO_143B_4800
+#define IO_143B_2400  __IO_143B_2400
+
 // 0x133b, IO_UART_STATUS
 
 #define IUS_RX_AVAIL  __IUS_RX_AVAIL
 #define IUS_TX_READY  __IUS_TX_READY
+
+#define IO_133B_RX_AVAIL  __IO_133B_RX_AVAIL
+#define IO_133B_TX_READY  __IO_133B_TX_READY
 
 ///////////////////////////////////////////////////////////////
 
@@ -519,7 +570,7 @@ __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_mangle_bank_state
 
 ///////////////////////////////////////////////////////////////
 
-// tape i/o
+// tape i/o - ROM3 (48k rom) must be enabled
 
 struct zxtapehdr
 {
@@ -539,9 +590,13 @@ __DPROTO(`iyl,iyh',`iyl,iyh',unsigned int,,zx_tape_verify_block,void *dst,unsign
 
 // timex video mode
 
+// flags for "mode" parameter of ts_vmod()
+
 #define TVM_SPECTRUM   __IO_TVM_DFILE_1       // 256x192 pix, 32x24 attr
+#define TVM_DFILE1     __IO_TVM_DFILE_1       // synonym ^^
+#define TVM_DFILE2     __IO_TVM_DFILE_2       // 256x192 pix, 32x24 attr second display file
 #define TVM_HICOLOR    __IO_TVM_HICOLOR       // 256x192 pix, 32x192 attr
-#define TVM_HIRES      __IO_TVM_HIRES         // 512x192 pix or with paper colour
+#define TVM_HIRES      __IO_TVM_HIRES         // 512x192 pix OR with paper colour
 
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',void,,ts_vmod,unsigned char mode)
 

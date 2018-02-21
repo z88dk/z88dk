@@ -34,6 +34,7 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
+	defc	__CPU_CLOCK = 4606000
         INCLUDE "crt/classic/crt_rules.inc"
 
 

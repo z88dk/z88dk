@@ -14,6 +14,7 @@ stdlib/obj/${TYPE}/l_qsort
 stdlib/obj/${TYPE}/l_qsort_callee
 stdlib/obj/${TYPE}/Lbsearch
 stdlib/obj/${TYPE}/Lqsort
+stdlib/obj/${TYPE}/msleep
 stdlib/obj/${TYPE}/outp
 stdlib/obj/${TYPE}/outp_callee
 stdlib/obj/${TYPE}/qsort_sccz80

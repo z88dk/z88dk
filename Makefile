@@ -8,9 +8,9 @@
 # ---> Configurable parameters are below his point
 prefix ?= /usr/local
 prefix_share = $(prefix)/share/z88dk
-git_rev = $(shell git rev-parse --short HEAD)
-git_count = $(shell git rev-list --count HEAD)
-version := $(shell date +%Y%m%d)
+git_rev ?= $(shell git rev-parse --short HEAD)
+git_count ?= $(shell git rev-list --count HEAD)
+version ?= $(shell date +%Y%m%d)
 
 INSTALL ?= install
 CFLAGS ?= -O2

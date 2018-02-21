@@ -32,6 +32,8 @@
 
 	        defc    TAR__clib_exit_stack_size = 32
         	defc    TAR__register_sp = -1
+		; Guess below
+		defc	__CPU_CLOCK = 3072000
         	INCLUDE "crt/classic/crt_rules.inc"
 
 ;-------

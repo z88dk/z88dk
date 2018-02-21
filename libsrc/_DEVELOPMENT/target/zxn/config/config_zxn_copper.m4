@@ -47,8 +47,8 @@ divert(-1)
 # (2) Write a value to a nextreg.
 #
 # These operations are encoded into a 16-bit instruction which
-# is stored in big endian form.  The Copper has a 1k code space
-# on the fpga, which means an instruction space of 512 instructions.
+# is stored in big endian form.  The Copper has a 2k code space
+# on the fpga, which means an instruction space of 1024 instructions.
 #
 # Programming the Copper involves writing zeroes to nextreg 97 & 98
 # to turn off the Copper and set the current instruction index to zero.
@@ -75,13 +75,13 @@ divert(-1)
 # For modes RUN_ONCE and RUN_ON_INTERRUPT, the Copper program
 # should be terminated by a stop instruction (wait for a
 # non-existent line).  For RUN_LOOP, the Copper continuously
-# executes all instructions in its 1k memory, looping from
+# executes all instructions in its 2k memory, looping from
 # the end back to the beginning.  If the instruction list is
-# less than 1k, it should be padded with nops (a write of 0
+# less than 2k, it should be padded with nops (a write of 0
 # to nextreg 0) which will each take one pixel in time to
 # execute.  More advanced applications can have the dma stream
 # new instructions into the copper as it executes so that the
-# instruction space is effectively larger than 1k.
+# instruction space is effectively larger than 2k.
 
 #
 # END OF USER CONFIGURATION
