@@ -299,7 +299,7 @@ extern void __LIB__ msleep(unsigned int milliseconds) __z88dk_fastcall;
 /* Sleep for a number of centiseconds */
 extern void __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
 #else
-#define csleep(x) msleep((x) / 10)
+#define csleep(x) msleep((x) * 10)
 #endif
 
 
