@@ -20,7 +20,7 @@ all:    $(AOBJECTS)
 
 
 .c.o:
-	zcc +test $(CFLAGS) $*.c
+	$(ZCC) +test $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i
