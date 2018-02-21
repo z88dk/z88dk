@@ -9,6 +9,7 @@ include ../Make.config
 
 AFILES = \
 	subcpu_command.c \
+	subcpu_reset.c \
 	subcpu_set.c \
 	subcpu_get.c
 
@@ -19,7 +20,7 @@ all:    $(AOBJECTS)
 
 
 .c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
+	zcc +test $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i
