@@ -11,6 +11,6 @@ PUBLIC  _font_4x8_64_nbot_end
 
 _font_4x8_64_nbot:
 
-   BINARY "../font/font_4x8/_font_4x8_64_nbot.fon"
+   BINARY "font_4x8_64_nbot.bin"
 
 _font_4x8_64_nbot_end:

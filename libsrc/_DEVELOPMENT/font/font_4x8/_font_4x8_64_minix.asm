@@ -11,6 +11,6 @@ PUBLIC  _font_4x8_64_minix_end
 
 _font_4x8_64_minix:
 
-   BINARY "../font/font_4x8/_font_4x8_64_minix.fon"
+   BINARY "font_4x8_64_minix.bin"
 
 _font_4x8_64_minix_end:

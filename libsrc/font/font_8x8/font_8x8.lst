@@ -1,3 +1,1 @@
-font/font_8x8/_font_8x8_commodore64
-font/font_8x8/_font_8x8_VGAROM
-font/font_8x8/_font_8x8_CPC
+font/font_4x8/obj/${TYPE}/**/*.o

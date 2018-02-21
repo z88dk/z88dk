@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = fzx
+SUBDIRS = fzx font_4x8 font_8x8
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all
@@ -9,7 +9,7 @@ all: subdirs-all
 
 subdirs-all: $(SUBDIRS)
 
-subdirs-clean: $(SUBDIRS_CLEAN) clean-kludge
+subdirs-clean: $(SUBDIRS_CLEAN)
 
 
 clean: subdirs-clean
@@ -28,4 +28,3 @@ $(CLEANDIRS):
 	$(MAKE) -C $(@:clean-%=%) clean
 
 clean-kludge:
-	$(RM) */*.o

@@ -12,6 +12,6 @@ PUBLIC  _font_8x8_vga_rom_end
 
 _font_8x8_vga_rom:
 
-   BINARY "../font/font_8x8/_font_8x8_VGAROM.fon"
+   BINARY "font_8x8_vga_rom.bin"
 
 _font_8x8_vga_rom_end:

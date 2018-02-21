@@ -13,6 +13,6 @@ PUBLIC  _zx7_font_8x8_vga_rom_end
 
 _zx7_font_8x8_vga_rom:
 
-   BINARY "font/font_8x8/font_8x8_vga_rom.bin.zx7"
+   BINARY "font_8x8_vga_rom.bin.zx7"
 
 _zx7_font_8x8_vga_rom_end:
