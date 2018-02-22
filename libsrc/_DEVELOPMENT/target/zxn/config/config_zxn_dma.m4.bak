@@ -34,14 +34,14 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #
 # The single channel of the DMA chip consists of two ports named A and B.  Transfers can occur
 # in either direction between ports A and B, each port can describe a target in memory or io,
-# and each can be configured to autoincrement or autodecrement after a byte is transferred.  A
-# special feature of the ZXN DMA can force each byte transfer to take a fixed amount of time so
+# and each can be configured to autoincrement, autodecrement or stay fixed after a byte is transferred.
+# A special feature of the ZXN DMA can force each byte transfer to take a fixed amount of time so
 # that the ZXN DMA can be used to deliver sampled audio.
 #
 # The ZXN DMA can operate in either burst or continuous mode.  Continuous mode means the DMA chip
 # runs to completion without allowing the CPU to run.  Burst mode nominally means the DMA lets the
 # CPU run if either port is not ready.  This condition can't happen in the ZXN DMA chip except when
-# operated in the special fixed time transfer mode.  In this case, the ZXN DMA chip will let the CPU
+# operated in the special fixed time transfer mode.  In this mode, the ZXN DMA chip will let the CPU
 # run while it waits for the fixed time to expire between bytes transferred.  Note that there is no
 # byte transfer mode as in the Z80 DMA.
 #
@@ -98,7 +98,7 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #
 # The cycle length is the number of cycles used in a read or write operation.
 # The first cycle asserts signals and the last cycle releases them.  There is
-# no half cycle timing for some of the control signals.
+# no half cycle timing for the control signals.
 #
 # WR2 - Write Register Group 2
 #
@@ -127,17 +127,21 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # The ZXN PRESCALAR is a feature of the ZXN DMA implementation.
 # If non-zero, a delay will be inserted after each byte is transferred
 # such that the total time needed for the transfer is at least the number
-# of cycles indicated by the prescalar.  A 14MHz clock is used to run the
-# dma so a full delay of 255 cycles means each byte transfer can take
-# at most 255/14MHz = 18.2us.  If the DMA is also operated in burst mode,
-# the DMA will give up any waiting time to the CPU so that the CPU can run.
+# of cycles indicated by the prescalar.  This works in both the continuous
+# mode and the burst mode.
 #
-# This feature was specifically implemented to allow the DMA to transfer
-# sampled audio to the mono dac with minimal CPU intervention.  The DMA's
-# clock has recently been pinned at 14MHz which means the max prescalar
-# delay possible leads to a lowest sample rate of 1/18.2us = 54.9kHz.
-# This is quite high so it's very likely the prescalar will be changed
-# somehow to allow lower sample rates.
+# The ZXN DMA's speed matches the current CPU speed so it can operate
+# at 3.5MHz, 7MHz or 14MHz.  Since the prescalar delay is a cycle count,
+# the actual duration depends on the speed of the DMA.  A prescalar
+# delay set to N cycles will result in a real time transfer taking N/fCPU
+# seconds.  For example, if the DMA is operating at 3.5MHz and the max
+# prescalar of 255 is set, the transfer time for each byte will be
+# 255/3.5MHz = 72.9us.  If the DMA is used to send sampled audio, the
+# sample rate would be 13.7kHz and this is the lowest sample rate possible
+# using the prescalar.
+#
+# If the DMA is operated in burst mode, the DMA will give up any waiting
+# time to the CPU so that the CPU can run while the DMA is idle.
 #
 # WR3 - Write Register Group 3
 #
@@ -209,10 +213,10 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #  D7  D6  D5  D4  D3  D2  D1  D0  Status Byte (ZXN DMA not currently implemented)
 #       |   |   |   |   |   |
 #       |   |   |   |   |   V
-#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter Low (Bug: Currently Byte Counter High)
+#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter Low
 #       |   |   |   |   |
 #       |   |   |   |   V
-#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter High (Bug: Currently Byte Counter Low)
+#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter High
 #       |   |   |   |
 #       |   |   |   V
 #  D7  D6  D5  D4  D3  D2  D1  D0  Port A Address Low
@@ -238,19 +242,23 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # pointers.  Ie it continues where the last copy operation left off.
 #
 # Registers can be read via an io read from the dma port after setting the read mask.
-# Register values are the current internal dma counter values.  So "Port Address A Low"
-# is the lower 8-bits of Port A's next transfer address.  Once the end of the read
-# mask is reached, further reads repeatedly return the last register indicated.
+# (At power up the read mask is set to 0x7f).  Register values are the current internal
+# dma counter values.  So "Port Address A Low" is the lower 8-bits of Port A's next
+# transfer address.  Once the end of the read mask is reached, further reads loop around
+# to the first one.
 
 # OPERATING SPEED
 #
-# The ZXN DMA operates at a fixed 14MHz rate.  The cycle lengths specified for Ports A
-# and B are intended to selectively slow down read or write cycles for hardware that cannot
-# operate at the DMA's full speed.  This is the case, for example, with layer 2.
+# The ZXN DMA operates at the same speed as the CPU, that is 3.5MHz, 7MHz or 14MHz.
+# The cycle lengths specified for Ports A and B are intended to selectively slow down
+# read or write cycles for hardware that cannot operate at the DMA's full speed.  This
+# is the case, for example, with layer 2 which can only tolerate a two cycle read/write
+# at 7MHz speed.
 #
 # Cycle Length      Description
 #
-#       4           Layer 2 r/w while active display is generated
+#   4 @ 14MHz       Layer 2 r/w while active display is generated
+#   2               Everything else
 
 # SYMBOLIC DEFINES
 #
