@@ -4476,6 +4476,7 @@
  pop hl'                        ; Error
  pop ip                         ; Error
  pop su                         ; Error
+ popx                           ; Error
  push -32768                    ; Error
  push 32767                     ; Error
  push 65535                     ; Error

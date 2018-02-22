@@ -34,14 +34,14 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #
 # The single channel of the DMA chip consists of two ports named A and B.  Transfers can occur
 # in either direction between ports A and B, each port can describe a target in memory or io,
-# and each can be configured to autoincrement or autodecrement after a byte is transferred.  A
-# special feature of the ZXN DMA can force each byte transfer to take a fixed amount of time so
+# and each can be configured to autoincrement, autodecrement or stay fixed after a byte is transferred.
+# A special feature of the ZXN DMA can force each byte transfer to take a fixed amount of time so
 # that the ZXN DMA can be used to deliver sampled audio.
 #
 # The ZXN DMA can operate in either burst or continuous mode.  Continuous mode means the DMA chip
 # runs to completion without allowing the CPU to run.  Burst mode nominally means the DMA lets the
 # CPU run if either port is not ready.  This condition can't happen in the ZXN DMA chip except when
-# operated in the special fixed time transfer mode.  In this case, the ZXN DMA chip will let the CPU
+# operated in the special fixed time transfer mode.  In this mode, the ZXN DMA chip will let the CPU
 # run while it waits for the fixed time to expire between bytes transferred.  Note that there is no
 # byte transfer mode as in the Z80 DMA.
 #
@@ -75,6 +75,34 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # next two writes will be directed to "PORT A STARTING ADDRESS LOW" followed by
 # "BLOCK LENGTH HIGH".
 #
+
+define(`__IO_DMA_WR0', 0x00)
+
+define(`__IO_DMA_WR0_TRANSFER', 0x01)
+define(`__IO_DMA_WR0_A_TO_B', 0x04)
+define(`__IO_DMA_WR0_B_TO_A', 0x00)
+
+define(`__IO_DMA_WR0_X3_A_START_L', 0x08)
+define(`__IO_DMA_WR0_X4_A_START_H', 0x10)
+define(`__IO_DMA_WR0_X5_LEN_L', 0x20)
+define(`__IO_DMA_WR0_X6_LEN_H', 0x40)
+
+define(`__IO_DMA_WR0_X3', 0x08)
+define(`__IO_DMA_WR0_X4', 0x10)
+define(`__IO_DMA_WR0_X5', 0x20)
+define(`__IO_DMA_WR0_X6', 0x40)
+define(`__IO_DMA_WR0_X34', 0x18)
+define(`__IO_DMA_WR0_X35', 0x28)
+define(`__IO_DMA_WR0_X36', 0x48)
+define(`__IO_DMA_WR0_X45', 0x30)
+define(`__IO_DMA_WR0_X46', 0x50)
+define(`__IO_DMA_WR0_X56', 0x60)
+define(`__IO_DMA_WR0_X345', 0x38)
+define(`__IO_DMA_WR0_X346', 0x58)
+define(`__IO_DMA_WR0_X356', 0x68)
+define(`__IO_DMA_WR0_X456', 0x70)
+define(`__IO_DMA_WR0_X3456', 0x78)
+
 # WR1 - Write Register Group 1
 #
 #  D7  D6  D5  D4  D3  D2  D1  D0  BASE REGISTER BYTE
@@ -98,8 +126,26 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #
 # The cycle length is the number of cycles used in a read or write operation.
 # The first cycle asserts signals and the last cycle releases them.  There is
-# no half cycle timing for some of the control signals.
+# no half cycle timing for the control signals.
 #
+
+define(`__IO_DMA_WR1', 0x04)
+
+define(`__IO_DMA_WR1_A_IS_MEM', 0x00)
+define(`__IO_DMA_WR1_A_IS_IO', 0x08)
+define(`__IO_DMA_WR1_A_DEC', 0x00)
+define(`__IO_DMA_WR1_A_INC', 0x10)
+define(`__IO_DMA_WR1_A_FIX', 0x20)
+
+define(`__IO_DMA_WR1_X6', 0x40)
+define(`__IO_DMA_WR1_X6_A_TIMING', 0x40)
+
+#
+
+define(`__IO_DMA_WR1X6_CYCLEN_2', 0x02)
+define(`__IO_DMA_WR1X6_CYCLEN_3', 0x01)
+define(`__IO_DMA_WR1X6_CYCLEN_4', 0x00)
+
 # WR2 - Write Register Group 2
 #
 #  D7  D6  D5  D4  D3  D2  D1  D0  BASE REGISTER BYTE
@@ -127,18 +173,43 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # The ZXN PRESCALAR is a feature of the ZXN DMA implementation.
 # If non-zero, a delay will be inserted after each byte is transferred
 # such that the total time needed for the transfer is at least the number
-# of cycles indicated by the prescalar.  A 14MHz clock is used to run the
-# dma so a full delay of 255 cycles means each byte transfer can take
-# at most 255/14MHz = 18.2us.  If the DMA is also operated in burst mode,
-# the DMA will give up any waiting time to the CPU so that the CPU can run.
+# of cycles indicated by the prescalar.  This works in both the continuous
+# mode and the burst mode.
 #
-# This feature was specifically implemented to allow the DMA to transfer
-# sampled audio to the mono dac with minimal CPU intervention.  The DMA's
-# clock has recently been pinned at 14MHz which means the max prescalar
-# delay possible leads to a lowest sample rate of 1/18.2us = 54.9kHz.
-# This is quite high so it's very likely the prescalar will be changed
-# somehow to allow lower sample rates.
+# The ZXN DMA's speed matches the current CPU speed so it can operate
+# at 3.5MHz, 7MHz or 14MHz.  Since the prescalar delay is a cycle count,
+# the actual duration depends on the speed of the DMA.  A prescalar
+# delay set to N cycles will result in a real time transfer taking N/fCPU
+# seconds.  For example, if the DMA is operating at 3.5MHz and the max
+# prescalar of 255 is set, the transfer time for each byte will be
+# 255/3.5MHz = 72.9us.  If the DMA is used to send sampled audio, the
+# sample rate would be 13.7kHz and this is the lowest sample rate possible
+# using the prescalar.
 #
+# If the DMA is operated in burst mode, the DMA will give up any waiting
+# time to the CPU so that the CPU can run while the DMA is idle.
+#
+
+define(`__IO_DMA_WR2', 0x00)
+
+define(`__IO_DMA_WR2_B_IS_MEM', 0x00)
+define(`__IO_DMA_WR2_B_IS_IO', 0x08)
+define(`__IO_DMA_WR2_B_DEC', 0x00)
+define(`__IO_DMA_WR2_B_INC', 0x10)
+define(`__IO_DMA_WR2_B_FIX', 0x20)
+
+define(`__IO_DMA_WR2_X6', 0x40)
+define(`__IO_DMA_WR2_X6_B_TIMING', 0x40)
+
+#
+
+define(`__IO_DMA_WR2X6_CYCLEN_2', 0x02)
+define(`__IO_DMA_WR2X6_CYCLEN_3', 0x01)
+define(`__IO_DMA_WR2X6_CYCLEN_4', 0x00)
+
+define(`__IO_DMA_WR2X6_X5', 0x20)
+define(`__IO_DMA_WR2X6_X5_PRESCALAR', 0x20)
+
 # WR3 - Write Register Group 3
 #
 #  D7  D6  D5  D4  D3  D2  D1  D0  BASE REGISTER BYTE
@@ -152,6 +223,11 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #
 # It's preferred to enable the DMA by writing an "Enable DMA" command to WR6.
 #
+
+define(`__IO_DMA_WR3', 0x80)
+
+define(`__IO_DMA_WR3_ENABLE_DMA', 0x40)
+
 # WR4 - Write Register Group 4
 #
 #  D7  D6  D5  D4  D3  D2  D1  D0  BASE REGISTER BYTE
@@ -172,6 +248,19 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # define interrupt behaviour.  Interrups and pulse generation are not
 # implemented in the ZXN DMA nor are these registers available for writing.
 #
+
+define(`__IO_DMA_WR4', 0x81)
+
+define(`__IO_DMA_WR4_CONTINUOUS', 0x20)
+define(`__IO_DMA_WR4_BURST', 0x40)
+
+define(`__IO_DMA_WR4_X2', 0x04)
+define(`__IO_DMA_WR4_X3', 0x08)
+define(`__IO_DMA_WR4_X23', 0x0c)
+
+define(`__IO_DMA_WR4_X2_B_START_L', 0x04)
+define(`__IO_DMA_WR4_X3_B_START_H', 0x08)
+
 # WR5 - Write Register Group 5
 #
 #  D7  D6  D5  D4  D3  D2  D1  D0  BASE REGISTER BYTE
@@ -192,6 +281,12 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # destination addresses and reset its byte counter to zero to repeat the last
 # transfer when a previous one is finished.
 #
+
+define(`__IO_DMA_WR5', 0x82)
+
+define(`__IO_DMA_WR5_CE_WAIT', 0x10)
+define(`__IO_DMA_WR5_RESTART', 0x20)
+
 # WR6 - Command Register
 #
 #  D7  D6  D5  D4  D3  D2  D1  D0  BASE REGISTER BYTE
@@ -209,10 +304,10 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 #  D7  D6  D5  D4  D3  D2  D1  D0  Status Byte (ZXN DMA not currently implemented)
 #       |   |   |   |   |   |
 #       |   |   |   |   |   V
-#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter Low (Bug: Currently Byte Counter High)
+#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter Low
 #       |   |   |   |   |
 #       |   |   |   |   V
-#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter High (Bug: Currently Byte Counter Low)
+#  D7  D6  D5  D4  D3  D2  D1  D0  Byte Counter High
 #       |   |   |   |
 #       |   |   |   V
 #  D7  D6  D5  D4  D3  D2  D1  D0  Port A Address Low
@@ -238,23 +333,41 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # pointers.  Ie it continues where the last copy operation left off.
 #
 # Registers can be read via an io read from the dma port after setting the read mask.
-# Register values are the current internal dma counter values.  So "Port Address A Low"
-# is the lower 8-bits of Port A's next transfer address.  Once the end of the read
-# mask is reached, further reads repeatedly return the last register indicated.
+# (At power up the read mask is set to 0x7f).  Register values are the current internal
+# dma counter values.  So "Port Address A Low" is the lower 8-bits of Port A's next
+# transfer address.  Once the end of the read mask is reached, further reads loop around
+# to the first one.
+#
+
+define(`__IO_DMA_CMD_LOAD', 0xcf)
+define(`__IO_DMA_CMD_CONTINUE', 0xd3)
+define(`__IO_DMA_CMD_ENABLE_DMA', 0x87)
+define(`__IO_DMA_CMD_DISABLE_DMA', 0x83)
+define(`__IO_DMA_CMD_READ_MASK', 0xbb)
+
+#
+
+define(`__IO_DMA_RM_STATUS', 0x01)
+define(`__IO_DMA_RM_COUNTER_L', 0x02)
+define(`__IO_DMA_RM_COUNTER_H', 0x04)
+define(`__IO_DMA_RM_A_ADDR_L', 0x08)
+define(`__IO_DMA_RM_A_ADDR_H', 0x10)
+define(`__IO_DMA_RM_B_ADDR_L', 0x20)
+define(`__IO_DMA_RM_B_ADDR_H', 0x40)
 
 # OPERATING SPEED
 #
-# The ZXN DMA operates at a fixed 14MHz rate.  The cycle lengths specified for Ports A
-# and B are intended to selectively slow down read or write cycles for hardware that cannot
-# operate at the DMA's full speed.  This is the case, for example, with layer 2.
+# The ZXN DMA operates at the same speed as the CPU, that is 3.5MHz, 7MHz or 14MHz.
+# The cycle lengths specified for Ports A and B are intended to selectively slow down
+# read or write cycles for hardware that cannot operate at the DMA's full speed.  This
+# is the case, for example, with layer 2 which can only tolerate a two cycle write
+# at 7MHz speed.  Reads from layer 2 may be able to go as fast as two cycles at 14MHz.
+# The required timings are not clear at this time.
 #
 # Cycle Length      Description
 #
-#       4           Layer 2 r/w while active display is generated
-
-# SYMBOLIC DEFINES
-#
-#
+#   4 @ 14MHz       Layer 2 write while active display is generated
+#   2               Everything else
 
 #
 # END OF USER CONFIGURATION
@@ -272,6 +385,100 @@ PUBLIC `__IO_DMA'
 
 PUBLIC `__IO_DMA_MB02'
 PUBLIC `__IO_DMA_DATAGEAR'
+
+PUBLIC `__IO_DMA_WR0'
+
+PUBLIC `__IO_DMA_WR0_TRANSFER'
+PUBLIC `__IO_DMA_WR0_A_TO_B'
+PUBLIC `__IO_DMA_WR0_B_TO_A'
+
+PUBLIC `__IO_DMA_WR0_X3_A_START_L'
+PUBLIC `__IO_DMA_WR0_X4_A_START_H'
+PUBLIC `__IO_DMA_WR0_X5_LEN_L'
+PUBLIC `__IO_DMA_WR0_X6_LEN_H'
+
+PUBLIC `__IO_DMA_WR0_X3'
+PUBLIC `__IO_DMA_WR0_X4'
+PUBLIC `__IO_DMA_WR0_X5'
+PUBLIC `__IO_DMA_WR0_X6'
+PUBLIC `__IO_DMA_WR0_X34'
+PUBLIC `__IO_DMA_WR0_X35'
+PUBLIC `__IO_DMA_WR0_X36'
+PUBLIC `__IO_DMA_WR0_X45'
+PUBLIC `__IO_DMA_WR0_X46'
+PUBLIC `__IO_DMA_WR0_X56'
+PUBLIC `__IO_DMA_WR0_X345'
+PUBLIC `__IO_DMA_WR0_X346'
+PUBLIC `__IO_DMA_WR0_X356'
+PUBLIC `__IO_DMA_WR0_X456'
+PUBLIC `__IO_DMA_WR0_X3456'
+
+PUBLIC `__IO_DMA_WR1'
+
+PUBLIC `__IO_DMA_WR1_A_IS_MEM'
+PUBLIC `__IO_DMA_WR1_A_IS_IO'
+PUBLIC `__IO_DMA_WR1_A_DEC'
+PUBLIC `__IO_DMA_WR1_A_INC'
+PUBLIC `__IO_DMA_WR1_A_FIX'
+
+PUBLIC `__IO_DMA_WR1_X6'
+PUBLIC `__IO_DMA_WR1_X6_A_TIMING'
+
+PUBLIC `__IO_DMA_WR1X6_CYCLEN_2'
+PUBLIC `__IO_DMA_WR1X6_CYCLEN_3'
+PUBLIC `__IO_DMA_WR1X6_CYCLEN_4'
+
+PUBLIC `__IO_DMA_WR2'
+
+PUBLIC `__IO_DMA_WR2_B_IS_MEM'
+PUBLIC `__IO_DMA_WR2_B_IS_IO'
+PUBLIC `__IO_DMA_WR2_B_DEC'
+PUBLIC `__IO_DMA_WR2_B_INC'
+PUBLIC `__IO_DMA_WR2_B_FIX'
+
+PUBLIC `__IO_DMA_WR2_X6'
+PUBLIC `__IO_DMA_WR2_X6_B_TIMING'
+
+PUBLIC `__IO_DMA_WR2X6_CYCLEN_2'
+PUBLIC `__IO_DMA_WR2X6_CYCLEN_3'
+PUBLIC `__IO_DMA_WR2X6_CYCLEN_4'
+
+PUBLIC `__IO_DMA_WR2X6_X5'
+PUBLIC `__IO_DMA_WR2X6_X5_PRESCALAR'
+
+PUBLIC `__IO_DMA_WR3'
+PUBLIC `__IO_DMA_WR3_ENABLE_DMA'
+
+PUBLIC `__IO_DMA_WR4'
+
+PUBLIC `__IO_DMA_WR4_CONTINUOUS'
+PUBLIC `__IO_DMA_WR4_BURST'
+
+PUBLIC `__IO_DMA_WR4_X2'
+PUBLIC `__IO_DMA_WR4_X3'
+PUBLIC `__IO_DMA_WR4_X23'
+
+PUBLIC `__IO_DMA_WR4_X2_B_START_L'
+PUBLIC `__IO_DMA_WR4_X3_B_START_H'
+
+PUBLIC `__IO_DMA_WR5'
+
+PUBLIC `__IO_DMA_WR5_CE_WAIT'
+PUBLIC `__IO_DMA_WR5_RESTART'
+
+PUBLIC `__IO_DMA_CMD_LOAD'
+PUBLIC `__IO_DMA_CMD_CONTINUE'
+PUBLIC `__IO_DMA_CMD_ENABLE_DMA'
+PUBLIC `__IO_DMA_CMD_DISABLE_DMA'
+PUBLIC `__IO_DMA_CMD_READ_MASK'
+
+PUBLIC `__IO_DMA_RM_STATUS'
+PUBLIC `__IO_DMA_RM_COUNTER_L'
+PUBLIC `__IO_DMA_RM_COUNTER_H'
+PUBLIC `__IO_DMA_RM_A_ADDR_L'
+PUBLIC `__IO_DMA_RM_A_ADDR_H'
+PUBLIC `__IO_DMA_RM_B_ADDR_L'
+PUBLIC `__IO_DMA_RM_B_ADDR_H'
 ')
 
 dnl#
@@ -284,6 +491,100 @@ defc `__IO_DMA' = __IO_DMA
 
 defc `__IO_DMA_MB02' = __IO_DMA_MB02
 defc `__IO_DMA_DATAGEAR' = __IO_DMA_DATAGEAR
+
+defc `__IO_DMA_WR0' = __IO_DMA_WR0
+
+defc `__IO_DMA_WR0_TRANSFER' = __IO_DMA_WR0_TRANSFER
+defc `__IO_DMA_WR0_A_TO_B' = __IO_DMA_WR0_A_TO_B
+defc `__IO_DMA_WR0_B_TO_A' = __IO_DMA_WR0_B_TO_A
+
+defc `__IO_DMA_WR0_X3_A_START_L' = __IO_DMA_WR0_X3_A_START_L
+defc `__IO_DMA_WR0_X4_A_START_H' = __IO_DMA_WR0_X4_A_START_H
+defc `__IO_DMA_WR0_X5_LEN_L' = __IO_DMA_WR0_X5_LEN_L
+defc `__IO_DMA_WR0_X6_LEN_H' = __IO_DMA_WR0_X6_LEN_H
+
+defc `__IO_DMA_WR0_X3' = __IO_DMA_WR0_X3
+defc `__IO_DMA_WR0_X4' = __IO_DMA_WR0_X4
+defc `__IO_DMA_WR0_X5' = __IO_DMA_WR0_X5
+defc `__IO_DMA_WR0_X6' = __IO_DMA_WR0_X6
+defc `__IO_DMA_WR0_X34' = __IO_DMA_WR0_X34
+defc `__IO_DMA_WR0_X35' = __IO_DMA_WR0_X35
+defc `__IO_DMA_WR0_X36' = __IO_DMA_WR0_X36
+defc `__IO_DMA_WR0_X45' = __IO_DMA_WR0_X45
+defc `__IO_DMA_WR0_X46' = __IO_DMA_WR0_X46
+defc `__IO_DMA_WR0_X56' = __IO_DMA_WR0_X56
+defc `__IO_DMA_WR0_X345' = __IO_DMA_WR0_X345
+defc `__IO_DMA_WR0_X346' = __IO_DMA_WR0_X346
+defc `__IO_DMA_WR0_X356' = __IO_DMA_WR0_X356
+defc `__IO_DMA_WR0_X456' = __IO_DMA_WR0_X456
+defc `__IO_DMA_WR0_X3456' = __IO_DMA_WR0_X3456
+
+defc `__IO_DMA_WR1' = __IO_DMA_WR1
+
+defc `__IO_DMA_WR1_A_IS_MEM' = __IO_DMA_WR1_A_IS_MEM
+defc `__IO_DMA_WR1_A_IS_IO' = __IO_DMA_WR1_A_IS_IO
+defc `__IO_DMA_WR1_A_DEC' = __IO_DMA_WR1_A_DEC
+defc `__IO_DMA_WR1_A_INC' = __IO_DMA_WR1_A_INC
+defc `__IO_DMA_WR1_A_FIX' = __IO_DMA_WR1_A_FIX
+
+defc `__IO_DMA_WR1_X6' = __IO_DMA_WR1_X6
+defc `__IO_DMA_WR1_X6_A_TIMING' = __IO_DMA_WR1_X6_A_TIMING
+
+defc `__IO_DMA_WR1X6_CYCLEN_2' = __IO_DMA_WR1X6_CYCLEN_2
+defc `__IO_DMA_WR1X6_CYCLEN_3' = __IO_DMA_WR1X6_CYCLEN_3
+defc `__IO_DMA_WR1X6_CYCLEN_4' = __IO_DMA_WR1X6_CYCLEN_4
+
+defc `__IO_DMA_WR2' = __IO_DMA_WR2
+
+defc `__IO_DMA_WR2_B_IS_MEM' = __IO_DMA_WR2_B_IS_MEM
+defc `__IO_DMA_WR2_B_IS_IO' = __IO_DMA_WR2_B_IS_IO
+defc `__IO_DMA_WR2_B_DEC' = __IO_DMA_WR2_B_DEC
+defc `__IO_DMA_WR2_B_INC' = __IO_DMA_WR2_B_INC
+defc `__IO_DMA_WR2_B_FIX' = __IO_DMA_WR2_B_FIX
+
+defc `__IO_DMA_WR2_X6' = __IO_DMA_WR2_X6
+defc `__IO_DMA_WR2_X6_B_TIMING' = __IO_DMA_WR2_X6_B_TIMING
+
+defc `__IO_DMA_WR2X6_CYCLEN_2' = __IO_DMA_WR2X6_CYCLEN_2
+defc `__IO_DMA_WR2X6_CYCLEN_3' = __IO_DMA_WR2X6_CYCLEN_3
+defc `__IO_DMA_WR2X6_CYCLEN_4' = __IO_DMA_WR2X6_CYCLEN_4
+
+defc `__IO_DMA_WR2X6_X5' = __IO_DMA_WR2X6_X5
+defc `__IO_DMA_WR2X6_X5_PRESCALAR' = __IO_DMA_WR2X6_X5_PRESCALAR
+
+defc `__IO_DMA_WR3' = __IO_DMA_WR3
+defc `__IO_DMA_WR3_ENABLE_DMA' = __IO_DMA_WR3_ENABLE_DMA
+
+defc `__IO_DMA_WR4' = __IO_DMA_WR4
+
+defc `__IO_DMA_WR4_CONTINUOUS' = __IO_DMA_WR4_CONTINUOUS
+defc `__IO_DMA_WR4_BURST' = __IO_DMA_WR4_BURST
+
+defc `__IO_DMA_WR4_X2' = __IO_DMA_WR4_X2
+defc `__IO_DMA_WR4_X3' = __IO_DMA_WR4_X3
+defc `__IO_DMA_WR4_X23' = __IO_DMA_WR4_X23
+
+defc `__IO_DMA_WR4_X2_B_START_L' = __IO_DMA_WR4_X2_B_START_L
+defc `__IO_DMA_WR4_X3_B_START_H' = __IO_DMA_WR4_X3_B_START_H
+
+defc `__IO_DMA_WR5' = __IO_DMA_WR5
+
+defc `__IO_DMA_WR5_CE_WAIT' = __IO_DMA_WR5_CE_WAIT
+defc `__IO_DMA_WR5_RESTART' = __IO_DMA_WR5_RESTART
+
+defc `__IO_DMA_CMD_LOAD' = __IO_DMA_CMD_LOAD
+defc `__IO_DMA_CMD_CONTINUE' = __IO_DMA_CMD_CONTINUE
+defc `__IO_DMA_CMD_ENABLE_DMA' = __IO_DMA_CMD_ENABLE_DMA
+defc `__IO_DMA_CMD_DISABLE_DMA' = __IO_DMA_CMD_DISABLE_DMA
+defc `__IO_DMA_CMD_READ_MASK' = __IO_DMA_CMD_READ_MASK
+
+defc `__IO_DMA_RM_STATUS' = __IO_DMA_RM_STATUS
+defc `__IO_DMA_RM_COUNTER_L' = __IO_DMA_RM_COUNTER_L
+defc `__IO_DMA_RM_COUNTER_H' = __IO_DMA_RM_COUNTER_H
+defc `__IO_DMA_RM_A_ADDR_L' = __IO_DMA_RM_A_ADDR_L
+defc `__IO_DMA_RM_A_ADDR_H' = __IO_DMA_RM_A_ADDR_H
+defc `__IO_DMA_RM_B_ADDR_L' = __IO_DMA_RM_B_ADDR_L
+defc `__IO_DMA_RM_B_ADDR_H' = __IO_DMA_RM_B_ADDR_H
 ')
 
 dnl#
@@ -296,4 +597,98 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__IO_DMA_MB02'  __IO_DMA_MB02
 `#define' `__IO_DMA_DATAGEAR'  __IO_DMA_DATAGEAR
+
+`#define' `__IO_DMA_WR0'  __IO_DMA_WR0
+
+`#define' `__IO_DMA_WR0_TRANSFER'  __IO_DMA_WR0_TRANSFER
+`#define' `__IO_DMA_WR0_A_TO_B'  __IO_DMA_WR0_A_TO_B
+`#define' `__IO_DMA_WR0_B_TO_A'  __IO_DMA_WR0_B_TO_A
+
+`#define' `__IO_DMA_WR0_X3_A_START_L'  __IO_DMA_WR0_X3_A_START_L
+`#define' `__IO_DMA_WR0_X4_A_START_H'  __IO_DMA_WR0_X4_A_START_H
+`#define' `__IO_DMA_WR0_X5_LEN_L'  __IO_DMA_WR0_X5_LEN_L
+`#define' `__IO_DMA_WR0_X6_LEN_H'  __IO_DMA_WR0_X6_LEN_H
+
+`#define' `__IO_DMA_WR0_X3'  __IO_DMA_WR0_X3
+`#define' `__IO_DMA_WR0_X4'  __IO_DMA_WR0_X4
+`#define' `__IO_DMA_WR0_X5'  __IO_DMA_WR0_X5
+`#define' `__IO_DMA_WR0_X6'  __IO_DMA_WR0_X6
+`#define' `__IO_DMA_WR0_X34'  __IO_DMA_WR0_X34
+`#define' `__IO_DMA_WR0_X35'  __IO_DMA_WR0_X35
+`#define' `__IO_DMA_WR0_X36'  __IO_DMA_WR0_X36
+`#define' `__IO_DMA_WR0_X45'  __IO_DMA_WR0_X45
+`#define' `__IO_DMA_WR0_X46'  __IO_DMA_WR0_X46
+`#define' `__IO_DMA_WR0_X56'  __IO_DMA_WR0_X56
+`#define' `__IO_DMA_WR0_X345'  __IO_DMA_WR0_X345
+`#define' `__IO_DMA_WR0_X346'  __IO_DMA_WR0_X346
+`#define' `__IO_DMA_WR0_X356'  __IO_DMA_WR0_X356
+`#define' `__IO_DMA_WR0_X456'  __IO_DMA_WR0_X456
+`#define' `__IO_DMA_WR0_X3456'  __IO_DMA_WR0_X3456
+
+`#define' `__IO_DMA_WR1'  __IO_DMA_WR1
+
+`#define' `__IO_DMA_WR1_A_IS_MEM'  __IO_DMA_WR1_A_IS_MEM
+`#define' `__IO_DMA_WR1_A_IS_IO'  __IO_DMA_WR1_A_IS_IO
+`#define' `__IO_DMA_WR1_A_DEC'  __IO_DMA_WR1_A_DEC
+`#define' `__IO_DMA_WR1_A_INC'  __IO_DMA_WR1_A_INC
+`#define' `__IO_DMA_WR1_A_FIX'  __IO_DMA_WR1_A_FIX
+
+`#define' `__IO_DMA_WR1_X6'  __IO_DMA_WR1_X6
+`#define' `__IO_DMA_WR1_X6_A_TIMING'  __IO_DMA_WR1_X6_A_TIMING
+
+`#define' `__IO_DMA_WR1X6_CYCLEN_2'  __IO_DMA_WR1X6_CYCLEN_2
+`#define' `__IO_DMA_WR1X6_CYCLEN_3'  __IO_DMA_WR1X6_CYCLEN_3
+`#define' `__IO_DMA_WR1X6_CYCLEN_4'  __IO_DMA_WR1X6_CYCLEN_4
+
+`#define' `__IO_DMA_WR2'  __IO_DMA_WR2
+
+`#define' `__IO_DMA_WR2_B_IS_MEM'  __IO_DMA_WR2_B_IS_MEM
+`#define' `__IO_DMA_WR2_B_IS_IO'  __IO_DMA_WR2_B_IS_IO
+`#define' `__IO_DMA_WR2_B_DEC'  __IO_DMA_WR2_B_DEC
+`#define' `__IO_DMA_WR2_B_INC'  __IO_DMA_WR2_B_INC
+`#define' `__IO_DMA_WR2_B_FIX'  __IO_DMA_WR2_B_FIX
+
+`#define' `__IO_DMA_WR2_X6'  __IO_DMA_WR2_X6
+`#define' `__IO_DMA_WR2_X6_B_TIMING'  __IO_DMA_WR2_X6_B_TIMING
+
+`#define' `__IO_DMA_WR2X6_CYCLEN_2'  __IO_DMA_WR2X6_CYCLEN_2
+`#define' `__IO_DMA_WR2X6_CYCLEN_3'  __IO_DMA_WR2X6_CYCLEN_3
+`#define' `__IO_DMA_WR2X6_CYCLEN_4'  __IO_DMA_WR2X6_CYCLEN_4
+
+`#define' `__IO_DMA_WR2X6_X5'  __IO_DMA_WR2X6_X5
+`#define' `__IO_DMA_WR2X6_X5_PRESCALAR'  __IO_DMA_WR2X6_X5_PRESCALAR
+
+`#define' `__IO_DMA_WR3'  __IO_DMA_WR3
+`#define' `__IO_DMA_WR3_ENABLE_DMA'  __IO_DMA_WR3_ENABLE_DMA
+
+`#define' `__IO_DMA_WR4'  __IO_DMA_WR4
+
+`#define' `__IO_DMA_WR4_CONTINUOUS'  __IO_DMA_WR4_CONTINUOUS
+`#define' `__IO_DMA_WR4_BURST'  __IO_DMA_WR4_BURST
+
+`#define' `__IO_DMA_WR4_X2'  __IO_DMA_WR4_X2
+`#define' `__IO_DMA_WR4_X3'  __IO_DMA_WR4_X3
+`#define' `__IO_DMA_WR4_X23'  __IO_DMA_WR4_X23
+
+`#define' `__IO_DMA_WR4_X2_B_START_L'  __IO_DMA_WR4_X2_B_START_L
+`#define' `__IO_DMA_WR4_X3_B_START_H'  __IO_DMA_WR4_X3_B_START_H
+
+`#define' `__IO_DMA_WR5'  __IO_DMA_WR5
+
+`#define' `__IO_DMA_WR5_CE_WAIT'  __IO_DMA_WR5_CE_WAIT
+`#define' `__IO_DMA_WR5_RESTART'  __IO_DMA_WR5_RESTART
+
+`#define' `__IO_DMA_CMD_LOAD'  __IO_DMA_CMD_LOAD
+`#define' `__IO_DMA_CMD_CONTINUE'  __IO_DMA_CMD_CONTINUE
+`#define' `__IO_DMA_CMD_ENABLE_DMA'  __IO_DMA_CMD_ENABLE_DMA
+`#define' `__IO_DMA_CMD_DISABLE_DMA'  __IO_DMA_CMD_DISABLE_DMA
+`#define' `__IO_DMA_CMD_READ_MASK'  __IO_DMA_CMD_READ_MASK
+
+`#define' `__IO_DMA_RM_STATUS'  __IO_DMA_RM_STATUS
+`#define' `__IO_DMA_RM_COUNTER_L'  __IO_DMA_RM_COUNTER_L
+`#define' `__IO_DMA_RM_COUNTER_H'  __IO_DMA_RM_COUNTER_H
+`#define' `__IO_DMA_RM_A_ADDR_L'  __IO_DMA_RM_A_ADDR_L
+`#define' `__IO_DMA_RM_A_ADDR_H'  __IO_DMA_RM_A_ADDR_H
+`#define' `__IO_DMA_RM_B_ADDR_L'  __IO_DMA_RM_B_ADDR_L
+`#define' `__IO_DMA_RM_B_ADDR_H'  __IO_DMA_RM_B_ADDR_H
 ')
