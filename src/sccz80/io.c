@@ -144,6 +144,17 @@ void clearbuffer(t_buffer* buf)
     FREENULL(buf);
 }
 
+void discardbuffer(t_buffer* buf)
+{
+    if (!buf || !buf->start)
+        return;
+    if (currentbuffer == buf)
+        currentbuffer = (t_buffer*)currentbuffer->before;
+    FREENULL(buf->start);
+    buf->start = buf->next = 0;
+    FREENULL(buf);
+}
+
 int outbuffer(char c)
 {
     if (currentbuffer->next == currentbuffer->end) {

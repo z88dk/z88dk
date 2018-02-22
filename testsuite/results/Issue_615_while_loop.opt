@@ -1,0 +1,55 @@
+
+
+
+	MODULE	Issue_615_while_loop
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+.i_2
+	call	_func0
+	jp	i_2
+.i_3
+	ret
+
+
+
+._func1
+	ret
+
+
+
+._func2
+	push	bc
+.i_6
+	pop	hl
+	push	hl
+	ld	a,h
+	or	l
+	jp	z,i_7
+	call	_func0
+	jp	i_6
+.i_7
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func0
+	GLOBAL	_func
+	GLOBAL	_func1
+	GLOBAL	_func2
+
+
+
+

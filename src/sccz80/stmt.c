@@ -268,7 +268,7 @@ void doiferror()
     postlabel(flab1); /* print false label */
     statement(); /* and do 'else' clause */
     postlabel(flab2);
-}
+}   
 
 /*
  *              "if" statement
@@ -276,24 +276,50 @@ void doiferror()
 void doif()
 {
     int flab1, flab2;
+    int testtype;
+    t_buffer *buf = startbuffer(100);
 
     flab1 = getlabel(); /* get label for false branch */
-    test(flab1, YES); /* get expression, and branch false */
-    statement(); /* if true, do a statement */
+    testtype = test(flab1, YES); /* get expression, and branch false */
+    statement();
+
+    if ( testtype == 0 ) {
+        discardbuffer(buf);
+        lastst = STRETURN;
+    }
+
     if (amatch("else") == 0) {
         /* no else, print false label and exit  */
-        postlabel(flab1);
+        if ( testtype < 0 ) {
+            postlabel(flab1);
+            clearbuffer(buf);
+        } else if  (testtype ==  1 ) { /* Evaluate to true */
+            clearbuffer(buf);
+        }
         return;
     }
+
+    clearbuffer(buf);
+    if ( testtype == 1 ) {
+        // We evaluated the if to true, so we can discard the else
+        t_buffer *buf2 = startbuffer(100);
+        statement();
+        discardbuffer(buf2);
+        return;
+    } 
     /* an "if...else" statement. */
     flab2 = getlabel();
     if (lastst != STRETURN) {
         /* if last statement of 'if' was 'return' we needn't skip 'else' code */
         jump(flab2);
     }
-    postlabel(flab1); /* print false label */
+    if ( testtype != 0 ) {
+        postlabel(flab1); /* print false label */
+    }
     statement(); /* and do 'else' clause */
-    postlabel(flab2); /* print true label */
+    if ( testtype != 0 ) {
+        postlabel(flab2); /* print true label */
+    }
 }
 
 /*
@@ -323,14 +349,25 @@ Type *doexpr()
 void dowhile()
 {
     WHILE_TAB wq; /* allocate local queue */
+    t_buffer  *buf;
+    int       exprconstant;
 
     addwhile(&wq); /* add entry to queue */
     /* (for "break" statement) */
+    buf = startbuffer(100);
     postlabel(wq.loop); /* loop label */
-    test(wq.exit, YES); /* see if true */
-    statement(); /* if so, do a statement */
-    jump(wq.loop); /* loop to label */
-    postlabel(wq.exit); /* exit label */
+    exprconstant = test(wq.exit, YES); /* see if true */
+    if ( exprconstant == 0 ) {
+        t_buffer *buf2 = startbuffer(100);
+        statement();
+        discardbuffer(buf2);
+        discardbuffer(buf);
+    } else {
+        statement(); /* if so, do a statement */
+        jump(wq.loop); /* loop to label */
+        postlabel(wq.exit); /* exit label */
+        clearbuffer(buf);
+    }
     delwhile(); /* delete queue entry */
 }
 
