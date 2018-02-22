@@ -27043,6 +27043,14 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_POPX _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_Z80_ZXN: 
+DO_stmt(0xED8B);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_PUSH _TK_AF _TK_NEWLINE @{
 DO_stmt(0xF5);
 }
