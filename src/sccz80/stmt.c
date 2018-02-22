@@ -286,6 +286,7 @@ void doif()
     if ( testtype == 0 ) {
         discardbuffer(buf);
         lastst = STRETURN;
+        buf = NULL;
     }
 
     if (amatch("else") == 0) {
