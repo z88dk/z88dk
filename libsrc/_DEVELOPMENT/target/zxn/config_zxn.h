@@ -1867,6 +1867,100 @@
 #define __IO_DMA_MB02  0x0b
 #define __IO_DMA_DATAGEAR  0x6b
 
+#define __IO_DMA_WR0  0x00
+
+#define __IO_DMA_WR0_TRANSFER  0x01
+#define __IO_DMA_WR0_A_TO_B  0x04
+#define __IO_DMA_WR0_B_TO_A  0x00
+
+#define __IO_DMA_WR0_X3_A_START_L  0x08
+#define __IO_DMA_WR0_X4_A_START_H  0x10
+#define __IO_DMA_WR0_X5_LEN_L  0x20
+#define __IO_DMA_WR0_X6_LEN_H  0x40
+
+#define __IO_DMA_WR0_X3  0x08
+#define __IO_DMA_WR0_X4  0x10
+#define __IO_DMA_WR0_X5  0x20
+#define __IO_DMA_WR0_X6  0x40
+#define __IO_DMA_WR0_X34  0x18
+#define __IO_DMA_WR0_X35  0x28
+#define __IO_DMA_WR0_X36  0x48
+#define __IO_DMA_WR0_X45  0x30
+#define __IO_DMA_WR0_X46  0x50
+#define __IO_DMA_WR0_X56  0x60
+#define __IO_DMA_WR0_X345  0x38
+#define __IO_DMA_WR0_X346  0x58
+#define __IO_DMA_WR0_X356  0x68
+#define __IO_DMA_WR0_X456  0x70
+#define __IO_DMA_WR0_X3456  0x78
+
+#define __IO_DMA_WR1  0x04
+
+#define __IO_DMA_WR1_A_IS_MEM  0x00
+#define __IO_DMA_WR1_A_IS_IO  0x08
+#define __IO_DMA_WR1_A_DEC  0x00
+#define __IO_DMA_WR1_A_INC  0x10
+#define __IO_DMA_WR1_A_FIX  0x20
+
+#define __IO_DMA_WR1_X6  0x40
+#define __IO_DMA_WR1_X6_A_TIMING  0x40
+
+#define __IO_DMA_WR1X6_CYCLEN_2  0x02
+#define __IO_DMA_WR1X6_CYCLEN_3  0x01
+#define __IO_DMA_WR1X6_CYCLEN_4  0x00
+
+#define __IO_DMA_WR2  0x00
+
+#define __IO_DMA_WR2_B_IS_MEM  0x00
+#define __IO_DMA_WR2_B_IS_IO  0x08
+#define __IO_DMA_WR2_B_DEC  0x00
+#define __IO_DMA_WR2_B_INC  0x10
+#define __IO_DMA_WR2_B_FIX  0x20
+
+#define __IO_DMA_WR2_X6  0x40
+#define __IO_DMA_WR2_X6_B_TIMING  0x40
+
+#define __IO_DMA_WR2X6_CYCLEN_2  0x02
+#define __IO_DMA_WR2X6_CYCLEN_3  0x01
+#define __IO_DMA_WR2X6_CYCLEN_4  0x00
+
+#define __IO_DMA_WR2X6_X5  0x20
+#define __IO_DMA_WR2X6_X5_PRESCALAR  0x20
+
+#define __IO_DMA_WR3  0x80
+#define __IO_DMA_WR3_ENABLE_DMA  0x40
+
+#define __IO_DMA_WR4  0x81
+
+#define __IO_DMA_WR4_CONTINUOUS  0x20
+#define __IO_DMA_WR4_BURST  0x40
+
+#define __IO_DMA_WR4_X2  0x04
+#define __IO_DMA_WR4_X3  0x08
+#define __IO_DMA_WR4_X23  0x0c
+
+#define __IO_DMA_WR4_X2_B_START_L  0x04
+#define __IO_DMA_WR4_X3_B_START_H  0x08
+
+#define __IO_DMA_WR5  0x82
+
+#define __IO_DMA_WR5_CE_WAIT  0x10
+#define __IO_DMA_WR5_RESTART  0x20
+
+#define __IO_DMA_CMD_LOAD  0xcf
+#define __IO_DMA_CMD_CONTINUE  0xd3
+#define __IO_DMA_CMD_ENABLE_DMA  0x87
+#define __IO_DMA_CMD_DISABLE_DMA  0x83
+#define __IO_DMA_CMD_READ_MASK  0xbb
+
+#define __IO_DMA_RM_STATUS  0x01
+#define __IO_DMA_RM_COUNTER_L  0x02
+#define __IO_DMA_RM_COUNTER_H  0x04
+#define __IO_DMA_RM_A_ADDR_L  0x08
+#define __IO_DMA_RM_A_ADDR_H  0x10
+#define __IO_DMA_RM_B_ADDR_L  0x20
+#define __IO_DMA_RM_B_ADDR_H  0x40
+
 
 
 
