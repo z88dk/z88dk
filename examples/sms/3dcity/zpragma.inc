@@ -17,5 +17,5 @@
 
 #pragma output CRT_MODEL = 2
 
-// Reduce stdio - it's not needed
-#pragma output CLIB_FOPEN_MAX = 3
+// Start BSS after the music manager memory from 0xC100 to 0xC2xx
+#pragma output CRT_ORG_BSS = 0xc300

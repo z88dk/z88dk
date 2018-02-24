@@ -239,7 +239,11 @@ _End:
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	defc __crt_org_bss = RAM_Start
+	IF DEFINED_CRT_ORG_BSS
+		defc __crt_org_bss = CRT_ORG_BSS
+	ELSE
+		defc __crt_org_bss = RAM_Start
+	ENDIF
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
             defc __crt_model = CRT_MODEL
