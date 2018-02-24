@@ -16,3 +16,6 @@
 // Compress Stored Data Section to Reduce ROM Size
 
 #pragma output CRT_MODEL = 2
+
+// Reduce stdio - it's not needed
+#pragma output CLIB_FOPEN_MAX = 3
