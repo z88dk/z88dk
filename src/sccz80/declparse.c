@@ -413,6 +413,9 @@ static Type *parse_type(void)
     Type *type = CALLOC(1,sizeof(*type));
     int   typed = 0;
 
+
+    swallow("register");
+    swallow("auto");
     type->len = 1;
     if ( swallow("const")) {
         type->isconst = 1;
