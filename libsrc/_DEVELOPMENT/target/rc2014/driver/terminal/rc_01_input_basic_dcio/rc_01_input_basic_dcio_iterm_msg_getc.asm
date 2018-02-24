@@ -28,10 +28,7 @@ rc_01_input_basic_dcio_iterm_msg_getc:
    
    cp 13
    jr z, key_lf
-   
-   cp CHAR_CTRL_Z
-   jp z, error_mc              ; generate EOF (ctr-z is from cp/m)
-   
+
    or a                        ; reset carry to indicate success
    ret
 

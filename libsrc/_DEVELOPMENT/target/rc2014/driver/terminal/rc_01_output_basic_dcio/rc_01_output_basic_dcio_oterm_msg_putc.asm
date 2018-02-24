@@ -54,7 +54,7 @@ rc_01_output_basic_dcio_oterm_msg_putc_raw:
    ; send cr+lf
    
    ld a,13
-   call 0x08                   ; send cr
+   rst 0x08                    ; send cr
    
    ld a,10
    jp 0x08
