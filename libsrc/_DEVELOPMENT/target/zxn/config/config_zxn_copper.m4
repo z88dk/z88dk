@@ -12,11 +12,8 @@ divert(-1)
 # one horizontal pixel.
 #
 # Vertically the display consists of 262 lines in 60Hz mode and
-# 311 lines in 50Hz mode.  Lines 0-191 always correspond to the
-# area containing the active display.  In 60Hz mode, the next 32
-# lines are bottom border, 8 lines for Vsync, and 32 lines for top
-# border.  In 50Hz mode, the next 56 lines are bottom border, 8
-# lines for Vsync and 56 lines for top border.
+# 312 lines in 50Hz mode.  Lines 0-191 always correspond to the
+# area containing the active display.
 #
 # 50Hz                          60Hz
 # Lines                         Lines
@@ -26,7 +23,7 @@ divert(-1)
 # 248-255  Vsync (interrupt)    224-231  Vsync (interrupt)
 # 256-311  Top Border           232-261  Top Border
 #
-# Horizontally the display is the same in 50 or 60Hz mode but it
+# Horizontally the display is the same in 50Hz or 60Hz mode but it
 # varies by model.  It consists of 448 pixels (0-447) in 48k mode
 # and 456 pixels (0-455) in 128k mode.  Grouped in eight pixels
 # that's screen bytes 0-55 in 48k mode and 0-56 in 128k mode.
@@ -49,6 +46,13 @@ divert(-1)
 # These operations are encoded into a 16-bit instruction which
 # is stored in big endian form.  The Copper has a 2k code space
 # on the fpga, which means an instruction space of 1024 instructions.
+#
+# z88dk/z80asm adds the following instructions to assemble copper code:
+#
+# cu.wait line,hor   ; wait for LINE line and HORIZONTAL hor
+# cu.move reg,val    ; move val to nextreg reg
+# cu.nop             ; wait one horizontal pixel (cu.move 0,0)
+# cu.stop            ; stop the copper (impossible wait) 
 #
 # Programming the Copper involves writing zeroes to nextreg 97 & 98
 # to turn off the Copper and set the current instruction index to zero.
