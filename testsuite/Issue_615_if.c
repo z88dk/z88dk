@@ -2,6 +2,8 @@ void resultif();
 void resultelse();
 void resultelseif();
 
+int var;
+
 int func1() 
 {
 	if ( 1 )  {
@@ -10,6 +12,7 @@ int func1()
 		resultelse();
 	}
 }
+
 
 int func1a() 
 {
@@ -29,6 +32,14 @@ int func1b()
 	}
 }
 
+int func1c() 
+{
+	if ( var++, 1 )  {
+		resultif();
+	}
+}
+
+
 int func2() 
 {
 	if ( 0 )  {
@@ -44,6 +55,13 @@ int func2a()
 		resultif();
 	}
 }
+int func2b() 
+{
+	if ( var++, 0 )  {
+		resultif();
+	}
+}
+
 
 int func3() 
 {
