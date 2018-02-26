@@ -9,9 +9,8 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] A new port to the Pacman arcade hardware is availble
 - [classiclib] Bug fixes for memrchr() and gets()
 - [classiclib] Compiler intrinsics are now available
-- [classiclib] fmemopen is now available
-- [classiclib] funopen is now available
-- [classiclib] ROM cartridge support for PC6001
+- [classiclib] fmemopen() and funopen() are now available
+- [classiclib] +pc6001 ROM cartridge support 
 - [classiclib] +test target now supports amalloc and command line arguments
 - [classiclib] printf format %s now supports a precision field
 - [classiclib] printf format %x, %p, %X, %B now disable the + flag
@@ -29,15 +28,22 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] +ts2068 screen printer doesn't force hires screen
 - [classiclib] +zx ROM screen printer now available
 - [classiclib] +zx Non ROM based stdin is now available
-- [classiclib] +zx Default console font can be changed at compile time (CRT_FONT)
+- [classiclib] +zx Default console font can be changed at compile time (CRT_FONT/CRT_FONT64)
 - [classiclib] +zx FZX based screen printer is now available
 - [classiclib] imported obstack, balloc and adt libraries from newlib. balloc can now
   be configured in the same was as newlib (-pragma-define:CLIB_BALLOC_TABLE_SIZE=n)
 - [classiclib] Marked adt and balloc classic apis as deprecated
-- [classiclib] cpcrslib has been imported
-- [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam port improvements
+- [classiclib] +cpc cpcrslib has been imported
+- [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam, X1, Z1013 port improvements
 - [classiclib] SMS stability improvements
+- [classiclib] [all] New kbhit() implementation
 - [classiclib] Now shares ctype, string and most of stdlib with newlib
+- [newlib] +sms devKit SMS has been incorporated
+- [newlib] +zxn Extensive support for the ZX Spectrum Next
+- [newlib] +rc2014 Many enhancements for the RC2014
+- [newlib] +vgl Support for the V-Tech Genius Leader
+- [newlib] +z180 Support for bare-bone z180 boards
+- [newlib] +yaz180 Support for YAZ180
 - [sccz80] #36: Defining an extern variable with @ no longer exports symbol
 - [sccz80] #9: The sdcc directives __z88dk_fastcall and __z88dk_callee are now
   supported. Additionally __preserves_regs() is ignored.
@@ -105,12 +111,6 @@ z88dk vX.XX  - XX.XX.XXXX
 - [zpragma] Support for #pragma printf and #pragma scanf which take a format string
   argument and configure the appropriate printf converters.
 - [zpragma] has now been completely renamed, scanner is no more
-- [newlib] +sms devKit SMS has been incorporated
-- [newlib] +zxn Support for the ZX Spectrum Next
-- [newlib] +rc2014 Many enhancements for the RC2014
-- [newlib] +vgl Support for the V-Tech Genius Leader
-- [newlib] +z180 Support for bare-bone z180 boards
-- [newlib] +yaz180 Support for YAZ180
 - [all] #105: main() always takes its parameters in r->l format regardless of compiler
 
 z88dk v1.99B - 10.01.2017
