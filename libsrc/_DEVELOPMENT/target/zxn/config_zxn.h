@@ -585,7 +585,7 @@
 #define __ESXDOS_SYS_F_GETFREE  177
 
 #define __ESXDOS_PATH_MAX  256
-#define __ESXDOS_NAME_MAX  12
+#define __ESXDOS_NAME_MAX  128
 
 #define __ESXDOS_MODE_READ  0x01
 #define __ESXDOS_MODE_WRITE  0x02
@@ -1109,6 +1109,120 @@
 
 
 
+#define __IO_DMA  0x6b
+#define __IO_DMA_DATAGEAR  0x6b
+
+#define __DMA_WR0  0x00
+
+#define __DMA_WR0_TRANSFER  0x01
+#define __DMA_WR0_A_TO_B  0x04
+#define __DMA_WR0_B_TO_A  0x00
+
+#define __DMA_WR0_X3_A_START_L  0x08
+#define __DMA_WR0_X4_A_START_H  0x10
+#define __DMA_WR0_X34_A_START  0x18
+#define __DMA_WR0_X5_LEN_L  0x20
+#define __DMA_WR0_X6_LEN_H  0x40
+#define __DMA_WR0_X56_LEN  0x60
+
+#define __DMA_WR0_X3  0x08
+#define __DMA_WR0_X4  0x10
+#define __DMA_WR0_X5  0x20
+#define __DMA_WR0_X6  0x40
+#define __DMA_WR0_X34  0x18
+#define __DMA_WR0_X35  0x28
+#define __DMA_WR0_X36  0x48
+#define __DMA_WR0_X45  0x30
+#define __DMA_WR0_X46  0x50
+#define __DMA_WR0_X56  0x60
+#define __DMA_WR0_X345  0x38
+#define __DMA_WR0_X346  0x58
+#define __DMA_WR0_X356  0x68
+#define __DMA_WR0_X456  0x70
+#define __DMA_WR0_X3456  0x78
+
+#define __DMA_WR1  0x04
+
+#define __DMA_WR1_A_IS_MEM  0x00
+#define __DMA_WR1_A_IS_IO  0x08
+#define __DMA_WR1_A_DEC  0x00
+#define __DMA_WR1_A_INC  0x10
+#define __DMA_WR1_A_FIX  0x20
+
+#define __DMA_WR1_X6  0x40
+#define __DMA_WR1_X6_A_TIMING  0x40
+
+#define __DMA_WR1X6_A_CLEN_2  0x02
+#define __DMA_WR1X6_A_CLEN_3  0x01
+#define __DMA_WR1X6_A_CLEN_4  0x00
+
+#define __DMA_WR2  0x00
+
+#define __DMA_WR2_B_IS_MEM  0x00
+#define __DMA_WR2_B_IS_IO  0x08
+#define __DMA_WR2_B_DEC  0x00
+#define __DMA_WR2_B_INC  0x10
+#define __DMA_WR2_B_FIX  0x20
+
+#define __DMA_WR2_X6  0x40
+#define __DMA_WR2_X6_B_TIMING  0x40
+
+#define __DMA_WR2X6_B_CLEN_2  0x02
+#define __DMA_WR2X6_B_CLEN_3  0x01
+#define __DMA_WR2X6_B_CLEN_4  0x00
+
+#define __DMA_WR2X6_X5  0x20
+#define __DMA_WR2X6_X5_PRESCALAR  0x20
+
+#define __DMA_WR3  0x80
+#define __DMA_WR3_ENABLE_DMA  0x40
+
+#define __DMA_WR4  0x81
+
+#define __DMA_WR4_CONT  0x20
+#define __DMA_WR4_BURST  0x40
+
+#define __DMA_WR4_X2  0x04
+#define __DMA_WR4_X3  0x08
+#define __DMA_WR4_X23  0x0c
+
+#define __DMA_WR4_X2_B_START_L  0x04
+#define __DMA_WR4_X3_B_START_H  0x08
+#define __DMA_WR4_X23_B_START  0x0c
+
+#define __DMA_WR5  0x82
+
+#define __DMA_WR5_CE_WAIT  0x10
+#define __DMA_WR5_RESTART  0x20
+
+#define __DMA_LOAD  0xcf
+#define __DMA_CONTINUE  0xd3
+#define __DMA_ENABLE_DMA  0x87
+#define __DMA_DISABLE_DMA  0x83
+#define __DMA_READ_MASK  0xbb
+
+#define __DMA_RM_STATUS  0x01
+#define __DMA_RM_COUNTER_L  0x02
+#define __DMA_RM_COUNTER_H  0x04
+#define __DMA_RM_COUNTER  0x06
+#define __DMA_RM_A_ADDR_L  0x08
+#define __DMA_RM_A_ADDR_H  0x10
+#define __DMA_RM_A_ADDR  0x18
+#define __DMA_RM_B_ADDR_L  0x20
+#define __DMA_RM_B_ADDR_H  0x40
+#define __DMA_RM_B_ADDR  0x60
+
+
+
+
+
+
+
+
+
+
+
+
 #define __IO_LAYER_2_CONFIG  0x123b
 
 #define __IL2C_ENABLE_LOWER_16K  0x01
@@ -1126,6 +1240,18 @@
 #define __IO_123B_BANK_SELECT_0  0x00
 #define __IO_123B_BANK_SELECT_1  0x40
 #define __IO_123B_BANK_SELECT_2  0x80
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1413,9 +1539,9 @@
 #define __RMT_PENTAGON  0x04
 
 #define __REG_PAGE_RAM  4
-#define __RPR_MASK  0x7f
+#define __RPR_MASK  0x3f
 #define __REG_BANK_RAM  4
-#define __RBR_MASK  0x7f
+#define __RBR_MASK  0x3f
 
 #define __REG_PERIPHERAL_1  5
 #define __RP1_JOY1_SINCLAIR  0x00
@@ -1458,20 +1584,22 @@
 #define __RP3_ENABLE_TURBOSOUND  0x02
 #define __RP3_UNLOCK_7FFD  0x80
 
-#define __REG_ANTI_BRICK  10
+#define __REG_SUB_VERSION  14
+
+#define __REG_ANTI_BRICK  16
 #define __RAB_START_NORMAL_CORE  0x80
 #define __RAB_BUTTON_DIVMMC  0x02
 #define __RAB_BUTTON_MULTIFACE  0x01
 
 #define __REG_LAYER_2_RAM_PAGE  18
-#define __RL2RP_MASK  0x7f
+#define __RL2RP_MASK  0x3f
 #define __REG_LAYER_2_RAM_BANK  18
-#define __RL2RB_MASK  0x7f
+#define __RL2RB_MASK  0x3f
 
 #define __REG_LAYER_2_SHADOW_RAM_PAGE  19
-#define __RL2SRP_MASK  0x7f
+#define __RL2SRP_MASK  0x3f
 #define __REG_LAYER_2_SHADOW_RAM_BANK  19
-#define __RL2SRB_MASK  0x7f
+#define __RL2SRB_MASK  0x3f
 
 #define __REG_GLOBAL_TRANSPARENCY_COLOR  20
 
@@ -1501,27 +1629,27 @@
 #define __RCWC_RESET_SPRITE_CLIP_INDEX  0x02
 #define __RCWC_RESET_LAYER_2_CLIP_INDEX  0x01
 
-#define __REG_ACTIVE_VIDEO_LINE_MSB  30
+#define __REG_ACTIVE_VIDEO_LINE_H  30
 
-#define __REG_ACTIVE_VIDEO_LINE_LSB  31
+#define __REG_ACTIVE_VIDEO_LINE_L  31
 
 #define __REG_LINE_INTERRUPT_CONTROL  34
 #define __RLIC_INTERRUPT_FLAG  0x80
 #define __RLIC_DISABLE_ULA_INTERRUPT  0x04
 #define __RLIC_ENABLE_LINE_INTERRUPT  0x02
-#define __RLIC_LINE_INTERRUPT_VALUE_MSB  0x01
+#define __RLIC_LINE_INTERRUPT_VALUE_H  0x01
 
-#define __REG_LINE_INTERRUPT_VALUE_LSB  35
+#define __REG_LINE_INTERRUPT_VALUE_L  35
 
-#define __REG_KEYMAP_ADDRESS_MSB  40
+#define __REG_KEYMAP_ADDRESS_H  40
 
-#define __REG_KEYMAP_ADDRESS_LSB  41
+#define __REG_KEYMAP_ADDRESS_L  41
 
-#define __REG_KEYMAP_DATA_MSB  42
+#define __REG_KEYMAP_DATA_H  42
 
-#define __REG_KEYMAP_DATA_LSB  43
+#define __REG_KEYMAP_DATA_L  43
 
-#define __REG_AUDIO_MONO_DAC  45
+#define __REG_DAC_MONO  45
 
 #define __REG_LORES_OFFSET_X  50
 
@@ -1531,9 +1659,10 @@
 
 #define __REG_PALETTE_VALUE_8  65
 
-#define __REG_ULA_PALETTE_FORMAT  66
+#define __REG_ULANEXT_PALETTE_FORMAT  66
 
 #define __REG_PALETTE_CONTROL  67
+#define __RPC_DISABLE_AUTOINC  0x80
 #define __RPC_SELECT_ULA_PALETTE_0  0x00
 #define __RPC_SELECT_ULA_PALETTE_1  0x40
 #define __RPC_SELECT_LAYER_2_PALETTE_0  0x10
@@ -1550,6 +1679,8 @@
 
 #define __REG_PALETTE_VALUE_16  68
 
+#define __REG_FALLBACK_COLOR  74
+
 #define __REG_MMU0  80
 #define __REG_MMU1  81
 #define __REG_MMU2  82
@@ -1561,13 +1692,13 @@
 
 #define __REG_COPPER_DATA  96
 
-#define __REG_COPPER_CONTROL_LO  97
+#define __REG_COPPER_CONTROL_L  97
 
-#define __REG_COPPER_CONTROL_HI  98
+#define __REG_COPPER_CONTROL_H  98
 #define __RCCH_COPPER_STOP  0x00
-#define __RCCH_COPPER_RUN_ONCE  0x40
+#define __RCCH_COPPER_RUN_LOOP_RESET  0x40
 #define __RCCH_COPPER_RUN_LOOP  0x80
-#define __RCCH_COPPER_RUN_ON_INTERRUPT  0xc0
+#define __RCCH_COPPER_RUN_VBI  0xc0
 
 
 
@@ -1850,116 +1981,6 @@
 #define __IO_FF_HIRES_CYAN  0x2e
 #define __IO_FF_HIRES_YELLOW  0x36
 #define __IO_FF_HIRES_WHITE  0x3e
-
-
-
-
-
-
-
-
-
-
-
-
-#define __IO_DMA  0x6b
-
-#define __IO_DMA_MB02  0x0b
-#define __IO_DMA_DATAGEAR  0x6b
-
-#define __IO_DMA_WR0  0x00
-
-#define __IO_DMA_WR0_TRANSFER  0x01
-#define __IO_DMA_WR0_A_TO_B  0x04
-#define __IO_DMA_WR0_B_TO_A  0x00
-
-#define __IO_DMA_WR0_X3_A_START_L  0x08
-#define __IO_DMA_WR0_X4_A_START_H  0x10
-#define __IO_DMA_WR0_X5_LEN_L  0x20
-#define __IO_DMA_WR0_X6_LEN_H  0x40
-
-#define __IO_DMA_WR0_X3  0x08
-#define __IO_DMA_WR0_X4  0x10
-#define __IO_DMA_WR0_X5  0x20
-#define __IO_DMA_WR0_X6  0x40
-#define __IO_DMA_WR0_X34  0x18
-#define __IO_DMA_WR0_X35  0x28
-#define __IO_DMA_WR0_X36  0x48
-#define __IO_DMA_WR0_X45  0x30
-#define __IO_DMA_WR0_X46  0x50
-#define __IO_DMA_WR0_X56  0x60
-#define __IO_DMA_WR0_X345  0x38
-#define __IO_DMA_WR0_X346  0x58
-#define __IO_DMA_WR0_X356  0x68
-#define __IO_DMA_WR0_X456  0x70
-#define __IO_DMA_WR0_X3456  0x78
-
-#define __IO_DMA_WR1  0x04
-
-#define __IO_DMA_WR1_A_IS_MEM  0x00
-#define __IO_DMA_WR1_A_IS_IO  0x08
-#define __IO_DMA_WR1_A_DEC  0x00
-#define __IO_DMA_WR1_A_INC  0x10
-#define __IO_DMA_WR1_A_FIX  0x20
-
-#define __IO_DMA_WR1_X6  0x40
-#define __IO_DMA_WR1_X6_A_TIMING  0x40
-
-#define __IO_DMA_WR1X6_CYCLEN_2  0x02
-#define __IO_DMA_WR1X6_CYCLEN_3  0x01
-#define __IO_DMA_WR1X6_CYCLEN_4  0x00
-
-#define __IO_DMA_WR2  0x00
-
-#define __IO_DMA_WR2_B_IS_MEM  0x00
-#define __IO_DMA_WR2_B_IS_IO  0x08
-#define __IO_DMA_WR2_B_DEC  0x00
-#define __IO_DMA_WR2_B_INC  0x10
-#define __IO_DMA_WR2_B_FIX  0x20
-
-#define __IO_DMA_WR2_X6  0x40
-#define __IO_DMA_WR2_X6_B_TIMING  0x40
-
-#define __IO_DMA_WR2X6_CYCLEN_2  0x02
-#define __IO_DMA_WR2X6_CYCLEN_3  0x01
-#define __IO_DMA_WR2X6_CYCLEN_4  0x00
-
-#define __IO_DMA_WR2X6_X5  0x20
-#define __IO_DMA_WR2X6_X5_PRESCALAR  0x20
-
-#define __IO_DMA_WR3  0x80
-#define __IO_DMA_WR3_ENABLE_DMA  0x40
-
-#define __IO_DMA_WR4  0x81
-
-#define __IO_DMA_WR4_CONTINUOUS  0x20
-#define __IO_DMA_WR4_BURST  0x40
-
-#define __IO_DMA_WR4_X2  0x04
-#define __IO_DMA_WR4_X3  0x08
-#define __IO_DMA_WR4_X23  0x0c
-
-#define __IO_DMA_WR4_X2_B_START_L  0x04
-#define __IO_DMA_WR4_X3_B_START_H  0x08
-
-#define __IO_DMA_WR5  0x82
-
-#define __IO_DMA_WR5_CE_WAIT  0x10
-#define __IO_DMA_WR5_RESTART  0x20
-
-#define __IO_DMA_CMD_LOAD  0xcf
-#define __IO_DMA_CMD_CONTINUE  0xd3
-#define __IO_DMA_CMD_ENABLE_DMA  0x87
-#define __IO_DMA_CMD_DISABLE_DMA  0x83
-#define __IO_DMA_CMD_READ_MASK  0xbb
-
-#define __IO_DMA_RM_STATUS  0x01
-#define __IO_DMA_RM_COUNTER_L  0x02
-#define __IO_DMA_RM_COUNTER_H  0x04
-#define __IO_DMA_RM_A_ADDR_L  0x08
-#define __IO_DMA_RM_A_ADDR_H  0x10
-#define __IO_DMA_RM_B_ADDR_L  0x20
-#define __IO_DMA_RM_B_ADDR_H  0x40
 
 
 
