@@ -1,7 +1,7 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##       RC2014_CRT_256.ASM.M4 - EXAMPLE TARGET          ##
+dnl##          RC2014_CRT_256.ASM.M4 - NODRIVERS             ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                RC2014 standalone target                   ;;
@@ -41,13 +41,13 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/character/rc_00_input_acia.m4')
-dnl#include(`driver/character/rc_00_input_basic.m4')
+dnl#include(`driver/terminal/rc_01_input_acia.m4')
+dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/character/rc_00_output_acia.m4')
-dnl#include(`driver/character/rc_00_output_basic.m4')
+dnl#include(`driver/terminal/rc_01_output_acia.m4')
+dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl

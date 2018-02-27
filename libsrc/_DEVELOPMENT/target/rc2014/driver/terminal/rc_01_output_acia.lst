@@ -1,0 +1,7 @@
+target/rc2014/driver/terminal/rc_01_output_acia
+target/rc2014/driver/terminal/rc_01_output_acia/rc_01_output_acia_iterm_msg_bell
+target/rc2014/driver/terminal/rc_01_output_acia/rc_01_output_acia_iterm_msg_bs
+target/rc2014/driver/terminal/rc_01_output_acia/rc_01_output_acia_iterm_msg_putc
+target/rc2014/driver/terminal/rc_01_output_acia/rc_01_output_acia_oterm_msg_bell
+target/rc2014/driver/terminal/rc_01_output_acia/rc_01_output_acia_oterm_msg_putc
+target/rc2014/driver/terminal/rc_01_output_acia/rc_01_output_acia_stdio_msg_ictl
