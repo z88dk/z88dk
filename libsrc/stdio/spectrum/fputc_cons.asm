@@ -103,6 +103,7 @@ ENDIF
 ;Exit with carry set if OK..
 	
 .print64
+	sub	32
 	ld	c,a		;save character
 	call	calc_screen_address
 	ex	de,hl		;de = screen address
@@ -112,7 +113,7 @@ ENDIF
 	add	hl,hl  
 	add	hl,hl  
 	add	hl,hl  
-	ld	bc,CRT_FONT_64-256
+	ld	bc,(font64addr)
 	add	hl,bc
 
 	; a = mask
@@ -383,7 +384,7 @@ ENDIF
 .code_table
 	defw    noop      ; 0 - NUL
 	defw    switch    ; 1 - SOH
-	defw    setfont32 ; 2
+	defw    setfont ; 2
 	defw    setudg    ; 3
 	defw    setvscroll ; 4
 	defw    noop    ; 5
@@ -583,15 +584,26 @@ ENDIF
 	ld	(hl),a
 	ret
 
-.dofont	ld	hl,(params)
-	ld	(fontaddr),hl
+.dofont	ld	hl,(print_routine)
+	and	a
+	ld	de,print32
+	sbc	hl,de
+	ld	de,fontaddr
+	jr	nc,dofont_setit
+	ld	de,font64addr
+.dofont_setit
+	ld	hl,(params)
+	ex	de,hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
 	ret
 
 .doudg	ld	hl,(params)
 	ld	(udgaddr),hl
 	ret
 
-.setfont32
+.setfont
 	ld	hl,dofont
 	ld	a,2
 	jr	setparams
@@ -710,6 +722,7 @@ ENDIF
 	SECTION data_clib
 
 .fontaddr	defw	CRT_FONT
+.font64addr	defw	CRT_FONT_64
 .udgaddr	defw	65368
 .attr		defb	56
 .print_routine	defw	print64
