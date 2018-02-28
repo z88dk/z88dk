@@ -16,3 +16,6 @@
 // Compress Stored Data Section to Reduce ROM Size
 
 #pragma output CRT_MODEL = 2
+
+// Start BSS after the music manager memory from 0xC100 to 0xC2xx
+#pragma output CRT_ORG_BSS = 0xc300

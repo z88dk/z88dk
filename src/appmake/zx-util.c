@@ -363,7 +363,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                         }
                     }
 
-                    if (zxt->screen && !zxt->turbo)  mlen += 5;			/* Add the space count for -- LOAD "" SCREEN$: */
+                    if (zxt->screen && !zxt->turbo)  mlen += (5 + 17);			/* Add the space count for -- LOAD "" SCREEN$: */
 
                                                                 /* Write out the BASIC header file */
                     writeword_p(19, fpout, &zxt->parity);         /* Header len */
@@ -404,7 +404,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                     writebyte_p(10, fpout, &zxt->parity);         /* LSB... */
                     if (!zxt->turbo)
                         if (zxt->screen)
-                            writeword_p(26 + 5, fpout, &zxt->parity);         /* BASIC line length */
+                            writeword_p(26 + 5 + 17, fpout, &zxt->parity);         /* BASIC line length */
                         else
                             writeword_p(26, fpout, &zxt->parity);         /* BASIC line length */
                     else
@@ -440,6 +440,13 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                             writebyte_p('"', fpout, &zxt->parity);
                             writebyte_p(0xaa, fpout, &zxt->parity);       /* SCREEN$ */
                             writebyte_p(':', fpout, &zxt->parity);
+                            writebyte_p(0xf4, fpout, &zxt->parity);   /* POKE */
+                            writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
+                            sprintf(mybuf, "\"23739\",", (int)pos);        
+                            writestring_p(mybuf, fpout, &zxt->parity);
+                            writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
+                            sprintf(mybuf, "\"111\":", (int)pos);        
+                            writestring_p(mybuf, fpout, &zxt->parity);
                         }
                         writebyte_p(0xef, fpout, &zxt->parity);       /* LOAD */
                         writebyte_p('"', fpout, &zxt->parity);

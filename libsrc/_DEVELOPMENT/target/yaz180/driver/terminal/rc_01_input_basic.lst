@@ -1,0 +1,5 @@
+target/yaz180/driver/terminal/rc_01_input_basic
+target/yaz180/driver/terminal/rc_01_input_basic/rc_01_input_basic_iterm_msg_getc
+target/yaz180/driver/terminal/rc_01_input_basic/rc_01_input_basic_iterm_msg_interrupt
+target/yaz180/driver/terminal/rc_01_input_basic/rc_01_input_basic_iterm_msg_reject
+target/yaz180/driver/terminal/rc_01_input_basic/rc_01_input_basic_stdio_msg_flsh

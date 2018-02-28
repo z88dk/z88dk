@@ -76,7 +76,7 @@ IF (startup=2)
 	;EXTERN ASMTAIL
 		ld	hl,$100
 		ld  de,32768
-		ld  bc,$4000	; max. code size = 16K
+		ld  bc,$4000-$100	; max. code size is about 16K
 		ldir
 IF !DEFINED_noprotectmsdos
 		jp  32768+14
@@ -224,11 +224,13 @@ ENDIF
 
 	INCLUDE	"crt/classic/crt_section.asm"
 
+
 	SECTION code_crt_init
 	ld	c,25
 	call	5
 	ld	(defltdsk),a
 
+	
 	SECTION bss_crt
 
 ;-----------------------

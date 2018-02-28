@@ -1,7 +1,7 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##       RC2014_CRT_16.ASM.M4 - EXAMPLE TARGET            ##
+dnl##      RC2014_CRT_16.ASM.M4 - IO THROUGH BASIC           ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                RC2014 standalone target                   ;;
@@ -41,13 +41,13 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/character/rc_00_input_acia.m4')
-dnl#include(`driver/character/rc_00_input_basic.m4')
+dnl#include(`driver/terminal/rc_01_input_acia.m4')
+dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/character/rc_00_output_acia.m4')
-dnl#include(`driver/character/rc_00_output_basic.m4')
+dnl#include(`driver/terminal/rc_01_output_acia.m4')
+dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl
@@ -66,14 +66,14 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`driver/character/rc_00_input_basic.m4')
-   m4_rc_00_input_basic(_stdin, 0x0100)
+   include(`driver/terminal/rc_01_input_basic.m4')
+   m4_rc_01_input_basic(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
-   include(`driver/character/rc_00_output_basic.m4')
-   m4_rc_00_output_basic(_stdout, 0x0100)
+   include(`driver/terminal/rc_01_output_basic.m4')
+   m4_rc_01_output_basic(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
-   include(`../m4_file_dup.m4')
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+   include(`../m4_file_dup.m4')dnl
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
 ',
 `
    include(`crt_driver_instantiation.asm.m4')
@@ -211,7 +211,7 @@ SECTION code_crt_return
       ENDIF
       
       ld sp,(__sp_or_ret)
-  
+      
       IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
 
          im __crt_interrupt_mode_exit

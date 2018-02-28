@@ -11,6 +11,6 @@ PUBLIC  _font_4x8_64_owen_end
 
 _font_4x8_64_owen:
 
-   BINARY "../font/font_4x8/_font_4x8_64_owen.fon"
+   BINARY "font_4x8_64_owen.bin"
 
 _font_4x8_64_owen_end:

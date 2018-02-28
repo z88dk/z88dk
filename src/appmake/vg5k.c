@@ -3,7 +3,7 @@
  *      Philips VG-5000 application packager
  * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
  *      
- *      $Id: vg5k.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: vg5k.c $
  */
 
 
@@ -192,7 +192,10 @@ int vg5k_exec(char *target)
 
 		fseek(fpin,0L,SEEK_SET);
 		
-		checksum = 0;
+		if ( pos == 18953 )
+		   checksum = 0x1FB;		/* BASIC stub checksum */
+		else
+			checksum = 0;
 
 		for ( i = 0; i < len; i++) {
 			c = getc(fpin);
@@ -208,35 +211,70 @@ int vg5k_exec(char *target)
 
 		/* HEADER */
 
-		/* Leader */
+		/* Leader 'tone' */
 		for (i=0; (i < 10); i++)
 			writebyte(0xd3,fpout);
 
-		writebyte('M',fpout);
+		writebyte('M',fpout);	/* 'CSAVEM/CLOADM', binary machine code file type */
 
 		/* Deal with the filename */
 		if (strlen(blockname) >= 7 ) {
 			strncpy(name,blockname,7);
 		} else {
-			strcpy(name,blockname);
+			strcpy(name,blockname);		/* optionally, 00 - 01  to terminate the fname text, then zero-fill */
 			strncat(name,"       ",7-strlen(blockname));
 		}
 		for (i=0;i<=6;i++)
 			writebyte(name[i],fpout);
 
-		for (i=0;i<=7;i++)
-			writebyte(0,fpout);
+		if ( pos == 18953 ) {
+			writebyte('1',fpout);	/* run BASIC line #1 after loading */
+			for (i=0;i<=6;i++)
+				writebyte(0,fpout);		/* tail for BASIC line number */
+			
+			writeword(18940,fpout);              /* Program Location (18900?) */
+			writeword(len+13,fpout);             /* Program Length + BASIC part*/
+			writeword((checksum%65536),fpout);   /* Program checksum */
+			
+			
+		} else {
+			
+			for (i=0;i<=7;i++)
+				writebyte(0,fpout);		/* BASIC autorun after loading is disabled */
+		
+			writeword(pos,fpout);                /* Program Location */
+			writeword(len,fpout);                /* Program Length */
+			writeword((checksum%65536),fpout);   /* Program checksum */
+		}
 
-		writeword(pos,fpout);                /* Program Location */
-		writeword(len,fpout);                /* Program Length */
-		writeword((checksum%65536),fpout);   /* Program checksum */
-
-		/* One more Leader */
+		/* One more Leader 'tone' */
 		for (i=0; (i < 10); i++)
 			writebyte(0xd6,fpout);
 
-		/* PROGRAM BLOCK */
+		/* PROGRAM BLOCK (52 bytes) */
 
+		if ( pos == 18953 ) {
+			
+			writeword (18951,fpout);    /* end of program (or PTR to next BASIC program line?) */
+			
+			writeword (1,fpout);        /* 1 CALL18953 */
+			writebyte (0x9f,fpout);     /* CALL token */
+			writebyte ('1',fpout);
+			writebyte ('8',fpout);
+			writebyte ('9',fpout);
+			writebyte ('5',fpout);
+			writebyte ('3',fpout);
+			
+			writebyte (0,fpout);
+			writebyte (0,fpout);
+			writebyte (0,fpout);      /* <- end position = (18952) */
+
+			
+		}
+
+
+		/* M/C program data */
+		
 		for ( i = 0; i < len; i++) {
 			c = getc(fpin);
 			writebyte(c,fpout);
@@ -326,6 +364,5 @@ int vg5k_exec(char *target)
 	
     return 0;
 }
-
 
 

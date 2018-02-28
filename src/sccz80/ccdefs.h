@@ -120,6 +120,7 @@ extern void     dogoto(void);
 extern void     goto_cleanup(void);
 
 #include "io.h"
+extern void     discardbuffer(t_buffer *buf);
 
 /* lex.c */
 extern int      streq(char str1[], char str2[]);

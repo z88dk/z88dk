@@ -12,6 +12,6 @@ PUBLIC  _font_8x8_cpc_system_end
 
 _font_8x8_cpc_system:
 
-   BINARY "../font/font_8x8/_font_8x8_CPC.fon"
+   BINARY "font_8x8_cpc_system.bin"
 
 _font_8x8_cpc_system_end:

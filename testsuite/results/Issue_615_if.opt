@@ -1,0 +1,113 @@
+
+
+
+	MODULE	Issue_615_if
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+	call	_resultif
+	ret
+
+
+
+._func1a
+	call	_resultif
+	ret
+
+
+
+._func1b
+	call	_resultif
+	ret
+
+
+
+._func1c
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	call	_resultif
+	ret
+
+
+
+._func2
+	call	_resultelse
+	ret
+
+
+
+._func2a
+	ret
+
+
+
+._func2b
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	ret
+
+
+
+._func3
+	push	bc
+	pop	hl
+	push	hl
+	ld	a,h
+	or	l
+	jp	z,i_11
+	call	_resultif
+	jp	i_12
+.i_11
+	call	_resultelse
+.i_12
+	pop	bc
+	ret
+
+
+
+._func3a
+	push	bc
+	pop	hl
+	push	hl
+	ld	a,h
+	or	l
+	call	nz,_resultif
+.i_13
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._var	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_resultif
+	GLOBAL	_resultelse
+	GLOBAL	_resultelseif
+	GLOBAL	_var
+	GLOBAL	_func1
+	GLOBAL	_func1a
+	GLOBAL	_func1b
+	GLOBAL	_func1c
+	GLOBAL	_func2
+	GLOBAL	_func2a
+	GLOBAL	_func2b
+	GLOBAL	_func3
+	GLOBAL	_func3a
+
+
+
+

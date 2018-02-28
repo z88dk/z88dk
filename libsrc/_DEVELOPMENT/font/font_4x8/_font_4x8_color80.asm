@@ -11,6 +11,6 @@ PUBLIC  _font_4x8_color80_end
 
 _font_4x8_color80:
 
-   BINARY "../font/font_4x8/_font_4x8_color80.fon"
+   BINARY "font_4x8_color80.bin"
 
 _font_4x8_color80_end:

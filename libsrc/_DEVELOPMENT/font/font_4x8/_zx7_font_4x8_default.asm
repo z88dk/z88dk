@@ -8,6 +8,6 @@ PUBLIC _zx7_font_4x8_default_end
 
 _zx7_font_4x8_default:
 
-   BINARY "font/font_4x8/font_4x8_default.bin.zx7"
+   BINARY "font_4x8_default.bin.zx7"
 
 _zx7_font_4x8_default_end:

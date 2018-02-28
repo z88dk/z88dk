@@ -1,0 +1,215 @@
+
+
+
+	MODULE	Issue_615_loop
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+.i_4
+	call	_whilefunc
+.i_2
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	ret
+
+
+
+._func1a
+.i_7
+	call	_whilefunc
+.i_5
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	jp	i_7
+.i_6
+	ret
+
+
+
+._func1b
+.i_10
+	call	_whilefunc
+.i_8
+	ld	hl,(_var)
+	ld	a,h
+	or	l
+	jp	nz,i_10
+.i_9
+	ret
+
+
+
+._func1c
+.i_13
+	call	_whilefunc
+.i_11
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	ld	hl,1	;const
+	ld	a,h
+	or	l
+	jp	nz,i_14
+	ld	hl,(_var)
+	ld	a,h
+	or	l
+	jp	nz,i_14
+	jr	i_15
+.i_14
+	ld	hl,1	;const
+.i_15
+	ld	a,h
+	or	l
+	jp	nz,i_13
+.i_12
+	ret
+
+
+
+._func2
+.i_16
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	ret
+
+
+
+._func2a
+.i_18
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	call	_whilefunc
+	jp	i_18
+.i_19
+	ret
+
+
+
+._func2b
+.i_20
+	ld	hl,(_var)
+	ld	a,h
+	or	l
+	jp	z,i_21
+	call	_whilefunc
+	jp	i_20
+.i_21
+	ret
+
+
+
+._func3
+	ld	hl,0	;const
+	push	hl
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	pop	bc
+	ret
+
+
+
+._func3a
+	ld	hl,0	;const
+	push	hl
+	jp	i_27
+.i_25
+	pop	hl
+	inc	hl
+	push	hl
+	dec	hl
+.i_27
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	dec	hl
+	call	_forfunc
+	jp	i_25
+.i_26
+	pop	bc
+	ret
+
+
+
+._func3b
+	ld	hl,0	;const
+	push	hl
+	jp	i_30
+.i_28
+	pop	hl
+	inc	hl
+	push	hl
+	dec	hl
+.i_30
+	ld	hl,(_var)
+	inc	hl
+	ld	(_var),hl
+	pop	hl
+	push	hl
+	ld	a,h
+	or	l
+	jp	z,i_29
+	call	_forfunc
+	jp	i_28
+.i_29
+	pop	bc
+	ret
+
+
+
+._func3c
+	ld	hl,0	;const
+	push	hl
+	add	hl,sp
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
+	dec	hl
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._var	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_var
+	GLOBAL	_func1
+	GLOBAL	_whilefunc
+	GLOBAL	_func1a
+	GLOBAL	_func1b
+	GLOBAL	_func1c
+	GLOBAL	_func2
+	GLOBAL	_func2a
+	GLOBAL	_func2b
+	GLOBAL	_func3
+	GLOBAL	_forfunc
+	GLOBAL	_func3a
+	GLOBAL	_func3b
+	GLOBAL	_func3c
+
+
+
+

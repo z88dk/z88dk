@@ -1,0 +1,7 @@
+target/yaz180/driver/terminal/rc_01_output_asci1
+target/yaz180/driver/terminal/rc_01_output_asci1/rc_01_output_asci1_iterm_msg_bell
+target/yaz180/driver/terminal/rc_01_output_asci1/rc_01_output_asci1_iterm_msg_bs
+target/yaz180/driver/terminal/rc_01_output_asci1/rc_01_output_asci1_iterm_msg_putc
+target/yaz180/driver/terminal/rc_01_output_asci1/rc_01_output_asci1_oterm_msg_bell
+target/yaz180/driver/terminal/rc_01_output_asci1/rc_01_output_asci1_oterm_msg_putc
+target/yaz180/driver/terminal/rc_01_output_asci1/rc_01_output_asci1_stdio_msg_ictl

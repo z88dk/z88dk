@@ -687,7 +687,7 @@ int test(int label, int parens)
             return 1;
         }
         /* false constant, jump round body */
-        jump(label);
+      //  jump(label);
         return 0;
     }
     if (lval.stage_add) { /* stage address of "..oper 0" code */
@@ -700,11 +700,16 @@ int test(int label, int parens)
         else if (oper == zne || (oper == zgt && utype(&lval)))
             zerojump(testjump, label, &lval);
         else if (oper == zge && utype(&lval)) {
+            zerojump(ge0, label, &lval);
             clearstage(lval.stage_add, 0);
-            lval.stage_add = NULL;
+            return 1; // Always true
         } else if (oper == zlt && utype(&lval)) {
-            zerojump(jump0, label, &lval);
             warningfmt("unreachable","Unreachable code follows");
+            zerojump(jump0, label, &lval);
+            clearstage(before, start);
+            return 0; // Always false
+        } else if (oper == zgt && utype(&lval)) {
+            zerojump(testjump, label, &lval);  // Convert to != 0
         } else if (oper == zgt)
             zerojump(gt0, label, &lval);
         else if (oper == zge)

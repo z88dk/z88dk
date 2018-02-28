@@ -63,7 +63,7 @@ define(`__IO_DAC_L1', 0x1f)
 define(`__IO_DAC_R0', 0x4f)
 define(`__IO_DAC_R1', 0x5f)
 
-# PORT 0x2D: Mono DAC
+# PORT 0xDF: Mono DAC
 
 define(`__IO_DAC_M0', 0xdf)          # writes L0 and R0
 

@@ -11,6 +11,6 @@ PUBLIC  _zx7_font_4x8_64_omni2_end
 
 _zx7_font_4x8_64_omni2:
 
-   BINARY "font/font_4x8/font_4x8_64_omni2.bin.zx7"
+   BINARY "font_4x8_64_omni2.bin.zx7"
 
 _zx7_font_4x8_64_omni2_end:

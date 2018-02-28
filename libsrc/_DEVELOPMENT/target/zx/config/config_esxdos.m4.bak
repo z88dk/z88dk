@@ -63,7 +63,7 @@ define(`__ESXDOS_SYS_F_GETFREE', eval(__ESXDOS_BASE_FSYS + 25))     # unimplemen
 # Limits
 
 define(`__ESXDOS_PATH_MAX', 128)           # max pathname length in bytes including terminating \0
-define(`__ESXDOS_NAME_MAX', 12)            # max filename length in bytes not including terminating \0
+define(`__ESXDOS_NAME_MAX', 128)           # max filename length in bytes not including terminating \0
 
 # File Access Mode
 # there is one file pointer per file shared by reads and writes

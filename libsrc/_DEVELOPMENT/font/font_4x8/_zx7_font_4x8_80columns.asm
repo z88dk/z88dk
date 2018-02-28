@@ -11,6 +11,6 @@ PUBLIC	_zx7_font_4x8_80columns_end
 
 _zx7_font_4x8_80columns:
 
-   BINARY "font/font_4x8/font_4x8_80columns.bin.zx7"
+   BINARY "font_4x8_80columns.bin.zx7"
 
 _zx7_font_4x8_80columns_end:

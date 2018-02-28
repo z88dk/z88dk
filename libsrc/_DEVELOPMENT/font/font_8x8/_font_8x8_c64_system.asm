@@ -12,6 +12,6 @@ PUBLIC  _font_8x8_c64_system_end
 
 _font_8x8_c64_system:
 
-   BINARY "../font/font_8x8/_font_8x8_commodore64.fon"
+   BINARY "font_8x8_c64_system.bin"
 
 _font_8x8_c64_system_end:

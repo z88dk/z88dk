@@ -180,6 +180,7 @@ IF __crt_model > 0
 		SECTION smc_user
 		SECTION data_clib
 		SECTION data_crt
+		SECTION data_stdlib
 		SECTION data_compiler
 		SECTION data_user
 		SECTION data_alloc_balloc

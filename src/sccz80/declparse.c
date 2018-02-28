@@ -413,6 +413,9 @@ static Type *parse_type(void)
     Type *type = CALLOC(1,sizeof(*type));
     int   typed = 0;
 
+
+    swallow("register");
+    swallow("auto");
     type->len = 1;
     if ( swallow("const")) {
         type->isconst = 1;
@@ -1568,7 +1571,7 @@ static void declfunc(Type *type, enum storage_type storage)
     }
     
     stackargs = where;
-    if (statement() != STRETURN ) {
+    if (statement() != STRETURN && (type->flags & NAKED) == 0 ) {
         if ( type->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("return-type","Control reaches end of non-void function");
         }

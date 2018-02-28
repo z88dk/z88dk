@@ -3409,7 +3409,7 @@ int main (int argc, char **argv){
               uint8_t msb = get_memory(pc++);
               uint8_t lsb = get_memory(pc++);
               PUSH(msb,lsb);
-              st += 1;
+              st += 22;
             } else {
               st += 8;
             }
@@ -3417,7 +3417,7 @@ int main (int argc, char **argv){
           case 0x8b:                                         // (ZXN) popx
             if ( c_cpu == CPU_Z80_ZXN ) {
               sp += 2;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
