@@ -32,7 +32,7 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; yabios drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; yabios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -287,6 +287,25 @@ ENDIF
       ELSE
       
          defc __crt_interrupt_mode = DEF__crt_interrupt_mode
+      
+      ENDIF
+      
+   ENDIF
+
+
+   IFDEF CRT_INTERRUPT_MODE_EXIT
+   
+      defc __crt_interrupt_mode_exit = CRT_INTERRUPT_MODE_EXIT
+   
+   ELSE
+   
+      IFDEF TAR__crt_interrupt_mode_exit
+      
+         defc __crt_interrupt_mode_exit = TAR__crt_interrupt_mode_exit
+      
+      ELSE
+      
+         defc __crt_interrupt_mode_exit = DEF__crt_interrupt_mode_exit
       
       ENDIF
       
@@ -662,11 +681,21 @@ ENDIF
    PUBLIC __register_sp
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; Returning to Basic
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; if non-zero, address called in basic rom to return value in AB
+
+   IFNDEF CRT_ABPASS
+      defc CRT_ABPASS = 0
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IFNDEF CRT_ITERM_TERMINAL_FLAGS
-      defc CRT_ITERM_TERMINAL_FLAGS = 0x03b0
+      defc CRT_ITERM_TERMINAL_FLAGS = 0x01b0
    ENDIF
 
    ; buffer size must be available to m4 (requires special case in zcc)
@@ -753,12 +782,14 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
-   ; driver: rc_00_input_asci0
+   ; driver: rc_01_input_asci0
    ; fd    : 0
    ; mode  : read only
-   ; type  : 003 = character input
+   ; type  : 001 = input terminal
+   ; tie   : __i_fcntl_fdstruct_0
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
+   ; buffer size   : 64 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -813,14 +844,14 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_00_input_asci0
+   EXTERN rc_01_input_asci0
    
    __i_fcntl_heap_0:
    
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 23
+      defw 98
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -835,19 +866,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_00_input_asci0
+      defw rc_01_input_asci0
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x03      ; stdio handles ungetc + type = character input
+      defb 0x01      ; stdio handles ungetc + type = input terminal
       defb 2
       defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw CRT_ITERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -857,6 +888,26 @@ ENDIF
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
+      ; tied output terminal
+      ; pending_char
+      ; read_index
+      
+      defw __i_fcntl_fdstruct_0
+      defb 0
+      defw 0
+      
+      ; b_array_t edit_buffer
+      
+      defw __edit_buffer_0
+      defw 0
+      defw 64
+      
+            
+      ; reserve space for edit buffer
+      
+      __edit_buffer_0:   defs 64
+      
+
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -865,14 +916,16 @@ ENDIF
 
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : _linein
+   ; FILE  : _ttyin
    ;
-   ; driver: rc_00_input_asci1
+   ; driver: rc_01_input_asci1
    ; fd    : 1
    ; mode  : read only
-   ; type  : 003 = character input
+   ; type  : 001 = input terminal
+   ; tie   : __i_fcntl_fdstruct_1
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
+   ; buffer size   : 64 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -881,9 +934,9 @@ ENDIF
    
    ; FILE *
       
-   PUBLIC _linein
+   PUBLIC _ttyin
       
-   _linein:  defw __i_stdio_file_1 + 2
+   _ttyin:  defw __i_stdio_file_1 + 2
    
    ; FILE structure
    
@@ -927,14 +980,14 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_00_input_asci1
+   EXTERN rc_01_input_asci1
    
    __i_fcntl_heap_1:
    
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 23
+      defw 98
       defw __i_fcntl_heap_0
    
    __i_fcntl_fdstruct_1:
@@ -949,19 +1002,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_00_input_asci1
+      defw rc_01_input_asci1
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x03      ; stdio handles ungetc + type = character input
+      defb 0x01      ; stdio handles ungetc + type = input terminal
       defb 2
       defb 0x01      ; read only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw CRT_ITERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -971,22 +1024,42 @@ ENDIF
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
+      ; tied output terminal
+      ; pending_char
+      ; read_index
+      
+      defw __i_fcntl_fdstruct_1
+      defb 0
+      defw 0
+      
+      ; b_array_t edit_buffer
+      
+      defw __edit_buffer_1
+      defw 0
+      defw 64
+      
+            
+      ; reserve space for edit buffer
+      
+      __edit_buffer_1:   defs 64
+      
+
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
-   
+
+
    
 
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: rc_00_output_asci0
+   ; driver: rc_01_output_asci0
    ; fd    : 2
    ; mode  : write only
-   ; type  : 004 = character output
+   ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -1041,7 +1114,7 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN rc_00_output_asci0
+   EXTERN rc_01_output_asci0
    
    __i_fcntl_heap_2:
    
@@ -1063,19 +1136,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_00_output_asci0
+      defw rc_01_output_asci0
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x04      ; type = character output
+      defb 0x02      ; type = output terminal
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw CRT_OTERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -1093,14 +1166,14 @@ ENDIF
 
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : _lineout
+   ; FILE  : _ttyout
    ;
-   ; driver: rc_00_output_asci1
+   ; driver: rc_01_output_asci1
    ; fd    : 3
    ; mode  : write only
-   ; type  : 004 = character output
+   ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x0100
+   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -1109,9 +1182,9 @@ ENDIF
    
    ; FILE *
       
-   PUBLIC _lineout
+   PUBLIC _ttyout
       
-   _lineout:  defw __i_stdio_file_3 + 2
+   _ttyout:  defw __i_stdio_file_3 + 2
    
    ; FILE structure
    
@@ -1155,7 +1228,7 @@ ENDIF
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN rc_00_output_asci1
+   EXTERN rc_01_output_asci1
    
    __i_fcntl_heap_3:
    
@@ -1177,19 +1250,19 @@ ENDIF
       ; jump to driver
       
       defb 195
-      defw rc_00_output_asci1
+      defw rc_01_output_asci1
       
       ; flags
       ; reference_count
       ; mode_byte
       
-      defb 0x04      ; type = character output
+      defb 0x02      ; type = output terminal
       defb 2
       defb 0x02      ; write only
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw CRT_OTERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -1212,7 +1285,7 @@ ENDIF
    ; flags : 0x80
    ;
    ; fd    : 4
-   ; dup fd: __i_fcntl_fdstruct_1
+   ; dup fd: __i_fcntl_fdstruct_0
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -1236,7 +1309,7 @@ ENDIF
       ; jump to duped fd
       
       defb 195
-      defw __i_fcntl_fdstruct_1
+      defw __i_fcntl_fdstruct_0
 
       ; state_flags_0
       ; state_flags_1
@@ -1260,17 +1333,17 @@ ENDIF
    ; fd table entry
    
    SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_1
+   defw __i_fcntl_fdstruct_0
    
    ; FDSTRUCT structure
    
-   defc __i_fcntl_fdstruct_4 = __i_fcntl_fdstruct_1
+   defc __i_fcntl_fdstruct_4 = __i_fcntl_fdstruct_0
    
    ; adjust reference count on duped FDSTRUCT
    
    SECTION code_crt_init
    
-   ld hl,__i_fcntl_fdstruct_1 + 7     ; & FDSTRUCT.ref_count
+   ld hl,__i_fcntl_fdstruct_0 + 7     ; & FDSTRUCT.ref_count
    inc (hl)
    inc (hl)
 
@@ -1463,11 +1536,11 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 92  = byte size of static FDSTRUCTs
+   ; 242  = byte size of static FDSTRUCTs
    ; 4   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 92 > 0
+   IF 242 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -1488,7 +1561,7 @@ ENDIF
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (92 + 14)
+      IF __clib_stdio_heap_size > (242 + 14)
       
          ; expand stdio heap to desired size
          
@@ -1499,7 +1572,7 @@ ENDIF
             defw __i_fcntl_heap_5
             defw 0
             defw __i_fcntl_heap_3
-            defs __clib_stdio_heap_size - 92 - 14
+            defs __clib_stdio_heap_size - 242 - 14
          
          ; terminate stdio heap
          
@@ -1696,9 +1769,6 @@ include "../clib_stubs.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
 
 
 

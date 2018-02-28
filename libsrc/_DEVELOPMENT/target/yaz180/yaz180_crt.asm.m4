@@ -84,26 +84,6 @@ ifelse(__STARTUP, 16,
    include(`startup/yaz180_crt_16.asm.m4')
 ')
 
-ifelse(__STARTUP, 17,
-`
-   ; basic drivers using installed on stdin, stdout, stderr
-
-   IFNDEF __CRTCFG
-   
-      defc __CRTCFG = 1
-   
-   ENDIF
-   
-   IFNDEF __MMAP
-   
-      defc __MMAP = 0
-   
-   ENDIF
-
-   include(`startup/yaz180_crt_17.asm.m4')
-')
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; none ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
