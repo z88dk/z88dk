@@ -156,6 +156,12 @@ IF FORjupiter
 	defc blankch	= 128
 ENDIF
 
+IF FORkaypro
+	DEFINE gotgfx
+	defc maxx	= 160
+	defc maxy	= 100
+ENDIF
+
 IF FORzx
 	DEFINE gotgfx
 	defc maxx	= 256

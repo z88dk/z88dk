@@ -544,6 +544,11 @@ cpm_clib.lib:
 	$(call buildgeneric,cpm)
 	$(MAKE) -C fcntl/cpm
 	TARGET=cpm TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+	@echo ''
+	@echo '--- Building Kaypro graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/gfxkp.lst
 
 # Sorcerer Exidy lib - Stefano
 sorcerer_clib.lib:
