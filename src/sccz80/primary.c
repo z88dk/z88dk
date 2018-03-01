@@ -801,6 +801,7 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     dest_lval->ltype = lval->cast_type;
     dest_lval->val_type = dest_lval->ltype->kind;
     lval->cast_type = NULL;
+    dest_lval->ptr_type = KIND_NONE;
     if ( ispointer(dest_lval->ltype) ) {
         dest_lval->ptr_type = dest_lval->ltype->ptr->kind;
         /* djm long pointers */
