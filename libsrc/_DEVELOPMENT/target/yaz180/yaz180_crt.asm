@@ -32,7 +32,7 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; yabios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; yabios drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -698,6 +698,10 @@ ENDIF
       defc CRT_ITERM_TERMINAL_FLAGS = 0x01b0
    ENDIF
 
+   IFNDEF TTY_ITERM_TERMINAL_FLAGS
+      defc TTY_ITERM_TERMINAL_FLAGS = 0x01b0
+   ENDIF
+
    ; buffer size must be available to m4 (requires special case in zcc)
 	
 	
@@ -706,12 +710,22 @@ ENDIF
       defc CRT_ITERM_EDIT_BUFFER_SIZE = 64
    ENDIF
 
+	
+
+   IFNDEF TTY_ITERM_EDIT_BUFFER_SIZE
+      defc TTY_ITERM_EDIT_BUFFER_SIZE = 64
+   ENDIF
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Output Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IFNDEF CRT_OTERM_TERMINAL_FLAGS
       defc CRT_OTERM_TERMINAL_FLAGS = 0x2370
+   ENDIF
+
+   IFNDEF TTY_OTERM_TERMINAL_FLAGS
+      defc TTY_OTERM_TERMINAL_FLAGS = 0x2370
    ENDIF
 
 ;; end crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -924,7 +938,7 @@ ENDIF
    ; type  : 001 = input terminal
    ; tie   : __i_fcntl_fdstruct_1
    ;
-   ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
+   ; ioctl_flags   : TTY_ITERM_TERMINAL_FLAGS
    ; buffer size   : 64 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1014,7 +1028,7 @@ ENDIF
       
       ; ioctl_flags
       
-      defw CRT_ITERM_TERMINAL_FLAGS
+      defw TTY_ITERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
@@ -1173,7 +1187,7 @@ ENDIF
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : CRT_OTERM_TERMINAL_FLAGS
+   ; ioctl_flags   : TTY_OTERM_TERMINAL_FLAGS
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -1262,7 +1276,7 @@ ENDIF
       
       ; ioctl_flags
       
-      defw CRT_OTERM_TERMINAL_FLAGS
+      defw TTY_OTERM_TERMINAL_FLAGS
       
       ; mtx_plain
       
