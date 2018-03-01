@@ -17,6 +17,9 @@
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
 
+	EXTERN     swapgfxbk
+        EXTERN	__graphics_end
+
 	EXTERN	plotpixel
 	EXTERN	respixel
 	EXTERN	xorpixel
@@ -26,12 +29,13 @@
 
 .putsprite
 ._putsprite
-	push	ix
+		call swapgfxbk
         ld      hl,2   
         add     hl,sp
         ld      e,(hl)
         inc     hl
         ld      d,(hl)  ;sprite address
+	push	ix
 	push	de
 	pop	ix
 
@@ -124,8 +128,8 @@
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopx
-	pop	ix
-	ret
+	;pop	ix
+	jp	__graphics_end
 
 
 
@@ -194,8 +198,8 @@
 	pop	af
         pop	bc		;Restore data
         djnz    oloopa
-	pop	ix
-        ret
+	;pop	ix
+	jp	__graphics_end
 
 
 
@@ -266,6 +270,6 @@
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopo
-	pop	ix
-	ret
+	;pop	ix
+	jp	__graphics_end
 
