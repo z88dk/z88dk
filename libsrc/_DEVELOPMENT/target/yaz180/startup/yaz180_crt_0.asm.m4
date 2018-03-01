@@ -72,13 +72,13 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    m4_rc_01_input_asci0(_stdin, __i_fcntl_fdstruct_0, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
    include(`driver/terminal/rc_01_input_asci1.m4')
-   m4_rc_01_input_asci1(_ttyin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+   m4_rc_01_input_asci1(_ttyin, __i_fcntl_fdstruct_1, TTY_ITERM_TERMINAL_FLAGS, M4__TTY_ITERM_EDIT_BUFFER_SIZE)
 
    include(`driver/terminal/rc_01_output_asci0.m4')
    m4_rc_01_output_asci0(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
    include(`driver/terminal/rc_01_output_asci1.m4')
-   m4_rc_01_output_asci1(_ttyout, CRT_OTERM_TERMINAL_FLAGS)
+   m4_rc_01_output_asci1(_ttyout, TTY_OTERM_TERMINAL_FLAGS)
 
    include(`../m4_file_dup.m4')
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_0)
