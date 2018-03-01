@@ -1,6 +1,6 @@
 ;
 ;       Kaypro '84 pseudo graphics routines
-;	Version for the 2x3 graphics symbols
+;	Version for the 2x4 graphics symbols, BIOS driven
 ;
 ;       Stefano Bodrato 2018
 ;

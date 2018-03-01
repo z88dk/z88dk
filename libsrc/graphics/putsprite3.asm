@@ -11,12 +11,16 @@
 ; ** putsprite3 is a thin version with a Self Modifying Code trick **
 ;
 ;
-; $Id: putsprite3.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
+; $Id: putsprite3.asm $
 ;
 
 
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 
+	EXTERN     swapgfxbk
+        EXTERN	__graphics_end
+		
 	EXTERN	plotpixel
 	EXTERN	respixel
 	EXTERN	xorpixel
@@ -25,12 +29,14 @@
 ; sprite: (ix)
 
 .putsprite
-
-        ld      hl,2   
+._putsprite
+		call swapgfxbk
+        ld      hl,2
         add     hl,sp
         ld      e,(hl)
         inc     hl
         ld      d,(hl)  ;sprite address
+		push	ix
 	push	de
 	pop	ix
 
@@ -135,5 +141,5 @@
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopx
-	ret
+	jp       __graphics_end
 

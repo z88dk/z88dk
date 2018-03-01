@@ -162,6 +162,12 @@ IF FORkaypro
 	defc maxy	= 100
 ENDIF
 
+IF FORkaypro83
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 50
+ENDIF
+
 IF FORzx
 	DEFINE gotgfx
 	defc maxx	= 256

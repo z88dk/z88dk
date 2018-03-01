@@ -34,7 +34,7 @@
 		ld	a,(hl)
 		ret
 
-	SECTION		data_clib
+        SECTION rodata_clib
 _dithpat:
 	
 	defb	@00000010	; 1
