@@ -1,4 +1,5 @@
-divert(`-1')
+pushdef(`Z88DK_DIVNUM', divnum)
+divert(-1)
 
 # Z88DK_FORARG(FROM, TO, MACRO)
 # Invoke MACRO(VALUE) for each VALUE from FROM to TO.
@@ -55,4 +56,5 @@ ifelse($1,, __uniq_, $1_)`'eval(_Z88DK_UNIQ_ID_$1, 10, 4)')
 define(`Z88DK_CLBL', `define(`_Z88DK_UNIQ_ID_$2', ifdef(`_Z88DK_UNIQ_ID_$2', _Z88DK_UNIQ_ID_$2, 0))dnl
 ifelse($2,, __uniq_, $2_)`'ifelse($1,, eval(_Z88DK_UNIQ_ID_$2, 10, 4), `eval(_Z88DK_UNIQ_ID_$2 + $1, 10, 4)')')
 
-divert`'dnl
+divert(Z88DK_DIVNUM)
+dnl`'popdef(`Z88DK_DIVNUM')
