@@ -45,7 +45,7 @@ asm_getline:
    ;
    ; uses  : all except ix
 
-   ld bc,ASCII_EOL
+   ld bc,CHAR_LF
    jp asm_getdelim
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
