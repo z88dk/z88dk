@@ -49,8 +49,8 @@ include(`target/zxn/config/config_nirvanam.m4')
 include(`target/zxn/config/config_nirvanap.m4')
 include(`target/zxn/config/config_sound_bit.m4')
 include(`target/zxn/config/config_sp1.m4')
-include(`target/zxn/config/config_layer2_color.m4')
 include(`target/zxn/config/config_zxn_audio.m4')
+include(`target/zxn/config/config_zxn_color.m4')
 include(`target/zxn/config/config_zxn_copper.m4')
 include(`target/zxn/config/config_zxn_dma.m4')
 include(`target/zxn/config/config_zxn_layer_2.m4')
@@ -61,7 +61,6 @@ include(`target/zxn/config/config_zxn_nextreg.m4')
 include(`target/zxn/config/config_zxn_sprites.m4')
 include(`target/zxn/config/config_zxn_sysvar.m4')
 include(`target/zxn/config/config_zxn_uart.m4')
-include(`target/zxn/config/config_zxn_ula.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

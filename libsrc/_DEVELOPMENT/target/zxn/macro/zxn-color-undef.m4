@@ -1,4 +1,5 @@
-divert(`-1')
+pushdef(`Z88DK_DIVNUM', divnum)
+divert(-1)
 
 # Local Macros
 
@@ -20,6 +21,8 @@ popdef(`RGB332_FROM_RGB333')
 popdef(`RGB332_FROM_RGB333C')
 popdef(`RGB332_FROM_RGB888')
 popdef(`RGB332_FROM_RGB888C')
+popdef(`RGB332_FROM_RGB888T')
+popdef(`RGB332_FROM_RGB888TC')
 popdef(`RGB332_FROM_ULAP')
 popdef(`RGB332_FROM_GRB332')
 popdef(`RGB332_FROM_GRB332C')
@@ -32,6 +35,8 @@ popdef(`RGB333_FROM_RGB332C')
 popdef(`RGB333_FROM_RGB333C')
 popdef(`RGB333_FROM_RGB888')
 popdef(`RGB333_FROM_RGB888C')
+popdef(`RGB333_FROM_RGB888T')
+popdef(`RGB333_FROM_RGB888TC')
 popdef(`RGB333_FROM_ULAP')
 popdef(`RGB333_FROM_GRB332')
 popdef(`RGB333_FROM_GRB332C')
@@ -39,4 +44,5 @@ popdef(`RGB333_FROM_BGR233')
 popdef(`RGB333_FROM_BGR233C')
 popdef(`RGB333_FROM_RGBPPPC')
 
-divert`'dnl
+divert(Z88DK_DIVNUM)
+dnl`'popdef(`Z88DK_DIVNUM')
