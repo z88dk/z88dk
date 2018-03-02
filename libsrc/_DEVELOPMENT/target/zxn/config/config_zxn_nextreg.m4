@@ -494,9 +494,9 @@ define(`__REG_COPPER_CONTROL_L', 97)
 # (W) 0x62 (98) => Copper control HI bit
 #   bits 7-6 = Start control
 #       00 = Copper fully stoped
-#       01 = Copper start, execute the list from index 0, then loop list from start
-#       10 = Copper start, execute the list, then loop the list from start
-#       11 = Copper start, execute the list and restart the list at each frame
+#       01 = Copper start, execute the list from index 0, and loop to the start
+#       10 = Copper start, execute the list from last point, and loop to the start
+#       11 = Copper start, execute the list from index 0, and restart the list at each frame
 #   bits 2-0 = Copper list index address MSB
 
 define(`__REG_COPPER_CONTROL_H', 98)

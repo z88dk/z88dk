@@ -66,26 +66,40 @@ divert(-1)
 
 # NEXTREG 97: Copper Control Lo
 #
-# define(`__REG_COPPER_CONTROL_LO', 97)
+# define(`__REG_COPPER_CONTROL_L', 97)
 
 # NEXTREG 98: Copper Control Hi
 #
-# define(`__REG_COPPER_CONTROL_HI', 98)
+# define(`__REG_COPPER_CONTROL_H', 98)
 # define(`__RCCH_COPPER_STOP', 0x00)
-# define(`__RCCH_COPPER_RUN_ONCE', 0x40)
+# define(`__RCCH_COPPER_RUN_LOOP_RESET', 0x40)
 # define(`__RCCH_COPPER_RUN_LOOP', 0x80)
-# define(`__RCCH_COPPER_RUN_ON_INTERRUPT', 0xc0)
+# define(`__RCCH_COPPER_RUN_VBI', 0xc0)
 
-# For modes RUN_ONCE and RUN_ON_INTERRUPT, the Copper program
-# should be terminated by a stop instruction (wait for a
-# non-existent line).  For RUN_LOOP, the Copper continuously
-# executes all instructions in its 2k memory, looping from
-# the end back to the beginning.  If the instruction list is
-# less than 2k, it should be padded with nops (a write of 0
-# to nextreg 0) which will each take one pixel in time to
-# execute.  More advanced applications can have the dma stream
-# new instructions into the copper as it executes so that the
-# instruction space is effectively larger than 2k.
+# STOP causes the copper to stop executing instructions
+# and hold the instruction pointer at its current position.
+#
+# RUN_LOOP_RESET causes the copper to reset its instruction
+# pointer to 0 and run in LOOP mode (next).
+#
+# RUN_LOOP causes the copper to restart with the instruction
+# pointer at its current position.  Once the end of the instruction
+# list is reached, the copper loops back to the beginning.
+#
+# RUN_VBI causes the copper to reset its instruction
+# pointer to 0 and run in VBI mode.  On vsync interrupt,
+# the copper restarts the instruction list from the beginning.
+
+# Note that modes RUN_LOOP_RESET and RUN_VBI will only reset
+# the instruction pointer to zero if the mode actually changes
+# to RUN_LOOP_RESET or RUN_VBI.  Writing the same mode in a
+# second write will not cause the instruction pointer to zero.
+
+# It is possible to write values into the copper's instruction
+# space while it is running and since the copper constantly
+# refetches a wait instruction it is executing, you can cause
+# the wait instruction to end prematurely by changing it to
+# something else.
 
 #
 # END OF USER CONFIGURATION
