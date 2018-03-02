@@ -36,12 +36,6 @@
       defc CRT_ITERM_EDIT_BUFFER_SIZE = M4__CRT_ITERM_EDIT_BUFFER_SIZE
    ENDIF
 
-	ifdef(`M4__TTY_ITERM_EDIT_BUFFER_SIZE',,`define(`M4__TTY_ITERM_EDIT_BUFFER_SIZE', 64)')
-
-   IFNDEF TTY_ITERM_EDIT_BUFFER_SIZE
-      defc TTY_ITERM_EDIT_BUFFER_SIZE = M4__TTY_ITERM_EDIT_BUFFER_SIZE
-   ENDIF
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Output Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

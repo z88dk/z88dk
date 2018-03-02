@@ -52,6 +52,8 @@ ENDIF
 
    
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                  yaz180 YABIOS  target                    ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
@@ -710,12 +712,6 @@ ENDIF
       defc CRT_ITERM_EDIT_BUFFER_SIZE = 64
    ENDIF
 
-	
-
-   IFNDEF TTY_ITERM_EDIT_BUFFER_SIZE
-      defc TTY_ITERM_EDIT_BUFFER_SIZE = 64
-   ENDIF
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Output Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -800,7 +796,7 @@ ENDIF
    ; fd    : 0
    ; mode  : read only
    ; type  : 001 = input terminal
-   ; tie   : __i_fcntl_fdstruct_0
+   ; tie   : __i_fcntl_fdstruct_1
    ;
    ; ioctl_flags   : CRT_ITERM_TERMINAL_FLAGS
    ; buffer size   : 64 bytes
@@ -906,7 +902,7 @@ ENDIF
       ; pending_char
       ; read_index
       
-      defw __i_fcntl_fdstruct_0
+      defw __i_fcntl_fdstruct_1
       defb 0
       defw 0
       
@@ -930,146 +926,10 @@ ENDIF
 
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : _ttyin
-   ;
-   ; driver: rc_01_input_asci1
-   ; fd    : 1
-   ; mode  : read only
-   ; type  : 001 = input terminal
-   ; tie   : __i_fcntl_fdstruct_1
-   ;
-   ; ioctl_flags   : TTY_ITERM_TERMINAL_FLAGS
-   ; buffer size   : 64 bytes
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-      
-   SECTION data_clib
-   SECTION data_stdio
-   
-   ; FILE *
-      
-   PUBLIC _ttyin
-      
-   _ttyin:  defw __i_stdio_file_1 + 2
-   
-   ; FILE structure
-   
-   __i_stdio_file_1:
-   
-      ; open files link
-      
-      defw __i_stdio_file_0
-      
-      ; jump to underlying fd
-      
-      defb 195
-      defw __i_fcntl_fdstruct_1
-
-      ; state_flags_0
-      ; state_flags_1
-      ; conversion flags
-      ; ungetc
-
-      defb 0x40      ; read + stdio manages ungetc + normal file type
-      defb 0x02      ; last operation was read
-      defb 0
-      defb 0
-      
-      ; mtx_recursive
-      
-      defb 0         ; thread owner = none
-      defb 0x02      ; mtx_recursive
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-    
-         
-   ; fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_1
-
-   ; FDSTRUCT structure
-   
-   SECTION data_fcntl_stdio_heap_body
-   
-   EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_01_input_asci1
-   
-   __i_fcntl_heap_1:
-   
-      ; heap header
-      
-      defw __i_fcntl_heap_2
-      defw 98
-      defw __i_fcntl_heap_0
-   
-   __i_fcntl_fdstruct_1:
-
-      ; FDSTRUCT structure
-      
-      ; call to first entry to driver
-      
-      defb 205
-      defw console_01_input_terminal_fdriver
-      
-      ; jump to driver
-      
-      defb 195
-      defw rc_01_input_asci1
-      
-      ; flags
-      ; reference_count
-      ; mode_byte
-      
-      defb 0x01      ; stdio handles ungetc + type = input terminal
-      defb 2
-      defb 0x01      ; read only
-      
-      ; ioctl_flags
-      
-      defw TTY_ITERM_TERMINAL_FLAGS
-      
-      ; mtx_plain
-      
-      defb 0         ; thread owner = none
-      defb 0x01      ; mtx_plain
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-
-      ; tied output terminal
-      ; pending_char
-      ; read_index
-      
-      defw __i_fcntl_fdstruct_1
-      defb 0
-      defw 0
-      
-      ; b_array_t edit_buffer
-      
-      defw __edit_buffer_1
-      defw 0
-      defw 64
-      
-            
-      ; reserve space for edit buffer
-      
-      __edit_buffer_1:   defs 64
-      
-
-            
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-   
-
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
    ; driver: rc_01_output_asci0
-   ; fd    : 2
+   ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
@@ -1084,20 +944,20 @@ ENDIF
       
    PUBLIC _stdout
       
-   _stdout:  defw __i_stdio_file_2 + 2
+   _stdout:  defw __i_stdio_file_1 + 2
    
    ; FILE structure
    
-   __i_stdio_file_2:
+   __i_stdio_file_1:
    
       ; open files link
       
-      defw __i_stdio_file_1
+      defw __i_stdio_file_0
       
       ; jump to underlying fd
       
       defb 195
-      defw __i_fcntl_fdstruct_2
+      defw __i_fcntl_fdstruct_1
 
       ; state_flags_0
       ; state_flags_1
@@ -1121,7 +981,7 @@ ENDIF
    ; fd table entry
    
    SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_2
+   defw __i_fcntl_fdstruct_1
 
    ; FDSTRUCT structure
    
@@ -1130,15 +990,15 @@ ENDIF
    EXTERN console_01_output_terminal_fdriver
    EXTERN rc_01_output_asci0
    
-   __i_fcntl_heap_2:
+   __i_fcntl_heap_1:
    
       ; heap header
       
-      defw __i_fcntl_heap_3
+      defw __i_fcntl_heap_2
       defw 23
-      defw __i_fcntl_heap_1
+      defw __i_fcntl_heap_0
 
-   __i_fcntl_fdstruct_2:
+   __i_fcntl_fdstruct_1:
    
       ; FDSTRUCT structure
       
@@ -1177,13 +1037,224 @@ ENDIF
 
 
    
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; DUPED FILE DESCRIPTOR
+   ;
+   ; FILE  : _stderr
+   ; flags : 0x80
+   ;
+   ; fd    : 2
+   ; dup fd: __i_fcntl_fdstruct_1
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+      
+   SECTION data_clib
+   SECTION data_stdio
+      
+   ; FILE *
+      
+   PUBLIC _stderr
+      
+   _stderr:  defw __i_stdio_file_2 + 2
+      
+   ; FILE structure
+      
+   __i_stdio_file_2:
+   
+      ; open files link
+      
+      defw __i_stdio_file_1
+      
+      ; jump to duped fd
+      
+      defb 195
+      defw __i_fcntl_fdstruct_1
+
+      ; state_flags_0
+      ; state_flags_1
+      ; conversion flags
+      ; ungetc
+
+      defb 0x80
+      defb 0
+      defb 0
+      defb 0
+      
+      ; mtx_recursive
+      
+      defb 0         ; thread owner = none
+      defb 0x02      ; mtx_recursive
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+
+         
+   ; fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw __i_fcntl_fdstruct_1
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_2 = __i_fcntl_fdstruct_1
+   
+   ; adjust reference count on duped FDSTRUCT
+   
+   SECTION code_crt_init
+   
+   ld hl,__i_fcntl_fdstruct_1 + 7     ; & FDSTRUCT.ref_count
+   inc (hl)
+   inc (hl)
+
+      
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+   
+
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE  : _ttyin
+   ;
+   ; driver: rc_01_input_asci1
+   ; fd    : 3
+   ; mode  : read only
+   ; type  : 001 = input terminal
+   ; tie   : __i_fcntl_fdstruct_4
+   ;
+   ; ioctl_flags   : TTY_ITERM_TERMINAL_FLAGS
+   ; buffer size   : 64 bytes
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+      
+   SECTION data_clib
+   SECTION data_stdio
+   
+   ; FILE *
+      
+   PUBLIC _ttyin
+      
+   _ttyin:  defw __i_stdio_file_3 + 2
+   
+   ; FILE structure
+   
+   __i_stdio_file_3:
+   
+      ; open files link
+      
+      defw __i_stdio_file_2
+      
+      ; jump to underlying fd
+      
+      defb 195
+      defw __i_fcntl_fdstruct_3
+
+      ; state_flags_0
+      ; state_flags_1
+      ; conversion flags
+      ; ungetc
+
+      defb 0x40      ; read + stdio manages ungetc + normal file type
+      defb 0x02      ; last operation was read
+      defb 0
+      defb 0
+      
+      ; mtx_recursive
+      
+      defb 0         ; thread owner = none
+      defb 0x02      ; mtx_recursive
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+    
+         
+   ; fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw __i_fcntl_fdstruct_3
+
+   ; FDSTRUCT structure
+   
+   SECTION data_fcntl_stdio_heap_body
+   
+   EXTERN console_01_input_terminal_fdriver
+   EXTERN rc_01_input_asci1
+   
+   __i_fcntl_heap_2:
+   
+      ; heap header
+      
+      defw __i_fcntl_heap_3
+      defw 98
+      defw __i_fcntl_heap_1
+   
+   __i_fcntl_fdstruct_3:
+
+      ; FDSTRUCT structure
+      
+      ; call to first entry to driver
+      
+      defb 205
+      defw console_01_input_terminal_fdriver
+      
+      ; jump to driver
+      
+      defb 195
+      defw rc_01_input_asci1
+      
+      ; flags
+      ; reference_count
+      ; mode_byte
+      
+      defb 0x01      ; stdio handles ungetc + type = input terminal
+      defb 2
+      defb 0x01      ; read only
+      
+      ; ioctl_flags
+      
+      defw TTY_ITERM_TERMINAL_FLAGS
+      
+      ; mtx_plain
+      
+      defb 0         ; thread owner = none
+      defb 0x01      ; mtx_plain
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+
+      ; tied output terminal
+      ; pending_char
+      ; read_index
+      
+      defw __i_fcntl_fdstruct_4
+      defb 0
+      defw 0
+      
+      ; b_array_t edit_buffer
+      
+      defw __edit_buffer_3
+      defw 0
+      defw 64
+      
+            
+      ; reserve space for edit buffer
+      
+      __edit_buffer_3:   defs 64
+      
+
+            
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+   
 
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _ttyout
    ;
    ; driver: rc_01_output_asci1
-   ; fd    : 3
+   ; fd    : 4
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
@@ -1198,20 +1269,20 @@ ENDIF
       
    PUBLIC _ttyout
       
-   _ttyout:  defw __i_stdio_file_3 + 2
+   _ttyout:  defw __i_stdio_file_4 + 2
    
    ; FILE structure
    
-   __i_stdio_file_3:
+   __i_stdio_file_4:
    
       ; open files link
       
-      defw __i_stdio_file_2
+      defw __i_stdio_file_3
       
       ; jump to underlying fd
       
       defb 195
-      defw __i_fcntl_fdstruct_3
+      defw __i_fcntl_fdstruct_4
 
       ; state_flags_0
       ; state_flags_1
@@ -1235,7 +1306,7 @@ ENDIF
    ; fd table entry
    
    SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_3
+   defw __i_fcntl_fdstruct_4
 
    ; FDSTRUCT structure
    
@@ -1252,7 +1323,7 @@ ENDIF
       defw 23
       defw __i_fcntl_heap_2
 
-   __i_fcntl_fdstruct_3:
+   __i_fcntl_fdstruct_4:
    
       ; FDSTRUCT structure
       
@@ -1287,81 +1358,6 @@ ENDIF
       defw 0         ; list of blocked threads
 
          
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; DUPED FILE DESCRIPTOR
-   ;
-   ; FILE  : _stderr
-   ; flags : 0x80
-   ;
-   ; fd    : 4
-   ; dup fd: __i_fcntl_fdstruct_0
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-      
-   SECTION data_clib
-   SECTION data_stdio
-      
-   ; FILE *
-      
-   PUBLIC _stderr
-      
-   _stderr:  defw __i_stdio_file_4 + 2
-      
-   ; FILE structure
-      
-   __i_stdio_file_4:
-   
-      ; open files link
-      
-      defw __i_stdio_file_3
-      
-      ; jump to duped fd
-      
-      defb 195
-      defw __i_fcntl_fdstruct_0
-
-      ; state_flags_0
-      ; state_flags_1
-      ; conversion flags
-      ; ungetc
-
-      defb 0x80
-      defb 0
-      defb 0
-      defb 0
-      
-      ; mtx_recursive
-      
-      defb 0         ; thread owner = none
-      defb 0x02      ; mtx_recursive
-      defb 0         ; lock count = 0
-      defb 0xfe      ; atomic spinlock
-      defw 0         ; list of blocked threads
-
-         
-   ; fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_4 = __i_fcntl_fdstruct_0
-   
-   ; adjust reference count on duped FDSTRUCT
-   
-   SECTION code_crt_init
-   
-   ld hl,__i_fcntl_fdstruct_0 + 7     ; & FDSTRUCT.ref_count
-   inc (hl)
-   inc (hl)
-
-      
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
