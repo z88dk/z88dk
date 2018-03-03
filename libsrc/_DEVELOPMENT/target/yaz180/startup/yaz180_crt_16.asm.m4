@@ -4,7 +4,7 @@ dnl############################################################
 dnl##      YAZ180_CRT_16.ASM.M4 - IO THROUGH BASIC           ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                yaz180 standalone target                   ;;
+;;                   yaz180 basic target                     ;;
 ;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
@@ -41,7 +41,7 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-ddnl#include(`driver/terminal/rc_01_input_asci0.m4')
+dnl#include(`driver/terminal/rc_01_input_asci0.m4')
 dnl#include(`driver/terminal/rc_01_input_asci1.m4')
 dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
