@@ -61,6 +61,13 @@ extern FILE *stdlst;
 
 #endif
 
+#ifdef __YAZ180
+
+extern FILE *ttyin;
+extern FILE *ttyout;
+
+#endif
+
 // FUNCTIONS
 
 extern FILE __LIB__ *_fmemopen_(void **bufp,size_t *sizep,char *mode) __smallc;

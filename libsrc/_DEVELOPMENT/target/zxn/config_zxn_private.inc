@@ -2587,5 +2587,51 @@ defc __IO_133B_TX_READY = 0x02
 
 
 
+
+
+defc __IO_FE = 0xfe
+defc __IO_FE_EAR = 0x10
+defc __IO_FE_MIC = 0x08
+defc __IO_FE_BORDER_MASK = 0x07
+
+defc __IO_TIMEX_VIDEO_MODE = 0xff
+
+defc __IO_TVM_DISABLE_ULA_INTERRUPT = 0x40
+defc __IO_TVM_DFILE_1 = 0x0
+defc __IO_TVM_DFILE_2 = 0x01
+defc __IO_TVM_HICOLOR = 0x02
+defc __IO_TVM_HIRES = 0x06
+defc __IO_TVM_HIRES_BLACK = 0x06
+defc __IO_TVM_HIRES_BLUE = 0x0e
+defc __IO_TVM_HIRES_RED = 0x16
+defc __IO_TVM_HIRES_MAGENTA = 0x1e
+defc __IO_TVM_HIRES_GREEN = 0x26
+defc __IO_TVM_HIRES_CYAN = 0x2e
+defc __IO_TVM_HIRES_YELLOW = 0x36
+defc __IO_TVM_HIRES_WHITE = 0x3e
+
+defc __IO_FF_DISABLE_ULA_INTERRUPT = 0x40
+defc __IO_FF_DFILE_1 = 0x0
+defc __IO_FF_DFILE_2 = 0x01
+defc __IO_FF_HICOLOR = 0x02
+defc __IO_FF_HIRES = 0x06
+defc __IO_FF_HIRES_BLACK = 0x06
+defc __IO_FF_HIRES_BLUE = 0x0e
+defc __IO_FF_HIRES_RED = 0x16
+defc __IO_FF_HIRES_MAGENTA = 0x1e
+defc __IO_FF_HIRES_GREEN = 0x26
+defc __IO_FF_HIRES_CYAN = 0x2e
+defc __IO_FF_HIRES_YELLOW = 0x36
+defc __IO_FF_HIRES_WHITE = 0x3e
+
+
+
+
+
+
+
+
+
+
 ENDIF
 

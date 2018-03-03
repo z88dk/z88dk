@@ -45,6 +45,7 @@ ifelse(__STARTUP, -1,
 ifelse(__STARTUP, 0,
 `
    ; yabios asci0 drivers installed on stdin, stdout, stderr
+   ; yabios asci1 drivers installed on ttyin, ttyout
 
    IFNDEF __CRTCFG
    

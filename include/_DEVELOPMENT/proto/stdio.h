@@ -59,6 +59,13 @@ extern FILE *stdlst;
 
 #endif
 
+#ifdef __YAZ180
+
+extern FILE *ttyin;
+extern FILE *ttyout;
+
+#endif
+
 // FUNCTIONS
 
 __DPROTO(,,FILE,*,_fmemopen_,void **bufp,size_t *sizep,char *mode)
