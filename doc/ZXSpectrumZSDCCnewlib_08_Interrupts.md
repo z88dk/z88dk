@@ -81,8 +81,8 @@ out of the way in high memory. As befits a getting started guide, this
 configuration will suit many scenarios and will suffice until the reader is
 knowledgeable enough to work out a more suitable alternative for their situation. 
 
-Our vector table needs to be 257 bytes. Referring back to (installment
-6)[https://github.com/derekfountain/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md]
+Our vector table needs to be 257 bytes. Referring back to [installment
+6](https://github.com/derekfountain/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
 of this getting started guide where we looked at the memory map of the Spectrum,
 we see that with the default compiler settings our simple program's memory map
 looks like this:
@@ -214,7 +214,7 @@ Having worked all that out, we can now look at the program which arranges it.
 Here's a piece of code which sets up interrupt mode 2 routine as per the
 discussion above:
 
-'''
+```
 #pragma output REGISTER_SP = 0xFF58
 
 #include <z80.h>
@@ -249,13 +249,13 @@ int main()
 
   while(1);
 }
-'''
+```
 
 Save this to a file called im2_simple.c and compile it with this command:
 
-'''
+```
 zcc +zx -vn -clib=sdcc_iy -startup=31 im2_simple.c -o im2_simple -create-app
-'''
+```
 
 This is our typical, simplest compile command, using the stripped down CRT31. It
 deliberately uses C macros to define the salient values to make things a bit
@@ -275,11 +275,21 @@ simply :
   JMP isr
 ```
 
-where 'isr' is the address of our C routine. This jump point is placed in
-memory with the Z88DK z80_*poke() calls. The first puts in the value 195, which
-is the Z80 machine code value for the JMP instruction. The second puts in the
-address of the interrupt service routine named isr(), and which will be located
-somewhere in memory by the compiler. We can use its symbol in the C code.
+where 'isr' is the address of our C routine. This jump point is placed in memory
+with the Z88DK z80_*poke() calls. The first puts in the value 195 (that's 0xC3),
+which is the Z80 machine code value for the JMP instruction. The second puts in
+the address of the interrupt service routine named isr(), and which will be
+located somewhere in memory by the compiler. We can use its symbol in the C
+code.
+
+We can see this arrangement in memory using an emulator's memory inspector:
+
+![alt text](images/fuse_im2_memory.png "IM2 memory")
+
+This screenshot is from Fuse which, depending on your context, displays memory
+upside down. Nevertheless, you can see the JMP instrunction in the "C3 E7 80"
+bytes at 0xFBFB (so for this compliation the isr() routine was placed at
+0x80E7).  Then there's 2 empty bytes, then the vector table, full of 0xFB bytes.
 
 The defintion of the interrupt service routine, isr(), uses a wrapper macro
 IM2_DEFINE_ISR(). This is because a C function can't be used as an interrupt
