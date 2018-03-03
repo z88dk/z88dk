@@ -60,12 +60,12 @@ others. We'll see how to handle this from C using Z88DK.
 
 Unusually for this series, the example which follows isn't a particularly simple
 one. The Z88DK wiki document already referenced provides a simple example to get
-started with. What follows is a careful examination of how a IM 2 example can be
-fitted into the Spectrum's memory model. If we're going to write complex
+started with. What follows is a careful examination of how an IM 2 example can
+be fitted into the Spectrum's memory model. If we're going to write complex
 programs which use interrupts we need to think things through carefully. Just
-throwing things into RAM as any location might work in the short term, but in
+throwing things into RAM at any location might work in the short term, but in
 the longer term will result in baffling crashes when memory gets
-corrupted. Let's take this slowly.
+overwritten. Let's take this slowly.
 
 The steps required to set up a Spectrum IM 2 routine are these:
 
