@@ -71,15 +71,16 @@ The steps required to set up a Spectrum IM 2 routine are these:
 
 * fill in the vector table with a complete set of vectors, all the same
 * at that vector, place an instruction to jump to the interrupt service routine
-* set the Z80's I register to point at a vector table
+* set the Z80's I register to point at the vector table
 * enable the interrupts
 
 The first issue we need to cover is, where can we put the vector table and jump
-instruction? The answer is, anywhere convenient. What follows is a description
-of one solution which would work for a program where such things can be placed
-out of the way in high memory. As befits a getting started guide, this
-configuration will suit many scenarios and will suffice until the reader is
-knowledgeable enough to work out a more suitable alternative for their situation. 
+instruction? The answer is, anywhere convenient, but that doesn't really answer
+the question properly. What follows is a description of one solution which would
+work for a program where such things can be placed out of the way in high
+memory. As befits a getting started guide, this configuration will suit many
+scenarios and will suffice until the reader is knowledgeable enough to work out
+a more suitable alternative for their situation.
 
 Our vector table needs to be 257 bytes. Referring back to [installment
 6](https://github.com/derekfountain/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)
