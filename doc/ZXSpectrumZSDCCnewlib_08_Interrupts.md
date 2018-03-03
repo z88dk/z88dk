@@ -287,18 +287,18 @@ We can see this arrangement in memory using an emulator's memory inspector:
 
 ![alt text](images/fuse_im2_memory.png "IM2 memory")
 
-This screenshot is from Fuse which displays memory upside down. Nevertheless,
-you can see the JMP instrunction in the "C3 E7 80" bytes at 0xFBFB (so for this
-compliation the isr() routine was placed at 0x80E7).  Then there's 2 empty
-bytes, then the vector table, full of 0xFB bytes.
+This screenshot is from Fuse which displays memory upside down. You can see the
+JMP instruction in the "C3 E7 80" bytes at 0xFBFB (so for this compliation the
+*isr()* routine was placed at 0x80E7).  Then there are 2 empty bytes, then the
+vector table, full of 0xFB bytes.
 
-The defintion of the interrupt service routine, *isr()*, uses a wrapper macro
+The defintion of the interrupt service routine *isr()* uses a wrapper macro
 *IM2_DEFINE_ISR()*. This is because a C function can't be used as an interrupt
 serivce routine by itself. It needs some Z80 instructions around it which save a
 few registers on the stack, restore them when the routine is finished, plus some
 other housekeeping bit and pieces. The details aren't really important here; all
-that's required is that the definition of C function to be used as the interrupt
-service routine is wrapped in the the *IM2_DEFINE_ISR()* macro. The C compiler
+that's required is that the definition of the C function to be used as the interrupt
+service routine is wrapped in the *IM2_DEFINE_ISR()* macro. The C compiler
 looks after everything else.
 
 In this example the interrupt service routine simply places the value 0x55 in
@@ -306,7 +306,7 @@ the first byte of screen memory, hence the smalled dashed line in the Spectrum's
 display when this code is run.
 
 Back in the *main()* function, after the pokes to place the JMP instruction we
-have the call to im2_init(). This library function takes the address of the
+have the call to *im2_init()*. This library function takes the address of the
 vector table which it programs into the Z80's I register, and then sets
 the interrupt mode to 2. We then enable interrupts and the interrupt service
 routine will start being called every 50th of a second.
