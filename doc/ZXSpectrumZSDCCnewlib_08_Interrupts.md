@@ -264,10 +264,10 @@ clearer. If you run it you'll notice that a) a small dashed line appears in the
 top left corner of the screen and b) the Spectrum locks up.  Let's look at the
 code to see what's happening.
 
-The first thing the code does is set up the vector table. As described above,
-the table will occupy the 257 bytes from 0xFC00, so a simple memset() is all
-that's required. The jump vector is at 0xFBFB, so the table is filled with 0xFB
-in every byte.
+The first thing the code does in main() is set up the vector table. As described
+above, the table will occupy the 257 bytes from 0xFC00, so a simple memset() is
+all that's required. The jump vector is at 0xFBFB, so the table is filled with
+0xFB in every byte.
 
 Next we need to place our redirection JMP instruction at address 0xFBFB. This is
 simply :
@@ -277,7 +277,7 @@ simply :
 ```
 
 where 'isr' is the address of our C routine. This jump point is placed in memory
-with the Z88DK z80_*poke() calls. The first puts in the value 195 (that's 0xC3),
+with the Z88DK *z80_*poke()* calls. The first puts in the value 195 (that's 0xC3 hex),
 which is the Z80 machine code value for the JMP instruction. The second puts in
 the address of the interrupt service routine named isr(), and which will be
 located somewhere in memory by the compiler. We can use its symbol in the C
