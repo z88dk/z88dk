@@ -277,7 +277,7 @@ simply :
 ```
 
 where 'isr' is the address of our C routine. This jump point is placed in memory
-with the Z88DK *z80_*poke()* calls. The first puts in the value 195 (that's 0xC3 hex),
+with the Z88DK *z80*_*poke()* calls. The first puts in the value 195 (that's 0xC3 hex),
 which is the Z80 machine code value for the JMP instruction. The second puts in
 the address of the interrupt service routine named isr(), and which will be
 located somewhere in memory by the compiler. We can use its symbol in the C
