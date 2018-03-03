@@ -457,6 +457,8 @@ to re-enable interrupts when returning to BASIC.
 
 ### Conclusion
 
-Now that we've seen how programs are laid out in memory, we can have a better 
-look at the BiFrost library.
-Part 7 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)
+There's more to look at regarding the programming of the Spectrum's interrupts
+with Z88DK, but it's all well documented so doesn't need to be explored further
+here. This guide has built on the existing documentation by looking at the some
+of the options for laying out Spectrum's memory map when using interrupt mode
+2. Understanding the memory map is a skill we need to continue to develop.
