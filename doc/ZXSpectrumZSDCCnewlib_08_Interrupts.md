@@ -294,7 +294,7 @@ vector table, full of 0xFB bytes.
 
 The defintion of the interrupt service routine *isr()* uses a wrapper macro
 *IM2_DEFINE_ISR()*. This is because a C function can't be used as an interrupt
-serivce routine by itself. It needs some Z80 instructions around it which save a
+service routine by itself. It needs some Z80 instructions around it which save a
 few registers on the stack, restore them when the routine is finished, plus some
 other housekeeping bit and pieces. The details aren't really important here; all
 that's required is that the definition of the C function to be used as the interrupt
@@ -333,12 +333,13 @@ BASIC.
 
 To use this feature we need to ensure that as well as having our C interrupt
 service routine run every interrupt, we must also have the Spectrum's BASIC
-interrupt service routine called as well as. This is because that code, in the
+interrupt service routine called as well. This is because that code, in the
 Spectrum's ROM, handles things like keyboard input which BASIC expects to keep
 happening. We arrange this by wrapping our interrupt serivce routine definition
 with the *IM2_DEFINE_ISR_WITH_BASIC()* macro. This adds the same housekeeping
 wrapping code around the C ISR, and additionally makes a call into the Spectrum's
-ROM to run the BASIC ISR as well.
+ROM to run the BASIC ISR as well. If you're interested, you can see how this is
+set up by looking at the macro in the [im2 header file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/im2.h#L87).
 
 With this in place we can set up a C code interrupt service routine, then return
 to BASIC with it still running, like this example:
@@ -462,7 +463,7 @@ Compile this with:
 zcc +zx -vn -clib=sdcc_iy -startup=31 atts_ticker.c -o atts_ticker -create-app
 ```
 
-Note how the call to *intrinsic_ei()* isn't required in the main() code in this
+Note how the call to *intrinsic_ei()* isn't required in the *main()* code in this
 example. This is because the Z88DK CRT code will always contain an instruction
 to re-enable interrupts when returning to BASIC.
 
@@ -471,5 +472,5 @@ to re-enable interrupts when returning to BASIC.
 There's more to look at regarding the programming of the Spectrum's interrupts
 with Z88DK, but it's all well documented so doesn't need to be explored further
 here. This guide has built on the existing documentation by looking at the some
-of the options for laying out Spectrum's memory map when using interrupt mode
+of the options for laying out the Spectrum's memory map when using interrupt mode
 2. Understanding the memory map is a skill we need to continue to develop.
