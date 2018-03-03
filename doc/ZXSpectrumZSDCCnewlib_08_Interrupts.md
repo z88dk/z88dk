@@ -2,7 +2,7 @@
 
 This is the eighth document in the series which describes how to get started
 writing ZX Spectrum programs using Z88DK. As before, it concerns itself only
-with the newer, more standards compilant zsdcc C compiler. Neither the original
+with the newer, more standards compliant zsdcc C compiler. Neither the original
 sccz80 compiler nor the classic library is discussed.
 
 This document relates specifically to the 48K Spectrum. Other models have more
@@ -47,7 +47,7 @@ it's this which we'll be using from Z88DK.
 The second key detail the reader needs to understand is concept of the
 [interrupt mode 2](https://www.z88dk.org/wiki/doku.php?id=library:interrupts#im_2) "identifier
 byte supplied by the interrupting peripheral". On the Spectrum the interrupting
-peripheral, the video hardware, doesn't supply this indentifier byte. It
+peripheral, the video hardware, doesn't supply this identifier byte. It
 essentially arrives as a random number from 0-255, and this is the reason Spectrum
 programs need to build a specifically configured vector table when using
 interrupt mode 2. This is hinted at in the [second
@@ -200,7 +200,7 @@ bytes for our JMP instruction, so we can use the bytes at 0xFBFB, 0xFBFC and
 |-------------| ^^^
 ```
 
-So our situtation now is that the Z88DK program, with its DATA and BSS sections
+So our situation now is that the Z88DK program, with its DATA and BSS sections
 and heap, start (by default) at 0x8000 (32768) and grow upwards. The top byte of
 the heap will be 0xFBFA, above which is our JMP instruction, then 2 unused
 bytes, then the vector table, then the 600 byte stack, then the UDGs. This is a
@@ -288,11 +288,11 @@ We can see this arrangement in memory using an emulator's memory inspector:
 ![alt text](images/fuse_im2_memory.png "IM2 memory")
 
 This screenshot is from Fuse which displays memory upside down. You can see the
-JMP instruction in the "C3 E7 80" bytes at 0xFBFB (so for this compliation the
+JMP instruction in the "C3 E7 80" bytes at 0xFBFB (so for this compilation the
 *isr()* routine was placed at 0x80E7).  Then there are 2 empty bytes, then the
 vector table, full of 0xFB bytes.
 
-The defintion of the interrupt service routine *isr()* uses a wrapper macro
+The definition of the interrupt service routine *isr()* uses a wrapper macro
 *IM2_DEFINE_ISR()*. This is because a C function can't be used as an interrupt
 service routine by itself. It needs some Z80 instructions around it which save a
 few registers on the stack, restore them when the routine is finished, plus some
@@ -302,7 +302,7 @@ service routine is wrapped in the *IM2_DEFINE_ISR()* macro. The C compiler
 looks after everything else.
 
 In this example the interrupt service routine simply places the value 0x55 in
-the first byte of screen memory, hence the smalled dashed line in the Spectrum's
+the first byte of screen memory, hence the small dashed line in the Spectrum's
 display when this code is run.
 
 Back in the *main()* function, after the pokes to place the JMP instruction we
@@ -335,7 +335,7 @@ To use this feature we need to ensure that as well as having our C interrupt
 service routine run every interrupt, we must also have the Spectrum's BASIC
 interrupt service routine called as well. This is because that code, in the
 Spectrum's ROM, handles things like keyboard input which BASIC expects to keep
-happening. We arrange this by wrapping our interrupt serivce routine definition
+happening. We arrange this by wrapping our interrupt service routine definition
 with the *IM2_DEFINE_ISR_WITH_BASIC()* macro. This adds the same housekeeping
 wrapping code around the C ISR, and additionally makes a call into the Spectrum's
 ROM to run the BASIC ISR as well. If you're interested, you can see how this is
