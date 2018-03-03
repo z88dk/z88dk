@@ -264,8 +264,8 @@ clearer. If you run it you'll notice that a) a small dashed line appears in the
 top left corner of the screen and b) the Spectrum locks up.  Let's look at the
 code to see what's happening.
 
-The first thing the code does in main() is set up the vector table. As described
-above, the table will occupy the 257 bytes from 0xFC00, so a simple memset() is
+The first thing the code does in *main()* is set up the vector table. As described
+above, the table will occupy the 257 bytes from 0xFC00, so a simple *memset()* is
 all that's required. The jump vector is at 0xFBFB, so the table is filled with
 0xFB in every byte.
 
@@ -276,10 +276,10 @@ simply :
   JMP isr
 ```
 
-where 'isr' is the address of our C routine. This jump point is placed in memory
+where *'isr'* is the address of our C routine. This jump point is placed in memory
 with the Z88DK *z80*_*poke()* calls. The first puts in the value 195 (that's 0xC3 hex),
 which is the Z80 machine code value for the JMP instruction. The second puts in
-the address of the interrupt service routine named isr(), and which will be
+the address of the interrupt service routine named *isr()*, and which will be
 located somewhere in memory by the compiler. We can use its symbol in the C
 code.
 
@@ -287,25 +287,25 @@ We can see this arrangement in memory using an emulator's memory inspector:
 
 ![alt text](images/fuse_im2_memory.png "IM2 memory")
 
-This screenshot is from Fuse which, depending on your context, displays memory
-upside down. Nevertheless, you can see the JMP instrunction in the "C3 E7 80"
-bytes at 0xFBFB (so for this compliation the isr() routine was placed at
-0x80E7).  Then there's 2 empty bytes, then the vector table, full of 0xFB bytes.
+This screenshot is from Fuse which displays memory upside down. Nevertheless,
+you can see the JMP instrunction in the "C3 E7 80" bytes at 0xFBFB (so for this
+compliation the isr() routine was placed at 0x80E7).  Then there's 2 empty
+bytes, then the vector table, full of 0xFB bytes.
 
-The defintion of the interrupt service routine, isr(), uses a wrapper macro
-IM2_DEFINE_ISR(). This is because a C function can't be used as an interrupt
+The defintion of the interrupt service routine, *isr()*, uses a wrapper macro
+*IM2_DEFINE_ISR()*. This is because a C function can't be used as an interrupt
 serivce routine by itself. It needs some Z80 instructions around it which save a
 few registers on the stack, restore them when the routine is finished, plus some
 other housekeeping bit and pieces. The details aren't really important here; all
 that's required is that the definition of C function to be used as the interrupt
-service routine is wrapped in the the IM2_DEFINE_ISR() macro. The C compiler
+service routine is wrapped in the the *IM2_DEFINE_ISR()* macro. The C compiler
 looks after everything else.
 
 In this example the interrupt service routine simply places the value 0x55 in
 the first byte of screen memory, hence the smalled dashed line in the Spectrum's
 display when this code is run.
 
-Back in the main() function, after the pokes to place the JMP instruction we
+Back in the *main()* function, after the pokes to place the JMP instruction we
 have the call to im2_init(). This library function takes the address of the
 vector table which it programs into the Z80's I register, and then sets
 the interrupt mode to 2. We then enable interrupts and the interrupt service
@@ -320,7 +320,7 @@ to BASIC. For this example we don't want this to happen, otherwise we wouldn't
 see the dashed line in the display.
 
 We can control the interrupt mode the program exits with via the
-CRT_INTERRUPT_MODE_EXIT pragma, like this:
+*CRT_INTERRUPT_MODE_EXIT* pragma, like this:
 
 ```
 #pragma output CRT_INTERRUPT_MODE_EXIT = 2
@@ -336,7 +336,7 @@ service routine run every interrupt, we must also have the Spectrum's BASIC
 interrupt service routine called as well as. This is because that code, in the
 Spectrum's ROM, handles things like keyboard input which BASIC expects to keep
 happening. We arrange this by wrapping our interrupt serivce routine definition
-with the IM2_DEFINE_ISR_WITH_BASIC() macro. This adds the same housekeeping
+with the *IM2_DEFINE_ISR_WITH_BASIC()* macro. This adds the same housekeeping
 wrapping code around the C ISR, and additionally makes a call into the Spectrum's
 ROM to run the BASIC ISR as well.
 
@@ -462,7 +462,7 @@ Compile this with:
 zcc +zx -vn -clib=sdcc_iy -startup=31 atts_ticker.c -o atts_ticker -create-app
 ```
 
-Note how the call to intrinsic_ei() isn't required in the main() code in this
+Note how the call to *intrinsic_ei()* isn't required in the main() code in this
 example. This is because the Z88DK CRT code will always contain an instruction
 to re-enable interrupts when returning to BASIC.
 
