@@ -168,12 +168,8 @@ as possible. 0xFFFF is the top of memory, so that's no good. 0xFEFE and 0xFDFD
 are the next ones down, but those are in the stack area. Next would be 0xFCFC
 which is in our vector table so that's no use either. Next one down is
 0xFBFB. Ah, this looks better. That's just below the vector table. We need 3
-<<<<<<< HEAD
 bytes for our JMP instruction, so we can use the bytes at 0xFBFB, 0xFBFC and
 0xFBFD:
-=======
-bytes, so we can use the bytes at 0xFBFB, 0xFBFC and 0xFBFD:
->>>>>>> ea407168d56a5cd5e054e26dcb9e767bd4989c64
 
 ```
 |-------------|
@@ -185,12 +181,9 @@ bytes, so we can use the bytes at 0xFBFB, 0xFBFC and 0xFBFD:
 |             | (257 bytes total)
 |0xFC00  64512|
 |-------------|
-<<<<<<< HEAD
 |0xFBFF       | 2 unused bytes
 |0xFBFE       |
 |-------------|
-=======
->>>>>>> ea407168d56a5cd5e054e26dcb9e767bd4989c64
 |0xFBFD       | IM 2 JMP instruction
 |0xFBFC       | (3 bytes total)
 |0xFBFB       |
@@ -208,17 +201,11 @@ bytes, so we can use the bytes at 0xFBFB, 0xFBFC and 0xFBFD:
 
 So our situtation now is that the Z88DK program, with its DATA and BSS sections
 and heap, start (by default) at 0x8000 (32768) and grow upwards. The top byte of
-<<<<<<< HEAD
 the heap will be 0xFBFA, above which is our JMP instruction, then 2 unused
 bytes, then the vector table, then the 600 byte stack, then the UDGs. This is a
 reasonably compact and memory efficient arrangement, but as mentioned before,
 it's only one solution. If your program already has something in high memory
 you'll need to rearrange things. For now, this approach works for us.
-=======
-the heap will be 0xFBFA, above which is our JMP instruction, then the vector
-table, then the 600 byte stack, then the UDGs. This is a reasonably compact and
-memory efficient arrangement.
->>>>>>> ea407168d56a5cd5e054e26dcb9e767bd4989c64
 
 Having worked all that out, we can now look at the program which arranges it.
 
@@ -241,7 +228,6 @@ IM2_DEFINE_ISR(isr)
   *(unsigned char*)0x4000 = 0x55;
 }
 
-<<<<<<< HEAD
 #define TABLE_HIGH_BYTE        ((unsigned int)0xfc)
 #define JUMP_POINT_HIGH_BYTE   ((unsigned int)0xfb)
 
@@ -256,22 +242,6 @@ int main()
 
   z80_bpoke( JUMP_POINT,   195 );
   z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
-=======
-#define TABLE_HIGH_BYTE           ((unsigned int)0xfc)
-#define INT_JUMP_POINT_HIGH_BYTE  ((unsigned int)0xfb)
-
-#define UI_256                    ((unsigned int)256)
-
-#define TABLE_ADDR                ((void*)(TABLE_HIGH_BYTE*UI_256))
-#define INT_JUMP_POINT            ((unsigned char*)( (unsigned int)(INT_JUMP_POINT_HIGH_BYTE*UI_256) + INT_JUMP_POINT_HIGH_BYTE ))
-
-int main()
-{
-  memset( TABLE_ADDR, INT_JUMP_POINT_HIGH_BYTE, 257 );
-
-  z80_bpoke( INT_JUMP_POINT,   195 );
-  z80_wpoke( INT_JUMP_POINT+1, (unsigned int)isr );
->>>>>>> ea407168d56a5cd5e054e26dcb9e767bd4989c64
 
   im2_init( TABLE_ADDR );
 
@@ -288,7 +258,6 @@ zcc +zx -vn -clib=sdcc_iy -startup=31 im2_simple.c -o im2_simple -create-app
 '''
 
 This is our typical, simplest compile command, using the stripped down CRT31. It
-<<<<<<< HEAD
 deliberately uses C macros to define the salient values to make things a bit
 clearer. If you run it you'll notice that a) a small dashed line appears in the
 top left corner of the screen and b) the Spectrum locks up.  Let's look at the
@@ -493,16 +462,3 @@ with Z88DK, but it's all well documented so doesn't need to be explored further
 here. This guide has built on the existing documentation by looking at the some
 of the options for laying out Spectrum's memory map when using interrupt mode
 2. Understanding the memory map is a skill we need to continue to develop.
-=======
-deliberately uses C macros to define the salient values, and they will be
-discussed on a moment. If you run it you'll notice that a) the Spectrum locks
-up, and b) a small dashed line appears in the top left corner of the
-screen. Let's look at the code to see what's happening.
-
-
-### Conclusion
-
-Now that we've seen how programs are laid out in memory, we can have a better 
-look at the BiFrost library.
-Part 7 is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)
->>>>>>> ea407168d56a5cd5e054e26dcb9e767bd4989c64
