@@ -703,7 +703,7 @@ msx_clib.lib:
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx TARGET=msx
 	$(MAKE) -C psg
-	TARGET=msx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
+	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
 mtx_clib.lib:
