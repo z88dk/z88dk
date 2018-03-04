@@ -1931,6 +1931,23 @@
 
 
 
+#define __IO_SD_CONTROL  0xe7
+#define __IO_SD_STATUS  0xe7
+#define __IO_SD_DATA  0xeb
+
+#define __IO_LED  0x103b
+
+
+
+
+
+
+
+
+
+
+
+
 #define __NEXTOS_DOS_VERSION  0x0103
 #define __NEXTOS_DOS_OPEN  0x0106
 #define __NEXTOS_DOS_CLOSE  0x0109
@@ -2152,6 +2169,15 @@
 #define __IO_NEXTREG_DAT  0x253b
 
 #define __REG_MACHINE_ID  0
+#define __RMI_DE1A  1
+#define __RMI_DE2A  2
+#define __RMI_FBLABS  5
+#define __RMI_VTRUCCO  6
+#define __RMI_WXEDA  7
+#define __RMI_EMULATORS  8
+#define __RMI_ZXNEXT  10
+#define __RMI_MULTICORE  11
+#define __RMI_ZXNEXT_AB  250
 
 #define __REG_VERSION  1
 #define __RV_MAJOR  0xf0
@@ -2174,10 +2200,11 @@
 #define __RMT_P3E  0x03
 #define __RMT_PENTAGON  0x04
 
-#define __REG_PAGE_RAM  4
-#define __RPR_MASK  0x3f
-#define __REG_BANK_RAM  4
-#define __RBR_MASK  0x3f
+#define __REG_RAM_PAGE  4
+#define __RRP_RAM_DIVMMC  0x08
+#define __RRP_ROM_DIVMMC  0x04
+#define __RRP_ROM_MF  0x05
+#define __RRP_ROM_SPECTRUM  0x00
 
 #define __REG_PERIPHERAL_1  5
 #define __RP1_JOY1_SINCLAIR  0x00
@@ -2222,10 +2249,14 @@
 
 #define __REG_SUB_VERSION  14
 
+#define __REG_VIDEO_PARAM  15
+
 #define __REG_ANTI_BRICK  16
-#define __RAB_START_NORMAL_CORE  0x80
+#define __RAB_COMMAND_NORMALCORE  0x80
 #define __RAB_BUTTON_DIVMMC  0x02
 #define __RAB_BUTTON_MULTIFACE  0x01
+
+#define __REG_VIDEO_TIMING  17
 
 #define __REG_LAYER_2_RAM_PAGE  18
 #define __RL2RP_MASK  0x3f
@@ -2335,6 +2366,8 @@
 #define __RCCH_COPPER_RUN_LOOP_RESET  0x40
 #define __RCCH_COPPER_RUN_LOOP  0x80
 #define __RCCH_COPPER_RUN_VBI  0xc0
+
+#define __REG_DEBUG  0xff
 
 
 
