@@ -63,6 +63,7 @@ extern FILE *stdlst;
 
 extern FILE *ttyin;
 extern FILE *ttyout;
+extern FILE *ttyerr;
 
 #endif
 
