@@ -612,8 +612,12 @@ memset_far_error_exit:
 ; Therefore BANK changes can be done by inputting the correct ESA data as 0xn000.
 ;
 ; This is a system function, and can only be called from BANK0.
+;
+; Reads the _bios_ioByte bit 0 to determine which serial interface to use.
 
 PUBLIC _load_hex, _load_hex_fastcall
+
+EXTERN _bios_ioByte
 
 EXTERN initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
@@ -636,21 +640,31 @@ _load_hex_fastcall:
     and a, $F0                  ; be sure it is sane
     ret Z                       ; and not trying to write to BANK0
     out0 (BBR), a               ; set the BBR
-                                ; from BANK0, so no need for stack change
+                                ; from BANK0, so no need for stack change, we use system stack
 
     ld de, initString           ; pstring modifies AF, DE, & HL
     call pstring
     call delay
 
-load_hex_wait_lock:
+    ld a, (_bios_ioByte)        ; get I/O bit
+    rrca                        ; put it in Carry
+    jr NC, load_hex_get_lock1  ; TTY=0
+
+load_hex_get_lock0:
     ld hl, _asci0RxLock
     sra (hl)                    ; take the ASCI0 Rx lock
-    jr C, load_hex_wait_lock
-
+    ret C                       ; return if we can't get lock
     call _asci0_flush_Rx_di     ; flush the ASCI0 Rx buffer
+    jr load_hex_wait_colon
+
+load_hex_get_lock1:
+    ld hl, _asci1RxLock
+    sra (hl)                    ; take the ASCI1 Rx lock
+    ret C                       ; return if we can't get lock
+    call _asci1_flush_Rx_di     ; flush the ASCI1 Rx buffer
 
 load_hex_wait_colon:
-    call _asci0_getc            ; Rx byte in L (A = char received too)
+    call rchar                  ; Rx byte in L (A = char received too)
     cp ':'                      ; wait for ':'
     jr NZ, load_hex_wait_colon
     ld c, 0                     ; reset C to compute checksum
@@ -678,7 +692,7 @@ load_hex_read_chksum:
     or a
     jr NZ, load_hex_bad_chk     ; non zero, we have an issue
     ld l, '#'                   ; "#" per line loaded
-    call _asci0_putc            ; Print it
+    call pchar                  ; Print it
     jr load_hex_wait_colon
 
 load_hex_esa_data:
@@ -706,7 +720,17 @@ load_hex_exit:
     call delay
     call delay
 
+    ld a, (_bios_ioByte)        ; get I/O bit
+    rrca                        ; put it in Carry
+    jr NC, load_hex_unlock1     ; TTY=0
+
+load_hex_unlock0:
     ld hl, _asci0RxLock         ; give up the ASCI0 Rx mutex
+    ld (hl), $FE
+    ret
+
+load_hex_unlock1:
+    ld hl, _asci1RxLock         ; give up the ASCI1 Rx mutex
     ld (hl), $FE
     ret
 
@@ -2281,12 +2305,15 @@ ide_write_sector:
 ;
 
 PUBLIC delay
-PUBLIC rhexdwd, rhexwd, rhex
-PUBLIC phexdwd, phexwd, phex
+PUBLIC rhexdwd, rhexwd, rhex, rchar
+PUBLIC phexdwd, phexwd, phex, pchar
 PUBLIC phexdwdreg, phexwdreg
 PUBLIC pstring, pnewline
 
-EXTERN _asci0_reset, _asci0_putchar, _asci0_putc, _asci0_getc
+EXTERN _bios_ioByte
+
+EXTERN _asci0_putc, _asci0_getc
+EXTERN _asci1_putc, _asci1_getc
 
 ;==============================================================================
 ;       DELAY SUBROUTINES
@@ -2351,9 +2378,8 @@ rhex:                   ; Returns byte in A, modifies HL
     or h                ; assemble two nibbles into one byte in A
     ret                 ; return the byte read in A  
 
-
 rhex_nibble:
-    call _asci0_getc    ; Rx byte in L (A = byte Rx too) SCF if char read
+    call rchar          ; Rx byte in L (A = byte Rx too) SCF if char read
     jr NC, rhex_nibble  ; keep trying if no characters
     sub '0'
     cp 10
@@ -2361,27 +2387,32 @@ rhex_nibble:
     sub 7               ; else subtract 'A'-'0' (17) and add 10
     ret
 
+rchar:                  ; Rx byte in L (A = byte Rx too) SCF if char read
+    ld a, (_bios_ioByte); get I/O bit
+    rrca                ; put it in Carry
+    jp NC, _asci1_getc  ; TTY=0 (asci1)
+    jp _asci0_getc      ; CRT=1 (asci0)
+ 
 ;==============================================================================
 ;       OUTPUT SUBROUTINES
 ;
 
-    ; print string from location in DE, modifies AF, DE, & HL
+    ; print string from location in DE to asci0/1, modifies AF, DE, & HL
 pstring: 
     ld a, (de)          ; Get character from DE address
     or a                ; Is it $00 ?
     ret Z               ; Then return on terminator
     ld l, a
-    call _asci0_putc    ; Print it
+    call pchar          ; Print it
     inc de              ; Point to next character 
     jr pstring          ; Continue until $00
 
-    ; print CR/LF, modifies AF & HL
+    ; print CR/LF to asci0/1,, modifies AF & HL
 pnewline:
     ld l, CHAR_CR
-    call _asci0_putc
+    call pchar
     ld l, CHAR_LF
-    call _asci0_putc
-    ret
+    jp pchar
 
     ; print Double Word at address HL as 32 bit number in ASCII HEX, modifies AF
 phexdwd:
@@ -2425,9 +2456,9 @@ phexwdreg:
     call phex
     ret
 
-    ; print contents of L as 8 bit number in ASCII HEX, modifies AF & HL
+    ; print contents of L as 8 bit number in ASCII HEX to asci0/1, modifies AF & HL
 phex:
-    ld a, l         ; _asci0_putc modifies AF, HL
+    ld a, l         ; _asci0_putc / _asci1_putc modifies AF, HL
     push af
     rrca
     rrca
@@ -2442,8 +2473,13 @@ phex_conv:
     adc  a,$40
     daa
     ld l, a
-    call _asci0_putc
-    ret
+
+    ; print contents of L to asci0/1, modifies AF & HL
+pchar:
+    ld a, (_bios_ioByte); get I/O bit
+    rrca                ; put it in Carry
+    jp NC, _asci1_putc  ; TTY=0 (asci1)
+    jp _asci0_putc      ; CRT=1 (asci0)
 
 PUBLIC _common1_phase_end
 _common1_phase_end:     ; just to make sure there's enough space
