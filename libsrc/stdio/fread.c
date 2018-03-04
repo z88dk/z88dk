@@ -1,15 +1,15 @@
 /*
- *	Read from a file
+ *    Read from a file
  *
- *	int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
+ *    int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
  *
- *	Calls read() in fcntl to do the dirty work
+ *    Calls read() in fcntl to do the dirty work
  *
- *	Returns number of members readen
+ *    Returns number of members readen
  *
- *	We have to take account of ungotten characters
+ *    We have to take account of ungotten characters
  *
- *	djm 1/4/2000
+ *    djm 1/4/2000
  *
  * --------
  * $Id: fread.c,v 1.7 2010-01-15 07:12:05 stefano Exp $
@@ -23,36 +23,36 @@ static int fread1(void *ptr, size_t len, FILE *fp) __z88dk_callee;
 
 int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
-	if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && 
-			fchkstd(fp)== 0) {
-		int	readen = size*nmemb;
-		int     count  = 0;
+    if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && 
+            fchkstd(fp)== 0) {
+        int    readen = size*nmemb;
+        int     count  = 0;
 #ifdef __STDIO_BINARY
-		while ( count < readen ) {
-		    int c = fgetc(fp);
-		    if ( c == EOF ) {
-			break;
-		    }
-		    *ptr++ = (unsigned char)c;
-		    ++count;
-		}
-		return ( count / size );  /* Relies on 0 / x != EXCEPTION */
-#else			
-		if (readen) {
-		    /* Pick up ungot character */
-		    int c = fgetc(fp);
-		    /* Horrible hack around here */
-		    if ( c >= 0 ) {
-			*ptr = (unsigned char )c;
-			readen=fread1(ptr+1,readen-1,fp);
-			++readen;
-			/* Return number of members read */
-			return (readen/size);
-		    }
-		}
+        while ( count < readen ) {
+            int c = fgetc(fp);
+            if ( c == EOF ) {
+                break;
+            }
+            *ptr++ = (unsigned char)c;
+            ++count;
+        }
+        return ( count / size );  /* Relies on 0 / x != EXCEPTION */
+#else            
+        if (readen) {
+            /* Pick up ungot character */
+            int c = fgetc(fp);
+            /* Horrible hack around here */
+            if ( c >= 0 ) {
+            *ptr = (unsigned char )c;
+            readen=fread1(ptr+1,readen-1,fp);
+            ++readen;
+            /* Return number of members read */
+            return (readen/size);
+            }
+        }
 #endif
-	}
-	return 0;
+    }
+    return 0;
 }
 
 
@@ -71,7 +71,7 @@ _fread1:
         jr      z,fread_direct
         ; Calling via the extra hook
 IF __CPU_R2K__ | __CPU_R3K__
-	ld	hl,(ix+fp_extra)
+        ld    hl,(ix+fp_extra)
 ELSE
         ld      l,(ix+fp_extra)
         ld      h,(ix+fp_extra+1)
@@ -80,7 +80,7 @@ ENDIF
         jp      l_jphl
 fread_direct:
 IF __CPU_R2K__ | __CPU_R3K__
-	ld	hl,(ix+fp_desc)
+        ld    hl,(ix+fp_desc)
 ELSE
         ld      l,(ix+fp_desc)
         ld      h,(ix+fp_desc+1)

@@ -123,16 +123,16 @@ ENDIF
 #ifdef __STDIO_CRLF
 	ld	a,_IOTEXT	;check for text mode
 	and	(ix+fp_flags)
-	jr	z,no_binary
+	jr	nz,no_binary
 	ld	a,l
 #ifdef __STDIO_EOFMARKER
 	cp	__STDIO_EOFMARKER
 	jr	z,is_eof
-	and	a
-	jr	z,is_eof
+;	and	a
+;	jr	z,is_eof
 #endif
 	cp	13
-	jr	z,no_stdin
+	jr	z,no_stdin		; Read again
 	cp	10
 	jr	nz,no_binary
 	ld	l,13
