@@ -1937,6 +1937,23 @@ defc __IO_1FFD_PRINTER_STROBE = 0x10
 
 
 
+defc __IO_SD_CONTROL = 0xe7
+defc __IO_SD_STATUS = 0xe7
+defc __IO_SD_DATA = 0xeb
+
+defc __IO_LED = 0x103b
+
+
+
+
+
+
+
+
+
+
+
+
 defc __NEXTOS_DOS_VERSION = 0x0103
 defc __NEXTOS_DOS_OPEN = 0x0106
 defc __NEXTOS_DOS_CLOSE = 0x0109
@@ -2158,6 +2175,15 @@ defc __IO_NEXTREG_REG = 0x243b
 defc __IO_NEXTREG_DAT = 0x253b
 
 defc __REG_MACHINE_ID = 0
+defc __RMI_DE1A = 1
+defc __RMI_DE2A = 2
+defc __RMI_FBLABS = 5
+defc __RMI_VTRUCCO = 6
+defc __RMI_WXEDA = 7
+defc __RMI_EMULATORS = 8
+defc __RMI_ZXNEXT = 10
+defc __RMI_MULTICORE = 11
+defc __RMI_ZXNEXT_AB = 250
 
 defc __REG_VERSION = 1
 defc __RV_MAJOR = 0xf0
@@ -2180,10 +2206,11 @@ defc __RMT_128 = 0x02
 defc __RMT_P3E = 0x03
 defc __RMT_PENTAGON = 0x04
 
-defc __REG_PAGE_RAM = 4
-defc __RPR_MASK = 0x3f
-defc __REG_BANK_RAM = 4
-defc __RBR_MASK = 0x3f
+defc __REG_RAM_PAGE = 4
+defc __RRP_RAM_DIVMMC = 0x08
+defc __RRP_ROM_DIVMMC = 0x04
+defc __RRP_ROM_MF = 0x05
+defc __RRP_ROM_SPECTRUM = 0x00
 
 defc __REG_PERIPHERAL_1 = 5
 defc __RP1_JOY1_SINCLAIR = 0x00
@@ -2228,10 +2255,14 @@ defc __RP3_UNLOCK_7FFD = 0x80
 
 defc __REG_SUB_VERSION = 14
 
+defc __REG_VIDEO_PARAM = 15
+
 defc __REG_ANTI_BRICK = 16
-defc __RAB_START_NORMAL_CORE = 0x80
+defc __RAB_COMMAND_NORMALCORE = 0x80
 defc __RAB_BUTTON_DIVMMC = 0x02
 defc __RAB_BUTTON_MULTIFACE = 0x01
+
+defc __REG_VIDEO_TIMING = 17
 
 defc __REG_LAYER_2_RAM_PAGE = 18
 defc __RL2RP_MASK = 0x3f
@@ -2341,6 +2372,8 @@ defc __RCCH_COPPER_STOP = 0x00
 defc __RCCH_COPPER_RUN_LOOP_RESET = 0x40
 defc __RCCH_COPPER_RUN_LOOP = 0x80
 defc __RCCH_COPPER_RUN_VBI = 0xc0
+
+defc __REG_DEBUG = 0xff
 
 
 
