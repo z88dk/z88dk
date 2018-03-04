@@ -6,8 +6,40 @@
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 0
+	defc startup = 16
 	IFNDEF startup
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_PRINTF
+	defc	DEFINED_CLIB_OPT_PRINTF = 1
+	defc CLIB_OPT_PRINTF = 0x200
+	IFNDEF CLIB_OPT_PRINTF
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_PRINTF_2
+	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
+	defc CLIB_OPT_PRINTF_2 = 0
+	IFNDEF CLIB_OPT_PRINTF_2
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_SCANF
+	defc	DEFINED_CLIB_OPT_SCANF = 1
+	defc CLIB_OPT_SCANF = 0x200000
+	IFNDEF CLIB_OPT_SCANF
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_SCANF_2
+	defc	DEFINED_CLIB_OPT_SCANF_2 = 1
+	defc CLIB_OPT_SCANF_2 = 0
+	IFNDEF CLIB_OPT_SCANF_2
 	ENDIF
 ENDIF
 
@@ -20,7 +52,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
    
-   defc startup = 0
+   defc startup = 16
 
 ENDIF
 
@@ -36,12 +68,18 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
    ; yabios asci0 drivers installed on stdin, stdout, stderr
    ; yabios asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
    
-      defc __CRTCFG = 0
+      defc __CRTCFG = 1
    
    ENDIF
    
@@ -56,10 +94,10 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                  yaz180 YABIOS target                     ;;
-;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
+;;                yaz180 application target                  ;;
+;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
-;;                banked 64k address spaces                  ;;
+;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,6 +112,7 @@ include "config_yaz180_public.inc"
 
 include "../crt_defaults.inc"
 include "crt_config.inc"
+include "crt_yabios_def.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; crt rules ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -682,16 +721,6 @@ ENDIF
    ; make the default SP location public
    
    PUBLIC __register_sp
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; Returning to Basic
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ; if non-zero, address called in basic rom to return value in AB
-
-   IFNDEF CRT_ABPASS
-      defc CRT_ABPASS = 0
-   ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
@@ -1736,7 +1765,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "crt_page_zero_yabios.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 
@@ -1824,9 +1853,9 @@ SECTION code_crt_return
 
    ; terminate
    
-   include "../crt_exit_eidi.inc"
-   include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"      
+      include "../crt_exit_eidi.inc"
+      include "../crt_restore_sp.inc"
+      include "../crt_program_exit.inc"      
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1849,12 +1878,6 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 

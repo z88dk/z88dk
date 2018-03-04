@@ -67,16 +67,16 @@ ENDIF
 IF __CRTCFG = 1
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; basic driver model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; application with yabios driver model ;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   defc TAR__crt_org_code              = 0x2900
+   defc TAR__crt_org_code              = 0x0100
    defc TAR__crt_org_data              = 0
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
 
-   defc TAR__register_sp               = -1
+   defc TAR__register_sp               = -0x003B
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
@@ -87,7 +87,7 @@ IF __CRTCFG = 1
    defc TAR__crt_io_vector_base        = -1
 
    defc TAR__crt_interrupt_mode        = -1
-   defc TAR__crt_interrupt_mode_exit   = 1
+   defc TAR__crt_interrupt_mode_exit   = -1
 
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
@@ -127,7 +127,7 @@ IF __CRTCFG = 2
 
    defc TAR__crt_model                 = 0
 
-   defc TAR__register_sp               = -1
+   defc TAR__register_sp               = -0x003B
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1

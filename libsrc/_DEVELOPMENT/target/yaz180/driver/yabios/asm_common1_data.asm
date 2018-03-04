@@ -144,7 +144,7 @@ _ideLock:       defb    $FE             ; mutex for IDE drive
 
 PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
-initString:     defm    CHAR_CR,CHAR_LF,"LoadHex: ",0
+initString:     defm    CHAR_CR,CHAR_LF,"LoadHex::",0
 invalidTypeStr: defm    CHAR_CR,CHAR_LF,"Invalid Type",CHAR_CR,CHAR_LF,0
 badCheckSumStr: defm    CHAR_CR,CHAR_LF,"Checksum Error",CHAR_CR,CHAR_LF,0
 LoadOKStr:      defm    CHAR_CR,CHAR_LF,"Done",CHAR_CR,CHAR_LF,0

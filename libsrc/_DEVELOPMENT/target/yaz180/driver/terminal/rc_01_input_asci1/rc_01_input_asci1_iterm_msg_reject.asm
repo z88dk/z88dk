@@ -3,9 +3,7 @@ SECTION code_driver_terminal_input
 
 PUBLIC rc_01_input_asci1_iterm_msg_reject
 
-EXTERN rc_01_input_basic_iterm_msg_reject
-
-defc rc_01_input_asci1_iterm_msg_reject = rc_01_input_basic_iterm_msg_reject
+rc_01_input_asci1_iterm_msg_reject:
 
    ;   Indicate whether typed character should be rejected.
    ;
@@ -15,3 +13,6 @@ defc rc_01_input_asci1_iterm_msg_reject = rc_01_input_basic_iterm_msg_reject
    
    ; accept all for the moment
    ; put state machine here to eliminate pc keyboard escape sequences
+
+   scf
+   ret

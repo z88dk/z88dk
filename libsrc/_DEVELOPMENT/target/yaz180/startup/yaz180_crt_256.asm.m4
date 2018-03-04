@@ -43,13 +43,11 @@ dnl## input terminals
 dnl
 dnl#include(`driver/terminal/rc_01_input_asci0.m4')
 dnl#include(`driver/terminal/rc_01_input_asci1.m4')
-dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/terminal/rc_01_output_asci0.m4')
 dnl#include(`driver/terminal/rc_01_output_asci1.m4')
-dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl
