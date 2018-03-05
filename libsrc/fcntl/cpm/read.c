@@ -15,7 +15,7 @@
 
 ssize_t read(int fd, void *buf, size_t len)
 {   
-    char    buffer[SECSIZE+2];
+    unsigned char    buffer[SECSIZE+2];
     unsigned char uid;
     struct fcb *fc;
     int    cnt,size,offset;
@@ -24,7 +24,6 @@ ssize_t read(int fd, void *buf, size_t len)
     return -1;
 
     fc = &_fcb[fd];
-
     switch ( fc->use ) {
 #ifdef DEVICES
     case U_RDR:         /* Reader device */
