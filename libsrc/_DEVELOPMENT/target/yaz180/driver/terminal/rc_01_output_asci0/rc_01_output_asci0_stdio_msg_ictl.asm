@@ -3,9 +3,9 @@ SECTION code_driver_terminal_output
 
 PUBLIC rc_01_output_asci0_stdio_msg_ictl
 
-EXTERN rc_01_output_basic_stdio_msg_ictl
+EXTERN asm_vioctl_driver, error_einval_zc
 
-defc rc_01_output_asci0_stdio_msg_ictl = rc_01_output_basic_stdio_msg_ictl
+rc_01_output_asci0_stdio_msg_ictl:
 
    ; ioctl messages understood:
    ;
@@ -23,3 +23,74 @@ defc rc_01_output_asci0_stdio_msg_ictl = rc_01_output_basic_stdio_msg_ictl
    ;         carry set if ioctl rejected
    ;
    ; uses  : af, bc, de, hl
+   
+   ; flag bits managed by stdio?
+   
+   ld a,h
+   or l
+   jr nz, ioctl_message
+
+   call qualify
+   jp asm_vioctl_driver
+
+qualify:
+
+   ; stdio ioctl flags
+   ; de = affected flag bits
+   ;    = accept $0010, $0020, $0100, $0200
+
+   ld a,e
+   or a
+   jr nz, part_2
+
+part_1:
+
+   dec d
+   ret z
+   
+   dec d
+   ret z
+
+reject:
+
+   scf
+   ret
+
+part_2:
+
+   inc d
+   dec d
+   jr nz, reject
+   
+   cp $10
+   ret z
+   
+   cp $20
+   ret z
+   
+   jr reject
+
+ioctl_message:
+
+   ; check that message is specifically for an output terminal
+   
+   ld a,e
+   cp $02                      ; output terminal messages are type $02
+   jp nz, error_einval_zc
+
+   ld a,d
+   cp $06
+   jp nz, error_einval_zc
+
+_ioctl_get_oterm:
+
+   ; return the address of this oterm's FDSTRUCT
+   
+   push ix
+   pop hl
+   
+   dec hl
+   dec hl
+   dec hl
+   
+   ret

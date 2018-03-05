@@ -702,20 +702,6 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
-defc __Z80_VECTOR_BASE_BASIC = 0x2000
-defc __Z180_VECTOR_IL_BASIC = 0x40
-
-
-
-
-
-
-
-
-
-
-
-
 defc __IO_PIO_PORT_A = 0x4000
 defc __IO_PIO_PORT_B = 0x4001
 defc __IO_PIO_PORT_C = 0x4002
