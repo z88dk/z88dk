@@ -202,7 +202,7 @@ __sfr __at __IO_SD_CONTROL IO_SD_CONTROL;
 __sfr __at __IO_SD_STATUS IO_SD_STATUS;
 
 __sfr __at 0xeb IO_EB;
-__sfr __at __IO_SD_DATA IO_SD_DATA
+__sfr __at __IO_SD_DATA IO_SD_DATA;
 
 // io ports - LED
 
