@@ -71,8 +71,8 @@ ENDIF
 IF __CPU_R2K__ | __CPU_R3K__
 	ld	(ix+fp_extra),hl
 ELSE
-	ld	(ix+fp_extra),e
-	ld	(ix+fp_extra+1),d
+	ld	(ix+fp_extra),l
+	ld	(ix+fp_extra+1),h
 ENDIF
 
 IF __CPU_R2K__ | __CPU_R3K__
