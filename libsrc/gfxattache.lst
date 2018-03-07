@@ -1,0 +1,16 @@
+graphics/clg
+graphics/attache/clsgraph
+graphics/clrarea
+graphics/w_clga
+graphics/w_drawb
+graphics/w_undrawb
+graphics/w_xorborder
+graphics/w_putsprite2
+graphics/w_stencil_render2
+graphics/attache/w_plotpixl
+graphics/attache/w_respixl
+graphics/lftscrol
+graphics/attache/swapgfxbk
+graphics/draw_profile
+graphics/attache/div64
+@gfxbasew.lst
