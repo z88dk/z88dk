@@ -49,7 +49,7 @@ define(`__ZXN_FILENAME_MF1', `mf1.rom')
 define(`__ZXN_FILENAME_MF3', `mf3.rom')
 define(`__ZXN_FILENAME_MF128', `mf128.rom')
 
-define(`__ZXN_FILENAME_KEYMAP', `keymap.bin')
+define(`__ZXN_FILENAME_KEYMAP', `__ZXN_DIR_NEXT_DIRECTORY`'keymap.bin')
 
 #
 # END OF USER CONFIGURATION

@@ -3633,7 +3633,7 @@ defc __IO_LED_L = 0x103b
 ; define(`__ZXN_FILENAME_MF3', "mf3.rom")
 ; define(`__ZXN_FILENAME_MF128', "mf128.rom")
 
-; define(`__ZXN_FILENAME_KEYMAP', "keymap.bin")
+; define(`__ZXN_FILENAME_KEYMAP', "/tbblue/keymap.bin")
 
 
 
