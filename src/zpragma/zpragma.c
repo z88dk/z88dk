@@ -250,7 +250,7 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
     uint64_t format_option = 0;
     CONVSPEC *fmt;
 
-    for (complex = 1; c = *arg; ++arg)
+    for (complex = 1; (c = *arg); ++arg)
     {
         if (c == '/')
             break;
@@ -340,16 +340,17 @@ int main(int argc, char **argv)
             if ( ( strncmp(ptr, "output",6) == 0 ) || ( strncmp(ptr, "define",6) == 0 ) || ( strncmp(ptr, "export",6) == 0 ) ) {
                 char *offs;
                 int   value = 0;
-				int   exp = strncmp(ptr, "export", 6) == 0;
+				int   exp = strncmp(ptr, "export",6) == 0;
+
                 ptr = skip_ws(ptr+6);
+                
                 if ( (offs = strchr(ptr+1,'=') ) != NULL  ) {
                     value = (int)strtol(offs+1,NULL,0);
                     *offs = 0;
                 }
                 write_defined(ptr,value,exp);
-
-                if ( strcmp(ptr, "STACKPTR")) {
-                    write_defined(ptr,"REGISTER_SP",exp);                    
+                if ( strncmp(ptr, "STACKPTR",8) == 0 ) {
+                    write_defined("REGISTER_SP",value,exp);                    
                 }
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;

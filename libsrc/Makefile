@@ -556,7 +556,7 @@ cpm_clib.lib:
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORkaypro83 -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/gfxkp83.lst
 	@echo ''
-	@echo '--- Building Otrona Attache' graphics Library ---'
+	@echo '--- Building Otrona Attache graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/gfxattache @$(LISTFILE_DIRECTORY)/gfxattache.lst
