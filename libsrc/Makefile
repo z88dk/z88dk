@@ -555,6 +555,11 @@ cpm_clib.lib:
 	$(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/gfxkp.lst
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORkaypro83 -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/gfxkp83.lst
+	@echo ''
+	@echo '--- Building Otrona Attache' graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/gfxattache @$(LISTFILE_DIRECTORY)/gfxattache.lst
 
 # Sorcerer Exidy lib - Stefano
 sorcerer_clib.lib:
