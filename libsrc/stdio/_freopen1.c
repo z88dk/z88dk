@@ -33,7 +33,8 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         return NULL;
     }
 
-    if (*(unsigned char*)mode++ == '+') {
+    if (*(unsigned char*)mode == '+') {
+        mode++;
         if (access == O_RDONLY) {
             access = O_RDWR;
         } else if (access & O_WRONLY) {

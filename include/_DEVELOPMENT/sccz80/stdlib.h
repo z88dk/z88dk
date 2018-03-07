@@ -230,8 +230,8 @@ extern int __LIB__ atoi(char *buf) __smallc __z88dk_fastcall;
 extern long __LIB__ atol(char *buf) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc;
-extern void __LIB__ bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc __z88dk_callee;
+extern void __LIB__ *bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc;
+extern void __LIB__ *bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc __z88dk_callee;
 #define bsearch(a,b,c,d,e) bsearch_callee(a,b,c,d,e)
 
 

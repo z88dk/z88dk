@@ -5,9 +5,9 @@ SECTION code_driver_terminal_input
 
 PUBLIC rc_01_input_asci1_iterm_msg_interrupt
 
-EXTERN rc_01_input_basic_iterm_msg_interrupt
+EXTERN rc_01_input_asci0_iterm_msg_interrupt
 
-defc rc_01_input_asci1_iterm_msg_interrupt = rc_01_input_basic_iterm_msg_interrupt
+defc rc_01_input_asci1_iterm_msg_interrupt = rc_01_input_asci0_iterm_msg_interrupt
 
    ;   Indicate whether character should interrupt line editing.
    ;

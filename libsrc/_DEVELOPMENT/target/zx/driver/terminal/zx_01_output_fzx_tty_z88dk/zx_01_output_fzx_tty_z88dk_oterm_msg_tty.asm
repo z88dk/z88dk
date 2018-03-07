@@ -51,6 +51,7 @@ zx_01_output_fzx_tty_z88dk_oterm_msg_tty:
    EXTERN zx_01_output_fzx_tty_z88dk_18_flash
    EXTERN zx_01_output_fzx_tty_z88dk_19_bright
    EXTERN zx_01_output_fzx_tty_z88dk_20_inverse
+   EXTERN zx_01_output_fzx_tty_z88dk_21_foreground_attr
    EXTERN zx_01_output_fzx_tty_z88dk_22_at
    EXTERN zx_01_output_fzx_tty_z88dk_23_atr
    EXTERN zx_01_output_char_32_tty_z88dk_27_escape
@@ -81,7 +82,7 @@ action_table:
    defw zx_01_output_fzx_tty_z88dk_18_flash             ; [ 18 = flash 0..1 ]
    defw zx_01_output_fzx_tty_z88dk_19_bright            ; [ 19 = bright 0..1 ]
    defw zx_01_output_fzx_tty_z88dk_20_inverse           ; [ 20 = inverse 0..1 ]
-   defw error_einval_znc
+   defw zx_01_output_fzx_tty_z88dk_21_foreground_attr   ; [ 21 = foreground attr ]
    defw zx_01_output_fzx_tty_z88dk_22_at
    defw zx_01_output_fzx_tty_z88dk_23_atr
    defw error_einval_znc

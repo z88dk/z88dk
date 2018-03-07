@@ -15,6 +15,15 @@ define(`__IO_NEXTREG_DAT', 0x253b)
 # (R) 0x00 (00) => Machine ID
 
 define(`__REG_MACHINE_ID', 0)
+define(`__RMI_DE1A', 1)
+define(`__RMI_DE2A', 2)
+define(`__RMI_FBLABS', 5)
+define(`__RMI_VTRUCCO', 6)
+define(`__RMI_WXEDA', 7)
+define(`__RMI_EMULATORS', 8)
+define(`__RMI_ZXNEXT', 10)      # ZX Spectrum Next
+define(`__RMI_MULTICORE', 11)
+define(`__RMI_ZXNEXT_AB', 250)  # ZX Spectrum Next Anti-brick
 
 # (R) 0x01 (01) => Core Version 
 #  bits 7-4 = Major version number
@@ -70,13 +79,11 @@ define(`__RMT_PENTAGON', 0x04)
 #   bits 5-0 = RAM page mapped in 0x0000-0x3FFF 
 #   (64 x 16k pages = 1024K, Reset to 0 after a PoR or Hard-reset)
 
-define(`__REG_PAGE_RAM', 4)
-define(`__RPR_MASK', 0x3f)
-
-# preferred name is bank for 16k banks
-
-define(`__REG_BANK_RAM', __REG_PAGE_RAM)
-define(`__RBR_MASK', __RPR_MASK)
+define(`__REG_RAM_PAGE', 4)
+define(`__RRP_RAM_DIVMMC', 0x08)    # 0x00
+define(`__RRP_ROM_DIVMMC', 0x04)    # 0x18
+define(`__RRP_ROM_MF', 0x05)        # 0x19
+define(`__RRP_ROM_SPECTRUM', 0x00)  # 0x1c
 
 # (R/W) 0x05 (05) => Peripheral 1 setting:
 #  bits 7-6 = joystick 1 mode 
@@ -159,6 +166,11 @@ define(`__RP3_UNLOCK_7FFD', 0x80)
 
 define(`__REG_SUB_VERSION', 14)
 
+# (W) 0x0F (15) => Video Register
+# An ordered list of video parameters are written during boot
+
+define(`__REG_VIDEO_PARAM', 15)
+
 # (R/W) 0x10 (16) => Anti-brick system (only in ZX Next Board):
 #  bit 7 = (W) If 1 start normal core
 #  bits 6-2 = Reserved, must be 0
@@ -166,9 +178,14 @@ define(`__REG_SUB_VERSION', 14)
 #  bit 0 = (R) Button Multiface (1=pressed)
 
 define(`__REG_ANTI_BRICK', 16)
-define(`__RAB_START_NORMAL_CORE', 0x80)
+define(`__RAB_COMMAND_NORMALCORE', 0x80)
 define(`__RAB_BUTTON_DIVMMC', 0x02)
 define(`__RAB_BUTTON_MULTIFACE', 0x01)
+
+# (W) 0x11 (17) => Video Timing
+# A video timing setting is written during boot
+
+define(`__REG_VIDEO_TIMING', 17)
 
 # (R/W) 0x12 (18) => Layer 2 RAM page
 # bits 7-6 = Reserved, must be 0
@@ -494,9 +511,9 @@ define(`__REG_COPPER_CONTROL_L', 97)
 # (W) 0x62 (98) => Copper control HI bit
 #   bits 7-6 = Start control
 #       00 = Copper fully stoped
-#       01 = Copper start, execute the list from index 0, then loop list from start
-#       10 = Copper start, execute the list, then loop the list from start
-#       11 = Copper start, execute the list and restart the list at each frame
+#       01 = Copper start, execute the list from index 0, and loop to the start
+#       10 = Copper start, execute the list from last point, and loop to the start
+#       11 = Copper start, execute the list from index 0, and restart the list at each frame
 #   bits 2-0 = Copper list index address MSB
 
 define(`__REG_COPPER_CONTROL_H', 98)
@@ -504,6 +521,10 @@ define(`__RCCH_COPPER_STOP', 0x00)
 define(`__RCCH_COPPER_RUN_LOOP_RESET', 0x40)
 define(`__RCCH_COPPER_RUN_LOOP', 0x80)
 define(`__RCCH_COPPER_RUN_VBI', 0xc0)
+
+# (W) 0xFF (255) => Debug LEDs (DE-1, DE-2 am Multicore only)
+
+define(`__REG_DEBUG', 0xff)
 
 #
 # END OF USER CONFIGURATION
@@ -521,6 +542,15 @@ PUBLIC `__IO_NEXTREG_REG'
 PUBLIC `__IO_NEXTREG_DAT'
 
 PUBLIC `__REG_MACHINE_ID'
+PUBLIC `__RMI_DE1A'
+PUBLIC `__RMI_DE2A'
+PUBLIC `__RMI_FBLABS'
+PUBLIC `__RMI_VTRUCCO'
+PUBLIC `__RMI_WXEDA'
+PUBLIC `__RMI_EMULATORS'
+PUBLIC `__RMI_ZXNEXT'
+PUBLIC `__RMI_MULTICORE'
+PUBLIC `__RMI_ZXNEXT_AB'
 
 PUBLIC `__REG_VERSION'
 PUBLIC `__RV_MAJOR'
@@ -543,10 +573,11 @@ PUBLIC `__RMT_128'
 PUBLIC `__RMT_P3E'
 PUBLIC `__RMT_PENTAGON'
 
-PUBLIC `__REG_PAGE_RAM'
-PUBLIC `__RPR_MASK'
-PUBLIC `__REG_BANK_RAM'
-PUBLIC `__RBR_MASK'
+PUBLIC `__REG_RAM_PAGE'
+PUBLIC `__RRP_RAM_DIVMMC'
+PUBLIC `__RRP_ROM_DIVMMC'
+PUBLIC `__RRP_ROM_MF'
+PUBLIC `__RRP_ROM_SPECTRUM'
 
 PUBLIC `__REG_PERIPHERAL_1'
 PUBLIC `__RP1_JOY1_SINCLAIR'
@@ -591,10 +622,14 @@ PUBLIC `__RP3_UNLOCK_7FFD'
 
 PUBLIC `__REG_SUB_VERSION'
 
+PUBLIC `__REG_VIDEO_PARAM'
+
 PUBLIC `__REG_ANTI_BRICK'
-PUBLIC `__RAB_START_NORMAL_CORE'
+PUBLIC `__RAB_COMMAND_NORMALCORE'
 PUBLIC `__RAB_BUTTON_DIVMMC'
 PUBLIC `__RAB_BUTTON_MULTIFACE'
+
+PUBLIC `__REG_VIDEO_TIMING'
 
 PUBLIC `__REG_LAYER_2_RAM_PAGE'
 PUBLIC `__RL2RP_MASK'
@@ -704,6 +739,8 @@ PUBLIC `__RCCH_COPPER_STOP'
 PUBLIC `__RCCH_COPPER_RUN_LOOP_RESET'
 PUBLIC `__RCCH_COPPER_RUN_LOOP'
 PUBLIC `__RCCH_COPPER_RUN_VBI'
+
+PUBLIC `__REG_DEBUG'
 ')
 
 dnl#
@@ -716,6 +753,15 @@ defc `__IO_NEXTREG_REG' = __IO_NEXTREG_REG
 defc `__IO_NEXTREG_DAT' = __IO_NEXTREG_DAT
 
 defc `__REG_MACHINE_ID' = __REG_MACHINE_ID
+defc `__RMI_DE1A' = __RMI_DE1A
+defc `__RMI_DE2A' = __RMI_DE2A
+defc `__RMI_FBLABS' = __RMI_FBLABS
+defc `__RMI_VTRUCCO' = __RMI_VTRUCCO
+defc `__RMI_WXEDA' = __RMI_WXEDA
+defc `__RMI_EMULATORS' = __RMI_EMULATORS
+defc `__RMI_ZXNEXT' = __RMI_ZXNEXT
+defc `__RMI_MULTICORE' = __RMI_MULTICORE
+defc `__RMI_ZXNEXT_AB' = __RMI_ZXNEXT_AB
 
 defc `__REG_VERSION' = __REG_VERSION
 defc `__RV_MAJOR' = __RV_MAJOR
@@ -738,10 +784,11 @@ defc `__RMT_128' = __RMT_128
 defc `__RMT_P3E' = __RMT_P3E
 defc `__RMT_PENTAGON' = __RMT_PENTAGON
 
-defc `__REG_PAGE_RAM' = __REG_PAGE_RAM
-defc `__RPR_MASK' = __RPR_MASK
-defc `__REG_BANK_RAM' = __REG_BANK_RAM
-defc `__RBR_MASK' = __RBR_MASK
+defc `__REG_RAM_PAGE' = __REG_RAM_PAGE
+defc `__RRP_RAM_DIVMMC' = __RRP_RAM_DIVMMC
+defc `__RRP_ROM_DIVMMC' = __RRP_ROM_DIVMMC
+defc `__RRP_ROM_MF' = __RRP_ROM_MF
+defc `__RRP_ROM_SPECTRUM' = __RRP_ROM_SPECTRUM
 
 defc `__REG_PERIPHERAL_1' = __REG_PERIPHERAL_1
 defc `__RP1_JOY1_SINCLAIR' = __RP1_JOY1_SINCLAIR
@@ -786,10 +833,14 @@ defc `__RP3_UNLOCK_7FFD' = __RP3_UNLOCK_7FFD
 
 defc `__REG_SUB_VERSION' = __REG_SUB_VERSION
 
+defc `__REG_VIDEO_PARAM' = __REG_VIDEO_PARAM
+
 defc `__REG_ANTI_BRICK' = __REG_ANTI_BRICK
-defc `__RAB_START_NORMAL_CORE' = __RAB_START_NORMAL_CORE
+defc `__RAB_COMMAND_NORMALCORE' = __RAB_COMMAND_NORMALCORE
 defc `__RAB_BUTTON_DIVMMC' = __RAB_BUTTON_DIVMMC
 defc `__RAB_BUTTON_MULTIFACE' = __RAB_BUTTON_MULTIFACE
+
+defc `__REG_VIDEO_TIMING' = __REG_VIDEO_TIMING
 
 defc `__REG_LAYER_2_RAM_PAGE' = __REG_LAYER_2_RAM_PAGE
 defc `__RL2RP_MASK' = __RL2RP_MASK
@@ -899,6 +950,8 @@ defc `__RCCH_COPPER_STOP' = __RCCH_COPPER_STOP
 defc `__RCCH_COPPER_RUN_LOOP_RESET' = __RCCH_COPPER_RUN_LOOP_RESET
 defc `__RCCH_COPPER_RUN_LOOP' = __RCCH_COPPER_RUN_LOOP
 defc `__RCCH_COPPER_RUN_VBI' = __RCCH_COPPER_RUN_VBI
+
+defc `__REG_DEBUG' = __REG_DEBUG
 ')
 
 dnl#
@@ -911,6 +964,15 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_NEXTREG_DAT'  __IO_NEXTREG_DAT
 
 `#define' `__REG_MACHINE_ID'  __REG_MACHINE_ID
+`#define' `__RMI_DE1A'  __RMI_DE1A
+`#define' `__RMI_DE2A'  __RMI_DE2A
+`#define' `__RMI_FBLABS'  __RMI_FBLABS
+`#define' `__RMI_VTRUCCO'  __RMI_VTRUCCO
+`#define' `__RMI_WXEDA'  __RMI_WXEDA
+`#define' `__RMI_EMULATORS'  __RMI_EMULATORS
+`#define' `__RMI_ZXNEXT'  __RMI_ZXNEXT
+`#define' `__RMI_MULTICORE'  __RMI_MULTICORE
+`#define' `__RMI_ZXNEXT_AB'  __RMI_ZXNEXT_AB
 
 `#define' `__REG_VERSION'  __REG_VERSION
 `#define' `__RV_MAJOR'  __RV_MAJOR
@@ -933,10 +995,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__RMT_P3E'  __RMT_P3E
 `#define' `__RMT_PENTAGON'  __RMT_PENTAGON
 
-`#define' `__REG_PAGE_RAM'  __REG_PAGE_RAM
-`#define' `__RPR_MASK'  __RPR_MASK
-`#define' `__REG_BANK_RAM'  __REG_BANK_RAM
-`#define' `__RBR_MASK'  __RBR_MASK
+`#define' `__REG_RAM_PAGE'  __REG_RAM_PAGE
+`#define' `__RRP_RAM_DIVMMC'  __RRP_RAM_DIVMMC
+`#define' `__RRP_ROM_DIVMMC'  __RRP_ROM_DIVMMC
+`#define' `__RRP_ROM_MF'  __RRP_ROM_MF
+`#define' `__RRP_ROM_SPECTRUM'  __RRP_ROM_SPECTRUM
 
 `#define' `__REG_PERIPHERAL_1'  __REG_PERIPHERAL_1
 `#define' `__RP1_JOY1_SINCLAIR'  __RP1_JOY1_SINCLAIR
@@ -981,10 +1044,14 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__REG_SUB_VERSION'  __REG_SUB_VERSION
 
+`#define' `__REG_VIDEO_PARAM'  __REG_VIDEO_PARAM
+
 `#define' `__REG_ANTI_BRICK'  __REG_ANTI_BRICK
-`#define' `__RAB_START_NORMAL_CORE'  __RAB_START_NORMAL_CORE
+`#define' `__RAB_COMMAND_NORMALCORE'  __RAB_COMMAND_NORMALCORE
 `#define' `__RAB_BUTTON_DIVMMC'  __RAB_BUTTON_DIVMMC
 `#define' `__RAB_BUTTON_MULTIFACE'  __RAB_BUTTON_MULTIFACE
+
+`#define' `__REG_VIDEO_TIMING'  __REG_VIDEO_TIMING
 
 `#define' `__REG_LAYER_2_RAM_PAGE'  __REG_LAYER_2_RAM_PAGE
 `#define' `__RL2RP_MASK'  __RL2RP_MASK
@@ -1094,4 +1161,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__RCCH_COPPER_RUN_LOOP_RESET'  __RCCH_COPPER_RUN_LOOP_RESET
 `#define' `__RCCH_COPPER_RUN_LOOP'  __RCCH_COPPER_RUN_LOOP
 `#define' `__RCCH_COPPER_RUN_VBI'  __RCCH_COPPER_RUN_VBI
+
+`#define' `__REG_DEBUG'  __REG_DEBUG
 ')

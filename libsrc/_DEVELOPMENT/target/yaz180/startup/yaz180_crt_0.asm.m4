@@ -4,7 +4,7 @@ dnl############################################################
 dnl##         YAZ180_CRT_0.ASM.M4 - YABIOS TARGET            ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                  yaz180 YABIOS  target                    ;;
+;;                  yaz180 YABIOS target                     ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
 ;;                banked 64k address spaces                  ;;
@@ -43,13 +43,11 @@ dnl## input terminals
 dnl
 dnl#include(`driver/terminal/rc_01_input_asci0.m4')
 dnl#include(`driver/terminal/rc_01_input_asci1.m4')
-dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/terminal/rc_01_output_asci0.m4')
 dnl#include(`driver/terminal/rc_01_output_asci1.m4')
-dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl
@@ -69,19 +67,22 @@ include(`../clib_instantiate_begin.m4')
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
    include(`driver/terminal/rc_01_input_asci0.m4')
-   m4_rc_01_input_asci0(_stdin, __i_fcntl_fdstruct_0, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
-
-   include(`driver/terminal/rc_01_input_asci1.m4')
-   m4_rc_01_input_asci1(_ttyin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+   m4_rc_01_input_asci0(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
    include(`driver/terminal/rc_01_output_asci0.m4')
    m4_rc_01_output_asci0(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
+   include(`../m4_file_dup.m4')
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+
+   include(`driver/terminal/rc_01_input_asci1.m4')
+   m4_rc_01_input_asci1(_ttyin, __i_fcntl_fdstruct_4, TTY_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+
    include(`driver/terminal/rc_01_output_asci1.m4')
-   m4_rc_01_output_asci1(_ttyout, CRT_OTERM_TERMINAL_FLAGS)
+   m4_rc_01_output_asci1(_ttyout, TTY_OTERM_TERMINAL_FLAGS)
 
    include(`../m4_file_dup.m4')
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_0)
+   m4_file_dup(_ttyerr, 0x80, __i_fcntl_fdstruct_4)
 ',
 `
    include(`crt_driver_instantiation.asm.m4')

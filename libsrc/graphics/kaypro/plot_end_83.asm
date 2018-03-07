@@ -17,14 +17,13 @@
 			
 			ld	c,a
 			srl a
+			;and a
 			ld	b,a	;y/2
 			ld	a,h
 			
 			ld	hl,$3000
-			inc b
-			dec b
-			jr z,az
 			ld  de,128
+			jr z,az
 .yloop		add hl,de
 			djnz yloop
 .az

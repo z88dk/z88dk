@@ -7,22 +7,21 @@
 
 #include <arch.h>
 
-// provide the asci1 input and output stream instantiation
-// note that asci0 is attached to stdin and stdout
-
-extern FILE *linein;
-extern FILE *lineout;
-
 // provide the location for stack pointers to be stored
 
-extern uint16_t *bios_sp;      // yabios SP here when other banks running
-extern uint16_t *bank_sp;      // bank SP storage, in Page0 TCB 0x003B
+extern uint16_t *bios_sp;       // yabios SP here when other banks running
+extern uint16_t *bank_sp;       // bank SP storage, in Page0 TCB 0x003B
 
 // provide the location for important Page 0 bank addresses
 
 extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
 extern uint8_t bank_cmp_default_drive;  // CP/M default drive
 extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
+
+// provide the location of the IO byte based on CP/M
+// only bit 0 distinguished currently with TTY=0 CRT=1.
+
+extern uint8_t bios_ioByte;     // intel I/O byte
 
 // provide the simple mutex locks for hardware resources
 

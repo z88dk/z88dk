@@ -108,6 +108,13 @@ extern unsigned char IO_UART_TX;
 extern unsigned char IO_UART_STATUS;
 extern unsigned char IO_6B;
 extern unsigned char IO_DMA;
+extern unsigned char IO_E7;
+extern unsigned char IO_SD_CONTROL;
+extern unsigned char IO_SD_STATUS;
+extern unsigned char IO_EB;
+extern unsigned char IO_SD_DATA
+extern unsigned char IO_103B;
+extern unsigned char IO_LED_L;
 
 #else
 
@@ -182,6 +189,20 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 
 __sfr __at 0x6b IO_6B;
 __sfr __at __IO_DMA IO_DMA;
+
+// io ports - sd card
+
+__sfr __at 0xe7 IO_E7;
+__sfr __at __IO_SD_CONTROL IO_SD_CONTROL;
+__sfr __at __IO_SD_STATUS IO_SD_STATUS;
+
+__sfr __at 0xeb IO_EB;
+__sfr __at __IO_SD_DATA IO_SD_DATA;
+
+// io ports - LED
+
+__sfr __banked __at 0x103b IO_103B;
+__sfr __banked __at __IO_LED_L IO_LED_L;
 
 #endif
 
@@ -431,6 +452,15 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 // zx next registry
 
 #define REG_MACHINE_ID  __REG_MACHINE_ID
+#define RMI_DE1A  __RMI_DE1A
+#define RMI_DE2A  __RMI_DE2A
+#define RMI_FBLABS  __RMI_FBLABS
+#define RMI_VTRUCCO  __RMI_VTRUCCO
+#define RMI_WXEDA  __RMI_WXEDA
+#define RMI_EMULATORS  __RMI_EMULATORS
+#define RMI_ZXNEXT  __RMI_ZXNEXT
+#define RMI_MULTICORE  __RMI_MULTICORE
+#define RMI_ZXNEXT_AB  __RMI_ZXNEXT_AB
 
 #define REG_VERSION  __REG_VERSION
 #define RV_MAJOR  __RV_MAJOR
@@ -453,11 +483,11 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define RMT_P3E  __RMT_P3E
 #define RMT_PENTAGON  __RMT_PENTAGON
 
-#define REG_PAGE_RAM  __REG_PAGE_RAM
-#define RPR_MASK  __RPR_MASK
-// preferred name is bank for 16k banks
-#define REG_BANK_RAM  __REG_BANK_RAM
-#define RBR_MASK  __RBR_MASK
+#define REG_RAM_PAGE  __REG_RAM_PAGE
+#define RRP_RAM_DIVMMC  __RRP_RAM_DIVMMC
+#define RRP_ROM_DIVMMC  __RRP_ROM_DIVMMC
+#define RRP_ROM_MF  __RRP_ROM_MF
+#define RRP_ROM_SPECTRUM  __RRP_ROM_SPECTRUM
 
 #define REG_PERIPHERAL_1  __REG_PERIPHERAL_1
 #define RP1_JOY1_SINCLAIR  __RP1_JOY1_SINCLAIR
@@ -502,10 +532,14 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 
 #define REG_SUB_VERSION  __REG_SUB_VERSION
 
+#define REG_VIDEO_PARAM  __REG_VIDEO_PARAM
+
 #define REG_ANTI_BRICK  __REG_ANTI_BRICK
-#define RAB_START_NORMAL_CORE  __RAB_START_NORMAL_CORE
+#define RAB_COMMAND_NORMALCORE  __RAB_COMMAND_NORMALCORE
 #define RAB_BUTTON_DIVMMC  __RAB_BUTTON_DIVMMC
 #define RAB_BUTTON_MULTIFACE  __RAB_BUTTON_MULTIFACE
+
+#define REG_VIDEO_TIMING  __REG_VIDEO_TIMING
 
 #define REG_LAYER_2_RAM_PAGE  __REG_LAYER_2_RAM_PAGE
 #define RL2RP_MASK  __RL2RP_MASK
@@ -617,6 +651,28 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define RCCH_COPPER_RUN_LOOP_RESET  __RCCH_COPPER_RUN_LOOP_RESET
 #define RCCH_COPPER_RUN_LOOP  __RCCH_COPPER_RUN_LOOP
 #define RCCH_COPPER_RUN_VBI  __RCCH_COPPER_RUN_VBI
+
+#define REG_DEBUG  __REG_DEBUG
+
+// important filenames
+
+#define ZXN_FILENAME_NEXT_UPDATE_FILE  __ZXN_FILENAME_NEXT_UPDATE_FILE
+#define ZXN_FILENAME_NEXT_UPDATE_FILE_2  __ZXN_FILENAME_NEXT_UPDATE_FILE_2
+
+#define ZXN_FILENAME_NEXT_FIRMWARE_FILE  __ZXN_FILENAME_NEXT_FIRMWARE_FILE
+#define ZXN_FILENAME_NEXT_FIRMWARE_FILE_2  __ZXN_FILENAME_NEXT_FIRMWARE_FILE_2
+
+#define ZXN_DIR_NEXT_DIRECTORY  __ZXN_DIR_NEXT_DIRECTORY
+
+#define ZXN_FILENAME_CONFIG  __ZXN_FILENAME_CONFIG
+#define ZXN_FILENAME_TIMING  __ZXN_FILENAME_TIMING
+
+#define ZXN_FILENAME_ESXMMC  __ZXN_FILENAME_ESXMMC
+#define ZXN_FILENAME_MF1  __ZXN_FILENAME_MF1
+#define ZXN_FILENAME_MF3  __ZXN_FILENAME_MF3
+#define ZXN_FILENAME_MF128  __ZXN_FILENAME_MF128
+
+#define ZXN_FILENAME_KEYMAP  __ZXN_FILENAME_KEYMAP
 
 ///////////////////////////////////////////////////////////////
 

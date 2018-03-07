@@ -3,9 +3,9 @@ SECTION code_driver_terminal_output
 
 PUBLIC rc_01_output_asci1_stdio_msg_ictl
 
-EXTERN rc_01_output_basic_stdio_msg_ictl
+EXTERN rc_01_output_asci0_stdio_msg_ictl
 
-defc rc_01_output_asci1_stdio_msg_ictl = rc_01_output_basic_stdio_msg_ictl
+defc rc_01_output_asci1_stdio_msg_ictl = rc_01_output_asci0_stdio_msg_ictl
 
    ; ioctl messages understood:
    ;

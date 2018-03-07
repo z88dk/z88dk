@@ -10,25 +10,33 @@ zx_01_output_fzx_tty_z88dk_22_at:
    
    ; de = parameters *
 
-   ex de,hl
+   ld l,0
    
-   ld e,(hl)                   ; e = y coord
-   dec e
-   inc hl
-   ld l,(hl)                   ; l = x coord
-   dec l
+do_y:
 
-   xor a
+   ld a,(de)                   ; biased y
+   inc de
    
-   ld d,a
-   ld h,a
+   inc a
+   jr z, do_x                  ; skip if -1 (means x=254 not allowed)
    
-   ld (ix+35),l
-   ld (ix+36),h                ; set x coord
+   dec a
+   dec a
    
-   ex de,hl
+   ld (ix+37),a                ; set y
+   ld (ix+38),l
    
-   ld (ix+37),l
-   ld (ix+38),h                ; set y coord
+do_x:
+
+   ld a,(de)                   ; biased x
+   
+   inc a
+   ret z                       ; skip if -1 (means y=254 not allowed)
+   
+   dec a
+   dec a
+   
+   ld (ix+35),a                ; set x
+   ld (ix+36),l
    
    ret

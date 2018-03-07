@@ -100,6 +100,11 @@ APUStatus:              defb    0
 APUError:               defb    0
 _APULock:               defb    $FE             ; mutex for APU
 
+; currently active console interface, only bit 0 is distinguished currently with TTY=0 CRT=1.
+PUBLIC  _bios_ioByte
+
+_bios_ioByte:   defb    0               ; intel I/O byte
+
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, _asci0RxLock
 
 asci0RxCount:   defb    0               ; Space for Rx Buffer Management 
@@ -139,7 +144,7 @@ _ideLock:       defb    $FE             ; mutex for IDE drive
 
 PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
-initString:     defm    CHAR_CR,CHAR_LF,"LoadHex: ",0
+initString:     defm    CHAR_CR,CHAR_LF,"LoadHex::",0
 invalidTypeStr: defm    CHAR_CR,CHAR_LF,"Invalid Type",CHAR_CR,CHAR_LF,0
 badCheckSumStr: defm    CHAR_CR,CHAR_LF,"Checksum Error",CHAR_CR,CHAR_LF,0
 LoadOKStr:      defm    CHAR_CR,CHAR_LF,"Done",CHAR_CR,CHAR_LF,0

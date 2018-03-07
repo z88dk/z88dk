@@ -543,7 +543,11 @@ cpm_clib.lib:
 	@echo ''
 	$(call buildgeneric,cpm)
 	$(MAKE) -C fcntl/cpm
-	TARGET=cpm TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library ---'
+	@echo ''
+	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
 	@echo ''
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''
@@ -699,7 +703,7 @@ msx_clib.lib:
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx TARGET=msx
 	$(MAKE) -C psg
-	TARGET=msx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
+	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
 mtx_clib.lib:

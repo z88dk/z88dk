@@ -745,302 +745,6 @@
 
 
 
-#define __LAYER2_COLOR_MONO_BLACK  0x00
-#define __LAYER2_COLOR_MONO_GREY_0  0x00
-#define __LAYER2_COLOR_MONO_GREY_1  0x49
-#define __LAYER2_COLOR_MONO_GREY_2  0x92
-#define __LAYER2_COLOR_MONO_GREY_3  0xff
-#define __LAYER2_COLOR_MONO_WHITE  0xff
-
-#define __LAYER2_COLOR_AMBER_0  0x00
-#define __LAYER2_COLOR_AMBER_1  0x20
-#define __LAYER2_COLOR_AMBER_2  0x44
-#define __LAYER2_COLOR_AMBER_3  0x64
-#define __LAYER2_COLOR_AMBER_4  0x88
-#define __LAYER2_COLOR_AMBER_5  0xa8
-#define __LAYER2_COLOR_AMBER_6  0xcc
-#define __LAYER2_COLOR_AMBER_7  0xec
-
-#define __LAYER2_COLOR_GREEN_0  0x00
-#define __LAYER2_COLOR_GREEN_1  0x04
-#define __LAYER2_COLOR_GREEN_2  0x08
-#define __LAYER2_COLOR_GREEN_3  0x0c
-#define __LAYER2_COLOR_GREEN_4  0x10
-#define __LAYER2_COLOR_GREEN_5  0x14
-#define __LAYER2_COLOR_GREEN_6  0x18
-#define __LAYER2_COLOR_GREEN_7  0x1c
-
-#define __LAYER2_COLOR_RB_RED  0xe0
-#define __LAYER2_COLOR_RB_ORANGE  0xec
-#define __LAYER2_COLOR_RB_YELLOW  0xfc
-#define __LAYER2_COLOR_RB_GREEN  0x1c
-#define __LAYER2_COLOR_RB_BLUE  0x03
-#define __LAYER2_COLOR_RB_VIOLET  0x42
-#define __LAYER2_COLOR_RB_INDIGO  0x83
-
-#define __LAYER2_COLOR_ZX_BLACK  0x00
-#define __LAYER2_COLOR_ZX_BLUE  0x02
-#define __LAYER2_COLOR_ZX_RED  0xc0
-#define __LAYER2_COLOR_ZX_MAGENTA  0xc3
-#define __LAYER2_COLOR_ZX_GREEN  0x18
-#define __LAYER2_COLOR_ZX_CYAN  0x1b
-#define __LAYER2_COLOR_ZX_YELLOW  0xd8
-#define __LAYER2_COLOR_ZX_WHITE  0xdb
-#define __LAYER2_COLOR_ZX_BRIGHT_BLACK  0x00
-#define __LAYER2_COLOR_ZX_BRIGHT_BLUE  0x03
-#define __LAYER2_COLOR_ZX_BRIGHT_RED  0xe0
-#define __LAYER2_COLOR_ZX_BRIGHT_MAGENTA  0xe3
-#define __LAYER2_COLOR_ZX_BRIGHT_GREEN  0x1c
-#define __LAYER2_COLOR_ZX_BRIGHT_CYAN  0x1f
-#define __LAYER2_COLOR_ZX_BRIGHT_YELLOW  0xfc
-#define __LAYER2_COLOR_ZX_BRIGHT_WHITE  0xff
-
-#define __LAYER2_COLOR_ZXNR_NAVY  0x01
-#define __LAYER2_COLOR_ZXNR_MAROON  0x40
-#define __LAYER2_COLOR_ZXNR_INDIGO  0x41
-#define __LAYER2_COLOR_ZXNR_RACING_GREEN  0x08
-#define __LAYER2_COLOR_ZXNR_SHERPA_BLUE  0x09
-#define __LAYER2_COLOR_ZXNR_OLIVE  0x48
-#define __LAYER2_COLOR_ZXNR_BLACK  0x00
-#define __LAYER2_COLOR_ZXNR_MIDNIGHT_BLUE  0x02
-#define __LAYER2_COLOR_ZXNR_DARK_RED  0x80
-#define __LAYER2_COLOR_ZXNR_DARK_VIOLET  0x82
-#define __LAYER2_COLOR_ZXNR_ISLAMIC_GREEN  0x10
-#define __LAYER2_COLOR_ZXNR_BONDI_BLUE  0x12
-#define __LAYER2_COLOR_ZXNR_BRIGHT_OLIVE  0x90
-#define __LAYER2_COLOR_ZXNR_GUNPOWDER_GRAY  0x49
-#define __LAYER2_COLOR_ZXNR_BLUE  0x03
-#define __LAYER2_COLOR_ZXNR_RED  0xe0
-#define __LAYER2_COLOR_ZXNR_MAGENTA  0xe7
-#define __LAYER2_COLOR_ZXNR_GREEN  0x1c
-#define __LAYER2_COLOR_ZXNR_AQUA  0x1f
-#define __LAYER2_COLOR_ZXNR_YELLOW  0xfc
-#define __LAYER2_COLOR_ZXNR_MIST_GRAY  0xb6
-#define __LAYER2_COLOR_ZXNR_SLATE_BLUE  0x6f
-#define __LAYER2_COLOR_ZXNR_BITTERSWEET  0xed
-#define __LAYER2_COLOR_ZXNR_ULTRA_PINK  0xef
-#define __LAYER2_COLOR_ZXNR_SCREAMING_GREEN  0x7d
-#define __LAYER2_COLOR_ZXNR_ELECTRIC_BLUE  0x9f
-#define __LAYER2_COLOR_ZXNR_LASER_LEMON  0xfd
-#define __LAYER2_COLOR_ZXNR_WHITE  0xff
-#define __LAYER2_COLOR_ZXNR_LAVENDER_BLUE  0xb7
-#define __LAYER2_COLOR_ZXNR_MELON  0xf6
-#define __LAYER2_COLOR_ZXNR_LAVENDER_ROSE  0xf7
-#define __LAYER2_COLOR_ZXNR_MINT_GREEN  0xbe
-#define __LAYER2_COLOR_ZXNR_COLUMBIA_BLUE  0xbf
-#define __LAYER2_COLOR_ZXNR_CANARY  0xfe
-
-#define __LAYER2_COLOR_C64_BLACK  0x00
-#define __LAYER2_COLOR_C64_WHITE  0xff
-#define __LAYER2_COLOR_C64_RED  0x84
-#define __LAYER2_COLOR_C64_CYAN  0x77
-#define __LAYER2_COLOR_C64_VIOLET  0x8a
-#define __LAYER2_COLOR_C64_GREEN  0x75
-#define __LAYER2_COLOR_C64_BLUE  0x26
-#define __LAYER2_COLOR_C64_YELLOW  0xd9
-#define __LAYER2_COLOR_C64_ORANGE  0x88
-#define __LAYER2_COLOR_C64_BROWN  0x48
-#define __LAYER2_COLOR_C64_LIGHTRED  0xad
-#define __LAYER2_COLOR_C64_GREY1  0x49
-#define __LAYER2_COLOR_C64_GREY2  0x92
-#define __LAYER2_COLOR_C64_LIGHTGREEN  0xbe
-#define __LAYER2_COLOR_C64_LIGHTBLUE  0x6f
-#define __LAYER2_COLOR_C64_GREY3  0xb6
-
-#define __LAYER2_COLOR_G1_BLACK  0x00
-#define __LAYER2_COLOR_G1_GREY  0x6d
-#define __LAYER2_COLOR_G1_SILVER  0xb6
-#define __LAYER2_COLOR_G1_DARK_TEAL  0x0e
-#define __LAYER2_COLOR_G1_GREEN  0x14
-#define __LAYER2_COLOR_G1_GREENYELLOW  0x9c
-#define __LAYER2_COLOR_G1_MAROON  0x60
-#define __LAYER2_COLOR_G1_SIENNA  0xa8
-#define __LAYER2_COLOR_G1_SANDYBROWN  0xf0
-#define __LAYER2_COLOR_G1_KHAKI  0xfd
-#define __LAYER2_COLOR_G1_WHITE  0xff
-#define __LAYER2_COLOR_G1_SKYBLUE  0x9b
-#define __LAYER2_COLOR_G1_SLATEBLUE  0x4f
-#define __LAYER2_COLOR_G1_BLUE  0x02
-
-#define __LAYER2_COLOR_STD_DARK_BLUE  0x02
-#define __LAYER2_COLOR_STD_BRIGHT_BLUE  0xdb
-#define __LAYER2_COLOR_STD_BLUE  0x03
-#define __LAYER2_COLOR_STD_CYAN  0x1f
-#define __LAYER2_COLOR_STD_BRIGHT_YELLOW  0xf9
-#define __LAYER2_COLOR_STD_YELLOW  0xfc
-#define __LAYER2_COLOR_STD_ORANGE  0xf1
-#define __LAYER2_COLOR_STD_BRIGHT_RED  0xe9
-#define __LAYER2_COLOR_STD_RED  0xe0
-#define __LAYER2_COLOR_STD_DARK_RED  0x80
-#define __LAYER2_COLOR_STD_MAGENTA  0xe3
-#define __LAYER2_COLOR_STD_BRIGHT_GREEN  0x9e
-#define __LAYER2_COLOR_STD_GREEN  0x1c
-#define __LAYER2_COLOR_STD_DARK_GREEN  0x10
-#define __LAYER2_COLOR_STD_BRIGHT_GREY  0x49
-#define __LAYER2_COLOR_STD_LIGHT_GREY  0x6d
-#define __LAYER2_COLOR_STD_GREY  0x24
-#define __LAYER2_COLOR_STD_WHITE  0xff
-#define __LAYER2_COLOR_STD_BLACK  0x00
-
-#define __LAYER2_COLOR_HTML_Black  0x00
-#define __LAYER2_COLOR_HTML_Navy  0x02
-#define __LAYER2_COLOR_HTML_DarkBlue  0x02
-#define __LAYER2_COLOR_HTML_MediumBlue  0x03
-#define __LAYER2_COLOR_HTML_Blue  0x03
-#define __LAYER2_COLOR_HTML_DarkGreen  0x0c
-#define __LAYER2_COLOR_HTML_Green  0x10
-#define __LAYER2_COLOR_HTML_Teal  0x12
-#define __LAYER2_COLOR_HTML_DarkCyan  0x12
-#define __LAYER2_COLOR_HTML_DeepSkyBlue  0x17
-#define __LAYER2_COLOR_HTML_DarkTurquoise  0x1b
-#define __LAYER2_COLOR_HTML_MediumSpringGreen  0x1e
-#define __LAYER2_COLOR_HTML_Lime  0x1c
-#define __LAYER2_COLOR_HTML_SpringGreen  0x1d
-#define __LAYER2_COLOR_HTML_Aqua  0x1f
-#define __LAYER2_COLOR_HTML_Cyan  0x1f
-#define __LAYER2_COLOR_HTML_MidnightBlue  0x01
-#define __LAYER2_COLOR_HTML_DodgerBlue  0x13
-#define __LAYER2_COLOR_HTML_LightSeaGreen  0x36
-#define __LAYER2_COLOR_HTML_ForestGreen  0x30
-#define __LAYER2_COLOR_HTML_SeaGreen  0x31
-#define __LAYER2_COLOR_HTML_DarkSlateGray  0x29
-#define __LAYER2_COLOR_HTML_DarkSlateGrey  0x29
-#define __LAYER2_COLOR_HTML_LimeGreen  0x38
-#define __LAYER2_COLOR_HTML_MediumSeaGreen  0x35
-#define __LAYER2_COLOR_HTML_Turquoise  0x5f
-#define __LAYER2_COLOR_HTML_RoyalBlue  0x4f
-#define __LAYER2_COLOR_HTML_SteelBlue  0x52
-#define __LAYER2_COLOR_HTML_DarkSlateBlue  0x46
-#define __LAYER2_COLOR_HTML_MediumTurquoise  0x5b
-#define __LAYER2_COLOR_HTML_Indigo  0x42
-#define __LAYER2_COLOR_HTML_DarkOliveGreen  0x4c
-#define __LAYER2_COLOR_HTML_CadetBlue  0x52
-#define __LAYER2_COLOR_HTML_CornflowerBlue  0x73
-#define __LAYER2_COLOR_HTML_RebeccaPurple  0x66
-#define __LAYER2_COLOR_HTML_MediumAquaMarine  0x7a
-#define __LAYER2_COLOR_HTML_DimGray  0x6d
-#define __LAYER2_COLOR_HTML_DimGrey  0x6d
-#define __LAYER2_COLOR_HTML_SlateBlue  0x6b
-#define __LAYER2_COLOR_HTML_OliveDrab  0x70
-#define __LAYER2_COLOR_HTML_SlateGray  0x72
-#define __LAYER2_COLOR_HTML_SlateGrey  0x72
-#define __LAYER2_COLOR_HTML_LightSlateGray  0x72
-#define __LAYER2_COLOR_HTML_LightSlateGrey  0x72
-#define __LAYER2_COLOR_HTML_MediumSlateBlue  0x6f
-#define __LAYER2_COLOR_HTML_LawnGreen  0x7c
-#define __LAYER2_COLOR_HTML_Chartreuse  0x7c
-#define __LAYER2_COLOR_HTML_Aquamarine  0x7f
-#define __LAYER2_COLOR_HTML_Maroon  0x80
-#define __LAYER2_COLOR_HTML_Purple  0x82
-#define __LAYER2_COLOR_HTML_Olive  0x90
-#define __LAYER2_COLOR_HTML_Gray  0x92
-#define __LAYER2_COLOR_HTML_Grey  0x92
-#define __LAYER2_COLOR_HTML_SkyBlue  0x9b
-#define __LAYER2_COLOR_HTML_LightSkyBlue  0x9b
-#define __LAYER2_COLOR_HTML_BlueViolet  0x87
-#define __LAYER2_COLOR_HTML_DarkRed  0x80
-#define __LAYER2_COLOR_HTML_DarkMagenta  0x82
-#define __LAYER2_COLOR_HTML_SaddleBrown  0x88
-#define __LAYER2_COLOR_HTML_DarkSeaGreen  0x96
-#define __LAYER2_COLOR_HTML_LightGreen  0x9e
-#define __LAYER2_COLOR_HTML_MediumPurple  0x8f
-#define __LAYER2_COLOR_HTML_DarkViolet  0x83
-#define __LAYER2_COLOR_HTML_PaleGreen  0x9e
-#define __LAYER2_COLOR_HTML_DarkOrchid  0x87
-#define __LAYER2_COLOR_HTML_YellowGreen  0x98
-#define __LAYER2_COLOR_HTML_Sienna  0xa8
-#define __LAYER2_COLOR_HTML_Brown  0xa4
-#define __LAYER2_COLOR_HTML_DarkGray  0xb6
-#define __LAYER2_COLOR_HTML_DarkGrey  0xb6
-#define __LAYER2_COLOR_HTML_LightBlue  0xbb
-#define __LAYER2_COLOR_HTML_GreenYellow  0xbc
-#define __LAYER2_COLOR_HTML_PaleTurquoise  0xbf
-#define __LAYER2_COLOR_HTML_LightSteelBlue  0xbb
-#define __LAYER2_COLOR_HTML_PowderBlue  0xbf
-#define __LAYER2_COLOR_HTML_FireBrick  0xa4
-#define __LAYER2_COLOR_HTML_DarkGoldenRod  0xb0
-#define __LAYER2_COLOR_HTML_MediumOrchid  0xab
-#define __LAYER2_COLOR_HTML_RosyBrown  0xb2
-#define __LAYER2_COLOR_HTML_DarkKhaki  0xb5
-#define __LAYER2_COLOR_HTML_Silver  0xdb
-#define __LAYER2_COLOR_HTML_MediumVioletRed  0xc2
-#define __LAYER2_COLOR_HTML_IndianRed  0xc9
-#define __LAYER2_COLOR_HTML_Peru  0xd0
-#define __LAYER2_COLOR_HTML_Chocolate  0xcc
-#define __LAYER2_COLOR_HTML_Tan  0xd6
-#define __LAYER2_COLOR_HTML_LightGray  0xdb
-#define __LAYER2_COLOR_HTML_LightGrey  0xdb
-#define __LAYER2_COLOR_HTML_Thistle  0xd7
-#define __LAYER2_COLOR_HTML_Orchid  0xcf
-#define __LAYER2_COLOR_HTML_GoldenRod  0xd4
-#define __LAYER2_COLOR_HTML_PaleVioletRed  0xce
-#define __LAYER2_COLOR_HTML_Crimson  0xc0
-#define __LAYER2_COLOR_HTML_Gainsboro  0xdb
-#define __LAYER2_COLOR_HTML_Plum  0xd7
-#define __LAYER2_COLOR_HTML_BurlyWood  0xd6
-#define __LAYER2_COLOR_HTML_LightCyan  0xff
-#define __LAYER2_COLOR_HTML_Lavender  0xff
-#define __LAYER2_COLOR_HTML_DarkSalmon  0xf1
-#define __LAYER2_COLOR_HTML_Violet  0xf3
-#define __LAYER2_COLOR_HTML_PaleGoldenRod  0xfe
-#define __LAYER2_COLOR_HTML_LightCoral  0xf2
-#define __LAYER2_COLOR_HTML_Khaki  0xfe
-#define __LAYER2_COLOR_HTML_AliceBlue  0xff
-#define __LAYER2_COLOR_HTML_HoneyDew  0xff
-#define __LAYER2_COLOR_HTML_Azure  0xff
-#define __LAYER2_COLOR_HTML_SandyBrown  0xf5
-#define __LAYER2_COLOR_HTML_Wheat  0xfa
-#define __LAYER2_COLOR_HTML_Beige  0xff
-#define __LAYER2_COLOR_HTML_WhiteSmoke  0xff
-#define __LAYER2_COLOR_HTML_MintCream  0xff
-#define __LAYER2_COLOR_HTML_GhostWhite  0xff
-#define __LAYER2_COLOR_HTML_Salmon  0xf1
-#define __LAYER2_COLOR_HTML_AntiqueWhite  0xff
-#define __LAYER2_COLOR_HTML_Linen  0xff
-#define __LAYER2_COLOR_HTML_LightGoldenRodYellow  0xff
-#define __LAYER2_COLOR_HTML_OldLace  0xff
-#define __LAYER2_COLOR_HTML_Red  0xe0
-#define __LAYER2_COLOR_HTML_Fuchsia  0xe3
-#define __LAYER2_COLOR_HTML_Magenta  0xe3
-#define __LAYER2_COLOR_HTML_DeepPink  0xe2
-#define __LAYER2_COLOR_HTML_OrangeRed  0xe8
-#define __LAYER2_COLOR_HTML_Tomato  0xed
-#define __LAYER2_COLOR_HTML_HotPink  0xee
-#define __LAYER2_COLOR_HTML_Coral  0xed
-#define __LAYER2_COLOR_HTML_DarkOrange  0xf0
-#define __LAYER2_COLOR_HTML_LightSalmon  0xf5
-#define __LAYER2_COLOR_HTML_Orange  0xf4
-#define __LAYER2_COLOR_HTML_LightPink  0xf7
-#define __LAYER2_COLOR_HTML_Pink  0xfb
-#define __LAYER2_COLOR_HTML_Gold  0xf8
-#define __LAYER2_COLOR_HTML_PeachPuff  0xfa
-#define __LAYER2_COLOR_HTML_NavajoWhite  0xfa
-#define __LAYER2_COLOR_HTML_Moccasin  0xfe
-#define __LAYER2_COLOR_HTML_Bisque  0xff
-#define __LAYER2_COLOR_HTML_MistyRose  0xff
-#define __LAYER2_COLOR_HTML_BlanchedAlmond  0xff
-#define __LAYER2_COLOR_HTML_PapayaWhip  0xff
-#define __LAYER2_COLOR_HTML_LavenderBlush  0xff
-#define __LAYER2_COLOR_HTML_SeaShell  0xff
-#define __LAYER2_COLOR_HTML_Cornsilk  0xff
-#define __LAYER2_COLOR_HTML_LemonChiffon  0xff
-#define __LAYER2_COLOR_HTML_FloralWhite  0xff
-#define __LAYER2_COLOR_HTML_Snow  0xff
-#define __LAYER2_COLOR_HTML_Yellow  0xfc
-#define __LAYER2_COLOR_HTML_LightYellow  0xff
-#define __LAYER2_COLOR_HTML_Ivory  0xff
-#define __LAYER2_COLOR_HTML_White  0xff
-
-
-
-
-
-
-
-
-
-
-
 
 #define __IO_DAC_L0  0x0f
 #define __IO_DAC_L1  0x1f
@@ -1085,6 +789,938 @@
 
 #define __IO_AY_REG  0xfffd
 #define __IO_AY_DAT  0xbffd
+
+
+
+
+
+
+
+
+
+
+
+
+#define __ZXN_RGB332_RED_0  0x20
+#define __ZXN_RGB332_RED_1  0x40
+#define __ZXN_RGB332_RED_2  0x60
+#define __ZXN_RGB332_RED_3  0x80
+#define __ZXN_RGB332_RED_4  0xa0
+#define __ZXN_RGB332_RED_5  0xc0
+#define __ZXN_RGB332_RED_6  0xe0
+
+#define __ZXN_RGB333_RED_0  0x040
+#define __ZXN_RGB333_RED_1  0x080
+#define __ZXN_RGB333_RED_2  0x0c0
+#define __ZXN_RGB333_RED_3  0x100
+#define __ZXN_RGB333_RED_4  0x140
+#define __ZXN_RGB333_RED_5  0x180
+#define __ZXN_RGB333_RED_6  0x1c0
+
+#define __ZXN_RGB332_GREEN_0  0x04
+#define __ZXN_RGB332_GREEN_1  0x08
+#define __ZXN_RGB332_GREEN_2  0x0c
+#define __ZXN_RGB332_GREEN_3  0x10
+#define __ZXN_RGB332_GREEN_4  0x14
+#define __ZXN_RGB332_GREEN_5  0x18
+#define __ZXN_RGB332_GREEN_6  0x1c
+
+#define __ZXN_RGB333_GREEN_0  0x008
+#define __ZXN_RGB333_GREEN_1  0x010
+#define __ZXN_RGB333_GREEN_2  0x018
+#define __ZXN_RGB333_GREEN_3  0x020
+#define __ZXN_RGB333_GREEN_4  0x028
+#define __ZXN_RGB333_GREEN_5  0x030
+#define __ZXN_RGB333_GREEN_6  0x038
+
+#define __ZXN_RGB332_BLUE_0  0x01
+#define __ZXN_RGB332_BLUE_1  0x02
+#define __ZXN_RGB332_BLUE_2  0x03
+
+#define __ZXN_RGB333_BLUE_0  0x001
+#define __ZXN_RGB333_BLUE_1  0x002
+#define __ZXN_RGB333_BLUE_2  0x003
+#define __ZXN_RGB333_BLUE_3  0x004
+#define __ZXN_RGB333_BLUE_4  0x005
+#define __ZXN_RGB333_BLUE_5  0x006
+#define __ZXN_RGB333_BLUE_6  0x007
+
+#define __ZXN_RGB332_YELLOW_0  0x24
+#define __ZXN_RGB332_YELLOW_1  0x48
+#define __ZXN_RGB332_YELLOW_2  0x6c
+#define __ZXN_RGB332_YELLOW_3  0x90
+#define __ZXN_RGB332_YELLOW_4  0xb4
+#define __ZXN_RGB332_YELLOW_5  0xd8
+#define __ZXN_RGB332_YELLOW_6  0xfc
+
+#define __ZXN_RGB333_YELLOW_0  0x048
+#define __ZXN_RGB333_YELLOW_1  0x090
+#define __ZXN_RGB333_YELLOW_2  0x0d8
+#define __ZXN_RGB333_YELLOW_3  0x120
+#define __ZXN_RGB333_YELLOW_4  0x168
+#define __ZXN_RGB333_YELLOW_5  0x1b0
+#define __ZXN_RGB333_YELLOW_6  0x1f8
+
+#define __ZXN_RGB332_MAGENTA_0  0x41
+#define __ZXN_RGB332_MAGENTA_1  0xa2
+#define __ZXN_RGB332_MAGENTA_2  0xe3
+
+#define __ZXN_RGB333_MAGENTA_0  0x041
+#define __ZXN_RGB333_MAGENTA_1  0x082
+#define __ZXN_RGB333_MAGENTA_2  0x0c3
+#define __ZXN_RGB333_MAGENTA_3  0x104
+#define __ZXN_RGB333_MAGENTA_4  0x145
+#define __ZXN_RGB333_MAGENTA_5  0x186
+#define __ZXN_RGB333_MAGENTA_6  0x1c7
+
+#define __ZXN_RGB332_CYAN_0  0x09
+#define __ZXN_RGB332_CYAN_1  0x16
+#define __ZXN_RGB332_CYAN_2  0x1f
+
+#define __ZXN_RGB333_CYAN_0  0x009
+#define __ZXN_RGB333_CYAN_1  0x012
+#define __ZXN_RGB333_CYAN_2  0x01b
+#define __ZXN_RGB333_CYAN_3  0x024
+#define __ZXN_RGB333_CYAN_4  0x02d
+#define __ZXN_RGB333_CYAN_5  0x036
+#define __ZXN_RGB333_CYAN_6  0x03f
+
+#define __ZXN_RGB332_MONO_GRAY_0  0x00
+#define __ZXN_RGB332_MONO_GRAY_1  0x49
+#define __ZXN_RGB332_MONO_GRAY_2  0x92
+#define __ZXN_RGB332_MONO_GRAY_3  0xff
+
+#define __ZXN_RGB333_MONO_GRAY_0  0x000
+#define __ZXN_RGB333_MONO_GRAY_1  0x049
+#define __ZXN_RGB333_MONO_GRAY_2  0x092
+#define __ZXN_RGB333_MONO_GRAY_3  0x0db
+#define __ZXN_RGB333_MONO_GRAY_4  0x124
+#define __ZXN_RGB333_MONO_GRAY_5  0x16d
+#define __ZXN_RGB333_MONO_GRAY_6  0x1b6
+#define __ZXN_RGB333_MONO_GRAY_7  0x1ff
+
+#define __ZXN_RGB332_AMBER_0  0x20
+#define __ZXN_RGB332_AMBER_1  0x44
+#define __ZXN_RGB332_AMBER_2  0x64
+#define __ZXN_RGB332_AMBER_3  0x88
+#define __ZXN_RGB332_AMBER_4  0xa8
+#define __ZXN_RGB332_AMBER_5  0xcc
+#define __ZXN_RGB332_AMBER_6  0xec
+
+#define __ZXN_RGB333_AMBER_0  0x0d0
+#define __ZXN_RGB333_AMBER_1  0x118
+#define __ZXN_RGB333_AMBER_2  0x1a0
+#define __ZXN_RGB333_AMBER_3  0x1ab
+#define __ZXN_RGB333_AMBER_4  0x1fc
+#define __ZXN_RGB333_AMBER_5  0x1fe
+
+#define __ZXN_RGB332_SKINC_0  0xff
+#define __ZXN_RGB332_SKINC_1  0xfa
+#define __ZXN_RGB332_SKINC_2  0xfa
+#define __ZXN_RGB332_SKINC_3  0xf6
+#define __ZXN_RGB332_SKINC_4  0xfe
+
+#define __ZXN_RGB333_SKINC_0  0x1fe
+#define __ZXN_RGB333_SKINC_1  0x1f5
+#define __ZXN_RGB333_SKINC_2  0x1f4
+#define __ZXN_RGB333_SKINC_3  0x1eb
+#define __ZXN_RGB333_SKINC_4  0x1fd
+
+#define __ZXN_RGB332_SKINT_0  0x8d
+#define __ZXN_RGB332_SKINT_1  0xd1
+#define __ZXN_RGB332_SKINT_2  0xf6
+#define __ZXN_RGB332_SKINT_3  0xfa
+#define __ZXN_RGB332_SKINT_4  0xff
+
+#define __ZXN_RGB333_SKINT_0  0x119
+#define __ZXN_RGB333_SKINT_1  0x1a2
+#define __ZXN_RGB333_SKINT_2  0x1eb
+#define __ZXN_RGB333_SKINT_3  0x1f4
+#define __ZXN_RGB333_SKINT_4  0x1fd
+
+#define __ZXN_RGB332_SKINL_0  0xfb
+#define __ZXN_RGB332_SKINL_1  0xf6
+#define __ZXN_RGB332_SKINL_2  0xf6
+#define __ZXN_RGB332_SKINL_3  0xd2
+#define __ZXN_RGB332_SKINL_4  0xee
+
+#define __ZXN_RGB333_SKINL_0  0x1f5
+#define __ZXN_RGB333_SKINL_1  0x1ed
+#define __ZXN_RGB333_SKINL_2  0x1ec
+#define __ZXN_RGB333_SKINL_3  0x1a4
+#define __ZXN_RGB333_SKINL_4  0x1db
+
+#define __ZXN_RGB332_SKIND_0  0xb1
+#define __ZXN_RGB332_SKIND_1  0xad
+#define __ZXN_RGB332_SKIND_2  0x8d
+#define __ZXN_RGB332_SKIND_3  0x8c
+#define __ZXN_RGB332_SKIND_4  0x68
+
+#define __ZXN_RGB333_SKIND_0  0x162
+#define __ZXN_RGB333_SKIND_1  0x159
+#define __ZXN_RGB333_SKIND_2  0x119
+#define __ZXN_RGB333_SKIND_3  0x119
+#define __ZXN_RGB333_SKIND_4  0x0d1
+
+#define __ZXN_RGB332_FACEBOOK_0  0x00
+#define __ZXN_RGB332_FACEBOOK_1  0x4e
+#define __ZXN_RGB332_FACEBOOK_2  0x97
+#define __ZXN_RGB332_FACEBOOK_3  0xff
+#define __ZXN_RGB332_FACEBOOK_4  0xff
+#define __ZXN_RGB332_FACEBOOK_5  0xff
+
+#define __ZXN_RGB333_FACEBOOK_0  0x000
+#define __ZXN_RGB333_FACEBOOK_1  0x09d
+#define __ZXN_RGB333_FACEBOOK_2  0x12e
+#define __ZXN_RGB333_FACEBOOK_3  0x1ff
+#define __ZXN_RGB333_FACEBOOK_4  0x1ff
+#define __ZXN_RGB333_FACEBOOK_5  0x1ff
+
+#define __ZXN_RGB332_FBM_BLUE  0x13
+#define __ZXN_RGB332_FBM_CYAN  0x5b
+#define __ZXN_RGB332_FBM_YELLOW  0xf8
+#define __ZXN_RGB332_FBM_RED  0xe9
+#define __ZXN_RGB332_FBM_PURPLE  0xf7
+
+#define __ZXN_RGB333_FBM_BLUE  0x027
+#define __ZXN_RGB333_FBM_CYAN  0x0b6
+#define __ZXN_RGB333_FBM_YELLOW  0x1f0
+#define __ZXN_RGB333_FBM_RED  0x1d2
+#define __ZXN_RGB333_FBM_PURPLE  0x1ee
+
+#define __ZXN_RGB332_GOOGLE_BLACK  0x00
+#define __ZXN_RGB332_GOOGLE_GREEN  0x11
+#define __ZXN_RGB332_GOOGLE_BLUE  0x0f
+#define __ZXN_RGB332_GOOGLE_RED  0xe5
+#define __ZXN_RGB332_GOOGLE_YELLOW  0xf4
+#define __ZXN_RGB332_GOOGLE_WHITE  0xff
+
+#define __ZXN_RGB333_GOOGLE_BLACK  0x000
+#define __ZXN_RGB333_GOOGLE_GREEN  0x022
+#define __ZXN_RGB333_GOOGLE_BLUE  0x01f
+#define __ZXN_RGB333_GOOGLE_RED  0x1c9
+#define __ZXN_RGB333_GOOGLE_YELLOW  0x1e8
+#define __ZXN_RGB333_GOOGLE_WHITE  0x1ff
+
+#define __ZXN_RGB332_YOUTUBE_RED  0xc4
+#define __ZXN_RGB332_YOUTUBE_BLUE  0x37
+#define __ZXN_RGB332_YOUTUBE_GREEN  0x74
+#define __ZXN_RGB332_YOUTUBE_GREY  0x6e
+#define __ZXN_RGB332_YOUTUBE_WHITE  0xff
+
+#define __ZXN_RGB333_YOUTUBE_RED  0x189
+#define __ZXN_RGB333_YOUTUBE_BLUE  0x06f
+#define __ZXN_RGB333_YOUTUBE_GREEN  0x0e8
+#define __ZXN_RGB333_YOUTUBE_GREY  0x0db
+#define __ZXN_RGB333_YOUTUBE_WHITE  0x1ff
+
+#define __ZXN_RGB332_INSTAGRAM_BROWN  0xad
+#define __ZXN_RGB332_INSTAGRAM_RED  0xe9
+#define __ZXN_RGB332_INSTAGRAM_YELLOW  0xfd
+#define __ZXN_RGB332_INSTAGRAM_GREEN  0x9e
+#define __ZXN_RGB332_INSTAGRAM_BLUE  0x0f
+
+#define __ZXN_RGB333_INSTAGRAM_BROWN  0x15a
+#define __ZXN_RGB333_INSTAGRAM_RED  0x1d2
+#define __ZXN_RGB333_INSTAGRAM_YELLOW  0x1fa
+#define __ZXN_RGB333_INSTAGRAM_GREEN  0x13b
+#define __ZXN_RGB333_INSTAGRAM_BLUE  0x01e
+
+#define __ZXN_RGB332_ZX_BLACK  0x00
+#define __ZXN_RGB332_ZX_BLUE  0x02
+#define __ZXN_RGB332_ZX_RED  0xc0
+#define __ZXN_RGB332_ZX_MAGENTA  0xc3
+#define __ZXN_RGB332_ZX_GREEN  0x18
+#define __ZXN_RGB332_ZX_CYAN  0x1b
+#define __ZXN_RGB332_ZX_YELLOW  0xd8
+#define __ZXN_RGB332_ZX_WHITE  0xdb
+#define __ZXN_RGB332_ZX_BRIGHT_BLACK  0x00
+#define __ZXN_RGB332_ZX_BRIGHT_BLUE  0x03
+#define __ZXN_RGB332_ZX_BRIGHT_RED  0xe0
+#define __ZXN_RGB332_ZX_BRIGHT_MAGENTA  0xe3
+#define __ZXN_RGB332_ZX_BRIGHT_GREEN  0x1c
+#define __ZXN_RGB332_ZX_BRIGHT_CYAN  0x1f
+#define __ZXN_RGB332_ZX_BRIGHT_YELLOW  0xfc
+#define __ZXN_RGB332_ZX_BRIGHT_WHITE  0xff
+
+#define __ZXN_RGB333_ZX_BLACK  0x000
+#define __ZXN_RGB333_ZX_BLUE  0x006
+#define __ZXN_RGB333_ZX_RED  0x180
+#define __ZXN_RGB333_ZX_MAGENTA  0x186
+#define __ZXN_RGB333_ZX_GREEN  0x030
+#define __ZXN_RGB333_ZX_CYAN  0x036
+#define __ZXN_RGB333_ZX_YELLOW  0x1b0
+#define __ZXN_RGB333_ZX_WHITE  0x1b6
+#define __ZXN_RGB333_ZX_BRIGHT_BLACK  0x000
+#define __ZXN_RGB333_ZX_BRIGHT_BLUE  0x007
+#define __ZXN_RGB333_ZX_BRIGHT_RED  0x1c0
+#define __ZXN_RGB333_ZX_BRIGHT_MAGENTA  0x1c7
+#define __ZXN_RGB333_ZX_BRIGHT_GREEN  0x038
+#define __ZXN_RGB333_ZX_BRIGHT_CYAN  0x03f
+#define __ZXN_RGB333_ZX_BRIGHT_YELLOW  0x1f8
+#define __ZXN_RGB333_ZX_BRIGHT_WHITE  0x1ff
+
+#define __ZXN_RGB332_C64_BLACK  0x00
+#define __ZXN_RGB332_C64_WHITE  0xff
+#define __ZXN_RGB332_C64_RED  0x84
+#define __ZXN_RGB332_C64_CYAN  0x77
+#define __ZXN_RGB332_C64_VIOLET  0x8a
+#define __ZXN_RGB332_C64_GREEN  0x75
+#define __ZXN_RGB332_C64_BLUE  0x26
+#define __ZXN_RGB332_C64_YELLOW  0xd9
+#define __ZXN_RGB332_C64_ORANGE  0x88
+#define __ZXN_RGB332_C64_BROWN  0x48
+#define __ZXN_RGB332_C64_LIGHTRED  0xad
+#define __ZXN_RGB332_C64_DARKGRAY  0x49
+#define __ZXN_RGB332_C64_GRAY  0x92
+#define __ZXN_RGB332_C64_LIGHTGREEN  0xbe
+#define __ZXN_RGB332_C64_LIGHTBLUE  0x6f
+#define __ZXN_RGB332_C64_LIGHTGRAY  0xb6
+
+#define __ZXN_RGB333_C64_BLACK  0x000
+#define __ZXN_RGB333_C64_WHITE  0x1ff
+#define __ZXN_RGB333_C64_RED  0x100
+#define __ZXN_RGB333_C64_CYAN  0x17f
+#define __ZXN_RGB333_C64_VIOLET  0x196
+#define __ZXN_RGB333_C64_GREEN  0x032
+#define __ZXN_RGB333_C64_BLUE  0x005
+#define __ZXN_RGB333_C64_YELLOW  0x1fb
+#define __ZXN_RGB333_C64_ORANGE  0x1a2
+#define __ZXN_RGB333_C64_BROWN  0x0d0
+#define __ZXN_RGB333_C64_LIGHTRED  0x1db
+#define __ZXN_RGB333_C64_DARKGRAY  0x049
+#define __ZXN_RGB333_C64_GRAY  0x0db
+#define __ZXN_RGB333_C64_LIGHTGREEN  0x17b
+#define __ZXN_RGB333_C64_LIGHTBLUE  0x027
+#define __ZXN_RGB333_C64_LIGHTGRAY  0x16d
+
+#define __ZXN_RGB332_APPLEII_BLACK  0x00
+#define __ZXN_RGB332_APPLEII_RED  0xe1
+#define __ZXN_RGB332_APPLEII_DBLUE  0x6a
+#define __ZXN_RGB332_APPLEII_PURPLE  0xeb
+#define __ZXN_RGB332_APPLEII_DGREEN  0x15
+#define __ZXN_RGB332_APPLEII_GRAY  0x92
+#define __ZXN_RGB332_APPLEII_MBLUE  0x1b
+#define __ZXN_RGB332_APPLEII_LBLUE  0xdb
+#define __ZXN_RGB332_APPLEII_BROWN  0x6c
+#define __ZXN_RGB332_APPLEII_ORANGE  0xec
+#define __ZXN_RGB332_APPLEII_PINK  0xf7
+#define __ZXN_RGB332_APPLEII_LGREEN  0x1c
+#define __ZXN_RGB332_APPLEII_YELLOW  0xda
+#define __ZXN_RGB332_APPLEII_AQUA  0x7f
+#define __ZXN_RGB332_APPLEII_WHITE  0xff
+
+#define __ZXN_RGB333_APPLEII_BLACK  0x00
+#define __ZXN_RGB333_APPLEII_RED  0x1c3
+#define __ZXN_RGB333_APPLEII_DBLUE  0xd5
+#define __ZXN_RGB333_APPLEII_PURPLE  0x1d7
+#define __ZXN_RGB333_APPLEII_DGREEN  0x2b
+#define __ZXN_RGB333_APPLEII_GRAY  0x124
+#define __ZXN_RGB333_APPLEII_MBLUE  0x37
+#define __ZXN_RGB333_APPLEII_LBLUE  0x1b7
+#define __ZXN_RGB333_APPLEII_BROWN  0xd8
+#define __ZXN_RGB333_APPLEII_ORANGE  0x1d9
+#define __ZXN_RGB333_APPLEII_PINK  0x1ee
+#define __ZXN_RGB333_APPLEII_LGREEN  0x39
+#define __ZXN_RGB333_APPLEII_YELLOW  0x1b4
+#define __ZXN_RGB333_APPLEII_AQUA  0xfe
+#define __ZXN_RGB333_APPLEII_WHITE  0x1ff
+
+#define __ZXN_RGB332_PICO8_BLACK  0x00
+#define __ZXN_RGB332_PICO8_GRAY  0x49
+#define __ZXN_RGB332_PICO8_VIOLET  0x8e
+#define __ZXN_RGB332_PICO8_LGRAY  0xdb
+#define __ZXN_RGB332_PICO8_WHITE  0xff
+#define __ZXN_RGB332_PICO8_PURPLE  0x65
+#define __ZXN_RGB332_PICO8_RED  0xe1
+#define __ZXN_RGB332_PICO8_PINK  0xee
+#define __ZXN_RGB332_PICO8_BROWN  0xa8
+#define __ZXN_RGB332_PICO8_GOLD  0xf4
+#define __ZXN_RGB332_PICO8_YELLOW  0xfc
+#define __ZXN_RGB332_PICO8_SKIN  0xfa
+#define __ZXN_RGB332_PICO8_GREEN  0x11
+#define __ZXN_RGB332_PICO8_LGREEN  0x1c
+#define __ZXN_RGB332_PICO8_BLUE  0x25
+#define __ZXN_RGB332_PICO8_CYAN  0x37
+
+#define __ZXN_RGB333_PICO8_BLACK  0x000
+#define __ZXN_RGB333_PICO8_GRAY  0x092
+#define __ZXN_RGB333_PICO8_VIOLET  0x11c
+#define __ZXN_RGB333_PICO8_LGRAY  0x1b6
+#define __ZXN_RGB333_PICO8_WHITE  0x1ff
+#define __ZXN_RGB333_PICO8_PURPLE  0x0ca
+#define __ZXN_RGB333_PICO8_RED  0x1c2
+#define __ZXN_RGB333_PICO8_PINK  0x1dd
+#define __ZXN_RGB333_PICO8_BROWN  0x151
+#define __ZXN_RGB333_PICO8_GOLD  0x1e8
+#define __ZXN_RGB333_PICO8_YELLOW  0x1f9
+#define __ZXN_RGB333_PICO8_SKIN  0x1f5
+#define __ZXN_RGB333_PICO8_GREEN  0x022
+#define __ZXN_RGB333_PICO8_LGREEN  0x039
+#define __ZXN_RGB333_PICO8_BLUE  0x04a
+#define __ZXN_RGB333_PICO8_CYAN  0x06f
+
+#define __ZXN_RGB332_ARCADE29_WHITE  0xff
+#define __ZXN_RGB332_ARCADE29_PINKROSE  0xe9
+#define __ZXN_RGB332_ARCADE29_BRICK  0xa5
+#define __ZXN_RGB332_ARCADE29_YELLOW  0xf9
+#define __ZXN_RGB332_ARCADE29_ORANGE  0xec
+#define __ZXN_RGB332_ARCADE29_SKIN  0xfa
+#define __ZXN_RGB332_ARCADE29_DSKIN  0xd1
+#define __ZXN_RGB332_ARCADE29_REDBROWN  0xa9
+#define __ZXN_RGB332_ARCADE29_MAROON  0x65
+#define __ZXN_RGB332_ARCADE29_LGREEN  0x99
+#define __ZXN_RGB332_ARCADE29_GREEN  0x31
+#define __ZXN_RGB332_ARCADE29_TEAL  0x09
+#define __ZXN_RGB332_ARCADE29_BCYAN  0x5b
+#define __ZXN_RGB332_ARCADE29_LTEAL  0x32
+#define __ZXN_RGB332_ARCADE29_CYAN  0x7f
+#define __ZXN_RGB332_ARCADE29_LBLUE  0x57
+#define __ZXN_RGB332_ARCADE29_BLUE  0x4f
+#define __ZXN_RGB332_ARCADE29_DBLUE  0x26
+#define __ZXN_RGB332_ARCADE29_LPINK  0xcf
+#define __ZXN_RGB332_ARCADE29_PURPLE  0x6a
+#define __ZXN_RGB332_ARCADE29_PALEPINK  0xf7
+#define __ZXN_RGB332_ARCADE29_PINK  0xef
+#define __ZXN_RGB332_ARCADE29_BLACK  0x24
+#define __ZXN_RGB332_ARCADE29_LGRAY  0xb7
+#define __ZXN_RGB332_ARCADE29_GRAY  0x6e
+#define __ZXN_RGB332_ARCADE29_BLUEGRAY  0x29
+#define __ZXN_RGB332_ARCADE29_BEIGE  0xd6
+#define __ZXN_RGB332_ARCADE29_LBROWN  0x8d
+#define __ZXN_RGB332_ARCADE29_BROWN  0x45
+
+#define __ZXN_RGB333_ARCADE29_WHITE  0x1ff
+#define __ZXN_RGB333_ARCADE29_PINKROSE  0x1d2
+#define __ZXN_RGB333_ARCADE29_BRICK  0x14a
+#define __ZXN_RGB333_ARCADE29_YELLOW  0x1f2
+#define __ZXN_RGB333_ARCADE29_ORANGE  0x1d8
+#define __ZXN_RGB333_ARCADE29_SKIN  0x1f4
+#define __ZXN_RGB333_ARCADE29_DSKIN  0x1a2
+#define __ZXN_RGB333_ARCADE29_REDBROWN  0x152
+#define __ZXN_RGB333_ARCADE29_MAROON  0x0c9
+#define __ZXN_RGB333_ARCADE29_LGREEN  0x131
+#define __ZXN_RGB333_ARCADE29_GREEN  0x062
+#define __ZXN_RGB333_ARCADE29_TEAL  0x012
+#define __ZXN_RGB333_ARCADE29_BCYAN  0x0b5
+#define __ZXN_RGB333_ARCADE29_LTEAL  0x064
+#define __ZXN_RGB333_ARCADE29_CYAN  0x0ff
+#define __ZXN_RGB333_ARCADE29_LBLUE  0x0af
+#define __ZXN_RGB333_ARCADE29_BLUE  0x09f
+#define __ZXN_RGB333_ARCADE29_DBLUE  0x04c
+#define __ZXN_RGB333_ARCADE29_LPINK  0x19f
+#define __ZXN_RGB333_ARCADE29_PURPLE  0x0d5
+#define __ZXN_RGB333_ARCADE29_PALEPINK  0x1ee
+#define __ZXN_RGB333_ARCADE29_PINK  0x1dd
+#define __ZXN_RGB333_ARCADE29_BLACK  0x049
+#define __ZXN_RGB333_ARCADE29_LGRAY  0x16d
+#define __ZXN_RGB333_ARCADE29_GRAY  0x0dc
+#define __ZXN_RGB333_ARCADE29_BLUEGRAY  0x052
+#define __ZXN_RGB333_ARCADE29_BEIGE  0x1ac
+#define __ZXN_RGB333_ARCADE29_LBROWN  0x11b
+#define __ZXN_RGB333_ARCADE29_BROWN  0x089
+
+#define __ZXN_RGB332_GAMEBOY_0  0x05
+#define __ZXN_RGB332_GAMEBOY_1  0x4d
+#define __ZXN_RGB332_GAMEBOY_2  0x9a
+#define __ZXN_RGB332_GAMEBOY_3  0xff
+
+#define __ZXN_RGB333_GAMEBOY_0  0x009
+#define __ZXN_RGB333_GAMEBOY_1  0x09b
+#define __ZXN_RGB333_GAMEBOY_2  0x134
+#define __ZXN_RGB333_GAMEBOY_3  0x1ff
+
+#define __ZXN_RGB332_GZXNR_BLUE_0  0x01
+#define __ZXN_RGB332_GZXNR_BLUE_1  0x03
+#define __ZXN_RGB332_GZXNR_BLUE_2  0x03
+#define __ZXN_RGB332_GZXNR_BLUE_3  0x6f
+#define __ZXN_RGB332_GZXNR_BLUE_4  0xdb
+
+#define __ZXN_RGB332_GZXNR_RED_0  0x40
+#define __ZXN_RGB332_GZXNR_RED_1  0xa0
+#define __ZXN_RGB332_GZXNR_RED_2  0xe0
+#define __ZXN_RGB332_GZXNR_RED_3  0xed
+#define __ZXN_RGB332_GZXNR_RED_4  0xfb
+
+#define __ZXN_RGB332_GZXNR_PURPLE_0  0x41
+#define __ZXN_RGB332_GZXNR_PURPLE_1  0xa3
+#define __ZXN_RGB332_GZXNR_PURPLE_2  0xe7
+#define __ZXN_RGB332_GZXNR_PURPLE_3  0xef
+#define __ZXN_RGB332_GZXNR_PURPLE_4  0xfb
+
+#define __ZXN_RGB332_GZXNR_GREEN_0  0x08
+#define __ZXN_RGB332_GZXNR_GREEN_1  0x14
+#define __ZXN_RGB332_GZXNR_GREEN_2  0x1c
+#define __ZXN_RGB332_GZXNR_GREEN_3  0xbd
+#define __ZXN_RGB332_GZXNR_GREEN_4  0xdf
+
+#define __ZXN_RGB332_GZXNR_CYAN_0  0x09
+#define __ZXN_RGB332_GZXNR_CYAN_1  0x17
+#define __ZXN_RGB332_GZXNR_CYAN_2  0x1f
+#define __ZXN_RGB332_GZXNR_CYAN_3  0xbf
+#define __ZXN_RGB332_GZXNR_CYAN_4  0xdf
+
+#define __ZXN_RGB332_GZXNR_YELLOW_0  0x48
+#define __ZXN_RGB332_GZXNR_YELLOW_1  0xb4
+#define __ZXN_RGB332_GZXNR_YELLOW_2  0xfc
+#define __ZXN_RGB332_GZXNR_YELLOW_3  0xfd
+#define __ZXN_RGB332_GZXNR_YELLOW_4  0xff
+
+#define __ZXN_RGB332_GZXNR_BLACK  0x00
+#define __ZXN_RGB332_GZXNR_GRAY_0  0x49
+#define __ZXN_RGB332_GZXNR_GRAY_1  0xdb
+#define __ZXN_RGB332_GZXNR_WHITE  0xff
+
+#define __ZXN_RGB333_GZXNR_BLUE_0  0x003
+#define __ZXN_RGB333_GZXNR_BLUE_1  0x005
+#define __ZXN_RGB333_GZXNR_BLUE_2  0x007
+#define __ZXN_RGB333_GZXNR_BLUE_3  0x0df
+#define __ZXN_RGB333_GZXNR_BLUE_4  0x1b7
+
+#define __ZXN_RGB333_GZXNR_RED_0  0x080
+#define __ZXN_RGB333_GZXNR_RED_1  0x140
+#define __ZXN_RGB333_GZXNR_RED_2  0x1c0
+#define __ZXN_RGB333_GZXNR_RED_3  0x1db
+#define __ZXN_RGB333_GZXNR_RED_4  0x1f5
+
+#define __ZXN_RGB333_GZXNR_PURPLE_0  0x083
+#define __ZXN_RGB333_GZXNR_PURPLE_1  0x145
+#define __ZXN_RGB333_GZXNR_PURPLE_2  0x1cf
+#define __ZXN_RGB333_GZXNR_PURPLE_3  0x1df
+#define __ZXN_RGB333_GZXNR_PURPLE_4  0x1f7
+
+#define __ZXN_RGB333_GZXNR_GREEN_0  0x010
+#define __ZXN_RGB333_GZXNR_GREEN_1  0x028
+#define __ZXN_RGB333_GZXNR_GREEN_2  0x038
+#define __ZXN_RGB333_GZXNR_GREEN_3  0x17b
+#define __ZXN_RGB333_GZXNR_GREEN_4  0x1bd
+
+#define __ZXN_RGB333_GZXNR_CYAN_0  0x013
+#define __ZXN_RGB333_GZXNR_CYAN_1  0x02d
+#define __ZXN_RGB333_GZXNR_CYAN_2  0x03f
+#define __ZXN_RGB333_GZXNR_CYAN_3  0x17f
+#define __ZXN_RGB333_GZXNR_CYAN_4  0x1bf
+
+#define __ZXN_RGB333_GZXNR_YELLOW_0  0x090
+#define __ZXN_RGB333_GZXNR_YELLOW_1  0x168
+#define __ZXN_RGB333_GZXNR_YELLOW_2  0x1f8
+#define __ZXN_RGB333_GZXNR_YELLOW_3  0x1fb
+#define __ZXN_RGB333_GZXNR_YELLOW_4  0x1fd
+
+#define __ZXN_RGB333_GZXNR_BLACK  0x000
+#define __ZXN_RGB333_GZXNR_GRAY_0  0x093
+#define __ZXN_RGB333_GZXNR_GRAY_1  0x1b5
+#define __ZXN_RGB333_GZXNR_WHITE  0x1ff
+
+#define __ZXN_RGB332_EGACOM_BLACK  0x25
+#define __ZXN_RGB332_EGACOM_GRAY  0x6d
+#define __ZXN_RGB332_EGACOM_LGRAY  0xb6
+#define __ZXN_RGB332_EGACOM_WHITE  0xff
+#define __ZXN_RGB332_EGACOM_MAROON  0x85
+#define __ZXN_RGB332_EGACOM_PINKROSE  0xe9
+#define __ZXN_RGB332_EGACOM_GOLD  0xd1
+#define __ZXN_RGB332_EGACOM_YELLOW  0xf9
+#define __ZXN_RGB332_EGACOM_BROWN  0x69
+#define __ZXN_RGB332_EGACOM_LBROWN  0x8d
+#define __ZXN_RGB332_EGACOM_TEAL  0x72
+#define __ZXN_RGB332_EGACOM_GREEN  0x7a
+#define __ZXN_RGB332_EGACOM_BLUE  0x2a
+#define __ZXN_RGB332_EGACOM_LBLUE  0x4e
+#define __ZXN_RGB332_EGACOM_PURPLE  0x8e
+#define __ZXN_RGB332_EGACOM_SAND  0xf6
+#define __ZXN_RGB332_EGACOM_DGREEN  0x6d
+#define __ZXN_RGB332_EGACOM_CYAN  0x9f
+#define __ZXN_RGB332_EGACOM_VIOLET  0xaa
+#define __ZXN_RGB332_EGACOM_PINK  0xf2
+
+#define __ZXN_RGB333_EGACOM_BLACK  0x049
+#define __ZXN_RGB333_EGACOM_GRAY  0x0db
+#define __ZXN_RGB333_EGACOM_LGRAY  0x16d
+#define __ZXN_RGB333_EGACOM_WHITE  0x1ff
+#define __ZXN_RGB333_EGACOM_MAROON  0x109
+#define __ZXN_RGB333_EGACOM_PINKROSE  0x1d2
+#define __ZXN_RGB333_EGACOM_GOLD  0x1a1
+#define __ZXN_RGB333_EGACOM_YELLOW  0x1f2
+#define __ZXN_RGB333_EGACOM_BROWN  0x0d2
+#define __ZXN_RGB333_EGACOM_LBROWN  0x11a
+#define __ZXN_RGB333_EGACOM_TEAL  0x0e3
+#define __ZXN_RGB333_EGACOM_GREEN  0x0f3
+#define __ZXN_RGB333_EGACOM_BLUE  0x053
+#define __ZXN_RGB333_EGACOM_LBLUE  0x09c
+#define __ZXN_RGB333_EGACOM_PURPLE  0x11c
+#define __ZXN_RGB333_EGACOM_SAND  0x1eb
+#define __ZXN_RGB333_EGACOM_DGREEN  0x0db
+#define __ZXN_RGB333_EGACOM_CYAN  0x13f
+#define __ZXN_RGB333_EGACOM_VIOLET  0x153
+#define __ZXN_RGB333_EGACOM_PINK  0x1e4
+
+#define __ZXN_RGB332_GMSX_BLACK  0x00
+#define __ZXN_RGB332_GMSX_GRAY  0x6d
+#define __ZXN_RGB332_GMSX_SILVER  0xb6
+#define __ZXN_RGB332_GMSX_DARK_TEAL  0x0e
+#define __ZXN_RGB332_GMSX_GREEN  0x14
+#define __ZXN_RGB332_GMSX_GREENYELLOW  0x9c
+#define __ZXN_RGB332_GMSX_MAROON  0x60
+#define __ZXN_RGB332_GMSX_SIENNA  0xa8
+#define __ZXN_RGB332_GMSX_SANDYBROWN  0xf0
+#define __ZXN_RGB332_GMSX_KHAKI  0xfd
+#define __ZXN_RGB332_GMSX_WHITE  0xff
+#define __ZXN_RGB332_GMSX_SKYBLUE  0x9b
+#define __ZXN_RGB332_GMSX_SLATEBLUE  0x4f
+#define __ZXN_RGB332_GMSX_BLUE  0x02
+
+#define __ZXN_RGB333_GMSX_BLACK  0x000
+#define __ZXN_RGB333_GMSX_GRAY  0x0db
+#define __ZXN_RGB333_GMSX_SILVER  0x16d
+#define __ZXN_RGB333_GMSX_DARK_TEAL  0x01c
+#define __ZXN_RGB333_GMSX_GREEN  0x028
+#define __ZXN_RGB333_GMSX_GREENYELLOW  0x138
+#define __ZXN_RGB333_GMSX_MAROON  0x0c0
+#define __ZXN_RGB333_GMSX_SIENNA  0x150
+#define __ZXN_RGB333_GMSX_SANDYBROWN  0x1e1
+#define __ZXN_RGB333_GMSX_KHAKI  0x1fb
+#define __ZXN_RGB333_GMSX_WHITE  0x1ff
+#define __ZXN_RGB333_GMSX_SKYBLUE  0x137
+#define __ZXN_RGB333_GMSX_SLATEBLUE  0x09f
+#define __ZXN_RGB333_GMSX_BLUE  0x005
+
+#define __ZXN_RGB332_D4D_DARK_BLUE  0x02
+#define __ZXN_RGB332_D4D_BRIGHT_BLUE  0xff
+#define __ZXN_RGB332_D4D_BLUE  0x03
+#define __ZXN_RGB332_D4D_CYAN  0x1f
+#define __ZXN_RGB332_D4D_BRIGHT_YELLOW  0xfe
+#define __ZXN_RGB332_D4D_YELLOW  0xfc
+#define __ZXN_RGB332_D4D_ORANGE  0xf6
+#define __ZXN_RGB332_D4D_BRIGHT_RED  0xe9
+#define __ZXN_RGB332_D4D_RED  0xe0
+#define __ZXN_RGB332_D4D_DARK_RED  0xa0
+#define __ZXN_RGB332_D4D_MAGENTA  0xe3
+#define __ZXN_RGB332_D4D_BRIGHT_GREEN  0xbe
+#define __ZXN_RGB332_D4D_GREEN  0x1c
+#define __ZXN_RGB332_D4D_DARK_GREEN  0x10
+#define __ZXN_RGB332_D4D_BRIGHT_GREY  0x49
+#define __ZXN_RGB332_D4D_LIGHT_GREY  0x92
+#define __ZXN_RGB332_D4D_GREY  0x25
+#define __ZXN_RGB332_D4D_WHITE  0xff
+#define __ZXN_RGB332_D4D_BLACK  0x00
+
+#define __ZXN_RGB333_D4D_DARK_BLUE  0x005
+#define __ZXN_RGB333_D4D_BRIGHT_BLUE  0x1ff
+#define __ZXN_RGB333_D4D_BLUE  0x007
+#define __ZXN_RGB333_D4D_CYAN  0x03f
+#define __ZXN_RGB333_D4D_BRIGHT_YELLOW  0x1fc
+#define __ZXN_RGB333_D4D_YELLOW  0x1f8
+#define __ZXN_RGB333_D4D_ORANGE  0x1eb
+#define __ZXN_RGB333_D4D_BRIGHT_RED  0x1d2
+#define __ZXN_RGB333_D4D_RED  0x1c0
+#define __ZXN_RGB333_D4D_DARK_RED  0x140
+#define __ZXN_RGB333_D4D_MAGENTA  0x1c7
+#define __ZXN_RGB333_D4D_BRIGHT_GREEN  0x17d
+#define __ZXN_RGB333_D4D_GREEN  0x038
+#define __ZXN_RGB333_D4D_DARK_GREEN  0x020
+#define __ZXN_RGB333_D4D_BRIGHT_GREY  0x092
+#define __ZXN_RGB333_D4D_LIGHT_GREY  0x124
+#define __ZXN_RGB333_D4D_GREY  0x049
+#define __ZXN_RGB333_D4D_WHITE  0x1ff
+#define __ZXN_RGB333_D4D_BLACK  0x000
+
+#define __ZXN_RGB332_HTML_AliceBlue  0xff
+#define __ZXN_RGB332_HTML_AntiqueWhite  0xff
+#define __ZXN_RGB332_HTML_Aqua  0x1f
+#define __ZXN_RGB332_HTML_Aquamarine  0x9f
+#define __ZXN_RGB332_HTML_Azure  0xff
+#define __ZXN_RGB332_HTML_Beige  0xff
+#define __ZXN_RGB332_HTML_Bisque  0xff
+#define __ZXN_RGB332_HTML_Black  0x00
+#define __ZXN_RGB332_HTML_BlanchedAlmond  0xff
+#define __ZXN_RGB332_HTML_Blue  0x03
+#define __ZXN_RGB332_HTML_BlueViolet  0x87
+#define __ZXN_RGB332_HTML_Brown  0xa5
+#define __ZXN_RGB332_HTML_BurlyWood  0xfa
+#define __ZXN_RGB332_HTML_CadetBlue  0x77
+#define __ZXN_RGB332_HTML_Chartreuse  0x9c
+#define __ZXN_RGB332_HTML_Chocolate  0xec
+#define __ZXN_RGB332_HTML_Coral  0xf1
+#define __ZXN_RGB332_HTML_CornflowerBlue  0x77
+#define __ZXN_RGB332_HTML_Cornsilk  0xff
+#define __ZXN_RGB332_HTML_Crimson  0xe5
+#define __ZXN_RGB332_HTML_Cyan  0x1f
+#define __ZXN_RGB332_HTML_DarkBlue  0x02
+#define __ZXN_RGB332_HTML_DarkCyan  0x12
+#define __ZXN_RGB332_HTML_DarkGoldenRod  0xd0
+#define __ZXN_RGB332_HTML_DarkGray  0xb7
+#define __ZXN_RGB332_HTML_DarkGrey  0xb7
+#define __ZXN_RGB332_HTML_DarkGreen  0x0c
+#define __ZXN_RGB332_HTML_DarkKhaki  0xda
+#define __ZXN_RGB332_HTML_DarkMagenta  0x82
+#define __ZXN_RGB332_HTML_DarkOliveGreen  0x6d
+#define __ZXN_RGB332_HTML_DarkOrange  0xf0
+#define __ZXN_RGB332_HTML_DarkOrchid  0xab
+#define __ZXN_RGB332_HTML_DarkRed  0x80
+#define __ZXN_RGB332_HTML_DarkSalmon  0xf6
+#define __ZXN_RGB332_HTML_DarkSeaGreen  0x9a
+#define __ZXN_RGB332_HTML_DarkSlateBlue  0x4a
+#define __ZXN_RGB332_HTML_DarkSlateGray  0x29
+#define __ZXN_RGB332_HTML_DarkSlateGrey  0x29
+#define __ZXN_RGB332_HTML_DarkTurquoise  0x1b
+#define __ZXN_RGB332_HTML_DarkViolet  0xa3
+#define __ZXN_RGB332_HTML_DeepPink  0xe6
+#define __ZXN_RGB332_HTML_DeepSkyBlue  0x1b
+#define __ZXN_RGB332_HTML_DimGray  0x6e
+#define __ZXN_RGB332_HTML_DimGrey  0x6e
+#define __ZXN_RGB332_HTML_DodgerBlue  0x37
+#define __ZXN_RGB332_HTML_FireBrick  0xc5
+#define __ZXN_RGB332_HTML_FloralWhite  0xff
+#define __ZXN_RGB332_HTML_ForestGreen  0x31
+#define __ZXN_RGB332_HTML_Fuchsia  0xe3
+#define __ZXN_RGB332_HTML_Gainsboro  0xff
+#define __ZXN_RGB332_HTML_GhostWhite  0xff
+#define __ZXN_RGB332_HTML_Gold  0xfc
+#define __ZXN_RGB332_HTML_GoldenRod  0xf5
+#define __ZXN_RGB332_HTML_Gray  0x92
+#define __ZXN_RGB332_HTML_Grey  0x92
+#define __ZXN_RGB332_HTML_Green  0x10
+#define __ZXN_RGB332_HTML_GreenYellow  0xbd
+#define __ZXN_RGB332_HTML_HoneyDew  0xff
+#define __ZXN_RGB332_HTML_HotPink  0xef
+#define __ZXN_RGB332_HTML_IndianRed  0xcd
+#define __ZXN_RGB332_HTML_Indigo  0x42
+#define __ZXN_RGB332_HTML_Ivory  0xff
+#define __ZXN_RGB332_HTML_Khaki  0xfe
+#define __ZXN_RGB332_HTML_Lavender  0xff
+#define __ZXN_RGB332_HTML_LavenderBlush  0xff
+#define __ZXN_RGB332_HTML_LawnGreen  0x9c
+#define __ZXN_RGB332_HTML_LemonChiffon  0xff
+#define __ZXN_RGB332_HTML_LightBlue  0xbf
+#define __ZXN_RGB332_HTML_LightCoral  0xf2
+#define __ZXN_RGB332_HTML_LightCyan  0xff
+#define __ZXN_RGB332_HTML_LightGoldenRodYellow  0xff
+#define __ZXN_RGB332_HTML_LightGray  0xff
+#define __ZXN_RGB332_HTML_LightGrey  0xff
+#define __ZXN_RGB332_HTML_LightGreen  0xbe
+#define __ZXN_RGB332_HTML_LightPink  0xfb
+#define __ZXN_RGB332_HTML_LightSalmon  0xf6
+#define __ZXN_RGB332_HTML_LightSeaGreen  0x3b
+#define __ZXN_RGB332_HTML_LightSkyBlue  0x9b
+#define __ZXN_RGB332_HTML_LightSlateGray  0x92
+#define __ZXN_RGB332_HTML_LightSlateGrey  0x92
+#define __ZXN_RGB332_HTML_LightSteelBlue  0xdb
+#define __ZXN_RGB332_HTML_LightYellow  0xff
+#define __ZXN_RGB332_HTML_Lime  0x1c
+#define __ZXN_RGB332_HTML_LimeGreen  0x59
+#define __ZXN_RGB332_HTML_Linen  0xff
+#define __ZXN_RGB332_HTML_Magenta  0xe3
+#define __ZXN_RGB332_HTML_Maroon  0x80
+#define __ZXN_RGB332_HTML_MediumAquaMarine  0x7b
+#define __ZXN_RGB332_HTML_MediumBlue  0x03
+#define __ZXN_RGB332_HTML_MediumOrchid  0xcf
+#define __ZXN_RGB332_HTML_MediumPurple  0xb3
+#define __ZXN_RGB332_HTML_MediumSeaGreen  0x5a
+#define __ZXN_RGB332_HTML_MediumSlateBlue  0x8f
+#define __ZXN_RGB332_HTML_MediumSpringGreen  0x1e
+#define __ZXN_RGB332_HTML_MediumTurquoise  0x5f
+#define __ZXN_RGB332_HTML_MediumVioletRed  0xc6
+#define __ZXN_RGB332_HTML_MidnightBlue  0x26
+#define __ZXN_RGB332_HTML_MintCream  0xff
+#define __ZXN_RGB332_HTML_MistyRose  0xff
+#define __ZXN_RGB332_HTML_Moccasin  0xff
+#define __ZXN_RGB332_HTML_NavajoWhite  0xff
+#define __ZXN_RGB332_HTML_Navy  0x02
+#define __ZXN_RGB332_HTML_OldLace  0xff
+#define __ZXN_RGB332_HTML_Olive  0x90
+#define __ZXN_RGB332_HTML_OliveDrab  0x71
+#define __ZXN_RGB332_HTML_Orange  0xf4
+#define __ZXN_RGB332_HTML_OrangeRed  0xe8
+#define __ZXN_RGB332_HTML_Orchid  0xf3
+#define __ZXN_RGB332_HTML_PaleGoldenRod  0xff
+#define __ZXN_RGB332_HTML_PaleGreen  0xbe
+#define __ZXN_RGB332_HTML_PaleTurquoise  0xbf
+#define __ZXN_RGB332_HTML_PaleVioletRed  0xf2
+#define __ZXN_RGB332_HTML_PapayaWhip  0xff
+#define __ZXN_RGB332_HTML_PeachPuff  0xff
+#define __ZXN_RGB332_HTML_Peru  0xd1
+#define __ZXN_RGB332_HTML_Pink  0xfb
+#define __ZXN_RGB332_HTML_Plum  0xf7
+#define __ZXN_RGB332_HTML_PowderBlue  0xdf
+#define __ZXN_RGB332_HTML_Purple  0x82
+#define __ZXN_RGB332_HTML_RebeccaPurple  0x6a
+#define __ZXN_RGB332_HTML_Red  0xe0
+#define __ZXN_RGB332_HTML_RosyBrown  0xd2
+#define __ZXN_RGB332_HTML_RoyalBlue  0x4f
+#define __ZXN_RGB332_HTML_SaddleBrown  0x88
+#define __ZXN_RGB332_HTML_Salmon  0xf2
+#define __ZXN_RGB332_HTML_SandyBrown  0xf6
+#define __ZXN_RGB332_HTML_SeaGreen  0x31
+#define __ZXN_RGB332_HTML_SeaShell  0xff
+#define __ZXN_RGB332_HTML_Sienna  0xad
+#define __ZXN_RGB332_HTML_Silver  0xdb
+#define __ZXN_RGB332_HTML_SkyBlue  0x9b
+#define __ZXN_RGB332_HTML_SlateBlue  0x6f
+#define __ZXN_RGB332_HTML_SlateGray  0x92
+#define __ZXN_RGB332_HTML_SlateGrey  0x92
+#define __ZXN_RGB332_HTML_Snow  0xff
+#define __ZXN_RGB332_HTML_SpringGreen  0x1e
+#define __ZXN_RGB332_HTML_SteelBlue  0x53
+#define __ZXN_RGB332_HTML_Tan  0xfa
+#define __ZXN_RGB332_HTML_Teal  0x12
+#define __ZXN_RGB332_HTML_Thistle  0xfb
+#define __ZXN_RGB332_HTML_Tomato  0xed
+#define __ZXN_RGB332_HTML_Turquoise  0x5f
+#define __ZXN_RGB332_HTML_Violet  0xf3
+#define __ZXN_RGB332_HTML_Wheat  0xff
+#define __ZXN_RGB332_HTML_White  0xff
+#define __ZXN_RGB332_HTML_WhiteSmoke  0xff
+#define __ZXN_RGB332_HTML_Yellow  0xfc
+#define __ZXN_RGB332_HTML_YellowGreen  0xb9
+
+#define __ZXN_RGB333_HTML_AliceBlue  0x1ff
+#define __ZXN_RGB333_HTML_AntiqueWhite  0x1ff
+#define __ZXN_RGB333_HTML_Aqua  0x03f
+#define __ZXN_RGB333_HTML_Aquamarine  0x13f
+#define __ZXN_RGB333_HTML_Azure  0x1ff
+#define __ZXN_RGB333_HTML_Beige  0x1ff
+#define __ZXN_RGB333_HTML_Bisque  0x1fe
+#define __ZXN_RGB333_HTML_Black  0x000
+#define __ZXN_RGB333_HTML_BlanchedAlmond  0x1fe
+#define __ZXN_RGB333_HTML_Blue  0x007
+#define __ZXN_RGB333_HTML_BlueViolet  0x10f
+#define __ZXN_RGB333_HTML_Brown  0x149
+#define __ZXN_RGB333_HTML_BurlyWood  0x1f4
+#define __ZXN_RGB333_HTML_CadetBlue  0x0ed
+#define __ZXN_RGB333_HTML_Chartreuse  0x138
+#define __ZXN_RGB333_HTML_Chocolate  0x1d9
+#define __ZXN_RGB333_HTML_Coral  0x1e3
+#define __ZXN_RGB333_HTML_CornflowerBlue  0x0ef
+#define __ZXN_RGB333_HTML_Cornsilk  0x1ff
+#define __ZXN_RGB333_HTML_Crimson  0x1ca
+#define __ZXN_RGB333_HTML_Cyan  0x03f
+#define __ZXN_RGB333_HTML_DarkBlue  0x004
+#define __ZXN_RGB333_HTML_DarkCyan  0x024
+#define __ZXN_RGB333_HTML_DarkGoldenRod  0x1a0
+#define __ZXN_RGB333_HTML_DarkGray  0x16d
+#define __ZXN_RGB333_HTML_DarkGrey  0x16d
+#define __ZXN_RGB333_HTML_DarkGreen  0x018
+#define __ZXN_RGB333_HTML_DarkKhaki  0x1b3
+#define __ZXN_RGB333_HTML_DarkMagenta  0x104
+#define __ZXN_RGB333_HTML_DarkOliveGreen  0x0d9
+#define __ZXN_RGB333_HTML_DarkOrange  0x1e0
+#define __ZXN_RGB333_HTML_DarkOrchid  0x156
+#define __ZXN_RGB333_HTML_DarkRed  0x100
+#define __ZXN_RGB333_HTML_DarkSalmon  0x1ec
+#define __ZXN_RGB333_HTML_DarkSeaGreen  0x134
+#define __ZXN_RGB333_HTML_DarkSlateBlue  0x094
+#define __ZXN_RGB333_HTML_DarkSlateGray  0x052
+#define __ZXN_RGB333_HTML_DarkSlateGrey  0x052
+#define __ZXN_RGB333_HTML_DarkTurquoise  0x037
+#define __ZXN_RGB333_HTML_DarkViolet  0x147
+#define __ZXN_RGB333_HTML_DeepPink  0x1cd
+#define __ZXN_RGB333_HTML_DeepSkyBlue  0x037
+#define __ZXN_RGB333_HTML_DimGray  0x0db
+#define __ZXN_RGB333_HTML_DimGrey  0x0db
+#define __ZXN_RGB333_HTML_DodgerBlue  0x06f
+#define __ZXN_RGB333_HTML_FireBrick  0x189
+#define __ZXN_RGB333_HTML_FloralWhite  0x1ff
+#define __ZXN_RGB333_HTML_ForestGreen  0x061
+#define __ZXN_RGB333_HTML_Fuchsia  0x1c7
+#define __ZXN_RGB333_HTML_Gainsboro  0x1ff
+#define __ZXN_RGB333_HTML_GhostWhite  0x1ff
+#define __ZXN_RGB333_HTML_Gold  0x1f8
+#define __ZXN_RGB333_HTML_GoldenRod  0x1e9
+#define __ZXN_RGB333_HTML_Gray  0x124
+#define __ZXN_RGB333_HTML_Grey  0x124
+#define __ZXN_RGB333_HTML_Green  0x020
+#define __ZXN_RGB333_HTML_GreenYellow  0x179
+#define __ZXN_RGB333_HTML_HoneyDew  0x1ff
+#define __ZXN_RGB333_HTML_HotPink  0x1de
+#define __ZXN_RGB333_HTML_IndianRed  0x19b
+#define __ZXN_RGB333_HTML_Indigo  0x084
+#define __ZXN_RGB333_HTML_Ivory  0x1ff
+#define __ZXN_RGB333_HTML_Khaki  0x1fc
+#define __ZXN_RGB333_HTML_Lavender  0x1ff
+#define __ZXN_RGB333_HTML_LavenderBlush  0x1ff
+#define __ZXN_RGB333_HTML_LawnGreen  0x138
+#define __ZXN_RGB333_HTML_LemonChiffon  0x1fe
+#define __ZXN_RGB333_HTML_LightBlue  0x17f
+#define __ZXN_RGB333_HTML_LightCoral  0x1e4
+#define __ZXN_RGB333_HTML_LightCyan  0x1ff
+#define __ZXN_RGB333_HTML_LightGoldenRodYellow  0x1ff
+#define __ZXN_RGB333_HTML_LightGray  0x1ff
+#define __ZXN_RGB333_HTML_LightGrey  0x1ff
+#define __ZXN_RGB333_HTML_LightGreen  0x17d
+#define __ZXN_RGB333_HTML_LightPink  0x1f6
+#define __ZXN_RGB333_HTML_LightSalmon  0x1ec
+#define __ZXN_RGB333_HTML_LightSeaGreen  0x075
+#define __ZXN_RGB333_HTML_LightSkyBlue  0x137
+#define __ZXN_RGB333_HTML_LightSlateGray  0x125
+#define __ZXN_RGB333_HTML_LightSlateGrey  0x125
+#define __ZXN_RGB333_HTML_LightSteelBlue  0x1b7
+#define __ZXN_RGB333_HTML_LightYellow  0x1ff
+#define __ZXN_RGB333_HTML_Lime  0x038
+#define __ZXN_RGB333_HTML_LimeGreen  0x0b2
+#define __ZXN_RGB333_HTML_Linen  0x1ff
+#define __ZXN_RGB333_HTML_Magenta  0x1c7
+#define __ZXN_RGB333_HTML_Maroon  0x100
+#define __ZXN_RGB333_HTML_MediumAquaMarine  0x0f5
+#define __ZXN_RGB333_HTML_MediumBlue  0x006
+#define __ZXN_RGB333_HTML_MediumOrchid  0x19f
+#define __ZXN_RGB333_HTML_MediumPurple  0x167
+#define __ZXN_RGB333_HTML_MediumSeaGreen  0x0b4
+#define __ZXN_RGB333_HTML_MediumSlateBlue  0x11f
+#define __ZXN_RGB333_HTML_MediumSpringGreen  0x03d
+#define __ZXN_RGB333_HTML_MediumTurquoise  0x0be
+#define __ZXN_RGB333_HTML_MediumVioletRed  0x18c
+#define __ZXN_RGB333_HTML_MidnightBlue  0x04c
+#define __ZXN_RGB333_HTML_MintCream  0x1ff
+#define __ZXN_RGB333_HTML_MistyRose  0x1ff
+#define __ZXN_RGB333_HTML_Moccasin  0x1fe
+#define __ZXN_RGB333_HTML_NavajoWhite  0x1fd
+#define __ZXN_RGB333_HTML_Navy  0x004
+#define __ZXN_RGB333_HTML_OldLace  0x1ff
+#define __ZXN_RGB333_HTML_Olive  0x120
+#define __ZXN_RGB333_HTML_OliveDrab  0x0e1
+#define __ZXN_RGB333_HTML_Orange  0x1e8
+#define __ZXN_RGB333_HTML_OrangeRed  0x1d0
+#define __ZXN_RGB333_HTML_Orchid  0x1e7
+#define __ZXN_RGB333_HTML_PaleGoldenRod  0x1fd
+#define __ZXN_RGB333_HTML_PaleGreen  0x17d
+#define __ZXN_RGB333_HTML_PaleTurquoise  0x17f
+#define __ZXN_RGB333_HTML_PaleVioletRed  0x1e5
+#define __ZXN_RGB333_HTML_PapayaWhip  0x1ff
+#define __ZXN_RGB333_HTML_PeachPuff  0x1fe
+#define __ZXN_RGB333_HTML_Peru  0x1a2
+#define __ZXN_RGB333_HTML_Pink  0x1f6
+#define __ZXN_RGB333_HTML_Plum  0x1ef
+#define __ZXN_RGB333_HTML_PowderBlue  0x1bf
+#define __ZXN_RGB333_HTML_Purple  0x104
+#define __ZXN_RGB333_HTML_RebeccaPurple  0x0d5
+#define __ZXN_RGB333_HTML_Red  0x1c0
+#define __ZXN_RGB333_HTML_RosyBrown  0x1a4
+#define __ZXN_RGB333_HTML_RoyalBlue  0x09f
+#define __ZXN_RGB333_HTML_SaddleBrown  0x111
+#define __ZXN_RGB333_HTML_Salmon  0x1e4
+#define __ZXN_RGB333_HTML_SandyBrown  0x1eb
+#define __ZXN_RGB333_HTML_SeaGreen  0x063
+#define __ZXN_RGB333_HTML_SeaShell  0x1ff
+#define __ZXN_RGB333_HTML_Sienna  0x159
+#define __ZXN_RGB333_HTML_Silver  0x1b6
+#define __ZXN_RGB333_HTML_SkyBlue  0x137
+#define __ZXN_RGB333_HTML_SlateBlue  0x0de
+#define __ZXN_RGB333_HTML_SlateGray  0x125
+#define __ZXN_RGB333_HTML_SlateGrey  0x125
+#define __ZXN_RGB333_HTML_Snow  0x1ff
+#define __ZXN_RGB333_HTML_SpringGreen  0x03c
+#define __ZXN_RGB333_HTML_SteelBlue  0x0a6
+#define __ZXN_RGB333_HTML_Tan  0x1f4
+#define __ZXN_RGB333_HTML_Teal  0x024
+#define __ZXN_RGB333_HTML_Thistle  0x1f7
+#define __ZXN_RGB333_HTML_Tomato  0x1da
+#define __ZXN_RGB333_HTML_Turquoise  0x0bf
+#define __ZXN_RGB333_HTML_Violet  0x1e7
+#define __ZXN_RGB333_HTML_Wheat  0x1fe
+#define __ZXN_RGB333_HTML_White  0x1ff
+#define __ZXN_RGB333_HTML_WhiteSmoke  0x1ff
+#define __ZXN_RGB333_HTML_Yellow  0x1f8
+#define __ZXN_RGB333_HTML_YellowGreen  0x172
 
 
 
@@ -1283,6 +1919,41 @@
 #define __IO_1FFD_ROM1  0x04
 #define __IO_1FFD_DISK_MOTOR  0x08
 #define __IO_1FFD_PRINTER_STROBE  0x10
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_SD_CONTROL  0xe7
+#define __IO_SD_STATUS  0xe7
+#define __IO_SD_DATA  0xeb
+
+#define __IO_LED_L  0x103b
+
+#define __ZXN_FILENAME_NEXT_UPDATE_FILE  "TBBLUE  TBU"
+#define __ZXN_FILENAME_NEXT_UPDATE_FILE_2  "TBBLUE.TBU"
+
+#define __ZXN_FILENAME_NEXT_FIRMWARE_FILE  "TBBLUE  FW "
+#define __ZXN_FILENAME_NEXT_FIRMWARE_FILE_2  "TBBLUE.FW"
+
+#define __ZXN_DIR_NEXT_DIRECTORY  "/tbblue/"
+
+#define __ZXN_FILENAME_CONFIG  "/tbblue/config.ini"
+#define __ZXN_FILENAME_TIMING  "/tbblue/timing.ini"
+
+#define __ZXN_FILENAME_ESXMMC  "esxmmc.rom"
+#define __ZXN_FILENAME_MF1  "mf1.rom"
+#define __ZXN_FILENAME_MF3  "mf3.rom"
+#define __ZXN_FILENAME_MF128  "mf128.rom"
+
+#define __ZXN_FILENAME_KEYMAP  "/tbblue/keymap.bin"
 
 
 
@@ -1516,6 +2187,15 @@
 #define __IO_NEXTREG_DAT  0x253b
 
 #define __REG_MACHINE_ID  0
+#define __RMI_DE1A  1
+#define __RMI_DE2A  2
+#define __RMI_FBLABS  5
+#define __RMI_VTRUCCO  6
+#define __RMI_WXEDA  7
+#define __RMI_EMULATORS  8
+#define __RMI_ZXNEXT  10
+#define __RMI_MULTICORE  11
+#define __RMI_ZXNEXT_AB  250
 
 #define __REG_VERSION  1
 #define __RV_MAJOR  0xf0
@@ -1538,10 +2218,11 @@
 #define __RMT_P3E  0x03
 #define __RMT_PENTAGON  0x04
 
-#define __REG_PAGE_RAM  4
-#define __RPR_MASK  0x3f
-#define __REG_BANK_RAM  4
-#define __RBR_MASK  0x3f
+#define __REG_RAM_PAGE  4
+#define __RRP_RAM_DIVMMC  0x08
+#define __RRP_ROM_DIVMMC  0x04
+#define __RRP_ROM_MF  0x05
+#define __RRP_ROM_SPECTRUM  0x00
 
 #define __REG_PERIPHERAL_1  5
 #define __RP1_JOY1_SINCLAIR  0x00
@@ -1586,10 +2267,14 @@
 
 #define __REG_SUB_VERSION  14
 
+#define __REG_VIDEO_PARAM  15
+
 #define __REG_ANTI_BRICK  16
-#define __RAB_START_NORMAL_CORE  0x80
+#define __RAB_COMMAND_NORMALCORE  0x80
 #define __RAB_BUTTON_DIVMMC  0x02
 #define __RAB_BUTTON_MULTIFACE  0x01
+
+#define __REG_VIDEO_TIMING  17
 
 #define __REG_LAYER_2_RAM_PAGE  18
 #define __RL2RP_MASK  0x3f
@@ -1699,6 +2384,8 @@
 #define __RCCH_COPPER_RUN_LOOP_RESET  0x40
 #define __RCCH_COPPER_RUN_LOOP  0x80
 #define __RCCH_COPPER_RUN_VBI  0xc0
+
+#define __REG_DEBUG  0xff
 
 
 

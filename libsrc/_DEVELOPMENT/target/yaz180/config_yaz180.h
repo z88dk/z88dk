@@ -708,20 +708,6 @@
 
 
 
-#define __Z80_VECTOR_BASE_BASIC  0x2000
-#define __Z180_VECTOR_IL_BASIC  0x40
-
-
-
-
-
-
-
-
-
-
-
-
 #define __IO_PIO_PORT_A  0x4000
 #define __IO_PIO_PORT_B  0x4001
 #define __IO_PIO_PORT_C  0x4002
