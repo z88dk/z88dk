@@ -46,6 +46,13 @@ ELSE
 	pop	ix		;ix = fp
 ENDIF
 	ld	de,0		;bytes read
+	; Check that we have a non-system reader thats in use
+	ld	a,(ix + fp_flags)
+	bit	4,a			; _IOSYSTEM
+	jr	nz,read_byte_done
+	and	_IOUSE | _IOREAD
+	cp	_IOUSE | _IOREAD
+	jr	nz,read_byte_done
 #ifdef __STDIO_BINARY
 	bit	6,(ix + fp_flags)	; _IOTEXT
 	jp	z,fread_block
@@ -60,14 +67,14 @@ read_byte_loop:
 	push	bc
 	push	ix
 	call	fgetc	;NB: preserves ix
-	pop	bc	;so don't need ot explicitly pop it
+	pop	bc	;so dont need ot explicitly pop it
 	pop	bc	;bc= remaining
 	pop	de	;de= count
 	ld	a,l
 	inc	h
 	pop	hl
 	jr	z,read_byte_done
-	; It wasn't EOF, carry on
+	; It wasnt EOF, carry on
 	ld	(hl),a
 	inc	de
 	inc	hl
