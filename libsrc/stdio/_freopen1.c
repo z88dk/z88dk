@@ -22,11 +22,11 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         flags = _IOREAD | _IOUSE | _IOTEXT;
         break;
     case 'w':
-        access = O_WRONLY | O_TRUNC;
+        access = O_WRONLY | O_TRUNC | O_CREAT;
         flags = _IOWRITE | _IOUSE | _IOTEXT;
         break;
     case 'a':
-        access = O_APPEND | O_WRONLY;
+        access = O_APPEND | O_WRONLY | O_CREAT;
         flags = _IOWRITE | _IOUSE | _IOTEXT;
         break;
     default:
@@ -37,8 +37,10 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         mode++;
         if (access == O_RDONLY) {
             access = O_RDWR;
-        } else if (access & O_WRONLY) {
-            access = O_RDWR | O_TRUNC;
+        } else if (access & O_TRUNC) {  // 'w'
+            access = O_RDWR | O_TRUNC | O_CREAT;
+        } else {
+            access = O_RDWR | O_CREAT;
         }
     }
 #ifdef __STDIO_BINARY

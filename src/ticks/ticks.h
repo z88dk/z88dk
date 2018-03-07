@@ -97,6 +97,7 @@ extern int f_(void);
 #define Z88DK_O_RDWR   2
 #define Z88DK_O_TRUNC  512
 #define Z88DK_O_APPEND 256
+#define Z88DK_O_CREAT  1024
 
 #define Z88DK_SEEK_SET 0
 #define Z88DK_SEEK_END 1
