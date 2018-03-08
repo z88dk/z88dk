@@ -5,6 +5,7 @@ C, Z88DK and the SP1 sprite library.
 
 ## Purpose
 
+<<<TODO, if at all? Introduction, maybe?>>>
 
 ## Assumptions
 
@@ -14,6 +15,9 @@ understanding of the details of the more advanced topics such as BiFrost and
 interrupts is not required, but understanding how to view a Spectrum memory map
 is. The reader is assumed to be familiar with at least the first 6 installments
 of that guide.
+
+<<<TODO Add link to the tutorial. It's not essential, but a skim read of the
+ideas would be useful.>>>
 
 ## Strategy
 
@@ -82,14 +86,15 @@ needs to be placed in the *read only user's data* section.
 Next we declare the label *circle* to be publicly visible such that
 code in external files (the C source) can see it.
 
-Then we define 8 zero bytes. This isn't, as might be expected,
-anything to do with a mask. As stated, this example isn't going to use
-a mask. There's another reason for placing these bytes here, and we'll
-come to it shortly.
+Then we define 8 zero bytes. This isn't, as might be expected by more
+experienced readers, anything to do with a mask. As stated, this
+example isn't going to use a mask. There's another reason for placing
+these 8 bytes here, and we'll come to it shortly.
 
-Finally see the 8x8 pixel sprite data. 8 bytes which, in exactly the
-same manner as a traditional user defined graphic (UDG), define a
-small circle.
+Finally we see the 8x8 pixel sprite data, labelled as *_circle* with a
+leading underscore, which is how the C compiler expects to be able to
+reference it. These 8 bytes define a small circle in exactly the same
+manner as a traditional user defined graphic (UDG).
 
 We therefore have our sprite data, defined in assembly language. Let's
 now look at some C code.
@@ -188,16 +193,23 @@ moves the stack pointer from its default location down to address
 in due course; for now we just need to understand that the SP1
 library (in its default configuration) builds its data structures in
 high memory. This pragma moves the stack pointer below those data
-structures. 
+structures.
+<<<TODO Check -1 required?>>>
 
-We then come to the function call which initialises the SP1 library,
-*sp1_Initialize()*. The 3 flags in the first argument are standard
-boilerplate for an SP1 program on the Spectrum. Unfortunately, and as
-is frequently the case with SP1, the documentation is lacking, but
-there's a forum post
+Recall that the data for the sprite was defined in the assembly
+language file we're linking this C code to. We therefore declare our
+circle sprite data as an external character array, which is how the C
+compiler will see it.
+
+In the *main()* code we see the function call which initialises the
+SP1 library, *sp1_Initialize()*. The 3 flags in the first argument are
+standard boilerplate for an SP1 program on the
+Spectrum. Unfortunately, and as is frequently the case with SP1, the
+documentation is lacking, but there's a forum post
 [here](https://www.z88dk.org/forum/viewtopic.php?pid=15708#p15708)
-which describes them in detail. The next argument initialises the
-screen to blank ink on whie paper, and the final argument specifies a
+which describes these flags in detail. It's not necessary to
+understand them at this point. The next argument initialises the
+screen to black ink on white paper, and the final argument specifies a
 'tile' to prepare the screen with. We haven't covered tiles yet; at
 this stage it can be seen as a character to fill the screen with. A
 space effectively clears the screen.
@@ -212,11 +224,11 @@ as empty structures, then the graphical data is subsequently filled
 in. The first call we see is therefore *sp1_CreateSpr()* which creates
 the sprite structure. This is followed by a call to *sp1_AddColSpr()*
 which adds in a single column of data to the sprite. A 'column' in
-this context is an 8 pixel wide block of graphical data. Since our
-sprite is only 8 pixels wide in total we only need a single call to
-*sp1_AddColSpr()*. A 16 pixel wide sprite would need a second
-call. There is a lot of detail in these 2 function calls, so we'll
-return to them in a moment.
+this context is an 8 pixel wide block of graphical data as tall as the
+sprite. Since our sprite is only 8 pixels wide in total we only need a
+single call to *sp1_AddColSpr()*. A 16 pixel wide sprite would need a
+second call. There is a lot of detail in these 2 function calls which
+we need to cover, so we'll return to them in a moment.
 
 Next, we place the sprite ready to be drawn via the call to
 *sp1_MoveSprAbs()*. The final 4 arguments to this function specify
@@ -225,7 +237,8 @@ vertical rotation, format. The row and column specify the character
 cell location for the sprite in the ranges 0-32 and 0-23
 respectively. The horizontal and vertical rotation values are both in
 the range 0-7 and specify how many pixels to rotate the sprite data by
-so it sits in the exact pixel location required.
+within the character cell so it sits in the exact pixel location
+required.
 
 The sprite's location in pixels is therefore:
 
@@ -256,7 +269,15 @@ free.
 
 The program then drops into an infinite loop so we can see the result.
 
+#### A closer look at the sprites code
+
+
+### Pixel positioning
+
+<<<TODO Explain those 8 zeroes above the sprite data>>>
+
+### The memory map
 
 
 
-[... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)
+[... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_HelloWorld.md)
