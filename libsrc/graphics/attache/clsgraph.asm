@@ -7,9 +7,10 @@
    PUBLIC	LINDSP
 
 	EXTERN	base_graphics
+	EXTERN	setres
 
 ;
-;	$Id: clsgraph.asm $
+;	$Id: clsgraph.asm,v 1.7 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 ; ******************************************************************
@@ -56,3 +57,9 @@ GFX_COUT:
 	POP	HL
 	RET
 
+
+setres:
+				LD 	C,27
+				CALL	GFX_COUT
+				LD 	C,'9'			; 8/9 = plot/unplot mode
+				JP	GFX_COUT

@@ -19,23 +19,20 @@
 			
 			EXTERN	w_plotpixel
 			EXTERN	w_xorpixel
-			EXTERN	GFX_COUT
+			
+				EXTERN	setres
+				EXTERN	swapgfxbk1
 
 .w_respixel
 .w_xorpixel
 						push hl
 						push de
-
-						LD 	C,27
-						CALL	GFX_COUT
-						LD 	C,'9'			; 8/9 = plot/unplot mode
-						CALL	GFX_COUT
 						
+						call setres
+
 						pop de
 						pop hl
+						
 						call	w_plotpixel
 						
-						LD 	C,27
-						CALL	GFX_COUT
-						LD 	C,'8'			; 8/9 = plot/unplot mode
-						JP	GFX_COUT
+						jp	swapgfxbk1

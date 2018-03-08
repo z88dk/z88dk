@@ -17,17 +17,17 @@
                 PUBLIC    swapgfxbk1
                 PUBLIC    _swapgfxbk1
 
+			EXTERN	GFX_COUT
 
 .swapgfxbk
 ._swapgfxbk
+				ret
 
 .swapgfxbk1
 ._swapgfxbk1
 
-	ret
-
-
-
-
-
+				LD 	C,27
+				CALL	GFX_COUT
+				LD 	C,'8'			; 8/9 = plot/unplot mode
+				JP	GFX_COUT
 

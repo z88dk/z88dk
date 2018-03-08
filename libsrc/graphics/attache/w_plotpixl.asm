@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: w_plotpixl.asm $
+;	$Id: w_plotpixel.asm $
 ;
 
 
@@ -56,7 +56,7 @@
 						
 						pop de		; y coordinate
 						
-						ld	hl,maxy		; flip vertically
+						ld	hl,maxy-1		; flip vertically
 						sbc hl,de
 						ex de,hl
 
