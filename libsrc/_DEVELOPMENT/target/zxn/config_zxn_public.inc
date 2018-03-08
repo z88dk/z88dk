@@ -3606,7 +3606,7 @@ PUBLIC __IO_SD_CONTROL
 PUBLIC __IO_SD_STATUS
 PUBLIC __IO_SD_DATA
 
-PUBLIC __IO_LED
+PUBLIC __IO_LED_L
 
 
 
@@ -3615,7 +3615,25 @@ defc __IO_SD_CONTROL = 0xe7
 defc __IO_SD_STATUS = 0xe7
 defc __IO_SD_DATA = 0xeb
 
-defc __IO_LED = 0x103b
+defc __IO_LED_L = 0x103b
+
+; define(`__ZXN_FILENAME_NEXT_UPDATE_FILE', "TBBLUE  TBU")
+; define(`__ZXN_FILENAME_NEXT_UPDATE_FILE_2', "TBBLUE.TBU")
+
+; define(`__ZXN_FILENAME_NEXT_FIRMWARE_FILE', "TBBLUE  FW ")
+; define(`__ZXN_FILENAME_NEXT_FIRMWARE_FILE_2', "TBBLUE.FW")
+
+; define(`__ZXN_DIR_NEXT_DIRECTORY', "/tbblue/")
+
+; define(`__ZXN_FILENAME_CONFIG', "/tbblue/config.ini")
+; define(`__ZXN_FILENAME_TIMING', "/tbblue/timing.ini")
+
+; define(`__ZXN_FILENAME_ESXMMC', "esxmmc.rom")
+; define(`__ZXN_FILENAME_MF1', "mf1.rom")
+; define(`__ZXN_FILENAME_MF3', "mf3.rom")
+; define(`__ZXN_FILENAME_MF128', "mf128.rom")
+
+; define(`__ZXN_FILENAME_KEYMAP', "/tbblue/keymap.bin")
 
 
 

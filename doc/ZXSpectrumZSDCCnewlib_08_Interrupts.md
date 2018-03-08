@@ -217,6 +217,7 @@ discussion above:
 
 ```
 #pragma output REGISTER_SP = 0xFF58
+#pragma output CLIB_MALLOC_HEAP_SIZE = -0xFBFA
 
 #include <z80.h>
 #include <string.h>
@@ -263,6 +264,15 @@ deliberately uses C macros to define the salient values to make things a bit
 clearer. If you run it you'll notice that a) a small dashed line appears in the
 top left corner of the screen and b) the Spectrum locks up.  Let's look at the
 code to see what's happening.
+
+The first pragma, as we saw in [installment 6](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md#changing-the-memory-layout),
+sets the stack pointer to address 0xFF58. This happens to be the default stack
+location but there's no harm is stating it explicitly. The second pragma sets
+the top byte of the heap to address 0xFBFA. Note how this is done: you give it
+the negation of the absolute address you want the top byte of the heap to be, as described
+[here](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded&s[]=crt&s[]=enable&s[]=restart#crt_configuration).
+If the program attempts a *malloc()* which would cause the heap to overwrite the
+interrupt structures, the *malloc()* will fail.
 
 The first thing the code does in *main()* is set up the vector table. As described
 above, the table will occupy the 257 bytes from 0xFC00, so a simple *memset()* is
@@ -345,6 +355,9 @@ With this in place we can set up a C code interrupt service routine, then return
 to BASIC with it still running, like this example:
 
 ```
+
+#pragma output REGISTER_SP = 0xFF58
+#pragma output CLIB_MALLOC_HEAP_SIZE = -0xFBFA
 
 /* Ensure IM2 is left at exit */
 #pragma output CRT_INTERRUPT_MODE_EXIT = 2
@@ -466,6 +479,25 @@ zcc +zx -vn -clib=sdcc_iy -startup=31 atts_ticker.c -o atts_ticker -create-app
 Note how the call to *intrinsic_ei()* isn't required in the *main()* code in this
 example. This is because the Z88DK CRT code will always contain an instruction
 to re-enable interrupts when returning to BASIC.
+
+### Warnings
+
+Working with interrupts on the Spectrum can be a fiddly business, and it's an
+area where intimate knowledge of the hardware is required to ensure correct and
+reliable operation. For example, the programmer needs to beware of putting the
+interrupt structures in lower, contended memory. Issues with the Spectrum
+hardware make this produce an on-screen effect colloquially known as
+"snow".
+
+Also, although this getting started series only applies to the 48K Spectrum, it
+should be pointed out that arranging things in high memory on the 128K machines
+can cause problems with bank switching. Crashes caused by the interrupt
+structures suddenly disappearing or being overwritten can be baffling, which is
+why this guide has focused so heavily on understanding the memory layout.
+
+If you find yourself uncertain as to how to proceed with a particular scenario,
+or are getting occasional or strange, sudden crashes, consider raising the
+issue on the Z88DK [ZX support forum](https://www.z88dk.org/forum/viewforum.php?id=2).
 
 ### Conclusion
 

@@ -115,11 +115,8 @@ extern unsigned char IO_SD_CONTROL;
 extern unsigned char IO_SD_STATUS;
 extern unsigned char IO_EB;
 extern unsigned char IO_SD_DATA
-
-// LED
-
-__sfr __banked __at 0x103b IO_103B;
-__sfr __banked __at __IO_LED IO_LED;
+extern unsigned char IO_103B;
+extern unsigned char IO_LED_L;
 
 #else
 
@@ -202,12 +199,12 @@ __sfr __at __IO_SD_CONTROL IO_SD_CONTROL;
 __sfr __at __IO_SD_STATUS IO_SD_STATUS;
 
 __sfr __at 0xeb IO_EB;
-__sfr __at __IO_SD_DATA IO_SD_DATA
+__sfr __at __IO_SD_DATA IO_SD_DATA;
 
 // io ports - LED
 
 __sfr __banked __at 0x103b IO_103B;
-__sfr __banked __at __IO_LED IO_LED;
+__sfr __banked __at __IO_LED_L IO_LED_L;
 
 #endif
 
@@ -658,6 +655,26 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define RCCH_COPPER_RUN_VBI  __RCCH_COPPER_RUN_VBI
 
 #define REG_DEBUG  __REG_DEBUG
+
+// important filenames
+
+#define ZXN_FILENAME_NEXT_UPDATE_FILE  __ZXN_FILENAME_NEXT_UPDATE_FILE
+#define ZXN_FILENAME_NEXT_UPDATE_FILE_2  __ZXN_FILENAME_NEXT_UPDATE_FILE_2
+
+#define ZXN_FILENAME_NEXT_FIRMWARE_FILE  __ZXN_FILENAME_NEXT_FIRMWARE_FILE
+#define ZXN_FILENAME_NEXT_FIRMWARE_FILE_2  __ZXN_FILENAME_NEXT_FIRMWARE_FILE_2
+
+#define ZXN_DIR_NEXT_DIRECTORY  __ZXN_DIR_NEXT_DIRECTORY
+
+#define ZXN_FILENAME_CONFIG  __ZXN_FILENAME_CONFIG
+#define ZXN_FILENAME_TIMING  __ZXN_FILENAME_TIMING
+
+#define ZXN_FILENAME_ESXMMC  __ZXN_FILENAME_ESXMMC
+#define ZXN_FILENAME_MF1  __ZXN_FILENAME_MF1
+#define ZXN_FILENAME_MF3  __ZXN_FILENAME_MF3
+#define ZXN_FILENAME_MF128  __ZXN_FILENAME_MF128
+
+#define ZXN_FILENAME_KEYMAP  __ZXN_FILENAME_KEYMAP
 
 ///////////////////////////////////////////////////////////////
 

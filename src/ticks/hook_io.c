@@ -71,6 +71,7 @@ static void cmd_openfile(void)
     if ( z88dk_flags & Z88DK_O_RDWR ) flags = O_RDWR;
     if ( z88dk_flags & Z88DK_O_TRUNC ) flags |= O_TRUNC;
     if ( z88dk_flags & Z88DK_O_APPEND ) flags |= O_APPEND;
+    if ( z88dk_flags & Z88DK_O_CREAT ) flags |= O_CREAT;
 
     l = h = 255; 
     if ( slot != -1 ) {

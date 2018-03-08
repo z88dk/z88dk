@@ -32,15 +32,25 @@ CFILES = \
 	write.c \
 	writebyte.c 
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+AFILES = $(CFILES:.c=.asm)
+OFILES = $(CFILES:.c=.o)
+OBJECTS = $(addprefix obj/nodevice/,$(OFILES)) $(addprefix obj/device/,$(OFILES))
 
-all: $(OBJECTS)
+
+all: dirs $(OBJECTS)
 
 # It can't be +cpm, otherwise the bin output filename
 # will be forced to 'a.com' !!
-.c.o:
-	$(ZCC) +cpm $(CFLAGS) $*.c
+obj/nodevice/%.o: %.c
+	$(ZCC) +cpm $(CFLAGS) $^ -o $@
+
+obj/device/%.o: %.c
+	$(ZCC) +cpm $(CFLAGS) -DDEVICES $^ -o $@
+
+.PHONY:	dirs
+
+dirs:
+	@mkdir -p obj obj/device obj/nodevice
 
 clean:
-	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.i $(AFILES)
+	$(RM) -fr obj zcc_opt.def

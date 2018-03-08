@@ -212,7 +212,7 @@ extern int atoi(char *buf);
 extern long atol(char *buf);
 
 
-extern void bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar);
+extern void *bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar);
 
 
 extern size_t dtoa(double_t x,void *buf,uint16_t prec,uint16_t flags);

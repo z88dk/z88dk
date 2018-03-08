@@ -9,42 +9,36 @@ zx_01_output_fzx_tty_z88dk_23_atr:
    ; atr dx,dy
    
    ; de = parameters *
-   
-   ld a,(de)                   ; a = dy
-   dec a
+
+   ld a,(de)                   ; biased dy
    inc de
    
-   ld c,a
-   
+   sub 0x80
+   ld l,a
    add a,a
    sbc a,a
+   ld h,a                      ; hl = dy
    
-   ld b,a                      ; bc = dy
+   ld a,(ix+37)                ; y
+   add a,l
+   ld (ix+37),a
+   ld a,(ix+38)
+   adc a,h
+   ld (ix+38),a
    
-   ld l,(ix+37)
-   ld h,(ix+38)                ; hl = y
+   ld a,(de)                   ; biased dx
    
-   add hl,bc
-   
-   ld (ix+37),l
-   ld (ix+38),h                ; set new y
-   
-   ld a,(de)                   ; a = dx
-   dec a
-   
-   ld c,a
-   
+   sub 0x80
+   ld l,a
    add a,a
    sbc a,a
+   ld h,a                      ; hl = dx
    
-   ld b,a                      ; bc = dx
-   
-   ld l,(ix+35)
-   ld h,(ix+36)                ; hl = x
-   
-   add hl,bc
-   
-   ld (ix+35),l
-   ld (ix+36),h                ; set new x
+   ld a,(ix+35)                ; x
+   add a,l
+   ld (ix+35),a
+   ld a,(ix+36)
+   adc a,h
+   ld (ix+36),a
    
    ret
