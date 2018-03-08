@@ -97,19 +97,20 @@ now look at some C code.
 Save this listing to a file named 'circle.c':
 
 ```
-#pragma output REGISTER_SP = 53248
+#pragma output REGISTER_SP = 0xD000
 
+#include <intrinsic.h>
 #include <arch/zx.h>
 #include <arch/zx/sp1.h>
 
 extern unsigned char circle[];
 
-struct sp1_Rect full_screen = {0, 0, 32, 24};
-
-struct sp1_ss  *circle_sprite;
-
 int main()
 {
+  struct sp1_Rect full_screen = {0, 0, 32, 24};
+  struct sp1_ss  *circle_sprite;
+
+  intrinsic_ei();
   zx_border(INK_BLACK);
 
   sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
@@ -121,7 +122,9 @@ int main()
 
   sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, 0, 0, 0);
 
-  sp1_MoveSprAbs(circle_sprite, &full_screen, circle, 0, 0, 0, 0);
+  sp1_MoveSprAbs(circle_sprite, &full_screen, 0, 0, 0, 0, 0);
+
+  intrinsic_halt();
   sp1_UpdateNow();
 
   while(1);
@@ -139,7 +142,7 @@ When you run the resultant program you'll see the border turns black
 and the 8x8 pixel circle sprite appears in the top left corner of the
 screen. It's not much, but it's a start.
 
-### The SP1 header file and library
+#### The SP1 header file and library
 
 As
 [discussed](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#header-files)
@@ -165,12 +168,10 @@ local configuration. Although we're not going to cover the SP1
 reconfiguration here, it's for this reason you should always reference
 your local copy of the header file, not the one online at GitHub.
 
-As
-[always](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#library-files)
-with these getting started guides, we're using sdcc and the new
-libraries, so the SP1 library itelf is in the 'iy' version of the
-standard C library. On Linux you can confirm this with a command such
-as:
+The SP1 library code we're using is in the 'iy' version of the
+standard C library, as described
+[here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#library-files).
+On Linux you can confirm this with a command such as:
 
 ```
 >z80nm $ZCCCFG/../../libsrc/_DEVELOPMENT/lib/sdcc_iy/zx.lib | less
@@ -179,10 +180,83 @@ as:
 and search for 'sp1' in the output.
 
 
-#### Header Files
+#### The C code
+
+Returning to the example C code, we see a pragma at the top which
+moves the stack pointer from its default location down to address
+0xD000 (53248 decimal). We'll look at the memory map of an SP1 program
+in due course; for now we just need to understand that the SP1
+library (in its default configuration) builds its data structures in
+high memory. This pragma moves the stack pointer below those data
+structures. 
+
+We then come to the function call which initialises the SP1 library,
+*sp1_Initialize()*. The 3 flags in the first argument are standard
+boilerplate for an SP1 program on the Spectrum. Unfortunately, and as
+is frequently the case with SP1, the documentation is lacking, but
+there's a forum post
+[here](https://www.z88dk.org/forum/viewtopic.php?pid=15708#p15708)
+which describes them in detail. The next argument initialises the
+screen to blank ink on whie paper, and the final argument specifies a
+'tile' to prepare the screen with. We haven't covered tiles yet; at
+this stage it can be seen as a character to fill the screen with. A
+space effectively clears the screen.
+
+We then 'invalidate' a rectange of screen space, defined in character
+cells. This tells the screen updater algorithm in SP1 that the
+specified area - in this case it's the whole of the Spectrum screen -
+is going to need to be redrawn when we get to that point.
+
+Next we have to create the sprite. SP1 sprites are initially created
+as empty structures, then the graphical data is subsequently filled
+in. The first call we see is therefore *sp1_CreateSpr()* which creates
+the sprite structure. This is followed by a call to *sp1_AddColSpr()*
+which adds in a single column of data to the sprite. A 'column' in
+this context is an 8 pixel wide block of graphical data. Since our
+sprite is only 8 pixels wide in total we only need a single call to
+*sp1_AddColSpr()*. A 16 pixel wide sprite would need a second
+call. There is a lot of detail in these 2 function calls, so we'll
+return to them in a moment.
+
+Next, we place the sprite ready to be drawn via the call to
+*sp1_MoveSprAbs()*. The final 4 arguments to this function specify
+exactly where to place the sprite in row, column, horizontal rotation,
+vertical rotation, format. The row and column specify the character
+cell location for the sprite in the ranges 0-32 and 0-23
+respectively. The horizontal and vertical rotation values are both in
+the range 0-7 and specify how many pixels to rotate the sprite data by
+so it sits in the exact pixel location required.
+
+The sprite's location in pixels is therefore:
+
+```
+ x = (row*8) + horizontal_rotation
+ y = (col*8) + vertical_rotation
+```
+
+This method of screen positioning might seem a little fussy, but there
+is good reason for it. As we shall see, SP1 largely works in character
+cells, not pixels, and having the user's program specify values in
+character cells where possible makes the library more efficient.
+
+Up to this point the program has only been arranging things in
+memory. Nothing has been drawn to the screen. To make that happen we
+call *sp1_UpdateNow()* which is the function which causes the screen
+to be updated. Although it's not necessary for this tiny example, it's
+typical practice to use a call to *intrinsic_halt()* to wait for an
+interrupt to occur before calling the screen updater function. This
+causes the Z80 to stop work until the Spectrum's video circuitry
+generates the next interrupt signal, at which point things
+continue. Arranging the timing like this ensures the updater function
+does all the video memory updates while the video circuitry is busy
+drawing the top part of the Spectrum's border. As long as all the
+video memory changes are complete before the video circuitry gets as
+far as drawing the actual pixel display, everything will be flicker
+free.
+
+The program then drops into an infinite loop so we can see the result.
 
 
-#### Library Files
 
 
 [... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)
