@@ -1,71 +1,136 @@
-/*
- *    Read from a file
- *
- *    int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
- *
- *    Calls read() in fcntl to do the dirty work
- *
- *    Returns number of members readen
- *
- *    We have to take account of ungotten characters
- *
- *    djm 1/4/2000
- *
- * --------
- * $Id: fread.c,v 1.7 2010-01-15 07:12:05 stefano Exp $
- */
+
 
 #define ANSI_STDIO
 #define STDIO_ASM
 #include <stdio.h>
 
-static int fread1(void *ptr, size_t len, FILE *fp) __z88dk_callee;
-
-int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
+static int wrapper() __naked
 {
-    if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && 
-            fchkstd(fp)== 0) {
-        int    readen = size*nmemb;
-        int     count  = 0;
-#ifdef __STDIO_BINARY
-        while ( count < readen ) {
-            int c = fgetc(fp);
-            if ( c == EOF ) {
-                break;
-            }
-            *ptr++ = (unsigned char)c;
-            ++count;
-        }
-        return ( count / size );  /* Relies on 0 / x != EXCEPTION */
-#else            
-        if (readen) {
-            /* Pick up ungot character */
-            int c = fgetc(fp);
-            /* Horrible hack around here */
-            if ( c >= 0 ) {
-            *ptr = (unsigned char )c;
-            readen=fread1(ptr+1,readen-1,fp);
-            ++readen;
-            /* Return number of members read */
-            return (readen/size);
-            }
-        }
-#endif
-    }
-    return 0;
-}
-
-
-#ifndef __STDIO_BINARY
-
 #asm
-; (buf, size, fp)
-_fread1:
-        pop     hl
-        pop     ix              ;fp
-        pop     bc              ;size
-        pop     de              ;buf
-        push    hl              ;restore return address
+; int fread(void *ptr, size_t size, size_t nmemb, FILE *fp) __naked
+	GLOBAL _fread
+fread:
+_fread:
+	push	ix	;save callers
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(sp + 8)	; size
+	ld	c,l
+	ld	b,h
+	ld	hl,(sp + 6)	; nmemb
+	mul
+	ld	l,c
+	ld	h,b
+ELSE
+	ld	ix,0
+	add	ix,sp
+	ld	l,(ix+6)	;nmemb
+	ld	h,(ix+7)
+	ld	e,(ix+8)	;size
+	ld	d,(ix+9)
+	call	l_mult		;hl = nmemb * size
+ENDIF
+	ld	a,h
+	or	l
+	jp	z,fread_exit
+	ld	c,l
+	ld	b,h
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	ix,(sp + 4)	;fp
+	ld	hl,(sp + 10)	;ptr
+ELSE
+	ld	l,(ix+10)	;ptr
+	ld	h,(ix+11)
+	ld	e,(ix+4)	;fp
+	ld	d,(ix+5)
+	push	de	
+	pop	ix		;ix = fp
+ENDIF
+	ld	de,0		;bytes read
+	; Check that we have a non-system reader thats in use
+	ld	a,(ix + fp_flags)
+	bit	4,a			; _IOSYSTEM
+	jr	nz,read_byte_done
+	and	_IOUSE | _IOREAD
+	cp	_IOUSE | _IOREAD
+	jr	nz,read_byte_done
+#ifdef __STDIO_BINARY
+	bit	6,(ix + fp_flags)	; _IOTEXT
+	jp	z,fread_block
+	; Text mode, read byte byte
+	; ix = fp
+	; hl = ptr
+	; bc = count
+	; de = bytes read
+read_byte_loop:
+	push	hl
+	push	de
+	push	bc
+	push	ix
+	call	fgetc	;NB: preserves ix
+	pop	bc	;so dont need ot explicitly pop it
+	pop	bc	;bc= remaining
+	pop	de	;de= count
+	ld	a,l
+	inc	h
+	pop	hl
+	jr	z,read_byte_done
+	; It wasnt EOF, carry on
+	ld	(hl),a
+	inc	de
+	inc	hl
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,read_byte_loop
+#else
+	jr	fread_block
+#endif
+read_byte_done:
+	; de = bytes read
+	; divide and return
+IF __CPU_R2K__ | __CPU_R3K__
+	ld	hl,(sp + 8)	;size
+ELSE
+	ld	ix,0
+	add	ix,sp
+	ld	l,(ix+8)	;size
+	ld	h,(ix+9)
+ENDIF
+	call	l_div		;hl = de/hl = bytes_read/size
+fread_exit:
+	pop	ix		;restore callers
+	ret
+
+fread_block:
+	; Read from a file using blocks	
+	; Pick up any ungot character
+        push    hl
+        push    de
+        push    bc
+        push    ix
+        call    fgetc	;preserves ix
+        pop     bc
+        pop     bc
+        pop     de
+	ld	a,l
+	inc	h
+	pop	hl
+	jr	z,read_byte_done
+	ld	(hl),a		;save byte
+	inc	hl
+	inc	de
+	dec	bc
+
+	; Now call fread1 directly
+	ex	de,hl		; de = buf
+				; bc = bytes to read
+				; ix = fp
+	call	fread1		; hl = bytes read
+	inc	hl
+	ex	de,hl
+	jr	read_byte_done
+
+fread1:
         ld      a,(ix+fp_flags)
         and     _IOEXTRA
         jr      z,fread_direct
@@ -94,5 +159,4 @@ ENDIF
         pop     bc
         ret
 #endasm
-#endif
-
+}

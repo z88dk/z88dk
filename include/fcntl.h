@@ -21,6 +21,7 @@
 #define O_RDWR    2
 #define O_APPEND  256
 #define O_TRUNC   512
+#define O_CREAT   1024
 
 #define SEEK_SET 0
 #define SEEK_CUR 1

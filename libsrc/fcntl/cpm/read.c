@@ -21,8 +21,7 @@ ssize_t read(int fd, void *buf, size_t len)
     int    cnt,size,offset;
 
     if ( fd >= MAXFILE )
-    return -1;
-
+       return -1;
     fc = &_fcb[fd];
     switch ( fc->use ) {
 #ifdef DEVICES
