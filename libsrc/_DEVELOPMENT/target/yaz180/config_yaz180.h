@@ -43,7 +43,10 @@
 
 #define __IO_BASE_ADDRESS 0x0
 
-#define __COMMON_AREA_1_BASE  0xf000
+#define __BIOS_SP   0xFFDE
+#define __BANK_SP   0x003B
+
+#define __COMMON_AREA_1_BASE  0xF000
 #define __COMMON_AREA_1_PHASE_DATA  0xf000
 #define __COMMON_AREA_1_PHASE_DRIVER  0xf600
 

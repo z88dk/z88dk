@@ -20,10 +20,13 @@ define(`__IO_BASE_ADDRESS', 0x00)
 
 define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS&0xc0,16))
 
+define(`__BIOS_SP', 0xFFDE)                         # location of bios SP when other banks running
+define(`__BANK_SP', 0x003B)                         # location of banked SP when not running
+
 # All I/O drivers are passed through system buffers
 # This will help when user banking is used, as all I/O is via system RAM
 
-define(`__COMMON_AREA_1_BASE', 0xf000)              # Base address of COMMON AREA 1
+define(`__COMMON_AREA_1_BASE', 0xF000)              # Base address of COMMON AREA 1
 define(`__COMMON_AREA_1_PHASE_DATA_SIZE', 0x0600)   # Size allowance for COMMON AREA 1 PHASE DATA
 
 define(`__COMMON_AREA_1_PHASE_DATA', 0x`'eval(__COMMON_AREA_1_BASE,16))    # Origin of COMMON AREA 1 Data
@@ -77,6 +80,9 @@ PUBLIC `__CPU_CLOCK'
 
 PUBLIC `__IO_BASE_ADDRESS'
 
+PUBLIC `__BIOS_SP'
+PUBLIC `__BANK_SP'
+
 PUBLIC `__COMMON_AREA_1_BASE'
 PUBLIC `__COMMON_AREA_1_PHASE_DATA'
 PUBLIC `__COMMON_AREA_1_PHASE_DRIVER'
@@ -111,6 +117,9 @@ defc `__YAZ180' = __YAZ180
 defc `__CPU_CLOCK' = __CPU_CLOCK
 
 defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
+
+defc `__BIOS_SP' = __BIOS_SP
+defc `__BANK_SP' = __BANK_SP
 
 defc `__COMMON_AREA_1_BASE' = __COMMON_AREA_1_BASE
 defc `__COMMON_AREA_1_PHASE_DATA' = __COMMON_AREA_1_PHASE_DATA
@@ -147,6 +156,9 @@ ifdef(`CFG_C_DEF',
 `#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__IO_BASE_ADDRESS' __IO_BASE_ADDRESS
+
+`#define' `__BIOS_SP'   __BIOS_SP
+`#define' `__BANK_SP'   __BANK_SP
 
 `#define' `__COMMON_AREA_1_BASE'  __COMMON_AREA_1_BASE
 `#define' `__COMMON_AREA_1_PHASE_DATA'  __COMMON_AREA_1_PHASE_DATA
