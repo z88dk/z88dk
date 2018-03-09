@@ -1,7 +1,8 @@
 ;
-;       Generic pseudo graphics routines for text-only platforms
+;       Generic pseudo graphics routines for Osborne 1
+;		pseudo-graphics symbols, 52 columns mode
 ;
-;       Written by Stefano Bodrato 30/01/2002
+;       Written by Stefano Bodrato 2018
 ;
 ;
 ;       Plot pixel at (x,y) coordinate.
@@ -21,7 +22,7 @@
 			EXTERN	base_graphics
 
 
-.plotpixel			
+.plotpixel
 			ld	a,h
 			cp	maxx
 			ret	nc
@@ -40,12 +41,12 @@
 			
 			srl	b
 			srl	c
-			ld	hl,(base_graphics)
+			ld	hl,$f000
 			ld	a,c
 			ld	c,b	; !!
 			and	a
 			ld	b,a
-			ld	de,maxx/2
+			ld	de,$80		; ..a text row every 128 bytes
 			jr	z,r_zero
 .r_loop
 			add	hl,de
