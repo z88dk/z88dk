@@ -7,7 +7,7 @@
 ;	Erases pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.8 2016-08-05 07:04:09 stefano Exp $
+;	$Id: respixl.asm $
 ;
 
 
@@ -44,9 +44,9 @@
 			ld	a,c
 			ld	c,b	; !!
 			and	a
-			jr	z,r_zero
 			ld	b,a
 			ld	de,maxx/2
+			jr	z,r_zero
 .r_loop
 			add	hl,de
 			djnz	r_loop
