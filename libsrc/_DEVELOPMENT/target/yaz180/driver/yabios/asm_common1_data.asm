@@ -7,12 +7,7 @@ INCLUDE "config_private.inc"
 
 PUBLIC  _bios_sp
 
-IF __register_sp
-EXTERN  __register_sp
-defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here, when other banks running
-ELSE
-defc    _bios_sp    =   $FFDE           ; or here if __register_sp is undefined
-ENDIF
+defc    _bios_sp    =   __BIOS_SP   ; yabios BANK0 SP here, when other banks running
 
 ; start of the Transitory Program Area (TPA) Control Block (TCB)
 ; for BANK1 through BANK12
@@ -23,7 +18,7 @@ ENDIF
 
 PUBLIC  _bank_sp                        ; DEFW at 0x003B in Page 0
 
-defc    _bank_sp    =   $003B
+defc    _bank_sp    =   __BANK_SP
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - page aligned data

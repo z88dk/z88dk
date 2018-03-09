@@ -17,9 +17,12 @@ IF __CPU_R2K__ | __CPU_R3K__
 	ld	c,l
 	ld	b,h
 	ld	hl,(sp + 6)	; nmemb
-	mul
-	ld	l,c
-	ld	h,b
+	mul			; bc = nmemb * size
+	ld	a,c
+	or	b
+	jp	z,fread_exit
+	ld	ix,(sp + 4)	;fp
+	ld	hl,(sp + 10)	;ptr
 ELSE
 	ld	ix,0
 	add	ix,sp
@@ -28,16 +31,11 @@ ELSE
 	ld	e,(ix+8)	;size
 	ld	d,(ix+9)
 	call	l_mult		;hl = nmemb * size
-ENDIF
 	ld	a,h
 	or	l
 	jp	z,fread_exit
 	ld	c,l
 	ld	b,h
-IF __CPU_R2K__ | __CPU_R3K__
-	ld	ix,(sp + 4)	;fp
-	ld	hl,(sp + 10)	;ptr
-ELSE
 	ld	l,(ix+10)	;ptr
 	ld	h,(ix+11)
 	ld	e,(ix+4)	;fp
@@ -96,7 +94,7 @@ ELSE
 	ld	l,(ix+8)	;size
 	ld	h,(ix+9)
 ENDIF
-	call	l_div		;hl = de/hl = bytes_read/size
+	call	l_div_u		;hl = de/hl = bytes_read/size
 fread_exit:
 	pop	ix		;restore callers
 	ret
@@ -131,8 +129,7 @@ fread_block:
 	jr	read_byte_done
 
 fread1:
-        ld      a,(ix+fp_flags)
-        and     _IOEXTRA
+        bit	5,(ix+fp_flags)	; _IOEXTRA
         jr      z,fread_direct
         ; Calling via the extra hook
 IF __CPU_R2K__ | __CPU_R3K__

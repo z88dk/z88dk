@@ -637,7 +637,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                 } else if ( z == 7 ) {
                     if ( israbbit() && y == 0 ) { handle_immed16(state, opbuf1, sizeof(opbuf1)); handle_immed8(state, opbuf2, sizeof(opbuf2)); BUF_PRINTF("%-8s%s,%s","ljp", opbuf2, opbuf1); }
                     else if ( israbbit() && y == 1 ) { handle_immed16(state, opbuf1, sizeof(opbuf1)); handle_immed8(state, opbuf2, sizeof(opbuf2)); BUF_PRINTF("%-8s%s,%s","lcall", opbuf2, opbuf1); }
-                    else if ( israbbit() && y == 7 ) BUF_PRINTF("mul");
+                    else if ( israbbit() && y == 6 ) BUF_PRINTF("mul");
                     else BUF_PRINTF("%-8s$%02x", "rst", y * 8);
                 }
                 break;

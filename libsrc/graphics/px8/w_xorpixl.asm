@@ -3,10 +3,10 @@
         SECTION code_clib
         PUBLIC    w_xorpixel
 
-        EXTERN     w_plotpixel
+        EXTERN     w_respixel
 
 ;
-;       $Id: w_xorpixl.asm, Stefano - 2017 $
+;       $Id: w_xorpixl.asm $
 ;
 
 ; ******************************************************************
@@ -26,4 +26,4 @@
 ;  afbcdehl/.... different
 ;
 .w_xorpixel
-					jp w_plotpixel
+					jp w_respixel

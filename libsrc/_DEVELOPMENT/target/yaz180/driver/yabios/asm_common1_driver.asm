@@ -172,7 +172,7 @@ _jp_far:
     pop hl              ; addr in HL
     dec sp
     pop de              ; bank in D
-    push af             ; put ret address back for posterity, but we're not coming back
+    push af             ; put ret address back for posterity, perhaps we'll return one day
                         ; this is the future top of _bios_sp
     ld e, d             ; put bank in E
 
@@ -285,8 +285,8 @@ system_try_alt_lock:
 
     in0 b, (BBR)        ; get and save origin BBR in B 
     ld c, 0             ; hold absolute destination, BANK0, in C
-    ld hl, _bankLockBase; get the bank Lock Base, for BANK0
 
+    ld hl, _bankLockBase; get the bank Lock Base, for BANK0
 system_try_bios_lock:
     sra (hl)            ; now get the bios bank lock,
     jr C, system_try_bios_lock   ; keep trying if bios bank is hot
@@ -346,7 +346,56 @@ system_ret:             ; we land back here once the yabios call is done
     ld hl, _shadowLock  ; give alt register mutex
     ld (hl), $FE
     pop hl
-    ret
+    ret                 ; ret (jp) to the address that we left on the stack
+
+;------------------------------------------------------------------------------
+
+PUBLIC _exit_far
+
+_exit_far:              ; use this to return to yabios from an exiting application
+    push af             ; save flags
+    push hl
+    ld hl, _shadowLock
+exit_far_try_alt_lock:
+    sra (hl)            ; get alt register mutex
+    jr C, exit_far_try_alt_lock ; just keep trying, can't give up
+    pop hl
+    pop af
+
+    ex af,af            ; all your register are belong to us
+    exx
+
+    xor a               ; hold absolute destination, BANK0, in A
+    in0 c, (BBR)        ; get and save origin BBR in C
+
+    ld hl, _bankLockBase; get the bank Lock Base, for BANK0
+exit_far_try_bios_lock:
+    sra (hl)            ; now get the bios bank lock,
+    jr C, exit_far_try_bios_lock   ; keep trying if bios bank is hot
+
+    di
+    ld (_bank_sp), sp   ; save the departing bank SP in Page0
+    out0 (BBR), a       ; make the bank swap
+    ld sp, (_bios_sp)   ; set up the arriving SP in bios
+    ei
+
+    ld h, _bankLockBase/$100    ; get the BANK Lock Base, page aligned
+    ld a, c             ; make the reference to origin BANKnn Lock
+    rrca                ; move the origin bank to low nibble
+    rrca                ; we know BBR lower nibble is 0
+    rrca
+    rrca
+    ld l, a
+    ld (hl), $FE        ; free the bank we are now departing
+
+    exx                 ; alt registers are returned
+    ex af,af
+
+    push hl
+    ld hl, _shadowLock  ; give alt register mutex
+    ld (hl), $FE
+    pop hl
+    ret                 ; ret (jp) to the address that we left on the bios stack
 
 ;------------------------------------------------------------------------------
 
@@ -1425,7 +1474,6 @@ _asci0_init:
     ret
 
 PUBLIC _asci0_flush_Rx_di
-;PUBLIC _asci0_flush_Rx
 
 EXTERN asci0RxCount, asci0RxIn, asci0RxOut, asci0RxBuffer, _asci0RxLock
 
@@ -1737,7 +1785,6 @@ _asci1_init:
     ret
 
 PUBLIC _asci1_flush_Rx_di
-;PUBLIC _asci1_flush_Rx
 
 EXTERN asci1RxCount, asci1RxIn, asci1RxOut, asci1RxBuffer, _asci1RxLock
 
