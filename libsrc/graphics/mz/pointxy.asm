@@ -5,7 +5,7 @@
 	EXTERN	__gfx_coords
 
 ;
-;	$Id: pointxy.asm,v 1.5 2016-07-02 09:01:36 dom Exp $
+;	$Id: pointxy.asm $
 ;
 
 ; ******************************************************************
@@ -46,9 +46,9 @@
 				ld	a,c
 				ld	c,b	; !!
 				and	a
-				jr	z,r_zero
 				ld	b,a
 				ld	de,40
+				jr	z,r_zero
 .r_loop
 				add	hl,de
 				djnz	r_loop
