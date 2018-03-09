@@ -10,12 +10,25 @@
  */
 
 #define ANSI_STDIO
+#define STDIO_ASM
 
 #include <stdio.h>
 
-int feof(FILE *fp)
+static void wrapper() __naked
 {
-	return (fp->flags&_IOEOF ? 1 : 0 );
+#asm
+feof:
+_feof:
+	inc	hl
+	inc	hl	;flags
+	ld	a,(hl)
+	ld	hl,1
+	bit	3,a	;_IOEOF
+	ret	nz
+	dec	hl	;hl = 0
+	ret
+#endasm
+//	return (fp->flags&_IOEOF ? 1 : 0 );
 }
 
 
