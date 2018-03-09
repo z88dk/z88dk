@@ -55,7 +55,6 @@ PUBLIC _circle
 	defb @00000000
 	defb @00000000
 	defb @00000000
-	defb @00000000
 
 ._circle
 	defb @00111100
@@ -66,10 +65,19 @@ PUBLIC _circle
 	defb @10000001
 	defb @01000010
 	defb @00111100
+
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+
 ```
 
-This piece of assembly defines an SP1 sprite in 16 data bytes. We
-could do this quite easily in C of course, given that it's only 16
+This piece of assembly defines an SP1 sprite in 22 data bytes. We
+could do this quite easily in C of course, given that it's only 22
 static numbers, but we use assembly language for it because the
 assembler allows numbers to be declared using binary notation, whereas
 C doesn't. You can see the pattern of the sprite in the ones and
@@ -86,15 +94,18 @@ needs to be placed in the *read only user's data* section.
 Next we declare the label *circle* to be publicly visible such that
 code in external files (the C source) can see it.
 
-Then we define 8 zero bytes. This isn't, as might be expected by more
+Then we define 7 zero bytes. This isn't, as might be expected by more
 experienced readers, anything to do with a mask. As stated, this
 example isn't going to use a mask. There's another reason for placing
-these 8 bytes here, and we'll come to it shortly.
+these 7 bytes here, and we'll come to it shortly.
 
-Finally we see the 8x8 pixel sprite data, labelled as *_circle* with a
+Then we see the 8x8 pixel sprite data, labelled as *_circle* with a
 leading underscore, which is how the C compiler expects to be able to
 reference it. These 8 bytes define a small circle in exactly the same
 manner as a traditional user defined graphic (UDG).
+
+Finally there is another 7 zero bytes following the graphic
+data. Again, we'll see what this is for in a moment.
 
 We therefore have our sprite data, defined in assembly language. Let's
 now look at some C code.
@@ -123,7 +134,7 @@ int main()
                   ' ' );
   sp1_Invalidate(&full_screen);
  
-  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE,  2,  0,  0);
+  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0);
 
   sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, 0, 0, 0);
 
@@ -271,6 +282,20 @@ The program then drops into an infinite loop so we can see the result.
 
 #### A closer look at the sprites code
 
+The two lines of code which create the sprite in memory stand closer
+inspection. Here's the first:
+
+```
+  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE,  2,  0,  0);
+```
+
+This function call creates the sprite structure in memory. The first
+argument is a pointer to a function used to draw the left boundary of
+the sprite. (There's no immediately obvious reason for the
+capitalisation of the function name.)
+
+Explain left side != right side for 8 pixel sprite when rotated. Maybe
+put the pixel positioning bit first, with graphics to explain?
 
 ### Pixel positioning
 
