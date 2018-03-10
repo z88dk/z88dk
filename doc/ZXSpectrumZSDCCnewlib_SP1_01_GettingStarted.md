@@ -76,8 +76,8 @@ PUBLIC _circle
 
 ```
 
-This piece of assembly defines an SP1 sprite in 22 data bytes. We
-could do this quite easily in C of course, given that it's only 22
+This piece of assembly defines an SP1 sprite in 23 data bytes. We
+could do this quite easily in C of course, given that it's only 23
 static numbers, but we use assembly language for it because the
 assembler allows numbers to be declared using binary notation, whereas
 C doesn't. You can see the pattern of the sprite in the ones and
@@ -104,7 +104,7 @@ leading underscore, which is how the C compiler expects to be able to
 reference it. These 8 bytes define a small circle in exactly the same
 manner as a traditional user defined graphic (UDG).
 
-Finally there is another 7 zero bytes following the graphic
+Finally there is another 8 zero bytes following the graphic
 data. Again, we'll see what this is for in a moment.
 
 We therefore have our sprite data, defined in assembly language. Let's
@@ -134,9 +134,9 @@ int main()
                   ' ' );
   sp1_Invalidate(&full_screen);
  
-  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0);
+  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)circle, 0);
 
-  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, 0, 0, 0);
+  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, (int)circle, 0);
 
   sp1_MoveSprAbs(circle_sprite, &full_screen, 0, 0, 0, 0, 0);
 
@@ -254,8 +254,8 @@ required.
 The sprite's location in pixels is therefore:
 
 ```
- x = (row*8) + horizontal_rotation
- y = (col*8) + vertical_rotation
+ x = (col*8) + horizontal_rotation
+ y = (row*8) + vertical_rotation
 ```
 
 This method of screen positioning might seem a little fussy, but there
@@ -270,36 +270,108 @@ to be updated. Although it's not necessary for this tiny example, it's
 typical practice to use a call to *intrinsic_halt()* to wait for an
 interrupt to occur before calling the screen updater function. This
 causes the Z80 to stop work until the Spectrum's video circuitry
-generates the next interrupt signal, at which point things
-continue. Arranging the timing like this ensures the updater function
-does all the video memory updates while the video circuitry is busy
-drawing the top part of the Spectrum's border. As long as all the
-video memory changes are complete before the video circuitry gets as
-far as drawing the actual pixel display, everything will be flicker
-free.
+generates the next interrupt signal at the start of the TV frame, at
+which point things continue. Arranging the timing like this ensures
+the updater function does all the video memory updates in RAM while
+the video circuitry is busy drawing the top part of the Spectrum's
+border. As long as all the video memory changes are complete before
+the video circuitry gets as far as drawing the actual pixel display,
+everything will be flicker free.
 
 The program then drops into an infinite loop so we can see the result.
-
-#### A closer look at the sprites code
-
-The two lines of code which create the sprite in memory stand closer
-inspection. Here's the first:
-
-```
-  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE,  2,  0,  0);
-```
-
-This function call creates the sprite structure in memory. The first
-argument is a pointer to a function used to draw the left boundary of
-the sprite. (There's no immediately obvious reason for the
-capitalisation of the function name.)
-
-Explain left side != right side for 8 pixel sprite when rotated. Maybe
-put the pixel positioning bit first, with graphics to explain?
 
 ### Pixel positioning
 
 <<<TODO Explain those 8 zeroes above the sprite data>>>
+
+#### A closer look at the sprites code
+
+The 3 lines of code which create the sprite in memory stand closer
+inspection. Here's the first:
+
+```
+  circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)circle, 0);
+```
+
+This function call creates the sprite structure in memory. The first
+argument is a pointer to a function used to draw the left side of the
+sprite. (There's no immediately obvious reason for the capitalisation
+of the function name; it's not a macro.) The function we're using here
+uses a simple "load" to transfer the sprite data bytes into the screen
+memory, overwriting whatever is already there. This is fast and
+simple. There are alternative drawing techniques such as those with
+masks. We'll come to those in due course. The "1" part of the drawing
+function name indicates the function draws each line of the sprite
+from 1 data byte. Masked sprites use 2 data bytes (graphic and
+data). The "LB" means "left boundary" which says this function knows
+how to draw the left side of the sprite. We don't need to worry too
+much about this given that our sprite is only 1 byte wide. We'll come
+on to wider sprites.
+
+Have a look in the sp1.h header file for the declarations of the
+drawing functions. There are about 2 dozen of them, all named with the
+above convention. You need to pick the right one for each column of
+your sprite.
+
+The next argument to sp1_CreateSpr() is the sprite type. There are
+only 2 types: 1 byte and 2 byte. As indicated above, 1 byte sprites
+just use a data byte. 2 byte sprites use a data byte and a mask
+byte. Our simple circle sprite is the 1 byte type.
+
+We then provide the height of the sprite in character cells. This is
+the maximum height of the sprite when it's being vertically rotated
+into position. As we've seen, an 8 pixel high sprite can take 2
+character cells.
+
+Next we provide the graphical data for the sprite. There are two ways
+of using this function, and putting the graphic data in this argument
+is the simpler way. Many SP1 examples use the other way, which we'll
+see shortly. In the meantime, if you look at other code, don't be
+surprised to see a zero value here.
+
+Finally the add the plane of the display to draw the sprite into. SP1
+uses 64 "planes" in its display, which are filled in from the back to
+the front and allow sprites to be logically on top of each
+other. Plane 63 is the background; plane 0 is closest to the viewer.
+
+Let's move on to the second line of sprite generation code:
+
+```
+  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, (int)circle, 0);
+```
+
+SP1 sprites are built up in columns, left to right. This approach
+allows sprites to be of arbitrary size, and allows different parts of
+the sprite to be drawn using different, more appropriate drawing
+algorithms. The sp1_AddColSpr() function adds another column to the
+right side of an existing sprite.
+
+We specify the sprite we're adding to, and the draw function for
+column we're adding. In this case the draw function is the one which
+uses the "load" drawing algorithm, a data type of 1 byte (i.e. no
+mask), and which knows it's responsible for drawing the right boundary
+of the sprite.
+
+We then add the sprite type and the sprite data as before. In this
+case, with a 8 pixel wide sprite, the left side data is actually the
+same as the the right side data. The plane is 0, closest to the
+viewer.
+
+We already looked at the line which moves the sprite to the required
+screen location:
+
+```
+  sp1_MoveSprAbs(circle_sprite, &full_screen, 0, 0, 0, 0, 0);
+```
+
+We revisit this to look at the third argument, which here is a
+zero. The header file says this argument is a "frame", and it's used
+in animation. We're not going to look at this topic for a while, but
+it's pointed out here because the alternative way of creating and
+moving sprites under SP1 puts the graphical data in this argument. We
+don't need to know about this yet, but some of the example code might
+be a bit confusing if this weren't pointed out.
+
 
 ### The memory map
 
