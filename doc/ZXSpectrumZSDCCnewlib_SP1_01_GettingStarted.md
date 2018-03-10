@@ -282,6 +282,18 @@ The program then drops into an infinite loop so we can see the result.
 
 ### Pixel positioning
 
+Our sprite is a simple 8x8 graphic, and as such fits into a single
+character cell of the Spectrum's display:
+
+![alt text](images/circle_8x8_1.png "Circle in one cell")
+
+Only, it doesn't, because as soon as it's rotated it flows out into 2,
+or maybe 4 character cells:
+
+![alt text](images/circle_8x8_2.png "Circle in 4 cells")
+
+
+
 <<<TODO Explain those 8 zeroes above the sprite data>>>
 
 #### A closer look at the sprites code
