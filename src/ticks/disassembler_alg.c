@@ -6,7 +6,7 @@
 
 
 static char *rp2_table[] = { "bc", "de", "hl", "af"};
-static char *cc_table[] = { "nz", "z", "c", "nc", "po", "pe", "p", "m"};
+static char *cc_table[] = { "nz", "z", "nc", "c", "po", "pe", "p", "m"};
 static char *alu_table[] = { "add", "adc", "sub", "sbc", "and", "xor", "or", "cp"};
 static char *assorted_mainpage_opcodes[] = { "rlca", "rrca", "rla", "rra", "daa", "cpl", "scf", "ccf" };
 
@@ -526,7 +526,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                             if ( q == 0 ) BUF_PRINTF("%-8s%s',de","ld",handle_register16(state, p, state->index));
                                             else BUF_PRINTF("%-8s%s',bc","ld",handle_register16(state, p, state->index));
                                         } else {
-                                            if ( y != 6 ) BUF_PRINTF("%-8s(%s),%s", "out", isez80() ? "c" : "bc", handle_register8(state, y, opbuf1, sizeof(opbuf1)));
+                                            if ( y != 6 ) BUF_PRINTF("%-8s(%s),%s", "out", !isez80() ? "c" : "bc", handle_register8(state, y, opbuf1, sizeof(opbuf1)));
                                             else BUF_PRINTF("%-8s(c),0","out");
                                         }
                                         break;                     
