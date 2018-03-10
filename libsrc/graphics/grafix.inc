@@ -168,6 +168,13 @@ IF FORkaypro83
 	defc maxy	= 50
 ENDIF
 
+IF FORosborne1
+	DEFINE gotgfx
+	defc maxx	= 104
+	defc maxy	= 48
+	defc blankch	= 32
+ENDIF
+
 IF FORzx
 	DEFINE gotgfx
 	defc maxx	= 256

@@ -560,6 +560,12 @@ cpm_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/gfxattache @$(LISTFILE_DIRECTORY)/gfxattache.lst
+	@echo ''
+	@echo '--- Building Osborne 1 graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORosborne1 -x$(OUTPUT_DIRECTORY)/gfxosborne1 @$(LISTFILE_DIRECTORY)/gfxosborne1.lst
+
 
 # Sorcerer Exidy lib - Stefano
 sorcerer_clib.lib:

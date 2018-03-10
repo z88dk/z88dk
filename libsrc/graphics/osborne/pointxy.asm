@@ -1,37 +1,41 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
 ;
-;       Written by Stefano Bodrato 30/01/2002
+;       Written by Stefano Bodrato 07/09/2007
 ;
 ;
-;       Plot pixel at (x,y) coordinate.
+;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm $
+;	$Id: pointxy.asm $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
                         SECTION code_clib
-			PUBLIC	plotpixel
+			PUBLIC	pointxy
 
-			EXTERN	textpixl
-			EXTERN	__gfx_coords
-			EXTERN	base_graphics
+			EXTERN  textpixl
+			EXTERN  __gfx_coords
+			EXTERN  base_graphics
 
 
-.plotpixel			
+.pointxy
 			ld	a,h
 			cp	maxx
 			ret	nc
 			ld	a,l
 			cp	maxy
 			ret	nc		; y0	out of range
+
+			push	bc
+			push	de
+			push	hl			
 			
 			ld	(__gfx_coords),hl
 			
-			push	bc
+;			push	bc
 
 			ld	c,a
 			ld	b,h
@@ -40,12 +44,12 @@
 			
 			srl	b
 			srl	c
-			ld	hl,(base_graphics)
+			ld	hl,$f000
 			ld	a,c
 			ld	c,b	; !!
 			and	a
 			ld	b,a
-			ld	de,maxx/2
+			ld	de,$80		; ..a text row every 128 bytes
 			jr	z,r_zero
 .r_loop
 			add	hl,de
@@ -86,16 +90,13 @@
 			add	a,a
 			add	a,a		; move down the bit
 .evenrow
-			or	b
-
-			ld	hl,textpixl
-			ld	d,0
-			ld	e,a
-			add	hl,de
-			ld	a,(hl)
-
-			pop	hl
-			ld	(hl),a
+			
+			and	b
 			
 			pop	bc
+			
+			pop	hl
+			pop	de
+			pop	bc
+			
 			ret

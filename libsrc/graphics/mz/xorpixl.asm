@@ -5,7 +5,7 @@
 	EXTERN	__gfx_coords
 
 ;
-;	$Id: xorpixl.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
+;	$Id: xorpixl.asm $
 ;
 
 ; ******************************************************************
@@ -42,9 +42,9 @@
 				ld	a,c
 				ld	c,b	; !!
 				and	a
-				jr	z,r_zero
 				ld	b,a
 				ld	de,40
+				jr	z,r_zero
 .r_loop
 				add	hl,de
 				djnz	r_loop
