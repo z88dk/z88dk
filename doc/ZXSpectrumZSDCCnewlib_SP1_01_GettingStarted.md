@@ -3,21 +3,22 @@
 This document describes how to get started writing ZX Spectrum programs using
 C, Z88DK and the SP1 sprite library. 
 
-## Purpose
-
-<<<TODO, if at all? Introduction, maybe?>>>
-
 ## Assumptions
 
-The reader is assumed to have read the Z88DK getting started guide, which covers
-getting started with Z88DK and its 'C' programming environment. A complete
-understanding of the details of the more advanced topics such as BiFrost and
-interrupts is not required, but understanding how to view a Spectrum memory map
-is. The reader is assumed to be familiar with at least the first 6 installments
-of that guide.
+The reader is assumed to have read the Z88DK getting started guide,
+which covers getting started with Z88DK and its 'C' programming
+environment. A complete understanding of the details of the more
+advanced topics such as BiFrost and interrupts is not required to work
+with SP1, but the reader is assumed to be familiar with at least the
+first 6 installments of that guide.
 
-<<<TODO Add link to the tutorial. It's not essential, but a skim read of the
-ideas would be useful.>>>
+The tutorial for SP1's predecessor, splib2, is avaiable as a PDF
+document
+[here](http://www.mojontwins.com/warehouse/splib2-tutorial.pdf). It's
+not essential to understand that document, and the details in this one
+override the details in that older one, but splib2 does cover quite a
+lot of the details and algorithms which apply to SP1. It's worth at
+least skimming.
 
 ## Strategy
 
@@ -27,7 +28,7 @@ learn, with the danger the user gets lost chasing down endless
 dependency information and rapidly losing the plot.
 
 We shall try to avoid this scenario by deliberately skimming, and in
-many cases ignoring, fine details and nuances which a beginner
+some cases ignoring, fine details and nuances which a beginner
 shouldn't be worrying about. We're going to dive straight into code,
 and the reader will need to accept that not everything will be
 explained as we go.
@@ -92,7 +93,7 @@ aren't important at this stage, just be aware that if C code is to
 use the data being specified in an assembly language file, that data
 needs to be placed in the *read only user's data* section.
 
-Next we declare the label *circle* to be publicly visible such that
+Next we declare the label *_circle* to be publicly visible such that
 code in external files (the C source) can see it.
 
 Then we define 7 zero bytes. This isn't, as might be expected by more
@@ -101,11 +102,11 @@ example isn't going to use a mask. There's another reason for placing
 these 7 bytes here, and we'll come to it shortly.
 
 Then we see the 8x8 pixel sprite data, labelled as *_circle* with a
-leading underscore, which is how the C compiler expects to be able to
+leading underscore which is how the C compiler expects to be able to
 reference it. These 8 bytes define a small circle in exactly the same
 manner as a traditional user defined graphic (UDG).
 
-Finally there is another 8 zero bytes following the graphic
+Finally there are another 8 zero bytes following the graphic
 data. Again, we'll see what this is for in a moment.
 
 We therefore have our sprite data, defined in assembly language. Let's
@@ -206,7 +207,6 @@ in due course; for now we just need to understand that the SP1
 library (in its default configuration) builds its data structures in
 high memory. This pragma moves the stack pointer below those data
 structures.
-<<<TODO Check -1 required?>>>
 
 Recall that the data for the sprite was defined in the assembly
 language file we're linking this C code to. We therefore declare our
@@ -231,16 +231,14 @@ cells. This tells the screen updater algorithm in SP1 that the
 specified area - in this case it's the whole of the Spectrum screen -
 is going to need to be redrawn when we get to that point.
 
-Next we have to create the sprite. SP1 sprites are initially created
-as empty structures, then the graphical data is subsequently filled
-in. The first call we see is therefore *sp1_CreateSpr()* which creates
-the sprite structure. This is followed by a call to *sp1_AddColSpr()*
-which adds in a single column of data to the sprite. A 'column' in
-this context is an 8 pixel wide block of graphical data as tall as the
-sprite. Since our sprite is only 8 pixels wide in total we only need a
-single call to *sp1_AddColSpr()*. A 16 pixel wide sprite would need a
-second call. There is a lot of detail in these 2 function calls which
-we need to cover, so we'll return to them in a moment.
+Next we have to create the sprite. SP1 sprites are created, then
+graphical data is subsequently filled in. The first call we see is
+therefore *sp1_CreateSpr()* which creates the sprite structure. This
+is followed by a call to *sp1_AddColSpr()* which adds a single
+column of data to the sprite. A 'column' in this context is an 8 pixel
+wide block of graphical data as tall as the sprite. There is a lot of
+detail in these 2 function calls which we need to cover, so we'll
+return to them in a moment.
 
 Next, we place the sprite ready to be drawn via the call to
 *sp1_MoveSprAbs()*. The final 4 arguments to this function specify
@@ -288,8 +286,8 @@ character cell of the Spectrum's display:
 
 ![alt text](images/circle_8x8_1.png "Circle in one cell")
 
-Only, it doesn't, because as soon as it's rotated it flows out into 2,
-or maybe 4 character cells:
+Only, it doesn't, because as soon as it's rotated into pixel perfect
+position it (might) flow out into 2, or maybe 4 character cells:
 
 ![alt text](images/circle_8x8_2.png "Circle in 4 cells")
 
@@ -303,7 +301,7 @@ consider a sprite as occupying not pixels but character cells, and
 will take the maximum number of cells a sprite may use, not the
 smallest. Try to keep this mind because seeing an 8x8 sprite declared
 as having a height of '2' can be a bit confusing. It means a maximum
-of 2 character cells.
+of 2 character cells need to be considered when drawing the sprite.
 
 On the subject of pixel positioning, it's worth a look at how SP1
 positions a sprite on the requested pixel in the y-axis. It uses a
@@ -389,15 +387,15 @@ memory, overwriting whatever is already there. This is fast and
 simple. There are alternative drawing techniques such as those with
 masks. We'll come to those in due course. The "1" part of the drawing
 function name indicates the function draws each line of the sprite
-from 1 data byte. Masked sprites use 2 data bytes (graphic and
-data). The "LB" means "left boundary" which says this function knows
-how to draw the left side of the sprite. We don't need to worry too
-much about this given that our sprite is only 1 byte wide. We'll come
-on to wider sprites.
+from 1 data byte. Masked sprites use 2 bytes (graphic and data). The
+"LB" means "left boundary" which says this function knows how to draw
+the left side of the sprite. We don't need to worry too much about
+this given that our sprite is only 1 byte wide. We'll come on to wider
+sprites.
 
 Have a look in the sp1.h header file for the declarations of the
 drawing functions. There are about 2 dozen of them, all named with the
-above convention. You need to pick the right one for each column of
+above convention. You need to pick the correct one for each column of
 your sprite.
 
 The next argument to sp1_CreateSpr() is the sprite type. There are
@@ -411,12 +409,12 @@ into position. As we've seen, an 8 pixel high sprite can take 2
 character cells.
 
 Next we provide the graphical data for the sprite. There are two ways
-of using this function, and putting the graphic data in this argument
-is the simpler way. Many SP1 examples use the other way, which we'll
-see shortly. In the meantime, if you look at other code, don't be
-surprised to see a zero value here.
+of using this function, and putting the graphic data in this 4th
+argument is the simpler way. Many SP1 examples use the other way,
+which we'll see shortly. In the meantime, if you look at other code,
+don't be surprised to see a zero value here.
 
-Finally the add the plane of the display to draw the sprite into. SP1
+Finally we add the plane of the display to draw the sprite into. SP1
 uses 64 "planes" in its display, which are filled in from the back to
 the front and allow sprites to be logically on top of each
 other. Plane 63 is the background; plane 0 is closest to the viewer.
@@ -431,10 +429,12 @@ SP1 sprites are built up in columns, left to right. This approach
 allows sprites to be of arbitrary size, and allows different parts of
 the sprite to be drawn using different, more appropriate drawing
 algorithms. The sp1_AddColSpr() function adds another column to the
-right side of an existing sprite.
+right side of an existing sprite. Remember, our 8 pixel wide sprite
+actually occupies 2 character cells when it's rotated horizontally, so
+that's 2 columns.
 
 We specify the sprite we're adding to, and the draw function for
-column we're adding. In this case the draw function is the one which
+the column we're adding. In this case the draw function is the one which
 uses the "load" drawing algorithm, a data type of 1 byte (i.e. no
 mask), and which knows it's responsible for drawing the right boundary
 of the sprite.
@@ -459,9 +459,13 @@ moving sprites under SP1 puts the graphical data in this argument. We
 don't need to know about this yet, but some of the example code might
 be a bit confusing if this weren't pointed out.
 
+### Conclusion
 
-### The memory map
+In the first of these SP1 guides we've looked at defining a simple
+sprite and getting it onto the Spectrum's screen. It should be obvious
+that SP1 is a rather technical library which takes a fair bit of
+effort to understand. But it's also extremely competent, and used
+skillfully can be the basis of many excellent games.
 
-
-
-[... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_HelloWorld.md)
+In the next part of this series we'll pick up the pace a little and
+look at masked sprites.
