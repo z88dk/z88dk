@@ -73,6 +73,7 @@ PUBLIC _circle
 	defb @00000000
 	defb @00000000
 	defb @00000000
+	defb @00000000
 
 ```
 
@@ -292,9 +293,83 @@ or maybe 4 character cells:
 
 ![alt text](images/circle_8x8_2.png "Circle in 4 cells")
 
+SP1 is character cell orientated. Sprites are measured in character
+cells and they are considered to occupy character cells. As we shall
+see, SP1 doesn't redraw things at the pixel level, it redraws things
+at the character cell level.
 
+As we review the code you'll notice that many things in the SP1 world
+consider a sprite as occupying not pixels but character cells, and
+will take the maximum number of cells a sprite may use, not the
+smallest. Try to keep this mind because seeing an 8x8 sprite declared
+as having a height of '2' can be a bit confusing. It means a maximum
+of 2 character cells.
 
-<<<TODO Explain those 8 zeroes above the sprite data>>>
+On the subject of pixel positioning, it's worth a look at how SP1
+positions a sprite on the requested pixel in the y-axis. It uses a
+trick which needs to be understood. In order to place our sprite on a
+character cell boundary, such as row 0, or 8, or maybe 64, the top
+line of the sprite graphic is copied into the requested screen row,
+then subsequent lines are filled in below it just as you'd expect. But
+if the requested destination row is, say, one pixel below the top line
+of a cell, say 1, or 9, or maybe 65, rather than rotating the graphic
+data downwards, the source address for the graphic data is moved back
+(i.e. lower in memory) by one byte. So for example, if the top line of
+the graphic data is at address 50,000, the byte at address 49,999 is
+the first to be transfered into the display, followed by the byte at
+50,000, and so on. 9 bytes in total will be transfered. That means the
+actual graphic is placed one scan line lower than the top of the
+character cell, effecting the one-pixel-lower screen location
+requested.
+
+"What," you might ask, "is at address 49,999?" because whatever is
+there is going to end up in the display and the user will see it!
+Recall our sprite data, in assembly language:
+
+```
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+
+._circle
+	defb @00111100
+	defb @01000010
+	defb @10000001
+	defb @10000001
+	defb @10000001
+	defb @10000001
+	defb @01000010
+	defb @00111100
+
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+
+```
+
+The top line of the graphic, at _circle, is preceded by 7 zeroes. In
+this example, _circle is at address 50,000, and address 49,999
+contains a zero. There are in fact 7 zeroes logically above _circle,
+so when the sprite is placed in the display, between zero and all 7 of
+those will be copied in above it to get the actual circle graphic in
+the location required.
+
+You'll also note the 8 zeroes after the graphic data, the purpose of
+which might now be a little clearer. When the graphic is placed in the
+screen, it might partially occupy the lower character cell. What data
+should SP1 place into the rest of that lower character cell? Those
+zeroes. It's quicker and easier to just copy those bytes into the
+display than it is to worry about which scan lines the graphic
+actually occupies and which is doesn't.
 
 #### A closer look at the sprites code
 
