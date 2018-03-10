@@ -17,9 +17,15 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "classlist.h"
 #include "scan.h"
 #include "sym.h"
+#include "utarray.h"
 
 struct Module;
 struct Section;
+
+/*-----------------------------------------------------------------------------
+*	UT_array of Expr*
+*----------------------------------------------------------------------------*/
+extern UT_icd ut_exprs_icd;
 
 /*-----------------------------------------------------------------------------
 *	Types of operations and associativity

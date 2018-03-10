@@ -393,6 +393,33 @@ void error_int_range(long value)
 	
 	STR_DELETE(msg);
 }
+void error_base_register_illegal(long value)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "base register byte '%ld' is illegal", value );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_missing_arguments(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "missing arguments" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_extra_arguments(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "extra arguments" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_cmd_failed(char *cmd)
 {
 	STR_DEFINE(msg, STR_SIZE);

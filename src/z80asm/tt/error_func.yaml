@@ -232,6 +232,21 @@ errors:
     args	: long value
     message	: "\"integer '%ld' out of range\", value"
 
+  - type	: ErrError
+    func	: error_base_register_illegal
+    args	: long value
+    message	: "\"base register byte '%ld' is illegal\", value"
+
+  - type	: ErrError
+    func	: error_missing_arguments
+    args	: void
+    message	: "\"missing arguments\""
+
+  - type	: ErrError
+    func	: error_extra_arguments
+    args	: void
+    message	: "\"extra arguments\""
+
   # system call errors
   - type	: ErrError
     func	: error_cmd_failed

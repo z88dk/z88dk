@@ -386,3 +386,99 @@ static void check_org_align()
 	if (org >= 0 && align > 1 && (org % align) != 0)
 		error_org_not_aligned(org, align);
 }
+
+/*-----------------------------------------------------------------------------
+*   DMA
+*----------------------------------------------------------------------------*/
+static Expr *asm_DMA_shift_exprs(UT_array *exprs)
+{
+	assert(utarray_len(exprs) > 0);
+
+	Expr *expr = *((Expr **)utarray_front(exprs));	// copy first element
+	*((Expr **)utarray_front(exprs)) = NULL;		// do not destroy
+	utarray_erase(exprs, 0, 1);						// delete first element
+
+	return expr;
+}
+
+static void asm_DMA_command_1(int cmd, UT_array *exprs)
+{
+	// retrieve first constant expression
+	Expr *expr = asm_DMA_shift_exprs(exprs);
+	int N = Expr_eval(expr, TRUE);
+	Bool not_evaluable = expr->result.not_evaluable;
+	OBJ_DELETE(expr);
+	if (not_evaluable) {
+		error_expected_const_expr();
+		return;
+	}
+	if (N >= 128 || N < 0) {
+		error_int_range(N);
+		return;
+	}
+
+	// retrieve next arguments
+	switch (cmd) {
+	case 0:
+		/*
+		dma.wr0 n [, w, x, y, z] with whitespace following comma including newline and 
+		maybe comment to the end of the line so params can be listed on following lines
+		or 0x01 into n
+		n: bit 7 must be 0, bits 1..0 must be 01 else error "base register byte is illegal"
+		If bit 3 of n is set then accept one following byte\
+		If bit 4 of n is set then accept one following byte/ set together, expect word instead
+		If bit 5 of n is set then accept one following byte\
+		If bit 6 of n is set then accept one following byte/ set together, expect word instead
+		*/
+		N |= 0x01;
+		if ((N & 0x03) != 0x01) {
+			error_base_register_illegal(N);
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0x7F);
+
+		// parse wr0 parameters: check bits 3,4
+		if ((N & 0x18) != 0 && utarray_len(exprs) == 0) {
+			error_missing_arguments();
+			return;
+		}
+		switch (N & 0x18) {
+		case 0: break;
+		case 0x08: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 3
+		case 0x10: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break; 		// bit 4
+		case 0x18: asm_DEFW(asm_DMA_shift_exprs(exprs)); break; 			// bits 3,4
+		default: assert(0);
+		}
+
+		// parse wr0 parameters: check bits 5,6
+		if ((N & 0x60) != 0 && utarray_len(exprs) == 0) {
+			error_missing_arguments();
+			return;
+		}
+		switch (N & 0x60) {
+		case 0: break;
+		case 0x20: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 5
+		case 0x40: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 6
+		case 0x60: asm_DEFW(asm_DMA_shift_exprs(exprs)); break;				// bits 5,6
+		default: assert(0);
+		}
+
+		break;
+
+	default: 
+		assert(0);
+	}
+
+	// check for extra arguments
+	if (utarray_len(exprs) > 0) 
+		error_extra_arguments();
+}
+
+void asm_DMA_command(int cmd, UT_array *exprs)
+{
+	assert(utarray_len(exprs) > 0);
+	asm_DMA_command_1(cmd, exprs);
+	utarray_clear(exprs);			// clear any expr left over in case of error
+}

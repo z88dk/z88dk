@@ -23,6 +23,24 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
+*	UT_array of Expr*
+*----------------------------------------------------------------------------*/
+void ut_exprs_init(void *elt)
+{
+	Expr *expr = OBJ_NEW(Expr);
+	*((Expr **)elt) = expr;
+}
+
+void ut_exprs_dtor(void *elt)
+{
+	Expr *expr = *((Expr **)elt);
+	OBJ_DELETE(expr);
+}
+
+UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
+
+
+/*-----------------------------------------------------------------------------
 *	Expression operations
 *----------------------------------------------------------------------------*/
 

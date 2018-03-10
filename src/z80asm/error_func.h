@@ -45,4 +45,7 @@ extern void error_not_lib_file(char *filename);
 extern void error_lib_file_version(char *filename, int found_version, int expected_version);
 extern void warn_int_range(long value);
 extern void error_int_range(long value);
+extern void error_base_register_illegal(long value);
+extern void error_missing_arguments(void);
+extern void error_extra_arguments(void);
 extern void error_cmd_failed(char *cmd);

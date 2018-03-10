@@ -396,6 +396,29 @@ Define rules for a ragel-based parser.
 	asm_Z88DK = asm_CALL_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
 
 	/*---------------------------------------------------------------------
+	*   ZXN DMA
+	*--------------------------------------------------------------------*/
+	asm_DMA =	
+			label? _TK_DMA_WR0 expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 
+				DO_STMT_LABEL(); 
+				asm_DMA_command(0, ctx->exprs);
+			}
+		|	label? _TK_DMA_WR0 expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE @{ 
+				DO_STMT_LABEL(); 
+				ctx->dma_cmd = 0;
+				ctx->current_sm = SM_DMA_PARAMS;
+			}
+		;
+
+	dma_params := 
+			expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 
+				asm_DMA_command(ctx->dma_cmd, ctx->exprs);
+				ctx->current_sm = SM_MAIN;
+			}
+		|	expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE
+		;
+	
+	/*---------------------------------------------------------------------
 	*   assembly statement
 	*--------------------------------------------------------------------*/
 	main := 
@@ -408,6 +431,7 @@ Define rules for a ragel-based parser.
 		| asm_DEFGROUP
 		| asm_DEFVARS
 		| asm_conditional
+		| asm_DMA
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
@@ -556,6 +580,10 @@ static int get_start_state(ParseCtx *ctx)
 	case SM_DEFGROUP_LINE:
 		scan_expect_operands();
 		return parser_en_defgroup_line;
+
+	case SM_DMA_PARAMS:
+		scan_expect_operands();
+		return parser_en_dma_params;
 
 	default:
 		assert(0);
