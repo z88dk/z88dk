@@ -7,21 +7,23 @@
 
 #include <arch.h>
 
+// GLOBAL VARIABLES
+
 // provide the location for stack pointers to be stored
 
 extern uint16_t *bios_sp;       // yabios SP here when other banks running
 extern uint16_t *bank_sp;       // bank SP storage, in Page0 TCB 0x003B
+
+// provide the location of the IO byte based on CP/M
+// only bit 0 distinguished currently with TTY=0 CRT=1.
+
+extern uint8_t bios_ioByte;     // intel I/O byte
 
 // provide the location for important Page 0 bank addresses
 
 extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
 extern uint8_t bank_cmp_default_drive;  // CP/M default drive
 extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
-
-// provide the location of the IO byte based on CP/M
-// only bit 0 distinguished currently with TTY=0 CRT=1.
-
-extern uint8_t bios_ioByte;     // intel I/O byte
 
 // provide the simple mutex locks for hardware resources
 
@@ -42,6 +44,48 @@ extern uint8_t APULock;         //  mutex for APU
 // provide the simple mutex locks for the BANK (for system usage)
 
 extern uint8_t bankLockBase[];  // base address for 16 BANK locks
+
+// IO MAPPED REGISTERS
+
+#ifdef __CLANG
+
+extern unsigned char io_break;
+
+extern unsigned char io_pio_port_a;
+extern unsigned char io_pio_port_b;
+extern unsigned char io_pio_port_b;
+extern unsigned char io_pio_control;
+
+extern unsigned char io_pio_ide_lsb;
+extern unsigned char io_pio_ide_msb;
+extern unsigned char io_pio_ide_ctl;
+extern unsigned char io_pio_ide_config;
+
+extern unsigned char io_apu_port_data;
+extern unsigned char io_apu_port_control;
+extern unsigned char io_apu_port_status;
+
+#else
+
+__sfr __banked __at __IO_BREAK io_break;
+
+__sfr __banked __at __IO_PIO_PORT_A  io_pio_port_a;
+__sfr __banked __at __IO_PIO_PORT_B  io_pio_port_b;
+__sfr __banked __at __IO_PIO_PORT_C  io_pio_port_c;
+__sfr __banked __at __IO_PIO_CONTROL io_pio_control;
+
+__sfr __banked __at __IO_PIO_IDE_LSB    io_pio_ide_lsb;
+__sfr __banked __at __IO_PIO_IDE_MSB    io_pio_ide_msb;
+__sfr __banked __at __IO_PIO_IDE_CTL    io_pio_ide_ctl;
+__sfr __banked __at __IO_PIO_IDE_CONFIG io_pio_ide_config;
+
+__sfr __banked __at __IO_APU_DATA    io_apu_data;
+__sfr __banked __at __IO_APU_CONTROL io_apu_control;
+__sfr __banked __at __IO_APU_STATUS  io_apu_status;
+
+#endif
+
+// SYSTEM FUNCTIONS
 
 // provide methods to get, try, and give the simple mutex locks
 
@@ -89,48 +133,46 @@ extern void load_hex_fastcall(uint8_t bankAbs) __preserves_regs(iyh,iyl) __z88dk
 
 
 
-// provide far jp, call, & sys functions
+// provide jp_far function
 
 extern void jp_far(void *str,int8_t bank) __preserves_regs(b,c,iyh,iyl);
 
 
-#define call_error(code)        \
-    do{                         \
-        __asm                   \
-        rst 8H                  \
-        defb code               \
-        __endasm;               \
+// SYSTEM FUNCTION MACROS
+
+// provide call_error, call_far, call_sys, & call_apu function macros
+
+#define call_error(code)                      \
+    do{                                       \
+        __asm                                 \
+        rst 8h        ; call_error(code)      \
+        defb code                             \
+        __endasm;                             \
     }while(0)
 
-#define call_far(addr, bank)    \
-    do{                         \
-        __asm                   \
-        rst 10H                 \
-        defw addr               \
-        defb bank               \
-        __endasm;               \
+#define call_far(addr, bank)                  \
+    do{                                       \
+        __asm                                 \
+        rst 10h        ; call_far(addr, bank) \
+        defw addr                             \
+        defb bank                             \
+        __endasm;                             \
     }while(0)
 
-#define call_sys(addr)          \
-    do{                         \
-        __asm                   \
-        rst 20H                 \
-        defw addr               \
-        __endasm;               \
+#define call_sys(addr)                        \
+    do{                                       \
+        __asm                                 \
+        rst 20h        ; call_sys(addr)       \
+        defw addr                             \
+        __endasm;                             \
     }while(0)
 
-#define call_apu(cmd)           \
-    do{                         \
-        __asm                   \
-        rst 28H                 \
-        defb cmd                \
-        __endasm;               \
+#define call_apu(cmd)                         \
+    do{                                       \
+        __asm                                 \
+        rst 28h        ; call_apu(cmd)        \
+        defb cmd                              \
+        __endasm;                             \
     }while(0)
-
-// halt the YAZ180 with single step hardware.
-
-#define __BREAK  __BREAK_HELPER()
-extern void __BREAK_HELPER(void) __preserves_regs(a,d,e,h,l,iyl,iyh);
-
 
 #endif

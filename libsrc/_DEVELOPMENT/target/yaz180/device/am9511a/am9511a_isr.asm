@@ -40,7 +40,7 @@
         ld hl, APUStatus        ; set APUStatus to busy
         ld (hl), __IO_APU_STATUS_BUSY
 
-        ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
+        ld bc, __IO_APU_STATUS  ; the address of the APU status port in BC
         in a, (c)               ; read the APU
         and __IO_APU_STATUS_ERROR   ; any errors?
         call nz, am9511a_isr_error  ; then capture error in APUError
@@ -63,7 +63,7 @@
         jr z, am9511a_isr_op_rem    ; remove an OPERAND
 
         pop af                  ; recover the COMMAND 
-        ld bc, __IO_APU_PORT_CONTROL    ; the address of the APU control port in BC
+        ld bc, __IO_APU_CONTROL    ; the address of the APU control port in BC
         out (c), a              ; load the COMMAND, and do it
 
     am9511a_isr_exit:
@@ -77,7 +77,7 @@
         reti
 
     am9511a_isr_end:            ; we've finished a COMMAND sentence
-        ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
+        ld bc, __IO_APU_STATUS  ; the address of the APU status port in BC
         in a, (c)               ; read the APU
         tst __IO_APU_STATUS_BUSY    ; test the STATUS byte is valid (i.e. we're not busy)
         jr nz, am9511a_isr_end
@@ -96,7 +96,7 @@
         dec (hl)
         dec (hl)
 
-        ld bc, __IO_APU_PORT_DATA+$0300 ; the address of the APU data port (+3) in BC
+        ld bc, __IO_APU_DATA+$0300 ; the address of the APU data port (+3) in BC
         ex de, hl               ; move the base address of the OPERAND to HL
 
         outi                    ; output 16 bit OPERAND
@@ -131,7 +131,7 @@
         dec (hl)
         dec (hl)
 
-        ld bc, __IO_APU_PORT_DATA+$0300 ; the address of the APU data port (+3) in BC
+        ld bc, __IO_APU_DATA+$0300 ; the address of the APU data port (+3) in BC
         ex de, hl               ; move the base address of the OPERAND to HL
 
         inc hl                  ; reverse the OPERAND bytes to load
