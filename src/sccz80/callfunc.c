@@ -274,10 +274,10 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
         } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
-        } else if (watcharg || (ptr->flags & (SHARED|SHAREDC)) ) {
-            if ((ptr->flags & (SHARED|SHAREDC) ) )
+        } else if (watcharg || (functype->flags & (SHARED|SHAREDC)) ) {
+            if ((functype->flags & (SHARED|SHAREDC) ) )
                 preserve = YES;
-            if (ptr->flags & SHAREDC)
+            if (functype->flags & SHAREDC)
                 zclibcallop();
             else
                 zcallop();
@@ -287,9 +287,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
                 printf_format_option |= format_option;
             }
             outname(funcname, dopref(ptr));
-            if ((ptr->flags & SHARED) && c_useshared)
+            if ((functype->flags & SHARED) && c_useshared)
                 outstr("_sl");
-            else if (ptr->flags & SHAREDC)
+            else if (functype->flags & SHAREDC)
                 outstr("_rst");
             nl();
         } else {
