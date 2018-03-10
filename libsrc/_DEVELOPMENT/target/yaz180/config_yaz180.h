@@ -747,9 +747,9 @@
 
 
 
-#define __IO_APU_PORT_DATA  0xc000
-#define __IO_APU_PORT_CONTROL  0xc001
-#define __IO_APU_PORT_STATUS  0xc001
+#define __IO_APU_DATA  0xc000
+#define __IO_APU_CONTROL  0xc001
+#define __IO_APU_STATUS  0xc001
 
 #define __IO_APU_STATUS_BUSY  0x80
 #define __IO_APU_STATUS_SIGN  0x40

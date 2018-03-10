@@ -61,7 +61,7 @@
         ld (hl), d
 
     am9511a_reset_loop:
-        ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in bc
+        ld bc, __IO_APU_STATUS  ; the address of the APU status port in bc
         in a, (c)               ; read the APU
         and __IO_APU_STATUS_BUSY    ; busy?
         jr nz, am9511a_reset_loop
