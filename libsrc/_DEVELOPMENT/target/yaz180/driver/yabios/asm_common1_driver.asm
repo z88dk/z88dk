@@ -1001,7 +1001,7 @@ am9511a_isr_entry:
     ld hl, APUStatus        ; set APUStatus to busy
     ld (hl), __IO_APU_STATUS_BUSY
 
-    ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
+    ld bc, __IO_APU_STATUS  ; the address of the APU status port in BC
     in a, (c)               ; read the APU
     and __IO_APU_STATUS_ERROR   ; any errors?
     call NZ, am9511a_isr_error  ; then capture the error in APUError
@@ -1024,7 +1024,7 @@ am9511a_isr_entry:
     jr Z, am9511a_isr_op_rem    ; remove an OPERAND
 
     pop af                  ; recover the COMMAND 
-    ld bc, __IO_APU_PORT_CONTROL    ; the address of the APU control port in BC
+    ld bc, __IO_APU_CONTROL ; the address of the APU control port in BC
     out (c), a              ; load the COMMAND, and do it
 
 am9511a_isr_exit:
@@ -1039,7 +1039,7 @@ am9511a_isr_exit:
     ret                     ; no Z80 interrupt chaining
 
 am9511a_isr_end:            ; we've finished a COMMAND sentence
-    ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in BC
+    ld bc, __IO_APU_STATUS  ; the address of the APU status port in BC
     in a, (c)               ; read the APU
     tst __IO_APU_STATUS_BUSY    ; test the STATUS byte is valid (i.e. we're not busy)
     jr NZ, am9511a_isr_end
@@ -1047,7 +1047,7 @@ am9511a_isr_end:            ; we've finished a COMMAND sentence
     jr am9511a_isr_exit     ; we're done here
 
 am9511a_isr_op_ent:
-    ld bc, __IO_APU_PORT_DATA   ; the address of the APU data port in BC
+    ld bc, __IO_APU_DATA    ; the address of the APU data port in BC
     call am9511a_isr_op16_ent
 
     pop af                  ; recover the COMMAND 
@@ -1058,7 +1058,7 @@ am9511a_isr_op_ent:
     jr am9511a_isr_entry    ; go back to get another COMMAND
 
 am9511a_isr_op_rem:         ; REMINDER operands removed BIG ENDIAN !!!
-    ld bc, __IO_APU_PORT_DATA   ; the address of the APU data port in BC
+    ld bc, __IO_APU_DATA   ; the address of the APU data port in BC
     call am9511a_isr_op16_rem
 
     pop af                  ; recover the COMMAND 
@@ -1176,7 +1176,7 @@ _apu_reset:
     ld (APUError), a        ; clear APU errors
    
 am9511a_reset_loop:
-    ld bc, __IO_APU_PORT_STATUS ; the address of the APU status port in bc
+    ld bc, __IO_APU_STATUS  ; the address of the APU status port in bc
     in a, (c)                   ; read the APU
     and __IO_APU_STATUS_BUSY    ; busy?
     jr NZ, am9511a_reset_loop
@@ -1213,7 +1213,7 @@ EXTERN APUStatus, APUError
 
 _apu_chk_idle_fastcall:
     ld a, (APUStatus)       ; get the status of the APU (but don't disturb APU)
-    tst __IO_APU_STATUS_BUSY    ; check busy bit is set,
+    tst __IO_APU_STATUS_BUSY; check busy bit is set,
     jr NZ, _apu_chk_idle_fastcall ; so we wait
 
     ld hl, APUError

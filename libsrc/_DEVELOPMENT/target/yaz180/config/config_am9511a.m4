@@ -4,9 +4,9 @@ divert(-1)
 # AM9511A CONFIGURATION
 #
 
-define(`__IO_APU_PORT_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU Data Port
-define(`__IO_APU_PORT_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Control Port
-define(`__IO_APU_PORT_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Status Port == Control Port
+define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU Data Port
+define(`__IO_APU_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Control Port
+define(`__IO_APU_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Status Port == Control Port
 
 define(`__IO_APU_STATUS_BUSY',  0x80)
 define(`__IO_APU_STATUS_SIGN',  0x40)
@@ -93,9 +93,9 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `__IO_APU_PORT_DATA'
-PUBLIC `__IO_APU_PORT_CONTROL'
-PUBLIC `__IO_APU_PORT_STATUS'
+PUBLIC `__IO_APU_DATA'
+PUBLIC `__IO_APU_CONTROL'
+PUBLIC `__IO_APU_STATUS'
 
 PUBLIC `__IO_APU_STATUS_BUSY'
 PUBLIC `__IO_APU_STATUS_SIGN'
@@ -171,9 +171,9 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `__IO_APU_PORT_DATA' = __IO_APU_PORT_DATA
-defc `__IO_APU_PORT_CONTROL' = __IO_APU_PORT_CONTROL
-defc `__IO_APU_PORT_STATUS' = __IO_APU_PORT_STATUS
+defc `__IO_APU_DATA' = __IO_APU_DATA
+defc `__IO_APU_CONTROL' = __IO_APU_CONTROL
+defc `__IO_APU_STATUS' = __IO_APU_STATUS
 
 defc `__IO_APU_STATUS_BUSY' = __IO_APU_STATUS_BUSY
 defc `__IO_APU_STATUS_SIGN' = __IO_APU_STATUS_SIGN
@@ -249,9 +249,9 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-`#define' `__IO_APU_PORT_DATA'  __IO_APU_PORT_DATA
-`#define' `__IO_APU_PORT_CONTROL'  __IO_APU_PORT_CONTROL
-`#define' `__IO_APU_PORT_STATUS'  __IO_APU_PORT_STATUS
+`#define' `__IO_APU_DATA'  __IO_APU_DATA
+`#define' `__IO_APU_CONTROL'  __IO_APU_CONTROL
+`#define' `__IO_APU_STATUS'  __IO_APU_STATUS
 
 `#define' `__IO_APU_STATUS_BUSY'  __IO_APU_STATUS_BUSY
 `#define' `__IO_APU_STATUS_SIGN'  __IO_APU_STATUS_SIGN
