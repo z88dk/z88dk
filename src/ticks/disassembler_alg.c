@@ -277,7 +277,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                             else if (isgbz80() ) BUF_PRINTF("%-8s(%s),sp","ld",handle_addr16(state, opbuf1,sizeof(opbuf1)));
                             else BUF_PRINTF("nop");
                         } else if ( y == 2 ) {
-                            if ( isgbz80() )  BUF_PRINTF("%-8s%s","stop", handle_immed8(state, opbuf1, sizeof(opbuf1)));
+                            if ( isgbz80() )  BUF_PRINTF("%-8s","stop");
                             else if ( is8080() ) BUF_PRINTF("nop");                            
                             else BUF_PRINTF("%-8s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));                  
                         } else if ( y == 3 ) {
@@ -347,6 +347,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                     BUF_PRINTF("%-8shl,(%s)", "ldp", handle_register16(state,2, state->index)); 
                 } else if ( israbbit() && z == 5 && y == 5 && state->index ) {
                     BUF_PRINTF("%-8s%s,(%s)", "ldp", handle_register16(state,2, state->index),  handle_addr16(state,opbuf1, sizeof(opbuf1)));
+                } else if ( israbbit3k() && z == 3 && y == 3 && state->index == 0) {
+                    BUF_PRINTF("%-8s","idet");
                 } else {
                     handle_register8(state, y, opbuf1, sizeof(opbuf1));
                     handle_register8(state, z, opbuf2, sizeof(opbuf2));
