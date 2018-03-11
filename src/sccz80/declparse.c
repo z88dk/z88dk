@@ -514,6 +514,29 @@ static void parse_trailing_modifiers(Type *type)
             type->flags |= SDCCDECL;
             type->flags &= ~SMALLC;
             continue;
+        } else if ( amatch("__z88dk_shortcall")) { // __z88dk_shortcall(rstnumber, value)
+            double   rstnumber,val;
+            Kind  valtype;
+
+            needchar('(');
+            if (constexpr(&rstnumber,&valtype, 1) == 0 ) {
+                errorfmt("Expecting a restart number",1);
+            } else {
+                if ( rstnumber < 0 || rstnumber > 0x38 || ((int)rstnumber % 8 ) ) {
+                    errorfmt("Invalid rst number: %d",1, (int)rstnumber);
+                } 
+                needchar(',');
+                if (  constexpr(&val,&valtype, 1) == 0 ) {
+                    errorfmt("Expecting a constant call number",1);
+                } else {
+                    if ( val < 0 || val > 65535 ) {
+                        errorfmt("Short call value is out of range (%x)",1, (int)val);
+                    }
+                    type->flags |= SHORTCALL;
+                    type->value = (int)rstnumber << 16 | ( (int)val & 0xfff);
+                }
+            }
+            needchar(')');
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -725,6 +748,8 @@ Type *parse_decl(char name[], Type *base_type)
             junk();
             return NULL;
         }
+        if ( amatch("__far"))
+            base_type->isfar = 1;
         return parse_decl(name, make_pointer(base_type));
     }
 
@@ -1251,10 +1276,7 @@ void type_describe(Type *type, UT_string *output)
     tail[0] = 0;
     if ( type->ptr )
         type_describe(type->ptr,output);
-
-
-    if ( type->isfar )
-        utstring_printf(output, "far ");    
+   
     switch ( type->kind ) {
     case KIND_NONE:
         return;
@@ -1281,8 +1303,10 @@ void type_describe(Type *type, UT_string *output)
         snprintf(tail, sizeof(tail),"[%d]",type->len);
         break;
     case KIND_PTR:
-    case KIND_CPTR:
         utstring_printf(output,"*");
+        break;
+    case KIND_CPTR:
+        utstring_printf(output,"*__far ");
         break;
     case KIND_STRUCT:
         utstring_printf(output,"%s %s ",type->tag->isstruct ? "struct" : "union", type->tag->name);

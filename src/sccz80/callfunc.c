@@ -25,7 +25,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst);
  *      zero, will call the contents of HL
  */
 
-void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
+void callfunction(SYMBOL *ptr, Type *fnptr_type)
 {
     int isscanf = 0;
     uint32_t format_option = 0;
@@ -44,7 +44,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     int   savesp;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
-    Type   *functype = ptr ? ptr->ctype: fnptr_call_type;
+    Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
     
     if ( functype->kind != KIND_FUNC ) {
         warningfmt("incompatible-pointer-types","Calling via non-function pointer");
@@ -211,6 +211,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
                 if (ptr)
                     debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
                 minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
+                if (isscanf) {
+                    scanf_format_option |= format_option;
+                } else {
+                    printf_format_option |= format_option;
+                }
             }
             if ( function_pointer_call == 0 ) {
                 if (expr == KIND_DOUBLE) {
@@ -274,18 +279,15 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
         } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
-        } else if (watcharg || (functype->flags & (SHARED|SHAREDC)) ) {
+        } else if ( functype->flags & SHORTCALL ) {
+            zshortcall(functype->value >> 16 & 0xff, functype->value & 0xffff);
+        } else if ((functype->flags & (SHARED|SHAREDC)) ) {
             if ((functype->flags & (SHARED|SHAREDC) ) )
                 preserve = YES;
             if (functype->flags & SHAREDC)
                 zclibcallop();
             else
                 zcallop();
-            if (isscanf) {
-                scanf_format_option |= format_option;
-            } else {
-                printf_format_option |= format_option;
-            }
             outname(funcname, dopref(ptr));
             if ((functype->flags & SHARED) && c_useshared)
                 outstr("_sl");
@@ -297,7 +299,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs);
+        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR);
     }
     /*
      *        Modify the stack after a function call

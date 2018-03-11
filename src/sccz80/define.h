@@ -101,7 +101,7 @@ struct type_s {
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
     
-    int32_t   value; // For enum, goto position
+    int32_t   value; // For enum, goto position, short call value
     
     // Structures
     Type   *tag;     // Reference to the structure type
@@ -156,7 +156,8 @@ enum symbol_flags {
         FLOATINGDECL = 0x400, /* For a function pointer, the calling convention is floating */
         NAKED = 0x800,      /* Function is naked - don't generate any code */
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
-        SDCCDECL = 0x2000   /* Function uses sdcc convention for chars */
+        SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
+        SHORTCALL = 0x4000   /* Function uses short call (via rst) */
 };
 
 

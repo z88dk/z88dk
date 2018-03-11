@@ -747,6 +747,12 @@ void zcallop(void)
     ot("call\t");
 }
 
+void zshortcall(int rst, int value) 
+{
+    outfmt("\trst\t%d\n",rst);
+    outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
+}
+
 /* djm (move this!) Decide whether to print a prefix or not 
  * This uses new flags bit LIBRARY
  */
@@ -779,7 +785,7 @@ void zret(void)
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
  */
-void callstk(Type *type, int n)
+void callstk(Type *type, int n, int isfarptr)
 {
     if (n == 2) {
         /* At this point, TOS = function, hl = argument */
@@ -788,7 +794,10 @@ void callstk(Type *type, int n)
     
     if ( type->hasva )
         loadargc(n);
-    callrts("l_jphl");
+    if ( isfarptr ) 
+        callrts("l_farcall");
+    else
+        callrts("l_jphl");
 }
 
 void jump0(LVALUE* lval, int label)

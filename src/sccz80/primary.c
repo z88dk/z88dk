@@ -279,7 +279,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
     /* Converting between pointer types..far and near */
     if (t1 == KIND_CPTR && t2 == KIND_INT)
         convUint2long();
-    else if (t2 == KIND_CPTR && t1 == KIND_INT)
+    else if (t2 == KIND_CPTR && (t1 == KIND_INT || t1 == KIND_PTR))
         warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
         
     /* Char conversion */

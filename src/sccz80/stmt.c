@@ -767,6 +767,19 @@ void doasm()
     cmode = 1; /* then back to parse level */
 }
 
+static void set_section(char **dest_section) 
+{
+    char sname[NAMESIZE];
+
+    if (symname(sname) == 0) {
+        illname(sname);
+        clear();
+        return;
+    }
+
+    *dest_section = STRDUP(sname);
+}
+
 /* #pragma statement */
 void dopragma()
 {
@@ -779,6 +792,16 @@ void dopragma()
         delmac();
     else if (amatch("unset"))
         delmac();
+    else if (amatch("codeseg"))
+        set_section(&c_code_section);
+    else if (amatch("constseg"))
+        set_section(&c_rodata_section);
+    else if (amatch("dataseg"))
+        set_section(&c_data_section);
+    else if (amatch("bssseg"))
+        set_section(&c_bss_section);
+    else if (amatch("initseg"))
+        set_section(&c_init_section);
     else {
         warningfmt("unknown-pragmas","Unknown #pragma directive");
         clear();

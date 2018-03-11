@@ -684,7 +684,7 @@ int heirb(LVALUE* lval)
                      if (k && lval->const_val == 0)
                         rvalue(lval);
                     // Functino pointer call
-                    callfunction(NULL,lval->ltype->ptr);
+                    callfunction(NULL,lval->ltype);
                     return_type = lval->ltype->ptr->return_type;
                     if ( return_type == NULL ) {
                         return_type = lval->ltype->ptr;
