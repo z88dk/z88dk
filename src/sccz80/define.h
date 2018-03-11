@@ -290,6 +290,7 @@ struct gototab_s {
 #define STDEF           12
 #define STGOTO          13
 #define STCRITICAL      14
+#define STASSERT        15
 
 
 /* Maximum number of (non fatal) errors before we quit */

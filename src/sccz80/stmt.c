@@ -23,6 +23,7 @@ static void     dodefault(void);
 static void     doreturn(char);
 static void     dobreak(void);
 static void     docont(void);
+static void     dostaticassert(void);
 
 /*
  *      Some variables for goto and cleaning up after compound 
@@ -183,7 +184,10 @@ int statement()
             }
             break;
         case '_':
-            if (match("__critical")) {
+            if (match("_Static_assert")) {
+                dostaticassert();
+                st = STASSERT;
+            } else if (match("__critical")) {
                 docritical();
                 st = STCRITICAL;
             }
@@ -806,4 +810,28 @@ void dopragma()
         warningfmt("unknown-pragmas","Unknown #pragma directive");
         clear();
     }
+}
+
+static void dostaticassert() 
+{
+    Kind   valtype;
+    double val;
+    double global_start;
+    char   *before, *start;
+
+    needchar('(');
+    setstage(&before, &start);
+    if (constexpr(&val,&valtype, 1) == 0) {
+        val = 0;
+    }
+    needchar(',');
+    qstr(&global_start);
+    needchar(')');
+    if ( val == 0 ) {
+        errorfmt("_Static_assert failed: '%s'",1,&glbq[(int)global_start]);
+    }
+    // Restore literal queue
+    gltptr = global_start;
+    clearstage(before, NULL);
+
 }
