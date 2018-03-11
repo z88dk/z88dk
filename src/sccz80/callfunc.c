@@ -175,7 +175,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
 
-        if ( function_pointer_call ) zpush(); // Save function address
+        if ( function_pointer_call ) {
+            zpush(); // Save function address
+        }
         /* ordinary call */
         expr = expression(&vconst, &val, &type);
         if (expr == KIND_CARRY) {
@@ -299,7 +301,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR);
+        if ( fnptr_type->kind == KIND_CPTR && argnumber )
+            errorfmt("Far function pointer calling with arguments is not supported",1);
+        callstk(functype, nargs, 0);
     }
     /*
      *        Modify the stack after a function call
