@@ -420,6 +420,24 @@ void error_extra_arguments(void)
 	
 	STR_DELETE(msg);
 }
+void error_port_A_timing(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "port A timing is illegal" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void warn_dma_half_cycle_timing(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA does not support half cycle timing" );
+	do_error( ErrWarn, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_cmd_failed(char *cmd)
 {
 	STR_DEFINE(msg, STR_SIZE);

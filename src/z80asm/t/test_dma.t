@@ -26,6 +26,16 @@ Error at file 'test.asm' line 2: syntax error
 ERR
 
 z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	extern ext
+	ld a,1
+	dma.wr0 ext
+	ld a,2
+ASM
+Error at file 'test.asm' line 3: expected constant expression
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 -1
 	ld a,2
@@ -181,6 +191,98 @@ check_bin_file("test.bin", pack("C*",
 				0x3E, 1, 
 				0x79, 0x02, 0x40, 0x02, 0x80,
 				0x3E, 2));
+
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr1 0
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: base register byte '0' is illegal
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr1 0x04
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x04, 
+				0x3E, 2));
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr1 0x44
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: missing arguments
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	extern ext
+	ld a,1
+	dma.wr1 0x44, ext
+	ld a,2
+ASM
+Error at file 'test.asm' line 3: expected constant expression
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr1 0x44, 0x10
+	dma.wr1 0x44, 0x20
+	dma.wr1 0x44, 0x30
+	dma.wr1 0x44, 0x03
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: port A timing is illegal
+Error at file 'test.asm' line 3: port A timing is illegal
+Error at file 'test.asm' line 4: port A timing is illegal
+Error at file 'test.asm' line 5: port A timing is illegal
+4 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr1 0x44, 0x00
+	dma.wr1 0x44, 0x01
+	dma.wr1 0x44, 0x02
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x44, 0x00,
+				0x44, 0x01,
+				0x44, 0x02,
+				0x3E, 2));
+
+
+z80asm(<<'ASM', "-b", 0, "", <<'WARN');
+	ld a,1
+	dma.wr1 0x44, 0x80
+	dma.wr1 0x44, 0x40
+	dma.wr1 0x44, 0x08
+	dma.wr1 0x44, 0x04
+	ld a,2
+ASM
+Warning at file 'test.asm' line 2: DMA does not support half cycle timing
+Warning at file 'test.asm' line 3: DMA does not support half cycle timing
+Warning at file 'test.asm' line 4: DMA does not support half cycle timing
+Warning at file 'test.asm' line 5: DMA does not support half cycle timing
+WARN
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x44, 0x80,
+				0x44, 0x40,
+				0x44, 0x08,
+				0x44, 0x04,
+				0x3E, 2));
+
+
 
 
 unlink_testfiles();

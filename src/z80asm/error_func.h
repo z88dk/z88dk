@@ -48,4 +48,6 @@ extern void error_int_range(long value);
 extern void error_base_register_illegal(long value);
 extern void error_missing_arguments(void);
 extern void error_extra_arguments(void);
+extern void error_port_A_timing(void);
+extern void warn_dma_half_cycle_timing(void);
 extern void error_cmd_failed(char *cmd);

@@ -398,17 +398,20 @@ Define rules for a ragel-based parser.
 	/*---------------------------------------------------------------------
 	*   ZXN DMA
 	*--------------------------------------------------------------------*/
-	asm_DMA =	
-			label? _TK_DMA_WR0 expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 
-				DO_STMT_LABEL(); 
-				asm_DMA_command(0, ctx->exprs);
+#define DEFINE_DMA_WR(N)																\
+			label? _TK_DMA_WR ## N expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 				\
+				DO_STMT_LABEL(); 														\
+				asm_DMA_command(N, ctx->exprs);											\
+			}																			\
+		|	label? _TK_DMA_WR ## N expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE @{ 	\
+				DO_STMT_LABEL(); 														\
+				ctx->dma_cmd = N;														\
+				ctx->current_sm = SM_DMA_PARAMS;										\
 			}
-		|	label? _TK_DMA_WR0 expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE @{ 
-				DO_STMT_LABEL(); 
-				ctx->dma_cmd = 0;
-				ctx->current_sm = SM_DMA_PARAMS;
-			}
-		;
+
+	asm_DMA =	DEFINE_DMA_WR(0)
+			|	DEFINE_DMA_WR(1)
+			;
 
 	dma_params := 
 			expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 

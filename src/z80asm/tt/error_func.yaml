@@ -247,6 +247,16 @@ errors:
     args	: void
     message	: "\"extra arguments\""
 
+  - type	: ErrError
+    func	: error_port_A_timing
+    args	: void
+    message	: "\"port A timing is illegal\""
+
+  - type	: ErrWarn
+    func	: warn_dma_half_cycle_timing
+    args	: void
+    message	: "\"DMA does not support half cycle timing\""
+	
   # system call errors
   - type	: ErrError
     func	: error_cmd_failed

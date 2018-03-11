@@ -401,17 +401,32 @@ static Expr *asm_DMA_shift_exprs(UT_array *exprs)
 	return expr;
 }
 
-static void asm_DMA_command_1(int cmd, UT_array *exprs)
+static Bool asm_DMA_shift_const_expr(UT_array *exprs, int *out_value)
 {
-	// retrieve first constant expression
+	*out_value = 0;
+
 	Expr *expr = asm_DMA_shift_exprs(exprs);
-	int N = Expr_eval(expr, TRUE);
+	*out_value = Expr_eval(expr, TRUE);
 	Bool not_evaluable = expr->result.not_evaluable;
 	OBJ_DELETE(expr);
+
 	if (not_evaluable) {
 		error_expected_const_expr();
-		return;
+		*out_value = 0;
+		return FALSE;
 	}
+	else
+		return TRUE;
+}
+
+static void asm_DMA_command_1(int cmd, UT_array *exprs)
+{
+	int N, W;
+
+	// retrieve first constant expression
+	if (!asm_DMA_shift_const_expr(exprs, &N))
+		return;
+
 	if (N >= 128 || N < 0) {
 		error_int_range(N);
 		return;
@@ -463,6 +478,40 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		default: assert(0);
 		}
 
+		break;
+
+	case 1:
+		/*
+		dma.wr1 n [,w]
+		n: bit 7 must be 0, bits 2..0 must be 100 else error "base register byte is illegal"
+		If bit 6 of n is set then accept one following byte w.
+		In w bits 5..4 must be 0, bits 1..0 must not be 11 error "port A timing is illegal"
+		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
+		*/
+		if ((N & 0x07) != 0x04) {
+			error_base_register_illegal(N);
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0x7F);
+
+		if (N & 0x40) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			if (!asm_DMA_shift_const_expr(exprs, &W))
+				return;
+
+			add_opcode(W & 0xFF);
+			if ((W & 0x30) != 0 || (W & 0x03) == 0x03) {
+				error_port_A_timing();
+				return;
+			}
+			if ((W & 0xCC)) 
+				warn_dma_half_cycle_timing();
+		}
 		break;
 
 	default: 
