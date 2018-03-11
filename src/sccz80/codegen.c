@@ -792,7 +792,7 @@ void callstk(Type *type, int n, int isfarptr)
         swapstk();
     }
     
-    if ( type->hasva )
+    if ( type->hasva || isfarptr )
         loadargc(n);
     if ( isfarptr ) 
         callrts("l_farcall");
