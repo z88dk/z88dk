@@ -52,12 +52,14 @@ Error at file 'test.asm' line 2: base register byte '3' is illegal
 1 errors occurred during assembly
 ERR
 
-z80asm(<<'ASM', "-b", 0, "", "");
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 0
 	ld a,2
 ASM
-check_bin_file("test.bin", pack("C*", 0x3E, 1, 0x01, 0x3E, 2));
+Error at file 'test.asm' line 2: base register byte '0' is illegal
+1 errors occurred during assembly
+ERR
 
 z80asm(<<'ASM', "-b", 0, "", "");
 	ld a,1
@@ -101,17 +103,6 @@ ASM
 Error at file 'test.asm' line 2: missing arguments
 1 errors occurred during assembly
 ERR
-
-z80asm(<<'ASM', "-b", 0, "", "");
-	ld a,1
-lbl:dma.wr0 0x08, 
-			lbl
-	ld a,2
-ASM
-check_bin_file("test.bin", pack("C*", 
-				0x3E, 1, 
-				0x09, 0x02, 
-				0x3E, 2));
 
 z80asm(<<'ASM', "-b", 0, "", "");
 	ld a,1

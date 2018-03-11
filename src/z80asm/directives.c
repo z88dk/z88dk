@@ -423,14 +423,12 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		/*
 		dma.wr0 n [, w, x, y, z] with whitespace following comma including newline and 
 		maybe comment to the end of the line so params can be listed on following lines
-		or 0x01 into n
 		n: bit 7 must be 0, bits 1..0 must be 01 else error "base register byte is illegal"
 		If bit 3 of n is set then accept one following byte\
 		If bit 4 of n is set then accept one following byte/ set together, expect word instead
 		If bit 5 of n is set then accept one following byte\
 		If bit 6 of n is set then accept one following byte/ set together, expect word instead
 		*/
-		N |= 0x01;
 		if ((N & 0x03) != 0x01) {
 			error_base_register_illegal(N);
 			return;
