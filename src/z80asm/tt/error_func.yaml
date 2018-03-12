@@ -252,6 +252,11 @@ errors:
     args	: void
     message	: "\"port A timing is illegal\""
 
+  - type	: ErrError
+    func	: error_port_B_timing
+    args	: void
+    message	: "\"port B timing is illegal\""
+
   - type	: ErrWarn
     func	: warn_dma_half_cycle_timing
     args	: void

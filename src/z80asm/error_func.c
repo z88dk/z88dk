@@ -429,6 +429,15 @@ void error_port_A_timing(void)
 	
 	STR_DELETE(msg);
 }
+void error_port_B_timing(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "port B timing is illegal" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void warn_dma_half_cycle_timing(void)
 {
 	STR_DEFINE(msg, STR_SIZE);

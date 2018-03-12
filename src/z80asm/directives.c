@@ -439,6 +439,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		dma.wr0 n [, w, x, y, z] with whitespace following comma including newline and 
 		maybe comment to the end of the line so params can be listed on following lines
 		n: bit 7 must be 0, bits 1..0 must be 01 else error "base register byte is illegal"
+
 		If bit 3 of n is set then accept one following byte\
 		If bit 4 of n is set then accept one following byte/ set together, expect word instead
 		If bit 5 of n is set then accept one following byte\
@@ -483,15 +484,18 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 	case 1:
 		/*
 		dma.wr1 n [,w]
+		or 0x04 into n
 		n: bit 7 must be 0, bits 2..0 must be 100 else error "base register byte is illegal"
 		If bit 6 of n is set then accept one following byte w.
+
 		In w bits 5..4 must be 0, bits 1..0 must not be 11 error "port A timing is illegal"
 		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
 		*/
-		if ((N & 0x07) != 0x04) {
+		if (((N & 0x07) | 0x04) != 0x04) {
 			error_base_register_illegal(N);
 			return;
 		}
+		N |= 0x04;
 
 		// add command byte
 		add_opcode(N & 0x7F);
@@ -509,8 +513,52 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 				error_port_A_timing();
 				return;
 			}
-			if ((W & 0xCC)) 
+			if (W & 0xCC)
 				warn_dma_half_cycle_timing();
+		}
+		break;
+
+	case 2:
+		/*
+		dma.wr2 n [,w,x]
+		n: bit 7 must be 0, bits 2..0 must be 000 else error "base register byte is illegal"
+		If bit 6 of n is set then accept one following byte w
+
+		In w bit 4 must be 0, bits 1..0 must not be 11 error "port B timing is illegal"
+		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
+		If bit 5 of w is set then accept one following byte x that can be anything.
+		*/
+		if ((N & 0x07) != 0x00) {
+			error_base_register_illegal(N);
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0x7F);
+
+		if (N & 0x40) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			if (!asm_DMA_shift_const_expr(exprs, &W))
+				return;
+
+			add_opcode(W & 0xFF);
+			if ((W & 0x10) != 0 || (W & 0x03) == 0x03) {
+				error_port_B_timing();
+				return;
+			}
+			if (W & 0xCC)
+				warn_dma_half_cycle_timing();
+
+			if (W & 0x20) {
+				if (utarray_len(exprs) == 0) {
+					error_missing_arguments();
+					return;
+				}
+				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+			}
 		}
 		break;
 
