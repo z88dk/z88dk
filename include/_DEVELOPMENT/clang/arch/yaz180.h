@@ -117,7 +117,7 @@ extern void *memset_far(void *str,int8_t bank,const int16_t c,size_t n);
 
 
 
-// provide load_hex and load_bin functions
+// provide load_hex function
 
 extern void load_hex(uint8_t bankAbs);
 

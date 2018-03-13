@@ -125,7 +125,7 @@ extern void *memcpy_far(void *str1,int8_t bank1,const void *str2,const int8_t ba
 extern void *memset_far(void *str,int8_t bank,const int16_t c,size_t n) __preserves_regs(b,c,iyh,iyl);
 
 
-// provide load_hex and load_bin functions
+// provide load_hex function
 
 extern void load_hex(uint8_t bankAbs) __preserves_regs(iyh,iyl);
 extern void load_hex_fastcall(uint8_t bankAbs) __preserves_regs(iyh,iyl) __z88dk_fastcall;

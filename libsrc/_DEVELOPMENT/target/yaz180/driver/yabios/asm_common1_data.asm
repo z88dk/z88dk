@@ -95,7 +95,7 @@ APUStatus:              defb    0
 APUError:               defb    0
 _APULock:               defb    $FE             ; mutex for APU
 
-; currently active console interface, only bit 0 is distinguished currently with TTY=0 CRT=1.
+; currently active console interface, only bit 0 is distinguished with TTY=0 CRT=1
 PUBLIC  _bios_ioByte
 
 _bios_ioByte:   defb    0               ; intel I/O byte
