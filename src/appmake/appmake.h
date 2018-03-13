@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.63 2016-11-06 05:14:02 aralbrec Exp $
+ *   $Id: appmake.h $
  */
 
 
@@ -62,6 +62,10 @@ extern option_t  c7420_options;
 
 extern int       cpc_exec(char *target);
 extern option_t  cpc_options;
+
+extern int       cpm_exec(char *target);
+extern option_t  cpm_options;
+extern char      cpm_longhelp[];
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
@@ -223,6 +227,10 @@ struct {
       "Adds a type 5 header to make a .app file",
       NULL,
       enterprise_exec,   &enterprise_options },
+    { "cpm",  "cpm",      "(C) 2018 Stefano Bodrato",
+      "CPM disk image creation",
+      cpm_longhelp,
+      cpm_exec,     &cpm_options },
     { "bin2gtp",  "gal",      "(C) 2007,2008 Tomaz Solc & Stefano Bodrato",
       "Creates a tape file image for the Galaksija micro",
       NULL,
