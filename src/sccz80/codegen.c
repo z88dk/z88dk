@@ -787,17 +787,31 @@ void zret(void)
  */
 void callstk(Type *type, int n, int isfarptr)
 {
-    if (n == 2) {
-        /* At this point, TOS = function, hl = argument */
-        swapstk();
-    }
-    
-    if ( type->hasva || isfarptr )
+    if ( isfarptr ) {
+        // The function address is on the stack at +n
+        if ( n > 0 ) {
+            outfmt("\tld\thl,%d\n",n);
+            ol("add\thl,de");
+            ol("ld\te,(hl)");
+            ol("inc\thl");
+            ol("ld\td,(hl)");
+            ol("inc\thl");
+            ol("ld\tl,(hl)");
+            ol("ex\tde,hl");
+        }
         loadargc(n);
-    if ( isfarptr ) 
         callrts("l_farcall");
-    else
+    } else {
+        if (n == 2) {
+            /* At this point, TOS = function, hl = argument */
+            swapstk();
+        }
+        
+        if ( type->hasva ) 
+            loadargc(n);
+
         callrts("l_jphl");
+    }
 }
 
 void jump0(LVALUE* lval, int label)

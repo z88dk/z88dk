@@ -176,6 +176,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         set_temporary_input(tmpfiles[argnumber]);
 
         if ( function_pointer_call ) {
+            if ( fnptr_type->kind == KIND_CPTR )
+                zpushde();
             zpush(); // Save function address
         }
         /* ordinary call */
@@ -219,7 +221,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                     printf_format_option |= format_option;
                 }
             }
-            if ( function_pointer_call == 0 ) {
+            if ( function_pointer_call == 0 || ( fnptr_type->kind == KIND_CPTR ) ) {
                 if (expr == KIND_DOUBLE) {
                     dpush();
                     nargs += 6;
@@ -301,9 +303,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        if ( fnptr_type->kind == KIND_CPTR && argnumber )
-            errorfmt("Far function pointer calling with arguments is not supported",1);
-        callstk(functype, nargs, 0);
+        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR);
     }
     /*
      *        Modify the stack after a function call
@@ -316,8 +316,15 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
 
     if ((functype->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((functype->flags & LIBRARY) == 0))) {
         Zsp += nargs;
+        // IF we called a far pointer and we had arguments, pop the address off the stack
+        if ( fnptr_type->kind == KIND_CPTR && nargs ) {
+            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE, preserve); 
+        }
     } else {
         /* If we have a frame pointer then ix holds it */
+        if ( fnptr_type->kind == KIND_CPTR && nargs ) {
+            nargs += 4;
+        }
 #ifdef USEFRAME
         if (c_framepointer_is_ix != -1) {
             if (nargs)
