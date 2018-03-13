@@ -317,12 +317,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     if ((functype->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((functype->flags & LIBRARY) == 0))) {
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack
-        if ( fnptr_type->kind == KIND_CPTR && nargs ) {
+        if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
             Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE, preserve); 
         }
     } else {
         /* If we have a frame pointer then ix holds it */
-        if ( fnptr_type->kind == KIND_CPTR && nargs ) {
+        if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
             nargs += 4;
         }
 #ifdef USEFRAME
