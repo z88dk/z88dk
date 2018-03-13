@@ -531,6 +531,7 @@ void dumpvars()
                 continue;
             if ( ptr->ctype->size == -1 )
                 continue;
+            if ( ptr->bss_section ) output_section(ptr->bss_section);
             prefix();
             outname(ptr->name, 1);
             col();

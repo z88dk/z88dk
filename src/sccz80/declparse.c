@@ -794,6 +794,8 @@ int declare_local(int local_static)
                 sym->isassigned = 1;
                 sym->initialised = 1;
                 initials(namebuf, type);                
+            } else {
+                sym->bss_section = strdup(c_bss_section);
             }
         } else {
             int size = type->size;
@@ -956,8 +958,12 @@ Type *dodeclare(enum storage_type storage)
         }
 
          if ( cmatch(';')) {
+             // Maybe not right
+            sym->bss_section = strdup(c_bss_section);
+
             return type;
         } else if ( cmatch(',')) {
+            sym->bss_section = strdup(c_bss_section);
             continue;
         } 
 
