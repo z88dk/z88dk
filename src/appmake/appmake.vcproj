@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\cpm.c"
+				>
+			</File>
+			<File
 				RelativePath=".\enterprise.c"
 				>
 			</File>
