@@ -16,7 +16,7 @@ char hello[] = { PH_H, PH_E | PH_PITCH, PH_LL, PH_O, PH___, PH_END };
 void main()
 {
     if (!currah_detect()) {
-        printf("CURRAH uSpeech is present\n");
+        printf("CURRAH uSpeech is NOT present!\n");
     } else {
         printf("Hello (from the direct engine)\n");
         currah_direct(hello);
