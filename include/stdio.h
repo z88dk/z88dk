@@ -198,7 +198,7 @@ extern int __LIB__ fputc(int c, FILE *fp) __smallc;
 extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
-extern int __LIB__ feof(FILE *fp);
+extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
 extern int __LIB__ puts(char *s);
 
 /* Some standard macros */
@@ -224,7 +224,7 @@ extern int __LIB__ fgetc(FILE *fp);
 
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
-extern int __LIB__ feof(FILE *fp);
+extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
 extern int __LIB__ puts(const char *);
 
 #define fputs(a,b)   fputs_callee(a,b)
