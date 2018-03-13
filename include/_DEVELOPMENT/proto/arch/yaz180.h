@@ -101,7 +101,7 @@ __DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t ba
 __OPROTO(`iyh,iyl',`iyh,iyl',void,*,memcpy_far,void *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
 __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,*,memset_far,void *str, int8_t bank, const int16_t c, size_t n)
 
-// provide load_hex and load_bin functions
+// provide load_hex function
 
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,load_hex,uint8_t bankAbs)
 

@@ -30,8 +30,6 @@ _error_handler_rst:     ; RST  8
     call phexwdreg      ; output originating RST address on serial port
     ex de, hl           ; get error code in L
     call phex           ; output error code on serial port
-    call delay
-    call delay
     halt
 
 ;------------------------------------------------------------------------------
@@ -172,7 +170,8 @@ _jp_far:
     pop hl              ; addr in HL
     dec sp
     pop de              ; bank in D
-    push af             ; put ret address back for posterity, perhaps we'll return one day
+    push af             ; put ret address back for posterity, if called from c application,
+                        ; perhaps we'll return one day
                         ; this is the future top of _bios_sp
     ld e, d             ; put bank in E
 
@@ -677,34 +676,30 @@ _load_hex:
     push af
 
 _load_hex_fastcall:
-    in0 a, (BBR)                ; grab and store the current Bank Base Register
+    in0 a, (BBR)                ; grab the current Bank Base Register
     and a                       ; check it is BANK0, so the user can't use this function
     ret NZ
 
-    ld a, l                     ; get the destination BBR
-    rrca                        ; move the origin bank to high nibble
+    ld a, l                     ; get the destination bank, to convert to BBR
+    and a, $0F                  ; be sure it is sane
+    ret Z                       ; and not trying to write to BANK0    
+
+    rrca                        ; move the destination bank to high nibble
     rrca                        ; we know BBR lower nibble is 0
     rrca
     rrca
-    and a, $F0                  ; be sure it is sane
-    ret Z                       ; and not trying to write to BANK0
-    out0 (BBR), a               ; set the BBR
-                                ; from BANK0, so no need for stack change, we use system stack
-
-    ld de, initString           ; pstring modifies AF, DE, & HL
-    call pstring
-    call delay
+    out0 (BBR), a               ; set the BBR from BANK0, so no need for stack change
 
     ld a, (_bios_ioByte)        ; get I/O bit
     rrca                        ; put it in Carry
-    jr NC, load_hex_get_lock1  ; TTY=0
+    jr NC, load_hex_get_lock1   ; ASCI1 TTY=0, ASCI0 CRT=1
 
 load_hex_get_lock0:
     ld hl, _asci0RxLock
     sra (hl)                    ; take the ASCI0 Rx lock
     ret C                       ; return if we can't get lock
-    call _asci0_flush_Rx_di     ; flush the ASCI0 Rx buffer
-    jr load_hex_wait_colon
+    call _asci0_flush_Rx_di     ; flush the ASCI0 Rx buffer     
+    jr load_hex_print_init
 
 load_hex_get_lock1:
     ld hl, _asci1RxLock
@@ -712,8 +707,14 @@ load_hex_get_lock1:
     ret C                       ; return if we can't get lock
     call _asci1_flush_Rx_di     ; flush the ASCI1 Rx buffer
 
+load_hex_print_init:
+    ld de, initString
+    call pstring                ; pstring modifies AF, DE, & HL
+
 load_hex_wait_colon:
     call rchar                  ; Rx byte in L (A = char received too)
+    cp CHAR_CTRL_C              ; check for CTRL_C
+    jr Z, load_hex_done         ; exit done
     cp ':'                      ; wait for ':'
     jr NZ, load_hex_wait_colon
     ld c, 0                     ; reset C to compute checksum
@@ -759,19 +760,18 @@ load_hex_end_load:
     or a
     jr NZ, load_hex_bad_chk     ; non zero, we have an issue
 
+load_hex_done:
     ld de, LoadOKStr
 
 load_hex_exit:
     xor a
     out0 (BBR), a               ; get our originating BANK0 BBR back, write it to the BBR
 
-    call pstring
-    call delay
-    call delay
+    call pstring                ; pstring modifies AF, DE, & HL
 
     ld a, (_bios_ioByte)        ; get I/O bit
     rrca                        ; put it in Carry
-    jr NC, load_hex_unlock1     ; TTY=0
+    jr NC, load_hex_unlock1     ; ASCI1 TTY=0, ASCI0 CRT=1
 
 load_hex_unlock0:
     ld hl, _asci0RxLock         ; give up the ASCI0 Rx mutex
@@ -1471,6 +1471,11 @@ _asci0_init:
     ld      a,STAT0_RIE         ; receive interrupt enabled
     out0    (STAT0),a           ; output to the ASCI0 status reg
 
+    ld hl, _asci0TxLock         ; load the mutex lock address
+    ld (hl), $FE                ; give mutex lock
+    ld hl, _asci0RxLock         ; load the mutex lock address
+    ld (hl), $FE                ; give mutex lock
+
     ret
 
 PUBLIC _asci0_flush_Rx_di
@@ -1482,13 +1487,8 @@ _asci0_flush_Rx_di:
     push hl
 
     di                          ; di
-
     call _asci0_flush_Rx
-
     ei                          ; ei
-
-    ld hl, _asci0RxLock         ; load the mutex lock address
-    ld (hl), $FE                ; give mutex lock
 
     pop hl
     pop af
@@ -1497,11 +1497,9 @@ _asci0_flush_Rx_di:
 _asci0_flush_Rx:
     xor a
     ld (asci0RxCount), a        ; reset the Rx counter (set 0)  		
-
     ld hl, asci0RxBuffer        ; load Rx buffer pointer home
     ld (asci0RxIn), hl
     ld (asci0RxOut), hl
-
     ret
 
 PUBLIC _asci0_flush_Tx_di
@@ -1514,13 +1512,8 @@ _asci0_flush_Tx_di:
     push hl
 
     di                          ; di
-
     call _asci0_flush_Tx
-
     ei                          ; ei
-
-    ld hl, _asci0TxLock         ; load the mutex lock address
-    ld (hl), $FE                ; give mutex lock
 
     pop hl
     pop af
@@ -1529,11 +1522,9 @@ _asci0_flush_Tx_di:
 _asci0_flush_Tx:
     xor a
     ld (asci0TxCount), a        ; reset the Tx counter (set 0)
-
     ld hl, asciTxBuffer         ; load Tx buffer pointer home
     ld (asci0TxIn), hl
     ld (asci0TxOut), hl
-
     ret
 
 PUBLIC _asci0_reset
@@ -1782,6 +1773,11 @@ _asci1_init:
     ld      a,STAT1_RIE         ; receive interrupt enabled
     out0    (STAT1),a           ; output to the ASCI1 status reg
 
+    ld hl, _asci1TxLock         ; load the mutex lock address
+    ld (hl), $FE                ; give mutex lock
+    ld hl, _asci1RxLock         ; load the mutex lock address
+    ld (hl), $FE                ; give mutex lock
+
     ret
 
 PUBLIC _asci1_flush_Rx_di
@@ -1793,13 +1789,8 @@ _asci1_flush_Rx_di:
     push hl
 
     di                          ; di
-
     call _asci1_flush_Rx
-
     ei                          ; ei
-
-    ld hl, _asci1RxLock         ; load the mutex lock address
-    ld (hl), $FE                ; give mutex lock
 
     pop hl
     pop af
@@ -1808,11 +1799,9 @@ _asci1_flush_Rx_di:
 _asci1_flush_Rx:
     xor a
     ld (asci1RxCount), a        ; reset the Rx counter (set 0)  		
-
     ld hl, asci1RxBuffer        ; load Rx buffer pointer home
     ld (asci1RxIn), hl
     ld (asci1RxOut), hl
-
     ret
 
 PUBLIC _asci1_flush_Tx_di
@@ -1825,13 +1814,8 @@ _asci1_flush_Tx_di:
     push hl
 
     di                          ; di
-
     call _asci1_flush_Tx
-
     ei                          ; ei
-
-    ld hl, _asci1TxLock         ; load the mutex lock address
-    ld (hl), $FE                ; give mutex lock
 
     pop hl
     pop af
@@ -1841,11 +1825,9 @@ _asci1_flush_Tx:
 
     xor a
     ld (asci1TxCount), a        ; reset the Tx counter (set 0)
-
     ld hl, asciTxBuffer+1       ; load Tx buffer pointer home
     ld (asci1TxIn), hl
     ld (asci1TxOut), hl
-
     ret
 
 PUBLIC _asci1_reset
@@ -2040,7 +2022,7 @@ ide_rdblk2:
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert read pin
     dec e                   ;keep iterative count in e
-    jr nz, ide_rdblk2
+    jr NZ, ide_rdblk2
 
 ELSE
 ide_rdblk2:
@@ -2054,7 +2036,7 @@ ide_rdblk2:
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert read pin
     dec e                   ;keep iterative count in e
-    jr nz, ide_rdblk2
+    jr NZ, ide_rdblk2
 
 ENDIF
 ;   ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
@@ -2117,7 +2099,7 @@ ide_wrblk2:
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert write pin
     dec e                   ;keep iterative count in e
-    jr nz, ide_wrblk2
+    jr NZ, ide_wrblk2
 
 ELSE
 ide_wrblk2: 
@@ -2131,7 +2113,7 @@ ide_wrblk2:
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert write pin
     dec e                   ;keep iterative count in e
-    jr nz, ide_wrblk2
+    jr NZ, ide_wrblk2
 
 ENDIF
 ;   ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
@@ -2178,7 +2160,7 @@ ide_setup_lba:
     or  11100000b           ;to enable LBA address mode
     ld hl, ideStatus        ;set bit 4 accordingly
     bit 0, (hl)
-    jr z, ide_setup_master
+    jr Z, ide_setup_master
     or $10                  ;if it is a slave, set that bit
 ide_setup_master:
     ld e, a
@@ -2201,10 +2183,10 @@ ide_wait_ready2:
     ld a, __IO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
     tst 00100001b           ;test for ERR or DFE
-    jr nz, ide_wait_error
+    jr NZ, ide_wait_error
     and 11000000b           ;mask off BuSY and RDY bits
     xor 01000000b           ;wait for RDY to be set and BuSY to be clear
-    jr nz, ide_wait_ready2
+    jr NZ, ide_wait_ready2
     pop af
     scf                     ;set carry flag on success
     ret
@@ -2225,10 +2207,10 @@ ide_wait_drq2:
     ld a, __IO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
     tst 00100001b           ;test for ERR or DFE
-    jr nz, ide_wait_error
+    jr NZ, ide_wait_error
     and 10001000b           ;mask off BuSY and DRQ bits
     xor 00001000b           ;wait for DRQ to be set and BuSY to be clear
-    jr nz, ide_wait_drq2
+    jr NZ, ide_wait_drq2
     pop af
     scf                     ;set carry flag on success
     ret
@@ -2244,9 +2226,9 @@ ide_test_error:
     ld a, __IO_IDE_ALT_STATUS    ;select status register
     call ide_read_byte      ;get status in A
     bit 0, a                ;test ERR bit
-    jr z, ide_test_success
+    jr Z, ide_test_success
     bit 5, a
-    jr nz, ide_test2        ;test write error bit
+    jr NZ, ide_test2        ;test write error bit
 
     ld a, __IO_IDE_ERROR    ;select error register
     call ide_read_byte      ;get error register in a
@@ -2279,7 +2261,7 @@ ide_read_sector:
     push bc
     push de
     call ide_wait_ready     ;make sure drive is ready
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
     call ide_setup_lba      ;tell it which sector we want in BCDE
     ld e, $1
     ld a, __IO_IDE_SEC_CNT
@@ -2288,9 +2270,9 @@ ide_read_sector:
     ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;ask the drive to read it
     call ide_wait_ready     ;make sure drive is ready to proceed
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
     call ide_wait_drq       ;wait until it's got the data
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
     call ide_read_block     ;grab the data into (HL++)
 
 _ide_x_sector_ok:
@@ -2325,7 +2307,7 @@ ide_write_sector:
     push bc
     push de
     call ide_wait_ready     ;make sure drive is ready
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
     call ide_setup_lba      ;tell it which sector we want in BCDE
     ld e, $1
     ld a, __IO_IDE_SEC_CNT
@@ -2334,27 +2316,26 @@ ide_write_sector:
     ld a, __IO_IDE_COMMAND
     call ide_write_byte     ;instruct drive to write a sector
     call ide_wait_ready     ;make sure drive is ready to proceed
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
     call ide_wait_drq       ;wait until it wants the data
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
     call ide_write_block    ;send the data to the drive from (HL++)
     call ide_wait_ready
-    jr nc, _disk_x_sector_error
+    jr NC, _disk_x_sector_error
 ;   ld e, __IDE_CMD_CACHE_FLUSH
 ;   ld a, __IO_IDE_COMMAND
 ;   call ide_write_byte     ;tell drive to flush its hardware cache
 ;   call ide_wait_ready     ;wait until the write is complete
-;   jr nc, _disk_x_sector_error
+;   jr NC, _disk_x_sector_error
     jr _ide_x_sector_ok     ;carry = 1 on return = operation ok
 
 ;==============================================================================
 ;       DEBUGGING SUBROUTINES
 ;
 
-PUBLIC delay
-PUBLIC rhexdwd, rhexwd, rhex, rchar
-PUBLIC phexdwd, phexwd, phex, pchar
-PUBLIC phexdwdreg, phexwdreg
+PUBLIC rhexwd, rhex, rchar
+PUBLIC phexwd, phex, pchar
+PUBLIC phexwdreg
 PUBLIC pstring, pnewline
 
 EXTERN _bios_ioByte
@@ -2363,43 +2344,8 @@ EXTERN _asci0_putc, _asci0_getc
 EXTERN _asci1_putc, _asci1_getc
 
 ;==============================================================================
-;       DELAY SUBROUTINES
-;
-
-delay:
-    push bc
-    ld b, $00
-_delay_loop:
-    ex (sp), hl
-    ex (sp), hl
-    djnz _delay_loop
-    pop bc
-    ret
-
-;==============================================================================
 ;       INPUT SUBROUTINES
 ;
-
-rhexdwd:                ; returns 4 bytes LE, to address in DE, modifies AF
-    push af
-    push hl
-    inc de
-    inc de
-    inc de
-    call rhex
-    ld (de), a
-    dec de
-    call rhex
-    ld (de), a
-    dec de
-    call rhex
-    ld (de), a
-    dec de
-    call rhex
-    ld (de), a
-    pop hl   
-    pop af
-    ret
 
 rhexwd:                 ; returns 2 bytes LE, to address in DE, modifies AF
     push af
@@ -2461,16 +2407,6 @@ pnewline:
     ld l, CHAR_LF
     jp pchar
 
-    ; print Double Word at address HL as 32 bit number in ASCII HEX, modifies AF
-phexdwd:
-    inc hl
-    inc hl
-    call phexwd
-    dec hl
-    dec hl
-    call phexwd
-    ret
-
     ; print Word at address HL as 16 bit number in ASCII HEX, modifies AF
 phexwd:
     push hl
@@ -2480,18 +2416,6 @@ phexwd:
     ld l, a
     call phexwdreg
     pop hl
-    ret
-
-    ; print contents of DEHL as 32 bit number in ASCII HEX, modifies AF
-phexdwdreg:
-    push de
-    push hl
-    ex de, hl
-    call phexwdreg  ; print DE
-    ex de, hl
-    call phexwdreg  ; print HL
-    pop hl
-    pop de
     ret
 
     ; print contents of HL as 16 bit number in ASCII HEX, modifies AF & HL
