@@ -456,6 +456,24 @@ void warn_dma_unsupported_features(void)
 	
 	STR_DELETE(msg);
 }
+void error_dma_unsupported_interrupts(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA does not support interrupts" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_dma_illegal_mode(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA mode is illegal" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_cmd_failed(char *cmd)
 {
 	STR_DEFINE(msg, STR_SIZE);

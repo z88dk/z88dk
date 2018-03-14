@@ -514,5 +514,106 @@ check_bin_file("test.bin", pack("C*",
 				0x98, 23, 45,
 				0x3E, 2));
 
+
+#------------------------------------------------------------------------------
+# DMA.WR4
+#------------------------------------------------------------------------------
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr4 2
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: base register byte '2' is illegal
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr4 0x11
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: DMA does not support interrupts
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr4 0x01
+	dma.wr4 0x61
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: DMA mode is illegal
+Error at file 'test.asm' line 3: DMA mode is illegal
+2 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr4 0x40
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0xC1, 
+				0x3E, 2));
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr4 0x44
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: missing arguments
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr4 0x48
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: missing arguments
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr4 0x44, 23
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0xC5, 23,
+				0x3E, 2));
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr4 0x48, 23
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0xC9, 23,
+				0x3E, 2));
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr4 0x4C
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: missing arguments
+1 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr4 0x4C, 0x1234
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0xCD, 0x34, 0x12,
+				0x3E, 2));
+
 unlink_testfiles();
 done_testing();

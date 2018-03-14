@@ -600,8 +600,62 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
 		}
 		break;
+		
+	case 4:
+		/*
+		dma.wr4 n, [w,x]
+		or 0x81 into n
+		n: bit 7 must be 1, bits 1..0 must be 01 else error "base register byte is illegal"
+		If bit 4 of n is set then error "dma does not support interrupts"
+		If bits 6..5 of n are 00 or 11 error "dma mode is illegal"
+		If bit 2 of n is set then accept one following byte\
+		If bit 3 of n is set then accept one following byte/ set together, expect word instead
 
-	default: 
+		Again if both bits 2 & 3 are set, w,x must be combined into a single word parameter.
+		*/
+		if (((N & 0x83) | 0x81) != 0x81) {
+			error_base_register_illegal(N);
+			return;
+		}
+		if (N & 0x10) {
+			error_dma_unsupported_interrupts();
+			return;
+		}
+		if ((N & 0x60) == 0 || (N & 0x60) == 0x60) {
+			error_dma_illegal_mode();
+			return;
+		}
+		N |= 0x81;
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if ((N & 0x0C) == 0x0C) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			asm_DEFW(asm_DMA_shift_exprs(exprs));
+		}
+		else {
+			if (N & 0x04) {
+				if (utarray_len(exprs) == 0) {
+					error_missing_arguments();
+					return;
+				}
+				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+			}
+			if (N & 0x08) {
+				if (utarray_len(exprs) == 0) {
+					error_missing_arguments();
+					return;
+				}
+				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+			}
+		}
+		break;
+
+	default:
 		assert(0);
 	}
 

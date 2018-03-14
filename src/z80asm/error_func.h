@@ -52,4 +52,6 @@ extern void error_port_A_timing(void);
 extern void error_port_B_timing(void);
 extern void warn_dma_half_cycle_timing(void);
 extern void warn_dma_unsupported_features(void);
+extern void error_dma_unsupported_interrupts(void);
+extern void error_dma_illegal_mode(void);
 extern void error_cmd_failed(char *cmd);

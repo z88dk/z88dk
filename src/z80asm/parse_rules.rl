@@ -413,6 +413,7 @@ Define rules for a ragel-based parser.
 			|	DEFINE_DMA_WR(1)
 			|	DEFINE_DMA_WR(2)
 			|	DEFINE_DMA_WR(3)
+			|	DEFINE_DMA_WR(4)
 			;
 
 	dma_params := 

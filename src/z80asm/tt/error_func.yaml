@@ -267,6 +267,16 @@ errors:
     args	: void
     message	: "\"DMA does not support some features\""
 	
+  - type	: ErrError
+    func	: error_dma_unsupported_interrupts
+    args	: void
+    message	: "\"DMA does not support interrupts\""
+	
+  - type	: ErrError
+    func	: error_dma_illegal_mode
+    args	: void
+    message	: "\"DMA mode is illegal\""
+	
   # system call errors
   - type	: ErrError
     func	: error_cmd_failed
