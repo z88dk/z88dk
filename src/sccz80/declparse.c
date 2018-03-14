@@ -514,16 +514,16 @@ static void parse_trailing_modifiers(Type *type)
             type->flags |= SDCCDECL;
             type->flags &= ~SMALLC;
             continue;
-        } else if ( amatch("__z88dk_frame_offset")) {
+        } else if ( amatch("__z88dk_params_offset")) {
             needchar('(');
             double   val;
             Kind     valtype;
 
             if (constexpr(&val,&valtype, 1) == 0 ) {
-                errorfmt("Expecting a constant expression for __z88dk_frame_offset", 1);
+                errorfmt("Expecting a constant expression for __z88dk_params_offset", 1);
                 val = 0;
             }
-            type->funcattrs.frame_offset = val;
+            type->funcattrs.params_offset = val;
             needchar(')');
         } else if ( amatch("__z88dk_shortcall")) { // __z88dk_shortcall(rstnumber, value)
             double   rstnumber,val;
@@ -1285,8 +1285,8 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__z88dk_shortcall(%d,%d) ", type->funcattrs.shortcall_rst, type->funcattrs.shortcall_value);
     }
 
-    if ( type->funcattrs.frame_offset ) {
-        utstring_printf(output,"__z88dk_frame_offset(%d) ", type->funcattrs.frame_offset);
+    if ( type->funcattrs.params_offset ) {
+        utstring_printf(output,"__z88dk_params_offset(%d) ", type->funcattrs.params_offset);
     }
 
 }
@@ -1474,8 +1474,8 @@ static void declfunc(Type *type, enum storage_type storage)
         }
         // Take the prototype flags
         type->flags |= currfn->ctype->flags;
-        if ( currfn->ctype->funcattrs.frame_offset ) 
-            type->funcattrs.frame_offset = currfn->ctype->funcattrs.frame_offset;
+        if ( currfn->ctype->funcattrs.params_offset ) 
+            type->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         type->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
         type->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
     } else {
@@ -1493,7 +1493,7 @@ static void declfunc(Type *type, enum storage_type storage)
 
     infunc = 1; /* In a function for sure! */
     
-    where = 2 + currfn->ctype->funcattrs.frame_offset;
+    where = 2 + currfn->ctype->funcattrs.params_offset;
 
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function

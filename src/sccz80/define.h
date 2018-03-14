@@ -113,7 +113,7 @@ struct type_s {
     struct {
         char  hasva;
         char  oldstyle;
-        int   frame_offset;
+        int   params_offset;
         uint8_t  shortcall_rst;
         uint16_t shortcall_value;
     } funcattrs;
