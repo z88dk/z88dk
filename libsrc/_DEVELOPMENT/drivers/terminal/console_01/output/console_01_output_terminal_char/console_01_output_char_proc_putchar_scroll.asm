@@ -20,7 +20,8 @@ console_01_output_char_proc_putchar_scroll:
    ld c,a                      ; c = num rows to scroll
 
    bit 7,(ix+7)
-   jr nz, scroll_it            ; if input terminal is reading input
+;;   jr nz, scroll_it            ; if input terminal is reading input
+   jr nz, scroll_immediate
 
    bit 6,(ix+6)
    jr z, scroll_immediate      ; if pause flag is reset
