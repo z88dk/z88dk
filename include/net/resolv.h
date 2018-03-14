@@ -32,8 +32,8 @@
  * (shoves it into *name and returns TRUE/FALSE for success/failure
  */
 
-extern ipaddr_t __LIB__ __SHARED__   resolve(char *name);
-extern int __LIB__ __SHARED__   reverse_addr_lookup(ipaddr_t ipaddr, char *name);
+extern ipaddr_t __LIB__    resolve(char *name);
+extern int __LIB__    reverse_addr_lookup(ipaddr_t ipaddr, char *name);
 
 /* The getxxbyXX routines are now implemented in the library not the kernel */
 

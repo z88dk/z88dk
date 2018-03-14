@@ -27,7 +27,7 @@
  * Returns length written
  */
 
-extern size_t __LIB__ __SHARED__ sock_write(SOCKET *s,void *dp,size_t len);
+extern size_t __LIB__  sock_write(SOCKET *s,void *dp,size_t len);
 
 /*
  * Write byte c to socket s
@@ -35,7 +35,7 @@ extern size_t __LIB__ __SHARED__ sock_write(SOCKET *s,void *dp,size_t len);
  * Returns length written
  */
 
-extern size_t __LIB__ __SHARED__  sock_putc(char c,SOCKET *s);
+extern size_t __LIB__   sock_putc(char c,SOCKET *s);
 
 /* 
  * Write a null terminated string to socket s
@@ -43,13 +43,13 @@ extern size_t __LIB__ __SHARED__  sock_putc(char c,SOCKET *s);
  * Returns length written
  */
 
-extern size_t __LIB__ __SHARED__  sock_puts(SOCKET *s,char *dp);
+extern size_t __LIB__   sock_puts(SOCKET *s,char *dp);
 
 /*
  * Flush the socket (Valid for TCP)
  */
 
-extern void  __LIB__ __SHARED__ sock_flush(SOCKET *s);
+extern void  __LIB__  sock_flush(SOCKET *s);
 
 /*
  * Read up to len bytes to address dp from socket s
@@ -60,47 +60,47 @@ extern void  __LIB__ __SHARED__ sock_flush(SOCKET *s);
 #define MSG_PEEK       0x02
 #define MSG_DONTWAIT   0x40
 
-extern size_t __LIB__ __SHARED__  sock_recv(SOCKET *s,u8_t *dp,size_t len,u8_t flags);
-extern size_t __LIB__ __SHARED__  sock_read(SOCKET *s,u8_t *dp,size_t len);
+extern size_t __LIB__   sock_recv(SOCKET *s,u8_t *dp,size_t len,u8_t flags);
+extern size_t __LIB__   sock_read(SOCKET *s,u8_t *dp,size_t len);
 
 /*
  * Close a socket
  */
 
-extern void __LIB__ __SHARED__  sock_close(SOCKET *s);
+extern void __LIB__   sock_close(SOCKET *s);
 
 /*
  * Abort a connection
  */
 
-extern void __LIB__ __SHARED__  sock_abort(SOCKET *s);
+extern void __LIB__   sock_abort(SOCKET *s);
 
 /*
  * Shutdown a socket - finish with it completely
  */
 
-extern void __LIB__ __SHARED__ sock_shutdown(SOCKET *s);
+extern void __LIB__  sock_shutdown(SOCKET *s);
 
 /*
  * Test to see if a socket has data ready, returns amount
  * of data available to read
  */
 
-extern size_t __LIB__ __SHARED__  sock_dataready(SOCKET *s);
+extern size_t __LIB__   sock_dataready(SOCKET *s);
 
 /*
  * Test whether a socket is open 
  * returns TRUE/FALSE
  */
 
-extern bool_t __LIB__ __SHARED__ sock_opened(SOCKET *s);
+extern bool_t __LIB__  sock_opened(SOCKET *s);
 
 /*
  * Test whether a socket is closed
  * returns TRUE/FALSE
  */
 
-extern bool_t __LIB__ __SHARED__ sock_closed(SOCKET *s);
+extern bool_t __LIB__  sock_closed(SOCKET *s);
 
 /*
  * Open a socket for either listen or active connection
@@ -111,9 +111,9 @@ extern bool_t __LIB__ __SHARED__ sock_closed(SOCKET *s);
  * protocol	= prot_TCP or prot_UDP
  */
 
-extern SOCKET __LIB__ __SHARED__ *sock_listen(ipaddr_t ipaddr,tcpport_t lport,void (*datahandler)(),char protocol);
-extern SOCKET __LIB__ __SHARED__ *sock_pair_listen(ipaddr_t ipaddr,tcpport_t lport,tcpport_t dport,void (*datahandler)(),char protocol);
-extern SOCKET __LIB__ __SHARED__ *sock_open(ipaddr_t ipaddr,tcpport_t dport,void (*datahandler)(),char protocol);
+extern SOCKET __LIB__  *sock_listen(ipaddr_t ipaddr,tcpport_t lport,void (*datahandler)(),char protocol);
+extern SOCKET __LIB__  *sock_pair_listen(ipaddr_t ipaddr,tcpport_t lport,tcpport_t dport,void (*datahandler)(),char protocol);
+extern SOCKET __LIB__  *sock_open(ipaddr_t ipaddr,tcpport_t dport,void (*datahandler)(),char protocol);
 
 /*
  * Check and set timeouts on a socket (not used much)
@@ -121,41 +121,41 @@ extern SOCKET __LIB__ __SHARED__ *sock_open(ipaddr_t ipaddr,tcpport_t dport,void
  * chk_timeout returns TRUE/FALSE for timedout/not
  */
 
-extern void __LIB__ __SHARED__ sock_settimeout(SOCKET *s,int time);
-extern int  __LIB__ __SHARED__ sock_chktimeout(SOCKET *s);
+extern void __LIB__  sock_settimeout(SOCKET *s,int time);
+extern int  __LIB__  sock_chktimeout(SOCKET *s);
 
 /*
  * Some routines suitable for daemons
  */
 
 /* Read/write user pointer associated with socket */
-extern int __LIB__ __SHARED__ sock_setptr(SOCKET *s, void *ptr);
-extern void __LIB__ __SHARED__ *sock_getptr(SOCKET *s);
+extern int __LIB__  sock_setptr(SOCKET *s, void *ptr);
+extern void __LIB__  *sock_getptr(SOCKET *s);
 
 /* Resize the tcp input queue size - returns the size the buffer is now set to*/
-extern int __LIB__ __SHARED__ sock_setrsize(SOCKET *s, int size);
+extern int __LIB__  sock_setrsize(SOCKET *s, int size);
 
 /* Set the UDP socket mode to something */
 
-extern int __LIB__ __SHARED__ sock_setmode(SOCKET *s, int mode);
+extern int __LIB__  sock_setmode(SOCKET *s, int mode);
 
 /* Set the datahandler for a socket (handler is package call) */
 
-extern int __LIB__ __SHARED__ sock_sethandler(SOCKET *s, int call);
+extern int __LIB__  sock_sethandler(SOCKET *s, int call);
 
 /* Wait for a socket to become established, checks for ^C, returns 1
  * on successfull open or 0 on ^C detected 
  */
 
-extern int __LIB__ __SHARED__ sock_waitopen(SOCKET *s);
-extern int __LIB__ __SHARED__ sock_waitclose(SOCKET *s);
+extern int __LIB__  sock_waitopen(SOCKET *s);
+extern int __LIB__  sock_waitclose(SOCKET *s);
 
 /*
  * Set the ttl and tos for a socket (defaults are 255 and 0 respectively)
  */
 
-extern void __LIB__ __SHARED__ sock_settos(SOCKET *s,u8_t tos);
-extern void __LIB__ __SHARED__ sock_setttl(SOCKET *s,u8_t ttl);
+extern void __LIB__  sock_settos(SOCKET *s,u8_t tos);
+extern void __LIB__  sock_setttl(SOCKET *s,u8_t ttl);
 
 struct sockinfo_t {
 	u8_t	  protocol;
@@ -166,7 +166,7 @@ struct sockinfo_t {
 	u8_t      ttl;
 };
 
-extern int __LIB__ __SHARED__ sock_getinfo(SOCKET *s, struct sockinfo_t *);
+extern int __LIB__  sock_getinfo(SOCKET *s, struct sockinfo_t *);
 
 
 

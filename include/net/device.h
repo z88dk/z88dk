@@ -55,14 +55,14 @@ struct pktdrive {
 
 /* Set the host IP address, returns it as well..network order! */
 
-extern ipaddr_t __LIB__ __SHARED__ SetHostAddr(ipaddr_t ip);
+extern ipaddr_t __LIB__  SetHostAddr(ipaddr_t ip);
 
 /*
  * Set the name servers - supply both, if ns1 == 0 then no DNS 
  * returns number of nameservers
  */
 
-extern size_t __LIB__ __SHARED__ SetNameServers(ipaddr_t ns1, ipaddr_t ns2);
+extern size_t __LIB__  SetNameServers(ipaddr_t ns1, ipaddr_t ns2);
 
 #endif /* _KERNEL */
 

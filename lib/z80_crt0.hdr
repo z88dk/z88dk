@@ -186,6 +186,8 @@
 	EXTERN	lp_plong
 	EXTERN	lp_pptr
 
+	EXTERN  l_farcall	; Long call
+
 
 ;-------------------
 ; Routines for SDCC
