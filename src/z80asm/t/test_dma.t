@@ -615,5 +615,40 @@ check_bin_file("test.bin", pack("C*",
 				0xCD, 0x34, 0x12,
 				0x3E, 2));
 
+
+#------------------------------------------------------------------------------
+# DMA.WR5
+#------------------------------------------------------------------------------
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr5 0x01
+	dma.wr5 0x04
+	dma.wr5 0x40
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: base register byte '1' is illegal
+Error at file 'test.asm' line 3: base register byte '4' is illegal
+Error at file 'test.asm' line 4: base register byte '64' is illegal
+3 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", <<'WARN');
+	ld a,1
+	dma.wr5 0
+	dma.wr5 0x08
+	ld a,2
+ASM
+Warning at file 'test.asm' line 3: DMA does not support ready signals
+WARN
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x82, 
+				0x8A,
+				0x3E, 2));
+
+
+
+
 unlink_testfiles();
 done_testing();

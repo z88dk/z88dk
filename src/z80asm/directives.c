@@ -655,6 +655,27 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		}
 		break;
 
+	case 5:
+		/*
+		dma.wr5 n
+		or 0x82 into n
+		n: bits 7..6 must be 10, bits 2..0 must be 010 else error "base register byte is illegal"
+		If bit 3 of n is set then warning "dma does not support ready signals"
+		*/
+		if (((N & 0xC7) | 0x82) != 0x82) {
+			error_base_register_illegal(N);
+			return;
+		}
+		N |= 0x82;
+
+		if (N & 0x08)
+			warn_dma_ready_signal_unsupported();
+
+		// add command byte
+		add_opcode(N & 0xFF);
+		
+		break;
+
 	default:
 		assert(0);
 	}
