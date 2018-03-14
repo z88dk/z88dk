@@ -447,6 +447,15 @@ void warn_dma_half_cycle_timing(void)
 	
 	STR_DELETE(msg);
 }
+void warn_dma_unsupported_features(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA does not support some features" );
+	do_error( ErrWarn, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_cmd_failed(char *cmd)
 {
 	STR_DEFINE(msg, STR_SIZE);

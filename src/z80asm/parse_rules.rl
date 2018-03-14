@@ -412,6 +412,7 @@ Define rules for a ragel-based parser.
 	asm_DMA =	DEFINE_DMA_WR(0)
 			|	DEFINE_DMA_WR(1)
 			|	DEFINE_DMA_WR(2)
+			|	DEFINE_DMA_WR(3)
 			;
 
 	dma_params := 

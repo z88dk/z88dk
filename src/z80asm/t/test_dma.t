@@ -50,10 +50,10 @@ ERR
 
 z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	ld a,1
-	dma.wr0 128
+	dma.wr0 255
 	ld a,2
 ASM
-Error at file 'test.asm' line 2: integer '128' out of range
+Error at file 'test.asm' line 2: base register byte '255' is illegal
 1 errors occurred during assembly
 ERR
 
@@ -62,12 +62,14 @@ z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	dma.wr0 0
 	dma.wr0 2
 	dma.wr0 3
+	dma.wr0 128
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: base register byte '0' is illegal
 Error at file 'test.asm' line 3: base register byte '2' is illegal
 Error at file 'test.asm' line 4: base register byte '3' is illegal
-3 errors occurred during assembly
+Error at file 'test.asm' line 5: base register byte '128' is illegal
+4 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b", 1, "", <<'ERR');
@@ -212,6 +214,7 @@ z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	dma.wr1 5
 	dma.wr1 6
 	dma.wr1 7
+	dma.wr1 128
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: base register byte '1' is illegal
@@ -220,7 +223,8 @@ Error at file 'test.asm' line 4: base register byte '3' is illegal
 Error at file 'test.asm' line 5: base register byte '5' is illegal
 Error at file 'test.asm' line 6: base register byte '6' is illegal
 Error at file 'test.asm' line 7: base register byte '7' is illegal
-6 errors occurred during assembly
+Error at file 'test.asm' line 8: base register byte '128' is illegal
+7 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b", 0, "", "");
@@ -316,6 +320,7 @@ z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	dma.wr2 5
 	dma.wr2 6
 	dma.wr2 7
+	dma.wr2 128
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: base register byte '1' is illegal
@@ -325,7 +330,8 @@ Error at file 'test.asm' line 5: base register byte '4' is illegal
 Error at file 'test.asm' line 6: base register byte '5' is illegal
 Error at file 'test.asm' line 7: base register byte '6' is illegal
 Error at file 'test.asm' line 8: base register byte '7' is illegal
-7 errors occurred during assembly
+Error at file 'test.asm' line 9: base register byte '128' is illegal
+8 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b", 0, "", "");
@@ -422,12 +428,91 @@ check_bin_file("test.bin", pack("C*",
 				0x40, 0x20, 2,
 				0x3E, 2));
 
+#------------------------------------------------------------------------------
+# DMA.WR3
+#------------------------------------------------------------------------------
+
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr3 1
+	dma.wr2 2
+	dma.wr2 3
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: base register byte '1' is illegal
+Error at file 'test.asm' line 3: base register byte '2' is illegal
+Error at file 'test.asm' line 4: base register byte '3' is illegal
+3 errors occurred during assembly
+ERR
+
+z80asm(<<'ASM', "-b", 0, "", "");
+	ld a,1
+	dma.wr3 0x00
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x80, 
+				0x3E, 2));
 
 
+z80asm(<<'ASM', "-b", 0, "", <<'WARN');
+	ld a,1
+	dma.wr3 0b00000100
+	dma.wr3 0b00100000
+	dma.wr3 0b01000000
+	ld a,2
+ASM
+Warning at file 'test.asm' line 2: DMA does not support some features
+Warning at file 'test.asm' line 3: DMA does not support some features
+Warning at file 'test.asm' line 4: DMA does not support some features
+WARN
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x84, 
+				0xA0, 
+				0xC0, 
+				0x3E, 2));
 
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr3 0x88
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: missing arguments
+1 errors occurred during assembly
+ERR
 
+z80asm(<<'ASM', "-b", 0, "", "");
+	extern ext
+	ld a,1
+	dma.wr3 0x88, 23
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x88, 23,
+				0x3E, 2));
 
+z80asm(<<'ASM', "-b", 1, "", <<'ERR');
+	ld a,1
+	dma.wr3 0x98, 23
+	ld a,2
+ASM
+Error at file 'test.asm' line 2: missing arguments
+1 errors occurred during assembly
+ERR
 
+z80asm(<<'ASM', "-b", 0, "", "");
+	extern ext
+	ld a,1
+	dma.wr3 0x98, 23, 45
+	ld a,2
+ASM
+check_bin_file("test.bin", pack("C*", 
+				0x3E, 1, 
+				0x98, 23, 45,
+				0x3E, 2));
 
 unlink_testfiles();
 done_testing();

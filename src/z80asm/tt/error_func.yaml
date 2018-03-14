@@ -262,6 +262,11 @@ errors:
     args	: void
     message	: "\"DMA does not support half cycle timing\""
 	
+  - type	: ErrWarn
+    func	: warn_dma_unsupported_features
+    args	: void
+    message	: "\"DMA does not support some features\""
+	
   # system call errors
   - type	: ErrError
     func	: error_cmd_failed

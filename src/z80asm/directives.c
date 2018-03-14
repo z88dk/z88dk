@@ -401,7 +401,7 @@ static Expr *asm_DMA_shift_exprs(UT_array *exprs)
 	return expr;
 }
 
-static Bool asm_DMA_shift_const_expr(UT_array *exprs, int *out_value)
+static Bool asm_DMA_shift_byte(UT_array *exprs, int *out_value)
 {
 	*out_value = 0;
 
@@ -415,6 +415,11 @@ static Bool asm_DMA_shift_const_expr(UT_array *exprs, int *out_value)
 		*out_value = 0;
 		return FALSE;
 	}
+	else if (*out_value < 0 || *out_value > 255) {
+		error_int_range(*out_value);
+		*out_value = 0;
+		return FALSE;
+	}
 	else
 		return TRUE;
 }
@@ -424,13 +429,8 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 	int N, W;
 
 	// retrieve first constant expression
-	if (!asm_DMA_shift_const_expr(exprs, &N))
+	if (!asm_DMA_shift_byte(exprs, &N))
 		return;
-
-	if (N >= 128 || N < 0) {
-		error_int_range(N);
-		return;
-	}
 
 	// retrieve next arguments
 	switch (cmd) {
@@ -445,13 +445,13 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		If bit 5 of n is set then accept one following byte\
 		If bit 6 of n is set then accept one following byte/ set together, expect word instead
 		*/
-		if ((N & 0x03) != 0x01) {
+		if ((N & 0x83) != 0x01) {
 			error_base_register_illegal(N);
 			return;
 		}
 
 		// add command byte
-		add_opcode(N & 0x7F);
+		add_opcode(N & 0xFF);
 
 		// parse wr0 parameters: check bits 3,4
 		if ((N & 0x18) != 0 && utarray_len(exprs) == 0) {
@@ -491,21 +491,21 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		In w bits 5..4 must be 0, bits 1..0 must not be 11 error "port A timing is illegal"
 		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
 		*/
-		if (((N & 0x07) | 0x04) != 0x04) {
+		if (((N & 0x87) | 0x04) != 0x04) {
 			error_base_register_illegal(N);
 			return;
 		}
 		N |= 0x04;
 
 		// add command byte
-		add_opcode(N & 0x7F);
+		add_opcode(N & 0xFF);
 
 		if (N & 0x40) {
 			if (utarray_len(exprs) == 0) {
 				error_missing_arguments();
 				return;
 			}
-			if (!asm_DMA_shift_const_expr(exprs, &W))
+			if (!asm_DMA_shift_byte(exprs, &W))
 				return;
 
 			add_opcode(W & 0xFF);
@@ -528,20 +528,20 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
 		If bit 5 of w is set then accept one following byte x that can be anything.
 		*/
-		if ((N & 0x07) != 0x00) {
+		if ((N & 0x87) != 0x00) {
 			error_base_register_illegal(N);
 			return;
 		}
 
 		// add command byte
-		add_opcode(N & 0x7F);
+		add_opcode(N & 0xFF);
 
 		if (N & 0x40) {
 			if (utarray_len(exprs) == 0) {
 				error_missing_arguments();
 				return;
 			}
-			if (!asm_DMA_shift_const_expr(exprs, &W))
+			if (!asm_DMA_shift_byte(exprs, &W))
 				return;
 
 			add_opcode(W & 0xFF);
@@ -559,6 +559,45 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 				}
 				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
 			}
+		}
+		break;
+
+	case 3:
+		/*
+		dma.wr3 n [,w,x]
+		or 0x80 into n
+		n: bit 7 must be 1, bits 1..0 must be 00 else error "base register byte is illegal"
+		If any of bits 6,5,2 of n are set then warning "dma does not support some features"
+
+		If bit 3 of n is set then accept one following byte that can be anything.
+		If bit 4 of n is set then accept one following byte that can be anything.
+		*/
+		if (((N & 0x83) | 0x80) != 0x80) {
+			error_base_register_illegal(N);
+			return;
+		}
+		N |= 0x80;
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if (N & 0x64)
+			warn_dma_unsupported_features();
+
+		if (N & 0x08) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+		}
+
+		if (N & 0x10) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
 		}
 		break;
 
