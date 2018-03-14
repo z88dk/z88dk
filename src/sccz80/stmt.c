@@ -251,7 +251,6 @@ void compound()
  *    to combine C and asm compactly and efficiently requires
  *     this sort of extension (much like return_c/_nc
  */
-
 void doiferror()
 {
     int flab1, flab2;
@@ -595,7 +594,7 @@ void leave(int vartype, char type, int incritical)
 {
     int savesp;
     int save = vartype;
-    int callee_cleanup = (c_compact_code || currfn->ctype->flags & CALLEE) && (stackargs > 2);
+    int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
     int hlsaved;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
@@ -605,7 +604,7 @@ void leave(int vartype, char type, int incritical)
     if (vartype == KIND_CPTR) /* they are the same in any case! */
         vartype = KIND_LONG;
     else if ( vartype == KIND_DOUBLE ) {
-        vartype = NO;
+        vartype = KIND_NONE;
         save = NO;
     }
 
@@ -621,7 +620,7 @@ void leave(int vartype, char type, int incritical)
 
     if (callee_cleanup) {
         int save = vartype;
-        if ( vartype  ) {
+        if ( vartype != KIND_NONE ) {
             save = NO;
             if ( c_notaltreg ) {
                 if ( vartype == KIND_LONG )

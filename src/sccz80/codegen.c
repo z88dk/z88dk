@@ -728,17 +728,6 @@ void sw(char type)
         callrts("l_case");
 }
 
-/* Call a shared library routine FIXME!!!!
- * Dunno which one myself and Garry are gonna hijack yet!
- */
-
-void zclibcallop()
-{
-    ol("rst\t8");
-    defword();
-}
-
-
 
 /* Output the call op code */
 
@@ -807,7 +796,7 @@ void callstk(Type *type, int n, int isfarptr)
             swapstk();
         }
         
-        if ( type->hasva ) 
+        if ( type->funcattrs.hasva ) 
             loadargc(n);
 
         callrts("l_jphl");

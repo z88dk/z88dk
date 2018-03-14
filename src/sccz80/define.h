@@ -26,10 +26,6 @@
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
 #define MAX_MANTISSA_SIZE  5    
 
-/* Offset to stack params for shared lib funcs */
-
-#define SHAREOFFSET   4
-
 /*      System wide name size (for symbols)     */
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -114,8 +110,14 @@ struct type_s {
     Type    *return_type;
     array    *parameters; // (Type)
     uint32_t  flags;        // Fast call etc
-    char      hasva;
-    char      oldstyle;
+    struct {
+        char  hasva;
+        char  oldstyle;
+        int   frame_offset;
+        uint8_t  shortcall_rst;
+        uint16_t shortcall_value;
+    } funcattrs;
+
     UT_hash_handle hh;
 };
 
@@ -147,8 +149,6 @@ enum symbol_flags {
         FARPTR = 0x02,
         FARACC = 0x04,
         FASTCALL = 0x08,     /* for certain lib calls only */
-        SHARED = 0x10,     /* Call via shared library method (append _s) */
-        SHAREDC = 0x20,     /* Call via rst (library is C code) */
         CALLEE = 0x40,      /* Called function pops regs */
         LIBRARY = 0x80,    /* Lib routine */
         SAVEFRAME = 0x100,  /* Save framepointer */
