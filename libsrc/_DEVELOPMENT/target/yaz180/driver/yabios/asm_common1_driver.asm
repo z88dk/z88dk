@@ -27,7 +27,7 @@ _error_handler_rst:     ; RST  8
     pop hl              ; get the originating PC address
     ld e, (hl)          ; get error code in E
     dec hl
-    call phexwdreg      ; output originating RST address on serial port
+    call phexwd         ; output originating RST address on serial port
     ex de, hl           ; get error code in L
     call phex           ; output error code on serial port
     halt
@@ -567,89 +567,6 @@ memcpy_far_left_right_early:
 
     jr memcpy_far_error_exit
 
-;------------------------------------------------------------------------------
-; void *memset_far(void *str, int8_t bank, const int16_t c, size_t n)
-;
-; str  − This is a pointer to the block of memory to fill,
-;       type-cast to a pointer of type void*.
-; bank − This is the bank address, relative to the current bank.
-; c    − This is the value to be set. The value is passed as an int, but the
-;       function fills the block of memory using the unsigned char conversion.
-; n    − This is the number of bytes to be set to the value c.
-;
-; This function returns a void* pointer to the memory area str in HL.
-
-; stack:
-;   n high
-;   n low
-;   c high
-;   c low
-;   bank far
-;   str high
-;   str low
-;   ret high
-;   ret low
-
-PUBLIC _memset_far
-
-_memset_far:
-    ld hl, _dmac0Lock
-    sra (hl)            ; take the DMAC0 lock
-    jr C, _memset_far
-
-    ld hl, 8
-    add hl, sp          ; pointing at nh bytes
-    ld d, (hl)          ; d = nh 
-    dec hl   
-    ld e, (hl)          ; e = nl
-
-    ld a, d             ; test for zero size, and exit
-    or a, e
-    jr Z, memset_far_error_exit ; return on zero size
-
-    out0 (BCR0H), d     ; set up the transfer size   
-    out0 (BCR0L), e
-
-    dec hl
-    dec hl              ; pointing at c low byte
-
-    out0 (SAR0H), h     ; c low byte is source, address in hl
-    out0 (SAR0L), l
-
-    dec hl              ; pointing at str far
-
-    in0 a, (BBR)        ; get the current bank
-    rrca                ; move the current bank to low nibble
-    rrca
-    rrca
-    rrca                ; shift current bank to address format
-
-    out0 (SAR0B), a     ; use the current bank for the origin
-
-    add a, (hl)         ; create relative destination far address, from twos complement input
-    and a, $0F          ; convert it to 4 bit positive address (think this is implicit)
-    out0 (DAR0B), a     ; (DAR0B has only 4 bits)
-
-    dec hl
-    ld d, (hl)          ; get destination high address in d
-    dec hl
-    ld e, (hl)          ; get destination low address in e
-
-    out0 (DAR0H), d
-    out0 (DAR0L), e
-
-    ld hl, +(DMODE_SM1|DMODE_MMOD)*$100+DSTAT_DE0
-    out0 (DMODE), h     ; DMODE_MMOD - memory00 to memory++, burst mode
-    out0 (DSTAT), l     ; DSTAT_DE0 - enable DMA channel 0, no interrupt
-                        ; in burst mode the Z180 CPU stops until the DMA completes
-
-    ex de, hl           ; and swap the destination address into hl, to return
-
-memset_far_error_exit:
-    ld a, $FE
-    ld (_dmac0Lock), a  ; give DMAC0 free
-
-    ret
 
 ;------------------------------------------------------------------------------
 ; void load_hex(uint8_t bankAbs)
@@ -926,7 +843,7 @@ _lock_give_fastcall:
 
 PUBLIC	asm_system_tick
 
-EXTERN  __system_time_fraction, __system_time
+EXTERN  __system_time_fraction, __system_time, _bios_stack_canary
 
 asm_system_tick:
     push af
@@ -937,7 +854,7 @@ asm_system_tick:
 
     ld hl, __system_time_fraction
     inc (hl)
-    jr Z, system_tick_update    ; at 0 we're at 1 second count, interrupted 256 times
+    jr Z, system_tick_stack_check ; at 0 we're at 1 second count, interrupted 256 times
 
 system_tick_exit:
     pop hl
@@ -945,8 +862,18 @@ system_tick_exit:
     ei                          ; interrupts were enabled, or we wouldn't have been here
     ret
 
+system_tick_stack_check:
+    ld hl, _bios_stack_canary   ; check that the bios stack has not collided with code
+    ld a, (hl)                  ; grab first byte $AA
+    rrca                        ; rotate it to $55
+    inc hl                      ; point to second byte $55
+    xor (hl)                    ; if correct, zero result
+    jr Z, system_tick_update    ; so continue as normal
+    rst 8                       ; Okay, Houston, we've had a problem!
+    defb $40                    ; Stack Error Code 0x40 '@'
+
 system_tick_update:
-    ld hl, __system_time        ; inc hl would also work, provided the storage is contiguous
+    ld hl, __system_time
     inc (hl)
     jr NZ, system_tick_exit
     inc hl
@@ -2333,58 +2260,14 @@ ide_write_sector:
 ;       DEBUGGING SUBROUTINES
 ;
 
-PUBLIC rhexwd, rhex, rchar
+PUBLIC rhex, rchar
 PUBLIC phexwd, phex, pchar
-PUBLIC phexwdreg
 PUBLIC pstring, pnewline
 
 EXTERN _bios_ioByte
 
 EXTERN _asci0_putc, _asci0_getc
 EXTERN _asci1_putc, _asci1_getc
-
-;==============================================================================
-;       INPUT SUBROUTINES
-;
-
-rhexwd:                 ; returns 2 bytes LE, to address in DE, modifies AF
-    push af
-    push hl
-    inc de
-    call rhex
-    ld (de), a
-    dec de
-    call rhex
-    ld (de), a
-    pop hl
-    pop af
-    ret
-
-rhex:                   ; Returns byte in A, modifies HL
-    call rhex_nibble    ; read the first nibble
-    rlca                ; shift it left by 4 bits
-    rlca
-    rlca
-    rlca
-    ld h, a             ; temporarily store the first nibble in H
-    call rhex_nibble    ; get the second (low) nibble
-    or h                ; assemble two nibbles into one byte in A
-    ret                 ; return the byte read in A  
-
-rhex_nibble:
-    call rchar          ; Rx byte in L (A = byte Rx too) SCF if char read
-    jr NC, rhex_nibble  ; keep trying if no characters
-    sub '0'
-    cp 10
-    ret C               ; if A<10 just return
-    sub 7               ; else subtract 'A'-'0' (17) and add 10
-    ret
-
-rchar:                  ; Rx byte in L (A = byte Rx too) SCF if char read
-    ld a, (_bios_ioByte); get I/O bit
-    rrca                ; put it in Carry
-    jp NC, _asci1_getc  ; TTY=0 (asci1)
-    jp _asci0_getc      ; CRT=1 (asci0)
  
 ;==============================================================================
 ;       OUTPUT SUBROUTINES
@@ -2405,21 +2288,10 @@ pnewline:
     ld l, CHAR_CR
     call pchar
     ld l, CHAR_LF
-    jp pchar
-
-    ; print Word at address HL as 16 bit number in ASCII HEX, modifies AF
-phexwd:
-    push hl
-    ld a, (hl)
-    inc hl
-    ld h, (hl)
-    ld l, a
-    call phexwdreg
-    pop hl
-    ret
+    jr pchar
 
     ; print contents of HL as 16 bit number in ASCII HEX, modifies AF & HL
-phexwdreg:
+phexwd:
     push hl
     ld l, h         ; high byte to L
     call phex
@@ -2451,6 +2323,46 @@ pchar:
     rrca                ; put it in Carry
     jp NC, _asci1_putc  ; TTY=0 (asci1)
     jp _asci0_putc      ; CRT=1 (asci0)
+
+;==============================================================================
+;       INPUT SUBROUTINES
+;
+
+rhex:                   ; Returns byte in A, modifies HL
+    call rhex_nibble    ; read the first nibble
+    rlca                ; shift it left by 4 bits
+    rlca
+    rlca
+    rlca
+    ld h, a             ; temporarily store the first nibble in H
+    call rhex_nibble    ; get the second (low) nibble
+    or h                ; assemble two nibbles into one byte in A
+    ret                 ; return the byte read in A  
+
+rhex_nibble:
+    call rchar          ; Rx byte in L (A = byte Rx too) SCF if char read
+    jr NC, rhex_nibble  ; keep trying if no characters
+    sub '0'
+    cp 10
+    ret C               ; if A<10 just return
+    sub 7               ; else subtract 'A'-'0' (17) and add 10
+    ret
+
+rchar:                  ; Rx byte in L (A = byte Rx too) SCF if char read
+    ld a, (_bios_ioByte); get I/O bit
+    rrca                ; put it in Carry
+    jp NC, _asci1_getc  ; TTY=0 (asci1)
+    jp _asci0_getc      ; CRT=1 (asci0)
+
+;==============================================================================
+;       BIOS STACK CANARY
+;
+
+PUBLIC _bios_stack_canary
+
+_bios_stack_canary:
+    defb $AA
+    defb $55
 
 PUBLIC _common1_phase_end
 _common1_phase_end:     ; just to make sure there's enough space

@@ -19,12 +19,6 @@ extern uint16_t *bank_sp;       // bank SP storage, in Page0 TCB 0x003B
 
 extern uint8_t bios_ioByte;     // intel I/O byte
 
-// provide the location for important Page 0 bank addresses
-
-extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
-extern uint8_t bank_cmp_default_drive;  // CP/M default drive
-extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
-
 // provide the simple mutex locks for hardware resources
 
 extern uint8_t shadowLock;      //  mutex for alternate registers
@@ -44,6 +38,18 @@ extern uint8_t APULock;         //  mutex for APU
 // provide the simple mutex locks for the BANK (for system usage)
 
 extern uint8_t bankLockBase[];  // base address for 16 BANK locks
+
+// provide the location of the bios stack canary
+// this location holds 0xAA55 and if it does not
+// it means that the bios stack has collided with code
+
+extern uint16_t bios_stack_canary;      // two bytes of stack canary
+
+// provide the location for important CP/M Page 0 bank addresses
+
+extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
+extern uint8_t bank_cmp_default_drive;  // CP/M default drive
+extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
 
 // IO MAPPED REGISTERS
 
@@ -108,12 +114,9 @@ extern uint8_t __LIB__ bank_get_abs(int8_t bankRel) __smallc __z88dk_fastcall;
 
 
 
-// provide memcpy_far and memset_far functions
+// provide memcpy_far function
 
 extern void __LIB__ *memcpy_far(void *str1,int8_t bank1,const void *str2,const int8_t bank2,size_t n) __smallc;
-
-
-extern void __LIB__ *memset_far(void *str,int8_t bank,const int16_t c,size_t n) __smallc;
 
 
 
