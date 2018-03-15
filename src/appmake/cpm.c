@@ -1,7 +1,11 @@
 /*
- *      Simplified CP/M disk image creation with a single program file on it
- *      
- *      $Id: cpm.c $
+ *   Simplified CP/M disk creation with a single program file on it
+ *   Create a RAW disk file, then ImageDisk can be used to add sectoring informations.
+ *
+ *   Otrona Attache':      bin2imd  a.raw a.imd /2 DM=5 N=40 SS=512 SM=1-10
+ *   NCR Decision Mate V:  bin2imd  a.raw a.imd /2 DM=4 N=40 SS=512 SM=1-8
+ *
+ *   $Id: cpm.c $
  */
 
 
@@ -14,7 +18,7 @@ static char              help         = 0;
 
 
 char cpm_longhelp[] = "" \
-    "Supported disk formats: DMV = NCR DecisionMate V\n";
+    "Supported disk formats: DMV (NCR DecisionMate V), ATTACHE (Otrona Attache')\n";
 
 /* Options that are available for this module */
 option_t cpm_options[] = {
@@ -29,7 +33,8 @@ option_t cpm_options[] = {
 /* modes */
 enum {
   NONE,
-  DMV
+  DMV,
+  ATTACHE
 };
 
 
@@ -48,6 +53,9 @@ int cpm_exec(char *target)
 	int		format;
 	
 	int		blocksize;
+	int		phy_block;
+	int		phy_block_gap;
+
 	int		trackpos;	/* first track # for the dst file */
     
 	/* TODO: check the values for the file extent */
@@ -60,14 +68,25 @@ int cpm_exec(char *target)
 	if (!dformat)
         exit_log(1,"Disk format must be specified (e.g. -f DMV).\n");
 		
-	format = NONE;
-	if ( strncmp(dformat,"DMV",3)) {
-        exit_log(1,"Invalid format.\nThe only supported format at the moment is 'DMV'.\n");
-	} else {
+	if (!strncmp(dformat,"DMV",3)) {
 		format = DMV;
 		blocksize = 2048;
+		phy_block = 4096;
+		phy_block_gap = 4096;
 		trackpos = 2;
 	}
+	
+	if (!strncmp(dformat,"ATTACHE",7)) {
+		//entry_skeleton[12] = 0;
+		format = ATTACHE;
+		blocksize = 1024;
+		phy_block = 1024;
+		phy_block_gap = 5120;		/* A000-8C00 */
+		trackpos = 2;
+	}
+	
+	if (format == NONE)
+        exit_log(1,"Invalid format.\nThe only supported format at the moment is 'DMV'.\n");
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
@@ -106,6 +125,11 @@ int cpm_exec(char *target)
 		for (i=0; i<0x6000-16; i++)
 			writebyte(0xe5,fpout);
 	}
+	
+	if (format == ATTACHE) {
+		for (i=0; i<0x7800; i++)
+			writebyte(0xe5,fpout);
+	}
 
     /* Directory entry */
 	i=0;
@@ -124,30 +148,51 @@ int cpm_exec(char *target)
 		writebyte(entry_skeleton[i],fpout);
 		
     /* First gap after the directory */
-	for (i=0; i<(0x2000-32); i++)
-		writebyte(0xe5,fpout);
+	if (format == DMV) {
+		for (i=0; i<(0x2000-32); i++)
+			writebyte(0xe5,fpout);
+	}
+	if (format == ATTACHE) {
+		for (i=0; i<(0x1000-32); i++)
+			writebyte(0xe5,fpout);
+	}
 
 	
-	len2=((len+0x1000-1)/0x1000)*0x1000;
+	/* Insert file */
+	len2=((len+phy_block-1)/phy_block)*phy_block;
 	
 	k=0;
-	for (i=0; i<len2; i++) {
-		for (j=0; j<0x1000; j++) {
-		   c = getc(fpin);
-			writebyte(c,fpout);
-			i++;
-			k++;
+	len2 += phy_block;
+		
+		for (i=0; i<len2; i++) {
+			for (j=0; j<phy_block; j++) {
+				c = getc(fpin);
+				writebyte(c,fpout);
+				i++;
+				k++;
+			}
+			/* gap */
+			for (j=0; j<phy_block_gap; j++) {
+				writebyte(0xe5,fpout);
+				k++;
+			}
+			/* no more gaps for the Otrona Attachè */
+			if (format == ATTACHE)
+					phy_block=5120;
+					//phy_block_gap=0;
 		}
-		/* gap */
-		for (j=0; j<0x1000; j++) {
+
+	
+	// Fill the remaining disk area
+	if (format == DMV) {
+		for (i=0; i<(0x50000-0x6000-0x2000-k); i++) {
 			writebyte(0xe5,fpout);
-			k++;
 		}
 	}
-	
-		
-	for (i=0; i<(0x50000-0x6000-0x2000-k); i++) {
-		writebyte(0xe5,fpout);
+	if (format == ATTACHE) {
+		for (i=0; i<(0x64000-0x7800-0x1000-k); i++) {
+			writebyte(0xe5,fpout);
+		}
 	}
 	
     fclose(fpin);

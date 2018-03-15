@@ -114,7 +114,12 @@ format_loop_scanf:
 percent_join_scanf:
 
    ld a,(de)
-   jr c, possible_error_scanf
+
+; stream error while traversing format string characters
+; must not terminate processing because there are converters
+; like %n that must be filled in at EOF.
+
+;   jr c, possible_error_scanf
    
    ;  a = next char of format string
    ; de = char *format (address of next char)
@@ -172,14 +177,15 @@ ENDIF
    scf                         ; indicate failure
    ret
 
-possible_error_scanf:
-
-   ; stream error occurred
-   ; if end of format string reached no one cares
-   
-   or a
-   jr z, exit_success_scanf
-   jr exit_failure_scanf
+;possible_error_scanf:
+;
+;   ; stream error occurred
+;   ; if end of format string reached no one cares
+;   
+;   or a
+;   jr z, exit_success_scanf
+;
+;   jr exit_failure_scanf
 
 possible_conversion_0_scanf:
 

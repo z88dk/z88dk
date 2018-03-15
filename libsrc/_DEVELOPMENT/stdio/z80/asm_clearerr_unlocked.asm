@@ -55,3 +55,5 @@ asm1_clearerr_unlocked:
    ld (ix+3),a
    
    jp error_znc
+
+;;; NEEDS TO SEND IOCTL_RESET TO THE FILE DESCRIPTOR
