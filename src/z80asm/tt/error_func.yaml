@@ -240,23 +240,18 @@ errors:
   - type	: ErrError
     func	: error_missing_arguments
     args	: void
-    message	: "\"missing arguments\""
+    message	: "\"DMA missing register group member(s)\""
 
   - type	: ErrError
     func	: error_extra_arguments
     args	: void
-    message	: "\"extra arguments\""
+    message	: "\"DMA too many arguments\""
 
   - type	: ErrError
     func	: error_port_A_timing
     args	: void
     message	: "\"port A timing is illegal\""
 
-  - type	: ErrWarn
-    func	: warn_dma_unsupported_features
-    args	: void
-    message	: "\"DMA does not support some features\""
-	
   - type	: ErrError
     func	: error_dma_unsupported_interrupts
     args	: void
@@ -268,10 +263,30 @@ errors:
     message	: "\"DMA mode is illegal\""
 	
   - type	: ErrError
+    func	: error_dma_illegal_command
+    args	: void
+    message	: "\"illegal DMA command\""
+	
+  - type	: ErrError
+    func	: error_dma_illegal_read_mask
+    args	: void
+    message	: "\"DMA read mask is illegal\""
+	
+  - type	: ErrError
     func	: error_port_B_timing
     args	: void
     message	: "\"port B timing is illegal\""
 
+  - type	: ErrWarn
+    func	: warn_dma_unsupported_features
+    args	: void
+    message	: "\"DMA does not support some features\""
+	
+  - type	: ErrWarn
+    func	: warn_dma_unsupported_command
+    args	: void
+    message	: "\"DMA does not implement this command\""
+	
   - type	: ErrWarn
     func	: warn_dma_half_cycle_timing
     args	: void

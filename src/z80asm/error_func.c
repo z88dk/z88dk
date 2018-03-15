@@ -406,7 +406,7 @@ void error_missing_arguments(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	str_append_sprintf( msg, "missing arguments" );
+	str_append_sprintf( msg, "DMA missing register group member(s)" );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -415,7 +415,7 @@ void error_extra_arguments(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	str_append_sprintf( msg, "extra arguments" );
+	str_append_sprintf( msg, "DMA too many arguments" );
 	do_error( ErrError, str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -426,15 +426,6 @@ void error_port_A_timing(void)
 
 	str_append_sprintf( msg, "port A timing is illegal" );
 	do_error( ErrError, str_data(msg) );
-	
-	STR_DELETE(msg);
-}
-void warn_dma_unsupported_features(void)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	str_append_sprintf( msg, "DMA does not support some features" );
-	do_error( ErrWarn, str_data(msg) );
 	
 	STR_DELETE(msg);
 }
@@ -456,12 +447,48 @@ void error_dma_illegal_mode(void)
 	
 	STR_DELETE(msg);
 }
+void error_dma_illegal_command(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "illegal DMA command" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_dma_illegal_read_mask(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA read mask is illegal" );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_port_B_timing(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
 	str_append_sprintf( msg, "port B timing is illegal" );
 	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void warn_dma_unsupported_features(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA does not support some features" );
+	do_error( ErrWarn, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void warn_dma_unsupported_command(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "DMA does not implement this command" );
+	do_error( ErrWarn, str_data(msg) );
 	
 	STR_DELETE(msg);
 }

@@ -398,23 +398,25 @@ Define rules for a ragel-based parser.
 	/*---------------------------------------------------------------------
 	*   ZXN DMA
 	*--------------------------------------------------------------------*/
-#define DEFINE_DMA_WR(N)																\
-			label? _TK_DMA_WR ## N expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 				\
-				DO_STMT_LABEL(); 														\
-				asm_DMA_command(N, ctx->exprs);											\
-			}																			\
-		|	label? _TK_DMA_WR ## N expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE @{ 	\
-				DO_STMT_LABEL(); 														\
-				ctx->dma_cmd = N;														\
-				ctx->current_sm = SM_DMA_PARAMS;										\
+#define DEFINE_DMA_WR(N, TOKEN)												\
+			label? TOKEN expr ( _TK_COMMA expr )* _TK_NEWLINE @{			\
+				DO_STMT_LABEL(); 											\
+				asm_DMA_command(N, ctx->exprs);								\
+			}																\
+		|	label? TOKEN expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE @{ 	\
+				DO_STMT_LABEL(); 											\
+				ctx->dma_cmd = N;											\
+				ctx->current_sm = SM_DMA_PARAMS;							\
 			}
 
-	asm_DMA =	DEFINE_DMA_WR(0)
-			|	DEFINE_DMA_WR(1)
-			|	DEFINE_DMA_WR(2)
-			|	DEFINE_DMA_WR(3)
-			|	DEFINE_DMA_WR(4)
-			|	DEFINE_DMA_WR(5)
+	asm_DMA =	DEFINE_DMA_WR(0, _TK_DMA_WR0)
+			|	DEFINE_DMA_WR(1, _TK_DMA_WR1)
+			|	DEFINE_DMA_WR(2, _TK_DMA_WR2)
+			|	DEFINE_DMA_WR(3, _TK_DMA_WR3)
+			|	DEFINE_DMA_WR(4, _TK_DMA_WR4)
+			|	DEFINE_DMA_WR(5, _TK_DMA_WR5)
+			|	DEFINE_DMA_WR(6, _TK_DMA_WR6)
+			|	DEFINE_DMA_WR(6, _TK_DMA_CMD)
 			;
 
 	dma_params := 

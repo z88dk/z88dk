@@ -676,6 +676,69 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		
 		break;
 
+	case 6:
+		/*
+		dma.wr6 n [,w] or dma.cmd n [,w]
+		n:
+		accept 0xcf, 0xd3, 0x87, 0x83, 0xbb
+		warning on 0xc3, 0xc7, 0xcb, 0xaf, 0xab, 0xa3, 0xb7, 0xbf, 0x8b, 0xa7, 0xb3 
+		"dma does not implement this command"
+		anything else error "illegal dma command"
+
+		if n = 0xbb accept a following byte w
+		If bit 7 of w is set error "read mask is illegal"
+
+		If any of these are missing following bytes in the comma list then maybe error 
+		"missing register group member(s)". 
+		if there are too many bytes "too many arguments".
+		*/
+		switch (N) {
+		case 0x83:
+		case 0x87:
+		case 0xBB:
+		case 0xCF:
+		case 0xD3:
+			break;
+
+		case 0x8B:
+		case 0xA3:
+		case 0xA7:
+		case 0xAB:
+		case 0xAF:
+		case 0xB3:
+		case 0xB7:
+		case 0xBF:
+		case 0xC3:
+		case 0xC7:
+		case 0xCB:
+			warn_dma_unsupported_command();
+			break;
+
+		default:
+			error_dma_illegal_command();
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if (N == 0xBB) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			if (!asm_DMA_shift_byte(exprs, &W))
+				return;
+
+			if (W & 0x80) {
+				error_dma_illegal_read_mask();
+				return;
+			}
+
+			add_opcode(W & 0xFF);
+		}
+		break;
+
 	default:
 		assert(0);
 	}
