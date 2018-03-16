@@ -26,7 +26,8 @@ typedef struct ParseCtx
 		SM_MAIN,
 		SM_SKIP,					/* in FALSE branch of an IF, skip */
 		SM_DEFVARS_OPEN, SM_DEFVARS_LINE,
-		SM_DEFGROUP_OPEN, SM_DEFGROUP_LINE
+		SM_DEFGROUP_OPEN, SM_DEFGROUP_LINE,
+		SM_DMA_PARAMS
 	} current_sm;					/* current parser state machine */
 
 	int cs;							/* current state */
@@ -37,6 +38,7 @@ typedef struct ParseCtx
 	UT_array *token_strings;		/* strings saved from the current statement */
 	UT_array *exprs;				/* array of expressions computed during parse */
 	UT_array *open_structs;			/* nested array of structures being parsed (IF/ENDIF,...) */
+	int dma_cmd;					/* current DMA command */
 } ParseCtx;
 
 /* create a new parse context */
