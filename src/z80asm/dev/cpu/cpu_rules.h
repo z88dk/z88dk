@@ -27043,7 +27043,7 @@ break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_POPX _TK_NEWLINE @{
+| label? _TK_POP _TK_X _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 DO_stmt(0xED8B);
