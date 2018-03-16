@@ -339,105 +339,127 @@ __sfr __banked __at __IO_LED_L IO_LED_L;
 
 // 0x6b, IO_DMA
 
-#define DMA_WR0  __DMA_WR0
+#define D_WR0  __D_WR0
 
-#define DMA_WR0_TRANSFER  __DMA_WR0_TRANSFER
-#define DMA_WR0_A_TO_B  __DMA_WR0_A_TO_B
-#define DMA_WR0_B_TO_A  __DMA_WR0_B_TO_A
+#define D_WR0_TRANSFER  __D_WR0_TRANSFER
+#define D_WR0_A_TO_B  __D_WR0_A_TO_B
+#define D_WR0_B_TO_A  __D_WR0_B_TO_A
 
-#define DMA_WR0_X3_A_START_L  __DMA_WR0_X3_A_START_L
-#define DMA_WR0_X4_A_START_H  __DMA_WR0_X4_A_START_H
-#define DMA_WR0_X34_A_START  __DMA_WR0_X34_A_START
-#define DMA_WR0_X5_LEN_L  __DMA_WR0_X5_LEN_L
-#define DMA_WR0_X6_LEN_H  __DMA_WR0_X6_LEN_H
-#define DMA_WR0_X56_LEN  __DMA_WR0_X56_LEN
+#define D_WR0_X3_A_START_L  __D_WR0_X3_A_START_L
+#define D_WR0_X4_A_START_H  __D_WR0_X4_A_START_H
+#define D_WR0_X34_A_START  __D_WR0_X34_A_START
+#define D_WR0_X5_LEN_L  __D_WR0_X5_LEN_L
+#define D_WR0_X6_LEN_H  __D_WR0_X6_LEN_H
+#define D_WR0_X56_LEN  __D_WR0_X56_LEN
 
-#define DMA_WR0_X3  __DMA_WR0_X3
-#define DMA_WR0_X4  __DMA_WR0_X4
-#define DMA_WR0_X5  __DMA_WR0_X5
-#define DMA_WR0_X6  __DMA_WR0_X6
-#define DMA_WR0_X34  __DMA_WR0_X34
-#define DMA_WR0_X35  __DMA_WR0_X35
-#define DMA_WR0_X36  __DMA_WR0_X36
-#define DMA_WR0_X45  __DMA_WR0_X45
-#define DMA_WR0_X46  __DMA_WR0_X46
-#define DMA_WR0_X56  __DMA_WR0_X56
-#define DMA_WR0_X345  __DMA_WR0_X345
-#define DMA_WR0_X346  __DMA_WR0_X346
-#define DMA_WR0_X356  __DMA_WR0_X356
-#define DMA_WR0_X456  __DMA_WR0_X456
-#define DMA_WR0_X3456  __DMA_WR0_X3456
+#define D_WR0_X3  __D_WR0_X3
+#define D_WR0_X4  __D_WR0_X4
+#define D_WR0_X5  __D_WR0_X5
+#define D_WR0_X6  __D_WR0_X6
+#define D_WR0_X34  __D_WR0_X34
+#define D_WR0_X35  __D_WR0_X35
+#define D_WR0_X36  __D_WR0_X36
+#define D_WR0_X45  __D_WR0_X45
+#define D_WR0_X46  __D_WR0_X46
+#define D_WR0_X56  __D_WR0_X56
+#define D_WR0_X345  __D_WR0_X345
+#define D_WR0_X346  __D_WR0_X346
+#define D_WR0_X356  __D_WR0_X356
+#define D_WR0_X456  __D_WR0_X456
+#define D_WR0_X3456  __D_WR0_X3456
 
-#define DMA_WR1  __DMA_WR1
+#define D_WR0_TRANSFER_A_TO_B  __D_WR0_TRANSFER_A_TO_B
+#define D_WR0_TRANSFER_B_TO_A  __D_WR0_TRANSFER_B_TO_A
+#define D_WR0_XFER_A_TO_B  __D_WR0_XFER_A_TO_B
+#define D_WR0_XFER_B_TO_A  __D_WR0_XFER_B_TO_A
 
-#define DMA_WR1_A_IS_MEM  __DMA_WR1_A_IS_MEM
-#define DMA_WR1_A_IS_IO  __DMA_WR1_A_IS_IO
-#define DMA_WR1_A_DEC  __DMA_WR1_A_DEC
-#define DMA_WR1_A_INC  __DMA_WR1_A_INC
-#define DMA_WR1_A_FIX  __DMA_WR1_A_FIX
+#define D_WR1  __D_WR1
 
-#define DMA_WR1_X6  __DMA_WR1_X6
-#define DMA_WR1_X6_A_TIMING  __DMA_WR1_X6_A_TIMING
+#define D_WR1_A_IS_MEM  __D_WR1_A_IS_MEM
+#define D_WR1_A_IS_IO  __D_WR1_A_IS_IO
+#define D_WR1_A_DEC  __D_WR1_A_DEC
+#define D_WR1_A_INC  __D_WR1_A_INC
+#define D_WR1_A_FIX  __D_WR1_A_FIX
 
-#define DMA_WR1X6_A_CLEN_2  __DMA_WR1X6_A_CLEN_2
-#define DMA_WR1X6_A_CLEN_3  __DMA_WR1X6_A_CLEN_3
-#define DMA_WR1X6_A_CLEN_4  __DMA_WR1X6_A_CLEN_4
+#define D_WR1_X6  __D_WR1_X6
+#define D_WR1_X6_A_TIMING  __D_WR1_X6_A_TIMING
 
-#define DMA_WR2  __DMA_WR2
+#define D_WR1X6_A_CLEN_2  __D_WR1X6_A_CLEN_2
+#define D_WR1X6_A_CLEN_3  __D_WR1X6_A_CLEN_3
+#define D_WR1X6_A_CLEN_4  __D_WR1X6_A_CLEN_4
 
-#define DMA_WR2_B_IS_MEM  __DMA_WR2_B_IS_MEM
-#define DMA_WR2_B_IS_IO  __DMA_WR2_B_IS_IO
-#define DMA_WR2_B_DEC  __DMA_WR2_B_DEC
-#define DMA_WR2_B_INC  __DMA_WR2_B_INC
-#define DMA_WR2_B_FIX  __DMA_WR2_B_FIX
+#define D_WR1_A_IS_MEM_DEC  __D_WR1_A_IS_MEM_DEC
+#define D_WR1_A_IS_MEM_INC  __D_WR1_A_IS_MEM_INC
+#define D_WR1_A_IS_MEM_FIX  __D_WR1_A_IS_MEM_FIX
+#define D_WR1_A_IS_IO_DEC  __D_WR1_A_IS_IO_DEC
+#define D_WR1_A_IS_IO_INC  __D_WR1_A_IS_IO_INC
+#define D_WR1_A_IS_IO_FIX  __D_WR1_A_IS_IO_FIX
 
-#define DMA_WR2_X6  __DMA_WR2_X6
-#define DMA_WR2_X6_B_TIMING  __DMA_WR2_X6_B_TIMING
+#define D_WR2  __D_WR2
 
-#define DMA_WR2X6_B_CLEN_2  __DMA_WR2X6_B_CLEN_2
-#define DMA_WR2X6_B_CLEN_3  __DMA_WR2X6_B_CLEN_3
-#define DMA_WR2X6_B_CLEN_4  __DMA_WR2X6_B_CLEN_4
+#define D_WR2_B_IS_MEM  __D_WR2_B_IS_MEM
+#define D_WR2_B_IS_IO  __D_WR2_B_IS_IO
+#define D_WR2_B_DEC  __D_WR2_B_DEC
+#define D_WR2_B_INC  __D_WR2_B_INC
+#define D_WR2_B_FIX  __D_WR2_B_FIX
 
-#define DMA_WR2X6_X5  __DMA_WR2X6_X5
-#define DMA_WR2X6_X5_PRESCALAR  __DMA_WR2X6_X5_PRESCALAR
+#define D_WR2_X6  __D_WR2_X6
+#define D_WR2_X6_B_TIMING  __D_WR2_X6_B_TIMING
 
-#define DMA_WR3  __DMA_WR3
-#define DMA_WR3_ENABLE_DMA  __DMA_WR3_ENABLE_DMA
+#define D_WR2X6_B_CLEN_2  __D_WR2X6_B_CLEN_2
+#define D_WR2X6_B_CLEN_3  __D_WR2X6_B_CLEN_3
+#define D_WR2X6_B_CLEN_4  __D_WR2X6_B_CLEN_4
 
-#define DMA_WR4  __DMA_WR4
+#define D_WR2X6_X5  __D_WR2X6_X5
+#define D_WR2X6_X5_PRESCALAR  __D_WR2X6_X5_PRESCALAR
 
-#define DMA_WR4_CONT  __DMA_WR4_CONT
-#define DMA_WR4_BURST  __DMA_WR4_BURST
+#define D_WR2_B_IS_MEM_DEC  __D_WR2_B_IS_MEM_DEC
+#define D_WR2_B_IS_MEM_INC  __D_WR2_B_IS_MEM_INC
+#define D_WR2_B_IS_MEM_FIX  __D_WR2_B_IS_MEM_FIX
+#define D_WR2_B_IS_IO_DEC  __D_WR2_B_IS_IO_DEC
+#define D_WR2_B_IS_IO_INC  __D_WR2_B_IS_IO_INC
+#define D_WR2_B_IS_IO_FIX  __D_WR2_B_IS_IO_FIX
 
-#define DMA_WR4_X2  __DMA_WR4_X2
-#define DMA_WR4_X3  __DMA_WR4_X3
-#define DMA_WR4_X23  __DMA_WR4_X23
+#define D_WR3  __D_WR3
+#define D_WR3_ENABLE_DMA  __D_WR3_ENABLE_DMA
 
-#define DMA_WR4_X2_B_START_L  __DMA_WR4_X2_B_START_L
-#define DMA_WR4_X3_B_START_H  __DMA_WR4_X3_B_START_H
-#define DMA_WR4_X23_B_START  __DMA_WR4_X23_B_START
+#define D_WR4  __D_WR4
 
-#define DMA_WR5  __DMA_WR5
+#define D_WR4_CONT  __D_WR4_CONT
+#define D_WR4_BURST  __D_WR4_BURST
 
-#define DMA_WR5_CE_WAIT  __DMA_WR5_CE_WAIT
-#define DMA_WR5_RESTART  __DMA_WR5_RESTART
+#define D_WR4_X2  __D_WR4_X2
+#define D_WR4_X3  __D_WR4_X3
+#define D_WR4_X23  __D_WR4_X23
 
-#define DMA_LOAD  __DMA_LOAD
-#define DMA_CONTINUE  __DMA_CONTINUE
-#define DMA_ENABLE_DMA  __DMA_ENABLE_DMA
-#define DMA_DISABLE_DMA  __DMA_DISABLE_DMA
-#define DMA_READ_MASK  __DMA_READ_MASK
+#define D_WR4_X2_B_START_L  __D_WR4_X2_B_START_L
+#define D_WR4_X3_B_START_H  __D_WR4_X3_B_START_H
+#define D_WR4_X23_B_START  __D_WR4_X23_B_START
 
-#define DMA_RM_STATUS  __DMA_RM_STATUS
-#define DMA_RM_COUNTER_L  __DMA_RM_COUNTER_L
-#define DMA_RM_COUNTER_H  __DMA_RM_COUNTER_H
-#define DMA_RM_COUNTER  __DMA_RM_COUNTER
-#define DMA_RM_A_ADDR_L  __DMA_RM_A_ADDR_L
-#define DMA_RM_A_ADDR_H  __DMA_RM_A_ADDR_H
-#define DMA_RM_A_ADDR  __DMA_RM_A_ADDR
-#define DMA_RM_B_ADDR_L  __DMA_RM_B_ADDR_L
-#define DMA_RM_B_ADDR_H  __DMA_RM_B_ADDR_H
-#define DMA_RM_B_ADDR  __DMA_RM_B_ADDR
+#define D_WR5  __D_WR5
+
+#define D_WR5_CE  __D_WR5_CE
+#define D_WR5_CE_WAIT  __D_WR5_CE_WAIT
+
+#define D_WR5_STOP  __D_WR5_STOP
+#define D_WR5_RESTART  __D_WR5_RESTART
+
+#define D_LOAD  __D_LOAD
+#define D_CONTINUE  __D_CONTINUE
+#define D_ENABLE_DMA  __D_ENABLE_DMA
+#define D_DISABLE_DMA  __D_DISABLE_DMA
+#define D_READ_MASK  __D_READ_MASK
+
+#define D_RM_STATUS  __D_RM_STATUS
+#define D_RM_COUNTER_L  __D_RM_COUNTER_L
+#define D_RM_COUNTER_H  __D_RM_COUNTER_H
+#define D_RM_COUNTER  __D_RM_COUNTER
+#define D_RM_A_ADDR_L  __D_RM_A_ADDR_L
+#define D_RM_A_ADDR_H  __D_RM_A_ADDR_H
+#define D_RM_A_ADDR  __D_RM_A_ADDR
+#define D_RM_B_ADDR_L  __D_RM_B_ADDR_L
+#define D_RM_B_ADDR_H  __D_RM_B_ADDR_H
+#define D_RM_B_ADDR  __D_RM_B_ADDR
 
 ///////////////////////////////////////////////////////////////
 

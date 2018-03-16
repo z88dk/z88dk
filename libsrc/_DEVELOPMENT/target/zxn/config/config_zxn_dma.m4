@@ -73,34 +73,41 @@ define(`__IO_DMA_DATAGEAR', 0x6b)
 # "BLOCK LENGTH HIGH".
 #
 
-define(`__DMA_WR0', 0x00)
+define(`__D_WR0', 0x00)
 
-define(`__DMA_WR0_TRANSFER', 0x01)
-define(`__DMA_WR0_A_TO_B', 0x04)
-define(`__DMA_WR0_B_TO_A', 0x00)
+define(`__D_WR0_TRANSFER', 0x01)
+define(`__D_WR0_A_TO_B', 0x04)
+define(`__D_WR0_B_TO_A', 0x00)
 
-define(`__DMA_WR0_X3_A_START_L', 0x08)
-define(`__DMA_WR0_X4_A_START_H', 0x10)
-define(`__DMA_WR0_X34_A_START', 0x18)
-define(`__DMA_WR0_X5_LEN_L', 0x20)
-define(`__DMA_WR0_X6_LEN_H', 0x40)
-define(`__DMA_WR0_X56_LEN', 0x60)
+define(`__D_WR0_X3_A_START_L', 0x08)
+define(`__D_WR0_X4_A_START_H', 0x10)
+define(`__D_WR0_X34_A_START', 0x18)
+define(`__D_WR0_X5_LEN_L', 0x20)
+define(`__D_WR0_X6_LEN_H', 0x40)
+define(`__D_WR0_X56_LEN', 0x60)
 
-define(`__DMA_WR0_X3', 0x08)
-define(`__DMA_WR0_X4', 0x10)
-define(`__DMA_WR0_X5', 0x20)
-define(`__DMA_WR0_X6', 0x40)
-define(`__DMA_WR0_X34', 0x18)
-define(`__DMA_WR0_X35', 0x28)
-define(`__DMA_WR0_X36', 0x48)
-define(`__DMA_WR0_X45', 0x30)
-define(`__DMA_WR0_X46', 0x50)
-define(`__DMA_WR0_X56', 0x60)
-define(`__DMA_WR0_X345', 0x38)
-define(`__DMA_WR0_X346', 0x58)
-define(`__DMA_WR0_X356', 0x68)
-define(`__DMA_WR0_X456', 0x70)
-define(`__DMA_WR0_X3456', 0x78)
+define(`__D_WR0_X3', 0x08)
+define(`__D_WR0_X4', 0x10)
+define(`__D_WR0_X5', 0x20)
+define(`__D_WR0_X6', 0x40)
+define(`__D_WR0_X34', 0x18)
+define(`__D_WR0_X35', 0x28)
+define(`__D_WR0_X36', 0x48)
+define(`__D_WR0_X45', 0x30)
+define(`__D_WR0_X46', 0x50)
+define(`__D_WR0_X56', 0x60)
+define(`__D_WR0_X345', 0x38)
+define(`__D_WR0_X346', 0x58)
+define(`__D_WR0_X356', 0x68)
+define(`__D_WR0_X456', 0x70)
+define(`__D_WR0_X3456', 0x78)
+
+# Shortcuts
+
+define(`__D_WR0_TRANSFER_A_TO_B', eval(__D_WR0 | __D_WR0_TRANSFER | __D_WR0_A_TO_B))
+define(`__D_WR0_TRANSFER_B_TO_A', eval(__D_WR0 | __D_WR0_TRANSFER | __D_WR0_B_TO_A))
+define(`__D_WR0_XFER_A_TO_B', __D_WR0_TRANSFER_A_TO_B)
+define(`__D_WR0_XFER_B_TO_A', __D_WR0_TRANSFER_B_TO_A)
 
 # WR1 - Write Register Group 1
 #
@@ -128,22 +135,31 @@ define(`__DMA_WR0_X3456', 0x78)
 # no half cycle timing for the control signals.
 #
 
-define(`__DMA_WR1', 0x04)
+define(`__D_WR1', 0x04)
 
-define(`__DMA_WR1_A_IS_MEM', 0x00)
-define(`__DMA_WR1_A_IS_IO', 0x08)
-define(`__DMA_WR1_A_DEC', 0x00)
-define(`__DMA_WR1_A_INC', 0x10)
-define(`__DMA_WR1_A_FIX', 0x20)
+define(`__D_WR1_A_IS_MEM', 0x00)
+define(`__D_WR1_A_IS_IO', 0x08)
+define(`__D_WR1_A_DEC', 0x00)
+define(`__D_WR1_A_INC', 0x10)
+define(`__D_WR1_A_FIX', 0x20)
 
-define(`__DMA_WR1_X6', 0x40)
-define(`__DMA_WR1_X6_A_TIMING', 0x40)
+define(`__D_WR1_X6', 0x40)
+define(`__D_WR1_X6_A_TIMING', 0x40)
 
 #
 
-define(`__DMA_WR1X6_A_CLEN_2', 0x02)
-define(`__DMA_WR1X6_A_CLEN_3', 0x01)
-define(`__DMA_WR1X6_A_CLEN_4', 0x00)
+define(`__D_WR1X6_A_CLEN_2', 0x02)
+define(`__D_WR1X6_A_CLEN_3', 0x01)
+define(`__D_WR1X6_A_CLEN_4', 0x00)
+
+# Shortcuts
+
+define(`__D_WR1_A_IS_MEM_DEC', eval(__D_WR1 | __D_WR1_A_IS_MEM | __D_WR1_A_DEC))
+define(`__D_WR1_A_IS_MEM_INC', eval(__D_WR1 | __D_WR1_A_IS_MEM | __D_WR1_A_INC))
+define(`__D_WR1_A_IS_MEM_FIX', eval(__D_WR1 | __D_WR1_A_IS_MEM | __D_WR1_A_FIX))
+define(`__D_WR1_A_IS_IO_DEC', eval(__D_WR1 | __D_WR1_A_IS_IO | __D_WR1_A_DEC))
+define(`__D_WR1_A_IS_IO_INC', eval(__D_WR1 | __D_WR1_A_IS_IO | __D_WR1_A_INC))
+define(`__D_WR1_A_IS_IO_FIX', eval(__D_WR1 | __D_WR1_A_IS_IO | __D_WR1_A_FIX))
 
 # WR2 - Write Register Group 2
 #
@@ -189,25 +205,34 @@ define(`__DMA_WR1X6_A_CLEN_4', 0x00)
 # time to the CPU so that the CPU can run while the DMA is idle.
 #
 
-define(`__DMA_WR2', 0x00)
+define(`__D_WR2', 0x00)
 
-define(`__DMA_WR2_B_IS_MEM', 0x00)
-define(`__DMA_WR2_B_IS_IO', 0x08)
-define(`__DMA_WR2_B_DEC', 0x00)
-define(`__DMA_WR2_B_INC', 0x10)
-define(`__DMA_WR2_B_FIX', 0x20)
+define(`__D_WR2_B_IS_MEM', 0x00)
+define(`__D_WR2_B_IS_IO', 0x08)
+define(`__D_WR2_B_DEC', 0x00)
+define(`__D_WR2_B_INC', 0x10)
+define(`__D_WR2_B_FIX', 0x20)
 
-define(`__DMA_WR2_X6', 0x40)
-define(`__DMA_WR2_X6_B_TIMING', 0x40)
+define(`__D_WR2_X6', 0x40)
+define(`__D_WR2_X6_B_TIMING', 0x40)
 
 #
 
-define(`__DMA_WR2X6_B_CLEN_2', 0x02)
-define(`__DMA_WR2X6_B_CLEN_3', 0x01)
-define(`__DMA_WR2X6_B_CLEN_4', 0x00)
+define(`__D_WR2X6_B_CLEN_2', 0x02)
+define(`__D_WR2X6_B_CLEN_3', 0x01)
+define(`__D_WR2X6_B_CLEN_4', 0x00)
 
-define(`__DMA_WR2X6_X5', 0x20)
-define(`__DMA_WR2X6_X5_PRESCALAR', 0x20)
+define(`__D_WR2X6_X5', 0x20)
+define(`__D_WR2X6_X5_PRESCALAR', 0x20)
+
+# Shortcuts
+
+define(`__D_WR2_B_IS_MEM_DEC', eval(__D_WR2 | __D_WR2_B_IS_MEM | __D_WR2_B_DEC))
+define(`__D_WR2_B_IS_MEM_INC', eval(__D_WR2 | __D_WR2_B_IS_MEM | __D_WR2_B_INC))
+define(`__D_WR2_B_IS_MEM_FIX', eval(__D_WR2 | __D_WR2_B_IS_MEM | __D_WR2_B_FIX))
+define(`__D_WR2_B_IS_IO_DEC', eval(__D_WR2 | __D_WR2_B_IS_IO | __D_WR2_B_DEC))
+define(`__D_WR2_B_IS_IO_INC', eval(__D_WR2 | __D_WR2_B_IS_IO | __D_WR2_B_INC))
+define(`__D_WR2_B_IS_IO_FIX', eval(__D_WR2 | __D_WR2_B_IS_IO | __D_WR2_B_FIX))
 
 # WR3 - Write Register Group 3
 #
@@ -223,9 +248,9 @@ define(`__DMA_WR2X6_X5_PRESCALAR', 0x20)
 # It's preferred to enable the DMA by writing an "Enable DMA" command to WR6.
 #
 
-define(`__DMA_WR3', 0x80)
+define(`__D_WR3', 0x80)
 
-define(`__DMA_WR3_ENABLE_DMA', 0x40)
+define(`__D_WR3_ENABLE_DMA', 0x40)
 
 # WR4 - Write Register Group 4
 #
@@ -248,18 +273,18 @@ define(`__DMA_WR3_ENABLE_DMA', 0x40)
 # implemented in the ZXN DMA nor are these registers available for writing.
 #
 
-define(`__DMA_WR4', 0x81)
+define(`__D_WR4', 0x81)
 
-define(`__DMA_WR4_CONT', 0x20)
-define(`__DMA_WR4_BURST', 0x40)
+define(`__D_WR4_CONT', 0x20)
+define(`__D_WR4_BURST', 0x40)
 
-define(`__DMA_WR4_X2', 0x04)
-define(`__DMA_WR4_X3', 0x08)
-define(`__DMA_WR4_X23', 0x0c)
+define(`__D_WR4_X2', 0x04)
+define(`__D_WR4_X3', 0x08)
+define(`__D_WR4_X23', 0x0c)
 
-define(`__DMA_WR4_X2_B_START_L', 0x04)
-define(`__DMA_WR4_X3_B_START_H', 0x08)
-define(`__DMA_WR4_X23_B_START', 0x0c)
+define(`__D_WR4_X2_B_START_L', 0x04)
+define(`__D_WR4_X3_B_START_H', 0x08)
+define(`__D_WR4_X23_B_START', 0x0c)
 
 # WR5 - Write Register Group 5
 #
@@ -282,10 +307,13 @@ define(`__DMA_WR4_X23_B_START', 0x0c)
 # transfer when a previous one is finished.
 #
 
-define(`__DMA_WR5', 0x82)
+define(`__D_WR5', 0x82)
 
-define(`__DMA_WR5_CE_WAIT', 0x10)
-define(`__DMA_WR5_RESTART', 0x20)
+define(`__D_WR5_CE', 0x00)
+define(`__D_WR5_CE_WAIT', 0x10)
+
+define(`__D_WR5_RESTART', 0x20)
+define(`__D_WR5_STOP', 0x00)
 
 # WR6 - Command Register
 #
@@ -341,24 +369,24 @@ define(`__DMA_WR5_RESTART', 0x20)
 # Z80 DMA commands not implemented in the ZXN DMA are simply ignored. 
 #
 
-define(`__DMA_LOAD', 0xcf)
-define(`__DMA_CONTINUE', 0xd3)
-define(`__DMA_ENABLE_DMA', 0x87)
-define(`__DMA_DISABLE_DMA', 0x83)
-define(`__DMA_READ_MASK', 0xbb)
+define(`__D_LOAD', 0xcf)
+define(`__D_CONTINUE', 0xd3)
+define(`__D_ENABLE_DMA', 0x87)
+define(`__D_DISABLE_DMA', 0x83)
+define(`__D_READ_MASK', 0xbb)
 
 #
 
-define(`__DMA_RM_STATUS', 0x01)
-define(`__DMA_RM_COUNTER_L', 0x02)
-define(`__DMA_RM_COUNTER_H', 0x04)
-define(`__DMA_RM_COUNTER', 0x06)
-define(`__DMA_RM_A_ADDR_L', 0x08)
-define(`__DMA_RM_A_ADDR_H', 0x10)
-define(`__DMA_RM_A_ADDR', 0x18)
-define(`__DMA_RM_B_ADDR_L', 0x20)
-define(`__DMA_RM_B_ADDR_H', 0x40)
-define(`__DMA_RM_B_ADDR', 0x60)
+define(`__D_RM_STATUS', 0x01)
+define(`__D_RM_COUNTER_L', 0x02)
+define(`__D_RM_COUNTER_H', 0x04)
+define(`__D_RM_COUNTER', 0x06)
+define(`__D_RM_A_ADDR_L', 0x08)
+define(`__D_RM_A_ADDR_H', 0x10)
+define(`__D_RM_A_ADDR', 0x18)
+define(`__D_RM_B_ADDR_L', 0x20)
+define(`__D_RM_B_ADDR_H', 0x40)
+define(`__D_RM_B_ADDR', 0x60)
 
 # OPERATING SPEED
 #
@@ -389,105 +417,127 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__IO_DMA'
 PUBLIC `__IO_DMA_DATAGEAR'
 
-PUBLIC `__DMA_WR0'
+PUBLIC `__D_WR0'
 
-PUBLIC `__DMA_WR0_TRANSFER'
-PUBLIC `__DMA_WR0_A_TO_B'
-PUBLIC `__DMA_WR0_B_TO_A'
+PUBLIC `__D_WR0_TRANSFER'
+PUBLIC `__D_WR0_A_TO_B'
+PUBLIC `__D_WR0_B_TO_A'
 
-PUBLIC `__DMA_WR0_X3_A_START_L'
-PUBLIC `__DMA_WR0_X4_A_START_H'
-PUBLIC `__DMA_WR0_X34_A_START'
-PUBLIC `__DMA_WR0_X5_LEN_L'
-PUBLIC `__DMA_WR0_X6_LEN_H'
-PUBLIC `__DMA_WR0_X56_LEN'
+PUBLIC `__D_WR0_X3_A_START_L'
+PUBLIC `__D_WR0_X4_A_START_H'
+PUBLIC `__D_WR0_X34_A_START'
+PUBLIC `__D_WR0_X5_LEN_L'
+PUBLIC `__D_WR0_X6_LEN_H'
+PUBLIC `__D_WR0_X56_LEN'
 
-PUBLIC `__DMA_WR0_X3'
-PUBLIC `__DMA_WR0_X4'
-PUBLIC `__DMA_WR0_X5'
-PUBLIC `__DMA_WR0_X6'
-PUBLIC `__DMA_WR0_X34'
-PUBLIC `__DMA_WR0_X35'
-PUBLIC `__DMA_WR0_X36'
-PUBLIC `__DMA_WR0_X45'
-PUBLIC `__DMA_WR0_X46'
-PUBLIC `__DMA_WR0_X56'
-PUBLIC `__DMA_WR0_X345'
-PUBLIC `__DMA_WR0_X346'
-PUBLIC `__DMA_WR0_X356'
-PUBLIC `__DMA_WR0_X456'
-PUBLIC `__DMA_WR0_X3456'
+PUBLIC `__D_WR0_X3'
+PUBLIC `__D_WR0_X4'
+PUBLIC `__D_WR0_X5'
+PUBLIC `__D_WR0_X6'
+PUBLIC `__D_WR0_X34'
+PUBLIC `__D_WR0_X35'
+PUBLIC `__D_WR0_X36'
+PUBLIC `__D_WR0_X45'
+PUBLIC `__D_WR0_X46'
+PUBLIC `__D_WR0_X56'
+PUBLIC `__D_WR0_X345'
+PUBLIC `__D_WR0_X346'
+PUBLIC `__D_WR0_X356'
+PUBLIC `__D_WR0_X456'
+PUBLIC `__D_WR0_X3456'
 
-PUBLIC `__DMA_WR1'
+PUBLIC `__D_WR0_TRANSFER_A_TO_B'
+PUBLIC `__D_WR0_TRANSFER_B_TO_A'
+PUBLIC `__D_WR0_XFER_A_TO_B'
+PUBLIC `__D_WR0_XFER_B_TO_A'
 
-PUBLIC `__DMA_WR1_A_IS_MEM'
-PUBLIC `__DMA_WR1_A_IS_IO'
-PUBLIC `__DMA_WR1_A_DEC'
-PUBLIC `__DMA_WR1_A_INC'
-PUBLIC `__DMA_WR1_A_FIX'
+PUBLIC `__D_WR1'
 
-PUBLIC `__DMA_WR1_X6'
-PUBLIC `__DMA_WR1_X6_A_TIMING'
+PUBLIC `__D_WR1_A_IS_MEM'
+PUBLIC `__D_WR1_A_IS_IO'
+PUBLIC `__D_WR1_A_DEC'
+PUBLIC `__D_WR1_A_INC'
+PUBLIC `__D_WR1_A_FIX'
 
-PUBLIC `__DMA_WR1X6_A_CLEN_2'
-PUBLIC `__DMA_WR1X6_A_CLEN_3'
-PUBLIC `__DMA_WR1X6_A_CLEN_4'
+PUBLIC `__D_WR1_X6'
+PUBLIC `__D_WR1_X6_A_TIMING'
 
-PUBLIC `__DMA_WR2'
+PUBLIC `__D_WR1X6_A_CLEN_2'
+PUBLIC `__D_WR1X6_A_CLEN_3'
+PUBLIC `__D_WR1X6_A_CLEN_4'
 
-PUBLIC `__DMA_WR2_B_IS_MEM'
-PUBLIC `__DMA_WR2_B_IS_IO'
-PUBLIC `__DMA_WR2_B_DEC'
-PUBLIC `__DMA_WR2_B_INC'
-PUBLIC `__DMA_WR2_B_FIX'
+PUBLIC `__D_WR1_A_IS_MEM_DEC'
+PUBLIC `__D_WR1_A_IS_MEM_INC'
+PUBLIC `__D_WR1_A_IS_MEM_FIX'
+PUBLIC `__D_WR1_A_IS_IO_DEC'
+PUBLIC `__D_WR1_A_IS_IO_INC'
+PUBLIC `__D_WR1_A_IS_IO_FIX'
 
-PUBLIC `__DMA_WR2_X6'
-PUBLIC `__DMA_WR2_X6_B_TIMING'
+PUBLIC `__D_WR2'
 
-PUBLIC `__DMA_WR2X6_B_CLEN_2'
-PUBLIC `__DMA_WR2X6_B_CLEN_3'
-PUBLIC `__DMA_WR2X6_B_CLEN_4'
+PUBLIC `__D_WR2_B_IS_MEM'
+PUBLIC `__D_WR2_B_IS_IO'
+PUBLIC `__D_WR2_B_DEC'
+PUBLIC `__D_WR2_B_INC'
+PUBLIC `__D_WR2_B_FIX'
 
-PUBLIC `__DMA_WR2X6_X5'
-PUBLIC `__DMA_WR2X6_X5_PRESCALAR'
+PUBLIC `__D_WR2_X6'
+PUBLIC `__D_WR2_X6_B_TIMING'
 
-PUBLIC `__DMA_WR3'
-PUBLIC `__DMA_WR3_ENABLE_DMA'
+PUBLIC `__D_WR2X6_B_CLEN_2'
+PUBLIC `__D_WR2X6_B_CLEN_3'
+PUBLIC `__D_WR2X6_B_CLEN_4'
 
-PUBLIC `__DMA_WR4'
+PUBLIC `__D_WR2X6_X5'
+PUBLIC `__D_WR2X6_X5_PRESCALAR'
 
-PUBLIC `__DMA_WR4_CONT'
-PUBLIC `__DMA_WR4_BURST'
+PUBLIC `__D_WR2_B_IS_MEM_DEC'
+PUBLIC `__D_WR2_B_IS_MEM_INC'
+PUBLIC `__D_WR2_B_IS_MEM_FIX'
+PUBLIC `__D_WR2_B_IS_IO_DEC'
+PUBLIC `__D_WR2_B_IS_IO_INC'
+PUBLIC `__D_WR2_B_IS_IO_FIX'
 
-PUBLIC `__DMA_WR4_X2'
-PUBLIC `__DMA_WR4_X3'
-PUBLIC `__DMA_WR4_X23'
+PUBLIC `__D_WR3'
+PUBLIC `__D_WR3_ENABLE_DMA'
 
-PUBLIC `__DMA_WR4_X2_B_START_L'
-PUBLIC `__DMA_WR4_X3_B_START_H'
-PUBLIC `__DMA_WR4_X23_B_START'
+PUBLIC `__D_WR4'
 
-PUBLIC `__DMA_WR5'
+PUBLIC `__D_WR4_CONT'
+PUBLIC `__D_WR4_BURST'
 
-PUBLIC `__DMA_WR5_CE_WAIT'
-PUBLIC `__DMA_WR5_RESTART'
+PUBLIC `__D_WR4_X2'
+PUBLIC `__D_WR4_X3'
+PUBLIC `__D_WR4_X23'
 
-PUBLIC `__DMA_LOAD'
-PUBLIC `__DMA_CONTINUE'
-PUBLIC `__DMA_ENABLE_DMA'
-PUBLIC `__DMA_DISABLE_DMA'
-PUBLIC `__DMA_READ_MASK'
+PUBLIC `__D_WR4_X2_B_START_L'
+PUBLIC `__D_WR4_X3_B_START_H'
+PUBLIC `__D_WR4_X23_B_START'
 
-PUBLIC `__DMA_RM_STATUS'
-PUBLIC `__DMA_RM_COUNTER_L'
-PUBLIC `__DMA_RM_COUNTER_H'
-PUBLIC `__DMA_RM_COUNTER'
-PUBLIC `__DMA_RM_A_ADDR_L'
-PUBLIC `__DMA_RM_A_ADDR_H'
-PUBLIC `__DMA_RM_A_ADDR'
-PUBLIC `__DMA_RM_B_ADDR_L'
-PUBLIC `__DMA_RM_B_ADDR_H'
-PUBLIC `__DMA_RM_B_ADDR'
+PUBLIC `__D_WR5'
+
+PUBLIC `__D_WR5_CE'
+PUBLIC `__D_WR5_CE_WAIT'
+
+PUBLIC `__D_WR5_STOP'
+PUBLIC `__D_WR5_RESTART'
+
+PUBLIC `__D_LOAD'
+PUBLIC `__D_CONTINUE'
+PUBLIC `__D_ENABLE_DMA'
+PUBLIC `__D_DISABLE_DMA'
+PUBLIC `__D_READ_MASK'
+
+PUBLIC `__D_RM_STATUS'
+PUBLIC `__D_RM_COUNTER_L'
+PUBLIC `__D_RM_COUNTER_H'
+PUBLIC `__D_RM_COUNTER'
+PUBLIC `__D_RM_A_ADDR_L'
+PUBLIC `__D_RM_A_ADDR_H'
+PUBLIC `__D_RM_A_ADDR'
+PUBLIC `__D_RM_B_ADDR_L'
+PUBLIC `__D_RM_B_ADDR_H'
+PUBLIC `__D_RM_B_ADDR'
 ')
 
 dnl#
@@ -496,108 +546,135 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+IFNDEF __ZXN_INC_DMA
+DEFINE __ZXN_INC_DMA
+
 defc `__IO_DMA' = __IO_DMA
 defc `__IO_DMA_DATAGEAR' = __IO_DMA_DATAGEAR
 
-defc `__DMA_WR0' = __DMA_WR0
+defc `__D_WR0' = __D_WR0
 
-defc `__DMA_WR0_TRANSFER' = __DMA_WR0_TRANSFER
-defc `__DMA_WR0_A_TO_B' = __DMA_WR0_A_TO_B
-defc `__DMA_WR0_B_TO_A' = __DMA_WR0_B_TO_A
+defc `__D_WR0_TRANSFER' = __D_WR0_TRANSFER
+defc `__D_WR0_A_TO_B' = __D_WR0_A_TO_B
+defc `__D_WR0_B_TO_A' = __D_WR0_B_TO_A
 
-defc `__DMA_WR0_X3_A_START_L' = __DMA_WR0_X3_A_START_L
-defc `__DMA_WR0_X4_A_START_H' = __DMA_WR0_X4_A_START_H
-defc `__DMA_WR0_X34_A_START' = __DMA_WR0_X34_A_START
-defc `__DMA_WR0_X5_LEN_L' = __DMA_WR0_X5_LEN_L
-defc `__DMA_WR0_X6_LEN_H' = __DMA_WR0_X6_LEN_H
-defc `__DMA_WR0_X56_LEN' = __DMA_WR0_X56_LEN
+defc `__D_WR0_X3_A_START_L' = __D_WR0_X3_A_START_L
+defc `__D_WR0_X4_A_START_H' = __D_WR0_X4_A_START_H
+defc `__D_WR0_X34_A_START' = __D_WR0_X34_A_START
+defc `__D_WR0_X5_LEN_L' = __D_WR0_X5_LEN_L
+defc `__D_WR0_X6_LEN_H' = __D_WR0_X6_LEN_H
+defc `__D_WR0_X56_LEN' = __D_WR0_X56_LEN
 
-defc `__DMA_WR0_X3' = __DMA_WR0_X3
-defc `__DMA_WR0_X4' = __DMA_WR0_X4
-defc `__DMA_WR0_X5' = __DMA_WR0_X5
-defc `__DMA_WR0_X6' = __DMA_WR0_X6
-defc `__DMA_WR0_X34' = __DMA_WR0_X34
-defc `__DMA_WR0_X35' = __DMA_WR0_X35
-defc `__DMA_WR0_X36' = __DMA_WR0_X36
-defc `__DMA_WR0_X45' = __DMA_WR0_X45
-defc `__DMA_WR0_X46' = __DMA_WR0_X46
-defc `__DMA_WR0_X56' = __DMA_WR0_X56
-defc `__DMA_WR0_X345' = __DMA_WR0_X345
-defc `__DMA_WR0_X346' = __DMA_WR0_X346
-defc `__DMA_WR0_X356' = __DMA_WR0_X356
-defc `__DMA_WR0_X456' = __DMA_WR0_X456
-defc `__DMA_WR0_X3456' = __DMA_WR0_X3456
+defc `__D_WR0_X3' = __D_WR0_X3
+defc `__D_WR0_X4' = __D_WR0_X4
+defc `__D_WR0_X5' = __D_WR0_X5
+defc `__D_WR0_X6' = __D_WR0_X6
+defc `__D_WR0_X34' = __D_WR0_X34
+defc `__D_WR0_X35' = __D_WR0_X35
+defc `__D_WR0_X36' = __D_WR0_X36
+defc `__D_WR0_X45' = __D_WR0_X45
+defc `__D_WR0_X46' = __D_WR0_X46
+defc `__D_WR0_X56' = __D_WR0_X56
+defc `__D_WR0_X345' = __D_WR0_X345
+defc `__D_WR0_X346' = __D_WR0_X346
+defc `__D_WR0_X356' = __D_WR0_X356
+defc `__D_WR0_X456' = __D_WR0_X456
+defc `__D_WR0_X3456' = __D_WR0_X3456
 
-defc `__DMA_WR1' = __DMA_WR1
+defc `__D_WR0_TRANSFER_A_TO_B' = __D_WR0_TRANSFER_A_TO_B
+defc `__D_WR0_TRANSFER_B_TO_A' = __D_WR0_TRANSFER_B_TO_A
+defc `__D_WR0_XFER_A_TO_B' = __D_WR0_XFER_A_TO_B
+defc `__D_WR0_XFER_B_TO_A' = __D_WR0_XFER_B_TO_A
 
-defc `__DMA_WR1_A_IS_MEM' = __DMA_WR1_A_IS_MEM
-defc `__DMA_WR1_A_IS_IO' = __DMA_WR1_A_IS_IO
-defc `__DMA_WR1_A_DEC' = __DMA_WR1_A_DEC
-defc `__DMA_WR1_A_INC' = __DMA_WR1_A_INC
-defc `__DMA_WR1_A_FIX' = __DMA_WR1_A_FIX
+defc `__D_WR1' = __D_WR1
 
-defc `__DMA_WR1_X6' = __DMA_WR1_X6
-defc `__DMA_WR1_X6_A_TIMING' = __DMA_WR1_X6_A_TIMING
+defc `__D_WR1_A_IS_MEM' = __D_WR1_A_IS_MEM
+defc `__D_WR1_A_IS_IO' = __D_WR1_A_IS_IO
+defc `__D_WR1_A_DEC' = __D_WR1_A_DEC
+defc `__D_WR1_A_INC' = __D_WR1_A_INC
+defc `__D_WR1_A_FIX' = __D_WR1_A_FIX
 
-defc `__DMA_WR1X6_A_CLEN_2' = __DMA_WR1X6_A_CLEN_2
-defc `__DMA_WR1X6_A_CLEN_3' = __DMA_WR1X6_A_CLEN_3
-defc `__DMA_WR1X6_A_CLEN_4' = __DMA_WR1X6_A_CLEN_4
+defc `__D_WR1_X6' = __D_WR1_X6
+defc `__D_WR1_X6_A_TIMING' = __D_WR1_X6_A_TIMING
 
-defc `__DMA_WR2' = __DMA_WR2
+defc `__D_WR1X6_A_CLEN_2' = __D_WR1X6_A_CLEN_2
+defc `__D_WR1X6_A_CLEN_3' = __D_WR1X6_A_CLEN_3
+defc `__D_WR1X6_A_CLEN_4' = __D_WR1X6_A_CLEN_4
 
-defc `__DMA_WR2_B_IS_MEM' = __DMA_WR2_B_IS_MEM
-defc `__DMA_WR2_B_IS_IO' = __DMA_WR2_B_IS_IO
-defc `__DMA_WR2_B_DEC' = __DMA_WR2_B_DEC
-defc `__DMA_WR2_B_INC' = __DMA_WR2_B_INC
-defc `__DMA_WR2_B_FIX' = __DMA_WR2_B_FIX
+defc `__D_WR1_A_IS_MEM_DEC' = __D_WR1_A_IS_MEM_DEC
+defc `__D_WR1_A_IS_MEM_INC' = __D_WR1_A_IS_MEM_INC
+defc `__D_WR1_A_IS_MEM_FIX' = __D_WR1_A_IS_MEM_FIX
+defc `__D_WR1_A_IS_IO_DEC' = __D_WR1_A_IS_IO_DEC
+defc `__D_WR1_A_IS_IO_INC' = __D_WR1_A_IS_IO_INC
+defc `__D_WR1_A_IS_IO_FIX' = __D_WR1_A_IS_IO_FIX
 
-defc `__DMA_WR2_X6' = __DMA_WR2_X6
-defc `__DMA_WR2_X6_B_TIMING' = __DMA_WR2_X6_B_TIMING
+defc `__D_WR2' = __D_WR2
 
-defc `__DMA_WR2X6_B_CLEN_2' = __DMA_WR2X6_B_CLEN_2
-defc `__DMA_WR2X6_B_CLEN_3' = __DMA_WR2X6_B_CLEN_3
-defc `__DMA_WR2X6_B_CLEN_4' = __DMA_WR2X6_B_CLEN_4
+defc `__D_WR2_B_IS_MEM' = __D_WR2_B_IS_MEM
+defc `__D_WR2_B_IS_IO' = __D_WR2_B_IS_IO
+defc `__D_WR2_B_DEC' = __D_WR2_B_DEC
+defc `__D_WR2_B_INC' = __D_WR2_B_INC
+defc `__D_WR2_B_FIX' = __D_WR2_B_FIX
 
-defc `__DMA_WR2X6_X5' = __DMA_WR2X6_X5
-defc `__DMA_WR2X6_X5_PRESCALAR' = __DMA_WR2X6_X5_PRESCALAR
+defc `__D_WR2_X6' = __D_WR2_X6
+defc `__D_WR2_X6_B_TIMING' = __D_WR2_X6_B_TIMING
 
-defc `__DMA_WR3' = __DMA_WR3
-defc `__DMA_WR3_ENABLE_DMA' = __DMA_WR3_ENABLE_DMA
+defc `__D_WR2X6_B_CLEN_2' = __D_WR2X6_B_CLEN_2
+defc `__D_WR2X6_B_CLEN_3' = __D_WR2X6_B_CLEN_3
+defc `__D_WR2X6_B_CLEN_4' = __D_WR2X6_B_CLEN_4
 
-defc `__DMA_WR4' = __DMA_WR4
+defc `__D_WR2X6_X5' = __D_WR2X6_X5
+defc `__D_WR2X6_X5_PRESCALAR' = __D_WR2X6_X5_PRESCALAR
 
-defc `__DMA_WR4_CONT' = __DMA_WR4_CONT
-defc `__DMA_WR4_BURST' = __DMA_WR4_BURST
+defc `__D_WR2_B_IS_MEM_DEC' = __D_WR2_B_IS_MEM_DEC
+defc `__D_WR2_B_IS_MEM_INC' = __D_WR2_B_IS_MEM_INC
+defc `__D_WR2_B_IS_MEM_FIX' = __D_WR2_B_IS_MEM_FIX
+defc `__D_WR2_B_IS_IO_DEC' = __D_WR2_B_IS_IO_DEC
+defc `__D_WR2_B_IS_IO_INC' = __D_WR2_B_IS_IO_INC
+defc `__D_WR2_B_IS_IO_FIX' = __D_WR2_B_IS_IO_FIX
 
-defc `__DMA_WR4_X2' = __DMA_WR4_X2
-defc `__DMA_WR4_X3' = __DMA_WR4_X3
-defc `__DMA_WR4_X23' = __DMA_WR4_X23
+defc `__D_WR3' = __D_WR3
+defc `__D_WR3_ENABLE_DMA' = __D_WR3_ENABLE_DMA
 
-defc `__DMA_WR4_X2_B_START_L' = __DMA_WR4_X2_B_START_L
-defc `__DMA_WR4_X3_B_START_H' = __DMA_WR4_X3_B_START_H
-defc `__DMA_WR4_X23_B_START' = __DMA_WR4_X23_B_START
+defc `__D_WR4' = __D_WR4
 
-defc `__DMA_WR5' = __DMA_WR5
+defc `__D_WR4_CONT' = __D_WR4_CONT
+defc `__D_WR4_BURST' = __D_WR4_BURST
 
-defc `__DMA_WR5_CE_WAIT' = __DMA_WR5_CE_WAIT
-defc `__DMA_WR5_RESTART' = __DMA_WR5_RESTART
+defc `__D_WR4_X2' = __D_WR4_X2
+defc `__D_WR4_X3' = __D_WR4_X3
+defc `__D_WR4_X23' = __D_WR4_X23
 
-defc `__DMA_LOAD' = __DMA_LOAD
-defc `__DMA_CONTINUE' = __DMA_CONTINUE
-defc `__DMA_ENABLE_DMA' = __DMA_ENABLE_DMA
-defc `__DMA_DISABLE_DMA' = __DMA_DISABLE_DMA
-defc `__DMA_READ_MASK' = __DMA_READ_MASK
+defc `__D_WR4_X2_B_START_L' = __D_WR4_X2_B_START_L
+defc `__D_WR4_X3_B_START_H' = __D_WR4_X3_B_START_H
+defc `__D_WR4_X23_B_START' = __D_WR4_X23_B_START
 
-defc `__DMA_RM_STATUS' = __DMA_RM_STATUS
-defc `__DMA_RM_COUNTER_L' = __DMA_RM_COUNTER_L
-defc `__DMA_RM_COUNTER_H' = __DMA_RM_COUNTER_H
-defc `__DMA_RM_COUNTER' = __DMA_RM_COUNTER
-defc `__DMA_RM_A_ADDR_L' = __DMA_RM_A_ADDR_L
-defc `__DMA_RM_A_ADDR_H' = __DMA_RM_A_ADDR_H
-defc `__DMA_RM_A_ADDR' = __DMA_RM_A_ADDR
-defc `__DMA_RM_B_ADDR_L' = __DMA_RM_B_ADDR_L
-defc `__DMA_RM_B_ADDR_H' = __DMA_RM_B_ADDR_H
-defc `__DMA_RM_B_ADDR' = __DMA_RM_B_ADDR
+defc `__D_WR5' = __D_WR5
+
+defc `__D_WR5_CE' = __D_WR5_CE
+defc `__D_WR5_CE_WAIT' = __D_WR5_CE_WAIT
+
+defc `__D_WR5_STOP' = __D_WR5_STOP
+defc `__D_WR5_RESTART' = __D_WR5_RESTART
+
+defc `__D_LOAD' = __D_LOAD
+defc `__D_CONTINUE' = __D_CONTINUE
+defc `__D_ENABLE_DMA' = __D_ENABLE_DMA
+defc `__D_DISABLE_DMA' = __D_DISABLE_DMA
+defc `__D_READ_MASK' = __D_READ_MASK
+
+defc `__D_RM_STATUS' = __D_RM_STATUS
+defc `__D_RM_COUNTER_L' = __D_RM_COUNTER_L
+defc `__D_RM_COUNTER_H' = __D_RM_COUNTER_H
+defc `__D_RM_COUNTER' = __D_RM_COUNTER
+defc `__D_RM_A_ADDR_L' = __D_RM_A_ADDR_L
+defc `__D_RM_A_ADDR_H' = __D_RM_A_ADDR_H
+defc `__D_RM_A_ADDR' = __D_RM_A_ADDR
+defc `__D_RM_B_ADDR_L' = __D_RM_B_ADDR_L
+defc `__D_RM_B_ADDR_H' = __D_RM_B_ADDR_H
+defc `__D_RM_B_ADDR' = __D_RM_B_ADDR
+
+ENDIF
 ')
 
 dnl#
@@ -609,103 +686,125 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_DMA'  __IO_DMA
 `#define' `__IO_DMA_DATAGEAR'  __IO_DMA_DATAGEAR
 
-`#define' `__DMA_WR0'  __DMA_WR0
+`#define' `__D_WR0'  __D_WR0
 
-`#define' `__DMA_WR0_TRANSFER'  __DMA_WR0_TRANSFER
-`#define' `__DMA_WR0_A_TO_B'  __DMA_WR0_A_TO_B
-`#define' `__DMA_WR0_B_TO_A'  __DMA_WR0_B_TO_A
+`#define' `__D_WR0_TRANSFER'  __D_WR0_TRANSFER
+`#define' `__D_WR0_A_TO_B'  __D_WR0_A_TO_B
+`#define' `__D_WR0_B_TO_A'  __D_WR0_B_TO_A
 
-`#define' `__DMA_WR0_X3_A_START_L'  __DMA_WR0_X3_A_START_L
-`#define' `__DMA_WR0_X4_A_START_H'  __DMA_WR0_X4_A_START_H
-`#define' `__DMA_WR0_X34_A_START'  __DMA_WR0_X34_A_START
-`#define' `__DMA_WR0_X5_LEN_L'  __DMA_WR0_X5_LEN_L
-`#define' `__DMA_WR0_X6_LEN_H'  __DMA_WR0_X6_LEN_H
-`#define' `__DMA_WR0_X56_LEN'  __DMA_WR0_X56_LEN
+`#define' `__D_WR0_X3_A_START_L'  __D_WR0_X3_A_START_L
+`#define' `__D_WR0_X4_A_START_H'  __D_WR0_X4_A_START_H
+`#define' `__D_WR0_X34_A_START'  __D_WR0_X34_A_START
+`#define' `__D_WR0_X5_LEN_L'  __D_WR0_X5_LEN_L
+`#define' `__D_WR0_X6_LEN_H'  __D_WR0_X6_LEN_H
+`#define' `__D_WR0_X56_LEN'  __D_WR0_X56_LEN
 
-`#define' `__DMA_WR0_X3'  __DMA_WR0_X3
-`#define' `__DMA_WR0_X4'  __DMA_WR0_X4
-`#define' `__DMA_WR0_X5'  __DMA_WR0_X5
-`#define' `__DMA_WR0_X6'  __DMA_WR0_X6
-`#define' `__DMA_WR0_X34'  __DMA_WR0_X34
-`#define' `__DMA_WR0_X35'  __DMA_WR0_X35
-`#define' `__DMA_WR0_X36'  __DMA_WR0_X36
-`#define' `__DMA_WR0_X45'  __DMA_WR0_X45
-`#define' `__DMA_WR0_X46'  __DMA_WR0_X46
-`#define' `__DMA_WR0_X56'  __DMA_WR0_X56
-`#define' `__DMA_WR0_X345'  __DMA_WR0_X345
-`#define' `__DMA_WR0_X346'  __DMA_WR0_X346
-`#define' `__DMA_WR0_X356'  __DMA_WR0_X356
-`#define' `__DMA_WR0_X456'  __DMA_WR0_X456
-`#define' `__DMA_WR0_X3456'  __DMA_WR0_X3456
+`#define' `__D_WR0_X3'  __D_WR0_X3
+`#define' `__D_WR0_X4'  __D_WR0_X4
+`#define' `__D_WR0_X5'  __D_WR0_X5
+`#define' `__D_WR0_X6'  __D_WR0_X6
+`#define' `__D_WR0_X34'  __D_WR0_X34
+`#define' `__D_WR0_X35'  __D_WR0_X35
+`#define' `__D_WR0_X36'  __D_WR0_X36
+`#define' `__D_WR0_X45'  __D_WR0_X45
+`#define' `__D_WR0_X46'  __D_WR0_X46
+`#define' `__D_WR0_X56'  __D_WR0_X56
+`#define' `__D_WR0_X345'  __D_WR0_X345
+`#define' `__D_WR0_X346'  __D_WR0_X346
+`#define' `__D_WR0_X356'  __D_WR0_X356
+`#define' `__D_WR0_X456'  __D_WR0_X456
+`#define' `__D_WR0_X3456'  __D_WR0_X3456
 
-`#define' `__DMA_WR1'  __DMA_WR1
+`#define' `__D_WR0_TRANSFER_A_TO_B'  __D_WR0_TRANSFER_A_TO_B
+`#define' `__D_WR0_TRANSFER_B_TO_A'  __D_WR0_TRANSFER_B_TO_A
+`#define' `__D_WR0_XFER_A_TO_B'  __D_WR0_XFER_A_TO_B
+`#define' `__D_WR0_XFER_B_TO_A'  __D_WR0_XFER_B_TO_A
 
-`#define' `__DMA_WR1_A_IS_MEM'  __DMA_WR1_A_IS_MEM
-`#define' `__DMA_WR1_A_IS_IO'  __DMA_WR1_A_IS_IO
-`#define' `__DMA_WR1_A_DEC'  __DMA_WR1_A_DEC
-`#define' `__DMA_WR1_A_INC'  __DMA_WR1_A_INC
-`#define' `__DMA_WR1_A_FIX'  __DMA_WR1_A_FIX
+`#define' `__D_WR1'  __D_WR1
 
-`#define' `__DMA_WR1_X6'  __DMA_WR1_X6
-`#define' `__DMA_WR1_X6_A_TIMING'  __DMA_WR1_X6_A_TIMING
+`#define' `__D_WR1_A_IS_MEM'  __D_WR1_A_IS_MEM
+`#define' `__D_WR1_A_IS_IO'  __D_WR1_A_IS_IO
+`#define' `__D_WR1_A_DEC'  __D_WR1_A_DEC
+`#define' `__D_WR1_A_INC'  __D_WR1_A_INC
+`#define' `__D_WR1_A_FIX'  __D_WR1_A_FIX
 
-`#define' `__DMA_WR1X6_A_CLEN_2'  __DMA_WR1X6_A_CLEN_2
-`#define' `__DMA_WR1X6_A_CLEN_3'  __DMA_WR1X6_A_CLEN_3
-`#define' `__DMA_WR1X6_A_CLEN_4'  __DMA_WR1X6_A_CLEN_4
+`#define' `__D_WR1_X6'  __D_WR1_X6
+`#define' `__D_WR1_X6_A_TIMING'  __D_WR1_X6_A_TIMING
 
-`#define' `__DMA_WR2'  __DMA_WR2
+`#define' `__D_WR1X6_A_CLEN_2'  __D_WR1X6_A_CLEN_2
+`#define' `__D_WR1X6_A_CLEN_3'  __D_WR1X6_A_CLEN_3
+`#define' `__D_WR1X6_A_CLEN_4'  __D_WR1X6_A_CLEN_4
 
-`#define' `__DMA_WR2_B_IS_MEM'  __DMA_WR2_B_IS_MEM
-`#define' `__DMA_WR2_B_IS_IO'  __DMA_WR2_B_IS_IO
-`#define' `__DMA_WR2_B_DEC'  __DMA_WR2_B_DEC
-`#define' `__DMA_WR2_B_INC'  __DMA_WR2_B_INC
-`#define' `__DMA_WR2_B_FIX'  __DMA_WR2_B_FIX
+`#define' `__D_WR1_A_IS_MEM_DEC'  __D_WR1_A_IS_MEM_DEC
+`#define' `__D_WR1_A_IS_MEM_INC'  __D_WR1_A_IS_MEM_INC
+`#define' `__D_WR1_A_IS_MEM_FIX'  __D_WR1_A_IS_MEM_FIX
+`#define' `__D_WR1_A_IS_IO_DEC'  __D_WR1_A_IS_IO_DEC
+`#define' `__D_WR1_A_IS_IO_INC'  __D_WR1_A_IS_IO_INC
+`#define' `__D_WR1_A_IS_IO_FIX'  __D_WR1_A_IS_IO_FIX
 
-`#define' `__DMA_WR2_X6'  __DMA_WR2_X6
-`#define' `__DMA_WR2_X6_B_TIMING'  __DMA_WR2_X6_B_TIMING
+`#define' `__D_WR2'  __D_WR2
 
-`#define' `__DMA_WR2X6_B_CLEN_2'  __DMA_WR2X6_B_CLEN_2
-`#define' `__DMA_WR2X6_B_CLEN_3'  __DMA_WR2X6_B_CLEN_3
-`#define' `__DMA_WR2X6_B_CLEN_4'  __DMA_WR2X6_B_CLEN_4
+`#define' `__D_WR2_B_IS_MEM'  __D_WR2_B_IS_MEM
+`#define' `__D_WR2_B_IS_IO'  __D_WR2_B_IS_IO
+`#define' `__D_WR2_B_DEC'  __D_WR2_B_DEC
+`#define' `__D_WR2_B_INC'  __D_WR2_B_INC
+`#define' `__D_WR2_B_FIX'  __D_WR2_B_FIX
 
-`#define' `__DMA_WR2X6_X5'  __DMA_WR2X6_X5
-`#define' `__DMA_WR2X6_X5_PRESCALAR'  __DMA_WR2X6_X5_PRESCALAR
+`#define' `__D_WR2_X6'  __D_WR2_X6
+`#define' `__D_WR2_X6_B_TIMING'  __D_WR2_X6_B_TIMING
 
-`#define' `__DMA_WR3'  __DMA_WR3
-`#define' `__DMA_WR3_ENABLE_DMA'  __DMA_WR3_ENABLE_DMA
+`#define' `__D_WR2X6_B_CLEN_2'  __D_WR2X6_B_CLEN_2
+`#define' `__D_WR2X6_B_CLEN_3'  __D_WR2X6_B_CLEN_3
+`#define' `__D_WR2X6_B_CLEN_4'  __D_WR2X6_B_CLEN_4
 
-`#define' `__DMA_WR4'  __DMA_WR4
+`#define' `__D_WR2X6_X5'  __D_WR2X6_X5
+`#define' `__D_WR2X6_X5_PRESCALAR'  __D_WR2X6_X5_PRESCALAR
 
-`#define' `__DMA_WR4_CONT'  __DMA_WR4_CONT
-`#define' `__DMA_WR4_BURST'  __DMA_WR4_BURST
+`#define' `__D_WR2_B_IS_MEM_DEC'  __D_WR2_B_IS_MEM_DEC
+`#define' `__D_WR2_B_IS_MEM_INC'  __D_WR2_B_IS_MEM_INC
+`#define' `__D_WR2_B_IS_MEM_FIX'  __D_WR2_B_IS_MEM_FIX
+`#define' `__D_WR2_B_IS_IO_DEC'  __D_WR2_B_IS_IO_DEC
+`#define' `__D_WR2_B_IS_IO_INC'  __D_WR2_B_IS_IO_INC
+`#define' `__D_WR2_B_IS_IO_FIX'  __D_WR2_B_IS_IO_FIX
 
-`#define' `__DMA_WR4_X2'  __DMA_WR4_X2
-`#define' `__DMA_WR4_X3'  __DMA_WR4_X3
-`#define' `__DMA_WR4_X23'  __DMA_WR4_X23
+`#define' `__D_WR3'  __D_WR3
+`#define' `__D_WR3_ENABLE_DMA'  __D_WR3_ENABLE_DMA
 
-`#define' `__DMA_WR4_X2_B_START_L'  __DMA_WR4_X2_B_START_L
-`#define' `__DMA_WR4_X3_B_START_H'  __DMA_WR4_X3_B_START_H
-`#define' `__DMA_WR4_X23_B_START'  __DMA_WR4_X23_B_START
+`#define' `__D_WR4'  __D_WR4
 
-`#define' `__DMA_WR5'  __DMA_WR5
+`#define' `__D_WR4_CONT'  __D_WR4_CONT
+`#define' `__D_WR4_BURST'  __D_WR4_BURST
 
-`#define' `__DMA_WR5_CE_WAIT'  __DMA_WR5_CE_WAIT
-`#define' `__DMA_WR5_RESTART'  __DMA_WR5_RESTART
+`#define' `__D_WR4_X2'  __D_WR4_X2
+`#define' `__D_WR4_X3'  __D_WR4_X3
+`#define' `__D_WR4_X23'  __D_WR4_X23
 
-`#define' `__DMA_LOAD'  __DMA_LOAD
-`#define' `__DMA_CONTINUE'  __DMA_CONTINUE
-`#define' `__DMA_ENABLE_DMA'  __DMA_ENABLE_DMA
-`#define' `__DMA_DISABLE_DMA'  __DMA_DISABLE_DMA
-`#define' `__DMA_READ_MASK'  __DMA_READ_MASK
+`#define' `__D_WR4_X2_B_START_L'  __D_WR4_X2_B_START_L
+`#define' `__D_WR4_X3_B_START_H'  __D_WR4_X3_B_START_H
+`#define' `__D_WR4_X23_B_START'  __D_WR4_X23_B_START
 
-`#define' `__DMA_RM_STATUS'  __DMA_RM_STATUS
-`#define' `__DMA_RM_COUNTER_L'  __DMA_RM_COUNTER_L
-`#define' `__DMA_RM_COUNTER_H'  __DMA_RM_COUNTER_H
-`#define' `__DMA_RM_COUNTER'  __DMA_RM_COUNTER
-`#define' `__DMA_RM_A_ADDR_L'  __DMA_RM_A_ADDR_L
-`#define' `__DMA_RM_A_ADDR_H'  __DMA_RM_A_ADDR_H
-`#define' `__DMA_RM_A_ADDR'  __DMA_RM_A_ADDR
-`#define' `__DMA_RM_B_ADDR_L'  __DMA_RM_B_ADDR_L
-`#define' `__DMA_RM_B_ADDR_H'  __DMA_RM_B_ADDR_H
-`#define' `__DMA_RM_B_ADDR'  __DMA_RM_B_ADDR
+`#define' `__D_WR5'  __D_WR5
+
+`#define' `__D_WR5_CE'  __D_WR5_CE
+`#define' `__D_WR5_CE_WAIT'  __D_WR5_CE_WAIT
+
+`#define' `__D_WR5_STOP'  __D_WR5_STOP
+`#define' `__D_WR5_RESTART'  __D_WR5_RESTART
+
+`#define' `__D_LOAD'  __D_LOAD
+`#define' `__D_CONTINUE'  __D_CONTINUE
+`#define' `__D_ENABLE_DMA'  __D_ENABLE_DMA
+`#define' `__D_DISABLE_DMA'  __D_DISABLE_DMA
+`#define' `__D_READ_MASK'  __D_READ_MASK
+
+`#define' `__D_RM_STATUS'  __D_RM_STATUS
+`#define' `__D_RM_COUNTER_L'  __D_RM_COUNTER_L
+`#define' `__D_RM_COUNTER_H'  __D_RM_COUNTER_H
+`#define' `__D_RM_COUNTER'  __D_RM_COUNTER
+`#define' `__D_RM_A_ADDR_L'  __D_RM_A_ADDR_L
+`#define' `__D_RM_A_ADDR_H'  __D_RM_A_ADDR_H
+`#define' `__D_RM_A_ADDR'  __D_RM_A_ADDR
+`#define' `__D_RM_B_ADDR_L'  __D_RM_B_ADDR_L
+`#define' `__D_RM_B_ADDR_H'  __D_RM_B_ADDR_H
+`#define' `__D_RM_B_ADDR'  __D_RM_B_ADDR
 ')
