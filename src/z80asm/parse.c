@@ -46,23 +46,6 @@ typedef struct OpenStruct
 static UT_icd ut_OpenStruct_icd = { sizeof(OpenStruct), NULL, NULL, NULL };
 
 /*-----------------------------------------------------------------------------
-* 	Array of expressions computed during parse 
-*----------------------------------------------------------------------------*/
-void ut_exprs_init(void *elt) 
-{
-	Expr *expr = OBJ_NEW(Expr); 
-	*((Expr **)elt) = expr; 
-}
-
-void ut_exprs_dtor(void *elt) 
-{ 
-	Expr *expr = *((Expr **)elt);  
-	OBJ_DELETE(expr); 
-}
-
-UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
-
-/*-----------------------------------------------------------------------------
 * 	Current parse context
 *----------------------------------------------------------------------------*/
 ParseCtx *ParseCtx_new(void)
@@ -296,7 +279,9 @@ static void free_tokens(ParseCtx *ctx)
 {
 	utarray_clear(ctx->tokens);
 	utarray_clear(ctx->token_strings);
-	utarray_clear(ctx->exprs);
+	if (ctx->current_sm != SM_DMA_PARAMS) {		// DMA_PARAMS needs to preserve exprs between lines
+		utarray_clear(ctx->exprs);
+	}
 }
 
 /*-----------------------------------------------------------------------------

@@ -386,3 +386,376 @@ static void check_org_align()
 	if (org >= 0 && align > 1 && (org % align) != 0)
 		error_org_not_aligned(org, align);
 }
+
+/*-----------------------------------------------------------------------------
+*   DMA
+*----------------------------------------------------------------------------*/
+static Expr *asm_DMA_shift_exprs(UT_array *exprs)
+{
+	assert(utarray_len(exprs) > 0);
+
+	Expr *expr = *((Expr **)utarray_front(exprs));	// copy first element
+	*((Expr **)utarray_front(exprs)) = NULL;		// do not destroy
+	utarray_erase(exprs, 0, 1);						// delete first element
+
+	return expr;
+}
+
+static Bool asm_DMA_shift_byte(UT_array *exprs, int *out_value)
+{
+	*out_value = 0;
+
+	Expr *expr = asm_DMA_shift_exprs(exprs);
+	*out_value = Expr_eval(expr, TRUE);
+	Bool not_evaluable = expr->result.not_evaluable;
+	OBJ_DELETE(expr);
+
+	if (not_evaluable) {
+		error_expected_const_expr();
+		*out_value = 0;
+		return FALSE;
+	}
+	else if (*out_value < 0 || *out_value > 255) {
+		error_int_range(*out_value);
+		*out_value = 0;
+		return FALSE;
+	}
+	else
+		return TRUE;
+}
+
+static void asm_DMA_command_1(int cmd, UT_array *exprs)
+{
+	int N, W;
+
+	// retrieve first constant expression
+	if (!asm_DMA_shift_byte(exprs, &N))
+		return;
+
+	// retrieve next arguments
+	switch (cmd) {
+	case 0:
+		/*
+		dma.wr0 n [, w, x, y, z] with whitespace following comma including newline and 
+		maybe comment to the end of the line so params can be listed on following lines
+		n: bit 7 must be 0, bits 1..0 must be 01 else error "base register byte is illegal"
+
+		If bit 3 of n is set then accept one following byte\
+		If bit 4 of n is set then accept one following byte/ set together, expect word instead
+		If bit 5 of n is set then accept one following byte\
+		If bit 6 of n is set then accept one following byte/ set together, expect word instead
+		*/
+		if ((N & 0x83) != 0x01) {
+			error_base_register_illegal(N);
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		// parse wr0 parameters: check bits 3,4
+		if ((N & 0x18) != 0 && utarray_len(exprs) == 0) {
+			error_missing_arguments();
+			return;
+		}
+		switch (N & 0x18) {
+		case 0: break;
+		case 0x08: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 3
+		case 0x10: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break; 		// bit 4
+		case 0x18: asm_DEFW(asm_DMA_shift_exprs(exprs)); break; 			// bits 3,4
+		default: assert(0);
+		}
+
+		// parse wr0 parameters: check bits 5,6
+		if ((N & 0x60) != 0 && utarray_len(exprs) == 0) {
+			error_missing_arguments();
+			return;
+		}
+		switch (N & 0x60) {
+		case 0: break;
+		case 0x20: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 5
+		case 0x40: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 6
+		case 0x60: asm_DEFW(asm_DMA_shift_exprs(exprs)); break;				// bits 5,6
+		default: assert(0);
+		}
+
+		break;
+
+	case 1:
+		/*
+		dma.wr1 n [,w]
+		or 0x04 into n
+		n: bit 7 must be 0, bits 2..0 must be 100 else error "base register byte is illegal"
+		If bit 6 of n is set then accept one following byte w.
+
+		In w bits 5..4 must be 0, bits 1..0 must not be 11 error "port A timing is illegal"
+		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
+		*/
+		if (((N & 0x87) | 0x04) != 0x04) {
+			error_base_register_illegal(N);
+			return;
+		}
+		N |= 0x04;
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if (N & 0x40) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			if (!asm_DMA_shift_byte(exprs, &W))
+				return;
+
+			add_opcode(W & 0xFF);
+			if ((W & 0x30) != 0 || (W & 0x03) == 0x03) {
+				error_port_A_timing();
+				return;
+			}
+			if (W & 0xCC)
+				warn_dma_half_cycle_timing();
+		}
+		break;
+
+	case 2:
+		/*
+		dma.wr2 n [,w,x]
+		n: bit 7 must be 0, bits 2..0 must be 000 else error "base register byte is illegal"
+		If bit 6 of n is set then accept one following byte w
+
+		In w bit 4 must be 0, bits 1..0 must not be 11 error "port B timing is illegal"
+		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
+		If bit 5 of w is set then accept one following byte x that can be anything.
+		*/
+		if ((N & 0x87) != 0x00) {
+			error_base_register_illegal(N);
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if (N & 0x40) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			if (!asm_DMA_shift_byte(exprs, &W))
+				return;
+
+			add_opcode(W & 0xFF);
+			if ((W & 0x10) != 0 || (W & 0x03) == 0x03) {
+				error_port_B_timing();
+				return;
+			}
+			if (W & 0xCC)
+				warn_dma_half_cycle_timing();
+
+			if (W & 0x20) {
+				if (utarray_len(exprs) == 0) {
+					error_missing_arguments();
+					return;
+				}
+				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+			}
+		}
+		break;
+
+	case 3:
+		/*
+		dma.wr3 n [,w,x]
+		or 0x80 into n
+		n: bit 7 must be 1, bits 1..0 must be 00 else error "base register byte is illegal"
+		If any of bits 6,5,2 of n are set then warning "dma does not support some features"
+
+		If bit 3 of n is set then accept one following byte that can be anything.
+		If bit 4 of n is set then accept one following byte that can be anything.
+		*/
+		if (((N & 0x83) | 0x80) != 0x80) {
+			error_base_register_illegal(N);
+			return;
+		}
+		N |= 0x80;
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if (N & 0x64)
+			warn_dma_unsupported_features();
+
+		if (N & 0x08) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+		}
+
+		if (N & 0x10) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+		}
+		break;
+		
+	case 4:
+		/*
+		dma.wr4 n, [w,x]
+		or 0x81 into n
+		n: bit 7 must be 1, bits 1..0 must be 01 else error "base register byte is illegal"
+		If bit 4 of n is set then error "dma does not support interrupts"
+		If bits 6..5 of n are 00 or 11 error "dma mode is illegal"
+		If bit 2 of n is set then accept one following byte\
+		If bit 3 of n is set then accept one following byte/ set together, expect word instead
+
+		Again if both bits 2 & 3 are set, w,x must be combined into a single word parameter.
+		*/
+		if (((N & 0x83) | 0x81) != 0x81) {
+			error_base_register_illegal(N);
+			return;
+		}
+		if (N & 0x10) {
+			error_dma_unsupported_interrupts();
+			return;
+		}
+		if ((N & 0x60) == 0 || (N & 0x60) == 0x60) {
+			error_dma_illegal_mode();
+			return;
+		}
+		N |= 0x81;
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if ((N & 0x0C) == 0x0C) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			asm_DEFW(asm_DMA_shift_exprs(exprs));
+		}
+		else {
+			if (N & 0x04) {
+				if (utarray_len(exprs) == 0) {
+					error_missing_arguments();
+					return;
+				}
+				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+			}
+			if (N & 0x08) {
+				if (utarray_len(exprs) == 0) {
+					error_missing_arguments();
+					return;
+				}
+				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
+			}
+		}
+		break;
+
+	case 5:
+		/*
+		dma.wr5 n
+		or 0x82 into n
+		n: bits 7..6 must be 10, bits 2..0 must be 010 else error "base register byte is illegal"
+		If bit 3 of n is set then warning "dma does not support ready signals"
+		*/
+		if (((N & 0xC7) | 0x82) != 0x82) {
+			error_base_register_illegal(N);
+			return;
+		}
+		N |= 0x82;
+
+		if (N & 0x08)
+			warn_dma_ready_signal_unsupported();
+
+		// add command byte
+		add_opcode(N & 0xFF);
+		
+		break;
+
+	case 6:
+		/*
+		dma.wr6 n [,w] or dma.cmd n [,w]
+		n:
+		accept 0xcf, 0xd3, 0x87, 0x83, 0xbb
+		warning on 0xc3, 0xc7, 0xcb, 0xaf, 0xab, 0xa3, 0xb7, 0xbf, 0x8b, 0xa7, 0xb3 
+		"dma does not implement this command"
+		anything else error "illegal dma command"
+
+		if n = 0xbb accept a following byte w
+		If bit 7 of w is set error "read mask is illegal"
+
+		If any of these are missing following bytes in the comma list then maybe error 
+		"missing register group member(s)". 
+		if there are too many bytes "too many arguments".
+		*/
+		switch (N) {
+		case 0x83:
+		case 0x87:
+		case 0xBB:
+		case 0xCF:
+		case 0xD3:
+			break;
+
+		case 0x8B:
+		case 0xA3:
+		case 0xA7:
+		case 0xAB:
+		case 0xAF:
+		case 0xB3:
+		case 0xB7:
+		case 0xBF:
+		case 0xC3:
+		case 0xC7:
+		case 0xCB:
+			warn_dma_unsupported_command();
+			break;
+
+		default:
+			error_dma_illegal_command();
+			return;
+		}
+
+		// add command byte
+		add_opcode(N & 0xFF);
+
+		if (N == 0xBB) {
+			if (utarray_len(exprs) == 0) {
+				error_missing_arguments();
+				return;
+			}
+			if (!asm_DMA_shift_byte(exprs, &W))
+				return;
+
+			if (W & 0x80) {
+				error_dma_illegal_read_mask();
+				return;
+			}
+
+			add_opcode(W & 0xFF);
+		}
+		break;
+
+	default:
+		assert(0);
+	}
+
+	// check for extra arguments
+	if (utarray_len(exprs) > 0) 
+		error_extra_arguments();
+}
+
+void asm_DMA_command(int cmd, UT_array *exprs)
+{
+	if (opts.cpu != CPU_Z80_ZXN) {
+		error_illegal_ident();
+		return;
+	}
+
+	assert(utarray_len(exprs) > 0);
+	asm_DMA_command_1(cmd, exprs);
+	utarray_clear(exprs);			// clear any expr left over in case of error
+}
