@@ -750,6 +750,11 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 
 void asm_DMA_command(int cmd, UT_array *exprs)
 {
+	if (opts.cpu != CPU_Z80_ZXN) {
+		error_illegal_ident();
+		return;
+	}
+
 	assert(utarray_len(exprs) > 0);
 	asm_DMA_command_1(cmd, exprs);
 	utarray_clear(exprs);			// clear any expr left over in case of error
