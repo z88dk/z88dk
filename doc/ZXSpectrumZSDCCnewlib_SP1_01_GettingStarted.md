@@ -33,6 +33,13 @@ shouldn't be worrying about. We're going to dive straight into code,
 and the reader will need to accept that not everything will be
 explained as we go.
 
+SP1 is a lot more than just a sprite library. It handles backgrounds
+and text, supports with clipping rectangles and animations, and has a
+sophisticated screen updating algorithm. But since it's identified by
+many as a sprite library, and sprites are probably the primary reason
+many people are reading this getting started guide, it's a simple
+sprite that we're going to begin with.
+
 ## Program 1 - SP1 Circle Sprite
 
 We're going to start with a program which sets up the SP1
@@ -415,9 +422,9 @@ which we'll see shortly. In the meantime, if you look at other code,
 don't be surprised to see a zero value here.
 
 Finally we add the plane of the display to draw the sprite into. SP1
-uses 64 "planes" in its display, which are filled in from the back to
+uses 256 "planes" in its display, which are filled in from the back to
 the front and allow sprites to be logically on top of each
-other. Plane 63 is the background; plane 0 is closest to the viewer.
+other. Plane 255 is the background; plane 0 is closest to the viewer.
 
 Let's move on to the second line of sprite generation code:
 
@@ -465,7 +472,25 @@ In the first of these SP1 guides we've looked at defining a simple
 sprite and getting it onto the Spectrum's screen. It should be obvious
 that SP1 is a rather technical library which takes a fair bit of
 effort to understand. But it's also extremely competent, and used
-skillfully can be the basis of many excellent games.
+skillfully can be the basis of an excellent game.
 
-In the next part of this series we'll pick up the pace a little and
-look at masked sprites.
+### Where To Go From Here
+
+The Z88DK wiki [overview
+page](https://www.z88dk.org/wiki/doku.php?id=library:sprites:sp1)
+contains more information about the background of the library and
+links to further information.
+
+The wiki also has an [SP1 examples
+page](https://www.z88dk.org/wiki/doku.php?id=libnew:examples:sp1_ex1),
+on which at least the first example should now be accessible. There's
+useful information on there about reconfiguring the library too.
+
+There are lots of example programs in the Z88DK source tree, including
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1)
+and
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/spectrum/examples).
+
+[Blackstar](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar)
+in particular is a complete game written with SP1, and is an excellent
+source of ideas and revelations.
