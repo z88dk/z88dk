@@ -1,11 +1,12 @@
 SECTION code_driver
 SECTION code_driver_terminal_input
 
-PUBLIC rc_01_input_basic_iterm_msg_reject
+PUBLIC term_01_input_char_iterm_msg_reject
 
-rc_01_input_basic_iterm_msg_reject:
+term_01_input_char_iterm_msg_reject:
 
-   ;   Indicate whether typed character should be rejected.
+   ;   Indicate whether typed character should be rejected
+   ;   from the input stream
    ;
    ;   enter:  c = ascii code
    ;    exit:  carry reset indicates the character should be rejected.

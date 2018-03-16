@@ -14,7 +14,8 @@
 int readbyte(int fd)
 {
     unsigned char  buffer;
-    if ( read(fd,&buffer,1) == -1 )
-	return_c -1;
+    if ( read(fd,&buffer,1) == -1 ) {
+        return_c -1;
+    }
     return_nc buffer;
 }

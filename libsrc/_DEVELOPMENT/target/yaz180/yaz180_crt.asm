@@ -37,6 +37,7 @@ ENDIF
 
 
    ; yabios asci0 drivers installed on stdin, stdout, stderr
+   ; yabios asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
    
@@ -55,7 +56,7 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                  yaz180 YABIOS  target                    ;;
+;;                  yaz180 YABIOS target                     ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
 ;;                banked 64k address spaces                  ;;
@@ -683,16 +684,6 @@ ENDIF
    PUBLIC __register_sp
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; Returning to Basic
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ; if non-zero, address called in basic rom to return value in AB
-
-   IFNDEF CRT_ABPASS
-      defc CRT_ABPASS = 0
-   ENDIF
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -701,7 +692,7 @@ ENDIF
    ENDIF
 
    IFNDEF TTY_ITERM_TERMINAL_FLAGS
-      defc TTY_ITERM_TERMINAL_FLAGS = 0x01b0
+      defc TTY_ITERM_TERMINAL_FLAGS = 0x0130
    ENDIF
 
    ; buffer size must be available to m4 (requires special case in zcc)
@@ -1361,6 +1352,81 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; DUPED FILE DESCRIPTOR
+   ;
+   ; FILE  : _ttyerr
+   ; flags : 0x80
+   ;
+   ; fd    : 5
+   ; dup fd: __i_fcntl_fdstruct_4
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+      
+   SECTION data_clib
+   SECTION data_stdio
+      
+   ; FILE *
+      
+   PUBLIC _ttyerr
+      
+   _ttyerr:  defw __i_stdio_file_5 + 2
+      
+   ; FILE structure
+      
+   __i_stdio_file_5:
+   
+      ; open files link
+      
+      defw __i_stdio_file_4
+      
+      ; jump to duped fd
+      
+      defb 195
+      defw __i_fcntl_fdstruct_4
+
+      ; state_flags_0
+      ; state_flags_1
+      ; conversion flags
+      ; ungetc
+
+      defb 0x80
+      defb 0
+      defb 0
+      defb 0
+      
+      ; mtx_recursive
+      
+      defb 0         ; thread owner = none
+      defb 0x02      ; mtx_recursive
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+
+         
+   ; fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw __i_fcntl_fdstruct_4
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_5 = __i_fcntl_fdstruct_4
+   
+   ; adjust reference count on duped FDSTRUCT
+   
+   SECTION code_crt_init
+   
+   ld hl,__i_fcntl_fdstruct_4 + 7     ; & FDSTRUCT.ref_count
+   inc (hl)
+   inc (hl)
+
+      
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1368,7 +1434,7 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; __clib_fopen_max   = max number of open FILEs specified by user
-   ; 5 = number of static FILEs instantiated in crt
+   ; 6 = number of static FILEs instantiated in crt
    ; __i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
 
 	PUBLIC __MAX_FOPEN
@@ -1376,13 +1442,13 @@ ENDIF
    SECTION data_clib
    SECTION data_stdio
 
-   IF (__clib_fopen_max > 0) || (5 > 0)
+   IF (__clib_fopen_max > 0) || (6 > 0)
 
       ; number of FILEs > 0
 
       ; construct list of open files
 
-      IF 5 > 0
+      IF 6 > 0
    
          ; number of FILEs statically generated > 0
       
@@ -1391,7 +1457,7 @@ ENDIF
       
          PUBLIC __stdio_open_file_list
       
-         __stdio_open_file_list:  defw __i_stdio_file_4
+         __stdio_open_file_list:  defw __i_stdio_file_5
    
       ELSE
    
@@ -1415,7 +1481,7 @@ ENDIF
    
       __stdio_closed_file_list:   defw 0, __stdio_closed_file_list
    
-      IF __clib_fopen_max > 5
+      IF __clib_fopen_max > 6
 
 		   defc __MAX_FOPEN = __clib_fopen_max
 		
@@ -1424,13 +1490,13 @@ ENDIF
          SECTION bss_clib
          SECTION bss_stdio
       
-         __stdio_file_extra:      defs (__clib_fopen_max - 5) * 15
+         __stdio_file_extra:      defs (__clib_fopen_max - 6) * 15
       
          SECTION code_crt_init
       
             ld bc,__stdio_closed_file_list
             ld de,__stdio_file_extra
-            ld l,__clib_fopen_max - 5
+            ld l,__clib_fopen_max - 6
      
          loop:
       
@@ -1450,13 +1516,13 @@ ENDIF
 				
       ELSE
 
-         defc __MAX_FOPEN = 5
+         defc __MAX_FOPEN = 6
 				
       ENDIF   
 
    ENDIF
 
-   IF (__clib_fopen_max = 0) && (5 = 0)
+   IF (__clib_fopen_max = 0) && (6 = 0)
    
       defc __MAX_FOPEN = 0
 	
@@ -1476,7 +1542,7 @@ ENDIF
 
    ENDIF
 
-   IF (__clib_fopen_max < 0) && (5 = 0)
+   IF (__clib_fopen_max < 0) && (6 = 0)
 
       defc __MAX_FOPEN = 0
 
@@ -1487,12 +1553,12 @@ ENDIF
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_open_max  = max number of open fds specified by user
-   ; 5 = number of static file descriptors created
+   ; 6 = number of static file descriptors created
 	
    PUBLIC __fcntl_fdtbl
    PUBLIC __fcntl_fdtbl_size
    
-   IF 5 > 0
+   IF 6 > 0
    
       ; create rest of fd table in data segment
       
@@ -1502,16 +1568,16 @@ ENDIF
       
       defc __fcntl_fdtbl = __data_fcntl_fdtable_body_head
       
-      IF __clib_open_max > 5
+      IF __clib_open_max > 6
       
          SECTION data_fcntl_fdtable_body
          
-         defs (__clib_open_max - 5) * 2
+         defs (__clib_open_max - 6) * 2
          defc __fcntl_fdtbl_size = __clib_open_max
       
       ELSE
       
-         defc __fcntl_fdtbl_size = 5
+         defc __fcntl_fdtbl_size = 6
       
       ENDIF
    
@@ -1777,7 +1843,7 @@ include "../clib_stubs.inc"
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 

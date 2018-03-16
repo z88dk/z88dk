@@ -63,12 +63,13 @@ ifelse(__STARTUP, 0,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 16,
 `
-   ; basic drivers installed on stdin, stdout, stderr
+   ; yabios asci0 drivers installed on stdin, stdout, stderr
+   ; yabios asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
    

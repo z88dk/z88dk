@@ -10,15 +10,29 @@ zx_01_output_char_32_tty_z88dk_22_at:
    
    ; de = parameters *
 
-   ex de,hl
-   
-   ld d,(hl)                   ; d = y coord
-   dec d
-   inc hl
-   ld e,(hl)                   ; e = x coord
-   dec e
+do_y:
 
-   ld (ix+14),e                ; set x coord
-   ld (ix+15),d                ; set y coord
+   ld a,(de)                   ; biased y coord
+   inc de
+   
+   inc a
+   jr z, do_x                  ; skip if -1
+
+   dec a
+   dec a
+   
+   ld (ix+15),a                ; set y coord
+
+do_x:
+
+   ld a,(de)                   ; biased x coord
+   
+   inc a
+   ret z                       ; skip if -1
+   
+   dec a
+   dec a
+   
+   ld (ix+14),a                ; set x coord
    
    ret

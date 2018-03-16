@@ -41,8 +41,8 @@ sms_tty_z88dk_state_table:
    defw asm_tty_output_char                      ; 19 =
    defw asm_tty_output_char                      ; 20 =
    defw asm_tty_output_char                      ; 21 = 
-   defw asm_tty_param_bb_action                  ; 22 = at x,y
-   defw asm_tty_param_bb_action                  ; 23 = atr x,y
+   defw asm_tty_param_bb_action                  ; 22 = at x,y coords biased +1 (-1 means no change)
+   defw asm_tty_param_bb_action                  ; 23 = atr x,y coords biased +0x80
    defw asm_tty_output_char                      ; 24 = 
    defw asm_tty_output_char                      ; 25 = 
    defw asm_tty_output_char                      ; 26 = 

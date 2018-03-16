@@ -10,28 +10,17 @@ sms_01_output_terminal_tty_z88dk_23_atr:
    
    ; de = parameters *
    
-   ex de,hl
+   ld a,(de)                   ; biased dy
+   inc de
    
-   ld d,(hl)                   ; d = dy
-   dec d
-   inc hl
-   ld e,(hl)                   ; e = dx
-   dec e
+   sub 0x80                    ; dy
+   add a,(ix+15)               ; + y
+   ld (ix+15),a
    
-   ex de,hl
+   ld a,(de)                   ; biased dx
+   
+   sub 0x80                    ; dx
+   add a,(ix+14)               ; + x
+   ld (ix+14),a
 
-   ld e,(ix+14)                ; e = x
-   ld d,(ix+15)                ; d = y
-   
-   ld a,l
-   add a,e
-   ld e,a                      ; e = x + dx
-   
-   ld a,h
-   add a,d
-   ld d,a                      ; d = y + dy
-
-   ld (ix+14),e                ; store x coord
-   ld (ix+15),d                ; store y coord
-   
    ret

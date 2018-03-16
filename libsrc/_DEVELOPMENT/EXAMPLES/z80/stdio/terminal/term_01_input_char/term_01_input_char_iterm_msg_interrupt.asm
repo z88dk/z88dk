@@ -3,11 +3,11 @@ INCLUDE "config_private.inc"
 SECTION code_driver
 SECTION code_driver_terminal_input
 
-PUBLIC rc_01_input_basic_iterm_msg_interrupt
+PUBLIC term_01_input_char_iterm_msg_interrupt
 
 EXTERN asm_exit
 
-rc_01_input_basic_iterm_msg_interrupt:
+term_01_input_char_iterm_msg_interrupt:
 
    ;   Indicate whether character should interrupt line editing.
    ;

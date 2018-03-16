@@ -106,7 +106,11 @@ SECTION code_crt_init
 
     EXTERN  _asci1_init    
     call    _asci1_init     ; and the asci1 interfaces
-    
+
+    EXTERN  _bios_ioByte    ; set default interface to asci0
+    ld      hl, _bios_ioByte
+    ld      (hl), $01       ; via the bios IO Byte
+           
     EXTERN  _bankLockBase   ; lock BANK0 whilst the yabios CLI is running
     ld      hl, _bankLockBase
     ld      (hl), $FF

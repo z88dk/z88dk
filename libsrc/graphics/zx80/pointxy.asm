@@ -33,8 +33,6 @@
 				ld	c,l
 				ld	b,h
 
-				push	bc
-				
 				srl	b
 				srl	c
 				ld	hl,(16396)

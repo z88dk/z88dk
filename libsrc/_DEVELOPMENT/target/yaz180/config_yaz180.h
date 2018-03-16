@@ -43,7 +43,10 @@
 
 #define __IO_BASE_ADDRESS 0x0
 
-#define __COMMON_AREA_1_BASE  0xf000
+#define __BIOS_SP   0xFFDE
+#define __BANK_SP   0x003B
+
+#define __COMMON_AREA_1_BASE  0xF000
 #define __COMMON_AREA_1_PHASE_DATA  0xf000
 #define __COMMON_AREA_1_PHASE_DRIVER  0xf600
 
@@ -708,20 +711,6 @@
 
 
 
-#define __Z80_VECTOR_BASE_BASIC  0x2000
-#define __Z180_VECTOR_IL_BASIC  0x40
-
-
-
-
-
-
-
-
-
-
-
-
 #define __IO_PIO_PORT_A  0x4000
 #define __IO_PIO_PORT_B  0x4001
 #define __IO_PIO_PORT_C  0x4002
@@ -758,9 +747,9 @@
 
 
 
-#define __IO_APU_PORT_DATA  0xc000
-#define __IO_APU_PORT_CONTROL  0xc001
-#define __IO_APU_PORT_STATUS  0xc001
+#define __IO_APU_DATA  0xc000
+#define __IO_APU_CONTROL  0xc001
+#define __IO_APU_STATUS  0xc001
 
 #define __IO_APU_STATUS_BUSY  0x80
 #define __IO_APU_STATUS_SIGN  0x40

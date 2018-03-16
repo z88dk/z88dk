@@ -247,8 +247,8 @@ extern long atol_fastcall(char *buf) __z88dk_fastcall;
 #define atol(a) atol_fastcall(a)
 
 
-extern void bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar);
-extern void bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar) __z88dk_callee;
+extern void *bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar);
+extern void *bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar) __z88dk_callee;
 #define bsearch(a,b,c,d,e) bsearch_callee(a,b,c,d,e)
 
 

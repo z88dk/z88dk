@@ -18,16 +18,12 @@
  * enough space for the the FCBs */
 #define MAXFILE  10
 
-/* Whether we want fileio to support devices (default, no), if you
- * change it then recompile the library
- * the DEVICES flag adds the following filenames:  CON: RDR: PUN: LST:
- * When DEVICES is not set, an optimized driver helps saving memory and
+/* If you want fileio to support devices then link with -lcpmdevice.
+ * This adds the following devices: CON: RDR: PUN: LST: without this
+ * library an optimised driver saves memory and
  * permits to specify the user area in filenames, i.e.  "0/c:file.ext"
  */
  
-#if 0
-#define DEVICES
-#endif
 
 /* Size of CPM Sector */
 #define SECSIZE  128

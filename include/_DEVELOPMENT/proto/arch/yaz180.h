@@ -5,22 +5,17 @@ include(__link__.m4)
 
 #include <arch.h>
 
-// provide the asci1 input and output stream instantiation
-// note that asci0 is attached to stdin and stdout
-
-extern FILE *linein;
-extern FILE *lineout;
+// GLOBAL VARIABLES
 
 // provide the location for stack pointers to be stored
 
-extern uint16_t *bios_sp;      // yabios SP here when other banks running
-extern uint16_t *bank_sp;      // bank SP storage, in Page0 TCB 0x003B
+extern uint16_t *bios_sp;       // yabios SP here when other banks running
+extern uint16_t *bank_sp;       // bank SP storage, in Page0 TCB 0x003B
 
-// provide the location for important Page 0 bank addresses
+// provide the location of the IO byte based on CP/M
+// only bit 0 distinguished currently with TTY=0 CRT=1.
 
-extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
-extern uint8_t bank_cmp_default_drive;  // CP/M default drive
-extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
+extern uint8_t bios_ioByte;     // intel I/O byte
 
 // provide the simple mutex locks for hardware resources
 
@@ -42,6 +37,60 @@ extern uint8_t APULock;         //  mutex for APU
 
 extern uint8_t bankLockBase[];  // base address for 16 BANK locks
 
+// provide the location of the bios stack canary
+// this location holds 0xAA55 and if it does not
+// it means that the bios stack has collided with code
+
+extern uint16_t bios_stack_canary;      // two bytes of stack canary
+
+// provide the location for important CP/M Page 0 bank addresses
+
+extern uint8_t bank_cpm_iobyte;         // CP/M IOBYTE
+extern uint8_t bank_cmp_default_drive;  // CP/M default drive
+extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
+
+// IO MAPPED REGISTERS
+
+#ifdef __CLANG
+
+extern unsigned char io_break;
+
+extern unsigned char io_pio_port_a;
+extern unsigned char io_pio_port_b;
+extern unsigned char io_pio_port_b;
+extern unsigned char io_pio_control;
+
+extern unsigned char io_pio_ide_lsb;
+extern unsigned char io_pio_ide_msb;
+extern unsigned char io_pio_ide_ctl;
+extern unsigned char io_pio_ide_config;
+
+extern unsigned char io_apu_port_data;
+extern unsigned char io_apu_port_control;
+extern unsigned char io_apu_port_status;
+
+#else
+
+__sfr __banked __at __IO_BREAK io_break;
+
+__sfr __banked __at __IO_PIO_PORT_A  io_pio_port_a;
+__sfr __banked __at __IO_PIO_PORT_B  io_pio_port_b;
+__sfr __banked __at __IO_PIO_PORT_C  io_pio_port_c;
+__sfr __banked __at __IO_PIO_CONTROL io_pio_control;
+
+__sfr __banked __at __IO_PIO_IDE_LSB    io_pio_ide_lsb;
+__sfr __banked __at __IO_PIO_IDE_MSB    io_pio_ide_msb;
+__sfr __banked __at __IO_PIO_IDE_CTL    io_pio_ide_ctl;
+__sfr __banked __at __IO_PIO_IDE_CONFIG io_pio_ide_config;
+
+__sfr __banked __at __IO_APU_DATA    io_apu_data;
+__sfr __banked __at __IO_APU_CONTROL io_apu_control;
+__sfr __banked __at __IO_APU_STATUS  io_apu_status;
+
+#endif
+
+// SYSTEM FUNCTIONS
+
 // provide methods to get, try, and give the simple mutex locks
 
 __DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,lock_get,uint8_t * mutex)
@@ -53,55 +102,53 @@ __DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,lock_give,uint8_t * mutex)
 __DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',int8_t,,bank_get_rel,uint8_t bankAbs)
 __DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',uint8_t,,bank_get_abs,int8_t bankRel)
 
-// provide memcpy_far and memset_far functions
+// provide memcpy_far function
 
 __OPROTO(`iyh,iyl',`iyh,iyl',void,*,memcpy_far,void *str1, int8_t bank1, const void *str2, const int8_t bank2, size_t n)
-__OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,*,memset_far,void *str, int8_t bank, const int16_t c, size_t n)
 
-// provide load_hex and load_bin functions
+// provide load_hex function
 
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,load_hex,uint8_t bankAbs)
 
-// provide far jp, call, & sys functions
+// provide jp_far function
 
 __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
 
-#define call_error(code)        \
-    do{                         \
-        __asm                   \
-        rst 8H                  \
-        defb code               \
-        __endasm;               \
+// SYSTEM FUNCTION MACROS
+
+// provide call_error, call_far, call_sys, & call_apu function macros
+
+#define call_error(code)                      \
+    do{                                       \
+        __asm                                 \
+        rst 8h        ; call_error(code)      \
+        defb code                             \
+        __endasm;                             \
     }while(0)
 
-#define call_far(addr, bank)    \
-    do{                         \
-        __asm                   \
-        rst 10H                 \
-        defw addr               \
-        defb bank               \
-        __endasm;               \
+#define call_far(addr, bank)                  \
+    do{                                       \
+        __asm                                 \
+        rst 10h        ; call_far(addr, bank) \
+        defw addr                             \
+        defb bank                             \
+        __endasm;                             \
     }while(0)
 
-#define call_sys(addr)          \
-    do{                         \
-        __asm                   \
-        rst 20H                 \
-        defw addr               \
-        __endasm;               \
+#define call_sys(addr)                        \
+    do{                                       \
+        __asm                                 \
+        rst 20h        ; call_sys(addr)       \
+        defw addr                             \
+        __endasm;                             \
     }while(0)
 
-#define call_apu(cmd)           \
-    do{                         \
-        __asm                   \
-        rst 28H                 \
-        defb cmd                \
-        __endasm;               \
+#define call_apu(cmd)                         \
+    do{                                       \
+        __asm                                 \
+        rst 28h        ; call_apu(cmd)        \
+        defb cmd                              \
+        __endasm;                             \
     }while(0)
-
-// halt the YAZ180 with single step hardware.
-
-#define __BREAK  __BREAK_HELPER()
-__OPROTO(`a,d,e,h,l,iyl,iyh',`a,d,e,h,l,iyl,iyh',void,,__BREAK_HELPER,void)
 
 #endif

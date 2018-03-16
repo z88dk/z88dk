@@ -1,8 +1,8 @@
 dnl############################################################
-dnl##        RC_01_INPUT_BASIC STATIC INSTANTIATOR           ##
+dnl##       TERM_01_INPUT_CHAR STATIC INSTANTIATOR           ##
 dnl############################################################
 dnl##                                                        ##
-dnl## m4_rc_01_input_basic(...)                              ##
+dnl## m4_term_01_input_char(...)                             ##
 dnl##                                                        ##
 dnl## $1 = label attached to FILE or 0 if fd only            ##
 dnl## $2 = label attached to output FDSTRUCT or 0 if none    ##
@@ -11,12 +11,12 @@ dnl## $4 = size of edit buffer attached to FDSTRUCT or 0     ##
 dnl##                                                        ##
 dnl############################################################
 
-define(`m4_rc_01_input_basic',dnl
+define(`m4_term_01_input_char',dnl
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: rc_01_input_basic
+   ; driver: term_01_input_char
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : read only
    ; type  : 001 = input terminal
@@ -81,7 +81,7 @@ define(`m4_rc_01_input_basic',dnl
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN rc_01_input_basic
+   EXTERN term_01_input_char
    
    __i_fcntl_heap_`'__I_FCNTL_NUM_HEAP:
    
@@ -103,7 +103,7 @@ define(`m4_rc_01_input_basic',dnl
       ; jump to driver
       
       defb 195
-      defw rc_01_input_basic
+      defw term_01_input_char
       
       ; flags
       ; reference_count

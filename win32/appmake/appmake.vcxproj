@@ -169,6 +169,7 @@
     <ClCompile Include="..\..\src\appmake\c128.c" />
     <ClCompile Include="..\..\src\appmake\c7420.c" />
     <ClCompile Include="..\..\src\appmake\cpc.c" />
+    <ClCompile Include="..\..\src\appmake\cpm.c" />
     <ClCompile Include="..\..\src\appmake\enterprise.c" />
     <ClCompile Include="..\..\src\appmake\extract.c" />
     <ClCompile Include="..\..\src\appmake\galaksija.c" />

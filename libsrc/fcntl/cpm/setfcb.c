@@ -27,10 +27,10 @@ int setfcb( struct fcb *fc, unsigned char *name)
 
     /* Check for devices */
     for ( i = 0; i < NUM_DEVNAMES; i++ ) {
-		if ( !strnicmp(name, devnames + (i * NUM_DEVNAMES ), DEVNAME_LEN) ) {
-			fc->use = i + U_CON;
-			return 1;
-		}
+	if ( strnicmp(name, devnames + (i * NUM_DEVNAMES ), DEVNAME_LEN) == 0 ) {
+		fc->use = i + U_CON;
+		return 1;
+	}
     }
 #endif
     parsefcb(fc,name);

@@ -3,9 +3,9 @@ INCLUDE "config_private.inc"
 SECTION code_driver
 SECTION code_driver_terminal_input
 
-PUBLIC rc_01_input_basic_iterm_msg_getc
+PUBLIC term_01_input_char_iterm_msg_getc
 
-rc_01_input_basic_iterm_msg_getc:
+term_01_input_char_iterm_msg_getc:
 
    ;    enter : ix = & FDSTRUCT.JP
    ;
@@ -13,9 +13,15 @@ rc_01_input_basic_iterm_msg_getc:
    ;            carry set on error, hl = 0 (stream error) or -1 (eof)
    ;
    ;  can use : af, bc, de, hl
+   
+   ; Get a character in a blocking read
+   
+error implement term_01_input_char_iterm_msg_getc
 
-   rst 0x10                    ; get any characters available
-                               ; if Rx buffer is empty, will block
+   ; After character is retrieved do any necessary
+   ; character set translation including ascii codes
+   ; 10 and 13 as shown below
+
    ; a = ascii code
 
    cp 32

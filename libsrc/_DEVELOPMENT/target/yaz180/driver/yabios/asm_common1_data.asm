@@ -7,12 +7,7 @@ INCLUDE "config_private.inc"
 
 PUBLIC  _bios_sp
 
-IF __register_sp
-EXTERN  __register_sp
-defc    _bios_sp    =   __register_sp   ; yabios BANK0 SP here, when other banks running
-ELSE
-defc    _bios_sp    =   $FFDE           ; or here if __register_sp is undefined
-ENDIF
+defc    _bios_sp    =   __BIOS_SP   ; yabios BANK0 SP here, when other banks running
 
 ; start of the Transitory Program Area (TPA) Control Block (TCB)
 ; for BANK1 through BANK12
@@ -23,7 +18,7 @@ ENDIF
 
 PUBLIC  _bank_sp                        ; DEFW at 0x003B in Page 0
 
-defc    _bank_sp    =   $003B
+defc    _bank_sp    =   __BANK_SP
 
 ;------------------------------------------------------------------------------
 ; start of common area 1 - page aligned data
@@ -100,6 +95,11 @@ APUStatus:              defb    0
 APUError:               defb    0
 _APULock:               defb    $FE             ; mutex for APU
 
+; currently active console interface, only bit 0 is distinguished with TTY=0 CRT=1
+PUBLIC  _bios_ioByte
+
+_bios_ioByte:   defb    0               ; intel I/O byte
+
 PUBLIC asci0RxCount, asci0RxIn, asci0RxOut, _asci0RxLock
 
 asci0RxCount:   defb    0               ; Space for Rx Buffer Management 
@@ -139,9 +139,9 @@ _ideLock:       defb    $FE             ; mutex for IDE drive
 
 PUBLIC initString, invalidTypeStr, badCheckSumStr, LoadOKStr
 
-initString:     defm    CHAR_CR,CHAR_LF,"LoadHex: ",0
-invalidTypeStr: defm    CHAR_CR,CHAR_LF,"Invalid Type",CHAR_CR,CHAR_LF,0
-badCheckSumStr: defm    CHAR_CR,CHAR_LF,"Checksum Error",CHAR_CR,CHAR_LF,0
-LoadOKStr:      defm    CHAR_CR,CHAR_LF,"Done",CHAR_CR,CHAR_LF,0
+initString:     defm    CHAR_CR,CHAR_LF,"::",0
+invalidTypeStr: defm    CHAR_CR,CHAR_LF,"Type!",CHAR_CR,CHAR_LF,0
+badCheckSumStr: defm    CHAR_CR,CHAR_LF,"Checksum!",CHAR_CR,CHAR_LF,0
+LoadOKStr:      defm    CHAR_CR,CHAR_LF,"Done!",CHAR_CR,CHAR_LF,0
 
 DEPHASE

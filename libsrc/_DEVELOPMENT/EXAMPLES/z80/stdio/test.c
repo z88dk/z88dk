@@ -1,13 +1,19 @@
-#pragma printf = ""   // list required % converters here
+#pragma printf = "%s"   // prune to required converters
+#pragma scanf  = "%s"   // prune to required converters
 
 #include <stdio.h>
-#include <z80.h>
+
+unsigned char buf[64];
 
 void main(void)
 {
    while (1)
    {
-      printf("Hello World!\n");
-      z80_delay_ms(1000);
+      printf("Message: ";
+      
+      fflush(stdin);
+      scanf("%63s", buf);
+      
+      printf("\"%s\"\n\n", buf);
    }
 }

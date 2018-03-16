@@ -1751,108 +1751,135 @@ defc __ZXN_RGB333_HTML_YellowGreen = 0x172
 
 
 
+IFNDEF __ZXN_INC_DMA
+DEFINE __ZXN_INC_DMA
+
 defc __IO_DMA = 0x6b
 defc __IO_DMA_DATAGEAR = 0x6b
 
-defc __DMA_WR0 = 0x00
+defc __D_WR0 = 0x00
 
-defc __DMA_WR0_TRANSFER = 0x01
-defc __DMA_WR0_A_TO_B = 0x04
-defc __DMA_WR0_B_TO_A = 0x00
+defc __D_WR0_TRANSFER = 0x01
+defc __D_WR0_A_TO_B = 0x04
+defc __D_WR0_B_TO_A = 0x00
 
-defc __DMA_WR0_X3_A_START_L = 0x08
-defc __DMA_WR0_X4_A_START_H = 0x10
-defc __DMA_WR0_X34_A_START = 0x18
-defc __DMA_WR0_X5_LEN_L = 0x20
-defc __DMA_WR0_X6_LEN_H = 0x40
-defc __DMA_WR0_X56_LEN = 0x60
+defc __D_WR0_X3_A_START_L = 0x08
+defc __D_WR0_X4_A_START_H = 0x10
+defc __D_WR0_X34_A_START = 0x18
+defc __D_WR0_X5_LEN_L = 0x20
+defc __D_WR0_X6_LEN_H = 0x40
+defc __D_WR0_X56_LEN = 0x60
 
-defc __DMA_WR0_X3 = 0x08
-defc __DMA_WR0_X4 = 0x10
-defc __DMA_WR0_X5 = 0x20
-defc __DMA_WR0_X6 = 0x40
-defc __DMA_WR0_X34 = 0x18
-defc __DMA_WR0_X35 = 0x28
-defc __DMA_WR0_X36 = 0x48
-defc __DMA_WR0_X45 = 0x30
-defc __DMA_WR0_X46 = 0x50
-defc __DMA_WR0_X56 = 0x60
-defc __DMA_WR0_X345 = 0x38
-defc __DMA_WR0_X346 = 0x58
-defc __DMA_WR0_X356 = 0x68
-defc __DMA_WR0_X456 = 0x70
-defc __DMA_WR0_X3456 = 0x78
+defc __D_WR0_X3 = 0x08
+defc __D_WR0_X4 = 0x10
+defc __D_WR0_X5 = 0x20
+defc __D_WR0_X6 = 0x40
+defc __D_WR0_X34 = 0x18
+defc __D_WR0_X35 = 0x28
+defc __D_WR0_X36 = 0x48
+defc __D_WR0_X45 = 0x30
+defc __D_WR0_X46 = 0x50
+defc __D_WR0_X56 = 0x60
+defc __D_WR0_X345 = 0x38
+defc __D_WR0_X346 = 0x58
+defc __D_WR0_X356 = 0x68
+defc __D_WR0_X456 = 0x70
+defc __D_WR0_X3456 = 0x78
 
-defc __DMA_WR1 = 0x04
+defc __D_WR0_TRANSFER_A_TO_B = 5
+defc __D_WR0_TRANSFER_B_TO_A = 1
+defc __D_WR0_XFER_A_TO_B = 5
+defc __D_WR0_XFER_B_TO_A = 1
 
-defc __DMA_WR1_A_IS_MEM = 0x00
-defc __DMA_WR1_A_IS_IO = 0x08
-defc __DMA_WR1_A_DEC = 0x00
-defc __DMA_WR1_A_INC = 0x10
-defc __DMA_WR1_A_FIX = 0x20
+defc __D_WR1 = 0x04
 
-defc __DMA_WR1_X6 = 0x40
-defc __DMA_WR1_X6_A_TIMING = 0x40
+defc __D_WR1_A_IS_MEM = 0x00
+defc __D_WR1_A_IS_IO = 0x08
+defc __D_WR1_A_DEC = 0x00
+defc __D_WR1_A_INC = 0x10
+defc __D_WR1_A_FIX = 0x20
 
-defc __DMA_WR1X6_A_CLEN_2 = 0x02
-defc __DMA_WR1X6_A_CLEN_3 = 0x01
-defc __DMA_WR1X6_A_CLEN_4 = 0x00
+defc __D_WR1_X6 = 0x40
+defc __D_WR1_X6_A_TIMING = 0x40
 
-defc __DMA_WR2 = 0x00
+defc __D_WR1X6_A_CLEN_2 = 0x02
+defc __D_WR1X6_A_CLEN_3 = 0x01
+defc __D_WR1X6_A_CLEN_4 = 0x00
 
-defc __DMA_WR2_B_IS_MEM = 0x00
-defc __DMA_WR2_B_IS_IO = 0x08
-defc __DMA_WR2_B_DEC = 0x00
-defc __DMA_WR2_B_INC = 0x10
-defc __DMA_WR2_B_FIX = 0x20
+defc __D_WR1_A_IS_MEM_DEC = 4
+defc __D_WR1_A_IS_MEM_INC = 20
+defc __D_WR1_A_IS_MEM_FIX = 36
+defc __D_WR1_A_IS_IO_DEC = 12
+defc __D_WR1_A_IS_IO_INC = 28
+defc __D_WR1_A_IS_IO_FIX = 44
 
-defc __DMA_WR2_X6 = 0x40
-defc __DMA_WR2_X6_B_TIMING = 0x40
+defc __D_WR2 = 0x00
 
-defc __DMA_WR2X6_B_CLEN_2 = 0x02
-defc __DMA_WR2X6_B_CLEN_3 = 0x01
-defc __DMA_WR2X6_B_CLEN_4 = 0x00
+defc __D_WR2_B_IS_MEM = 0x00
+defc __D_WR2_B_IS_IO = 0x08
+defc __D_WR2_B_DEC = 0x00
+defc __D_WR2_B_INC = 0x10
+defc __D_WR2_B_FIX = 0x20
 
-defc __DMA_WR2X6_X5 = 0x20
-defc __DMA_WR2X6_X5_PRESCALAR = 0x20
+defc __D_WR2_X6 = 0x40
+defc __D_WR2_X6_B_TIMING = 0x40
 
-defc __DMA_WR3 = 0x80
-defc __DMA_WR3_ENABLE_DMA = 0x40
+defc __D_WR2X6_B_CLEN_2 = 0x02
+defc __D_WR2X6_B_CLEN_3 = 0x01
+defc __D_WR2X6_B_CLEN_4 = 0x00
 
-defc __DMA_WR4 = 0x81
+defc __D_WR2X6_X5 = 0x20
+defc __D_WR2X6_X5_PRESCALAR = 0x20
 
-defc __DMA_WR4_CONT = 0x20
-defc __DMA_WR4_BURST = 0x40
+defc __D_WR2_B_IS_MEM_DEC = 0
+defc __D_WR2_B_IS_MEM_INC = 16
+defc __D_WR2_B_IS_MEM_FIX = 32
+defc __D_WR2_B_IS_IO_DEC = 8
+defc __D_WR2_B_IS_IO_INC = 24
+defc __D_WR2_B_IS_IO_FIX = 40
 
-defc __DMA_WR4_X2 = 0x04
-defc __DMA_WR4_X3 = 0x08
-defc __DMA_WR4_X23 = 0x0c
+defc __D_WR3 = 0x80
+defc __D_WR3_ENABLE_DMA = 0x40
 
-defc __DMA_WR4_X2_B_START_L = 0x04
-defc __DMA_WR4_X3_B_START_H = 0x08
-defc __DMA_WR4_X23_B_START = 0x0c
+defc __D_WR4 = 0x81
 
-defc __DMA_WR5 = 0x82
+defc __D_WR4_CONT = 0x20
+defc __D_WR4_BURST = 0x40
 
-defc __DMA_WR5_CE_WAIT = 0x10
-defc __DMA_WR5_RESTART = 0x20
+defc __D_WR4_X2 = 0x04
+defc __D_WR4_X3 = 0x08
+defc __D_WR4_X23 = 0x0c
 
-defc __DMA_LOAD = 0xcf
-defc __DMA_CONTINUE = 0xd3
-defc __DMA_ENABLE_DMA = 0x87
-defc __DMA_DISABLE_DMA = 0x83
-defc __DMA_READ_MASK = 0xbb
+defc __D_WR4_X2_B_START_L = 0x04
+defc __D_WR4_X3_B_START_H = 0x08
+defc __D_WR4_X23_B_START = 0x0c
 
-defc __DMA_RM_STATUS = 0x01
-defc __DMA_RM_COUNTER_L = 0x02
-defc __DMA_RM_COUNTER_H = 0x04
-defc __DMA_RM_COUNTER = 0x06
-defc __DMA_RM_A_ADDR_L = 0x08
-defc __DMA_RM_A_ADDR_H = 0x10
-defc __DMA_RM_A_ADDR = 0x18
-defc __DMA_RM_B_ADDR_L = 0x20
-defc __DMA_RM_B_ADDR_H = 0x40
-defc __DMA_RM_B_ADDR = 0x60
+defc __D_WR5 = 0x82
+
+defc __D_WR5_CE = 0x00
+defc __D_WR5_CE_WAIT = 0x10
+
+defc __D_WR5_STOP = 0x00
+defc __D_WR5_RESTART = 0x20
+
+defc __D_LOAD = 0xcf
+defc __D_CONTINUE = 0xd3
+defc __D_ENABLE_DMA = 0x87
+defc __D_DISABLE_DMA = 0x83
+defc __D_READ_MASK = 0xbb
+
+defc __D_RM_STATUS = 0x01
+defc __D_RM_COUNTER_L = 0x02
+defc __D_RM_COUNTER_H = 0x04
+defc __D_RM_COUNTER = 0x06
+defc __D_RM_A_ADDR_L = 0x08
+defc __D_RM_A_ADDR_H = 0x10
+defc __D_RM_A_ADDR = 0x18
+defc __D_RM_B_ADDR_L = 0x20
+defc __D_RM_B_ADDR_H = 0x40
+defc __D_RM_B_ADDR = 0x60
+
+ENDIF
 
 
 
@@ -1925,6 +1952,41 @@ defc __IO_1FFD_PAGING_MODE_SPECIAL_3674 = 0x07
 defc __IO_1FFD_ROM1 = 0x04
 defc __IO_1FFD_DISK_MOTOR = 0x08
 defc __IO_1FFD_PRINTER_STROBE = 0x10
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_SD_CONTROL = 0xe7
+defc __IO_SD_STATUS = 0xe7
+defc __IO_SD_DATA = 0xeb
+
+defc __IO_LED_L = 0x103b
+
+; define(`__ZXN_FILENAME_NEXT_UPDATE_FILE', "TBBLUE  TBU")
+; define(`__ZXN_FILENAME_NEXT_UPDATE_FILE_2', "TBBLUE.TBU")
+
+; define(`__ZXN_FILENAME_NEXT_FIRMWARE_FILE', "TBBLUE  FW ")
+; define(`__ZXN_FILENAME_NEXT_FIRMWARE_FILE_2', "TBBLUE.FW")
+
+; define(`__ZXN_DIR_NEXT_DIRECTORY', "/tbblue/")
+
+; define(`__ZXN_FILENAME_CONFIG', "/tbblue/config.ini")
+; define(`__ZXN_FILENAME_TIMING', "/tbblue/timing.ini")
+
+; define(`__ZXN_FILENAME_ESXMMC', "esxmmc.rom")
+; define(`__ZXN_FILENAME_MF1', "mf1.rom")
+; define(`__ZXN_FILENAME_MF3', "mf3.rom")
+; define(`__ZXN_FILENAME_MF128', "mf128.rom")
+
+; define(`__ZXN_FILENAME_KEYMAP', "/tbblue/keymap.bin")
 
 
 
@@ -2158,6 +2220,15 @@ defc __IO_NEXTREG_REG = 0x243b
 defc __IO_NEXTREG_DAT = 0x253b
 
 defc __REG_MACHINE_ID = 0
+defc __RMI_DE1A = 1
+defc __RMI_DE2A = 2
+defc __RMI_FBLABS = 5
+defc __RMI_VTRUCCO = 6
+defc __RMI_WXEDA = 7
+defc __RMI_EMULATORS = 8
+defc __RMI_ZXNEXT = 10
+defc __RMI_MULTICORE = 11
+defc __RMI_ZXNEXT_AB = 250
 
 defc __REG_VERSION = 1
 defc __RV_MAJOR = 0xf0
@@ -2180,10 +2251,11 @@ defc __RMT_128 = 0x02
 defc __RMT_P3E = 0x03
 defc __RMT_PENTAGON = 0x04
 
-defc __REG_PAGE_RAM = 4
-defc __RPR_MASK = 0x3f
-defc __REG_BANK_RAM = 4
-defc __RBR_MASK = 0x3f
+defc __REG_RAM_PAGE = 4
+defc __RRP_RAM_DIVMMC = 0x08
+defc __RRP_ROM_DIVMMC = 0x04
+defc __RRP_ROM_MF = 0x05
+defc __RRP_ROM_SPECTRUM = 0x00
 
 defc __REG_PERIPHERAL_1 = 5
 defc __RP1_JOY1_SINCLAIR = 0x00
@@ -2228,10 +2300,14 @@ defc __RP3_UNLOCK_7FFD = 0x80
 
 defc __REG_SUB_VERSION = 14
 
+defc __REG_VIDEO_PARAM = 15
+
 defc __REG_ANTI_BRICK = 16
-defc __RAB_START_NORMAL_CORE = 0x80
+defc __RAB_COMMAND_NORMALCORE = 0x80
 defc __RAB_BUTTON_DIVMMC = 0x02
 defc __RAB_BUTTON_MULTIFACE = 0x01
+
+defc __REG_VIDEO_TIMING = 17
 
 defc __REG_LAYER_2_RAM_PAGE = 18
 defc __RL2RP_MASK = 0x3f
@@ -2341,6 +2417,8 @@ defc __RCCH_COPPER_STOP = 0x00
 defc __RCCH_COPPER_RUN_LOOP_RESET = 0x40
 defc __RCCH_COPPER_RUN_LOOP = 0x80
 defc __RCCH_COPPER_RUN_VBI = 0xc0
+
+defc __REG_DEBUG = 0xff
 
 
 

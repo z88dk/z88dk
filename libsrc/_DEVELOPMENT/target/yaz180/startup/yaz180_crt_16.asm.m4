@@ -1,10 +1,10 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##      YAZ180_CRT_16.ASM.M4 - IO THROUGH BASIC           ##
+dnl##      YAZ180_CRT_16.ASM.M4 - IO THROUGH YABIOS          ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                   yaz180 basic target                     ;;
+;;                yaz180 application target                  ;;
 ;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
@@ -21,6 +21,7 @@ include "config_yaz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
+include "crt_yabios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`yaz180_rules.inc')
@@ -43,13 +44,11 @@ dnl## input terminals
 dnl
 dnl#include(`driver/terminal/rc_01_input_asci0.m4')
 dnl#include(`driver/terminal/rc_01_input_asci1.m4')
-dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/terminal/rc_01_output_asci0.m4')
 dnl#include(`driver/terminal/rc_01_output_asci1.m4')
-dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl
@@ -68,14 +67,23 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`driver/terminal/rc_01_input_basic.m4')
-   m4_rc_01_input_basic(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+   include(`driver/terminal/rc_01_input_asci0.m4')
+   m4_rc_01_input_asci0(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
-   include(`driver/terminal/rc_01_output_basic.m4')
-   m4_rc_01_output_basic(_stdout, CRT_OTERM_TERMINAL_FLAGS)
+   include(`driver/terminal/rc_01_output_asci0.m4')
+   m4_rc_01_output_asci0(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
    include(`../m4_file_dup.m4')
    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+
+   include(`driver/terminal/rc_01_input_asci1.m4')
+   m4_rc_01_input_asci1(_ttyin, __i_fcntl_fdstruct_4, TTY_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+
+   include(`driver/terminal/rc_01_output_asci1.m4')
+   m4_rc_01_output_asci1(_ttyout, TTY_OTERM_TERMINAL_FLAGS)
+
+   include(`../m4_file_dup.m4')
+   m4_file_dup(_ttyerr, 0x80, __i_fcntl_fdstruct_4)
 ',
 `
    include(`crt_driver_instantiation.asm.m4')
@@ -198,45 +206,16 @@ SECTION code_crt_return
 
    ; terminate
    
-   IF (__crt_on_exit = 0x10002)
-   
-      ; returning to basic
-      
-      pop hl
-      
-      IF CRT_ABPASS > 0
-      
-         ld a,h
-         ld b,l
-         call CRT_ABPASS
-
-      ENDIF
-      
-      ld sp,(__sp_or_ret)
-      
-      IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
-
-         im __crt_interrupt_mode_exit
-
-      ENDIF
-
-      ei
-      ret
-   
-   ELSE
-   
       include "../crt_exit_eidi.inc"
       include "../crt_restore_sp.inc"
       include "../crt_program_exit.inc"      
 
-   ENDIF
-   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_jump_vectors_z180.inc"
-include "crt_interrupt_vectors_basic.inc"
+include "crt_interrupt_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
