@@ -199,6 +199,7 @@ tokens:
   - name    : IYH
   - name    : IXL
   - name    : IYL
+  - name    : X
   
   # 16-bit registers
   - name    : BC
@@ -388,7 +389,6 @@ tokens:
   - name    : FILL
   - name    : FILLDE
   - name    : MIRROR
-  - name    : POPX
   - name    : NEXTREG
   - name    : PIXELDN
   - name    : PIXELAD
