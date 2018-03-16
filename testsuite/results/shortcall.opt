@@ -1,0 +1,57 @@
+
+
+
+	MODULE	shortcall
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,1	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	rst	8
+	defb	200
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func2
+	ld	hl,1	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	rst	8
+	defw	2000
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_scall
+	GLOBAL	_scall2
+	GLOBAL	_func
+	GLOBAL	_func2
+
+
+
+

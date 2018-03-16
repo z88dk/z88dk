@@ -176,9 +176,13 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         set_temporary_input(tmpfiles[argnumber]);
 
         if ( function_pointer_call ) {
-            if ( fnptr_type->kind == KIND_CPTR )
-                zpushde();
-            zpush(); // Save function address
+            if ( fnptr_type->kind == KIND_CPTR ) {
+                if ( argnumber == 1 )  {
+                    lpush();
+                }
+            } else {
+                zpush(); // Save function address
+            }
         }
         /* ordinary call */
         expr = expression(&vconst, &val, &type);
