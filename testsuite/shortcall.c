@@ -13,3 +13,11 @@ int func2()
    return scall2(1L, 2);
 }
 
+int func3() 
+{
+	int (*funcptr)(long x, int y) = scall;
+
+	return funcptr(2L, 3);
+}
+
+	
