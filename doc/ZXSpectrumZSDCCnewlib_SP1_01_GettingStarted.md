@@ -149,7 +149,6 @@ int main()
 
   sp1_MoveSprAbs(circle_sprite, &full_screen, 0, 0, 0, 0, 0);
 
-  intrinsic_halt();
   sp1_UpdateNow();
 
   while(1);
@@ -272,17 +271,7 @@ character cells where possible makes the library more efficient.
 Up to this point the program has only been arranging things in
 memory. Nothing has been drawn to the screen. To make that happen we
 call *sp1_UpdateNow()* which is the function which causes the screen
-to be updated. Although it's not necessary for this tiny example, it's
-typical practice to use a call to *intrinsic_halt()* to wait for an
-interrupt to occur before calling the screen updater function. This
-causes the Z80 to stop work until the Spectrum's video circuitry
-generates the next interrupt signal at the start of the TV frame, at
-which point things continue. Arranging the timing like this ensures
-the updater function does all the video memory updates in RAM while
-the video circuitry is busy drawing the top part of the Spectrum's
-border. As long as all the video memory changes are complete before
-the video circuitry gets as far as drawing the actual pixel display,
-everything will be flicker free.
+to be updated.
 
 The program then drops into an infinite loop so we can see the result.
 
