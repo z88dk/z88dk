@@ -50,6 +50,7 @@
     <ClCompile Include="..\..\src\appmake\zxn.c" />
     <ClCompile Include="..\..\src\appmake\zx-util.c" />
     <ClCompile Include="..\..\src\appmake\x1.c" />
+    <ClCompile Include="..\..\src\appmake\cpm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
