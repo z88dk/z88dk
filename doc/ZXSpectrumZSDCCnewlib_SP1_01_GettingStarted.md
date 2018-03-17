@@ -351,7 +351,7 @@ Recall our sprite data, in assembly language:
 
 ```
 
-The top line of the graphic, at _circle, is preceded by 7 zeroes. In
+The top line of the graphic, at *_circle*, is preceded by 7 zeroes. In
 this example, *_circle* is at address 50,000, and address 49,999
 contains a zero. There are in fact 7 zeroes logically above *_circle*,
 so when the sprite is placed in the display, between zero and all 7 of
