@@ -4,7 +4,7 @@
 SECTION code_clib
 SECTION code_adt_p_list
 
-PUBLIC asm_p_list_insert_after_callee
+PUBLIC p_list_insert_after_callee
 
 EXTERN asm_p_list_insert_after
 
