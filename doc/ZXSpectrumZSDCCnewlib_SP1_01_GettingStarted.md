@@ -15,7 +15,7 @@ topics such as BiFrost and interrupts is not required to work with
 SP1, but the reader is assumed to be familiar with at least the first
 6 installments of that guide.
 
-The tutorial for SP1's predecessor, splib2, is avaiable as a PDF
+The tutorial for SP1's predecessor, splib2, is available as a PDF
 document
 [here](http://www.mojontwins.com/warehouse/splib2-tutorial.pdf). It's
 not essential to understand that document, and the details in this one
@@ -233,7 +233,7 @@ screen to black ink on white paper, and the final argument specifies a
 this stage it can be seen as a character to fill the screen with. A
 space effectively clears the screen.
 
-We then 'invalidate' a rectange of screen space, defined in character
+We then 'invalidate' a rectangle of screen space, defined in character
 cells. This tells the screen updater algorithm in SP1 that the
 specified area - in this case it's the whole of the Spectrum screen -
 is going to need to be redrawn when we get to that point.
@@ -311,8 +311,8 @@ of a cell, say 1, or 9, or maybe 65, rather than rotating the graphic
 data downwards, the source address for the graphic data is moved back
 (i.e. lower in memory) by one byte. So for example, if the top line of
 the graphic data is at address 50,000, the byte at address 49,999 is
-the first to be transfered into the display, followed by the byte at
-50,000, and so on. 9 bytes in total will be transfered. That means the
+the first to be transferred into the display, followed by the byte at
+50,000, and so on. 9 bytes in total will be transferred. That means the
 actual graphic is placed one scan line lower than the top of the
 character cell, effecting the one-pixel-lower screen location
 requested.
@@ -489,7 +489,7 @@ In the first of these SP1 guides we've looked at defining a simple
 sprite and getting it onto the Spectrum's screen. It should be obvious
 that SP1 is a rather technical library which takes a fair bit of
 effort to understand. But it's also extremely competent, and used
-skillfully can be the basis of an excellent game.
+skilfully can be the basis of an excellent game.
 
 ### Where To Go From Here
 
