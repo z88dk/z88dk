@@ -1,7 +1,7 @@
 # The ZX Spectrum Programmer's Z88DK Getting Started Guide
 
 The *ZX Spectrum Programmer's Z88DK Getting Started Guide* consists of a series
-of documents written to assist Spectrum developers who want write programs in
+of documents written to assist Spectrum developers who want write to programs in
 'C' using the Z88DK development toolset. The reader is expected to know the 'C'
 programming language, but otherwise the series starts from the very beginning.
 
@@ -18,7 +18,9 @@ be read in sequence:
 | [Multiple Files](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md)  | Multiple file builds, list files |
 | [Some Details](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)    | Memory map, pragmas |
 | [BiFrost](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)         | The BiFrost multicolour library |
-| [Interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)      | Mode 2 interrupts |
+|
+[Interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
+| Z80 Mode 2 interrupts |
 
 A complementary series of documents covers the SP1 sprite library, which is
 an excellent basis for Spectrum games written with Z88DK:
