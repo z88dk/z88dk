@@ -1,16 +1,19 @@
 # ZX Spectrum Development with C, Z88DK and SP1 - Getting Started
 
 This document describes how to get started writing ZX Spectrum programs using
-C, Z88DK and the SP1 sprite library. 
+C, Z88DK and the SP1 sprite library. It's part of the ZX Spectrum
+Z88DK/C developer's getting start guide.
 
 ## Assumptions
 
-The reader is assumed to have read the Z88DK getting started guide,
-which covers getting started with Z88DK and its 'C' programming
-environment. A complete understanding of the details of the more
-advanced topics such as BiFrost and interrupts is not required to work
-with SP1, but the reader is assumed to be familiar with at least the
-first 6 installments of that guide.
+This is the introductory document for the SP1 sprite library. It is
+not an introduction to Spectrum development using Z88DK. The reader is
+assumed to have read the Z88DK getting started guide, which covers
+getting started with Z88DK and its 'C' programming environment. A
+complete understanding of the details of the more advanced Z88DK
+topics such as BiFrost and interrupts is not required to work with
+SP1, but the reader is assumed to be familiar with at least the first
+6 installments of that guide.
 
 The tutorial for SP1's predecessor, splib2, is avaiable as a PDF
 document
@@ -34,11 +37,11 @@ and the reader will need to accept that not everything will be
 explained as we go.
 
 SP1 is a lot more than just a sprite library. It handles backgrounds
-and text, supports with clipping rectangles and animations, and has a
+and text, supports clipping rectangles and animations, and has a
 sophisticated screen updating algorithm. But since it's identified by
 many as a sprite library, and sprites are probably the primary reason
 many people are reading this getting started guide, it's a simple
-sprite that we're going to begin with.
+sprite example that we're going to begin with.
 
 ## Program 1 - SP1 Circle Sprite
 
@@ -124,7 +127,6 @@ Save this listing to a file named 'circle.c':
 ```
 #pragma output REGISTER_SP = 0xD000
 
-#include <intrinsic.h>
 #include <arch/zx.h>
 #include <arch/zx/sp1.h>
 
@@ -135,7 +137,6 @@ int main()
   struct sp1_Rect full_screen = {0, 0, 32, 24};
   struct sp1_ss  *circle_sprite;
 
-  intrinsic_ei();
   zx_border(INK_BLACK);
 
   sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
@@ -159,7 +160,7 @@ Compile this, together with the graphical data in the assembly
 language file, using this line:
 
 ```
-zcc +zx -vn -m -startup=31 -clib=sdcc_iy circle.c circle_sprite.asm -o circle -create-app
+zcc +zx -vn -startup=31 -clib=sdcc_iy circle.c circle_sprite.asm -o circle -create-app
 ```
 
 When you run the resultant program you'll see the border turns black
@@ -250,7 +251,7 @@ Next, we place the sprite ready to be drawn via the call to
 *sp1_MoveSprAbs()*. The final 4 arguments to this function specify
 exactly where to place the sprite in row, column, horizontal rotation,
 vertical rotation, format. The row and column specify the character
-cell location for the sprite in the ranges 0-32 and 0-23
+cell location for the sprite in the ranges 0-24 and 0-32
 respectively. The horizontal and vertical rotation values are both in
 the range 0-7 and specify how many pixels to rotate the sprite data by
 within the character cell so it sits in the exact pixel location
@@ -389,15 +390,15 @@ the left side of the sprite. We don't need to worry too much about
 this given that our sprite is only 1 byte wide. We'll come on to wider
 sprites.
 
-Have a look in the sp1.h header file for the declarations of the
+Have a look in the *sp1.h* header file for the declarations of the
 drawing functions. There are about 2 dozen of them, all named with the
 above convention. You need to pick the correct one for each column of
 your sprite.
 
-The next argument to sp1_CreateSpr() is the sprite type. There are
+The next argument to *sp1_CreateSpr()* is the sprite type. There are
 only 2 types: 1 byte and 2 byte. As indicated above, 1 byte sprites
-just use a data byte. 2 byte sprites use a data byte and a mask
-byte. Our simple circle sprite is the 1 byte type.
+just use a data byte per scan line. 2 byte sprites use a data byte and
+a mask byte. Our simple circle sprite is the 1 byte type.
 
 We then provide the height of the sprite in character cells. This is
 the maximum height of the sprite when it's being vertically rotated
@@ -424,7 +425,7 @@ Let's move on to the second line of sprite generation code:
 SP1 sprites are built up in columns, left to right. This approach
 allows sprites to be of arbitrary size, and allows different parts of
 the sprite to be drawn using different, more appropriate drawing
-algorithms. The sp1_AddColSpr() function adds another column to the
+algorithms. The *sp1_AddColSpr()* function adds another column to the
 right side of an existing sprite. Remember, our 8 pixel wide sprite
 actually occupies 2 character cells when it's rotated horizontally, so
 that's 2 columns.
@@ -452,8 +453,35 @@ zero. The header file says this argument is a "frame", and it's used
 in animation. We're not going to look at this topic for a while, but
 it's pointed out here because the alternative way of creating and
 moving sprites under SP1 puts the graphical data in this argument. We
-don't need to know about this yet, but some of the example code might
-be a bit confusing if this weren't pointed out.
+don't need to know about this yet, but some of the SP1 example code in
+Z88DK might be a bit confusing if this weren't pointed out.
+
+### Runtime
+
+When this code runs the following steps take place:
+
+* SP1 is initialised
+* the library is told that the entire Spectrum screen is invalid and
+the whole lot needs updating
+* a sprite is created with the left boundary draw function and the
+graphical data, which tells the library how to draw the left side of the
+sprite
+* another column is added with the right boundary draw function and
+the graphical data, which tells the library how to draw the right side of
+the sprite
+* the sprite is moved into the display
+* SP1 is told to draw the screen. The whole screen has been marked as
+invalid so it knows everything must be drawn. When it gets to drawing
+the sprite it will use the left boundary function to draw the left
+side of the sprite, and, assuming the sprite isn't perfectly aligned to a
+horizontal character cell, will then use the right boundary function
+to draw the right side of the sprite.
+
+Unlike many other Spectrum graphics libraries, there's no need to
+*halt* the Z80 CPU to ensure flicker free updates. SP1 was
+specifically designed not to need that step, allowing the programmer
+to reclaim the CPU cycles normally lost waiting for the TV raster. Our
+sprite appears instantly and without flicker.
 
 ### Conclusion
 
