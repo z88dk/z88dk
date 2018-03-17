@@ -52,7 +52,7 @@ sprite will be loaded straight into screen memory overwriting whatever
 is there. We have to start somewhere.
 
 And we start not with C code, but assembly language. Save this listing to a
-file named 'circle.asm':
+file named 'circle_sprite.asm':
 
 ```
 SECTION rodata_user
