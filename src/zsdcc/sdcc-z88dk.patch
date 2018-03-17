@@ -1,224 +1,20 @@
-Index: sdcc/src/SDCC.y
+Index: src/SDCC.lex
 ===================================================================
---- sdcc/src/SDCC.y	(revision 9958)
-+++ sdcc/src/SDCC.y	(working copy)
-@@ -182,7 +182,7 @@
-           allocVariables ($1);
-           cleanUpLevel (SymbolTab, 1);
-         }
--   | addressmod
-+   | addressmod {}
-    ;
- 
- function_definition
-@@ -1793,7 +1793,7 @@
-        werror(W_LABEL_WITHOUT_STATEMENT);
-        $$ = $1;
-        yychar = '}';
--     };
-+     }
-     ;
- 
- label
-Index: sdcc/src/SDCCasm.c
+--- src/SDCC.lex	(revision 9958)
++++ src/SDCC.lex	(working copy)
+@@ -171,6 +171,8 @@
+ "__preserves_regs"      { count (); return PRESERVES_REGS; }
+ "__z88dk_fastcall"      { count (); TKEYWORD (Z88DK_FASTCALL); }
+ "__z88dk_callee"        { count (); TKEYWORD (Z88DK_CALLEE); }
++"__z88dk_shortcall"     { count (); return Z88DK_SHORTCALL; }
++"__z88dk_params_offset" { count (); return Z88DK_PARAMS_OFFSET; }
+ "__addressmod"          { count (); return ADDRESSMOD; }
+ "_Static_assert"        { count (); return STATIC_ASSERT; }
+ "_Alignas"              { count (); return ALIGNAS; }
+Index: src/SDCCpeeph.c
 ===================================================================
---- sdcc/src/SDCCasm.c	(revision 9958)
-+++ sdcc/src/SDCCasm.c	(working copy)
-@@ -401,8 +401,8 @@
- static const ASM_MAPPING _asxxxx_mapping[] = {
-   {"labeldef", "%s::"},
-   {"slabeldef", "%s:"},
--  {"tlabeldef", "%05d$:"},
--  {"tlabel", "%05d$"},
-+  {"tlabeldef", "l%N_%05d$:"},
-+  {"tlabel", "l%N_%05d$"},
-   {"immed", "#"},
-   {"zero", "#0x00"},
-   {"one", "#0x01"},
-@@ -425,6 +425,7 @@
-   {"msbimmeds", "#>(%s)"},
-   {"module", ".module %s"},
-   {"global", ".globl %s"},
-+  {"extern", ".globl %s"},
-   {"fileprelude", ""},
-   {"functionheader",
-    "; ---------------------------------\n"
-Index: sdcc/src/SDCCglue.c
-===================================================================
---- sdcc/src/SDCCglue.c	(revision 9958)
-+++ sdcc/src/SDCCglue.c	(working copy)
-@@ -185,7 +185,7 @@
-            (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
-           addPublics &&
-           !IS_STATIC (sym->etype) &&
--          (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
-+          (IS_FUNC (sym->type) ? (IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
-           !(IFFUNC_ISINLINE (sym->type) && !IS_STATIC (sym->etype) && !IS_EXTERN (sym->etype)))
-         {
-           addSetHead (&publics, sym);
-@@ -361,11 +361,15 @@
-               emitDebugSym (&map->oBuf, sym);
-               dbuf_printf (&map->oBuf, "==.\n");
-             }
--          if (IS_STATIC (sym->etype) || sym->level)
--            dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
--          else
--            dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
--          dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
-+          if (!IS_EXTERN (sym->etype))
-+            {
-+              if (IS_STATIC (sym->etype) || sym->level)
-+                dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
-+              else
-+                dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
-+
-+              dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
-+            }
-         }
- 
-       sym->ival = NULL;
-@@ -1808,9 +1812,12 @@
-   /* for all variables in this segment do */
-   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
-     {
--      /* if it is "extern" then do nothing */
-+      /* if it is "extern" then add to the extern table */
-       if (IS_EXTERN (sym->etype) && !sym->ival)
--        continue;
-+        {
-+          addSetHead (&externs, sym);
-+          continue;
-+        }
- 
-       /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
-       if (!isinSet (tmpSet, sym))
-@@ -1882,7 +1889,6 @@
-                   emitDebugSym (oBuf, sym);
-                   dbuf_printf (oBuf, " == .\n");
-                 }
--              dbuf_printf (oBuf, "%s:\n", sym->rname);
-               /* special case for character strings */
-               if (IS_ARRAY (sym->type) &&
-                 (IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char ||
-@@ -1889,6 +1895,9 @@
-                  IS_INT (sym->type->next) && !IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char16 ||
-                  IS_INT (sym->type->next) && IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char32))
-                 {
-+                  if (options.const_seg)
-+                     dbuf_tprintf(&code->oBuf, "\t!area\n", options.const_seg);
-+                  dbuf_printf (oBuf, "%s:\n", sym->rname);
-                   if (IS_CHAR (sym->type->next))
-                     printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
-                   else if (IS_INT (sym->type->next) && !IS_LONG (sym->type->next))
-@@ -1897,9 +1906,12 @@
-                     printChar32 (oBuf, SPEC_CVAL (sym->etype).v_char32, size / 4);
-                   else
-                     wassert (0);
-+                  if (options.const_seg)
-+                     dbuf_tprintf(oBuf, "\t!areacode\n", options.code_seg);
-                 }
-               else
-                 {
-+                  dbuf_printf (oBuf, "%s:\n", sym->rname);
-                   dbuf_tprintf (oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
-                 }
-             }
-@@ -1984,7 +1996,11 @@
- void
- flushStatics (void)
- {
-+  if (options.const_seg)
-+      dbuf_tprintf (&code->oBuf, "\t!area\n", options.const_seg);
-   emitStaticSeg (statsg, codeOutBuf);
-+  if (options.const_seg)
-+      dbuf_tprintf(&code->oBuf, "\t!areacode\n", options.code_seg);
-   statsg->syms = NULL;
- }
- 
-Index: sdcc/src/SDCCmain.c
-===================================================================
---- sdcc/src/SDCCmain.c	(revision 9958)
-+++ sdcc/src/SDCCmain.c	(working copy)
-@@ -480,20 +480,19 @@
- /* printVersionInfo - prints the version info        */
- /*-----------------------------------------------------------------*/
- void
--printVersionInfo (FILE * stream)
-+printVersionInfo(FILE * stream)
- {
--  int i;
-+    int i;
- 
--  fprintf (stream, "SDCC : ");
--  for (i = 0; i < NUM_PORTS; i++)
--    fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
--
--  fprintf (stream, " " SDCC_VERSION_STR
-+    fprintf(stream, "\nZSDCC IS A MODIFICATION OF SDCC FOR Z88DK\n");
-+    fprintf(stream, "Build: " SDCC_VERSION_STR
- #ifdef SDCC_SUB_VERSION_STR
--           "/" SDCC_SUB_VERSION_STR
-+        "/" SDCC_SUB_VERSION_STR
- #endif
--           " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
--  fprintf (stream, "published under GNU General Public License (GPL)\n");
-+        " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
-+    fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
-+    fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip\n\n");
-+    fprintf(stream, "published under GNU General Public License (GPL)\n");
- }
- 
- static void
-Index: sdcc/src/SDCCopt.c
-===================================================================
---- sdcc/src/SDCCopt.c	(revision 9958)
-+++ sdcc/src/SDCCopt.c	(working copy)
-@@ -2036,10 +2036,11 @@
-   int i;
-   int change = 0;
-   iCode *ic, *newic;
--  iCode *uic;
-+  iCode *uic, *lic, *ric;
-   sym_link *nextresulttype;
-   symbol *sym;
-   int resultsize, nextresultsize;
-+  unsigned long litval;
- 
-   // Wide loop counter
-   for (i = 0; i < count; i++)
-@@ -2207,8 +2208,8 @@
-             IS_ITEMP (right) && bitVectnBitsOn (OP_DEFS (right)) != 1)
-             continue;
- 
--          iCode *lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
--          iCode *ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
-+          lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
-+          ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
- 
-           if (lic)
-             {
-@@ -2215,7 +2216,7 @@
-               if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
-                 continue;
- 
--              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
-+              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
- 
-               if (litval > 0x7f)
-                 continue;
-@@ -2228,7 +2229,7 @@
-               if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
-                 continue;
- 
--              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
-+              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
- 
-               if (litval > 0x7f)
-                 continue;
-Index: sdcc/src/SDCCpeeph.c
-===================================================================
---- sdcc/src/SDCCpeeph.c	(revision 9958)
-+++ sdcc/src/SDCCpeeph.c	(working copy)
+--- src/SDCCpeeph.c	(revision 9958)
++++ src/SDCCpeeph.c	(working copy)
 @@ -77,8 +77,10 @@
    (*cmdLine)++;
    if (!ISCHARDIGIT (**cmdLine))
@@ -477,10 +273,386 @@ Index: sdcc/src/SDCCpeeph.c
  
                    /* if restart rule type then
                       start at the top again */
-Index: sdcc/src/z80/peep.c
+Index: src/SDCCerr.c
 ===================================================================
---- sdcc/src/z80/peep.c	(revision 9958)
-+++ sdcc/src/z80/peep.c	(working copy)
+--- src/SDCCerr.c	(revision 9958)
++++ src/SDCCerr.c	(working copy)
+@@ -535,6 +535,8 @@
+     "inline function '%s' might lose function attributes", 0},
+   { E_FOR_INITAL_DECLARATION_C99, ERROR_LEVEL_ERROR,
+     "initial declaration in for loop requires ISO C99 or later", 0},
++  { E_SHORTCALL_INVALID_VALUE, ERROR_LEVEL_ERROR,
++    "invalid value for __z88dk_shortcall %s parameter: %x", 0},
+ };
+ 
+ /* -------------------------------------------------------------------------------
+Index: src/SDCCerr.h
+===================================================================
+--- src/SDCCerr.h	(revision 9958)
++++ src/SDCCerr.h	(working copy)
+@@ -266,6 +266,7 @@
+   E_ANONYMOUS_STRUCT_TAG        = 237, /* anonymous struct/union should not have a tag */
+   W_INLINE_FUNCATTR             = 238, /* inline functions should not be z88dk_fastcall or z88dk_callee */
+   E_FOR_INITAL_DECLARATION_C99  = 239, /* initial declaration in for loop requires ISO C99 or later */
++  E_SHORTCALL_INVALID_VALUE     = 240, /* Invalid value for a __z88dk_shortcall specifier */
+ 
+   /* don't touch this! */
+   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */
+Index: src/SDCCasm.c
+===================================================================
+--- src/SDCCasm.c	(revision 9958)
++++ src/SDCCasm.c	(working copy)
+@@ -401,8 +401,8 @@
+ static const ASM_MAPPING _asxxxx_mapping[] = {
+   {"labeldef", "%s::"},
+   {"slabeldef", "%s:"},
+-  {"tlabeldef", "%05d$:"},
+-  {"tlabel", "%05d$"},
++  {"tlabeldef", "l%N_%05d$:"},
++  {"tlabel", "l%N_%05d$"},
+   {"immed", "#"},
+   {"zero", "#0x00"},
+   {"one", "#0x01"},
+@@ -425,6 +425,7 @@
+   {"msbimmeds", "#>(%s)"},
+   {"module", ".module %s"},
+   {"global", ".globl %s"},
++  {"extern", ".globl %s"},
+   {"fileprelude", ""},
+   {"functionheader",
+    "; ---------------------------------\n"
+Index: src/SDCCsymt.h
+===================================================================
+--- src/SDCCsymt.h	(revision 9958)
++++ src/SDCCsymt.h	(working copy)
+@@ -273,6 +273,8 @@
+     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
+     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
+     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
++    unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
++    unsigned z88dk_has_params_offset:1;     /* Has a parameter offset (Z80 only) */
+     unsigned intno;                 /* 1=Interrupt service routine          */
+     short regbank;                  /* register bank 2b used                */
+     unsigned builtin;               /* is a builtin function                */
+@@ -280,6 +282,9 @@
+     unsigned overlay;               /* force parameters & locals into overlay segment */
+     unsigned hasStackParms;         /* function has parameters on stack     */
+     bool preserved_regs[9];         /* Registers preserved by the function - may be an underestimate */
++    unsigned char z88dk_shortcall_rst;  /* Rst for a short call */
++    unsigned short z88dk_shortcall_val; /* Value for a short call */
++    unsigned short z88dk_params_offset;  /* Additional offset from for arguments */
+   } funcAttrs;
+ 
+   struct sym_link *next;            /* next element on the chain  */
+@@ -454,6 +459,8 @@
+ #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
+ #define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)
+ #define IFFUNC_ISZ88DK_CALLEE(x) (IS_FUNC(x) && FUNC_ISZ88DK_CALLEE(x))
++#define FUNC_ISZ88DK_SHORTCALL(x) (x->funcAttrs.z88dk_shortcall)
++#define IFFUNC_ISZ88DK_SHORTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_SHORTCALL(x))
+ 
+ #define BANKED_FUNCTIONS        ( options.model == MODEL_HUGE || \
+                                   ( (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \
+Index: src/SDCC.y
+===================================================================
+--- src/SDCC.y	(revision 9958)
++++ src/SDCC.y	(working copy)
+@@ -104,7 +104,7 @@
+ %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
+ %token RRC RLC
+ %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
+-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
++%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+ %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
+ %token ASM
+ 
+@@ -182,7 +182,7 @@
+           allocVariables ($1);
+           cleanUpLevel (SymbolTab, 1);
+         }
+-   | addressmod
++   | addressmod {}
+    ;
+ 
+ function_definition
+@@ -289,6 +289,39 @@
+    |  Z88DK_CALLEE   {  $$ = newLink (SPECIFIER);
+                         FUNC_ISZ88DK_CALLEE($$) = 1;
+                      }
++   |  Z88DK_PARAMS_OFFSET '(' constant_expr ')' 
++                     {
++                        value *offset_v = constExprValue ($3, TRUE);
++                        int    offset = 0;
++                        $$ = newLink(SPECIFIER);
++                        if  ( offset_v ) 
++                          offset = ulFromVal(offset_v);
++                        $$->funcAttrs.z88dk_params_offset = offset;
++                     } 
++   |  Z88DK_SHORTCALL '(' constant_expr ',' constant_expr ')'
++                     {
++                        value *rst_v = constExprValue ($3, TRUE);
++                        value *value_v = constExprValue ($5, TRUE);
++                        int rst = -1, value = -1;
++                        $$ = newLink(SPECIFIER);
++
++                        if  ( rst_v ) 
++                          rst = ulFromVal(rst_v);
++                        if  ( value_v ) 
++                          value = ulFromVal(value_v);
++          
++                        if ( rst < 0 || rst > 56 || ( rst % 8 ) )
++                          {
++                            werror(E_SHORTCALL_INVALID_VALUE, "rst", rst);
++                          }
++                        if ( value < 0 || value > 0xfff )
++                          {
++                            werror(E_SHORTCALL_INVALID_VALUE, "value", value);
++                          }
++                        $$->funcAttrs.z88dk_shortcall_rst = rst;
++                        $$->funcAttrs.z88dk_shortcall_val = value;
++                        FUNC_ISZ88DK_SHORTCALL($$) = 1;
++                     }
+    |  PRESERVES_REGS '(' identifier_list ')'
+                      {
+                         const struct symbol *regsym;
+@@ -1793,7 +1826,7 @@
+        werror(W_LABEL_WITHOUT_STATEMENT);
+        $$ = $1;
+        yychar = '}';
+-     };
++     }
+     ;
+ 
+ label
+Index: src/SDCCmain.c
+===================================================================
+--- src/SDCCmain.c	(revision 9958)
++++ src/SDCCmain.c	(working copy)
+@@ -480,20 +480,19 @@
+ /* printVersionInfo - prints the version info        */
+ /*-----------------------------------------------------------------*/
+ void
+-printVersionInfo (FILE * stream)
++printVersionInfo(FILE * stream)
+ {
+-  int i;
++    int i;
+ 
+-  fprintf (stream, "SDCC : ");
+-  for (i = 0; i < NUM_PORTS; i++)
+-    fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
+-
+-  fprintf (stream, " " SDCC_VERSION_STR
++    fprintf(stream, "\nZSDCC IS A MODIFICATION OF SDCC FOR Z88DK\n");
++    fprintf(stream, "Build: " SDCC_VERSION_STR
+ #ifdef SDCC_SUB_VERSION_STR
+-           "/" SDCC_SUB_VERSION_STR
++        "/" SDCC_SUB_VERSION_STR
+ #endif
+-           " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
+-  fprintf (stream, "published under GNU General Public License (GPL)\n");
++        " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
++    fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
++    fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip\n\n");
++    fprintf(stream, "published under GNU General Public License (GPL)\n");
+ }
+ 
+ static void
+Index: src/SDCCglue.c
+===================================================================
+--- src/SDCCglue.c	(revision 9958)
++++ src/SDCCglue.c	(working copy)
+@@ -185,7 +185,7 @@
+            (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
+           addPublics &&
+           !IS_STATIC (sym->etype) &&
+-          (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
++          (IS_FUNC (sym->type) ? (IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
+           !(IFFUNC_ISINLINE (sym->type) && !IS_STATIC (sym->etype) && !IS_EXTERN (sym->etype)))
+         {
+           addSetHead (&publics, sym);
+@@ -361,11 +361,15 @@
+               emitDebugSym (&map->oBuf, sym);
+               dbuf_printf (&map->oBuf, "==.\n");
+             }
+-          if (IS_STATIC (sym->etype) || sym->level)
+-            dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
+-          else
+-            dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
+-          dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
++          if (!IS_EXTERN (sym->etype))
++            {
++              if (IS_STATIC (sym->etype) || sym->level)
++                dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
++              else
++                dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
++
++              dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
++            }
+         }
+ 
+       sym->ival = NULL;
+@@ -1808,9 +1812,12 @@
+   /* for all variables in this segment do */
+   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
+     {
+-      /* if it is "extern" then do nothing */
++      /* if it is "extern" then add to the extern table */
+       if (IS_EXTERN (sym->etype) && !sym->ival)
+-        continue;
++        {
++          addSetHead (&externs, sym);
++          continue;
++        }
+ 
+       /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+       if (!isinSet (tmpSet, sym))
+@@ -1882,13 +1889,15 @@
+                   emitDebugSym (oBuf, sym);
+                   dbuf_printf (oBuf, " == .\n");
+                 }
+-              dbuf_printf (oBuf, "%s:\n", sym->rname);
+               /* special case for character strings */
+               if (IS_ARRAY (sym->type) &&
+                 (IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char ||
+                  IS_INT (sym->type->next) && !IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char16 ||
+                  IS_INT (sym->type->next) && IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char32))
+                 {
++                  if (options.const_seg)
++                     dbuf_tprintf(&code->oBuf, "\t!area\n", options.const_seg);
++                  dbuf_printf (oBuf, "%s:\n", sym->rname);
+                   if (IS_CHAR (sym->type->next))
+                     printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
+                   else if (IS_INT (sym->type->next) && !IS_LONG (sym->type->next))
+@@ -1897,9 +1906,12 @@
+                     printChar32 (oBuf, SPEC_CVAL (sym->etype).v_char32, size / 4);
+                   else
+                     wassert (0);
++                  if (options.const_seg)
++                     dbuf_tprintf(oBuf, "\t!areacode\n", options.code_seg);
+                 }
+               else
+                 {
++                  dbuf_printf (oBuf, "%s:\n", sym->rname);
+                   dbuf_tprintf (oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
+                 }
+             }
+@@ -1984,7 +1996,11 @@
+ void
+ flushStatics (void)
+ {
++  if (options.const_seg)
++      dbuf_tprintf (&code->oBuf, "\t!area\n", options.const_seg);
+   emitStaticSeg (statsg, codeOutBuf);
++  if (options.const_seg)
++      dbuf_tprintf(&code->oBuf, "\t!areacode\n", options.code_seg);
+   statsg->syms = NULL;
+ }
+ 
+Index: src/SDCCopt.c
+===================================================================
+--- src/SDCCopt.c	(revision 9958)
++++ src/SDCCopt.c	(working copy)
+@@ -2036,10 +2036,11 @@
+   int i;
+   int change = 0;
+   iCode *ic, *newic;
+-  iCode *uic;
++  iCode *uic, *lic, *ric;
+   sym_link *nextresulttype;
+   symbol *sym;
+   int resultsize, nextresultsize;
++  unsigned long litval;
+ 
+   // Wide loop counter
+   for (i = 0; i < count; i++)
+@@ -2207,15 +2208,15 @@
+             IS_ITEMP (right) && bitVectnBitsOn (OP_DEFS (right)) != 1)
+             continue;
+ 
+-          iCode *lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
+-          iCode *ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
++          lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
++          ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
+ 
+           if (lic)
+             {
+               if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
+                 continue;
+ 
+-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
++              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
+ 
+               if (litval > 0x7f)
+                 continue;
+@@ -2228,7 +2229,7 @@
+               if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
+                 continue;
+ 
+-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
++              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
+ 
+               if (litval > 0x7f)
+                 continue;
+Index: src/z80/gen.c
+===================================================================
+--- src/z80/gen.c	(revision 9958)
++++ src/z80/gen.c	(working copy)
+@@ -4254,6 +4254,10 @@
+         {
+           werror (W_INDIR_BANKED);
+         }
++      else if ( IFFUNC_ISZ88DK_SHORTCALL(ftype) ) 
++       {
++          wassertl(0, "__z88dk_short_call via function pointer not implemented");
++       }
+       aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+ 
+       if (isLitWord (AOP (IC_LEFT (ic))))
+@@ -4295,6 +4299,17 @@
+               emit2 ("call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+               regalloc_dry_run_cost += 3;
+             }
++          else if ( IFFUNC_ISZ88DK_SHORTCALL(ftype) ) 
++            {
++              int rst = ftype->funcAttrs.z88dk_shortcall_rst;
++              int value = ftype->funcAttrs.z88dk_shortcall_val;
++              emit2 ("rst 0x%02x", rst);
++              if ( value < 256 ) 
++                emit2 ("defb 0x%02x\n",value);
++              else
++                emit2 ("defw 0x%04x\n",value);
++              regalloc_dry_run_cost += 3;
++            }
+           else
+             {
+               bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (ftype));
+@@ -4409,7 +4424,7 @@
+      doesn't seem to get reset anywhere else.
+    */
+   _G.receiveOffset = 0;
+-  _G.stack.param_offset = 0;
++  _G.stack.param_offset = sym->type->funcAttrs.z88dk_params_offset;
+ 
+   /* Record the last function name for debugging. */
+   _G.lastFunctionName = sym->rname;
+Index: src/z80/main.c
+===================================================================
+--- src/z80/main.c	(revision 9958)
++++ src/z80/main.c	(working copy)
+@@ -120,6 +120,8 @@
+   "z88dk_fastcall",
+   "z88dk_callee",
+   "smallc",
++  "z88dk_shortcall",
++  "z88dk_params_offset",
+   NULL
+ };
+ 
+Index: src/z80/peep.c
+===================================================================
+--- src/z80/peep.c	(revision 9958)
++++ src/z80/peep.c	(working copy)
 @@ -201,6 +201,109 @@
    return NULL;
  }
@@ -1098,7 +1270,7 @@ Index: sdcc/src/z80/peep.c
  }
  
  static bool
-@@ -465,6 +709,7 @@
+@@ -465,12 +709,23 @@
      return TRUE;
    if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0)
      {
@@ -1106,7 +1278,6 @@ Index: sdcc/src/z80/peep.c
        const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
        const bool *preserved_regs;
  
-@@ -471,6 +716,16 @@
        if(!strcmp(what, "ix"))
          return FALSE;
  
@@ -1123,7 +1294,7 @@ Index: sdcc/src/z80/peep.c
        if(f)
            preserved_regs = f->type->funcAttrs.preserved_regs;
        else // Err on the safe side.
-@@ -491,6 +746,7 @@
+@@ -491,25 +746,26 @@
        if(!strcmp(what, "iy"))
          return !preserved_regs[IYL_IDX] && !preserved_regs[IYH_IDX];
      }
@@ -1131,7 +1302,6 @@ Index: sdcc/src/z80/peep.c
    if(strcmp(pl->line, "ret") == 0)
      return TRUE;
    if(ISINST(pl->line, "ld\tiy") && strncmp(what, "iy", 2) == 0)
-@@ -497,19 +753,19 @@
      return TRUE;
  
    if (IS_Z180)
