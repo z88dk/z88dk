@@ -1,8 +1,8 @@
 # ZX Spectrum Development with C, Z88DK and SP1 - Getting Started
 
 This document describes how to get started writing ZX Spectrum programs using
-C, Z88DK and the SP1 sprite library. It's part of the ZX Spectrum
-Z88DK/C developer's getting start guide.
+C, Z88DK and the SP1 sprite library. It's part of the [ZX Spectrum
+Z88DK/C developer's getting started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md).
 
 ## Assumptions
 
