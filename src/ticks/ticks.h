@@ -117,6 +117,7 @@ typedef void (*hook_command)(void);
 extern void      PatchZ80(void);
 extern void      hook_init(void);
 extern void      hook_io_init(hook_command *cmds);
+extern void      hook_io_set_ide_device(int unit, const char *file);
 extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
