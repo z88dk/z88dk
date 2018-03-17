@@ -31,5 +31,4 @@ an excellent basis for Spectrum games written with Z88DK:
 These documents are a work in progress. Comments and suggestions are welcome in
 the [Z88DK Sinclair ZX forum](https://www.z88dk.org/forum/viewforum.php?id=2).
 
-Regards
 [Derek Fountain](http://www.derekfountain.org/), March, 2018
