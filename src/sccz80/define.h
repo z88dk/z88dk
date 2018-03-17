@@ -26,10 +26,6 @@
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
 #define MAX_MANTISSA_SIZE  5    
 
-/* Offset to stack params for shared lib funcs */
-
-#define SHAREOFFSET   4
-
 /*      System wide name size (for symbols)     */
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -101,7 +97,7 @@ struct type_s {
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
     
-    int32_t   value; // For enum, goto position
+    int32_t   value; // For enum, goto position, short call value
     
     // Structures
     Type   *tag;     // Reference to the structure type
@@ -114,8 +110,14 @@ struct type_s {
     Type    *return_type;
     array    *parameters; // (Type)
     uint32_t  flags;        // Fast call etc
-    char      hasva;
-    char      oldstyle;
+    struct {
+        char  hasva;
+        char  oldstyle;
+        int   params_offset;
+        uint8_t  shortcall_rst;
+        uint16_t shortcall_value;
+    } funcattrs;
+
     UT_hash_handle hh;
 };
 
@@ -147,8 +149,6 @@ enum symbol_flags {
         FARPTR = 0x02,
         FARACC = 0x04,
         FASTCALL = 0x08,     /* for certain lib calls only */
-        SHARED = 0x10,     /* Call via shared library method (append _s) */
-        SHAREDC = 0x20,     /* Call via rst (library is C code) */
         CALLEE = 0x40,      /* Called function pops regs */
         LIBRARY = 0x80,    /* Lib routine */
         SAVEFRAME = 0x100,  /* Save framepointer */
@@ -156,7 +156,8 @@ enum symbol_flags {
         FLOATINGDECL = 0x400, /* For a function pointer, the calling convention is floating */
         NAKED = 0x800,      /* Function is naked - don't generate any code */
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
-        SDCCDECL = 0x2000   /* Function uses sdcc convention for chars */
+        SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
+        SHORTCALL = 0x4000   /* Function uses short call (via rst) */
 };
 
 
@@ -180,6 +181,7 @@ struct symbol_s {
                 SYMBOL *p ;  /* also used to form linked list of fn args */
         } offset ;
         char  declared_location[1024];  /* Where it was declared, this will truncated with a silly long path */
+        char  *bss_section;      /* Section that this symbol is in */
         int  more ;          /* index of linked entry in dummy_sym */
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */
@@ -289,6 +291,7 @@ struct gototab_s {
 #define STDEF           12
 #define STGOTO          13
 #define STCRITICAL      14
+#define STASSERT        15
 
 
 /* Maximum number of (non fatal) errors before we quit */

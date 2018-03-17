@@ -514,6 +514,41 @@ static void parse_trailing_modifiers(Type *type)
             type->flags |= SDCCDECL;
             type->flags &= ~SMALLC;
             continue;
+        } else if ( amatch("__z88dk_params_offset")) {
+            needchar('(');
+            double   val;
+            Kind     valtype;
+
+            if (constexpr(&val,&valtype, 1) == 0 ) {
+                errorfmt("Expecting a constant expression for __z88dk_params_offset", 1);
+                val = 0;
+            }
+            type->funcattrs.params_offset = val;
+            needchar(')');
+        } else if ( amatch("__z88dk_shortcall")) { // __z88dk_shortcall(rstnumber, value)
+            double   rstnumber,val;
+            Kind  valtype;
+
+            needchar('(');
+            if (constexpr(&rstnumber,&valtype, 1) == 0 ) {
+                errorfmt("Expecting a restart number",1);
+            } else {
+                if ( rstnumber < 0 || rstnumber > 0x38 || ((int)rstnumber % 8 ) ) {
+                    errorfmt("Invalid rst number: %d",1, (int)rstnumber);
+                } 
+                needchar(',');
+                if (  constexpr(&val,&valtype, 1) == 0 ) {
+                    errorfmt("Expecting a constant call number",1);
+                } else {
+                    if ( val < 0 || val > 65535 ) {
+                        errorfmt("Short call value is out of range (%x)",1, (int)val);
+                    }
+                    type->flags |= SHORTCALL;
+                    type->funcattrs.shortcall_rst = rstnumber;
+                    type->funcattrs.shortcall_value = val;
+                }
+            }
+            needchar(')');
         } else if (amatch("__preserves_regs")) {
             int c;
             needchar('(');
@@ -567,7 +602,7 @@ Type *parse_parameter_list(Type *return_type)
         func->kind = KIND_FUNC;
         func->size = 0;
         func->len = 1;
-        func->oldstyle = 1;  // i.e. arbitrary number of parameters
+        func->funcattrs.oldstyle = 1;  // i.e. arbitrary number of parameters
         func->return_type = return_type;
         func->parameters = array_init(free_type);
         parse_trailing_modifiers(func);
@@ -614,7 +649,7 @@ Type *parse_parameter_list(Type *return_type)
         if ( param->kind == KIND_ELLIPSES) {
             if ( array_len(func->parameters)  ) {
                 array_add(func->parameters, param);    
-                func->hasva = 1;            
+                func->funcattrs.hasva = 1;            
             } else {                    
                 errorfmt("Ellipses must follow a parameter",1);
             }
@@ -725,6 +760,8 @@ Type *parse_decl(char name[], Type *base_type)
             junk();
             return NULL;
         }
+        if ( amatch("__far"))
+            base_type->isfar = 1;
         return parse_decl(name, make_pointer(base_type));
     }
 
@@ -769,6 +806,8 @@ int declare_local(int local_static)
                 sym->isassigned = 1;
                 sym->initialised = 1;
                 initials(namebuf, type);                
+            } else {
+                sym->bss_section = strdup(c_bss_section);
             }
         } else {
             int size = type->size;
@@ -931,8 +970,12 @@ Type *dodeclare(enum storage_type storage)
         }
 
          if ( cmatch(';')) {
+             // Maybe not right
+            sym->bss_section = strdup(c_bss_section);
+
             return type;
         } else if ( cmatch(',')) {
+            sym->bss_section = strdup(c_bss_section);
             continue;
         } 
 
@@ -1019,10 +1062,6 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
                 flags |= LIBRARY;
             } else if ( amatch("__CALLEE__") ) {
                 flags |= CALLEE;
-            } else if ( amatch("__SHARED__") ) {
-                flags |= SHARED;
-            } else if ( amatch("__SHAREDC__") ) {
-                flags |= SHAREDC;
             } else if ( amatch("__FASTCALL__") ) {
                 flags |= FASTCALL;
             } else if ( amatch("__SAVEFRAME__") ) {
@@ -1098,7 +1137,7 @@ Type *default_function_with_type(const char *name, Type *return_type)
 
     strcpy(type->name, name);
     type->kind = KIND_FUNC;
-    type->oldstyle = 1;
+    type->funcattrs.oldstyle = 1;
     type->return_type = return_type;
     type->parameters = array_init(NULL);
     type->size = 0;
@@ -1117,7 +1156,7 @@ Type *asm_function(const char *name)
 
     strcpy(type->name, name);
     type->kind = KIND_FUNC;
-    type->oldstyle = 1;
+    type->funcattrs.oldstyle = 1;
     type->return_type = type_void;
     type->parameters = array_init(NULL);
     array_add(type->parameters, make_pointer(type_char));
@@ -1215,7 +1254,7 @@ static void handle_kr_type_parameters(Type *func)
     }
 }
 
-void flags_describe(int32_t flags, UT_string *output)
+void flags_describe(Type *type, int32_t flags, UT_string *output)
 {
     if ( flags & SDCCDECL ) {
         utstring_printf(output,"__z88dk_sdccdecl ");
@@ -1241,6 +1280,15 @@ void flags_describe(int32_t flags, UT_string *output)
     if ( flags & CRITICAL ) {
         utstring_printf(output,"__critical ");
     }  
+
+    if ( flags & SHORTCALL ) {
+        utstring_printf(output,"__z88dk_shortcall(%d,%d) ", type->funcattrs.shortcall_rst, type->funcattrs.shortcall_value);
+    }
+
+    if ( type->funcattrs.params_offset ) {
+        utstring_printf(output,"__z88dk_params_offset(%d) ", type->funcattrs.params_offset);
+    }
+
 }
 
 void type_describe(Type *type, UT_string *output)
@@ -1251,10 +1299,7 @@ void type_describe(Type *type, UT_string *output)
     tail[0] = 0;
     if ( type->ptr )
         type_describe(type->ptr,output);
-
-
-    if ( type->isfar )
-        utstring_printf(output, "far ");    
+   
     switch ( type->kind ) {
     case KIND_NONE:
         return;
@@ -1281,8 +1326,10 @@ void type_describe(Type *type, UT_string *output)
         snprintf(tail, sizeof(tail),"[%d]",type->len);
         break;
     case KIND_PTR:
-    case KIND_CPTR:
         utstring_printf(output,"*");
+        break;
+    case KIND_CPTR:
+        utstring_printf(output,"*__far ");
         break;
     case KIND_STRUCT:
         utstring_printf(output,"%s %s ",type->tag->isstruct ? "struct" : "union", type->tag->name);
@@ -1359,7 +1406,7 @@ int type_matches(Type *t1, Type *t2)
         return 0;
     }
 
-    if ( t1->oldstyle == 0 ) {                
+    if ( t1->funcattrs.oldstyle == 0 ) {                
         if ( t1->parameters && t2->parameters) {
             if ( array_len(t1->parameters) != array_len(t2->parameters))
                 return 0;
@@ -1420,9 +1467,17 @@ static void declfunc(Type *type, enum storage_type storage)
             type_describe(currfn->ctype, output);            
             errorfmt("%s",0,utstring_body(output));
             utstring_free(output);
+            if ( currfn->ctype->kind != KIND_FUNC ) {
+                currfn = NULL;
+                return;
+            }
         }
         // Take the prototype flags
-        type->flags = currfn->ctype->flags;
+        type->flags |= currfn->ctype->flags;
+        if ( currfn->ctype->funcattrs.params_offset ) 
+            type->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
+        type->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
+        type->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
     } else {
         currfn = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
     }
@@ -1438,11 +1493,8 @@ static void declfunc(Type *type, enum storage_type storage)
 
     infunc = 1; /* In a function for sure! */
     
-    if (((type->flags & SHARED) && c_makeshare) || c_shared_file) {
-        /* Shared library definition, offset the stack */
-        where = 2 + c_share_offset;
-    } else
-        where = 2;
+    where = 2 + currfn->ctype->funcattrs.params_offset;
+
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function
         */
@@ -1460,7 +1512,7 @@ static void declfunc(Type *type, enum storage_type storage)
         UT_string *str;
 
         utstring_new(str);
-        flags_describe(type->flags, str);
+        flags_describe(type, type->flags, str);
         
         outfmt("; Function %s flags 0x%08x %s\n",type->name,type->flags, utstring_body(str));
         utstring_renew(str);

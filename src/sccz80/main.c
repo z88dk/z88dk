@@ -26,12 +26,6 @@ static int      filenum; /* next argument to be used */
 
 char Filenorig[FILENAME_LEN + 1];
 
-int c_makeshare; /* Do we want to make a shared library? */
-int c_useshared; /* Use shared lib routines? */
-int c_shared_file; /* File contains routines which are to be
-          * called via lib package - basically jimmy
-          * the stack but that's it..
-          */
 
 int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
@@ -113,7 +107,6 @@ static option  sccz80_opts[] = {
     { 0, "fp-mantissa-size", OPT_INT, "=<num> FP mantissa size (default: 5 bytes)", &c_fp_mantissa_bytes, 0 },
     
     { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, 0 },
-    { 0, "compact", OPT_BOOL, "Make all functions callee", &c_compact_code, 0},
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, 0},
     { 0, "set-r2l-by-default", OPT_BOOL, "Use r->l calling convention by default", &c_use_r2l_calling_convention, 0 },
     { 0, "asm", OPT_FUNCTION, "=<name> Set the assembler output (z80asm,vasm,asxx,gnu)", SetAssembler, 0 },
@@ -129,12 +122,6 @@ static option  sccz80_opts[] = {
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},
     { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, 0},
 #endif
-    { 0, "", OPT_HEADER, "Shared code generation:", NULL, 0 },
-    { 0, "make-shared", OPT_BOOL, "This Library file is shared", &c_makeshare, 0 },
-    { 0, "shared-file", OPT_BOOL, "All functions with this file are shared", &c_shared_file, 0 },
-    { 0, "use-shared", OPT_BOOL, "Use shared library functions", &c_useshared, 0 },
-    { 0, "share-offset", OPT_INT, "=<val> Define the shared offset (use with -make-shared)", &c_share_offset, 0 },
-
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },
     { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, 0 },
@@ -215,16 +202,14 @@ int main(int argc, char** argv)
 
     currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = c_doinline = need_floatpack = c_compact_code = 0;
+    ncomp = c_doinline = need_floatpack = 0;
     c_default_unsigned = NO;
-    c_useshared = c_makeshare = c_shared_file = NO;
     nxtlab = 0;/* start numbers at lowest possible */
     c_intermix_ccode = 0; /* don't include the C text as comments */
     c_errstop =0;  /* don't stop after errors */
     c_verbose = 0;
     c_double_strings = 0;
     c_notaltreg = NO;
-    c_share_offset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
     c_assembler_type = ASM_Z80ASM;
     c_framepointer_is_ix = -1;
@@ -409,10 +394,6 @@ static void dumpfns()
                 if ( storage == EXTERNP ) {
                     outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
                 } else if ( storage != LSTATIC && storage != TYPDEF ) {
-                    if ( ptr->ctype->flags & SHARED && c_useshared ) {
-                        GlobalPrefix();
-                        outfmt("%s_sl\n",ptr->name);
-                    }
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
                 }
@@ -531,6 +512,7 @@ void dumpvars()
                 continue;
             if ( ptr->ctype->size == -1 )
                 continue;
+            if ( ptr->bss_section ) output_section(ptr->bss_section);
             prefix();
             outname(ptr->name, 1);
             col();

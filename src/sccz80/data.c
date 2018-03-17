@@ -56,7 +56,7 @@ int need_floatpack, c_doinline, ncomp;
 int stackargs;
 
 
-char c_default_unsigned,c_compact_code;
+char c_default_unsigned;
 
 int nxtlab, /* next avail label # */
     glblab, /* For initializing global literals */
@@ -85,13 +85,6 @@ FILE    *saveout; /* holds output ptr when diverted to console */
 
 SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
 
-
-
-/*
- * Variable for the offset to a shared library routine
- */
-
-int c_share_offset;
 
 /*
  * Doms debug variable
