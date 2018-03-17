@@ -18,9 +18,7 @@ be read in sequence:
 | [Multiple Files](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_05_MultipleFiles.md)  | Multiple file builds, list files |
 | [Some Details](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md)    | Memory map, pragmas |
 | [BiFrost](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)         | The BiFrost multicolour library |
-|
-[Interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
-| Z80 Mode 2 interrupts |
+| [Interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md) | Z80 Mode 2 interrupts |
 
 A complementary series of documents covers the SP1 sprite library, which is
 an excellent basis for Spectrum games written with Z88DK:
