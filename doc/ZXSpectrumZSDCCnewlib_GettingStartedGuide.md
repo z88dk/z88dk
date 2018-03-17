@@ -24,6 +24,8 @@ be read in sequence:
 A complementary series of documents covers the SP1 sprite library, which is
 an excellent basis for Spectrum games written with Z88DK:
 
+| Article         | Covers        |
+| --------------- | ------------- |
 | [SP1, Getting Started](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md) | Getting started with SP1 |
 
 These documents are a work in progress. Comments and suggestions are welcome in
