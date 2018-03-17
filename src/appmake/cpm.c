@@ -79,7 +79,7 @@ int cpm_exec(char *target)
 	if (!strncmp(dformat,"ATTACHE",7)) {
 		//entry_skeleton[12] = 0;
 		format = ATTACHE;
-		blocksize = 1024;
+		blocksize = 2048;
 		phy_block = 1024;
 		phy_block_gap = 5120;		/* A000-8C00 */
 		trackpos = 2;
