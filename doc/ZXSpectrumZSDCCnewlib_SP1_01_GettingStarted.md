@@ -352,8 +352,8 @@ Recall our sprite data, in assembly language:
 ```
 
 The top line of the graphic, at _circle, is preceded by 7 zeroes. In
-this example, _circle is at address 50,000, and address 49,999
-contains a zero. There are in fact 7 zeroes logically above _circle,
+this example, *_circle* is at address 50,000, and address 49,999
+contains a zero. There are in fact 7 zeroes logically above *_circle*,
 so when the sprite is placed in the display, between zero and all 7 of
 those will be copied in above it to get the actual circle graphic in
 the location required.
@@ -364,7 +364,7 @@ screen, it might partially occupy the lower character cell. What data
 should SP1 place into the rest of that lower character cell? Those
 zeroes. It's quicker and easier to just copy those bytes into the
 display than it is to worry about which scan lines the graphic
-actually occupies and which is doesn't.
+actually occupies and which it doesn't.
 
 #### A closer look at the sprites code
 
