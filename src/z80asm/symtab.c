@@ -660,3 +660,22 @@ void write_sym_file(Module *module)
 		get_sym_filename(module->filename),
 		module, cond_module_symbols, "", TRUE);
 }
+
+void check_undefined_symbols(SymbolHash *symtab)
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter))
+	{
+		sym = (Symbol *)iter->value;
+
+		if (sym->scope == SCOPE_PUBLIC && !sym->is_defined) {
+			set_error_null();
+			set_error_file(sym->filename);
+			set_error_line(sym->line_nr);
+			error_not_defined(sym->name);
+		}
+	}
+	set_error_null();
+}
