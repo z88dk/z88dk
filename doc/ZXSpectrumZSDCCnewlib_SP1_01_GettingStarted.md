@@ -384,7 +384,7 @@ memory, overwriting whatever is already there. This is fast and
 simple. There are alternative drawing techniques such as those with
 masks. We'll come to those in due course. The "1" part of the drawing
 function name indicates the function draws each line of the sprite
-from 1 data byte. Masked sprites use 2 bytes (graphic and data). The
+from 1 data byte. Masked sprites use 2 bytes (graphic and mask). The
 "LB" means "left boundary" which says this function knows how to draw
 the left side of the sprite. We don't need to worry too much about
 this given that our sprite is only 1 byte wide. We'll come on to wider
