@@ -1,10 +1,9 @@
-# The Spectrum Programmer's Z88DK Getting Started Guide
+# The ZX Spectrum Programmer's Z88DK Getting Started Guide
 
-The *Spectrum Programmer's Z88DK Getting Started Guide* consists of a series of
-documents written to assist Spectrum developers who want write programs in 'C'
-using the Z88DK development toolset. The reader is expected to know the 'C'
-programming language, but otherwise the series starts from the very
-beginning.
+The *ZX Spectrum Programmer's Z88DK Getting Started Guide* consists of a series
+of documents written to assist Spectrum developers who want write programs in
+'C' using the Z88DK development toolset. The reader is expected to know the 'C'
+programming language, but otherwise the series starts from the very beginning.
 
 The articles lean towards Spectrum games development, and they are designed to
 be read in sequence:
