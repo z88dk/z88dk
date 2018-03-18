@@ -53,7 +53,9 @@
         out (__IO_ACIA_DATA_REGISTER), a   ; output the Tx byte to the ACIA
 
         inc l                       ; move the Tx pointer low byte along, 0xnF rollover
+        ld a, l
         and __IO_ACIA_TX_SIZE-1
+        ld l, a
         ld (aciaTxOut), hl          ; write where the next byte should be popped
 
         ld hl, aciaTxCount
