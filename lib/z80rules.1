@@ -2915,12 +2915,3 @@
 	pop	hl
 	push	hl
 	ld	h,0
-
-	ld	de,0	;const
-	call	l_eq
-=
-	ld	a,h
-	or	l
-	ld	hl,0
-	jr	nz,ASMPC+3
-	inc	hl
