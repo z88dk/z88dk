@@ -42,9 +42,6 @@
         ld hl, (aciaTxIn)           ; get the pointer to where we poke
         ld (hl), a                  ; write the Tx byte to the aciaTxIn
 
-        ld hl, (aciaTxIn)           ; get the pointer to where we poke
-        ld (hl), a                  ; write the Tx byte to the aciaTxIn
-
         inc l                       ; move the Tx pointer low byte along, 0xnF rollover
         ld a, l
         and __IO_ACIA_TX_SIZE-1
