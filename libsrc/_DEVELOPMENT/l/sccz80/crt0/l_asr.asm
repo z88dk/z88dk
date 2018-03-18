@@ -10,12 +10,14 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_asr
+PUBLIC l_asr_hl_by_e
 
 EXTERN l_asr_hl
 
 l_asr:
 
-   ld a,l
    ex de,hl
+l_asr_hl_by_e:
+   ld a,e
    
    jp l_asr_hl

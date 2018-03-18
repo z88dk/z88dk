@@ -8,9 +8,11 @@
 
                 SECTION   code_crt0_sccz80
                 PUBLIC    l_asr_u
+		PUBLIC    l_asr_u_hl_by_e
 
 .l_asr_u
         ex      de,hl
+.l_asr_u_hl_by_e
 .l_asr_u_1
         dec     e
         ret     m

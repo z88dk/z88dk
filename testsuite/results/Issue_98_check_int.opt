@@ -67,6 +67,10 @@
 	pop	hl
 	push	hl
 	push	bc
+	bit	7,h
+	jr	z,i_2
+	inc	hl
+.i_2
 	sra	h
 	rr	l
 	ret

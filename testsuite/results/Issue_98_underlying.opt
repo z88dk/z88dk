@@ -86,6 +86,10 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
+	bit	7,d
+	jr	z,i_2
+	call	l_inclong
+.i_2
 	sra	d
 	rr	e
 	rr	h
