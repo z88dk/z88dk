@@ -114,6 +114,15 @@ void warn_expr_in_parens(void)
 	
 	STR_DELETE(msg);
 }
+void error_redefined_macro(char *name)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "macro '%s' redefined", name );
+	do_error( ErrError, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_syntax(void)
 {
 	STR_DEFINE(msg, STR_SIZE);

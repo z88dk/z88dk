@@ -18,12 +18,13 @@ require './t/test_utils.pl';
 my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o expr.o ".
 		   "lib/str.o lib/strhash.o lib/fileutil.o ".
-		   "lib/srcfile.o lib/class.o ".
+		   "lib/srcfile.o macros.o lib/class.o ".
 		   "lib/list.o lib/array.o lib/dbg.o ../../ext/UNIXem/src/glob.o";
 		   
 my $init = <<'END';
 #include "scan.h"
 #include "symbol.h"
+#include "macros.h"
 #include <assert.h>
 
 char *GetLibfile( char *filename ) {return NULL;}
@@ -156,7 +157,7 @@ t_compile_module($init, <<'END', $objs);
 	char string[MAXLINE];
 	char opcode_lcase[MAXLINE];
 	
-
+	init_macros();
 	SetTemporaryLine("");
 	T_END();
 
@@ -908,6 +909,8 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IX, "ix");
 	T_END();
 
+	free_macros();
+	
 	return 0;
 	
 END

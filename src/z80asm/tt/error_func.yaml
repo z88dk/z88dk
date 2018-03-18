@@ -73,6 +73,12 @@ errors:
     args	: void
     message	: '"interpreting indirect value as immediate"'
 	
+  # Macros
+  - type	: ErrError
+    func	: error_redefined_macro
+    args	: 'char *name'
+    message	: "\"macro '%s' redefined\", name"
+	
   # Assembly errors
   - type	: ErrError
     func	: error_syntax
