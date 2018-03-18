@@ -52,10 +52,13 @@
         ld a, (hl)                  ; get the Tx byte
         out (__IO_ACIA_DATA_REGISTER), a   ; output the Tx byte to the ACIA
 
-        inc l                       ; move the Tx pointer low byte along, 0xnF rollover
-        ld a, l
-        and __IO_ACIA_TX_SIZE-1
-        ld l, a
+        ld a,l                      ; check if Tx pointer is at the end of its range
+        cp +(aciaTxBuffer + __IO_ACIA_TX_SIZE - 1) & 0xff
+        jr z, resetTxBuffer         ; if at end of range, reset Tx pointer to start of Tx buffer
+        inc hl                      ; else advance to next byte in Tx buffer
+
+    tx_buffer_adjusted:
+    
         ld (aciaTxOut), hl          ; write where the next byte should be popped
 
         ld hl, aciaTxCount
@@ -86,6 +89,10 @@
         
         ei
         reti
+
+    resetTxBuffer:
+        ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
+        jp tx_buffer_adjusted
 
     EXTERN _acia_need
     defc NEED = _acia_need
