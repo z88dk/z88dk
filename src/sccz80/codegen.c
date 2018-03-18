@@ -1489,6 +1489,28 @@ void zdiv(LVALUE* lval)
     }
 }
 
+static void add_if_negative(LVALUE *lval, int32_t toadd) 
+{
+    int label;
+
+    if ( utype(lval) )
+        return;
+    label = getlabel();
+    if ( lval->val_type == KIND_LONG ) {
+        ol("bit\t7,d");
+        ot("jr\tz,");
+        printlabel(label);
+        nl();     
+    } else {
+        ol("bit\t7,h");
+        ot("jr\tz,");
+        printlabel(label);
+        nl();  
+    }
+    zadd_const(lval,toadd);
+    postlabel(label);
+}
+
 void zdiv_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG && utype(lval) ) {
@@ -1520,14 +1542,38 @@ void zdiv_const(LVALUE *lval, int32_t value)
         case 1:
             break;
         case 2:
+            add_if_negative(lval, 1);
             asr_const(lval,1);
             break;
         case 4:
+            add_if_negative(lval, 3);
             asr_const(lval,2);
             break;
         case 8:
+            add_if_negative(lval, 7);
             asr_const(lval,3);
             break;
+        case 16:
+            add_if_negative(lval, 15);
+            asr_const(lval,4);
+            break;   
+        case 32:
+            add_if_negative(lval, 31);
+            asr_const(lval,5);
+            break; 
+        case 64:
+            add_if_negative(lval, 63);
+            asr_const(lval,6);
+            break; 
+        case 128:
+            add_if_negative(lval, 127);
+            asr_const(lval,7);
+            break; 
+        case 256:
+            /* Unsigned is dealt with above */
+            add_if_negative(lval, 255);
+            asr_const(lval,8);
+            break; 
         default:
             if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
                 lpush();
@@ -1941,11 +1987,21 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( value == 8 && utype(lval) )  {
-            ol("ld\tl,h"); /* 5 bytes, 4 + 4 + 4 +7 = 19T */
-            ol("ld\th,e");
-            ol("ld\te,d");
-            ol("ld\td,0");
+        } else if ( value == 8 ) {
+            if ( utype(lval) ) {  /* 5 bytes, 4 + 4 + 4 +7 = 19T */            
+                ol("ld\tl,h");
+                ol("ld\th,e");
+                ol("ld\te,d");
+                ol("ld\td,0");
+            } else {   /* 9 bytes, 28T */
+                ol("ld\tl,h");
+                ol("ld\th,e");
+                ol("ld\te,d");   
+                ol("ld\ta,d");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");  
+            }
         } else if ( value == 9 && utype(lval) ) {
             ol("ld\tl,h");  /* 11 bytes, 4+ 4 +4 +7 + 8 +8 + 8 = 43T */
             ol("ld\th,e");
@@ -1978,9 +2034,18 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("adc\thl,hl");
             ol("ld\tde,0");
             ol("rl\te");
-        } else if ( value == 16 && utype(lval)) {
-            ol("ex\tde,hl"); /* 4 bytes 14T */
-            ol("ld\tde,0");
+        } else if ( value == 16 ) {
+            if ( utype(lval)) {
+                ol("ex\tde,hl"); /* 4 bytes 14T */
+                ol("ld\tde,0");
+            } else {
+                ol("ex\tde,hl"); /* 6 bytes 20T */
+                ol("ld\ta,h");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");  
+                ol("ld\te,a");  
+            }
         } else if ( value == 17 && utype(lval)) {
             ol("srl\td"); /* 8 bytes 30T */
             ol("rr\te");
@@ -2011,10 +2076,20 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\th,0");
             ol("rl\th");
             ol("ld\tde,0");
-        } else if ( value == 24 && utype(lval)) {
-            ol("ld\tl,d"); /* 6 bytes , 21T */
-            ol("ld\th,0");
-            ol("ld\tde,0");
+        } else if ( value == 24 ) {
+            if ( utype(lval) ) {
+                ol("ld\tl,d"); /* 6 bytes , 21T */
+                ol("ld\th,0");
+                ol("ld\tde,0");
+            } else {
+                ol("ld\tl,d"); /* 7 bytes , 28T */
+                ol("ld\ta,d");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");  
+                ol("ld\te,a");  
+                ol("ld\th,a");  
+            }
         } else if ( value == 25 && utype(lval)) {
             ol("ld\tl,d"); /* 8 bytes, 29T */
             ol("srl\tl");
@@ -2061,17 +2136,30 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sra\th");
             }
             ol("rr\tl");
-        } else if ( value == 8 && utype(lval) ) { /* 3 bytes, 11T */
-            ol("ld\tl,h");
-            ol("ld\th,0");
+        } else if ( value == 8 ) {
+            if ( utype(lval) ) { /* 3 bytes, 11T */
+                ol("ld\tl,h");  
+                ol("ld\th,0");  
+            } else { /* 5 bytes, 20 T */
+                ol("ld\tl,h");
+                ol("ld\ta,h");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\th,a");
+            }
         } else if ( value == 15 && utype(lval) ) {
             ol("rl\th");   /* 7 bytes, 26T */
             vconst(0);
             ol("rl\tl");
+        } else if ( value == 2 ) { /* 8 bytes, 32T */
+            asr_const(lval, 1);
+            asr_const(lval, 1);
         } else if ( value != 0 ) {
-            const2(value);
-            swap();
-            asr(lval);
+            const2(value);  /* 6 bytes */
+            if ( utype(lval))
+                callrts("l_asr_u_hl_by_e");
+            else
+                callrts("l_asr_hl_by_e");
         }
     }
 }
