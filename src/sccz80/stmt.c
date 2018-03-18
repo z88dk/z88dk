@@ -23,6 +23,7 @@ static void     dodefault(void);
 static void     doreturn(char);
 static void     dobreak(void);
 static void     docont(void);
+static void     dostaticassert(void);
 
 /*
  *      Some variables for goto and cleaning up after compound 
@@ -183,7 +184,10 @@ int statement()
             }
             break;
         case '_':
-            if (match("__critical")) {
+            if (match("_Static_assert")) {
+                dostaticassert();
+                st = STASSERT;
+            } else if (match("__critical")) {
                 docritical();
                 st = STCRITICAL;
             }
@@ -247,7 +251,6 @@ void compound()
  *    to combine C and asm compactly and efficiently requires
  *     this sort of extension (much like return_c/_nc
  */
-
 void doiferror()
 {
     int flab1, flab2;
@@ -591,7 +594,7 @@ void leave(int vartype, char type, int incritical)
 {
     int savesp;
     int save = vartype;
-    int callee_cleanup = (c_compact_code || currfn->ctype->flags & CALLEE) && (stackargs > 2);
+    int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
     int hlsaved;
 
     if ( (currfn->flags & NAKED) == NAKED ) {
@@ -601,7 +604,7 @@ void leave(int vartype, char type, int incritical)
     if (vartype == KIND_CPTR) /* they are the same in any case! */
         vartype = KIND_LONG;
     else if ( vartype == KIND_DOUBLE ) {
-        vartype = NO;
+        vartype = KIND_NONE;
         save = NO;
     }
 
@@ -617,7 +620,7 @@ void leave(int vartype, char type, int incritical)
 
     if (callee_cleanup) {
         int save = vartype;
-        if ( vartype  ) {
+        if ( vartype != KIND_NONE ) {
             save = NO;
             if ( c_notaltreg ) {
                 if ( vartype == KIND_LONG )
@@ -767,6 +770,19 @@ void doasm()
     cmode = 1; /* then back to parse level */
 }
 
+static void set_section(char **dest_section) 
+{
+    char sname[NAMESIZE];
+
+    if (symname(sname) == 0) {
+        illname(sname);
+        clear();
+        return;
+    }
+
+    *dest_section = STRDUP(sname);
+}
+
 /* #pragma statement */
 void dopragma()
 {
@@ -779,8 +795,42 @@ void dopragma()
         delmac();
     else if (amatch("unset"))
         delmac();
+    else if (amatch("codeseg"))
+        set_section(&c_code_section);
+    else if (amatch("constseg"))
+        set_section(&c_rodata_section);
+    else if (amatch("dataseg"))
+        set_section(&c_data_section);
+    else if (amatch("bssseg"))
+        set_section(&c_bss_section);
+    else if (amatch("initseg"))
+        set_section(&c_init_section);
     else {
         warningfmt("unknown-pragmas","Unknown #pragma directive");
         clear();
     }
+}
+
+static void dostaticassert() 
+{
+    Kind   valtype;
+    double val;
+    double global_start;
+    char   *before, *start;
+
+    needchar('(');
+    setstage(&before, &start);
+    if (constexpr(&val,&valtype, 1) == 0) {
+        val = 0;
+    }
+    needchar(',');
+    qstr(&global_start);
+    needchar(')');
+    if ( val == 0 ) {
+        errorfmt("_Static_assert failed: '%s'",1,&glbq[(int)global_start]);
+    }
+    // Restore literal queue
+    gltptr = global_start;
+    clearstage(before, NULL);
+
 }

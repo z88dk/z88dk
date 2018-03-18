@@ -29,6 +29,11 @@
 
 #define CMD_GETTIME       30    /*< Get unix time (ret=dehl = 32 bit seconds)  */
 
+#define CMD_IDE_SELECT 40   /**< Select unit (l) */
+#define CMD_IDE_ID     41   /**< Get number of logical blocks -> dehl  */
+#define CMD_IDE_READ   42   /**< Read bchl=lba to de=address */
+#define CMD_IDE_WRITE  43   /**< Write bchl=lba from de=address */
+
 #define CMD_DBG       255  /**< Debugger build */
 
 #endif

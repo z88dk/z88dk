@@ -728,23 +728,18 @@ void sw(char type)
         callrts("l_case");
 }
 
-/* Call a shared library routine FIXME!!!!
- * Dunno which one myself and Garry are gonna hijack yet!
- */
-
-void zclibcallop()
-{
-    ol("rst\t8");
-    defword();
-}
-
-
 
 /* Output the call op code */
 
 void zcallop(void)
 {
     ot("call\t");
+}
+
+void zshortcall(int rst, int value) 
+{
+    outfmt("\trst\t%d\n",rst);
+    outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
 }
 
 /* djm (move this!) Decide whether to print a prefix or not 
@@ -779,16 +774,33 @@ void zret(void)
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
  */
-void callstk(Type *type, int n)
+void callstk(Type *type, int n, int isfarptr)
 {
-    if (n == 2) {
-        /* At this point, TOS = function, hl = argument */
-        swapstk();
-    }
-    
-    if ( type->hasva )
+    if ( isfarptr ) {
+        // The function address is on the stack at +n
+        if ( n > 0 ) {
+            outfmt("\tld\thl,%d\n",n);
+            ol("add\thl,de");
+            ol("ld\te,(hl)");
+            ol("inc\thl");
+            ol("ld\td,(hl)");
+            ol("inc\thl");
+            ol("ld\tl,(hl)");
+            ol("ex\tde,hl");
+        }
         loadargc(n);
-    callrts("l_jphl");
+        callrts("l_farcall");
+    } else {
+        if (n == 2) {
+            /* At this point, TOS = function, hl = argument */
+            swapstk();
+        }
+        
+        if ( type->funcattrs.hasva ) 
+            loadargc(n);
+
+        callrts("l_jphl");
+    }
 }
 
 void jump0(LVALUE* lval, int label)

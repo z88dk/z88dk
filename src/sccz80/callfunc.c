@@ -25,7 +25,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst);
  *      zero, will call the contents of HL
  */
 
-void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
+void callfunction(SYMBOL *ptr, Type *fnptr_type)
 {
     int isscanf = 0;
     uint32_t format_option = 0;
@@ -44,7 +44,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     int   savesp;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
-    Type   *functype = ptr ? ptr->ctype: fnptr_call_type;
+    Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
     
     if ( functype->kind != KIND_FUNC ) {
         warningfmt("incompatible-pointer-types","Calling via non-function pointer");
@@ -98,12 +98,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
     Zsp = savesp;
 
     //  if ( ptr == NULL ) ptr = fnptr;
-    if ( functype->oldstyle == 0 && functype->hasva == 0 && array_len(functype->parameters) < argnumber  ) {
+    if ( functype->funcattrs.oldstyle == 0 && functype->funcattrs.hasva == 0 && array_len(functype->parameters) < argnumber  ) {
         errorfmt("Too many arguments to call to function '%s'", 1, functype->name);
     }
 
-    if ( functype->oldstyle == 0 && array_len(functype->parameters) > argnumber ) {
-        if ( !(functype->hasva && argnumber == array_len(functype->parameters) -1) ) 
+    if ( functype->funcattrs.oldstyle == 0 && array_len(functype->parameters) > argnumber ) {
+        if ( !(functype->funcattrs.hasva && argnumber == array_len(functype->parameters) -1) ) 
             errorfmt("Too few arguments to call to function '%s'", 1, functype->name);
     }
 
@@ -175,7 +175,15 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
 
-        if ( function_pointer_call ) zpush(); // Save function address
+        if ( function_pointer_call ) {
+            if ( fnptr_type->kind == KIND_CPTR ) {
+                if ( argnumber == 1 )  {
+                    lpush();
+                }
+            } else {
+                zpush(); // Save function address
+            }
+        }
         /* ordinary call */
         expr = expression(&vconst, &val, &type);
         if (expr == KIND_CARRY) {
@@ -183,7 +191,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
             expr = KIND_INT;
             type = type_int;
         }
-        if ( functype->oldstyle == 0 && argnumber <= array_len(functype->parameters)) {       
+        if ( functype->funcattrs.oldstyle == 0 && argnumber <= array_len(functype->parameters)) {       
             int proto_argnumber;
             Type *prototype;
             if ( (functype->flags & SMALLC) == SMALLC)  {
@@ -211,8 +219,13 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
                 if (ptr)
                     debug(DBG_ARG1, "Caughtarg!! %s", litq + (int)val + 1);
                 minifunc = SetMiniFunc(litq + (int)val + 1, &format_option);
+                if (isscanf) {
+                    scanf_format_option |= format_option;
+                } else {
+                    printf_format_option |= format_option;
+                }
             }
-            if ( function_pointer_call == 0 ) {
+            if ( function_pointer_call == 0 || ( fnptr_type->kind == KIND_CPTR ) ) {
                 if (expr == KIND_DOUBLE) {
                     dpush();
                     nargs += 6;
@@ -256,7 +269,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
 
     if (function_pointer_call == NO ) {
         /* Check to see if we have a variable number of arguments */
-        if ( functype->hasva ) {
+        if ( functype->funcattrs.hasva ) {
             if ( (functype->flags & SMALLC) == SMALLC ) {
                 loadargc(nargs);
             }
@@ -274,44 +287,27 @@ void callfunction(SYMBOL *ptr, Type *fnptr_call_type)
         } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
-        } else if (watcharg || (functype->flags & (SHARED|SHAREDC)) ) {
-            if ((functype->flags & (SHARED|SHAREDC) ) )
-                preserve = YES;
-            if (functype->flags & SHAREDC)
-                zclibcallop();
-            else
-                zcallop();
-            if (isscanf) {
-                scanf_format_option |= format_option;
-            } else {
-                printf_format_option |= format_option;
-            }
-            outname(funcname, dopref(ptr));
-            if ((functype->flags & SHARED) && c_useshared)
-                outstr("_sl");
-            else if (functype->flags & SHAREDC)
-                outstr("_rst");
-            nl();
+        } else if ( functype->flags & SHORTCALL ) {
+            zshortcall(functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
         } else {
             zcallop();
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs);
+        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR);
     }
-    /*
-     *        Modify the stack after a function call
-     *
-     *        We should modify stack if:
-     *        - __CALLEE__ isn't set
-     *        - Function is __LIB__ even if c_compact_code is set
-     *        - c_compact_code isn't set and __CALLEE__ isn't set
-     */
 
-    if ((functype->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((functype->flags & LIBRARY) == 0))) {
+    if (functype->flags & CALLEE ) {
         Zsp += nargs;
+        // IF we called a far pointer and we had arguments, pop the address off the stack
+        if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
+            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE, preserve); 
+        }
     } else {
         /* If we have a frame pointer then ix holds it */
+        if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
+            nargs += 4;
+        }
 #ifdef USEFRAME
         if (c_framepointer_is_ix != -1) {
             if (nargs)

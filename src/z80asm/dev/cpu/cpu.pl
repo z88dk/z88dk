@@ -569,7 +569,7 @@ for my $cpu (@CPUS) {
 		}
 
 		add_opc($cpu, "push %M",	 	0xED, 0x8A, '%M', '%M');
-		add_opc($cpu, "popx",		 	0xED, 0x8B);
+		add_opc($cpu, "pop x",		 	0xED, 0x8B);
 
 		add_opc($cpu, "outinb",			0xED, 0x90);
 		

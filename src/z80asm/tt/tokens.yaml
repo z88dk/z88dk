@@ -199,6 +199,7 @@ tokens:
   - name    : IYH
   - name    : IXL
   - name    : IYL
+  - name    : X
   
   # 16-bit registers
   - name    : BC
@@ -388,7 +389,6 @@ tokens:
   - name    : FILL
   - name    : FILLDE
   - name    : MIRROR
-  - name    : POPX
   - name    : NEXTREG
   - name    : PIXELDN
   - name    : PIXELAD
@@ -407,7 +407,15 @@ tokens:
   - name    : CU_MOVE
   - name    : CU_STOP
   - name    : CU_NOP
-
+  - name    : DMA_WR0
+  - name    : DMA_WR1
+  - name    : DMA_WR2
+  - name    : DMA_WR3
+  - name    : DMA_WR4
+  - name    : DMA_WR5
+  - name    : DMA_WR6
+  - name    : DMA_CMD
+  
   # Z180 specific opcodes
   - name    : SLP 
   - name    : MLT 

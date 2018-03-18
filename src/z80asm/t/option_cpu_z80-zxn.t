@@ -80,8 +80,8 @@ add("push 1",			0xED, 0x8A, 0x00, 0x01);
 add("push 256",			0xED, 0x8A, 0x01, 0x00);
 add("push 32767",		0xED, 0x8A, 0x7F, 0xFF);
 
-# 4T*    popx              ED 8B           pop value and discard
-add("popx",				0xED, 0x8B);
+# 4T*    pop x             ED 8B           pop value and discard
+add("pop x",			0xED, 0x8B);
 
 # ** reg,val are both 8-bit numbers
 # 12T*   nextreg reg,val   ED 91 reg,val   Set a NEXT register (like doing out($243b),reg then out($253b),val

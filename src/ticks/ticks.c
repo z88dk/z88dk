@@ -666,6 +666,8 @@ int main (int argc, char **argv){
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
     printf("  -mz80-zxn      Emulate a Spectrum Next Z80\n"),
     printf("  -x <file>      Symbol file to read\n"),
+    printf("  -ide0 <file>   Set file to be ide device 0\n"),
+    printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
@@ -687,7 +689,13 @@ int main (int argc, char **argv){
           end= strtol(argv[1], NULL, 16);
           break;
         case 'i':
-          intr= strtol(argv[1], NULL, 10);
+          if ( strcmp(&argv[0][1], "ide0") == 0 ) {
+            hook_io_set_ide_device(0, argv[1]);
+          } else if ( strcmp(&argv[0][1], "ide1") == 0 ) {
+            hook_io_set_ide_device(1, argv[1]);
+          } else {
+            intr= strtol(argv[1], NULL, 10);
+          }
           break;
         case 'c':
           sscanf(argv[1], "%llu", &counter);

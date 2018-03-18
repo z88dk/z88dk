@@ -12,6 +12,7 @@ Assembly directives.
 #pragma once
 
 #include "str.h"
+#include "utarray.h"
 
 struct Expr;
 
@@ -87,3 +88,6 @@ extern void asm_DEFQ(struct Expr *expr);
 
 /* align directive */
 extern void asm_ALIGN(int align, int filler);
+
+/* Z80 DMA commands */
+extern void asm_DMA_command(int cmd, UT_array *exprs);	// stack of exprs, top is last

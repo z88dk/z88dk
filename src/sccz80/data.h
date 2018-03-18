@@ -32,7 +32,6 @@ extern int c_doinline;
 extern int ncomp;
 extern int stackargs;
 extern char c_default_unsigned;
-extern char c_compact_code;
 extern int nxtlab;
 extern int glblab;
 extern int litlab;
@@ -55,7 +54,6 @@ extern FILE *inpt2;
 extern FILE *saveout;
 extern SYMBOL *currfn;
 
-extern int c_share_offset;
 extern int debuglevel;
 extern int c_assembler_type;
 extern int c_framepointer_is_ix;

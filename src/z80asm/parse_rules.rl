@@ -396,6 +396,38 @@ Define rules for a ragel-based parser.
 	asm_Z88DK = asm_CALL_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
 
 	/*---------------------------------------------------------------------
+	*   ZXN DMA
+	*--------------------------------------------------------------------*/
+#define DEFINE_DMA_WR(N, TOKEN)												\
+			label? TOKEN expr ( _TK_COMMA expr )* _TK_NEWLINE @{			\
+				DO_STMT_LABEL(); 											\
+				asm_DMA_command(N, ctx->exprs);								\
+			}																\
+		|	label? TOKEN expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE @{ 	\
+				DO_STMT_LABEL(); 											\
+				ctx->dma_cmd = N;											\
+				ctx->current_sm = SM_DMA_PARAMS;							\
+			}
+
+	asm_DMA =	DEFINE_DMA_WR(0, _TK_DMA_WR0)
+			|	DEFINE_DMA_WR(1, _TK_DMA_WR1)
+			|	DEFINE_DMA_WR(2, _TK_DMA_WR2)
+			|	DEFINE_DMA_WR(3, _TK_DMA_WR3)
+			|	DEFINE_DMA_WR(4, _TK_DMA_WR4)
+			|	DEFINE_DMA_WR(5, _TK_DMA_WR5)
+			|	DEFINE_DMA_WR(6, _TK_DMA_WR6)
+			|	DEFINE_DMA_WR(6, _TK_DMA_CMD)
+			;
+
+	dma_params := 
+			expr ( _TK_COMMA expr )* _TK_NEWLINE @{ 
+				asm_DMA_command(ctx->dma_cmd, ctx->exprs);
+				ctx->current_sm = SM_MAIN;
+			}
+		|	expr ( _TK_COMMA expr )* _TK_COMMA _TK_NEWLINE
+		;
+	
+	/*---------------------------------------------------------------------
 	*   assembly statement
 	*--------------------------------------------------------------------*/
 	main := 
@@ -408,6 +440,7 @@ Define rules for a ragel-based parser.
 		| asm_DEFGROUP
 		| asm_DEFVARS
 		| asm_conditional
+		| asm_DMA
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
@@ -556,6 +589,10 @@ static int get_start_state(ParseCtx *ctx)
 	case SM_DEFGROUP_LINE:
 		scan_expect_operands();
 		return parser_en_defgroup_line;
+
+	case SM_DMA_PARAMS:
+		scan_expect_operands();
+		return parser_en_dma_params;
 
 	default:
 		assert(0);
