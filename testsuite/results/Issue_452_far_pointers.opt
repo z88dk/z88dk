@@ -66,9 +66,12 @@
 	ld	hl,0	;const
 	add	hl,sp
 	call	l_getptr
-	call	l_inclong
-	call	l_inclong
-	call	l_inclong
+	ld	bc,3
+	add	hl,bc
+	ex	de,hl
+	ld	c,0
+	adc	hl,bc
+	ex	de,hl
 	call	lp_gchar
 	call	l_sxt
 	inc	sp
@@ -135,7 +138,7 @@
 	ld	bc,12
 	add	hl,bc
 	ex	de,hl
-	ld	bc,0
+	ld	c,0
 	adc	hl,bc
 	ex	de,hl
 	push	de

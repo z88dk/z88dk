@@ -1364,32 +1364,40 @@ void zadd_const(LVALUE *lval, int32_t value)
 {
     switch (value) {
     case -3:
-        dec(lval);
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
+        dec(lval);  
     case -2:
-        dec(lval);
+        dec(lval); 
     case -1:
-        dec(lval);
+        dec(lval); // (long) = 3 bytes = (17 + 4 + 4 + 6 + 5 + 6 + 10) = 53T (worst), 38T best
+        return;
     case 0:
-        break;
+        return;
     case 3:
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
         inc(lval);
     case 2:
-        inc(lval);
+        inc(lval); // (long) = 66T best (6 bytes) vs 51T (10 bytes)
     case 1:
-        inc(lval);
-        break;
-    default:
-        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
-            // 11 bytes, 54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
-            constbc(((uint32_t)value) % 65536);   // 3, 10
-            ol("add\thl,bc");                     // 1, 11
-            ol("ex\tde,hl");                      // 1, 4
-            constbc(((uint32_t)value) / 65536);   // 3, 10
-            ol("adc\thl,bc");                     // 2, 15
-            ol("ex\tde,hl");                      // 1, 4
+        inc(lval);  // (int) =1, 6T, (ling) = 3 + (17 + 4 + 5 + 4 + 5 + 6) + 10 = 51T worst case  (17 + 4 + 11 = 33T = best)
+        return;
+    }
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+        // 10/11 bytes, 51/54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
+        constbc(((uint32_t)value) % 65536);   // 3, 10
+        ol("add\thl,bc");                     // 1, 11
+        ol("ex\tde,hl");                      // 1, 4
+        if ( value >= 0 && value < 256 ) {
+            ol("ld\tc,0");                    // 2, 7
         } else {
-            addbchl(value);
+            constbc(((uint32_t)value) / 65536);   // 3, 10
         }
+        ol("adc\thl,bc");                     // 2, 15
+        ol("ex\tde,hl");                      // 1, 4
+    } else {
+        addbchl(value);
     }
 }
 
