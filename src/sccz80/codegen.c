@@ -1360,6 +1360,35 @@ void zadd(LVALUE* lval)
 }
 
 
+static int add_to_high_word(int32_t value) 
+{
+    int16_t    delta = value >> 16;
+
+    switch ( delta ) {
+    case -4:   // 4, 24
+        ol("dec\tde");
+    case -3:
+        ol("dec\tde");
+    case -2:
+        ol("dec\tde");
+    case -1:
+        ol("dec\tde");
+        break;
+    case 4:
+        ol("inc\tde");
+    case 3:
+        ol("inc\tde");
+    case 2:
+        ol("inc\tde");
+    case 1:
+        ol("inc\tde");
+        break;
+    default:
+        return 0;
+    }
+    return 1; // Handled it
+}
+
 void zadd_const(LVALUE *lval, int32_t value)
 {
     switch (value) {
@@ -1368,8 +1397,21 @@ void zadd_const(LVALUE *lval, int32_t value)
             break;
         dec(lval);  
     case -2:
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
         dec(lval); 
     case -1:
+      if ( c_size_optimisation & OPT_SUB32 ) {
+            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+                // 6 bytes, 27T (best), 28T (worst)
+                ol("ld\ta,h");    // 1, 4
+                ol("or\tl");      // 1, 4
+                ol("dec\thl");    // 1, 6    
+                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                ol("dec\tde");    // 1, 6
+                return;
+            }
+        }
         dec(lval); // (long) = 3 bytes = (17 + 4 + 4 + 6 + 5 + 6 + 10) = 53T (worst), 38T best
         return;
     case 0:
@@ -1379,23 +1421,57 @@ void zadd_const(LVALUE *lval, int32_t value)
             break;
         inc(lval);
     case 2:
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
         inc(lval); // (long) = 66T best (6 bytes) vs 51T (10 bytes)
     case 1:
-        inc(lval);  // (int) =1, 6T, (ling) = 3 + (17 + 4 + 5 + 4 + 5 + 6) + 10 = 51T worst case  (17 + 4 + 11 = 33T = best)
+        if ( c_size_optimisation & OPT_ADD32 ) {
+            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+                // 6 bytes, 27T (best), 28T (worst)
+                ol("inc\thl");    // 1, 6    
+                ol("ld\ta,h");    // 1, 4
+                ol("or\tl");      // 1, 4
+                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                ol("inc\tde");    // 1, 6
+                return;
+            }
+        }
+        inc(lval);  // (int) =1, 6T, (ling) = 3 + (17 + 4 + 5 + 4 + 5 + 6 + 10) = 51T worst case  (17 + 4 + 11 = 33T = best)
         return;
     }
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+        uint32_t highword = ((uint32_t)value) / 65536;
+        if ( (value % 65536) == 0 ) {
+            if ( add_to_high_word(value) == 0 ) {
+                swap();         // 1, 4
+                addbchl(((uint32_t)value) / 65536); // 4, 21
+                swap();         // 4
+            }
+            return;
+        }
+
         // 10/11 bytes, 51/54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
+        // If < 65536 - 7 bytes, 33T (best), 34T (worst)
         constbc(((uint32_t)value) % 65536);   // 3, 10
         ol("add\thl,bc");                     // 1, 11
-        ol("ex\tde,hl");                      // 1, 4
-        if ( value >= 0 && value < 256 ) {
-            ol("ld\tc,0");                    // 2, 7
+        if ( value >= 0 && value < 65536 ) {
+            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            ol("inc\tde");                    // 1, 6
+        } else if ( highword <= 4 ) {
+            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            ol("inc\tde");                    // 1, 6
+	        add_to_high_word(value);          // it will be < 7 bytes, 33T
+        } else if ( highword >= 65532 && highword <= 65535  ) {
+            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            ol("inc\tde");                    // 1, 6
+	        add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
+            ol("ex\tde,hl");                      // 1, 4
             constbc(((uint32_t)value) / 65536);   // 3, 10
+            ol("adc\thl,bc");                     // 2, 15
+            ol("ex\tde,hl");                      // 1, 4
         }
-        ol("adc\thl,bc");                     // 2, 15
-        ol("ex\tde,hl");                      // 1, 4
+
     } else {
         addbchl(value);
     }

@@ -73,10 +73,8 @@
 	call	l_glong
 	ld	bc,10
 	add	hl,bc
-	ex	de,hl
-	ld	c,0
-	adc	hl,bc
-	ex	de,hl
+	jr	nc,ASMPC+3
+	inc	de
 	ret
 
 
@@ -87,10 +85,9 @@
 	call	l_glong
 	ld	bc,65516
 	add	hl,bc
-	ex	de,hl
-	ld	bc,65535
-	adc	hl,bc
-	ex	de,hl
+	jr	nc,ASMPC+3
+	inc	de
+	dec	de
 	push	de
 	push	hl
 	ld	hl,6	;const
@@ -98,10 +95,9 @@
 	call	l_glong
 	ld	bc,15536
 	add	hl,bc
-	ex	de,hl
-	ld	bc,65535
-	adc	hl,bc
-	ex	de,hl
+	jr	nc,ASMPC+3
+	inc	de
+	dec	de
 	pop	bc
 	pop	bc
 	ret
@@ -114,10 +110,9 @@
 	call	l_glong
 	ld	bc,65516
 	add	hl,bc
-	ex	de,hl
-	ld	bc,65535
-	adc	hl,bc
-	ex	de,hl
+	jr	nc,ASMPC+3
+	inc	de
+	dec	de
 	push	de
 	push	hl
 	ld	hl,6	;const
@@ -125,10 +120,9 @@
 	call	l_glong
 	ld	bc,15536
 	add	hl,bc
-	ex	de,hl
-	ld	bc,65535
-	adc	hl,bc
-	ex	de,hl
+	jr	nc,ASMPC+3
+	inc	de
+	dec	de
 	pop	bc
 	pop	bc
 	ret
