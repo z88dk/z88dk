@@ -14,7 +14,7 @@
         SECTION   code_clib
         PUBLIC    cpc_SetColour_callee
         PUBLIC    _cpc_SetColour_callee
-        PUBLIC    ASMDISP_CPC_SETCOLOUR_CALLEE
+        PUBLIC    ASMDISP_CPC_SET_COLOUR_CALLEE
 
 .cpc_SetColour_callee
 ._cpc_SetColour_callee

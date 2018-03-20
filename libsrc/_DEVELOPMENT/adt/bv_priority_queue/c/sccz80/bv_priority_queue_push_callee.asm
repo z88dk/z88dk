@@ -18,7 +18,7 @@ bv_priority_queue_push_callee:
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _bv_priority_queue_push
+PUBLIC _bv_priority_queue_push_callee
 defc _bv_priority_queue_push_callee = bv_priority_queue_push_callee
 ENDIF
 

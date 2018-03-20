@@ -20,6 +20,7 @@ EXTERN am48_dcmp
    ;
    ; uses  : AF, BC, DE, HL
 
+am48_dcmp_s:
    pop af
    
    pop hl                      ; AC = x

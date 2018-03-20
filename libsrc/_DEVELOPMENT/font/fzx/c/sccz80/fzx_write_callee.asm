@@ -9,6 +9,7 @@ PUBLIC fzx_write_callee, fzx0_write_callee
 EXTERN l_neg_hl, asm_fzx_write
 
 fzx_write_callee:
+fzx0_write_callee:
 
    pop af
    pop bc

@@ -8,7 +8,7 @@ PUBLIC _dup2_callee
 
 EXTERN asm_dup2
 
-_dup2:
+_dup2_callee:
 
    pop af
    pop hl

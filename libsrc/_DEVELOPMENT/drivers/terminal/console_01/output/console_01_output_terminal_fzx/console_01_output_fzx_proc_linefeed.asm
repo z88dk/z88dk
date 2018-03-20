@@ -10,6 +10,7 @@ EXTERN console_01_output_fzx_proc_line_spacing
 EXTERN console_01_output_fzx_proc_check_scroll
 
 console_01_output_fzx_proc_linefeed:
+console_01_output_fzx_proc_linefeed_check_scroll:
 
    ; change coordinates to beginning of next line
    ;

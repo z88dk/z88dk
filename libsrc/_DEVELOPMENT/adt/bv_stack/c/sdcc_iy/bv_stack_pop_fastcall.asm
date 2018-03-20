@@ -8,4 +8,4 @@ PUBLIC _bv_stack_pop_fastcall
 
 EXTERN asm_bv_stack_pop
 
-defc _bv_stack_pop = asm_bv_stack_pop
+defc _bv_stack_pop_fastcall = asm_bv_stack_pop

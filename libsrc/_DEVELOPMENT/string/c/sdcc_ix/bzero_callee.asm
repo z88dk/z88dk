@@ -9,7 +9,7 @@ PUBLIC _bzero_callee
 
 EXTERN asm_bzero
 
-_bzero:
+_bzero_callee:
 
    pop af
    pop hl

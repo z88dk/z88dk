@@ -11,7 +11,10 @@
         SECTION code_clib
 	PUBLIC	msx_set_mode
 	PUBLIC	_msx_set_mode
+	EXTERN  VDPreg_Write
+IF !FOReinstein
 	PUBLIC  VDPreg_Write
+ENDIF
 	
 	INCLUDE	"msx/vdp.inc"
 

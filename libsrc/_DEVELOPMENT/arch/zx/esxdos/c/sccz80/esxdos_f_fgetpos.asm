@@ -3,7 +3,7 @@
 SECTION code_clib
 SECTION code_esxdos
 
-PUBLIC esxdos_f_fgetpos
+PUBLIC esxdos_f_fgetpos_fastcall
 
 EXTERN asm_esxdos_f_fgetpos
 
