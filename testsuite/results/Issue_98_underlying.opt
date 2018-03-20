@@ -172,8 +172,7 @@
 	call	l_glong
 	ld	bc,65534
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	ret
 
@@ -189,8 +188,7 @@
 	call	l_long_mult
 	ld	bc,65534
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	ret
 

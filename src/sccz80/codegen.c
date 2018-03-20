@@ -1462,8 +1462,8 @@ void zadd_const(LVALUE *lval, int32_t value)
             ol("inc\tde");                    // 1, 6
 	        add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else if ( highword >= 65532 && highword <= 65535  ) {
-            ol("jr\tnc,ASMPC+3");             // 2, 12/7
-            ol("inc\tde");                    // 1, 6
+            // Jump into the block of dec de that we produce
+            ol("jr\tc,ASMPC+3");              // 2, 12/7
 	        add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
             ol("ex\tde,hl");                      // 1, 4

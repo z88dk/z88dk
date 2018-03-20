@@ -85,8 +85,7 @@
 	call	l_glong
 	ld	bc,65516
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	push	de
 	push	hl
@@ -95,8 +94,7 @@
 	call	l_glong
 	ld	bc,15536
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	pop	bc
 	pop	bc
@@ -110,8 +108,7 @@
 	call	l_glong
 	ld	bc,65516
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	push	de
 	push	hl
@@ -120,8 +117,7 @@
 	call	l_glong
 	ld	bc,15536
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	pop	bc
 	pop	bc

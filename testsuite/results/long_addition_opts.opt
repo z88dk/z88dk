@@ -185,8 +185,7 @@
 	call	l_glong
 	ld	bc,65534
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	pop	bc
 	call	l_plong
@@ -201,8 +200,7 @@
 	call	l_glong
 	ld	bc,65533
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	pop	bc
 	call	l_plong
@@ -217,8 +215,7 @@
 	call	l_glong
 	ld	bc,65532
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	pop	bc
 	call	l_plong
@@ -233,8 +230,7 @@
 	call	l_glong
 	ld	bc,65526
 	add	hl,bc
-	jr	nc,ASMPC+3
-	inc	de
+	jr	c,ASMPC+3
 	dec	de
 	pop	bc
 	call	l_plong
