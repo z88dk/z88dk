@@ -660,6 +660,24 @@ void rvalue(LVALUE* lval)
 #endif
 }
 
+/* Check the comparison range, try to determine always true/false conditions */
+int check_range(LVALUE *lval, int32_t min_value, int32_t max_value) 
+{
+    int always = -1;
+    void (*oper)(LVALUE *lva) = lval->binop;
+
+    if ( ((oper == zlt || oper == zle) && lval->const_val > max_value) ||
+        (( oper == zgt || oper == zge) && lval->const_val <= min_value) ||
+        ( oper == zne && (lval->const_val < min_value || lval->const_val > max_value)) ) {
+        always = 1;
+    } else if ( ((oper == zlt || oper == zle) && lval->const_val < min_value) ||
+        (( oper == zgt || oper == zge) && lval->const_val > max_value) ||
+        ( oper == zeq && (lval->const_val < min_value || lval->const_val > max_value)) ) {
+        always = 0;
+    }
+    return always;
+}
+
 /** 
  * \retval 1 - If constant true
  * \retval 0 - If constant false
@@ -668,6 +686,7 @@ void rvalue(LVALUE* lval)
 int test(int label, int parens)
 {
     char *before, *start;
+    int   need_to_test_jump = 1;
     LVALUE lval={0};
     void (*oper)(LVALUE *lva);
     
@@ -695,7 +714,7 @@ int test(int label, int parens)
       //  jump(label);
         return 0;
     }
-    if (lval.stage_add) { /* stage address of "..oper 0" code */
+    if (lval.stage_add && lval.const_val == 0 ) { /* stage address of "..oper 0" code */
         lval.ltype= lval.stage_add_ltype;
         
         oper = lval.binop; /* operator function pointer */
@@ -725,7 +744,32 @@ int test(int label, int parens)
             zerojump(le0, label, &lval);
         else
             testjump(&lval, label);
-    } else {
+        need_to_test_jump = 0;
+    } else if ( lval.stage_add ) {
+        // Comparision with int
+        int always = -1;
+        oper = lval.binop; /* operator function pointer */
+        if ( lval.oldval_kind == KIND_INT && !utype(&lval) ) {
+            always = check_range(&lval, -32768, 32767);
+        } else if ( lval.oldval_kind == KIND_INT && utype(&lval) ) {
+            always = check_range(&lval, 0, 65535);
+        } else if ( lval.oldval_kind == KIND_CHAR && !utype(&lval) ) {
+            always = check_range(&lval, -128, 127);
+        } else if ( lval.oldval_kind == KIND_CHAR && utype(&lval) ) {
+            always = check_range(&lval, 0, 255);
+        }
+        if ( always != -1 ) {
+            warningfmt("limited-range", "Due to limited range of data type, expression is always %s", always ? "true" : "false");
+            // It's always true
+            lval.binop = NULL;
+            clearstage(lval.stage_add, 0);
+            lval.stage_add = NULL;
+            clearstage(before, 0);
+            return always;
+        }
+    }
+
+    if ( need_to_test_jump) {
         if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
             if (lval.binop == dummy) {
                 lval.val_type = KIND_INT; /* logical always int */

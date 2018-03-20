@@ -126,10 +126,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         setstage(&before_constlval, &start_constlval);
 
 
-        if (lval->const_val == 0) {
+     //   if (lval->const_val == 0) {
             lval->stage_add = stagenext;
             lval->stage_add_ltype = lval2->ltype;
-        }
+     //   }
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
@@ -196,10 +196,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right, primary loaded */
-            if (lval2->const_val == 0) {
+          //  if (lval2->const_val == 0) {
                 lval->stage_add = start;
-                lval->stage_add_ltype = lval->ltype;   
-            }
+                lval->stage_add_ltype = lval->ltype;  
+                lval->const_val = lval2->const_val; 
+//            }
 
             /* djm, load double reg for long operators */
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {

@@ -116,7 +116,7 @@ static option  sccz80_opts[] = {
     { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, 0 },
     { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, 0 },
-    { 0, "opt-code-speed", OPT_FUNCTION, "Optimise for speed not size", opt_code_size, 0},
+    { 0, "opt-code-speed", OPT_FUNCTION|OPT_BOOL, "Optimise for speed not size", opt_code_size, 0},
 #ifdef USEFRAME
     { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},
