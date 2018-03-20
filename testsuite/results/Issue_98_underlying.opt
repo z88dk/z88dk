@@ -86,6 +86,10 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
+	bit	7,d
+	jr	z,i_2
+	call	l_inclong
+.i_2
 	sra	d
 	rr	e
 	rr	h
@@ -124,8 +128,10 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	call	l_inclong
-	call	l_inclong
+	ld	bc,2
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
 	ret
 
 
@@ -164,8 +170,10 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	call	l_declong
-	call	l_declong
+	ld	bc,65534
+	add	hl,bc
+	jr	c,ASMPC+3
+	dec	de
 	ret
 
 
@@ -178,8 +186,10 @@
 	add	hl,sp
 	call	l_glong
 	call	l_long_mult
-	call	l_declong
-	call	l_declong
+	ld	bc,65534
+	add	hl,bc
+	jr	c,ASMPC+3
+	dec	de
 	ret
 
 

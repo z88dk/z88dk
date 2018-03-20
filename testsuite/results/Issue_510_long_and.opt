@@ -124,12 +124,9 @@
 	add	hl,sp
 	push	hl
 	call	l_glong
-	ld	bc,65298
-	add	hl,bc
-	ex	de,hl
-	ld	bc,65535
-	adc	hl,bc
-	ex	de,hl
+	ld	a,l
+	and	18
+	ld	l,a
 	pop	bc
 	call	l_plong
 	pop	bc

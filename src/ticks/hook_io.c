@@ -24,6 +24,9 @@
 #define NUM_SLOTS 256
 static int slots[NUM_SLOTS];
 
+static int selected_unit = 0;
+static int devices[2];
+
 
 static int normalise_errno()
 {
@@ -201,6 +204,55 @@ static void cmd_seek(void)
     }
 }
 
+static void cmd_ide_identify(void)
+{
+
+}
+
+static void cmd_ide_select(void)
+{
+    selected_unit = l & 1;
+
+    SET_ERROR(Z88DK_ENONE);
+}
+
+static void cmd_ide_read(void)
+{
+    off_t  dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+
+    if ( lseek(devices[selected_unit], dest, SEEK_SET) != dest ) {
+        SET_ERROR(normalise_errno());
+        return;
+    }
+    if ( read(devices[selected_unit], (char *)mem + (e | d << 8), 512) != 512 ) {
+        SET_ERROR(normalise_errno());
+    }
+    SET_ERROR(Z88DK_ENONE);
+}
+
+static void cmd_ide_write(void)
+{
+    off_t  dest = (( ( c | b << 8) << 16 ) | (l | h << 8)) * 512;
+
+    if ( lseek(devices[selected_unit], dest, SEEK_SET) != dest ) {
+        SET_ERROR(normalise_errno());
+        return;
+    }
+    if ( write(devices[selected_unit], (char *)mem + (e | d << 8), 512) != 512 ) {
+        SET_ERROR(normalise_errno());
+    }
+    SET_ERROR(Z88DK_ENONE);
+}
+
+void hook_io_set_ide_device(int unit, const char *file)
+{
+    devices[unit] = open(file, O_RDWR);
+    if ( devices[unit] == -1 ) {
+        printf("Cannot open <%s>",file);
+        exit(1);
+    }
+}
+
 void hook_io_init(hook_command *cmds)
 {
     int  i;
@@ -220,5 +272,10 @@ void hook_io_init(hook_command *cmds)
     cmds[CMD_SEEK] = cmd_seek;
     cmds[CMD_READBLOCK] = cmd_readblock;
     cmds[CMD_WRITEBLOCK] = cmd_writeblock;
+
+    cmds[CMD_IDE_SELECT] = cmd_ide_select;
+    cmds[CMD_IDE_ID] = cmd_ide_identify;
+    cmds[CMD_IDE_READ] = cmd_ide_read;
+    cmds[CMD_IDE_WRITE] = cmd_ide_write;
 }
 

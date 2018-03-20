@@ -29,5 +29,5 @@ void func5()
 void func6()
 {
 	long l = 0;
-	l += 0xFFFFFF12;
+	l &= 0xFFFFFF12;
 }
