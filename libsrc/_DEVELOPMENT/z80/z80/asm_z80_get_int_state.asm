@@ -24,6 +24,16 @@ asm_cpu_get_int_state:
    ;
    ; uses  : af, hl
 
+IF __CPU_R2K__ | __CPU_R3K__
+
+   push ip
+   dec sp
+   pop hl
+   ld l,h
+   ret
+
+ELSE
+
    IF __Z80 & __Z80_NMOS
    
       ; nmos z80 bug prevents use of "ld a,i" to gather IFF2 into p/v flag
@@ -65,3 +75,5 @@ continue:
    pop hl
 
    ret
+
+ENDIF

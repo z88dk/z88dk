@@ -1,0 +1,340 @@
+
+
+
+	MODULE	long_addition_opts
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	call	l_inclong
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func2
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,2
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func3
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,3
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func4
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,4
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcx
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,10
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func65536
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func65536_2
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	inc	de
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func65536_3
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	inc	de
+	inc	de
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func65536_4
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	inc	de
+	inc	de
+	inc	de
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func65536_x
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ex	de,hl
+	ld	bc,10
+	add	hl,bc
+	ex	de,hl
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._func65537
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,1
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
+	inc	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm1
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	call	l_declong
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm2
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,65534
+	add	hl,bc
+	jr	c,ASMPC+3
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm3
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,65533
+	add	hl,bc
+	jr	c,ASMPC+3
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm4
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,65532
+	add	hl,bc
+	jr	c,ASMPC+3
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcmx
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ld	bc,65526
+	add	hl,bc
+	jr	c,ASMPC+3
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm65536
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm65536_2
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	dec	de
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm65536_3
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	dec	de
+	dec	de
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm65536_4
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	dec	de
+	dec	de
+	dec	de
+	dec	de
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funcm65536_x
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_glong
+	ex	de,hl
+	ld	bc,65526
+	add	hl,bc
+	ex	de,hl
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_func3
+	GLOBAL	_func4
+	GLOBAL	_funcx
+	GLOBAL	_func65536
+	GLOBAL	_func65536_2
+	GLOBAL	_func65536_3
+	GLOBAL	_func65536_4
+	GLOBAL	_func65536_x
+	GLOBAL	_func65537
+	GLOBAL	_funcm1
+	GLOBAL	_funcm2
+	GLOBAL	_funcm3
+	GLOBAL	_funcm4
+	GLOBAL	_funcmx
+	GLOBAL	_funcm65536
+	GLOBAL	_funcm65536_2
+	GLOBAL	_funcm65536_3
+	GLOBAL	_funcm65536_4
+	GLOBAL	_funcm65536_x
+
+
+
+

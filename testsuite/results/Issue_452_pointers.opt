@@ -80,9 +80,10 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
-	ld	de,2
-	ex	de,hl
-	call	l_asr_u
+	srl	h
+	rr	l
+	srl	h
+	rr	l
 	pop	bc
 	pop	bc
 	ret

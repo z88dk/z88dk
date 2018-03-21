@@ -20,9 +20,13 @@ PUBLIC asm_cpu_push_di
 
 asm_z80_push_di:
 asm_cpu_push_di:
+
 IF __CPU_R2K__ | __CPU_R3K__
+
    ipset 3
+
 ELSE
+
    ; exit  : stack = ei_di_status
    ;
    ; uses  : af
@@ -76,5 +80,7 @@ continue:
    ex (sp),hl                  ; restore hl, push ei_di_status
    
    push af
+
 ENDIF
+
    ret

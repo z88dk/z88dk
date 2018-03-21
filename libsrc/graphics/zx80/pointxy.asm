@@ -28,7 +28,7 @@
 				
 				ld	(__gfx_coords),hl
 				
-				push	bc
+				push	hl		;save coordinates
 
 				ld	c,l
 				ld	b,h

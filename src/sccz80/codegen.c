@@ -1360,36 +1360,120 @@ void zadd(LVALUE* lval)
 }
 
 
+static int add_to_high_word(int32_t value) 
+{
+    int16_t    delta = value >> 16;
+
+    switch ( delta ) {
+    case -4:   // 4, 24
+        ol("dec\tde");
+    case -3:
+        ol("dec\tde");
+    case -2:
+        ol("dec\tde");
+    case -1:
+        ol("dec\tde");
+        break;
+    case 4:
+        ol("inc\tde");
+    case 3:
+        ol("inc\tde");
+    case 2:
+        ol("inc\tde");
+    case 1:
+        ol("inc\tde");
+        break;
+    default:
+        return 0;
+    }
+    return 1; // Handled it
+}
+
 void zadd_const(LVALUE *lval, int32_t value)
 {
     switch (value) {
     case -3:
-        dec(lval);
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
+        dec(lval);  
     case -2:
-        dec(lval);
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
+        dec(lval); 
     case -1:
-        dec(lval);
+      if ( c_size_optimisation & OPT_SUB32 ) {
+            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+                // 6 bytes, 27T (best), 28T (worst)
+                ol("ld\ta,h");    // 1, 4
+                ol("or\tl");      // 1, 4
+                ol("dec\thl");    // 1, 6    
+                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                ol("dec\tde");    // 1, 6
+                return;
+            }
+        }
+        dec(lval); // (long) = 3 bytes = (17 + 4 + 4 + 6 + 5 + 6 + 10) = 53T (worst), 38T best
+        return;
     case 0:
-        break;
+        return;
     case 3:
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
         inc(lval);
     case 2:
-        inc(lval);
+        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) 
+            break;
+        inc(lval); // (long) = 66T best (6 bytes) vs 51T (10 bytes)
     case 1:
-        inc(lval);
-        break;
-    default:
-        if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
-            // 11 bytes, 54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
-            constbc(((uint32_t)value) % 65536);   // 3, 10
-            ol("add\thl,bc");                     // 1, 11
+        if ( c_size_optimisation & OPT_ADD32 ) {
+            if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+                // 6 bytes, 27T (best), 28T (worst)
+                ol("inc\thl");    // 1, 6    
+                ol("ld\ta,h");    // 1, 4
+                ol("or\tl");      // 1, 4
+                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                ol("inc\tde");    // 1, 6
+                return;
+            }
+        }
+        inc(lval);  // (int) =1, 6T, (ling) = 3 + (17 + 4 + 5 + 4 + 5 + 6 + 10) = 51T worst case  (17 + 4 + 11 = 33T = best)
+        return;
+    }
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+        uint32_t highword = ((uint32_t)value) / 65536;
+        if ( (value % 65536) == 0 ) {
+            if ( add_to_high_word(value) == 0 ) {
+                swap();         // 1, 4
+                addbchl(((uint32_t)value) / 65536); // 4, 21
+                swap();         // 4
+            }
+            return;
+        }
+
+        // 10/11 bytes, 51/54T vs 11 bytes + l_long_add ( 11 + 11 + 10 + 10 + 17  + 76 = 135T)
+        // If < 65536 - 7 bytes, 33T (best), 34T (worst)
+        constbc(((uint32_t)value) % 65536);   // 3, 10
+        ol("add\thl,bc");                     // 1, 11
+        if ( value >= 0 && value < 65536 ) {
+            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            ol("inc\tde");                    // 1, 6
+        } else if ( highword <= 4 ) {
+            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            ol("inc\tde");                    // 1, 6
+	        add_to_high_word(value);          // it will be < 7 bytes, 33T
+        } else if ( highword >= 65532 && highword <= 65535  ) {
+            // Jump into the block of dec de that we produce
+            ol("jr\tc,ASMPC+3");              // 2, 12/7
+	        add_to_high_word(value);          // it will be < 7 bytes, 33T
+        } else {
             ol("ex\tde,hl");                      // 1, 4
             constbc(((uint32_t)value) / 65536);   // 3, 10
             ol("adc\thl,bc");                     // 2, 15
             ol("ex\tde,hl");                      // 1, 4
-        } else {
-            addbchl(value);
         }
+
+    } else {
+        addbchl(value);
     }
 }
 
@@ -1489,6 +1573,28 @@ void zdiv(LVALUE* lval)
     }
 }
 
+static void add_if_negative(LVALUE *lval, int32_t toadd) 
+{
+    int label;
+
+    if ( utype(lval) )
+        return;
+    label = getlabel();
+    if ( lval->val_type == KIND_LONG ) {
+        ol("bit\t7,d");
+        ot("jr\tz,");
+        printlabel(label);
+        nl();     
+    } else {
+        ol("bit\t7,h");
+        ot("jr\tz,");
+        printlabel(label);
+        nl();  
+    }
+    zadd_const(lval,toadd);
+    postlabel(label);
+}
+
 void zdiv_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG && utype(lval) ) {
@@ -1520,14 +1626,38 @@ void zdiv_const(LVALUE *lval, int32_t value)
         case 1:
             break;
         case 2:
+            add_if_negative(lval, 1);
             asr_const(lval,1);
             break;
         case 4:
+            add_if_negative(lval, 3);
             asr_const(lval,2);
             break;
         case 8:
+            add_if_negative(lval, 7);
             asr_const(lval,3);
             break;
+        case 16:
+            add_if_negative(lval, 15);
+            asr_const(lval,4);
+            break;   
+        case 32:
+            add_if_negative(lval, 31);
+            asr_const(lval,5);
+            break; 
+        case 64:
+            add_if_negative(lval, 63);
+            asr_const(lval,6);
+            break; 
+        case 128:
+            add_if_negative(lval, 127);
+            asr_const(lval,7);
+            break; 
+        case 256:
+            /* Unsigned is dealt with above */
+            add_if_negative(lval, 255);
+            asr_const(lval,8);
+            break; 
         default:
             if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
                 lpush();
@@ -1557,17 +1687,51 @@ void zmod(LVALUE* lval)
     }
 }
 
+void negate_if_negative(LVALUE *lval, int32_t value)
+{
+    int label;
+    // Only need to consider int handling here
+    // We're called for parameters on the lowest byte, so only need to consider l
+    if ( utype(lval) )
+        return;
+    label = getlabel();
+    if ( lval->val_type == KIND_LONG ) {
+        ol("bit\t7,d");
+        ot("jr\tz,");
+        printlabel(label);
+        nl();     
+    } else {
+        ol("bit\t7,h");
+        ot("jr\tz,");
+        printlabel(label);
+        nl();  
+    }
+    ol("ld\ta,l");
+    ol("cpl");
+    ol("inc\ta");
+    ol("ld\tl,a");
+    postlabel(label);
+}
+
 void zmod_const(LVALUE *lval, int32_t value)
 {
     LVALUE  templval={0};
 
+    templval.val_type = KIND_INT;
+    if ( utype(lval) ) 
+        templval.ltype = type_uint;
+    else
+        templval.ltype = type_int;
+
     if ( lval->val_type == KIND_LONG ) {
         if ( value <= 256 && value > 0 ) {
-            // Fall through into int handling
-        } else if ( value == 65536 ) {
+            zmod_const(&templval, value);
             const2(0);
             return;
-        } else if ( value == 65536 * 256 ) {
+        } else if ( value == 65536 && utype(lval) ) {
+            const2(0);
+            return;
+        } else if ( value == 65536 * 256 && utype(lval)  ) {
             ol("ld\td,0");
             return;
         } else {
@@ -1578,38 +1742,45 @@ void zmod_const(LVALUE *lval, int32_t value)
         }
     } 
 
-    templval.val_type = KIND_INT;
-    if ( utype(lval) ) 
-        templval.ltype = type_uint;
-    else
-        templval.ltype = type_int;
     switch ( value ) {
-        case 256:
-            ol("ld\th,0");
-            break;
         case 1:
             vconst(0);
             break;
         case 2:
+            negate_if_negative(lval, 1);
             zand_const(&templval,1);
             break;
         case 4:
+            negate_if_negative(lval, 3);
             zand_const(&templval, 3);
             break;
         case 8:
+            negate_if_negative(lval, 7);
             zand_const(&templval,7);
             break;
         case 16:
+            negate_if_negative(lval, 15);
             zand_const(&templval,15);
             break;
         case 32:
+            negate_if_negative(lval, 31);
             zand_const(&templval, 31);
             break;
         case 64:
+            negate_if_negative(lval, 63);
             zand_const(&templval,63);
             break;
         case 128:
+            negate_if_negative(lval, 127);
             zand_const(&templval,127);
+            break;
+        case 256:
+            if ( utype(lval) ) {
+                ol("ld\th,0");
+            } else {
+                negate_if_negative(lval, 255);
+                ol("ld\th,0");
+            }
             break;
         default:
             const2(value);
@@ -1941,11 +2112,21 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( value == 8 && utype(lval) )  {
-            ol("ld\tl,h"); /* 5 bytes, 4 + 4 + 4 +7 = 19T */
-            ol("ld\th,e");
-            ol("ld\te,d");
-            ol("ld\td,0");
+        } else if ( value == 8 ) {
+            if ( utype(lval) ) {  /* 5 bytes, 4 + 4 + 4 +7 = 19T */            
+                ol("ld\tl,h");
+                ol("ld\th,e");
+                ol("ld\te,d");
+                ol("ld\td,0");
+            } else {   /* 9 bytes, 28T */
+                ol("ld\tl,h");
+                ol("ld\th,e");
+                ol("ld\te,d");   
+                ol("ld\ta,d");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");  
+            }
         } else if ( value == 9 && utype(lval) ) {
             ol("ld\tl,h");  /* 11 bytes, 4+ 4 +4 +7 + 8 +8 + 8 = 43T */
             ol("ld\th,e");
@@ -1978,9 +2159,18 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("adc\thl,hl");
             ol("ld\tde,0");
             ol("rl\te");
-        } else if ( value == 16 && utype(lval)) {
-            ol("ex\tde,hl"); /* 4 bytes 14T */
-            ol("ld\tde,0");
+        } else if ( value == 16 ) {
+            if ( utype(lval)) {
+                ol("ex\tde,hl"); /* 4 bytes 14T */
+                ol("ld\tde,0");
+            } else {
+                ol("ex\tde,hl"); /* 6 bytes 20T */
+                ol("ld\ta,h");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");  
+                ol("ld\te,a");  
+            }
         } else if ( value == 17 && utype(lval)) {
             ol("srl\td"); /* 8 bytes 30T */
             ol("rr\te");
@@ -2011,10 +2201,20 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\th,0");
             ol("rl\th");
             ol("ld\tde,0");
-        } else if ( value == 24 && utype(lval)) {
-            ol("ld\tl,d"); /* 6 bytes , 21T */
-            ol("ld\th,0");
-            ol("ld\tde,0");
+        } else if ( value == 24 ) {
+            if ( utype(lval) ) {
+                ol("ld\tl,d"); /* 6 bytes , 21T */
+                ol("ld\th,0");
+                ol("ld\tde,0");
+            } else {
+                ol("ld\tl,d"); /* 7 bytes , 28T */
+                ol("ld\ta,d");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\td,a");  
+                ol("ld\te,a");  
+                ol("ld\th,a");  
+            }
         } else if ( value == 25 && utype(lval)) {
             ol("ld\tl,d"); /* 8 bytes, 29T */
             ol("srl\tl");
@@ -2061,17 +2261,30 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sra\th");
             }
             ol("rr\tl");
-        } else if ( value == 8 && utype(lval) ) { /* 3 bytes, 11T */
-            ol("ld\tl,h");
-            ol("ld\th,0");
+        } else if ( value == 8 ) {
+            if ( utype(lval) ) { /* 3 bytes, 11T */
+                ol("ld\tl,h");  
+                ol("ld\th,0");  
+            } else { /* 5 bytes, 20 T */
+                ol("ld\tl,h");
+                ol("ld\ta,h");
+                ol("rlca");
+                ol("sbc\ta");
+                ol("ld\th,a");
+            }
         } else if ( value == 15 && utype(lval) ) {
             ol("rl\th");   /* 7 bytes, 26T */
             vconst(0);
             ol("rl\tl");
+        } else if ( value == 2 ) { /* 8 bytes, 32T */
+            asr_const(lval, 1);
+            asr_const(lval, 1);
         } else if ( value != 0 ) {
-            const2(value);
-            swap();
-            asr(lval);
+            const2(value);  /* 6 bytes */
+            if ( utype(lval))
+                callrts("l_asr_u_hl_by_e");
+            else
+                callrts("l_asr_hl_by_e");
         }
     }
 }
