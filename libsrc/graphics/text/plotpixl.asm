@@ -20,7 +20,6 @@
 			EXTERN	__gfx_coords
 			EXTERN	base_graphics
 
-
 .plotpixel			
 			ld	a,h
 			cp	maxx
@@ -51,6 +50,7 @@
 			add	hl,de
 			djnz	r_loop
 .r_zero						; hl = char address
+			ld	d,0
 			ld	e,c
 			add	hl,de
 			
