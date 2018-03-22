@@ -7,7 +7,7 @@ PUBLIC _tshc_cxy2aaddr
 
 EXTERN asm_tshc_cxy2aaddr
 
-_tshc_cyx2aaddr:
+_tshc_cxy2aaddr:
 
    pop af
    pop hl
