@@ -51,7 +51,6 @@
 			add	hl,de
 			djnz	r_loop
 .r_zero						; hl = char address
-			ld	d,0
 			ld	e,c
 			add	hl,de
 			
