@@ -11,7 +11,6 @@
     EXTERN __IO_ACIA_RX_SIZE, __IO_ACIA_RX_FULLISH, __IO_ACIA_TX_SIZE
 
     _acia_interrupt:
-
         push af
         push hl
 
@@ -41,7 +40,6 @@
     ; now start doing the Tx stuff
 
     tx_check:
-
         in a, (__IO_ACIA_STATUS_REGISTER)  ; get the status of the ACIA
         and __IO_ACIA_SR_TDRE       ; check whether a byte can be transmitted
         jr z, rts_check             ; if not, go check for the receive RTS selection
@@ -68,7 +66,6 @@
         jr nz, tx_end               ; if we've more Tx bytes to send, we're done for now
         
     tei_clear:
-
         ld a, (aciaControl)         ; get the ACIA control echo byte
         and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
         or __IO_ACIA_CR_TDI_RTS0    ; mask out (disable) the Tx Interrupt, keep RTS low
@@ -76,7 +73,6 @@
         out (__IO_ACIA_CONTROL_REGISTER), a   ; Set the ACIA CTRL register
 
     rts_check:
-
         ld a, (aciaRxCount)         ; get the current Rx count    	
         cp __IO_ACIA_RX_FULLISH        ; compare the count with the preferred full size
         jr c, tx_end                ; leave the RTS low, and end
@@ -88,7 +84,6 @@
         out (__IO_ACIA_CONTROL_REGISTER), a	; Set the ACIA CTRL register
 
     tx_end:
-
         pop hl
         pop af
         
@@ -96,7 +91,6 @@
         reti
 
     resetTxBuffer:
-    
         ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
         jp tx_buffer_adjusted
 
