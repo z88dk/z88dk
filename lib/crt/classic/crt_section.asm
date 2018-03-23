@@ -13,11 +13,11 @@
 crt0_init_bss:
         EXTERN  __BSS_head
         EXTERN  __BSS_END_tail
+        xor     a 
 IF CRT_INITIALIZE_BSS	
         ld      hl,__BSS_head
         ld      de,__BSS_head + 1
         ld      bc,__BSS_END_tail - __BSS_head - 1
-        xor     a 
 	ld	(hl),a
         ldir
 ENDIF
