@@ -36,7 +36,7 @@ while (<$p>) {
 	last;
 }
 
-#unlink_testfiles();
+unlink_testfiles();
 done_testing();
 
 __DATA__
