@@ -1705,7 +1705,7 @@ ENDIF
 
 SECTION CODE
 
-PUBLIC __Start, __Exit
+PUBLIC __Start, __Restart, __Exit
 
 EXTERN _main
 
