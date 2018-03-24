@@ -1,4 +1,8 @@
 
+   IFNDEF CRT_INITIALIZE_BSS
+      defc CRT_INITIALIZE_BSS = 1
+   ENDIF
+
    IFDEF REGISTER_SP
       defc __register_sp = REGISTER_SP
    ELSE
