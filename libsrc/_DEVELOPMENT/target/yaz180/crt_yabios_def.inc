@@ -96,9 +96,6 @@ DEFC _lock_give                      = $F913
 PUBLIC _lock_give_fastcall
 DEFC _lock_give_fastcall             = $F917
 
-PUBLIC _bios_stack_canary
-DEFC _bios_stack_canary              = $FEDC
-
 PUBLIC _apu_init
 DEFC _apu_init                       = $F949
 

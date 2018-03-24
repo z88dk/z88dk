@@ -46,6 +46,8 @@ __sfr __at __IO_PROM_TOGGLE     io_prom_toggle;
 
 #endif
 
+#endif
+
 // SYSTEM FUNCTIONS
 
 
