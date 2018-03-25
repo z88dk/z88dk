@@ -323,9 +323,9 @@ int heir5(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("==")) {
-            plnge2a(heir6, lval, &lval2, zeq, zeq, NULL);
+            plnge2a(heir6, lval, &lval2, zeq, zeq, zeq_const);
         } else if (match("!=")) {
-            plnge2a(heir6, lval, &lval2, zne, zne, NULL);
+            plnge2a(heir6, lval, &lval2, zne, zne, zne_const);
         } else
             return 0;
     }
@@ -348,15 +348,15 @@ int heir6(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("<=")) {
-            plnge2a(heir7, lval, &lval2, zle, zle, NULL);
+            plnge2a(heir7, lval, &lval2, zle, zle, zle_const);
         } else if (match(">=")) {
-            plnge2a(heir7, lval, &lval2, zge, zge, NULL);
+            plnge2a(heir7, lval, &lval2, zge, zge, zge_const);
         } else if (ch() == '<' && nch() != '<') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zlt, zlt, NULL);
+            plnge2a(heir7, lval, &lval2, zlt, zlt, zlt_const);
         } else if (ch() == '>' && nch() != '>') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zgt, zgt, NULL);
+            plnge2a(heir7, lval, &lval2, zgt, zgt, zgt_const);
         } else
             return 0;
     }

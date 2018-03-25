@@ -20,9 +20,10 @@
 	push	hl
 	dec	hl
 .i_4
-	pop	de
-	push	de
-	ld	hl,10	;const
+	pop	hl
+	push	hl
+	ld	de,10
+	ex	de,hl
 	call	l_lt
 	jp	nc,i_3
 	pop	hl

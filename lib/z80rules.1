@@ -1,4 +1,4 @@
-	d	a,#(0 % 256)
+	ld	a,#(0 % 256)
 =
 	xor	a
 
@@ -2915,3 +2915,149 @@
 	pop	hl
 	push	hl
 	ld	h,0
+
+	scf
+	jr	z,ASMPC+3
+	ccf
+	call	c,%1
+=
+	call	z,%1
+
+	scf
+	jr	z,ASMPC+3
+	ccf
+	jp	nc,%1
+=
+	jp	nz,%1
+
+	jr	z,ASMPC+3
+	scf
+	jp	nc,%1
+=
+	jp	z,%1
+
+	scf
+	jr	z,ASMPC+3
+	ccf
+	ld	hl,0	;const
+	rl	l
+=
+	ld	hl,1	;const
+	jr	z,ASMPC+3
+	dec	hl
+
+	jr	z,ASMPC+3
+	scf
+	ld	hl,0	;const
+	rl	l
+=
+	ld	hl,0	;const
+	jr	z,ASMPC+3
+	inc	hl
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	cp	%1
+	ld	hl,%2
+	jr	%3z,%4
+=
+	ld	a,%1
+	cp	(hl)
+	ld	hl,%2
+	jr	%3z,%4
+
+	jr	nz,ASMPC+3
+	scf
+	jp	nc,%1
+=
+	jp	nz,%1
+
+	jr	nz,ASMPC+3
+	scf
+	ld	hl,0	;const
+	rl	l
+=
+	ld	hl,0	;const
+	jr	nz,ASMPC+3
+	inc	l
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,%1
+	sub	l
+	ld	hl,%2	;const
+=
+	ld	a,%1
+	sub	(hl)
+	ld	hl,%2	;const
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	sub	%1
+	ld	hl,%2
+=
+	ld	a,(hl)
+	sub	%1
+	ld	hl,%2
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,%1
+	sub	l
+	ccf
+	ld	hl,%2
+=
+	ld	a,%1
+	sub	(hl)
+	ccf
+	ld	hl,%2
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	sub	%2
+	jp	c,%4
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	sub	%2
+	jp	c,%4
+	ld	hl,%3
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	sub	%2
+	ccf
+	jp	c,%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	sub	%2
+	jp	nc,%3
+	ld	hl,%4
+
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	ld	a,l
+	cp	%1
+=
+	ld	hl,1	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(%1 %% 256)
+
+	pop	hl
+	push	hl
+	ld	h,0
+	ld	a,l
+	cp	%1
+=
+	ld	hl,0	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(%1 %% 256)

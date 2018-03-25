@@ -278,16 +278,16 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         widenlong(lval, lval2);
     }
     if (lval->ptr_type || lval2->ptr_type) {
+        lval->binop = oper;
         (*oper)(lval);
         //                if (lval->val_type == KIND_CPTR) zpop(); /* rest top bits */
-        lval->binop = oper;
         return;
     }
     /* Moved unsigned thing to below, so can fold expr correctly! */
 
     if ((lval2->symbol && lval2->symbol->ctype->kind == KIND_PTR)) {
-        (*oper)(lval);
         lval->binop = oper;
+        (*oper)(lval);
         return;
     }
     if (lval->is_const) {
@@ -328,6 +328,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             int doconstoper = 0;
             int32_t const_val;
 
+            if ( lhs_val_type != KIND_CHAR && rhs_val_type == KIND_CHAR ) {
+                rhs_val_type = lhs_val_type;
+            } else if ( lhs_val_type == KIND_CHAR && rhs_val_type != KIND_CHAR ) {
+                lhs_val_type = rhs_val_type;
+            }
+
 
             if ( lval2->is_const && (lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval->val_type == KIND_LONG) ) {
                 doconstoper = 1;
@@ -343,13 +349,14 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval2->ltype->isunsigned,0);
             }
             if ( doconstoper ) {
-                Zsp = savesp;                
+                Zsp = savesp;  
+                lval->binop = oper;              
                 constoper(lval, const_val);
                 return;
             }
         }
-        (*oper)(lval);
         lval->binop = oper;
+        (*oper)(lval);
     }
 }
 
