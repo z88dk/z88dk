@@ -4,14 +4,13 @@
 SECTION code_clib
 SECTION code_alloc_balloc
 
-PUBLIC _balloc_firstfit_callee, l0_balloc_firstfit_callee
+PUBLIC _balloc_firstfit_callee
 
 EXTERN asm_balloc_firstfit
 
 _balloc_firstfit_callee:
-l0_balloc_firstfit_callee:
 
    pop hl
-	ex (sp),hl
+   ex (sp),hl
 
    jp asm_balloc_firstfit
