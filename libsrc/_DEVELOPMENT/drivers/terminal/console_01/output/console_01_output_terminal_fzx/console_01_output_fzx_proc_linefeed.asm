@@ -3,14 +3,12 @@ SECTION code_driver
 SECTION code_driver_terminal_output
 
 PUBLIC console_01_output_fzx_proc_linefeed
-PUBLIC console_01_output_fzx_proc_linefeed_check_scroll
 
 EXTERN __fzx_puts_newline, __fzx_puts_newline_set_y
 EXTERN console_01_output_fzx_proc_line_spacing 
 EXTERN console_01_output_fzx_proc_check_scroll
 
 console_01_output_fzx_proc_linefeed:
-console_01_output_fzx_proc_linefeed_check_scroll:
 
    ; change coordinates to beginning of next line
    ;
