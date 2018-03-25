@@ -9,7 +9,6 @@ PUBLIC _lseek_callee, l0_lseek_callee
 EXTERN asm_lseek
 
 _lseek_callee:
-l0_lseek_callee:
 
    pop bc
    exx
@@ -20,7 +19,7 @@ l0_lseek_callee:
    ld a,l
    pop hl
 
-l0__lseek_callee:
+l0_lseek_callee:
 
    exx
    push bc
