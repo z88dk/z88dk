@@ -4,8 +4,8 @@
 SECTION code_clib
 SECTION code_adt_p_list
 
-PUBLIC p_list_next
+PUBLIC _p_list_next
 
 EXTERN _p_forward_list_next
 
-defc p_list_next = _p_forward_list_next
+defc _p_list_next = _p_forward_list_next
