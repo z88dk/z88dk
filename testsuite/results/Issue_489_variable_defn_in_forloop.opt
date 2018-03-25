@@ -22,9 +22,13 @@
 .i_4
 	pop	hl
 	push	hl
-	ld	de,10
-	ex	de,hl
-	call	l_lt
+	ld	a,l
+	sub	10
+	ld	a,h
+	rla
+	ccf
+	rra
+	sbc	128
 	jp	nc,i_3
 	pop	hl
 	push	hl

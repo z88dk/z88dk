@@ -111,11 +111,10 @@
 
 ._sub
 	pop	bc
-	pop	hl
-	push	hl
+	pop	de
+	push	de
 	push	bc
-	ld	de,2
-	ex	de,hl
+	ld	hl,2
 	and	a
 	sbc	hl,de
 	ret
