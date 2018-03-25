@@ -2774,6 +2774,20 @@ void zlt_const(LVALUE *lval, int32_t value)
         ol("ld\ta,l");
         outfmt("\tsub\t%d\n", (value % 256));
         set_carry(lval);
+    } else if ( (lval->val_type == KIND_INT && utype(lval)) || lval->val_type == KIND_PTR ) {
+        const2(value);  // 6 bytes
+        ol("and\ta");
+        ol("sbc\thl,de");
+        set_carry(lval);
+    } else if ( lval->val_type == KIND_INT ) {
+        ol("ld\ta,l"); // 9 bytes
+        outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
+        ol("ld\ta,h");
+        ol("rla");
+        ol("ccf");
+        ol("rra");
+        outfmt("\tsbc\t%d\n", (0x80 | ((uint32_t)value / 256)) & 0xff);
+        set_carry(lval);
     } else {
         const2(value);  // 7 bytes
         swap();
