@@ -99,3 +99,5 @@ extern void declare_extern_symbol( char *name );
 extern void write_map_file(void);
 extern void write_def_file(void);
 extern void write_sym_file(struct Module *module);
+
+extern void check_undefined_symbols(SymbolHash *symtab);

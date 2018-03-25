@@ -17,7 +17,7 @@
 	
 	PUBLIC	cmd_generic
 	PUBLIC	cmd_generic_args
-	PUBLIC	cmd_generic_crc
+;	PUBLIC	cmd_generic_crc
 
 	EXTERN		sd_select_card
 	EXTERN		sd_send_eight_clocks

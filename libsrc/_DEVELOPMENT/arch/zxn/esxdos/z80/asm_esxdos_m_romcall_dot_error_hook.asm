@@ -5,7 +5,7 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_esxdos
 
-PUBLIC asm_esxdos_m_romcall_error_hook
+PUBLIC asm_esxdos_m_romcall_dot_error_hook
 
 asm_esxdos_m_romcall_dot_error_hook:
 

@@ -7,7 +7,7 @@ PUBLIC _UNSAFE_SMS_VRAMmemcpy64
 
 EXTERN asm_SMSlib_UNSAFE_VRAMmemcpy64
 
-_UNSAFE_SMS_UNSAFE_VRAMmemcpy64:
+_UNSAFE_SMS_VRAMmemcpy64:
 
    pop af
    pop hl

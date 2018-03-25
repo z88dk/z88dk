@@ -20,7 +20,6 @@
 			EXTERN	__gfx_coords
 			EXTERN	base_graphics
 
-
 .plotpixel			
 			ld	a,h
 			cp	maxx

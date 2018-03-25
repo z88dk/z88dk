@@ -361,7 +361,8 @@ void asm_ALIGN(int align, int filler)
 		error_int_range(align);
 	}
 	else {
-		if (CURRENTSECTION->asmpc == 0) {		// first ALIGN defines section alignment
+		// first ALIGN defines section alignment
+		if (CURRENTSECTION->asmpc == 0) {		
 			if (CURRENTSECTION->align_found) {
 				error_align_redefined();
 			}
@@ -371,8 +372,10 @@ void asm_ALIGN(int align, int filler)
 				check_org_align();
 			}
 		}
-		else {									// other ALIGN reserves space with DEFS
-			int above = CURRENTSECTION->asmpc % align;
+		// other ALIGN reserves space with DEFS
+		else {
+			int pc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+			int above = pc % align;
 			if (above > 0)
 				asm_DEFS(align - above, filler);
 		}

@@ -16,6 +16,8 @@
 .fgetc_cons
 ._fgetc_cons
         call    $2b
+	and	a
+	jr	z,fgetc_cons
 
 IF STANDARDESCAPECHARS
 	cp	13

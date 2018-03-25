@@ -9,8 +9,8 @@
 ;
 
         SECTION code_clib
-PUBLIC	exos_capture_channel_callee
-PUBLIC	_exos_capture_channel_callee
+PUBLIC	exos_redirect_channel_callee
+PUBLIC	_exos_redirect_channel_callee
 PUBLIC 	ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE
 
 exos_redirect_channel_callee:

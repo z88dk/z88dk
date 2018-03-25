@@ -2,7 +2,7 @@
 		PUBLIC	_fsetattr
 		PUBLIC	__fsetattr
 
-.__fgetattr
+.__fsetattr
 ._fsetattr
       pop de
 		pop hl

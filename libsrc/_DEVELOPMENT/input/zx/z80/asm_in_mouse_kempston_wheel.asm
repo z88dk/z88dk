@@ -12,7 +12,7 @@
 SECTION code_clib
 SECTION code_input
 
-PUBLIC asm_in_mouse_kemptson_wheel
+PUBLIC asm_in_mouse_kempston_wheel
 
 EXTERN __input_kempston_mouse_wheel
 

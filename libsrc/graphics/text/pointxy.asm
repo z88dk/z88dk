@@ -37,7 +37,7 @@
 			
 			;push	bc
 
-			ld	c,a
+			ld	c,l
 			ld	b,h
 
 			push	bc

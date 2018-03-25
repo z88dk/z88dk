@@ -12,7 +12,6 @@
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     _acia_putc:
-
         ; enter    : l = char to output
         ; exit     : l = 1 if Tx buffer is full
         ;            carry reset
@@ -33,7 +32,6 @@
         ret                         ; and just complete
 
     put_buffer_tx:
-
         ld a, (aciaTxCount)         ; Get the number of bytes in the Tx buffer
         cp __IO_ACIA_TX_SIZE - 1    ; check whether there is space in the buffer
         ld a,l                      ; Tx byte
@@ -55,11 +53,9 @@
 
         ld hl, aciaTxCount
         inc (hl)                    ; atomic increment of Tx count
-
         ld l, 0                     ; indicate Tx buffer was not full
 
     clean_up_tx:
-        
         call asm_z80_push_di        ; critical section begin
         
         ld a, (aciaControl)         ; get the ACIA control echo byte
@@ -71,7 +67,6 @@
         jp asm_z80_pop_ei_jp        ; critical section end
 
     resetTxBuffer:
-    
         ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
         jp tx_buffer_adjusted
 
