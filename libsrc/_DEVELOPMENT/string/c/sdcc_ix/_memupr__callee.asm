@@ -8,7 +8,7 @@ PUBLIC __memupr__callee
 
 EXTERN asm__memupr
 
-__memupr_:
+__memupr__callee:
 
    pop af
    pop hl

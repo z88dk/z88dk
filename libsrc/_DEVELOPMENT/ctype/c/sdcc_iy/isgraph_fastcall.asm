@@ -4,7 +4,7 @@
 SECTION code_clib
 SECTION code_ctype
 
-PUBLIC _isgraph
+PUBLIC _isgraph_fastcall
 
 EXTERN asm_isgraph, error_zc
 

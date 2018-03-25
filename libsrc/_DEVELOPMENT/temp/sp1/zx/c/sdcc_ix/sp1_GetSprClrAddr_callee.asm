@@ -7,7 +7,7 @@ PUBLIC _sp1_GetSprClrAddr_callee, l0_sp1_GetSprClrAddr_callee
 
 EXTERN asm_sp1_GetSprClrAddr
 
-_sp1_GetSprClrAddr:
+_sp1_GetSprClrAddr_callee:
 
    pop af
    pop hl

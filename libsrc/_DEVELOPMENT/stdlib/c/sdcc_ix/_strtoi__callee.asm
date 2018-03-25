@@ -8,7 +8,7 @@ PUBLIC __strtoi__callee
 
 EXTERN asm__strtoi
 
-__strtoi_:
+__strtoi__callee:
 
    pop af
    pop hl

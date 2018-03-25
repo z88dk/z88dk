@@ -6,7 +6,7 @@ SECTION code_driver_terminal_output
 
 PUBLIC vgl_01_output_4000_oterm_msg_printc
 PUBLIC vgl_01_output_4000_oterm_msg_printc_raw
-PUBLIC vgl_01_output_4000_oterm_msg_printc_cursor
+;PUBLIC vgl_01_output_4000_oterm_msg_printc_cursor
 
 EXTERN vgl_01_output_4000_refresh
 
