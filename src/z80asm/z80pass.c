@@ -62,7 +62,9 @@ Z80pass2( void )
 				do_patch = FALSE;
 			}
 		}
-		else if ( ( (expr->type >= TYPE_ADDRESS) || expr->result.extern_symbol ) )
+		else if ( expr->type >= TYPE_ADDRESS || 
+				  expr->result.extern_symbol ||
+			      expr->target_name )
 		{
 			do_patch = FALSE;
 			do_store = TRUE;            /* store expression in relocatable file */

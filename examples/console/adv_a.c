@@ -194,7 +194,7 @@ char *strInstructions =
     "Welcome to Adventure 'A' - The Planet of Death.\n"
 	"In this adventure you find yourself stranded on an alien planet. "
 	"Your aim is to escape from this planet by finding your, now captured and disabled, space ship."
-	"You will meet varius hazards and dangers on your adventure, some natural, some not, all of which you must overcome to succeed.\n"
+	"You will meet various hazards and dangers on your adventure, some natural, some not, all of which you must overcome to succeed.\n"
 	"Good luck, you will need it!\n\n"
 	"PRESS ANY KEY TO START\n";
 

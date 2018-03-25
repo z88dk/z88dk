@@ -42,15 +42,13 @@ PUBLIC asciTxBuffer
 
 asciTxBuffer:   defs    __ASCI0_TX_SIZE+__ASCI1_TX_SIZE ; Space for the Tx0 & Tx1 Buffer
 
-; optionally, pad to next 256 byte boundary
-
-IF (ASMPC & 0xff)
-   defs 256 - (ASMPC & 0xff)
-ENDIF
-
 ;------------------------------------------------------------------------------
 ; start of common area 1 - non aligned data
 ;------------------------------------------------------------------------------
+
+; pad to next 256 byte boundary
+
+ALIGN           0x100
 
 ; immediately after page aligned area so that we don't have to worry about the
 ; LSB when indexing, for call_far, jp_far, and system_rst

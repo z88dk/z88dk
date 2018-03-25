@@ -20,6 +20,8 @@ IF CRT_INITIALIZE_BSS
         xor     a 
 	ld	(hl),a
         ldir
+ELSE
+        xor     a 
 ENDIF
 
 	; a = 0 - reset exitcount
