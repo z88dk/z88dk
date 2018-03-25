@@ -18,7 +18,7 @@
 
 
 
-int __FASTCALL__ fclose(FILE *fp)
+int fclose(FILE *fp)
 {
 #asm
 IF __CPU_R2K__ | __CPU_R3K__
