@@ -718,7 +718,7 @@ int test(int label, int parens)
         lval.ltype= lval.stage_add_ltype;
         
         oper = lval.binop; /* operator function pointer */
-        lval.binop = 0; /* Reset binop to 0 so not picked up by comparison ops */
+        lval.binop = NULL; /* Reset binop to 0 so not picked up by comparison ops */
         if (oper == zeq || (oper == zle && utype(&lval)))
             zerojump(eq0, label, &lval);
         else if (oper == zne || (oper == zgt && utype(&lval)))

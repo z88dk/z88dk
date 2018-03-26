@@ -2652,11 +2652,18 @@ void zeq_const(LVALUE *lval, int32_t value)
         vlongconst(value);
         zeq(lval);
     } else if ( lval->val_type == KIND_CHAR ) {
-        ol("ld\ta,l");  // 7 bytes
-        outfmt("\tcp\t%d\n", (value % 256));
-        ol("scf");
-        ol("jr\tz,ASMPC+3");
-        ol("ccf");
+        if ( value == 0 ) {
+            ol("ld\ta,l");  // 5 bytes
+            ol("and\ta");
+            ol("jr\tnz,ASMPC+3");
+            ol("scf");
+        } else {
+            ol("ld\ta,l");  // 7 bytes
+            outfmt("\tcp\t%d\n", (value % 256));
+            ol("scf");
+            ol("jr\tz,ASMPC+3");
+            ol("ccf");
+        }
         set_carry(lval);
     } else {
         const2(value);  // 10 bytes
@@ -2691,11 +2698,7 @@ void zeq(LVALUE* lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            if (ISASM(ASM_Z80ASM)) {
-                ol("jr\tnz,ASMPC+3");
-            } else {
-                ol("jr\tnz,$+3");
-            }
+            ol("jr\tnz,ASMPC+3");
             ol("scf");
             break;
         }
@@ -2712,10 +2715,17 @@ void zne_const(LVALUE *lval, int32_t value)
         vlongconst(value);
         zne(lval);
     } else if ( lval->val_type == KIND_CHAR ) {
-        ol("ld\ta,l");  // 6 bytes
-        outfmt("\tcp\t%d\n", (value % 256));  /* z = 1, c = 0 */
-        ol("jr\tz,ASMPC+3");
-        ol("scf");
+         if ( value == 0 ) {
+            ol("ld\ta,l");  // 5 bytes
+            ol("and\ta");
+            ol("jr\tz,ASMPC+3");
+            ol("scf");
+        } else {
+            ol("ld\ta,l");  // 6 bytes
+            outfmt("\tcp\t%d\n", (value % 256));  /* z = 1, c = 0 */
+            ol("jr\tz,ASMPC+3");
+            ol("scf");
+        }
         set_carry(lval);
     } else {
         const2(value);  // 9 bytes
