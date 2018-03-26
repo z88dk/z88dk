@@ -2666,13 +2666,20 @@ void zeq_const(LVALUE *lval, int32_t value)
         }
         set_carry(lval);
     } else {
-        const2(value);  // 10 bytes
-        ol("and\ta");
-        ol("sbc\thl,de");
-        ol("scf");
-        ol("jr\tz,ASMPC+3");
-        ol("ccf");
-        set_carry(lval);
+        if ( value == 0 ) {
+            ol("ld\ta,h");
+            ol("or\tl");
+            ol("jr\tnz,ASMPC+3");
+            ol("scf");
+        } else {
+            const2(value);  // 10 bytes
+            ol("and\ta");
+            ol("sbc\thl,de");
+            ol("scf");
+            ol("jr\tz,ASMPC+3");
+            ol("ccf");
+        }
+         set_carry(lval);
     }
 }
 
@@ -2728,11 +2735,18 @@ void zne_const(LVALUE *lval, int32_t value)
         }
         set_carry(lval);
     } else {
-        const2(value);  // 9 bytes
-        ol("and\ta");
-        ol("sbc\thl,de");
-        ol("jr\tz,ASMPC+3");
-        ol("scf");
+        if ( value == 0 ) {
+            ol("ld\ta,h");
+            ol("or\tl");
+            ol("jr\tz,ASMPC+3");
+            ol("scf");
+        } else {
+            const2(value);  // 9 bytes
+            ol("and\ta");
+            ol("sbc\thl,de");
+            ol("jr\tz,ASMPC+3");
+            ol("scf");
+        }
         set_carry(lval);
     }
 }

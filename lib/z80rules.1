@@ -3075,3 +3075,9 @@
 	push	de
 	push	bc
 	ld	hl,%1
+
+	jr	nz,ASMPC+3
+	scf
+	jp	c,%1
+=
+	jp	z,%1
