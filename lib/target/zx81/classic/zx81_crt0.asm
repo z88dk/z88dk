@@ -54,8 +54,6 @@
 
         PUBLIC    __sgoioblk      ;stdio info block
 
-        PUBLIC    heaplast        ;Near malloc heap variables
-        PUBLIC    heapblocks
 
 IF (startup>100)
 		; LAMBDA specific definitions (if any)

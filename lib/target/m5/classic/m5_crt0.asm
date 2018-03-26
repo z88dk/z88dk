@@ -31,8 +31,6 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-; Graphics stuff
-        PUBLIC	pixelbyte	; Temp store for non-buffered mode
 
 ; MSX platform specific stuff
 ;
