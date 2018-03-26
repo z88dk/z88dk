@@ -43,16 +43,8 @@
 ;For stdin, stdout, stder
 		PUBLIC    __sgoioblk
         
-		PUBLIC	heaplast	;Near malloc heap variables
-		PUBLIC	heapblocks
 
-; Graphics stuff
-		PUBLIC	pixelbyte	; Temp store for non-buffered mode
 		PUBLIC	base_graphics
-
-; 1 bit sound status byte
-		PUBLIC	snd_tick
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ; SEGA and MSX specific
 		PUBLIC	msxbios
