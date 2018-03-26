@@ -20,15 +20,10 @@
 	push	hl
 	dec	hl
 .i_4
-	pop	hl
-	push	hl
-	ld	a,l
-	sub	10
-	ld	a,h
-	rla
-	ccf
-	rra
-	sbc	128
+	pop	de
+	push	de
+	ld	hl,10	;const
+	call	l_lt
 	jp	nc,i_3
 	pop	hl
 	push	hl

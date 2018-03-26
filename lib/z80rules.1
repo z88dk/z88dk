@@ -3061,3 +3061,16 @@
 	add	hl,sp
 	ld	a,(hl)
 	cp	#(%1 %% 256)
+
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,%1
+	ex	de,hl
+=
+	pop	bc
+	pop	de
+	push	de
+	push	bc
+	ld	hl,%1
