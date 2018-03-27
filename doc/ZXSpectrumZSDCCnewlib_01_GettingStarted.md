@@ -254,4 +254,7 @@ can inspect the contents of the library with the z80nm command:
 ```
 Do a search and you'll find the zx_border() function listed in there.
 
+The actual source code used to build the library is rooted in [z88dk/libsrc/_DEVELOPMENT](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT)
+and a search using the header path `arch/zx` as clue locates the [asm_zx_border.asm](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/arch/zx/misc/z80/asm_zx_border.asm) function in `arch/zx/misc/z80`.
+
 [... continue to Part 2: Hello World](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md)
