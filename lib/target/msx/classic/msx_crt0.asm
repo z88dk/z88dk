@@ -293,7 +293,7 @@ end:	defb	0
 	SECTION		bss_crt
 ; Keeping the BREAK status
 	PUBLIC	brksave
-	PUBLIC	dfltdsk
+	PUBLIC	defltdsk
 brksave:	defb	1
 defltdsk:       defb    0	; Default disc
 IF (startup=2)

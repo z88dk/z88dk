@@ -2,27 +2,26 @@
 ;       Jupiter ACE pseudo graphics routines
 ;	Version for the 2x3 graphics symbols (UDG redefined)
 ;
-;
-;       Written by Stefano Bodrato 2014
-;
-;
-;       Get pixel at (x,y) coordinate.
+;       Stefano Bodrato 2014
 ;
 ;
-;	$Id: pointxy.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
+;       Plot pixel at (x,y) coordinate.
+;
+;
+;	$Id: plotpixl.asm $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
 			SECTION code_clib
-			PUBLIC	pointxy
+			PUBLIC	plotpixel
 
 			EXTERN	div3
 			EXTERN	__gfx_coords
 			EXTERN	base_graphics
 
-.pointxy
+.plotpixel
 			ld	a,h
 			cp	maxx
 			ret	nc
@@ -31,15 +30,10 @@
 			ret	nc		; y0	out of range
 
 			dec	a
-			dec	a
-			
-			push	bc
-			push	de
-			push	hl			
 			
 			ld	(__gfx_coords),hl
 			
-			;push	bc
+			push	bc
 
 			ld	c,a	; y
 			ld	b,h	; x
@@ -52,11 +46,11 @@
 			inc	e
 			add	hl,de
 			ld	a,(hl)
-			ld	c,a	; y/3
+;			ld	c,a	; y/3
 			
 			srl	b	; x/2
 			
-			ld	a,c
+;			ld	a,c
 			ld	c,b	; !!
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -65,15 +59,16 @@
 
 			ld	b,a		; keep y/3
 			and	a
-			jr	z,r_zero
 
 			ld	de,32
+			;dec	a
+			jr	z,r_zero
 .r_loop
 			add	hl,de
 			dec	a
 			jr	nz,r_loop
 		
-.r_zero     ld	d,0
+.r_zero     ;ld	d,0
 			ld	e,c
 			add	hl,de
 
@@ -83,10 +78,8 @@
 			sub 128
 			ld	e,a		; ..and its copy
 			
-			pop	hl		;  restore x,y  (y=h, x=l)
+			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
 			
-
-
 			ld	a,l
 			inc	a
 			inc	a
@@ -111,12 +104,11 @@
 			jr	nz,evenrow
 			add	a,a		; move down the bit
 .evenrow
-
-			and	e
-			
+			or	e
+			add 128
 
 			pop	hl
-			pop	de
-			pop	bc
+			ld	(hl),a
 			
+			pop	bc
 			ret

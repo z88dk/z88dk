@@ -36,8 +36,12 @@ defc __RC2014 = 1
 
 defc __CPU_CLOCK = 7372800
 
-defc __IO_ACIA_PORT_BASE = 0x80
+defc __IO_DIO_PORT = 0x00
+defc __IO_CF_PORT = 0x10
 defc __IO_PIO_PORT_BASE = 0x20
+defc __IO_PROM_RESET = 0x30
+defc __IO_PROM_TOGGLE = 0x38
+defc __IO_ACIA_PORT_BASE = 0x80
 
 
 

@@ -73,7 +73,9 @@
 	EXTERN    l_cmp		;Int signed compare
 	EXTERN    l_ucmp		;Int unsigned compare
 	EXTERN    l_asr		;Int signed >>
+	EXTERN    l_asr_hl_by_e		;Int signed >>
 	EXTERN    l_asr_u		;Int unsigned >>
+	EXTERN    l_asr_u_hl_by_e		;Int unsigned >>
 	EXTERN    l_asl		;Int <<
 	EXTERN    l_sub		;Int subtract
 	EXTERN    l_neg		;Int negate

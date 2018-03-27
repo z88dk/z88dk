@@ -8,7 +8,7 @@ PUBLIC _w_vector_append_n_callee
 
 EXTERN asm_w_vector_append_n
 
-_w_vector_append_n:
+_w_vector_append_n_callee:
 
    pop af
    pop hl

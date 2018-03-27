@@ -24,6 +24,7 @@ _msx_noblank:
 	jr	do_blank
 
 msx_blank:
+_msx_blank:
 
 	ld	a,($FE3C+1)	; VDPReg0
 	and	$bf

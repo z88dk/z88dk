@@ -9,7 +9,7 @@
 
                 SECTION code_clib
 		PUBLIC	fputc_cons_native
-		PUBLIC	_fputc_cons
+;		PUBLIC	_fputc_cons
 
 		INCLUDE	"target/test/def/test_cmds.def"
 

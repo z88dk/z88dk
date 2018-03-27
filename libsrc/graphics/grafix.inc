@@ -149,11 +149,18 @@ IF FORzx81g007
 	defc maxy	= 185
 ENDIF
 
-IF FORjupiter
+IF FORaceudg
 	DEFINE gotgfx
 	defc maxx	= 64
-	defc maxy	= 72
+	defc maxy	= 71
 	defc blankch	= 128
+ENDIF
+
+IF FORace
+	DEFINE gotgfx
+	defc maxx	= 64
+	defc maxy	= 48
+	defc blankch	= 32
 ENDIF
 
 IF FORkaypro

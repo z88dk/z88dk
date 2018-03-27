@@ -6,6 +6,8 @@ PUBLIC am48_dcmp_s
 
 EXTERN am48_dcmp
 
+am48_dcmp_s:
+
    ; compare double on stack to AC' (effective double - AC')
    ;
    ; enter : AC'   = double y

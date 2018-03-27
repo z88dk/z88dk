@@ -62,7 +62,9 @@ Z80pass2( void )
 				do_patch = FALSE;
 			}
 		}
-		else if ( ( (expr->type >= TYPE_ADDRESS) || expr->result.extern_symbol ) )
+		else if ( expr->type >= TYPE_ADDRESS || 
+				  expr->result.extern_symbol ||
+			      expr->target_name )
 		{
 			do_patch = FALSE;
 			do_store = TRUE;            /* store expression in relocatable file */
@@ -154,7 +156,11 @@ Z80pass2( void )
 		}
     }
 
-    /* clean error location */
+	// check for undefined symbols
+	check_undefined_symbols(CURRENTMODULE->local_symtab);
+	check_undefined_symbols(global_symtab);
+
+	/* clean error location */
     set_error_null();
     //set_error_module( CURRENTMODULE->modname );
 

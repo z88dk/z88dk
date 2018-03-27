@@ -9,8 +9,8 @@
 
         SECTION code_clib
 	PUBLIC  page_in_video
-   PUBLIC  _page_in_video
+	PUBLIC  _page_in_video
 
-	defc page_in_videp = kjt_page_in_video
-	defc _page_in_videp = kjt_page_in_video
+	defc page_in_video = kjt_page_in_video
+	defc _page_in_video = kjt_page_in_video
 	

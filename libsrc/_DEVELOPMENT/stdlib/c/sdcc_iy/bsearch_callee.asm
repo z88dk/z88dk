@@ -22,7 +22,7 @@ _bsearch_callee:
    pop ix
    push af
 
-l0__bsearch_callee:
+l0_bsearch_callee:
 
    exx
    push bc

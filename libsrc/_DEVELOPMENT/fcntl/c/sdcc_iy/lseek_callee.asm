@@ -19,7 +19,7 @@ _lseek_callee:
    ld a,l
    pop hl
 
-l0__lseek_callee:
+l0_lseek_callee:
 
    exx
    push bc

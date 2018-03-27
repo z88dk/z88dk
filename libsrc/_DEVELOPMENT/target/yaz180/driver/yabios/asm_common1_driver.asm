@@ -843,7 +843,7 @@ _lock_give_fastcall:
 
 PUBLIC	asm_system_tick
 
-EXTERN  __system_time_fraction, __system_time, _bios_stack_canary
+EXTERN  __system_time_fraction, __system_time
 
 asm_system_tick:
     push af
@@ -2265,9 +2265,6 @@ PUBLIC phexwd, phex, pchar
 PUBLIC pstring, pnewline
 
 EXTERN _bios_ioByte
-
-EXTERN _asci0_putc, _asci0_getc
-EXTERN _asci1_putc, _asci1_getc
  
 ;==============================================================================
 ;       OUTPUT SUBROUTINES
@@ -2357,8 +2354,6 @@ rchar:                  ; Rx byte in L (A = byte Rx too) SCF if char read
 ;==============================================================================
 ;       BIOS STACK CANARY
 ;
-
-PUBLIC _bios_stack_canary
 
 _bios_stack_canary:
     defb $AA

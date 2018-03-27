@@ -171,10 +171,8 @@
 	ld	hl,(sp + 2)
 	ld	bc,10
 	add	hl,bc
-	ex	de,hl
-	ld	bc,0
-	adc	hl,bc
-	ex	de,hl
+	jr	nc,ASMPC+3
+	inc	de
 	ret
 
 

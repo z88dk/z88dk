@@ -4,7 +4,7 @@
 ;
 ;
 	SECTION	code_clib
-	PUBLIC	pixeladdress
+;	PUBLIC	pixeladdress
 
 ;
 ;	$Id: clg.asm,  Stefano, 2017 $

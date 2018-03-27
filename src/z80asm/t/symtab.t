@@ -115,6 +115,12 @@ t_z80asm(
 	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
+t_z80asm(
+	asm		=> "PUBLIC am48_dcmp : EXTERN mm48_cmp : defc am48_dcmp = mm48_cmp",
+	asm1	=> "PUBLIC mm48_cmp : mm48_cmp: ret",
+	bin		=> "\xC9",
+);
+
 # VAR:
 t_z80asm(
 	asm		=> "VAR: : defb VAR",

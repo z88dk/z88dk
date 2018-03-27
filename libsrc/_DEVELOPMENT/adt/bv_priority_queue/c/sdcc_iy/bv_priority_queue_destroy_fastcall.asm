@@ -8,4 +8,4 @@ PUBLIC _bv_priority_queue_destroy_fastcall
 
 EXTERN asm_bv_priority_queue_destroy
 
-defc _bv_priority_queue_destroy = asm_bv_priority_queue_destroy
+defc _bv_priority_queue_destroy_fastcall = asm_bv_priority_queue_destroy

@@ -590,16 +590,21 @@ END
 
 #------------------------------------------------------------------------------
 # Declare label as public, use it in an expression and dont define it - crash
-z80asm(
-	asm		=> <<'...',
+write_file("test.asm", <<'END');
 				PUBLIC	sd_write_block_2gb
 				EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
 			sd_write_sector:
 				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol 'sd_write_block_2gb' not defined
-...
-	options	=> " ",
-);
+END
+($stdout, $stderr, $return) = capture { system "z80asm test.asm"; };
+is $stdout, "";
+is $stderr, <<'END';
+Error at file 'test.asm' line 5: symbol 'sd_write_block_2gb' not defined
+Error at file 'test.asm' line 1: symbol 'sd_write_block_2gb' not defined
+2 errors occurred during assembly
+END
+is !!$return, !!1;
 
 #------------------------------------------------------------------------------
 # DEFC use case for library entry points

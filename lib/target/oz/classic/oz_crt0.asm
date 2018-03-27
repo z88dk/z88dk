@@ -45,20 +45,15 @@
 		PUBLIC	cleanup         ;jp'd to by exit()
 		PUBLIC	l_dcal          ;jp(hl)
 
-		PUBLIC	_std_seed        ;Integer rand() seed
-
 
 		PUBLIC	exitsp          ;atexit() variables
 		PUBLIC	exitcount
 
 		PUBLIC	__sgoioblk      ;stdio info block
 
-		PUBLIC	heaplast	;Near malloc heap variables
-		PUBLIC	heapblocks
 
 		PUBLIC	base_graphics   ;Graphical variables
 
-		PUBLIC	coords          ;Current xy position
 		PUBLIC	s_filetypetable
 
 		PUBLIC	saved_hl	;Temporary store used by compiler

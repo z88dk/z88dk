@@ -18,8 +18,13 @@
 
 .getk
 ._getk
-	ld	ix,ACECH0
-	call	msxbios
+;        ld      ix,ACECH0
+;       call    msxbios
+	call	$966
+	call	$8da
+	ld	hl,0
+	and	a
+	ret	z
 
 IF STANDARDESCAPECHARS
 	cp	13
@@ -27,7 +32,5 @@ IF STANDARDESCAPECHARS
 	ld	a,10
 .not_return
 ENDIF
-
-	ld	h,0
 	ld	l,a
 	ret

@@ -17,7 +17,8 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	
+	cp	12
+	jr	z,cls
 IF STANDARDESCAPECHARS
 	cp  13
 	ret z
@@ -38,3 +39,6 @@ ENDIF
         call    $33
 	ret
 
+.cls
+	call	$1c9		;CLS	
+	ret

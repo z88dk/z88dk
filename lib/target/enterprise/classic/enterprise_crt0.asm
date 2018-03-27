@@ -40,9 +40,6 @@
         PUBLIC    exitsp
         PUBLIC    exitcount
 
-       	PUBLIC	heaplast	; Near malloc heap variables
-        PUBLIC	heapblocks
-
         PUBLIC    __sgoioblk
 
 ; Enterprise 64/128 specific stuff

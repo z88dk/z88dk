@@ -54,6 +54,9 @@ divert(-1)
 # cu.nop             ; wait one horizontal pixel (cu.move 0,0)
 # cu.stop            ; stop the copper (impossible wait) 
 #
+# The instruction format can be found at:
+# https://docs.google.com/document/d/1nhBNre5ePgelGfcB0KRmut1D3lUlk8R1IFj4MAmAiK0/edit
+#
 # Programming the Copper involves writing zeroes to nextreg 97 & 98
 # to turn off the Copper and set the current instruction index to zero.
 # Then the program is loaded into the Copper by writing bytes to
@@ -80,7 +83,7 @@ divert(-1)
 # and hold the instruction pointer at its current position.
 #
 # RUN_LOOP_RESET causes the copper to reset its instruction
-# pointer to 0 and run in LOOP mode (next).
+# pointer to 0 and run in LOOP mode (see next).
 #
 # RUN_LOOP causes the copper to restart with the instruction
 # pointer at its current position.  Once the end of the instruction
