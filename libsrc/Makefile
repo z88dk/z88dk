@@ -610,11 +610,15 @@ ace_clib.lib:
 	@echo ''
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
 	$(call buildgeneric,ace)
 	$(MAKE) -C ace 
 	$(MAKE) -C games TARGET=ace
-	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	@echo ''
+	@echo '--- Building Jupiter Ace Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORace -x$(OUTPUT_DIRECTORY)/gfxace @$(LISTFILE_DIRECTORY)/gfxace.lst
 
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
