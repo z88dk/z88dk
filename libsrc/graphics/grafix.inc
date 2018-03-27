@@ -115,7 +115,7 @@ ENDIF
 IF FORzx81udg
 	DEFINE gotgfx
 	defc maxx	= 64
-	defc maxy	= 72
+	defc maxy	= 71
 	defc blankch	= 0
 ENDIF
 
@@ -152,7 +152,7 @@ ENDIF
 IF FORaceudg
 	DEFINE gotgfx
 	defc maxx	= 64
-	defc maxy	= 72
+	defc maxy	= 71
 	defc blankch	= 128
 ENDIF
 
