@@ -628,12 +628,17 @@ ace_clib.lib:
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
 	@echo ''
-	@echo '--- Building Mattel Aquarius Library ---'
+	@echo '--- Building Mattel Aquarius Library (& 80x72 GFX) ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,aquarius)
 	$(MAKE) -C games TARGET=aquarius 
 	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	@echo ''
+	@echo '--- Building Mattel Aquarius 80x48 Graphics lib ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(LISTFILE_DIRECTORY)/gfxaq48.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:
