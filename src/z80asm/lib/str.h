@@ -30,7 +30,8 @@ extern char *stoupper(char *str);
 extern char *stolower(char *str);
 
 /* case insensitive compare */
-extern int stricompare(char *str1, char *str2);
+extern int stricompare(char *s1, char *s2);
+extern int strnicompare(char *s1, char *s2, size_t n);
 
 /* remove end newline and whitespace - modify in place, return address of string */
 extern char *chomp(char *str);
