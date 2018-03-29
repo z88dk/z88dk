@@ -10,7 +10,7 @@
 
 #include "ccdefs.h"
 
-static double   CalcStand(double left, void (*oper)(LVALUE *), double right);
+static double   CalcStand(Kind left_kind, double left, void (*oper)(LVALUE *), double right);
 static void     nstep(LVALUE *lval, int n, void (*unstep)(LVALUE *lval));
 static void     store(LVALUE *lval);
 
@@ -168,6 +168,7 @@ int primary(LVALUE* lval)
  * calculate constant expression (signed values)
  */
 double calc(
+    Kind   left_kind,
     double left,
     void (*oper)(LVALUE *),
     double right, int is16bit)
@@ -185,13 +186,19 @@ double calc(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr) {
+        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
+             (left_kind == KIND_LONG && right >= 32) ) {
+            warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
+            right = 0;
+        }
         if ( is16bit ) return ((int16_t)left >> (int16_t)right);
         else return ((int)left >> (int)right);
     } else
-        return (CalcStand(left, oper, right));
+        return (CalcStand(left_kind, left, oper, right));
 }
 
 double calcun(
+    Kind   left_kind,
     double left,
     void (*oper)(LVALUE *),
     double right)
@@ -208,10 +215,15 @@ double calcun(
         return (left < right);
     else if (oper == zgt)
         return (left > right);
-    else if (oper == asr)
+    else if (oper == asr) {
+         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
+             (left_kind == KIND_LONG && right >= 32) ) {
+            warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
+            right = 0;
+        }
         return ((unsigned int)left >> (unsigned int)right);
-    else
-        return (CalcStand(left, oper, right));
+    } else
+        return (CalcStand(left_kind, left, oper, right));
 }
 
 /*
@@ -219,6 +231,7 @@ double calcun(
  */
 
 double CalcStand(
+    Kind left_kind,
     double left,
     void (*oper)(LVALUE *),
     double right)
@@ -231,9 +244,14 @@ double CalcStand(
         return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
         return ((unsigned int)left * (unsigned int)right);
-    else if (oper == asl)
+    else if (oper == asl) {
+        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
+             (left_kind == KIND_LONG && right >= 32) ) {
+            warningfmt("limited-range", "Left shifting by more than size of object, changed to zero");
+            right = 0;
+        }
         return ((unsigned int)left << (unsigned int)right);
-    else if (oper == zeq)
+    } else if (oper == zeq)
         return (left == right);
     else if (oper == zne)
         return (left != right);
@@ -666,13 +684,18 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
     int always = -1;
     void (*oper)(LVALUE *lva) = lval->binop;
 
-    if ( ((oper == zlt || oper == zle) && lval->const_val > max_value) ||
-        (( oper == zgt || oper == zge) && lval->const_val <= min_value) ||
+    if ( ( oper == zlt && lval->const_val > max_value) ||
+        (oper == zle && lval->const_val >= max_value ) ||
+        ( oper == zgt && lval->const_val < min_value) ||
+        ( oper == zgt && lval->const_val < min_value) ||
+        ( oper == zge && lval->const_val <= min_value) ||
         ( oper == zne && (lval->const_val < min_value || lval->const_val > max_value)) ) {
         always = 1;
-    } else if ( ((oper == zlt || oper == zle) && lval->const_val < min_value) ||
-        (( oper == zgt || oper == zge) && lval->const_val > max_value) ||
-        ( oper == zeq && (lval->const_val < min_value || lval->const_val > max_value)) ) {
+    } else if ( (oper == zlt && lval->const_val < min_value) ||
+                (oper == zle && lval->const_val <= min_value ) ||
+                (oper == zgt && lval->const_val > max_value) ||
+                (oper == zge && lval->const_val >= max_value) ||
+                ( oper == zeq && (lval->const_val < min_value || lval->const_val > max_value)) ) {
         always = 0;
     }
     return always;
@@ -706,69 +729,16 @@ int test(int label, int parens)
         needchar(')');
     if (lval.is_const) { /* constant expression */
         clearstage(before, 0);
+        lval.binop = NULL;
         if (lval.const_val) {
             /* true constant, perform body */
-            return 1;
+            return lval.const_val;
         }
         /* false constant, jump round body */
       //  jump(label);
         return 0;
     }
-    if (lval.stage_add && lval.const_val == 0 ) { /* stage address of "..oper 0" code */
-        lval.ltype= lval.stage_add_ltype;
-        
-        oper = lval.binop; /* operator function pointer */
-        lval.binop = NULL; /* Reset binop to 0 so not picked up by comparison ops */
-        if (oper == zeq || (oper == zle && utype(&lval)))
-            zerojump(eq0, label, &lval);
-        else if (oper == zne || (oper == zgt && utype(&lval)))
-            zerojump(testjump, label, &lval);
-        else if (oper == zge && utype(&lval)) {
-            zerojump(ge0, label, &lval);
-            clearstage(lval.stage_add, 0);
-            return 1; // Always true
-        } else if (oper == zlt && utype(&lval)) {
-            warningfmt("unreachable","Unreachable code follows");
-            zerojump(jump0, label, &lval);
-            clearstage(before, start);
-            return 0; // Always false
-        } else if (oper == zgt && utype(&lval)) {
-            zerojump(testjump, label, &lval);  // Convert to != 0
-        } else if (oper == zgt)
-            zerojump(gt0, label, &lval);
-        else if (oper == zge)
-            zerojump(ge0, label, &lval);
-        else if (oper == zlt)
-            zerojump(lt0, label, &lval);
-        else if (oper == zle)
-            zerojump(le0, label, &lval);
-        else
-            testjump(&lval, label);
-        need_to_test_jump = 0;
-    } else if ( lval.stage_add ) {
-        // Comparision with int
-        int always = -1;
-        oper = lval.binop; /* operator function pointer */
-        if ( lval.oldval_kind == KIND_INT && !utype(&lval) ) {
-            always = check_range(&lval, -32768, 32767);
-        } else if ( lval.oldval_kind == KIND_INT && utype(&lval) ) {
-            always = check_range(&lval, 0, 65535);
-        } else if ( lval.oldval_kind == KIND_CHAR && !utype(&lval) ) {
-            always = check_range(&lval, -128, 127);
-        } else if ( lval.oldval_kind == KIND_CHAR && utype(&lval) ) {
-            always = check_range(&lval, 0, 255);
-        }
-        if ( always != -1 ) {
-            warningfmt("limited-range", "Due to limited range of data type, expression is always %s", always ? "true" : "false");
-            // It's always true
-            lval.binop = NULL;
-            clearstage(lval.stage_add, 0);
-            lval.stage_add = NULL;
-            clearstage(before, 0);
-            return always;
-        }
-    }
-
+    
     if ( need_to_test_jump) {
         if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
             if (lval.binop == dummy) {

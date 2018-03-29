@@ -33,7 +33,9 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
             postlabel(droplab);
             vconst(dropval);
             postlabel(endlab);
-            lval->val_type = lval->oldval_kind = KIND_INT; /* stops the carry stuff coming in */
+            if ( lval->val_type == KIND_CARRY ) {
+                lval->val_type = KIND_INT;
+            }
             lval->ltype = type_int;
             lval->indirect_kind = KIND_NONE;
             lval->ptr_type = lval->is_const = 0;
@@ -65,9 +67,14 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
     if (k)
         rvalue(lval);
     else if (lval->is_const) {
+        if ( lval->const_val && testfuncz == eq0 ) {
+            jump(exit1);
+            return;
+        } else if ( lval->const_val == 0 && testfuncz == testjump) {
+            jump(exit1);
+            return;
+        } 
         load_constant(lval);
-
-       
     }
     if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
@@ -98,6 +105,15 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
         }
     }
     return (k);
+}
+
+
+int operator_is_comparison(void (*oper)(LVALUE *lval)) 
+{
+    if ( oper == zeq || oper == zne || oper == zle || oper == zlt || oper == zge || oper == zgt ) {
+        return 1;
+    }
+    return 9;
 }
 
 /*
@@ -245,10 +261,20 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
             if ( lhs_val_type == KIND_DOUBLE ) decrement_double_ref(lval);
             if ( rhs_val_type == KIND_DOUBLE ) decrement_double_ref(lval2);
-            if (lval->ltype->isunsigned | lval2->ltype->isunsigned ) 
-                lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
-            else
-                lval->const_val = calc(lval->const_val, oper, lval2->const_val, is16bit);
+            if (lval->ltype->isunsigned | lval2->ltype->isunsigned ) {
+                lval->const_val = calcun(lhs_val_type, lval->const_val, oper, lval2->const_val);
+                // Promote char here
+                if ( lval->val_type == KIND_CHAR && lval->const_val >= 256 ) {
+                    lval->val_type = KIND_INT;
+                    lval->ltype = type_int;
+                }
+            } else {
+                lval->const_val = calc(lhs_val_type, lval->const_val, oper, lval2->const_val, is16bit);
+                if ( lval->val_type == KIND_CHAR && (lval->const_val < -127 || lval->const_val > 127) ) {
+                    lval->val_type = KIND_INT;
+                    lval->ltype = type_int;
+                }
+            }
 
             // Promote as necessary
             if ( lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE ) {
@@ -298,9 +324,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( lval->val_type == KIND_DOUBLE ) decrement_double_ref(lval);
         if ( lval2->val_type == KIND_DOUBLE ) decrement_double_ref(lval2);
         if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) 
-            lval->const_val = calcun(lval->const_val, oper, lval2->const_val);
+            lval->const_val = calcun(lval->val_type, lval->const_val, oper, lval2->const_val);
         else
-            lval->const_val = calc(lval->const_val, oper, lval2->const_val, is16bit);
+            lval->const_val = calc(lval->val_type, lval->const_val, oper, lval2->const_val, is16bit);
         clearstage(before, 0);
         Zsp = savesp;
     } else {
@@ -328,25 +354,54 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             int doconstoper = 0;
             int32_t const_val;
 
-            if ( lhs_val_type != KIND_CHAR && rhs_val_type == KIND_CHAR ) {
+ 
+
+            /* Check for comparisions being out of range, if so, return constant */
+            if ( lval2->is_const && operator_is_comparison(oper)) {
+                int     always = -1;
+
+                lval2->binop = oper;
+                if ( lhs_val_type == KIND_INT && !utype(lval) ) {
+                    always = check_range(lval2, -32768, 32767);
+                } else if ( lhs_val_type == KIND_INT && utype(lval) ) {
+                    always = check_range(lval2, 0, 65535);
+                } else if ( lhs_val_type == KIND_CHAR && !utype(lval) ) {
+                    always = check_range(lval2, -128, 127);
+                } else if ( lhs_val_type == KIND_CHAR && utype(lval) ) {
+                    always = check_range(lval2, 0, 255);
+                }
+                lval2->binop = NULL;
+                always = -1;
+
+                if ( always != -1 ) {
+                    warningfmt("limited-range", "Due to limited range of data type, expression is always %s", always ? "true" : "false");
+                    // It's always "always"
+                    lval->binop = NULL;
+                    lval->is_const = 1;
+                    lval->const_val = always;
+                    return;
+                }
+            }
+            lval->stage_add = NULL;
+
+           if ( lhs_val_type != KIND_CHAR && rhs_val_type == KIND_CHAR ) {
                 rhs_val_type = lhs_val_type;
             } else if ( lhs_val_type == KIND_CHAR && rhs_val_type != KIND_CHAR ) {
                 lhs_val_type = rhs_val_type;
             }
 
-
             if ( lval2->is_const && (lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval->val_type == KIND_LONG) ) {
                 doconstoper = 1;
                 const_val = (uint32_t)lval2->const_val;
                 clearstage(before, 0);
-                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, 0);
+                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, 1);
             }
             /* Handle the case that the constant was on the left */
             if ( lval1_wasconst && (lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR || lval2->val_type == KIND_LONG) ) {
                 doconstoper = 1;
                 const_val = (uint32_t)lval->const_val;
                 clearstage(before_constlval, 0);
-                force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval2->ltype->isunsigned,0);
+                force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval2->ltype->isunsigned,1);
             }
             if ( doconstoper ) {
                 Zsp = savesp;  

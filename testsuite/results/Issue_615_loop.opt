@@ -55,10 +55,8 @@
 	ld	hl,(_var)
 	inc	hl
 	ld	(_var),hl
-	ld	hl,1	;const
-	ld	a,h
-	or	l
-	jp	nz,i_14
+	dec	hl
+	jp	i_14
 	ld	hl,(_var)
 	ld	a,h
 	or	l
