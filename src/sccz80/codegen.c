@@ -2831,8 +2831,12 @@ void zlt_const(LVALUE *lval, int32_t value)
             zlt(lval);
         }
     } else if ( lval->val_type == KIND_CHAR && utype(lval)) {
-        ol("ld\ta,l");
-        outfmt("\tsub\t%d\n", (value % 256));
+        if ( value ==  0 ) {
+            ol("and\ta");
+        } else {
+            ol("ld\ta,l");
+            outfmt("\tsub\t%d\n", (value % 256));
+        }
         set_carry(lval);
     } else if ( (lval->val_type == KIND_INT && utype(lval)) || lval->val_type == KIND_PTR ) {
         const2(value & 0xffff);  // 6 bytes
@@ -2916,8 +2920,10 @@ void zle_const(LVALUE *lval, int32_t value)
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
        if ( value ==  0 ) {
             ol("ld\ta,d"); // 10 bytes
-            ol("rla");
-            ol("jr\tc,ASMPC+8");
+            if ( !utype(lval)) {
+                ol("rla");
+                ol("jr\tc,ASMPC+8");
+            }
             ol("or\te"); // We know MSBit was 0, so no point shifting it back in
             ol("or\th"); 
             ol("or\tl");
@@ -3093,6 +3099,16 @@ void zgt(LVALUE* lval)
 void zge_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+        if ( value == 0 ) {
+            if ( utype(lval) ) {
+                ol("scf");
+            } else {
+                ol("ld\ta,d");
+                ol("rla");
+            }
+            set_carry(lval);
+            return;
+        }
         lpush();
         vlongconst(value);
         zge(lval);

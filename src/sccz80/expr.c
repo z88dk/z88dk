@@ -115,7 +115,6 @@ int heir1(LVALUE* lval)
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");
         }
-
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
@@ -187,6 +186,7 @@ int heir1a(LVALUE* lval)
     LVALUE lval2={0};
     int k;
     Kind temptype;
+    Type *templtype;
 
     k = heir2a(lval);
     if (cmatch('?')) {
@@ -198,9 +198,12 @@ int heir1a(LVALUE* lval)
             // Always evaluated as an integer, so fake it temporarily
             force(KIND_INT, lval->val_type, c_default_unsigned, lval->ltype->isunsigned, 0);
             temptype = lval->val_type;
+            templtype = lval->ltype;
             lval->val_type = KIND_INT; /* Force to integer */
+            lval->ltype = type_int;
             testjump(lval, falselab = getlabel());
             lval->val_type = temptype;
+            lval->ltype = templtype;
             /* evaluate 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);

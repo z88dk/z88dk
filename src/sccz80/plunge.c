@@ -197,9 +197,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (lval->val_type == KIND_DOUBLE) {
             dpush();
         } else if (lval->val_type == KIND_CARRY) {
+
             force(KIND_INT, KIND_CARRY, 0, 0, 0);
             setstage(&before, &start);
-            lval->val_type = KIND_INT;
+            lval->val_type = lhs_val_type = KIND_INT;
             lval->ltype = type_int;
             zpush();
         } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
@@ -497,7 +498,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else {
             if (lval->val_type == KIND_CARRY) {
                 zcarryconv();
-                lval->val_type = KIND_INT;
+                lval->val_type = lhs_val_type = KIND_INT;
                 lval->ltype = type_int;
             }
             zpush();

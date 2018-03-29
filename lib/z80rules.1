@@ -3081,3 +3081,16 @@
 	jp	c,%1
 =
 	jp	z,%1
+
+	ld	hl,0	;const
+	jr	nz,ASMPC+3
+	inc	l
+	ld	a,h
+	or	l
+	ld	hl,0	;const
+	jr	nz,ASMPC+3
+	inc	l
+=
+	ld	hl,1	;const
+	jr	nz,ASMPC+3
+	dec	l
