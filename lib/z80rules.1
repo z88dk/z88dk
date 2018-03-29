@@ -3094,3 +3094,16 @@
 	ld	hl,1	;const
 	jr	nz,ASMPC+3
 	dec	l
+
+	ld	hl,1	;const
+	jr	z,ASMPC+3
+	dec	hl
+	ld	a,h
+	or	l
+	ld	hl,0	;const
+	jr	nz,ASMPC+3
+	inc	l
+=
+	ld	hl,0
+	jr	z,ASMPC+3
+	inc	l
