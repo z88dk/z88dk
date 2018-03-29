@@ -33,7 +33,6 @@ void test_comparem1_uchar()
 
     if ( a == -1 ) { Assert(-1, "a == -1"); }
     if ( b == -1 ) { } else { Assert(-1, "b == -1"); } 
-    Assert( b == -1, "(b == -1)");
     Assert( (a == -1) == 0, "(a == -1) == 0");
  
     if ( a != -1 ) { } else { Assert(-1, "b != -1"); }
@@ -81,7 +80,6 @@ void test_comparem1_uint()
 
     if ( a == -1 ) { Assert(-1, "a == -1"); }
     if ( b == -1 ) { } else { Assert(-1, "b == -1"); } 
-    Assert( b == -1, "(b == -1)");
     Assert( (a == -1) == 0, "(a == -1) == 0");
  
     if ( a != -1 ) { } else { Assert(-1, "b != -1"); }

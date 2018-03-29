@@ -363,16 +363,15 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
                 lval2->binop = oper;
                 if ( lhs_val_type == KIND_INT && !utype(lval) ) {
-                    always = check_range(lval2, -32768, 32767);
+                    always = check_range(lval2, -32768, 65535);
                 } else if ( lhs_val_type == KIND_INT && utype(lval) ) {
                     always = check_range(lval2, 0, 65535);
                 } else if ( lhs_val_type == KIND_CHAR && !utype(lval) ) {
-                    always = check_range(lval2, -128, 127);
+                    always = check_range(lval2, -128, 255);
                 } else if ( lhs_val_type == KIND_CHAR && utype(lval) ) {
                     always = check_range(lval2, 0, 255);
                 }
                 lval2->binop = NULL;
-                always = -1;
 
                 if ( always != -1 ) {
                     warningfmt("limited-range", "Due to limited range of data type, expression is always %s", always ? "true" : "false");
