@@ -11,6 +11,7 @@ Assembly macros.
 #include "macros.h"
 #include "alloc.h"
 #include "errors.h"
+#include "str.h"
 #include "strpool.h"
 #include "utarray.h"
 #include "uthash.h"
@@ -18,6 +19,10 @@ Assembly macros.
 #include "types.h"
 #include <assert.h>
 #include <ctype.h>
+
+#define Is_ident_prefix(x)	((x)=='.' || (x)=='#' || (x)=='$' || (x)=='%' || (x)=='@')
+#define Is_ident_start(x)	(isalpha(x) || (x)=='_')
+#define Is_ident_cont(x)	(isalnum(x) || (x)=='_')
 
 //-----------------------------------------------------------------------------
 //	#define macros
@@ -34,6 +39,7 @@ static DefMacro *def_macros = NULL;		// global list of #define macros
 static UT_array *in_lines = NULL;		// line stream from input
 static UT_array *out_lines = NULL;		// line stream to ouput
 static UT_string *current_line = NULL;	// current returned line
+static Bool in_defgroup;				// no EQU transformation in defgroup
 
 static DefMacro *DefMacro_add(char *name)
 {
@@ -78,6 +84,7 @@ static DefMacro *DefMacro_lookup(char *name)
 void init_macros()
 {
 	def_macros = NULL;
+	in_defgroup = FALSE;
 	utarray_new(in_lines, &ut_str_icd);
 	utarray_new(out_lines, &ut_str_icd);
 	utstring_new(current_line);
@@ -90,6 +97,7 @@ void clear_macros()
 		DefMacro_delete_elem(elem);
 	}
 	def_macros = NULL;
+	in_defgroup = FALSE;
 
 	utarray_clear(in_lines);
 	utarray_clear(out_lines);
@@ -131,22 +139,27 @@ static Bool shift_lines(UT_array *lines)
 }
 
 // collect a macro or argument name [\.\#]?[a-z_][a-z_0-9]*
-static Bool collect_name(char **p, UT_string *out)
+static Bool collect_name(char **in, UT_string *out)
 {
-#define P (*p)
+	char *p = *in;
 
 	utstring_clear(out);
-	while (isspace(*P)) P++;
-	if (*P == '.' || *P == '#') { utstring_bincpy(out, P, 1); P++; }
-	if (isalpha(*P) || *P == '_') { utstring_bincpy(out, P, 1); P++; }
-	while (isalnum(*P) || *P == '_') { utstring_bincpy(out, P, 1); P++; }
+	while (isspace(*p)) p++;
 
-	if (utstring_len(out) == 0)
-		return FALSE;
-	else
+	if (Is_ident_prefix(p[0]) && Is_ident_start(p[1])) {
+		utstring_bincpy(out, p, 2); p += 2;
+		while (Is_ident_cont(*p)) { utstring_bincpy(out, p, 1); p++; }
+		*in = p;
 		return TRUE;
-
-#undef P
+	}
+	else if (Is_ident_start(p[0])) {
+		while (Is_ident_cont(*p)) { utstring_bincpy(out, p, 1); p++; }
+		*in = p;
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
 }
 
 // collect formal parameters
@@ -185,15 +198,20 @@ static Bool collect_text(char **p, DefMacro *macro, UT_string *text)
 			break;
 		else if (*P == '\'' || *P == '"') {
 			char q = *P; utstring_bincpy(text, P, 1); P++;
-			while (*P != q) {
-				if (*P == '\\' && P[1] != '\0') {
-					utstring_bincpy(text, P, 2); P += 2;
+			while (*P != q && *P != '\0') {
+				if (*P == '\\') {
+					utstring_bincpy(text, P, 1); P++;
+					if (*P != '\0') {
+						utstring_bincpy(text, P, 1); P++;
+					}
 				}
 				else {
 					utstring_bincpy(text, P, 1); P++;
 				}
 			}
-			utstring_bincpy(text, P, 1); P++;
+			if (*P != '\0') {
+				utstring_bincpy(text, P, 1); P++;
+			}
 		}
 		else {
 			utstring_bincpy(text, P, 1); P++;
@@ -217,13 +235,69 @@ static Bool collect_eol(char **p)
 {
 #define P (*p)
 
-	while (isspace(*P)) P++;
-	if (*P == ';' || *P == '\n' || *P == '\0')
+	while (isspace(*P)) P++; // consumes also \n and \r
+	if (*P == ';' || *P == '\0')
 		return TRUE;
 	else
 		return FALSE;
 
 #undef P
+}
+
+// is this an identifier?
+static Bool collect_ident(char **in, char *ident)
+{
+	char *p = *in;
+
+	size_t idlen = strlen(ident);
+	if (strnicompare(p, ident, idlen) == 0 && !Is_ident_cont(p[idlen])) {
+		*in = p + idlen;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+// is this a "NAME EQU xxx" or "NAME = xxx"?
+static Bool collect_equ(char **in, UT_string *name)
+{
+	char *p = *in;
+
+	while (isspace(*p)) p++;
+
+	if (in_defgroup) {
+		while (*p != '\0' && *p != ';') {
+			if (*p == '}') {
+				in_defgroup = FALSE;
+				return FALSE;
+			}
+			p++;
+		}
+	}
+	else if (collect_name(&p, name)) {
+		if (stricompare(utstring_body(name), "defgroup") == 0) {
+			in_defgroup = TRUE;
+			while (*p != '\0' && *p != ';') {
+				if (*p == '}') {
+					in_defgroup = FALSE;
+					return FALSE;
+				}
+				p++;
+			}
+			return FALSE;
+		}
+
+		while (isspace(*p)) p++;
+
+		if (*p == '=') {
+			*in = p + 1;
+			return TRUE;
+		}
+		else if (Is_ident_start(*p) && collect_ident(&p, "equ")) {
+			*in = p;
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 // collect arguments and expand macro
@@ -245,81 +319,117 @@ static void parse1(UT_string *in, UT_string *out, UT_string *name, UT_string *te
 
 	char *p = utstring_body(in);
 
-	if (strncmp(p, "#define", 7) == 0 && isspace(p[7])) {
-		p += 8;
-		utstring_clear(out); utstring_printf(out, "\n");
+	if (*p == '#') {
+		p++;
 
-		// get macro name
-		if (!collect_name(&p, name)) {
-			error_syntax();
-			return;
+		if (collect_ident(&p, "define")) {
+			utstring_clear(out);
+
+			// get macro name
+			if (!collect_name(&p, name)) {
+				error_syntax();
+				return;
+			}
+
+			// create macro, error if duplicate
+			DefMacro *macro = DefMacro_add(utstring_body(name));
+			if (!macro) {
+				error_redefined_macro(utstring_body(name));
+				return;
+			}
+
+			// get macro params
+#if 0
+			if (!collect_params(&p, macro, text)) {
+				error_syntax();
+				return;
+			}
+#endif
+
+			// get macro text
+			if (!collect_text(&p, macro, text)) {
+				error_syntax();
+				return;
+			}
 		}
+		else if (collect_ident(&p, "undef")) {
+			utstring_clear(out);
 
-		// create macro, error if duplicate
-		DefMacro *macro = DefMacro_add(utstring_body(name));
-		if (!macro) {
-			error_redefined_macro(utstring_body(name));
-			return;
+			// get macro name
+			if (!collect_name(&p, name)) {
+				error_syntax();
+				return;
+			}
+
+			// assert end of line
+			if (!collect_eol(&p)) {
+				error_syntax();
+				return;
+			}
+
+			DefMacro_delete(utstring_body(name));
 		}
-
-		// get macro params
-		if (!collect_params(&p, macro, text)) {
-			error_syntax();
-			return;
+		else {
 		}
-
-		// get macro text
-		if (!collect_text(&p, macro, text)) {
-			error_syntax();
-			return;
-		}
-	}
-	else if (strncmp(p, "#undef", 6) == 0 && isspace(p[6])) {
-		p += 7;
-		utstring_clear(out); utstring_printf(out, "\n");
-
-		// get macro name
-		if (!collect_name(&p, name)) {
-			error_syntax();
-			return;
-		}
-
-		// assert end of line
-		if (!collect_eol(&p)) {
-			error_syntax();
-			return;
-		}
-
-		DefMacro_delete(utstring_body(name));
 	}
 	else {	// expand macros
 		utstring_clear(out);
-		while (*p) {
-			while (*p != '.' && *p != '#' && *p != '_' && *p != '\0' && !isalpha(*p)) {
+		while (*p != '\0') {
+			if ((Is_ident_prefix(p[0]) && Is_ident_start(p[1])) ||
+				Is_ident_start(p[0])) {
+				// maybe at start of macro call
+				collect_name(&p, name);
+				DefMacro *macro = DefMacro_lookup(utstring_body(name));
+				if (macro)
+					macro_expand(macro, &p, out);
+				else {
+					// try after prefix
+					if (Is_ident_prefix(utstring_body(name)[0])) {
+						utstring_bincpy(out, utstring_body(name), 1);
+						macro = DefMacro_lookup(utstring_body(name) + 1);
+						if (macro)
+							macro_expand(macro, &p, out);
+						else
+							utstring_bincpy(out, utstring_body(name) + 1, utstring_len(name) - 1);
+					}
+					else {
+						utstring_bincpy(out, utstring_body(name), utstring_len(name));
+					}
+				}
+			}
+			else if (*p == '\'' || *p == '"') {
+				char q = *p;
+				utstring_bincpy(out, p, 1); p++;
+				while (*p != q && *p != '\0') {
+					if (*p == '\\') {
+						utstring_bincpy(out, p, 1); p++;
+						if (*p != '\0') {
+							utstring_bincpy(out, p, 1); p++;
+						}
+					}
+					else {
+						utstring_bincpy(out, p, 1); p++;
+					}
+				}
+				if (*p != '\0') {
+					utstring_bincpy(out, p, 1); p++;
+				}
+			}
+			else if (*p == ';') {
+				utstring_bincpy(out, "\n", 1); p += strlen(p);		// skip comments
+			}
+			else {
 				utstring_bincpy(out, p, 1); p++;
 			}
-			if (*p == '\0')
-				break;
+		}
 
-			// maybe at start of macro call
-			collect_name(&p, name);
-			DefMacro *macro = DefMacro_lookup(utstring_body(name));
-			if (macro) 
-				macro_expand(macro, &p, out);
-			else {
-				// try after . or # prefix
-				if (utstring_body(name)[0] == '.' || utstring_body(name)[0] == '#') {
-					utstring_bincpy(out, utstring_body(name), 1);
-					macro = DefMacro_lookup(utstring_body(name) + 1);
-					if (macro)
-						macro_expand(macro, &p, out);
-					else
-						utstring_bincpy(out, utstring_body(name) + 1, utstring_len(name) - 1);
-				}
-				else {
-					utstring_bincpy(out, utstring_body(name), utstring_len(name));
-				}
-			}
+		// check other commands after macro expansion
+		utstring_clear(in); utstring_concat(in, out);	// in = out
+
+		p = utstring_body(in);
+		if (collect_equ(&p, name)) {
+			utstring_clear(out); 
+			utstring_printf(out, "defc %s = %s", utstring_body(name), p);
 		}
 	}
 }
