@@ -2831,12 +2831,17 @@ void zlt_const(LVALUE *lval, int32_t value)
             zlt(lval);
         }
     } else if ( lval->val_type == KIND_CHAR && utype(lval)) {
-        if ( value ==  0 ) {
+        if ( value == 0 ) {
             ol("and\ta");
         } else {
             ol("ld\ta,l");
             outfmt("\tsub\t%d\n", (value % 256));
         }
+        set_carry(lval);
+    } else if ( lval->val_type == KIND_CHAR ) {
+        // We're signed here
+        ol("ld\ta,h");
+        ol("rla");  
         set_carry(lval);
     } else if ( (lval->val_type == KIND_INT && utype(lval)) || lval->val_type == KIND_PTR ) {
         const2(value & 0xffff);  // 6 bytes
