@@ -883,48 +883,6 @@ void testjump(LVALUE* lval, int label)
     opjump("z,", label);
 }
 
-/* test primary register against zero and jump if false */
-/* Special conditions for testing char here */
-void zerojump(
-    void (*oper)(LVALUE*, int),
-    int label,
-    LVALUE* lval)
-{
-    clearstage(lval->stage_add, 0); /* purge conventional code */
-    lval->stage_add = NULL;
-#ifdef CHARCOMP0
-    if (lval->oldval_kind == KIND_CHAR) {
-        if (oper == testjump) { /* !=0 or >=0U */
-            LoadAccum();
-            ol("and\ta");
-            opjump("z,", label);
-            return;
-        } else if (oper == le0) { /* <=0 */
-            LoadAccum();
-            ol("and\ta");
-            if (IS_ASM(ASM_Z80ASM)) {
-                ol("jr\tz,ASMPC+5");
-            } else {
-                ol("jr\tz,$+5");
-            }
-            opjump("p,", label);
-            return;
-        } else if (oper == ge0) { /* > 0 */
-            LoadAccum();
-            ol("and\ta");
-            opjump("m,", label);
-            return;
-        } else if (oper == gt0) {
-            LoadAccum();
-            ol("and\ta");
-            opjump("m,", label);
-            opjump("z,", label);
-            return;
-        }
-    }
-#endif
-    (*oper)(lval, label);
-}
 
 /* Print pseudo-op to define a byte */
 void defbyte(void)
@@ -2574,81 +2532,7 @@ void eq0(LVALUE* lval, int label)
     opjump("nz,", label);
 }
 
-void lt0(LVALUE* lval, int label)
-{
-    switch (lval->oldval_kind) {
-#ifdef CHARCOMP0
-    case KIND_CHAR:
-        ol("xor\ta");
-        ol("or\tl");
-        break;
-#endif
-    case KIND_LONG:
-        ol("xor\ta");
-        ol("or\td");
-        break;
-    case KIND_CPTR:
-        ol("xor\ta");
-        ol("or\te");
-        break;
-    default:
-        ol("xor\ta");
-        ol("or\th");
-    }
-    opjump("p,", label);
-}
 
-/* Test for less than or equal to zero */
-void le0(LVALUE* lval, int label)
-{
-    ol("ld\ta,h");
-    ol("or\tl");
-    if (lval->oldval_kind == KIND_LONG) {
-        ol("or\td");
-        ol("or\te");
-    }
-    if (lval->oldval_kind == KIND_CPTR) {
-        ol("or\te");
-    }
-    if (ISASM(ASM_Z80ASM)) {
-        ol("jr\tz,ASMPC+7");
-    } else {
-        ol("jr\tz,$+7");
-    }
-    lt0(lval, label);
-}
-
-/* test for greater than zero */
-void gt0(LVALUE* lval, int label)
-{    
-    ge0(lval, label);
-    if (lval->oldval_kind == KIND_LONG) {
-        ol("or\th");
-        ol("or\te");
-    }
-    if (lval->oldval_kind == KIND_CPTR) {
-        ol("or\th");
-    }
-    ol("or\tl");
-    opjump("z,", label);
-}
-
-/* test for greater than or equal to zero */
-void ge0(LVALUE* lval, int label)
-{
-    ol("xor\ta");
-    switch (lval->oldval_kind) {
-    case KIND_LONG:
-        ol("or\td");
-        break;
-    case KIND_CPTR:
-        ol("or\te");
-        break;
-    default:
-        ol("or\th");
-    }
-    opjump("m,", label);
-}
 
 void zeq_const(LVALUE *lval, int32_t value) 
 {
@@ -2840,7 +2724,7 @@ void zlt_const(LVALUE *lval, int32_t value)
         set_carry(lval);
     } else if ( lval->val_type == KIND_CHAR ) {
         // We're signed here
-        ol("ld\ta,h");
+        ol("ld\ta,l");
         ol("rla");  
         set_carry(lval);
     } else if ( (lval->val_type == KIND_INT && utype(lval)) || lval->val_type == KIND_PTR ) {
