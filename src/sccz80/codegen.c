@@ -102,7 +102,6 @@ void DoLibHeader(void)
      */
     strncpy(filen, Filename + 1, strlen(Filename) - 2);
     filen[strlen(Filename) - 1] = '\0';
-    changesuffix(filen, "");
     if (1) {
         char* ptr = filen;
         if (!isalpha(*ptr) && *ptr != '_') {
