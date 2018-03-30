@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_482_optrule
 
 
 	INCLUDE "z80_crt0.hdr"

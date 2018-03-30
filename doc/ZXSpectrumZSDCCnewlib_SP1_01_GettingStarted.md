@@ -96,12 +96,12 @@ C doesn't. You can see the pattern of the sprite in the ones and
 zeroes which makes it a little easier to look at.
 
 The very top line of the file sets the *section* of the final program
-this piece of data needs to go into. Z88DK uses sections to arrange
-the final output in the Spectrum's memory. The
-[details](https://www.z88dk.org/wiki/doku.php?id=temp:front#assembly_language)
-aren't important at this stage, just be aware that if C code is to
-use the data being specified in an assembly language file, that data
-needs to be placed in the *read only user's data* section.
+that this piece of data will be placed into. Z88DK uses sections as
+named containers holding bytes that are arranged in the output binary
+by a memory map. The [details](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded#mixing_c_and_assembly_language)
+aren't important at this stage, but for informational purposes, this
+section directive will place this sprite data in the *read only user's
+data* section.
 
 Next we declare the label *_circle* to be publicly visible such that
 code in external files (the C source) can see it.
@@ -134,7 +134,7 @@ extern unsigned char circle[];
 
 int main()
 {
-  struct sp1_Rect full_screen = {0, 0, 32, 24};
+  static struct sp1_Rect full_screen = {0, 0, 32, 24};
   struct sp1_ss  *circle_sprite;
 
   zx_border(INK_BLACK);
@@ -146,7 +146,7 @@ int main()
  
   circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)circle, 0);
 
-  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, (int)circle, 0);
+  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
 
   sp1_MoveSprAbs(circle_sprite, &full_screen, 0, 0, 0, 0, 0);
 
@@ -186,12 +186,7 @@ include/_DEVELOPMENT/sdcc/arch/zx/sp1.h
 ```
 
 You should keep this file open. It is currently sparsely documented,
-but it's still the definitive guide to the SP1 C interface. Also, be
-aware that SP1 is configured when Z88DK is installed and
-built, and several files are automatically generated to match the
-local configuration. Although we're not going to cover the SP1
-reconfiguration here, it's for this reason you should always reference
-your local copy of the header file, not the one online at GitHub.
+but it's still the definitive guide to the SP1 C interface.
 
 The SP1 library code we're using is in the 'iy' version of the
 standard C library, as described
@@ -238,20 +233,20 @@ cells. This tells the screen updater algorithm in SP1 that the
 specified area - in this case it's the whole of the Spectrum screen -
 is going to need to be redrawn when we get to that point.
 
-Next we have to create the sprite. SP1 sprites are created, then
-graphical data is subsequently filled in. The first call we see is
-therefore *sp1_CreateSpr()* which creates the sprite structure. This
-is followed by a call to *sp1_AddColSpr()* which adds a single
-column of data to the sprite. A 'column' in this context is an 8 pixel
-wide block of graphical data as tall as the sprite. There is a lot of
-detail in these 2 function calls which we need to cover, so we'll
-return to them in a moment.
+Next we have to create the sprite. SP1 sprites are created one column
+at a time. The first call we see is therefore *sp1_CreateSpr()* which
+creates the sprite structure and adds the first column of the sprite's
+graphics. This is followed by a call to *sp1_AddColSpr()* which adds a
+second column of sprite graphics to the sprite. A 'column' in this
+context is an 8 pixel wide block of graphical data as tall as the
+sprite. There is a lot of detail in these 2 function calls which we
+need to cover, so we'll return to them in a moment.
 
-Next, we place the sprite ready to be drawn via the call to
+Next, we place the sprite on screen via the call to
 *sp1_MoveSprAbs()*. The final 4 arguments to this function specify
 exactly where to place the sprite in row, column, horizontal rotation,
 vertical rotation, format. The row and column specify the character
-cell location for the sprite in the ranges 0-24 and 0-32
+cell location for the sprite in the ranges 0-23 and 0-31
 respectively. The horizontal and vertical rotation values are both in
 the range 0-7 and specify how many pixels to rotate the sprite data by
 within the character cell so it sits in the exact pixel location
@@ -267,7 +262,10 @@ The sprite's location in pixels is therefore:
 This method of screen positioning might seem a little fussy, but there
 is good reason for it. As we shall see, SP1 largely works in character
 cells, not pixels, and having the user's program specify values in
-character cells where possible makes the library more efficient.
+character cells where possible makes the library more efficient.  There
+are a couple more move functions that allow, among other things, pixel
+positions to be specified that will internally convert to this character
+cell + rotation form.
 
 Up to this point the program has only been arranging things in
 memory. Nothing has been drawn to the screen. To make that happen we
@@ -303,19 +301,19 @@ of 2 character cells need to be considered when drawing the sprite.
 On the subject of pixel positioning, it's worth a look at how SP1
 positions a sprite on the requested pixel in the y-axis. It uses a
 trick which needs to be understood. In order to place our sprite on a
-character cell boundary, such as row 0, or 8, or maybe 64, the top
+vertical character cell boundary, such as pixel row 0, or 8, or maybe 64, the top
 line of the sprite graphic is copied into the requested screen row,
 then subsequent lines are filled in below it just as you'd expect. But
 if the requested destination row is, say, one pixel below the top line
-of a cell, say 1, or 9, or maybe 65, rather than rotating the graphic
+of a cell, say pixel row 1, or 9, or maybe 65, rather than rotating the graphic
 data downwards, the source address for the graphic data is moved back
 (i.e. lower in memory) by one byte. So for example, if the top line of
 the graphic data is at address 50,000, the byte at address 49,999 is
 the first to be transferred into the display, followed by the byte at
 50,000, and so on. 9 bytes in total will be transferred. That means the
 actual graphic is placed one scan line lower than the top of the
-character cell, effecting the one-pixel-lower screen location
-requested.
+character cell, effectively moving the sprite image one pixel lower
+on screen.
 
 "What," you might ask, "is at address 49,999?" because whatever is
 there is going to end up in the display and the user will see it!
@@ -375,7 +373,8 @@ inspection. Here's the first:
   circle_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, (int)circle, 0);
 ```
 
-This function call creates the sprite structure in memory. The first
+This function call creates the sprite structure in memory and adds
+the first column of the sprite's graphics. The first
 argument is a pointer to a function used to draw the left side of the
 sprite. (There's no immediately obvious reason for the capitalisation
 of the function name; it's not a macro.) The function we're using here
@@ -405,21 +404,22 @@ the maximum height of the sprite when it's being vertically rotated
 into position. As we've seen, an 8 pixel high sprite can take 2
 character cells.
 
-Next we provide the graphical data for the sprite. There are two ways
-of using this function, and putting the graphic data in this 4th
-argument is the simpler way. Many SP1 examples use the other way,
-which we'll see shortly. In the meantime, if you look at other code,
-don't be surprised to see a zero value here.
+Next we provide the graphical data for the first column of the sprite.
+There are two ways of using this function, and putting the graphic
+data in this 4th argument is the simpler way. Many SP1 examples use
+the other way, which we'll see shortly. In the meantime, if you look
+at other code, don't be surprised to see a zero value here.
 
 Finally we add the plane of the display to draw the sprite into. SP1
 uses 256 "planes" in its display, which are filled in from the back to
 the front and allow sprites to be logically on top of each
-other. Plane 255 is the background; plane 0 is closest to the viewer.
+other. Plane 255 is just above the background; plane 0 is closest to
+the viewer.
 
 Let's move on to the second line of sprite generation code:
 
 ```
-  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, (int)circle, 0);
+  sp1_AddColSpr(circle_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
 ```
 
 SP1 sprites are built up in columns, left to right. This approach
@@ -436,10 +436,17 @@ uses the "load" drawing algorithm, a data type of 1 byte (i.e. no
 mask), and which knows it's responsible for drawing the right boundary
 of the sprite.
 
-We then add the sprite type and the sprite data as before. In this
-case, with a 8 pixel wide sprite, the left side data is actually the
-same as the the right side data. The plane is 0, closest to the
-viewer.
+We then add the sprite type as before.
+
+The next zero is the address
+of the graphic to use for this column.  There are no graphics for this
+column because this sprite's image is only one character wide.  The draw
+function used `SP1_DRAW_LOAD1RB` is right-boundary type and it knows
+there isn't an image in this column and will only draw the portion of image
+shifted into the column from the left.  In other words, the graphic address
+specified here is ignored and zero is as good a value as any.
+
+The final zero sets the plane to 0, closest to the viewer.
 
 We already looked at the line which moves the sprite to the required
 screen location:
@@ -466,9 +473,8 @@ the whole lot needs updating
 * a sprite is created with the left boundary draw function and the
 graphical data, which tells the library how to draw the left side of the
 sprite
-* another column is added with the right boundary draw function and
-the graphical data, which tells the library how to draw the right side of
-the sprite
+* another column is added with the right boundary draw function, which
+tells the library how to draw the right side of the sprite
 * the sprite is moved into the display
 * SP1 is told to draw the screen. The whole screen has been marked as
 invalid so it knows everything must be drawn. When it gets to drawing
@@ -506,7 +512,7 @@ useful information on there about reconfiguring the library too.
 There are lots of example programs in the Z88DK source tree, including
 [here](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1)
 and
-[here](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/spectrum/examples).
+[here](https://github.com/z88dk/z88dk/tree/master/libsrc/sprites/software/sp1/spectrum/examples), although examples from the latter link are older and may need minor changes to compile.
 
 [Blackstar](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar)
 in particular is a complete game written with SP1, and is an excellent

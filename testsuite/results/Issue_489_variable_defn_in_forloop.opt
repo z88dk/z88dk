@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_489_variable_defn_in_forloop
 
 
 	INCLUDE "z80_crt0.hdr"

@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_490_repeated_extern_decls
 
 
 	INCLUDE "z80_crt0.hdr"

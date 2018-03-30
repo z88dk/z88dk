@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_26_casting
 
 
 	INCLUDE "z80_crt0.hdr"

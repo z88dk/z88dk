@@ -37,23 +37,32 @@ char *stolower(char *str)
 	return str;
 }
 
-int stricompare(char *str1, char *str2)
+int stricompare(char *s1, char *s2)
+{
+	if (s1 == s2)   return 0;
+	if (s1 == NULL) return -1;
+	if (s2 == NULL)	return 1;
+	while (*s2 != '\0' && tolower(*s1) == tolower(*s2)) {
+		s1++; s2++;
+	}
+	return (int)(tolower(*s1) - tolower(*s2));
+}
+
+int strnicompare(char *s1, char *s2, size_t n)
 {
 	char c1, c2;
 
-	while (1)
-	{
-		c1 = tolower(*str1++);
-		c2 = tolower(*str2++);
+	if (s1 == s2)   return 0;
+	if (s1 == NULL) return -1;
+	if (s2 == NULL)	return 1;
+	if (n == 0)		return 0;
+	do {
+		c1 = tolower(*s1++);
+		c2 = tolower(*s2++);
+		n--;
+	} while ((c1 != '\0') && (c1 == c2) && (n > 0));
 
-		if (c1 != c2)
-			return c1 - c2;		/* different */
-		else if (c1 == 0)
-			return 0;           /* equal */
-		else
-		{
-		}					/* check next */
-	}
+	return (int)(c1 - c2);
 }
 
 char *chomp(char *str)

@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;       $Id: clsgraph.asm,v 1.5 2017-01-02 21:51:23 aralbrec Exp $
+;       $Id: clsgraph.asm $
 ;
 
 			SECTION   code_clib

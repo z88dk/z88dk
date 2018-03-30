@@ -84,6 +84,7 @@ ENDIF
 
 
 IF (startup=2)
+
 	ld    hl,$2c00		; character set RAM
 		; init the first 256 bytes with gfx blocks
 gfx_bloop:
@@ -122,6 +123,11 @@ blankloop:
 
 	EXTERN  cleargraphics
 	call cleargraphics
+	
+ELSE
+
+	ld   hl,$2400
+	ld   (base_graphics),hl
 
 ENDIF
 

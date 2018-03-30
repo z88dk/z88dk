@@ -59,7 +59,8 @@ static struct zx_common zxc = {
     NULL,       // excluded_banks
     NULL,       // excluded_sections
     0,          // clean
-    -1          // main_fence applies to banked model compiles only
+    -1,         // main_fence applies to banked model compiles only
+    0           // pages - zx next only
 };
 
 static struct zx_tape zxt = {
@@ -90,7 +91,7 @@ static struct zx_bin zxb = {
     0xff,       // romfill
     0,          // ihex
     0,          // ipad
-    16          // recsize
+    16,         // recsize
 };
 
 static char tap = 0;   // .tap tape

@@ -202,6 +202,7 @@
     <ClCompile Include="..\..\src\z80asm\lib\strhash.c" />
     <ClCompile Include="..\..\src\z80asm\lib\strpool.c" />
     <ClCompile Include="..\..\src\z80asm\listfile.c" />
+    <ClCompile Include="..\..\src\z80asm\macros.c" />
     <ClCompile Include="..\..\src\z80asm\main.c" />
     <ClCompile Include="..\..\src\z80asm\model.c" />
     <ClCompile Include="..\..\src\z80asm\modlink.c" />
@@ -244,6 +245,7 @@
     <ClInclude Include="..\..\src\z80asm\lib\strpool.h" />
     <ClInclude Include="..\..\src\z80asm\lib\types.h" />
     <ClInclude Include="..\..\src\z80asm\listfile.h" />
+    <ClInclude Include="..\..\src\z80asm\macros.h" />
     <ClInclude Include="..\..\src\z80asm\model.h" />
     <ClInclude Include="..\..\src\z80asm\modlink.h" />
     <ClInclude Include="..\..\src\z80asm\module.h" />

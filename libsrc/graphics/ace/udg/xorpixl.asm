@@ -8,7 +8,7 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
+;	$Id: xorpixl.asm $
 ;
 
 
@@ -30,7 +30,6 @@
 			ret	nc		; y0	out of range
 
 			dec	a
-			dec	a
 			
 			ld	(__gfx_coords),hl
 			
@@ -47,11 +46,11 @@
 			inc	e
 			add	hl,de
 			ld	a,(hl)
-			ld	c,a	; y/3
+;			ld	c,a	; y/3
 			
 			srl	b	; x/2
 			
-			ld	a,c
+;			ld	a,c
 			ld	c,b	; !!
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -60,15 +59,16 @@
 
 			ld	b,a		; keep y/3
 			and	a
-			jr	z,r_zero
 
 			ld	de,32
+			;dec	a
+			jr	z,r_zero
 .r_loop
 			add	hl,de
 			dec	a
 			jr	nz,r_loop
 		
-.r_zero     ld	d,0
+.r_zero     ;ld	d,0
 			ld	e,c
 			add	hl,de
 

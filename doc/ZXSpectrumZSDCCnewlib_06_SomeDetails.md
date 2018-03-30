@@ -26,7 +26,7 @@ just the ones which will be useful to know as we move forward.
 By default a Z88DK Spectrum program will be compiled such that its code
 originates at address 32768. This is one of the numerous configuration
 parameters defined in the C Runtime Configuration file
-[here](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/crt_config.inc):
+[here](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/target/zx/crt_config.inc#L19):
 
 ```
 libsrc/_DEVELOPMENT/target/zx/crt_config.inc
@@ -37,7 +37,7 @@ also find the stack register is initially set to 65368 (REGISTER_SP) which
 places it immediately below the user defined graphics area. This is so that if
 the program returns to BASIC the UDGs will still be intact. The stack size is set to 
 512 bytes. There's quite a few other things in there too, and they're documented
-[here](https://www.z88dk.org/wiki/doku.php?id=temp:front#crt_configuration).
+[here](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded#crt_configuration).
 
 So by default the Spectrum's memory map for a Z88DK program is:
 

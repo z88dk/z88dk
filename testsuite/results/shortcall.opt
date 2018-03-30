@@ -1,7 +1,6 @@
 
 
 
-	MODULE	shortcall
 
 
 	INCLUDE "z80_crt0.hdr"
