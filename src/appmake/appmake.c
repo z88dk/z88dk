@@ -1605,7 +1605,7 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
     char filename[MBLINEMAX];
     char ihexname[MBLINEMAX];
     FILE *fbin, *fhex;
-    int   i, j, error;
+    int   i, j, k, error;
 
     // generate output binaries
 
@@ -1629,7 +1629,7 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
 
         free_gap = 0;
 
-        for (int k = 1; k < memory->mainbank.num; ++k)
+        for (k = 1; k < memory->mainbank.num; ++k)
             free_gap += memory->mainbank.secbin[k].org - memory->mainbank.secbin[k - 1].org - memory->mainbank.secbin[k - 1].size;
 
         printf("Creating %s (org 0x%04x", filename, memory->mainbank.secbin[0].org);
@@ -1674,8 +1674,10 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
                 // count free space in bank
 
                 free_gap = 0;
+                free_head = 0;
+                free_tail = 0;
 
-                for (int k = 1; k < mb->num; ++k)
+                for (k = 1; k < mb->num; ++k)
                     free_gap += mb->secbin[k].org - mb->secbin[k - 1].org - mb->secbin[k - 1].size;
 
                 if (bs->size > 0)
@@ -1687,9 +1689,9 @@ void mb_generate_output_binary_complete(char *binname, int ihex, int filler, int
                 // generate output binary
 
                 printf("Creating %s (org 0x%04x", filename, (bs->size > 0) ? bs->org : mb->secbin[0].org);
-                if ((bs->size > 0) && free_head) printf(", %d head bytes free", free_head);
+                if (free_head) printf(", %d head bytes free", free_head);
                 if (free_gap) printf(", %d gap bytes free", free_gap);
-                if ((bs->size > 0) && free_tail) printf(", %d tail bytes free", free_tail);
+                if (free_tail) printf(", %d tail bytes free", free_tail);
                 printf(")\n");
 
                 error = mb_generate_output_binary(fbin, filler, fhex, ipad, irecsz, mb, bs->org, bs->size);
