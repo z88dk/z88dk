@@ -1,7 +1,6 @@
 
 
 
-	MODULE	zxn_Issue_312_zxn_optimisations
 
 
 	INCLUDE "z80_crt0.hdr"

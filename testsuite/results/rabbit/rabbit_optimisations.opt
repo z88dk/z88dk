@@ -1,7 +1,6 @@
 
 
 
-	MODULE	rabbit_rabbit_optimisations
 
 
 	INCLUDE "z80_crt0.hdr"

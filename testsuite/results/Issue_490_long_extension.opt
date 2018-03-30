@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_490_long_extension
 
 
 	INCLUDE "z80_crt0.hdr"

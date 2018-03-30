@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_514_flexible_member
 
 
 	INCLUDE "z80_crt0.hdr"

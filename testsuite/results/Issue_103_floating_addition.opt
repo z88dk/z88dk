@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_103_floating_addition
 
 
 	INCLUDE "z80_crt0.hdr"

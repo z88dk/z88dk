@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_569_init_from_2d_array
 
 
 	INCLUDE "z80_crt0.hdr"

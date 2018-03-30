@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_501_extern_at
 
 
 	INCLUDE "z80_crt0.hdr"

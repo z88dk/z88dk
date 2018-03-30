@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_419_Extern_Prototypes_In_Function
 
 
 	INCLUDE "z80_crt0.hdr"

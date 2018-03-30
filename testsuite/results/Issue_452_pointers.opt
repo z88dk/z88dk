@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_452_pointers
 
 
 	INCLUDE "z80_crt0.hdr"

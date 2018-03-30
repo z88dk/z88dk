@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_507_unnamed_structs
 
 
 	INCLUDE "z80_crt0.hdr"

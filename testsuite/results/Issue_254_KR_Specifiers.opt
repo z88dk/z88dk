@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_254_KR_Specifiers
 
 
 	INCLUDE "z80_crt0.hdr"

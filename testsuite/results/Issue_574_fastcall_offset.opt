@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_574_fastcall_offset
 
 
 	INCLUDE "z80_crt0.hdr"

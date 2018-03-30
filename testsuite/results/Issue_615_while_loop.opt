@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_615_while_loop
 
 
 	INCLUDE "z80_crt0.hdr"
