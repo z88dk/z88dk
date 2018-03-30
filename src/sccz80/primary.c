@@ -709,7 +709,6 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
 int test(int label, int parens)
 {
     char *before, *start;
-    int   need_to_test_jump = 1;
     LVALUE lval={0};
     void (*oper)(LVALUE *lva);
     
@@ -739,16 +738,14 @@ int test(int label, int parens)
         return 0;
     }
     
-    if ( need_to_test_jump) {
-        if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
-            if (lval.binop == dummy) {
-                lval.val_type = KIND_INT; /* logical always int */
-                lval.ltype = type_int;
-            }
-            testjump(&lval, label);
-        } else {
-            jumpnc(label);
+    if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
+        if (lval.binop == dummy) {
+            lval.val_type = KIND_INT; /* logical always int */
+            lval.ltype = type_int;
         }
+        testjump(&lval, label);
+    } else {
+        jumpnc(label);
     }
     clearstage(before, start);
     return -1;

@@ -803,10 +803,6 @@ void callstk(Type *type, int n, int isfarptr)
     }
 }
 
-void jump0(LVALUE* lval, int label)
-{
-    opjump("", label);
-}
 
 /* Jump to specified internal label number */
 void jump(int label)
@@ -1567,7 +1563,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
             const2(0);
             return;
         }
-    } else if ( utype(lval) ) {
+    } else if ( lval->val_type == KIND_INT && utype(lval) ) {
         if ( value == 512 ) {
             ol("ld\tl,h");
             ol("ld\th,0");
@@ -1745,8 +1741,6 @@ void zmod_const(LVALUE *lval, int32_t value)
             swap();
             zmod(&templval);
     }
-    if ( lval->val_type == KIND_LONG ) 
-        const2(0);
 }
 
 /* Inclusive 'or' the primary and secondary */
@@ -2404,7 +2398,7 @@ void lneg(LVALUE* lval)
         callrts("l_long_lneg");
         break;
     case KIND_CARRY:
-        set_int(lval);
+        set_carry(lval);
         ol("ccf");
         break;
     case KIND_DOUBLE:
@@ -2538,8 +2532,12 @@ void zeq_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
-            ol("ld\ta,d");
-            ol("or\te");
+            if ( lval->val_type == KIND_CPTR) {
+                ol("ld\ta,e");
+            } else {
+                ol("ld\ta,d");
+                ol("or\te");
+            }
             ol("or\th");
             ol("or\tl");
             ol("jr\tnz,ASMPC+3");
@@ -2619,8 +2617,12 @@ void zne_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
-            ol("ld\ta,d");
-            ol("or\te");
+            if ( lval->val_type == KIND_CPTR) {
+                ol("ld\ta,e");
+            } else {
+                ol("ld\ta,d");
+                ol("or\te");
+            }
             ol("or\th");
             ol("or\tl");
             ol("jr\tz,ASMPC+3");
@@ -2741,7 +2743,7 @@ void zlt_const(LVALUE *lval, int32_t value)
                 ol("rla");
             }
         } else {
-            ol("ld\ta,l"); // 9 bytes
+            ol("ld\ta,l"); // 9 bytesz
             outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
             ol("ld\ta,h");
             ol("rla");
@@ -2808,12 +2810,17 @@ void zle_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
        if ( value ==  0 ) {
-            ol("ld\ta,d"); // 10 bytes
-            if ( !utype(lval)) {
-                ol("rla");
-                ol("jr\tc,ASMPC+8");
+            if ( lval->val_type == KIND_CPTR) {
+                ol("ld\ta,e");
+            } else {
+                ol("ld\ta,d");
+                ol("or\te");
+                if ( !utype(lval)) {
+                    ol("rla");
+                    ol("jr\tc,ASMPC+8");
+                }
+                ol("or\te"); // We know MSBit was 0, so no point shifting it back in
             }
-            ol("or\te"); // We know MSBit was 0, so no point shifting it back in
             ol("or\th"); 
             ol("or\tl");
             ol("jr\tnz,ASMPC+3");
@@ -2904,8 +2911,12 @@ void zgt_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 && utype(lval) ) {
-            ol("ld\ta,d");
-            ol("or\te");
+            if ( lval->val_type == KIND_CPTR ) {
+                ol("ld\ta,e");
+            } else {
+                ol("ld\ta,d");
+                ol("or\te");
+            }
             ol("or\th");
             ol("or\tl");
             ol("jr\tz,ASMPC+3");
@@ -2957,12 +2968,6 @@ void zgt(LVALUE* lval)
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
-                if (ISASM(ASM_Z80ASM)) {
-                    ol("jr\tz,ASMPC+3"); /* If zero, nc */
-                } else {
-                    ol("jr\tz,$+3"); /* If zero, nc */
-                }
-                ol("ccf");
             } else {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -2994,6 +2999,7 @@ void zge_const(LVALUE *lval, int32_t value)
             } else {
                 ol("ld\ta,d");
                 ol("rla");
+                ol("ccf");
             }
             set_carry(lval);
             return;
@@ -3158,16 +3164,6 @@ void DoubSwap(void)
     callrts("dswap");
 }
 
-/*
- * Load long into hl and de 
- * Takes respect of sign, so if signed and high word=0 then
- * print 65535 else print whats there..could possibly come unstuck!
- * this is so that -1 -> -32768 are correcly represented
- *
- * djm 21/2/99 fixed, so that sign is disregarded! this allows us
- * to have -1 entered correctly
- */
-
 void vlongconst(uint32_t val)
 {
     vconst(val % 65536);
@@ -3184,14 +3180,6 @@ void vlongconst_tostack(uint32_t val)
     Zsp -= 4;
 }
 
-void vlongconst_noalt(uint32_t val)
-{
-    constbc(val / 65536);
-    ol("push\tbc");
-    constbc(val % 65536);
-    ol("push\tbc");
-    Zsp -= 4;
-}
 
 /*
  * load constant into primary register

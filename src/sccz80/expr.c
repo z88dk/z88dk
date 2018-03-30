@@ -194,7 +194,7 @@ int heir1a(LVALUE* lval)
         if (k)
             rvalue(lval);
         /* test condition, jump to false expression evaluation if necessary */
-        if (check_lastop_was_testjump(lval)) {
+    if (check_lastop_was_testjump(lval)) {
             // Always evaluated as an integer, so fake it temporarily
             force(KIND_INT, lval->val_type, c_default_unsigned, lval->ltype->isunsigned, 0);
             temptype = lval->val_type;

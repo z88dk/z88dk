@@ -185,7 +185,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         } else {
             if ( lval2->val_type == KIND_LONG ) {
-                vlongconst_noalt(lval->const_val); 
+                vlongconst_tostack(lval->const_val); 
                 lval->val_type = KIND_LONG;  
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;        
             } else {
@@ -477,7 +477,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             vlongconst(lval->const_val);
         } else {
             if ( lval2->val_type == KIND_LONG ) {
-                vlongconst_noalt(lval->const_val); 
+                vlongconst_tostack(lval->const_val); 
                 lval->val_type = KIND_LONG;   
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else {
