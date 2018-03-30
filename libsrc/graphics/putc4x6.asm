@@ -43,19 +43,22 @@
 
 		cp	10
 		jp	z,do_nl
+		cp	13
+		jp	z,do_nl
 
 		cp  8
 		jr	nz,nobs
 		ld	a,(x_4x6)
-		sub 6
+		sub 4
 		jr c,nobs1
 		ld	(x_4x6),a
 .nobs1
 		ld	a,' '
 		call nolower
 		ld	a,(x_4x6)
-		sub 6
+		sub 4
 		ld	(x_4x6),a
+		ret
 		
 .nobs
 		cp	97
