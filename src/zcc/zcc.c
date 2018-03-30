@@ -1344,12 +1344,9 @@ int main(int argc, char **argv)
                     q = original_filenames[i];
 
                 snprintf(tmp, sizeof(tmp) - 3, "MODULE %s\n"
-                                               "LINE -1, \"%s\"\n", q, original_filenames[i]);
+                                               "LINE -1, \"%s\"\n\n", q, original_filenames[i]);
 
-                // be consistent with z80asm by not having the asm extension part of the module name
-                if ((q = find_file_ext(tmp)) && (strcmp(q, ".asm") == 0))
-                    *q = '\0';
-                strcat(tmp, "\n\n");
+                // change non-alnum chars in module name to underscore
 
                 for (q = tmp+7; *q != '\n'; ++q)
                     if (!isalnum(*q)) *q = '_';
