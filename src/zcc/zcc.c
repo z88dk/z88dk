@@ -2425,7 +2425,7 @@ static void configure_compiler()
 			BuildOptions(&cpparg, preprocarg);
 		}
 		c_compiler = c_sccz80_exe;
-		compiler_style = outimplied;
+		compiler_style = outspecified_flag;
 	}
 }
 

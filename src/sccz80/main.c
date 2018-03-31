@@ -14,7 +14,7 @@ extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. 
 #endif
 
 static char   *c_output_extension = "asm";
-
+static char   *c_output_file = NULL;
 
 static int      gargc; /* global copies of command line args */
 static char   **gargv;
@@ -91,6 +91,7 @@ static void atexit_deallocate(void);
 static option  sccz80_opts[] = {
     { 'v', "verbose", OPT_BOOL, "Be verbose", &c_verbose, 0 },
     { 'h', "help", OPT_FUNCTION|OPT_BOOL, "Show this help page", DispInfo, 0 },
+    { 'o', "output", OPT_STRING, "Set the output filename", &c_output_file, 0 },
     { 0, "", OPT_HEADER, "CPU Targetting:", NULL, 0 },
     { 0, "mz80-zxn", OPT_ASSIGN|OPT_INT, "Generate output for the z80-zxn", &c_cpu, CPU_Z80ZXN },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, CPU_Z80 },
@@ -643,11 +644,19 @@ void openout()
 
     /* copy file name to string */
     strcpy(Filename, filen2);
-    strcpy(Filenorig, filen2);
-    changesuffix(filen2, extension); /* Change appendix to .asm */
-    if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
-        fprintf(stderr, "Cannot open output file: %s\n", line);
-        exit(1);
+
+    if ( c_output_file != NULL ) {
+        if ((output = fopen(c_output_file, "w")) == NULL && (!eof)) {
+            fprintf(stderr, "Cannot open output file: %s\n", line);
+            exit(1);
+        }
+    } else {
+        strcpy(Filenorig, filen2);
+        changesuffix(filen2, extension); /* Change appendix to .asm */
+        if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
+            fprintf(stderr, "Cannot open output file: %s\n", line);
+            exit(1);
+        }
     }
     clear(); /* erase line */
 }
@@ -657,8 +666,8 @@ void openout()
  */
 void openin()
 {
-    input = 0; /* none to start with */
-    while (input == 0) { /* any above 1 allowed */
+    input = NULL; /* none to start with */
+    while (input == NULL) { /* any above 1 allowed */
         clear(); /* clear line */
         if (eof)
             break; /* if user said none */
