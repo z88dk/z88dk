@@ -16,3 +16,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct opts_s
+{
+	bool	verbose;
+	bool	list;
+} opts_t;
+
+extern opts_t opts;
+
+typedef struct global_s
+{
+	bool	modified;
+} global_t;
+
+extern global_t global;

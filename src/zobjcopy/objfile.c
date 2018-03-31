@@ -132,10 +132,40 @@ void objfile_free(objfile_t *obj)
 	Free(obj);
 }
 
+static void print_section(UT_string *section)
+{
+	if (opts.list && utstring_len(section) > 0)		// not "" section
+		printf(" (section %s)", utstring_body(section));
+}
+
+static void print_bytes(UT_array *data) 
+{
+	size_t addr = 0;
+	byte_t *p = (byte_t*)utarray_front(data);
+	size_t size = utarray_len(data);
+
+	while (size-- != 0) {
+		if ((addr % 16) == 0) {
+			if (addr != 0)
+				printf("\n");
+			printf("    C $%04X:", addr);
+		}
+
+		printf(" %02X", *p++);
+		addr++;
+	}
+
+	if (addr != 0)
+		printf("\n");
+}
+
 static void objfile_read_names(objfile_t *obj, FILE *fp, long fpos_start, long fpos_end)
 {
 	if (obj->version >= 5)					// signal end by zero type
 		fpos_end = MAX_FP;
+
+	if (opts.list)
+		printf("  Names:\n");
 
 	fseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
@@ -161,6 +191,18 @@ static void objfile_read_names(objfile_t *obj, FILE *fp, long fpos_start, long f
 			sym->line_nr = xfread_dword(fp);
 		}
 
+		if (opts.list) {
+			printf("    %c %c $%04X %s",
+				sym->scope, sym->type, sym->value, utstring_body(sym->name));
+			if (obj->version >= 5) {
+				print_section(sym->section);
+			}
+			if (obj->version >= 9) {
+				printf(" %s:%d", utstring_body(sym->filename), sym->line_nr);
+			}
+			printf("\n");
+		}
+
 		// insert in the list
 		DL_APPEND(obj->names, sym);
 	}
@@ -171,10 +213,16 @@ static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long
 	UT_string *name;
 	utstring_new(name);
 
+	if (opts.list)
+		printf("  External names:\n");
+
 	fseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		xfread_bcount_str(name, fp);
 		utarray_push_back(obj->externs, &utstring_body(name));
+
+		if (opts.list)
+			printf("    U         %s\n", utstring_body(name));
 	}
 
 	utstring_free(name);
@@ -187,11 +235,22 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 	if (obj->version >= 4)					// signal end by zero type
 		fpos_end = MAX_FP;
 
+	if (opts.list)
+		printf("  Expressions:\n");
+
 	fseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		char type = xfread_byte(fp);
 		if (type == 0)
 			break;							// end marker
+
+		if (opts.list)
+			printf("    E %c%c",
+				type,
+				type == '=' ? ' ' :
+				type == 'L' ? 'l' :
+				type == 'C' ? 'w' :
+				type == 'B' ? 'W' : 'b');
 
 		// create a new expression
 		expr_t *expr = expr_new();
@@ -201,22 +260,35 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 
 		if (obj->version >= 4) {
 			xfread_wcount_str(expr->filename, fp);
-			if (last_filename == NULL || utstring_len(expr->filename) == 0)
+			if (last_filename == NULL || utstring_len(expr->filename) > 0)
 				last_filename = expr->filename;
 
 			expr->line_nr = xfread_dword(fp);
+
+			if (opts.list)
+				printf(" (%s:%d)", utstring_body(last_filename), expr->line_nr);
 		}
 
 		if (obj->version >= 5)
 			xfread_bcount_str(expr->section, fp);
 
-		if (obj->version >= 3)
+		if (obj->version >= 3) {
 			expr->asmpc = xfread_word(fp);
 
-		expr->patch_ptr = xfread_word(fp);
+			if (opts.list)
+				printf(" $%04X", expr->asmpc);
+		}
 
-		if (obj->version >= 6)
+		expr->patch_ptr = xfread_word(fp);
+		if (opts.list)
+			printf(" $%04X: ", expr->patch_ptr);
+
+		if (obj->version >= 6) {
 			xfread_bcount_str(expr->target_name, fp);
+
+			if (opts.list && utstring_len(expr->target_name) > 0)
+				printf("%s := ", utstring_body(expr->target_name));
+		}
 
 		if (obj->version >= 4) {
 			xfread_wcount_str(expr->text, fp);
@@ -228,6 +300,15 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 				die("missing expression end marker in file '%s'\n",
 					utstring_body(obj->filename));
 		}
+
+		if (opts.list)
+			printf("%s", utstring_body(expr->text));
+
+		if (opts.list && obj->version >= 5) 
+			print_section(expr->section);
+
+		if (opts.list)
+			printf("\n");
 
 		// insert in the list
 		DL_APPEND(obj->exprs, expr);
@@ -258,8 +339,28 @@ static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 			else
 				code->align = -1;
 
+			if (opts.list) {
+				printf("  Code: %d bytes", code_size);
+
+				if (code->org >= 0)
+					printf(", ORG $%04X", code->org);
+				else if (code->org == -2) 
+					printf(", section split");
+				else
+					;
+
+				if (code->align > 1)
+					printf(", ALIGN %d", code->align);
+
+				print_section(code->section);
+				printf("\n");
+			}
+
 			utarray_resize(code->data, code_size);
 			xfread(utarray_front(code->data), sizeof(byte_t), code_size, fp);
+
+			if (opts.list)
+				print_bytes(code->data);
 
 			// insert in the list
 			DL_APPEND(obj->codes, code);
@@ -274,6 +375,11 @@ static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 
 		utarray_resize(code->data, code_size);
 		xfread(utarray_front(code->data), sizeof(byte_t), code_size, fp);
+
+		if (opts.list && code_size > 0) {
+			printf("  Code: %d bytes\n", code_size);
+			print_bytes(code->data);
+		}
 
 		// insert in the list
 		DL_APPEND(obj->codes, code);
@@ -302,6 +408,12 @@ void objfile_read(objfile_t *obj, FILE *fp)
 	// module name
 	fseek(fp, fpos0 + fpos_modname, SEEK_SET);
 	xfread_bcount_str(obj->modname, fp);
+	if (opts.list)
+		printf("  Name: %s\n", utstring_body(obj->modname));
+
+	// global ORG
+	if (obj->global_org >= 0)
+		printf("  Org:  $%04X\n", obj->global_org);
 
 	// names
 	if (fpos_names >= 0)
@@ -385,6 +497,11 @@ static enum file_type file_read_signature(file_t *file, FILE *fp)
 		die("error: file '%s' version %d not supported\n",
 			utstring_body(file->filename), file->version);
 
+	if (opts.list)
+		printf("\nFile %s at $%04lX: %s\n", 
+			utstring_body(file->filename), 
+			ftell(fp) - SIGNATURE_SIZE, file_signature);
+
 	return file->type;
 }
 
@@ -415,8 +532,6 @@ void file_read(file_t *file, const char *filename)
 	// open file and read signature
 	FILE *fp = xfopen(filename, "rb");
 	file_read_signature(file, fp);
-	printf("Input file %s: %s file version %d\n",
-		filename, (file->type == is_library ? "library" : "object"), file->version);
 
 	// read object files
 	switch (file->type) {

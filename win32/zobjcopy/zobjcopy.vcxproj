@@ -125,6 +125,7 @@
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ext\optparse\optparse.h" />
     <ClInclude Include="..\..\src\common\die.h" />
     <ClInclude Include="..\..\src\zobjcopy\objfile.h" />
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />

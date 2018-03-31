@@ -5,17 +5,24 @@
 //-----------------------------------------------------------------------------
 #include "zobjcopy.h"
 
+// global variables
+opts_t opts;
+global_t global;
+
 //-----------------------------------------------------------------------------
 // Usage and command line options
 //-----------------------------------------------------------------------------
 static char usage[] =
 	"Usage: zobjcopy [options] input [output]\n"
+	"  -v|--verbose          show what is going on\n"
+	"  -l|--list             dump contents of file\n"
 ;
 
 static struct optparse_long longopts[] = {
-	{ 0 }
+	{ "verbose",	'v', OPTPARSE_NONE },
+	{ "list",		'l', OPTPARSE_NONE },
+	{ 0,0,0 }
 };
-
 
 //-----------------------------------------------------------------------------
 // Do the object file copy
@@ -24,7 +31,6 @@ static void objcopy(char *infile, char *outfile)
 {
 	file_t *in = file_new();
 	file_read(in, infile);
-
 
 	file_free(in);
 }
@@ -47,6 +53,8 @@ int main(int argc, char *argv[])
 	optparse_init(&options, argv);
 	while ((option = optparse_long(&options, longopts, NULL)) != -1) {
 		switch (option) {
+		case 'l': opts.list = true; break;
+		case 'v': opts.verbose = true; break;
 		case '?':
 			fprintf(stderr, "error: %s\n", options.errmsg);
 			exit(EXIT_FAILURE);

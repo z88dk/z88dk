@@ -38,5 +38,8 @@
     <ClInclude Include="..\..\src\common\die.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ext\optparse\optparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
