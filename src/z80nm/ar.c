@@ -15,6 +15,7 @@
 #include <getopt.h>
 #include <assert.h>
 #include <stdarg.h>
+#include "die.h"
 
 #define MAX_FP     0x7FFFFFFF
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
@@ -30,35 +31,9 @@ int  file_version;			/* set with last file version, -1 if invalid */
 char *last_name = NULL;		/* keep last name returned by xfread_name */
 
 /*-----------------------------------------------------------------------------
-*   die()
-*----------------------------------------------------------------------------*/
-void die( char *msg, ... )
-{
-    va_list argptr;
-    
-	va_start( argptr, msg ); /* init variable args */
-	vfprintf( stderr, msg, argptr );
-	va_end( argptr );
-
-    exit( 1 );
-}
-
-/*-----------------------------------------------------------------------------
 *	File IO with fatal errors
 *----------------------------------------------------------------------------*/
-FILE *xfopen( char *filename, char *mode )
-{
-	FILE *fp = fopen( filename, mode );
-	if ( fp == NULL )
-		die("File %s: cannot open\n", filename );
-	return fp;
-}
 
-void xfread( FILE *file, char *filename, char *buffer, size_t len )
-{
-	if ( fread( buffer, sizeof(char), len, file ) != len )
-        die("File %s: error reading %d bytes\n", filename, len );
-}
 
 long xfread_value( FILE *fp, char *filename, size_t len )
 {
@@ -75,21 +50,6 @@ long xfread_value( FILE *fp, char *filename, size_t len )
 	}
 
 	return value;
-}
-
-int xfread_byte( FILE *fp, char *filename )
-{
-	return xfread_value( fp, filename, 1 ) & 0xFF;
-}
-
-int xfread_word( FILE *fp, char *filename )
-{
-	return xfread_value( fp, filename, 2 ) & 0xFFFF;
-}
-
-long xfread_long( FILE *fp, char *filename )
-{
-	return xfread_value( fp, filename, 4 );
 }
 
 void free_last_name ( void ) 
@@ -118,7 +78,7 @@ char *xfread_name( FILE *fp, char *filename, size_t len_bytes )
 	}
 
 	/* read bytes */
-	xfread( fp, filename, last_name, len );
+	xfread(last_name, sizeof(char), len, fp);
 	last_name[len] = '\0';
 
 	return last_name;
@@ -161,7 +121,7 @@ enum file_type read_signature( FILE *fp, char *filename )
 	memset( file_signature, 0, sizeof(file_signature) );
 
 	/* read signature */
-	xfread( fp, filename, file_signature, 8 );
+	xfread(file_signature, sizeof(char), 8, fp);
 	if ( strncmp( file_signature, "Z80RMF", 6 ) == 0 )
 		type = is_object;
 	else if ( strncmp( file_signature, "Z80LMF", 6 ) == 0 )
@@ -190,38 +150,38 @@ void print_section_name( char *section_name )
 		printf(" (section %s)", section_name );
 }
 
-void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
+void dump_names( FILE *fp, char *filename, long fpos_start, long fpos_end )
 {
 	int scope, type;
 	long value, line_nr;
 	char *name, *section_name, *def_filename;
 
 	if ( file_version >= 5 )				/* signal end by zero type */
-		fp_end = MAX_FP;
+		fpos_end = MAX_FP;
 
 	printf("  Names:\n");
-	fseek( fp, fp_start, SEEK_SET );
-	while ( ftell( fp ) < fp_end )
+	fseek( fp, fpos_start, SEEK_SET );
+	while ( ftell( fp ) < fpos_end )
 	{
 		name = NULL;
 		section_name = NULL;
 		def_filename = NULL;
 
-		scope = xfread_byte( fp, filename );
+		scope = xfread_byte(fp);
 		if ( scope == 0 )
 			break;							/* end marker */
 
-		type  = xfread_byte( fp, filename );
+		type  = xfread_byte(fp);
 		
 		if ( file_version >= 5 )
 			section_name = strdup( xfread_string( fp, filename ) );
 
-		value = xfread_long( fp, filename );
+		value = xfread_dword(fp);
 		name = strdup(xfread_string(fp, filename));
 
 		if (file_version >= 9) {			// add definition location
 			def_filename = strdup(xfread_string(fp, filename));
-			line_nr = xfread_long(fp, filename);
+			line_nr = xfread_dword(fp);
 		}
 
 		if ( opt_showlocal || scope != 'L' )
@@ -242,20 +202,20 @@ void dump_names( FILE *fp, char *filename, long fp_start, long fp_end )
 	}
 }
 
-void dump_extern( FILE *fp, char *filename, long fp_start, long fp_end )
+void dump_externs( FILE *fp, char *filename, long fpos_start, long fpos_end )
 {
 	char *name;
 
 	printf("  External names:\n");
-	fseek( fp, fp_start, SEEK_SET );
-	while ( ftell( fp ) < fp_end )
+	fseek( fp, fpos_start, SEEK_SET );
+	while ( ftell( fp ) < fpos_end )
 	{
 		name = xfread_string( fp, filename );
 		printf("    U         %s\n", name );
 	}
 }
 
-void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
+void dump_exprs( FILE *fp, char *filename, long fpos_start, long fpos_end )
 {
 	int type, asmpc, patch_ptr, end_marker;
 	char *source_file, *last_source_file, *section_name, *target_name;
@@ -264,13 +224,13 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 	last_source_file = strdup("");
 
 	if ( file_version >= 4 )				/* signal end by zero type */
-		fp_end = MAX_FP;
+		fpos_end = MAX_FP;
 
 	printf("  Expressions:\n");
-	fseek( fp, fp_start, SEEK_SET );
-	while ( ftell( fp ) < fp_end )
+	fseek( fp, fpos_start, SEEK_SET );
+	while ( ftell( fp ) < fpos_end )
 	{
-		type = xfread_byte( fp, filename );
+		type = xfread_byte(fp);
 		if ( type == 0 )
 			break;							/* end marker */
 
@@ -289,7 +249,7 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 				last_source_file = strdup( source_file );
 			}
 
-			line_number = xfread_long( fp, filename );
+			line_number = xfread_dword(fp);
 			printf(" (%s:%ld)", last_source_file, line_number );
 		}
 
@@ -300,11 +260,11 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 
 		if ( file_version >= 3 )
 		{
-			asmpc = xfread_word( fp, filename );
+			asmpc = xfread_word(fp);
 			printf(" $%04X", asmpc);
 		}
 
-		patch_ptr = xfread_word( fp, filename );
+		patch_ptr = xfread_word(fp);
 		printf(" $%04X", patch_ptr);
 
 		printf(": ");
@@ -330,7 +290,7 @@ void dump_expr( FILE *fp, char *filename, long fp_start, long fp_end )
 
 		if ( file_version < 4 )
 		{
-			end_marker = xfread_byte( fp, filename );
+			end_marker = xfread_byte(fp);
 			if ( end_marker != 0 )
 				die("File %s: missing expression end marker\n", filename );
 		}
@@ -352,7 +312,7 @@ void dump_bytes( FILE *fp, char *filename, int size )
 			printf("    C $%04X:", addr);
 		}
 
-		byte = xfread_byte( fp, filename );
+		byte = xfread_byte(fp);
 		printf(" %02X", byte );
 
 		addr++;
@@ -362,30 +322,30 @@ void dump_bytes( FILE *fp, char *filename, int size )
 		printf("\n");
 }
 
-void dump_code( FILE *fp, char *filename, long fp_start )
+void dump_code( FILE *fp, char *filename, long fpos_start )
 {
 	int code_size;
 	int org, align;
 	char *section_name; 
 
-	fseek( fp, fp_start, SEEK_SET );
+	fseek( fp, fpos_start, SEEK_SET );
 
 	if ( file_version >= 5 )
 	{
 		while (1)
 		{
-			code_size = xfread_long( fp, filename );
+			code_size = xfread_dword(fp);
 			if ( code_size < 0 )
 				break;
 			section_name = xfread_string( fp, filename );
 
 			if ( file_version >= 8 )
-				org = (int) xfread_long( fp, filename );
+				org = (int) xfread_dword(fp);
 			else 
 				org = -1;
 
 			if (file_version >= 10)
-				align = (int)xfread_long(fp, filename);
+				align = (int)xfread_dword(fp);
 			else
 				align = -1;
 
@@ -410,7 +370,7 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 	}
 	else
 	{
-		code_size = xfread_word( fp, filename );
+		code_size = xfread_word(fp);
 		if ( code_size == 0 )
 			code_size = 0x10000;
 		if ( code_size > 0 )
@@ -423,25 +383,25 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 
 void dump_object( FILE *fp, char *filename )
 {
-	long obj_start = ftell(fp) - 8;		/* before signature */
+	long fpos0 = ftell(fp) - 8;		/* before signature */
 	int org = -1;
-	long fp_modname, fp_expr, fp_names, fp_extern, fp_code;
+	long fpos_modname, fpos_exprs, fpos_names, fpos_externs, fpos_code;
 
 	if ( file_version >= 8 )
 		; /* no object ORG - ORG is now per section */
 	else if ( file_version >= 5 )
-		org		= (int) xfread_long( fp, filename );
+		org		= (int) xfread_dword(fp);
 	else
-		org		= xfread_word( fp, filename );
+		org		= xfread_word(fp);
 
-	fp_modname	= xfread_long( fp, filename );
-	fp_expr		= xfread_long( fp, filename );
-	fp_names	= xfread_long( fp, filename );
-	fp_extern	= xfread_long( fp, filename );
-	fp_code		= xfread_long( fp, filename );
+	fpos_modname = xfread_dword(fp);
+	fpos_exprs = xfread_dword(fp);
+	fpos_names = xfread_dword(fp);
+	fpos_externs = xfread_dword(fp);
+	fpos_code = xfread_dword(fp);
 
 	/* module name */
-	fseek( fp, obj_start + fp_modname, SEEK_SET );
+	fseek( fp, fpos0 + fpos_modname, SEEK_SET );
 	printf("  Name: %s\n", xfread_string( fp, filename ) );
 	
 	/* org */
@@ -449,26 +409,26 @@ void dump_object( FILE *fp, char *filename )
 		printf("  Org:  $%04X\n", org );
 
 	/* names */
-	if ( fp_names >= 0 ) 
+	if ( fpos_names >= 0 ) 
 		dump_names( fp, filename, 
-					obj_start + fp_names, 
-					obj_start + END( fp_extern, fp_modname ) );
+					fpos0 + fpos_names, 
+					fpos0 + END( fpos_externs, fpos_modname ) );
 
 	/* extern */
-	if ( fp_extern >= 0 ) 
-		dump_extern( fp, filename, 
-					 obj_start + fp_extern, 
-					 obj_start + fp_modname );
+	if ( fpos_externs >= 0 ) 
+		dump_externs( fp, filename, 
+					 fpos0 + fpos_externs, 
+					 fpos0 + fpos_modname );
 
 	/* expressions */
-	if ( fp_expr >= 0 && opt_showexpr ) 
-		dump_expr( fp, filename, 
-				   obj_start + fp_expr, 
-				   obj_start + END( fp_names, END( fp_extern, fp_modname ) ) );
+	if ( fpos_exprs >= 0 && opt_showexpr ) 
+		dump_exprs( fp, filename, 
+				   fpos0 + fpos_exprs, 
+				   fpos0 + END( fpos_names, END( fpos_externs, fpos_modname ) ) );
 
 	/* code */
-	if ( fp_code >= 0 && opt_dump_code ) 
-		dump_code( fp, filename, obj_start + fp_code );
+	if ( fpos_code >= 0 && opt_dump_code ) 
+		dump_code( fp, filename, fpos0 + fpos_code );
 }
 
 /*-----------------------------------------------------------------------------
@@ -486,8 +446,8 @@ void dump_library( FILE *fp, char *filename )
 		fseek( fp, next_ptr, SEEK_SET );	/* next block */
 		obj_start = next_ptr + 8;
 
-		next_ptr = xfread_long( fp, filename );
-		obj_len = xfread_long( fp, filename );
+		next_ptr = xfread_dword(fp);
+		obj_len = xfread_dword(fp);
 
 		type = read_signature( fp, filename );
 		if ( type != is_object )
