@@ -2607,8 +2607,17 @@ void zeq(LVALUE* lval)
             break;
         }
     default:
-        set_int(lval);
-        callrts("l_eq");
+        if ( c_size_optimisation & OPT_INT_COMPARE ) {
+            ol("and\ta");
+            ol("sbc\thl,de");
+            ol("scf");
+            ol("jr\tz,ASMPC+3");
+            ol("ccf");
+            set_carry(lval);
+        } else {
+            set_int(lval);
+            callrts("l_eq");
+        }
     }
 }
 
@@ -2652,11 +2661,12 @@ void zne_const(LVALUE *lval, int32_t value)
             ol("jr\tz,ASMPC+3");
             ol("scf");
         } else {
-            const2(value & 0xffff);  // 9 bytes
+            const2(value & 0xffff);  // 10 bytes
             ol("and\ta");
             ol("sbc\thl,de");
-            ol("jr\tz,ASMPC+3");
             ol("scf");
+            ol("jr\tnz,ASMPC+3");
+            ol("ccf");
         }
         set_carry(lval);
     }
@@ -2676,6 +2686,7 @@ void zne(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dne");
+        set_int(lval);            
         Zsp += 6;
         break;
     case KIND_CHAR:
@@ -2693,8 +2704,17 @@ void zne(LVALUE* lval)
             break;
         }
     default:
-        set_int(lval);
-        callrts("l_ne");
+        if ( c_size_optimisation & OPT_INT_COMPARE ) {
+            ol("and\ta");
+            ol("sbc\thl,de");
+            ol("scf");
+            ol("jr\tnz,ASMPC+3");
+            ol("ccf");
+            set_carry(lval);
+        } else {
+            set_int(lval);
+            callrts("l_ne");
+        }
     }
 }
 
@@ -2775,6 +2795,7 @@ void zlt(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dlt");
+        set_int(lval);            
         Zsp += 6;
         break;
     case KIND_CHAR:
@@ -2795,11 +2816,17 @@ void zlt(LVALUE* lval)
             break;
         }
     default:
-        if (utype(lval))
-            callrts("l_ult");
-        else
+        if (utype(lval)) {
+           // callrts("l_ult");
+            // de = lhs, hl = rhs
+            swap();
+            ol("and\ta");
+            ol("sbc\thl,de");
+            set_carry(lval);
+        } else {
             callrts("l_lt");
-        set_int(lval);            
+            set_int(lval);            
+        }
     }
 }
 
@@ -2869,6 +2896,7 @@ void zle(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dleq");
+        set_int(lval);            
         Zsp += 6;
         break;
     case KIND_CHAR:
@@ -2898,11 +2926,17 @@ void zle(LVALUE* lval)
             break;
         }
     default:
-        if (utype(lval))
-            callrts("l_ule");
-        else
+        if (utype(lval)) {
+            // de = lhs, hl = rhs
+            ol("and\ta");
+            ol("sbc\thl,de");
+            ol("ccf");
+            set_carry(lval);
+           // callrts("l_ule");
+        } else {
             callrts("l_le");
-        set_int(lval);            
+            set_int(lval);            
+        }
     }
 }
 
@@ -2961,6 +2995,7 @@ void zgt(LVALUE* lval)
     case KIND_DOUBLE:
         callrts("dgt");
         Zsp += 6;
+        set_int(lval);
         break;
     case KIND_CHAR:
         if (c_doinline) {
@@ -2980,11 +3015,15 @@ void zgt(LVALUE* lval)
             break;
         }
     default:
-        if (utype(lval))
-            callrts("l_ugt");
-        else
+        if (utype(lval)) {
+            ol("and\ta");
+            ol("sbc\thl,de");
+            set_carry(lval);
+//            callrts("l_ugt");
+        } else {
             callrts("l_gt");
-        set_int(lval);            
+            set_int(lval);
+        }
     }
 }
 
@@ -3057,6 +3096,7 @@ void zge(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dge");
+        set_int(lval);
         Zsp += 6;
         break;
     case KIND_CHAR:
@@ -3083,11 +3123,21 @@ void zge(LVALUE* lval)
             break;
         }
     default:
-        if (utype(lval))
-            callrts("l_uge");
-        else
+        if (utype(lval)) {
+            if ( c_size_optimisation & OPT_INT_COMPARE ) {
+                swap();
+                ol("and\ta");
+                ol("sbc\thl,de");
+                ol("ccf");
+                set_carry(lval);
+            } else {
+                callrts("l_uge");
+                set_int(lval);
+            }
+        } else {
             callrts("l_ge");
-        set_int(lval);            
+            set_int(lval);
+        }
     }
 }
 

@@ -5,7 +5,7 @@ include ../make.config
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test_mult.bin test_callee.bin test_lshift.bin test_autoinit.bin test_sizeof.bin test_rshift.bin test_division.bin test_offsetof.bin test_compare0.bin test_compare_const.bin test_compare_mconst.bin
+all:	test_mult.bin test_callee.bin test_lshift.bin test_autoinit.bin test_sizeof.bin test_rshift.bin test_division.bin test_offsetof.bin test_compare0.bin test_compare_const.bin test_compare_mconst.bin test_compare.bin
 
 
 
@@ -16,6 +16,10 @@ test_autoinit.bin: $(SOURCES) autoinit.c
 
 test_callee.bin: $(SOURCES) callee.c
 	$(call compile,-lm)
+	$(runtest)
+
+test_compare.bin: $(SOURCES) compare.c
+	$(call compile, -Cc--opt-code-speed,)
 	$(runtest)
 
 
