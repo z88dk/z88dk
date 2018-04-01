@@ -1291,7 +1291,7 @@ void zadd(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_size_optimisation & OPT_ADD32 ) {
+        if ( c_speed_optimisation & OPT_ADD32 ) {
             ol("pop\tbc");        /* 7 bytes, 54T */
             ol("add\thl,bc");
             ol("ex\tde,hl");
@@ -1354,7 +1354,7 @@ void zadd_const(LVALUE *lval, int32_t value)
             break;
         dec(lval); 
     case -1:
-      if ( c_size_optimisation & OPT_SUB32 ) {
+      if ( c_speed_optimisation & OPT_SUB32 ) {
             if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
                 // 6 bytes, 27T (best), 28T (worst)
                 ol("ld\ta,h");    // 1, 4
@@ -1378,7 +1378,7 @@ void zadd_const(LVALUE *lval, int32_t value)
             break;
         inc(lval); // (long) = 66T best (6 bytes) vs 51T (10 bytes)
     case 1:
-        if ( c_size_optimisation & OPT_ADD32 ) {
+        if ( c_speed_optimisation & OPT_ADD32 ) {
             if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
                 // 6 bytes, 27T (best), 28T (worst)
                 ol("inc\thl");    // 1, 6    
@@ -1437,7 +1437,7 @@ void zsub(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_size_optimisation & OPT_SUB32 ) {
+        if ( c_speed_optimisation & OPT_SUB32 ) {
             ol("ld\tc,l");        /* 13 bytes: 4 + 4 + 10 + 4 + 15 + 4  + 4 + 4 + 10 + 15 + 4 = 78T */
             ol("ld\tb,h");
             ol("pop\thl");        
@@ -1459,7 +1459,7 @@ void zsub(LVALUE* lval)
         Zsp += 6;
         break;
     default:
-        if ( c_size_optimisation & OPT_SUB16 ) {
+        if ( c_speed_optimisation & OPT_SUB16 ) {
             swap();
             ol("and\ta");
             ol("sbc\thl,de");
@@ -2086,7 +2086,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( value == 10 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32) )  {
+        } else if ( value == 10 && utype(lval) && (c_speed_optimisation & OPT_RSHIFT32) )  {
             ol("ld\tl,h"); /* 17 bytes, 19 + 48 = 67T */
             ol("ld\th,e");
             ol("ld\te,d");
@@ -2134,7 +2134,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\tl");
             ol("srl\th");
             ol("rr\tl");
-        } else if ( value == 20 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32) ) {
+        } else if ( value == 20 && utype(lval) && (c_speed_optimisation & OPT_RSHIFT32) ) {
             ol("ex\tde,hl"); /* 20 bytes, 78T */
             ol("ld\tde,0");
             ol("srl\th");
@@ -2178,7 +2178,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
-        } else if ( value == 30 && utype(lval) && (c_size_optimisation & OPT_RSHIFT32)) {
+        } else if ( value == 30 && utype(lval) && (c_speed_optimisation & OPT_RSHIFT32)) {
             ol("ld\tl,0"); /* 15 bytes, 51T */
             ol("rl\td");
             ol("rl\tl");
@@ -2277,7 +2277,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             ol("ld\tl,0");
         break;
         case 7:
-            if ( c_size_optimisation & OPT_LSHIFT32 ) {
+            if ( c_speed_optimisation & OPT_LSHIFT32 ) {
                 ol("rr\th");  // 9 bytes, 8 + 4  + 8 + 7 + 8 = 35T
                 ol("ld\th,l");
                 ol("rr\th");
@@ -2542,6 +2542,19 @@ void zeq_const(LVALUE *lval, int32_t value)
             ol("jr\tnz,ASMPC+3");
             ol("scf");
             set_carry(lval);
+        } else if ( c_speed_optimisation & OPT_LONG_COMPARE ) {
+            constbc(value % 65536); // 19 bytes
+            ol("and\ta");
+            ol("sbc\thl,bc");
+            ol("jr\tnz,ASMPC+13");
+            ol("ex\tde,hl");
+            constbc(value / 65536);
+            ol("and\ta");
+            ol("sbc\thl,bc");
+            ol("scf");
+            ol("jr\tz,ASMPC+3");
+            ol("and\ta");
+            set_carry(lval);
         } else {
             lpush();  // 11 bytes
             vlongconst(value);
@@ -2607,7 +2620,7 @@ void zeq(LVALUE* lval)
             break;
         }
     default:
-        if ( c_size_optimisation & OPT_INT_COMPARE ) {
+        if ( c_speed_optimisation & OPT_INT_COMPARE ) {
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
@@ -2704,7 +2717,7 @@ void zne(LVALUE* lval)
             break;
         }
     default:
-        if ( c_size_optimisation & OPT_INT_COMPARE ) {
+        if ( c_speed_optimisation & OPT_INT_COMPARE ) {
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
@@ -3124,7 +3137,7 @@ void zge(LVALUE* lval)
         }
     default:
         if (utype(lval)) {
-            if ( c_size_optimisation & OPT_INT_COMPARE ) {
+            if ( c_speed_optimisation & OPT_INT_COMPARE ) {
                 swap();
                 ol("and\ta");
                 ol("sbc\thl,de");

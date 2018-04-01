@@ -204,7 +204,7 @@ int heir1a(LVALUE* lval)
             testjump(lval, falselab = getlabel());
             lval->val_type = temptype;
             lval->ltype = templtype;
-            /* evaluate 'true' expression */
+            /* evaluazte 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);
             jump(endlab = getlabel());
