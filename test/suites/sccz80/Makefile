@@ -19,7 +19,7 @@ test_callee.bin: $(SOURCES) callee.c
 	$(runtest)
 
 test_compare.bin: $(SOURCES) compare.c
-	$(call compile, -Cc--opt-code-speed,)
+	$(call compile, -Cc--opt-code-speed=all,)
 	$(runtest)
 
 
