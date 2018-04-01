@@ -710,7 +710,6 @@ int test(int label, int parens)
 {
     char *before, *start;
     LVALUE lval={0};
-    void (*oper)(LVALUE *lva);
     
     if (parens)
         needchar('(');
