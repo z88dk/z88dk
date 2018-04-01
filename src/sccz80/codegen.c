@@ -100,8 +100,9 @@ void DoLibHeader(void)
      * Copy filename over (obtained by preprocessor), carefully skipping
      * over the quotes!
      */
+    
     strncpy(filen, Filename + 1, strlen(Filename) - 2);
-    filen[strlen(Filename) - 1] = '\0';
+    filen[strlen(Filename) - 2] = '\0';
     if (1) {
         char* ptr = filen;
         if (!isalpha(*ptr) && *ptr != '_') {
@@ -143,7 +144,6 @@ void DoLibHeader(void)
                 segment++;
             else
                 segment = filen;
-            changesuffix(filen, ".c");
             outstr("scp_"); /* alpha id incase tmpfile is numeric */
             outstr(segment);
         }
