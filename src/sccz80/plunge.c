@@ -428,6 +428,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     lhs_val_type = lval->val_type;
     setstage(&before, &start);
     if (lval->is_const) {
+        int doconst_oper = 0;
+
         /* constant on left not yet loaded */
         if (plnge1(heir, lval2))
             rvalue(lval2);
@@ -440,15 +442,19 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             val = ival;
         }
 
+        doconst_oper = oper == zadd;
+        
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
                 convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
                 lval2->ltype = type_double;
             }
+            doconst_oper = 0; // No const operator for double
             dpush();
             load_double_into_fa(lval);
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
+            doconst_oper = 0; // No const operator for double
             /* FA holds the right hand side */
             dpush();
             if ( lval->val_type == KIND_DOUBLE ) {
@@ -472,18 +478,30 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
             lval2->val_type = KIND_LONG; /* Kludge */
-            lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;            
-            lpush();
-            vlongconst(lval->const_val);
+            lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long; 
+            if ( doconst_oper == 0 ) {
+                lpush();
+                vlongconst(lval->const_val);
+            }
         } else {
             if ( lval2->val_type == KIND_LONG ) {
-                vlongconst_tostack(lval->const_val); 
+                if ( doconst_oper == 0 ) {
+                    vlongconst_tostack(lval->const_val); 
+                }
                 lval->val_type = KIND_LONG;   
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             } else {
-                lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;                
-                const2(lval->const_val);
+                lval->ltype = lval2->ltype->isunsigned ? type_uint : type_int;  
+                if ( doconst_oper == 0 ) {              
+                    const2(lval->const_val);
+                }
             }
+        }
+        if ( doconst_oper ) {
+            lval->is_const = 0;
+            zadd_const(lval, lval->const_val);
+            result(lval, lval2);
+            return;
         }
     } else {
         /* non-constant on left */

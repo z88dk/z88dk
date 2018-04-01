@@ -91,8 +91,8 @@
 	pop	hl
 	push	hl
 	push	bc
-	ld	de,2
-	add	hl,de
+	inc	hl
+	inc	hl
 	ret
 
 
