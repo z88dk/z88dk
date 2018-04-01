@@ -442,7 +442,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             val = ival;
         }
 
-        doconst_oper = oper == zadd;
+        doconst_oper = oper == zadd && lval2->is_const == 0 && lval->is_const;
         
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
