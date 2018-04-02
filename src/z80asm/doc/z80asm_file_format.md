@@ -1,8 +1,8 @@
-z80asm File formats (v05)
+z80asm File formats (v06)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
-versions *2.4.x*. 
+versions *2.5.x*. 
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -43,7 +43,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF05' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF06' (file signature and version)                |  
     |   8 | long   | *ORG Address*                                          |  
     |  12 | long   | File pointer to *Module Name*, always the last section |  
     |  16 | long   | File pointer to *Expressions*, may be -1               |  
@@ -72,6 +72,7 @@ format:
      * 'S' : 8-bit signed integer (-128 to 127)  
      * 'C' : 16-bit integer (-32768 to 65535)  
      * 'L' : 32-bit signed integer     
+     * '=' : computed name at link time
 
   * *sourcefile* (lstring) : source file name where expression was defined,
   to be used in error messages. May be an empty string, signalling that
@@ -90,6 +91,10 @@ format:
   * *patchptr* (word) : defines the relative module code patch pointer to 
   store the result of evaluating the expression.
 
+  * *target_name* (string) : contains the name of the symbol that receives
+  the result of evaluating the expression, only used for '=' type expressions,
+  empty string for the other types.
+	
   * *expression* (lstring) : contains the expression text as parsed from the 
   source file, in the standard C-like expression syntax.
 
@@ -142,7 +147,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF05' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF06' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -167,3 +172,6 @@ no longer used.
 * version *04* : include the source file location of expressions in order to give meaningful link-time 
 error messages.
 * version *05* : include source code sections.
+* version *06* : incomplete implementation, fixed in version *07*
+* version *07* : include *DEFC* symbols that are defined as an expression using other symbols and are computed 
+at link time, after all addresses are allocated.
