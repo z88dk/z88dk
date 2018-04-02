@@ -1,4 +1,4 @@
-z80asm File formats (v10)
+z80asm File formats (v11)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
@@ -43,7 +43,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF10' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF11' (file signature and version)                |  
     |   8 | long   | File pointer to *Module Name*, always the last section |  
     |  12 | long   | File pointer to *Expressions*, may be -1               |  
     |  16 | long   | File pointer to *Module Names*, may be -1              |  
@@ -66,7 +66,8 @@ format:
      *  0  : end marker 
      * 'U' : 8-bit integer (0 to 255)  
      * 'S' : 8-bit signed integer (-128 to 127)  
-     * 'C' : 16-bit integer (-32768 to 65535)  
+     * 'C' : 16-bit integer, little-endian (-32768 to 65535)  
+     * 'B' : 16-bit integer, big-endian (-32768 to 65535)  
      * 'L' : 32-bit signed integer     
      * '=' : computed name at link time
 
@@ -158,7 +159,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF10' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF11' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -189,4 +190,4 @@ at link time, after all addresses are allocated.
 * version *08* : include a user defined ORG address per section.
 * version *09* : include the file and line number where each symbol was defined.
 * version *10* : allow a section alignment to be defined.
-
+* version *11* : allow big-endian 16-bit expressions to be patched; these big-endian values are used in the ZXN coper unit.
