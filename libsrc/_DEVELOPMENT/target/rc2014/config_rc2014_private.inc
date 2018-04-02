@@ -42,6 +42,11 @@ defc __IO_PIO_PORT_BASE = 0x20
 defc __IO_PROM_RESET = 0x30
 defc __IO_PROM_TOGGLE = 0x38
 defc __IO_ACIA_PORT_BASE = 0x80
+defc __IO_SIO_PORT_BASE = 0x80
+defc __IO_SIO_PORT_OFFSET_A = 0x00
+defc __IO_SIO_PORT_OFFSET_B = 0x02
+defc __IO_SIO_PORT_OFFSET_C = 0x00
+defc __IO_SIO_PORT_OFFSET_D = 0x01
 
 
 
@@ -480,6 +485,127 @@ defc __IO_ACIA_RX_SIZE     = 0x100
 defc __IO_ACIA_RX_FULLISH  = 0xf8
 defc __IO_ACIA_RX_EMPTYISH = 0x08
 defc __IO_ACIA_TX_SIZE     = 0x10
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_SIOA_CONTROL_REGISTER   = 0x80
+defc __IO_SIOA_DATA_REGISTER      = 0x81
+defc __IO_SIOB_CONTROL_REGISTER   = 0x82
+defc __IO_SIOB_DATA_REGISTER      = 0x83
+
+defc __IO_SIO_WR0_NULL      = 0x00
+
+defc __IO_SIO_WR0_R0      = 0x00
+defc __IO_SIO_WR0_R1      = 0x01
+defc __IO_SIO_WR0_R2      = 0x02
+defc __IO_SIO_WR0_R3      = 0x03
+defc __IO_SIO_WR0_R4      = 0x04
+defc __IO_SIO_WR0_R5      = 0x05
+defc __IO_SIO_WR0_R6      = 0x06
+defc __IO_SIO_WR0_R7      = 0x07
+
+defc __IO_SIO_WR0_SDLC_ABORT      = 0x08
+defc __IO_SIO_WR0_EXT_INT_RESET      = 0x10
+defc __IO_SIO_WR0_CHANNEL_RESET      = 0x18
+defc __IO_SIO_WR0_RX_INT_FIRST_REENABLE      = 0x20
+defc __IO_SIO_WR0_TX_INT_PENDING_RESET      = 0x28
+defc __IO_SIO_WR0_ERROR_RESET      = 0x30
+defc __IO_SIO_WR0_A_INT_RETURN      = 0x38
+
+defc __IO_SIO_WR0_RX_CRC_RESET      = 0x40
+defc __IO_SIO_WR0_TX_CRC_RESET      = 0x80
+defc __IO_SIO_WR0_TX_EOM_RESET      = 0xC0
+
+defc __IO_SIO_WR1_INT_EXT_ENABLE      = 0x01
+defc __IO_SIO_WR1_INT_TX_ENABLE      = 0x02
+defc __IO_SIO_WR1_B_STATUS_VECTOR      = 0x04
+
+defc __IO_SIO_WR1_RX_NO_INT      = 0x00
+defc __IO_SIO_WR1_RX_INT_FIRST      = 0x08
+defc __IO_SIO_WR1_RX_INT_ALL_EX_SPECIAL      = 0x10
+defc __IO_SIO_WR1_RX_INT_ALL      = 0x18
+
+defc __IO_SIO_WR1_WAIT_READY_RX      = 0x20
+defc __IO_SIO_WR1_WAIT_READY_READY      = 0x40
+defc __IO_SIO_WR1_WAIT_READY_ENABLE      = 0x80
+
+defc __IO_SIO_WR3_RX_ENABLE      = 0x01
+defc __IO_SIO_WR3_RX_SYNC_LOAD_INHIBIT      = 0x02
+defc __IO_SIO_WR3_SDLC_ADDRESS_SEARCH      = 0x04
+defc __IO_SIO_WR3_SDLC_RX_CRC      = 0x08
+defc __IO_SIO_WR3_HUNT_PHASE_ENABLE      = 0x10
+defc __IO_SIO_WR3_AUTO_ENABLES      = 0x20
+
+defc __IO_SIO_WR3_RX_5BIT      = 0x00
+defc __IO_SIO_WR3_RX_7BIT      = 0x40
+defc __IO_SIO_WR3_RX_6BIT      = 0x80
+defc __IO_SIO_WR3_RX_8BIT      = 0xC0
+
+defc __IO_SIO_WR4_PARITY_ENABLE      = 0x01
+defc __IO_SIO_WR4_PARITY_EVEN      = 0x02
+defc __IO_SIO_WR4_PARITY_ODD      = 0x00
+
+defc __IO_SIO_WR4_SYNC_MODE      = 0x00
+defc __IO_SIO_WR4_STOP_1      = 0x04
+defc __IO_SIO_WR4_STOP_3HALF      = 0x08
+defc __IO_SIO_WR4_STOP_2      = 0x0C
+
+defc __IO_SIO_WR4_SYNC_8BIT      = 0x00
+defc __IO_SIO_WR4_SYNC_16BIT      = 0x10
+defc __IO_SIO_WR4_SYNC_SDLC      = 0x20
+defc __IO_SIO_WR4_SYNC_EXTERN      = 0x30
+
+defc __IO_SIO_WR4_CLK_DIV_01      = 0x00
+defc __IO_SIO_WR4_CLK_DIV_16      = 0x40
+defc __IO_SIO_WR4_CLK_DIV_32      = 0x80
+defc __IO_SIO_WR4_CLK_DIV_64      = 0xC0
+
+defc __IO_SIO_WR5_TX_CRC_ENABLE      = 0x00
+defc __IO_SIO_WR5_TX_RTS      = 0x00
+defc __IO_SIO_WR5_SDLC_CRC_16      = 0x00
+defc __IO_SIO_WR5_TX_ENABLE      = 0x00
+defc __IO_SIO_WR5_TX_BREAK      = 0x00
+
+defc __IO_SIO_WR5_TX_5BIT      = 0x00
+defc __IO_SIO_WR5_TX_7BIT      = 0x20
+defc __IO_SIO_WR5_TX_6BIT      = 0x40
+defc __IO_SIO_WR5_TX_8BIT      = 0x60
+
+defc __IO_SIO_WR5_TX_DTR      = 0x60
+
+defc __IO_SIO_RR0_RX_CHAR      = 0x01
+defc __IO_SIO_RR0_A_INT_PENDING      = 0x02
+defc __IO_SIO_RR0_TX_EMPTY      = 0x04
+defc __IO_SIO_RR0_DCD      = 0x08
+defc __IO_SIO_RR0_SYNC      = 0x10
+defc __IO_SIO_RR0_CTS      = 0x20
+defc __IO_SIO_RR0_TX_EOM      = 0x40
+defc __IO_SIO_RR0_RX_BREAK      = 0x80
+
+defc __IO_SIO_RR1_TX_ALL_SENT      = 0x01
+
+defc __IO_SIO_RR1_SDLC_RESIDUE_CODE_0      = 0x02
+defc __IO_SIO_RR1_SDLC_RESIDUE_CODE_1      = 0x04
+defc __IO_SIO_RR1_SDLC_RESIDUE_CODE_2      = 0x08
+
+defc __IO_SIO_RR1_RX_PARITY_ERROR      = 0x10
+defc __IO_SIO_RR1_RX_OVERRUN      = 0x20
+defc __IO_SIO_RR1_RX_FRAMING_ERROR      = 0x40
+defc __IO_SIO_RR1_SDLC_EOF      = 0x80
+
+defc __IO_SIO_RX_SIZE      = 0x100
+defc __IO_SIO_RX_FULLISH      = 0xf8
+defc __IO_SIO_RX_EMPTYISH      = 0x08
+defc __IO_SIO_TX_SIZE      = 0x10
 
 
 
