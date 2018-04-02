@@ -1,4 +1,4 @@
-z80asm File formats (v09)
+z80asm File formats (v10)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
@@ -43,7 +43,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF09' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF10' (file signature and version)                |  
     |   8 | long   | File pointer to *Module Name*, always the last section |  
     |  12 | long   | File pointer to *Expressions*, may be -1               |  
     |  16 | long   | File pointer to *Module Names*, may be -1              |  
@@ -145,6 +145,8 @@ following format:
   assembler generates one binary file for each section with a defined 
   ORG, followed by all sections without one.
 
+  * *ALIGN* (long) : defines the address alignment of this section, -1 if not defined. The previous section is padded to align the start address of this section.
+
   * *code* (byte[length]) : contains the binary code.
 
 
@@ -156,7 +158,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF09' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF10' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -186,3 +188,5 @@ error messages.
 at link time, after all addresses are allocated.
 * version *08* : include a user defined ORG address per section.
 * version *09* : include the file and line number where each symbol was defined.
+* version *10* : allow a section alignment to be defined.
+
