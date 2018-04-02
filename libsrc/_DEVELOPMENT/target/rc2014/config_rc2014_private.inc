@@ -525,13 +525,13 @@ defc __IO_SIO_WR0_RX_CRC_RESET      = 0x40
 defc __IO_SIO_WR0_TX_CRC_RESET      = 0x80
 defc __IO_SIO_WR0_TX_EOM_RESET      = 0xC0
 
-defc __IO_SIO_WR1_INT_EXT_ENABLE      = 0x01
-defc __IO_SIO_WR1_INT_TX_ENABLE      = 0x02
+defc __IO_SIO_WR1_EXT_INT_ENABLE      = 0x01
+defc __IO_SIO_WR1_TX_INT_ENABLE      = 0x02
 defc __IO_SIO_WR1_B_STATUS_VECTOR      = 0x04
 
-defc __IO_SIO_WR1_RX_NO_INT      = 0x00
+defc __IO_SIO_WR1_RX_INT_NONE      = 0x00
 defc __IO_SIO_WR1_RX_INT_FIRST      = 0x08
-defc __IO_SIO_WR1_RX_INT_ALL_EX_SPECIAL      = 0x10
+defc __IO_SIO_WR1_RX_INT_ALL_EXCL_SPECIAL      = 0x10
 defc __IO_SIO_WR1_RX_INT_ALL      = 0x18
 
 defc __IO_SIO_WR1_WAIT_READY_RX      = 0x20

@@ -525,13 +525,13 @@
 #define __IO_SIO_WR0_TX_CRC_RESET     0x80
 #define __IO_SIO_WR0_TX_EOM_RESET     0xC0
 
-#define __IO_SIO_WR1_INT_EXT_ENABLE     0x01
-#define __IO_SIO_WR1_INT_TX_ENABLE     0x02
+#define __IO_SIO_WR1_EXT_INT_ENABLE     0x01
+#define __IO_SIO_WR1_TX_INT_ENABLE     0x02
 #define __IO_SIO_WR1_B_STATUS_VECTOR     0x04
 
-#define __IO_SIO_WR1_RX_NO_INT     0x00
+#define __IO_SIO_WR1_RX_INT_NONE     0x00
 #define __IO_SIO_WR1_RX_INT_FIRST     0x08
-#define __IO_SIO_WR1_RX_INT_ALL_EX_SPECIAL     0x10
+#define __IO_SIO_WR1_RX_INT_ALL_EXCL_SPECIAL     0x10
 #define __IO_SIO_WR1_RX_INT_ALL     0x18
 
 #define __IO_SIO_WR1_WAIT_READY_RX     0x20
