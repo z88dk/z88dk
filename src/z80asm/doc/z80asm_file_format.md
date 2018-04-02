@@ -1,8 +1,8 @@
-z80asm File formats (v02)
+z80asm File formats (v03)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
-from version *2.0.0* up to version *2.1.8*.  
+versions *2.2.x*.
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -40,7 +40,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF02' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF03' (file signature and version)                |  
     |   8 | word   | *ORG Address*                                          |  
     |  10 | long   | File pointer to *Module Name*, always the last section |  
     |  14 | long   | File pointer to *Expressions*, may be -1               |  
@@ -70,6 +70,10 @@ format:
      * 'C' : 16-bit integer (-32768 to 65535)  
      * 'L' : 32-bit signed integer     
 
+  * *ASMPC* (word) : defines the relative module code address of the 
+  start of the assembly instruction to be used as *ASMPC* during
+  expression evaluation.
+
   * *patchptr* (word) : defines the relative module code patch pointer to 
   store the result of evaluating the expression.
 
@@ -84,7 +88,6 @@ up to the next existing section. Each name has the following format:
   * *scope* (char) : defines the scope of the name:
      * 'L' is local,  
      * 'G' is global,  
-     * 'X' global library
 
   * *type (char) : defines whether it is a: 
      * 'A' relocatable address,   
@@ -121,7 +124,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF02' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF03' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -139,3 +142,4 @@ History
 
 * version *01* : original z80asm version
 * version *02* : allow expressions to use standard C operators instead of the original (legacy) z80asm specific syntax. 
+* version *03* : include the address of the start of the assembly instruction in the object file, so that expressions with ASMPC are correctly computed at link time; remove type 'X' symbols (global library), no longer used.
