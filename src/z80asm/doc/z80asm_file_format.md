@@ -1,8 +1,8 @@
-z80asm File formats (v07)
+z80asm File formats (v08)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
-versions *2.5.x*. 
+versions *2.6.x*. 
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -43,14 +43,13 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF07' (file signature and version)                |  
-    |   8 | long   | *ORG Address*                                          |  
-    |  12 | long   | File pointer to *Module Name*, always the last section |  
-    |  16 | long   | File pointer to *Expressions*, may be -1               |  
-    |  20 | long   | File pointer to *Module Names*, may be -1              |  
-    |  24 | long   | File pointer to *External Names*, may be -1            |  
-    |  28 | long   | File pointer to *Machine Code*, may be -1              |  
-    |  32 |        | *Expressions*                                          |  
+    |   0 | char[8]| 'Z80RMF08' (file signature and version)                |  
+    |   8 | long   | File pointer to *Module Name*, always the last section |  
+    |  12 | long   | File pointer to *Expressions*, may be -1               |  
+    |  16 | long   | File pointer to *Module Names*, may be -1              |  
+    |  20 | long   | File pointer to *External Names*, may be -1            |  
+    |  24 | long   | File pointer to *Machine Code*, may be -1              |  
+    |  28 |        | *Expressions*                                          |  
     |     |        | ...                                                    |  
     |     |        | *Module Names*                                         |  
     |     |        | ...                                                    |  
@@ -59,9 +58,6 @@ The format of the object file is as follows:
     |     |        | *Module Name*                                          |  
     |     |        | *Machine Code*                                         |  
 
-
-* *ORG Address* : contains the ORG address for the linked machine code 
-or -1 for no ORG address defined. 
 
 * *Expressions* : contains a set of expressions up to an end marker (*type* = 0). Each expression has the following
 format:
@@ -138,6 +134,13 @@ following format:
 
   * *section* (string) : source file section name. 
  
+  * *ORG Address* (long) : contains the user defined ORG address for 
+  the start of this section, -1 for no ORG address was defined, or 
+  -2 to split section to a different binary file. 
+  If multiple setions are given with an ORG address each, the 
+  assembler generates one binary file for each section with a defined 
+  ORG, followed by all sections without one.
+
   * *code* (byte[length]) : contains the binary code.
 
 
@@ -149,7 +152,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF07' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF08' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -177,3 +180,4 @@ error messages.
 * version *06* : incomplete implementation, fixed in version *07*
 * version *07* : include *DEFC* symbols that are defined as an expression using other symbols and are computed 
 at link time, after all addresses are allocated.
+* version *08* : include a user defined ORG address per section.
