@@ -71,4 +71,4 @@ extern char *c_bss_section;
 extern char *c_data_section;
 extern char *c_rodata_section;
 extern int c_disable_builtins;
-extern uint32_t c_size_optimisation;
+extern uint32_t c_speed_optimisation;

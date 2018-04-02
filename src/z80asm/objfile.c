@@ -227,7 +227,7 @@ void write_obj_file( char *source_filename )
 	/* write header */
     xfput_strz( fp, Z80objhdr );
 
-	/* write placeholders for 5 pointers pointers */
+	/* write placeholders for 5 pointers */
 	header_ptr = ftell( fp );
 	for ( i = 0; i < 5; i++ )
 	    xfput_uint32( fp, -1 );

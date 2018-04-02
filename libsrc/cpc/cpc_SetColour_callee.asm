@@ -37,4 +37,4 @@
 	RET
 	
 	
-DEFC ASMDISP_CPC_SETCOLOUR_CALLEE = # asmentry - cpc_SetColour_callee
+DEFC ASMDISP_CPC_SETCOLOUR_CALLEE = asmentry - cpc_SetColour_callee

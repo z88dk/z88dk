@@ -13,4 +13,4 @@ PUBLIC BIFROSTL_showNextTile
 
 EXTERN asm_BIFROSTL_showNextTile
 
-defc BIFROST_showNextTile = asm_BIFROSTL_showNextTile
+defc BIFROSTL_showNextTile = asm_BIFROSTL_showNextTile

@@ -78,6 +78,7 @@ static void            PragmaNeed(arg_t *arg, char *);
 static void            PragmaBytes(arg_t *arg, char *);
 static void            PragmaInclude(arg_t *arg, char *);
 static void            AddArray(arg_t *arg, char *);
+static void            OptCodeSpeed(arg_t *arg, char *);
 static void            write_zcc_defined(char *name, int value, int export);
 
 
@@ -452,8 +453,8 @@ static arg_t     myargs[] = {
 	{ "x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files" },
 	{ "-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files" },
 	{ "-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)" },
+	{ "-opt-code-speed", AF_MORE, OptCodeSpeed, NULL, NULL, "Optimize for code speed (sccz80 only)" },
 	{ "custom-copt-rules", AF_MORE, SetString, &c_coptrules_user, NULL, "Custom user copy rules" },
-	{ "sccz80-inline-ints", AF_BOOL_TRUE, SetBoolean, &c_sccz80_inline_ints, NULL, "Inline int gets/puts for sccz80" },
 	{ "zopt", AF_BOOL_TRUE, SetBoolean, &zopt, NULL, "Enable llvm-optimizer (clang only)" },
 	{ "m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable" },
 	{ "g", AF_MORE, GlobalDefc, &globaldefrefile, &globaldefon, "Generate a global defc file of the final executable (-g, -gp, -gpf filename)" },
@@ -1344,12 +1345,9 @@ int main(int argc, char **argv)
                     q = original_filenames[i];
 
                 snprintf(tmp, sizeof(tmp) - 3, "MODULE %s\n"
-                                               "LINE -1, \"%s\"\n", q, original_filenames[i]);
+                                               "LINE -1, \"%s\"\n\n", q, original_filenames[i]);
 
-                // be consistent with z80asm by not having the asm extension part of the module name
-                if ((q = find_file_ext(tmp)) && (strcmp(q, ".asm") == 0))
-                    *q = '\0';
-                strcat(tmp, "\n\n");
+                // change non-alnum chars in module name to underscore
 
                 for (q = tmp+7; *q != '\n'; ++q)
                     if (!isalnum(*q)) *q = '_';
@@ -1941,6 +1939,13 @@ void AddArray(arg_t *argument, char *arg)
 }
 
 
+void OptCodeSpeed(arg_t *argument, char *arg)
+{	
+	if ( strstr(arg,"inlineints") != NULL || strstr(arg,"all") != NULL) {
+		c_sccz80_inline_ints = 1;
+	}
+	BuildOptions(&sccz80arg, arg);
+}
 
 void AddAppmake(arg_t *argument, char *arg)
 {
@@ -2428,7 +2433,7 @@ static void configure_compiler()
 			BuildOptions(&cpparg, preprocarg);
 		}
 		c_compiler = c_sccz80_exe;
-		compiler_style = outimplied;
+		compiler_style = outspecified_flag;
 	}
 }
 

@@ -505,7 +505,7 @@ t_binary(read_binfile("test.bin"), "\xFE\x10");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o hist.o lib/dbg.o ../../ext/UNIXem/src/glob.o";
+my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o ../../ext/UNIXem/src/glob.o";
 
 # get init code except init() and main()
 my $init = <<'END';

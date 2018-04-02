@@ -610,21 +610,35 @@ ace_clib.lib:
 	@echo ''
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
 	$(call buildgeneric,ace)
 	$(MAKE) -C ace 
 	$(MAKE) -C games TARGET=ace
-	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DFORjupiter -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+	@echo ''
+	@echo '--- Building Jupiter Ace Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORace -x$(OUTPUT_DIRECTORY)/gfxace @$(LISTFILE_DIRECTORY)/gfxace.lst
+	@echo ''
+	@echo '--- Building Jupiter Ace UDG based Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORaceudg -x$(OUTPUT_DIRECTORY)/gfxaceudg @$(LISTFILE_DIRECTORY)/gfxaceudg.lst
 
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
 	@echo ''
-	@echo '--- Building Mattel Aquarius Library ---'
+	@echo '--- Building Mattel Aquarius Library (& 80x72 GFX) ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,aquarius)
 	$(MAKE) -C games TARGET=aquarius 
 	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaquarius -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	@echo ''
+	@echo '--- Building Mattel Aquarius 80x48 Graphics lib ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(LISTFILE_DIRECTORY)/gfxaq48.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:

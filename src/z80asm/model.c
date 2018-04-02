@@ -13,6 +13,7 @@ Global data model.
 #include "codearea.h"
 #include "errors.h"
 #include "init.h"
+#include "macros.h"
 #include "listfile.h"
 #include "options.h"
 #include "srcfile.h"
@@ -71,10 +72,15 @@ Bool src_open(char *filename, UT_array *dir_list)
 	return SrcFile_open( g_src_input, filename, dir_list );
 }
 
-char *src_getline( void )
+static char *src_getline1( void )
 {
 	init_module();
 	return SrcFile_getline( g_src_input );
+}
+
+char *src_getline()
+{
+	return macros_getline(src_getline1);
 }
 
 void src_ungetline( char *lines )

@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_509_long_constant
 
 
 	INCLUDE "z80_crt0.hdr"

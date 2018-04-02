@@ -22,6 +22,7 @@ static char              dumb         = 0;
 static char              collapsed    = 0;
 static char              zx80         = 0;
 static char              lambda       = 0;
+static char              disable_autorun = 0;
 
 
 /* Options that are available for this module */
@@ -35,6 +36,7 @@ option_t zx81_options[] = {
     {  0,  "collapsed",  "Collapse display to save loading time",  OPT_BOOL,  &collapsed },
     {  0,  "zx80",     "Work in ZX80 mode (4K ROM)",  OPT_BOOL,  &zx80 },
     {  0,  "lambda",   "Work in LAMBDA 8300 mode",   OPT_BOOL,  &lambda },
+    {  0,  "disable-autorun", "Disable autorun",     OPT_BOOL,  &disable_autorun },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -170,7 +172,7 @@ int zx81_exec(char *target)
 /* ************************************* */
 			// SYSTEM VARS before "VERSN" are not saved (ERR_NR, FLAGS, ERR_SP, RAMTOP, MODE, PPC are preserved)
 			fputc(255,fpout);							// VERSN ($4009) set to 255 when in PC8300 BASIC mode
-			writeword(17302,fpout);						// NXTLIN PC change to autorun; was 16509
+			writeword(disable_autorun ? 16509 : 17302,fpout);						// NXTLIN PC change to autorun; was 16509
 			writeword(17302,fpout);						// PROGRAM
 			writeword(16510,fpout);						// DF-CC (Display addr+1)
 			//writeword(17327,fpout);						// VARS
@@ -243,7 +245,7 @@ int zx81_exec(char *target)
 			fputc(253,fpout);							// 
 			fputc(255,fpout);							// DB_ST
 			fputc(55,fpout);							// MARGIN (55 if 50hz, 31 if 60 hz)
-			writeword(16509, fpout);					// NXTLIN; PC change to autorun; was 16530 + len
+			writeword(disable_autorun ? 16530 + len : 16509, fpout);					// NXTLIN; PC change to autorun; was 16530 + len
 			writeword(0,fpout);							// OLDPPC
 			fputc(0,fpout);								// FLAGX
 			writeword(0,fpout);							// STRLEN

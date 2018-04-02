@@ -156,7 +156,11 @@ Z80pass2( void )
 		}
     }
 
-    /* clean error location */
+	// check for undefined symbols
+	check_undefined_symbols(CURRENTMODULE->local_symtab);
+	check_undefined_symbols(global_symtab);
+
+	/* clean error location */
     set_error_null();
     //set_error_module( CURRENTMODULE->modname );
 

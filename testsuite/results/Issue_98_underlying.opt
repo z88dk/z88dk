@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_98_underlying
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -115,11 +114,10 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	ld	bc,0
-	push	bc
 	ld	bc,2
-	push	bc
-	call	l_long_add
+	add	hl,bc
+	jr	nc,ASMPC+3
+	inc	de
 	ret
 
 

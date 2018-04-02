@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_510_long_and
 
 
 	INCLUDE "z80_crt0.hdr"

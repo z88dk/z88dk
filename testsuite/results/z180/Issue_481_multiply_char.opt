@@ -1,7 +1,6 @@
 
 
 
-	MODULE	z180_Issue_481_multiply_char
 
 
 	INCLUDE "z80_crt0.hdr"

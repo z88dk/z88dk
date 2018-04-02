@@ -7,4 +7,4 @@ PUBLIC esxdos_f_fgetpos
 
 EXTERN asm_esxdos_f_fgetpos
 
-defc esxdos_f_fgetpos_fastcall = asm_esxdos_f_fgetpos
+defc esxdos_f_fgetpos = asm_esxdos_f_fgetpos

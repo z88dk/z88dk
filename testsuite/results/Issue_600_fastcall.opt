@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_600_fastcall
 
 
 	INCLUDE "z80_crt0.hdr"

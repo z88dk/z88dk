@@ -11,6 +11,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "fileutil.h"
 #include "libfile.h"
 #include "listfile.h"
+#include "macros.h"
 #include "modlink.h"
 #include "module.h"
 #include "objfile.h"
@@ -175,6 +176,8 @@ static void do_assemble( char *src_filename )
     int start_errors = get_num_errors();     /* count errors in this source file */
 	char *obj_filename = get_obj_filename(src_filename);
 
+	clear_macros();
+
 	/* create list file */
 	if (opts.list)
 		list_open(get_list_filename(src_filename));
@@ -323,6 +326,7 @@ int z80asm_main( int argc, char *argv[] )
 
 	model_init();						/* init global data */
 	libraryhdr = NULL;					/* initialise to no library files */
+	init_macros();
 
 	/* parse command line and call-back via assemble_file() */
 	/* If filename starts with '@', reads the file as a list of filenames
@@ -381,6 +385,8 @@ int z80asm_main( int argc, char *argv[] )
 		if (reloctable != NULL)
 			m_free(reloctable);
 	}
+
+	free_macros();
 
     if ( get_num_errors() )
     {

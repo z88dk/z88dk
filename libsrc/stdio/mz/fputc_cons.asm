@@ -33,7 +33,11 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	
+	cp  12
+	jr  nz,nocls
+	ld	a,$16
+.nocls
+
 IF STANDARDESCAPECHARS
 	cp  10
 	jr  nz,notCR

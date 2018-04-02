@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_615_if
 
 
 	INCLUDE "z80_crt0.hdr"

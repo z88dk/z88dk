@@ -55,6 +55,7 @@ graphics/setxy
 graphics/move
 graphics/pen_up
 graphics/pen_down
+graphics/putc4x6
 graphics/zx81/swapgfxbk
 graphics/drawbox
 stdio/ansi/zx81/text/f_ansi_attr

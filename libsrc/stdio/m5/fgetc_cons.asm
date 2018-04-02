@@ -18,8 +18,7 @@
 
 .fgetc_cons
 ._fgetc_cons
-	ld	ix,ACECHI
-	call	msxbios
+	call	WTKDTC
 
 IF STANDARDESCAPECHARS
 	cp	13

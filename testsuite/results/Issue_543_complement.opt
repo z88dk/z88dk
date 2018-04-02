@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_543_complement
 
 
 	INCLUDE "z80_crt0.hdr"

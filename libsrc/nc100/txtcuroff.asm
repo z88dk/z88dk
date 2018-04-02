@@ -1,8 +1,8 @@
 
 
                 SECTION code_clib
-		PUBLIC textcurff
-		PUBLIC _textcurff
+		PUBLIC txtcuroff
+		PUBLIC _txtcuroff
 
 .txtcuroff
 ._txtcuroff

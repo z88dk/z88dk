@@ -14,6 +14,7 @@ extern void error_glob_no_files(char *filename);
 extern void error_not_regular_file(char *filename);
 extern void warn_symbol_different(char *name, char *used);
 extern void warn_expr_in_parens(void);
+extern void error_redefined_macro(char *name);
 extern void error_syntax(void);
 extern void error_syntax_expr(void);
 extern void error_invalid_squoted_string(void);

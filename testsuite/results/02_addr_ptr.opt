@@ -1,7 +1,6 @@
 
 
 
-	MODULE	X02_addr_ptr
 
 
 	INCLUDE "z80_crt0.hdr"

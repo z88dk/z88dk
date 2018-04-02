@@ -4,7 +4,7 @@
 SECTION code_clib
 SECTION code_adt_b_array
 
-PUBLIC _b_array_size
+PUBLIC _b_array_size_fastcall
 
 EXTERN asm_b_array_size
 

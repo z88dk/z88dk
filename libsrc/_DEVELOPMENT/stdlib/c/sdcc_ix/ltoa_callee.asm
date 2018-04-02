@@ -8,7 +8,7 @@ PUBLIC _ltoa_callee, l0_ltoa_callee
 
 EXTERN asm_ltoa
 
-_ltoa:
+_ltoa_callee:
 
    pop af
    pop hl

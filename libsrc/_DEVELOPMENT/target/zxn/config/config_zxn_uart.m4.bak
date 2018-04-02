@@ -27,8 +27,9 @@ divert(-1)
 # receive at the same time.  There is no hardware flow control
 # available because of the small number of pins on the esp module.
 
-# The Rx buffer is 256 bytes in size but the buffer is circular
-# so if it overruns, older unretrieved bytes will be overwritten.
+# The Rx buffer is 256 bytes in size and if it overruns, further
+# received bytes will be silently dropped.
+
 # There is no Tx buffer - the moment a byte is sent, it is
 # transmitted over the serial link.  Because there is no Tx buffer,
 # there must be a time delay between successive bytes sent to
@@ -37,6 +38,26 @@ divert(-1)
 # is 10*(Fcpu/R) where Fcpu = cpu speed (3.5Mhz, eg) and R
 # is the baud rate (115200, eg).  A status bit can also be
 # polled to find out when it's safe to send another byte.
+
+# The UART baud rate is set by writing a 14-bit period measured
+# in 28MHz cycles.  Periods for common baud rates are shown below:
+#
+# 28000000 / 2400    = 11666  = 2400 bps
+# 28000000 / 4800    = 5833   = 4800 bps
+# 28000000 / 9600    = 2916   = 9600 bps
+# 28000000 / 19200   = 1458   = 19200 bps
+# 28000000 / 31250   = 896    = 31250 bps
+# 28000000 / 38400   = 729    = 38400 bps
+# 28000000 / 57600   = 486    = 57600 bps
+# 28000000 / 115200  = 243    = 115200 bps
+#
+# These 14-bit baud rates are written to the baud rate register
+# 7-bits at a time.  In the 8-bit byte written, the top bit
+# is set to indicate that the upper 7-bits are being written and
+# it is reset to indicate that the lower 7-bits are being written.
+#
+# Note:  At the moment the lower 7-bits should always be written
+# first because this write may also overwrite the top 7-bits.
 
 # PORT 0x143B: UART Rx (read only)
 #
@@ -48,23 +69,39 @@ define(`__IO_UART_RX', 0x143b)
 
 define(`__IO_UART_BAUD_RATE', 0x143b)
 
-define(`__IUBR_115200', 0)
-define(`__IUBR_57600', 1)
-define(`__IUBR_38400', 2)
-define(`__IUBR_31250', 3)
-define(`__IUBR_19200', 4)
-define(`__IUBR_9600', 5)
-define(`__IUBR_4800', 6)
-define(`__IUBR_2400', 7)
+define(`__IUBR_115200_L', 0x73)
+define(`__IUBR_115200_H', 0x81)
+define(`__IUBR_57600_L', 0x66)
+define(`__IUBR_57600_H', 0x83)
+define(`__IUBR_38400_L', 0x59)
+define(`__IUBR_38400_H', 0x85)
+define(`__IUBR_31250_L', 0x00)
+define(`__IUBR_31250_H', 0x87)
+define(`__IUBR_19200_L', 0x32)
+define(`__IUBR_19200_H', 0x8b)
+define(`__IUBR_9600_L', 0x64)
+define(`__IUBR_9600_H', 0x96)
+define(`__IUBR_4800_L', 0x49)
+define(`__IUBR_4800_H', 0xad)
+define(`__IUBR_2400_L', 0x12)
+define(`__IUBR_2400_H', 0xdb)
 
-define(`__IO_143B_115200', __IUBR_115200)
-define(`__IO_143B_57600', __IUBR_57600)
-define(`__IO_143B_38400', __IUBR_38400)
-define(`__IO_143B_31250', __IUBR_31250)
-define(`__IO_143B_19200', __IUBR_19200)
-define(`__IO_143B_9600', __IUBR_9600)
-define(`__IO_143B_4800', __IUBR_4800)
-define(`__IO_143B_2400', __IUBR_2400)
+define(`__IO_143B_115200_L', __IUBR_115200_L)
+define(`__IO_143B_115200_H', __IUBR_115200_H)
+define(`__IO_143B_57600_L', __IUBR_57600_L)
+define(`__IO_143B_57600_H', __IUBR_57600_H)
+define(`__IO_143B_38400_L', __IUBR_38400_L)
+define(`__IO_143B_38400_H', __IUBR_38400_H)
+define(`__IO_143B_31250_L', __IUBR_31250_L)
+define(`__IO_143B_31250_H', __IUBR_31250_H)
+define(`__IO_143B_19200_L', __IUBR_19200_L)
+define(`__IO_143B_19200_H', __IUBR_19200_H)
+define(`__IO_143B_9600_L', __IUBR_9600_L)
+define(`__IO_143B_9600_H', __IUBR_9600_H)
+define(`__IO_143B_4800_L', __IUBR_4800_L)
+define(`__IO_143B_4800_H', __IUBR_4800_H)
+define(`__IO_143B_2400_L', __IUBR_2400_L)
+define(`__IO_143B_2400_H', __IUBR_2400_H)
 
 # PORT 0x133B: UART Tx (write only)
 
@@ -74,11 +111,13 @@ define(`__IO_UART_TX', 0x133b)
 
 define(`__IO_UART_STATUS', 0x133b)
 
-define(`__IUS_RX_AVAIL', 0x01)   # active high
-define(`__IUS_TX_READY', 0x02)   # active low
+define(`__IUS_RX_AVAIL', 0x01)  # active high
+define(`__IUS_TX_BUSY', 0x02)   # active high
+define(`__IUS_RX_FULL', 0x04)   # active high
 
 define(`__IO_133B_RX_AVAIL', __IUS_RX_AVAIL)
-define(`__IO_133B_TX_READY', __IUS_TX_READY)
+define(`__IO_133B_TX_BUSY', __IUS_TX_READY)
+define(`__IO_133B_RX_FULL', __IUS_RX_FULL)
 
 #
 # END OF USER CONFIGURATION
@@ -96,33 +135,51 @@ PUBLIC `__IO_UART_RX'
 
 PUBLIC `__IO_UART_BAUD_RATE'
 
-PUBLIC `__IUBR_115200'
-PUBLIC `__IUBR_57600'
-PUBLIC `__IUBR_38400'
-PUBLIC `__IUBR_31250'
-PUBLIC `__IUBR_19200'
-PUBLIC `__IUBR_9600'
-PUBLIC `__IUBR_4800'
-PUBLIC `__IUBR_2400'
+PUBLIC `__IUBR_115200_L'
+PUBLIC `__IUBR_115200_H'
+PUBLIC `__IUBR_57600_L'
+PUBLIC `__IUBR_57600_H'
+PUBLIC `__IUBR_38400_L'
+PUBLIC `__IUBR_38400_H'
+PUBLIC `__IUBR_31250_L'
+PUBLIC `__IUBR_31250_H'
+PUBLIC `__IUBR_19200_L'
+PUBLIC `__IUBR_19200_H'
+PUBLIC `__IUBR_9600_L'
+PUBLIC `__IUBR_9600_H'
+PUBLIC `__IUBR_4800_L'
+PUBLIC `__IUBR_4800_H'
+PUBLIC `__IUBR_2400_L'
+PUBLIC `__IUBR_2400_H'
 
-PUBLIC `__IO_143B_115200'
-PUBLIC `__IO_143B_57600'
-PUBLIC `__IO_143B_38400'
-PUBLIC `__IO_143B_31250'
-PUBLIC `__IO_143B_19200'
-PUBLIC `__IO_143B_9600'
-PUBLIC `__IO_143B_4800'
-PUBLIC `__IO_143B_2400'
+PUBLIC `__IO_143B_115200_L'
+PUBLIC `__IO_143B_115200_H'
+PUBLIC `__IO_143B_57600_L'
+PUBLIC `__IO_143B_57600_H'
+PUBLIC `__IO_143B_38400_L'
+PUBLIC `__IO_143B_38400_H'
+PUBLIC `__IO_143B_31250_L'
+PUBLIC `__IO_143B_31250_H'
+PUBLIC `__IO_143B_19200_L'
+PUBLIC `__IO_143B_19200_H'
+PUBLIC `__IO_143B_9600_L'
+PUBLIC `__IO_143B_9600_H'
+PUBLIC `__IO_143B_4800_L'
+PUBLIC `__IO_143B_4800_H'
+PUBLIC `__IO_143B_2400_L'
+PUBLIC `__IO_143B_2400_H'
 
 PUBLIC `__IO_UART_TX'
 
 PUBLIC `__IO_UART_STATUS'
 
 PUBLIC `__IUS_RX_AVAIL'
-PUBLIC `__IUS_TX_READY'
+PUBLIC `__IUS_TX_BUSY'
+PUBLIC `__IUS_RX_FULL'
 
 PUBLIC `__IO_133B_RX_AVAIL'
-PUBLIC `__IO_133B_TX_READY'
+PUBLIC `__IO_133B_TX_BUSY'
+PUBLIC `__IO_133B_RX_FULL'
 ')
 
 dnl#
@@ -135,33 +192,51 @@ defc `__IO_UART_RX' = __IO_UART_RX
 
 defc `__IO_UART_BAUD_RATE' = __IO_UART_BAUD_RATE
 
-defc `__IUBR_115200' = __IUBR_115200
-defc `__IUBR_57600' = __IUBR_57600
-defc `__IUBR_38400' = __IUBR_38400
-defc `__IUBR_31250' = __IUBR_31250
-defc `__IUBR_19200' = __IUBR_19200
-defc `__IUBR_9600' = __IUBR_9600
-defc `__IUBR_4800' = __IUBR_4800
-defc `__IUBR_2400' = __IUBR_2400
+defc `__IUBR_115200_L' = __IUBR_115200_L
+defc `__IUBR_115200_H' = __IUBR_115200_H
+defc `__IUBR_57600_L' = __IUBR_57600_L
+defc `__IUBR_57600_H' = __IUBR_57600_H
+defc `__IUBR_38400_L' = __IUBR_38400_L
+defc `__IUBR_38400_H' = __IUBR_38400_H
+defc `__IUBR_31250_L' = __IUBR_31250_L
+defc `__IUBR_31250_H' = __IUBR_31250_H
+defc `__IUBR_19200_L' = __IUBR_19200_L
+defc `__IUBR_19200_H' = __IUBR_19200_H
+defc `__IUBR_9600_L' = __IUBR_9600_L
+defc `__IUBR_9600_H' = __IUBR_9600_H
+defc `__IUBR_4800_L' = __IUBR_4800_L
+defc `__IUBR_4800_H' = __IUBR_4800_H
+defc `__IUBR_2400_L' = __IUBR_2400_L
+defc `__IUBR_2400_H' = __IUBR_2400_H
 
-defc `__IO_143B_115200' = __IUBR_115200
-defc `__IO_143B_57600' = __IUBR_57600
-defc `__IO_143B_38400' = __IUBR_38400
-defc `__IO_143B_31250' = __IUBR_31250
-defc `__IO_143B_19200' = __IUBR_19200
-defc `__IO_143B_9600' = __IUBR_9600
-defc `__IO_143B_4800' = __IUBR_4800
-defc `__IO_143B_2400' = __IUBR_2400
+defc `__IO_143B_115200_L' = __IO_143B_115200_L
+defc `__IO_143B_115200_H' = __IO_143B_115200_H
+defc `__IO_143B_57600_L' = __IO_143B_57600_L
+defc `__IO_143B_57600_H' = __IO_143B_57600_H
+defc `__IO_143B_38400_L' = __IO_143B_38400_L
+defc `__IO_143B_38400_H' = __IO_143B_38400_H
+defc `__IO_143B_31250_L' = __IO_143B_31250_L
+defc `__IO_143B_31250_H' = __IO_143B_31250_H
+defc `__IO_143B_19200_L' = __IO_143B_19200_L
+defc `__IO_143B_19200_H' = __IO_143B_19200_H
+defc `__IO_143B_9600_L' = __IO_143B_9600_L
+defc `__IO_143B_9600_H' = __IO_143B_9600_H
+defc `__IO_143B_4800_L' = __IO_143B_4800_L
+defc `__IO_143B_4800_H' = __IO_143B_4800_H
+defc `__IO_143B_2400_L' = __IO_143B_2400_L
+defc `__IO_143B_2400_H' = __IO_143B_2400_H
 
 defc `__IO_UART_TX' = __IO_UART_TX
 
 defc `__IO_UART_STATUS' = __IO_UART_STATUS
 
 defc `__IUS_RX_AVAIL' = __IUS_RX_AVAIL
-defc `__IUS_TX_READY' = __IUS_TX_READY
+defc `__IUS_TX_BUSY' = __IUS_TX_BUSY
+defc `__IUS_RX_FULL' = __IUS_RX_FULL
 
 defc `__IO_133B_RX_AVAIL' = __IUS_RX_AVAIL
-defc `__IO_133B_TX_READY' = __IUS_TX_READY
+defc `__IO_133B_TX_BUSY' = __IUS_TX_BUSY
+defc `__IO_133B_RX_FULL' = __IUS_RX_FULL
 ')
 
 dnl#
@@ -174,31 +249,49 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__IO_UART_BAUD_RATE'  __IO_UART_BAUD_RATE
 
-`#define' `__IUBR_115200'  __IUBR_115200
-`#define' `__IUBR_57600'  __IUBR_57600
-`#define' `__IUBR_38400'  __IUBR_38400
-`#define' `__IUBR_31250'  __IUBR_31250
-`#define' `__IUBR_19200'  __IUBR_19200
-`#define' `__IUBR_9600'  __IUBR_9600
-`#define' `__IUBR_4800'  __IUBR_4800
-`#define' `__IUBR_2400'  __IUBR_2400
+`#define' `__IUBR_115200_L'  __IUBR_115200_L
+`#define' `__IUBR_115200_H'  __IUBR_115200_H
+`#define' `__IUBR_57600_L'  __IUBR_57600_L
+`#define' `__IUBR_57600_H'  __IUBR_57600_H
+`#define' `__IUBR_38400_L'  __IUBR_38400_L
+`#define' `__IUBR_38400_H'  __IUBR_38400_H
+`#define' `__IUBR_31250_L'  __IUBR_31250_L
+`#define' `__IUBR_31250_H'  __IUBR_31250_H
+`#define' `__IUBR_19200_L'  __IUBR_19200_L
+`#define' `__IUBR_19200_H'  __IUBR_19200_H
+`#define' `__IUBR_9600_L'  __IUBR_9600_L
+`#define' `__IUBR_9600_H'  __IUBR_9600_H
+`#define' `__IUBR_4800_L'  __IUBR_4800_L
+`#define' `__IUBR_4800_H'  __IUBR_4800_H
+`#define' `__IUBR_2400_L'  __IUBR_2400_L
+`#define' `__IUBR_2400_H'  __IUBR_2400_H
 
-`#define' `__IO_143B_115200'  __IUBR_115200
-`#define' `__IO_143B_57600'  __IUBR_57600
-`#define' `__IO_143B_38400'  __IUBR_38400
-`#define' `__IO_143B_31250'  __IUBR_31250
-`#define' `__IO_143B_19200'  __IUBR_19200
-`#define' `__IO_143B_9600'  __IUBR_9600
-`#define' `__IO_143B_4800'  __IUBR_4800
-`#define' `__IO_143B_2400'  __IUBR_2400
+`#define' `__IO_143B_115200_L'  __IO_143B_115200_L
+`#define' `__IO_143B_115200_H'  __IO_143B_115200_H
+`#define' `__IO_143B_57600_L'  __IO_143B_57600_L
+`#define' `__IO_143B_57600_H'  __IO_143B_57600_H
+`#define' `__IO_143B_38400_L'  __IO_143B_38400_L
+`#define' `__IO_143B_38400_H'  __IO_143B_38400_H
+`#define' `__IO_143B_31250_L'  __IO_143B_31250_L
+`#define' `__IO_143B_31250_H'  __IO_143B_31250_H
+`#define' `__IO_143B_19200_L'  __IO_143B_19200_L
+`#define' `__IO_143B_19200_H'  __IO_143B_19200_H
+`#define' `__IO_143B_9600_L'  __IO_143B_9600_L
+`#define' `__IO_143B_9600_H'  __IO_143B_9600_H
+`#define' `__IO_143B_4800_L'  __IO_143B_4800_L
+`#define' `__IO_143B_4800_H'  __IO_143B_4800_H
+`#define' `__IO_143B_2400_L'  __IO_143B_2400_L
+`#define' `__IO_143B_2400_H'  __IO_143B_2400_H
 
 `#define' `__IO_UART_TX'  __IO_UART_TX
 
 `#define' `__IO_UART_STATUS'  __IO_UART_STATUS
 
 `#define' `__IUS_RX_AVAIL'  __IUS_RX_AVAIL
-`#define' `__IUS_TX_READY'  __IUS_TX_READY
+`#define' `__IUS_TX_BUSY'  __IUS_TX_BUSY
+`#define' `__IUS_RX_FULL'  __IUS_RX_FULL
 
 `#define' `__IO_133B_RX_AVAIL'  __IUS_RX_AVAIL
-`#define' `__IO_133B_TX_READY'  __IUS_TX_READY
+`#define' `__IO_133B_TX_BUSY'  __IUS_TX_BUSY
+`#define' `__IO_133B_RX_FULL'  __IUS_RX_FULL
 ')

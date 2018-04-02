@@ -13,6 +13,7 @@ struct zx_common
     char          *excluded_sections;
     char           clean;
     int            main_fence;
+    char           pages;
 };
 
 struct zx_tape

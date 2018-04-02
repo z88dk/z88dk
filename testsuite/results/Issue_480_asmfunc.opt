@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_480_asmfunc
 
 
 	INCLUDE "z80_crt0.hdr"

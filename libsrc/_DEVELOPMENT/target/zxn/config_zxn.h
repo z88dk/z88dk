@@ -1959,24 +1959,6 @@
 
 #define __IO_LED_L  0x103b
 
-#define __ZXN_FILENAME_NEXT_UPDATE_FILE  "TBBLUE  TBU"
-#define __ZXN_FILENAME_NEXT_UPDATE_FILE_2  "TBBLUE.TBU"
-
-#define __ZXN_FILENAME_NEXT_FIRMWARE_FILE  "TBBLUE  FW "
-#define __ZXN_FILENAME_NEXT_FIRMWARE_FILE_2  "TBBLUE.FW"
-
-#define __ZXN_DIR_NEXT_DIRECTORY  "/tbblue/"
-
-#define __ZXN_FILENAME_CONFIG  "/tbblue/config.ini"
-#define __ZXN_FILENAME_TIMING  "/tbblue/timing.ini"
-
-#define __ZXN_FILENAME_ESXMMC  "esxmmc.rom"
-#define __ZXN_FILENAME_MF1  "mf1.rom"
-#define __ZXN_FILENAME_MF3  "mf3.rom"
-#define __ZXN_FILENAME_MF128  "mf128.rom"
-
-#define __ZXN_FILENAME_KEYMAP  "/tbblue/keymap.bin"
-
 
 
 
@@ -2617,33 +2599,51 @@
 
 #define __IO_UART_BAUD_RATE  0x143b
 
-#define __IUBR_115200  0
-#define __IUBR_57600  1
-#define __IUBR_38400  2
-#define __IUBR_31250  3
-#define __IUBR_19200  4
-#define __IUBR_9600  5
-#define __IUBR_4800  6
-#define __IUBR_2400  7
+#define __IUBR_115200_L  0x73
+#define __IUBR_115200_H  0x81
+#define __IUBR_57600_L  0x66
+#define __IUBR_57600_H  0x83
+#define __IUBR_38400_L  0x59
+#define __IUBR_38400_H  0x85
+#define __IUBR_31250_L  0x00
+#define __IUBR_31250_H  0x87
+#define __IUBR_19200_L  0x32
+#define __IUBR_19200_H  0x8b
+#define __IUBR_9600_L  0x64
+#define __IUBR_9600_H  0x96
+#define __IUBR_4800_L  0x49
+#define __IUBR_4800_H  0xad
+#define __IUBR_2400_L  0x12
+#define __IUBR_2400_H  0xdb
 
-#define __IO_143B_115200  0
-#define __IO_143B_57600  1
-#define __IO_143B_38400  2
-#define __IO_143B_31250  3
-#define __IO_143B_19200  4
-#define __IO_143B_9600  5
-#define __IO_143B_4800  6
-#define __IO_143B_2400  7
+#define __IO_143B_115200_L  0x73
+#define __IO_143B_115200_H  0x81
+#define __IO_143B_57600_L  0x66
+#define __IO_143B_57600_H  0x83
+#define __IO_143B_38400_L  0x59
+#define __IO_143B_38400_H  0x85
+#define __IO_143B_31250_L  0x00
+#define __IO_143B_31250_H  0x87
+#define __IO_143B_19200_L  0x32
+#define __IO_143B_19200_H  0x8b
+#define __IO_143B_9600_L  0x64
+#define __IO_143B_9600_H  0x96
+#define __IO_143B_4800_L  0x49
+#define __IO_143B_4800_H  0xad
+#define __IO_143B_2400_L  0x12
+#define __IO_143B_2400_H  0xdb
 
 #define __IO_UART_TX  0x133b
 
 #define __IO_UART_STATUS  0x133b
 
 #define __IUS_RX_AVAIL  0x01
-#define __IUS_TX_READY  0x02
+#define __IUS_TX_BUSY  0x02
+#define __IUS_RX_FULL  0x04
 
 #define __IO_133B_RX_AVAIL  0x01
-#define __IO_133B_TX_READY  0x02
+#define __IO_133B_TX_BUSY  0x02
+#define __IO_133B_RX_FULL  0x04
 
 
 

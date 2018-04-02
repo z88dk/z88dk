@@ -8,4 +8,4 @@ PUBLIC _bv_priority_queue_capacity_fastcall
 
 EXTERN asm_bv_priority_queue_capacity
 
-defc _bv_priority_queue_capacity = asm_bv_priority_queue_capacity
+defc _bv_priority_queue_capacity_fastcall = asm_bv_priority_queue_capacity

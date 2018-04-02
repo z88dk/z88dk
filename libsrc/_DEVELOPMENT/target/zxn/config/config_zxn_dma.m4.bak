@@ -358,7 +358,7 @@ define(`__D_WR5_STOP', 0x00)
 #
 # The "Continue" command resets the DMA's byte counter so that a following "Enable DMA"
 # allows the DMA to repeat the last transfer but using the current internal address
-# pointers.  Ie it continues where the last copy operation left off.
+# pointers.  Ie it continues from where the last copy operation left off.
 #
 # Registers can be read via an io read from the dma port after setting the read mask.
 # (At power up the read mask is set to 0x7f).  Register values are the current internal
@@ -391,6 +391,11 @@ define(`__D_RM_B_ADDR', 0x60)
 # OPERATING SPEED
 #
 # The ZXN DMA operates at the same speed as the CPU, that is 3.5MHz, 7MHz or 14MHz.
+# This is a contended clock that is modified by the ULA and the auto-slowdown by layer 2.
+# Because of this the cycle lengths for Ports A and B can be set to their minimum
+# values without ill effects.  However this may change so the following paragraph
+# is kept for informational purposes.
+#
 # The cycle lengths specified for Ports A and B are intended to selectively slow down
 # read or write cycles for hardware that cannot operate at the DMA's full speed.  This
 # is the case, for example, with layer 2 which can only tolerate a two cycle write
@@ -402,6 +407,20 @@ define(`__D_RM_B_ADDR', 0x60)
 #   4 @ 14MHz       Layer 2 write while active display is generated
 #   2               Everything else
 
+# z88dk/z80asm adds instructions to help with programming the dma:
+#
+#   dma.wr0
+#   dma.wr1
+#   dma.wr2
+#   dma.wr3
+#   dma.wr4
+#   dma.wr5
+#   dma.wr6 / dma.cmd
+#
+# These opcodes generate dma programs in z80 asm code and error
+# check dma parameters.
+#
+# See https://github.com/z88dk/z88dk/issues/312#issuecomment-373608766
 #
 # END OF USER CONFIGURATION
 ###############################################################

@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_569_jagged_array
 
 
 	INCLUDE "z80_crt0.hdr"

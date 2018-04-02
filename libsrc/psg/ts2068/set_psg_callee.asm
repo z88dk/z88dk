@@ -14,7 +14,7 @@
 	PUBLIC	set_psg_callee
 	PUBLIC	_set_psg_callee
 	PUBLIC	psg_patch0
-	PUBLIC	psg_patch1
+;	PUBLIC	psg_patch1
 	
 	PUBLIC ASMDISP_SET_PSG_CALLEE
 

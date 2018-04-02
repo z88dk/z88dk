@@ -54,8 +54,6 @@
 
         PUBLIC    __sgoioblk      ;stdio info block
 
-        PUBLIC    heaplast        ;Near malloc heap variables
-        PUBLIC    heapblocks
 
 IF (startup>100)
 		; LAMBDA specific definitions (if any)
@@ -255,11 +253,13 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 restore81:
 IF (!DEFINED_startup | (startup=1))
         ex      af,af
-        ld      a,(a1save)
+a1save:
+        ld      a,0
         ex      af,af
 ENDIF
         exx
-        ld	hl,(hl1save)
+hl1save:
+        ld	hl,0
         ;ld	bc,(bc1save)
         ;ld	de,(de1save)
         exx
@@ -269,12 +269,11 @@ ENDIF
 save81:
 IF (!DEFINED_startup | (startup=1))
         ex      af,af
-        ld      (a1save),a
+        ld      (a1save+1),a
         ex      af,af
 ENDIF
         exx
-        ld	(hl1save),hl
-        ;ld	(bc1save),bc
+        ld	(hl1save + 1),hl
         ;ld	(de1save),de
         exx
         ret
@@ -351,15 +350,4 @@ ENDIF
 ;                defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"
-
-
-	SECTION bss_crt
-IF (!DEFINED_startup | (startup=1))
-a1save: 	defb    0
-ENDIF
-hl1save:	defw	0
-;bc1save:	defw	0
-;de1save:	defw	0
-
-
 

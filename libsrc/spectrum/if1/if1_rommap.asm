@@ -23,7 +23,7 @@
                 PUBLIC    MOTOR
                 PUBLIC    RD_BUFF
                 PUBLIC    ERASEM
-                PUBLIC    ADD_RECD
+;                PUBLIC    ADD_RECD
                 PUBLIC    DEL_S_1
 
                 PUBLIC    mdvbuffer

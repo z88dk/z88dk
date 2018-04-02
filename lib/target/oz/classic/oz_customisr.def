@@ -25,7 +25,6 @@
 	
 	PUBLIC	serial_hook
 
-	PUBLIC	ozkeyclick
 	PUBLIC	oz1hz
 
 	PUBLIC	frames

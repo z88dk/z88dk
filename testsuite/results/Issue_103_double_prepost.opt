@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_103_double_prepost
 
 
 	INCLUDE "z80_crt0.hdr"
