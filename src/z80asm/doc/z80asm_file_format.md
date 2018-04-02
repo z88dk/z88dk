@@ -1,4 +1,4 @@
-z80asm File formats (v06)
+z80asm File formats (v07)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
@@ -43,7 +43,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF06' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF07' (file signature and version)                |  
     |   8 | long   | *ORG Address*                                          |  
     |  12 | long   | File pointer to *Module Name*, always the last section |  
     |  16 | long   | File pointer to *Expressions*, may be -1               |  
@@ -109,6 +109,8 @@ up to the next existing section. Each name has the following format:
   * *type (char) : defines whether it is a: 
      * 'A' relocatable address,   
      * 'C' a constant.
+     * '=' a symbol computed at link time, the corresponding
+     expression is in the *Expressions* section.
 
   * *section* (string) : source file section name where name 
   was defined. 
@@ -147,7 +149,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF06' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF07' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
