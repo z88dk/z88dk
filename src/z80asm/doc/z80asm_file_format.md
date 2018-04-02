@@ -1,8 +1,8 @@
-z80asm File formats (v01)
+z80asm File formats (v02)
 =========================
 
-This document describes the object and libary formats used by *z80asm* 
-up to version *1.2.10*.
+This document describes the object and libary formats used by *z80asm*
+from version *2.0.0* up to version *2.1.8*.  
 
 The object and library files are stored in binary form as a set of 
 contiguous objects, i.e. each section follows the previous one without 
@@ -40,7 +40,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF01' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF02' (file signature and version)                |  
     |   8 | word   | *ORG Address*                                          |  
     |  10 | long   | File pointer to *Module Name*, always the last section |  
     |  14 | long   | File pointer to *Expressions*, may be -1               |  
@@ -74,7 +74,7 @@ format:
   store the result of evaluating the expression.
 
   * *expression* (string) : contains the expression text as parsed from the 
-  source file, in the original (legacy) expression syntax.
+  source file, in the standard C-like expression syntax.
 
   * *0* (byte) : is a zero byte end marker, not part of the expression length.
 
@@ -121,7 +121,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF01' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF02' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -138,3 +138,4 @@ History
 -------
 
 * version *01* : original z80asm version
+* version *02* : allow expressions to use standard C operators instead of the original (legacy) z80asm specific syntax. 
