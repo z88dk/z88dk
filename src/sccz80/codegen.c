@@ -2324,6 +2324,8 @@ void asl_const(LVALUE *lval, int32_t value)
             ol("ld\te,0");
             vconst(0);
             break;
+        case 18: // 6 btes
+            ol("add\thl,hl");
         case 17: // 5 bytes
             ol("add\thl,hl");  // 5 bytes, 11 + 4 + 10 = 25T
             // Fall through
@@ -2342,10 +2344,28 @@ void asl_const(LVALUE *lval, int32_t value)
             ol("rl\te");
             ol("rl\td");   
             break;
+        case 7:
+            if ( 0 &&  c_speed_optimisation & OPT_LSHIFT32) {
+                ol("rr\td");  // 15 bytes, 59T
+                ol("ld\td,e");
+                ol("ld\te,h");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                ol("rr\td");
+                ol("rr\te");
+                ol("rr\th");
+                ol("rr\tl");
+            } else {
+                loada( value );
+                callrts("l_long_aslo");                
+            }
+            break;
         case 9:
         case 10:
         case 11:
         case 12: 
+        case 13: 
+        case 14:
             // Shift by 8, 10 bytes, 4 + 4 + 4+ 7 = 19T + 
             ol("ld\td,e");
             ol("ld\te,h");
@@ -2353,7 +2373,7 @@ void asl_const(LVALUE *lval, int32_t value)
             ol("ld\tl,0");
             loada( value - 8 ); 
             callrts("l_long_aslo");
-            break;
+            break;        
         default: //  5 bytes
             if ( value >= 32 ) warningfmt("overflow","Left shifting by more than the size of the object");
             value &= 31;

@@ -3107,3 +3107,111 @@
 	ld	hl,0
 	jr	z,ASMPC+3
 	inc	l
+
+	call	l_declong
+.i_%1
+	ld	hl,%2
+=
+.i_%1
+	ld	hl,%2
+
+	call	l_inclong
+.i_%1
+	ld	hl,%2
+=
+.i_%1
+	ld	hl,%2
+
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,%1
+	add	hl,bc
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+=
+	pop	de
+	pop	hl
+	ld	bc,%1
+	add	hl,bc
+	push	hl
+	push	de
+
+	ld	h,(hl)
+	ld	l,a
+	%1c	hl
+	pop	hl
+	push	hl
+=
+	pop	hl
+	push	hl
+
+	ld	de,0
+	ld	hl,%1
+	call	l_asr_u
+	inc	e
+=
+	ld	hl,0	;const
+	ld	de,0
+
+	ld	hl,0	;const
+	ld	de,0
+	pop	bc
+	add	hl,bc
+	ex	de,hl
+	pop	bc
+	adc	hl,bc
+	ex	de,hl
+=
+	pop	hl
+	pop	de
+
+	push	hl
+	call	l_glong2sp
+	pop	hl
+	pop	de
+	pop	bc
+	call	l_plong
+=
+	call	l_glong
+
+	call	l_g%3
+.i_%1
+	ld	hl,%2
+=
+.i_%1
+	ld	hl,%2
+
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	bc,%2
+	add	hl,bc
+.i_%3
+	ld	hl,%4
+=
+.i_%3
+	ld	hl,%4
+
+	call	l_glong
+	ld	hl,%1
+=
+	inc	hl
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1
+
+	push	de
+	ld	hl,%1
+	add	hl,de
+	pop	bc
+	push	hl
+=
+	ld	hl,%1
+	add	hl,de
+	push	hl

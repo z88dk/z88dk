@@ -62,7 +62,6 @@
 	call	l_inclong
 	pop	bc
 	call	l_plong
-	call	l_declong
 .i_7
 	ld	hl,0	;const
 	add	hl,sp
