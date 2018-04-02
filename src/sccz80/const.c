@@ -186,7 +186,10 @@ int number(LVALUE *lval)
         k = (-k);
     lval->const_val = k;
 typecheck:
-    lval->val_type = KIND_INT;
+    lval->val_type = KIND_CHAR;
+    if ( lval->const_val >= 256 || lval->const_val < -127 ) {
+        lval->val_type = KIND_INT;
+    }
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = KIND_LONG;
     }

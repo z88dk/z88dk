@@ -115,7 +115,6 @@ int heir1(LVALUE* lval)
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");
         }
-
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
@@ -187,43 +186,39 @@ int heir1a(LVALUE* lval)
     LVALUE lval2={0};
     int k;
     Kind temptype;
+    Type *templtype;
 
     k = heir2a(lval);
     if (cmatch('?')) {
         /* evaluate condition expression */
         if (k)
             rvalue(lval);
+
+        if ( lval->is_const ) {
+            vconst(lval->const_val);
+        }
         /* test condition, jump to false expression evaluation if necessary */
         if (check_lastop_was_testjump(lval)) {
             // Always evaluated as an integer, so fake it temporarily
             force(KIND_INT, lval->val_type, c_default_unsigned, lval->ltype->isunsigned, 0);
             temptype = lval->val_type;
+            templtype = lval->ltype;
             lval->val_type = KIND_INT; /* Force to integer */
+            lval->ltype = type_int;
             testjump(lval, falselab = getlabel());
             lval->val_type = temptype;
+            lval->ltype = templtype;
             /* evaluate 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);
             jump(endlab = getlabel());
             postlabel(falselab);
         } else {
-/* New handling by djm 13/5/99, push flags, load true, jump on true 
- * The optimizer will with a bit of luck catch inefficient push/pop
- */
-#if 1
             jumpnc(falselab = getlabel());
             if (heir1(&lval2))
                 rvalue(&lval2);
             jump(endlab = getlabel());
             postlabel(falselab);
-#else
-            zpushflags();
-            /* evaluate 'true' expression */
-            if (heir1(&lval2))
-                rvalue(&lval2);
-            zpopflags();
-            jumpc(endlab = getlabel());
-#endif
         }
         needchar(':');
         /* evaluate 'false' expression */
@@ -238,13 +233,7 @@ int heir1a(LVALUE* lval)
             postlabel(endlab);
             convert_int_to_double(lval2.val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
-        }
-        /* 12/8/98 Mod by djm to convert long types - it's nice when someone
- * else has had to do it before! */
-        else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
-            /* Check for signed, if both signed convert properly, if one/neither signed
- * then we have dodgy equating in anycase, so treat as unsigned
- */
+        } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenlong(&lval2, lval);
             lval->val_type = KIND_LONG;
             lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
@@ -323,9 +312,9 @@ int heir5(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("==")) {
-            plnge2a(heir6, lval, &lval2, zeq, zeq, NULL);
+            plnge2a(heir6, lval, &lval2, zeq, zeq, zeq_const);
         } else if (match("!=")) {
-            plnge2a(heir6, lval, &lval2, zne, zne, NULL);
+            plnge2a(heir6, lval, &lval2, zne, zne, zne_const);
         } else
             return 0;
     }
@@ -348,15 +337,15 @@ int heir6(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("<=")) {
-            plnge2a(heir7, lval, &lval2, zle, zle, NULL);
+            plnge2a(heir7, lval, &lval2, zle, zle, zle_const);
         } else if (match(">=")) {
-            plnge2a(heir7, lval, &lval2, zge, zge, NULL);
+            plnge2a(heir7, lval, &lval2, zge, zge, zge_const);
         } else if (ch() == '<' && nch() != '<') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zlt, zlt, NULL);
+            plnge2a(heir7, lval, &lval2, zlt, zlt, zlt_const);
         } else if (ch() == '>' && nch() != '>') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zgt, zgt, NULL);
+            plnge2a(heir7, lval, &lval2, zgt, zgt, zgt_const);
         } else
             return 0;
     }

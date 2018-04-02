@@ -40,9 +40,9 @@ void test_lshift16_var(void)
      ++v;
      Assert( val << v == 1  << 15, "<<15");
      ++v;
-     Assert( val << v == 1  << 16, "<<16"); // Undefined
+//     Assert( val << v == (1  << 16) & 0xffff, "<<16"); // Undefined
      ++v;
-     Assert( val << v == 1  << 17, "<<17"); // Undefined
+//     Assert( val << v == (1 << 17) & 0xffff, "<<17"); // Undefined
 }
 
 void test_lshift32_var(void)
@@ -115,9 +115,9 @@ void test_lshift32_var(void)
      ++v;
      Assert( val << v == 1L << 31, "<<31");
      ++v;
-     Assert( val << v == 1L << 32, "<<32"); // Undefined behaviour
+//     Assert( val << v == (1L << 32) & 0xffffffff, "<<32"); // Undefined behaviour
      ++v;
-     Assert( val << v == 1L << 33, "<<33"); // Undefined, but it should match
+ //    Assert( val << v == (1L << 33) & 0xffffffff, "<<33"); // Undefined, but it should match
 }
 
 void test_lshift16_const(void)
@@ -140,9 +140,9 @@ void test_lshift16_const(void)
      Assert( val << 12 == 1 << 12, "<<12");
      Assert( val << 13 == 1 << 13, "<<13");
      Assert( val << 14 == 1 << 14, "<<14");
-     Assert( val << 15 == 1 << 15, "<<15");
-     Assert( val << 16 == 1 << 16, "<<16"); // Undefined
-     Assert( val << 17 == 1 << 17, "<<17"); // Undefined
+     Assert( val << 15 == (1 << 15) & 0xffff, "<<15");
+//     Assert( val << 16 == (1 << 16) & 0xffff, "<<16"); // Undefined
+//     Assert( val << 17 == (1 << 17) & 0xffff, "<<17"); // Undefined
 }
 
 void test_lshift32_const(void)
@@ -182,8 +182,8 @@ void test_lshift32_const(void)
      Assert( val << 29 == 1L << 29, "<<29");
      Assert( val << 30 == 1L << 30, "<<30");
      Assert( val << 31 == 1L << 31, "<<31");
-     Assert( val << 32 == 1L << 32, "<<32"); // Undefined behaviour
-     Assert( val << 33 == 1L << 33, "<<33"); // Undefined, but it should match
+//     Assert( val << 32 == (1L << 32) & 0xffffffff, "<<32"); // Undefined behaviour
+//     Assert( val << 33 == (1L << 33) & 0xffffffff, "<<33"); // Undefined, but it should match
 }
 
 int suite_lshift()
