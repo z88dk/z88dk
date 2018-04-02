@@ -1,4 +1,4 @@
-z80asm File formats (v08)
+z80asm File formats (v09)
 =========================
 
 This document describes the object and libary formats used by *z80asm*
@@ -43,7 +43,7 @@ The format of the object file is as follows:
 
     |Addr | Type   | Object                                                 |  
     +-----+--------+--------------------------------------------------------+  
-    |   0 | char[8]| 'Z80RMF08' (file signature and version)                |  
+    |   0 | char[8]| 'Z80RMF09' (file signature and version)                |  
     |   8 | long   | File pointer to *Module Name*, always the last section |  
     |  12 | long   | File pointer to *Expressions*, may be -1               |  
     |  16 | long   | File pointer to *Module Names*, may be -1              |  
@@ -115,7 +115,11 @@ up to the next existing section. Each name has the following format:
   relative address to the start of the code block for a relocatable
   address.
 	
-	* *name* (string) : contains the name.
+  * *name* (string) : contains the name.
+
+  * *filename* (string) : contains the source file name where the symbol was defined.
+
+  * *line_nr* (long) : contains the source line number where the symbols was defined.
 
 
 * *External Names* : contains a set of external names referred 
@@ -152,7 +156,7 @@ structures.
 
     |Addr | Type   | Object                                                 |
     +-----+--------+--------------------------------------------------------+
-    |   0 | char[8]| 'Z80LMF08' (file signature and version)                |
+    |   0 | char[8]| 'Z80LMF09' (file signature and version)                |
     |   8 | word   | *Object File Block*                                    |
     |     |        | ...                                                    |
 
@@ -181,3 +185,4 @@ error messages.
 * version *07* : include *DEFC* symbols that are defined as an expression using other symbols and are computed 
 at link time, after all addresses are allocated.
 * version *08* : include a user defined ORG address per section.
+* version *09* : include the file and line number where each symbol was defined.
