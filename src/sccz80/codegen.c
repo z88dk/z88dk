@@ -2826,12 +2826,7 @@ void zlt_const(LVALUE *lval, int32_t value)
         ol("ld\ta,l");
         ol("rla");  
         set_carry(lval);
-    } else if ( (lval->val_type == KIND_INT && utype(lval)) || lval->val_type == KIND_PTR ) {
-        const2(value & 0xffff);  // 6 bytes
-        ol("and\ta");
-        ol("sbc\thl,de");
-        set_carry(lval);
-    } else if ( lval->val_type == KIND_INT ) {
+    } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
         if ( value == 0 ) {
             if ( utype(lval) ) {
                 ol("and\ta"); // Should not reach here
@@ -2840,13 +2835,19 @@ void zlt_const(LVALUE *lval, int32_t value)
                 ol("rla");
             }
         } else {
-            ol("ld\ta,l"); // 9 bytesz
-            outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
-            ol("ld\ta,h");
-            ol("rla");
-            ol("ccf");
-            ol("rra");
-            outfmt("\tsbc\t%d\n", (0x80 +  ((uint32_t)value / 256)) & 0xff);
+            if ( utype(lval)) {
+                const2(value & 0xffff);  // 6 bytes
+                ol("and\ta");
+                ol("sbc\thl,de");
+            } else {
+                ol("ld\ta,l"); // 9 bytesz
+                outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
+                ol("ld\ta,h");
+                ol("rla");
+                ol("ccf");
+                ol("rra");
+                outfmt("\tsbc\t%d\n", (0x80 +  ((uint32_t)value / 256)) & 0xff);
+            }
         }
         set_carry(lval);
     } else {
