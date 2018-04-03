@@ -1,11 +1,11 @@
 FROM ubuntu:latest
 
 LABEL Maintainer="Garrafon Software (@garrafonsoft)"
-LABEL Version="0.3"
-LABEL Date="2018-Apr-02"
+LABEL Version="0.4"
+LABEL Date="2018-Apr-03"
 LABEL Description="A basic Docker container to compile and use z88dk from GIT"
 LABEL Creation_Command="docker build -t z88dk - < z88dk.Dockerfile"
-LABEL Execution_Command="docker run -v $PWD:/src/ -it z88dk <command>"
+LABEL Execution_Command="docker run -v ${PWD}:/src/ -it z88dk <command>"
 
 RUN apt-get update && apt-get install -y build-essential git m4 libxml2-dev subversion bison flex libboost-dev texinfo && apt-get clean && rm -rf /var/lib/apt/lists/*
 
