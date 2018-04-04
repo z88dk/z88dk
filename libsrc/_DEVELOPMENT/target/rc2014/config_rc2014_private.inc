@@ -550,9 +550,9 @@ defc __IO_SIO_WR3_RX_7BIT      = 0x40
 defc __IO_SIO_WR3_RX_6BIT      = 0x80
 defc __IO_SIO_WR3_RX_8BIT      = 0xC0
 
+defc __IO_SIO_WR4_PARITY_NONE      = 0x00
 defc __IO_SIO_WR4_PARITY_ENABLE      = 0x01
 defc __IO_SIO_WR4_PARITY_EVEN      = 0x02
-defc __IO_SIO_WR4_PARITY_ODD      = 0x00
 
 defc __IO_SIO_WR4_SYNC_MODE      = 0x00
 defc __IO_SIO_WR4_STOP_1      = 0x04
@@ -569,18 +569,18 @@ defc __IO_SIO_WR4_CLK_DIV_16      = 0x40
 defc __IO_SIO_WR4_CLK_DIV_32      = 0x80
 defc __IO_SIO_WR4_CLK_DIV_64      = 0xC0
 
-defc __IO_SIO_WR5_TX_CRC_ENABLE      = 0x00
-defc __IO_SIO_WR5_TX_RTS      = 0x00
-defc __IO_SIO_WR5_SDLC_CRC_16      = 0x00
-defc __IO_SIO_WR5_TX_ENABLE      = 0x00
-defc __IO_SIO_WR5_TX_BREAK      = 0x00
+defc __IO_SIO_WR5_TX_CRC_ENABLE      = 0x01
+defc __IO_SIO_WR5_TX_RTS      = 0x02
+defc __IO_SIO_WR5_SDLC_CRC_16      = 0x04
+defc __IO_SIO_WR5_TX_ENABLE      = 0x08
+defc __IO_SIO_WR5_TX_BREAK      = 0x10
 
 defc __IO_SIO_WR5_TX_5BIT      = 0x00
 defc __IO_SIO_WR5_TX_7BIT      = 0x20
 defc __IO_SIO_WR5_TX_6BIT      = 0x40
 defc __IO_SIO_WR5_TX_8BIT      = 0x60
 
-defc __IO_SIO_WR5_TX_DTR      = 0x60
+defc __IO_SIO_WR5_TX_DTR      = 0x80
 
 defc __IO_SIO_RR0_RX_CHAR      = 0x01
 defc __IO_SIO_RR0_A_INT_PENDING      = 0x02
