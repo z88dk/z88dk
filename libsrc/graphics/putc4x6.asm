@@ -151,8 +151,13 @@
 		djnz	lrloop
 		ld	a,e
 		
+		IF maxx <> 256
 		cp  maxx
 		call  nc,do_nl
+		ELSE
+		and a
+		call  z,do_nl		
+		ENDIF
 		
 		ld	(x_4x6),a		; update x position
 		
