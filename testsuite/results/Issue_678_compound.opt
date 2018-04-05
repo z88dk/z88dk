@@ -9,9 +9,7 @@
 	SECTION	code_compiler
 
 ._test
-	ld	hl,(_version)
-	ld	h,0
-	ld	a,l
+	ld	a,(_version)
 	sub	4
 	jp	nc,i_3
 	ld	hl,(_mem_size)
@@ -28,8 +26,6 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
 	call	l_glong
 	ld	de,0
 	pop	bc
@@ -55,8 +51,6 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
 	call	l_glong
 	ld	de,0
 	pop	bc
@@ -81,8 +75,6 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
 	call	l_glong
 	ld	de,0
 	pop	bc
@@ -93,9 +85,7 @@
 
 
 ._test_value_and
-	ld	hl,(_version)
-	ld	h,0
-	ld	a,l
+	ld	a,(_version)
 	sub	4
 	jp	nc,i_12
 	ld	hl,(_mem_size)
@@ -111,8 +101,6 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
 	call	l_glong
 	ld	de,0
 	pop	bc
