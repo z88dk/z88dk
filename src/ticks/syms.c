@@ -80,6 +80,17 @@ void read_symbol_file(char *filename)
 
             // Ignore
             if ( argc < 9 ) {
+                if ( argc >= 3 ) {
+                    // We've got at least 3, do something (it's an old format)
+                    symbol *sym = calloc(1,sizeof(*sym));
+                    sym->name = strdup(argv[0]);
+                    sym->address = strtol(argv[2], NULL, 16);
+                    sym->symtype = SYM_ADDRESS;
+                    if ( sym->address >= 0 && sym->address <= 65535 ) {
+                        LL_APPEND(symbols[sym->address], sym);
+                    }
+                    HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
+                }
                 free(argv);
                 continue;
             }
