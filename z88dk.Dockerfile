@@ -1,20 +1,21 @@
 # To create the image:
 #  macOS / GNU/Linux:
-#   $ docker build --squash -t z88dk - < z88dk.Dockerfile
+#   $ docker build -t z88dk - < z88dk.Dockerfile
 #  Windows 10 PowerShell:
-#   PS> cmd /c 'docker build --squash -t z88dk - < z88dk.Dockerfile'
+#   PS> cmd /c 'docker build -t z88dk - < z88dk.Dockerfile'
 # To run the container (works for macOS, GNU/Linux & Windows PowerShell):
 #  docker run -v ${PWD}:/src/ -it z88dk <command>
 
 FROM alpine:latest
 
-LABEL Version="0.6" \
+LABEL Version="0.7" \
       Date="2018-Apr-05" \
+      Docker_Version="18.03.0-ce-mac60 (23751)" \
       Maintainer="Garrafon Software (@garrafonsoft)" \
       Description="A basic Docker container to compile and use z88dk from GIT"
 
-RUN apk add --no-cache build-base m4 bison flex libxml2 boost \ 
-    && apk add --no-cache -t .build_deps libxml2-dev git subversion boost-dev texinfo \
+RUN apk add --no-cache build-base libxml2 \ 
+    && apk add --no-cache -t .build_deps m4 bison flex libxml2-dev git subversion boost-dev texinfo \
     && mkdir /opt \
     && cd /opt \
     && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git \
