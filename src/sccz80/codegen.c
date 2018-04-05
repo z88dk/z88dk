@@ -1985,7 +1985,7 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
            // Only the bits 15-8
            ol("ld\ta,h");
-           outfmt("\tand\t%#(%d %% 256)\n",(value & 0xff00)>>8);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff00)>>8);
            ol("ld\th,a");
         } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
            // Only the bits 23-16

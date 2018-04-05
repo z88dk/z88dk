@@ -40,7 +40,7 @@
 	push	hl
 	call	l_glong
 	ld	a,h
-	and	(18 % 256)
+	and	#(18 % 256)
 	ld	h,a
 	pop	bc
 	call	l_plong
