@@ -1,6 +1,6 @@
 
 OBJS = ar.o ../common/die.o
-CFLAGS += -I../common -I../../ext/uthash/src
+CFLAGS += -std=gnu11 -I../common -I../../ext/uthash/src
 
 INSTALL ?= install
 
