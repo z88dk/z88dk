@@ -156,6 +156,7 @@ int glue_exec(char *target)
 
         if (mb->num > 0)
         {
+            int i;
             long code_end_tail, data_end_tail, bss_end_tail;
             struct section_bin *last = &mb->secbin[mb->num - 1];
             int error = 0;
@@ -183,7 +184,17 @@ int glue_exec(char *target)
             }
 
             if ((last->org + last->size) > main_fence)
-                fprintf(stderr, "\nWarning: Extra fragments in main bank have exceeded the fence by %u bytes\n(section = %s, last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - main_fence, last->section_name, last->org + last->size - 1, main_fence);
+            {
+                fprintf(stderr, "\nWarning: Extra fragments in main bank have exceeded the fence\n");
+
+                for (i = 0; i < mb->num; ++i)
+                {
+                    struct section_bin *sb = &mb->secbin[i];
+
+                    if ((sb->org + sb->size) > main_fence)
+                        fprintf(stderr, "(section = %s, last address = 0x%04x, fence = 0x%04x)\n", sb->section_name, sb->org + sb->size - 1, main_fence);
+                }
+            }
 
             if (error) exit(1);
         }

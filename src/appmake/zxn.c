@@ -462,7 +462,17 @@ int zxn_exec(char *target)
             }
 
             if ((last->org + last->size) > zxc.main_fence)
-                fprintf(stderr, "\nWarning: Extra fragments in main bank have exceeded the fence by %u bytes\n(section = %s, last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - zxc.main_fence, last->section_name, last->org + last->size - 1, zxc.main_fence);
+            {
+                fprintf(stderr, "\nWarning: Extra fragments in main bank have exceeded the fence\n");
+
+                for (i = 0; i < mb->num; ++i)
+                {
+                    struct section_bin *sb = &mb->secbin[i];
+
+                    if ((sb->org + sb->size) > zxc.main_fence)
+                        fprintf(stderr, "(section = %s, last address = 0x%04x, fence = 0x%04x)\n", sb->section_name, sb->org + sb->size - 1, zxc.main_fence);
+                }
+            }
 
             if (error) exit(1);
         }
