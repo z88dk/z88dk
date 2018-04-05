@@ -3215,3 +3215,27 @@
 	ld	hl,%1
 	add	hl,de
 	push	hl
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	cp	%2
+	jp	nz,%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	nz,%3
+	ld	hl,%4
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	#(128 %% 256)
+	jp	z,%2
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	rlca
+	jp	nc,%2
+	ld	hl,%3
