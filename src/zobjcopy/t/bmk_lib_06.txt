@@ -1,0 +1,59 @@
+Library file test.lib at $0000: Z80LMF06
+Object  file test.lib at $0010: Z80RMF06
+  Deleted...
+
+Object  file test.lib at $01C9: Z80RMF06
+  Name: file1
+  Org:  $0000
+  Names:
+    L A $0000 start (section text_1)
+    G C $0000 main (section text_1)
+  External names:
+    U         ext1
+    U         ext2
+  Expressions:
+    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
+    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
+    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
+    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
+    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
+  Code: 63 bytes (section text_1)
+    C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
+    C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20
+    C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
+    C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
+  Code: 64 bytes (section text_2)
+    C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
+    C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20
+    C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
+    C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F 40
+
+Object  file test.lib at $0382: Z80RMF06
+  Deleted...
+
+Object  file test.lib at $053B: Z80RMF06
+  Name: file1
+  Org:  $0000
+  Names:
+    L A $0000 start (section text_1)
+    G C $0000 main (section text_1)
+  External names:
+    U         ext1
+    U         ext2
+  Expressions:
+    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
+    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
+    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
+    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
+    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
+  Code: 63 bytes (section text_1)
+    C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
+    C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20
+    C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
+    C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
+  Code: 64 bytes (section text_2)
+    C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
+    C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20
+    C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
+    C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F 40
+

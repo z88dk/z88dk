@@ -210,3 +210,8 @@ int xfread_dword(FILE * stream)
 	return value;
 }
 
+void xfseek(FILE *stream, long offset, int origin)
+{
+	if (fseek(stream, offset, origin) != 0)
+		die("failed to seek to %l in file '%s'\n", offset, get_filename(stream));
+}

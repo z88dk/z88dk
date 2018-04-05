@@ -143,19 +143,24 @@ static void print_bytes(UT_array *data)
 	size_t addr = 0;
 	byte_t *p = (byte_t*)utarray_front(data);
 	size_t size = utarray_len(data);
+	bool need_nl = false;
 
-	while (size-- != 0) {
+	for (size_t i = 0; i < size; i++) {
 		if ((addr % 16) == 0) {
-			if (addr != 0)
+			if (need_nl) {
 				printf("\n");
+				need_nl = false;
+			}
 			printf("    C $%04X:", addr);
+			need_nl = true;
 		}
 
 		printf(" %02X", *p++);
+		need_nl = true;
 		addr++;
 	}
 
-	if (addr != 0)
+	if (need_nl)
 		printf("\n");
 }
 
@@ -167,7 +172,7 @@ static void objfile_read_names(objfile_t *obj, FILE *fp, long fpos_start, long f
 	if (opts.list)
 		printf("  Names:\n");
 
-	fseek(fp, fpos_start, SEEK_SET);
+	xfseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		char scope = xfread_byte(fp);
 		if (scope == '\0')
@@ -216,7 +221,7 @@ static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long
 	if (opts.list)
 		printf("  External names:\n");
 
-	fseek(fp, fpos_start, SEEK_SET);
+	xfseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		xfread_bcount_str(name, fp);
 		utarray_push_back(obj->externs, &utstring_body(name));
@@ -238,7 +243,7 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 	if (opts.list)
 		printf("  Expressions:\n");
 
-	fseek(fp, fpos_start, SEEK_SET);
+	xfseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		char type = xfread_byte(fp);
 		if (type == 0)
@@ -317,7 +322,7 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 
 static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 {
-	fseek(fp, fpos_start, SEEK_SET);
+	xfseek(fp, fpos_start, SEEK_SET);
 	if (obj->version >= 5) {
 		while (true) {
 			int code_size = xfread_dword(fp);
@@ -406,7 +411,7 @@ void objfile_read(objfile_t *obj, FILE *fp)
 	long fpos_codes = xfread_dword(fp);
 
 	// module name
-	fseek(fp, fpos0 + fpos_modname, SEEK_SET);
+	xfseek(fp, fpos0 + fpos_modname, SEEK_SET);
 	xfread_bcount_str(obj->modname, fp);
 	if (opts.list)
 		printf("  Name: %s\n", utstring_body(obj->modname));
@@ -498,8 +503,9 @@ static enum file_type file_read_signature(file_t *file, FILE *fp)
 			utstring_body(file->filename), file->version);
 
 	if (opts.list)
-		printf("\nFile %s at $%04lX: %s\n", 
-			utstring_body(file->filename), 
+		printf("%s file %s at $%04lX: %s\n", 
+			file->type == is_library ? "Library" : "Object ",
+			utstring_body(file->filename),
 			ftell(fp) - SIGNATURE_SIZE, file_signature);
 
 	return file->type;
@@ -520,7 +526,27 @@ static void file_read_object(file_t *file, FILE *fp)
 
 static void file_read_library(file_t *file, FILE *fp)
 {
-	die("not implemented\n");
+	long fpos0 = ftell(fp) - SIGNATURE_SIZE;	// before signature
+	int next = SIGNATURE_SIZE;
+	int length = 0;
+
+	do {
+		xfseek(fp, fpos0 + next, SEEK_SET);		// next object file
+
+		next = xfread_dword(fp);
+		length = xfread_dword(fp);
+
+		enum file_type type = file_read_signature(file, fp);
+		if (type != is_object)
+			die("File %s: contains non-object file\n", utstring_body(file->filename));
+
+		if (length == 0)
+			printf("  Deleted...\n");
+		else
+			file_read_object(file, fp);
+
+		printf("\n");
+	} while (next != -1);
 }
 
 void file_read(file_t *file, const char *filename)

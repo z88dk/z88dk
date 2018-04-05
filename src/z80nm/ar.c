@@ -136,7 +136,9 @@ enum file_type read_signature( FILE *fp, char *filename )
 	if ( file_version < MIN_VERSION || file_version > MAX_VERSION )
 		die("File %s: not object or library file version %d not supported\n", filename, file_version );
 
-	printf("\nFile %s at $%04X: %s\n", filename, ftell( fp ) - 8, file_signature );
+	printf("%s file %s at $%04X: %s\n",
+		type == is_library ? "Library" : "Object ",
+		filename, ftell(fp) - 8, file_signature);
 
 	return type;
 }
@@ -302,23 +304,28 @@ void dump_exprs( FILE *fp, char *filename, long fpos_start, long fpos_end )
 void dump_bytes( FILE *fp, char *filename, int size )
 {
 	int addr = 0, byte;
+	int need_nl = 0;
 
-	while ( size-- > 0 )
+	for (int i = 0; i < size; i++)
 	{
 		if ( (addr % 16) == 0 )
 		{
-			if ( addr != 0 )
+			if (need_nl) {
 				printf("\n");
+				need_nl = 0;
+			}
 			printf("    C $%04X:", addr);
+			need_nl = 1;
 		}
 
 		byte = xfread_byte(fp);
 		printf(" %02X", byte );
+		need_nl = 1;
 
 		addr++;
 	}
 
-	if ( addr != 0 )
+	if (need_nl)
 		printf("\n");
 }
 
@@ -455,9 +462,10 @@ void dump_library( FILE *fp, char *filename )
 
 		if ( obj_len == 0 )
 			printf("  Deleted...\n");
+		else
+			dump_object(fp, filename);
 
-		dump_object( fp, filename );
-
+		printf("\n");
 	} while ( next_ptr >= 0 );
 }
 

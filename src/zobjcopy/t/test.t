@@ -16,6 +16,7 @@ my $OBJ_FILE_VERSION = "11";
 # global test data
 #------------------------------------------------------------------------------
 my @objfile;
+my @libfile;
 for my $version (1 .. $OBJ_FILE_VERSION) {
 	$objfile[$version] = objfile(
 		VERSION => $version,
@@ -41,244 +42,16 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 		],
 		CODES => [
 			# section, org, align, code
-			[ "text_1", 0, 1, "hello" ],
-			[ "text_2", -1, 16, "world" ]
+			[ "text_1", 0, 1, pack("C*", 1..63) ],
+			[ "text_2", -1, 16, pack("C*", 1..64) ]
 		],
 	);
+	
+	$libfile[$version] = libfile(
+			VERSION => $version,
+			OBJS => [$objfile[$version], $objfile[$version]]
+	);
 }
-
-	my @expected;
-	$expected[1] = <<'...';
-
-File test.o at $0000: Z80RMF01
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start
-    G C $0000 main
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub $0001: start % 256
-    E Sb $0001: start % 127
-    E Cw $0001: start
-    E Ll $0001: start
-  Code: 5 bytes
-    C $0000: 68 65 6C 6C 6F
-...
-	$expected[2] = <<'...';
-
-File test.o at $0000: Z80RMF02
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start
-    G C $0000 main
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub $0001: start % 256
-    E Sb $0001: start % 127
-    E Cw $0001: start
-    E Ll $0001: start
-  Code: 5 bytes
-    C $0000: 68 65 6C 6C 6F
-...
-	$expected[3] = <<'...';
-
-File test.o at $0000: Z80RMF03
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start
-    G C $0000 main
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub $0000 $0001: start % 256
-    E Sb $0000 $0001: start % 127
-    E Cw $0000 $0001: start
-    E Ll $0000 $0001: start
-  Code: 5 bytes
-    C $0000: 68 65 6C 6C 6F
-...
-	$expected[4] = <<'...';
-
-File test.o at $0000: Z80RMF04
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start
-    G C $0000 main
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256
-    E Sb (file1.asm:132) $0000 $0001: start % 127
-    E Cw (file1.asm:231) $0000 $0001: start
-    E Ll (file1.asm:321) $0000 $0001: start
-  Code: 5 bytes
-    C $0000: 68 65 6C 6C 6F
-...
-	$expected[5] = <<'...';
-
-File test.o at $0000: Z80RMF05
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start (section text_1)
-    G C $0000 main (section text_1)
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-  Code: 5 bytes (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
-	$expected[6] = <<'...';
-
-File test.o at $0000: Z80RMF06
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start (section text_1)
-    G C $0000 main (section text_1)
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
-  Code: 5 bytes (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
-	$expected[7] = <<'...';
-
-File test.o at $0000: Z80RMF07
-  Name: file1
-  Org:  $0000
-  Names:
-    L A $0000 start (section text_1)
-    G C $0000 main (section text_1)
-    G = $0000 _start (section text_1)
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
-  Code: 5 bytes (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
-	$expected[8] = <<'...';
-
-File test.o at $0000: Z80RMF08
-  Name: file1
-  Names:
-    L A $0000 start (section text_1)
-    G C $0000 main (section text_1)
-    G = $0000 _start (section text_1)
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
-  Code: 5 bytes, ORG $0000 (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
-	$expected[9] = <<'...';
-
-File test.o at $0000: Z80RMF09
-  Name: file1
-  Names:
-    L A $0000 start (section text_1) file1.asm:123
-    G C $0000 main (section text_1) file1.asm:231
-    G = $0000 _start (section text_1) file1.asm:231
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
-  Code: 5 bytes, ORG $0000 (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
-	$expected[10] = <<'...';
-
-File test.o at $0000: Z80RMF10
-  Name: file1
-  Names:
-    L A $0000 start (section text_1) file1.asm:123
-    G C $0000 main (section text_1) file1.asm:231
-    G = $0000 _start (section text_1) file1.asm:231
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
-  Code: 5 bytes, ORG $0000 (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes, ALIGN 16 (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
-	$expected[11] = <<'...';
-
-File test.o at $0000: Z80RMF11
-  Name: file1
-  Names:
-    L A $0000 start (section text_1) file1.asm:123
-    G C $0000 main (section text_1) file1.asm:231
-    G = $0000 _start (section text_1) file1.asm:231
-  External names:
-    U         ext1
-    U         ext2
-  Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
-    E BW (file1.asm:231) $0000 $0001: start (section text_1)
-  Code: 5 bytes, ORG $0000 (section text_1)
-    C $0000: 68 65 6C 6C 6F
-  Code: 5 bytes, ALIGN 16 (section text_2)
-    C $0000: 77 6F 72 6C 64
-...
 
 #------------------------------------------------------------------------------
 # call zobjcopy
@@ -313,23 +86,46 @@ is !!$exit, !!1;
 #------------------------------------------------------------------------------
 # parse object file of each version
 #------------------------------------------------------------------------------
+my $bmk;
 for my $version (1 .. $OBJ_FILE_VERSION) {
-	$objfile[$version] && $expected[$version] 
+	$objfile[$version] && $libfile[$version] 
 		or die "Version $version not supported";
-		
-	path("test.o")->spew_raw($objfile[$version]);	
-	($out, $err, $exit, @dummy) = capture {system "z80nm -a test.o"};
-	is $out, $expected[$version];
-	is $err, "";
-	is !!$exit, !!0;
+	
+	path("test.o")->spew_raw($objfile[$version]);
+	
+	$bmk = sprintf("t/bmk_obj_%02d.txt", $version);
+	$out = sprintf("t/out_obj_%02d.txt", $version);
+	
+	is 0, system("z80nm -a test.o > $out"), "z80nm -a test.o > $out";
+	is 0, system("diff $out $bmk"), "diff $out $bmk";
+	
+	die unless Test::More->builder->is_passing;
 
-	($out, $err, $exit, @dummy) = capture {system "zobjcopy -l test.o"};
-	is $out, $expected[$version];
-	is $err, "";
-	is !!$exit, !!0;
+	is 0, system("zobjcopy -l test.o > $out"), "zobjcopy -l test.o > $out";
+	is 0, system("diff $out $bmk"), "diff $out $bmk";
+	
+	die unless Test::More->builder->is_passing;
+
+	unlink "test.o", $out;
+	
+	path("test.lib")->spew_raw($libfile[$version]);
+	
+	$bmk = sprintf("t/bmk_lib_%02d.txt", $version);
+	$out = sprintf("t/out_lib_%02d.txt", $version);
+	
+	is 0, system("z80nm -a test.lib > $out"), "z80nm -a test.lib > $out";
+	is 0, system("diff $out $bmk"), "diff $out $bmk";
+	
+	die unless Test::More->builder->is_passing;
+
+	is 0, system("zobjcopy -l test.lib > $out"), "zobjcopy -l test.lib > $out";
+	is 0, system("diff $out $bmk"), "diff $out $bmk";
+
+	die unless Test::More->builder->is_passing;
+
+	unlink "test.lib", $out;
 }
 
-unlink "test.o";
 done_testing;
 
 #------------------------------------------------------------------------------
@@ -432,6 +228,33 @@ sub objfile {
 			}
 		}
 		$o .= pack("V", -1) if $args{VERSION} >= 5;
+	}
+
+	return $o;
+}
+
+#------------------------------------------------------------------------------
+# return library file binary representation
+sub libfile {
+	my(%args) = @_;
+
+	my $o = "Z80LMF".sprintf("%02d",($args{VERSION} || $OBJ_FILE_VERSION));
+	my $next_pos;
+	my @objs = @{$args{OBJS}};
+	for (0 .. $#objs) {
+		my $obj = $objs[$_];
+		
+		# save a "deleted" copy
+		$next_pos = length($o); $o .= pack("V", -1);
+		$o .= pack("V", 0);
+		$o .= $obj;
+		store_ptr(\$o, $next_pos);
+
+		# save a a not-deleted copy
+		$next_pos = length($o); $o .= pack("V", -1);
+		$o .= pack("V", length($obj));
+		$o .= $obj;
+		store_ptr(\$o, $next_pos) if $_ != $#objs;
 	}
 
 	return $o;

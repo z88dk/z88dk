@@ -55,3 +55,5 @@ extern byte_t xfread_byte(FILE *stream);
 extern int xfread_word(FILE *stream);
 extern int xfread_dword(FILE *stream);
 
+// dies if fseek() fails
+extern void xfseek(FILE *stream, long offset, int origin);
