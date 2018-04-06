@@ -185,11 +185,11 @@
 
 .x_4x6
 ._x_4x6
- defb 0
+ defw 0
  
 .y_4x6
 ._y_4x6
- defb 0
+ defw 0
 
 .chr
  defb 0
