@@ -17,6 +17,7 @@
 
 		
 	PUBLIC    putc4x6
+	PUBLIC    _putc4x6
 	
 	EXTERN     swapgfxbk
         EXTERN	__graphics_end
@@ -29,6 +30,7 @@
 ; sprite: (ix)
 
 .putc4x6
+._putc4x6
         ld      hl,2
         add     hl,sp
 		
