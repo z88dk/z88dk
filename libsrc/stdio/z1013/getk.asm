@@ -5,7 +5,7 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.1 2016-08-05 07:04:10 stefano Exp $
+;	$Id: getk.asm $
 ;
 
 		SECTION code_clib
@@ -15,22 +15,19 @@
 .getk
 ._getk
 	
-	ld	a,($F012)
-	cp  $af
-	jr	nz,no_mon_202
+	ld	a,($F130)
+	cp	$af
+	jr	nz,no_Z1013_202
 	
-;	rst $20
-;	defb 4		; 'INKEY' function
-	ld	a,(4)
-	jr	getk_end
+	XOR A
+	LD	(4),A	; LASTK
 	
-	
-.no_mon_202
+.no_Z1013_202
+
 	rst $20
-	defb 1		; 'INCH' function
+	defb 4		; 'INKEY' function
 
-.getk_end
-
+.getk_done
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
