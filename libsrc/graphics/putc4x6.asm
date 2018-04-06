@@ -26,8 +26,6 @@
 	EXTERN	unplot
 	EXTERN	clg
 
-; __gfx_coords: h,l (vert-horz)
-; sprite: (ix)
 
 .putc4x6
 ._putc4x6
