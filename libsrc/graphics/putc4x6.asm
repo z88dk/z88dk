@@ -38,6 +38,7 @@
 		jr		nz,nocls
 		ld		hl,0
 		ld		(x_4x6),hl
+		ld		(y_4x6),hl
 		jp		clg
 .nocls
 
