@@ -15,14 +15,8 @@
 .getk
 ._getk
 	
-	ld	a,($F130)
-	cp	$af
-	jr	nz,no_Z1013_202
-	
 	XOR A
 	LD	(4),A	; LASTK
-	
-.no_Z1013_202
 
 	rst $20
 	defb 4		; 'INKEY' function
