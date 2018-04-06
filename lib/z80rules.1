@@ -3040,6 +3040,18 @@
 	jp	nc,%3
 	ld	hl,%4
 
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	sub	%2
+	jp	nc,%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	sub	%2
+	jp	nc,%3
+	ld	hl,%4
+
 	pop	hl
 	push	hl
 	ld	l,h
@@ -3214,4 +3226,39 @@
 =
 	ld	hl,%1
 	add	hl,de
+	push	hl
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	cp	%2
+	jp	nz,%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	nz,%3
+	ld	hl,%4
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	#(128 %% 256)
+	jp	z,%2
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	rlca
+	jp	nc,%2
+	ld	hl,%3
+
+%eval 2 = %%2 %%1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
 	push	hl

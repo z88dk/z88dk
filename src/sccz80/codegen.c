@@ -856,15 +856,12 @@ void setcond(int val)
 /* Test the primary register and jump if false to label */
 void testjump(LVALUE* lval, int label)
 {
-    int type;
+    Kind type;
+
     ol("ld\ta,h");
     ol("or\tl");
 
-    if (lval->oldval_kind == KIND_LONG) {
-        ol("or\td");
-        ol("or\te");
-    }
-    type = lval->oldval_kind;
+    type = lval->val_type;
     if (lval->binop == NULL)
         type = lval->val_type;
 
@@ -1983,22 +1980,22 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( (value & 0xffffff00) == 0xffffff00 ) {
            // Only the bottom 8 bits
            ol("ld\ta,l");
-           outfmt("\tand\t%d\n",(value & 0xff));
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff));
            ol("ld\tl,a");
         } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
            // Only the bits 15-8
            ol("ld\ta,h");
-           outfmt("\tand\t%d\n",(value & 0xff00)>>8);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff00)>>8);
            ol("ld\th,a");
         } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
            // Only the bits 23-16
            ol("ld\ta,e");
-           outfmt("\tand\t%d\n",(value & 0xff0000)>>16);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff0000)>>16);
            ol("ld\te,a");
         } else if ( (value & 0x00ffffff) == 0x00ffffff ) {
            // Only the bits 32-23
            ol("ld\ta,d");
-           outfmt("\tand\t%d\n",(value & 0xff000000) >> 24);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff000000) >> 24);
            ol("ld\td,a");
         } else { // 13 bytes
             lpush(); // 4
@@ -2013,12 +2010,12 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( value >= 0 && value < 256 ) {
             // 6 bytes, library call is 6 bytes, this is faster
             ol("ld\ta,l");
-            ot("and\t"); outdec(value % 256); nl();
+            outfmt("\tand\t#(%d %% 256)\n",value % 256);
             ol("ld\tl,a");
             ol("ld\th,0");
         } else if ( value % 256 == 0 ) {
             ol("ld\ta,h");
-            ot("and\t"); outdec( (value % 65536) / 256); nl();
+            outfmt("\tand\t#(%d %% 256)\n",(value % 65536) / 256);
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else if ( value == 0xffff ) {
@@ -2520,7 +2517,7 @@ void dummy(LVALUE *lval)
 void eq0(LVALUE* lval, int label)
 {
     check_lastop_was_comparison(lval);
-    switch (lval->oldval_kind) {
+    switch (lval->val_type) {
 #ifdef CHARCOMP0
     case KIND_CHAR:
         ol("ld\ta,l");

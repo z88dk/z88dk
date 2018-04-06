@@ -42,7 +42,7 @@
 	ld	hl,1	;const
 	add	hl,sp
 	ld	a,(hl)
-	cp	#(12 % 256)
+	cp	12
 	jp	z,i_4
 	ld	hl,0	;const
 	add	hl,sp
@@ -58,7 +58,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
-	cp	#(64 % 256)
+	cp	64
 	jp	z,i_7
 	ld	hl,_starField
 	push	hl
