@@ -1,36 +1,47 @@
 
-    INCLUDE "config_private.inc"
+INCLUDE "config_private.inc"
 
-    SECTION code_driver
+SECTION code_driver
 
-    EXTERN  sioaRxCount, sioaRxIn
-    EXTERN  sioaTxCount, sioaTxOut
-    EXTERN  siobRxCount, siobRxIn
-    EXTERN  siobTxCount, siobTxOut
+EXTERN  sioaRxCount, sioaRxIn
+EXTERN  sioaTxCount, sioaTxOut
+EXTERN  siobRxCount, siobRxIn
+EXTERN  siobTxCount, siobTxOut
 
-    EXTERN  __sio_interrupt_vector_table
-    
-    PUBLIC  __sio_interrupt    
+PUBLIC  __siob_interrupt_tx_empty
+PUBLIC  __siob_interrupt_ext_status
+PUBLIC  __siob_interrupt_rx_char
+PUBLIC  __siob_interrupt_rx_error
+PUBLIC  __sioa_interrupt_tx_empty
+PUBLIC  __sioa_interrupt_ext_status
+PUBLIC  __sioa_interrupt_rx_char
+PUBLIC  __sioa_interrupt_rx_error
 
-    PUBLIC  __siob_interrupt_tx_empty
-    PUBLIC  __siob_interrupt_ext_status
-    PUBLIC  __siob_interrupt_rx_char
-    PUBLIC  __siob_interrupt_rx_error
-    PUBLIC  __sioa_interrupt_tx_empty
-    PUBLIC  __sioa_interrupt_ext_status
-    PUBLIC  __sioa_interrupt_rx_char
-    PUBLIC  __sioa_interrupt_rx_error
+__siob_interrupt_tx_empty:
+    defw 1
+    reti
+__siob_interrupt_ext_status:
+    defw 2
+    reti
+__siob_interrupt_rx_char:
+    defw 3
+    reti
+__siob_interrupt_rx_error:
+    defw 4
+    reti
+__sioa_interrupt_tx_empty:
+    defw 5
+    reti
+__sioa_interrupt_ext_status:
+    defw 6
+    reti
+__sioa_interrupt_rx_char:
+    defw 7
+    reti
+__sioa_interrupt_rx_error:
+    defw 8
+    reti
 
-    __siob_interrupt_tx_empty:
-    __siob_interrupt_ext_status:
-    __siob_interrupt_rx_char:
-    __siob_interrupt_rx_error:
-    __sioa_interrupt_tx_empty:
-    __sioa_interrupt_ext_status:
-    __sioa_interrupt_rx_char:
-    __sioa_interrupt_rx_error:
-
-    __sio_interrupt:
 
 ;        push af
 ;        push hl
@@ -104,3 +115,4 @@ SIO_TX_END:
 
     EXTERN _sio_need
     defc NEED = _sio_need
+

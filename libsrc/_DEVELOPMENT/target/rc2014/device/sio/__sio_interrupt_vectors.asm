@@ -1,7 +1,5 @@
 
-    INCLUDE "config_private.inc"
-
-    SECTION interrupt_vectors
+    SECTION     interrupt_vectors
 
     EXTERN      __siob_interrupt_tx_empty
     EXTERN      __siob_interrupt_ext_status
@@ -20,4 +18,7 @@
     defw        __sioa_interrupt_ext_status
     defw        __sioa_interrupt_rx_char
     defw        __sioa_interrupt_rx_error
+
+    EXTERN _sio_need
+    defc NEED = _sio_need
 

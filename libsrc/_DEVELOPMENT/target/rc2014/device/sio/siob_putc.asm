@@ -12,6 +12,7 @@
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     _siob_putc:
+        ret
 
         ; enter    : l = char to output
         ; exit     : l = 1 if Tx buffer is full
@@ -68,3 +69,4 @@
 
     EXTERN _sio_need
     defc NEED = _sio_need
+

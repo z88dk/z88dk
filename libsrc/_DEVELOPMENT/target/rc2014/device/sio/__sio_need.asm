@@ -1,15 +1,16 @@
 
-; Generate references to any portions of sioa
-; code that must be part of every compile that
-; uses the sioa.
+    ; Generate references to any portions of SIO
+    ; code that must be part of every compile that
+    ; uses the SIO
 
-PUBLIC _sio_need
+    PUBLIC _sio_need
 
-EXTERN _sio_init
+    EXTERN _sio_init
 
-defc _sio_need = _sio_init
+    defc _sio_need = _sio_init
 
-; The sioa must be initialized before main is called
+    ; The sioa must be initialized before main is called
 
-SECTION code_crt_init
-call _sio_init
+    SECTION code_crt_init
+    call _sio_init
+
