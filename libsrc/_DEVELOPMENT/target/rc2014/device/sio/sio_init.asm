@@ -3,9 +3,9 @@
 
     SECTION code_driver
 
-    PUBLIC _sio_init
+    PUBLIC  _sio_init
 
-    EXTERN _sioa_init_rodata, _siob_init_rodata
+    EXTERN  __sio_init_async_rodata
 
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
@@ -13,19 +13,20 @@
 
         call asm_z80_push_di        ; di
 
-        ; initialise the SIOA
-                                    ; load the default ASCI configuration
+        ; initialise the SIO interrupt vectors in preamble IM 2
+
+        ; initialise the SIO
+                                    ; load the default SIO configuration
+                                    ; ASYNC operation
                                     ; BAUD = 115200 8n1
                                     ; receive enabled
                                     ; transmit enabled
                                     ; receive interrupt enabled
-                                    ; transmit interrupt disabled
+                                    ; transmit interrupt enabled
 
-        ld hl,_sioa_init_rodata
-        call _sio_io_ports          ; initialise the SIO via control Reg A
-        ld hl,_siob_init_rodata
-        call _sio_io_ports          ; initialise the SIO via control Reg B
-        
+        ld hl,__sio_init_async_rodata
+        call _sio_io_ports          ; initialise the SIO for ASYNC via control Reg A & B
+
         jp asm_z80_pop_ei_jp        ; ei
 
 
