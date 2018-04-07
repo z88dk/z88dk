@@ -25,6 +25,5 @@ target/rc2014/device/sio/sio_init
 target/rc2014/device/sio/sio_interrupt
 
 target/rc2014/device/sio/__sio_init_async_rodata
-target/rc2014/device/sio/__sio_interrupt_vectors
 
 target/rc2014/device/sio/__sio_need

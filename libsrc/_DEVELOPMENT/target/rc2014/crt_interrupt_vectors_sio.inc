@@ -1,4 +1,10 @@
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; sio driver model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+IF (__Z80 != 0) && (__page_zero_present) && (__crt_org_vector_table > 0x100) && (__CRTCFG = 1)
+
     SECTION     interrupt_vectors
 
     EXTERN      __siob_interrupt_tx_empty
@@ -19,6 +25,5 @@
     defw        __sioa_interrupt_rx_char
     defw        __sioa_interrupt_rx_error
 
-    EXTERN _sio_need
-    defc NEED = _sio_need
+ENDIF
 

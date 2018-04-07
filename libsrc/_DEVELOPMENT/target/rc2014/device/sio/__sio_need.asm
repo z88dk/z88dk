@@ -9,7 +9,7 @@
 
     defc _sio_need = _sio_init
 
-    ; The sioa must be initialized before main is called
+    ; The SIO must be initialized before main is called
 
     SECTION code_crt_init
     call _sio_init
