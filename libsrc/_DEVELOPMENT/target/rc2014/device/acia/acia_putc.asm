@@ -48,7 +48,6 @@
         inc hl                      ; else advance to next byte in Tx buffer
 
     tx_buffer_adjusted:
-    
         ld (aciaTxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaTxCount
@@ -68,7 +67,7 @@
 
     resetTxBuffer:
         ld hl,aciaTxBuffer          ; move tx buffer pointer back to start of buffer
-        jp tx_buffer_adjusted
+        jr tx_buffer_adjusted
 
     EXTERN _acia_need
     defc NEED = _acia_need
