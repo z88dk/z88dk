@@ -377,11 +377,13 @@ struct lvalue_s {
 
 /* Enable optimisations that are longer than the conventional sequence */ 
 enum optimisation {
-        OPT_LSHIFT32 = (1 << 0 ),
-        OPT_RSHIFT32 = (1 << 1 ),
-        OPT_ADD32    = (1 << 2 ),
-        OPT_SUB16    = (1 << 3 ),
-        OPT_SUB32    = (1 << 4 )
+        OPT_LSHIFT32       = (1 << 0),
+        OPT_RSHIFT32       = (1 << 1),
+        OPT_ADD32          = (1 << 2),
+        OPT_SUB16          = (1 << 3),
+        OPT_SUB32          = (1 << 4),
+        OPT_INT_COMPARE    = (1 << 5),
+        OPT_LONG_COMPARE   = (1 << 6)
 };
 
 

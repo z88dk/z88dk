@@ -16,8 +16,15 @@ zx_01_output_fzx_oterm_msg_fzx_putc:
 
    push hl
    ex (sp),ix
-   
+
+   ex af,af'
+   push af
+
    call asm_fzx_putc
-   
+
+   ex af,af'
+   pop af
+   ex af,af'
+
    pop ix
    ret

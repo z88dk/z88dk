@@ -19,10 +19,15 @@
 	push	hl
 	dec	hl
 .i_4
-	pop	de
-	push	de
-	ld	hl,10	;const
-	call	l_lt
+	pop	hl
+	push	hl
+	ld	a,l
+	sub	10
+	ld	a,h
+	rla
+	ccf
+	rra
+	sbc	128
 	jp	nc,i_3
 	pop	hl
 	push	hl
@@ -57,14 +62,21 @@
 	call	l_inclong
 	pop	bc
 	call	l_plong
-	call	l_declong
 .i_7
 	ld	hl,0	;const
 	add	hl,sp
-	call	l_glong2sp
-	ld	hl,10	;const
-	ld	de,0
-	call	l_long_lt
+	call	l_glong
+	ld	a,l
+	sub	10
+	ld	a,h
+	sbc	0
+	ld	a,e
+	sbc	0
+	ld	a,d
+	rla
+	ccf
+	rra
+	sbc	128
 	jp	nc,i_6
 	ld	hl,0	;const
 	add	hl,sp
