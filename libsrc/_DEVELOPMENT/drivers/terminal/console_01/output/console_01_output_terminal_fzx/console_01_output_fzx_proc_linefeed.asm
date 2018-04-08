@@ -30,8 +30,15 @@ console_01_output_fzx_proc_linefeed:
    ; ix = struct fzx_state *
    ; de = font_height
    ; hl = y + font_height
+   
+   push de
 
    call console_01_output_fzx_proc_line_spacing
    call nz, __fzx_puts_newline_set_y               ; if y coord changes
    
+   pop de
+   
+   dec de
+   add hl,de                                       ; last occupied y pixel in new row
+
    jp console_01_output_fzx_proc_check_scroll

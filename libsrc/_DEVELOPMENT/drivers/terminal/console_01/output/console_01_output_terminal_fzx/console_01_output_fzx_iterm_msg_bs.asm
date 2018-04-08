@@ -8,7 +8,7 @@ PUBLIC console_01_output_fzx_iterm_msg_bs_join_pwd
 
 EXTERN OTERM_MSG_FZX_PUTC
 
-EXTERN asm_fzx_buffer_partition, asm_fzx_putc, l_jpix
+EXTERN asm_fzx_buffer_partition, l_jpix
 EXTERN l_offset_ix_de, console_01_output_fzx_proc_linefeed
 
 console_01_output_fzx_iterm_msg_bs:
@@ -282,8 +282,6 @@ putchar_loop:
    pop bc                      ; c = char to erase
    
    pop ix                      ; ix = struct fzx_state *
-   pop de                      ; de = FDSTRUCT.JP *
-   
    jr nc, backspace_done
    
    ; can only fail if no fit horizontally
@@ -292,9 +290,13 @@ putchar_loop:
    jr z, backspace_done        ; failed to fit vertically, cannot happen so give up
    
    call console_01_output_fzx_proc_linefeed
+
+   pop de                      ; de = FDSTRUCT.JP *
    jr putchar_loop
 
 backspace_done:
+
+   pop de                      ; de = FDSTRUCT.JP *
 
    ; ix = struct fzx_state *
    ; stack = FDSTRUCT.JP *, x coord, y coord
