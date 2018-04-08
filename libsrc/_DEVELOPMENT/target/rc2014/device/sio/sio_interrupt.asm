@@ -3,10 +3,13 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
-EXTERN  sioaRxCount, sioaRxIn
-EXTERN  sioaTxCount, sioaTxOut
+EXTERN  siobTxBuffer
+EXTERN  sioaTxBuffer
+
 EXTERN  siobRxCount, siobRxIn
 EXTERN  siobTxCount, siobTxOut
+EXTERN  sioaRxCount, sioaRxIn
+EXTERN  sioaTxCount, sioaTxOut
 
 PUBLIC  __siob_interrupt_tx_empty
 PUBLIC  __siob_interrupt_ext_status
@@ -17,101 +20,212 @@ PUBLIC  __sioa_interrupt_ext_status
 PUBLIC  __sioa_interrupt_rx_char
 PUBLIC  __sioa_interrupt_rx_error
 
-__siob_interrupt_tx_empty:
-    defw 1
-    reti
+
+__siob_interrupt_tx_empty:          ; start doing the SIOB Tx stuff
+        push af
+        push hl
+
+        ld a,(sioaTxCount)          ; get the number of bytes in the Tx buffer
+        or a                        ; check whether it is zero
+        jr Z,siob_tx_int_pend       ; if the count is zero, then disable the Tx Interrupt
+
+        ld hl,(sioaTxOut)           ; get the pointer to place where we pop the Tx byte
+        ld a,(hl)                   ; get the Tx byte
+        out (__IO_SIOB_DATA_REGISTER),a ; output the Tx byte to the SIOB
+
+        ld a,l                      ; check if Tx pointer is at the end of its range
+        cp +(siobTxBuffer+__IO_SIO_TX_SIZE-1)&0xff
+        jr Z,siob_tx_reset_buffer   ; if at end of range, reset Tx pointer to start of Tx buffer
+        inc hl                      ; else advance to next byte in Tx buffer
+
+siob_tx_buffer_adjusted:
+        ld (sioaTxOut),hl           ; write where the next byte should be popped
+
+        ld hl,sioaTxCount
+        dec (hl)                    ; atomically decrement current Tx count
+
+siob_tx_end:                        ; if we've more Tx bytes to send, we're done for now
+        pop hl
+        pop af
+        ei
+        reti
+
+siob_tx_int_pend:
+        ld a,__IO_SIO_WR0_TX_INT_PENDING_RESET  ; otherwise pend the Tx interrupt
+        out (__IO_SIOB_CONTROL_REGISTER),a      ; into the SIOB control register
+        jr siob_tx_end
+
+siob_tx_reset_buffer:
+        ld hl,siobTxBuffer         ; move tx buffer pointer back to start of buffer
+        jr siob_tx_buffer_adjusted
+
+
 __siob_interrupt_ext_status:
-    defw 2
-    reti
+        ei
+        reti
+
+
 __siob_interrupt_rx_char:
-    defw 3
-    reti
+        push af
+        push hl
+
+siob_rx_get:
+        in a,(__IO_SIOB_DATA_REGISTER)  ; move Rx byte from the SIOB to A
+        ld l,a                      ; put it in L
+
+        ld a,(sioaRxCount)          ; get the number of bytes in the Rx buffer      
+        cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
+        jr NC, siob_rx_check        ; buffer full, check whether we need to drain H/W FIFO
+
+        ld a,l                      ; get Rx byte from l
+        ld hl,(sioaRxIn)            ; get the pointer to where we poke
+        ld (hl),a                   ; write the Rx byte to the sioaRxIn target
+
+        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        ld (sioaRxIn),hl            ; write where the next byte should be poked
+
+        ld hl,sioaRxCount
+        inc (hl)                    ; atomically increment Rx buffer count
+
+siob_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
+        in a,(__IO_SIOB_CONTROL_REGISTER)   ; load the SIOB control register
+        rrca                        ; test whether we have received on SIOB
+        jr C,siob_rx_get            ; if still more bytes in H/W FIFO, get them
+
+        ld a,__IO_SIO_WR0_RX_INT_FIRST_REENABLE ; otherwise reenable the Rx interrupt
+        out (__IO_SIOB_CONTROL_REGISTER),a      ; into the SIOB control register
+
+        pop hl                      ; and clean up
+        pop af
+        ei
+        reti
+
+
 __siob_interrupt_rx_error:
-    defw 4
-    reti
-__sioa_interrupt_tx_empty:
-    defw 5
-    reti
+        push af
+        push hl
+
+        ld a,__IO_SIO_WR0_R1                ; set request for SIOB Read Register 1
+        out (__IO_SIOB_CONTROL_REGISTER),a  ; into the SIOB control register
+        in a,(__IO_SIOB_CONTROL_REGISTER)   ; load Read Register 1
+                                            ; test whether we have error on SIOB
+        and __IO_SIO_RR1_RX_FRAMING_ERROR|__IO_SIO_RR1_RX_OVERRUN|__IO_SIO_RR1_RX_PARITY_ERROR
+        jr Z, siob_interrupt_rx_exit        ; clear error, and exit
+
+        in a,(__IO_SIOB_DATA_REGISTER)      ; remove errored Rx byte from the SIOB
+
+siob_interrupt_rx_exit:
+        ld a,__IO_SIO_WR0_ERROR_RESET       ; otherwise reset the Error flags
+        out (__IO_SIOB_CONTROL_REGISTER),a  ; into the SIOB control register
+
+        pop hl                              ; and clean up
+        pop af
+        ei
+        reti
+
+
+__sioa_interrupt_tx_empty:          ; start doing the SIOA Tx stuff
+        push af
+        push hl
+
+        ld a,(sioaTxCount)          ; get the number of bytes in the Tx buffer
+        or a                        ; check whether it is zero
+        jr Z,sioa_tx_int_pend       ; if the count is zero, then disable the Tx Interrupt
+
+        ld hl,(sioaTxOut)           ; get the pointer to place where we pop the Tx byte
+        ld a,(hl)                   ; get the Tx byte
+        out (__IO_SIOA_DATA_REGISTER),a ; output the Tx byte to the SIOA
+
+        ld a,l                      ; check if Tx pointer is at the end of its range
+        cp +(sioaTxBuffer+__IO_SIO_TX_SIZE-1)&0xff
+        jr Z,sioa_tx_reset_buffer   ; if at end of range, reset Tx pointer to start of Tx buffer
+        inc hl                      ; else advance to next byte in Tx buffer
+
+sioa_tx_buffer_adjusted:
+        ld (sioaTxOut),hl           ; write where the next byte should be popped
+
+        ld hl,sioaTxCount
+        dec (hl)                    ; atomically decrement current Tx count
+
+sioa_tx_end:                        ; if we've more Tx bytes to send, we're done for now
+        pop hl
+        pop af
+        ei
+        reti
+
+sioa_tx_int_pend:
+        ld a,__IO_SIO_WR0_TX_INT_PENDING_RESET  ; otherwise pend the Tx interrupt
+        out (__IO_SIOA_CONTROL_REGISTER),a      ; into the SIOA control register
+        jr sioa_tx_end
+
+sioa_tx_reset_buffer:
+        ld hl,sioaTxBuffer         ; move tx buffer pointer back to start of buffer
+        jr sioa_tx_buffer_adjusted
+
+
 __sioa_interrupt_ext_status:
-    defw 6
-    reti
+        ei
+        reti
+
+
 __sioa_interrupt_rx_char:
-    defw 7
-    reti
+        push af
+        push hl
+
+sioa_rx_get:
+        in a,(__IO_SIOA_DATA_REGISTER)  ; move Rx byte from the SIOA to A
+        ld l,a                      ; put it in L
+
+        ld a,(sioaRxCount)          ; get the number of bytes in the Rx buffer      
+        cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
+        jr NC, sioa_rx_check        ; buffer full, check whether we need to drain H/W FIFO
+
+        ld a,l                      ; get Rx byte from l
+        ld hl,(sioaRxIn)            ; get the pointer to where we poke
+        ld (hl),a                   ; write the Rx byte to the sioaRxIn target
+
+        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        ld (sioaRxIn),hl            ; write where the next byte should be poked
+
+        ld hl,sioaRxCount
+        inc (hl)                    ; atomically increment Rx buffer count
+
+sioa_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
+        in a,(__IO_SIOA_CONTROL_REGISTER)   ; load the SIOA control register
+        rrca                        ; test whether we have received on SIOA
+        jr C,sioa_rx_get            ; if still more bytes in H/W FIFO, get them
+
+        ld a,__IO_SIO_WR0_RX_INT_FIRST_REENABLE ; otherwise reenable the Rx interrupt
+        out (__IO_SIOA_CONTROL_REGISTER),a      ; into the SIOA control register
+
+        pop hl                      ; and clean up
+        pop af
+        ei
+        reti
+
+
 __sioa_interrupt_rx_error:
-    defw 8
-    reti
+        push af
+        push hl
 
+        ld a,__IO_SIO_WR0_R1                ; set request for SIOA Read Register 1
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; into the SIOA control register
+        in a,(__IO_SIOA_CONTROL_REGISTER)   ; load Read Register 1
+                                            ; test whether we have error on SIOA
+        and __IO_SIO_RR1_RX_FRAMING_ERROR|__IO_SIO_RR1_RX_OVERRUN|__IO_SIO_RR1_RX_PARITY_ERROR
+        jr Z, sioa_interrupt_rx_exit        ; clear error, and exit
 
-;        push af
-;        push hl
-                                    ; start doing the Rx stuff
-;        in0 a, (STAT0)              ; load the SIOA status register
-;        tst STAT0_RDRF              ; test whether we have received on SIOA
-;        jr z, SIO_TX_CHECK          ; if not, go check for bytes to transmit
+        in a,(__IO_SIOA_DATA_REGISTER)      ; remove errored Rx byte from the SIOA
 
-SIO_RX_GET:
-;        in0 l, (RDR0)               ; move Rx byte from the SIOA RDR to l
-        
-;        and STAT0_OVRN|STAT0_PE|STAT0_FE ; test whether we have error on SIOA
-;        jr nz, SIO_RX_ERROR         ; drop this byte, clear error, and get the next byte
+sioa_interrupt_rx_exit:
+        ld a,__IO_SIO_WR0_ERROR_RESET       ; otherwise reset the Error flags
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; into the SIOA control register
 
-;        ld a, (sioaRxCount)         ; get the number of bytes in the Rx buffer      
-;        cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
-;        jr nc, SIO_RX_CHECK         ; buffer full, check whether we need to drain H/W FIFO
+        pop hl                              ; and clean up
+        pop af
+        ei
+        reti
 
-;        ld a, l                     ; get Rx byte from l
-;        ld hl, (sioaRxIn)           ; get the pointer to where we poke
-;        ld (hl), a                  ; write the Rx byte to the sioaRxIn target
-
-;        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
-;        ld (sioaRxIn), hl           ; write where the next byte should be poked
-
-;        ld hl, sioaRxCount
-;        inc (hl)                    ; atomically increment Rx buffer count
-;        jr SIO_RX_CHECK             ; check for additional bytes
-
-SIO_RX_ERROR:
-;        in0 a, (CNTLA0)             ; get the CNTRLA0 register
-;        and ~  CNTLA0_EFR           ; to clear the error flag, EFR, to 0 
-;        out0 (CNTLA0), a            ; and write it back
-
-SIO_RX_CHECK:                       ; Z8S180 has 4 byte Rx H/W FIFO
-;        in0 a, (STAT0)              ; load the SIOA status register
-;        tst STAT0_RDRF              ; test whether we have received on SIOA
-;        jr nz, SIO_RX_GET           ; if still more bytes in H/W FIFO, get them
-
-SIO_TX_CHECK:                       ; now start doing the Tx stuff
-;        and STAT0_TDRE              ; test whether we can transmit on SIOA
-;        jr z, SIO_TX_END            ; if not, then end
-
-;        ld a, (sioaTxCount)         ; get the number of bytes in the Tx buffer
-;        or a                        ; check whether it is zero
-;        jr z, SIO_TX_TIE0_CLEAR     ; if the count is zero, then disable the Tx Interrupt
-
-;        ld hl, (sioaTxOut)          ; get the pointer to place where we pop the Tx byte
-;        ld a, (hl)                  ; get the Tx byte
-;        out0 (TDR0), a              ; output the Tx byte to the SIOA
-
-;        inc l                       ; move the Tx pointer low byte along, 0xFF rollover
-;        ld (sioaTxOut), hl          ; write where the next byte should be popped
-
-;        ld hl, sioaTxCount
-;        dec (hl)                    ; atomically decrement current Tx count
-
-;        jr nz, SIO_TX_END           ; if we've more Tx bytes to send, we're done for now
-
-SIO_TX_TIE0_CLEAR:
-;        in0 a, (STAT0)              ; get the SIOA status register
-;        and ~STAT0_TIE              ; mask out (disable) the Tx Interrupt
-;        out0 (STAT0), a             ; set the SIOA status register
-
-SIO_TX_END:
-;        pop hl
-;        pop af
-
-;        ei
-;        reti
 
     EXTERN _sio_need
     defc NEED = _sio_need

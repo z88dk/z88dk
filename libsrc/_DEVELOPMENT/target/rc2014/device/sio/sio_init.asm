@@ -13,7 +13,7 @@
 
         call asm_z80_push_di        ; di
 
-        ; initialise the SIO interrupt vectors in preamble IM 2
+        ; initialise the SIO interrupt vectors in preamble for IM 2
 
         ; initialise the SIO
                                     ; load the default SIO configuration
