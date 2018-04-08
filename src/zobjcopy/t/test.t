@@ -84,9 +84,22 @@ is $err, "error: too many arguments\n";
 is !!$exit, !!1;
 
 #------------------------------------------------------------------------------
+($out, $err, $exit, @dummy) = capture {system "zobjcopy -l test1.o test2.o"};
+is $out, "";
+is $err, "error: too many arguments\n";
+is !!$exit, !!1;
+
+#------------------------------------------------------------------------------
+($out, $err, $exit, @dummy) = capture {system "zobjcopy test1.o"};
+is $out, "";
+is $err, "error: no output file\n";
+is !!$exit, !!1;
+
+#------------------------------------------------------------------------------
 # parse object file of each version
 #------------------------------------------------------------------------------
 my $bmk;
+my $bmk2;
 for my $version (1 .. $OBJ_FILE_VERSION) {
 	$objfile[$version] && $libfile[$version] 
 		or die "Version $version not supported";
@@ -94,6 +107,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 	path("test.o")->spew_raw($objfile[$version]);
 	
 	$bmk = sprintf("t/bmk_obj_%02d.txt", $version);
+	$bmk2 = sprintf("t/bmk_obj_%02d_converted.txt", $version);
 	$out = sprintf("t/out_obj_%02d.txt", $version);
 	
 	is 0, system("z80nm -a test.o > $out"), "z80nm -a test.o > $out";
@@ -103,6 +117,12 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 
 	is 0, system("zobjcopy -l test.o > $out"), "zobjcopy -l test.o > $out";
 	is 0, system("diff $out $bmk"), "diff $out $bmk";
+	
+	die unless Test::More->builder->is_passing;
+
+	is 0, system("zobjcopy test.o test2.o"), "zobjcopy test.o test2.o";
+	is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
+	is 0, system("diff $out $bmk2"), "diff $out $bmk2";
 	
 	die unless Test::More->builder->is_passing;
 

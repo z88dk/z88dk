@@ -85,6 +85,63 @@ void code_free(code_t *code)
 }
 
 //-----------------------------------------------------------------------------
+// signature
+//-----------------------------------------------------------------------------
+static enum file_type file_read_signature(file_t *file, FILE *fp)
+{
+	file->type = is_none;
+	file->version = -1;
+
+	char file_signature[SIGNATURE_SIZE + 1];
+	memset(file_signature, 0, sizeof(file_signature));
+
+	// read signature
+	if (fread(file_signature, sizeof(char), SIGNATURE_SIZE, fp) != SIGNATURE_SIZE)
+		die("error: signature not found in '%s'\n", utstring_body(file->filename));
+
+	if (strncmp(file_signature, SIGNATURE_OBJ, 6) == 0)
+		file->type = is_object;
+	else if (strncmp(file_signature, SIGNATURE_LIB, 6) == 0)
+		file->type = is_library;
+	else
+		die("error: file '%s' not object nor library\n", utstring_body(file->filename));
+
+	utstring_clear(file->signature);
+	utstring_bincpy(file->signature, file_signature, SIGNATURE_SIZE);
+
+	// read version
+	if (sscanf(file_signature + 6, "%d", &file->version) < 1)
+		die("error: file '%s' not object nor library\n", utstring_body(file->filename));
+
+	if (file->version < MIN_VERSION || file->version > MAX_VERSION)
+		die("error: file '%s' version %d not supported\n",
+			utstring_body(file->filename), file->version);
+
+	if (opt_list)
+		printf("%s file %s at $%04lX: %s\n",
+			file->type == is_library ? "Library" : "Object ",
+			utstring_body(file->filename),
+			ftell(fp) - SIGNATURE_SIZE, file_signature);
+
+	return file->type;
+}
+
+static void file_write_signature(FILE *fp, enum file_type type)
+{
+	UT_string *signature;
+	utstring_new(signature);
+
+	utstring_printf(signature,
+		"%s" SIGNATURE_VERS,
+		type == is_object ? SIGNATURE_OBJ : SIGNATURE_LIB,
+		CUR_VERSION);
+
+	xfwrite(utstring_body(signature), sizeof(char), SIGNATURE_SIZE, fp);
+
+	utstring_free(signature);
+}
+
+//-----------------------------------------------------------------------------
 // object file
 //-----------------------------------------------------------------------------
 objfile_t *objfile_new()
@@ -134,8 +191,28 @@ void objfile_free(objfile_t *obj)
 
 static void print_section(UT_string *section)
 {
-	if (opts.list && utstring_len(section) > 0)		// not "" section
-		printf(" (section %s)", utstring_body(section));
+	if (opt_list) {
+		printf(" (section ");
+		if (utstring_len(section) > 0)
+			printf("%s", utstring_body(section));
+		else
+			printf("\"\"");
+		printf(")");
+	}
+}
+
+static void print_filename_line_nr(UT_string *filename, int line_nr)
+{
+	if (opt_list) {
+		printf(" (file ");
+		if (utstring_len(filename) > 0)
+			printf("%s", utstring_body(filename));
+		else
+			printf("\"\"");
+		if (line_nr > 0)
+			printf(":%d", line_nr);
+		printf(")");
+	}
 }
 
 static void print_bytes(UT_array *data) 
@@ -169,7 +246,7 @@ static void objfile_read_names(objfile_t *obj, FILE *fp, long fpos_start, long f
 	if (obj->version >= 5)					// signal end by zero type
 		fpos_end = MAX_FP;
 
-	if (opts.list)
+	if (opt_list)
 		printf("  Names:\n");
 
 	xfseek(fp, fpos_start, SEEK_SET);
@@ -196,15 +273,16 @@ static void objfile_read_names(objfile_t *obj, FILE *fp, long fpos_start, long f
 			sym->line_nr = xfread_dword(fp);
 		}
 
-		if (opts.list) {
+		if (opt_list) {
 			printf("    %c %c $%04X %s",
 				sym->scope, sym->type, sym->value, utstring_body(sym->name));
-			if (obj->version >= 5) {
+
+			if (obj->version >= 5)
 				print_section(sym->section);
-			}
-			if (obj->version >= 9) {
-				printf(" %s:%d", utstring_body(sym->filename), sym->line_nr);
-			}
+
+			if (obj->version >= 9)
+				print_filename_line_nr(sym->filename, sym->line_nr);
+
 			printf("\n");
 		}
 
@@ -213,12 +291,34 @@ static void objfile_read_names(objfile_t *obj, FILE *fp, long fpos_start, long f
 	}
 }
 
+static long objfile_write_names(objfile_t *obj, FILE *fp)
+{
+	if (!obj->names) return -1;					// no defined symbols
+
+	long fpos0 = ftell(fp);						// start of symbols area
+
+	for (symbol_t *symbol = obj->names; symbol; symbol = symbol->next) {
+		xfwrite_byte(symbol->scope, fp);		// scope
+		xfwrite_byte(symbol->type, fp);			// type
+		xfwrite_bcount_str(symbol->section, fp);// section
+		xfwrite_dword(symbol->value, fp);		// value
+		xfwrite_bcount_str(symbol->name, fp);	// name
+		xfwrite_bcount_str(symbol->filename, fp);// filename
+		xfwrite_dword(symbol->line_nr, fp);		// definition line
+	}
+
+	// store end-terminator
+	xfwrite_byte(0, fp);
+
+	return fpos0;
+}
+
 static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long fpos_end)
 {
 	UT_string *name;
 	utstring_new(name);
 
-	if (opts.list)
+	if (opt_list)
 		printf("  External names:\n");
 
 	xfseek(fp, fpos_start, SEEK_SET);
@@ -226,11 +326,38 @@ static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long
 		xfread_bcount_str(name, fp);
 		utarray_push_back(obj->externs, &utstring_body(name));
 
-		if (opts.list)
+		if (opt_list)
 			printf("    U         %s\n", utstring_body(name));
 	}
 
 	utstring_free(name);
+}
+
+static long objfile_write_externs1(objfile_t *obj, FILE *fp, UT_string *name)
+{
+	if (utarray_len(obj->externs) == 0) return -1;	// no external symbols
+
+	long fpos0 = ftell(fp);							// start of externals area
+
+	char **pname = NULL;
+	while ((pname = (char**)utarray_next(obj->externs, pname)) != NULL) {
+		utstring_clear(name);
+		utstring_printf(name, "%s", *pname);
+		xfwrite_bcount_str(name, fp);
+	}
+
+	return fpos0;
+}
+
+static long objfile_write_externs(objfile_t *obj, FILE *fp)
+{
+	UT_string *name;
+	utstring_new(name);
+
+	long ret = objfile_write_externs1(obj, fp, name);
+
+	utstring_free(name);
+	return ret;
 }
 
 static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long fpos_end)
@@ -240,7 +367,7 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 	if (obj->version >= 4)					// signal end by zero type
 		fpos_end = MAX_FP;
 
-	if (opts.list)
+	if (opt_list)
 		printf("  Expressions:\n");
 
 	xfseek(fp, fpos_start, SEEK_SET);
@@ -249,7 +376,7 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 		if (type == 0)
 			break;							// end marker
 
-		if (opts.list)
+		if (opt_list)
 			printf("    E %c%c",
 				type,
 				type == '=' ? ' ' :
@@ -269,9 +396,6 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 				last_filename = expr->filename;
 
 			expr->line_nr = xfread_dword(fp);
-
-			if (opts.list)
-				printf(" (%s:%d)", utstring_body(last_filename), expr->line_nr);
 		}
 
 		if (obj->version >= 5)
@@ -280,18 +404,18 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 		if (obj->version >= 3) {
 			expr->asmpc = xfread_word(fp);
 
-			if (opts.list)
+			if (opt_list)
 				printf(" $%04X", expr->asmpc);
 		}
 
 		expr->patch_ptr = xfread_word(fp);
-		if (opts.list)
+		if (opt_list)
 			printf(" $%04X: ", expr->patch_ptr);
 
 		if (obj->version >= 6) {
 			xfread_bcount_str(expr->target_name, fp);
 
-			if (opts.list && utstring_len(expr->target_name) > 0)
+			if (opt_list && utstring_len(expr->target_name) > 0)
 				printf("%s := ", utstring_body(expr->target_name));
 		}
 
@@ -306,18 +430,71 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 					utstring_body(obj->filename));
 		}
 
-		if (opts.list)
+		if (opt_list)
 			printf("%s", utstring_body(expr->text));
 
-		if (opts.list && obj->version >= 5) 
+		if (opt_list && obj->version >= 5) 
 			print_section(expr->section);
 
-		if (opts.list)
+		if (opt_list && obj->version >= 4)
+			print_filename_line_nr(last_filename, expr->line_nr);
+
+		if (opt_list)
 			printf("\n");
 
 		// insert in the list
 		DL_APPEND(obj->exprs, expr);
 	}
+}
+
+static long objfile_write_exprs1(objfile_t *obj, FILE *fp, UT_string *last_filename, UT_string *empty)
+{
+	if (!obj->exprs) return -1;				// no expressions
+
+	long fpos0 = ftell(fp);					// start of expressions area
+
+	utstring_clear(last_filename);
+	for (expr_t *expr = obj->exprs; expr; expr = expr->next) {
+		
+		// store type
+		xfwrite_byte(expr->type, fp);		
+
+		// store file name if different from last, folowed by source line number
+		if (strcmp(utstring_body(expr->filename), utstring_body(last_filename)) != 0) {
+			xfwrite_wcount_str(expr->filename, fp);
+			utstring_clear(last_filename); 
+			utstring_concat(last_filename, expr->filename);
+		}
+		else {
+			xfwrite_wcount_str(empty, fp);
+		}
+
+		xfwrite_dword(expr->line_nr, fp);			// source line number
+		xfwrite_bcount_str(expr->section, fp);		// section name
+
+		xfwrite_word(expr->asmpc, fp);				// ASMPC
+		xfwrite_word(expr->patch_ptr, fp);			// patchptr
+		xfwrite_bcount_str(expr->target_name, fp);	// target symbol for expression
+		xfwrite_wcount_str(expr->text, fp);			// expression
+	}
+
+	// store end-terminator
+	xfwrite_byte(0, fp);
+
+	return fpos0;
+}
+
+static long objfile_write_exprs(objfile_t *obj, FILE *fp)
+{
+	UT_string *last_filename, *empty;
+	utstring_new(last_filename);
+	utstring_new(empty);
+
+	long ret = objfile_write_exprs1(obj, fp, last_filename, empty);
+
+	utstring_free(last_filename);
+	utstring_free(empty);
+	return ret;
 }
 
 static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
@@ -344,7 +521,7 @@ static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 			else
 				code->align = -1;
 
-			if (opts.list) {
+			if (opt_list) {
 				printf("  Code: %d bytes", code_size);
 
 				if (code->org >= 0)
@@ -364,7 +541,7 @@ static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 			utarray_resize(code->data, code_size);
 			xfread(utarray_front(code->data), sizeof(byte_t), code_size, fp);
 
-			if (opts.list)
+			if (opt_list)
 				print_bytes(code->data);
 
 			// insert in the list
@@ -381,7 +558,7 @@ static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 		utarray_resize(code->data, code_size);
 		xfread(utarray_front(code->data), sizeof(byte_t), code_size, fp);
 
-		if (opts.list && code_size > 0) {
+		if (opt_list && code_size > 0) {
 			printf("  Code: %d bytes\n", code_size);
 			print_bytes(code->data);
 		}
@@ -389,6 +566,32 @@ static void objfile_read_codes(objfile_t *obj, FILE *fp, long fpos_start)
 		// insert in the list
 		DL_APPEND(obj->codes, code);
 	}
+}
+
+static long objfile_write_codes(objfile_t *obj, FILE *fp)
+{
+	if (!obj->codes) return -1;				// no code sections
+
+	long fpos0 = ftell(fp);
+
+	for (code_t *code = obj->codes; code; code = code->next) {
+		xfwrite_dword(utarray_len(code->data), fp);
+		xfwrite_bcount_str(code->section, fp);
+		xfwrite_dword(code->org, fp);
+		xfwrite_dword(code->align, fp);
+		xfwrite(utarray_front(code->data), sizeof(byte_t), utarray_len(code->data), fp);
+	}
+
+	xfwrite_dword(-1, fp);					// end marker
+
+	return fpos0;
+}
+
+static long objfile_write_modname(objfile_t *obj, FILE *fp)
+{
+	long fpos0 = ftell(fp);
+	xfwrite_bcount_str(obj->modname, fp);
+	return fpos0;
 }
 
 void objfile_read(objfile_t *obj, FILE *fp)
@@ -413,11 +616,11 @@ void objfile_read(objfile_t *obj, FILE *fp)
 	// module name
 	xfseek(fp, fpos0 + fpos_modname, SEEK_SET);
 	xfread_bcount_str(obj->modname, fp);
-	if (opts.list)
+	if (opt_list)
 		printf("  Name: %s\n", utstring_body(obj->modname));
 
 	// global ORG
-	if (obj->global_org >= 0)
+	if (opt_list && obj->global_org >= 0)
 		printf("  Org:  $%04X\n", obj->global_org);
 
 	// names
@@ -441,6 +644,37 @@ void objfile_read(objfile_t *obj, FILE *fp)
 	// code
 	if (fpos_codes >= 0)
 		objfile_read_codes(obj, fp, fpos0 + fpos_codes);
+}
+
+void objfile_write(objfile_t *obj, FILE *fp)
+{
+	long fpos0 = ftell(fp);
+
+	// write header
+	file_write_signature(fp, is_object);
+
+	// write placeholders for 5 pointers
+	long header_ptr = ftell(fp);
+	for (int i = 0; i < 5; i++)
+		xfwrite_dword(-1, fp);
+
+	// write sections, return pointers
+	long expr_ptr = objfile_write_exprs(obj, fp);
+	long symbols_ptr = objfile_write_names(obj, fp);
+	long externsym_ptr = objfile_write_externs(obj, fp);
+	long modname_ptr = objfile_write_modname(obj, fp);
+	long code_ptr = objfile_write_codes(obj, fp);
+	long end_ptr = ftell(fp);
+
+	// write pointers to areas
+	xfseek(fp, header_ptr, SEEK_SET);
+	xfwrite_dword(modname_ptr == -1 ? -1 : modname_ptr - fpos0, fp);
+	xfwrite_dword(expr_ptr == -1 ? -1 : expr_ptr - fpos0, fp);
+	xfwrite_dword(symbols_ptr == -1 ? -1 : symbols_ptr - fpos0, fp);
+	xfwrite_dword(externsym_ptr == -1 ? -1 : externsym_ptr - fpos0, fp);
+	xfwrite_dword(code_ptr == -1 ? -1 : code_ptr - fpos0, fp);
+
+	xfseek(fp, end_ptr, SEEK_SET);
 }
 
 //-----------------------------------------------------------------------------
@@ -470,45 +704,6 @@ void file_free(file_t *file)
 		objfile_free(obj);
 	}
 	Free(file);
-}
-
-static enum file_type file_read_signature(file_t *file, FILE *fp)
-{
-	file->type = is_none;
-	file->version = -1;
-	
-	char file_signature[SIGNATURE_SIZE + 1];
-	memset(file_signature, 0, sizeof(file_signature));
-
-	// read signature
-	if (fread(file_signature, sizeof(char), SIGNATURE_SIZE, fp) != SIGNATURE_SIZE)
-		die("error: signature not found in '%s'\n", utstring_body(file->filename));
-
-	if (strncmp(file_signature, "Z80RMF", 6) == 0)
-		file->type = is_object;
-	else if (strncmp(file_signature, "Z80LMF", 6) == 0)
-		file->type = is_library;
-	else
-		die("error: file '%s' not object nor library\n", utstring_body(file->filename));
-
-	utstring_clear(file->signature);
-	utstring_bincpy(file->signature, file_signature, SIGNATURE_SIZE);
-
-	// read version
-	if (sscanf(file_signature + 6, "%d", &file->version) < 1)
-		die("error: file '%s' not object nor library\n", utstring_body(file->filename));
-
-	if (file->version < MIN_VERSION || file->version > MAX_VERSION)
-		die("error: file '%s' version %d not supported\n",
-			utstring_body(file->filename), file->version);
-
-	if (opts.list)
-		printf("%s file %s at $%04lX: %s\n", 
-			file->type == is_library ? "Library" : "Object ",
-			utstring_body(file->filename),
-			ftell(fp) - SIGNATURE_SIZE, file_signature);
-
-	return file->type;
 }
 
 static void file_read_object(file_t *file, FILE *fp)
@@ -563,6 +758,49 @@ void file_read(file_t *file, const char *filename)
 	switch (file->type) {
 	case is_object:  file_read_object(file, fp);  break;
 	case is_library: file_read_library(file, fp); break;
+	default: assert(0);
+	}
+
+	xfclose(fp);
+}
+
+static void file_write_object(file_t *file, FILE *fp)
+{
+	objfile_write(file->objs, fp);
+}
+
+static void file_write_library(file_t *file, FILE *fp)
+{
+	// write header
+	file_write_signature(fp, is_library);
+
+	for (objfile_t *obj = file->objs; obj; obj = obj->next) {
+		long header_ptr = ftell(fp);
+		xfwrite_dword(-1, fp);			// place holder for next
+		xfwrite_dword(-1, fp);			// place holder for size
+		
+		long obj_start = ftell(fp);
+		objfile_write(obj, fp);
+		long obj_end = ftell(fp);
+
+		xfseek(fp, header_ptr, SEEK_SET);
+		if (obj->next)
+			xfwrite_dword(obj_end, fp);		// next
+		else
+			xfwrite_dword(-1, fp);			// last
+		xfwrite_dword(obj_end - obj_start, fp);
+
+		xfseek(fp, obj_end, SEEK_SET);
+	}
+}
+
+void file_write(file_t *file, const char *filename)
+{
+	FILE *fp = xfopen(filename, "wb");
+
+	switch (file->type) {
+	case is_object:  file_write_object(file, fp);  break;
+	case is_library: file_write_library(file, fp); break;
 	default: assert(0);
 	}
 

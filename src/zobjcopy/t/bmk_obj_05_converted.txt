@@ -1,9 +1,8 @@
-Object  file test.o at $0000: Z80RMF05
+Object  file test2.o at $0000: Z80RMF11
   Name: file1
-  Org:  $0000
   Names:
-    L A $0000 start (section text_1)
-    G C $0000 main (section text_1)
+    L A $0000 start (section text_1) (file "")
+    G C $0000 main (section text_1) (file "")
   External names:
     U         ext1
     U         ext2

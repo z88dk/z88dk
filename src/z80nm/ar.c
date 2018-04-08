@@ -148,8 +148,24 @@ enum file_type read_signature( FILE *fp, char *filename )
 *----------------------------------------------------------------------------*/
 void print_section_name( char *section_name )
 {
+	printf(" (section ");
 	if ( section_name && *section_name )		/* not "" section */
-		printf(" (section %s)", section_name );
+		printf("%s", section_name );
+	else
+		printf("\"\"");
+	printf(")");
+}
+
+void print_filename_line_nr(char *filename, int line_nr)
+{
+	printf(" (file ");
+	if (filename && *filename)
+		printf("%s", filename);
+	else
+		printf("\"\"");
+	if (line_nr > 0)
+		printf(":%d", line_nr);
+	printf(")");
 }
 
 void dump_names( FILE *fp, char *filename, long fpos_start, long fpos_end )
@@ -193,7 +209,7 @@ void dump_names( FILE *fp, char *filename, long fpos_start, long fpos_end )
 				print_section_name(section_name);
 			}
 			if (file_version >= 9) {
-				printf(" %s:%d", def_filename, (int)line_nr);
+				print_filename_line_nr(def_filename, line_nr);
 			}
 			printf("\n");
 		}
@@ -252,7 +268,6 @@ void dump_exprs( FILE *fp, char *filename, long fpos_start, long fpos_end )
 			}
 
 			line_number = xfread_dword(fp);
-			printf(" (%s:%ld)", last_source_file, line_number );
 		}
 
 		if ( file_version >= 5 )
@@ -288,6 +303,11 @@ void dump_exprs( FILE *fp, char *filename, long fpos_start, long fpos_end )
 			free( section_name );
 		}
 
+		if (file_version >= 4)
+		{
+			print_filename_line_nr(last_source_file, line_number);
+		}
+		
 		printf("\n");
 
 		if ( file_version < 4 )

@@ -12,11 +12,11 @@ Object  file test.lib at $01E1: Z80RMF08
     U         ext1
     U         ext2
   Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
+    E Ub $0000 $0001: start % 256 (section text_1) (file file1.asm:123)
+    E Sb $0000 $0001: start % 127 (section text_1) (file file1.asm:132)
+    E Cw $0000 $0001: start (section text_1) (file file1.asm:231)
+    E Ll $0000 $0001: start (section text_1) (file file1.asm:321)
+    E =  $0000 $0000: _start := start (section text_1) (file file1.asm:321)
   Code: 63 bytes, ORG $0000 (section text_1)
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
     C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20
@@ -41,11 +41,11 @@ Object  file test.lib at $0583: Z80RMF08
     U         ext1
     U         ext2
   Expressions:
-    E Ub (file1.asm:123) $0000 $0001: start % 256 (section text_1)
-    E Sb (file1.asm:132) $0000 $0001: start % 127 (section text_1)
-    E Cw (file1.asm:231) $0000 $0001: start (section text_1)
-    E Ll (file1.asm:321) $0000 $0001: start (section text_1)
-    E =  (file1.asm:321) $0000 $0000: _start := start (section text_1)
+    E Ub $0000 $0001: start % 256 (section text_1) (file file1.asm:123)
+    E Sb $0000 $0001: start % 127 (section text_1) (file file1.asm:132)
+    E Cw $0000 $0001: start (section text_1) (file file1.asm:231)
+    E Ll $0000 $0001: start (section text_1) (file file1.asm:321)
+    E =  $0000 $0000: _start := start (section text_1) (file file1.asm:321)
   Code: 63 bytes, ORG $0000 (section text_1)
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
     C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20

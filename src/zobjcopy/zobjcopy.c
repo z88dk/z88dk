@@ -6,8 +6,8 @@
 #include "zobjcopy.h"
 
 // global variables
-opts_t opts;
-global_t global;
+bool opt_verbose;
+bool opt_list;
 
 //-----------------------------------------------------------------------------
 // Usage and command line options
@@ -32,6 +32,11 @@ static void objcopy(char *infile, char *outfile)
 	file_t *in = file_new();
 	file_read(in, infile);
 
+	if (!opt_list) {
+		assert(outfile);
+		file_write(in, outfile);
+	}
+
 	file_free(in);
 }
 
@@ -53,29 +58,29 @@ int main(int argc, char *argv[])
 	optparse_init(&options, argv);
 	while ((option = optparse_long(&options, longopts, NULL)) != -1) {
 		switch (option) {
-		case 'l': opts.list = true; break;
-		case 'v': opts.verbose = true; break;
+		case 'l': opt_list = true; break;
+		case 'v': opt_verbose = true; break;
 		case '?':
-			fprintf(stderr, "error: %s\n", options.errmsg);
-			exit(EXIT_FAILURE);
+			die("error: %s\n", options.errmsg);
 		default: assert(0);
 		}
 	}
 
 	// collect file names
 	char *infile = optparse_arg(&options);
-	if (!infile) {
-		fprintf(stderr, "error: no input file\n");
-		exit(EXIT_FAILURE);
-	}
+	if (!infile)
+		die("error: no input file\n");
 
-	// may be NULL
 	char *outfile = optparse_arg(&options);
+	if (opt_list && outfile)
+		die("error: too many arguments\n");
+	else if (!opt_list && !outfile)
+		die("error: no output file\n");
+	else
+		;
 
-	if (optparse_arg(&options)!=NULL) {
-		fprintf(stderr, "error: too many arguments\n");
-		exit(EXIT_FAILURE);
-	}
+	if (optparse_arg(&options) != NULL) 
+		die("error: too many arguments\n");
 
 	objcopy(infile, outfile);
 }

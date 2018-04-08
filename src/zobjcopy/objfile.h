@@ -10,10 +10,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define MIN_VERSION 1
-#define MAX_VERSION 11
-#define CUR_VERSION MAX_VERSION
-#define SIGNATURE_SIZE 8
+#define MIN_VERSION		1
+#define MAX_VERSION		11
+#define CUR_VERSION		MAX_VERSION
+#define SIGNATURE_SIZE	8
+#define SIGNATURE_OBJ	"Z80RMF"
+#define SIGNATURE_LIB	"Z80LMF"
+#define SIGNATURE_VERS	"%02d"
 
 enum file_type { is_none, is_library, is_object };
 
@@ -85,6 +88,7 @@ typedef struct objfile_s
 extern objfile_t *objfile_new();
 extern void objfile_free(objfile_t *obj);
 extern void objfile_read(objfile_t *obj, FILE *fp);
+extern void objfile_write(objfile_t *obj, FILE *fp);
 
 // one file - either object or library
 typedef struct file_s
@@ -101,3 +105,4 @@ typedef struct file_s
 extern file_t *file_new();
 extern void file_free(file_t *file);
 extern void file_read(file_t *file, const char *filename);
+extern void file_write(file_t *file, const char *filename);
