@@ -37,10 +37,7 @@
         PUBLIC    l_dcal
 
 
-        PUBLIC    exitsp
-        PUBLIC    exitcount
 
-        PUBLIC    __sgoioblk
 
 ; Enterprise 64/128 specific stuff
 		PUBLIC    warmreset

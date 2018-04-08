@@ -49,11 +49,6 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-        PUBLIC    __sgoioblk      ;stdio info block
-
 
 IF (startup>100)
 		; LAMBDA specific definitions (if any)
