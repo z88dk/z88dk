@@ -23,7 +23,7 @@ CROSS ?= 0
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
 
-all: setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm lstmanip ticks z80svg testsuite z88dk-lib
+all: setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy lstmanip ticks z80svg testsuite z88dk-lib
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -80,6 +80,10 @@ zx7:
 z80nm:
 	$(MAKE) -C src/z80nm
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
+
+zobjcopy:
+	$(MAKE) -C src/zobjcopy
+	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
 
 lstmanip:
 	$(MAKE) -C src/lstmanip
