@@ -689,7 +689,16 @@ int rpn_eval(const char* expr, char** vars)
 
     while (*ptr) {
         switch (*ptr++) {
-        case '0' ... '9':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
             n = strtoll(ptr - 1, &endptr, 10);
             ptr = endptr;
             push(n);
