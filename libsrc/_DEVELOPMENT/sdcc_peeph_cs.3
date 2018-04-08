@@ -15049,7 +15049,7 @@ replace restart {
 	ld	%1,l
 	ld	%2,h
 	; peephole z88dk-348b
-}
+} if notSame(%1 %2), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'hl')
 
 replace restart {
 	ld	b,#0x10
@@ -24302,13 +24302,6 @@ replace restart {
 	; peephole z88dk-459e19
 }
 
-
-
-
-
-
-
-
 replace restart {
 	ld	%1 (%2),#%9
 	ld	%3 (%4),#%9
@@ -24335,15 +24328,15 @@ replace restart {
 	; peephole z88dk-460b
 } if notUsed('a')
 
-replace restart {
-	ld	%1 (%2),#%9
-	ld	%3 (%4),#%9
-} by {
-	ld	a,#%9
-	ld	%1 (%2),a
-	ld	%3 (%4),a
-	; peephole z88dk-460c
-} if notUsed('a')
+//replace restart {
+//	ld	%1 (%2),#%9
+//	ld	%3 (%4),#%9
+//} by {
+//	ld	a,#%9
+//	ld	%1 (%2),a
+//	ld	%3 (%4),a
+//	; peephole z88dk-460c
+//} if notUsed('a')
 
 replace restart {
 	ld	l,e
@@ -27601,7 +27594,30 @@ replace restart {
 	; peephole z88dk-492a1
 } if notUsed('a')
 
+replace restart {
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ld	a,l
+	ld	l,h
+	ld	h,a
+} by {
+	ld a,h
+	; peephole z88dk-492b1
+}
 
+replace restart {
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ex	de,hl
+} by {
+	ex	de,hl
+	ld	a,e
+	ld	e,d
+	ld	d,a
+	; peephole z88dk-492b2
+}
 
 
 
