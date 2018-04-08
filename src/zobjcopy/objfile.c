@@ -754,6 +754,10 @@ void file_read(file_t *file, const char *filename)
 	FILE *fp = xfopen(filename, "rb");
 	file_read_signature(file, fp);
 
+	if (opt_verbose)
+		printf("Reading file '%s': %s version %d\n",
+			filename, file->type == is_object ? "object" : "library", file->version);
+
 	// read object files
 	switch (file->type) {
 	case is_object:  file_read_object(file, fp);  break;
@@ -796,6 +800,10 @@ static void file_write_library(file_t *file, FILE *fp)
 
 void file_write(file_t *file, const char *filename)
 {
+	if (opt_verbose)
+		printf("Writing file '%s': %s version %d\n",
+			filename, file->type == is_object ? "object" : "library", CUR_VERSION);
+
 	FILE *fp = xfopen(filename, "wb");
 
 	switch (file->type) {

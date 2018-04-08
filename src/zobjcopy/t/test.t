@@ -96,6 +96,18 @@ is $err, "error: no output file\n";
 is !!$exit, !!1;
 
 #------------------------------------------------------------------------------
+path("test.o")->spew_raw($objfile[1]);
+($out, $err, $exit, @dummy) = capture {system "zobjcopy -v test.o test2.o"};
+is $out, <<"END";
+Reading file 'test.o': object version 1
+Writing file 'test2.o': object version $OBJ_FILE_VERSION
+END
+is $err, "";
+is !!$exit, !!0;
+ok -f "test2.o";
+unlink "test.o", "test2.o";
+
+#------------------------------------------------------------------------------
 # parse object file of each version
 #------------------------------------------------------------------------------
 my $bmk;
