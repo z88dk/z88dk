@@ -721,23 +721,17 @@ int rpn_eval(const char* expr, char** vars)
                 return 0; // Divide by zero
             break;
         case '%':
-            if ( *ptr == '%') {
+            if ( isdigit(*ptr) ) {
                 // It's a variable
-                ptr++;
                 char v = *ptr++;
-
-                if ( v < '0' || v > '9') {
-                    // Invalid variable
-                    return 0;
-                } else {
-                    push(atoi(vars[v - '0']));
-                }
-            } else {
+                push(atoi(vars[v - '0']));
+            } else if ( *ptr++ == '%' ) {
                 op2 = pop();
-                if (op2 != 0)
+                if (op2 != 0) {
                     push(pop() % op2);
-                else
+                } else {
                     return 0; // Divide by zero
+				}
             }
             break;
         }
