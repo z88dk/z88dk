@@ -22,7 +22,7 @@ OBJS		:= $(OBJS_ALL:$(PROJ).o=)
 DEPENDS		:= $(SRCS:.c=.d) $(T_SRCS:.c=.d)
 
 #------------------------------------------------------------------------------
-.PHONY: all clean test
+.PHONY: all clean test install
 
 #------------------------------------------------------------------------------
 define MAKE_EXE
@@ -53,5 +53,9 @@ test:: $(PROJ)$(EXE)
 #------------------------------------------------------------------------------
 clean::
 	$(RM) $(OBJS) $(DEPENDS) *.bak
+
+#------------------------------------------------------------------------------
+install: 
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z80nm$(EXESUFFIX)
 
 -include $(DEPENDS)
