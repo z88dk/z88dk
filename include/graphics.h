@@ -95,8 +95,8 @@ extern void __LIB__ clga(int tlx, int tly, int width, int height) __smallc;
 /* pseudo text console support, 4x6 font */
 /* when used to replace fputc_cons: -pragma-redirect=fputc_cons=putc4x6 */
 extern int __LIB__ putc4x6(char c);
-extern unsigned char x_4x6;
-extern unsigned char y_4x6;
+extern int x_4x6;
+extern int y_4x6;
 
 /* Get MAX x and y coordinates */
 extern int __LIB__ getmaxx(void);

@@ -17,6 +17,7 @@
 
 		
 	PUBLIC    putc4x6
+	PUBLIC    _putc4x6
 	
 	EXTERN     swapgfxbk
         EXTERN	__graphics_end
@@ -25,10 +26,9 @@
 	EXTERN	unplot
 	EXTERN	clg
 
-; __gfx_coords: h,l (vert-horz)
-; sprite: (ix)
 
 .putc4x6
+._putc4x6
         ld      hl,2
         add     hl,sp
 		
@@ -38,6 +38,7 @@
 		jr		nz,nocls
 		ld		hl,0
 		ld		(x_4x6),hl
+		ld		(y_4x6),hl
 		jp		clg
 .nocls
 
@@ -185,11 +186,11 @@
 
 .x_4x6
 ._x_4x6
- defb 0
+ defw 0
  
 .y_4x6
 ._y_4x6
- defb 0
+ defw 0
 
 .chr
  defb 0
