@@ -570,7 +570,7 @@ defc __IO_SIO_WR4_CLK_DIV_32      = 0x80
 defc __IO_SIO_WR4_CLK_DIV_64      = 0xC0
 
 defc __IO_SIO_WR5_TX_CRC_ENABLE      = 0x01
-defc __IO_SIO_WR5_TX_RTS      = 0x02
+defc __IO_SIO_WR5_RTS      = 0x02
 defc __IO_SIO_WR5_SDLC_CRC_16      = 0x04
 defc __IO_SIO_WR5_TX_ENABLE      = 0x08
 defc __IO_SIO_WR5_TX_BREAK      = 0x10

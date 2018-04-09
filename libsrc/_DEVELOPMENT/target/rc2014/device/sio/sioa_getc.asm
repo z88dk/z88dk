@@ -4,6 +4,11 @@
 
     PUBLIC _sioa_getc
 
+    EXTERN __IO_SIOA_CONTROL_REGISTER
+
+    EXTERN __IO_SIO_WR0_R5, __IO_SIO_WR5_RTS
+    EXTERN __IO_SIO_RX_EMPTYISH
+
     EXTERN sioaRxCount, sioaRxOut
 
     _sioa_getc:
@@ -15,8 +20,27 @@
         
         ld a, (sioaRxCount)         ; get the number of bytes in the Rx buffer
         or a                        ; see if there are zero bytes available
-        ret z                       ; if the count is zero, then return
+        ret Z                       ; if the count is zero, then return
 
+        cp __IO_SIO_RX_EMPTYISH     ; compare the count with the preferred empty size
+        jr NC, getc_clean_up        ; if the buffer NOT emptyish, don't change the RTS
+                                    ; this means getting characters will be slower
+                                    ; when the buffer is emptyish.
+                                    ; Better than the reverse case.
+        
+        ld a,__IO_SIO_WR0_R5        ; prepare for a read from R5
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
+        in a,(__IO_SIOA_CONTROL_REGISTER)   ; read from the SIOA R5 register
+        ld l,a                      ; put it in L
+        
+        ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
+
+        ld a,__IO_SIO_WR5_RTS       ; set the RTS
+        or l                        ; with previous contents of R5
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
+        
+    getc_clean_up:
         ld hl, (sioaRxOut)          ; get the pointer to place where we pop the Rx byte
         ld a, (hl)                  ; get the Rx byte
 
