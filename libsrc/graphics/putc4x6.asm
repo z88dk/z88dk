@@ -139,18 +139,18 @@
 		ld	d,0
 		ld	e,a
 .lrloop
+		push bc
 		push de
 		ld  a,(y_4x6)
-		;inc a
 		ld	e,a
 		push de
 		call	unplot
 		pop de
 		pop de
-		ld	a,e					; keep new x position
 		inc e
+		pop bc
 		djnz	lrloop
-		ld	a,e
+		ld	a,e				; new x position
 		
 		IF maxx <> 256
 		cp  maxx
@@ -199,7 +199,7 @@
  
         SECTION rodata_clib
 	
-; 4x5 font (4x6 including a bottom space row) 
+; 4x5 font (it will be 4x6 because the driver adds a bottom blank row)
 .font4x5
 defb	0x04 , 0x04 , 0x04 , 0x00 , 0x04
 defb	0xAA , 0xAE , 0x0A , 0x0E , 0x0A
