@@ -1,44 +1,45 @@
 # To create the image:
-#  macOS / GNU/Linux:
-#   $ docker build -t z88dk - < z88dk.Dockerfile
-#  Windows 10 PowerShell:
-#   PS> cmd /c 'docker build -t z88dk - < z88dk.Dockerfile'
-# To run the container (works for macOS, GNU/Linux & Windows PowerShell):
-#  docker run -v ${PWD}:/src/ -it z88dk <command>
+#   $ docker build -t z88dk -f z88dk.Dockerfile .
+# To run the container:
+#   $ docker run -v ${PWD}:/src/ -it z88dk <command>
 
 FROM alpine:latest
 
-LABEL Version="0.7" \
-      Date="2018-Apr-05" \
+LABEL Version="0.8" \
+      Date="2018-Apr-10" \
       Docker_Version="18.03.0-ce-mac60 (23751)" \
       Maintainer="Garrafon Software (@garrafonsoft)" \
       Description="A basic Docker container to compile and use z88dk from GIT"
 
+ENV Z88DK_PATH="/opt/z88dk" \
+    SDCC_PATH="/tmp/sdcc"
+
 RUN apk add --no-cache build-base libxml2 \ 
     && apk add --no-cache -t .build_deps m4 bison flex libxml2-dev git subversion boost-dev texinfo \
-    && mkdir /opt \
-    && cd /opt \
-    && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git \
-    && cd z88dk \
+    && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git ${Z88DK_PATH}
+
+# Add, edit or uncomment the following lines to customize the z88dk compilation
+# COPY clib_const.m4 ${Z88DK_PATH}/libsrc/_DEVELOPMENT/target/
+# COPY config_sp1.m4 ${Z88DK_PATH}/libsrc/_DEVELOPMENT/target/zx/config/
+
+RUN cd ${Z88DK_PATH} \
     && chmod 777 build.sh \
     && ./build.sh \
-    && cd /opt \
-    && svn checkout -r 9958 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc \
-    && cd sdcc \
-    && patch -p0 < /opt/z88dk/src/zsdcc/sdcc-z88dk.patch \
+    && svn checkout -r 9958 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
+    && cd ${SDCC_PATH} \
+    && patch -p0 < ${Z88DK_PATH}/src/zsdcc/sdcc-z88dk.patch \
     && ./configure --disable-mcs51-port --disable-gbz80-port --disable-avr-port --disable-ds390-port \
                    --disable-ds400-port --disable-hc08-port --disable-pic-port --disable-pic14-port \
                    --disable-pic16-port --disable-stm8-port --disable-tlcs90-port --disable-s08-port \
                    --disable-ucsim --disable-device-lib --disable-packihx \
     && make \
-    && cd bin \
-    && mv sdcc /opt/z88dk/bin/zsdcc \
-    && mv sdcpp /opt/z88dk/bin/zsdcpp \
+    && mv ./bin/sdcc ${Z88DK_PATH}/bin/zsdcc \
+    && mv ./bin/sdcpp ${Z88DK_PATH}/bin/zsdcpp \
     && cd / \
-    && rm -fR /opt/sdcc \
+    && rm -fR ${SDCC_PATH} \
     && apk del .build_deps
 
-ENV PATH="/opt/z88dk/bin:${PATH}" \
-    ZCCCFG="/opt/z88dk/lib/config/"
+ENV PATH="${Z88DK_PATH}/bin:${PATH}" \
+    ZCCCFG="${Z88DK_PATH}/lib/config/"
 
 WORKDIR /src/
