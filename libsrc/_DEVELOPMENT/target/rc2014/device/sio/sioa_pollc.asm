@@ -13,11 +13,11 @@
         ;
         ; modifies : af, hl
 
-        ld a, (sioaRxCount)         ; load the Rx bytes in buffer
-        ld l, a	                    ; load result
+        ld a,(sioaRxCount)          ; load the Rx bytes in buffer
+        ld l,a                      ; load result
         
         or a                        ; check whether there are non-zero count
-        ret z                       ; return if zero count
+        ret Z                       ; return if zero count
         
         scf                         ; set carry to indicate char received
         ret

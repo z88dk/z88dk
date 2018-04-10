@@ -27,7 +27,7 @@ __siob_interrupt_tx_empty:          ; start doing the SIOB Tx stuff
 
         ld a,(siobTxCount)          ; get the number of bytes in the Tx buffer
         or a                        ; check whether it is zero
-        jr Z,siob_tx_int_pend       ; if the count is zero, then disable the Tx Interrupt
+        jr Z,siob_tx_int_pend       ; if the count is zero, disable the Tx Interrupt and exit
 
         ld hl,(siobTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
@@ -47,22 +47,19 @@ siob_tx_buffer_adjusted:
 siob_tx_end:                        ; if we've more Tx bytes to send, we're done for now
         pop hl
         pop af
+
+__siob_interrupt_ext_status:
         ei
         reti
 
 siob_tx_int_pend:
         ld a,__IO_SIO_WR0_TX_INT_PENDING_RESET  ; otherwise pend the Tx interrupt
-        out (__IO_SIOB_CONTROL_REGISTER),a      ; into the SIOB control register
+        out (__IO_SIOB_CONTROL_REGISTER),a      ; into the SIOB register R0
         jr siob_tx_end
 
 siob_tx_reset_buffer:
         ld hl,siobTxBuffer         ; move tx buffer pointer back to start of buffer
         jr siob_tx_buffer_adjusted
-
-
-__siob_interrupt_ext_status:
-        ei
-        reti
 
 
 __siob_interrupt_rx_char:
@@ -107,7 +104,9 @@ siob_rx_get:
         out (__IO_SIOB_CONTROL_REGISTER),a  ; write the SIOB R5 register
 
 siob_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
-        in a,(__IO_SIOB_CONTROL_REGISTER)   ; load the SIOB control register
+        xor a                       ; prepare to read from Read Register 0
+        out (__IO_SIOB_CONTROL_REGISTER),a  ; into the SIOB control register
+        in a,(__IO_SIOB_CONTROL_REGISTER)   ; get the SIOB register R0
         rrca                        ; test whether we have received on SIOB
         jr C,siob_rx_get            ; if still more bytes in H/W FIFO, get them
 
@@ -135,7 +134,7 @@ __siob_interrupt_rx_error:
 
 siob_interrupt_rx_exit:
         ld a,__IO_SIO_WR0_ERROR_RESET       ; otherwise reset the Error flags
-        out (__IO_SIOB_CONTROL_REGISTER),a  ; into the SIOB control register
+        out (__IO_SIOB_CONTROL_REGISTER),a  ; in the SIOB Write Register 0
 
         pop hl                              ; and clean up
         pop af
@@ -149,7 +148,7 @@ __sioa_interrupt_tx_empty:          ; start doing the SIOA Tx stuff
 
         ld a,(sioaTxCount)          ; get the number of bytes in the Tx buffer
         or a                        ; check whether it is zero
-        jr Z,sioa_tx_int_pend       ; if the count is zero, then disable the Tx Interrupt
+        jr Z,sioa_tx_int_pend       ; if the count is zero, disable the Tx Interrupt and exit
 
         ld hl,(sioaTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
@@ -169,22 +168,19 @@ sioa_tx_buffer_adjusted:
 sioa_tx_end:                        ; if we've more Tx bytes to send, we're done for now
         pop hl
         pop af
+
+__sioa_interrupt_ext_status:
         ei
         reti
 
 sioa_tx_int_pend:
         ld a,__IO_SIO_WR0_TX_INT_PENDING_RESET  ; otherwise pend the Tx interrupt
-        out (__IO_SIOA_CONTROL_REGISTER),a      ; into the SIOA control register
+        out (__IO_SIOA_CONTROL_REGISTER),a      ; into the SIOA register R0
         jr sioa_tx_end
 
 sioa_tx_reset_buffer:
         ld hl,sioaTxBuffer         ; move tx buffer pointer back to start of buffer
         jr sioa_tx_buffer_adjusted
-
-
-__sioa_interrupt_ext_status:
-        ei
-        reti
 
 
 __sioa_interrupt_rx_char:
@@ -229,7 +225,9 @@ sioa_rx_get:
         out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
 
 sioa_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
-        in a,(__IO_SIOA_CONTROL_REGISTER)   ; load the SIOA control register
+        xor a                       ; prepare to read from Read Register 0
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; into the SIOA control register
+        in a,(__IO_SIOA_CONTROL_REGISTER)   ; get the SIOA register R0
         rrca                        ; test whether we have received on SIOA
         jr C,sioa_rx_get            ; if still more bytes in H/W FIFO, get them
 
@@ -257,7 +255,7 @@ __sioa_interrupt_rx_error:
 
 sioa_interrupt_rx_exit:
         ld a,__IO_SIO_WR0_ERROR_RESET       ; otherwise reset the Error flags
-        out (__IO_SIOA_CONTROL_REGISTER),a  ; into the SIOA control register
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; in the SIOA Write Register 0
 
         pop hl                              ; and clean up
         pop af

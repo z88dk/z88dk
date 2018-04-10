@@ -21,7 +21,9 @@
         or a                        ; check whether the buffer is empty
         jr NZ,putc_buffer_tx        ; buffer not empty, so abandon immediate Tx
 
-        in a,(__IO_SIOB_CONTROL_REGISTER)   ; get the SIOB control register
+        xor a                       ; prepare to read from Read Register 0
+        out (__IO_SIOB_CONTROL_REGISTER),a  ; into the SIOB control register
+        in a,(__IO_SIOB_CONTROL_REGISTER)   ; get the SIOB register R0
         and __IO_SIO_RR0_TX_EMPTY   ; test whether we can transmit on SIOB
         jr Z,putc_buffer_tx         ; if not, so abandon immediate Tx
 
