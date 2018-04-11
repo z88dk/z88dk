@@ -62,6 +62,11 @@ ENDIF
         PUBLIC    _FRAMES
         defc    _FRAMES = 16436	; Timer
 
+	PUBLIC	CONSOLE_ROWS
+	PUBLIC	CONSOLE_COLUMNS
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 32
+
         IF      !DEFINED_CRT_ORG_CODE
 	    IF (startup>100)
 		; ORG position for LAMBDA
