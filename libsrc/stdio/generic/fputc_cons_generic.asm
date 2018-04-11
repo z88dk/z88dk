@@ -15,10 +15,10 @@
 
 
 		SECTION		code_clib
-		PUBLIC		fputc_generic
-		PUBLIC		_fputc_generic
-		PUBLIC		fputc_generic_setmode
-		PUBLIC		_fputc_generic_setmode
+		PUBLIC		fputc_cons_generic
+		PUBLIC		_fputc_cons_generic
+		PUBLIC		fputc_cons_generic_setmode
+		PUBLIC		_fputc_cons_generic_setmode
 
 		EXTERN		CONSOLE_ROWS
 		EXTERN		CONSOLE_COLUMNS
@@ -29,8 +29,8 @@
 ; void fputc_generic_setmode(char raw) __z88dk_fastcall
 ;
 ; Put the console into raw mode so characters passed through verbatim
-fputc_generic_setmode:
-_fputc_generic_setmode:
+fputc_cons_generic_setmode:
+_fputc_cons_generic_setmode:
 	ld	a,l
 	ld	hl,flags
 	res	6,(hl)
@@ -41,8 +41,8 @@ _fputc_generic_setmode:
 
 
 ; extern int __LIB__ fputc_cons(char c);
-fputc_generic:
-_fputc_generic:
+fputc_cons_generic:
+_fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)

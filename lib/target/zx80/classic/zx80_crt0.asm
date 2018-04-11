@@ -49,6 +49,11 @@
                 defc    CRT_ORG_CODE  = 16525
         ENDIF
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 24
+        defc    CONSOLE_COLUMNS = 32
+
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 3250000
