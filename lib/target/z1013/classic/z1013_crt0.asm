@@ -29,6 +29,12 @@
 	PUBLIC    l_dcal          ;jp(hl)
 
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 32
+        defc    CONSOLE_COLUMNS = 32
+
+
 IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = 100h
 ENDIF
