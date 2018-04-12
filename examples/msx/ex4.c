@@ -77,8 +77,10 @@ void main() {
 	//set_sprite_16(0, (void*)(0x1BBF + 8));
 	// ..equivalent to:  msx_vwrite((void*)(0x1BBF + 8), 14336, 32);
 
+#ifndef __MSX__
 	// internally stored sprite option
 	set_sprite_16(0, sprite0);
+#endif
 		
 	while (!get_trigger(0)) 
 		for (c = 0; c < MAX_POINT; c++) { // for each starting point
