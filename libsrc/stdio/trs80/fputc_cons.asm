@@ -8,6 +8,7 @@
 ;
 ;	$Id: fputc_cons.asm,v 1.4 2016-05-15 20:15:46 dom Exp $
 ;
+;	Prints at cooards from 4020-4021
 
 	  SECTION code_clib
           PUBLIC  fputc_cons_native

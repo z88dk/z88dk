@@ -37,6 +37,12 @@ IF      !DEFINED_CRT_ORG_CODE
 	ENDIF
 ENDIF
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 16
+        defc    CONSOLE_COLUMNS = 64
+
+
 	defc	TAR__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 1774000
