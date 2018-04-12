@@ -30,6 +30,4 @@ graphics/nascom/swapgfxbk
 games/joystick
 @z80.lst
 stdio/generic/fputc_cons_generic
-stdio/nascom/generic_console_cls
-stdio/nascom/generic_console_scrollup
-stdio/nascom/generic_console_printc
+stdio/nascom/generic_console

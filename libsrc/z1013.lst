@@ -29,6 +29,4 @@ graphics/stencil_render2
 graphics/text/swapgfxbk
 @z80.lst
 stdio/generic/fputc_cons_generic
-stdio/z1013/generic_console_cls
-stdio/z1013/generic_console_scrollup
-stdio/z1013/generic_console_printc
+stdio/z1013/generic_console
