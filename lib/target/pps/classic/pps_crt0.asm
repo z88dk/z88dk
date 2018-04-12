@@ -25,6 +25,11 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 32
+        defc    CONSOLE_COLUMNS = 80
+
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 6000000

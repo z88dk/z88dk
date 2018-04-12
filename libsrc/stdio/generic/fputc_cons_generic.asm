@@ -20,6 +20,10 @@
 		PUBLIC		fputc_cons_generic_setmode
 		PUBLIC		_fputc_cons_generic_setmode
 
+		; Variables that can be adjusted by platform specific code
+		PUBLIC		generic_console_w
+		PUBLIC		generic_console_h
+
 		EXTERN		CONSOLE_ROWS
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		generic_console_scrollup
@@ -60,19 +64,19 @@ _fputc_cons_generic:
 	cp	8
 	jr	z,left
 	cp	9
-	jr	z,right
+	jp	z,right
 	cp	10
 	jp	z,handle_cr
 	cp	11
 	jr	z,up
 	cp	12
-	jr	z,cls
+	jp	z,cls
 	cp	13
 	jr	z,down
 	cp	22
-	jr	z,start_xypos
+	jp	z,start_xypos
 	cp	4
-	jr	z,start_vscroll
+	jp	z,start_vscroll
 	ld	e,0		;translate mode
 handle_character:
 	; At this point:
@@ -82,12 +86,15 @@ handle_character:
 	; a = character to print
 	; e = raw character mode
 	ld	d,a
-	ld	a,b
-	cp	CONSOLE_ROWS
-	jr	c,handle_character_no_scroll
+	ld	a,(generic_console_h)
+	cp	b
+	jr	nc,handle_character_no_scroll
 	bit	7,(hl)
 	call	z,generic_console_scrollup
-	ld	bc, +(CONSOLE_ROWS-1) * 256
+	ld	a,(generic_console_h)
+	dec	a
+	ld	b,a
+	ld	c,0
 	ld	(generic_x),bc
 handle_character_no_scroll:
 	ld	a,d
@@ -95,27 +102,32 @@ handle_character_no_scroll:
 	call	generic_console_printc
 	pop	bc	
 	inc	c
-	ld	a,CONSOLE_COLUMNS
-	jr	nz,store_position
+	ld	a,(generic_console_w)
+	cp	c
+	jr	nz,store_coords
 	ld	c,0
 	inc	b
-store_position:
-	ld	(generic_x),bc
-	ret
+	jr	store_coords
 
 
 set_x:
 	res	1,(hl)
 	sub	32
-	cp	CONSOLE_COLUMNS
-	ret	nc			;out of range
+	ld	b,a
+	ld	a,(generic_console_w)
+	cp	b
+	ret	c		;out of range
+	ld	a,b
 	ld	(generic_x),a
 	ret
 set_y:
 	res	0,(hl)
 	sub	32
-	cp	CONSOLE_ROWS
-	ret	nc			;out of range
+	ld	b,a
+	ld	a,(generic_console_h)
+	cp	b
+	ret	c	;out of range
+	ld	a,b
 	ld	(generic_y),a
 	ret
 
@@ -131,39 +143,40 @@ set_vscroll:
 left:	ld	a,c
 	and	a
 	jr	nz,left_1
-	ld	c,CONSOLE_COLUMNS - 1
+	ld	a,(generic_console_w)
+	dec	a
+	ld	c,a
 	jr	up
-left_1: dec	a
-	ld	(generic_x),a
+left_1: dec	c
+store_coords:
+	ld	(generic_x),bc
 	ret
 
 ; Move print position up
 up:	ld	a,b
 	and	a
-	jr	z,up_1
+	jr	z,store_coords
 	dec	b
-up_1:	ld	(generic_x),bc
-	ret
+	jr	store_coords
 
-down:	ld	a,b
-	cp	CONSOLE_ROWS - 1
-	ret	z
-	inc	a
-	ld	(generic_y),a
-	ret
-
-right:	ld	a,c
-	cp	CONSOLE_COLUMNS - 1
-	ret	z
+down:	ld	a,(generic_console_h)
 	dec	a
-	ld	(generic_y),a
-	ret
+	cp	b
+	ret	z
+	inc	b
+	jr	store_coords
+
+right:	ld	a,(generic_console_w)
+	dec	a
+	cp	c
+	ret	z
+	inc	c
+	jr	store_coords
 
 
 cls:	call	generic_console_cls
-	ld	hl,0
-	ld	(generic_x),hl
-	ret
+	ld	bc,0
+	jr	store_coords
 
 start_xypos:
 	ld	a,(hl)
@@ -178,27 +191,32 @@ start_vscroll:
 
 
 handle_cr:
-	ld	a,b
-	cp	CONSOLE_ROWS - 1
+	ld	a,(generic_console_h)
+	dec	a
+	cp	b
 	jr	nz,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
 	ld	a,(flags)
 	rlca
 	call	nc,generic_console_scrollup
 
-	ld	b,CONSOLE_ROWS - 2
+	ld	a,(generic_console_h)
+	sub	2
+	ld	b,a
 handle_cr_no_need_to_scroll:
 	inc	b
 	ld	c,0
-	ld	(generic_x),bc
-	ret
+	jr	store_coords
 
 
 
 
 
 	
+		SECTION		data_clib
 
+generic_console_w:	defb	CONSOLE_COLUMNS
+generic_console_h:	defb	CONSOLE_ROWS
 
 		SECTION		bss_clib
 
