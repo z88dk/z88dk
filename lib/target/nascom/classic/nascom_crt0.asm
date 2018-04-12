@@ -31,6 +31,11 @@
 
 	PUBLIC    montest         ;NASCOM: check the monitor type
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 16
+        defc    CONSOLE_COLUMNS = 48 
+
 	IF      !DEFINED_CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = 1000h
 	ENDIF
