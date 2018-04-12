@@ -61,6 +61,4 @@ vz/vz_soundcopy
 vz/vz_soundcopy_callee
 @z80.lst
 stdio/generic/fputc_cons_generic
-stdio/vz200/generic_console_cls
-stdio/vz200/generic_console_scrollup
-stdio/vz200/generic_console_printc
+stdio/vz200/generic_console

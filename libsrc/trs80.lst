@@ -14,6 +14,4 @@ games/trs80/bit_close_ei
 @games/games.lst
 @z80.lst
 stdio/generic/fputc_cons_generic
-stdio/trs80/generic_console_cls
-stdio/trs80/generic_console_scrollup
-stdio/trs80/generic_console_printc
+stdio/trs80/generic_console

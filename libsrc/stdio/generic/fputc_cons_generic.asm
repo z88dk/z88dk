@@ -115,6 +115,7 @@ set_x:
 	sub	32
 	ld	b,a
 	ld	a,(generic_console_w)
+	dec	a
 	cp	b
 	ret	c		;out of range
 	ld	a,b
@@ -125,6 +126,7 @@ set_y:
 	sub	32
 	ld	b,a
 	ld	a,(generic_console_h)
+	dec	a
 	cp	b
 	ret	c	;out of range
 	ld	a,b

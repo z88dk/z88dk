@@ -5,10 +5,14 @@
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
+		PUBLIC		generic_console_ioctl
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
+generic_console_ioctl:
+	scf
+	ret
 
 generic_console_cls:
 	ld	de,0

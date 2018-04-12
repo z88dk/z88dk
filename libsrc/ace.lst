@@ -15,6 +15,4 @@ time/ace/clock
 @ace/ace.lst
 @z80.lst
 stdio/generic/fputc_cons_generic
-stdio/ace/generic_console_cls
-stdio/ace/generic_console_scrollup
-stdio/ace/generic_console_printc
+stdio/ace/generic_console
