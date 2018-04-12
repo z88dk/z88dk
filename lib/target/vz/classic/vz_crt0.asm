@@ -40,6 +40,10 @@
             ENDIF
         ENDIF
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 16
+        defc    CONSOLE_COLUMNS = 32
 
 ; Now, getting to the real stuff now!
 
