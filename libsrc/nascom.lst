@@ -2,6 +2,7 @@
 stdio/nascom/fgetc_cons
 stdio/nascom/getk
 stdio/nascom/fputc_cons
+stdio/nascom/generic_console
 @stdio/ansicore.lst
 stdio/ansi/nascom/f_ansi_attr
 stdio/ansi/nascom/f_ansi_bel
@@ -29,5 +30,3 @@ graphics/stencil_render2
 graphics/nascom/swapgfxbk
 games/joystick
 @z80.lst
-stdio/generic/fputc_cons_generic
-stdio/nascom/generic_console

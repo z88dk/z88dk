@@ -3,6 +3,7 @@
 stdio/zx81/fgetc_cons
 stdio/zx81/getk
 stdio/zx81/fputc_cons
+stdio/zx81/generic_console
 @stdio/ansicore.lst
 stdio/ansi/zx81/f_ansi_attr
 stdio/ansi/zx81/f_ansi_bel
@@ -28,5 +29,3 @@ psg/zx81/get_psg
 psg/zx81/psg_init
 @psg/psg.lst
 @z80.lst
-stdio/generic/fputc_cons_generic
-stdio/zx81/generic_console

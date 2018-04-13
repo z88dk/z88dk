@@ -17,31 +17,17 @@
 		SECTION		code_clib
 		PUBLIC		fputc_cons_generic
 		PUBLIC		_fputc_cons_generic
-		PUBLIC		fputc_cons_generic_setmode
-		PUBLIC		_fputc_cons_generic_setmode
 
 		; Variables that can be adjusted by platform specific code
 		PUBLIC		generic_console_w
 		PUBLIC		generic_console_h
+		PUBLIC		generic_console_flags
 
 		EXTERN		CONSOLE_ROWS
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		generic_console_scrollup
 		EXTERN		generic_console_printc
 		EXTERN		generic_console_cls
-
-; void fputc_generic_setmode(char raw) __z88dk_fastcall
-;
-; Put the console into raw mode so characters passed through verbatim
-fputc_cons_generic_setmode:
-_fputc_cons_generic_setmode:
-	ld	a,l
-	ld	hl,flags
-	res	6,(hl)
-	and	a
-	ret	z
-	set	6,(hl)
-	ret
 
 
 ; extern int __LIB__ fputc_cons(char c);
@@ -51,7 +37,7 @@ _fputc_cons_generic:
 	add	hl,sp
 	ld	a,(hl)
 	ld	bc,(generic_x)		;coordinates
-	ld	hl,flags
+	ld	hl,generic_console_flags
 	bit	0,(hl)
 	jr	nz,set_y
 	bit	1,(hl)
@@ -80,7 +66,7 @@ _fputc_cons_generic:
 	ld	e,0		;translate mode
 handle_character:
 	; At this point:
-	;hl = flags
+	;hl = generic_console_flags
 	; c = x position 
 	; b = y position
 	; a = character to print
@@ -198,7 +184,7 @@ handle_cr:
 	cp	b
 	jr	nz,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
-	ld	a,(flags)
+	ld	a,(generic_console_flags)
 	rlca
 	call	nc,generic_console_scrollup
 
@@ -224,7 +210,7 @@ generic_console_h:	defb	CONSOLE_ROWS
 
 generic_x:	defb	0
 generic_y:	defb	0
-flags:		defb	0		; bit 0 = set x
+generic_console_flags:		defb	0		; bit 0 = set x
 					; bit 1 = set y
 					; bit 2 = set vertical scroll
 					; bit 6 = raw mode

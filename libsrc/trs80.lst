@@ -2,6 +2,7 @@
 stdio/trs80/fgetc_cons
 stdio/trs80/fputc_cons
 stdio/trs80/getk
+stdio/trs80/generic_console
 psg/trs80/set_psg
 psg/trs80/set_psg_callee
 psg/trs80/get_psg
@@ -13,5 +14,3 @@ games/trs80/bit_close
 games/trs80/bit_close_ei
 @games/games.lst
 @z80.lst
-stdio/generic/fputc_cons_generic
-stdio/trs80/generic_console

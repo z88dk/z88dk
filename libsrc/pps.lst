@@ -3,6 +3,7 @@ stdio/sprinter/puts_cons
 stdio/sprinter/fgetc_cons
 stdio/sprinter/fputc_cons
 stdio/sprinter/getk
+stdio/sprinter/generic_console
 @stdio/ansicore.lst
 stdio/ansi/sprinter/f_ansi_attr
 stdio/ansi/sprinter/f_ansi_bel
@@ -36,5 +37,3 @@ psg/spectrum/get_psg
 psg/spectrum/psg_init
 @psg/psg.lst
 @z80.lst
-stdio/generic/fputc_cons_generic
-stdio/sprinter/generic_console

@@ -2,6 +2,7 @@
 stdio/vz200/fgetc_cons
 stdio/vz200/fputc_cons
 stdio/vz200/getk
+stdio/vz200/generic_console
 @stdio/ansicore.lst
 stdio/ansi/vz200/f_ansi_attr
 stdio/ansi/vz200/f_ansi_bel
@@ -60,5 +61,3 @@ vz/vz_sound_callee
 vz/vz_soundcopy
 vz/vz_soundcopy_callee
 @z80.lst
-stdio/generic/fputc_cons_generic
-stdio/vz200/generic_console

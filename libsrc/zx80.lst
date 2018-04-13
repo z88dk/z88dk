@@ -4,6 +4,7 @@ stdio/zx80/fgetc_cons
 stdio/zx80/getk
 stdio/zx80/zx80_decode_keys
 stdio/zx81/fputc_cons
+stdio/zx81/generic_console
 @stdio/ansicore.lst
 stdio/ansi/zx81/f_ansi_bel
 stdio/ansi/zx81/text/f_ansi_attr
@@ -46,5 +47,3 @@ psg/zx81/get_psg
 psg/zx81/psg_init
 @psg/psg.lst
 @z80.lst
-stdio/generic/fputc_cons_generic
-stdio/zx81/generic_console
