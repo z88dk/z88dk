@@ -21,8 +21,9 @@
                 PUBLIC    surface_circle
                 PUBLIC    _surface_circle
                 
-                ;EXTERN     swapgfxbk
+                EXTERN     swapgfxbk
                 ;EXTERN    swapgfxbk1
+				EXTERN	__graphics_end
                 
 		EXTERN	base_graphics
 
@@ -50,9 +51,11 @@
 		ld	c,(ix+6)	;y
 		ld	b,(ix+8)	;x
 
-		;call    swapgfxbk
+		call    swapgfxbk
                 ld      ix,surface_plotpixel
                 call    draw_circle
                 ;jp      swapgfxbk1
-		pop	ix		;restore callers
-                ret
+		;pop	ix		;restore callers
+        ;        ret
+		
+		jp	__graphics_end
