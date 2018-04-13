@@ -449,10 +449,16 @@ ENDIF
 IF !DEFINED_fputc_cons
 	PUBLIC		fputc_cons
 	PUBLIC		_fputc_cons
-	EXTERN		fputc_cons_native
 	defc DEFINED_fputc_cons = 1
-	defc fputc_cons = fputc_cons_native
-	defc _fputc_cons = fputc_cons_native
+        IF !TAR__fputc_cons_generic
+	     EXTERN	fputc_cons_native
+  	     defc fputc_cons = fputc_cons_native
+	     defc _fputc_cons = fputc_cons_native
+        ELSE
+	     EXTERN	fputc_cons_generic
+  	     defc fputc_cons = fputc_cons_generic
+	     defc _fputc_cons = fputc_cons_generic
+        ENDIF
 ENDIF
 
 ; And the fallback puts_cons implementation
