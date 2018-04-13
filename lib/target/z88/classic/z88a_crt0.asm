@@ -152,7 +152,7 @@ ENDIF
         call    _main		;Call the users code
         xor     a		;Exit with zero 
 cleanup:			;Jump back to here from exit()
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	push	af		;Save exit value
 	EXTERN	closeall
 	call	closeall	;Close all files

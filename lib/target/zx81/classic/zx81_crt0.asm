@@ -208,7 +208,7 @@ cleanup:
 ;
         push    hl		; keep return code
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF

@@ -146,7 +146,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF
@@ -306,7 +306,7 @@ ENDIF
         SECTION rodata_clib
 IF (startup=2)
 IF !DEFINED_noredir
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 redir_fopen_flag:	defb	'w',0
 redir_fopen_flagr:	defb	'r',0
 ENDIF
