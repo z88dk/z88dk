@@ -22,20 +22,21 @@ Contact the author:
 #include <math.h>
 #include <msx/gfx.h>
 
-#ifndef __MSX__
 char sprite0[] = {
  0x00 , 0x07 , 0x6C , 0x1B , 0xC8 , 0x6C , 0x0C , 0x34,
  0x34 , 0x0C , 0x6C , 0xC8 , 0x1B , 0x6C , 0x07 , 0x00,
  0x00 , 0x80 , 0xE0 , 0x30 , 0x18 , 0xEC , 0xB6 , 0x93,
  0x93 , 0xB6 , 0xEC , 0x18 , 0x30 , 0xE0 , 0x80 , 0x00,  };
-#endif
+
 
 typedef struct {
 	int x;
 	int y;
 } point_t;
 
+
 #define MAX_POINT	256
+
 
 void main() {
 	double	m_pi;
@@ -77,10 +78,8 @@ void main() {
 	//set_sprite_16(0, (void*)(0x1BBF + 8));
 	// ..equivalent to:  msx_vwrite((void*)(0x1BBF + 8), 14336, 32);
 
-#ifndef __MSX__
 	// internally stored sprite option
 	set_sprite_16(0, sprite0);
-#endif
 		
 	while (!get_trigger(0)) 
 		for (c = 0; c < MAX_POINT; c++) { // for each starting point
