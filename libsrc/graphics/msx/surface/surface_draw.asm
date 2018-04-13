@@ -21,8 +21,10 @@
                 PUBLIC    surface_draw
                 PUBLIC    _surface_draw
                 
-                ;EXTERN     swapgfxbk
+                EXTERN     swapgfxbk
                 ;EXTERN    swapgfxbk1
+				
+		EXTERN __graphics_end
                 
 		EXTERN	base_graphics
 
@@ -36,8 +38,8 @@
 		ld	ix,2
 		add	ix,sp
 
-		ld	l,(ix+10)	; surface struct
-		ld	h,(ix+11)
+		ld	l,(ix+12)	; surface struct
+		ld	h,(ix+13)
 		ld	de,6		; shift to screen buffer ptr
 		add	hl,de
 		ld	e,(hl)
@@ -45,11 +47,11 @@
 		ld	d,(hl)
 		ld	(base_graphics),de
 
-		ld	l,(ix+6)	;y0
-		ld	h,(ix+8)	;x0
-		ld	e,(ix+2)	;y1
-		ld	d,(ix+4)	;x1
-		;call    swapgfxbk
+		ld	l,(ix+8)	;y0
+		ld	h,(ix+10)	;x0
+		ld	e,(ix+4)	;y1
+		ld	d,(ix+6)	;x1
+		call    swapgfxbk
 		push	hl
 		push    de
 		call	surface_plotpixel
@@ -58,5 +60,7 @@
                 ld      ix,surface_plotpixel
                 call    Line
                 ;jp      swapgfxbk1
-		pop	ix	;restore callers
-                ret
+				
+		jp	__graphics_end
+		;pop	ix	;restore callers
+        ;        ret
