@@ -23,14 +23,19 @@ CFILES = \
 	ex10.c \
 	ex10b.c \
 	ex11.c \
-	showlib3d.c
+	showlib3d.c \
+	vpoke.c
+
 
 EXECFILES = $(CFILES:.c=.cas)
 
-all: $(EXECFILES)
+all: $(EXECFILES) ex8.com
 
+ex8.com: ex8.c
+	zcc +msx -subtype=msxdos -create-app -oex8 ex8.c
+ 
 %.cas: %.c
 	$(CC) $(CFLAGS) -o$*.bin $*.c
 
 clean:
-	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas
+	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas *.COM
