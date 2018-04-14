@@ -3262,3 +3262,12 @@
 	ld	hl,%1	;const
 	add	hl,sp
 	push	hl
+
+	push	de
+	push	hl
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+=
+	push	de
+	push	hl
