@@ -1664,6 +1664,9 @@ void PrintCR()
 void ClearScr()
 {
 	putchar(12);
+#ifdef PICS
+	clg();
+#endif
 	/*
 	int n;
 	for (n = 0; n < 50; ++n)
