@@ -29,7 +29,7 @@ CFILES = \
 
 EXECFILES = $(CFILES:.c=.cas)
 
-all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas
+all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 
 #ex8.com: ex8.c
 #	$(CC) +cpm -create-app -lsvicpm -oex8 ex8.c
@@ -52,6 +52,11 @@ wall.cas: ../wall.c
 globe.cas: ../graphics/globe.c
 	$(CC) $(CFLAGS) ../graphics/globe.c -I../graphics -create-app -pragma-redirect=fputc_cons=putc4x6 -oglobe.bin
 
+snakes.cas: ../graphics/snakes.c
+	$(CC) $(CFLAGS) ../graphics/snakes.c -I../graphics -DJOYSTICK_DIALOG -DSPEED=1500 -DPSG -create-app -osnakes.bin
+	
+vtstone.cas: ../console/vtstone.c
+	$(CC) $(CFLAGS) ../console/vtstone.c -I../console -clib=ansi -pragma-define:ansicolumns=80 -create-app -ovtstone.bin
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.cas
