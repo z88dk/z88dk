@@ -1,7 +1,7 @@
 #
 # Examples for MSX 
 #
-# $Id: Makefile $
+# $Id: Makefile,v 1.3 2016-07-02 10:38:28 dom Exp $
 #
 
 #include ../../libsrc/Make.config
@@ -29,10 +29,13 @@ CFILES = \
 
 EXECFILES = $(CFILES:.c=.cas)
 
-all: $(EXECFILES) ex8.com dstar.cas microman.cas othello.cas wall.cas globe.cas
+all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas
 
-ex8.com: ex8.c
-	$(CC) +msx -subtype=msxdos -create-app -oex8 ex8.c
+EX8.COM: ex8.c
+	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c
+
+ADVA.COM: ../console/adv_a.c
+	$(CC) +msx -vn -subtype=msxdos ../console/adv_a.c -I../console -DCOMPUTE_SCORE -DPICS -DDISK -create-app -clib=ansi -oadva.bin
 
 %.cas: %.c
 	$(CC) $(CFLAGS) -o$*.bin $*.c
@@ -51,6 +54,9 @@ wall.cas: ../wall.c
 
 globe.cas: ../graphics/globe.c
 	$(CC) $(CFLAGS) ../graphics/globe.c -I../graphics -create-app -pragma-redirect=fputc_cons=putc4x6 -oglobe.bin
+
+snakes.cas: ../graphics/snakes.c
+	$(CC) $(CFLAGS) ../graphics/snakes.c -I../graphics -DJOYSTICK_DIALOG -DSPEED=1500 -DPSG -create-app -osnakes.bin
 
 
 clean:
