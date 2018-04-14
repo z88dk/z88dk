@@ -1,7 +1,7 @@
 #
 # Examples for MSX 
 #
-# $Id: Makefile,v 1.3 2016-07-02 10:38:28 dom Exp $
+# $Id: Makefile $
 #
 
 #include ../../libsrc/Make.config
@@ -29,7 +29,7 @@ CFILES = \
 
 EXECFILES = $(CFILES:.c=.cas)
 
-all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas
+all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 
 EX8.COM: ex8.c
 	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c
@@ -57,6 +57,9 @@ globe.cas: ../graphics/globe.c
 
 snakes.cas: ../graphics/snakes.c
 	$(CC) $(CFLAGS) ../graphics/snakes.c -I../graphics -DJOYSTICK_DIALOG -DSPEED=1500 -DPSG -create-app -osnakes.bin
+	
+vtstone.cas: ../console/vtstone.c
+	$(CC) $(CFLAGS) ../console/vtstone.c -I../console -clib=ansi -pragma-define:ansicolumns=80 -create-app -ovtstone.bin
 
 
 clean:
