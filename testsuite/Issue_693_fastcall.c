@@ -16,3 +16,8 @@ void func2(int c) __z88dk_fastcall
 {
     call(c);
 }
+
+void func3(unsigned char d, unsigned char c) __z88dk_fastcall
+{
+    call(d);
+}

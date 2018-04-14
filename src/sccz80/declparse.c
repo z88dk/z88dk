@@ -1615,7 +1615,7 @@ static void declfunc(Type *type, enum storage_type storage)
                     Type *arg = array_get_byindex(currfn->ctype->parameters, i);
                     ptr = findloc(arg->name);
                     if ( ptr ) {
-                        ptr->offset.i -= type->size;
+                        ptr->offset.i -= get_parameter_size(currfn->ctype,type);
                     }
                 }
             }
