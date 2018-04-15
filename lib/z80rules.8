@@ -115,3 +115,63 @@
 	or	(hl)
 	ld	l,a
 	ld	h,0
+
+	ld	hl,(_%1)
+	ld	h,0
+	ex	de,hl
+	ld	hl,(_%2)
+	ld	h,0
+	call	l_or
+=
+	ld	hl,_%1
+	ld	a,(_%2)
+	or	(hl)
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	xor	%1
+	ld	l,a
+	ld	h,0
+=
+	xor	%1
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	ld	h,0
+=
+	ld	h,0
+
+	ld	a,l
+	ld	l,a
+=
+	ld	a,l
+
+	ld	h,0
+	ld	a,l
+	rlca
+	sbc	a,a
+	ld	h,a
+=
+	ld	a,l
+	rlca
+	sbc	a,a
+	ld	h,a
+
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,(_%1)
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	call	l_xor
+=
+	ld	e,(hl)
+	ld	hl,(_%1)
+	ld	a,(hl)
+	xor	e
+	ld	l,a
+	ld	h,0
