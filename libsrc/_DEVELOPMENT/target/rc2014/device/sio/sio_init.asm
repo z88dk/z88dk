@@ -11,7 +11,6 @@
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     _sio_init:
-
         call asm_z80_push_di        ; di
 
         ; initialise the SIO interrupt vectors in preamble for IM 2
@@ -31,7 +30,7 @@
         call _sioa_reset            ; reset and empty the SIOA Tx & Rx buffers
         call _siob_reset            ; reset and empty the SIOB Tx & Rx buffers
 
-        jp asm_z80_pop_ei_jp        ; ei
+        jp asm_z80_pop_ei_jp        ; ei ret
 
 
     ; Initialise the I/O ports from an array of addresses and values

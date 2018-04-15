@@ -17,6 +17,7 @@
         ;            carry reset
         ; modifies : af, hl
 
+        di
         ld a,(siobTxCount)          ; get the number of bytes in the Tx buffer
         or a                        ; check whether the buffer is empty
         jr NZ,putc_buffer_tx        ; buffer not empty, so abandon immediate Tx
@@ -31,6 +32,7 @@
         out (__IO_SIOB_DATA_REGISTER),a ; output the Tx byte to the SIOB
 
         ld l,0                      ; indicate Tx buffer was not full
+        ei
         ret                         ; and just complete
 
     putc_buffer_tx:
@@ -39,10 +41,15 @@
         ld a,l                      ; Tx byte
 
         ld l,1
+        ei
         ret NC                      ; buffer full, so drop the Tx byte and return
 
-        ld hl, (siobTxIn)           ; get the pointer to where we poke
-        ld (hl), a                  ; write the Tx byte to the siobTxIn
+        di
+        ld hl,siobTxCount
+        inc (hl)                    ; atomic increment of Tx count
+        ld hl,(siobTxIn)            ; get the pointer to where we poke
+        ei
+        ld (hl),a                   ; write the Tx byte to the siobTxIn
 
         ld a,l                      ; check if Tx pointer is at the end of its range
         cp +(siobTxBuffer + __IO_SIO_TX_SIZE - 1)&0xff
@@ -51,9 +58,6 @@
 
     putc_buffer_tx_adjusted:
         ld (siobTxIn), hl           ; write where the next byte should be poked
-
-        ld hl, siobTxCount
-        inc (hl)                    ; atomic increment of Tx count
 
         ld l, 0                     ; indicate Tx buffer was not full
         ret

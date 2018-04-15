@@ -103,6 +103,10 @@ define(`__IO_SIO_WR5_TX_8BIT', 0x60)
 
 define(`__IO_SIO_WR5_TX_DTR', 0x80)
 
+# Write Register 6 (SDLC SYNC LSB)
+
+# Write Register 7 (SDLC SYNC MSB)
+
 # Read Register 0
 
 define(`__IO_SIO_RR0_RX_CHAR', 0x01)

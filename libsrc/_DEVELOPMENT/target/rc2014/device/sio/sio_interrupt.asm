@@ -29,6 +29,8 @@ __siob_interrupt_tx_empty:          ; start doing the SIOB Tx stuff
         or a                        ; check whether it is zero
         jr Z,siob_tx_int_pend       ; if the count is zero, disable the Tx Interrupt and exit
 
+        ld hl,siobTxCount
+        dec (hl)                    ; atomically decrement current Tx count
         ld hl,(siobTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
         out (__IO_SIOB_DATA_REGISTER),a ; output the Tx byte to the SIOB
@@ -40,9 +42,6 @@ __siob_interrupt_tx_empty:          ; start doing the SIOB Tx stuff
 
 siob_tx_buffer_adjusted:
         ld (siobTxOut),hl           ; write where the next byte should be popped
-
-        ld hl,siobTxCount
-        dec (hl)                    ; atomically decrement current Tx count
 
 siob_tx_end:                        ; if we've more Tx bytes to send, we're done for now
         pop hl
@@ -75,33 +74,32 @@ siob_rx_get:
         jr NC, siob_rx_check        ; buffer full, check whether we need to drain H/W FIFO
 
         ld a,l                      ; get Rx byte from l
+        ld hl,siobRxCount
+        inc (hl)                    ; atomically increment Rx buffer count
         ld hl,(siobRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the siobRxIn target
 
         inc l                       ; move the Rx pointer low byte along, 0xFF rollover
         ld (siobRxIn),hl            ; write where the next byte should be poked
 
-        ld hl,siobRxCount
-        inc (hl)                    ; atomically increment Rx buffer count
-
-        ld a,(hl)                   ; get the current Rx count
-        cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
-        jr C, siob_rx_check         ; if the buffer is fullish reset the RTS line
+;       ld a,(siobRxCount)          ; get the current Rx count
+;       cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
+;       jr C, siob_rx_check         ; if the buffer is fullish reset the RTS line
                                     ; this means getting characters will be slower
                                     ; when the buffer is fullish,
                                     ; but we stop the lemmings.
 
-        ld a,__IO_SIO_WR0_R5        ; prepare for a read from R5
-        out (__IO_SIOB_CONTROL_REGISTER),a  ; write to SIOB control register
-        in a,(__IO_SIOB_CONTROL_REGISTER)   ; read from the SIOB R5 register
-        ld l,a                      ; put it in L
+;       ld a,__IO_SIO_WR0_R5        ; prepare for a read from R5
+;       out (__IO_SIOB_CONTROL_REGISTER),a  ; write to SIOB control register
+;       in a,(__IO_SIOB_CONTROL_REGISTER)   ; read from the SIOB R5 register
+;       ld l,a                      ; put it in L
         
-        ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
-        out (__IO_SIOB_CONTROL_REGISTER),a  ; write to SIOB control register
+;       ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
+;       out (__IO_SIOB_CONTROL_REGISTER),a  ; write to SIOB control register
 
-        ld a,~__IO_SIO_WR5_RTS      ; clear RTS
-        and l                       ; with previous contents of R5
-        out (__IO_SIOB_CONTROL_REGISTER),a  ; write the SIOB R5 register
+;       ld a,~__IO_SIO_WR5_RTS      ; clear RTS
+;       and l                       ; with previous contents of R5
+;       out (__IO_SIOB_CONTROL_REGISTER),a  ; write the SIOB R5 register
 
 siob_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
         xor a                       ; prepare to read from Read Register 0
@@ -110,10 +108,7 @@ siob_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
         rrca                        ; test whether we have received on SIOB
         jr C,siob_rx_get            ; if still more bytes in H/W FIFO, get them
 
-        ld a,__IO_SIO_WR0_RX_INT_FIRST_REENABLE ; otherwise reenable the Rx interrupt
-        out (__IO_SIOB_CONTROL_REGISTER),a      ; into the SIOB control register
-
-        pop hl                      ; and clean up
+        pop hl                      ; or clean up
         pop af
         ei
         reti
@@ -150,6 +145,8 @@ __sioa_interrupt_tx_empty:          ; start doing the SIOA Tx stuff
         or a                        ; check whether it is zero
         jr Z,sioa_tx_int_pend       ; if the count is zero, disable the Tx Interrupt and exit
 
+        ld hl,sioaTxCount
+        dec (hl)                    ; atomically decrement current Tx count
         ld hl,(sioaTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
         out (__IO_SIOA_DATA_REGISTER),a ; output the Tx byte to the SIOA
@@ -161,9 +158,6 @@ __sioa_interrupt_tx_empty:          ; start doing the SIOA Tx stuff
 
 sioa_tx_buffer_adjusted:
         ld (sioaTxOut),hl           ; write where the next byte should be popped
-
-        ld hl,sioaTxCount
-        dec (hl)                    ; atomically decrement current Tx count
 
 sioa_tx_end:                        ; if we've more Tx bytes to send, we're done for now
         pop hl
@@ -196,33 +190,32 @@ sioa_rx_get:
         jr NC, sioa_rx_check        ; buffer full, check whether we need to drain H/W FIFO
 
         ld a,l                      ; get Rx byte from l
+        ld hl,sioaRxCount
+        inc (hl)                    ; atomically increment Rx buffer count
         ld hl,(sioaRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the sioaRxIn target
 
         inc l                       ; move the Rx pointer low byte along, 0xFF rollover
         ld (sioaRxIn),hl            ; write where the next byte should be poked
 
-        ld hl,sioaRxCount
-        inc (hl)                    ; atomically increment Rx buffer count
-
-        ld a,(hl)                   ; get the current Rx count
-        cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
-        jr C, sioa_rx_check         ; if the buffer is fullish reset the RTS line
+;       ld a,(sioaRxCount)          ; get the current Rx count
+;       cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
+;       jr C, sioa_rx_check         ; if the buffer is fullish reset the RTS line
                                     ; this means getting characters will be slower
                                     ; when the buffer is fullish,
                                     ; but we stop the lemmings.
 
-        ld a,__IO_SIO_WR0_R5        ; prepare for a read from R5
-        out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
-        in a,(__IO_SIOA_CONTROL_REGISTER)   ; read from the SIOA R5 register
-        ld l,a                      ; put it in L
+;       ld a,__IO_SIO_WR0_R5        ; prepare for a read from R5
+;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
+;       in a,(__IO_SIOA_CONTROL_REGISTER)   ; read from the SIOA R5 register
+;       ld l,a                      ; put it in L
         
-        ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
-        out (__IO_SIOA_CONTROL_REGISTER),a   ; write to SIOA control register
+;       ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
+;       out (__IO_SIOA_CONTROL_REGISTER),a   ; write to SIOA control register
 
-        ld a,~__IO_SIO_WR5_RTS      ; clear RTS
-        and l                       ; with previous contents of R5
-        out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
+;       ld a,~__IO_SIO_WR5_RTS      ; clear RTS
+;       and l                       ; with previous contents of R5
+;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
 
 sioa_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
         xor a                       ; prepare to read from Read Register 0
@@ -231,10 +224,7 @@ sioa_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
         rrca                        ; test whether we have received on SIOA
         jr C,sioa_rx_get            ; if still more bytes in H/W FIFO, get them
 
-        ld a,__IO_SIO_WR0_RX_INT_FIRST_REENABLE ; otherwise reenable the Rx interrupt
-        out (__IO_SIOA_CONTROL_REGISTER),a      ; into the SIOA control register
-
-        pop hl                      ; and clean up
+        pop hl                      ; or clean up
         pop af
         ei
         reti
