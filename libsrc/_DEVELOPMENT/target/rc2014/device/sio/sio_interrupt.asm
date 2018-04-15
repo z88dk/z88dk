@@ -33,6 +33,7 @@ __siob_interrupt_tx_empty:          ; start doing the SIOB Tx stuff
         dec (hl)                    ; atomically decrement current Tx count
         ld hl,(siobTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
+        ei
         out (__IO_SIOB_DATA_REGISTER),a ; output the Tx byte to the SIOB
 
         ld a,l                      ; check if Tx pointer is at the end of its range
@@ -102,8 +103,6 @@ siob_rx_get:
 ;       out (__IO_SIOB_CONTROL_REGISTER),a  ; write the SIOB R5 register
 
 siob_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
-        xor a                       ; prepare to read from Read Register 0
-        out (__IO_SIOB_CONTROL_REGISTER),a  ; into the SIOB control register
         in a,(__IO_SIOB_CONTROL_REGISTER)   ; get the SIOB register R0
         rrca                        ; test whether we have received on SIOB
         jr C,siob_rx_get            ; if still more bytes in H/W FIFO, get them
@@ -149,6 +148,7 @@ __sioa_interrupt_tx_empty:          ; start doing the SIOA Tx stuff
         dec (hl)                    ; atomically decrement current Tx count
         ld hl,(sioaTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
+        ei
         out (__IO_SIOA_DATA_REGISTER),a ; output the Tx byte to the SIOA
 
         ld a,l                      ; check if Tx pointer is at the end of its range
@@ -218,8 +218,6 @@ sioa_rx_get:
 ;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
 
 sioa_rx_check:                      ; SIO has 4 byte Rx H/W FIFO
-        xor a                       ; prepare to read from Read Register 0
-        out (__IO_SIOA_CONTROL_REGISTER),a  ; into the SIOA control register
         in a,(__IO_SIOA_CONTROL_REGISTER)   ; get the SIOA register R0
         rrca                        ; test whether we have received on SIOA
         jr C,sioa_rx_get            ; if still more bytes in H/W FIFO, get them

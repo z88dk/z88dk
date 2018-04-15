@@ -22,8 +22,6 @@
         or a                        ; check whether the buffer is empty
         jr NZ,putc_buffer_tx        ; buffer not empty, so abandon immediate Tx
 
-        xor a                       ; prepare to read from Read Register 0
-        out (__IO_SIOA_CONTROL_REGISTER),a  ; into the SIOA control register
         in a,(__IO_SIOA_CONTROL_REGISTER)   ; get the SIOA register R0
         and __IO_SIO_RR0_TX_EMPTY   ; test whether we can transmit on SIOA
         jr Z,putc_buffer_tx         ; if not, so abandon immediate Tx
@@ -38,13 +36,9 @@
     putc_buffer_tx:
         ld a,(sioaTxCount)          ; Get the number of bytes in the Tx buffer
         cp __IO_SIO_TX_SIZE-1       ; check whether there is space in the buffer
+        jp NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
+        
         ld a,l                      ; Tx byte
-
-        ld l,1
-        ei
-        ret NC                      ; buffer full, so drop the Tx byte and return
-
-        di
         ld hl,sioaTxCount
         inc (hl)                    ; atomic increment of Tx count
         ld hl,(sioaTxIn)            ; get the pointer to where we poke
@@ -56,15 +50,20 @@
         jr Z,putc_buffer_tx_reset   ; if at end of range, reset Tx pointer to start of Tx buffer
         inc hl                      ; else advance to next byte in Tx buffer
 
-    putc_buffer_tx_adjusted:
+    putc_buffer_tx_exit:
         ld (sioaTxIn), hl           ; write where the next byte should be poked
-
-        ld l, 0                     ; indicate Tx buffer was not full
+        ld l,0                      ; indicate Tx buffer was not full
         ret
 
     putc_buffer_tx_reset:
         ld hl,sioaTxBuffer          ; move tx buffer pointer back to start of buffer
-        jr putc_buffer_tx_adjusted
+        jr putc_buffer_tx_exit
+
+    putc_buffer_tx_overflow:
+        ld l,1                      ; indicate Tx buffer was full
+        ei
+        ret
+
 
     EXTERN _sio_need
     defc NEED = _sio_need
