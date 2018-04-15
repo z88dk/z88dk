@@ -1076,6 +1076,11 @@ void scale(Kind type, Type *tag)
 void quikmult(int type, int32_t size, char preserve)
 {
     if ( type == KIND_LONG ) {
+        LVALUE lval = {0};
+
+        lval.val_type = type;
+        lval.ltype = type_long;
+
         /* Normal long multiplication is:
            push, push, ld hl, ld de, call l_long_mult = 11 bytes
         */
@@ -1154,6 +1159,9 @@ void quikmult(int type, int32_t size, char preserve)
                 ol("ex\tde,hl");
                 ol("adc\thl,bc");
                 ol("ex\tde,hl");
+                break;
+            case 8192:
+                asl_const(&lval, 13);
                 break;
             default:
                 lpush();       
@@ -2319,7 +2327,7 @@ void asl_16bit_const(LVALUE *lval, int value)
 
 void asl_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == KIND_LONG  ) { 
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR  ) { 
         switch ( value ) {
         case 0: 
             return;
