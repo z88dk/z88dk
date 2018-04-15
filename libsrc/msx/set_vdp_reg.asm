@@ -16,7 +16,11 @@
 	PUBLIC	_set_vdp_reg
 	EXTERN	msxbios
 	
+IF FORmsx
         INCLUDE "target/msx/def/msxbios.def"
+ELSE
+        INCLUDE "target/svi/def/svibios.def"
+ENDIF
 
 set_vdp_reg:
 _set_vdp_reg:

@@ -1,5 +1,5 @@
 #
-# Examples for MSX 
+# Examples for Spectravideo SVI 
 #
 # $Id: Makefile $
 #
@@ -7,7 +7,7 @@
 #include ../../libsrc/Make.config
 
 CC = zcc
-CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app
+CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app
 
 
 CFILES = \
@@ -29,16 +29,13 @@ CFILES = \
 
 EXECFILES = $(CFILES:.c=.cas)
 
-all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
+all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 
-EX8.COM: ex8.c
-	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c
+#ex8.com: ex8.c
+#	$(CC) +cpm -create-app -lsvicpm -oex8 ex8.c
 
-ADVA.COM: ../console/adv_a.c
-	$(CC) +msx -vn -subtype=msxdos ../console/adv_a.c -I../console -DCOMPUTE_SCORE -DPICS -DDISK -create-app -clib=ansi -oadva.bin
-
-%.cas: %.c
-	$(CC) $(CFLAGS) -o$*.bin $*.c
+%.cas: ../msx/%.c
+	$(CC) $(CFLAGS) -o$*.bin ../msx/$*.c
 
 dstar.cas: ../dstar.c
 	$(CC) $(CFLAGS) ../dstar.c -I.. -Dspritesize=16 -DSOUND -create-app -odstar.bin
@@ -61,6 +58,5 @@ snakes.cas: ../graphics/snakes.c
 vtstone.cas: ../console/vtstone.c
 	$(CC) $(CFLAGS) ../console/vtstone.c -I../console -clib=ansi -pragma-define:ansicolumns=80 -create-app -ovtstone.bin
 
-
 clean:
-	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas *.COM
+	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.cas

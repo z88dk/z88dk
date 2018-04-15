@@ -85,7 +85,7 @@ extern void __LIB__ *intrinsic_return_de(void) __smallc;
 
 
 
-extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned long n) __smallc __z88dk_fastcall;
+extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __smallc __z88dk_fastcall;
 
 
 extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __smallc __z88dk_fastcall;

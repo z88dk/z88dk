@@ -153,6 +153,11 @@
 	add	hl,hl
 	rl	de
 
+	rl	e
+	rl	d
+=
+	rl	de
+
 %check -128 <= %1 <= 126
 	inc	hl
 	ld	hl,(hl + %1)

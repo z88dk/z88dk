@@ -10,8 +10,11 @@
 	EXTERN	surface_pixeladdress
 	EXTERN	__gfx_coords
 
+	EXTERN	__graphics_end
+	EXTERN swapgfxbk
+
 ;
-;	$Id: surface_plotpixl.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
+;	$Id: surface_plotpixl.asm $
 ;
 
 ; ******************************************************************
@@ -41,6 +44,9 @@
 				
 				ld	(__gfx_coords),hl
 
+				call	swapgfxbk
+				push	ix
+				
 				push	bc
 				call	surface_pixeladdress
 				ld	b,a
@@ -52,4 +58,4 @@
 				or	(hl)
 				ld	(hl),a
 				pop	bc
-				ret
+				jp __graphics_end
