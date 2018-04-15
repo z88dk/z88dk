@@ -392,7 +392,6 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
                 } else {
                     convSint2long();
                 }
-                convSint2long();
                 lval->ltype = type_long;
             }
             lval->val_type = KIND_LONG;
