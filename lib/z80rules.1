@@ -3271,3 +3271,235 @@
 =
 	push	de
 	push	hl
+
+	ld	de,%1
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ld	de,%2
+=
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ld	de,%2
+
+	call	l_glong
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+
+	ld	hl,(_%1)
+	ld	h,0
+	add	hl,de
+	ld	h,0
+	ld	a,l
+	ld	(_%2),a
+	%3	hl%4
+=
+	ld	a,(_%1)
+	add	e
+	ld	(_%2),a
+	%3	hl%4
+
+	call	l_glong
+	ld	de,0
+=
+	call	l_gint
+	ld	de,0
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	cp	%2
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	cp	%2
+	ld	hl,%3
+
+	ld	h,0
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	h,0
+=
+	ld	h,0
+	ld	a,%2
+	and	l
+	ld	l,a
+
+	ld	l,(hl)
+	ld	h,0
+	call	l_sxt
+=
+	ld	a,(hl)
+	call	l_sxt
+
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_lneg
+	jp	nc,%2
+=
+	ld	a,(_%1)
+	and	a
+	jp	nz,%2
+
+	ld	l,(hl)
+	ld	h,0
+	call	l_lneg
+	jp	c,%1
+=
+	ld	a,(hl)
+	and	a
+	jp	z,%1
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	sub	%1
+	jp	%2c,%3
+=
+	ld	a,(hl)
+	sub	%1
+	jp	%2c,%3
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	call	l_sxt
+=
+	ld	a,(_%1)
+	ld	l,a
+	rla	
+	sbc	a
+	ld	h,a
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	%2
+	jp	z,%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	and	%2
+	jp	z,%3
+	ld	hl,%4
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	de,4
+	call	l_asr_u_hl_by_e
+=
+	ld	a,(_%1)
+	rra
+	rra
+	rra
+	rra
+	and	15
+	ld	l,a
+	ld	h,0
+
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	ld	de,0
+=
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,(hl)
+	and	%1
+	ld	l,a
+	ld	h,0
+	ld	de,0
+
+	ld	l,a
+	ld	h,0
+	ld	de,0
+	ld	a,h
+	or	l
+	jp	z,%2
+	ld	hl,%3
+=
+	and	a
+	jp	z,%2
+	ld	hl,%3
+
+	ld	d,(hl)	;broken
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ex	de,hl
+
+	push	hl
+	ld	l,(hl)
+	ld	h,0
+	srl	l
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	srl	(hl)
+
+	call	l_ghtonsint
+	ld	a,h
+	and	%1
+	ld	h,a
+	ld	l,0
+=
+	ld	a,(hl)
+	and	%1
+	ld	h,a
+	ld	l,0
+
+	and	%1
+	ld	h,a
+	ld	l,0
+	and	a
+	jp	z,%2
+	ld	hl,%3
+=
+	and	%1
+	jp	z,%2
+	ld	hl,%3

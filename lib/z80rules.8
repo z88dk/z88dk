@@ -74,3 +74,44 @@
 	ld	b,(hl)
 	ld	hl,%1
 	add	hl,bc
+
+	call	l_ghtonsint
+=
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+
+	ld	l,(hl)
+	ld	h,l
+	ld	l,0
+=
+	ld	h,(hl)
+	ld	l,0
+
+	ld	h,(hl)
+	ld	l,0
+	ex	de,hl
+=
+	ld	d,(hl)
+	ld	e,0
+
+	ld	l,a
+	ld	h,l
+	ld	l,0
+=
+	ld	h,a
+	ld	l,0
+
+	ld	hl,_%1
+	ld	d,(hl)
+	ld	e,0
+	ld	hl,(_%2)
+	ld	h,0
+	call	l_or
+=
+	ld	hl,_%1
+	ld	a,(_%2)
+	or	(hl)
+	ld	l,a
+	ld	h,0

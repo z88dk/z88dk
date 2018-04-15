@@ -1554,6 +1554,10 @@ void zdiv_const(LVALUE *lval, int32_t value)
             ol("ld\te,d");
             ol("ld\td,0");
             return;
+        } else if ( value == 8192 && utype(lval) ) {
+            // Shift 14 bits
+            asr_const(lval, 13);
+            return;
         } else if ( value == 65536 ) {
             swap();
             const2(0);
@@ -1683,6 +1687,9 @@ void zmod_const(LVALUE *lval, int32_t value)
             return;
         } else if ( value == 65536 * 256 && utype(lval)  ) {
             ol("ld\td,0");
+            return;
+        } else if ( value == 8192 && utype(lval) ) {
+            zand_const(lval, 8191);
             return;
         } else {
             lpush();
@@ -2094,8 +2101,8 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( (value == 11 || value == 12 || value == 13 || value == 14) && utype(lval) ) {
-            ol("ld\tl,h"); /* 12 bytes */
+        } else if ( (value == 11 || value == 12 || value == 13  || value == 14 ) && utype(lval) ) {
+            ol("ld\tl,h"); /* 12 bytes - shift by 8 initially */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
@@ -3255,6 +3262,11 @@ void convUint2long(void)
 /* Signed int to long */
 void convSint2long(void)
 {
+    // ol("ld\ta,h");
+    // ol("rla");
+    // ol("sbc\ta");
+    // ol("ld\te,a");
+    // ol("ld\td,a");
     callrts("l_int2long_s");
 }
 

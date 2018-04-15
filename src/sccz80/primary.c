@@ -270,7 +270,7 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 }
 
 /* Forces result, having type t2, to have type t1 */
-void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
+void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 {
     if (t2 == KIND_CARRY) {
         zcarryconv();
@@ -278,7 +278,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
 
     if (t1 == KIND_DOUBLE) {
         if (t2 != KIND_DOUBLE) {
-            convert_int_to_double(t2, sign2);
+            convert_int_to_double(t2, isunsigned2);
         }
     } else {
         if (t2 == KIND_DOUBLE) {
@@ -291,7 +291,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
         if (t2 != KIND_LONG ) {
-            if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY) {
+            if (isunsigned2 == NO && isunsigned1 == NO && t2 != KIND_CARRY) {
                 convSint2long();
             } else
                 convUint2long();
@@ -306,13 +306,13 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
         warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
         
     /* Char conversion */
-    if (t1 == KIND_CHAR && sign2 == NO && !isconst) {
-        if (sign1 == NO)
+    if (t1 == KIND_CHAR && isunsigned2 == NO && !isconst) {
+        if (isunsigned1 == NO)
             convSint2char();
         else
             convUint2char();
-    } else if (t1 == KIND_CHAR && sign2 == YES && !isconst) {
-        if (sign1 == NO)
+    } else if (t1 == KIND_CHAR && isunsigned2 == YES && !isconst) {
+        if (isunsigned1 == NO)
             convSint2char();
         else
             convUint2char();
@@ -378,10 +378,20 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
 
     if (lval->val_type == KIND_LONG) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
-            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
+            if ( lval->ltype->isunsigned ) {
+                if ( !lval2->ltype->isunsigned ) {
+                    // RHS is signed, 
+                    convSint2long();
+                } else {
+                    convUint2long();
+                }
                 lval->ltype = type_ulong;
-                convUint2long();
             } else {
+                if ( lval2->ltype->isunsigned ) {
+                    convUint2long();
+                } else {
+                    convSint2long();
+                }
                 convSint2long();
                 lval->ltype = type_long;
             }
