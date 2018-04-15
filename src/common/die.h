@@ -18,13 +18,13 @@ extern void die(char *msg, ...);
 extern void *check_alloc(void *p);
 #define Check_alloc(type, p)	((type)(p))
 
-#define Malloc(size)		check_alloc(malloc(size))
-#define Calloc(count,size)	check_alloc(calloc((cout), (size)))
-#define Realloc(p,size)		check_alloc(realloc((p), (size)))
-#define Free(p)				(free(p), (p) = NULL)
-#define Strdup(s)			Check_alloc(char*, strdup(s))
+#define xmalloc(size)		check_alloc(malloc(size))
+#define xcalloc(count,size)	check_alloc(calloc((cout), (size)))
+#define xrealloc(p,size)	check_alloc(realloc((p), (size)))
+#define xfree(p)			(free(p), (p) = NULL)
+#define xstrdup(s)			Check_alloc(char*, strdup(s))
 
-#define New(type)			Check_alloc(type*, calloc(1, sizeof(type)))
+#define xnew(type)			Check_alloc(type*, calloc(1, sizeof(type)))
 
 // file IO, die if error
 // maps internally FILE* -> fileno -> filename for error messages

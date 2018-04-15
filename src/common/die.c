@@ -39,7 +39,7 @@ static void add_open_file(FILE *stream, const char *filename)
 	if (fno >= utarray_len(open_files))
 		utarray_resize(open_files, fno + 1);
 	free(*(char**)utarray_eltptr(open_files, fno));
-	*(char**)utarray_eltptr(open_files, fno) = Strdup(filename);
+	*(char**)utarray_eltptr(open_files, fno) = xstrdup(filename);
 }
 
 static char *get_filename(FILE *fp)

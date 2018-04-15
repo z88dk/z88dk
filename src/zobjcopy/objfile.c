@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 symbol_t *symbol_new()
 {
-	symbol_t *sym = New(symbol_t);
+	symbol_t *sym = xnew(symbol_t);
 
 	utstring_new(sym->name);
 	utstring_new(sym->section);
@@ -31,7 +31,7 @@ void symbol_free(symbol_t *sym)
 	utstring_free(sym->name);
 	utstring_free(sym->section);
 	utstring_free(sym->filename);
-	Free(sym);
+	xfree(sym);
 }
 
 //-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ void symbol_free(symbol_t *sym)
 //-----------------------------------------------------------------------------
 expr_t *expr_new()
 {
-	expr_t *expr = New(expr_t);
+	expr_t *expr = xnew(expr_t);
 	utstring_new(expr->text);
 	utstring_new(expr->section);
 	utstring_new(expr->target_name);
@@ -57,7 +57,7 @@ void expr_free(expr_t *expr)
 	utstring_free(expr->section);
 	utstring_free(expr->target_name);
 	utstring_free(expr->filename);
-	Free(expr);
+	xfree(expr);
 }
 
 //-----------------------------------------------------------------------------
@@ -68,12 +68,13 @@ static UT_icd ut_byte_icd = { sizeof(byte_t),NULL,NULL,NULL };
 
 code_t *code_new()
 {
-	code_t *code = New(code_t);
+	code_t *code = xnew(code_t);
 	utarray_new(code->data, &ut_byte_icd);
 	utstring_new(code->section);
 	code->org = -1;
 	code->align = 1;
-
+	code->renamed = false;
+	code->deleted = false;
 	return code;
 }
 
@@ -81,52 +82,52 @@ void code_free(code_t *code)
 {
 	utarray_free(code->data);
 	utstring_free(code->section);
-	Free(code);
+	xfree(code);
 }
 
 //-----------------------------------------------------------------------------
 // signature
 //-----------------------------------------------------------------------------
-static enum file_type file_read_signature(file_t *file, FILE *fp)
+static enum file_type read_signature(FILE *fp, const char *filename,
+	UT_string *signature, int *version)
 {
-	file->type = is_none;
-	file->version = -1;
+	enum file_type type = is_none;
+	*version = -1;
 
 	char file_signature[SIGNATURE_SIZE + 1];
-	memset(file_signature, 0, sizeof(file_signature));
 
 	// read signature
 	if (fread(file_signature, sizeof(char), SIGNATURE_SIZE, fp) != SIGNATURE_SIZE)
-		die("error: signature not found in '%s'\n", utstring_body(file->filename));
+		die("error: signature not found in '%s'\n", filename);
 
 	if (strncmp(file_signature, SIGNATURE_OBJ, 6) == 0)
-		file->type = is_object;
+		type = is_object;
 	else if (strncmp(file_signature, SIGNATURE_LIB, 6) == 0)
-		file->type = is_library;
+		type = is_library;
 	else
-		die("error: file '%s' not object nor library\n", utstring_body(file->filename));
+		die("error: file '%s' not object nor library\n", filename);
 
-	utstring_clear(file->signature);
-	utstring_bincpy(file->signature, file_signature, SIGNATURE_SIZE);
+	utstring_clear(signature);
+	utstring_bincpy(signature, file_signature, SIGNATURE_SIZE);
 
 	// read version
-	if (sscanf(file_signature + 6, "%d", &file->version) < 1)
-		die("error: file '%s' not object nor library\n", utstring_body(file->filename));
+	if (sscanf(file_signature + 6, "%d", version) < 1)
+		die("error: file '%s' not object nor library\n", filename);
 
-	if (file->version < MIN_VERSION || file->version > MAX_VERSION)
+	if (*version < MIN_VERSION || *version > MAX_VERSION)
 		die("error: file '%s' version %d not supported\n",
-			utstring_body(file->filename), file->version);
+			filename, *version);
 
 	if (opt_list)
 		printf("%s file %s at $%04lX: %s\n",
-			file->type == is_library ? "Library" : "Object ",
-			utstring_body(file->filename),
+			type == is_library ? "Library" : "Object ",
+			filename,
 			ftell(fp) - SIGNATURE_SIZE, file_signature);
 
-	return file->type;
+	return type;
 }
 
-static void file_write_signature(FILE *fp, enum file_type type)
+static void write_signature(FILE *fp, enum file_type type)
 {
 	UT_string *signature;
 	utstring_new(signature);
@@ -146,7 +147,7 @@ static void file_write_signature(FILE *fp, enum file_type type)
 //-----------------------------------------------------------------------------
 objfile_t *objfile_new()
 {
-	objfile_t *obj = New(objfile_t);
+	objfile_t *obj = xnew(objfile_t);
 	utstring_new(obj->filename);
 	utstring_new(obj->signature);
 	utstring_new(obj->modname);
@@ -186,7 +187,7 @@ void objfile_free(objfile_t *obj)
 		code_free(code);
 	}
 
-	Free(obj);
+	xfree(obj);
 }
 
 static void print_section(UT_string *section)
@@ -651,7 +652,7 @@ void objfile_write(objfile_t *obj, FILE *fp)
 	long fpos0 = ftell(fp);
 
 	// write header
-	file_write_signature(fp, is_object);
+	write_signature(fp, is_object);
 
 	// write placeholders for 5 pointers
 	long header_ptr = ftell(fp);
@@ -683,7 +684,7 @@ void objfile_write(objfile_t *obj, FILE *fp)
 
 file_t *file_new()
 {
-	file_t *file = New(file_t);
+	file_t *file = xnew(file_t);
 	utstring_new(file->filename);
 	utstring_new(file->signature);
 	file->type = is_none;
@@ -703,27 +704,34 @@ void file_free(file_t *file)
 		DL_DELETE(file->objs, obj);
 		objfile_free(obj);
 	}
-	Free(file);
+	xfree(file);
 }
 
-static void file_read_object(file_t *file, FILE *fp)
+static void file_read_object(file_t *file, FILE *fp, UT_string *signature, int version)
 {
 	objfile_t *obj = objfile_new();
 
 	utstring_concat(obj->filename, file->filename);
-	utstring_concat(obj->signature, file->signature);
-	obj->version = file->version;
+	utstring_concat(obj->signature, signature);
+	obj->version = version;
 
 	objfile_read(obj, fp);
 
 	DL_APPEND(file->objs, obj);
 }
 
-static void file_read_library(file_t *file, FILE *fp)
+static void file_read_library(file_t *file, FILE *fp, UT_string *signature, int version)
 {
+	utstring_concat(file->signature, signature);
+	file->version = version;
+
+	UT_string *obj_signature;
+	utstring_new(obj_signature);
+
 	long fpos0 = ftell(fp) - SIGNATURE_SIZE;	// before signature
 	int next = SIGNATURE_SIZE;
 	int length = 0;
+	int obj_version = -1;
 
 	do {
 		xfseek(fp, fpos0 + next, SEEK_SET);		// next object file
@@ -731,28 +739,37 @@ static void file_read_library(file_t *file, FILE *fp)
 		next = xfread_dword(fp);
 		length = xfread_dword(fp);
 
-		enum file_type type = file_read_signature(file, fp);
+		enum file_type type = read_signature(fp, utstring_body(file->filename), obj_signature, &obj_version);
 		if (type != is_object)
 			die("File %s: contains non-object file\n", utstring_body(file->filename));
 
-		if (length == 0)
-			printf("  Deleted...\n");
-		else
-			file_read_object(file, fp);
+		if (length == 0) {
+			if (opt_list)
+				printf("  Deleted...\n");
+		}
+		else {
+			file_read_object(file, fp, obj_signature, obj_version);
+		}
 
-		printf("\n");
+		if (opt_list)
+			printf("\n");
 	} while (next != -1);
+
+	utstring_free(obj_signature);
 }
 
 void file_read(file_t *file, const char *filename)
 {
+	UT_string *signature;
+	utstring_new(signature);
+
 	// save file name
 	utstring_clear(file->filename); 
 	utstring_bincpy(file->filename, filename, strlen(filename));
 
 	// open file and read signature
 	FILE *fp = xfopen(filename, "rb");
-	file_read_signature(file, fp);
+	file->type = read_signature(fp, utstring_body(file->filename), signature, &file->version);
 
 	if (opt_verbose)
 		printf("Reading file '%s': %s version %d\n",
@@ -760,12 +777,14 @@ void file_read(file_t *file, const char *filename)
 
 	// read object files
 	switch (file->type) {
-	case is_object:  file_read_object(file, fp);  break;
-	case is_library: file_read_library(file, fp); break;
+	case is_object:  file_read_object(file, fp, signature, file->version);  break;
+	case is_library: file_read_library(file, fp, signature, file->version); break;
 	default: assert(0);
 	}
 
 	xfclose(fp);
+
+	utstring_free(signature);
 }
 
 static void file_write_object(file_t *file, FILE *fp)
@@ -776,7 +795,7 @@ static void file_write_object(file_t *file, FILE *fp)
 static void file_write_library(file_t *file, FILE *fp)
 {
 	// write header
-	file_write_signature(fp, is_library);
+	write_signature(fp, is_library);
 
 	for (objfile_t *obj = file->objs; obj; obj = obj->next) {
 		long header_ptr = ftell(fp);
@@ -815,3 +834,136 @@ void file_write(file_t *file, const char *filename)
 	xfclose(fp);
 }
 
+static void merge_section(objfile_t *obj, code_t *code_head, int code_size,
+	const char *old_name, const char *new_name)
+{
+	symbol_t *symbol;
+	expr_t *expr;
+	code_t *code;
+
+	// merge code first to compute alignment
+	DL_FOREACH(obj->codes, code) {
+		if (strcmp(utstring_body(code->section), old_name) == 0) {
+			utstring_clear(code->section);
+			utstring_bincpy(code->section, new_name, strlen(new_name));
+
+			// merge code blocks
+			if (code_head) {
+				// handle alignment
+				int above = code_size % code->align;
+				if (above > 0) {
+					byte_t filler = ALIGN_FILLER;
+					for (int i = 0; i < code->align - above; i++)
+						utarray_push_back(code_head->data, &filler);
+					code_size += code->align - above;
+				}
+
+				// concatenate code blocks
+				utarray_concat(code_head->data, code->data);
+				utarray_clear(code->data);
+				code->deleted = true;
+			}
+		}
+	}
+
+	DL_FOREACH(obj->names, symbol) {
+		if (strcmp(utstring_body(symbol->section), old_name) == 0) {
+			// rename section
+			utstring_clear(symbol->section);
+			utstring_bincpy(symbol->section, new_name, strlen(new_name));
+
+			// compute changed Address
+			if (code_head && symbol->type == 'A')
+				symbol->value += code_size;
+		}
+	}
+
+	DL_FOREACH(obj->exprs, expr) {
+		if (strcmp(utstring_body(expr->section), old_name) == 0) {
+			utstring_clear(expr->section);
+			utstring_bincpy(expr->section, new_name, strlen(new_name));
+
+			// compute changed path address
+			if (code_head) {
+				expr->asmpc += code_size;
+				expr->patch_ptr += code_size;
+			}
+		}
+	}
+}
+
+void file_rename_sections(file_t *file, const char *old_regexp, const char *new_name)
+{
+	if (opt_verbose)
+		printf("Renaming sections in file '%s' that match '%s' to '%s'\n",
+			utstring_body(file->filename), old_regexp, new_name);
+
+	// compile regular expression
+	regex_t regex;
+	int reti = regcomp(&regex, old_regexp, REG_EXTENDED | REG_NOSUB);
+	if (reti)
+		die("error: could not compile regex '%s'\n", old_regexp);
+
+	// search file for sections that match
+	objfile_t *obj;
+	code_t *code;
+	DL_FOREACH(file->objs, obj) {
+
+		if (opt_verbose)
+			printf("Block '%s'\n", utstring_body(obj->signature));
+
+		// for each object file
+		DL_FOREACH(obj->codes, code) {
+			code->renamed = false;
+			code->deleted = false;
+		}
+
+		// section to collect all other that match
+		code_t *code_head = NULL;
+		int code_size = 0;
+
+		DL_FOREACH(obj->codes, code) {
+			if (!code->renamed) {
+				reti = regexec(&regex, utstring_body(code->section), 0, NULL, 0);
+				if (reti == REG_OKAY) {				// match
+					if (opt_verbose)
+						printf("  rename section %s -> %s\n",
+							utstring_body(code->section), new_name);
+
+					// join sections
+					// NOTE: code->section is modified in merge_section(), need to save old name
+					char *old_name = xstrdup(utstring_body(code->section));
+					merge_section(obj, code_head, code_size, old_name, new_name);
+					xfree(old_name);
+
+					if (!code_head) 
+						code_head = code;
+					code_size = utarray_len(code_head->data);
+				}
+				else if (reti == REG_NOMATCH) {		// no match
+					if (opt_verbose)
+						printf("  skip section %s\n",
+							utstring_body(code->section));
+				}
+				else {								// error
+					char msgbuf[100];
+					regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+					die("error: regex match failed: %s\n", msgbuf);
+				}
+				code->renamed = true;
+			}
+		}
+
+		// delete code blocks that have been merged
+		code_t *tmp;
+		DL_FOREACH_SAFE(obj->codes, code, tmp) {
+			if (code->deleted) {
+				DL_DELETE(obj->codes, code);
+				code_free(code);
+			}
+		}
+	}
+
+	// free memory
+	regfree(&regex);
+}

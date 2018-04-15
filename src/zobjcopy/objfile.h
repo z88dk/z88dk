@@ -17,6 +17,7 @@
 #define SIGNATURE_OBJ	"Z80RMF"
 #define SIGNATURE_LIB	"Z80LMF"
 #define SIGNATURE_VERS	"%02d"
+#define ALIGN_FILLER	0xFF
 
 enum file_type { is_none, is_library, is_object };
 
@@ -63,6 +64,9 @@ typedef struct code_s
 	int			 align;
 
 	struct code_s *next, *prev;			// to store DL list of symbols
+
+	bool	renamed;
+	bool	deleted;
 } code_t;
 
 extern code_t *code_new();
@@ -106,3 +110,4 @@ extern file_t *file_new();
 extern void file_free(file_t *file);
 extern void file_read(file_t *file, const char *filename);
 extern void file_write(file_t *file, const char *filename);
+extern void file_rename_sections(file_t *file, const char *old_regexp, const char *new_name);
