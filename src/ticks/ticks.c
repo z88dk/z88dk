@@ -655,7 +655,8 @@ void setf(int a){
 }
 
 void reset_zxnext_mmu() {
-  for ( int i = 0; i < 256; i++ ) zxnext_mmu[i] = 0xff;
+  int i;
+  for ( i = 0; i < 256; i++ ) zxnext_mmu[i] = 0xff;
 }
 
 int main (int argc, char **argv){
