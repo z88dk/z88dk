@@ -615,14 +615,17 @@ int in(int port){
 
 void out(int port, int value){
   static int nextport = 0;
+
+  printf("out(%04x),%02x (nextport=%02x)\n",port,value,nextport);
   if ( port == 0x243B && nextport == 0 ) {
       nextport = value;
       return;
   }
   if ( nextport >= 0x50 && nextport <= 0x57 ) {
+    printf("Segment %d page %02x\n",nextport - 0x50, value);
     zxnext_mmu[nextport - 0x50] = value;
-    nextport = 0;
   }
+  nextport = 0;
   return;
 }
 
@@ -656,7 +659,7 @@ void setf(int a){
 
 void reset_zxnext_mmu() {
   int i;
-  for ( i = 0; i < 256; i++ ) zxnext_mmu[i] = 0xff;
+  for ( i = 0; i < 8; i++ ) zxnext_mmu[i] = 0xff;
 }
 
 int main (int argc, char **argv){
