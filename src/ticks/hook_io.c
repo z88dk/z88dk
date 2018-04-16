@@ -78,7 +78,7 @@ static void cmd_openfile(void)
 
     l = h = 255; 
     if ( slot != -1 ) {
-        int fd = open(filename, flags);
+        int fd = open(filename, flags, S_IRWXU);
         
         if ( fd != -1 ) {
             slots[slot] = fd;
