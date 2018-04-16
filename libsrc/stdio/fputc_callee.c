@@ -23,6 +23,7 @@ static void wrapper() __naked
 {
 //#ifdef Z80
 #asm
+	PUBLIC	_fputc_callee
 fputc_callee:
 _fputc_callee:
 
