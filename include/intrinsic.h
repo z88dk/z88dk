@@ -4,6 +4,8 @@
 #ifndef __INTRINSIC_H__
 #define __INTRINSIC_H__
 
+#include <sys/compiler.h>
+
 #ifdef __SDCC
 
 // SDCC Compiles
@@ -42,8 +44,8 @@ extern void intrinsic_exx(void) __preserves_regs(a);
 extern void *intrinsic_return_bc(void) __preserves_regs(a,b,c,d,e);
 extern void *intrinsic_return_de(void) __preserves_regs(a,b,c,d,e);
 
-extern unsigned int intrinsic_swap_endian_16(unsigned long n) __preserves_regs(b,c,d,e);
-extern unsigned int intrinsic_swap_endian_16_fastcall(unsigned long n) __preserves_regs(b,c,d,e) __z88dk_fastcall;
+extern unsigned int intrinsic_swap_endian_16(unsigned int n) __preserves_regs(b,c,d,e);
+extern unsigned int intrinsic_swap_endian_16_fastcall(unsigned int n) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define intrinsic_swap_endian_16(a) intrinsic_swap_endian_16_fastcall(a)
 
 extern unsigned long intrinsic_swap_endian_32(unsigned long n) __preserves_regs(b,c);
@@ -94,7 +96,7 @@ extern void __LIB__ intrinsic_exx(void) __smallc;
 extern void __LIB__ *intrinsic_return_bc(void) __smallc;
 extern void __LIB__ *intrinsic_return_de(void) __smallc;
 
-extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned long n) __smallc __z88dk_fastcall;
+extern unsigned int __LIB__ intrinsic_swap_endian_16(unsigned int n) __smallc __z88dk_fastcall;
 extern unsigned long __LIB__ intrinsic_swap_endian_32(unsigned long n) __smallc __z88dk_fastcall;
 extern unsigned long __LIB__ intrinsic_swap_word_32(unsigned long n) __smallc __z88dk_fastcall;
 
