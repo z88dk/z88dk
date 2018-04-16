@@ -19,10 +19,12 @@
 
 
 
-int fputc_callee(int c,FILE *fp)
+static void wrapper() __naked
 {
 //#ifdef Z80
 #asm
+fputc_callee:
+_fputc_callee:
 
 	pop	de
 	pop	hl	;fp
@@ -139,5 +141,6 @@ ENDIF
 	call	writebyte
 	pop	hl	;discard values
 	pop	bc	; fd
+	ret
 #endasm
 }
