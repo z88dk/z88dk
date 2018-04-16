@@ -2483,7 +2483,7 @@
 	and	a
 	jp	%1,%2
 
-	ld	hl,%1
+	ld	hl,_%1
 	ld	(hl),#(%2 % 256)
 	inc	hl
 	ld	(hl),#(%2 / 256)
