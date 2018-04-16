@@ -175,3 +175,11 @@
 	xor	e
 	ld	l,a
 	ld	h,0
+
+	call	l_int2long_s
+=
+	ld	a,h
+	rla
+	sbc	a
+	ld	e,a
+	ld	d,a
