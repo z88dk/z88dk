@@ -699,19 +699,25 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 // zx next configuration
 
 #ifdef __CLANG
-#define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
+#define ZXN_NEXTREG(reg,val)  ((void)ZXN_NEXTREG_##reg##_##val())
 #endif
 
 #ifdef __SDCC
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
+#define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
+#define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 #ifdef __SCCZ80
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
+#define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
+#define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 __DPROTO(`a,d,e,h,iyl,iyh',`a,d,e,h,iyl,iyh',unsigned char,,ZXN_READ_REG,unsigned char reg)
-__DPROTO(`a,d,e,iyl,iyh',`a,d,e,iyl,iyh',void,,ZXN_WRITE_REG,unsigned char reg, unsigned char data)
+__DPROTO(`a,d,e,iyl,iyh',`a,d,e,iyl,iyh',void,,ZXN_WRITE_REG,unsigned char reg, unsigned char val)
 
 // zx next memory map
 
@@ -724,24 +730,22 @@ __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU5,void)
 __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU6,void)
 __OPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',unsigned char,,ZXN_READ_MMU7,void)
 
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU0,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU1,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU2,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU3,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU4,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU5,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU6,unsigned char page)
-__DPROTO(`d,e,h,iyl,iyh',`d,e,h,iyl,iyh',void,,ZXN_WRITE_MMU7,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU0,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU1,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU2,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU3,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU4,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU5,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU6,unsigned char page)
+__DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU7,unsigned char page)
 
-// miscellaneous - paging and banking state
+// memory - paging and banking state
 
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_addr_from_mmu,unsigned char mmu)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zxn_mmu_from_addr,unsigned int addr)
 
 __DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned long,,zxn_addr_from_page,unsigned char page)
-__DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned long,,zxn_addr_from_page_2mb,unsigned char page)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr,unsigned long addr)
-__DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr_2mb,unsigned long addr)
 
 __DPROTO(`a,iyl,iyh',`iyl,iyh',void,,zxn_read_mmu_state,void *dst)
 __DPROTO(`iyl,iyh',`iyl,iyh',void,,zxn_write_mmu_state,void *src)

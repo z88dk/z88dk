@@ -1,5 +1,5 @@
 ;;
-;; ZXN_NEXTREG(reg,val)
+;; ZXN_NEXTREG(reg,data)
 ;;
 
 %"[ \t]*"0jp%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
@@ -16,27 +16,6 @@
 %2:
 	call	_ZXN_NEXTREG_%5_%6
 	ret
-
-;;
-;; ZXN_NEXTREGA(reg,val)
-;;
-
-%"[ \t]*"0jp%"[ \t]*"1_ZXN_NEXTREGA_%"[A-Fa-f0-9xX]+"2
-=
-	call	_ZXN_NEXTREGA_%2
-	ret
-
-%"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREGA_%"[A-Fa-f0-9xX]+"2
-=
-	ld	a,l
-	nextreg	%2,a
-
-%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_NEXTREGA_%"[A-Fa-f0-9xX]+"5
-=
-%2:
-	call	_ZXN_NEXTREGA_%5
-	ret
-
 
 ;;
 ;; ZXN_READ_REG(reg)
@@ -210,22 +189,22 @@
 ;; This rules file only affects c code.
 ;;
 
-;;	nextreg	%"[A-Fa-f0-9xX]+"1,%"[A-Fa-f0-9xX]+"2
-;;=
-;;	ld	bc,0x243b
-;;	ld	a,%1
-;;	out	(c),a
-;;	inc	b
-;;	ld	a,%2
-;;	out	(c),a
+	nextreg	%"[A-Fa-f0-9xX]+"1,%"[A-Fa-f0-9xX]+"2
+=
+	ld	bc,0x243b
+	ld	a,%1
+	out	(c),a
+	inc	b
+	ld	a,%2
+	out	(c),a
 
-;;	mmu%"[0-9]+"1	a
-;;=
-;;	ld	bc,0x243b
-;;	ld	l,0x50+%1
-;;	out	(c),l
-;;	inc	b
-;;	out	(c),a
+	mmu%"[0-9]+"1	a
+=
+	ld	bc,0x243b
+	ld	l,0x50+%1
+	out	(c),l
+	inc	b
+	out	(c),a
 
 	ld	a,l
 	ld	l,a
