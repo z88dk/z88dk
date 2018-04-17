@@ -14,7 +14,9 @@
 
 // SNA
 
-#define ZX_SNA_PROTOTYPE  "src/appmake/data/zx_48.sna"
+#define ZX48_SNA_PROTOTYPE    "src/appmake/data/zx_48.sna"
+#define ZX128_SNA_PROTOTYPE   "src/appmake/data/zx_128.sna"
+#define ZXN_NEXTOS_PROTOTYPE  "src/appmake/data/zxn_nextos.sna"
 
 // ZXN UNIVERSAL DOT
 
@@ -999,6 +1001,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     int i, j;
     int is_128 = 0;
     int bsnum_bank;
+    int return_to_basic = 0;
 
     // find bankspace BANK
 
@@ -1026,6 +1029,11 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         zxs->intstate = parameter_search(zxc->crtfile, ".map", "__crt_enable_eidi");
 
     zxs->intstate = (zxs->intstate == -1) ? 0xff : ((zxs->intstate & 0x01) ? 0 : 0xff);
+
+    // returning to basic?
+
+    return_to_basic = parameter_search(zxc->crtfile, ".map", "__crt_on_exit");
+    return_to_basic = (return_to_basic != -1) && ((return_to_basic & 0x30000) == 0x30000) && ((return_to_basic & 0xa) == 0x2);
 
     // merge banks 5,2,0 into the main binary
 
@@ -1081,16 +1089,36 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
     memset(mem128, 0, sizeof(mem128));
 
-    snprintf(filename, sizeof(filename), "%s" ZX_SNA_PROTOTYPE, c_install_dir);
+    snprintf(filename, sizeof(filename), "%s%s", c_install_dir, is_128 ? (is_zxn ? ZXN_NEXTOS_PROTOTYPE : ZX128_SNA_PROTOTYPE) : ZX48_SNA_PROTOTYPE);
 
     if ((fin = fopen(filename, "rb")) == NULL)
         exit_log(1, "Error: SNA prototype %s not found\n", filename);
 
     fread(sna_state, 27, 1, fin);
+
     if (fread(mem128, 49152, 1, fin) < 1)
     {
         fclose(fin);
         exit_log(1, "Error: SNA prototype %s is shorter than 49179 bytes\n", filename);
+    }
+
+    if (is_128)
+    {
+        fread(&sna_state[SNA_128_PC], 4, 1, fin);
+
+        // 5,2,0 (48k) 1,3,4,6,7
+
+        for (i = 0; i < 8; ++i)
+        {
+            if ((i != 0) && (i != 2) && (i != 5))
+            {
+                if (fread(&mem128[49152 + i * 16384], 16384, 1, fin) < 1)
+                {
+                    fclose(fin);
+                    exit_log(1, "Error: SNA prototype %s is shorter than 131103 bytes\n", filename);
+                }
+            }
+        }
     }
 
     fclose(fin);
@@ -1161,8 +1189,13 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
             zxs->stackloc = mem128[(abs(zxs->stackloc) - 0x4000) % 0xc000] + 256 * mem128[(abs(zxs->stackloc) - 0x4000 + 1) % 0xc000];
     }
 
-    if (zxs->stackloc < 0)
+    if (return_to_basic || (zxs->stackloc < 0))
+    {
         zxs->stackloc = sna_state[SNA_REG_SP] + 256 * sna_state[SNA_REG_SP + 1];
+
+        if (!is_128)
+            zxs->stackloc = (zxs->stackloc + 2) & 0xffff;   // 48k sna contains an extra address on the stack to restart the snapshot
+    }
 
     if (!is_128)
     {
@@ -1206,6 +1239,8 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if (is_128)
     {
         fwrite(&sna_state[SNA_128_PC], 4, 1, fout);
+
+        // 5,2,0 (48k) 1,3,4,6,7
 
         for (i = 0; i < 8; ++i)
         {
