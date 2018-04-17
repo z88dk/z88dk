@@ -81,7 +81,7 @@ static void cmd_openfile(void)
 #ifdef WIN32
         int fd = open(filename, flags, _S_IREAD | _S_IWRITE);
 #else
-        int fd = open(filename, flags, S_IREAD| S_IWRITE);
+        int fd = open(filename, flags, S_IRWXU);
 #endif
         
         if ( fd != -1 ) {
