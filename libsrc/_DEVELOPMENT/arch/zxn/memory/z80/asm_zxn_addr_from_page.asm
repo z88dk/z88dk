@@ -6,21 +6,16 @@
 ;
 ; ===============================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zxn_addr_from_page
-PUBLIC asm_zxn_addr_from_page_nocheck
-
-EXTERN error_lmc
 
 asm_zxn_addr_from_page:
 
    ; return linear address from page number
    ;
-   ; enter : l = page 0-223
+   ; enter : l = 8k page 0-255
    ;
    ; exit  : success
    ;
@@ -35,17 +30,6 @@ asm_zxn_addr_from_page:
    ; uses  : af, de, hl
 
    ld a,l
-IF __ZXNEXT = __ZXNEXT_1MB
-   cp 96
-ELSE
-   cp 224
-ENDIF
-   jp nc, error_lmc
-
-asm_zxn_addr_from_page_nocheck:
-
-   ; a = page
-
    rrca
    rrca
    rrca

@@ -6,13 +6,10 @@
 ;
 ; ===============================================================
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zxn_page_from_addr
-PUBLIC asm_zxn_page_from_addr_ehl
 PUBLIC asm_zxn_page_from_addr_nocheck
 
 EXTERN error_mc
@@ -25,7 +22,7 @@ asm_zxn_page_from_addr:
    ;
    ; exit  : success
    ;
-   ;            l = page number 0-223
+   ;            l = 8k page number 0-255
    ;            carry reset
    ;
    ;         fail
@@ -39,16 +36,8 @@ asm_zxn_page_from_addr:
    dec d
    jp nz, error_mc
    
-asm_zxn_page_from_addr_ehl:
-
-   ; page number is eight bits
-   
    ld a,e
-IF __ZXNEXT = __ZXNEXT_1MB
-   cp 96/8
-ELSE
-   cp 224/8
-ENDIF
+   cp 255/8+1
    jp nc, error_mc
    
    ; page number is in range
