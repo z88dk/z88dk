@@ -1,0 +1,217 @@
+;;
+;; ZXN_NEXTREG(reg,data)
+;;
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
+=
+	call	_ZXN_NEXTREG_%2_%3
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"2_%"[A-Fa-f0-9xX]+"3
+=
+	nextreg	%2,%3
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_NEXTREG_%"[A-Fa-f0-9xX]+"5_%"[A-Fa-f0-9xX]+"6
+=
+%2:
+	call	_ZXN_NEXTREG_%5_%6
+	ret
+
+;;
+;; ZXN_READ_REG(reg)
+;;
+
+;; zsdcc
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_READ_REG_fastcall
+=
+	call	_ZXN_READ_REG_fastcall
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_READ_REG_fastcall
+=
+%2:
+	call	_ZXN_READ_REG_fastcall
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1_ZXN_READ_REG_fastcall
+=
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	in	l,(c)
+
+;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_READ_REG
+=
+	call	ZXN_READ_REG
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_READ_REG
+=
+%2:
+	call	ZXN_READ_REG
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1ZXN_READ_REG
+=
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	in	l,(c)
+	ld	h,0
+
+;;
+;; ZXN_WRITE_REG(reg,data)
+;;
+
+;; zsdcc
+
+%"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_REG_callee
+=
+	pop	hl
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	out	(c),h
+
+
+;; sccz80
+
+%"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_REG_callee
+=
+	pop	de
+	pop	hl
+	ld	bc,0x243b
+	out	(c),l
+	inc	b
+	out	(c),e
+
+;;
+;; ZXN_READ_MMUn()
+;;
+
+;; zsdcc
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_READ_MMU%"[0-9]+"3
+=
+	call	_ZXN_READ_MMU%3
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_READ_MMU%"[0-9]+"5
+=
+%2:
+	call	_ZXN_READ_MMU%5
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1_ZXN_READ_MMU%"[0-9]+"3
+=
+	ld	bc,0x243b
+	ld	a,0x50+%3
+	out	(c),a
+	inc	b
+	in	l,(c)
+
+;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_READ_MMU%"[0-9]+"3
+=
+	call	ZXN_READ_MMU%3
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_READ_MMU%"[0-9]+"5
+=
+%2:
+	call	ZXN_READ_MMU%5
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1ZXN_READ_MMU%"[0-9]+"3
+=
+	ld	bc,0x243b
+	ld	a,0x50+%3
+	out	(c),a
+	inc	b
+	in	l,(c)
+	ld	h,0
+
+;;
+;; ZXN_WRITE_MMUn(page)
+;;
+
+;; zsdcc
+
+%"[ \t]*"0jp%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+=
+	call	_ZXN_WRITE_MMU%3_fastcall
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4_ZXN_WRITE_MMU%"[0-9]+"5_fastcall
+=
+%2:
+	call	_ZXN_WRITE_MMU%5_fastcall
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1_ZXN_WRITE_MMU%"[0-9]+"3_fastcall
+=
+	ld	a,l
+	mmu%3	a
+
+;; sccz80
+
+%"[ \t]*"0jp%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
+=
+	call	ZXN_WRITE_MMU%3
+	ret
+
+%"[ \t]*"0defc%"[ \t]*"1%"[A-Za-z0-9_]*"2%"[ \t]*"3=%"[ \t]*"4ZXN_WRITE_MMU%"[0-9]+"5
+=
+%2:
+	call	ZXN_WRITE_MMU%5
+	ret
+
+%"[ \t]*"0call%"[ \t]*"1ZXN_WRITE_MMU%"[0-9]+"3
+=
+	ld	a,l
+	mmu%3	a
+
+;;
+;; TEMPORARY AREA
+;;
+;; Real test hardware has had zx next instructions removed
+;; as many have smaller fpgas that cannot hold all the logic.
+;;
+;; Must translate "nextreg" and "mmu" instructions we are
+;; using to actual OUTs.  This also affects the C macros
+;; used to inline these instructions in zxn.h because zsdcc
+;; is being told which registers are unaffected by the macros.
+;;
+;; This rules file only affects c code.
+;;
+
+	nextreg	%"[A-Fa-f0-9xX]+"1,%"[A-Fa-f0-9xX]+"2
+=
+	ld	bc,0x243b
+	ld	a,%1
+	out	(c),a
+	inc	b
+	ld	a,%2
+	out	(c),a
+
+	mmu%"[0-9]+"1	a
+=
+	ld	bc,0x243b
+	ld	l,0x50+%1
+	out	(c),l
+	inc	b
+	out	(c),a
+
+	ld	a,l
+	ld	l,a
+=
+	ld	a,l
+
+	ld	l,a
+	ld	a,l
+=
+	ld	l,a

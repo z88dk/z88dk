@@ -701,15 +701,21 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 // zx next configuration
 
 #ifdef __CLANG
-#define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
+#define ZXN_NEXTREG(reg,val)  ((void)ZXN_NEXTREG_##reg##_##val())
 #endif
 
 #ifdef __SDCC
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
+#define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
+#define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 #ifdef __SCCZ80
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
+#define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
+#define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 extern unsigned char ZXN_READ_REG(unsigned char reg) __preserves_regs(a,d,e,h,iyl,iyh);
@@ -717,8 +723,8 @@ extern unsigned char ZXN_READ_REG_fastcall(unsigned char reg) __preserves_regs(a
 #define ZXN_READ_REG(a) ZXN_READ_REG_fastcall(a)
 
 
-extern void ZXN_WRITE_REG(unsigned char reg,unsigned char data) __preserves_regs(a,d,e,iyl,iyh);
-extern void ZXN_WRITE_REG_callee(unsigned char reg,unsigned char data) __preserves_regs(a,d,e,iyl,iyh) __z88dk_callee;
+extern void ZXN_WRITE_REG(unsigned char reg,unsigned char val) __preserves_regs(a,d,e,iyl,iyh);
+extern void ZXN_WRITE_REG_callee(unsigned char reg,unsigned char val) __preserves_regs(a,d,e,iyl,iyh) __z88dk_callee;
 #define ZXN_WRITE_REG(a,b) ZXN_WRITE_REG_callee(a,b)
 
 
@@ -742,48 +748,48 @@ extern unsigned char ZXN_READ_MMU6(void) __preserves_regs(d,e,h,iyl,iyh);
 extern unsigned char ZXN_READ_MMU7(void) __preserves_regs(d,e,h,iyl,iyh);
 
 
-extern void ZXN_WRITE_MMU0(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU0_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU0(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU0_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU0(a) ZXN_WRITE_MMU0_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU1(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU1_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU1(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU1_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU1(a) ZXN_WRITE_MMU1_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU2(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU2_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU2(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU2_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU2(a) ZXN_WRITE_MMU2_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU3(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU3_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU3(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU3_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU3(a) ZXN_WRITE_MMU3_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU4(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU4_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU4(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU4_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU4(a) ZXN_WRITE_MMU4_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU5(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU5_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU5(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU5_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU5(a) ZXN_WRITE_MMU5_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU6(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU6_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU6(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU6_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU6(a) ZXN_WRITE_MMU6_fastcall(a)
 
 
-extern void ZXN_WRITE_MMU7(unsigned char page) __preserves_regs(d,e,h,iyl,iyh);
-extern void ZXN_WRITE_MMU7_fastcall(unsigned char page) __preserves_regs(d,e,h,iyl,iyh) __z88dk_fastcall;
+extern void ZXN_WRITE_MMU7(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh);
+extern void ZXN_WRITE_MMU7_fastcall(unsigned char page) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define ZXN_WRITE_MMU7(a) ZXN_WRITE_MMU7_fastcall(a)
 
 
 
-// miscellaneous - paging and banking state
+// memory - paging and banking state
 
 extern unsigned int zxn_addr_from_mmu(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh);
 extern unsigned int zxn_addr_from_mmu_fastcall(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
@@ -801,19 +807,9 @@ extern unsigned long zxn_addr_from_page_fastcall(unsigned char page) __preserves
 #define zxn_addr_from_page(a) zxn_addr_from_page_fastcall(a)
 
 
-extern unsigned long zxn_addr_from_page_2mb(unsigned char page) __preserves_regs(b,c,iyl,iyh);
-extern unsigned long zxn_addr_from_page_2mb_fastcall(unsigned char page) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;
-#define zxn_addr_from_page_2mb(a) zxn_addr_from_page_2mb_fastcall(a)
-
-
 extern unsigned char zxn_page_from_addr(unsigned long addr) __preserves_regs(b,c,iyl,iyh);
 extern unsigned char zxn_page_from_addr_fastcall(unsigned long addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
 #define zxn_page_from_addr(a) zxn_page_from_addr_fastcall(a)
-
-
-extern unsigned char zxn_page_from_addr_2mb(unsigned long addr) __preserves_regs(b,c,iyl,iyh);
-extern unsigned char zxn_page_from_addr_2mb_fastcall(unsigned long addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
-#define zxn_page_from_addr_2mb(a) zxn_page_from_addr_2mb_fastcall(a)
 
 
 

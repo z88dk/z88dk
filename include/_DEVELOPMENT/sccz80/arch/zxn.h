@@ -701,22 +701,28 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 // zx next configuration
 
 #ifdef __CLANG
-#define ZXN_NEXTREG(reg,data) ((void)ZXN_NEXTREG_##reg##_##data())
+#define ZXN_NEXTREG(reg,val)  ((void)ZXN_NEXTREG_##reg##_##val())
 #endif
 
 #ifdef __SDCC
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void) __preserves_regs(d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
+#define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __preserves_regs(b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
+#define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 #ifdef __SCCZ80
-#define ZXN_NEXTREG(reg,data) { extern void ZXN_NEXTREG_##reg##_##data(void); ZXN_NEXTREG_##reg##_##data(); }
+#define ZXN_NEXTREG_helper(reg,val)  { extern void ZXN_NEXTREG_##reg##_##val(void); ZXN_NEXTREG_##reg##_##val(); }
+#define ZXN_NEXTREG(reg,val)  ZXN_NEXTREG_helper(reg,val)
+#define ZXN_NEXTREGA_helper(reg,val)  { extern void ZXN_NEXTREGA_##reg(unsigned char) __z88dk_fastcall; ZXN_NEXTREGA_##reg(val); }
+#define ZXN_NEXTREGA(reg,val)  ZXN_NEXTREGA_helper(reg,val)
 #endif
 
 extern unsigned char __LIB__ ZXN_READ_REG(unsigned char reg) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ ZXN_WRITE_REG(unsigned char reg,unsigned char data) __smallc;
-extern void __LIB__ ZXN_WRITE_REG_callee(unsigned char reg,unsigned char data) __smallc __z88dk_callee;
+extern void __LIB__ ZXN_WRITE_REG(unsigned char reg,unsigned char val) __smallc;
+extern void __LIB__ ZXN_WRITE_REG_callee(unsigned char reg,unsigned char val) __smallc __z88dk_callee;
 #define ZXN_WRITE_REG(a,b) ZXN_WRITE_REG_callee(a,b)
 
 
@@ -773,7 +779,7 @@ extern void __LIB__ ZXN_WRITE_MMU7(unsigned char page) __smallc __z88dk_fastcall
 
 
 
-// miscellaneous - paging and banking state
+// memory - paging and banking state
 
 extern unsigned int __LIB__ zxn_addr_from_mmu(unsigned char mmu) __smallc __z88dk_fastcall;
 
@@ -785,13 +791,7 @@ extern unsigned char __LIB__ zxn_mmu_from_addr(unsigned int addr) __smallc __z88
 extern unsigned long __LIB__ zxn_addr_from_page(unsigned char page) __smallc __z88dk_fastcall;
 
 
-extern unsigned long __LIB__ zxn_addr_from_page_2mb(unsigned char page) __smallc __z88dk_fastcall;
-
-
 extern unsigned char __LIB__ zxn_page_from_addr(unsigned long addr) __smallc __z88dk_fastcall;
-
-
-extern unsigned char __LIB__ zxn_page_from_addr_2mb(unsigned long addr) __smallc __z88dk_fastcall;
 
 
 
