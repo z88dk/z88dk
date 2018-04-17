@@ -3203,6 +3203,27 @@ int main (int argc, char **argv){
               fa= 0; break;
             }
             break;
+          case 0x91:
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t v = get_memory(pc++);
+              uint8_t r = get_memory(pc++);
+              out(0x243b, v);
+              out(0x253b, r);
+              st += 16;
+            } else {
+              st+= 8; break;
+            }
+            break;
+          case 0x92:
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t v = get_memory(pc++);
+              out(0x243b, v);
+              out(0x253b, a);
+              st += 12;
+            } else {
+              st+= 8; break;
+            }
+            break;
           case 0x00: case 0x01: case 0x02: case 0x03:        // NOP
           case 0x05: case 0x06: case 0x07:
           case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -3220,7 +3241,7 @@ int main (int argc, char **argv){
           case 0x84: case 0x85: case 0x86: case 0x87:
           case 0x88: case 0x89: 
           case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-          case 0x90: case 0x91: case 0x92: case 0x93:
+          case 0x90: case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
