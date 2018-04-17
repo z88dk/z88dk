@@ -61,6 +61,14 @@ extern FILE *stdlst;
 
 #endif
 
+#ifdef __RC2014
+
+extern FILE *ttyin;
+extern FILE *ttyout;
+extern FILE *ttyerr;
+
+#endif
+
 #ifdef __YAZ180
 
 extern FILE *ttyin;

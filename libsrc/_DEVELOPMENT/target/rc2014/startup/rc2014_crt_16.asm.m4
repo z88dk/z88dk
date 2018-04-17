@@ -41,12 +41,10 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(`driver/terminal/rc_01_input_acia.m4')
 dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
-dnl#include(`driver/terminal/rc_01_output_acia.m4')
 dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
@@ -189,7 +187,7 @@ __Exit:
 
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
-   
+
    ; close files
    
    include "../clib_close.inc"

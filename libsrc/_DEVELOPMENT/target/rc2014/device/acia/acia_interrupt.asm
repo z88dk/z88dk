@@ -73,7 +73,7 @@
         out (__IO_ACIA_CONTROL_REGISTER), a   ; Set the ACIA CTRL register
 
     rts_check:
-        ld a, (aciaRxCount)         ; get the current Rx count    	
+        ld a, (aciaRxCount)         ; get the current Rx count
         cp __IO_ACIA_RX_FULLISH        ; compare the count with the preferred full size
         jr c, tx_end                ; leave the RTS low, and end
 

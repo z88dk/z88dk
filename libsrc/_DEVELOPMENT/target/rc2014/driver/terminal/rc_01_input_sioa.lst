@@ -1,0 +1,5 @@
+target/rc2014/driver/terminal/rc_01_input_sioa
+target/rc2014/driver/terminal/rc_01_input_sioa/rc_01_input_sioa_iterm_msg_getc
+target/rc2014/driver/terminal/rc_01_input_sioa/rc_01_input_sioa_iterm_msg_interrupt
+target/rc2014/driver/terminal/rc_01_input_sioa/rc_01_input_sioa_iterm_msg_reject
+target/rc2014/driver/terminal/rc_01_input_sioa/rc_01_input_sioa_stdio_msg_flsh

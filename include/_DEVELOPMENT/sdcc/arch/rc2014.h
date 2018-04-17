@@ -16,6 +16,15 @@
 
 extern unsigned char io_dio;
 
+extern unsigned char io_acia_control;
+extern unsigned char io_acia_status;
+extern unsigned char io_acia_data;
+
+extern unsigned char io_sio_a_control;
+extern unsigned char io_sio_a_data;
+extern unsigned char io_sio_b_control;
+extern unsigned char io_sio_b_data;
+
 extern unsigned char io_pio_port_a;
 extern unsigned char io_pio_port_b;
 extern unsigned char io_pio_port_b;
@@ -32,6 +41,15 @@ extern unsigned char io_prom_toggle;
 #else
 
 __sfr __at __IO_DIO_PORT        io_dio;
+
+__sfr __at  __IO_ACIA_CONTROL_REGISTER  io_acia_control;
+__sfr __at  __IO_ACIA_STATUS_REGISTER   io_acia_status;
+__sfr __at  __IO_ACIA_DATA_REGISTER     io_acia_data;
+
+__sfr __at  __IO_SIOA_CONTROL_REGISTER  io_sio_a_control;
+__sfr __at  __IO_SIOA_DATA_REGISTER     io_sio_a_data;
+__sfr __at  __IO_SIOB_CONTROL_REGISTER  io_sio_b_control;
+__sfr __at  __IO_SIOB_DATA_REGISTER     io_sio_b_data;
 
 __sfr __at __IO_PIO_PORT_A      io_pio_port_a;
 __sfr __at __IO_PIO_PORT_B      io_pio_port_b;
