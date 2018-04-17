@@ -1563,7 +1563,6 @@ void zdiv_const(LVALUE *lval, int32_t value)
             ol("ld\td,0");
             return;
         } else if ( value == 8192 && utype(lval) ) {
-            // Shift 14 bits
             asr_const(lval, 13);
             return;
         } else if ( value == 65536 ) {
