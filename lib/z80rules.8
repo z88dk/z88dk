@@ -25,8 +25,8 @@
 	call	l_sxt
 =
 	ld	l,a
-	rlca
-	sbc	a,a
+	rla
+	sbc	a
 	ld	h,a
 
 	call	l_sub
@@ -151,13 +151,13 @@
 
 	ld	h,0
 	ld	a,l
-	rlca
-	sbc	a,a
+	rla
+	sbc	a
 	ld	h,a
 =
 	ld	a,l
-	rlca
-	sbc	a,a
+	rla
+	sbc	a
 	ld	h,a
 
 	ld	l,(hl)
@@ -183,3 +183,24 @@
 	sbc	a
 	ld	e,a
 	ld	d,a
+
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	rla
+	sbc	a
+	ld	e,a
+	ld	d,a
+=
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	ld	e,a
+	ld	d,a
+
+	ld	%1,%2
+	ld	%2,%1
+=
+	ld	%1,%2

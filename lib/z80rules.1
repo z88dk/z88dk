@@ -3612,3 +3612,74 @@
 	pop	de
 	ld	(de),a
 	ld	hl,%2
+
+	ld	h,0
+	ld	de,3
+	call	l_asr_u_hl_by_e
+	ld	a,l
+	and	%1
+=
+	ld	a,l
+	rra
+	rra
+	rra
+	and	31
+	and	%1
+	ld	l,a
+
+	ld	l,a
+	ld	l,a
+=
+	ld	l,a
+
+	ld	l,a
+	ld	h,0
+	ld	a,l
+=
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	ld	de,6
+	call	l_asr_u_hl_by_e
+	ld	h,0
+=
+	ld	a,l
+	rlca
+	rlca
+	and	3
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	(_%1),a
+	pop	hl
+=
+	ld	(_%1),a
+	pop	hl
+
+	ld	h,0
+	ld	de,4
+	call	l_asr_u_hl_by_e
+=
+	ld	h,0
+	ld	a,l
+	rrca
+	rrca
+	rrca
+	rrca
+	and	15
+	ld	l,a
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	a
+	jp	%2
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	and	a
+	jp	%2
+	ld	hl,%3
