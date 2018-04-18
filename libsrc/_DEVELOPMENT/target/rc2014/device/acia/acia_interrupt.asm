@@ -25,28 +25,27 @@
 
         ld a, (aciaRxCount)         ; Get the number of bytes in the Rx buffer
         cp __IO_ACIA_RX_SIZE - 1    ; check whether there is space in the buffer
-        jr nc, tx_check             ; buffer full, check if we can send something
+        jr NC, tx_check             ; buffer full, check if we can send something
 
         ld a, l                     ; get Rx byte from l
+        ld hl, aciaRxCount
+        inc (hl)                    ; atomically increment Rx buffer count
         ld hl, (aciaRxIn)           ; get the pointer to where we poke
         ld (hl), a                  ; write the Rx byte to the aciaRxIn address
 
         inc l                       ; move the Rx pointer low byte along, 0xFF rollover
         ld (aciaRxIn), hl           ; write where the next byte should be poked
 
-        ld hl, aciaRxCount
-        inc (hl)                    ; atomically increment Rx buffer count
-
     ; now start doing the Tx stuff
 
     tx_check:
         in a, (__IO_ACIA_STATUS_REGISTER)  ; get the status of the ACIA
         and __IO_ACIA_SR_TDRE       ; check whether a byte can be transmitted
-        jr z, rts_check             ; if not, go check for the receive RTS selection
+        jr Z, rts_check             ; if not, go check for the receive RTS selection
 
         ld a, (aciaTxCount)         ; get the number of bytes in the Tx buffer
         or a                        ; check whether it is zero
-        jr z, tei_clear             ; if the count is zero, then disable the Tx Interrupt
+        jr Z, tei_clear             ; if the count is zero, then disable the Tx Interrupt
 
         ld hl, (aciaTxOut)          ; get the pointer to place where we pop the Tx byte
         ld a, (hl)                  ; get the Tx byte
@@ -54,7 +53,7 @@
 
         ld a,l                      ; check if Tx pointer is at the end of its range
         cp +(aciaTxBuffer + __IO_ACIA_TX_SIZE - 1) & 0xff
-        jr z, resetTxBuffer         ; if at end of range, reset Tx pointer to start of Tx buffer
+        jr Z, resetTxBuffer         ; if at end of range, reset Tx pointer to start of Tx buffer
         inc hl                      ; else advance to next byte in Tx buffer
 
     tx_buffer_adjusted:
@@ -63,7 +62,7 @@
 
         ld hl, aciaTxCount
         dec (hl)                    ; atomically decrement current Tx count
-        jr nz, tx_end               ; if we've more Tx bytes to send, we're done for now
+        jr NZ, tx_end               ; if we've more Tx bytes to send, we're done for now
         
     tei_clear:
         ld a, (aciaControl)         ; get the ACIA control echo byte
