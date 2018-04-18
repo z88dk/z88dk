@@ -13,14 +13,17 @@
 			PUBLIC    clg
          PUBLIC    _clg
 
+	EXTERN	base_graphics
+	
 			INCLUDE	"graphics/grafix.inc"
 
 
 .clg
 ._clg
-	jp $38a9	; FGR
-	;call $38a9	; FGR
-	;ld   a,0	; black
-	;call $384d	; FCLS
+	call $38a9	; FGR
+	xor a	; black
+	call $3852	; FCLS
 	;ld	a,3		; green
-	;jp  $38da	; FCOLOU
+	;call  $38da	; FCOLOU
+	;call $384d	; FCLS
+	ret
