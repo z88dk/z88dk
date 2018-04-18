@@ -3181,7 +3181,7 @@ int main (int argc, char **argv){
               TEST(h, 7);
             } else if ( c_cpu == CPU_Z80_ZXN ) {   // (ZXN) mirror a
               a = mirror_table[a & 0x0f] << 4 | mirror_table[(a & 0xf0) >> 4];
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3269,6 +3269,7 @@ int main (int argc, char **argv){
           case 0x23:                                         // (ZXN) swapnib
             if ( c_cpu == CPU_Z80_ZXN ) {
               a = (( a & 0xf0) >> 4) | (( a & 0x0f) << 4);
+              st += 8;
             } else {
               st += 8;
             }
@@ -3279,16 +3280,14 @@ int main (int argc, char **argv){
             e = d;
             d = t;
             e = (mirror_table[e & 0x0f] << 4) | mirror_table[(e & 0xf0) >> 4];
-            st += 4;
+            st += 8;
             break;
           case 0x30:                                         // (ZXN) mul
             if ( c_cpu == CPU_Z80_ZXN ) {
-              int32_t result = (( d * 256 ) + e) * (( h * 256 ) + l);
-              d = (result >> 24);
-              e = (result >> 16) & 0xff;
-              h  = (result >> 8 ) & 0xff;
-              l = result & 0xff;
-              st += 4;
+              int16_t result = d * e;
+              d  = (result >> 8 ) & 0xff;
+              e = result & 0xff;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3298,7 +3297,7 @@ int main (int argc, char **argv){
               int16_t result = (( h * 256 ) + l) + a;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3308,7 +3307,7 @@ int main (int argc, char **argv){
               int16_t result = (( d * 256 ) + e) + a;
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3318,7 +3317,7 @@ int main (int argc, char **argv){
               int16_t result = (( b * 256 ) + c) + a;
               b  = (result >> 8 ) & 0xff;
               c = result & 0xff;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3330,7 +3329,7 @@ int main (int argc, char **argv){
               int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
-              st += 12;
+              st += 16;
             } else if ( c_cpu == CPU_Z180 ) {               // (Z180) TST A,(HL)
               uint8_t v = get_memory(l | h << 8);
               TEST(v, 10);
@@ -3345,7 +3344,7 @@ int main (int argc, char **argv){
               int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
-              st += 12;
+              st += 16;
             } else {
               st += 8;
             }
@@ -3357,7 +3356,7 @@ int main (int argc, char **argv){
               int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
               b = (result >> 8 ) & 0xff;
               c = result & 0xff;
-              st += 12;
+              st += 16;
             } else {
               st += 8;
             }
@@ -3459,10 +3458,10 @@ int main (int argc, char **argv){
             break;
           case 0x8a:                                         // (ZXN) push $xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t msb = get_memory(pc++);
               uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               PUSH(msb,lsb);
-              st += 22;
+              st += 19  ;
             } else {
               st += 8;
             }
@@ -3479,6 +3478,7 @@ int main (int argc, char **argv){
             if ( c_cpu == CPU_Z80_ZXN ) {
               uint8_t v = get_memory(pc++);
               TEST(v, 7);
+              st += 11;
             } else {
               st += 8;
             }
