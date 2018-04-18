@@ -421,6 +421,7 @@ void dofor()
     savedloc = locptr;
 
     needchar('(');
+    ++ncmp;
     if (cmatch(';') == 0) {
         if ( declare_local(0) == 0 ) {
             doexpr(); /*         initialization             */
@@ -457,6 +458,7 @@ void dofor()
         statement(); // Evaluate it
         discardbuffer(buf4);
     }
+    --ncmp;
     modstk(savedsp, NO, NO);
     Zsp = savedsp;
     locptr = savedloc;

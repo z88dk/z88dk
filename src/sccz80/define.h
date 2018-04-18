@@ -194,6 +194,7 @@ struct symbol_s {
                                 bit 1 = far data/pointer
                                 bit 2 = access via far methods
                               */
+        int level;           /* Compound level that this variable is declared at */
         UT_hash_handle  hh;
 
 };
