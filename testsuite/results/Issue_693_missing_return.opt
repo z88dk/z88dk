@@ -1,0 +1,35 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._str_word_wrap
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ret
+
+
+
+._ms_statuschar
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_ms_statuschar
+
+
+
+

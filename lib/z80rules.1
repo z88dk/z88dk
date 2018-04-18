@@ -2483,14 +2483,14 @@
 	and	a
 	jp	%1,%2
 
-	ld	hl,%1
+	ld	hl,_%1
 	ld	(hl),#(%2 % 256)
 	inc	hl
 	ld	(hl),#(%2 / 256)
 	ld	hl,%3
 =
 	ld	hl,%2	;const
-	ld	(%1),hl
+	ld	(_%1),hl
 	ld	hl,%3
 
 	call	l_gintspsp	;
@@ -3271,3 +3271,415 @@
 =
 	push	de
 	push	hl
+
+	ld	de,%1
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ld	de,%2
+=
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ld	de,%2
+
+	call	l_glong
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+
+	ld	hl,(_%1)
+	ld	h,0
+	add	hl,de
+	ld	h,0
+	ld	a,l
+	ld	(_%2),a
+	%3	hl%4
+=
+	ld	a,(_%1)
+	add	e
+	ld	(_%2),a
+	%3	hl%4
+
+	call	l_glong
+	ld	de,0
+=
+	call	l_gint
+	ld	de,0
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	cp	%2
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	cp	%2
+	ld	hl,%3
+
+	ld	h,0
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	h,0
+=
+	ld	h,0
+	ld	a,%2
+	and	l
+	ld	l,a
+
+	ld	l,(hl)
+	ld	h,0
+	call	l_sxt
+=
+	ld	a,(hl)
+	call	l_sxt
+
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_lneg
+	jp	nc,%2
+=
+	ld	a,(_%1)
+	and	a
+	jp	nz,%2
+
+	ld	l,(hl)
+	ld	h,0
+	call	l_lneg
+	jp	c,%1
+=
+	ld	a,(hl)
+	and	a
+	jp	z,%1
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	sub	%1
+	jp	%2c,%3
+=
+	ld	a,(hl)
+	sub	%1
+	jp	%2c,%3
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	call	l_sxt
+=
+	ld	a,(_%1)
+	ld	l,a
+	rla	
+	sbc	a
+	ld	h,a
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	%2
+	jp	z,%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	and	%2
+	jp	z,%3
+	ld	hl,%4
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	de,4
+	call	l_asr_u_hl_by_e
+=
+	ld	a,(_%1)
+	rra
+	rra
+	rra
+	rra
+	and	15
+	ld	l,a
+	ld	h,0
+
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	ld	de,0
+=
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,(hl)
+	and	%1
+	ld	l,a
+	ld	h,0
+	ld	de,0
+
+	ld	l,a
+	ld	h,0
+	ld	de,0
+	ld	a,h
+	or	l
+	jp	z,%2
+	ld	hl,%3
+=
+	and	a
+	jp	z,%2
+	ld	hl,%3
+
+	ld	d,(hl)	;broken
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,a
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ex	de,hl
+
+	push	hl
+	ld	l,(hl)
+	ld	h,0
+	srl	l
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	srl	(hl)
+
+	call	l_ghtonsint
+	ld	a,h
+	and	%1
+	ld	h,a
+	ld	l,0
+=
+	ld	a,(hl)
+	and	%1
+	ld	h,a
+	ld	l,0
+
+	and	%1
+	ld	h,a
+	ld	l,0
+	and	a
+	jp	z,%2
+	ld	hl,%3
+=
+	and	%1
+	jp	z,%2
+	ld	hl,%3
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,#%2
+	and	l
+	ld	l,a
+	push	hl
+=
+	ld	a,(_%1)
+	and	#%2
+	ld	l,a
+	ld	h,0
+	push	hl	
+
+	scf
+	jr	z,ASMPC+3
+	and	a
+	jr	c,%2
+.%3
+	jp	%4
+.%2
+=
+	scf
+	jr	z,%2
+	and	a
+.%3
+	jp	%4
+.%2
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	de,0
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
+=
+	ld	hl,(_%1 - 1)
+	ld	l,0
+	ld	de,0
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	sub	e
+	and	a
+	jp	z,%1
+	pop	hl
+=
+	ld	a,(hl)
+	sub	e
+	and	a
+	jp	z,%1
+	pop	hl
+
+	call	l_glong2sp
+	ld	hl,%1	;const
+	ld	de,0
+	call	l_long_and
+	pop	de
+	call	l_pint
+	ld	hl,%2
+=
+	pop	bc
+	ld	a,(hl)
+	and	#(%1 %% 256)
+	ld	(bc),a
+	inc	bc
+	inc	hl
+	ld	a,(hl)
+	and	#(%1 / 256)
+	ld	(bc),a
+	ld	hl,%2
+
+	push	hl
+	ld	hl,%1	;const
+	add	hl,sp
+	pop	bc
+=
+	ld	c,l
+	ld	b,h
+	ld	hl,%eval( %1 2 -)	;const
+	add	hl,sp
+
+%check 0 <= %1 <= 7
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+	ld	c,%1
+	call	l_long_asr_uo
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	b,%1
+.i_x%L	rr	h
+	rra
+	djnz	i_x%L
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+	ld	h,0
+	ld	de,3
+	call	l_asr_u_hl_by_e
+	ld	a,l
+	and	%1
+=
+	ld	a,l
+	rra
+	rra
+	rra
+	and	31
+	and	%1
+	ld	l,a
+
+	ld	l,a
+	ld	l,a
+=
+	ld	l,a
+
+	ld	l,a
+	ld	h,0
+	ld	a,l
+=
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	ld	de,6
+	call	l_asr_u_hl_by_e
+	ld	h,0
+=
+	ld	a,l
+	rlca
+	rlca
+	and	3
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	(_%1),a
+	pop	hl
+=
+	ld	(_%1),a
+	pop	hl
+
+	ld	h,0
+	ld	de,4
+	call	l_asr_u_hl_by_e
+=
+	ld	h,0
+	ld	a,l
+	rrca
+	rrca
+	rrca
+	rrca
+	and	15
+	ld	l,a
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	a
+	jp	%2
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	and	a
+	jp	%2
+	ld	hl,%3

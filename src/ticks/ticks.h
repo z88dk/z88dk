@@ -48,7 +48,6 @@ extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
 extern unsigned char xh, xl, yh, yl;
 extern unsigned short ff, pc, sp;
-extern unsigned char *mem;
 extern long long st;
 
 
@@ -130,7 +129,7 @@ extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
 extern char **parse_words(char *line, int *argc);
 
-
+extern void        reset_zxnext_mmu();
 extern uint8_t    *get_memory_addr(int pc);
 extern uint8_t     get_memory(int pc);
 extern uint8_t     put_memory(int pc, uint8_t b);
