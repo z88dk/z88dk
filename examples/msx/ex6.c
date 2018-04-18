@@ -21,37 +21,8 @@ Contact the author:
 #include <stdio.h>
 #include <msx/gfx.h>
 
-extern char diamond[];
-extern char diamond_attr[];
-
-
-//extern u_char diamond[8];  
-//extern u_char diamond_attr[8];
-//extern u_char diamond_attr[8]={0x70,0x70,0x70,0xF0,0x50,0x50,0x50,0x00};
-
-
-#asm
-._diamond
-	defb	@00010000
-	defb	@00111000
-	defb	@01011100
-	defb	@11111110
-	defb	@01110100
-	defb	@00111000
-	defb	@00010000
-	defb	@00000000
-
-._diamond_attr
-	defb	070H
-	defb	070H
-	defb	070H
-	defb	0F0H
-	defb	050H
-	defb	050H
-	defb	050H
-	defb	000H
-#endasm
-
+extern char diamond[8]={0x10,0x38,0x5c,0xFE,0x74,0x38,0x10,0x00};
+extern char diamond_attr[8]={0x70,0x70,0x70,0xF0,0x50,0x50,0x50,0x00};
 
 void main() {
 	int d;
@@ -67,7 +38,6 @@ void main() {
 
 	// also set sprite 0 with the diamond shape
 	set_sprite_8(0, diamond);
-	//set_sprite_16(0, (void*)(0x1BBF + 8));
 
 	// print the '&' in the middle of the screen
 	vpoke(6144 + 32 * 12 + 16, '&');

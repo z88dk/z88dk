@@ -1076,6 +1076,11 @@ void scale(Kind type, Type *tag)
 void quikmult(int type, int32_t size, char preserve)
 {
     if ( type == KIND_LONG ) {
+        LVALUE lval = {0};
+
+        lval.val_type = type;
+        lval.ltype = type_long;
+
         /* Normal long multiplication is:
            push, push, ld hl, ld de, call l_long_mult = 11 bytes
         */
@@ -1154,6 +1159,9 @@ void quikmult(int type, int32_t size, char preserve)
                 ol("ex\tde,hl");
                 ol("adc\thl,bc");
                 ol("ex\tde,hl");
+                break;
+            case 8192:
+                asl_const(&lval, 13);
                 break;
             default:
                 lpush();       
@@ -1554,6 +1562,9 @@ void zdiv_const(LVALUE *lval, int32_t value)
             ol("ld\te,d");
             ol("ld\td,0");
             return;
+        } else if ( value == 8192 && utype(lval) ) {
+            asr_const(lval, 13);
+            return;
         } else if ( value == 65536 ) {
             swap();
             const2(0);
@@ -1683,6 +1694,9 @@ void zmod_const(LVALUE *lval, int32_t value)
             return;
         } else if ( value == 65536 * 256 && utype(lval)  ) {
             ol("ld\td,0");
+            return;
+        } else if ( value == 8192 && utype(lval) ) {
+            zand_const(lval, 8191);
             return;
         } else {
             lpush();
@@ -2094,8 +2108,8 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( (value == 11 || value == 12 || value == 13 || value == 14) && utype(lval) ) {
-            ol("ld\tl,h"); /* 12 bytes */
+        } else if ( (value == 11 || value == 12 || value == 13  || value == 14 ) && utype(lval) ) {
+            ol("ld\tl,h"); /* 12 bytes - shift by 8 initially */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
@@ -2312,7 +2326,7 @@ void asl_16bit_const(LVALUE *lval, int value)
 
 void asl_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == KIND_LONG  ) { 
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR  ) { 
         switch ( value ) {
         case 0: 
             return;
@@ -3255,6 +3269,11 @@ void convUint2long(void)
 /* Signed int to long */
 void convSint2long(void)
 {
+    // ol("ld\ta,h");
+    // ol("rla");
+    // ol("sbc\ta");
+    // ol("ld\te,a");
+    // ol("ld\td,a");
     callrts("l_int2long_s");
 }
 

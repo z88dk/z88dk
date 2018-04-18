@@ -374,7 +374,6 @@ IF FORp2000
 	DEFINE gotgfx
 	defc maxx	= 78
 	defc maxy	= 72
-	defc blankch	= 32
 ENDIF
 
 IF FORpx4

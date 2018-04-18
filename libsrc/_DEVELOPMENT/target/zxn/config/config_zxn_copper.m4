@@ -39,7 +39,9 @@ divert(-1)
 # The ZXN Copper understands two operations:
 #
 # (1) Wait for a particular line (0-311 @ 50Hz or 0-261 @ 60Hz)
-#     and a horizontal character position (0-55 or 0-56)
+#     and a horizontal character position (0-55 or 0-56).  The
+#     wait is an equality comparison for line and a greater equal
+#     comparison for horizontal character position.
 #
 # (2) Write a value to a nextreg.
 #

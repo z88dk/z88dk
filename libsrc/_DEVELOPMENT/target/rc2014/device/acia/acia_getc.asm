@@ -22,7 +22,7 @@
         ld l, a                     ; and put it in hl
 
         or a                        ; see if there are zero bytes available
-        ret z                       ; if the count is zero, then return
+        ret Z                       ; if the count is zero, then return
 
         ld hl, (aciaRxOut)          ; get the pointer to place where we pop the Rx byte
         ld a, (hl)                  ; get the Rx byte
@@ -36,7 +36,7 @@
         ld a,(hl)                   ; get the newly decremented Rx count
 
         cp __IO_ACIA_RX_EMPTYISH    ; compare the count with the preferred empty size
-        jr nc, get_clean_up_rx      ; if the buffer is full, don't change the RTS
+        jr NC, get_clean_up_rx      ; if the buffer is full, don't change the RTS
 
         call asm_z80_push_di        ; critical section begin
         

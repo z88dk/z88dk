@@ -11,12 +11,11 @@ aciaRxOut:      defw aciaRxBuffer       ; non-zero item in bss since it's initia
 
 SECTION data_align_256
 
+; pad to next 256 byte boundary
+
+ALIGN 0x100
+
 PUBLIC aciaRxBuffer
 
 aciaRxBuffer:   defs __IO_ACIA_RX_SIZE  ; Space for the Rx Buffer
 
-; pad to next 256 byte boundary
-
-IF (ASMPC & 0xff)
-   defs 256 - (ASMPC & 0xff)
-ENDIF

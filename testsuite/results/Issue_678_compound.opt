@@ -26,7 +26,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	call	l_glong
+	call	l_gint
 	ld	de,0
 	pop	bc
 	call	l_plong
@@ -51,7 +51,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	call	l_glong
+	call	l_gint
 	ld	de,0
 	pop	bc
 	call	l_plong
@@ -75,7 +75,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	call	l_glong
+	call	l_gint
 	ld	de,0
 	pop	bc
 	call	l_plong
@@ -101,7 +101,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	call	l_glong
+	call	l_gint
 	ld	de,0
 	pop	bc
 	call	l_plong
