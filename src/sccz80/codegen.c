@@ -856,15 +856,12 @@ void setcond(int val)
 /* Test the primary register and jump if false to label */
 void testjump(LVALUE* lval, int label)
 {
-    int type;
+    Kind type;
+
     ol("ld\ta,h");
     ol("or\tl");
 
-    if (lval->oldval_kind == KIND_LONG) {
-        ol("or\td");
-        ol("or\te");
-    }
-    type = lval->oldval_kind;
+    type = lval->val_type;
     if (lval->binop == NULL)
         type = lval->val_type;
 
@@ -1079,6 +1076,11 @@ void scale(Kind type, Type *tag)
 void quikmult(int type, int32_t size, char preserve)
 {
     if ( type == KIND_LONG ) {
+        LVALUE lval = {0};
+
+        lval.val_type = type;
+        lval.ltype = type_long;
+
         /* Normal long multiplication is:
            push, push, ld hl, ld de, call l_long_mult = 11 bytes
         */
@@ -1157,6 +1159,9 @@ void quikmult(int type, int32_t size, char preserve)
                 ol("ex\tde,hl");
                 ol("adc\thl,bc");
                 ol("ex\tde,hl");
+                break;
+            case 8192:
+                asl_const(&lval, 13);
                 break;
             default:
                 lpush();       
@@ -1557,6 +1562,9 @@ void zdiv_const(LVALUE *lval, int32_t value)
             ol("ld\te,d");
             ol("ld\td,0");
             return;
+        } else if ( value == 8192 && utype(lval) ) {
+            asr_const(lval, 13);
+            return;
         } else if ( value == 65536 ) {
             swap();
             const2(0);
@@ -1686,6 +1694,9 @@ void zmod_const(LVALUE *lval, int32_t value)
             return;
         } else if ( value == 65536 * 256 && utype(lval)  ) {
             ol("ld\td,0");
+            return;
+        } else if ( value == 8192 && utype(lval) ) {
+            zand_const(lval, 8191);
             return;
         } else {
             lpush();
@@ -1983,22 +1994,22 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( (value & 0xffffff00) == 0xffffff00 ) {
            // Only the bottom 8 bits
            ol("ld\ta,l");
-           outfmt("\tand\t%d\n",(value & 0xff));
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff));
            ol("ld\tl,a");
         } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
            // Only the bits 15-8
            ol("ld\ta,h");
-           outfmt("\tand\t%d\n",(value & 0xff00)>>8);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff00)>>8);
            ol("ld\th,a");
         } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
            // Only the bits 23-16
            ol("ld\ta,e");
-           outfmt("\tand\t%d\n",(value & 0xff0000)>>16);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff0000)>>16);
            ol("ld\te,a");
         } else if ( (value & 0x00ffffff) == 0x00ffffff ) {
            // Only the bits 32-23
            ol("ld\ta,d");
-           outfmt("\tand\t%d\n",(value & 0xff000000) >> 24);
+           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff000000) >> 24);
            ol("ld\td,a");
         } else { // 13 bytes
             lpush(); // 4
@@ -2013,12 +2024,12 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( value >= 0 && value < 256 ) {
             // 6 bytes, library call is 6 bytes, this is faster
             ol("ld\ta,l");
-            ot("and\t"); outdec(value % 256); nl();
+            outfmt("\tand\t#(%d %% 256)\n",value % 256);
             ol("ld\tl,a");
             ol("ld\th,0");
         } else if ( value % 256 == 0 ) {
             ol("ld\ta,h");
-            ot("and\t"); outdec( (value % 65536) / 256); nl();
+            outfmt("\tand\t#(%d %% 256)\n",(value % 65536) / 256);
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else if ( value == 0xffff ) {
@@ -2097,8 +2108,8 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("srl\te");
             ol("rr\th");
             ol("rr\tl");
-        } else if ( (value == 11 || value == 12 || value == 13 || value == 14) && utype(lval) ) {
-            ol("ld\tl,h"); /* 12 bytes */
+        } else if ( (value == 11 || value == 12 || value == 13  || value == 14 ) && utype(lval) ) {
+            ol("ld\tl,h"); /* 12 bytes - shift by 8 initially */
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
@@ -2315,7 +2326,7 @@ void asl_16bit_const(LVALUE *lval, int value)
 
 void asl_const(LVALUE *lval, int32_t value)
 {
-    if ( lval->val_type == KIND_LONG  ) { 
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR  ) { 
         switch ( value ) {
         case 0: 
             return;
@@ -2520,7 +2531,7 @@ void dummy(LVALUE *lval)
 void eq0(LVALUE* lval, int label)
 {
     check_lastop_was_comparison(lval);
-    switch (lval->oldval_kind) {
+    switch (lval->val_type) {
 #ifdef CHARCOMP0
     case KIND_CHAR:
         ol("ld\ta,l");
@@ -2563,17 +2574,25 @@ void zeq_const(LVALUE *lval, int32_t value)
             ol("scf");
             set_carry(lval);
         } else if ( c_speed_optimisation & OPT_LONG_COMPARE ) {
-            constbc(value % 65536); // 19 bytes
+            constbc(value % 65536); // 18 bytes or 14 with zero top word
             ol("and\ta");
             ol("sbc\thl,bc");
-            ol("jr\tnz,ASMPC+13");
-            ol("ex\tde,hl");
-            constbc(value / 65536);
-            ol("and\ta");
-            ol("sbc\thl,bc");
-            ol("scf");
-            ol("jr\tz,ASMPC+3");
-            ol("and\ta");
+            if ( value / 65536 == 0 ) {
+                ol("jr\tnz,ASMPC+7"); // into and a
+                ol("ld\ta,d");
+                ol("or\te");
+                ol("scf");
+                ol("jr\tz,ASMPC+3");
+                ol("and\ta");
+            } else {
+                ol("jr\tnz,ASMPC+11"); // into and a
+                ol("ex\tde,hl");
+                constbc(value / 65536);
+                ol("sbc\thl,bc");
+                ol("scf");
+                ol("jr\tz,ASMPC+3");
+                ol("and\ta");
+            }
             set_carry(lval);
         } else {
             lpush();  // 11 bytes
@@ -2630,7 +2649,7 @@ void zeq(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if (c_doinline) {
+        if (c_speed_optimisation & OPT_INT_COMPARE ) {
             set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
@@ -2670,9 +2689,33 @@ void zne_const(LVALUE *lval, int32_t value)
             ol("scf");
             set_carry(lval);
         } else {
-            lpush();  // 11 bytes
-            vlongconst(value);
-            zne(lval);
+            if ( c_speed_optimisation & OPT_LONG_COMPARE ) {
+                ol("and\ta");   // 18 bytes, 14 bytes if zero top word
+                constbc(value % 65536);
+                ol("sbc\thl,bc");
+                if ( value / 65536 == 0 ) {
+                    ol("jr\tnz,ASMPC+4"); // into scf
+                    ol("ld\ta,d");
+                    ol("or\te");
+                    ol("scf");
+                    ol("jr\tnz,ASMPC+3");
+                    ol("and\ta");
+                } else {
+                    ol("jr\tnz,ASMPC+8"); // into scf
+                    // Carry should still be reset if zero
+                    swap();
+                    constbc(value / 65536);
+                    ol("sbc\thl,bc");
+                    ol("scf");
+                    ol("jr\tnz,ASMPC+3");
+                    ol("and\ta");   // Reset carry
+                    set_carry(lval);
+                }
+            } else {
+                lpush();  // 11 bytes
+                vlongconst(value);
+                zne(lval);
+            }
         }
     } else if ( lval->val_type == KIND_CHAR ) {
          if ( value == 0 ) {
@@ -2723,7 +2766,7 @@ void zne(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if (c_doinline) {
+        if (c_speed_optimisation & OPT_INT_COMPARE ) {
             set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
@@ -2738,7 +2781,7 @@ void zne(LVALUE* lval)
         }
     default:
         if ( c_speed_optimisation & OPT_INT_COMPARE ) {
-            ol("and\ta");
+            ol("and\ta"); // 7 bytes
             ol("sbc\thl,de");
             ol("scf");
             ol("jr\tnz,ASMPC+3");
@@ -2764,9 +2807,22 @@ void zlt_const(LVALUE *lval, int32_t value)
             }
             set_carry(lval);
         } else {
-            lpush();
-            vlongconst(value);
-            zlt(lval);
+            ol("ld\ta,l");  // 12 bytes (unsigned), 15 bytes (signed) vs 11 bytes + call
+            outfmt("\tsub\t%d\n", (value % 65536) % 256);
+            ol("ld\ta,h");
+            outfmt("\tsbc\t%d\n", (value % 65536) / 256);
+            ol("ld\ta,e");
+            outfmt("\tsbc\t%d\n", (value / 65536) % 256);
+            ol("ld\ta,d");
+            if ( utype(lval)) {
+                outfmt("\tsbc\t%d\n", (value / 65536) / 256);
+            } else {
+                ol("rla");
+                ol("ccf");
+                ol("rra");
+                outfmt("\tsbc\t%d\n", (0x80 + ((uint32_t)(value /65536) / 256)) & 0xff);
+            }
+            set_carry(lval);
         }
     } else if ( lval->val_type == KIND_CHAR && utype(lval)) {
         if ( value == 0 ) {
@@ -2781,12 +2837,7 @@ void zlt_const(LVALUE *lval, int32_t value)
         ol("ld\ta,l");
         ol("rla");  
         set_carry(lval);
-    } else if ( (lval->val_type == KIND_INT && utype(lval)) || lval->val_type == KIND_PTR ) {
-        const2(value & 0xffff);  // 6 bytes
-        ol("and\ta");
-        ol("sbc\thl,de");
-        set_carry(lval);
-    } else if ( lval->val_type == KIND_INT ) {
+    } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
         if ( value == 0 ) {
             if ( utype(lval) ) {
                 ol("and\ta"); // Should not reach here
@@ -2795,13 +2846,19 @@ void zlt_const(LVALUE *lval, int32_t value)
                 ol("rla");
             }
         } else {
-            ol("ld\ta,l"); // 9 bytesz
-            outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
-            ol("ld\ta,h");
-            ol("rla");
-            ol("ccf");
-            ol("rra");
-            outfmt("\tsbc\t%d\n", (0x80 | ((uint32_t)value / 256)) & 0xff);
+            if ( utype(lval)) {
+                const2(value & 0xffff);  // 6 bytes
+                ol("and\ta");
+                ol("sbc\thl,de");
+            } else {
+                ol("ld\ta,l"); // 9 bytesz
+                outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
+                ol("ld\ta,h");
+                ol("rla");
+                ol("ccf");
+                ol("rra");
+                outfmt("\tsbc\t%d\n", (0x80 +  ((uint32_t)value / 256)) & 0xff);
+            }
         }
         set_carry(lval);
     } else {
@@ -2832,7 +2889,7 @@ void zlt(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if (c_doinline) {
+        if (c_speed_optimisation & OPT_INT_COMPARE ) {
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -2933,7 +2990,7 @@ void zle(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if (c_doinline) {
+        if (c_speed_optimisation & OPT_INT_COMPARE ) {
             if (utype(lval)) { /* unsigned */
                 ol("ld\ta,e");
                 ol("sub\tl"); /* If l < e then carry set */
@@ -3031,7 +3088,7 @@ void zgt(LVALUE* lval)
         set_int(lval);
         break;
     case KIND_CHAR:
-        if (c_doinline) {
+        if (c_speed_optimisation & OPT_INT_COMPARE ) {
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -3078,11 +3135,18 @@ void zge_const(LVALUE *lval, int32_t value)
         lpush();
         vlongconst(value);
         zge(lval);
-    } else if ( lval->val_type == KIND_CHAR && utype(lval)) {
-        ol("ld\ta,l");
-        outfmt("\tsub\t%d\n", (value % 256));
-        ol("ccf");
-        set_carry(lval);
+    } else if ( lval->val_type == KIND_CHAR ) {
+        if ( utype(lval) ) {
+            ol("ld\ta,l");
+            outfmt("\tsub\t%d\n", (value % 256));
+            ol("ccf");
+            set_carry(lval);
+        } else {
+            ol("ld\ta,l");
+            ol("xor\t128");
+            outfmt("\tsub\t%d\n", 0x80 + ( value % 256));
+            ol("ccf");
+        }
     } else {
         if ( value == 0 ) {
             if ( utype(lval) ) {
@@ -3133,7 +3197,7 @@ void zge(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if (c_doinline) {
+        if (c_speed_optimisation & OPT_INT_COMPARE ) {
             if (utype(lval)) {
                 ol("ld\ta,l");
                 ol("sub\te"); /* If l > e, carry set */
@@ -3205,6 +3269,11 @@ void convUint2long(void)
 /* Signed int to long */
 void convSint2long(void)
 {
+    // ol("ld\ta,h");
+    // ol("rla");
+    // ol("sbc\ta");
+    // ol("ld\te,a");
+    // ol("ld\td,a");
     callrts("l_int2long_s");
 }
 

@@ -1,14 +1,2 @@
-@arch/zxn/misc/misc_asm.lst
+@arch/zx/misc/misc_asm.lst
 @arch/ts2068/misc/misc_sccz80.lst
-arch/zxn/misc/c/sccz80/zxn_addr_from_mmu
-arch/zxn/misc/c/sccz80/zxn_addr_from_page
-arch/zxn/misc/c/sccz80/zxn_addr_from_page_2mb
-arch/zxn/misc/c/sccz80/zxn_mangle_bank_state
-arch/zxn/misc/c/sccz80/zxn_mmu_from_addr
-arch/zxn/misc/c/sccz80/zxn_page_from_addr
-arch/zxn/misc/c/sccz80/zxn_page_from_addr_2mb
-arch/zxn/misc/c/sccz80/zxn_read_mmu_state
-arch/zxn/misc/c/sccz80/zxn_read_sysvar_bank_state
-arch/zxn/misc/c/sccz80/zxn_write_bank_state
-arch/zxn/misc/c/sccz80/zxn_write_mmu_state
-arch/zxn/misc/c/sccz80/zxn_write_sysvar_bank_state

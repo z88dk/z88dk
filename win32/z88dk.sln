@@ -86,6 +86,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ucpp", "ucpp\ucpp.vcxproj",
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zobjcopy", "zobjcopy\zobjcopy.vcxproj", "{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -246,8 +248,19 @@ Global
 		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|Win32.Build.0 = Release|Win32
 		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|x64.ActiveCfg = Release|x64
 		{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}.Release|x64.Build.0 = Release|x64
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Debug|Win32.Build.0 = Debug|Win32
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Debug|x64.ActiveCfg = Debug|x64
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Debug|x64.Build.0 = Debug|x64
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Release|Win32.ActiveCfg = Release|Win32
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Release|Win32.Build.0 = Release|Win32
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Release|x64.ActiveCfg = Release|x64
+		{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B4EBB526-56AD-448E-868F-5938D77F2042}
 	EndGlobalSection
 EndGlobal

@@ -1592,9 +1592,9 @@ static void declfunc(Type *type, enum storage_type storage)
         Type *type = array_get_byindex(currfn->ctype->parameters,array_len(currfn->ctype->parameters) - 1);
         int   adjust = 1;
 
-        if ( type->size == 2 ) 
+        if ( type->size == 2 || type->size == 1) 
             zpush();
-        else if ( type->size == 4)
+        else if ( type->size == 4 || type->size == 3)
             lpush();
         else if ( type->kind == KIND_DOUBLE )
             dpush();
@@ -1606,7 +1606,7 @@ static void declfunc(Type *type, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i -= (type->size + 2);
+                ptr->offset.i -= (get_parameter_size(currfn->ctype,type) + 2);
                 where = 2;
             }
 
@@ -1615,7 +1615,7 @@ static void declfunc(Type *type, enum storage_type storage)
                     Type *arg = array_get_byindex(currfn->ctype->parameters, i);
                     ptr = findloc(arg->name);
                     if ( ptr ) {
-                        ptr->offset.i -= type->size;
+                        ptr->offset.i -= get_parameter_size(currfn->ctype,type);
                     }
                 }
             }
@@ -1623,6 +1623,7 @@ static void declfunc(Type *type, enum storage_type storage)
     }
     
     stackargs = where;
+    lastst = STEXP;
     if (statement() != STRETURN && (type->flags & NAKED) == 0 ) {
         if ( type->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("return-type","Control reaches end of non-void function");

@@ -100,7 +100,6 @@ static option  sccz80_opts[] = {
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, CPU_R3K },
     { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
-    { 0, "do-inline", OPT_ASSIGN|OPT_INT, "Inlne some common functions", &c_doinline, ~0 },
     { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
     { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
@@ -203,7 +202,7 @@ int main(int argc, char** argv)
 
     currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = c_doinline = need_floatpack = 0;
+    ncomp = need_floatpack = 0;
     c_default_unsigned = NO;
     nxtlab = 0;/* start numbers at lowest possible */
     c_intermix_ccode = 0; /* don't include the C text as comments */

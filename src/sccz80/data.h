@@ -28,7 +28,6 @@ extern int lptr;
 extern int mptr;
 extern char Filename[];
 extern int need_floatpack;
-extern int c_doinline;
 extern int ncomp;
 extern int stackargs;
 extern char c_default_unsigned;

@@ -6,7 +6,7 @@
 ;	GTTRIG
 ;
 ;
-;	$Id: svi_gttrig.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
+;	$Id: svi_gttrig.asm $
 ;
 
         SECTION code_clib
@@ -19,8 +19,8 @@
 
 	
 GTTRIG:
-	dec	a
-	jp	m,getspace
+;	dec	a
+;	jp	m,getspace
 
 	push	af
 	and	1
@@ -38,16 +38,16 @@ trig2:	sub	1	; 255 if a=0, otherwise 0
 	sbc	a,a
 	ret
 
-getspace:
-	di
-	in	a,(PPI_C)
-	and	$f0
-	ld	c,a
-	add	8		; keyboard row #8
-	out	(PPI_COUT),a
-	in	a,(PPI_B)	; bits: RDULxxxF  Fire is the SPACE key
-	ei
-
-	and	1
-	jr	trig2
+;getspace:
+;	di
+;	in	a,(PPI_C)
+;	and	$f0
+;	ld	c,a
+;	add	8		; keyboard row #8
+;	out	(PPI_COUT),a
+;	in	a,(PPI_B)	; bits: RDULxxxF  Fire is the SPACE key
+;	ei
+;
+;	and	1
+;	jr	trig2
 

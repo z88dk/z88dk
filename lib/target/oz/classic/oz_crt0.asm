@@ -46,12 +46,6 @@
 		PUBLIC	l_dcal          ;jp(hl)
 
 
-		PUBLIC	exitsp          ;atexit() variables
-		PUBLIC	exitcount
-
-		PUBLIC	__sgoioblk      ;stdio info block
-
-
 		PUBLIC	base_graphics   ;Graphical variables
 
 		PUBLIC	s_filetypetable

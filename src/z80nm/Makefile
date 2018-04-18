@@ -1,11 +1,12 @@
 
-OBJS = ar.o 
+OBJS = ar.o ../common/die.o
+CFLAGS += -std=gnu11 -I../common -I../../ext/uthash/src
 
 INSTALL ?= install
 
 ifeq ($(EXEPREFIX),.exe)
 OBJS += ../../ext/getopt/getopt.o
-CFLAGS += -I../../ext/getopt
+CFLAGS += -I../../ext/getopt 
 endif
 
 all: z80nm$(EXESUFFIX)
@@ -17,7 +18,7 @@ install:
 	$(INSTALL) z80nm$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z80nm$(EXESUFFIX)
 
 clean:
-	$(RM) z80nm$(EXESUFFIX) ar.o getopt/*.o core
+	$(RM) z80nm$(EXESUFFIX) $(OBJS) core
 	$(RM) -rf Debug Release
 
 

@@ -36,15 +36,6 @@
 		PUBLIC    l_dcal
 
 
-;Exit variables
-		PUBLIC    exitsp
-		PUBLIC    exitcount
-
-;For stdin, stdout, stder
-		PUBLIC    __sgoioblk
-        
-
-		PUBLIC	base_graphics
 
 ; SEGA and MSX specific
 		PUBLIC	msxbios

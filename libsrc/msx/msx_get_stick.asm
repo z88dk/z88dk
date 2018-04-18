@@ -14,6 +14,7 @@
         SECTION code_clib
 	PUBLIC	msx_get_stick
 	PUBLIC	_msx_get_stick
+	PUBLIC	st_dir
 	PUBLIC	_st_dir
 	
 	EXTERN	msxbios
@@ -24,16 +25,17 @@ ELSE
         INCLUDE "target/svi/def/svibios.def"
 ENDIF
 
+st_dir:
 _st_dir:
-	defb @0000 ; 0
-	defb @0001 ; 1
-	defb @0011 ; 2
-	defb @0010 ; 3
-	defb @0110 ; 4
-	defb @0100 ; 5
-	defb @1100 ; 6
-	defb @1000 ; 7
-	defb @1001 ; 8
+	defw @0000 ; 0
+	defw @0001 ; 1
+	defw @0011 ; 2
+	defw @0010 ; 3
+	defw @0110 ; 4
+	defw @0100 ; 5
+	defw @1100 ; 6
+	defw @1000 ; 7
+	defw @1001 ; 8
 
 
 msx_get_stick:

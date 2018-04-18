@@ -18,8 +18,9 @@
 
 .clg
 ._clg
-	call $38a9	; FGR
-	ld   a,0	; black
-;	call $384d	; FCLS
-	ld	a,3		; green
-	jp  $38da	; FCOLOU
+	jp $38a9	; FGR
+	;call $38a9	; FGR
+	;ld   a,0	; black
+	;call $384d	; FCLS
+	;ld	a,3		; green
+	;jp  $38da	; FCOLOU

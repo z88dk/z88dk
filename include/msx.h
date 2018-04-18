@@ -285,10 +285,10 @@ extern void __LIB__ msx_put_sprite_16(unsigned int id, int x, int y, unsigned in
 
 // Sprite data
 typedef struct {
-        unsigned int y;	///< Y position
-        unsigned int x;	///< X position
-        unsigned int handle;	///< internal vdp handle
-        unsigned int color;	///< sprite color
+        unsigned char y;	///< Y position
+        unsigned char x;	///< X position
+        unsigned char handle;	///< internal vdp handle
+        unsigned char color;	///< sprite color
 } sprite_t;
 
 

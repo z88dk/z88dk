@@ -28,14 +28,14 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
             dropout(k, testfuncz, testfuncq, droplab, lval);
         } else if (hits) {
             dropout(k, testfuncz, testfuncq, droplab, lval);
+	    // TODO: Change to a carry?
             vconst(endval);
             jumpr(endlab = getlabel());
             postlabel(droplab);
             vconst(dropval);
             postlabel(endlab);
-            if ( lval->val_type == KIND_CARRY ) {
-                lval->val_type = KIND_INT;
-            }
+            lval->val_type = KIND_INT;
+            lval->oldval_kind = KIND_INT;
             lval->ltype = type_int;
             lval->indirect_kind = KIND_NONE;
             lval->ptr_type = lval->is_const = 0;
@@ -79,7 +79,7 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
     if (check_lastop_was_testjump(lval) || lval->binop == dummy) {
         if (lval->binop == dummy) {
             lval->val_type = KIND_INT;
-            lval->ltype = type_int;
+            lval->ltype = type_int;      
         }
         (*testfuncz)(lval, exit1); /* test zero jump */
     } else {

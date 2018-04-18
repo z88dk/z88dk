@@ -9,22 +9,31 @@
 #endif
 
 
+static unsigned char zxnext_mmu[8] = {0xff};
+static unsigned char *mem;
+static unsigned char banks[256][8192];
 
 
 uint8_t get_memory(int pc)
 {
-  return mem[pc & 65535];
+  return  *get_memory_addr(pc);
 }
 
 
 uint8_t *get_memory_addr(int pc)
 {
+  int segment = pc / 8192;
+  pc &= 0xffff;
+
+  if ( zxnext_mmu[segment] != 0xff ) {
+    return &banks[zxnext_mmu[segment]][pc % 8192];
+  }
   return &mem[pc & 65535];
 }
 
 uint8_t put_memory(int pc, uint8_t b)
 {
-  return mem[pc & 65535] = b;
+  return *get_memory_addr(pc) = b;
 }
 
 // fr = zero, ff = carry, ff&128 = s/p
@@ -570,7 +579,6 @@ unsigned char
       , ioe = 0
       ;
 
-unsigned char * mem;
 
 char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
@@ -606,6 +614,16 @@ int in(int port){
 }
 
 void out(int port, int value){
+  static int nextport = 0;
+
+  if ( port == 0x243B && nextport == 0 ) {
+      nextport = value;
+      return;
+  }
+  if ( nextport >= 0x50 && nextport <= 0x57 ) {
+    zxnext_mmu[nextport - 0x50] = value;
+  }
+  nextport = 0;
   return;
 }
 
@@ -637,11 +655,17 @@ void setf(int a){
   fa= 255 & (fb= a & -129 | (a&4)<<5);
 }
 
+void reset_zxnext_mmu() {
+  int i;
+  for ( i = 0; i < 8; i++ ) zxnext_mmu[i] = 0xff;
+}
+
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0;
   char * output= NULL;
   FILE * fh;
 
+  reset_zxnext_mmu();
   mem = calloc(0x10000, 1);
 
   hook_init();
@@ -3179,6 +3203,27 @@ int main (int argc, char **argv){
               fa= 0; break;
             }
             break;
+          case 0x91:
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t v = get_memory(pc++);
+              uint8_t r = get_memory(pc++);
+              out(0x243b, v);
+              out(0x253b, r);
+              st += 16;
+            } else {
+              st+= 8; break;
+            }
+            break;
+          case 0x92:
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t v = get_memory(pc++);
+              out(0x243b, v);
+              out(0x253b, a);
+              st += 12;
+            } else {
+              st+= 8; break;
+            }
+            break;
           case 0x00: case 0x01: case 0x02: case 0x03:        // NOP
           case 0x05: case 0x06: case 0x07:
           case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -3196,7 +3241,7 @@ int main (int argc, char **argv){
           case 0x84: case 0x85: case 0x86: case 0x87:
           case 0x88: case 0x89: 
           case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-          case 0x90: case 0x91: case 0x92: case 0x93:
+          case 0x90: case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:

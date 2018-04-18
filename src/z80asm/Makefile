@@ -46,7 +46,7 @@ OBJS			+= ../../ext/UNIXem/src/glob.o
 endif
 
 # uthash
-LOCAL_CFLAGS	+= -I../../ext/uthash/src
+LOCAL_CFLAGS	+= -I../common -I../../ext/uthash/src
 
 #------------------------------------------------------------------------------
 # main
