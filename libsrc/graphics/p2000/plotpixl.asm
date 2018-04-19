@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.5 2016-07-02 09:01:36 dom Exp $
+;	$Id: plotpixl.asm $
 ;
 
 
@@ -27,10 +27,9 @@
 			ret	nc
 			ld	a,l
 			cp	maxy
-			ret	nc		; y0	out of range
-
-			dec	a
-			dec	a
+			ret	nc		; y0	out of range			
+			inc a
+			;inc a
 			
 			ld	(__gfx_coords),hl
 			
@@ -44,31 +43,35 @@
 			ld	hl,div3
 			ld	d,0
 			ld	e,c
-			inc	e
+			inc e
 			add	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
 			
 			srl	b	; x/2
 			
+			ld    hl,(base_graphics)
+			inc hl
 			ld	a,c
 			ld	c,b	; !!
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-			ld    hl,(base_graphics)
-			inc hl
-			ld	b,a		; keep y/3
 			and	a
-			jr	z,r_zero
 
 			ld	de,80
-.r_loop
+			sbc	hl,de
+			
+			jr	z,r_zero
+			ld	b,a
+
+.r_loop			
 			add	hl,de
-			dec	a
-			jr	nz,r_loop
-		
-.r_zero     ld	d,0
+			djnz	r_loop
+
+.r_zero						; hl = char address
+			ld	b,a		; keep y/3
+			;ld	d,0
 			ld	e,c
 			add	hl,de
 

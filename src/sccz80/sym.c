@@ -42,11 +42,11 @@ SYMBOL* findloc(char* sname)
 {
     SYMBOL* ptr;
 
-    ptr = STARTLOC;
-    while (ptr != locptr) {
+    ptr = locptr - 1;
+    while (ptr >= STARTLOC) {
         if (strcmp(sname, ptr->name) == 0)
             return ptr;
-        ++ptr;
+        --ptr;
     }
     return 0;
 }
@@ -99,7 +99,7 @@ SYMBOL* addloc(
 {
     SYMBOL* cptr;
 
-    if ((cptr = findloc(sname))) {
+    if ((cptr = findloc(sname)) && cptr->level == ncmp ) {
         multidef(sname);
         return cptr;
     }
@@ -109,6 +109,7 @@ SYMBOL* addloc(
     }
     cptr = locptr++;
     initialise_sym(cptr, sname, id, kind, STKLOC);
+    cptr->level = ncmp;
     return cptr;
 }
 

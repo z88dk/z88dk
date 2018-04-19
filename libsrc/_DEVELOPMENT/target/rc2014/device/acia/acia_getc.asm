@@ -20,39 +20,32 @@
 
         ld a, (aciaRxCount)         ; get the number of bytes in the Rx buffer
         ld l, a                     ; and put it in hl
-
         or a                        ; see if there are zero bytes available
-        ret z                       ; if the count is zero, then return
-
-        ld hl, (aciaRxOut)          ; get the pointer to place where we pop the Rx byte
-        ld a, (hl)                  ; get the Rx byte
-        push af                     ; save the Rx byte on stack
-
-        inc l                       ; move the Rx pointer low byte along
-        ld (aciaRxOut), hl          ; write where the next byte should be popped
-
-        ld hl,aciaRxCount
-        dec (hl)                    ; atomically decrement Rx count
-        ld a,(hl)                   ; get the newly decremented Rx count
+        ret Z                       ; if the count is zero, then return
 
         cp __IO_ACIA_RX_EMPTYISH    ; compare the count with the preferred empty size
-        jr nc, get_clean_up_rx      ; if the buffer is full, don't change the RTS
+        jr NC, get_clean_up_rx      ; if the buffer not emptyish, don't change the RTS
 
-        call asm_z80_push_di        ; critical section begin
-        
+        di        
         ld a, (aciaControl)         ; get the ACIA control echo byte
         and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
         or __IO_ACIA_CR_TDI_RTS0    ; set RTS low.
         ld (aciaControl), a	        ; write the ACIA control echo byte back
+        ei
         out (__IO_ACIA_CONTROL_REGISTER), a    ; set the ACIA CTRL register
-        
-        call asm_z80_pop_ei         ; critical section end
 
     get_clean_up_rx:
+        ld hl,aciaRxCount
+        di      
+        dec (hl)                    ; atomically decrement Rx count
+        ld hl, (aciaRxOut)          ; get the pointer to place where we pop the Rx byte
+        ei
+        ld a, (hl)                  ; get the Rx byte
 
-        pop af                      ; get the Rx byte from stack
+        inc l                       ; move the Rx pointer low byte along
+        ld (aciaRxOut), hl          ; write where the next byte should be popped
+
         ld l, a                     ; and put it in hl
-
         scf                         ; indicate char received
         ret
 

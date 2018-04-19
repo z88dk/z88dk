@@ -3,13 +3,15 @@
 ;		 Fast background restore
 ;
 ;
-; $Id: bkrestore.asm,v 1.2 2016-06-20 21:47:41 dom Exp $
+; $Id: bkrestore.asm $
 ;
 
 	SECTION   code_clib
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
 	EXTERN	pixeladdress
+
+        EXTERN	__graphics_end
 
 .bkrestore
 ._bkrestore
@@ -60,8 +62,8 @@
 	
 	pop	bc
 	djnz	_sloop
-	pop	ix
-	ret
+	jp __graphics_end
+	
 
 .bkrestorew
 	push	bc
@@ -105,5 +107,4 @@
 	
 	pop	bc
 	djnz	bkrestorew
-	pop	ix
-	ret
+	jp __graphics_end

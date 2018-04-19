@@ -153,7 +153,7 @@ void debugger()
 
     if ( trace ) {
         cmd_registers(0, NULL);
-        disassemble(pc, buf, sizeof(buf));
+        disassemble2(pc, buf, sizeof(buf));
         printf("%s\n",buf);     
     }
 
@@ -200,7 +200,7 @@ void debugger()
     }
 
 
-    disassemble(pc, buf, sizeof(buf));
+    disassemble2(pc, buf, sizeof(buf));
     printf("%s\n",buf);
     /* In the debugger, loop continuously for commands */
     snprintf(prompt,sizeof(prompt)," %04x >", pc);  // TODO: Symbol address
@@ -249,7 +249,7 @@ static int cmd_next(int argc, char **argv)
     int   len;
     uint8_t opcode = get_memory(pc);
 
-    len = disassemble(pc, buf, sizeof(buf));
+    len = disassemble2(pc, buf, sizeof(buf));
 
     // Set a breakpoint after the call
     printf("%02x %02x %02x\n",opcode,opcode & 0xc0, opcode & 0x07);
@@ -296,7 +296,7 @@ static int cmd_disassemble(int argc, char **argv)
     }
 
     while ( i < 10 ) {
-       where += disassemble(where, buf, sizeof(buf));
+       where += disassemble2(where, buf, sizeof(buf));
        printf("%s\n",buf);
        i++;
     }
@@ -594,10 +594,11 @@ static void print_hotspots()
     FILE  *fp;
 
     if ( hotspot == 0 ) return;
+    reset_zxnext_mmu();
     if ( (fp = fopen("hotspots", "w")) != NULL ) {
         for ( i = 0; i < max_hotspot_addr; i++) {
             if ( hotspots[i] != 0 ) {
-                disassemble(i, buf, sizeof(buf));
+                disassemble2(i, buf, sizeof(buf));
                 fprintf(fp, "%d\t\t%s\n",hotspots[i],buf);
             }
         }

@@ -1,0 +1,11 @@
+arch/zxn/memory/z80/asm_zxn_addr_from_mmu
+arch/zxn/memory/z80/asm_zxn_addr_from_page
+arch/zxn/memory/z80/asm_zxn_addr_in_mmu
+arch/zxn/memory/z80/asm_zxn_mangle_bank_state
+arch/zxn/memory/z80/asm_zxn_mmu_from_addr
+arch/zxn/memory/z80/asm_zxn_page_from_addr
+arch/zxn/memory/z80/asm_zxn_read_mmu_state
+arch/zxn/memory/z80/asm_zxn_read_sysvar_bank_state
+arch/zxn/memory/z80/asm_zxn_write_bank_state
+arch/zxn/memory/z80/asm_zxn_write_mmu_state
+arch/zxn/memory/z80/asm_zxn_write_sysvar_bank_state

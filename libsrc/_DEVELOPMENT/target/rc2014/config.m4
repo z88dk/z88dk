@@ -43,6 +43,7 @@ include(`target/rc2014/config/config_clib.m4')
 include(`target/rc2014/config/config_clib_const.m4')
 
 include(`target/rc2014/config/config_acia.m4')
+include(`target/rc2014/config/config_sio.m4')
 include(`target/rc2014/config/config_82c55.m4')
 
 include(`target/rc2014/config/config_ide.m4')

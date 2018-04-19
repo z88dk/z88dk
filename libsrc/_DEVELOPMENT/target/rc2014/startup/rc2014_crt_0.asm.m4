@@ -42,12 +42,10 @@ dnl
 dnl## input terminals
 dnl
 dnl#include(`driver/terminal/rc_01_input_acia.m4')
-dnl#include(`driver/terminal/rc_01_input_basic.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`driver/terminal/rc_01_output_acia.m4')
-dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl
@@ -87,7 +85,7 @@ include(`../clib_instantiate_end.m4')
 
 SECTION CODE
 
-PUBLIC __Start, __Restart, __Exit
+PUBLIC __Start, __Exit
 
 EXTERN _main
 
@@ -166,7 +164,7 @@ SECTION code_crt_main
 
    ; call user program
    
-   call _main                  ; hl = return status
+      call _main                ; hl = return status
 
    ; run exit stack
 

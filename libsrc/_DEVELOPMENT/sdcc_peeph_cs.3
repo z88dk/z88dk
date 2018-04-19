@@ -26456,8 +26456,22 @@ replace restart {
 	ld	c,#%1
 	ld	a,c
 	push	bc
-	; peephole z88dk-481r2
+	; peephole z88dk-481r2a
 } if notUsed('c')
+
+replace restart {
+	push	bc
+	inc	sp
+	ld	a,#%1
+	push	af
+	inc	sp
+} by {
+	ld	l,#%1
+	ld	h,b
+	ld	a,l
+	push	hl
+	; peephole z88dk-481r2b
+} if notUsed('hl')
 
 replace restart {
 	push	de
@@ -26469,8 +26483,22 @@ replace restart {
 	ld	e,#%1
 	ld	a,e
 	push	de
-	; peephole z88dk-481r3
+	; peephole z88dk-481r3a
 } if notUsed('e')
+
+replace restart {
+	push	de
+	inc	sp
+	ld	a,#%1
+	push	af
+	inc	sp
+} by {
+	ld	l,#%1
+	ld	h,d
+	ld	a,l
+	push	hl
+	; peephole z88dk-481r3b
+} if notUsed('hl')
 
 replace restart {
 	push	hl
