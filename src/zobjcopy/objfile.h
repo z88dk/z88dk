@@ -19,60 +19,83 @@
 #define SIGNATURE_VERS	"%02d"
 #define ALIGN_FILLER	0xFF
 
-enum file_type { is_none, is_library, is_object };
+struct section_s;
 
+//-----------------------------------------------------------------------------
+typedef enum file_type 
+{ 
+	is_none, 
+	is_library, 
+	is_object 
+} file_type_e;
+
+//-----------------------------------------------------------------------------
 // a defined symbol
+//-----------------------------------------------------------------------------
 typedef struct symbol_s
 {
-	UT_string *name;
-	UT_string *section;
-	UT_string *filename;
-	char	scope;
-	char	type;
-	int		value;
-	int		line_nr;
+	UT_string	*name;
+	char		 scope;
+	char		 type;
+	int			 value;
 
-	struct symbol_s *next, *prev;		// to store DL list of symbols
+	struct section_s *section;		// weak
+
+	UT_string	*filename;
+	int			 line_nr;
+
+	struct symbol_s *next, *prev;
 } symbol_t;
 
 extern symbol_t *symbol_new();
-extern void symbol_free(symbol_t *sym);
+extern void symbol_free(symbol_t *self);
 
+//-----------------------------------------------------------------------------
 // an expression
+//-----------------------------------------------------------------------------
 typedef struct expr_s
 {
-	UT_string *text;
-	UT_string *section;
-	UT_string *target_name;
-	UT_string *filename;
-	char	type;
-	int		asmpc, patch_ptr;
-	int		line_nr;
+	UT_string	*text;
+	char		 type;
+	int			 asmpc;
+	int			 patch_ptr;
 
-	struct expr_s *next, *prev;			// to store DL list of symbols
+	struct section_s *section;		// weak
+
+	UT_string	*target_name;
+
+	UT_string	*filename;
+	int			 line_nr;
+
+	struct expr_s *next, *prev;
 } expr_t;
 
 extern expr_t *expr_new();
-extern void expr_free(expr_t *expr);
+extern void expr_free(expr_t *self);
 
-// object code
-typedef struct code_s
+//-----------------------------------------------------------------------------
+// one section
+//-----------------------------------------------------------------------------
+typedef struct section_s
 {
+	UT_string	*name;
 	UT_array	*data;
-	UT_string	*section;
 	int			 org;
 	int			 align;
 
-	struct code_s *next, *prev;			// to store DL list of symbols
+	symbol_t	*symbols;
+	expr_t		*exprs;
 
-	bool	renamed;
-	bool	deleted;
-} code_t;
+	struct section_s *next, *prev;
 
-extern code_t *code_new();
-extern void code_free(code_t *code);
+} section_t;
 
+extern section_t *section_new();
+extern void section_free(section_t *self);
+
+//-----------------------------------------------------------------------------
 // one object file
+//-----------------------------------------------------------------------------
 typedef struct objfile_s
 {
 	UT_string	*filename;
@@ -80,13 +103,10 @@ typedef struct objfile_s
 	UT_string	*modname;
 	int			 version;
 	int			 global_org;
-
-	symbol_t	*names;
 	UT_array	*externs;
-	expr_t		*exprs;
-	code_t		*codes;
+	section_t	*sections;
 
-	struct objfile_s *next, *prev;		// to store DL list of object files
+	struct objfile_s *next, *prev;
 } objfile_t;
 
 extern objfile_t *objfile_new();
@@ -94,12 +114,14 @@ extern void objfile_free(objfile_t *obj);
 extern void objfile_read(objfile_t *obj, FILE *fp);
 extern void objfile_write(objfile_t *obj, FILE *fp);
 
+//-----------------------------------------------------------------------------
 // one file - either object or library
+//-----------------------------------------------------------------------------
 typedef struct file_s
 {
 	UT_string	*filename;
 	UT_string	*signature;
-	enum file_type type;
+	file_type_e type;
 	int			 version;
 
 	objfile_t	*objs;					// either one or multiple object files
