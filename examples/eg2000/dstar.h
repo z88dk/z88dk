@@ -32,13 +32,13 @@ char Board[144];        /* Space for decompressed Level */
 #define K_NEXTLEV '+'
 #define K_PREVLEV '-'
 
-#define K_UP       'q'  /* arrow up     */
-#define K_DOWN     'a' /* arrow down   */
-#define K_LEFT     'o'  /* arrow left   */
-#define K_RIGHT    'p'  /* arrow right  */
-#define K_SWITCH   'm'  /* Change between blocker/ball */
-#define K_EXIT     'g' /* [Esc]/[Quit] */
-#define K_CLEAR    'h'
+#define K_UP       'Q'  /* arrow up     */
+#define K_DOWN     'A' /* arrow down   */
+#define K_LEFT     'O'  /* arrow left   */
+#define K_RIGHT    'P'  /* arrow right  */
+#define K_SWITCH   'M'  /* Change between blocker/ball */
+#define K_EXIT     'G' /* [Esc]/[Quit] */
+#define K_CLEAR    'H'
 
 extern char levels[];
 extern unsigned char sprites[];
