@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2015
 ;
 ;
-;       $Id: clg.asm,v 1.3 2017-01-02 22:57:58 aralbrec Exp $
+;       $Id: clg.asm $
 ;
 
 			SECTION	code_clib
@@ -21,9 +21,18 @@
 .clg
 ._clg
 	call $38a9	; FGR
-	xor a	; black
-	call $3852	; FCLS
-	;ld	a,3		; green
-	;call  $38da	; FCOLOU
-	;call $384d	; FCLS
+	ld	hl,$4800
+	ld	bc,$FF0
+.clsloop
+	ld	 (hl),0
+	inc hl
+	dec bc
+	ld	a,b
+	or c
+	jr nz,clsloop
 	ret
+	
+;	call $38a9	; FGR
+;	xor a	; black
+;	call $3852	; FCLS
+;	ret
