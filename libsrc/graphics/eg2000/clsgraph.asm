@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2015
 ;
 ;
-;       $Id: clsgraph.asm,v 1.3 2017-01-02 22:57:58 aralbrec Exp $
+;       $Id: clsgraph.asm $
 ;
 
 			SECTION	  code_clib
@@ -18,8 +18,4 @@
 
 .clsgraph
 ._clsgraph
-	call $38a9	; FGR
-	ld   a,0	; black
-	call $384d	; FCLS
-	ld	a,3		; green
-	jp  $38da	; FCOLOU
+	jp $38a9	; FGR
