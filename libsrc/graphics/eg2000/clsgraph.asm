@@ -13,9 +13,21 @@
 			PUBLIC    clsgraph
          PUBLIC    _clsgraph
 
+	EXTERN	base_graphics
+
 			INCLUDE	"graphics/grafix.inc"
 
 
 .clsgraph
 ._clsgraph
-	jp $38a9	; FGR
+	call $38a9	; FGR
+	ld	hl,$4800
+	ld	bc,$FF0
+.clsloop
+	ld	 (hl),0
+	inc hl
+	dec bc
+	ld	a,b
+	or c
+	jr nz,clsloop
+	ret
