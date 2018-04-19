@@ -787,6 +787,11 @@ extern unsigned int __LIB__ zxn_addr_from_mmu(unsigned char mmu) __smallc __z88d
 extern unsigned char __LIB__ zxn_mmu_from_addr(unsigned int addr) __smallc __z88dk_fastcall;
 
 
+extern unsigned int __LIB__ zxn_addr_in_mmu(unsigned char mmu,unsigned int addr) __smallc;
+extern unsigned int __LIB__ zxn_addr_in_mmu_callee(unsigned char mmu,unsigned int addr) __smallc __z88dk_callee;
+#define zxn_addr_in_mmu(a,b) zxn_addr_in_mmu_callee(a,b)
+
+
 
 extern unsigned long __LIB__ zxn_addr_from_page(unsigned char page) __smallc __z88dk_fastcall;
 
