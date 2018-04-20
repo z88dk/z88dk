@@ -22,6 +22,7 @@ static file_type_e read_signature(FILE *fp, const char *filename,
 	// read signature
 	if (fread(file_signature, sizeof(char), SIGNATURE_SIZE, fp) != SIGNATURE_SIZE)
 		die("error: signature not found in '%s'\n", filename);
+	file_signature[SIGNATURE_SIZE] = '\0';
 
 	if (strncmp(file_signature, SIGNATURE_OBJ, 6) == 0)
 		type = is_object;
@@ -45,7 +46,7 @@ static file_type_e read_signature(FILE *fp, const char *filename,
 		printf("%s file %s at $%04X: %s\n",
 			type == is_library ? "Library" : "Object ",
 			filename,
-			(unsigned)(ftell(fp) - SIGNATURE_SIZE), utstring_body(signature));
+			(unsigned)(ftell(fp) - SIGNATURE_SIZE), file_signature);
 
 	return type;
 }
