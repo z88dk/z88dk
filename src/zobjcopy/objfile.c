@@ -266,7 +266,9 @@ objfile_t *objfile_new()
 	
 	utarray_new(self->externs, &ut_str_icd);
 	
+	section_t *section= section_new();			// section "" must exist
 	self->sections = NULL;
+	DL_APPEND(self->sections, section);
 
 	self->next = self->prev = NULL;
 
@@ -301,11 +303,24 @@ static void objfile_read_sections(objfile_t *obj, FILE *fp, long fpos_start)
 			if (code_size < 0)
 				break;
 
-			// create new section object
-			section_t *section = section_new();
+			UT_string *name;
+			utstring_new(name);
+			xfread_bcount_str(name, fp);
 
-			xfread_bcount_str(section->name, fp);
+			// create new section object or use first if empty section
+			section_t *section;
+			if (utstring_len(name) == 0) {
+				section = obj->sections;			// empty section is the first
+				assert(utstring_len(section->name) == 0);
+				assert(utarray_len(section->data) == 0);
+			}
+			else {
+				section = section_new();			// create a new section
+			}
 
+			utstring_clear(section->name);
+			utstring_concat(section->name, name);
+			utstring_free(name);
 			if (obj->version >= 8)
 				section->org = xfread_dword(fp);
 			else
@@ -341,12 +356,13 @@ static void objfile_read_sections(objfile_t *obj, FILE *fp, long fpos_start)
 				print_bytes(section->data);
 
 			// insert in the list
-			DL_APPEND(obj->sections, section);
+			if (section != obj->sections)		// not first = "" section
+				DL_APPEND(obj->sections, section);
 		}
 	}
 	else {
-		// create new section object
-		section_t *section = section_new();
+		// reuse first section object
+		section_t *section = obj->sections;
 		
 		int code_size = xfread_word(fp);
 		if (code_size == 0) 
@@ -362,8 +378,6 @@ static void objfile_read_sections(objfile_t *obj, FILE *fp, long fpos_start)
 			print_bytes(section->data);
 		}
 
-		// insert in the list
-		DL_APPEND(obj->sections, section);
 	}
 }
 
@@ -559,10 +573,6 @@ void objfile_read(objfile_t *obj, FILE *fp)
 	// sections
 	if (fpos_sections >= 0)
 		objfile_read_sections(obj, fp, fpos0 + fpos_sections);
-	else {
-		section_t *section = section_new();
-		DL_APPEND(obj->sections, section);		// create empty section as anchor for symbols and exps
-	}
 
 	// symbols
 	if (fpos_symbols >= 0)
@@ -1026,7 +1036,8 @@ void file_rename_sections(file_t *file, const char *old_regexp, const char *new_
 			{	// match
 				if (opt_verbose)
 					printf("  rename section %s -> %s\n",
-						utstring_body(section->name), new_name);
+						utstring_len(section->name) > 0 ? utstring_body(section->name) : "\"\"",
+						new_name);
 
 				// join sections
 				if (delete_merged_section(obj, &merged_section, section, new_name)) {
@@ -1037,7 +1048,7 @@ void file_rename_sections(file_t *file, const char *old_regexp, const char *new_
 			else if (reti == REG_NOMATCH) {		// no match
 				if (opt_verbose)
 					printf("  skip section %s\n",
-						utstring_body(section->name));
+						utstring_len(section->name) > 0 ? utstring_body(section->name) : "\"\"");
 			}
 			else {								// error
 				char msgbuf[100];

@@ -173,6 +173,7 @@ is $out, <<'...';
 Reading file 'test.o': object version 11
 Renaming sections in file 'test.o' that match 'text' to 'text'
 Block 'Z80RMF11'
+  skip section ""
   rename section text_1 -> text
   rename section text_2 -> text
   skip section base
@@ -180,6 +181,7 @@ Block 'Z80RMF11'
   skip section data_2
 Renaming sections in file 'test.o' that match 'data' to 'data'
 Block 'Z80RMF11'
+  skip section ""
   skip section text
   skip section base
   rename section data_1 -> data
@@ -211,12 +213,14 @@ is $out, <<'...';
 Reading file 'test.lib': library version 11
 Renaming sections in file 'test.lib' that match 'text' to 'text'
 Block 'Z80RMF11'
+  skip section ""
   rename section text_1 -> text
   rename section text_2 -> text
   skip section base
   skip section data_1
   skip section data_2
 Block 'Z80RMF11'
+  skip section ""
   rename section text_1 -> text
   rename section text_2 -> text
   skip section base
@@ -224,11 +228,13 @@ Block 'Z80RMF11'
   skip section data_2
 Renaming sections in file 'test.lib' that match 'data' to 'data'
 Block 'Z80RMF11'
+  skip section ""
   skip section text
   skip section base
   rename section data_1 -> data
   rename section data_2 -> data
 Block 'Z80RMF11'
+  skip section ""
   skip section text
   skip section base
   rename section data_1 -> data
@@ -260,6 +266,7 @@ is $out, <<'...';
 Reading file 'test.o': object version 11
 Renaming sections in file 'test.o' that match '.' to 'ram'
 Block 'Z80RMF11'
+  skip section ""
   rename section text_1 -> ram
   rename section text_2 -> ram
   rename section base -> ram
@@ -292,6 +299,7 @@ is $out, <<'...';
 Reading file 'test.o': object version 11
 Renaming sections in file 'test.o' that match '^text' to 'rom_text'
 Block 'Z80RMF11'
+  skip section ""
   rename section text_1 -> rom_text
   rename section text_2 -> rom_text
   skip section base
@@ -299,6 +307,7 @@ Block 'Z80RMF11'
   skip section data_2
 Renaming sections in file 'test.o' that match '^data' to 'ram_data'
 Block 'Z80RMF11'
+  skip section ""
   skip section rom_text
   skip section base
   rename section data_1 -> ram_data
@@ -327,6 +336,7 @@ ok run("zobjcopy -v test.o -s ^data=base test2.o", <<'...', "", 0);
 Reading file 'test.o': object version 11
 Renaming sections in file 'test.o' that match '^data' to 'base'
 Block 'Z80RMF11'
+  skip section ""
   skip section text_1
   skip section text_2
   rename section base -> base
@@ -354,6 +364,7 @@ ok run("zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<'...', "", 0)
 Reading file 'test.o': object version 11
 Renaming sections in file 'test.o' that match '^data' to 'base'
 Block 'Z80RMF11'
+  skip section ""
   skip section text_1
   skip section text_2
   rename section base -> base
@@ -361,6 +372,7 @@ Block 'Z80RMF11'
   rename section data_2 -> base
 Renaming sections in file 'test.o' that match '^text' to 'base'
 Block 'Z80RMF11'
+  skip section ""
   rename section text_1 -> base
   rename section text_2 -> base
   rename section base -> base
@@ -383,12 +395,14 @@ unlink "test.o", "test2.o", $out;
 #------------------------------------------------------------------------------
 path("test.asm")->spew(<<'...');
 	public aa
-	defc aa=2
+	defc aa=2		; in section ''
+	section text	; so that obj file has one section but no ''
 ...
 ok run("z80asm test.asm", "", "", 0);
 ok run("zobjcopy -l test.o", <<'...', "", 0);
 Object  file test.o at $0000: Z80RMF11
   Name: test
+  Section text: 0 bytes
   Symbols:
     G C $0002 aa (section "") (file test.asm:2)
 ...
@@ -398,6 +412,7 @@ ok run("zobjcopy -l test2.o", <<'...', "", 0);
 Object  file test2.o at $0000: Z80RMF11
   Name: test
   Section "": 0 bytes
+  Section text: 0 bytes
   Symbols:
     G C $0002 aa (section "") (file test.asm:2)
 ...
