@@ -22,9 +22,3 @@ subdirs-clean:
 
 $(SUBDIRS):
 	$(MAKE) -C $@ all
-
-all: src-tests
-
-src-tests:
-	$(MAKE) -C ../src/zobjcopy test
-
