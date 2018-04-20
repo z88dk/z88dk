@@ -367,7 +367,7 @@ ENDIF
 IF FOReg2000
 	DEFINE gotgfx
 	defc maxx	= 160
-	defc maxy	= 100
+	defc maxy	= 102
 ENDIF
 
 IF FORp2000

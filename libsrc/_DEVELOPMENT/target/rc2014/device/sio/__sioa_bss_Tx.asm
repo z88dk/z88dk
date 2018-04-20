@@ -8,7 +8,7 @@ PUBLIC sioaTxCount, sioaTxIn, sioaTxOut, sioaTxLock
 sioaTxCount:    defb 0                  ; Space for Tx Buffer Management
 sioaTxIn:       defw sioaTxBuffer       ; non-zero item in bss since it's initialized anyway
 sioaTxOut:      defw sioaTxBuffer       ; non-zero item in bss since it's initialized anyway
-sioaTxLock:     defb $FE                ; lock flag for Tx exclusion
+sioaTxLock:     defb 0                  ; lock flag for Tx exclusion
 
 PUBLIC sioaTxBuffer
 

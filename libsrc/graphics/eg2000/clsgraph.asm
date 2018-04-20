@@ -6,12 +6,14 @@
 ;       Stefano Bodrato - 2015
 ;
 ;
-;       $Id: clsgraph.asm,v 1.3 2017-01-02 22:57:58 aralbrec Exp $
+;       $Id: clsgraph.asm $
 ;
 
 			SECTION	  code_clib
 			PUBLIC    clsgraph
          PUBLIC    _clsgraph
+
+	EXTERN	base_graphics
 
 			INCLUDE	"graphics/grafix.inc"
 
@@ -19,7 +21,13 @@
 .clsgraph
 ._clsgraph
 	call $38a9	; FGR
-	ld   a,0	; black
-	call $384d	; FCLS
-	ld	a,3		; green
-	jp  $38da	; FCOLOU
+	ld	hl,$4800
+	ld	bc,$FF0
+.clsloop
+	ld	 (hl),0
+	inc hl
+	dec bc
+	ld	a,b
+	or c
+	jr nz,clsloop
+	ret

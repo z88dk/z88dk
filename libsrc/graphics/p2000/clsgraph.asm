@@ -21,7 +21,7 @@
 ;	call  $60C0     ; cls
 	
 	ld    hl,(base_graphics)
-	ld    c,23
+	ld    c,24
 gfxset:
 	ld    (hl),23	; Set graph mode modifier at the beginning of the text rows
 	inc   hl

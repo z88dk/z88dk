@@ -8,7 +8,7 @@ PUBLIC siobRxCount, siobRxIn, siobRxOut, siobRxLock
 siobRxCount:    defb 0                  ; Space for Rx Buffer Management 
 siobRxIn:       defw siobRxBuffer       ; non-zero item in bss since it's initialized anyway
 siobRxOut:      defw siobRxBuffer       ; non-zero item in bss since it's initialized anyway
-siobRxLock:     defb $FE                ; lock flag for Rx exclusion
+siobRxLock:     defb 0                  ; lock flag for Rx exclusion
 
 SECTION bss_align_256
 

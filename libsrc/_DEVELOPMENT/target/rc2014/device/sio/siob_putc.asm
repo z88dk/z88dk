@@ -64,7 +64,6 @@
         ei
         ret
 
-
     EXTERN _sio_need
     defc NEED = _sio_need
 

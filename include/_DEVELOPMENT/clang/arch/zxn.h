@@ -785,6 +785,9 @@ extern unsigned int zxn_addr_from_mmu(unsigned char mmu);
 extern unsigned char zxn_mmu_from_addr(unsigned int addr);
 
 
+extern unsigned int zxn_addr_in_mmu(unsigned char mmu,unsigned int addr);
+
+
 
 extern unsigned long zxn_addr_from_page(unsigned char page);
 
