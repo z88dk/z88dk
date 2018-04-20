@@ -9,8 +9,12 @@ use Modern::Perl;
 use Path::Tiny;
 use Test::More;
 use Capture::Tiny 'capture';
+use Config;
 
 my $OBJ_FILE_VERSION = "11";
+
+$ENV{PATH} = ".".$Config{path_sep}."../../bin".$Config{path_sep}.$ENV{PATH};
+
 #------------------------------------------------------------------------------
 # global test data
 #------------------------------------------------------------------------------
