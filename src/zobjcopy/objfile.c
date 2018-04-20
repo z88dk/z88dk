@@ -42,7 +42,7 @@ static file_type_e read_signature(FILE *fp, const char *filename,
 			filename, *version);
 
 	if (opt_list)
-		printf("%s file %s at $%04lX: %s\n",
+		printf("%s file %s at $%04X: %s\n",
 			type == is_library ? "Library" : "Object ",
 			filename,
 			(unsigned)(ftell(fp) - SIGNATURE_SIZE), utstring_body(signature));
