@@ -3,6 +3,7 @@
 	SECTION	code_clib
 
 	PUBLIC	printk
+	PUBLIC  cprintf
 
 	EXTERN	asm_printf
 	EXTERN	printk_outc
@@ -19,6 +20,7 @@
 ;        printk1(fp, print_func, sccz80_delta, *ct,ct-1);
 ;}
 printk:
+cprintf:
 	ld	l,a
 	ld	h,0
         add     hl,hl

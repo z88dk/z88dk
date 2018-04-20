@@ -326,17 +326,13 @@ ENDIF
 
 IF NEED_ansiterminal
 	PUBLIC		fputc_cons
-	PUBLIC		puts_cons
 	PUBLIC		_fputc_cons
-	PUBLIC		_puts_cons
 	EXTERN		fputc_cons_ansi
 	EXTERN		puts_cons_ansi
 	defc DEFINED_fputc_cons = 1
 	defc DEFINED_puts_cons = 1
 	defc fputc_cons = fputc_cons_ansi
-	defc puts_cons = puts_cons_ansi
 	defc _fputc_cons = fputc_cons_ansi
-	defc _puts_cons = puts_cons_ansi
 
         PUBLIC ansicolumns
         PUBLIC ansicharacter_pixelwidth
@@ -461,13 +457,4 @@ IF !DEFINED_fputc_cons
         ENDIF
 ENDIF
 
-; And the fallback puts_cons implementation
-IF !DEFINED_puts_cons
-	PUBLIC		puts_cons
-	PUBLIC		_puts_cons
-	EXTERN		puts_cons_native
-	defc DEFINED_puts_cons = 1
-	defc puts_cons = puts_cons_native
-	defc _puts_cons = puts_cons_native
-ENDIF
 
