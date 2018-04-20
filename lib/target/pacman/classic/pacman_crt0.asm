@@ -31,7 +31,6 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
-	;defc 	DEFINED_nostreams = 1
 	defc    crt0 = 1
 	
 	INCLUDE "zcc_opt.def"
@@ -48,13 +47,18 @@ ENDIF
 	PUBLIC    l_dcal          ;jp(hl)
 
 
+
 IF !DEFINED_CRT_ORG_BSS
 	defc CRT_ORG_BSS =  RAM_Start   ; Static variables are kept in RAM
 	defc DEFINED_CRT_ORG_BSS = 1
 ENDIF
+        defc    TAR__register_sp = -1
+        defc    TAR__clib_exit_stack_size = 4
+
 	defc	__crt_org_bss = CRT_ORG_BSS
 	PUBLIC	__CPU_CLOCK
 	defc	__CPU_CLOCK = 2000000
+        INCLUDE "crt/classic/crt_rules.inc"
 
 
 	org    ROM_Start

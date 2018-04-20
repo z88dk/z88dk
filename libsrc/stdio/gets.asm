@@ -11,7 +11,12 @@
 		SECTION	code_clib
 		PUBLIC  gets
 		PUBLIC  _gets
+		PUBLIC	cgets
+		PUBLIC	_cgets
 		EXTERN  fgets_cons
+
+		defc	cgets = gets
+		defc	_cgets = gets
 
 ; gets(char *s)
 .gets

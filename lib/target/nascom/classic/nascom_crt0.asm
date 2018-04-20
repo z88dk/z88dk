@@ -31,10 +31,16 @@
 
 	PUBLIC    montest         ;NASCOM: check the monitor type
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 16
+        defc    CONSOLE_COLUMNS = 48 
+
 	IF      !DEFINED_CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = 1000h
 	ENDIF
 
+	defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 0xe000
 	defc	__CPU_CLOCK = 2000000
@@ -71,7 +77,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

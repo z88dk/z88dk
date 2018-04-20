@@ -13,7 +13,7 @@
 crt0_init_bss:
         EXTERN  __BSS_head
         EXTERN  __BSS_END_tail
-IF CRT_INITIALIZE_BSS	
+IF CRT_INITIALIZE_BSS = 1
         ld      hl,__BSS_head
         ld      de,__BSS_head + 1
         ld      bc,__BSS_END_tail - __BSS_head - 1
@@ -26,7 +26,7 @@ ENDIF
 
 	; a = 0 - reset exitcount
         ld      (exitcount),a
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	; Setup std* streams
         ld      hl,__sgoioblk+2
         ld      (hl),19 ;stdin
@@ -134,7 +134,7 @@ ENDIF
 		SECTION bss_fp
 		SECTION bss_error
 		SECTION bss_crt
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         IF !DEFINED_CLIB_FOPEN_MAX
                 DEFC    CLIB_FOPEN_MAX = 10
         ENDIF

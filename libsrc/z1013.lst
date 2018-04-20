@@ -2,6 +2,7 @@
 stdio/z1013/fgetc_cons
 stdio/z1013/getk
 stdio/z1013/fputc_cons
+stdio/z1013/generic_console
 @stdio/ansicore.lst
 stdio/ansi/z1013/f_ansi_attr
 stdio/ansi/z1013/f_ansi_bel

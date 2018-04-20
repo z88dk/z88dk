@@ -25,6 +25,12 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+        PUBLIC  CONSOLE_ROWS
+        PUBLIC  CONSOLE_COLUMNS
+        defc    CONSOLE_ROWS = 32
+        defc    CONSOLE_COLUMNS = 80
+
+	defc	TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 6000000
@@ -90,7 +96,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl	;save return code
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF
@@ -118,7 +124,7 @@ start_prefix:   defw	0	; Entry handle from OS
 
 	SECTION	rodata_clib
 IF !DEFINED_noredir
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 redir_fopen_flag:               defb 'w',0
 redir_fopen_flagr:              defb 'r',0
 ENDIF

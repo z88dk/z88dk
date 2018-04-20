@@ -1,4 +1,3 @@
-stdio/pc6001/puts_cons
 @stdio/stdio.lst
 stdio/pc6001/fgetc_cons
 stdio/pc6001/getk

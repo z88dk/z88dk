@@ -58,7 +58,10 @@ ELSE
                 defc CRT_ORG_CODE = $100   ; MSXDOS
         ENDIF
 ENDIF
-
+	PUBLIC	CONSOLE_COLUMNS
+	PUBLIC	CONSOLE_ROWS
+	defc	CONSOLE_COLUMNS = 32
+	defc    CONSOLE_ROWS = 24
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 3580000
@@ -146,7 +149,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF
@@ -306,7 +309,7 @@ ENDIF
         SECTION rodata_clib
 IF (startup=2)
 IF !DEFINED_noredir
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 redir_fopen_flag:	defb	'w',0
 redir_fopen_flagr:	defb	'r',0
 ENDIF

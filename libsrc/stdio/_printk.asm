@@ -3,6 +3,7 @@
 	SECTION	code_clib
 
 	PUBLIC	_printk
+	PUBLIC  _cprintf
 
 	EXTERN	asm_printf
 	EXTERN	printk_outc
@@ -13,6 +14,7 @@
 
 ;sdcc version
 _printk:
+_cprintf:
 	ld	hl,4
 	add	hl,sp	;points to first argument
 	pop	bc	;ret address

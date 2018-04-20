@@ -56,7 +56,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

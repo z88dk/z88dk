@@ -17,6 +17,10 @@
       ENDIF
    ENDIF
 
+   IFNDEF CRT_ENABLE_STDIO
+       defc CRT_ENABLE_STDIO = 1
+   ENDIF
+
    IFDEF CLIB_EXIT_STACK_SIZE
       defc __clib_exit_stack_size = CLIB_EXIT_STACK_SIZE
    ELSE
