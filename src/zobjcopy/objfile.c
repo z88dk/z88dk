@@ -45,7 +45,7 @@ static file_type_e read_signature(FILE *fp, const char *filename,
 		printf("%s file %s at $%04lX: %s\n",
 			type == is_library ? "Library" : "Object ",
 			filename,
-			ftell(fp) - SIGNATURE_SIZE, file_signature);
+			(unsigned)(ftell(fp) - SIGNATURE_SIZE), utstring_body(signature));
 
 	return type;
 }
@@ -129,12 +129,12 @@ static void print_filename_line_nr(UT_string *filename, int line_nr)
 
 static void print_bytes(UT_array *data)
 {
-	size_t addr = 0;
+	unsigned addr = 0;
 	byte_t *p = (byte_t*)utarray_front(data);
-	size_t size = utarray_len(data);
+	unsigned size = utarray_len(data);
 	bool need_nl = false;
 
-	for (size_t i = 0; i < size; i++) {
+	for (unsigned i = 0; i < size; i++) {
 		if ((addr % 16) == 0) {
 			if (need_nl) {
 				printf("\n");
