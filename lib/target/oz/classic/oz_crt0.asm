@@ -29,6 +29,8 @@
 		defc	NEED_ansiterminal = 1
 		INCLUDE "zcc_opt.def"
 
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 10
 
 	        defc    TAR__clib_exit_stack_size = 32
         	defc    TAR__register_sp = -1

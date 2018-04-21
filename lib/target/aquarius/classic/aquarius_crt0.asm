@@ -26,6 +26,8 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 40
 
         IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 14712

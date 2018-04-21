@@ -41,6 +41,9 @@
             ENDIF
         ENDIF
 
+        defc    CONSOLE_COLUMNS = 40
+        defc    CONSOLE_ROWS = 25
+
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"

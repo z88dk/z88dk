@@ -33,6 +33,9 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $100
 ENDIF
 
+        defc    CONSOLE_COLUMNS = 24
+        defc    CONSOLE_ROWS = 4
+
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	INCLUDE	"crt/classic/crt_rules.inc"

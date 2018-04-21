@@ -12,7 +12,7 @@
 
         SECTION  code_clib
 	PUBLIC	ansi_cls
-	EXTERN	text_cols
+	EXTERN	__console_w
 
 	
 .vdutab		; 80x25 - Peter Broughton
@@ -27,7 +27,7 @@
 .ansi_cls
 
 	LD	HL,vdutab
-	ld	a,(text_cols)
+	ld	a,(__console_w)
 	cp	40
 	jr	nz,no40
 	
@@ -38,7 +38,7 @@
 
 .no40
 	ld	a,80
-	ld	(text_cols),a	; just to be sure, force default to 80 columns
+	ld	(__console_w),a	; just to be sure, force default to 80 columns
 
 .is40
 	LD  C,0

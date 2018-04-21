@@ -58,6 +58,9 @@ IF      !CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $c437  ; PC6001 - 16K
 ENDIF
 
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 16
+
         defc    TAR__clib_exit_stack_size = 32
 	defc	DEF__register_sp = -1
 	defc	__CPU_CLOCK = 3800000

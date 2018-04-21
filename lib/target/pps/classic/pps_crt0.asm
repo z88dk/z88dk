@@ -25,8 +25,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        PUBLIC  CONSOLE_ROWS
-        PUBLIC  CONSOLE_COLUMNS
         defc    CONSOLE_ROWS = 32
         defc    CONSOLE_COLUMNS = 80
 

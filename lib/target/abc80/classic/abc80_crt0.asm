@@ -27,6 +27,8 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 40
 
 IF      !DEFINED_CRT_ORG_CODE
         defc    CRT_ORG_CODE  = 50000

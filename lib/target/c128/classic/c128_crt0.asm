@@ -26,8 +26,8 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-
-; Now, getting to the real stuff now!
+        defc    CONSOLE_COLUMNS = 40
+        defc    CONSOLE_ROWS = 25
 
         IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = $3000	; no, use a fixed entry location at $3000, 'appmake' is not ready for different values!

@@ -4,10 +4,10 @@
 ;	Stefano Bodrato - 2017
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -17,24 +17,11 @@
         SECTION  code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 	
 
-.text_cols   defb 24
-
-	EXTERN	ansirows
-.text_rows   defb ansirows
-
-; PC-G850
-;.text_rows   defb 6
-; PC-G815, PC-E200, PC-E220
-;.text_rows   defb 4
-
-
 .ansi_CHAR
-	ld de,(ansi_COLUMN)
+	ld de,(__console_x)
 	jp	$BE62

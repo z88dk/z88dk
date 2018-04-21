@@ -347,6 +347,15 @@ IF NEED_ansiterminal
 		 defc ansicolumns = 64
 	ENDIF
 
+	UNDEFINE CONSOLE_COLUMNS
+	defc CONSOLE_COLUMNS = ansicolumns
+
+	IF DEFINED_ansirows
+		UNDEFINE CONSOLE_ROWS
+		defc CONSOLE_ROWS = ansirows
+	ENDIF
+
+
 	IF (ansicolumns = (ansipixels/2))
 	    defc ansicharacter_pixelwidth = 2
             IF !DEFINED_ansifont
@@ -458,3 +467,10 @@ IF !DEFINED_fputc_cons
 ENDIF
 
 
+
+IF CONSOLE_COLUMNS
+	PUBLIC CONSOLE_COLUMNS
+ENDIF
+IF CONSOLE_ROWS
+	PUBLIC CONSOLE_ROWS
+ENDIF

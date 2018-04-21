@@ -23,6 +23,9 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+        defc    CONSOLE_COLUMNS = 80
+        defc    CONSOLE_ROWS = 25
+
         PUBLIC    cpc_enable_fw_exx_set       ;needed by firmware interposer
         PUBLIC    cpc_enable_process_exx_set  ;needed by firmware interposer
 		

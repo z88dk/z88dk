@@ -58,8 +58,6 @@ ELSE
                 defc CRT_ORG_CODE = $100   ; MSXDOS
         ENDIF
 ENDIF
-	PUBLIC	CONSOLE_COLUMNS
-	PUBLIC	CONSOLE_ROWS
 	defc	CONSOLE_COLUMNS = 32
 	defc    CONSOLE_ROWS = 24
         defc    TAR__clib_exit_stack_size = 32

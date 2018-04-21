@@ -28,6 +28,8 @@
 		EXTERN		generic_console_scrollup
 		EXTERN		generic_console_printc
 		EXTERN		generic_console_cls
+		EXTERN		__console_x
+		EXTERN		__console_y
 
 
 ; extern int __LIB__ fputc_cons(char c);
@@ -36,7 +38,7 @@ _fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	ld	bc,(generic_x)		;coordinates
+	ld	bc,(__console_x)		;coordinates
 	ld	hl,generic_console_flags
 	bit	0,(hl)
 	jr	nz,set_y
@@ -81,7 +83,7 @@ handle_character:
 	dec	a
 	ld	b,a
 	ld	c,0
-	ld	(generic_x),bc
+	ld	(__console_x),bc
 handle_character_no_scroll:
 	ld	a,d
 	push	bc		;save coordinates
@@ -105,7 +107,7 @@ set_x:
 	cp	b
 	ret	c		;out of range
 	ld	a,b
-	ld	(generic_x),a
+	ld	(__console_x),a
 	ret
 set_y:
 	res	0,(hl)
@@ -116,7 +118,7 @@ set_y:
 	cp	b
 	ret	c	;out of range
 	ld	a,b
-	ld	(generic_y),a
+	ld	(__console_y),a
 	ret
 
 set_vscroll:
@@ -137,7 +139,7 @@ left:	ld	a,c
 	jr	up
 left_1: dec	c
 store_coords:
-	ld	(generic_x),bc
+	ld	(__console_x),bc
 	ret
 
 ; Move print position up
@@ -208,8 +210,6 @@ generic_console_h:	defb	CONSOLE_ROWS
 
 		SECTION		bss_clib
 
-generic_x:	defb	0
-generic_y:	defb	0
 generic_console_flags:		defb	0		; bit 0 = set x
 					; bit 1 = set y
 					; bit 2 = set vertical scroll

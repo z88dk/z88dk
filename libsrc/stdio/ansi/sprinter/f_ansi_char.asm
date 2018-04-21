@@ -9,24 +9,19 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
-
-	PUBLIC	text_cols
-	PUBLIC	text_rows
+	EXTERN	__console_y
+	EXTERN	__console_x
 
 	EXTERN	text_attr
 	
 
-.text_rows   defb 32
-.text_cols   defb 80
 
 ; a = character to print - need to handle attributes
 .ansi_CHAR
 	ex	af,af
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	ld	d,a
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	ld	e,a	
 	ld	a,(text_attr)
 	ld	b,a

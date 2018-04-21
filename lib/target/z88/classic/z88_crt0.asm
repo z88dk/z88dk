@@ -46,6 +46,9 @@
 	PUBLIC	_cpfar2near	;Conversion of far to near data
 
 
+        defc    CONSOLE_COLUMNS = 80
+        defc    CONSOLE_ROWS = 8
+
 
 	defc	__CPU_CLOCK = 3276800
 

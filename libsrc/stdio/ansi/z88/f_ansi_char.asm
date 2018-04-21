@@ -1,5 +1,5 @@
 ;
-;	Print a character at ansi_ROW, ansi_COLUMNUMN
+;	Print a character at __console_y, __console_xUMN
 ;	Enter with char in a
 ;
 ;	djm 6/6/2000
@@ -15,24 +15,24 @@
 
 		INCLUDE	"stdio.def"
 
-		EXTERN ansi_ROW
-		EXTERN ansi_COLUMN
-		PUBLIC text_rows
-		PUBLIC text_cols
+		EXTERN __console_y
+		EXTERN __console_x
+		PUBLIC __console_h
+		PUBLIC __console_w
 
 
-.text_rows	defb 8
-.text_cols	defb 80
+.__console_h	defb 8
+.__console_w	defb 80
 
 
 .ansi_CHAR
 	push	af
 	ld	hl,start
 	call_oz(gn_sop)
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	add	a,32
 	call_oz(os_out)
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	add	a,32
 	call_oz(os_out)
 	pop	af

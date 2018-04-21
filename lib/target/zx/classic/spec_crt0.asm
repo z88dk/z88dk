@@ -56,6 +56,8 @@
             ENDIF
         ENDIF
 
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 24
 
 	defc	DEF__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32

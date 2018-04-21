@@ -2,10 +2,10 @@
 ; 	ANSI Video handling for the MSX/SVI video chip
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -34,27 +34,19 @@ ENDIF
 	EXTERN	ansifont_is_packed
 	EXTERN	ansifont
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
 	EXTERN     swapgfxbk
         EXTERN	__graphics_end
 
 	INCLUDE	"msx/vdp.inc"
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
 	EXTERN	ansicharacter_pixelwidth
-
-	EXTERN	ansicolumns
-.text_cols   defb ansicolumns
-
-.text_rows   defb 24
 
 
 .ansi_CHAR
@@ -76,12 +68,12 @@ ENDIF
 	add hl,de
 	djnz LFONT2
 	pop bc		; 8
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	add a
 	add a
 	add a
 	ld	e,a
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	ld	d,a
 	ld (RIGA2+1),de	
 		ld ix,LDIRVM
@@ -94,7 +86,7 @@ ENDIF
 	ld ix,chline_buffer
   ld (char+1),a
   
-  ld a,(ansi_ROW)       ; Line text position
+  ld a,(__console_y)       ; Line text position
    
 	ld	h,a		; current row * 256 = start position in VRAM
 	ld  l,0
@@ -104,7 +96,7 @@ ENDIF
   ld b,(hl)
   ld hl,0
 
-  ld a,(ansi_COLUMN)       ; Column text position
+  ld a,(__console_x)       ; Column text position
   ld e,a
   ld d,0
   or d

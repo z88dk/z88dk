@@ -2,10 +2,10 @@
 ; 	ANSI Video handling for the ABC80
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;	A slower (but working) method it commented out
@@ -18,19 +18,13 @@
 	PUBLIC	ansi_CHAR
 	
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-.text_cols   defb 40
-.text_rows   defb 24
-
-
 .ansi_CHAR
 	push	af
 
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 
 	ld	hl,884		; ROW table in ROM
 	ld	d,0
@@ -61,7 +55,7 @@
 ;	djnz	r_loop
 
 .r_zero
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 ;	ld	d,0
 	ld	e,a
 	add	hl,de

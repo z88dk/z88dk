@@ -49,8 +49,6 @@
                 defc    CRT_ORG_CODE  = 16525
         ENDIF
 
-        PUBLIC  CONSOLE_ROWS
-        PUBLIC  CONSOLE_COLUMNS
         defc    CONSOLE_ROWS = 24
         defc    CONSOLE_COLUMNS = 32
 

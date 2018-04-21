@@ -6,8 +6,8 @@ PUBLIC gotoxy_callee
 PUBLIC _gotoxy_callee
 PUBLIC ASMDISP_GOTOXY_CALLEE
 
-EXTERN ansi_COLUMN
-EXTERN ansi_ROW
+EXTERN __console_x
+EXTERN __console_y
 
 .gotoxy_callee
 ._gotoxy_callee
@@ -21,9 +21,9 @@ EXTERN ansi_ROW
 
    ; c = x    e = y
    ld	a,c
-   ld	(ansi_COLUMN),a
+   ld	(__console_x),a
    ld	a,e
-   ld	(ansi_ROW),a
+   ld	(__console_y),a
 
    ret
 

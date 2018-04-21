@@ -47,7 +47,8 @@
         PUBLIC	ansi_del_line
         PUBLIC	ansi_SCROLLUP
 
-
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 24
 
         IF      !DEFINED_CRT_ORG_CODE
 	   IF (startup=2)
