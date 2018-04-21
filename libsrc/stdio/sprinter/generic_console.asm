@@ -7,7 +7,7 @@
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_ioctl
 
-		EXTERN		generic_console_w
+		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
@@ -17,7 +17,7 @@ generic_console_ioctl:
 
 generic_console_cls:
 	ld	de,0
-	ld	hl,(generic_console_w)	; +(CONSOLE_ROWS * 256 ) + CONSOLE_COLUMNS
+	ld	hl,(__console_w)	; +(CONSOLE_ROWS * 256 ) + CONSOLE_COLUMNS
 	ld	a,(text_colour)
 	ld	b,a
 	ld	a,' '
@@ -29,7 +29,7 @@ generic_console_scrollup:
 	push	de
 	push	bc
 	ld	de,0
-	ld	hl,(generic_console_w)	; +(CONSOLE_ROWS * 256 ) + CONSOLE_COLUMNS
+	ld	hl,(__console_w)	; +(CONSOLE_ROWS * 256 ) + CONSOLE_COLUMNS
 	ld	b,1
 	ld	a,0
 	ld	c,0x55		;SCROLL

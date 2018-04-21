@@ -19,8 +19,6 @@
 		PUBLIC		_fputc_cons_generic
 
 		; Variables that can be adjusted by platform specific code
-		PUBLIC		generic_console_w
-		PUBLIC		generic_console_h
 		PUBLIC		generic_console_flags
 
 		EXTERN		CONSOLE_ROWS
@@ -30,6 +28,8 @@
 		EXTERN		generic_console_cls
 		EXTERN		__console_x
 		EXTERN		__console_y
+		EXTERN		__console_w
+		EXTERN		__console_h
 
 
 ; extern int __LIB__ fputc_cons(char c);
@@ -74,12 +74,12 @@ handle_character:
 	; a = character to print
 	; e = raw character mode
 	ld	d,a
-	ld	a,(generic_console_h)
+	ld	a,(__console_h)
 	cp	b
 	jr	nc,handle_character_no_scroll
 	bit	7,(hl)
 	call	z,generic_console_scrollup
-	ld	a,(generic_console_h)
+	ld	a,(__console_h)
 	dec	a
 	ld	b,a
 	ld	c,0
@@ -90,7 +90,7 @@ handle_character_no_scroll:
 	call	generic_console_printc
 	pop	bc	
 	inc	c
-	ld	a,(generic_console_w)
+	ld	a,(__console_w)
 	cp	c
 	jr	nz,store_coords
 	ld	c,0
@@ -102,7 +102,7 @@ set_x:
 	res	1,(hl)
 	sub	32
 	ld	b,a
-	ld	a,(generic_console_w)
+	ld	a,(__console_w)
 	dec	a
 	cp	b
 	ret	c		;out of range
@@ -113,7 +113,7 @@ set_y:
 	res	0,(hl)
 	sub	32
 	ld	b,a
-	ld	a,(generic_console_h)
+	ld	a,(__console_h)
 	dec	a
 	cp	b
 	ret	c	;out of range
@@ -133,7 +133,7 @@ set_vscroll:
 left:	ld	a,c
 	and	a
 	jr	nz,left_1
-	ld	a,(generic_console_w)
+	ld	a,(__console_w)
 	dec	a
 	ld	c,a
 	jr	up
@@ -149,14 +149,14 @@ up:	ld	a,b
 	dec	b
 	jr	store_coords
 
-down:	ld	a,(generic_console_h)
+down:	ld	a,(__console_h)
 	dec	a
 	cp	b
 	ret	z
 	inc	b
 	jr	store_coords
 
-right:	ld	a,(generic_console_w)
+right:	ld	a,(__console_w)
 	dec	a
 	cp	c
 	ret	z
@@ -181,7 +181,7 @@ start_vscroll:
 
 
 handle_cr:
-	ld	a,(generic_console_h)
+	ld	a,(__console_h)
 	dec	a
 	cp	b
 	jr	nz,handle_cr_no_need_to_scroll
@@ -190,7 +190,7 @@ handle_cr:
 	rlca
 	call	nc,generic_console_scrollup
 
-	ld	a,(generic_console_h)
+	ld	a,(__console_h)
 	sub	2
 	ld	b,a
 handle_cr_no_need_to_scroll:
@@ -203,10 +203,6 @@ handle_cr_no_need_to_scroll:
 
 
 	
-		SECTION		data_clib
-
-generic_console_w:	defb	CONSOLE_COLUMNS
-generic_console_h:	defb	CONSOLE_ROWS
 
 		SECTION		bss_clib
 

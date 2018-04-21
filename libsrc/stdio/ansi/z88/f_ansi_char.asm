@@ -17,12 +17,7 @@
 
 		EXTERN __console_y
 		EXTERN __console_x
-		PUBLIC __console_h
-		PUBLIC __console_w
 
-
-.__console_h	defb 8
-.__console_w	defb 80
 
 
 .ansi_CHAR
