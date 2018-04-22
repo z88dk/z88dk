@@ -1273,3 +1273,66 @@ void file_make_symbols_global(file_t *file, const char *regexp)
 {
 	file_change_symbols_scope(file, regexp, 'L', 'G');
 }
+
+void file_set_section_org(file_t *file, const char *name, int value)
+{
+	if (opt_verbose)
+		printf("File '%s': set section '%s' ORG to $%04X\n",
+			utstring_body(file->filename), name, value);
+
+	// search file for section
+	objfile_t *obj;
+	DL_FOREACH(file->objs, obj) {
+
+		if (opt_verbose)
+			printf("Block '%s'\n", utstring_body(obj->signature));
+
+		section_t *section;
+		DL_FOREACH(obj->sections, section) {
+			if (strcmp(utstring_body(section->name), name) == 0) {
+				if (opt_verbose)
+					printf("  section %s ORG -> $%04X\n", 
+						utstring_len(section->name) > 0 ? utstring_body(section->name) : "\"\"", 
+						value);
+				section->org = value;
+			}
+			else {
+				if (opt_verbose)
+					printf("  skip section %s\n", 
+						utstring_len(section->name) > 0 ? utstring_body(section->name) : "\"\"");
+			}
+		}
+	}
+}
+
+void file_set_section_align(file_t *file, const char *name, int value)
+{
+	if (opt_verbose)
+		printf("File '%s': set section '%s' ALIGN to $%04X\n",
+			utstring_body(file->filename), name, value);
+
+	// search file for section
+	objfile_t *obj;
+	DL_FOREACH(file->objs, obj) {
+
+		if (opt_verbose)
+			printf("Block '%s'\n", utstring_body(obj->signature));
+
+		section_t *section;
+		DL_FOREACH(obj->sections, section) {
+			if (strcmp(utstring_body(section->name), name) == 0) {
+				if (opt_verbose)
+					printf("  section %s ALIGN -> $%04X\n",
+						utstring_len(section->name) > 0 ? utstring_body(section->name) : "\"\"",
+						value);
+				section->align = value;
+			}
+			else {
+				if (opt_verbose)
+					printf("  skip section %s\n",
+						utstring_len(section->name) > 0 ? utstring_body(section->name) : "\"\"");
+			}
+		}
+	}
+}
+

@@ -78,6 +78,8 @@ Usage: zobjcopy input [options] [output]
   -L|--local regexp                     ; make symbols that match local
   -G|--global regexp                    ; make symbols that match global
   -F|--filler nn|0xhh                   ; use nn as filler for align
+  -O|--org section,nn|0xhh              ; change ORG of one section
+  -A|--align section,nn|0xhh            ; change ALIGN of one section
 ...
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
@@ -93,6 +95,10 @@ ok run("zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aa
 ok run("zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
 ok run("zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
 ok run("zobjcopy --filler",							"", "error: option requires an argument -- 'filler'\n",	1);
+ok run("zobjcopy --org",							"", "error: option requires an argument -- 'org'\n",	1);
+ok run("zobjcopy --org aaa",						"", "error: no ',' in --org argument 'aaa'\n",			1);
+ok run("zobjcopy --align",							"", "error: option requires an argument -- 'align'\n",	1);
+ok run("zobjcopy --align aaa",						"", "error: no ',' in --align argument 'aaa'\n",		1);
 ok run("zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
 ok run("zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
 ok run("zobjcopy test.o",							"", "error: no output file\n",							1);
@@ -305,7 +311,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --filler 127 -s text=text test2.o", <<'...');
+ok run("zobjcopy test.o --verbose -F 127 -s text=text test2.o", <<'...');
 Filler byte: $7F
 Reading file 'test.o': object version 11
 File 'test.o': rename sections that match 'text' to 'text'
@@ -319,6 +325,58 @@ Block 'Z80RMF11'
 Writing file 'test2.o': object version 11
 ...
 ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections7.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
+
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok run("zobjcopy test.o --verbose -s .=text --org text,0x8000 --align text,64 test2.o", <<'...');
+Reading file 'test.o': object version 11
+File 'test.o': rename sections that match '.' to 'text'
+Block 'Z80RMF11'
+  skip section ""
+  rename section text_1 -> text
+  rename section text_2 -> text
+  rename section base -> text
+  rename section data_1 -> text
+  rename section data_2 -> text
+File 'test.o': set section 'text' ORG to $8000
+Block 'Z80RMF11'
+  skip section ""
+  section text ORG -> $8000
+File 'test.o': set section 'text' ALIGN to $0040
+Block 'Z80RMF11'
+  skip section ""
+  section text ALIGN -> $0040
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections8.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
+
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok run("zobjcopy test.o --verbose -s .=text -O text,0x8000 -A text,64 test2.o", <<'...');
+Reading file 'test.o': object version 11
+File 'test.o': rename sections that match '.' to 'text'
+Block 'Z80RMF11'
+  skip section ""
+  rename section text_1 -> text
+  rename section text_2 -> text
+  rename section base -> text
+  rename section data_1 -> text
+  rename section data_2 -> text
+File 'test.o': set section 'text' ORG to $8000
+Block 'Z80RMF11'
+  skip section ""
+  section text ORG -> $8000
+File 'test.o': set section 'text' ALIGN to $0040
+Block 'Z80RMF11'
+  skip section ""
+  section text ALIGN -> $0040
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections8.txt", $OBJ_FILE_VERSION));
 unlink "test.o", "test2.o";
 
 #------------------------------------------------------------------------------

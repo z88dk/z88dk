@@ -140,3 +140,5 @@ extern void file_add_symbol_prefix(file_t *file, const char *regexp, const char 
 extern void file_rename_symbol(file_t *file, const char *old_name, const char *new_name);
 extern void file_make_symbols_local(file_t *file, const char *regexp);
 extern void file_make_symbols_global(file_t *file, const char *regexp);
+extern void file_set_section_org(file_t *file, const char *name, int value);
+extern void file_set_section_align(file_t *file, const char *name, int value);

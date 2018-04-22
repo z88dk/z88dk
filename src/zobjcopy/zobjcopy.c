@@ -23,6 +23,8 @@ static char usage[] =
 "  -L|--local regexp                     ; make symbols that match local\n"
 "  -G|--global regexp                    ; make symbols that match global\n"
 "  -F|--filler nn|0xhh                   ; use nn as filler for align\n"
+"  -O|--org section,nn|0xhh              ; change ORG of one section\n"
+"  -A|--align section,nn|0xhh            ; change ALIGN of one section\n"
 ;
 
 #define OPT_SECTION			's'
@@ -31,6 +33,8 @@ static char usage[] =
 #define OPT_LOCAL			'L'
 #define OPT_GLOBAL			'G'
 #define OPT_FILLER			'F'
+#define OPT_ORG				'O'
+#define OPT_ALIGN			'A'
 
 static struct optparse_long longopts[] = {
 { "verbose",	'v',				OPTPARSE_NONE },
@@ -41,6 +45,8 @@ static struct optparse_long longopts[] = {
 { "local",		OPT_LOCAL,			OPTPARSE_REQUIRED },
 { "global",		OPT_GLOBAL,			OPTPARSE_REQUIRED },
 { "filler",		OPT_FILLER,			OPTPARSE_REQUIRED },
+{ "org",		OPT_ORG,			OPTPARSE_REQUIRED },
+{ "align",		OPT_ALIGN,			OPTPARSE_REQUIRED },
 { 0,0,0 }
 };
 
@@ -53,7 +59,7 @@ int main(int argc, char *argv[])
 	utarray_new(commands, &ut_str_icd);
 
 	char *command = xstrdup("X");
-	char *regexp, *old_name, *name, *prefix, *p;
+	char *regexp, *old_name, *name, *prefix, *p, *arg;
 	int val;
 
 	// show usage
@@ -133,6 +139,34 @@ int main(int argc, char *argv[])
 			if (opt_verbose)
 				printf("Filler byte: $%02X\n", opt_obj_align_filler);
 			break;
+		case OPT_ORG:
+			*command = OPT_ORG;
+			utarray_push_back(commands, &command);
+
+			p = strchr(options.optarg, ',');
+			if (!p)
+				die("error: no ',' in --org argument '%s'\n", options.optarg);
+
+			name = options.optarg; *p = '\0';
+			utarray_push_back(commands, &name);
+
+			arg = p + 1;
+			utarray_push_back(commands, &arg);
+			break;
+		case OPT_ALIGN:
+			*command = OPT_ALIGN;
+			utarray_push_back(commands, &command);
+
+			p = strchr(options.optarg, ',');
+			if (!p)
+				die("error: no ',' in --align argument '%s'\n", options.optarg);
+
+			name = options.optarg; *p = '\0';
+			utarray_push_back(commands, &name);
+
+			arg = p + 1;
+			utarray_push_back(commands, &arg);
+			break;
 		case '?':
 			die("error: %s\n", options.errmsg);
 		default: assert(0);
@@ -191,6 +225,28 @@ int main(int argc, char *argv[])
 			regexp = *(char**)utarray_eltptr(commands, 1);
 			file_make_symbols_global(file, regexp);
 			utarray_erase(commands, 0, 2);
+			break;
+		case OPT_ORG:
+			name = *(char**)utarray_eltptr(commands, 1);
+			arg = *(char**)utarray_eltptr(commands, 2);
+			val = -1;
+			if (strncmp(arg, "0x", 2) == 0)
+				sscanf(arg + 2, "%x", &val);
+			else
+				sscanf(arg, "%d", &val);
+			file_set_section_org(file, name, val);
+			utarray_erase(commands, 0, 3);
+			break;
+		case OPT_ALIGN:
+			name = *(char**)utarray_eltptr(commands, 1);
+			arg = *(char**)utarray_eltptr(commands, 2);
+			val = -1;
+			if (strncmp(arg, "0x", 2) == 0)
+				sscanf(arg + 2, "%x", &val);
+			else
+				sscanf(arg, "%d", &val);
+			file_set_section_align(file, name, val);
+			utarray_erase(commands, 0, 3);
 			break;
 		default:
 			assert(0);
