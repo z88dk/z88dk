@@ -22,6 +22,7 @@ static char usage[] =
 "  -y|--symbol old-name=new-name         ; rename global and extern symbols\n"
 "  -L|--local regexp                     ; make symbols that match local\n"
 "  -G|--global regexp                    ; make symbols that match global\n"
+"  -F|--filler nn|0xhh                   ; use nn as filler for align\n"
 ;
 
 #define OPT_SECTION			's'
@@ -29,6 +30,7 @@ static char usage[] =
 #define OPT_SYMBOL			'y'
 #define OPT_LOCAL			'L'
 #define OPT_GLOBAL			'G'
+#define OPT_FILLER			'F'
 
 static struct optparse_long longopts[] = {
 { "verbose",	'v',				OPTPARSE_NONE },
@@ -38,6 +40,7 @@ static struct optparse_long longopts[] = {
 { "symbol",		OPT_SYMBOL,			OPTPARSE_REQUIRED },
 { "local",		OPT_LOCAL,			OPTPARSE_REQUIRED },
 { "global",		OPT_GLOBAL,			OPTPARSE_REQUIRED },
+{ "filler",		OPT_FILLER,			OPTPARSE_REQUIRED },
 { 0,0,0 }
 };
 
@@ -51,6 +54,7 @@ int main(int argc, char *argv[])
 
 	char *command = xstrdup("X");
 	char *regexp, *old_name, *name, *prefix, *p;
+	int val;
 
 	// show usage
 	if (argc < 2) {
@@ -118,6 +122,16 @@ int main(int argc, char *argv[])
 			*command = OPT_GLOBAL;
 			utarray_push_back(commands, &command);
 			utarray_push_back(commands, &options.optarg);
+			break;
+		case OPT_FILLER:
+			val = DEFAULT_ALIGN_FILLER;
+			if (strncmp(options.optarg, "0x", 2) == 0)
+				sscanf(options.optarg + 2, "%x", &val);
+			else
+				sscanf(options.optarg, "%d", &val);
+			opt_obj_align_filler = val & 0xFF;
+			if (opt_verbose)
+				printf("Filler byte: $%02X\n", opt_obj_align_filler);
 			break;
 		case '?':
 			die("error: %s\n", options.errmsg);

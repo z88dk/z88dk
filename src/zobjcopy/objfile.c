@@ -8,6 +8,8 @@
 #define MAX_FP     0x7FFFFFFF
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
+byte_t opt_obj_align_filler = DEFAULT_ALIGN_FILLER;
+
 //-----------------------------------------------------------------------------
 // read from file
 //-----------------------------------------------------------------------------
@@ -960,10 +962,9 @@ static bool delete_merged_section(objfile_t *obj, section_t **p_merged_section,
 		// handle alignment
 		int above = merged_base % section->align;
 		if (above > 0) {
-			byte_t filler = ALIGN_FILLER;
 			int fill = section->align - above;
 			for (int i = 0; i < fill; i++)
-				utarray_push_back(merged_section->data, &filler);
+				utarray_push_back(merged_section->data, &opt_obj_align_filler);
 
 			merged_base += fill;
 		}

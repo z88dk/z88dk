@@ -77,6 +77,7 @@ Usage: zobjcopy input [options] [output]
   -y|--symbol old-name=new-name         ; rename global and extern symbols
   -L|--local regexp                     ; make symbols that match local
   -G|--global regexp                    ; make symbols that match global
+  -F|--filler nn|0xhh                   ; use nn as filler for align
 ...
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
@@ -91,6 +92,7 @@ ok run("zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compil
 ok run("zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
 ok run("zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
 ok run("zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
+ok run("zobjcopy --filler",							"", "error: option requires an argument -- 'filler'\n",	1);
 ok run("zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
 ok run("zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
 ok run("zobjcopy test.o",							"", "error: no output file\n",							1);
@@ -279,6 +281,44 @@ Block 'Z80RMF11'
 Writing file 'test2.o': object version 11
 ...
 ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections5.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
+
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok run("zobjcopy test.o --verbose --filler 0x55 -s text=text test2.o", <<'...');
+Filler byte: $55
+Reading file 'test.o': object version 11
+File 'test.o': rename sections that match 'text' to 'text'
+Block 'Z80RMF11'
+  skip section ""
+  rename section text_1 -> text
+  rename section text_2 -> text
+  skip section base
+  skip section data_1
+  skip section data_2
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections6.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
+
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok run("zobjcopy test.o --verbose --filler 127 -s text=text test2.o", <<'...');
+Filler byte: $7F
+Reading file 'test.o': object version 11
+File 'test.o': rename sections that match 'text' to 'text'
+Block 'Z80RMF11'
+  skip section ""
+  rename section text_1 -> text
+  rename section text_2 -> text
+  skip section base
+  skip section data_1
+  skip section data_2
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections7.txt", $OBJ_FILE_VERSION));
 unlink "test.o", "test2.o";
 
 #------------------------------------------------------------------------------

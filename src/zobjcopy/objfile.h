@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
+#include "die.h"
 #include "utarray.h"
 #include "utstring.h"
 #include <stdbool.h>
@@ -17,7 +18,9 @@
 #define SIGNATURE_OBJ	"Z80RMF"
 #define SIGNATURE_LIB	"Z80LMF"
 #define SIGNATURE_VERS	"%02d"
-#define ALIGN_FILLER	0xFF
+#define DEFAULT_ALIGN_FILLER	0xFF
+
+extern byte_t opt_obj_align_filler;
 
 struct section_s;
 
