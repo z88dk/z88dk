@@ -30,6 +30,8 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 			[ 'S', "file1.asm", 132, "text_2", 0, 1, "", "start2 % 127" ],
 			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "msg1" ],
 			[ 'L', "file1.asm", 321, "data_2", 0, 1, "", "msg2" ],
+			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "ext1" ],
+			[ 'L', "file1.asm", 321, "data_2", 0, 1, "", "ext2" ],
 			[ 'C', "file1.asm", 231, "data_1", 0, 1, "", "msg2-msg1" ],
 			[ '=', "file1.asm", 321, "text_1", 0, 0, "_start", "start1" ],
 			[ 'B', "file1.asm", 231, "text_1", 0, 1, "", "start1" ],
@@ -66,12 +68,13 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 #------------------------------------------------------------------------------
 # call zobjcopy
 #------------------------------------------------------------------------------
-ok run("zobjcopy", <<'...', "", 0);
+ok run("zobjcopy", <<'...');
 Usage: zobjcopy input [options] [output]
   -v|--verbose                          ; show what is going on
   -l|--list                             ; dump contents of file
   -s|--section old-regexp=new-name      ; rename all sections that match
      --add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match
+  -y|--symbol old-name=new-name         ; rename global and extern symbols
 ...
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
@@ -83,13 +86,14 @@ ok run("zobjcopy --section aaa",					"", "error: no '=' in --section argument 'a
 ok run("zobjcopy --section ?=aaa test.o test2.o",	"", "error: could not compile regex '?'\n",				1);
 ok run("zobjcopy --add-prefix aaa",					"", "error: no ',' in --add-prefix argument 'aaa'\n",	1);
 ok run("zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compile regex '?'\n",				1);
+ok run("zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
 ok run("zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
 ok run("zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
 ok run("zobjcopy test.o",							"", "error: no output file\n",							1);
 	
 path("test.o")->spew_raw($objfile[1]);	
 	
-ok run("zobjcopy -v test.o test2.o",				<<"...", "",											0);
+ok run("zobjcopy -v test.o test2.o", <<"...");
 Reading file 'test.o': object version 1
 Writing file 'test2.o': object version $OBJ_FILE_VERSION
 ...
@@ -99,70 +103,28 @@ unlink "test.o", "test2.o";
 #------------------------------------------------------------------------------
 # parse object file of each version
 #------------------------------------------------------------------------------
-my $bmk;
-my $bmk2;
 for my $version (1 .. $OBJ_FILE_VERSION) {
 	$objfile[$version] && $libfile[$version] 
 		or die "Version $version not supported";
 	
-	path("test.o")->spew_raw($objfile[$version]);
+	path("test.o")->spew_raw($objfile[$version]); 
 	unlink "test2.o";
 
-	$bmk = sprintf("t/bmk_obj_%02d.txt", $version);
-	$bmk2 = sprintf("t/bmk_obj_%02d_converted.txt", $version);
-	my $out = sprintf("t/out_obj_%02d.txt", $version);
-	
-	is 0, system("z80nm -a test.o > $out"), "z80nm -a test.o > $out";
-	is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-	
-	system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-	# die unless Test::More->builder->is_passing;
-
-	is 0, system("zobjcopy -l test.o > $out"), "zobjcopy -l test.o > $out";
-	is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-	
-	system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-	# die unless Test::More->builder->is_passing;
-
-	is 0, system("zobjcopy test.o test2.o"), "zobjcopy test.o test2.o";
-	is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-	is 0, system("diff -w $out $bmk2"), "diff -w $out $bmk2";
-	
-	system("winmergeu $out $bmk2") unless Test::More->builder->is_passing;
-	# die unless Test::More->builder->is_passing;
-
-	unlink "test.o", "test2.o", $out;
+	ok check_z80nm("test.o", 		sprintf("t/bmk_obj_%02d.txt", $version));
+	ok check_zobjcopy("test.o", 	sprintf("t/bmk_obj_%02d.txt", $version));
+	ok run("zobjcopy test.o test2.o");
+	ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_converted.txt", $version));
+	unlink "test.o", "test2.o";
 	
 	path("test.lib")->spew_raw($libfile[$version]);
 	unlink "test2.lib";
 	
-	$bmk = sprintf("t/bmk_lib_%02d.txt", $version);
-	$bmk2 = sprintf("t/bmk_lib_%02d_converted.txt", $version);
-	$out = sprintf("t/out_lib_%02d.txt", $version);
-	
-	is 0, system("z80nm -a test.lib > $out"), "z80nm -a test.lib > $out";
-	is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-	
-	system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-	# die unless Test::More->builder->is_passing;
-
-	is 0, system("zobjcopy -l test.lib > $out"), "zobjcopy -l test.lib > $out";
-	is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-	system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-	# die unless Test::More->builder->is_passing;
-
-	is 0, system("zobjcopy test.lib test2.lib"), "zobjcopy test.lib test2.lib";
-	is 0, system("zobjcopy -l test2.lib > $out"), "zobjcopy -l test2.lib > $out";
-	is 0, system("diff -w $out $bmk2"), "diff -w $out $bmk2";
-	
-	system("winmergeu $out $bmk2") unless Test::More->builder->is_passing;
-	# die unless Test::More->builder->is_passing;
-
-	unlink "test.lib", "test2.lib", $out;
+	ok check_z80nm("test.lib", 		sprintf("t/bmk_lib_%02d.txt", $version));
+	ok check_zobjcopy("test.lib", 	sprintf("t/bmk_lib_%02d.txt", $version));
+	ok run("zobjcopy test.lib test2.lib");
+	ok check_zobjcopy("test2.lib", 	sprintf("t/bmk_lib_%02d_converted.txt", $version));
+	unlink "test.lib", "test2.lib";
 }
-
-# die unless Test::More->builder->is_passing;
 
 #------------------------------------------------------------------------------
 # rename sections
@@ -170,10 +132,7 @@ for my $version (1 .. $OBJ_FILE_VERSION) {
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-my $cmd = "zobjcopy test.o --verbose -s text=text --section data=data test2.o";
-ok 1, $cmd;
-my($out, $err, $exit, @dummy) = capture {system $cmd};
-is $out, <<'...';
+ok run("zobjcopy test.o --verbose -s text=text --section data=data test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': rename sections that match 'text' to 'text'
 Block 'Z80RMF11'
@@ -192,28 +151,13 @@ Block 'Z80RMF11'
   rename section data_2 -> data
 Writing file 'test2.o': object version 11
 ...
-is $err, "";
-is !!$exit, !!0;
-
-$bmk = sprintf("t/bmk_obj_%02d_sections1.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
-
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections1.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 path("test.lib")->spew_raw($libfile[$OBJ_FILE_VERSION]);
 unlink "test2.lib";
 
-$cmd = "zobjcopy test.lib --verbose -s text=text --section data=data test2.lib";
-ok 1, $cmd;
-($out, $err, $exit, @dummy) = capture {system $cmd};
-is $out, <<'...';
+ok run("zobjcopy test.lib --verbose -s text=text --section data=data test2.lib", <<'...');
 Reading file 'test.lib': library version 11
 File 'test.lib': rename sections that match 'text' to 'text'
 Block 'Z80RMF11'
@@ -245,28 +189,13 @@ Block 'Z80RMF11'
   rename section data_2 -> data
 Writing file 'test2.lib': library version 11
 ...
-is $err, "";
-is !!$exit, !!0;
-
-$bmk = sprintf("t/bmk_lib_%02d_sections1.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_lib_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.lib > $out"), "zobjcopy -l test2.lib > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.lib", "test2.lib", $out;
-
+ok check_zobjcopy("test2.lib", 	sprintf("t/bmk_lib_%02d_sections1.txt", $OBJ_FILE_VERSION));
+unlink "test.lib", "test2.lib";
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-$cmd = "zobjcopy -v test.o -s .=ram test2.o";
-ok 1, $cmd;
-($out, $err, $exit, @dummy) = capture {system $cmd};
-is $out, <<'...';
+ok run("zobjcopy -v test.o -s .=ram test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': rename sections that match '.' to 'ram'
 Block 'Z80RMF11'
@@ -278,28 +207,13 @@ Block 'Z80RMF11'
   rename section data_2 -> ram
 Writing file 'test2.o': object version 11
 ...
-is $err, "";
-is !!$exit, !!0;
-
-$bmk = sprintf("t/bmk_obj_%02d_sections2.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
-
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections2.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-$cmd = "zobjcopy -v test.o -s ^text=rom_text -s ^data=ram_data test2.o";
-ok 1, $cmd;
-($out, $err, $exit, @dummy) = capture {system $cmd};
-is $out, <<'...';
+ok run("zobjcopy -v test.o -s ^text=rom_text -s ^data=ram_data test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': rename sections that match '^text' to 'rom_text'
 Block 'Z80RMF11'
@@ -318,25 +232,13 @@ Block 'Z80RMF11'
   rename section data_2 -> ram_data
 Writing file 'test2.o': object version 11
 ...
-is $err, "";
-is !!$exit, !!0;
-
-$bmk = sprintf("t/bmk_obj_%02d_sections3.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
-
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections3.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^data=base test2.o", <<'...', "", 0);
+ok run("zobjcopy -v test.o -s ^data=base test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': rename sections that match '^data' to 'base'
 Block 'Z80RMF11'
@@ -348,23 +250,13 @@ Block 'Z80RMF11'
   rename section data_2 -> base
 Writing file 'test2.o': object version 11
 ...
-
-$bmk = sprintf("t/bmk_obj_%02d_sections4.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
-
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections4.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<'...', "", 0);
+ok run("zobjcopy -v test.o -s ^data=base -s ^text=base test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': rename sections that match '^data' to 'base'
 Block 'Z80RMF11'
@@ -382,17 +274,8 @@ Block 'Z80RMF11'
   rename section base -> base
 Writing file 'test2.o': object version 11
 ...
-
-$bmk = sprintf("t/bmk_obj_%02d_sections5.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_sections5.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 #------------------------------------------------------------------------------
 # add prefix to symbols
@@ -400,10 +283,7 @@ unlink "test.o", "test2.o", $out;
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-$cmd = "zobjcopy test.o --verbose --add-prefix .,lib_ test2.o";
-ok 1, $cmd;
-($out, $err, $exit, @dummy) = capture {system $cmd};
-is $out, <<'...';
+ok run("zobjcopy test.o --verbose --add-prefix .,lib_ test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': add prefix 'lib_' to symbols that match '.'
 Block 'Z80RMF11'
@@ -413,28 +293,13 @@ Block 'Z80RMF11'
   rename symbol msg2 -> lib_msg2
 Writing file 'test2.o': object version 11
 ...
-is $err, "";
-is !!$exit, !!0;
-
-$bmk = sprintf("t/bmk_obj_%02d_add-prefix1.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
-
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
-
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_add-prefix1.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-$cmd = "zobjcopy test.o --verbose --add-prefix m,lib_ test2.o";
-ok 1, $cmd;
-($out, $err, $exit, @dummy) = capture {system $cmd};
-is $out, <<'...';
+ok run("zobjcopy test.o --verbose --add-prefix m,lib_ test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': add prefix 'lib_' to symbols that match 'm'
 Block 'Z80RMF11'
@@ -444,20 +309,45 @@ Block 'Z80RMF11'
   rename symbol msg2 -> lib_msg2
 Writing file 'test2.o': object version 11
 ...
-is $err, "";
-is !!$exit, !!0;
+ok check_zobjcopy("test2.o", 	sprintf("t/bmk_obj_%02d_add-prefix2.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
-$bmk = sprintf("t/bmk_obj_%02d_add-prefix2.txt", $OBJ_FILE_VERSION);
-$out = sprintf("t/out_obj_%02d.txt", $OBJ_FILE_VERSION);
+#------------------------------------------------------------------------------
+# rename symbol
+#------------------------------------------------------------------------------
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
 
-is 0, system("zobjcopy -l test2.o > $out"), "zobjcopy -l test2.o > $out";
-is 0, system("diff -w $out $bmk"), "diff -w $out $bmk";
-
-system("winmergeu $out $bmk") unless Test::More->builder->is_passing;
-# die unless Test::More->builder->is_passing;
-
-unlink "test.o", "test2.o", $out;
-
+ok run("zobjcopy test.o --verbose --symbol ext1=ff_lib_ext1 -y ext=xxx -y msg1=MSG1 test2.o", <<'...');
+Reading file 'test.o': object version 11
+File 'test.o': rename symbol 'ext1' to 'ff_lib_ext1'
+Block 'Z80RMF11'
+  rename symbol ext1 -> ff_lib_ext1
+  skip symbol ext2
+  skip symbol main
+  skip symbol _start
+  skip symbol msg1
+  skip symbol msg2
+File 'test.o': rename symbol 'ext' to 'xxx'
+Block 'Z80RMF11'
+  skip symbol ff_lib_ext1
+  skip symbol ext2
+  skip symbol main
+  skip symbol _start
+  skip symbol msg1
+  skip symbol msg2
+File 'test.o': rename symbol 'msg1' to 'MSG1'
+Block 'Z80RMF11'
+  skip symbol ff_lib_ext1
+  skip symbol ext2
+  skip symbol main
+  skip symbol _start
+  rename symbol msg1 -> MSG1
+  skip symbol msg2
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_symbol1.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
 
 #------------------------------------------------------------------------------
 # handle the case with no sections
@@ -467,8 +357,8 @@ path("test.asm")->spew(<<'...');
 	defc aa=2		; in section ''
 	section text	; so that obj file has one section but no ''
 ...
-ok run("z80asm test.asm", "", "", 0);
-ok run("zobjcopy -l test.o", <<'...', "", 0);
+ok run("z80asm test.asm");
+ok run("zobjcopy -l test.o", <<'...');
 Object  file test.o at $0000: Z80RMF11
   Name: test
   Section text: 0 bytes
@@ -476,8 +366,8 @@ Object  file test.o at $0000: Z80RMF11
     G C $0002 aa (section "") (file test.asm:2)
 ...
 
-ok run("zobjcopy test.o test2.o", "", "", 0);
-ok run("zobjcopy -l test2.o", <<'...', "", 0);
+ok run("zobjcopy test.o test2.o");
+ok run("zobjcopy -l test2.o", <<'...');
 Object  file test2.o at $0000: Z80RMF11
   Name: test
   Section "": 0 bytes
@@ -646,6 +536,9 @@ sub pack_lstring {
 #------------------------------------------------------------------------------
 sub run {
 	my($cmd, $exp_out, $exp_err, $exp_exit) = @_;
+	$exp_out //= "";
+	$exp_err //= "";
+	$exp_exit //= 0;	
 
 	my $ok = Test::More->builder->is_passing;
 	
@@ -656,4 +549,34 @@ sub run {
 	is !!$exit, !!$exp_exit, $cmd;
 	
 	return $ok && Test::More->builder->is_passing;
+}
+
+#------------------------------------------------------------------------------
+sub check_zobjcopy_nm {
+	my($cmd, $file, $bmk) = @_;
+	
+	my $ok = Test::More->builder->is_passing;
+	
+	(my $out = $bmk) =~ s/$/.out/;
+	
+	is 0, system("$cmd $file > $out"), "$cmd $file > $out";
+	my $diff = system("diff -w $out $bmk"), "diff -w $out $bmk";
+	is 0, $diff;
+	
+	system("winmergeu $out $bmk") if $diff;
+	unlink $out unless $diff;
+	
+	return $ok && Test::More->builder->is_passing;
+}
+
+sub check_zobjcopy {
+	my($file, $bmk) = @_;
+	return check_zobjcopy_nm("zobjcopy -l", $file, $bmk);
+
+}
+
+sub check_z80nm {
+	my($file, $bmk) = @_;
+	return check_zobjcopy_nm("z80nm -a", $file, $bmk);
+
 }

@@ -33,10 +33,12 @@ Object  file test2.lib at $0010: Z80RMF11
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
+    E Cw $0000 $0001: ext1 (section data_1) (file file1.asm:231)
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
 
-Object  file test2.lib at $02F4: Z80RMF11
+Object  file test2.lib at $0326: Z80RMF11
   Name: file1
   Section "": 0 bytes
   Section text_1: 63 bytes, ORG $0000
@@ -70,6 +72,8 @@ Object  file test2.lib at $02F4: Z80RMF11
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
+    E Cw $0000 $0001: ext1 (section data_1) (file file1.asm:231)
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
 

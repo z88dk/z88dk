@@ -1161,3 +1161,55 @@ void file_add_symbol_prefix(file_t *file, const char *regexp, const char *prefix
 	regfree(&regex);
 	utstring_free(new_name);
 }
+
+void file_rename_symbol(file_t *file, const char *old_name, const char *new_name)
+{
+	if (opt_verbose)
+		printf("File '%s': rename symbol '%s' to '%s'\n",
+			utstring_body(file->filename), old_name, new_name);
+
+	objfile_t *obj;
+	DL_FOREACH(file->objs, obj) {
+
+		if (opt_verbose)
+			printf("Block '%s'\n", utstring_body(obj->signature));
+
+		char **ext = NULL;
+		while ((ext = (char**)utarray_next(obj->externs, ext)) != NULL) {
+			if (strcmp(*ext, old_name) == 0) {	// match
+				if (opt_verbose)
+					printf("  rename symbol %s -> %s\n", old_name, new_name);
+
+				obj_rename_symbol(obj, old_name, new_name);
+				xfree(*ext);
+				*ext = xstrdup(new_name);
+			}
+			else {		// no match
+				if (opt_verbose)
+					printf("  skip symbol %s\n", *ext);
+			}
+		}
+
+		section_t *section;
+		DL_FOREACH(obj->sections, section) {
+
+			symbol_t *symbol;
+			DL_FOREACH(section->symbols, symbol) {
+				if (symbol->scope == 'G') {
+					if (strcmp(utstring_body(symbol->name), old_name) == 0) {	// match
+						if (opt_verbose)
+							printf("  rename symbol %s -> %s\n", old_name, new_name);
+
+						obj_rename_symbol(obj, old_name, new_name);
+						utstring_clear(symbol->name);
+						utstring_bincpy(symbol->name, new_name, strlen(new_name));
+					}
+					else {		// no match
+						if (opt_verbose)
+							printf("  skip symbol %s\n", utstring_body(symbol->name));
+					}
+				}
+			}
+		}
+	}
+}

@@ -134,3 +134,4 @@ extern void file_read(file_t *file, const char *filename);
 extern void file_write(file_t *file, const char *filename);
 extern void file_rename_sections(file_t *file, const char *old_regexp, const char *new_name);
 extern void file_add_symbol_prefix(file_t *file, const char *regexp, const char *prefix);
+extern void file_rename_symbol(file_t *file, const char *old_name, const char *new_name);

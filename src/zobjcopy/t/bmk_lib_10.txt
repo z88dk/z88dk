@@ -2,7 +2,7 @@ Library file test.lib at $0000: Z80LMF10
 Object  file test.lib at $0010: Z80RMF10
   Deleted...
 
-Object  file test.lib at $02F9: Z80RMF10
+Object  file test.lib at $033D: Z80RMF10
   Name: file1
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -35,13 +35,15 @@ Object  file test.lib at $02F9: Z80RMF10
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Cw $0000 $0001: ext1 (section data_1) (file file1.asm:231)
+    E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
 
-Object  file test.lib at $05E2: Z80RMF10
+Object  file test.lib at $066A: Z80RMF10
   Deleted...
 
-Object  file test.lib at $08CB: Z80RMF10
+Object  file test.lib at $0997: Z80RMF10
   Name: file1
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -74,6 +76,8 @@ Object  file test.lib at $08CB: Z80RMF10
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Cw $0000 $0001: ext1 (section data_1) (file file1.asm:231)
+    E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
 

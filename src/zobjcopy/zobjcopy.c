@@ -19,16 +19,19 @@ static char usage[] =
 "  -l|--list                             ; dump contents of file\n"
 "  -s|--section old-regexp=new-name      ; rename all sections that match\n"
 "     --add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match\n"
+"  -y|--symbol old-name=new-name         ; rename global and extern symbols\n"
 ;
 
 #define OPT_SECTION			's'
 #define OPT_ADD_PREFIX		'\1'
+#define OPT_SYMBOL			'y'
 
 static struct optparse_long longopts[] = {
 { "verbose",	'v',				OPTPARSE_NONE },
 { "list",		'l',				OPTPARSE_NONE },
 { "section",	OPT_SECTION,		OPTPARSE_REQUIRED },
 { "add-prefix",	OPT_ADD_PREFIX,		OPTPARSE_REQUIRED },
+{ "symbol",		OPT_SYMBOL,			OPTPARSE_REQUIRED },
 { 0,0,0 }
 };
 
@@ -41,7 +44,7 @@ int main(int argc, char *argv[])
 	utarray_new(commands, &ut_str_icd);
 
 	char *command = xstrdup("X");
-	char *regexp, *name, *prefix, *p;
+	char *regexp, *old_name, *name, *prefix, *p;
 
 	// show usage
 	if (argc < 2) {
@@ -86,6 +89,20 @@ int main(int argc, char *argv[])
 			prefix = p + 1;
 			utarray_push_back(commands, &prefix);
 			break;
+		case OPT_SYMBOL:
+			*command = OPT_SYMBOL;
+			utarray_push_back(commands, &command);
+
+			p = strchr(options.optarg, '=');
+			if (!p)
+				die("error: no '=' in --symbol argument '%s'\n", options.optarg);
+
+			old_name = options.optarg; *p = '\0';
+			utarray_push_back(commands, &old_name);
+
+			name = p + 1;
+			utarray_push_back(commands, &name);
+			break;
 		case '?':
 			die("error: %s\n", options.errmsg);
 		default: assert(0);
@@ -127,6 +144,12 @@ int main(int argc, char *argv[])
 			regexp = *(char**)utarray_eltptr(commands, 1);
 			prefix = *(char**)utarray_eltptr(commands, 2);
 			file_add_symbol_prefix(file, regexp, prefix);
+			utarray_erase(commands, 0, 3);
+			break;
+		case OPT_SYMBOL:
+			old_name = *(char**)utarray_eltptr(commands, 1);
+			name = *(char**)utarray_eltptr(commands, 2);
+			file_rename_symbol(file, old_name, name);
 			utarray_erase(commands, 0, 3);
 			break;
 		default:

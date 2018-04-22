@@ -19,4 +19,6 @@ Object  file test2.o at $0000: Z80RMF11
     E Sb $0000 $0001: start2 % 127 (section "") (file "")
     E Cw $0000 $0001: msg1 (section "") (file "")
     E Ll $0000 $0001: msg2 (section "") (file "")
+    E Cw $0000 $0001: ext1 (section "") (file "")
+    E Ll $0000 $0001: ext2 (section "") (file "")
     E Cw $0000 $0001: msg2-msg1 (section "") (file "")

@@ -29,5 +29,7 @@ Object  file test2.o at $0000: Z80RMF11
     E BW $0000 $0001: start1 (section base) (file file1.asm:231)
     E Sb $0040 $0041: start2 % 127 (section base) (file file1.asm:132)
     E Cw $0090 $0091: msg1 (section base) (file file1.asm:231)
+    E Cw $0090 $0091: ext1 (section base) (file file1.asm:231)
     E Cw $0090 $0091: msg2-msg1 (section base) (file file1.asm:231)
     E Ll $009A $009B: msg2 (section base) (file file1.asm:321)
+    E Ll $009A $009B: ext2 (section base) (file file1.asm:321)
