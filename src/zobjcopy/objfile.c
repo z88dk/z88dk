@@ -1009,7 +1009,7 @@ static bool delete_merged_section(objfile_t *obj, section_t **p_merged_section,
 void file_rename_sections(file_t *file, const char *old_regexp, const char *new_name)
 {
 	if (opt_verbose)
-		printf("Renaming sections in file '%s' that match '%s' to '%s'\n",
+		printf("File '%s': rename sections that match '%s' to '%s'\n",
 			utstring_body(file->filename), old_regexp, new_name);
 
 	// compile regular expression
@@ -1060,4 +1060,104 @@ void file_rename_sections(file_t *file, const char *old_regexp, const char *new_
 
 	// free memory
 	regfree(&regex);
+}
+
+static void obj_rename_symbol(objfile_t *obj, const char *old_name, const char *new_name)
+{
+	UT_string *new_text;
+	utstring_new(new_text);
+
+	section_t *section;
+	DL_FOREACH(obj->sections, section) {
+		expr_t *expr;
+		DL_FOREACH(section->exprs, expr) {
+			if (strcmp(utstring_body(expr->target_name), old_name) == 0) {
+				utstring_clear(expr->target_name);
+				utstring_bincpy(expr->target_name, new_name, strlen(new_name));
+			}
+
+			char *p = NULL;
+			size_t n = 0;
+			while (n < utstring_len(expr->text) &&
+				(p = strstr(utstring_body(expr->text) + n, old_name)) != NULL) {
+				if ((p == utstring_body(expr->text) || !isalnum(p[-1])) &&
+					!isalnum(p[strlen(old_name)])) {
+					// old_name is not part of a bigger identifier
+					utstring_clear(new_text);
+					utstring_printf(new_text, "%.*s%s%s",
+						p - utstring_body(expr->text), utstring_body(expr->text),
+						new_name,
+						p + strlen(old_name));
+					utstring_clear(expr->text);
+					utstring_concat(expr->text, new_text);
+					n += p - utstring_body(expr->text) + strlen(new_name);
+				}
+			}
+		}
+	}
+
+	utstring_free(new_text);
+}
+
+void file_add_symbol_prefix(file_t *file, const char *regexp, const char *prefix)
+{
+	if (opt_verbose)
+		printf("File '%s': add prefix '%s' to symbols that match '%s'\n",
+			utstring_body(file->filename), prefix, regexp);
+
+	// compile regular expression
+	regex_t regex;
+	int reti = regcomp(&regex, regexp, REG_EXTENDED | REG_NOSUB);
+	if (reti)
+		die("error: could not compile regex '%s'\n", regexp);
+
+	// search file for symbols that match
+	UT_string *new_name;
+	utstring_new(new_name);
+
+	objfile_t *obj;
+	DL_FOREACH(file->objs, obj) {
+
+		if (opt_verbose)
+			printf("Block '%s'\n", utstring_body(obj->signature));
+
+		section_t *section;
+		DL_FOREACH(obj->sections, section) {
+
+			symbol_t *symbol;
+			DL_FOREACH(section->symbols, symbol) {
+				if (symbol->scope == 'G') {
+					if ((reti = regexec(&regex, utstring_body(symbol->name), 0, NULL, 0)) == REG_OKAY) {	// match
+						utstring_clear(new_name);
+						utstring_printf(new_name, "%s%s", prefix, utstring_body(symbol->name));
+
+						if (opt_verbose)
+							printf("  rename symbol %s -> %s\n",
+								utstring_body(symbol->name),
+								utstring_body(new_name));
+
+						obj_rename_symbol(obj,
+							utstring_body(symbol->name),
+							utstring_body(new_name));
+
+						utstring_clear(symbol->name);
+						utstring_concat(symbol->name, new_name);
+					}
+					else if (reti == REG_NOMATCH) {		// no match
+						if (opt_verbose)
+							printf("  skip symbol %s\n", utstring_body(symbol->name));
+					}
+					else {								// error
+						char msgbuf[100];
+						regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+						die("error: regex match failed: %s\n", msgbuf);
+					}
+				}
+			}
+		}
+	}
+
+	// free memory
+	regfree(&regex);
+	utstring_free(new_name);
 }

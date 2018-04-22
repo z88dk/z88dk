@@ -2,7 +2,7 @@ Library file test.lib at $0000: Z80LMF03
 Object  file test.lib at $0010: Z80RMF03
   Deleted...
 
-Object  file test.lib at $00FE: Z80RMF03
+Object  file test.lib at $010E: Z80RMF03
   Name: file1
   Org:  $0000
   Section "": 63 bytes
@@ -24,11 +24,12 @@ Object  file test.lib at $00FE: Z80RMF03
     E Sb $0000 $0001: start2 % 127
     E Cw $0000 $0001: msg1
     E Ll $0000 $0001: msg2
+    E Cw $0000 $0001: msg2-msg1
 
-Object  file test.lib at $01EC: Z80RMF03
+Object  file test.lib at $020C: Z80RMF03
   Deleted...
 
-Object  file test.lib at $02DA: Z80RMF03
+Object  file test.lib at $030A: Z80RMF03
   Name: file1
   Org:  $0000
   Section "": 63 bytes
@@ -50,4 +51,5 @@ Object  file test.lib at $02DA: Z80RMF03
     E Sb $0000 $0001: start2 % 127
     E Cw $0000 $0001: msg1
     E Ll $0000 $0001: msg2
+    E Cw $0000 $0001: msg2-msg1
 

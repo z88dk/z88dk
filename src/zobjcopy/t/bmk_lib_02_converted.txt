@@ -20,8 +20,9 @@ Object  file test2.lib at $0010: Z80RMF11
     E Sb $0000 $0001: start2 % 127 (section "") (file "")
     E Cw $0000 $0001: msg1 (section "") (file "")
     E Ll $0000 $0001: msg2 (section "") (file "")
+    E Cw $0000 $0001: msg2-msg1 (section "") (file "")
 
-Object  file test2.lib at $014B: Z80RMF11
+Object  file test2.lib at $0163: Z80RMF11
   Name: file1
   Section "": 63 bytes
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -42,4 +43,5 @@ Object  file test2.lib at $014B: Z80RMF11
     E Sb $0000 $0001: start2 % 127 (section "") (file "")
     E Cw $0000 $0001: msg1 (section "") (file "")
     E Ll $0000 $0001: msg2 (section "") (file "")
+    E Cw $0000 $0001: msg2-msg1 (section "") (file "")
 

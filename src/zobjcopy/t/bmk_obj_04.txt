@@ -20,3 +20,4 @@ Object  file test.o at $0000: Z80RMF04
     E Sb $0000 $0001: start2 % 127 (file file1.asm:132)
     E Cw $0000 $0001: msg1 (file file1.asm:231)
     E Ll $0000 $0001: msg2 (file file1.asm:321)
+    E Cw $0000 $0001: msg2-msg1 (file file1.asm:231)

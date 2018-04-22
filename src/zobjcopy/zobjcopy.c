@@ -15,15 +15,20 @@ bool opt_list = false;
 static char usage[] =
 //   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x
 "Usage: zobjcopy input [options] [output]\n"
-"  -v|--verbose                      ; show what is going on\n"
-"  -l|--list                         ; dump contents of file\n"
-"  -s|--section old-regexp=new-name  ; rename all sections that match\n"
+"  -v|--verbose                          ; show what is going on\n"
+"  -l|--list                             ; dump contents of file\n"
+"  -s|--section old-regexp=new-name      ; rename all sections that match\n"
+"     --add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match\n"
 ;
 
+#define OPT_SECTION			's'
+#define OPT_ADD_PREFIX		'\1'
+
 static struct optparse_long longopts[] = {
-{ "verbose",	'v', OPTPARSE_NONE },
-{ "list",		'l', OPTPARSE_NONE },
-{ "section",	's', OPTPARSE_REQUIRED },
+{ "verbose",	'v',				OPTPARSE_NONE },
+{ "list",		'l',				OPTPARSE_NONE },
+{ "section",	OPT_SECTION,		OPTPARSE_REQUIRED },
+{ "add-prefix",	OPT_ADD_PREFIX,		OPTPARSE_REQUIRED },
 { 0,0,0 }
 };
 
@@ -32,10 +37,11 @@ static struct optparse_long longopts[] = {
 //-----------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-	UT_array *rename_section_args;
-	char *old_regexp, *new_name, *p;
+	UT_array *commands;
+	utarray_new(commands, &ut_str_icd);
 
-	utarray_new(rename_section_args, &ut_str_icd);
+	char *command = xstrdup("X");
+	char *regexp, *name, *prefix, *p;
 
 	// show usage
 	if (argc < 2) {
@@ -52,15 +58,33 @@ int main(int argc, char *argv[])
 		switch (option) {
 		case 'l': opt_list = true; break;
 		case 'v': opt_verbose = true; break;
-		case 's': 
+		case OPT_SECTION:
+			*command = OPT_SECTION;
+			utarray_push_back(commands, &command);
+
 			p = strchr(options.optarg, '=');
 			if (!p)
 				die("error: no '=' in --section argument '%s'\n", options.optarg);
-			old_regexp = options.optarg; *p = '\0';
-			utarray_push_back(rename_section_args, &old_regexp);
 
-			new_name = p + 1;
-			utarray_push_back(rename_section_args, &new_name);
+			regexp = options.optarg; *p = '\0';
+			utarray_push_back(commands, &regexp);
+
+			name = p + 1;
+			utarray_push_back(commands, &name);
+			break;
+		case OPT_ADD_PREFIX: 
+			*command = OPT_ADD_PREFIX;
+			utarray_push_back(commands, &command);
+
+			p = strchr(options.optarg, ',');
+			if (!p)
+				die("error: no ',' in --add-prefix argument '%s'\n", options.optarg);
+
+			regexp = options.optarg; *p = '\0';
+			utarray_push_back(commands, &regexp);
+
+			prefix = p + 1;
+			utarray_push_back(commands, &prefix);
 			break;
 		case '?':
 			die("error: %s\n", options.errmsg);
@@ -89,14 +113,25 @@ int main(int argc, char *argv[])
 	file_t *file = file_new();
 	file_read(file, infile);
 
-	// rename sections
-	while (utarray_len(rename_section_args) >= 2) {
-		old_regexp = *(char**)utarray_eltptr(rename_section_args, 0);
-		new_name = *(char**)utarray_eltptr(rename_section_args, 1);
-
-		file_rename_sections(file, old_regexp, new_name);
-
-		utarray_erase(rename_section_args, 0, 2);
+	// execute commands
+	while (utarray_len(commands) > 0) {
+		char *command = *(char**)utarray_eltptr(commands, 0);
+		switch (*command) {
+		case OPT_SECTION:
+			regexp = *(char**)utarray_eltptr(commands, 1);
+			name = *(char**)utarray_eltptr(commands, 2);
+			file_rename_sections(file, regexp, name);
+			utarray_erase(commands, 0, 3);
+			break;
+		case OPT_ADD_PREFIX:
+			regexp = *(char**)utarray_eltptr(commands, 1);
+			prefix = *(char**)utarray_eltptr(commands, 2);
+			file_add_symbol_prefix(file, regexp, prefix);
+			utarray_erase(commands, 0, 3);
+			break;
+		default:
+			assert(0);
+		}
 	}
 
 	// write changed file
@@ -107,5 +142,6 @@ int main(int argc, char *argv[])
 
 	// release memory
 	file_free(file);
-	utarray_free(rename_section_args);
+	utarray_free(commands);
+	xfree(command);
 }

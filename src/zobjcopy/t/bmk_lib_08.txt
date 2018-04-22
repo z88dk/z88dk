@@ -2,7 +2,7 @@ Library file test.lib at $0000: Z80LMF08
 Object  file test.lib at $0010: Z80RMF08
   Deleted...
 
-Object  file test.lib at $026A: Z80RMF08
+Object  file test.lib at $0291: Z80RMF08
   Name: file1
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -26,7 +26,7 @@ Object  file test.lib at $026A: Z80RMF08
     G A $0002 msg1 (section data_1)
     G A $0002 msg2 (section data_2)
     G C $0000 main (section text_1)
-    L = $0000 _start (section text_1)
+    G = $0000 _start (section text_1)
   Externs:
     U         ext1
     U         ext2
@@ -35,12 +35,13 @@ Object  file test.lib at $026A: Z80RMF08
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
 
-Object  file test.lib at $04C4: Z80RMF08
+Object  file test.lib at $0512: Z80RMF08
   Deleted...
 
-Object  file test.lib at $071E: Z80RMF08
+Object  file test.lib at $0793: Z80RMF08
   Name: file1
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -64,7 +65,7 @@ Object  file test.lib at $071E: Z80RMF08
     G A $0002 msg1 (section data_1)
     G A $0002 msg2 (section data_2)
     G C $0000 main (section text_1)
-    L = $0000 _start (section text_1)
+    G = $0000 _start (section text_1)
   Externs:
     U         ext1
     U         ext2
@@ -73,5 +74,6 @@ Object  file test.lib at $071E: Z80RMF08
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
 

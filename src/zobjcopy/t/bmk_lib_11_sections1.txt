@@ -19,7 +19,7 @@ Object  file test2.lib at $0010: Z80RMF11
   Symbols:
     L A $0002 start1 (section text) (file file1.asm:123)
     G C $0000 main (section text) (file file1.asm:231)
-    L = $0000 _start (section text) (file file1.asm:231)
+    G = $0000 _start (section text) (file file1.asm:231)
     L A $0042 start2 (section text) (file file1.asm:123)
     G A $0002 msg1 (section data) (file file1.asm:123)
     G A $000C msg2 (section data) (file file1.asm:123)
@@ -32,9 +32,10 @@ Object  file test2.lib at $0010: Z80RMF11
     E BW $0000 $0001: start1 (section text) (file file1.asm:231)
     E Sb $0040 $0041: start2 % 127 (section text) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data) (file file1.asm:231)
+    E Cw $0000 $0001: msg2-msg1 (section data) (file file1.asm:231)
     E Ll $000A $000B: msg2 (section data) (file file1.asm:321)
 
-Object  file test2.lib at $029E: Z80RMF11
+Object  file test2.lib at $02BA: Z80RMF11
   Name: file1
   Section "": 0 bytes
   Section text: 128 bytes, ORG $0000
@@ -54,7 +55,7 @@ Object  file test2.lib at $029E: Z80RMF11
   Symbols:
     L A $0002 start1 (section text) (file file1.asm:123)
     G C $0000 main (section text) (file file1.asm:231)
-    L = $0000 _start (section text) (file file1.asm:231)
+    G = $0000 _start (section text) (file file1.asm:231)
     L A $0042 start2 (section text) (file file1.asm:123)
     G A $0002 msg1 (section data) (file file1.asm:123)
     G A $000C msg2 (section data) (file file1.asm:123)
@@ -67,5 +68,6 @@ Object  file test2.lib at $029E: Z80RMF11
     E BW $0000 $0001: start1 (section text) (file file1.asm:231)
     E Sb $0040 $0041: start2 % 127 (section text) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data) (file file1.asm:231)
+    E Cw $0000 $0001: msg2-msg1 (section data) (file file1.asm:231)
     E Ll $000A $000B: msg2 (section data) (file file1.asm:321)
 

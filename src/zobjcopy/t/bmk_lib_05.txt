@@ -2,7 +2,7 @@ Library file test.lib at $0000: Z80LMF05
 Object  file test.lib at $0010: Z80RMF05
   Deleted...
 
-Object  file test.lib at $0218: Z80RMF05
+Object  file test.lib at $023E: Z80RMF05
   Name: file1
   Org:  $0000
   Section text_1: 63 bytes
@@ -35,11 +35,12 @@ Object  file test.lib at $0218: Z80RMF05
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
 
-Object  file test.lib at $0420: Z80RMF05
+Object  file test.lib at $046C: Z80RMF05
   Deleted...
 
-Object  file test.lib at $0628: Z80RMF05
+Object  file test.lib at $069A: Z80RMF05
   Name: file1
   Org:  $0000
   Section text_1: 63 bytes
@@ -72,4 +73,5 @@ Object  file test.lib at $0628: Z80RMF05
     E Sb $0000 $0001: start2 % 127 (section text_2) (file file1.asm:132)
     E Cw $0000 $0001: msg1 (section data_1) (file file1.asm:231)
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
+    E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
 

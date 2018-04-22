@@ -20,3 +20,4 @@ Object  file test.o at $0000: Z80RMF01
     E Sb $0001: start2 % 127
     E Cw $0001: msg1
     E Ll $0001: msg2
+    E Cw $0001: msg2-msg1
