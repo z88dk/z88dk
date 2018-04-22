@@ -35,18 +35,18 @@ static void add_open_file(FILE *stream, const char *filename)
 {
 	init();
 	assert(stream);
-	size_t fno = fileno(stream);
+	unsigned fno = fileno(stream);
 	if (fno >= utarray_len(open_files))
 		utarray_resize(open_files, fno + 1);
 	free(*(char**)utarray_eltptr(open_files, fno));
-	*(char**)utarray_eltptr(open_files, fno) = Strdup(filename);
+	*(char**)utarray_eltptr(open_files, fno) = xstrdup(filename);
 }
 
 static char *get_filename(FILE *fp)
 {
 	init();
 	assert(fp);
-	size_t fno = fileno(fp);
+	unsigned fno = fileno(fp);
 	if (fno >= utarray_len(open_files))
 		return "?";
 	else
@@ -118,7 +118,7 @@ void xfwrite_bcount_str(UT_string *str, FILE *stream)
 
 void xfwrite_wcount_str(UT_string * str, FILE * stream)
 {
-	size_t len = utstring_len(str);
+	int len = (int)utstring_len(str);
 	if (len > 0xFFFF)
 		die("string '%s' too long for word counted string", str);
 	xfwrite_word(len, stream);

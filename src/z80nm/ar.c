@@ -177,7 +177,7 @@ void dump_names( FILE *fp, char *filename, long fpos_start, long fpos_end )
 	if ( file_version >= 5 )				/* signal end by zero type */
 		fpos_end = MAX_FP;
 
-	printf("  Names:\n");
+	printf("  Symbols:\n");
 	fseek( fp, fpos_start, SEEK_SET );
 	while ( ftell( fp ) < fpos_end )
 	{
@@ -224,7 +224,7 @@ void dump_externs( FILE *fp, char *filename, long fpos_start, long fpos_end )
 {
 	char *name;
 
-	printf("  External names:\n");
+	printf("  Externs:\n");
 	fseek( fp, fpos_start, SEEK_SET );
 	while ( ftell( fp ) < fpos_end )
 	{
@@ -376,7 +376,9 @@ void dump_code( FILE *fp, char *filename, long fpos_start )
 			else
 				align = -1;
 
-			printf("  Code: %d bytes", code_size );
+			printf("  Section %s: %d bytes", 
+				*section_name ? section_name : "\"\"",
+				code_size );
 			if (org >= 0) {
 				printf(", ORG $%04X", org );
 			}
@@ -389,7 +391,6 @@ void dump_code( FILE *fp, char *filename, long fpos_start )
 			if (align > 1)
 				printf(", ALIGN %d", align);
 
-			print_section_name( section_name );
 			printf("\n");
 
 			dump_bytes( fp, filename, code_size );
@@ -402,7 +403,7 @@ void dump_code( FILE *fp, char *filename, long fpos_start )
 			code_size = 0x10000;
 		if ( code_size > 0 )
 		{
-			printf("  Code: %d bytes\n", code_size );
+			printf("  Section \"\": %d bytes\n", code_size);
 			dump_bytes( fp, filename, code_size );
 		}
 	}
@@ -435,6 +436,10 @@ void dump_object( FILE *fp, char *filename )
 	if ( org >= 0 )
 		printf("  Org:  $%04X\n", org );
 
+	/* code */
+	if (fpos_code >= 0 && opt_dump_code)
+		dump_code(fp, filename, fpos0 + fpos_code);
+
 	/* names */
 	if ( fpos_names >= 0 ) 
 		dump_names( fp, filename, 
@@ -453,9 +458,6 @@ void dump_object( FILE *fp, char *filename )
 				   fpos0 + fpos_exprs, 
 				   fpos0 + END( fpos_names, END( fpos_externs, fpos_modname ) ) );
 
-	/* code */
-	if ( fpos_code >= 0 && opt_dump_code ) 
-		dump_code( fp, filename, fpos0 + fpos_code );
 }
 
 /*-----------------------------------------------------------------------------

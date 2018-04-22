@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
+#include "die.h"
 #include "utarray.h"
 #include "utstring.h"
 #include <stdbool.h>
@@ -17,58 +18,87 @@
 #define SIGNATURE_OBJ	"Z80RMF"
 #define SIGNATURE_LIB	"Z80LMF"
 #define SIGNATURE_VERS	"%02d"
+#define DEFAULT_ALIGN_FILLER	0xFF
 
-enum file_type { is_none, is_library, is_object };
+extern byte_t opt_obj_align_filler;
 
+struct section_s;
+
+//-----------------------------------------------------------------------------
+typedef enum file_type 
+{ 
+	is_none, 
+	is_library, 
+	is_object 
+} file_type_e;
+
+//-----------------------------------------------------------------------------
 // a defined symbol
+//-----------------------------------------------------------------------------
 typedef struct symbol_s
 {
-	UT_string *name;
-	UT_string *section;
-	UT_string *filename;
-	char	scope;
-	char	type;
-	int		value;
-	int		line_nr;
+	UT_string	*name;
+	char		 scope;
+	char		 type;
+	int			 value;
 
-	struct symbol_s *next, *prev;		// to store DL list of symbols
+	struct section_s *section;		// weak
+
+	UT_string	*filename;
+	int			 line_nr;
+
+	struct symbol_s *next, *prev;
 } symbol_t;
 
 extern symbol_t *symbol_new();
-extern void symbol_free(symbol_t *sym);
+extern void symbol_free(symbol_t *self);
 
+//-----------------------------------------------------------------------------
 // an expression
+//-----------------------------------------------------------------------------
 typedef struct expr_s
 {
-	UT_string *text;
-	UT_string *section;
-	UT_string *target_name;
-	UT_string *filename;
-	char	type;
-	int		asmpc, patch_ptr;
-	int		line_nr;
+	UT_string	*text;
+	char		 type;
+	int			 asmpc;
+	int			 patch_ptr;
 
-	struct expr_s *next, *prev;			// to store DL list of symbols
+	struct section_s *section;		// weak
+
+	UT_string	*target_name;
+
+	UT_string	*filename;
+	int			 line_nr;
+
+	struct expr_s *next, *prev;
 } expr_t;
 
 extern expr_t *expr_new();
-extern void expr_free(expr_t *expr);
+extern void expr_free(expr_t *self);
 
-// object code
-typedef struct code_s
+//-----------------------------------------------------------------------------
+// one section
+//-----------------------------------------------------------------------------
+typedef struct section_s
 {
+	UT_string	*name;
 	UT_array	*data;
-	UT_string	*section;
 	int			 org;
 	int			 align;
 
-	struct code_s *next, *prev;			// to store DL list of symbols
-} code_t;
+	symbol_t	*symbols;
+	expr_t		*exprs;
 
-extern code_t *code_new();
-extern void code_free(code_t *code);
+	struct section_s *next, *prev;
 
+} section_t;
+
+extern section_t *section_new();
+extern void section_free(section_t *self);
+
+//-----------------------------------------------------------------------------
 // one object file
+//-----------------------------------------------------------------------------
 typedef struct objfile_s
 {
 	UT_string	*filename;
@@ -76,13 +106,10 @@ typedef struct objfile_s
 	UT_string	*modname;
 	int			 version;
 	int			 global_org;
-
-	symbol_t	*names;
 	UT_array	*externs;
-	expr_t		*exprs;
-	code_t		*codes;
+	section_t	*sections;
 
-	struct objfile_s *next, *prev;		// to store DL list of object files
+	struct objfile_s *next, *prev;
 } objfile_t;
 
 extern objfile_t *objfile_new();
@@ -90,12 +117,14 @@ extern void objfile_free(objfile_t *obj);
 extern void objfile_read(objfile_t *obj, FILE *fp);
 extern void objfile_write(objfile_t *obj, FILE *fp);
 
+//-----------------------------------------------------------------------------
 // one file - either object or library
+//-----------------------------------------------------------------------------
 typedef struct file_s
 {
 	UT_string	*filename;
 	UT_string	*signature;
-	enum file_type type;
+	file_type_e type;
 	int			 version;
 
 	objfile_t	*objs;					// either one or multiple object files
@@ -106,3 +135,10 @@ extern file_t *file_new();
 extern void file_free(file_t *file);
 extern void file_read(file_t *file, const char *filename);
 extern void file_write(file_t *file, const char *filename);
+extern void file_rename_sections(file_t *file, const char *old_regexp, const char *new_name);
+extern void file_add_symbol_prefix(file_t *file, const char *regexp, const char *prefix);
+extern void file_rename_symbol(file_t *file, const char *old_name, const char *new_name);
+extern void file_make_symbols_local(file_t *file, const char *regexp);
+extern void file_make_symbols_global(file_t *file, const char *regexp);
+extern void file_set_section_org(file_t *file, const char *name, int value);
+extern void file_set_section_align(file_t *file, const char *name, int value);
