@@ -21,6 +21,9 @@
 #define DEFAULT_ALIGN_FILLER	0xFF
 
 extern byte_t opt_obj_align_filler;
+extern bool opt_obj_hide_local;
+extern bool opt_obj_hide_expr;
+extern bool opt_obj_hide_code;
 
 struct section_s;
 

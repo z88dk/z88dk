@@ -17,6 +17,9 @@ static char usage[] =
 "Usage: zobjcopy input [options] [output]\n"
 "  -v|--verbose                          ; show what is going on\n"
 "  -l|--list                             ; dump contents of file\n"
+"     --hide-local                       ; in list don't show local symbols\n"
+"     --hide-expr                        ; in list don't show expressions\n"
+"     --hide-code                        ; in list don't show code dump\n"
 "  -s|--section old-regexp=new-name      ; rename all sections that match\n"
 "  -p|--add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match\n"
 "  -y|--symbol old-name=new-name         ; rename global and extern symbols\n"
@@ -27,6 +30,11 @@ static char usage[] =
 "  -A|--align section,nn|0xhh            ; change ALIGN of one section\n"
 ;
 
+#define OPT_VERBOSE			'v'
+#define OPT_LIST			'l'
+#define OPT_HIDE_LOCAL		'\1'
+#define OPT_HIDE_EXPR		'\2'
+#define OPT_HIDE_CODE		'\3'
 #define OPT_SECTION			's'
 #define OPT_ADD_PREFIX		'p'
 #define OPT_SYMBOL			'y'
@@ -37,8 +45,11 @@ static char usage[] =
 #define OPT_ALIGN			'A'
 
 static struct optparse_long longopts[] = {
-{ "verbose",	'v',				OPTPARSE_NONE },
-{ "list",		'l',				OPTPARSE_NONE },
+{ "verbose",	OPT_VERBOSE,		OPTPARSE_NONE },
+{ "list",		OPT_LIST,			OPTPARSE_NONE },
+{ "hide-local",	OPT_HIDE_LOCAL,		OPTPARSE_NONE },
+{ "hide-expr",	OPT_HIDE_EXPR,		OPTPARSE_NONE },
+{ "hide-code",	OPT_HIDE_CODE,		OPTPARSE_NONE },
 { "section",	OPT_SECTION,		OPTPARSE_REQUIRED },
 { "add-prefix",	OPT_ADD_PREFIX,		OPTPARSE_REQUIRED },
 { "symbol",		OPT_SYMBOL,			OPTPARSE_REQUIRED },
@@ -75,8 +86,11 @@ int main(int argc, char *argv[])
 	optparse_init(&options, argv);
 	while ((option = optparse_long(&options, longopts, NULL)) != -1) {
 		switch (option) {
-		case 'l': opt_list = true; break;
-		case 'v': opt_verbose = true; break;
+		case OPT_LIST: opt_list = true; break;
+		case OPT_VERBOSE: opt_verbose = true; break;
+		case OPT_HIDE_LOCAL: opt_obj_hide_local = true; break;
+		case OPT_HIDE_EXPR: opt_obj_hide_expr = true; break;
+		case OPT_HIDE_CODE: opt_obj_hide_code = true; break;
 		case OPT_SECTION:
 			*command = OPT_SECTION;
 			utarray_push_back(commands, &command);

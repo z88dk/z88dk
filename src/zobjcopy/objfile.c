@@ -9,6 +9,9 @@
 #define END(a, b)  ((a) >= 0 ? (a) : (b))
 
 byte_t opt_obj_align_filler = DEFAULT_ALIGN_FILLER;
+bool opt_obj_hide_local = false;
+bool opt_obj_hide_expr = false;
+bool opt_obj_hide_code = false;
 
 //-----------------------------------------------------------------------------
 // read from file
@@ -354,7 +357,7 @@ static void objfile_read_sections(objfile_t *obj, FILE *fp, long fpos_start)
 			utarray_resize(section->data, code_size);
 			xfread(utarray_front(section->data), sizeof(byte_t), code_size, fp);
 
-			if (opt_list)
+			if (opt_list && !opt_obj_hide_code)
 				print_bytes(section->data);
 
 			// insert in the list
@@ -417,16 +420,18 @@ static void objfile_read_symbols(objfile_t *obj, FILE *fp, long fpos_start, long
 		}
 
 		if (opt_list) {
-			printf("    %c %c $%04X %s",
-				symbol->scope, symbol->type, symbol->value, utstring_body(symbol->name));
+			if (!(opt_obj_hide_local && symbol->scope == 'L')) {
+				printf("    %c %c $%04X %s",
+					symbol->scope, symbol->type, symbol->value, utstring_body(symbol->name));
 
-			if (obj->version >= 5)
-				print_section(symbol->section->name);
+				if (obj->version >= 5)
+					print_section(symbol->section->name);
 
-			if (obj->version >= 9)
-				print_filename_line_nr(symbol->filename, symbol->line_nr);
+				if (obj->version >= 9)
+					print_filename_line_nr(symbol->filename, symbol->line_nr);
 
-			printf("\n");
+				printf("\n");
+			}
 		}
 
 		// insert in the list
@@ -457,11 +462,12 @@ static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long
 static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long fpos_end)
 {
 	UT_string *last_filename = NULL;		// weak pointer to last filename
+	bool show_expr = opt_list && !opt_obj_hide_expr;
 
 	if (obj->version >= 4)					// signal end by zero type
 		fpos_end = MAX_FP;
 
-	if (opt_list)
+	if (show_expr)
 		printf("  Expressions:\n");
 
 	xfseek(fp, fpos_start, SEEK_SET);
@@ -470,7 +476,7 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 		if (type == 0)
 			break;							// end marker
 
-		if (opt_list)
+		if (show_expr)
 			printf("    E %c%c",
 				type,
 				type == '=' ? ' ' :
@@ -500,18 +506,18 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 		if (obj->version >= 3) {
 			expr->asmpc = xfread_word(fp);
 
-			if (opt_list)
+			if (show_expr)
 				printf(" $%04X", expr->asmpc);
 		}
 
 		expr->patch_ptr = xfread_word(fp);
-		if (opt_list)
+		if (show_expr)
 			printf(" $%04X: ", expr->patch_ptr);
 
 		if (obj->version >= 6) {
 			xfread_bcount_str(expr->target_name, fp);
 
-			if (opt_list && utstring_len(expr->target_name) > 0)
+			if (show_expr && utstring_len(expr->target_name) > 0)
 				printf("%s := ", utstring_body(expr->target_name));
 		}
 
@@ -526,16 +532,16 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 					utstring_body(obj->filename));
 		}
 
-		if (opt_list)
+		if (show_expr)
 			printf("%s", utstring_body(expr->text));
 
-		if (opt_list && obj->version >= 5)
+		if (show_expr && obj->version >= 5)
 			print_section(expr->section->name);
 
-		if (opt_list && obj->version >= 4)
+		if (show_expr && obj->version >= 4)
 			print_filename_line_nr(last_filename, expr->line_nr);
 
-		if (opt_list)
+		if (show_expr)
 			printf("\n");
 
 		// insert in the list
