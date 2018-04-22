@@ -1213,3 +1213,62 @@ void file_rename_symbol(file_t *file, const char *old_name, const char *new_name
 		}
 	}
 }
+
+static void file_change_symbols_scope(file_t *file, const char *regexp, char old_scope, char new_scope)
+{
+	if (opt_verbose)
+		printf("File '%s': make symbols that match '%s' %s\n",
+			utstring_body(file->filename), regexp,
+			new_scope == 'L' ? "local" : "global");
+
+	// compile regular expression
+	regex_t regex;
+	int reti = regcomp(&regex, regexp, REG_EXTENDED | REG_NOSUB);
+	if (reti)
+		die("error: could not compile regex '%s'\n", regexp);
+
+	// search file for symbols that match
+	objfile_t *obj;
+	DL_FOREACH(file->objs, obj) {
+
+		if (opt_verbose)
+			printf("Block '%s'\n", utstring_body(obj->signature));
+
+		section_t *section;
+		DL_FOREACH(obj->sections, section) {
+
+			symbol_t *symbol;
+			DL_FOREACH(section->symbols, symbol) {
+				if (symbol->scope == old_scope) {
+					if ((reti = regexec(&regex, utstring_body(symbol->name), 0, NULL, 0)) == REG_OKAY) {	// match
+						if (opt_verbose)
+							printf("  change scope of symbol %s -> %c\n", utstring_body(symbol->name), new_scope);
+						symbol->scope = new_scope;
+					}
+					else if (reti == REG_NOMATCH) {		// no match
+						if (opt_verbose)
+							printf("  skip symbol %s\n", utstring_body(symbol->name));
+					}
+					else {								// error
+						char msgbuf[100];
+						regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+						die("error: regex match failed: %s\n", msgbuf);
+					}
+				}
+			}
+		}
+	}
+
+	// free memory
+	regfree(&regex);
+}
+
+void file_make_symbols_local(file_t *file, const char *regexp)
+{
+	file_change_symbols_scope(file, regexp, 'G', 'L');
+}
+
+void file_make_symbols_global(file_t *file, const char *regexp)
+{
+	file_change_symbols_scope(file, regexp, 'L', 'G');
+}

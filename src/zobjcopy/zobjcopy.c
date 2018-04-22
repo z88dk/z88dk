@@ -18,13 +18,17 @@ static char usage[] =
 "  -v|--verbose                          ; show what is going on\n"
 "  -l|--list                             ; dump contents of file\n"
 "  -s|--section old-regexp=new-name      ; rename all sections that match\n"
-"     --add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match\n"
+"  -p|--add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match\n"
 "  -y|--symbol old-name=new-name         ; rename global and extern symbols\n"
+"  -L|--local regexp                     ; make symbols that match local\n"
+"  -G|--global regexp                    ; make symbols that match global\n"
 ;
 
 #define OPT_SECTION			's'
-#define OPT_ADD_PREFIX		'\1'
+#define OPT_ADD_PREFIX		'p'
 #define OPT_SYMBOL			'y'
+#define OPT_LOCAL			'L'
+#define OPT_GLOBAL			'G'
 
 static struct optparse_long longopts[] = {
 { "verbose",	'v',				OPTPARSE_NONE },
@@ -32,6 +36,8 @@ static struct optparse_long longopts[] = {
 { "section",	OPT_SECTION,		OPTPARSE_REQUIRED },
 { "add-prefix",	OPT_ADD_PREFIX,		OPTPARSE_REQUIRED },
 { "symbol",		OPT_SYMBOL,			OPTPARSE_REQUIRED },
+{ "local",		OPT_LOCAL,			OPTPARSE_REQUIRED },
+{ "global",		OPT_GLOBAL,			OPTPARSE_REQUIRED },
 { 0,0,0 }
 };
 
@@ -103,6 +109,16 @@ int main(int argc, char *argv[])
 			name = p + 1;
 			utarray_push_back(commands, &name);
 			break;
+		case OPT_LOCAL:
+			*command = OPT_LOCAL;
+			utarray_push_back(commands, &command);
+			utarray_push_back(commands, &options.optarg);
+			break;
+		case OPT_GLOBAL:
+			*command = OPT_GLOBAL;
+			utarray_push_back(commands, &command);
+			utarray_push_back(commands, &options.optarg);
+			break;
 		case '?':
 			die("error: %s\n", options.errmsg);
 		default: assert(0);
@@ -151,6 +167,16 @@ int main(int argc, char *argv[])
 			name = *(char**)utarray_eltptr(commands, 2);
 			file_rename_symbol(file, old_name, name);
 			utarray_erase(commands, 0, 3);
+			break;
+		case OPT_LOCAL:
+			regexp = *(char**)utarray_eltptr(commands, 1);
+			file_make_symbols_local(file, regexp);
+			utarray_erase(commands, 0, 2);
+			break;
+		case OPT_GLOBAL:
+			regexp = *(char**)utarray_eltptr(commands, 1);
+			file_make_symbols_global(file, regexp);
+			utarray_erase(commands, 0, 2);
 			break;
 		default:
 			assert(0);

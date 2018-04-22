@@ -73,8 +73,10 @@ Usage: zobjcopy input [options] [output]
   -v|--verbose                          ; show what is going on
   -l|--list                             ; dump contents of file
   -s|--section old-regexp=new-name      ; rename all sections that match
-     --add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match
+  -p|--add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match
   -y|--symbol old-name=new-name         ; rename global and extern symbols
+  -L|--local regexp                     ; make symbols that match local
+  -G|--global regexp                    ; make symbols that match global
 ...
 
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
@@ -87,10 +89,12 @@ ok run("zobjcopy --section ?=aaa test.o test2.o",	"", "error: could not compile 
 ok run("zobjcopy --add-prefix aaa",					"", "error: no ',' in --add-prefix argument 'aaa'\n",	1);
 ok run("zobjcopy --add-prefix ?,aaa test.o test2.o","", "error: could not compile regex '?'\n",				1);
 ok run("zobjcopy --symbol aaa",						"", "error: no '=' in --symbol argument 'aaa'\n",		1);
+ok run("zobjcopy --local",							"", "error: option requires an argument -- 'local'\n",	1);
+ok run("zobjcopy --global",							"", "error: option requires an argument -- 'global'\n",	1);
 ok run("zobjcopy test1.o test2.o test3.o",			"", "error: too many arguments\n",						1);
 ok run("zobjcopy -l test1.o test2.o",				"", "error: too many arguments\n",						1);
 ok run("zobjcopy test.o",							"", "error: no output file\n",							1);
-	
+
 path("test.o")->spew_raw($objfile[1]);	
 	
 ok run("zobjcopy -v test.o test2.o", <<"...");
@@ -299,7 +303,7 @@ unlink "test.o", "test2.o";
 path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
 unlink "test2.o";
 
-ok run("zobjcopy test.o --verbose --add-prefix m,lib_ test2.o", <<'...');
+ok run("zobjcopy test.o --verbose -p m,lib_ test2.o", <<'...');
 Reading file 'test.o': object version 11
 File 'test.o': add prefix 'lib_' to symbols that match 'm'
 Block 'Z80RMF11'
@@ -347,6 +351,49 @@ Block 'Z80RMF11'
 Writing file 'test2.o': object version 11
 ...
 ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_symbol1.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
+
+#------------------------------------------------------------------------------
+# make symbols local
+#------------------------------------------------------------------------------
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok run("zobjcopy test.o --verbose --local \"^_\" -L msg test2.o", <<'...');
+Reading file 'test.o': object version 11
+File 'test.o': make symbols that match '^_' local
+Block 'Z80RMF11'
+  skip symbol main
+  change scope of symbol _start -> L
+  skip symbol msg1
+  skip symbol msg2
+File 'test.o': make symbols that match 'msg' local
+Block 'Z80RMF11'
+  skip symbol main
+  change scope of symbol msg1 -> L
+  change scope of symbol msg2 -> L
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_local1.txt", $OBJ_FILE_VERSION));
+unlink "test.o", "test2.o";
+
+#------------------------------------------------------------------------------
+# make symbols global
+#------------------------------------------------------------------------------
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok run("zobjcopy test.o --verbose --global start -G s test2.o", <<'...');
+Reading file 'test.o': object version 11
+File 'test.o': make symbols that match 'start' global
+Block 'Z80RMF11'
+  change scope of symbol start1 -> G
+  change scope of symbol start2 -> G
+File 'test.o': make symbols that match 's' global
+Block 'Z80RMF11'
+Writing file 'test2.o': object version 11
+...
+ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_global1.txt", $OBJ_FILE_VERSION));
 unlink "test.o", "test2.o";
 
 #------------------------------------------------------------------------------
