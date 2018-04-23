@@ -12,7 +12,7 @@ SECTION code_clib
 PUBLIC vz_plot_callee
 PUBLIC _vz_plot_callee
 PUBLIC ASMDISP_VZ_PLOT_CALLEE
-EXTERN scrbase
+EXTERN base_graphics
 
 .vz_plot_callee
 ._vz_plot_callee
@@ -60,7 +60,7 @@ EXTERN scrbase
    rrc c
    djnz pset1
 
-   ld de,(scrbase)
+   ld de,(base_graphics)
    add hl,de
    and (hl)
    or c
