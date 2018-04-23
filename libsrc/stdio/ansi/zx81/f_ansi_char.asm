@@ -62,8 +62,9 @@ IF G007
 	EXTERN	_console_h
 	ld	a,23
 	ld	(_console_h),a
-	EXTERN	ansicolumns
+	SECTION	code_clib
 ENDIF
+
 
 .ansi_CHAR
 	ld	hl,char+1

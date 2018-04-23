@@ -21,12 +21,10 @@
 	
 
         SECTION bss_clib
-.vg5k_attr	defb 0
 .vg5k_inverse	defb 0
 
-        SECTION code_crt_init
-	ld	a,7		; White on black
-	ld	(vg5k_attr),a
+	SECTION	data_clib
+.vg5k_attr	defb 7		;White on black
 
 
         SECTION code_clib
