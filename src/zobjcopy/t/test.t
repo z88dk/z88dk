@@ -13,7 +13,17 @@ use Config;
 
 my $OBJ_FILE_VERSION = "11";
 
-$ENV{PATH} = ".".$Config{path_sep}."../../bin".$Config{path_sep}.$ENV{PATH};
+$ENV{PATH} = join($Config{path_sep}, 
+				".",
+				"../z80nm",
+				"../../bin",
+				$ENV{PATH});
+
+#------------------------------------------------------------------------------
+# build tools
+#------------------------------------------------------------------------------
+ok 0 == system("make"), "make";
+ok 0 == system("make -C ../z80nm"), "make -C ../z80nm";
 
 #------------------------------------------------------------------------------
 # global test data
@@ -507,6 +517,12 @@ ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d.txt", $OBJ_FILE_VERSION), ""
 ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d_list1.txt", $OBJ_FILE_VERSION), "--hide-local");
 ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d_list2.txt", $OBJ_FILE_VERSION), "--hide-expr");
 ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d_list3.txt", $OBJ_FILE_VERSION), "--hide-code");
+
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d.txt", $OBJ_FILE_VERSION), "-l -e -c");
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d_list1.txt", $OBJ_FILE_VERSION), "-e -c");
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d_list2.txt", $OBJ_FILE_VERSION), "-l -c");
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d_list3.txt", $OBJ_FILE_VERSION), "-l -e");
+
 unlink "test.o";
 
 #------------------------------------------------------------------------------
@@ -720,7 +736,7 @@ sub check_zobjcopy_nm {
 	(my $out = $bmk) =~ s/$/.out/;
 	
 	is 0, system("$cmd $file > $out"), "$cmd $file > $out";
-	my $diff = system("diff -w $out $bmk"), "diff -w $out $bmk";
+	my $diff = system("diff -w $out $bmk");
 	is 0, $diff;
 	
 	system("winmergeu $out $bmk") if $diff;
@@ -737,7 +753,8 @@ sub check_zobjcopy {
 }
 
 sub check_z80nm {
-	my($file, $bmk) = @_;
-	return check_zobjcopy_nm("z80nm -a", $file, $bmk);
+	my($file, $bmk, $options) = @_;
+	$options //= "-a";
+	return check_zobjcopy_nm("z80nm $options", $file, $bmk);
 
 }

@@ -5,10 +5,6 @@
 //-----------------------------------------------------------------------------
 #include "zobjcopy.h"
 
-// global variables
-bool opt_verbose = false;
-bool opt_list = false;
-
 //-----------------------------------------------------------------------------
 // Usage and command line options
 //-----------------------------------------------------------------------------
@@ -86,8 +82,8 @@ int main(int argc, char *argv[])
 	optparse_init(&options, argv);
 	while ((option = optparse_long(&options, longopts, NULL)) != -1) {
 		switch (option) {
-		case OPT_LIST: opt_list = true; break;
-		case OPT_VERBOSE: opt_verbose = true; break;
+		case OPT_LIST: opt_obj_list = true; break;
+		case OPT_VERBOSE: opt_obj_verbose = true; break;
 		case OPT_HIDE_LOCAL: opt_obj_hide_local = true; break;
 		case OPT_HIDE_EXPR: opt_obj_hide_expr = true; break;
 		case OPT_HIDE_CODE: opt_obj_hide_code = true; break;
@@ -150,7 +146,7 @@ int main(int argc, char *argv[])
 			else
 				sscanf(options.optarg, "%d", &val);
 			opt_obj_align_filler = val & 0xFF;
-			if (opt_verbose)
+			if (opt_obj_verbose)
 				printf("Filler byte: $%02X\n", opt_obj_align_filler);
 			break;
 		case OPT_ORG:
@@ -194,9 +190,9 @@ int main(int argc, char *argv[])
 
 	// collect output file
 	char *outfile = optparse_arg(&options);
-	if (opt_list && outfile)
+	if (opt_obj_list && outfile)
 		die("error: too many arguments\n");
-	else if (!opt_list && !outfile)
+	else if (!opt_obj_list && !outfile)
 		die("error: no output file\n");
 	else
 		;
@@ -268,7 +264,7 @@ int main(int argc, char *argv[])
 	}
 
 	// write changed file
-	if (!opt_list) {
+	if (!opt_obj_list) {
 		assert(outfile);
 		file_write(file, outfile);
 	}
