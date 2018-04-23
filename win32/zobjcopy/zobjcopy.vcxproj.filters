@@ -27,9 +27,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\zobjcopy\objfile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,15 +48,12 @@
     <ClCompile Include="..\..\src\common\optparse.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\objfile.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\zobjcopy\objfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\optparse\optparse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ext\regex\cclass.h">
@@ -78,6 +72,12 @@
       <Filter>Header Files\regex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\common\die.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\optparse\optparse.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\objfile.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
   </ItemGroup>

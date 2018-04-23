@@ -13,7 +13,17 @@ use Config;
 
 my $OBJ_FILE_VERSION = "11";
 
-$ENV{PATH} = ".".$Config{path_sep}."../../bin".$Config{path_sep}.$ENV{PATH};
+$ENV{PATH} = join($Config{path_sep}, 
+				".",
+				"../z80nm",
+				"../../bin",
+				$ENV{PATH});
+
+#------------------------------------------------------------------------------
+# build tools
+#------------------------------------------------------------------------------
+ok 0 == system("make"), "make";
+ok 0 == system("make -C ../z80nm"), "make -C ../z80nm";
 
 #------------------------------------------------------------------------------
 # global test data
@@ -72,6 +82,9 @@ ok run("zobjcopy", <<'...');
 Usage: zobjcopy input [options] [output]
   -v|--verbose                          ; show what is going on
   -l|--list                             ; dump contents of file
+     --hide-local                       ; in list don't show local symbols
+     --hide-expr                        ; in list don't show expressions
+     --hide-code                        ; in list don't show code dump
   -s|--section old-regexp=new-name      ; rename all sections that match
   -p|--add-prefix symbol-regexp,prefix  ; add prefix to all symbols that match
   -y|--symbol old-name=new-name         ; rename global and extern symbols
@@ -495,6 +508,24 @@ ok check_zobjcopy("test2.o", sprintf("t/bmk_obj_%02d_global1.txt", $OBJ_FILE_VER
 unlink "test.o", "test2.o";
 
 #------------------------------------------------------------------------------
+# list
+#------------------------------------------------------------------------------
+path("test.o")->spew_raw($objfile[$OBJ_FILE_VERSION]);
+unlink "test2.o";
+
+ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d.txt", $OBJ_FILE_VERSION), "");
+ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d_list1.txt", $OBJ_FILE_VERSION), "--hide-local");
+ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d_list2.txt", $OBJ_FILE_VERSION), "--hide-expr");
+ok check_zobjcopy("test.o", sprintf("t/bmk_obj_%02d_list3.txt", $OBJ_FILE_VERSION), "--hide-code");
+
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d.txt", $OBJ_FILE_VERSION), "-l -e -c");
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d_list1.txt", $OBJ_FILE_VERSION), "-e -c");
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d_list2.txt", $OBJ_FILE_VERSION), "-l -c");
+ok check_z80nm("test.o", sprintf("t/bmk_obj_%02d_list3.txt", $OBJ_FILE_VERSION), "-l -e");
+
+unlink "test.o";
+
+#------------------------------------------------------------------------------
 # handle the case with no sections
 #------------------------------------------------------------------------------
 path("test.asm")->spew(<<'...');
@@ -705,7 +736,7 @@ sub check_zobjcopy_nm {
 	(my $out = $bmk) =~ s/$/.out/;
 	
 	is 0, system("$cmd $file > $out"), "$cmd $file > $out";
-	my $diff = system("diff -w $out $bmk"), "diff -w $out $bmk";
+	my $diff = system("diff -w $out $bmk");
 	is 0, $diff;
 	
 	system("winmergeu $out $bmk") if $diff;
@@ -715,13 +746,15 @@ sub check_zobjcopy_nm {
 }
 
 sub check_zobjcopy {
-	my($file, $bmk) = @_;
-	return check_zobjcopy_nm("zobjcopy -l", $file, $bmk);
+	my($file, $bmk, $options) = @_;
+	$options //= "";
+	return check_zobjcopy_nm("zobjcopy -l $options", $file, $bmk);
 
 }
 
 sub check_z80nm {
-	my($file, $bmk) = @_;
-	return check_zobjcopy_nm("z80nm -a", $file, $bmk);
+	my($file, $bmk, $options) = @_;
+	$options //= "-a";
+	return check_zobjcopy_nm("z80nm $options", $file, $bmk);
 
 }
