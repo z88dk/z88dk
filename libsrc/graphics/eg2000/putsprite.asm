@@ -6,13 +6,14 @@
 ;       Colour Genie EG2000 version
 ;
 ;
-; $Id: putsprite.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
+; $Id: putsprite.asm $
 ;
 
 	SECTION	  smc_clib
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
 	EXTERN	pixeladdress
+        EXTERN	__graphics_end
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -21,7 +22,7 @@
 .putsprite
 ._putsprite
 	push	ix	; save caller
-        ld      hl,2   
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -94,9 +95,9 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     _oloop
-	 pop	  ix		; restore callers
-         ret
-         
+		 
+		jp	__graphics_end
+
 
 .putspritew
          ld       d,(ix+0)
@@ -138,8 +139,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     woloop
-	 pop	  ix		; restore callers
-         ret
+		jp	__graphics_end
 
 .wover_1
          ld       c,(ix+2)
@@ -151,8 +151,7 @@
          add      hl,bc
          pop      bc
          djnz     woloop
-	 pop	  ix		; restore callers
-         ret
+		jp	__graphics_end
 
 	SECTION rodata_clib
 .offsets_table

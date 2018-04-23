@@ -3,6 +3,8 @@ arch/zxn/memory/c/sdcc/zxn_addr_from_mmu
 arch/zxn/memory/c/sdcc/zxn_addr_from_mmu_fastcall
 arch/zxn/memory/c/sdcc/zxn_addr_from_page
 arch/zxn/memory/c/sdcc/zxn_addr_from_page_fastcall
+arch/zxn/memory/c/sdcc/zxn_addr_in_mmu
+arch/zxn/memory/c/sdcc/zxn_addr_in_mmu_callee
 arch/zxn/memory/c/sdcc/zxn_mangle_bank_state
 arch/zxn/memory/c/sdcc/zxn_mangle_bank_state_fastcall
 arch/zxn/memory/c/sdcc/zxn_mmu_from_addr

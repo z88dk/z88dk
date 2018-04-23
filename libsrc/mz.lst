@@ -7,7 +7,7 @@ stdio/ansi/sharp-mz/f_ansi_attr
 stdio/ansi/sharp-mz/f_ansi_bel
 stdio/ansi/sharp-mz/f_ansi_char
 stdio/ansi/sharp-mz/f_ansi_cls
-stdio/ansi/sharp-mz/f_ansi_dline
+stdio/ansi/generic/f_ansi_dline
 stdio/ansi/sharp-mz/f_ansi_scrollup
 @gfxbase.lst
 graphics/dcircle

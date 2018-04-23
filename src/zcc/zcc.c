@@ -1345,7 +1345,7 @@ int main(int argc, char **argv)
                     q = original_filenames[i];
 
                 snprintf(tmp, sizeof(tmp) - 3, "MODULE %s\n"
-                                               "LINE -1, \"%s\"\n\n", q, original_filenames[i]);
+                                               "LINE 0, \"%s\"\n\n", q, original_filenames[i]);
 
                 // change non-alnum chars in module name to underscore
 

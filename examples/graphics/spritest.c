@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <games.h>
 #include <ctype.h>
-//#include <graphics.h>
+#include <graphics.h>
 
 char bullet[] = 
 	{ 11,3,
@@ -105,7 +105,7 @@ int flag=1;
 int speed=1;
 char *ptr;
 
-  //clg();
+  clg();
   //printf("%c",12);		//clear screen
   for (x=10; x<39; x=x+3)	//put some trash on screen
   {

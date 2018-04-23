@@ -29,6 +29,7 @@
 			cp	maxy
 			ret	nc		; y0	out of range			
 			inc a
+			;inc a
 			
 			ld	(__gfx_coords),hl
 			
@@ -42,7 +43,8 @@
 			ld	hl,div3
 			ld	d,0
 			ld	e,c
-			adc	hl,de
+			inc e
+			add	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
 			

@@ -801,6 +801,11 @@ extern unsigned char zxn_mmu_from_addr_fastcall(unsigned int addr) __preserves_r
 #define zxn_mmu_from_addr(a) zxn_mmu_from_addr_fastcall(a)
 
 
+extern unsigned int zxn_addr_in_mmu(unsigned char mmu,unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned int zxn_addr_in_mmu_callee(unsigned char mmu,unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_callee;
+#define zxn_addr_in_mmu(a,b) zxn_addr_in_mmu_callee(a,b)
+
+
 
 extern unsigned long zxn_addr_from_page(unsigned char page) __preserves_regs(b,c,iyl,iyh);
 extern unsigned long zxn_addr_from_page_fastcall(unsigned char page) __preserves_regs(b,c,iyl,iyh) __z88dk_fastcall;

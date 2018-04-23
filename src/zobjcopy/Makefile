@@ -12,10 +12,18 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD -I../common -I../../ext/uthash/src -I../../ext/optparse
+CFLAGS		+= -Wall -std=gnu11 -MMD \
+-I../common \
+-I../../ext/uthash/src \
+-I../../ext/optparse \
+-I../../ext/regex
+
 INSTALL 	?= install
 
-SRCS 		:= $(wildcard *.c) $(wildcard ../common/*.c)
+SRCS 		:= $(wildcard *.c) \
+$(wildcard ../common/*.c) \
+$(wildcard ../../ext/regex/reg*.c)
+
 OBJS_ALL	:= $(SRCS:.c=.o)
 OBJS		:= $(OBJS_ALL:$(PROJ).o=)
 
