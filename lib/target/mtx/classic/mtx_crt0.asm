@@ -40,8 +40,10 @@
             ENDIF
         ENDIF
 
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 80
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
+        defc    TAR__register_sp = -0xfa96
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
@@ -50,11 +52,11 @@
 
 start:
 
-        ld      (start1+1),sp   ; Save entry stack
 
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 
+        ld      (start1+1),sp   ; Save entry stack
 	call	crt0_init_bss
         ld      (exitsp),sp
 
