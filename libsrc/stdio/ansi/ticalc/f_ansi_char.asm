@@ -58,16 +58,11 @@
 	EXTERN	base_graphics
 	EXTERN	cpygraph
 	
-	PUBLIC	__console_w
-	PUBLIC	__console_h
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
-	EXTERN	ansicolumns
-.__console_w   defb ansicolumns
-.__console_h   defb 8
 
 .ansi_CHAR
   	ld (char+1),a

@@ -22,23 +22,25 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 
-	PUBLIC	__console_w
-	PUBLIC	__console_h
+	EXTERN	__console_w
 
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 	PUBLIC	UNDERLINE
 
+	SECTION	code_crt_init
+
 IF A85COL
-.__console_w   defb 85
+	ld	a,85
+	ld	(__console_w),a
 ENDIF
 
 IF A80COL
-.__console_w   defb 80
+	ld	a,85
+	ld	(__console_w),a
 ENDIF
-
-.__console_h   defb 24
+	SECTION	code_clib
 
 .ansi_CHAR
 	ld (char+1),a

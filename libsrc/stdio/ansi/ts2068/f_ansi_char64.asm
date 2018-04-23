@@ -25,16 +25,18 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 
-	PUBLIC	__console_w
-	PUBLIC	__console_h
+	EXTERN	__console_w
 
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS	
 	PUBLIC	BOLD
 	PUBLIC	UNDERLINE
 
-.__console_w   defb 64
-.__console_h   defb 24
+	SECTION	code_crt_init
+	ld	a,64
+	ld	(__console_w),a
+	SECTION	code_clib
+
 
 .ansi_CHAR
 	ld (char+1),a

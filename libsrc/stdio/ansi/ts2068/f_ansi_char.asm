@@ -48,48 +48,59 @@ ELSE
 	PUBLIC	INVRS	
 	PUBLIC	BOLD
 
+	SECTION code_crt_init
+	EXTERN	__console_w
 IF A255COL
-.__console_w   defb 255 ;defb 128
+	ld	a,255
+	ld	(__console_w),a
 ENDIF
 
 IF A160COL
-.__console_w   defb 160;defb 80
+	ld	a,160
+	ld	(__console_w),a
 ENDIF
 
 IF A170COL
-.__console_w   defb 170; defb 85
+	ld	a,170
+	ld	(__console_w),a
 ENDIF
 
 IF A128COL
-.__console_w   defb 128; defb 64
+	ld	a,128
+	ld	(__console_w),a
 ENDIF
 
 IF A102COL
-.__console_w   defb 102; defb 51
+	ld	a,102
+	ld	(__console_w),a
 ENDIF
 
 IF A85COL
-.__console_w   defb 85; defb 42
+	ld	a,85
+	ld	(__console_w),a
 ENDIF
 
 IF A80COL
-.__console_w   defb 80; defb 40
+	ld	a,80
+	ld	(__console_w),a
 ENDIF
 
 IF A73COL
-.__console_w   defb 73; defb 36
+	ld	a,73
+	ld	(__console_w),a
 ENDIF
 
 IF A64COL
-.__console_w   defb 64; defb 32
+	ld	a,64
+	ld	(__console_w),a
 ENDIF
 
 IF A56COL
-.__console_w   defb 56; defb 28
+	ld	a,56
+	ld	(__console_w),a
 ENDIF
+	SECTION	code_clib
 
-
-.__console_h   defb 24
 
 .ansi_CHAR
   ld (char+1),a
