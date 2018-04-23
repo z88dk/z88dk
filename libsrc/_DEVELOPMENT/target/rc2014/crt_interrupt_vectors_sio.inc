@@ -15,7 +15,8 @@ IF (__Z80 != 0) && (__page_zero_present) && (__crt_org_vector_table > 0x100) && 
     EXTERN      __sioa_interrupt_ext_status
     EXTERN      __sioa_interrupt_rx_char
     EXTERN      __sioa_interrupt_rx_error
-
+    
+    _sio_interrupt_vectors:
     defw        __siob_interrupt_tx_empty
     defw        __siob_interrupt_ext_status
     defw        __siob_interrupt_rx_char
