@@ -11,9 +11,9 @@ aciaRxLock:     defb 0                  ; lock flag for Rx exclusion
 
 SECTION bss_align_256
 
-; pad to next 256 byte boundary
+; pad to next __IO_ACIA_RX_SIZE byte boundary
 
-ALIGN 0x100
+ALIGN __IO_ACIA_RX_SIZE
 
 PUBLIC aciaRxBuffer
 
