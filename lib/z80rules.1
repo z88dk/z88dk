@@ -890,7 +890,7 @@
 	call	l_long_asl
 =
 	push	hl
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
 	pop	hl
@@ -905,7 +905,7 @@
 	call	l_long_asl
 =
 	push	hl
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
 	pop	hl
@@ -962,7 +962,7 @@
 	ld	a,(hl)
 	pop	de
 =
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
 
@@ -1377,7 +1377,7 @@
 	pop	de
 =
 	ex	de,hl
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	call	l_gint	;%9
 
@@ -1564,7 +1564,7 @@
 	pop	bc
 	push	hl
 =
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	call	l_gint	;%9
 	push	hl
@@ -1923,7 +1923,7 @@
 	pop	de
 =
 	ex	de,hl
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
@@ -1991,7 +1991,7 @@
 	sub	e
 =
 	ld	e,(hl)
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
 	sub	e
@@ -2076,7 +2076,7 @@
 	ld	a,e
 =
 	ld	e,(hl)
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
 	%2	#%3
@@ -2726,7 +2726,7 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	ld	hl,+(%1 - 2)	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
@@ -2757,7 +2757,7 @@
 	call	l_gint	;
 	pop	de
 =
-	ld	hl,%1-2	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	call	l_gint
 
