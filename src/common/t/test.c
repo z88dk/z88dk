@@ -23,10 +23,11 @@ int main(int argc, char *argv[])
 	T(t_str_set);
 	T(t_str_set_f);
 	T(t_str_set_bin);
+	T(t_str_set_str);
 	T(t_str_append);
 	T(t_str_append_f);
 	T(t_str_append_bin);
-	T(t_str_concat);
-
+	T(t_str_append_str);
+	
 	return UNITY_END();
 }

@@ -14,10 +14,10 @@ str_t *str_new()
 	return str;
 }
 
-str_t *str_new_copy(const char *in)
+str_t *str_new_copy(const char *src)
 {
 	str_t *str = str_new();
-	str_set(str, in);
+	str_set(str, src);
 	return str;
 }
 
@@ -36,10 +36,10 @@ void str_reserve(str_t *str, size_t amt)
 	utstring_reserve(str, amt);
 }
 
-void str_set(str_t *str, const char *in)
+void str_set(str_t *str, const char *src)
 {
 	utstring_clear(str);
-	utstring_bincpy(str, in, strlen(in));
+	utstring_bincpy(str, src, strlen(src));
 }
 
 void str_set_f(str_t *str, const char *fmt, ...)
@@ -57,9 +57,15 @@ void str_set_bin(str_t *str, const char *data, size_t len)
 	utstring_bincpy(str, data, len);
 }
 
-void str_append(str_t *str, const char *in)
+void str_set_str(str_t *str, str_t *src)
 {
-	utstring_bincpy(str, in, strlen(in));
+	utstring_clear(str);
+	utstring_concat(str, src);
+}
+
+void str_append(str_t *str, const char *src)
+{
+	utstring_bincpy(str, src, strlen(src));
 }
 
 void str_append_f(str_t *str, const char *fmt, ...)
@@ -75,7 +81,7 @@ void str_append_bin(str_t *str, const char *data, size_t len)
 	utstring_bincpy(str, data, len);
 }
 
-void str_concat(str_t *str, str_t *src)
+void str_append_str(str_t *str, str_t *src)
 {
 	utstring_concat(str, src);
 }

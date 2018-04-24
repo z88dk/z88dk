@@ -10,7 +10,7 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD -I../../ext/uthash/src
+CFLAGS		+= -Wall -std=gnu11 -MMD -I../../ext/uthash/src -I../../ext/regex
 
 SRCS 		:= \
 $(wildcard *.c) \

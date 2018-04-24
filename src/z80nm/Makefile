@@ -1,6 +1,7 @@
 SRCS 		:= $(wildcard *.c) \
 ../common/die.c \
 ../common/objfile.c \
+../common/strutil.c \
 $(wildcard ../../ext/regex/reg*.c)
 
 OBJS	:= $(SRCS:.c=.o)

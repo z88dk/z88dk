@@ -101,6 +101,24 @@ void t_str_set_bin(void)
 	str_free(s);
 }
 
+void t_str_set_str(void)
+{
+	str_t *s = str_new();
+	TEST_ASSERT_EQUAL_STRING("", str_data(s));
+
+	str_t *s1 = str_new_copy("hello");
+	str_set_str(s, s1);
+	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
+
+	str_t *s2 = str_new_copy("world");
+	str_set_str(s, s2);
+	TEST_ASSERT_EQUAL_STRING("world", str_data(s));
+
+	str_free(s);
+	str_free(s1);
+	str_free(s2);
+}
+
 void t_str_append(void)
 {
 	str_t *s = str_new();
@@ -145,14 +163,20 @@ void t_str_append_bin(void)
 	str_free(s);
 }
 
-void t_str_concat(void)
+void t_str_append_str(void)
 {
-	str_t *s1 = str_new_copy("hello ");
+	str_t *s = str_new();
+	TEST_ASSERT_EQUAL_STRING("", str_data(s));
+
+	str_t *s1 = str_new_copy("hello");
+	str_append_str(s, s1);
+	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
+
 	str_t *s2 = str_new_copy("world");
+	str_append_str(s, s2);
+	TEST_ASSERT_EQUAL_STRING("helloworld", str_data(s));
 
-	str_concat(s1, s2);
-	TEST_ASSERT_EQUAL_STRING("hello world", str_data(s1));
-
+	str_free(s);
 	str_free(s1);
 	str_free(s2);
 }
