@@ -352,6 +352,9 @@ int main(int argc, char **argv)
                 if ( strncmp(ptr, "STACKPTR",8) == 0 ) {
                     write_defined("REGISTER_SP",value,exp);                    
                 }
+                if ( strncmp(ptr, "nostreams",9) == 0 ) {
+                    write_defined("CRT_ENABLE_STDIO",0,exp);                    
+                }
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;
                 char *value = "0";

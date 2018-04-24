@@ -13,7 +13,7 @@
         PUBLIC	ansi_SCROLLUP
 
         INCLUDE "target/cpc/def/cpcfirm.def"
-        EXTERN	text_rows
+        EXTERN	__console_h
 
 
 .ansi_SCROLLUP

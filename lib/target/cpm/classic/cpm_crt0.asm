@@ -152,7 +152,7 @@ ENDIF
 
 cleanup:
 	push	hl		;Save return value
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall	;Close any opened files
 	call	closeall
 ENDIF
@@ -261,7 +261,7 @@ ENDIF
 
 	SECTION  rodata_clib
 IF !DEFINED_noredir
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 redir_fopen_flag:		defb	'w',0
 redir_fopen_flagr:		defb	'r',0
 ENDIF

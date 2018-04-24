@@ -4,10 +4,10 @@
 ; 	Handles colors referring to current PAPER/INK/etc. settings
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -20,25 +20,18 @@
     INCLUDE "target/cpc/def/cpcfirm.def"
                
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
-
-	PUBLIC	text_cols
-	PUBLIC	text_rows
+	EXTERN	__console_y
+	EXTERN	__console_x
 
 	EXTERN	INVRS
 	EXTERN	UNDRL
 	
-.text_cols   defb 80
-
-.text_rows   defb 25
-
 .ansi_CHAR
         push	af
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         inc     a
         ld      h,a
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         inc     a
         ld      l,a
         push	hl

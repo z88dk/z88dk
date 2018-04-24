@@ -29,10 +29,16 @@
 	PUBLIC    l_dcal          ;jp(hl)
 
 
+        defc    CONSOLE_ROWS = 32
+        defc    CONSOLE_COLUMNS = 32
+
+
 IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = 100h
 ENDIF
 
+
+	defc    TAR__fputc_cons_generic = 1
 	defc	TAR__register_sp = 0xdfff
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 1000000
@@ -61,7 +67,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

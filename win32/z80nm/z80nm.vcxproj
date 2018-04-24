@@ -92,7 +92,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\getopt</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\getopt;..\..\ext\regex</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,7 +122,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\getopt</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\getopt;..\..\ext\regex</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,7 +168,12 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ext\regex\regcomp.c" />
+    <ClCompile Include="..\..\ext\regex\regerror.c" />
+    <ClCompile Include="..\..\ext\regex\regexec.c" />
+    <ClCompile Include="..\..\ext\regex\regfree.c" />
     <ClCompile Include="..\..\src\common\die.c" />
+    <ClCompile Include="..\..\src\common\objfile.c" />
     <ClCompile Include="..\..\src\z80nm\ar.c" />
   </ItemGroup>
   <ItemGroup>
@@ -177,7 +182,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ext\regex\cclass.h" />
+    <ClInclude Include="..\..\ext\regex\cname.h" />
+    <ClInclude Include="..\..\ext\regex\regex.h" />
+    <ClInclude Include="..\..\ext\regex\regex2.h" />
+    <ClInclude Include="..\..\ext\regex\utils.h" />
     <ClInclude Include="..\..\src\common\die.h" />
+    <ClInclude Include="..\..\src\common\objfile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,6 +27,8 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 40
 
 IF      !DEFINED_CRT_ORG_CODE
         defc    CRT_ORG_CODE  = 50000
@@ -59,7 +61,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

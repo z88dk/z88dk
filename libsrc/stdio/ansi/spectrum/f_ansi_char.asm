@@ -10,12 +10,12 @@
 ;	** ROM font -DROMFONT
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -25,18 +25,13 @@
 	SECTION	code_clib
 	PUBLIC	ansi_CHAR
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
+	EXTERN	__console_x
+	EXTERN	__console_y
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS	
 
-	EXTERN	ansicolumns
-.text_cols   defb ansicolumns
-.text_rows   defb 24
 
 	EXTERN	ansicharacter_pixelwidth
 	EXTERN	ansifont_is_packed
@@ -50,9 +45,9 @@ ansi_CHAR:
 	jr	nz,ansi_CHAR_flexible
 ; So we can fast path 32 column printing
 	ex	af,af		;save character
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	ld	l,a
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	ld	h,a
 	rrca
 	rrca
@@ -112,7 +107,7 @@ no_underline:
 
 .ansi_CHAR_flexible
   ld (char+1),a
-  ld a,(ansi_ROW)       ; Line text position
+  ld a,(__console_y)       ; Line text position
   push af
   and 24
   ld d,a
@@ -129,7 +124,7 @@ no_underline:
   ld hl,DOTS+1
   ld b,(hl)
   ld hl,0
-  ld a,(ansi_COLUMN)       ; Column text position
+  ld a,(__console_x)       ; Column text position
   ld e,a
   ld d,0
   or d
@@ -149,7 +144,7 @@ no_underline:
   push af
   ld de,22528-32
   add hl,de
-  ld a,(ansi_ROW)
+  ld a,(__console_y)
   inc a
   ld de,32
 .CLP

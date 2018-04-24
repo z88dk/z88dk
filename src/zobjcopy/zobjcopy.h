@@ -19,6 +19,3 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-extern bool opt_verbose;
-extern bool opt_list;

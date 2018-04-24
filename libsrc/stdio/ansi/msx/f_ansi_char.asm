@@ -2,10 +2,10 @@
 ; 	ANSI Video handling for the MSX/SVI video chip
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -34,27 +34,19 @@ ENDIF
 	EXTERN	ansifont_is_packed
 	EXTERN	ansifont
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
 	EXTERN     swapgfxbk
         EXTERN	__graphics_end
 
 	INCLUDE	"msx/vdp.inc"
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
 	EXTERN	ansicharacter_pixelwidth
-
-	EXTERN	ansicolumns
-.text_cols   defb ansicolumns
-
-.text_rows   defb 24
 
 
 .ansi_CHAR
@@ -69,49 +61,48 @@ ENDIF
 	jr	nz,ansi_CHAR_flexible
 	
 ; So we can fast path 32 column printing
-	ld	hl,ansifont	- 256
-	ld de,8
-	push de
-.LFONT2
-	add hl,de
-	djnz LFONT2
-	pop bc		; 8
-	ld	a,(ansi_COLUMN)
-	add a
-	add a
-	add a
+	ld	l,b
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	de,ansifont - 256
+	add	hl,de
+	ld	bc,8
+	ld	a,(__console_x)
+	add	a
+	add	a
+	add	a
 	ld	e,a
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	ld	d,a
-	ld (RIGA2+1),de	
-		ld ix,LDIRVM
-		call	msxbios
-	jp	RIGA2
+	ld	ix,LDIRVM
+	push	de
+	call	msxbios
+	pop	de
+	jp	set_attribute
 	
 	
 
 .ansi_CHAR_flexible
-	ld ix,chline_buffer
-  ld (char+1),a
-  
-  ld a,(ansi_ROW)       ; Line text position
-   
+	ld	ix,chline_buffer
+	ld	(char+1),a			;SMC
+  	ld	a,(__console_y)       ; Line text position
 	ld	h,a		; current row * 256 = start position in VRAM
-	ld  l,0
-	ld (RIGA+1),hl
+	ld	l,0
+	ld	(RIGA+1),hl
 
-  ld hl,DOTS+1
-  ld b,(hl)
-  ld hl,0
-
-  ld a,(ansi_COLUMN)       ; Column text position
-  ld e,a
-  ld d,0
-  or d
-  jr z,ZCL
+	ld	hl,DOTS+1
+	ld	b,(hl)
+	ld	hl,0
+	ld	a,(__console_x)       ; Column text position
+	ld	e,a
+	ld	d,0
+  	or	d
+	jr	z,ZCL
 .LP
-  add hl,de
-  djnz LP
+	add	hl,de
+	djnz	LP
 
   srl h
   rr l
@@ -158,8 +149,8 @@ ENDIF
 	in	a, (VDP_DATAIN)
 	ld (chline_buffer),a
 
-	ld de,8	; next row
-	add hl,de
+	ld	de,8	; next row
+	add	hl,de
 	
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
@@ -172,29 +163,25 @@ ENDIF
 	
   
 .char
-  ld b,'A'      ; Put here the character to be printed
-
-	  ld a,ansifont_is_packed
-	  ld	hl,ansifont	- 256
-	  and	a
-	  jr    z,got_font_location
-
-	  xor	a
-	  rr	b
-	  jr	c,even
-	  ld	a,4
-	.even
-	  ld	(ROLL+1),a
-	  ld hl,ansifont - 128
-
-	.got_font_location
-
-  ld de,8
-.LFONT
-  add hl,de
-  djnz LFONT
-.NOLFONT
-
+	ld	b,'A'      ; SMC Put here the character to be printed
+	ld	a,ansifont_is_packed
+	ld	de,ansifont	- 256
+	and	a
+	jr	z,got_font_location
+	xor	a
+	rr	b
+	jr	c,even
+	ld	a,4
+.even
+	ld	(ROLL+1),a
+	ld	de,ansifont - 128
+.got_font_location
+	ld	l,b
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,de
   ld c,8
 .PRE
   ld b,4
@@ -331,14 +318,15 @@ ENDIF
   jp nz,PRE
   
 .RIGA2
-  ld de,0
-  ld hl,8192
-  add hl,de
-  ld a,(msx_attr)
-  ld bc,8
-	ld ix,FILVRM
+	ld	de,0		;SMC, screen location
+.set_attribute
+	ld	hl,8192
+	add	hl,de
+	ld	a,(msx_attr)
+	ld	bc,8
+	ld	ix,FILVRM
 	call	msxbios
-  jp __graphics_end
+  	jp	__graphics_end
 
 
 ;	SECTION bss_clib

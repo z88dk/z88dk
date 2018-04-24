@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// zobjcopy - manipulate z80asm object files
+// zobjfile - manipulate z80asm object files
 // Copyright (C) Paulo Custodio, 2011-2018
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
@@ -11,16 +11,21 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define MIN_VERSION		1
-#define MAX_VERSION		11
-#define CUR_VERSION		MAX_VERSION
-#define SIGNATURE_SIZE	8
-#define SIGNATURE_OBJ	"Z80RMF"
-#define SIGNATURE_LIB	"Z80LMF"
-#define SIGNATURE_VERS	"%02d"
+#define MIN_VERSION				1
+#define MAX_VERSION				11
+#define CUR_VERSION				MAX_VERSION
+#define SIGNATURE_SIZE			8
+#define SIGNATURE_OBJ			"Z80RMF"
+#define SIGNATURE_LIB			"Z80LMF"
+#define SIGNATURE_VERS			"%02d"
 #define DEFAULT_ALIGN_FILLER	0xFF
 
 extern byte_t opt_obj_align_filler;
+extern bool opt_obj_verbose;
+extern bool opt_obj_list;
+extern bool opt_obj_hide_local;
+extern bool opt_obj_hide_expr;
+extern bool opt_obj_hide_code;
 
 struct section_s;
 

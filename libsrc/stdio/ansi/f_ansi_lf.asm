@@ -13,22 +13,22 @@
 	SECTION code_clib
 	PUBLIC	ansi_LF
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
-	EXTERN	text_rows
+	EXTERN	__console_y
+	EXTERN	__console_x
+	EXTERN	__console_h
 
 	EXTERN	ansi_SCROLLUP
 
 .ansi_LF
  xor a          ; yes,
- ld (ansi_COLUMN),a       ; automatic CR
- ld a,(ansi_ROW)
+ ld (__console_x),a       ; automatic CR
+ ld a,(__console_y)
  inc a
- ld (ansi_ROW),a
- ld hl,text_rows
+ ld (__console_y),a
+ ld hl,__console_h
  cp (hl)	; Out of screen?
  ret nz		; no, return
- ld a,(text_rows)
+ ld a,(__console_h)
  dec a		; yes!
- ld (ansi_ROW),a
+ ld (__console_y),a
  jp ansi_SCROLLUP

@@ -8,12 +8,12 @@
 ;	** use the -DPACKEDFONT flag
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -48,8 +48,8 @@
 	
 	PUBLIC	ansi_CHAR
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
 	EXTERN	ansicharacter_pixelwidth
 	EXTERN	ansifont_is_packed
@@ -58,23 +58,18 @@
 	EXTERN	base_graphics
 	EXTERN	cpygraph
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
-	EXTERN	ansicolumns
-.text_cols   defb ansicolumns
-.text_rows   defb 8
 
 .ansi_CHAR
   	ld (char+1),a
 
   	ld	hl,(base_graphics)
 
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 
 	and	a
 	jr	z,ZROW
@@ -94,7 +89,7 @@
 
   ld hl,0
 
-  ld a,(ansi_COLUMN)       ; Column text position
+  ld a,(__console_x)       ; Column text position
   ld e,a
   ld d,0
   or d

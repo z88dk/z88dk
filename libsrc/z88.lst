@@ -1,4 +1,3 @@
-stdio/z88/puts_cons
 stdio/z88/fgets_cons
 @stdio/stdio.lst
 @stdio/stdio_net.lst

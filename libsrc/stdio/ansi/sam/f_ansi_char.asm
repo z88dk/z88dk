@@ -11,12 +11,12 @@
 ;	** ROM font -DROMFONT
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;       Frode Tennebø - 29/12/2002
@@ -28,12 +28,9 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
- 	PUBLIC	text_cols
- 	PUBLIC	text_rows
-	
 	PUBLIC	UNDRLN
 	
 .ansi_CHAR
@@ -44,9 +41,9 @@
 
 	ld	a,22		; AT
 	rst	16
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	rst	16
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	rst	16
 	ld	a,b		; char
 	rst	16
@@ -63,17 +60,10 @@
 .nounderline	
 	ret
 
-; IF ROMFONT
-; .text_cols   defb 36		
-; ELSE
-.text_cols   defb 32	; <- Change this for different font sizes !!
-; ENDIF
-
-.text_rows   defb 22
 	
 ; .ansi_CHAR
 ;   ld (char+1),a
-;   ld a,(ansi_ROW)       ; Line text position
+;   ld a,(__console_y)       ; Line text position
 ;   push af
 ;   and 24
 ;   ld d,a
@@ -90,7 +80,7 @@
 ;   ld hl,DOTS+1
 ;   ld b,(hl)
 ;   ld hl,0
-;   ld a,(ansi_COLUMN)       ; Column text position
+;   ld a,(__console_x)       ; Column text position
 ;   ld e,a
 ;   ld d,0
 ;   or d
@@ -110,7 +100,7 @@
 ;   push af
 ;   ld de,22528-32
 ;   add hl,de
-;   ld a,(ansi_ROW)
+;   ld a,(__console_y)
 ;   inc a
 ;   ld de,32
 ; .CLP

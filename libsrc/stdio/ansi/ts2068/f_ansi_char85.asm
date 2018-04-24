@@ -5,11 +5,11 @@
 ;	** ROM font -DROMFONT
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -19,30 +19,32 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
+	EXTERN	__console_w
 
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 	PUBLIC	UNDERLINE
 
+	SECTION	code_crt_init
+
 IF A85COL
-.text_cols   defb 85
+	ld	a,85
+	ld	(__console_w),a
 ENDIF
 
 IF A80COL
-.text_cols   defb 80
+	ld	a,85
+	ld	(__console_w),a
 ENDIF
-
-.text_rows   defb 24
+	SECTION	code_clib
 
 .ansi_CHAR
 	ld (char+1),a
-	ld a,(ansi_ROW)       ; Line text position
+	ld a,(__console_y)       ; Line text position
 	ld c,a
 	and 24
 	ld d,a
@@ -55,7 +57,7 @@ ENDIF
 	ld hl,16384
 	add hl,de
 
-	ld a,(ansi_COLUMN)
+	ld a,(__console_x)
 	ld c,a
 	add a,a
 	add a,c
