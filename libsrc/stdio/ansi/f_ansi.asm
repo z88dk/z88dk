@@ -32,8 +32,10 @@
         EXTERN     ansi_del_line
 
 
-        EXTERN    text_cols
-        EXTERN    text_rows
+        EXTERN    __console_w
+        EXTERN    __console_h
+	EXTERN	  __console_x
+	EXTERN	  __console_y
 
 
 
@@ -79,9 +81,9 @@
 ; cp     13  ; CR?
 ;------------------------
 ; jr     nz,NoCR
-; ld     a,(ansi_COLUMN)
+; ld     a,(__console_x)
 ; xor    a
-; ld     (ansi_COLUMN),a
+; ld     (__console_x),a
 ; jr     loopn
 ;.NoCR
 
@@ -113,18 +115,18 @@
         jr     nz,NoTAB
         push   hl
         push   de
-        ld     a,(ansi_COLUMN)
+        ld     a,(__console_x)
         rra
         rra
         inc    a
         rla
         rla
         push   hl
-        ld     hl,text_cols
+        ld     hl,__console_w
         cp     (hl)
         pop    hl
         jp     p,OutTAB
-        ld     (ansi_COLUMN),a
+        ld     (__console_x),a
 .OutTAB
         pop    de
         pop    hl
@@ -147,21 +149,21 @@
  cp     8   ; BackSpace
 ;------------------------
         jr     nz,NoBS
-        ld     a,(ansi_COLUMN)
+        ld     a,(__console_x)
         and    a
         jr     z,firstc ; are we in the first column?
         dec    a
-        ld     (ansi_COLUMN),a
+        ld     (__console_x),a
         jr     loopn
 .firstc
-        ld     a,(ansi_ROW)
+        ld     a,(__console_y)
         and    a
         jr     z,loopn
         dec    a
-        ld     (ansi_ROW),a
-        ld     a,(text_cols)
+        ld     (__console_y),a
+        ld     a,(__console_w)
         dec    a
-        ld     (ansi_COLUMN),a
+        ld     (__console_x),a
         jr     loopn
 .NoBS
 
@@ -195,8 +197,8 @@
         push   bc
         call   ansi_cls
         xor    a                ; HOME cursor
-        ld     (ansi_ROW),a
-        ld     (ansi_COLUMN),a
+        ld     (__console_y),a
+        ld     (__console_x),a
         pop    bc
         pop    de
         pop    hl
@@ -561,23 +563,23 @@ push de
         jr nz,no_C
 
         ld      hl,param_buffer
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         add     a,(hl)
         push    bc
         push    af
-        ld      a,(text_cols)
+        ld      a,(__console_w)
         ld      b,a
         pop     af
         inc     b
         cp      b
         pop     bc
         jp      p, no_C_FWD
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         jp      f_cmd_exit
 .no_C_FWD
-        ld      a,(text_cols)
+        ld      a,(__console_w)
         dec     a
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         jp      f_cmd_exit
 .no_C
 
@@ -589,12 +591,12 @@ push de
         jr nz,no_D
 
         ld      hl,param_buffer
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         sub     (hl)
         jp      nc, no_D_TOP
         xor     a
 .no_D_TOP
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         jp      f_cmd_exit
 .no_D
 
@@ -607,12 +609,12 @@ push de
 
         ld      hl,param_buffer
 .f_ansi_cup
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         sub     (hl)
         jp      p, no_A_TOP
         xor     a
 .no_A_TOP
-        ld      (ansi_ROW),a
+        ld      (__console_y),a
         jp      f_cmd_exit
 .no_A
 
@@ -624,16 +626,16 @@ push de
         jr nz,no_B
 
         ld      hl,param_buffer
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         add     a,(hl)
         inc     a
-        ld      hl,text_rows
+        ld      hl,__console_h
         cp      (hl)
         jp      p,B_ok
-        ld      a,(text_rows)
+        ld      a,(__console_h)
 .B_ok
         dec     a
-        ld      (ansi_ROW),a
+        ld      (__console_y),a
         jp      f_cmd_exit
 .no_B
 
@@ -647,9 +649,9 @@ push de
         cp 'j'
         jr nz,no_s
 .do_s
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         ld      (scp_x),a
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         ld      (scp_y),a
         jp      f_cmd_exit
 .no_s
@@ -665,9 +667,9 @@ push de
         jr nz,no_u
 .do_u
         ld      a,(scp_x)
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         ld      a,(scp_y)
-        ld      (ansi_ROW),a
+        ld      (__console_y),a
         jp      f_cmd_exit
 .no_u
 
@@ -703,27 +705,27 @@ push de
         jr      z,HLineOK
         push    hl
         dec     a
-        ld      hl,text_rows
+        ld      hl,__console_h
         cp      (hl)
         pop     hl
         jr      c,HLineOK
-        ld      a,(text_rows)   ; position next char at max possible row
+        ld      a,(__console_h)   ; position next char at max possible row
         dec     a
 .HLineOK
-        ld      (ansi_ROW),a
+        ld      (__console_y),a
 
         inc     hl              ; point to column
         ld      a,(hl)
         and     a
         jr      z,HColOK
         dec     a               ; char position
-        ld      hl,text_cols
+        ld      hl,__console_w
         cp      (hl)
         jr      c,HColOK
-        ld      a,(text_cols)   ; position next char at max possible column
+        ld      a,(__console_w)   ; position next char at max possible column
         dec     a
 .HColOK
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         jp      f_cmd_exit
 .no_H
 
@@ -754,9 +756,9 @@ push de
         and     a       ; from cursor to end of screen
         jr      nz,no_J_0
         ; First, from cursor to EOL
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         push    af
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         push    af
 .j0loop
         push    af
@@ -764,19 +766,19 @@ push de
         call    ansi_CHAR   ; The low level video routine
         pop     af
         inc     a
-        ld      (ansi_COLUMN),a
-        ld      hl,text_cols
+        ld      (__console_x),a
+        ld      hl,__console_w
         cp      (hl)
         jp      m,j0loop
         pop     af
-        ld      (ansi_COLUMN),a   ; restore orig. cursor pos.
+        ld      (__console_x),a   ; restore orig. cursor pos.
         pop     af
-        ld      (ansi_ROW),a   ; restore orig. cursor pos.
+        ld      (__console_y),a   ; restore orig. cursor pos.
         ; Then, from the cursor line + 1 up to the last line
 .j0LineLoop
         inc     a
         inc     a
-        ld      hl,text_rows
+        ld      hl,__console_h
         cp      (hl)
         jp      z,f_cmd_exit
         ;dec    a
@@ -789,9 +791,9 @@ push de
         jr      nz,no_J_1
 .is_J1_b
         ; First, from cursor to 0
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         push    af
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         push    af
 .j1loop
         push    af
@@ -799,13 +801,13 @@ push de
         call    ansi_CHAR   ; The low level video routine
         pop     af
         dec     a
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         cp      0
         jp      p,j1loop
         pop     af
-        ld      (ansi_COLUMN),a   ; restore orig. cursor pos.
+        ld      (__console_x),a   ; restore orig. cursor pos.
         pop     af
-        ld      (ansi_ROW),a   ; restore orig. cursor pos.
+        ld      (__console_y),a   ; restore orig. cursor pos.
         ; Then, from the cursor line - 1 up to 0
         and     a
         jp      z,f_cmd_exit
@@ -853,7 +855,7 @@ push de
         ld      a,(hl)
         and     a       ; From cursor to end of line
         jr      nz,no_K_0
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         push    af
 .K0loop
         push    af
@@ -861,17 +863,17 @@ push de
         call    ansi_CHAR   ; The low level video routine
         pop     af
         inc     a
-        ld      (ansi_COLUMN),a
-        ld      hl,text_cols
+        ld      (__console_x),a
+        ld      hl,__console_w
         cp      (hl)
         jp      m,K0loop
         pop     af
-        ld      (ansi_COLUMN),a   ; restore orig. cursor pos.
+        ld      (__console_x),a   ; restore orig. cursor pos.
 .no_K_0
         cp      1       ; From beginning of line to cursor
         jr      nz,no_K_1
 .is_K1_o
-        ld      a,(ansi_COLUMN)
+        ld      a,(__console_x)
         push    af
 .K1loop
         push    af
@@ -879,16 +881,16 @@ push de
         call    ansi_CHAR   ; The low level video routine
         pop     af
         dec     a
-        ld      (ansi_COLUMN),a
+        ld      (__console_x),a
         cp      0
         jp      p,K1loop
         pop     af
-        ld      (ansi_COLUMN),a   ; restore orig. cursor pos.
+        ld      (__console_x),a   ; restore orig. cursor pos.
         jp      f_cmd_exit
 .no_K_1
         cp      2       ; entire screen (+home cursor [non-standard])
         jp      nz,f_cmd_exit ;  Syntax Error!
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         call    ansi_del_line
         jp      f_cmd_exit
 .no_K
@@ -900,7 +902,7 @@ push de
 ;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         cp      'l'
         jr      nz,noecl
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         call    ansi_del_line
         jp      f_cmd_exit
 .noecl
@@ -932,7 +934,7 @@ push de
         jr nz,no_L
         ld      hl,param_buffer
         ld      b,(hl)
-        ld      a,(ansi_ROW)
+        ld      a,(__console_y)
         
         jp      f_cmd_exit        
 .no_L
@@ -958,15 +960,6 @@ push de
 ; Variables declaration
 ;-----------------------------------------
 	SECTION		bss_clib
-        PUBLIC    	_ansi_COLUMN
-        PUBLIC    	ansi_COLUMN
-		PUBLIC    	_ansi_ROW
-        PUBLIC    	ansi_ROW
-
-._ansi_COLUMN
-.ansi_COLUMN    defb    0
-._ansi_ROW
-.ansi_ROW       defw    0
 
 .scp_x  defb 0
 .scp_y  defb 0

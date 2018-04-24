@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/sms/fputc_cons
 time/spectrum/clock
 sms/clear_vram
@@ -45,4 +44,5 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+@stdio/stdio.lst
 @z80.lst

@@ -100,3 +100,6 @@ stdio/obj/ixiy/__printf_handle_llo
 stdio/obj/ixiy/__printf_handle_llu
 stdio/obj/ixiy/__printf_handle_llx
 stdio/obj/ixiy/kbhit
+stdio/obj/ixiy/fputc_cons_generic
+stdio/obj/ixiy/fputc_cons_generic_ioctl
+@stdio/conio.lst

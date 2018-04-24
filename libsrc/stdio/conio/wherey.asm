@@ -5,12 +5,12 @@ SECTION code_clib
 PUBLIC wherey
 PUBLIC _wherey
 
-EXTERN ansi_COLUMN
+EXTERN __console_x
 
 .wherey
 ._wherey
 
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	ld	l,a
 	ld	h,0
 	ret

@@ -42,7 +42,13 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-	defc	__CPU_CLOCK = 6000000
+        defc    TAR__register_sp = -1
+        defc    TAR__clib_exit_stack_size = 0
+
+        PUBLIC  __CPU_CLOCK
+        defc    __CPU_CLOCK = 6000000
+        INCLUDE "crt/classic/crt_rules.inc"
+
 
 	org 0
 start:
@@ -60,7 +66,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

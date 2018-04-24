@@ -62,6 +62,9 @@ ENDIF
         PUBLIC    _FRAMES
         defc    _FRAMES = 16436	; Timer
 
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 32
+
         IF      !DEFINED_CRT_ORG_CODE
 	    IF (startup>100)
 		; ORG position for LAMBDA
@@ -203,7 +206,7 @@ cleanup:
 ;
         push    hl		; keep return code
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF

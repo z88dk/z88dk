@@ -1,0 +1,7 @@
+stdio/conio/wherex
+stdio/conio/wherey
+stdio/conio/gotoxy
+stdio/conio/gotoxy_callee
+stdio/conio/screensize
+stdio/conio/screensize_callee
+stdio/conio/console_coords

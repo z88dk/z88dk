@@ -332,7 +332,7 @@ extern int __LIB__ remove(const char *name);
 extern int __LIB__ getk();
 #define getkey() fgetc_cons()
 extern void __LIB__ puts_cons(const char *message);
-extern int __LIB__ printk(const char *fmt,...);
+extern int __LIB__ printk(const char *fmt,...) __vasmallc;
 
 
 

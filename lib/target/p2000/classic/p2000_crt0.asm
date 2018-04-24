@@ -29,6 +29,9 @@
                 defc    CRT_ORG_CODE  = $6547
         ENDIF
 
+        defc    CONSOLE_COLUMNS = 40
+        defc    CONSOLE_ROWS = 25
+
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 2500000
@@ -83,7 +86,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

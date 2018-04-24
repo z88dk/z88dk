@@ -12,7 +12,7 @@
 	PUBLIC	ansi_SCROLLUP
 	EXTERN	ansi_del_line
 	EXTERN	base_graphics
-	EXTERN	text_rows
+	EXTERN	__console_h
 
 
 .ansi_SCROLLUP
@@ -35,7 +35,7 @@ ELSE
  ENDIF
 ENDIF
 
-	ld	a,(text_rows)
+	ld	a,(__console_h)
 	dec a
 
 IF G007
@@ -57,7 +57,7 @@ ELSE
  ENDIF
 ENDIF
 	ldir
-;	ld	a,(text_rows)
+;	ld	a,(__console_h)
 ;	dec	a
 	call	ansi_del_line
 	ret

@@ -13,9 +13,9 @@
 	SECTION	code_clib
 	PUBLIC	ansi_putc
 
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_x
 
-	EXTERN	text_cols
+	EXTERN	__console_w
 
 	EXTERN	ansi_CHAR
 	EXTERN	ansi_LF
@@ -24,14 +24,14 @@
 .ansi_putc
  
   push af
-  ld a,(text_cols)
+  ld a,(__console_w)
   ld d,a
-  ld a,(ansi_COLUMN)
+  ld a,(__console_x)
   cp d          ; last column ?
   call nc,ansi_LF; yes
   pop af
   call ansi_CHAR
-  ld a,(ansi_COLUMN)
+  ld a,(__console_x)
   inc a
-  ld (ansi_COLUMN),a
+  ld (__console_x),a
   ret

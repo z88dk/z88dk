@@ -11,10 +11,12 @@
 
 SECTION code_clib
 PUBLIC asctozx81
+PUBLIC asctozx81_entry_reg
 EXTERN zx81_cnvtab
 
 .asctozx81
 	ld	a,(hl)
+.asctozx81_entry_reg
 	push	hl
  	cp	48	; Between 0 and 9 ?
 	jr	c,isntnum

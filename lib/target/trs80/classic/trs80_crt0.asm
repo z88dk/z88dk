@@ -37,6 +37,11 @@ IF      !DEFINED_CRT_ORG_CODE
 	ENDIF
 ENDIF
 
+        defc    CONSOLE_ROWS = 16
+        defc    CONSOLE_COLUMNS = 64
+
+
+        defc    TAR__fputc_cons_generic = 1
 	defc	TAR__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 1774000
@@ -65,7 +70,7 @@ cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF

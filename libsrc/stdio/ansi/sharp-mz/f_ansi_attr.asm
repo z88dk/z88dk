@@ -19,12 +19,11 @@
 
 	SECTION bss_clib
 
-.current_attr	defb	0 
 .mz_inverse	defb	0
 
-	SECTION code_crt_init
-	ld	a,$70	;  White text on black background
-	ld	(current_attr),a
+	SECTION data_clib
+
+.current_attr	defb	$70
 
         SECTION code_clib
 

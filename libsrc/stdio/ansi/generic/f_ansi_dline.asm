@@ -15,29 +15,29 @@
         SECTION  code_clib
 	PUBLIC	ansi_del_line
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
-	EXTERN	text_cols
+	EXTERN	__console_w
 
 	EXTERN	ansi_CHAR
 
 .ansi_del_line
 
 	ld	e,a
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	push af
 	
 	ld	a,e
-	ld  (ansi_ROW),a
+	ld  (__console_y),a
 
-	ld	a,(text_cols)
+	ld	a,(__console_w)
 	ld  b,a
 
 .rloop
 	ld	a,b
 	dec a
-	ld  (ansi_COLUMN),a
+	ld  (__console_x),a
 	push bc
 	ld   a,' '
 	call ansi_CHAR
@@ -45,6 +45,6 @@
 	djnz rloop
 
 	pop	af
-	ld  (ansi_ROW),a
+	ld  (__console_y),a
 	
 	ret

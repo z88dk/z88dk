@@ -5,12 +5,12 @@
 ;	** use the -DPACKEDFONT flag
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -26,12 +26,9 @@
 	EXTERN	pix_post
 	EXTERN	pix_return
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-		
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
@@ -39,9 +36,6 @@
         EXTERN  ansicharacter_pixelwidth
         EXTERN  ansifont_is_packed
         EXTERN  ansifont
-        EXTERN  ansicolumns
-.text_cols   defb ansicolumns
-.text_rows   defb 24
 
 .ansi_CHAR
 
@@ -54,17 +48,17 @@
 	
 	
 ; So we can fast path 32 column printing
-	ld	hl,ansifont	- 256
-	ld de,8
-	push de
-.LFONT2
-	add hl,de
-	djnz LFONT2
-	
-	ld a,(ansi_ROW)       ; Line text position
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl		
+	ld	de,ansifont	- 256
+	add	hl,de
+	ld a,(__console_y)       ; Line text position
 	add	$80
 	ld d,a
-	ld a,(ansi_COLUMN)       ; Column text position
+	ld a,(__console_x)       ; Column text position
 	ld e,a
 
 	ld c,8
@@ -87,7 +81,7 @@
 	
 .ansi_CHAR_flexible
   ld (char+1),a
-  ld a,(ansi_ROW)       ; Line text position
+  ld a,(__console_y)       ; Line text position
   
   ld	d,a
   ld	e,0
@@ -100,7 +94,7 @@
   ld b,(hl)
   ld hl,0
 
-  ld a,(ansi_COLUMN)       ; Column text position
+  ld a,(__console_x)       ; Column text position
   ld e,a
   ld d,0
   or d

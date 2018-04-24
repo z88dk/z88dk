@@ -12,7 +12,7 @@
 	PUBLIC	ansi_cls
 	EXTERN	_clg_hr		; we use the graphics CLS routine
 IF MTHRG
-	EXTERN	text_rows
+	EXTERN	__console_h
 	EXTERN	MTCH_P2
 ENDIF
 
@@ -23,7 +23,7 @@ IF MTHRG
 	srl a
 	srl a
 	srl a
-	ld	(text_rows),a
+	ld	(__console_h),a
 ENDIF
 
 	ret

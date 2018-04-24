@@ -64,7 +64,7 @@ ENDIF
 
 cleanup:
 ;	push	hl		;Save return value
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall	;Close any opened files
 	call	closeall
 ENDIF

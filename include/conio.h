@@ -97,12 +97,13 @@ extern void    __LIB__     screensize_callee(unsigned char *x, unsigned char *y)
 /* The leading underscores are for compatibility with the 
  * Digital Mars library */
 
-#define cprintf printf
-#define _cprintf printf
-#define cputs puts_cons
-#define _cputs puts_cons
-#define cgets gets
-#define _cgets gets
+extern int __LIB__ cprintf(const char *fmt,...) __vasmallc;
+#define _cprintf cprintf
+extern void __LIB__ cputs(const char *message);
+#define _cputs cputs
+extern void __LIB__ cgets(char *dest);
+#define _cgets cgets
+
 #define cscanf scanf
 #define _cscanf scanf
 
