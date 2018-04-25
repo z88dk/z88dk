@@ -6,6 +6,8 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] The value of FOPEN_MAX can now be controlled at link time with
   -pragma-define=CLIB_FOPEN_MAX=YY. The default for YY is 10.
 - [classiclib] #571: The atexit stack size can be configured with CLIB_EXIT_STACK_SIZE
+- [classiclib] #666: A lightweight terminal is now available for many targets
+- [classiclib] stdio can be disabled with -pragma-define:CRT_ENABLE_STDIO=1
 - [classiclib] A new port to the Pacman arcade hardware is availble
 - [classiclib] Bug fixes for memrchr() and gets()
 - [classiclib] Compiler intrinsics are now available
@@ -69,7 +71,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [sccz80] #155: The section names used by sccz80 can now be configured
 - [sccz80] #188: sccz80 now provides builtin functions for memcpy, memset, strcpy, strchr
 - [sccz80] #220: sccz80 now supports __critical blocks and functions
-- [sccz80] #275: don't swallow white space before constant L,U,S modify 
+- [sccz80] #275: don't swallow white space before constant L,U,S modifier
 - [sccz80] ZX Next specific code can now be generated
 - [sccz80] #419: Extern function declarations are now accepted with blocks
 - [sccz80] #452: Declaration parser rewritten
@@ -86,10 +88,13 @@ z88dk vX.XX  - XX.XX.XXXX
   function placement
 - [sccz80] #514: sccz80 now supports flexible members at the end of struct definition
 - [sccz80] #519: The preprocessor has been switched over to ucpp which is C99 compatible
+- [sccz80] #495, #615, #658: Performance optimisations
+- [sccz80] #641: Improved support for far pointers and banked calling
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [ticks] [classiclib] File IO is now available
 - [ticks] A debugger is now available
 - [ticks] Now supports Rabbit, z180 and ZX Next cpus
+- [ticks] Now supports ZX Next MMU paging
 - [z80asm] Rabbit 2000 and 3000 are now fully supported
 - [z80asm] Z180 is now fully supported
 - [z80asm] ZX Spectrum Next CPU extensions and Copper Unit are supported
@@ -106,8 +111,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [zcc] Spaces in filenames (and paths) are now supported.
 - [zcc] Custom optimisation rules can be supplied with -custom-copt-rules=
 - [zcc] A target must now be supplied to zcc
-- [zcc] The option -sccz80-inline-ints will inline any calls generates to l_gint and l_pint.
-  This can improve performance at the cost of a small increase in binary size
+- [zcc] The option --opt-code-speed=all will enable speed optimisations for sccz80
 - [zpragma] Support for #pragma printf and #pragma scanf which take a format string
   argument and configure the appropriate printf converters.
 - [zpragma] has now been completely renamed, scanner is no more

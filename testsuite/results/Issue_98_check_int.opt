@@ -30,9 +30,10 @@
 
 ._mul3
 	ld	de,(_g)
-	ld	hl,4-2	;const
-	add	hl,sp
-	call	l_gint	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	call	l_mult
 	ret
 
@@ -78,9 +79,10 @@
 
 ._div3
 	ld	de,(_g)
-	ld	hl,4-2	;const
-	add	hl,sp
-	call	l_gint	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	call	l_div
 	ret
 
@@ -163,9 +165,10 @@
 
 ._sub3
 	ld	de,(_g)
-	ld	hl,4-2	;const
-	add	hl,sp
-	call	l_gint	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	ex	de,hl
 	and	a
 	sbc	hl,de
