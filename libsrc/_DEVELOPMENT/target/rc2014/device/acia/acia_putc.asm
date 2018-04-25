@@ -1,12 +1,10 @@
 
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
     SECTION code_driver_character_output
 
     PUBLIC _acia_putc
-    
-    EXTERN __IO_ACIA_CONTROL_REGISTER, __IO_ACIA_STATUS_REGISTER, __IO_ACIA_DATA_REGISTER
-    EXTERN __IO_ACIA_SR_RDRF, __IO_ACIA_SR_TDRE, __IO_ACIA_CR_TEI_MASK, __IO_ACIA_CR_TEI_RTS0
-    EXTERN __IO_ACIA_TX_SIZE
 
     EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
@@ -44,9 +42,12 @@
         ld (hl),a                   ; write the Tx byte to the aciaTxIn
 
         inc l                       ; move the Tx pointer, just low byte along
+IF __IO_ACIA_TX_SIZE != 0x100
         ld a,__IO_ACIA_TX_SIZE-1    ; load the buffer size, (n^2)-1
         and l                       ; range check
+        or aciaTxBuffer&0xFF        ; locate base
         ld l,a                      ; return the low byte to l
+ENDIF
         ld (aciaTxIn),hl            ; write where the next byte should be poked
         ld l,0                      ; indicate Tx buffer was not full
 

@@ -3,7 +3,9 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
+EXTERN  siobRxBuffer
 EXTERN  siobTxBuffer
+EXTERN  sioaRxBuffer
 EXTERN  sioaTxBuffer
 
 EXTERN  siobRxCount, siobRxIn
@@ -36,12 +38,13 @@ __siob_interrupt_tx_empty:          ; start doing the SIOB Tx stuff
         ei
         out (__IO_SIOB_DATA_REGISTER),a ; output the Tx byte to the SIOB
 
-        ld a,l                      ; check if Tx pointer is at the end of its range
-        cp +(siobTxBuffer+__IO_SIO_TX_SIZE-1)&0xff
-        jr Z,siob_tx_reset_buffer   ; if at end of range, reset Tx pointer to start of Tx buffer
-        inc hl                      ; else advance to next byte in Tx buffer
-
-siob_tx_buffer_adjusted:
+        inc l                       ; move the Tx pointer, just low byte along
+IF __IO_SIO_TX_SIZE != 0x100
+        ld a,__IO_SIO_TX_SIZE-1     ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or siobTxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (siobTxOut),hl           ; write where the next byte should be popped
 
 siob_tx_end:                        ; if we've more Tx bytes to send, we're done for now
@@ -56,10 +59,6 @@ siob_tx_int_pend:
         ld a,__IO_SIO_WR0_TX_INT_PENDING_RESET  ; otherwise pend the Tx interrupt
         out (__IO_SIOB_CONTROL_REGISTER),a      ; into the SIOB register R0
         jr siob_tx_end
-
-siob_tx_reset_buffer:
-        ld hl,siobTxBuffer         ; move tx buffer pointer back to start of buffer
-        jr siob_tx_buffer_adjusted
 
 
 __siob_interrupt_rx_char:
@@ -80,7 +79,13 @@ siob_rx_get:
         ld hl,(siobRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the siobRxIn target
 
-        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Rx pointer low byte along
+IF __IO_SIO_RX_SIZE != 0x100
+        ld a,__IO_SIO_RX_SIZE-1     ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or siobRxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (siobRxIn),hl            ; write where the next byte should be poked
 
 ;       ld a,(siobRxCount)          ; get the current Rx count
@@ -151,12 +156,13 @@ __sioa_interrupt_tx_empty:          ; start doing the SIOA Tx stuff
         ei
         out (__IO_SIOA_DATA_REGISTER),a ; output the Tx byte to the SIOA
 
-        ld a,l                      ; check if Tx pointer is at the end of its range
-        cp +(sioaTxBuffer+__IO_SIO_TX_SIZE-1)&0xff
-        jr Z,sioa_tx_reset_buffer   ; if at end of range, reset Tx pointer to start of Tx buffer
-        inc hl                      ; else advance to next byte in Tx buffer
-
-sioa_tx_buffer_adjusted:
+        inc l                       ; move the Tx pointer, just low byte along
+IF __IO_SIO_TX_SIZE != 0x100
+        ld a,__IO_SIO_TX_SIZE-1     ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or sioaTxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (sioaTxOut),hl           ; write where the next byte should be popped
 
 sioa_tx_end:                        ; if we've more Tx bytes to send, we're done for now
@@ -171,10 +177,6 @@ sioa_tx_int_pend:
         ld a,__IO_SIO_WR0_TX_INT_PENDING_RESET  ; otherwise pend the Tx interrupt
         out (__IO_SIOA_CONTROL_REGISTER),a      ; into the SIOA register R0
         jr sioa_tx_end
-
-sioa_tx_reset_buffer:
-        ld hl,sioaTxBuffer         ; move tx buffer pointer back to start of buffer
-        jr sioa_tx_buffer_adjusted
 
 
 __sioa_interrupt_rx_char:
@@ -195,7 +197,13 @@ sioa_rx_get:
         ld hl,(sioaRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the sioaRxIn target
 
-        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Rx pointer low byte along
+IF __IO_SIO_RX_SIZE != 0x100
+        ld a,__IO_SIO_RX_SIZE-1     ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or sioaRxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (sioaRxIn),hl            ; write where the next byte should be poked
 
 ;       ld a,(sioaRxCount)          ; get the current Rx count
@@ -249,7 +257,6 @@ sioa_interrupt_rx_exit:
         pop af
         ei
         reti
-
 
     EXTERN _sio_need
     defc NEED = _sio_need
