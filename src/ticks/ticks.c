@@ -9,32 +9,7 @@
 #endif
 
 
-static unsigned char zxnext_mmu[8] = {0xff};
-static unsigned char *mem;
-static unsigned char banks[256][8192];
 
-
-uint8_t get_memory(int pc)
-{
-  return  *get_memory_addr(pc);
-}
-
-
-uint8_t *get_memory_addr(int pc)
-{
-  int segment = pc / 8192;
-  pc &= 0xffff;
-
-  if ( zxnext_mmu[segment] != 0xff ) {
-    return &banks[zxnext_mmu[segment]][pc % 8192];
-  }
-  return &mem[pc & 65535];
-}
-
-uint8_t put_memory(int pc, uint8_t b)
-{
-  return *get_memory_addr(pc) = b;
-}
 
 // fr = zero, ff = carry, ff&128 = s/p
 
@@ -614,17 +589,7 @@ int in(int port){
 }
 
 void out(int port, int value){
-  static int nextport = 0;
-
-  if ( port == 0x243B && nextport == 0 ) {
-      nextport = value;
-      return;
-  }
-  if ( nextport >= 0x50 && nextport <= 0x57 ) {
-    zxnext_mmu[nextport - 0x50] = value;
-  }
-  nextport = 0;
-  return;
+  memory_handle_paging(port, value);
 }
 
 int f(void){
@@ -655,18 +620,13 @@ void setf(int a){
   fa= 255 & (fb= a & -129 | (a&4)<<5);
 }
 
-void reset_zxnext_mmu() {
-  int i;
-  for ( i = 0; i < 8; i++ ) zxnext_mmu[i] = 0xff;
-}
+
 
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0;
   char * output= NULL;
+  char  *memory_model = "standard";
   FILE * fh;
-
-  reset_zxnext_mmu();
-  mem = calloc(0x10000, 1);
 
   hook_init();
   debugger_init();
@@ -685,6 +645,7 @@ int main (int argc, char **argv){
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
+    printf("  -b <model>     Memory model (zxn/64k)"),
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
@@ -702,6 +663,9 @@ int main (int argc, char **argv){
         case 'w':
           alarmtime = strtol(argv[1], NULL, 10);
           counter = 400000000LL * alarmtime;
+          break;
+        case 'b':
+          memory_model = argv[1];
           break;
         case 'p':
           pc= strtol(argv[1], NULL, 16);
@@ -740,6 +704,7 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
             c_cpu = CPU_Z80_ZXN;
+            memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
             c_cpu = CPU_R2K;
           } else {
@@ -798,14 +763,16 @@ int main (int argc, char **argv){
             argc--;
             argv++;
           }
-          mem[65280] = cmd_arguments_len % 256;
-          memcpy(&mem[65281], cmd_arguments, cmd_arguments_len % 256);
+          put_memory(65280,cmd_arguments_len % 256);
+          memcpy(get_memory_addr(65281), cmd_arguments, cmd_arguments_len % 256);
           break;
         default:
           printf("\nWrong Argument: %s\n", argv[0]);
           exit(-1);
       }
     else{
+      memory_init(memory_model);
+
       fh= fopen(argv[1], "rb");
       if( !fh )
         printf("\nFile not found: %s\n", argv[1]),
@@ -821,7 +788,7 @@ int main (int argc, char **argv){
         if( !fk )
           printf("\nZX Spectrum ROM file not found: 48.rom\n"),
           exit(-1);
-        (void)fread(mem, 1, 16384, fk);
+        (void)fread(get_memory_addr(0), 1, 16384, fk);
         fclose(fk);
         (void)fread(&i, 1, 1, fh);
         (void)fread(&l_, 1, 1, fh);
@@ -857,11 +824,11 @@ int main (int argc, char **argv){
         (void)fread(&sp, 2, 1, fh);
         (void)fread(&im, 1, 1, fh);
         (void)fread(&w, 1, 1, fh);
-        (void)fread(mem+0x4000, 1, 0xc000, fh);
+        (void)fread(get_memory_addr(0x4000), 1, 0xc000, fh);
         RET(0);
       }
       else if( size==65574 )
-        (void)fread(mem, 1, 65536, fh),
+        (void)fread(get_memory_addr(0), 1, 65536, fh),
         (void)fread(&w, 1, 1, fh),
         u= w,
         (void)fread(&a, 1, 1, fh),
@@ -898,7 +865,7 @@ int main (int argc, char **argv){
         (void)fread(&im, 1, 1, fh),
         (void)fread(&mp, 2, 1, fh);
       else
-        (void)fread(mem, 1, size, fh);
+        (void)fread(get_memory_addr(0), 1, size, fh);
     }
     ++argv;
     --argc;
@@ -4041,11 +4008,11 @@ int main (int argc, char **argv){
       fwrite(&sp, 2, 1, fh),
       fwrite(&im, 1, 1, fh),
       fwrite(&w, 1, 1, fh),
-      fwrite(mem+0x4000, 1, 0xc000, fh);
+      fwrite(get_memory_addr(0x4000), 1, 0xc000, fh);
     else if ( !strcasecmp(strchr(output, '.'), ".scr" ) )
-      fwrite(mem+0x4000, 1, 0x1b00, fh);
+      fwrite(get_memory_addr(0x4000), 1, 0x1b00, fh);
     else{
-      fwrite(mem, 1, 65536, fh);
+      fwrite(get_memory_addr(0), 1, 65536, fh);
       w= f();
       fwrite(&w, 1, 1, fh);    // 10000 F
       fwrite(&a, 1, 1, fh);    // 10001 A
