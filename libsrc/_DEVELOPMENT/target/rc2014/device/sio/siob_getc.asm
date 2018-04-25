@@ -7,8 +7,9 @@
     EXTERN __IO_SIOB_CONTROL_REGISTER
 
     EXTERN __IO_SIO_WR0_R5, __IO_SIO_WR5_RTS
-    EXTERN __IO_SIO_RX_EMPTYISH
+    EXTERN __IO_SIO_RX_SIZE, __IO_SIO_RX_EMPTYISH
 
+    EXTERN siobRxBuffer
     EXTERN siobRxCount, siobRxOut
 
     _siob_getc:
@@ -49,7 +50,13 @@
         ei
         ld a, (hl)                  ; get the Rx byte
 
-        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Rx pointer low byte along
+IF __IO_SIO_RX_SIZE != 0x100
+        ld a,__IO_SIO_RX_SIZE-1     ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or siobRxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (siobRxOut), hl          ; write where the next byte should be popped
 
         ld l, a                     ; put the byte in hl

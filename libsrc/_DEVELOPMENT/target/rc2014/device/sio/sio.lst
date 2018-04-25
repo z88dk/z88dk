@@ -1,9 +1,9 @@
 
-target/rc2014/device/sio/__sioa_bss_Rx
-target/rc2014/device/sio/__siob_bss_Rx
+target/rc2014/device/sio/__sioa_data_Rx
+target/rc2014/device/sio/__siob_data_Rx
 
-target/rc2014/device/sio/__sioa_bss_Tx
-target/rc2014/device/sio/__siob_bss_Tx
+target/rc2014/device/sio/__sioa_data_Tx
+target/rc2014/device/sio/__siob_data_Tx
 
 target/rc2014/device/sio/sioa_flush_Rx
 target/rc2014/device/sio/sioa_flush_Tx

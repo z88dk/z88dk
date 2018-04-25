@@ -6,7 +6,7 @@
 
     EXTERN __IO_ACIA_CONTROL_REGISTER
     EXTERN __IO_ACIA_CR_TEI_MASK, __IO_ACIA_CR_TDI_RTS0
-    EXTERN __IO_ACIA_RX_EMPTYISH
+    EXTERN __IO_ACIA_RX_SIZE, __IO_ACIA_RX_EMPTYISH
 
     EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
     EXTERN asm_z80_push_di, asm_z80_pop_ei
@@ -42,6 +42,12 @@
         ld a,(hl)                   ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along
+IF __IO_ACIA_RX_SIZE != 0x100
+        ld a,__IO_ACIA_RX_SIZE-1    ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or aciaRxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (aciaRxOut),hl           ; write where the next byte should be popped
 
         ld l,a                      ; and put it in hl

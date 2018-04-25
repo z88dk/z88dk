@@ -45,19 +45,16 @@
         ei
         ld (hl),a                   ; write the Tx byte to the sioaTxIn
 
-        ld a,l                      ; check if Tx pointer is at the end of its range
-        cp +(sioaTxBuffer + __IO_SIO_TX_SIZE - 1)&0xff
-        jr Z,putc_buffer_tx_reset   ; if at end of range, reset Tx pointer to start of Tx buffer
-        inc hl                      ; else advance to next byte in Tx buffer
-
-    putc_buffer_tx_exit:
+        inc l                       ; move the Tx pointer, just low byte along
+IF __IO_SIO_TX_SIZE != 0x100
+        ld a,__IO_SIO_TX_SIZE-1     ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or sioaTxBuffer&0xFF        ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (sioaTxIn), hl           ; write where the next byte should be poked
         ld l,0                      ; indicate Tx buffer was not full
         ret
-
-    putc_buffer_tx_reset:
-        ld hl,sioaTxBuffer          ; move tx buffer pointer back to start of buffer
-        jr putc_buffer_tx_exit
 
     putc_buffer_tx_overflow:
         ld l,1                      ; indicate Tx buffer was full

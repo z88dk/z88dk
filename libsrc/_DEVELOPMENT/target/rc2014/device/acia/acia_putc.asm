@@ -44,9 +44,12 @@
         ld (hl),a                   ; write the Tx byte to the aciaTxIn
 
         inc l                       ; move the Tx pointer, just low byte along
+IF __IO_ACIA_TX_SIZE != 0x100
         ld a,__IO_ACIA_TX_SIZE-1    ; load the buffer size, (n^2)-1
         and l                       ; range check
+        or aciaTxBuffer&0xFF        ; locate base
         ld l,a                      ; return the low byte to l
+ENDIF
         ld (aciaTxIn),hl            ; write where the next byte should be poked
         ld l,0                      ; indicate Tx buffer was not full
 
