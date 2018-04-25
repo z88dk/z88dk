@@ -1,13 +1,12 @@
 
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
 
     PUBLIC _acia_init
 
     EXTERN _acia_reset, aciaControl
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
-
-    EXTERN __IO_ACIA_CONTROL_REGISTER
-    EXTERN __IO_ACIA_CR_RESET, __IO_ACIA_CR_REI, __IO_ACIA_CR_TDI_RTS0, __IO_ACIA_CR_8N1, __IO_ACIA_CR_CLK_DIV_64
 
     _acia_init:
     

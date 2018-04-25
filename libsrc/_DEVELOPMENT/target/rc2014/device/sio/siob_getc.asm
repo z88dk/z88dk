@@ -1,13 +1,10 @@
 
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
     SECTION code_driver_character_input
 
     PUBLIC _siob_getc
-
-    EXTERN __IO_SIOB_CONTROL_REGISTER
-
-    EXTERN __IO_SIO_WR0_R5, __IO_SIO_WR5_RTS
-    EXTERN __IO_SIO_RX_SIZE, __IO_SIO_RX_EMPTYISH
 
     EXTERN siobRxBuffer
     EXTERN siobRxCount, siobRxOut
@@ -52,10 +49,12 @@
 
         inc l                       ; move the Rx pointer low byte along
 IF __IO_SIO_RX_SIZE != 0x100
+        push af
         ld a,__IO_SIO_RX_SIZE-1     ; load the buffer size, (n^2)-1
         and l                       ; range check
         or siobRxBuffer&0xFF        ; locate base
         ld l,a                      ; return the low byte to l
+        pop af
 ENDIF
         ld (siobRxOut), hl          ; write where the next byte should be popped
 

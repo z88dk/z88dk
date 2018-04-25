@@ -1,12 +1,10 @@
+
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
     SECTION code_driver_character_output
 
     PUBLIC _sioa_putc
-    
-    EXTERN __IO_SIOA_CONTROL_REGISTER, __IO_SIOA_DATA_REGISTER
-
-    EXTERN __IO_SIO_RR0_TX_EMPTY
-    EXTERN __IO_SIO_TX_SIZE
 
     EXTERN sioaTxBuffer
     EXTERN sioaTxCount, sioaTxIn
