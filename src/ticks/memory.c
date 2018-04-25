@@ -60,7 +60,7 @@ void memory_handle_paging(int port, int value)
 
 static void standard_init(void) 
 {
-    mem = calloc(65536, 0);
+    mem = calloc(65536, 1);
     get_mem_addr = standard_get_memory_addr;
 }
 
