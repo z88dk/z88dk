@@ -1,14 +1,12 @@
 
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
 
     PUBLIC _acia_interrupt
     
     EXTERN aciaRxCount, aciaRxIn, aciaRxBuffer
     EXTERN aciaTxCount, aciaTxOut, aciaTxBuffer, aciaControl
-
-    EXTERN __IO_ACIA_CONTROL_REGISTER, __IO_ACIA_STATUS_REGISTER, __IO_ACIA_DATA_REGISTER
-    EXTERN __IO_ACIA_CR_TEI_MASK, __IO_ACIA_CR_TDI_RTS0, __IO_ACIA_CR_TDI_RTS1, __IO_ACIA_SR_RDRF, __IO_ACIA_SR_TDRE
-    EXTERN __IO_ACIA_RX_SIZE, __IO_ACIA_RX_FULLISH, __IO_ACIA_TX_SIZE
 
     _acia_interrupt:
         push af

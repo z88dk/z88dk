@@ -1,12 +1,10 @@
 
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
     SECTION code_driver_character_input
 
     PUBLIC _acia_getc
-
-    EXTERN __IO_ACIA_CONTROL_REGISTER
-    EXTERN __IO_ACIA_CR_TEI_MASK, __IO_ACIA_CR_TDI_RTS0
-    EXTERN __IO_ACIA_RX_SIZE, __IO_ACIA_RX_EMPTYISH
 
     EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
     EXTERN asm_z80_push_di, asm_z80_pop_ei
@@ -43,10 +41,12 @@
 
         inc l                       ; move the Rx pointer low byte along
 IF __IO_ACIA_RX_SIZE != 0x100
+        push af
         ld a,__IO_ACIA_RX_SIZE-1    ; load the buffer size, (n^2)-1
         and l                       ; range check
         or aciaRxBuffer&0xFF        ; locate base
         ld l,a                      ; return the low byte to l
+        pop af
 ENDIF
         ld (aciaRxOut),hl           ; write where the next byte should be popped
 
