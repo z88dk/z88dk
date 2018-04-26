@@ -41,35 +41,33 @@ z80asm(<<'END', "-b -s -g -m -Ddummy");
 END
 check_bin_file("test.bin", pack("C*", 0xC9));
 check_text_file("test.sym", <<'END');
-	program                         = $0000 ; addr, public, , , , test.asm:18
-	asm_BIFROST2_start              = $C9A9 ; const, public, , , , test.asm:8
-	asm_BIFROST2_stop               = $C9B2 ; const, public, , , , test.asm:9
+program                         = $0000 ; addr, public, , , , test.asm:18
+asm_BIFROST2_start              = $C9A9 ; const, public, , , , test.asm:8
+asm_BIFROST2_stop               = $C9B2 ; const, public, , , , test.asm:9
 END
 check_text_file("test.map", <<'END');
-	program                         = $FDE8 ; addr, public, , test, , test.asm:18
-	asm_BIFROST2_start              = $C9A9 ; const, public, , test, , test.asm:8
-	asm_BIFROST2_stop               = $C9B2 ; const, public, , test, , test.asm:9
-	__head                          = $FDE8 ; const, public, def, , ,
-	__tail                          = $FDE9 ; const, public, def, , ,
-	__size                          = $0001 ; const, public, def, , ,
+program                         = $FDE8 ; addr, public, , test, , test.asm:18
+asm_BIFROST2_start              = $C9A9 ; const, public, , test, , test.asm:8
+asm_BIFROST2_stop               = $C9B2 ; const, public, , test, , test.asm:9
+__head                          = $FDE8 ; const, public, def, , ,
+__tail                          = $FDE9 ; const, public, def, , ,
+__size                          = $0001 ; const, public, def, , ,
 END
 check_text_file("test.def", <<'END');
-	DEFC program                         = $FDE8
-	DEFC asm_BIFROST2_start              = $C9A9
-	DEFC asm_BIFROST2_stop               = $C9B2
+DEFC program                         = $FDE8
+DEFC asm_BIFROST2_start              = $C9A9
+DEFC asm_BIFROST2_stop               = $C9B2
 END
 
-
 z80nm("test.o", <<'END');
-
-	File test.o at $0000: Z80RMF11
-	  Name: test
-	  Names:
-		G A $0000 program test.asm:18
-		G C $C9A9 asm_BIFROST2_start test.asm:8
-		G C $C9B2 asm_BIFROST2_stop test.asm:9
-	  Code: 1 bytes, ORG $FDE8
-		C $0000: C9
+Object  file test.o at $0000: Z80RMF11
+  Name: test
+  Section "": 1 bytes, ORG $FDE8
+    C $0000: C9
+  Symbols:
+    G A $0000 program (section "") (file test.asm:18)
+    G C $C9A9 asm_BIFROST2_start (section "") (file test.asm:8)
+    G C $C9B2 asm_BIFROST2_stop (section "") (file test.asm:9)
 END
 
 unlink_testfiles();
