@@ -102,13 +102,13 @@ check_bin_file("test.bin", pack("C*", 0x3E, 10));
 $ENV{TEST_ENV} = 'test';
 
 unlink "test.bin";
-z80asm('include "test.inc"', '-b -I${TEST_ENV}_dir');
+z80asm('include "test.inc"', '-b "-I${TEST_ENV}_dir"');
 check_bin_file("test.bin", pack("C*", 0x3E, 10));
 
 delete $ENV{TEST_ENV};
 
 unlink "test.bin";
-z80asm('include "test.inc"', '-b -Itest${TEST_ENV}_dir');
+z80asm('include "test.inc"', '-b "-Itest${TEST_ENV}_dir"');
 check_bin_file("test.bin", pack("C*", 0x3E, 10));
 
 unlink_testfiles();
