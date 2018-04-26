@@ -41,8 +41,8 @@ LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT)
 # Use these flags both in Windows_NT and in a MinGW build in Unix
 #ifeq ($(OS),Windows_NT)
 ifeq ($(EXE),.exe)
-LOCAL_CFLAGS	+= -I../../ext/UNIXem/include
-OBJS			+= ../../ext/UNIXem/src/glob.o
+#LOCAL_CFLAGS	+= -I../../ext/UNIXem/include
+#OBJS			+= ../../ext/UNIXem/src/glob.o
 endif
 
 # uthash
