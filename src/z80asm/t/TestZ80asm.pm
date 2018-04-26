@@ -21,6 +21,13 @@ use Capture::Tiny::Extended 'capture';
 our @EXPORT = qw( z80asm z80nm 
 				  read_binfile write_binfile test_binfile );
 
+use Config;
+$ENV{PATH} = join($Config{path_sep}, 
+			".",
+			"../z80nm",
+			"../../bin",
+			$ENV{PATH});
+
 our $KEEP_FILES;
 our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
 
@@ -243,11 +250,21 @@ sub z80nm {
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "$AR/z80nm -a $o_file";
+		system "z80nm -a $o_file";
 	};
 	eq_or_diff_text $stdout, $expected_out, "$line stdout";
 	eq_or_diff_text $stderr, "", "$line stderr";
 	ok !!$return == !!0, "$line retval";
+	
+	if ($stdout ne $expected_out) {
+		my($file, $line) = (caller)[1,2];
+		my $out = "test.out";
+		system "head -$line $file > $out";
+		system "z80nm -a $o_file >> $out";
+		system "winmergeu -w $file $out";
+		unlink "test.out";
+		die;		# need to refresh source
+	}
 }
 
 1;

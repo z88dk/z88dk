@@ -116,14 +116,12 @@ END
 check_bin_file("test.bin", pack("C*", 0, (0) x 15, 1,2,3,4));
 
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 1 bytes (section code)
+  Section code: 1 bytes
     C $0000: 00
-  Code: 4 bytes, ALIGN 16 (section data)
+  Section data: 4 bytes, ALIGN 16
     C $0000: 01 02 03 04
-
 END
 
 unlink_testfiles();

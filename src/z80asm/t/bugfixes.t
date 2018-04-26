@@ -291,7 +291,7 @@ note "BUG_0018";
 	write_file("test".($levels+1).".lst", "");
 
 	z80asm(
-		options	=> "-b -otest.bin \@test.lst",
+		options	=> "-b -otest.bin \"\@test.lst\"",
 		bin		=> $bin,
 	);
 }
@@ -474,7 +474,7 @@ END
 	
 	# make library
 	unlink 'test.lib';
-	$cmd = './z80asm -b -xtest @test.lst';
+	$cmd = './z80asm -b -xtest "@test.lst"';
 	ok 1, $cmd;
 	($out, $err, $ret) = capture { system $cmd; };
 	is $out, "";

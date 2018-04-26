@@ -93,7 +93,6 @@ clean::
 .PHONY: dev
 dev:
 	$(MAKE) -C tt
-	$(MAKE) -C doc
 	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
 	$(MAKE) all
@@ -166,7 +165,8 @@ test_enigma: $(TARGET)
 	zcc +cpm -oenigma.bin t/data/enigma.c
 	echo HELLO. > enigma.in
 	cpm enigma.bin < enigma.in > enigma.out
-	echo 'HREXLSLEOC .' > enigma.bmk
+	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
+	echo 'HREXLSLEOC .' >> enigma.bmk
 	diff -w enigma.bmk enigma.out
 	$(RM) enigma.bin enigma.in enigma.out enigma.bmk
 	

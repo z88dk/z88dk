@@ -300,7 +300,7 @@ for my $options ("-o$bin", "-o=$bin", "--output$bin", "--output=$bin") {
 $ENV{TEST_ENV} = '2.bin';
 unlink_testfiles($bin);
 write_file(asm_file(), "nop");
-t_z80asm_capture('-b -otest${TEST_ENV} '.asm_file(), "", "", 0);
+t_z80asm_capture('-b "-otest${TEST_ENV}" '.asm_file(), "", "", 0);
 ok ! -f bin_file();
 ok -f $bin;
 t_binary(read_file($bin, binmode => ':raw'), "\0");
@@ -308,7 +308,7 @@ t_binary(read_file($bin, binmode => ':raw'), "\0");
 delete $ENV{TEST_ENV};
 unlink_testfiles($bin);
 write_file(asm_file(), "nop");
-t_z80asm_capture('-b -otest${TEST_ENV}2.bin '.asm_file(), "", "", 0);
+t_z80asm_capture('-b "-otest${TEST_ENV}2.bin" '.asm_file(), "", "", 0);
 ok ! -f bin_file();
 ok -f $bin;
 t_binary(read_file($bin, binmode => ':raw'), "\0");
@@ -458,10 +458,10 @@ for my $options ('-L', '-L=', '--lib-path', '--lib-path=') {
 
 # use environment variable in -L
 $ENV{TEST_ENV} = 'data';
-t_z80asm_ok(0, $asm, $bin, '-Lt/${TEST_ENV} -i'.$lib_base);
+t_z80asm_ok(0, $asm, $bin, '"-Lt/${TEST_ENV}" -i'.$lib_base);
 
 delete $ENV{TEST_ENV};
-t_z80asm_ok(0, $asm, $bin, '-Lt/da${TEST_ENV}ta -i'.$lib_base);
+t_z80asm_ok(0, $asm, $bin, '"-Lt/da${TEST_ENV}ta" -i'.$lib_base);
 
 unlink_testfiles($lib);
 
@@ -489,10 +489,10 @@ for my $options ('-D', '-D=', '--define', '--define=') {
 
 # -D with environment variables
 $ENV{TEST_ENV} = 'value';
-t_z80asm_ok(0, $asm, "\x3E\x01", '-D=_${TEST_ENV}23');
+t_z80asm_ok(0, $asm, "\x3E\x01", '"-D=_${TEST_ENV}23"');
 
 delete $ENV{TEST_ENV};
-t_z80asm_ok(0, $asm, "\x3E\x01", '-D=_value${TEST_ENV}23');
+t_z80asm_ok(0, $asm, "\x3E\x01", '"-D=_value${TEST_ENV}23"');
 
 #------------------------------------------------------------------------------
 # -i, --use-lib, -x, --make-lib

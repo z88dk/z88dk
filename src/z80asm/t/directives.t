@@ -169,13 +169,12 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 main test.asm:1
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: C9
+  Symbols:
+    L A $0000 main (section "") (file test.asm:1)
 END
 
 # one module directive
@@ -186,13 +185,12 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: lib
-  Names:
-    L A $0000 main test.asm:2
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: C9
+  Symbols:
+    L A $0000 main (section "") (file test.asm:2)
 END
 
 # two module directive
@@ -204,13 +202,12 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: lib2
-  Names:
-    L A $0000 main test.asm:3
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: C9
+  Symbols:
+    L A $0000 main (section "") (file test.asm:3)
 END
 
 
