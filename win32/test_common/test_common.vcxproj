@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,23 +20,23 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{236EDD66-24B8-448E-9B8D-1483A4E0F3D6}</ProjectGuid>
-    <RootNamespace>zobjcopy</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectGuid>{068AE20D-138D-4D6B-9F65-EBAD8AEC1177}</ProjectGuid>
+    <RootNamespace>testcommon</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -76,8 +76,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex;..\..\ext\Unity\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -86,8 +86,6 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,22 +96,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex;..\..\ext\Unity\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
-    <CustomBuildStep>
-      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>..\..\bin\$(TargetName)$(TargetExt)</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -123,45 +112,36 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
-    <CustomBuildStep>
-      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>..\..\bin\$(TargetName)$(TargetExt)</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ext\regex\regcomp.c" />
     <ClCompile Include="..\..\ext\regex\regerror.c" />
     <ClCompile Include="..\..\ext\regex\regexec.c" />
     <ClCompile Include="..\..\ext\regex\regfree.c" />
+    <ClCompile Include="..\..\ext\Unity\src\unity.c" />
     <ClCompile Include="..\..\src\common\die.c" />
-    <ClCompile Include="..\..\src\common\optparse.c" />
     <ClCompile Include="..\..\src\common\objfile.c" />
+    <ClCompile Include="..\..\src\common\optparse.c" />
     <ClCompile Include="..\..\src\common\strutil.c" />
-    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
+    <ClCompile Include="..\..\src\common\t\test.c" />
+    <ClCompile Include="..\..\src\common\t\t_strutil.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ext\optparse\optparse.h" />
     <ClInclude Include="..\..\ext\regex\cclass.h" />
     <ClInclude Include="..\..\ext\regex\cname.h" />
     <ClInclude Include="..\..\ext\regex\regex.h" />
     <ClInclude Include="..\..\ext\regex\regex2.h" />
     <ClInclude Include="..\..\ext\regex\utils.h" />
+    <ClInclude Include="..\..\ext\Unity\src\unity.h" />
+    <ClInclude Include="..\..\ext\Unity\src\unity_internals.h" />
     <ClInclude Include="..\..\src\common\die.h" />
     <ClInclude Include="..\..\src\common\objfile.h" />
     <ClInclude Include="..\..\src\common\strutil.h" />
-    <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

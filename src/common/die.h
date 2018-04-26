@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
-#include "utstring.h"
+#include "strutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,11 +33,11 @@ extern void xfclose(FILE *stream);
 
 // dies if error writing all elements
 extern void xfwrite(const void *ptr, size_t size, size_t count, FILE *stream);
-extern void xfwrite_str(UT_string *str, FILE *stream);
+extern void xfwrite_str(str_t *str, FILE *stream);
 
 // byte/word length followed by string
-extern void xfwrite_bcount_str(UT_string *str, FILE *stream);
-extern void xfwrite_wcount_str(UT_string *str, FILE *stream);
+extern void xfwrite_bcount_str(str_t *str, FILE *stream);
+extern void xfwrite_wcount_str(str_t *str, FILE *stream);
 
 extern void xfwrite_byte(byte_t value, FILE *stream);
 extern void xfwrite_word(int value, FILE *stream);
@@ -45,11 +45,11 @@ extern void xfwrite_dword(int value, FILE *stream);
 
 // dies if cannot read all expected elements; use fread() if this is expected
 extern void xfread(void *ptr, size_t size, size_t count, FILE *stream);
-extern void xfread_str(size_t size, UT_string *str, FILE *stream);
+extern void xfread_str(size_t size, str_t *str, FILE *stream);
 
 // byte/word length followed by string
-extern void xfread_bcount_str(UT_string *str, FILE *stream);
-extern void xfread_wcount_str(UT_string *str, FILE *stream);
+extern void xfread_bcount_str(str_t *str, FILE *stream);
+extern void xfread_wcount_str(str_t *str, FILE *stream);
 
 extern byte_t xfread_byte(FILE *stream);
 extern int xfread_word(FILE *stream);
