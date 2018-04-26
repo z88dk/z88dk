@@ -64,6 +64,6 @@ clean::
 
 #------------------------------------------------------------------------------
 install: 
-	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z80nm$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)
