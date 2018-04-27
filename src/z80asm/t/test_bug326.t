@@ -49,7 +49,7 @@ for my $id (7..12) {
 
 # link all
 unlink_testfiles();
-run("./z80asm -b -d -o=test.bin \@$dir/lib.lst");
+run("./z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 1..12));
 
 # test file not found
@@ -57,7 +57,7 @@ ok unlink "$dir/f1.asm", "$dir/f1.asm";
 ok unlink "$dir/f1.o",   "$dir/f1.o";
 
 unlink_testfiles();
-run("./z80asm -b -d -o=test.bin \@$dir/lib.lst", 1, "", <<END);
+run("./z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"", 1, "", <<END);
 Error at file 'test/my/deep/lib/lib.lst' line 1: cannot read file 'test/my/deep/lib/f1.asm'
 1 errors occurred during assembly
 END

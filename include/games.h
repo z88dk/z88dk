@@ -180,6 +180,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 1
 #endif
 
+#ifdef __VZ200__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"Keys 1-5","Keys 6-0","QAOP-MN"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
 #ifdef __ZXVGS__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};

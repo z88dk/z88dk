@@ -22,3 +22,8 @@ subdirs-clean:
 
 $(SUBDIRS):
 	$(MAKE) -C $@ all
+
+all: src-all
+
+src-all:
+	$(MAKE) -C ../src/common test

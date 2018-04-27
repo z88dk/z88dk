@@ -34,6 +34,7 @@ games/vz/bit_open
 games/vz/bit_open_di
 games/vz/bit_close
 games/vz/bit_close_ei
+games/vz/joystick
 @games/games_mwr.lst
 vz/vz_bgrd
 vz/vz_brick

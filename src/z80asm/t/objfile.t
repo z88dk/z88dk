@@ -16,6 +16,13 @@ use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 require './t/test_utils.pl';
 
+use Config;
+$ENV{PATH} = join($Config{path_sep}, 
+			".",
+			"../z80nm",
+			"../../bin",
+			$ENV{PATH});
+
 our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
 #------------------------------------------------------------------------------
@@ -27,11 +34,23 @@ sub t_z80nm {
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "$AR/z80nm -a $o_file";
+		system "z80nm -a $o_file";
 	};
 	eq_or_diff_text $stdout, $expected_out, "$line stdout";
 	eq_or_diff_text $stderr, "", "$line stderr";
 	ok !!$return == !!0, "$line retval";
+
+		
+	if ($stdout ne $expected_out) {
+		my($file, $line) = (caller)[1,2];
+		my $out = "test.out";
+		system "head -$line $file > $out";
+		system "z80nm -a $o_file >> $out";
+		system "winmergeu -w $file $out";
+		unlink "test.out";
+		die;		# need to refresh source
+	}
+
 }
 
 #------------------------------------------------------------------------------
@@ -47,8 +66,7 @@ t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test'));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
 END
 
@@ -60,10 +78,9 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", -1, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: 00
 END
 
@@ -75,10 +92,9 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", -1, 1, "\x00" x 0x10000]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 65536 bytes
+  Section "": 65536 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     C $0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     C $0020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4185,10 +4201,9 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", 0, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 1 bytes, ORG $0000
+  Section "": 1 bytes, ORG $0000
     C $0000: 00
 END
 
@@ -4199,10 +4214,9 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", 0xFFFF, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 1 bytes, ORG $FFFF
+  Section "": 1 bytes, ORG $FFFF
     C $0000: 00
 END
 
@@ -4223,10 +4237,9 @@ t_binary($obj, objfile(NAME => 'test',
 									"\x11\x0C\x00".
 									"\x0C\x00\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 12 bytes
+  Section "": 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
 END
 
@@ -4253,14 +4266,13 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L C $0003 value8 test.asm:2
-    L C $0003 value16 test.asm:3
-  Code: 12 bytes
+  Section "": 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
+  Symbols:
+    L C $0003 value8 (section "") (file test.asm:2)
+    L C $0003 value16 (section "") (file test.asm:3)
 END
 
 unlink_testfiles();
@@ -4286,14 +4298,13 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L C $0003 value8 test.asm:7
-    L C $0003 value16 test.asm:8
-  Code: 12 bytes
+  Section "": 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
+  Symbols:
+    L C $0003 value8 (section "") (file test.asm:7)
+    L C $0003 value16 (section "") (file test.asm:8)
 END
 
 unlink_testfiles();
@@ -4330,22 +4341,21 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x01\x00\x00".			# addr  11
 					"\x00\x00\x00\x00"]]));	# addr  14
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 label test.asm:3
-    L A $0008 label2 test.asm:6
-  Expressions:
-    E Ub (test.asm:3) $0000 $0001: label*4
-    E Sb (test.asm:4) $0002 $0004: label*5
-    E Cw (test.inc:2) $0005 $0006: label*2
-    E Cw (test.asm:6) $0008 $0009: label2*4
-    E Cw (test.inc:2) $000B $000C: label*2
-    E Ll (test.asm:8) $000E $000E: label2*6
-  Code: 18 bytes, ORG $0003
+  Section "": 18 bytes, ORG $0003
     C $0000: 3E 00 DD 46 00 01 00 00 11 00 00 01 00 00 00 00
     C $0010: 00 00
+  Symbols:
+    L A $0000 label (section "") (file test.asm:3)
+    L A $0008 label2 (section "") (file test.asm:6)
+  Expressions:
+    E Ub $0000 $0001: label*4 (section "") (file test.asm:3)
+    E Sb $0002 $0004: label*5 (section "") (file test.asm:4)
+    E Cw $0005 $0006: label*2 (section "") (file test.inc:2)
+    E Cw $0008 $0009: label2*4 (section "") (file test.asm:6)
+    E Cw $000B $000C: label*2 (section "") (file test.inc:2)
+    E Ll $000E $000E: label2*6 (section "") (file test.asm:8)
 END
 
 # local and global symbols
@@ -4374,20 +4384,19 @@ t_binary($obj, objfile(NAME => 'test',
 		                "\xCD\x00\x00".
 		                "\xCD\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 local test.asm:6
-    G A $0001 global test.asm:7
-  External names:
+  Section "": 7 bytes
+    C $0000: 00 CD 00 00 CD 00 00
+  Symbols:
+    L A $0000 local (section "") (file test.asm:6)
+    G A $0001 global (section "") (file test.asm:7)
+  Externs:
     U         extobj
     U         extlib
   Expressions:
-    E Cw (test.asm:7) $0001 $0002: extobj
-    E Cw (test.asm:8) $0004 $0005: extlib
-  Code: 7 bytes
-    C $0000: 00 CD 00 00 CD 00 00
+    E Cw $0001 $0002: extobj (section "") (file test.asm:7)
+    E Cw $0004 $0005: extlib (section "") (file test.asm:8)
 END
 
 # library
@@ -4406,22 +4415,21 @@ my $obj2 = read_binfile(o2_file());
 my $lib  = read_binfile(lib_file());
 t_binary($lib, libfile( $obj1, $obj2 ));
 t_z80nm(lib_file(), <<'END');
-
-File test.lib at $0000: Z80LMF11
-
-File test.lib at $0010: Z80RMF11
+Library file test.lib at $0000: Z80LMF11
+Object  file test.lib at $0010: Z80RMF11
   Name: test1
-  Names:
-    G A $0000 mult test1.asm:3
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: C9
+  Symbols:
+    G A $0000 mult (section "") (file test1.asm:3)
 
-File test.lib at $0067: Z80RMF11
+Object  file test.lib at $0067: Z80RMF11
   Name: test2
-  Names:
-    G A $0000 div test2.asm:3
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: C9
+  Symbols:
+    G A $0000 div (section "") (file test2.asm:3)
+
 END
 
 # link modules
@@ -4455,7 +4463,7 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "objfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o ../../ext/UNIXem/src/glob.o";
+my $objs = "objfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o";
 
 # get init code except init() and main()
 my $init = <<'END';

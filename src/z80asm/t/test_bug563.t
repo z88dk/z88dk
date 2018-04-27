@@ -33,16 +33,15 @@ END
 
 run("z80asm -otestx.o test1.asm test2.asm");
 z80nm("testx.o", <<'END');
-
-File testx.o at $0000: Z80RMF11
+Object  file testx.o at $0000: Z80RMF11
   Name: testx
-  Names:
-    G = $0000 main1 test1.asm:4
-    G A $0000 main test2.asm:2
-  Expressions:
-    E =  (test1.asm:4) $0000 $0000: main1 := main
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: C9
+  Symbols:
+    G = $0000 main1 (section "") (file test1.asm:4)
+    G A $0000 main (section "") (file test2.asm:2)
+  Expressions:
+    E =  $0000 $0000: main1 := main (section "") (file test1.asm:4)
 END
 
 spew("test.asm", <<'END');

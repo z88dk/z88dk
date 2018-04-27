@@ -35,7 +35,7 @@ static void add_open_file(FILE *stream, const char *filename)
 {
 	init();
 	assert(stream);
-	unsigned fno = fileno(stream);
+	size_t fno = fileno(stream);
 	if (fno >= utarray_len(open_files))
 		utarray_resize(open_files, fno + 1);
 	free(*(char**)utarray_eltptr(open_files, fno));
@@ -46,7 +46,7 @@ static char *get_filename(FILE *fp)
 {
 	init();
 	assert(fp);
-	unsigned fno = fileno(fp);
+	size_t fno = fileno(fp);
 	if (fno >= utarray_len(open_files))
 		return "?";
 	else
@@ -102,23 +102,23 @@ void xfwrite(const void *ptr, size_t size, size_t count, FILE *stream)
 		die("failed to write %u bytes to file '%s'\n", size*count, get_filename(stream));
 }
 
-void xfwrite_str(UT_string *str, FILE *stream)
+void xfwrite_str(str_t *str, FILE *stream)
 {
-	xfwrite(utstring_body(str), sizeof(char), utstring_len(str), stream);
+	xfwrite(str_data(str), sizeof(char), str_len(str), stream);
 }
 
-void xfwrite_bcount_str(UT_string *str, FILE *stream)
+void xfwrite_bcount_str(str_t *str, FILE *stream)
 {
-	size_t len = utstring_len(str);
+	size_t len = str_len(str);
 	if (len > 255)
 		die("string '%s' too long for byte counted string", str);
 	xfwrite_byte(len & 0xFF, stream);
 	xfwrite_str(str, stream);
 }
 
-void xfwrite_wcount_str(UT_string * str, FILE * stream)
+void xfwrite_wcount_str(str_t * str, FILE * stream)
 {
-	int len = (int)utstring_len(str);
+	size_t len = str_len(str);
 	if (len > 0xFFFF)
 		die("string '%s' too long for word counted string", str);
 	xfwrite_word(len, stream);
@@ -155,21 +155,21 @@ void xfread(void *ptr, size_t size, size_t count, FILE *stream)
 		die("failed to read %u bytes from file '%s'\n", size*count, get_filename(stream));
 }
 
-void xfread_str(size_t size, UT_string *str, FILE *stream)
+void xfread_str(size_t size, str_t *str, FILE *stream)
 {
-	utstring_reserve(str, size);
-	xfread(utstring_body(str), sizeof(char), size, stream);
-	utstring_len(str) = size;
-	utstring_body(str)[utstring_len(str)] = '\0';
+	str_reserve(str, size);
+	xfread(str_data(str), sizeof(char), size, stream);
+	str_len(str) = size;
+	str_data(str)[str_len(str)] = '\0';
 }
 
-void xfread_bcount_str(UT_string *str, FILE *stream)
+void xfread_bcount_str(str_t *str, FILE *stream)
 {
 	size_t len = xfread_byte(stream);
 	xfread_str(len, str, stream);
 }
 
-void xfread_wcount_str(UT_string * str, FILE * stream)
+void xfread_wcount_str(str_t * str, FILE * stream)
 {
 	size_t len = xfread_word(stream);
 	xfread_str(len, str, stream);

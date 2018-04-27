@@ -48,6 +48,9 @@
     <ClCompile Include="..\..\src\common\objfile.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\strutil.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\regex\cclass.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\common\objfile.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\strutil.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
   </ItemGroup>

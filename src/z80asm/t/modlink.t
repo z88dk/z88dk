@@ -66,54 +66,52 @@ z80asm(
 );
 
 z80nm("test.o test1.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    G A $0013 a1 test.asm:13
-  External names:
+  Section "": 28 bytes, ORG $1234
+    C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
+    C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
+  Symbols:
+    G A $0013 a1 (section "") (file test.asm:13)
+  Externs:
     U         a2
     U         __head
     U         __tail
     U         __size
   Expressions:
-    E Ub (test.asm:6) $0000 $0001: ASMPC-4608
-    E Cw (test.asm:7) $0002 $0003: ASMPC
-    E Ub (test.asm:8) $0005 $0006: a1-4608
-    E Cw (test.asm:9) $0007 $0008: a1
-    E Cw (test.asm:10) $000A $000B: a2-a1
-    E Cw (test.asm:11) $000D $000E: a1-ASMPC
-    E Cw (test.asm:12) $0010 $0011: a2-ASMPC
-    E Cw (test.asm:14) $0013 $0014: __head
-    E Cw (test.asm:15) $0016 $0017: __tail
-    E Cw (test.asm:16) $0019 $001A: __size
-  Code: 28 bytes, ORG $1234
+    E Ub $0000 $0001: ASMPC-4608 (section "") (file test.asm:6)
+    E Cw $0002 $0003: ASMPC (section "") (file test.asm:7)
+    E Ub $0005 $0006: a1-4608 (section "") (file test.asm:8)
+    E Cw $0007 $0008: a1 (section "") (file test.asm:9)
+    E Cw $000A $000B: a2-a1 (section "") (file test.asm:10)
+    E Cw $000D $000E: a1-ASMPC (section "") (file test.asm:11)
+    E Cw $0010 $0011: a2-ASMPC (section "") (file test.asm:12)
+    E Cw $0013 $0014: __head (section "") (file test.asm:14)
+    E Cw $0016 $0017: __tail (section "") (file test.asm:15)
+    E Cw $0019 $001A: __size (section "") (file test.asm:16)
+Object  file test1.o at $0000: Z80RMF11
+  Name: test1
+  Section "": 28 bytes, ORG $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
-
-File test1.o at $0000: Z80RMF11
-  Name: test1
-  Names:
-    G A $0013 a2 test1.asm:11
-  External names:
+  Symbols:
+    G A $0013 a2 (section "") (file test1.asm:11)
+  Externs:
     U         a1
     U         __head
     U         __tail
     U         __size
   Expressions:
-    E Ub (test1.asm:4) $0000 $0001: ASMPC-4608
-    E Cw (test1.asm:5) $0002 $0003: ASMPC
-    E Ub (test1.asm:6) $0005 $0006: a2-4608
-    E Cw (test1.asm:7) $0007 $0008: a2
-    E Cw (test1.asm:8) $000A $000B: a2-a1
-    E Cw (test1.asm:9) $000D $000E: ASMPC-a1
-    E Cw (test1.asm:10) $0010 $0011: a2-ASMPC
-    E Cw (test1.asm:12) $0013 $0014: __head
-    E Cw (test1.asm:13) $0016 $0017: __tail
-    E Cw (test1.asm:14) $0019 $001A: __size
-  Code: 28 bytes, ORG $1234
-    C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
-    C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
+    E Ub $0000 $0001: ASMPC-4608 (section "") (file test1.asm:4)
+    E Cw $0002 $0003: ASMPC (section "") (file test1.asm:5)
+    E Ub $0005 $0006: a2-4608 (section "") (file test1.asm:6)
+    E Cw $0007 $0008: a2 (section "") (file test1.asm:7)
+    E Cw $000A $000B: a2-a1 (section "") (file test1.asm:8)
+    E Cw $000D $000E: ASMPC-a1 (section "") (file test1.asm:9)
+    E Cw $0010 $0011: a2-ASMPC (section "") (file test1.asm:10)
+    E Cw $0013 $0014: __head (section "") (file test1.asm:12)
+    E Cw $0016 $0017: __tail (section "") (file test1.asm:13)
+    E Cw $0019 $001A: __size (section "") (file test1.asm:14)
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
@@ -220,47 +218,45 @@ z80asm(
 );
 
 z80nm("test.o test1.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 mes1 (section data) test.asm:10
-    L A $0000 start (section code) test.asm:6
-    L A $0005 mes1end (section data) test.asm:11
-    L A $0005 mes2 (section data) test.asm:20
-    L A $000B mes2end (section data) test.asm:21
-  External names:
+  Section "": 0 bytes, ORG $1234
+  Section code: 28 bytes
+    C $0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
+    C $0010: 00 00 21 00 00 01 00 00 CD 00 00 C9
+  Section data: 11 bytes
+    C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
+  Symbols:
+    L A $0000 mes1 (section data) (file test.asm:10)
+    L A $0000 start (section code) (file test.asm:6)
+    L A $0005 mes1end (section data) (file test.asm:11)
+    L A $0005 mes2 (section data) (file test.asm:20)
+    L A $000B mes2end (section data) (file test.asm:21)
+  Externs:
     U         prmes
     U         mes0
     U         mes0end
   Expressions:
-    E Cw (test.asm:6) $0000 $0001: mes1 (section code)
-    E Cw (test.asm:7) $0003 $0004: mes1end-mes1 (section code)
-    E Cw (test.asm:13) $0006 $0007: prmes (section code)
-    E Cw (test.asm:16) $0009 $000A: mes2 (section code)
-    E Cw (test.asm:17) $000C $000D: mes2end-mes2 (section code)
-    E Cw (test.asm:23) $000F $0010: prmes (section code)
-    E Cw (test.asm:25) $0012 $0013: mes0 (section code)
-    E Cw (test.asm:26) $0015 $0016: mes0end-mes0 (section code)
-    E Cw (test.asm:27) $0018 $0019: prmes (section code)
-  Code: 0 bytes, ORG $1234
-  Code: 28 bytes (section code)
-    C $0000: 21 00 00 01 00 00 CD 00 00 21 00 00 01 00 00 CD
-    C $0010: 00 00 21 00 00 01 00 00 CD 00 00 C9
-  Code: 11 bytes (section data)
-    C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
-
-File test1.o at $0000: Z80RMF11
+    E Cw $0000 $0001: mes1 (section code) (file test.asm:6)
+    E Cw $0003 $0004: mes1end-mes1 (section code) (file test.asm:7)
+    E Cw $0006 $0007: prmes (section code) (file test.asm:13)
+    E Cw $0009 $000A: mes2 (section code) (file test.asm:16)
+    E Cw $000C $000D: mes2end-mes2 (section code) (file test.asm:17)
+    E Cw $000F $0010: prmes (section code) (file test.asm:23)
+    E Cw $0012 $0013: mes0 (section code) (file test.asm:25)
+    E Cw $0015 $0016: mes0end-mes0 (section code) (file test.asm:26)
+    E Cw $0018 $0019: prmes (section code) (file test.asm:27)
+Object  file test1.o at $0000: Z80RMF11
   Name: test1
-  Names:
-    G A $0000 prmes (section code) test1.asm:7
-    G A $0000 mes0 (section data) test1.asm:3
-    G A $0001 mes0end (section data) test1.asm:4
-  Code: 0 bytes, ORG $1234
-  Code: 9 bytes (section code)
+  Section "": 0 bytes, ORG $1234
+  Section code: 9 bytes
     C $0000: 78 B1 C8 7E 23 D7 0B 18 F7
-  Code: 1 bytes (section data)
+  Section data: 1 bytes
     C $0000: 2E
+  Symbols:
+    G A $0000 prmes (section code) (file test1.asm:7)
+    G A $0000 mes0 (section data) (file test1.asm:3)
+    G A $0001 mes0end (section data) (file test1.asm:4)
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
@@ -313,27 +309,24 @@ ASM2
 	bin		=> "\1\2\3",
 );
 z80nm("test.o test1.o test2.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 0 bytes (section code)
-  Code: 0 bytes (section data)
-  Code: 1 bytes (section bss)
+  Section code: 0 bytes
+  Section data: 0 bytes
+  Section bss: 1 bytes
     C $0000: 03
-
-File test1.o at $0000: Z80RMF11
+Object  file test1.o at $0000: Z80RMF11
   Name: test1
-  Code: 0 bytes (section code)
-  Code: 1 bytes (section data)
+  Section code: 0 bytes
+  Section data: 1 bytes
     C $0000: 02
-  Code: 0 bytes (section bss)
-
-File test2.o at $0000: Z80RMF11
+  Section bss: 0 bytes
+Object  file test2.o at $0000: Z80RMF11
   Name: test2
-  Code: 1 bytes (section code)
+  Section code: 1 bytes
     C $0000: 01
-  Code: 0 bytes (section data)
-  Code: 0 bytes (section bss)
+  Section data: 0 bytes
+  Section bss: 0 bytes
 END
 
 # link only
@@ -342,27 +335,24 @@ z80asm(
 	bin		=> "\1\2\3",
 );
 z80nm("test.o test1.o test2.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 0 bytes (section code)
-  Code: 0 bytes (section data)
-  Code: 1 bytes (section bss)
+  Section code: 0 bytes
+  Section data: 0 bytes
+  Section bss: 1 bytes
     C $0000: 03
-
-File test1.o at $0000: Z80RMF11
+Object  file test1.o at $0000: Z80RMF11
   Name: test1
-  Code: 0 bytes (section code)
-  Code: 1 bytes (section data)
+  Section code: 0 bytes
+  Section data: 1 bytes
     C $0000: 02
-  Code: 0 bytes (section bss)
-
-File test2.o at $0000: Z80RMF11
+  Section bss: 0 bytes
+Object  file test2.o at $0000: Z80RMF11
   Name: test2
-  Code: 1 bytes (section code)
+  Section code: 1 bytes
     C $0000: 01
-  Code: 0 bytes (section data)
-  Code: 0 bytes (section bss)
+  Section data: 0 bytes
+  Section bss: 0 bytes
 END
 
 #------------------------------------------------------------------------------
@@ -388,21 +378,20 @@ z80asm(
 );
 
 z80nm("test.o", <<'...');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 start test.asm:2
-    L A $0008 end1 test.asm:4
-    L A $0008 end2 test.asm:5
-    L A $0008 end3 test.asm:6
-  Expressions:
-    E Cw (test.asm:3) $0000 $0000: start
-    E Cw (test.asm:3) $0000 $0002: end1
-    E Cw (test.asm:3) $0000 $0004: end2
-    E Cw (test.asm:3) $0000 $0006: end3
-  Code: 8 bytes, ORG $0100
+  Section "": 8 bytes, ORG $0100
     C $0000: 00 00 00 00 00 00 00 00
+  Symbols:
+    L A $0000 start (section "") (file test.asm:2)
+    L A $0008 end1 (section "") (file test.asm:4)
+    L A $0008 end2 (section "") (file test.asm:5)
+    L A $0008 end3 (section "") (file test.asm:6)
+  Expressions:
+    E Cw $0000 $0000: start (section "") (file test.asm:3)
+    E Cw $0000 $0002: end1 (section "") (file test.asm:3)
+    E Cw $0000 $0004: end2 (section "") (file test.asm:3)
+    E Cw $0000 $0006: end3 (section "") (file test.asm:3)
 ...
 
 #------------------------------------------------------------------------------
@@ -467,50 +456,47 @@ z80asm(
 );
 
 z80nm("test.o test1.o test2.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  External names:
+  Section "": 0 bytes, ORG $1000
+  Section code: 9 bytes
+    C $0000: CD 00 00 CD 00 00 C3 00 00
+  Section lib: 0 bytes
+  Externs:
     U         func1_alias
     U         func2_alias
     U         computed_end
   Expressions:
-    E Cw (test.asm:7) $0000 $0001: func1_alias (section code)
-    E Cw (test.asm:8) $0003 $0004: func2_alias (section code)
-    E Cw (test.asm:9) $0006 $0007: computed_end (section code)
-  Code: 0 bytes, ORG $1000
-  Code: 9 bytes (section code)
-    C $0000: CD 00 00 CD 00 00 C3 00 00
-  Code: 0 bytes (section lib)
-
-File test1.o at $0000: Z80RMF11
+    E Cw $0000 $0001: func1_alias (section code) (file test.asm:7)
+    E Cw $0003 $0004: func2_alias (section code) (file test.asm:8)
+    E Cw $0006 $0007: computed_end (section code) (file test.asm:9)
+Object  file test1.o at $0000: Z80RMF11
   Name: test1
-  Names:
-    G A $0000 func1 (section lib) test1.asm:7
-    G A $0000 func2 (section code) test1.asm:10
-  Code: 0 bytes, ORG $1000
-  Code: 1 bytes (section code)
+  Section "": 0 bytes, ORG $1000
+  Section code: 1 bytes
     C $0000: C8
-  Code: 1 bytes (section lib)
+  Section lib: 1 bytes
     C $0000: C9
-
-File test2.o at $0000: Z80RMF11
+  Symbols:
+    G A $0000 func1 (section lib) (file test1.asm:7)
+    G A $0000 func2 (section code) (file test1.asm:10)
+Object  file test2.o at $0000: Z80RMF11
   Name: test2
-  Names:
-    L A $FFFFFFFF chain1 (section lib) test2.asm:11
-    L A $0000 chain2 (section lib) test2.asm:12
-    G = $0000 func1_alias (section lib) test2.asm:7
-    G = $0000 func2_alias (section lib) test2.asm:8
-    G A $0000 computed_end (section lib) test2.asm:10
-  External names:
+  Section "": 0 bytes, ORG $1000
+  Section code: 0 bytes
+  Section lib: 0 bytes
+  Symbols:
+    L A $FFFFFFFF chain1 (section lib) (file test2.asm:11)
+    L A $0000 chain2 (section lib) (file test2.asm:12)
+    G = $0000 func1_alias (section lib) (file test2.asm:7)
+    G = $0000 func2_alias (section lib) (file test2.asm:8)
+    G A $0000 computed_end (section lib) (file test2.asm:10)
+  Externs:
     U         func1
     U         func2
   Expressions:
-    E =  (test2.asm:7) $0000 $0000: func1_alias := func1 (section lib)
-    E =  (test2.asm:8) $0000 $0000: func2_alias := func2 (section lib)
-  Code: 0 bytes, ORG $1000
-  Code: 0 bytes (section code)
-  Code: 0 bytes (section lib)
+    E =  $0000 $0000: func1_alias := func1 (section lib) (file test2.asm:7)
+    E =  $0000 $0000: func2_alias := func2 (section lib) (file test2.asm:8)
 END
 
 #------------------------------------------------------------------------------
@@ -565,28 +551,26 @@ z80asm(
 );
 
 z80nm("test.o test1.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    G A $0000 func1 test.asm:1
-  External names:
+  Section "": 4 bytes, ORG $1000
+    C $0000: CD 00 00 C9
+  Symbols:
+    G A $0000 func1 (section "") (file test.asm:1)
+  Externs:
     U         func2
   Expressions:
-    E Cw (test.asm:1) $0000 $0001: func2
-  Code: 4 bytes, ORG $1000
-    C $0000: CD 00 00 C9
-
-File test1.o at $0000: Z80RMF11
+    E Cw $0000 $0001: func2 (section "") (file test.asm:1)
+Object  file test1.o at $0000: Z80RMF11
   Name: test1
-  Names:
-    G A $0000 func2 test1.asm:1
-  External names:
+  Section "": 4 bytes, ORG $1000
+    C $0000: CD 00 00 C9
+  Symbols:
+    G A $0000 func2 (section "") (file test1.asm:1)
+  Externs:
     U         func1
   Expressions:
-    E Cw (test1.asm:1) $0000 $0001: func1
-  Code: 4 bytes, ORG $1000
-    C $0000: CD 00 00 C9
+    E Cw $0000 $0001: func1 (section "") (file test1.asm:1)
 END
 
 #------------------------------------------------------------------------------
@@ -643,36 +627,33 @@ z80asm(
 );
 
 z80nm("test.o test1.o test2.o", <<'...');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    G = $0000 asm_b_vector_at test.asm:4
-  External names:
+  Section "": 0 bytes, ORG $1000
+  Symbols:
+    G = $0000 asm_b_vector_at (section "") (file test.asm:4)
+  Externs:
     U         asm_b_array_at
   Expressions:
-    E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
-  Code: 0 bytes, ORG $1000
-
-File test1.o at $0000: Z80RMF11
+    E =  $0000 $0000: asm_b_vector_at := asm_b_array_at (section "") (file test.asm:4)
+Object  file test1.o at $0000: Z80RMF11
   Name: test1
-  Names:
-    G A $0000 asm_b_array_at test1.asm:3
-  Code: 1 bytes, ORG $1000
+  Section "": 1 bytes, ORG $1000
     C $0000: C9
-
-File test2.o at $0000: Z80RMF11
+  Symbols:
+    G A $0000 asm_b_array_at (section "") (file test1.asm:3)
+Object  file test2.o at $0000: Z80RMF11
   Name: test2
-  Names:
-    L A $0000 start test2.asm:4
-  External names:
+  Section "": 7 bytes, ORG $1000
+    C $0000: CD 00 00 CD 00 00 C9
+  Symbols:
+    L A $0000 start (section "") (file test2.asm:4)
+  Externs:
     U         asm_b_vector_at
     U         asm_b_array_at
   Expressions:
-    E Cw (test2.asm:5) $0000 $0001: asm_b_vector_at
-    E Cw (test2.asm:6) $0003 $0004: asm_b_array_at
-  Code: 7 bytes, ORG $1000
-    C $0000: CD 00 00 CD 00 00 C9
+    E Cw $0000 $0001: asm_b_vector_at (section "") (file test2.asm:5)
+    E Cw $0003 $0004: asm_b_array_at (section "") (file test2.asm:6)
 ...
 
 #------------------------------------------------------------------------------
@@ -890,45 +871,44 @@ eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
 
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 test1_mess (section data) test1.asm:12
-    L = $0000 test2_printa1 test2.asm:4
-    L A $0018 test2__delay (section code) test2.asm:16
-    L A $001A test2__delay_1 (section code) test2.asm:18
-    L A $0006 test2_mess (section data) test2.asm:24
-    L A $000B test3_mess (section data) test3.asm:11
-    L A $000D test3_dollar (section data) test3.asm:12
-    G A $0000 main (section code) test1.asm:4
-    G = $0000 main1 (section data) test1.asm:14
-    G = $0000 print test2.asm:3
-    G A $000D printa (section code) test2.asm:7
-    G A $001F print1 (section code) test3.asm:4
-    G A $0025 code_end (section code) test4.asm:4
-  External names:
-    U         lib_start
-    U         lib_end
-  Expressions:
-    E Cw (test1.asm:5) $0000 $0001: lib_start (section code)
-    E Cw (test1.asm:6) $0003 $0004: test1_mess (section code)
-    E Cw (test1.asm:7) $0006 $0007: print (section code)
-    E Cw (test1.asm:8) $0009 $000A: lib_end (section code)
-    E =  (test1.asm:14) $0006 $0006: main1 := main (section data)
-    E Cw (test2.asm:20) $001B $001C: test2__delay_1 (section code)
-    E Cw (test2.asm:14) $0015 $0016: test2_printa1 (section code)
-    E Cw (test2.asm:13) $0012 $0013: test2__delay (section code)
-    E =  (test2.asm:4) $0000 $0000: test2_printa1 := printa
-    E =  (test2.asm:3) $0000 $0000: print := print1
-    E Cw (test3.asm:12) $000D $000D: ASMPC (section data)
-    E Cw (test3.asm:6) $0020 $0021: printa (section code)
-  Code: 37 bytes (section code)
+  Section code: 37 bytes
     C $0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
     C $0010: D7 23 CD 00 00 C3 00 00 06 00 05 C2 00 00 C9 E5
     C $0020: CD 00 00 E1 C9
-  Code: 15 bytes (section data)
+  Section data: 15 bytes
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
+  Symbols:
+    L A $0000 test1_mess (section data) (file test1.asm:12)
+    L = $0000 test2_printa1 (section "") (file test2.asm:4)
+    L A $0018 test2__delay (section code) (file test2.asm:16)
+    L A $001A test2__delay_1 (section code) (file test2.asm:18)
+    L A $0006 test2_mess (section data) (file test2.asm:24)
+    L A $000B test3_mess (section data) (file test3.asm:11)
+    L A $000D test3_dollar (section data) (file test3.asm:12)
+    G A $0000 main (section code) (file test1.asm:4)
+    G = $0000 main1 (section data) (file test1.asm:14)
+    G = $0000 print (section "") (file test2.asm:3)
+    G A $000D printa (section code) (file test2.asm:7)
+    G A $001F print1 (section code) (file test3.asm:4)
+    G A $0025 code_end (section code) (file test4.asm:4)
+  Externs:
+    U         lib_start
+    U         lib_end
+  Expressions:
+    E Cw $0000 $0001: lib_start (section code) (file test1.asm:5)
+    E Cw $0003 $0004: test1_mess (section code) (file test1.asm:6)
+    E Cw $0006 $0007: print (section code) (file test1.asm:7)
+    E Cw $0009 $000A: lib_end (section code) (file test1.asm:8)
+    E =  $0006 $0006: main1 := main (section data) (file test1.asm:14)
+    E Cw $001B $001C: test2__delay_1 (section code) (file test2.asm:20)
+    E Cw $0015 $0016: test2_printa1 (section code) (file test2.asm:14)
+    E Cw $0012 $0013: test2__delay (section code) (file test2.asm:13)
+    E =  $0000 $0000: test2_printa1 := printa (section "") (file test2.asm:4)
+    E =  $0000 $0000: print := print1 (section "") (file test2.asm:3)
+    E Cw $000D $000D: ASMPC (section data) (file test3.asm:12)
+    E Cw $0020 $0021: printa (section code) (file test3.asm:6)
 END
 
 eq_or_diff_text scalar(read_file("test.sym")), <<'END';
@@ -1090,38 +1070,36 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 2, 0xC9));
 
 z80nm("test_plat1.lib", <<'END');
-
-File test_plat1.lib at $0000: Z80LMF11
-
-File test_plat1.lib at $0010: Z80RMF11
+Library file test_plat1.lib at $0000: Z80LMF11
+Object  file test_plat1.lib at $0010: Z80RMF11
   Name: test_plat1
 
-File test_plat1.lib at $003F: Z80RMF11
+Object  file test_plat1.lib at $003F: Z80RMF11
   Name: test_gen
-  Names:
-    G A $0000 putpixel test_gen.asm:3
-  Code: 3 bytes
+  Section "": 3 bytes
     C $0000: 3E 01 C9
+  Symbols:
+    G A $0000 putpixel (section "") (file test_gen.asm:3)
+
 END
 
 
 z80nm("test_plat2.lib", <<'END');
-
-File test_plat2.lib at $0000: Z80LMF11
-
-File test_plat2.lib at $0010: Z80RMF11
+Library file test_plat2.lib at $0000: Z80LMF11
+Object  file test_plat2.lib at $0010: Z80RMF11
   Name: test_plat2
-  Names:
-    G A $0000 putpixel test_plat2.asm:3
-  Code: 3 bytes
+  Section "": 3 bytes
     C $0000: 3E 02 C9
+  Symbols:
+    G A $0000 putpixel (section "") (file test_plat2.asm:3)
 
-File test_plat2.lib at $0077: Z80RMF11
+Object  file test_plat2.lib at $0077: Z80RMF11
   Name: test_gen
-  Names:
-    G A $0000 putpixel test_gen.asm:3
-  Code: 3 bytes
+  Section "": 3 bytes
     C $0000: 3E 01 C9
+  Symbols:
+    G A $0000 putpixel (section "") (file test_gen.asm:3)
+
 END
 
 #------------------------------------------------------------------------------

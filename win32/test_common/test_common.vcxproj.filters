@@ -14,20 +14,35 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Header Files\regex">
-      <UniqueIdentifier>{f7ea5ebd-3be7-4ae2-afa4-d9194f7617b4}</UniqueIdentifier>
+      <UniqueIdentifier>{4cc7238f-2da3-4a31-b367-7acac0b0a9c3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\regex">
-      <UniqueIdentifier>{ded62bbb-3b39-43c7-9603-c11fbb66f6f1}</UniqueIdentifier>
+      <UniqueIdentifier>{ac85d6b9-2161-419b-aba0-082f47044237}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\common">
-      <UniqueIdentifier>{68f82956-71c2-436b-b15b-bce8053ce250}</UniqueIdentifier>
+    <Filter Include="Header Files\Unity">
+      <UniqueIdentifier>{16573ad6-03df-4260-8f51-bd9af1c8fba6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\common">
-      <UniqueIdentifier>{ffa0744a-cf3e-446f-a54a-08c7721c63cd}</UniqueIdentifier>
+    <Filter Include="Source Files\Unity">
+      <UniqueIdentifier>{3f1b05cf-01df-47a7-81d6-c05cc340433d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c">
+    <ClCompile Include="..\..\src\common\die.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\objfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\optparse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\strutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\t\t_strutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\t\test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ext\regex\regcomp.c">
@@ -42,21 +57,18 @@
     <ClCompile Include="..\..\ext\regex\regfree.c">
       <Filter>Source Files\regex</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\die.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\optparse.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\objfile.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\strutil.c">
-      <Filter>Source Files\common</Filter>
+    <ClCompile Include="..\..\ext\Unity\src\unity.c">
+      <Filter>Source Files\Unity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h">
+    <ClInclude Include="..\..\src\common\die.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\objfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\strutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ext\regex\cclass.h">
@@ -74,17 +86,11 @@
     <ClInclude Include="..\..\ext\regex\utils.h">
       <Filter>Header Files\regex</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\common\die.h">
-      <Filter>Header Files\common</Filter>
+    <ClInclude Include="..\..\ext\Unity\src\unity.h">
+      <Filter>Header Files\Unity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ext\optparse\optparse.h">
-      <Filter>Header Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\common\objfile.h">
-      <Filter>Header Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\common\strutil.h">
-      <Filter>Header Files\common</Filter>
+    <ClInclude Include="..\..\ext\Unity\src\unity_internals.h">
+      <Filter>Header Files\Unity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
