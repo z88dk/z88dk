@@ -28,4 +28,4 @@ test_%.bin: $(SOURCES) %.c
 	$(runtest)
 
 clean:
-	rm -f *.bin $(OBJECTS) zcc_opt.def *~
+	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~
