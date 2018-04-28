@@ -28,4 +28,4 @@ test_sprintf_sdcc.bin: sprintf.c $(SOURCES)
 
 
 clean:
-	rm -f *.bin zcc_opt.def *~
+	rm -f *.bin *.map zcc_opt.def *~

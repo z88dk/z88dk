@@ -57,7 +57,7 @@ int main(int argc, char **argv)
                 break;
             case 'i':
                 input = optarg;
-                break;
+				break;
             case 'p':
                 newlibpath = optarg;
                 break;
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     } else if ( makefile ) {
         int i;
         for ( i = 0; i < num_files; i++ ) {
-            outp_filter(outp, "%s/%s.asm ", newlibpath,files[i]);
+            outp_filter(outp, "%s/%s.asm ", newlibpath, files[i]);
         }
     }
     if ( outp != stdout ) {
@@ -158,11 +158,19 @@ static int substr_iseq(char *s1, int n, char *s2)
 // MinGW and what is the prefix to remove
 static char *remove_mingw_prefix(char *str)
 {
-	if (root
-		&& strcmp(root, "/") != 0  	// if root is "/", it's not MinGW, don't remove root
-		&& substr_iseq(str, strlen(root), root)		// prefix to remove
-	)
-		str += strlen(root);
+	if (root && strcmp(root, "/") != 0) {  	// if root is "/", it's not MinGW, don't remove root
+
+		// remove root prefix
+		if (substr_iseq(str, strlen(root), root)) {
+			// move to slash after prefix
+			str += strlen(root);
+		}
+		else if (isalpha(str[0]) && str[1] == ':' && str[2] == '/') {
+			// if MinGW, convert path c:/... to /c/...
+			str[1] = str[0]; str[0] = '/';
+		}
+	}
+
 	return str;
 }
 // </HACK>

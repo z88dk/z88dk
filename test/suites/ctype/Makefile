@@ -70,4 +70,4 @@ test7_rcm.bin: $(SOURCES) test_isbdigit.c test_isodigit.c main.c
 
 
 clean:
-	rm -f test*.bin $(OBJECTS) zcc_opt.def *~
+	rm -f test*.bin *.map $(OBJECTS) zcc_opt.def *~
