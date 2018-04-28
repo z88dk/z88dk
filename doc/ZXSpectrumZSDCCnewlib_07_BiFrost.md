@@ -42,7 +42,8 @@ you require.
 ---
 
 **_This section introduces the BiFrost concept of 'tiles'. If you've already
-read the SP1 part of this guide you'll know that SP1 also has the concept
+read the [SP1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md)
+part of this guide you'll know that SP1 also has the concept
 of 'tiles'. It's somewhat unfortunate and confusing that the two graphics
 libraries use the same term for different things. As we're about to see,
 BiFrost uses the term 'tile' for a 16x16 pixel graphical object which it can
