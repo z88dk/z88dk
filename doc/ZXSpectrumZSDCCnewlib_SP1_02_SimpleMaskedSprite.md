@@ -330,8 +330,8 @@ order to lock the code to 50fps using the interrupt, but without consuming CPU
 time with the services the Spectrum's ROM code adds to the interrupt call. This
 is a fairly common approach with SP1 programs. While there's no need to
 synchronise with the raster, it's common to use the ISR to do other background
-tasks likes maintain timers or play music. The default SP1 installation creates
-the interrupt vector table at 0xD000, and makes room for the jump vector at
+tasks like maintain timers or play music. The default SP1 installation leaves
+room for the interrupt vector table at 0xD000, and the jump vector at
 0xD1D1. All these details are covered in the
 [interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
 document of this getting started guide.
