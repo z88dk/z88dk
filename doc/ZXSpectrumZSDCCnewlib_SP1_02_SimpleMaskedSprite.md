@@ -385,7 +385,7 @@ programmer.
 
 More of the [example
 links](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#where-to-go-from-here)
-given in the first article in this series will make sense, since most of them
+given in the first article in this series will now make sense, since most of them
 use masked sprites.
 
 The next article in this series will start to explore sprite animation.
