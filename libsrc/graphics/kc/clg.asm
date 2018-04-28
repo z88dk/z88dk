@@ -3,29 +3,37 @@
 ;       Stefano - Sept 2016
 ;
 ;
-;	$Id: clg.asm,v 1.2 2017-01-02 22:57:58 aralbrec Exp $
+;	$Id: clg.asm $
 ;
 
 		SECTION code_clib
                 PUBLIC    clg
                 PUBLIC    _clg
+				
+			EXTERN w_pixeladdress
 
-		INCLUDE  "target/kc/def/caos.def"
+;		INCLUDE  "target/kc/def/caos.def"
 
 .clg
 ._clg
 
-;	ld      a,7			; Fore color
-;	ld      (FARB),a
-	ld      a,7
-	ld      (COLOR),a
-;	ld      l,a
+	ld	de,0
+	ld h,d
+	ld l,e
 	
+	call	w_pixeladdress
+	ld h,d
+	ld l,e
+	inc	de
+	
+	ld	bc,10239
+	ldir
+	
+;	ld      a,7
+;	ld      (COLOR),a
+;	
+;    ld  a,$0c ; clear screen    
 ;    call PV1
-;    defb FNCOLORUP
-		
-    ld  a,$0c ; clear screen    
-    call PV1
-    defb FNCRT
+;    defb FNCRT
 	
     ret

@@ -40,6 +40,8 @@
             ENDIF
         ENDIF
 
+        defc    CONSOLE_ROWS = 16
+        defc    CONSOLE_COLUMNS = 32
 
 ; Now, getting to the real stuff now!
 
@@ -115,7 +117,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push    hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF

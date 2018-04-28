@@ -2,10 +2,10 @@
 ; 	ANSI Video handling for the Philips VG-5000
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;	Stefano Bodrato - 2014
@@ -17,16 +17,10 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 	
 	EXTERN	vg5k_attr
-
-.text_cols   defb 40
-.text_rows   defb 25
 
 
 .ansi_CHAR
@@ -37,9 +31,9 @@
 	ld    a,(vg5k_attr)
 	ld    e,a		; white on black
 	
-	ld    a,(ansi_COLUMN)
+	ld    a,(__console_x)
 	ld    l,a
-	ld    a,(ansi_ROW)	
+	ld    a,(__console_y)	
 	ld    h,a
 	push  hl
 	and   a

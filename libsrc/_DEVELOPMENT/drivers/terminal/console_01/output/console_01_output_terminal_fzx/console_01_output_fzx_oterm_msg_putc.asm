@@ -7,7 +7,7 @@ SECTION code_driver_terminal_output
 PUBLIC console_01_output_fzx_oterm_msg_putc
 PUBLIC console_01_output_fzx_oterm_msg_putc_raw
 
-EXTERN l_jpix, l_offset_ix_de, asm_fzx_putc
+EXTERN l_jpix, l_offset_ix_de
 EXTERN __fzx_puts_newline, __fzx_puts_newline_set_y
 EXTERN console_01_output_fzx_proc_linefeed
 EXTERN console_01_output_fzx_proc_check_scroll

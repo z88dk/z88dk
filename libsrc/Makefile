@@ -29,7 +29,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
-	 im2.lib lib3d.lib x11.lib
+	 im2.lib lib3d.lib x11.lib fastmath.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
@@ -142,6 +142,12 @@ gen_math.lib:
 	@echo '--- Building Z80 Generic Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/genmath
+
+fastmath.lib:
+	@echo ''
+	@echo '--- Building fast integer maths library ---'
+	@echo ''
+	$(MAKE) -C math/fastmath
 
 # Math48
 math48.lib:
@@ -1158,10 +1164,7 @@ classic-clean:
 	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C fcntl clean
-	$(MAKE) -C math/genmath clean
-	$(MAKE) -C math/z88math clean
-	$(MAKE) -C math/cpcmath clean
-	$(MAKE) -C math/zxmath clean
+	$(MAKE) -C math clean
 	$(MAKE) -C graphics clean
 	$(MAKE) -C net clean
 	$(MAKE) -C rex clean

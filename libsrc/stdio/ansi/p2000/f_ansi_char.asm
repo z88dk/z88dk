@@ -3,7 +3,7 @@
 ;
 ;	Stefano Bodrato - Apr. 2014
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -13,15 +13,10 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 	
-.text_cols   defb 40
-.text_rows   defb 25
-
 
 .ansi_CHAR
 
@@ -29,11 +24,11 @@
 	ld	a,4
 	call $60C0
 	
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	inc a
 	call $60C0
 
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	inc a
 	call $60C0
 
@@ -50,10 +45,10 @@ nounderscore:
 	ld	a,4
 	call $60C0
 
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	inc a
 	call $60C0
 
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	inc a
 	jp $60C0

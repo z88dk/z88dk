@@ -2,6 +2,7 @@
 stdio/ace/fputc_cons
 stdio/ace/fgetc_cons
 stdio/ace/getk
+stdio/ace/generic_console
 @stdio/ansicore.lst
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/ace/f_ansi_attr

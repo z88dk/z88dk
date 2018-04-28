@@ -21,7 +21,7 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 
 .PHONY: dirs
 
-all: dirs $(OBJECTS) fastmath.lst $(OUTPUT_DIRECTORY)/fastmath.lib
+all: dirs $(OBJECTS) fastmath.lst $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib
 
 obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
 	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
@@ -72,6 +72,9 @@ fastmath.lst: $(OBJECTS)
 
 $(OUTPUT_DIRECTORY)/fastmath.lib: fastmath.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath.lib @fastmath.lst
+
+$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib: fastmath.lst
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib @fastmath.lst
 
 dirs:
 	@mkdir -p $(dir $(OBJECTS))

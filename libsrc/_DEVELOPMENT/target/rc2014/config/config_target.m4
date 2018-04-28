@@ -34,6 +34,22 @@ define(`__IO_PROM_TOGGLE', 0x38)   # Port Address for PROM Toggle
 
 define(`__IO_ACIA_PORT_BASE', 0x80)   # Port Address for 68C50
 
+# Zilog SIO Port Definitions
+
+define(`__IO_SIO_PORT_BASE', 0x80)   # Port Address for SIO/0-2
+
+# Spencer's build
+define(`__IO_SIO_PORT_OFFSET_A', 0x00)   # Port Offset for A Channel (A1)
+define(`__IO_SIO_PORT_OFFSET_B', 0x02)   # Port Offset for B Channel (A1)
+define(`__IO_SIO_PORT_OFFSET_C', 0x00)   # Port Offset for Command (!A0)
+define(`__IO_SIO_PORT_OFFSET_D', 0x01)   # Port Offset for Data (!A0)
+
+# Standard (including Dr Baker)
+# define(`__IO_SIO_PORT_OFFSET_A', 0x00)   # Port Offset for A Channel (A0)
+# define(`__IO_SIO_PORT_OFFSET_B', 0x01)   # Port Offset for B Channel (A0)
+# define(`__IO_SIO_PORT_OFFSET_C', 0x02)   # Port Offset for Command (A1)
+# define(`__IO_SIO_PORT_OFFSET_D', 0x00)   # Port Offset for Data (A1)
+
 #
 # END OF USER CONFIGURATION
 ###############################################################
@@ -56,6 +72,11 @@ PUBLIC `__IO_PIO_PORT_BASE'
 PUBLIC `__IO_PROM_RESET'
 PUBLIC `__IO_PROM_TOGGLE'
 PUBLIC `__IO_ACIA_PORT_BASE'
+PUBLIC `__IO_SIO_PORT_BASE'
+PUBLIC `__IO_SIO_PORT_OFFSET_A'
+PUBLIC `__IO_SIO_PORT_OFFSET_B'
+PUBLIC `__IO_SIO_PORT_OFFSET_C'
+PUBLIC `__IO_SIO_PORT_OFFSET_D'
 ')
 
 dnl#
@@ -74,6 +95,11 @@ defc `__IO_PIO_PORT_BASE' = __IO_PIO_PORT_BASE
 defc `__IO_PROM_RESET' = __IO_PROM_RESET
 defc `__IO_PROM_TOGGLE' = __IO_PROM_TOGGLE
 defc `__IO_ACIA_PORT_BASE' = __IO_ACIA_PORT_BASE
+defc `__IO_SIO_PORT_BASE' = __IO_SIO_PORT_BASE
+defc `__IO_SIO_PORT_OFFSET_A' = __IO_SIO_PORT_OFFSET_A
+defc `__IO_SIO_PORT_OFFSET_B' = __IO_SIO_PORT_OFFSET_B
+defc `__IO_SIO_PORT_OFFSET_C' = __IO_SIO_PORT_OFFSET_C
+defc `__IO_SIO_PORT_OFFSET_D' = __IO_SIO_PORT_OFFSET_D
 ')
 
 dnl#
@@ -92,5 +118,4 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
 `#define' `__IO_PROM_RESET'  __IO_PROM_RESET
 `#define' `__IO_PROM_TOGGLE'  __IO_PROM_TOGGLE
-`#define' `__IO_ACIA_PORT_BASE'  __IO_ACIA_PORT_BASE
 ')

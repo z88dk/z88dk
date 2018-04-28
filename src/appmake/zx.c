@@ -59,7 +59,8 @@ static struct zx_common zxc = {
     NULL,       // excluded_banks
     NULL,       // excluded_sections
     0,          // clean
-    -1          // main_fence applies to banked model compiles only
+    -1,         // main_fence applies to banked model compiles only
+    0           // pages - zx next only
 };
 
 static struct zx_tape zxt = {
@@ -90,7 +91,7 @@ static struct zx_bin zxb = {
     0xff,       // romfill
     0,          // ihex
     0,          // ipad
-    16          // recsize
+    16,         // recsize
 };
 
 static char tap = 0;   // .tap tape
@@ -353,10 +354,46 @@ int zx_exec(char *target)
 
         if (mb->num > 0)
         {
+            long code_end_tail, data_end_tail, bss_end_tail;
             struct section_bin *last = &mb->secbin[mb->num - 1];
+            int error = 0;
+
+            code_end_tail = parameter_search(zxc.crtfile, ".map", "__CODE_END_tail");
+            data_end_tail = parameter_search(zxc.crtfile, ".map", "__DATA_END_tail");
+            bss_end_tail = parameter_search(zxc.crtfile, ".map", "__BSS_END_tail");
+
+            if (code_end_tail > zxc.main_fence)
+            {
+                fprintf(stderr, "\nError: The code section has exceeded the fence by %u bytes\n(last address = 0x%04x, fence = 0x%04x)\n", (unsigned int)code_end_tail - zxc.main_fence, (unsigned int)code_end_tail - 1, zxc.main_fence);
+                error++;
+            }
+
+            if (data_end_tail > zxc.main_fence)
+            {
+                fprintf(stderr, "\nError: The data section has exceeded the fence by %u bytes\n(last address = 0x%04x, fence = 0x%04x)\n", (unsigned int)data_end_tail - zxc.main_fence, (unsigned int)data_end_tail - 1, zxc.main_fence);
+                error++;
+            }
+
+            if (bss_end_tail > zxc.main_fence)
+            {
+                fprintf(stderr, "\nError: The bss section has exceeded the fence by %u bytes\n(last address = 0x%04x, fence = 0x%04x)\n", (unsigned int)bss_end_tail - zxc.main_fence, (unsigned int)bss_end_tail - 1, zxc.main_fence);
+                error++;
+            }
 
             if ((last->org + last->size) > zxc.main_fence)
-                exit_log(1, "Error: Main bank has exceeded its maximum allowed size by %u bytes (last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - zxc.main_fence, last->org + last->size - 1, zxc.main_fence);
+            {
+                fprintf(stderr, "\nWarning: Extra fragments in main bank have exceeded the fence\n");
+
+                for (i = 0; i < mb->num; ++i)
+                {
+                    struct section_bin *sb = &mb->secbin[i];
+
+                    if ((sb->org + sb->size) > zxc.main_fence)
+                        fprintf(stderr, "(section = %s, last address = 0x%04x, fence = 0x%04x)\n", sb->section_name, sb->org + sb->size - 1, zxc.main_fence);
+                }
+            }
+ 
+            if (error) exit(1);
         }
     }
 

@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_493__func__
 
 
 	INCLUDE "z80_crt0.hdr"

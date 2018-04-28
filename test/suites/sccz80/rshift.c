@@ -40,9 +40,9 @@ void test_rshift16_var(void)
      ++v;
      Assert( val >> v == 0x8000 >> 15, ">>15");
      ++v;
-     Assert( val >> v == 0x8000 >> 16, ">>16"); // Undefined
+//     Assert( val >> v == 0x8000 >> 16, ">>16"); // Undefined
      ++v;
-     Assert( val >> v == 0x8000 >> 17, ">>17"); // Undefined
+//     Assert( val >> v == 0x8000 >> 17, ">>17"); // Undefined
 }
 
 void test_rshift32_var(void)
@@ -115,9 +115,9 @@ void test_rshift32_var(void)
      ++v;
      Assert( val >> v == 0x80000000L >> 31, ">>31");
      ++v;
-     Assert( val >> v == 0x80000000L >> 32, ">>32"); // Undefined behaviour
+//     Assert( val >> v == 0x80000000L >> 32, ">>32"); // Undefined behaviour
      ++v;
-     Assert( val >> v == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
+//     Assert( val >> v == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
 }
 
 void test_rshift16_const(void)
@@ -141,8 +141,8 @@ void test_rshift16_const(void)
      Assert( val >> 13 == 0x8000 >> 13, ">>13");
      Assert( val >> 14 == 0x8000 >> 14, ">>14");
      Assert( val >> 15 == 0x8000 >> 15, ">>15");
-     Assert( val >> 16 == 0x8000 >> 16, ">>16"); // Undefined
-     Assert( val >> 17 == 0x8000 >> 17, ">>17"); // Undefined
+//     Assert( val >> 16 == 0x8000 >> 16, ">>16"); // Undefined
+//     Assert( val >> 17 == 0x8000 >> 17, ">>17"); // Undefined
 }
 
 void test_rshift32_const(void)
@@ -182,8 +182,8 @@ void test_rshift32_const(void)
      Assert( val >> 29 == 0x80000000L >> 29, ">>29");
      Assert( val >> 30 == 0x80000000L >> 30, ">>30");
      Assert( val >> 31 == 0x80000000L >> 31, ">>31");
-     Assert( val >> 32 == 0x80000000L >> 32, ">>32"); // Undefined behaviour
-     Assert( val >> 33 == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
+//     Assert( val >> 32 == 0x80000000L >> 32, ">>32"); // Undefined behaviour
+//     Assert( val >> 33 == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
 }
 
 void test_rshift32_const_unsigned(void)
@@ -223,8 +223,8 @@ void test_rshift32_const_unsigned(void)
      Assert( val >> 29 == 0x80000000UL >> 29, ">>29");
      Assert( val >> 30 == 0x80000000UL >> 30, ">>30");
      Assert( val >> 31 == 0x80000000UL >> 31, ">>31");
-     Assert( val >> 32 == 0x80000000UL >> 32, ">>32"); // Undefined behaviour
-     Assert( val >> 33 == 0x80000000UL >> 33, ">>33"); // Undefined, but it should match
+//     Assert( val >> 32 == 0x80000000UL >> 32, ">>32"); // Undefined behaviour
+//     Assert( val >> 33 == 0x80000000UL >> 33, ">>33"); // Undefined, but it should match
 }
 
 int suite_rshift()

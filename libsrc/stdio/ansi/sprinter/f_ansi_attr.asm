@@ -131,15 +131,9 @@
 	ld	(inverse_attr),a
 	ret
 
-	SECTION		code_crt_init
 
-	ld	a,@00001111       ;bright white on black
-	ld	(text_attr),a
-	ld	a,@01111000       ;grey on white
-	ld	(inverse_attr),a
-
-	SECTION	bss_clib
+	SECTION	data_clib
 
 	PUBLIC	text_attr
-.text_attr	defb	0
-.inverse_attr	defb	0
+.text_attr	defb	@00001111       ;bright white on black
+.inverse_attr	defb	@01111000       ;grey on white

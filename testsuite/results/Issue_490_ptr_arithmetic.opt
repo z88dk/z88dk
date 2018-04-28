@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_490_ptr_arithmetic
 
 
 	INCLUDE "z80_crt0.hdr"

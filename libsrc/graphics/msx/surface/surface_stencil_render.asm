@@ -19,18 +19,16 @@
 	EXTERN	base_graphics
 	EXTERN	dither_pattern
 
-	;EXTERN swapgfxbk
+	EXTERN swapgfxbk
 	EXTERN surface_pixeladdress
 	EXTERN leftbitmask, rightbitmask
 	;EXTERN swapgfxbk1
+	
+	EXTERN __graphics_end
 
 ;	
-;	$Id: surface_stencil_render.asm,v 1.7 2016-07-14 17:44:17 pauloscustodio Exp $
+;	$Id: surface_stencil_render.asm $
 ;
-
-.render_exit
-		pop	ix
-		ret
 
 .surface_stencil_render
 ._surface_stencil_render
@@ -38,8 +36,8 @@
 		ld	ix,0
 		add	ix,sp
 				
-		ld	l,(ix+6)	; surface struct
-		ld	h,(ix+7)
+		ld	l,(ix+8)	; surface struct
+		ld	h,(ix+9)
 		ld	de,6		; shift to screen buffer ptr
 		add	hl,de
 		ld	e,(hl)
@@ -47,21 +45,22 @@
 		ld	d,(hl)
 		ld	(base_graphics),de
 
-		;call	swapgfxbk
+		call	swapgfxbk
 
 		ld	c,maxy
 		push	bc
 .yloop		pop	bc
 		dec	c
 		;jp	z,swapgfxbk1
-		jr	z,render_exit
+		jp	z,__graphics_end
+
 		push	bc
 		
 		ld	d,0
 		ld	e,c
 
-		ld	l,(ix+4)	; stencil
-		ld	h,(ix+5)
+		ld	l,(ix+6)	; stencil
+		ld	h,(ix+7)
 		add	hl,de
 		ld	a,(hl)		;X1
 		
@@ -76,7 +75,7 @@
 		ld	a,(hl)
 		ld	b,a		; X2
 		
-		ld	a,(ix+2)	; intensity
+		ld	a,(ix+4)	; intensity
 		call	dither_pattern
 		ld	(pattern1+1),a
 		ld	(pattern2+1),a

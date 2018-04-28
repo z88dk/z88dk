@@ -10,12 +10,12 @@
 ;	** ROM font -DROMFONT
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -38,62 +38,73 @@ ELSE
 
 	PUBLIC	ansi_CHAR
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
+	PUBLIC	__console_w
+	PUBLIC	__console_h
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS	
 	PUBLIC	BOLD
 
+	SECTION code_crt_init
+	EXTERN	__console_w
 IF A255COL
-.text_cols   defb 255 ;defb 128
+	ld	a,255
+	ld	(__console_w),a
 ENDIF
 
 IF A160COL
-.text_cols   defb 160;defb 80
+	ld	a,160
+	ld	(__console_w),a
 ENDIF
 
 IF A170COL
-.text_cols   defb 170; defb 85
+	ld	a,170
+	ld	(__console_w),a
 ENDIF
 
 IF A128COL
-.text_cols   defb 128; defb 64
+	ld	a,128
+	ld	(__console_w),a
 ENDIF
 
 IF A102COL
-.text_cols   defb 102; defb 51
+	ld	a,102
+	ld	(__console_w),a
 ENDIF
 
 IF A85COL
-.text_cols   defb 85; defb 42
+	ld	a,85
+	ld	(__console_w),a
 ENDIF
 
 IF A80COL
-.text_cols   defb 80; defb 40
+	ld	a,80
+	ld	(__console_w),a
 ENDIF
 
 IF A73COL
-.text_cols   defb 73; defb 36
+	ld	a,73
+	ld	(__console_w),a
 ENDIF
 
 IF A64COL
-.text_cols   defb 64; defb 32
+	ld	a,64
+	ld	(__console_w),a
 ENDIF
 
 IF A56COL
-.text_cols   defb 56; defb 28
+	ld	a,56
+	ld	(__console_w),a
 ENDIF
+	SECTION	code_clib
 
-
-.text_rows   defb 24
 
 .ansi_CHAR
   ld (char+1),a
-  ld a,(ansi_ROW)       ; Line text position
+  ld a,(__console_y)       ; Line text position
   push af
   and 24
   ld d,a
@@ -110,7 +121,7 @@ ENDIF
   ld hl,DOTS+1
   ld b,(hl)
   ld hl,0
-  ld a,(ansi_COLUMN)       ; Column text position
+  ld a,(__console_x)       ; Column text position
   ld e,a
   ld d,0
   or d
@@ -135,7 +146,7 @@ ENDIF
  ; push af
 ;  ld de,22528-32
 ;  add hl,de
-;  ld a,(ansi_ROW)
+;  ld a,(__console_y)
 ;  inc a
 ;  ld de,32
 ;.CLP

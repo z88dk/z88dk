@@ -29,6 +29,8 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	defc	CONSOLE_COLUMNS = 80
+	defc	CONSOLE_ROWS = 25
 
         IF      !DEFINED_CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = $900  ; clean binary block
@@ -78,7 +80,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 ;        push    hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF

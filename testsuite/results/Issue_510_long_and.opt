@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_510_long_and
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -20,7 +19,7 @@
 	push	hl
 	call	l_glong
 	ld	a,l
-	and	18
+	and	#(18 % 256)
 	ld	l,a
 	pop	bc
 	call	l_plong
@@ -41,7 +40,7 @@
 	push	hl
 	call	l_glong
 	ld	a,h
-	and	18
+	and	#(18 % 256)
 	ld	h,a
 	pop	bc
 	call	l_plong
@@ -62,7 +61,7 @@
 	push	hl
 	call	l_glong
 	ld	a,e
-	and	18
+	and	#(18 % 256)
 	ld	e,a
 	pop	bc
 	call	l_plong
@@ -83,7 +82,7 @@
 	push	hl
 	call	l_glong
 	ld	a,d
-	and	18
+	and	#(18 % 256)
 	ld	d,a
 	pop	bc
 	call	l_plong
@@ -125,7 +124,7 @@
 	push	hl
 	call	l_glong
 	ld	a,l
-	and	18
+	and	#(18 % 256)
 	ld	l,a
 	pop	bc
 	call	l_plong

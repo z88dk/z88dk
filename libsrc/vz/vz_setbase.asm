@@ -11,16 +11,13 @@
 SECTION code_clib
 PUBLIC vz_setbase
 PUBLIC _vz_setbase
-PUBLIC scrbase
+EXTERN base_graphics
+
 
 .vz_setbase
 ._vz_setbase
 
-   ld (scrbase),hl
+   ld (base_graphics),hl
    ret
 
-	SECTION bss_clib
-.scrbase
-
-   defw $7000
  

@@ -56,6 +56,8 @@
             ENDIF
         ENDIF
 
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 24
 
 	defc	DEF__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
@@ -157,7 +159,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push    hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF

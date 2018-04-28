@@ -26,6 +26,8 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 40
 
         IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 14712
@@ -60,7 +62,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

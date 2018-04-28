@@ -47,32 +47,6 @@ t_z80asm_capture("-b -ixxxx ".asm_file(), "",
 		1);
 	
 #------------------------------------------------------------------------------
-# error_write_file
-for (  ["-b",	 	err_file()],
-	 # ["-l -b",	lis_file()],	# these files are removed at start of z80asm
-	 # ["-s -b",	sym_file()],
-	 # ["-b",		o_file()],
-	 # ["-b",		bin_file()],
-	) {
-	my($options, $file) = @$_;
-	ok 1, "$options $file";
-	
-	unlink_testfiles();
-
-	# create read-only file
-	path($file)->spew(""); 
-	ok chmod(0400, $file);
-
-	write_file( asm_file(), 'nop' );
-	t_z80asm_capture($options." ".asm_file(),
-					"", 
-					"Error: cannot write file '$file'\n".
-					"1 errors occurred during assembly\n",
-					1);
-	ok unlink($file);
-}
-
-#------------------------------------------------------------------------------
 # error_expression 
 unlink_testfiles();
 write_binfile(o_file(), objfile( NAME => "test", 
@@ -505,7 +479,7 @@ t_binary(read_binfile("test.bin"), "\xFE\x10");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o ../../ext/UNIXem/src/glob.o";
+my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o";
 
 # get init code except init() and main()
 my $init = <<'END';

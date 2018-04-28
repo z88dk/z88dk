@@ -36,15 +36,6 @@
 		PUBLIC    l_dcal
 
 
-;Exit variables
-		PUBLIC    exitsp
-		PUBLIC    exitcount
-
-;For stdin, stdout, stder
-		PUBLIC    __sgoioblk
-        
-
-		PUBLIC	base_graphics
 
 ; SEGA and MSX specific
 		PUBLIC	msxbios
@@ -66,6 +57,8 @@ ELSE
         defc    TAR__register_sp = -1
 ENDIF
 
+	defc	CONSOLE_COLUMNS = 40
+	defc	CONSOLE_ROWS = 25
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 3580000
 	INCLUDE	"crt/classic/crt_rules.inc"
@@ -209,7 +202,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN 	closeall
 	call	closeall
 ENDIF

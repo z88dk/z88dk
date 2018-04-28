@@ -10,7 +10,7 @@
 
 #include "ccdefs.h"
 
-static double   CalcStand(double left, void (*oper)(LVALUE *), double right);
+static double   CalcStand(Kind left_kind, double left, void (*oper)(LVALUE *), double right);
 static void     nstep(LVALUE *lval, int n, void (*unstep)(LVALUE *lval));
 static void     store(LVALUE *lval);
 
@@ -168,6 +168,7 @@ int primary(LVALUE* lval)
  * calculate constant expression (signed values)
  */
 double calc(
+    Kind   left_kind,
     double left,
     void (*oper)(LVALUE *),
     double right, int is16bit)
@@ -185,13 +186,19 @@ double calc(
     else if (oper == zgt)
         return (left > right);
     else if (oper == asr) {
+        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
+             (left_kind == KIND_LONG && right >= 32) ) {
+            warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
+            right = 0;
+        }
         if ( is16bit ) return ((int16_t)left >> (int16_t)right);
         else return ((int)left >> (int)right);
     } else
-        return (CalcStand(left, oper, right));
+        return (CalcStand(left_kind, left, oper, right));
 }
 
 double calcun(
+    Kind   left_kind,
     double left,
     void (*oper)(LVALUE *),
     double right)
@@ -208,10 +215,15 @@ double calcun(
         return (left < right);
     else if (oper == zgt)
         return (left > right);
-    else if (oper == asr)
+    else if (oper == asr) {
+         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
+             (left_kind == KIND_LONG && right >= 32) ) {
+            warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
+            right = 0;
+        }
         return ((unsigned int)left >> (unsigned int)right);
-    else
-        return (CalcStand(left, oper, right));
+    } else
+        return (CalcStand(left_kind, left, oper, right));
 }
 
 /*
@@ -219,6 +231,7 @@ double calcun(
  */
 
 double CalcStand(
+    Kind left_kind,
     double left,
     void (*oper)(LVALUE *),
     double right)
@@ -231,9 +244,14 @@ double CalcStand(
         return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
         return ((unsigned int)left * (unsigned int)right);
-    else if (oper == asl)
+    else if (oper == asl) {
+        if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
+             (left_kind == KIND_LONG && right >= 32) ) {
+            warningfmt("limited-range", "Left shifting by more than size of object, changed to zero");
+            right = 0;
+        }
         return ((unsigned int)left << (unsigned int)right);
-    else if (oper == zeq)
+    } else if (oper == zeq)
         return (left == right);
     else if (oper == zne)
         return (left != right);
@@ -252,7 +270,7 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 }
 
 /* Forces result, having type t2, to have type t1 */
-void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
+void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 {
     if (t2 == KIND_CARRY) {
         zcarryconv();
@@ -260,7 +278,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
 
     if (t1 == KIND_DOUBLE) {
         if (t2 != KIND_DOUBLE) {
-            convert_int_to_double(t2, sign2);
+            convert_int_to_double(t2, isunsigned2);
         }
     } else {
         if (t2 == KIND_DOUBLE) {
@@ -273,7 +291,7 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
         if (t2 != KIND_LONG ) {
-            if (sign2 == NO && sign1 == NO && t2 != KIND_CARRY) {
+            if (isunsigned2 == NO && isunsigned1 == NO && t2 != KIND_CARRY) {
                 convSint2long();
             } else
                 convUint2long();
@@ -288,13 +306,13 @@ void force(Kind t1, Kind t2, char sign1, char sign2, int isconst)
         warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
         
     /* Char conversion */
-    if (t1 == KIND_CHAR && sign2 == NO && !isconst) {
-        if (sign1 == NO)
+    if (t1 == KIND_CHAR && isunsigned2 == NO && !isconst) {
+        if (isunsigned1 == NO)
             convSint2char();
         else
             convUint2char();
-    } else if (t1 == KIND_CHAR && sign2 == YES && !isconst) {
-        if (sign1 == NO)
+    } else if (t1 == KIND_CHAR && isunsigned2 == YES && !isconst) {
+        if (isunsigned1 == NO)
             convSint2char();
         else
             convUint2char();
@@ -360,11 +378,20 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
 
     if (lval->val_type == KIND_LONG) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
-            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
+            if ( lval->ltype->isunsigned ) {
+                if ( !lval2->ltype->isunsigned ) {
+                    // RHS is signed, 
+                    convSint2long();
+                } else {
+                    convUint2long();
+                }
                 lval->ltype = type_ulong;
-                convUint2long();
             } else {
-                convSint2long();
+                if ( lval2->ltype->isunsigned ) {
+                    convUint2long();
+                } else {
+                    convSint2long();
+                }
                 lval->ltype = type_long;
             }
             lval->val_type = KIND_LONG;
@@ -660,6 +687,29 @@ void rvalue(LVALUE* lval)
 #endif
 }
 
+/* Check the comparison range, try to determine always true/false conditions */
+int check_range(LVALUE *lval, int32_t min_value, int32_t max_value) 
+{
+    int always = -1;
+    void (*oper)(LVALUE *lva) = lval->binop;
+
+    if ( ( oper == zlt && lval->const_val > max_value) ||
+        (oper == zle && lval->const_val > max_value ) ||
+        ( oper == zgt && lval->const_val < min_value) ||
+        ( oper == zgt && lval->const_val < min_value) ||
+        ( oper == zge && lval->const_val <= min_value) ||
+        ( oper == zne && (lval->const_val < min_value || lval->const_val > max_value)) ) {
+        always = 1;
+    } else if ( (oper == zlt && lval->const_val < min_value) ||
+                (oper == zle && lval->const_val < min_value ) ||
+                (oper == zgt && lval->const_val > max_value) ||
+                (oper == zge && lval->const_val >= max_value) ||
+                ( oper == zeq && (lval->const_val < min_value || lval->const_val > max_value)) ) {
+        always = 0;
+    }
+    return always;
+}
+
 /** 
  * \retval 1 - If constant true
  * \retval 0 - If constant false
@@ -669,7 +719,6 @@ int test(int label, int parens)
 {
     char *before, *start;
     LVALUE lval={0};
-    void (*oper)(LVALUE *lva);
     
     if (parens)
         needchar('(');
@@ -687,54 +736,24 @@ int test(int label, int parens)
         needchar(')');
     if (lval.is_const) { /* constant expression */
         clearstage(before, 0);
+        lval.binop = NULL;
         if (lval.const_val) {
             /* true constant, perform body */
-            return 1;
+            return lval.const_val;
         }
         /* false constant, jump round body */
       //  jump(label);
         return 0;
     }
-    if (lval.stage_add) { /* stage address of "..oper 0" code */
-        lval.ltype= lval.stage_add_ltype;
-        
-        oper = lval.binop; /* operator function pointer */
-        lval.binop = 0; /* Reset binop to 0 so not picked up by comparison ops */
-        if (oper == zeq || (oper == zle && utype(&lval)))
-            zerojump(eq0, label, &lval);
-        else if (oper == zne || (oper == zgt && utype(&lval)))
-            zerojump(testjump, label, &lval);
-        else if (oper == zge && utype(&lval)) {
-            zerojump(ge0, label, &lval);
-            clearstage(lval.stage_add, 0);
-            return 1; // Always true
-        } else if (oper == zlt && utype(&lval)) {
-            warningfmt("unreachable","Unreachable code follows");
-            zerojump(jump0, label, &lval);
-            clearstage(before, start);
-            return 0; // Always false
-        } else if (oper == zgt && utype(&lval)) {
-            zerojump(testjump, label, &lval);  // Convert to != 0
-        } else if (oper == zgt)
-            zerojump(gt0, label, &lval);
-        else if (oper == zge)
-            zerojump(ge0, label, &lval);
-        else if (oper == zlt)
-            zerojump(lt0, label, &lval);
-        else if (oper == zle)
-            zerojump(le0, label, &lval);
-        else
-            testjump(&lval, label);
-    } else {
-        if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
-            if (lval.binop == dummy) {
-                lval.val_type = KIND_INT; /* logical always int */
-                lval.ltype = type_int;
-            }
-            testjump(&lval, label);
-        } else {
-            jumpnc(label);
+    
+    if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
+        if (lval.binop == dummy) {
+            lval.val_type = KIND_INT; /* logical always int */
+            lval.ltype = type_int;
         }
+        testjump(&lval, label);
+    } else {
+        jumpnc(label);
     }
     clearstage(before, start);
     return -1;

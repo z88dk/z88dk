@@ -109,7 +109,7 @@ start:
 
 cleanup:
 	push	hl
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall	;Close all opened files
 	call	closeall
 ENDIF

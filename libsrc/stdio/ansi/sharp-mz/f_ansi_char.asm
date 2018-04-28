@@ -2,10 +2,10 @@
 ; 	ANSI Video handling for the SHARP MZ
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -15,17 +15,11 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
 	EXTERN	current_attr
 	
-
-.text_cols   defb 40
-.text_rows   defb 25
 
 ; 0=space
 ; 1=A..Z
@@ -78,7 +72,7 @@
 .setout
 	push	af
 	ld	hl,$D000
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	and	a
 	jr	z,r_zero
 	ld	b,a
@@ -87,7 +81,7 @@
 	add	hl,de
 	djnz	r_loop
 .r_zero
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	ld	d,0
 	ld	e,a
 	add	hl,de

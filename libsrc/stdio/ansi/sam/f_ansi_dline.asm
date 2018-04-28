@@ -19,10 +19,10 @@
  	EXTERN	ansi_default
 	EXTERN	ansi_restore	
 	
-	EXTERN	ansi_ROW
+	EXTERN	__console_y
 	
 .ansi_del_line
- 	ld	(ansi_ROW),a
+ 	ld	(__console_y),a
 
 	call	ansi_default
 	ld	b,32

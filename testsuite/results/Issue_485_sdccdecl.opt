@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_485_sdccdecl
 
 
 	INCLUDE "z80_crt0.hdr"

@@ -62,6 +62,31 @@ ifelse(__STARTUP, 0,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; sio driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 4,
+`
+   ; sioa drivers installed on stdin, stdout, stderr,
+   ; siob drivers installed on ttyin, ttyout, ttyerr
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 1
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/rc2014_crt_4.asm.m4')
+')
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -71,7 +96,7 @@ ifelse(__STARTUP, 16,
 
    IFNDEF __CRTCFG
    
-      defc __CRTCFG = 1
+      defc __CRTCFG = 2
    
    ENDIF
    
@@ -94,7 +119,7 @@ ifelse(__STARTUP, 256,
 
    IFNDEF __CRTCFG
    
-      defc __CRTCFG = 2
+      defc __CRTCFG = 3
    
    ENDIF
    

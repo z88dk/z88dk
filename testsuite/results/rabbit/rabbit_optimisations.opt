@@ -1,7 +1,6 @@
 
 
 
-	MODULE	rabbit_rabbit_optimisations
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -93,8 +92,7 @@
 	ex	de,hl
 	ld	hl,(sp + 2)
 	add	hl,hl
-	rl	e
-	rl	d
+	rl	de
 	push	de
 	push	hl
 	bool	hl

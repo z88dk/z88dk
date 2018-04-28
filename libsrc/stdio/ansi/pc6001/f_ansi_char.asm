@@ -2,10 +2,10 @@
 ; 	ANSI Video handling for the PC6001
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -15,25 +15,19 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
-
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 	
 	EXTERN	pc6001_attr
-
-.text_cols   defb 32
-.text_rows   defb 16
 
 
 .ansi_CHAR
 
 	push	af
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	inc	a
 	ld	l,a
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	inc	a
 	ld	h,a
 	CALL 11CDh      ; L2A - convert location to screen address

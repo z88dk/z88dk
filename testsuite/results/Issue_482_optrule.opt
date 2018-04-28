@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_482_optrule
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -14,7 +13,7 @@
 	add	hl,sp
 	ld	e,(hl)
 	ld	d,0
-	ld	hl,4-2	;const
+	ld	hl,2	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
@@ -56,7 +55,7 @@
 	add	hl,sp
 	ld	e,(hl)
 	ld	d,0
-	ld	hl,4-2	;const
+	ld	hl,2	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
@@ -70,7 +69,7 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	ld	hl,4-2	;const
+	ld	hl,2	;const
 	add	hl,sp
 	call	l_gint
 	ex	de,hl

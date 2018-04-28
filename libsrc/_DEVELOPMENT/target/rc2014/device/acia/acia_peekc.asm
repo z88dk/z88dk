@@ -7,15 +7,14 @@
     EXTERN aciaRxCount, aciaRxOut
 
     _acia_peekc:
-
-        ld a, (aciaRxCount)         ; get the number of bytes in the Rx buffer
-        ld l, a                     ; and put it in hl
+        ld a,(aciaRxCount)          ; get the number of bytes in the Rx buffer
+        ld l,a                      ; and put it in hl
         or a                        ; see if there are zero bytes available
-        ret z                       ; if the count is zero, then return
+        ret Z                       ; if the count is zero, then return
 
-        ld hl, (aciaRxOut)          ; get the pointer to place where we pop the Rx byte
-        ld a, (hl)                  ; get the Rx byte
-        ld l, a                     ; and put it in hl
+        ld hl,(aciaRxOut)           ; get the pointer to place where we pop the Rx byte
+        ld a,(hl)                   ; get the Rx byte
+        ld l,a                      ; and put it in hl
         ret
 
     EXTERN _acia_need

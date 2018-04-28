@@ -2,7 +2,7 @@
 *        ZX NEXT Application Generator
 *        See also zx.c
 *
-*        Alvin Albrecht  - 09/2017
+*        Alvin Albrecht  - 09/2017 through 03/2018
 */
 
 #include "appmake.h"
@@ -21,7 +21,8 @@ static struct zx_common zxc = {
     NULL,       // excluded_banks
     NULL,       // excluded_sections
     0,          // clean
-    -1          // main_fence applies to banked model compiles only
+    -1,         // main_fence applies to banked model compiles only
+    0           // pages
 };
 
 static struct zx_tape zxt = {
@@ -69,6 +70,7 @@ option_t zxn_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &zxc.binname },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &zxc.origin },
     {  0 , "main-fence", "Main bin restricted below this address", OPT_INT, &zxc.main_fence },
+    {  0 , "pages",    "Output memory in 8k pages",  OPT_BOOL,  &zxc.pages },
     { 'o', "output",   "Name of output file\n",      OPT_STR,   &zxc.outfile },
 
     {  0,  "bin",      "Make .bin instead of .tap",  OPT_BOOL,  &bin },
@@ -380,10 +382,11 @@ int zxn_exec(char *target)
                     newsec.filename = must_strdup(sb->filename);
                     newsec.offset = offset;
 
-                    buffer = must_malloc((strlen(sb->section_name) + 6) * sizeof(*buffer));
-                    sprintf(buffer, "%s_f%03u", sb->section_name, part);
-                    newsec.section_name = buffer;
+                    // buffer = must_malloc((strlen(sb->section_name) + 6) * sizeof(*buffer));
+                    // sprintf(buffer, "%s_f%03u", sb->section_name, part);
+                    // newsec.section_name = buffer;
 
+                    newsec.section_name = must_strdup(sb->section_name);
                     newsec.org = (org & 0x3fff) + 0xc000;
 
                     len = min(0x10000 - newsec.org, size);
@@ -432,10 +435,46 @@ int zxn_exec(char *target)
 
         if (mb->num > 0)
         {
+            long code_end_tail, data_end_tail, bss_end_tail;
             struct section_bin *last = &mb->secbin[mb->num - 1];
+            int error = 0;
+
+            code_end_tail = parameter_search(zxc.crtfile, ".map", "__CODE_END_tail");
+            data_end_tail = parameter_search(zxc.crtfile, ".map", "__DATA_END_tail");
+            bss_end_tail = parameter_search(zxc.crtfile, ".map", "__BSS_END_tail");
+
+            if (code_end_tail > zxc.main_fence)
+            {
+                fprintf(stderr, "\nError: The code section has exceeded the fence by %u bytes\n(last address = 0x%04x, fence = 0x%04x)\n", (unsigned int)code_end_tail - zxc.main_fence, (unsigned int)code_end_tail - 1, zxc.main_fence);
+                error++;
+            }
+
+            if (data_end_tail > zxc.main_fence)
+            {
+                fprintf(stderr, "\nError: The data section has exceeded the fence by %u bytes\n(last address = 0x%04x, fence = 0x%04x)\n", (unsigned int)data_end_tail - zxc.main_fence, (unsigned int)data_end_tail - 1, zxc.main_fence);
+                error++;
+            }
+
+            if (bss_end_tail > zxc.main_fence)
+            {
+                fprintf(stderr, "\nError: The bss section has exceeded the fence by %u bytes\n(last address = 0x%04x, fence = 0x%04x)\n", (unsigned int)bss_end_tail - zxc.main_fence, (unsigned int)bss_end_tail - 1, zxc.main_fence);
+                error++;
+            }
 
             if ((last->org + last->size) > zxc.main_fence)
-                exit_log(1, "Error: Main bank has exceeded its maximum allowed size by %u bytes (last address = 0x%04x, fence = 0x%04x)\n", last->org + last->size - zxc.main_fence, last->org + last->size - 1, zxc.main_fence);
+            {
+                fprintf(stderr, "\nWarning: Extra fragments in main bank have exceeded the fence\n");
+
+                for (i = 0; i < mb->num; ++i)
+                {
+                    struct section_bin *sb = &mb->secbin[i];
+
+                    if ((sb->org + sb->size) > zxc.main_fence)
+                        fprintf(stderr, "(section = %s, last address = 0x%04x, fence = 0x%04x)\n", sb->section_name, sb->org + sb->size - 1, zxc.main_fence);
+                }
+            }
+
+            if (error) exit(1);
         }
     }
 
@@ -469,7 +508,124 @@ int zxn_exec(char *target)
         }
     }
 
-    if (bin || sna || dot)
+    // if user wants memory represented in 8k segments must switch from current 16k segments
+
+    if (zxc.pages)
+    {
+        // move everything from BANK space to PAGE space
+        // at this point everything in BANK space lies in [0xc000, 0xffff] 
+
+        mb_create_bankspace(&memory, "PAGE");
+        bsnum_page = mb_find_bankspace(&memory, "PAGE");
+
+        if ((bsnum_page >= 0) && (bsnum_bank >= 0))
+        {
+            for (i = 0; i < MAXBANKS; ++i)
+            {
+                int numlive = 0;
+                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+
+                for (j = 0; j < mb->num; ++j)
+                {
+                    int pnum = MAXBANKS;
+                    struct section_bin *sb = &mb->secbin[j];
+
+                    int org = sb->org;
+                    int size = sb->size;   // size of section in bytes
+                    uint32_t offset = sb->offset;   // offset of data in source file
+
+                    // reassign to page space
+
+                    while (size > 0)
+                    {
+                        int len;
+                        struct section_bin newsec;
+
+                        // make a new section to contain this part
+
+                        memset(&newsec, 0, sizeof(newsec));
+
+                        newsec.filename = must_strdup(sb->filename);
+                        newsec.offset = offset;
+                        newsec.section_name = must_strdup(sb->section_name);
+                        newsec.org = org & 0x1fff;
+
+                        len = min(0x2000 - newsec.org, size);
+                        newsec.size = len;
+
+                        // put the section in PAGE space
+
+                        pnum = i * 2 + (org >= 0xe000);
+
+                        if (pnum < MAXBANKS)
+                        {
+                            struct memory_bank *dst;
+
+                            dst = &memory.bankspace[bsnum_page].membank[pnum];
+
+                            dst->num++;
+                            dst->secbin = must_realloc(dst->secbin, dst->num * sizeof(*dst->secbin));
+
+                            memcpy(&dst->secbin[dst->num - 1], &newsec, sizeof(*dst->secbin));
+                        }
+
+                        // update pointers
+
+                        org += len;
+                        size -= len;
+                        offset += len;
+                    }
+
+                    // flag this section for removal from BANK bankspace
+
+                    if (pnum < MAXBANKS)
+                    {
+                        free(sb->filename);
+                        free(sb->section_name);
+
+                        sb->filename = NULL;
+                        sb->section_name = NULL;
+
+                        sb->size = 0;
+                    }
+                    else
+                        numlive++;
+                }
+
+                // remove dead sections from BANK
+
+                for (j = 0; j < mb->num; ++j)
+                {
+                    if (mb->secbin[j].size == 0)
+                    {
+                        memcpy(&mb->secbin[j], &mb->secbin[j + 1], (mb->num - j - 1) * sizeof(*mb->secbin));
+
+                        if (--mb->num > 0)
+                            mb->secbin = must_realloc(mb->secbin, mb->num * sizeof(*mb->secbin));
+                        else
+                        {
+                            free(mb->secbin);
+                            mb->secbin = NULL;
+                        }
+
+                        j--;
+                    }
+                }
+            }
+        }
+
+        //
+
+        if (zxb.fullsize)
+        {
+            memory.bankspace[bsnum_page].org = 0x0000;
+            memory.bankspace[bsnum_page].size = 0x2000;
+        }
+    }
+
+    // output remaining memory bank contents as raw binaries
+
+    if (bin || sna || dot || tap)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
         ret = 0;

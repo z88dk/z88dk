@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_510_mult_minus1
 
 
 	INCLUDE "z80_crt0.hdr"

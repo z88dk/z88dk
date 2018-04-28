@@ -37,10 +37,7 @@
         PUBLIC    l_dcal
 
 
-        PUBLIC    exitsp
-        PUBLIC    exitcount
 
-        PUBLIC    __sgoioblk
 
 ; Enterprise 64/128 specific stuff
 		PUBLIC    warmreset
@@ -178,7 +175,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF

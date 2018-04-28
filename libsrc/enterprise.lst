@@ -2,7 +2,6 @@
 stdio/enterprise/fgetc_cons
 stdio/enterprise/getk
 stdio/enterprise/fputc_cons
-stdio/enterprise/puts_cons
 time/enterprise/clock
 games/enterprise/joystick
 games/enterprise/bit_open

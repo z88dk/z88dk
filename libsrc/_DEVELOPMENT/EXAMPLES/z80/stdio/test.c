@@ -9,7 +9,7 @@ void main(void)
 {
    while (1)
    {
-      printf("Message: ";
+      printf("Message: ");
       
       fflush(stdin);
       scanf("%63s", buf);

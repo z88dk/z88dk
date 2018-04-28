@@ -7,15 +7,21 @@
 ;	$Id: puts_cons.asm,v 1.7 2016-07-02 13:52:42 dom Exp $
 ;
 
-		MODULE puts_cons_native
+		MODULE puts_cons
 		SECTION	code_clib
-		PUBLIC	puts_cons_native
+		PUBLIC	puts_cons
+		PUBLIC	_puts_cons
+		PUBLIC	cputs
+		PUBLIC	_cputs
 		EXTERN	fputc_cons
 
 
 ; Enter in with hl holding the address of string to print
 
-.puts_cons_native
+.puts_cons
+._puts_cons
+.cputs
+._cputs
 	pop	bc
 	pop	hl
 	push	hl

@@ -1,0 +1,25 @@
+Object  file test.o at $0000: Z80RMF03
+  Name: file1
+  Org:  $0000
+  Section "": 63 bytes
+    C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
+    C $0010: 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20
+    C $0020: 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30
+    C $0030: 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
+  Symbols:
+    L A $0002 start1
+    L A $0002 start2
+    G A $0002 msg1
+    G A $0002 msg2
+    G C $0000 main
+  Externs:
+    U         ext1
+    U         ext2
+  Expressions:
+    E Ub $0000 $0001: start1 % 256
+    E Sb $0000 $0001: start2 % 127
+    E Cw $0000 $0001: msg1
+    E Ll $0000 $0001: msg2
+    E Cw $0000 $0001: ext1
+    E Ll $0000 $0001: ext2
+    E Cw $0000 $0001: msg2-msg1

@@ -1,4 +1,4 @@
-INCLUDE "config_private.inc"
+INCLUDE "config_z80_private.inc"
 
 SECTION code_driver
 SECTION code_driver_terminal_input

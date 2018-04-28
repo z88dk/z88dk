@@ -1,7 +1,6 @@
 
 
 
-	MODULE	paramsoffset
 
 
 	INCLUDE "z80_crt0.hdr"

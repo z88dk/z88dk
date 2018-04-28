@@ -184,8 +184,8 @@ extern void     pop_buffer_fp(void);
 
 /* primary.c */
 extern int      primary(LVALUE *lval);
-extern double   calc(double left, void (*oper)(LVALUE *), double right, int is16bit);
-extern double   calcun(double left, void (*oper)(LVALUE *),double right);
+extern double   calc(Kind left_kind, double left, void (*oper)(LVALUE *), double right, int is16bit);
+extern double   calcun(Kind left_kind, double left, void (*oper)(LVALUE *),double right);
 extern int      intcheck(LVALUE *lval, LVALUE *lval2);
 extern void     force(Kind t1, Kind t2, char sign1, char sign2, int lconst);
 extern int      widen(LVALUE *lval, LVALUE *lval2);
@@ -205,6 +205,7 @@ extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern void     convert_int_to_double(char type, char zunsign);
 extern int      utype(LVALUE *lval);
 extern int      check_lastop_was_testjump(LVALUE *lval);
+extern int      check_range(LVALUE *lval, int32_t min_value, int32_t max_value) ;
 
 /* stmt.c */
 extern int      statement(void);

@@ -1,7 +1,6 @@
 
 
 
-	MODULE	long_addition_opts
 
 
 	INCLUDE "z80_crt0.hdr"

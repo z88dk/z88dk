@@ -16,6 +16,12 @@ Contact the author:
 	homepage  : http://jannone.org/gfxlib
 	ICQ UIN   : 10115284
 
+
+	
+z88dk specific build instructions:
+zcc +msx -subtype=msxdos -create-app -oex8 ex8.c
+
+
 =========================================================================*/
 
 #include <stdio.h>
@@ -26,22 +32,7 @@ Contact the author:
 #define MAX_BUF		(256 * 8)
 
 // cursor shape
-extern void *square;
-
-// binary data for cursor shape
-#asm
-._square
-	defb @11100111
-	defb @10000001
-	defb @10000001
-	defb @00000000
-	defb @00000000
-	defb @10000001
-	defb @10000001
-	defb @11100111
-
-#endasm
-
+extern char square[]={0xE7,0x81,0x81,0x00,0x00,0x81,0x81,0xE7};
 
 // zooms into a char shape
 void preview_char(u_char* p) {
@@ -97,7 +88,7 @@ void do_preview(u_char* buf) {
 	}	
 }
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 	FILE* f;
 	bool preview;
 	u_char buf[MAX_BUF];

@@ -2,7 +2,8 @@
 EXECFILES = adv_a.cas othello.cas enigma.cas fib.cas mm.cas rpn.cas tic.cas sorter.cas \
 	chessboard.cas mandel.cas julia.cas smallgfx.cas stencil.cas showlib3d.cas \
 	smallgfx2.cas sinwave.cas coswave.cas smile.cas clicktest.cas fx.cas \
-	sndtest.cas synthdemo.cas dstar.cas dstar_native.cas
+	sndtest.cas synthdemo.cas dstar.cas dstar_native.cas \
+	globe.cas microman.cas snakes.cas
 
 
 
@@ -21,6 +22,15 @@ dstar_native.vz: dstar.c
 
 adv_a.vz: ../console/adv_a.c
 	zcc +vz -vn -DCOMPUTE_SCORE $^ -O3 -o $@
+
+globe.vz: ../graphics/globe.c
+	zcc +vz -vn -DNOLOGO -lm -llib3d $^ -O3 -Dhires -o $@
+
+microman.vz: ../microman.c
+	zcc +vz -vn $^ -I.. -DJOYSTICK_DIALOG -DDEFINE_JOYSTICK_TYPE -DCOMPACT=2 -DSIZE=6 -DSOUND -o microman.vz
+
+snakes.vz: snakes.c
+	zcc +vz -vn $^ -DJOYSTICK_DIALOG -DDEFINE_JOYSTICK_TYPE  -o $@
 
 %.vz: ../console/%.c
 	zcc +vz -vn $^ -O3 -o $@

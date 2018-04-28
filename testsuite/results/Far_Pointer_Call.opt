@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Far_Pointer_Call
 
 
 	INCLUDE "z80_crt0.hdr"

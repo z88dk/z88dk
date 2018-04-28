@@ -46,6 +46,7 @@ graphics/setxy
 graphics/move
 graphics/pen_up
 graphics/pen_down
+graphics/putc4x6
 graphics/xorborder
 graphics/xorplot
 graphics/text6/plotpixl

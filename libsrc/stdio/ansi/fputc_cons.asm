@@ -9,6 +9,7 @@
 ;	$Id: fputc_cons.asm,v 1.7 2016-05-15 20:15:45 dom Exp $
 ;
 
+	MODULE	fputc_cons_ansi
 	SECTION		code_clib
           PUBLIC  fputc_cons_ansi
 	  EXTERN	f_ansi

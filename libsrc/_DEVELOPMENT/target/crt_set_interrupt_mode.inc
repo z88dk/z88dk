@@ -29,14 +29,23 @@
       ld i,a
 
       IF (__Z180)
-      
+
         ; Set the z180 internal interrupt vector low byte  
-            
-        ld a,+(__crt_org_vector_table+__IO_VECTOR_BASE)&$E0
+
+        IF (__crt_org_vector_table < 0)
+
+           ld a,+(-__crt_org_vector_table+__IO_VECTOR_BASE)&$E0
+
+        ELSE
+
+           ld a,+(__crt_org_vector_table+__IO_VECTOR_BASE)&$E0
+
+        ENDIF
+
         out0 (IL),a
-        
+
       ENDIF
-   
+
    ENDIF
    
    IF (__crt_interrupt_mode >= 0) && (__crt_interrupt_mode <= 2)

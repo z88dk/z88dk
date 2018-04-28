@@ -4,13 +4,16 @@
 ;	 Colour Genie EG2000 version By Stefano Bodrato
 ;
 ;
-; $Id: bksave.asm,v 1.4 2017-01-02 22:57:57 aralbrec Exp $
+; $Id: bksave.asm $
 ;
 
 	SECTION   code_clib
 	PUBLIC    bksave
 	PUBLIC    _bksave
+	
 	EXTERN	pixeladdress
+	
+        EXTERN	__graphics_end
 
 .bksave
 ._bksave
@@ -81,8 +84,7 @@
 	pop	bc
 	
 	djnz	_sloop
-	pop	ix	;restore callers
-	ret
+	jp __graphics_end
 
 .bksavew
 	push	bc
@@ -131,5 +133,4 @@
 	pop	bc
 	
 	djnz	bksavew
-	pop	ix	;restore callers
-	ret
+	jp __graphics_end

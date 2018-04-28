@@ -16,10 +16,10 @@
 
 	EXTERN		ansi_del_line
 
-	EXTERN	text_rows
+	EXTERN	__console_h
 
 .ansi_cls
-	ld a,(text_rows)
+	ld a,(__console_h)
 	ld b,a
 
 .clsloop

@@ -10,12 +10,12 @@
 ;	** ROM font -DROMFONT
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -26,11 +26,9 @@
 	PUBLIC	ansi_CHAR
     INCLUDE "target/osca/def/flos.def"
 	
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
-	PUBLIC	text_cols
-	PUBLIC	text_rows
 
 ;	EXTERN	cursor_y
 ;	EXTERN	cursor_x
@@ -38,23 +36,21 @@
 ;.mychar   defb 0
 ;          defb 0 ; string termination
 	
-.text_cols   defb 40
-.text_rows   defb 25
 
 .ansi_CHAR
 
 ;	ld (mychar),a
-;	ld a,(ansi_ROW)
+;	ld a,(__console_y)
 ;	ld (cursor_y),a
-;	ld a,(ansi_COLUMN)
+;	ld a,(__console_x)
 ;	ld (cursor_x),a
 ;	ld hl,mychar
 ;	jp kjt_print_string
 
 	ld e,a
-	ld a,(ansi_COLUMN)
+	ld a,(__console_x)
 	ld b,a
-	ld a,(ansi_ROW)
+	ld a,(__console_y)
 	ld c,a
 	ld a,e
 	jp kjt_plot_char

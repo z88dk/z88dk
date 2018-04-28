@@ -1,7 +1,6 @@
 
 
 
-	MODULE	Issue_98_check_int
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -31,9 +30,10 @@
 
 ._mul3
 	ld	de,(_g)
-	ld	hl,4-2	;const
-	add	hl,sp
-	call	l_gint	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	call	l_mult
 	ret
 
@@ -79,9 +79,10 @@
 
 ._div3
 	ld	de,(_g)
-	ld	hl,4-2	;const
-	add	hl,sp
-	call	l_gint	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	call	l_div
 	ret
 
@@ -92,8 +93,8 @@
 	pop	hl
 	push	hl
 	push	bc
-	ld	de,2
-	add	hl,de
+	inc	hl
+	inc	hl
 	ret
 
 
@@ -111,11 +112,10 @@
 
 ._sub
 	pop	bc
-	pop	hl
-	push	hl
+	pop	de
+	push	de
 	push	bc
-	ld	de,2
-	ex	de,hl
+	ld	hl,2
 	and	a
 	sbc	hl,de
 	ret
@@ -165,9 +165,10 @@
 
 ._sub3
 	ld	de,(_g)
-	ld	hl,4-2	;const
-	add	hl,sp
-	call	l_gint	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	ex	de,hl
 	and	a
 	sbc	hl,de

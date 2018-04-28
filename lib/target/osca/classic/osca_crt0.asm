@@ -94,6 +94,9 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $5000
 ENDIF
 
+        defc    CONSOLE_COLUMNS = 40
+        defc    CONSOLE_ROWS = 25
+
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65536 - 6
 	defc	__CPU_CLOCK = 4000000
@@ -198,7 +201,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push	hl		;save exit value
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF
@@ -356,7 +359,7 @@ current_asciicode	ds.b 1
 
         SECTION  rodata_clib
 IF !DEFINED_noredir
-IF !DEFINED_nostreams
+IF CRT_ENABLE_STDIO = 1
 redir_fopen_flag:               defb    'w',0
 redir_fopen_flagr:              defb    'r',0
 ENDIF

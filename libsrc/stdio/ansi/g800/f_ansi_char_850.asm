@@ -5,10 +5,10 @@
 ;	Original code by maruhiro, 2007
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -19,11 +19,14 @@
 		
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
+	EXTERN	__console_w
+	EXTERN	__console_h
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
+
+	EXTERN	CONSOLE_COLUMNS
+	EXTERN	CONSOLE_ROWS
 
 	
 	PUBLIC	init_screen
@@ -44,9 +47,6 @@
 ;ATTR_KANJIL_MASK=0x20
 
 	
-defc SMALL_WIDTH=36
-defc SMALL_HEIGHT=8
-
 
 
 defc SCREENMODE_VISIBLECURSOR_MASK=0x01
@@ -57,23 +57,13 @@ defc SCREENMODE_VISIBLECURSOR_BIT=0
 ;
 
 
-;	EXTERN	ansirows
-;.text_rows   defb ansirows
-screen_width:
-text_cols:
-	defb SMALL_WIDTH
-	
-screen_height:
-text_rows:
-	defb SMALL_HEIGHT
-
 
 
 
 
 .ansi_CHAR
 _print_char:
-	ld de,(ansi_COLUMN)
+	ld de,(__console_x)
 	; D=x; E=Y
 	push	ix	;save callers
 ;	push BC
@@ -441,8 +431,8 @@ ENDIF
 ;
 update_cell:
 	; font size?
-	ld A, (screen_height)
-	cp SMALL_HEIGHT
+	ld A, (__console_h)
+	cp CONSOLE_ROWS
 	jp Z, update_cell_3x5
 
 ;
@@ -456,9 +446,9 @@ ENDIF
 	ld B, 0
 	ld D, B
 	call setpat3x5
-	ld A, (IX+SMALL_WIDTH*1)
+	ld A, (IX+CONSOLE_COLUMNS*1)
 IF USE_ATTR
-	ld C, (IY+SMALL_WIDTH*1)
+	ld C, (IY+CONSOLE_COLUMNS*1)
 ENDIF
 	ld B, 6
 	inc D
@@ -477,7 +467,7 @@ ENDIF
 IF USE_ATTR
 	add IY, BC
 ENDIF
-	ld BC, SMALL_WIDTH
+	ld BC, CONSOLE_COLUMNS
 	inc D
 	dec D
 	jr Z, update_cell_3x5_0
@@ -522,9 +512,9 @@ ENDIF
 	ld B, -2
 	ld D, 1
 	call setpat3x5
-	ld A, (IX+SMALL_WIDTH*1)
+	ld A, (IX+CONSOLE_COLUMNS*1)
 IF USE_ATTR
-	ld C, (IY+SMALL_WIDTH*1)
+	ld C, (IY+CONSOLE_COLUMNS*1)
 ENDIF
 	ld B, 4
 	inc D
@@ -539,9 +529,9 @@ ENDIF
 	ld B, -4
 	ld D, 2
 	call setpat3x5
-	ld A, (IX+SMALL_WIDTH*1)
+	ld A, (IX+CONSOLE_COLUMNS*1)
 IF USE_ATTR
-	ld C, (IY+SMALL_WIDTH*1)
+	ld C, (IY+CONSOLE_COLUMNS*1)
 ENDIF
 	ld B, 2
 	inc D
@@ -556,9 +546,9 @@ ENDIF
 	ld B, 0
 	ld D, 4
 	call setpat3x5
-	ld A, (IX+SMALL_WIDTH*1)
+	ld A, (IX+CONSOLE_COLUMNS*1)
 IF USE_ATTR
-	ld C, (IY+SMALL_WIDTH*1)
+	ld C, (IY+CONSOLE_COLUMNS*1)
 ENDIF
 	ld B, 6
 	inc D
@@ -573,9 +563,9 @@ ENDIF
 	ld B, -2
 	ld D, 5
 	call setpat3x5
-	ld A, (IX+SMALL_WIDTH*1)
+	ld A, (IX+CONSOLE_COLUMNS*1)
 IF USE_ATTR
-	ld C, (IY+SMALL_WIDTH*1)
+	ld C, (IY+CONSOLE_COLUMNS*1)
 ENDIF
 	ld B, 4
 	inc D
@@ -591,9 +581,9 @@ ENDIF
 	ld B, -4
 	ld D, 6
 	call setpat3x5
-	ld A, (IX+SMALL_WIDTH*1)
+	ld A, (IX+CONSOLE_COLUMNS*1)
 IF USE_ATTR
-	ld C, (IY+SMALL_WIDTH*1)
+	ld C, (IY+CONSOLE_COLUMNS*1)
 ENDIF
 	ld B, 2
 	inc D
@@ -704,15 +694,15 @@ vram_size:
 	ret
 
 vram_size_table:
-	defw SMALL_WIDTH * 0
-	defw SMALL_WIDTH * 1
-	defw SMALL_WIDTH * 2
-	defw SMALL_WIDTH * 3
-	defw SMALL_WIDTH * 4
-	defw SMALL_WIDTH * 5
-	defw SMALL_WIDTH * 6
-	defw SMALL_WIDTH * 7
-	defw SMALL_WIDTH * 8
+	defw CONSOLE_COLUMNS * 0
+	defw CONSOLE_COLUMNS * 1
+	defw CONSOLE_COLUMNS * 2
+	defw CONSOLE_COLUMNS * 3
+	defw CONSOLE_COLUMNS * 4
+	defw CONSOLE_COLUMNS * 5
+	defw CONSOLE_COLUMNS * 6
+	defw CONSOLE_COLUMNS * 7
+	defw CONSOLE_COLUMNS * 8
 
 ;
 ; Initialize the screen
@@ -728,7 +718,7 @@ init_screen:
 	ld HL, 0
 	ld (update_loc), HL
 	; Initialize screen area
-	ld A, (screen_height)
+	ld A, (__console_h)
 	dec A
 	ld L, A
 	ld (screen_region), HL
@@ -757,7 +747,7 @@ init_screen_loop:
 ; AF, BC, HL: Destroyed
 ;
 clear_screen:
-	ld HL, SMALL_HEIGHT - 1
+	ld HL, CONSOLE_ROWS - 1
 
 ;
 ; Delete the scroll area of the screen
@@ -814,7 +804,7 @@ clear_region0:
 	ld (HL), ' '
 IF USE_ATTR
 	; Delete one attribute
-	ld BC, (SMALL_WIDTH * 8 + 8)
+	ld BC, (CONSOLE_COLUMNS * 8 + 8)
 	add HL, BC
 	ld (HL), 0
 ENDIF
@@ -837,7 +827,7 @@ IF USE_ATTR
 	; Delete attribute
 	pop HL
 	pop DE
-	ld BC, (SMALL_WIDTH * 8 + 8)
+	ld BC, (CONSOLE_COLUMNS * 8 + 8)
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -869,7 +859,7 @@ IF USE_ATTR
 	ldir
 	pop HL
 	pop DE
-	ld BC, (SMALL_WIDTH * 8 + 8)
+	ld BC, (CONSOLE_COLUMNS * 8 + 8)
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -877,7 +867,7 @@ IF USE_ATTR
 	pop BC
 	ldir
 
-	ld BC, -(SMALL_WIDTH * 8 + 8)
+	ld BC, -(CONSOLE_COLUMNS * 8 + 8)
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -1038,7 +1028,7 @@ refresh_screen0:
 	ret P
 	
 	; x := WIDTH - 1
-	ld A, (screen_width)
+	ld A, (__console_w)
 	dec A
 	ld (HL), A
 	
@@ -1233,7 +1223,7 @@ ENDIF
 ;
 screen_region:
 screen_bottom:
-	defb SMALL_HEIGHT - 1
+	defb CONSOLE_ROWS - 1
 screen_top:
 	defb 0
 

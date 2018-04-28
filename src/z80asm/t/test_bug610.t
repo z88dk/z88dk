@@ -30,10 +30,9 @@ spew("test.def",	"test");
 run("z80asm test");
 
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Code: 1 bytes
+  Section "": 1 bytes
     C $0000: 00
 END
 

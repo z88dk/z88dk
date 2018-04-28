@@ -1,11 +1,11 @@
 
-OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o disassembler.o debugger.o linenoise.o utf8.o syms.o
+OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o debugger.o linenoise.o utf8.o syms.o disassembler_alg.o memory.o
 
-DISOBJS = disassembler_main.o disassembler.o syms.o disassembler_alg.o
+DISOBJS = disassembler_main.o  syms.o disassembler_alg.o
 
 INSTALL ?= install
 
-CFLAGS += -I../../ext/uthash/src/
+CFLAGS += -I../../ext/uthash/src/ -g
 
 all: ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX)
 

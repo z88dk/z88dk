@@ -1,7 +1,6 @@
 
 
 
-	MODULE	z180_Issue_481_multiply_char
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -64,7 +63,7 @@
 	dec	sp
 	pop	de
 	push	de
-	ld	hl,+(4 - 2)	;const
+	ld	hl,2	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0

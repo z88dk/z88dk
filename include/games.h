@@ -138,6 +138,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 5
 #endif
 
+#ifdef __ACE__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"Keys 1-5","Keys 6-0","Cursor"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
 #ifdef __ZX81__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
@@ -171,6 +178,13 @@ extern unsigned char *joystick_type[];
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 #endif
 	#define GAME_DEVICES 1
+#endif
+
+#ifdef __VZ200__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"Keys 1-5","Keys 6-0","QAOP-MN"};
+#endif
+	#define GAME_DEVICES 3
 #endif
 
 #ifdef __ZXVGS__

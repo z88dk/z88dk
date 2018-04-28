@@ -1,3 +1,4 @@
+**/*.bak
 **/*.d
 **/*.err
 **/*.exe
@@ -46,6 +47,7 @@ support/graphics/z80svg
 t/**
 win32/*/Debug/
 win32/*/Release/
+win32/*/x64/
 win32/.vs/
 win32/Debug/
 win32/Release/

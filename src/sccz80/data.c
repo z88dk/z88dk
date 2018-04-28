@@ -51,7 +51,7 @@ char Filename[FILENAME_LEN + 1]; /* original file name */
 
 /* My stuff for LIB of long common functions */
 
-int need_floatpack, c_doinline, ncomp;
+int need_floatpack, ncomp;
 
 int stackargs;
 

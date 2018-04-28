@@ -32,10 +32,14 @@ _get_vdp_reg:
 
 IF FORmsx
 	ld	de,RG0SAV
-ELSE
-	ld	de,RG0SAV
-ENDIF
 	add	hl,de
+ELSE
+	dec l
+	ld	hl,RG0SAV
+	jr	c,have_rg0
+	ld	hl,RG1SAV
+have_rg0:
+ENDIF
 	
 	ld	l,(hl)
 	ld	h,0

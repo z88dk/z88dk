@@ -11,22 +11,6 @@
 
 
 
-uint8_t get_memory(int pc)
-{
-  return mem[pc & 65535];
-}
-
-
-uint8_t *get_memory_addr(int pc)
-{
-  return &mem[pc & 65535];
-}
-
-uint8_t put_memory(int pc, uint8_t b)
-{
-  return mem[pc & 65535] = b;
-}
-
 // fr = zero, ff = carry, ff&128 = s/p
 
 // TODO: Setting P flag
@@ -570,7 +554,6 @@ unsigned char
       , ioe = 0
       ;
 
-unsigned char * mem;
 
 char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
@@ -606,7 +589,7 @@ int in(int port){
 }
 
 void out(int port, int value){
-  return;
+  memory_handle_paging(port, value);
 }
 
 int f(void){
@@ -637,12 +620,13 @@ void setf(int a){
   fa= 255 & (fb= a & -129 | (a&4)<<5);
 }
 
+
+
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0;
   char * output= NULL;
+  char  *memory_model = "standard";
   FILE * fh;
-
-  mem = calloc(0x10000, 1);
 
   hook_init();
   debugger_init();
@@ -661,6 +645,7 @@ int main (int argc, char **argv){
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
+    printf("  -b <model>     Memory model (zxn/64k)"),
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
@@ -678,6 +663,9 @@ int main (int argc, char **argv){
         case 'w':
           alarmtime = strtol(argv[1], NULL, 10);
           counter = 400000000LL * alarmtime;
+          break;
+        case 'b':
+          memory_model = argv[1];
           break;
         case 'p':
           pc= strtol(argv[1], NULL, 16);
@@ -716,6 +704,7 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
             c_cpu = CPU_Z80_ZXN;
+            memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
             c_cpu = CPU_R2K;
           } else {
@@ -774,14 +763,16 @@ int main (int argc, char **argv){
             argc--;
             argv++;
           }
-          mem[65280] = cmd_arguments_len % 256;
-          memcpy(&mem[65281], cmd_arguments, cmd_arguments_len % 256);
+          put_memory(65280,cmd_arguments_len % 256);
+          memcpy(get_memory_addr(65281), cmd_arguments, cmd_arguments_len % 256);
           break;
         default:
           printf("\nWrong Argument: %s\n", argv[0]);
           exit(-1);
       }
     else{
+      memory_init(memory_model);
+
       fh= fopen(argv[1], "rb");
       if( !fh )
         printf("\nFile not found: %s\n", argv[1]),
@@ -797,7 +788,7 @@ int main (int argc, char **argv){
         if( !fk )
           printf("\nZX Spectrum ROM file not found: 48.rom\n"),
           exit(-1);
-        (void)fread(mem, 1, 16384, fk);
+        (void)fread(get_memory_addr(0), 1, 16384, fk);
         fclose(fk);
         (void)fread(&i, 1, 1, fh);
         (void)fread(&l_, 1, 1, fh);
@@ -833,11 +824,11 @@ int main (int argc, char **argv){
         (void)fread(&sp, 2, 1, fh);
         (void)fread(&im, 1, 1, fh);
         (void)fread(&w, 1, 1, fh);
-        (void)fread(mem+0x4000, 1, 0xc000, fh);
+        (void)fread(get_memory_addr(0x4000), 1, 0xc000, fh);
         RET(0);
       }
       else if( size==65574 )
-        (void)fread(mem, 1, 65536, fh),
+        (void)fread(get_memory_addr(0), 1, 65536, fh),
         (void)fread(&w, 1, 1, fh),
         u= w,
         (void)fread(&a, 1, 1, fh),
@@ -874,7 +865,7 @@ int main (int argc, char **argv){
         (void)fread(&im, 1, 1, fh),
         (void)fread(&mp, 2, 1, fh);
       else
-        (void)fread(mem, 1, size, fh);
+        (void)fread(get_memory_addr(0), 1, size, fh);
     }
     ++argv;
     --argc;
@@ -3157,7 +3148,7 @@ int main (int argc, char **argv){
               TEST(h, 7);
             } else if ( c_cpu == CPU_Z80_ZXN ) {   // (ZXN) mirror a
               a = mirror_table[a & 0x0f] << 4 | mirror_table[(a & 0xf0) >> 4];
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3179,6 +3170,27 @@ int main (int argc, char **argv){
               fa= 0; break;
             }
             break;
+          case 0x91:
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t v = get_memory(pc++);
+              uint8_t r = get_memory(pc++);
+              out(0x243b, v);
+              out(0x253b, r);
+              st += 16;
+            } else {
+              st+= 8; break;
+            }
+            break;
+          case 0x92:
+            if ( c_cpu == CPU_Z80_ZXN ) {
+              uint8_t v = get_memory(pc++);
+              out(0x243b, v);
+              out(0x253b, a);
+              st += 12;
+            } else {
+              st+= 8; break;
+            }
+            break;
           case 0x00: case 0x01: case 0x02: case 0x03:        // NOP
           case 0x05: case 0x06: case 0x07:
           case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -3196,7 +3208,7 @@ int main (int argc, char **argv){
           case 0x84: case 0x85: case 0x86: case 0x87:
           case 0x88: case 0x89: 
           case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-          case 0x90: case 0x91: case 0x92: case 0x93:
+          case 0x90: case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
@@ -3224,6 +3236,7 @@ int main (int argc, char **argv){
           case 0x23:                                         // (ZXN) swapnib
             if ( c_cpu == CPU_Z80_ZXN ) {
               a = (( a & 0xf0) >> 4) | (( a & 0x0f) << 4);
+              st += 8;
             } else {
               st += 8;
             }
@@ -3234,16 +3247,14 @@ int main (int argc, char **argv){
             e = d;
             d = t;
             e = (mirror_table[e & 0x0f] << 4) | mirror_table[(e & 0xf0) >> 4];
-            st += 4;
+            st += 8;
             break;
           case 0x30:                                         // (ZXN) mul
             if ( c_cpu == CPU_Z80_ZXN ) {
-              int32_t result = (( d * 256 ) + e) * (( h * 256 ) + l);
-              d = (result >> 24);
-              e = (result >> 16) & 0xff;
-              h  = (result >> 8 ) & 0xff;
-              l = result & 0xff;
-              st += 4;
+              int16_t result = d * e;
+              d  = (result >> 8 ) & 0xff;
+              e = result & 0xff;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3253,7 +3264,7 @@ int main (int argc, char **argv){
               int16_t result = (( h * 256 ) + l) + a;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3263,7 +3274,7 @@ int main (int argc, char **argv){
               int16_t result = (( d * 256 ) + e) + a;
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3273,7 +3284,7 @@ int main (int argc, char **argv){
               int16_t result = (( b * 256 ) + c) + a;
               b  = (result >> 8 ) & 0xff;
               c = result & 0xff;
-              st += 4;
+              st += 8;
             } else {
               st += 8;
             }
@@ -3285,7 +3296,7 @@ int main (int argc, char **argv){
               int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
-              st += 12;
+              st += 16;
             } else if ( c_cpu == CPU_Z180 ) {               // (Z180) TST A,(HL)
               uint8_t v = get_memory(l | h << 8);
               TEST(v, 10);
@@ -3300,7 +3311,7 @@ int main (int argc, char **argv){
               int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
-              st += 12;
+              st += 16;
             } else {
               st += 8;
             }
@@ -3312,7 +3323,7 @@ int main (int argc, char **argv){
               int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
               b = (result >> 8 ) & 0xff;
               c = result & 0xff;
-              st += 12;
+              st += 16;
             } else {
               st += 8;
             }
@@ -3414,10 +3425,10 @@ int main (int argc, char **argv){
             break;
           case 0x8a:                                         // (ZXN) push $xxxx
             if ( c_cpu == CPU_Z80_ZXN ) {
-              uint8_t msb = get_memory(pc++);
               uint8_t lsb = get_memory(pc++);
+              uint8_t msb = get_memory(pc++);
               PUSH(msb,lsb);
-              st += 22;
+              st += 19  ;
             } else {
               st += 8;
             }
@@ -3434,6 +3445,7 @@ int main (int argc, char **argv){
             if ( c_cpu == CPU_Z80_ZXN ) {
               uint8_t v = get_memory(pc++);
               TEST(v, 7);
+              st += 11;
             } else {
               st += 8;
             }
@@ -3996,11 +4008,11 @@ int main (int argc, char **argv){
       fwrite(&sp, 2, 1, fh),
       fwrite(&im, 1, 1, fh),
       fwrite(&w, 1, 1, fh),
-      fwrite(mem+0x4000, 1, 0xc000, fh);
+      fwrite(get_memory_addr(0x4000), 1, 0xc000, fh);
     else if ( !strcasecmp(strchr(output, '.'), ".scr" ) )
-      fwrite(mem+0x4000, 1, 0x1b00, fh);
+      fwrite(get_memory_addr(0x4000), 1, 0x1b00, fh);
     else{
-      fwrite(mem, 1, 65536, fh);
+      fwrite(get_memory_addr(0), 1, 65536, fh);
       w= f();
       fwrite(&w, 1, 1, fh);    // 10000 F
       fwrite(&a, 1, 1, fh);    // 10001 A

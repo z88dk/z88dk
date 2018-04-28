@@ -99,3 +99,6 @@ stdio/obj/stdesc/__printf_handle_llo
 stdio/obj/stdesc/__printf_handle_llu
 stdio/obj/stdesc/__printf_handle_llx
 stdio/obj/stdesc/kbhit
+stdio/obj/stdesc/fputc_cons_generic
+stdio/obj/stdesc/fputc_cons_generic_ioctl
+@stdio/conio.lst

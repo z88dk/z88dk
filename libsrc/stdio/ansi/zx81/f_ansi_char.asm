@@ -10,8 +10,8 @@
 
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.__console_w	= max columns
+;	.__console_h	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
 
@@ -27,7 +27,7 @@
 ; No file for ROM Font
 
 ;
-;	Display a char in location (ansi_ROW),(ansi_COLUMN)
+;	Display a char in location (__console_y),(__console_x)
 ;	A=char to display
 ;
 ;
@@ -49,30 +49,22 @@ ENDIF
 	
 	EXTERN	base_graphics
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
+	EXTERN	__console_y
+	EXTERN	__console_x
 
-	PUBLIC	text_cols
-IF G007
-	PUBLIC	text_rows
-ENDIF
-IF MTHRG
-	PUBLIC	text_rows
-ENDIF
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
-	EXTERN	ansicolumns
-.text_cols   defb ansicolumns
-
 IF G007
-.text_rows   defb 23
+	SECTION	code_crt_init
+	EXTERN	_console_h
+	ld	a,23
+	ld	(_console_h),a
+	SECTION	code_clib
 ENDIF
-IF MTHRG
-.text_rows   defb 24
-ENDIF
+
 
 .ansi_CHAR
 	ld	hl,char+1
@@ -115,7 +107,7 @@ ENDIF
 ; --- END OF ROM FONT ADAPTER ---
 .norom
   ld (hl),a
-  ld a,(ansi_ROW)       ; Line text position
+  ld a,(__console_y)       ; Line text position
   
 IF G007
 	ld  h,0
@@ -160,7 +152,7 @@ ENDIF
   ld b,(hl)
   ld hl,0
 
-  ld a,(ansi_COLUMN)       ; Column text position
+  ld a,(__console_x)       ; Column text position
   ld e,a
   ld d,0
   or d
