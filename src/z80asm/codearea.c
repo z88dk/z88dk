@@ -544,7 +544,8 @@ Bool fwrite_module_code(FILE *file, int* p_code_size)
 		/* write all sections, even empty ones, to allow user to define sections list by
 		   a sequence of SECTION statements
 		   exception: empty section, as it is the first one anyway, if no ORG is defined */
-		if (size > 0 || section != get_first_section(NULL) || section->origin >= 0)
+		if (size > 0 || section != get_first_section(NULL) || 
+		    section->origin >= 0 || section->align > 1)
 		{
 			xfput_int32(file, size);
 			xfput_count_byte_strz(file, section->name);
